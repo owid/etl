@@ -48,13 +48,81 @@ definitions:
       - The original survey question used a scale where 0 meant "worry all of the time" and 10 meant "do not ever worry". We have reversed the scale so that 0 is "never" and 10 is "always", to make the interpretation of the data more intuitive.
 
   life_sat: &life_sat
-    title: Life satisfaction - Share of people who answer << answer >>
+    title: Life satisfaction - Share of people who answer ANSWER
     unit: "%"
     short_unit: "%"
     description_short: |-
-      Share of people who answer << answer >> when asked "Overall, how satisfied are you with your life as a whole these days?", with 0 being "not at all satisfied" and 10 being "completely satisfied".
+      Share of people who answer ANSWER when asked "Overall, how satisfied are you with your life as a whole these days?", with 0 being "not at all satisfied" and 10 being "completely satisfied".
     description_key:
       - "{definitions.survey_text.life_sat}"
+
+  wb_fiveyrs: &wb_fiveyrs
+    title: Life evaluation outlook - Share of people who answered ANSWER
+    unit: "%"
+    short_unit: "%"
+    description_short: |-
+      Share of people who answered ANSWER when asked "Imagine a [ladder](#dod:cantril-ladder) with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. Take your best guess: On which step of the ladder do you think you will stand in about five years from now?"
+    description_key:
+      - "{definitions.survey_text.wb_fiveyrs}"
+
+  wb_today: &wb_today
+    title: Life evaluation - Share of people who answered ANSWER
+    unit: "%"
+    short_unit: "%"
+    description_short: |-
+      Share of people who answered ANSWER when asked "Imagine a [ladder](#dod:cantril-ladder) with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?"
+    description_key:
+      - "{definitions.survey_text.wb_today}"
+
+  worry_safety: &worry_safety
+    title: Safety worry - Share of people who answered ANSWER
+    unit: "%"
+    short_unit: "%"
+    description_short: |-
+      Share of people who answered ANSWER when asked "How often do you worry about safety, food or housing?", where 0 is "never" and 10 is "always".
+    description_processing: |-
+      {definitions.processing_notes.worry_safety}
+    description_key:
+      - "{definitions.survey_text.worry}"
+
+  physical_hlth_ans_9_share: &physical_hlth
+    title: Physical health - Share of people who answered ANSWER
+    unit: "%"
+    short_unit: "%"
+    description_short: |-
+      Share of people who answered ANSWER when asked "How would you rate your overall physical health?", where 0 is "poor physical health" and 10 is "excellent physical health".
+    description_key:
+      - "{definitions.survey_text.physical_health}"
+
+  lonely_ans_1_share: &lonely
+    title: Loneliness - Share of people who answered ANSWER
+    unit: "%"
+    short_unit: "%"
+    description_short: |-
+      Share of people who answered ANSWER when asked "How often do you feel lonely?", where 0 is "never" and 10 is "always".
+    description_processing: |-
+      {definitions.processing_notes.lonely}
+    description_key:
+      - "{definitions.survey_text.lonely}"
+
+  mental_health_ans_0_share: &mental_health
+    title: Mental health - Share of people who answered ANSWER
+    unit: "%"
+    short_unit: "%"
+    description_short: |-
+      Share of people who answered ANSWER when asked "How would you rate your overall mental health?", where 0 is "poor mental health" and 10 is "excellent mental health".
+    description_key:
+      - "{definitions.survey_text.mental_health}"
+
+
+  hope_future_ans_0_share: &hope_future
+    title: Hopefulness - Share of people who answered ANSWER
+    unit: "%"
+    short_unit: "%"
+    description_short: |-
+      Share of people who answered ANSWER when asked to rate how much they agree with the statement "Despite challenges, I always remain hopeful about the future.", where 0 is "strongly disagree" and 10 is "strongly agree".
+    description_key:
+      - "{definitions.survey_text.hope}"
 
 dataset:
   update_period_days: 365
@@ -220,73 +288,27 @@ tables:
         description_short: |-
           Share of respondents who did not answer the question "Overall, how satisfied are you with your life as a whole these days?"
       life_sat_ans_0_share:
-        title: Life satisfaction - Share of people who answer 0
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answer 0 when asked "Overall, how satisfied are you with your life as a whole these days?", with 0 being "not at all satisfied" and 10 being "completely satisfied".
-        description_key:
-          - "{definitions.survey_text.life_sat}"
+        <<: *life_sat
       life_sat_ans_1_share:
-        context:
-          answer: 1
         <<: *life_sat
       life_sat_ans_2_share:
-        context:
-          answer: 2
         <<: *life_sat
       life_sat_ans_3_share:
-        context:
-          answer: 3
         <<: *life_sat
       life_sat_ans_4_share:
-        context:
-          answer: 4
         <<: *life_sat
       life_sat_ans_5_share:
-        context:
-          answer: 5
         <<: *life_sat
       life_sat_ans_6_share:
-        title: Life satisfaction - Share of people who answer 6
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answer 6 when asked "Overall, how satisfied are you with your life as a whole these days?", with 0 being "not at all satisfied" and 10 being "completely satisfied".
-        description_key:
-          - "{definitions.survey_text.life_sat}"
+        <<: *life_sat
       life_sat_ans_7_share:
-        title: Life satisfaction - Share of people who answer 7
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answer 7 when asked "Overall, how satisfied are you with your life as a whole these days?", with 0 being "not at all satisfied" and 10 being "completely satisfied".
-        description_key:
-          - "{definitions.survey_text.life_sat}"
+        <<: *life_sat
       life_sat_ans_8_share:
-        title: Life satisfaction - Share of people who answer 8
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answer 8 when asked "Overall, how satisfied are you with your life as a whole these days?", with 0 being "not at all satisfied" and 10 being "completely satisfied".
-        description_key:
-          - "{definitions.survey_text.life_sat}"
+        <<: *life_sat
       life_sat_ans_9_share:
-        title: Life satisfaction - Share of people who answer 9
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answer 9 when asked "Overall, how satisfied are you with your life as a whole these days?", with 0 being "not at all satisfied" and 10 being "completely satisfied".
-        description_key:
-          - "{definitions.survey_text.life_sat}"
+        <<: *life_sat
       life_sat_ans_10_share:
-        title: Life satisfaction - Share of people who answer 10
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answer 10 when asked "Overall, how satisfied are you with your life as a whole these days?", with 0 being "not at all satisfied" and 10 being "completely satisfied".
-        description_key:
-          - "{definitions.survey_text.life_sat}"
+        <<: *life_sat
       close_to_no_share:
         title: Share of people who feel close to no one
         unit: "%"
@@ -891,93 +913,27 @@ tables:
         description_short: |-
          Share of respondents who did not answer the question "Despite challenges, I always remain hopeful about the future."
       hope_future_ans_0_share:
-        title: Hopefulness - Share of people who answered 0
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-         Share of people who answered 0 when asked to rate how much they agree with the statement "Despite challenges, I always remain hopeful about the future.", where 0 is "strongly disagree" and 10 is "strongly agree".
-        description_key:
-          - "{definitions.survey_text.hope}"
+        <<: *hope_future
       hope_future_ans_1_share:
-        title: Hopefulness - Share of people who answered 1
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-         Share of people who answered 1 when asked to rate how much they agree with the statement "Despite challenges, I always remain hopeful about the future.", where 0 is "strongly disagree" and 10 is "strongly agree".
-        description_key:
-          - "{definitions.survey_text.hope}"
+        <<: *hope_future
       hope_future_ans_2_share:
-        title: Hopefulness - Share of people who answered 2
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-         Share of people who answered 2 when asked to rate how much they agree with the statement "Despite challenges, I always remain hopeful about the future.", where 0 is "strongly disagree" and 10 is "strongly agree".
-        description_key:
-          - "{definitions.survey_text.hope}"
+        <<: *hope_future
       hope_future_ans_3_share:
-        title: Hopefulness - Share of people who answered 3
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-         Share of people who answered 3 when asked to rate how much they agree with the statement "Despite challenges, I always remain hopeful about the future.", where 0 is "strongly disagree" and 10 is "strongly agree".
-        description_key:
-          - "{definitions.survey_text.hope}"
+        <<: *hope_future
       hope_future_ans_4_share:
-        title: Hopefulness - Share of people who answered 4
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-         Share of people who answered 4 when asked to rate how much they agree with the statement "Despite challenges, I always remain hopeful about the future.", where 0 is "strongly disagree" and 10 is "strongly agree".
-        description_key:
-          - "{definitions.survey_text.hope}"
+        <<: *hope_future
       hope_future_ans_5_share:
-        title: Hopefulness - Share of people who answered 5
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-         Share of people who answered 5 when asked to rate how much they agree with the statement "Despite challenges, I always remain hopeful about the future.", where 0 is "strongly disagree" and 10 is "strongly agree".
-        description_key:
-          - "{definitions.survey_text.hope}"
+        <<: *hope_future
       hope_future_ans_6_share:
-        title: Hopefulness - Share of people who answered 6
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-         Share of people who answered 6 when asked to rate how much they agree with the statement "Despite challenges, I always remain hopeful about the future.", where 0 is "strongly disagree" and 10 is "strongly agree".
-        description_key:
-          - "{definitions.survey_text.hope}"
+        <<: *hope_future
       hope_future_ans_7_share:
-        title: Hopefulness - Share of people who answered 7
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-         Share of people who answered 7 when asked to rate how much they agree with the statement "Despite challenges, I always remain hopeful about the future.", where 0 is "strongly disagree" and 10 is "strongly agree".
-        description_key:
-          - "{definitions.survey_text.hope}"
+        <<: *hope_future
       hope_future_ans_8_share:
-        title: Hopefulness - Share of people who answered 8
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-         Share of people who answered 8 when asked to rate how much they agree with the statement "Despite challenges, I always remain hopeful about the future.", where 0 is "strongly disagree" and 10 is "strongly agree".
-        description_key:
-          - "{definitions.survey_text.hope}"
+        <<: *hope_future
       hope_future_ans_9_share:
-        title: Hopefulness - Share of people who answered 9
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-         Share of people who answered 9 when asked to rate how much they agree with the statement "Despite challenges, I always remain hopeful about the future.", where 0 is "strongly disagree" and 10 is "strongly agree".
-        description_key:
-          - "{definitions.survey_text.hope}"
+        <<: *hope_future
       hope_future_ans_10_share:
-        title: Hopefulness - Share of people who answered 10
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-         Share of people who answered 10 when asked to rate how much they agree with the statement "Despite challenges, I always remain hopeful about the future.", where 0 is "strongly disagree" and 10 is "strongly agree".
-        description_key:
-          - "{definitions.survey_text.hope}"
+        <<: *hope_future
       mental_health_mean:
         title: Self-reported mental health
         unit: ""
@@ -991,93 +947,27 @@ tables:
         description_short: |-
          Share of respondents who did not answer the question "How would you rate your overall mental health?"
       mental_health_ans_0_share:
-        title: Mental health - Share of people who answered 0
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-         Share of people who answered 0 when asked "How would you rate your overall mental health?", where 0 is "poor mental health" and 10 is "excellent mental health".
-        description_key:
-          - "{definitions.survey_text.mental_health}"
+        <<: *mental_health
       mental_health_ans_1_share:
-        title: Mental health - Share of people who answered 1
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-         Share of people who answered 1 when asked "How would you rate your overall mental health?", where 0 is "poor mental health" and 10 is "excellent mental health".
-        description_key:
-          - "{definitions.survey_text.mental_health}"
+        <<: *mental_health
       mental_health_ans_2_share:
-        title: Mental health - Share of people who answered 2
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-         Share of people who answered 2 when asked "How would you rate your overall mental health?", where 0 is "poor mental health" and 10 is "excellent mental health".
-        description_key:
-          - "{definitions.survey_text.mental_health}"
+        <<: *mental_health
       mental_health_ans_3_share:
-        title: Mental health - Share of people who answered 3
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-         Share of people who answered 3 when asked "How would you rate your overall mental health?", where 0 is "poor mental health" and 10 is "excellent mental health".
-        description_key:
-          - "{definitions.survey_text.mental_health}"
+        <<: *mental_health
       mental_health_ans_4_share:
-        title: Mental health - Share of people who answered 4
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-         Share of people who answered 4 when asked "How would you rate your overall mental health?", where 0 is "poor mental health" and 10 is "excellent mental health".
-        description_key:
-          - "{definitions.survey_text.mental_health}"
+        <<: *mental_health
       mental_health_ans_5_share:
-        title: Mental health - Share of people who answered 5
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-         Share of people who answered 5 when asked "How would you rate your overall mental health?", where 0 is "poor mental health" and 10 is "excellent mental health".
-        description_key:
-          - "{definitions.survey_text.mental_health}"
+        <<: *mental_health
       mental_health_ans_6_share:
-        title: Mental health - Share of people who answered 6
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-         Share of people who answered 6 when asked "How would you rate your overall mental health?", where 0 is "poor mental health" and 10 is "excellent mental health".
-        description_key:
-          - "{definitions.survey_text.mental_health}"
+        <<: *mental_health
       mental_health_ans_7_share:
-        title: Mental health - Share of people who answered 7
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-         Share of people who answered 7 when asked "How would you rate your overall mental health?", where 0 is "poor mental health" and 10 is "excellent mental health".
-        description_key:
-          - "{definitions.survey_text.mental_health}"
+        <<: *mental_health
       mental_health_ans_8_share:
-        title: Mental health - Share of people who answered 8
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-         Share of people who answered 8 when asked "How would you rate your overall mental health?", where 0 is "poor mental health" and 10 is "excellent mental health".
-        description_key:
-          - "{definitions.survey_text.mental_health}"
+        <<: *mental_health
       mental_health_ans_9_share:
-        title: Mental health - Share of people who answered 9
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-         Share of people who answered 9 when asked "How would you rate your overall mental health?", where 0 is "poor mental health" and 10 is "excellent mental health".
-        description_key:
-          - "{definitions.survey_text.mental_health}"
+        <<: *mental_health
       mental_health_ans_10_share:
-        title: Mental health - Share of people who answered 10
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-         Share of people who answered 10 when asked "How would you rate your overall mental health?", where 0 is "poor mental health" and 10 is "excellent mental health".
-        description_key:
-          - "{definitions.survey_text.mental_health}"
+        <<: *mental_health
       lonely_mean:
         title: Self-reported loneliness
         unit: ""
@@ -1095,115 +985,27 @@ tables:
         description_short: |-
          Share of respondents who did not answer the question "How often do you feel lonely?"
       lonely_ans_0_share:
-        title: Loneliness - Share of people who answered 0
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-         Share of people who answered 0 when asked "How often do you feel lonely?", where 0 is "never" and 10 is "always".
-        description_processing: |-
-          {definitions.processing_notes.lonely}
-        description_key:
-          - "{definitions.survey_text.lonely}"
+        <<: *lonely
       lonely_ans_1_share:
-        title: Loneliness - Share of people who answered 1
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-         Share of people who answered 1 when asked "How often do you feel lonely?", where 0 is "never" and 10 is "always".
-        description_processing: |-
-          {definitions.processing_notes.lonely}
-        description_key:
-          - "{definitions.survey_text.lonely}"
+        <<: *lonely
       lonely_ans_2_share:
-        title: Loneliness - Share of people who answered 2
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-         Share of people who answered 2 when asked "How often do you feel lonely?", where 0 is "never" and 10 is "always".
-        description_processing: |-
-          {definitions.processing_notes.lonely}
-        description_key:
-          - "{definitions.survey_text.lonely}"
+        <<: *lonely
       lonely_ans_3_share:
-        title: Loneliness - Share of people who answered 3
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-         Share of people who answered 3 when asked "How often do you feel lonely?", where 0 is "never" and 10 is "always".
-        description_processing: |-
-          {definitions.processing_notes.lonely}
-        description_key:
-          - "{definitions.survey_text.lonely}"
+        <<: *lonely
       lonely_ans_4_share:
-        title: Loneliness - Share of people who answered 4
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-         Share of people who answered 4 when asked "How often do you feel lonely?", where 0 is "never" and 10 is "always".
-        description_processing: |-
-          {definitions.processing_notes.lonely}
-        description_key:
-          - "{definitions.survey_text.lonely}"
+        <<: *lonely
       lonely_ans_5_share:
-        title: Loneliness - Share of people who answered 5
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-         Share of people who answered 5 when asked "How often do you feel lonely?", where 0 is "never" and 10 is "always".
-        description_processing: |-
-          {definitions.processing_notes.lonely}
-        description_key:
-          - "{definitions.survey_text.lonely}"
+        <<: *lonely
       lonely_ans_6_share:
-        title: Loneliness - Share of people who answered 6
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-         Share of people who answered 6 when asked "How often do you feel lonely?", where 0 is "never" and 10 is "always".
-        description_processing: |-
-          {definitions.processing_notes.lonely}
-        description_key:
-          - "{definitions.survey_text.lonely}"
+        <<: *lonely
       lonely_ans_7_share:
-        title: Loneliness - Share of people who answered 7
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-         Share of people who answered 7 when asked "How often do you feel lonely?", where 0 is "never" and 10 is "always".
-        description_processing: |-
-          {definitions.processing_notes.lonely}
-        description_key:
-          - "{definitions.survey_text.lonely}"
+        <<: *lonely
       lonely_ans_8_share:
-        title: Loneliness - Share of people who answered 8
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-         Share of people who answered 8 when asked "How often do you feel lonely?", where 0 is "never" and 10 is "always".
-        description_processing: |-
-          {definitions.processing_notes.lonely}
-        description_key:
-          - "{definitions.survey_text.lonely}"
+        <<: *lonely
       lonely_ans_9_share:
-        title: Loneliness - Share of people who answered 9
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-         Share of people who answered 9 when asked "How often do you feel lonely?", where 0 is "never" and 10 is "always".
-        description_processing: |-
-          {definitions.processing_notes.lonely}
-        description_key:
-          - "{definitions.survey_text.lonely}"
+        <<: *lonely
       lonely_ans_10_share:
-        title: Loneliness - Share of people who answered 10
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-         Share of people who answered 10 when asked "How often do you feel lonely?", where 0 is "never" and 10 is "always".
-        description_processing: |-
-          {definitions.processing_notes.lonely}
-        description_key:
-          - "{definitions.survey_text.lonely}"
+        <<: *lonely
       physical_hlth_mean:
         title: Self-reported physical health
         unit: ""
@@ -1217,93 +1019,27 @@ tables:
         description_short: |-
          Share of respondents who did not answer the question "How would you rate your overall physical health?"
       physical_hlth_ans_0_share:
-        title: Physical health - Share of people who answered 0
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-         Share of people who answered 0 when asked "How would you rate your overall physical health?", where 0 is "poor physical health" and 10 is "excellent physical health".
-        description_key:
-          - "{definitions.survey_text.physical_health}"
+        <<: *physical_hlth
       physical_hlth_ans_1_share:
-        title: Physical health - Share of people who answered 1
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-         Share of people who answered 1 when asked "How would you rate your overall physical health?", where 0 is "poor physical health" and 10 is "excellent physical health".
-        description_key:
-          - "{definitions.survey_text.physical_health}"
+        <<: *physical_hlth
       physical_hlth_ans_2_share:
-        title: Physical health - Share of people who answered 2
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-         Share of people who answered 2 when asked "How would you rate your overall physical health?", where 0 is "poor physical health" and 10 is "excellent physical health".
-        description_key:
-          - "{definitions.survey_text.physical_health}"
+        <<: *physical_hlth
       physical_hlth_ans_3_share:
-        title: Physical health - Share of people who answered 3
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-         Share of people who answered 3 when asked "How would you rate your overall physical health?", where 0 is "poor physical health" and 10 is "excellent physical health".
-        description_key:
-          - "{definitions.survey_text.physical_health}"
+        <<: *physical_hlth
       physical_hlth_ans_4_share:
-        title: Physical health - Share of people who answered 4
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-         Share of people who answered 4 when asked "How would you rate your overall physical health?", where 0 is "poor physical health" and 10 is "excellent physical health".
-        description_key:
-          - "{definitions.survey_text.physical_health}"
+        <<: *physical_hlth
       physical_hlth_ans_5_share:
-        title: Physical health - Share of people who answered 5
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-         Share of people who answered 5 when asked "How would you rate your overall physical health?", where 0 is "poor physical health" and 10 is "excellent physical health".
-        description_key:
-          - "{definitions.survey_text.physical_health}"
+        <<: *physical_hlth
       physical_hlth_ans_6_share:
-        title: Physical health - Share of people who answered 6
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-         Share of people who answered 6 when asked "How would you rate your overall physical health?", where 0 is "poor physical health" and 10 is "excellent physical health".
-        description_key:
-          - "{definitions.survey_text.physical_health}"
+        <<: *physical_hlth
       physical_hlth_ans_7_share:
-        title: Physical health - Share of people who answered 7
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-         Share of people who answered 7 when asked "How would you rate your overall physical health?", where 0 is "poor physical health" and 10 is "excellent physical health".
-        description_key:
-          - "{definitions.survey_text.physical_health}"
+        <<: *physical_hlth
       physical_hlth_ans_8_share:
-        title: Physical health - Share of people who answered 8
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-         Share of people who answered 8 when asked "How would you rate your overall physical health?", where 0 is "poor physical health" and 10 is "excellent physical health".
-        description_key:
-          - "{definitions.survey_text.physical_health}"
+        <<: *physical_hlth
       physical_hlth_ans_9_share:
-        title: Physical health - Share of people who answered 9
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-         Share of people who answered 9 when asked "How would you rate your overall physical health?", where 0 is "poor physical health" and 10 is "excellent physical health".
-        description_key:
-          - "{definitions.survey_text.physical_health}"
+        <<: *physical_hlth
       physical_hlth_ans_10_share:
-        title: Physical health - Share of people who answered 10
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-         Share of people who answered 10 when asked "How would you rate your overall physical health?", where 0 is "poor physical health" and 10 is "excellent physical health".
-        description_key:
-          - "{definitions.survey_text.physical_health}"
+        <<: *physical_hlth
       rel8_ans_1_share:
         title: Share of people who feel identify as spiritual
         unit: "%"
@@ -1447,93 +1183,27 @@ tables:
         description_short: |-
          Share of respondents who did not answer the question "Imagine a [ladder](#dod:cantril-ladder) with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?"
       wb_today_ans_0_share:
-        title: Life evaluation - Share of people who answered 0
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-         Share of people who answered 0 when asked "Imagine a [ladder](#dod:cantril-ladder) with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?"
-        description_key:
-          - "{definitions.survey_text.wb_today}"
+        <<: *wb_today
       wb_today_ans_1_share:
-        title: Life evaluation - Share of people who answered 1
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-         Share of people who answered 1 when asked "Imagine a [ladder](#dod:cantril-ladder) with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?"
-        description_key:
-          - "{definitions.survey_text.wb_today}"
+        <<: *wb_today
       wb_today_ans_2_share:
-        title: Life evaluation - Share of people who answered 2
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answered 2 when asked "Imagine a [ladder](#dod:cantril-ladder) with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?"
-        description_key:
-          - "{definitions.survey_text.wb_today}"
+        <<: *wb_today
       wb_today_ans_3_share:
-        title: Life evaluation - Share of people who answered 3
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answered 3 when asked "Imagine a [ladder](#dod:cantril-ladder) with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?"
-        description_key:
-          - "{definitions.survey_text.wb_today}"
+        <<: *wb_today
       wb_today_ans_4_share:
-        title: Life evaluation - Share of people who answered 4
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answered 4 when asked "Imagine a [ladder](#dod:cantril-ladder) with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?"
-        description_key:
-          - "{definitions.survey_text.wb_today}"
+        <<: *wb_today
       wb_today_ans_5_share:
-        title: Life evaluation - Share of people who answered 5
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answered 5 when asked "Imagine a [ladder](#dod:cantril-ladder) with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?"
-        description_key:
-          - "{definitions.survey_text.wb_today}"
+        <<: *wb_today
       wb_today_ans_6_share:
-        title: Life evaluation - Share of people who answered 6
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answered 6 when asked "Imagine a [ladder](#dod:cantril-ladder) with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?"
-        description_key:
-          - "{definitions.survey_text.wb_today}"
+        <<: *wb_today
       wb_today_ans_7_share:
-        title: Life evaluation - Share of people who answered 7
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answered 7 when asked "Imagine a [ladder](#dod:cantril-ladder) with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?"
-        description_key:
-          - "{definitions.survey_text.wb_today}"
+        <<: *wb_today
       wb_today_ans_8_share:
-        title: Life evaluation - Share of people who answered 8
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answered 8 when asked "Imagine a [ladder](#dod:cantril-ladder) with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?"
-        description_key:
-          - "{definitions.survey_text.wb_today}"
+        <<: *wb_today
       wb_today_ans_9_share:
-        title: Life evaluation - Share of people who answered 9
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answered 9 when asked "Imagine a [ladder](#dod:cantril-ladder) with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?"
-        description_key:
-          - "{definitions.survey_text.wb_today}"
+        <<: *wb_today
       wb_today_ans_10_share:
-        title: Life evaluation - Share of people who answered 10
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answered 10 when asked "Imagine a [ladder](#dod:cantril-ladder) with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?"
-        description_key:
-          - "{definitions.survey_text.wb_today}"
+        <<: *wb_today
       wb_fiveyrs_mean:
         title: Self-reported life evaluation outlook
         unit: ""
@@ -1549,93 +1219,27 @@ tables:
         description_short: |-
           Share of respondents who did not answer the question "Imagine a [ladder](#dod:cantril-ladder) with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. Take your best guess: On which step of the ladder do you think you will stand in about five years from now?"
       wb_fiveyrs_ans_0_share:
-        title : Life evaluation outlook - Share of people who answered 0
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answered 0 when asked "Imagine a [ladder](#dod:cantril-ladder) with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. Take your best guess: On which step of the ladder do you think you will stand in about five years from now?"
-        description_key:
-          - "{definitions.survey_text.wb_fiveyrs}"
+        <<: *wb_fiveyrs
       wb_fiveyrs_ans_1_share:
-        title: Life evaluation outlook - Share of people who answered 1
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answered 1 when asked "Imagine a [ladder](#dod:cantril-ladder) with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. Take your best guess: On which step of the ladder do you think you will stand in about five years from now?"
-        description_key:
-          - "{definitions.survey_text.wb_fiveyrs}"
+        <<: *wb_fiveyrs
       wb_fiveyrs_ans_2_share:
-        title: Life evaluation outlook - Share of people who answered 2
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answered 2 when asked "Imagine a [ladder](#dod:cantril-ladder) with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. Take your best guess: On which step of the ladder do you think you will stand in about five years from now?"
-        description_key:
-          - "{definitions.survey_text.wb_fiveyrs}"
+        <<: *wb_fiveyrs
       wb_fiveyrs_ans_3_share:
-        title: Life evaluation outlook - Share of people who answered 3
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answered 3 when asked "Imagine a [ladder](#dod:cantril-ladder) with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. Take your best guess: On which step of the ladder do you think you will stand in about five years from now?"
-        description_key:
-          - "{definitions.survey_text.wb_fiveyrs}"
+        <<: *wb_fiveyrs
       wb_fiveyrs_ans_4_share:
-        title: Life evaluation outlook - Share of people who answered 4
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answered 4 when asked "Imagine a [ladder](#dod:cantril-ladder) with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. Take your best guess: On which step of the ladder do you think you will stand in about five years from now?"
-        description_key:
-          - "{definitions.survey_text.wb_fiveyrs}"
+        <<: *wb_fiveyrs
       wb_fiveyrs_ans_5_share:
-        title: Life evaluation outlook - Share of people who answered 5
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answered 5 when asked "Imagine a [ladder](#dod:cantril-ladder) with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. Take your best guess: On which step of the ladder do you think you will stand in about five years from now?"
-        description_key:
-          - "{definitions.survey_text.wb_fiveyrs}"
+        <<: *wb_fiveyrs
       wb_fiveyrs_ans_6_share:
-        title: Life evaluation outlook - Share of people who answered 6
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answered 6 when asked "Imagine a [ladder](#dod:cantril-ladder) with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. Take your best guess: On which step of the ladder do you think you will stand in about five years from now?"
-        description_key:
-          - "{definitions.survey_text.wb_fiveyrs}"
+        <<: *wb_fiveyrs
       wb_fiveyrs_ans_7_share:
-        title: Life evaluation outlook - Share of people who answered 7
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answered 7 when asked "Imagine a [ladder](#dod:cantril-ladder) with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. Take your best guess: On which step of the ladder do you think you will stand in about five years from now?"
-        description_key:
-          - "{definitions.survey_text.wb_fiveyrs}"
+        <<: *wb_fiveyrs
       wb_fiveyrs_ans_8_share:
-        title: Life evaluation outlook - Share of people who answered 8
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answered 8 when asked "Imagine a [ladder](#dod:cantril-ladder) with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. Take your best guess: On which step of the ladder do you think you will stand in about five years from now?"
-        description_key:
-          - "{definitions.survey_text.wb_fiveyrs}"
+        <<: *wb_fiveyrs
       wb_fiveyrs_ans_9_share:
-        title: Life evaluation outlook - Share of people who answered 9
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answered 9 when asked "Imagine a [ladder](#dod:cantril-ladder) with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. Take your best guess: On which step of the ladder do you think you will stand in about five years from now?"
-        description_key:
-          - "{definitions.survey_text.wb_fiveyrs}"
+        <<: *wb_fiveyrs
       wb_fiveyrs_ans_10_share:
-        title: Life evaluation outlook - Share of people who answered 10
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answered 10 when asked "Imagine a [ladder](#dod:cantril-ladder) with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. Take your best guess: On which step of the ladder do you think you will stand in about five years from now?"
-        description_key:
-          - "{definitions.survey_text.wb_fiveyrs}"
+        <<: *wb_fiveyrs
       wb_improvement_yes_share:
         title: Share of people who think their life will improve in the next years
         unit: "%"
@@ -1673,113 +1277,25 @@ tables:
         description_short: |-
           Share of respondents who did not answer the question "How often do you worry about safety, food or housing?"
       worry_safety_ans_0_share:
-        title: Safety worry - Share of people who answered 0
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answered 0 when asked "How often do you worry about safety, food or housing?", where 0 is "never" and 10 is "always".
-        description_processing: |-
-          {definitions.processing_notes.worry_safety}
-        description_key:
-          - "{definitions.survey_text.worry}"
+        <<: *worry_safety
       worry_safety_ans_1_share:
-        title: Safety worry - Share of people who answered 1
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answered 1 when asked "How often do you worry about safety, food or housing?", where 0 is "never" and 10 is "always".
-        description_processing: |-
-          {definitions.processing_notes.worry_safety}
-        description_key:
-          - "{definitions.survey_text.worry}"
+        <<: *worry_safety
       worry_safety_ans_2_share:
-        title: Safety worry - Share of people who answered 2
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answered 2 when asked "How often do you worry about safety, food or housing?", where 0 is "never" and 10 is "always".
-        description_processing: |-
-          {definitions.processing_notes.worry_safety}
-        description_key:
-          - "{definitions.survey_text.worry}"
+        <<: *worry_safety
       worry_safety_ans_3_share:
-        title: Safety worry - Share of people who answered 3
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answered 3 when asked "How often do you worry about safety, food or housing?", where 0 is "never" and 10 is "always".
-        description_processing: |-
-          {definitions.processing_notes.worry_safety}
-        description_key:
-          - "{definitions.survey_text.worry}"
+        <<: *worry_safety
       worry_safety_ans_4_share:
-        title: Safety worry - Share of people who answered 4
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answered 4 when asked "How often do you worry about safety, food or housing?", where 0 is "never" and 10 is "always".
-        description_processing: |-
-          {definitions.processing_notes.worry_safety}
-        description_key:
-          - "{definitions.survey_text.worry}"
+        <<: *worry_safety
       worry_safety_ans_5_share:
-        title: Safety worry - Share of people who answered 5
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answered 5 when asked "How often do you worry about safety, food or housing?", where 0 is "never" and 10 is "always".
-        description_processing: |-
-          {definitions.processing_notes.worry_safety}
-        description_key:
-          - "{definitions.survey_text.worry}"
+        <<: *worry_safety
       worry_safety_ans_6_share:
-        title: Safety worry - Share of people who answered 6
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answered 6 when asked "How often do you worry about safety, food or housing?", where 0 is "never" and 10 is "always".
-        description_processing: |-
-          {definitions.processing_notes.worry_safety}
-        description_key:
-          - "{definitions.survey_text.worry}"
+        <<: *worry_safety
       worry_safety_ans_7_share:
-        title: Safety worry - Share of people who answered 7
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answered 7 when asked "How often do you worry about safety, food or housing?", where 0 is "never" and 10 is "always".
-        description_processing: |-
-          {definitions.processing_notes.worry_safety}
-        description_key:
-          - "{definitions.survey_text.worry}"
+        <<: *worry_safety
       worry_safety_ans_8_share:
-        title: Safety worry - Share of people who answered 8
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answered 8 when asked "How often do you worry about safety, food or housing?", where 0 is "never" and 10 is "always".
-        description_processing: |-
-          {definitions.processing_notes.worry_safety}
-        description_key:
-          - "{definitions.survey_text.worry}"
+        <<: *worry_safety
       worry_safety_ans_9_share:
-        title: Safety worry - Share of people who answered 9
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answered 9 when asked "How often do you worry about safety, food or housing?", where 0 is "never" and 10 is "always".
-        description_processing: |-
-          {definitions.processing_notes.worry_safety}
-        description_key:
-          - "{definitions.survey_text.worry}"
+        <<: *worry_safety
       worry_safety_ans_10_share:
-        title: Safety worry - Share of people who answered 10
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answered 10 when asked "How often do you worry about safety, food or housing?", where 0 is "never" and 10 is "always".
-        description_processing: |-
-          {definitions.processing_notes.worry_safety}
-        description_key:
-          - "{definitions.survey_text.worry}"
+        <<: *worry_safety
 
