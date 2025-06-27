@@ -36,7 +36,9 @@ def run(dest_dir: str) -> None:
     paths.log.info("reading dataset `life_tables`")
     ds_lt = paths.load_dataset("life_tables")
     tb_lt = ds_lt.read("life_tables")
-    tb_lt["source"] = "Life tables"
+    # In this dataset HMD is used before 1950 and UN WPP after 1950.
+    tb_lt.loc[tb_lt["year"] < YEAR_WPP_START, "source"] = "Human Mortality Database"
+    tb_lt.loc[tb_lt["year"] >= YEAR_WPP_START, "source"] = "UN World Population Prospects"
     ## zijdeman_et_al_2015
     paths.log.info("reading dataset `zijdeman_et_al_2015`")
     ds_zi = paths.load_dataset("zijdeman_et_al_2015")
@@ -288,7 +290,9 @@ def combine_tables(tb_lt: Table, tb_un: Table, tb_zi: Table, tb_ri: Table) -> Ta
     tb = tb.merge(tb_0, on=["country", "year", "sex", "age"], how="outer", suffixes=("", "_0"))
     tb["source"] = tb["source"].fillna(tb["source_0"])
     tb = tb.drop(columns=["source_0"])
-    assert all(tb["source"].isin(["Riley", "Zijdeman et al.", "UN WPP", "Life tables"])), "No source found in table!"
+    assert all(
+        tb["source"].isin(["Riley", "Zijdeman et al.", "UN World Population Prospects", "Human Mortality Database"])
+    ), "No source found in table!"
     # For some reason, 'sex' is assigned type object
     tb["sex"] = tb["sex"].astype("string")
 
