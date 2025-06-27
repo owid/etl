@@ -696,9 +696,8 @@ steps:
   data://grapher/un/2025-05-15/un_members:
     - data://garden/un/2025-05-15/un_members
 
-  #
+
   # UNODC Homicide Data
-  #
   data://meadow/unodc/2025-05-28/homicide:
     - snapshot://unodc/2025-05-28/homicide.xlsx
   data://garden/unodc/2025-05-28/homicide:
@@ -709,9 +708,16 @@ steps:
     - data://garden/unodc/2025-05-28/homicide
 
 
-  #
+  # Housing prices 1870-2012 (Knoll paper)
+  data://meadow/housing/2025-06-25/knoll_prices:
+    - snapshot://housing/2025-06-25/knoll_prices.dta
+  data://garden/housing/2025-06-25/knoll_prices:
+    - data://meadow/housing/2025-06-25/knoll_prices
+  data://grapher/housing/2025-06-25/knoll_prices:
+    - data://garden/housing/2025-06-25/knoll_prices
+  
+  
   # OECD Analytical House Prices
-  #
   data://meadow/oecd/2025-06-20/housing_prices:
     - snapshot://oecd/2025-06-20/housing_prices.csv
   data://garden/oecd/2025-06-20/housing_prices:
