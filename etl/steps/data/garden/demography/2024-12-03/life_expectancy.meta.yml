@@ -64,9 +64,6 @@ definitions:
       The total period life expectancy at age << age >> among << sex + 's' >>, in a given year.
       <%- endif -%>
     <%- endif -%>
-  presentation:
-    title_public: |-
-      Life expectancy at << age if age != 0 else 'birth'>>
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
@@ -132,8 +129,7 @@ tables:
             Life expectancy at << 'birth' if (age == 0) else age >><< ', ' + sex + 's' if (sex != 'total') >>, with UN medium projections
         presentation:
           title_variant: &title_variant_w_proj << sex + 's, ' if sex != 'total' >>period tables, with UN medium projections
-          title_public: |-
-            {definitions.presentation.title_public}
+          title_public: Life expectancy at << age if age != 0 else 'birth'>>
 
       life_expectancy_0_with_proj:
         title: |-
@@ -144,8 +140,7 @@ tables:
         presentation:
           attribution_short: Various sources
           title_variant: *title_variant_w_proj
-          title_public: |-
-            {definitions.presentation.title_public}
+          title_public: Life expectancy at << age if age != 0 else 'birth'>>
           grapher_config:
             selectedEntityNames: *sel_entities_americas
           attribution: |-
@@ -171,8 +166,7 @@ tables:
         presentation:
           attribution_short: &attr_o_proj UN WPP
           title_variant: &title_variant_o_proj << sex + 's, ' if sex != 'total' >>period tables, medium projection
-          title_public: |-
-            {definitions.presentation.title_public}
+          title_public: Life expectancy at << age if age != 0 else 'birth'>>
 
       life_expectancy_0_only_proj:
         title: |-
@@ -188,8 +182,7 @@ tables:
         presentation:
           attribution_short: *attr_o_proj
           title_variant: *title_variant_o_proj
-          title_public: |-
-            {definitions.presentation.title_public}
+          title_public: Life expectancy at << age if age != 0 else 'birth'>>
           grapher_config:
             selectedEntityNames: *sel_entities_americas
     ### Source table
