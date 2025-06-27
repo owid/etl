@@ -4,6 +4,7 @@ definitions:
     display: &display_common
       numDecimalPlaces: 0
       tolerance: 0
+    # NOTE: Update this in each data update
     description_key:
       - The data is up to date as of June 2025.
     processing_level: major

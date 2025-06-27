@@ -6,13 +6,14 @@ import owid.catalog.processing as pr
 from owid.catalog import Dataset, Table
 
 from etl.data_helpers import geo
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-# Define last year (last update May 2023)
-LATEST_YEAR = 2023
+# NOTE: Update this
+# Define last year
+LATEST_YEAR = 2025
 
 # Define regions to aggregate
 REGIONS = ["Europe", "Asia", "North America", "South America", "Africa", "Oceania", "World"]
@@ -21,7 +22,7 @@ REGIONS = ["Europe", "Asia", "North America", "South America", "Africa", "Oceani
 FRAC_ALLOWED_NANS_PER_YEAR = 0.2
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -31,7 +32,7 @@ def run(dest_dir: str) -> None:
     ds_population = paths.load_dataset("population")
 
     # Read table from meadow dataset.
-    tb = ds_meadow["same_sex_marriage"].reset_index()
+    tb = ds_meadow.read("same_sex_marriage")
 
     #
     # Process data.
@@ -64,9 +65,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
-    )
+    ds_garden = paths.create_dataset(tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata)
 
     # Save changes in the new garden dataset.
     ds_garden.save()
