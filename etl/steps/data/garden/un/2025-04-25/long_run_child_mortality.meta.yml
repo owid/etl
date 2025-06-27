@@ -57,7 +57,7 @@ tables:
 
           For years where data from both sources is available, we prioritize the UN IGME data.
 
-          We calculate continental averages, but otherwise no alterations are made to the data.
+          In the Gapminder dataset we remove rows where the source is "Guesstimate" or "Model based on Life Expectancy", to try and ensure we are using the best available data.
         presentation:
           title_public: Child mortality rate
           title_variant: Long-run data
