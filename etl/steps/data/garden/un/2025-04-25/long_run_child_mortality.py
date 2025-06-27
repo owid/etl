@@ -82,7 +82,7 @@ def run() -> None:
 def add_world_from_gapminder_full_to_selected(tb_gap_full: Table, tb_gap_sel: Table) -> Table:
     """
     The 'full' Gapminder dataset has a much longer time series for the world than the 'selected' Gapminder dataset.
-    We don't tend to promote the 'full' Gapminder dataset as it has a lot of guesses, but as should the global total in this chart - http://staging-site-enhance-data-pages-child/grapher/global-child-mortality-timeseries,
+    We don't tend to promote the 'full' Gapminder dataset as it has a lot of guesses, but as should the global total in this chart - https://ourworldindata.org/grapher/global-child-mortality-timeseries,
     so I think we can also show it in the 'selected' dataset.
     """
     tb_gap_full = tb_gap_full[tb_gap_full["country"] == "World"].drop(columns=["source"])
