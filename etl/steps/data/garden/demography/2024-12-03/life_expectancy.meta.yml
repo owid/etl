@@ -33,8 +33,26 @@ definitions:
       <%- else -%>
       For a given year, it represents the remaining average lifespan for a hypothetical group of people, if they experienced the same age-specific death rates throughout the rest of their lives as the age-specific death rates seen in that particular year.
       <%- endif -%>
-
-  common:
+    common:
+      description_key:
+        - |-
+          {definitions.global.point_1}
+        - |-
+          {definitions.global.point_2}
+        - |-
+          {definitions.global.data_used}
+      attribution_short: HMD, UN WPP
+      topic_tags:
+        - Life Expectancy
+      grapher_config:
+        hasMapTab: true
+        selectedEntityNames: *sel_entities
+    display:
+      numDecimalPlaces: 1
+    unit: years
+    short_unit: years
+    processing_level: minor
+  descriptions:
     description_short: |-
       <%- if age == 0 -%>
         <%- if sex == 'total' -%>
@@ -49,27 +67,10 @@ definitions:
         The total period life expectancy at age << age >> among << sex + 's' >>, in a given year.
         <%- endif -%>
       <%- endif -%>
-    description_key:
-      - |-
-        {definitions.global.point_1}
-      - |-
-        {definitions.global.point_2}
-      - |-
-        {definitions.global.data_used}
+
     presentation:
       title_public: |-
         {definitions.global.title_public} at << age if age != 0 else 'birth'>>
-      attribution_short: HMD, UN WPP
-      topic_tags:
-        - Life Expectancy
-      grapher_config:
-        hasMapTab: true
-        selectedEntityNames: *sel_entities
-    display:
-      numDecimalPlaces: 1
-    unit: years
-    short_unit: years
-    processing_level: minor
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
@@ -93,7 +94,6 @@ tables:
             {definitions.global.title_public} at << 'birth' if (age == 0) else age >><< ', ' + sex + 's' if (sex != 'total') >>
         presentation:
           title_variant: << sex + 's, ' if sex != 'total' >>period tables
-
       life_expectancy_0:
         title: |-
           {definitions.global.title_base} at birth
@@ -129,20 +129,28 @@ tables:
       life_expectancy_with_proj:
         title: |-
           {definitions.global.title_base} (with projections)
+        description_short: |-
+          {definitions.descriptions.description_short}
         display: &display_w_proj
           numDecimalPlaces: 1
           name: |-
             {definitions.global.title_public} at << 'birth' if (age == 0) else age >><< ', ' + sex + 's' if (sex != 'total') >>, with UN medium projections
         presentation:
           title_variant: &title_variant_w_proj << sex + 's, ' if sex != 'total' >>period tables, with UN medium projections
+          title_public: |-
+            { definitions.descriptions.title_public }
 
       life_expectancy_0_with_proj:
         title: |-
           {definitions.global.title_base} at birth (with projections)
+        description_short: |-
+          {definitions.descriptions.description_short}
         display: *display_w_proj
         presentation:
           attribution_short: Various sources
           title_variant: *title_variant_w_proj
+          title_public: |-
+            { definitions.descriptions.title_public }
           grapher_config:
             selectedEntityNames: *sel_entities_americas
           attribution: |-
@@ -154,6 +162,8 @@ tables:
       life_expectancy_only_proj:
         title: |-
           {definitions.global.title_base} (only projections)
+        description_short: |-
+          {definitions.descriptions.description_short}
         description_key:
           - |-
             {definitions.global.point_1}
@@ -166,10 +176,14 @@ tables:
         presentation:
           attribution_short: &attr_o_proj UN WPP
           title_variant: &title_variant_o_proj << sex + 's, ' if sex != 'total' >>period tables, medium projection
+          title_public: |-
+            { definitions.descriptions.title_public }
 
       life_expectancy_0_only_proj:
         title: |-
           {definitions.global.title_base} at birth (only projections)
+        description_short: |-
+          {definitions.descriptions.description_short}
         description_key:
           - |-
             {definitions.global.point_1}
@@ -179,6 +193,8 @@ tables:
         presentation:
           attribution_short: *attr_o_proj
           title_variant: *title_variant_o_proj
+          title_public: |-
+            { definitions.descriptions.title_public }
           grapher_config:
             selectedEntityNames: *sel_entities_americas
     ### Source table
