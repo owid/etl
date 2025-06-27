@@ -190,7 +190,7 @@ tables:
           The source of the life expectancy at birth data.
         description_key:
           - |-
-            The source of the life expecancy at birth data used for each country and year.
+            The source of the life expectancy at birth data used for each country and year.
         unit: ""
         short_unit: ""
         display:
