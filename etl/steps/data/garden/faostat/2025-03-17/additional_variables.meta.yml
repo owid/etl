@@ -655,19 +655,19 @@ tables:
         unit: "%"
         short_unit: "%"
         description_processing: |
-          - This indicator is calculated by dividing the amount of cereals allocated to animal feed by the sum of all cereal uses considered (namely human food, animal feed, and other uses such us biofuel production). This corresponds to cereals available domestically (after trade) excluding supply chain losses and seed resown from the crop.
+          - This indicator is calculated by dividing the amount of cereals allocated to animal feed by the sum of those allocated to human food, animal feed, and other industrial uses (e.g., biofuel production). It reflects the domestic use of cereals after trade adjustments, but excludes cereals used for seed, processing into other products, and losses along the supply chain.
       share_of_cereals_allocated_to_food:
         title: Share of cereals that are allocated to human food
         unit: "%"
         short_unit: "%"
         description_processing: |
-          - This indicator is calculated by dividing the amount of cereals allocated to human food by the sum of all cereal uses considered (namely human food, animal feed, and other uses such us biofuel production). This corresponds to cereals available domestically (after trade) excluding supply chain losses and seed resown from the crop.
+          - This indicator is calculated by dividing the amount of cereals allocated to human food by the sum of those allocated to human food, animal feed, and other industrial uses (e.g., biofuel production). It reflects the domestic use of cereals after trade adjustments, but excludes cereals used for seed, processing into other products, and losses along the supply chain.
       share_of_cereals_allocated_to_other_uses:
         title: Share of cereals that are allocated to other uses such as biofuel production
         unit: "%"
         short_unit: "%"
         description_processing: |
-          - This indicator is calculated by dividing the amount of cereals allocated to other uses (predominantly industrial uses such as biofuel production) by the sum of all cereal uses considered (namely human food, animal feed, and other uses). This corresponds to cereals available domestically (after trade) excluding supply chain losses and seed resown from the crop.
+          - This indicator is calculated by dividing the amount of cereals allocated to uses other than human food or animal feed (e.g. industrial uses such as biofuel production) by the sum of those allocated to human food, animal feed, and other uses. It reflects the domestic use of cereals after trade adjustments, but excludes cereals used for seed, processing into other products, and losses along the supply chain.
   # All metadata for maize_and_wheat and fertilizer_exports is prepared via script.
   # maize_and_wheat:
   # fertilizer_exports:

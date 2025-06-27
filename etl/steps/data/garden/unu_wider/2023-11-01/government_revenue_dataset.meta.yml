@@ -236,6 +236,7 @@ tables:
                 binningStrategy: manual
                 legendDescription: ''
                 customNumericValues:
+                  - 0
                   - 5
                   - 10
                   - 15
@@ -246,7 +247,6 @@ tables:
                   - 40
                   - 45
                   - 1
-                customNumericMinValue: 0
             selectedEntityNames:
               - Colombia
               - Ghana

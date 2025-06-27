@@ -185,7 +185,7 @@ tables:
               colorScale:
                 customNumericColorsActive: true
                 binningStrategy: manual
-                customNumericValues: [100000, 1000000, 10000000, 100000000, 1000000000]
+                customNumericValues: [0, 100000, 1000000, 10000000, 100000000, 1000000000]
                 baseColorScheme: Blues
       # Tests, per-capita
       total_tests_per_thousand:
@@ -205,7 +205,7 @@ tables:
               colorScale:
                 customNumericColorsActive: true
                 binningStrategy: manual
-                customNumericValues: [10, 30, 100, 300, 1000, 3000, 10000]
+                customNumericValues: [0, 10, 30, 100, 300, 1000, 3000, 10000]
                 baseColorScheme: Blues
 
       # Tests, daily, absolute
@@ -226,7 +226,7 @@ tables:
               colorScale:
                 customNumericColorsActive: true
                 binningStrategy: manual
-                customNumericValues: [25000, 50000, 100000, 250000, 500000, 1000000]
+                customNumericValues: [0, 25000, 50000, 100000, 250000, 500000, 1000000]
                 baseColorScheme: Blues
       # Tests, daily, per-capita
       new_tests_per_thousand:
@@ -246,7 +246,7 @@ tables:
               colorScale:
                 customNumericColorsActive: true
                 binningStrategy: manual
-                customNumericValues: [0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100]
+                customNumericValues: [0, 0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100]
                 baseColorScheme: Blues
 
       # Tests, 7d average, absolute
@@ -275,7 +275,7 @@ tables:
               colorScale:
                 customNumericColorsActive: true
                 binningStrategy: manual
-                customNumericValues: [25000, 50000, 100000, 250000, 500000, 1000000]
+                customNumericValues: [0, 25000, 50000, 100000, 250000, 500000, 1000000]
                 baseColorScheme: Blues
       # Tests, 7d average, per-capita
       new_tests_per_thousand_7day_smoothed:
@@ -299,5 +299,5 @@ tables:
               colorScale:
                 customNumericColorsActive: true
                 binningStrategy: manual
-                customNumericValues: [0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100]
+                customNumericValues: [0, 0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100]
                 baseColorScheme: Blues

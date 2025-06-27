@@ -22,6 +22,10 @@ def run() -> None:
     #
     # Harmonize country names.
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+
+    # Exclude Sweden data for "Other acts of corruption" and "Corruption" before 2015 as suggested by the data provider.
+    tb = tb[~((tb["country"] == "Sweden") & (tb["category"] != "Bribery") & (tb["year"] < 2015))]
+
     # Improve table format.
     tb = tb.drop(["dimension", "sex", "age"], axis=1)
     tb["category"] = tb["category"].replace(

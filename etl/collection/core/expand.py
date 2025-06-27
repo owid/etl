@@ -1,18 +1,19 @@
-from typing import Any, Dict, List, Literal, Optional, Union
+from typing import Any, Dict, List, Literal
 
 import pandas as pd
 from owid.catalog import Table
 
+from etl.collection.exceptions import MissingDimensionalIndicatorError
 from etl.collection.utils import INDICATORS_SLUG
 
 
 def expand_config(
     tb: Table,
-    indicator_names: Optional[Union[str, List[str]]] = None,
-    dimensions: Optional[Union[List[str], Dict[str, Union[List[str], str]]]] = None,
-    common_view_config: Optional[Dict[str, Any]] = None,
+    indicator_names: str | List[str] | None = None,
+    dimensions: list[str] | dict[str, list[str] | str] | None = None,
+    common_view_config: Dict[str, Any] | None = None,
     indicator_as_dimension: bool = False,
-    indicators_slug: Optional[str] = None,
+    indicators_slug: str | None = None,
     expand_path_mode: Literal["table", "dataset", "full"] = "table",
 ) -> Dict[str, Any]:
     """Create partial config (dimensions and views) from multi-dimensional indicator in table `tb`.
@@ -163,7 +164,7 @@ class CollectionConfigExpander:
         self,
         tb: Table,
         indicators_slug: str,
-        indicator_names: Optional[Union[str, List[str]]] = None,
+        indicator_names: str | List[str] | None = None,
         indicator_as_dimension: bool = False,
         expand_path_mode: Literal["table", "dataset", "full"] = "table",
     ):
@@ -196,7 +197,7 @@ class CollectionConfigExpander:
 
     def build_dimensions(
         self,
-        dimensions: Optional[Union[List[str], Dict[str, Union[List[str], str]]]] = None,
+        dimensions: List[str] | Dict[str, List[str] | str] | None = None,
     ):
         """Create the specs for each dimension."""
         # Support dimension is None
@@ -243,7 +244,7 @@ class CollectionConfigExpander:
                     elif not isinstance(dim_values, list):
                         # Sanity check: besides exceptions above (where we allow dim_values to be a string initially), dim_values should be a list
                         raise ValueError(
-                            f"Unexpected value for dimension `{dim}`. Please review `dimensions`: '{dim_values}'!"
+                            f"Unexpected value for dimension `{dim}`. Make sure that the dimension choices are in a list or '*'. Please review `dimensions`: '{dim_values}'!"
                         )
 
                 # Sanity check: values in dim_values are expected
@@ -290,8 +291,8 @@ class CollectionConfigExpander:
 
     def build_views(
         self,
-        dimension_choices: Optional[Dict[str, List[str]]] = None,
-        common_view_config: Optional[Dict[str, Any]] = None,
+        dimension_choices: Dict[str, List[str]] | None = None,
+        common_view_config: Dict[str, Any] | None = None,
     ):
         """Generate one view for each indicator in the table."""
         df_dims_filt = self.df_dims.copy()
@@ -329,7 +330,7 @@ class CollectionConfigExpander:
             raise ValueError(f"Unknown expand_path_mode: {self.expand_path_mode}")
         return f"{table_path}#{indicator_slug}"
 
-    def build_df_dims(self, tb: Table, indicator_names: Optional[Union[str, List[str]]]):
+    def build_df_dims(self, tb: Table, indicator_names: str | List[str] | None):
         """Build dataframe with dimensional information from table tb.
 
         It contains the following columns:
@@ -392,6 +393,11 @@ class CollectionConfigExpander:
                 # Add entry to records
                 records.append(row)
 
+        if len(records) == 0:
+            raise MissingDimensionalIndicatorError(
+                "No indicators with dimensions found in the table. Please check that the table has columns with metadata.dimensions set."
+            )
+
         # Build dataframe with dimensional information
         df_dims = pd.DataFrame(records)
 
@@ -404,7 +410,7 @@ class CollectionConfigExpander:
 
         return df_dims
 
-    def _sanity_checks_df_dims(self, indicator_names: Optional[List[str]], df_dims: pd.DataFrame):
+    def _sanity_checks_df_dims(self, indicator_names: List[str] | None, df_dims: pd.DataFrame):
         """Sanity checks of df_dims."""
         # List with names of indicators and dimensions
         indicator_names_available = list(df_dims[self.indicators_slug].unique())
@@ -430,7 +436,7 @@ class CollectionConfigExpander:
 def _check_intersection_iters(
     items_expected,
     items_given,
-    key_name: Optional[str] = None,
+    key_name: str | None = None,
     check_dups: bool = True,
     check_missing: bool = True,
     check_unexpected: bool = True,

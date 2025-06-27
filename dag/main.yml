@@ -37,15 +37,6 @@ steps:
     - data://garden/worldbank_wdi/2024-05-20/wdi
     - data://garden/un/2024-07-12/un_wpp
 
-    # Homicide - UNODC - update
-  data://meadow/homicide/2024-10-30/unodc:
-    - snapshot://homicide/2024-10-30/unodc.xlsx
-  data://garden/homicide/2024-10-30/unodc:
-    - data://meadow/homicide/2024-10-30/unodc
-    - data://garden/demography/2023-03-31/population
-  data://grapher/homicide/2024-10-30/unodc:
-    - data://garden/homicide/2024-10-30/unodc
-
   #
   # UN
   # UN SDG - current
@@ -382,19 +373,6 @@ steps:
   data://grapher/growth/2024-05-16/gdp_historical:
     - data://garden/growth/2024-05-16/gdp_historical
 
-  ######################################################################################################################
-  # Map (Natural Earth)
-  data://meadow/geography/2023-11-28/nat_earth_110:
-    - snapshot://geography/2023-11-28/nat_earth_110.zip
-  data://garden/geography/2023-11-28/nat_earth_110:
-    - data://meadow/geography/2023-11-28/nat_earth_110
-
-  ######################################################################################################################
-
-  # Latitude
-  data://grapher/geography/2024-07-18/latitude:
-    - data://garden/geography/2023-11-28/nat_earth_110
-
   # Attention in Media: The Guardian
   data://meadow/news/2024-05-08/guardian_mentions:
     - snapshot://news/2024-05-07/guardian_mentions.csv
@@ -455,16 +433,6 @@ steps:
     - data://garden/worldbank_wdi/2024-05-20/wdi
   data://grapher/aviation_safety_network/2024-06-05/aviation_statistics:
     - data://garden/aviation_safety_network/2024-06-05/aviation_statistics
-
-  # Same-Sex Marriage Around the World from Pew Research Center
-  data://meadow/pew/2024-06-03/same_sex_marriage:
-    - snapshot://pew/2024-06-03/same_sex_marriage.csv
-  data://garden/pew/2024-06-03/same_sex_marriage:
-    - data://meadow/pew/2024-06-03/same_sex_marriage
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/demography/2023-03-31/population
-  data://grapher/pew/2024-06-03/same_sex_marriage:
-    - data://garden/pew/2024-06-03/same_sex_marriage
 
   # UN Regions
   data://meadow/un/2024-06-24/sdg_regions:
@@ -605,7 +573,7 @@ steps:
 
   data://garden/wpf/2025-01-17/famines_by_regime_gdp_population:
     - data://garden/wpf/2025-01-17/famines
-    - data://garden/democracy/2024-03-07/vdem
+    - data://garden/democracy/2025-03-17/vdem
     - data://garden/ggdc/2024-04-26/maddison_project_database
     - data://garden/demography/2024-07-15/population
   data://grapher/wpf/2025-01-17/famines_by_regime_gdp_population:
@@ -620,6 +588,14 @@ steps:
     - data://garden/wpf/2025-01-17/famines
   data://grapher/wpf/2025-01-17/famines_by_trigger:
     - data://garden/wpf/2025-01-17/famines_by_trigger
+
+  # Global Flourishing Study
+  data-private://meadow/gfs/2024-11-11/gfs_wave_one:
+    - snapshot-private://gfs/2024-11-11/gfs_wave_one.csv
+  data-private://garden/gfs/2024-11-11/gfs_wave_one:
+    - data-private://meadow/gfs/2024-11-11/gfs_wave_one
+  data-private://grapher/gfs/2024-11-11/gfs_wave_one:
+    - data-private://garden/gfs/2024-11-11/gfs_wave_one
 
   data-private://meadow/owid/latest/ig_countries:
     - snapshot-private://owid/latest/ig_countries.csv
@@ -697,46 +673,60 @@ steps:
   data://grapher/aviation/2025-04-01/air_traffic:
     - data://garden/aviation/2025-04-01/air_traffic
 
-  # UNODC - Access and Functioning of Justice
-  data://meadow/unodc/2025-05-12/justice:
-    - snapshot://unodc/2025-05-12/justice.xlsx
-  data://garden/unodc/2025-05-12/justice:
-    - data://meadow/unodc/2025-05-12/justice
-  data://grapher/unodc/2025-05-12/justice:
-    - data://garden/unodc/2025-05-12/justice
-
-  # UNODC - Corruption & Economic Crime
-  data://meadow/unodc/2025-05-12/corruption:
-    - snapshot://unodc/2025-05-12/corruption.xlsx
-  data://garden/unodc/2025-05-12/corruption:
-    - data://meadow/unodc/2025-05-12/corruption
-  data://grapher/unodc/2025-05-12/corruption:
-    - data://garden/unodc/2025-05-12/corruption
-
-  #
-  # Corruption Barometer
-  #
-  data://meadow/corruption/2025-05-12/corruption_barometer:
-    - snapshot://corruption/2025-05-12/corruption_barometer.xlsx
-  data://garden/corruption/2025-05-12/corruption_barometer:
-    - data://meadow/corruption/2025-05-12/corruption_barometer
+  # United Nations members
+  data://meadow/un/2025-05-15/un_members:
+    - snapshot://un/2025-05-15/un_members.csv
+  # United Nations members
+  data://garden/un/2025-05-15/un_members:
+    - data://garden/wb/2021-07-01/wb_income
     - data://garden/demography/2024-07-15/population
+    - data://meadow/un/2025-05-15/un_members
     - data://garden/regions/2023-01-01/regions
-  data://grapher/corruption/2025-05-12/corruption_barometer:
-    - data://garden/corruption/2025-05-12/corruption_barometer
-  export://multidim/corruption/latest/corruption_barometer:
-    - data://grapher/corruption/2025-05-12/corruption_barometer
+  # United Nations members
+  data://grapher/un/2025-05-15/un_members:
+    - data://garden/un/2025-05-15/un_members
 
 
-  #
-  # Corruption Perceptions Index - Transparency International
-  #
-  data://meadow/corruption/2025-05-13/perception_index:
-    - snapshot://corruption/2025-05-13/perception_index.csv
-  data://garden/corruption/2025-05-13/perception_index:
-    - data://meadow/corruption/2025-05-13/perception_index
-  data://grapher/corruption/2025-05-13/perception_index:
-    - data://garden/corruption/2025-05-13/perception_index
+  # UNODC Homicide Data
+  data://meadow/unodc/2025-05-28/homicide:
+    - snapshot://unodc/2025-05-28/homicide.xlsx
+  data://garden/unodc/2025-05-28/homicide:
+    - data://meadow/unodc/2025-05-28/homicide
+    - data://garden/demography/2024-07-15/population
+    - data://garden/un/2024-07-12/un_wpp
+  data://grapher/unodc/2025-05-28/homicide:
+    - data://garden/unodc/2025-05-28/homicide
+
+
+  # Housing prices 1870-2012 (Knoll paper)
+  data://meadow/housing/2025-06-25/knoll_prices:
+    - snapshot://housing/2025-06-25/knoll_prices.dta
+  data://garden/housing/2025-06-25/knoll_prices:
+    - data://meadow/housing/2025-06-25/knoll_prices
+  data://grapher/housing/2025-06-25/knoll_prices:
+    - data://garden/housing/2025-06-25/knoll_prices
+  
+  
+  # OECD Analytical House Prices
+  data://meadow/oecd/2025-06-20/housing_prices:
+    - snapshot://oecd/2025-06-20/housing_prices.csv
+  data://garden/oecd/2025-06-20/housing_prices:
+    - data://meadow/oecd/2025-06-20/housing_prices
+  data://grapher/oecd/2025-06-20/housing_prices:
+    - data://garden/oecd/2025-06-20/housing_prices
+
+
+  # Same-Sex Marriage Around the World from Pew Research Center
+  data://meadow/pew/2025-06-27/same_sex_marriage:
+    - snapshot://pew/2025-06-27/same_sex_marriage.csv
+
+  data://garden/pew/2025-06-27/same_sex_marriage:
+    - data://garden/demography/2024-07-15/population
+    - data://meadow/pew/2025-06-27/same_sex_marriage
+    - data://garden/regions/2023-01-01/regions
+
+  data://grapher/pew/2025-06-27/same_sex_marriage:
+    - data://garden/pew/2025-06-27/same_sex_marriage
 
 include:
   - dag/open_numbers.yml
@@ -778,3 +768,4 @@ include:
   - dag/technology.yml
   - dag/redistribution.yml
   - dag/corruption.yml
+  - dag/geography.yml

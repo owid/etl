@@ -1,6 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from owid.catalog import VariableMeta
+import owid.catalog.processing as pr
+from owid.catalog import Table, VariableMeta
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder
@@ -15,9 +16,13 @@ def run() -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("education_sdgs")
+    ds_expenditure = paths.load_dataset("public_expenditure")
 
     # Read table from meadow dataset.
     tb = ds_meadow.read("education_sdgs")
+
+    # Load historical expenditure data
+    tb_expenditure = ds_expenditure.read("public_expenditure")
 
     # Retrieve snapshot with the metadata provided via World Bank.
 
@@ -49,7 +54,7 @@ def run() -> None:
     tb = tb[tb["indicator_label_en"].notna()]
     tb["indicator_label_en"] = tb["indicator_label_en"].astype(str) + ", " + tb["indicator_id"].astype(str)
 
-    # Pivot the table to have the indicators as columns to add descriptions from producer
+    # # Pivot the table to have the indicators as columns to add descriptions from producer
     tb_pivoted = tb.pivot(index=["country", "year"], columns="indicator_label_en", values="value")
 
     for column in tb_pivoted.columns:
@@ -83,6 +88,8 @@ def run() -> None:
 
     tb_pivoted = tb_pivoted.reset_index()
     tb_pivoted = tb_pivoted.format(["country", "year"])
+    # Combine recent literacy estimates and expenditure data with historical estimates from a migrated dataset
+    tb_pivoted = combine_historical_expenditure(tb_pivoted, tb_expenditure)
 
     #
     # Save outputs.
@@ -94,6 +101,47 @@ def run() -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def combine_historical_expenditure(tb: Table, tb_expenditure: Table) -> Table:
+    """
+    Merge historical and recent expenditure data into a single Table.
+
+    This function combines data from a Table containing historical public expenditure on education
+    with a primary Table. The function handles missing data by favoring recent data; if this is not available,
+    it falls back to historical data, which could also be missing (NaN).
+
+    """
+    tb = tb.reset_index()
+
+    # Historical expenditure data
+    historic_expenditure = tb_expenditure[
+        ["year", "country", "public_expenditure_on_education__tanzi__and__schuktnecht__2000"]
+    ].copy()
+
+    # Recent public expenditure from main table
+    recent_expenditure = tb[
+        ["year", "country", "government_expenditure_on_education_as_a_percentage_of_gdp__pct__xgdp_fsgov"]
+    ].copy()
+
+    # Merge historic and recent expenditure data based on 'year' and 'country'
+    combined_df = pr.merge(historic_expenditure, recent_expenditure, on=["year", "country"], how="outer")
+
+    # Combine expenditure data, favoring recent over historical
+    combined_df["combined_expenditure_share_gdp"] = combined_df[
+        "government_expenditure_on_education_as_a_percentage_of_gdp__pct__xgdp_fsgov"
+    ].fillna(combined_df["public_expenditure_on_education__tanzi__and__schuktnecht__2000"])
+
+    # Merge the combined expenditure data back into the original table
+    tb = pr.merge(
+        tb,
+        combined_df[["year", "country", "combined_expenditure_share_gdp"]],
+        on=["year", "country"],
+        how="outer",
+    )
+
+    tb = tb.format(["country", "year"])
+    return tb
 
 
 def update_metadata(meta: VariableMeta, display_decimals: int, unit: str, short_unit: str) -> None:

@@ -69,6 +69,11 @@ log = structlog.get_logger()
     help="Run private steps.",
 )
 @click.option(
+    "--instant",
+    is_flag=True,
+    help="Only apply YAML metadata in the garden step.",
+)
+@click.option(
     "--grapher/--no-grapher",
     "-g/-ng",
     default=False,
@@ -138,9 +143,27 @@ log = structlog.get_logger()
 )
 @click.option(
     "--watch",
-    "-w",
     is_flag=True,
     help="Run ETL infinitely and update changed files.",
+)
+@click.option(
+    "--continue-on-failure",
+    is_flag=True,
+    help="Continue running remaining steps if a step fails (steps depending on failed step will be skipped).",
+)
+@click.option(
+    "--force-upload",
+    is_flag=True,
+    help="Always upload grapher data & metadata JSON files even if checksums match.",
+)
+@click.option(
+    "--prefer-download",
+    is_flag=True,
+    help="Prefer downloading datasets from catalog instead of building them.",
+)
+@click.option(
+    "--subset",
+    help="Filter to speed up development - works as regex for both data processing and grapher upload.",
 )
 @click.argument(
     "steps",
@@ -152,6 +175,7 @@ def main_cli(
     dry_run: bool = False,
     force: bool = False,
     private: bool = False,
+    instant: bool = False,
     grapher: bool = False,
     export: bool = False,
     ipdb: bool = False,
@@ -164,6 +188,10 @@ def main_cli(
     use_threads: bool = True,
     strict: Optional[bool] = None,
     watch: bool = False,
+    continue_on_failure: bool = False,
+    force_upload: bool = False,
+    prefer_download: bool = False,
+    subset: Optional[str] = None,
 ) -> None:
     """Generate datasets by running their corresponding ETL steps.
 
@@ -198,6 +226,26 @@ def main_cli(
     # GRAPHER_INSERT_WORKERS should be split among workers
     if workers > 1:
         config.GRAPHER_INSERT_WORKERS = config.GRAPHER_INSERT_WORKERS // workers
+
+    # Set INSTANT mode from CLI flag
+    if instant:
+        config.INSTANT = instant
+
+    # Set CONTINUE_ON_FAILURE from CLI flag
+    if continue_on_failure:
+        config.CONTINUE_ON_FAILURE = continue_on_failure
+
+    # Set FORCE_UPLOAD from CLI flag
+    if force_upload:
+        config.FORCE_UPLOAD = force_upload
+
+    # Set PREFER_DOWNLOAD from CLI flag
+    if prefer_download:
+        config.PREFER_DOWNLOAD = prefer_download
+
+    # Set SUBSET from CLI flag
+    if subset:
+        config.SUBSET = subset
 
     kwargs = dict(
         steps=steps,
@@ -525,6 +573,8 @@ def exec_graph_parallel(
     with pool_factory(max_workers=workers) as executor:
         # Dictionary to keep track of future tasks
         future_to_task: Dict[Future, str] = {}
+        failed_tasks = set()
+        exceptions = []
 
         ready_tasks = []
 
@@ -532,10 +582,20 @@ def exec_graph_parallel(
             # add new tasks
             ready_tasks += topological_sorter.get_ready()
 
-            # Submit tasks that are ready to the executor
-            # NOTE: limit it to `workers`, otherwise it might accept tasks that are not CPU bound
-            # and overload our DB
+            # Submit tasks that are ready to the executor, but skip those dependent on failed tasks
+            tasks_to_submit = []
             for task in ready_tasks[:workers]:
+                if config.CONTINUE_ON_FAILURE:
+                    # Check if any dependency of this task has failed
+                    task_deps = exec_graph.get(task, set())
+                    if task_deps & failed_tasks:
+                        print(f"--- Skipping {task} (depends on failed task)")
+                        topological_sorter.done(task)  # Mark as done so execution can continue
+                        continue
+
+                tasks_to_submit.append(task)
+
+            for task in tasks_to_submit:
                 future = executor.submit(func, task, **kwargs)
                 future_to_task[future] = task
 
@@ -543,13 +603,29 @@ def exec_graph_parallel(
             ready_tasks = ready_tasks[workers:]
 
             # Wait for at least one future to complete
-            done, _ = wait(future_to_task.keys(), return_when=FIRST_COMPLETED)
+            if future_to_task:
+                done, _ = wait(future_to_task.keys(), return_when=FIRST_COMPLETED)
 
-            # Mark completed tasks as done
-            for future in done:
-                task = future_to_task.pop(future)
-                future.result()
-                topological_sorter.done(task)
+                # Mark completed tasks as done
+                for future in done:
+                    task = future_to_task.pop(future)
+                    try:
+                        future.result()
+                        topological_sorter.done(task)
+                    except Exception as e:
+                        if config.CONTINUE_ON_FAILURE:
+                            failed_tasks.add(task)
+                            exceptions.append(e)
+                            topological_sorter.done(task)  # Mark as done so execution can continue
+                            print(f"--- Failed {task} - {click.style('FAILED', fg='red')}")
+                        else:
+                            raise e
+
+        # If we collected exceptions during CONTINUE_ON_FAILURE mode, raise the first one
+        if config.CONTINUE_ON_FAILURE and exceptions:
+            for exception in exceptions:
+                log.error("step_exception", exception=str(exception))
+            raise exceptions[0]
 
 
 def _create_expected_time_message(

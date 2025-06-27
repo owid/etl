@@ -59,4 +59,5 @@ zpop/
 node_modules/
 dist/
 
-.claude
+.claude/settings.local.json
+CLAUDE.local.md

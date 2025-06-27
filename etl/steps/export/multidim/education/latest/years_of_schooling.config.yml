@@ -1,0 +1,54 @@
+title:
+  title: Years of schooling
+  title_variant: by level of education and gender
+default_selection:
+  - Germany
+dimensions:
+  - slug: metric_type
+    name: Metric
+    choices:
+      - slug: expected_years_schooling
+        name: Expected years of schooling
+        description: The number of years a person is expected to spend in school or university, including years spent on repetition.
+      - slug: average_years_schooling
+        name: Average years of schooling
+        description: The average number of completed years of education of a population.
+      - slug: learning_adjusted_years_schooling
+        name: Learning adjusted years of schooling
+        description: Learning-adjusted years of schooling is the expected years of schooling adjusted for quality of learning.
+  - slug: level
+    name: Education level
+    choices:
+      - slug: all
+        name: Total
+        description: Total years across all education levels.
+      - slug: preprimary
+        name: Pre-primary
+        description: Often provided through kindergarten or nursery for children ages around 3 to 5.
+      - slug: primary
+        name: Primary
+        description: Marks the start of formal schooling, typically for children aged 5 to 7.
+      - slug: secondary
+        name: Secondary
+        description: For students generally aged 11 to 18.
+      - slug: tertiary
+        name: Tertiary
+        description: Formal post-secondary learning, ranging from short vocational programs to university degrees.
+      - slug: level_side_by_side
+        name: All levels
+        description: Compare expected years across all education levels.
+
+  - slug: sex
+    name: Gender
+    choices:
+      - slug: both
+        name: Both genders
+      - slug: girls
+        name: Girls/women
+      - slug: boys
+        name: Boys/men
+      - slug: "sex_side_by_side"
+        name: Girls and boys
+        description: Compare genders
+
+views: []

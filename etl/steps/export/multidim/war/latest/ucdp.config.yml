@@ -1,8 +1,34 @@
+definitions:
+  common_views:
+    - config:
+        hasMapTab: true
+        originUrl: ourworldindata.org/ucdp
+        relatedQuestions:
+          text: "How do different approaches measure armed conflicts and their deaths?"
+          url: "https://ourworldindata.org/conflict-data-how-do-researchers-measure-armed-conflicts-and-their-deaths"
+        map:
+          colorScale:
+            baseColorScheme: "OrRd"
+        # tab: "map"
+
 title:
   title: Data on conflict since 1989
   title_variant: "from UCDP"
 default_selection:
   - World
+  - Afghanistan
+  - Democratic Republic of Congo
+  - Ethiopia
+  - Eritrea
+  - Mexico
+  - Rwanda
+  - Syria
+  - Ukraine
+default_dimensions:
+  indicator: deaths
+  conflict_type: all
+  people: all
+  estimate: best
 
 dimensions:
   - slug: indicator
@@ -10,11 +36,14 @@ dimensions:
     choices:
       - slug: "deaths"
         name: "Deaths"
+        group: How deadly are conflicts?
       - slug: "death_rate"
         name: "Death rate"
         description: The number of deaths divided by the total population
+        group: How deadly are conflicts?
       - slug: "num_conflicts"
-        name: "Number of wars"
+        name: "Number of conflicts"
+        group: How common are conflicts?
 
   - slug: conflict_type
     name: "Conflict type"
@@ -22,12 +51,12 @@ dimensions:
       - slug: "all"
         name: "All armed conflicts"
       - slug: all_stacked
-        name: "All armed conflicts (breakdown)"
+        name: "All armed conflicts (by type)"
         description: Breakdown by conflict type
-      - slug: "intrastate"
+      - slug: "interstate"
         name: "Interstate conflicts"
         description: Between states
-      - slug: "interstate"
+      - slug: "intrastate"
         name: "Civil conflicts"
         description: Between a state and another armed group
       - slug: "non-state conflict"
@@ -43,8 +72,8 @@ dimensions:
         name: "All deaths"
         description: All deaths in armed conflicts
       - slug: "all_stacked"
-        name: "All deaths (breakdown)"
-        description: Breakdown by death type
+        name: "All deaths (by type)"
+        description: Breakdown by combatants and civilians
       - slug: na
         name: "Not applicable"
 
@@ -52,9 +81,9 @@ dimensions:
     name: "Estimate"
     choices:
       - slug: "best"
-        name: "Best estimate"
+        name: "Best estimate only"
       - slug: best_ci
-        name: Best estimate (with CI)
+        name: Show high and low estimates
       - slug: "high"
         name: "High estimate"
       - slug: "low"

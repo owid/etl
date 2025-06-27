@@ -1,10 +1,26 @@
 """I've implemented a simple version of create_collections with support for multiple tables. We should move this somewhere so others can use, or just replace the behavior of paths.create_collection."""
 
-from etl.collection import combine_collections
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
+
+COMMON_CONFIG = {
+    "originUrl": "ourworldindata.org/war-and-peace",
+    "relatedQuestions": [
+        {
+            "text": "How do different approaches measure armed conflicts and their deaths?",
+            "url": "https://ourworldindata.org/conflict-data-how-do-researchers-measure-armed-conflicts-and-their-deaths",
+        }
+    ],
+    "hideAnnotationFieldsInTitle": {
+        "time": True,
+        "entity": True,
+    },
+    "entityType": "region",
+    "entityTypePlural": "regions",
+}
 
 
 def run() -> None:
@@ -14,7 +30,7 @@ def run() -> None:
     # load table using load_data=False which only loads metadata significantly speeds this up
     ## UCDP/PRIO
     ds_up = paths.load_dataset("ucdp_prio")
-    tb_up = ds_up.read("ucdp_prio", load_data=False)
+    tb_up = ds_up.read("ucdp_prio")
     ## UCDP
     ds_u = paths.load_dataset("ucdp")
     tb_ucdp = ds_u.read("ucdp", load_data=False)
@@ -29,8 +45,8 @@ def run() -> None:
     tb_ucdp = adjust_dimensions_ucdp(tb_ucdp)
 
     # Create collections
-    c = create_collection_multiple_tables(
-        tbs=[tb_up, tb_ucdp],
+    c = paths.create_collection(
+        tb=[tb_up, tb_ucdp],
         config=config,
         indicator_names=[
             ["deaths", "death_rate"],
@@ -46,18 +62,14 @@ def run() -> None:
             ],
             "estimate": "*",
         },
-        common_view_config={
-            "hideAnnotationFieldsInTitle": {
-                "time": True,
-            },
-        },
+        common_view_config=COMMON_CONFIG,
     )
 
     # Edit indicator-level display settings
     choice_names = c.get_choice_names("conflict_type")
     for view in c.views:
         for slug, name in choice_names.items():
-            if view.dimensions["conflict_type"] == slug:
+            if view.d.conflict_type == slug:
                 assert view.indicators.y is not None
                 view.indicators.y[0].display = {"name": name}
 
@@ -73,27 +85,25 @@ def run() -> None:
                     "extrasystemic",
                 ],
                 "choice_new_slug": "state_based_stacked",
-                "view_config": {
+                "view_config": COMMON_CONFIG
+                | {
                     "chartTypes": ["StackedBar"],
-                    "hideAnnotationFieldsInTitle": {
-                        "time": True,
-                    },
+                    "selectedFacetStrategy": "entity",
                 },
             },
             {
                 "dimension": "estimate",
                 "choices": ["low", "high", "best"],
                 "choice_new_slug": "best_ci",
-                "view_config": {
+                "view_config": COMMON_CONFIG
+                | {
                     "selectedFacetStrategy": "entity",
-                    "hideAnnotationFieldsInTitle": {
-                        "time": True,
-                    },
                 },
             },
         ]
     )
 
+    # Drop views
     c.drop_views(
         [
             {"estimate": ["low", "high"]},
@@ -101,47 +111,11 @@ def run() -> None:
     )
 
     # Edit FAUST
-    edit_faust(c)
+    region_names = tb_up.dropna(subset="number_deaths_ongoing_conflicts__conflict_type_all")["country"].unique()
+    edit_faust(c, tb_ucdp, tb_up, region_names)
 
     # Save & upload
     c.save()
-
-
-def create_collection_multiple_tables(tbs, config, indicator_names, dimensions, common_view_config):
-    """This function should be migrated somewhere for everyone to use.
-
-    It is trying to support creation of Collections based on multiple tables.
-
-    Ideas:
-        - tbs: List[Table]
-        - indicator_names:
-            List[List[str]]: Each element contains the indicator names for the corresponding table. Length of indicator_names should match the length of tbs.
-            List[str]: A single list of indicator names. It should be applicable to all tables (i.e. all tables should have these indicator names).
-        - config: ? unclear
-        - dimensions: Similar behavior as indicator_names.
-        - common_view_config: Similar behavior as indicator_names.
-
-        Possibly more arguments needed to match create_collection and combine_collections.
-    """
-    # Create collections
-    collections = []
-    for tb, names in zip(tbs, indicator_names):
-        c_ = paths.create_collection(
-            config=config,
-            tb=tb,
-            indicator_names=names,
-            dimensions=dimensions,
-            common_view_config=common_view_config,
-        )
-        collections.append(c_)
-
-    c = combine_collections(
-        collections=collections,
-        collection_name=paths.short_name,  # Optional: add option to force a certain short_name
-        config=config,
-    )
-
-    return c
 
 
 def adjust_dimensions_ucdp_prio(tb):
@@ -234,52 +208,92 @@ def adjust_dimensions(tb, indicator_dim, fct_dims):  # -> Any:
     return tb
 
 
-def edit_faust(c):
+def edit_faust(c, tb_ucdp, tb_up, region_names):
     """Edit FAUST of views: Chart and indicator-level."""
     choice_names = c.get_choice_names("conflict_type")
     for view in c.views:
-        # Edit title and subtitle in charts
-        edit_view_title(view, choice_names)
-
         # Edit FAUST in charts with CI (color, display names). Indicator-level.
-        edit_view_display_estimates_ci(view)
+        edit_indicator_displays(view)
 
-
-def edit_view_title(view, conflict_renames):
-    """Edit FAUST titles and subtitles."""
-    # Get conflict type name
-    conflict_name = "state-based conflicts"
-    if view.dimensions["conflict_type"] not in {"state-based", "state_based_stacked"}:
-        conflict_name = conflict_renames.get(view.dimensions["conflict_type"]).lower()
-
-    # Add title based on indicator
-    if view.dimensions["indicator"] == "deaths":
-        view.config = {
-            **(view.config or {}),
-            "title": f"Deaths in {conflict_name}",
+    c.set_global_config(
+        {
+            "title": lambda view: _set_title(view, choice_names),
+            "subtitle": lambda view: _set_subtitle(view),
+            "timelineMinTime": 1946,
+            "note": lambda view: _set_note(view),
+            "hideRelativeToggle": lambda view: view.d.conflict_type != "state_based_stacked",
+            "hideFacetControl": False,
+            "includedEntityNames": region_names,
         }
-    elif view.dimensions["indicator"] == "death_rate":
-        view.config = {
-            **(view.config or {}),
-            "title": f"Death rate in {conflict_name}",
+    )
+    c.set_global_metadata(
+        {
+            "description_short": (
+                lambda view: _set_subtitle(view)
+                if ((view.d.conflict_type == "state_based_stacked") or (view.d.estimate == "best_ci"))
+                else None
+            ),
+            "description_key": lambda view: _set_description_key(view, tb_ucdp=tb_ucdp, tb_up=tb_up),
         }
-    elif view.dimensions["indicator"] == "wars_ongoing":
-        view.config = {
-            **(view.config or {}),
-            "title": f"Number of {conflict_name}",
-            # "subtitle": "Included are [interstate](#dod:interstate-war-mars) and [civil](#dod:civil-war-mars) wars that were ongoing that year.",
-        }
-    elif view.dimensions["indicator"] == "wars_ongoing_country_rate":
-        view.config = {
-            **(view.config or {}),
-            "title": f"Rate of {conflict_name}",
-            # "subtitle": "The number of wars divided by the number of all states. This accounts for the changing number of states over time. Included are [interstate](#dod:interstate-war-mars) and [civil](#dod:civil-war-mars) wars that were ongoing that year.",
-        }
+    )
 
 
-def edit_view_display_estimates_ci(view):
+def _set_description_key(view, tb_ucdp, tb_up):
+    if (view.d.conflict_type == "state_based_stacked") or (view.d.estimate == "best_ci"):
+        if view.d.indicator == "deaths":
+            keys = tb_up["number_deaths_ongoing_conflicts__conflict_type_state_based"].metadata.description_key
+        elif view.d.indicator == "death_rate":
+            keys = tb_up[
+                "number_deaths_ongoing_conflicts_per_capita__conflict_type_state_based"
+            ].metadata.description_key
+        elif view.d.indicator == "wars_ongoing":
+            keys = tb_ucdp["number_ongoing_conflicts__conflict_type_all"].metadata.description_key
+        elif view.d.indicator == "wars_ongoing_country_rate":
+            keys = tb_ucdp["number_ongoing_conflicts_per_country__conflict_type_all"].metadata.description_key
+        else:
+            raise ValueError(f"Unknown indicator: {view.d.indicator}")
+
+        # return
+        if view.d.estimate == "best_ci":
+            assert keys[-1].startswith("'Best' death estimates")
+            keys = keys[:-1]  # + [None]
+        return keys
+    return None
+
+
+def _set_title(view, choice_names):
+    conflict_name = _set_title_ending(view, choice_names)
+    if view.d.indicator == "deaths":
+        return f"Deaths in {conflict_name}"
+    elif view.d.indicator == "death_rate":
+        return f"Death rate in {conflict_name}"
+    elif view.d.indicator == "wars_ongoing":
+        return f"Number of {conflict_name}"
+    elif view.d.indicator == "wars_ongoing_country_rate":
+        return f"Rate of {conflict_name}"
+    else:
+        raise ValueError(f"Unknown indicator: {view.d.indicator}")
+
+
+def _set_subtitle(view):
+    dods = _set_dods(view)
+    subtitle_deaths = f"Reported deaths of combatants and civilians due to fighting{{placeholder}} {dods} conflicts that were ongoing that year. Deaths due to disease and starvation resulting from the conflict are not included."
+
+    if view.d.indicator == "deaths":
+        return subtitle_deaths.format(placeholder=" in")
+    elif view.d.indicator == "death_rate":
+        return subtitle_deaths.format(placeholder=", per 100,000 people. Included are")
+    elif view.d.indicator == "wars_ongoing":
+        return f"Included are {dods} conflicts that were ongoing that year."
+    elif view.d.indicator == "wars_ongoing_country_rate":
+        return f"The number of conflicts divided by the number of all states. This accounts for the changing number of states over time. Included are {dods} conflicts that were ongoing that year."
+    else:
+        raise ValueError(f"Unknown indicator: {view.d.indicator}")
+
+
+def edit_indicator_displays(view):
     """Edit FAUST estimates for confidence intervals."""
-    if view.dimensions["estimate"] == "best_ci":
+    if view.d.estimate == "best_ci":
         assert view.indicators.y is not None
         for indicator in view.indicators.y:
             if "_high_" in indicator.catalogPath:
@@ -297,3 +311,40 @@ def edit_view_display_estimates_ci(view):
                     "name": "Best estimate",
                     "color": "#B13507",
                 }
+
+
+def _set_dods(view):
+    # DoD
+    if view.d.conflict_type in ("state-based", "state_based_stacked"):
+        dods = (
+            "[interstate](#dod:interstate-ucdp), [civil](#dod:intrastate-ucdp), and [colonial](#dod:extrasystemic-ucdp)"
+        )
+    elif view.d.conflict_type == "interstate":
+        dods = "[interstate conflicts](#dod:interstate-ucdp)"
+    elif view.d.conflict_type == "intrastate (internationalized)":
+        dods = "[foreign-backed civil conflicts](#dod:intrastate-ucdp)"
+    elif view.d.conflict_type == "intrastate (non-internationalized)":
+        dods = "[domestic civil conflicts](#dod:intrastate-ucdp)"
+    elif view.d.conflict_type == "extrasystemic":
+        dods = "[colonial conflicts](#dod:extrasystemic-ucdp)"
+    else:
+        raise ValueError(f"Unknown conflict type: {view.d.conflict_type}")
+
+    return dods
+
+
+def _set_title_ending(view, choice_names):
+    title = "all conflicts involving states"
+    if view.d.conflict_type not in {"state-based", "state_based_stacked"}:
+        title = choice_names.get(view.d.conflict_type).lower()
+
+    if view.d.conflict_type == "state_based_stacked":
+        title += " by type"
+    return title
+
+
+def _set_note(view):
+    if view.d.indicator in ("wars_ongoing", "wars_ongoing_country_rate"):
+        return "Some conflicts affect several regions. The sum across all regions can therefore be higher than the total number."
+    if view.d.indicator in ("deaths", "death_rate") and (view.d.estimate == "best_ci"):
+        return "'Best' estimates as identified by UCDP and PRIO."

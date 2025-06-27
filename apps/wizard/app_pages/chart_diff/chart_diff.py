@@ -868,11 +868,13 @@ def _modified_chart_configs_on_staging(
     TIMESTAMP_STAGING_CREATION = get_staging_creation_time(source_session)
 
     # get modified charts
+    # NOTE: isInheritanceEnabled change needs to be detected too
     base_q = """
     select
         c.id as chartId,
-        MD5(cc.full) as chartChecksum,
-        cc.full as chartConfig
+        MD5(CONCAT(cc.full, IFNULL(isInheritanceEnabled, 0))) as chartChecksum,
+        cc.full as chartConfig,
+        isInheritanceEnabled
     from charts as c
     join chart_configs as cc on c.configId = cc.id
     where
@@ -922,6 +924,10 @@ def _modified_chart_configs_on_staging(
     for chart_id, row in diff.loc[ix].iterrows():
         source_config = json.loads(row["chartConfig"])
         target_config = json.loads(target_df.loc[chart_id, "chartConfig"])
+
+        # Add isInheritanceEnabled to configs for comparison
+        source_config["isInheritanceEnabled"] = bool(row["isInheritanceEnabled"])
+        target_config["isInheritanceEnabled"] = bool(target_df.loc[chart_id, "isInheritanceEnabled"])
 
         # Compare configs
         if configs_are_equal(source_config, target_config):
@@ -989,6 +995,9 @@ def get_chart_diffs_from_grapher(
 
 def configs_are_equal(config_1: Dict[str, Any], config_2: Dict[str, Any], verbose=False) -> bool:
     """Compare two chart configs, ignoring certain fields."""
+    assert "isInheritanceEnabled" in config_1, "isInheritanceEnabled must be in config_1"
+    assert "isInheritanceEnabled" in config_2, "isInheritanceEnabled must be in config_2"
+
     exclude_keys = ("id", "isPublished", "bakedGrapherURL", "adminBaseUrl", "dataApiUrl", "version")
     config_1 = {k: v for k, v in config_1.items() if k not in exclude_keys}
     config_2 = {k: v for k, v in config_2.items() if k not in exclude_keys}

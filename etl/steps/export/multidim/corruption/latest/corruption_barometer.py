@@ -17,10 +17,10 @@ def run() -> None:
     # Load inputs.
     #
 
-    # Load grapher dataset.
     # Load configuration from adjacent yaml file.
     config = paths.load_config()
 
+    # Load grapher dataset.
     ds = paths.load_dataset("corruption_barometer")
     tb = ds.read("corruption_barometer")
 
@@ -64,20 +64,24 @@ def run() -> None:
                     "hasMapTab": False,
                     "chartTypes": ["DiscreteBar"],
                     "tab": "chart",
-                    "facettingLabelByYVariables": "institution",
-                    "selectedFacetStrategy": "metric",
-                    "title": "How many of the following people do you think are involved in corruption? {answer}",
+                    # "facettingLabelByYVariables": "institution",
+                    # "selectedFacetStrategy": "metric",
+                    "title": "{title_public}",
                     "subtitle": 'Percentage of respondents who answered {answer} to the question "How many of the following people do you think are involved in corruption?".',
-                },
-                "view_params": {
-                    "answer": lambda view: CHOICE_NAMES.get(view.dimensions["answer"]),
                 },
                 "view_metadata": {
                     "description_short": 'Percentage of respondents who answered "{answer}" to the question "How many of the following people do you think are involved in corruption?".',
+                    "presentation": {"title_public": "{title_public}"},
                 },
             },
-        ]
+        ],
+        params={
+            "answer": lambda view: CHOICE_NAMES.get(view.dimensions["answer"]),
+            "title_public": lambda view: f"How many of the following people do you think are involved in corruption? {view.dimensions['answer']}",
+        },
     )
+    # Sort choices alphabetically
+    c.sort_choices({"institution": lambda x: sorted(x)})
 
     #
     # Save garden dataset.

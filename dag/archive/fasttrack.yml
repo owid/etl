@@ -83,3 +83,7 @@ steps:
     - snapshot://fasttrack/latest/daily_caloric_supply_fao_historical.csv
   data://grapher/fasttrack/latest/nature_index_undp:
     - snapshot://fasttrack/latest/nature_index_undp.csv
+
+    # Livestock
+  data-private://grapher/fasttrack/latest/antibiotic_usage_livestock:
+    - snapshot-private://fasttrack/latest/antibiotic_usage_livestock.csv

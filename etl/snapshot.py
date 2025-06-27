@@ -2,10 +2,11 @@ import datetime as dt
 import json
 import re
 import tempfile
+import time
 from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Iterator, Optional, Union, cast
+from typing import Any, Callable, Dict, Iterator, Optional, Union, cast
 
 import owid.catalog.processing as pr
 import pandas as pd
@@ -27,6 +28,7 @@ from owid.datautils.io import decompress_file
 from owid.repack import to_safe_types
 
 from etl import config, download_helpers, paths
+from etl.download_helpers import DownloadCorrupted
 from etl.files import checksum_file, ruamel_dump, ruamel_load, yaml_dump, yaml_load
 
 log = structlog.get_logger()
@@ -202,6 +204,7 @@ class Snapshot:
         filename: Optional[Union[str, Path]] = None,
         data: Optional[Union[Table, pd.DataFrame]] = None,
         upload: bool = False,
+        download_retries: int = 1,
     ) -> None:
         """Create a new snapshot from a local file, or from data in memory, or from a download link.
         Then upload it to S3. This is the recommended way to create a snapshot.
@@ -212,6 +215,7 @@ class Snapshot:
             filename (str or None): Path to local data file (if dataframe is not given).
             data (Table or pd.DataFrame or None): Data to upload (if filename is not given).
             upload (bool): True to upload data to bucket.
+            download_retries (int): Number of retries for downloading from source (default: 1, no retries).
         """
         assert not (filename is not None and data is not None), "Pass either a filename or data, but not both."
 
@@ -225,8 +229,24 @@ class Snapshot:
             # Copy dataframe to snapshots data folder.
             dataframes.to_file(data, file_path=self.path)
         elif self.metadata.origin and self.metadata.origin.url_download:
-            # Create snapshot by downloading data from a URL.
-            self.download_from_source()
+            # Create snapshot by downloading data from a URL with retry logic.
+            for attempt in range(1, download_retries + 1):
+                try:
+                    self.download_from_source()
+                    break
+                except DownloadCorrupted as e:
+                    log.warning(
+                        str(e),
+                        attempt=attempt,
+                        max_attempts=download_retries,
+                    )
+                    if attempt == download_retries:
+                        # Re-raise the exception on final attempt
+                        raise
+                    else:
+                        # Wait before retrying (exponential backoff)
+                        wait_time = min(4 * (2 ** (attempt - 1)), 10)
+                        time.sleep(wait_time)
         else:
             # Maybe file is already there
             assert self.path.exists(), "File not found. Provide a filename, data or add url_download to metadata."
@@ -390,6 +410,13 @@ class Snapshot:
             temp_dir.cleanup()
             self._unarchived_dir = None
 
+    @property
+    def path_unarchived(self) -> Path:
+        if not hasattr(self, "_unarchived_dir") or self._unarchived_dir is None:
+            raise RuntimeError("Archive is not unarchived. Use 'with snap.unarchived()' context manager.")
+
+        return self._unarchived_dir
+
     def read_from_archive(self, filename: str, force_extension: Optional[str] = None, *args, **kwargs) -> Table:
         """Read a file in an archive.
 
@@ -407,7 +434,7 @@ class Snapshot:
 
         tb = read_table_from_snapshot(
             *args,
-            path=self._unarchived_dir / filename,
+            path=self.path_unarchived / filename,
             table_metadata=self.to_table_metadata(),
             snapshot_origin=self.metadata.origin,
             file_extension=new_extension,
@@ -690,6 +717,7 @@ def read_table_from_snapshot(
     snapshot_origin: Union[Origin, None],
     file_extension: str,
     safe_types: bool = True,
+    read_function: Callable | None = None,
     *args,
     **kwargs,
 ) -> Table:
@@ -705,24 +733,27 @@ def read_table_from_snapshot(
         "origin": snapshot_origin,
     }
     # Read table
-    if file_extension == "csv":
-        tb = pr.read_csv(*args, **kwargs)
-    elif file_extension == "feather":
-        tb = pr.read_feather(*args, **kwargs)
-    elif file_extension in ["xlsx", "xls", "xlsm", "xlsb", "odf", "ods", "odt"]:
-        tb = pr.read_excel(*args, **kwargs)
-    elif file_extension == "json":
-        tb = pr.read_json(*args, **kwargs)
-    elif file_extension == "dta":
-        tb = pr.read_stata(*args, **kwargs)
-    elif file_extension == "rds":
-        tb = pr.read_rds(*args, **kwargs)
-    elif file_extension == "rda":
-        tb = pr.read_rda(*args, **kwargs)
-    elif file_extension == "parquet":
-        tb = pr.read_parquet(*args, **kwargs)
+    if read_function is not None:
+        tb = pr.read_custom(read_function, *args, **kwargs)
     else:
-        raise ValueError(f"Unknown extension {file_extension}")
+        if file_extension == "csv":
+            tb = pr.read_csv(*args, **kwargs)
+        elif file_extension == "feather":
+            tb = pr.read_feather(*args, **kwargs)
+        elif file_extension in ["xlsx", "xls", "xlsm", "xlsb", "odf", "ods", "odt"]:
+            tb = pr.read_excel(*args, **kwargs)
+        elif file_extension == "json":
+            tb = pr.read_json(*args, **kwargs)
+        elif file_extension == "dta":
+            tb = pr.read_stata(*args, **kwargs)
+        elif file_extension == "rds":
+            tb = pr.read_rds(*args, **kwargs)
+        elif file_extension == "rda":
+            tb = pr.read_rda(*args, **kwargs)
+        elif file_extension == "parquet":
+            tb = pr.read_parquet(*args, **kwargs)
+        else:
+            raise ValueError(f"Unknown extension {file_extension}")
 
     if safe_types:
         tb = cast(Table, to_safe_types(tb))

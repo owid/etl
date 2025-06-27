@@ -1,4 +1,16 @@
 # NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Global Education
+
+  desc_key_lays: &desc_key_lays
+    - Students around the world spend different amounts of time in school and receive a different quality of education while they’re there. This indicator combines both the quantity and quality of education into a single measure.
+    - It reflects the number of years of schooling that would be equivalent to those completed in a benchmark country, accounting for differences in learning achievement between education systems.
+    - The measure is calculated by multiplying average years of schooling by a learning adjustment factor, which compares a country's test performance to that of a high-performing benchmark country.
+    - Learning-adjusted years of schooling are derived using international assessments such as TIMSS (Trends in International Mathematics and Science Study), with learning productivity measured as test scores divided by years of schooling preceding the assessment. Since it relies on test scores from specific grades and subjects, it may not fully capture all aspects of education quality or learning across different areas of knowledge.
+    - A country with higher learning-adjusted years has either more years of schooling, better learning outcomes per year, or both.
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
@@ -78,3 +90,69 @@ tables:
         processing_level: major
         display:
           numDecimalPlaces: 0
+
+      hd_hci_lays:
+        title: Learning-adjusted years of schooling
+        description_short: "[Learning-adjusted years of schooling](#dod:lays) combine the quantity and quality of education into one metric, accounting for the fact that similar durations of schooling can yield different learning outcomes."
+        unit: "years"
+        description_key: *desc_key_lays
+        presentation:
+          title_public: Learning-adjusted years of schooling
+          grapher_config:
+            maxTime: 2024
+            hasMapTab: true
+            map:
+              time: 2024
+              timeTolerance: 5
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [0,2,4,6,8,10,12,14,16]
+                baseColorScheme: Blues
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name: Both genders
+
+      hd_hci_lays_fe:
+        title: Learning-adjusted years of schooling among girls
+        description_short: "[Learning-adjusted years of schooling](#dod:lays) among girls combine the quantity and quality of education into one metric, accounting for the fact that similar durations of schooling can yield different learning outcomes."
+        unit: "years"
+        description_key: *desc_key_lays
+        presentation:
+          title_public: Learning-adjusted years of schooling among girls
+          grapher_config:
+            maxTime: 2024
+            hasMapTab: true
+            map:
+              time: 2024
+              timeTolerance: 5
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [0,2,4,6,8,10,12,14,16]
+                baseColorScheme: Purples
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name: Girls
+
+      hd_hci_lays_ma:
+        title: Learning-adjusted years of schooling among boys
+        description_short: "[Learning-adjusted years of schooling](#dod:lays) among boys combine the quantity and quality of education into one metric, accounting for the fact that similar durations of schooling can yield different learning outcomes."
+        unit: "years"
+        description_key: *desc_key_lays
+        presentation:
+          title_public: Learning-adjusted years of schooling among boys
+          grapher_config:
+            maxTime: 2024
+            hasMapTab: true
+            map:
+              time: 2024
+              timeTolerance: 5
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [0,2,4,6,8,10,12,14,16]
+                baseColorScheme: BuGn
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name: Boys

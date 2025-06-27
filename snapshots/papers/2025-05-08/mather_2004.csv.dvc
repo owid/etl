@@ -1,0 +1,18 @@
+meta:
+  origin:
+    producer: A.S. Mather
+    title: Forest transition theory and the reforesting of Scotland
+    citation_full: |-
+      A.S. Mather (2004) Forest transition theory and the reforesting of Scotland, Scottish Geographical Journal, 120:1-2, 83-98, DOI: 10.1080/00369220418737194
+    attribution_short: Mather
+    url_main: |-
+      https://www.tandfonline.com/doi/abs/10.1080/00369220418737194
+    date_accessed: "2025-05-08"
+    date_published: "2008-02-28"
+    license:
+      name: Copyright © 2023 Royal Scottish Geographical Society
+      url: https://www.tandfonline.com/page/terms-and-conditions
+outs:
+  - md5: 18fdcbcf6d3671cc1cc498b387bfbaee
+    size: 189
+    path: mather_2004.csv
