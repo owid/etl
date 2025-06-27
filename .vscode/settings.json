@@ -61,6 +61,20 @@
       "file": ".copilot-commit-message-instructions.md"
     }
   ],
+  "github.copilot.chat.codeGeneration.instructions": [
+    {
+      "file": "CLAUDE.md"
+    },
+    {
+      "file": ".github/instructions/copilot-instructions.md"
+    },
+    {
+      "file": ".github/instructions/garden-metadata.instructions.md"
+    },
+    {
+      "file": ".github/instructions/snapshot-metadata.instructions.md"
+    },
+  ],
   "files.exclude": {
     "snapshots/backport": true,
   },
