@@ -774,8 +774,8 @@ def test_validate_indicators_are_from_dependencies_success():
     """
     Test Collection.validate_indicators_are_from_dependencies - passes when indicators match dependencies.
     
-    Example: If collection has dependency "data://garden/ns/2023/dataset" and uses 
-    indicator "garden/ns/2023/dataset/table#column", validation should pass.
+    Example: If collection has dependency "data://grapher/ns/2023/dataset" and uses 
+    indicator "grapher/ns/2023/dataset/table#column", validation should pass.
     """
     collection = Collection(
         catalog_path="test#table",
@@ -785,14 +785,14 @@ def test_validate_indicators_are_from_dependencies_success():
         views=[
             View(
                 dimensions={"country": "usa"}, 
-                indicators=ViewIndicators(y=[Indicator(catalogPath="garden/ns/2023/dataset/table#column")])
+                indicators=ViewIndicators(y=[Indicator(catalogPath="grapher/ns/2023/dataset/table#column")])
             )
         ],
         _definitions=Definitions(),
     )
     
-    # Set up dependencies
-    collection._dependencies = {"data://garden/ns/2023/dataset"}
+    # Set up dependencies that match the indicator path
+    collection._dependencies = {"data://grapher/ns/2023/dataset"}
     
     # Get indicators in use
     indicators = collection.indicators_in_use()
@@ -806,8 +806,8 @@ def test_validate_indicators_are_from_dependencies_failure():
     """
     Test Collection.validate_indicators_are_from_dependencies - fails when indicators don't match dependencies.
     
-    Example: If collection has dependency "data://garden/ns/2023/dataset" but uses 
-    indicator from "garden/other/2023/otherset", validation should fail.
+    Example: If collection has dependency "data://grapher/ns/2023/dataset" but uses 
+    indicator from "grapher/other/2023/otherset", validation should fail.
     """
     collection = Collection(
         catalog_path="test#table",
@@ -817,20 +817,20 @@ def test_validate_indicators_are_from_dependencies_failure():
         views=[
             View(
                 dimensions={"country": "usa"}, 
-                indicators=ViewIndicators(y=[Indicator(catalogPath="garden/other/2023/otherset/table#column")])
+                indicators=ViewIndicators(y=[Indicator(catalogPath="grapher/other/2023/otherset/table#column")])
             )
         ],
         _definitions=Definitions(),
     )
     
     # Set up dependencies (doesn't include the dataset being used)
-    collection._dependencies = {"data://garden/ns/2023/dataset"}
+    collection._dependencies = {"data://grapher/ns/2023/dataset"}
     
     # Get indicators in use
     indicators = collection.indicators_in_use()
     
     # Should fail validation
-    with pytest.raises(ValueError, match="Indicator garden/other/2023/otherset/table#column is not covered by any dependency"):
+    with pytest.raises(ValueError, match="Indicator grapher/other/2023/otherset/table#column is not covered by any dependency"):
         collection.validate_indicators_are_from_dependencies(indicators)
 
 
@@ -852,8 +852,8 @@ def test_validate_indicators_are_from_dependencies_multiple_dependencies():
             View(
                 dimensions={"country": "usa", "metric": "cases"}, 
                 indicators=ViewIndicators(y=[
-                    Indicator(catalogPath="garden/ns1/2023/dataset1/table#column1"),
-                    Indicator(catalogPath="garden/ns2/2023/dataset2/table#column2")
+                    Indicator(catalogPath="grapher/ns1/2023/dataset1/table#column1"),
+                    Indicator(catalogPath="grapher/ns2/2023/dataset2/table#column2")
                 ])
             )
         ],
@@ -862,8 +862,8 @@ def test_validate_indicators_are_from_dependencies_multiple_dependencies():
     
     # Set up multiple dependencies
     collection._dependencies = {
-        "data://garden/ns1/2023/dataset1",
-        "data://garden/ns2/2023/dataset2"
+        "data://grapher/ns1/2023/dataset1",
+        "data://grapher/ns2/2023/dataset2"
     }
     
     # Get indicators in use
@@ -892,8 +892,8 @@ def test_validate_indicators_are_from_dependencies_partial_match():
             View(
                 dimensions={"country": "usa", "metric": "cases"}, 
                 indicators=ViewIndicators(y=[
-                    Indicator(catalogPath="garden/ns1/2023/dataset1/table#column1"),  # Covered
-                    Indicator(catalogPath="garden/other/2023/uncovered/table#column2")  # Not covered
+                    Indicator(catalogPath="grapher/ns1/2023/dataset1/table#column1"),  # Covered
+                    Indicator(catalogPath="grapher/other/2023/uncovered/table#column2")  # Not covered
                 ])
             )
         ],
@@ -901,13 +901,13 @@ def test_validate_indicators_are_from_dependencies_partial_match():
     )
     
     # Set up dependencies (only covers first indicator)
-    collection._dependencies = {"data://garden/ns1/2023/dataset1"}
+    collection._dependencies = {"data://grapher/ns1/2023/dataset1"}
     
     # Get indicators in use
     indicators = collection.indicators_in_use()
     
     # Should fail validation for the uncovered indicator
-    with pytest.raises(ValueError, match="Indicator garden/other/2023/uncovered/table#column2 is not covered by any dependency"):
+    with pytest.raises(ValueError, match="Indicator grapher/other/2023/uncovered/table#column2 is not covered by any dependency"):
         collection.validate_indicators_are_from_dependencies(indicators)
 
 
@@ -925,7 +925,7 @@ def test_validate_indicators_are_from_dependencies_empty_dependencies():
         views=[
             View(
                 dimensions={"country": "usa"}, 
-                indicators=ViewIndicators(y=[Indicator(catalogPath="garden/ns/2023/dataset/table#column")])
+                indicators=ViewIndicators(y=[Indicator(catalogPath="grapher/ns/2023/dataset/table#column")])
             )
         ],
         _definitions=Definitions(),
@@ -938,7 +938,7 @@ def test_validate_indicators_are_from_dependencies_empty_dependencies():
     indicators = collection.indicators_in_use()
     
     # Should fail validation
-    with pytest.raises(ValueError, match="Indicator garden/ns/2023/dataset/table#column is not covered by any dependency"):
+    with pytest.raises(ValueError, match="Indicator grapher/ns/2023/dataset/table#column is not covered by any dependency"):
         collection.validate_indicators_are_from_dependencies(indicators)
 
 
@@ -960,7 +960,7 @@ def test_validate_indicators_are_from_dependencies_empty_indicators():
     )
     
     # Set up dependencies
-    collection._dependencies = {"data://garden/ns/2023/dataset"}
+    collection._dependencies = {"data://grapher/ns/2023/dataset"}
     
     # Get indicators in use (should be empty)
     indicators = collection.indicators_in_use()

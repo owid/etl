@@ -319,16 +319,18 @@ def test_view_matches_empty_list():
     """
     Test View.matches with empty list (edge case).
     
-    Example: matches(age=[]) should return False as empty list matches nothing.
+    Example: matches(age=[]) should return True as empty list means no restrictions.
+    This makes sense - an empty list means "don't filter on this dimension".
     """
     view = View(
         dimensions={"country": "usa", "age": "adult"},
         indicators=ViewIndicators.from_dict({"y": "table#indicator"}),
     )
     
-    # Empty list should not match anything
-    assert not view.matches(age=[])
-    assert not view.matches(country=[])
+    # Empty list should match anything (no restrictions)
+    assert view.matches(age=[])
+    assert view.matches(country=[])
+    assert view.matches(age=[], country="usa")  # Mix of empty list and exact match
 
 
 def test_view_matches_mixed_types():
