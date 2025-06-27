@@ -1340,8 +1340,9 @@ qui merge 1:1 year country using "`democracy_important_file'", nogenerate // kee
 
 qui merge 1:1 year country using "`democratic_file'", nogenerate // keep(master match)
 
-qui merge 1:1 year country using "`elections_difference_`var'_file'", nogenerate // keep(master match)
-
+foreach var in $democracy_elections_makes_diff {
+	qui merge 1:1 year country using "`elections_difference_`var'_file'", nogenerate // keep(master match)
+}
 
 * Get a list of variables excluding country and year (and avg_score_eq_ineq to not multiply it by 100)
 ds country year avg_score*, not
