@@ -1,19 +1,5 @@
 """Load snapshots of data files of the Statistical Review of World Energy, and create a meadow dataset.
 
-NOTE: The following notes were written for the 2024 release and may not be valid in later releases.
-The Energy Institute provides different data files:
-* Narrow-format (long-format) ~15MB xlsx file.
-* Narrow-format (long-format) ~11MB csv file.
-* Panel-format (wide-format) ~4MB xlsx file.
-* Panel-format (wide-format) ~3MB csv file.
-* Additionally, they provide the main data file, which is a human-readable xlsx file with many sheets.
-
-For some reason, the latter file (which is much harder to parse programmatically) contains some variables
-that are not given in the other data files (e.g. data on coal reserves).
-
-Therefore, we extract most of the data from the wide-format csv file, and the required additional variables
-from the main excel file.
-
 """
 
 import re
