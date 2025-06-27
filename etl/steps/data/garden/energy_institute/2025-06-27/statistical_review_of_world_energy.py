@@ -32,7 +32,7 @@ LB_TO_KG = 0.453593
 PRICE_INDEX_REFERENCE_YEAR = 2019
 
 # Reference year to use for table of prices.
-PRICE_REFERENCE_YEAR = 2023
+PRICE_REFERENCE_YEAR = 2024
 
 # There is overlapping data for gas_reserves_tcm from USSR and Russia between 1991 and 1996.
 # By looking at the original file, this overlap seems to be intentional, so we keep the overlapping data when creating
@@ -224,10 +224,11 @@ COLUMNS_PRICES = {
     # Natural gas prices.
     "natural_gas__netherlands_ttf": "gas_price_netherlands_ttf_current_dollars_per_million_btu",
     "natural_gas__uk_nbp": "gas_price_uk_nbp_current_dollars_per_million_btu",
-    "natural_gas__us__henry_hub": "gas_price_us_henry_hub_current_dollars_per_million_btu",
+    "natural_gas__us_henry_hub": "gas_price_us_henry_hub_current_dollars_per_million_btu",
     "natural_gas__zeebrugge": "gas_price_zeebrugge_current_dollars_per_million_btu",
     # Oil prices.
-    f"oil_crude_prices__dollar_{PRICE_REFERENCE_YEAR}": f"oil_price_crude_{PRICE_REFERENCE_YEAR}_dollars_per_barrel",
+    # Oil crude prices will be renamed afterwards, once the reference year of the price is known.
+    # f"oil_crude_prices__dollar_{PRICE_REFERENCE_YEAR}": f"oil_price_crude_{PRICE_REFERENCE_YEAR}_dollars_per_barrel",
     "oil_crude_prices__dollar_money_of_the_day": "oil_price_crude_current_dollars_per_barrel",
     "oil_spot_crude_prices__brent": "oil_spot_crude_price_brent_current_dollars_per_barrel",
     "oil_spot_crude_prices__dubai": "oil_spot_crude_price_dubai_current_dollars_per_barrel",
@@ -612,26 +613,6 @@ def run() -> None:
     # Fill spurious nans in nuclear energy data with zeros.
     tb = fix_missing_nuclear_energy_data(tb=tb)
 
-    ####################################################################################################################
-    # Similarly to missing nuclear data, hydropower is missing from year 2000 onwards, at least for Saudi Arabia.
-    # However, in the excel data file, those values are zero.
-    # Fill those missing points with zeros.
-    error = "Expected missing data for Arabia's hydropower from 2000 on. It may be fixed, so, remove this code."
-    assert (
-        tb.loc[
-            (tb["country"] == "Saudi Arabia") & (tb["year"] >= 2000),
-            ["hydro_consumption_equivalent_ej", "hydro_electricity_generation_twh"],
-        ]
-        .isnull()
-        .all()
-        .all()
-    ), error
-    tb.loc[
-        (tb["country"] == "Saudi Arabia") & (tb["year"] >= 2000),
-        ["hydro_consumption_equivalent_ej", "hydro_electricity_generation_twh"],
-    ] = 0
-    ####################################################################################################################
-
     # Create additional variables, like primary energy consumption in TWh (both direct and in input-equivalents).
     tb = create_additional_variables(tb=tb)
 
@@ -658,6 +639,12 @@ def run() -> None:
 
     # Rename columns from the additional data file related to prices.
     tb_prices = tb_meadow_prices.rename(columns=COLUMNS_PRICES, errors="raise").copy()
+    # Fetch the reference year of the price from the publication date of the dataset (assume it's the year prior to publication).
+    price_reference_year = int(tb_meadow_prices["year"].m.origins[0].date_published.split("-")[0]) - 1
+    tb_prices = tb_prices.rename(
+        columns={f"oil_crude_prices__dollar_{price_reference_year}": "oil_price_crude_constant_dollars_per_barrel"},
+        errors="raise",
+    )
 
     # Convert units of price variables.
     tb_prices = convert_price_units(tb_prices=tb_prices)
@@ -672,5 +659,9 @@ def run() -> None:
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = paths.create_dataset(tables=[tb, tb_prices, tb_prices_index], default_metadata=ds_meadow.metadata)
+    ds_garden = paths.create_dataset(
+        tables=[tb, tb_prices, tb_prices_index],
+        default_metadata=ds_meadow.metadata,
+        yaml_params={"price_reference_year": price_reference_year},
+    )
     ds_garden.save()

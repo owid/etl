@@ -1,4 +1,4 @@
-"""Script to create a snapshot of dataset 'Energy Institute Statistical Review of World Energy (2023)'
+"""Script to create a snapshot of dataset 'Energy Institute Statistical Review of World Energy'
 
 NOTE: On next update, check if the Energy Institute has fixed the following issue:
 (from https://github.com/owid/owid-issues/issues/1267)

@@ -1,5 +1,6 @@
 """Load snapshots of data files of the Statistical Review of World Energy, and create a meadow dataset.
 
+NOTE: The following notes were written for the 2024 release and may not be valid in later releases.
 The Energy Institute provides different data files:
 * Narrow-format (long-format) ~15MB xlsx file.
 * Narrow-format (long-format) ~11MB csv file.
@@ -25,6 +26,58 @@ from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
+
+def parse_primary_energy(data_additional: pr.ExcelFile) -> Table:
+    # The EI used to provide primary energy consumption in their consolidated dataset.
+    # But now they have moved to using Total Energy Supply.
+    # They still have primary energy consumption, but only in the excel file, so I'll get it from there.
+
+    sheet_name = "Primary Energy Cons (old meth)"
+    tb = data_additional.parse(sheet_name, skiprows=2)
+
+    # Remove empty rows and rows of footnotes.
+    tb = tb.dropna(subset=tb.columns[1:], how="all").reset_index(drop=True)
+
+    # Sanity check.
+    assert tb.columns[0] == "Exajoules", "Unit or format of primary energy sheet has changed"
+
+    # Transpose table.
+    tb = tb.rename(columns={"Exajoules": "country"})
+
+    # Drop columns of growth and share.
+    tb = tb[[column for column in tb.columns if isinstance(column, int) or (column == "country")]]
+
+    # Clean country names.
+    tb["country"] = tb["country"].str.replace(" #", "").str.replace("of which: ", "").str.strip()
+
+    # Transpose table.
+    tb = tb.melt(id_vars=["country"], var_name="year", value_name="primary_ej")
+
+    # Fix dtypes.
+    tb = tb.astype({"year": "Int64", "primary_ej": "Float64"})
+
+    # For consistency with all other tables, rename some countries to their most common names in the dataset.
+    # Their names will be properly harmonized in the garden step.
+    country_mapping = {
+        "Central America": "Total Central America",
+        "Eastern Africa": "Total Eastern Africa",
+        "European Union": "Total EU",
+        "Middle Africa": "Total Middle Africa",
+        "Non-OECD": "Total Non-OECD",
+        "OECD": "Total OECD",
+        "Turkey": "Turkiye",
+        "Western Africa": "Total Western Africa",
+    }
+    tb["country"] = map_series(
+        tb["country"],
+        country_mapping,
+        warn_on_missing_mappings=False,
+        warn_on_unused_mappings=True,
+        show_full_warning=True,
+    )
+
+    return tb
 
 
 def parse_coal_reserves(data: pr.ExcelFile) -> Table:
@@ -396,6 +449,12 @@ def run() -> None:
     #
     # Process data.
     #
+    tb_primary_energy = parse_primary_energy(data_additional=data_additional)
+
+    # Sanity check.
+    error = "Country names in primary energy consumption sheet may have changed"
+    assert set(tb_primary_energy["country"]) <= set(tb["country"]), error
+
     # Parse coal reserves sheet.
     tb_coal_reserves = parse_coal_reserves(data=data_additional)
 
@@ -424,7 +483,13 @@ def run() -> None:
 
     # Combine main table and coal, gas, and oil reserves.
     tb = pr.multi_merge(
-        [tb, tb_coal_reserves.reset_index(), tb_gas_reserves.reset_index(), tb_oil_reserves.reset_index()],
+        [
+            tb,
+            tb_primary_energy,
+            tb_coal_reserves.reset_index(),
+            tb_gas_reserves.reset_index(),
+            tb_oil_reserves.reset_index(),
+        ],
         how="outer",
         on=["country", "year"],
     )
