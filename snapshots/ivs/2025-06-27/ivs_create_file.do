@@ -68,9 +68,17 @@ global neighbors_questions A124_02 A124_03 A124_06 A124_07 A124_08 A124_09 A124_
 * Homosexuals as parents
 global homosexuals_parents_questions D081
 
+* Democracy questions
+global democracy_satisfied E111_01
+global democracy_very_good_bery_bad E115 E116 E117
+global democracy_essential_char E224 E225 E226 E227 E228 E229 E233 E233A E233B
+global democracy_importance E235
+global democracy_democraticness E236
+global democracy_elections_makes_diff E266
+
 * List of questions to work with
 * NOTE: A168 is not available in IVS
-global questions A165 A168 G007_33_B G007_34_B $additional_questions $important_in_life_questions $politics_questions $environment_vs_econ_questions $income_equality_questions $schwartz_questions $work_leisure_questions $work_questions $most_serious_problem_questions $justifiable_questions $worries_questions $happiness_questions $neighbors_questions $homosexuals_parents_questions
+global questions A165 A168 G007_33_B G007_34_B $additional_questions $important_in_life_questions $politics_questions $environment_vs_econ_questions $income_equality_questions $schwartz_questions $work_leisure_questions $work_questions $most_serious_problem_questions $justifiable_questions $worries_questions $happiness_questions $neighbors_questions $homosexuals_parents_questions $democracy_satisfied $democracy_very_good_bery_bad $democracy_essential_char $democracy_importance $democracy_democraticness $democracy_elections_makes_diff
 
  * Keep wave ID, country, weight and the list of questions
 keep S002VS S002EVS S003 S017 $questions
@@ -937,6 +945,62 @@ save "`homosexual_parents_file'"
 restore
 preserve
 
+* Processing satisfaction with democracy
+/*
+           1 Not satisfied at all
+           2 2
+           3 3
+           4 4
+           5 5
+           6 6
+           7 7
+           8 8
+           9 9
+          10 Completely satisfied
+          .a Don't know
+          .b No answer
+          .c Not applicable
+          .d Not asked in survey
+          .e Missing: other
+*/
+
+keep if $democracy_satisfied >= 1
+keep if $democracy_satisfied != .c
+keep if $democracy_satisfied != .d
+keep if $democracy_satisfied != .e
+
+
+gen not_satisfied_democracy = 0
+replace not_satisfied_democracy = 1 if $democracy_satisfied <= 4
+
+gen satisfied_democracy = 0
+replace satisfied_democracy = 1 if $democracy_satisfied >= 6 & $democracy_satisfied <= 10
+
+gen not_satisfied_at_all_democracy = 0
+replace not_satisfied_at_all_democracy = 1 if $democracy_satisfied == 1
+
+gen satisfied_completely_democracy = 0
+replace satisfied_completely_democracy = 1 if $democracy_satisfied == 10
+
+gen neutral_satisfied_democracy = 0
+replace neutral_satisfied_democracy = 1 if $democracy_satisfied == 5
+
+gen dont_know_satisfied_democracy = 0
+replace dont_know_satisfied_democracy = 1 if $democracy_satisfied == .a
+
+gen no_answer_satisfied_democracy = 0
+replace no_answer_satisfied_democracy = 1 if $democracy_satisfied == .b
+
+gen avg_score_satisfied_democracy = $democracy_satisfied
+
+collapse (mean) not_satisfied_democracy satisfied_democracy not_satisfied_at_all_democracy satisfied_completely_democracy neutral_satisfied_democracy dont_know_satisfied_democracy no_answer_satisfied_democracy avg_score_satisfied_democracy  [w=S017], by (year country)
+tempfile democracy_satisfied_file
+save "`democracy_satisfied_file'"
+	
+	
+restore
+preserve
+
 
 
 * Combine all the saved datasets
@@ -990,6 +1054,7 @@ foreach var in $neighbors_questions {
 
 merge 1:1 year country using "`happiness_file'", nogenerate // keep(master match)
 merge 1:1 year country using "`homosexual_parents_file'", nogenerate // keep(master match)
+merge 1:1 year country using "`democracy_satisfied_file'", nogenerate // keep(master match)
 
 
 
