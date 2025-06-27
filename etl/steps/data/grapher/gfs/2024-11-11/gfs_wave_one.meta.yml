@@ -48,8 +48,6 @@ definitions:
 
   life_sat: &life_sat
     title: Life satisfaction - Share of people who answer ANSWER
-    unit: "%"
-    short_unit: "%"
     description_short: |-
       Share of people who answer ANSWER when asked "Overall, how satisfied are you with your life as a whole these days?", with 0 being "not at all satisfied" and 10 being "completely satisfied".
     description_key:
@@ -57,8 +55,6 @@ definitions:
 
   wb_fiveyrs: &wb_fiveyrs
     title: Life evaluation outlook - Share of people who answered ANSWER
-    unit: "%"
-    short_unit: "%"
     description_short: |-
       Share of people who answered ANSWER when asked "Imagine a [ladder](#dod:cantril-ladder) with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. Take your best guess: On which step of the ladder do you think you will stand in about five years from now?"
     description_key:
@@ -66,8 +62,6 @@ definitions:
 
   wb_today: &wb_today
     title: Life evaluation - Share of people who answered ANSWER
-    unit: "%"
-    short_unit: "%"
     description_short: |-
       Share of people who answered ANSWER when asked "Imagine a [ladder](#dod:cantril-ladder) with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?"
     description_key:
@@ -75,8 +69,6 @@ definitions:
 
   worry_safety: &worry_safety
     title: Safety worry - Share of people who answered ANSWER
-    unit: "%"
-    short_unit: "%"
     description_short: |-
       Share of people who answered ANSWER when asked "How often do you worry about safety, food or housing?", where 0 is "never" and 10 is "always".
     description_processing: |-
@@ -86,8 +78,6 @@ definitions:
 
   physical_hlth: &physical_hlth
     title: Physical health - Share of people who answered ANSWER
-    unit: "%"
-    short_unit: "%"
     description_short: |-
       Share of people who answered ANSWER when asked "How would you rate your overall physical health?", where 0 is "poor physical health" and 10 is "excellent physical health".
     description_key:
@@ -95,8 +85,6 @@ definitions:
 
   lonely: &lonely
     title: Loneliness - Share of people who answered ANSWER
-    unit: "%"
-    short_unit: "%"
     description_short: |-
       Share of people who answered ANSWER when asked "How often do you feel lonely?", where 0 is "never" and 10 is "always".
     description_processing: |-
@@ -106,8 +94,6 @@ definitions:
 
   mental_health: &mental_health
     title: Mental health - Share of people who answered ANSWER
-    unit: "%"
-    short_unit: "%"
     description_short: |-
       Share of people who answered ANSWER when asked "How would you rate your overall mental health?", where 0 is "poor mental health" and 10 is "excellent mental health".
     description_key:
@@ -116,8 +102,6 @@ definitions:
 
   hope_future: &hope_future
     title: Hopefulness - Share of people who answered ANSWER
-    unit: "%"
-    short_unit: "%"
     description_short: |-
       Share of people who answered ANSWER when asked to rate how much they agree with the statement "Despite challenges, I always remain hopeful about the future.", where 0 is "strongly disagree" and 10 is "strongly agree".
     description_key:
@@ -125,8 +109,6 @@ definitions:
 
   happiness: &happiness
     title: Happiness - Share of people who answer ANSWER
-    unit: "%"
-    short_unit: "%"
     description_short: |-
       Share of people who answer ANSWER when asked "On a scale from 0 to 10, where 0 means extremely unhappy and 10 means extremely happy, how happy do you usually feel?"
     description_key:
@@ -134,8 +116,6 @@ definitions:
 
   content: &content
     title: Content with relationships - Share of people who answered ANSWER
-    unit: "%"
-    short_unit: "%"
     description_short: |-
       Share of people who answered ANSWER when asked to rate how much they agree with the statement "I am content with my friendships and relationships."
     description_key:
@@ -143,8 +123,6 @@ definitions:
 
   freedom: &freedom
     title: Freedom to make life choices - Share of people who answered ANSWER
-    unit: "%"
-    short_unit: "%"
     description_short: |-
       Share of people who answered ANSWER when asked to rate how much they agree with the statement "I have the freedom in my life to pursue the things that are most important to me."
     description_key:
@@ -152,8 +130,6 @@ definitions:
 
   expenses: &expenses
     title: Worry about living expenses - Share of people who answered ANSWER
-    unit: "%"
-    short_unit: "%"
     description_short: |-
       Share of people who answered ANSWER when asked "How often do you worry about being able to meet normal monthly living expenses?", where 0 is "never" and 10 is "always".
     description_processing: |-
@@ -171,18 +147,12 @@ tables:
     variables:
       abused_yes_share:
         title: Share of people who experienced abuse when growing up
-        # unit: "%"
-        # short_unit: "%"
         description_short: Share of respondents who said they had experienced physical or sexual abuse when growing up.
       abused_no_share:
         title: Share of people who have not experienced abuse when growing up
-        unit: "%"
-        short_unit: "%"
         description_short: Share of respondents who said they had not experienced physical or sexual abuse when growing up.
       abused_na_share:
         title: Share of respondents who did not answer the question about abuse
-        unit: "%"
-        short_unit: "%"
         description_key:
           - "{definitions.survey_text.no_answer}"
         description_short: Share of respondents who did not answer the question "Were you ever physically or sexually abused when you were growing up?"
@@ -193,8 +163,6 @@ tables:
         description_short: Average number of cigarettes respondents reported smoking per day, including both smokers and non-smokers.
       cigarettes_na_share:
         title: Share of respondents who did not answer the question about smoking
-        unit: "%"
-        short_unit: "%"
         description_key:
           - "{definitions.survey_text.no_answer}"
         description_short: Share of respondents who did not answer the question "On average, how many cigarettes do you smoke per day?"
@@ -205,8 +173,6 @@ tables:
         description_short: Average number of alcoholic drinks respondents reported consuming in the last week. This includes both people who reported drinking alcohol and those who did not.
       drinks_na_share:
         title: Share of respondents who did not answer the question about alcohol consumption
-        unit: "%"
-        short_unit: "%"
         description_key:
           - "{definitions.survey_text.no_answer}"
         description_short: Share of respondents who did not answer the question "On how many days did you drink alcohol in the last week?"
@@ -218,8 +184,6 @@ tables:
           Average of responses to the question of how happy or unhappy the respondent usually feels in general, ranging from 0 ("extremely unhappy") to 10 ("extremely happy").
       happy_na_share:
         title: Share of respondents who did not answer the happiness question
-        unit: "%"
-        short_unit: "%"
         description_short: |-
           Share of respondents who did not answer the question "In general, how happy or unhappy do you usually feel?"
       happy_ans_0_share:
@@ -252,8 +216,6 @@ tables:
           Average of responses to the question of how satisfied the respondent is with their life as a whole these days, ranging from 0 ("not at all satisfied") to 10 ("completely satisfied").
       life_sat_na_share:
         title: Share of respondents who did not answer the life satisfaction question
-        unit: "%"
-        short_unit: "%"
         description_key:
           - "{definitions.survey_text.no_answer}"
         description_short: |-
@@ -282,8 +244,6 @@ tables:
         <<: *life_sat
       close_to_no_share:
         title: Share of people who feel close to no one
-        unit: "%"
-        short_unit: "%"
         description_short: |-
           Share of respondents who said "no" when asked whether there is a special person they feel very close to.
         presentation:
@@ -292,8 +252,6 @@ tables:
               The full question text is: "Is there any one special person you know that you feel very close to? For example someone you can confide in and share your feelings with. If you feel very close to more than one person, select Yes.""
       close_to_yes_share:
         title: Share of people who feel close to at least one person
-        unit: "%"
-        short_unit: "%"
         description_short: |-
           Share of respondents who said "yes" when asked whether there is a special person they feel very close to.
         presentation:
@@ -302,8 +260,6 @@ tables:
               The full question text is "Is there any one special person you know that you feel very close to? For example someone you can confide in and share your feelings with. If you feel very close to more than one person, select Yes."
       close_to_na_share:
         title: Share of respondents who did not answer the question about feeling close to someone
-        unit: "%"
-        short_unit: "%"
         description_key:
           - "{definitions.survey_text.no_answer}"
         description_short: |-
@@ -320,8 +276,6 @@ tables:
           Average of responses to the statement "I am content with my friendships and relationships", ranging from 0 ("strongly disagree") to 10 ("strongly agree").
       content_na_share:
         title: Share of respondents who did not answer the question about happiness with relationships
-        unit: "%"
-        short_unit: "%"
         description_key:
           - "{definitions.survey_text.no_answer}"
         description_short: |-
@@ -359,8 +313,6 @@ tables:
             note: "{definitions.survey_text.exercise}"
       days_exercise_ans_0_share:
         title: Share of people who did not exercise in the last week
-        unit: "%"
-        short_unit: "%"
         description_short: |-
           Share of people who reported exercising 0 days in the last week."
         presentation:
@@ -368,8 +320,6 @@ tables:
             note: "{definitions.survey_text.exercise}"
       days_exercise_ans_1_share:
         title: Share of people who exercised on one day in the last week
-        unit: "%"
-        short_unit: "%"
         description_short: |-
           Share of people who reported exercising one day in the last week."
         presentation:
@@ -377,8 +327,6 @@ tables:
             note: "{definitions.survey_text.exercise}"
       days_exercise_ans_2_share:
         title: Share of people who exercised on two days in the last week
-        unit: "%"
-        short_unit: "%"
         description_short: |-
           Share of people who reported exercising two days in the last week."
         presentation:
@@ -386,8 +334,6 @@ tables:
             note: "{definitions.survey_text.exercise}"
       days_exercise_ans_3_share:
         title: Share of people who exercised on three days in the last week
-        unit: "%"
-        short_unit: "%"
         description_short: |-
           Share of people who reported exercising three days in the last week."
         presentation:
@@ -395,8 +341,6 @@ tables:
             note: "{definitions.survey_text.exercise}"
       days_exercise_ans_4_share:
         title: Share of people who exercised on four days in the last week
-        unit: "%"
-        short_unit: "%"
         description_short: |-
           Share of people who reported exercising four days in the last week."
         presentation:
@@ -404,8 +348,6 @@ tables:
             note: "{definitions.survey_text.exercise}"
       days_exercise_ans_5_share:
         title: Share of people who exercised on five days in the last week
-        unit: "%"
-        short_unit: "%"
         description_short: |-
           Share of people who reported exercising five days in the last week."
         presentation:
@@ -413,8 +355,6 @@ tables:
             note: "{definitions.survey_text.exercise}"
       days_exercise_ans_6_share:
         title: Share of people who exercised on six days in the last week
-        unit: "%"
-        short_unit: "%"
         description_short: |-
           Share of people who reported exercising six days in the last week."
         presentation:
@@ -422,8 +362,6 @@ tables:
             note: "{definitions.survey_text.exercise}"
       days_exercise_ans_7_share:
         title: Share of people who exercised every day in the last week
-        unit: "%"
-        short_unit: "%"
         description_short: |-
           Share of people who reported exercising every day in the last week."
         presentation:
@@ -431,8 +369,6 @@ tables:
             note: "{definitions.survey_text.exercise}"
       days_exercise_na_share:
         title: Share of respondents who did not answer the exercise question
-        unit: "%"
-        short_unit: "%"
         description_key:
           - "{definitions.survey_text.no_answer}"
         description_short: |-
@@ -445,32 +381,22 @@ tables:
           Average score people gave when asked "In the last two weeks, have you felt down, depressed or hopeless", where 1 is "nearly every day" and 4 is "not at all".
       depressed_ans_1_share:
         title: Share of people who felt depressed nearly every day in the last two weeks
-        unit: "%"
-        short_unit: "%"
         description_short: |-
           Share of people who reported feeling down nearly every day in the last two weeks."
       depressed_ans_2_share:
         title: Share of people who felt depressed more than half of the days in the last two weeks
-        unit: "%"
-        short_unit: "%"
         description_short: |-
           Share of people who reported feeling depressed or hopeless more than half of the days in the last two weeks."
       depressed_ans_3_share:
         title: Share of people who felt depressed several days in the last two weeks
-        unit: "%"
-        short_unit: "%"
         description_short: |-
           Share of people who reported feeling down several days in the last two weeks."
       depressed_ans_4_share:
         title: Share of people who did not feel depressed in the last two weeks
-        unit: "%"
-        short_unit: "%"
         description_short: |-
           Share of people who reported not feeling down, depressed or hopeless in the last two weeks."
       depressed_na_share:
         title: Share of respondents who did not answer the question about depression
-        unit: "%"
-        short_unit: "%"
         description_key:
           - "{definitions.survey_text.no_answer}"
         description_short: |-
@@ -483,58 +409,40 @@ tables:
          Average score people gave when asked "How often do you feel discriminated against because of any group you are part of?", where 1 is "always" and 4 is "never".
       discriminated_often_share:
         title: Share of people who feel discriminated against often or always
-        unit: "%"
-        short_unit: "%"
         description_short: |-
           Share of people who answered "often" or "always" when asked "How often do you feel discriminated against because of any group you are part of?"
       discriminated_ans_1_share:
         title: Share of people who feel discriminated against always
-        unit: "%"
-        short_unit: "%"
         description_short: |-
           Share of people who answered "always" when asked "How often do you feel discriminated against because of any group you are part of?"
       discriminated_ans_2_share:
         title: Share of people who feel discriminated against often
-        unit: "%"
-        short_unit: "%"
         description_short: |-
           Share of people who answered "often" when asked "How often do you feel discriminated against because of any group you are part of?"
       discriminated_ans_3_share:
         title: Share of people who feel discriminated against rarely
-        unit: "%"
-        short_unit: "%"
         description_short: |-
           Share of people who answered "rarely" when asked "How often do you feel discriminated against because of any group you are part of?"
       discriminated_ans_4_share:
         title: Share of people who never feel discriminated against
-        unit: "%"
-        short_unit: "%"
         description_short: |-
          Share of people who answered "never" when asked "How often do you feel discriminated against because of any group you are part of?"
       discriminated_na_share:
         title: Share of respondents who did not answer the question about discrimination
-        unit: "%"
-        short_unit: "%"
         description_key:
           - "{definitions.survey_text.no_answer}"
         description_short: |-
          Share of respondents who did not answer the question "How often do you feel discriminated against because of any group you are part of?"
       donated_no_share:
         title: Share of people who did not recently donate to charity
-        unit: "%"
-        short_unit: "%"
         description_short: |-
          Share of respondents who said "no" when asked whether they had donated to a charity or non-profit in the last month.
       donated_yes_share:
         title: Share of people who recently donated to charity
-        unit: "%"
-        short_unit: "%"
         description_short: |-
          Share of respondents who said "yes" when asked whether they had donated to a charity or non-profit in the last month.
       donated_na_share:
         title: Share of respondents who did not answer the question about donating to charity
-        unit: "%"
-        short_unit: "%"
         description_key:
           - "{definitions.survey_text.no_answer}"
         description_short: |-
@@ -549,8 +457,6 @@ tables:
           {definitions.processing_notes.expenses}
       expenses_na_share:
         title: Share of respondents who did not answer the question about living expenses
-        unit: "%"
-        short_unit: "%"
         description_key:
           - "{definitions.survey_text.no_answer}"
         description_short: |-
@@ -585,32 +491,22 @@ tables:
          Average score people gave when asked "In the last two weeks, how often have you felt nervous, anxious or on edge?", where 1 is "nearly every day" and 4 is "not at all".
       feel_anxious_ans_1_share:
         title: Share of people who felt anxious nearly every day in the last two weeks
-        unit: "%"
-        short_unit: "%"
         description_short: |-
          Share of people who reported feeling nervous nearly every day in the last two weeks."
       feel_anxious_ans_2_share:
         title: Share of people who felt anxious more than half of the days in the last two weeks
-        unit: "%"
-        short_unit: "%"
         description_short: |-
          Share of people who reported feeling nervous or anxious more than half of the days in the last two weeks."
       feel_anxious_ans_3_share:
         title: Share of people who felt anxious several days in the last two weeks
-        unit: "%"
-        short_unit: "%"
         description_short: |-
          Share of people who reported feeling nervous several days in the last two weeks."
       feel_anxious_ans_4_share:
         title: Share of people who did not feel anxious in the last two weeks
-        unit: "%"
-        short_unit: "%"
         description_short: |-
          Share of people who reported not feeling nervous, anxious or on edge in the last two weeks."
       feel_anxious_na_share:
         title: Share of respondents who did not answer the question about anxiety
-        unit: "%"
-        short_unit: "%"
         description_key:
           - "{definitions.survey_text.no_answer}"
         description_short: |-
@@ -623,8 +519,6 @@ tables:
          Average of responses of how much the respondent agreed with the statement that they have the freedom to pursue the things that are important to them, ranging from 0 ("strongly disagree") to 10 ("strongly agree").
       freedom_na_share:
         title: Share of respondents who did not answer the question about freedom to make life choices
-        unit: "%"
-        short_unit: "%"
         description_key:
           - "{definitions.survey_text.no_answer}"
         description_short: |-
@@ -659,8 +553,6 @@ tables:
           Average of responses of how much the respondent agreed with the statement that, despite challenges, they always remain hopeful about the future, ranging from 0 ("strongly disagree") to 10 ("strongly agree").
       hope_future_na_share:
         title: Share of respondents who did not answer the question about hopefulness
-        unit: "%"
-        short_unit: "%"
         description_key:
           - "{definitions.survey_text.no_answer}"
         description_short: |-
@@ -695,8 +587,6 @@ tables:
          Average of responses to the question of how the respondent would rate their overall mental health, ranging from 0 ("poor") to 10 ("excellent").
       mental_health_na_share:
         title: Share of respondents who did not answer the question about mental health
-        unit: "%"
-        short_unit: "%"
         description_short: |-
          Share of respondents who did not answer the question "How would you rate your overall mental health?"
       mental_health_ans_0_share:
@@ -731,8 +621,6 @@ tables:
           {definitions.processing_notes.lonely}
       lonely_na_share:
         title: Share of respondents who did not answer the question about loneliness
-        unit: "%"
-        short_unit: "%"
         description_key:
           - "{definitions.survey_text.no_answer}"
         description_short: |-
@@ -767,8 +655,6 @@ tables:
          Average of responses to the question of how the respondent would rate their overall physical health, ranging from 0 ("poor") to 10 ("excellent").
       physical_hlth_na_share:
         title: Share of respondents who did not answer the question about physical health
-        unit: "%"
-        short_unit: "%"
         description_short: |-
          Share of respondents who did not answer the question "How would you rate your overall physical health?"
       physical_hlth_ans_0_share:
@@ -795,58 +681,40 @@ tables:
         <<: *physical_hlth
       rel8_ans_1_share:
         title: Share of people who feel identify as spiritual
-        unit: "%"
-        short_unit: "%"
         description_short: |-
          Share of people who answered "spiritual" when asked "Would you say you are religious, spiritual, neither, or both?"
       rel8_ans_2_share:
         title: Share of people who feel identify as religious
-        unit: "%"
-        short_unit: "%"
         description_short: |-
          Share of people who answered "religious" when asked "Would you say you are religious, spiritual, neither, or both?"
       rel8_ans_3_share:
         title: Share of people who feel identify as both religious and spiritual
-        unit: "%"
-        short_unit: "%"
         description_short: |-
          Share of people who answered "both" when asked "Would you say you are religious, spiritual, neither, or both?"
       rel8_ans_4_share:
         title: Share of people who feel identify as neither religious nor spiritual
-        unit: "%"
-        short_unit: "%"
         description_short: |-
          Share of people who answered "neither" when asked "Would you say you are religious, spiritual, neither, or both?"
       rel8_na_share:
         title: Share of respondents who did not answer the question about religion and spirituality
-        unit: "%"
-        short_unit: "%"
         description_key:
           - "{definitions.survey_text.no_answer}"
         description_short: |-
          Share of respondents who did not answer the question "Would you say you are religious, spiritual, neither, or both?"
       say_in_govt_ans_1_share:
         title: Share of people who feel they have a say in government
-        unit: "%"
-        short_unit: "%"
         description_short: |-
          Share of people who agree with the statement "People like me have a say in what the government does."
       say_in_govt_ans_2_share:
         title: Share of people who feel they do not have a say in government
-        unit: "%"
-        short_unit: "%"
         description_short: |-
          Share of people who disagree with the statement "People like me have a say in what the government does."
       say_in_govt_ans_3_share:
         title: Share of people who feel unsure about having a say in government
-        unit: "%"
-        short_unit: "%"
         description_short: |-
          Share of people who are unsure about whether "People like me have a say in what the government does."
       say_in_govt_na_share:
         title: Share of respondents who did not answer the question about having a say in government
-        unit: "%"
-        short_unit: "%"
         description_key:
           - "{definitions.survey_text.no_answer}"
         description_short: |-
@@ -859,64 +727,44 @@ tables:
          Average score people gave when asked "How many people in this country trust each other?", where 1 is "all people" and 5 is "none".
       trust_people_most_share:
         title: Share of people who think most or all people trust each other
-        unit: "%"
-        short_unit: "%"
         description_short: |-
          Share of people who answered "most" or "all" when asked "How many people in this country trust each other?"
       trust_people_ans_1_share:
         title: Share of people who think all people trust each other
-        unit: "%"
-        short_unit: "%"
         description_short: |-
          Share of people who answered "all" when asked "How many people in this country trust each other?"
       trust_people_ans_2_share:
         title: Share of people who think most people trust each other
-        unit: "%"
-        short_unit: "%"
         description_short: |-
          Share of people who answered "most" when asked "How many people in this country trust each other?"
       trust_people_ans_3_share:
         title: Share of people who think only some people trust each other
-        unit: "%"
-        short_unit: "%"
         description_short: |-
          Share of people who answered "some" when asked "How many people in this country trust each other?"
       trust_people_ans_4_share:
         title: Share of people who think not very many people trust each other
-        unit: "%"
-        short_unit: "%"
         description_short: |-
          Share of people who answered "not very many" when asked "How many people in this country trust each other?"
       trust_people_ans_5_share:
         title: Share of people who think no people trust each other
-        unit: "%"
-        short_unit: "%"
         description_short: |-
          Share of people who answered "none" when asked "How many people in this country trust each other?"
       trust_people_na_share:
         title: Share of respondents who did not answer the question about trust in people
-        unit: "%"
-        short_unit: "%"
         description_key:
           - "{definitions.survey_text.no_answer}"
         description_short: |-
          Share of respondents who did not answer the question "How many people in this country trust each other?"
       volunteered_no_share:
         title: Share of people who did not recently volunteer
-        unit: "%"
-        short_unit: "%"
         description_short: |-
          Share of respondents who said "no" when asked whether they had volunteered for an organization in the last month.
       volunteered_yes_share:
         title: Share of people who recently volunteered
-        unit: "%"
-        short_unit: "%"
         description_short: |-
           Share of respondents who said "yes" when asked whether they had volunteered for an organization in the last month.
       volunteered_na_share:
         title: Share of respondents who did not answer the question about volunteering
-        unit: "%"
-        short_unit: "%"
         description_key:
           - "{definitions.survey_text.no_answer}"
         description_short: |-
@@ -929,8 +777,6 @@ tables:
          Average score people gave when asked "Imagine a [ladder](#dod:cantril-ladder) with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?"
       wb_today_na_share:
         title: Share of respondents who did not answer the life evaluation question
-        unit: "%"
-        short_unit: "%"
         description_key:
           - "{definitions.survey_text.no_answer}"
         description_short: |-
@@ -965,8 +811,6 @@ tables:
           Average score people gave when asked "Imagine a [ladder](#dod:cantril-ladder) with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. Take your best guess: On which step of the ladder do you think you will stand in about five years from now?"
       wb_fiveyrs_na_share:
         title: Share of respondents who did not answer the life evaluation outlook question
-        unit: "%"
-        short_unit: "%"
         description_key:
           - "{definitions.survey_text.no_answer}"
         description_short: |-
@@ -995,20 +839,14 @@ tables:
         <<: *wb_fiveyrs
       wb_improvement_yes_share:
         title: Share of people who think their life will improve in the next years
-        unit: "%"
-        short_unit: "%"
         description_short: |-
           Share of respondents who saw themselves on a higher step of the [cantril ladder](#dod:cantril-ladder) in five years than they are now."
       wb_improvement_no_share:
         title: Share of people who do not think their life will improve in the next five years
-        unit: "%"
-        short_unit: "%"
         description_short: |-
           Share of respondents who saw themselves on a same or lower step of the [cantril ladder](#dod:cantril-ladder) in five years than they are now."
       wb_improvement_na_share:
         title: Share of respondents who did not answer the question about life improvement
-        unit: "%"
-        short_unit: "%"
         description_key:
           - "{definitions.survey_text.no_answer}"
         description_short: |-
@@ -1023,8 +861,6 @@ tables:
           {definitions.processing_notes.worry_safety}
       worry_safety_na_share:
         title: Share of respondents who did not answer the question about safety
-        unit: "%"
-        short_unit: "%"
         description_key:
           - "{definitions.survey_text.no_answer}"
         description_short: |-
