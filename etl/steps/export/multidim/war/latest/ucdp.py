@@ -67,12 +67,7 @@ def run() -> None:
             assert v.indicators.y is not None
             v.indicators.y[0].display = {"name": choice_names[v.d.conflict_type]}
 
-        if (
-            (v.d.indicator == "deaths")
-            & (v.d.conflict_type == "all")
-            & (v.d.estimate == "best")
-            & (v.d.people == "all")
-        ):
+        if v.matches(indicator="deaths", conflict_type="all", estimate="best", people="all"):
             assert v.indicators.y is not None
             assert len(v.indicators.y) == 1
             v.indicators.y[0].catalogPath = v.indicators.y[0].catalogPath.replace(tb.m.uri, tb_pre.m.uri)
