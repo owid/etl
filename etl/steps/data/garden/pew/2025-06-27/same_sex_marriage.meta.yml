@@ -1,0 +1,76 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    display: &display_common
+      numDecimalPlaces: 0
+      tolerance: 0
+    description_key:
+      - The data is up to date as of May 2023.
+    processing_level: major
+    description_processing: |-
+      We converted the original data with the years of the legalization of same-sex marriage into a expanded dataset with the legal status of same-sex marriage for each country and year.
+
+      We estimated regional aggregations of these status by using [Our World in Data definitions of regions](https://ourworldindata.org/world-region-map-definitions) and our [consolidated population data](https://ourworldindata.org/population-sources).
+    presentation:
+      topic_tags:
+        - LGBT+ Rights
+        - Human Rights
+        - Marriages & Divorces
+
+  same_sex_marriage: Same-sex marriage is marriage and marriage recognition between two people of the same biological sex or gender identity.
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  same_sex_marriage:
+    variables:
+      legal_status:
+        title: Legal status of same-sex marriage
+        unit: ""
+        short_unit: ""
+        description_short: Describes the legislation status of same-sex marriage. This is marriage and marriage recognition between two people of the same biological sex or gender identity.
+        presentation:
+          title_public: Legal status of same-sex marriage
+        display:
+          name: Legal status of same-sex marriage
+          <<: *display_common
+
+      legal_status_legal_count:
+        title: Number of countries where same-sex marriage is legal
+        unit: ""
+        short_unit: ""
+        description_short: "{definitions.same_sex_marriage}"
+        presentation:
+          title_public: Number of countries where same-sex marriage is legal
+        display:
+          name: Legal
+          <<: *display_common
+
+      legal_status_not_legal_pop:
+        title: Population in countries where same-sex marriage is not legal
+        unit: ""
+        short_unit: ""
+        description_short: "{definitions.same_sex_marriage}"
+        presentation:
+          title_public: Population in countries where same-sex marriage is not legal
+        display:
+          name: Not legal
+          <<: *display_common
+
+      legal_status_legal_pop:
+        title: Population in countries where same-sex marriage is legal
+        unit: ""
+        short_unit: ""
+        description_short: "{definitions.same_sex_marriage}"
+        presentation:
+          title_public: Population in countries where same-sex marriage is legal
+        display:
+          name: Legal
+          <<: *display_common
+
+

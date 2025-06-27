@@ -1,0 +1,16 @@
+meta:
+  origin:
+    producer: Pew Research Center
+    title: Same-sex marriage around the world - Pew Research Center
+    description: |-
+      Since the first same-sex marriages took place in the Netherlands in 2001, more than 30 other jurisdictions have enacted laws allowing gays and lesbians to marry, mostly in Europe and the Americas. This interactive table allows you to sort those places by name, region and the year legal same-sex marriage took effect. It also includes some key facts about the process in each jurisdiction.
+    citation_full: |-
+      Pew Research Center (2023). https://www.pewresearch.org/religion/fact-sheet/gay-marriage-around-the-world/
+
+      “Same-Sex Marriage Around the World.” Pew Research Center, Washington, D.C. (9 June 2023) https://www.pewresearch.org/religion/fact-sheet/gay-marriage-around-the-world/.
+    url_main: https://www.pewresearch.org/religion/fact-sheet/gay-marriage-around-the-world/
+    date_accessed: '2025-06-27'
+    date_published: '2023-06-09'
+    license:
+      name: © Pew Research Center
+      url: https://www.pewresearch.org/about/terms-and-conditions/
