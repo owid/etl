@@ -536,6 +536,14 @@ steps:
   data://grapher/un/2024-09-11/igme:
     - data://garden/un/2024-09-11/igme
 
+  # WB income groups 2023-04-30
+  data://meadow/wb/2023-04-30/income_groups:
+    - snapshot://wb/2023-04-30/income_groups.xlsx
+  data://garden/wb/2023-04-30/income_groups:
+    - data://meadow/wb/2023-04-30/income_groups
+  data://grapher/wb/2023-04-30/income_groups:
+    - data://garden/wb/2023-04-30/income_groups
+
 include:
   # Include all active steps plus all archive steps.
   - dag/main.yml

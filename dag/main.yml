@@ -458,14 +458,6 @@ steps:
   data://grapher/homicide/2024-07-30/homicide_long_run_omm:
     - data://garden/homicide/2024-07-30/homicide_long_run_omm
 
-  # WB income groups 2023-04-30
-  data://meadow/wb/2023-04-30/income_groups:
-    - snapshot://wb/2023-04-30/income_groups.xlsx
-  data://garden/wb/2023-04-30/income_groups:
-    - data://meadow/wb/2023-04-30/income_groups
-  data://grapher/wb/2023-04-30/income_groups:
-    - data://garden/wb/2023-04-30/income_groups
-
   # WB income groups 2024-03-11
   data://meadow/wb/2024-03-11/income_groups:
     - snapshot://wb/2024-03-11/income_groups.xlsx
