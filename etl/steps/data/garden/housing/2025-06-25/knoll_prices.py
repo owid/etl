@@ -17,7 +17,8 @@ def run() -> None:
     # Read table from meadow dataset.
     tb = ds_meadow.read("knoll_prices")
 
-    # Calculate real house prices from nominal house prices and CPI (analogue to Knoll)
+    # Calculate real house prices from nominal house prices and CPI
+    # This calculation is identical to the calculation used in the original paper which can be found here: https://www.aeaweb.org/articles?id=10.1257/aer.20150501
     tb["hpreal"] = tb["hpnom"] / tb["cpi"] * 100
 
     tb = tb[["country", "year", "hpreal"]]
