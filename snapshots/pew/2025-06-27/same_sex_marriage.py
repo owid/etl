@@ -1,4 +1,12 @@
-"""Script to create a snapshot of dataset."""
+"""
+INSTRUCTIONS FOR EXTRACTION
+    1. Go to https://www.pewresearch.org/religion/fact-sheet/same-sex-marriage-around-the-world/
+    2. Copy the table available in the website in Excel, for example. (Paste special>Paste special>Text)
+    3. Add column titles for country and year and only keep those.
+    4. Save as a CSV, called `same_sex_marriage.csv`.
+    5. Place the CSV file in this directory.
+    6. Run this script to create a snapshot of the dataset.
+"""
 
 from pathlib import Path
 
