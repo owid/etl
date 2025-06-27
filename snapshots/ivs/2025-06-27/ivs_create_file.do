@@ -1081,7 +1081,7 @@ foreach var in $democracy_essential_char {
 	keep if `var' != .e
 
 	gen not_essential_dem_agg_`var' = 0
-	replace not_essential_dem_agg_`var' = 1 if `var' <= 4
+	replace not_essential_dem_agg_`var' = 1 if `var' <= 4 //Note that I am including the spontaneous "it is against democracy" answer
 
 	gen essential_dem_agg_`var' = 0
 	replace essential_dem_agg_`var' = 1 if `var' >= 6 & `var' <= 10

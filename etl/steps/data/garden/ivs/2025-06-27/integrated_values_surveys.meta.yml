@@ -3785,3 +3785,842 @@ tables:
         display:
           name: "Homosexual couples are as good parents as other couples: No answer"
           <<: *common-display
+
+      not_satisfied_democracy:
+        title: "Democracy - Satisfaction with the political system: Not satisfied (aggregate)"
+        description_short: '% of respondents replying 1 to 4 in a scale from 1 to 10 when asked "How satisfied are you with how the political system is functioning in your country these days? On the scale from 1 to 10 below, 1 means not satisfied at all and 10 means completely satisfied."'
+        display:
+          name: "Satisfaction with the political system: Not satisfied"
+          <<: *common-display
+      satisfied_democracy:
+        title: "Democracy - Satisfaction with the political system: Satisfied (aggregate)"
+        description_short: '% of respondents replying 6 to 10 in a scale from 1 to 10 when asked "How satisfied are you with how the political system is functioning in your country these days? On the scale from 1 to 10 below, 1 means not satisfied at all and 10 means completely satisfied."'
+        display:
+          name: "Satisfaction with the political system: Satisfied"
+          <<: *common-display
+      not_satisfied_at_all_democracy:
+        title: "Democracy - Satisfaction with the political system: Not satisfied at all"
+        description_short: '% of respondents replying 1 in a scale from 1 to 10 when asked "How satisfied are you with how the political system is functioning in your country these days? On the scale from 1 to 10 below, 1 means not satisfied at all and 10 means completely satisfied."'
+        display:
+          name: "Satisfaction with the political system: Not satisfied at all"
+          <<: *common-display
+      satisfied_completely_democracy:
+        title: "Democracy - Satisfaction with the political system: Satisfied completely"
+        description_short: '% of respondents replying 10 in a scale from 1 to 10 when asked "How satisfied are you with how the political system is functioning in your country these days? On the scale from 1 to 10 below, 1 means not satisfied at all and 10 means completely satisfied."'
+        display:
+          name: "Satisfaction with the political system: Satisfied completely"
+          <<: *common-display
+      neutral_satisfied_democracy:
+        title: "Democracy - Satisfaction with the political system: Neutral"
+        description_short: '% of respondents replying 5 in a scale from 1 to 10 when asked "How satisfied are you with how the political system is functioning in your country these days? On the scale from 1 to 10 below, 1 means not satisfied at all and 10 means completely satisfied."'
+        display:
+          name: "Satisfaction with the political system: Neutral"
+          <<: *common-display
+      dont_know_satisfied_democracy:
+        title: "Democracy - Satisfaction with the political system: Don't know"
+        description_short: '% of respondents replying "don''t know" when asked "How satisfied are you with how the political system is functioning in your country these days? On the scale from 1 to 10 below, 1 means not satisfied at all and 10 means completely satisfied."'
+        display:
+          name: "Satisfaction with the political system: Don't know"
+          <<: *common-display
+      no_answer_satisfied_democracy:
+        title: "Democracy - Satisfaction with the political system: No answer"
+        description_short: '% of answers classified as "No answer" for the question "How satisfied are you with how the political system is functioning in your country these days? On the scale from 1 to 10 below, 1 means not satisfied at all and 10 means completely satisfied."'
+        display:
+          name: "Satisfaction with the political system: No answer"
+          <<: *common-display
+      avg_score_satisfied_democracy:
+        title: "Democracy - Satisfaction with the political system: Average score"
+        description_short: 'Average score in a scale from 1 to 10 when asked "How satisfied are you with how the political system is functioning in your country these days? On the scale from 1 to 10 below, 1 means not satisfied at all and 10 means completely satisfied." In the scale, 1 means not satisfied at all and 10 means completely satisfied.'
+        display:
+          name: "Satisfaction with the political system: Average score"
+          <<: *common-display
+        unit: ""
+        short_unit: ""
+
+      good_experts_make_decisions:
+        title: "Democracy - Experts, not government, making decisions: Good"
+        description_short: '% of respondents replying "Very good" or "Fairly good" when asked "I''m going to describe various types of political systems and ask what you think about each as a way of governing this country. For each one, would you say it is a very good, fairly good, fairly bad or very bad way of governing this country?" when the system the system is "Having experts, not government, make decisions according to what they think is best for the country".'
+        display:
+          name: "Experts, not government, making decisions: Good"
+          <<: *common-display
+      bad_experts_make_decisions:
+        title: "Democracy - Experts, not government, making decisions: Bad"
+        description_short: '% of respondents replying "Very bad" or "Fairly bad" when asked "I''m going to describe various types of political systems and ask what you think about each as a way of governing this country. For each one, would you say it is a very good, fairly good, fairly bad or very bad way of governing this country?" when the system the system is "Having experts, not government, make decisions according to what they think is best for the country".'
+        display:
+          name: "Experts, not government, making decisions: Bad"
+          <<: *common-display
+      very_good_experts_make_decisions:
+        title: "Democracy - Experts, not government, making decisions: Very good"
+        description_short: '% of respondents replying "Very good" when asked "I''m going to describe various types of political systems and ask what you think about each as a way of governing this country. For each one, would you say it is a very good, fairly good, fairly bad or very bad way of governing this country?" when the system the system is "Having experts, not government, make decisions according to what they think is best for the country".'
+        display:
+          name: "Experts, not government, making decisions: Very good"
+          <<: *common-display
+      fairly_good_experts_make_decisions:
+        title: "Democracy - Experts, not government, making decisions: Fairly good"
+        description_short: '% of respondents replying "Fairly good" when asked "I''m going to describe various types of political systems and ask what you think about each as a way of governing this country. For each one, would you say it is a very good, fairly good, fairly bad or very bad way of governing this country?" when the system the system is "Having experts, not government, make decisions according to what they think is best for the country".'
+        display:
+          name: "Experts, not government, making decisions: Fairly good"
+          <<: *common-display
+      fairly_bad_experts_make_decisions:
+        title: "Democracy - Experts, not government, making decisions: Fairly bad"
+        description_short: '% of respondents replying "Fairly bad" when asked "I''m going to describe various types of political systems and ask what you think about each as a way of governing this country. For each one, would you say it is a very good, fairly good, fairly bad or very bad way of governing this country?" when the system the system is "Having experts, not government, make decisions according to what they think is best for the country".'
+        display:
+          name: "Experts, not government, making decisions: Fairly bad"
+          <<: *common-display
+      very_bad_experts_make_decisions:
+        title: "Democracy - Experts, not government, making decisions: Very bad"
+        description_short: '% of respondents replying "Very bad" when asked "I''m going to describe various types of political systems and ask what you think about each as a way of governing this country. For each one, would you say it is a very good, fairly good, fairly bad or very bad way of governing this country?" when the system the system is "Having experts, not government, make decisions according to what they think is best for the country".'
+        display:
+          name: "Experts, not government, making decisions: Very bad"
+          <<: *common-display
+      dont_know_experts_make_decisions:
+        title: "Democracy - Experts, not government, making decisions: Don't know"
+        description_short: '% of respondents replying "don''t know" when asked "I''m going to describe various types of political systems and ask what you think about each as a way of governing this country. For each one, would you say it is a very good, fairly good, fairly bad or very bad way of governing this country?" when the system the system is "Having experts, not government, make decisions according to what they think is best for the country".'
+        display:
+          name: "Experts, not government, making decisions: Don't know"
+          <<: *common-display
+      no_answer_experts_make_decisions:
+        title: "Democracy - Experts, not government, making decisions: No answer"
+        description_short: '% of answers classified as "No answer" for the question "I''m going to describe various types of political systems and ask what you think about each as a way of governing this country. For each one, would you say it is a very good, fairly good, fairly bad or very bad way of governing this country?" when the system the system is "Having experts, not government, make decisions according to what they think is best for the country".'
+        display:
+          name: "Experts, not government, making decisions: No answer"
+          <<: *common-display
+      avg_score_experts_make_decisions:
+        title: "Democracy - Experts, not government, making decisions: Average score"
+        description_short: 'Average score in a scale from 1 to 4 when asked "I''m going to describe various types of political systems and ask what you think about each as a way of governing this country. For each one, would you say it is a very good, fairly good, fairly bad or very bad way of governing this country?" when the system the system is "Having experts, not government, make decisions according to what they think is best for the country". In the scale, 1 means very bad and 4 means very good.'
+        display:
+          name: "Experts, not government, making decisions: Average score"
+          <<: *common-display
+        unit: ""
+        short_unit: ""
+
+      good_army_rule:
+        title: "Democracy - Having the army rule: Good"
+        description_short: '% of respondents replying "Very good" or "Fairly good" when asked "I''m going to describe various types of political systems and ask what you think about each as a way of governing this country. For each one, would you say it is a very good, fairly good, fairly bad or very bad way of governing this country?" when the system is "Having the army rule".'
+        display:
+          name: "Having the army rule: Good"
+          <<: *common-display
+      bad_army_rule:
+        title: "Democracy - Having the army rule: Bad"
+        description_short: '% of respondents replying "Very bad" or "Fairly bad" when asked "I''m going to describe various types of political systems and ask what you think about each as a way of governing this country. For each one, would you say it is a very good, fairly good, fairly bad or very bad way of governing this country?" when the system is "Having the army rule".'
+        display:
+          name: "Having the army rule: Bad"
+          <<: *common-display
+      very_good_army_rule:
+        title: "Democracy - Having the army rule: Very good"
+        description_short: '% of respondents replying "Very good" when asked "I''m going to describe various types of political systems and ask what you think about each as a way of governing this country. For each one, would you say it is a very good, fairly good, fairly bad or very bad way of governing this country?" when the system is "Having the army rule".'
+        display:
+          name: "Having the army rule: Very good"
+          <<: *common-display
+      fairly_good_army_rule:
+        title: "Democracy - Having the army rule: Fairly good"
+        description_short: '% of respondents replying "Fairly good" when asked "I''m going to describe various types of political systems and ask what you think about each as a way of governing this country. For each one, would you say it is a very good, fairly good, fairly bad or very bad way of governing this country?" when the system is "Having the army rule".'
+        display:
+          name: "Having the army rule: Fairly good"
+          <<: *common-display
+      fairly_bad_army_rule:
+        title: "Democracy - Having the army rule: Fairly bad"
+        description_short: '% of respondents replying "Fairly bad" when asked "I''m going to describe various types of political systems and ask what you think about each as a way of governing this country. For each one, would you say it is a very good, fairly good, fairly bad or very bad way of governing this country?" when the system is "Having the army rule".'
+        display:
+          name: "Having the army rule: Fairly bad"
+          <<: *common-display
+      very_bad_army_rule:
+        title: "Democracy - Having the army rule: Very bad"
+        description_short: '% of respondents replying "Very bad" when asked "I''m going to describe various types of political systems and ask what you think about each as a way of governing this country. For each one, would you say it is a very good, fairly good, fairly bad or very bad way of governing this country?" when the system is "Having the army rule".'
+        display:
+          name: "Having the army rule: Very bad"
+          <<: *common-display
+      dont_know_army_rule:
+        title: "Democracy - Having the army rule: Don't know"
+        description_short: '% of respondents replying "don''t know" when asked "I''m going to describe various types of political systems and ask what you think about each as a way of governing this country. For each one, would you say it is a very good, fairly good, fairly bad or very bad way of governing this country?" when the system is "Having the army rule".'
+        display:
+          name: "Having the army rule: Don't know"
+          <<: *common-display
+      no_answer_army_rule:
+        title: "Democracy - Having the army rule: No answer"
+        description_short: '% of answers classified as "No answer" for the question "I''m going to describe various types of political systems and ask what you think about each as a way of governing this country. For each one, would you say it is a very good, fairly good, fairly bad or very bad way of governing this country?" when the system is "Having the army rule".'
+        display:
+          name: "Having the army rule: No answer"
+          <<: *common-display
+      avg_score_army_rule:
+        title: "Democracy - Having the army rule: Average score"
+        description_short: 'Average score in a scale from 1 to 4 when asked "I''m going to describe various types of political systems and ask what you think about each as a way of governing this country. For each one, would you say it is a very good, fairly good, fairly bad or very bad way of governing this country?" when the system is "Having the army rule". In the scale, 1 means very bad and 4 means very good.'
+        display:
+          name: "Having the army rule: Average score"
+          <<: *common-display
+        unit: ""
+        short_unit: ""
+
+      good_democratic_political_system:
+        title: "Democracy - Having a democratic political system: Good"
+        description_short: '% of respondents replying "Very good" or "Fairly good" when asked "I''m going to describe various types of political systems and ask what you think about each as a way of governing this country. For each one, would you say it is a very good, fairly good, fairly bad or very bad way of governing this country?" when the system is "Having a democratic political system".'
+        display:
+          name: "Having a democratic political system: Good"
+          <<: *common-display
+      bad_democratic_political_system:
+        title: "Democracy - Having a democratic political system: Bad"
+        description_short: '% of respondents replying "Very bad" or "Fairly bad" when asked "I''m going to describe various types of political systems and ask what you think about each as a way of governing this country. For each one, would you say it is a very good, fairly good, fairly bad or very bad way of governing this country?" when the system is "Having a democratic political system".'
+        display:
+          name: "Having a democratic political system: Bad"
+          <<: *common-display
+      very_good_democratic_political_system:
+        title: "Democracy - Having a democratic political system: Very good"
+        description_short: '% of respondents replying "Very good" when asked "I''m going to describe various types of political systems and ask what you think about each as a way of governing this country. For each one, would you say it is a very good, fairly good, fairly bad or very bad way of governing this country?" when the system is "Having a democratic political system".'
+        display:
+          name: "Having a democratic political system: Very good"
+          <<: *common-display
+      fairly_good_democratic_political_system:
+        title: "Democracy - Having a democratic political system: Fairly good"
+        description_short: '% of respondents replying "Fairly good" when asked "I''m going to describe various types of political systems and ask what you think about each as a way of governing this country. For each one, would you say it is a very good, fairly good, fairly bad or very bad way of governing this country?" when the system is "Having a democratic political system".'
+        display:
+          name: "Having a democratic political system: Fairly good"
+          <<: *common-display
+      fairly_bad_democratic_political_system:
+        title: "Democracy - Having a democratic political system: Fairly bad"
+        description_short: '% of respondents replying "Fairly bad" when asked "I''m going to describe various types of political systems and ask what you think about each as a way of governing this country. For each one, would you say it is a very good, fairly good, fairly bad or very bad way of governing this country?" when the system is "Having a democratic political system".'
+        display:
+          name: "Having a democratic political system: Fairly bad"
+          <<: *common-display
+      very_bad_democratic_political_system:
+        title: "Democracy - Having a democratic political system: Very bad"
+        description_short: '% of respondents replying "Very bad" when asked "I''m going to describe various types of political systems and ask what you think about each as a way of governing this country. For each one, would you say it is a very good, fairly good, fairly bad or very bad way of governing this country?" when the system is "Having a democratic political system".'
+        display:
+          name: "Having a democratic political system: Very bad"
+          <<: *common-display
+      dont_know_democratic_political_system:
+        title: "Democracy - Having a democratic political system: Don't know"
+        description_short: '% of respondents replying "don''t know" when asked "I''m going to describe various types of political systems and ask what you think about each as a way of governing this country. For each one, would you say it is a very good, fairly good, fairly bad or very bad way of governing this country?" when the system is "Having a democratic political system".'
+        display:
+          name: "Having a democratic political system: Don't know"
+          <<: *common-display
+      no_answer_democratic_political_system:
+        title: "Democracy - Having a democratic political system: No answer"
+        description_short: '% of answers classified as "No answer" for the question "I''m going to describe various types of political systems and ask what you think about each as a way of governing this country. For each one, would you say it is a very good, fairly good, fairly bad or very bad way of governing this country?" when the system is "Having a democratic political system".'
+        display:
+          name: "Having a democratic political system: No answer"
+          <<: *common-display
+      avg_score_democratic_political_system:
+        title: "Democracy - Having a democratic political system: Average score"
+        description_short: 'Average score in a scale from 1 to 4 when asked "I''m going to describe various types of political systems and ask what you think about each as a way of governing this country. For each one, would you say it is a very good, fairly good, fairly bad or very bad way of governing this country?" when the system is "Having a democratic political system". In the scale, 1 means very bad and 4 means very good.'
+        display:
+          name: "Having a democratic political system: Average score"
+          <<: *common-display
+        unit: ""
+        short_unit: ""
+      not_essential_dem_agg_governments_tax_the_rich_and_subsidize_the_poor:
+        title: "Democracy - Governments tax the rich and subsidize the poor: Not essential (aggregate)"
+        description_short: '% of respondents replying 1 to 4 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "Governments tax the rich and subsidize the poor". It also includes the answer "It is against democracy", an answer spontaneously given by some respondents.'
+        display:
+          name: "Governments tax the rich and subsidize the poor: Not essential (aggregate)"
+          <<: *common-display
+      essential_dem_agg_governments_tax_the_rich_and_subsidize_the_poor:
+        title: "Democracy - Governments tax the rich and subsidize the poor: Essential (aggregate)"
+        description_short: '% of respondents replying 6 to 10 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "Governments tax the rich and subsidize the poor".'
+        display:
+          name: "Governments tax the rich and subsidize the poor: Essential (aggregate)"
+          <<: *common-display
+      not_essential_dem_governments_tax_the_rich_and_subsidize_the_poor:
+        title: "Democracy - Governments tax the rich and subsidize the poor: Not essential"
+        description_short: '% of respondents replying 1 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "Governments tax the rich and subsidize the poor". It also includes the answer "It is against democracy", an answer spontaneously given by some respondents.'
+        display:
+          name: "Governments tax the rich and subsidize the poor: Not essential"
+          <<: *common-display
+      essential_dem_governments_tax_the_rich_and_subsidize_the_poor:
+        title: "Democracy - Governments tax the rich and subsidize the poor: Essential"
+        description_short: '% of respondents replying 10 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "Governments tax the rich and subsidize the poor".'
+        display:
+          name: "Governments tax the rich and subsidize the poor: Essential"
+          <<: *common-display
+      neutral_essential_dem_governments_tax_the_rich_and_subsidize_the_poor:
+        title: "Democracy - Governments tax the rich and subsidize the poor: Neutral"
+        description_short: '% of respondents replying 5 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "Governments tax the rich and subsidize the poor".'
+        display:
+          name: "Governments tax the rich and subsidize the poor: Neutral"
+          <<: *common-display
+      dont_know_governments_tax_the_rich_and_subsidize_the_poor:
+        title: "Democracy - Governments tax the rich and subsidize the poor: Don't know"
+        description_short: '% of respondents replying "don''t know" when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "Governments tax the rich and subsidize the poor".'
+        display:
+          name: "Governments tax the rich and subsidize the poor: Don't know"
+          <<: *common-display
+      no_answer_governments_tax_the_rich_and_subsidize_the_poor:
+        title: "Democracy - Governments tax the rich and subsidize the poor: No answer"
+        description_short: '% of answers classified as "No answer" for the question "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "Governments tax the rich and subsidize the poor".'
+        display:
+          name: "Governments tax the rich and subsidize the poor: No answer"
+          <<: *common-display
+      avg_score_governments_tax_the_rich_and_subsidize_the_poor:
+        title: "Democracy - Governments tax the rich and subsidize the poor: Average score"
+        description_short: 'Average score in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "Governments tax the rich and subsidize the poor". In the scale, 1 means not at all an essential characteristic of democracy and 10 means definitely an essential characteristic of democracy.'
+        display:
+          name: "Governments tax the rich and subsidize the poor: Average score"
+          <<: *common-display
+        unit: ""
+        short_unit: ""
+
+      not_essential_dem_agg_religious_authorities_interpret_the_laws:
+        title: "Democracy - Religious authorities interpret the laws: Not essential (aggregate)"
+        description_short: '% of respondents replying 1 to 4 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "Religious authorities interpret the laws". It also includes the answer "It is against democracy", an answer spontaneously given by some respondents.'
+        display:
+          name: "Religious authorities interpret the laws: Not essential (aggregate)"
+          <<: *common-display
+      essential_dem_agg_religious_authorities_interpret_the_laws:
+        title: "Democracy - Religious authorities interpret the laws: Essential (aggregate)"
+        description_short: '% of respondents replying 6 to 10 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "Religious authorities interpret the laws".'
+        display:
+          name: "Religious authorities interpret the laws: Essential (aggregate)"
+          <<: *common-display
+      not_essential_dem_religious_authorities_interpret_the_laws:
+        title: "Democracy - Religious authorities interpret the laws: Not essential"
+        description_short: '% of respondents replying 1 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "Religious authorities interpret the laws".'
+        display:
+          name: "Religious authorities interpret the laws: Not essential"
+          <<: *common-display
+      essential_dem_religious_authorities_interpret_the_laws:
+        title: "Democracy - Religious authorities interpret the laws: Essential"
+        description_short: '% of respondents replying 10 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "Religious authorities interpret the laws".'
+        display:
+          name: "Religious authorities interpret the laws: Essential"
+          <<: *common-display
+      neutral_essential_dem_religious_authorities_interpret_the_laws:
+        title: "Democracy - Religious authorities interpret the laws: Neutral"
+        description_short: '% of respondents replying 5 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "Religious authorities interpret the laws".'
+        display:
+          name: "Religious authorities interpret the laws: Neutral"
+          <<: *common-display
+      dont_know_religious_authorities_interpret_the_laws:
+        title: "Democracy - Religious authorities interpret the laws: Don't know"
+        description_short: '% of respondents replying "don''t know" when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "Religious authorities interpret the laws".'
+        display:
+          name: "Religious authorities interpret the laws: Don't know"
+          <<: *common-display
+      no_answer_religious_authorities_interpret_the_laws:
+        title: "Democracy - Religious authorities interpret the laws: No answer"
+        description_short: '% of answers classified as "No answer" for the question "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "Religious authorities interpret the laws".'
+        display:
+          name: "Religious authorities interpret the laws: No answer"
+          <<: *common-display
+      avg_score_religious_authorities_interpret_the_laws:
+        title: "Democracy - Religious authorities interpret the laws: Average score"
+        description_short: 'Average score in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "Religious authorities interpret the laws". In the scale, 1 means not at all an essential characteristic of democracy and 10 means definitely an essential characteristic of democracy.'
+        display:
+          name: "Religious authorities interpret the laws: Average score"
+          <<: *common-display
+        unit: ""
+        short_unit: ""
+
+      not_essential_dem_agg_people_choose_their_leaders_in_free_elections:
+        title: "Democracy - People choose their leaders in free elections: Not essential (aggregate)"
+        description_short: '% of respondents replying 1 to 4 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "People choose their leaders in free elections". It also includes the answer "It is against democracy", an answer spontaneously given by some respondents.'
+        display:
+          name: "People choose their leaders in free elections: Not essential (aggregate)"
+          <<: *common-display
+      essential_dem_agg_people_choose_their_leaders_in_free_elections:
+        title: "Democracy - People choose their leaders in free elections: Essential (aggregate)"
+        description_short: '% of respondents replying 6 to 10 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "People choose their leaders in free elections".'
+        display:
+          name: "People choose their leaders in free elections: Essential (aggregate)"
+          <<: *common-display
+      not_essential_dem_people_choose_their_leaders_in_free_elections:
+        title: "Democracy - People choose their leaders in free elections: Not essential"
+        description_short: '% of respondents replying 1 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "People choose their leaders in free elections". It also includes the answer "It is against democracy", an answer spontaneously given by some respondents.'
+        display:
+          name: "People choose their leaders in free elections: Not essential"
+          <<: *common-display
+      essential_dem_people_choose_their_leaders_in_free_elections:
+        title: "Democracy - People choose their leaders in free elections: Essential"
+        description_short: '% of respondents replying 10 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "People choose their leaders in free elections".'
+        display:
+          name: "People choose their leaders in free elections: Essential"
+          <<: *common-display
+      neutral_essential_dem_people_choose_their_leaders_in_free_elections:
+        title: "Democracy - People choose their leaders in free elections: Neutral"
+        description_short: '% of respondents replying 5 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "People choose their leaders in free elections".'
+        display:
+          name: "People choose their leaders in free elections: Neutral"
+          <<: *common-display
+      dont_know_people_choose_their_leaders_in_free_elections:
+        title: "Democracy - People choose their leaders in free elections: Don't know"
+        description_short: '% of respondents replying "don''t know" when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "People choose their leaders in free elections".'
+        display:
+          name: "People choose their leaders in free elections: Don't know"
+          <<: *common-display
+      no_answer_people_choose_their_leaders_in_free_elections:
+        title: "Democracy - People choose their leaders in free elections: No answer"
+        description_short: '% of answers classified as "No answer" for the question "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "People choose their leaders in free elections".'
+        display:
+          name: "People choose their leaders in free elections: No answer"
+          <<: *common-display
+      avg_score_people_choose_their_leaders_in_free_elections:
+        title: "Democracy - People choose their leaders in free elections: Average score"
+        description_short: 'Average score in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "People choose their leaders in free elections". In the scale, 1 means not at all an essential characteristic of democracy and 10 means definitely an essential characteristic of democracy.'
+        display:
+          name: "People choose their leaders in free elections: Average score"
+          <<: *common-display
+        unit: ""
+        short_unit: ""
+
+      not_essential_dem_agg_people_receive_state_aid_for_unemployment:
+        title: "Democracy - People receive state aid for unemployment: Not essential (aggregate)"
+        description_short: '% of respondents replying 1 to 4 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "People receive state aid for unemployment". It also includes the answer "It is against democracy", an answer spontaneously given by some respondents.'
+        display:
+          name: "People receive state aid for unemployment: Not essential (aggregate)"
+          <<: *common-display
+      essential_dem_agg_people_receive_state_aid_for_unemployment:
+        title: "Democracy - People receive state aid for unemployment: Essential (aggregate)"
+        description_short: '% of respondents replying 6 to 10 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "People receive state aid for unemployment".'
+        display:
+          name: "People receive state aid for unemployment: Essential (aggregate)"
+          <<: *common-display
+      not_essential_dem_people_receive_state_aid_for_unemployment:
+        title: "Democracy - People receive state aid for unemployment: Not essential"
+        description_short: '% of respondents replying 1 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "People receive state aid for unemployment". It also includes the answer "It is against democracy", an answer spontaneously given by some respondents.'
+        display:
+          name: "People receive state aid for unemployment: Not essential"
+          <<: *common-display
+      essential_dem_people_receive_state_aid_for_unemployment:
+        title: "Democracy - People receive state aid for unemployment: Essential"
+        description_short: '% of respondents replying 10 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "People receive state aid for unemployment".'
+        display:
+          name: "People receive state aid for unemployment: Essential"
+          <<: *common-display
+      neutral_essential_dem_people_receive_state_aid_for_unemployment:
+        title: "Democracy - People receive state aid for unemployment: Neutral"
+        description_short: '% of respondents replying 5 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "People receive state aid for unemployment".'
+        display:
+          name: "People receive state aid for unemployment: Neutral"
+          <<: *common-display
+      dont_know_people_receive_state_aid_for_unemployment:
+        title: "Democracy - People receive state aid for unemployment: Don't know"
+        description_short: '% of respondents replying "don''t know" when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "People receive state aid for unemployment".'
+        display:
+          name: "People receive state aid for unemployment: Don't know"
+          <<: *common-display
+      no_answer_people_receive_state_aid_for_unemployment:
+        title: "Democracy - People receive state aid for unemployment: No answer"
+        description_short: '% of respondents not providing an answer when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "People receive state aid for unemployment".'
+        display:
+          name: "People receive state aid for unemployment: No answer"
+          <<: *common-display
+      avg_score_people_receive_state_aid_for_unemployment:
+        title: "Democracy - People receive state aid for unemployment: Average score"
+        description_short: 'Average score in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "People receive state aid for unemployment".'
+        display:
+          name: "People receive state aid for unemployment: Average score"
+          <<: *common-display
+        unit: ""
+        short_unit: ""
+
+      not_essential_dem_agg_army_takes_over_when_government_is_incompetent:
+        title: "Democracy - The army takes over when government is incompetent: Not essential (aggregate)"
+        description_short: '% of respondents replying 1 to 4 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "The army takes over when government is incompetent". It also includes the answer "It is against democracy", an answer spontaneously given by some respondents.'
+        display:
+          name: "The army takes over when government is incompetent: Not essential (aggregate)"
+          <<: *common-display
+      essential_dem_agg_army_takes_over_when_government_is_incompetent:
+        title: "Democracy - The army takes over when government is incompetent: Essential (aggregate)"
+        description_short: '% of respondents replying 6 to 10 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "The army takes over when government is incompetent".'
+        display:
+          name: "The army takes over when government is incompetent: Essential (aggregate)"
+          <<: *common-display
+      not_essential_dem_army_takes_over_when_government_is_incompetent:
+        title: "Democracy - The army takes over when government is incompetent: Not essential"
+        description_short: '% of respondents replying 1 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "The army takes over when government is incompetent". It also includes the answer "It is against democracy", an answer spontaneously given by some respondents.'
+        display:
+          name: "The army takes over when government is incompetent: Not essential"
+          <<: *common-display
+      essential_dem_army_takes_over_when_government_is_incompetent:
+        title: "Democracy - The army takes over when government is incompetent: Essential"
+        description_short: '% of respondents replying 10 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "The army takes over when government is incompetent".'
+        display:
+          name: "The army takes over when government is incompetent: Essential"
+          <<: *common-display
+      neutral_essential_dem_army_takes_over_when_government_is_incompetent:
+        title: "Democracy - The army takes over when government is incompetent: Neutral"
+        description_short: '% of respondents replying 5 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "The army takes over when government is incompetent".'
+        display:
+          name: "The army takes over when government is incompetent: Neutral"
+          <<: *common-display
+      dont_know_army_takes_over_when_government_is_incompetent:
+        title: "Democracy - The army takes over when government is incompetent: Don't know"
+        description_short: '% of respondents replying "don''t know" when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "The army takes over when government is incompetent".'
+        display:
+          name: "The army takes over when government is incompetent: Don't know"
+          <<: *common-display
+      no_answer_army_takes_over_when_government_is_incompetent:
+        title: "Democracy - The army takes over when government is incompetent: No answer"
+        description_short: '% of answers classified as "No answer" for the question "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "The army takes over when government is incompetent".'
+        display:
+          name: "The army takes over when government is incompetent: No answer"
+          <<: *common-display
+      avg_score_army_takes_over_when_government_is_incompetent:
+        title: "Democracy - The army takes over when government is incompetent: Average score"
+        description_short: 'Average score in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "The army takes over when government is incompetent". In the scale, 1 means not at all an essential characteristic of democracy and 10 means definitely an essential characteristic of democracy.'
+        display:
+          name: "The army takes over when government is incompetent: Average score"
+          <<: *common-display
+        unit: ""
+        short_unit: ""
+
+      not_essential_dem_agg_civil_rights_protects_peoples_liberty_against_oppression:
+        title: "Democracy - Civil rights protect people’s liberty from state oppression: Not essential (aggregate)"
+        description_short: '% of respondents replying 1 to 4 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "Civil rights protect people’s liberty from state oppression". It also includes the answer "It is against democracy", an answer spontaneously given by some respondents.'
+        display:
+          name: "Civil rights protect people’s liberty from state oppression: Not essential (aggregate)"
+          <<: *common-display
+      essential_dem_agg_civil_rights_protects_peoples_liberty_against_oppression:
+        title: "Democracy - Civil rights protect people’s liberty from state oppression: Essential (aggregate)"
+        description_short: '% of respondents replying 6 to 10 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "Civil rights protect people’s liberty from state oppression".'
+        display:
+          name: "Civil rights protect people’s liberty from state oppression: Essential (aggregate)"
+          <<: *common-display
+      not_essential_dem_civil_rights_protects_peoples_liberty_against_oppression:
+        title: "Democracy - Civil rights protect people’s liberty from state oppression: Not essential"
+        description_short: '% of respondents replying 1 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "Civil rights protect people’s liberty from state oppression". It also includes the answer "It is against democracy", an answer spontaneously given by some respondents.'
+        display:
+          name: "Civil rights protect people’s liberty from state oppression: Not essential"
+          <<: *common-display
+      essential_dem_civil_rights_protects_peoples_liberty_against_oppression:
+        title: "Democracy - Civil rights protect people’s liberty from state oppression: Essential"
+        description_short: '% of respondents replying 10 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "Civil rights protect people’s liberty from state oppression".'
+        display:
+          name: "Civil rights protect people’s liberty from state oppression: Essential"
+          <<: *common-display
+      neutral_essential_dem_civil_rights_protects_peoples_liberty_against_oppression:
+        title: "Democracy - Civil rights protect people’s liberty from state oppression: Neutral"
+        description_short: '% of respondents replying 5 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "Civil rights protect people’s liberty from state oppression".'
+        display:
+          name: "Civil rights protect people’s liberty from state oppression: Neutral"
+          <<: *common-display
+      dont_know_civil_rights_protects_peoples_liberty_against_oppression:
+        title: "Democracy - Civil rights protect people’s liberty from state oppression: Don't know"
+        description_short: '% of respondents replying "don''t know" when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "Civil rights protect people’s liberty from state oppression".'
+        display:
+          name: "Civil rights protect people’s liberty from state oppression: Don't know"
+          <<: *common-display
+      no_answer_civil_rights_protects_peoples_liberty_against_oppression:
+        title: "Democracy - Civil rights protect people’s liberty from state oppression: No answer"
+        description_short: '% of answers classified as "No answer" for the question "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "Civil rights protect people’s liberty from state oppression".'
+        display:
+          name: "Civil rights protect people’s liberty from state oppression: No answer"
+          <<: *common-display
+      avg_score_civil_rights_protects_peoples_liberty_against_oppression:
+        title: "Democracy - Civil rights protect people’s liberty from state oppression: Average score"
+        description_short: 'Average score in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "Civil rights protect people’s liberty from state oppression". In the scale, 1 means not at all an essential characteristic of democracy and 10 means definitely an essential characteristic of democracy.'
+        display:
+          name: "Civil rights protect people’s liberty from state oppression: Average score"
+          <<: *common-display
+        unit: ""
+        short_unit: ""
+
+      not_essential_dem_agg_women_have_the_same_rights_as_men:
+        title: "Democracy - Women have the same rights as men: Not essential (aggregate)"
+        description_short: '% of respondents replying 1 to 4 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "Women have the same rights as men". It also includes the answer "It is against democracy", an answer spontaneously given by some respondents.'
+        display:
+          name: "Women have the same rights as men: Not essential (aggregate)"
+          <<: *common-display
+      essential_dem_agg_women_have_the_same_rights_as_men:
+        title: "Democracy - Women have the same rights as men: Essential (aggregate)"
+        description_short: '% of respondents replying 6 to 10 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "Women have the same rights as men".'
+        display:
+          name: "Women have the same rights as men: Essential (aggregate)"
+          <<: *common-display
+      not_essential_dem_women_have_the_same_rights_as_men:
+        title: "Democracy - Women have the same rights as men: Not essential"
+        description_short: '% of respondents replying 1 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "Women have the same rights as men". It also includes the answer "It is against democracy", an answer spontaneously given by some respondents.'
+        display:
+          name: "Women have the same rights as men: Not essential"
+          <<: *common-display
+      essential_dem_women_have_the_same_rights_as_men:
+        title: "Democracy - Women have the same rights as men: Essential"
+        description_short: '% of respondents replying 6 to 10 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "Women have the same rights as men".'
+        display:
+          name: "Women have the same rights as men: Essential"
+          <<: *common-display
+      neutral_essential_dem_women_have_the_same_rights_as_men:
+        title: "Democracy - Women have the same rights as men: Neutral"
+        description_short: '% of respondents replying 5 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "Women have the same rights as men".'
+        display:
+          name: "Women have the same rights as men: Neutral"
+          <<: *common-display
+      dont_know_women_have_the_same_rights_as_men:
+        title: "Democracy - Women have the same rights as men: Don't know"
+        description_short: '% of respondents replying "Don’t know" in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "Women have the same rights as men".'
+        display:
+          name: "Women have the same rights as men: Don't know"
+          <<: *common-display
+      no_answer_women_have_the_same_rights_as_men:
+        title: "Democracy - Women have the same rights as men: No answer"
+        description_short: '% of respondents not providing an answer in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "Women have the same rights as men".'
+        display:
+          name: "Women have the same rights as men: No answer"
+          <<: *common-display
+      avg_score_women_have_the_same_rights_as_men:
+        title: "Democracy - Women have the same rights as men: Average score"
+        description_short: 'Average score from respondents in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "Women have the same rights as men".'
+        display:
+          name: "Women have the same rights as men: Average score"
+          <<: *common-display
+        unit: ""
+        short_unit: ""
+
+      not_essential_dem_agg_the_state_makes_peoples_incomes_equal:
+        title: "Democracy - The state makes people´s incomes equal: Not essential (aggregate)"
+        description_short: '% of respondents replying 1 to 4 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "The state makes people´s incomes equal". It also includes the answer "It is against democracy", an answer spontaneously given by some respondents.'
+        display:
+          name: "The state makes people´s incomes equal: Not essential (aggregate)"
+          <<: *common-display
+      essential_dem_agg_the_state_makes_peoples_incomes_equal:
+        title: "Democracy - The state makes people´s incomes equal: Essential (aggregate)"
+        description_short: '% of respondents replying 6 to 10 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "The state makes people´s incomes equal".'
+        display:
+          name: "The state makes people´s incomes equal: Essential (aggregate)"
+          <<: *common-display
+      not_essential_dem_the_state_makes_peoples_incomes_equal:
+        title: "Democracy - The state makes people´s incomes equal: Not essential"
+        description_short: '% of respondents replying 1 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "The state makes people´s incomes equal". It also includes the answer "It is against democracy", an answer spontaneously given by some respondents.'
+        display:
+          name: "The state makes people´s incomes equal: Not essential"
+          <<: *common-display
+      essential_dem_the_state_makes_peoples_incomes_equal:
+        title: "Democracy - The state makes people´s incomes equal: Essential"
+        description_short: '% of respondents replying 10 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "The state makes people´s incomes equal".'
+        display:
+          name: "The state makes people´s incomes equal: Essential"
+          <<: *common-display
+      neutral_essential_dem_the_state_makes_peoples_incomes_equal:
+        title: "Democracy - The state makes people´s incomes equal: Neutral"
+        description_short: '% of respondents replying 5 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "The state makes people´s incomes equal".'
+        display:
+          name: "The state makes people´s incomes equal: Neutral"
+          <<: *common-display
+      dont_know_the_state_makes_peoples_incomes_equal:
+        title: "Democracy - The state makes people´s incomes equal: Don't know"
+        description_short: '% of respondents replying "don''t know" when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "The state makes people´s incomes equal".'
+        display:
+          name: "The state makes people´s incomes equal: Don't know"
+          <<: *common-display
+      no_answer_the_state_makes_peoples_incomes_equal:
+        title: "Democracy - The state makes people´s incomes equal: No answer"
+        description_short: '% of answers classified as "No answer" for the question "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "The state makes people´s incomes equal".'
+        display:
+          name: "The state makes people´s incomes equal: No answer"
+          <<: *common-display
+      avg_score_the_state_makes_peoples_incomes_equal:
+        title: "Democracy - The state makes people´s incomes equal: Average score"
+        description_short: 'Average score in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "The state makes people´s incomes equal". In the scale, 1 means not at all an essential characteristic of democracy and 10 means definitely an essential characteristic of democracy.'
+        display:
+          name: "The state makes people´s incomes equal: Average score"
+          <<: *common-display
+        unit: ""
+        short_unit: ""
+
+      not_essential_dem_agg_people_obey_their_rulers:
+        title: "Democracy - People obey their rulers: Not essential (aggregate)"
+        description_short: '% of respondents replying 1 to 4 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "People obey their rulers". It also includes the answer "It is against democracy", an answer spontaneously given by some respondents.'
+        display:
+          name: "People obey their rulers: Not essential (aggregate)"
+          <<: *common-display
+      essential_dem_agg_people_obey_their_rulers:
+        title: "Democracy - People obey their rulers: Essential (aggregate)"
+        description_short: '% of respondents replying 6 to 10 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "People obey their rulers".'
+        display:
+          name: "People obey their rulers: Essential (aggregate)"
+          <<: *common-display
+      not_essential_dem_people_obey_their_rulers:
+        title: "Democracy - People obey their rulers: Not essential"
+        description_short: '% of respondents replying 1 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "People obey their rulers". It also includes the answer "It is against democracy", an answer spontaneously given by some respondents.'
+        display:
+          name: "People obey their rulers: Not essential"
+          <<: *common-display
+      essential_dem_people_obey_their_rulers:
+        title: "Democracy - People obey their rulers: Essential"
+        description_short: '% of respondents replying 10 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "People obey their rulers".'
+        display:
+          name: "People obey their rulers: Essential"
+          <<: *common-display
+      neutral_essential_dem_people_obey_their_rulers:
+        title: "Democracy - People obey their rulers: Neutral"
+        description_short: '% of respondents replying 5 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "People obey their rulers".'
+        display:
+          name: "People obey their rulers: Neutral"
+          <<: *common-display
+      dont_know_people_obey_their_rulers:
+        title: "Democracy - People obey their rulers: Don't know"
+        description_short: '% of respondents replying "don''t know" when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "People obey their rulers".'
+        display:
+          name: "People obey their rulers: Don't know"
+          <<: *common-display
+      no_answer_people_obey_their_rulers:
+        title: "Democracy - People obey their rulers: No answer"
+        description_short: '% of answers classified as "No answer" for the question "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "People obey their rulers".'
+        display:
+          name: "People obey their rulers: No answer"
+          <<: *common-display
+      avg_score_people_obey_their_rulers:
+        title: "Democracy - People obey their rulers: Average score"
+        description_short: 'Average score (1-10) of respondents when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "People obey their rulers".'
+        display:
+          name: "People obey their rulers: Average score"
+          <<: *common-display
+        unit: ""
+        short_unit: ""
+
+      not_important_democracy:
+        title: "Democracy - Importance of democracy: Not important"
+        description_short: '% of respondents replying 1 to 4 in a scale from 1 to 10 when asked "How important is it for you to live in a country that is governed democratically? On this scale where 1 means it is “not at all important” and 10 means “absolutely important” what position would you choose?"'
+        display:
+          name: "Importance of democracy: Not important"
+          <<: *common-display
+      important_democracy:
+        title: "Democracy - Importance of democracy: Important"
+        description_short: '% of respondents replying 6 to 10 in a scale from 1 to 10 when asked "How important is it for you to live in a country that is governed democratically? On this scale where 1 means it is “not at all important” and 10 means “absolutely important” what position would you choose?"'
+        display:
+          name: "Importance of democracy: Important"
+          <<: *common-display
+      not_at_all_important_democracy:
+        title: "Democracy - Importance of democracy: Not at all important"
+        description_short: '% of respondents replying 1 in a scale from 1 to 10 when asked "How important is it for you to live in a country that is governed democratically? On this scale where 1 means it is “not at all important” and 10 means “absolutely important” what position would you choose?"'
+        display:
+          name: "Importance of democracy: Not at all important"
+          <<: *common-display
+      absolutely_important_democracy:
+        title: "Democracy - Importance of democracy: Absolutely important"
+        description_short: '% of respondents replying 10 in a scale from 1 to 10 when asked "How important is it for you to live in a country that is governed democratically? On this scale where 1 means it is “not at all important” and 10 means “absolutely important” what position would you choose?"'
+        display:
+          name: "Importance of democracy: Absolutely important"
+          <<: *common-display
+      neutral_important_democracy:
+        title: "Democracy - Importance of democracy: Neutral"
+        description_short: '% of respondents replying 5 in a scale from 1 to 10 when asked "How important is it for you to live in a country that is governed democratically? On this scale where 1 means it is “not at all important” and 10 means “absolutely important” what position would you choose?"'
+        display:
+          name: "Importance of democracy: Neutral"
+          <<: *common-display
+      dont_know_important_democracy:
+        title: "Democracy - Importance of democracy: Don't know"
+        description_short: '% of respondents replying "don''t know" when asked "How important is it for you to live in a country that is governed democratically? On this scale where 1 means it is “not at all important” and 10 means “absolutely important” what position would you choose?"'
+        display:
+          name: "Importance of democracy: Don't know"
+          <<: *common-display
+      no_answer_important_democracy:
+        title: "Democracy - Importance of democracy: No answer"
+        description_short: '% of answers classified as "No answer" for the question "How important is it for you to live in a country that is governed democratically? On this scale where 1 means it is “not at all important” and 10 means “absolutely important” what position would you choose?"'
+        display:
+          name: "Importance of democracy: No answer"
+          <<: *common-display
+      avg_score_important_democracy:
+        title: "Democracy - Importance of democracy: Average score"
+        description_short: 'Average score in a scale from 1 to 10 when asked "How important is it for you to live in a country that is governed democratically? On this scale where 1 means it is “not at all important” and 10 means “absolutely important” what position would you choose?" In the scale, 1 means not at all important and 10 means absolutely important.'
+        display:
+          name: "Importance of democracy: Average score"
+          <<: *common-display
+        unit: ""
+        short_unit: ""
+
+      not_democratic:
+        title: "Democracy - Democraticness in own country: Not democratic"
+        description_short: '% of respondents replying 1 to 4 in a scale from 1 to 10 when asked "And how democratically is this country being governed today?. Again using a scale from 1 to 10, where 1 means that it is “not at all democratic” and 10 means that it is “completely democratic,” what position would you choose?"'
+        display:
+          name: "Democraticness in own country: Not democratic"
+          <<: *common-display
+      democratic:
+        title: "Democracy - Democraticness in own country: Democratic"
+        description_short: '% of respondents replying 6 to 10 in a scale from 1 to 10 when asked "And how democratically is this country being governed today?. Again using a scale from 1 to 10, where 1 means that it is “not at all democratic” and 10 means that it is “completely democratic,” what position would you choose?"'
+        display:
+          name: "Democraticness in own country: Democratic"
+          <<: *common-display
+      not_at_all_democratic:
+        title: "Democracy - Democraticness in own country: Not at all democratic"
+        description_short: '% of respondents replying 1 in a scale from 1 to 10 when asked "And how democratically is this country being governed today?. Again using a scale from 1 to 10, where 1 means that it is “not at all democratic” and 10 means that it is “completely democratic,” what position would you choose?"'
+        display:
+          name: "Democraticness in own country: Not at all democratic"
+          <<: *common-display
+      completely_democratic:
+        title: "Democracy - Democraticness in own country: Completely democratic"
+        description_short: '% of respondents replying 10 in a scale from 1 to 10 when asked "And how democratically is this country being governed today?. Again using a scale from 1 to 10, where 1 means that it is “not at all democratic” and 10 means that it is “completely democratic,” what position would you choose?"'
+        display:
+          name: "Democraticness in own country: Completely democratic"
+          <<: *common-display
+      neutral_democratic:
+        title: "Democracy - Democraticness in own country: Neutral"
+        description_short: '% of respondents replying 5 in a scale from 1 to 10 when asked "And how democratically is this country being governed today?. Again using a scale from 1 to 10, where 1 means that it is “not at all democratic” and 10 means that it is “completely democratic,” what position would you choose?"'
+        display:
+          name: "Democraticness in own country: Neutral"
+          <<: *common-display
+      dont_know_democratic:
+        title: "Democracy - Democraticness in own country: Don't know"
+        description_short: '% of respondents replying "don''t know" when asked "And how democratically is this country being governed today?. Again using a scale from 1 to 10, where 1 means that it is “not at all democratic” and 10 means that it is “completely democratic,” what position would you choose?"'
+        display:
+          name: "Democraticness in own country: Don't know"
+          <<: *common-display
+      no_answer_democratic:
+        title: "Democracy - Democraticness in own country: No answer"
+        description_short: '% of answers classified as "No answer" for the question "And how democratically is this country being governed today?. Again using a scale from 1 to 10, where 1 means that it is “not at all democratic” and 10 means that it is “completely democratic,” what position would you choose?"'
+        display:
+          name: "Democraticness in own country: No answer"
+          <<: *common-display
+      avg_score_democratic:
+        title: "Democracy - Democraticness in own country: Average score"
+        description_short: 'Average score in a scale from 1 to 10 when asked "And how democratically is this country being governed today?. Again using a scale from 1 to 10, where 1 means that it is “not at all democratic” and 10 means that it is “completely democratic,” what position would you choose?" In the scale, 1 means not at all democratic and 10 means completely democratic.'
+        display:
+          name: "Democraticness in own country: Average score"
+          <<: *common-display
+        unit: ""
+        short_unit: ""
+
+      important_honest_elections_makes_a_difference:
+        title: "Democracy - Honest elections make a difference: Important"
+        description_short: '% of respondents replying "very important" or "rather important" when asked "Some people think that having honest elections makes a lot of difference in their lives; other people think that it doesn’t matter much. How important would you say is having honest elections for you—very important,rather important, not very important or not at all important?"'
+        display:
+          name: "Honest elections make a difference: Important"
+          <<: *common-display
+      not_important_honest_elections_makes_a_difference:
+        title: "Democracy - Honest elections make a difference: Not important"
+        description_short: '% of respondents replying "not very important" or "not at all important" when asked "Some people think that having honest elections makes a lot of difference in their lives; other people think that it doesn’t matter much. How important would you say is having honest elections for you—very important,rather important, not very important or not at all important?"'
+        display:
+          name: "Honest elections make a difference: Not important"
+          <<: *common-display
+      very_important_honest_elections_makes_a_difference:
+        title: "Democracy - Honest elections make a difference: Very important"
+        description_short: '% of respondents replying "very important" when asked "Some people think that having honest elections makes a lot of difference in their lives; other people think that it doesn’t matter much. How important would you say is having honest elections for you—very important,rather important, not very important or not at all important?"'
+        display:
+          name: "Honest elections make a difference: Very important"
+          <<: *common-display
+      rather_important_honest_elections_makes_a_difference:
+        title: "Democracy - Honest elections make a difference: Rather important"
+        description_short: '% of respondents replying "rather important" when asked "Some people think that having honest elections makes a lot of difference in their lives; other people think that it doesn’t matter much. How important would you say is having honest elections for you—very important,rather important, not very important or not at all important?"'
+        display:
+          name: "Honest elections make a difference: Rather important"
+          <<: *common-display
+      not_very_important_honest_elections_makes_a_difference:
+        title: "Democracy - Honest elections make a difference: Not very important"
+        description_short: '% of respondents replying "not very important" when asked "Some people think that having honest elections makes a lot of difference in their lives; other people think that it doesn’t matter much. How important would you say is having honest elections for you—very important,rather important, not very important or not at all important?"'
+        display:
+          name: "Honest elections make a difference: Not very important"
+          <<: *common-display
+      not_at_all_important_honest_elections_makes_a_difference:
+        title: "Democracy - Honest elections make a difference: Not at all important"
+        description_short: '% of respondents replying "not at all important" when asked "Some people think that having honest elections makes a lot of difference in their lives; other people think that it doesn’t matter much. How important would you say is having honest elections for you—very important,rather important, not very important or not at all important?"'
+        display:
+          name: "Honest elections make a difference: Not at all important"
+          <<: *common-display
+      dont_know_honest_elections_makes_a_difference:
+        title: "Democracy - Honest elections make a difference: Don't know"
+        description_short: '% of respondents replying "don’t know" when asked "Some people think that having honest elections makes a lot of difference in their lives; other people think that it doesn’t matter much. How important would you say is having honest elections for you—very important,rather important, not very important or not at all important?"'
+        display:
+          name: "Honest elections make a difference: Don't know"
+          <<: *common-display
+      no_answer_honest_elections_makes_a_difference:
+        title: "Democracy - Honest elections make a difference: No answer"
+        description_short: '% of answers classified as "No answer" for the question "Some people think that having honest elections makes a lot of difference in their lives; other people think that it doesn’t matter much. How important would you say is having honest elections for you—very important,rather important, not very important or not at all important?"'
+        display:
+          name: "Honest elections make a difference: No answer"
+          <<: *common-display
+      avg_score_honest_elections_makes_a_difference:
+        title: "Democracy - Honest elections make a difference: Average score"
+        description_short: 'Average score in a scale from 1 to 4 when asked "Some people think that having honest elections makes a lot of difference in their lives; other people think that it doesn’t matter much. How important would you say is having honest elections for you—very important,rather important, not very important or not at all important?" In the scale, 1 means very important and 4 means not at all important.'
+        display:
+          name: "Honest elections make a difference: Average score"
+          <<: *common-display
+        unit: ""
+        short_unit: ""
