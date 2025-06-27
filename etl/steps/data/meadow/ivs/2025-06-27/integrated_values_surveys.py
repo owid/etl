@@ -138,6 +138,19 @@ VARS_DICT = {
     "A124_17": "Gypsies",
     "A124_42": "Unmarried couples",
     "A124_43": "Different language",
+    "E115": "Experts make decisions",
+    "E116": "Army rule",
+    "E117": "Democratic political system",
+    "E224": "Governments tax the rich and subsidize the poor",
+    "E225": "Religious authorities interpret the laws",
+    "E226": "People choose their leaders in free elections",
+    "E227": "People receive state aid for unemployment",
+    "E228": "Army takes over when government is incompetent",
+    "E229": "Civil rights protects people's liberty against oppression",
+    "E233": "Women have the same rights as men",
+    "E233A": "The state makes people's incomes equal",
+    "E233B": "People obey their rulers",
+    "E266": "Honest elections makes a difference",
 }
 
 
@@ -181,7 +194,9 @@ def rename_vars(tb: Table) -> Table:
 
     # Rename columns, replacing var with name when the original name ends with var
     for var, name in VARS_DICT.items():
-        tb = tb.rename(columns={column: column.replace(var, name) for column in tb.columns if column.endswith(var)})
+        tb = tb.rename(
+            columns={column: column.replace(var, name) for column in tb.columns if column.endswith(var)}, errors="raise"
+        )
 
     # Generate snake case names
     tb.columns = tb.columns.str.lower().str.replace(" ", "_")
