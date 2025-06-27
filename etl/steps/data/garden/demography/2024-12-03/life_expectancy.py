@@ -53,7 +53,7 @@ def run(dest_dir: str) -> None:
     paths.log.info("reading dataset `un_wpp`")
     ds_un = paths.load_dataset("un_wpp")
     tb_un = ds_un.read("life_expectancy")
-    tb_un["source"] = "UN WPP"
+    tb_un["source"] = "UN World Population Prospects"
 
     #
     # Process data.
@@ -278,7 +278,7 @@ def combine_tables(tb_lt: Table, tb_un: Table, tb_zi: Table, tb_ri: Table) -> Ta
     tb = tb.loc[~mask]
 
     # Extend tb_0 (only for period)
-    ## Zijdeman: complement country data
+    ## Zijdeman: complement country data - filling in blanks left by HMD and UN WPP
     tb_0 = tb_0.merge(tb_zi, how="outer", on=["country", "year", "sex", "age"], suffixes=("", "_zij"))
     tb_0["life_expectancy"] = tb_0["life_expectancy"].fillna(tb_0["life_expectancy_zij"])
     tb_0["source"] = tb_0["source"].fillna(tb_0["source_zij"])
