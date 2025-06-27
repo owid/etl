@@ -244,7 +244,7 @@ class CollectionConfigExpander:
                     elif not isinstance(dim_values, list):
                         # Sanity check: besides exceptions above (where we allow dim_values to be a string initially), dim_values should be a list
                         raise ValueError(
-                            f"Unexpected value for dimension `{dim}`. Please review `dimensions`: '{dim_values}'!"
+                            f"Unexpected value for dimension `{dim}`. Make sure that the dimension choices are in a list or '*'. Please review `dimensions`: '{dim_values}'!"
                         )
 
                 # Sanity check: values in dim_values are expected

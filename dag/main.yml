@@ -373,19 +373,6 @@ steps:
   data://grapher/growth/2024-05-16/gdp_historical:
     - data://garden/growth/2024-05-16/gdp_historical
 
-  ######################################################################################################################
-  # Map (Natural Earth)
-  data://meadow/geography/2023-11-28/nat_earth_110:
-    - snapshot://geography/2023-11-28/nat_earth_110.zip
-  data://garden/geography/2023-11-28/nat_earth_110:
-    - data://meadow/geography/2023-11-28/nat_earth_110
-
-  ######################################################################################################################
-
-  # Latitude
-  data://grapher/geography/2024-07-18/latitude:
-    - data://garden/geography/2023-11-28/nat_earth_110
-
   # Attention in Media: The Guardian
   data://meadow/news/2024-05-08/guardian_mentions:
     - snapshot://news/2024-05-07/guardian_mentions.csv
@@ -732,6 +719,7 @@ steps:
   data://grapher/oecd/2025-06-20/housing_prices:
     - data://garden/oecd/2025-06-20/housing_prices
 
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
@@ -772,3 +760,4 @@ include:
   - dag/technology.yml
   - dag/redistribution.yml
   - dag/corruption.yml
+  - dag/geography.yml
