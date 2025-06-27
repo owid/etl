@@ -515,14 +515,6 @@ steps:
   data://grapher/un/2025-03-25/igme:
     - data://garden/un/2025-03-25/igme
 
-  # Long-run child mortality, Gapminder + UN IGME - to archive
-  data://garden/un/2024-09-16/long_run_child_mortality:
-    - data://garden/un/2024-09-11/igme
-    - data://garden/gapminder/2023-09-18/under_five_mortality
-    - data://garden/gapminder/2023-09-21/under_five_mortality
-  data://grapher/un/2024-09-16/long_run_child_mortality:
-    - data://garden/un/2024-09-16/long_run_child_mortality
-
     # Long-run child mortality, Gapminder + UN IGME - to update
   data://garden/un/2025-04-25/long_run_child_mortality:
     - data://garden/un/2025-03-25/igme
@@ -686,7 +678,6 @@ steps:
   data://grapher/un/2025-05-15/un_members:
     - data://garden/un/2025-05-15/un_members
 
-
   # UNODC Homicide Data
   data://meadow/unodc/2025-05-28/homicide:
     - snapshot://unodc/2025-05-28/homicide.xlsx
@@ -697,7 +688,6 @@ steps:
   data://grapher/unodc/2025-05-28/homicide:
     - data://garden/unodc/2025-05-28/homicide
 
-
   # Housing prices 1870-2012 (Knoll paper)
   data://meadow/housing/2025-06-25/knoll_prices:
     - snapshot://housing/2025-06-25/knoll_prices.dta
@@ -705,8 +695,7 @@ steps:
     - data://meadow/housing/2025-06-25/knoll_prices
   data://grapher/housing/2025-06-25/knoll_prices:
     - data://garden/housing/2025-06-25/knoll_prices
-  
-  
+
   # OECD Analytical House Prices
   data://meadow/oecd/2025-06-20/housing_prices:
     - snapshot://oecd/2025-06-20/housing_prices.csv
@@ -714,7 +703,6 @@ steps:
     - data://meadow/oecd/2025-06-20/housing_prices
   data://grapher/oecd/2025-06-20/housing_prices:
     - data://garden/oecd/2025-06-20/housing_prices
-
 
   # Same-Sex Marriage Around the World from Pew Research Center
   data://meadow/pew/2025-06-27/same_sex_marriage:
