@@ -307,6 +307,21 @@ REGIONS = {
 }
 
 
+def fix_zeros_in_primary_energy(tb: Table) -> Table:
+    # Primary energy consumption is zero for many countries in the excel file, on years where the country did not exist.
+    # This happens to various European countries (e.g. USSR successors) prior to 1991, for USSR after 1984, or Bangladesh prior to 1971.
+    # Instead of having zeros, I'll make them nan.
+    tb = tb.copy()
+
+    error = "Expected all zeros in the data to happen prior to 1991 (except for USSR)."
+    assert (
+        tb[(tb["country"] != "USSR") & (tb["primary_energy_consumption_equivalent_ej"] == 0)]["year"].max() == 1989
+    ), error
+    tb.loc[tb["primary_energy_consumption_equivalent_ej"] == 0, "primary_energy_consumption_equivalent_ej"] = None
+
+    return tb
+
+
 def create_additional_variables(tb: Table) -> Table:
     tb = tb.copy()
 
@@ -604,6 +619,9 @@ def run() -> None:
     #
     # Select necessary columns from the data, and rename them conveniently.
     tb = tb_meadow[list(COLUMNS)].rename(columns=COLUMNS, errors="raise")
+
+    # Fix zeros in primary energy consumption (on years where countries did not exist).
+    tb = fix_zeros_in_primary_energy(tb=tb)
 
     # Harmonize country names.
     tb = geo.harmonize_countries(
