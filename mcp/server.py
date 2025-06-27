@@ -47,17 +47,6 @@ class StepUpdateResult:
     dry_run: bool
 
 
-@dataclass
-class ETLRunResult:
-    """Result of running ETL steps."""
-
-    success: bool
-    executed_steps: List[str]
-    skipped_steps: List[str]
-    failed_steps: List[str]
-    message: str
-    dry_run: bool
-    execution_time: Optional[float] = None
 
 
 def invoke_cli_tool(
@@ -315,132 +304,8 @@ def update_step(
     )
 
 
-def _parse_etl_run_result(result, steps: List[str], dry_run: bool) -> ETLRunResult:
-    """Parse CLI result for ETL run."""
-    if hasattr(result, "exception"):
-        return ETLRunResult(
-            success=False,
-            executed_steps=[],
-            skipped_steps=[],
-            failed_steps=steps,
-            message=f"Error running ETL: {str(result.exception)}",
-            dry_run=dry_run
-        )
-    
-    if result.exit_code == 0:
-        # Parse output to extract step information
-        output_lines = result.output.split("\n")
-        executed_steps = []
-        skipped_steps = []
-        failed_steps = []
-        
-        # Look for step execution information in the output
-        for line in output_lines:
-            if "Executing step:" in line or "Running step:" in line:
-                step_match = re.search(r'(data://[^\s]+|snapshot://[^\s]+)', line)
-                if step_match:
-                    executed_steps.append(step_match.group())
-            elif "Skipping step:" in line or "Already up-to-date:" in line:
-                step_match = re.search(r'(data://[^\s]+|snapshot://[^\s]+)', line)
-                if step_match:
-                    skipped_steps.append(step_match.group())
-            elif "Failed step:" in line or "Error in step:" in line:
-                step_match = re.search(r'(data://[^\s]+|snapshot://[^\s]+)', line)
-                if step_match:
-                    failed_steps.append(step_match.group())
-        
-        # If no specific steps found, assume input steps were processed
-        if not executed_steps and not skipped_steps and not failed_steps:
-            executed_steps = steps
-        
-        return ETLRunResult(
-            success=True,
-            executed_steps=executed_steps,
-            skipped_steps=skipped_steps,
-            failed_steps=failed_steps,
-            message=f"Successfully {'previewed' if dry_run else 'executed'} {len(executed_steps)} step(s), skipped {len(skipped_steps)}",
-            dry_run=dry_run
-        )
-    else:
-        return ETLRunResult(
-            success=False,
-            executed_steps=[],
-            skipped_steps=[],
-            failed_steps=steps,
-            message=f"ETL run failed with exit code {result.exit_code}: {result.output}",
-            dry_run=dry_run
-        )
 
 
-@mcp.tool
-def run_etl(
-    steps: List[str],
-    dry_run: bool = False,
-    force: bool = False,
-    private: bool = False,
-    instant: bool = False,
-    grapher: bool = False,
-    export: bool = False,
-    downstream: bool = False,
-    only: bool = False,
-    exact_match: bool = False,
-    exclude: Optional[str] = None,
-    workers: int = 1,
-    use_threads: bool = True,
-    strict: Optional[bool] = None,
-    continue_on_failure: bool = False,
-    force_upload: bool = False,
-    prefer_download: bool = False,
-    subset: Optional[str] = None,
-) -> ETLRunResult:
-    """Run ETL steps using the existing ETL CLI functionality.
-
-    Args:
-        steps: List of step patterns to run (e.g., ["biodiversity/2025-06-28/cherry_blossom"])
-        dry_run: Preview the steps without actually running them
-        force: Re-run the steps even if they appear done and up-to-date
-        private: Run private steps
-        instant: Only apply YAML metadata in the garden step
-        grapher: Upsert datasets from grapher channel to DB (OWID staff only)
-        export: Run export steps like saving explorer (OWID staff only)
-        downstream: Include downstream dependencies
-        only: Only run the selected step (no upstream or downstream dependencies)
-        exact_match: Steps should exactly match the arguments
-        exclude: Comma-separated patterns to exclude
-        workers: Parallelize execution of steps
-        use_threads: Use threads when checking dirty steps and upserting to MySQL
-        strict: Force strict or lax validation on DAG steps
-        continue_on_failure: Continue running remaining steps if a step fails
-        force_upload: Always upload grapher data even if checksums match
-        prefer_download: Prefer downloading datasets from catalog instead of building them
-        subset: Filter to speed up development (regex for data processing and grapher upload)
-
-    Returns:
-        ETLRunResult with success status, executed/skipped/failed steps, and message
-    """
-    options = {
-        "dry_run": dry_run,
-        "force": force,
-        "private": private,
-        "instant": instant,
-        "grapher": grapher,
-        "export": export,
-        "downstream": downstream,
-        "only": only,
-        "exact_match": exact_match,
-        "exclude": exclude,
-        "workers": workers,
-        "use_threads": use_threads,
-        "strict": strict,
-        "continue_on_failure": continue_on_failure,
-        "force_upload": force_upload,
-        "prefer_download": prefer_download,
-        "subset": subset,
-    }
-    
-    return invoke_cli_tool(
-        etl_cli, steps, options, lambda result: _parse_etl_run_result(result, steps, dry_run)
-    )
 
 
 if __name__ == "__main__":

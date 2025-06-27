@@ -170,14 +170,22 @@ When asked to "update a dataset", update ALL steps in the pipeline:
 Use the mcp__catalog__update_step tool with include_dependencies=true and include_usages=true to update the entire pipeline.
 
 ## Running ETL Steps
-Use MCP tools to run ETL steps:
+Use `etlr` to run ETL steps:
 
 ### Basic Usage
-Use `mcp__catalog__run_etl` tool with these patterns:
-- Run steps matching a pattern: `steps=["biodiversity/2025-06-28/cherry_blossom"]`
-- Run with grapher upload: `steps=["biodiversity/2025-06-28/cherry_blossom"], grapher=true`
-- Dry run (preview): `steps=["biodiversity/2025-06-28/cherry_blossom"], dry_run=true`
-- Force re-run: `steps=["biodiversity/2025-06-28/cherry_blossom"], force=true`
+- Run steps matching a pattern: `etlr biodiversity/2025-06-28/cherry_blossom`
+- Run with grapher upload: `etlr biodiversity/2025-06-28/cherry_blossom --grapher`
+- Dry run (preview): `etlr biodiversity/2025-06-28/cherry_blossom --dry-run`
+- Force re-run: `etlr biodiversity/2025-06-28/cherry_blossom --force`
+
+### Key Options
+- `--grapher/-g`: Upload datasets to grapher database (OWID staff only)
+- `--dry-run`: Preview steps without running them
+- `--force/-f`: Re-run steps even if up-to-date
+- `--only/-o`: Run only selected step (no dependencies)
+- `--downstream/-d`: Include downstream dependencies
+- `--exact-match/-x`: Steps must exactly match arguments
+
 
 ## Git Workflow
 Create PR first, then commit files:
