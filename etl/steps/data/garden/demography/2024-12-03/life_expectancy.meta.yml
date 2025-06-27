@@ -17,8 +17,6 @@ definitions:
         - Europe
         - Oceania
         - World
-    title_base: Period life expectancy
-    title_public: Life expectancy
     data_used: |-
       <%- if (age == 0) and (sex == 'total') -%>
       Prior to 1950, we used the Human Mortality Database (2024) data combined with Zijdeman (2015). For historical regional data, before 1950, we used Riley's (2005) estimates. From 1950 onwards, we used United Nations World Population Prospects (2024) data.
@@ -52,25 +50,23 @@ definitions:
     unit: years
     short_unit: years
     processing_level: minor
-  descriptions:
-    description_short: |-
-      <%- if age == 0 -%>
-        <%- if sex == 'total' -%>
-        The period life expectancy at birth, in a given year.
-        <%- else -%>
-        The period life expectancy at birth among << sex + 's' >>, in a given year.
-        <%- endif -%>
+  description_short: |-
+    <%- if age == 0 -%>
+      <%- if sex == 'total' -%>
+      The period life expectancy at birth, in a given year.
       <%- else -%>
-        <%- if sex == 'total' -%>
-        The total period life expectancy at age << age >>, in a given year.
-        <%- else -%>
-        The total period life expectancy at age << age >> among << sex + 's' >>, in a given year.
-        <%- endif -%>
+      The period life expectancy at birth among << sex + 's' >>, in a given year.
       <%- endif -%>
-
-    presentation:
-      title_public: |-
-        {definitions.global.title_public} at << age if age != 0 else 'birth'>>
+    <%- else -%>
+      <%- if sex == 'total' -%>
+      The total period life expectancy at age << age >>, in a given year.
+      <%- else -%>
+      The total period life expectancy at age << age >> among << sex + 's' >>, in a given year.
+      <%- endif -%>
+    <%- endif -%>
+  presentation:
+    title_public: |-
+      Life expectancy at << age if age != 0 else 'birth'>>
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
@@ -84,19 +80,18 @@ tables:
   # HISTORICAL VALUES (until today)
   life_expectancy:
     variables:
-      # {definitions.global.title_base}
       life_expectancy:
         title: |-
-          {definitions.global.title_base}
+          Period life expectancy
         display:
           numDecimalPlaces: 1
           name: |-
-            {definitions.global.title_public} at << 'birth' if (age == 0) else age >><< ', ' + sex + 's' if (sex != 'total') >>
+            Life expectancy at << 'birth' if (age == 0) else age >><< ', ' + sex + 's' if (sex != 'total') >>
         presentation:
           title_variant: << sex + 's, ' if sex != 'total' >>period tables
       life_expectancy_0:
         title: |-
-          {definitions.global.title_base} at birth
+          Period life expectancy at birth
         description_short: The [period life expectancy](#dod:period-life-expectancy) at birth, in a given year. Period life expectancy is the number of years the average person born in a certain year would live if they experienced the same chances of dying at each age as people did in that year.
         description_key:
           - Across the world, people are living longer. In 1900, the global average life expectancy of a newborn was 32 years. By 2021, this had more than doubled to 71 years.
@@ -128,29 +123,29 @@ tables:
     variables:
       life_expectancy_with_proj:
         title: |-
-          {definitions.global.title_base} (with projections)
+          Period life expectancy (with projections)
         description_short: |-
-          {definitions.descriptions.description_short}
+          {definitions.description_short}
         display: &display_w_proj
           numDecimalPlaces: 1
           name: |-
-            {definitions.global.title_public} at << 'birth' if (age == 0) else age >><< ', ' + sex + 's' if (sex != 'total') >>, with UN medium projections
+            Life expectancy at << 'birth' if (age == 0) else age >><< ', ' + sex + 's' if (sex != 'total') >>, with UN medium projections
         presentation:
           title_variant: &title_variant_w_proj << sex + 's, ' if sex != 'total' >>period tables, with UN medium projections
           title_public: |-
-            { definitions.descriptions.title_public }
+            {definitions.presentation.title_public}
 
       life_expectancy_0_with_proj:
         title: |-
-          {definitions.global.title_base} at birth (with projections)
+          Period life expectancy at birth (with projections)
         description_short: |-
-          {definitions.descriptions.description_short}
+          {definitions.description_short}
         display: *display_w_proj
         presentation:
           attribution_short: Various sources
           title_variant: *title_variant_w_proj
           title_public: |-
-            { definitions.descriptions.title_public }
+            {definitions.presentation.title_public}
           grapher_config:
             selectedEntityNames: *sel_entities_americas
           attribution: |-
@@ -161,9 +156,9 @@ tables:
     variables:
       life_expectancy_only_proj:
         title: |-
-          {definitions.global.title_base} (only projections)
+          Period life expectancy (only projections)
         description_short: |-
-          {definitions.descriptions.description_short}
+          {definitions.description_short}
         description_key:
           - |-
             {definitions.global.point_1}
@@ -172,18 +167,18 @@ tables:
         display: &display_o_proj
           numDecimalPlaces: 1
           name: |-
-            {definitions.global.title_public} at << 'birth' if (age == 0) else age >><< ', ' + sex + 's' if (sex != 'total') >>, medium projection
+            Life expectancy at << 'birth' if (age == 0) else age >><< ', ' + sex + 's' if (sex != 'total') >>, medium projection
         presentation:
           attribution_short: &attr_o_proj UN WPP
           title_variant: &title_variant_o_proj << sex + 's, ' if sex != 'total' >>period tables, medium projection
           title_public: |-
-            { definitions.descriptions.title_public }
+            {definitions.presentation.title_public}
 
       life_expectancy_0_only_proj:
         title: |-
-          {definitions.global.title_base} at birth (only projections)
+          Period life expectancy at birth (only projections)
         description_short: |-
-          {definitions.descriptions.description_short}
+          {definitions.description_short}
         description_key:
           - |-
             {definitions.global.point_1}
@@ -194,7 +189,7 @@ tables:
           attribution_short: *attr_o_proj
           title_variant: *title_variant_o_proj
           title_public: |-
-            { definitions.descriptions.title_public }
+            {definitions.presentation.title_public}
           grapher_config:
             selectedEntityNames: *sel_entities_americas
     ### Source table
@@ -202,6 +197,8 @@ tables:
     variables:
       source:
         title: Source of life expectancy at birth data
+        unit: ""
+        short_unit: ""
         display:
           name: Source
           numDecimalPlaces: 0
