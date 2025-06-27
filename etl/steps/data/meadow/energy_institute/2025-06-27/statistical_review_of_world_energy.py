@@ -1,6 +1,4 @@
-"""Load snapshots of data files of the Statistical Review of World Energy, and create a meadow dataset.
-
-"""
+"""Load snapshots of data files of the Statistical Review of World Energy, and create a meadow dataset."""
 
 import re
 
