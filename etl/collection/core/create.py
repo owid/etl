@@ -90,7 +90,11 @@ def create_collection(
 
         # Create collections for each table
         collections = []
+        indicator_as_dimension_ = False
         for i in range(num_tables):
+            if isinstance(indicator_names_[i], list) and len(cast(list, indicator_names_[i])) > 1:
+                indicator_as_dimension_ = True
+
             c = create_collection_single_table(
                 config_yaml=config_yaml,
                 dependencies=dependencies,
@@ -100,12 +104,15 @@ def create_collection(
                 dimensions=dimensions_[i],
                 common_view_config=common_view_config_[i],
                 indicators_slug=indicators_slug,
-                indicator_as_dimension=indicator_as_dimension,
+                indicator_as_dimension=indicator_as_dimension or indicator_as_dimension_,
                 choice_renames=choice_renames_[i],
                 catalog_path_full=catalog_path_full,
                 explorer=explorer,
             )
             collections.append(c)
+
+        if len(collections) == 1:
+            return collections[0]
 
         # Combine all collections
         c = combine_collections(

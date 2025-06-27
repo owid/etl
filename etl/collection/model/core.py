@@ -86,7 +86,7 @@ class Collection(MDIMBase):
 
     # Internal use. For save() method.
     _collection_type: str | None = field(init=False, default="multidim")
-
+    _dependencies: set[str] = field(init=False, default_factory=set)
     _group_operations_done: int = field(init=False, default=0)
 
     @classmethod
@@ -204,8 +204,11 @@ class Collection(MDIMBase):
         # Check that no choice name or slug is repeated
         self.validate_dimension_uniqueness()
 
-        # Check that all indicators in explorer exist
+        # Validate that datasets used are part of the dependencies
         indicators = self.indicators_in_use(tolerate_extra_indicators)
+        self.validate_indicators_are_from_dependencies(indicators)
+
+        # Check that all indicators in collection exist
         validate_indicators_in_db(indicators, owid_env.engine)
 
         # Run sanity checks on grouped views
@@ -493,6 +496,13 @@ class Collection(MDIMBase):
 
             # Add slug to set
             slugs.add(dim.slug)
+
+    def validate_indicators_are_from_dependencies(self, indicators):
+        """Validate that the provided indicators are from tables in datasets specified in the collections dependencies."""
+        for indicator in indicators:
+            if not any(f"data://{indicator}".startswith(f"{dep}/") for dep in self._dependencies):
+                raise ValueError(f"Indicator {indicator} is not covered by any dependency: {self._dependencies}")
+        return True
 
     def validate_grouped_views(self):
         for view in self.views:
