@@ -343,13 +343,18 @@ steps:
   #
   data://grapher/energy_institute/2025-06-27/statistical_review_of_world_energy:
     - data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy
-  # #
-  # # Energy - Electricity mix (EI & Ember).
-  # #
-  # data://garden/energy/2025-06-27/electricity_mix:
-  #   - data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy
-  #   - data://garden/demography/2024-07-15/population
-  #   - data://garden/ember/2025-05-12/yearly_electricity
+  #
+  # Energy - Electricity mix (EI & Ember).
+  #
+  data://garden/energy/2025-06-27/electricity_mix:
+    - data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy
+    - data://garden/demography/2024-07-15/population
+    - data://garden/ember/2025-05-12/yearly_electricity
+  #
+  # Energy - Electricity mix (EI & Ember).
+  #
+  data://grapher/energy/2025-06-27/electricity_mix:
+    - data://garden/energy/2025-06-27/electricity_mix
   # #
   # # Energy - Energy mix.
   # #
@@ -383,11 +388,6 @@ steps:
   #   - data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy
   #   - data://garden/shift/2023-12-12/energy_production_from_fossil_fuels
   #   - data://garden/demography/2024-07-15/population
-  # #
-  # # Energy - Electricity mix (EI & Ember).
-  # #
-  # data://grapher/energy/2025-06-27/electricity_mix:
-  #   - data://garden/energy/2025-06-27/electricity_mix
   # #
   # # Energy - UK historical electricity.
   # #
