@@ -238,7 +238,7 @@ def sanity_checks(tb: Table) -> None:
         if not tb_error.empty:
             if DEBUG:
                 log.warning(
-                    f"""{len(tb_error)} observations of {column} are negative::
+                    f"""{len(tb_error)} observations of {column} are negative:
                         {tabulate(tb_error[INDEX + [column]], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
                 )
 
@@ -264,7 +264,7 @@ def sanity_checks(tb: Table) -> None:
     if not tb_error.empty:
         if DEBUG:
             log.warning(
-                f"""{len(tb_error)} observations of Government expenditure by function do not add up to 100%::
+                f"""{len(tb_error)} observations of Government expenditure by function do not add up to 100%:
                     {tabulate(tb_error[["country", "year", "Government expenditure by function"]], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
             )
 
