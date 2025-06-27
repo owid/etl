@@ -356,7 +356,7 @@ class View(MDIMBase):
 
         return indicators
 
-    def matches(self, _or=False, **kwargs):
+    def matches(self, **kwargs):
         """Evaluate if a view matches a set of dimensions.
 
         kwargs:
