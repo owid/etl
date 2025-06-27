@@ -1,4 +1,3 @@
-
 definitions:
   common:
     processing_level: major
@@ -85,7 +84,7 @@ definitions:
     description_key:
       - "{definitions.survey_text.worry}"
 
-  physical_hlth_ans_9_share: &physical_hlth
+  physical_hlth: &physical_hlth
     title: Physical health - Share of people who answered ANSWER
     unit: "%"
     short_unit: "%"
@@ -94,7 +93,7 @@ definitions:
     description_key:
       - "{definitions.survey_text.physical_health}"
 
-  lonely_ans_1_share: &lonely
+  lonely: &lonely
     title: Loneliness - Share of people who answered ANSWER
     unit: "%"
     short_unit: "%"
@@ -105,7 +104,7 @@ definitions:
     description_key:
       - "{definitions.survey_text.lonely}"
 
-  mental_health_ans_0_share: &mental_health
+  mental_health: &mental_health
     title: Mental health - Share of people who answered ANSWER
     unit: "%"
     short_unit: "%"
@@ -115,7 +114,7 @@ definitions:
       - "{definitions.survey_text.mental_health}"
 
 
-  hope_future_ans_0_share: &hope_future
+  hope_future: &hope_future
     title: Hopefulness - Share of people who answered ANSWER
     unit: "%"
     short_unit: "%"
@@ -123,6 +122,44 @@ definitions:
       Share of people who answered ANSWER when asked to rate how much they agree with the statement "Despite challenges, I always remain hopeful about the future.", where 0 is "strongly disagree" and 10 is "strongly agree".
     description_key:
       - "{definitions.survey_text.hope}"
+
+  happiness: &happiness
+    title: Happiness - Share of people who answer ANSWER
+    unit: "%"
+    short_unit: "%"
+    description_short: |-
+      Share of people who answer ANSWER when asked "On a scale from 0 to 10, where 0 means extremely unhappy and 10 means extremely happy, how happy do you usually feel?"
+    description_key:
+      - "{definitions.survey_text.happiness}"
+
+  content: &content
+    title: Content with relationships - Share of people who answered ANSWER
+    unit: "%"
+    short_unit: "%"
+    description_short: |-
+      Share of people who answered ANSWER when asked to rate how much they agree with the statement "I am content with my friendships and relationships."
+    description_key:
+      - "{definitions.survey_text.content}"
+
+  freedom: &freedom
+    title: Freedom to make life choices - Share of people who answered ANSWER
+    unit: "%"
+    short_unit: "%"
+    description_short: |-
+      Share of people who answered ANSWER when asked to rate how much they agree with the statement "I have the freedom in my life to pursue the things that are most important to me."
+    description_key:
+      - "{definitions.survey_text.freedom}"
+
+  expenses: &expenses
+    title: Worry about living expenses - Share of people who answered ANSWER
+    unit: "%"
+    short_unit: "%"
+    description_short: |-
+      Share of people who answered ANSWER when asked "How often do you worry about being able to meet normal monthly living expenses?", where 0 is "never" and 10 is "always".
+    description_processing: |-
+      {definitions.processing_notes.expenses}
+    description_key:
+      - "{definitions.survey_text.expenses}"
 
 dataset:
   update_period_days: 365
@@ -186,93 +223,27 @@ tables:
         description_short: |-
           Share of respondents who did not answer the question "In general, how happy or unhappy do you usually feel?"
       happy_ans_0_share:
-        title: Happiness - Share of people who answer 0
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answer 0 when asked "On a scale from 0 to 10, where 0 means extremely unhappy and 10 means extremely happy, how happy do you usually feel?"
-        description_key:
-          - "{definitions.survey_text.happiness}"
+        <<: *happiness
       happy_ans_1_share:
-        title: Happiness - Share of people who answer 1
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answer 1 when asked "On a scale from 0 to 10, where 0 means extremely unhappy and 10 means extremely happy, how happy do you usually feel?"
-        description_key:
-          - "{definitions.survey_text.happiness}"
+        <<: *happiness
       happy_ans_2_share:
-        title: Happiness - Share of people who answer 2
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answer 2 when asked "On a scale from 0 to 10, where 0 means extremely unhappy and 10 means extremely happy, how happy do you usually feel?"
-        description_key:
-          - "{definitions.survey_text.happiness}"
+        <<: *happiness
       happy_ans_3_share:
-        title: Happiness - Share of people who answer 3
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answer 3 when asked "On a scale from 0 to 10, where 0 means extremely unhappy and 10 means extremely happy, how happy do you usually feel?"
-        description_key:
-          - "{definitions.survey_text.happiness}"
+        <<: *happiness
       happy_ans_4_share:
-        title: Happiness - Share of people who answer 4
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answer 4 when asked "On a scale from 0 to 10, where 0 means extremely unhappy and 10 means extremely happy, how happy do you usually feel?"
-        description_key:
-          - "{definitions.survey_text.happiness}"
+        <<: *happiness
       happy_ans_5_share:
-        title: Happiness - Share of people who answer 5
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answer 5 when asked "On a scale from 0 to 10, where 0 means extremely unhappy and 10 means extremely happy, how happy do you usually feel?"
-        description_key:
-          - "{definitions.survey_text.happiness}"
+        <<: *happiness
       happy_ans_6_share:
-        title: Happiness - Share of people who answer 6
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answer 6 when asked "On a scale from 0 to 10, where 0 means extremely unhappy and 10 means extremely happy, how happy do you usually feel?"
-        description_key:
-          - "{definitions.survey_text.happiness}"
+        <<: *happiness
       happy_ans_7_share:
-        title: Happiness - Share of people who answer 7
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answer 7 when asked "On a scale from 0 to 10, where 0 means extremely unhappy and 10 means extremely happy, how happy do you usually feel?"
-        description_key:
-          - "{definitions.survey_text.happiness}"
+        <<: *happiness
       happy_ans_8_share:
-        title: Happiness - Share of people who answer 8
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answer 8 when asked "On a scale from 0 to 10, where 0 means extremely unhappy and 10 means extremely happy, how happy do you usually feel?"
-        description_key:
-          - "{definitions.survey_text.happiness}"
+        <<: *happiness
       happy_ans_9_share:
-        title: Happiness - Share of people who answer 9
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answer 9 when asked "On a scale from 0 to 10, where 0 means extremely unhappy and 10 means extremely happy, how happy do you usually feel?"
-        description_key:
-          - "{definitions.survey_text.happiness}"
+        <<: *happiness
       happy_ans_10_share:
-        title: Happiness - Share of people who answer 10
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answer 10 when asked "On a scale from 0 to 10, where 0 means extremely unhappy and 10 means extremely happy, how happy do you usually feel?"
-        description_key:
-          - "{definitions.survey_text.happiness}"
+        <<: *happiness
       life_sat_mean:
         title: Self-reported life satisfaction
         unit: ""
@@ -356,93 +327,27 @@ tables:
         description_short: |-
           Share of respondents who did not answer the question "I am content with my friendships and relationships."
       content_ans_0_share:
-        title: Content with relationships - Share of people who answered 0
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answered 0 when asked to rate how much they agree with the statement "I am content with my friendships and relationships."
-        description_key:
-          - "{definitions.survey_text.content}"
+        <<: *content
       content_ans_1_share:
-        title: Content with relationships - Share of people who answered 1
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answered 1 when asked to rate how much they agree with the statement "I am content with my friendships and relationships."
-        description_key:
-          - "{definitions.survey_text.content}"
+        <<: *content
       content_ans_2_share:
-        title: Content with relationships - Share of people who answered 2
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answered 2 when asked to rate how much they agree with the statement "I am content with my friendships and relationships."
-        description_key:
-          - "{definitions.survey_text.content}"
+        <<: *content
       content_ans_3_share:
-        title: Content with relationships - Share of people who answered 3
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answered 3 when asked to rate how much they agree with the statement "I am content with my friendships and relationships."
-        description_key:
-          - "{definitions.survey_text.content}"
+        <<: *content
       content_ans_4_share:
-        title: Content with relationships - Share of people who answered 4
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answered 4 when asked to rate how much they agree with the statement "I am content with my friendships and relationships."
-        description_key:
-          - "{definitions.survey_text.content}"
+        <<: *content
       content_ans_5_share:
-        title: Content with relationships - Share of people who answered 5
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answered 5 when asked to rate how much they agree with the statement "I am content with my friendships and relationships."
-        description_key:
-          - "{definitions.survey_text.content}"
+        <<: *content
       content_ans_6_share:
-        title: Content with relationships - Share of people who answered 6
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answered 6 when asked to rate how much they agree with the statement "I am content with my friendships and relationships."
-        description_key:
-          - "{definitions.survey_text.content}"
+        <<: *content
       content_ans_7_share:
-        title: Content with relationships - Share of people who answered 7
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answered 7 when asked to rate how much they agree with the statement "I am content with my friendships and relationships."
-        description_key:
-          - "{definitions.survey_text.content}"
+        <<: *content
       content_ans_8_share:
-        title: Content with relationships - Share of people who answered 8
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answered 8 when asked to rate how much they agree with the statement "I am content with my friendships and relationships."
-        description_key:
-          - "{definitions.survey_text.content}"
+        <<: *content
       content_ans_9_share:
-        title: Content with relationships - Share of people who answered 9
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answered 9 when asked to rate how much they agree with the statement "I am content with my friendships and relationships."
-        description_key:
-          - "{definitions.survey_text.content}"
+        <<: *content
       content_ans_10_share:
-        title: Content with relationships - Share of people who answered 10
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answered 10 when asked to rate how much they agree with the statement "I am content with my friendships and relationships."
-        description_key:
-          - "{definitions.survey_text.content}"
+        <<: *content
       days_exercise_mean:
         title: Average days of exercise per week
         unit: ""
@@ -651,113 +556,27 @@ tables:
         description_short: |-
           Share of respondents who did not answer the question "How often do you worry about being able to meet normal monthly living expenses?"
       expenses_ans_0_share:
-        title: Worry about living expenses - Share of people who answered 0
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answered 0 when asked "How often do you worry about being able to meet normal monthly living expenses?", where 0 is "never" and 10 is "always".
-        description_processing: |-
-          {definitions.processing_notes.expenses}
-        description_key:
-          - "{definitions.survey_text.expenses}"
+        <<: *expenses
       expenses_ans_1_share:
-        title: Worry about living expenses - Share of people who answered 1
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answered 1 when asked "How often do you worry about being able to meet normal monthly living expenses?", where 0 is "never" and 10 is "always".
-        description_processing: |-
-          {definitions.processing_notes.expenses}
-        description_key:
-          - "{definitions.survey_text.expenses}"
+        <<: *expenses
       expenses_ans_2_share:
-        title: Worry about living expenses - Share of people who answered 2
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-         Share of people who answered 2 when asked "How often do you worry about being able to meet normal monthly living expenses?", where 0 is "never" and 10 is "always".
-        description_processing: |-
-         {definitions.processing_notes.expenses}
-        description_key:
-          - "{definitions.survey_text.expenses}"
+        <<: *expenses
       expenses_ans_3_share:
-        title: Worry about living expenses - Share of people who answered 3
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answered 3 when asked "How often do you worry about being able to meet normal monthly living expenses?", where 0 is "never" and 10 is "always".
-        description_processing: |-
-          {definitions.processing_notes.expenses}
-        description_key:
-          - "{definitions.survey_text.expenses}"
+        <<: *expenses
       expenses_ans_4_share:
-        title: Worry about living expenses - Share of people who answered 4
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answered 4 when asked "How often do you worry about being able to meet normal monthly living expenses?", where 0 is "never" and 10 is "always".
-        description_processing: |-
-          {definitions.processing_notes.expenses}
-        description_key:
-          - "{definitions.survey_text.expenses}"
+        <<: *expenses
       expenses_ans_5_share:
-        title: Worry about living expenses - Share of people who answered 5
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answered 5 when asked "How often do you worry about being able to meet normal monthly living expenses?", where 0 is "never" and 10 is "always".
-        description_processing: |-
-          {definitions.processing_notes.expenses}
-        description_key:
-          - "{definitions.survey_text.expenses}"
+        <<: *expenses
       expenses_ans_6_share:
-        title: Worry about living expenses - Share of people who answered 6
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-         Share of people who answered 6 when asked "How often do you worry about being able to meet normal monthly living expenses?", where 0 is "never" and 10 is "always".
-        description_key:
-          - "{definitions.survey_text.expenses}"
+        <<: *expenses
       expenses_ans_7_share:
-        title: Worry about living expenses - Share of people who answered 7
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answered 7 when asked "How often do you worry about being able to meet normal monthly living expenses?", where 0 is "never" and 10 is "always".
-        description_processing: |-
-          {definitions.processing_notes.expenses}
-        description_key:
-          - "{definitions.survey_text.expenses}"
+        <<: *expenses
       expenses_ans_8_share:
-        title: Worry about living expenses - Share of people who answered 8
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-         Share of people who answered 8 when asked "How often do you worry about being able to meet normal monthly living expenses?", where 0 is "never" and 10 is "always".
-        description_processing: |-
-          {definitions.processing_notes.expenses}
-        description_key:
-          - "{definitions.survey_text.expenses}"
+        <<: *expenses
       expenses_ans_9_share:
-        title: Worry about living expenses - Share of people who answered 9
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-         Share of people who answered 9 when asked "How often do you worry about being able to meet normal monthly living expenses?", where 0 is "never" and 10 is "always".
-        description_processing: |-
-          {definitions.processing_notes.expenses}
-        description_key:
-          - "{definitions.survey_text.expenses}"
+        <<: *expenses
       expenses_ans_10_share:
-        title: Worry about living expenses - Share of people who answered 10
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-         Share of people who answered 10 when asked "How often do you worry about being able to meet normal monthly living expenses?", where 0 is "never" and 10 is "always".
-        description_processing: |-
-          {definitions.processing_notes.expenses}
-        description_key:
-          - "{definitions.survey_text.expenses}"
+        <<: *expenses
       feel_anxious_mean:
         title: Self-reported anxiety
         unit: ""
@@ -811,93 +630,27 @@ tables:
         description_short: |-
          Share of respondents who did not answer the question "I have the freedom in my life to pursue the things that are most important to me."
       freedom_ans_0_share:
-        title: Freedom to make life choices - Share of people who answered 0
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-         Share of people who answered 0 when asked to rate how much they agree with the statement "I have the freedom in my life to pursue the things that are most important to me."
-        description_key:
-          - "{definitions.survey_text.freedom}"
+        <<: *freedom
       freedom_ans_1_share:
-        title: Freedom to make life choices - Share of people who answered 1
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-         Share of people who answered 1 when asked to rate how much they agree with the statement "I have the freedom in my life to pursue the things that are most important to me."
-        description_key:
-          - "{definitions.survey_text.freedom}"
+        <<: *freedom
       freedom_ans_2_share:
-        title: Freedom to make life choices - Share of people who answered 2
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-         Share of people who answered 2 when asked to rate how much they agree with the statement "I have the freedom in my life to pursue the things that are most important to me."
-        description_key:
-          - "{definitions.survey_text.freedom}"
+        <<: *freedom
       freedom_ans_3_share:
-        title: Freedom to make life choices - Share of people who answered 3
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-         Share of people who answered 3 when asked to rate how much they agree with the statement "I have the freedom in my life to pursue the things that are most important to me."
-        description_key:
-          - "{definitions.survey_text.freedom}"
+        <<: *freedom
       freedom_ans_4_share:
-        title: Freedom to make life choices - Share of people who answered 4
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-         Share of people who answered 4 when asked to rate how much they agree with the statement "I have the freedom in my life to pursue the things that are most important to me."
-        description_key:
-          - "{definitions.survey_text.freedom}"
+        <<: *freedom
       freedom_ans_5_share:
-        title: Freedom to make life choices - Share of people who answered 5
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-         Share of people who answered 5 when asked to rate how much they agree with the statement "I have the freedom in my life to pursue the things that are most important to me."
-        description_key:
-          - "{definitions.survey_text.freedom}"
+        <<: *freedom
       freedom_ans_6_share:
-        title: Freedom to make life choices - Share of people who answered 6
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-         Share of people who answered 6 when asked to rate how much they agree with the statement "I have the freedom in my life to pursue the things that are most important to me."
-        description_key:
-          - "{definitions.survey_text.freedom}"
+        <<: *freedom
       freedom_ans_7_share:
-        title: Freedom to make life choices - Share of people who answered 7
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-         Share of people who answered 7 when asked to rate how much they agree with the statement "I have the freedom in my life to pursue the things that are most important to me."
-        description_key:
-          - "{definitions.survey_text.freedom}"
+        <<: *freedom
       freedom_ans_8_share:
-        title: Freedom to make life choices - Share of people who answered 8
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-         Share of people who answered 8 when asked to rate how much they agree with the statement "I have the freedom in my life to pursue the things that are most important to me."
-        description_key:
-          - "{definitions.survey_text.freedom}"
+        <<: *freedom
       freedom_ans_9_share:
-        title: Freedom to make life choices - Share of people who answered 9
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-         Share of people who answered 9 when asked to rate how much they agree with the statement "I have the freedom in my life to pursue the things that are most important to me."
-        description_key:
-          - "{definitions.survey_text.freedom}"
+        <<: *freedom
       freedom_ans_10_share:
-        title: Freedom to make life choices - Share of people who answered 10
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answered 10 when asked to rate how much they agree with the statement "I have the freedom in my life to pursue the things that are most important to me."
-        description_key:
-          - "{definitions.survey_text.freedom}"
+        <<: *freedom
       hope_future_mean:
         title: Self-reported hopefulness
         unit: ""
