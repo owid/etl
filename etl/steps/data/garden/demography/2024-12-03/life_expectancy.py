@@ -82,6 +82,7 @@ def run(dest_dir: str) -> None:
     ## Add source table for period life expectancy at birth
     tb_source = tb[(tb["sex"] == "total") & (tb["age"] == 0)].copy()
     tb_source = tb_source[["country", "year", "source"]]
+    tb = tb.drop(columns=["source"])
     ## (i) Main table (historical values)
     tb_main = tb.loc[tb["year"] <= YEAR_ESTIMATE_LAST].copy()
 
