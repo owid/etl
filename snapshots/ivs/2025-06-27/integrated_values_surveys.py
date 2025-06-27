@@ -11,7 +11,6 @@ INSTRUCTIONS
         4.	Add snapshot. Currently the command is
                         python snapshots/ivs/{date}/integrated_values_surveys.py --path-to-file snapshots/ivs/{date}/ivs.csv
         5.	Delete csv file
-        6.	Run `etl wvs_trust`
 """
 
 from pathlib import Path
