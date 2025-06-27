@@ -461,7 +461,7 @@ class TableMeta(MetaBase):
         """Return unique URI for this table."""
         assert self.dataset, "TableMeta.dataset is not set"
         assert self.short_name, "TableMeta.short_name is not set"
-        dataset_uri = self.dataset.uri.rstrip('/')
+        dataset_uri = self.dataset.uri.rstrip("/")
         return f"{dataset_uri}/{self.short_name}"
 
 
