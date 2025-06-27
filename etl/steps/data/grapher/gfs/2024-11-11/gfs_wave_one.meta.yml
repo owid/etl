@@ -171,8 +171,8 @@ tables:
     variables:
       abused_yes_share:
         title: Share of people who experienced abuse when growing up
-        unit: "%"
-        short_unit: "%"
+        # unit: "%"
+        # short_unit: "%"
         description_short: Share of respondents who said they had experienced physical or sexual abuse when growing up.
       abused_no_share:
         title: Share of people who have not experienced abuse when growing up
