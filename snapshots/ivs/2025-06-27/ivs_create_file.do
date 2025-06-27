@@ -70,7 +70,7 @@ global homosexuals_parents_questions D081
 
 * Democracy questions
 global democracy_satisfied E111_01
-global democracy_very_good_bery_bad E115 E116 E117
+global democracy_very_good_very_bad E115 E116 E117
 global democracy_essential_char E224 E225 E226 E227 E228 E229 E233 E233A E233B
 global democracy_importance E235
 global democracy_democraticness E236
@@ -78,7 +78,7 @@ global democracy_elections_makes_diff E266
 
 * List of questions to work with
 * NOTE: A168 is not available in IVS
-global questions A165 A168 G007_33_B G007_34_B $additional_questions $important_in_life_questions $politics_questions $environment_vs_econ_questions $income_equality_questions $schwartz_questions $work_leisure_questions $work_questions $most_serious_problem_questions $justifiable_questions $worries_questions $happiness_questions $neighbors_questions $homosexuals_parents_questions $democracy_satisfied $democracy_very_good_bery_bad $democracy_essential_char $democracy_importance $democracy_democraticness $democracy_elections_makes_diff
+global questions A165 A168 G007_33_B G007_34_B $additional_questions $important_in_life_questions $politics_questions $environment_vs_econ_questions $income_equality_questions $schwartz_questions $work_leisure_questions $work_questions $most_serious_problem_questions $justifiable_questions $worries_questions $happiness_questions $neighbors_questions $homosexuals_parents_questions $democracy_satisfied $democracy_very_good_very_bad $democracy_essential_char $democracy_importance $democracy_democraticness $democracy_elections_makes_diff
 
  * Keep wave ID, country, weight and the list of questions
 keep S002VS S002EVS S003 S017 $questions
@@ -996,66 +996,351 @@ gen avg_score_satisfied_democracy = $democracy_satisfied
 collapse (mean) not_satisfied_democracy satisfied_democracy not_satisfied_at_all_democracy satisfied_completely_democracy neutral_satisfied_democracy dont_know_satisfied_democracy no_answer_satisfied_democracy avg_score_satisfied_democracy  [w=S017], by (year country)
 tempfile democracy_satisfied_file
 save "`democracy_satisfied_file'"
-	
-	
+
 restore
 preserve
 
+* Processing questions about political systems
+/*
+           1 Very good
+           2 Fairly good
+           3 Fairly bad
+           4 Very bad
+          .a Don't know
+          .b No answer
+          .c Not applicable
+          .d Not asked in survey
+          .e Missing: other
+*/
+
+foreach var in $democracy_very_good_very_bad {
+	keep if `var' >= 1
+	keep if `var' != .c
+	keep if `var' != .d
+	keep if `var' != .e
+
+	gen good_`var' = 0
+	replace good_`var' = 1 if `var' == 1 | `var' == 2
+
+	gen bad_`var' = 0
+	replace bad_`var' = 1 if `var' == 3 | `var' == 4
+
+	gen very_good_`var' = 0
+	replace very_good_`var' = 1 if `var' == 1
+
+	gen fairly_good_`var' = 0
+	replace fairly_good_`var' = 1 if `var' == 2
+
+	gen fairly_bad_`var' = 0
+	replace fairly_bad_`var' = 1 if `var' == 3
+
+	gen very_bad_`var' = 0
+	replace very_bad_`var' = 1 if `var' == 4
+
+	gen dont_know_`var' = 0
+	replace dont_know_`var' = 1 if `var' == .a
+
+	gen no_answer_`var' = 0
+	replace no_answer_`var' = 1 if `var' == .b
+
+	gen avg_score_`var' = `var'
+
+	collapse (mean) good_`var' bad_`var' very_good_`var' fairly_good_`var' fairly_bad_`var' very_bad_`var' dont_know_`var' no_answer_`var' avg_score_`var' [w=S017], by (year country)
+	tempfile political_systems_`var'_file
+	save "`political_systems_`var'_file'"
+
+	restore
+	preserve
+}
+
+
+* Processing "x essential characteristic of democracy"
+/*
+           0 It is against democracy (spontaneous)
+           1 Not an essential characteristic of democracy
+           2 2
+           3 3
+           4 4
+           5 5
+           6 6
+           7 7
+           8 8
+           9 9
+          10 An essential characteristic of democracy
+          .a Don't know
+          .b No answer
+          .c Not applicable
+          .d Not asked in survey
+          .e Missing: other
+*/
+
+foreach var in $democracy_essential_char {
+	keep if `var' >= 0
+	keep if `var' != .c
+	keep if `var' != .d
+	keep if `var' != .e
+
+	gen not_essential_dem_agg_`var' = 0
+	replace not_essential_dem_agg_`var' = 1 if `var' <= 4
+
+	gen essential_dem_agg_`var' = 0
+	replace essential_dem_agg_`var' = 1 if `var' >= 6 & `var' <= 10
+
+	gen not_essential_dem_`var' = 0
+	replace not_essential_dem_`var' = 1 if `var' == 1 | `var' == 0 //Note that I am including the spontaneous "it is against democracy" answer
+
+	gen essential_dem_`var' = 0
+	replace essential_dem_`var' = 1 if `var' == 10
+
+	gen neutral_essential_dem_`var' = 0
+	replace neutral_essential_dem_`var' = 1 if `var' == 5
+
+	gen dont_know_`var' = 0
+	replace dont_know_`var' = 1 if `var' == .a
+
+	gen no_answer_`var' = 0
+	replace no_answer_`var' = 1 if `var' == .b
+
+	gen avg_score_`var' = `var'
+
+	collapse (mean) not_essential_dem_agg_`var' essential_dem_agg_`var' not_essential_dem_`var' essential_dem_`var' neutral_essential_dem_`var' dont_know_`var' no_answer_`var' avg_score_`var' [w=S017], by (year country)
+	tempfile democracy_essential_`var'_file
+	save "`democracy_essential_`var'_file'"
+
+	restore
+	preserve
+}
+
+* Processing importance of democracy question
+/*
+           1 Not at all important
+           2 2
+           3 3
+           4 4
+           5 5
+           6 6
+           7 7
+           8 8
+           9 9
+          10 Absolutely important
+          .a Don't know
+          .b No answer
+          .c Not applicable
+          .d Not asked in survey
+          .e Missing: other
+*/
+
+keep if $democracy_importance >= 1
+keep if $democracy_importance != .c
+keep if $democracy_importance != .d
+keep if $democracy_importance != .e
+
+
+gen not_important_democracy = 0
+replace not_important_democracy = 1 if $democracy_importance <= 4
+
+gen important_democracy = 0
+replace important_democracy = 1 if $democracy_importance >= 6 & $democracy_importance <= 10
+
+gen not_at_all_important_democracy = 0
+replace not_at_all_important_democracy = 1 if $democracy_importance == 1
+
+gen absolutely_important_democracy = 0
+replace absolutely_important_democracy = 1 if $democracy_importance == 10
+
+gen neutral_important_democracy = 0
+replace neutral_important_democracy = 1 if $democracy_importance == 5
+
+gen dont_know_important_democracy = 0
+replace dont_know_important_democracy = 1 if $democracy_importance == .a
+
+gen no_answer_important_democracy = 0
+replace no_answer_important_democracy = 1 if $democracy_importance == .b
+
+gen avg_score_important_democracy = $democracy_importance
+
+collapse (mean) not_important_democracy important_democracy not_at_all_important_democracy absolutely_important_democracy neutral_important_democracy dont_know_important_democracy no_answer_important_democracy avg_score_important_democracy [w=S017], by (year country)
+tempfile democracy_important_file
+save "`democracy_important_file'"
+
+restore
+preserve
+
+* Processing democraticness in own country question
+/*
+           1 Not at all democratic
+           2 2
+           3 3
+           4 4
+           5 5
+           6 6
+           7 7
+           8 8
+           9 9
+          10 Completely democratic
+          .a Don't know
+          .b No answer
+          .c Not applicable
+          .d Not asked in survey
+          .e Missing: other
+*/
+
+keep if $democracy_democraticness >= 1
+keep if $democracy_democraticness != .c
+keep if $democracy_democraticness != .d
+keep if $democracy_democraticness != .e
+
+
+gen not_democratic = 0
+replace not_democratic = 1 if $democracy_democraticness <= 4
+
+gen democratic = 0
+replace democratic = 1 if $democracy_democraticness >= 6 & $democracy_democraticness <= 10
+
+gen not_at_all_democratic = 0
+replace not_at_all_democratic = 1 if $democracy_democraticness == 1
+
+gen completely_democratic = 0
+replace completely_democratic = 1 if $democracy_democraticness == 10
+
+gen neutral_democratic = 0
+replace neutral_democratic = 1 if $democracy_democraticness == 5
+
+gen dont_know_democratic = 0
+replace dont_know_democratic = 1 if $democracy_democraticness == .a
+
+gen no_answer_democratic = 0
+replace no_answer_democratic = 1 if $democracy_democraticness == .b
+
+gen avg_score_democratic = $democracy_democraticness
+
+collapse (mean) not_democratic democratic not_at_all_democratic completely_democratic neutral_democratic dont_know_democratic no_answer_democratic avg_score_democratic [w=S017], by (year country)
+tempfile democratic_file
+save "`democratic_file'"
+
+restore
+preserve
+
+* Processing "honest elections makes a difference in democracy" questions
+/*
+           1 Very important
+           2 Rather important
+           3 Not very important
+           4 Not at all important
+          .a Don't know
+          .b No answer
+          .c Not applicable
+          .d Not asked in survey
+          .e Missing: other
+*/
+
+foreach var in $democracy_elections_makes_diff {
+	keep if `var' >= 1
+	keep if `var' != .c
+	keep if `var' != .d
+	keep if `var' != .e
+
+	gen important_`var' = 0
+	replace important_`var' = 1 if `var' == 1 | `var' == 2
+
+	gen not_important_`var' = 0
+	replace not_important_`var' = 1 if `var' == 3 | `var' == 4
+
+	gen very_important_`var' = 0
+	replace very_important_`var' = 1 if `var' == 1
+
+	gen rather_important_`var' = 0
+	replace rather_important_`var' = 1 if `var' == 2
+
+	gen not_very_important_`var' = 0
+	replace not_very_important_`var' = 1 if `var' == 3
+
+	gen not_at_all_important_`var' = 0
+	replace not_at_all_important_`var' = 1 if `var' == 4
+
+	gen dont_know_`var' = 0
+	replace dont_know_`var' = 1 if `var' == .a
+
+	gen no_answer_`var' = 0
+	replace no_answer_`var' = 1 if `var' == .b
+
+	gen avg_score_`var' = `var'
+
+	collapse (mean) important_`var' not_important_`var' very_important_`var' rather_important_`var' not_very_important_`var' not_at_all_important_`var' dont_know_`var' no_answer_`var' avg_score_`var' [w=S017], by (year country)
+	tempfile elections_difference_`var'_file
+	save "`elections_difference_`var'_file'"
+
+	restore
+	preserve
+}
 
 
 * Combine all the saved datasets
 use "`trust_file'", clear
 
-merge 1:1 year country using "`trust_first_file'", nogenerate // keep(master match)
-merge 1:1 year country using "`trust_personally_file'", nogenerate // keep(master match)
-merge 1:1 year country using "`take_advantage_file'", nogenerate // keep(master match)
+qui merge 1:1 year country using "`trust_first_file'", nogenerate // keep(master match)
+qui merge 1:1 year country using "`trust_personally_file'", nogenerate // keep(master match)
+qui merge 1:1 year country using "`take_advantage_file'", nogenerate // keep(master match)
 
 foreach var in $additional_questions {
-	merge 1:1 year country using "`confidence_`var'_file'", nogenerate // keep(master match)
+	qui merge 1:1 year country using "`confidence_`var'_file'", nogenerate // keep(master match)
 }
 
 foreach var in $important_in_life_questions {
-	merge 1:1 year country using "`important_in_life_`var'_file'", nogenerate // keep(master match)
+	qui merge 1:1 year country using "`important_in_life_`var'_file'", nogenerate // keep(master match)
 }
 
-merge 1:1 year country using "`interest_politics_file'", nogenerate // keep(master match)
+qui merge 1:1 year country using "`interest_politics_file'", nogenerate // keep(master match)
 
 foreach var in $rest_politics_questions {
-	merge 1:1 year country using "`politics_`var'_file'", nogenerate // keep(master match)
+	qui merge 1:1 year country using "`politics_`var'_file'", nogenerate // keep(master match)
 }
 
-merge 1:1 year country using "`environment_vs_econ_file'", nogenerate // keep(master match)
+qui merge 1:1 year country using "`environment_vs_econ_file'", nogenerate // keep(master match)
 
-merge 1:1 year country using "`income_equality_file'", nogenerate // keep(master match)
+qui merge 1:1 year country using "`income_equality_file'", nogenerate // keep(master match)
 
 foreach var in $schwartz_questions {
-	merge 1:1 year country using "`schwartz_`var'_file'", nogenerate // keep(master match)
+	qui merge 1:1 year country using "`schwartz_`var'_file'", nogenerate // keep(master match)
 }
 
-merge 1:1 year country using "`leisure_vs_work_file'", nogenerate // keep(master match)
+qui merge 1:1 year country using "`leisure_vs_work_file'", nogenerate // keep(master match)
 
 foreach var in $work_questions {
-	merge 1:1 year country using "`work_`var'_file'", nogenerate // keep(master match)
+	qui merge 1:1 year country using "`work_`var'_file'", nogenerate // keep(master match)
 }
 
-merge 1:1 year country using "`most_serious_file'", nogenerate // keep(master match)
+qui merge 1:1 year country using "`most_serious_file'", nogenerate // keep(master match)
 
 foreach var in $justifiable_questions {
-	merge 1:1 year country using "`justifiable_`var'_file'", nogenerate // keep(master match)
+	qui merge 1:1 year country using "`justifiable_`var'_file'", nogenerate // keep(master match)
 }
 
 foreach var in $worries_questions {
-	merge 1:1 year country using "`worries_`var'_file'", nogenerate // keep(master match)
+	qui merge 1:1 year country using "`worries_`var'_file'", nogenerate // keep(master match)
 }
 
 foreach var in $neighbors_questions {
-	merge 1:1 year country using "`neighbors_`var'_file'", nogenerate // keep(master match)
+	qui merge 1:1 year country using "`neighbors_`var'_file'", nogenerate // keep(master match)
 }
 
-merge 1:1 year country using "`happiness_file'", nogenerate // keep(master match)
-merge 1:1 year country using "`homosexual_parents_file'", nogenerate // keep(master match)
-merge 1:1 year country using "`democracy_satisfied_file'", nogenerate // keep(master match)
+qui merge 1:1 year country using "`happiness_file'", nogenerate // keep(master match)
+qui merge 1:1 year country using "`homosexual_parents_file'", nogenerate // keep(master match)
+qui merge 1:1 year country using "`democracy_satisfied_file'", nogenerate // keep(master match)
 
+foreach var in $democracy_very_good_very_bad {
+	qui merge 1:1 year country using "`political_systems_`var'_file'", nogenerate // keep(master match)
+}
+
+foreach var in $democracy_essential_char {
+	qui merge 1:1 year country using "`democracy_essential_`var'_file'", nogenerate // keep(master match)
+}
+
+qui merge 1:1 year country using "`democracy_important_file'", nogenerate // keep(master match)
+
+qui merge 1:1 year country using "`democratic_file'", nogenerate // keep(master match)
+
+qui merge 1:1 year country using "`elections_difference_`var'_file'", nogenerate // keep(master match)
 
 
 * Get a list of variables excluding country and year (and avg_score_eq_ineq to not multiply it by 100)

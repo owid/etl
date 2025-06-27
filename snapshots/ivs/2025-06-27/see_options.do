@@ -16,5 +16,6 @@ global democracy_elections_makes_diff E266
 
 foreach var in $democracy_questions {
 	di "`var'"
+	tab `var'
 	label list `var'
 }
