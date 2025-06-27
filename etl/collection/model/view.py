@@ -1,12 +1,12 @@
 import re
 from copy import deepcopy
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, Union
-
-from owid.catalog.meta import GrapherConfig
+from types import SimpleNamespace
+from typing import Any, Dict, List, cast
 
 from etl.collection.exceptions import CommonViewParamConflict, ExtraIndicatorsInUseError
 from etl.collection.model.base import MDIMBase, pruned_json
+from etl.collection.model.schema_types import ViewConfig, ViewMetadata
 from etl.collection.utils import CHART_DIMENSIONS
 
 REGEX_CATALOG_PATH = (
@@ -17,12 +17,19 @@ REGEX_CATALOG_PATH_OPTIONS = (
 )
 
 
+class ReadOnlyNamespace(SimpleNamespace):
+    def __setattr__(self, name, value):
+        if hasattr(self, name):
+            raise AttributeError(f"Cannot modify attribute '{name}'")
+        super().__setattr__(name, value)
+
+
 @pruned_json
 @dataclass
 class CommonView(MDIMBase):
-    dimensions: Optional[Dict[str, Any]] = None
-    config: Optional[Dict[str, Any]] = None
-    metadata: Optional[Dict[str, Any]] = None
+    dimensions: Dict[str, Any] | None = None
+    config: ViewConfig | Dict[str, Any] | None = None
+    metadata: ViewMetadata | Dict[str, Any] | None = None
 
     @property
     def num_dimensions(self) -> int:
@@ -33,7 +40,7 @@ class CommonView(MDIMBase):
 @dataclass
 class Indicator(MDIMBase):
     catalogPath: str
-    display: Optional[Dict[str, Any]] = None
+    display: Dict[str, Any] | None = None
 
     def __post_init__(self):
         # Validate that the catalog path is either (i) complete or (ii) in the format table#indicator.
@@ -102,10 +109,10 @@ class Indicator(MDIMBase):
 class ViewIndicators(MDIMBase):
     """Indicators in a MDIM/Explorer view."""
 
-    y: Optional[List[Indicator]] = None
-    x: Optional[Indicator] = None
-    size: Optional[Indicator] = None
-    color: Optional[Indicator] = None
+    y: List[Indicator] | None = None
+    x: Indicator | None = None
+    size: Indicator | None = None
+    color: Indicator | None = None
 
     @property
     def num_indicators(self) -> int:
@@ -135,7 +142,7 @@ class ViewIndicators(MDIMBase):
         # Now that data is in the expected shape, let the parent class handle the rest
         return super().from_dict(data)
 
-    def to_records(self) -> List[Dict[str, Union[str, Dict[str, Any]]]]:
+    def to_records(self) -> List[Dict[str, str | Dict[str, Any]]]:
         indicators = []
         for dim in CHART_DIMENSIONS:
             dimension_val = getattr(self, dim, None)
@@ -170,6 +177,36 @@ class ViewIndicators(MDIMBase):
 
         return self
 
+    def set_indicator(
+        self,
+        y: List[str] | List[Dict[str, Any]] | str | Dict[str, Any] | None = None,
+        x: str | None = None,
+        color: str | None = None,
+        size: str | None = None,
+    ):
+        def _load_indicator(indicator_raw, indicator_label):
+            if isinstance(indicator_raw, str):
+                indicator = Indicator(catalogPath=indicator_raw)
+            elif isinstance(indicator_raw, dict):
+                indicator = Indicator.from_dict(indicator_raw)
+            else:
+                raise ValueError(
+                    f"Invalid type for indicator {indicator_label}: {type(indicator_raw)}. Expected str or dict."
+                )
+            return indicator
+
+        if y is not None:
+            if isinstance(y, list):
+                self.y = [_load_indicator(yy, "y") for yy in y]
+            else:
+                self.y = [_load_indicator(y, "y")]
+        if x is not None:
+            self.x = _load_indicator(x, "x")
+        if color is not None:
+            self.color = _load_indicator(color, "color")
+        if size is not None:
+            self.size = _load_indicator(size, "size")
+
 
 @pruned_json
 @dataclass
@@ -178,13 +215,44 @@ class View(MDIMBase):
 
     dimensions: Dict[str, str]
     indicators: ViewIndicators
-    # NOTE: Maybe worth putting as classes at some point?
-    config: Optional[GrapherConfig] = None
-    metadata: Optional[Any] = None
+    # config: Optional[Union[ViewConfig, Dict[str, Any]]] = None
+    config: ViewConfig | Dict[str, Any] | None = None
+    metadata: ViewMetadata | Dict[str, Any] | None = None
+    _is_grouped: bool = False  # Private flag to mark views created by grouping
 
     @property
-    def d(self):
-        return self.dimensions
+    def is_grouped(self) -> bool:
+        """Check if this view was created by grouping other views."""
+        return self._is_grouped
+
+    def mark_as_grouped(self) -> None:
+        """Mark this view as created by grouping other views."""
+        object.__setattr__(self, "_is_grouped", True)
+
+    @property
+    def d(self) -> ReadOnlyNamespace:
+        # Create a hash of current dimensions content for cache invalidation
+        current_hash = hash(frozenset(self.dimensions.items()))
+
+        # Check if we have a cached version and if dimensions haven't changed
+        if hasattr(self, "_d_cache") and hasattr(self, "_d_hash") and self._d_hash == current_hash:
+            return self._d_cache
+
+        # Create new ReadOnlyNamespace and cache it with current hash
+        self._d_cache = ReadOnlyNamespace(**self.dimensions)
+        self._d_hash = current_hash
+        return self._d_cache
+
+    def __setattr__(self, name, value):
+        if name == "d":
+            raise AttributeError(f"Cannot set read-only property '{name}'")
+        # Clear cache when dimensions object is replaced entirely
+        if name == "dimensions":
+            if hasattr(self, "_d_cache"):
+                delattr(self, "_d_cache")
+            if hasattr(self, "_d_hash"):
+                delattr(self, "_d_hash")
+        super().__setattr__(name, value)
 
     def has_non_y_indicators(self) -> bool:
         """Check if the view has non-y indicators."""
@@ -237,7 +305,7 @@ class View(MDIMBase):
             common_has_priority=common_has_priority,
         )
         if new_config:
-            self.config = new_config
+            self.config = cast(ViewConfig, new_config)
         # Update metadata
         new_metadata = merge_common_metadata_by_dimension(
             common_views,
@@ -247,7 +315,7 @@ class View(MDIMBase):
             common_has_priority=common_has_priority,
         )
         if new_metadata:
-            self.metadata = new_metadata
+            self.metadata = cast(ViewMetadata, new_metadata)
 
         return self
 

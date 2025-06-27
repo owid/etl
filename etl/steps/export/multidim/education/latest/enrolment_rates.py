@@ -6,7 +6,7 @@ from etl.helpers import PathFinder
 paths = PathFinder(__file__)
 
 MULTIDIM_CONFIG = {
-    "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.005.json",
+    "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.008.json",
     "hasMapTab": True,
     "tab": "map",
     "originUrl": "ourworldindata.org/education",
@@ -143,6 +143,13 @@ def run() -> None:
         # Generate dynamic subtitle
         if level and enrolment_type:
             view.config["subtitle"] = generate_subtitle_by_level(level, sex, enrolment_type)
+        if sex == "sex_side_by_side" or level == "level_side_by_side":
+            view.metadata = {
+                "presentation": {
+                    "title_public": view.config["title"],
+                },
+                "description_short": view.config["subtitle"],
+            }
 
         edit_indicator_displays(view)
 

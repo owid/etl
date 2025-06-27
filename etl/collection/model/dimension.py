@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Callable, ClassVar, List, Optional, TypeGuard, Union
+from typing import Callable, ClassVar, List, TypeGuard
 
 from etl.collection.exceptions import DuplicateValuesError, MissingChoiceError
 from etl.collection.model.base import MDIMBase, pruned_json
@@ -10,8 +10,8 @@ from etl.collection.model.base import MDIMBase, pruned_json
 class DimensionChoice(MDIMBase):
     slug: str
     name: str
-    description: Optional[str] = None
-    group: Optional[str] = None
+    description: str | None = None
+    group: str | None = None
 
 
 @dataclass(frozen=True)
@@ -35,7 +35,7 @@ class DimensionPresentationUIType:
 @dataclass
 class DimensionPresentation(MDIMBase):
     type: str
-    choice_slug_true: Optional[str] = None
+    choice_slug_true: str | None = None
 
     def __post_init__(self):
         if not DimensionPresentationUIType.is_valid(self.type):
@@ -54,7 +54,8 @@ class Dimension(MDIMBase):
     slug: str
     name: str
     choices: List[DimensionChoice]
-    presentation: Optional[DimensionPresentation] = None
+    description: str | None = None
+    presentation: DimensionPresentation | None = None
 
     def __post_init__(self):
         """Validations."""
@@ -89,7 +90,7 @@ class Dimension(MDIMBase):
     def ppt(self):
         return self.presentation
 
-    def sort_choices(self, slug_order: Union[List[str], Callable]):
+    def sort_choices(self, slug_order: List[str] | Callable):
         """Sort choices based on the given order.
 
         Args:
@@ -115,14 +116,14 @@ class Dimension(MDIMBase):
         # Sort based on your desired slug order
         self.choices.sort(key=lambda choice: slug_position.get(choice.slug, float("inf")))
 
-    def validate_unique_names(self):
+    def validate_choice_names_unique(self):
         """Validate that all choice names are unique."""
         # TODO: Check if (name, group) is unique instead of just name
         names = [choice.name for choice in self.choices]
         if len(names) != len(set(names)):
             raise DuplicateValuesError(f"Dimension choices for '{self.slug}' must have unique names!")
 
-    def validate_unique_slugs(self):
+    def validate_choice_slugs_unique(self):
         """Validate that all choice names are unique."""
         slug = [choice.slug for choice in self.choices]
         if len(slug) != len(set(slug)):

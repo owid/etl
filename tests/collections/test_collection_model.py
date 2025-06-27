@@ -3,11 +3,17 @@ Tests for Collection model from etl.collection.model.core.
 
 This module tests the core functionality of the Collection class including
 initialization, validation, view management, dimension handling, and data export.
+It also tests the CollectionSet class for managing multiple collections.
 """
+
+import warnings
+from pathlib import Path
+from unittest.mock import patch
 
 import pytest
 
-from etl.collection.exceptions import DuplicateCollectionViews
+from etl.collection.core.collection_set import CollectionSet
+from etl.collection.exceptions import DuplicateCollectionViews, DuplicateValuesError
 from etl.collection.model.core import Collection, Definitions
 from etl.collection.model.dimension import Dimension, DimensionChoice
 from etl.collection.model.view import Indicator, View, ViewIndicators
@@ -446,3 +452,319 @@ def test_sort_views_with_default_first():
     # After sorting - USA view should be first
     assert collection.views[0].dimensions["country"] == "usa"
     assert collection.views[1].dimensions["country"] == "uk"
+
+
+def test_validate_dimension_uniqueness_success():
+    """
+    Test Collection.validate_dimension_uniqueness - passes with unique dimension slugs.
+
+    Example: Collection with dimensions having different slugs should pass validation
+    """
+    collection = Collection(
+        catalog_path="test#table",
+        title={"en": "Test"},
+        default_selection=["country", "metric"],
+        dimensions=[
+            Dimension(slug="country", name="Country", choices=[DimensionChoice(slug="usa", name="USA")]),
+            Dimension(slug="metric", name="Metric", choices=[DimensionChoice(slug="cases", name="Cases")]),
+            Dimension(slug="year", name="Year", choices=[DimensionChoice(slug="2023", name="2023")]),
+        ],
+        views=[View(dimensions={"country": "usa", "metric": "cases", "year": "2023"}, indicators=ViewIndicators(y=[]))],
+        _definitions=Definitions(),
+    )
+
+    # Should not raise any exception
+    collection.validate_dimension_uniqueness()
+
+
+def test_validate_dimension_uniqueness_duplicate_slugs():
+    """
+    Test Collection.validate_dimension_uniqueness - fails with duplicate dimension slugs.
+
+    Example: Collection with dimensions having same slug should raise DuplicateValuesError
+    """
+    collection = Collection(
+        catalog_path="test#table",
+        title={"en": "Test"},
+        default_selection=["country"],
+        dimensions=[
+            Dimension(slug="country", name="Country", choices=[DimensionChoice(slug="usa", name="USA")]),
+            Dimension(
+                slug="country", name="Another Country", choices=[DimensionChoice(slug="uk", name="UK")]
+            ),  # Duplicate slug
+        ],
+        views=[View(dimensions={"country": "usa"}, indicators=ViewIndicators(y=[]))],
+        _definitions=Definitions(),
+    )
+
+    with pytest.raises(DuplicateValuesError, match="Dimension slug 'country' is not unique"):
+        collection.validate_dimension_uniqueness()
+
+
+def test_validate_dimension_uniqueness_empty_dimensions():
+    """
+    Test Collection.validate_dimension_uniqueness - passes with no dimensions.
+
+    Example: Collection with empty dimensions list should pass validation
+    """
+    collection = Collection(
+        catalog_path="test#table",
+        title={"en": "Test"},
+        default_selection=[],
+        dimensions=[],
+        views=[],
+        _definitions=Definitions(),
+    )
+
+    # Should not raise any exception
+    collection.validate_dimension_uniqueness()
+
+
+def test_validate_dimension_uniqueness_single_dimension():
+    """
+    Test Collection.validate_dimension_uniqueness - passes with single dimension.
+
+    Example: Collection with only one dimension should always pass validation
+    """
+    collection = Collection(
+        catalog_path="test#table",
+        title={"en": "Test"},
+        default_selection=["country"],
+        dimensions=[
+            Dimension(slug="country", name="Country", choices=[DimensionChoice(slug="usa", name="USA")]),
+        ],
+        views=[View(dimensions={"country": "usa"}, indicators=ViewIndicators(y=[]))],
+        _definitions=Definitions(),
+    )
+
+    # Should not raise any exception
+    collection.validate_dimension_uniqueness()
+
+
+def test_validate_dimension_uniqueness_multiple_duplicates():
+    """
+    Test Collection.validate_dimension_uniqueness - catches first duplicate when multiple exist.
+
+    Example: Collection with multiple duplicate dimension slugs should raise error for first found
+    """
+    collection = Collection(
+        catalog_path="test#table",
+        title={"en": "Test"},
+        default_selection=["country"],
+        dimensions=[
+            Dimension(slug="country", name="Country 1", choices=[DimensionChoice(slug="usa", name="USA")]),
+            Dimension(slug="metric", name="Metric 1", choices=[DimensionChoice(slug="cases", name="Cases")]),
+            Dimension(
+                slug="country", name="Country 2", choices=[DimensionChoice(slug="uk", name="UK")]
+            ),  # First duplicate
+            Dimension(
+                slug="metric", name="Metric 2", choices=[DimensionChoice(slug="deaths", name="Deaths")]
+            ),  # Second duplicate
+        ],
+        views=[View(dimensions={"country": "usa", "metric": "cases"}, indicators=ViewIndicators(y=[]))],
+        _definitions=Definitions(),
+    )
+
+    # Should raise error for the first duplicate found (country)
+    with pytest.raises(DuplicateValuesError, match="Dimension slug 'country' is not unique"):
+        collection.validate_dimension_uniqueness()
+
+
+# =============================================================================
+# CollectionSet and grouped view validation tests
+# =============================================================================
+
+
+def _simple_collection_dict(name: str) -> dict:
+    """Create a minimal collection dictionary for testing purposes.
+
+    Args:
+        name: The name to use for the collection (used in catalog_path)
+
+    Returns:
+        A dictionary representing a basic collection with:
+        - One dimension with one choice
+        - One view with that dimension and one indicator
+        - Basic metadata (title, catalog_path, etc.)
+    """
+    return {
+        "dimensions": [{"slug": "dim", "name": "Dim", "choices": [{"slug": "a", "name": "A"}]}],
+        "views": [
+            {
+                "dimensions": {"dim": "a"},
+                "indicators": {"y": [{"catalogPath": "table#ind"}]},
+            }
+        ],
+        "catalog_path": f"dataset#{name}",
+        "title": {"title": "Title"},
+        "default_selection": [],
+    }
+
+
+def test_collection_set(tmp_path: Path):
+    """Test CollectionSet functionality for managing multiple collections.
+
+    This test verifies that:
+    1. Collections can be created from dictionaries and saved to files
+    2. CollectionSet can discover and list collection files in a directory
+    3. CollectionSet can load individual collections by name
+    4. Loaded collections maintain their properties (short_name, etc.)
+    5. The file naming convention (*.config.json) works correctly
+
+    Args:
+        tmp_path: Pytest fixture providing a temporary directory for test files
+    """
+    path = tmp_path
+    coll1 = Collection.from_dict(_simple_collection_dict("coll1"))
+    coll2 = Collection.from_dict(_simple_collection_dict("coll2"))
+    coll1.save_file(path / "coll1.config.json")
+    coll2.save_file(path / "coll2.config.json")
+
+    cs = CollectionSet(path)
+    assert cs.names == ["coll1", "coll2"]
+
+    loaded = cs.read("coll1")
+    assert isinstance(loaded, Collection)
+    assert loaded.short_name == "coll1"
+
+
+def test_grouped_view_validation_warnings():
+    """Test that grouped views without proper metadata generate warnings during save.
+
+    This test verifies the sanity_check_grouped_view functionality by:
+    1. Creating a collection with multiple views
+    2. Grouping views to create grouped views without metadata
+    3. Mocking the database validation to avoid DB dependency
+    4. Calling save() and verifying appropriate warnings are raised
+    """
+    # Create collection with dimensions and views
+    collection = Collection(
+        dimensions=[
+            Dimension(
+                slug="sex",
+                name="Sex",
+                choices=[
+                    DimensionChoice(slug="male", name="Male"),
+                    DimensionChoice(slug="female", name="Female"),
+                ],
+            ),
+            Dimension(
+                slug="age",
+                name="Age",
+                choices=[
+                    DimensionChoice(slug="adults", name="Adults"),
+                    DimensionChoice(slug="children", name="Children"),
+                ],
+            ),
+        ],
+        views=[
+            View(
+                dimensions={"sex": "male", "age": "adults"},
+                indicators=ViewIndicators.from_dict({"y": [{"catalogPath": "table#indicator1"}]}),
+            ),
+            View(
+                dimensions={"sex": "female", "age": "adults"},
+                indicators=ViewIndicators.from_dict({"y": [{"catalogPath": "table#indicator2"}]}),
+            ),
+            View(
+                dimensions={"sex": "male", "age": "children"},
+                indicators=ViewIndicators.from_dict({"y": [{"catalogPath": "table#indicator3"}]}),
+            ),
+            View(
+                dimensions={"sex": "female", "age": "children"},
+                indicators=ViewIndicators.from_dict({"y": [{"catalogPath": "table#indicator4"}]}),
+            ),
+        ],
+        catalog_path="test#collection",
+        title={"title": "Test Collection"},
+        default_selection=["test"],
+        _definitions=Definitions(common_views=None),
+    )
+
+    # Group views by sex dimension (creates grouped views without metadata)
+    collection.group_views([{"dimension": "sex", "choice_new_slug": "all_sexes", "choices": ["male", "female"]}])
+
+    # Verify that grouped views were created and marked as grouped
+    grouped_views = [view for view in collection.views if view.is_grouped]
+    assert len(grouped_views) == 2  # Should have 2 grouped views (one for each age group)
+
+    # Mock database validation to avoid DB dependency
+    with patch("etl.collection.utils.validate_indicators_in_db"):
+        # Capture warnings during save
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")  # Ensure all warnings are captured
+
+            # This should trigger warnings for missing metadata
+            collection.validate_grouped_views()
+
+            # Verify warnings were raised
+            assert len(w) >= 2  # At least 2 warnings (one per grouped view)
+
+            # Check that warnings mention missing metadata
+            warning_messages = [str(warning.message) for warning in w]
+
+            # Should have warnings about missing metadata attribute
+            missing_metadata_warnings = [msg for msg in warning_messages if "missing 'metadata' attribute" in msg]
+            assert len(missing_metadata_warnings) >= 2
+
+            # Verify warning details
+            for warning_msg in missing_metadata_warnings:
+                assert "description_key" in warning_msg
+                assert "description_short" in warning_msg
+                assert "all_sexes" in warning_msg  # Should mention the grouped choice
+
+
+def test_grouped_view_validation_with_incomplete_metadata():
+    """Test warnings for grouped views with partial metadata."""
+    # Create a collection similar to above
+    collection = Collection(
+        dimensions=[
+            Dimension(
+                slug="category",
+                name="Category",
+                choices=[
+                    DimensionChoice(slug="a", name="A"),
+                    DimensionChoice(slug="b", name="B"),
+                ],
+            )
+        ],
+        views=[
+            View(
+                dimensions={"category": "a"},
+                indicators=ViewIndicators.from_dict({"y": [{"catalogPath": "table#indicator1"}]}),
+            ),
+            View(
+                dimensions={"category": "b"},
+                indicators=ViewIndicators.from_dict({"y": [{"catalogPath": "table#indicator2"}]}),
+            ),
+        ],
+        catalog_path="test#collection2",
+        title={"title": "Test Collection 2"},
+        default_selection=["test"],
+        _definitions=Definitions(common_views=None),
+    )
+
+    # Group views with partial metadata (missing description_short)
+    collection.group_views(
+        [
+            {
+                "dimension": "category",
+                "choice_new_slug": "combined",
+                "choices": ["a", "b"],
+                "view_metadata": {
+                    "description_key": ["Some key info"]  # Missing description_short
+                },
+            }
+        ]
+    )
+
+    # Test validation
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter("always")
+
+        collection.validate_grouped_views()
+
+        # Should have warning about missing description_short
+        warning_messages = [str(warning.message) for warning in w]
+        missing_desc_short = [msg for msg in warning_messages if "missing 'description_short'" in msg]
+        assert len(missing_desc_short) >= 1

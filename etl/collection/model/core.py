@@ -7,7 +7,7 @@ from collections import defaultdict
 from copy import deepcopy
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Set, Union, cast
+from typing import Any, Callable, Dict, List, Set, cast
 
 import fastjsonschema
 import pandas as pd
@@ -18,9 +18,16 @@ from structlog import get_logger
 from typing_extensions import Self
 
 from apps.chart_sync.admin_api import AdminAPI
-from etl.collection.exceptions import DuplicateCollectionViews
+from etl.collection.exceptions import DuplicateCollectionViews, DuplicateValuesError
 from etl.collection.model.base import MDIMBase, pruned_json
 from etl.collection.model.dimension import Dimension, DimensionChoice
+from etl.collection.model.schema_types import (
+    GroupViewsConfig,
+    ViewConfig,
+    ViewConfigParam,
+    ViewMetadata,
+    ViewMetadataParam,
+)
 from etl.collection.model.view import CommonView, View, ViewIndicators
 from etl.collection.utils import (
     fill_placeholders,
@@ -40,7 +47,7 @@ log = get_logger()
 @pruned_json
 @dataclass
 class Definitions(MDIMBase):
-    common_views: Optional[List[CommonView]] = None
+    common_views: List[CommonView] | None = None
 
     def __post_init__(self):
         # Validate that there is no duplicate common view (based on dimensions)
@@ -74,11 +81,11 @@ class Collection(MDIMBase):
 
     _definitions: Definitions
 
-    topic_tags: Optional[List[str]] = None
-    _default_dimensions: Optional[Dict[str, str]] = None
+    topic_tags: List[str] | None = None
+    _default_dimensions: Dict[str, str] | None = None
 
     # Internal use. For save() method.
-    _collection_type: Optional[str] = field(init=False, default="multidim")
+    _collection_type: str | None = field(init=False, default="multidim")
 
     _group_operations_done: int = field(init=False, default=0)
 
@@ -112,7 +119,7 @@ class Collection(MDIMBase):
         return self._definitions
 
     @property
-    def default_dimensions(self) -> Optional[Dict[str, str]]:
+    def default_dimensions(self) -> Dict[str, str] | None:
         return self._default_dimensions
 
     @default_dimensions.setter
@@ -167,12 +174,12 @@ class Collection(MDIMBase):
         return SCHEMAS_DIR / f"{self._collection_type}-schema.json"
 
     def save_config_local(self) -> None:
-        log.info(f"Exporting config to {self.local_config_path}")
-        self.save_file(self.local_config_path, force_create=False)
+        log.info(f"Exporting collection config to {self.local_config_path}")
+        self.save_file(self.local_config_path, force_create=True)
 
     def save(  # type: ignore[override]
         self,
-        owid_env: Optional[OWIDEnv] = None,
+        owid_env: OWIDEnv | None = None,
         tolerate_extra_indicators: bool = False,
         prune_choices: bool = True,
         prune_dimensions: bool = True,
@@ -194,9 +201,15 @@ class Collection(MDIMBase):
         # Check that no choice name or slug is repeated
         self.validate_choice_uniqueness()
 
+        # Check that no choice name or slug is repeated
+        self.validate_dimension_uniqueness()
+
         # Check that all indicators in explorer exist
         indicators = self.indicators_in_use(tolerate_extra_indicators)
         validate_indicators_in_db(indicators, owid_env.engine)
+
+        # Run sanity checks on grouped views
+        self.validate_grouped_views()
 
         # Sort views based on dimension order
         self.sort_views_based_on_dimensions()
@@ -228,6 +241,9 @@ class Collection(MDIMBase):
         # Upsert config via Admin API
         admin_api = AdminAPI(owid_env)
         admin_api.put_mdim_config(self.catalog_path, config)
+
+        # Link to preview
+        log.info(f"PREVIEW: {owid_env.collection_preview(self.catalog_path)}")
 
     def snake_case_slugs(self):
         """
@@ -354,7 +370,7 @@ class Collection(MDIMBase):
                     view.dimensions[dim_slug] in choice_slugs
                 ), f"Choice {view.dimensions[dim_slug]} not found for dimension {dim_slug}! View: {view.to_dict()}; Available choices: {choice_slugs}"
 
-    def validate_schema(self, schema_path: Optional[Union[str, Path]] = None):
+    def validate_schema(self, schema_path: str | Path | None = None):
         """Validate class against schema."""
         if schema_path is None:
             schema_path = self.schema_path
@@ -405,7 +421,7 @@ class Collection(MDIMBase):
         """Check for duplicate views in the collection."""
         check_duplicate_views(self.views)
 
-    def sort_choices(self, slug_order: Dict[str, Union[List[str], Callable]]):
+    def sort_choices(self, slug_order: Dict[str, List[str] | Callable]):
         """Sort choices based on the given order."""
         not_expected = set(slug_order).difference(self.dimension_slugs)
         if not_expected:
@@ -462,13 +478,26 @@ class Collection(MDIMBase):
     def validate_choice_uniqueness(self):
         """Validate that all choice names (and slugs) are unique."""
         for dim in self.dimensions:
-            dim.validate_unique_names()
-            dim.validate_unique_slugs()
+            dim.validate_choice_names_unique()
+            dim.validate_choice_slugs_unique()
 
-    def validate_choice_names(self):
-        """Validate that all choice names are unique."""
+    def validate_dimension_uniqueness(self):
+        """Validate that all choice names (and slugs) are unique."""
+        slugs = set()
         for dim in self.dimensions:
-            dim.validate_unique_names()
+            # Check if slug was already seen
+            if dim.slug in slugs:
+                raise DuplicateValuesError(
+                    f"Dimension slug '{dim.slug}' is not unique! Found in dimensions: {self.dimensions}"
+                )
+
+            # Add slug to set
+            slugs.add(dim.slug)
+
+    def validate_grouped_views(self):
+        for view in self.views:
+            if view.is_grouped:
+                sanity_check_grouped_view(view)
 
     def prune_dimensions(self):
         """Remove dimension if only one of its choice is in use."""
@@ -516,7 +545,7 @@ class Collection(MDIMBase):
 
     def drop_views(
         self,
-        dimensions: Union[Dict[str, Union[List[str], str]], List[Dict[str, Union[List[str], str]]]],
+        dimensions: Dict[str, List[str] | str] | List[Dict[str, List[str] | str]],
     ):
         """Remove views that have any set of dimensions that can be generated from the given in `dimensions`.
 
@@ -564,16 +593,16 @@ class Collection(MDIMBase):
 
     def group_views(
         self,
-        groups: List[Dict[str, Any]],
+        groups: List[GroupViewsConfig],  # Also accepts List[Dict[str, Any]] for backward compatibility
         drop_dimensions_if_single_choice: bool = True,
-        params: Optional[Dict[str, Any]] = None,
+        params: Dict[str, Any] | None = None,
     ):
         """Group views into new ones.
 
         Group views in a single view to show an aggregate view combining multiple choices for a given dimension. It takes all the views where the `dimension` choice is one of `choices` and groups them together to create a new one.
 
         Args:
-            groups (List[Dict[str, Any]]): List of dictionaries with the following keys:
+            groups (List[GroupViewsConfig]): List of group configurations with the following keys:
                     - dimension: str
                         Slug of the dimension that contains the choices to group.
                     - choices: List[str]
@@ -649,16 +678,21 @@ class Collection(MDIMBase):
         )
         ```
         """
+
+        def _ensure_choices(group, dimension):
+            # Get choice slugs
+            if "choices" not in group:
+                return self.get_dimension(dimension).choice_slugs
+            else:
+                return group["choices"]
+
         new_views_all = []
         for group in groups:
             # Get dimension slug
             assert "dimension" in group, "Dimension must be provided!"
             dimension = group["dimension"]
             # Get choice slugs
-            if "choices" not in group:
-                choices = self.get_dimension(dimension).choice_slugs
-            else:
-                choices = group["choices"]
+            choices = _ensure_choices(group, dimension)
 
             # Get new choice slug
             assert "choice_new_slug" in group, "Dimension must be provided!"
@@ -729,7 +763,7 @@ class Collection(MDIMBase):
         for group in groups:
             if group.get("replace", False):
                 dimension = group["dimension"]
-                choices = group["choices"]
+                choices = _ensure_choices(group, dimension)
                 # Remove views with old choices
                 new_views = [view for view in self.views if view.dimensions[dimension] not in choices]
                 # Remove unused choices
@@ -741,8 +775,8 @@ class Collection(MDIMBase):
 
     def set_global_config(
         self,
-        config,
-        params: Optional[Dict[str, Any]] = None,
+        config: ViewConfigParam,
+        params: Dict[str, Any] | None = None,
     ):
         self.edit_views(
             [
@@ -756,8 +790,8 @@ class Collection(MDIMBase):
 
     def set_global_metadata(
         self,
-        metadata,
-        params: Optional[Dict[str, Any]] = None,
+        metadata: ViewMetadataParam,
+        params: Dict[str, Any] | None = None,
     ):
         self.edit_views(
             [
@@ -772,7 +806,7 @@ class Collection(MDIMBase):
     def edit_views(
         self,
         edits: List[Dict[str, Any]],
-        params: Optional[Dict[str, Any]] = None,
+        params: Dict[str, Any] | None = None,
     ):
         """Edit the display of a view. Text can come from `config` (Grapher config) or `metadata` (Grapher metadata, i.e. text in the data page).
 
@@ -837,9 +871,9 @@ class Collection(MDIMBase):
         dimension: str,
         choices: List[str],
         choice_new_slug: str,
-        view_config: Optional[GrapherConfig] = None,
-        view_metadata: Optional[Any] = None,
-        params: Optional[Dict[str, Any]] = None,
+        view_config: ViewConfigParam | None = None,
+        view_metadata: ViewMetadataParam | None = None,
+        params: Dict[str, Any] | None = None,
     ) -> List[View]:
         """Create new grouped views."""
         if params is None:
@@ -869,6 +903,9 @@ class Collection(MDIMBase):
                 dimensions=new_dimensions,
                 indicators=_combine_view_indicators(view_group),
             )
+            # Mark as grouped view
+            new_view.mark_as_grouped()
+
             # Create config for new view
             new_view = _set_config_metadata_with_params(new_view, view_config, view_metadata, params)
 
@@ -890,9 +927,9 @@ def _expand_params(params: Dict[str, Any], view: View) -> Dict[str, Any]:
 
 def _set_config_metadata_with_params(
     view,
-    view_config: Optional[GrapherConfig] = None,
-    view_metadata: Optional[Any] = None,
-    params: Optional[Dict[str, Any]] = None,
+    view_config: ViewConfigParam | GrapherConfig | None = None,
+    view_metadata: ViewMetadataParam | Any | None = None,
+    params: Dict[str, Any] | None = None,
 ) -> View:
     # Set params to dict if None
     if params is None:
@@ -900,7 +937,8 @@ def _set_config_metadata_with_params(
 
     # Sanity check
     if (view_config is None) and (view_metadata is None):
-        raise ValueError("Either view_config or view_metadata must be provided!")
+        return view
+        # raise ValueError("Either view_config or view_metadata must be provided!")
 
     # Execute callables in params to get a proper Dict[str, str]
     params_view = _expand_params(params, view)
@@ -914,8 +952,9 @@ def _set_config_metadata_with_params(
     new_metadata = run_callbacks(new_metadata, view)
 
     # Add config and metadata to new view
-    view.config = cast(GrapherConfig, new_config)
-    view.metadata = new_metadata
+    # For now, keep as dicts to maintain compatibility with existing merge logic
+    view.config = cast(ViewConfig, new_config)
+    view.metadata = cast(ViewMetadata, new_metadata)
 
     return view
 
@@ -992,7 +1031,7 @@ def snake_to_camel(s: str) -> str:
 
 
 # model.core
-def camelize(obj: Any, exclude_keys: Optional[Set[str]] = None) -> Any:
+def camelize(obj: Any, exclude_keys: Set[str] | None = None) -> Any:
     """
     Recursively converts dictionary keys from snake_case to camelCase, unless the key is in exclude_keys.
 
@@ -1034,3 +1073,56 @@ def run_callbacks(data, view):
         return data(view)
     # Otherwise, return the data as is
     return data
+
+
+def sanity_check_grouped_view(view: View) -> None:
+    """
+    Perform sanity checks on grouped views.
+
+    Validates that grouped views have proper metadata configuration,
+    specifically checking for required description fields.
+
+    Args:
+        view: The grouped view to validate
+
+    Warns:
+        UserWarning: If required metadata fields are missing
+    """
+    import warnings
+
+    # Check if metadata is defined
+    if view.metadata is None:
+        warnings.warn(
+            f"Grouped view with dimensions {view.dimensions} is missing 'metadata' attribute. "
+            "Consider adding metadata with 'description_key' and 'description_short' fields.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return
+
+    # Convert to dict if it's a ViewMetadata object for easier checking
+    metadata_dict = (
+        view.metadata
+        if isinstance(view.metadata, dict)
+        else view.metadata.to_dict()
+        if hasattr(view.metadata, "to_dict")
+        else {}
+    )
+
+    # Check for description_key
+    if "description_key" not in metadata_dict or metadata_dict["description_key"] is None:
+        warnings.warn(
+            f"Grouped view with dimensions {view.dimensions} is missing 'description_key' in metadata. "
+            "This field provides key information about the grouped view.",
+            UserWarning,
+            stacklevel=2,
+        )
+
+    # Check for description_short
+    if "description_short" not in metadata_dict or metadata_dict["description_short"] is None:
+        warnings.warn(
+            f"Grouped view with dimensions {view.dimensions} is missing 'description_short' in metadata. "
+            "This field provides a short description of the grouped view.",
+            UserWarning,
+            stacklevel=2,
+        )

@@ -40,11 +40,11 @@ definitions:
 
       <%- endif -%>
     location_conflicts_method: |-
-      UCDP provides geographical coordinates of each conflict event. We have mapped these coordinates to countries by means of the Natural Earth dataset.
+      UCDP provides geographical coordinates of each conflict event. We have mapped these coordinates to countries by means of the geoBoundaries dataset.
 
       In some instances, the event's coordinates fall within the borders of a country. Other times, the event's coordinates fall outside the borders of a country. In the latter case, we have mapped the event to the country that is closest to the event's coordinates.
 
-      Conflict event with id "53238" and relid "PAK-2003-1-345-88" was assigned to "Siachen Glacier" by Natural Earth. We have mapped it to "Pakistan" following the text in the `where_description` field from the Natural Earth data, which refers to "Giang sector in Siachen, Pakistani Kashmir".
+      Conflict event with id "53238" and relid "PAK-2003-1-345-88" was assigned to "Siachen-Saltoro" by geoBoundaries. We have mapped it to "Pakistan" following the text in the `where_description` field from UCDP, which refers to "Giang sector in Siachen, Pakistani Kashmir".
 
   # Fields used for number of deaths indicators
   number_deaths:
@@ -314,7 +314,7 @@ tables:
             map:
               colorScale:
                 binningStrategy: "manual"
-                customNumericValues: [10, 100, 1000, 10000, 100000]
+                customNumericValues: [0, 10, 100, 1000, 10000, 100000]
 
       number_deaths_ongoing_conflicts_high:
         title: Deaths in ongoing conflicts (high estimate)
@@ -384,7 +384,7 @@ tables:
             map:
               colorScale:
                 binningStrategy: "manual"
-                customNumericValues: [0.1, 0.3, 1, 3, 10, 30, 100]
+                customNumericValues: [0, 0.1, 0.3, 1, 3, 10, 30, 100]
 
       number_deaths_ongoing_conflicts_high_per_capita:
         title: Death rate in ongoing conflicts (high estimate)
@@ -426,8 +426,8 @@ tables:
             map:
               colorScale:
                 binningStrategy: "manual"
-                customNumericValues: [1, 2, 5, 10]
-          attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2025); Natural Earth (2022)
+                customNumericValues: [0, 1, 2, 5, 10]
+          attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2025); geoBoundaries (2023)
 
       number_ongoing_conflicts_per_country:
         title: Number of ongoing conflicts per state
@@ -488,7 +488,7 @@ tables:
 dataset:
   title: UCDP, History of war
   description: |-
-    This dataset provides information on armed conflicts, using data from the UCDP Georeferenced Event Dataset (version 24.1), the UCDP/PRIO Armed Conflict Dataset (version 24.1), and the UCDP Battle-Related Deaths Dataset (version 24.1).
+    This dataset provides information on armed conflicts, using data from the UCDP Georeferenced Event Dataset (version 25.1), the UCDP/PRIO Armed Conflict Dataset (version 25.1), and the UCDP Battle-Related Deaths Dataset (version 25.1).
 
     We aggregate the UCDP Georeferenced Event Dataset up to the year and world (region) to identify all conflict deaths, non-state conflicts, and one-sided violence.
 
