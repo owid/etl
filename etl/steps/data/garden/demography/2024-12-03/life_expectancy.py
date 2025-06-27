@@ -283,10 +283,8 @@ def combine_tables(tb_lt: Table, tb_un: Table, tb_zi: Table, tb_ri: Table) -> Ta
 
     # Combine tb_0 with tb
     tb = tb.merge(tb_0, on=["country", "year", "sex", "age"], how="outer", suffixes=("", "_0"))
-    # Fill NaN values in life_expectancy_0 with life_expectancy
-    tb["life_expectancy"] = tb["life_expectancy"].fillna(tb["life_expectancy_0"])
     tb["source"] = tb["source"].fillna(tb["source_0"])
-    tb = tb.drop(columns=["life_expectancy_0", "source_0"])
+    tb = tb.drop(columns=["source_0"])
     assert all(tb["source"].isin(["Riley", "Zijdeman et al.", "UN WPP", "Life tables"])), "No source found in table!"
     # For some reason, 'sex' is assigned type object
     tb["sex"] = tb["sex"].astype("string")
