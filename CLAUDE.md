@@ -160,6 +160,35 @@ These are installed as editable packages (`owid-catalog`, `owid-datautils`, `owi
 - **Core ETL** (`etl/`): Step execution engine, catalog management, DAG processing
 - **Apps** (`apps/`): Extended functionality - Wizard, chart sync, anomaly detection, maintenance tools
 
+## Dataset Updates
+When asked to "update a dataset", update ALL steps in the pipeline:
+- snapshot (raw data)
+- meadow (cleaned/processed data)
+- garden (transformed data)
+- grapher (chart-ready data)
+
+Use the mcp__catalog__update_step tool with include_dependencies=true and include_usages=true to update the entire pipeline.
+
+## Running ETL Steps
+Use MCP tools to run ETL steps:
+
+### Basic Usage
+Use `mcp__catalog__run_etl` tool with these patterns:
+- Run steps matching a pattern: `steps=["biodiversity/2025-06-28/cherry_blossom"]`
+- Run with grapher upload: `steps=["biodiversity/2025-06-28/cherry_blossom"], grapher=true`
+- Dry run (preview): `steps=["biodiversity/2025-06-28/cherry_blossom"], dry_run=true`
+- Force re-run: `steps=["biodiversity/2025-06-28/cherry_blossom"], force=true`
+
+## Git Workflow
+Create PR first, then commit files:
+
+1. **Create PR**: Use `mcp__catalog__create_pr` tool (creates new branch)
+2. **Check status**: `git status` to see modified/untracked files
+3. **Add files**: `git add .` or `git add <specific-files>`
+4. **Commit**: `git commit -m "Description of changes"`
+
+Note: The MCP create_pr tool creates a new branch but does NOT automatically commit files - you must commit manually after creating the PR.
+
 ## Important Development Notes
 
 - Always use `geo.harmonize_countries()` for geographic data
