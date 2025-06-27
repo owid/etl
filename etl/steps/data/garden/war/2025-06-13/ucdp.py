@@ -17,6 +17,11 @@ Notes:
             3 = Asia (GWNo: 700-999)  [renamed to 'Asia and Oceania']
             4 = Africa (GWNo: 400-626)
             5 = Americas (GWNo: 2-199)
+
+
+
+NOTES ON GEO COORDINATES:
+    - Look below for the section dedicated to debugging geocoordinates
 """
 
 from typing import List, Optional, cast
@@ -27,6 +32,7 @@ import pandas as pd
 from owid.catalog import Dataset, Table
 from owid.catalog import processing as pr
 from shapely import wkt
+from shapely.strtree import STRtree
 from shared import (
     add_indicators_extra,
     aggregate_conflict_types,
@@ -71,7 +77,7 @@ REGIONS_EXPECTED = set(REGIONS_MAPPING.values())
 LAST_YEAR = 2024
 
 # Number of events with no location assigned (see function estimate_metrics_locations)
-NUM_MISSING_LOCATIONS = 2398
+NUM_MISSING_LOCATIONS = 1214
 
 
 def run() -> None:
@@ -83,8 +89,10 @@ def run() -> None:
     # Load datasets
     ds_meadow = paths.load_dataset("ucdp")  # UCDP
     ds_gw = paths.load_dataset("gleditsch")  # Gleditsch
-    ds_maps = paths.load_dataset("nat_earth_110")  # Nat Earth
-    ds_population = paths.load_dataset("population")  # Population
+    ds_population = paths.load_dataset("population")
+    ds_gb = paths.load_dataset("geoboundaries_cgaz")
+
+    # Population
 
     # Sanity checks (1)
     paths.log.info("sanity checks")
@@ -97,13 +105,10 @@ def run() -> None:
     tb_prio = ds_meadow.read("ucdp_prio_armed_conflict")
     tb_regions = ds_gw.read("gleditsch_regions")
     tb_codes = ds_gw.read("gleditsch_countries")
-    tb_maps = ds_maps.read("nat_earth_110")
+    tb_maps = ds_gb.read("geoboundaries_cgaz")
 
     # Filter codes
     tb_codes = tb_codes.loc[tb_codes["year"] <= LAST_YEAR].set_index(["id", "year"])
-
-    # TODO: Temporary fix (conflict type in "Conflict" table is not available, instead combine it with "Dyadic" table)
-    tb_conflict = _load_conflict_table(tb_conflict, tb_dyadic)
 
     #
     # Run main code
@@ -111,6 +116,7 @@ def run() -> None:
     tables = run_pipeline(
         tb_ged=tb_ged,
         tb_conflict=tb_conflict,
+        tb_dyadic=tb_dyadic,
         tb_prio=tb_prio,
         tb_regions=tb_regions,
         tb_codes=tb_codes,
@@ -212,6 +218,7 @@ def _sanity_checks(ds: Dataset) -> None:
 def run_pipeline(
     tb_ged: Table,
     tb_conflict: Table,
+    tb_dyadic: Table,
     tb_prio: Table,
     tb_regions: Table,
     tb_codes: Table,
@@ -235,6 +242,9 @@ def run_pipeline(
     if short_name is None:
         short_name = paths.short_name
 
+    # TODO: Temporary fix (conflict type in "Conflict" table is not available, instead combine it with "Dyadic" table)
+    tb_conflict = _load_conflict_table(tb_conflict, tb_dyadic)
+
     # Keep only active conflicts
     paths.log.info("keep active conflicts")
     tb_ged = tb_ged.loc[tb_ged["active_year"] == 1]
@@ -244,7 +254,7 @@ def run_pipeline(
 
     # Create `conflict_type` column
     paths.log.info("add field `conflict_type`")
-    tb = add_conflict_type(tb_ged, tb_conflict, last_year)
+    tb = add_conflict_type(tb_ged, tb_conflict=tb_conflict, last_year=last_year)
 
     # Sanity-check that the number of 'unknown' types of some conflicts is controlled
     # NOTE: Export summary of conflicts that have no category assigned
@@ -680,7 +690,15 @@ def estimate_metrics_locations(
     # these are mappable in OWID maps.
     # We map entry with id "53238" and relid "PAK-2003-1-345-88" from "Siachen Glacier" to "Pakistan" based on
     # the text in `where_description` field, which says: "Giang sector in Siachen, Pakistani Kashmir"
-    tb_locations.loc[tb_locations["country_name_location"] == "Siachen Glacier", "country_name_location"] = "Pakistan"
+    tb_locations.loc[tb_locations["country_name_location"] == "Siachen-Saltoro", "country_name_location"] = "Pakistan"
+
+    # Sanity check non-standard countries
+    countries = ds_population["population"].reset_index().country.unique()
+    tb_locations_ns = tb_locations.loc[
+        ~tb_locations["country_name_location"].isin(countries),
+        ["country_name_location", "year", "conflict_name", "where_description", "where_coordinates"],
+    ].sort_values(["country_name_location", "year"])
+    assert set(tb_locations_ns["country_name_location"].unique()) == {"Abyei"}
 
     ###################
     # COUNTRY-LEVEL: Country in conflict or not (1 or 0)
@@ -785,10 +803,10 @@ def estimate_metrics_locations(
         fillna_method="zero",
     )
 
-    # Add origins from Natural Earth
+    # Add origins from geoBoundaries
     # cols = ["is_location_of_conflict"] + cols_num_deaths
     for col in cols_indicators:
-        tb_locations_country[col].origins += tb_maps["name"].m.origins
+        tb_locations_country[col].origins += tb_maps["country"].m.origins
 
     ###################
     # Add conflict type aggregates
@@ -937,17 +955,6 @@ def _get_location_of_conflict_in_ucdp_ged(tb: Table, tb_maps: Table, num_missing
     # The 'within' predicate is faster than intersection for point-in-polygon
     gdf_match = gpd.sjoin(gdf, gdf_maps, how="inner", predicate="within")
 
-    # TODO: below code might be equivalent to how we estimate location for missing points!
-    # if gdf_match2["name"].isna().any():
-    #     missing_points = gdf[~gdf["relid"].isin(gdf_match2.dropna(subset=["name"])["relid"])]
-    #     if not missing_points.empty:
-    #         # Create spatial index for faster nearest computation
-    #         nearest_idx = gdf_maps.sindex.nearest(missing_points.geometry)
-    #         assert nearest_idx.shape == (2, len(missing_points)), "Expected result to be of shape (2, 1)!"
-
-    #         names = gdf_maps.iloc[nearest_idx[1, :]]["name"]
-    #         gdf_match2.loc[nearest_idx[0, :], "name"] = gdf_maps.iloc[nearest_idx]["name"]
-
     ###
     # Events not assigned to any country
     COLUMN_COUNTRY_NAME = "country_name_location"
@@ -957,7 +964,7 @@ def _get_location_of_conflict_in_ucdp_ged(tb: Table, tb_maps: Table, num_missing
         gdf_match,
         gdf_maps,
         num_missing_location,
-        COLUMN_COUNTRY_NAME,
+        column_country_name=COLUMN_COUNTRY_NAME,
     )
 
     # SOME CORRECTIONS #
@@ -970,6 +977,40 @@ def _get_location_of_conflict_in_ucdp_ged(tb: Table, tb_maps: Table, num_missing
     mask = (tb[COLUMN_COUNTRY_NAME] == "Morocco") & (tb["latitude"] < 27.66727)
     paths.log.info(f"{len(tb.loc[mask, COLUMN_COUNTRY_NAME])} datapoints in land contested by Morocco/W.Sahara")
     tb.loc[mask, COLUMN_COUNTRY_NAME] = "Western Sahara"
+    ## Rwanda -> DRC
+    relids = [
+        "DRC-2025-1-17740-16",
+        "DRC-2025-1-17740-17",
+        "DRC-2025-1-17740-21",
+        "DRC-2025-1-17740-23",
+        "DRC-2025-1-17740-24",
+        "DRC-2025-1-17740-25",
+        "DRC-2025-1-17740-26",
+        "DRC-2025-1-17740-29",
+        "DRC-2025-1-17740-60",
+        "DRC-2025-1-17740-63",
+        "DRC-2025-1-17740-69",
+        "DRC-2025-1-17740-81",
+        "DRC-2025-1-17740-98",
+        "DRC-2025-1-17740-89",
+        "DRC-2025-1-17740-99",
+        "DRC-2025-1-17740-109",
+        "DRC-2025-3-17706-1",
+        "DRC-2025-3-17741-1",
+        "DRC-2025-3-17741-10",
+        "DRC-2025-3-17741-11",
+        "DRC-2025-3-17741-13",
+        "DRC-2025-3-17741-36",
+        "DRC-2025-3-17741-16",
+        "DRC-2025-3-17741-14",
+        "DRC-2025-3-17741-20",
+        "DRC-2025-3-17741-23",
+        "DRC-2025-3-17741-24",
+        "DRC-2025-3-17741-27",
+        "DRC-2025-3-17741-28",
+        "DRC-2025-3-17741-30",
+    ]
+    tb.loc[tb["relid"].isin(relids), COLUMN_COUNTRY_NAME] = "Democratic Republic of Congo"
 
     # Add a flag column for points likely to have incorrect coordinates:
     # a) points where coordiantes are (0 0), or points where latitude and longitude are exactly the same
@@ -986,7 +1027,10 @@ def _get_location_of_conflict_in_ucdp_ged(tb: Table, tb_maps: Table, num_missing
         tb.loc[error[0], "flag"] = error[1]
         tb.loc[mask, COLUMN_COUNTRY_NAME] = np.nan
 
-    assert tb[COLUMN_COUNTRY_NAME].isna().sum() == 4, "4 missing values were expected! Found a different amount!"
+    num_err_expected_max = 6
+    assert (
+        (num_err := tb[COLUMN_COUNTRY_NAME].isna().sum()) <= num_err_expected_max
+    ), f"{num_err_expected_max} missing values were expected at most! Found a different amount ({num_err})!"
     tb = tb.dropna(subset=[COLUMN_COUNTRY_NAME])
 
     return tb
@@ -1017,17 +1061,30 @@ def _add_missing_values(
     wec_crs = "+proj=eqc +lat_ts=0 +lat_0=0 +lon_0=0 +x_0=0 +y_0=0 +a=6371007 +b=6371007 +units=m +no_defs"
     gdf_missing_wec = gdf_missing.to_crs(wec_crs)
     gdf_maps_wec = gdf_maps.to_crs(wec_crs)
+
+    # Create spatial index for polygons
+    tree = STRtree(gdf_maps_wec.geometry)
+
     # For these points we can find the nearest country using the distance function
-    polygon_near = []
+    # NOTE: should take ~20 seconds (takes long bc borders have quite some resolution)
+    polygon_near_name = []
     for _, row in gdf_missing_wec.iterrows():
-        polygon_index = gdf_maps_wec.distance(row["geometry"]).sort_values().index[0]
-        ne_country_name = gdf_maps_wec["name"][polygon_index]
-        polygon_near.append(ne_country_name)
+        nearest_idx = tree.nearest(row["geometry"])
+        country_row = gdf_maps_wec.iloc[nearest_idx]
+        polygon_near_name.append(country_row["country"])
+
     # Assign
-    gdf_missing["name"] = polygon_near
+    gdf_missing.loc[:, "name"] = polygon_near_name
+
+    # DEBUGGING: Plot re-assigned events
+    # plot_missed_countries(gdf_missing, gdf_maps, max_countries=30)
 
     # Combining and adding name to original table
-    gdf_country_names = pr.concat([Table(gdf_match[["relid", "name"]]), Table(gdf_missing[["relid", "name"]])])
+    gdf_match = gdf_match.rename(
+        columns={"country": "name"}
+    )  # Do this otherwise there is a collision with column from tb
+    columns = ["relid", "name"]
+    gdf_country_names = pr.concat([Table(gdf_match[columns]), Table(gdf_missing[columns])])
     tb = tb.merge(gdf_country_names, on="relid", how="left", validate="one_to_one").rename(
         columns={"name": column_country_name}
     )
@@ -1589,3 +1646,47 @@ def _fix_type_conflict(x):
         return 4
     else:
         raise ValueError("Unexpected number of different conflict types!")
+
+
+####################################################################
+# DEBUGGING GEO STUFF
+####################################################################
+def plot_events_not_classified(gdf, matches, maps):
+    """
+    gdf: original data with all events (all relid)
+    matches: after applying sjoin, some events are missing.
+    maps: map as per the source (geoBoundaries, Nat Earth, etc.)
+    """
+    ids_missing = set(gdf["relid"]) - set(matches["relid"])
+    gdf_missing = gdf.loc[gdf["relid"].isin(ids_missing)]
+    plot_map_and_events(maps, gdf_missing)
+
+
+def plot_map_and_events(maps, events):
+    import matplotlib.pyplot as plt
+
+    fig, ax = plt.subplots(figsize=(6, 8), dpi=1000)  # larger dpi ⇒ more pixels
+    maps.boundary.plot(ax=ax, linewidth=0.25, edgecolor="k")
+    # gdf_maps.boundary.plot(ax=ax, linewidth=0.25, edgecolor="k")
+    if not events.empty:
+        events.plot(ax=ax, color="blue", markersize=0.5)
+
+
+def plot_missed_countries(gdf_missing, gdf_maps, max_countries=10):
+    """Execute this function to plot events that were not classified within no country.
+
+    This will generate a plot of the country borders where these events where assigned to + markers for the events."""
+    import matplotlib.pyplot as plt
+
+    countries = gdf_missing["name"].value_counts()
+    print(f"{len(countries)} countries (plotting at most {max_countries})")
+    countries = countries.iloc[:max_countries]
+    for country, count in countries.items():
+        print(f"{country}: {count} events")
+        events_markers = gdf_missing[gdf_missing["name"] == country]
+        country_map = gdf_maps[gdf_maps["country"] == country]
+        _, ax = plt.subplots(figsize=(6, 8), dpi=1000)  # larger dpi ⇒ more pixels
+        country_map.boundary.plot(ax=ax, linewidth=0.25, edgecolor="k")
+        if not events_markers.empty:
+            events_markers.plot(ax=ax, color="red", markersize=0.5)
+        ax.set_title(f"{country}, {count} events", fontsize=12, loc="center", pad=10)

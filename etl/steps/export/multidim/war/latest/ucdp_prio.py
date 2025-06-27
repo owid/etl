@@ -222,7 +222,7 @@ def edit_faust(c, tb_ucdp, tb_up, region_names):
             "timelineMinTime": 1946,
             "note": lambda view: _set_note(view),
             "hideRelativeToggle": lambda view: view.d.conflict_type != "state_based_stacked",
-            # "hideFacetControl": False, #lambda view: view.d.estimate == "best_ci",
+            "hideFacetControl": False,
             "includedEntityNames": region_names,
         }
     )

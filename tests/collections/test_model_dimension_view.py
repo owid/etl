@@ -214,3 +214,208 @@ def test_view_expand_paths_and_indicators_used():
         "grapher/ns/latest/ds/table#ind1",  # From explicit indicators
         "grapher/ns/latest/ds/other#ind2",  # From config.sortColumnSlug
     }
+
+
+def test_view_matches_single_dimension_exact():
+    """
+    Test View.matches with single dimension exact matching.
+
+    Example: View with dimensions {"country": "usa", "age": "adult"} should match
+    country="usa" but not country="uk".
+    """
+    view = View(
+        dimensions={"country": "usa", "age": "adult"},
+        indicators=ViewIndicators.from_dict({"y": "table#indicator"}),
+    )
+
+    # Should match exact dimension value
+    assert view.matches(country="usa")
+    assert view.matches(age="adult")
+
+    # Should not match different values
+    assert not view.matches(country="uk")
+    assert not view.matches(age="child")
+
+
+def test_view_matches_multiple_dimensions():
+    """
+    Test View.matches with multiple dimension matching.
+
+    Example: View should match only when ALL specified dimensions match.
+    """
+    view = View(
+        dimensions={"country": "usa", "age": "adult", "sex": "female"},
+        indicators=ViewIndicators.from_dict({"y": "table#indicator"}),
+    )
+
+    # Should match when all specified dimensions match
+    assert view.matches(country="usa", age="adult")
+    assert view.matches(country="usa", sex="female")
+    assert view.matches(age="adult", sex="female")
+    assert view.matches(country="usa", age="adult", sex="female")
+
+    # Should not match when any dimension doesn't match
+    assert not view.matches(country="usa", age="child")  # age mismatch
+    assert not view.matches(country="uk", age="adult")  # country mismatch
+    assert not view.matches(country="usa", age="adult", sex="male")  # sex mismatch
+
+
+def test_view_matches_list_values():
+    """
+    Test View.matches with list of acceptable values.
+
+    Example: matches(age=["adult", "child"]) should match if view.age is either "adult" OR "child".
+    """
+    view_adult = View(
+        dimensions={"country": "usa", "age": "adult"},
+        indicators=ViewIndicators.from_dict({"y": "table#indicator"}),
+    )
+
+    view_child = View(
+        dimensions={"country": "usa", "age": "child"},
+        indicators=ViewIndicators.from_dict({"y": "table#indicator"}),
+    )
+
+    view_elderly = View(
+        dimensions={"country": "usa", "age": "elderly"},
+        indicators=ViewIndicators.from_dict({"y": "table#indicator"}),
+    )
+
+    # Should match when view's dimension value is in the list
+    assert view_adult.matches(age=["adult", "child"])
+    assert view_child.matches(age=["adult", "child"])
+
+    # Should not match when view's dimension value is not in the list
+    assert not view_elderly.matches(age=["adult", "child"])
+
+    # Test with multiple dimensions, some with lists
+    assert view_adult.matches(country="usa", age=["adult", "child"])
+    assert not view_adult.matches(country="uk", age=["adult", "child"])  # country mismatch
+
+
+def test_view_matches_numeric_values():
+    """
+    Test View.matches with numeric values (int, float).
+
+    Example: Views with numeric dimension values should match properly.
+    """
+    view = View(
+        dimensions={"year": "2023", "score": "95.5", "rank": "1"},
+        indicators=ViewIndicators.from_dict({"y": "table#indicator"}),
+    )
+
+    # Should match numeric values (note: dimensions are stored as strings)
+    assert view.matches(year="2023")
+    assert view.matches(score="95.5")
+    assert view.matches(rank="1")
+
+    # Should not match different numeric values
+    assert not view.matches(year="2022")
+    assert not view.matches(score="95.6")
+    assert not view.matches(rank="2")
+
+
+def test_view_matches_empty_list():
+    """
+    Test View.matches with empty list (edge case).
+
+    Example: matches(age=[]) should return True as empty list means no restrictions.
+    This makes sense - an empty list means "don't filter on this dimension".
+    """
+    view = View(
+        dimensions={"country": "usa", "age": "adult"},
+        indicators=ViewIndicators.from_dict({"y": "table#indicator"}),
+    )
+
+    # Empty list should match anything (no restrictions)
+    assert view.matches(age=[])
+    assert view.matches(country=[])
+    assert view.matches(age=[], country="usa")  # Mix of empty list and exact match
+
+
+def test_view_matches_mixed_types():
+    """
+    Test View.matches with mixed argument types (strings and lists).
+
+    Example: matches(country="usa", age=["adult", "child"]) mixes string and list matching.
+    """
+    view = View(
+        dimensions={"country": "usa", "age": "adult", "sex": "female"},
+        indicators=ViewIndicators.from_dict({"y": "table#indicator"}),
+    )
+
+    # Mix of exact match and list match
+    assert view.matches(country="usa", age=["adult", "child"])
+    assert view.matches(country=["usa", "canada"], age="adult")
+    assert view.matches(country=["usa", "canada"], age=["adult", "child"])
+
+    # Should fail if any condition fails
+    assert not view.matches(country="uk", age=["adult", "child"])  # country mismatch
+    assert not view.matches(country=["canada", "mexico"], age="adult")  # country not in list
+    assert not view.matches(country="usa", age=["child", "elderly"])  # age not in list
+
+
+def test_view_matches_nonexistent_dimension():
+    """
+    Test View.matches raises ValueError for non-existent dimensions.
+
+    Example: Trying to match on dimension not present in view should raise ValueError.
+    """
+    view = View(
+        dimensions={"country": "usa", "age": "adult"},
+        indicators=ViewIndicators.from_dict({"y": "table#indicator"}),
+    )
+
+    # Should raise ValueError for dimension not in view
+    with pytest.raises(ValueError, match="Dimension 'region' not found in view dimensions"):
+        view.matches(region="north_america")
+
+    with pytest.raises(ValueError, match="Dimension 'income' not found in view dimensions"):
+        view.matches(country="usa", income="high")
+
+
+def test_view_matches_string_vs_bytes():
+    """
+    Test View.matches properly handles string vs bytes distinction.
+
+    Example: String values should be treated as single values, not iterables.
+    """
+    view = View(
+        dimensions={"country": "usa", "category": "health"},
+        indicators=ViewIndicators.from_dict({"y": "table#indicator"}),
+    )
+
+    # String should be treated as single value, not iterable
+    assert view.matches(country="usa")  # exact string match
+    assert view.matches(category="health")  # exact string match
+
+    # Should not match substring iterations
+    assert not view.matches(country="us")  # partial match should fail
+    assert not view.matches(category="heal")  # partial match should fail
+
+
+def test_view_matches_complex_scenario():
+    """
+    Test View.matches with complex real-world scenario.
+
+    Example: Multi-dimensional view with various matching patterns as might be used
+    in an actual data collection filtering scenario.
+    """
+    view = View(
+        dimensions={"country": "usa", "age_group": "adult", "sex": "female", "year": "2023", "metric": "population"},
+        indicators=ViewIndicators.from_dict({"y": "table#population_count"}),
+    )
+
+    # Various realistic matching scenarios
+    assert view.matches(country="usa")  # Filter by country only
+    assert view.matches(country="usa", year="2023")  # Filter by country and year
+    assert view.matches(sex="female", metric="population")  # Filter by sex and metric
+    assert view.matches(age_group=["adult", "elderly"], sex="female")  # Mix of list and exact
+
+    # Complex multi-criteria filtering
+    assert view.matches(country=["usa", "canada"], age_group="adult", year=["2022", "2023"])
+
+    # Should fail when criteria don't match
+    assert not view.matches(country="usa", sex="male")  # sex mismatch
+    assert not view.matches(country=["canada", "mexico"])  # country not in list
+    assert not view.matches(year=["2020", "2021", "2022"])  # year not in list

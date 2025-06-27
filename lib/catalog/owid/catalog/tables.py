@@ -1911,6 +1911,20 @@ def read_parquet(
     return cast(Table, table)
 
 
+def read_custom(
+    read_function: Callable,
+    filepath_or_buffer: str | Path | IO[AnyStr],
+    metadata: TableMeta,
+    origin: Origin | None = None,
+    underscore: bool = False,
+    *args,
+    **kwargs,
+) -> Table:
+    table = Table(read_function(filepath_or_buffer, *args, **kwargs), underscore=underscore)
+    table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
+    return cast(Table, table)
+
+
 class ExcelFile(pd.ExcelFile):
     def __init__(self, *args, metadata: TableMeta | None = None, origin: Origin | None = None, **kwargs):
         super().__init__(*args, **kwargs)

@@ -1,0 +1,22 @@
+steps:
+    # Map (Natural Earth)
+  data://meadow/geography/2023-11-28/nat_earth_110:
+    - snapshot://geography/2023-11-28/nat_earth_110.zip
+  data://garden/geography/2023-11-28/nat_earth_110:
+    - data://meadow/geography/2023-11-28/nat_earth_110
+
+    # Country borders (WB)
+  data://meadow/geography/2025-06-26/wb_admin_boundaries:
+    - snapshot://geography/2025-06-26/wb_admin_boundaries.zip
+  data://garden/geography/2025-06-26/wb_admin_boundaries:
+    - data://meadow/geography/2025-06-26/wb_admin_boundaries
+
+    # Latitude
+  data://grapher/geography/2024-07-18/latitude:
+    - data://garden/geography/2023-11-28/nat_earth_110
+
+    # geoBoundaries
+  data://meadow/geography/2025-06-26/geoboundaries_cgaz:
+    - snapshot://geography/2025-06-26/geoboundaries_cgaz.zip
+  data://garden/geography/2025-06-26/geoboundaries_cgaz:
+    - data://meadow/geography/2025-06-26/geoboundaries_cgaz

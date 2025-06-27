@@ -456,6 +456,14 @@ class TableMeta(MetaBase):
              {}
         """.format(short_name, to_html(record))
 
+    @property
+    def uri(self) -> str:
+        """Return unique URI for this table."""
+        assert self.dataset, "TableMeta.dataset is not set"
+        assert self.short_name, "TableMeta.short_name is not set"
+        dataset_uri = self.dataset.uri.rstrip("/")
+        return f"{dataset_uri}/{self.short_name}"
+
 
 def to_html(record: Any) -> str | None:
     if isinstance(record, dict):

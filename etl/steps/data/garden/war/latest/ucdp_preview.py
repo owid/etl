@@ -53,7 +53,7 @@ LAST_YEAR = 2024
 LAST_YEAR_PREVIEW = 2025
 
 # Number of events with no location assigned (see function estimate_metrics_locations)
-NUM_MISSING_LOCATIONS = 2433
+NUM_MISSING_LOCATIONS = 1216
 
 # Catalog path of the main UCDP dataset. NOTE: Change this when there is a new UCDP stable (yearly) release.
 VERSION_UCDP_STABLE = "2025-06-13"
@@ -71,7 +71,7 @@ def run() -> None:
         short_name="ucdp", channel="meadow", namespace="war", version=VERSION_UCDP_STABLE
     )  # UCDP
     ds_gw = paths.load_dataset("gleditsch")  # Gleditsch
-    ds_maps = paths.load_dataset("nat_earth_110")  # Nat Earth
+    ds_maps = paths.load_dataset("geoboundaries_cgaz")  # GeoBoundaries
     ds_population = paths.load_dataset("population")  # Population
 
     # Import UCDP module
@@ -84,10 +84,15 @@ def run() -> None:
     # Load tables
     tb_ged = ds_meadow.read("ucdp_ged")
     tb_conflict = ds_meadow.read("ucdp_battle_related_conflict")
+    tb_dyadic = ds_meadow.read("ucdp_battle_related_dyadic")
     tb_prio = ds_meadow.read("ucdp_prio_armed_conflict")
     tb_regions = ds_gw.read("gleditsch_regions")
     tb_codes = ds_gw.read("gleditsch_countries")
-    tb_maps = ds_maps.read("nat_earth_110")
+    tb_maps = ds_maps.read("geoboundaries_cgaz")
+
+    # Load candidate (preliminary) data
+    ds_ced = paths.load_dataset("ucdp_ced")
+    tb_ced = ds_ced.read("ucdp_ced")
 
     #
     # Adapt for with CED data
@@ -95,7 +100,7 @@ def run() -> None:
     ## Extend codes to have data for latest years
     tb_codes = tb_codes.loc[tb_codes["year"] <= LAST_YEAR_PREVIEW].set_index(["id", "year"])
     ## Add CED data
-    tb_ged = add_ced_data(tb_ged, LAST_YEAR, LAST_YEAR_PREVIEW)
+    tb_ged = add_ced_data(tb_ged, tb_ced, LAST_YEAR, LAST_YEAR_PREVIEW)
 
     #
     # Run main code
@@ -103,6 +108,7 @@ def run() -> None:
     tables = module_ucdp.run_pipeline(
         tb_ged=tb_ged,
         tb_conflict=tb_conflict,
+        tb_dyadic=tb_dyadic,
         tb_prio=tb_prio,
         tb_regions=tb_regions,
         tb_codes=tb_codes,
@@ -112,6 +118,7 @@ def run() -> None:
         last_year=LAST_YEAR,
         last_year_preview=LAST_YEAR_PREVIEW,
         short_name=paths.short_name,
+        tolerance_unk_ctype=0.01,
     )
 
     #
@@ -217,11 +224,7 @@ def extend_latest_years(tb: Table, since_year, to_year) -> Table:
     return tb
 
 
-def add_ced_data(tb_ged: Table, last_year_ged: int, last_year_ced: int):
-    # Read CED table
-    ds_ced = paths.load_dataset("ucdp_ced")
-    tb_ced = ds_ced.read("ucdp_ced")
-
+def add_ced_data(tb_ged: Table, tb_ced: Table, last_year_ged: int, last_year_ced: int):
     # Merge CED into GED
     assert (tb_ced.columns == tb_ged.columns).all(), "Columns are not the same!"
     assert tb_ged["year"].max() == last_year_ged, "GED data is not up to date!"
