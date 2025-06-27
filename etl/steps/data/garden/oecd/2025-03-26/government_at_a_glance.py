@@ -116,8 +116,8 @@ TOLERANCE_CHECK = 0.5
 # Set table format when printing
 TABLEFMT = "pretty"
 
-# Define if I show the full table or just the first 5 rows for assertions
-LONG_FORMAT = False
+# Set debug mode
+DEBUG = False
 
 
 def run() -> None:
@@ -236,10 +236,11 @@ def sanity_checks(tb: Table) -> None:
         tb_error = tb[mask].reset_index(drop=True)
 
         if not tb_error.empty:
-            log.warning(
-                f"""{len(tb_error)} observations of {column} are negative::
-                    {_tabulate(tb_error[INDEX + [column]], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f", long_format=LONG_FORMAT)}"""
-            )
+            if DEBUG:
+                log.warning(
+                    f"""{len(tb_error)} observations of {column} are negative::
+                        {tabulate(tb_error[INDEX + [column]], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
+                )
 
     # SPENDING BY FUNCTION ADDING UP TO 100%
     # Exclude rows with function == "Total"
@@ -261,16 +262,10 @@ def sanity_checks(tb: Table) -> None:
 
     tb_error = tb_sum[~mask].reset_index(drop=True)
     if not tb_error.empty:
-        log.warning(
-            f"""{len(tb_error)} observations of Government expenditure by function do not add up to 100%::
-                {_tabulate(tb_error[["country", "year", "Government expenditure by function"]], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f", long_format=LONG_FORMAT)}"""
-        )
+        if DEBUG:
+            log.warning(
+                f"""{len(tb_error)} observations of Government expenditure by function do not add up to 100%::
+                    {tabulate(tb_error[["country", "year", "Government expenditure by function"]], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
+            )
 
     return None
-
-
-def _tabulate(tb: Table, long_format: bool, headers="keys", tablefmt=TABLEFMT, **kwargs):
-    if long_format:
-        return tabulate(tb, headers=headers, tablefmt=tablefmt, **kwargs)
-    else:
-        return tabulate(tb.head(5), headers=headers, tablefmt=tablefmt, **kwargs)
