@@ -38,46 +38,39 @@ def run() -> None:
 
     # Filter unnecessary columns
     tb = tb.filter(regex="^country|^year|^number_deaths_ongoing|^number_ongoing_conflicts__")
-    tb_pre = tb_pre.filter(regex="^country|^year|^number_deaths_ongoing|^number_ongoing_conflicts__")
 
     #
     # (optional) Adjust dimensions if needed
     #
     tb = adjust_dimensions(tb)
-    tb_pre = adjust_dimensions(tb_pre)
 
     #
     # Create collection object
     #
-    choices = {tb[col].m.dimensions["conflict_type"] for col in tb.columns if col not in {"country", "year"}} - {"all"}
 
     c = paths.create_collection(
         config=config,
         short_name="ucdp",
-        tb=[tb, tb_pre],
+        tb=tb,
         indicator_names=[
-            [
-                "deaths",
-                "death_rate",
-                "num_conflicts",
-            ],
-            ["deaths"],
-        ],
-        dimensions=[
-            {"conflict_type": list(choices), "estimate": "*", "people": "*"},
-            {"conflict_type": ["all"], "estimate": "*", "people": "*"},
+            "deaths",
+            "death_rate",
+            "num_conflicts",
         ],
         common_view_config=COMMON_CONFIG,
-        indicator_as_dimension=True,
     )
 
     # Edit indicator-level display settings
     choice_names = c.get_choice_names("conflict_type")
-    for view in c.views:
-        for slug, name in choice_names.items():
-            if view.d.conflict_type == slug:
-                assert view.indicators.y is not None
-                view.indicators.y[0].display = {"name": name}
+    for v in c.views:
+        if v.d.conflict_type in choice_names:
+            assert v.indicators.y is not None
+            v.indicators.y[0].display = {"name": choice_names[v.d.conflict_type]}
+
+        if v.matches(indicator="deaths", conflict_type="all", estimate="best", people="all"):
+            assert v.indicators.y is not None
+            assert len(v.indicators.y) == 1
+            v.indicators.y[0].catalogPath = v.indicators.y[0].catalogPath.replace(tb.m.uri, tb_pre.m.uri)
 
     # Aggregate views
     c.group_views(
@@ -339,7 +332,7 @@ def _set_subtitle(view):
         # Define subtitle
         if view.d.indicator == "deaths":
             subtitle = subtitle_template.format(placeholder=f" in {dod}")
-            if view.d.conflict_type == "all":
+            if view.matches(conflict_type="all", estimate="best", people="all"):
                 subtitle += " The data for 2025 is preliminary and was last updated in June 2025."
             return subtitle
         elif view.d.indicator == "death_rate":
