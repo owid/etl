@@ -434,16 +434,6 @@ steps:
   data://grapher/aviation_safety_network/2024-06-05/aviation_statistics:
     - data://garden/aviation_safety_network/2024-06-05/aviation_statistics
 
-  # Same-Sex Marriage Around the World from Pew Research Center
-  data://meadow/pew/2024-06-03/same_sex_marriage:
-    - snapshot://pew/2024-06-03/same_sex_marriage.csv
-  data://garden/pew/2024-06-03/same_sex_marriage:
-    - data://meadow/pew/2024-06-03/same_sex_marriage
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/demography/2023-03-31/population
-  data://grapher/pew/2024-06-03/same_sex_marriage:
-    - data://garden/pew/2024-06-03/same_sex_marriage
-
   # UN Regions
   data://meadow/un/2024-06-24/sdg_regions:
     - snapshot://un/2024-06-24/sdg_regions.csv
@@ -696,9 +686,8 @@ steps:
   data://grapher/un/2025-05-15/un_members:
     - data://garden/un/2025-05-15/un_members
 
-  #
+
   # UNODC Homicide Data
-  #
   data://meadow/unodc/2025-05-28/homicide:
     - snapshot://unodc/2025-05-28/homicide.xlsx
   data://garden/unodc/2025-05-28/homicide:
@@ -709,9 +698,16 @@ steps:
     - data://garden/unodc/2025-05-28/homicide
 
 
-  #
+  # Housing prices 1870-2012 (Knoll paper)
+  data://meadow/housing/2025-06-25/knoll_prices:
+    - snapshot://housing/2025-06-25/knoll_prices.dta
+  data://garden/housing/2025-06-25/knoll_prices:
+    - data://meadow/housing/2025-06-25/knoll_prices
+  data://grapher/housing/2025-06-25/knoll_prices:
+    - data://garden/housing/2025-06-25/knoll_prices
+  
+  
   # OECD Analytical House Prices
-  #
   data://meadow/oecd/2025-06-20/housing_prices:
     - snapshot://oecd/2025-06-20/housing_prices.csv
   data://garden/oecd/2025-06-20/housing_prices:
@@ -719,6 +715,18 @@ steps:
   data://grapher/oecd/2025-06-20/housing_prices:
     - data://garden/oecd/2025-06-20/housing_prices
 
+
+  # Same-Sex Marriage Around the World from Pew Research Center
+  data://meadow/pew/2025-06-27/same_sex_marriage:
+    - snapshot://pew/2025-06-27/same_sex_marriage.csv
+
+  data://garden/pew/2025-06-27/same_sex_marriage:
+    - data://garden/demography/2024-07-15/population
+    - data://meadow/pew/2025-06-27/same_sex_marriage
+    - data://garden/regions/2023-01-01/regions
+
+  data://grapher/pew/2025-06-27/same_sex_marriage:
+    - data://garden/pew/2025-06-27/same_sex_marriage
 
 include:
   - dag/open_numbers.yml
