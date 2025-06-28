@@ -25,13 +25,13 @@ meta:
     # Files
     url_main: https://immunizationdata.who.int/global?topic=Vaccination-coverage&location=
     url_download: https://srhdpeuwpubsa-geecgzbpd5h0fueu.z01.azurefd.net/whdh/WIISE/export/coverage-data.xlsx
-    date_accessed: '2025-06-27'
+    date_accessed: '2025-06-28'
 
     # License
     license:
       name: © WHO
       url: https://www.who.int/about/policies/terms-of-use
 outs:
-  - md5: c566277601ff9bfbec323d4fa30d6eb6
-    size: 18474696
+  - md5: 1a8c8efae63b9925a88a7dcbc9807844
+    size: 18474761
     path: vaccination_coverage.xlsx
