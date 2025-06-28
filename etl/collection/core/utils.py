@@ -81,4 +81,7 @@ def create_collection_from_config(
     # Validate duplicate views
     c.check_duplicate_views()
 
+    # Add dependencies to collection
+    c._dependencies = dependencies
+
     return c
