@@ -1,0 +1,46 @@
+title:
+  title: Population
+  title_variant: since 10,000 BCE
+default_selection:
+  - Asia
+  - Africa
+  - Europe
+  - North America
+  - South America
+  - Oceania
+
+definitions:
+  common_views:
+    - config:
+        hasMapTab: true
+        originUrl: ourworldindata.org/population
+        relatedQuestions:
+          - text: What sources do we rely on for population estimates?
+            url: https://ourworldindata.org/population-sources
+        title: Population
+
+
+
+dimensions:
+  - slug: mode
+    name: Mode
+    description: Switch between data and metadata.
+    choices:
+      - slug: data
+        name: Data
+        description: The actual population data.
+      - slug: metadata
+        name: Metadata
+        description: Information about the dataset.
+
+views:
+  - dimensions:
+      mode: data
+    indicators:
+      y:
+        - grapher/demography/2024-07-15/population/historical#population_historical
+        - grapher/demography/2024-07-15/population/population#source_short
+  - dimensions:
+      mode: metadata
+    indicators:
+      y: grapher/demography/2024-07-15/population/population#source_short
