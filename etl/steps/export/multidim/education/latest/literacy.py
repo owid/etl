@@ -49,7 +49,6 @@ def run() -> None:
 
     # Select only relevant columns
     tb = tb.loc[:, ["country", "year"] + literacy_cols].copy()
-
     # Adjust dimensions
     tb = adjust_dimensions(tb)
 
@@ -271,12 +270,16 @@ def generate_subtitle_by_age_and_gender(view):
 
     # Handle different combinations properly
     if age_group == "age_side_by_side":
-        if sex == "sex_side_by_side":
-            return f"Share of {age_term} who can read and write a short, simple sentence with understanding, by gender and age group."
-        elif sex == "both":
-            return f"Share of {age_term} who can read and write a short, simple sentence with understanding."
+        # Generate gender-specific age descriptions
+        if sex == "both":
+            age_descriptions = "adults aged 15 and above, young people (15–24), and older adults (65 and above)"
+        elif sex == "male":
+            age_descriptions = "men aged 15 and above, young men (15–24), and older men (65 and above)"
+        elif sex == "female":
+            age_descriptions = "women aged 15 and above, young women (15–24), and older women (65 and above )"
         else:
-            return f"Share of {gender_term} across different age groups who can read and write a short, simple sentence with understanding."
+            age_descriptions = age_term  # fallback to original
+        return f"Share of {age_descriptions} who can read and write a short, simple sentence with understanding."
     elif sex == "sex_side_by_side":
         return f"Share of {age_term} who can read and write a short, simple sentence with understanding, by gender."
     elif sex == "both":
@@ -298,12 +301,26 @@ def edit_indicator_displays(view):
     if view.indicators.y is None:
         return
 
-    # Display name mappings for age groups
-    AGE_DISPLAY_NAMES = {
-        "adult": "Adults (15+)",
-        "youth": "Youth (15-24)",
-        "elderly": "Elderly (65+)",
-    }
+    # Generate gender-specific age display names
+    sex = view.dimensions.get("sex", "both")
+    if sex == "male":
+        AGE_DISPLAY_NAMES = {
+            "adult": "Men (15+)",
+            "youth": "Young men (15–24)",
+            "elderly": "Older men (65+)",
+        }
+    elif sex == "female":
+        AGE_DISPLAY_NAMES = {
+            "adult": "Women (15+)",
+            "youth": "Young women (15–24)",
+            "elderly": "Older women (65+)",
+        }
+    else:  # both sexes
+        AGE_DISPLAY_NAMES = {
+            "adult": "Adults (15+)",
+            "youth": "Young people (15–24)",
+            "elderly": "Older adults (65+)",
+        }
 
     # Display name mappings for gender
     GENDER_DISPLAY_NAMES = {

@@ -12,13 +12,13 @@ dimensions:
     name: Age group
     choices:
       - slug: adult
-        name: Adults (15+)
+        name: Adults
         description: Adults aged 15 years and older who can read and write.
       - slug: youth
-        name: Youth (15-24)
+        name: Young people
         description: Young people aged 15 to 24 years who can read and write.
       - slug: elderly
-        name: Elderly (65+)
+        name: Older people
         description: Older adults aged 65 years and older who can read and write.
       - slug: age_side_by_side
         name: All age groups
