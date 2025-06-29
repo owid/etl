@@ -276,7 +276,7 @@ def generate_subtitle_by_age_and_gender(view):
         elif sex == "male":
             age_descriptions = "men aged 15 and above, young men (15–24), and older men (65 and above)"
         elif sex == "female":
-            age_descriptions = "women aged 15 and above, young women (15–24), and older women (65 and above )"
+            age_descriptions = "women aged 15 and above, young women (15–24), and older women (65 and above)"
         else:
             age_descriptions = age_term  # fallback to original
         return f"Share of {age_descriptions} who can read and write a short, simple sentence with understanding."
