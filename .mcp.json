@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "catalog": {
+      "type": "stdio",
+      "command": ".venv/bin/fastmcp",
+      "args": [
+        "run",
+        "mcp/server.py"
+      ],
+      "env": {}
+    }
+  }
+}
