@@ -281,7 +281,15 @@ def generate_subtitle_by_age_and_gender(view):
             age_descriptions = age_term  # fallback to original
         return f"Share of {age_descriptions} who can read and write a short, simple sentence with understanding."
     elif sex == "sex_side_by_side":
-        return f"Share of {age_term} who can read and write a short, simple sentence with understanding, by gender."
+        # Generate gender-specific subtitle based on age group
+        if age_group == "adult":
+            return "Share of women and men aged 15 years and older who can read and write a short, simple sentence with understanding."
+        elif age_group == "youth":
+            return "Share of young women and men aged 15 to 24 years who can read and write a short, simple sentence with understanding."
+        elif age_group == "elderly":
+            return "Share of older women and men aged 65 years and older who can read and write a short, simple sentence with understanding."
+        else:
+            return f"Share of women and men among {age_term} who can read and write a short, simple sentence with understanding."
     elif sex == "both":
         return f"Share of {age_term} who can read and write a short, simple sentence with understanding."
     else:
