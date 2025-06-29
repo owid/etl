@@ -47,6 +47,15 @@ definitions:
       {definitions.common.description_processing}
       - The original survey question used a scale where 0 meant "worry all of the time" and 10 meant "do not ever worry". We have reversed the scale so that 0 is "never" and 10 is "always", to make the interpretation of the data more intuitive.
 
+  life_sat: &life_sat
+    title: Life satisfaction - Share of people who answer << answer >>
+    unit: "%"
+    short_unit: "%"
+    description_short: |-
+      Share of people who answer << answer >> when asked "Overall, how satisfied are you with your life as a whole these days?", with 0 being "not at all satisfied" and 10 being "completely satisfied".
+    description_key:
+      - "{definitions.survey_text.life_sat}"
+
 dataset:
   update_period_days: 365
   non_redistributable: true
@@ -219,45 +228,25 @@ tables:
         description_key:
           - "{definitions.survey_text.life_sat}"
       life_sat_ans_1_share:
-        title: Life satisfaction - Share of people who answer 1
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answer 1 when asked "Overall, how satisfied are you with your life as a whole these days?", with 0 being "not at all satisfied" and 10 being "completely satisfied".
-        description_key:
-          - "{definitions.survey_text.life_sat}"
+        context:
+          answer: 1
+        <<: *life_sat
       life_sat_ans_2_share:
-        title: Life satisfaction - Share of people who answer 2
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answer 2 when asked "Overall, how satisfied are you with your life as a whole these days?", with 0 being "not at all satisfied" and 10 being "completely satisfied".
-        description_key:
-          - "{definitions.survey_text.life_sat}"
+        context:
+          answer: 2
+        <<: *life_sat
       life_sat_ans_3_share:
-        title: Life satisfaction - Share of people who answer 3
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answer 3 when asked "Overall, how satisfied are you with your life as a whole these days?", with 0 being "not at all satisfied" and 10 being "completely satisfied".
-        description_key:
-          - "{definitions.survey_text.life_sat}"
+        context:
+          answer: 3
+        <<: *life_sat
       life_sat_ans_4_share:
-        title: Life satisfaction - Share of people who answer 4
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answer 4 when asked "Overall, how satisfied are you with your life as a whole these days?", with 0 being "not at all satisfied" and 10 being "completely satisfied".
-        description_key:
-          - "{definitions.survey_text.life_sat}"
+        context:
+          answer: 4
+        <<: *life_sat
       life_sat_ans_5_share:
-        title: Life satisfaction - Share of people who answer 5
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of people who answer 5 when asked "Overall, how satisfied are you with your life as a whole these days?", with 0 being "not at all satisfied" and 10 being "completely satisfied".
-        description_key:
-          - "{definitions.survey_text.life_sat}"
+        context:
+          answer: 5
+        <<: *life_sat
       life_sat_ans_6_share:
         title: Life satisfaction - Share of people who answer 6
         unit: "%"
