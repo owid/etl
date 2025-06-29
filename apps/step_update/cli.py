@@ -163,9 +163,6 @@ class StepUpdater:
             # Save temporary dag.
             write_to_dag_file(dag_file=DAG_TEMP_FILE, dag_part=step_temp, comments={step_new: step_header})
 
-            # Reload steps dataframe.
-            self._load_version_tracker()
-
         return 0
 
     def _update_data_step(
@@ -243,9 +240,6 @@ class StepUpdater:
 
             # Add new step and its dependencies to the dag.
             write_to_dag_file(dag_file=dag_file, dag_part=dag_part, comments={step_new: step_header})
-
-            # Reload steps dataframe.
-            self._load_version_tracker()
 
         return 0
 
@@ -363,6 +357,9 @@ class StepUpdater:
                     log.error(f"Stopped because of a failure on step {step}.")
                     break
 
+            # Reload version tracker after updating steps.
+            self._load_version_tracker()
+
     def _archive_step(self, step: str) -> None:
         # Move a certain step from its active dag to its corresponding archive dag.
 
@@ -407,9 +404,6 @@ class StepUpdater:
             # Delete the step from the active dag.
             remove_steps_from_dag_file(dag_file=dag_file_active, steps_to_remove=[step])
 
-            # Reload steps dataframe.
-            self._load_version_tracker()
-
     def archive_steps(self, steps: Union[str, List[str]], include_usages: bool = False) -> None:
         """Move one or more steps from their active to their archive dag."""
 
@@ -452,6 +446,9 @@ class StepUpdater:
 
         for step in steps:
             self._archive_step(step=step)
+
+        # Reload version tracker after archiving steps.
+        self._load_version_tracker()
 
 
 def _update_temporary_dag(dag_active, dag_all_reverse) -> None:
