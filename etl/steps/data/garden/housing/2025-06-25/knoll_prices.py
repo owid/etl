@@ -47,7 +47,9 @@ def run() -> None:
         tb.loc[tb["country"] == country, "hp_per_gdp_nom"] = (tb_c["hp_per_gdp"] / norm) * 100
 
     tb["hp_per_gdp"] = tb["hp_per_gdp_nom"].round(3)
+    tb["hp_per_gdp"].m.origins = [tb["hpreal"].m.origins[0], tb["gdp_per_capita"].m.origins[0]]
 
+    tb = tb[["country", "year", "hpreal", "hp_per_gdp"]]
 
     # Improve table format.
     tb = tb.format(["country", "year"])
