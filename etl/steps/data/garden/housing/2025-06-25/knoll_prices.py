@@ -31,9 +31,6 @@ def run() -> None:
     #
     # Harmonize country names.
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path, warn_on_unused_countries=False)
-    tb_gdp = geo.harmonize_countries(
-        df=tb_gdp, countries_file=paths.country_mapping_path, warn_on_unused_countries=False
-    )
 
     # calculate real house prices per gdp per capita
     tb = tb.merge(tb_gdp, on=["country", "year"], how="left")
@@ -43,6 +40,10 @@ def run() -> None:
     # index time series to 1990 value for each country
     for country in tb["country"].unique():
         tb_c = tb.loc[tb["country"] == country]
+        # check that the country has data for 1990
+        if 1990 not in tb_c["year"].values:
+            raise ValueError(f"Country {country} does not have data for 1990.")
+        # normalize to 1990 value
         norm = tb_c.loc[tb_c["year"] == 1990, "hp_per_gdp"].iloc[0]
         tb.loc[tb["country"] == country, "hp_per_gdp_nom"] = (tb_c["hp_per_gdp"] / norm) * 100
 
