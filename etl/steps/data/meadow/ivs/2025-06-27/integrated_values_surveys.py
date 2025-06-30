@@ -150,7 +150,7 @@ VARS_DICT = {
     "E233": "Women have the same rights as men",
     "E233A": "The state makes people's incomes equal",
     "E233B": "People obey their rulers",
-    "E266": "Honest elections makes a difference",
+    "E266": "Honest elections make a difference",
 }
 
 
