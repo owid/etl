@@ -697,24 +697,24 @@ steps:
   data://grapher/pew/2025-06-27/same_sex_marriage:
     - data://garden/pew/2025-06-27/same_sex_marriage
 
-  # WB income groups 2023-04-30
-data://meadow/wb/2023-04-30/income_groups:
-  - snapshot://wb/2023-04-30/income_groups.xlsx
-data://garden/wb/2023-04-30/income_groups:
-  - data://meadow/wb/2023-04-30/income_groups
-data://grapher/wb/2023-04-30/income_groups:
-  - data://garden/wb/2023-04-30/income_groups
+    # WB income groups 2023-04-30
+  data://meadow/wb/2023-04-30/income_groups:
+    - snapshot://wb/2023-04-30/income_groups.xlsx
+  data://garden/wb/2023-04-30/income_groups:
+    - data://meadow/wb/2023-04-30/income_groups
+  data://grapher/wb/2023-04-30/income_groups:
+    - data://garden/wb/2023-04-30/income_groups
 
-    # Child Mortality Estimates - UN IGME - to archive
-data://meadow/un/2024-09-11/igme:
-  - snapshot://un/2024-09-11/igme.zip
-data://garden/un/2024-09-11/igme:
-  - data://meadow/un/2024-09-11/igme
-  - data://garden/un/2018/igme
-  - data://garden/regions/2023-01-01/regions
-  - data://garden/demography/2024-07-15/population
-data://grapher/un/2024-09-11/igme:
-  - data://garden/un/2024-09-11/igme
+      # Child Mortality Estimates - UN IGME - to archive
+  data://meadow/un/2024-09-11/igme:
+    - snapshot://un/2024-09-11/igme.zip
+  data://garden/un/2024-09-11/igme:
+    - data://meadow/un/2024-09-11/igme
+    - data://garden/un/2018/igme
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2024-07-15/population
+  data://grapher/un/2024-09-11/igme:
+    - data://garden/un/2024-09-11/igme
 
 include:
   - dag/open_numbers.yml
