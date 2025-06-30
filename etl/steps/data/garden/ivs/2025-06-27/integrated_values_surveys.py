@@ -488,7 +488,7 @@ def sanity_checks(tb: Table) -> Table:
     tb = check_sum_100(
         tb=tb,
         questions=["democracy"],
-        answers=["not_satisfied", "satisfied", "neutral", "dont_know", "no_answer"],
+        answers=["not_satisfied", "satisfied", "neutral_satisfied", "dont_know_satisfied", "no_answer_satisfied"],
         margin=MARGIN,
     )
 
@@ -518,7 +518,7 @@ def sanity_checks(tb: Table) -> Table:
     tb = check_sum_100(
         tb=tb,
         questions=["democracy"],
-        answers=["not_important", "important", "neutral_important", "dont_know", "no_answer"],
+        answers=["not_important", "important", "neutral_important", "dont_know_important", "no_answer_important"],
         margin=MARGIN,
     )
 
