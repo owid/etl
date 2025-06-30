@@ -116,7 +116,8 @@ tables:
           numDecimalPlaces: 1
         presentation:
           title_public: Life expectancy
-          title_variant: Long run estimates - Riley; Zijdeman et al.; HMD; UN WPP
+          title_variant: Long run estimates
+          attribution_short: Riley; Zijdeman et al.; HMD; UN WPP
           grapher_config:
             selectedEntityNames: *sel_entities_americas
           attribution: |-
