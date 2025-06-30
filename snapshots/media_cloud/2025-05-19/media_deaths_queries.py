@@ -260,7 +260,6 @@ def create_queries():
         "single_terms": ["diabetes", "insulin", "hyperglycemia", "diabetic"],
         "combinations": [
             "diabetes diabetes",
-            "insulin insulin",
             "hyperglycemia hyperglycemia",
             "diabetic diabetic",
             "diabetes insulin",
