@@ -249,14 +249,11 @@ definitions:
     - The data comes from school administrative records that track enrolment by individual age, combined with population estimates from national statistics offices or UN sources.
 
   desc_literacy: &desc_literacy
-    - Literacy unlocks access to education, employment, and civic participation — this indicator shows what share of young people and adults can read and write a short, simple sentence with understanding.
-    - It captures the percentage of individuals in a given age group (such as young people aged 15–24 or adults aged 15 and above) who are considered literate, based on their ability to both read and write.
-    - The literacy rate is calculated by dividing the number of literate persons by the total number of individuals in the same age group, excluding those with unknown literacy status.
-    - A high literacy rate signals that most people have acquired basic reading and writing skills, often through primary education or literacy programs. Low rates may indicate gaps in access, retention, or effectiveness of foundational education.
-    - Data typically come from population censuses or household surveys and are often self-reported. In some countries, respondents may be asked to read or write a simple sentence or complete basic tasks to verify literacy.
-    - The UNESCO Institute for Statistics (UIS) and its partners also use statistical models to estimate literacy rates for years or regions where recent data are not available, supporting regional and global comparisons.
-    - For most countries literacy is self-reported but there may be some challenges associated to changes over time in a given country and to differences in definition across countries.
-    - Literacy should not be confused with functional literacy. This indicator reflects basic abilities but does not measure whether individuals can apply these skills effectively in daily life, work, or learning.
+    - Literacy is a foundational skill. Children need to learn to read so that they can read to learn. When we fail to teach this foundational skill, people have fewer opportunities to lead the rich and interesting lives that a good education offers.
+    - This indicator measures the percentage of people who can read and write a simple sentence about their daily life. It’s calculated as the number of people in a given age group who report being able to do so, divided by the total number in that group. UNESCO tracks this across different generations – including youth, adults, and older people – to show how literacy is changing over time.
+    - Most of the data comes from national surveys. In some countries, people are asked directly whether they can read and write; in others, they take a short test. This allows for comparisons across countries and regions. But these are minimal standards – they capture basic literacy, not the broader skills people need to navigate today’s information-rich world.
+    - In many high-income countries, literacy rates reached near-universal levels by the late 20th century. As a result, regular tracking has been scaled back, since changes are small and less relevant for education policy.
+    - This data tells us whether someone can read and write at a very basic level – for example, reading simple sentences or writing their name. But it doesn’t tell us whether they can use reading and writing in everyday life, like filling out a job application or reading health instructions. Those kinds of skills take more years of schooling and are much harder to measure, especially when comparing across countries and over time.
 
   desc_key_completion_rate: &desc_key_completion_rate
     - This indicator estimates what share of children complete a given level of education, even if they do so later than the expected age. It is measured as the share of children 3 to 5 years older than the official age for the last grade of a particular education level who have successfully completed it.
