@@ -499,9 +499,10 @@ class Collection(MDIMBase):
 
     def validate_indicators_are_from_dependencies(self, indicators):
         """Validate that the provided indicators are from tables in datasets specified in the collections dependencies."""
+        deps = {dep.split("://", 1)[-1] if "://" in dep else dep for dep in self._dependencies}
         for indicator in indicators:
-            if not any(f"data://{indicator}".startswith(f"{dep}/") for dep in self._dependencies):
-                raise ValueError(f"Indicator {indicator} is not covered by any dependency: {self._dependencies}")
+            if not any(indicator.startswith(f"{dep}/") for dep in deps):
+                raise ValueError(f"Indicator {indicator} is not covered by any dependency: {deps}")
         return True
 
     def validate_grouped_views(self):
