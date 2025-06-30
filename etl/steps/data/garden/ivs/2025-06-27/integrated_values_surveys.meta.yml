@@ -4524,7 +4524,7 @@ tables:
         display:
           name: "Democraticness in own country: Not democratic"
           <<: *common-display
-      democratic:
+      yes_democratic:
         title: "Democracy - Democraticness in own country: Democratic"
         description_short: '% of respondents replying 6 to 10 in a scale from 1 to 10 when asked "And how democratically is this country being governed today?. Again using a scale from 1 to 10, where 1 means that it is “not at all democratic” and 10 means that it is “completely democratic,” what position would you choose?"'
         display:

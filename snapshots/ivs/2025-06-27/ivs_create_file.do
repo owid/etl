@@ -1194,8 +1194,8 @@ keep if $democracy_democraticness != .e
 gen not_democratic = 0
 replace not_democratic = 1 if $democracy_democraticness <= 4
 
-gen democratic = 0
-replace democratic = 1 if $democracy_democraticness >= 6 & $democracy_democraticness <= 10
+gen yes_democratic = 0
+replace yes_democratic = 1 if $democracy_democraticness >= 6 & $democracy_democraticness <= 10
 
 gen not_at_all_democratic = 0
 replace not_at_all_democratic = 1 if $democracy_democraticness == 1
@@ -1214,7 +1214,7 @@ replace no_answer_democratic = 1 if $democracy_democraticness == .b
 
 gen avg_score_democratic = $democracy_democraticness
 
-collapse (mean) not_democratic democratic not_at_all_democratic completely_democratic neutral_democratic dont_know_democratic no_answer_democratic avg_score_democratic [w=S017], by (year country)
+collapse (mean) not_democratic yes_democratic not_at_all_democratic completely_democratic neutral_democratic dont_know_democratic no_answer_democratic avg_score_democratic [w=S017], by (year country)
 tempfile democratic_file
 save "`democratic_file'"
 

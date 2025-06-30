@@ -105,6 +105,24 @@ NEIGHBORS_QUESTIONS = [
 
 HOMOSEXUAL_PARENTS_QUESTIONS = ["homosx_prnts"]
 
+POLITICAL_SYSTEMS_QUESTIONS = [
+    "experts_make_decisions",
+    "army_rule",
+    "democratic_political_system",
+]
+
+ESSENTIAL_CHARACTERISTIC_OF_DEMOCRACY_QUESTIONS = [
+    "governments_tax_the_rich_and_subsidize_the_poor",
+    "religious_authorities_interpret_the_laws",
+    "people_choose_their_leaders_in_free_elections",
+    "people_receive_state_aid_for_unemployment",
+    "army_takes_over_when_government_is_incompetent",
+    "civil_rights_protects_peoples_liberty_against_oppression",
+    "women_have_the_same_rights_as_men",
+    "the_state_makes_peoples_incomes_equal",
+    "people_obey_their_rulers",
+]
+
 
 def run() -> None:
     #
@@ -460,6 +478,67 @@ def sanity_checks(tb: Table) -> Table:
             "neither",
             "disagree",
             "strongly_disagree",
+            "dont_know",
+            "no_answer",
+        ],
+        margin=MARGIN,
+    )
+
+    # For democracy satisfaction questions
+    tb = check_sum_100(
+        tb=tb,
+        questions=["democracy"],
+        answers=["not_satisfied", "satisfied", "neutral", "dont_know", "no_answer"],
+        margin=MARGIN,
+    )
+
+    # For political systems questions
+    tb = check_sum_100(
+        tb=tb,
+        questions=POLITICAL_SYSTEMS_QUESTIONS,
+        answers=["very_good", "fairly_good", "fairly_bad", "very_bad", "dont_know", "no_answer"],
+        margin=MARGIN,
+    )
+
+    # For essential characteristic of democracy questions
+    tb = check_sum_100(
+        tb=tb,
+        questions=ESSENTIAL_CHARACTERISTIC_OF_DEMOCRACY_QUESTIONS,
+        answers=[
+            "not_essential_dem_agg",
+            "essential_dem_agg",
+            "neutral_essential_dem",
+            "dont_know",
+            "no_answer",
+        ],
+        margin=MARGIN,
+    )
+
+    # For democracy importance question
+    tb = check_sum_100(
+        tb=tb,
+        questions=["democracy"],
+        answers=["not_important", "important", "neutral_important", "dont_know", "no_answer"],
+        margin=MARGIN,
+    )
+
+    # For democraticness in own country question
+    tb = check_sum_100(
+        tb=tb,
+        questions=["democratic"],
+        answers=["not", "yes", "neutral", "dont_know", "no_answer"],
+        margin=MARGIN,
+    )
+
+    # For honest elections making a difference question
+    tb = check_sum_100(
+        tb=tb,
+        questions=["honest_elections_make_a_difference"],
+        answers=[
+            "very_important",
+            "rather_important",
+            "not_very_important",
+            "not_at_all_important",
             "dont_know",
             "no_answer",
         ],
