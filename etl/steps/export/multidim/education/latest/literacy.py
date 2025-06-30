@@ -46,7 +46,7 @@ AGE_GROUPS = {
         "gender_prefix": "",
     },
     "youth": {
-        "keywords": "population_15_24_years", 
+        "keywords": "population_15_24_years",
         "age_range": "15 to 24 years",
         "age_short": "15–24",
         "title_term": "young people",
@@ -54,7 +54,7 @@ AGE_GROUPS = {
     },
     "elderly": {
         "keywords": "population_65plus_years",
-        "age_range": "65 years and older", 
+        "age_range": "65 years and older",
         "age_short": "65+",
         "title_term": "older adults",
         "gender_prefix": "older ",
@@ -71,8 +71,12 @@ GENDERS = {
 
 # Exclusion patterns for filtering columns
 EXCLUSION_PATTERNS = [
-    "urban", "rural", "the_global_age_specific_literacy_projections_model",
-    "poorest_quintile", "richest_quintile", "adjusted",
+    "urban",
+    "rural",
+    "the_global_age_specific_literacy_projections_model",
+    "poorest_quintile",
+    "richest_quintile",
+    "adjusted",
 ]
 
 # Dimension mapping configurations
@@ -92,7 +96,7 @@ def run() -> None:
 
     # Select only relevant columns
     tb = tb.loc[:, ["country", "year"] + literacy_cols].copy()
-    
+
     # Adjust dimensions
     tb = adjust_dimensions(tb)
 
@@ -169,10 +173,12 @@ def adjust_dimensions(tb):
         }
 
     # Add dimension definitions to table metadata
-    tb.metadata.dimensions.extend([
-        {"name": "Age group", "slug": "age_group"},
-        {"name": "Gender", "slug": "sex"},
-    ])
+    tb.metadata.dimensions.extend(
+        [
+            {"name": "Age group", "slug": "age_group"},
+            {"name": "Gender", "slug": "sex"},
+        ]
+    )
 
     return tb
 
@@ -218,7 +224,7 @@ def generate_title_by_gender_and_age(view):
 
     # Get gender and age terms
     gender_term = GENDERS.get(sex, {}).get("title", "")
-    
+
     if age_group == "age_side_by_side":
         return "Literacy rates by age group"
     elif sex == "sex_side_by_side":
@@ -251,7 +257,7 @@ def _get_gender_specific_subtitle(age_group, gender_term):
     age_config = AGE_GROUPS.get(age_group, {})
     prefix = age_config.get("gender_prefix", "")
     age_range = age_config.get("age_range", "")
-    
+
     return f"Share of {prefix}{gender_term} aged {age_range} who can read and write a short, simple sentence with understanding."
 
 
@@ -260,7 +266,7 @@ def _get_sex_side_by_side_subtitle(age_group):
     age_config = AGE_GROUPS.get(age_group, {})
     prefix = age_config.get("gender_prefix", "")
     age_range = age_config.get("age_range", "")
-    
+
     if prefix:
         return f"Share of {prefix}women and men aged {age_range} who can read and write a short, simple sentence with understanding."
     else:
@@ -270,7 +276,7 @@ def _get_sex_side_by_side_subtitle(age_group):
 def generate_subtitle_by_age_and_gender(view):
     """Generate subtitle based on age group and gender."""
     sex, age_group = view.dimensions["sex"], view.dimensions["age_group"]
-    
+
     # Handle different combinations
     if age_group == "age_side_by_side":
         age_descriptions = _get_age_descriptions_by_gender(sex)
@@ -278,15 +284,15 @@ def generate_subtitle_by_age_and_gender(view):
             return f"Share of {age_descriptions} who can read and write a short, simple sentence with understanding."
         else:
             return "Share of adults, young people, and older adults who can read and write a short, simple sentence with understanding."
-    
+
     elif sex == "sex_side_by_side":
         return _get_sex_side_by_side_subtitle(age_group)
-    
+
     elif sex == "both":
         age_config = AGE_GROUPS.get(age_group, {})
         age_range = age_config.get("age_range", "")
         return f"Share of adults aged {age_range} who can read and write a short, simple sentence with understanding."
-    
+
     else:
         # For specific genders
         gender_term = GENDERS.get(sex, {}).get("subtitle", "")
@@ -321,12 +327,12 @@ def edit_indicator_displays(view):
         return
 
     sex = view.dimensions.get("sex", "both")
-    
+
     # Get appropriate display names
     age_display_names = _get_age_display_names(sex)
     gender_display_names = {
         "years__male": "Men",
-        "years__female": "Women", 
+        "years__female": "Women",
         "both": "Both genders",
     }
 
