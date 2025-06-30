@@ -11,35 +11,113 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-
-def parse_primary_energy(data_additional: pr.ExcelFile) -> Table:
+# The following list will contain the (sheet name, indicator name, unit) for each relevant sheet in the main excel file.
+# Here, indicator name is the name of the indicator given in that sheet, as it appears in the consolidated datasets.
+# And unit is the one as it appears in the corresponding sheet.
+SHEET_INDICATOR_UNITS = [
     # The EI used to provide primary energy consumption in their consolidated dataset.
     # But now they have moved to using Total Energy Supply.
     # They still have primary energy consumption, but only in the excel file, so I'll get it from there.
+    ("Total Energy Supply (TES) -EJ", "tes_ej", "Exajoules"),
+    # ('TES by fuel', 'UNKNOWN', 'Exajoules'),
+    # ('TES per Capita', 'tes_gj_pc', 'Gigajoule per capita'),
+    ("Natural Gas Flaring", "gasflared_bcm", "Billion cubic metres"),
+    ("Oil Production - barrels", "oilprod_kbd", "Thousand barrels daily"),
+    ("Oil Production - tonnes", "oilprod_mt", "Million tonnes"),
+    ("Crude+cond production - barrels", "oilprod_crudecond_kbd", "Thousand barrels daily"),
+    ("NGLs production - barrels", "oilprod_ngl_kbd", "Thousand barrels daily"),
+    ("Liquids Consumption - barrels", "liqcons_kbd", "Thousand barrels daily"),
+    ("Oil Consumption - barrels", "oilcons_kbd", "Thousand barrels daily"),
+    ("Oil Consumption - Tonnes", "oilcons_mt", "Million tonnes"),
+    ("Oil Consumption - EJ", "oilcons_ej", "Exajoules"),
+    ("Oil refinery - throughput", "refthru_kbd", "Thousand barrels daily*"),
+    ("Oil refinery - capacity", "refcap_kbd", "Thousand barrels daily*"),
+    ("Gas Production - Bcm", "gasprod_bcm", "Billion cubic metres"),
+    ("Gas Production - bcf", "gasprod_bcfd", "Billion cubic feet per day"),
+    ("Gas Production - EJ", "gasprod_ej", "Exajoules"),
+    ("Gas Consumption - Bcm", "gascons_bcm", "Billion cubic metres"),
+    ("Gas Consumption - Bcf", "gascons_bcfd", "Billion cubic feet per day"),
+    ("Gas Consumption - EJ", "gascons_ej", "Exajoules"),
+    # ('Gas - H2 Production Capacity', 'hydrogen', 'Production Capacity (Thousand tonnes/yr)'),
+    ("Coal Production - mt", "coalprod_mt", "Million tonnes "),
+    ("Coal Production - EJ", "coalprod_ej", "Exajoules"),
+    ("Coal Consumption - EJ", "coalcons_ej", "Exajoules"),
+    ("Nuclear Generation - TWh", "nuclear_twh", "Terawatt-hours"),
+    ("Nuclear Consumption - EJ", "nuclear_ej", "Exajoules"),
+    ("Hydro Generation - TWh", "hydro_twh", "Terawatt-hours"),
+    ("Hydro Consumption - EJ", "hydro_ej", "Exajoules"),
+    ("Renewables Consumption -EJ", "renewables_ej", "Exajoules"),
+    ("Renewable Power (inc hydro) -EJ", "ren_power_ej", "Exajoules"),
+    ("Renewable Power (inc hydro)-TWh", "ren_power_twh", "Terawatt-hours"),
+    ("Renewables Generation by Source", "electbyfuel_ren_power", "Terawatt-hours"),
+    ("Solar Generation - TWh", "solar_twh", "Terawatt-hours"),
+    ("Solar Consumption - EJ", "solar_ej", "Exajoules"),
+    # ('Solar Installed Capacity', 'UNKNOWN', 'nan'),
+    ("Wind Generation - TWh", "wind_twh", "Terawatt-hours"),
+    ("Wind Consumption - EJ", "wind_ej", "Exajoules "),
+    # ('Wind Installed Capacity', 'UNKNOWN', 'nan'),
+    ("Geo Biomass Other - TWh", "biogeo_twh", "Terawatt-hours"),
+    ("Geo Biomass Other - EJ", "biogeo_ej", "Exajoules"),
+    # NOTE: Biofuels sheets contain total, biogasoline and biodiesel one above the other. So they need to be handled separately.
+    # ('Biofuels production - kboed', 'biofuels_prod_kboed', 'Thousand barrels of oil equivalent per day'),
+    # ('Biofuels production - PJ', 'biofuels_prod_pj', 'Petajoules'),
+    # ('Biofuels Consumption - kboed', 'biofuels_cons_kboed', 'Thousand barrels of oil equivalent per day'),
+    # ('Biofuels consumption - PJ', 'biofuels_cons_pj', 'Petajoules'),
+    ("Electricity Generation - TWh", "elect_twh", "Terawatt-hours"),
+    ("Elec generation by fuel", "electbyfuel_total", "Terawatt-hours"),
+    ("Oil inputs - Elec generation ", "electbyfuel_oil", "Terawatt-hours"),
+    ("Gas inputs - Elec generation", "electbyfuel_gas", "Terawatt-hours"),
+    ("Coal inputs - Elec generation ", "electbyfuel_coal", "Terawatt-hours"),
+    ("Other inputs - Elec generation", "electbyfuel_other", "Terawatt-hours"),
+    # ('Grid Scale BESS Capacity', 'UNKNOWN', 'Installed Capacity (Gigawatts)'),
+    ("Cobalt P-R", "cobalt_kt", "Thousand tonnes"),
+    ("Lithium P-R", "lithium_kt", "Thousand tonnes of Lithium content"),
+    ("Natural Graphite P-R", "graphite_kt", "Thousand tonnes"),
+    ("Rare Earth metals P-R", "rareearths_kt", "Thousand tonnes1"),
+    # ('Copper P-R', 'UNKNOWN', 'Thousand tonnes'),
+    # ('Manganese P-R', 'UNKNOWN', 'Thousand tonnes'),
+    # ('Nickel P-R', 'UNKNOWN', 'Thousand tonnes'),
+    # ('Zinc P-R', 'UNKNOWN', 'Thousand tonnes'),
+    # ('Platinum Group Metals P-R', 'UNKNOWN', 'Thousand tonnes'),
+    # ('Bauxite P-R', 'UNKNOWN', 'Thousand tonnes'),
+    # ('Aluminium P-R', 'UNKNOWN', 'Thousand tonnes'),
+    # ('Tin P-R', 'UNKNOWN', 'Thousand tonnes'),
+    # ('Vanadium P-R', 'UNKNOWN', 'Thousand tonnes'),
+    # ('Mineral Commodity Prices', 'UNKNOWN', 'nan'),
+    ("Primary Energy Cons (old meth)", "primary_ej", "Exajoules"),
+    # ('PE Cons by fuel (old meth) ', 'UNKNOWN', 'Exajoules'),
+]
 
-    sheet_name = "Primary Energy Cons (old meth)"
-    tb = data_additional.parse(sheet_name, skiprows=2)
+
+def parse_sheet(data_additional: pr.ExcelFile, sheet: str, indicator: str, unit: str) -> Table:
+    tb = data_additional.parse(sheet, skiprows=2)
 
     # Remove empty rows and rows of footnotes.
     tb = tb.dropna(subset=tb.columns[1:], how="all").reset_index(drop=True)
 
     # Sanity check.
-    assert tb.columns[0] == "Exajoules", "Unit or format of primary energy sheet has changed"
+    assert tb.columns[0] == unit, f"Unit {unit} or format of sheet '{sheet}' has changed"
 
     # Transpose table.
-    tb = tb.rename(columns={"Exajoules": "country"})
+    tb = tb.rename(columns={unit: "country"})
 
     # Drop columns of growth and share.
     tb = tb[[column for column in tb.columns if isinstance(column, int) or (column == "country")]]
 
     # Clean country names.
-    tb["country"] = tb["country"].str.replace(" #", "").str.replace("of which: ", "").str.strip()
+    tb["country"] = (
+        tb["country"]
+        .str.replace(" #", "")
+        .str.replace("of which: ", "")
+        .str.replace(r"\d+$", "", regex=True)
+        .str.strip()
+    )
 
     # Transpose table.
-    tb = tb.melt(id_vars=["country"], var_name="year", value_name="primary_ej")
+    tb = tb.melt(id_vars=["country"], var_name="year", value_name=indicator)
 
     # Fix dtypes.
-    tb = tb.astype({"year": "Int64", "primary_ej": "Float64"})
+    tb = tb.astype({"year": "Int64", indicator: "Float64"})
 
     # For consistency with all other tables, rename some countries to their most common names in the dataset.
     # Their names will be properly harmonized in the garden step.
@@ -50,16 +128,22 @@ def parse_primary_energy(data_additional: pr.ExcelFile) -> Table:
         "Middle Africa": "Total Middle Africa",
         "Non-OECD": "Total Non-OECD",
         "OECD": "Total OECD",
+        "OPEC": "Total OPEC",
+        "Non-OPEC": "Total Non-OPEC",
         "Turkey": "Turkiye",
         "Western Africa": "Total Western Africa",
+        "DR Congo": "Democratic Republic of Congo",
     }
     tb["country"] = map_series(
         tb["country"],
         country_mapping,
         warn_on_missing_mappings=False,
-        warn_on_unused_mappings=True,
+        warn_on_unused_mappings=False,
         show_full_warning=True,
     )
+
+    # Drop any remaining rows with no data.
+    tb = tb.dropna(subset=[indicator]).reset_index(drop=True)
 
     return tb
 
@@ -433,11 +517,35 @@ def run() -> None:
     #
     # Process data.
     #
-    tb_primary_energy = parse_primary_energy(data_additional=data_additional)
+    ####################################################################################################################
+    # TODO: Make a function:
+    tables = []
+    for sheet, indicator, unit in SHEET_INDICATOR_UNITS:
+        _table = parse_sheet(data_additional=data_additional, sheet=sheet, indicator=indicator, unit=unit)
+        assert list(_table.columns) == ["country", "year", indicator]
+        tables.append(_table)
+    tb_additional = pr.multi_merge(tables, on=["country", "year"], how="outer")
+    # Sanity checks.
+    error = "Duplicated rows found when combining data extracted from sheets. Sheets format may have changed."
+    assert tb_additional[tb_additional.duplicated(subset=["country", "year"])].empty, error
+    error = (
+        "Unexpected mismatch between entities extracted from the consolidated dataset and those from the spreadsheet."
+    )
+    # "Other North Africa" is not in the consolidated dataset, but in the spreadsheet appears only in "Geo Biomass Other - TWh", and it's all zeros.
+    # So this is not relevant.
+    assert set(tb_additional["country"]) - set(tb["country"]) == {"Other North Africa"}, error
+    # However, there are entities in the consolidated dataset which do have nonzero data, which is not present in the spreadsheet.
+    # But they are all "Other*" regions, so we can also ignore them.
+    # tb[tb["country"] == "Other Eastern Africa"].loc[:, subset.ne(0).any()]
+    assert set(tb["country"]) - set(tb_additional["country"]) == {
+        "Other Eastern Africa",
+        "Other Middle Africa",
+        "Other North America",
+        "Other Western Africa",
+    }
+    ####################################################################################################################
 
-    # Sanity check.
-    error = "Country names in primary energy consumption sheet may have changed"
-    assert set(tb_primary_energy["country"]) <= set(tb["country"]), error
+    # TODO: For now, keep loading all indicators (except primary energy) from the consolidated dataset. But then compare them with the ones from the spreadsheet, and eventually use the latter (which should not be affected by the missing zeros issue). Hopefully, we don't find new issues in the data from the spreadsheet.
 
     # Parse coal reserves sheet.
     tb_coal_reserves = parse_coal_reserves(data=data_additional)
@@ -469,7 +577,7 @@ def run() -> None:
     tb = pr.multi_merge(
         [
             tb,
-            tb_primary_energy,
+            tb_additional[["country", "year", "primary_ej"]],
             tb_coal_reserves.reset_index(),
             tb_gas_reserves.reset_index(),
             tb_oil_reserves.reset_index(),
