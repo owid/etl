@@ -1,0 +1,43 @@
+title:
+  title: Literacy rates
+  title_variant: by age group and gender
+default_selection:
+  - Mexico
+  - Afghanistan
+  - India
+  - Mali
+
+dimensions:
+  - slug: age_group
+    name: Age group
+    choices:
+      - slug: adult
+        name: Adults
+        description: Adults aged 15 years and older who can read and write.
+      - slug: youth
+        name: Young people
+        description: Young people aged 15 to 24 years who can read and write.
+      - slug: elderly
+        name: Older people
+        description: Older adults aged 65 years and older who can read and write.
+      - slug: age_side_by_side
+        name: All age groups
+        description: Compare literacy rates across different age groups.
+
+  - slug: sex
+    name: Gender
+    choices:
+      - slug: both
+        name: Both genders
+        description: Literacy rates for all people regardless of gender.
+      - slug: female
+        name: Women
+        description: Literacy rates among women.
+      - slug: male
+        name: Men
+        description: Literacy rates among men.
+      - slug: sex_side_by_side
+        name: Men and women
+        description: Compare literacy rates between genders.
+
+views: []
