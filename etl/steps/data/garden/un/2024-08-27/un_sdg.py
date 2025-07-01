@@ -62,10 +62,6 @@ def run(dest_dir: str) -> None:
         tb_garden.metadata = tb_meadow.metadata
         short_name = tb_garden.index[0][4] + "_" + tb_garden.index[0][5]
         tb_garden.metadata.short_name = underscore(short_name)
-        # Remove Peru as the value is likey to be an error (as confirmed by source viaz)
-        if tb_garden.metadata.short_name == "_16_5_1_iu_cor_brib":
-            tb_garden = tb_garden[~tb_garden.index.get_level_values("country").isin(["Peru", "Panama"])]
-
         ds_garden.add(tb_garden)
 
     ds_garden.save()
