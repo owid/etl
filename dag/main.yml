@@ -705,8 +705,8 @@ steps:
     - data://meadow/housing/2025-06-25/knoll_prices
   data://grapher/housing/2025-06-25/knoll_prices:
     - data://garden/housing/2025-06-25/knoll_prices
-  
-  
+
+
   # OECD Analytical House Prices
   data://meadow/oecd/2025-06-20/housing_prices:
     - snapshot://oecd/2025-06-20/housing_prices.csv
@@ -728,7 +728,7 @@ steps:
   data://grapher/pew/2025-06-27/same_sex_marriage:
     - data://garden/pew/2025-06-27/same_sex_marriage
 
-  # WB income groups 2024-07-29
+  # WB income groups 2025-07-01
   data://meadow/wb/2025-07-01/income_groups:
     - snapshot://wb/2025-07-01/income_groups.xlsx
 
