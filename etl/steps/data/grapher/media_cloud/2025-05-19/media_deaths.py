@@ -31,6 +31,19 @@ def run() -> None:
         tb[col].m.unit = "%"
         tb[col].m.short_unit = "%"
 
+    tb = tb.rename(
+        index={
+            "deaths_share": "Share of Deaths by Cause (US)",
+            "deaths": "Number of Deaths by Cause (US)",
+            "nyt_share": "Share of Mentions by Cause (New York Times)",
+            "nyt_mentions": "Number of Mentions by Cause (New York Times)",
+            "wapo_share": "Share of Mentions by Cause (Washington Post)",
+            "wapo_mentions": "Number of Mentions by Cause (Washington Post)",
+            "fox_share": "Share of Mentions by Cause (Fox News)",
+            "fox_mentions": "Number of Mentions by Cause (Fox News)",
+        }
+    )
+
     tb = tb.reset_index()
 
     # rename cause to country for grapher
