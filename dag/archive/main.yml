@@ -517,6 +517,14 @@ steps:
   data://grapher/pew/2024-06-03/same_sex_marriage:
     - data://garden/pew/2024-06-03/same_sex_marriage
 
+      # Integrated Values Survey
+  data://meadow/ivs/2023-11-27/integrated_values_survey:
+    - snapshot://ivs/2023-11-27/integrated_values_survey.csv
+  data://garden/ivs/2023-11-27/integrated_values_survey:
+    - data://meadow/ivs/2023-11-27/integrated_values_survey
+  data://grapher/ivs/2023-11-27/integrated_values_survey:
+    - data://garden/ivs/2023-11-27/integrated_values_survey
+
 include:
   # Include all active steps plus all archive steps.
   - dag/main.yml
