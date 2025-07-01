@@ -56,7 +56,7 @@ def add_shares(tb, columns=None):
     for col in columns:
         total = tb[col].sum()
         if total == 0:
-            tb[col] = 0
+            tb[f"{col}_share"] = 0
         else:
             tb[f"{col}_share"] = round(
                 (tb[col] / total) * 100, 3
