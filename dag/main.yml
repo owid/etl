@@ -728,6 +728,18 @@ steps:
   data://grapher/pew/2025-06-27/same_sex_marriage:
     - data://garden/pew/2025-06-27/same_sex_marriage
 
+  # WB income groups 2024-07-29
+  data://meadow/wb/2025-07-01/income_groups:
+    - snapshot://wb/2025-07-01/income_groups.xlsx
+
+  data://garden/wb/2025-07-01/income_groups:
+    - data://meadow/wb/2025-07-01/income_groups
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2024-07-15/population
+
+  data://grapher/wb/2025-07-01/income_groups:
+    - data://garden/wb/2025-07-01/income_groups
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
