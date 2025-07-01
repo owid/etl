@@ -1,7 +1,8 @@
 import re
 from copy import deepcopy
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, Union, cast
+from types import SimpleNamespace
+from typing import Any, Dict, List, cast
 
 from etl.collection.exceptions import CommonViewParamConflict, ExtraIndicatorsInUseError
 from etl.collection.model.base import MDIMBase, pruned_json
@@ -16,12 +17,19 @@ REGEX_CATALOG_PATH_OPTIONS = (
 )
 
 
+class ReadOnlyNamespace(SimpleNamespace):
+    def __setattr__(self, name, value):
+        if hasattr(self, name):
+            raise AttributeError(f"Cannot modify attribute '{name}'")
+        super().__setattr__(name, value)
+
+
 @pruned_json
 @dataclass
 class CommonView(MDIMBase):
-    dimensions: Optional[Dict[str, Any]] = None
-    config: Optional[Union[ViewConfig, Dict[str, Any]]] = None
-    metadata: Optional[Union[ViewMetadata, Dict[str, Any]]] = None
+    dimensions: Dict[str, Any] | None = None
+    config: ViewConfig | Dict[str, Any] | None = None
+    metadata: ViewMetadata | Dict[str, Any] | None = None
 
     @property
     def num_dimensions(self) -> int:
@@ -32,7 +40,7 @@ class CommonView(MDIMBase):
 @dataclass
 class Indicator(MDIMBase):
     catalogPath: str
-    display: Optional[Dict[str, Any]] = None
+    display: Dict[str, Any] | None = None
 
     def __post_init__(self):
         # Validate that the catalog path is either (i) complete or (ii) in the format table#indicator.
@@ -101,10 +109,10 @@ class Indicator(MDIMBase):
 class ViewIndicators(MDIMBase):
     """Indicators in a MDIM/Explorer view."""
 
-    y: Optional[List[Indicator]] = None
-    x: Optional[Indicator] = None
-    size: Optional[Indicator] = None
-    color: Optional[Indicator] = None
+    y: List[Indicator] | None = None
+    x: Indicator | None = None
+    size: Indicator | None = None
+    color: Indicator | None = None
 
     @property
     def num_indicators(self) -> int:
@@ -134,7 +142,7 @@ class ViewIndicators(MDIMBase):
         # Now that data is in the expected shape, let the parent class handle the rest
         return super().from_dict(data)
 
-    def to_records(self) -> List[Dict[str, Union[str, Dict[str, Any]]]]:
+    def to_records(self) -> List[Dict[str, str | Dict[str, Any]]]:
         indicators = []
         for dim in CHART_DIMENSIONS:
             dimension_val = getattr(self, dim, None)
@@ -207,12 +215,44 @@ class View(MDIMBase):
 
     dimensions: Dict[str, str]
     indicators: ViewIndicators
-    config: Optional[Union[ViewConfig, Dict[str, Any]]] = None
-    metadata: Optional[Union[ViewMetadata, Dict[str, Any]]] = None
+    # config: Optional[Union[ViewConfig, Dict[str, Any]]] = None
+    config: ViewConfig | Dict[str, Any] | None = None
+    metadata: ViewMetadata | Dict[str, Any] | None = None
+    _is_grouped: bool = False  # Private flag to mark views created by grouping
 
     @property
-    def d(self):
-        return self.dimensions
+    def is_grouped(self) -> bool:
+        """Check if this view was created by grouping other views."""
+        return self._is_grouped
+
+    def mark_as_grouped(self) -> None:
+        """Mark this view as created by grouping other views."""
+        object.__setattr__(self, "_is_grouped", True)
+
+    @property
+    def d(self) -> ReadOnlyNamespace:
+        # Create a hash of current dimensions content for cache invalidation
+        current_hash = hash(frozenset(self.dimensions.items()))
+
+        # Check if we have a cached version and if dimensions haven't changed
+        if hasattr(self, "_d_cache") and hasattr(self, "_d_hash") and self._d_hash == current_hash:
+            return self._d_cache
+
+        # Create new ReadOnlyNamespace and cache it with current hash
+        self._d_cache = ReadOnlyNamespace(**self.dimensions)
+        self._d_hash = current_hash
+        return self._d_cache
+
+    def __setattr__(self, name, value):
+        if name == "d":
+            raise AttributeError(f"Cannot set read-only property '{name}'")
+        # Clear cache when dimensions object is replaced entirely
+        if name == "dimensions":
+            if hasattr(self, "_d_cache"):
+                delattr(self, "_d_cache")
+            if hasattr(self, "_d_hash"):
+                delattr(self, "_d_hash")
+        super().__setattr__(name, value)
 
     def has_non_y_indicators(self) -> bool:
         """Check if the view has non-y indicators."""
@@ -315,6 +355,32 @@ class View(MDIMBase):
             indicators = indicators + list(invalid_indicators)
 
         return indicators
+
+    def matches(self, **kwargs):
+        """Evaluate if a view matches a set of dimensions.
+
+        kwargs:
+            Key-value pairs representing the dimension names and values to match. Keys are function arguments, and values are the argument values, which can either be a single value or a list of values. If a list, it evaluates to True if any value is matched.
+
+        ```python
+        for v in c.views:
+            if v.matches(age="all", sex="female"):
+                pass
+            elif v.matches(age=[0, 10]):
+                pass
+        ```
+        """
+        for dim_name, dim_value in kwargs.items():
+            if dim_name not in self.dimensions:
+                raise ValueError(f"Dimension '{dim_name}' not found in view dimensions: {self.dimensions.keys()}")
+            if hasattr(dim_value, "__iter__") and not isinstance(dim_value, (str, bytes)):
+                # If the dimension value is a list, check if it matches any of the values in the view dimensions
+                if dim_value and self.dimensions[dim_name] not in dim_value:
+                    return False
+            elif isinstance(dim_value, (str, int, float)):
+                if self.dimensions[dim_name] != dim_value:
+                    return False
+        return True
 
 
 def merge_common_metadata_by_dimension(

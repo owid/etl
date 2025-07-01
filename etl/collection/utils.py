@@ -8,7 +8,7 @@ from collections import defaultdict
 from copy import deepcopy
 from itertools import product
 from string import Formatter
-from typing import Any, Dict, List, Optional, Set, Tuple, Union
+from typing import Any, Dict, List, Set, Tuple
 
 from deprecated import deprecated
 from owid.catalog import Dataset
@@ -38,7 +38,7 @@ def records_to_dictionary(records, key: str):
 
 
 # common, model.core
-def map_indicator_path_to_id(catalog_path: str, owid_env: Optional[OWIDEnv] = None) -> str | int:
+def map_indicator_path_to_id(catalog_path: str, owid_env: OWIDEnv | None = None) -> str | int:
     # Check if given path is actually an ID
     if str(catalog_path).isdigit():
         return catalog_path
@@ -263,7 +263,7 @@ def _check_missing_fields(template: str, params: dict) -> None:
         raise ParamKeyError(f"Missing keys for placeholders {missing!r} in template: {template!r}")
 
 
-def fill_placeholders(data, params) -> Union[Dict[str, Any], List[Any], Set[Any], Tuple[Any], str]:
+def fill_placeholders(data, params) -> Dict[str, Any] | List[Any] | Set[Any] | Tuple[Any] | str:
     """
     Recursively walk *data* (dicts, lists, tuples, sets, primitives) and
     replace any `{placeholder}` found in strings using values from *params*.

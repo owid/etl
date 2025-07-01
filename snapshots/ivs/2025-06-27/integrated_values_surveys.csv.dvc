@@ -1,0 +1,20 @@
+meta:
+  origin:
+    producer: Integrated Values Surveys
+    title: Integrated Values Surveys (IVS)
+    description: |-
+      The European Value Study (EVS) and the World Value Survey (WVS) are two large-scale, cross-national, and repeated cross-sectional longitudinal survey research programs. Since their emergence in the early 1980s, the EVS has conducted 5 survey waves (every 9 years) and the WVS has conducted 7 survey waves (every 5 years). Both research programs include a large number of questions, which have been replicated over time and across the EVS and the WVS surveys. Such repeated questions constitute the Integrated Values Surveys (IVS), the joint EVS-WVS time-series data which at the moment covers a 40-years period (1981-2022).
+    citation_full: |-
+      - EVS (2022): EVS Trend File 1981-2017. GESIS Data Archive, Cologne. ZA7503 Data file Version 3.0.0, doi:10.4232/1.14021
+      - Haerpfer, C., Inglehart, R., Moreno, A., Welzel, C., Kizilova, K., Diez-Medrano J., M. Lagos, P. Norris, E. Ponarin & B. Puranen et al. (eds.). 2022. World Values Survey Trend File (1981-2022) Cross-National Data-Set. Madrid, Spain  &  Vienna,  Austria:  JD  Systems  Institute  &  WVSA Secretariat. Data File Version 4.0.0, doi:10.14281/18241.27.
+    version_producer: Version 4
+    url_main: https://www.worldvaluessurvey.org/WVSEVStrend.jsp
+    date_accessed: '2025-06-27'
+    date_published: '2024-06-30'
+    license:
+      name: IVS Conditions of use
+      url: https://www.worldvaluessurvey.org/WVSEVStrend.jsp
+outs:
+  - md5: 4181bc7257138837840d3d489e475a01
+    size: 1363158
+    path: integrated_values_surveys.csv
