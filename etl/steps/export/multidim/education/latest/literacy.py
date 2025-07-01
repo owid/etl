@@ -281,6 +281,8 @@ def _get_sex_side_by_side_subtitle(age_group):
 
     if prefix:
         return f"Share of {prefix}women and men aged {age_range} who can read and write a short, simple sentence with understanding."
+    else:
+        return f"Share of women and men aged {age_range} who can read and write a short, simple sentence with understanding."
 
 
 def generate_subtitle_by_age_and_gender(view):
