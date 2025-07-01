@@ -23,20 +23,12 @@ GROUPED_VIEW_CONFIG = MULTIDIM_CONFIG | {
     "selectedFacetStrategy": "entity",
 }
 
-# Column filtering patterns
-LITERACY_RATE_PATTERNS = {
-    "adult": ["adult_literacy_rate", "population_15plus_years", "both_sexes"],
-    "adult_male": ["adult_literacy_rate", "population_15plus_years", "years__male"],
-    "adult_female": ["adult_literacy_rate", "population_15plus_years", "years__female"],
-    "youth_both": ["youth_literacy_rate", "population_15_24_years", "both_sexes"],
-    "youth_male": ["youth_literacy_rate", "population_15_24_years", "years__male"],
-    "youth_female": ["youth_literacy_rate", "population_15_24_years", "years__female"],
-    "elderly": ["elderly_literacy_rate", "population_65plus_years", "both_sexes"],
-    "elderly_male": ["elderly_literacy_rate", "population_65plus_years", "years__male"],
-    "elderly_female": ["elderly_literacy_rate", "population_65plus_years", "years__female"],
-}
-
-# Age group configurations
+# Age group configurations - maps internal age group keys to column detection and display formatting
+# - keywords: column name substring used to identify this age group in source data
+# - age_range: human-readable age range for subtitles
+# - age_short: abbreviated age range for chart legends
+# - title_term: noun used in chart titles (e.g. "adults", "young people")
+# - gender_prefix: prefix added when combining with gender terms (e.g. "young men")
 AGE_GROUPS = {
     "adult": {
         "keywords": "population_15plus_years",
@@ -61,7 +53,10 @@ AGE_GROUPS = {
     },
 }
 
-# Gender configurations
+# Gender configurations - maps internal gender keys to display text for chart titles and subtitles
+# Used in chart title generation and gender-specific visualizations
+# - title: noun used in chart titles
+# - subtitle: noun used in chart subtitles
 GENDERS = {
     "both": {"title": "adults", "subtitle": "adults"},
     "male": {"title": "men", "subtitle": "men"},
@@ -69,17 +64,9 @@ GENDERS = {
     "sex_side_by_side": {"title": "men and women", "subtitle": "men and women"},
 }
 
-# Exclusion patterns for filtering columns
-EXCLUSION_PATTERNS = [
-    "urban",
-    "rural",
-    "the_global_age_specific_literacy_projections_model",
-    "poorest_quintile",
-    "richest_quintile",
-    "adjusted",
-]
-
-# Dimension mapping configurations
+# Dimension mapping configurations - reverse lookups for extracting dimensions from column names
+# AGE_GROUP_KEYWORDS: maps column keywords (e.g. "population_15plus_years") -> age group keys (e.g. "adult")
+# SEX_KEYWORDS: maps column sex terms (e.g. "both_sexes", "male") -> internal gender keys (e.g. "both", "male")
 AGE_GROUP_KEYWORDS = {config["keywords"]: key for key, config in AGE_GROUPS.items()}
 SEX_KEYWORDS = {"both_sexes": "both", "male": "male", "female": "female"}
 
@@ -128,14 +115,37 @@ def run() -> None:
 
 def get_literacy_rate_columns(tb):
     """Filter literacy rate columns by age and gender category."""
-    literacy_cols = []
+    # Create a regex pattern that matches literacy rate columns
+    literacy_patterns = "|".join(
+        [
+            r"adult_literacy_rate.*population_15plus_years",
+            r"youth_literacy_rate.*population_15_24_years",
+            r"elderly_literacy_rate.*population_65plus_years",
+        ]
+    )
 
-    for patterns in LITERACY_RATE_PATTERNS.values():
-        cols = [col for col in tb.columns if all(pattern in col for pattern in patterns)]
-        # Filter out columns containing exclusion patterns
-        cols = [col for col in cols if not any(exclusion in col for exclusion in EXCLUSION_PATTERNS)]
-        literacy_cols.extend(cols)
+    # Create exclusion pattern - filters out unwanted column types:
+    # - Geographic breakdowns (urban/rural)
+    # - Wealth quintile data (poorest/richest)
+    # - Model-specific projections
+    # - Adjusted parity index
+    exclusion_pattern = "|".join(
+        [
+            "urban",
+            "rural",
+            "the_global_age_specific_literacy_projections_model",
+            "poorest_quintile",
+            "richest_quintile",
+            "adjusted",
+        ]
+    )
 
+    # Filter columns using regex
+    import re
+
+    literacy_cols = [
+        col for col in tb.columns if re.search(literacy_patterns, col) and not re.search(exclusion_pattern, col)
+    ]
     return literacy_cols
 
 
@@ -225,19 +235,21 @@ def generate_title_by_gender_and_age(view):
     # Get gender and age terms
     gender_term = GENDERS.get(sex, {}).get("title", "")
 
-    if age_group == "age_side_by_side":
-        return "Literacy rates by age group"
-    elif sex == "sex_side_by_side":
+    if view.matches(age_group="age_side_by_side"):
+        term = "by age group"
+    elif view.matches(sex="sex_side_by_side"):
         age_config = AGE_GROUPS.get(age_group, {})
-        return f"Literacy rates among {age_config.get('title_term', age_group)}, by gender"
-    elif sex == "both":
+        term = f"among {age_config.get('title_term', age_group)}, by gender"
+    elif view.matches(sex="both"):
         age_config = AGE_GROUPS.get(age_group, {})
-        return f"Literacy rates among {age_config.get('title_term', age_group)}"
+        term = f"among {age_config.get('title_term', age_group)}"
     else:
         # For specific genders, create better titles
         age_config = AGE_GROUPS.get(age_group, {})
         prefix = age_config.get("gender_prefix", "")
-        return f"Literacy rates among {prefix}{gender_term}"
+        term = f"among {prefix}{gender_term}"
+
+    return f"Literacy rates {term}"
 
 
 def _get_age_descriptions_by_gender(sex):
@@ -249,7 +261,7 @@ def _get_age_descriptions_by_gender(sex):
     elif sex == "female":
         return "women aged 15 and above, young women (15–24), and older women (65 and above)"
     else:
-        return None
+        return "adults, young people, and older adults"
 
 
 def _get_gender_specific_subtitle(age_group, gender_term):
@@ -269,8 +281,6 @@ def _get_sex_side_by_side_subtitle(age_group):
 
     if prefix:
         return f"Share of {prefix}women and men aged {age_range} who can read and write a short, simple sentence with understanding."
-    else:
-        return f"Share of women and men aged {age_range} who can read and write a short, simple sentence with understanding."
 
 
 def generate_subtitle_by_age_and_gender(view):
@@ -301,24 +311,16 @@ def generate_subtitle_by_age_and_gender(view):
 
 def _get_age_display_names(sex):
     """Get age display names based on gender."""
-    if sex == "male":
-        return {
-            "adult": f"Men ({AGE_GROUPS['adult']['age_short']})",
-            "youth": f"Young men ({AGE_GROUPS['youth']['age_short']})",
-            "elderly": f"Older men ({AGE_GROUPS['elderly']['age_short']})",
-        }
-    elif sex == "female":
-        return {
-            "adult": f"Women ({AGE_GROUPS['adult']['age_short']})",
-            "youth": f"Young women ({AGE_GROUPS['youth']['age_short']})",
-            "elderly": f"Older women ({AGE_GROUPS['elderly']['age_short']})",
-        }
-    else:  # both sexes
-        return {
-            "adult": f"Adults ({AGE_GROUPS['adult']['age_short']})",
-            "youth": f"Young people ({AGE_GROUPS['youth']['age_short']})",
-            "elderly": f"Older adults ({AGE_GROUPS['elderly']['age_short']})",
-        }
+    term = {
+        "male": "Men",
+        "female": "Women",
+    }.get(sex, "Adults")
+
+    return {
+        "adult": f"{term} ({AGE_GROUPS['adult']['age_short']})",
+        "youth": f"Young {term.lower()} ({AGE_GROUPS['youth']['age_short']})",
+        "elderly": f"Older {term.lower()} ({AGE_GROUPS['elderly']['age_short']})",
+    }
 
 
 def edit_indicator_displays(view):
@@ -326,7 +328,7 @@ def edit_indicator_displays(view):
     if view.indicators.y is None:
         return
 
-    sex = view.dimensions.get("sex", "both")
+    sex = view.d.sex
 
     # Get appropriate display names
     age_display_names = _get_age_display_names(sex)
@@ -338,14 +340,14 @@ def edit_indicator_displays(view):
 
     for indicator in view.indicators.y:
         # Check for age-based display names
-        if view.dimensions.get("age_group") == "age_side_by_side":
+        if view.d.age_group == "age_side_by_side":
             for age_key, display_name in age_display_names.items():
                 if age_key in indicator.catalogPath:
                     indicator.display = {"name": display_name}
                     break
 
         # Check for gender-based display names
-        elif view.dimensions.get("sex") == "sex_side_by_side":
+        elif sex == "sex_side_by_side":
             for gender_key, display_name in gender_display_names.items():
                 if gender_key in indicator.catalogPath:
                     indicator.display = {"name": display_name}
