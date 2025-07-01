@@ -303,7 +303,7 @@ def generate_subtitle_by_age_and_gender(view):
     elif sex == "both":
         age_config = AGE_GROUPS.get(age_group, {})
         age_range = age_config.get("age_range", "")
-        return f"Share of adults aged {age_range} who can read and write a short, simple sentence with understanding."
+        return f"Share of {age_config.get('title_term', 'adults')} aged {age_range} who can read and write a short, simple sentence with understanding."
 
     else:
         # For specific genders
