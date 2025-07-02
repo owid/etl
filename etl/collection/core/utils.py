@@ -38,6 +38,7 @@ def create_collection_from_config(
     dependencies: Set[str],
     catalog_path: str,
     *,  # Force keyword-only arguments after this
+    dependencies_combined: set[str] | None = None,
     validate_schema: bool = True,
     explorer: bool,
 ) -> Explorer: ...
@@ -49,6 +50,7 @@ def create_collection_from_config(
     dependencies: Set[str],
     catalog_path: str,
     *,  # Force keyword-only arguments after this
+    dependencies_combined: set[str] | None = None,
     validate_schema: bool = True,
     explorer: bool = False,
 ) -> Collection: ...
@@ -59,9 +61,19 @@ def create_collection_from_config(
     dependencies: Set[str],
     catalog_path: str,
     *,  # Force keyword-only arguments after this
+    dependencies_combined: set[str] | None = None,
     validate_schema: bool = True,
     explorer: bool = False,
 ) -> Union[Explorer, Collection]:
+    """Create a Collection or Explorer instance from a configuration dictionary.
+
+    config: Configuration of the collection.
+    dependencies: Set of dependencies (dataset URIs) for the collection.
+    catalog_path: Path to the step.
+    dependencies_combined: Optional set of combined dependencies.
+    validate_schema: Whether to validate the schema of the collection.
+    explorer: Whether to create an Explorer instance instead of a Collection.
+    """
     # Read config as structured object
     if explorer:
         c = Explorer.from_dict(dict(**config, catalog_path=catalog_path))
@@ -82,6 +94,6 @@ def create_collection_from_config(
     c.check_duplicate_views()
 
     # Add dependencies to collection
-    c._dependencies = dependencies
+    c.dependencies = dependencies_combined or dependencies
 
     return c
