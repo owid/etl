@@ -732,6 +732,7 @@ steps:
 
   data://grapher/wb/2025-07-01/income_groups:
     - data://garden/wb/2025-07-01/income_groups
+
   # Integrated Values Survey
   data://meadow/ivs/2025-06-27/integrated_values_surveys:
     - snapshot://ivs/2025-06-27/integrated_values_surveys.csv
