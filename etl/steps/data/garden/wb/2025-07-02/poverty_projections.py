@@ -84,12 +84,12 @@ def calculate_regional_and_global_aggregates(tb):
         .assign(region_pip="WLD")
     )
 
-    # Make this columns not in millions, but in absolute numbers.
-    tb_global["pop"] *= 1_000_000
-    tb_global["poorpop"] *= 1_000_000
-
     # Concatenate the regional and global aggregates.
     tb = pr.concat([tb, tb_global], ignore_index=True)
+
+    # Make these columns not in millions, but in absolute numbers.
+    tb["pop"] *= 1_000_000
+    tb["poorpop"] *= 1_000_000
 
     return tb
 
