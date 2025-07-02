@@ -11,7 +11,7 @@ definitions:
 
     description_key:
       - The World Bank creates a yearly classification of countries by income, for all countries with population over 30,000.
-      - This classification stays the same throughout the fiscal year (from July 1 to June 30) even if the income data for a country changes.
+      - This classification stays the same throughout the World Bank's fiscal year (from July 1 to June 30) even if the income data for a country changes.
       - Low-income countries are those with a gross national income (GNI) per capita of $1,135 or less in 2024.
       - Lower-middle-income countries are those with a GNI per capita between $1,136 and $4,495 in 2024.
       - Upper-middle-income countries are those with a GNI per capita between $4,496 and $13,935 in 2024.
