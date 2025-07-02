@@ -1,7 +1,9 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
   common:
-    processing_level: minor
+    processing_level: major
+    description_processing: |-
+      We obtained regional estimates of the number in poverty by summing the number of people in poverty in each region. For global estimates, we proceeded in a similar way, but summing the regional data. To calculate the share in poverty, we divided these results by the total population in each region or globally, and multiplied by 100 to get a percentage.
     display: &common-display
       tolerance: 0
       entityAnnotationsMap: |-
