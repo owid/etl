@@ -46,7 +46,6 @@ CAUSES_OF_DEATH = [
     "drug overdose",
     "homicide",
     "terrorism",
-    "accidents",
 ]
 
 YEAR = 2023  # set to year you want to query
