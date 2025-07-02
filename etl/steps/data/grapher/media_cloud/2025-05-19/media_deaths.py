@@ -41,6 +41,7 @@ def run() -> None:
             "wapo_mentions": "Number of Mentions by Cause (Washington Post)",
             "fox_share": "Share of Mentions by Cause (Fox News)",
             "fox_mentions": "Number of Mentions by Cause (Fox News)",
+            "nyt_over_under": "Factor of Over-/Under-Reporting (Share of Mentions in NYT / Share of Deaths)",
         }
     )
 

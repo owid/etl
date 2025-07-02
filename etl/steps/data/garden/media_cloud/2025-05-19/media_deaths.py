@@ -8,6 +8,7 @@ paths = PathFinder(__file__)
 
 YEAR = 2023  # year of the data
 
+# these are the causes of death we are using for the 2023 version
 CAUSES_OF_DEATH = [
     "heart disease",
     "cancer",
@@ -144,33 +145,33 @@ def run() -> None:
     # load tables
     tb_leading_causes = ds_leading_causes["leading_causes"].reset_index()
     tb_ext_causes = ds_ext_causes["external_causes"].reset_index()
-    tb_media_mentions = ds_media_mentions["media_deaths"].reset_index()
+    tb_mm = ds_media_mentions["media_deaths"].reset_index()
 
     tb_leading_causes = tb_leading_causes.drop(columns=["full_icd_code", "crude_rate"], errors="raise")
 
     tb_deaths = create_tb_death(tb_leading_causes, tb_ext_causes)
 
     # filter only on causes of death we are interested in
-    tb_media_mentions = tb_media_mentions[tb_media_mentions["cause"].isin(CAUSES_OF_DEATH)]
+    tb_mm = tb_mm[tb_mm["cause"].isin(CAUSES_OF_DEATH)]
 
-    tb_media_mentions = pr.merge(left=tb_media_mentions, right=tb_deaths, on=["cause", "year"], how="left")
+    tb_mm = pr.merge(left=tb_mm, right=tb_deaths, on=["cause", "year"], how="left")
 
-    sources = tb_media_mentions["source"].unique().tolist()
+    sources = tb_mm["source"].unique().tolist()
 
     # add shares to media mentions table
-    tb_media_mentions["mentions_share"] = 0.0
-    tb_media_mentions["deaths_share"] = 0.0
+    tb_mm["mentions_share"] = 0.0
+    tb_mm["deaths_share"] = 0.0
     for source in sources:
-        tb_s = tb_media_mentions[tb_media_mentions["source"] == source]
+        tb_s = tb_mm[tb_mm["source"] == source]
         tb_s = add_shares(tb_s, columns=["mentions", "deaths"])
-        tb_media_mentions.update(tb_s)
+        tb_mm.update(tb_s)
 
     # pivot table
-    tb_media_mentions = tb_media_mentions.pivot(
+    tb_mm = tb_mm.pivot(
         index=["cause", "year", "deaths", "deaths_share"], columns="source", values=["mentions", "mentions_share"]
     ).reset_index()
 
-    tb_media_mentions.columns = [
+    tb_mm.columns = [
         "cause",
         "year",
         "deaths",
@@ -183,8 +184,14 @@ def run() -> None:
         "wapo_share",
     ]
 
+    tb_mm["nyt_over_under"] = tb_mm["nyt_share"] / tb_mm["deaths_share"]
+    # set values smaller 1 to negative reciprocal
+    tb_mm.loc[tb_mm["nyt_over_under"] < 1, "nyt_over_under"] = -1 / tb_mm.loc[
+        tb_mm["nyt_over_under"] < 1, "nyt_over_under"
+    ].round(2)
+
     # format table
-    tb = tb_media_mentions.format(["cause", "year"])
+    tb = tb_mm.format(["cause", "year"])
 
     ds_garden = paths.create_dataset(tables=[tb], check_variables_metadata=True)
     ds_garden.save()

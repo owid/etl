@@ -28,6 +28,27 @@ FOX_ID = 1092
 QUERIES = create_queries()
 STR_QUERIES = create_full_queries()
 
+# These are the causes of death we are using for the 2023 version.
+# They are based on the 12 leading causes of death in the US for 2023, plus drug overdoses, homicides, and terrorism
+CAUSES_OF_DEATH = [
+    "heart disease",
+    "cancer",
+    "accidents",
+    "stroke",
+    "respiratory",
+    "alzheimers",
+    "diabetes",
+    "kidney",
+    "liver",
+    "covid",
+    "suicide",
+    "influenza",
+    "drug overdose",
+    "homicide",
+    "terrorism",
+    "accidents",
+]
+
 YEAR = 2023  # set to year you want to query
 
 search_api = mediacloud.api.SearchApi(MC_API_TOKEN)
@@ -92,8 +113,10 @@ def run(upload: bool) -> None:
 
     mentions_ls = []
 
+    queries_in_use = {q: q_str for q, q_str in STR_QUERIES.items() if q in CAUSES_OF_DEATH}
+
     for s_id, s_name in zip(source_ids, sources):
-        mentions = get_mentions_from_source([s_id], s_name, STR_QUERIES, year=YEAR)
+        mentions = get_mentions_from_source([s_id], s_name, queries_in_use, year=YEAR)
         mentions_ls.append(mentions.copy(deep=True))
 
     # concatenate all mentions into a single DataFrame
