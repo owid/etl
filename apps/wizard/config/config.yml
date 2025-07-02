@@ -173,7 +173,7 @@ sections:
         description: "Export any dataset table to a public Google Sheet"
         entrypoint: app_pages/dataset_to_sheet.py
         icon: "📊"
-        image_url: "https://commons.wikimedia.org/wiki/File:Google_Sheets_logo_%282014-2020%29.svg"
+        image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f1/Google_Sheets_logo_%282014-2020%29.svg/512px-Google_Sheets_logo_%282014-2020%29.svg.png"
 
   - title: "Search"
     description: |-
