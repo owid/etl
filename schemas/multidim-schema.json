@@ -42,8 +42,15 @@
                 "demography/2023-12-15/population#age_structure"
             ],
             "examples_bad": [
-                ["energy", "energy/2024-01-01", "energy/2024-01-01/energy_mix"],
-                ["demography", "population#age_structure"]
+                [
+                    "energy",
+                    "energy/2024-01-01",
+                    "energy/2024-01-01/energy_mix"
+                ],
+                [
+                    "demography",
+                    "population#age_structure"
+                ]
             ]
         },
         "grapherConfigSchema": {
@@ -63,7 +70,10 @@
                 "https://files.ourworldindata.org/schemas/grapher-schema.008.json"
             ],
             "examples_bad": [
-                ["http://invalid-url.com/schema.json", "grapher-schema.008.json"]
+                [
+                    "http://invalid-url.com/schema.json",
+                    "grapher-schema.008.json"
+                ]
             ]
         },
         "title": {
@@ -108,9 +118,19 @@
                         "Climate Change Indicators"
                     ],
                     "examples_bad": [
-                        ["energy mix", "Energy Mix.", "Energy"],
-                        ["global population demographics", "Demographics"],
-                        ["climate change indicators", "Climate"]
+                        [
+                            "energy mix",
+                            "Energy Mix.",
+                            "Energy"
+                        ],
+                        [
+                            "global population demographics",
+                            "Demographics"
+                        ],
+                        [
+                            "climate change indicators",
+                            "Climate"
+                        ]
                     ]
                 },
                 "title_variant": {
@@ -162,9 +182,18 @@
                 "[\"Europe\", \"North America\", \"Asia\"]"
             ],
             "examples_bad": [
-                ["[]", "[\"USA\", \"PRC\"]"],
-                ["[\"Earth\"]", "[\"Global\"]"],
-                ["[\"EU\", \"NA\", \"AS\"]", "[\"Too many entities...\"]"]
+                [
+                    "[]",
+                    "[\"USA\", \"PRC\"]"
+                ],
+                [
+                    "[\"Earth\"]",
+                    "[\"Global\"]"
+                ],
+                [
+                    "[\"EU\", \"NA\", \"AS\"]",
+                    "[\"Too many entities...\"]"
+                ]
             ],
             "items": {
                 "type": "string"
@@ -194,14 +223,58 @@
                 "{\"age_group\": \"adults\", \"gender\": \"total\"}"
             ],
             "examples_bad": [
-                ["{\"nonexistent_dimension\": \"value\"}", "{\"metric\": \"nonexistent_choice\"}"],
-                ["{\"invalid_dimension\": \"adults\"}", "{\"age_group\": \"invalid_choice\"}"]
+                [
+                    "{\"nonexistent_dimension\": \"value\"}",
+                    "{\"metric\": \"nonexistent_choice\"}"
+                ],
+                [
+                    "{\"invalid_dimension\": \"adults\"}",
+                    "{\"age_group\": \"invalid_choice\"}"
+                ]
             ],
             "patternProperties": {
                 ".*": {
                     "type": "string"
                 }
             }
+        },
+        "dependencies": {
+            "type": "array",
+            "title": "Collection dependencies",
+            "description": "List of dataset URIs that this collection depends on for its indicators.",
+            "requirement_level": "optional",
+            "guidelines": [
+                [
+                    "Used internally to validate that all indicators come from specified datasets."
+                ],
+                [
+                    "Should contain dataset paths in the format 'namespace/version/dataset'."
+                ],
+                [
+                    "Can optionally include protocol prefixes like 'data://garden/namespace/version/dataset'."
+                ],
+                [
+                    "Dependencies are automatically resolved during collection creation if not explicitly provided."
+                ]
+            ],
+            "items": {
+                "type": "string"
+            },
+            "uniqueItems": true,
+            "examples": [
+                "[\"energy/2024-01-01/energy_mix\", \"demography/2023-12-15/population\"]",
+                "[\"data://garden/energy/2024-01-01/energy_mix\"]"
+            ],
+            "examples_bad": [
+                [
+                    "[\"energy/renewable_share\"]",
+                    "[\"incomplete/path\"]"
+                ],
+                [
+                    "[\"data://invalid/format\"]",
+                    "[\"namespace/version\"]"
+                ]
+            ]
         },
         "topic_tags": {
             "type": "array",
@@ -225,9 +298,18 @@
                 "[\"Population Growth\", \"Demography\"]"
             ],
             "examples_bad": [
-                ["[\"energy\"]", "[\"Invalid Topic\"]"],
-                ["[\"climate change\", \"energy\"]", "[\"Too\", \"Many\", \"Tags\"]"],
-                ["[\"population growth\", \"demography\"]", "[\"Nonexistent Topic\"]"]
+                [
+                    "[\"energy\"]",
+                    "[\"Invalid Topic\"]"
+                ],
+                [
+                    "[\"climate change\", \"energy\"]",
+                    "[\"Too\", \"Many\", \"Tags\"]"
+                ],
+                [
+                    "[\"population growth\", \"demography\"]",
+                    "[\"Nonexistent Topic\"]"
+                ]
             ],
             "items": {
                 "type": "string"

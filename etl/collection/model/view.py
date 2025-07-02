@@ -356,6 +356,32 @@ class View(MDIMBase):
 
         return indicators
 
+    def matches(self, **kwargs):
+        """Evaluate if a view matches a set of dimensions.
+
+        kwargs:
+            Key-value pairs representing the dimension names and values to match. Keys are function arguments, and values are the argument values, which can either be a single value or a list of values. If a list, it evaluates to True if any value is matched.
+
+        ```python
+        for v in c.views:
+            if v.matches(age="all", sex="female"):
+                pass
+            elif v.matches(age=[0, 10]):
+                pass
+        ```
+        """
+        for dim_name, dim_value in kwargs.items():
+            if dim_name not in self.dimensions:
+                raise ValueError(f"Dimension '{dim_name}' not found in view dimensions: {self.dimensions.keys()}")
+            if hasattr(dim_value, "__iter__") and not isinstance(dim_value, (str, bytes)):
+                # If the dimension value is a list, check if it matches any of the values in the view dimensions
+                if dim_value and self.dimensions[dim_name] not in dim_value:
+                    return False
+            elif isinstance(dim_value, (str, int, float)):
+                if self.dimensions[dim_name] != dim_value:
+                    return False
+        return True
+
 
 def merge_common_metadata_by_dimension(
     common_config,
