@@ -13,6 +13,6 @@ meta:
       name: Creative Commons BY 4.0
       url: https://www.worldbank.org/en/about/legal/terms-of-use-for-datasets
 outs:
-  - md5: f878c6168f826a650f21477bea3bf904
-    size: 116890
+  - md5: f580e6bd1b15747b99a066cf465e8eca
+    size: 117503
     path: income_groups.xlsx
