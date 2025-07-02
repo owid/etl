@@ -85,6 +85,7 @@ def load_table_data(dataset_uri: str, table_name: str) -> Optional[pd.DataFrame]
         if dataset_path.exists():
             ds = Dataset(dataset_path)
             tb = ds.read(table_name)
+            table_name = tb.metadata.title
             df = pd.DataFrame(tb)
             return df
         else:
@@ -96,7 +97,7 @@ def load_table_data(dataset_uri: str, table_name: str) -> Optional[pd.DataFrame]
         return None
 
 
-def create_sheet_from_data(df: pd.DataFrame, sheet_title: str) -> tuple[Optional[str], Optional[str]]:
+def create_sheet_from_data(df: pd.DataFrame, sheet_title: str) -> tuple[str, str] | tuple[None, None]:
     """Create a public read-only Google Sheet from DataFrame."""
     try:
         # Create sheet
@@ -115,7 +116,6 @@ def create_sheet_from_data(df: pd.DataFrame, sheet_title: str) -> tuple[Optional
         return None, None
 
 
-# Main interface
 # Main interface
 datasets: List[str] = get_available_datasets()
 dataset_display_names: Dict[str, str] = get_dataset_names()
@@ -189,7 +189,7 @@ if selected_dataset_uri:
                     "Maximum Rows to Export",
                     min_value=1,
                     max_value=len(df),
-                    value=min(10000, len(df)),
+                    value=min(len(df), len(df)),
                     help="Limit the number of rows to export (Google Sheets has limits)",
                 )
 
@@ -204,7 +204,13 @@ if selected_dataset_uri:
             if create_button:
                 with st.spinner("Creating Google Sheet..."):
                     # Limit data if necessary
-                    export_df = df.head(max_rows) if max_rows < len(df) else df
+                    if max_rows < len(df):
+                        export_df = df.head(max_rows)
+                    else:
+                        export_df = df.copy()
+
+                    # Explicit assertion that we have a DataFrame
+                    assert isinstance(export_df, pd.DataFrame), "Expected DataFrame"
 
                     # Create sheet
                     sheet_url, sheet_id = create_sheet_from_data(export_df, sheet_title)
