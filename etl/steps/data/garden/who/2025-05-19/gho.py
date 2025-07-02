@@ -12,7 +12,7 @@ from owid.catalog.utils import underscore
 from owid.repack import repack_series
 
 from etl.data_helpers import geo
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 from .gho_omms import create_omms
 
@@ -57,7 +57,7 @@ NAN_VALUES = [
 PRIORITY_OF_REGIONS = ["WORLDBANKREGION", "REGION", "UNICEFREGION", "UNREGION", "UNSDGREGION", "FAOREGION"]
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -157,8 +157,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(
-        dest_dir,
+    ds_garden = paths.create_dataset(
         tables=tables_dict.values(),
         check_variables_metadata=True,
         default_metadata=ds_meadow.metadata,

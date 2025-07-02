@@ -7,6 +7,7 @@ from etl.helpers import PathFinder
 paths = PathFinder(__file__)
 
 MULTIDIM_CONFIG = {
+    "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.008.json",
     "hasMapTab": True,
     "tab": "map",
     "originUrl": "ourworldindata.org/education",
