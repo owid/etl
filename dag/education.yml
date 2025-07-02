@@ -177,10 +177,15 @@ steps:
   export://multidim/education/latest/completion_rates:
     - data://grapher/unesco/2025-05-01/education_sdgs
 
-
   #
   # Mdim for education spending
   #
   export://multidim/education/latest/education_spending:
     - data://grapher/unesco/2025-05-01/education_sdgs
     - data://grapher/unesco/2025-05-01/education_opri
+
+  #
+  # Mdim for literacy rates
+  #
+  export://multidim/education/latest/literacy:
+    - data://grapher/unesco/2025-05-01/education_sdgs

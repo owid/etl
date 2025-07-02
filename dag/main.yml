@@ -695,6 +695,7 @@ steps:
     - snapshot://housing/2025-06-25/knoll_prices.dta
   data://garden/housing/2025-06-25/knoll_prices:
     - data://meadow/housing/2025-06-25/knoll_prices
+    - data://garden/ggdc/2024-04-26/maddison_project_database
   data://grapher/housing/2025-06-25/knoll_prices:
     - data://garden/housing/2025-06-25/knoll_prices
 
