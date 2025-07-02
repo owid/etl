@@ -168,10 +168,13 @@ sections:
         icon: ":material/analytics:"
         image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Wikimedia_Product_Analytics_team_logo.svg/512px-Wikimedia_Product_Analytics_team_logo.svg.png"
       - title: "Dataset to Sheet"
+        alias: dataset_to_sheet
+        maintainer: "@fiona"
         description: "Export any dataset table to a public Google Sheet"
         entrypoint: "apps.wizard.app_pages.dataset_to_sheet"
         icon: "📊"
         image_url: "https://via.placeholder.com/150x100/4CAF50/FFFFFF/?text=Sheet"
+        enable: true
 
   - title: "Search"
     description: |-

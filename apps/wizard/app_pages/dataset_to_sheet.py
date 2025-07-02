@@ -11,7 +11,6 @@ import streamlit as st
 
 from apps.utils.google import GoogleDrive, GoogleSheet
 from apps.wizard.utils import cached
-from etl.helpers import PathFinder
 
 # Page config
 st.set_page_config(page_title="Dataset to Google Sheet", page_icon="📊", layout="wide")
@@ -27,18 +26,46 @@ if "sheet_url" not in st.session_state:
 
 
 @st.cache_data(ttl=300)
-def get_available_datasets() -> Dict[str, str]:
+def get_available_datasets() -> List[str]:
     """Get available datasets from the database."""
     return cached.load_dataset_uris()
+
+
+@st.cache_data(ttl=300)
+def get_dataset_names() -> Dict[str, str]:
+    """Get mapping of dataset URIs to display names."""
+    dataset_uris = cached.load_dataset_uris()
+    # Create a simple mapping from URI to a display name
+    dataset_names = {}
+    for uri in dataset_uris:
+        # Extract a display name from the URI (e.g., "garden/who/2024-01-01/dataset_name")
+        parts = uri.split("/")
+        if len(parts) >= 2:
+            display_name = f"{parts[-2]} - {parts[-1]}" if len(parts) >= 3 else parts[-1]
+        else:
+            display_name = uri
+        dataset_names[uri] = display_name
+    return dataset_names
 
 
 @st.cache_data(ttl=60)
 def load_dataset_tables(dataset_uri: str) -> List[str]:
     """Load table names from a dataset URI."""
     try:
-        paths = PathFinder(__file__)
-        ds = paths.load_dataset(dataset_uri)
-        return list(ds.table_names)
+        from owid.catalog import Dataset
+
+        from etl.paths import DATA_DIR
+
+        # Construct the dataset path directly
+        dataset_path = DATA_DIR / dataset_uri
+
+        if dataset_path.exists():
+            ds = Dataset(dataset_path)
+            return list(ds.table_names)
+        else:
+            st.error(f"Dataset path does not exist: {dataset_path}")
+            return []
+
     except Exception as e:
         st.error(f"Error loading dataset tables: {e}")
         return []
@@ -48,10 +75,22 @@ def load_dataset_tables(dataset_uri: str) -> List[str]:
 def load_table_data(dataset_uri: str, table_name: str) -> Optional[pd.DataFrame]:
     """Load data from a specific table."""
     try:
-        paths = PathFinder(__file__)
-        ds = paths.load_dataset(dataset_uri)
-        tb = ds.read(table_name)
-        return tb.to_pandas()
+        from owid.catalog import Dataset
+
+        from etl.paths import DATA_DIR
+
+        # Construct the dataset path directly
+        dataset_path = DATA_DIR / dataset_uri
+
+        if dataset_path.exists():
+            ds = Dataset(dataset_path)
+            tb = ds.read(table_name)
+            df = pd.DataFrame(tb)
+            return df
+        else:
+            st.error(f"Dataset path does not exist: {dataset_path}")
+            return None
+
     except Exception as e:
         st.error(f"Error loading table: {e}")
         return None
@@ -77,7 +116,9 @@ def create_sheet_from_data(df: pd.DataFrame, sheet_title: str) -> tuple[Optional
 
 
 # Main interface
-datasets = get_available_datasets()
+# Main interface
+datasets: List[str] = get_available_datasets()
+dataset_display_names: Dict[str, str] = get_dataset_names()
 
 if not datasets:
     st.error("No datasets available.")
@@ -87,10 +128,10 @@ if not datasets:
 col1, col2 = st.columns(2)
 
 with col1:
-    selected_dataset_uri = st.selectbox(
+    selected_dataset_uri: Optional[str] = st.selectbox(
         label="Select Dataset",
-        options=list(datasets.keys()),
-        format_func=lambda x: datasets[x],
+        options=datasets,
+        format_func=lambda uri: dataset_display_names.get(uri, uri),
         help="Choose the dataset you want to export to Google Sheets",
     )
 
@@ -111,7 +152,7 @@ if selected_dataset_uri:
     with st.expander("Dataset Information", expanded=False):
         col_info1, col_info2 = st.columns(2)
         with col_info1:
-            st.write(f"**Dataset:** {datasets[selected_dataset_uri]}")
+            st.write(f"**Dataset:** {dataset_display_names.get(selected_dataset_uri, selected_dataset_uri)}")
             st.write(f"**URI:** {selected_dataset_uri}")
         with col_info2:
             st.write(f"**Tables Available:** {len(table_names)}")
@@ -139,7 +180,7 @@ if selected_dataset_uri:
             with col_options1:
                 sheet_title = st.text_input(
                     "Sheet Title",
-                    value=f"{datasets[selected_dataset_uri]} - {selected_table}",
+                    value=f"{dataset_display_names.get(selected_dataset_uri, selected_dataset_uri)} - {selected_table}",
                     help="Title for the Google Sheet",
                 )
 
