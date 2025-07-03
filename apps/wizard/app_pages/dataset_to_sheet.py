@@ -116,7 +116,7 @@ def load_table_data(dataset_uri: str, table_name: str) -> tuple[Optional[pd.Data
             # Ensure we get a proper DataFrame
             df = pd.DataFrame(tb)
             # Reset index to flatten multi-index if present
-            df = df.reset_index()
+            df = df.reset_index(drop=True)
 
             return df, sheet_title
         else:
