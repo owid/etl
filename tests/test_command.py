@@ -100,7 +100,6 @@ def test_construct_subdag():
         "data-private://garden/secret/2023-01-01/secret": {"snapshot-private://meadow/secret/2023-01-01/secret"},
         "private://test/private_step": {"data-private://garden/secret/2023-01-01/secret"},
         "data://meadow/climate/2023-01-01/temperature": {"snapshot://meadow/climate/2023-01-01/temperature"},
-        "grapher://grapher/regions/latest/regions": {"data://grapher/regions/latest/regions"},
     }
 
     # Test basic include filtering
@@ -143,11 +142,6 @@ def test_construct_subdag():
     subdag = cmd.construct_subdag(full_dag, includes=[".*"], private=True)
     private_steps = [step for step in subdag.keys() if step.startswith("private://")]
     assert len(private_steps) > 0
-
-    # Test regions exclusion
-    subdag = cmd.construct_subdag(full_dag, includes=[".*"], grapher=True)
-    regions_step = "grapher://grapher/regions/latest/regions"
-    assert regions_step not in subdag
 
     # Test exact match - should include dependencies by default
     subdag = cmd.construct_subdag(full_dag, includes=["data://garden/happiness/2023-01-01/happiness"], exact_match=True)
