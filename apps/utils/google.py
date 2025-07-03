@@ -880,8 +880,7 @@ class GoogleSheet:
             try:
                 self.add_sheet(sheet_name)
             except Exception:
-                # Sheet might already exist, continue with writing
-                pass
+                raise RuntimeError(f"Failed to create or clear sheet '{sheet_name}'. Error: {e}")
 
         # Convert DataFrame to list of lists
         values = []
