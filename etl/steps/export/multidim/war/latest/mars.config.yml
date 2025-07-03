@@ -6,7 +6,7 @@ default_selection:
 
 default_dimensions:
   indicator: deaths
-  conflict_type: all
+  conflict_type: all_stacked
   estimate: low
 
 dimensions:
@@ -15,16 +15,20 @@ dimensions:
     choices:
       - slug: "deaths"
         name: "Deaths"
+        group: "How deadly are wars?"
         # description: People moving away from country
       - slug: "death_rate"
         name: "Death rate"
-        # description: People moving to country
+        group: "How deadly are wars?"
+        description: The number of deaths divided by the total population
       - slug: "wars_ongoing"
         name: "Number of wars"
+        group: "How common are wars?"
         # description: People moving to country
       - slug: "wars_ongoing_country_rate"
         name: "Rate of wars"
         description: The number of wars divided by the number of countries
+        group: "How common are wars?"
 
   - slug: conflict_type
     name: "Conflict type"
