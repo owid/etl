@@ -864,8 +864,24 @@ class GoogleSheet:
             Default is 'RAW'.
 
         """
-        # First clear the sheet
-        self.clear_sheet_data(sheet_name)
+        # Check if sheet exists, create if it doesn't
+        try:
+            existing_sheets = self.get_sheet_names()
+
+            if sheet_name not in existing_sheets:
+                # Create the sheet
+                self.add_sheet(sheet_name)
+            else:
+                # Clear existing sheet data only if sheet exists
+                self.clear_sheet_data(sheet_name)
+
+        except Exception as e:
+            # If we can't check/create sheets, try to create anyway
+            try:
+                self.add_sheet(sheet_name)
+            except Exception:
+                # Sheet might already exist, continue with writing
+                pass
 
         # Convert DataFrame to list of lists
         values = []
@@ -899,6 +915,39 @@ class GoogleSheet:
         values = [[convert_value(cell) for cell in row] for row in values]
 
         self.write_sheet_data(values, sheet_name, value_input_option)
+
+    def rename_sheet(self, old_name: str, new_name: str) -> None:
+        """
+        Rename a worksheet in the spreadsheet.
+
+        Parameters
+        ----------
+        old_name : str
+            The current name of the worksheet to rename.
+        new_name : str
+            The new name for the worksheet.
+
+        """
+        # Get sheet properties to find the sheet ID
+        properties = self.get_sheet_properties()
+        sheet_id = None
+
+        for sheet in properties:
+            if sheet["title"] == old_name:
+                sheet_id = sheet["sheetId"]
+                break
+
+        if sheet_id is None:
+            raise ValueError(f"Sheet '{old_name}' not found in spreadsheet")
+
+        # Update the sheet title
+        body = {
+            "requests": [
+                {"updateSheetProperties": {"properties": {"sheetId": sheet_id, "title": new_name}, "fields": "title"}}
+            ]
+        }
+
+        self.sheets_service.spreadsheets().batchUpdate(spreadsheetId=self.sheet_id, body=body).execute()
 
     def append_dataframe(
         self,

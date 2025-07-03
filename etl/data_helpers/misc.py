@@ -2,7 +2,7 @@
 
 import math
 from datetime import date, datetime
-from typing import Any, Iterable, List, Literal, Optional, Set, TypeVar, Union, cast
+from typing import Any, Dict, Iterable, List, Literal, Optional, Set, TypeVar, Union, cast
 
 import owid.catalog.processing as pr
 import pandas as pd
@@ -10,6 +10,8 @@ import plotly.express as px
 from owid.catalog import Table
 from owid.datautils import dataframes
 from tqdm.auto import tqdm
+
+from apps.utils.google import GoogleDrive, GoogleSheet
 
 TableOrDataFrame = TypeVar("TableOrDataFrame", pd.DataFrame, Table)
 DIMENSION_COL_NONE = "temporary"
@@ -836,3 +838,180 @@ def humanize_number(number, sig_figs=2):
         humanized = f"{value_str} {scale_name}".strip()
 
     return humanized
+
+
+def export_table_to_gsheet(
+    table: Table,
+    sheet_title: str,
+    update_existing: bool = True,
+    folder_id: Optional[str] = None,
+    role: Literal["reader", "commenter", "writer"] = "reader",
+    general_access: Literal["anyone", "domain", "user"] = "anyone",
+    include_metadata: bool = True,
+) -> tuple[str, str]:
+    """Export a Table to Google Sheets.
+
+    Parameters
+    ----------
+    table : Table
+        The OWID catalog Table to export.
+    sheet_title : str
+        Title for the Google Sheet.
+    update_existing : bool, optional
+        Whether to update existing sheet with same title, by default True.
+    folder_id : Optional[str], optional
+        Google Drive folder ID to store the sheet in, by default None.
+    role : Literal["reader", "commenter", "writer"], optional
+        Access level for the sheet. Options are "reader" (view-only), "commenter" (comment access),
+        or "writer" (edit access), by default "reader".
+    general_access : Literal["anyone", "domain", "user"], optional
+        The type of sharing. Use "anyone" for public access or "restricted" to remove general access permissions. By default, "anyone".
+    include_metadata : bool, optional
+        Whether to include variable metadata in separate tabs, by default True.
+
+    Returns
+    -------
+    tuple[str, str]
+        A tuple containing (sheet_url, sheet_id).
+
+    Examples
+    --------
+    >>> # In a garden step
+    >>> from etl.data_helpers.misc import export_table_to_gsheet
+    >>> tb = ds_garden.read("my_table")
+    >>> url, sheet_id = export_table_to_gsheet(
+    ...     tb,
+    ...     "My Dataset - Table Name",
+    ... )
+    >>> print(f"Sheet available at: {url}")
+    """
+
+    # Convert Table to DataFrame
+    df = pd.DataFrame(table.reset_index())
+
+    def _create_metadata_dataframes(table: Table) -> Dict[str, pd.DataFrame]:
+        """Create metadata DataFrames for each variable in the table."""
+        metadata_dfs = {}
+
+        for column_name in table.columns:
+            if hasattr(table[column_name], "metadata") and table[column_name].metadata:
+                metadata = table[column_name].metadata
+
+                # Convert metadata to a simple two-column format
+                metadata_rows = []
+
+                # Flatten the metadata dictionary
+                def flatten_metadata(obj, prefix=""):
+                    rows = []
+                    if hasattr(obj, "__dict__"):
+                        # Handle metadata objects with attributes
+                        for key, value in obj.__dict__.items():
+                            if value is not None and value != "":
+                                full_key = f"{prefix}.{key}" if prefix else key
+                                if isinstance(value, (dict, list)) and len(str(value)) > 100:
+                                    # For complex objects, show a summary
+                                    rows.append([full_key, f"[{type(value).__name__}] {str(value)[:100]}..."])
+                                else:
+                                    rows.append([full_key, str(value)])
+                    elif isinstance(obj, dict):
+                        # Handle dictionary metadata
+                        for key, value in obj.items():
+                            if value is not None and value != "":
+                                full_key = f"{prefix}.{key}" if prefix else key
+                                if isinstance(value, (dict, list)) and len(str(value)) > 100:
+                                    rows.append([full_key, f"[{type(value).__name__}] {str(value)[:100]}..."])
+                                else:
+                                    rows.append([full_key, str(value)])
+                    return rows
+
+                metadata_rows = flatten_metadata(metadata)
+
+                if metadata_rows:
+                    # Create DataFrame with metadata
+                    metadata_df = pd.DataFrame(metadata_rows, columns=["Property", "Value"])
+                    # Clean sheet name (Google Sheets has naming restrictions)
+                    clean_name = column_name.replace("/", "_").replace("\\", "_")[:31]  # 31 char limit
+                    metadata_dfs[f"Meta_{clean_name}"] = metadata_df
+
+        return metadata_dfs
+
+    # Handle existing sheets if requested
+
+    # Handle existing sheets if requested
+
+    if update_existing:
+        try:
+            drive = GoogleDrive()
+            # Search for existing sheet with this title
+            query = f"name='{sheet_title}' and mimeType='application/vnd.google-apps.spreadsheet'"
+            results = drive.drive_service.files().list(q=query).execute()
+            files = results.get("files", [])
+
+            if files:
+                # Update existing sheet
+                existing_sheet_id = files[0]["id"]
+                sheet = GoogleSheet(existing_sheet_id)
+
+                # Get the first available sheet tab instead of assuming "Data" exists
+                try:
+                    # Get sheet metadata to find existing tabs
+                    sheet_metadata = sheet.sheets_service.spreadsheets().get(spreadsheetId=existing_sheet_id).execute()
+                    existing_sheets = sheet_metadata.get("sheets", [])
+
+                    if existing_sheets:
+                        # Use the first sheet tab
+                        first_sheet_name = existing_sheets[0]["properties"]["title"]
+                        sheet.clear_sheet_data(first_sheet_name)
+                        sheet.write_dataframe(df, sheet_name=first_sheet_name)
+
+                        # Try to rename to "Data" if it's not already named that
+                        if first_sheet_name != "Data":
+                            try:
+                                # Check if rename_sheet method exists
+                                if hasattr(sheet, "rename_sheet"):
+                                    sheet.rename_sheet(first_sheet_name, "Data")
+                                else:
+                                    print(f"Note: Sheet will keep name '{first_sheet_name}' (rename not available)")
+                            except Exception as e:
+                                print(f"Note: Could not rename sheet to 'Data': {e}")
+                    else:
+                        # No sheets exist, create new one
+                        sheet.write_dataframe(df, sheet_name="Data")
+
+                except Exception as e:
+                    # Fallback: try to write directly to "Data" sheet
+                    print(f"Note: Could not get sheet metadata, trying direct write: {e}")
+                    sheet.write_dataframe(df, sheet_name="Data")
+
+                # Add metadata tabs if requested
+                if include_metadata:
+                    metadata_dfs = _create_metadata_dataframes(table)
+                    for sheet_name, metadata_df in metadata_dfs.items():
+                        try:
+                            sheet.write_dataframe(metadata_df, sheet_name=sheet_name)
+                        except Exception as e:
+                            print(f"Note: Could not write to sheet '{sheet_name}': {e}")
+
+                drive.set_file_permissions(file_id=existing_sheet_id, role=role, general_access=general_access)
+
+                return sheet.url, existing_sheet_id
+        except Exception as e:
+            print(f"Warning: Could not update existing sheet: {e}")
+
+    # Create new sheet
+    sheet = GoogleSheet.create_sheet(title=sheet_title, folder_id=folder_id)
+    sheet.write_dataframe(df, sheet_name="Data")
+
+    # Add metadata tabs if requested
+    if include_metadata:
+        metadata_dfs = _create_metadata_dataframes(table)
+        for sheet_name, metadata_df in metadata_dfs.items():
+            try:
+                sheet.write_dataframe(metadata_df, sheet_name=sheet_name)
+            except Exception as e:
+                print(f"Note: Could not create metadata sheet '{sheet_name}': {e}")
+
+    drive = GoogleDrive()
+    drive.set_file_permissions(file_id=sheet.sheet_id, role=role, general_access=general_access)
+
+    return sheet.url, sheet.sheet_id

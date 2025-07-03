@@ -1,5 +1,6 @@
 """Load a garden dataset and create a grapher dataset."""
 
+from etl.data_helpers.misc import export_table_to_gsheet
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -16,7 +17,9 @@ def run() -> None:
     # Read table from garden dataset.
     tb = ds_garden["long_run_child_mortality"]
     tb_sel = ds_garden["long_run_child_mortality_selected"]
-    #
+    # Export the table to a Google Sheet.
+    export_table_to_gsheet(table=tb_sel, sheet_title="Long Run Child Mortality", update_existing=True)
+
     # Process data.
     #
 
