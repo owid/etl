@@ -156,6 +156,9 @@ def filter_chart_diffs():
             st.session_state.chart_diffs_filtered = {
                 k: v for k, v in st.session_state.chart_diffs_filtered.items() if v.chart_id in chart_ids
             }
+            # Automatically show reviewed charts when chart IDs are selected
+            if "show_reviewed" not in st.query_params:
+                st.query_params["show_reviewed"] = "true"
         if "indicator_id" in st.query_params:
             indicator_ids = list(map(int, st.query_params.get_all("indicator_id")))
 
