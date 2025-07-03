@@ -332,7 +332,7 @@ def _show_options_filters():
     st.toggle(
         "**Show** reviewed charts",
         key="show-reviewed-charts",
-        value="show_reviewed" in st.query_params,
+        value="show_reviewed" in st.query_params or "chart_id" in st.query_params,
         on_change=show_reviewed,  # type: ignore
         help="Show only chart diffs that are pending approval (or rejection).",
     )
