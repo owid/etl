@@ -25,6 +25,8 @@ NYT_ID = 1
 WAPO_ID = 2
 FOX_ID = 1092
 
+US_COLLECTION_ID = 34412234
+
 QUERIES = create_queries()
 STR_QUERIES = create_full_queries()
 
@@ -117,6 +119,16 @@ def run(upload: bool) -> None:
     for s_id, s_name in zip(source_ids, sources):
         mentions = get_mentions_from_source([s_id], s_name, queries_in_use, year=YEAR)
         mentions_ls.append(mentions.copy(deep=True))
+
+    # add mentions for US collection
+    collection_mentions = get_mentions_from_source(
+        source_ids=[],
+        source_name="US Collection",
+        queries=queries_in_use,
+        year=YEAR,
+        collection_ids=[US_COLLECTION_ID],
+    )
+    mentions_ls.append(collection_mentions.copy(deep=True))
 
     # concatenate all mentions into a single DataFrame
     mentions_df = pd.concat(mentions_ls, ignore_index=True)

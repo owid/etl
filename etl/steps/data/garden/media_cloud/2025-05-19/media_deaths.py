@@ -179,10 +179,15 @@ def run() -> None:
         "fox_mentions",
         "nyt_mentions",
         "wapo_mentions",
+        "us_mentions",
         "fox_share",
         "nyt_share",
         "wapo_share",
+        "us_share",
     ]
+
+    # US collection is not used in grapher
+    tb_mm = tb_mm.drop(columns=["us_mentions", "us_share"], errors="raise")
 
     tb_mm["nyt_over_under"] = tb_mm["nyt_share"] / tb_mm["deaths_share"]
     # set values smaller 1 to negative reciprocal
