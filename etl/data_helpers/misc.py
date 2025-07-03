@@ -936,9 +936,6 @@ def export_table_to_gsheet(
         return metadata_dfs
 
     # Handle existing sheets if requested
-
-    # Handle existing sheets if requested
-
     if update_existing:
         try:
             drive = GoogleDrive()
