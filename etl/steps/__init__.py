@@ -64,12 +64,26 @@ def compile_steps(
     """
     Return the list of steps which, if executed in order, mean that every
     step has its dependencies ready for it.
+
+    Parameters
+    ----------
+    dag : DAG
+        The full DAG containing all steps and their complete dependency information.
+        Required to get the full dependencies of each step during parsing.
+    subdag : DAG
+        The filtered subset of steps to execute. Used to determine execution order
+        while maintaining access to complete dependency information from the full DAG.
+
+    Returns
+    -------
+    List[Step]
+        Steps in dependency order, ready for execution.
     """
     # make sure each step runs after its dependencies
     steps = to_dependency_order(subdag)
 
     # parse the steps into Python objects
-    # TODO: we need full DAG here to get dependencies of each step
+    # NOTE: We need the full DAG here to get complete dependencies of each step
     return [parse_step(name, dag) for name in steps]
 
 

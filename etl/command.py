@@ -281,6 +281,7 @@ def _find_closest_matches(includes_str: str, dag: DAG) -> None:
 
 
 def main(
+    # TODO: includes should be called `include` and be a regex, not a list of strings. Same for excludes.
     includes: List[str],
     dry_run: bool = False,
     force: bool = False,
@@ -394,10 +395,6 @@ def construct_subdag(
     # Exclude private steps
     if not private:
         excludes.append("private://.*")
-
-    # Exclude grapher regions, they're fetched by owid-grapher as CSV from catalog
-    # but are not supposed to be in DB
-    excludes.append("grapher://grapher/regions/latest/regions")
 
     # Get subdag based on includes and excludes
     subdag = filter_to_subgraph(dag, includes=includes, excludes=excludes, only=only, exact_match=exact_match)
