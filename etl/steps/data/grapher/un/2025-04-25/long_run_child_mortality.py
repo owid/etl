@@ -19,7 +19,9 @@ def run() -> None:
     tb_sel = ds_garden["long_run_child_mortality_selected"]
     # Export the table to a Google Sheet.
     sheet_url, sheet_id = export_table_to_gsheet(
-        table=tb_sel, sheet_title="Long Run Child Mortality", update_existing=True
+        table=tb_sel,
+        sheet_title="Long Run Child Mortality",
+        update_existing=True,
     )
     print(f"Google Sheet exported successfully. URL: {sheet_url}, ID: {sheet_id}")
     # Process data.

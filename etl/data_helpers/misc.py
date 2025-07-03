@@ -893,6 +893,9 @@ def export_table_to_gsheet(
         """Create metadata DataFrames for each variable in the table."""
         metadata_dfs = {}
 
+        # Fields to exclude from metadata export
+        excluded_fields = {"short_unit", "display", "processing_log", "presentation", "sources", "sort", "_name"}
+
         for column_name in table.columns:
             if hasattr(table[column_name], "metadata") and table[column_name].metadata:
                 metadata = table[column_name].metadata
@@ -906,8 +909,12 @@ def export_table_to_gsheet(
                     if hasattr(obj, "__dict__"):
                         # Handle metadata objects with attributes
                         for key, value in obj.__dict__.items():
+                            # Skip excluded fields
+                            full_key = f"{prefix}.{key}" if prefix else key
+                            if key in excluded_fields or full_key in excluded_fields:
+                                continue
+
                             if value is not None and value != "":
-                                full_key = f"{prefix}.{key}" if prefix else key
                                 if isinstance(value, (dict, list)) and len(str(value)) > 100:
                                     # For complex objects, show a summary
                                     rows.append([full_key, f"[{type(value).__name__}] {str(value)[:100]}..."])
@@ -916,8 +923,12 @@ def export_table_to_gsheet(
                     elif isinstance(obj, dict):
                         # Handle dictionary metadata
                         for key, value in obj.items():
+                            # Skip excluded fields
+                            full_key = f"{prefix}.{key}" if prefix else key
+                            if key in excluded_fields or full_key in excluded_fields:
+                                continue
+
                             if value is not None and value != "":
-                                full_key = f"{prefix}.{key}" if prefix else key
                                 if isinstance(value, (dict, list)) and len(str(value)) > 100:
                                     rows.append([full_key, f"[{type(value).__name__}] {str(value)[:100]}..."])
                                 else:
@@ -931,7 +942,7 @@ def export_table_to_gsheet(
                     metadata_df = pd.DataFrame(metadata_rows, columns=["Property", "Value"])
                     # Clean sheet name (Google Sheets has naming restrictions)
                     clean_name = column_name.replace("/", "_").replace("\\", "_")[:31]  # 31 char limit
-                    metadata_dfs[f"Meta_{clean_name}"] = metadata_df
+                    metadata_dfs[f"metadata_{clean_name}"] = metadata_df
 
         return metadata_dfs
 
