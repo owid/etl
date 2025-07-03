@@ -848,6 +848,7 @@ def export_table_to_gsheet(
     role: Literal["reader", "commenter", "writer"] = "reader",
     general_access: Literal["anyone", "domain", "user"] = "anyone",
     include_metadata: bool = True,
+    metadata_variables: Optional[List[str]] = None,
 ) -> tuple[str, str]:
     """Export a Table to Google Sheets.
 
@@ -868,6 +869,8 @@ def export_table_to_gsheet(
         The type of sharing. Use "anyone" for public access or "restricted" to remove general access permissions. By default, "anyone".
     include_metadata : bool, optional
         Whether to include variable metadata in separate tabs, by default True.
+    metadata_variables : Optional[List[str]], optional
+        List of variable names to include metadata for. If None, includes all variables with metadata, by default None.
 
     Returns
     -------
@@ -876,7 +879,7 @@ def export_table_to_gsheet(
 
     Examples
     --------
-    >>> # In a garden step
+    >>> # In a garden step - all metadata
     >>> from etl.data_helpers.misc import export_table_to_gsheet
     >>> tb = ds_garden.read("my_table")
     >>> url, sheet_id = export_table_to_gsheet(
@@ -884,19 +887,38 @@ def export_table_to_gsheet(
     ...     "My Dataset - Table Name",
     ... )
     >>> print(f"Sheet available at: {url}")
+
+    >>> # Only metadata for specific variables
+    >>> url, sheet_id = export_table_to_gsheet(
+    ...     tb,
+    ...     "My Dataset - Table Name",
+    ...     metadata_variables=["child_mortality_rate", "population"]
+    ... )
     """
 
-    # Convert Table to DataFrame
-    df = pd.DataFrame(table.reset_index())
-
-    def _create_metadata_dataframes(table: Table) -> Dict[str, pd.DataFrame]:
+    def _create_metadata_dataframes(
+        table: Table, metadata_variables: Optional[List[str]] = None
+    ) -> Dict[str, pd.DataFrame]:
         """Create metadata DataFrames for each variable in the table."""
         metadata_dfs = {}
 
         # Fields to exclude from metadata export
         excluded_fields = {"short_unit", "display", "processing_log", "presentation", "sources", "sort", "_name"}
 
-        for column_name in table.columns:
+        # Determine which variables to process
+        if metadata_variables is None:
+            # Include all variables with metadata
+            variables_to_process = table.columns
+        else:
+            # Only include specified variables that exist in the table
+            variables_to_process = [var for var in metadata_variables if var in table.columns]
+
+            # Warn about any requested variables that don't exist
+            missing_vars = [var for var in metadata_variables if var not in table.columns]
+            if missing_vars:
+                print(f"Warning: Variables {missing_vars} not found in table")
+
+        for column_name in variables_to_process:
             if hasattr(table[column_name], "metadata") and table[column_name].metadata:
                 metadata = table[column_name].metadata
 
@@ -915,7 +937,20 @@ def export_table_to_gsheet(
                                 continue
 
                             if value is not None and value != "":
-                                if isinstance(value, (dict, list)) and len(str(value)) > 100:
+                                # Handle lists by joining items with newlines or separators
+                                if isinstance(value, list):
+                                    if key in ["description_key", "origins", "licenses"]:
+                                        # Join list items with newlines for better readability
+                                        formatted_value = "\n".join(str(item) for item in value)
+                                        rows.append([full_key, formatted_value])
+                                    elif len(str(value)) > 100:
+                                        # For other long lists, show summary
+                                        rows.append([full_key, f"[List with {len(value)} items] {str(value)[:100]}..."])
+                                    else:
+                                        # For short lists, join with commas
+                                        formatted_value = ", ".join(str(item) for item in value)
+                                        rows.append([full_key, formatted_value])
+                                elif isinstance(value, dict) and len(str(value)) > 100:
                                     # For complex objects, show a summary
                                     rows.append([full_key, f"[{type(value).__name__}] {str(value)[:100]}..."])
                                 else:
@@ -929,7 +964,20 @@ def export_table_to_gsheet(
                                 continue
 
                             if value is not None and value != "":
-                                if isinstance(value, (dict, list)) and len(str(value)) > 100:
+                                # Handle lists by joining items with newlines or separators
+                                if isinstance(value, list):
+                                    if key in ["description_key", "origins", "licenses"]:
+                                        # Join list items with newlines for better readability
+                                        formatted_value = "\n".join(str(item) for item in value)
+                                        rows.append([full_key, formatted_value])
+                                    elif len(str(value)) > 100:
+                                        # For other long lists, show summary
+                                        rows.append([full_key, f"[List with {len(value)} items] {str(value)[:100]}..."])
+                                    else:
+                                        # For short lists, join with commas
+                                        formatted_value = ", ".join(str(item) for item in value)
+                                        rows.append([full_key, formatted_value])
+                                elif isinstance(value, dict) and len(str(value)) > 100:
                                     rows.append([full_key, f"[{type(value).__name__}] {str(value)[:100]}..."])
                                 else:
                                     rows.append([full_key, str(value)])
@@ -945,6 +993,9 @@ def export_table_to_gsheet(
                     metadata_dfs[f"metadata_{clean_name}"] = metadata_df
 
         return metadata_dfs
+
+    # Convert Table to DataFrame
+    df = pd.DataFrame(table.reset_index())
 
     # Handle existing sheets if requested
     if update_existing:
@@ -993,7 +1044,7 @@ def export_table_to_gsheet(
 
                 # Add metadata tabs if requested
                 if include_metadata:
-                    metadata_dfs = _create_metadata_dataframes(table)
+                    metadata_dfs = _create_metadata_dataframes(table, metadata_variables)
                     for sheet_name, metadata_df in metadata_dfs.items():
                         try:
                             sheet.write_dataframe(metadata_df, sheet_name=sheet_name)
@@ -1012,7 +1063,7 @@ def export_table_to_gsheet(
 
     # Add metadata tabs if requested
     if include_metadata:
-        metadata_dfs = _create_metadata_dataframes(table)
+        metadata_dfs = _create_metadata_dataframes(table, metadata_variables)
         for sheet_name, metadata_df in metadata_dfs.items():
             try:
                 sheet.write_dataframe(metadata_df, sheet_name=sheet_name)

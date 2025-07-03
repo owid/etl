@@ -34,20 +34,24 @@ def run() -> None:
     )
     # Select out columns of interest.
     tb_igme["source"] = "UN IGME"
-
+    tb_igme["source_url"] = "https://childmortality.org/data/igme/"
     # Load full Gapminder data v11, v11 includes projections, so we need to remove years beyond the last year of IGME data
 
     max_year = tb_igme["year"].max()
     tb_gap_full = ds_gapminder_v11["under_five_mortality"].reset_index()
     tb_gap_full = tb_gap_full[tb_gap_full["year"] <= max_year].reset_index(drop=True)
     tb_gap_full = tb_gap_full.rename(columns={"child_mortality": "child_mortality_rate"}, errors="raise")
-    tb_gap_full["source"] = "Gapminder"
+    tb_gap_full["source"] = "Gapminder v11"
+    tb_gap_full["source_url"] = (
+        "https://docs.google.com/spreadsheets/d/1Av7eps_zEK73-AdbFYEmtTrwFKlfruBYXdrnXAOFVpM/edit?gid=501532268#gid=501532268"
+    )
     tb_gap_full["child_mortality_rate"] = tb_gap_full["child_mortality_rate"].div(10)
 
     # Load Gapminder data v7 - has the source of the data (unlike v11)
     # We've removed some years from the v7 data, for years where the source was 'Guesstimate' or 'Model based on Life Expectancy'
     tb_gap_sel = ds_gapminder_v7["under_five_mortality_selected"].reset_index()
-    tb_gap_sel["source"] = "Gapminder"
+    tb_gap_sel["source"] = "Gapminder v7"
+    tb_gap_sel["source_url"] = "https://www.gapminder.org/documentation/documentation/gapdata005%20v7.xlsx"
     tb_gap_sel = tb_gap_sel.rename(columns={"under_five_mortality": "child_mortality_rate"}, errors="raise")
     tb_gap_sel["child_mortality_rate"] = tb_gap_sel["child_mortality_rate"].div(10)
     # Remove the early years for Austria - there is a signicant jump in the data in 1830 which suggests an incongruency in method or data availability
@@ -127,7 +131,7 @@ def calculate_share_surviving_first_five_years(tb_combined: Table) -> Table:
     """
     # Drop out years prior to 1800 and regions that aren't countries
 
-    tb_world = tb_combined[(tb_combined["country"] == "World")].drop(columns=["source"])
+    tb_world = tb_combined[(tb_combined["country"] == "World")].drop(columns=["source", "source_url"])
 
     # Add global labels and calculate the share of children surviving/dying in their first five years
 
