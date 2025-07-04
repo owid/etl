@@ -336,7 +336,7 @@ steps:
   #
   data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy:
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/wb/2025-07-01/income_groups
     - data://meadow/energy_institute/2025-06-27/statistical_review_of_world_energy
   #
   # Energy Institute - Statistical Review of World Energy.
