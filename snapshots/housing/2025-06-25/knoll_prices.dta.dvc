@@ -1,0 +1,28 @@
+# The file is downloaded from the OpenICPSR repository - /20150501_data/KSS_NPLH_FiguresTables/data/NPLH.dta
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "No Price Like Home: Global House Prices, 1870-2012"
+    description: |-
+      Annual house prices for 14 advanced economies since 1870, taken from the paper "No Price Like Home: Global House Prices, 1870-2012" by Katharina Knoll, Moritz Schularick and Thomas Steger.
+
+    date_published: "2017"
+
+    # Citation
+    producer: Knoll, Schularick, and Steger
+    citation_full: |-
+      Knoll, Katharina, Moritz Schularick, and Thomas Steger. 2017. "No Price Like Home: Global House Prices, 1870-2012." American Economic Review 107 (2): 331–53. DOI: 10.1257/aer.20150501
+
+    # Files
+    url_main: https://www.aeaweb.org/articles?id=10.1257/aer.20150501
+    url_download: https://www.openicpsr.org/openicpsr/project/113055/version/V1/view?path=/openicpsr/113055/fcr:versions/V1/20150501_data/KSS_NPLH_FiguresTables/data/NPLH.dta&type=file
+    date_accessed: '2025-06-25'
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://www.openicpsr.org/openicpsr/project/113055/version/V1/view?path=/openicpsr/113055/fcr:versions/V1/LICENSE.txt&type=file
+outs:
+  - md5: 66c8058b9ecb99f43e86763db0341c94
+    size: 212891
+    path: knoll_prices.dta

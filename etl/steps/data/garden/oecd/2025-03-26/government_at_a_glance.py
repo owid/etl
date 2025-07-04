@@ -1,12 +1,25 @@
-"""Load a meadow dataset and create a garden dataset."""
+"""
+Load a meadow dataset and create a garden dataset.
+
+NOTE: To extract the log of the process (to review sanity checks, for example), follow these steps:
+    1. Define LONG_FORMAT as True.
+    2. Run the following command in the terminal:
+        nohup uv run etl run government_at_a_glance > output_govt_glance.log 2>&1 &
+"""
 
 import owid.catalog.processing as pr
+from owid.catalog import Table
+from structlog import get_logger
+from tabulate import tabulate
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
+# Initialize logger.
+log = get_logger()
 
 
 # Define units and their new names
@@ -94,6 +107,18 @@ FUNCTIONS = {
     "Social protection n.e.c.": "Social protection | Social protection not elsewhere classified",
 }
 
+# Define table index
+INDEX = ["country", "year", "unit", "economic_transaction", "function", "function_subcategory"]
+
+# Add tolerance check for spending by function
+TOLERANCE_CHECK = 0.5
+
+# Set table format when printing
+TABLEFMT = "pretty"
+
+# Set debug mode
+DEBUG = False
+
 
 def run() -> None:
     #
@@ -158,15 +183,17 @@ def run() -> None:
 
     # Make table wide, using indicator as columns.
     tb = tb.pivot(
-        index=["country", "year", "unit", "economic_transaction", "function", "function_subcategory"],
+        index=INDEX,
         columns=["indicator"],
         values="value",
         join_column_levels_with="_",
     ).reset_index(drop=True)
 
+    sanity_checks(tb)
+
     # Improve table format.
     tb = tb.format(
-        ["country", "year", "unit", "economic_transaction", "function", "function_subcategory"],
+        INDEX,
         short_name=paths.short_name,
     )
 
@@ -178,3 +205,67 @@ def run() -> None:
 
     # Save garden dataset.
     ds_garden.save()
+
+
+def sanity_checks(tb: Table) -> None:
+    """
+    We check if the percentages sum to 100% (in the case of spending by function) or if there are any negative values.
+    """
+
+    tb = tb.copy()
+
+    # NEGATIVE VALUES
+    # Define mask
+    for column in [
+        col
+        for col in tb.columns
+        if col
+        not in INDEX
+        + [
+            "Government fiscal balance",
+            "Government gross debt per capita",
+            "Government net interest spending",
+            "Government primary balance",
+            "Government revenues per capita",
+            "Government structural balance",
+            "Government structural primary balance",
+        ]
+    ]:
+        mask = (tb[column] < 0) & (tb["unit"] != "growth_rate")
+
+        tb_error = tb[mask].reset_index(drop=True)
+
+        if not tb_error.empty:
+            if DEBUG:
+                log.warning(
+                    f"""{len(tb_error)} observations of {column} are negative:
+                        {tabulate(tb_error[INDEX + [column]], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
+                )
+
+    # SPENDING BY FUNCTION ADDING UP TO 100%
+    # Exclude rows with function == "Total"
+    tb_function = tb[tb["function"] != "Total"].reset_index(drop=True)
+
+    # Keep only the rows with function_subcategory == "Total"
+    tb_function = tb_function[tb_function["function_subcategory"] == "Total"].reset_index(drop=True)
+
+    # Keep only the unit share_gov_exp
+    tb_function = tb_function[tb_function["unit"] == "share_gov_exp"].reset_index(drop=True)
+
+    # Calculate the sum of the values for each "country", "year"
+    tb_sum = tb_function.groupby(["country", "year"]).sum().reset_index()
+
+    # Create a mask
+    mask = (tb_sum["Government expenditure by function"] < 100 + TOLERANCE_CHECK) & (
+        tb_sum["Government expenditure by function"] > 100 - TOLERANCE_CHECK
+    )
+
+    tb_error = tb_sum[~mask].reset_index(drop=True)
+    if not tb_error.empty:
+        if DEBUG:
+            log.warning(
+                f"""{len(tb_error)} observations of Government expenditure by function do not add up to 100%:
+                    {tabulate(tb_error[["country", "year", "Government expenditure by function"]], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
+            )
+
+    return None
