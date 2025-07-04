@@ -41,7 +41,6 @@ def run() -> None:
         ["category", "dimension", "age", "sex"],
         axis=1,
     )
-    print(tb)
     # Improve table format.
     tb = tb.format(["country", "year", "indicator", "unit_of_measurement"])
 
