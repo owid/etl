@@ -109,6 +109,11 @@ def run() -> None:
     #
     # Process data.
     #
+    # It's better to not combine the UK long-run series with the long-term wheat yields series.
+    # The latter only adds a few points to the UK, and the first one (in 1850, from Bayliss-Smith & Wanmali (1984)) is at odds with the closest estimates from Broadberry et al. (2015).
+    # NOTE: In the future, consider fixing this discrepancy in either the uk_long_term_yields or the long_term_wheat_yields steps (or merge them into one).
+    tb_wheat = tb_wheat[tb_wheat["country"] != "United Kingdom"].reset_index(drop=True)
+
     # Prepare FAOSTAT QCL data.
     tb_qcl = prepare_faostat_data(tb_qcl=tb_qcl)
 
