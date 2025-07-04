@@ -54,5 +54,5 @@ tables:
             <% elif indicator == "Persons prosecuted" %>
             Prosecutions
             <% elif indicator == "Persons arrested/cautioned/suspected" %>
-            Arrests
+            Arrests, cautions or suspicions
             <%- endif -%>
