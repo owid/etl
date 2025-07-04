@@ -4,7 +4,6 @@
 
 from typing import List
 
-import owid.catalog.processing as pr
 from owid.catalog import Dataset, Table
 
 from etl.data_helpers import geo
