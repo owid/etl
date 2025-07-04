@@ -63,6 +63,9 @@ def run() -> None:
     # Create an additional table for the classification of the latest year available.
     tb_latest = tb.reset_index(drop=True).drop_duplicates(subset=["country"], keep="last")
 
+    # Rename new table.
+    tb_latest.metadata.short_name = "income_groups_latest"
+
     # Check that countries without classification for the latest year are as expected.
     missing_countries = set(tb_latest.loc[tb_latest["year"] != tb_latest["year"].max(), "country"])
     assert (
@@ -95,7 +98,7 @@ def run() -> None:
     tb = tb.format(["country", "year"])
 
     # Set an appropriate index and sort conveniently.
-    tb_latest = tb_latest.format(["country"], short_name="income_groups_latest")
+    tb_latest = tb_latest.format(["country"])
 
     # Find the version of the current World Bank's classification.
     origin = tb_latest["classification"].metadata.origins[0]
