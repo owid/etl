@@ -86,7 +86,6 @@ steps:
   data://garden/energy/2024-06-20/energy_mix:
     - data://garden/demography/2023-03-31/population
     - data://garden/energy_institute/2024-06-20/statistical_review_of_world_energy
-    - data://garden/wb/2025-07-01/income_groups
   #
   # Energy - Energy mix.
   #
