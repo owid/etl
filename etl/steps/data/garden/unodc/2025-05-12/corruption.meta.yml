@@ -6,6 +6,8 @@ definitions:
       - Many crimes are never reported by victims, so the data cannot be used to measure exactly how common crime is. However, the data is still useful for spotting patterns and trends over time.
       - Most crime data come from records kept by the police or other law enforcement agencies. Countries vary in whether they record a crime when it is first reported, during an investigation, or after the investigation is finished.
       - In some countries, more than one agency collects crime data, and these different sets of data must be combined before they are published.
+      - Rates on prosecutions, convictions, etc. for various offenses including bribery depend very strongly on national law enforcement efforts, recording and reporting practices, and even social norms. For example, in some places, bribery is so normalised that instances are rarely taken seriously enough to be reported to the police.
+      - "Analysis of trends in law enforcement data within countries can be useful, especially when analysed together with survey data on prevalence, but trends are potentially the result of at least three changes: changes in the actual prevalence of the crime, changes in the intensity of law enforcement in relation to the crime, and changes in the reporting practices of victims of that crime."
     presentation:
       topic_tags:
         - Corruption
