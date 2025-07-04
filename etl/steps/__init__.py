@@ -646,13 +646,8 @@ class DataStep(Step):
         env = os.environ.copy()
         env["PATH"] = os.path.expanduser("~/.cargo/bin") + ":" + env["PATH"]
 
-        try:
-            subprocess.check_call(args, env=env)
-        except subprocess.CalledProcessError:
-            # swallow this exception and just exit -- the important stack trace
-            # will already have been printed to stderr
-            print(f'\nCOMMAND: {" ".join(args)}', file=sys.stderr)
-            sys.exit(1)
+        # This might raise subprocess.CalledProcessError
+        subprocess.check_call(args, env=env)
 
     def _run_notebook(self) -> None:
         "Run a parameterised Jupyter notebook."

@@ -470,7 +470,7 @@ def mk_custom_entities(df: Table) -> pd.DataFrame:
     return df_cust
 
 
-@memory.cache
+# @memory.cache
 def _fetch_metadata_for_indicator(indicator_code: str) -> Dict[str, str]:
     indicator_code = indicator_code.replace("_", ".").upper()
     api_url = f"https://api.worldbank.org/v2/indicator/{indicator_code}?format=json"
