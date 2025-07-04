@@ -41,7 +41,7 @@ tables:
           people per 100,000 population
           <%- endif -%>
         presentation:
-         title_public: |-
+          title_public: |-
             <%- if unit_of_measurement.lower() == "counts" %>
             << indicator >> in bribery cases (<< unit_of_measurement.lower() >>)
             <% elif unit_of_measurement.lower() == "rate per 100,000 population" %>
