@@ -733,19 +733,15 @@ tables:
       #   title: 'Oil price - Crude prices since 1861 (current US$)'
       #   unit: 'current US$ per barrel'
       #   short_unit: '$'
-      # oil_price_crude_2022_dollars_per_barrel:
-      #   title: 'Oil price - Crude prices since 1861 (constant 2022 US$)'
-      #   unit: 'constant 2022 US$ per barrel'
-      #   short_unit: '$'
       oil_price_crude_current_dollars_per_m3:
         title: 'Oil price - Crude prices since 1861 (current US$)'
         unit: 'current US$ per cubic meter'
         short_unit: '$'
         presentation:
           title_public: 'Oil price - Crude prices since 1861'
-      oil_price_crude_2023_dollars_per_m3:
-        title: 'Oil price - Crude prices since 1861 (constant 2023 US$)'
-        unit: 'constant 2023 US$ per cubic meter'
+      oil_price_crude_constant_dollars_per_m3:
+        title: 'Oil price - Crude prices since 1861 (constant {price_reference_year} US$)'
+        unit: 'constant {price_reference_year} US$ per cubic meter'
         short_unit: '$'
         presentation:
           title_public: 'Oil price - Crude prices since 1861'

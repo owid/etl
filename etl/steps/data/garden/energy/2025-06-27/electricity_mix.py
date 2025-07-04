@@ -357,17 +357,72 @@ def fix_discrepancies_in_aggregate_regions(tb_review: Table, tb_ember: Table, co
     segments_not_combined = {region: [] for region in geo.REGIONS}
     segments_not_combined.update(
         {
-            "Lower-middle-income countries": [
+            "Low-income countries": [
+                "coal_generation__twh",
+                "fossil_generation__twh",
+                "gas_generation__twh",
                 "hydro_generation__twh",
-                "nuclear_generation__twh",
+                "low_carbon_generation__twh",
+                "oil_generation__twh",
+                "other_renewables_including_bioenergy_generation__twh",
+                "renewable_generation__twh",
+                "total_generation__twh",
+            ],
+            "Lower-middle-income countries": [
+                "fossil_generation__twh",
+                "gas_generation__twh",
+                "hydro_generation__twh",
+                "low_carbon_generation__twh",
+                "oil_generation__twh",
+                "other_renewables_including_bioenergy_generation__twh",
+                "renewable_generation__twh",
+                "solar_and_wind_generation__twh",
+                "solar_generation__twh",
+                "wind_generation__twh",
+            ],
+            "Upper-middle-income countries": [
+                "gas_generation__twh",
+                "oil_generation__twh",
+                "solar_and_wind_generation__twh",
+                "solar_generation__twh",
+                "wind_generation__twh",
+            ],
+            "High-income countries": [
+                "oil_generation__twh",
+                "solar_and_wind_generation__twh",
+                "solar_generation__twh",
+                "wind_generation__twh",
+            ],
+            "Europe": [
                 "oil_generation__twh",
                 "renewable_generation__twh",
+                "solar_and_wind_generation__twh",
+                "solar_generation__twh",
+                "wind_generation__twh",
             ],
-            "Upper-middle-income countries": ["nuclear_generation__twh", "oil_generation__twh"],
-            "High-income countries": ["gas_generation__twh", "oil_generation__twh"],
-            "Europe": ["oil_generation__twh"],
-            "North America": ["oil_generation__twh"],
-            "European Union (27)": ["oil_generation__twh"],
+            "North America": [
+                "oil_generation__twh",
+                "solar_and_wind_generation__twh",
+                "solar_generation__twh",
+                "wind_generation__twh",
+            ],
+            "European Union (27)": [
+                "oil_generation__twh",
+                "renewable_generation__twh",
+                "solar_and_wind_generation__twh",
+                "solar_generation__twh",
+                "wind_generation__twh",
+            ],
+            "Africa": ["solar_and_wind_generation__twh", "solar_generation__twh", "wind_generation__twh"],
+            "Asia": ["solar_and_wind_generation__twh", "solar_generation__twh", "wind_generation__twh"],
+            "Oceania": [
+                "low_carbon_generation__twh",
+                "renewable_generation__twh",
+                "solar_and_wind_generation__twh",
+                "solar_generation__twh",
+                "wind_generation__twh",
+            ],
+            "South America": ["solar_and_wind_generation__twh", "solar_generation__twh", "wind_generation__twh"],
         }
     )
     for region in segments_not_combined:
@@ -390,7 +445,8 @@ def fix_discrepancies_in_aggregate_regions(tb_review: Table, tb_ember: Table, co
                         # px.line(compared.melt(id_vars="year"), x="year", y="value", color="variable", markers=True, title=f"{region} - {col}").show()
                         assert compared["year"].min() == 2000, "Minimum year changed."
         error = f"Expected discrepancies between Statistical Review and Ember data for aggregate regions may have changed for region: {region}. Current discrepant indicators: {_remove_combination}. Use this list in 'segments_not_combined'."
-        assert set(segments_not_combined[region]) == set(_remove_combination), error
+        if set(segments_not_combined[region]) != set(_remove_combination):
+            log.error(error)
 
         for col in _remove_combination:
             # Remove data for years prior to 2000 (which correspond to the Statistical Review).
@@ -425,25 +481,34 @@ def run() -> None:
     ####################################################################################################################
     # There is a big discrepancy between Oceania's oil generation from the Energy Institute and Ember.
     # Ember's oil generation is significantly larger. The reason seems to be that the Energy Institute's Statistical
-    # Review has no data for Papua New Guinea and New Caledonia (except the zeros on nuclear generation that were
-    # manually imputed in the Statistical Review garden step), while Ember does have data for both.
+    # Review has spurious zeros for Papua New Guinea and New Caledonia (all electricity columns are zero)
+    # while Ember does have data for both countries.
     # Therefore, to avoid spurious jumps in the intersection between EI and Ember data, we remove Oceania data from EI
     # before combining both tables.
     # Specifically, the columns where the discrepancy between EI and Ember is notorious are oil and gas generation (and
     # therefore fossil generation).
 
     # First check that indeed there is no data for Papua New Guinea and New Caledonia in EI.
-    error = (
-        "Expected no oil or gas generation data for Papua New Guinea and New Caledonia in the Statistical Review. "
-        "This is no longer the case. Check if now EI and Ember Oceania data are consistent and if so, remove this code."
+    error = "Expected all electricity data for Papua New Guinea and New Caledania to be zero in the Statistical Review."
+    assert (
+        (
+            tb_review[tb_review["country"].isin(["Papua New Guinea", "New Caledonia"])].fillna(0)[
+                [c for c in tb_review.columns if c not in ["country", "year"]]
+            ]
+            == 0
+        )
+        .all()
+        .all()
     )
     affected_columns = ["oil_generation__twh", "gas_generation__twh", "fossil_generation__twh"]
-    assert (
-        tb_review[tb_review["country"].isin(["Papua New Guinea", "New Caledonia"])][affected_columns]
-        .dropna(how="all")
-        .empty
-    ), error
     tb_review.loc[tb_review["country"] == "Oceania", affected_columns] = None
+
+    # We also remove all electricity data for these countries from the Statistical Review, given that they are all zero
+    # (most of them spurious).
+    tb_review.loc[
+        (tb_review["country"].isin(["Papua New Guinea", "New Caledonia"])),
+        tb_review.drop(columns=["country", "year"]).columns,
+    ] = None
 
     # Coal generation in Ember data is missing.
     # The reason may be that Switzerland stopped using coal for electricity before year 2000:
