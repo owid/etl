@@ -104,6 +104,14 @@ def parse_sheet(data_additional: pr.ExcelFile, sheet: str, indicator: str, unit:
     # Drop columns of growth and share.
     tb = tb[[column for column in tb.columns if isinstance(column, int) or (column == "country")]]
 
+    ####################################################################################################################
+    # Temporary fix for a typo in the spreadsheet.
+    if sheet == "Solar Generation - TWh":
+        error = f"There was a spurious column in {sheet}, but this may have been fixed."
+        assert 20234 in tb.columns, error
+        tb = tb.drop(columns=[20234])
+    ####################################################################################################################
+
     # Clean country names.
     tb["country"] = (
         tb["country"]
