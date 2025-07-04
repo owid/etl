@@ -4,8 +4,8 @@
 
 from typing import List
 
-import numpy as np
 import owid.catalog.processing as pr
+import pandas as pd
 from owid.catalog import Dataset, Table
 
 from etl.data_helpers import geo
@@ -31,12 +31,6 @@ FRENCH_OVERSEAS_TERRITORIES = [
     "French Southern Territories",
 ]
 
-# Define regions to aggregate
-REGIONS = ["Europe", "Asia", "North America", "South America", "Africa", "Oceania", "World"]
-
-# Define fraction of allowed NaNs per year
-FRAC_ALLOWED_NANS_PER_YEAR = 0.2
-
 
 def run() -> None:
     #
@@ -44,9 +38,7 @@ def run() -> None:
     #
     # Load meadow dataset and read its main table.
     ds_meadow = paths.load_dataset("income_groups")
-    ds_regions = paths.load_dataset("regions")
-    ds_population = paths.load_dataset("population")
-    tb = ds_meadow["income_groups"].reset_index()
+    tb = ds_meadow.read("income_groups")
 
     #
     # Process data.
@@ -78,15 +70,6 @@ def run() -> None:
 
     # Extract data only for latest release (and remove column year).
     tb_latest = tb_latest[tb_latest["year"] == tb_latest["year"].max()].drop(columns=["year"])
-
-    tb = add_country_counts_and_population_by_status(
-        tb=tb,
-        columns=["classification"],
-        ds_regions=ds_regions,
-        ds_population=ds_population,
-        regions=REGIONS,
-        missing_data_on_columns=False,
-    )
 
     # Assign the same income group as France to the French overseas territories.
     tb = assign_french_overseas_group_same_as_france(
@@ -137,7 +120,7 @@ def run_sanity_checks_on_inputs(tb: Table) -> None:
         # Upper middle income.
         "UM",
         # Another label for when no classification is available.
-        np.nan,
+        pd.NA,
     }, f"Unknown income group label! Check {labels}"
 
 
@@ -149,7 +132,7 @@ def harmonize_income_group_labels(tb: Table) -> Table:
 
     # Rename labels.
     classification_mapping = {
-        "..": np.nan,
+        "..": pd.NA,
         "L": "Low-income countries",
         "H": "High-income countries",
         "UM": "Upper-middle-income countries",

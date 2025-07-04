@@ -701,11 +701,14 @@ steps:
 
   data://garden/wb/2025-07-01/income_groups:
     - data://meadow/wb/2025-07-01/income_groups
+  data://garden/wb/2025-07-01/income_groups_aggregations:
+    - data://garden/wb/2025-07-01/income_groups
     - data://garden/regions/2023-01-01/regions
     - data://garden/demography/2024-07-15/population
 
   data://grapher/wb/2025-07-01/income_groups:
     - data://garden/wb/2025-07-01/income_groups
+    - data://garden/wb/2025-07-01/income_groups_aggregations
 
   # Integrated Values Survey
   data://meadow/ivs/2025-06-27/integrated_values_surveys:
