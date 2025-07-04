@@ -25,8 +25,7 @@ def run() -> None:
 
     # Filter for Bribery category with specific indicators
     bribery_indicators = ["Persons convicted", "Persons prosecuted", "Persons arrested/cautioned/suspected"]
-    tb = tb[(tb["category"] == "Bribery") & (tb["indicator"].isin(bribery_indicators) & (tb["sex"] == "Total"))]
-
+    tb = tb[(tb["category"] == "Bribery") & (tb["indicator"].isin(bribery_indicators)) & (tb["sex"] == "Total")]
     tb["sex"] = tb["sex"].replace(
         {
             "Total": "all individuals",
