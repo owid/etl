@@ -275,7 +275,6 @@ def create_queries():
             "renal disease",
             "renal failure",
             "kidney failure",
-            "renal disease",
             "dialysis",
             "nephropathy",
             "nephrology",
