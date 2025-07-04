@@ -2,13 +2,13 @@
 definitions:
   common:
     description_key:
-      - Justice data is hard to compare across countries and over time due to different legal systems, data collection methods, and reporting practices.
-      - Cases move slowly through the justice system — arrests in one year typically lead to prosecutions the next year and convictions years later. This means arrest and conviction data from the same year reflect different groups of cases, making direct comparisons misleading.
-      - Different agencies (police, prosecutors, courts) maintain separate records using different criteria, creating data gaps that make it difficult to track cases from arrest to final outcome.
-      - Bribery cases are particularly complex, often involving criminal networks and requiring specialized expertise that many justice systems lack. This leads to higher case dismissal rates compared to other crimes.
-      - Countries use different data collection approaches. Some apply the "principal offence rule" (counting only the most serious crime when multiple offenses occur together), and adherence to international standards like the [International Classification of Crime for Statistical Purposes (ICCS)](https://www.unodc.org/unodc/en/data-and-analysis/statistics/iccs.html) varies significantly.
-      - Apparent anomalies — such as prosecution rates exceeding arrest rates — typically reflect these data collection challenges rather than procedural irregularities.
-      - Prosecution and conviction rates depend heavily on law enforcement intensity, reporting practices, and social norms. In places where bribery is normalized, it's often not considered serious enough to report.
+      - Justice data is difficult to compare across countries and over time due to differences in legal systems, data collection methods, and reporting practices.
+      - Cases can move slowly through the justice system. Arrests in one year often lead to prosecutions the next, and convictions years later. As a result, arrest and conviction data from the same year reflect different cases, making direct comparisons misleading.
+      - Different agencies — police, prosecutors, and courts — keep separate records using varying criteria. This creates gaps that make it hard to track individual cases from arrest to final outcome.
+      - Bribery cases are especially complex. They often involve criminal networks and require specialist expertise that many justice systems lack, leading to higher rates of case dismissal compared to other crimes.
+      - Countries use different data collection approaches. Some use the "principal offence rule," counting only the most serious crime when multiple offenses occur together. Adherence to international standards like the [International Classification of Crime for Statistical Purposes (ICCS)](https://www.unodc.org/unodc/en/data-and-analysis/statistics/iccs.html) also varies.
+      - Apparent anomalies — such as prosecution rates that exceed arrest rates — usually reflect differences in data collection, not irregularities in legal procedures.
+      - Arrest, prosecution and conviction rates are shaped by how strongly laws are enforced, how crimes are reported, and what societies consider worth reporting. In places where bribery is normalised, it is often not seen as serious enough to report.
       - Trends within countries can still be useful, especially when compared with survey data on [bribery prevalence](https://ourworldindata.org/grapher/bribery-prevalence-un). However, these trends may reflect changes in policing or reporting willingness, not just actual crime levels.
     presentation:
       topic_tags:
