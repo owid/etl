@@ -1,4 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
+# NOTE: We have manually modified the value for Ethiopia, because, although it is included in the file, it has officially a temporary status of unclassification.
+# NOTE: Check this back when it's fixed in the source file.
 
 from typing import List
 
@@ -20,6 +22,7 @@ EXPECTED_MISSING_COUNTRIES_IN_LATEST_RELEASE = {
     "USSR",
     "Venezuela",
     "Yugoslavia",
+    "Ethiopia",  # NOTE: This is the one we manually modified. Delete when it has a classification again.
 }
 
 # Define French overseas territories where we want to assign the same income group as France
@@ -59,6 +62,10 @@ def run() -> None:
 
     # Drop unnecessary columns.
     tb = tb.drop(columns=["country_code"], errors="raise")
+
+    # Delete the row for Ethiopia in the latest year, as it has a temporary status of unclassification.
+    # NOTE: This is a manual fix, delete the line when the source file is fixed.
+    tb = tb[~((tb["country"] == "Ethiopia") & (tb["year"] == tb["year"].max()))].reset_index(drop=True)
 
     # Create an additional table for the classification of the latest year available.
     tb_latest = tb.reset_index(drop=True).drop_duplicates(subset=["country"], keep="last")
