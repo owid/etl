@@ -18,7 +18,7 @@ definitions:
       - High-income countries are those with a GNI per capita of more than $13,935 in 2024.
       - Venezuela, classified as an upper-middle income country until the fiscal year 2021, has been unclassified since then due to the unavailability of data. Ethiopia is currently in a temporary status of unclassification.
 
-  description_processing_count_population: We count the countries in each income group and also calculate the total population in them by using a long-run dataset [mantained by Our World in Data](https://ourworldindata.org/population-sources).
+  description_processing_count_population: We count the countries in each income group and also calculate the total population in them by using a long-run dataset [maintained by Our World in Data](https://ourworldindata.org/population-sources).
 
   classification_sort: &classification_sort
     - Low-income countries
