@@ -358,13 +358,15 @@ def fix_discrepancies_in_aggregate_regions(tb_review: Table, tb_ember: Table, co
     segments_not_combined.update(
         {
             "Lower-middle-income countries": [
+                "fossil_generation__twh",
+                "gas_generation__twh",
                 "hydro_generation__twh",
-                "nuclear_generation__twh",
+                "low_carbon_generation__twh",
                 "oil_generation__twh",
                 "renewable_generation__twh",
             ],
-            "Upper-middle-income countries": ["nuclear_generation__twh", "oil_generation__twh"],
-            "High-income countries": ["gas_generation__twh", "oil_generation__twh"],
+            "Upper-middle-income countries": ["gas_generation__twh", "oil_generation__twh"],
+            "High-income countries": ["oil_generation__twh"],
             "Europe": ["oil_generation__twh"],
             "North America": ["oil_generation__twh"],
             "European Union (27)": ["oil_generation__twh"],
