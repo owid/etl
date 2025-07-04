@@ -158,14 +158,11 @@ tables:
         description_short: |-
           Share of respondents who reported having contact with a public official in the past 12 months and paying or being asked to pay a [bribe](#dod:bribery).
         description_key:
-          - This measure tracks how common bribery is when citizens interact with public officials.
-          - It shows the proportion of people who interacted with a public official in the past year and reported either paying a bribe or being asked to pay one.
-          - Bribes include extra payments, gifts, or favors given in exchange for special treatment from government workers.
-          - The focus is on everyday administrative bribery—the type most citizens face in routine interactions with public officials.
-          - Public officials can hold a legislative, executive, administrative or judicial office, such as customs or police officers, judges, teachers or doctors.
-          - It does not cover high-level political corruption, influence trading, or abuse of power.
+          - This measure tracks how common bribery is when citizens interact with public officials.It shows the proportion of people who interacted with a public official in the past year and reported either paying a bribe or being asked to pay one.
+          - Bribes include extra payments, gifts, or favors given in exchange for special treatment from government workers. The focus is on everyday administrative bribery—the type most citizens face in routine interactions with public officials.
+          - Public officials can hold a legislative, executive, administrative or judicial office, such as customs or police officers, judges, teachers or doctors. It does not cover high-level political corruption, influence trading, or abuse of power.
           - Data is collected through national surveys. Respondents report only their own direct experiences, though cases involving middlemen are included. Indirect accounts from other household members are not.
-          - When national authorities do not provide appropriate data, Global Corruption Barometer (GCB) data is integrated if the methodology is sufficiently close to SDG requirements. All non-governmental data is then reviewed and validated by national authorities, typically national statistics offices.
+          - When national authorities do not provide appropriate data, [Global Corruption Barometer (GCB)](https://www.transparency.org/en/gcb) data is integrated if the methodology is sufficiently close to SDG requirements. All non-governmental data is then reviewed and validated by national authorities, typically national statistics offices.
           - Differences between GCB and other sources may reflect variations in question wording (GCB asks about 6-8 specific services vs. any interactions with public officials), computation methods (treatment of persons without contact with officials), sample sizes (GCB typically uses 1,000-1,500 respondents), and interviewing methods (e.g., random digit dialing vs. household surveys).
           - Bribery usually leaves no trace in financial records or documentation. Surveys offer a practical approach for measuring these events.
           - Many surveys have historically excluded people who were asked for a bribe but refused to pay. This leads to underestimates and could be one reason for lower reported shares in earlier years. More countries are now using standardized methods to address this.
