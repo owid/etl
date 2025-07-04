@@ -25,7 +25,7 @@ tables:
   justice:
     variables:
       value:
-        title: << indicator >> in bribery cases - (<< unit_of_measurement.lower() >>)
+        title: << indicator >> in bribery cases (<< unit_of_measurement.lower() >>)
         description_short: |-
           <% if indicator == "Persons convicted" %>
           The number of people found guilty of crimes by the courts, as reported by national authorities. Bribery cases include those involving attempts to influence public or private sector decision-making through undue advantages.
@@ -43,9 +43,9 @@ tables:
         presentation:
          title_public: |-
             <%- if unit_of_measurement.lower() == "counts" %>
-            << indicator >> in bribery cases - (<< unit_of_measurement.lower() >>)
+            << indicator >> in bribery cases (<< unit_of_measurement.lower() >>)
             <% elif unit_of_measurement.lower() == "rate per 100,000 population" %>
-            << indicator >> in bribery cases - (<< unit_of_measurement.lower() >>)
+            << indicator >> in bribery cases (<< unit_of_measurement.lower() >>)
             <%- endif -%>
         display:
           name:
