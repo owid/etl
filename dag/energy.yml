@@ -22,7 +22,7 @@ steps:
     - snapshot://shift/2023-12-12/energy_production_from_fossil_fuels.csv
   data://garden/shift/2023-12-12/energy_production_from_fossil_fuels:
     - data://meadow/shift/2023-12-12/energy_production_from_fossil_fuels
-    - data://garden/wb/2023-04-30/income_groups
+    - data://garden/wb/2025-07-01/income_groups
     - data://garden/regions/2023-01-01/regions
   #
   # UK BEIS - UK historical electricity.
@@ -38,7 +38,7 @@ steps:
     - snapshot://eia/2023-12-12/international_energy_data.zip
   data://garden/eia/2023-12-12/energy_consumption:
     - data://meadow/eia/2023-12-12/energy_consumption
-    - data://garden/wb/2023-04-30/income_groups
+    - data://garden/wb/2025-07-01/income_groups
     - data://garden/regions/2023-01-01/regions
   #
   # Energy - OWID Energy dataset.
@@ -63,7 +63,7 @@ steps:
   data://garden/energy_institute/2024-06-20/statistical_review_of_world_energy:
     - data://meadow/energy_institute/2024-06-20/statistical_review_of_world_energy
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2024-03-11/income_groups
+    - data://garden/wb/2025-07-01/income_groups
   #
   # Energy Institute - Statistical Review of World Energy.
   #
@@ -86,7 +86,7 @@ steps:
   data://garden/energy/2024-06-20/energy_mix:
     - data://garden/demography/2023-03-31/population
     - data://garden/energy_institute/2024-06-20/statistical_review_of_world_energy
-    - data://garden/wb/2024-03-11/income_groups
+    - data://garden/wb/2025-07-01/income_groups
   #
   # Energy - Energy mix.
   #
@@ -138,7 +138,7 @@ steps:
   data://garden/irena/2024-11-01/renewable_capacity_statistics:
     - data://meadow/irena/2024-11-01/renewable_capacity_statistics
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/wb/2025-07-01/income_groups
   #
   # IRENA - Renewable electricity capacity.
   #
@@ -292,7 +292,7 @@ steps:
   # Ember - Yearly electricity data (Global and Europe).
   #
   data://garden/ember/2025-05-12/yearly_electricity:
-    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/wb/2025-07-01/income_groups
     - data://garden/regions/2023-01-01/regions
     - data://garden/demography/2024-07-15/population
     - data://meadow/ember/2025-05-12/yearly_electricity
@@ -328,7 +328,7 @@ steps:
   # IRENA - Renewable energy patents.
   #
   data://garden/irena/2025-06-20/renewable_energy_patents:
-    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/wb/2025-07-01/income_groups
     - data://meadow/irena/2025-06-20/renewable_energy_patents
     - data://garden/regions/2023-01-01/regions
   #
