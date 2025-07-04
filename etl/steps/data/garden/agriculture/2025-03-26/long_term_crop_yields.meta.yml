@@ -8,13 +8,13 @@ definitions:
         - Crop Yields
 
 dataset:
+  title: Long-term crop yields
   update_period_days: 365
   description: |-
     This is a compilation of all our data on crop yields, extracted from different sources. The majority of the data comes from FAOSTAT, where the earliest information is of 1961. However, where possible, we complement that data with other sources, to have long-run series on crop yields, going back to even the XIII century.
 
 tables:
   long_term_crop_yields:
-    title: Long-term crop yields
     variables:
       maize_yield:
         title: Maize yield
@@ -354,3 +354,20 @@ tables:
         title: Yams yield
       yautia_yield:
         title: Yautia yield
+  long_term_crop_yields_smoothed:
+    title: Long-term crop yields (10-year rolling averages)
+    variables:
+      barley_yield_smoothed:
+        title: Barley yield (10-year rolling averages)
+      oats_yield_smoothed:
+        title: Oats yield (10-year rolling averages)
+      potatoes_yield_smoothed:
+        title: Potatoes yield (10-year rolling averages)
+      pulses_yield_smoothed:
+        title: Pulses yield (10-year rolling averages)
+      rye_yield_smoothed:
+        title: Rye yield (10-year rolling averages)
+      sugar_beet_yield_smoothed:
+        title: Sugar beet yield (10-year rolling averages)
+      wheat_yield_smoothed:
+        title: Wheat yield (10-year rolling averages)
