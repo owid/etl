@@ -191,9 +191,9 @@ def run() -> None:
 
     tb_mm["nyt_over_under"] = tb_mm["nyt_share"] / tb_mm["deaths_share"]
     # set values smaller 1 to negative reciprocal
-    tb_mm.loc[tb_mm["nyt_over_under"] < 1, "nyt_over_under"] = -1 / tb_mm.loc[
+    tb_mm.loc[tb_mm["nyt_over_under"] < 1, "nyt_over_under"] = (-1 / tb_mm.loc[
         tb_mm["nyt_over_under"] < 1, "nyt_over_under"
-    ].round(2)
+    ]).round(2)
 
     # format table
     tb = tb_mm.format(["cause", "year"])
