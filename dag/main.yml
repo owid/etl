@@ -734,11 +734,9 @@ steps:
 
   #
   # OECD Affordable Housing Database
-  data://meadow/oecd/2025-07-03/affordable_housing:
+  data://garden/oecd/2025-07-03/affordable_housing:
     - snapshot://oecd/2025-07-03/affordable_housing_income.xlsx
     - snapshot://oecd/2025-07-03/affordable_housing.xlsx
-  data://garden/oecd/2025-07-03/affordable_housing:
-    - data://meadow/oecd/2025-07-03/affordable_housing
   data://grapher/oecd/2025-07-03/affordable_housing:
     - data://garden/oecd/2025-07-03/affordable_housing
 

@@ -30,6 +30,13 @@ def run() -> None:
         value_name="hc_share",
     )
 
+    tb_soc = geo.harmonize_countries(
+        tb_soc,
+        countries_file=paths.country_mapping_path,
+        country_col="Country",
+        warn_on_unused_countries=False,
+    )
+
     # housing cost burden split by owner and renter
     tb_hc_b = snap_1_2.read_excel(sheet_name="HC12_A1", header=4)
     tenure_types_b = ["Owner with mortgage", "Rent (private and subsidised)"]
@@ -94,6 +101,8 @@ def run() -> None:
 
     tb_b_full = pd.concat(burden_tables, axis=0)
 
+    tb_b = geo.harmonize_countries(tb_b_full, countries_file=paths.country_mapping_path, warn_on_unused_countries=False)
+
     index_cols = ["country", "year", "quintile", "tenure_type"]
 
     # get all combinations of country, year, quintile, and tenure type
@@ -117,16 +126,11 @@ def run() -> None:
     )
 
     # harmonize country names
-    geo.harmonize_countries(
+    tb_soc = geo.harmonize_countries(
         tb_soc,
         countries_file=paths.country_mapping_path,
-        country_column="Country",
-    )
-
-    geo.harmonize_countries(
-        tb_b,
-        countries_file=paths.country_mapping_path,
-        country_column="country",
+        country_col="Country",
+        warn_on_unused_countries=False,
     )
 
     tb_soc = tb_soc.format(["year", "country"], short_name="housing_costs_share")
