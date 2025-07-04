@@ -49,7 +49,7 @@ SHEET_INDICATOR_UNITS = [
     ("Renewables Consumption -EJ", "renewables_ej", "Exajoules"),
     ("Renewable Power (inc hydro) -EJ", "ren_power_ej", "Exajoules"),
     ("Renewable Power (inc hydro)-TWh", "ren_power_twh", "Terawatt-hours"),
-    ("Renewables Generation by Source", "electbyfuel_ren_power", "Terawatt-hours"),
+    # ("Renewables Generation by Source", "electbyfuel_ren_power", "Terawatt-hours"),
     ("Solar Generation - TWh", "solar_twh", "Terawatt-hours"),
     ("Solar Consumption - EJ", "solar_ej", "Exajoules"),
     # ('Solar Installed Capacity', 'UNKNOWN', 'nan'),
@@ -64,7 +64,7 @@ SHEET_INDICATOR_UNITS = [
     # ('Biofuels Consumption - kboed', 'biofuels_cons_kboed', 'Thousand barrels of oil equivalent per day'),
     # ('Biofuels consumption - PJ', 'biofuels_cons_pj', 'Petajoules'),
     ("Electricity Generation - TWh", "elect_twh", "Terawatt-hours"),
-    ("Elec generation by fuel", "electbyfuel_total", "Terawatt-hours"),
+    # ("Elec generation by fuel", "electbyfuel_total", "Terawatt-hours"),
     ("Oil inputs - Elec generation ", "electbyfuel_oil", "Terawatt-hours"),
     ("Gas inputs - Elec generation", "electbyfuel_gas", "Terawatt-hours"),
     ("Coal inputs - Elec generation ", "electbyfuel_coal", "Terawatt-hours"),
@@ -133,6 +133,7 @@ def parse_sheet(data_additional: pr.ExcelFile, sheet: str, indicator: str, unit:
         "Turkey": "Turkiye",
         "Western Africa": "Total Western Africa",
         "DR Congo": "Democratic Republic of Congo",
+        "Other North Africa": "Other Northern Africa",
     }
     tb["country"] = map_series(
         tb["country"],
@@ -502,6 +503,48 @@ def parse_thermal_equivalent_efficiency(data: pr.ExcelFile, origin: Origin, lice
     return efficiency
 
 
+def combine_consolidated_dataset_and_spreadsheet(tb_consolidated, data_additional):
+    tables = []
+    for sheet, indicator, unit in SHEET_INDICATOR_UNITS:
+        _table = parse_sheet(data_additional=data_additional, sheet=sheet, indicator=indicator, unit=unit)
+        assert list(_table.columns) == ["country", "year", indicator]
+        assert not _table.empty
+        tables.append(_table)
+    tb_additional = pr.multi_merge(tables, on=["country", "year"], how="outer")
+    # Sanity checks.
+    error = "Duplicated rows found when combining data extracted from sheets. Sheets format may have changed."
+    assert tb_additional[tb_additional.duplicated(subset=["country", "year"])].empty, error
+    error = (
+        "Unexpected mismatch between entities extracted from the consolidated dataset and those from the spreadsheet."
+    )
+    assert set(tb_additional["country"]) - set(tb_consolidated["country"]) == set(), error
+    # However, there are entities in the consolidated dataset which do have nonzero data, which is not present in the spreadsheet.
+    # But they are all "Other*" regions, so we can also ignore them.
+    # tb[tb["country"] == "Other Eastern Africa"].loc[:, subset.ne(0).any()]
+    assert set(tb_consolidated["country"]) - set(tb_additional["country"]) == {
+        "Other Eastern Africa",
+        "Other Middle Africa",
+        "Other North America",
+        "Other Western Africa",
+    }
+
+    # Check that the only indicator that is in the spreadsheet and not in the consolidated dataset is primary energy consumption.
+    error = "Expected only primary energy consumption to be in the spreadsheet but not in the consolidated dataset."
+    assert set(tb_additional.columns) - set(tb_consolidated.columns) == {"primary_ej"}, error
+
+    # Combine data from the consolidated dataset with the one from the spreadsheet.
+    # If an indicator is in the spreadsheet, take that one, otherwise, take it from the consolidated dataset.
+    tb_combined = tb_consolidated[
+        [
+            column
+            for column in tb_consolidated.columns
+            if column not in tb_additional.drop(columns=["country", "year"]).columns
+        ]
+    ].merge(tb_additional, on=["country", "year"], how="outer")
+
+    return tb_combined
+
+
 def run() -> None:
     #
     # Load inputs.
@@ -511,41 +554,16 @@ def run() -> None:
     snap_additional = paths.load_snapshot("statistical_review_of_world_energy.xlsx")
 
     # Most data comes from the wide-format csv file, and some additional variables from the excel file.
-    tb = snap.read(underscore=True)
+    tb_consolidated = snap.read(underscore=True)
     data_additional = snap_additional.ExcelFile()
 
     #
     # Process data.
     #
-    ####################################################################################################################
-    # TODO: Make a function:
-    tables = []
-    for sheet, indicator, unit in SHEET_INDICATOR_UNITS:
-        _table = parse_sheet(data_additional=data_additional, sheet=sheet, indicator=indicator, unit=unit)
-        assert list(_table.columns) == ["country", "year", indicator]
-        tables.append(_table)
-    tb_additional = pr.multi_merge(tables, on=["country", "year"], how="outer")
-    # Sanity checks.
-    error = "Duplicated rows found when combining data extracted from sheets. Sheets format may have changed."
-    assert tb_additional[tb_additional.duplicated(subset=["country", "year"])].empty, error
-    error = (
-        "Unexpected mismatch between entities extracted from the consolidated dataset and those from the spreadsheet."
-    )
-    # "Other North Africa" is not in the consolidated dataset, but in the spreadsheet appears only in "Geo Biomass Other - TWh", and it's all zeros.
-    # So this is not relevant.
-    assert set(tb_additional["country"]) - set(tb["country"]) == {"Other North Africa"}, error
-    # However, there are entities in the consolidated dataset which do have nonzero data, which is not present in the spreadsheet.
-    # But they are all "Other*" regions, so we can also ignore them.
-    # tb[tb["country"] == "Other Eastern Africa"].loc[:, subset.ne(0).any()]
-    assert set(tb["country"]) - set(tb_additional["country"]) == {
-        "Other Eastern Africa",
-        "Other Middle Africa",
-        "Other North America",
-        "Other Western Africa",
-    }
-    ####################################################################################################################
-
-    # TODO: For now, keep loading all indicators (except primary energy) from the consolidated dataset. But then compare them with the ones from the spreadsheet, and eventually use the latter (which should not be affected by the missing zeros issue). Hopefully, we don't find new issues in the data from the spreadsheet.
+    # Extract most of the data from the main spreadsheet, and some from the consolidated dataset.
+    # NOTE: It used to be the other way around, and we usted to rely mostly on the consolidated dataset.
+    # But several important issues have been detected in the consolidated dataset (see docstring of snapshot).
+    tb = combine_consolidated_dataset_and_spreadsheet(tb_consolidated=tb_consolidated, data_additional=data_additional)
 
     # Parse coal reserves sheet.
     tb_coal_reserves = parse_coal_reserves(data=data_additional)
@@ -577,7 +595,6 @@ def run() -> None:
     tb = pr.multi_merge(
         [
             tb,
-            tb_additional[["country", "year", "primary_ej"]],
             tb_coal_reserves.reset_index(),
             tb_gas_reserves.reset_index(),
             tb_oil_reserves.reset_index(),
