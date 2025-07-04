@@ -135,11 +135,12 @@ tables:
     title: World Bank's latest income classification
     variables:
       classification:
-        title: World Bank's {year_world_bank_classification} income classification
+        title: World Bank's latest income classification
         unit: ""
         description_short: Income classification based on the country's income for the latest year informed.
         type: ordinal
         display:
+          name: World Bank's {year_world_bank_classification} income classification
           # Assign an arbitrarily large tolerance to be able to show the income groups for all years in the Table tab.
           tolerance: 1000
         sort: *classification_sort
