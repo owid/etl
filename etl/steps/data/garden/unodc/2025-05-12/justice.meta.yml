@@ -25,15 +25,13 @@ tables:
   justice:
     variables:
       value:
-        title: << indicator >>  - << category.lower() >> << age.lower() >> << sex.lower() >> (<< unit_of_measurement.lower() >>)
+        title: << indicator >> in bribery cases - (<< unit_of_measurement.lower() >>)
         description_short: |-
-          <% if indicator == "Persons brought before criminal courts" and category.lower() == "bribery" %>
-          The number of people brought before criminal courts for alleged bribery offences, as reported by national authorities. Bribery cases include those involving attempts to influence public or private sector decision-making through undue advantages.
-          <% elif indicator == "Persons convicted" and category.lower() == "bribery" %>
+          <% if indicator == "Persons convicted" %>
           The number of people found guilty of crimes by the courts, as reported by national authorities. Bribery cases include those involving attempts to influence public or private sector decision-making through undue advantages.
-          <% elif indicator == "Persons prosecuted" and category.lower() == "bribery" %>
+          <% elif indicator == "Persons prosecuted" %>
           The number of people formally charged with crimes, as reported by national authorities. Bribery cases include those involving attempts to influence public or private sector decision-making through undue advantages.
-          <% elif indicator == "Persons arrested/cautioned/suspected" and category.lower() == "bribery" %>
+          <% elif indicator == "Persons arrested/cautioned/suspected" %>
           The number of people arrested, given formal warnings, or identified as suspects, as reported by national authorities. Bribery cases include those involving attempts to influence public or private sector decision-making through undue advantages.
           <%- endif -%>
         unit: |-
@@ -42,3 +40,19 @@ tables:
           <% elif unit_of_measurement.lower() == "rate per 100,000 population" %>
           people per 100,000 population
           <%- endif -%>
+        presentation:
+         title_public: |-
+            <%- if unit_of_measurement.lower() == "counts" %>
+            << indicator >> in bribery cases - (<< unit_of_measurement.lower() >>)
+            <% elif unit_of_measurement.lower() == "rate per 100,000 population" %>
+            << indicator >> in bribery cases - (<< unit_of_measurement.lower() >>)
+            <%- endif -%>
+        display:
+          name:
+            <% if indicator == "Persons convicted" %>
+            Convictions
+            <% elif indicator == "Persons prosecuted" %>
+            Prosecutions
+            <% elif indicator == "Persons arrested/cautioned/suspected" %>
+            Arrests
+            <%- endif -%>
