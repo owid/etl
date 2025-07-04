@@ -8,7 +8,7 @@ steps:
   # Create a step with regions data used by the owid-grapher repository.
   data://external/owid_grapher/latest/regions:
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/wb/2025-07-01/income_groups
   # Create a step with a simplified countries-regions file used by the notebooks repository.
   data://external/notebooks/latest/regions:
     - data://grapher/regions/2023-01-01/regions
@@ -295,14 +295,6 @@ steps:
     - data://garden/regions/2023-01-01/regions
   data://grapher/state_capacity/2023-11-20/information_capacity_dataset:
     - data://garden/state_capacity/2023-11-10/information_capacity_dataset
-
-  # Integrated Values Survey
-  data://meadow/ivs/2023-11-27/integrated_values_survey:
-    - snapshot://ivs/2023-11-27/integrated_values_survey.csv
-  data://garden/ivs/2023-11-27/integrated_values_survey:
-    - data://meadow/ivs/2023-11-27/integrated_values_survey
-  data://grapher/ivs/2023-11-27/integrated_values_survey:
-    - data://garden/ivs/2023-11-27/integrated_values_survey
 
   # National Human Genome Research Institute - DNA Sequencing Costs
   data://meadow/technology/2023-11-28/dna_sequencing:
@@ -703,10 +695,11 @@ steps:
     - snapshot://housing/2025-06-25/knoll_prices.dta
   data://garden/housing/2025-06-25/knoll_prices:
     - data://meadow/housing/2025-06-25/knoll_prices
+    - data://garden/ggdc/2024-04-26/maddison_project_database
   data://grapher/housing/2025-06-25/knoll_prices:
     - data://garden/housing/2025-06-25/knoll_prices
-  
-  
+
+
   # OECD Analytical House Prices
   data://meadow/oecd/2025-06-20/housing_prices:
     - snapshot://oecd/2025-06-20/housing_prices.csv
@@ -727,6 +720,28 @@ steps:
 
   data://grapher/pew/2025-06-27/same_sex_marriage:
     - data://garden/pew/2025-06-27/same_sex_marriage
+
+  # WB income groups 2025-07-01
+  data://meadow/wb/2025-07-01/income_groups:
+    - snapshot://wb/2025-07-01/income_groups.xlsx
+
+  data://garden/wb/2025-07-01/income_groups:
+    - data://meadow/wb/2025-07-01/income_groups
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2024-07-15/population
+
+  data://grapher/wb/2025-07-01/income_groups:
+    - data://garden/wb/2025-07-01/income_groups
+
+  # Integrated Values Survey
+  data://meadow/ivs/2025-06-27/integrated_values_surveys:
+    - snapshot://ivs/2025-06-27/integrated_values_surveys.csv
+
+  data://garden/ivs/2025-06-27/integrated_values_surveys:
+    - data://meadow/ivs/2025-06-27/integrated_values_surveys
+
+  data://grapher/ivs/2025-06-27/integrated_values_surveys:
+    - data://garden/ivs/2025-06-27/integrated_values_surveys
 
 include:
   - dag/open_numbers.yml
