@@ -2,12 +2,11 @@
 definitions:
   common:
     description_key:
-      - Crime data can be difficult to compare between countries because of differences in how justice systems work, when the data is collected (for example, when a crime is first reported or after it has been investigated), and how international guidelines are used in each country.
-      - Many crimes are never reported by victims, so the data cannot be used to measure exactly how common crime is. However, the data is still useful for spotting patterns and trends over time.
-      - Most crime data come from records kept by the police or other law enforcement agencies. Countries vary in whether they record a crime when it is first reported, during an investigation, or after the investigation is finished.
-      - In some countries, more than one agency collects crime data, and these different sets of data must be combined before they are published.
-      - Rates on prosecutions, convictions, etc. for various offenses including bribery depend very strongly on national law enforcement efforts, recording and reporting practices, and even social norms. For example, in some places, bribery is so normalised that instances are rarely taken seriously enough to be reported to the police.
-      - "Analysis of trends in law enforcement data within countries can be useful, especially when analysed together with survey data on prevalence, but trends are potentially the result of at least three changes: changes in the actual prevalence of the crime, changes in the intensity of law enforcement in relation to the crime, and changes in the reporting practices of victims of that crime."
+      - Crime data is hard to compare between countries. Justice systems work differently, and countries vary in how and when they record crimes — whether it’s when the crime is first reported, during an investigation, or after it’s resolved. They also differ in how they apply international guidelines.
+      - Many crimes are never reported, so official records don’t capture the full picture. That means we can’t use the data to measure exactly how common crime is. But it’s still valuable for spotting patterns and changes over time.
+      - Most crime statistics come from police or other law enforcement agencies. In some countries, several agencies are involved, and their records can take time to be collected, processed, and published. This can mean that an arrest happening in one year may be prosecuted and convicted in later years.
+      - Prosecution and conviction rates — especially for crimes like bribery — depend heavily on how strongly the law is enforced, how crimes are reported and recorded, and what society considers worth reporting. In places where bribery is normalised, it’s often not seen as serious enough to report.
+      - Looking at trends within a country can still be useful, especially when law enforcement data is compared with survey data on [bribery prevalence](https://ourworldindata.org/grapher/bribery-prevalence-un). But these trends can reflect more than just changes in crime itself. They might also reflect changes in policing, or in how willing people are to report crimes.
     presentation:
       topic_tags:
         - Corruption
