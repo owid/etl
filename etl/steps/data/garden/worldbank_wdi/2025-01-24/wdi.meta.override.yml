@@ -757,11 +757,12 @@ tables:
         short_unit: '%'
         description_short: *description_short_electricity
         description_key:
-          - "Access to electricity improves people's living conditions in many ways. [Light at night](https://ourworldindata.org/light-at-night) makes it possible to get together after sunset; mobile phones allow us to stay in touch with those far away; the refrigeration of food reduces food waste; and household appliances free up time from household chores."
+          - "Access to electricity improves people's living conditions in many ways. [Light at night](https://ourworldindata.org/light-at-night) makes it possible to get together after sunset; mobile phones allow us to stay in touch with those far away; refrigeration reduces food waste; and household appliances free up time from chores."
           - This data captures whether people have access to the most basic electricity supply — just enough to provide basic lighting and charge a phone or power a radio for 4 hours per day.
-          - It shows that, especially in several African countries, a large share of the population lacks the benefits that basic electricity offers. No light at night, no way to charge a phone, no access to radio, no refrigeration for food or medicine, and no power for the most basic household needs.
-          - "This data comes from the World Bank's World Development Indicators, which reports the official Sustainable Development Goal (SDG) 7.1.1 indicator on access to electricity. Estimates are based on national household surveys, census data, and reports from energy providers or government agencies. Where data is missing, values are estimated using a model informed by trends across countries, regions, and time. Some countries classified as developed by the United Nations are assumed to have universal access."
-          - "To learn more, read our article [Definitions: access to electricity](https://ourworldindata.org/definition-electricity-access)"
+          - It shows that, especially in several African countries, a large share of the population lacks the benefits of basic electricity.
+          - Universal access to electricity by 2030 is one of the United Nations [Sustainable Development Goals](https://ourworldindata.org/sdgs/affordable-clean-energy#sdg-indicator-7-1-1-access-to-electricity).
+          - "This data comes from the World Bank's World Development Indicators. Estimates are based on national household surveys, census data, and reports from energy providers or government agencies. Where data is missing, values are estimated by the source using a model based on trends across countries, regions, and time. Countries classified as “developed” by the United Nations are assumed to have universal access."
+          - "To learn more, read our article: [Definitions: access to electricity](https://ourworldindata.org/definition-electricity-access)."
         presentation:
           title_public: Share of the population with access to electricity
           attribution: Data compiled from multiple sources by World Bank
@@ -771,7 +772,7 @@ tables:
             - Energy
         processing_level: minor
         display:
-          numDecimalPlaces: 1
+          numSignificantFigures: 2
           tolerance: 5
       sn_itk_defc_zs:
         title: Prevalence of undernourishment (% of population)
