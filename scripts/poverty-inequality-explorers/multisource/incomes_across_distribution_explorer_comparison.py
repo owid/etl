@@ -149,7 +149,7 @@ header_dict = {
         "China",
     ],
     "explorerSubtitle": "Compare World Bank, WID, and LIS data on the distribution of incomes.",
-    "isPublished": "true",
+    "isPublished": "false",
     "googleSheet": "",
     "wpBlockId": "57742",
     "entityType": "country or region",
