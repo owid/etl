@@ -34,6 +34,9 @@ def run() -> None:
             "Corruption: Bribery": "Bribery",
         }
     )
+    # Keep only the specified categories
+    tb = tb[tb["category"].isin(["Corruption", "Bribery", "Other acts of corruption"])]
+
     # Use american spelling for "offences"
     tb["indicator"] = tb["indicator"].replace(
         {
