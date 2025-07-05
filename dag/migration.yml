@@ -38,7 +38,7 @@ steps:
   data://garden/wb/2024-12-17/bilateral_remittance:
     - data://meadow/wb/2024-12-17/knomad
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/wb/2025-07-01/income_groups
   data://grapher/wb/2024-12-17/bilateral_remittance:
     - data://garden/wb/2024-12-17/bilateral_remittance
 
@@ -53,7 +53,7 @@ steps:
   data://garden/migration/2024-11-18/migration_between_regions:
     - data://garden/un/2025-03-12/migrant_stock
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/wb/2025-07-01/income_groups
   data://grapher/migration/2024-11-18/migration_between_regions:
     - data://garden/migration/2024-11-18/migration_between_regions
 
@@ -73,7 +73,7 @@ steps:
     - snapshot://un/2025-03-12/migrant_stock_dest_origin.xlsx
   data://garden/un/2025-03-12/migrant_stock:
     - data://meadow/un/2025-03-12/migrant_stock
-    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/wb/2025-07-01/income_groups
     - data://garden/regions/2023-01-01/regions
   data://grapher/un/2025-03-12/migrant_stock:
     - data://garden/un/2025-03-12/migrant_stock
@@ -81,7 +81,7 @@ steps:
   # UN DESA migrant stock flows (2024)
   data://garden/un/2025-03-18/migration_stock_flows:
     - data://garden/un/2025-03-12/migrant_stock
-    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/wb/2025-07-01/income_groups
     - data://garden/regions/2023-01-01/regions
   data://grapher/un/2025-03-18/migration_stock_flows:
     - data://garden/un/2025-03-18/migration_stock_flows
