@@ -24,7 +24,8 @@ def run() -> None:
         sheet_name="Figure HC1.1.2", usecols="J:AL", header=2
     )  # housing costs share of consumption
     tb_soc = tb_soc.dropna(subset=["Country"])  # drop empty rows
-    tb_soc = tb_soc.melt(
+    tb_soc = pr.melt(
+        tb_soc,
         id_vars=["Country"],
         var_name="year",
         value_name="hc_share",
@@ -62,7 +63,7 @@ def run() -> None:
     tb_hc_ob_q = snap_1_2.read_excel(sheet_name="HC12_A3", header=[4, 5])
     tb_hc_ob_q.columns = [f"{item[0]}_{item[1]}" for item in tb_hc_ob_q.columns]
     tb_hc_ob_q = remove_notes(tb_hc_ob_q)
-    tenure_types_ob = ["Owner with mortgage", "Rent (private and subsidised)"]
+    tenure_types_ob = ["Owner with mortgage", "Rent (private)", "Rent (subsidised)"]
     tb_hc_ob_q = melt_housing_records(tb_hc_ob_q, tenure_types=tenure_types_ob, value_col="hc_overburden")
 
     # housing cost overburden split by owner and renter, all quintiles
@@ -99,9 +100,11 @@ def run() -> None:
     for tb in burden_tables:
         tb = tb.reset_index()
 
-    tb_b_full = pd.concat(burden_tables, axis=0)
+    tb_b_full = pr.concat(burden_tables, axis=0)
 
-    tb_b = geo.harmonize_countries(tb_b_full, countries_file=paths.country_mapping_path, warn_on_unused_countries=False)
+    tb_b_full = geo.harmonize_countries(
+        tb_b_full, countries_file=paths.country_mapping_path, warn_on_unused_countries=False
+    )
 
     index_cols = ["country", "year", "quintile", "tenure_type"]
 
@@ -125,13 +128,9 @@ def run() -> None:
         how="left",
     )
 
-    # harmonize country names
-    tb_soc = geo.harmonize_countries(
-        tb_soc,
-        countries_file=paths.country_mapping_path,
-        country_col="Country",
-        warn_on_unused_countries=False,
-    )
+    # convert into percentage
+    tb_b["hc_burden"] = tb_b["hc_burden"] * 100
+    tb_b["hc_overburden"] = tb_b["hc_overburden"] * 100
 
     tb_soc = tb_soc.format(["year", "country"], short_name="housing_costs_share")
     tb_b = tb_b.format(["year", "country", "quintile", "tenure_type"], short_name="housing_costs_burden")
@@ -166,7 +165,8 @@ def remove_notes(tb, break_str: str = BREAK_STR, index_col: str = "index"):
 
 def melt_housing_records(tb, tenure_types=[], value_col="value", index_col="index"):
     # check whether tb has MultiIndex columns
-    tb = tb.melt(
+    tb = pr.melt(
+        tb,
         id_vars=[index_col],
         var_name="year",  # this will be the year and quintile for multi-index columns
         value_name=value_col,

@@ -13,46 +13,54 @@ dataset:
 
 
 tables:
-  affordable_housing_income:
+  housing_costs_burden:
     variables:
-      # testing_variable:
-      #   title: Testing variable title
-      #   unit: arbitrary units
-      #   short_unit: au
-      #   description_short: Short description of testing variable.
-      #   description_processing: Description of processing of testing variable.
-      #   description_key: List of key points about the indicator.
-      #   description_from_producer: Description of testing variable from producer.
-      #   processing_level: minor
-      #   type:
-      #   sort:
-      #   presentation:
-      #     attribution:
-      #     attribution_short:
-      #     faqs:
-      #     grapher_config:
-      #     title_public:
-      #     title_variant:
-      #     topic_tags:
-      #   display:
-      #     name: Testing variable
-      #     numDecimalPlaces: 0
-      #     tolerance: 0
-      #     color:
-      #     conversionFactor: 1
-      #     description:
-      #     entityAnnotationsMap: Test annotation
-      #     includeInTable:
-      #     isProjection: false
-      #     unit: arbitrary units
-      #     shortUnit: au
-      #     tableDisplay:
-      #       hideAbsoluteChange:
-      #       hideRelativeChange:
-      #     yearIsDay: false
-      #     zeroDay:
-      #     roundingMode:
-      #     numSignificantFigures:
-      #
-      {}
+      hc_burden:
+        title: Housing Cost Burden as a share of disposable income
+        description_short: |
+          <% if tenure_type == "All tenures" %>
+            The share of disposable income that all households in << quintile.lower() >> spend on housing costs, including rent or mortgage payments.
+          <% elif tenure_type == "Rent (private and subsided)" %>
+            The share of disposable income that renters (private and subsidized) in << quintile.lower() >> spend on rent.
+          <% elif tenure_type == "Rent (private)" %>
+            The share of disposable income that renters (on the private market) in << quintile.lower() >> spend on rent.
+          <% elif tenure_type == "Rent (subsidised)" %>
+            The share of disposable income that renters with subsided housing costs (e.g. in social housing) spend on rent.
+          <% elif tenure_type == "Owner with mortgage" %>
+            The share of disposable income that homeowners in << quintile.lower() >> spend on their mortgage payments, including interest and principal repayments.
+          <% endif %>
+        description_from_producer: "Median of the mortgage burden (principal repayment and interest payments) or rent burden (private market and subsidised rent) as a share of disposable income, in percent"
+        unit: "%"
+        short_unit: "%"
+      hc_overburden:
+        title: Housing Cost Overburden
+        description_short: |
+          <% if tenure_type == "All tenures" %>
+            The share of households in << quintile.lower() >> that spend more than 40% of their disposable income on housing costs.
+          <% elif tenure_type == "Rent (private and subsided)" %>
+            The share of renters (private and subsidized) in << quintile.lower() >> that spend more than 40% of their disposable income on rent.
+          <% elif tenure_type == "Rent (private)" %>
+            The share of renters (on the private market) in << quintile.lower() >> that spend more than 40% of their disposable income on rent.
+          <% elif tenure_type == "Rent (subsidised)" %>
+            The share of renters with subsided housing costs (e.g. in social housing) in << quintile.lower() >> that spend more than 40% of their disposable income on rent.
+          <% elif tenure_type == "Owner with mortgage" %>
+            The share of homeowners in << quintile.lower() >> that spend more than 40% of their disposable income on their mortgage payments, including interest and principal repayments.
+          <% endif %>
+        description_from_producer: "Share of population spending more than 40% of disposable income on mortgage and rent, in percent"
+        unit: "%"
+        short_unit: "%"
+  housing_costs_share:
+    variables:
+      hc_share:
+        title: Housing Cost Share
+        description_short: |
+          The percentage of overall consumption that households spend on housing costs. This includes rent, bills such as electricity, gas and water and maintenance and repair costs.
+        description_from_producer: "Housing expenditure as share of final consumption expenditure of households"
+        unit: "%"
+        short_unit: "%"
+        presentation:
+          grapher_config:
+            note: |
+              For owner-occupied housing imputed rents are used to estimate the cost of housing. This means that the share of total expenditure is estimated as if homeowners were renting their own homes, instead of the actual costs they are paying e.g. for their mortgage.
+
 
