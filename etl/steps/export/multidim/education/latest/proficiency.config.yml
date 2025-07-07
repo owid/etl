@@ -1,35 +1,36 @@
 title:
-  title: Proficiency levels
+  title: Proficiency in reading and math
   title_variant: by education level, subject, and gender
 default_selection:
-  - Mexico
-  - Kenya
-  - India
+  - United States
+  - Zambia
+  - Germany
   - Brazil
+  - Vietnam
 
 dimensions:
   - slug: level
     name: Education level
     choices:
       - slug: primary
-        name: Primary education
-        description: Children at the age of primary education who achieve minimum proficiency levels.
+        name: End of primary education
+        description: For children generally 7 or 8 years old.
       - slug: lower_secondary
-        name: Lower secondary education
-        description: Children at the age of lower secondary education who achieve minimum proficiency levels.
+        name: End of lower secondary education
+        description: For children generally aged 11 to 14.
       - slug: level_side_by_side
         name: All education levels
-        description: Compare proficiency across different education levels.
+        description: Compare proficiency rates across all education levels.
 
   - slug: subject
     name: Subject
     choices:
       - slug: mathematics
         name: Mathematics
-        description: Children achieving minimum proficiency in mathematics.
+        description: Minimum proficiency in mathematics.
       - slug: reading
         name: Reading
-        description: Children achieving minimum proficiency in reading.
+        description: Minimum proficiency in reading.
       - slug: subject_side_by_side
         name: All subjects
         description: Compare proficiency across mathematics and reading.

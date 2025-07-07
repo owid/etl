@@ -37,18 +37,6 @@ EDUCATION_LEVELS = {
         "age_description": "at the age of lower secondary education",
         "title_term": "lower secondary school age",
     },
-    "grade_2": {
-        "keywords": ["g2"],
-        "display_name": "Grade 2",
-        "age_description": "in grade 2",
-        "title_term": "grade 2",
-    },
-    "grade_3": {
-        "keywords": ["g3"],
-        "display_name": "Grade 3",
-        "age_description": "in grade 3",
-        "title_term": "grade 3",
-    },
 }
 
 # Subject configurations
@@ -106,7 +94,6 @@ def run() -> None:
 
     # Filter both prepared for the future and student proficiency columns
     proficiency_cols = get_proficiency_columns(tb)
-    print(proficiency_cols)
 
     # Select only relevant columns
     tb = tb.loc[:, ["country", "year"] + proficiency_cols].copy()
@@ -154,6 +141,7 @@ def get_proficiency_columns(tb):
     # - Model-specific projections
     # - Adjusted parity indices (except basic ones)
     # - Language and immigration status
+    # - Specific grade levels (grade_2, grade_3) as the coverage is pretty low
     exclusion_pattern = "|".join(
         [
             "urban",
@@ -167,6 +155,8 @@ def get_proficiency_columns(tb):
             "immigrant",
             "native",
             "language_of_the_test",
+            "grade_2",
+            "grade_3",
         ]
     )
 
@@ -299,7 +289,6 @@ def generate_title_by_dimensions(view):
     gender_term = GENDERS.get(sex, {}).get("title", "children")
     level_config = EDUCATION_LEVELS.get(level, {})
     subject_config = SUBJECTS.get(subject, {})
-    population_config = POPULATIONS.get(population, {})
 
     # Adjust gender term for population type
     if population == "students":
@@ -337,7 +326,6 @@ def generate_subtitle_by_dimensions(view):
     gender_term = GENDERS.get(sex, {}).get("subtitle", "children")
     level_config = EDUCATION_LEVELS.get(level, {})
     subject_config = SUBJECTS.get(subject, {})
-    population_config = POPULATIONS.get(population, {})
 
     # Adjust gender term for population type
     if population == "students":
@@ -369,8 +357,6 @@ def edit_indicator_displays(view):
     level_display_names = {
         "primary": "Primary education",
         "lower_secondary": "Lower secondary education",
-        "grade_2": "Grade 2",
-        "grade_3": "Grade 3",
     }
 
     subject_display_names = {
@@ -380,8 +366,8 @@ def edit_indicator_displays(view):
 
     gender_display_names = {
         "both_sexes": "Both genders",
-        "male": "Boys",
-        "female": "Girls",
+        "_male": "Boys",
+        "_female": "Girls",
     }
 
     population_display_names = {
