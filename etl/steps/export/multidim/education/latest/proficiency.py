@@ -32,7 +32,7 @@ EDUCATION_LEVELS = {
         "title_term": "primary school age",
     },
     "lower_secondary": {
-        "keywords": ["prepfuture_2", "lowersec"], 
+        "keywords": ["prepfuture_2", "lowersec"],
         "display_name": "Lower secondary education",
         "age_description": "at the age of lower secondary education",
         "title_term": "lower secondary school age",
@@ -45,7 +45,7 @@ EDUCATION_LEVELS = {
     },
     "grade_3": {
         "keywords": ["g3"],
-        "display_name": "Grade 3", 
+        "display_name": "Grade 3",
         "age_description": "in grade 3",
         "title_term": "grade 3",
     },
@@ -106,6 +106,7 @@ def run() -> None:
 
     # Filter both prepared for the future and student proficiency columns
     proficiency_cols = get_proficiency_columns(tb)
+    print(proficiency_cols)
 
     # Select only relevant columns
     tb = tb.loc[:, ["country", "year"] + proficiency_cols].copy()
@@ -143,8 +144,10 @@ def get_proficiency_columns(tb):
     """Filter both prepared for the future and student proficiency columns excluding unwanted categories."""
     # Create inclusion patterns for both variable types
     prepared_for_future_pattern = r"proportion_of_children_young_people.*prepared_for_the_future"
-    student_proficiency_pattern = r"achieving_at_least_a_minimum_proficiency.*mathematics|achieving_at_least_a_minimum_proficiency.*reading"
-    
+    student_proficiency_pattern = (
+        r"achieving_at_least_a_minimum_proficiency.*mathematics|achieving_at_least_a_minimum_proficiency.*reading"
+    )
+
     # Create exclusion pattern - filters out unwanted column types:
     # - Geographic breakdowns (urban/rural)
     # - Wealth quintile data (poorest/richest, very_affluent/very_poor)
@@ -155,7 +158,7 @@ def get_proficiency_columns(tb):
         [
             "urban",
             "rural",
-            "the_global_age_specific_literacy_projections_model", 
+            "the_global_age_specific_literacy_projections_model",
             "poorest_quintile",
             "richest_quintile",
             "adjusted",
@@ -171,7 +174,8 @@ def get_proficiency_columns(tb):
     import re
 
     proficiency_cols = [
-        col for col in tb.columns 
+        col
+        for col in tb.columns
         if (re.search(prepared_for_future_pattern, col) or re.search(student_proficiency_pattern, col))
         and not re.search(exclusion_pattern, col)
     ]
@@ -204,7 +208,7 @@ def adjust_dimensions(tb):
         level = _extract_dimension(col, LEVEL_KEYWORDS)
         subject = _extract_dimension(col, SUBJECT_KEYWORDS)
         sex = _extract_gender(col, SEX_KEYWORDS)
-        
+
         # Determine population type based on variable pattern
         if "prepared_for_the_future" in col:
             population = "all_children"
@@ -305,7 +309,7 @@ def generate_title_by_dimensions(view):
             gender_term = "male students"
         elif gender_term == "girls":
             gender_term = "female students"
-    
+
     # Handle different combinations
     if view.matches(population="population_side_by_side"):
         return f"Share of {gender_term} of {level_config.get('title_term', level)} achieving minimum proficiency in {subject_config.get('title_term', subject)}, by population type"
@@ -368,18 +372,18 @@ def edit_indicator_displays(view):
         "grade_2": "Grade 2",
         "grade_3": "Grade 3",
     }
-    
+
     subject_display_names = {
         "mathematics": "Mathematics",
         "reading": "Reading",
     }
-    
+
     gender_display_names = {
         "both_sexes": "Both genders",
         "male": "Boys",
         "female": "Girls",
     }
-    
+
     population_display_names = {
         "all_children": "All children",
         "students": "Students",
@@ -389,25 +393,26 @@ def edit_indicator_displays(view):
         # Check for population-based display names
         if view.matches(population="population_side_by_side"):
             for pop_key, display_name in population_display_names.items():
-                if (pop_key == "all_children" and "prepared_for_the_future" in indicator.catalogPath) or \
-                   (pop_key == "students" and "achieving_at_least_a_minimum_proficiency" in indicator.catalogPath):
+                if (pop_key == "all_children" and "prepared_for_the_future" in indicator.catalogPath) or (
+                    pop_key == "students" and "achieving_at_least_a_minimum_proficiency" in indicator.catalogPath
+                ):
                     indicator.display = {"name": display_name}
                     break
-        
+
         # Check for level-based display names
         elif view.matches(level="level_side_by_side"):
             for level_key, display_name in level_display_names.items():
                 if level_key in indicator.catalogPath:
                     indicator.display = {"name": display_name}
                     break
-        
+
         # Check for subject-based display names
         elif view.matches(subject="subject_side_by_side"):
             for subject_key, display_name in subject_display_names.items():
                 if subject_key in indicator.catalogPath:
                     indicator.display = {"name": display_name}
                     break
-        
+
         # Check for gender-based display names
         elif view.matches(sex="sex_side_by_side"):
             for gender_key, display_name in gender_display_names.items():
