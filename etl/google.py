@@ -104,7 +104,7 @@ class GoogleDrive:
                 credentials = pickle.load(token_file)
         else:
             if not CLIENT_SECRET_FILE.exists():
-                log.error("Follow instructions in apps.utils.google.py to create a client_secret.json file.")
+                log.error("Follow instructions in etl/google.py to create a client_secret.json file.")
                 raise FileNotFoundError(f"Client secret file not found at {CLIENT_SECRET_FILE}.")
             # Create an OAuth flow using the client secrets file and the required scopes.
             flow = InstalledAppFlow.from_client_secrets_file(CLIENT_SECRET_FILE, self.SCOPES)
