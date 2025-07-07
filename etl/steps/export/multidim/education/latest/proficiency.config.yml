@@ -3,10 +3,9 @@ title:
   title_variant: by education level, subject, and gender
 default_selection:
   - United States
-  - Zambia
   - Germany
-  - Brazil
-  - Vietnam
+  - Iran
+  - Turkey
 
 dimensions:
   - slug: level
