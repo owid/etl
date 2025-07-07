@@ -630,6 +630,13 @@ def run() -> None:
     # Add column for thermal equivalent efficiency factors.
     tb = tb.merge(tb_efficiency, how="left", on="year")
 
+    # NOTE: In the latest methodology, they have not included a thermal efficiency factor for the latest year (I suppose that this is because thermal efficiency factors are only used for the (legacy) primary energy consumption). Check that, indeed, this factor is missing for the latest year, and then fill it with the previously informed year.
+    error = "Expected efficiency factor to be missing for the latest year."
+    assert set(tb[tb["efficiency_factor"].isnull()]["year"]) == {tb["year"].max()}, error
+    error = "Table was expected to be sorted chronologically (to forward-fill missing thermal efficiency factors)."
+    assert set(tb.groupby(["country"])["year"].diff().fillna(1)) == {1}, error
+    tb["efficiency_factor"] = tb["efficiency_factor"].ffill()
+
     # Remove "Other *" regions, since they mean different set of countries for different variables.
     # NOTE: They have to be removed *after* creating region aggregates, otherwise those regions would be underestimated.
     tb = tb[~tb["country"].str.startswith("Other ")].reset_index(drop=True)
