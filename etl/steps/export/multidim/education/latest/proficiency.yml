@@ -1,0 +1,66 @@
+title:
+  title: Proficiency levels
+  title_variant: by education level, subject, and gender
+default_selection:
+  - Mexico
+  - Kenya
+  - India
+  - Brazil
+
+dimensions:
+  - slug: level
+    name: Education level
+    choices:
+      - slug: primary
+        name: Primary education
+        description: Children at the age of primary education who achieve minimum proficiency levels.
+      - slug: lower_secondary
+        name: Lower secondary education
+        description: Children at the age of lower secondary education who achieve minimum proficiency levels.
+      - slug: level_side_by_side
+        name: All education levels
+        description: Compare proficiency across different education levels.
+
+  - slug: subject
+    name: Subject
+    choices:
+      - slug: mathematics
+        name: Mathematics
+        description: Children achieving minimum proficiency in mathematics.
+      - slug: reading
+        name: Reading
+        description: Children achieving minimum proficiency in reading.
+      - slug: subject_side_by_side
+        name: All subjects
+        description: Compare proficiency across mathematics and reading.
+
+  - slug: sex
+    name: Gender
+    choices:
+      - slug: both
+        name: Both genders
+        description: Educational outcomes for all children regardless of gender.
+      - slug: female
+        name: Girls
+        description: Educational outcomes among girls.
+      - slug: male
+        name: Boys
+        description: Educational outcomes among boys.
+      - slug: sex_side_by_side
+        name: Boys and girls
+        description: Compare educational outcomes between genders.
+
+  - slug: population
+    name: Population type
+    choices:
+      - slug: all_children
+        name: All children
+        description: Includes all children in the relevant age group, not just those enrolled in school. Provides a comprehensive view of educational outcomes.
+      - slug: students
+        name: Students
+        description: Includes only students enrolled in school.
+      - slug: population_side_by_side
+        name: All children and students
+        description: Compare outcomes between all children and enrolled students.
+
+views: []
