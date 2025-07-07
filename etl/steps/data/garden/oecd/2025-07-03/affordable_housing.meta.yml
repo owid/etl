@@ -19,15 +19,15 @@ tables:
         title: Housing Cost Burden as a share of disposable income
         description_short: |
           <% if tenure_type == "All tenures" %>
-            The share of disposable income that all households in << quintile.lower() >> spend on housing costs, including rent or mortgage payments.
+            The share of disposable income that the median households in << quintile.lower() >> spend on rent or mortgage payments.
           <% elif tenure_type == "Rent (private and subsided)" %>
-            The share of disposable income that renters (private and subsidized) in << quintile.lower() >> spend on rent.
+            The share of disposable income that the median renters (private and subsidized) in << quintile.lower() >> spend on rent.
           <% elif tenure_type == "Rent (private)" %>
-            The share of disposable income that renters (on the private market) in << quintile.lower() >> spend on rent.
+            The share of disposable income that the median renters (on the private market) in << quintile.lower() >> spend on rent.
           <% elif tenure_type == "Rent (subsidised)" %>
-            The share of disposable income that renters with subsided housing costs (e.g. in social housing) spend on rent.
+            The share of disposable income that the median renters with subsided housing costs (e.g. in social housing) spend on rent.
           <% elif tenure_type == "Owner with mortgage" %>
-            The share of disposable income that homeowners in << quintile.lower() >> spend on their mortgage payments, including interest and principal repayments.
+            The share of disposable income that the median homeowners in << quintile.lower() >> spend on their mortgage payments, including interest and principal repayments.
           <% endif %>
         description_from_producer: "Median of the mortgage burden (principal repayment and interest payments) or rent burden (private market and subsidised rent) as a share of disposable income, in percent"
         unit: "%"
@@ -36,7 +36,7 @@ tables:
         title: Housing Cost Overburden
         description_short: |
           <% if tenure_type == "All tenures" %>
-            The share of households in << quintile.lower() >> that spend more than 40% of their disposable income on housing costs.
+            The share of households in << quintile.lower() >> that spend more than 40% of their disposable income on rent or mortgage costs.
           <% elif tenure_type == "Rent (private and subsided)" %>
             The share of renters (private and subsidized) in << quintile.lower() >> that spend more than 40% of their disposable income on rent.
           <% elif tenure_type == "Rent (private)" %>
