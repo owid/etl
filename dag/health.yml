@@ -205,13 +205,6 @@ steps:
   data://grapher/cardiovascular_diseases/2023-11-01/deaths_from_cardiovascular_diseases_vs_other:
     - data://garden/cardiovascular_diseases/2023-11-01/deaths_from_cardiovascular_diseases_vs_other
 
-  # WHO Medical Devices Atlas
-  data://meadow/who/2023-11-01/who_statins:
-    - snapshot://who/2023-11-01/who_statins.csv
-  data://garden/who/2023-11-01/who_statins:
-    - data://meadow/who/2023-11-01/who_statins
-  data://grapher/who/2023-11-01/who_statins:
-    - data://garden/who/2023-11-01/who_statins
 
   # Global Health Observatory (GHO) from WHO
   data://meadow/who/2024-01-03/gho:
