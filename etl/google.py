@@ -24,7 +24,7 @@ To be able to use them, you will first need to generate your own credentials, fo
     .config/owid_etl_doc/client_secret.json
 4. Generate your own token pickle:
   - Run the following code from the python terminal (or interactive window):
-    from apps.utils.google import GoogleDrive
+    from etl.google import GoogleDrive
     GoogleDrive()
   - A browser window should appear. Log in with your owid google account. This will create a token.pickle in the same folder as your client_secret.json
 
