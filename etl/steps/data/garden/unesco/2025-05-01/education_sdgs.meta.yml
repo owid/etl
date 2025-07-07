@@ -416,7 +416,6 @@ tables:
           - This indicator measures basic literacy, not functional literacy. It reflects the presence of foundational skills, but not whether they are applied effectively in everyday contexts.
           - Cross-country comparability may be affected by differences in definitions, data collection methods, and the extent to which responses are self-reported or verified.
         display:
-
           numDecimalPlaces: 1
 
       # ========================================================================
