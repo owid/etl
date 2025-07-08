@@ -1062,8 +1062,31 @@ def export_table_to_gsheet(
             print(f"Warning: Could not update existing sheet: {e}")
 
     # Create new sheet
+
     sheet = GoogleSheet.create_sheet(title=sheet_title, folder_id=folder_id)
     sheet.write_dataframe(df, sheet_name="Data")
+
+    # Remove the default 'Sheet1' if it exists and is empty
+    try:
+        # Get all sheets in the spreadsheet
+        sheet_metadata = sheet.sheets_service.spreadsheets().get(spreadsheetId=sheet.sheet_id).execute()
+        existing_sheets = sheet_metadata.get("sheets", [])
+
+        # Look for 'Sheet1'
+        sheet1_id = None
+        for sheet_info in existing_sheets:
+            if sheet_info["properties"]["title"] == "Sheet1":
+                sheet1_id = sheet_info["properties"]["sheetId"]
+                break
+
+        # Delete 'Sheet1' if found and there are other sheets
+        if sheet1_id is not None and len(existing_sheets) > 1:
+            delete_request = {"requests": [{"deleteSheet": {"sheetId": sheet1_id}}]}
+            sheet.sheets_service.spreadsheets().batchUpdate(spreadsheetId=sheet.sheet_id, body=delete_request).execute()
+            print("Note: Removed empty 'Sheet1'")
+
+    except Exception as e:
+        print(f"Note: Could not remove 'Sheet1': {e}")
 
     # Add metadata tabs if requested
     if include_metadata:
@@ -1073,8 +1096,7 @@ def export_table_to_gsheet(
                 sheet.write_dataframe(metadata_df, sheet_name=sheet_name)
             except Exception as e:
                 print(f"Note: Could not create metadata sheet '{sheet_name}': {e}")
-
-    drive = GoogleDrive()
-    drive.set_file_permissions(file_id=sheet.sheet_id, role=role, general_access=general_access)
+        drive = GoogleDrive()
+        drive.set_file_permissions(file_id=sheet.sheet_id, role=role, general_access=general_access)
 
     return sheet.url, sheet.sheet_id
