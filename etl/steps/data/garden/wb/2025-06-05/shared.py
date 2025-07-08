@@ -305,6 +305,16 @@ abs_dict = {
             "title_between": "$6.85",
             "description_key": "A poverty line of $6.85 a day represents definitions of national poverty lines in upper-middle-income countries.",
         },
+        500: {
+            "title": "$5 a day",
+            "title_between": "$5",
+            "description_key": "",
+        },
+        700: {
+            "title": "$7 a day",
+            "title_between": "$7",
+            "description_key": "",
+        },
         1000: {
             "title": "$10 a day",
             "title_between": "$10",
@@ -342,6 +352,16 @@ abs_dict = {
             "title": "$8.30 a day",
             "title_between": "$8.30",
             "description_key": "A poverty line of $8.30 a day represents definitions of national poverty lines in upper-middle-income countries.",
+        },
+        500: {
+            "title": "$5 a day",
+            "title_between": "$5",
+            "description_key": "",
+        },
+        700: {
+            "title": "$7 a day",
+            "title_between": "$7",
+            "description_key": "",
         },
         1000: {
             "title": "$10 a day",
