@@ -20,7 +20,7 @@ def run() -> None:
     # Export the table to a Google Sheet.
     sheet_url, sheet_id = export_table_to_gsheet(
         table=tb_sel,
-        sheet_title="Long Run Child Mortality",
+        sheet_title="Long Run Child Mortality Estimates",
         update_existing=True,
         metadata_variables=["child_mortality_rate"],
     )

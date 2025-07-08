@@ -844,7 +844,7 @@ def export_table_to_gsheet(
     table: Table,
     sheet_title: str,
     update_existing: bool = True,
-    folder_id: Optional[str] = None,
+    folder_id: Optional[str] = None,  # Default is the OWID Google Drive folder for GSheet OMMs
     role: Literal["reader", "commenter", "writer"] = "reader",
     general_access: Literal["anyone", "domain", "user"] = "anyone",
     include_metadata: bool = True,
