@@ -11,7 +11,7 @@ from owid.catalog import Table
 from owid.datautils import dataframes
 from tqdm.auto import tqdm
 
-from apps.utils.google import GoogleDrive, GoogleSheet
+from apps.utils.google import CLIENT_SECRET_FILE, GoogleDrive, GoogleSheet
 
 TableOrDataFrame = TypeVar("TableOrDataFrame", pd.DataFrame, Table)
 DIMENSION_COL_NONE = "temporary"
@@ -895,6 +895,10 @@ def export_table_to_gsheet(
     ...     metadata_variables=["child_mortality_rate", "population"]
     ... )
     """
+    # Check if Google API credentials are available
+    if not CLIENT_SECRET_FILE or not CLIENT_SECRET_FILE.exists():
+        print("Warning: Google API credentials not found. Skipping Google Sheets export.")
+        return "", ""
 
     def _create_metadata_dataframes(
         table: Table, metadata_variables: Optional[List[str]] = None
