@@ -9,11 +9,11 @@ definitions:
           - World
         hasMapTab: true
   description_key_standard_one: |-
-    This data represents official WHO/UNICEF estimates of national immunization coverage (WUENIC). The estimates include all WHO Member States, even those that did not report 2023 data. For non-reporting countries, WHO uses statistical methods to extrapolate from previously reported data, ensuring global coverage can be assessed.
+    This chart showsdata represents official WHO/UNICEF estimates of national immunization coverage published by the WHO and UNICEF (WUENIC). The estimates include all WHO mMember sStates, even those that did not report 2023 data. For non-reporting countries, WHO uses statistical methods to extrapolate from previously reported data, ensuring global coverage can be assessed.
   description_key_standard_two: |-
     Global and regional vaccination coverage is calculated using population-weighted averages. In 2023, approximately 5% of countries did not report data, requiring extrapolation from their 2022 data to maintain complete global estimates.
   description_key_standard_three: |-
-    These estimates synthesize multiple data sources: officially reported administrative data (based on health facility reports), coverage surveys that meet WHO quality criteria, and contextual information about vaccine supply disruptions or schedule changes. The quality and reliability of these estimates depend on the completeness and accuracy of country reporting systems.
+    These estimates combine several sources: official administrative data from health facilities, coverage surveys that meet WHO quality standards, and other relevant information like vaccine supply issues or schedule changes. The accuracy of these estimates depends on how complete and reliable each country’s reporting systems are.
   antigen_age_group: |-
     <% if antigen == "BCG" %>
     newborns
@@ -44,7 +44,7 @@ definitions:
     <%- elif antigen == "IPV2" %>
     one-year-olds
     <%- elif antigen == "MCV2X2" %>
-    two year olds
+    two-year-olds
     <%- endif %>
   antigen_title: |-
     <% if antigen == "BCG" %>
@@ -148,21 +148,21 @@ definitions:
     <%- elif antigen == "RCV1" %>
     Coverage estimates are based on WHO and UNICEF data for the first dose of the measles-rubella vaccine. These are taken from measles vaccine data, so country-reported rubella coverage is not used.
     <%- elif antigen == "HEPB_BD" %>
-    Estimates of hepatitis B birth dose coverage are produced only for countries with a universal birth dose policy. Estimates are not produced for countries that recommend a birth dose to infants born to HepB virus-infected mothers only or where there is insufficient information to determine whether vaccination is within 24 hours of birth.
+    WHO and UNICEF only estimate coverage of the hepatitis B birth dose (a vaccine given within 24 hours of birth) for countries with a policy to provide this dose for all newborns. They don’t produce estimates for countries that only recommend this dose for babies born to mothers infected with hepatitis B, or for countries where there isn’t enough information to know whether the vaccine is given within 24 hours of birth.
     <%- elif antigen == "PCV3" %>
     In some countries, coverage may show the percentage of infants who received two doses of pneumococcal vaccine before their first birthday, based on national schedules and disease patterns.
     <%- elif antigen == "IPV1" %>
-    In countries using both IPV and OPV in their immunization schedules, WHO and UNICEF count any infant under 1 year who received at least one routine dose of IPV in their IPV1 estimates. In countries using only IPV, IPV1 refers to the first IPV dose. These estimates began in 2015 and do not affect the reported coverage for the third polio dose (Pol3). For countries using three doses of IPV, Pol3 coverage equals coverage with three IPV doses. In countries using a mix of IPV and OPV, Pol3 reflects coverage with any third polio vaccine dose, regardless of type.
+    In countries where both types of polio vaccine are used — IPV (inactivated polio vaccine, given as an injection) and OPV (oral polio vaccine, given as drops) — WHO and UNICEF count any baby under 1 year old who received at least one routine dose of IPV in their estimate of “first dose” coverage (meaning the first dose of IPV). In countries that only use IPV, “first dose” simply refers to the first IPV dose given.
     <%- endif %>
   antigen_note: |-
     <% if antigen in ["MCV2", "MCV2X2"] %>
-      Measles is a highly contagious viral disease, most common in young children. Its effects include blindness, inflammation of the brain, severe diarrhea, and severe respiratory infections such as pneumonia. Recommended child's age for MCV2 vaccination varies by country.
+      Measles is a highly contagious viral disease, most common in young children. Its effects include blindness, inflammation of the brain, severe diarrhea, and severe respiratory infections such as pneumonia. The recommended age for the second dose varies by country.
     <%- elif antigen == "MCV1" %>
       Measles is a highly contagious viral disease, most common in young children. Its effects include blindness, inflammation of the brain, severe diarrhea, and severe respiratory infections such as pneumonia.
     <%- elif antigen in ["HEPB3", "HEPB_BD"] %>
       Hepatitis B is a viral infection that attacks the liver and can cause both acute and chronic disease.
     <%- elif antigen == "HIB3" %>
-      Haemophilus influenzae type B is a bacteria responsible for severe pneumonia, meningitis and other invasive diseases almost exclusively in children younger than five years.
+      Haemophilus influenzae type B is a bacterium responsible for severe pneumonia, meningitis and other invasive diseases almost exclusively in children younger than five years.
     <%- elif antigen == "PCV3" %>
       Streptococcus pneumoniae is a bacterium that causes a number of common diseases including meningitis, septicaemia and pneumonia. It is most common in young children and the elderly.
     <%- elif antigen in ["IPV1", "IPV2","POL3"]  %>
@@ -170,7 +170,7 @@ definitions:
     <%- elif antigen == "RCV1" %>
       Rubella is a contagious viral infection that occurs most often in children and young adults. Rubella infection in pregnant women may cause fetal death or congenital defects known as congenital rubella syndrome.
     <%- elif antigen == "ROTAC" %>
-      Rotavirus vaccines became available for the first time in 2006.
+
     <%- endif %>
   antigen_display_name: |-
     <% if antigen == "BCG" %>
@@ -214,7 +214,7 @@ tables:
     variables:
       coverage:
         title: Share of {definitions.antigen_age_group} {definitions.antigen_title}
-        description_short: The percentage of {definitions.antigen_age_group} who have had {definitions.antigen_description} in a given year.
+        description_short: Share of {definitions.antigen_age_group} who have had {definitions.antigen_description} in a given year.
         description_key:
           - "{definitions.description_key_standard_one}"
           - "{definitions.description_key_standard_two}"
@@ -246,7 +246,7 @@ tables:
               {definitions.antigen_note}
       vaccinated:
         title: Number of {definitions.antigen_age_group} {definitions.antigen_title}
-        description_short: The number of {definitions.antigen_age_group} who had {definitions.antigen_description} in a given year.
+        description_short: Number of {definitions.antigen_age_group} who had {definitions.antigen_description} in a given year.
         unit: |-
           {definitions.antigen_age_group}
         description_key:
@@ -279,7 +279,7 @@ tables:
                   - 30000000
       unvaccinated:
         title: Number of {definitions.antigen_age_group} {definitions.antigen_title_negative}
-        description_short: The number of {definitions.antigen_age_group} who have not had {definitions.antigen_description} in a given year.
+        description_short: Number of {definitions.antigen_age_group} who have not had {definitions.antigen_description} in a given year.
         unit: |-
           {definitions.antigen_age_group}
         description_key:
