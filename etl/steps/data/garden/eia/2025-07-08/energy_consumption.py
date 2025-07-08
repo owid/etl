@@ -34,46 +34,7 @@ REGIONS = {
 # Known overlaps between historical regions and successor countries.
 # NOTE: They are not removed from the data when constructing the aggregate for Europe, but the contribution of Aruba is
 # negligible, so the double-counting is not relevant.
-KNOWN_OVERLAPS = [
-    {
-        1986: {"Aruba", "Netherlands Antilles"},
-        1987: {"Aruba", "Netherlands Antilles"},
-        1988: {"Aruba", "Netherlands Antilles"},
-        1989: {"Aruba", "Netherlands Antilles"},
-        1990: {"Aruba", "Netherlands Antilles"},
-        1991: {"Aruba", "Netherlands Antilles"},
-        1992: {"Aruba", "Netherlands Antilles"},
-        1993: {"Aruba", "Netherlands Antilles"},
-        1994: {"Aruba", "Netherlands Antilles"},
-        1995: {"Aruba", "Netherlands Antilles"},
-        1996: {"Aruba", "Netherlands Antilles"},
-        1997: {"Aruba", "Netherlands Antilles"},
-        1998: {"Aruba", "Netherlands Antilles"},
-        1999: {"Aruba", "Netherlands Antilles"},
-        2000: {"Aruba", "Netherlands Antilles"},
-        2001: {"Aruba", "Netherlands Antilles"},
-        2002: {"Aruba", "Netherlands Antilles"},
-        2003: {"Aruba", "Netherlands Antilles"},
-        2004: {"Aruba", "Netherlands Antilles"},
-        2005: {"Aruba", "Netherlands Antilles"},
-        2006: {"Aruba", "Netherlands Antilles"},
-        2007: {"Aruba", "Netherlands Antilles"},
-        2008: {"Aruba", "Netherlands Antilles"},
-        2009: {"Aruba", "Netherlands Antilles"},
-        2010: {"Aruba", "Netherlands Antilles"},
-        2011: {"Aruba", "Netherlands Antilles"},
-        2012: {"Aruba", "Netherlands Antilles"},
-        2013: {"Aruba", "Netherlands Antilles"},
-        2014: {"Aruba", "Netherlands Antilles"},
-        2015: {"Aruba", "Netherlands Antilles"},
-        2016: {"Aruba", "Netherlands Antilles"},
-        2017: {"Aruba", "Netherlands Antilles"},
-        2018: {"Aruba", "Netherlands Antilles"},
-        2019: {"Aruba", "Netherlands Antilles"},
-        2020: {"Aruba", "Netherlands Antilles"},
-        2021: {"Aruba", "Netherlands Antilles"},
-    }
-]
+KNOWN_OVERLAPS = [{year: {"Aruba", "Netherlands Antilles"} for year in range(1986, 2024)}]
 
 
 def run() -> None:
