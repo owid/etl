@@ -67,8 +67,7 @@ def run() -> None:
     # Load inputs
     config = paths.load_collection_config()
     ds = paths.load_dataset("pisa")
-    tb = ds.read("pisa", load_data=False)
-    print(tb)
+    tb = ds.read("pisa_math_boys_girls", load_data=False)
 
     # Filter PISA performance columns
     pisa_cols = get_pisa_performance_columns(tb)
@@ -259,18 +258,17 @@ def generate_subtitle_by_subject_and_gender(view):
 
 def edit_indicator_displays(view):
     """Edit display names for the grouped views."""
-    if view.dimensions.get("subject") != "subject_side_by_side" or view.indicators.y is None:
+    if view.dimensions.get("sex") != "sex_side_by_side" or view.indicators.y is None:
         return
 
-    # Display name mappings for subjects
+    # Display name mappings for genders
     DISPLAY_NAMES = {
-        "mathematics": "Mathematics",
-        "science": "Science",
-        "reading": "Reading",
+        "average_girls": "Girls",
+        "average_boys": "Boys",
     }
 
     for indicator in view.indicators.y:
-        for subject_key, display_name in DISPLAY_NAMES.items():
-            if subject_key in indicator.catalogPath:
+        for gender_key, display_name in DISPLAY_NAMES.items():
+            if gender_key in indicator.catalogPath:
                 indicator.display = {"name": display_name}
                 break
