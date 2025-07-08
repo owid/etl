@@ -54,7 +54,6 @@ GENDERS = {
     "both": {"title": "students", "subtitle": "students"},
     "boys": {"title": "boys", "subtitle": "boys"},
     "girls": {"title": "girls", "subtitle": "girls"},
-    "sex_side_by_side": {"title": "boys and girls", "subtitle": "boys and girls"},
 }
 
 # Dimension mapping configurations
@@ -71,7 +70,6 @@ def run() -> None:
 
     # Filter PISA performance columns
     pisa_cols = get_pisa_performance_columns(tb)
-    print(pisa_cols)
     # Select only relevant columns
     tb = tb.loc[:, ["country", "year"] + pisa_cols].copy()
 
@@ -95,10 +93,6 @@ def run() -> None:
             "subtitle": lambda view: generate_subtitle_by_subject_and_gender(view),
         }
     )
-
-    # Edit display names
-    for view in c.views:
-        edit_indicator_displays(view)
 
     # Save collection
     c.save()
@@ -182,13 +176,6 @@ def create_grouped_views(collection):
     collection.group_views(
         groups=[
             {
-                "dimension": "sex",
-                "choice_new_slug": "sex_side_by_side",
-                "choices": ["girls", "boys"],
-                "view_config": view_config,
-                "view_metadata": view_metadata,
-            },
-            {
                 "dimension": "subject",
                 "choice_new_slug": "subject_side_by_side",
                 "choices": ["mathematics", "science", "reading"],
@@ -205,8 +192,8 @@ def create_grouped_views(collection):
 
 # Common mappings used by both title and subtitle functions
 GENDER_MAPPINGS = {
-    "title": {"both": "students", "boys": "boys", "girls": "girls", "sex_side_by_side": "boys and girls"},
-    "subtitle": {"both": "students", "boys": "boys", "girls": "girls", "sex_side_by_side": "boys and girls"},
+    "title": {"both": "students", "boys": "boys", "girls": "girls"},
+    "subtitle": {"both": "students", "boys": "boys", "girls": "girls"},
 }
 
 SUBJECT_MAPPINGS = {
@@ -238,37 +225,11 @@ def generate_title_by_subject_and_gender(view):
         raise ValueError(f"Unknown subject: {subject}")
 
     if subject == "subject_side_by_side":
-        return f"PISA scores for {gender_term} by subject"
-    else:
-        return f"PISA {subject_term} scores for {gender_term}"
+        return f"Average performance of 15-year-old {gender_term} by subject"
 
 
 def generate_subtitle_by_subject_and_gender(view):
     """Generate subtitle based on subject and gender."""
-    sex, subject = view.dimensions["sex"], view.dimensions["subject"]
 
-    subject_term = SUBJECT_MAPPINGS["subtitle"].get(subject, "")
-    gender_term = GENDER_MAPPINGS["subtitle"].get(sex, "")
-
-    if not subject_term:
-        raise ValueError(f"Unknown subject: {subject}")
-
-    return f"Average PISA scores in {subject_term} for {gender_term} aged 15. PISA is an international assessment that measures student performance in key subjects."
-
-
-def edit_indicator_displays(view):
-    """Edit display names for the grouped views."""
-    if view.dimensions.get("sex") != "sex_side_by_side" or view.indicators.y is None:
-        return
-
-    # Display name mappings for genders
-    DISPLAY_NAMES = {
-        "average_girls": "Girls",
-        "average_boys": "Boys",
-    }
-
-    for indicator in view.indicators.y:
-        for gender_key, display_name in DISPLAY_NAMES.items():
-            if gender_key in indicator.catalogPath:
-                indicator.display = {"name": display_name}
-                break
+    if view.d.subject == "subject_side_by_side":
+        return "Assessed through the PISA scales: mathematics, which evaluates problem-solving in real-life situations; science, which measures understanding and critical thinking about scientific issues; and reading, which gauges the ability to comprehend and use written information."

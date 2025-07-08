@@ -36,8 +36,4 @@ dimensions:
       - slug: boys
         name: Boys
         description: PISA performance among male students.
-      - slug: sex_side_by_side
-        name: Boys and girls
-        description: Compare PISA performance between genders.
-
 views: []

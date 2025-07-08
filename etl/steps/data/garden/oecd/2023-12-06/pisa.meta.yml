@@ -102,10 +102,10 @@ tables:
   pisa_math_boys_girls:
     variables:
       pisa_math_average_boys:
-        title: PISA mathematics scores for boys
+        title: Average performance of 15-year-old boys in mathematics
         unit: score
         short_unit: ""
-        description_short: Average PISA mathematics scores for boys aged 15.
+        description_short: Assessed through the PISA mathematics scale, which measures how well someone can use math to solve everyday problems and understand the role of math in the real world.
         display:
           tolerance: 3
           name: Mathematics
@@ -114,10 +114,10 @@ tables:
           title_public: PISA mathematics scores for boys
 
       pisa_math_average_girls:
-        title: PISA mathematics scores for girls
+        title: Average performance of 15-year-old girls in mathematics
         unit: score
         short_unit: ""
-        description_short: Average PISA mathematics scores for girls aged 15.
+        description_short: Assessed through the PISA mathematics scale, which measures how well someone can use math to solve everyday problems and understand the role of math in the real world.
         display:
           tolerance: 3
           name: Mathematics
@@ -126,10 +126,10 @@ tables:
           title_public: PISA mathematics scores for girls
 
       pisa_science_average_boys:
-        title: PISA science scores for boys
+        title: Average performance of 15-year-old boys in science
         unit: score
         short_unit: ""
-        description_short: Average PISA science scores for boys aged 15.
+        description_short: Assessed through the PISA science scale, which assesses how comfortable and knowledgeable someone is with science topics, focusing on their ability to discuss and think about scientific issues in everyday life.
         display:
           tolerance: 3
           name: Science
@@ -138,10 +138,10 @@ tables:
           title_public: PISA science scores for boys
 
       pisa_science_average_girls:
-        title: PISA science scores for girls
+        title: Average performance of 15-year-old girls in science
         unit: score
         short_unit: ""
-        description_short: Average PISA science scores for girls aged 15.
+        description_short: Assessed through the PISA science scale, which assesses how comfortable and knowledgeable someone is with science topics, focusing on their ability to discuss and think about scientific issues in everyday life.
         display:
           tolerance: 3
           name: Science
@@ -150,10 +150,10 @@ tables:
           title_public: PISA science scores for girls
 
       pisa_reading_average_boys:
-        title: PISA reading scores for boys
+        title: Average performance of 15-year-old boys in reading
         unit: score
         short_unit: ""
-        description_short: Average PISA reading scores for boys aged 15.
+        description_short: Assessed through the PISA reading scale, which measures how well someone can understand and use written information to learn new things and be a part of society.
         display:
           tolerance: 3
           name: Reading
@@ -162,10 +162,10 @@ tables:
           title_public: PISA reading scores for boys
 
       pisa_reading_average_girls:
-        title: PISA reading scores for girls
+        title: Average performance of 15-year-old girls in reading
         unit: score
         short_unit: ""
-        description_short: Average PISA reading scores for girls aged 15.
+        description_short: Assessed through the PISA reading scale, which measures how well someone can understand and use written information to learn new things and be a part of society.
         display:
           tolerance: 3
           name: Reading
@@ -174,10 +174,10 @@ tables:
           title_public: PISA reading scores for girls
 
       pisa_math_all_average:
-        title: PISA mathematics scores
+        title: Average performance of 15-year-old students in mathematics
         unit: score
         short_unit: ""
-        description_short: Average PISA mathematics scores for all students aged 15.
+        description_short: Assessed through the PISA mathematics scale, which measures how well someone can use math to solve everyday problems and understand the role of math in the real world.
         display:
           tolerance: 3
           name: Mathematics
@@ -186,10 +186,10 @@ tables:
           title_public: PISA mathematics scores for all students
 
       pisa_science_all_average:
-        title: PISA science scores
+        title: Average performance of 15-year-old students in science
         unit: score
         short_unit: ""
-        description_short: Average PISA science scores for all students aged 15.
+        description_short: Assessed through the PISA science scale, which assesses how comfortable and knowledgeable someone is with science topics, focusing on their ability to discuss and think about scientific issues in everyday life.
         display:
           tolerance: 3
           name: Science
@@ -198,10 +198,10 @@ tables:
           title_public: PISA science scores for all students
 
       pisa_reading_all_average:
-        title: PISA reading scores
+        title: Average performance of 15-year-old students in reading
         unit: score
         short_unit: ""
-        description_short: Average PISA reading scores for all students aged 15.
+        description_short: Assessed through the PISA reading scale, which measures how well someone can understand and use written information to learn new things and be a part of society.
         display:
           tolerance: 3
           name: Reading
