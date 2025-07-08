@@ -29,8 +29,8 @@ log = get_logger()
 # NOTE: Modify if poverty lines are updated from source
 # TODO: Modify the lines in 2021 prices
 POVLINES_DICT = {
-    2017: [100, 215, 365, 685, 1000, 2000, 3000, 4000],
-    2021: [100, 300, 420, 830, 1000, 2000, 3000, 4000],
+    2017: [100, 215, 365, 500, 685, 700, 1000, 2000, 3000, 4000],
+    2021: [100, 300, 420, 500, 700, 830, 1000, 2000, 3000, 4000],
 }
 
 # Define PPP versions from POVLINES_DICT
@@ -482,6 +482,9 @@ def create_stacked_variables(tb: Table, povlines_dict: dict, ppp_version: int) -
     # Select poverty lines between PPP_YEAR_OLD and PPP_YEAR_CURRENT and sort in case they are not in order
     povlines = povlines_dict[ppp_version]
     povlines.sort()
+
+    # Remove 500 and 700 from povlines, since I don't want to use them for this indicator
+    povlines = [p for p in povlines if p not in [500, 700]]
 
     # Above variables
 

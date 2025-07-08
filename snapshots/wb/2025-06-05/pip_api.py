@@ -163,8 +163,8 @@ def poverty_lines_regions():
 # It includes the international poverty line, lower and upper-middle income lines, and some other lines.
 # NOTE: Define this dictionary to show the most recent PPP prices second
 POVLINES_DICT = {
-    2017: [100, 215, 365, 685, 1000, 2000, 3000, 4000],
-    2021: [100, 300, 420, 830, 1000, 2000, 3000, 4000],  # TODO: add lines
+    2017: [100, 215, 365, 500, 685, 700, 1000, 2000, 3000, 4000],
+    2021: [100, 300, 420, 500, 700, 830, 1000, 2000, 3000, 4000],
 }
 
 # Define international poverty lines as the second value in each list in POVLINES_DICT

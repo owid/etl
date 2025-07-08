@@ -28,10 +28,9 @@ log = get_logger()
 
 # Define absolute poverty lines used depending on PPP version
 # NOTE: Modify if poverty lines are updated from source
-# TODO: Modify the lines in 2021 prices
 POVLINES_DICT = {
-    2017: ["100", "215", "365", "685", "1000", "2000", "3000", "4000"],
-    2021: ["100", "300", "420", "830", "1000", "2000", "3000", "4000"],
+    2017: ["100", "215", "365", "500", "685", "700", "1000", "2000", "3000", "4000"],
+    2021: ["100", "300", "420", "500", "700", "830", "1000", "2000", "3000", "4000"],
 }
 
 # Define international poverty lines as the second value in each list in POVLINES_DICT
@@ -502,6 +501,9 @@ def create_stacked_variables(tb: Table) -> Tuple[Table, list, list]:
     )
 
     for ppp_year, povlines in POVLINES_DICT.items():
+        # Remove "500" and "700" from povlines, since I don't want to use them for this indicator
+        povlines = [p for p in povlines if p not in ["500", "700"]]
+
         for i in range(len(povlines)):
             # if it's the first value only continue
             if i == 0:
@@ -669,7 +671,10 @@ def sanity_checks(
         # Initialize the stacked column lists representing all the possible intervals
         col_stacked_pct_all = []
         col_stacked_n_all = []
-        for i in range(len(povlines)):
+
+        # Remove "500" and "700" from povlines, since I don't want to use them for stacked indicators
+        povlines_stacked = [p for p in povlines if p not in ["500", "700"]]
+        for i in range(len(povlines_stacked)):
             # if it's the first value only continue
             if i == 0:
                 continue
@@ -677,19 +682,25 @@ def sanity_checks(
             # If it's the last value calculate the people between this value and the previous
             # and also the people over this poverty line (and percentages)
             else:
-                varname_n = ("headcount_between", ppp_year, f"{povlines[i-1]} and {povlines[i]}")
-                varname_pct = ("headcount_ratio_between", ppp_year, f"{povlines[i-1]} and {povlines[i]}")
+                varname_n = ("headcount_between", ppp_year, f"{povlines_stacked[i-1]} and {povlines_stacked[i]}")
+                varname_pct = (
+                    "headcount_ratio_between",
+                    ppp_year,
+                    f"{povlines_stacked[i-1]} and {povlines_stacked[i]}",
+                )
                 col_stacked_n_all.append(varname_n)
                 col_stacked_pct_all.append(varname_pct)
 
         col_stacked_pct_all = (
-            [("headcount_ratio", ppp_year, povlines[0])]
+            [("headcount_ratio", ppp_year, povlines_stacked[0])]
             + col_stacked_pct_all
-            + [("headcount_ratio_above", ppp_year, povlines[-1])]
+            + [("headcount_ratio_above", ppp_year, povlines_stacked[-1])]
         )
 
         col_stacked_n_all = (
-            [("headcount", ppp_year, povlines[0])] + col_stacked_n_all + [("headcount_above", ppp_year, povlines[-1])]
+            [("headcount", ppp_year, povlines_stacked[0])]
+            + col_stacked_n_all
+            + [("headcount_above", ppp_year, povlines_stacked[-1])]
         )
 
         col_stacked_pct_dict[ppp_year] = {"all": col_stacked_pct_all}
@@ -697,16 +708,16 @@ def sanity_checks(
 
         # Define the stacked columns for a reduced set of intervals
         col_stacked_pct_reduced = [
-            ("headcount_ratio", ppp_year, povlines[1]),
-            ("headcount_ratio_between", ppp_year, f"{povlines[1]} and {povlines[4]}"),
-            ("headcount_ratio_between", ppp_year, f"{povlines[4]} and {povlines[6]}"),
-            ("headcount_ratio_above", ppp_year, povlines[6]),
+            ("headcount_ratio", ppp_year, povlines_stacked[1]),
+            ("headcount_ratio_between", ppp_year, f"{povlines_stacked[1]} and {povlines_stacked[4]}"),
+            ("headcount_ratio_between", ppp_year, f"{povlines_stacked[4]} and {povlines_stacked[6]}"),
+            ("headcount_ratio_above", ppp_year, povlines_stacked[6]),
         ]
         col_stacked_n_reduced = [
-            ("headcount", ppp_year, povlines[1]),
-            ("headcount_between", ppp_year, f"{povlines[1]} and {povlines[4]}"),
-            ("headcount_between", ppp_year, f"{povlines[4]} and {povlines[6]}"),
-            ("headcount_above", ppp_year, povlines[6]),
+            ("headcount", ppp_year, povlines_stacked[1]),
+            ("headcount_between", ppp_year, f"{povlines_stacked[1]} and {povlines_stacked[4]}"),
+            ("headcount_between", ppp_year, f"{povlines_stacked[4]} and {povlines_stacked[6]}"),
+            ("headcount_above", ppp_year, povlines_stacked[6]),
         ]
 
         # Add the reduced columns to the dictionary
