@@ -357,17 +357,7 @@ def fix_discrepancies_in_aggregate_regions(tb_review: Table, tb_ember: Table, co
     segments_not_combined = {region: [] for region in geo.REGIONS}
     segments_not_combined.update(
         {
-            "Low-income countries": [
-                "coal_generation__twh",
-                "fossil_generation__twh",
-                "gas_generation__twh",
-                "hydro_generation__twh",
-                "low_carbon_generation__twh",
-                "oil_generation__twh",
-                "other_renewables_including_bioenergy_generation__twh",
-                "renewable_generation__twh",
-                "total_generation__twh",
-            ],
+            "Low-income countries": [],
             "Lower-middle-income countries": [
                 "fossil_generation__twh",
                 "gas_generation__twh",
@@ -376,53 +366,28 @@ def fix_discrepancies_in_aggregate_regions(tb_review: Table, tb_ember: Table, co
                 "oil_generation__twh",
                 "other_renewables_including_bioenergy_generation__twh",
                 "renewable_generation__twh",
-                "solar_and_wind_generation__twh",
-                "solar_generation__twh",
-                "wind_generation__twh",
             ],
-            "Upper-middle-income countries": [
+            "Upper-middle-income countries": ["gas_generation__twh", "oil_generation__twh"],
+            "High-income countries": ["oil_generation__twh"],
+            "Europe": ["oil_generation__twh"],
+            "North America": ["oil_generation__twh"],
+            "European Union (27)": ["oil_generation__twh"],
+            "Africa": [
+                "hydro_generation__twh",
+                "low_carbon_generation__twh",
+                "other_renewables_including_bioenergy_generation__twh",
+                "renewable_generation__twh",
+                "solar_generation__twh",
+                "total_generation__twh",
+            ],
+            "Asia": [],
+            "Oceania": [],
+            "South America": [
+                "coal_generation__twh",
+                "fossil_generation__twh",
                 "gas_generation__twh",
                 "oil_generation__twh",
-                "solar_and_wind_generation__twh",
-                "solar_generation__twh",
-                "wind_generation__twh",
             ],
-            "High-income countries": [
-                "oil_generation__twh",
-                "solar_and_wind_generation__twh",
-                "solar_generation__twh",
-                "wind_generation__twh",
-            ],
-            "Europe": [
-                "oil_generation__twh",
-                "renewable_generation__twh",
-                "solar_and_wind_generation__twh",
-                "solar_generation__twh",
-                "wind_generation__twh",
-            ],
-            "North America": [
-                "oil_generation__twh",
-                "solar_and_wind_generation__twh",
-                "solar_generation__twh",
-                "wind_generation__twh",
-            ],
-            "European Union (27)": [
-                "oil_generation__twh",
-                "renewable_generation__twh",
-                "solar_and_wind_generation__twh",
-                "solar_generation__twh",
-                "wind_generation__twh",
-            ],
-            "Africa": ["solar_and_wind_generation__twh", "solar_generation__twh", "wind_generation__twh"],
-            "Asia": ["solar_and_wind_generation__twh", "solar_generation__twh", "wind_generation__twh"],
-            "Oceania": [
-                "low_carbon_generation__twh",
-                "renewable_generation__twh",
-                "solar_and_wind_generation__twh",
-                "solar_generation__twh",
-                "wind_generation__twh",
-            ],
-            "South America": ["solar_and_wind_generation__twh", "solar_generation__twh", "wind_generation__twh"],
         }
     )
     for region in segments_not_combined:
