@@ -35,7 +35,7 @@ tables:
         presentation:
           title_public: Share of total exports of goods (FOB) to << counterpart_country >>
         display:
-          name: << counterpart_country >>
+          name: Exports to << counterpart_country >>
 
       imports_of_goods__cost_insurance_freight__cif__share:
         title: Share of total imports of goods (CIF) from << counterpart_country >>
@@ -53,7 +53,7 @@ tables:
         presentation:
           title_public: Share of total imports of goods (CIF) from << counterpart_country >>
         display:
-          name: << counterpart_country >>
+          name: Imports from << counterpart_country >>
 
       trade_balance_goods__share:
         title: Trade balance of goods with << counterpart_country >> as share of total trade volume
