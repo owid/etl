@@ -400,3 +400,11 @@ steps:
     - data://meadow/health/2025-02-13/vaccine_confidence
   data://grapher/health/2025-02-13/vaccine_confidence:
     - data://garden/health/2025-02-13/vaccine_confidence
+
+  # WHO Statins (moved to main GHPO script)
+  data://meadow/who/2023-11-01/who_statins:
+    - snapshot://who/2023-11-01/who_statins.csv
+  data://garden/who/2023-11-01/who_statins:
+    - data://meadow/who/2023-11-01/who_statins
+  data://grapher/who/2023-11-01/who_statins:
+    - data://garden/who/2023-11-01/who_statins
