@@ -355,83 +355,84 @@ steps:
   #
   data://grapher/energy/2025-06-27/electricity_mix:
     - data://garden/energy/2025-06-27/electricity_mix
-  # #
-  # # Energy - Energy mix.
-  # #
-  # data://garden/energy/2025-06-27/energy_mix:
-  #   - data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy
-  #   - data://garden/demography/2024-07-15/population
-  #   - data://garden/wb/2024-07-29/income_groups
-  # #
-  # # Energy - Fossil fuel reserves/production ratio.
-  # #
-  # data://garden/energy/2025-06-27/fossil_fuel_reserves_production_ratio:
-  #   - data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy
-  # #
-  # # Energy - Primary energy consumption.
-  # #
-  # data://garden/energy/2025-06-27/primary_energy_consumption:
-  #   - data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy
-  #   - data://garden/demography/2024-07-15/population
-  #   - data://garden/ggdc/2024-04-26/maddison_project_database
-  #   - data://garden/eia/2023-12-12/energy_consumption
-  # #
-  # # Energy - Global primary energy.
-  # #
-  # data://garden/energy/2025-06-27/global_primary_energy:
-  #   - data://garden/papers/2023-12-12/smil_2017
-  #   - data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy
-  # #
-  # # Energy - Fossil Fuel Production.
-  # #
-  # data://garden/energy/2025-06-27/fossil_fuel_production:
-  #   - data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy
-  #   - data://garden/shift/2023-12-12/energy_production_from_fossil_fuels
-  #   - data://garden/demography/2024-07-15/population
-  # #
-  # # Energy - UK historical electricity.
-  # #
-  # data://garden/energy/2025-06-27/uk_historical_electricity:
-  #   - data://garden/energy/2025-06-27/electricity_mix
-  #   - data://garden/uk_beis/2023-12-12/uk_historical_electricity
-  # #
-  # # Energy - Energy mix.
-  # #
-  # data://grapher/energy/2025-06-27/energy_mix:
-  #   - data://garden/energy/2025-06-27/energy_mix
-  # #
-  # # Energy - Fossil fuel reserves/production ratio.
-  # #
-  # data://grapher/energy/2025-06-27/fossil_fuel_reserves_production_ratio:
-  #   - data://garden/energy/2025-06-27/fossil_fuel_reserves_production_ratio
-  # #
-  # # Energy - Primary energy consumption.
-  # #
-  # data://grapher/energy/2025-06-27/primary_energy_consumption:
-  #   - data://garden/energy/2025-06-27/primary_energy_consumption
-  # #
-  # # Energy - Global primary energy.
-  # #
-  # data://grapher/energy/2025-06-27/global_primary_energy:
-  #   - data://garden/energy/2025-06-27/global_primary_energy
-  # #
-  # # Energy - Fossil Fuel Production.
-  # #
-  # data://grapher/energy/2025-06-27/fossil_fuel_production:
-  #   - data://garden/energy/2025-06-27/fossil_fuel_production
-  # #
-  # # Energy - UK historical electricity.
-  # #
-  # data://grapher/energy/2025-06-27/uk_historical_electricity:
-  #   - data://garden/energy/2025-06-27/uk_historical_electricity
-  # #
-  # # Energy - OWID Energy dataset.
-  # #
-  # data://external/energy_data/latest/owid_energy:
-  #   - data://garden/regions/2023-01-01/regions
-  #   - data://garden/demography/2024-07-15/population
-  #   - data://garden/ggdc/2024-04-26/maddison_project_database
-  #   - data://garden/energy/2025-06-27/electricity_mix
-  #   - data://garden/energy/2025-06-27/fossil_fuel_production
-  #   - data://garden/energy/2025-06-27/primary_energy_consumption
-  #   - data://garden/energy/2025-06-27/energy_mix
+  #
+  # Energy - UK historical electricity.
+  #
+  data://garden/energy/2025-06-27/uk_historical_electricity:
+    - data://garden/energy/2025-06-27/electricity_mix
+    - data://garden/uk_beis/2023-12-12/uk_historical_electricity
+  #
+  # Energy - UK historical electricity.
+  #
+  data://grapher/energy/2025-06-27/uk_historical_electricity:
+    - data://garden/energy/2025-06-27/uk_historical_electricity
+  #
+  # Energy - Energy mix.
+  #
+  data://garden/energy/2025-06-27/energy_mix:
+    - data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy
+    - data://garden/demography/2024-07-15/population
+    - data://garden/wb/2025-07-01/income_groups
+  #
+  # Energy - Energy mix.
+  #
+  data://grapher/energy/2025-06-27/energy_mix:
+    - data://garden/energy/2025-06-27/energy_mix
+  #
+  # Energy - Fossil fuel reserves/production ratio.
+  #
+  data://garden/energy/2025-06-27/fossil_fuel_reserves_production_ratio:
+    - data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy
+  #
+  # Energy - Fossil fuel reserves/production ratio.
+  #
+  data://grapher/energy/2025-06-27/fossil_fuel_reserves_production_ratio:
+    - data://garden/energy/2025-06-27/fossil_fuel_reserves_production_ratio
+  #
+  # Energy - Fossil Fuel Production.
+  #
+  data://garden/energy/2025-06-27/fossil_fuel_production:
+    - data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy
+    - data://garden/shift/2023-12-12/energy_production_from_fossil_fuels
+    - data://garden/demography/2024-07-15/population
+  #
+  # Energy - Fossil Fuel Production.
+  #
+  data://grapher/energy/2025-06-27/fossil_fuel_production:
+    - data://garden/energy/2025-06-27/fossil_fuel_production
+  #
+  # Energy - Global primary energy.
+  #
+  data://garden/energy/2025-06-27/global_primary_energy:
+    - data://garden/papers/2023-12-12/smil_2017
+    - data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy
+  #
+  # Energy - Global primary energy.
+  #
+  data://grapher/energy/2025-06-27/global_primary_energy:
+    - data://garden/energy/2025-06-27/global_primary_energy
+  #
+  # Energy - Primary energy consumption.
+  #
+  # TODO: Consider updating the eia energy_consumption dataset.
+  data://garden/energy/2025-06-27/primary_energy_consumption:
+    - data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy
+    - data://garden/demography/2024-07-15/population
+    - data://garden/ggdc/2024-04-26/maddison_project_database
+    - data://garden/eia/2023-12-12/energy_consumption
+  #
+  # Energy - Primary energy consumption.
+  #
+  data://grapher/energy/2025-06-27/primary_energy_consumption:
+    - data://garden/energy/2025-06-27/primary_energy_consumption
+  #
+  # Energy - OWID Energy dataset.
+  #
+  data://external/energy_data/latest/owid_energy:
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2024-07-15/population
+    - data://garden/ggdc/2024-04-26/maddison_project_database
+    - data://garden/energy/2025-06-27/electricity_mix
+    - data://garden/energy/2025-06-27/fossil_fuel_production
+    - data://garden/energy/2025-06-27/primary_energy_consumption
+    - data://garden/energy/2025-06-27/energy_mix
