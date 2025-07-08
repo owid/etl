@@ -761,6 +761,16 @@ steps:
   data-private://grapher/happiness/2025-07-22/life_in_five_years_and_life_today:
     - data-private://garden/happiness/2025-07-22/life_in_five_years_and_life_today
 
+  #
+  # IMF Trade Data - Regional
+  #
+  data://meadow/imf/2025-07-08/trade:
+    - snapshot://imf/2025-07-08/trade.csv
+  data://garden/imf/2025-07-08/trade:
+    - data://meadow/imf/2025-07-08/trade
+  data://grapher/imf/2025-07-08/trade:
+    - data://garden/imf/2025-07-08/trade
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
