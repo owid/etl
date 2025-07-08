@@ -1,11 +1,210 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
   common:
+    processing_level: minor
+    description_key:
+      - PISA (Programme for International Student Assessment) is a triennial international survey which aims to evaluate education systems worldwide by testing the skills and knowledge of 15-year-old students.
+      - Students take a two-hour computer-based test that covers reading, mathematics, and science, with a focus on how well students can apply their knowledge and skills to real-world situations.
+      - PISA scores are standardized to have a mean of 500 and a standard deviation of 100 across OECD countries in the first assessment (2000 for reading, 2003 for mathematics, 2006 for science).
+      - Higher scores indicate better performance, with scores typically ranging from around 300 to 600, though exceptional performances can exceed this range.
+      - The assessment is administered every three years to nationally representative samples of 15-year-old students in schools.
+      - Results are reported as mean scores for each country, with confidence intervals reflecting sampling and measurement uncertainty.
+      - Cross-country comparisons should account for differences in education systems, socioeconomic contexts, and cultural factors that may affect performance.
     presentation:
       topic_tags:
         - Global Education
+      grapher_config:
+        hasMapTab: true
+        maxTime: 2022
+        map:
+          time: 2022
+          timeTolerance: 3
+    display:
+      tolerance: 3
+      numDecimalPlaces: 1
+
+  # ============================================================================
+  # COMMON CONFIGURATION TEMPLATES
+  # ============================================================================
+
+  # Base grapher configuration templates
+  common_grapher_config: &common_grapher_config
+    maxTime: 2022
+    hasMapTab: true
+
+  common_grapher_map_config: &common_grapher_map_config
+    time: 2022
+    timeTolerance: 3
+
+  # ============================================================================
+  # VALUE RANGES (BINS) FOR PISA SCORES
+  # ============================================================================
+
+  pisa_score_bins: &pisa_score_bins [300,340,380,420,460,500,540]
+
+  # ============================================================================
+  # PISA SCORE CONFIGURATIONS
+  # ============================================================================
+
+  grapher_config_pisa_math: &grapher_config_pisa_math
+    <<: *common_grapher_config
+    map:
+      <<: *common_grapher_map_config
+      colorScale:
+        binningStrategy: manual
+        customNumericValues: *pisa_score_bins
+        baseColorScheme: Blues
+
+  grapher_config_pisa_science: &grapher_config_pisa_science
+    <<: *common_grapher_config
+    map:
+      <<: *common_grapher_map_config
+      colorScale:
+        binningStrategy: manual
+        customNumericValues: *pisa_score_bins
+        baseColorScheme: Greens
+
+  grapher_config_pisa_reading: &grapher_config_pisa_reading
+    <<: *common_grapher_config
+    map:
+      <<: *common_grapher_map_config
+      colorScale:
+        binningStrategy: manual
+        customNumericValues: *pisa_score_bins
+        baseColorScheme: Oranges
+
+  grapher_config_pisa_boys: &grapher_config_pisa_boys
+    <<: *common_grapher_config
+    map:
+      <<: *common_grapher_map_config
+      colorScale:
+        binningStrategy: manual
+        customNumericValues: *pisa_score_bins
+        baseColorScheme: Blues
+
+  grapher_config_pisa_girls: &grapher_config_pisa_girls
+    <<: *common_grapher_config
+    map:
+      <<: *common_grapher_map_config
+      colorScale:
+        binningStrategy: manual
+        customNumericValues: *pisa_score_bins
+        baseColorScheme: Purples
+
+
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
 dataset:
   update_period_days: 365
+
+tables:
+  pisa_math_boys_girls:
+    variables:
+      pisa_math_average_boys:
+        title: PISA mathematics scores for boys
+        unit: score
+        short_unit: ""
+        description_short: Average PISA mathematics scores for boys aged 15.
+        display:
+          tolerance: 3
+          name: Mathematics
+        presentation:
+          grapher_config: *grapher_config_pisa_boys
+          title_public: PISA mathematics scores for boys
+
+      pisa_math_average_girls:
+        title: PISA mathematics scores for girls
+        unit: score
+        short_unit: ""
+        description_short: Average PISA mathematics scores for girls aged 15.
+        display:
+          tolerance: 3
+          name: Mathematics
+        presentation:
+          grapher_config: *grapher_config_pisa_girls
+          title_public: PISA mathematics scores for girls
+
+      pisa_science_average_boys:
+        title: PISA science scores for boys
+        unit: score
+        short_unit: ""
+        description_short: Average PISA science scores for boys aged 15.
+        display:
+          tolerance: 3
+          name: Science
+        presentation:
+          grapher_config: *grapher_config_pisa_boys
+          title_public: PISA science scores for boys
+
+      pisa_science_average_girls:
+        title: PISA science scores for girls
+        unit: score
+        short_unit: ""
+        description_short: Average PISA science scores for girls aged 15.
+        display:
+          tolerance: 3
+          name: Science
+        presentation:
+          grapher_config: *grapher_config_pisa_girls
+          title_public: PISA science scores for girls
+
+      pisa_reading_average_boys:
+        title: PISA reading scores for boys
+        unit: score
+        short_unit: ""
+        description_short: Average PISA reading scores for boys aged 15.
+        display:
+          tolerance: 3
+          name: Reading
+        presentation:
+          grapher_config: *grapher_config_pisa_boys
+          title_public: PISA reading scores for boys
+
+      pisa_reading_average_girls:
+        title: PISA reading scores for girls
+        unit: score
+        short_unit: ""
+        description_short: Average PISA reading scores for girls aged 15.
+        display:
+          tolerance: 3
+          name: Reading
+        presentation:
+          grapher_config: *grapher_config_pisa_girls
+          title_public: PISA reading scores for girls
+
+      pisa_math_all_average:
+        title: PISA mathematics scores
+        unit: score
+        short_unit: ""
+        description_short: Average PISA mathematics scores for all students aged 15.
+        display:
+          tolerance: 3
+          name: Mathematics
+        presentation:
+          grapher_config: *grapher_config_pisa_math
+          title_public: PISA mathematics scores for all students
+
+      pisa_science_all_average:
+        title: PISA science scores
+        unit: score
+        short_unit: ""
+        description_short: Average PISA science scores for all students aged 15.
+        display:
+          tolerance: 3
+          name: Science
+        presentation:
+          grapher_config: *grapher_config_pisa_science
+          title_public: PISA science scores for all students
+
+      pisa_reading_all_average:
+        title: PISA reading scores
+        unit: score
+        short_unit: ""
+        description_short: Average PISA reading scores for all students aged 15.
+        display:
+          tolerance: 3
+          name: Reading
+        presentation:
+          grapher_config: *grapher_config_pisa_reading
+          title_public: PISA reading scores for all students
