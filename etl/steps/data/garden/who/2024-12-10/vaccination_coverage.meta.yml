@@ -8,6 +8,8 @@ definitions:
         selectedEntityNames:
           - World
         hasMapTab: true
+        hideAnnotationFieldsInTitle:
+          time: true
   description_key_standard_one: |-
     This chart showsdata represents official WHO/UNICEF estimates of national immunization coverage published by the WHO and UNICEF (WUENIC). The estimates include all WHO mMember sStates, even those that did not report 2023 data. For non-reporting countries, WHO uses statistical methods to extrapolate from previously reported data, ensuring global coverage can be assessed.
   description_key_standard_two: |-
@@ -170,7 +172,13 @@ definitions:
     <%- elif antigen == "RCV1" %>
       Rubella is a contagious viral infection that occurs most often in children and young adults. Rubella infection in pregnant women may cause fetal death or congenital defects known as congenital rubella syndrome.
     <%- elif antigen == "ROTAC" %>
-
+      Rotavirus is a virus that causes severe diarrhea, mostly in infants and young children. It can lead to dehydration and death if not treated.
+    <%- elif antigen == "BCG" %>
+      Tuberculosis (TB) is a bacterial infection that primarily affects the lungs but can also affect other parts of the body. It is the leading infectious cause of death worldwide.
+    <%- elif antigen in ["DTPCV1", "DTPCV3"] %>
+      Diphtheria can cause breathing problems, heart failure, paralysis, and even death. Tetanus causes painful muscle stiffness and lockjaw. Pertussis (whooping cough) causes severe coughing fits that can lead to pneumonia, seizures, and brain damage.
+    <%- elif antigen in ["HEPB_BD","HEPB3"] %>
+      Hepatitis B is a viral infection that attacks the liver and can cause both acute and chronic disease.
     <%- endif %>
   antigen_display_name: |-
     <% if antigen == "BCG" %>
