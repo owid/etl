@@ -344,6 +344,18 @@ steps:
   data://grapher/energy_institute/2025-06-27/statistical_review_of_world_energy:
     - data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy
   #
+  # EIA - Energy consumption.
+  #
+  data://meadow/eia/2025-07-08/energy_consumption:
+    - snapshot://eia/2025-07-08/international_energy_data.zip
+  #
+  # EIA - Energy consumption.
+  #
+  data://garden/eia/2025-07-08/energy_consumption:
+    - data://meadow/eia/2025-07-08/energy_consumption
+    - data://garden/wb/2025-07-01/income_groups
+    - data://garden/regions/2023-01-01/regions
+  #
   # Energy - Electricity mix (EI & Ember).
   #
   data://garden/energy/2025-06-27/electricity_mix:
@@ -414,12 +426,11 @@ steps:
   #
   # Energy - Primary energy consumption.
   #
-  # TODO: Consider updating the eia energy_consumption dataset.
   data://garden/energy/2025-06-27/primary_energy_consumption:
     - data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy
     - data://garden/demography/2024-07-15/population
     - data://garden/ggdc/2024-04-26/maddison_project_database
-    - data://garden/eia/2023-12-12/energy_consumption
+    - data://garden/eia/2025-07-08/energy_consumption
   #
   # Energy - Primary energy consumption.
   #
