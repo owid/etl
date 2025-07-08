@@ -69,12 +69,11 @@ def get_statistical_review_data(tb_review: Table) -> Table:
         "Wind generation - TWh": "Wind (TWh - direct)",
         "Other renewables (including geothermal and biomass) electricity generation - TWh": "Other renewables (TWh - direct)",
         # Non-fossil based electricity generation converted into input-equivalent primary energy.
-        # NOTE: In the 2025 release, the consumption of non-fossil sources is not anymore given in input-equivalents. So, for now, we will calculate these input equivalents using thermal efficiency factors (as they used to do in previous releases).
-        # "Hydro consumption - TWh": "Hydro (TWh - equivalent)",
-        # "Nuclear consumption - TWh": "Nuclear (TWh - equivalent)",
-        # "Solar consumption - TWh": "Solar (TWh - equivalent)",
-        # "Wind consumption - TWh": "Wind (TWh - equivalent)",
-        # "Other renewables (including geothermal and biomass) - TWh": "Other renewables (TWh - equivalent)",
+        "Hydro consumption - TWh": "Hydro (TWh - equivalent)",
+        "Nuclear consumption - TWh": "Nuclear (TWh - equivalent)",
+        "Solar consumption - TWh": "Solar (TWh - equivalent)",
+        "Wind consumption - TWh": "Wind (TWh - equivalent)",
+        "Other renewables (including geothermal and biomass) - TWh": "Other renewables (TWh - equivalent)",
         # Total, input-equivalent primary energy consumption.
         # NOTE: The input-equivalent primary energy consumption will be calculated later on, so the following column
         # will be used just to sanity check.
@@ -82,7 +81,7 @@ def get_statistical_review_data(tb_review: Table) -> Table:
         # Biofuels consumption.
         "Biofuels consumption - TWh": "Biofuels (TWh)",
         # Thermal efficiency factors.
-        "Thermal equivalent efficiency factors": "Thermal equivalent efficiency factors",
+        # "Thermal equivalent efficiency factors": "Thermal equivalent efficiency factors",
     }
 
     # Sanity check.
@@ -160,13 +159,6 @@ def calculate_equivalent_primary_energy(primary_energy: Table) -> Table:
 
     """
     primary_energy = primary_energy.copy()
-
-    # Create primary energy consumption in input-equivalents.
-    # NOTE: This only needs to be done to non-fossil generation sources (which are "inflated" to mimic fossil inefficiencies). Fossil fuels consumption is by construction identical to primary energy consumption.
-    for source in ["Hydro", "Nuclear", "Solar", "Wind", "Other renewables"]:
-        primary_energy[f"{source} (TWh - equivalent)"] = (
-            primary_energy[f"{source} (TWh - direct)"] / primary_energy["Thermal equivalent efficiency factors"]
-        )
 
     # Create column for total renewable input-equivalent primary energy.
     # Fill missing values with zeros (see comment above).

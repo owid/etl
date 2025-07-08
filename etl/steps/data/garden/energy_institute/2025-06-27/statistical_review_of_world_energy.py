@@ -1,4 +1,23 @@
-"""Load a meadow dataset and create a garden dataset."""
+"""Load a meadow dataset and create a garden dataset.
+
+The Statistical Review of World Energy changed its methodology to calculate energy consumption in the 2025 release.
+
+Previously, it reported primary energy consumption using what we call the substitution method (or input-equivalent method), where non-fossil power generation (all sources except coal, gas, and oil) was expressed as input-equivalent energy.
+
+With this method:
+- Fossil fuels: Primary energy consumption included the gross calorific value of fossil fuels (i.e., including energy lost as heat during conversion).
+- Non-fossil sources (nuclear and renewables): Energy consumption figures were calculated by inflating electricity generation by roughly 1/0.4 (more precisely, by dividing by a thermal efficiency factor that varied over time).
+
+This approach aimed to make non-fossil sources comparable with fossil fuels by assuming they were “as inefficient” as fossil fuel power plants.
+
+In the new methodology (from the 2025 release), energy is reported as Total Energy Supply (TES) using the Physical Energy Content method:
+- Fossil fuels: TES is unchanged. It still includes the full gross calorific value, including energy wasted as heat.
+- Non-combustible renewables (wind, solar PV, hydro, ocean, wave): TES is now simply the gross amount of electricity generated (assuming 100% efficiency, no inflation).
+- Non-fossil sources where the primary energy input is heat (nuclear, geothermal, concentrating solar): The heat input is estimated using assumed thermal efficiencies — 33% for nuclear and concentrating solar, 10% for geothermal, and 33% for biomass.
+
+For now, we are ignoring TES and continuing to adapt consumption of non-fossil sources to match the old substitution method. This is a temporary solution, as moving to the new methodology would require rewriting and adapting hundreds of charts and articles.
+
+"""
 
 from owid.catalog import Table
 
@@ -636,6 +655,16 @@ def run() -> None:
     error = "Table was expected to be sorted chronologically (to forward-fill missing thermal efficiency factors)."
     assert set(tb.groupby(["country"])["year"].diff().fillna(1)) == {1}, error
     tb["efficiency_factor"] = tb["efficiency_factor"].ffill()
+
+    # Create primary energy consumption in input-equivalents.
+    # NOTE: This only needs to be done to non-fossil generation sources (which are "inflated" to mimic fossil inefficiencies). Fossil fuels consumption is by construction identical to primary energy consumption.
+    for source in ["nuclear", "hydro", "other_renewables", "solar", "wind"]:
+        tb[f"{source}_consumption_equivalent_twh"] = (
+            tb[f"{source}_electricity_generation_twh"] / tb["efficiency_factor"]
+        )
+        tb[f"{source}_consumption_equivalent_ej"] = (
+            tb[f"{source}_consumption_equivalent_twh"] / EJ_TO_TWH
+        ).copy_metadata(tb[f"{source}_consumption_equivalent_ej"])
 
     # Remove "Other *" regions, since they mean different set of countries for different variables.
     # NOTE: They have to be removed *after* creating region aggregates, otherwise those regions would be underestimated.

@@ -1,23 +1,4 @@
-"""Load a meadow dataset and create a garden dataset.
-
-The Statistical Review of World Energy has changed their methodology to calculate energy consumption in 2025.
-
-They used to report primary energy consumption using the "substitution method", where non-fossil power generation (all sources except coal, gas and oil) was given in input-equivalent energy. With this method:
-- The primary energy consumption of fossil fuels was unaffected. In other words, for fossil fuels, primary energy consumption included the additional energy that is wasted in heat.
-- For non-fossil sources (nuclear and renewables), energy consumption figures were calculated by "inflating" electricity generation by a factor of ~1/0.4 (more specifically, these factors were given by a "thermal efficiency" that changes depending on the year).
-The goal of this method is to be able to compare fossil fuel energy consumption (which is highly inefficient) with non-fossil sources. The substitution method makes non-fossil sources appear "as inefficient" as fossil sources.
-
-On the other hand, in the new methodology (used from the 2025 release), energy is reported in terms of the Total Energy Supply (TES), in physical energy content. With this method:
-- The TES of fossil fuels corresponds to the actual useful energy supplied to users. In other words, it doesn't include the part that has been wasted in heat.
-- The TES of non-fossil sources is not inflated: we can now directly compare fossil and non-fossil sources without any artificial inflation.
-
-There are some additional details about the new methodology (e.g. nuclear, geothermal, concentrating solar, and biomass are treated differently to the rest of low-carbon sources). But, for now, we are ignoring TES, and adapting consumption of non-fossil sources to stick to the old methodology. We do this as a temporary solution, because changing to the new one involves rewriting and adapting hundreds of charts and articles.
-
-########################################################################################################################
-TODO: For now, the conversion to input equivalents is done in the energy_mix step. But it should happen in this step!
-########################################################################################################################
-
-"""
+"""Load a meadow dataset and create a garden dataset."""
 
 from owid.catalog import Table
 
