@@ -69,17 +69,20 @@ def get_statistical_review_data(tb_review: Table) -> Table:
         "Wind generation - TWh": "Wind (TWh - direct)",
         "Other renewables (including geothermal and biomass) electricity generation - TWh": "Other renewables (TWh - direct)",
         # Non-fossil based electricity generation converted into input-equivalent primary energy.
-        "Hydro consumption - TWh": "Hydro (TWh - equivalent)",
-        "Nuclear consumption - TWh": "Nuclear (TWh - equivalent)",
-        "Solar consumption - TWh": "Solar (TWh - equivalent)",
-        "Wind consumption - TWh": "Wind (TWh - equivalent)",
-        "Other renewables (including geothermal and biomass) - TWh": "Other renewables (TWh - equivalent)",
+        # NOTE: In the 2025 release, the consumption of non-fossil sources is not anymore given in input-equivalents. So, for now, we will calculate these input equivalents using thermal efficiency factors (as they used to do in previous releases).
+        # "Hydro consumption - TWh": "Hydro (TWh - equivalent)",
+        # "Nuclear consumption - TWh": "Nuclear (TWh - equivalent)",
+        # "Solar consumption - TWh": "Solar (TWh - equivalent)",
+        # "Wind consumption - TWh": "Wind (TWh - equivalent)",
+        # "Other renewables (including geothermal and biomass) - TWh": "Other renewables (TWh - equivalent)",
         # Total, input-equivalent primary energy consumption.
         # NOTE: The input-equivalent primary energy consumption will be calculated later on, so the following column
         # will be used just to sanity check.
         "Primary energy consumption - TWh": "Primary energy (TWh - equivalent) - original",
         # Biofuels consumption.
         "Biofuels consumption - TWh": "Biofuels (TWh)",
+        # Thermal efficiency factors.
+        "Thermal equivalent efficiency factors": "Thermal equivalent efficiency factors",
     }
 
     # Sanity check.
@@ -158,6 +161,13 @@ def calculate_equivalent_primary_energy(primary_energy: Table) -> Table:
     """
     primary_energy = primary_energy.copy()
 
+    # Create primary energy consumption in input-equivalents.
+    # NOTE: This only needs to be done to non-fossil generation sources (which are "inflated" to mimic fossil inefficiencies). Fossil fuels consumption is by construction identical to primary energy consumption.
+    for source in ["Hydro", "Nuclear", "Solar", "Wind", "Other renewables"]:
+        primary_energy[f"{source} (TWh - equivalent)"] = (
+            primary_energy[f"{source} (TWh - direct)"] / primary_energy["Thermal equivalent efficiency factors"]
+        )
+
     # Create column for total renewable input-equivalent primary energy.
     # Fill missing values with zeros (see comment above).
     primary_energy["Renewables (TWh - equivalent)"] = (
@@ -185,7 +195,7 @@ def calculate_equivalent_primary_energy(primary_energy: Table) -> Table:
     # input-equivalent primary energy.
     _check_that_substitution_method_is_well_calculated(primary_energy)
     # Remove original primary energy column.
-    primary_energy = primary_energy.drop(columns=["Primary energy (TWh - equivalent) - original"], errors="raise")
+    # primary_energy = primary_energy.drop(columns=["Primary energy (TWh - equivalent) - original"], errors="raise")
 
     return primary_energy
 
@@ -195,21 +205,22 @@ def _check_that_substitution_method_is_well_calculated(
 ) -> None:
     # Check that the constructed primary energy using the substitution method (in TWh) coincides with the
     # input-equivalent primary energy (converted from EJ into TWh) given in the original data.
-    check = primary_energy[
+    check = primary_energy.reset_index()[
         [
+            "country",
+            "year",
             "Primary energy (TWh - equivalent) - original",
             "Primary energy (TWh - equivalent)",
         ]
     ]
-    check = check.dropna().reset_index(drop=True)
-    # They may not coincide exactly, but at least check that they differ (point by point) by less than 10%.
-    max_deviation = max(
-        abs(
-            (check["Primary energy (TWh - equivalent)"] - check["Primary energy (TWh - equivalent) - original"])
-            / check["Primary energy (TWh - equivalent) - original"]
-        )
+    check = check.fillna(0)
+    # They may not coincide exactly, but at least check that they differ (point by point) by less than 5%.
+    check["dev"] = 100 * abs(
+        (check["Primary energy (TWh - equivalent)"] - check["Primary energy (TWh - equivalent) - original"])
+        / check["Primary energy (TWh - equivalent) - original"]
     )
-    assert max_deviation < 0.1
+    error = "Unexpected issue during the calculation of the primary energy consumption."
+    assert check["dev"].max() < 5, error
 
 
 def calculate_share_of_primary_energy(primary_energy: Table) -> Table:
@@ -235,7 +246,7 @@ def calculate_share_of_primary_energy(primary_energy: Table) -> Table:
             [
                 source.split("(")[0].strip()
                 for source in primary_energy.columns
-                if not source.startswith(("Country", "Year", "Primary"))
+                if not source.startswith(("Country", "Year", "Primary", "Thermal"))
             ]
         )
     )
