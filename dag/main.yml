@@ -660,6 +660,16 @@ steps:
   data-private://grapher/language/2025-09-03/ethnologue:
     - data-private://garden/language/2025-09-03/ethnologue
 
+  #
+  # IMF Trade Data - Regional
+  #
+  data://meadow/imf/2025-07-08/trade:
+    - snapshot://imf/2025-07-08/trade.csv
+  data://garden/imf/2025-07-08/trade:
+    - data://meadow/imf/2025-07-08/trade
+  data://grapher/imf/2025-07-08/trade:
+    - data://garden/imf/2025-07-08/trade
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml

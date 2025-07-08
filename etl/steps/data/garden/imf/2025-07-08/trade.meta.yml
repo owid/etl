@@ -1,0 +1,59 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Trade & Globalization
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  trade:
+    variables:
+      exports_of_goods__free_on_board__fob__us_dollar:
+        title: Exports of goods (Free on Board, FOB) in US dollars to the << counterpart_country >>
+        unit: US $
+        short_unit: $
+        description_short: Total value of goods exported to << counterpart_country >>, measured at Free on Board (FOB) prices in US dollars.
+        description_key:
+          - Free on Board (FOB) valuation includes the value of goods plus all costs of bringing the goods to the border of the exporting country, including loading onto the transport vessel.
+          - FOB prices exclude international freight, insurance, and other costs beyond the exporting country's border.
+          - This is the standard valuation method for exports as it reflects the value received by the exporting country.
+          - Data is compiled from customs records and other official trade statistics by national statistical offices.
+          - Figures are converted to US dollars using market exchange rates, which may introduce volatility due to currency fluctuations.
+          - Re-exports (goods imported and then exported without substantial transformation) may be included depending on national accounting practices.
+          - Some countries may use different commodity classification systems, which can affect comparability over time or across countries.
+
+      imports_of_goods__cost_insurance_freight__cif__us_dollar:
+        title: Imports of goods (Cost, Insurance, Freight, CIF) in US dollars from the << counterpart_country >>
+        unit: US $
+        short_unit: $
+        description_short: Total value of goods imported from << counterpart_country >>, measured at Cost, Insurance, and Freight (CIF) prices in US dollars.
+        description_key:
+          - Cost, Insurance, and Freight (CIF) valuation includes the value of goods plus all costs of bringing them to the border of the importing country.
+          - CIF prices include international freight charges, insurance premiums, and other delivery costs to the destination country.
+          - This is the standard valuation method for imports as it reflects the total cost to the importing country.
+          - Data is compiled from customs declarations and import documentation by national statistical offices.
+          - Figures are converted to US dollars using market exchange rates, which may introduce volatility due to currency fluctuations.
+          - The difference between CIF and FOB values represents the cost of international transport and insurance services.
+          - Customs procedures and valuation methods may vary between countries, affecting data comparability.
+
+      trade_balance_goods__us_dollar:
+        title: Trade balance of goods in US dollars with the << counterpart_country >>
+        unit: US $
+        short_unit: $
+        description_short: Net trade in goods with << counterpart_country >>, calculated as exports minus imports, in US dollars.
+        description_key:
+          - Trade balance is calculated as the value of exports (FOB) minus the value of imports (CIF) for goods only.
+          - A positive balance indicates a trade surplus (exports exceed imports), while a negative balance indicates a trade deficit (imports exceed exports).
+          - The use of different valuation methods (FOB for exports, CIF for imports) means the global trade balance will not sum to zero due to freight and insurance costs.
+          - This measure excludes trade in services, which can be substantial for some countries and trading relationships.
+          - Changes in the trade balance can reflect shifts in economic competitiveness, exchange rates, trade policies, or economic conditions.
+          - Data is derived from national customs statistics and may be subject to revision as more complete information becomes available.
+          - Bilateral trade balances may not match when reported by both trading partners due to differences in recording methods, timing, and classification systems.
