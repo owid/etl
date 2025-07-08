@@ -148,11 +148,11 @@ definitions:
     <% if antigen == "MCV1" %>
     Measles is one of the most contagious diseases. The first dose of measles vaccine is critical for building immunity. In countries where the national schedule recommends the first dose at 12 months or later based on local epidemiology, these estimates reflect the percentage of children who received their first dose as recommended.
     <%- elif antigen == "RCV1" %>
-    Coverage estimates are based on WHO and UNICEF data for the first dose of the measles-rubella vaccine. These are taken from measles vaccine data, so country-reported rubella coverage is not used.
+    Rubella coverage estimates are based on WHO and UNICEF data for the first dose of the measles-rubella vaccine, as the WHO recommends this combined vaccine.
     <%- elif antigen == "HEPB_BD" %>
     WHO and UNICEF only estimate coverage of the hepatitis B birth dose (a vaccine given within 24 hours of birth) for countries with a policy to provide this dose for all newborns. They don’t produce estimates for countries that only recommend this dose for babies born to mothers infected with hepatitis B, or for countries where there isn’t enough information to know whether the vaccine is given within 24 hours of birth.
     <%- elif antigen == "PCV3" %>
-    In some countries, coverage may show the percentage of infants who received two doses of pneumococcal vaccine before their first birthday, based on national schedules and disease patterns.
+    In some countries the vaccine schedule may recommend two doses in before the age of one and a booster at a later date. These cases are also counted under this variable.
     <%- elif antigen == "IPV1" %>
     In countries where both types of polio vaccine are used — IPV (inactivated polio vaccine, given as an injection) and OPV (oral polio vaccine, given as drops) — WHO and UNICEF count any baby under 1 year old who received at least one routine dose of IPV in their estimate of “first dose” coverage (meaning the first dose of IPV). In countries that only use IPV, “first dose” simply refers to the first IPV dose given.
     <%- endif %>
