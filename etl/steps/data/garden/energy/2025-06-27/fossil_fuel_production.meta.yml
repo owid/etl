@@ -8,11 +8,11 @@ definitions:
       - We have converted primary production in exajoules to terawatt-hours using the conversion factor: 1,000,000 / 3,600 ~ 278.
       - Production per capita has been calculated by dividing by our population dataset, based on [different sources](https://ourworldindata.org/population-sources).
   description_short_twh: &description_short_twh |-
-    Measured in terawatt-hours.
+    Measured in [terawatt-hours](#dod:watt-hours).
   description_short_pct: &description_short_pct |-
     Measured as a percentage of the previous year's production.
   description_short_per_capita: &description_short_per_capita |-
-    Measured in kilowatt-hours per capita.
+    Measured in [kilowatt-hours](#dod:watt-hours) per capita.
 
 dataset:
   update_period_days: 365
