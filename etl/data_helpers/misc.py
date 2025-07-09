@@ -12,6 +12,7 @@ from owid.datautils import dataframes
 from tqdm.auto import tqdm
 
 from apps.utils.google import CLIENT_SECRET_FILE, GoogleDrive, GoogleSheet
+from etl.config import OWID_ENV
 
 TableOrDataFrame = TypeVar("TableOrDataFrame", pd.DataFrame, Table)
 DIMENSION_COL_NONE = "temporary"
@@ -895,8 +896,8 @@ def export_table_to_gsheet(
     ...     metadata_variables=["child_mortality_rate", "population"]
     ... )
     """
-    # Check if Google API credentials are available
-    if not CLIENT_SECRET_FILE or not CLIENT_SECRET_FILE.exists():
+    # Check if Google API credentials are available and that the script is being run locally
+    if not CLIENT_SECRET_FILE or not CLIENT_SECRET_FILE.exists() or OWID_ENV.env_local != "dev":
         print("Warning: Google API credentials not found. Skipping Google Sheets export.")
         return "", ""
 
