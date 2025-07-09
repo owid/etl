@@ -74,6 +74,7 @@ def run() -> None:
     tb_combined_full = tb_combined_full.drop(columns=["source"]).format(["country", "year"])
     tb_combined_sel = tb_combined_sel.format(["country", "year"])
     tb_combined_sel["source"].metadata.origins = tb_combined_sel["child_mortality_rate"].metadata.origins
+    tb_combined_sel["source_url"].metadata.origins = tb_combined_sel["child_mortality_rate"].metadata.origins
 
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = paths.create_dataset(tables=[tb_combined_full, tb_combined_sel], check_variables_metadata=True)
