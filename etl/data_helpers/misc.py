@@ -898,7 +898,9 @@ def export_table_to_gsheet(
     """
     # Check if Google API credentials are available and that the script is being run locally
     if not CLIENT_SECRET_FILE or not CLIENT_SECRET_FILE.exists() or OWID_ENV.env_local != "dev":
-        print("Warning: Google API credentials not found. Skipping Google Sheets export.")
+        print(
+            "Warning: Google API credentials not found or script is not running locally. Skipping Google Sheets export."
+        )
         return "", ""
 
     def _create_metadata_dataframes(
