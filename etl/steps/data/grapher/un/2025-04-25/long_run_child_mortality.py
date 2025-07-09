@@ -22,6 +22,7 @@ def run() -> None:
         table=tb_sel,
         sheet_title="Long Run Child Mortality - Gapminder; UN IGME",
         update_existing=True,
+        # folder_id="1qan1ZSJx2nCyIiVnFhJenVNeiN8r9Se9",
         metadata_variables=["child_mortality_rate"],
     )
     print(f"Google Sheet exported successfully. URL: {sheet_url}, ID: {sheet_id}")
