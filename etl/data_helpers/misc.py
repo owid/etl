@@ -11,8 +11,8 @@ from owid.catalog import Table
 from owid.datautils import dataframes
 from tqdm.auto import tqdm
 
-from apps.utils.google import CLIENT_SECRET_FILE, GoogleDrive, GoogleSheet
 from etl.config import OWID_ENV
+from etl.google import CLIENT_SECRET_FILE, GoogleDrive, GoogleSheet
 
 TableOrDataFrame = TypeVar("TableOrDataFrame", pd.DataFrame, Table)
 DIMENSION_COL_NONE = "temporary"

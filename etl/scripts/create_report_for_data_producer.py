@@ -10,8 +10,6 @@ import requests
 from rich_click.rich_command import RichCommand
 from structlog import get_logger
 
-from apps.utils.google import GoogleDoc, GoogleDrive, GoogleSheet
-from apps.utils.notion import get_data_producer_contacts, get_impact_highlights
 from etl.analytics import (
     get_chart_views_by_chart_id,
     get_post_views_by_chart_id,
@@ -19,6 +17,8 @@ from etl.analytics import (
 )
 from etl.data_helpers.misc import humanize_number
 from etl.db import get_engine
+from etl.google import GoogleDoc, GoogleDrive, GoogleSheet
+from etl.notion import get_data_producer_contacts, get_impact_highlights
 
 # Initialize logger.
 log = get_logger()

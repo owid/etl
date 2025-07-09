@@ -1,5 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import owid.catalog.processing as pr
 from owid.catalog import Table
 from owid.datautils.dataframes import combine_two_overlapping_dataframes
 
@@ -50,6 +51,41 @@ def run_sanity_checks_on_inputs(tb_qcl: Table, tb_us: Table, tb_uk: Table, tb_wh
     assert set(tb_qcl["year"]) <= set(tb_wheat["year"])
 
 
+def create_table_of_rolling_averages(tb: Table) -> Table:
+    # NOTE: Given that different countries have different sampling, I'll just create these variables for the UK and the World (since that's the only data we need for now). If we need smooth curves in the future for other countries, we can generalize this function.
+    countries = ["United Kingdom", "World"]
+    columns = ["country", "year"] + [
+        crop + "_yield" for crop in ["barley", "oats", "potatoes", "pulses", "rye", "sugar_beet", "wheat"]
+    ]
+    tb = tb[(tb["country"].isin(countries))][columns].reset_index(drop=True)
+    # To do that, combine pre-1961 data as-is, with a 10-year rolling average of FAOSTAT data (from 1961 onwards).
+    tb_historical = tb[tb["year"] < 1961].reset_index(drop=True)
+    tb_modern = tb[tb["year"] >= 1961].reset_index(drop=True)
+    # Get data columns.
+    data_columns = [column for column in tb.columns if column not in ["country", "year"]]
+    # Apply rolling average only to data columns for modern period.
+    _tables = []
+    for country in countries:
+        _tb_modern = tb[(tb["year"] >= 1961) & (tb["country"] == country)].reset_index(drop=True)
+        _tb_modern[data_columns] = _tb_modern[data_columns].rolling(window=10, min_periods=1).mean()
+        _tables.append(_tb_modern)
+    tb_modern = pr.concat(_tables)
+    # Combine both periods back together
+    tb_combined = pr.concat([tb_historical, tb_modern], ignore_index=True)
+    # Rename columns conveniently.
+    tb_combined = tb_combined.rename(columns={column: column + "_smoothed" for column in data_columns}, errors="raise")
+    # Improve table format.
+    tb_combined = tb_combined.format(short_name=paths.short_name + "_smoothed")
+
+    # Improve metadata.
+    for column in tb_combined.columns:
+        tb_combined[
+            column
+        ].metadata.description_processing = "- The historical data (before 1961) has been combined with a 10-year rolling average of the FAOSTAT data (from 1961 onwards), to reduce short-term volatility and make long-term trends more visible."
+
+    return tb_combined
+
+
 def run() -> None:
     #
     # Load inputs.
@@ -73,6 +109,11 @@ def run() -> None:
     #
     # Process data.
     #
+    # It's better to not combine the UK long-run series with the long-term wheat yields series.
+    # The latter only adds a few points to the UK, and the first one (in 1850, from Bayliss-Smith & Wanmali (1984)) is at odds with the closest estimates from Broadberry et al. (2015).
+    # NOTE: In the future, consider fixing this discrepancy in either the uk_long_term_yields or the long_term_wheat_yields steps (or merge them into one).
+    tb_wheat = tb_wheat[tb_wheat["country"] != "United Kingdom"].reset_index(drop=True)
+
     # Prepare FAOSTAT QCL data.
     tb_qcl = prepare_faostat_data(tb_qcl=tb_qcl)
 
@@ -100,6 +141,10 @@ def run() -> None:
         df1=tb_us, df2=tb, index_columns=["country", "year"], keep_column_order=True
     )
 
+    # Create another table of smooth yield series.
+    # NOTE: For now I'll do it only for the UK and the World, and for certain crops (required for a specific chart).
+    tb_smoothed = create_table_of_rolling_averages(tb=tb)
+
     # Set an appropriate index and sort conveniently.
     tb = tb.format(sort_columns=True, short_name=paths.short_name)
 
@@ -107,5 +152,5 @@ def run() -> None:
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_garden = paths.create_dataset(tables=[tb])
+    ds_garden = paths.create_dataset(tables=[tb, tb_smoothed])
     ds_garden.save()
