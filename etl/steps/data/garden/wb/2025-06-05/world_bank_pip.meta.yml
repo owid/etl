@@ -82,6 +82,8 @@ definitions:
     $2.15 and $10
     <%- elif poverty_line == "685 and 1000" %>
     $6.85 and $10
+    <%- elif poverty_line == "215 and 500" %>
+    $2.15 and $5
     <%- elif poverty_line == "300" %>
     $3
     <%- elif poverty_line == "420" %>
@@ -100,6 +102,8 @@ definitions:
     $4.20 and $10
     <%- elif poverty_line == "830 and 1000" %>
     $8.30 and $10
+    <%- elif poverty_line == "300 and 500" %>
+    $3 and $5
     <%- elif poverty_line == "100" %>
     $1
     <%- elif poverty_line == "500" %>
@@ -114,6 +118,10 @@ definitions:
     $30
     <%- elif poverty_line == "4000" %>
     $40
+    <%- elif poverty_line == "500 and 700" %>
+    $5 and $7
+    <%- elif poverty_line == "700 and 1000" %>
+    $7 and $10
     <%- elif poverty_line == "1000 and 2000" %>
     $10 and $20
     <%- elif poverty_line == "2000 and 3000" %>

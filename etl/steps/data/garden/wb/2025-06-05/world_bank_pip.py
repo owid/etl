@@ -537,6 +537,27 @@ def create_stacked_variables(tb: Table) -> Tuple[Table, list, list]:
             tb_pivot[("headcount_ratio", ppp_year, povlines[6])] - tb_pivot[("headcount_ratio", ppp_year, povlines[4])]
         )
 
+        # Calculate stacked for indicators with 500 and 700 poverty lines
+        tb_pivot[("headcount_between", ppp_year, f"{povlines[1]} and 500")] = (
+            tb_pivot[("headcount", ppp_year, "500")] - tb_pivot[("headcount", ppp_year, povlines[1])]
+        )
+        tb_pivot[("headcount_between", ppp_year, "500 and 700")] = (
+            tb_pivot[("headcount", ppp_year, "700")] - tb_pivot[("headcount", ppp_year, "500")]
+        )
+        tb_pivot[("headcount_between", ppp_year, "700 and 1000")] = (
+            tb_pivot[("headcount", ppp_year, "1000")] - tb_pivot[("headcount", ppp_year, "700")]
+        )
+
+        tb_pivot[("headcount_ratio_between", ppp_year, f"{povlines[1]} and 500")] = (
+            tb_pivot[("headcount_ratio", ppp_year, "500")] - tb_pivot[("headcount_ratio", ppp_year, povlines[1])]
+        )
+        tb_pivot[("headcount_ratio_between", ppp_year, "500 and 700")] = (
+            tb_pivot[("headcount_ratio", ppp_year, "700")] - tb_pivot[("headcount_ratio", ppp_year, "500")]
+        )
+        tb_pivot[("headcount_ratio_between", ppp_year, "700 and 1000")] = (
+            tb_pivot[("headcount_ratio", ppp_year, "1000")] - tb_pivot[("headcount_ratio", ppp_year, "700")]
+        )
+
     # Now, only keep headcount_between and headcount_ratio_between, and headcount_above and headcount_ratio_above
     tb_pivot = tb_pivot.loc[
         :,

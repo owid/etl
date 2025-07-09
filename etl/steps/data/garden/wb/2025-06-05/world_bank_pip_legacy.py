@@ -560,6 +560,17 @@ def create_stacked_variables(tb: Table, povlines_dict: dict, ppp_version: int) -
         tb[f"headcount_ratio_{povlines[6]}"] - tb[f"headcount_ratio_{povlines[4]}"]
     )
 
+    # Calculate stacked for indicators with 500 and 700 poverty lines
+    tb[f"headcount_between_{povlines[1]}_500"] = tb[f"headcount_{500}"] - tb[f"headcount_{povlines[1]}"]
+    tb["headcount_between_500_700"] = tb["headcount_700"] - tb["headcount_500"]
+    tb["headcount_between_700_1000"] = tb["headcount_1000"] - tb["headcount_700"]
+
+    tb[f"headcount_ratio_between_{povlines[1]}_500"] = (
+        tb[f"headcount_ratio_{500}"] - tb[f"headcount_ratio_{povlines[1]}"]
+    )
+    tb["headcount_ratio_between_500_700"] = tb["headcount_ratio_700"] - tb["headcount_ratio_500"]
+    tb["headcount_ratio_between_700_1000"] = tb["headcount_ratio_1000"] - tb["headcount_ratio_700"]
+
     return tb, col_stacked_n, col_stacked_pct
 
 
