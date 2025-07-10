@@ -314,7 +314,7 @@ definitions:
     - As with all education data, results should be interpreted carefully. Differences in how enrolment is defined, inconsistencies in age reporting, and timing of data collection (such as during holidays or late in the school year) can affect accuracy.
   desc_key_prof: &desc_key_prof
     - This indicator measures the share of children or students who achieve minimum proficiency in reading or mathematics by the end of a given education level (primary or lower secondary).
-    - Minimum proficiency in reading means students can understand main ideas, interpret meaning, and draw simple conclusions from texts; in mathematics, it means applying basic computation, interpreting graphs or tables, and solving everyday problems.
+    - Minimum proficiency in [reading](#dod:reading-proficiency) means students can understand main ideas, interpret meaning, and draw simple conclusions from texts; in [mathematics](#dod:math-proficiency), it means applying basic computation, interpreting graphs or tables, and solving everyday problems.
     - "There are two types of estimates: one for all children in the age group, and one for students who are still enrolled in school."
     - Estimates for all children adjust for school completion and enrolment, offering a full population-level view — including those who dropped out or were never enrolled.
     - Estimates for students reflect outcomes only among those still in school at the end of the education cycle.
