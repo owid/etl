@@ -312,6 +312,13 @@ definitions:
     - High out-of-school rates signal barriers to access — such as poverty, gender inequality, location, or limited availability of schools — and highlight where more targeted support is needed.
     - The data comes from administrative school enrolment records and household surveys, which provide age-specific insights when compared to population estimates.
     - As with all education data, results should be interpreted carefully. Differences in how enrolment is defined, inconsistencies in age reporting, and timing of data collection (such as during holidays or late in the school year) can affect accuracy.
+  desc_key_prof: &desc_key_prof
+    - This indicator measures the share of children or students who achieve minimum proficiency in reading or mathematics by the end of a given education level (primary or lower secondary).
+    - Minimum proficiency in reading means students can understand main ideas, interpret meaning, and draw simple conclusions from texts; in mathematics, it means applying basic computation, interpreting graphs or tables, and solving everyday problems.
+    - "There are two types of estimates: one for all children in the age group, and one for students who are still enrolled in school."
+    - Estimates for all children adjust for school completion and enrolment, offering a full population-level view — including those who dropped out or were never enrolled.
+    - Estimates for students reflect outcomes only among those still in school at the end of the education cycle.
+    - Data comes from international assessments such as TIMSS, PIRLS, or PISA, combined with completion and enrolment data from surveys or statistical models.
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
@@ -1146,20 +1153,13 @@ tables:
         description_short: Percentage of children at [lower secondary](#dod:lower-secondary-education) school age meeting minimum math proficiency for the end of [lower secondary](#dod:lower-secondary-education) education. This data accounts for school completion rates to estimate mathematical skills for all children, not just those in school.
         unit: "%"
         short_unit: "%"
-        description_key:
-          - This indicator shows the share of all children who reach minimum math proficiency by the expected age of completing lower secondary school.
-          - Minimum math proficiency at this level means demonstrating skills in computation, solving problems, interpreting tables and graphs, and using algebraic representations.
-          - It combines the percentage of children who complete lower secondary school with the percentage who meet the math benchmark.
-          - This provides a fuller picture of learning outcomes — not just for enrolled students, but for the entire age group.
-          - A higher percentage means more children are both staying in school and acquiring core math skills.
-          - Data comes from international assessments such as [TIMSS](https://timssandpirls.bc.edu/), along with completion estimates based on surveys or models.
-          - Comparability may be affected by gaps in data, different assessment tools, and mismatches in timing between sources.
+        description_key: *desc_key_prof
         presentation:
           title_public: Share of children achieving minimum math proficiency by the end of lower secondary age
           grapher_config: *grapher_config_proficiency_secondary_math
         display:
           numDecimalPlaces: 1
-          name: Lower secondary mathematics
+          name: End of lower secondary mathematics
           tolerance: *display_tolerance
 
       proportion_of_children_young_people_at_the_age_of_lower_secondary_education_prepared_for_the_future_in_mathematics__female__pct__prepfuture_2_math_f:
@@ -1167,14 +1167,7 @@ tables:
         description_short: Percentage of girls at [lower secondary](#dod:lower-secondary-education) school age meeting minimum math proficiency for the end of [lower secondary](#dod:lower-secondary-education) education. This data accounts for school completion rates to estimate mathematical skills for all girls, not just those in school.
         unit: "%"
         short_unit: "%"
-        description_key:
-          - This indicator shows the share of all girls who reach minimum math proficiency by the expected age of completing lower secondary school.
-          - Minimum math proficiency at this level means demonstrating skills in computation, solving problems, interpreting tables and graphs, and using algebraic representations.
-          - It combines the percentage of girls who complete lower secondary school with the percentage who meet the math benchmark.
-          - This provides insights into gender-specific learning outcomes across the full population, not just enrolled students.
-          - A higher percentage indicates that more girls are both completing school and acquiring essential math skills.
-          - Data comes from international assessments such as [TIMSS](https://timssandpirls.bc.edu/), along with completion estimates based on surveys or models.
-          - Cross-country comparisons should account for differences in assessment tools, coverage, and data timing.
+        description_key: *desc_key_prof
         presentation:
           title_public: Share of girls achieving minimum math proficiency by the end of lower secondary age
           grapher_config: *grapher_config_proficiency_secondary_math
@@ -1188,14 +1181,7 @@ tables:
         description_short: Percentage of boys at [lower secondary](#dod:lower-secondary-education) school age meeting minimum math proficiency for the end of [lower secondary](#dod:lower-secondary-education) education. This data accounts for school completion rates to estimate mathematical skills for all boys, not just those in school.
         unit: "%"
         short_unit: "%"
-        description_key:
-          - This indicator shows the share of all boys who reach minimum math proficiency by the expected age of completing lower secondary school.
-          - Minimum math proficiency at this level means demonstrating skills in computation, solving problems, interpreting tables and graphs, and using algebraic representations.
-          - It combines the percentage of boys who complete lower secondary school with the percentage who meet the math benchmark.
-          - This provides insights into gender-specific learning outcomes across the full population, not just enrolled students.
-          - A higher percentage indicates that more boys are both completing school and acquiring essential math skills.
-          - Data comes from international assessments such as [TIMSS](https://timssandpirls.bc.edu/), along with completion estimates based on surveys or models.
-          - Cross-country comparisons should account for differences in assessment tools, coverage, and data timing.
+        description_key: *desc_key_prof
         presentation:
           title_public: Share of boys achieving minimum math proficiency by the end of lower secondary age
           grapher_config: *grapher_config_proficiency_secondary_math
@@ -1209,20 +1195,13 @@ tables:
         description_short: Percentage of children at [lower secondary](#dod:lower-secondary-education) school age meeting reading comprehension standards. This data accounts for school completion rates to estimate reading skills for all children, not just those in school.
         unit: "%"
         short_unit: "%"
-        description_key:
-          - This indicator shows the share of all children who reach minimum reading proficiency by the expected age of completing lower secondary education.
-          - Minimum reading proficiency at this level means children can connect ideas across different types of texts, understand the author's intent, and draw basic conclusions.
-          - It combines the share of children who complete lower secondary education with the share who meet minimum reading standards.
-          - This captures outcomes across the full population — not just students still in school.
-          - A higher percentage suggests that most children are both completing school and acquiring core reading skills.
-          - Data comes from assessments like [PIRLS](https://www.iea.nl/studies/iea/pirls) and completion estimates from surveys or models.
-          - Comparability may be affected by differences in assessments, definitions, and data timing.
+        description_key: *desc_key_prof
         presentation:
           title_public: Share of children achieving minimum reading proficiency by the end of lower secondary age
           grapher_config: *grapher_config_proficiency_secondary_reading
         display:
           numDecimalPlaces: 1
-          name: Lower secondary reading
+          name: End of Lower secondary reading
           tolerance: *display_tolerance
 
       proportion_of_children_young_people_at_the_age_of_lower_secondary_education_prepared_for_the_future_in_reading__female__pct__prepfuture_2_read_f:
@@ -1230,14 +1209,7 @@ tables:
         description_short: Percentage of girls at [lower secondary](#dod:lower-secondary-education) school age meeting reading comprehension standards. This data accounts for school completion rates to estimate reading skills for all girls, not just those in school.
         unit: "%"
         short_unit: "%"
-        description_key:
-          - This indicator shows the share of all girls who reach minimum reading proficiency by the expected age of completing lower secondary education.
-          - Minimum reading proficiency at this level means girls can connect ideas across different types of texts, understand the author's intent, and draw basic conclusions.
-          - It combines the share of girls who complete lower secondary education with the share who meet minimum reading standards.
-          - This captures gender-specific outcomes across the full population — not just students still in school.
-          - A higher percentage suggests that most girls are both completing school and acquiring core reading skills.
-          - Data comes from assessments like [PIRLS](https://www.iea.nl/studies/iea/pirls) and completion estimates from surveys or models.
-          - Comparability may be affected by differences in assessments, definitions, and data timing.
+        description_key: *desc_key_prof
         presentation:
           title_public: Share of girls achieving minimum reading proficiency by the end of lower secondary age
           grapher_config: *grapher_config_proficiency_secondary_reading
@@ -1251,14 +1223,7 @@ tables:
         description_short: Percentage of boys at [lower secondary](#dod:lower-secondary-education) school age meeting reading comprehension standards. This data accounts for school completion rates to estimate reading skills for all boys, not just those in school.
         unit: "%"
         short_unit: "%"
-        description_key:
-          - This indicator shows the share of all boys who reach minimum reading proficiency by the expected age of completing lower secondary education.
-          - Minimum reading proficiency at this level means boys can connect ideas across different types of texts, understand the author's intent, and draw basic conclusions.
-          - It combines the share of boys who complete lower secondary education with the share who meet minimum reading standards.
-          - This captures gender-specific outcomes across the full population — not just students still in school.
-          - A higher percentage suggests that most boys are both completing school and acquiring core reading skills.
-          - Data comes from assessments like [PIRLS](https://www.iea.nl/studies/iea/pirls) and completion estimates from surveys or models.
-          - Comparability may be affected by differences in assessments, definitions, and data timing.
+        description_key: *desc_key_prof
         presentation:
           title_public: Share of boys achieving minimum reading proficiency by the end of lower secondary age
           grapher_config: *grapher_config_proficiency_secondary_reading
@@ -1272,14 +1237,7 @@ tables:
         description_short: Percentage of children at [primary](#dod:primary-education) school age meeting minimum math proficiency for the end of [primary](#dod:primary-education) education. This data accounts for school completion rates to estimate mathematical skills for all children, not just those in school.
         unit: "%"
         short_unit: "%"
-        description_key:
-          - This indicator shows the share of all children who reach minimum math proficiency by the expected age of completing primary school.
-          - Minimum math proficiency at this level means demonstrating skills in computation, solving problems, interpreting tables and graphs, and using algebraic representations.
-          - It combines the percentage of children who complete primary school with the percentage who meet the math benchmark.
-          - This reflects outcomes for the full population — not just those still enrolled.
-          - A higher percentage suggests education systems are enabling most children to complete school and build essential math skills.
-          - Data comes from assessments such as [TIMSS](https://timssandpirls.bc.edu/), along with completion estimates based on household surveys or models.
-          - Differences in assessment coverage, definitions of proficiency, and data timing may affect comparisons across countries.
+        description_key: *desc_key_prof
         presentation:
           title_public: Share of children achieving minimum math proficiency by the end of primary age
           grapher_config: *grapher_config_proficiency_primary_math
@@ -1293,14 +1251,7 @@ tables:
         description_short: Percentage of girls at [primary](#dod:primary-education) school age meeting minimum math proficiency for the end of [primary](#dod:primary-education) education. This data accounts for school completion rates to estimate mathematical skills for all girls, not just those in school.
         unit: "%"
         short_unit: "%"
-        description_key:
-          - This indicator shows the share of all girls who reach minimum math proficiency by the expected age of completing primary school.
-          - Minimum math proficiency at this level means demonstrating skills in computation, solving problems, interpreting tables and graphs, and using algebraic representations.
-          - It combines the percentage of girls who complete primary school with the percentage who meet the math benchmark.
-          - This reflects gender-specific outcomes for the full population — not just those still enrolled.
-          - A higher percentage suggests education systems are enabling most girls to complete school and build essential math skills.
-          - Data comes from assessments such as [TIMSS](https://timssandpirls.bc.edu/), along with completion estimates based on household surveys or models.
-          - Differences in assessment coverage, definitions of proficiency, and data timing may affect comparisons across countries.
+        description_key: *desc_key_prof
         presentation:
           title_public: Share of girls achieving minimum math proficiency by the end of primary age
           grapher_config: *grapher_config_proficiency_primary_math
@@ -1314,14 +1265,7 @@ tables:
         description_short: Percentage of boys at [primary](#dod:primary-education) school age meeting minimum math proficiency for the end of [primary](#dod:primary-education) education. This data accounts for school completion rates to estimate mathematical skills for all boys, not just those in school.
         unit: "%"
         short_unit: "%"
-        description_key:
-          - This indicator shows the share of all boys who reach minimum math proficiency by the expected age of completing primary school.
-          - Minimum math proficiency at this level means demonstrating skills in computation, solving problems, interpreting tables and graphs, and using algebraic representations.
-          - It combines the percentage of boys who complete primary school with the percentage who meet the math benchmark.
-          - This reflects gender-specific outcomes for the full population — not just those still enrolled.
-          - A higher percentage suggests education systems are enabling most boys to complete school and build essential math skills.
-          - Data comes from assessments such as [TIMSS](https://timssandpirls.bc.edu/), along with completion estimates based on household surveys or models.
-          - Differences in assessment coverage, definitions of proficiency, and data timing may affect comparisons across countries.
+        description_key: *desc_key_prof
         presentation:
           title_public: Share of boys achieving minimum math proficiency by the end of primary age
           grapher_config: *grapher_config_proficiency_primary_math
@@ -1335,14 +1279,7 @@ tables:
         description_short: Percentage of children at [primary](#dod:primary-education) school age meeting minimum reading proficiency by the end of [primary](#dod:primary-education) education. This data accounts for school completion rates to estimate reading skills for all children, not just those in school.
         unit: "%"
         short_unit: "%"
-        description_key:
-          - This indicator shows the share of all children who reach basic reading proficiency by the expected age of completing primary school.
-          - Minimum reading proficiency at the end of primary school means children can identify key ideas in simple texts and link them to personal experience.
-          - It combines the share of children who complete primary school with the share who meet reading standards.
-          - This reflects outcomes for all children — not just those still in school.
-          - A higher value suggests strong access to education and effective early learning.
-          - Data comes from assessments like [PIRLS](https://www.iea.nl/studies/iea/pirls) and completion estimates from surveys or models.
-          - Limitations include differences in assessment tools, definitions, and the timing of data sources.
+        description_key: *desc_key_prof
         presentation:
           title_public: Share of children achieving minimum reading proficiency by the end of primary age
           grapher_config: *grapher_config_proficiency_primary_reading
@@ -1356,14 +1293,7 @@ tables:
         description_short: Percentage of girls at [primary](#dod:primary-education) school age meeting minimum reading proficiency by the end of [primary](#dod:primary-education) education. This data accounts for school completion rates to estimate reading skills for all girls, not just those in school.
         unit: "%"
         short_unit: "%"
-        description_key:
-          - This indicator shows the share of all girls who reach basic reading proficiency by the expected age of completing primary school.
-          - Minimum reading proficiency at the end of primary school means girls can identify key ideas in simple texts and link them to personal experience.
-          - It combines the share of girls who complete primary school with the share who meet reading standards.
-          - This reflects gender-specific outcomes for all girls — not just those still in school.
-          - A higher value suggests strong access to education and effective early learning for girls.
-          - Data comes from assessments like [PIRLS](https://www.iea.nl/studies/iea/pirls) and completion estimates from surveys or models.
-          - Limitations include differences in assessment tools, definitions, and the timing of data sources.
+        description_key: *desc_key_prof
         presentation:
           title_public: Share of girls achieving minimum reading proficiency by the end of primary age
           grapher_config: *grapher_config_proficiency_primary_reading
@@ -1377,14 +1307,7 @@ tables:
         description_short: Percentage of boys at [primary](#dod:primary-education) school age meeting minimum reading proficiency by the end of [primary](#dod:primary-education) education. This data accounts for school completion rates to estimate reading skills for all boys, not just those in school.
         unit: "%"
         short_unit: "%"
-        description_key:
-          - This indicator shows the share of all boys who reach basic reading proficiency by the expected age of completing primary school.
-          - Minimum reading proficiency at the end of primary school means boys can identify key ideas in simple texts and link them to personal experience.
-          - It combines the share of boys who complete primary school with the share who meet reading standards.
-          - This reflects gender-specific outcomes for all boys — not just those still in school.
-          - A higher value suggests strong access to education and effective early learning for boys.
-          - Data comes from assessments like [PIRLS](https://www.iea.nl/studies/iea/pirls) and completion estimates from surveys or models.
-          - Limitations include differences in assessment tools, definitions, and the timing of data sources.
+        description_key: *desc_key_prof
         presentation:
           title_public: Share of boys achieving minimum reading proficiency by the end of primary age
           grapher_config: *grapher_config_proficiency_primary_reading
@@ -1402,13 +1325,7 @@ tables:
         description_short: Percentage of students at [lower secondary](#dod:lower-secondary-education) school age meeting minimum math proficiency by the end of [lower secondary](#dod:lower-secondary-education) education. This data omits children who don't attend school.
         unit: "%"
         short_unit: "%"
-        description_key:
-          - This indicator shows the percentage of students who reach minimum math proficiency by the end of lower secondary school.
-          - Minimum proficiency at this level means students can apply algebra, interpret graphs, and solve real-world problems.
-          - It only includes students who are still in school — not those who dropped out or were never enrolled.
-          - Math skills are measured through standardized tests, such as [TIMSS](https://timssandpirls.bc.edu/) or national assessments.
-          - A higher percentage means more students are developing foundational math skills before finishing lower secondary education.
-          - Differences in assessment tools, coverage, and standards can affect how results are compared across countries.
+        description_key: *desc_key_prof
         presentation:
           title_public: Share of students achieving minimum math proficiency by the end of lower secondary education
           grapher_config: *grapher_config_proficiency_secondary_math
@@ -1422,13 +1339,7 @@ tables:
         description_short: Percentage of female students at [lower secondary](#dod:lower-secondary-education) school age meeting minimum math proficiency by the end of [lower secondary](#dod:lower-secondary-education) education. This data omits girls who don't attend school.
         unit: "%"
         short_unit: "%"
-        description_key:
-          - This indicator shows the percentage of female students who reach minimum math proficiency by the end of lower secondary school.
-          - Minimum proficiency at this level means students can apply algebra, interpret graphs, and solve real-world problems.
-          - It only includes female students who are still in school — not those who dropped out or were never enrolled.
-          - Math skills are measured through standardized tests, such as [TIMSS](https://timssandpirls.bc.edu/) or national assessments.
-          - A higher percentage means more female students are developing foundational math skills before finishing lower secondary education.
-          - Differences in assessment tools, coverage, and standards can affect how results are compared across countries.
+        description_key: *desc_key_prof
         presentation:
           title_public: Share of female students achieving minimum math proficiency by the end of lower secondary education
           grapher_config: *grapher_config_proficiency_secondary_math
@@ -1442,13 +1353,7 @@ tables:
         description_short: Percentage of male students at [lower secondary](#dod:lower-secondary-education) school age meeting minimum math proficiency by the end of [lower secondary](#dod:lower-secondary-education) education. This data omits boys who don't attend school.
         unit: "%"
         short_unit: "%"
-        description_key:
-          - This indicator shows the percentage of male students who reach minimum math proficiency by the end of lower secondary school.
-          - Minimum proficiency at this level means students can apply algebra, interpret graphs, and solve real-world problems.
-          - It only includes male students who are still in school — not those who dropped out or were never enrolled.
-          - Math skills are measured through standardized tests, such as [TIMSS](https://timssandpirls.bc.edu/) or national assessments.
-          - A higher percentage means more male students are developing foundational math skills before finishing lower secondary education.
-          - Differences in assessment tools, coverage, and standards can affect how results are compared across countries.
+        description_key: *desc_key_prof
         presentation:
           title_public: Share of male students achieving minimum math proficiency by the end of lower secondary education
           grapher_config: *grapher_config_proficiency_secondary_math
@@ -1462,13 +1367,7 @@ tables:
         description_short: Percentage of students at [lower secondary](#dod:lower-secondary-education) school age meeting minimum reading proficiency by the end of [lower secondary](#dod:lower-secondary-education) education. This data omits children who don't attend school.
         unit: "%"
         short_unit: "%"
-        description_key:
-          - This indicator shows the percentage of students who reach minimum reading proficiency by the end of lower secondary school.
-          - Minimum proficiency at this level means students can connect main ideas across different text types, understand the author's intentions, and draw conclusions based on the text.
-          - It only includes students who are still in school — not those who dropped out or were never enrolled.
-          - Reading skills are measured through standardized tests, such as [PISA](https://www.oecd.org/en/about/programmes/pisa.html) or national assessments.
-          - A higher percentage means more students are developing foundational reading skills before finishing lower secondary education.
-          - Differences in assessment tools, coverage, and standards can affect how results are compared across countries.
+        description_key: *desc_key_prof
         presentation:
           title_public: Share of students achieving minimum reading proficiency by the end of lower secondary education
           grapher_config: *grapher_config_proficiency_secondary_reading
@@ -1482,13 +1381,7 @@ tables:
         description_short: Percentage of female students at [lower secondary](#dod:lower-secondary-education) school age meeting minimum reading proficiency by the end of [lower secondary](#dod:lower-secondary-education) education. This data omits girls who don't attend school.
         unit: "%"
         short_unit: "%"
-        description_key:
-          - This indicator shows the percentage of female students who reach minimum reading proficiency by the end of lower secondary school.
-          - Minimum proficiency at this level means students can connect main ideas across different text types, understand the author's intentions, and draw conclusions based on the text.
-          - It only includes female students who are still in school — not those who dropped out or were never enrolled.
-          - Reading skills are measured through standardized tests, such as [PISA](https://www.oecd.org/en/about/programmes/pisa.html) or national assessments.
-          - A higher percentage means more female students are developing foundational reading skills before finishing lower secondary education.
-          - Differences in assessment tools, coverage, and standards can affect how results are compared across countries.
+        description_key: *desc_key_prof
         presentation:
           title_public: Share of female students achieving minimum reading proficiency by the end of lower secondary education
           grapher_config: *grapher_config_proficiency_secondary_reading
@@ -1502,13 +1395,7 @@ tables:
         description_short: Percentage of male students at [lower secondary](#dod:lower-secondary-education) school age meeting minimum reading proficiency by the end of [lower secondary](#dod:lower-secondary-education) education. This data omits boys who don't attend school.
         unit: "%"
         short_unit: "%"
-        description_key:
-          - This indicator shows the percentage of male students who reach minimum reading proficiency by the end of lower secondary school.
-          - Minimum proficiency at this level means students can connect main ideas across different text types, understand the author's intentions, and draw conclusions based on the text.
-          - It only includes male students who are still in school — not those who dropped out or were never enrolled.
-          - Reading skills are measured through standardized tests, such as [PISA](https://www.oecd.org/en/about/programmes/pisa.html) or national assessments.
-          - A higher percentage means more male students are developing foundational reading skills before finishing lower secondary education.
-          - Differences in assessment tools, coverage, and standards can affect how results are compared across countries.
+        description_key: *desc_key_prof
         presentation:
           title_public: Share of male students achieving minimum reading proficiency by the end of lower secondary education
           grapher_config: *grapher_config_proficiency_secondary_reading
@@ -1522,13 +1409,7 @@ tables:
         description_short: Percentage of students at [primary](#dod:primary-education) school age meeting minimum math proficiency by the end of [primary](#dod:primary-education) education. This data omits children who don't attend school.
         unit: "%"
         short_unit: "%"
-        description_key:
-          - This indicator shows the percentage of students who reach minimum math proficiency by the end of primary school.
-          - Minimum math proficiency at the end of primary school means students can solve basic problems involving number sense, measurement, and interpreting simple data.
-          - It only includes students who are still in school — not those who dropped out or never enrolled.
-          - Skills are measured through standardized tests, such as [TIMSS](https://timssandpirls.bc.edu/) or national assessments.
-          - A higher percentage indicates more students are developing essential numeracy by the end of primary school.
-          - Cross-country comparisons may be affected by differences in test design and standards.
+        description_key: *desc_key_prof
         presentation:
           title_public: Share of students achieving minimum math proficiency by the end of primary education
           grapher_config: *grapher_config_proficiency_primary_math
@@ -1542,13 +1423,7 @@ tables:
         description_short: Percentage of female students at [primary](#dod:primary-education) school age meeting minimum math proficiency by the end of [primary](#dod:primary-education) education. This data omits girls who don't attend school.
         unit: "%"
         short_unit: "%"
-        description_key:
-          - This indicator shows the percentage of female students who reach minimum math proficiency by the end of primary school.
-          - Minimum math proficiency at the end of primary school means students can solve basic problems involving number sense, measurement, and interpreting simple data.
-          - It only includes female students who are still in school — not those who dropped out or never enrolled.
-          - Skills are measured through standardized tests, such as [TIMSS](https://timssandpirls.bc.edu/) or national assessments.
-          - A higher percentage indicates more female students are developing essential numeracy by the end of primary school.
-          - Cross-country comparisons may be affected by differences in test design and standards.
+        description_key: *desc_key_prof
         presentation:
           title_public: Share of female students achieving minimum math proficiency by the end of primary education
           grapher_config: *grapher_config_proficiency_primary_math
@@ -1562,13 +1437,7 @@ tables:
         description_short: Percentage of male students at [primary](#dod:primary-education) school age meeting minimum math proficiency by the end of [primary](#dod:primary-education) education. This data omits boys who don't attend school.
         unit: "%"
         short_unit: "%"
-        description_key:
-          - This indicator shows the percentage of male students who reach minimum math proficiency by the end of primary school.
-          - Minimum math proficiency at the end of primary school means students can solve basic problems involving number sense, measurement, and interpreting simple data.
-          - It only includes male students who are still in school — not those who dropped out or never enrolled.
-          - Skills are measured through standardized tests, such as [TIMSS](https://timssandpirls.bc.edu/) or national assessments.
-          - A higher percentage indicates more male students are developing essential numeracy by the end of primary school.
-          - Cross-country comparisons may be affected by differences in test design and standards.
+        description_key: *desc_key_prof
         presentation:
           title_public: Share of male students achieving minimum math proficiency by the end of primary education
           grapher_config: *grapher_config_proficiency_primary_math
@@ -1582,13 +1451,7 @@ tables:
         description_short: Percentage of students at [primary](#dod:primary-education) school age meeting minimum reading proficiency by the end of [primary](#dod:primary-education) education. This data omits children who don't attend school.
         unit: "%"
         short_unit: "%"
-        description_key:
-          - This indicator shows the percentage of students who reach minimum reading proficiency by the end of primary school.
-          - Minimum reading proficiency at the end of primary school means students can identify key ideas in simple texts and link them to personal experience.
-          - It only includes students who are still in school — not those who dropped out or never enrolled.
-          - Skills are measured through standardized tests, such as [PIRLS](https://www.iea.nl/studies/iea/pirls) or national assessments.
-          - A higher percentage indicates more students are developing essential literacy by the end of primary school.
-          - Cross-country comparisons may be affected by differences in test design and standards.
+        description_key: *desc_key_prof
         presentation:
           title_public: Share of students achieving minimum reading proficiency by the end of primary education
           grapher_config: *grapher_config_proficiency_primary_reading
@@ -1602,13 +1465,7 @@ tables:
         description_short: Percentage of female students at [primary](#dod:primary-education) school age meeting minimum reading proficiency by the end of [primary](#dod:primary-education) education. This data omits girls who don't attend school.
         unit: "%"
         short_unit: "%"
-        description_key:
-          - This indicator shows the percentage of female students who reach minimum reading proficiency by the end of primary school.
-          - Minimum reading proficiency at the end of primary school means students can identify key ideas in simple texts and link them to personal experience.
-          - It only includes female students who are still in school — not those who dropped out or never enrolled.
-          - Skills are measured through standardized tests, such as [PIRLS](https://www.iea.nl/studies/iea/pirls) or national assessments.
-          - A higher percentage indicates more female students are developing essential literacy by the end of primary school.
-          - Cross-country comparisons may be affected by differences in test design and standards.
+        description_key: *desc_key_prof
         presentation:
           title_public: Share of female students achieving minimum reading proficiency by the end of primary education
           grapher_config: *grapher_config_proficiency_primary_reading
@@ -1622,13 +1479,7 @@ tables:
         description_short: Percentage of male students at [primary](#dod:primary-education) school age meeting minimum reading proficiency by the end of [primary](#dod:primary-education) education. This data omits boys who don't attend school.
         unit: "%"
         short_unit: "%"
-        description_key:
-          - This indicator shows the percentage of male students who reach minimum reading proficiency by the end of primary school.
-          - Minimum reading proficiency at the end of primary school means students can identify key ideas in simple texts and link them to personal experience.
-          - It only includes male students who are still in school — not those who dropped out or never enrolled.
-          - Skills are measured through standardized tests, such as [PIRLS](https://www.iea.nl/studies/iea/pirls) or national assessments.
-          - A higher percentage indicates more male students are developing essential literacy by the end of primary school.
-          - Cross-country comparisons may be affected by differences in test design and standards.
+        description_key: *desc_key_prof
         presentation:
           title_public: Share of male students achieving minimum reading proficiency by the end of primary education
           grapher_config: *grapher_config_proficiency_primary_reading
