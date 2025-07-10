@@ -23,42 +23,42 @@ GROUPED_VIEW_CONFIG = MULTIDIM_CONFIG | {
     "selectedFacetStrategy": "entity",
 }
 
-# Column filtering patterns
-PISA_PATTERNS = {
-    "mathematics": ["pisa_math", "boys_girls", "average"],
-    "science": ["pisa_science", "all", "average"],
-    "reading": ["pisa_reading", "boys_girls", "average"],
-}
-
 # Subject configurations
 SUBJECTS = {
     "mathematics": {
         "keywords": "math",
         "display_name": "Mathematics",
         "title_term": "mathematics",
+        "description": "Assessed through the PISA mathematics scale, which measures how well someone can use math to solve everyday problems and understand the role of math in the real world.",
     },
     "science": {
         "keywords": "science",
         "display_name": "Science",
         "title_term": "science",
+        "description": "Assessed through the PISA science scale, which assesses how comfortable and knowledgeable someone is with science topics, focusing on their ability to discuss and think about scientific issues in everyday life.",
     },
     "reading": {
         "keywords": "reading",
         "display_name": "Reading",
         "title_term": "reading",
+        "description": "Assessed through the PISA reading scale, which measures how well someone can understand and use written information to learn new things and be a part of society.",
     },
 }
 
 # Gender configurations
 GENDERS = {
-    "both": {"title": "students", "subtitle": "students"},
-    "boys": {"title": "boys", "subtitle": "boys"},
-    "girls": {"title": "girls", "subtitle": "girls"},
+    "both": "students",
+    "boys": "boys",
+    "girls": "girls",
 }
 
 # Dimension mapping configurations
 SUBJECT_KEYWORDS = {config["keywords"]: key for key, config in SUBJECTS.items()}
 SEX_KEYWORDS = {"all": "both", "boys": "boys", "girls": "girls", "boys_girls": "both"}
+
+# Constants
+SUBJECT_SIDE_BY_SIDE_TITLE = "all subjects"
+SUBJECT_SIDE_BY_SIDE_SUBTITLE = "mathematics, science, and reading"
 
 
 def run() -> None:
@@ -86,7 +86,7 @@ def run() -> None:
     # Add grouped views
     create_grouped_views(c)
 
-    # Edit FAUST
+    # Set global configuration
     c.set_global_config(
         config={
             "title": lambda view: generate_title_by_subject_and_gender(view),
@@ -104,16 +104,11 @@ def run() -> None:
 
 def get_pisa_performance_columns(tb):
     """Filter PISA performance columns by subject and gender category."""
-    pisa_cols = []
-
-    # Look for PISA performance columns
-    for col in tb.columns:
-        if "pisa_" in col and "average" in col:
-            # Include math, science, and reading performance columns
-            if any(subject in col for subject in ["math", "science", "reading"]):
-                pisa_cols.append(col)
-
-    return pisa_cols
+    return [
+        col for col in tb.columns
+        if "pisa_" in col and "average" in col
+        and any(subject in col for subject in ["math", "science", "reading"])
+    ]
 
 
 def adjust_dimensions(tb):
@@ -201,79 +196,43 @@ def create_grouped_views(collection):
     )
 
 
-# Common mappings used by both title and subtitle functions
-GENDER_MAPPINGS = {
-    "title": {"both": "students", "boys": "boys", "girls": "girls"},
-    "subtitle": {"both": "students", "boys": "boys", "girls": "girls"},
-}
-
-SUBJECT_MAPPINGS = {
-    "title": {
-        "mathematics": "mathematics",
-        "science": "science",
-        "reading": "reading",
-        "subject_side_by_side": "all subjects",
-    },
-    "subtitle": {
-        "mathematics": "mathematics",
-        "science": "science",
-        "reading": "reading",
-        "subject_side_by_side": "mathematics, science, and reading",
-    },
-}
-
-
 def generate_title_by_subject_and_gender(view):
     """Generate title based on gender and subject."""
     sex, subject = view.dimensions["sex"], view.dimensions["subject"]
 
-    # Get gender term
-    gender_term = GENDER_MAPPINGS["title"].get(sex, "")
-    # Get subject term
-    subject_term = SUBJECT_MAPPINGS["title"].get(subject, "")
-
-    if not subject_term:
-        raise ValueError(f"Unknown subject: {subject}")
-
+    gender_term = GENDERS.get(sex, "students")
+    
     if subject == "subject_side_by_side":
         return f"Average performance of 15-year-old {gender_term} by subject"
-    else:
-        return f"Average performance of 15-year-old {gender_term} in {subject_term}"
+    
+    subject_config = SUBJECTS.get(subject)
+    if not subject_config:
+        raise ValueError(f"Unknown subject: {subject}")
+    
+    return f"Average performance of 15-year-old {gender_term} in {subject_config['title_term']}"
 
 
 def generate_subtitle_by_subject_and_gender(view):
     """Generate subtitle based on subject and gender."""
-
     sex, subject = view.dimensions["sex"], view.dimensions["subject"]
 
-    subject_term = SUBJECT_MAPPINGS["subtitle"].get(subject, "")
-    gender_term = GENDER_MAPPINGS["subtitle"].get(sex, "")
-
-    if not subject_term:
-        raise ValueError(f"Unknown subject: {subject}")
-
-    # Subject-specific descriptions
-    subject_descriptions = {
-        "mathematics": "Assessed through the PISA mathematics scale, which measures how well someone can use math to solve everyday problems and understand the role of math in the real world.",
-        "science": "Assessed through the PISA science scale, which assesses how comfortable and knowledgeable someone is with science topics, focusing on their ability to discuss and think about scientific issues in everyday life.",
-        "reading": "Assessed through the PISA reading scale, which measures how well someone can understand and use written information to learn new things and be a part of society.",
-    }
-
+    gender_term = GENDERS.get(sex, "students")
+    
     if subject == "subject_side_by_side":
-        return f"Average scores in {subject_term} for {gender_term} aged 15. Assessed through PISA scales, which evaluate children's ability to use mathematical reasoning, understand and engage with texts, and interact with scientific concepts for practical problem-solving, personal development, and informed citizenship."
-    else:
-        subject_description = subject_descriptions.get(
-            subject, "PISA is an international assessment that measures student performance in key subjects."
-        )
-        return f"Average scores in {subject_term} for {gender_term} aged 15. {subject_description}"
+        return f"Average scores in {SUBJECT_SIDE_BY_SIDE_SUBTITLE} for {gender_term} aged 15. Assessed through PISA scales, which evaluate children's ability to use mathematical reasoning, understand and engage with texts, and interact with scientific concepts for practical problem-solving, personal development, and informed citizenship."
+    
+    subject_config = SUBJECTS.get(subject)
+    if not subject_config:
+        raise ValueError(f"Unknown subject: {subject}")
+    
+    return f"Average scores in {subject_config['title_term']} for {gender_term} aged 15. {subject_config['description']}"
 
 
 def edit_indicator_displays(view):
     """Edit display names for the grouped views."""
-    if view.dimensions.get("sex") != "sex_side_by_side" or view.indicators.y is None:
+    if view.d.sex != "sex_side_by_side" or view.indicators.y is None:
         return
 
-    # Display name mappings for subjects
     DISPLAY_NAMES = {
         "average_girls": "Girls",
         "average_boys": "Boys",
