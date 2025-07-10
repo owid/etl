@@ -21,6 +21,19 @@ dimensions:
         name: All education levels
         description: Compare proficiency rates across all education levels.
 
+  - slug: population
+    name: Who is included
+    choices:
+      - slug: all_children
+        name: All children
+        description: Includes all children in the relevant age group, not just those enrolled in school. Provides a comprehensive view of educational outcomes.
+      - slug: students
+        name: Students
+        description: Includes only students enrolled in school.
+      - slug: population_side_by_side
+        name: Children and students
+        description: Compare outcomes between all children and enrolled students.
+
   - slug: subject
     name: Subject
     choices:
@@ -50,17 +63,5 @@ dimensions:
         name: Boys and girls
         description: Compare educational outcomes between genders.
 
-  - slug: population
-    name: Population type
-    choices:
-      - slug: all_children
-        name: All children
-        description: Includes all children in the relevant age group, not just those enrolled in school. Provides a comprehensive view of educational outcomes.
-      - slug: students
-        name: Students
-        description: Includes only students enrolled in school.
-      - slug: population_side_by_side
-        name: All children and students
-        description: Compare outcomes between all children and enrolled students.
 
 views: []
