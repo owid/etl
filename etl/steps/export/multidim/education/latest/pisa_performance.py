@@ -241,7 +241,7 @@ def generate_subtitle_by_subject_and_gender(view):
     """Generate subtitle based on subject and gender."""
 
     sex, subject = view.dimensions["sex"], view.dimensions["subject"]
-    
+
     subject_term = SUBJECT_MAPPINGS["subtitle"].get(subject, "")
     gender_term = GENDER_MAPPINGS["subtitle"].get(sex, "")
 
