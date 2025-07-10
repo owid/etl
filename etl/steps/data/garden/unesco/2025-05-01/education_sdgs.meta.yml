@@ -318,7 +318,7 @@ definitions:
     - "There are two types of estimates: one for all children in the age group, and one for students who are still enrolled in school."
     - Estimates for all children adjust for school completion and enrolment, offering a full population-level view — including those who dropped out or were never enrolled.
     - Estimates for students reflect outcomes only among those still in school at the end of the education cycle.
-    - Data comes from international assessments such as TIMSS, PIRLS, or PISA, combined with completion and enrolment data from surveys or statistical models.
+    - Data comes from international assessments such as [TIMSS, PIRLS](https://timssandpirls.bc.edu/), or [PISA](https://www.oecd.org/en/about/programmes/pisa.html), combined with completion and enrolment data from surveys or statistical models.
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
