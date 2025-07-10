@@ -13,7 +13,7 @@ dimensions:
     choices:
       - slug: mathematics
         name: Mathematics
-        description: Mthematics scores measuring mathematical literacy and problem-solving skills.
+        description: Mathematics scores measuring mathematical literacy and problem-solving skills.
       - slug: science
         name: Science
         description: Science scores measuring scientific literacy and understanding.
