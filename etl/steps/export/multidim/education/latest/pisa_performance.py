@@ -10,7 +10,7 @@ MULTIDIM_CONFIG = {
     "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.008.json",
     "originUrl": "ourworldindata.org/education",
     "hideAnnotationFieldsInTitle": {"time": True},
-    "yAxis": {"min": 300, "max": 600},
+    "yAxis": {"min": 350, "max": 550},
     "hasMapTab": True,
     "tab": "map",
     "addCountryMode": "change-country",
@@ -20,7 +20,7 @@ MULTIDIM_CONFIG = {
 GROUPED_VIEW_CONFIG = MULTIDIM_CONFIG | {
     "hasMapTab": False,
     "tab": "chart",
-    "selectedFacetStrategy": "entity",
+    "selectedFacetStrategy": "metric",
 }
 
 # Column filtering patterns
@@ -93,6 +93,10 @@ def run() -> None:
             "subtitle": lambda view: generate_subtitle_by_subject_and_gender(view),
         }
     )
+
+    # Edit display names
+    for view in c.views:
+        edit_indicator_displays(view)
 
     # Save collection
     c.save()
@@ -249,6 +253,24 @@ def generate_subtitle_by_subject_and_gender(view):
         raise ValueError(f"Unknown subject: {subject}")
 
     if subject == "subject_side_by_side":
-        return f"Assessed through the PISA scales: mathematics, which evaluates problem-solving in real-life situations; science, which measures understanding and critical thinking about scientific issues; and reading, which gauges the ability to comprehend and use written information."
+        return "Assessed through the PISA scales: mathematics, which evaluates problem - solving in real-life situations; science, which measures understanding and critical thinking about scientific issues; and reading, which gauges the ability to comprehend and use written information."
     else:
         return f"Average PISA scores in {subject_term} for {gender_term} aged 15. PISA is an international assessment that measures student performance in key subjects."
+
+
+def edit_indicator_displays(view):
+    """Edit display names for the grouped views."""
+    if view.dimensions.get("sex") != "sex_side_by_side" or view.indicators.y is None:
+        return
+
+    # Display name mappings for subjects
+    DISPLAY_NAMES = {
+        "average_girls": "Girls",
+        "average_boys": "Boys",
+    }
+
+    for indicator in view.indicators.y:
+        for gender_key, display_name in DISPLAY_NAMES.items():
+            if gender_key in indicator.catalogPath:
+                indicator.display = {"name": display_name}
+                break
