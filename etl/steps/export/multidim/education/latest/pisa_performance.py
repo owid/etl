@@ -256,14 +256,16 @@ def generate_subtitle_by_subject_and_gender(view):
     subject_descriptions = {
         "mathematics": "Assessed through the PISA mathematics scale, which measures how well someone can use math to solve everyday problems and understand the role of math in the real world.",
         "science": "Assessed through the PISA science scale, which assesses how comfortable and knowledgeable someone is with science topics, focusing on their ability to discuss and think about scientific issues in everyday life.",
-        "reading": "Assessed through the PISA reading scale, which measures how well someone can understand and use written information to learn new things and be a part of society."
+        "reading": "Assessed through the PISA reading scale, which measures how well someone can understand and use written information to learn new things and be a part of society.",
     }
 
     if subject == "subject_side_by_side":
-        return "Assessed through PISA scales, which evaluate children's ability to use mathematical reasoning, understand and engage with texts, and interact with scientific concepts for practical problem-solving, personal development, and informed citizenship."
+        return f"Average scores in {subject_term} for {gender_term} aged 15. Assessed through PISA scales, which evaluate children's ability to use mathematical reasoning, understand and engage with texts, and interact with scientific concepts for practical problem-solving, personal development, and informed citizenship."
     else:
-        subject_description = subject_descriptions.get(subject, "PISA is an international assessment that measures student performance in key subjects.")
-        return f"Average PISA scores in {subject_term} for {gender_term} aged 15. {subject_description}"
+        subject_description = subject_descriptions.get(
+            subject, "PISA is an international assessment that measures student performance in key subjects."
+        )
+        return f"Average scores in {subject_term} for {gender_term} aged 15. {subject_description}"
 
 
 def edit_indicator_displays(view):
