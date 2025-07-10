@@ -76,15 +76,15 @@ definitions:
     <%- elif antigen == "ROTAC" %>
     vaccinated against rotavirus
     <%- elif antigen == "PCV3" %>
-    who have had their third dose of the pneumococcal conjugate vaccine
+    who have had the third dose of the pneumococcal conjugate vaccine
     <%- elif antigen == "IPV1" %>
-    who have had their one dose of the inactivated polio vaccine
+    who have had the one dose of the inactivated polio vaccine
     <%- elif antigen == "IPV2" %>
-    who have had their two doses of the inactivated polio vaccine
+    who have had the two doses of the inactivated polio vaccine
     <%- elif antigen == "MCV2X2" %>
-    who have had their two doses of the measles vaccine
+    who have had the two doses of the measles vaccine
     <%- elif antigen == "YFV" %>
-    who have had their yellow fever vaccine
+    who have had the yellow fever vaccine
     <%- elif antigen == "MENA_C" %>
     who have had a meningococcal vaccine
     <%- endif %>
@@ -98,7 +98,7 @@ definitions:
     <%- elif antigen == "MCV1" %>
     who have not had the measles vaccine
     <%- elif antigen == "POL3" %>
-    who have not had their third dose of the polio vaccine
+    who have not had the third dose of the polio vaccine
     <%- elif antigen == "RCV1" %>
     who have not been vaccinated against rubella
     <%- elif antigen == "HEPB3" %>
@@ -112,7 +112,7 @@ definitions:
     <%- elif antigen == "ROTAC" %>
     who are not vaccinated against rotavirus
     <%- elif antigen == "PCV3" %>
-    who have not had their third dose of the pneumococcal conjugate vaccine
+    who have not had the third dose of the pneumococcal conjugate vaccine
     <%- elif antigen == "IPV1" %>
     who have not had the inactivated polio vaccine
     <%- elif antigen == "IPV2" %>
@@ -132,9 +132,9 @@ definitions:
     <%- elif antigen == "DTPCV3" %>
     three doses of the combined diphtheria, tetanus and [pertussis](#dod:pertussis) vaccine
     <%- elif antigen == "MCV1" %>
-    their first dose of the measles vaccine
+    the first dose of the measles vaccine
     <%- elif antigen == "POL3" %>
-    their third dose of either the oral or inactivated polio vaccine
+    the third dose of either the oral or inactivated polio vaccine
     <%- elif antigen == "RCV1" %>
     one dose of rubella vaccine
     <%- elif antigen == "HEPB3" %>
@@ -146,15 +146,15 @@ definitions:
     <%- elif antigen == "MCV2" %>
     two doses of the measles vaccine
     <%- elif antigen == "ROTAC" %>
-    their final recommended dose (2nd or 3rd) of the rotavirus vaccine
+    the final recommended dose (2nd or 3rd) of the rotavirus vaccine
     <%- elif antigen == "PCV3" %>
-    their third dose of the pneumococcal conjugate vaccine
+    the third dose of the pneumococcal conjugate vaccine
     <%- elif antigen == "IPV1" %>
-    their first dose of the inactivated polio vaccine
+    the first dose of the inactivated polio vaccine
     <%- elif antigen == "IPV2" %>
-    their second dose of the inactivated polio vaccine
+    the second dose of the inactivated polio vaccine
     <%- elif antigen == "MCV2X2" %>
-    their second dose of the measles vaccine
+    the second dose of the measles vaccine
     <%- elif antigen == "YFV" %>
     one dose of the yellow fever vaccine
     <%- elif antigen == "MENA_C" %>

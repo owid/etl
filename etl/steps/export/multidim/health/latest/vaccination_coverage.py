@@ -11,7 +11,7 @@ def run() -> None:
     # Add views for all dimensions
     # NOTE: using load_data=False which only loads metadata significantly speeds this up
     ds = paths.load_dataset("vaccination_coverage")
-    tb = ds.read("vaccination_coverage", load_data=True)
+    tb = ds.read("vaccination_coverage", load_data=False)
     # Drop out the non-global vaccinations
     tb = tb.drop(
         columns=[
