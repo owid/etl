@@ -47,6 +47,10 @@ definitions:
     one-year-olds
     <%- elif antigen == "MCV2X2" %>
     two-year-olds
+    <%- elif antigen == "YFV" %>
+    one-year-olds
+    <%- elif antigen == "MENA_C" %>
+    one-year-olds
     <%- endif %>
   antigen_title: |-
     <% if antigen == "BCG" %>
@@ -79,6 +83,10 @@ definitions:
     who have had their two doses of the inactivated polio vaccine
     <%- elif antigen == "MCV2X2" %>
     who have had their two doses of the measles vaccine
+    <%- elif antigen == "YFV" %>
+    who have had their yellow fever vaccine
+    <%- elif antigen == "MENA_C" %>
+    who have had a meningococcal vaccine
     <%- endif %>
   antigen_title_negative: |-
     <% if antigen == "BCG" %>
@@ -111,6 +119,10 @@ definitions:
     who have not had two doses of the inactivated polio vaccine
     <%- elif antigen == "MCV2X2" %>
     who have not had two doses of of the measles vaccine
+    <%- elif antigen == "YFV" %>
+    who have not had the yellow fever vaccine
+    <%- elif antigen == "MENA_C" %>
+    who have not had a meningococcal vaccine
     <%- endif %>
   antigen_description: |-
     <% if antigen == "BCG" %>
@@ -143,12 +155,16 @@ definitions:
     their second dose of the inactivated polio vaccine
     <%- elif antigen == "MCV2X2" %>
     their second dose of the measles vaccine
+    <%- elif antigen == "YFV" %>
+    one dose of the yellow fever vaccine
+    <%- elif antigen == "MENA_C" %>
+    a meningococcal vaccine
     <%- endif %>
   antigen_description_key: |-
     <% if antigen == "MCV1" %>
     Measles is one of the most contagious diseases. The first dose of measles vaccine is critical for building immunity. In countries where the national schedule recommends the first dose at 12 months or later based on local epidemiology, these estimates reflect the percentage of children who received their first dose as recommended.
     <% elif antigen == "BCG" %>
-    The WHO recommendes BCG vaccination at birth for all newborns in countries or settings with a high incidence of TB and/or high leprosy burden. In countries with low TB with low TB incidence or leprosy burden may choose to selectively vaccinate newborns in high-risk groups.
+    The WHO recommends BCG vaccination at birth for all newborns in countries or settings with a high incidence of TB and/or high leprosy burden. Countries with low TB incidence or leprosy burden may choose to selectively vaccinate newborns in high-risk groups.
     <%- elif antigen == "RCV1" %>
     Rubella coverage estimates are based on WHO and UNICEF data for the first dose of the measles-rubella vaccine, as the WHO recommends this combined vaccine.
     <%- elif antigen == "HEPB_BD" %>
@@ -213,6 +229,10 @@ definitions:
     Inactivated polio (IPV2)
     <%- elif antigen == "MCV2X2" %>
     Measles, second dose (MCV2X2)
+    <%- elif antigen == "YFV" %>
+    Yellow fever (YFV)
+    <%- elif antigen == "MENA_C" %>
+    Meningococcal (MENA_C)
     <%- endif %>
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
