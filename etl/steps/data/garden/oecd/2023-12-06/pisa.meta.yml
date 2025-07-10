@@ -3,13 +3,12 @@ definitions:
   common:
     processing_level: minor
     description_key:
-      - PISA (Programme for International Student Assessment) is a triennial international survey which aims to evaluate education systems worldwide by testing the skills and knowledge of 15-year-old students.
-      - Students take a two-hour computer-based test that covers reading, mathematics, and science, with a focus on how well students can apply their knowledge and skills to real-world situations.
-      - PISA scores are standardized to have a mean of 500 and a standard deviation of 100 across OECD countries in the first assessment (2000 for reading, 2003 for mathematics, 2006 for science).
-      - Higher scores indicate better performance, with scores typically ranging from around 300 to 600, though exceptional performances can exceed this range.
-      - The assessment is administered every three years to nationally representative samples of 15-year-old students in schools.
-      - Results are reported as mean scores for each country, with confidence intervals reflecting sampling and measurement uncertainty.
-      - Cross-country comparisons should account for differences in education systems, socioeconomic contexts, and cultural factors that may affect performance.
+      - The Programme for International Student Assessment (PISA) is an international survey that assesses the skills and knowledge of 15-year-old students. It provides a snapshot of how well education systems around the world are preparing young people for adult life.
+      - PISA is run every three years and tests students in reading, mathematics, and science. It doesn't just assess what students know — it focuses on how well they can use this knowledge to solve problems they might encounter in the real world. For example, can they interpret a bus timetable, reason through a scientific scenario, or compare prices to make a budget?
+      - Each student sits a two-hour computer-based test. Results are summarised as average scores for each country, and are designed to be comparable over time.
+      - "The scores are standardized to make comparisons easier: across OECD countries, the average score was set to 500 in the first year each subject was assessed (reading in 2000, mathematics in 2003, science in 2006). Most countries score somewhere between 300 and 600, although scores outside this range are possible."
+      - Higher scores indicate better performance — but comparing countries should be done carefully. Many factors affect student performance, including income, teacher quality, classroom time, and parental education. Cultural differences can also play a role in how students approach the test.
+      - PISA gives policymakers, researchers, and educators a way to evaluate their education systems and learn from others. But as with all such comparisons, it's important to consider the wider context behind the numbers.
     presentation:
       topic_tags:
         - Global Education
