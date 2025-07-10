@@ -32,6 +32,8 @@ DENOMINATOR = {
 
 # If the vaccine universally recommended in all countries by WHO and UNICEF, set to True.
 # If not, set to False.
+# See this table for details: https://www.who.int/publications/m/item/table1-summary-of-who-position-papers-recommendations-for-routine-immunization
+# Note BCG is quite nuanced
 UNIVERSAL = {
     "BCG": False,  # Only universally recommended in high TB incidence countries, only at risk groups in other countries
     "DTPCV1": True,
