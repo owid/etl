@@ -275,9 +275,10 @@ def combine_collections(
         if dim.ui_type == "checkbox" and is_explorer:
             raise NotImplementedError("Checkbox dimensions are not supported yet for Explorers.")
 
-    # Detect duplicate views
+    # Detect duplicate views + save dependencies
     seen_dims = set()
     has_duplicate_views = False
+    dependencies_combined = set()
     for collection in collections:
         # duplicate views within a collection
         collection.check_duplicate_views()
@@ -288,6 +289,9 @@ def combine_collections(
                 has_duplicate_views = True
                 break
             seen_dims.add(dims)
+
+        # Save dependencies from each collection
+        dependencies_combined |= collection.dependencies
 
     # Add collection dimension if needed
     if has_duplicate_views or force_collection_dimension:
@@ -389,6 +393,7 @@ def combine_collections(
         catalog_path=catalog_path_new,
         validate_schema=True if not is_explorer else False,
         explorer=is_explorer,
+        dependencies_combined=dependencies_combined,
     )
 
     # Log any conflicts that were resolved

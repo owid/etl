@@ -701,29 +701,17 @@ def get_info_for_etl_datasets(db_conn: Optional[pymysql.Connection] = None) -> p
 
     query = """\
     SELECT
-        q1.datasetId AS dataset_id,
+        d.id AS dataset_id,
         d.name AS dataset_name,
-        q1.etlPath AS etl_path,
+        d.catalogPath AS etl_path,
         d.isArchived AS is_archived,
         d.isPrivate AS is_private,
         q2.chartIds AS chart_ids,
-        q2.updatePeriodDays AS update_period_days
-    FROM
-        (SELECT
-            datasetId,
-            MIN(catalogPath) AS etlPath
-        FROM
-            variables
-        WHERE
-            catalogPath IS NOT NULL
-        GROUP BY
-            datasetId) q1
+        d.updatePeriodDays AS update_period_days
+    FROM datasets d
     LEFT JOIN
         (SELECT
             d.id AS datasetId,
-            d.isArchived,
-            d.isPrivate,
-            d.updatePeriodDays,
             GROUP_CONCAT(DISTINCT c.id) AS chartIds
         FROM
             datasets d
@@ -735,12 +723,10 @@ def get_info_for_etl_datasets(db_conn: Optional[pymysql.Connection] = None) -> p
             json_extract(cc.full, "$.isPublished") = TRUE
         GROUP BY
             d.id) q2
-        ON q1.datasetId = q2.datasetId
-    JOIN
-        datasets d ON q1.datasetId = d.id
+        ON d.id = q2.datasetId
+    WHERE d.catalogPath IS NOT NULL
     ORDER BY
-        q1.datasetId ASC;
-
+        d.id ASC;
     """
 
     with warnings.catch_warnings():
@@ -788,14 +774,6 @@ def get_info_for_etl_datasets(db_conn: Optional[pymysql.Connection] = None) -> p
     # Make is_archived and is_private boolean columns.
     df["is_archived"] = df["is_archived"].astype(bool)
     df["is_private"] = df["is_private"].astype(bool)
-
-    # Sanity check.
-    unknown_channels = set([etl_path.split("/")[0] for etl_path in set(df["etl_path"])]) - {"grapher"}
-    if len(unknown_channels) > 0:
-        log.error(
-            "Variables in grapher DB are expected to come only from ETL grapher channel, "
-            f"but other channels were found: {unknown_channels}"
-        )
 
     return df
 

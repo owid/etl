@@ -788,11 +788,9 @@ def test_validate_indicators_are_from_dependencies_success():
                 indicators=ViewIndicators(y=[Indicator(catalogPath="grapher/ns/2023/dataset/table#column")]),
             )
         ],
+        dependencies={"data://grapher/ns/2023/dataset"},
         _definitions=Definitions(),
     )
-
-    # Set up dependencies that match the indicator path
-    collection._dependencies = {"data://grapher/ns/2023/dataset"}
 
     # Get indicators in use
     indicators = collection.indicators_in_use()
@@ -820,11 +818,9 @@ def test_validate_indicators_are_from_dependencies_failure():
                 indicators=ViewIndicators(y=[Indicator(catalogPath="grapher/other/2023/otherset/table#column")]),
             )
         ],
+        dependencies={"data://grapher/ns/2023/dataset"},
         _definitions=Definitions(),
     )
-
-    # Set up dependencies (doesn't include the dataset being used)
-    collection._dependencies = {"data://grapher/ns/2023/dataset"}
 
     # Get indicators in use
     indicators = collection.indicators_in_use()
@@ -861,11 +857,9 @@ def test_validate_indicators_are_from_dependencies_multiple_dependencies():
                 ),
             )
         ],
+        dependencies={"data://grapher/ns1/2023/dataset1", "data://grapher/ns2/2023/dataset2"},
         _definitions=Definitions(),
     )
-
-    # Set up multiple dependencies
-    collection._dependencies = {"data://grapher/ns1/2023/dataset1", "data://grapher/ns2/2023/dataset2"}
 
     # Get indicators in use
     indicators = collection.indicators_in_use()
@@ -900,11 +894,9 @@ def test_validate_indicators_are_from_dependencies_partial_match():
                 ),
             )
         ],
+        dependencies={"data://grapher/ns1/2023/dataset1"},
         _definitions=Definitions(),
     )
-
-    # Set up dependencies (only covers first indicator)
-    collection._dependencies = {"data://grapher/ns1/2023/dataset1"}
 
     # Get indicators in use
     indicators = collection.indicators_in_use()
@@ -933,11 +925,9 @@ def test_validate_indicators_are_from_dependencies_empty_dependencies():
                 indicators=ViewIndicators(y=[Indicator(catalogPath="grapher/ns/2023/dataset/table#column")]),
             )
         ],
+        dependencies=set(),
         _definitions=Definitions(),
     )
-
-    # No dependencies set (empty set)
-    collection._dependencies = set()
 
     # Get indicators in use
     indicators = collection.indicators_in_use()
@@ -961,11 +951,9 @@ def test_validate_indicators_are_from_dependencies_empty_indicators():
         default_selection=["country"],
         dimensions=[Dimension(slug="country", name="Country", choices=[DimensionChoice(slug="usa", name="USA")])],
         views=[View(dimensions={"country": "usa"}, indicators=ViewIndicators(y=[]))],
+        dependencies={"data://grapher/ns/2023/dataset"},
         _definitions=Definitions(),
     )
-
-    # Set up dependencies
-    collection._dependencies = {"data://grapher/ns/2023/dataset"}
 
     # Get indicators in use (should be empty)
     indicators = collection.indicators_in_use()

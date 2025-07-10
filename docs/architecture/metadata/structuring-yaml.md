@@ -331,3 +331,47 @@ tables:
             description_short: |-
               The prevalence of << cause >> in << format_sex(sex) >>.
     ```
+
+## Metadata Postprocessing After Dataset Creation
+
+In some cases, you may need to programmatically modify metadata after creating a dataset with `create_dataset()`. This pattern is useful when metadata modifications require dynamic content that cannot be easily expressed in YAML files.
+
+### Pattern
+
+1. Create the dataset using `create_dataset()`
+2. Retrieve the table from the created dataset
+3. Modify metadata programmatically (e.g., using regex, calculations, or conditional logic)
+4. Re-add the modified table to the dataset using `ds.add()`
+5. Save the dataset with `ds.save()`
+
+### Example
+
+```python
+# Create a new grapher dataset
+ds_grapher = create_dataset(
+    dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_garden.metadata
+)
+
+# Retrieve the table from the created dataset for metadata modification
+tb = ds_grapher["my_table"]
+
+# Modify metadata programmatically
+for col in tb.columns:
+    m = tb[col].m
+
+    # Example: Replace placeholder text with dynamic values
+    if "ANSWER" in m.title:
+        answer_match = re.search(r"(\d+)", col)
+        answer_num = answer_match.group(1)
+
+        m.title = m.title.replace("ANSWER", answer_num)
+        m.description_short = m.description_short.replace("ANSWER", answer_num)
+
+# Re-add the modified table to the dataset
+ds_grapher.add(tb)
+
+# Save the changes
+ds_grapher.save()
+```
+
+This approach allows you to combine the declarative power of YAML metadata with programmatic flexibility when needed.

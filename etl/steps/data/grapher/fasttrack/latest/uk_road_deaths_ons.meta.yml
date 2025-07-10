@@ -55,6 +55,19 @@ tables:
         display:
           name: Deaths per billion miles
         description: The number of deaths in road incidents per billion miles driven.
+      road_collisions:
+        title: Number of road collisions
+        unit: collisions
+        display:
+          name: All collisions
+        description: The number reported collisions on the roads.
+      drink_drive_road_collisions:
+        title: Number of drink-drive road collisions
+        unit: collisions
+        display:
+          name: Drink-drive collisions
+        description: |-
+          A drink-drive accident is defined as being a reported incident on a public road in which someone is killed or injured, and where at least one of the motor vehicle drivers or riders involved either refuses to give a breath test specimen when requested by the police, or is found to be over the legal limit.
     dimensions:
       - name: country
         slug: country
