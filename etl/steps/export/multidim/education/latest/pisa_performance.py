@@ -176,6 +176,13 @@ def create_grouped_views(collection):
     collection.group_views(
         groups=[
             {
+                "dimension": "sex",
+                "choice_new_slug": "sex_side_by_side",
+                "choices": ["girls", "boys"],
+                "view_config": view_config,
+                "view_metadata": view_metadata,
+            },
+            {
                 "dimension": "subject",
                 "choice_new_slug": "subject_side_by_side",
                 "choices": ["mathematics", "science", "reading"],
@@ -226,10 +233,22 @@ def generate_title_by_subject_and_gender(view):
 
     if subject == "subject_side_by_side":
         return f"Average performance of 15-year-old {gender_term} by subject"
+    else:
+        return f"Average performance of 15-year-old {gender_term} in {subject_term}"
 
 
 def generate_subtitle_by_subject_and_gender(view):
     """Generate subtitle based on subject and gender."""
 
-    if view.d.subject == "subject_side_by_side":
-        return "Assessed through the PISA scales: mathematics, which evaluates problem-solving in real-life situations; science, which measures understanding and critical thinking about scientific issues; and reading, which gauges the ability to comprehend and use written information."
+    sex, subject = view.dimensions["sex"], view.dimensions["subject"]
+    
+    subject_term = SUBJECT_MAPPINGS["subtitle"].get(subject, "")
+    gender_term = GENDER_MAPPINGS["subtitle"].get(sex, "")
+
+    if not subject_term:
+        raise ValueError(f"Unknown subject: {subject}")
+
+    if subject == "subject_side_by_side":
+        return f"Assessed through the PISA scales: mathematics, which evaluates problem-solving in real-life situations; science, which measures understanding and critical thinking about scientific issues; and reading, which gauges the ability to comprehend and use written information."
+    else:
+        return f"Average PISA scores in {subject_term} for {gender_term} aged 15. PISA is an international assessment that measures student performance in key subjects."
