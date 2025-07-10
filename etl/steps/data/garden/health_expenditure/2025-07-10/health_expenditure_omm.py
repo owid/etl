@@ -78,9 +78,9 @@ def create_estimations_from_growth(tb: Table, reference_var_suffix: str, to_adju
     tb : Table
         Table that contains both the reference variable (the one the growth is extracted from) and the variable to be adjusted (the one the growth is applied to).
     reference_var_suffix : str
-        Suffix of the reference variable (the one the growth is extracted from). In this project, "_mpd" or "_md".
+        Suffix of the reference variable (the one the growth is extracted from). In this project, "_oecd_1993".
     to_adjust_var_suffix : str
-        Suffix of the variable to be adjusted (the one the growth is applied to). In this project, "_wdi" or "".
+        Suffix of the variable to be adjusted (the one the growth is applied to). In this project, "_oecd".
 
     Returns
     -------
