@@ -140,6 +140,10 @@ def run() -> None:
         # Check overlapping names
         check_overlapping_names(tb)
 
+        # Special processing for statins indicator
+        if "general_availability_of_statins_in_the_public_health_sector" in tb.columns:
+            tb = process_statins_indicator(tb)
+
         tables.append(tb)
 
     # Merge identical tables
@@ -426,5 +430,22 @@ def check_duplicate_index(tb: Table) -> Table:
                 duplicated_index=duplicated_index[:10],
             )
             tb = tb[~tb.index.duplicated()]
+
+    return tb
+
+
+def process_statins_indicator(tb: Table) -> Table:
+    """Special processing for statins indicator data."""
+
+    # Asserting that the unique values in the column are a subset of the provided list
+    provided_values = ["Yes", "Don't know", "No", "No data received", "No response"]
+    unique_values_in_column = tb["general_availability_of_statins_in_the_public_health_sector"].unique()
+    assert set(unique_values_in_column).issubset(provided_values)
+
+    # Replace the specified values where there is no data with "NaN" for consistency on grapher charts
+    values_to_replace = ["No data received", "No response", "Don't know"]
+    tb["general_availability_of_statins_in_the_public_health_sector"] = tb[
+        "general_availability_of_statins_in_the_public_health_sector"
+    ].replace(values_to_replace, np.nan)
 
     return tb

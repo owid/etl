@@ -637,7 +637,7 @@ class ChartDiffShow:
         # Copy link
         if self.show_link:
             # with col3:
-            query_params = f"chart_id={self.diff.chart_id}"
+            query_params = f"chart_id={self.diff.chart_id}&show_reviewed="
             # st.caption(f"**{OWID_ENV.wizard_url}?{query_params}**")
             if OWID_ENV.wizard_url != OWID_ENV.wizard_url_remote:
                 url = f"{OWID_ENV.wizard_url_remote}/chart-diff?{query_params}"
