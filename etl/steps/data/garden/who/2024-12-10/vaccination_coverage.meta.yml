@@ -49,7 +49,7 @@ definitions:
     two-year-olds
     <%- elif antigen == "YFV" %>
     one-year-olds
-    <%- elif antigen == "MENA_C"
+    <%- elif antigen == "MENA_C" %>
     one-year-olds
     <%- endif %>
   antigen_title: |-
