@@ -11,7 +11,7 @@ definitions:
         hideAnnotationFieldsInTitle:
           time: true
   description_key_standard_one: |-
-    This chart showsdata represents official WHO/UNICEF estimates of national immunization coverage published by the WHO and UNICEF (WUENIC). The estimates include all WHO mMember sStates, even those that did not report 2023 data. For non-reporting countries, WHO uses statistical methods to extrapolate from previously reported data, ensuring global coverage can be assessed.
+    This chart shows official estimates of national immunization coverage published by the WHO and UNICEF. The estimates include all WHO member states, even those that did not report 2023 data. For non-reporting countries, WHO uses statistical methods to extrapolate from previously reported data, ensuring global coverage can be assessed.
   description_key_standard_two: |-
     Global and regional vaccination coverage is calculated using population-weighted averages. In 2023, approximately 5% of countries did not report data, requiring extrapolation from their 2022 data to maintain complete global estimates.
   description_key_standard_three: |-
@@ -147,6 +147,8 @@ definitions:
   antigen_description_key: |-
     <% if antigen == "MCV1" %>
     Measles is one of the most contagious diseases. The first dose of measles vaccine is critical for building immunity. In countries where the national schedule recommends the first dose at 12 months or later based on local epidemiology, these estimates reflect the percentage of children who received their first dose as recommended.
+    <% elif antigen == "BCG" %>
+    The WHO recommendes BCG vaccination at birth for all newborns in countries or settings with a high incidence of TB and/or high leprosy burden. In countries with low TB with low TB incidence or leprosy burden may choose to selectively vaccinate newborns in high-risk groups.
     <%- elif antigen == "RCV1" %>
     Rubella coverage estimates are based on WHO and UNICEF data for the first dose of the measles-rubella vaccine, as the WHO recommends this combined vaccine.
     <%- elif antigen == "HEPB_BD" %>
@@ -174,7 +176,7 @@ definitions:
     <%- elif antigen == "ROTAC" %>
       Rotavirus is a virus that causes severe diarrhea, mostly in infants and young children. It can lead to dehydration and death if not treated.
     <%- elif antigen == "BCG" %>
-      Tuberculosis (TB) is a bacterial infection that primarily affects the lungs but can also affect other parts of the body. It is the leading infectious cause of death worldwide.
+      Coverage estimates include only countries where the WHO recommends vaccination for all newborns. Tuberculosis (TB) is a bacterial infection that primarily affects the lungs but can also affect other parts of the body. It is the leading infectious cause of death worldwide.
     <%- elif antigen in ["DTPCV1", "DTPCV3"] %>
       Diphtheria can cause breathing problems, heart failure, paralysis, and even death. Tetanus causes painful muscle stiffness and lockjaw. Pertussis (whooping cough) causes severe coughing fits that can lead to pneumonia, seizures, and brain damage.
     <%- elif antigen in ["HEPB_BD","HEPB3"] %>
@@ -224,10 +226,10 @@ tables:
         title: Share of {definitions.antigen_age_group} {definitions.antigen_title}
         description_short: Share of {definitions.antigen_age_group} who have had {definitions.antigen_description} in a given year.
         description_key:
+          - "{definitions.antigen_description_key}"
           - "{definitions.description_key_standard_one}"
           - "{definitions.description_key_standard_two}"
           - "{definitions.description_key_standard_three}"
-          - "{definitions.antigen_description_key}"
         unit: "%"
         short_unit: "%"
         display:
