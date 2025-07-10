@@ -326,7 +326,9 @@ def generate_subtitle_by_dimensions(view):
     reading_secondary_desc = "connect main ideas across different text types, understand the author's intentions, and draw conclusions from the text"
 
     # Population context descriptions
-    all_children_context = "This data accounts for school completion rates to estimate skills for all children, not just those in school."
+    all_children_context = (
+        "This data accounts for school completion rates to estimate skills for all children, not just those in school."
+    )
     students_context = "This data includes only students enrolled in school."
 
     # Handle different view types
