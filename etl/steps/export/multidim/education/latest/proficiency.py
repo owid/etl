@@ -131,9 +131,7 @@ def get_proficiency_columns(tb):
     """Filter both prepared for the future and student proficiency columns excluding unwanted categories."""
     # Create inclusion patterns for both variable types
     prepared_for_future_pattern = r"proportion_of_children_young_people.*prepared_for_the_future"
-    student_proficiency_pattern = (
-        r"achieving_at_least_a_minimum_proficiency.*mathematics|achieving_at_least_a_minimum_proficiency.*reading"
-    )
+    student_proficiency_pattern = r"achieving_at_least_a_minimum_proficiency.*(mathematics|reading)"
 
     # Create exclusion pattern - filters out unwanted column types:
     # - Geographic breakdowns (urban/rural)
@@ -317,35 +315,66 @@ def generate_title_by_dimensions(view):
 
 def generate_subtitle_by_dimensions(view):
     """Generate subtitle based on dimensions."""
-    sex = view.dimensions.get("sex", "both")
     level = view.dimensions.get("level", "primary")
     subject = view.dimensions.get("subject", "mathematics")
     population = view.dimensions.get("population", "all_children")
 
-    # Get terms
-    gender_term = GENDERS.get(sex, {}).get("subtitle", "children")
-    level_config = EDUCATION_LEVELS.get(level, {})
-    subject_config = SUBJECTS.get(subject, {})
+    # Define proficiency descriptions
+    math_primary_desc = "demonstrate skills in number sense and computation, basic measurement, reading, interpreting, and constructing graphs, spatial orientation, and number patterns"
+    math_secondary_desc = "demonstrate skills in computation, application problems, matching tables and graphs, and making use of algebraic representations"
+    reading_primary_desc = "identify key ideas in texts and connect them to their own experiences"
+    reading_secondary_desc = "connect main ideas across different text types, understand the author's intentions, and draw conclusions from the text"
 
-    # Adjust gender term for population type
-    if population == "students":
-        if gender_term == "children":
-            gender_term = "students"
-        elif gender_term == "boys":
-            gender_term = "male students"
-        elif gender_term == "girls":
-            gender_term = "female students"
+    # Population context descriptions
+    all_children_context = "This data accounts for school completion rates to estimate skills for all children, not just those in school."
+    students_context = "This data includes only students enrolled in school."
 
-    # Base description
-    base_description = f"Share of {gender_term} {level_config.get('age_description', 'at school age')} who achieve at least a minimum proficiency level in {subject_config.get('title_term', subject)}."
-
-    # Add explanation based on population type
-    if population == "all_children":
-        explanation = " This measure includes all children in the relevant age group, not just those enrolled in school, providing a comprehensive view of educational outcomes."
+    # Handle different view types
+    if view.matches(level="level_side_by_side") and view.matches(subject="subject_side_by_side"):
+        # Both levels and subjects side by side
+        return "The share of children who achieve the minimum [math](#dod:math-proficiency) and [reading](#dod:reading-proficiency) proficiency at different stages of education. For mathematics: at [primary](#dod:primary-education) level, students can demonstrate skills in number sense and computation, basic measurement, reading, interpreting, and constructing graphs, spatial orientation, and number patterns; at [lower-secondary](#dod:lower-secondary-education) level, students demonstrate skills in computation, application problems, matching tables and graphs, and making use of algebraic representations. For reading: at primary level, children can identify key ideas in texts and connect them to their own experiences; at lower-secondary level, children can connect main ideas across different text types, understand the author's intentions, and draw conclusions from the text."
+    elif view.matches(level="level_side_by_side"):
+        # Multiple education levels
+        if subject == "mathematics":
+            return f"The share of children who achieve minimum [math](#dod:math-proficiency) proficiency at different education levels. At [primary](#dod:primary-education) level, students can {math_primary_desc}. At [lower-secondary](#dod:lower-secondary-education) level, students {math_secondary_desc}."
+        else:
+            return f"The share of children who achieve minimum [reading](#dod:reading-proficiency) proficiency at different education levels. At [primary](#dod:primary-education) level, children can {reading_primary_desc}. At [lower-secondary](#dod:lower-secondary-education) level, children can {reading_secondary_desc}."
+    elif view.matches(subject="subject_side_by_side"):
+        # Multiple subjects
+        if level == "primary":
+            return f"The share of children who achieve minimum proficiency by the end of [primary](#dod:primary-education) education. For [mathematics](#dod:math-proficiency), students can {math_primary_desc}. For [reading](#dod:reading-proficiency), children can {reading_primary_desc}."
+        else:
+            return f"The share of children who achieve minimum proficiency by the end of [lower-secondary](#dod:lower-secondary-education) education. For [mathematics](#dod:math-proficiency), students {math_secondary_desc}. For [reading](#dod:reading-proficiency), children can {reading_secondary_desc}."
+    elif view.matches(population="population_side_by_side"):
+        # Different populations
+        if subject == "mathematics":
+            if level == "primary":
+                proficiency_desc = f"can {math_primary_desc}"
+            else:
+                proficiency_desc = math_secondary_desc
+            return f"The share of children who achieve minimum [math](#dod:math-proficiency) proficiency by the end of [{level}](#dod:{level}-education) education, where students {proficiency_desc}. Compares all children in the age group versus only those enrolled in school."
+        else:
+            if level == "primary":
+                proficiency_desc = f"can {reading_primary_desc}"
+            else:
+                proficiency_desc = f"can {reading_secondary_desc}"
+            return f"The share of children who achieve minimum [reading](#dod:reading-proficiency) proficiency by the end of [{level}](#dod:{level}-education) education, where children {proficiency_desc}. Compares all children in the age group versus only those enrolled in school."
     else:
-        explanation = " This measure includes only students enrolled in school."
-
-    return base_description + explanation
+        # Single dimension view
+        if subject == "mathematics":
+            if level == "primary":
+                proficiency_desc = f"can {math_primary_desc}"
+            else:
+                proficiency_desc = math_secondary_desc
+            population_context = all_children_context if population == "all_children" else students_context
+            return f"The share of children who achieve minimum [math](#dod:math-proficiency) proficiency by the end of [{level}](#dod:{level}-education) education, where students {proficiency_desc}. {population_context}"
+        else:
+            if level == "primary":
+                proficiency_desc = f"can {reading_primary_desc}"
+            else:
+                proficiency_desc = f"can {reading_secondary_desc}"
+            population_context = all_children_context if population == "all_children" else students_context
+            return f"The share of children who achieve minimum [reading](#dod:reading-proficiency) proficiency by the end of [{level}](#dod:{level}-education) education, where children {proficiency_desc}. {population_context}"
 
 
 def edit_indicator_displays(view):
