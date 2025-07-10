@@ -32,20 +32,18 @@ dimensions:
         description: Includes all children in the relevant age group, not just those enrolled in school.
       - slug: population_side_by_side
         name: Children and students
-        description: Compare outcomes between all children and enrolled students.
+        description: Compare learning outcomes between all children and just those students who are enrolled.
 
   - slug: subject
     name: Subject
     choices:
       - slug: mathematics
         name: Mathematics
-        description: Minimum proficiency in mathematics.
       - slug: reading
         name: Reading
-        description: Minimum proficiency in reading.
       - slug: subject_side_by_side
         name: All subjects
-        description: Compare proficiency rates in reading and mathematics.
+        description: Compare learning outcomes across subjects.
 
   - slug: sex
     name: Gender
