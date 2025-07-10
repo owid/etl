@@ -470,7 +470,7 @@ def mk_custom_entities(df: Table) -> pd.DataFrame:
     return df_cust
 
 
-@memory.cache
+# @memory.cache
 def _fetch_metadata_for_indicator(indicator_code: str) -> Dict[str, str]:
     indicator_code = indicator_code.replace("_", ".").upper()
     api_url = f"https://api.worldbank.org/v2/indicator/{indicator_code}?format=json"
@@ -618,17 +618,28 @@ def create_description_from_producer(var: Dict[str, Any]) -> Optional[str]:
         desc += var["short_definition"]
 
     if pd.notnull(var["limitations_and_exceptions"]) and len(var["limitations_and_exceptions"].strip()) > 0:
-        desc += f'\n\nLimitations and exceptions: {var["limitations_and_exceptions"]}'
+        desc += f'\n\n### Limitations and exceptions:\n{var["limitations_and_exceptions"]}'
 
     if (
         pd.notnull(var["statistical_concept_and_methodology"])
         and len(var["statistical_concept_and_methodology"].strip()) > 0
     ):
-        desc += f'\n\nStatistical concept and methodology: {var["statistical_concept_and_methodology"]}'
+        desc += f'\n\n### Statistical concept and methodology:\n{var["statistical_concept_and_methodology"]}'
+
+    ####################################################################################################################
+    # I think that the development relevance could also be an interesting field to add to the description_from_producer.
+    # For now, I'll include it in this specific indicator (access to electricity), but in the future we can consider adding this field for all indicators.
+    if (
+        (var["indicator_code_original"] in ["EG.ELC.ACCS.ZS"])
+        and pd.notnull(var["development_relevance"])
+        and len(var["development_relevance"].strip()) > 0
+    ):
+        desc += f'\n\n### Development relevance:\n{var["development_relevance"]}'
+    ####################################################################################################################
 
     # retrieves additional source info, if it exists.
     if pd.notnull(var["notes_from_original_source"]) and len(var["notes_from_original_source"].strip()) > 0:
-        desc += f'\n\nNotes from original source: {var["notes_from_original_source"]}'
+        desc += f'\n\n### Notes from original source:\n{var["notes_from_original_source"]}'
 
     desc = re.sub(r" *(\n+) *", r"\1", re.sub(r"[ \t]+", " ", desc)).strip()
 
@@ -812,6 +823,13 @@ def add_energy_access_variables(tb: Table) -> Table:
     tb["eg_cft_accs_zs_number"] = tb["eg_cft_accs_zs"] / 100 * tb["sp_pop_totl"]
     tb["eg_cft_accs_zs_without_number"] = tb["eg_cft_accs_zs_without"] / 100 * tb["sp_pop_totl"]
     tb = tb.format(["country", "year"])
+
+    # Add description from producer to the new indicators (which contains relevant information).
+    for indicator in ["eg_elc_accs_zs_without", "eg_elc_accs_zs_number", "eg_elc_accs_zs_without_number"]:
+        tb[indicator].metadata.description_from_producer = tb["eg_elc_accs_zs"].metadata.description_from_producer
+    for indicator in ["eg_cft_accs_zs_without", "eg_cft_accs_zs_number", "eg_cft_accs_zs_without_number"]:
+        tb[indicator].metadata.description_from_producer = tb["eg_cft_accs_zs"].metadata.description_from_producer
+
     return tb
 
 

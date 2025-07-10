@@ -81,12 +81,12 @@ class Collection(MDIMBase):
 
     _definitions: Definitions
 
+    dependencies: set[str] = field(default_factory=set)
     topic_tags: List[str] | None = None
     _default_dimensions: Dict[str, str] | None = None
 
     # Internal use. For save() method.
     _collection_type: str | None = field(init=False, default="multidim")
-    _dependencies: set[str] = field(init=False, default_factory=set)
     _group_operations_done: int = field(init=False, default=0)
 
     @classmethod
@@ -113,6 +113,10 @@ class Collection(MDIMBase):
     def __post_init__(self):
         # Sanity check
         assert "#" in self.catalog_path, "Catalog path should be in the format `path#name`."
+
+        if isinstance(self.dependencies, list):
+            # Convert list to set
+            self.dependencies = set(self.dependencies)
 
     @property
     def definitions(self) -> Definitions:
@@ -499,9 +503,10 @@ class Collection(MDIMBase):
 
     def validate_indicators_are_from_dependencies(self, indicators):
         """Validate that the provided indicators are from tables in datasets specified in the collections dependencies."""
+        deps = {dep.split("://", 1)[-1] if "://" in dep else dep for dep in self.dependencies}
         for indicator in indicators:
-            if not any(f"data://{indicator}".startswith(f"{dep}/") for dep in self._dependencies):
-                raise ValueError(f"Indicator {indicator} is not covered by any dependency: {self._dependencies}")
+            if not any(indicator.startswith(f"{dep}/") for dep in deps):
+                raise ValueError(f"Indicator {indicator} is not covered by any dependency: {deps}")
         return True
 
     def validate_grouped_views(self):

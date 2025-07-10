@@ -76,14 +76,14 @@ def run() -> None:
     )
 
     # Combine historical data with faostat data.
-    tb_garden = combine_two_overlapping_dataframes(df1=tb_qcl, df2=tb_historical, index_columns=["country", "year"])
+    tb = combine_two_overlapping_dataframes(df1=tb_qcl, df2=tb_historical, index_columns=["country", "year"])
 
     # Set an appropriate index and sort conveniently.
-    tb_garden = tb_garden.format(short_name=paths.short_name)
+    tb = tb.format(short_name=paths.short_name)
 
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = paths.create_dataset(tables=[tb_garden])
+    ds_garden = paths.create_dataset(tables=[tb])
     ds_garden.save()
