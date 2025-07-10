@@ -20,7 +20,7 @@ MULTIDIM_CONFIG = {
 GROUPED_VIEW_CONFIG = MULTIDIM_CONFIG | {
     "hasMapTab": False,
     "tab": "chart",
-    "selectedFacetStrategy": "metric",
+    "selectedFacetStrategy": "entity",
 }
 
 # Column filtering patterns
