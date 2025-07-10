@@ -559,6 +559,36 @@ def show_chart_diffs(chart_diffs, pagination_key, source_session: Session, targe
             st_show(chart_diff, source_session, target_session)
 
 
+def st_docs():
+    # Chart sync documentation
+    # TODO: keep this in sync with `etl chart-sync` CLI docs
+    with st.expander("📋 What gets synced when you merge your PR?", expanded=False):
+        st.markdown("""
+        When you merge your PR to master, the **chart-sync** process automatically runs and syncs approved charts from your staging environment to production. Here's what happens:
+
+        **Charts that get synced:**
+        - ✅ **Approved charts** (new or modified) are synced to production
+        - ✅ **New charts** include their tags when synced
+        - ⚠️ **Pending charts** are NOT synced (and will cause a Slack notification)
+        - ❌ **Rejected charts** are skipped entirely
+
+        **What gets synced for each chart:**
+        - **Chart configuration** (title, subtitle, axis labels, chart type, etc.)
+        - **Variable mappings** (automatically migrated from staging to production IDs)
+        - **Tags** (only for new charts; existing chart tags are not modified)
+        - **Chart metadata** (description, notes, etc.)
+
+        **Additional items synced:**
+        - **DoDs (Data on Demand)** that were created or modified since staging server creation
+
+        **Important considerations:**
+        - The underlying **dataset and indicators** must already exist in production (via ETL pipeline)
+        - Charts modified in production after staging creation will cause **conflicts** and require manual resolution
+        - **Deleted charts** are NOT synced (deletions must be done manually in production)
+        - Charts with **slug conflicts** (new chart with existing slug) will be skipped with an error
+        """)
+
+
 ########################################
 # MAIN
 ########################################
@@ -578,6 +608,8 @@ If you want any of the modified charts in `{OWID_ENV.name}` to be migrated to `p
         st.markdown("Other links: ")
         st_wizard_page_link("mdim-diff")
         st_wizard_page_link("explorer-diff")
+
+    st_docs()
 
     # Get actual charts
     get_chart_diffs()

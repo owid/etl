@@ -1,6 +1,33 @@
 """
 Google utilities.
 
+To be able to use them, you will first need to generate your own credentials, following these instructions:
+
+1. Create a Google Cloud Project:
+  - Go to Google Cloud Console:
+    https://console.cloud.google.com/ (ensure you are logged in with your owid google account)
+  - Click Select a project (top menu) > New Project.
+  - Name the project owid-etl-surname (e.g., owid-etl-rosado).
+  - Click Create.
+2. Enable Required APIs:
+  - Navigate to APIs & Services > Library.
+  - Enable the following APIs: Google Drive API, Google Docs API, Google Sheets API
+3. Create OAuth Credentials:
+  - Go to APIs & Services > Credentials.
+  - Click Create Credentials > OAuth Client ID.
+  - If prompted, configure the consent screen:
+    - Select External and click Create.
+    - Fill in the required fields (e.g., app name, email) and click Save and Continue until the process is complete.
+  - Choose Desktop App as the application type.
+  - Click Create and then Download JSON to save the client_secret.json file.
+  - Save the downloaded file in your home directory in a hidden folder and rename as:
+    .config/owid_etl_doc/client_secret.json
+4. Generate your own token pickle:
+  - Run the following code from the python terminal (or interactive window):
+    from etl.google import GoogleDrive
+    GoogleDrive()
+  - A browser window should appear. Log in with your owid google account. This will create a token.pickle in the same folder as your client_secret.json
+
 """
 
 import pickle
@@ -22,15 +49,11 @@ from etl.config import GOOGLE_APPLICATION_CREDENTIALS
 # Initialize logger.
 log = get_logger()
 
-########################################################################################################################
-# TODO: Handling gdocs will not work for other users, because they won't have the client_secret.json file.
-#  We need to find a common way to handle credentials. It could be similar to the way GBQ handles them, but with credentials adapted to the new scopes.
 # Path to OAuth client credentials.
 CLIENT_SECRET_FILE = Path.home() / ".config" / "owid_etl_doc" / "client_secret.json"
 
 # Path where to cache the token after the first login.
 TOKEN_PATH = Path.home() / ".config" / "owid_etl_doc" / "token.pickle"
-########################################################################################################################
 
 
 def read_gbq(*args, **kwargs) -> pd.DataFrame:
@@ -80,6 +103,9 @@ class GoogleDrive:
             with TOKEN_PATH.open("rb") as token_file:
                 credentials = pickle.load(token_file)
         else:
+            if not CLIENT_SECRET_FILE.exists():
+                log.error("Follow instructions in etl/google.py to create a client_secret.json file.")
+                raise FileNotFoundError(f"Client secret file not found at {CLIENT_SECRET_FILE}.")
             # Create an OAuth flow using the client secrets file and the required scopes.
             flow = InstalledAppFlow.from_client_secrets_file(CLIENT_SECRET_FILE, self.SCOPES)
 

@@ -4,10 +4,10 @@ from typing import Optional
 
 import pandas as pd
 
-from apps.utils.google import read_gbq
 from apps.wizard.utils.embeddings import Doc
 from etl.config import memory
 from etl.db import read_sql
+from etl.google import read_gbq
 
 
 @dataclass
