@@ -13,27 +13,30 @@ dimensions:
     choices:
       - slug: mathematics
         name: Mathematics
-        description: PISA mathematics scores measuring mathematical literacy and problem-solving skills.
+        description: Mthematics scores measuring mathematical literacy and problem-solving skills.
       - slug: science
         name: Science
-        description: PISA science scores measuring scientific literacy and understanding.
+        description: Science scores measuring scientific literacy and understanding.
       - slug: reading
         name: Reading
-        description: PISA reading scores measuring reading comprehension and literacy skills.
+        description: Reading scores measuring reading comprehension and literacy skills.
       - slug: subject_side_by_side
         name: All subjects
-        description: Compare PISA performance across mathematics, science, and reading.
+        description: Compare performance across subjects.
 
   - slug: sex
     name: Gender
     choices:
       - slug: both
         name: Both genders
-        description: PISA performance for all students regardless of gender.
+        description: Academic performance for all students regardless of gender.
       - slug: girls
         name: Girls
-        description: PISA performance among female students.
+        description: Academic performance among girls.
       - slug: boys
         name: Boys
-        description: PISA performance among male students.
+        description: Academic performance among boys.
+      - slug: sex_side_by_side
+        name: Girls and boys
+        description: Compare performance between boys and girls.
 views: []
