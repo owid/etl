@@ -50,6 +50,7 @@ tables:
             The share of homeowners in << quintile.lower() >> that spend more than 40% of their disposable income on their mortgage payments, including interest and principal repayments.
           <% endif %>
         description_from_producer: "Share of population spending more than 40% of disposable income on mortgage and rent, in percent"
+        description_processing: We removed data for Germany in 2020 due to the COVID-19 pandemic causing disruption to data collection.
         unit: "%"
         short_unit: "%"
   housing_costs_share:
