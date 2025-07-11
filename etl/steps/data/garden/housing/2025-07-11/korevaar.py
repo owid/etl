@@ -19,17 +19,10 @@ def run() -> None:
     tb = ds_meadow.read("korevaar")
     tb_quality = ds_meadow_quality.read("korevaar_quality")
 
-    # give percentages as percentage
-    for col in tb_quality.columns:
-        if col.endswith("_pct"):
-            tb_quality[col] = tb_quality[col].astype(float) * 100
-
     # drop belgian cities
     tb = tb.drop(columns=["antwerp_nom_rent", "bruges_nom_rent", "brussels_nom_rent", "ghent_nom_rent", "belgium_cpi"])
 
     # Process data.
-    #
-
     tb = tb.melt(id_vars="year")
 
     # Split the variable column into region and type

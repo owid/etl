@@ -72,6 +72,12 @@ def run() -> None:
     tb_par = tb_par.replace({"city": {"Paris (75)": "Paris"}})
     tb_lon["city"] = "London"
 
+    # give percentages as percentage
+    for tb in [tb_par, tb_lon, tb_bel]:
+        for col in tb.columns:
+            if col.endswith("_pct"):
+                tb[col] = tb[col].astype(float) * 100
+
     tb_all = pr.concat([tb_ams, tb_par, tb_lon, tb_bel], ignore_index=True)  # type : ignore
 
     #
