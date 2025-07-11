@@ -32,4 +32,77 @@ tables:
         description_short: Real rents, normalized to 1900=100. These values are adjusted for inflation and improvements in quality of the housing stock.
         unit: Index
         short_unit: ""
+  korevaar_quality:
+    variables:
+      rooms_per_occupant:
+        title: Rooms per occupant
+        description_short: Average number of rooms per occupant of a dwelling.
+        unit: Rooms per occupant
+        short_unit: "rooms"
+      surface_m2:
+        title: Surface area in square meters
+        description_short: Average surface area of the dwelling in square meters.
+        unit: square meters
+        short_unit: "m²"
+      surface_per_occupant:
+        title: Surface area per occupant
+        description_short: Average surface area per occupant in the household, in square meters.
+        unit: square meters
+        short_unit: "m²"
+      occupants:
+        title: Number of occupants
+        description_short: Average number of occupants in the household.
+        unit: Occupants
+        short_unit: ""
+      inside_toilet_pct:
+        title: Percentage of households with an inside toilet
+        description_short: Percentage of households that have an inside toilet.
+        unit: "%"
+        short_unit: "%"
+      bathroom_pct:
+        title: Percentage of households with a bathroom
+        description_short: Percentage of households that have a bathroom.
+        unit: "%"
+        short_unit: "%"
+      central_heating_pct:
+        title: Percentage of households with central heating
+        description_short: Percentage of households that have central heating.
+        unit: "%"
+        short_unit: "%"
+      water_pct:
+        title: Percentage of households with running water
+        description_short: Percentage of households that have running water.
+        unit: "%"
+        short_unit: "%"
+      electricity_pct:
+        title: Percentage of households with electricity
+        description_short: Percentage of households that have electricity.
+        unit: "%"
+        short_unit: "%"
+      rooms:
+        title: Number of rooms
+        description_short: Average number of rooms in the dwelling.
+        unit: Rooms
+        short_unit: "rooms"
+      rooms_per_capita:
+        title: Rooms per capita
+        description_short: Average number of rooms per capita in the region. This is calculated as the total number of rooms divided by the total number of people living in the city.
+        unit: Rooms
+        short_unit: "rooms"
+      kitchen_greater_than_4m2_pct:
+        title: Percentage of households with a kitchen larger than 4 square meters
+        description_short: Percentage of households that have a kitchen larger than 4 square meters.
+        unit: "%"
+        short_unit: "%"
+      isolation_pct:
+        title: Percentage of households with isolation
+        description_short: Percentage of households that have heat isolation.
+        unit: "%"
+        short_unit: "%"
+      gas_pct:
+        title: Percentage of households with gas
+        description_short: Percentage of households that are connected to the gas network.
+        unit: "%"
+        short_unit: "%"
+
 

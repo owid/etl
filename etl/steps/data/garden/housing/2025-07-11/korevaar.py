@@ -13,9 +13,16 @@ def run() -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("korevaar")
+    ds_meadow_quality = paths.load_dataset("korevaar_quality")
 
     # Read table from meadow dataset.
     tb = ds_meadow.read("korevaar")
+    tb_quality = ds_meadow_quality.read("korevaar_quality")
+
+    # give percentages as percentage
+    for col in tb_quality.columns:
+        if col.endswith("_pct"):
+            tb_quality[col] = tb_quality[col].astype(float) * 100
 
     # drop belgian cities
     tb = tb.drop(columns=["antwerp_nom_rent", "bruges_nom_rent", "brussels_nom_rent", "ghent_nom_rent", "belgium_cpi"])
@@ -35,17 +42,23 @@ def run() -> None:
 
     tb.columns = ["year", "country", "affordability", "real_rent", "real_wage"]
 
+    tb_quality = tb_quality.rename(columns={"city": "country"})
+
     # Harmonize country names.
-    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path, warn_on_unused_countries=False)
+    tb_quality = geo.harmonize_countries(
+        df=tb_quality, countries_file=paths.country_mapping_path, warn_on_unused_countries=False
+    )
 
     # Improve table format.
     tb = tb.format(["country", "year"])
+    tb_quality = tb_quality.format(["country", "year"])
 
     #
     # Save outputs.
     #
     # Initialize a new garden dataset.
-    ds_garden = paths.create_dataset(tables=[tb], default_metadata=ds_meadow.metadata)
+    ds_garden = paths.create_dataset(tables=[tb, tb_quality], default_metadata=ds_meadow.metadata)
 
     # Save garden dataset.
     ds_garden.save()
