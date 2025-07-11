@@ -751,6 +751,17 @@ steps:
   data://grapher/oecd/2025-07-03/affordable_housing:
     - data://garden/oecd/2025-07-03/affordable_housing
 
+  
+  #
+  # TODO: add step name (just something recognizable)
+  #
+  data://meadow/housing/2025-07-11/korevaar:
+    - snapshot://housing/2025-07-11/korevaar.xlsx
+  data://garden/housing/2025-07-11/korevaar:
+    - data://meadow/housing/2025-07-11/korevaar
+  data://grapher/housing/2025-07-11/korevaar:
+    - data://garden/housing/2025-07-11/korevaar
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
