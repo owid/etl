@@ -1,0 +1,52 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Causes of Death
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 1826
+  title: Media mentions of causes of death
+
+
+tables:
+  media_deaths:
+    variables:
+        deaths:
+          title: Deaths by cause of death
+          unit: "deaths"
+          short_unit: ""
+        deaths_share:
+          title: Share of deaths by cause of death
+          unit: "%"
+          short_unit: "%"
+        nyt_mentions:
+          title: Mentions in The New York Times (by cause of death)
+          unit: articles
+          short_unit: articles
+        nyt_share:
+          title: Share of mentions in The New York Times (by cause of death)
+          unit: "%"
+          short_unit: "%"
+        wapo_mentions:
+          title: Mentions in The Washington Post (by cause of death)
+          unit: articles
+          short_unit: articles
+        wapo_share:
+          title: Share of mentions in The Washington Post (by cause of death)
+          unit: "%"
+          short_unit: "%"
+        fox_mentions:
+          title: Mentions in Fox News (by cause of death)
+          unit: articles
+          short_unit: articles
+        fox_share:
+          title: Share of mentions in Fox News (by cause of death)
+          unit: "%"
+          short_unit: "%"
+
+
