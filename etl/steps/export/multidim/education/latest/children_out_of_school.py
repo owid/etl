@@ -10,7 +10,6 @@ MULTIDIM_CONFIG = {
     "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.008.json",
     "originUrl": "ourworldindata.org/education",
     "hideAnnotationFieldsInTitle": {"time": True},
-    "yAxis": {"min": 0},
     "hasMapTab": True,
     "tab": "map",
     "addCountryMode": "add-country",
@@ -20,6 +19,9 @@ MULTIDIM_CONFIG = {
 GROUPED_VIEW_CONFIG = MULTIDIM_CONFIG | {
     "hasMapTab": False,
     "tab": "chart",
+    "yAxis": {"min": 0, "facetDomain": "independent"},
+    "selectedFacetStrategy": "entity",
+    "addCountryMode": "change-country",
 }
 
 # Education level configurations
@@ -64,13 +66,13 @@ METRIC_TYPES = {
         "title": "Share of children out of school",
         "unit": "percent",
         "y_axis": {"min": 0, "max": 100},
-        "description": "as a percentage of children in the relevant age group",
+        "description": "shown as a percentage of children in the relevant age group",
     },
     "number": {
         "title": "Number of children out of school",
         "unit": "children",
         "y_axis": {"min": 0},
-        "description": "total number of children not enrolled in school",
+        "description": "shown as the total number of children not enrolled in school",
     },
 }
 
@@ -238,39 +240,20 @@ def create_grouped_views(collection):
         "description_short": "{subtitle}",
     }
 
-    def get_view_config(view):
-        """Get view config with conditional chart types based on metric type."""
-        base_config = GROUPED_VIEW_CONFIG | {
-            "title": "{title}",
-            "subtitle": "{subtitle}",
-        }
-
-        # Get metric type from view dimensions
-        metric_type = view.dimensions.get("metric_type", "rate")
-
-        if metric_type == "rate":
-            # For rate metrics (Share %), remove chartTypes to disable StackedArea
-            base_config.pop("chartTypes", None)
-        elif metric_type == "number":
-            # For number metrics, enable entity faceting
-            base_config["selectedFacetStrategy"] = "entity"
-
-        return base_config
-
     collection.group_views(
         groups=[
             {
                 "dimension": "sex",
                 "choice_new_slug": "sex_side_by_side",
                 "choices": ["female", "male"],
-                "view_config": get_view_config,
+                "view_config": GROUPED_VIEW_CONFIG,
                 "view_metadata": view_metadata,
             },
             {
                 "dimension": "level",
                 "choice_new_slug": "level_side_by_side",
                 "choices": ["primary", "lower_secondary", "upper_secondary"],
-                "view_config": get_view_config,
+                "view_config": GROUPED_VIEW_CONFIG,
                 "view_metadata": view_metadata,
             },
         ],
@@ -319,22 +302,24 @@ def generate_subtitle_by_dimensions(view):
     """Generate subtitle based on dimensions."""
     level = view.dimensions.get("level", "primary")
     metric_type = view.dimensions.get("metric_type", "rate")
+    sex = view.dimensions.get("sex")
 
     level_config = EDUCATION_LEVELS.get(level, {})
     metric_config = METRIC_TYPES.get(metric_type, {})
+    gender_config = GENDERS.get(sex, {})
 
     age_range = level_config.get("age_range", "school age")
     description = metric_config.get("description", "")
 
     # Handle different view types
     if view.matches(level="level_side_by_side") and view.matches(sex="sex_side_by_side"):
-        return f"Children not enrolled in school across different education levels and by gender. Data shows {description}."
+        return f"Children not enrolled in school across different education levels and by gender,{description}."
     elif view.matches(level="level_side_by_side"):
-        return f"Children not enrolled in school across different education levels. Data shows {description}."
+        return f"Children not enrolled in school across different education levels, {description}."
     elif view.matches(sex="sex_side_by_side"):
-        return f"Children of {age_range} not enrolled in school, by gender. Data shows {description}."
+        return f"Children of {age_range} not enrolled in school, {description}."
     else:
-        return f"Children of {age_range} not enrolled in school. Data shows {description}."
+        return f"Children of {age_range} not enrolled in school, {description}."
 
 
 def edit_indicator_displays(view):
