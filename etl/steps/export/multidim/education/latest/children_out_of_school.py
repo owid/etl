@@ -26,22 +26,28 @@ GROUPED_VIEW_CONFIG = MULTIDIM_CONFIG | {
 # Education level configurations
 EDUCATION_LEVELS = {
     "primary": {
-        "keywords": ["primary"],
+        "keywords": ["primary_school_age"],
         "display_name": "Primary education",
         "title_term": "primary school age",
         "age_range": "primary school age (typically 6-11 years)",
     },
     "lower_secondary": {
-        "keywords": ["lower_secondary", "lowersec"],
+        "keywords": ["lower_secondary_school_age"],
         "display_name": "Lower secondary education",
         "title_term": "lower secondary school age",
         "age_range": "lower secondary school age (typically 12-14 years)",
     },
     "upper_secondary": {
-        "keywords": ["upper_secondary", "uppersec"],
+        "keywords": ["upper_secondary_school_age"],
         "display_name": "Upper secondary education",
         "title_term": "upper secondary school age",
         "age_range": "upper secondary school age (typically 15-17 years)",
+    },
+    "pre_primary": {
+        "keywords": ["one_year_before_the_official_primary_entry_age"],
+        "display_name": "Pre-primary education",
+        "title_term": "pre-primary age",
+        "age_range": "one year before official primary entry age (typically age 5)",
     },
 }
 
@@ -75,19 +81,27 @@ for level_key, config in EDUCATION_LEVELS.items():
     for keyword in config["keywords"]:
         LEVEL_KEYWORDS[keyword] = level_key
 
-SEX_KEYWORDS = {"both_sexes": "both", "male": "male", "female": "female"}
+SEX_KEYWORDS = {"both_sexes": "both", "_male": "male", "_female": "female"}
 
-# Exclusion patterns for column filtering
+# Exclusion patterns for column filtering - exclude disability, combined age groups, and data source variations
 EXCLUSION_PATTERNS = [
     "urban",
     "rural",
-    "poorest_quintile",
-    "richest_quintile",
+    "quintile",
     "adjusted",
+    "modelled_data",
     "very_affluent",
     "very_poor",
     "immigrant",
     "native",
+    "disabled",
+    "not_disabled",
+    "primary_and_lower_secondary",  # Combined age groups
+    "primary_and_secondary",  # Combined age groups
+    "lower_and_upper_secondary",  # Combined age groups
+    "primary__lower_secondary_and_upper_secondary",  # Combined age groups
+    "household_survey_data",  # Keep only modelled data for consistency
+    "out_of_school_adolescents_and_youth_of_secondary",
 ]
 
 
@@ -97,25 +111,15 @@ def run() -> None:
     config = paths.load_collection_config()
 
     # Try both datasets and combine if both exist
-    datasets = []
-
-    ds_opri = paths.load_dataset("education_opri")
-    datasets.append(("opri", ds_opri))
-
-    ds_sdg = paths.load_dataset("education_sdg")
-    datasets.append(("sdg", ds_sdg))
     tbs_adjusted = []
-    for _, ds in datasets:
-        # Get first table from dataset
-        table_name = list(ds.table_names)[0]
-        tb = ds.read(table_name, load_data=False)
 
-        # Filter out of school columns
+    for dataset_name in ["education_opri", "education_sdgs"]:
+        ds = paths.load_dataset(dataset_name)
+        tb = ds.read(dataset_name, load_data=False)
+
         out_of_school_cols = get_out_of_school_columns(tb)
-
         # Select only relevant columns
         tb = tb.loc[:, ["country", "year"] + out_of_school_cols].copy()
-        print(tb.columns)
 
         tb = adjust_dimensions(tb)
         tbs_adjusted.append(tb)
@@ -123,7 +127,7 @@ def run() -> None:
     # Create collection
     c = paths.create_collection(
         config=config,
-        tb=tb,
+        tb=[tbs_adjusted[0], tbs_adjusted[1]],  # Use both datasets
         common_view_config=MULTIDIM_CONFIG,
     )
 
@@ -156,21 +160,29 @@ def get_out_of_school_columns(tb):
     # Create exclusion pattern
     exclusion_pattern = "|".join(EXCLUSION_PATTERNS)
 
-    return [
+    # Get all matching columns
+    all_cols = [
         col
         for col in tb.columns
         if re.search(out_of_school_pattern, col, re.IGNORECASE) and not re.search(exclusion_pattern, col, re.IGNORECASE)
     ]
 
+    return all_cols
+
 
 def adjust_dimensions(tb):
     """Add dimensions to out of school table columns."""
 
-    def _extract_dimension(column_name, keyword_map):
-        """Extract dimension value from column name using keyword mapping."""
-        for keyword, value in keyword_map.items():
-            if keyword in column_name:
-                return value
+    def _extract_education_level(column_name):
+        """Extract education level from column name."""
+        if "primary_school_age" in column_name and "secondary" not in column_name:
+            return "primary"
+        elif "lower_secondary_school_age" in column_name:
+            return "lower_secondary"
+        elif "upper_secondary_school_age" in column_name:
+            return "upper_secondary"
+        elif "one_year_before_the_official_primary_entry_age" in column_name:
+            return "pre_primary"
         return None
 
     def _extract_gender(column_name):
@@ -196,14 +208,14 @@ def adjust_dimensions(tb):
             continue
 
         # Extract dimensions
-        level = _extract_dimension(col, LEVEL_KEYWORDS)
+        level = _extract_education_level(col)
         sex = _extract_gender(col)
         metric_type = _extract_metric_type(col)
 
         # Set indicator name and dimensions
         tb[col].metadata.original_short_name = "children_out_of_school"
         tb[col].metadata.dimensions = {
-            "level": level or "primary",
+            "level": level,
             "sex": sex,
             "metric_type": metric_type,
         }
@@ -247,13 +259,6 @@ def create_grouped_views(collection):
                 "view_config": view_config,
                 "view_metadata": view_metadata,
             },
-            {
-                "dimension": "metric_type",
-                "choice_new_slug": "metric_type_side_by_side",
-                "choices": ["rate", "number"],
-                "view_config": view_config,
-                "view_metadata": view_metadata,
-            },
         ],
         params={
             "title": lambda view: generate_title_by_dimensions(view),
@@ -275,9 +280,7 @@ def generate_title_by_dimensions(view):
     base_title = metric_config.get("title", "Children out of school")
 
     # Handle different view combinations
-    if view.matches(metric_type="metric_type_side_by_side"):
-        return f"Children out of school of {level_config.get('title_term', level)}, by metric type"
-    elif view.matches(level="level_side_by_side"):
+    if view.matches(level="level_side_by_side"):
         if view.matches(sex="sex_side_by_side"):
             return f"{base_title}, by education level and gender"
         else:
@@ -306,8 +309,6 @@ def generate_subtitle_by_dimensions(view):
         return f"Children not enrolled in school across different education levels. Data shows {description}."
     elif view.matches(sex="sex_side_by_side"):
         return f"Children of {age_range} not enrolled in school, by gender. Data shows {description}."
-    elif view.matches(metric_type="metric_type_side_by_side"):
-        return f"Children of {age_range} not enrolled in school, shown both as a percentage and absolute numbers."
     else:
         return f"Children of {age_range} not enrolled in school. Data shows {description}."
 
@@ -319,6 +320,7 @@ def edit_indicator_displays(view):
 
     display_names = {
         "level": {
+            "pre_primary": "Pre-primary education",
             "primary": "Primary education",
             "lower_secondary": "Lower secondary education",
             "upper_secondary": "Upper secondary education",
@@ -327,10 +329,6 @@ def edit_indicator_displays(view):
             "male": "Boys",
             "female": "Girls",
             "both": "Both genders",
-        },
-        "metric_type": {
-            "rate": "Share (%)",
-            "number": "Number",
         },
     }
 
@@ -343,10 +341,5 @@ def edit_indicator_displays(view):
         elif view.matches(sex="sex_side_by_side"):
             for sex_key, display_name in display_names["sex"].items():
                 if sex_key in indicator.catalogPath:
-                    indicator.display = {"name": display_name}
-                    break
-        elif view.matches(metric_type="metric_type_side_by_side"):
-            for metric_key, display_name in display_names["metric_type"].items():
-                if metric_key in indicator.catalogPath:
                     indicator.display = {"name": display_name}
                     break
