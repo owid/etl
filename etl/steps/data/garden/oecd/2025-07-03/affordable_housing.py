@@ -138,6 +138,8 @@ def run() -> None:
     )
     tb_b["quintile"] = tb_b["quintile"].str.capitalize()
 
+    tb_b["year"] = tb_b["year"].astype(str)
+
     # remove data from the share of cost table for Germany in 2020 (limited data collection)
     tb_b = tb_b[~((tb_b["country"] == "Germany") & (tb_b["year"] == "2020"))]
 
