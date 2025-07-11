@@ -240,20 +240,29 @@ def create_grouped_views(collection):
         "description_short": "{subtitle}",
     }
 
+    def get_view_config(view):
+        """Get view config with conditional chart types based on metric type."""
+        base_config = GROUPED_VIEW_CONFIG | {
+            "title": "{title}",
+            "subtitle": "{subtitle}",
+        }
+
+        return base_config
+
     collection.group_views(
         groups=[
             {
                 "dimension": "sex",
                 "choice_new_slug": "sex_side_by_side",
                 "choices": ["female", "male"],
-                "view_config": GROUPED_VIEW_CONFIG,
+                "view_config": get_view_config,
                 "view_metadata": view_metadata,
             },
             {
                 "dimension": "level",
                 "choice_new_slug": "level_side_by_side",
                 "choices": ["primary", "lower_secondary", "upper_secondary"],
-                "view_config": GROUPED_VIEW_CONFIG,
+                "view_config": get_view_config,
                 "view_metadata": view_metadata,
             },
         ],
@@ -302,24 +311,34 @@ def generate_subtitle_by_dimensions(view):
     """Generate subtitle based on dimensions."""
     level = view.dimensions.get("level", "primary")
     metric_type = view.dimensions.get("metric_type", "rate")
-    sex = view.dimensions.get("sex")
+    sex = view.dimensions.get("sex", "both")
 
     level_config = EDUCATION_LEVELS.get(level, {})
-    metric_config = METRIC_TYPES.get(metric_type, {})
-    gender_config = GENDERS.get(sex, {})
+    gender_term = GENDERS.get(sex, "children")
 
     age_range = level_config.get("age_range", "school age")
-    description = metric_config.get("description", "")
+
+    # Generate gender-specific description based on metric type
+    if metric_type == "rate":
+        if sex == "both" or view.matches(sex="sex_side_by_side"):
+            description = "shown as a percentage of children in the relevant age group"
+        else:
+            description = f"shown as a percentage of {gender_term} in the relevant age group"
+    else:  # number
+        if sex == "both" or view.matches(sex="sex_side_by_side"):
+            description = "shown as the total number of children not enrolled in school"
+        else:
+            description = f"shown as the total number of {gender_term} not enrolled in school"
 
     # Handle different view types
     if view.matches(level="level_side_by_side") and view.matches(sex="sex_side_by_side"):
-        return f"Children not enrolled in school across different education levels and by gender,{description}."
+        return f"Children not enrolled in school across different education levels and by gender, {description}."
     elif view.matches(level="level_side_by_side"):
-        return f"Children not enrolled in school across different education levels, {description}."
+        return f"{gender_term.title()} not enrolled in school across different education levels, {description}."
     elif view.matches(sex="sex_side_by_side"):
         return f"Children of {age_range} not enrolled in school, {description}."
     else:
-        return f"Children of {age_range} not enrolled in school, {description}."
+        return f"{gender_term.title()} of {age_range} not enrolled in school, {description}."
 
 
 def edit_indicator_displays(view):
