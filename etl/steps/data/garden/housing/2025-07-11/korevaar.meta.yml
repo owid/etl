@@ -18,16 +18,16 @@ tables:
   korevaar:
     variables:
       affordability:
-        title: Housing affordability in the long run
-        description_short: Housing affordability, given as the ratio of real rents to real wages and normalized to 1900=100.
+        title: Housing affordability
+        description_short: Housing affordability in the long run, given as the ratio of real rents to real wages and normalized to 1900=100.
         unit: Index
         short_unit: ""
-      real_wages:
+      real_wage:
         title: Real wages
         description_short: Real wages, normalized to 1900=100. These values are adjusted for inflation.
         unit: Index
         short_unit: ""
-      real_rents:
+      real_rent:
         title: Real rents
         description_short: Real rents, normalized to 1900=100. These values are adjusted for inflation and improvements in quality of the housing stock.
         unit: Index
