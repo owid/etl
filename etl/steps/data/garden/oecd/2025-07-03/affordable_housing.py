@@ -132,6 +132,15 @@ def run() -> None:
     tb_b["hc_burden"] = tb_b["hc_burden"] * 100
     tb_b["hc_overburden"] = tb_b["hc_overburden"] * 100
 
+    # format columns
+    tb_b = tb_b.replace(
+        {"Rent (private and subsidised)": "Rent (private and subsidized)", "Rent (subsidised)": "Rent (subsidized)"}
+    )
+    tb_b["quintile"] = tb_b["quintile"].str.capitalize()
+
+    # remove data from the share of cost table for Germany in 2020 (limited data collection)
+    tb_soc = tb_soc[~((tb_soc["country"] == "Germany") & (tb_soc["year"] == "2020"))]
+
     tb_soc = tb_soc.format(["year", "country"], short_name="housing_costs_share")
     tb_b = tb_b.format(["year", "country", "quintile", "tenure_type"], short_name="housing_costs_burden")
 
