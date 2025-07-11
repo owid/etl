@@ -13,16 +13,13 @@ MULTIDIM_CONFIG = {
     "yAxis": {"min": 0},
     "hasMapTab": True,
     "tab": "map",
-    "chartTypes": ["StackedArea"],
-    "addCountryMode": "change-country",
+    "addCountryMode": "add-country",
 }
 
 # Common grouped view configuration
 GROUPED_VIEW_CONFIG = MULTIDIM_CONFIG | {
     "hasMapTab": False,
     "tab": "chart",
-    "chartTypes": ["StackedArea"],
-    "selectedFacetStrategy": "entity",
 }
 
 # Education level configurations
@@ -248,14 +245,15 @@ def create_grouped_views(collection):
             "subtitle": "{subtitle}",
         }
 
-        # Check if this is a rate (Share %) metric
-        metric_type = view.dimensions.get("metric_type", "number")
+        # Get metric type from view dimensions
+        metric_type = view.dimensions.get("metric_type", "rate")
+
         if metric_type == "rate":
-            # Remove StackedArea for rate metrics
-            config = base_config.copy()
-            if "chartTypes" in config:
-                config.pop("chartTypes")
-            return config
+            # For rate metrics (Share %), remove chartTypes to disable StackedArea
+            base_config.pop("chartTypes", None)
+        elif metric_type == "number":
+            # For number metrics, enable entity faceting
+            base_config["selectedFacetStrategy"] = "entity"
 
         return base_config
 
@@ -291,20 +289,30 @@ def generate_title_by_dimensions(view):
 
     gender_term = GENDERS.get(sex, "children")
     level_config = EDUCATION_LEVELS.get(level, {})
-    metric_config = METRIC_TYPES.get(metric_type, {})
-
-    base_title = metric_config.get("title", "Children out of school")
+    age_term = level_config.get("title_term", level)
 
     # Handle different view combinations
     if view.matches(level="level_side_by_side"):
         if view.matches(sex="sex_side_by_side"):
-            return f"{base_title}, by education level and gender"
+            if metric_type == "rate":
+                return "Share of children out of school, by education level and gender"
+            else:
+                return "Number of children out of school, by education level and gender"
         else:
-            return f"{base_title} ({gender_term}), by education level"
+            if metric_type == "rate":
+                return f"Share of {gender_term} out of school, by education level"
+            else:
+                return f"Number of {gender_term} out of school, by education level"
     elif view.matches(sex="sex_side_by_side"):
-        return f"{base_title} of {level_config.get('title_term', level)}, by gender"
+        if metric_type == "rate":
+            return f"Share of children of {age_term} who are not in school, by gender"
+        else:
+            return f"Number of children of {age_term} who are not in school, by gender"
     else:
-        return f"{base_title} {gender_term} of {level_config.get('title_term', level)}"
+        if metric_type == "rate":
+            return f"Share of {gender_term} of {age_term} who are not in school"
+        else:
+            return f"Number of {gender_term} of {age_term} who are not in school"
 
 
 def generate_subtitle_by_dimensions(view):
