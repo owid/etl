@@ -13,6 +13,7 @@ MULTIDIM_CONFIG = {
     "yAxis": {"min": 0},
     "hasMapTab": True,
     "tab": "map",
+    "chartTypes": ["StackedArea"],
     "addCountryMode": "change-country",
 }
 
@@ -20,6 +21,7 @@ MULTIDIM_CONFIG = {
 GROUPED_VIEW_CONFIG = MULTIDIM_CONFIG | {
     "hasMapTab": False,
     "tab": "chart",
+    "chartTypes": ["StackedArea"],
     "selectedFacetStrategy": "entity",
 }
 
@@ -238,10 +240,24 @@ def create_grouped_views(collection):
         "presentation": {"title_public": "{title}"},
         "description_short": "{subtitle}",
     }
-    view_config = GROUPED_VIEW_CONFIG | {
-        "title": "{title}",
-        "subtitle": "{subtitle}",
-    }
+
+    def get_view_config(view):
+        """Get view config with conditional chart types based on metric type."""
+        base_config = GROUPED_VIEW_CONFIG | {
+            "title": "{title}",
+            "subtitle": "{subtitle}",
+        }
+
+        # Check if this is a rate (Share %) metric
+        metric_type = view.dimensions.get("metric_type", "number")
+        if metric_type == "rate":
+            # Remove StackedArea for rate metrics
+            config = base_config.copy()
+            if "chartTypes" in config:
+                config.pop("chartTypes")
+            return config
+
+        return base_config
 
     collection.group_views(
         groups=[
@@ -249,14 +265,14 @@ def create_grouped_views(collection):
                 "dimension": "sex",
                 "choice_new_slug": "sex_side_by_side",
                 "choices": ["female", "male"],
-                "view_config": view_config,
+                "view_config": get_view_config,
                 "view_metadata": view_metadata,
             },
             {
                 "dimension": "level",
                 "choice_new_slug": "level_side_by_side",
                 "choices": ["primary", "lower_secondary", "upper_secondary"],
-                "view_config": view_config,
+                "view_config": get_view_config,
                 "view_metadata": view_metadata,
             },
         ],
@@ -288,7 +304,7 @@ def generate_title_by_dimensions(view):
     elif view.matches(sex="sex_side_by_side"):
         return f"{base_title} of {level_config.get('title_term', level)}, by gender"
     else:
-        return f"{base_title} ({gender_term} of {level_config.get('title_term', level)})"
+        return f"{base_title} {gender_term} of {level_config.get('title_term', level)}"
 
 
 def generate_subtitle_by_dimensions(view):
@@ -320,14 +336,14 @@ def edit_indicator_displays(view):
 
     display_names = {
         "level": {
-            "pre_primary": "Pre-primary education",
-            "primary": "Primary education",
-            "lower_secondary": "Lower secondary education",
-            "upper_secondary": "Upper secondary education",
+            "pre_primary": "Pre-primary",
+            "primary": "Primary",
+            "lower_secondary": "Lower secondary",
+            "upper_secondary": "Upper secondary",
         },
         "sex": {
-            "male": "Boys",
-            "female": "Girls",
+            "_male": "Boys",
+            "_female": "Girls",
             "both": "Both genders",
         },
     }
