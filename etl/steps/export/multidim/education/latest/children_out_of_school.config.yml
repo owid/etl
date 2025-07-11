@@ -1,10 +1,7 @@
-title: Children out of school
-title_variants:
-  - Children out of school
-  - Out-of-school children
-  - School enrollment gaps
-
-default_country_selection:
+title:
+  title: Children out of school
+  title_variant: by level of education and gender
+default_selection:
   - Nigeria
   - India
   - Pakistan
@@ -20,6 +17,9 @@ dimensions:
   - name: Education level
     slug: level
     choices:
+      - slug: pre_primary
+        name: Pre-primary education
+        description: Children one year before official primary entry age (typically age 5) who are not enrolled in school
       - slug: primary
         name: Primary education
         description: Children of primary school age (typically 6-11 years) who are not enrolled in school
@@ -30,7 +30,7 @@ dimensions:
         name: Upper secondary education
         description: Children of upper secondary school age (typically 15-17 years) who are not enrolled in school
       - slug: level_side_by_side
-        name: By education level
+        name: All education levels
         description: Compare out-of-school rates across different education levels
 
   - name: Gender
@@ -46,7 +46,7 @@ dimensions:
         name: Girls
         description: Female children only
       - slug: sex_side_by_side
-        name: By gender
+        name: Girls and Boys
         description: Compare out-of-school rates between boys and girls
 
   - name: Metric type
@@ -58,8 +58,5 @@ dimensions:
       - slug: number
         name: Number
         description: Total number of children out of school
-      - slug: metric_type_side_by_side
-        name: By metric type
-        description: Compare both percentage and absolute numbers
 
 views: []
