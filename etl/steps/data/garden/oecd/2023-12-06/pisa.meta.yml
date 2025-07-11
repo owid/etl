@@ -145,6 +145,7 @@ tables:
         display:
           tolerance: 3
           name: Science
+          numDecimalPlaces: 0
         presentation:
           grapher_config: *grapher_config_pisa_girls
           title_public: PISA science scores for girls
