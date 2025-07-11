@@ -105,9 +105,9 @@ def run() -> None:
 def get_pisa_performance_columns(tb):
     """Filter PISA performance columns by subject and gender category."""
     return [
-        col for col in tb.columns
-        if "pisa_" in col and "average" in col
-        and any(subject in col for subject in ["math", "science", "reading"])
+        col
+        for col in tb.columns
+        if "pisa_" in col and "average" in col and any(subject in col for subject in ["math", "science", "reading"])
     ]
 
 
@@ -201,14 +201,14 @@ def generate_title_by_subject_and_gender(view):
     sex, subject = view.dimensions["sex"], view.dimensions["subject"]
 
     gender_term = GENDERS.get(sex, "students")
-    
+
     if subject == "subject_side_by_side":
         return f"Average performance of 15-year-old {gender_term} by subject"
-    
+
     subject_config = SUBJECTS.get(subject)
     if not subject_config:
         raise ValueError(f"Unknown subject: {subject}")
-    
+
     return f"Average performance of 15-year-old {gender_term} in {subject_config['title_term']}"
 
 
@@ -217,15 +217,17 @@ def generate_subtitle_by_subject_and_gender(view):
     sex, subject = view.dimensions["sex"], view.dimensions["subject"]
 
     gender_term = GENDERS.get(sex, "students")
-    
+
     if subject == "subject_side_by_side":
         return f"Average scores in {SUBJECT_SIDE_BY_SIDE_SUBTITLE} for {gender_term} aged 15. Assessed through PISA scales, which evaluate children's ability to use mathematical reasoning, understand and engage with texts, and interact with scientific concepts for practical problem-solving, personal development, and informed citizenship."
-    
+
     subject_config = SUBJECTS.get(subject)
     if not subject_config:
         raise ValueError(f"Unknown subject: {subject}")
-    
-    return f"Average scores in {subject_config['title_term']} for {gender_term} aged 15. {subject_config['description']}"
+
+    return (
+        f"Average scores in {subject_config['title_term']} for {gender_term} aged 15. {subject_config['description']}"
+    )
 
 
 def edit_indicator_displays(view):
