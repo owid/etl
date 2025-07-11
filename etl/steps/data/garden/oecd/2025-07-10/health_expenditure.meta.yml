@@ -273,8 +273,8 @@ tables:
         title: Health expenditure per capita - <<financing_scheme>>
         description_short: Health expenditure in <<financing_scheme.lower()>> divided by population.
         description_key:
-          - The data is measured in international-$ at 2015 prices – this adjusts for inflation and for differences in the cost of living between countries.
-        unit: international-$ in 2015 prices
+          - The data is measured in international-$ at 2020 prices – this adjusts for inflation and for differences in the cost of living between countries.
+        unit: international-$ in 2020 prices
         short_unit: $
         display:
           name: Health expenditure per capita - <<financing_scheme>>
@@ -287,8 +287,8 @@ tables:
         title: Health expenditure - <<financing_scheme>>
         description_short: Health expenditure in <<financing_scheme.lower()>>.
         description_key:
-          - The data is measured in international-$ at 2015 prices – this adjusts for inflation and for differences in the cost of living between countries.
-        unit: international-$ in 2015 prices
+          - The data is measured in international-$ at 2020 prices – this adjusts for inflation and for differences in the cost of living between countries.
+        unit: international-$ in 2020 prices
         short_unit: $
         display:
           name: Health expenditure - <<financing_scheme>>

@@ -26,7 +26,7 @@ def run() -> None:
     ds_meadow = paths.load_dataset("health_expenditure")
 
     # Read table from meadow dataset.
-    tb = ds_meadow["health_expenditure"].reset_index()
+    tb = ds_meadow.read("health_expenditure")
 
     #
     # Process data.
