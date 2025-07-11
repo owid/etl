@@ -6,6 +6,7 @@ default_selection:
   - Niger
   - United Kingdom
   - Peru
+  - World
 
 dimensions:
   - name: Education level
