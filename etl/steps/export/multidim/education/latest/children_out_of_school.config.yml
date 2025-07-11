@@ -2,16 +2,10 @@ title:
   title: Children out of school
   title_variant: by level of education and gender
 default_selection:
-  - Nigeria
-  - India
-  - Pakistan
-  - Ethiopia
-  - Democratic Republic of Congo
-  - Kenya
-  - Uganda
+  - Egypt
   - Niger
-  - Burkina Faso
-  - Mali
+  - United Kingdom
+  - Peru
 
 dimensions:
   - name: Education level
