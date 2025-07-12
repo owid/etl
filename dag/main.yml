@@ -743,6 +743,14 @@ steps:
   data://grapher/ivs/2025-06-27/integrated_values_surveys:
     - data://garden/ivs/2025-06-27/integrated_values_surveys
 
+
+  # OECD Affordable Housing Database
+  data://garden/oecd/2025-07-03/affordable_housing:
+    - snapshot://oecd/2025-07-03/affordable_housing_income.xlsx
+    - snapshot://oecd/2025-07-03/affordable_housing.xlsx
+  data://grapher/oecd/2025-07-03/affordable_housing:
+    - data://garden/oecd/2025-07-03/affordable_housing
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
