@@ -184,6 +184,45 @@ definitions:
         binningStrategy: manual
         customNumericValues: *per_student_spending_bins
         baseColorScheme: YlOrRd
+
+  # Out-of-school children configurations
+  out_of_school_children_bins: &out_of_school_children_bins [10000, 50000, 100000, 500000, 1000000, 5000000, 10000000, 50000000]
+  
+  grapher_config_out_of_school_children_reds: &grapher_config_out_of_school_children_reds
+    <<: *common_grapher_config
+    map:
+      <<: *common_grapher_map_config
+      colorScale:
+        binningStrategy: manual
+        customNumericValues: *out_of_school_children_bins
+        baseColorScheme: Reds
+
+  grapher_config_out_of_school_children_oranges: &grapher_config_out_of_school_children_oranges
+    <<: *common_grapher_config
+    map:
+      <<: *common_grapher_map_config
+      colorScale:
+        binningStrategy: manual
+        customNumericValues: *out_of_school_children_bins
+        baseColorScheme: Oranges
+
+  grapher_config_out_of_school_children_purples: &grapher_config_out_of_school_children_purples
+    <<: *common_grapher_config
+    map:
+      <<: *common_grapher_map_config
+      colorScale:
+        binningStrategy: manual
+        customNumericValues: *out_of_school_children_bins
+        baseColorScheme: Purples
+
+  grapher_config_out_of_school_children_blues: &grapher_config_out_of_school_children_blues
+    <<: *common_grapher_config
+    map:
+      <<: *common_grapher_map_config
+      colorScale:
+        binningStrategy: manual
+        customNumericValues: *out_of_school_children_bins
+        baseColorScheme: Blues
   # ============================================================================
   # INDICATOR-SPECIFIC GRAPHER CONFIGURATIONS
   # ============================================================================
@@ -341,6 +380,15 @@ definitions:
     - Inconsistencies in definitions of enrolment, age reporting, or school level classifications may affect the estimates.
     - Children who are in school but enrolled below their age-appropriate level are included in this indicator.
 
+  desc_key_preprim_out_school: &desc_key_preprim_out_school
+    - This indicator shows the share of children who are one year before the official primary entry age but are not enrolled in pre-primary education.
+    - It focuses on those within the official pre-primary age range — typically 5 years old — who are not attending pre-primary education.
+    - These children may not have access to pre-primary programs, may be in informal early childhood care, or may not be enrolled in any educational program.
+    - The value is calculated by subtracting the number of pre-primary-age children enrolled in pre-primary education from the total number in that age group.
+    - Data comes from administrative enrolment records and household surveys that track participation in early childhood education programs.
+    - Pre-primary education provides important school readiness skills and can improve long-term educational outcomes.
+    - Children who are not enrolled in pre-primary education may face challenges when transitioning to primary school.
+
   # Education system descriptions
   desc_key_private_enrolment: &desc_key_private_enrolment
     - In many countries, education is provided not only by the government but also by private institutions — this indicator shows how much of total enrolment is taking place in privately run schools or educational programmes.
@@ -389,6 +437,7 @@ tables:
         description_key: *desc_key_prim_out_school
         presentation:
           title_public: Out-of-school children of primary school age
+          grapher_config: *grapher_config_out_of_school_children_reds
         display:
           name: Primary
           numDecimalPlaces: 0
@@ -400,6 +449,7 @@ tables:
         description_key: *desc_key_prim_out_school
         presentation:
           title_public: Out-of-school girls of primary school age
+          grapher_config: *grapher_config_out_of_school_children_purples
         display:
           name: Girls
           numDecimalPlaces: 0
@@ -411,6 +461,7 @@ tables:
         description_key: *desc_key_prim_out_school
         presentation:
           title_public: Out-of-school boys of primary school age
+          grapher_config: *grapher_config_out_of_school_children_blues
         display:
           name: Boys
           numDecimalPlaces: 0
@@ -422,8 +473,69 @@ tables:
         description_key: *deck_key_low_out_school
         presentation:
           title_public: Out-of-school children of lower secondary school age
+          grapher_config: *grapher_config_out_of_school_children_reds
         display:
           name: Lower secondary
+          numDecimalPlaces: 0
+
+      out_of_school_adolescents_of_lower_secondary_school_age__female__number:
+        title: Out-of-school girls of lower secondary school age
+        unit: "girls"
+        description_short: Girls in the official lower secondary school age range who are not enrolled in [lower secondary](#dod:lower-secondary-education) education.
+        description_key: *deck_key_low_out_school
+        presentation:
+          title_public: Out-of-school girls of lower secondary school age
+          grapher_config: *grapher_config_out_of_school_children_purples
+        display:
+          name: Girls
+          numDecimalPlaces: 0
+
+      out_of_school_adolescents_of_lower_secondary_school_age__male__number:
+        title: Out-of-school boys of lower secondary school age
+        unit: "boys"
+        description_short: Boys in the official lower secondary school age range who are not enrolled in [lower secondary](#dod:lower-secondary-education) education.
+        description_key: *deck_key_low_out_school
+        presentation:
+          title_public: Out-of-school boys of lower secondary school age
+          grapher_config: *grapher_config_out_of_school_children_blues
+        display:
+          name: Boys
+          numDecimalPlaces: 0
+
+      out_of_school_children__one_year_before_the_official_primary_entry_age__both_sexes__number:
+        title: Out-of-school children one year before official primary entry age
+        unit: "children"
+        description_short: Children who are one year before the official primary entry age who are not enrolled in pre-primary education.
+        description_key: *desc_key_preprim_out_school
+        presentation:
+          title_public: Out-of-school children one year before official primary entry age
+          grapher_config: *grapher_config_out_of_school_children_oranges
+        display:
+          name: Pre-primary
+          numDecimalPlaces: 0
+
+      out_of_school_children__one_year_before_the_official_primary_entry_age__female__number:
+        title: Out-of-school girls one year before official primary entry age
+        unit: "girls"
+        description_short: Girls who are one year before the official primary entry age who are not enrolled in pre-primary education.
+        description_key: *desc_key_preprim_out_school
+        presentation:
+          title_public: Out-of-school girls one year before official primary entry age
+          grapher_config: *grapher_config_out_of_school_children_purples
+        display:
+          name: Girls
+          numDecimalPlaces: 0
+
+      out_of_school_children__one_year_before_the_official_primary_entry_age__male__number:
+        title: Out-of-school boys one year before official primary entry age
+        unit: "boys"
+        description_short: Boys who are one year before the official primary entry age who are not enrolled in pre-primary education.
+        description_key: *desc_key_preprim_out_school
+        presentation:
+          title_public: Out-of-school boys one year before official primary entry age
+          grapher_config: *grapher_config_out_of_school_children_blues
+        display:
+          name: Boys
           numDecimalPlaces: 0
 
       out_of_school_youth_of_upper_secondary_school_age__both_sexes__number:
@@ -433,8 +545,33 @@ tables:
         description_key: *desc_key_up_out_school
         presentation:
           title_public: Out-of-school children of upper secondary school age
+          grapher_config: *grapher_config_out_of_school_children_reds
         display:
           name: Upper secondary
+          numDecimalPlaces: 0
+
+      out_of_school_youth_of_upper_secondary_school_age__female__number:
+        title: Out-of-school girls of upper secondary school age
+        unit: "girls"
+        description_short: Girls in the official upper secondary school age range who are not enrolled in [upper secondary](#dod:upper-secondary-education) education.
+        description_key: *desc_key_up_out_school
+        presentation:
+          title_public: Out-of-school girls of upper secondary school age
+          grapher_config: *grapher_config_out_of_school_children_purples
+        display:
+          name: Girls
+          numDecimalPlaces: 0
+
+      out_of_school_youth_of_upper_secondary_school_age__male__number:
+        title: Out-of-school boys of upper secondary school age
+        unit: "boys"
+        description_short: Boys in the official upper secondary school age range who are not enrolled in [upper secondary](#dod:upper-secondary-education) education.
+        description_key: *desc_key_up_out_school
+        presentation:
+          title_public: Out-of-school boys of upper secondary school age
+          grapher_config: *grapher_config_out_of_school_children_blues
+        display:
+          name: Boys
           numDecimalPlaces: 0
 
       # ========================================================================

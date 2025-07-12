@@ -189,3 +189,10 @@ steps:
   #
   export://multidim/education/latest/literacy:
     - data://grapher/unesco/2025-05-01/education_sdgs
+
+  #
+  # Mdim for children out of school
+  #
+  export://multidim/education/latest/children_out_of_school:
+    - data://grapher/unesco/2025-05-01/education_sdgs
+    - data://grapher/unesco/2025-05-01/education_opri
