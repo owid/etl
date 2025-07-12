@@ -1,0 +1,29 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "500 Years of Urban Rents, Housing Quality and Affordability in Europe"
+    description: |-
+      How do housing rents, quality and affordability evolve when cities grow over time? This paper studies urban housing markets for half a millennium (1500–2017) for Amsterdam, Antwerp, Bruges, Brussels, Ghent, London, and Paris. Based on a dataset of 436,000 rent observations, we build new indices of housing rents, quality and inequality, and relate these to changes in wages and population. Long-term growth in real rent prices has been limited. Before 1900, markets were unregulated and rent prices and wages rose in tandem when cities grew, while housing quality and inequality increased. After 1900, housing affordability started improving substantially, and we show that short-term improvements in this period were partially attributable to rent controls. Most of the surge in housing expenditure that did occur over time is due to increasing housing quality rather than rising rent
+    date_published: "2019-07-11"
+    title_snapshot: Quality Indicators
+    description_snapshot: |-
+      These are the quality indicators used in the paper.
+
+    # Citation
+    producer: Eichholtz, Korevaar & Lindenthal
+    citation_full: |-
+      Eichholtz, Korevaar & Lindenthal (2018). 500 Years of Urban Rents, Housing Quality and Affordability in Europe
+
+    # Files
+    url_main: https://www.researchgate.net/publication/328278380_500_Years_of_Housing_Rents_Quality_and_Affordability
+    date_accessed: '2025-07-11'
+
+    # License
+    license:
+      name: CC BY 4.0
+outs:
+  - md5: acb1439f2c071d8ab93bdba20a34ea77
+    size: 44663
+    path: korevaar_quality.xlsx
