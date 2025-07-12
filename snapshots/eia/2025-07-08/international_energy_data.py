@@ -1,4 +1,8 @@
-"""Script to create a snapshot of dataset 'International Energy Data'."""
+"""Script to create a snapshot of dataset 'International Energy Data'.
+
+The date_published is written at the beginning of the text file that is generated when uncompressing the .zip file, by a field called "last_updated". It may be fair to assume that the dataset is regularly updated, so we could just use date_accessed for it.
+
+"""
 
 from pathlib import Path
 

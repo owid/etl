@@ -6,28 +6,28 @@ definitions:
       - Energy
   # Short description for fossil fuels.
   description_short_twh: &description_short_twh |-
-    Measured in terawatt-hours.
+    Measured in [terawatt-hours](#dod:watt-hours).
   # Short description for non-fossil sources in terms of direct primary energy.
   description_short_twh_direct: &description_short_twh_direct |-
-    Measured in terawatt-hours of direct primary energy.
+    Measured in [terawatt-hours](#dod:watt-hours) of direct [primary energy](#dod:primaryenergy).
   # Short description for non-fossil sources in terms of primary energy using the substitution method.
   description_short_twh_equivalent: &description_short_twh_equivalent |-
-    Measured in terawatt-hours, using the substitution method.
+    Measured in [terawatt-hours](#dod:watt-hours), using the [substitution method](#dod:substitutionmethod).
   # Short description for any sources in terms of direct primary energy.
   description_short_pct_direct: &description_short_pct_direct |-
-    Measured as a percentage of the total (direct) primary energy.
+    Measured as a percentage of the total (direct) [primary energy](#dod:primaryenergy).
   # Short description for any sources in terms of primary energy using the substitution method.
   description_short_pct_equivalent: &description_short_pct_equivalent |-
-    Measured as a percentage of the total primary energy, using the substitution method.
+    Measured as a percentage of the total [primary energy](#dod:primaryenergy), using the [substitution method](#dod:substitutionmethod).
   # Short description for all per capita variables.
   description_short_per_capita: &description_short_per_capita |-
-    Measured in kilowatt-hours per person.
+    Measured in [kilowatt-hours](#dod:watt-hours) per person.
   # Key description item for any sources used for electricity generation.
   description_key_gross_generation: &description_key_gross_generation |-
     Figures are based on gross generation and do not account for cross-border electricity supply.
   # Key description item for non-fossil sources in terms of direct primary energy.
   description_key_primary_energy_direct: &description_key_primary_energy_direct |-
-    Direct primary energy of non-fossil electricity sources corresponds to electricity generation.
+    Direct [primary energy](#dod:primaryenergy) of non-fossil electricity sources corresponds to electricity generation.
   # Key description item for any sources in terms of primary energy using the substitution method.
   description_key_primary_energy_equivalent: &description_key_primary_energy_equivalent |-
     Primary energy is measured using the "substitution method" (also called "input-equivalent" primary energy). This method is used for non-fossil sources of electricity (namely renewables and nuclear), and measures the amount of fossil fuels that would be required by thermal power stations to generate the same amount of non-fossil electricity.
