@@ -189,3 +189,10 @@ steps:
   #
   export://multidim/education/latest/literacy:
     - data://grapher/unesco/2025-05-01/education_sdgs
+
+  #
+  # Mdim for proficiency levels in different subjects
+  #
+  export://multidim/education/latest/proficiency:
+    - data://grapher/unesco/2025-05-01/education_sdgs
+
