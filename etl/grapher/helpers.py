@@ -825,7 +825,7 @@ def grapher_checks(ds: catalog.Dataset, warn_title_public: bool = True) -> None:
             assert tab[col].metadata.title is not None, f"Column `{col}` must have a title."
             assert (
                 tab[col].m.origins or tab[col].m.sources or ds.metadata.sources
-            ), f"Column `{col}` must have either sources or origins"
+            ), f"Column `{tab.m.short_name}#{col}` must have either sources or origins"
 
             _validate_description_key(tab[col].m.description_key, col)
             _validate_ordinal_variables(tab, col)
