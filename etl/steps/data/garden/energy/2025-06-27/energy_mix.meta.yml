@@ -1,0 +1,1266 @@
+definitions:
+  common:
+    processing_level: major
+    presentation:
+      topic_tags:
+      - Energy
+  # Short description for fossil fuels.
+  description_short_twh: &description_short_twh |-
+    Measured in terawatt-hours.
+  # Short description for non-fossil sources in terms of direct primary energy.
+  description_short_twh_direct: &description_short_twh_direct |-
+    Measured in terawatt-hours of direct primary energy.
+  # Short description for non-fossil sources in terms of primary energy using the substitution method.
+  description_short_twh_equivalent: &description_short_twh_equivalent |-
+    Measured in terawatt-hours, using the substitution method.
+  # Short description for any sources in terms of direct primary energy.
+  description_short_pct_direct: &description_short_pct_direct |-
+    Measured as a percentage of the total (direct) primary energy.
+  # Short description for any sources in terms of primary energy using the substitution method.
+  description_short_pct_equivalent: &description_short_pct_equivalent |-
+    Measured as a percentage of the total primary energy, using the substitution method.
+  # Short description for all per capita variables.
+  description_short_per_capita: &description_short_per_capita |-
+    Measured in kilowatt-hours per person.
+  # Key description item for any sources used for electricity generation.
+  description_key_gross_generation: &description_key_gross_generation |-
+    Figures are based on gross generation and do not account for cross-border electricity supply.
+  # Key description item for non-fossil sources in terms of direct primary energy.
+  description_key_primary_energy_direct: &description_key_primary_energy_direct |-
+    Direct primary energy of non-fossil electricity sources corresponds to electricity generation.
+  # Key description item for any sources in terms of primary energy using the substitution method.
+  description_key_primary_energy_equivalent: &description_key_primary_energy_equivalent |-
+    Primary energy is measured using the "substitution method" (also called "input-equivalent" primary energy). This method is used for non-fossil sources of electricity (namely renewables and nuclear), and measures the amount of fossil fuels that would be required by thermal power stations to generate the same amount of non-fossil electricity.
+    For example, if a country's nuclear power generated 100 TWh of electricity, and assuming that the efficiency of a standard thermal power plant is 38%, the input-equivalent primary energy for this country would be 100 TWh / 0.38 = 263 TWh = 0.95 EJ. This input-equivalent primary energy takes account of the inefficiencies in energy production from fossil fuels and provides a better approximation of each source's share of energy consumption. You can find more details in [the Statistical Review of World Energy's methodology document](https://www.energyinst.org/__data/assets/pdf_file/0003/1055541/Methodology.pdf).
+  # Key description item for biofuels.
+  description_key_biofuels: &description_key_biofuels |-
+    Includes biogasoline (such as ethanol) and biodiesel. Volumes have been adjusted for energy content.
+  # Processing description for all quantities measuring annual change.
+  description_processing_annual_change: &description_processing_annual_change |-
+    The annual change in energy consumption by source is calculated as the difference with respect to the previous year.
+  # Processing description for all per capita quantities.
+  description_processing_per_capita: &description_processing_per_capita |-
+    Per capita figures are calculated by dividing by a population dataset that is built and maintained by Our World in Data, based on [different sources](https://ourworldindata.org/population-sources).
+  # Title variant for non-fossil sources in terms of direct primary energy.
+  title_variant_direct: &title_variant_direct |-
+    In terms of direct primary energy
+  # Title variant for non-fossil sources in terms of primary energy using the substitution method.
+  title_variant_equivalent: &title_variant_equivalent |-
+    Using the substitution method
+
+dataset:
+  update_period_days: 365
+
+tables:
+  energy_mix:
+    title: Energy mix
+    variables:
+      coal__twh:
+        title: Coal (TWh)
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: *description_short_twh
+        display:
+          name: Coal
+        presentation:
+          title_public: Primary energy consumption from coal
+      gas__twh:
+        title: Gas (TWh)
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: *description_short_twh
+        display:
+          name: Gas
+        presentation:
+          title_public: Primary energy consumption from gas
+      oil__twh:
+        title: Oil (TWh)
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: *description_short_twh
+        display:
+          name: Oil
+        presentation:
+          title_public: Primary energy consumption from oil
+      hydro__twh__direct:
+        title: Hydro (TWh - direct)
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: *description_short_twh_direct
+        display:
+          name: Hydro
+        presentation:
+          title_public: Primary energy consumption from hydropower
+          title_variant: *title_variant_direct
+        description_key:
+          - *description_key_gross_generation
+          - *description_key_primary_energy_direct
+      nuclear__twh__direct:
+        title: Nuclear (TWh - direct)
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: *description_short_twh_direct
+        display:
+          name: Nuclear
+        presentation:
+          title_public: Primary energy consumption from nuclear power
+          title_variant: *title_variant_direct
+        description_key:
+          - *description_key_gross_generation
+          - *description_key_primary_energy_direct
+      solar__twh__direct:
+        title: Solar (TWh - direct)
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: *description_short_twh_direct
+        display:
+          name: Solar
+        presentation:
+          title_public: Primary energy consumption from solar power
+          title_variant: *title_variant_direct
+        description_key:
+          - *description_key_gross_generation
+          - *description_key_primary_energy_direct
+      wind__twh__direct:
+        title: Wind (TWh - direct)
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: *description_short_twh_direct
+        display:
+          name: Wind
+        presentation:
+          title_public: Primary energy consumption from wind power
+          title_variant: *title_variant_direct
+        description_key:
+          - *description_key_gross_generation
+          - *description_key_primary_energy_direct
+      other_renewables__twh__direct:
+        title: Other renewables (TWh - direct)
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: *description_short_twh_direct
+        display:
+          name: Other renewables
+        presentation:
+          title_public: Primary energy consumption from other renewables
+          title_variant: *title_variant_direct
+        description_key:
+          - *description_key_gross_generation
+          - *description_key_primary_energy_direct
+      hydro__twh__equivalent:
+        title: Hydro (TWh - equivalent)
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: *description_short_twh_equivalent
+        display:
+          name: Hydro
+        presentation:
+          title_public: Primary energy consumption from hydropower
+          title_variant: *title_variant_equivalent
+        description_key:
+          - *description_key_gross_generation
+          - *description_key_primary_energy_equivalent
+      nuclear__twh__equivalent:
+        title: Nuclear (TWh - equivalent)
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: *description_short_twh_equivalent
+        display:
+          name: Nuclear
+        presentation:
+          title_public: Primary energy consumption from nuclear power
+          title_variant: *title_variant_equivalent
+        description_key:
+          - *description_key_gross_generation
+          - *description_key_primary_energy_equivalent
+      solar__twh__equivalent:
+        title: Solar (TWh - equivalent)
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: *description_short_twh_equivalent
+        display:
+          name: Solar
+        presentation:
+          title_public: Primary energy consumption from solar power
+          title_variant: *title_variant_equivalent
+        description_key:
+          - *description_key_gross_generation
+          - *description_key_primary_energy_equivalent
+      wind__twh__equivalent:
+        title: Wind (TWh - equivalent)
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: *description_short_twh_equivalent
+        display:
+          name: Wind
+        presentation:
+          title_public: Primary energy consumption from wind power
+          title_variant: *title_variant_equivalent
+        description_key:
+          - *description_key_gross_generation
+          - *description_key_primary_energy_equivalent
+      other_renewables__twh__equivalent:
+        title: Other renewables (TWh - equivalent)
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: *description_short_twh_equivalent
+        display:
+          name: Other renewables
+        presentation:
+          title_public: Primary energy consumption from other renewables
+          title_variant: *title_variant_equivalent
+        description_key:
+          - *description_key_gross_generation
+          - *description_key_primary_energy_equivalent
+      biofuels__twh:
+        title: Biofuels (TWh)
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: *description_short_twh
+        display:
+          name: Biofuels
+        presentation:
+          title_public: Primary energy consumption from biofuels
+        description_key:
+          - *description_key_biofuels
+      fossil_fuels__twh:
+        title: Fossil fuels (TWh)
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: *description_short_twh
+        display:
+          name: Fossil fuels
+        presentation:
+          title_public: Primary energy consumption from fossil fuels
+      renewables__twh__direct:
+        title: Renewables (TWh - direct)
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: *description_short_twh_direct
+        display:
+          name: Renewables
+        presentation:
+          title_public: Primary energy consumption from renewables
+          title_variant: *title_variant_direct
+      low_carbon_energy__twh__direct:
+        title: Low-carbon energy (TWh - direct)
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: *description_short_twh_direct
+        display:
+          name: Low-carbon energy
+        presentation:
+          title_public: Primary energy consumption from low-carbon sources
+          title_variant: *title_variant_direct
+        description_key:
+          - *description_key_gross_generation
+          - *description_key_primary_energy_direct
+      solar_and_wind__twh__direct:
+        title: Solar and wind (TWh - direct)
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: *description_short_twh_direct
+        display:
+          name: Solar and wind
+        presentation:
+          title_public: Primary energy consumption from solar and wind power
+          title_variant: *title_variant_direct
+        description_key:
+          - *description_key_gross_generation
+          - *description_key_primary_energy_direct
+      primary_energy__twh__direct:
+        title: Primary energy (TWh - direct)
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: *description_short_twh_direct
+        display:
+          name: Primary energy
+        presentation:
+          title_public: Primary energy consumption
+          title_variant: *title_variant_direct
+      renewables__twh__equivalent:
+        title: Renewables (TWh - equivalent)
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: *description_short_twh_equivalent
+        display:
+          name: Renewables
+        presentation:
+          title_public: Primary energy consumption from renewables
+          title_variant: *title_variant_equivalent
+        description_key:
+          - *description_key_gross_generation
+          - *description_key_primary_energy_equivalent
+      low_carbon_energy__twh__equivalent:
+        title: Low-carbon energy (TWh - equivalent)
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: *description_short_twh_equivalent
+        display:
+          name: Low-carbon energy
+        presentation:
+          title_public: Primary energy consumption from low-carbon sources
+          title_variant: *title_variant_equivalent
+        description_key:
+          - *description_key_primary_energy_equivalent
+      solar_and_wind__twh__equivalent:
+        title: Solar and wind (TWh - equivalent)
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: *description_short_twh_equivalent
+        display:
+          name: Solar and wind
+        presentation:
+          title_public: Primary energy consumption from solar and wind power
+          title_variant: *title_variant_equivalent
+        description_key:
+          - *description_key_gross_generation
+          - *description_key_primary_energy_equivalent
+      primary_energy__twh__equivalent:
+        title: Primary energy (TWh - equivalent)
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: *description_short_twh_equivalent
+        display:
+          name: Primary energy
+        presentation:
+          title_public: Primary energy consumption
+          title_variant: *title_variant_equivalent
+        description_key:
+          - *description_key_primary_energy_equivalent
+      coal__pct_direct_primary_energy:
+        title: Coal (% direct primary energy)
+        unit: '%'
+        short_unit: '%'
+        description_short: *description_short_pct_direct
+        display:
+          name: Coal
+        presentation:
+          title_public: Share of direct primary energy consumption that comes from coal
+          title_variant: *title_variant_direct
+      coal__pct_equivalent_primary_energy:
+        title: Coal (% equivalent primary energy)
+        unit: '%'
+        short_unit: '%'
+        description_short: *description_short_pct_equivalent
+        display:
+          name: Coal
+        presentation:
+          title_public: Share of primary energy consumption that comes from coal
+          title_variant: *title_variant_equivalent
+      fossil_fuels__pct_direct_primary_energy:
+        title: Fossil fuels (% direct primary energy)
+        unit: '%'
+        short_unit: '%'
+        description_short: *description_short_pct_direct
+        display:
+          name: Fossil fuels
+        presentation:
+          title_public: Share of direct primary energy consumption that comes from fossil fuels
+          title_variant: *title_variant_direct
+      fossil_fuels__pct_equivalent_primary_energy:
+        title: Fossil fuels (% equivalent primary energy)
+        unit: '%'
+        short_unit: '%'
+        description_short: *description_short_pct_equivalent
+        display:
+          name: Fossil fuels
+        presentation:
+          title_public: Share of primary energy consumption that comes from fossil fuels
+          title_variant: *title_variant_equivalent
+      gas__pct_direct_primary_energy:
+        title: Gas (% direct primary energy)
+        unit: '%'
+        short_unit: '%'
+        description_short: *description_short_pct_direct
+        display:
+          name: Gas
+        presentation:
+          title_public: Share of direct primary energy consumption that comes from gas
+          title_variant: *title_variant_direct
+      gas__pct_equivalent_primary_energy:
+        title: Gas (% equivalent primary energy)
+        unit: '%'
+        short_unit: '%'
+        description_short: *description_short_pct_equivalent
+        display:
+          name: Gas
+        presentation:
+          title_public: Share of primary energy consumption that comes from gas
+          title_variant: *title_variant_equivalent
+      oil__pct_direct_primary_energy:
+        title: Oil (% direct primary energy)
+        unit: '%'
+        short_unit: '%'
+        description_short: *description_short_pct_direct
+        display:
+          name: Oil
+        presentation:
+          title_public: Share of direct primary energy consumption that comes from oil
+          title_variant: *title_variant_direct
+        description_key:
+          - *description_key_primary_energy_direct
+      oil__pct_equivalent_primary_energy:
+        title: Oil (% equivalent primary energy)
+        unit: '%'
+        short_unit: '%'
+        description_short: *description_short_pct_equivalent
+        display:
+          name: Oil
+        presentation:
+          title_public: Share of primary energy consumption that comes from oil
+          title_variant: *title_variant_equivalent
+        description_key:
+          - *description_key_primary_energy_equivalent
+      biofuels__pct_direct_primary_energy:
+        title: Biofuels (% direct primary energy)
+        unit: '%'
+        short_unit: '%'
+        description_short: *description_short_pct_direct
+        display:
+          name: Biofuels
+        presentation:
+          title_public: Share of direct primary energy consumption that comes from biofuels
+          title_variant: *title_variant_direct
+        description_key:
+          - *description_key_biofuels
+          - *description_key_primary_energy_direct
+      biofuels__pct_equivalent_primary_energy:
+        title: Biofuels (% equivalent primary energy)
+        unit: '%'
+        short_unit: '%'
+        description_short: *description_short_pct_equivalent
+        display:
+          name: Biofuels
+        presentation:
+          title_public: Share of primary energy consumption that comes from biofuels
+          title_variant: *title_variant_equivalent
+        description_key:
+          - *description_key_biofuels
+          - *description_key_primary_energy_equivalent
+      hydro__pct_direct_primary_energy:
+        title: Hydro (% direct primary energy)
+        unit: '%'
+        short_unit: '%'
+        description_short: *description_short_pct_direct
+        display:
+          name: Hydro
+        presentation:
+          title_public: Share of direct primary energy consumption that comes from hydropower
+          title_variant: *title_variant_direct
+        description_key:
+          - *description_key_gross_generation
+          - *description_key_primary_energy_direct
+      hydro__pct_equivalent_primary_energy:
+        title: Hydro (% equivalent primary energy)
+        unit: '%'
+        short_unit: '%'
+        description_short: *description_short_pct_equivalent
+        display:
+          name: Hydro
+        presentation:
+          title_public: Share of primary energy consumption that comes from hydropower
+          title_variant: *title_variant_equivalent
+        description_key:
+          - *description_key_gross_generation
+          - *description_key_primary_energy_equivalent
+      low_carbon_energy__pct_direct_primary_energy:
+        title: Low-carbon energy (% direct primary energy)
+        unit: '%'
+        short_unit: '%'
+        description_short: *description_short_pct_direct
+        display:
+          name: Low-carbon energy
+        presentation:
+          title_public: Share of direct primary energy consumption that comes from low-carbon sources
+          title_variant: *title_variant_direct
+        description_key:
+          - *description_key_gross_generation
+          - *description_key_primary_energy_direct
+      low_carbon_energy__pct_equivalent_primary_energy:
+        title: Low-carbon energy (% equivalent primary energy)
+        unit: '%'
+        short_unit: '%'
+        description_short: *description_short_pct_equivalent
+        display:
+          name: Low-carbon energy
+        presentation:
+          title_public: Share of primary energy consumption that comes from low-carbon sources
+          title_variant: *title_variant_equivalent
+        description_key:
+          - *description_key_gross_generation
+          - *description_key_primary_energy_equivalent
+      nuclear__pct_direct_primary_energy:
+        title: Nuclear (% direct primary energy)
+        unit: '%'
+        short_unit: '%'
+        description_short: *description_short_pct_direct
+        display:
+          name: Nuclear
+        presentation:
+          title_public: Share of direct primary energy consumption that comes from nuclear power
+          title_variant: *title_variant_direct
+        description_key:
+          - *description_key_gross_generation
+          - *description_key_primary_energy_direct
+      nuclear__pct_equivalent_primary_energy:
+        title: Nuclear (% equivalent primary energy)
+        unit: '%'
+        short_unit: '%'
+        description_short: *description_short_pct_equivalent
+        display:
+          name: Nuclear
+        presentation:
+          title_public: Share of primary energy consumption that comes from nuclear power
+          title_variant: *title_variant_equivalent
+        description_key:
+          - *description_key_gross_generation
+          - *description_key_primary_energy_equivalent
+      other_renewables__pct_direct_primary_energy:
+        title: Other renewables (% direct primary energy)
+        unit: '%'
+        short_unit: '%'
+        description_short: *description_short_pct_direct
+        display:
+          name: Other renewables
+        presentation:
+          title_public: Share of direct primary energy consumption that comes from other renewables
+          title_variant: *title_variant_direct
+        description_key:
+          - *description_key_gross_generation
+          - *description_key_primary_energy_direct
+      other_renewables__pct_equivalent_primary_energy:
+        title: Other renewables (% equivalent primary energy)
+        unit: '%'
+        short_unit: '%'
+        description_short: *description_short_pct_equivalent
+        display:
+          name: Other renewables
+        presentation:
+          title_public: Share of primary energy consumption that comes from other renewables
+          title_variant: *title_variant_equivalent
+        description_key:
+          - *description_key_gross_generation
+          - *description_key_primary_energy_equivalent
+      renewables__pct_direct_primary_energy:
+        title: Renewables (% direct primary energy)
+        unit: '%'
+        short_unit: '%'
+        description_short: *description_short_pct_direct
+        display:
+          name: Renewables
+        presentation:
+          title_public: Share of direct primary energy consumption that comes from renewables
+          title_variant: *title_variant_direct
+        description_key:
+          - *description_key_gross_generation
+          - *description_key_primary_energy_direct
+      renewables__pct_equivalent_primary_energy:
+        title: Renewables (% equivalent primary energy)
+        unit: '%'
+        short_unit: '%'
+        description_short: *description_short_pct_equivalent
+        display:
+          name: Renewables
+        presentation:
+          title_public: Share of primary energy consumption that comes from renewables
+          title_variant: *title_variant_equivalent
+        description_key:
+          - *description_key_gross_generation
+          - *description_key_primary_energy_equivalent
+      solar__pct_direct_primary_energy:
+        title: Solar (% direct primary energy)
+        unit: '%'
+        short_unit: '%'
+        description_short: *description_short_pct_direct
+        display:
+          name: Solar
+        presentation:
+          title_public: Share of direct primary energy consumption that comes from solar power
+          title_variant: *title_variant_direct
+        description_key:
+          - *description_key_gross_generation
+          - *description_key_primary_energy_direct
+      solar__pct_equivalent_primary_energy:
+        title: Solar (% equivalent primary energy)
+        unit: '%'
+        short_unit: '%'
+        description_short: *description_short_pct_equivalent
+        display:
+          name: Solar
+        presentation:
+          title_public: Share of primary energy consumption that comes from solar power
+          title_variant: *title_variant_equivalent
+        description_key:
+          - *description_key_gross_generation
+          - *description_key_primary_energy_equivalent
+      wind__pct_direct_primary_energy:
+        title: Wind (% direct primary energy)
+        unit: '%'
+        short_unit: '%'
+        description_short: *description_short_pct_direct
+        display:
+          name: Wind
+        presentation:
+          title_public: Share of direct primary energy consumption that comes from wind power
+          title_variant: *title_variant_direct
+        description_key:
+          - *description_key_gross_generation
+          - *description_key_primary_energy_direct
+      wind__pct_equivalent_primary_energy:
+        title: Wind (% equivalent primary energy)
+        unit: '%'
+        short_unit: '%'
+        description_short: *description_short_pct_equivalent
+        display:
+          name: Wind
+        presentation:
+          title_public: Share of primary energy consumption that comes from wind power
+          title_variant: *title_variant_equivalent
+        description_key:
+          - *description_key_gross_generation
+          - *description_key_primary_energy_equivalent
+      solar_and_wind__pct_direct_primary_energy:
+        title: Solar and wind (% direct primary energy)
+        unit: '%'
+        short_unit: '%'
+        description_short: *description_short_pct_direct
+        display:
+          name: Solar and wind
+        presentation:
+          title_public: Share of direct primary energy consumption that comes from solar and wind power
+          title_variant: *title_variant_direct
+        description_key:
+          - *description_key_gross_generation
+          - *description_key_primary_energy_direct
+      solar_and_wind__pct_equivalent_primary_energy:
+        title: Solar and wind (% equivalent primary energy)
+        unit: '%'
+        short_unit: '%'
+        description_short: *description_short_pct_equivalent
+        display:
+          name: Solar and wind
+        presentation:
+          title_public: Share of primary energy consumption that comes from solar and wind power
+          title_variant: *title_variant_equivalent
+        description_key:
+          - *description_key_gross_generation
+          - *description_key_primary_energy_equivalent
+      coal__pct_growth:
+        title: Coal (% growth)
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Coal
+        presentation:
+          title_public: Annual percentage change in coal consumption
+        description_processing: *description_processing_annual_change
+      coal__twh_growth:
+        title: Coal (TWh growth)
+        unit: terawatt-hours
+        short_unit: TWh
+        display:
+          name: Coal
+        presentation:
+          title_public: Annual change in coal consumption
+        description_processing: *description_processing_annual_change
+      fossil_fuels__pct_growth:
+        title: Fossil fuels (% growth)
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Fossil fuels
+        presentation:
+          title_public: Annual percentage change in fossil fuel consumption
+        description_processing: *description_processing_annual_change
+      fossil_fuels__twh_growth:
+        title: Fossil fuels (TWh growth)
+        unit: terawatt-hours
+        short_unit: TWh
+        display:
+          name: Fossil fuels
+        presentation:
+          title_public: Annual change in fossil fuel consumption
+        description_processing: *description_processing_annual_change
+      gas__pct_growth:
+        title: Gas (% growth)
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Gas
+        presentation:
+          title_public: Annual percentage change in gas consumption
+        description_processing: *description_processing_annual_change
+      gas__twh_growth:
+        title: Gas (TWh growth)
+        unit: terawatt-hours
+        short_unit: TWh
+        display:
+          name: Gas
+        presentation:
+          title_public: Annual change in gas consumption
+        description_processing: *description_processing_annual_change
+      oil__pct_growth:
+        title: Oil (% growth)
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Oil
+        presentation:
+          title_public: Annual percentage change in oil consumption
+        description_processing: *description_processing_annual_change
+      oil__twh_growth:
+        title: Oil (TWh growth)
+        unit: terawatt-hours
+        short_unit: TWh
+        display:
+          name: Oil
+        presentation:
+          title_public: Annual change in oil consumption
+        description_processing: *description_processing_annual_change
+      biofuels__pct_growth:
+        title: Biofuels (% growth)
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Biofuels
+        presentation:
+          title_public: Annual percentage change in biofuel consumption
+        description_key:
+          - *description_key_biofuels
+        description_processing: *description_processing_annual_change
+      biofuels__twh_growth:
+        title: Biofuels (TWh growth)
+        unit: terawatt-hours
+        short_unit: TWh
+        display:
+          name: Biofuels
+        presentation:
+          title_public: Annual change in biofuel consumption
+        description_key:
+          - *description_key_biofuels
+        description_processing: *description_processing_annual_change
+      hydro__pct_growth:
+        title: Hydro (% growth)
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Hydro
+        presentation:
+          title_public: Annual percentage change in hydropower consumption
+        description_processing: *description_processing_annual_change
+      hydro__twh_growth__direct:
+        title: Hydro (TWh growth - direct)
+        unit: terawatt-hours
+        short_unit: TWh
+        display:
+          name: Hydro
+        presentation:
+          title_public: Annual change in hydropower consumption
+          title_variant: *title_variant_direct
+        description_key:
+          - *description_key_primary_energy_direct
+        description_processing: *description_processing_annual_change
+      hydro__twh_growth__equivalent:
+        title: Hydro (TWh growth - equivalent)
+        unit: terawatt-hours
+        short_unit: TWh
+        display:
+          name: Hydro
+        presentation:
+          title_public: Annual change in hydropower consumption
+          title_variant: *title_variant_equivalent
+        description_key:
+          - *description_key_primary_energy_equivalent
+        description_processing: *description_processing_annual_change
+      low_carbon_energy__pct_growth:
+        title: Low-carbon energy (% growth)
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Low-carbon energy
+        presentation:
+          title_public: Annual percentage change in low-carbon energy consumption
+        description_processing: *description_processing_annual_change
+      low_carbon_energy__twh_growth__direct:
+        title: Low-carbon energy (TWh growth - direct)
+        unit: terawatt-hours
+        short_unit: TWh
+        display:
+          name: Low-carbon energy
+        presentation:
+          title_public: Annual change in low-carbon energy consumption
+          title_variant: *title_variant_direct
+        description_key:
+          - *description_key_primary_energy_direct
+        description_processing: *description_processing_annual_change
+      low_carbon_energy__twh_growth__equivalent:
+        title: Low-carbon energy (TWh growth - equivalent)
+        unit: terawatt-hours
+        short_unit: TWh
+        display:
+          name: Low-carbon energy
+        presentation:
+          title_public: Annual change in low-carbon energy consumption
+          title_variant: *title_variant_equivalent
+        description_key:
+          - *description_key_primary_energy_equivalent
+        description_processing: *description_processing_annual_change
+      nuclear__pct_growth:
+        title: Nuclear (% growth)
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Nuclear
+        presentation:
+          title_public: Annual percentage change in nuclear power consumption
+        description_processing: *description_processing_annual_change
+      nuclear__twh_growth__direct:
+        title: Nuclear (TWh growth - direct)
+        unit: terawatt-hours
+        short_unit: TWh
+        display:
+          name: Nuclear
+        presentation:
+          title_public: Annual change in nuclear power consumption
+          title_variant: *title_variant_direct
+        description_key:
+          - *description_key_primary_energy_direct
+        description_processing: *description_processing_annual_change
+      nuclear__twh_growth__equivalent:
+        title: Nuclear (TWh growth - equivalent)
+        unit: terawatt-hours
+        short_unit: TWh
+        display:
+          name: Nuclear
+        presentation:
+          title_public: Annual change in nuclear power consumption
+          title_variant: *title_variant_equivalent
+        description_key:
+          - *description_key_primary_energy_equivalent
+        description_processing: *description_processing_annual_change
+      other_renewables__pct_growth:
+        title: Other renewables (% growth)
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Other renewables
+        presentation:
+          title_public: Annual percentage change in other renewables consumption
+        description_processing: *description_processing_annual_change
+      other_renewables__twh_growth__direct:
+        title: Other renewables (TWh growth - direct)
+        unit: terawatt-hours
+        short_unit: TWh
+        display:
+          name: Other renewables
+        presentation:
+          title_public: Annual change in other renewables consumption
+          title_variant: *title_variant_direct
+        description_key:
+          - *description_key_primary_energy_direct
+        description_processing: *description_processing_annual_change
+      other_renewables__twh_growth__equivalent:
+        title: Other renewables (TWh growth - equivalent)
+        unit: terawatt-hours
+        short_unit: TWh
+        display:
+          name: Other renewables
+        presentation:
+          title_public: Annual change in other renewables consumption
+          title_variant: *title_variant_equivalent
+        description_key:
+          - *description_key_primary_energy_equivalent
+        description_processing: *description_processing_annual_change
+      renewables__pct_growth:
+        title: Renewables (% growth)
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Renewables
+        presentation:
+          title_public: Annual percentage change in renewables consumption
+        description_processing: *description_processing_annual_change
+      renewables__twh_growth__direct:
+        title: Renewables (TWh growth - direct)
+        unit: terawatt-hours
+        short_unit: TWh
+        display:
+          name: Renewables
+        presentation:
+          title_public: Annual change in renewables consumption
+          title_variant: *title_variant_direct
+        description_key:
+          - *description_key_primary_energy_direct
+        description_processing: *description_processing_annual_change
+      renewables__twh_growth__equivalent:
+        title: Renewables (TWh growth - equivalent)
+        unit: terawatt-hours
+        short_unit: TWh
+        display:
+          name: Renewables
+        presentation:
+          title_public: Annual change in renewables consumption
+          title_variant: *title_variant_equivalent
+        description_key:
+          - *description_key_primary_energy_equivalent
+        description_processing: *description_processing_annual_change
+      solar__pct_growth:
+        title: Solar (% growth)
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Solar
+        presentation:
+          title_public: Annual percentage change in solar power consumption
+        description_processing: *description_processing_annual_change
+      solar__twh_growth__direct:
+        title: Solar (TWh growth - direct)
+        unit: terawatt-hours
+        short_unit: TWh
+        display:
+          name: Solar
+        presentation:
+          title_public: Annual change in solar power consumption
+          title_variant: *title_variant_direct
+        description_key:
+          - *description_key_primary_energy_direct
+        description_processing: *description_processing_annual_change
+      solar__twh_growth__equivalent:
+        title: Solar (TWh growth - equivalent)
+        unit: terawatt-hours
+        short_unit: TWh
+        display:
+          name: Solar
+        presentation:
+          title_public: Annual change in solar power consumption
+          title_variant: *title_variant_equivalent
+        description_key:
+          - *description_key_primary_energy_equivalent
+        description_processing: *description_processing_annual_change
+      wind__pct_growth:
+        title: Wind (% growth)
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Wind
+        presentation:
+          title_public: Annual percentage change in wind power consumption
+        description_processing: *description_processing_annual_change
+      wind__twh_growth__direct:
+        title: Wind (TWh growth - direct)
+        unit: terawatt-hours
+        short_unit: TWh
+        display:
+          name: Wind
+        presentation:
+          title_public: Annual change in wind power consumption
+          title_variant: *title_variant_direct
+        description_key:
+          - *description_key_primary_energy_direct
+        description_processing: *description_processing_annual_change
+      wind__twh_growth__equivalent:
+        title: Wind (TWh growth - equivalent)
+        unit: terawatt-hours
+        short_unit: TWh
+        display:
+          name: Wind
+        presentation:
+          title_public: Annual change in wind power consumption
+          title_variant: *title_variant_equivalent
+        description_key:
+          - *description_key_primary_energy_equivalent
+        description_processing: *description_processing_annual_change
+      solar_and_wind__pct_growth:
+        title: Solar and wind (% growth)
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Solar and wind
+        presentation:
+          title_public: Annual percentage change in solar and wind power consumption
+        description_processing: *description_processing_annual_change
+      solar_and_wind__twh_growth__direct:
+        title: Solar and wind (TWh growth - direct)
+        unit: terawatt-hours
+        short_unit: TWh
+        display:
+          name: Solar and wind
+        presentation:
+          title_public: Annual change in solar and wind power consumption
+          title_variant: *title_variant_direct
+        description_key:
+          - *description_key_primary_energy_direct
+        description_processing: *description_processing_annual_change
+      solar_and_wind__twh_growth__equivalent:
+        title: Solar and wind (TWh growth - equivalent)
+        unit: terawatt-hours
+        short_unit: TWh
+        display:
+          name: Solar and wind
+        presentation:
+          title_public: Annual change in solar and wind power consumption
+          title_variant: *title_variant_equivalent
+        description_key:
+          - *description_key_primary_energy_equivalent
+        description_processing: *description_processing_annual_change
+      coal_per_capita__kwh:
+        title: Coal per capita (kWh)
+        unit: kilowatt-hours
+        short_unit: kWh
+        description_short: *description_short_per_capita
+        display:
+          name: Coal
+        presentation:
+          title_public: Coal consumption per capita
+        description_processing: *description_processing_per_capita
+      fossil_fuels_per_capita__kwh:
+        title: Fossil fuels per capita (kWh)
+        unit: kilowatt-hours
+        short_unit: kWh
+        description_short: *description_short_per_capita
+        display:
+          name: Fossil fuels
+        presentation:
+          title_public: Fossil fuel consumption per capita
+        description_processing: *description_processing_per_capita
+      gas_per_capita__kwh:
+        title: Gas per capita (kWh)
+        unit: kilowatt-hours
+        short_unit: kWh
+        description_short: *description_short_per_capita
+        display:
+          name: Gas
+        presentation:
+          title_public: Gas consumption per capita
+        description_processing: *description_processing_per_capita
+      oil_per_capita__kwh:
+        title: Oil per capita (kWh)
+        unit: kilowatt-hours
+        short_unit: kWh
+        description_short: *description_short_per_capita
+        display:
+          name: Oil
+        presentation:
+          title_public: Oil consumption per capita
+        description_processing: *description_processing_per_capita
+      biofuels_per_capita__kwh:
+        title: Biofuels per capita (kWh)
+        unit: kilowatt-hours
+        short_unit: kWh
+        description_short: *description_short_per_capita
+        display:
+          name: Biofuels
+        presentation:
+          title_public: Biofuel consumption per capita
+        description_key:
+          - *description_key_biofuels
+        description_processing: *description_processing_per_capita
+      hydro_per_capita__kwh__direct:
+        title: Hydro per capita (kWh - direct)
+        unit: kilowatt-hours
+        short_unit: kWh
+        description_short: *description_short_per_capita
+        display:
+          name: Hydro
+        presentation:
+          title_public: Hydropower consumption per capita
+          title_variant: *title_variant_direct
+        description_key:
+          - *description_key_primary_energy_direct
+        description_processing: *description_processing_per_capita
+      hydro_per_capita__kwh__equivalent:
+        title: Hydro per capita (kWh - equivalent)
+        unit: kilowatt-hours
+        short_unit: kWh
+        description_short: *description_short_per_capita
+        display:
+          name: Hydro
+        presentation:
+          title_public: Hydropower consumption per capita
+          title_variant: *title_variant_equivalent
+        description_key:
+          - *description_key_primary_energy_equivalent
+        description_processing: *description_processing_per_capita
+      low_carbon_energy_per_capita__kwh__direct:
+        title: Low-carbon energy per capita (kWh - direct)
+        unit: kilowatt-hours
+        short_unit: kWh
+        description_short: *description_short_per_capita
+        display:
+          name: Low-carbon energy
+        presentation:
+          title_public: Low-carbon energy consumption per capita
+          title_variant: *title_variant_direct
+        description_key:
+          - *description_key_primary_energy_direct
+        description_processing: *description_processing_per_capita
+      low_carbon_energy_per_capita__kwh__equivalent:
+        title: Low-carbon energy per capita (kWh - equivalent)
+        unit: kilowatt-hours
+        short_unit: kWh
+        description_short: *description_short_per_capita
+        display:
+          name: Low-carbon energy
+        presentation:
+          title_public: Low-carbon energy consumption per capita
+          title_variant: *title_variant_equivalent
+        description_key:
+          - *description_key_primary_energy_equivalent
+        description_processing: *description_processing_per_capita
+      nuclear_per_capita__kwh__direct:
+        title: Nuclear per capita (kWh - direct)
+        unit: kilowatt-hours
+        short_unit: kWh
+        description_short: *description_short_per_capita
+        display:
+          name: Nuclear
+        presentation:
+          title_public: Nuclear power consumption per capita
+          title_variant: *title_variant_direct
+        description_key:
+          - *description_key_primary_energy_direct
+        description_processing: *description_processing_per_capita
+      nuclear_per_capita__kwh__equivalent:
+        title: Nuclear per capita (kWh - equivalent)
+        unit: kilowatt-hours
+        short_unit: kWh
+        description_short: *description_short_per_capita
+        display:
+          name: Nuclear
+        presentation:
+          title_public: Nuclear power consumption per capita
+          title_variant: *title_variant_equivalent
+        description_key:
+          - *description_key_primary_energy_equivalent
+        description_processing: *description_processing_per_capita
+      other_renewables_per_capita__kwh__direct:
+        title: Other renewables per capita (kWh - direct)
+        unit: kilowatt-hours
+        short_unit: kWh
+        description_short: *description_short_per_capita
+        display:
+          name: Other renewables
+        presentation:
+          title_public: Other renewables consumption per capita
+          title_variant: *title_variant_direct
+        description_key:
+          - *description_key_primary_energy_direct
+        description_processing: *description_processing_per_capita
+      other_renewables_per_capita__kwh__equivalent:
+        title: Other renewables per capita (kWh - equivalent)
+        unit: kilowatt-hours
+        short_unit: kWh
+        description_short: *description_short_per_capita
+        display:
+          name: Other renewables
+        presentation:
+          title_public: Other renewables consumption per capita
+          title_variant: *title_variant_equivalent
+        description_key:
+          - *description_key_primary_energy_equivalent
+        description_processing: *description_processing_per_capita
+      renewables_per_capita__kwh__direct:
+        title: Renewables per capita (kWh - direct)
+        unit: kilowatt-hours
+        short_unit: kWh
+        description_short: *description_short_per_capita
+        display:
+          name: Renewables
+        presentation:
+          title_public: Renewables consumption per capita
+          title_variant: *title_variant_direct
+        description_key:
+          - *description_key_primary_energy_direct
+        description_processing: *description_processing_per_capita
+      renewables_per_capita__kwh__equivalent:
+        title: Renewables per capita (kWh - equivalent)
+        unit: kilowatt-hours
+        short_unit: kWh
+        description_short: *description_short_per_capita
+        display:
+          name: Renewables
+        presentation:
+          title_public: Renewables consumption per capita
+          title_variant: *title_variant_equivalent
+        description_key:
+          - *description_key_primary_energy_equivalent
+        description_processing: *description_processing_per_capita
+      solar_per_capita__kwh__direct:
+        title: Solar per capita (kWh - direct)
+        unit: kilowatt-hours
+        short_unit: kWh
+        description_short: *description_short_per_capita
+        display:
+          name: Solar
+        presentation:
+          title_public: Solar power consumption per capita
+          title_variant: *title_variant_direct
+        description_key:
+          - *description_key_primary_energy_direct
+        description_processing: *description_processing_per_capita
+      solar_per_capita__kwh__equivalent:
+        title: Solar per capita (kWh - equivalent)
+        unit: kilowatt-hours
+        short_unit: kWh
+        description_short: *description_short_per_capita
+        display:
+          name: Solar
+        presentation:
+          title_public: Solar power consumption per capita
+          title_variant: *title_variant_equivalent
+        description_key:
+          - *description_key_primary_energy_equivalent
+        description_processing: *description_processing_per_capita
+      wind_per_capita__kwh__direct:
+        title: Wind per capita (kWh - direct)
+        unit: kilowatt-hours
+        short_unit: kWh
+        description_short: *description_short_per_capita
+        display:
+          name: Wind
+        presentation:
+          title_public: Wind power consumption per capita
+          title_variant: *title_variant_direct
+        description_key:
+          - *description_key_primary_energy_direct
+        description_processing: *description_processing_per_capita
+      wind_per_capita__kwh__equivalent:
+        title: Wind per capita (kWh - equivalent)
+        unit: kilowatt-hours
+        short_unit: kWh
+        description_short: *description_short_per_capita
+        display:
+          name: Wind
+        presentation:
+          title_public: Wind power consumption per capita
+          title_variant: *title_variant_equivalent
+        description_key:
+          - *description_key_primary_energy_equivalent
+        description_processing: *description_processing_per_capita
+      solar_and_wind_per_capita__kwh__direct:
+        title: Solar and wind per capita (kWh - direct)
+        unit: kilowatt-hours
+        short_unit: kWh
+        description_short: *description_short_per_capita
+        display:
+          name: Solar and wind
+        presentation:
+          title_public: Solar and wind power consumption per capita
+          title_variant: *title_variant_direct
+        description_key:
+          - *description_key_primary_energy_direct
+        description_processing: *description_processing_per_capita
+      solar_and_wind_per_capita__kwh__equivalent:
+        title: Solar and wind per capita (kWh - equivalent)
+        unit: kilowatt-hours
+        short_unit: kWh
+        description_short: *description_short_per_capita
+        display:
+          name: Solar and wind
+        presentation:
+          title_public: Solar and wind power consumption per capita
+          title_variant: *title_variant_equivalent
+        description_key:
+          - *description_key_primary_energy_equivalent
+        description_processing: *description_processing_per_capita
