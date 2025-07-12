@@ -12,6 +12,13 @@ def run() -> None:
     # NOTE: using load_data=False which only loads metadata significantly speeds this up
     ds = paths.load_dataset("vaccination_coverage")
     tb = ds.read("vaccination_coverage", load_data=False)
+    # Drop out the non-global vaccinations
+    tb = tb.drop(
+        columns=[
+            "coverage__antigen_yfv",
+            "coverage__antigen_mena_c",
+        ]
+    )
 
     common_view_config = {
         "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.005.json",
