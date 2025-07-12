@@ -33,16 +33,16 @@ Y_AXIS_MIN = 0
 ####################################################################################################
 # WORLD BANK POVERTY AND INEQUALITY PLATFORM
 ####################################################################################################
-SOURCE_NAME_PIP = "World Bank Poverty and Inequality Platform (2024)"
+SOURCE_NAME_PIP = "World Bank Poverty and Inequality Platform (2025)"
 # TODO: Update the PIP versions here
-DATA_PUBLISHED_BY_PIP = "World Bank (2024). Poverty and Inequality Platform (version 20240627_2017 and 20240627_2011) [Data set]. World Bank Group. https://pip.worldbank.org/."
+DATA_PUBLISHED_BY_PIP = "World Bank (2025). Poverty and Inequality Platform (version 20250401_2021 and 20250401_2017) [Data set]. World Bank Group. https://pip.worldbank.org/."
 SOURCE_LINK_PIP = "https://pip.worldbank.org"
-CONSUMPTION_SPELLS_PIP = 7
+CONSUMPTION_SPELLS_PIP = 8
 INCOME_SPELLS_PIP = 8
 
 # Define PPP versions
 # TODO: Update the PPP versions here
-PPP_VERSIONS_PIP = [2011, 2017]
+PPP_VERSIONS_PIP = [2017, 2021]
 
 # Define old and current PPP version
 PPP_VERSION_OLD_PIP = PPP_VERSIONS_PIP[0]
@@ -51,10 +51,10 @@ PPP_VERSION_CURRENT_PIP = PPP_VERSIONS_PIP[1]
 # Define PPP to use for comparisons with LIS
 # NOTE: Update the PPP version here
 # TODO: Update the PPP version here
-PPP_VERSION_COMPARISON_PIP = PPP_VERSION_CURRENT_PIP
+PPP_VERSION_COMPARISON_PIP = PPP_VERSION_OLD_PIP
 
 
-INCOME_OR_CONSUMPTION_PIP = "Depending on the country and year, the data relates to income measured after taxes and benefits, or to consumption, per capita. 'Per capita' means that the incomes of each household are attributed equally to each member of the household (including children)."
+INCOME_OR_CONSUMPTION_PIP = "Depending on the country and year, the data relates to income (measured after taxes and benefits) or to consumption, per capita. 'Per capita' means that the incomes of each household are attributed equally to each member of the household (including children)."
 NON_MARKET_DESCRIPTION_PIP = "Non-market sources of income, including food grown by subsistence farmers for their own consumption, are taken into account."
 NOWCAST_REGIONS_DESCRIPTION = "Regional and global estimates are extrapolated up until the year of the data release using GDP growth estimates and forecasts. For more details about the methodology, please refer to the [World Bank PIP documentation](https://datanalytics.worldbank.org/PIP-Methodology/lineupestimates.html#nowcasts)."
 

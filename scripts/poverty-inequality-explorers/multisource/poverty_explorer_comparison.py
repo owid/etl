@@ -880,7 +880,7 @@ selectedFacetStrategy = "entity"
 hasMapTab = "false"
 tab_parameter = "chart"
 
-datasets_description = "LIS data relates to income after taxes and benefits [per capita](#dod:per-capita). Depending on the country and year, PIP data relates to income measured after taxes and benefits, or to consumption, per capita."
+datasets_description = "LIS data relates to income after taxes and benefits [per capita](#dod:per-capita). Depending on the country and year, PIP data relates to income (measured after taxes and benefits) or to consumption, per capita."
 
 df_graphers = pd.DataFrame()
 
