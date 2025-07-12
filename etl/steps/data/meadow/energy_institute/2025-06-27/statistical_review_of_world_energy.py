@@ -18,8 +18,10 @@ SHEET_INDICATOR_UNITS = [
     # The EI used to provide primary energy consumption in their consolidated dataset.
     # But now they have moved to using Total Energy Supply.
     # They still have primary energy consumption, but only in the excel file, so I'll get it from there.
+    # WARNING: The following is my attempt to map the sheet names to the column names in the consolidated dataset, but I'm not sure if the mapping is accurate. In any case, this mapping is not crucial: In the garden step we rename columns again to something more meaningful. I'll keep this mapping for now, as sometimes we need to extract data from the sheets and sometimes from the consolidated file.
     ("Total Energy Supply (TES) -EJ", "tes_ej", "Exajoules"),
     # ('TES by fuel', 'UNKNOWN', 'Exajoules'),
+    # In principle, we calculate per capita indicators using our own population dataset. However, it is interesting that the statistical review provides per capita TES even for the "Other *" regions. With this information, we could potentially estimate which countries are included in those regions (although it would not be trivial); this could help when constructing region aggregates.
     # ('TES per Capita', 'tes_gj_pc', 'Gigajoule per capita'),
     ("Natural Gas Flaring", "gasflared_bcm", "Billion cubic metres"),
     ("Oil Production - barrels", "oilprod_kbd", "Thousand barrels daily"),
@@ -38,7 +40,7 @@ SHEET_INDICATOR_UNITS = [
     ("Gas Consumption - Bcm", "gascons_bcm", "Billion cubic metres"),
     ("Gas Consumption - Bcf", "gascons_bcfd", "Billion cubic feet per day"),
     ("Gas Consumption - EJ", "gascons_ej", "Exajoules"),
-    # ('Gas - H2 Production Capacity', 'hydrogen', 'Production Capacity (Thousand tonnes/yr)'),
+    # ('Gas - H2 Production Capacity', 'UNKNOWN', 'Production Capacity (Thousand tonnes/yr)'),
     ("Coal Production - mt", "coalprod_mt", "Million tonnes "),
     ("Coal Production - EJ", "coalprod_ej", "Exajoules"),
     ("Coal Consumption - EJ", "coalcons_ej", "Exajoules"),
@@ -47,9 +49,10 @@ SHEET_INDICATOR_UNITS = [
     ("Hydro Generation - TWh", "hydro_twh", "Terawatt-hours"),
     ("Hydro Consumption - EJ", "hydro_ej", "Exajoules"),
     ("Renewables Consumption -EJ", "renewables_ej", "Exajoules"),
-    ("Renewable Power (inc hydro) -EJ", "ren_power_ej", "Exajoules"),
-    ("Renewable Power (inc hydro)-TWh", "ren_power_twh", "Terawatt-hours"),
-    # ("Renewables Generation by Source", "electbyfuel_ren_power", "Terawatt-hours"),
+    # NOTE: In previous releases, the consolidated dataset ren_power_twh coincided with electbyfuel_ren_power (although the latter was often not infomed), and numerically, they coincided with sheet "Ren power (excl hydro) - TWh". In the 2025 release, electbyfuel_ren_power also coincides with "Ren power (excl hydro) - TWh", but, for whatever reason, ren_power_twh is all made of zeros (similarly, solar and wind generation are all zero in the consolidated dataset; I wrote to EI about this issue, but as of today, they haven't fixed it).
+    # Renewable power including hydro is simply not given in the consolidated dataset (at least not in the 2024 and 2025 releases). So we'll create new column names for those.
+    ("Renewable Power (inc hydro) -EJ", "ren_power_inc_hydro_ej", "Exajoules"),
+    ("Renewable Power (inc hydro)-TWh", "ren_power_inc_hydro_twh", "Terawatt-hours"),
     ("Solar Generation - TWh", "solar_twh", "Terawatt-hours"),
     ("Solar Consumption - EJ", "solar_ej", "Exajoules"),
     # ('Solar Installed Capacity', 'UNKNOWN', 'nan'),
@@ -70,10 +73,16 @@ SHEET_INDICATOR_UNITS = [
     ("Coal inputs - Elec generation ", "electbyfuel_coal", "Terawatt-hours"),
     ("Other inputs - Elec generation", "electbyfuel_other", "Terawatt-hours"),
     # ('Grid Scale BESS Capacity', 'UNKNOWN', 'Installed Capacity (Gigawatts)'),
-    ("Cobalt P-R", "cobalt_kt", "Thousand tonnes"),
-    ("Lithium P-R", "lithium_kt", "Thousand tonnes of Lithium content"),
+    # There's a sheet for Cobalt production and reserves (both side by side), which corresponds to cobalt_kt and cobaltres_kt.
+    # NOTE: We could extract production and reserves from the spreadsheet (for now, I'll skip, since we are not using that data). If extracted from the consolidated dataset, notice that they claim zero reserves for all years except for the latest year informed. Those zeros should probably be nans.
+    # ("Cobalt P-R", "UNKNOWN", "Thousand tonnes"),
+    # Similarly, there's a sheet for Lithium production (corresponding to lithium_kt) and reserves (lithiumres_kt).
+    # ("Lithium P-R", "UNKNOWN", "Thousand tonnes of Lithium content"),
+    # Same for graphite (graphite_kt and graphiteres_kt).
+    # TODO: Instead of extracting minerals this way, create a specific function for them, to extract production and reserves. Keep this one uncommented for now, to avoid an issue with Mozambique graphite (missing zeros in the consolidated dataset). Once fixed, comment the following (and to avoid confusion, change graphite_kt -> UNKNOWN).
     ("Natural Graphite P-R", "graphite_kt", "Thousand tonnes"),
-    ("Rare Earth metals P-R", "rareearths_kt", "Thousand tonnes1"),
+    # Same for rare earths (rareearths_kt and rareeaethsres_kt).
+    # ("Rare Earth metals P-R", "UNKNOWN", "Thousand tonnes1"),
     # ('Copper P-R', 'UNKNOWN', 'Thousand tonnes'),
     # ('Manganese P-R', 'UNKNOWN', 'Thousand tonnes'),
     # ('Nickel P-R', 'UNKNOWN', 'Thousand tonnes'),
@@ -89,8 +98,8 @@ SHEET_INDICATOR_UNITS = [
 ]
 
 
-def parse_sheet(data_additional: pr.ExcelFile, sheet: str, indicator: str, unit: str) -> Table:
-    tb = data_additional.parse(sheet, skiprows=2)
+def parse_sheet(data_spreadsheet: pr.ExcelFile, sheet: str, indicator: str, unit: str) -> Table:
+    tb = data_spreadsheet.parse(sheet, skiprows=2)
 
     # Remove empty rows and rows of footnotes.
     tb = tb.dropna(subset=tb.columns[1:], how="all").reset_index(drop=True)
@@ -130,16 +139,16 @@ def parse_sheet(data_additional: pr.ExcelFile, sheet: str, indicator: str, unit:
     # For consistency with all other tables, rename some countries to their most common names in the dataset.
     # Their names will be properly harmonized in the garden step.
     country_mapping = {
-        "Central America": "Total Central America",
         "Eastern Africa": "Total Eastern Africa",
-        "European Union": "Total EU",
         "Middle Africa": "Total Middle Africa",
+        "Western Africa": "Total Western Africa",
+        "Central America": "Total Central America",
+        "European Union": "Total EU",
         "Non-OECD": "Total Non-OECD",
         "OECD": "Total OECD",
         "OPEC": "Total OPEC",
         "Non-OPEC": "Total Non-OPEC",
         "Turkey": "Turkiye",
-        "Western Africa": "Total Western Africa",
         "DR Congo": "Democratic Republic of Congo",
         "Other North Africa": "Other Northern Africa",
     }
@@ -511,34 +520,31 @@ def parse_thermal_equivalent_efficiency(data: pr.ExcelFile, origin: Origin, lice
     return efficiency
 
 
-def combine_consolidated_dataset_and_spreadsheet(tb_consolidated, data_additional):
+def combine_consolidated_dataset_and_spreadsheet(tb_consolidated, data_spreadsheet):
     tables = []
     for sheet, indicator, unit in SHEET_INDICATOR_UNITS:
-        _table = parse_sheet(data_additional=data_additional, sheet=sheet, indicator=indicator, unit=unit)
+        _table = parse_sheet(data_spreadsheet=data_spreadsheet, sheet=sheet, indicator=indicator, unit=unit)
         assert list(_table.columns) == ["country", "year", indicator]
         assert not _table.empty
         tables.append(_table)
-    tb_additional = pr.multi_merge(tables, on=["country", "year"], how="outer")
+    tb_spreadsheet = pr.multi_merge(tables, on=["country", "year"], how="outer")
     # Sanity checks.
     error = "Duplicated rows found when combining data extracted from sheets. Sheets format may have changed."
-    assert tb_additional[tb_additional.duplicated(subset=["country", "year"])].empty, error
+    assert tb_spreadsheet[tb_spreadsheet.duplicated(subset=["country", "year"])].empty, error
     error = (
         "Unexpected mismatch between entities extracted from the consolidated dataset and those from the spreadsheet."
     )
-    assert set(tb_additional["country"]) - set(tb_consolidated["country"]) == set(), error
+    assert set(tb_spreadsheet["country"]) - set(tb_consolidated["country"]) == set(), error
     # However, there are entities in the consolidated dataset which do have nonzero data, which is not present in the spreadsheet.
     # But they are all "Other*" regions, so we can also ignore them.
-    # tb[tb["country"] == "Other Eastern Africa"].loc[:, subset.ne(0).any()]
-    assert set(tb_consolidated["country"]) - set(tb_additional["country"]) == {
-        "Other Eastern Africa",
-        "Other Middle Africa",
-        "Other North America",
-        "Other Western Africa",
-    }
 
-    # Check that the only indicator that is in the spreadsheet and not in the consolidated dataset is primary energy consumption.
-    error = "Expected only primary energy consumption to be in the spreadsheet but not in the consolidated dataset."
-    assert set(tb_additional.columns) - set(tb_consolidated.columns) == {"primary_ej"}, error
+    # Check that the only indicators that are in the spreadsheet and not in the consolidated dataset are primary energy consumption, and renewable power including hydro.
+    error = "Unexpected mismatch between sheets in the main file and columns in the consolidated dataset."
+    assert set(tb_spreadsheet.columns) - set(tb_consolidated.columns) == {
+        "primary_ej",
+        "ren_power_inc_hydro_ej",
+        "ren_power_inc_hydro_twh",
+    }, error
 
     # Combine data from the consolidated dataset with the one from the spreadsheet.
     # If an indicator is in the spreadsheet, take that one, otherwise, take it from the consolidated dataset.
@@ -546,9 +552,9 @@ def combine_consolidated_dataset_and_spreadsheet(tb_consolidated, data_additiona
         [
             column
             for column in tb_consolidated.columns
-            if column not in tb_additional.drop(columns=["country", "year"]).columns
+            if column not in tb_spreadsheet.drop(columns=["country", "year"]).columns
         ]
-    ].merge(tb_additional, on=["country", "year"], how="outer")
+    ].merge(tb_spreadsheet, on=["country", "year"], how="outer")
 
     return tb_combined
 
@@ -558,45 +564,46 @@ def run() -> None:
     # Load inputs.
     #
     # Retrieve snapshots.
-    snap = paths.load_snapshot("statistical_review_of_world_energy.csv")
-    snap_additional = paths.load_snapshot("statistical_review_of_world_energy.xlsx")
+    snap_consolidated = paths.load_snapshot("statistical_review_of_world_energy.csv")
+    snap_spreadsheet = paths.load_snapshot("statistical_review_of_world_energy.xlsx")
 
-    # Most data comes from the wide-format csv file, and some additional variables from the excel file.
-    tb_consolidated = snap.read(underscore=True)
-    data_additional = snap_additional.ExcelFile()
+    # Read data from the wide-format csv file, and from the excel file.
+    tb_consolidated = snap_consolidated.read(underscore=True)
+    data_spreadsheet = snap_spreadsheet.ExcelFile()
 
     #
     # Process data.
     #
     # Extract most of the data from the main spreadsheet, and some from the consolidated dataset.
-    # NOTE: It used to be the other way around, and we usted to rely mostly on the consolidated dataset.
-    # But several important issues have been detected in the consolidated dataset (see docstring of snapshot).
-    tb = combine_consolidated_dataset_and_spreadsheet(tb_consolidated=tb_consolidated, data_additional=data_additional)
+    # NOTE: It used to be the other way around, and we usted to rely mostly on the consolidated dataset. But several important issues have been detected in the consolidated dataset (see docstring of snapshot).
+    tb = combine_consolidated_dataset_and_spreadsheet(
+        tb_consolidated=tb_consolidated, data_spreadsheet=data_spreadsheet
+    )
 
     # Parse coal reserves sheet.
-    tb_coal_reserves = parse_coal_reserves(data=data_additional)
+    tb_coal_reserves = parse_coal_reserves(data=data_spreadsheet)
 
     # Parse gas reserves sheet.
-    tb_gas_reserves = parse_gas_reserves(data=data_additional)
+    tb_gas_reserves = parse_gas_reserves(data=data_spreadsheet)
 
     # Parse oil reserves sheet.
-    tb_oil_reserves = parse_oil_reserves(data=data_additional)
+    tb_oil_reserves = parse_oil_reserves(data=data_spreadsheet)
 
     # Parse oil spot crude prices.
-    tb_oil_spot_crude_prices = parse_oil_spot_crude_prices(data=data_additional)
+    tb_oil_spot_crude_prices = parse_oil_spot_crude_prices(data=data_spreadsheet)
 
     # Parse oil crude prices.
-    tb_oil_crude_prices = parse_oil_crude_prices(data=data_additional)
+    tb_oil_crude_prices = parse_oil_crude_prices(data=data_spreadsheet)
 
     # Parse gas prices.
-    tb_gas_prices = parse_gas_prices(data=data_additional)
+    tb_gas_prices = parse_gas_prices(data=data_spreadsheet)
 
     # Parse coal prices.
-    tb_coal_prices = parse_coal_prices(data=data_additional)
+    tb_coal_prices = parse_coal_prices(data=data_spreadsheet)
 
     # Parse thermal equivalent efficiency factors.
     tb_efficiency_factors = parse_thermal_equivalent_efficiency(
-        data=data_additional, origin=snap_additional.metadata.origin, license=snap_additional.metadata.license
+        data=data_spreadsheet, origin=snap_spreadsheet.metadata.origin, license=snap_spreadsheet.metadata.license
     )
 
     # Combine main table and coal, gas, and oil reserves.
@@ -651,5 +658,7 @@ def run() -> None:
     # Save outputs.
     #
     # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = paths.create_dataset(tables=[tb, tb_prices, tb_efficiency_factors], default_metadata=snap.metadata)
+    ds_meadow = paths.create_dataset(
+        tables=[tb, tb_prices, tb_efficiency_factors], default_metadata=snap_consolidated.metadata
+    )
     ds_meadow.save()

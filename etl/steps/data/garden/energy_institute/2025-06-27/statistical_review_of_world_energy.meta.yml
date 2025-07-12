@@ -121,14 +121,14 @@ tables:
           name: Other renewables
         presentation:
           title_public: 'Other renewables (including geothermal and biomass)'
-      total_co2_emissions_mtco2:
-        title: 'Carbon dioxide emissions - Mt'
-        unit: 'million tonnes of carbon dioxide'
-        short_unit: 'Mt'
-        description_key:
-          - Figures only reflect carbon emissions through consumption of oil, gas and coal for combustion-related activities, and are based on "Default CO2 Emissions Factors for Combustion" listed by the IPCC in its Guidelines for National Greenhouse Gas Inventories (2006). This does not allow for any carbon that is sequestered, for other sources of carbon emissions, or for emissions of other greenhouse gases. Our data is therefore not comparable to official national emissions data.
-        presentation:
-          title_public: 'Carbon dioxide emissions'
+      # total_co2_emissions_mtco2:
+      #   title: 'Carbon dioxide emissions - Mt'
+      #   unit: 'million tonnes of carbon dioxide'
+      #   short_unit: 'Mt'
+      #   description_key:
+      #     - Figures only reflect carbon emissions through consumption of oil, gas and coal for combustion-related activities, and are based on "Default CO2 Emissions Factors for Combustion" listed by the IPCC in its Guidelines for National Greenhouse Gas Inventories (2006). This does not allow for any carbon that is sequestered, for other sources of carbon emissions, or for emissions of other greenhouse gases. Our data is therefore not comparable to official national emissions data.
+      #   presentation:
+      #     title_public: 'Carbon dioxide emissions'
       coal_consumption_ej:
         title: 'Coal consumption - EJ'
         unit: 'exajoules'

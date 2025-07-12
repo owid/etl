@@ -4,22 +4,23 @@ The Statistical Review of World Energy changed its methodology to calculate ener
 
 Previously, it reported primary energy consumption using what we call the substitution method (or input-equivalent method), where non-fossil power generation (all sources except coal, gas, and oil) was expressed as input-equivalent energy.
 
-With this method:
+With the substitution method:
 - Fossil fuels: Primary energy consumption included the gross calorific value of fossil fuels (i.e., including energy lost as heat during conversion).
-- Non-fossil sources (nuclear and renewables): Energy consumption figures were calculated by inflating electricity generation by roughly 1/0.4 (more precisely, by dividing by a thermal efficiency factor that varied over time).
+- Non-fossil sources (nuclear and renewables): Energy consumption figures were calculated by inflating electricity generation by a factor of roughly 1/0.4 (where the denominator represents the efficiency of a standard thermal power plant; more specifically, it's a factor that's assumed to go from 36% to 41%, depending on the year).
 
-This approach aimed to make non-fossil sources comparable with fossil fuels by assuming they were “as inefficient” as fossil fuel power plants.
+That approach aimed to make non-fossil sources comparable with fossil fuels by assuming they were "as inefficient" as fossil fuel power plants.
 
 In the new methodology (from the 2025 release), energy is reported as Total Energy Supply (TES) using the Physical Energy Content method:
 - Fossil fuels: TES is unchanged. It still includes the full gross calorific value, including energy wasted as heat.
-- Non-combustible renewables (wind, solar PV, hydro, ocean, wave): TES is now simply the gross amount of electricity generated (assuming 100% efficiency, no inflation).
-- Non-fossil sources where the primary energy input is heat (nuclear, geothermal, concentrating solar): The heat input is estimated using assumed thermal efficiencies — 33% for nuclear and concentrating solar, 10% for geothermal, and 33% for biomass.
+- Non-combustible renewables (wind, solar PV, hydro, ocean, wave): TES is now simply the gross amount of electricity generated (assuming 100% efficiency; figures are not inflated).
+- Non-fossil sources where the primary energy input is heat (nuclear, geothermal, concentrating solar): The heat input is estimated using assumed thermal efficiencies — 33% for nuclear and concentrating solar and biomass, and 10% for geothermal.
 
-For now, we are ignoring TES and continuing to adapt consumption of non-fossil sources to match the old substitution method. This is a temporary solution, as moving to the new methodology would require rewriting and adapting hundreds of charts and articles.
+For now, we are ignoring TES and continuing to adapt consumption of non-fossil sources to match the old substitution method. This is a temporary solution, as moving to the new methodology requires rewriting and adapting hundreds of charts and articles.
 
 """
 
-from owid.catalog import Table
+import owid.catalog.processing as pr
+from owid.catalog import Dataset, Table
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder
@@ -147,13 +148,11 @@ COLUMNS = {
     "wind_twh": "wind_electricity_generation_twh",
     # 'wind_twh_net': 'wind_electricity_generation_net_twh',
     # Renewables electricity generation.
-    "electbyfuel_ren_power": "renewables_electricity_generation_twh",
+    "ren_power_inc_hydro_twh": "renewables_electricity_generation_twh",
     # Renewable consumption (input-equivalent).
     # 'renewables_ej': 'renewables_consumption_equivalent_ej',
-    # Renewable (excluding hydropower) consumption (input-equivalent).
-    # 'ren_power_ej': 'renewables_consumption_equivalent_ej',
     # Renewable (excluding hydropower) electricity generation.
-    # 'ren_power_twh': 'renewables_electricity_generation_twh',
+    # "electbyfuel_ren_power": "",
     # 'ren_power_twh_net': 'renewables_electricity_generation_net_twh',
     # Biodiesel production.
     # "biodiesel_prod_kboed": "biodiesel_production_kboed",
@@ -182,7 +181,7 @@ COLUMNS = {
     # Oil reserves.
     "oil_reserves_bbl": "oil_reserves_bbl",
     # CO2 and methane emissions.
-    "co2_mtco2": "total_co2_emissions_mtco2",
+    # "co2_mtco2": "total_co2_emissions_mtco2",
     # Other unused columns.
     # "kerosene_cons_kbd": "kerosene_consumption_kbd",
     # 'oilprod_crudecond_kbd': 'oil_crude_oil_production_kbd',
@@ -277,15 +276,28 @@ COLUMNS_PRICES = {
 
 # Regions to use to create aggregates.
 REGIONS = {
+    ####################################################################################################################
+    # NOTE: Given that the definition of Africa is the same for OWID and EI, and given some of the issues mentioned below, we will remove the aggregate for Africa, and simply copy the original one by EI. So the list of "additional_members" here is only kept for information purposes and sanity checks.
     "Africa": {
         "additional_members": [
-            # Additional African regions (e.g. 'Other Western Africa (EI)') seem to be included in
-            # 'Other Africa (EI)', therefore we ignore them when creating aggregates.
+            # Some indicators have Other Northern Africa and Other Southern Africa, while other indicators have Other Africa. But there is no indicator where both Other Northern or Southern Africa and Other Africa are informed at the same time (this is asserted in the code). So we can safely sum Other Northern Africa, Other Southern Africa, and Other Africa.
+            "Other Northern Africa (EI)",
+            "Other Southern Africa (EI)",
             "Other Africa (EI)",
+            # There are also Other Eastern/Middle/Western Africa regions, but they are always empty or zero (this is asserted in code), so they can be ignored.
+            "Other Eastern Africa (EI)",
+            "Other Middle Africa (EI)",
+            "Other Western Africa (EI)",
+            # NOTE: I detected that, in the consolidated dataset, for biofuels consumption "Eastern Africa (EI)" coincides with "Other Africa (EI)", which is probably a mistake. Meanwhile, in the spreadsheet, there is only data for "Total Africa" (which is nonzero, despite no African country being informed).
+            "Western Africa (EI)",
+            "Middle Africa (EI)",
+            "Eastern Africa (EI)",
         ],
     },
+    ####################################################################################################################
     "Asia": {
         "additional_members": [
+            # TODO: Apply the same logic implemented for South and Central America to CIS and Asia Pacific.
             # Adding 'Other Asia Pacific (EI)' may include areas of Oceania in Asia.
             # However, it seems that this region is usually significantly smaller than Asia.
             # So, we are possibly overestimating Asia, but not by a significant amount.
@@ -306,17 +318,18 @@ REGIONS = {
         "additional_members": [
             "Other Caribbean (EI)",
             "Other North America (EI)",
+            "Central America (EI)",
         ],
     },
+    # NOTE: There is also "Other S. & Cent. America" (renamed "Other South and Central America (EI)"). This cannot be mapped to either North America or South America. We simply keep it as a separate entity, and, on indicators where it becomes significant compared to South America, we remove the aggregate for South America (and idem for North America).
     "South America": {
         "additional_members": [
             "Other South America (EI)",
         ],
     },
-    # Given that 'Other Asia and Pacific (EI)' is often similar or even larger than Oceania, we avoid including it in
-    # Oceania (and include it in Asia, see comment above).
-    # This means that we may be underestimating Oceania by a significant amount, but EI does not provide unambiguous
-    # data to avoid this.
+    # Given that 'Other Asia and Pacific (EI)' is often similar or even larger than Oceania, we avoid including it in Oceania (and include it in Asia, see comment above).
+    # This means that we may be underestimating Oceania by a significant amount, but EI does not provide unambiguous data to avoid this.
+    # TODO: Reconsider this choice, and possibly remove Oceania, where that term is large (same logic as for South America).
     "Oceania": {},
     # Income groups.
     "Low-income countries": {},
@@ -324,6 +337,24 @@ REGIONS = {
     "Upper-middle-income countries": {},
     "High-income countries": {},
 }
+
+# Regions that don't need to be included as part of other region aggregates (unlike, e.g. "Other Africa (EI)", which needs to be added to "Africa").
+REGIONS_NOT_ASSIGNED_TO_OTHER_REGIONS = [
+    "Africa (EI)",
+    "Asia Pacific (EI)",
+    "CIS (EI)",
+    "Europe (EI)",
+    "Middle East (EI)",
+    "Middle East and Africa (EI)",
+    "Non-OECD (EI)",
+    "Non-OPEC (EI)",
+    "North America (EI)",
+    "OECD (EI)",
+    "OPEC (EI)",
+    "Other South and Central America (EI)",
+    "Rest of World (EI)",
+    "South and Central America (EI)",
+]
 
 
 def create_additional_variables(tb: Table) -> Table:
@@ -431,7 +462,7 @@ def fix_missing_nuclear_energy_data(tb: Table) -> Table:
         "Austria",
         "Azerbaijan",
         "Bahrain",
-        # Bangladesh is building its first nuclear power plant, to be commissioned in 2024.
+        # Bangladesh is building its first nuclear power plant, expected to become operational in December 2025.
         # https://en.wikipedia.org/wiki/Rooppur_Nuclear_Power_Plant
         "Bangladesh",
         "Bolivia",
@@ -449,12 +480,12 @@ def fix_missing_nuclear_energy_data(tb: Table) -> Table:
         "Denmark",
         # 'Eastern Africa (EI)',
         "Ecuador",
-        # Egypt is building its first nuclear power plant, to be commissioned in 2026.
+        # Egypt is building its first nuclear power plant, to be commissioned in 2028.
         # https://en.wikipedia.org/wiki/El_Dabaa_Nuclear_Power_Plant
         "Egypt",
         "Equatorial Guinea",
-        # Estonia has plans to built a nuclear power plant in 2024.
-        # https://en.wikipedia.org/wiki/Nuclear_power_in_Estonia
+        # Estonia has plans to build a nuclear power plant, which could start operating in 2035.
+        # https://www.world-nuclear-news.org/articles/estonia-starts-planning-process-for-smr-plant
         "Estonia",
         "Gabon",
         "Guyana",
@@ -520,7 +551,7 @@ def fix_missing_nuclear_energy_data(tb: Table) -> Table:
         "Trinidad and Tobago",
         "Tunisia",
         # Turkey's first nuclear power reactor is now expected to be connected to the grid in 2025.
-        # https://world-nuclear.org/information-library/country-profiles/countries-t-z/turkey#:~:text=Turkey%20has%20had%20plans%20for,financed%20and%20built%20by%20Russia.
+        # https://world-nuclear.org/information-library/country-profiles/countries-t-z/turkey
         "Turkey",
         "Turkmenistan",
         "Uzbekistan",
@@ -602,6 +633,116 @@ def fix_missing_nuclear_energy_data(tb: Table) -> Table:
     return tb
 
 
+def fix_issues_with_other_south_and_central_america(tb: Table) -> Table:
+    tb = tb.copy()
+    # TODO: Adapt to also check for other overlapping regions like "Other Asia Pacific".
+    # Remove aggregates of North America and/or South America for indicators where Other South and Central America  is large enough compared to those aggregates.
+    tb_other_south_and_central_america = (
+        tb[(tb["country"] == "Other South and Central America (EI)")].fillna(0).reset_index(drop=True)
+    )
+    for continent in ["South America", "North America"]:
+        tb_continent = tb[(tb["country"] == continent)].fillna(0).reset_index(drop=True)
+        for column in tb.drop(columns=["country", "year"]).columns:
+            remove_aggregate = False
+            # Define the "minimum range" of values that we care about (which is 10% of the maximum range of values for this indicator in the continent).
+            min_range = (tb_continent[column].max() - tb_continent[column].min()) / 10
+            # If "Other South and Central America" has any value larger than the minimum range, consider removing the aggregate.
+            mask = tb_other_south_and_central_america[column] > min_range
+            if mask.any():
+                max_dev = (
+                    100 * tb_other_south_and_central_america[mask][column] / (tb_continent[mask][column] + 1e-6)
+                ).max()
+                if max_dev > 10:
+                    # If the value for "Other South and Central America" is larger than 10% of the value for the continent, remove the aggregate.
+                    remove_aggregate = True
+
+            if remove_aggregate:
+                # Remove this aggregate.
+                tb.loc[(tb["country"] == continent), column] = None
+                # Uncomment to plot cases where aggregate was removed.
+                # px.line(pd.concat([tb_other_south_and_central_america, tb_continent]), x="year", y=column, color="country", markers=True, title="TO BE REMOVED").show()
+            # else:
+            #     # Uncomment to plot cases where the aggregates were kept.
+            #     px.line(pd.concat([tb_other_south_and_central_america, tb_continent]), x="year", y=column, color="country", markers=True).show()
+
+        return tb
+
+
+def create_region_aggregates(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Table:
+    # Sanity checks around the "Other *" regions. These are values that cannot be assigned to individual countries, but should be included in region aggregates.
+    # Check that the additional members mentioned in REGIONS (defined above) are as expected.
+    other_regions_found = set(tb[tb["country"].str.contains("(EI)", regex=False)]["country"])
+    other_regions_expected = set(
+        sum([member for member in [REGIONS[region].get("additional_members") for region in REGIONS] if member], [])
+    )
+    error = "Mismatch between expected 'Other *' regions and those found in the data."
+    assert other_regions_found - other_regions_expected == set(REGIONS_NOT_ASSIGNED_TO_OTHER_REGIONS), error
+    assert other_regions_expected - other_regions_found == set(), error
+
+    # TODO: Consider removing the following check, or, alternatively, generalize it to all EI regions.
+    # Check that "Other Africa" is never informed at the same time as either "Other Northern Africa" or "Other Southern Africa".
+    # NOTE: This is not fulfilled in the consolidated dataset, e.g. for biofuels consumption.
+    for column in tb.drop(columns=["country", "year"]).columns:
+        _tb_other_africa = tb[(tb["country"] == "Other Africa (EI)") & (tb[column].fillna(0) > 0)]
+        _tb_northern_or_southern_africa = tb[
+            (tb["country"].isin(["Other Northern Africa (EI)", "Other Southern Africa (EI)"]))
+            & (tb[column].fillna(0) > 0)
+        ]
+        assert not ((len(_tb_other_africa) > 0) and (len(_tb_northern_or_southern_africa) > 0))
+
+    # Add region aggregates.
+    tb = geo.add_regions_to_table(
+        tb,
+        regions=REGIONS,
+        ds_regions=ds_regions,
+        ds_income_groups=ds_income_groups,
+        min_num_values_per_year=1,
+        ignore_overlaps_of_zeros=True,
+        accepted_overlaps=KNOWN_OVERLAPS,
+    )
+
+    # Fix issues with "Other South and Central America", which cannot be assigned to either North or South America.
+    tb = fix_issues_with_other_south_and_central_america(tb=tb)
+
+    # NOTE: "Other *" regions mean different set of countries for different variables.
+    # We could remove them to avoid confusion. But it can also create confusion if aggregates do not add up to the sum of the expected countries. For some indicators, "Other *" regions carry a significant value.
+    # If we decide to remove these regions, do it *after* creating region aggregates, otherwise those regions would be underestimated.
+    # tb = tb[~tb["country"].str.startswith("Other ")].reset_index(drop=True)
+
+    # region = "Africa"
+    # for column in tb.drop(columns=["country", "year"]).columns:
+    #     px.line(tb[tb["country"].isin([region, f"{region} (EI)"])], x="year", y=column, color="country", markers=True).show()
+
+    # As mentioned above, given that OWID and EI define Africa in the same way, and given the issues around biofuels, we'll simply copy EI's aggregate.
+    tb_africa = tb[tb["country"] == "Africa (EI)"].reset_index(drop=True).assign(**{"country": "Africa"})
+    tb = pr.concat([tb[tb["country"] != "Africa"], tb_africa], ignore_index=True)
+
+    # TODO: There's an additional complication. Sometimes, there is no data for individual countries of a region, but there is data for the total region. For example, biofuels production (PJ) has data for Total Africa, Total CIS, and Total Middle East, but there's no way to know where those values come from. Given that we ignore those totals (otherwise we would be double-counting regions) this creates a mismatch between the EI continents and our aggregates. For example, the "Africa" aggregate for biofuels production is zero, whereas "Africa (EI)" is not. This may be tricky to solve, may not be worth it.
+
+    return tb
+
+
+def create_primary_energy_in_input_equivalents(tb: Table):
+    # NOTE: In the latest methodology, they have not included a thermal efficiency factor for the latest year (I suppose that this is because thermal efficiency factors are only used for the (legacy) primary energy consumption). Check that, indeed, this factor is missing for the latest year, and then fill it with the previously informed year.
+    error = "Expected efficiency factor to be missing for the latest year."
+    assert set(tb[tb["efficiency_factor"].isnull()]["year"]) == {tb["year"].max()}, error
+    error = "Table was expected to be sorted chronologically (to forward-fill missing thermal efficiency factors)."
+    assert set(tb.groupby(["country"])["year"].diff().fillna(1)) == {1}, error
+    tb["efficiency_factor"] = tb["efficiency_factor"].ffill()
+
+    # Create primary energy consumption in input-equivalents.
+    # NOTE: This only needs to be done to non-fossil generation sources (which are "inflated" to mimic fossil inefficiencies). Fossil fuels consumption is by construction identical to primary energy consumption.
+    for source in ["nuclear", "hydro", "other_renewables", "solar", "wind"]:
+        tb[f"{source}_consumption_equivalent_twh"] = (
+            tb[f"{source}_electricity_generation_twh"] / tb["efficiency_factor"]
+        )
+        tb[f"{source}_consumption_equivalent_ej"] = (
+            tb[f"{source}_consumption_equivalent_twh"] / EJ_TO_TWH
+        ).copy_metadata(tb[f"{source}_consumption_equivalent_ej"])
+
+    return tb
+
+
 def run() -> None:
     #
     # Load inputs.
@@ -635,40 +776,14 @@ def run() -> None:
     # Create additional variables, like primary energy consumption in TWh (both direct and in input-equivalents).
     tb = create_additional_variables(tb=tb)
 
-    # Add region aggregates.
-    tb = geo.add_regions_to_table(
-        tb,
-        regions=REGIONS,
-        ds_regions=ds_regions,
-        ds_income_groups=ds_income_groups,
-        min_num_values_per_year=1,
-        ignore_overlaps_of_zeros=True,
-        accepted_overlaps=KNOWN_OVERLAPS,
-    )
+    # Create region aggregates and fix various related issues.
+    tb = create_region_aggregates(tb=tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups)
 
     # Add column for thermal equivalent efficiency factors.
     tb = tb.merge(tb_efficiency, how="left", on="year")
 
-    # NOTE: In the latest methodology, they have not included a thermal efficiency factor for the latest year (I suppose that this is because thermal efficiency factors are only used for the (legacy) primary energy consumption). Check that, indeed, this factor is missing for the latest year, and then fill it with the previously informed year.
-    error = "Expected efficiency factor to be missing for the latest year."
-    assert set(tb[tb["efficiency_factor"].isnull()]["year"]) == {tb["year"].max()}, error
-    error = "Table was expected to be sorted chronologically (to forward-fill missing thermal efficiency factors)."
-    assert set(tb.groupby(["country"])["year"].diff().fillna(1)) == {1}, error
-    tb["efficiency_factor"] = tb["efficiency_factor"].ffill()
-
-    # Create primary energy consumption in input-equivalents.
-    # NOTE: This only needs to be done to non-fossil generation sources (which are "inflated" to mimic fossil inefficiencies). Fossil fuels consumption is by construction identical to primary energy consumption.
-    for source in ["nuclear", "hydro", "other_renewables", "solar", "wind"]:
-        tb[f"{source}_consumption_equivalent_twh"] = (
-            tb[f"{source}_electricity_generation_twh"] / tb["efficiency_factor"]
-        )
-        tb[f"{source}_consumption_equivalent_ej"] = (
-            tb[f"{source}_consumption_equivalent_twh"] / EJ_TO_TWH
-        ).copy_metadata(tb[f"{source}_consumption_equivalent_ej"])
-
-    # Remove "Other *" regions, since they mean different set of countries for different variables.
-    # NOTE: They have to be removed *after* creating region aggregates, otherwise those regions would be underestimated.
-    tb = tb[~tb["country"].str.startswith("Other ")].reset_index(drop=True)
+    # Create primary energy consumption in input equivalents for non-fossil sources (for consistency with previous releases).
+    tb = create_primary_energy_in_input_equivalents(tb=tb)
 
     # Set an appropriate index to main table and sort conveniently.
     tb = tb.format(sort_columns=True)
