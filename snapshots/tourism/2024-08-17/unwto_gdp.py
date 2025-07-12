@@ -1,24 +1,18 @@
 """Script to create a snapshot of dataset."""
 
-from pathlib import Path
+from etl.helpers import PathFinder
 
-import click
-
-from etl.snapshot import Snapshot
-
-# Version for current snapshot dataset.
-SNAPSHOT_VERSION = Path(__file__).parent.name
+paths = PathFinder(__file__)
 
 
-@click.command()
-@click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
-def main(upload: bool) -> None:
-    # Create a new snapshot.
-    snap = Snapshot(f"tourism/{SNAPSHOT_VERSION}/unwto_gdp.xlsx")
+def run(upload: bool = True) -> None:
+    """Create a new snapshot.
+
+    Args:
+        upload: Whether to upload the snapshot to S3.
+    """
+    # Init snapshot object
+    snap = paths.init_snapshot()
 
     # Download data from source, add file to DVC and upload to S3.
     snap.create_snapshot(upload=upload)
-
-
-if __name__ == "__main__":
-    main()

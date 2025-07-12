@@ -160,6 +160,7 @@ GROUPS = (
         {
             "name": "Data",
             "commands": {
+                "snapshot": "etl.snapshot_command.snapshot_cli",
                 "harmonize": "etl.harmonize.harmonize",
                 "diff": "etl.datadiff.cli",
                 "graphviz": "etl.to_graphviz.to_graphviz",
