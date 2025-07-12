@@ -1,0 +1,112 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Economic Growth
+    processing_level: major
+    type: int
+    sort: []
+
+  description_processing_count_population: We count the countries in each income group and also calculate the total population in them by using a long-run dataset [maintained by Our World in Data](https://ourworldindata.org/population-sources).
+
+
+
+dataset:
+  title: World Bank's income classification
+  update_period_days: 365
+
+tables:
+  income_groups_aggregations:
+    title: World Bank's income classification
+    variables:
+      classification_low_income_countries_count:
+        title: Number of low-income countries
+        unit: ""
+        description_short: Number of countries classified as low income by the World Bank.
+        description_processing: "{definitions.description_processing_count_population}"
+        display:
+          name: Low income
+        presentation:
+          title_public: Number of low-income countries
+
+      classification_lower_middle_income_countries_count:
+        title: Number of lower-middle-income countries
+        unit: ""
+        description_short: Number of countries classified as lower-middle income by the World Bank.
+        description_processing: "{definitions.description_processing_count_population}"
+        display:
+          name: Lower-middle income
+        presentation:
+          title_public: Number of lower-middle-income countries
+
+      classification_upper_middle_income_countries_count:
+        title: Number of upper-middle-income countries
+        unit: ""
+        description_short: Number of countries classified as upper-middle income by the World Bank.
+        description_processing: "{definitions.description_processing_count_population}"
+        display:
+          name: Upper-middle income
+        presentation:
+          title_public: Number of upper-middle-income countries
+
+      classification_high_income_countries_count:
+        title: Number of high-income countries
+        unit: ""
+        description_short: Number of countries classified as high income by the World Bank.
+        description_processing: "{definitions.description_processing_count_population}"
+        display:
+          name: High income
+        presentation:
+          title_public: Number of high-income countries
+
+      classification_low_income_countries_pop:
+        title: Population of low-income countries
+        unit: ""
+        description_short: Population of countries classified as low income by the World Bank.
+        description_processing: "{definitions.description_processing_count_population}"
+        display:
+          name: Low income
+        presentation:
+          title_public: Population of low-income countries
+
+      classification_lower_middle_income_countries_pop:
+        title: Population of lower-middle-income countries
+        unit: ""
+        description_short: Population of countries classified as lower-middle income by the World Bank.
+        description_processing: "{definitions.description_processing_count_population}"
+        display:
+          name: Lower-middle income
+        presentation:
+          title_public: Population of lower-middle-income countries
+
+      classification_upper_middle_income_countries_pop:
+        title: Population of upper-middle-income countries
+        unit: ""
+        description_short: Population of countries classified as upper-middle income by the World Bank.
+        description_processing: "{definitions.description_processing_count_population}"
+        display:
+          name: Upper-middle income
+        presentation:
+          title_public: Population of upper-middle-income countries
+
+      classification_high_income_countries_pop:
+        title: Population of high-income countries
+        unit: ""
+        description_short: Population of countries classified as high income by the World Bank.
+        description_processing: "{definitions.description_processing_count_population}"
+        display:
+          name: High income
+        presentation:
+          title_public: Population of high-income countries
+
+      classification_missing_pop:
+        title: Population of countries with no data on income classification
+        unit: ""
+        description_short: Population of countries with no data on income classification by the World Bank.
+        description_processing: "{definitions.description_processing_count_population}"
+        display:
+          name: No data on income classification
+        presentation:
+          title_public: Population of countries with no data on income classification
+
+
