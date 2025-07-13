@@ -266,3 +266,67 @@ def test__validate_description_key():
         gh._validate_description_key(description_key, col)
     except AssertionError:
         assert False, f"AssertionError raised for valid description_key: {description_key}"
+
+
+def test_yield_wide_table_with_origins_and_dimensions():
+    """Test that origins are properly filtered based on dimensions when converting long to wide."""
+    from owid.catalog import Origin
+
+    # Create origins with different dimensions - now using list of dictionaries
+    origin_male = Origin(
+        producer="Producer A",
+        title="Data for males",
+        dimensions=[{"sex": "male"}],
+    )
+    origin_female = Origin(
+        producer="Producer B",
+        title="Data for females",
+        dimensions=[{"sex": "female"}],
+    )
+    origin_both = Origin(
+        producer="Producer C",
+        title="Data for both",
+        dimensions=[{"sex": "female"}, {"sex": "male"}],  # List applies to both sexes
+    )
+    origin_all = Origin(
+        producer="Producer D",
+        title="Data for all",
+        # No dimensions - should apply to all
+    )
+
+    df = pd.DataFrame(
+        {
+            "year": [2019, 2019, 2019, 2019],
+            "entityId": [1, 1, 1, 1],
+            "sex": ["male", "female", "male", "female"],
+            "deaths": [10, 20, 30, 40],
+        }
+    )
+    table = Table(df.set_index(["entityId", "year", "sex"]))
+    table.deaths.metadata.unit = "people"
+    table.deaths.metadata.title = "Deaths"
+    table.deaths.metadata.origins = [origin_male, origin_female, origin_both, origin_all]
+
+    grapher_tables = list(gh._yield_wide_table(table))
+
+    assert len(grapher_tables) == 2
+
+    # Check male deaths table - use exact column name matching
+    male_table = [t for t in grapher_tables if t.columns[0] == "deaths__sex_male"][0]
+    male_origins = male_table[male_table.columns[0]].metadata.origins
+    assert len(male_origins) == 3  # origin_male, origin_both, and origin_all
+    origin_producers = [o.producer for o in male_origins]
+    assert "Producer A" in origin_producers  # male-specific origin
+    assert "Producer C" in origin_producers  # both sexes origin (list-based)
+    assert "Producer D" in origin_producers  # general origin
+    assert "Producer B" not in origin_producers  # female-specific origin should be filtered out
+
+    # Check female deaths table - use exact column name matching
+    female_table = [t for t in grapher_tables if t.columns[0] == "deaths__sex_female"][0]
+    female_origins = female_table[female_table.columns[0]].metadata.origins
+    assert len(female_origins) == 3  # origin_female, origin_both, and origin_all
+    origin_producers = [o.producer for o in female_origins]
+    assert "Producer B" in origin_producers  # female-specific origin
+    assert "Producer C" in origin_producers  # both sexes origin (list-based)
+    assert "Producer D" in origin_producers  # general origin
+    assert "Producer A" not in origin_producers  # male-specific origin should be filtered out
