@@ -719,18 +719,42 @@ def create_region_aggregates(tb: Table, ds_regions: Dataset, ds_income_groups: D
 
     # NOTE: "Other *" regions mean different set of countries for different variables.
     # We could remove them to avoid confusion. But it can also create confusion if aggregates do not add up to the sum of the expected countries. For some indicators, "Other *" regions carry a significant value.
-    # If we decide to remove these regions, do it *after* creating region aggregates, otherwise those regions would be underestimated.
-    # tb = tb[~tb["country"].str.startswith("Other ")].reset_index(drop=True)
-
-    # region = "Africa"
-    # for column in tb.drop(columns=["country", "year"]).columns:
-    #     px.line(tb[tb["country"].isin([region, f"{region} (EI)"])], x="year", y=column, color="country", markers=True).show()
 
     # As mentioned above, given that OWID and EI define Africa in the same way, and given the issues around biofuels, we'll simply copy EI's aggregate.
     tb_africa = tb[tb["country"] == "Africa (EI)"].reset_index(drop=True).assign(**{"country": "Africa"})
     tb = pr.concat([tb[tb["country"] != "Africa"], tb_africa], ignore_index=True)
 
-    # TODO: There's an additional complication. Sometimes, there is no data for individual countries of a region, but there is data for the total region. For example, biofuels production (PJ) has data for Total Africa, Total CIS, and Total Middle East, but there's no way to know where those values come from. Given that we ignore those totals (otherwise we would be double-counting regions) this creates a mismatch between the EI continents and our aggregates. For example, the "Africa" aggregate for biofuels production is zero, whereas "Africa (EI)" is not. To solve this, simply visually check (at least for the current release) when does this happen, apart from Africa. If there's any other case, it could be solved by creating their aggregate separately, including those continent totals.
+    # There's an additional complication. Sometimes, the spreadsheet has no data for individual countries of a region, but it does have data for the "Total" of the region.
+    # For example, biofuels production (PJ) has data for "Total Africa", "Total CIS", and "Total Middle East", but there's no way to know where those values come from. Given that we ignore those totals (otherwise we would be double-counting regions) this creates a mismatch between the EI continents and our aggregates. To solve this, simply visually check (at least for the current release) when does this happen, apart from Africa. If there's any other case, it could be solved by creating their aggregate separately, including those continent totals. Cases detected:
+    def _check_subregion_is_small_compared_to_region(tb, subregion, region, indicator, percentage):
+        _tb_subregion = tb[tb["country"] == subregion][["year", indicator]]
+        _tb_region = tb[tb["country"] == region][["year", indicator]]
+        check = _tb_subregion.merge(_tb_region, on=["year"], how="inner", suffixes=("_subregion", "_region")).dropna()
+        error = f"Expected '{subregion}' to be non-empty (despite no individual country being informed). This entity is now empty. Consider removing this fix."
+        assert (not check.empty) and (not check[check[f"{indicator}_subregion"] > 0].empty), error
+        error = f"Expected '{subregion}' {indicator} to be a small fraction of the aggregate for {region}. This is no longer the case. Consider removing the aggregate for {region} for {indicator}."
+        assert ((check[f"{indicator}_subregion"] / check[f"{indicator}_region"] * 100) < percentage).all(), error
+
+    # * Middle East, for "Coal Production - mt". In this case, simply check that Middle East is so small compared to Asia (less than 0.2%), that we can ignore its contribution.
+    _check_subregion_is_small_compared_to_region(
+        tb, subregion="Middle East (EI)", region="Asia", indicator="coal_production_mt", percentage=0.5
+    )
+    # * "Grid Scale BESS Capacity". This is so far not used, so we'll ignore it.
+    # * CIS, Middle East, and Africa, for all biofuels production and consumption indicators. We don't need to check Africa, since we are using the aggregate from EI directly. For CIS and Middle East, we simply check that they are relatively small (less than 5%) compared to the aggregates for Asia and Europe.
+    for indicator in [
+        "biofuels_production_pj",
+        "biofuels_consumption_ej",
+        "biofuels_production_twh",
+        "biofuels_consumption_twh",
+    ]:
+        for subregion in ["Middle East (EI)", "CIS (EI)"]:
+            _check_subregion_is_small_compared_to_region(
+                tb, subregion=subregion, region="Asia", indicator=indicator, percentage=5
+            )
+            _check_subregion_is_small_compared_to_region(
+                tb, subregion=subregion, region="Europe", indicator=indicator, percentage=5
+            )
+    # NOTE: I suppose the previous issue indicates that there can be hidden contributions in the totals of regions in the spreadsheet, even when the data for individual countries are specified. We could programmatically detect these cases, but it would not be trivial. Hopefully this issue happens only when no individual country of a region is informed.
 
     return tb
 
