@@ -329,7 +329,7 @@ def generate_subtitle_by_dimensions(view):
         if sex == "both" or view.matches(sex="sex_side_by_side"):
             description = f"shown as the total number of children not enrolled in {title_term} school"
         else:
-            description = f"shown as the total number of {gender_term} not enrolled in {title_term} school"
+            description = ""
 
     if view.matches(level="level_side_by_side"):
         return f"{gender_term.title()} not enrolled in school across different education levels, {description}."

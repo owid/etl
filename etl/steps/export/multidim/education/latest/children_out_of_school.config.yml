@@ -48,6 +48,6 @@ dimensions:
         name: Girls
       - slug: sex_side_by_side
         name: Girls and Boys
-        description: Compare how girls and boys differ in school participation.
+        description: Compare school participation across different education levels.
 
 views: []
