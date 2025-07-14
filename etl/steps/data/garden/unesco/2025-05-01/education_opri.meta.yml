@@ -513,7 +513,7 @@ tables:
       out_of_school_youth_of_upper_secondary_school_age__both_sexes__number:
         title: Out-of-school children of upper secondary school age
         unit: "children"
-        description_short: Children in the official upper secondary school age range who are not enrolled [upper secondary](#dod:upper-secondary-education) education.
+        description_short: Children in the official upper secondary school age range who are not enrolled in [upper secondary](#dod:upper-secondary-education) education.
         description_key: *desc_key_out_school
         presentation:
           title_public: Out-of-school children of upper secondary school age
