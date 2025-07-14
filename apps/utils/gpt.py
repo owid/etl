@@ -240,6 +240,11 @@ class OpenAIWrapper(OpenAI):
                 **kwargs,
             }
 
+        # Hotfix for temperature values
+        if model in ("o3"):
+            if "temperature" in kwargs:
+                kwargs["temperature"] = 1
+
         # Get chat completion
         chat_completion = self.chat.completions.create(**kwargs)  # type: ignore
 
