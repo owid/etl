@@ -353,13 +353,13 @@ definitions:
 
   # Out-of-school descriptions
   desc_key_out_school: &desc_key_out_school
-  - This indicator shows the share of children or adolescents who are not in school, despite being in the official age range for a given level of education.
-  - It includes those who are not enrolled at that level or any level above it.
-  - Some may have never started school, others may have dropped out, or may be delayed in starting.
-  - Children enrolled in a higher level than their age group are counted as being in school.
-  - Data comes from school records and household surveys, which help identify children not captured in official enrolment figures.
-  - Estimates can be influenced by delays in school entry, inconsistent age reporting, or differences in how enrolment is defined across countries.
-
+    - Many children and adolescents around the world are not in school, even though they are old enough to be. This indicator shows how many are missing out on education at each stage of the system.
+    - It measures the number of individuals in the official age range for a given level of education who are not enrolled at that level or in any higher level.
+    - These children or adolescents may have never entered school, may have dropped out, or may be starting later than expected.
+    - The indicator is calculated by subtracting the number of enrolled individuals in a specific age group from the total population of that group, and expressing the result as a percentage.
+    - High out-of-school rates signal barriers to access — such as poverty, gender inequality, location, or limited availability of schools — and highlight where more targeted support is needed.
+    - The data comes from administrative school enrolment records and household surveys, which provide age-specific insights when compared to population estimates.
+    - As with all education data, results should be interpreted carefully. Differences in how enrolment is defined, inconsistencies in age reporting, and timing of data collection (such as during holidays or late in the school year) can affect accuracy.
   # Education system descriptions
   desc_key_private_enrolment: &desc_key_private_enrolment
     - In many countries, education is provided not only by the government but also by private institutions — this indicator shows how much of total enrolment is taking place in privately run schools or educational programmes.

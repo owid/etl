@@ -326,7 +326,7 @@ def generate_subtitle_by_dimensions(view):
         else:
             description = f"expressed as a percentage of the total population of {gender_term} in that age group"
     else:  # number
-        if sex == "both" or view.matches(sex="sex_side_by_side"):
+        if view.matches(sex="sex_side_by_side"):
             description = f"shown as the total number of children not enrolled in {title_term} school"
         else:
             description = ""
