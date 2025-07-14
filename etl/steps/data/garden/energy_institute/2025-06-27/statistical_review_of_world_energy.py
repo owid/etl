@@ -652,6 +652,11 @@ def fix_issues_with_other_regions(tb: Table) -> Table:
         # NOTE: As explained above (where REGIONS are defined), we don't include "Oceania" here because most of "Other Asia Pacific (EI)" are Asian countries; including "Oceania" here would imply unnecessarily removing that aggregate for many indicators.
         "Other Asia Pacific (EI)": ["Asia"],
     }
+    # Fraction of the range (between maximum and minimum) above which discrepancies between "Other *" regions and their containing aggregate regions will be considered for removal.
+    fraction_of_range = 10
+    # Percentage (of "Other *" with respect to its containing aggregate region) above which the aggregate region will be removed.
+    max_percentage_deviation = 10
+    # Remove aggregates in columns for which an overlapping "Other *" region has a significant contribution, compared to the aggregate.
     for other_region, owid_regions in ei_regions_and_overlapping_owid_regions.items():
         tb_other = tb[(tb["country"] == other_region)].fillna(0).reset_index(drop=True)
         for continent in owid_regions:
@@ -659,12 +664,12 @@ def fix_issues_with_other_regions(tb: Table) -> Table:
             for column in tb.drop(columns=["country", "year"]).columns:
                 remove_aggregate = False
                 # Define the "minimum range" of values that we care about (which is 10% of the maximum range of values for this indicator in the continent).
-                min_range = (tb_continent[column].max() - tb_continent[column].min()) / 10
+                min_range = (tb_continent[column].max() - tb_continent[column].min()) / fraction_of_range
                 # If the "Other *" region has any value larger than the minimum range, consider removing the aggregate.
                 mask = tb_other[column] > min_range
                 if mask.any():
                     max_dev = (100 * tb_other[mask][column] / (tb_continent[mask][column] + 1e-6)).max()
-                    if max_dev > 10:
+                    if max_dev > max_percentage_deviation:
                         # If any of the values for the "Other *" region is larger than 10% of the value for the continent, remove the aggregate.
                         remove_aggregate = True
 

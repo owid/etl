@@ -395,6 +395,7 @@ def fix_discrepancies_in_aggregate_regions(tb_review: Table, tb_ember: Table, co
                     )
                     if median_error > maximum_median_error:
                         _remove_combination.append(col)
+                        # DEBUGGING: Uncomment to plot.
                         # px.line(compared.melt(id_vars="year"), x="year", y="value", color="variable", markers=True, title=f"{region} - {col}").show()
                         assert compared["year"].min() == 2000, "Minimum year changed."
         error = f"Expected discrepancies between Statistical Review and Ember data for aggregate regions may have changed for region: {region}. Current discrepant indicators: {_remove_combination}. Use this list in 'segments_not_combined'."
