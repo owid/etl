@@ -62,7 +62,7 @@ def run() -> None:
                     "selectedFacetStrategy": "entity",
                     "title": "{title}",
                     "subtitle": "{subtitle}",
-                    "note": "This includes [diphtheria](#dod:diphtheria), [pertussis](#dod:pertussis) and [tetanus](#dod:tetanus) (3rd dose), [measles](#dod:measles) (1st dose), [hepatitis B](#dod:hepatitis-virus) (3rd dose), [polio](#dod:polio) (3rd dose), Haemophilus influenzae b (3rd dose), [rubella](#dod:rubella) (1st dose), [rotavirus](#dod:rotavirus) (final dose), pneumococcal conjugate (3rd dose), and [inactivated polio](#dod:inactivated-polio-vaccine) (first dose).",
+                    "note": "This includes [diphtheria](#dod:diphtheria), [pertussis](#dod:pertussis) and [tetanus](#dod:tetanus) (3rd dose), [measles](#dod:measles) (1st dose), [hepatitis B](#dod:hepatitis-virus) (3rd dose), [polio](#dod:polio) (3rd dose), Haemophilus influenzae b (3rd dose), [rubella](#dod:rubella) (1st dose), [rotavirus](#dod:rotavirus) (final dose),[pneumococcal conjugate](dod:pneumococcal-conjugate-vaccine) (3rd dose), and [inactivated polio](#dod:inactivated-polio-vaccine) (first dose).",
                 },
                 "view_metadata": {
                     "title": "{title}",
