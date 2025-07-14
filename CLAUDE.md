@@ -164,7 +164,7 @@ These are installed as editable packages (`owid-catalog`, `owid-datautils`, `owi
 
 - Always use `geo.harmonize_countries()` for geographic data
 - Follow the `PathFinder` pattern for step inputs/outputs
-- Use content-based checksums - avoid `--force` unless necessary
+- Using `--force` is usually unnecessary - the step will be re-run if the code changes
 - Test steps with `etl run --dry-run` before execution
 - Use `make sync.catalog` to avoid rebuilding entire catalog locally
 - Check `etl d version-tracker` before major changes
