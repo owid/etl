@@ -693,16 +693,21 @@ def create_region_aggregates(tb: Table, ds_regions: Dataset, ds_income_groups: D
     assert other_regions_found - other_regions_expected == set(REGIONS_NOT_ASSIGNED_TO_OTHER_REGIONS), error
     assert other_regions_expected - other_regions_found == set(), error
 
-    # TODO: Consider removing the following check, or, alternatively, generalize it to all EI regions.
-    # Check that "Other Africa" is never informed at the same time as either "Other Northern Africa" or "Other Southern Africa".
-    # NOTE: This is not fulfilled in the consolidated dataset, e.g. for biofuels consumption.
-    for column in tb.drop(columns=["country", "year"]).columns:
-        _tb_other_africa = tb[(tb["country"] == "Other Africa (EI)") & (tb[column].fillna(0) > 0)]
-        _tb_northern_or_southern_africa = tb[
-            (tb["country"].isin(["Other Northern Africa (EI)", "Other Southern Africa (EI)"]))
-            & (tb[column].fillna(0) > 0)
-        ]
-        assert not ((len(_tb_other_africa) > 0) and (len(_tb_northern_or_southern_africa) > 0))
+    # Check that EI regions do not overlap with EI subregions. For example, "Other Africa (EI)" should not be given whenever "Other Northern Africa (EI)" or "Other Southern Africa (EI)" are also informed
+    # This check is not fulfilled in the consolidated dataset, e.g. for biofuels consumption.
+    # NOTE: This check is no longer needed, since it only involves Africa, which is an aggregate we will import directly from EI. But keep the code for now in case other similar cases arise.
+    # ei_regions_and_subregions = {
+    #     "Other Africa (EI)": ["Other Northern Africa (EI)", "Other Southern Africa (EI)"],
+    # }
+    # for ei_region, ei_subregions in ei_regions_and_subregions.items():
+    #     for column in tb.drop(columns=["country", "year"]).columns:
+    #         _tb_ei_region = tb[(tb["country"] == ei_region) & (tb[column].fillna(0) > 0)]
+    #         _tb_ei_subregions = tb[
+    #             (tb["country"].isin(ei_subregions))
+    #             & (tb[column].fillna(0) > 0)
+    #         ]
+    #         error = f"Found overlapping data for {ei_region} and {ei_subregions} in {column}."
+    #         assert not ((len(_tb_ei_region) > 0) and (len(_tb_ei_subregions) > 0))
 
     # Add region aggregates.
     tb = geo.add_regions_to_table(
