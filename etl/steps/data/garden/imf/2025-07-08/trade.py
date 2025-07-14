@@ -64,6 +64,13 @@ def run() -> None:
     tb["total_trade_volume"] = tb["total_exports"] + tb["total_imports"]
     tb["trade_balance_goods__share"] = tb["Trade balance goods, US dollar"] / tb["total_trade_volume"] * 100
 
+    # Calculate share of total trade with each region (exports + imports with region / total trade volume)
+    tb["bilateral_trade_volume"] = (
+        tb["Exports of goods, Free on board (FOB), US dollar"] + 
+        tb["Imports of goods, Cost insurance freight (CIF), US dollar"]
+    )
+    tb["share_of_total_trade"] = tb["bilateral_trade_volume"] / tb["total_trade_volume"] * 100
+
     # Keep only the share columns and identifiers
     tb = tb[
         [
@@ -73,6 +80,7 @@ def run() -> None:
             "exports_of_goods__free_on_board__fob__share",
             "imports_of_goods__cost_insurance_freight__cif__share",
             "trade_balance_goods__share",
+            "share_of_total_trade",
         ]
     ]
 

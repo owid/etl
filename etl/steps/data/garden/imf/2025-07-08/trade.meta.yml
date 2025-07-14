@@ -23,10 +23,10 @@ tables:
         title: Share of total exports of goods (FOB) to << counterpart_country >>
         unit: "%"
         short_unit: "%"
-        description_short: Exports of goods to << counterpart_country >> as a percentage of the country's total exports of goods.
+        description_short: Exports of goods to << counterpart_country >> as a percentage of the region's total exports of goods.
         description_key:
-          - This indicator shows what percentage of a country's total goods exports go to a specific trading partner.
-          - Calculated by dividing exports to the counterpart country by total exports to all countries, then multiplying by 100.
+          - This indicator shows what percentage of a region's total goods exports go to a specific trading partner.
+          - Calculated by dividing exports to the counterpart region by total exports to all countries, then multiplying by 100.
           - Based on Free on Board (FOB) valuation, which includes the value of goods plus all costs of bringing them to the border of the exporting country.
           - Values sum to 100% across all trading partners for each country-year, providing a complete picture of export concentration.
           - A higher percentage indicates greater trade dependence on that particular trading partner for exports.
@@ -41,11 +41,11 @@ tables:
         title: Share of total imports of goods (CIF) from << counterpart_country >>
         unit: "%"
         short_unit: "%"
-        description_short: Imports of goods from << counterpart_country >> as a percentage of the country's total imports of goods.
+        description_short: Imports of goods from << counterpart_country >> as a percentage of the region's total imports of goods.
         description_key:
-          - This indicator shows what percentage of a country's total goods imports come from a specific trading partner.
-          - Calculated by dividing imports from the counterpart country by total imports from all countries, then multiplying by 100.
-          - Based on Cost, Insurance, and Freight (CIF) valuation, which includes the total cost of bringing goods to the importing country's border.
+          - This indicator shows what percentage of a region's total goods imports come from a specific trading partner.
+          - Calculated by dividing imports from the counterpart region by total imports from all countries, then multiplying by 100.
+          - Based on Cost, Insurance, and Freight (CIF) valuation, which includes the total cost of bringing goods to the importing region's border.
           - Values sum to 100% across all trading partners for each country-year, showing the complete import composition.
           - A higher percentage indicates greater import dependence on that particular trading partner.
           - Changes can reflect diversification strategies, supply chain shifts, or changes in trade agreements.
@@ -59,9 +59,9 @@ tables:
         title: Trade balance of goods with << counterpart_country >> as share of total trade volume
         unit: "%"
         short_unit: "%"
-        description_short: Net trade in goods with << counterpart_country >> as a percentage of the country's total trade volume (exports plus imports).
+        description_short: Net trade in goods with << counterpart_country >> as a percentage of the region's total trade volume (exports plus imports).
         description_key:
-          - This indicator shows the trade balance with a specific partner relative to the country's overall trade activity.
+          - This indicator shows the trade balance with a specific partner relative to the region's overall trade activity.
           - Calculated as the trade balance (exports minus imports) divided by total trade volume (exports plus imports), then multiplied by 100.
           - A positive value indicates a trade surplus with that partner relative to total trade size, while negative indicates a deficit.
           - Unlike absolute trade balances, this measure accounts for the overall scale of trade activity.
@@ -72,3 +72,21 @@ tables:
           title_public: Trade balance of goods with << counterpart_country >> as share of total trade volume
         display:
           name: << counterpart_country >>
+
+      share_of_total_trade:
+        title: Share of total trade with << counterpart_country >>
+        unit: "%"
+        short_unit: "%"
+        description_short: Trade with << counterpart_country >> as a percentage of the region's total trade volume (exports plus imports).
+        description_key:
+          - This indicator shows what percentage of a region's total trade volume is conducted with a specific trading partner.
+          - Calculated by dividing bilateral trade volume (exports plus imports with the counterpart country) by total trade volume (exports plus imports with all countries), then multiplying by 100.
+          - Values sum to 100% across all trading partners for each country-year, providing a complete picture of trade concentration.
+          - A higher percentage indicates greater overall trade dependence on that particular trading partner.
+          - This measure captures the total economic relationship intensity, considering both export and import flows.
+          - Changes over time can reflect shifts in trade relationships, economic integration, or diversification strategies.
+          - Useful for identifying major trading partners and assessing trade concentration risks.
+        presentation:
+          title_public: Share of total trade with << counterpart_country >>
+        display:
+          name: Trade with << counterpart_country >>
