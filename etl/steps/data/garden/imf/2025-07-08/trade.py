@@ -1,10 +1,21 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import owid.catalog.processing as pr
+
 from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
+PARTNER_COUNTRY_DICT = {
+    "Latin America and the Caribbean (LAC)": "Latin America and the Caribbean",
+    "Sub-Saharan Africa (SSA)": "Sub-Saharan Africa",
+    "Emerging and Developing Asia": "Emerging and Developing Asia",
+    "Middle East and Central Asia": "Middle East and Central Asia",
+    "Advanced Economies": "Advanced Economies",
+    "Emerging and Developing Europe": "Emerging and Developing Europe",
+}
 
 
 def run() -> None:
@@ -27,6 +38,8 @@ def run() -> None:
         columns="indicator",
         values="value",
     ).reset_index()
+
+    tb["counterpart_country"] = tb["counterpart_country"].replace(PARTNER_COUNTRY_DICT)
 
     # Calculate total trade for each country-year to compute shares
     # Sum exports and imports across all counterpart countries
@@ -66,10 +79,42 @@ def run() -> None:
 
     # Calculate share of total trade with each region (exports + imports with region / total trade volume)
     tb["bilateral_trade_volume"] = (
-        tb["Exports of goods, Free on board (FOB), US dollar"] + 
-        tb["Imports of goods, Cost insurance freight (CIF), US dollar"]
+        tb["Exports of goods, Free on board (FOB), US dollar"]
+        + tb["Imports of goods, Cost insurance freight (CIF), US dollar"]
     )
     tb["share_of_total_trade"] = tb["bilateral_trade_volume"] / tb["total_trade_volume"] * 100
+
+    # Rename rows where country equals counterpart_country to "Intraregional"
+    tb.loc[tb["country"] == tb["counterpart_country"], "counterpart_country"] = "Intraregional"
+
+    # Calculate total net trade balance across all counterpart countries
+    total_net_balance = tb.groupby(["country", "year"])["Trade balance goods, US dollar"].sum().reset_index()
+    total_net_balance["counterpart_country"] = "Total"
+    total_net_balance = total_net_balance.merge(
+        totals[["country", "year", "total_exports", "total_imports"]], on=["country", "year"], how="left"
+    )
+    total_net_balance["total_trade_volume"] = total_net_balance["total_exports"] + total_net_balance["total_imports"]
+    total_net_balance["trade_balance_goods__share"] = (
+        total_net_balance["Trade balance goods, US dollar"] / total_net_balance["total_trade_volume"] * 100
+    )
+
+    # Add empty values for other columns to match structure
+    total_net_balance["exports_of_goods__free_on_board__fob__share"] = None
+    total_net_balance["imports_of_goods__cost_insurance_freight__cif__share"] = None
+    total_net_balance["share_of_total_trade"] = None
+
+    # Select only the columns we need for the total row
+    total_net_balance = total_net_balance[
+        [
+            "country",
+            "year",
+            "counterpart_country",
+            "exports_of_goods__free_on_board__fob__share",
+            "imports_of_goods__cost_insurance_freight__cif__share",
+            "trade_balance_goods__share",
+            "share_of_total_trade",
+        ]
+    ]
 
     # Keep only the share columns and identifiers
     tb = tb[
@@ -83,6 +128,8 @@ def run() -> None:
             "share_of_total_trade",
         ]
     ]
+
+    tb = pr.concat([tb, total_net_balance])
 
     # Improve table format.
     tb = tb.format(["country", "year", "counterpart_country"])
