@@ -18,7 +18,7 @@ def run() -> None:
     # Load data from snapshot.
     tb = snap.read()
 
-    # replace Suppressed/ Unreliable with pd.NA
+    # replace Suppressed (causes with less than 10 deaths this year)/ Unreliable with pd.NA
     tb = tb.replace("Suppressed", pd.NA)
     tb = tb.replace("Unreliable", pd.NA)
 

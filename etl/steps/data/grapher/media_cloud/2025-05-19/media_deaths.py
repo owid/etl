@@ -33,15 +33,15 @@ def run() -> None:
 
     tb = tb.rename(
         index={
-            "deaths_share": "Share of Deaths by Cause (US)",
-            "deaths": "Number of Deaths by Cause (US)",
-            "nyt_share": "Share of Mentions by Cause (New York Times)",
-            "nyt_mentions": "Number of Mentions by Cause (New York Times)",
-            "wapo_share": "Share of Mentions by Cause (Washington Post)",
-            "wapo_mentions": "Number of Mentions by Cause (Washington Post)",
-            "fox_share": "Share of Mentions by Cause (Fox News)",
-            "fox_mentions": "Number of Mentions by Cause (Fox News)",
-            "nyt_over_under": "Factor of Over-/Under-Reporting (Share of Mentions in NYT / Share of Deaths)",
+            "deaths_share": "Share of deaths by cause (US)",
+            "deaths": "Number of deaths by cause (US)",
+            "nyt_share": "Share of mentions by cause (New York Times)",
+            "nyt_mentions": "Number of mentions by cause (New York Times)",
+            "wapo_share": "Share of mentions by cause (Washington Post)",
+            "wapo_mentions": "Number of mentions by cause (Washington Post)",
+            "fox_share": "Share of mentions by cause (Fox News)",
+            "fox_mentions": "Number of mentions by cause (Fox News)",
+            "nyt_over_under": "Factor of over-/under-reporting (Share of mentions in NYT / Share of deaths)",
         }
     )
 
