@@ -133,16 +133,6 @@ def grapher_chart(
             owid_env=owid_env,
         )
 
-    ####################################################################################################################
-    # TODO: Remove this temporary solution after review.
-    chart_config["selectedEntityNames"] = [
-        "Low-income countries",
-        "Upper-middle-income countries",
-        "Lower-middle-income countries",
-        "High-income countries",
-    ]
-    ####################################################################################################################
-
     _chart_html(chart_config, owid_env, height=height, **kwargs)
 
 
