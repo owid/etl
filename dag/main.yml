@@ -743,6 +743,23 @@ steps:
   data://grapher/ivs/2025-06-27/integrated_values_surveys:
     - data://garden/ivs/2025-06-27/integrated_values_surveys
 
+  #
+  # Media deaths
+  #
+  data://meadow/media_cloud/2025-05-19/media_deaths:
+    - snapshot://media_cloud/2025-05-19/media_deaths.csv
+  data://garden/media_cloud/2025-05-19/media_deaths:
+     - data://meadow/media_cloud/2025-05-19/media_deaths
+     - data://meadow/cdc/2025-05-19/external_causes
+     - data://meadow/cdc/2025-05-19/leading_causes
+  data://grapher/media_cloud/2025-05-19/media_deaths:
+    - data://garden/media_cloud/2025-05-19/media_deaths
+
+# CDC Wonder - Causes of Death
+  data://meadow/cdc/2025-05-19/leading_causes:
+    - snapshot://cdc/2025-05-19/leading_causes.csv
+  data://meadow/cdc/2025-05-19/external_causes:
+    - snapshot://cdc/2025-05-19/external_causes.csv
 
   # OECD Affordable Housing Database
   data://garden/oecd/2025-07-03/affordable_housing:
@@ -751,8 +768,6 @@ steps:
   data://grapher/oecd/2025-07-03/affordable_housing:
     - data://garden/oecd/2025-07-03/affordable_housing
 
-
-  #
   # Housing indicators from Korevaar et al.
   #
   data://meadow/housing/2025-07-11/korevaar:
