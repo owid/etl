@@ -1,4 +1,5 @@
 """Script to create a snapshot of dataset."""
+"""Snapshot is created from a local file, which Matthijs Korevaar (https://sites.google.com/view/matthijskorevaar/home) shared with us."""
 
 from pathlib import Path
 
