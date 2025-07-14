@@ -297,23 +297,35 @@ REGIONS = {
     ####################################################################################################################
     "Asia": {
         "additional_members": [
-            # TODO: Apply the same logic implemented for South and Central America to CIS and Asia Pacific.
-            # Adding 'Other Asia Pacific (EI)' may include areas of Oceania in Asia.
-            # However, it seems that this region is usually significantly smaller than Asia.
-            # So, we are possibly overestimating Asia, but not by a significant amount.
+            # The region 'Other Asia Pacific (EI)' may include countries of both Oceania and Asia (according to OWID definitions). Unfortunately, the Statistical Review does not define "Oceania" explicitly in their "Definitions" sheet. However, it seems reasonable to expect that the main (and possibly only) country in "Other Asia Pacific" that belongs to OWID's Oceania would be Papua New Guinea. Other Oceanic countries like Samoa, Kiribati, or Vanuatu, are probably not included, or contributing minimally to the continent, for all indicators. We assume that Papua New Guinea is a small fraction of both Oceania, and Asia. Therefore, we include "Other Asia Pacific (EI)" under "Asia".
+            # This means that we might be underestimating Oceania, and overestimating Asia, but not by a significant amount.
+            # We correct for this issue in Asia. To do so, we remove the aggregate for Asia on any indicators where "Other Asia Pacific (EI)" exceeds a certain fraction.
+            # Note that the same correction cannot be done for Oceania. If we did, we would unnecessarily lose Oceania in many indicators (because the contribution of Asian countries in "Other Asia Pacific (EI)" would be significant).
             "Other Asia Pacific (EI)",
-            # Similarly, adding 'Other CIS (EI)' in Asia may include areas of Europe in Asia (e.g. Moldova).
-            # However, since most countries in 'Other CIS (EI)' are Asian, adding it is more accurate than not adding it.
+            # According to the Statistical Review's "Definitions" sheet, CIS includes four countries that are assigned to Europe in OWID's definition, namely 'Belarus', 'Moldova', 'Russia', 'Ukraine'.
+            # However, in the data, Ukraine is always included as part of Europe; I therefore understand that Ukraine is considered part of CIS only when referring to historical USSR data.
+            # Data for Belarus and Russia are usually informed explicitly in the data (under CIS countries).
+            # Hence, the only European country that could be included in "Other CIS (EI)" is Moldova (which is likely a small fraction). The rest of "Other CIS (EI)" are countries that are assigned to Asia in OWID's definitions.
+            # Therefore, it's safe to assign "Other CIS (EI)" to the Asian aggregate.
+            # Still, for safety, remove the aggregate for Europe and Asia on indicators where "Other CIS (EI)" is a significant fraction of the aggregate. In practice (at least as of the 2025 release), "Other CIS (EI)" is never a significant fraction of "Asia" and it is only a significant (>10%) fraction of "Europe" in the case of electricity from gas.
             "Other CIS (EI)",
             # Countries defined by EI in 'Middle East' are fully included in OWID's definition of Asia.
             "Other Middle East (EI)",
         ],
     },
+    # All countries in EI's definition of Europe are included in OWID's definition of Europe (except Georgia, that OWID includes in Asia).
     "Europe": {
         "additional_members": [
             "Other Europe (EI)",
         ],
     },
+    # NOTE: There is also "Other S. & Cent. America" (renamed "Other South and Central America (EI)"). This cannot be mapped to either North America or South America. We simply keep it as a separate entity. This means we may be underestimating South America and North America, but not by a significant amount. To correct for this issue, on indicators where "Other South and Central America (EI)" becomes significant compared to South America, we remove the aggregate for South America (and idem for North America).
+    "South America": {
+        "additional_members": [
+            "Other South America (EI)",
+        ],
+    },
+    # NOTE: See caveat about "Other South and Central America (EI)" explained above.
     "North America": {
         "additional_members": [
             "Other Caribbean (EI)",
@@ -321,15 +333,8 @@ REGIONS = {
             "Central America (EI)",
         ],
     },
-    # NOTE: There is also "Other S. & Cent. America" (renamed "Other South and Central America (EI)"). This cannot be mapped to either North America or South America. We simply keep it as a separate entity, and, on indicators where it becomes significant compared to South America, we remove the aggregate for South America (and idem for North America).
-    "South America": {
-        "additional_members": [
-            "Other South America (EI)",
-        ],
-    },
     # Given that 'Other Asia and Pacific (EI)' is often similar or even larger than Oceania, we avoid including it in Oceania (and include it in Asia, see comment above).
     # This means that we may be underestimating Oceania by a significant amount, but EI does not provide unambiguous data to avoid this.
-    # TODO: Reconsider this choice, and possibly remove Oceania, where that term is large (same logic as for South America).
     "Oceania": {},
     # Income groups.
     "Low-income countries": {},
@@ -633,37 +638,45 @@ def fix_missing_nuclear_energy_data(tb: Table) -> Table:
     return tb
 
 
-def fix_issues_with_other_south_and_central_america(tb: Table) -> Table:
+def fix_issues_with_other_regions(tb: Table) -> Table:
     tb = tb.copy()
-    # TODO: Adapt to also check for other overlapping regions like "Other Asia Pacific".
-    # Remove aggregates of North America and/or South America for indicators where Other South and Central America  is large enough compared to those aggregates.
-    tb_other_south_and_central_america = (
-        tb[(tb["country"] == "Other South and Central America (EI)")].fillna(0).reset_index(drop=True)
-    )
-    for continent in ["South America", "North America"]:
-        tb_continent = tb[(tb["country"] == continent)].fillna(0).reset_index(drop=True)
-        for column in tb.drop(columns=["country", "year"]).columns:
-            remove_aggregate = False
-            # Define the "minimum range" of values that we care about (which is 10% of the maximum range of values for this indicator in the continent).
-            min_range = (tb_continent[column].max() - tb_continent[column].min()) / 10
-            # If "Other South and Central America" has any value larger than the minimum range, consider removing the aggregate.
-            mask = tb_other_south_and_central_america[column] > min_range
-            if mask.any():
-                max_dev = (
-                    100 * tb_other_south_and_central_america[mask][column] / (tb_continent[mask][column] + 1e-6)
-                ).max()
-                if max_dev > 10:
-                    # If the value for "Other South and Central America" is larger than 10% of the value for the continent, remove the aggregate.
-                    remove_aggregate = True
+    # Dictionary of "Other *" regions, and the OWID regions with which they may overlap.
+    # For example, "Other South and Central America (EI)" could be assigned to either "South America" or "North America" (which, according to OWID region definitions, includes Central America).
+    # This function will check how big the contribution of the "Other *" region is with respect to the overlapping OWID regions; if too big, the OWID region aggregate will be removed for that indicator.
+    # We do this to avoid creating region aggregates that significantly underestimates the true value for the region.
+    # To justify this correction, note that for some indicators (e.g. oil electricity generation), "Other South and Central America (EI)" is actually larger than "South America".
+    # See further explanations above, where REGIONS is defined.
+    ei_regions_and_overlapping_owid_regions = {
+        "Other South and Central America (EI)": ["South America", "North America"],
+        "Other CIS (EI)": ["Asia", "Europe"],
+        # NOTE: As explained above (where REGIONS are defined), we don't include "Oceania" here because most of "Other Asia Pacific (EI)" are Asian countries; including "Oceania" here would imply unnecessarily removing that aggregate for many indicators.
+        "Other Asia Pacific (EI)": ["Asia"],
+    }
+    for other_region, owid_regions in ei_regions_and_overlapping_owid_regions.items():
+        tb_other = tb[(tb["country"] == other_region)].fillna(0).reset_index(drop=True)
+        for continent in owid_regions:
+            tb_continent = tb[(tb["country"] == continent)].fillna(0).reset_index(drop=True)
+            for column in tb.drop(columns=["country", "year"]).columns:
+                remove_aggregate = False
+                # Define the "minimum range" of values that we care about (which is 10% of the maximum range of values for this indicator in the continent).
+                min_range = (tb_continent[column].max() - tb_continent[column].min()) / 10
+                # If the "Other *" region has any value larger than the minimum range, consider removing the aggregate.
+                mask = tb_other[column] > min_range
+                if mask.any():
+                    max_dev = (100 * tb_other[mask][column] / (tb_continent[mask][column] + 1e-6)).max()
+                    if max_dev > 10:
+                        # If any of the values for the "Other *" region is larger than 10% of the value for the continent, remove the aggregate.
+                        remove_aggregate = True
 
-            if remove_aggregate:
-                # Remove this aggregate.
-                tb.loc[(tb["country"] == continent), column] = None
-                # Uncomment to plot cases where aggregate was removed.
-                # px.line(pd.concat([tb_other_south_and_central_america, tb_continent]), x="year", y=column, color="country", markers=True, title="TO BE REMOVED").show()
-            # else:
-            #     # Uncomment to plot cases where the aggregates were kept.
-            #     px.line(pd.concat([tb_other_south_and_central_america, tb_continent]), x="year", y=column, color="country", markers=True).show()
+                if remove_aggregate:
+                    # Uncomment to plot cases where aggregate was removed.
+                    # px.line(pd.concat([tb_other, tb_continent]), x="year", y=column, color="country", markers=True,title="TO BE REMOVED").show()
+                    # Remove this aggregate.
+                    tb.loc[(tb["country"] == continent), column] = None
+                else:
+                    pass
+                    # Uncomment to plot cases where the aggregates were kept.
+                    # px.line(pd.concat([tb_other, tb_continent]), x="year", y=column, color="country", markers=True).show()
 
         return tb
 
@@ -702,7 +715,7 @@ def create_region_aggregates(tb: Table, ds_regions: Dataset, ds_income_groups: D
     )
 
     # Fix issues with "Other South and Central America", which cannot be assigned to either North or South America.
-    tb = fix_issues_with_other_south_and_central_america(tb=tb)
+    tb = fix_issues_with_other_regions(tb=tb)
 
     # NOTE: "Other *" regions mean different set of countries for different variables.
     # We could remove them to avoid confusion. But it can also create confusion if aggregates do not add up to the sum of the expected countries. For some indicators, "Other *" regions carry a significant value.
@@ -717,7 +730,7 @@ def create_region_aggregates(tb: Table, ds_regions: Dataset, ds_income_groups: D
     tb_africa = tb[tb["country"] == "Africa (EI)"].reset_index(drop=True).assign(**{"country": "Africa"})
     tb = pr.concat([tb[tb["country"] != "Africa"], tb_africa], ignore_index=True)
 
-    # TODO: There's an additional complication. Sometimes, there is no data for individual countries of a region, but there is data for the total region. For example, biofuels production (PJ) has data for Total Africa, Total CIS, and Total Middle East, but there's no way to know where those values come from. Given that we ignore those totals (otherwise we would be double-counting regions) this creates a mismatch between the EI continents and our aggregates. For example, the "Africa" aggregate for biofuels production is zero, whereas "Africa (EI)" is not. This may be tricky to solve, may not be worth it.
+    # TODO: There's an additional complication. Sometimes, there is no data for individual countries of a region, but there is data for the total region. For example, biofuels production (PJ) has data for Total Africa, Total CIS, and Total Middle East, but there's no way to know where those values come from. Given that we ignore those totals (otherwise we would be double-counting regions) this creates a mismatch between the EI continents and our aggregates. For example, the "Africa" aggregate for biofuels production is zero, whereas "Africa (EI)" is not. To solve this, simply visually check (at least for the current release) when does this happen, apart from Africa. If there's any other case, it could be solved by creating their aggregate separately, including those continent totals.
 
     return tb
 
