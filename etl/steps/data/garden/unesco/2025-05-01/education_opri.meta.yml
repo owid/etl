@@ -187,7 +187,7 @@ definitions:
 
   # Out-of-school children configurations
   out_of_school_children_bins: &out_of_school_children_bins [10000, 50000, 100000, 500000, 1000000, 5000000, 10000000, 50000000]
-  
+
   grapher_config_out_of_school_children_reds: &grapher_config_out_of_school_children_reds
     <<: *common_grapher_config
     map:
@@ -352,42 +352,14 @@ definitions:
     - A higher value means students are expected to spend more time in school. For example, 2.5 years in pre-primary means most children will attend around 2.5 years of preschool; a country with 15 total expected years but only 0.5 in pre-primary likely has limited access to early childhood education.
 
   # Out-of-school descriptions
-  desc_key_prim_out_school: &desc_key_prim_out_school
-    - This indicator shows the share of children who are the right age for primary school but are not enrolled in primary or secondary education.
-    - It focuses on those in the official primary age range — typically 6 to 11 years old — who are not attending any formal level of education.
-    - Some may have never entered school, others may have dropped out, or they may not yet have started due to delayed entry.
-    - Children who are the right age for primary but are already in secondary school are considered enrolled and are not counted as out of school.
-    - The indicator is calculated by subtracting the number of primary-age children enrolled in primary or secondary education from the total in that age group.
-    - Data sources include enrolment records from school systems and household surveys that help identify children not captured in administrative data.
-    - Estimates may be affected by inconsistencies between sources, late school entry, or surveys conducted at different times of year.
-    - Children who are enrolled but not attending regularly may not always be captured correctly, depending on how data is collected and defined.
-
-  deck_key_low_out_school: &deck_key_low_out_school
-    - This indicator shows the share of adolescents who are the right age for lower secondary school but are not enrolled at that level.
-    - It focuses specifically on those within the official lower secondary age range — usually 12 to 14 or 13 to 15 — who are not attending lower secondary education.
-    - These adolescents may still be in primary school, may have dropped out, or may not be enrolled at any level.
-    - The value is calculated by comparing the number of lower secondary-age children enrolled in lower secondary education to the total number of children in that age group.
-    - Data comes from administrative enrolment records and household surveys, which allow tracking by age and education level.
-    - Estimates may be affected by mismatches between population and enrolment data, late school entry, or misreporting of enrolment levels.
-    - Children enrolled in a different level than expected for their age are included in this indicator, even if they are technically still in school.
-
-  desc_key_up_out_school: &desc_key_up_out_school
-    - This indicator shows the share of young people who are the right age for upper secondary school but are not enrolled at that level.
-    - It focuses on those within the official upper secondary age range — typically 15 to 17 or 16 to 18 — who are not attending upper secondary education.
-    - These children may still be in lower levels of school, may have left school entirely, or may not have transitioned to upper secondary after completing lower secondary.
-    - The value is calculated by subtracting the number of upper secondary-age students enrolled at the upper secondary level from the total number in that age group.
-    - Data is drawn from school records and household surveys that match enrolment levels to student age.
-    - Inconsistencies in definitions of enrolment, age reporting, or school level classifications may affect the estimates.
-    - Children who are in school but enrolled below their age-appropriate level are included in this indicator.
-
-  desc_key_preprim_out_school: &desc_key_preprim_out_school
-    - This indicator shows the share of children who are one year before the official primary entry age but are not enrolled in pre-primary education.
-    - It focuses on those within the official pre-primary age range — typically 5 years old — who are not attending pre-primary education.
-    - These children may not have access to pre-primary programs, may be in informal early childhood care, or may not be enrolled in any educational program.
-    - The value is calculated by subtracting the number of pre-primary-age children enrolled in pre-primary education from the total number in that age group.
-    - Data comes from administrative enrolment records and household surveys that track participation in early childhood education programs.
-    - Pre-primary education provides important school readiness skills and can improve long-term educational outcomes.
-    - Children who are not enrolled in pre-primary education may face challenges when transitioning to primary school.
+  desc_key_out_school: &desc_key_out_school
+  - This indicator shows the share of children or adolescents who are not in school, despite being in the official age range for a given level of education.
+  - It includes those who are not enrolled at that level or any level above it.
+  - Some may have never started school, others may have dropped out, or may be delayed in starting.
+  - Children enrolled in a higher level than their age group are counted as being in school.
+  - The share is calculated by comparing the total number of children in the age group to those enrolled in that level or above.
+  - Data comes from school records and household surveys, which help identify children not captured in official enrolment figures.
+  - Estimates can be influenced by delays in school entry, inconsistent age reporting, or differences in how enrolment is defined across countries.
 
   # Education system descriptions
   desc_key_private_enrolment: &desc_key_private_enrolment
@@ -434,7 +406,7 @@ tables:
         title: Out-of-school children of primary school age
         unit: "children"
         description_short: Children in the official primary school age range who are not enrolled in either [primary](#dod:primary-education) or [secondary](#dod:secondary-education) education.
-        description_key: *desc_key_prim_out_school
+        description_key: *desc_key_out_school
         presentation:
           title_public: Out-of-school children of primary school age
           grapher_config: *grapher_config_out_of_school_children_reds
@@ -446,7 +418,7 @@ tables:
         title: Out-of-school girls of primary school age
         unit: "girls"
         description_short: Girls in the official primary school age range who are not enrolled in either [primary](#dod:primary-education) or [secondary](#dod:secondary-education) education.
-        description_key: *desc_key_prim_out_school
+        description_key: *desc_key_out_school
         presentation:
           title_public: Out-of-school girls of primary school age
           grapher_config: *grapher_config_out_of_school_children_purples
@@ -458,7 +430,7 @@ tables:
         title: Out-of-school boys of primary school age
         unit: "boys"
         description_short: Boys in the official primary school age range who are not enrolled in either [primary](#dod:primary-education) or [secondary](#dod:secondary-education) education.
-        description_key: *desc_key_prim_out_school
+        description_key: *desc_key_out_school
         presentation:
           title_public: Out-of-school boys of primary school age
           grapher_config: *grapher_config_out_of_school_children_blues
@@ -470,7 +442,7 @@ tables:
         title: Out-of-school children of lower secondary school age
         unit: "children"
         description_short: Children in the official lower secondary school age range who are not enrolled in [lower secondary](#dod:lower-secondary-education) education.
-        description_key: *deck_key_low_out_school
+        description_key: *desc_key_out_school
         presentation:
           title_public: Out-of-school children of lower secondary school age
           grapher_config: *grapher_config_out_of_school_children_reds
@@ -482,7 +454,7 @@ tables:
         title: Out-of-school girls of lower secondary school age
         unit: "girls"
         description_short: Girls in the official lower secondary school age range who are not enrolled in [lower secondary](#dod:lower-secondary-education) education.
-        description_key: *deck_key_low_out_school
+        description_key: *desc_key_out_school
         presentation:
           title_public: Out-of-school girls of lower secondary school age
           grapher_config: *grapher_config_out_of_school_children_purples
@@ -494,7 +466,7 @@ tables:
         title: Out-of-school boys of lower secondary school age
         unit: "boys"
         description_short: Boys in the official lower secondary school age range who are not enrolled in [lower secondary](#dod:lower-secondary-education) education.
-        description_key: *deck_key_low_out_school
+        description_key: *desc_key_out_school
         presentation:
           title_public: Out-of-school boys of lower secondary school age
           grapher_config: *grapher_config_out_of_school_children_blues
@@ -506,7 +478,7 @@ tables:
         title: Out-of-school children one year before official primary entry age
         unit: "children"
         description_short: Children who are one year before the official primary entry age who are not enrolled in pre-primary education.
-        description_key: *desc_key_preprim_out_school
+        description_key: *desc_key_out_school
         presentation:
           title_public: Out-of-school children one year before official primary entry age
           grapher_config: *grapher_config_out_of_school_children_oranges
@@ -518,7 +490,7 @@ tables:
         title: Out-of-school girls one year before official primary entry age
         unit: "girls"
         description_short: Girls who are one year before the official primary entry age who are not enrolled in pre-primary education.
-        description_key: *desc_key_preprim_out_school
+        description_key: *desc_key_out_school
         presentation:
           title_public: Out-of-school girls one year before official primary entry age
           grapher_config: *grapher_config_out_of_school_children_purples
@@ -530,7 +502,7 @@ tables:
         title: Out-of-school boys one year before official primary entry age
         unit: "boys"
         description_short: Boys who are one year before the official primary entry age who are not enrolled in pre-primary education.
-        description_key: *desc_key_preprim_out_school
+        description_key: *desc_key_out_school
         presentation:
           title_public: Out-of-school boys one year before official primary entry age
           grapher_config: *grapher_config_out_of_school_children_blues
@@ -542,7 +514,7 @@ tables:
         title: Out-of-school children of upper secondary school age
         unit: "children"
         description_short: Children in the official upper secondary school age range who are not enrolled [upper secondary](#dod:upper-secondary-education) education.
-        description_key: *desc_key_up_out_school
+        description_key: *desc_key_out_school
         presentation:
           title_public: Out-of-school children of upper secondary school age
           grapher_config: *grapher_config_out_of_school_children_reds
@@ -554,7 +526,7 @@ tables:
         title: Out-of-school girls of upper secondary school age
         unit: "girls"
         description_short: Girls in the official upper secondary school age range who are not enrolled in [upper secondary](#dod:upper-secondary-education) education.
-        description_key: *desc_key_up_out_school
+        description_key: *desc_key_out_school
         presentation:
           title_public: Out-of-school girls of upper secondary school age
           grapher_config: *grapher_config_out_of_school_children_purples
@@ -566,7 +538,7 @@ tables:
         title: Out-of-school boys of upper secondary school age
         unit: "boys"
         description_short: Boys in the official upper secondary school age range who are not enrolled in [upper secondary](#dod:upper-secondary-education) education.
-        description_key: *desc_key_up_out_school
+        description_key: *desc_key_out_school
         presentation:
           title_public: Out-of-school boys of upper secondary school age
           grapher_config: *grapher_config_out_of_school_children_blues

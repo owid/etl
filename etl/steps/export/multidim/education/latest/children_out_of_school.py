@@ -316,19 +316,20 @@ def generate_subtitle_by_dimensions(view):
     level_config = EDUCATION_LEVELS.get(level, {})
     gender_term = GENDERS.get(sex, "children")
 
-    age_range = level_config.get("age_range", "school age")
+    age_range = level_config.get("age_range")
+    title_term = level_config.get("title_term")
 
     # Generate gender-specific description based on metric type
     if metric_type == "rate":
         if sex == "both" or view.matches(sex="sex_side_by_side"):
-            description = "shown as a percentage of children in the relevant age group"
+            description = "expressed as a percentage of the total population of children in that age group"
         else:
-            description = f"shown as a percentage of {gender_term} in the relevant age group"
+            description = f"expressed as a percentage of the total population of {gender_term} in that age group"
     else:  # number
         if sex == "both" or view.matches(sex="sex_side_by_side"):
-            description = "shown as the total number of children not enrolled in school"
+            description = f"shown as the total number of children not enrolled in {title_term} school"
         else:
-            description = f"shown as the total number of {gender_term} not enrolled in school"
+            description = f"shown as the total number of {gender_term} not enrolled in {title_term} school"
 
     if view.matches(level="level_side_by_side"):
         return f"{gender_term.title()} not enrolled in school across different education levels, {description}."
