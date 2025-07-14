@@ -8,7 +8,7 @@ definitions:
       topic_tags:
         - Trade & Globalization
 
-
+  decimals: &decimals 1
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -20,10 +20,10 @@ tables:
   trade:
     variables:
       exports_of_goods__free_on_board__fob__share:
-        title: Share of total exports of goods (FOB) to << counterpart_country >>
+        title: "Share of total exports of goods (FOB): << counterpart_country >>"
         unit: "%"
         short_unit: "%"
-        description_short: Exports of goods to << counterpart_country >> as a percentage of the region's total exports of goods.
+        description_short: "Exports of goods: << counterpart_country >> as a percentage of the region's total exports of goods."
         description_key:
           - This indicator shows what percentage of a region's total goods exports go to a specific trading partner.
           - Calculated by dividing exports to the counterpart region by total exports to all countries, then multiplying by 100.
@@ -33,15 +33,21 @@ tables:
           - Changes over time can reflect shifts in trade relationships, economic policies, or competitive dynamics.
           - Data is derived from customs records and official trade statistics compiled by national statistical offices.
         presentation:
-          title_public: Share of total exports of goods (FOB) to << counterpart_country >>
+          title_public: "Share of total exports of goods (FOB): << counterpart_country >>"
         display:
-          name: Exports to << counterpart_country >>
+          numDecimalPlaces: *decimals
+          name: |-
+            <% if counterpart_country != 'Intraregional' %>
+            Exports to << counterpart_country >>
+            <% elif counterpart_country == 'Intraregional' %>
+            Intraregional exports
+            <%- endif -%>
 
       imports_of_goods__cost_insurance_freight__cif__share:
-        title: Share of total imports of goods (CIF) from << counterpart_country >>
+        title: "Share of total imports of goods (CIF): << counterpart_country >>"
         unit: "%"
         short_unit: "%"
-        description_short: Imports of goods from << counterpart_country >> as a percentage of the region's total imports of goods.
+        description_short: "Imports of goods: << counterpart_country >> as a percentage of the region's total imports of goods."
         description_key:
           - This indicator shows what percentage of a region's total goods imports come from a specific trading partner.
           - Calculated by dividing imports from the counterpart region by total imports from all countries, then multiplying by 100.
@@ -51,15 +57,21 @@ tables:
           - Changes can reflect diversification strategies, supply chain shifts, or changes in trade agreements.
           - Data is compiled from customs declarations and import documentation by national statistical offices.
         presentation:
-          title_public: Share of total imports of goods (CIF) from << counterpart_country >>
+          title_public: "Share of total imports of goods (CIF): << counterpart_country >>"
         display:
-          name: Imports from << counterpart_country >>
+          numDecimalPlaces: *decimals
+          name: |-
+            <% if counterpart_country != 'Intraregional' %>
+            Imports from << counterpart_country >>
+            <% elif counterpart_country == 'Intraregional' %>
+            Intraregional imports
+            <%- endif -%>
 
       trade_balance_goods__share:
-        title: Trade balance of goods with << counterpart_country >> as share of total trade volume
+        title: "Trade balance of goods: << counterpart_country >> as share of total trade volume"
         unit: "%"
         short_unit: "%"
-        description_short: Net trade in goods with << counterpart_country >> as a percentage of the region's total trade volume (exports plus imports).
+        description_short: "Net trade in goods: << counterpart_country >> as a percentage of the region's total trade volume (exports plus imports)."
         description_key:
           - This indicator shows the trade balance with a specific partner relative to the region's overall trade activity.
           - Calculated as the trade balance (exports minus imports) divided by total trade volume (exports plus imports), then multiplied by 100.
@@ -69,15 +81,21 @@ tables:
           - This measure helps identify which trading relationships contribute most significantly to overall trade imbalances.
           - Provides insight into trade concentration and dependency beyond simple bilateral balance measures.
         presentation:
-          title_public: Trade balance of goods with << counterpart_country >> as share of total trade volume
+          title_public: "Trade balance of goods: << counterpart_country >> as share of total trade volume"
         display:
-          name: << counterpart_country >>
+          numDecimalPlaces: *decimals
+          name:  |-
+            <% if counterpart_country == 'Intraregional' %>
+            << counterpart_country >> trade balance
+            <% elif counterpart_country != 'Intraregional' %>
+            Trade balance with << counterpart_country >>
+            <%- endif -%>
 
       share_of_total_trade:
-        title: Share of total trade with << counterpart_country >>
+        title: "Share of total trade: << counterpart_country >>"
         unit: "%"
         short_unit: "%"
-        description_short: Trade with << counterpart_country >> as a percentage of the region's total trade volume (exports plus imports).
+        description_short: "Trade: << counterpart_country >> as a percentage of the region's total trade volume (exports plus imports)."
         description_key:
           - This indicator shows what percentage of a region's total trade volume is conducted with a specific trading partner.
           - Calculated by dividing bilateral trade volume (exports plus imports with the counterpart country) by total trade volume (exports plus imports with all countries), then multiplying by 100.
@@ -87,6 +105,12 @@ tables:
           - Changes over time can reflect shifts in trade relationships, economic integration, or diversification strategies.
           - Useful for identifying major trading partners and assessing trade concentration risks.
         presentation:
-          title_public: Share of total trade with << counterpart_country >>
+          title_public: "Share of total trade: << counterpart_country >>"
         display:
-          name: Trade with << counterpart_country >>
+          numDecimalPlaces: *decimals
+          name: |-
+            <% if counterpart_country != 'Intraregional' %>
+            Trade with << counterpart_country >>
+            <% elif counterpart_country == 'Intraregional' %>
+            Intraregional trade
+            <%- endif -%>
