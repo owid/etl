@@ -19,6 +19,8 @@ For now, we are ignoring TES and continuing to adapt consumption of non-fossil s
 
 """
 
+import json
+
 import owid.catalog.processing as pr
 from owid.catalog import Dataset, Table
 
@@ -791,6 +793,77 @@ def create_primary_energy_in_input_equivalents(tb: Table):
     return tb
 
 
+def fix_zeros_in_nonexisting_regions(tb: Table, ds_regions: Dataset) -> Table:
+    ussr_successors = set(
+        ds_regions["regions"].loc[json.loads(ds_regions["regions"].loc["OWID_USS"]["successors"])]["name"]
+    )
+    for column in tb.drop(columns=["country", "year", "efficiency_factor"]).columns:
+        if column in ["gas_reserves_tcm"]:
+            # For gas reserves, the data already contains nans. Simply double check, and do nothing.
+            ussr_last_year = 1996
+            error = f"Expected USSR to be nan > {ussr_last_year} for column {column}."
+            _mask = (tb["country"] == "USSR") & (tb["year"] > ussr_last_year)
+            assert (tb[_mask][column].isnull()).all(), error
+
+            # Russia has data from 1991, while all other successors have data from 1996 on.
+            error = f"Expected other USSR successors (except Russia) to be nan <= {ussr_last_year} for column {column}."
+            _mask = (tb["country"].isin(ussr_successors - set(["Russia"]))) & (tb["year"] <= ussr_last_year)
+            assert (tb[_mask][column].isnull()).all(), error
+
+            error = f"Expected Russia to be nan <= 1991 for column {column}."
+            _mask = (tb["country"].isin(["Russia"])) & (tb["year"] < 1991)
+            assert (tb[_mask][column].isnull()).all(), error
+
+            continue
+        # For all other columns, ensure there is no data on years where the countries did not exist.
+        elif column in ["oil_reserves_bbl", "oil_reserves_t"]:
+            ussr_last_year = 1990
+        else:
+            ussr_last_year = 1984
+
+        error = f"Expected USSR to be zero > {ussr_last_year} for column {column}."
+        _mask = (tb["country"] == "USSR") & (tb["year"] > ussr_last_year)
+        assert (tb[_mask][column].fillna(0) == 0).all(), error
+        tb.loc[_mask, column] = None
+
+        error = f"Expected USSR successors to be zero <= {ussr_last_year} for column {column}."
+        _mask = (tb["country"].isin(ussr_successors)) & (tb["year"] <= ussr_last_year)
+        assert (tb[_mask][column].fillna(0) == 0).all()
+        tb.loc[_mask, column] = None
+
+        # Remove zeros from other nonexisting regions.
+        _other_european = ["Croatia", "Slovenia", "North Macedonia"]
+        _mask = (tb["country"].isin(_other_european)) & (tb["year"] < 1990)
+        error = f"Expected {_other_european} to have only zeros < 1990."
+        assert (tb[_mask][column].fillna(0) == 0).all(), error
+        tb.loc[_mask, column] = None
+
+        # Remove spurious zeros for Serbia.
+        _mask = (tb["country"] == "Serbia") & (tb["year"] < 2007)
+        error = f"Expected data for Serbia to be zero < 2007 for column {column}."
+        assert (tb[_mask][column].fillna(0) == 0).all(), error
+        tb.loc[_mask, column] = None
+
+        # Remove spurious zeros for South Sudan.
+        _mask = (tb["country"] == "South Sudan") & (tb["year"] < 2012)
+        error = f"Expected data for Serbia to be zero < 2012 for column {column}."
+        assert (tb[_mask][column].fillna(0) == 0).all(), error
+        tb.loc[_mask, column] = None
+
+        # Remove spurious zeros for Yemen.
+        _mask = (tb["country"] == "Yemen") & (tb["year"] < 1985)
+        error = f"Expected data for Yemen to be zero < 1985 for column {column}."
+        assert (tb[_mask][column].fillna(0) == 0).all(), error
+        tb.loc[_mask, column] = None
+
+    # Check that other historical regions don't need to be handled, as they are not in the data.
+    _other_historical = ["Czechoslovakia", "Montenegro"]
+    error = f"Unexpected data found for {_other_historical}."
+    assert set(tb["country"]) & set(_other_historical) == set(), error
+
+    return tb
+
+
 def run() -> None:
     #
     # Load inputs.
@@ -832,6 +905,9 @@ def run() -> None:
 
     # Create primary energy consumption in input equivalents for non-fossil sources (for consistency with previous releases).
     tb = create_primary_energy_in_input_equivalents(tb=tb)
+
+    # Remove spurious zeros in nonexisting regions (e.g. USSR after its dissolution).
+    tb = fix_zeros_in_nonexisting_regions(tb=tb, ds_regions=ds_regions)
 
     # Set an appropriate index to main table and sort conveniently.
     tb = tb.format(sort_columns=True)
