@@ -21,12 +21,12 @@ def run(dest_dir: str) -> None:
 
     # Remove rows with null values
     tb = tb.dropna(subset=["DATE", "ISO3"], how="all")
-    
+
     # Check for and remove NaT values in DATE column
     initial_rows = len(tb)
     tb = tb.dropna(subset=["DATE"])
     final_rows = len(tb)
-    
+
     if initial_rows > final_rows:
         log.warning(f"Dropped {initial_rows - final_rows} rows with NaT values in DATE column")
 
