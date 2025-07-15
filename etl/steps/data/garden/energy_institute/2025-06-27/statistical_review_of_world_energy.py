@@ -2,20 +2,21 @@
 
 The Statistical Review of World Energy changed its methodology to calculate energy consumption in the 2025 release.
 
-Previously, it reported primary energy consumption using what we call the substitution method (or input-equivalent method), where non-fossil power generation (all sources except coal, gas, and oil) was expressed as input-equivalent energy.
+Previously, it reported primary energy consumption using what we call the substitution method, where non-fossil power generation (all sources except coal, gas, and oil) was expressed as input-equivalent energy.
 
 With the substitution method:
 - Fossil fuels: Primary energy consumption included the gross calorific value of fossil fuels (i.e., including energy lost as heat during conversion).
-- Non-fossil sources (nuclear and renewables): Energy consumption figures were calculated by inflating electricity generation by a factor of roughly 1/0.4 (where the denominator represents the efficiency of a standard thermal power plant; more specifically, it's a factor that's assumed to go from 36% to 41%, depending on the year).
+- Non-fossil sources (nuclear and renewables): Energy consumption figures were calculated by inflating electricity generation by a factor of roughly 1/0.4 (where the denominator represents the efficiency of a standard thermal power plant; more specifically, it's a factor that's assumed to go from 36% to 41%, depending on the year). For biomass generation, that factor is 32% for all years (as explained in their 2024 methodology).
 
-That approach aimed to make non-fossil sources comparable with fossil fuels by assuming they were "as inefficient" as fossil fuel power plants.
+That approach aimed to make non-fossil sources comparable with fossil fuels by assuming the former were "as inefficient" as fossil fuel power plants.
 
 In the new methodology (from the 2025 release), energy is reported as Total Energy Supply (TES) using the Physical Energy Content method:
 - Fossil fuels: TES is unchanged. It still includes the full gross calorific value, including energy wasted as heat.
 - Non-combustible renewables (wind, solar PV, hydro, ocean, wave): TES is now simply the gross amount of electricity generated (assuming 100% efficiency; figures are not inflated).
 - Non-fossil sources where the primary energy input is heat (nuclear, geothermal, concentrating solar): The heat input is estimated using assumed thermal efficiencies — 33% for nuclear and concentrating solar and biomass, and 10% for geothermal.
 
-For now, we are ignoring TES and continuing to adapt consumption of non-fossil sources to match the old substitution method. This is a temporary solution, as moving to the new methodology requires rewriting and adapting hundreds of charts and articles.
+For now, we are ignoring TES and continuing to adapt consumption of non-fossil sources to match the old substitution method.
+This is a temporary solution, as moving to the new methodology requires rewriting and adapting hundreds of charts and articles.
 
 """
 
