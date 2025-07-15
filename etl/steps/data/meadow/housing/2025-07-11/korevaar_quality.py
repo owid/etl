@@ -71,14 +71,23 @@ def run() -> None:
 
     tb_par = tb_par.replace({"city": {"Paris (75)": "Paris"}})
     tb_lon["city"] = "London"
+    tb_bel = tb_bel.replace({"city": {"Gent": "Ghent"}})
 
     # give percentages as percentage
-    for tb in [tb_par, tb_lon, tb_bel]:
+    for tb in [tb_par, tb_lon, tb_bel, tb_ams]:
         for col in tb.columns:
             if col.endswith("_pct"):
-                tb[col] = tb[col].astype(float) * 100
+                tb[col] = tb[col].astype(float)
+                # check whether all entries are smaller than 1
+                if tb[col].max() < 1:
+                    # if so, multiply by 100
+                    tb[col] = tb[col] * 100
+                # assert that all entries are between 0 and 100
+                assert (tb[col].min() >= 0) and (
+                    tb[col].max() <= 100
+                ), f"Column {col} has values outside of [0, 100] range."
 
-    tb_all = pr.concat([tb_ams, tb_par, tb_lon, tb_bel], ignore_index=True)  # type : ignore
+    tb_all = pr.concat([tb_ams, tb_par, tb_lon, tb_bel], ignore_index=True)  # type: ignore
 
     #
     # Process data.

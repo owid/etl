@@ -19,7 +19,7 @@ def run() -> None:
     tb = ds_meadow.read("korevaar")
     tb_quality = ds_meadow_quality.read("korevaar_quality")
 
-    # drop belgian cities
+    # drop belgian cities (as there is only nominal data available for them)
     tb = tb.drop(columns=["antwerp_nom_rent", "bruges_nom_rent", "brussels_nom_rent", "ghent_nom_rent", "belgium_cpi"])
 
     # Process data.
@@ -32,8 +32,6 @@ def run() -> None:
     tb = tb.dropna(subset=["type"])
 
     tb = tb.pivot(index=["year", "country"], columns="type", values="value").reset_index()
-
-    tb.columns = ["year", "country", "affordability", "real_rent", "real_wage"]
 
     tb_quality = tb_quality.rename(columns={"city": "country"})
 
