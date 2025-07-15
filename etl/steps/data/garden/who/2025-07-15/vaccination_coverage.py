@@ -68,11 +68,11 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
+    # Keep only data from WUENIC (the estimates by World Health Organization and UNICEF).
+    tb = use_only_wuenic_data(tb)
     tb = geo.harmonize_countries(
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
-    # Keep only data from WUENIC (the estimates by World Health Organization and UNICEF).
-    tb = use_only_wuenic_data(tb)
     tb = clean_data(tb)
     # Add denominator column
     tb = tb.assign(denominator=tb["antigen"].map(DENOMINATOR))
