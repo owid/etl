@@ -127,7 +127,7 @@ def calculate_one_year_olds_vaccinated(tb: Table, ds_population: Dataset) -> Tab
 
 def calculate_newborns_vaccinated(tb: Table, ds_population: Dataset) -> Table:
     """
-    Calculate the number of one-year-olds vaccinated for each antigen.
+    Calculate the number of newborns vaccinated for each antigen.
     """
 
     tb = tb[tb["denominator"] == "Live births"]

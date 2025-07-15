@@ -14,7 +14,7 @@ def run(dest_dir: str) -> None:
     ds_garden = paths.load_dataset("vaccination_coverage")
 
     # Read table from garden dataset.
-    tb = ds_garden.read("vaccination_coverage", reset_index=False)  #
+    tb = ds_garden.read("vaccination_coverage", reset_index=False)
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.

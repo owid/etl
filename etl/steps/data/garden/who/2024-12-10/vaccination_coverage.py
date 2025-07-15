@@ -43,10 +43,10 @@ UNIVERSAL = {
     "RCV1": True,  # All countries that have not yet introduced RCV should plan to do so.
     "HEPB3": True,
     "HIB3": True,
-    "HEPB_BD": True,  # Hepatitis B birth dose is recommended in
+    "HEPB_BD": True,  # Hepatitis B birth dose is recommended in all countries
     "MCV2": True,  # Measles second dose is recommended in all countries
     "ROTAC": True,  # Rotavirus vaccine is recommended in all countries
-    "PCV3": True,  # Pneumococcal conjugate vaccine is
+    "PCV3": True,  # Pneumococcal conjugate vaccine is recommended in all countries
     "IPV1": True,  # Inactivated polio vaccine is recommended in all countries
     "IPV2": True,  # Inactivated polio vaccine is recommended in all
     "YFV": False,  # Yellow fever vaccine is recommended in countries with risk of yellow fever transmission
@@ -99,7 +99,7 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def get_population_of_age_group(ds_population: Dataset, age=str) -> Table:
+def get_population_of_age_group(ds_population: Dataset, age: str) -> Table:
     tb_pop = ds_population.read("population", reset_metadata="keep_origins")
     tb_pop = tb_pop[(tb_pop["age"] == age) & (tb_pop["variant"] == "estimates") & (tb_pop["sex"] == "all")]
     tb_pop = tb_pop[["country", "year", "sex", "age", "variant", "population"]]
