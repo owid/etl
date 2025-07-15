@@ -164,8 +164,52 @@ These are installed as editable packages (`owid-catalog`, `owid-datautils`, `owi
 
 - Always use `geo.harmonize_countries()` for geographic data
 - Follow the `PathFinder` pattern for step inputs/outputs
-- Use content-based checksums - avoid `--force` unless necessary
+- Using `--force` is usually unnecessary - the step will be re-run if the code changes
 - Test steps with `etl run --dry-run` before execution
 - Use `make sync.catalog` to avoid rebuilding entire catalog locally
 - Check `etl d version-tracker` before major changes
 - VS Code extensions available: `make install-vscode-extensions`
+
+## Debugging ETL Data Quality Issues
+
+When ETL steps fail due to data quality issues (NaT values, missing data, etc.), always trace the problem upstream through the pipeline stages rather than patching symptoms downstream:
+
+### Systematic Debugging Approach
+
+1. **Identify the Error Location**: Note which step and function is failing
+2. **Trace Upstream**: Work backwards through the pipeline stages:
+   - **garden** → **meadow** → **snapshot** → **source data**
+3. **Examine Each Stage**: Load and inspect data at each stage to isolate where the issue originates
+4. **Fix at the Source**: Address the root cause at the earliest possible stage
+
+### Example Debugging Commands
+
+```python
+# Examine meadow dataset
+from owid.catalog import Dataset
+ds = Dataset('/path/to/meadow/dataset')
+tb = ds['table_name'].reset_index()
+print(f"Null values in date: {tb.date.isnull().sum()}")
+print(f"Problematic rows: {tb[tb.date.isnull()]}")
+
+# Examine snapshot data
+from etl.snapshot import Snapshot
+snap = Snapshot('namespace/version/dataset.csv')
+df = snap.read()
+print(f"Original null values: {df.DATE.isnull().sum()}")
+print(f"Source of issue: {df[df.DATE.isnull()]}")
+```
+
+### Common Data Quality Issues
+
+- **NaT/null dates**: Often caused by malformed dates in source data or incorrect `dropna()` logic in meadow steps
+- **Missing countries**: Check country mapping files and harmonization logic
+- **Invalid data types**: Verify data conversion and cleaning steps at each stage
+- **Duplicate records**: Examine index formation and deduplication logic
+
+### Best Practices
+
+- **Never patch symptoms**: Don't add workarounds in downstream steps for upstream data issues
+- **Add assertions**: Include data quality checks that fail fast with clear error messages
+- **Document data issues**: Log warnings about data quality problems found during processing
+- **Fix meadow steps**: Most data cleaning should happen in meadow, not garden steps
