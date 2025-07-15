@@ -29,6 +29,7 @@ help:
 	@echo '  make api   		Start the ETL API on port 8081'
 	@echo '  make fasttrack 	Start Fast-track on port 8082'
 	@echo '  make chart-sync 	Start Chart-sync on port 8083'
+	@echo '  make mcp-setup 	Set up MCP servers for Claude from .mcp.json'
 	@echo '  make test      	Run all linting and unit tests'
 	@echo '  make test-all  	Run all linting and unit tests (including for modules in lib/)'
 	@echo '  make vscode-exclude-archived  Exclude archived steps from VSCode user settings'
@@ -179,3 +180,9 @@ install-vscode-extensions:
 vscode-exclude-archived: .venv
 	@echo '==> Excluding archived steps from VSCode user settings'
 	.venv/bin/python scripts/exclude_archived_steps.py --settings-scope user
+
+mcp-setup: .venv
+	@echo '==> Setting up MCP servers for Claude'
+	claude mcp remove catalog 2>/dev/null || true; \
+	claude mcp add-json catalog '{"type": "stdio", "command": ".venv/bin/fastmcp", "args": ["run", "owid_mcp/server.py"], "env": {}}'; \
+	echo "MCP setup complete. Use 'claude mcp list' to view configured servers.";

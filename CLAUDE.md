@@ -136,6 +136,21 @@ pytest tests/test_steps.py -m integration
 
 ## Configuration
 
+### Python Environment
+- **Virtual Environment**: This project uses a Python virtual environment (`.venv/`)
+- **Activation**: Always activate the virtual environment before running commands:
+  ```bash
+  source .venv/bin/activate  # Activate virtual environment
+  ```
+- **Package Management**: Always use `uv` package manager instead of `pip`
+  ```bash
+  uv add package_name     # Add a new package
+  uv remove package_name  # Remove a package
+  uv sync                 # Sync dependencies
+  ```
+- **IMPORTANT**: Never install packages with `pip install` - always ask first, then use `uv` if approved
+- **MCP Server**: Run MCP servers with: `source .venv/bin/activate && python -m mcp.server`
+
 ### Environment Variables
 - `OWID_ENV`: dev/staging/production environment
 - `.env`: Local environment configuration
@@ -258,3 +273,15 @@ print(f"Garden null values: {tb.date.isnull().sum()}")
 - **Add assertions**: Include data quality checks that fail fast with clear error messages
 - **Document data issues**: Log warnings about data quality problems found during processing
 - **Fix meadow steps**: Most data cleaning should happen in meadow, not garden steps
+
+
+## Important Development Notes
+
+- Always use `geo.harmonize_countries()` for geographic data
+- Follow the `PathFinder` pattern for step inputs/outputs
+- Using `--force` is usually unnecessary - the step will be re-run if the code changes
+- Test steps with `etl run --dry-run` before execution
+- Use `make sync.catalog` to avoid rebuilding entire catalog locally
+- Check `etl d version-tracker` before major changes
+- VS Code extensions available: `make install-vscode-extensions`
+- **ALWAYS run `make check` before committing** - formats code, fixes linting issues, and runs type checks

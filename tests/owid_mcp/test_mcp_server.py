@@ -1,0 +1,58 @@
+"""
+Basic healthcheck tests for the OWID MCP server.
+"""
+
+import pytest
+from fastmcp import Client
+
+from owid_mcp.server import mcp
+
+
+@pytest.mark.asyncio
+async def test_mcp_server_health():
+    """Test that the MCP server starts and responds correctly."""
+    async with Client(mcp) as client:
+        # Test that the server is responsive by listing tools
+        tools = await client.list_tools()
+        assert tools is not None
+        assert len(tools) > 0
+
+
+@pytest.mark.asyncio
+async def test_catalog_find_table_basic_functionality():
+    """Test basic functionality of catalog_find_table tool."""
+    async with Client(mcp) as client:
+        # Test with simple parameters that should work
+        result = await client.call_tool("catalog_find_table", {"channel": "garden", "namespace": "demography"})
+        assert result is not None
+        # The result should be a list (even if empty)
+        assert isinstance(result.data, list)
+
+
+@pytest.mark.asyncio
+async def test_charts_search_population_density():
+    """Test chart search functionality with population density query."""
+    async with Client(mcp) as client:
+        # Test searching for population density charts
+        result = await client.call_tool("charts_search_chart", {"query": "population density"})
+        assert result is not None
+        # The result should be a list (even if empty)
+        assert isinstance(result.data, list)
+
+        # Print results
+        for item in result.data:
+            print(f"Found chart: {item['title']} (slug: {item['slug']})")
+
+
+@pytest.mark.asyncio
+async def test_chart_resource():
+    """Test chart resource functionality by fetching a chart."""
+    async with Client(mcp) as client:
+        # Test fetching a chart resource with a known slug
+        # Using a common chart slug that should exist
+        result = await client.read_resource("chart://population-density")
+        assert result is not None
+        # The result should contain SVG content
+        assert result.content is not None
+        # Check that it's SVG content
+        assert b"<svg" in result.content or b"<!DOCTYPE" in result.content

@@ -5,7 +5,7 @@
       "command": ".venv/bin/fastmcp",
       "args": [
         "run",
-        "mcp/server.py"
+        "owid_mcp/server.py"
       ],
       "env": {}
     }
