@@ -417,3 +417,14 @@ steps:
     - data://garden/un/2024-07-12/un_wpp
   data://grapher/who/2024-12-10/vaccination_coverage:
     - data://garden/who/2024-12-10/vaccination_coverage
+
+  # WHO Vaccine Introductions
+  #
+  data://meadow/who/2025-01-09/vaccination_introductions:
+    - snapshot://who/2025-01-09/vaccination_introductions.xlsx
+  data://garden/who/2025-01-09/vaccination_introductions:
+    - data://meadow/who/2025-01-09/vaccination_introductions
+  data://grapher/who/2025-01-09/vaccination_introductions:
+    - data://garden/who/2025-01-09/vaccination_introductions
+
+  #

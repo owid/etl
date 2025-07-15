@@ -787,16 +787,7 @@ steps:
     - data://garden/health/2024-12-31/height
 
   #
-  # WHO Vaccine Introductions
-  #
-  data://meadow/who/2025-01-09/vaccination_introductions:
-    - snapshot://who/2025-01-09/vaccination_introductions.xlsx
-  data://garden/who/2025-01-09/vaccination_introductions:
-    - data://meadow/who/2025-01-09/vaccination_introductions
-  data://grapher/who/2025-01-09/vaccination_introductions:
-    - data://garden/who/2025-01-09/vaccination_introductions
 
-  #
   # WHO vaccine stock out
   #
   data://meadow/who/2025-01-17/vaccine_stock_out:
