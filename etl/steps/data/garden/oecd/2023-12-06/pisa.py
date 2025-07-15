@@ -80,13 +80,9 @@ def run(dest_dir: str) -> None:
         tb[column].metadata.description_short = description_short
         if "bound" not in column:
             # Regular column metadata
-            tb[column].metadata.unit = "score"
             tb[
                 column
-            ].metadata.description_from_producer = f"Average score of 15-year-old {sex} on the PISA {subject} scale.Initially, the average PISA score across subjects and all OECD countries was at 500 with a standard deviation of 100, so that most students scored between 400 and 600. Scores in later cycles were calibrated to remain comparable to this baseline."
-            tb[column].metadata.title = f"Average performance of 15-year-old {sex} on the {subject} scale"
-            tb[column].metadata.display["name"] = f"Mean {subject} score"
-            tb[column].metadata.processing_level = "minor"
+            ].metadata.description_from_producer = f"Average score of 15-year-old {sex} on the PISA {subject} scale. Initially, the average PISA score across subjects and all OECD countries was at 500 with a standard deviation of 100, so that most students scored between 400 and 600. Scores in later cycles were calibrated to remain comparable to this baseline."
 
         else:
             # Bound column metadata
