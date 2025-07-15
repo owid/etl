@@ -217,7 +217,7 @@ def run() -> None:
         ]
 
         tb = pr.concat([tb, total_net_balance])
-        if t < 2:
+        if t > 1:
             tb = tb.rename(columns={"country": "counterpart_country", "counterpart_country": "country"})
         tbs.append(tb)
 
