@@ -23,6 +23,6 @@ meta:
       name: International Monetary Fund Copyright
       url: https://www.imf.org/en/About/copyright-and-terms
 outs:
-  - md5: f426faa53fd976369172c9520a3067a9
-    size: 135691
+  - md5: 7a2ea637c97ff064e2ec1f5fc1595225
+    size: 105071578
     path: trade.csv
