@@ -8,7 +8,7 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-REGIONS = ["North America", "South America", "Europe", "Africa", "Asia", "Oceania"]
+REGIONS = ["North America", "South America", "Europe", "Africa", "Asia", "Oceania", "World"]
 
 pairs = [
     ("Czechia", "Czechoslovakia"),
@@ -102,10 +102,10 @@ def run() -> None:
         regions=REGIONS,
         accepted_overlaps=ACCEPTED_OVERLAPS,
     )
-
-    tb_owid = tb[tb["country"].isin(REGIONS) & tb["counterpart_country"].isin(REGIONS)]
+    regions_without_world = [region for region in REGIONS if region != "World"]
+    tb_owid = tb[tb["country"].isin(regions_without_world) & tb["counterpart_country"].isin(regions_without_world)]
     members = []
-    for region in REGIONS:
+    for region in regions_without_world:
         members.append(
             geo.list_members_of_region(
                 region=region,
@@ -113,11 +113,12 @@ def run() -> None:
             )
         )
     members = set().union(*members)
-    tb_owid_countries = tb[tb["country"].isin(REGIONS) & tb["counterpart_country"].isin(members)]
+    tb_owid_countries = tb[tb["country"].isin(regions_without_world) & tb["counterpart_country"].isin(members)]
+    tb_owid_world = tb[(tb["country"] == "World") & (tb["counterpart_country"].isin(members))]
     tb_imf = tb[tb["country"].isin(IMF_REGIONS) & tb["counterpart_country"].isin(IMF_REGIONS)]
 
     tbs = []
-    for t, tb in enumerate([tb_owid, tb_imf, tb_owid_countries]):
+    for t, tb in enumerate([tb_owid, tb_imf, tb_owid_world, tb_owid_countries]):
         tb = tb.pivot(
             index=["country", "year", "counterpart_country"],
             columns="indicator",
@@ -216,7 +217,7 @@ def run() -> None:
         ]
 
         tb = pr.concat([tb, total_net_balance])
-        if t == 2:
+        if t < 2:
             tb = tb.rename(columns={"country": "counterpart_country", "counterpart_country": "country"})
         tbs.append(tb)
 
