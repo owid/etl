@@ -783,12 +783,52 @@ def create_primary_energy_in_input_equivalents(tb: Table):
     # Create primary energy consumption in input-equivalents.
     # NOTE: This only needs to be done to non-fossil generation sources (which are "inflated" to mimic fossil inefficiencies). Fossil fuels consumption is by construction identical to primary energy consumption.
     for source in ["nuclear", "hydro", "other_renewables", "solar", "wind"]:
-        tb[f"{source}_consumption_equivalent_twh"] = (
-            tb[f"{source}_electricity_generation_twh"] / tb["efficiency_factor"]
-        )
+        if source == "other_renewables":
+            # As explained in the 2024 methodology (and since the 2022 release), for biomass power, they assume a constant efficiency of 32% for biomass power to better reflect the actual efficiency of biomass power plants.
+            # NOTE that geothermal and other renewables are also included here, but we only have access to the aggregated "other renewables".
+            tb[f"{source}_consumption_equivalent_twh"] = tb[f"{source}_electricity_generation_twh"] / 0.32
+        else:
+            tb[f"{source}_consumption_equivalent_twh"] = (
+                tb[f"{source}_electricity_generation_twh"] / tb["efficiency_factor"]
+            )
+
         tb[f"{source}_consumption_equivalent_ej"] = (
             tb[f"{source}_consumption_equivalent_twh"] / EJ_TO_TWH
         ).copy_metadata(tb[f"{source}_consumption_equivalent_ej"])
+
+    # To check that the previous conversion is accurate, create a temporary column for total input-equivalent primary energy, and compare it with the primary energy consumption given in the original data.
+    check = tb.copy()
+    check["primary_energy_consumption_equivalent_twh_calculated"] = (
+        check["hydro_consumption_equivalent_twh"].fillna(0)
+        + check["solar_consumption_equivalent_twh"].fillna(0)
+        + check["wind_consumption_equivalent_twh"].fillna(0)
+        + check["other_renewables_consumption_equivalent_twh"].fillna(0)
+        + check["nuclear_consumption_equivalent_twh"].fillna(0)
+        + check["biofuels_consumption_twh"].fillna(0)
+        + check["coal_consumption_twh"].fillna(0)
+        + check["oil_consumption_twh"].fillna(0)
+        + check["gas_consumption_twh"].fillna(0)
+    )
+    # Check that the resulting calculated primary energy coincides (within ~5%) with the original one given in the statistical review.
+    check["dev"] = (
+        100
+        * (
+            check["primary_energy_consumption_equivalent_twh_calculated"].fillna(0)
+            - check["primary_energy_consumption_equivalent_twh"].fillna(0)
+        )
+        / check["primary_energy_consumption_equivalent_twh"].fillna(0)
+    )
+    error = "Unexpected issue during the calculation of the primary energy consumption."
+    assert abs(check["dev"]).max() < 5, error
+
+    # DEBUGGING: Uncomment to compare the resulting calculated primary energy consumption curves for non-fossil sources, with the ones from the 2024 release.
+    # from etl.data_helpers.misc import compare_tables
+    # from owid.catalog import find
+    # old = find("statistical_review_of_world_energy", version="2024-06-20").sort_values("table").head(1).load().reset_index()
+    # columns = [f"{source}_consumption_equivalent_twh" for source in ["hydro", "nuclear", "wind", "solar", "other_renewables"]]
+    # countries = sorted(set(old["country"]) & set(tb["country"]))
+    # year_max = old["year"].max()
+    # compare_tables(old[old["year"] <= year_max], tb[tb["year"] <= year_max], columns=columns, countries=countries, max_num_charts = 100)
 
     return tb
 

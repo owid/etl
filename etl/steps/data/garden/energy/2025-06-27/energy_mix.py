@@ -185,9 +185,8 @@ def calculate_equivalent_primary_energy(primary_energy: Table) -> Table:
     )
     # Check that the primary energy constructed using the substitution method coincides with the
     # input-equivalent primary energy.
+    # NOTE: This check was already performed in the statistical_review_of_world_energy garden step. But we keep it as a double-check.
     _check_that_substitution_method_is_well_calculated(primary_energy)
-    # Remove original primary energy column.
-    # primary_energy = primary_energy.drop(columns=["Primary energy (TWh - equivalent) - original"], errors="raise")
 
     return primary_energy
 
@@ -205,14 +204,17 @@ def _check_that_substitution_method_is_well_calculated(
             "Primary energy (TWh - equivalent)",
         ]
     ]
-    check = check.fillna(0)
     # They may not coincide exactly, but at least check that they differ (point by point) by less than 5%.
-    check["dev"] = 100 * abs(
-        (check["Primary energy (TWh - equivalent)"] - check["Primary energy (TWh - equivalent) - original"])
-        / check["Primary energy (TWh - equivalent) - original"]
+    check["dev"] = (
+        100
+        * (
+            check["Primary energy (TWh - equivalent)"].fillna(0)
+            - check["Primary energy (TWh - equivalent) - original"].fillna(0)
+        )
+        / check["Primary energy (TWh - equivalent) - original"].fillna(0)
     )
     error = "Unexpected issue during the calculation of the primary energy consumption."
-    assert check["dev"].max() < 5, error
+    assert abs(check["dev"]).max() < 5, error
 
 
 def calculate_share_of_primary_energy(primary_energy: Table) -> Table:
