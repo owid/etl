@@ -181,8 +181,8 @@ vscode-exclude-archived: .venv
 	@echo '==> Excluding archived steps from VSCode user settings'
 	.venv/bin/python scripts/exclude_archived_steps.py --settings-scope user
 
-mcp-setup: .venv
-	@echo '==> Setting up MCP servers for Claude'
-	claude mcp remove catalog 2>/dev/null || true; \
-	claude mcp add-json catalog '{"type": "stdio", "command": ".venv/bin/fastmcp", "args": ["run", "owid_mcp/server.py"], "env": {}}'; \
-	echo "MCP setup complete. Use 'claude mcp list' to view configured servers.";
+# mcp-setup: .venv
+# 	@echo '==> Setting up MCP servers for Claude'
+# 	claude mcp remove owid -s project 2>/dev/null || true; \
+# 	claude mcp add-json owid '{"type": "stdio", "command": ".venv/bin/fastmcp", "args": ["run", "owid_mcp/server.py"], "env": {}}'; \
+# 	echo "MCP setup complete. Use 'claude mcp list' to view configured servers.";

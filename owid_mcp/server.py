@@ -10,7 +10,7 @@ mcp = FastMCP("OWID Data Catalog & Charts 🚀")
 # Mount the specialized servers
 mcp.mount(etl_catalog_mcp, prefix="catalog")
 mcp.mount(etl_tools_mcp, prefix="tools")
-mcp.mount(charts_mcp, prefix="charts")
+mcp.mount(charts_mcp)
 
 if __name__ == "__main__":
     mcp.run()

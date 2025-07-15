@@ -2,6 +2,8 @@
 Basic healthcheck tests for the OWID MCP server.
 """
 
+import base64
+
 import pytest
 from fastmcp import Client
 
@@ -49,10 +51,15 @@ async def test_chart_resource():
     """Test chart resource functionality by fetching a chart."""
     async with Client(mcp) as client:
         # Test fetching a chart resource with a known slug
-        # Using a common chart slug that should exist
         result = await client.read_resource("chart://population-density")
         assert result is not None
-        # The result should contain SVG content
-        assert result.content is not None
+        assert isinstance(result, list)
+        assert len(result) == 1
+
+        # Check the resource content
+        content = result[0]
+        assert str(content.uri) == "chart://population-density"
+
         # Check that it's SVG content
-        assert b"<svg" in result.content or b"<!DOCTYPE" in result.content
+        svg_text = base64.b64decode(content.blob).decode("utf-8")
+        assert "<svg" in svg_text or "<!DOCTYPE" in svg_text
