@@ -205,7 +205,6 @@ steps:
   data://grapher/cardiovascular_diseases/2023-11-01/deaths_from_cardiovascular_diseases_vs_other:
     - data://garden/cardiovascular_diseases/2023-11-01/deaths_from_cardiovascular_diseases_vs_other
 
-
   # Global Health Observatory (GHO) from WHO
   data://meadow/who/2024-01-03/gho:
     - snapshot://who/2024-01-03/gho.zip
@@ -1044,7 +1043,7 @@ steps:
 
   # Multi-dim indicators - vaccination coverage
   export://multidim/health/latest/vaccination_coverage:
-    - data://grapher/who/2024-12-10/vaccination_coverage
+    - data://grapher/who/2025-07-15/vaccination_coverage
   export://multidim/health/latest/vaccination_introductions:
     - data://grapher/who/2025-01-09/vaccination_introductions
 
@@ -1255,6 +1254,7 @@ steps:
     - data://garden/wb/2025-07-01/income_groups
   data://grapher/tuberculosis/2025-06-16/drug_resistance_surveillance:
     - data://garden/tuberculosis/2025-06-16/drug_resistance_surveillance
+
   # Tuberculosis budget - WHO
   data://meadow/tuberculosis/2025-06-16/budget:
     - snapshot://tuberculosis/2025-06-16/budget.csv
@@ -1277,3 +1277,12 @@ steps:
     - data://garden/wb/2025-07-01/income_groups
   data://grapher/tuberculosis/2025-06-16/laboratories:
     - data://garden/tuberculosis/2025-06-16/laboratories
+
+  # WHO Immunization coverage
+  data://meadow/who/2025-07-15/vaccination_coverage:
+    - snapshot://who/2025-07-15/vaccination_coverage.xlsx
+  data://garden/who/2025-07-15/vaccination_coverage:
+    - data://garden/un/2024-07-12/un_wpp
+    - data://meadow/who/2025-07-15/vaccination_coverage
+  data://grapher/who/2025-07-15/vaccination_coverage:
+    - data://garden/who/2025-07-15/vaccination_coverage

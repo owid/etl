@@ -118,7 +118,7 @@ definitions:
     <%- elif antigen == "IPV2" %>
     who have not had two doses of the inactivated polio vaccine
     <%- elif antigen == "MCV2X2" %>
-    who have not had two doses of the measles vaccine
+    who have not had two doses of of the measles vaccine
     <%- elif antigen == "YFV" %>
     who have not had the yellow fever vaccine
     <%- elif antigen == "MENA_C" %>
