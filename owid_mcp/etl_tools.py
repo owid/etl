@@ -5,26 +5,9 @@ from typing import Any, Callable, Dict, List, Optional
 
 from click.testing import CliRunner
 from fastmcp import FastMCP
-from owid import catalog
 
 from apps.pr.cli import cli as pr_cli
 from apps.step_update.cli import cli as step_update_cli
-from etl.command import main_cli as etl_cli
-
-
-@dataclass
-class TableMetadata:
-    """Metadata for a table in the data catalog."""
-
-    table: Optional[str]
-    namespace: Optional[str]
-    dataset: Optional[str]
-    version: Optional[str]
-    channel: Optional[str]
-    path: Optional[str]
-    download_url: Optional[str]
-    dimensions: List[str]
-    description: str
 
 
 @dataclass
@@ -47,6 +30,8 @@ class StepUpdateResult:
     dry_run: bool
 
 
+# Create ETL Tools MCP server
+etl_tools_mcp = FastMCP("ETL Tools")
 
 
 def invoke_cli_tool(
@@ -83,64 +68,6 @@ def invoke_cli_tool(
 
     except Exception as e:
         return result_parser(type("MockResult", (), {"exit_code": 1, "output": str(e), "exception": e})())
-
-
-mcp = FastMCP("Data Catalog 🚀")
-
-
-@mcp.tool
-def find_table(
-    table: Optional[str] = None,
-    namespace: Optional[str] = None,
-    dataset: Optional[str] = None,
-    version: Optional[str] = None,
-    channel: Optional[str] = "garden",
-) -> List[TableMetadata]:
-    """Find tables in the data catalog using various filters.
-
-    Args:
-        table: Table name (supports regex patterns)
-        namespace: Namespace to filter by
-        dataset: Dataset name to filter by
-        version: Version to filter by
-        channel: Channel to search in (default: "garden")
-
-    Returns:
-        List of TableMetadata objects with table information
-    """
-    # Use catalog.find to search for tables
-    results = catalog.find(
-        table=table,
-        namespace=namespace,
-        dataset=dataset,
-        version=version,
-        channels=[channel] if channel else ["garden"],
-    )
-
-    # Convert results to a list of TableMetadata objects
-    tables = []
-    for _, row in results.iterrows():
-        # Generate download URL from path
-        path = row.get("path")
-        download_url = None
-        if path:
-            download_url = f"https://catalog.ourworldindata.org/{path}.feather"
-
-        tables.append(
-            TableMetadata(
-                table=row.get("table"),
-                namespace=row.get("namespace"),
-                dataset=row.get("dataset"),
-                version=row.get("version"),
-                channel=row.get("channel"),
-                path=path,
-                download_url=download_url,
-                dimensions=row.get("dimensions", []),
-                description=row.get("description", ""),
-            )
-        )
-
-    return tables
 
 
 def _get_current_branch() -> str:
@@ -183,7 +110,45 @@ def _parse_pr_result(result, work_branch: Optional[str]) -> PRResult:
         )
 
 
-@mcp.tool
+def _parse_step_update_result(result, steps: List[str], dry_run: bool) -> StepUpdateResult:
+    """Parse CLI result for step update."""
+    if hasattr(result, "exception"):
+        return StepUpdateResult(
+            success=False, updated_steps=[], message=f"Error updating steps: {str(result.exception)}", dry_run=dry_run
+        )
+
+    if result.exit_code == 0:
+        # Parse output to extract updated steps
+        output_lines = result.output.split("\n")
+        updated_steps = []
+
+        # Look for updated step information in the output
+        for line in output_lines:
+            if "Updating step:" in line or "Updated:" in line:
+                step_match = re.search(r"(data://[^\s]+|snapshot://[^\s]+)", line)
+                if step_match:
+                    updated_steps.append(step_match.group())
+
+        # If no specific steps found, use the input steps as they were processed
+        if not updated_steps:
+            updated_steps = steps
+
+        return StepUpdateResult(
+            success=True,
+            updated_steps=updated_steps,
+            message=f"Successfully {'previewed' if dry_run else 'updated'} {len(updated_steps)} step(s)",
+            dry_run=dry_run,
+        )
+    else:
+        return StepUpdateResult(
+            success=False,
+            updated_steps=[],
+            message=f"Step update failed with exit code {result.exit_code}: {result.output}",
+            dry_run=dry_run,
+        )
+
+
+@etl_tools_mcp.tool
 def create_pr(
     title: str,
     category: Optional[str] = None,
@@ -231,45 +196,7 @@ def create_pr(
     return invoke_cli_tool(pr_cli, args, options, lambda result: _parse_pr_result(result, work_branch))
 
 
-def _parse_step_update_result(result, steps: List[str], dry_run: bool) -> StepUpdateResult:
-    """Parse CLI result for step update."""
-    if hasattr(result, "exception"):
-        return StepUpdateResult(
-            success=False, updated_steps=[], message=f"Error updating steps: {str(result.exception)}", dry_run=dry_run
-        )
-
-    if result.exit_code == 0:
-        # Parse output to extract updated steps
-        output_lines = result.output.split("\n")
-        updated_steps = []
-
-        # Look for updated step information in the output
-        for line in output_lines:
-            if "Updating step:" in line or "Updated:" in line:
-                step_match = re.search(r"(data://[^\s]+|snapshot://[^\s]+)", line)
-                if step_match:
-                    updated_steps.append(step_match.group())
-
-        # If no specific steps found, use the input steps as they were processed
-        if not updated_steps:
-            updated_steps = steps
-
-        return StepUpdateResult(
-            success=True,
-            updated_steps=updated_steps,
-            message=f"Successfully {'previewed' if dry_run else 'updated'} {len(updated_steps)} step(s)",
-            dry_run=dry_run,
-        )
-    else:
-        return StepUpdateResult(
-            success=False,
-            updated_steps=[],
-            message=f"Step update failed with exit code {result.exit_code}: {result.output}",
-            dry_run=dry_run,
-        )
-
-
-@mcp.tool
+@etl_tools_mcp.tool
 def update_step(
     steps: List[str],
     step_version_new: Optional[str] = None,
@@ -302,11 +229,3 @@ def update_step(
     return invoke_cli_tool(
         step_update_cli, steps, options, lambda result: _parse_step_update_result(result, steps, dry_run)
     )
-
-
-
-
-
-
-if __name__ == "__main__":
-    mcp.run()

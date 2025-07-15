@@ -72,7 +72,7 @@ dependencies = [
     "sentry-sdk>=2.20.0",
     "fastjsonschema>=2.21.1",
     "mediacloud>=4.4.0",
-    "fastmcp>=2.8.1",
+    "fastmcp>=2.10.5",
 ]
 
 [tool.uv.sources]
@@ -113,6 +113,7 @@ dev-dependencies = [
     "ruff==0.8.6",
     "ipdb>=0.13.13",
     "commentjson>=0.9.0",
+    "pytest-asyncio>=1.0.0",
 ]
 
 [project.optional-dependencies]
