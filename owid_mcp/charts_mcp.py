@@ -61,15 +61,14 @@ async def search_chart(query: str, limit: int = 10) -> List[SearchResult]:
     return results
 
 
-@charts_mcp.resource("chart://{slug}")
-async def chart_resource(slug: str, **query) -> Response:
+@charts_mcp.resource("chart://{slug}", mime_type="image/svg+xml")
+async def chart_resource(slug: str, **query) -> bytes:
     """
     Streams the latest Grapher SVG for a given slug.
     Any query params (e.g. ?time=2022&country=USA) are forwarded verbatim.
     """
     qs = ("?" + urllib.parse.urlencode(query)) if query else ""
     url = f"https://ourworldindata.org/grapher/{slug}.svg{qs}"
-    __import__("ipdb").set_trace()
     async with httpx.AsyncClient(timeout=TIMEOUT) as c:
         r = await c.get(url)
         r.raise_for_status()
@@ -79,11 +78,5 @@ async def chart_resource(slug: str, **query) -> Response:
     match = re.search(rb"<title>([^<]{1,200})</title>", svg_bytes)
     alt = match.group(1).decode("utf-8") if match else slug.replace("-", " ")
 
-    return Response(
-        content=svg_bytes,
-        media_type="image/svg+xml",
-        headers={
-            "X‑Alt‑Text": alt,  # easy to read for screen readers / LLMs
-            "X‑Source-URI": url,
-        },
-    )
+    # Return the SVG content directly
+    return svg_bytes

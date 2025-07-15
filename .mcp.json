@@ -1,13 +1,16 @@
 {
   "mcpServers": {
-    "catalog": {
+    "owid": {
       "type": "stdio",
       "command": ".venv/bin/fastmcp",
       "args": [
         "run",
         "owid_mcp/server.py"
       ],
-      "env": {}
+      "env": {},
+      "dev": {
+        "watch": "owid_mcp/**/*.py"
+      }
     }
   }
 }
