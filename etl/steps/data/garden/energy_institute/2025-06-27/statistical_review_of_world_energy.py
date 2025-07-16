@@ -700,7 +700,7 @@ def fix_issues_with_other_regions(tb: Table) -> Table:
 
                 if remove_aggregate:
                     # DEBUGGING: Uncomment to plot cases where aggregate was removed.
-                    print(f"Removing {continent} aggregate for {column}")
+                    # print(f"Removing {continent} aggregate for {column}")
                     # px.line(pd.concat([tb_other, tb_continent]), x="year", y=column, color="country", markers=True,title="TO BE REMOVED").show()
                     # Remove this aggregate.
                     tb.loc[(tb["country"] == continent), column] = None

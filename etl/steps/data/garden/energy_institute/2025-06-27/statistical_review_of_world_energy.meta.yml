@@ -4,6 +4,10 @@ definitions:
     presentation:
       topic_tags:
         - Energy
+  description_processing_other_renewables: &description-processing-other-renewables |-
+    * Primary energy consumption is expressed in input-equivalents (using the [substitution method](#dod:substitutionmethod)). For "other renewables", we divide gross electricity generation by a factor of 0.32, which reflects an assumed efficiency of 32% for typical biomass power plants — the dominant source of electricity in this category globally. This approach follows the methodology used by the Statistical Review of World Energy up to the 2024 release. In 2025, the Statistical Review switched to the Physical Energy Content method to calculate Total Energy Supply. For now, we continue to use the substitution method to maintain consistency across our articles and charts.
+  description_processing_nuclear_solar_wind_hydro: &description-processing-nuclear-solar-wind-hydro |-
+    * Primary energy consumption is expressed in input-equivalents (using the [substitution method](#dod:substitutionmethod)). For nuclear, hydro, solar, and wind, we divide gross electricity generation by a time-dependent thermal efficiency factor (around 41% in recent years). This represents the average efficiency of fossil fuel power plants globally and reflects the amount of fuel that would have been required to produce the same electricity in such plants. This approach follows the methodology used by the Statistical Review of World Energy up to the 2024 release. In 2025, the Statistical Review switched to the Physical Energy Content method to calculate Total Energy Supply. For now, we continue to use the substitution method to maintain consistency across our articles and charts.
 
 dataset:
   update_period_days: 365
@@ -101,6 +105,7 @@ tables:
           Input-equivalent energy, in exajoules, is based on gross generation and does not account for cross-border electricity supply.
         presentation:
           title_public: 'Other renewables (including geothermal and biomass)'
+        description_processing: *description-processing-other-renewables
       other_renewables_consumption_equivalent_twh:  # Added by OWID.
         title: 'Other renewables (including geothermal and biomass) - TWh'
         unit: 'terawatt-hours'
@@ -111,6 +116,7 @@ tables:
           name: Other renewables
         presentation:
           title_public: 'Other renewables (including geothermal and biomass)'
+        description_processing: *description-processing-other-renewables
       other_renewables_electricity_generation_twh:
         title: 'Other renewables (including geothermal and biomass) electricity generation - TWh'
         unit: 'terawatt-hours'
@@ -307,6 +313,7 @@ tables:
           Input equivalent energy is based on gross generation and does not account for cross-border electricity supply.
         presentation:
           title_public: 'Hydropower consumption'
+        description_processing: *description-processing-nuclear-solar-wind-hydro
       hydro_consumption_equivalent_twh:  # Added by OWID.
         title: 'Hydro consumption - TWh'
         unit: 'terawatt-hours'
@@ -317,6 +324,7 @@ tables:
           name: Hydropower
         presentation:
           title_public: 'Hydropower consumption'
+        description_processing: *description-processing-nuclear-solar-wind-hydro
       hydro_electricity_generation_twh:
         title: 'Hydro generation - TWh'
         unit: 'terawatt-hours'
@@ -353,6 +361,7 @@ tables:
           Input-equivalent energy is based on gross generation and does not account for cross-border electricity supply.
         presentation:
           title_public: 'Nuclear consumption'
+        description_processing: *description-processing-nuclear-solar-wind-hydro
       nuclear_consumption_equivalent_twh:  # Added by OWID.
         title: 'Nuclear consumption - TWh'
         unit: 'terawatt-hours'
@@ -363,6 +372,7 @@ tables:
           name: Nuclear
         presentation:
           title_public: 'Nuclear consumption'
+        description_processing: *description-processing-nuclear-solar-wind-hydro
       nuclear_electricity_generation_twh:
         title: 'Nuclear generation - TWh'
         unit: 'terawatt-hours'
@@ -551,6 +561,7 @@ tables:
           Input-equivalent energy, in exajoules, is based on gross generation and does not account for cross-border electricity supply.
         presentation:
           title_public: 'Solar consumption'
+        description_processing: *description-processing-nuclear-solar-wind-hydro
       solar_consumption_equivalent_twh:  # Added by OWID.
         title: 'Solar consumption - TWh'
         unit: 'terawatt-hours'
@@ -561,6 +572,7 @@ tables:
           name: Solar
         presentation:
           title_public: 'Solar consumption'
+        description_processing: *description-processing-nuclear-solar-wind-hydro
       solar_electricity_generation_twh:
         title: 'Solar generation - TWh'
         unit: 'terawatt-hours'
@@ -579,6 +591,7 @@ tables:
           Input-equivalent energy, in exajoules, is based on gross generation and does not account for cross-border electricity supply.
         presentation:
           title_public: 'Wind consumption'
+        description_processing: *description-processing-nuclear-solar-wind-hydro
       wind_consumption_equivalent_twh:  # Added by OWID.
         title: 'Wind consumption - TWh'
         unit: 'terawatt-hours'
@@ -589,6 +602,7 @@ tables:
           name: Wind
         presentation:
           title_public: 'Wind consumption'
+        description_processing: *description-processing-nuclear-solar-wind-hydro
       wind_electricity_generation_twh:
         title: 'Wind generation - TWh'
         unit: 'terawatt-hours'
