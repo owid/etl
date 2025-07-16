@@ -189,3 +189,9 @@ steps:
   #
   export://multidim/education/latest/literacy:
     - data://grapher/unesco/2025-05-01/education_sdgs
+
+  #
+  # Mdim for PISA scores
+  #
+  export://multidim/education/latest/pisa_performance:
+    - data://grapher/oecd/2023-12-06/pisa

@@ -12,6 +12,13 @@ def run() -> None:
     # NOTE: using load_data=False which only loads metadata significantly speeds this up
     ds = paths.load_dataset("vaccination_coverage")
     tb = ds.read("vaccination_coverage", load_data=False)
+    # Drop out the non-global vaccinations
+    tb = tb.drop(
+        columns=[
+            "coverage__antigen_yfv",
+            "coverage__antigen_mena_c",
+        ]
+    )
 
     common_view_config = {
         "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.005.json",
@@ -55,7 +62,7 @@ def run() -> None:
                     "selectedFacetStrategy": "entity",
                     "title": "{title}",
                     "subtitle": "{subtitle}",
-                    "note": "This includes [diphtheria](#dod:diphtheria), [pertussis](#dod:pertussis) and [tetanus](#dod:tetanus) (3rd dose), [measles](#dod:measles) (1st dose), [hepatitis B](#dod:hepatitis-virus) (3rd dose), [polio](#dod:polio) (3rd dose), Haemophilus influenzae b (3rd dose), [rubella](#dod:rubella) (1st dose), [rotavirus](#dod:rotavirus) (final dose), pneumococcal conjugate (3rd dose), and [inactivated polio](#dod:inactivated-polio-vaccine) (first dose).",
+                    "note": "This includes [diphtheria](#dod:diphtheria), [pertussis](#dod:pertussis) and [tetanus](#dod:tetanus) (3rd dose), [measles](#dod:measles) (1st dose), [hepatitis B](#dod:hepatitis-virus) (3rd dose), [polio](#dod:polio) (3rd dose), Haemophilus influenzae b (3rd dose), [rubella](#dod:rubella) (1st dose), [rotavirus](#dod:rotavirus) (final dose), [pneumococcal conjugate](dod:pneumococcal-conjugate-vaccine) (3rd dose), and [inactivated polio](#dod:inactivated-polio-vaccine) (first dose).",
                 },
                 "view_metadata": {
                     "title": "{title}",
