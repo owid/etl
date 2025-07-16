@@ -443,7 +443,7 @@ def run() -> None:
     # therefore fossil generation).
 
     # First check that indeed there is no data for Papua New Guinea and New Caledonia in EI.
-    error = "Expected all electricity data for Papua New Guinea and New Caledania to be zero in the Statistical Review."
+    error = "Expected all electricity data for Papua New Guinea and New Caledonia to be zero in the Statistical Review."
     assert (
         (
             tb_review[tb_review["country"].isin(["Papua New Guinea", "New Caledonia"])].fillna(0)[
