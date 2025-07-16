@@ -13,7 +13,7 @@ It combines the following snapshots:
 from owid.catalog import Table
 from structlog import get_logger
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Initialize logger.
 log = get_logger()
@@ -153,7 +153,7 @@ def prepare_national_emissions(tb: Table, column_name: str) -> Table:
     return tb
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -200,10 +200,8 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = create_dataset(
-        dest_dir,
+    ds_meadow = paths.create_dataset(
         tables=[tb_fossil_co2, tb_historical, tb_land_use, tb_production, tb_consumption],
         default_metadata=snap_fossil_co2.metadata,
-        check_variables_metadata=True,
     )
     ds_meadow.save()

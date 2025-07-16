@@ -16,7 +16,7 @@ from owid.datautils import dataframes
 from structlog import get_logger
 
 from etl.data_helpers import geo
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 log = get_logger()
 
@@ -145,7 +145,7 @@ COLUMNS_THAT_MUST_HAVE_DATA = [
 ]
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -244,9 +244,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset and use metadata from meadow dataset.
-    ds_garden = create_dataset(
-        dest_dir=dest_dir, tables=[tb_combined], default_metadata=ds_meadow.metadata, check_variables_metadata=True
-    )
+    ds_garden = paths.create_dataset(tables=[tb_combined], default_metadata=ds_meadow.metadata)
     ds_garden.save()
 
 
