@@ -82,7 +82,7 @@ definitions:
         <%- endif %>
       - UCDP identifies conflict deaths [based on news reports, other contemporary sources, and academic research](https://www.uu.se/en/department/peace-and-conflict-research/research/ucdp/ucdp-methodology).
       - |-
-        UCDP's data for 2025 is preliminary. This means the number of deaths may be too low because more information becomes available later, or they may be too high because some events are later found not to be part of an armed conflict. We still show this data to provide more up-to-date information.
+        UCDP's data for 2025 is preliminary. This means the number of deaths may be too low because more information becomes available later, or they may be too high because some events are later found not to be part of an armed conflict. We still show this data to provide more up-to-date information, but figures on this chart may change in the future if UCDP revises its estimates.
       - |-
         We use UCDP's quarterly Candidate Events Datasets for the preliminary data. We add data for the first quarter of the current year in May, for the second quarter in August, for the third quarter in November, and for the fourth quarter in February.
 
@@ -94,7 +94,7 @@ definitions:
         <%- endif %>
       - UCDP identifies conflict deaths [based on news reports, other contemporary sources, and academic research](https://www.uu.se/en/department/peace-and-conflict-research/research/ucdp/ucdp-methodology).
       - |-
-        UCDP's data for 2025 is preliminary. This means the number of deaths may be too low because more information becomes available later, or they may be too high because some events are later found not to be part of an armed conflict. We still show this data to provide more up-to-date information.
+        UCDP's data for 2025 is preliminary. This means the number of deaths may be too low because more information becomes available later, or they may be too high because some events are later found not to be part of an armed conflict. We still show this data to provide more up-to-date information, but figures on this chart may change in the future if UCDP revises its estimates.
       - |-
         We use UCDP's quarterly Candidate Events Datasets for the preliminary data. We add data for the first quarter of the current year in May, for the second quarter in August, for the third quarter in November, and for the fourth quarter in February.
       - "'Best' death estimates as identified by UCDP."
