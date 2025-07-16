@@ -43,10 +43,10 @@ UNIVERSAL = {
     "RCV1": True,  # All countries that have not yet introduced RCV should plan to do so.
     "HEPB3": True,
     "HIB3": True,
-    "HEPB_BD": True,  # Hepatitis B birth dose is recommended in all countries
+    "HEPB_BD": True,  # Hepatitis B birth dose is recommended in
     "MCV2": True,  # Measles second dose is recommended in all countries
     "ROTAC": True,  # Rotavirus vaccine is recommended in all countries
-    "PCV3": True,  # Pneumococcal conjugate vaccine is recommended in all countries
+    "PCV3": True,  # Pneumococcal conjugate vaccine is
     "IPV1": True,  # Inactivated polio vaccine is recommended in all countries
     "IPV2": True,  # Inactivated polio vaccine is recommended in all
     "YFV": False,  # Yellow fever vaccine is recommended in countries with risk of yellow fever transmission
@@ -68,11 +68,11 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
+    # Keep only data from WUENIC (the estimates by World Health Organization and UNICEF).
+    tb = use_only_wuenic_data(tb)
     tb = geo.harmonize_countries(
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
-    # Keep only data from WUENIC (the estimates by World Health Organization and UNICEF).
-    tb = use_only_wuenic_data(tb)
     tb = clean_data(tb)
     # Add denominator column
     tb = tb.assign(denominator=tb["antigen"].map(DENOMINATOR))
@@ -99,7 +99,7 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def get_population_of_age_group(ds_population: Dataset, age: str) -> Table:
+def get_population_of_age_group(ds_population: Dataset, age=str) -> Table:
     tb_pop = ds_population.read("population", reset_metadata="keep_origins")
     tb_pop = tb_pop[(tb_pop["age"] == age) & (tb_pop["variant"] == "estimates") & (tb_pop["sex"] == "all")]
     tb_pop = tb_pop[["country", "year", "sex", "age", "variant", "population"]]
@@ -127,7 +127,7 @@ def calculate_one_year_olds_vaccinated(tb: Table, ds_population: Dataset) -> Tab
 
 def calculate_newborns_vaccinated(tb: Table, ds_population: Dataset) -> Table:
     """
-    Calculate the number of one-year-olds vaccinated for each antigen.
+    Calculate the number of newborns vaccinated for each antigen.
     """
 
     tb = tb[tb["denominator"] == "Live births"]
