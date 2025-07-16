@@ -53,6 +53,310 @@ OWID_API_BASE = os.getenv("OWID_API_BASE", "https://api.ourworldindata.org/v1/in
 GRAPHER_BASE = os.getenv("GRAPHER_BASE", "https://ourworldindata.org/grapher")
 HTTP_TIMEOUT = httpx.Timeout(10.0)
 
+# Common entities list for instructions
+COMMON_ENTITIES = """
+Abkhazia
+Afghanistan
+Africa
+Akrotiri and Dhekelia
+Aland Islands
+Albania
+Algeria
+American Samoa
+Andorra
+Angola
+Anguilla
+Antarctica
+Antigua and Barbuda
+Argentina
+Armenia
+Aruba
+Asia
+Australia
+Austria
+Austria-Hungary
+Azerbaijan
+Bahamas
+Bahrain
+Bangladesh
+Barbados
+Belarus
+Belgium
+Belize
+Benin
+Bermuda
+Bhutan
+Bolivia
+Bonaire Sint Eustatius and Saba
+Bosnia and Herzegovina
+Bosnia and Herz.
+Botswana
+Bouvet Island
+Brazil
+British Indian Ocean Territory
+British Virgin Islands
+Brunei
+Bulgaria
+Burkina Faso
+Burundi
+Cambodia
+Cameroon
+Canada
+Cape Verde
+Cayman Islands
+Central African Republic
+Chad
+Channel Islands
+Chile
+China
+Christmas Island
+Cocos Islands
+Colombia
+Comoros
+Congo
+Cook Islands
+Costa Rica
+Cote d'Ivoire
+Croatia
+Cuba
+Curacao
+Cyprus
+Czechia
+Czechoslovakia
+Democratic Republic of Congo
+DR Congo
+Denmark
+Djibouti
+Dominica
+Dominican Republic
+East Germany
+East Timor
+Ecuador
+Egypt
+El Salvador
+Equatorial Guinea
+Eritrea
+Ethiopia (former)
+Estonia
+Eswatini
+Ethiopia
+Europe
+European Union (27)
+Faroe Islands
+Falkland Islands
+Fiji
+Finland
+France
+French Guiana
+French Polynesia
+French Southern Territories
+Gabon
+Gambia
+Gaza Strip
+Georgia
+Germany
+Ghana
+Gibraltar
+Greece
+Greenland
+Grenada
+Guadeloupe
+Guam
+Guatemala
+Guernsey
+Guinea
+Guinea-Bissau
+Guyana
+Haiti
+Heard Island and McDonald Islands
+Honduras
+Hong Kong
+Hungary
+Iceland
+India
+Indonesia
+Iran
+Iraq
+Ireland
+Isle of Man
+Israel
+Italy
+Jamaica
+Japan
+Jersey
+Jordan
+Kazakhstan
+Kenya
+Kiribati
+Kosovo
+Kuwait
+Kyrgyzstan
+Laos
+Latvia
+Lebanon
+Lesotho
+Liberia
+Libya
+Liechtenstein
+Lithuania
+Luxembourg
+Macao
+Madagascar
+Malawi
+Malaysia
+Maldives
+Mali
+Malta
+Marshall Islands
+Martinique
+Mauritania
+Mauritius
+Mayotte
+Melanesia
+Mexico
+Micronesia (country)
+Moldova
+Monaco
+Mongolia
+Montenegro
+Montserrat
+Morocco
+Mozambique
+Myanmar
+Nagorno-Karabakh
+Namibia
+Nauru
+Nepal
+Netherlands
+Netherlands Antilles
+New Caledonia
+New Zealand
+Nicaragua
+Niger
+Nigeria
+Niue
+Norfolk Island
+North America
+North Korea
+North Macedonia
+Northern Cyprus
+Northern Mariana Islands
+Norway
+Oceania
+Oman
+Pakistan
+Palau
+Palestine
+Panama
+Papua New Guinea
+Paraguay
+Peru
+Philippines
+Pitcairn
+Poland
+Polynesia
+Portugal
+Puerto Rico
+Qatar
+Democratic Republic of Vietnam
+Republic of Vietnam
+Reunion
+Romania
+Russia
+Rwanda
+Saint Barthelemy
+Saint Helena
+Saint Kitts and Nevis
+Saint Lucia
+Saint Martin (French part)
+Saint Pierre and Miquelon
+Saint Vincent and the Grenadines
+Samoa
+San Marino
+Sao Tome and Principe
+Saudi Arabia
+Senegal
+Serbia
+Serbia and Montenegro
+Serbia excluding Kosovo
+Seychelles
+Sierra Leone
+Singapore
+Sint Maarten (Dutch part)
+Slovakia
+Slovenia
+Solomon Islands
+Somalia
+Somaliland
+South Africa
+South America
+South Georgia and the South Sandwich Islands
+South Korea
+South Ossetia
+South Sudan
+Spain
+Sri Lanka
+Sudan
+Sudan (former)
+Suriname
+Svalbard and Jan Mayen
+Sweden
+Switzerland
+Syria
+Taiwan
+Tajikistan
+Tanzania
+Thailand
+Togo
+Tokelau
+Tonga
+Transnistria
+Trinidad and Tobago
+Tunisia
+Turkey
+Turkmenistan
+Turks and Caicos Islands
+Turks and Caicos
+Tuvalu
+USSR
+Uganda
+Ukraine
+United Arab Emirates
+United Kingdom
+Korea (former)
+United States
+United States Minor Outlying Islands
+United States Virgin Islands
+Uruguay
+Uzbekistan
+Vanuatu
+Vatican
+Venezuela
+Vietnam
+Wallis and Futuna
+West Germany
+Western Sahara
+World
+Yemen
+Yemen Arab Republic
+Yemen People's Republic
+Yugoslavia
+Zambia
+Zanzibar
+Zimbabwe
+Grand Duchy of Tuscany
+Kingdom of the Two Sicilies
+Duchy of Modena and Reggio
+Kingdom of Sardinia
+Duchy of Parma and Piacenza
+Grand Duchy of Baden
+Kingdom of Bavaria
+Kingdom of Saxony
+Kingdom of Wurttemberg
+Great Colombia
+Federal Republic of Central America
+"""
+
 # ---------------------------------------------------------------------------
 # FastMCP server instance
 # ---------------------------------------------------------------------------
@@ -63,7 +367,8 @@ mcp = FastMCP(
         "Call `search_indicator` or `search_chart` to discover resources. "
         "Fetch indicators via `ind://{id}` for all data or `ind://{id}/{entity}` for specific country/entity data. "
         "Fetch charts via `chart://{slug}`. "
-        "Entity names must match exactly as they appear in OWID (e.g., 'United States', not 'US')."
+        "Entity names must match exactly as they appear in OWID:\n"
+        f"{COMMON_ENTITIES}"
     ),
 )
 
@@ -75,13 +380,13 @@ mcp = FastMCP(
 @mcp.tool
 async def search_indicator(query: str, limit: int = 10) -> List[Dict]:
     """Search for OWID indicators by name or description.
-    
+
     Returns a list of indicators matching the query, each with:
     - title: indicator name
     - resource_uri: URI to fetch the indicator data (e.g., 'ind://2118')
     - snippet: truncated description
     - score: relevance score
-    
+
     Use the resource_uri with ReadMcpResourceTool to get the actual data.
     """
     sql = """
@@ -114,14 +419,14 @@ async def search_indicator(query: str, limit: int = 10) -> List[Dict]:
 @mcp.tool
 async def search_chart(query: str, limit: int = 10) -> List[ChartSearchResult]:
     """Search for OWID charts by slug, title, or note.
-    
+
     Returns a list of charts matching the query, each with:
     - title: chart title
     - resource_uri: URI to fetch the chart SVG (e.g., 'chart://population-density')
     - snippet: truncated chart note/description
     - metadata: additional chart metadata
     - score: relevance score
-    
+
     Use the resource_uri with ReadMcpResourceTool to get the chart image.
     """
     sql = """
@@ -159,7 +464,7 @@ async def search_chart(query: str, limit: int = 10) -> List[ChartSearchResult]:
 
 
 def _build_rows(data_json: Dict[str, Any], entities_meta: Dict[int, Dict[str, str]]) -> List[Dict[str, Any]]:
-    """Convert the compact OWID arrays into a list[{entity, code, year, value}]."""
+    """Convert the compact OWID arrays into a list[{entity, year, value}]."""
 
     values = data_json["values"]
     years = data_json["years"]
@@ -180,7 +485,6 @@ def _build_rows(data_json: Dict[str, Any], entities_meta: Dict[int, Dict[str, st
         append(
             {
                 "entity": meta["name"],
-                "code": meta["code"],
                 "year": y,
                 "value": v,
             }
@@ -210,7 +514,7 @@ async def indicator_resource(indicator_id: int, entity: str | None = None) -> Di
         {
           "metadata": { <OWID metadata unchanged> },
           "data": [
-              {"entity": "United States", "code": "USA", "year": 2019, "value": 36.0},
+              {"entity": "United States", "year": 2019, "value": 36.0},
               ...
           ]
         }
@@ -231,7 +535,18 @@ async def indicator_resource(indicator_id: int, entity: str | None = None) -> Di
     # Optional server‑side filter for a single entity
     if entity is not None:
         ent_lower = entity.lower()
-        rows = [r for r in rows if (r["entity"] and r["entity"].lower() == ent_lower) or (r["code"] and r["code"].lower() == ent_lower)]
+        # Filter by entity name or code (check against entities_meta for code matching)
+        filtered_rows = []
+        for r in rows:
+            if r["entity"] and r["entity"].lower() == ent_lower:
+                filtered_rows.append(r)
+            else:
+                # Check if entity matches any code in entities_meta
+                for ent_meta in entities_meta.values():
+                    if ent_meta["code"] and ent_meta["code"].lower() == ent_lower and ent_meta["name"] == r["entity"]:
+                        filtered_rows.append(r)
+                        break
+        rows = filtered_rows
 
     return {"metadata": metadata, "data": rows}
 
@@ -255,7 +570,18 @@ async def indicator_resource_for_entity(indicator_id: int, entity: str) -> Dict[
     # Filter for the specific entity
     if entity is not None:
         ent_lower = entity.lower()
-        rows = [r for r in rows if (r["entity"] and r["entity"].lower() == ent_lower) or (r["code"] and r["code"].lower() == ent_lower)]
+        # Filter by entity name or code (check against entities_meta for code matching)
+        filtered_rows = []
+        for r in rows:
+            if r["entity"] and r["entity"].lower() == ent_lower:
+                filtered_rows.append(r)
+            else:
+                # Check if entity matches any code in entities_meta
+                for ent_meta in entities_meta.values():
+                    if ent_meta["code"] and ent_meta["code"].lower() == ent_lower and ent_meta["name"] == r["entity"]:
+                        filtered_rows.append(r)
+                        break
+        rows = filtered_rows
 
     return {"metadata": metadata, "data": rows}
 
