@@ -853,7 +853,7 @@ def create_primary_energy_in_input_equivalents(tb: Table):
     # year_max = old["year"].max()
     # compare_tables(old[old["year"] <= year_max], tb[tb["year"] <= year_max], columns=columns, countries=countries, max_num_charts = 100)
 
-    # Compare specifically the hydro primary consumption calculated here, with the one provided in the 2024 statistical review.
+    # Compare the primary consumption calculated here, with the one provided in the 2024 statistical review.
     # print(f"Mean percentual deviation between new (calculated) and old (from 2024 Statistical Review) primary energy consumption for:")
     # # Negative percentages mean that the new values are systematically lower than the 2024 ones.
     # for source in ["hydro", "nuclear", "solar", "wind", "other_renewables"]:
@@ -862,6 +862,33 @@ def create_primary_energy_in_input_equivalents(tb: Table):
     #     compared["dev"] = (compared[f"{source}_consumption_equivalent_twh_new"] - compared[f"{source}_consumption_equivalent_twh_old"]) / compared[f"{source}_consumption_equivalent_twh_old"]
     #     print(f"- {source}: {compared['dev'].mean():.2%}")
     #     px.line(compared[compared["country"]=="World"].drop(columns=["dev"]).melt(id_vars=["country", "year"]), x="year", y="value", color="variable", markers=True).show()
+    # The resulting deviations are:
+    # - hydro: -6.02%
+    # - nuclear: -2.10%
+    # - solar: -5.71%
+    # - wind: -6.00%
+    # - other_renewables: 8.54%
+
+    # Now forget about the 2025 data. Take the 2024 data alone, and compare the old primary energy consumption of each source with the one obtained by dividing electricity generation by efficiency. Do we get the same deviations?
+    # print(f"Using data from the 2024 Statistical Review alone, we now calculate the mean percentual deviation between the calculated primary energy consumption and the one given in the data:")
+    # for source in ["hydro", "nuclear", "solar", "wind", "other_renewables"]:
+    #     t = old[["country", "year", f"{source}_electricity_generation_twh", f"{source}_consumption_equivalent_twh", "efficiency_factor"]].copy()
+    #     if source == "other_renewables":
+    #         t[f"{source}_consumption_equivalent_twh_calculated"] = t[f"{source}_electricity_generation_twh"] / 0.32
+    #     else:
+    #         t[f"{source}_consumption_equivalent_twh_calculated"] = t[f"{source}_electricity_generation_twh"] / t["efficiency_factor"]
+    # t["dev"] = (t[f"{source}_consumption_equivalent_twh_calculated"] - t[f"{source}_consumption_equivalent_twh"]) / t[f"{source}_consumption_equivalent_twh"]
+    #     print(f"- {source}: {t['dev'].mean():.2%}")
+    #     px.line(t[t["country"]=="World"].drop(columns=["dev", "efficiency_factor", f"{source}_electricity_generation_twh"]).melt(id_vars=["country", "year"]), x="year", y="value", color="variable", markers=True).show()
+    # The resulting deviations are:
+    # - hydro: -6.05%
+    # - nuclear: -2.09%
+    # - solar: -6.04%
+    # - wind: -6.04%
+    # - other_renewables: 0.71%
+    # So, except for other renewables, we get very similar deviations as with the 2025 data.
+    # This means that the main issue is not related to changes in the 2025 methodology. Rather, what they used to call primary energy consumption for non-fossil generation is not exactly equal to gross generation / efficiency factor, as they describe in the methodology (or, alternatively, the efficiency factors quoted in their methodology are different to the ones used to do the conversion).
+    # By looking at the methodology document, I can't figure out the reason for this discrepancy (by which the calculated primary energy consumption of hydro, solar and wind is ~6% lower than the one quoted in the data). But this discrepancy has been there for at least various years.
 
     return tb
 
