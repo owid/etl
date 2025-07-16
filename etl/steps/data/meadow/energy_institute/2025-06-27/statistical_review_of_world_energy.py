@@ -98,6 +98,38 @@ SHEET_INDICATOR_UNITS = [
 ]
 
 
+def pre_harmonize_country_names(tb: Table) -> Table:
+    # For consistency with all other tables, rename some countries to their most common names in the dataset.
+    # Their names will be properly harmonized in the garden step.
+    country_mapping = {
+        "Eastern Africa": "Total Eastern Africa",
+        "Middle Africa": "Total Middle Africa",
+        "Western Africa": "Total Western Africa",
+        "Central America": "Total Central America",
+        "European Union": "Total EU",
+        "Non-OECD": "Total Non-OECD",
+        "OECD": "Total OECD",
+        "OPEC": "Total OPEC",
+        "Non-OPEC": "Total Non-OPEC",
+        "Turkey": "Turkiye",
+        "DR Congo": "Democratic Republic of Congo",
+        "Other North Africa": "Other Northern Africa",
+        # The following entities appear in minerals data. Pre-harmonize them to be consistent with other sheets.
+        "United States": "US",
+        "Russia": "Russian Federation",
+        "Burma": "Myanmar",
+    }
+    tb["country"] = map_series(
+        tb["country"],
+        country_mapping,
+        warn_on_missing_mappings=False,
+        warn_on_unused_mappings=False,
+        show_full_warning=True,
+    )
+
+    return tb
+
+
 def parse_sheet(data_spreadsheet: pr.ExcelFile, sheet: str, indicator: str, unit: str) -> Table:
     tb = data_spreadsheet.parse(sheet, skiprows=2)
 
@@ -136,29 +168,8 @@ def parse_sheet(data_spreadsheet: pr.ExcelFile, sheet: str, indicator: str, unit
     # Fix dtypes.
     tb = tb.astype({"year": "Int64", indicator: "Float64"})
 
-    # For consistency with all other tables, rename some countries to their most common names in the dataset.
-    # Their names will be properly harmonized in the garden step.
-    country_mapping = {
-        "Eastern Africa": "Total Eastern Africa",
-        "Middle Africa": "Total Middle Africa",
-        "Western Africa": "Total Western Africa",
-        "Central America": "Total Central America",
-        "European Union": "Total EU",
-        "Non-OECD": "Total Non-OECD",
-        "OECD": "Total OECD",
-        "OPEC": "Total OPEC",
-        "Non-OPEC": "Total Non-OPEC",
-        "Turkey": "Turkiye",
-        "DR Congo": "Democratic Republic of Congo",
-        "Other North Africa": "Other Northern Africa",
-    }
-    tb["country"] = map_series(
-        tb["country"],
-        country_mapping,
-        warn_on_missing_mappings=False,
-        warn_on_unused_mappings=False,
-        show_full_warning=True,
-    )
+    # Pre-harmonize country names.
+    tb = pre_harmonize_country_names(tb=tb)
 
     # Drop any remaining rows with no data.
     tb = tb.dropna(subset=[indicator]).reset_index(drop=True)
@@ -559,6 +570,97 @@ def combine_consolidated_dataset_and_spreadsheet(tb_consolidated, data_spreadshe
     return tb_combined
 
 
+def _parse_mineral_sheet(data_spreadsheet: pr.ExcelFile, sheet_name: str) -> Table:
+    # Extract mineral name.
+    mineral = sheet_name.replace(" P-R", "")
+
+    # Define production and reserves column names, following the naming of the consolidated dataset.
+    mineral_short_name = mineral.lower().replace(" ", "_")
+    production_column = f"{mineral_short_name}_production_kt"
+    reserves_column = f"{mineral_short_name}_reserves_kt"
+
+    # Parse sheet.
+    tb_production_and_reserves = data_spreadsheet.parse(sheet_name=sheet_name, skiprows=2)
+    error = f"Sheet {sheet_name} has changed."
+    assert tb_production_and_reserves.columns[0].startswith("Thousand tonnes"), error
+    tb_production_and_reserves = tb_production_and_reserves.rename(
+        columns={tb_production_and_reserves.columns[0]: "country"}, errors="raise"
+    )
+
+    # Remove empty rows and rows of footnotes.
+    tb_production_and_reserves = tb_production_and_reserves.dropna(
+        subset=tb_production_and_reserves.columns[1:], how="all"
+    ).reset_index(drop=True)
+
+    # Remove numbers from country names (they are references to footnotes).
+    tb_production_and_reserves["country"] = [
+        re.sub(r"\d", "", country).strip().strip(" -").replace("\n", " ")
+        for country in tb_production_and_reserves["country"]
+    ]
+    # Remove spurious spaces.
+    tb_production_and_reserves["country"] = [
+        re.sub(r"\s{2,3}", " ", country) for country in tb_production_and_reserves["country"]
+    ]
+
+    # Pre-harmonize country names.
+    tb_production_and_reserves = pre_harmonize_country_names(tb=tb_production_and_reserves)
+
+    # Extract reserves data.
+    _column_reserves = [column for column in tb_production_and_reserves.columns if str(column).startswith("At end of")]
+    assert len(_column_reserves) == 1, f"Could not extract reserves column for {sheet_name}"
+    column_reserves = _column_reserves[0]
+    reserves_year = int(re.findall(r"\d{4}", column_reserves)[0])
+    tb_reserves = (
+        tb_production_and_reserves[["country", column_reserves]]
+        .assign(**{"year": reserves_year})
+        .rename(columns={column_reserves: reserves_column}, errors="raise")
+    )
+
+    # Ignore columns of share, change, and reserves.
+    tb_production_and_reserves = tb_production_and_reserves[
+        ["country"] + [column for column in tb_production_and_reserves.columns if isinstance(column, int)]
+    ]
+
+    # Create a table of production data.
+    tb_production = tb_production_and_reserves.melt(id_vars=["country"], var_name="year", value_name=production_column)
+
+    # Combine production and reserves data.
+    tb_mineral = tb_production.merge(tb_reserves, on=["country", "year"], how="outer")
+
+    if mineral == "Aluminium":
+        # In the case of aluminium, the spreadsheet does not contain reserves (which is given for bauxite) but capacity.
+        tb_mineral = tb_mineral.rename(columns={"aluminium_reserves_kt": "aluminium_capacity_kt"}, errors="raise")
+
+    return tb_mineral
+
+
+def parse_minerals_data(data_spreadsheet: pr.ExcelFile) -> Table:
+    minerals = [
+        "Cobalt",
+        "Lithium",
+        "Natural Graphite",
+        "Rare Earth metals",
+        "Copper",
+        "Manganese",
+        "Nickel",
+        "Zinc",
+        "Platinum Group Metals",
+        "Bauxite",
+        "Aluminium",
+        "Tin",
+        "Vanadium",
+    ]
+    tables_minerals = [
+        _parse_mineral_sheet(data_spreadsheet=data_spreadsheet, sheet_name=f"{mineral} P-R") for mineral in minerals
+    ]
+    tb_minerals = pr.multi_merge(tables=tables_minerals, on=["country", "year"], how="outer")
+
+    # Improve table format.
+    tb_minerals = tb_minerals.format()
+
+    return tb_minerals
+
+
 def run() -> None:
     #
     # Load inputs.
@@ -606,6 +708,9 @@ def run() -> None:
         data=data_spreadsheet, origin=snap_spreadsheet.metadata.origin, license=snap_spreadsheet.metadata.license
     )
 
+    # Parse minerals production and reserves.
+    tb_minerals = parse_minerals_data(data_spreadsheet=data_spreadsheet)
+
     # Combine main table and coal, gas, and oil reserves.
     tb = pr.multi_merge(
         [
@@ -613,6 +718,7 @@ def run() -> None:
             tb_coal_reserves.reset_index(),
             tb_gas_reserves.reset_index(),
             tb_oil_reserves.reset_index(),
+            tb_minerals.reset_index(),
         ],
         how="outer",
         on=["country", "year"],

@@ -104,18 +104,40 @@ COLUMNS = {
     "electbyfuel_gas": "gas_electricity_generation_twh",
     # Gas reserves.
     "gas_reserves_tcm": "gas_reserves_tcm",
+    # NOTE: The following data for minerals does not follow the naming convention of the consolidated dataset, for convenience.
     # Cobalt production.
-    "cobalt_kt": "cobalt_production_kt",
+    "cobalt_production_kt": "cobalt_production_kt",
     # Cobalt reserves.
-    "cobaltres_kt": "cobalt_reserves_kt",
+    "cobalt_reserves_kt": "cobalt_reserves_kt",
     # Graphite production.
-    "graphite_kt": "graphite_production_kt",
+    "natural_graphite_production_kt": "graphite_production_kt",
     # Graphite reserves.
-    "graphiteres_kt": "graphite_reserves_kt",
+    "natural_graphite_reserves_kt": "graphite_reserves_kt",
     # Lithium production.
-    "lithium_kt": "lithium_production_kt",
+    "lithium_production_kt": "lithium_production_kt",
     # Lithium reserves.
-    "lithiumres_kt": "lithium_reserves_kt",
+    "lithium_reserves_kt": "lithium_reserves_kt",
+    # NOTE: There is data for other minerals that we could use here:
+    # "rare_earth_metals_production_kt": "rare_earth_metals_production_kt",
+    # "rare_earth_metals_reserves_kt": "rare_earth_metals_reserves_kt",
+    # "copper_production_kt": "copper_production_kt",
+    # "copper_reserves_kt": "copper_reserves_kt",
+    # "manganese_production_kt": "manganese_production_kt",
+    # "manganese_reserves_kt": "manganese_reserves_kt",
+    # "nickel_production_kt": "nickel_production_kt",
+    # "nickel_reserves_kt": "nickel_reserves_kt",
+    # "zinc_production_kt": "zinc_production_kt",
+    # "zinc_reserves_kt": "zinc_reserves_kt",
+    # "platinum_group_metals_production_kt": "platinum_group_metals_production_kt",
+    # "platinum_group_metals_reserves_kt": "platinum_group_metals_reserves_kt",
+    # "bauxite_production_kt": "bauxite_production_kt",
+    # "bauxite_reserves_kt": "bauxite_reserves_kt",
+    # "aluminium_production_kt": "aluminium_production_kt",
+    # "aluminium_capacity_kt": "aluminium_capacity_kt",
+    # "tin_production_kt": "tin_production_kt",
+    # "tin_reserves_kt": "tin_reserves_kt",
+    # "vanadium_production_kt": "vanadium_production_kt",
+    # "vanadium_reserves_kt": "vanadium_reserves_kt",
     # Electricity generation.
     "elect_twh": "electricity_generation_twh",
     # 'electbyfuel_total': 'electricity_generation_twh',
