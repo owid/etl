@@ -65,6 +65,8 @@ async def test_indicator_resource():
         assert "data" in data
         assert isinstance(data["data"], list)
 
+        assert data["data"][0] == {"code": "VUT", "entity": "Vanuatu", "value": 5.39073010664479, "year": 1961}
+
 
 @pytest.mark.asyncio
 async def test_indicator_resource_for_entity():
