@@ -1,124 +1,63 @@
-# OWID MCP Server
+# Test MCP Server
 
-A FastMCP server providing access to OWID's data catalog and chart visualization tools.
+This is a mock MCP server for testing purposes, demonstrating both resources and tools functionality using fastMCP.
 
-## Architecture
-
-This server uses FastMCP's composition pattern with separate modules:
-
-- **`server.py`** - Main server that mounts specialized sub-servers
-- **`etl.py`** - ETL catalog tools (find tables, create PRs, update steps)  
-- **`charts.py`** - Chart search and visualization tools
-
-## Available Tools
-
-### ETL Tools (mounted at `catalog/`)
-
-| Tool | Description |
-|------|-------------|
-| `find_table()` | Search data catalog tables by name, namespace, dataset, version |
-| `create_pr()` | Create pull requests using existing PR CLI |
-| `update_step()` | Update ETL steps to new versions |
-
-### Chart Tools (mounted at `charts/`)
-
-| Tool | Description |
-|------|-------------|
-| `search_chart(query)` | Find chart slugs by title/note (searches Datasette `charts` table) |
+## Features
 
 ### Resources
+- `dataset://{dataset_id}` - Get information about specific datasets
+- `test://data/all` - Get all test data
+- `test://data/{category}` - Get test data filtered by category
 
-| Resource | Description |
-|----------|-------------|
-| `chart://{slug}` | Streams latest Grapher SVG with optional query parameters |
+### Tools
+- `list_datasets()` - List all available datasets
+- `search_data(query, category, min_value, max_value)` - Search test data with filters
+- `calculate_stats(category)` - Calculate statistics for test data
+- `create_sample_data(name, value, category)` - Create new sample data entry
 
-## Usage Examples
-
-### Running the Server
-
-```bash
-# Run the main server
-python -m mcp.server
-
-# Or run individual modules for testing
-python -m mcp.etl
-python -m mcp.charts
-```
-
-### Testing Chart Search
-
-```python
-# Test directly in Python
-import asyncio
-from mcp.charts import search_chart
-
-async def test_chart_search():
-    results = await search_chart("population density")
-    for result in results:
-        print(f"Title: {result.title}")
-        print(f"URI: {result.resource_uri}")
-        print(f"Snippet: {result.snippet}")
-        print("---")
-
-asyncio.run(test_chart_search())
-```
+## Running the Server
 
 ```bash
-# Or run the charts server directly
-python -c "
-import asyncio
-from mcp.charts import charts_mcp
+# Activate virtual environment
+source .venv/bin/activate
 
-async def test():
-    # This would typically be called by MCP client
-    pass
-
-# Run the server
-charts_mcp.run()
-"
+# Run the test MCP server
+python -m owid_test_mcp.server
 ```
 
-### Testing ETL Tools
+## Testing with LLM
 
-```python
-# Test directly in Python
-from mcp.etl import find_table, create_pr, update_step
+Once the server is running, you can test it by asking an LLM to interact with it. Here are some example prompts:
 
-# Find tables in the biodiversity namespace
-tables = find_table(namespace="biodiversity", channel="garden")
-for table in tables:
-    print(f"Table: {table.table}")
-    print(f"Dataset: {table.dataset}")
-    print(f"Version: {table.version}")
-    print(f"Download URL: {table.download_url}")
-    print("---")
+### Testing Resources
+1. "Can you show me the available MCP resources?"
+2. "Read the resource `dataset://dataset1`"
+3. "Get all test data from `test://data/all`"
+4. "Show me climate data from `test://data/climate`"
 
-# Create a new PR (dry run - check what would happen)
-# pr_result = create_pr(title="Update biodiversity dataset", category="data")
-# print(f"PR would be created: {pr_result.message}")
+### Testing Tools
+1. "Use the MCP tool to list all datasets"
+2. "Search for data containing 'temperature' in the climate category"
+3. "Calculate statistics for the climate category"
+4. "Create a new sample data entry with name 'Wind Speed', value 15.5, category 'climate'"
 
-# Update ETL steps (dry run)
-# update_result = update_step(
-#     steps=["data://garden/biodiversity/2025-04-07/cherry_blossom"], 
-#     dry_run=True
-# )
-# print(f"Update result: {update_result.message}")
-```
+### Combined Testing
+"List all available datasets, then read the details of dataset1, and finally calculate statistics for climate data"
 
-### Testing with MCP Client
+## Sample Data
 
-If you have an MCP client configured, you can test with:
+The server includes sample datasets and test data for demonstration:
 
-```bash
-# Example with hypothetical MCP client
-# mcp-client call search_chart '{"query": "population density"}'
-# mcp-client call find_table '{"namespace": "biodiversity"}'
-```
+**Datasets:**
+- dataset1: Global Temperature Data (1000 records)
+- dataset2: Population Statistics (195 records)
+- dataset3: Economic Indicators (500 records)
 
-## Development
+**Test Data:**
+- Climate data: Temperature, Humidity, Pressure
+- Demographics: Population
+- Economics: GDP
 
-The server follows FastMCP best practices:
-- No nested function definitions
-- Clean module separation using `mount()`
-- Direct tool registration at module level
-- Proper type hints and documentation
+## Configuration
+
+The server runs on the default MCP port and can be configured through environment variables or command-line arguments as supported by fastMCP.
