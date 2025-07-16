@@ -25,7 +25,7 @@ import os
 import re
 import urllib.parse
 from dataclasses import dataclass
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 import httpx
 from fastmcp import FastMCP
@@ -35,6 +35,7 @@ from fastmcp.server.server import Response
 # Data structures
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class ChartSearchResult:
     title: str
@@ -42,6 +43,7 @@ class ChartSearchResult:
     snippet: str
     metadata: Dict
     score: float
+
 
 # ---------------------------------------------------------------------------
 # Configuration
@@ -135,19 +137,106 @@ async def search_chart(query: str, limit: int = 10) -> List[ChartSearchResult]:
 # ---------------------------------------------------------------------------
 
 
+def _build_rows(data_json: Dict[str, Any], entities_meta: Dict[int, Dict[str, str]]) -> List[Dict[str, Any]]:
+    """Convert the compact OWID arrays into a list[{entity, code, year, value}]."""
+
+    values = data_json["values"]
+    years = data_json["years"]
+    entity_ids = data_json["entities"]
+
+    # Guard against length mismatch
+    if not (len(values) == len(years) == len(entity_ids)):
+        raise ValueError("Mismatched lengths in OWID data arrays")
+
+    rows: List[Dict[str, Any]] = []
+    append = rows.append
+
+    for v, y, eid in zip(values, years, entity_ids):
+        meta = entities_meta.get(eid)
+        if meta is None:
+            # Skip unknown entity id (should not normally happen)
+            continue
+        append(
+            {
+                "entity": meta["name"],
+                "code": meta["code"],
+                "year": y,
+                "value": v,
+            }
+        )
+
+    return rows
+
+
+async def _fetch_json(url: str) -> Dict[str, Any]:
+    async with httpx.AsyncClient(timeout=HTTP_TIMEOUT) as client:
+        resp = await client.get(url)
+        resp.raise_for_status()
+        return resp.json()
+
+
 @mcp.resource("ind://{indicator_id}")
-async def indicator_resource(indicator_id: int) -> Dict:
-    """Return data & metadata JSON for a given indicator ID."""
+async def indicator_resource(indicator_id: int, entity: str | None = None) -> Dict[str, Any]:
+    """Return indicator **data** and **metadata** in a flat, convenient format.
 
-    async def _fetch(kind: str):
-        url = f"{OWID_API_BASE}/{indicator_id}.{kind}.json"
-        async with httpx.AsyncClient(timeout=HTTP_TIMEOUT) as c:
-            r = await c.get(url)
-            r.raise_for_status()
-            return r.json()
+    Args:
+        indicator_id: Numeric OWID indicator id (e.g. ``2118``).
+        entity: Optional entity name **or** ISO‑3 code. If provided, the server
+                 returns only rows matching that entity (case‑insensitive).
 
-    data, metadata = await asyncio.gather(_fetch("data"), _fetch("metadata"))
-    return {"data": data, "metadata": metadata}
+    Response JSON schema::
+
+        {
+          "metadata": { <OWID metadata unchanged> },
+          "data": [
+              {"entity": "United States", "code": "USA", "year": 2019, "value": 36.0},
+              ...
+          ]
+        }
+    """
+
+    # Fetch OWID raw data + metadata concurrently.
+    data_url = f"{OWID_API_BASE}/{indicator_id}.data.json"
+    meta_url = f"{OWID_API_BASE}/{indicator_id}.metadata.json"
+    data_json, metadata = await asyncio.gather(_fetch_json(data_url), _fetch_json(meta_url))
+
+    # Build mapping from numeric id -> {name, code}
+    entities_meta = {
+        ent["id"]: {"name": ent["name"], "code": ent["code"]} for ent in metadata["dimensions"]["entities"]["values"]
+    }
+
+    rows = _build_rows(data_json, entities_meta)
+
+    # Optional server‑side filter for a single entity
+    if entity is not None:
+        ent_lower = entity.lower()
+        rows = [r for r in rows if (r["entity"] and r["entity"].lower() == ent_lower) or (r["code"] and r["code"].lower() == ent_lower)]
+
+    return {"metadata": metadata, "data": rows}
+
+
+# Convenience alias: ``ind://{indicator_id}/{entity}``
+@mcp.resource("ind://{indicator_id}/{entity}")
+async def indicator_resource_for_entity(indicator_id: int, entity: str) -> Dict[str, Any]:
+    """Shorthand path that simply forwards to ``indicator_resource`` with ``entity``."""
+    # Fetch OWID raw data + metadata concurrently.
+    data_url = f"{OWID_API_BASE}/{indicator_id}.data.json"
+    meta_url = f"{OWID_API_BASE}/{indicator_id}.metadata.json"
+    data_json, metadata = await asyncio.gather(_fetch_json(data_url), _fetch_json(meta_url))
+
+    # Build mapping from numeric id -> {name, code}
+    entities_meta = {
+        ent["id"]: {"name": ent["name"], "code": ent["code"]} for ent in metadata["dimensions"]["entities"]["values"]
+    }
+
+    rows = _build_rows(data_json, entities_meta)
+
+    # Filter for the specific entity
+    if entity is not None:
+        ent_lower = entity.lower()
+        rows = [r for r in rows if (r["entity"] and r["entity"].lower() == ent_lower) or (r["code"] and r["code"].lower() == ent_lower)]
+
+    return {"metadata": metadata, "data": rows}
 
 
 @mcp.resource("chart://{slug}")
