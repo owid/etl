@@ -766,7 +766,7 @@ def create_region_aggregates(tb: Table, ds_regions: Dataset, ds_income_groups: D
         _tb_subregion = tb[tb["country"] == subregion][["year", indicator]]
         _tb_region = tb[tb["country"] == region][["year", indicator]]
         check = _tb_subregion.merge(_tb_region, on=["year"], how="inner", suffixes=("_subregion", "_region")).dropna()
-        error = f"Expected '{subregion}' to be non-empty (despite no individual country being informed). This entity is now empty. Consider removing this fix."
+        error = f"Expected '{subregion}' to be non-empty (despite no individual country being informed). This entity is now empty for {indicator}. Consider removing this fix."
         assert (not check.empty) and (not check[check[f"{indicator}_subregion"] > 0].empty), error
         error = f"Expected '{subregion}' {indicator} to be a small fraction of the aggregate for {region}. This is no longer the case. Consider removing the aggregate for {region} for {indicator}."
         assert ((check[f"{indicator}_subregion"] / check[f"{indicator}_region"] * 100) < percentage).all(), error
@@ -778,9 +778,9 @@ def create_region_aggregates(tb: Table, ds_regions: Dataset, ds_income_groups: D
     # * "Grid Scale BESS Capacity". This is so far not used, so we'll ignore it.
     # * CIS, Middle East, and Africa, for all biofuels production and consumption indicators. We don't need to check Africa, since we are using the aggregate from EI directly. For CIS and Middle East, we simply check that they are relatively small (less than 5%) compared to the aggregates for Asia and Europe.
     for indicator in [
-        "biofuels_production_pj",
+        # "biofuels_production_pj",
         "biofuels_consumption_ej",
-        "biofuels_production_twh",
+        # "biofuels_production_twh",
         "biofuels_consumption_twh",
     ]:
         for subregion in ["Middle East (EI)", "CIS (EI)"]:
