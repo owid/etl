@@ -7,17 +7,11 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-# Reference year to use for table of prices.
-# NOTE: This must be identical to the one defined in the garden step.
-PRICE_REFERENCE_YEAR = 2023
-
 
 def prepare_item_prices_table(tb_prices: Table, item_name: str) -> Table:
     if item_name == "oil_price":
         tb_item_prices = (
-            tb_prices[
-                ["oil_price_crude_current_dollars_per_m3", f"oil_price_crude_{PRICE_REFERENCE_YEAR}_dollars_per_m3"]
-            ]
+            tb_prices[["oil_price_crude_current_dollars_per_m3", "oil_price_crude_constant_dollars_per_m3"]]
             .reset_index()
             .assign(**{"country": "World"})
         )

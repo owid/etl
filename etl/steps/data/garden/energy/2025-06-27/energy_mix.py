@@ -80,6 +80,8 @@ def get_statistical_review_data(tb_review: Table) -> Table:
         "Primary energy consumption - TWh": "Primary energy (TWh - equivalent) - original",
         # Biofuels consumption.
         "Biofuels consumption - TWh": "Biofuels (TWh)",
+        # Thermal efficiency factors.
+        # "Thermal equivalent efficiency factors": "Thermal equivalent efficiency factors",
     }
 
     # Sanity check.
@@ -183,9 +185,8 @@ def calculate_equivalent_primary_energy(primary_energy: Table) -> Table:
     )
     # Check that the primary energy constructed using the substitution method coincides with the
     # input-equivalent primary energy.
+    # NOTE: This check was already performed in the statistical_review_of_world_energy garden step. But we keep it as a double-check.
     _check_that_substitution_method_is_well_calculated(primary_energy)
-    # Remove original primary energy column.
-    primary_energy = primary_energy.drop(columns=["Primary energy (TWh - equivalent) - original"], errors="raise")
 
     return primary_energy
 
@@ -195,21 +196,25 @@ def _check_that_substitution_method_is_well_calculated(
 ) -> None:
     # Check that the constructed primary energy using the substitution method (in TWh) coincides with the
     # input-equivalent primary energy (converted from EJ into TWh) given in the original data.
-    check = primary_energy[
+    check = primary_energy.reset_index()[
         [
+            "country",
+            "year",
             "Primary energy (TWh - equivalent) - original",
             "Primary energy (TWh - equivalent)",
         ]
     ]
-    check = check.dropna().reset_index(drop=True)
-    # They may not coincide exactly, but at least check that they differ (point by point) by less than 10%.
-    max_deviation = max(
-        abs(
-            (check["Primary energy (TWh - equivalent)"] - check["Primary energy (TWh - equivalent) - original"])
-            / check["Primary energy (TWh - equivalent) - original"]
+    # They may not coincide exactly, but at least check that they differ (point by point) by less than 5%.
+    check["dev"] = (
+        100
+        * (
+            check["Primary energy (TWh - equivalent)"].fillna(0)
+            - check["Primary energy (TWh - equivalent) - original"].fillna(0)
         )
+        / check["Primary energy (TWh - equivalent) - original"].fillna(0)
     )
-    assert max_deviation < 0.1
+    error = "Unexpected issue during the calculation of the primary energy consumption."
+    assert abs(check["dev"]).max() < 5, error
 
 
 def calculate_share_of_primary_energy(primary_energy: Table) -> Table:
@@ -235,7 +240,7 @@ def calculate_share_of_primary_energy(primary_energy: Table) -> Table:
             [
                 source.split("(")[0].strip()
                 for source in primary_energy.columns
-                if not source.startswith(("Country", "Year", "Primary"))
+                if not source.startswith(("Country", "Year", "Primary", "Thermal"))
             ]
         )
     )
