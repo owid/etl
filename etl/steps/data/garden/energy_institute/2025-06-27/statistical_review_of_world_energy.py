@@ -909,7 +909,7 @@ def fix_zeros_in_nonexisting_regions(tb: Table, ds_regions: Dataset) -> Table:
 
         # Remove spurious zeros for South Sudan.
         _mask = (tb["country"] == "South Sudan") & (tb["year"] < 2012)
-        error = f"Expected data for Serbia to be zero < 2012 for column {column}."
+        error = f"Expected data for South Sudan to be zero < 2012 for column {column}."
         assert (tb[_mask][column].fillna(0) == 0).all(), error
         tb.loc[_mask, column] = None
 
