@@ -66,7 +66,8 @@ definitions:
         <% if conflict_type == "state-based" %>
         This includes [interstate conflicts](#dod:interstate-ucdp), [civil conflicts](#dod:intrastate-ucdp), and [colonial conflicts](#dod:extrasystemic-ucdp).
         <%- endif %>
-      - UCDP and PRIO identify conflict deaths based on news reports, other contemporary sources, and academic research.
+      - |-
+        [UCDP](https://www.uu.se/en/department/peace-and-conflict-research/research/ucdp/ucdp-methodology) and [PRIO](https://www.semanticscholar.org/paper/Monitoring-Trends-in-Global-Combat%3A-A-New-Dataset-Lacina-Gleditsch/0c4ff27fff986bc30112ac59ad6afbd7b719ad17?p2df) identify conflict deaths based on news reports, other contemporary sources, and academic research.
     description_key_deaths_best: &description_key_deaths_best
       - |-
         {definitions.all.conflict_type}
@@ -74,7 +75,8 @@ definitions:
         <% if conflict_type == "state-based" %>
         This includes [interstate conflicts](#dod:interstate-ucdp), [civil conflicts](#dod:intrastate-ucdp), and [colonial conflicts](#dod:extrasystemic-ucdp).
         <%- endif %>
-      - UCDP and PRIO identify conflict deaths based on news reports, other contemporary sources, and academic research.
+      - |-
+        [UCDP](https://www.uu.se/en/department/peace-and-conflict-research/research/ucdp/ucdp-methodology) and [PRIO](https://www.semanticscholar.org/paper/Monitoring-Trends-in-Global-Combat%3A-A-New-Dataset-Lacina-Gleditsch/0c4ff27fff986bc30112ac59ad6afbd7b719ad17?p2df) identify conflict deaths based on news reports, other contemporary sources, and academic research.
       - |-
         'Best' death estimates as identified by UCDP and PRIO.
 
