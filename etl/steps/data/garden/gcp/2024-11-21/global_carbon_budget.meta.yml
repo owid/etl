@@ -13,13 +13,13 @@ definitions:
     - This data measures carbon dioxide (CO₂) emissions from fossil fuels and industry and does not include emissions from land use change, deforestation, soils, or vegetation.
   per_capita_description_key: &per_capita_description_key
     - "CO₂ emissions per capita are calculated by dividing emissions by population. They represent the average emissions per person in a country or region. To learn more about how different metrics capture the distribution of CO₂ emissions, read our article: [Per capita, national, historical: how do countries compare on CO2 metrics?](https://ourworldindata.org/co2-emissions-metrics)"
+  per_capita_description_processing: |-
+    - To calculate CO₂ emissions per capita, we divide the original data by a country's estimated population. These estimates come from our population dataset based on [multiple sources](https://ourworldindata.org/population-sources).
   # Common fields to be used in all indicators (unless overridden for specific indicators below).
   common:
-    # TODO: Remove per capita description point, and add it only where needed.
     description_processing: &description_processing |
       - Global emissions are converted from tonnes of carbon to tonnes of carbon dioxide (CO₂) using a factor of 3.664. This is the conversion factor [recommended by the Global Carbon Project](https://globalcarbonbudgetdata.org/downloads/jGJH0-data/Global+Carbon+Budget+v2024+Dataset+Descriptions.pdf). It reflects that one tonne of carbon, when fully oxidized, forms 3.664 tonnes of CO₂, based on the relative molecular weights of carbon and oxygen in CO₂.
       - Emissions from the 1991 Kuwaiti oil fires are included in Kuwait's emissions for that year.
-      - To calculate CO₂ emissions per capita, we divide the original data by a country's estimated population. These estimates come from our population dataset based on [multiple sources](https://ourworldindata.org/population-sources).
     description_key:
       # NOTE: The description key points are re-defined for each indicator on consumption-based emissions and traded emissions, as well as on per-capita indicators.
       - *production_emissions_description_key
@@ -62,7 +62,8 @@ tables:
           - *consumption_emissions_description_key
           - *per_capita_description_key
           - *international_aviation_description_key
-        description_processing: *description_processing
+        description_processing: |
+          {definitions.common.description_processing}{definitions.per_capita_description_processing}
         unit: tonnes per person
         short_unit: t/person
         display:
@@ -140,6 +141,8 @@ tables:
           - *production_emissions_description_key
           - The data comes from the Global Carbon Budget. Fossil CO₂ emissions are estimated using national statistics on energy use — such as coal, oil, and gas consumption — and industrial production, particularly cement. These figures are converted into CO₂ emissions using standardized emission factors. For more details, read [the Global Carbon Budget paper](https://doi.org/10.5194/essd-15-5301-2023).
           - *per_capita_description_key
+        description_processing: |
+          {definitions.common.description_processing}{definitions.per_capita_description_processing}
         presentation:
           title_public: CO₂ emissions per capita
       ##################################################################################################################
