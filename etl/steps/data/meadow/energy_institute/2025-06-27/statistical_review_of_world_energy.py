@@ -61,11 +61,11 @@ SHEET_INDICATOR_UNITS = [
     # ('Wind Installed Capacity', 'UNKNOWN', 'nan'),
     ("Geo Biomass Other - TWh", "biogeo_twh", "Terawatt-hours"),
     ("Geo Biomass Other - EJ", "biogeo_ej", "Exajoules"),
-    # NOTE: Biofuels sheets contain total, biogasoline and biodiesel one above the other. So they need to be handled separately.
-    # ('Biofuels production - kboed', 'biofuels_prod_kboed', 'Thousand barrels of oil equivalent per day'),
-    # ('Biofuels production - PJ', 'biofuels_prod_pj', 'Petajoules'),
-    # ('Biofuels Consumption - kboed', 'biofuels_cons_kboed', 'Thousand barrels of oil equivalent per day'),
-    # ('Biofuels consumption - PJ', 'biofuels_cons_pj', 'Petajoules'),
+    # NOTE: Biofuels sheets contain total, biogasoline and biodiesel one above the other. We will keep only biofuels data.
+    ("Biofuels production - kboed", "biofuels_prod_kboed", "Thousand barrels of oil equivalent per day"),
+    ("Biofuels production - PJ", "biofuels_prod_pj", "Petajoules"),
+    ("Biofuels Consumption - kboed", "biofuels_cons_kboed", "Thousand barrels of oil equivalent per day"),
+    ("Biofuels consumption - PJ", "biofuels_cons_pj", "Petajoules"),
     ("Electricity Generation - TWh", "elect_twh", "Terawatt-hours"),
     # ("Elec generation by fuel", "electbyfuel_total", "Terawatt-hours"),
     ("Oil inputs - Elec generation ", "electbyfuel_oil", "Terawatt-hours"),
@@ -132,6 +132,17 @@ def pre_harmonize_country_names(tb: Table) -> Table:
 
 def parse_sheet(data_spreadsheet: pr.ExcelFile, sheet: str, indicator: str, unit: str) -> Table:
     tb = data_spreadsheet.parse(sheet, skiprows=2)
+
+    # In the sheets for biofuels, they provide data for biofuels, and then, below, another table for biogasoline, and below, another table for biodiesels.
+    # For now, we use only biofuels data; so, detect the row where biogasoline or biodiesel appear, and remove all data from that row onwards.
+    row_biogasoline_or_biodiesel = [
+        i
+        for i, row in enumerate(tb[tb.columns[0]])
+        if (("biogasoline" in str(row).lower()) or ("biodiesel" in str(row).lower()))
+    ]
+    if len(row_biogasoline_or_biodiesel) > 0:
+        min_row_biogasoline_or_biodiesel = min(row_biogasoline_or_biodiesel)
+        tb = tb[0:min_row_biogasoline_or_biodiesel].reset_index(drop=True)
 
     # Remove empty rows and rows of footnotes.
     tb = tb.dropna(subset=tb.columns[1:], how="all").reset_index(drop=True)
