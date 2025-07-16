@@ -45,7 +45,7 @@ Since 2001, the GCP has published estimates of global and national fossil CO₂ 
 @click.command()
 @click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
 @click.option("--path-to-folder", prompt=True, type=str, help="Path to local folder where data files are.")
-def main(path_to_folder: str, upload: bool) -> None:
+def run(path_to_folder: str, upload: bool) -> None:
     # Create a new snapshot for each dataset.
     for data_file in DATA_FILES:
         snap = Snapshot(f"gcp/{SNAPSHOT_VERSION}/{data_file}")
@@ -69,4 +69,4 @@ def main(path_to_folder: str, upload: bool) -> None:
 
 
 if __name__ == "__main__":
-    main()
+    run()
