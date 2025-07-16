@@ -80,7 +80,7 @@ definitions:
         <% if conflict_type == "all" -%>
         This includes [interstate conflicts](#dod:interstate-ucdp), [civil conflicts](#dod:intrastate-ucdp), [colonial conflicts](#dod:extrasystemic-ucdp), [non-state conflicts](#dod:nonstate-ucdp), and [violence against civilians](#dod:onesided-ucdp).
         <%- endif %>
-      - UCDP identifies conflict deaths based on news reports, other contemporary sources, and academic research.
+      - UCDP identifies conflict deaths [based on news reports, other contemporary sources, and academic research](https://www.uu.se/en/department/peace-and-conflict-research/research/ucdp/ucdp-methodology).
 
     description_key_best: &description_key_deaths_best
       - "{definitions.all.conflict_type}"
@@ -88,7 +88,7 @@ definitions:
         <% if conflict_type == "all" -%>
         This includes [interstate conflicts](#dod:interstate-ucdp), [civil conflicts](#dod:intrastate-ucdp), [colonial conflicts](#dod:extrasystemic-ucdp), [non-state conflicts](#dod:nonstate-ucdp), and [violence against civilians](#dod:onesided-ucdp).
         <%- endif %>
-      - UCDP identifies conflict deaths based on news reports, other contemporary sources, and academic research.
+      - UCDP identifies conflict deaths [based on news reports, other contemporary sources, and academic research](https://www.uu.se/en/department/peace-and-conflict-research/research/ucdp/ucdp-methodology).
       - "'Best' death estimates as identified by UCDP."
 
   number_deaths_type:

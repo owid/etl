@@ -80,7 +80,7 @@ definitions:
         <% if conflict_type == "all" -%>
         This includes [interstate conflicts](#dod:interstate-ucdp), [civil conflicts](#dod:intrastate-ucdp), [colonial conflicts](#dod:extrasystemic-ucdp), [non-state conflicts](#dod:nonstate-ucdp), and [violence against civilians](#dod:onesided-ucdp).
         <%- endif %>
-      - UCDP identifies conflict deaths based on news reports, other contemporary sources, and academic research.
+      - UCDP identifies conflict deaths [based on news reports, other contemporary sources, and academic research](https://www.uu.se/en/department/peace-and-conflict-research/research/ucdp/ucdp-methodology).
       - |-
         UCDP's data for 2025 is preliminary. This means the number of deaths may be too low because more information becomes available later, or they may be too high because some events are later found not to be part of an armed conflict. We still show this data to provide more up-to-date information.
       - |-
@@ -92,7 +92,7 @@ definitions:
         <% if conflict_type == "all" -%>
         This includes [interstate conflicts](#dod:interstate-ucdp), [civil conflicts](#dod:intrastate-ucdp), [colonial conflicts](#dod:extrasystemic-ucdp), [non-state conflicts](#dod:nonstate-ucdp), and [violence against civilians](#dod:onesided-ucdp).
         <%- endif %>
-      - UCDP identifies conflict deaths based on news reports, other contemporary sources, and academic research.
+      - UCDP identifies conflict deaths [based on news reports, other contemporary sources, and academic research](https://www.uu.se/en/department/peace-and-conflict-research/research/ucdp/ucdp-methodology).
       - |-
         UCDP's data for 2025 is preliminary. This means the number of deaths may be too low because more information becomes available later, or they may be too high because some events are later found not to be part of an armed conflict. We still show this data to provide more up-to-date information.
       - |-
