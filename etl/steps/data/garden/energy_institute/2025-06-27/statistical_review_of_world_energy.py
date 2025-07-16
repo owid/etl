@@ -853,6 +853,16 @@ def create_primary_energy_in_input_equivalents(tb: Table):
     # year_max = old["year"].max()
     # compare_tables(old[old["year"] <= year_max], tb[tb["year"] <= year_max], columns=columns, countries=countries, max_num_charts = 100)
 
+    # Compare specifically the hydro primary consumption calculated here, with the one provided in the 2024 statistical review.
+    # print(f"Mean percentual deviation between new (calculated) and old (from 2024 Statistical Review) primary energy consumption for:")
+    # # Negative percentages mean that the new values are systematically lower than the 2024 ones.
+    # for source in ["hydro", "nuclear", "solar", "wind", "other_renewables"]:
+    #     cols = ["country", "year", f"{source}_consumption_equivalent_twh"]
+    #     compared = old[cols].merge(tb[cols], on=["country", "year"], how="inner", suffixes=("_old", "_new"))
+    #     compared["dev"] = (compared[f"{source}_consumption_equivalent_twh_new"] - compared[f"{source}_consumption_equivalent_twh_old"]) / compared[f"{source}_consumption_equivalent_twh_old"]
+    #     print(f"- {source}: {compared['dev'].mean():.2%}")
+    #     px.line(compared[compared["country"]=="World"].drop(columns=["dev"]).melt(id_vars=["country", "year"]), x="year", y="value", color="variable", markers=True).show()
+
     return tb
 
 
