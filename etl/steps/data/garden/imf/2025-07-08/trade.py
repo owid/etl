@@ -10,46 +10,6 @@ paths = PathFinder(__file__)
 
 REGIONS = ["North America", "South America", "Europe", "Africa", "Asia", "Oceania", "World"]
 
-pairs = [
-    ("Czechia", "Czechoslovakia"),
-    ("Slovakia", "Czechoslovakia"),
-    ("East Germany", "Germany"),
-    ("Aruba", "Netherlands Antilles"),
-    ("Curacao", "Netherlands Antilles"),
-    ("Sint Maarten (Dutch part)", "Netherlands Antilles"),
-    ("Montenegro", "Serbia and Montenegro"),
-    ("Serbia", "Serbia and Montenegro"),
-    ("Armenia", "USSR"),
-    ("Azerbaijan", "USSR"),
-    ("Belarus", "USSR"),
-    ("Estonia", "USSR"),
-    ("Georgia", "USSR"),
-    ("Kazakhstan", "USSR"),
-    ("Kyrgyzstan", "USSR"),
-    ("Lithuania", "USSR"),
-    ("Latvia", "USSR"),
-    ("Moldova", "USSR"),
-    ("Russia", "USSR"),
-    ("Tajikistan", "USSR"),
-    ("Turkmenistan", "USSR"),
-    ("Ukraine", "USSR"),
-    ("Uzbekistan", "USSR"),
-    ("Yemen", "Yemen Arab Republic"),
-    ("Bosnia and Herzegovina", "Yugoslavia"),
-    ("Croatia", "Yugoslavia"),
-    ("North Macedonia", "Yugoslavia"),
-    ("Montenegro", "Yugoslavia"),
-    ("Kosovo", "Yugoslavia"),
-    ("Serbia", "Yugoslavia"),
-    ("Slovenia", "Yugoslavia"),
-]
-
-# Build the new structure
-ACCEPTED_OVERLAPS = []
-
-for a, b in pairs:
-    entry = {year: {a, b} for year in range(1948, 2025)}
-    ACCEPTED_OVERLAPS.append(entry)
 
 IMF_REGIONS = [
     "Latin America and the Caribbean",
@@ -84,6 +44,7 @@ def run() -> None:
         countries_file=paths.country_mapping_path,
         excluded_countries_file=paths.excluded_countries_path,
     )
+    tb = tb.dropna(subset=["value"])  # Add this line
 
     tb = geo.add_regions_to_table(
         tb,
@@ -91,7 +52,6 @@ def run() -> None:
         index_columns=["country", "year", "indicator", "counterpart_country"],
         country_col="country",
         regions=REGIONS,
-        accepted_overlaps=ACCEPTED_OVERLAPS,
     )
 
     tb = geo.add_regions_to_table(
@@ -100,8 +60,8 @@ def run() -> None:
         index_columns=["country", "year", "indicator", "counterpart_country"],
         country_col="counterpart_country",
         regions=REGIONS,
-        accepted_overlaps=ACCEPTED_OVERLAPS,
     )
+
     regions_without_world = [region for region in REGIONS if region != "World"]
     tb_owid = tb[tb["country"].isin(regions_without_world) & tb["counterpart_country"].isin(regions_without_world)]
     members = []
