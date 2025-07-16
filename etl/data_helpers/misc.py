@@ -1,7 +1,10 @@
 """General data tools."""
 
 import math
+import random
+import time
 from datetime import date, datetime
+from functools import wraps
 from typing import Any, Dict, Iterable, List, Literal, Optional, Set, TypeVar, Union, cast
 
 import owid.catalog.processing as pr
@@ -16,6 +19,25 @@ from etl.google import CLIENT_SECRET_FILE, GoogleDrive, GoogleSheet
 
 TableOrDataFrame = TypeVar("TableOrDataFrame", pd.DataFrame, Table)
 DIMENSION_COL_NONE = "temporary"
+GSHEET_EXPORT_CONFIG = {
+    "MAX_TITLE_LENGTH": 100,
+    "MAX_SHEET_NAME_LENGTH": 31,
+    "MAX_RETRIES": 3,
+    "RETRY_DELAY": 1.0,
+    "INCLUDED_METADATA_FIELDS": frozenset(
+        {"title", "description_short", "description_key", "description_processing", "origins", "unit"}
+    ),
+    "FIELD_DISPLAY_NAMES": {
+        "title": "Title",
+        "description_short": "Description",
+        "description_key": "What you should know about this data",
+        "description_processing": "Processing steps",
+        "unit": "Unit",
+        "origins": "Data sources",
+    },
+}
+DEFAULT_TEAM_FOLDER_NAME = "ETL GSheet Exports"
+OWID_SHARED_FOLDER_ID = "1qH0uBtO5KLvdew8X6u-lF75E4uKHSrjp"  # Folder ID
 
 
 def check_known_columns(df: pd.DataFrame, known_cols: list) -> None:
@@ -856,6 +878,65 @@ def _should_skip_export() -> bool:
     return not CLIENT_SECRET_FILE or not CLIENT_SECRET_FILE.exists() or OWID_ENV.env_local != "dev"
 
 
+def _sanitize_sheet_name(name: str) -> str:
+    """Sanitize sheet name for Google Sheets compatibility."""
+    sanitized = name.replace("/", "_").replace("\\", "_").replace(":", "_")
+    return sanitized[: GSHEET_EXPORT_CONFIG["MAX_SHEET_NAME_LENGTH"]]
+
+
+def _validate_inputs(table: Table, sheet_title: str) -> bool:
+    """Validate inputs for export function."""
+    if not isinstance(table, Table):
+        print("Error: table must be an OWID catalog Table")
+        return False
+
+    if not sheet_title or not sheet_title.strip():
+        print("Error: sheet_title cannot be empty")
+        return False
+
+    return True
+
+
+def _prepare_dataframe(table: Table) -> pd.DataFrame:
+    """Convert table to DataFrame and optimize for Google Sheets."""
+    df = table.reset_index()
+    if isinstance(df, Table):
+        df = pd.DataFrame(df)
+
+    # Optimize data types for Google Sheets
+    for col in df.columns:
+        if df[col].dtype == "object":
+            df[col] = df[col].astype(str)
+
+    return df
+
+
+def retry_on_network_error(max_retries: int = 3, base_delay: float = 1.0):
+    """Decorator to retry on network/SSL errors."""
+
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            for attempt in range(max_retries):
+                try:
+                    return func(*args, **kwargs)
+                except Exception as e:
+                    if (
+                        any(term in str(e) for term in ["SSL", "EOF", "Connection", "Timeout"])
+                        and attempt < max_retries - 1
+                    ):
+                        delay = base_delay * (2**attempt) + random.uniform(0, 1)
+                        print(f"Network error on attempt {attempt + 1}, retrying in {delay:.1f}s...")
+                        time.sleep(delay)
+                        continue
+                    raise
+            return func(*args, **kwargs)
+
+        return wrapper
+
+    return decorator
+
+
 def _get_variables_to_process(table: Table, metadata_variables: Optional[List[str]]) -> List[str]:
     """Determine which variables to process for metadata export."""
     if metadata_variables is None:
@@ -869,53 +950,9 @@ def _get_variables_to_process(table: Table, metadata_variables: Optional[List[st
     return variables_to_process
 
 
-def _create_metadata_dataframes(
-    table: Table, metadata_variables: Optional[List[str]] = None
-) -> Dict[str, pd.DataFrame]:
-    """Create metadata DataFrames for each variable in the table."""
-    metadata_dfs = {}
-
-    # Fields to include in metadata export
-    included_fields = {
-        "title",
-        "description_short",
-        "description_key",
-        "description_processing",
-        "origins",
-        "licenses",
-        "unit",
-    }
-
-    variables_to_process = _get_variables_to_process(table, metadata_variables)
-
-    for column_name in variables_to_process:
-        if not (hasattr(table[column_name], "metadata") and table[column_name].metadata):
-            continue
-
-        metadata_rows = _extract_metadata_rows(table[column_name].metadata, included_fields)
-
-        if metadata_rows:
-            metadata_df = pd.DataFrame(metadata_rows, columns=["Property", "Value"])
-            clean_name = column_name.replace("/", "_").replace("\\", "_")[:31]
-            metadata_dfs[f"metadata_{clean_name}"] = metadata_df
-
-    return metadata_dfs
-
-
 def _extract_metadata_rows(metadata_obj, included_fields: set) -> List[List[str]]:
     """Extract metadata rows from a metadata object, keeping only specified fields."""
     rows = []
-
-    # Mapping for field names to display names
-    field_display_names = {
-        "title": "Title",
-        "description_short": "Description",
-        "description_key": "What you should know about this data",
-        "description_processing": "Processing steps",
-        "unit": "Unit",
-        "origins": "Data sources",
-        "licenses": "Licenses",
-    }
 
     # Handle both dict and object with __dict__
     items = metadata_obj.items() if isinstance(metadata_obj, dict) else metadata_obj.__dict__.items()
@@ -925,47 +962,105 @@ def _extract_metadata_rows(metadata_obj, included_fields: set) -> List[List[str]
         if key not in included_fields or value is None or value == "":
             continue
 
+        # Get display name
+        display_name = GSHEET_EXPORT_CONFIG["FIELD_DISPLAY_NAMES"].get(key, key)
+
         if isinstance(value, list):
-            formatted_value = _format_list_metadata(key, value)
+            # Handle special case for origins - split into separate rows
+            if key == "origins":
+                if len(value) == 1:
+                    # Single origin - extract attributes
+                    origin = value[0]
+                    rows.extend(_extract_origin_attributes(origin, display_name))
+                else:
+                    # Multiple origins - extract attributes for each
+                    for i, origin in enumerate(value, 1):
+                        numbered_display_name = f"{display_name} ({i})"
+                        rows.extend(_extract_origin_attributes(origin, numbered_display_name))
+            else:
+                # For other list fields, use the original formatting
+                formatted_value = _format_list_metadata(key, value)
+                rows.append([display_name, formatted_value])
         elif isinstance(value, dict) and len(str(value)) > 100:
             formatted_value = f"[{type(value).__name__}] {str(value)[:100]}..."
+            rows.append([display_name, formatted_value])
         else:
             formatted_value = str(value)
-
-        # Use display name if available, otherwise use the original key
-        display_name = field_display_names.get(key, key)
-        rows.append([display_name, formatted_value])
+            rows.append([display_name, formatted_value])
 
     return rows
 
 
-def _update_or_create_sheet(
-    sheet_title: str, folder_id: Optional[str], df: pd.DataFrame, update_existing: bool
-) -> GoogleSheet:
-    """Update existing sheet or create new one."""
-    if not update_existing:
-        return GoogleSheet.create_sheet(title=sheet_title, folder_id=folder_id)
+def _extract_origin_attributes(origin, base_display_name: str) -> List[List[str]]:
+    """Extract individual attributes from an Origin object and format them in a single cell."""
+    # Define the origin attributes we want to show and their display names
+    origin_field_mapping = {
+        "producer": "Producer",
+        "title": "Title",
+        "description": "Description",
+        "citation_full": "Citation",
+        "attribution_short": "Attribution",
+        "url_main": "Main URL",
+        "url_download": "Download URL",
+        "date_accessed": "Date accessed",
+        "date_published": "Date published",
+    }
 
-    # Try to find existing sheet
-    try:
-        drive = GoogleDrive()
-        query = f"name='{sheet_title}' and mimeType='application/vnd.google-apps.spreadsheet'"
-        results = drive.drive_service.files().list(q=query).execute()
-        files = results.get("files", [])
+    # Handle both dict and object with __dict__
+    items = origin.items() if isinstance(origin, dict) else origin.__dict__.items()
 
-        if files:
-            sheet = GoogleSheet(files[0]["id"])
-            # Just clear and write to first sheet, don't worry about names
-            sheet_metadata = sheet.sheets_service.spreadsheets().get(spreadsheetId=files[0]["id"]).execute()
-            first_sheet_name = sheet_metadata["sheets"][0]["properties"]["title"]
-            sheet.clear_sheet_data(first_sheet_name)
-            sheet.write_dataframe(df, sheet_name=first_sheet_name)
-            return sheet
-    except Exception as e:
-        print(f"Warning: Could not update existing sheet: {e}")
+    # Collect all attributes into a single formatted string
+    formatted_attributes = []
 
-    # Fallback to creating new sheet
-    return GoogleSheet.create_sheet(title=sheet_title, folder_id=folder_id)
+    for attr_key, attr_value in items:
+        if attr_value is None or attr_value == "":
+            continue
+
+        if attr_key == "license":
+            # Handle license object specially
+            if hasattr(attr_value, "name") and attr_value.name:
+                formatted_attributes.append(f"License: {attr_value.name}")
+            if hasattr(attr_value, "url") and attr_value.url:
+                formatted_attributes.append(f"License URL: {attr_value.url}")
+        elif attr_key in origin_field_mapping:
+            attr_display_name = origin_field_mapping[attr_key]
+            formatted_attributes.append(f"{attr_display_name}: {str(attr_value)}")
+
+    # Join all attributes with line breaks
+    formatted_value = "\n".join(formatted_attributes)
+
+    # Return a single row with all the origin information
+    return [[base_display_name, formatted_value]]
+
+
+def _create_metadata_dataframes(
+    table: Table, metadata_variables: Optional[List[str]] = None
+) -> Dict[str, pd.DataFrame]:
+    """Create metadata DataFrames for each variable in the table."""
+    metadata_dfs = {}
+
+    variables_to_process = _get_variables_to_process(table, metadata_variables)
+
+    for column_name in variables_to_process:
+        if not (hasattr(table[column_name], "metadata") and table[column_name].metadata):
+            continue
+
+        try:
+            metadata_rows = _extract_metadata_rows(
+                table[column_name].metadata, GSHEET_EXPORT_CONFIG["INCLUDED_METADATA_FIELDS"]
+            )
+
+            if metadata_rows:
+                # Create DataFrame with proper column headers
+                metadata_df = pd.DataFrame(metadata_rows, columns=["Property", "Value"])
+                clean_name = _sanitize_sheet_name(column_name)
+                metadata_dfs[f"metadata_{clean_name}"] = metadata_df
+
+        except Exception as e:
+            print(f"Warning: Could not process metadata for column '{column_name}': {e}")
+            continue
+
+    return metadata_dfs
 
 
 def export_table_to_gsheet(
@@ -978,33 +1073,203 @@ def export_table_to_gsheet(
     include_metadata: bool = True,
     metadata_variables: Optional[List[str]] = None,
 ) -> tuple[str, str]:
-    """Export a Table to Google Sheets."""
+    """Export a Table to Google Sheets with improved error handling and performance."""
+    import time
 
-    # Early exit if credentials not available
-    if _should_skip_export():
-        print(
-            "Warning: Google API credentials not found or script is not running locally. Skipping Google Sheets export."
-        )
+    start_time = time.time()
+
+    try:
+        # Input validation
+        if not _validate_inputs(table, sheet_title):
+            return "", ""
+
+        # Sanitize sheet title
+        sheet_title = sheet_title.strip()[: GSHEET_EXPORT_CONFIG["MAX_TITLE_LENGTH"]]
+
+        # Early exit if credentials not available
+        if _should_skip_export():
+            print(
+                "Warning: Google API credentials not found or script is not running locally. Skipping Google Sheets export."
+            )
+            return "", ""
+
+        # Convert and validate data
+        df = _prepare_dataframe(table)
+
+        # Create or update sheet
+        sheet = _update_or_create_sheet(sheet_title, folder_id, df, update_existing)
+
+        # Write main data
+        _write_main_data(sheet, df)
+
+        # Add metadata if requested
+        if include_metadata:
+            _add_metadata_tabs(sheet, table, metadata_variables)
+
+        # Set permissions
+        _set_permissions(sheet.sheet_id, role, general_access)
+
+        duration = time.time() - start_time
+        print(f"Export completed in {duration:.2f} seconds")
+
+        return sheet.url, sheet.sheet_id
+
+    except Exception as e:
+        duration = time.time() - start_time
+        print(f"Export failed after {duration:.2f} seconds: {e}")
         return "", ""
 
-    # Convert table to DataFrame
-    df = pd.DataFrame(table.reset_index())
 
-    # Create or update sheet
-    sheet = _update_or_create_sheet(sheet_title, folder_id, df, update_existing)
-    sheet.write_dataframe(df, sheet_name="Data")
+@retry_on_network_error()
+def _create_google_sheet(sheet_title: str, folder_id: Optional[str]) -> GoogleSheet:
+    """Create Google Sheet with retry logic."""
+    if folder_id:
+        # Create sheet in the specified folder
+        return GoogleSheet.create_sheet(title=sheet_title, folder_id=folder_id)
+    else:
+        # Create sheet in root
+        return GoogleSheet.create_sheet(title=sheet_title)
 
-    # Add metadata tabs
-    if include_metadata:
-        metadata_dfs = _create_metadata_dataframes(table, metadata_variables)
-        for sheet_name, metadata_df in metadata_dfs.items():
-            try:
-                sheet.write_dataframe(metadata_df, sheet_name=sheet_name, header=False)
-            except Exception as e:
-                print(f"Note: Could not create metadata sheet '{sheet_name}': {e}")
 
-    # Set permissions
+def _update_or_create_sheet(
+    sheet_title: str, folder_id: Optional[str], df: pd.DataFrame, update_existing: bool
+) -> GoogleSheet:
+    """Update existing sheet or create new one."""
+    if not update_existing:
+        return _create_google_sheet(sheet_title, folder_id)
+
+    # Try to find existing sheet in the specified folder
+    try:
+        drive = GoogleDrive()
+        query = f"name='{sheet_title}' and mimeType='application/vnd.google-apps.spreadsheet'"
+
+        # If folder_id is specified, search within that folder
+        if folder_id:
+            query += f" and '{folder_id}' in parents"
+
+        results = drive.drive_service.files().list(q=query).execute()
+        files = results.get("files", [])
+
+        if files:
+            sheet = GoogleSheet(files[0]["id"])
+            # Clear and write to first sheet
+            sheet_metadata = sheet.sheets_service.spreadsheets().get(spreadsheetId=files[0]["id"]).execute()
+            first_sheet_name = sheet_metadata["sheets"][0]["properties"]["title"]
+            sheet.clear_sheet_data(first_sheet_name)
+            sheet.write_dataframe(df, sheet_name=first_sheet_name)
+            return sheet
+    except Exception as e:
+        print(f"Warning: Could not update existing sheet: {e}")
+
+    # Fallback to creating new sheet in the specified folder
+    return _create_google_sheet(sheet_title, folder_id)
+
+
+def _write_main_data(sheet: GoogleSheet, df: pd.DataFrame) -> None:
+    """Write main data to the sheet."""
+    sheet.write_dataframe(df)
+
+
+def _add_metadata_tabs(sheet: GoogleSheet, table: Table, metadata_variables: Optional[List[str]]) -> None:
+    """Add metadata tabs to the sheet."""
+    metadata_dfs = _create_metadata_dataframes(table, metadata_variables)
+    for sheet_name, metadata_df in metadata_dfs.items():
+        try:
+            sheet.write_dataframe(metadata_df, sheet_name=sheet_name)
+        except Exception as e:
+            print(f"Note: Could not create metadata sheet '{sheet_name}': {e}")
+
+
+def _set_permissions(sheet_id: str, role: str, general_access: str) -> None:
+    """Set permissions for the sheet."""
     drive = GoogleDrive()
-    drive.set_file_permissions(file_id=sheet.sheet_id, role=role, general_access=general_access)
+    drive.set_file_permissions(file_id=sheet_id, role=role, general_access=general_access)
 
-    return sheet.url, sheet.sheet_id
+
+def create_or_get_shared_folder(
+    folder_name: str = "ETL GSheet Exports",
+    parent_folder_id: Optional[str] = None,  # Changed from hardcoded ID
+) -> str:
+    """Create or get a shared folder for storing multiple Google Sheets.
+
+    Parameters
+    ----------
+    folder_name : str
+        Name of the folder to create or find
+    parent_folder_id : Optional[str], optional
+        Parent folder ID, by default None (creates in root)
+
+    Returns
+    -------
+    str
+        The folder ID
+    """
+    try:
+        drive = GoogleDrive()
+
+        # Search for existing folder
+        query = f"name='{folder_name}' and mimeType='application/vnd.google-apps.folder' and trashed=false"
+        if parent_folder_id:
+            query += f" and '{parent_folder_id}' in parents"
+
+        results = drive.drive_service.files().list(q=query).execute()
+        files = results.get("files", [])
+
+        if files:
+            folder_id = files[0]["id"]
+            print(f"Using existing folder: {folder_name} (ID: {folder_id})")
+            return folder_id
+
+        # Create new folder
+        folder_metadata = {"name": folder_name, "mimeType": "application/vnd.google-apps.folder"}
+
+        if parent_folder_id:
+            folder_metadata["parents"] = [parent_folder_id]
+
+        folder = drive.drive_service.files().create(body=folder_metadata, fields="id").execute()
+        folder_id = folder.get("id")
+
+        # Set permissions for team access
+        drive.set_file_permissions(file_id=folder_id, role="reader", general_access="anyone")
+
+        print(f"Created new folder: {folder_name} (ID: {folder_id})")
+        print(f"Folder URL: https://drive.google.com/drive/folders/{folder_id}")
+
+        return folder_id
+
+    except Exception as e:
+        print(f"Warning: Could not create/access folder '{folder_name}': {e}")
+        return None
+
+
+def setup_owid_team_folder() -> Optional[str]:
+    """Create the main OWID team folder for Google Sheets exports."""
+    print("Setting up OWID team folder...")
+
+    # Create main folder only
+    main_folder_id = create_or_get_shared_folder(DEFAULT_TEAM_FOLDER_NAME)
+
+    if main_folder_id:
+        print(f"✅ Team folder created/found: {main_folder_id}")
+        print(f"📁 Folder URL: https://drive.google.com/drive/folders/{main_folder_id}")
+        return main_folder_id
+    else:
+        print("❌ Failed to create team folder")
+        return None
+
+
+def get_team_folder_id() -> Optional[str]:
+    """Get the team folder ID for OWID ETL exports."""
+    # Use the shared folder ID if available
+    if OWID_SHARED_FOLDER_ID:
+        try:
+            # Verify the current user can access this folder
+            drive = GoogleDrive()
+            drive.drive_service.files().get(fileId=OWID_SHARED_FOLDER_ID).execute()
+            return OWID_SHARED_FOLDER_ID
+        except Exception as e:
+            print(f"Warning: Cannot access shared folder {OWID_SHARED_FOLDER_ID}: {e}")
+            print("Creating personal folder instead...")
+
+    # Fallback to creating/finding personal folder
+    return setup_owid_team_folder()
