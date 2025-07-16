@@ -7,10 +7,7 @@
         "run",
         "owid_mcp/server.py"
       ],
-      "env": {},
-      "dev": {
-        "watch": "owid_mcp/**/*.py"
-      }
+      "env": {}
     }
   }
 }
