@@ -39,26 +39,26 @@ steps:
   data://garden/faostat/2025-03-17/faostat_cisp:
     - data://garden/demography/2024-07-15/population
     - data://meadow/faostat/2025-03-17/faostat_cisp
-    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/wb/2025-07-01/income_groups
     - data://garden/regions/2023-01-01/regions
     - data://garden/faostat/2025-03-17/faostat_metadata
   data://garden/faostat/2025-03-17/faostat_fbsc:
     - data://garden/demography/2024-07-15/population
     - data://meadow/faostat/2025-03-17/faostat_fbs
-    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/wb/2025-07-01/income_groups
     - data://meadow/faostat/2025-03-17/faostat_fbsh
     - data://garden/regions/2023-01-01/regions
     - data://garden/faostat/2025-03-17/faostat_metadata
   data://garden/faostat/2025-03-17/faostat_fs:
     - data://garden/demography/2024-07-15/population
     - data://meadow/faostat/2025-03-17/faostat_fs
-    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/wb/2025-07-01/income_groups
     - data://garden/regions/2023-01-01/regions
     - data://garden/faostat/2025-03-17/faostat_metadata
   data://garden/faostat/2025-03-17/faostat_lc:
     - data://garden/demography/2024-07-15/population
     - data://meadow/faostat/2025-03-17/faostat_lc
-    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/wb/2025-07-01/income_groups
     - data://garden/regions/2023-01-01/regions
     - data://garden/faostat/2025-03-17/faostat_metadata
   data://garden/faostat/2025-03-17/faostat_metadata:
@@ -77,44 +77,44 @@ steps:
     - data://meadow/faostat/2025-03-17/faostat_qcl
   data://garden/faostat/2025-03-17/faostat_qcl:
     - data://garden/demography/2024-07-15/population
-    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/wb/2025-07-01/income_groups
     - data://meadow/faostat/2025-03-17/faostat_qcl
     - data://garden/regions/2023-01-01/regions
     - data://garden/faostat/2025-03-17/faostat_metadata
   data://garden/faostat/2025-03-17/faostat_qi:
     - data://garden/demography/2024-07-15/population
     - data://meadow/faostat/2025-03-17/faostat_qi
-    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/wb/2025-07-01/income_groups
     - data://garden/regions/2023-01-01/regions
     - data://garden/faostat/2025-03-17/faostat_metadata
   data://garden/faostat/2025-03-17/faostat_qv:
     - data://garden/demography/2024-07-15/population
     - data://meadow/faostat/2025-03-17/faostat_qv
-    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/wb/2025-07-01/income_groups
     - data://garden/regions/2023-01-01/regions
     - data://garden/faostat/2025-03-17/faostat_metadata
   data://garden/faostat/2025-03-17/faostat_rfn:
     - data://garden/demography/2024-07-15/population
     - data://meadow/faostat/2025-03-17/faostat_rfn
-    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/wb/2025-07-01/income_groups
     - data://garden/regions/2023-01-01/regions
     - data://garden/faostat/2025-03-17/faostat_metadata
   data://garden/faostat/2025-03-17/faostat_rl:
     - data://garden/demography/2024-07-15/population
     - data://meadow/faostat/2025-03-17/faostat_rl
-    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/wb/2025-07-01/income_groups
     - data://garden/regions/2023-01-01/regions
     - data://garden/faostat/2025-03-17/faostat_metadata
   data://garden/faostat/2025-03-17/faostat_rp:
     - data://meadow/faostat/2025-03-17/faostat_rp
     - data://garden/demography/2024-07-15/population
-    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/wb/2025-07-01/income_groups
     - data://garden/regions/2023-01-01/regions
     - data://garden/faostat/2025-03-17/faostat_metadata
   data://garden/faostat/2025-03-17/faostat_sdgb:
     - data://garden/demography/2024-07-15/population
     - data://meadow/faostat/2025-03-17/faostat_sdgb
-    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/wb/2025-07-01/income_groups
     - data://garden/regions/2023-01-01/regions
     - data://garden/faostat/2025-03-17/faostat_metadata
   #

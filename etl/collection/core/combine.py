@@ -4,7 +4,7 @@ Additional: combine dimensions (using raw dictionaries)
 """
 
 from copy import deepcopy
-from typing import Any, Dict, List, Mapping, Optional, Set, Tuple, TypeVar, Union, overload
+from typing import Any, Dict, List, Mapping, Set, Tuple, TypeVar, overload
 
 import pandas as pd
 from structlog import get_logger
@@ -164,12 +164,12 @@ def combine_collections(
     collection_name: str | None = None,
     catalog_path: str | None = None,
     config: dict[str, Any] | None = None,
-    dependencies: Optional[Set[str]] = None,
+    dependencies: Set[str] | None = None,
     force_collection_dimension: bool = False,
-    collection_dimension_name: Optional[str] = None,
+    collection_dimension_name: str | None = None,
     collection_dimension_slug: str | None = None,
-    collection_choices_names: Optional[List[str]] = None,
-    is_explorer: Optional[bool] = None,
+    collection_choices_names: List[str] | None = None,
+    is_explorer: bool | None = None,
 ) -> E: ...
 
 
@@ -179,28 +179,28 @@ def combine_collections(
     collection_name: str | None = None,
     catalog_path: str | None = None,
     config: dict[str, Any] | None = None,
-    dependencies: Optional[Set[str]] = None,
+    dependencies: Set[str] | None = None,
     force_collection_dimension: bool = False,
-    collection_dimension_name: Optional[str] = None,
+    collection_dimension_name: str | None = None,
     collection_dimension_slug: str | None = None,
-    collection_choices_names: Optional[List[str]] = None,
-    is_explorer: Optional[bool] = None,
+    collection_choices_names: List[str] | None = None,
+    is_explorer: bool | None = None,
 ) -> T: ...
 
 
 # COMBINE COLLECTIONS
 def combine_collections(
-    collections: Union[List[Collection], List[Explorer]],
+    collections: List[Collection] | List[Explorer],
     collection_name: str | None = None,
     catalog_path: str | None = None,
     config: dict[str, Any] | None = None,
-    dependencies: Optional[Set[str]] = None,
+    dependencies: Set[str] | None = None,
     force_collection_dimension: bool = False,
-    collection_dimension_name: Optional[str] = None,
+    collection_dimension_name: str | None = None,
     collection_dimension_slug: str | None = None,
-    collection_choices_names: Optional[List[str]] = None,
-    is_explorer: Optional[bool] = None,
-) -> Union[Collection, Explorer]:
+    collection_choices_names: List[str] | None = None,
+    is_explorer: bool | None = None,
+) -> Collection | Explorer:
     """Combine multiple collections (MDIMs or Explorers) into a single one.
 
     This function serves as a unified interface to combine either Explorers
@@ -275,9 +275,10 @@ def combine_collections(
         if dim.ui_type == "checkbox" and is_explorer:
             raise NotImplementedError("Checkbox dimensions are not supported yet for Explorers.")
 
-    # Detect duplicate views
+    # Detect duplicate views + save dependencies
     seen_dims = set()
     has_duplicate_views = False
+    dependencies_combined = set()
     for collection in collections:
         # duplicate views within a collection
         collection.check_duplicate_views()
@@ -288,6 +289,9 @@ def combine_collections(
                 has_duplicate_views = True
                 break
             seen_dims.add(dims)
+
+        # Save dependencies from each collection
+        dependencies_combined |= collection.dependencies
 
     # Add collection dimension if needed
     if has_duplicate_views or force_collection_dimension:
@@ -389,6 +393,7 @@ def combine_collections(
         catalog_path=catalog_path_new,
         validate_schema=True if not is_explorer else False,
         explorer=is_explorer,
+        dependencies_combined=dependencies_combined,
     )
 
     # Log any conflicts that were resolved
@@ -421,7 +426,7 @@ def _extract_choice_slug_changes(df_choices) -> Dict[str, Any]:
 
 
 def _combine_dimensions(
-    df_choices: pd.DataFrame, cols_choices: List[str], collection: Union[Explorer, Collection]
+    df_choices: pd.DataFrame, cols_choices: List[str], collection: Explorer | Collection
 ) -> List[Dimension]:
     """Combine dimensions from different explorers"""
     # Dimension bucket
@@ -449,7 +454,7 @@ def _combine_dimensions(
     return dimensions
 
 
-def _update_choice_slugs_in_views(choice_slug_changes, collection_by_id) -> Mapping[str, Union[Collection, Explorer]]:
+def _update_choice_slugs_in_views(choice_slug_changes, collection_by_id) -> Mapping[str, Collection | Explorer]:
     """Access each explorer, and update choice slugs in views"""
     for collection_id, change in choice_slug_changes.items():
         # Get collection
@@ -472,7 +477,7 @@ def _update_choice_slugs_in_views(choice_slug_changes, collection_by_id) -> Mapp
     return collection_by_id
 
 
-def _build_df_choices(collections_by_id: Mapping[str, Union[Collection, Explorer]]) -> Tuple[pd.DataFrame, List[str]]:
+def _build_df_choices(collections_by_id: Mapping[str, Collection | Explorer]) -> Tuple[pd.DataFrame, List[str]]:
     # Collect all choices in a dataframe: choice_slug, choice_name, ..., collection_id, dimension_slug.
     records = []
     for i, explorer in collections_by_id.items():

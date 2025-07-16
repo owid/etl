@@ -11,7 +11,7 @@ TODO:
 from copy import copy
 from io import StringIO
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 import numpy as np
 import pandas as pd
@@ -65,15 +65,15 @@ class ExplorerLegacy:
 
     # Internal use. For save() method.
     # NOTE: name should match #[...] in catalog_path
-    _catalog_path: Optional[str] = None
+    _catalog_path: str | None = None
 
     def __init__(
         self,
-        name: Optional[str] = None,
-        config: Optional[Dict[str, Any]] = None,
-        df_graphers: Optional[pd.DataFrame] = None,
-        df_columns: Optional[pd.DataFrame] = None,
-        comments: Optional[List[str]] = None,
+        name: str | None = None,
+        config: Dict[str, Any] | None = None,
+        df_graphers: pd.DataFrame | None = None,
+        df_columns: pd.DataFrame | None = None,
+        comments: List[str] | None = None,
     ):
         """Build Explorer object from `content`.
 
@@ -110,7 +110,7 @@ class ExplorerLegacy:
         self.content_raw = None
 
     @property
-    def catalog_path(self) -> Optional[str]:
+    def catalog_path(self) -> str | None:
         return self._catalog_path
 
     @catalog_path.setter
@@ -121,9 +121,9 @@ class ExplorerLegacy:
     @classmethod
     def from_raw_string(
         cls,
-        content: Optional[str] = None,
+        content: str | None = None,
         sep: str = ",",
-        name: Optional[str] = None,
+        name: str | None = None,
     ):
         """Build Explorer object from `content`.
 
@@ -186,7 +186,7 @@ class ExplorerLegacy:
         return explorer
 
     @classmethod
-    def from_db(cls, name: str, owid_env: Optional[OWIDEnv] = None) -> "ExplorerLegacy":
+    def from_db(cls, name: str, owid_env: OWIDEnv | None = None) -> "ExplorerLegacy":
         """Load explorer config from DB."""
         # Ensure we have an environment set
         if owid_env is None:
@@ -203,7 +203,7 @@ class ExplorerLegacy:
 
         return explorer
 
-    def save(self, owid_env: Optional[OWIDEnv] = None) -> None:
+    def save(self, owid_env: OWIDEnv | None = None) -> None:
         # Ensure we have an environment set
         if owid_env is None:
             owid_env = OWID_ENV
@@ -669,7 +669,7 @@ def create_explorer_legacy(
     config: Dict[str, Any],
     df_graphers: pd.DataFrame,
     explorer_name: str,
-    df_columns: Optional[pd.DataFrame] = None,
+    df_columns: pd.DataFrame | None = None,
     reset: bool = True,
 ) -> ExplorerLegacy:
     """This function is used to create an Explorer object using the legacy configuration.

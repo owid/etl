@@ -1038,5 +1038,10 @@
     "rawName": "World Bank staff estimates based on age distributions of United Nations Population Division's World Population Prospects: 2024 Revision.",
     "dataPublisherSource": "World Bank based on World Population Prospects - UN Population Division (2024)",
     "name": "World Bank based on data from the UN Population Division"
+  },
+  {
+    "rawName": "Worldwide Governance Indicators, World Bank (WB), uri: www.govindicators.org, note: The Worldwide Governance Indicators (WGI) are a product of the staff of the World Bank with external contributions.",
+    "dataPublisherSource": "",
+    "name": "Worldwide Governance Indicators (WGI), World Bank"
   }
 ]

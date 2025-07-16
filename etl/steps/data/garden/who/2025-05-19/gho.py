@@ -12,7 +12,7 @@ from owid.catalog.utils import underscore
 from owid.repack import repack_series
 
 from etl.data_helpers import geo
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 from .gho_omms import create_omms
 
@@ -57,7 +57,7 @@ NAN_VALUES = [
 PRIORITY_OF_REGIONS = ["WORLDBANKREGION", "REGION", "UNICEFREGION", "UNREGION", "UNSDGREGION", "FAOREGION"]
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -140,6 +140,10 @@ def run(dest_dir: str) -> None:
         # Check overlapping names
         check_overlapping_names(tb)
 
+        # Special processing for statins indicator
+        if "general_availability_of_statins_in_the_public_health_sector" in tb.columns:
+            tb = process_statins_indicator(tb)
+
         tables.append(tb)
 
     # Merge identical tables
@@ -157,8 +161,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(
-        dest_dir,
+    ds_garden = paths.create_dataset(
         tables=tables_dict.values(),
         check_variables_metadata=True,
         default_metadata=ds_meadow.metadata,
@@ -427,5 +430,22 @@ def check_duplicate_index(tb: Table) -> Table:
                 duplicated_index=duplicated_index[:10],
             )
             tb = tb[~tb.index.duplicated()]
+
+    return tb
+
+
+def process_statins_indicator(tb: Table) -> Table:
+    """Special processing for statins indicator data."""
+
+    # Asserting that the unique values in the column are a subset of the provided list
+    provided_values = ["Yes", "Don't know", "No", "No data received", "No response"]
+    unique_values_in_column = tb["general_availability_of_statins_in_the_public_health_sector"].unique()
+    assert set(unique_values_in_column).issubset(provided_values)
+
+    # Replace the specified values where there is no data with "NaN" for consistency on grapher charts
+    values_to_replace = ["No data received", "No response", "Don't know"]
+    tb["general_availability_of_statins_in_the_public_health_sector"] = tb[
+        "general_availability_of_statins_in_the_public_health_sector"
+    ].replace(values_to_replace, np.nan)
 
     return tb

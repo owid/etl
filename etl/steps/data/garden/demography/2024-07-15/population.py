@@ -419,13 +419,14 @@ def add_regions(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Ta
                 "United Kingdom",
                 "Italy",
                 "South Korea",
+                "Russia",
             ],
             "Upper-middle-income countries": [
                 "China",
                 "Brazil",
                 "Indonesia",
-                "Russia",
                 "Mexico",
+                "Iran",
             ],
             "Lower-middle-income countries": [
                 "India",
@@ -435,12 +436,10 @@ def add_regions(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Ta
                 "Philippines",
                 "Egypt",
                 "Kenya",
-                "Philippines",
                 "Vietnam",
-                "Iran",
             ],
             "Low-income countries": [
-                "Ethiopia",
+                # "Ethiopia", Currently not classified as low-income by the World Bank, but historically it was.
                 "Democratic Republic of Congo",
                 "Uganda",
             ],

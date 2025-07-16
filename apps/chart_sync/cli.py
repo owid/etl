@@ -59,6 +59,7 @@ def cli(
     exclude: Optional[str],
     dry_run: bool,
 ) -> None:
+    # TODO: keep this docstring in sync with apps/wizard/app_pages/chart_diff/app.py
     """Sync Grapher charts and revisions from an environment to the main environment.
 
     It syncs the charts and revisions from `SOURCE` to `TARGET`. This is especially useful for syncing work from staging servers to production.

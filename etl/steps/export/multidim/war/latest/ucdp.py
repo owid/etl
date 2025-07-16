@@ -33,6 +33,8 @@ def run() -> None:
     # Load grapher dataset.
     ds = paths.load_dataset("ucdp")
     tb = ds.read("ucdp", load_data=False)
+    ds_pre = paths.load_dataset("ucdp_preview")
+    tb_pre = ds_pre.read("ucdp_preview", load_data=False)
 
     # Filter unnecessary columns
     tb = tb.filter(regex="^country|^year|^number_deaths_ongoing|^number_ongoing_conflicts__")
@@ -45,6 +47,7 @@ def run() -> None:
     #
     # Create collection object
     #
+
     c = paths.create_collection(
         config=config,
         short_name="ucdp",
@@ -59,11 +62,15 @@ def run() -> None:
 
     # Edit indicator-level display settings
     choice_names = c.get_choice_names("conflict_type")
-    for view in c.views:
-        for slug, name in choice_names.items():
-            if view.dimensions["conflict_type"] == slug:
-                assert view.indicators.y is not None
-                view.indicators.y[0].display = {"name": name}
+    for v in c.views:
+        if v.d.conflict_type in choice_names:
+            assert v.indicators.y is not None
+            v.indicators.y[0].display = {"name": choice_names[v.d.conflict_type]}
+
+        if v.matches(indicator="deaths", conflict_type="all", estimate="best", people="all"):
+            assert v.indicators.y is not None
+            assert len(v.indicators.y) == 1
+            v.indicators.y[0].catalogPath = v.indicators.y[0].catalogPath.replace(tb.m.uri, tb_pre.m.uri)
 
     # Aggregate views
     c.group_views(
@@ -145,8 +152,29 @@ def run() -> None:
             "note": lambda view: _set_note(view),
             "hideRelativeToggle": lambda view: (view.dimensions["people"] != "all_stacked")
             and (view.dimensions["conflict_type"] != "all_stacked"),
-            "hideFacetControl": lambda view: view.dimensions["estimate"] == "best_ci",
+            "hideFacetControl": False,
+            "yAxis": {
+                "facetDomain": lambda view: "independent" if view.d.conflict_type == "all" else "shared",
+            },
         },
+    )
+
+    c.edit_views(
+        edits=[
+            {
+                "dimensions": {
+                    "indicator": "deaths",
+                    "conflict_type": "all",
+                    "people": "all",
+                    "estimate": "best",
+                },
+                "config": {
+                    "yAxis": {
+                        "facetDomain": "independent",
+                    },
+                },
+            }
+        ]
     )
 
     #
@@ -233,19 +261,19 @@ def adjust_dimensions(tb):
 
 
 def _set_description_key(view, tb):
-    if view.dimensions["conflict_type"] in ("all", "all_stacked"):
+    if view.d.conflict_type in ("all", "all_stacked"):
         column = "number_deaths_ongoing_conflicts__conflict_type_all"
-    elif view.dimensions["conflict_type"] == "intrastate":
+    elif view.d.conflict_type == "intrastate":
         column = "number_deaths_ongoing_conflicts__conflict_type_intrastate"
-    elif view.dimensions["conflict_type"] == "interstate":
+    elif view.d.conflict_type == "interstate":
         column = "number_deaths_ongoing_conflicts__conflict_type_interstate"
-    elif view.dimensions["conflict_type"] == "non-state conflict":
+    elif view.d.conflict_type == "non-state conflict":
         column = "number_deaths_ongoing_conflicts__conflict_type_non_state_conflict"
     else:
         return []
     keys = tb[column].m.description_key
 
-    if (view.dimensions["estimate"] == "best_ci") or (view.dimensions["indicator"] == "num_conflicts"):
+    if (view.d.estimate == "best_ci") or (view.d.indicator == "num_conflicts"):
         assert keys[-1].startswith("'Best' death estimates")
         keys = keys[:-1] + [None]
 
@@ -254,59 +282,62 @@ def _set_description_key(view, tb):
 
 def _set_title(view, choice_names):
     conflict_name = _get_conflict_name(view, choice_names)
-    if view.dimensions["indicator"] in ("deaths", "death_rate"):
+    if view.d.indicator in ("deaths", "death_rate"):
         # Condition by indicator: "Deaths" vs "Death rate"
-        if view.dimensions["indicator"] == "death_rate":
+        if view.d.indicator == "death_rate":
             title = "Death rate"
         else:
             title = "Deaths"
 
         # Condition by conflict type: "in" vs "from", add conflict_name
-        title += f" {'from' if view.dimensions['conflict_type'] == 'one-sided violence' else 'in'} {conflict_name} based on where they occurred"
+        title += f" {'from' if view.d.conflict_type == 'one-sided violence' else 'in'} {conflict_name} based on where they occurred"
 
         # Condition by people: "Civilian and combatant" breakdown or aggregate
-        if view.dimensions["people"] == "all_stacked":
+        if view.d.people == "all_stacked":
             title = f"Civilian and combatant {title.lower()}"
     else:
-        title = f"Number of {'cases of ' if view.dimensions['conflict_type'] == 'one-sided violence' else ''}{conflict_name}"
+        title = f"Number of {'cases of ' if view.d.conflict_type == 'one-sided violence' else ''}{conflict_name}"
 
     # Add 'by type' at the end if applicable
-    if view.dimensions["conflict_type"] == "all_stacked":
+    if view.d.conflict_type == "all_stacked":
         title += " by type"
     return title
 
 
 def _set_subtitle(view):
     """Set subtitle based on view dimensions."""
-    if view.dimensions["conflict_type"] == "one-sided violence":
-        if view.dimensions["indicator"] == "num_conflicts":
+    if view.d.conflict_type == "one-sided violence":
+        if view.d.indicator == "num_conflicts":
             return "Included are cases of [one-sided violence against civilians](#dod:onesided-ucdp) that were ongoing that year."
-        return f"Reported deaths of civilians due to [one-sided violence](#dod:onesided-ucdp) that was ongoing that year{', per 100,000 people' if view.dimensions['indicator']=='death_rate' else ''}. Deaths due to disease and starvation resulting from one-sided violence are not included."
+        return f"Reported deaths of civilians due to [one-sided violence](#dod:onesided-ucdp) that was ongoing that year{', per 100,000 people' if view.d.indicator=='death_rate' else ''}. Deaths due to disease and starvation resulting from one-sided violence are not included."
 
     # DoD
-    if view.dimensions["conflict_type"] == "all":
+    if view.d.conflict_type == "all":
         dod = "[armed conflicts](#dod:armed-conflict-ucdp)"
-    elif view.dimensions["conflict_type"] == "interstate":
+    elif view.d.conflict_type == "interstate":
         dod = "[interstate conflicts](#dod:interstate-ucdp)"
-    elif view.dimensions["conflict_type"] == "intrastate":
+    elif view.d.conflict_type == "intrastate":
         dod = "[civil conflicts](#dod:intrastate-ucdp)"
-    elif view.dimensions["conflict_type"] == "non-state conflict":
+    elif view.d.conflict_type == "non-state conflict":
         dod = "[non-state conflicts](#dod:nonstate-ucdp)"
-    elif view.dimensions["conflict_type"] == "all_stacked":
+    elif view.d.conflict_type == "all_stacked":
         dod = "[interstate](#dod:interstate-ucdp), [civil](#dod:intrastate-ucdp), [non-state](#dod:nonstate-ucdp) conflicts, and [violence against civilians](#dod:onesided-ucdp)"
     else:
-        raise ValueError(f"Unknown conflict type: {view.dimensions['conflict_type']}")
+        raise ValueError(f"Unknown conflict type: {view.d.conflict_type}")
 
-    if view.dimensions["indicator"] in ("deaths", "death_rate"):
+    if view.d.indicator in ("deaths", "death_rate"):
         # Subtitle template
         subtitle_template = "Reported deaths of combatants and civilians due to fighting{placeholder} that were ongoing that year. Deaths due to disease and starvation resulting from the conflict are not included."
 
         # Define subtitle
-        if view.dimensions["indicator"] == "deaths":
-            return subtitle_template.format(placeholder=f" in {dod}")
-        elif view.dimensions["indicator"] == "death_rate":
+        if view.d.indicator == "deaths":
+            subtitle = subtitle_template.format(placeholder=f" in {dod}")
+            if view.matches(conflict_type="all", estimate="best", people="all"):
+                subtitle += " The data for 2025 is preliminary and was last updated in June 2025."
+            return subtitle
+        elif view.d.indicator == "death_rate":
             return subtitle_template.format(placeholder=f", per 100,000 people. Included are {dod}")
-    elif view.dimensions["indicator"] == "num_conflicts":
+    elif view.d.indicator == "num_conflicts":
         return f"Included are {dod} that were ongoing that year."
     return ""
 
@@ -314,9 +345,9 @@ def _set_subtitle(view):
 def _set_note(view):
     """Set subtitle based on view dimensions."""
     note = ""
-    if view.dimensions["estimate"] == "best_ci":
+    if view.d.estimate == "best_ci":
         note = "'Best' estimates as identified by UCDP."
-    elif view.dimensions["indicator"] == "num_conflicts":
+    elif view.d.indicator == "num_conflicts":
         note = "Some conflicts affect several countries and regions. The sum across all countries and regions can therefore be higher than the total number."
     return note
 
@@ -324,10 +355,10 @@ def _set_note(view):
 def _get_conflict_name(view, choice_names):
     """Get conflict name based on view dimensions."""
     conflict_name = "armed conflicts"
-    if view.dimensions["conflict_type"] == "one-sided violence":
+    if view.d.conflict_type == "one-sided violence":
         conflict_name = "one-sided violence against civilians"
-    elif view.dimensions["conflict_type"] not in {"all", "all_stacked"}:
-        conflict_name = choice_names[view.dimensions["conflict_type"]].lower()
+    elif view.d.conflict_type not in {"all", "all_stacked"}:
+        conflict_name = choice_names[view.d.conflict_type].lower()
     return conflict_name
 
 
@@ -341,7 +372,7 @@ def edit_indicator_displays(view):
             view.indicators.y[0].display["color"] = "#B13507"
 
     # Set colors for stacked bar charts
-    if view.dimensions["estimate"] == "best_ci":
+    if view.d.estimate == "best_ci":
         assert view.indicators.y is not None
         for indicator in view.indicators.y:
             if "_high_" in indicator.catalogPath:
@@ -359,7 +390,7 @@ def edit_indicator_displays(view):
                     "name": "Best estimate",
                     "color": "#B13507",
                 }
-    if view.dimensions["people"] == "all_stacked":
+    if view.d.people == "all_stacked":
         assert view.indicators.y is not None
         for indicator in view.indicators.y:
             if "_combatants_" in indicator.catalogPath:

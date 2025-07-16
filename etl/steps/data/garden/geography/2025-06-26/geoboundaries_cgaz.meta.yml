@@ -1,0 +1,29 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Uncategorized
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  geoboundaries_cgaz:
+    variables:
+      territory_code:
+        title: Territory code
+        unit: ""
+        description_short: "Identification code of the territory"
+      territory_type:
+        title: Type of the territory
+        unit: ""
+        description_short: "Territory might be a sovereign state (ADM0) or in dispute (DISP)"
+      geometry:
+        title: Geometry of territory
+        unit: ""
+        description_short: "Geometry of the territory (from shape file)"
