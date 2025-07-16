@@ -31,6 +31,9 @@ import httpx
 from fastmcp import FastMCP
 from fastmcp.server.server import Response
 
+from owid_mcp.config import COMMON_ENTITIES, DATASETTE_BASE, GRAPHER_BASE, HTTP_TIMEOUT, OWID_API_BASE
+from owid_mcp.utils import smart_round
+
 # ---------------------------------------------------------------------------
 # Data structures
 # ---------------------------------------------------------------------------
@@ -46,325 +49,15 @@ class ChartSearchResult:
 
 
 # ---------------------------------------------------------------------------
-# Configuration
-# ---------------------------------------------------------------------------
-DATASETTE_BASE = os.getenv("OWID_DATASETTE_BASE", "https://datasette-public.owid.io/owid.json")
-OWID_API_BASE = os.getenv("OWID_API_BASE", "https://api.ourworldindata.org/v1/indicators")
-GRAPHER_BASE = os.getenv("GRAPHER_BASE", "https://ourworldindata.org/grapher")
-HTTP_TIMEOUT = httpx.Timeout(10.0)
-
-# Common entities list for instructions
-COMMON_ENTITIES = """
-Abkhazia
-Afghanistan
-Africa
-Akrotiri and Dhekelia
-Aland Islands
-Albania
-Algeria
-American Samoa
-Andorra
-Angola
-Anguilla
-Antarctica
-Antigua and Barbuda
-Argentina
-Armenia
-Aruba
-Asia
-Australia
-Austria
-Austria-Hungary
-Azerbaijan
-Bahamas
-Bahrain
-Bangladesh
-Barbados
-Belarus
-Belgium
-Belize
-Benin
-Bermuda
-Bhutan
-Bolivia
-Bonaire Sint Eustatius and Saba
-Bosnia and Herzegovina
-Bosnia and Herz.
-Botswana
-Bouvet Island
-Brazil
-British Indian Ocean Territory
-British Virgin Islands
-Brunei
-Bulgaria
-Burkina Faso
-Burundi
-Cambodia
-Cameroon
-Canada
-Cape Verde
-Cayman Islands
-Central African Republic
-Chad
-Channel Islands
-Chile
-China
-Christmas Island
-Cocos Islands
-Colombia
-Comoros
-Congo
-Cook Islands
-Costa Rica
-Cote d'Ivoire
-Croatia
-Cuba
-Curacao
-Cyprus
-Czechia
-Czechoslovakia
-Democratic Republic of Congo
-DR Congo
-Denmark
-Djibouti
-Dominica
-Dominican Republic
-East Germany
-East Timor
-Ecuador
-Egypt
-El Salvador
-Equatorial Guinea
-Eritrea
-Ethiopia (former)
-Estonia
-Eswatini
-Ethiopia
-Europe
-European Union (27)
-Faroe Islands
-Falkland Islands
-Fiji
-Finland
-France
-French Guiana
-French Polynesia
-French Southern Territories
-Gabon
-Gambia
-Gaza Strip
-Georgia
-Germany
-Ghana
-Gibraltar
-Greece
-Greenland
-Grenada
-Guadeloupe
-Guam
-Guatemala
-Guernsey
-Guinea
-Guinea-Bissau
-Guyana
-Haiti
-Heard Island and McDonald Islands
-Honduras
-Hong Kong
-Hungary
-Iceland
-India
-Indonesia
-Iran
-Iraq
-Ireland
-Isle of Man
-Israel
-Italy
-Jamaica
-Japan
-Jersey
-Jordan
-Kazakhstan
-Kenya
-Kiribati
-Kosovo
-Kuwait
-Kyrgyzstan
-Laos
-Latvia
-Lebanon
-Lesotho
-Liberia
-Libya
-Liechtenstein
-Lithuania
-Luxembourg
-Macao
-Madagascar
-Malawi
-Malaysia
-Maldives
-Mali
-Malta
-Marshall Islands
-Martinique
-Mauritania
-Mauritius
-Mayotte
-Melanesia
-Mexico
-Micronesia (country)
-Moldova
-Monaco
-Mongolia
-Montenegro
-Montserrat
-Morocco
-Mozambique
-Myanmar
-Nagorno-Karabakh
-Namibia
-Nauru
-Nepal
-Netherlands
-Netherlands Antilles
-New Caledonia
-New Zealand
-Nicaragua
-Niger
-Nigeria
-Niue
-Norfolk Island
-North America
-North Korea
-North Macedonia
-Northern Cyprus
-Northern Mariana Islands
-Norway
-Oceania
-Oman
-Pakistan
-Palau
-Palestine
-Panama
-Papua New Guinea
-Paraguay
-Peru
-Philippines
-Pitcairn
-Poland
-Polynesia
-Portugal
-Puerto Rico
-Qatar
-Democratic Republic of Vietnam
-Republic of Vietnam
-Reunion
-Romania
-Russia
-Rwanda
-Saint Barthelemy
-Saint Helena
-Saint Kitts and Nevis
-Saint Lucia
-Saint Martin (French part)
-Saint Pierre and Miquelon
-Saint Vincent and the Grenadines
-Samoa
-San Marino
-Sao Tome and Principe
-Saudi Arabia
-Senegal
-Serbia
-Serbia and Montenegro
-Serbia excluding Kosovo
-Seychelles
-Sierra Leone
-Singapore
-Sint Maarten (Dutch part)
-Slovakia
-Slovenia
-Solomon Islands
-Somalia
-Somaliland
-South Africa
-South America
-South Georgia and the South Sandwich Islands
-South Korea
-South Ossetia
-South Sudan
-Spain
-Sri Lanka
-Sudan
-Sudan (former)
-Suriname
-Svalbard and Jan Mayen
-Sweden
-Switzerland
-Syria
-Taiwan
-Tajikistan
-Tanzania
-Thailand
-Togo
-Tokelau
-Tonga
-Transnistria
-Trinidad and Tobago
-Tunisia
-Turkey
-Turkmenistan
-Turks and Caicos Islands
-Turks and Caicos
-Tuvalu
-USSR
-Uganda
-Ukraine
-United Arab Emirates
-United Kingdom
-Korea (former)
-United States
-United States Minor Outlying Islands
-United States Virgin Islands
-Uruguay
-Uzbekistan
-Vanuatu
-Vatican
-Venezuela
-Vietnam
-Wallis and Futuna
-West Germany
-Western Sahara
-World
-Yemen
-Yemen Arab Republic
-Yemen People's Republic
-Yugoslavia
-Zambia
-Zanzibar
-Zimbabwe
-Grand Duchy of Tuscany
-Kingdom of the Two Sicilies
-Duchy of Modena and Reggio
-Kingdom of Sardinia
-Duchy of Parma and Piacenza
-Grand Duchy of Baden
-Kingdom of Bavaria
-Kingdom of Saxony
-Kingdom of Wurttemberg
-Great Colombia
-Federal Republic of Central America
-"""
-
-# ---------------------------------------------------------------------------
 # FastMCP server instance
 # ---------------------------------------------------------------------------
 mcp = FastMCP(
     name="OWID MCP Prototype",
     instructions=(
         "Search and fetch indicators & charts from Our World in Data. "
-        "Call `search_indicator` or `search_chart` to discover resources. "
+        "Call `search_indicator` to find indicators by their NAME or DESCRIPTION (e.g., 'population density', 'GDP per capita', 'life expectancy'). "
+        "Do NOT include entity/country names in search queries - search only for the indicator concept itself. "
+        "Call `search_chart` to find charts by slug, title, or description. "
         "Fetch indicators via `ind://{id}` for all data or `ind://{id}/{entity}` for specific country/entity data. "
         "Fetch charts via `chart://{slug}`. "
         "Entity names must match exactly as they appear in OWID:\n"
@@ -381,21 +74,35 @@ mcp = FastMCP(
 async def search_indicator(query: str, limit: int = 10) -> List[Dict]:
     """Search for OWID indicators by name or description.
 
+    Search for indicators by their CONCEPT/NAME only (e.g., 'population density', 'GDP', 'emissions').
+    Do NOT include country/entity names in the query - those are specified separately when fetching data.
+
+    Args:
+        query: Indicator concept to search for (e.g., 'population density', not 'population density USA')
+        limit: Maximum number of results to return
+
     Returns a list of indicators matching the query, each with:
     - title: indicator name
     - resource_uri: URI to fetch the indicator data (e.g., 'ind://2118')
     - snippet: truncated description
     - score: relevance score
+    - chart_count: number of charts this indicator is used in
 
     Use the resource_uri with ReadMcpResourceTool to get the actual data.
     """
     sql = """
     SELECT
-        id, name, description
-    FROM variables
+        v.id, v.name, v.description, COALESCE(cd.chart_count, 0) as chart_count
+    FROM variables v
+    LEFT JOIN (
+        SELECT variableId, COUNT(DISTINCT chartId) as chart_count
+        FROM chart_dimensions
+        GROUP BY variableId
+    ) cd ON v.id = cd.variableId
     WHERE
-        name LIKE :q COLLATE NOCASE
-        OR description LIKE :q COLLATE NOCASE
+        v.name LIKE :q COLLATE NOCASE
+        OR v.description LIKE :q COLLATE NOCASE
+    ORDER BY chart_count DESC, v.name
     LIMIT :limit
     """
     params = {"q": f"%{query}%", "limit": limit}
@@ -411,6 +118,7 @@ async def search_indicator(query: str, limit: int = 10) -> List[Dict]:
             "resource_uri": f"ind://{row[0]}",
             "snippet": (row[2] or "")[:160],
             "score": 1.0 - idx / max(1, len(rows)),
+            "chart_count": row[3],
         }
         for idx, row in enumerate(rows)
     ]
@@ -486,7 +194,7 @@ def _build_rows(data_json: Dict[str, Any], entities_meta: Dict[int, Dict[str, st
             {
                 "entity": meta["name"],
                 "year": y,
-                "value": v,
+                "value": smart_round(v),
             }
         )
 
