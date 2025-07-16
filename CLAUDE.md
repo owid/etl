@@ -285,5 +285,8 @@ print(f"Garden null values: {tb.date.isnull().sum()}")
 - Check `etl d version-tracker` before major changes
 - VS Code extensions available: `make install-vscode-extensions`
 - **ALWAYS run `make check` before committing** - formats code, fixes linting issues, and runs type checks
-- When I ask you to get something from MCP server, don't run a python script, but query the MCP server directly! If it is not available, let me know.
 - SQL queries enclose in triple quotes for readability
+
+## Instructions for MCP servers
+- When I ask you to get something from MCP server, don't run a python script, but query the MCP server directly! If it is not available, let me know.
+- If MCP server raises an error, try to fix it in code.
