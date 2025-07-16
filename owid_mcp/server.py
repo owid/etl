@@ -61,7 +61,9 @@ mcp = FastMCP(
     instructions=(
         "Search and fetch indicators & charts from Our World in Data. "
         "Call `search_indicator` or `search_chart` to discover resources. "
-        "Fetch indicators via `ind://{id}` or charts via `chart://{slug}`."
+        "Fetch indicators via `ind://{id}` for all data or `ind://{id}/{entity}` for specific country/entity data. "
+        "Fetch charts via `chart://{slug}`. "
+        "Entity names must match exactly as they appear in OWID (e.g., 'United States', not 'US')."
     ),
 )
 
@@ -72,7 +74,16 @@ mcp = FastMCP(
 
 @mcp.tool
 async def search_indicator(query: str, limit: int = 10) -> List[Dict]:
-    """Free‑text search across indicator names & descriptions."""
+    """Search for OWID indicators by name or description.
+    
+    Returns a list of indicators matching the query, each with:
+    - title: indicator name
+    - resource_uri: URI to fetch the indicator data (e.g., 'ind://2118')
+    - snippet: truncated description
+    - score: relevance score
+    
+    Use the resource_uri with ReadMcpResourceTool to get the actual data.
+    """
     sql = """
     SELECT
         id, name, description
@@ -102,7 +113,17 @@ async def search_indicator(query: str, limit: int = 10) -> List[Dict]:
 
 @mcp.tool
 async def search_chart(query: str, limit: int = 10) -> List[ChartSearchResult]:
-    """Free‑text search across chart slug, title or note."""
+    """Search for OWID charts by slug, title, or note.
+    
+    Returns a list of charts matching the query, each with:
+    - title: chart title
+    - resource_uri: URI to fetch the chart SVG (e.g., 'chart://population-density')
+    - snippet: truncated chart note/description
+    - metadata: additional chart metadata
+    - score: relevance score
+    
+    Use the resource_uri with ReadMcpResourceTool to get the chart image.
+    """
     sql = """
     SELECT
         slug, title, note, json_extract(config,'$.dimensions[0].variableId')
