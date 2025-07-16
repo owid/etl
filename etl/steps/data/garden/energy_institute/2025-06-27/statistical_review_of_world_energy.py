@@ -332,7 +332,7 @@ REGIONS = {
             # Data for Belarus and Russia are usually informed explicitly in the data (under CIS countries).
             # Hence, the only European country that could be included in "Other CIS (EI)" is Moldova (which is likely a small fraction). The rest of "Other CIS (EI)" are countries that are assigned to Asia in OWID's definitions.
             # Therefore, it's safe to assign "Other CIS (EI)" to the Asian aggregate.
-            # Still, for safety, remove the aggregate for Europe and Asia on indicators where "Other CIS (EI)" is a significant fraction of the aggregate. In practice (at least as of the 2025 release), "Other CIS (EI)" is never a significant fraction of "Asia" and it is only a significant (>10%) fraction of "Europe" in the case of electricity from gas.
+            # Still, for safety, remove the aggregate for Europe and Asia on indicators where "Other CIS (EI)" is a significant fraction of the aggregate. In practice (at least as of the 2025 release), "Other CIS (EI)" is never a significant fraction of "Asia" and it is only a significant (>15%) fraction of "Europe" in the case of electricity from gas.
             "Other CIS (EI)",
             # Countries defined by EI in 'Middle East' are fully included in OWID's definition of Asia.
             "Other Middle East (EI)",
@@ -678,9 +678,9 @@ def fix_issues_with_other_regions(tb: Table) -> Table:
         "Other Asia Pacific (EI)": ["Asia"],
     }
     # Fraction of the range (between maximum and minimum) above which discrepancies between "Other *" regions and their containing aggregate regions will be considered for removal.
-    fraction_of_range = 10
+    fraction_of_range = 15
     # Percentage (of "Other *" with respect to its containing aggregate region) above which the aggregate region will be removed.
-    max_percentage_deviation = 10
+    max_percentage_deviation = 15
     # Remove aggregates in columns for which an overlapping "Other *" region has a significant contribution, compared to the aggregate.
     for other_region, owid_regions in ei_regions_and_overlapping_owid_regions.items():
         tb_other = tb[(tb["country"] == other_region)].fillna(0).reset_index(drop=True)
@@ -688,19 +688,19 @@ def fix_issues_with_other_regions(tb: Table) -> Table:
             tb_continent = tb[(tb["country"] == continent)].fillna(0).reset_index(drop=True)
             for column in tb.drop(columns=["country", "year"]).columns:
                 remove_aggregate = False
-                # Define the "minimum range" of values that we care about (which is 10% of the maximum range of values for this indicator in the continent).
+                # Define the "minimum range" of values that we care about (which is 15% of the maximum range of values for this indicator in the continent).
                 min_range = (tb_continent[column].max() - tb_continent[column].min()) / fraction_of_range
                 # If the "Other *" region has any value larger than the minimum range, consider removing the aggregate.
                 mask = tb_other[column] > min_range
                 if mask.any():
                     max_dev = (100 * tb_other[mask][column] / (tb_continent[mask][column] + 1e-6)).max()
                     if max_dev > max_percentage_deviation:
-                        # If any of the values for the "Other *" region is larger than 10% of the value for the continent, remove the aggregate.
+                        # If any of the values for the "Other *" region is larger than 15% of the value for the continent, remove the aggregate.
                         remove_aggregate = True
 
                 if remove_aggregate:
                     # DEBUGGING: Uncomment to plot cases where aggregate was removed.
-                    # print(f"Removing {continent} aggregate for {column}")
+                    print(f"Removing {continent} aggregate for {column}")
                     # px.line(pd.concat([tb_other, tb_continent]), x="year", y=column, color="country", markers=True,title="TO BE REMOVED").show()
                     # Remove this aggregate.
                     tb.loc[(tb["country"] == continent), column] = None
@@ -709,7 +709,7 @@ def fix_issues_with_other_regions(tb: Table) -> Table:
                     # DEBUGGING: Uncomment to plot cases where the aggregates were kept.
                     # px.line(pd.concat([tb_other, tb_continent]), x="year", y=column, color="country", markers=True).show()
 
-        return tb
+    return tb
 
 
 def create_region_aggregates(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Table:
