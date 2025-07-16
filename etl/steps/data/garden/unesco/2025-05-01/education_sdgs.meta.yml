@@ -262,6 +262,14 @@ definitions:
     - These estimates are produced using a statistical model that draws on these sources, filling gaps where direct observations are missing or inconsistent.
     - Because values are estimated, they may differ from official national figures. Differences in school systems or grade structures can also affect comparability.
 
+  description_key_out_school: &description_key_out_school
+    - Many children and adolescents around the world are not in school, even though they are old enough to be. This indicator shows how many are missing out on education at each stage of the system.
+    - It measures the share of individuals in the official age range for a given level of education who are not enrolled at that level or in any higher level.
+    - These children or adolescents may have never entered school, may have dropped out, or may be starting later than expected.
+    - The indicator is calculated by subtracting the number of enrolled individuals in a specific age group from the total population of that group, and expressing the result as a percentage.
+    - High out-of-school rates signal barriers to access — such as poverty, gender inequality, location, or limited availability of schools — and highlight where more targeted support is needed.
+    - The data comes from administrative school enrolment records and household surveys, which provide age-specific insights when compared to population estimates.
+    - As with all education data, results should be interpreted carefully. Differences in how enrolment is defined, inconsistencies in age reporting, and timing of data collection (such as during holidays or late in the school year) can affect accuracy.
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
@@ -527,16 +535,10 @@ tables:
         description_short: Percentage of children in the official primary school age group who are not enrolled in any level of education.
         unit: "%"
         short_unit: "%"
-        description_key:
-          - Many children who are old enough for primary school are not attending any kind of school — this indicator shows how many are missing out on education.
-          - It captures the share of children in the official primary school age range who are not enrolled in primary or secondary education.
-          - The indicator is calculated by subtracting the number of enrolled primary-age children (regardless of the level of education) from the total number of children in that age group, and expressing the result as a percentage.
-          - These children may have never enrolled, may have dropped out, or may be starting late and not yet entered school.
-          - A high out-of-school rate highlights the need for improved access and targeted policies to reach excluded groups. When disaggregated, the indicator helps identify gaps by sex, location, or socioeconomic status.
-          - The data comes from administrative records and household surveys that collect information on enrolment by single year of age and compare it with population estimates for the same group.
-          - As with all estimates, there are limitations. Differences in data sources, enrolment definitions, and the timing of data collection (especially if late in the school year) can affect accuracy.
+        description_key: *description_key_out_school
         presentation:
           title_public: Out-of-school rate for children of primary school age
+          grapher_config: *grapher_config_enrolment_bugn
         display:
           name: Primary school age
           numDecimalPlaces: 1
@@ -546,15 +548,142 @@ tables:
         description_short: Percentage of adolescents in the official age group for [lower secondary](#dod:lower-secondary-education) education who are not enrolled in school at any level.
         unit: "%"
         short_unit: "%"
-        description_key:
-          - Many adolescents who are old enough for lower secondary school are not enrolled — this indicator shows how many are missing out on education during this critical stage.
-          - It captures the share of children in the official lower secondary age range who are not enrolled in any formal education, including pre-primary, primary, secondary, or tertiary levels.
-          - The indicator is calculated by subtracting the number of enrolled lower secondary-aged adolescents (regardless of the education level they attend) from the total population in that age group, and expressing the result as a percentage.
-          - These adolescents may have never made the transition from primary school, may have dropped out early, or may be late entrants who haven’t yet re-entered the system.
-          - A high out-of-school rate signals the need for better policies and programmes that promote continued schooling through early adolescence, particularly in underserved communities.
-          - The data is drawn from a combination of administrative records on school enrolment by age and household surveys that track participation in education, compared with population estimates for the relevant age group.
-          - As with all education indicators, results should be interpreted with caution — differences in data sources, how enrolment is defined, and the timing of surveys (especially if conducted late in the school year) may affect the accuracy of estimates.
+        description_key: *description_key_out_school
+        presentation:
+          title_public: Out-of-school rate for adolescents of lower secondary school age
+          grapher_config: *grapher_config_enrolment_bugn
         display:
+          name: Lower secondary school age
+          numDecimalPlaces: 1
+
+      out_of_school_rate_for_children_of_primary_school_age__female__pct__rofst_1_f_cp:
+        title: Out-of-school rate for girls of primary school age
+        description_short: Percentage of girls in the official primary school age group who are not enrolled in any level of education.
+        unit: "%"
+        short_unit: "%"
+        description_key: *description_key_out_school
+        presentation:
+          title_public: Out-of-school rate for girls of primary school age
+          grapher_config: *grapher_config_enrolment_purples
+        display:
+          name: Girls
+          numDecimalPlaces: 1
+
+      out_of_school_rate_for_children_of_primary_school_age__male__pct__rofst_1_m_cp:
+        title: Out-of-school rate for boys of primary school age
+        description_short: Percentage of boys in the official primary school age group who are not enrolled in any level of education.
+        unit: "%"
+        short_unit: "%"
+        description_key: *description_key_out_school
+        presentation:
+          title_public: Out-of-school rate for boys of primary school age
+          grapher_config: *grapher_config_enrolment_blues
+        display:
+          name: Boys
+          numDecimalPlaces: 1
+
+      out_of_school_rate_for_adolescents_of_lower_secondary_school_age__female__pct__rofst_2_f_cp:
+        title: Out-of-school rate for girls of lower secondary school age
+        description_short: Percentage of girls in the official age group for [lower secondary](#dod:lower-secondary-education) education who are not enrolled in school at any level.
+        unit: "%"
+        short_unit: "%"
+        description_key: *description_key_out_school
+        presentation:
+          title_public: Out-of-school rate for girls of lower secondary school age
+          grapher_config: *grapher_config_enrolment_purples
+        display:
+          name: Girls
+          numDecimalPlaces: 1
+
+      out_of_school_rate_for_adolescents_of_lower_secondary_school_age__male__pct__rofst_2_m_cp:
+        title: Out-of-school rate for boys of lower secondary school age
+        description_short: Percentage of boys in the official age group for [lower secondary](#dod:lower-secondary-education) education who are not enrolled in school at any level.
+        unit: "%"
+        short_unit: "%"
+        description_key: *description_key_out_school
+        presentation:
+          title_public: Out-of-school rate for boys of lower secondary school age
+          grapher_config: *grapher_config_enrolment_blues
+        display:
+          name: Boys
+          numDecimalPlaces: 1
+
+      out_of_school_rate_for_youth_of_upper_secondary_school_age__both_sexes__pct__rofst_3_cp:
+        title: Out-of-school rate for youth of upper secondary school age
+        description_short: Percentage of youth in the official age group for [upper secondary](#dod:upper-secondary-education) education who are not enrolled in school at any level.
+        unit: "%"
+        short_unit: "%"
+        description_key: *description_key_out_school
+        presentation:
+          title_public: Out-of-school rate for youth of upper secondary school age
+          grapher_config: *grapher_config_enrolment_bugn
+        display:
+          name: Upper secondary school age
+          numDecimalPlaces: 1
+
+      out_of_school_rate_for_youth_of_upper_secondary_school_age__female__pct__rofst_3_f_cp:
+        title: Out-of-school rate for girls of upper secondary school age
+        description_short: Percentage of girls in the official age group for [upper secondary](#dod:upper-secondary-education) education who are not enrolled in school at any level.
+        unit: "%"
+        short_unit: "%"
+        description_key: *description_key_out_school
+        presentation:
+          title_public: Out-of-school rate for girls of upper secondary school age
+          grapher_config: *grapher_config_enrolment_purples
+        display:
+          name: Girls
+          numDecimalPlaces: 1
+
+      out_of_school_rate_for_youth_of_upper_secondary_school_age__male__pct__rofst_3_m_cp:
+        title: Out-of-school rate for boys of upper secondary school age
+        description_short: Percentage of boys in the official age group for [upper secondary](#dod:upper-secondary-education) education who are not enrolled in school at any level.
+        unit: "%"
+        short_unit: "%"
+        description_key: *description_key_out_school
+        presentation:
+          title_public: Out-of-school rate for boys of upper secondary school age
+          grapher_config: *grapher_config_enrolment_blues
+        display:
+          name: Boys
+          numDecimalPlaces: 1
+
+      out_of_school_rate_for_children_one_year_before_the_official_primary_entry_age__both_sexes__pct__rofst_agm1_cp:
+        title: Out-of-school rate for children one year before official primary entry age
+        description_short: Percentage of children one year before the official primary entry age who are not enrolled in pre-primary education.
+        unit: "%"
+        short_unit: "%"
+        description_key: *description_key_out_school
+        presentation:
+          title_public: Out-of-school rate for children one year before official primary entry age
+          grapher_config: *grapher_config_enrolment_greens
+        display:
+          name: Pre-primary age
+          numDecimalPlaces: 1
+
+      out_of_school_rate_for_children_one_year_before_the_official_primary_entry_age__female__pct__rofst_agm1_f_cp:
+        title: Out-of-school rate for girls one year before official primary entry age
+        description_short: Percentage of girls one year before the official primary entry age who are not enrolled in pre-primary education.
+        unit: "%"
+        short_unit: "%"
+        description_key: *description_key_out_school
+        presentation:
+          title_public: Out-of-school rate for girls one year before official primary entry age
+          grapher_config: *grapher_config_enrolment_purples
+        display:
+          name: Girls
+          numDecimalPlaces: 1
+
+      out_of_school_rate_for_children_one_year_before_the_official_primary_entry_age__male__pct__rofst_agm1_m_cp:
+        title: Out-of-school rate for boys one year before official primary entry age
+        description_short: Percentage of boys one year before the official primary entry age who are not enrolled in pre-primary education.
+        unit: "%"
+        short_unit: "%"
+        description_key: *description_key_out_school
+        presentation:
+          title_public: Out-of-school rate for boys one year before official primary entry age
+          grapher_config: *grapher_config_enrolment_blues
+        display:
+          name: Boys
           numDecimalPlaces: 1
 
       # ========================================================================
