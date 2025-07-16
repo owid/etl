@@ -1188,8 +1188,8 @@ def _set_permissions(sheet_id: str, role: str, general_access: str) -> None:
 
 def create_or_get_shared_folder(
     folder_name: str = "ETL GSheet Exports",
-    parent_folder_id: Optional[str] = None,  # Changed from hardcoded ID
-) -> str:
+    parent_folder_id: Optional[str] = None,
+) -> Optional[str]:
     """Create or get a shared folder for storing multiple Google Sheets.
 
     Parameters
@@ -1201,8 +1201,8 @@ def create_or_get_shared_folder(
 
     Returns
     -------
-    str
-        The folder ID
+    Optional[str]
+        The folder ID, or None if creation failed
     """
     try:
         drive = GoogleDrive()
@@ -1221,13 +1221,17 @@ def create_or_get_shared_folder(
             return folder_id
 
         # Create new folder
-        folder_metadata = {"name": folder_name, "mimeType": "application/vnd.google-apps.folder"}
+        folder_metadata: Dict[str, Any] = {"name": folder_name, "mimeType": "application/vnd.google-apps.folder"}
 
         if parent_folder_id:
-            folder_metadata["parents"] = [parent_folder_id]
+            folder_metadata["parents"] = [parent_folder_id]  # This is correct - parents expects a list
 
         folder = drive.drive_service.files().create(body=folder_metadata, fields="id").execute()
         folder_id = folder.get("id")
+
+        if folder_id is None:
+            print(f"Failed to create folder: {folder_name}")
+            return None
 
         # Set permissions for team access
         drive.set_file_permissions(file_id=folder_id, role="reader", general_access="anyone")
@@ -1243,11 +1247,17 @@ def create_or_get_shared_folder(
 
 
 def setup_owid_team_folder() -> Optional[str]:
-    """Create the main OWID team folder for Google Sheets exports."""
+    """Create the main OWID team folder for Google Sheets exports.
+
+    Returns
+    -------
+    Optional[str]
+        The folder ID, or None if creation failed
+    """
     print("Setting up OWID team folder...")
 
     # Create main folder only
-    main_folder_id = create_or_get_shared_folder(DEFAULT_TEAM_FOLDER_NAME)
+    main_folder_id = create_or_get_shared_folder("OWID ETL Exports")
 
     if main_folder_id:
         print(f"✅ Team folder created/found: {main_folder_id}")
