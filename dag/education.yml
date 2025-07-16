@@ -198,6 +198,13 @@ steps:
     - data://grapher/unesco/2025-05-01/education_opri
 
   #
+  # Mdim for proficiency levels in different subjects
+  #
+  export://multidim/education/latest/proficiency:
+    - data://grapher/unesco/2025-05-01/education_sdgs
+
+
+  #
   # Mdim for PISA scores
   #
   export://multidim/education/latest/pisa_performance:
