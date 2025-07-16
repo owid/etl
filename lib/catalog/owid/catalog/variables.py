@@ -8,7 +8,7 @@ import json
 import os
 from collections import defaultdict
 from collections.abc import Callable
-from typing import Any, Literal, cast, overload
+from typing import Any, List, Literal, Optional, cast, overload
 
 import pandas as pd
 import structlog
@@ -461,41 +461,57 @@ def combine_variables_processing_logs(variables: list[Variable]) -> ProcessingLo
     return ProcessingLog(processing_log)
 
 
-def _get_dict_from_list_if_all_identical(list_of_objects: list[dict[str, Any] | None]) -> dict[str, Any] | None:
-    # The argument list_of_objects can contain dictionaries or None, or be empty.
-    # If a list contains one dictionary (possibly repeated multiple times with identical content), return that
-    # dictionary. Otherwise, if not all dictionaries are identical, return None.
-
-    # List all dictionaries, ignoring Nones.
-    defined_dicts = [d for d in list_of_objects if d is not None]
-
-    if not defined_dicts:
-        # If there are no dictionaries, return None.
+def _get_dict_from_list_of_common_field_if_all_defined_and_identical(
+    list_of_objects: List[dict[str, Any] | None],
+) -> Optional[dict[str, Any]]:
+    # If any display is None, return None.
+    if None in list_of_objects:
         return None
 
-    # Take the first dictionary as a reference.
-    reference_dict = defined_dicts[0]
+    # Extract all fields defined among all objects.
+    all_fields = set().union(*(obj.keys() for obj in list_of_objects if obj))
+    # Go field by field and keep it only if its value is identical for all objects.
+    common_fields = {}
+    for field in all_fields:
+        values = [obj.get(field) for obj in list_of_objects if obj]
+        # Check if all values for this field are identical.
+        first_value = values[0]
+        if all(value == first_value for value in values):
+            common_fields[field] = first_value
 
-    # Return a copy of the first dictionary if all dictionaries are identical, otherwise return None.
-    return reference_dict.copy() if all(d == reference_dict for d in defined_dicts) else None
+    # If no common fields were found, return None.
+    combined_display = common_fields if common_fields else None
+
+    return combined_display
 
 
-def combine_variables_display(
-    variables: list[Variable], operation: OPERATION, _field_name="display"
-) -> dict[str, Any] | None:
+def combine_variables_display(variables: List[Variable]) -> Optional[dict[str, Any]]:
+    # The logic for display propagation should be as follows:
+    # * If the display of any of the variables is None (e.g. not defined), the combined display should be None.
+    # * Else if display of all variables is defined (i.e. not None for any variable) then go field by field, and:
+    #   * If the field is identical for all variables, the combined field should be the same.
+    #   * In any other case (i.e. the field has different values for different variables, or is not defined for all variables), the combined value for that field should be None.
+    # * If, at the end of the combination, all display fields are None, make the resulting display None.
+
     # Gather displays from all variables that are defined.
-    list_of_displays = [getattr(variable.metadata, _field_name) for variable in variables]
-    if operation == "/" and list_of_displays[0] is None:
-        # When dividing a variable by another, it only makes sense to keep the display values of the first variable.
-        # Therefore, if the first variables doesn't have a display, the resulting variable should have no display.
-        return None
-    else:
-        return _get_dict_from_list_if_all_identical(list_of_objects=list_of_displays)
+    displays = [getattr(variable.metadata, "display") for variable in variables]
+
+    combined_display = _get_dict_from_list_of_common_field_if_all_defined_and_identical(list_of_objects=displays)
+
+    return combined_display
 
 
-def combine_variables_presentation(variables: list[Variable], operation: OPERATION) -> VariablePresentationMeta | None:
-    # Apply the same logic as for displays.
-    return combine_variables_display(variables=variables, operation=operation, _field_name="presentation")  # type: ignore
+def combine_variables_presentation(variables: List[Variable]) -> Optional[VariablePresentationMeta]:
+    # Apply the same logic as when combining displays (see documentation in combine_variables_display).
+    list_of_presentations = [
+        getattr(variable.metadata, "presentation").to_dict() if variable.metadata.presentation is not None else None
+        for variable in variables
+    ]
+    combined_presentation = VariablePresentationMeta.from_dict(
+        _get_dict_from_list_of_common_field_if_all_defined_and_identical(list_of_objects=list_of_presentations)  # type: ignore
+    )
+
+    return combined_presentation
 
 
 def combine_variables_processing_level(variables: list[Variable]) -> PROCESSING_LEVELS | None:
@@ -564,8 +580,8 @@ def combine_variables_metadata(
     metadata.sources = get_unique_sources_from_variables(variables=variables_only)
     metadata.origins = get_unique_origins_from_variables(variables=variables_only)
     metadata.licenses = get_unique_licenses_from_variables(variables=variables_only)
-    metadata.display = combine_variables_display(variables=variables_only, operation=operation)
-    metadata.presentation = combine_variables_presentation(variables=variables_only, operation=operation)
+    metadata.display = combine_variables_display(variables=variables_only)
+    metadata.presentation = combine_variables_presentation(variables=variables_only)
     metadata.processing_level = combine_variables_processing_level(variables=variables_only)
 
     metadata.type = _get_metadata_value_from_variables_if_all_identical(
