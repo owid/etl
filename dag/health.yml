@@ -1265,6 +1265,8 @@ steps:
     - snapshot://who/2025-07-15/vaccination_coverage.xlsx
   data://garden/who/2025-07-15/vaccination_coverage:
     - data://garden/un/2024-07-12/un_wpp
+    - data://garden/wb/2025-07-01/income_groups
+    - data://garden/regions/2023-01-01/regions
     - data://meadow/who/2025-07-15/vaccination_coverage
   data://grapher/who/2025-07-15/vaccination_coverage:
     - data://garden/who/2025-07-15/vaccination_coverage

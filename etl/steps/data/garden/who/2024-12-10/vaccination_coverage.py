@@ -54,6 +54,19 @@ UNIVERSAL = {
     "MENA_C": False,
 }
 
+REGIONS_TO_ADD = [
+    "North America",
+    "South America",
+    "Europe",
+    "Africa",
+    "Asia",
+    "Oceania",
+    "Low-income countries",
+    "Upper-middle-income countries",
+    "Lower-middle-income countries",
+    "High-income countries",
+]
+
 
 def run(dest_dir: str) -> None:
     #
@@ -62,6 +75,11 @@ def run(dest_dir: str) -> None:
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("vaccination_coverage")
     ds_population = paths.load_dataset("un_wpp")
+    # Load regions dataset.
+    ds_regions = paths.load_dataset("regions")
+
+    # Load income groups dataset.
+    ds_income_groups = paths.load_dataset("income_groups")
     # Read table from meadow dataset.
     tb = ds_meadow.read("vaccination_coverage")
 
@@ -85,6 +103,14 @@ def run(dest_dir: str) -> None:
     tb = pr.merge(tb, tb_number, on=["country", "year", "antigen"], how="left")
 
     tb = tb.format(["country", "year", "antigen"], short_name="vaccination_coverage")
+    # Add region aggregates.
+    tb = geo.add_regions_to_table(
+        tb=tb,
+        ds_regions=ds_regions,
+        ds_income_groups=ds_income_groups,
+        regions=REGIONS_TO_ADD,
+        min_num_values_per_year=1,
+    )
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
