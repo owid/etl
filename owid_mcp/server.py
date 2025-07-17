@@ -1,5 +1,5 @@
 """
-Our World in Data – FastMCP Server (prototype v0.2)
+Our World in Data – FastMCP Server (prototype v0.3)
 ---------------------------------------------------
 • Exposes search & fetch endpoints compatible with ChatGPT Deep research
   and any other Model Context Protocol (MCP) client.
@@ -9,6 +9,7 @@ Our World in Data – FastMCP Server (prototype v0.2)
 • Fetch resources return:
     – JSON (data+metadata) for indicators
     – SVG (image/svg+xml) for charts, with alt‑text header
+• NEW: run_sql tool for executing read-only SQL queries against Datasette
 
 Env vars (optional overrides):
     OWID_DATASETTE_BASE   – base URL for Datasette (default public instance)
@@ -31,8 +32,55 @@ import httpx
 from fastmcp import FastMCP
 from fastmcp.server.server import Response
 
-from owid_mcp.config import COMMON_ENTITIES, DATASETTE_BASE, GRAPHER_BASE, HTTP_TIMEOUT, OWID_API_BASE
+from owid_mcp.config import COMMON_ENTITIES, DATASETTE_BASE, GRAPHER_BASE, HTTP_TIMEOUT, MAX_ROWS_DEFAULT, MAX_ROWS_HARD, OWID_API_BASE
 from owid_mcp.utils import smart_round
+
+# ---------------------------------------------------------------------------
+# Configuration for catalog integration
+# ---------------------------------------------------------------------------
+CATALOG_BASE = os.getenv("CATALOG_BASE", "https://catalog.ourworldindata.org")
+
+# ---------------------------------------------------------------------------
+# Helper functions
+# ---------------------------------------------------------------------------
+
+def _build_catalog_info(catalog_path: str) -> Dict[str, str]:
+    """Build Parquet URL & example SQL template from catalogPath.
+    
+    Args:
+        catalog_path: Path like 'grapher/biodiversity/2025-04-07/cherry_blossom/cherry_blossom#average_20_years'
+    """
+    if not catalog_path:
+        return {}
+        
+    # Split on '#' to separate path from column
+    path_parts = catalog_path.split('#')
+    if len(path_parts) != 2:
+        return {}
+        
+    path, column = path_parts
+    
+    # Parse the path: channel/namespace/version/dataset_slug/dataset_slug
+    parts = path.split('/')
+    if len(parts) < 4:
+        return {}
+        
+    channel, namespace, version, dataset_slug = parts[0], parts[1], parts[2], parts[3]
+    
+    parquet_url = f"{CATALOG_BASE}/{channel}/{namespace}/{version}/{dataset_slug}/{dataset_slug}.parquet"
+    sql_tpl = (
+        "SELECT country, year, {col} FROM '{url}' "
+        "WHERE country = '??' LIMIT 100".format(col=column, url=parquet_url)
+    )
+    return {
+        "parquet_url": parquet_url,
+        "column": column,
+        "dataset_namespace": namespace,
+        "dataset_version": version,
+        "dataset_slug": dataset_slug,
+        "dataset_channel": channel,
+        "sql_template": sql_tpl,
+    }
 
 # ---------------------------------------------------------------------------
 # Data structures
@@ -60,6 +108,7 @@ mcp = FastMCP(
         "Call `search_chart` to find charts by slug, title, or description. "
         "Fetch indicators via `ind://{id}` for all data or `ind://{id}/{entity}` for specific country/entity data. "
         "Fetch charts via `chart://{slug}`. "
+        "Call `run_sql` to execute read-only SQL SELECT queries against the public Datasette. "
         "Entity names must match exactly as they appear in OWID:\n"
         f"{COMMON_ENTITIES}"
     ),
@@ -91,17 +140,16 @@ async def search_indicator(query: str, limit: int = 10) -> List[Dict]:
     Use the resource_uri with ReadMcpResourceTool to get the actual data.
     """
     sql = """
-    SELECT
-        v.id, v.name, v.description, COALESCE(cd.chart_count, 0) as chart_count
+    SELECT v.id, v.name, v.description,
+           v.catalogPath,
+           COALESCE(cd.chart_count, 0) AS chart_count
     FROM variables v
     LEFT JOIN (
-        SELECT variableId, COUNT(DISTINCT chartId) as chart_count
+        SELECT variableId, COUNT(DISTINCT chartId) AS chart_count
         FROM chart_dimensions
         GROUP BY variableId
-    ) cd ON v.id = cd.variableId
-    WHERE
-        v.name LIKE :q COLLATE NOCASE
-        OR v.description LIKE :q COLLATE NOCASE
+    ) cd ON cd.variableId = v.id
+    WHERE v.name LIKE :q COLLATE NOCASE OR v.description LIKE :q COLLATE NOCASE
     ORDER BY chart_count DESC, v.name
     LIMIT :limit
     """
@@ -112,16 +160,19 @@ async def search_indicator(query: str, limit: int = 10) -> List[Dict]:
         resp.raise_for_status()
         rows = resp.json()["rows"]
 
-    return [
-        {
-            "title": row[1],
-            "resource_uri": f"ind://{row[0]}",
-            "snippet": (row[2] or "")[:160],
+    results = []
+    for idx, row in enumerate(rows):
+        var_id, title, desc, catalog_path, chart_count = row
+        meta = _build_catalog_info(catalog_path or "")
+        meta["chart_count"] = chart_count
+        results.append({
+            "title": title,
+            "resource_uri": f"ind://{var_id}",
+            "snippet": (desc or "")[:160],
             "score": 1.0 - idx / max(1, len(rows)),
-            "chart_count": row[3],
-        }
-        for idx, row in enumerate(rows)
-    ]
+            "metadata": meta,
+        })
+    return results
 
 
 @mcp.tool
@@ -164,6 +215,55 @@ async def search_chart(query: str, limit: int = 10) -> List[ChartSearchResult]:
         )
         for idx, row in enumerate(rows)
     ]
+
+
+# ---------------------------------------------------------------------------
+# SQL query tool
+# ---------------------------------------------------------------------------
+
+SQL_SELECT_RE = re.compile(r"^\s*select\b", re.IGNORECASE | re.DOTALL)
+
+@mcp.tool
+async def run_sql(query: str, max_rows: int = MAX_ROWS_DEFAULT) -> Dict[str, Any]:
+    """Execute a **read‑only** SQL SELECT via the OWID public Datasette.
+
+    Parameters
+    ----------
+    query : str
+        A SQL statement starting with `SELECT`. Anything else is rejected.
+    max_rows : int
+        Safety cap (1‑5000). The query is rewritten with `LIMIT` if absent.
+    Returns
+    -------
+    dict
+        {"columns": [...], "rows": [[...], ...]}
+    """
+    if not SQL_SELECT_RE.match(query):
+        raise ValueError("Only SELECT statements are allowed.")
+    if max_rows < 1 or max_rows > MAX_ROWS_HARD:
+        raise ValueError(f"max_rows must be 1‑{MAX_ROWS_HARD}.")
+
+    # Append/override LIMIT to enforce row cap
+    if re.search(r"\blimit\b", query, re.IGNORECASE):
+        query = re.sub(r"limit\s+\d+", f"LIMIT {max_rows}", query, flags=re.IGNORECASE)
+    else:
+        query = f"{query} LIMIT {max_rows}"
+
+    qs = urllib.parse.urlencode({"sql": query, "_size": "max"})
+    # Remove the .json extension from DATASETTE_BASE since it's already included in config
+    datasette_base = DATASETTE_BASE.replace('.json', '')
+    datasette_url = f"{datasette_base}.json?{qs}"
+
+    async with httpx.AsyncClient(timeout=HTTP_TIMEOUT) as client:
+        resp = await client.get(datasette_url)
+        resp.raise_for_status()
+        js = resp.json()
+
+    return {
+        "columns": js.get("columns", []),
+        "rows": js.get("rows", []),
+        "source": datasette_url,
+    }
 
 
 # ---------------------------------------------------------------------------
