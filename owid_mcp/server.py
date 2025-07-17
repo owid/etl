@@ -32,7 +32,15 @@ import httpx
 from fastmcp import FastMCP
 from fastmcp.server.server import Response
 
-from owid_mcp.config import COMMON_ENTITIES, DATASETTE_BASE, GRAPHER_BASE, HTTP_TIMEOUT, MAX_ROWS_DEFAULT, MAX_ROWS_HARD, OWID_API_BASE
+from owid_mcp.config import (
+    COMMON_ENTITIES,
+    DATASETTE_BASE,
+    GRAPHER_BASE,
+    HTTP_TIMEOUT,
+    MAX_ROWS_DEFAULT,
+    MAX_ROWS_HARD,
+    OWID_API_BASE,
+)
 from owid_mcp.utils import smart_round
 
 # ---------------------------------------------------------------------------
@@ -44,43 +52,29 @@ CATALOG_BASE = os.getenv("CATALOG_BASE", "https://catalog.ourworldindata.org")
 # Helper functions
 # ---------------------------------------------------------------------------
 
+
 def _build_catalog_info(catalog_path: str) -> Dict[str, str]:
     """Build Parquet URL & example SQL template from catalogPath.
-    
+
     Args:
         catalog_path: Path like 'grapher/biodiversity/2025-04-07/cherry_blossom/cherry_blossom#average_20_years'
     """
-    if not catalog_path:
-        return {}
-        
     # Split on '#' to separate path from column
-    path_parts = catalog_path.split('#')
-    if len(path_parts) != 2:
-        return {}
-        
-    path, column = path_parts
-    
+    path, column = catalog_path.split("#")
+
     # Parse the path: channel/namespace/version/dataset_slug/dataset_slug
-    parts = path.split('/')
-    if len(parts) < 4:
-        return {}
-        
-    channel, namespace, version, dataset_slug = parts[0], parts[1], parts[2], parts[3]
-    
-    parquet_url = f"{CATALOG_BASE}/{channel}/{namespace}/{version}/{dataset_slug}/{dataset_slug}.parquet"
-    sql_tpl = (
-        "SELECT country, year, {col} FROM '{url}' "
-        "WHERE country = '??' LIMIT 100".format(col=column, url=parquet_url)
+    parts = path.split("/")
+    channel, namespace, version, dataset_slug, table_name = parts[0], parts[1], parts[2], parts[3], parts[4]
+
+    parquet_url = f"{CATALOG_BASE}/{channel}/{namespace}/{version}/{dataset_slug}/{table_name}.parquet"
+    sql_tpl = "SELECT country, year, {col} FROM '{url}' " "WHERE country = '??' LIMIT 100".format(
+        col=column, url=parquet_url
     )
     return {
         "parquet_url": parquet_url,
-        "column": column,
-        "dataset_namespace": namespace,
-        "dataset_version": version,
-        "dataset_slug": dataset_slug,
-        "dataset_channel": channel,
         "sql_template": sql_tpl,
     }
+
 
 # ---------------------------------------------------------------------------
 # Data structures
@@ -165,13 +159,15 @@ async def search_indicator(query: str, limit: int = 10) -> List[Dict]:
         var_id, title, desc, catalog_path, chart_count = row
         meta = _build_catalog_info(catalog_path or "")
         meta["chart_count"] = chart_count
-        results.append({
-            "title": title,
-            "resource_uri": f"ind://{var_id}",
-            "snippet": (desc or "")[:160],
-            "score": 1.0 - idx / max(1, len(rows)),
-            "metadata": meta,
-        })
+        results.append(
+            {
+                "title": title,
+                "resource_uri": f"ind://{var_id}",
+                "snippet": (desc or "")[:160],
+                "score": 1.0 - idx / max(1, len(rows)),
+                "metadata": meta,
+            }
+        )
     return results
 
 
@@ -223,6 +219,7 @@ async def search_chart(query: str, limit: int = 10) -> List[ChartSearchResult]:
 
 SQL_SELECT_RE = re.compile(r"^\s*select\b", re.IGNORECASE | re.DOTALL)
 
+
 @mcp.tool
 async def run_sql(query: str, max_rows: int = MAX_ROWS_DEFAULT) -> Dict[str, Any]:
     """Execute a **read‑only** SQL SELECT via the OWID public Datasette.
@@ -251,7 +248,7 @@ async def run_sql(query: str, max_rows: int = MAX_ROWS_DEFAULT) -> Dict[str, Any
 
     qs = urllib.parse.urlencode({"sql": query, "_size": "max"})
     # Remove the .json extension from DATASETTE_BASE since it's already included in config
-    datasette_base = DATASETTE_BASE.replace('.json', '')
+    datasette_base = DATASETTE_BASE.replace(".json", "")
     datasette_url = f"{datasette_base}.json?{qs}"
 
     async with httpx.AsyncClient(timeout=HTTP_TIMEOUT) as client:
