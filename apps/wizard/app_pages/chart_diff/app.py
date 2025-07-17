@@ -285,7 +285,7 @@ def sort_chart_diffs():
 @st.dialog(title="Set all charts to Pending")
 def set_chart_diffs_to_pending(engine: Engine) -> None:
     """Set approval status of all chart diffs to pending."""
-    st.markdown("**Do you want to set all charts-diffs to pending?** this will loose all your progress on reviews.")
+    st.markdown("**Do you want to set all charts-diffs to pending?** this will lose all your progress on reviews.")
     st.info(
         "💡 **Note:** This may take a moment. After completed, you may need to refresh the page to see the updated chart statuses."
     )
