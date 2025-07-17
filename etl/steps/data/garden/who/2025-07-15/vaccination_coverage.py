@@ -152,7 +152,7 @@ def calculate_coverage_for_regions_for_age_group(
         regions=REGIONS_TO_ADD,
         min_num_values_per_year=1,
         frac_allowed_nans_per_year=0.3,
-    )  # Allow up to 30% missing )
+    )  # Allow up to 30% missing values per year for regions
     tb_regions = pr.merge(tb_regions, tb_pop, on=["country", "year"], how="left")
     tb_regions["coverage"] = (tb_regions["vaccinated"] / tb_regions["population"]) * 100
     # Drop age-specific population column
