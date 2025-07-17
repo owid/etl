@@ -1,0 +1,30 @@
+dataset:
+  title: Material footprint in EU-27 by end use (Eurostat, 2025)
+  description: Raw material consumption in the EU-27, broken down by the end use of the final products.
+  licenses:
+    - {}
+tables:
+  material_footprint_end_use_eu:
+    variables:
+      material_footprint_thousand_tonnes:
+        title: Raw material consumption
+        unit: tonnes
+        short_unit: t
+        display:
+          name: Raw material consumption
+          conversionFactor: 1000.0
+        description: |-
+          The raw material consumption by end use of final products. This is the mass of any resources used directly or indirectly in the production of these products. This adjusts for trade so it includes all resource extraction, including those overseas.
+      share_material_footprint:
+        title: Share of economy's raw material consumption
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Share of total material consumption
+        description: |-
+          Each end use's share of the total material consumption of the economy. The raw material consumption is the mass of any resources used directly or indirectly in the production of these products. This adjusts for trade so it includes all resource extraction, including those overseas.
+    dimensions:
+      - name: country
+        slug: country
+      - name: year
+        slug: year
