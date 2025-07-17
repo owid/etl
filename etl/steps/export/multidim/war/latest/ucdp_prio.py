@@ -285,16 +285,16 @@ def _set_title(view, choice_names):
 
 def _set_subtitle(view):
     dods = _set_dods(view)
-    subtitle_deaths = f"Reported deaths of combatants and civilians due to fighting{{placeholder}} {dods} conflicts that were ongoing that year. Deaths due to disease and starvation resulting from the conflict are not included."
+    subtitle_deaths = f"Reported deaths of combatants and civilians due to fighting{{placeholder}} {dods} conflicts. Deaths due to disease and starvation resulting from the conflict are not included."
 
     if view.d.indicator == "deaths":
         return subtitle_deaths.format(placeholder=" in")
     elif view.d.indicator == "death_rate":
         return subtitle_deaths.format(placeholder=", per 100,000 people. Included are")
     elif view.d.indicator == "wars_ongoing":
-        return f"Included are {dods} conflicts that were ongoing that year."
+        return f"Included are {dods} conflicts."
     elif view.d.indicator == "wars_ongoing_country_rate":
-        return f"The number of conflicts divided by the number of all states. This accounts for the changing number of states over time. Included are {dods} conflicts that were ongoing that year."
+        return f"The number of conflicts divided by the number of all states. This accounts for the changing number of states over time. Included are {dods} conflicts."
     else:
         raise ValueError(f"Unknown indicator: {view.d.indicator}")
 

@@ -180,6 +180,7 @@ def run() -> None:
                     "map": {
                         "time": 2024,
                     },
+                    "hideTimeline": True,
                 },
             }
         ]
@@ -316,7 +317,7 @@ def _set_subtitle(view):
     """Set subtitle based on view dimensions."""
     if view.d.conflict_type == "one-sided violence":
         if view.d.indicator == "num_conflicts":
-            return "Included are cases of [one-sided violence against civilians](#dod:onesided-ucdp) that were ongoing that year."
+            return "Included are cases of [one-sided violence against civilians](#dod:onesided-ucdp)."
         return f"Reported deaths of civilians due to [one-sided violence](#dod:onesided-ucdp) that was ongoing that year{', per 100,000 people' if view.d.indicator=='death_rate' else ''}. Deaths due to disease and starvation resulting from one-sided violence are not included."
 
     # DoD
@@ -335,7 +336,7 @@ def _set_subtitle(view):
 
     if view.d.indicator in ("deaths", "death_rate"):
         # Subtitle template
-        subtitle_template = "Reported deaths of combatants and civilians due to fighting{placeholder} that were ongoing that year. Deaths due to disease and starvation resulting from the conflict are not included."
+        subtitle_template = "Reported deaths of combatants and civilians due to fighting{placeholder}. Deaths due to disease and starvation resulting from the conflict are not included."
 
         # Define subtitle
         if view.d.indicator == "deaths":
@@ -346,7 +347,7 @@ def _set_subtitle(view):
         elif view.d.indicator == "death_rate":
             return subtitle_template.format(placeholder=f", per 100,000 people. Included are {dod}")
     elif view.d.indicator == "num_conflicts":
-        return f"Included are {dod} that were ongoing that year."
+        return f"Included are {dod}."
     return ""
 
 

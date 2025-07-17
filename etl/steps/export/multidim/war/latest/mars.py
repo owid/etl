@@ -236,13 +236,13 @@ def _set_title(view):
 def _set_subtitle(view):
     dods = get_dods(view.d.conflict_type)
     if view.d.indicator == "deaths":
-        return f"Deaths of combatants due to fighting in {dods} wars that were ongoing that year. Civilian deaths and deaths of combatants due to disease and starvation resulting from the war are not included."
+        return f"Deaths of combatants due to fighting in {dods} wars. Civilian deaths and deaths of combatants due to disease and starvation resulting from the war are not included."
     elif view.d.indicator == "death_rate":
-        return f"Deaths of combatants due to fighting, per 100,000 people. Included are {dods} wars that were ongoing that year. Civilian deaths and deaths of combatants due to disease and starvation resulting from the war are not included."
+        return f"Deaths of combatants due to fighting, per 100,000 people. Included are {dods} wars. Civilian deaths and deaths of combatants due to disease and starvation resulting from the war are not included."
     elif view.d.indicator == "wars_ongoing":
-        return f"Included are {dods} wars that were ongoing that year."
+        return f"Included are {dods} wars."
     elif view.d.indicator == "wars_ongoing_country_rate":
-        return f"The number of conflicts divided by the number of all states. This accounts for the changing number of states over time. Included are {dods} wars that were ongoing that year."
+        return f"The number of conflicts divided by the number of all states. This accounts for the changing number of states over time. Included are {dods} wars."
     else:
         raise ValueError(f"Unknown indicator {view.d.indicator}")
 
