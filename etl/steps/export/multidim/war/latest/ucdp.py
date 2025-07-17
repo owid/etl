@@ -32,9 +32,13 @@ def run() -> None:
 
     # Load grapher dataset.
     ds = paths.load_dataset("ucdp")
-    tb = ds.read("ucdp", load_data=False)
+    tb = ds.read("ucdp")
     ds_pre = paths.load_dataset("ucdp_preview")
-    tb_pre = ds_pre.read("ucdp_preview", load_data=False)
+    tb_pre = ds_pre.read("ucdp_preview")
+
+    # Check years
+    assert tb["year"].max() == 2024
+    assert tb_pre["year"].max() == 2025
 
     # Filter unnecessary columns
     tb = tb.filter(regex="^country|^year|^number_deaths_ongoing|^number_ongoing_conflicts__")
@@ -171,6 +175,9 @@ def run() -> None:
                 "config": {
                     "yAxis": {
                         "facetDomain": "independent",
+                    },
+                    "map": {
+                        "time": 2024,
                     },
                 },
             }
