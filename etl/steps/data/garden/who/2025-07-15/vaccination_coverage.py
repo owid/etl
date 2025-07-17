@@ -104,7 +104,7 @@ def run(dest_dir: str) -> None:
         ds_income_groups=ds_income_groups,
         regions=REGIONS_TO_ADD,
         min_num_values_per_year=1,
-        frac_allowed_nans_per_year=0.3,  # Allow up to 50% missing values per year for regions
+        frac_allowed_nans_per_year=0.3,  # Allow up to 30% missing values per year for regions
     )
     tb = calculate_coverage_for_regions_for_age_group(
         tb=tb,
