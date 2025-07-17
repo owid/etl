@@ -54,7 +54,7 @@ steps:
     - data://meadow/gcp/2024-11-21/global_carbon_budget
     - data://garden/regions/2023-01-01/regions
     - data://garden/wb/2025-07-01/income_groups
-    - data://garden/energy/2024-06-20/primary_energy_consumption
+    - data://garden/energy/2025-06-27/primary_energy_consumption
     - data://garden/ggdc/2024-04-26/maddison_project_database
   #
   # Decoupling of GDP and CO2 (2023).
@@ -75,7 +75,7 @@ steps:
     - data://garden/emissions/2024-11-21/national_contributions
     - data://garden/gcp/2024-11-21/global_carbon_budget
     - data://garden/regions/2023-01-01/regions
-    - data://garden/energy/2024-06-20/primary_energy_consumption
+    - data://garden/energy/2025-06-27/primary_energy_consumption
     # - data://garden/climate_watch/2024-11-21/emissions_by_sector
     - data://garden/ggdc/2024-04-26/maddison_project_database
   #
