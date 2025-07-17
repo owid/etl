@@ -1,4 +1,17 @@
 definitions:
+  others:
+    regional_aggregates_processing: |-
+      ### Regional aggregates
+      **Continents and other region aggregates**
+      For most of the years, we've estimated regional aggregates by summing the population of countries in each region. We've relied on [our continents](https://ourworldindata.org/world-region-map-definitions#our-world-in-data) and [World Bank income group definitions](https://ourworldindata.org/grapher/world-bank-income-groups). The only exception is before 1800, where we've used HYDE's estimates on continents (but not income groups).
+
+      **World**:
+      - <1800: We've used HYDE's estimates.
+      - 1800-1950: We've estimated the World population by summing all available countries in the dataset, ensuring that we do not double-count any country.
+      - >1950: We've relied on UN WPP's estimates.
+
+      {definitions.others.regional_aggregates_processing}
+
   common:
     presentation:
       topic_tags:
@@ -16,15 +29,6 @@ definitions:
       - 1950-2023: Population records by the UN World Population Prospects (2024 revision).
 
       - 2024-2100: Projections based on Medium variant by the UN World Population Prospects (2024 revision).
-
-      ### Regional aggregates
-      **Continents and other region aggregates**
-      For most of the years, we've estimated regional aggregates by summing the population of countries in each region. We've relied on [our continents](https://ourworldindata.org/world-region-map-definitions#our-world-in-data) and [World Bank income group definitions](https://ourworldindata.org/grapher/world-bank-income-groups). The only exception is before 1800, where we've used HYDE's estimates on continents (but not income groups).
-
-      **World**:
-      - <1800: We've used HYDE's estimates.
-      - 1800-1950: We've estimated the World population by summing all available countries in the dataset, ensuring that we do not double-count any country.
-      - >1950: We've relied on UN WPP's estimates.
 
 tables:
   # Table with reduced metadata (to be used when estimating per-capita or other derived indicators)
@@ -111,6 +115,8 @@ tables:
 
           - 2024-2100: Projections based on Medium variant by the UN World Population Prospects (2024 revision). Growth rate estimated over 1-year periods.
 
+          {definitions.others.regional_aggregates_processing}
+
   # Historical data
   historical:
     common:
@@ -124,6 +130,8 @@ tables:
         - 1800 - 1949: Historical estimates by Gapminder (v7).
 
         - 1950-2023: Population records by the UN World Population Prospects (2024 revision).
+
+        {definitions.others.regional_aggregates_processing}
 
     variables:
       population_historical:
@@ -163,6 +171,8 @@ tables:
           - 1800 - 1949: Historical estimates by Gapminder (v7). Growth rate estimated over 50-year periods until 1900, then 10-year periods.
 
           - 1950-2023: Population records by the UN World Population Prospects (2024 revision). Growth rate estimated over 1-year periods.
+
+          {definitions.others.regional_aggregates_processing}
         unit: "{tables.population_growth_rate.variables.growth_rate.unit}"
         short_unit: "{tables.population_growth_rate.variables.growth_rate.short_unit}"
 
