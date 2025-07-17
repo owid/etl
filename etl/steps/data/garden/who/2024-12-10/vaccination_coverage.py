@@ -110,6 +110,7 @@ def run(dest_dir: str) -> None:
         ds_income_groups=ds_income_groups,
         regions=REGIONS_TO_ADD,
         min_num_values_per_year=1,
+        frac_countries_that_must_have_data=0.7,
     )
     # Save outputs.
     #
