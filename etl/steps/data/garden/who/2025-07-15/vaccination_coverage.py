@@ -54,6 +54,15 @@ UNIVERSAL = {
     "MENA_C": False,
 }
 
+REGIONS_TO_ADD = [
+    "North America",
+    "South America",
+    "Europe",
+    "Africa",
+    "Asia",
+    "Oceania",
+]
+
 
 def run(dest_dir: str) -> None:
     #
@@ -62,9 +71,12 @@ def run(dest_dir: str) -> None:
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("vaccination_coverage")
     ds_population = paths.load_dataset("un_wpp")
+    # Load regions dataset.
+    ds_regions = paths.load_dataset("regions")
+    # Load income groups dataset.
+    ds_income_groups = paths.load_dataset("income_groups")
     # Read table from meadow dataset.
     tb = ds_meadow.read("vaccination_coverage")
-
     #
     # Process data.
     #
@@ -80,10 +92,36 @@ def run(dest_dir: str) -> None:
     tb_one_year_olds = calculate_one_year_olds_vaccinated(tb, ds_population)
     tb_newborns = calculate_newborns_vaccinated(tb, ds_population)
     tb_number = pr.concat([tb_one_year_olds, tb_newborns], short_name="numbers")
-    tb = tb.drop(columns=["denominator"])
+    # tb = tb.drop(columns=["denominator"])
 
     tb = pr.merge(tb, tb_number, on=["country", "year", "antigen"], how="left")
 
+    tb = geo.add_regions_to_table(
+        tb=tb,
+        index_columns=["country", "year", "antigen"],
+        aggregations={"vaccinated": "sum", "unvaccinated": "sum"},
+        ds_regions=ds_regions,
+        ds_income_groups=ds_income_groups,
+        regions=REGIONS_TO_ADD,
+        min_num_values_per_year=1,
+        frac_allowed_nans_per_year=0.1,  # Allow up to 50% missing values per year for regions
+    )
+    tb_regions_infants = calculate_coverage_for_regions_for_age_group(
+        tb=tb,
+        ds_population=ds_population,
+        ds_regions=ds_regions,
+        age_group="Surviving infants",
+        age_group_number="1",
+    )
+    tb_regions_newborns = calculate_coverage_for_regions_for_age_group(
+        tb=tb,
+        ds_population=ds_population,
+        ds_regions=ds_regions,
+        age_group="Live births",
+        age_group_number="0",
+    )
+    tb = pr.concat([tb, tb_regions_infants, tb_regions_newborns])
+    tb = tb.drop(columns=["denominator", "population"])
     tb = tb.format(["country", "year", "antigen"], short_name="vaccination_coverage")
     # Save outputs.
     #
@@ -97,6 +135,30 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def calculate_coverage_for_regions_for_age_group(
+    tb: Table, ds_population: Dataset, ds_regions: Dataset, age_group: str, age_group_number: str
+) -> Table:
+    tb = tb.assign(denominator=tb["antigen"].map(DENOMINATOR))
+    msk = (tb["denominator"] == age_group) & (tb["country"].isin(REGIONS_TO_ADD))
+    tb_regions = tb[msk]
+    tb_pop = get_population_of_age_group(ds_population=ds_population, age=age_group_number)
+    tb_pop = tb_pop.drop(columns=["sex", "age", "variant"])
+    tb_pop = geo.add_regions_to_table(
+        tb=tb_pop,
+        index_columns=["country", "year"],
+        aggregations={"population": "sum"},
+        ds_regions=ds_regions,
+        regions=REGIONS_TO_ADD,
+        min_num_values_per_year=1,
+        frac_allowed_nans_per_year=0.3,
+    )  # Allow up to 30% missing )
+    tb_regions = pr.merge(tb_regions, tb_pop, on=["country", "year"], how="left")
+    tb_regions["coverage"] = (tb_regions["vaccinated"] / tb_regions["population"]) * 100
+
+    assert tb_regions["coverage"].max() <= 100, "Coverage cannot be more than 100%."
+    return tb_regions
 
 
 def get_population_of_age_group(ds_population: Dataset, age=str) -> Table:
