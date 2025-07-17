@@ -102,7 +102,10 @@ def run() -> None:
             }
         )
         .pipe(add_regions, ds_regions, ds_income_groups)
-        .pipe(add_world)
+    )
+
+    tb = (
+        tb.pipe(add_world)
         .pipe(add_historical_regions, tb_gapminder_sg_former, tb_regions)
         .pipe(fix_anomalies)
         .astype(
@@ -544,7 +547,7 @@ def add_world(tb: Table) -> Table:
         "Oceania",
     ]
     # Estimate "World" population for years without UN WPP data. Previously we avoided doing it so for HYDE, but then we could have sum(regions) != World for that period, which is odd.
-    mask = (tb["year"] < YEAR_START_WPP) & (tb["year"] > YEAR_START_HYDE)
+    mask = (tb["year"] < YEAR_START_WPP) & (tb["year"] >= YEAR_START_GAPMINDER)
     tb_world = (
         tb[(tb["country"].isin(continents)) & mask]
         .groupby("year", as_index=False)["population"]
@@ -553,7 +556,7 @@ def add_world(tb: Table) -> Table:
     )
 
     # Remove 'World' from tb
-    tb = tb.loc[mask & (tb["country"] != "World")]
+    tb = tb.loc[~(mask & (tb["country"] == "World"))]
 
     # Merge original tb (without World pre-WPP) with World estimates (pre-WPP)
     tb = pr.concat([tb, tb_world], ignore_index=True).sort_values(["country", "year"])
