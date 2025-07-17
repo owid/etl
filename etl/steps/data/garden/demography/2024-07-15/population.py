@@ -14,6 +14,7 @@ from typing import Dict, List, Tuple
 
 import numpy as np
 import owid.catalog.processing as pr
+import pandas as pd
 from owid.catalog import Dataset, License, Origin, Table
 from utils import (
     COUNTRIES_FORMER_EQUIVALENTS,
@@ -97,6 +98,7 @@ def run() -> None:
             {
                 "year": int,
                 "population": "uint64",
+                "source": "string",
             }
         )
         .pipe(add_regions, ds_regions, ds_income_groups)
@@ -426,14 +428,27 @@ def add_regions(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Ta
         tb_agg = geo.add_regions_to_table(
             tb=tb,
             regions=regions_,
-            aggregations={"population": "sum"},
+            aggregations={"population": "sum", "source": lambda x: "; ".join(sorted(set(x)))},  # type: ignore
             ds_regions=ds_regions,
             ds_income_groups=ds_income_groups,
             num_allowed_nans_per_year=None,
             frac_allowed_nans_per_year=0.2,
             countries_that_must_have_data=regions_required_countries,
         )
-        return tb_agg.loc[tb_agg["country"].isin(regions_)]
+        tb_agg = tb_agg.loc[tb_agg["country"].isin(regions_)]
+        tb_agg = tb_agg.dropna(subset=["population"])
+        return tb_agg
+
+    # Exclude regions and keep continents (<1800), exclude regions+continents (≥1800)
+    tb = tb.loc[
+        ~((tb["year"] < YEAR_START_GAPMINDER) & (tb["country"].isin(regions)))
+        & ~((tb["year"] >= YEAR_START_GAPMINDER) & tb["country"].isin(regions + continents))
+    ].copy()
+
+    # keep sources per countries, remove from tb
+    # remove from tb: otherwise geo.add_region_aggregates will add this column too
+    # sources = tb.loc[:, ["country", "year", "source"]].copy()
+    # tb = tb.drop(columns=["source"])
 
     # Get rid of historical regions
     ## Otherwise this are counted when estimating region values, and may lead to double-counts
@@ -443,7 +458,7 @@ def add_regions(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Ta
 
     # 1/ Estimate aggregates for HYDE ------
     ## <1800 and exclude regions (keep continents)
-    tb_agg_hyde = tb_agg.loc[(tb_agg["year"] < YEAR_START_GAPMINDER) & (~tb_agg["country"].isin(regions))].copy()
+    tb_agg_hyde = tb_agg.loc[tb_agg["year"] < YEAR_START_GAPMINDER].copy()
     # re-estimate region aggregates
     tb_agg_hyde = _aggregate(
         tb=tb_agg_hyde,
@@ -452,38 +467,41 @@ def add_regions(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Ta
 
     # 2/ Estimate aggregates post-HYDE (Gapminder + WPP) ------
     ## ≥1800 and exclude regions + continents
-    tb_agg = tb_agg.loc[(tb_agg["year"] >= YEAR_START_GAPMINDER) & ~tb_agg["country"].isin(regions + continents)].copy()
+    tb_agg = tb_agg.loc[tb_agg["year"] >= YEAR_START_GAPMINDER].copy()
+
     # Interpolate table
+    # Keep track of original sources for merging back later
+    sources_agg = tb_agg.loc[:, ["country", "year", "source"]].copy()
+
     tb_agg = geo.interpolate_table(
-        tb_agg[tb_agg["year"] >= YEAR_START_GAPMINDER],
+        tb_agg.loc[tb_agg["year"] >= YEAR_START_GAPMINDER, ["country", "year", "population"]],
         "country",
         "year",
     )
+
+    # Add source column back to interpolated data
+    tb_agg = tb_agg.merge(sources_agg, on=["country", "year"], how="left")
+    ## Previous interpolation left some sources empty (NA)
+    tb_agg.loc[(tb_agg["year"] < YEAR_START_GAPMINDER) & tb_agg["source"].isna(), "source"] = SOURCES_NAMES["hyde"]
+    tb_agg.loc[
+        (tb_agg["year"] >= YEAR_START_GAPMINDER) & (tb_agg["year"] < YEAR_START_WPP) & tb_agg["source"].isna(), "source"
+    ] = SOURCES_NAMES["gapminder"]
+    tb_agg.loc[(tb_agg["year"] > YEAR_START_WPP) & tb_agg["source"].isna(), "source"] = SOURCES_NAMES["unwpp"]
     # re-estimate region aggregates
     tb_agg = _aggregate(
         tb=tb_agg,
         regions_required_countries=regions_required | continents_required,
     )
 
-    # keep sources per countries, remove from tb
-    # remove from tb: otherwise geo.add_region_aggregates will add this column too
-    sources = tb.loc[:, ["country", "year", "source"]].copy()
-    tb = tb.drop(columns=["source"])
-
     # 3/ Combine aggregates with original data
     tb = pr.concat([tb, tb_agg, tb_agg_hyde], ignore_index=True)
 
-    # add sources back
-    # these are only added to countries, not aggregates
-    tb = tb.merge(sources, on=["country", "year"], how="left")
-
-    # add sources for region aggregates
-    # this is done by taking the union of all sources for countries in the region
-    for region in regions:
-        members = geo.list_members_of_region(region, ds_regions, ds_income_groups)
-        s = tb.loc[tb["country"].isin(members), "source"].unique()
-        sources_region = sorted(s)
-        tb.loc[tb["country"] == region, "source"] = "; ".join(sources_region)
+    # Ensure all rows have source
+    assert tb["source"].notna().all(), "Some rows do not have a source!"
+    vals = tb.loc[tb["country"].isin(continents) & (tb["year"] < YEAR_START_GAPMINDER), "source"].unique()
+    assert (
+        len(vals) == 1 and vals[0] == SOURCES_NAMES["hyde"]
+    ), f"Unexpected sources for continents before {YEAR_START_GAPMINDER}!"
     return tb
 
 
@@ -526,20 +544,16 @@ def add_world(tb: Table) -> Table:
         "Oceania",
     ]
     # Estimate "World" population for years without UN WPP data. Previously we avoided doing it so for HYDE, but then we could have sum(regions) != World for that period, which is odd.
-    mask_pre_wpp = tb["year"] < YEAR_START_WPP
+    mask = (tb["year"] < YEAR_START_WPP) & (tb["year"] > YEAR_START_HYDE)
     tb_world = (
-        tb[
-            (tb["country"].isin(continents))
-            # & (tb_world["year"] > YEAR_START_HYDE)
-            & mask_pre_wpp
-        ]
+        tb[(tb["country"].isin(continents)) & mask]
         .groupby("year", as_index=False)["population"]
         .sum(numeric_only=True)
         .assign(country="World")
     )
 
     # Remove 'World' from tb
-    tb = tb.loc[mask_pre_wpp & (tb["country"] != "World")]
+    tb = tb.loc[mask & (tb["country"] != "World")]
 
     # Merge original tb (without World pre-WPP) with World estimates (pre-WPP)
     tb = pr.concat([tb, tb_world], ignore_index=True).sort_values(["country", "year"])
