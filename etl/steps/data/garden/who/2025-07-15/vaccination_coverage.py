@@ -104,24 +104,22 @@ def run(dest_dir: str) -> None:
         ds_income_groups=ds_income_groups,
         regions=REGIONS_TO_ADD,
         min_num_values_per_year=1,
-        frac_allowed_nans_per_year=0.1,  # Allow up to 50% missing values per year for regions
+        frac_allowed_nans_per_year=0.3,  # Allow up to 50% missing values per year for regions
     )
-    tb_regions_infants = calculate_coverage_for_regions_for_age_group(
+    tb = calculate_coverage_for_regions_for_age_group(
         tb=tb,
         ds_population=ds_population,
         ds_regions=ds_regions,
         age_group="Surviving infants",
         age_group_number="1",
     )
-    tb_regions_newborns = calculate_coverage_for_regions_for_age_group(
+    tb = calculate_coverage_for_regions_for_age_group(
         tb=tb,
         ds_population=ds_population,
         ds_regions=ds_regions,
         age_group="Live births",
         age_group_number="0",
     )
-    tb = pr.concat([tb, tb_regions_infants, tb_regions_newborns])
-    tb = tb.drop(columns=["denominator", "population"])
     tb = tb.format(["country", "year", "antigen"], short_name="vaccination_coverage")
     # Save outputs.
     #
@@ -143,8 +141,10 @@ def calculate_coverage_for_regions_for_age_group(
     tb = tb.assign(denominator=tb["antigen"].map(DENOMINATOR))
     msk = (tb["denominator"] == age_group) & (tb["country"].isin(REGIONS_TO_ADD))
     tb_regions = tb[msk]
+    tb_no_regions = tb[~msk]
     tb_pop = get_population_of_age_group(ds_population=ds_population, age=age_group_number)
     tb_pop = tb_pop.drop(columns=["sex", "age", "variant"])
+    # Add regional aggregates for population
     tb_pop = geo.add_regions_to_table(
         tb=tb_pop,
         index_columns=["country", "year"],
@@ -156,9 +156,11 @@ def calculate_coverage_for_regions_for_age_group(
     )  # Allow up to 30% missing )
     tb_regions = pr.merge(tb_regions, tb_pop, on=["country", "year"], how="left")
     tb_regions["coverage"] = (tb_regions["vaccinated"] / tb_regions["population"]) * 100
-
+    # Drop age-specific population column
+    tb_regions = tb_regions.drop(columns=["denominator", "population"])
     assert tb_regions["coverage"].max() <= 100, "Coverage cannot be more than 100%."
-    return tb_regions
+    tb = pr.concat([tb_no_regions, tb_regions], short_name="vaccination_coverage")
+    return tb
 
 
 def get_population_of_age_group(ds_population: Dataset, age=str) -> Table:
