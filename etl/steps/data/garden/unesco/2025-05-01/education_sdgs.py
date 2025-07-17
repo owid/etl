@@ -87,6 +87,7 @@ def run() -> None:
             update_metadata(meta, 0, " ", " ")
 
     tb_pivoted = tb_pivoted.reset_index()
+
     tb_pivoted = tb_pivoted.format(["country", "year"])
     # Combine recent literacy estimates and expenditure data with historical estimates from a migrated dataset
     tb_pivoted = combine_historical_expenditure(tb_pivoted, tb_expenditure)
