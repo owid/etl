@@ -164,7 +164,7 @@ def calculate_coverage_for_regions_for_age_group(
     return tb
 
 
-def get_population_of_age_group(ds_population: Dataset, age=str) -> Table:
+def get_population_of_age_group(ds_population: Dataset, age: str) -> Table:
     tb_pop = ds_population.read("population", reset_metadata="keep_origins")
     tb_pop = tb_pop[(tb_pop["age"] == age) & (tb_pop["variant"] == "estimates") & (tb_pop["sex"] == "all")]
     tb_pop = tb_pop[["country", "year", "sex", "age", "variant", "population"]]
