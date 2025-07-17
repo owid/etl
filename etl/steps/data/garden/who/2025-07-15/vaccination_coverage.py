@@ -157,7 +157,7 @@ def calculate_coverage_for_regions_for_age_group(
     tb_regions["coverage"] = (tb_regions["vaccinated"] / tb_regions["population"]) * 100
     # Drop age-specific population column
 
-    assert tb_regions["coverage"].max() <= 100, "Coverage cannot be more than 100%."
+    assert tb_regions["coverage"].dropna().max() <= 100, "Coverage cannot be more than 100%."
     tb = pr.concat([tb_no_regions, tb_regions], short_name="vaccination_coverage")
     tb = tb.drop(columns=["denominator", "population"])
     return tb
