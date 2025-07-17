@@ -20,6 +20,7 @@ COMMON_CONFIG = {
     },
     "entityType": "region",
     "entityTypePlural": "regions",
+    "chartTypes": ["StackedBar"],
 }
 
 
@@ -214,6 +215,13 @@ def edit_faust(c, tb_ucdp, tb_up, region_names):
     for view in c.views:
         # Edit FAUST in charts with CI (color, display names). Indicator-level.
         edit_indicator_displays(view)
+
+        # Set color to red if there is only one line in the chart
+        if (view.indicators.y is not None) and (len(view.indicators.y) == 1):
+            if view.indicators.y[0].display is None:
+                view.indicators.y[0].display = {"color": "#B13507"}
+            else:
+                view.indicators.y[0].display["color"] = "#B13507"
 
     c.set_global_config(
         {

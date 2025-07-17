@@ -41,6 +41,7 @@ COMMON_CONFIG = {
     },
     "entityType": "region",
     "entityTypePlural": "regions",
+    "chartTypes": ["StackedBar"],
 }
 
 
@@ -161,6 +162,13 @@ def run() -> None:
                         "name": "High estimate",
                         "color": color_high,
                     }
+
+        # Set color to red if there is only one line in the chart
+        if (view.indicators.y is not None) and (len(view.indicators.y) == 1):
+            if view.indicators.y[0].display is None:
+                view.indicators.y[0].display = {"color": "#B13507"}
+            else:
+                view.indicators.y[0].display["color"] = "#B13507"
     # Save & upload
     c.save()
 

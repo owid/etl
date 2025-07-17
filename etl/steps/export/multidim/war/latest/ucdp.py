@@ -20,6 +20,7 @@ COMMON_CONFIG = {
     "hideAnnotationFieldsInTitle": {
         "time": True,
     },
+    "chartTypes": ["StackedBar"],
 }
 
 
@@ -116,7 +117,7 @@ def run() -> None:
                 "dimension": "estimate",
                 "choices": ["low", "high", "best"],
                 "choice_new_slug": "best_ci",
-                "view_config": COMMON_CONFIG | {"hasMapTab": False},
+                "view_config": COMMON_CONFIG | {"hasMapTab": False, "chartTypes": ["LineChart"]},
                 "view_metadata": {"description_key": lambda view: _set_description_key(view, tb)},
             },
         ]
@@ -351,12 +352,11 @@ def _set_subtitle(view):
 
 def _set_note(view):
     """Set subtitle based on view dimensions."""
-    note = ""
     if view.d.estimate == "best_ci":
-        note = "'Best' estimates as identified by UCDP."
+        return "'Best' estimates as identified by UCDP."
     elif view.d.indicator == "num_conflicts":
-        note = "Some conflicts affect several countries and regions. The sum across all countries and regions can therefore be higher than the total number."
-    return note
+        return "Some conflicts affect several countries and regions. The sum across all countries and regions can therefore be higher than the total number."
+    return None
 
 
 def _get_conflict_name(view, choice_names):

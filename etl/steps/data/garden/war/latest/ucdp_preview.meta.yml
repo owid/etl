@@ -3,6 +3,9 @@ definitions:
     presentation:
       topic_tags:
         - War & Peace
+      grapher_config:
+        note: &preliminary_note |-
+          Data for the latest year is based on quarterly reports from the source. These come with a higher level of uncertainty, and in many cases can be underestimates.
     display:
       numDecimalPlaces: 0
 
@@ -296,6 +299,7 @@ tables:
     common:
       presentation:
         grapher_config:
+          note: *preliminary_note
           selectedEntityNames:
             - Africa
             - Americas
@@ -319,6 +323,7 @@ tables:
           {definitions.all.location_conflicts_method}
         presentation:
           grapher_config:
+            note: *preliminary_note
             map:
               colorScale:
                 binningStrategy: "manual"
@@ -389,6 +394,7 @@ tables:
           {definitions.all.location_conflicts_method}
         presentation:
           grapher_config:
+            note: *preliminary_note
             map:
               colorScale:
                 binningStrategy: "manual"
@@ -429,6 +435,7 @@ tables:
         description_key: *description_key_ongoing
         presentation:
           grapher_config:
+            note: *preliminary_note
             selectedEntityNames:
               - World
             map:
