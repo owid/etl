@@ -11,6 +11,10 @@ GRAPHER_BASE = os.getenv("GRAPHER_BASE", "https://ourworldindata.org/grapher")
 # HTTP configuration
 HTTP_TIMEOUT = httpx.Timeout(10.0)
 
+# SQL tool configuration
+MAX_ROWS_DEFAULT = 1000
+MAX_ROWS_HARD = 5000
+
 # Common entities list for instructions
 COMMON_ENTITIES = """
 Abkhazia
