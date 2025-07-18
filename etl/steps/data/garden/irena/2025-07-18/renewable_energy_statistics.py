@@ -1,4 +1,4 @@
-"""Create a dataset of renewable electricity capacity using IRENA's Renewable Electricity Capacity and Generation.
+"""Create a dataset of renewable electricity capacity using IRENA's Renewable Energy Statistics.
 
 We will map the input data as follows (to generate the following mapping, uncomment the DEBUGGING section below):
 
@@ -139,14 +139,15 @@ CATEGORY_MAPPING = {
         "Onshore wind energy": "Onshore wind energy",
         "Straw": "Straw",
         "Pumped storage": "Pumped storage",
-        "Advanced biodiesel": "Advanced biodiesel",
+        # "Advanced biodiesel": "Advanced biodiesel",
         "Oil": "Oil",
         "Energy crops": "Energy crops",
         "Rice husks": "Rice husks",
         "Renewable industrial waste": "Renewable industrial waste",
         "Coal and peat": "Coal and peat",
         "Renewable hydropower": "Renewable hydropower",
-        "Advanced biogasoline": "Advanced biogasoline",
+        "Conventional biogasoline": "Conventional biogasoline",
+        # "Advanced biogasoline": "Advanced biogasoline",
         "Natural gas": "Natural gas",
         "On-grid Solar photovoltaic": "On-grid Solar photovoltaic",
         "Biogas n.e.s.": "Biogas n.e.s.",
@@ -334,8 +335,8 @@ def run() -> None:
     # Load data.
     #
     # Load dataset from Meadow and read its main table.
-    ds_meadow = paths.load_dataset("renewable_capacity_statistics")
-    tb = ds_meadow.read("renewable_capacity_statistics")
+    ds_meadow = paths.load_dataset("renewable_energy_statistics")
+    tb = ds_meadow.read("renewable_energy_statistics")
 
     # Load regions dataset.
     ds_regions = paths.load_dataset("regions")

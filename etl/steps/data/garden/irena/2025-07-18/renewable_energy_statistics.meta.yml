@@ -10,7 +10,7 @@ dataset:
   update_period_days: 365
 
 tables:
-  renewable_capacity_statistics:
+  renewable_energy_statistics:
     title: Renewable electricity capacity
     variables:
       bioenergy__total:
