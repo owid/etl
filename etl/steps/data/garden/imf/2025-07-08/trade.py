@@ -87,10 +87,12 @@ def run() -> None:
 
     tbs = []
     for table_index, (table_name, table_data) in enumerate(table_subsets):
-        if table_index > 1:  # Swap columns for country breakdown tables
-            table_data = table_data.rename(columns={"country": "counterpart_country", "counterpart_country": "country"})
-
         processed_table = sh.process_table_subset(table_data)
+        if table_index > 1:  # Swap columns for country breakdown tables
+            processed_table = processed_table.rename(
+                columns={"country": "counterpart_country", "counterpart_country": "country"}
+            )
+
         tbs.append(processed_table)
 
     tb = pr.concat(tbs)
