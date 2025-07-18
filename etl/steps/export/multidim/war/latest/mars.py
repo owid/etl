@@ -105,13 +105,13 @@ def run() -> None:
                 | {
                     "selectedFacetStrategy": "entity",
                     "hasMapTab": False,
+                    "chartTypes": ["LineChart"],
                 },
                 "view_metadata": {
                     "description_short": lambda view: _set_subtitle(view),
                     "presentation": {
                         "title_public": lambda view: f"{_set_title(view)}, low and high estimates",
                     },
-                    "chartTypes": ["LineChart"],
                 },
             },
         ]
