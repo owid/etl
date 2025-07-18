@@ -264,7 +264,7 @@ def _set_description_key(view, tb_ucdp, tb_up):
 
         # return
         if view.d.estimate == "best_ci":
-            assert keys[-1].startswith("We show here the 'best' death")
+            assert keys[-1].startswith('We show here the "best" death')
             keys = keys[:-1]  # + [None]
         return keys
     return None
