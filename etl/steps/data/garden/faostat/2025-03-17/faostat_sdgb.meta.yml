@@ -7,7 +7,7 @@ definitions:
     presentation:
       topic_tags:
         - Agricultural Production
-      attribution_short: FAO
+      attribution_short: UN FAO
 
 # NOTE: You can modify all indicators' metadata below.
 # However, it is preferrable to change unit and short_unit in the custom_elements_and_units.csv.
@@ -21,18 +21,18 @@ tables:
         description_short: |
           Share of the population whose daily food intake does not provide enough energy to maintain a normal, active, and healthy life.
         presentation:
-          title_public: Share of people that are undernourished
+          title_public: Share of people who are undernourished
           grapher_config:
             note: |
-              Values shown as "2.5%" correspond to rates below 2.5%, reflecting uncertainty at very low levels in the original data.
+              The FAO reports all values below 2.5% as "<2.5%" due to high uncertainty at very low levels of undernourishment.
         description_key:
-          - "[Hunger](https://ourworldindata.org/hunger-and-undernourishment) has been a severe problem throughout history. For most people, growing enough food to feed one's family was a daily struggle. Food shortages, malnutrition, and [famines](https://ourworldindata.org/famines) were common around the world."
+          - "[Hunger](https://ourworldindata.org/hunger-and-undernourishment) has been a severe problem throughout history. For most people, growing enough food to feed their family was a daily struggle. Food shortages, malnutrition, and [famines](https://ourworldindata.org/famines) were common around the world."
           - This data estimates the share of people who are undernourished — those whose daily energy (calorie) intake is too low to support a normal, active, and healthy life.
-          - "Undernourishment is determined solely by whether a person gets enough calories. It does not account for the quality or diversity of their diet. It is therefore only one aspect of malnutrition, which is a broader term that captures other types of nutrient deficiencies, such as micronutrients."
-          - Minimum calorie needs vary by sex, age, body size, and activity level. These differences are built into each country's estimates using demographic data.
-          - The data is published by the Food and Agriculture Organization of the United Nations (FAO). It is based on a statistical model that combines national food supply data, demographic projections, and, where available, household food consumption surveys. Estimates for countries are presented as three-year averages to reduce short-term variability.
-          - Many countries — especially high-income ones — are shown at 2.5% because values between 0% and 2.5% are not reported by the FAO, due to uncertainty at very low levels.
-          - "The world has made significant progress in reducing undernourishment. But this data shows that we are still far from ending hunger: nearly 1 in 10 people globally do not get enough to eat. Hunger worsened during the COVID-19 pandemic and remains a major challenge."
+          - "Undernourishment is determined solely by whether a person gets enough calories. It does not account for the quality or diversity of their diet. Therefore, it is only one aspect of malnutrition, a broader term that captures other deficiencies, such as micronutrients."
+          - Minimum calorie needs vary by sex, age, body size, and activity level. Researchers use demographic data to account for these differences in each country's estimates.
+          - The data is published by the Food and Agriculture Organization of the United Nations (FAO). It is based on a statistical model that combines national food supply data, demographic projections, and, where available, household food consumption surveys. To reduce short-term variability on country-level data, the FAO sets the values for a given year to the average of the last three years.
+          - Many countries, especially high-income ones, are shown at 2.5% because the FAO reports values between 0% and 2.5% as "<2.5%", due to uncertainty at very low levels of undernourishment.
+          - "The world has made significant progress in reducing undernourishment. However, this data shows we are still far from ending hunger: nearly 1 in 10 people globally don't get enough to eat. Hunger worsened during the COVID-19 pandemic and remains a major challenge."
         # The following description was manually extracted from the excel file that can be downloaded from https://www.fao.org/faostat/en/#data/SDGB (by clicking on Related Documents -> Metadata).
         # NOTE: We currently don't have access to this important information in our faostat_metadat step. Maybe there's a way to programmatically extract it.
         description_from_producer: |-
