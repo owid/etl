@@ -114,9 +114,12 @@ async def search_indicator(query: str, limit: int = 10) -> List[Dict]:
     Use the resource_uri with ReadMcpResourceTool to get the actual data.
     """
     sql = """
-    SELECT v.id, v.name, v.description,
-           v.catalogPath,
-           COALESCE(cd.chart_count, 0) AS chart_count
+    SELECT
+        v.id,
+        v.name,
+        v.description,
+        v.catalogPath,
+        COALESCE(cd.chart_count, 0) AS chart_count
     FROM variables v
     LEFT JOIN (
         SELECT variableId, COUNT(DISTINCT chartId) AS chart_count
@@ -124,6 +127,7 @@ async def search_indicator(query: str, limit: int = 10) -> List[Dict]:
         GROUP BY variableId
     ) cd ON cd.variableId = v.id
     WHERE v.name LIKE :q COLLATE NOCASE OR v.description LIKE :q COLLATE NOCASE
+        AND v.catalogPath IS NOT NULL
     ORDER BY chart_count DESC, v.name
     LIMIT :limit
     """
@@ -137,7 +141,7 @@ async def search_indicator(query: str, limit: int = 10) -> List[Dict]:
     results = []
     for idx, row in enumerate(rows):
         var_id, title, desc, catalog_path, chart_count = row
-        meta = _build_catalog_info(catalog_path or "")
+        meta = _build_catalog_info(catalog_path)
         meta["chart_count"] = chart_count
         results.append(
             {
