@@ -12,8 +12,8 @@ def run() -> None:
     # Load inputs.
     #
     # Load dataset from Garden and read its main table.
-    ds_garden = paths.load_dataset("renewable_capacity_statistics")
-    tb = ds_garden.read("renewable_capacity_statistics", reset_index=False)
+    ds_garden = paths.load_dataset("renewable_energy_statistics")
+    tb = ds_garden.read("renewable_energy_statistics", reset_index=False)
 
     # Add all indicators also in gigawatts.
     for column in tb.columns:

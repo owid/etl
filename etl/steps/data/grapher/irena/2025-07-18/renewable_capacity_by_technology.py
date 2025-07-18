@@ -45,8 +45,8 @@ def run() -> None:
     # Load inputs.
     #
     # Load dataset from Garden and read its main table.
-    ds_garden = paths.load_dataset("renewable_capacity_statistics")
-    tb = ds_garden.read("renewable_capacity_statistics", reset_index=False)
+    ds_garden = paths.load_dataset("renewable_energy_statistics")
+    tb = ds_garden.read("renewable_energy_statistics", reset_index=False)
 
     #
     # Process data.
@@ -85,7 +85,7 @@ def run() -> None:
     ]
 
     # Improve table format.
-    tb = tb.format(short_name="renewable_capacity_statistics_by_technology")
+    tb = tb.format(short_name="renewable_capacity_by_technology")
 
     # Update table's metadata.
     tb.metadata.title = "Renewable electricity capacity by technology"
