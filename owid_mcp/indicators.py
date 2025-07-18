@@ -118,7 +118,7 @@ async def search_indicator(query: str, limit: int = 10) -> List[Dict]:
     Use the resource_uri with ReadMcpResourceTool to get the actual data.
     """
     logger.info(f"Searching indicators: query='{query}', limit={limit}")
-    
+
     sql = """
     SELECT
         v.id,
@@ -147,7 +147,8 @@ async def search_indicator(query: str, limit: int = 10) -> List[Dict]:
     results = []
     for idx, row in enumerate(rows):
         var_id, title, desc, catalog_path, chart_count = row
-        logger.debug(f"Found indicator: id={var_id}, title='{title}', catalog_path='{catalog_path}'")
+        logger.info(f"Found indicator: id={var_id}, title='{title}', catalog_path='{catalog_path}'")
+        print(f"PRINT Found indicator: id={var_id}, title='{title}', catalog_path='{catalog_path}'")
         meta = _build_catalog_info(catalog_path)
         meta["chart_count"] = chart_count
         results.append(
@@ -159,7 +160,7 @@ async def search_indicator(query: str, limit: int = 10) -> List[Dict]:
                 "metadata": meta,
             }
         )
-    
+
     logger.info(f"Search completed: found {len(results)} indicators")
     return results
 
