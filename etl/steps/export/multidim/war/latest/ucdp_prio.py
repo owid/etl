@@ -99,6 +99,7 @@ def run() -> None:
                 "view_config": COMMON_CONFIG
                 | {
                     "selectedFacetStrategy": "entity",
+                    "chartTypes": ["LineChart"],
                 },
             },
         ]
