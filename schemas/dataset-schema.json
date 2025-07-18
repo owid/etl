@@ -1030,6 +1030,7 @@
                           "Healthcare Spending",
                           "Homelessness",
                           "Homicides",
+                          "Housing",
                           "Human Development Index (HDI)",
                           "Human Height",
                           "Human Rights",
@@ -1536,7 +1537,8 @@
                           "type": "array",
                           "description": "Which types of chart should be shown",
                           "default": [
-                            "LineChart"
+                            "LineChart",
+                            "DiscreteBar"
                           ],
                           "items": {
                             "type": "string",

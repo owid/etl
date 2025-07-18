@@ -1,0 +1,28 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "CDC Wonder - Leading Causes of Death"
+    description: |-
+      The Underlying Cause of Death data available on WONDER are county-level national mortality and population data spanning the years 1999-2023. Data are based on death certificates for U.S. residents. Each death certificate identifies a single underlying cause of death and demographic data. The number of deaths, crude death rates or age-adjusted death rates, and 95% confidence intervals and standard errors for death rates can be obtained by place of residence (total U.S., region, state and county), age group (single-year-of age, 5-year age groups, 10-year age groups and infant age groups), race, Hispanic ethnicity, sex, year, cause-of-death (4-digit ICD-10 code or group of codes), injury intent and injury mechanism, drug/alcohol induced causes and urbanization categories. Data are also available for place of death, month and week day of death, and whether an autopsy was performed.
+    date_published: "2024"
+
+    # Citation
+    producer: Centers for Disease Control and Prevention
+    citation_full: |-
+      Centers for Disease Control and Prevention, National Center for Health Statistics. National Vital Statistics System, Mortality 2018-2023 on CDC WONDER Online Database, released in 2024. Data are from the Multiple Cause of Death Files, 2018-2023, as compiled from data provided by the 57 vital statistics jurisdictions through the Vital Statistics Cooperative Program. Accessed at http://wonder.cdc.gov/ucd-icd10-expanded.html on Jun 23, 2025 3:21:39 PM
+    attribution_short: CDC
+
+    # Files
+    url_main: https://wonder.cdc.gov/ucd-icd10-expanded.html
+    date_accessed: '2025-06-23'
+
+    # License
+    license:
+      name: CDC data release guidelines
+      url: https://stacks.cdc.gov/view/cdc/7563
+outs:
+  - md5: 6fb0139e189d66756d94f84fafab7c3c
+    size: 6459
+    path: leading_causes.csv

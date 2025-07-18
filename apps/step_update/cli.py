@@ -2,7 +2,7 @@ import difflib
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Union
 
 import click
 import structlog
@@ -17,7 +17,7 @@ from etl.dag_helpers import (
 )
 from etl.paths import BASE_DIR, DAG_ARCHIVE_FILE, DAG_DIR, DAG_TEMP_FILE, SNAPSHOTS_DIR, STEP_DIR
 from etl.snapshot import SnapshotMeta
-from etl.steps import to_dependency_order
+from etl.steps import filter_to_subgraph, to_dependency_order
 from etl.version_tracker import DAG_TEMP_STEP, UpdateState, VersionTracker
 
 log = structlog.get_logger()
@@ -275,20 +275,13 @@ class StepUpdater:
 
     def update_steps(
         self,
-        steps: Union[str, List[str], Tuple[str]],
+        steps: List[str],
         step_version_new: Optional[str] = STEP_VERSION_NEW,
         include_dependencies: bool = False,
         include_usages: bool = False,
         step_headers: Optional[Dict[str, str]] = None,
     ) -> None:
         """Update one or more steps to their new version, if possible."""
-
-        # If a single step is given, convert it to a list.
-        if isinstance(steps, str):
-            steps = [steps]
-        elif isinstance(steps, tuple):
-            steps = list(steps)
-
         # Gather all steps to be updated.
         for step in steps:
             # Check that step to be updated exists in the active dag.
@@ -337,15 +330,15 @@ class StepUpdater:
             # Otherwise, if we updated meadow_c before meadow_a and meadow_b, the new meadow_c would depend on the old
             # meadow_a and meadow_b, and the new meadow_a and meadow_b would not be used.
             # This is the same topological sorting problem we have when deciding the order of steps to execute by etl.
-            # Therefore, we can use the same function to_dependency_order to solve it.
-            steps = to_dependency_order(
-                dag=self.tracker.dag_active,
-                includes=steps,  # type: ignore
+            # Therefore, we can use the same functions filter_to_subgraph and to_dependency_order to solve it.
+            filtered_dag = filter_to_subgraph(
+                graph=self.tracker.dag_active,
+                includes=steps,
                 excludes=[],
-                downstream=False,
                 only=True,
                 exact_match=True,
             )
+            steps = to_dependency_order(filtered_dag)
 
             message = "The following steps will be updated:"
             for step in steps:
@@ -424,6 +417,10 @@ class StepUpdater:
         # the meadow step without archiving the garden and grapher steps as well (otherwise there would be a broken
         # dependency in the dag).
         for step in steps:
+            if self.steps_df[self.steps_df["step"] == step].empty:
+                log.error(f"Step {step} not found in active dag.")
+                continue
+
             if include_usages:
                 # Add all active usages of current step to the list of steps to update (if not already in the list).
                 usages = self.steps_df[self.steps_df["step"] == step]["all_active_usages"].item()
@@ -434,13 +431,13 @@ class StepUpdater:
         # You attempt to archive [meadow_1, snapshot_1] (where snapshot_1 is a dependency of meadow_1).
         # In this case, if you archive meadow_1 first, the snapshot_1 is also removed from the active dag, and
         # when attempting to archive snapshot_1 afterwards, an error is raised. To avoid this, first archive snapshot_1.
-        steps = to_dependency_order(
-            dag=self.tracker.dag_active,
-            includes=steps,  # type: ignore
+        filtered_dag = filter_to_subgraph(
+            graph=self.tracker.dag_active,
+            includes=steps,
             excludes=[],
-            downstream=False,
             only=True,
         )
+        steps = to_dependency_order(filtered_dag)
 
         if self.interactive:
             message = "The following steps will be archived:"
@@ -568,6 +565,12 @@ def cli(
 
         Note that the code of the explorers step itself will not be updated (since it has version "latest"), but its dependencies will be updated in the dag.
     """
+    # If a single step is given, convert it to a list.
+    if isinstance(steps, str):
+        steps = [steps]
+    elif isinstance(steps, tuple):
+        steps = list(steps)
+
     # Initialize step updater and run update.
     StepUpdater(dry_run=dry_run, interactive=interactive).update_steps(
         steps=steps,

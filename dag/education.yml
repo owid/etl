@@ -104,7 +104,6 @@ steps:
   data://garden/unesco/2025-05-01/education_sdgs:
     - data://meadow/unesco/2025-05-01/education_sdgs
     - snapshot://wb/2024-06-18/edstats_metadata.xls
-    - data://garden/education/2018-04-18/literacy_rates
     - data://garden/education/2017-09-30/public_expenditure
   data://grapher/unesco/2025-05-01/education_sdgs:
     - data://garden/unesco/2025-05-01/education_sdgs
@@ -177,3 +176,36 @@ steps:
   #
   export://multidim/education/latest/completion_rates:
     - data://grapher/unesco/2025-05-01/education_sdgs
+
+  #
+  # Mdim for education spending
+  #
+  export://multidim/education/latest/education_spending:
+    - data://grapher/unesco/2025-05-01/education_sdgs
+    - data://grapher/unesco/2025-05-01/education_opri
+
+  #
+  # Mdim for literacy rates
+  #
+  export://multidim/education/latest/literacy:
+    - data://grapher/unesco/2025-05-01/education_sdgs
+
+  #
+  # Mdim for children out of school
+  #
+  export://multidim/education/latest/children_out_of_school:
+    - data://grapher/unesco/2025-05-01/education_sdgs
+    - data://grapher/unesco/2025-05-01/education_opri
+
+  #
+  # Mdim for proficiency levels in different subjects
+  #
+  export://multidim/education/latest/proficiency:
+    - data://grapher/unesco/2025-05-01/education_sdgs
+
+
+  #
+  # Mdim for PISA scores
+  #
+  export://multidim/education/latest/pisa_performance:
+    - data://grapher/oecd/2023-12-06/pisa

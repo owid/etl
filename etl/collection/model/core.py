@@ -81,12 +81,12 @@ class Collection(MDIMBase):
 
     _definitions: Definitions
 
+    dependencies: set[str] = field(default_factory=set)
     topic_tags: List[str] | None = None
     _default_dimensions: Dict[str, str] | None = None
 
     # Internal use. For save() method.
     _collection_type: str | None = field(init=False, default="multidim")
-
     _group_operations_done: int = field(init=False, default=0)
 
     @classmethod
@@ -113,6 +113,10 @@ class Collection(MDIMBase):
     def __post_init__(self):
         # Sanity check
         assert "#" in self.catalog_path, "Catalog path should be in the format `path#name`."
+
+        if isinstance(self.dependencies, list):
+            # Convert list to set
+            self.dependencies = set(self.dependencies)
 
     @property
     def definitions(self) -> Definitions:
@@ -204,8 +208,11 @@ class Collection(MDIMBase):
         # Check that no choice name or slug is repeated
         self.validate_dimension_uniqueness()
 
-        # Check that all indicators in explorer exist
+        # Validate that datasets used are part of the dependencies
         indicators = self.indicators_in_use(tolerate_extra_indicators)
+        self.validate_indicators_are_from_dependencies(indicators)
+
+        # Check that all indicators in collection exist
         validate_indicators_in_db(indicators, owid_env.engine)
 
         # Run sanity checks on grouped views
@@ -493,6 +500,14 @@ class Collection(MDIMBase):
 
             # Add slug to set
             slugs.add(dim.slug)
+
+    def validate_indicators_are_from_dependencies(self, indicators):
+        """Validate that the provided indicators are from tables in datasets specified in the collections dependencies."""
+        deps = {dep.split("://", 1)[-1] if "://" in dep else dep for dep in self.dependencies}
+        for indicator in indicators:
+            if not any(indicator.startswith(f"{dep}/") for dep in deps):
+                raise ValueError(f"Indicator {indicator} is not covered by any dependency: {deps}")
+        return True
 
     def validate_grouped_views(self):
         for view in self.views:
