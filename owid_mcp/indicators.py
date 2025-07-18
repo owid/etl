@@ -5,6 +5,7 @@ Provides indicator search and data retrieval functionality for Our World in Data
 """
 
 import asyncio
+import logging
 import os
 import re
 import urllib.parse
@@ -15,6 +16,9 @@ from fastmcp import FastMCP
 
 from owid_mcp.config import DATASETTE_BASE, HTTP_TIMEOUT, MAX_ROWS_DEFAULT, MAX_ROWS_HARD, OWID_API_BASE
 from owid_mcp.utils import smart_round
+
+# Configure logger
+logger = logging.getLogger(__name__)
 
 # Configuration for catalog integration
 CATALOG_BASE = os.getenv("CATALOG_BASE", "https://catalog.ourworldindata.org")
@@ -113,6 +117,8 @@ async def search_indicator(query: str, limit: int = 10) -> List[Dict]:
 
     Use the resource_uri with ReadMcpResourceTool to get the actual data.
     """
+    logger.info(f"Searching indicators: query='{query}', limit={limit}")
+    
     sql = """
     SELECT
         v.id,
@@ -141,6 +147,7 @@ async def search_indicator(query: str, limit: int = 10) -> List[Dict]:
     results = []
     for idx, row in enumerate(rows):
         var_id, title, desc, catalog_path, chart_count = row
+        logger.debug(f"Found indicator: id={var_id}, title='{title}', catalog_path='{catalog_path}'")
         meta = _build_catalog_info(catalog_path)
         meta["chart_count"] = chart_count
         results.append(
@@ -152,6 +159,8 @@ async def search_indicator(query: str, limit: int = 10) -> List[Dict]:
                 "metadata": meta,
             }
         )
+    
+    logger.info(f"Search completed: found {len(results)} indicators")
     return results
 
 
