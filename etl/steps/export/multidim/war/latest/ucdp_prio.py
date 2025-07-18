@@ -356,4 +356,4 @@ def _set_note(view):
     if view.d.indicator in ("wars_ongoing", "wars_ongoing_country_rate"):
         return "Some conflicts affect several regions. The sum across all regions can therefore be higher than the total number."
     if view.d.indicator in ("deaths", "death_rate") and (view.d.estimate == "best_ci"):
-        return "'Best' estimates as identified by UCDP and PRIO."
+        return '"Best" estimates as identified by UCDP and PRIO.'

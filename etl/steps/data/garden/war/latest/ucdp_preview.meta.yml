@@ -100,7 +100,7 @@ definitions:
       - UCDP identifies conflict deaths [based on news reports, other contemporary sources, and academic research](https://www.uu.se/en/department/peace-and-conflict-research/research/ucdp/ucdp-methodology).
       - *key_point_pre_1
       - *key_point_pre_2
-      - "We show here the 'best' death estimates as identified by UCDP. They also report high and low estimates."
+      - "We show here the \"best\" death estimates as identified by UCDP. They also report high and low estimates."
 
   number_deaths_type:
     description_short: |-
