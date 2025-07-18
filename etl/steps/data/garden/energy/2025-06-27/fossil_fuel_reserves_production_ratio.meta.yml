@@ -1,0 +1,67 @@
+definitions:
+  common:
+    processing_level: major
+    presentation:
+      topic_tags:
+        - Energy
+    description_key:
+      - The Reserves-to-Production (R/P) Ratio measures the number of years of fuel supplies left based on current annual consumption rates. Note that this can change through time through the discovery of new fuel reserves, and increases in annual consumption.
+  description_short_tonnes: &description_short_tonnes |-
+    Measured in tonnes.
+  description_short_years: &description_short_years |-
+    Measured in years.
+  description_short_cubic_meters: &description_short_cubic_meters |-
+    Measured in cubic meters.
+
+dataset:
+  update_period_days: 365
+
+tables:
+  fossil_fuel_reserves_production_ratio:
+    title: Fossil fuel reserves/production ratio
+    variables:
+      coal_left:
+        title: Coal reserves/production ratio
+        short_unit: years
+        unit: years
+        description_short: *description_short_years
+      coal_production:
+        title: Coal annual production
+        short_unit: t
+        unit: tonnes
+        description_short: *description_short_tonnes
+      coal_reserves:
+        title: Global reserves of coal
+        short_unit: t
+        unit: tonnes
+        description_short: *description_short_tonnes
+      gas_left:
+        title: Gas reserves/production ratio
+        short_unit: years
+        unit: years
+        description_short: *description_short_years
+      gas_production:
+        title: Gas annual production
+        short_unit: cubic meters
+        unit: cubic meters
+        description_short: *description_short_cubic_meters
+      gas_reserves:
+        title: Global reserves of gas
+        short_unit: cubic meters
+        unit: cubic meters
+        description_short: *description_short_cubic_meters
+      oil_left:
+        title: Oil reserves/production ratio
+        short_unit: years
+        unit: years
+        description_short: *description_short_years
+      oil_production:
+        title: Oil annual production
+        short_unit: t
+        unit: tonnes
+        description_short: *description_short_tonnes
+      oil_reserves:
+        title: Global reserves of oil
+        short_unit: t
+        unit: tonnes
+        description_short: *description_short_tonnes

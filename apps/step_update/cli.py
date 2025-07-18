@@ -417,6 +417,10 @@ class StepUpdater:
         # the meadow step without archiving the garden and grapher steps as well (otherwise there would be a broken
         # dependency in the dag).
         for step in steps:
+            if self.steps_df[self.steps_df["step"] == step].empty:
+                log.error(f"Step {step} not found in active dag.")
+                continue
+
             if include_usages:
                 # Add all active usages of current step to the list of steps to update (if not already in the list).
                 usages = self.steps_df[self.steps_df["step"] == step]["all_active_usages"].item()
