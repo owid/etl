@@ -62,15 +62,10 @@ def run() -> None:
 
     regions_without_world = [region for region in REGIONS if region != "World"]
     # Define member countries for each OWID region, excluding "World".
-    members = []
+    members = set()
     for region in regions_without_world:
-        members.append(
-            geo.list_members_of_region(
-                region=region,
-                ds_regions=ds_regions,
-            )
-        )
-    members = set().union(*members)
+        members.update(geo.list_members_of_region(region=region, ds_regions=ds_regions))
+
     tb_owid_countries = tb[tb["country"].isin(regions_without_world) & tb["counterpart_country"].isin(members)]
     tb_owid_world = tb[(tb["country"] == "World") & (tb["counterpart_country"].isin(members))]
     tb_all_countries = tb[tb["country"].isin(members) & tb["counterpart_country"].isin(members)]
