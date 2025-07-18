@@ -8,12 +8,6 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-# Columns to select from the data, and how to rename them.
-COLUMNS = {
-    "date": "date",
-    "phcalc_insitu": "ocean_ph",
-}
-
 
 def add_rolling_average(tb: Table, original_column_name: str) -> Table:
     tb_with_average = tb.copy()
