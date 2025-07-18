@@ -111,6 +111,7 @@ def run() -> None:
                     "presentation": {
                         "title_public": lambda view: f"{_set_title(view)}, low and high estimates",
                     },
+                    "chartTypes": ["LineChart"],
                 },
             },
         ]
