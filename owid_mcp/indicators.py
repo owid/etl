@@ -12,13 +12,13 @@ import urllib.parse
 from typing import Any, Dict, List
 
 import httpx
+import structlog
 from fastmcp import FastMCP
 
 from owid_mcp.config import DATASETTE_BASE, HTTP_TIMEOUT, MAX_ROWS_DEFAULT, MAX_ROWS_HARD, OWID_API_BASE
 from owid_mcp.utils import smart_round
 
-# Configure logger
-logger = logging.getLogger(__name__)
+log = structlog.get_logger()
 
 # Configuration for catalog integration
 CATALOG_BASE = os.getenv("CATALOG_BASE", "https://catalog.ourworldindata.org")
@@ -117,7 +117,7 @@ async def search_indicator(query: str, limit: int = 10) -> List[Dict]:
 
     Use the resource_uri with ReadMcpResourceTool to get the actual data.
     """
-    logger.info(f"Searching indicators: query='{query}', limit={limit}")
+    log.info("Searching indicators", query=query, limit=limit)
 
     sql = """
     SELECT
@@ -132,8 +132,11 @@ async def search_indicator(query: str, limit: int = 10) -> List[Dict]:
         FROM chart_dimensions
         GROUP BY variableId
     ) cd ON cd.variableId = v.id
-    WHERE v.name LIKE :q COLLATE NOCASE OR v.description LIKE :q COLLATE NOCASE
-        AND v.catalogPath IS NOT NULL
+    WHERE v.catalogPath IS NOT NULL AND (
+            v.name LIKE :q COLLATE NOCASE
+            OR
+            v.description LIKE :q COLLATE NOCASE
+    )
     ORDER BY chart_count DESC, v.name
     LIMIT :limit
     """
@@ -147,8 +150,7 @@ async def search_indicator(query: str, limit: int = 10) -> List[Dict]:
     results = []
     for idx, row in enumerate(rows):
         var_id, title, desc, catalog_path, chart_count = row
-        logger.info(f"Found indicator: id={var_id}, title='{title}', catalog_path='{catalog_path}'")
-        print(f"PRINT Found indicator: id={var_id}, title='{title}', catalog_path='{catalog_path}'")
+        log.info("Found indicator", id=var_id, title=title, catalog_path=catalog_path)
         meta = _build_catalog_info(catalog_path)
         meta["chart_count"] = chart_count
         results.append(
@@ -161,7 +163,7 @@ async def search_indicator(query: str, limit: int = 10) -> List[Dict]:
             }
         )
 
-    logger.info(f"Search completed: found {len(results)} indicators")
+    log.info("Search completed", found=len(results))
     return results
 
 
