@@ -339,6 +339,7 @@ class ChartDiff:
         source_session: Session,
         target_session: Session,
         estimate_relevance: bool = True,
+        ignore_conflicts: bool = False,
     ) -> List["ChartDiff"]:
         """Get chart diffs from chart ids.
 
@@ -362,7 +363,7 @@ class ChartDiff:
 
         # Get approval status
         # approval_statuses = cls._get_approval_statuses(source_session, chart_ids, source_charts, target_charts)
-        approvals = cls._get_approvals(source_session, chart_ids, source_charts, target_charts)
+        approvals = cls._get_approvals(source_session, chart_ids, source_charts, target_charts, ignore_conflicts)
 
         # Get conflicts
         conflicts = cls._get_conflicts(source_session, chart_ids, target_charts)
@@ -611,20 +612,33 @@ class ChartDiff:
 
     @staticmethod
     def _get_approvals(
-        source_session, chart_ids, source_charts, target_charts
+        source_session, chart_ids, source_charts, target_charts, ignore_conflicts=False
     ) -> Dict[int, Optional[gm.ChartDiffApprovals]]:
-        target_updated_ats = []
-        for chart_id in chart_ids:
-            if target_charts.get(chart_id) is not None:
-                target_updated_ats.append(target_charts[chart_id].updatedAt)  # type: ignore
-            else:
-                target_updated_ats.append(None)
-        approvals = gm.ChartDiffApprovals.latest_chart_approval_batch(
-            source_session,
-            chart_ids,
-            [source_charts[chart_id].updatedAt for chart_id in chart_ids],
-            target_updated_ats,
-        )
+        if ignore_conflicts:
+            # If ignore_conflicts is True, get the latest approval state of each chart, without timestamp matching
+            approvals = [
+                source_session.query(gm.ChartDiffApprovals)
+                .filter(gm.ChartDiffApprovals.chartId == chart_id)
+                .order_by(gm.ChartDiffApprovals.updatedAt.desc())
+                .first()
+                for chart_id in chart_ids
+            ]
+        else:
+            # Normal timestamp-based lookup
+            target_updated_ats = []
+            for chart_id in chart_ids:
+                if target_charts.get(chart_id) is not None:
+                    target_updated_ats.append(target_charts[chart_id].updatedAt)  # type: ignore
+                else:
+                    target_updated_ats.append(None)
+
+            approvals = gm.ChartDiffApprovals.latest_chart_approval_batch(
+                source_session,
+                chart_ids,
+                [source_charts[chart_id].updatedAt for chart_id in chart_ids],
+                target_updated_ats,
+            )
+
         approvals = dict(zip(chart_ids, approvals))
         return approvals
 
@@ -711,6 +725,7 @@ class ChartDiffsLoader:
         chart_ids: Optional[List[int]] = None,
         source_session: Optional[Session] = None,
         target_session: Optional[Session] = None,
+        ignore_conflicts: bool = False,
     ) -> List[ChartDiff]:
         """Optimised version of get_diffs."""
         if chart_ids:
@@ -725,6 +740,7 @@ class ChartDiffsLoader:
                 df_charts=df_charts,
                 source_session=source_session,
                 target_session=target_session,
+                ignore_conflicts=ignore_conflicts,
             )
         else:
             with Session(self.source_engine) as source_session, Session(self.target_engine) as target_session:
@@ -732,6 +748,7 @@ class ChartDiffsLoader:
                     df_charts=df_charts,
                     source_session=source_session,
                     target_session=target_session,
+                    ignore_conflicts=ignore_conflicts,
                 )
 
         self._diffs = chart_diffs
