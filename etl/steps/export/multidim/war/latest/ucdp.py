@@ -354,7 +354,7 @@ def _set_subtitle(view):
 def _set_note(view):
     """Set subtitle based on view dimensions."""
     if view.d.estimate == "best_ci":
-        return "'Best' estimates as identified by UCDP."
+        return '"Best" estimates as identified by UCDP.'
     elif view.d.indicator == "num_conflicts":
         return "Some conflicts affect several countries and regions. The sum across all countries and regions can therefore be higher than the total number."
     return None
