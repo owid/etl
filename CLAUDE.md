@@ -136,6 +136,21 @@ pytest tests/test_steps.py -m integration
 
 ## Configuration
 
+### Python Environment
+- **Virtual Environment**: This project uses a Python virtual environment (`.venv/`)
+- **Activation**: Always activate the virtual environment before running commands:
+  ```bash
+  source .venv/bin/activate  # Activate virtual environment
+  ```
+- **Package Management**: Always use `uv` package manager instead of `pip`
+  ```bash
+  uv add package_name     # Add a new package
+  uv remove package_name  # Remove a package
+  uv sync                 # Sync dependencies
+  ```
+- **IMPORTANT**: Never install packages with `pip install` - always ask first, then use `uv` if approved
+- **MCP Server**: Run MCP servers with: `source .venv/bin/activate && python -m mcp.server`
+
 ### Environment Variables
 - `OWID_ENV`: dev/staging/production environment
 - `.env`: Local environment configuration
@@ -160,15 +175,42 @@ These are installed as editable packages (`owid-catalog`, `owid-datautils`, `owi
 - **Core ETL** (`etl/`): Step execution engine, catalog management, DAG processing
 - **Apps** (`apps/`): Extended functionality - Wizard, chart sync, anomaly detection, maintenance tools
 
-## Important Development Notes
+## Dataset Updates
+When asked to "update a dataset", update ALL steps in the pipeline:
+- snapshot (raw data)
+- meadow (cleaned/processed data)
+- garden (transformed data)
+- grapher (chart-ready data)
 
-- Always use `geo.harmonize_countries()` for geographic data
-- Follow the `PathFinder` pattern for step inputs/outputs
-- Using `--force` is usually unnecessary - the step will be re-run if the code changes
-- Test steps with `etl run --dry-run` before execution
-- Use `make sync.catalog` to avoid rebuilding entire catalog locally
-- Check `etl d version-tracker` before major changes
-- VS Code extensions available: `make install-vscode-extensions`
+Use the mcp__catalog__update_step tool with include_dependencies=true and include_usages=true to update the entire pipeline.
+
+## Running ETL Steps
+Use `etlr` to run ETL steps:
+
+### Basic Usage
+- Run steps matching a pattern: `etlr biodiversity/2025-06-28/cherry_blossom`
+- Run with grapher upload: `etlr biodiversity/2025-06-28/cherry_blossom --grapher`
+- Dry run (preview): `etlr biodiversity/2025-06-28/cherry_blossom --dry-run`
+- Force re-run: `etlr biodiversity/2025-06-28/cherry_blossom --force`
+
+### Key Options
+- `--grapher/-g`: Upload datasets to grapher database (OWID staff only)
+- `--dry-run`: Preview steps without running them
+- `--force/-f`: Re-run steps even if up-to-date
+- `--only/-o`: Run only selected step (no dependencies)
+- `--downstream/-d`: Include downstream dependencies
+- `--exact-match/-x`: Steps must exactly match arguments
+
+
+## Git Workflow
+Create PR first, then commit files:
+
+1. **Create PR**: Use `mcp__catalog__create_pr` tool (creates new branch)
+2. **Check status**: `git status` to see modified/untracked files
+3. **Add files**: `git add .` or `git add <specific-files>`
+4. **Commit**: `git commit -m "Description of changes"`
+
+Note: The MCP create_pr tool creates a new branch but does NOT automatically commit files - you must commit manually after creating the PR.
 
 ## Debugging ETL Data Quality Issues
 
@@ -213,3 +255,20 @@ print(f"Source of issue: {df[df.DATE.isnull()]}")
 - **Add assertions**: Include data quality checks that fail fast with clear error messages
 - **Document data issues**: Log warnings about data quality problems found during processing
 - **Fix meadow steps**: Most data cleaning should happen in meadow, not garden steps
+
+
+## Important Development Notes
+
+- Always use `geo.harmonize_countries()` for geographic data
+- Follow the `PathFinder` pattern for step inputs/outputs
+- Using `--force` is usually unnecessary - the step will be re-run if the code changes
+- Test steps with `etl run --dry-run` before execution
+- Use `make sync.catalog` to avoid rebuilding entire catalog locally
+- Check `etl d version-tracker` before major changes
+- VS Code extensions available: `make install-vscode-extensions`
+- **ALWAYS run `make check` before committing** - formats code, fixes linting issues, and runs type checks
+- SQL queries enclose in triple quotes for readability
+
+## Instructions for MCP servers
+- When I ask you to get something from MCP server, don't run a python script, but query the MCP server directly! If it is not available, let me know.
+- If MCP server raises an error, try to fix it in code.
