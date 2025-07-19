@@ -15,6 +15,7 @@ from etl import paths
 from etl.config import ADMIN_HOST
 from etl.dag_helpers import load_dag
 from etl.db import can_connect
+from etl.git_helpers import log_time
 from etl.grapher.io import get_info_for_etl_datasets
 from etl.steps import extract_step_attributes, reverse_graph
 
@@ -319,6 +320,7 @@ class VersionTracker:
         "views_365d",
     ]
 
+    @log_time
     def __init__(
         self,
         connect_to_db: bool = True,
@@ -350,8 +352,6 @@ class VersionTracker:
         self.dag_archive = {step: self.dag_all[step] for step in self.dag_all if step not in self.dag_active}
         # List all unique steps that exist in the dag.
         self.all_steps = list_all_steps_in_dag(self.dag_all)
-        # Remove walden steps (TODO: remove this when walden is fully deprecated).
-        self.all_steps = [step for step in self.all_steps if not step.startswith("walden")]
         # List all unique active steps.
         self.all_active_steps = list_all_steps_in_dag(self.dag_active)
         # List all active steps usages (i.e. list of steps in the dag that should be executable by ETL).
@@ -850,6 +850,7 @@ class VersionTracker:
 
         return steps_df
 
+    @log_time
     def _create_steps_df(self) -> pd.DataFrame:
         # Initialise steps_df with core columns.
         steps_df = self._init_steps_df_ndim()
