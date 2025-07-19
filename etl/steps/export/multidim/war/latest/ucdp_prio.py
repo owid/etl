@@ -20,6 +20,7 @@ COMMON_CONFIG = {
     },
     "entityType": "region",
     "entityTypePlural": "regions",
+    "chartTypes": ["StackedBar"],
 }
 
 
@@ -98,6 +99,7 @@ def run() -> None:
                 "view_config": COMMON_CONFIG
                 | {
                     "selectedFacetStrategy": "entity",
+                    "chartTypes": ["LineChart"],
                 },
             },
         ]
@@ -215,6 +217,13 @@ def edit_faust(c, tb_ucdp, tb_up, region_names):
         # Edit FAUST in charts with CI (color, display names). Indicator-level.
         edit_indicator_displays(view)
 
+        # Set color to red if there is only one line in the chart
+        if (view.indicators.y is not None) and (len(view.indicators.y) == 1):
+            if view.indicators.y[0].display is None:
+                view.indicators.y[0].display = {"color": "#B13507"}
+            else:
+                view.indicators.y[0].display["color"] = "#B13507"
+
     c.set_global_config(
         {
             "title": lambda view: _set_title(view, choice_names),
@@ -255,7 +264,7 @@ def _set_description_key(view, tb_ucdp, tb_up):
 
         # return
         if view.d.estimate == "best_ci":
-            assert keys[-1].startswith("'Best' death estimates")
+            assert keys[-1].startswith('We show here the "best" death')
             keys = keys[:-1]  # + [None]
         return keys
     return None
@@ -277,16 +286,16 @@ def _set_title(view, choice_names):
 
 def _set_subtitle(view):
     dods = _set_dods(view)
-    subtitle_deaths = f"Reported deaths of combatants and civilians due to fighting{{placeholder}} {dods} conflicts that were ongoing that year. Deaths due to disease and starvation resulting from the conflict are not included."
+    subtitle_deaths = f"Reported deaths of combatants and civilians due to fighting{{placeholder}} {dods} conflicts. Deaths due to disease and starvation resulting from the conflict are not included."
 
     if view.d.indicator == "deaths":
         return subtitle_deaths.format(placeholder=" in")
     elif view.d.indicator == "death_rate":
         return subtitle_deaths.format(placeholder=", per 100,000 people. Included are")
     elif view.d.indicator == "wars_ongoing":
-        return f"Included are {dods} conflicts that were ongoing that year."
+        return f"Included are {dods} conflicts."
     elif view.d.indicator == "wars_ongoing_country_rate":
-        return f"The number of conflicts divided by the number of all states. This accounts for the changing number of states over time. Included are {dods} conflicts that were ongoing that year."
+        return f"The number of conflicts divided by the number of all states. This accounts for the changing number of states over time. Included are {dods} conflicts."
     else:
         raise ValueError(f"Unknown indicator: {view.d.indicator}")
 
@@ -347,4 +356,4 @@ def _set_note(view):
     if view.d.indicator in ("wars_ongoing", "wars_ongoing_country_rate"):
         return "Some conflicts affect several regions. The sum across all regions can therefore be higher than the total number."
     if view.d.indicator in ("deaths", "death_rate") and (view.d.estimate == "best_ci"):
-        return "'Best' estimates as identified by UCDP and PRIO."
+        return '"Best" estimates as identified by UCDP and PRIO.'

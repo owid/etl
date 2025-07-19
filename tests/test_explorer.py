@@ -79,7 +79,7 @@ EXPLORER_CONFIG = {
                     }
                 ]
             },
-            "config": {"title": "Mpox: Cumulative confirmed cases", "type": "LineChart"},
+            "config": {"title": "Mpox: Cumulative confirmed cases", "type": "LineChart DiscreteBar"},
         },
         # VIEW 1
         {
@@ -102,7 +102,7 @@ EXPLORER_CONFIG = {
                     }
                 ]
             },
-            "config": {"title": "Mpox: Cumulative confirmed cases", "type": "LineChart"},
+            "config": {"title": "Mpox: Cumulative confirmed cases", "type": "LineChart DiscreteBar"},
         },
         # VIEW 2
         {
@@ -125,7 +125,7 @@ EXPLORER_CONFIG = {
                     }
                 ]
             },
-            "config": {"title": "Mpox: Cumulative confirmed cases per million people", "type": "LineChart"},
+            "config": {"title": "Mpox: Cumulative confirmed cases per million people", "type": "LineChart DiscreteBar"},
         },
         # VIEW 3
         {
@@ -164,7 +164,7 @@ EXPLORER_CONFIG = {
             "config": {
                 "title": "Mpox: Cumulative confirmed and suspected cases",
                 "subtitle": "Confirmed cases are those that have been verified through laboratory testing. Suspected cases are those where mpox is likely based on an individual's initial clinical signs and symptoms, but the diagnosis has not yet been confirmed through laboratory testing.",
-                "type": "LineChart",
+                "type": "LineChart DiscreteBar",
                 "selectedFacetStrategy": "entity",
                 "hasMapTab": "false",
                 "minTime": "1433",

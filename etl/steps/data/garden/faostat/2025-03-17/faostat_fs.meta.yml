@@ -7,7 +7,7 @@ definitions:
     presentation:
       topic_tags:
         - Agricultural Production
-      attribution_short: FAO
+      attribution_short: UN FAO
 
 # NOTE: You can modify all indicators' metadata below.
 # However, it is preferrable to change unit and short_unit in the custom_elements_and_units.csv.
