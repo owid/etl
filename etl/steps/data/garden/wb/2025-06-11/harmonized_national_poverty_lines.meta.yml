@@ -1,0 +1,53 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Poverty
+        - Economic Inequality
+      attribution_short: World Bank
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 730
+
+
+tables:
+  harmonized_national_poverty_lines:
+    variables:
+      harmonized_national_poverty_line:
+        title: Harmonized national poverty line
+        unit: international-$ in 2021 prices
+        short_unit: $
+        description_short: National poverty line used to construct global poverty lines representing low-income and middle-income countries. This data is adjusted for inflation and differences in living costs between countries.
+        description_key:
+          - This data is constructed from data available in World Bank datasets, and also from the European Statistical Office (Eurostat), the OECD, and some national statistical offices.
+          - The original data comes usually as national poverty _rates_, and the authors select the closest poverty line available for this rate in the World Bank Poverty and Inequality Platform. For more details on the methodology, please refer to [the original paper](https://documents.worldbank.org/en/publication/documents-reports/documentdetail/099503206032533226).
+          - The resulting national poverty lines are used to construct global poverty lines in international dollars. The International Poverty Line, used to measure extreme poverty, is the median value among the harmonized national poverty lines in low-income countries. Similar calculations are made for lower- and upper-middle-income countries.
+          - The data is measured in international-$ at 2021 prices – this adjusts for inflation and for differences in living costs between countries.
+        display:
+          name: Harmonized national poverty line
+          numDecimalPlaces: 2
+
+      income_group:
+        title: World Bank's income classification
+        unit: ""
+        short_unit: ""
+        description_short: Income classification based on the country's income.
+        description_key:
+          - The income group is based on the World Bank's classification of countries by income level.
+          - This classification stays the same throughout the fiscal year (from July 1 to June 30) even if the income data for a country changes.
+          - Countries are classified according to their gross national income (GNI) per capita (Atlas method) in current US dollars.
+          - "Countries are grouped into four income categories: low income, lower-middle income, upper-middle income, and high income."
+        type: ordinal
+        sort:
+          - Low income
+          - Lower-middle income
+          - Upper-middle income
+          - High income
+        display:
+          name: Income group
+          numDecimalPlaces: 0

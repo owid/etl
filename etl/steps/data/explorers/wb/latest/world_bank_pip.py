@@ -12,18 +12,15 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-# Define PPP versions
+# Define PPP years
 # NOTE: Change this in case of new PPP versions in the future
-PPP_VERSIONS = [2011, 2017]
+PPP_YEAR_OLD = 2017
+PPP_YEAR_CURRENT = 2021
 
 # Define International Poverty Line (in cents)
 # NOTE: Change this in case of new IPL in the future
 # TODO: Change to 2021 prices
-INTERNATIONAL_POVERTY_LINE = 215
-
-# Define PPP years
-PPP_YEAR_OLD = PPP_VERSIONS[0]
-PPP_YEAR_CURRENT = PPP_VERSIONS[1]
+INTERNATIONAL_POVERTY_LINE = 300
 
 
 def run() -> None:

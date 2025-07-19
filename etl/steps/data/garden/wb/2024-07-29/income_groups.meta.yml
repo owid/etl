@@ -16,7 +16,7 @@ definitions:
       - Upper-middle-income countries are those with a GNI per capita between $4,516 and $14,005 in 2023.
       - High-income countries are those with a GNI per capita of more than $14,005 in 2023.
 
-  description_processing_count_population: We count the countries in each income group and also calculate the total population in them by using a long-run dataset [mantained by Our World in Data](https://ourworldindata.org/population-sources).
+  description_processing_count_population: We count the countries in each income group and also calculate the total population in them by using a long-run dataset [maintained by Our World in Data](https://ourworldindata.org/population-sources).
 
   classification_sort: &classification_sort
     - Low-income countries
