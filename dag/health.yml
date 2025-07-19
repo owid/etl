@@ -1277,3 +1277,23 @@ steps:
     - data://garden/wb/2025-07-01/income_groups
   data://grapher/tuberculosis/2025-06-16/laboratories:
     - data://garden/tuberculosis/2025-06-16/laboratories
+
+  #
+  # Drug approvals - FDA (Drugs@FDA and CDER Approvals)
+  #
+  data://meadow/health/2025-07-16/drug_approvals:
+    - snapshot://fda/2025-07-15/drugs_at_fda_json.zip
+  data://garden/health/2025-07-16/drug_approvals:
+    - data://meadow/health/2025-07-16/drug_approvals
+    - data://meadow/health/2025-07-16/cder_approvals
+    - data://meadow/health/2025-07-16/purple_book
+    - data://meadow/health/2025-07-16/orange_book
+  data://grapher/health/2025-07-16/drug_approvals:
+    - data://garden/health/2025-07-16/drug_approvals
+  data://meadow/health/2025-07-16/cder_approvals:
+    - snapshot://fda/2025-07-16/cder_approvals.xlsx
+
+  data://meadow/health/2025-07-16/purple_book:
+    - snapshot://fda/2025-07-16/purple_book.csv
+  data://meadow/health/2025-07-16/orange_book:
+    - snapshot://fda/2025-07-16/orange_book.zip
