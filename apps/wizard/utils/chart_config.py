@@ -42,7 +42,7 @@ CONFIG_BASE = {
     "version": 14,
     "sortOrder": "desc",
     "maxTime": "latest",
-    "chartTypes": ["LineChart"],
+    "chartTypes": ["LineChart", "DiscreteBar"],
     "hideRelativeToggle": True,
     "addCountryMode": "add-country",
     "hideAnnotationFieldsInTitle": {"entity": False, "changeInPrefix": False, "time": False},

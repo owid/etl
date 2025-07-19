@@ -1537,7 +1537,8 @@
                           "type": "array",
                           "description": "Which types of chart should be shown",
                           "default": [
-                            "LineChart"
+                            "LineChart",
+                            "DiscreteBar"
                           ],
                           "items": {
                             "type": "string",
