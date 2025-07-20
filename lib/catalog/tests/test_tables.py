@@ -438,8 +438,8 @@ def test_merge_without_any_on_arguments(table_1, table_2, sources, origins, lice
     assert tb["a"].metadata.processing_level == "major"
     # Since table_1["a"] and table_2["a"] have identical presentation, the combination should have the same.
     assert tb["a"].metadata.presentation == table_1["a"].metadata.presentation
-    # Since table_1["a"] and table_2["a"] have different display, the combination should have no display.
-    assert tb["a"].metadata.display is None
+    # The combined display of table_1["a"] and table_2["a"] should contain only the display fields whose values coincide for both variables.
+    assert tb["a"].metadata.display == {"isProjection": True, "numDecimalPlaces": 1}
     # Column "b" appears only in table_1, so it should keep its original metadata.
     assert tb["b"].metadata == table_1["b"].metadata
     # Column "c" appears only in table_2, so it should keep its original metadata.
@@ -702,8 +702,8 @@ def test_melt(table_1, sources, origins, licenses) -> None:
         assert tb[column].metadata.processing_level == "major"
         # Since "a" and "b" have different presentation, the combination should have no presentation.
         assert tb[column].metadata.presentation is None
-        # Since "a" and "b" have identical display, the combination should have the same display.
-        assert tb[column].metadata.display == table_1["a"].metadata.display
+        # Since "a" and "b" have identical display, but "country" and "year" don't have display, the combination should have no display.
+        assert tb[column].metadata.display is None
     # Now check that table metadata is identical.
     assert tb.metadata == table_1.metadata
 
@@ -723,8 +723,8 @@ def test_melt(table_1, sources, origins, licenses) -> None:
         assert tb[column].metadata.processing_level == "major"
         # Since "a" and "b" have different presentation, the combination should have no presentation.
         assert tb[column].metadata.presentation is None
-        # Since "a" and "b" have identical display, the combination should have the same display.
-        assert tb[column].metadata.display == table_1["a"].metadata.display
+        # Since "a" and "b" have identical display, but "country" and "year" don't have display, the combination should have no display.
+        assert tb[column].metadata.display is None
     # Now check that table metadata is identical.
     assert tb.metadata == table_1.metadata
 
