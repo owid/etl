@@ -69,6 +69,22 @@ SHARE_COLUMNS = [
 ]
 
 
+def process_table_subset(tb: Table) -> Table:
+    """Process a subset of the table."""
+    tb = tb.pivot(
+        index=["country", "year", "counterpart_country"],
+        columns="indicator",
+        values="value",
+    ).reset_index()
+
+    tb = calculate_trade_shares(tb)
+
+    # Select only needed columns
+    tb = tb[SHARE_COLUMNS]
+
+    return tb
+
+
 def calculate_trade_shares(tb: Table) -> Table:
     """Calculate trade shares for a given table."""
     # Calculate total trade for each country-year to compute shares
@@ -91,26 +107,9 @@ def calculate_trade_shares(tb: Table) -> Table:
 
     # Calculate trade volume and balance shares
     tb["total_trade_volume"] = tb["total_exports"] + tb["total_imports"]
-    tb["trade_balance_goods__share"] = tb[TRADE_BALANCE_COL] / tb["total_trade_volume"] * 100
-
     tb["bilateral_trade_volume"] = tb[EXPORT_COL] + tb[IMPORT_COL]
+
+    tb["trade_balance_goods__share"] = (tb[IMPORT_COL] - tb[EXPORT_COL]) / tb["total_trade_volume"] * 100
     tb["share_of_total_trade"] = tb["bilateral_trade_volume"] / tb["total_trade_volume"] * 100
-
-    return tb
-
-
-def process_table_subset(tb: Table) -> Table:
-    """Process a subset of the table."""
-    tb = tb.pivot(
-        index=["country", "year", "counterpart_country"],
-        columns="indicator",
-        values="value",
-    ).reset_index()
-
-    tb.loc[tb["country"] == tb["counterpart_country"], "counterpart_country"] = "Intraregional"
-    tb = calculate_trade_shares(tb)
-
-    # Select only needed columns
-    tb = tb[SHARE_COLUMNS]
 
     return tb
