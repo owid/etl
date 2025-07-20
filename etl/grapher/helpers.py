@@ -124,11 +124,41 @@ def _yield_wide_table(
 
 def _metadata_for_dimensions(meta: catalog.VariableMeta, dim_dict: Dict[str, Any], column: str) -> catalog.VariableMeta:
     """Add dimensions to metadata and expand Jinja in metadata fields."""
+    # Create a copy of metadata to avoid modifying the original
+    meta = meta.copy(deep=True)
+
     # Add info about dimensions to metadata
     if dim_dict:
         meta.dimensions = {dim_name: sanitize_numpy(dim_value) for dim_name, dim_value in dim_dict.items()}
         meta.original_short_name = column
         meta.original_title = meta.title
+
+        # Filter origins based on dimensions - create new list without modifying original
+        if meta.origins:
+            filtered_origins = []
+            for origin in meta.origins:
+                # Validate that origin dimensions are properly structured
+                if origin.dimensions:
+                    # Check that all dimension names in origin exist in table dimensions
+                    for dim_dict_candidate in origin.dimensions:
+                        invalid_dims = set(dim_dict_candidate.keys()) - set(dim_dict.keys())
+                        if invalid_dims:
+                            raise ValueError(
+                                f"Origin '{origin.producer}' has dimensions {list(invalid_dims)} that don't exist in the table dimensions {list(dim_dict.keys())}"
+                            )
+
+                # Only include origins that match the current dimensions
+                if _origin_matches_dimensions(origin, dim_dict):
+                    # Remove dimensions info from origins
+                    origin = copy.deepcopy(origin)
+                    origin.dimensions = None
+
+                    # It's possible that there are two origins with different dimensions
+                    if origin not in filtered_origins:
+                        filtered_origins.append(origin)
+
+            # Set the filtered origins list
+            meta.origins = filtered_origins
 
         # Soon to be deprecated
         meta.additional_info = {
@@ -155,6 +185,34 @@ def _metadata_for_dimensions(meta: catalog.VariableMeta, dim_dict: Dict[str, Any
         ) from e
 
 
+def _origin_matches_dimensions(origin: catalog.Origin, dim_dict: Dict[str, Any]) -> bool:
+    """Check if an origin's dimensions match the given dimension values.
+
+    Returns True if:
+    - Origin has no dimensions (applies to all dimension combinations)
+    - Origin dimensions is a list of dictionaries and any dictionary matches the current dimensions
+    """
+    if not origin.dimensions:
+        # Origin with no dimensions applies to all dimension combinations
+        return True
+
+    # Check if any of the dimension dictionaries match the current dimension values
+    for dim_dict_candidate in origin.dimensions:
+        # Check if all dimensions in this candidate match the current dimension values
+        match = True
+        for dim_name, dim_value in dim_dict_candidate.items():
+            if dim_name not in dim_dict or dim_dict[dim_name] != dim_value:
+                match = False
+                break
+
+        # If this candidate matches, the origin applies
+        if match:
+            return True
+
+    # No candidate matched
+    return False
+
+
 def _create_dim_dict(dim_names: List[str], dim_values: List[Any]) -> Dict[str, Any]:
     # Filter NaN values from dimensions and return dictionary
     return {n: v for n, v in zip(dim_names, dim_values) if pd.notnull(v)}
@@ -166,6 +224,8 @@ def long_to_wide(long_tb: catalog.Table) -> catalog.Table:
     in the grapher step and store a flattened dataset in the catalog."""
 
     dim_names = [k for k in long_tb.primary_key if k not in ("year", "country", "date")]
+
+    assert len(dim_names) > 0, "Table must have at least one dimension to unstack"
 
     # Unstack dimensions to a wide format
     wide_tb = cast(catalog.Table, long_tb.unstack(level=dim_names))  # type: ignore
@@ -541,8 +601,7 @@ def _adapt_table_for_grapher(table: catalog.Table, engine: Engine) -> catalog.Ta
 
     table = table.set_index(["entityId", "entityCode", "entityName", "year"] + dim_names)
 
-    # Ensure the default source of each column includes the description of the table (since that is the description that
-    # will appear in grapher on the SOURCES tab).
+    # Ensure the default source of each column includes the description of the table (since that is the description that grapher will appear in grapher on the SOURCES tab).
     table = _ensure_source_per_variable(table)
 
     return cast(catalog.Table, table)
