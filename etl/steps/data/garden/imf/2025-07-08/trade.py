@@ -93,6 +93,10 @@ def run() -> None:
             processed_table = processed_table.rename(
                 columns={"country": "counterpart_country", "counterpart_country": "country"}
             )
+            processed_table.loc[
+                processed_table["country"] == processed_table["counterpart_country"], "counterpart_country"
+            ] = "Intraregional"
+
         tbs.append(processed_table)
 
     tb = pr.concat(tbs)
