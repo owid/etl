@@ -66,9 +66,9 @@ def run() -> None:
     for region in regions_without_world:
         members.update(geo.list_members_of_region(region=region, ds_regions=ds_regions))
 
-    tb_owid_countries = tb[tb["country"].isin(regions_without_world) & tb["counterpart_country"].isin(members)]
-    tb_owid_world = tb[(tb["country"] == "World") & (tb["counterpart_country"].isin(members))]
-    tb_all_countries = tb[tb["country"].isin(members) & tb["counterpart_country"].isin(members)]
+    tb_owid_countries = tb[(tb["country"].isin(regions_without_world)) & (tb["counterpart_country"].isin(members))]
+    tb_owid_world = tb[(tb["country"].isin(members)) & (tb["counterpart_country"] == "World")]
+    tb_all_countries = tb[(tb["country"].isin(members)) & (tb["counterpart_country"].isin(members))]
 
     # Define table subsets with descriptive names
     table_subsets = [
@@ -79,14 +79,13 @@ def run() -> None:
 
     tbs = []
     for table_index, (table_name, table_data) in enumerate(table_subsets):
-        table_data = table_data.rename(columns={"country": "counterpart_country", "counterpart_country": "country"})
-
         processed_table = sh.process_table_subset(table_data)
         processed_table = processed_table.melt(
             id_vars=["country", "year", "counterpart_country"],
             var_name="metric",
             value_name="value",
         )
+
         tbs.append(processed_table)
 
     tb = pr.concat(tbs)

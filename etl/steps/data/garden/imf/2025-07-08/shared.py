@@ -72,7 +72,7 @@ SHARE_COLUMNS = [
 def calculate_trade_shares(tb: Table) -> Table:
     """Calculate trade shares for a given table."""
     # Calculate total trade for each country-year to compute shares
-    totals = tb.groupby(["country", "year"])[[EXPORT_COL, IMPORT_COL]].sum().reset_index()
+    totals = tb.groupby(["counterpart_country", "year"])[[EXPORT_COL, IMPORT_COL]].sum().reset_index()
 
     # Rename total columns
     totals = totals.rename(
@@ -83,7 +83,7 @@ def calculate_trade_shares(tb: Table) -> Table:
     )
 
     # Merge totals back to main table
-    tb = tb.merge(totals, on=["country", "year"], how="left")
+    tb = tb.merge(totals, on=["counterpart_country", "year"], how="left")
 
     # Calculate shares
     tb["exports_of_goods__free_on_board__fob__share"] = tb[EXPORT_COL] / tb["total_exports"] * 100
@@ -96,32 +96,7 @@ def calculate_trade_shares(tb: Table) -> Table:
     tb["bilateral_trade_volume"] = tb[EXPORT_COL] + tb[IMPORT_COL]
     tb["share_of_total_trade"] = tb["bilateral_trade_volume"] / tb["total_trade_volume"] * 100
 
-    return tb, totals
-
-
-def create_total_balance_row(tb: Table, totals: Table) -> Table:
-    """Create total net balance row."""
-    total_net_balance = tb.groupby(["country", "year"])[TRADE_BALANCE_COL].sum().reset_index()
-    total_net_balance["counterpart_country"] = "Total"
-
-    total_net_balance = total_net_balance.merge(
-        totals[["country", "year", "total_exports", "total_imports"]], on=["country", "year"], how="left"
-    )
-
-    total_net_balance["total_trade_volume"] = total_net_balance["total_exports"] + total_net_balance["total_imports"]
-    total_net_balance["trade_balance_goods__share"] = (
-        total_net_balance[TRADE_BALANCE_COL] / total_net_balance["total_trade_volume"] * 100
-    )
-
-    # Add empty values for other columns
-    for col in [
-        "exports_of_goods__free_on_board__fob__share",
-        "imports_of_goods__cost_insurance_freight__cif__share",
-        "share_of_total_trade",
-    ]:
-        total_net_balance[col] = None
-
-    return total_net_balance[total_net_balance["counterpart_country"] != "Total"]
+    return tb
 
 
 def process_table_subset(tb: Table) -> Table:
@@ -133,13 +108,9 @@ def process_table_subset(tb: Table) -> Table:
     ).reset_index()
 
     tb.loc[tb["country"] == tb["counterpart_country"], "counterpart_country"] = "Intraregional"
-
-    tb, totals = calculate_trade_shares(tb)
-    total_net_balance = create_total_balance_row(tb, totals)
+    tb = calculate_trade_shares(tb)
 
     # Select only needed columns
     tb = tb[SHARE_COLUMNS]
-    total_net_balance = total_net_balance[SHARE_COLUMNS]
 
-    tb = pr.concat([tb, total_net_balance])
     return tb

@@ -67,7 +67,7 @@ def run() -> None:
     )
 
     regions_without_world = [region for region in REGIONS if region != "World"]
-    tb_owid = tb[tb["country"].isin(regions_without_world) & tb["counterpart_country"].isin(regions_without_world)]
+    tb_owid = tb[(tb["country"].isin(regions_without_world)) & (tb["counterpart_country"].isin(regions_without_world))]
     tb_imf = tb[tb["country"].isin(IMF_REGIONS) & tb["counterpart_country"].isin(IMF_REGIONS)]
 
     # Define member countries for each OWID region, excluding "World".
@@ -75,8 +75,9 @@ def run() -> None:
     for region in regions_without_world:
         members.update(geo.list_members_of_region(region=region, ds_regions=ds_regions))
 
-    tb_owid_countries = tb[tb["country"].isin(regions_without_world) & tb["counterpart_country"].isin(members)]
-    tb_owid_world = tb[(tb["country"] == "World") & (tb["counterpart_country"].isin(members))]
+    tb_owid_countries = tb[(tb["country"].isin(members)) & (tb["counterpart_country"].isin(regions_without_world))]
+    tb_owid_world = tb[(tb["country"].isin(members)) & (tb["counterpart_country"] == "World")]
+
     # Define table subsets with descriptive names
     table_subsets = [
         ("owid_regions", tb_owid),
@@ -88,11 +89,10 @@ def run() -> None:
     tbs = []
     for table_index, (table_name, table_data) in enumerate(table_subsets):
         processed_table = sh.process_table_subset(table_data)
-        if table_index > 1:  # Swap columns for country breakdown tables
+        if table_name in ["owid_regions", "imf_regions"]:
             processed_table = processed_table.rename(
                 columns={"country": "counterpart_country", "counterpart_country": "country"}
             )
-
         tbs.append(processed_table)
 
     tb = pr.concat(tbs)
