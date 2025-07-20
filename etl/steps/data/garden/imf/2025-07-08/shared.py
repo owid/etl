@@ -109,7 +109,7 @@ def calculate_trade_shares(tb: Table) -> Table:
     tb["total_trade_volume"] = tb["total_exports"] + tb["total_imports"]
     tb["bilateral_trade_volume"] = tb[EXPORT_COL] + tb[IMPORT_COL]
 
-    tb["trade_balance_goods__share"] = (tb[IMPORT_COL] - tb[EXPORT_COL]) / tb["total_trade_volume"] * 100
+    tb["trade_balance_goods__share"] = (tb[TRADE_BALANCE_COL]) / tb["bilateral_trade_volume"] * 100
     tb["share_of_total_trade"] = tb["bilateral_trade_volume"] / tb["total_trade_volume"] * 100
 
     return tb
