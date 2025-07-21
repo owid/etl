@@ -168,7 +168,7 @@ tables:
       renewables__total:
         title: Renewable electricity capacity (total)
         description_short: |-
-          Total renewable (on- and off-grid) electricity installed capacity, measured in megawatts. This includes bioenergy, geothermal,hydropower (excluding pumped storage), solar, wind, and marine energy.
+          Total renewable (on- and off-grid) electricity installed capacity, measured in megawatts. This includes bioenergy, geothermal, hydropower (excluding pumped storage), solar, wind, and marine energy.
         display:
           name: Renewable electricity
         presentation:
