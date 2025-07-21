@@ -4,9 +4,6 @@ OWID Indicators MCP Server Module
 Provides indicator search and data retrieval functionality for Our World in Data.
 """
 
-import asyncio
-import logging
-import os
 import re
 import urllib.parse
 from typing import Any, Dict, List
@@ -15,13 +12,11 @@ import httpx
 import structlog
 from fastmcp import FastMCP
 
-from owid_mcp.config import DATASETTE_BASE, HTTP_TIMEOUT, MAX_ROWS_DEFAULT, MAX_ROWS_HARD, OWID_API_BASE
-from owid_mcp.utils import smart_round
+from owid_mcp.config import DATASETTE_BASE, HTTP_TIMEOUT, MAX_ROWS_DEFAULT, MAX_ROWS_HARD
+from owid_mcp.data_utils import build_catalog_info, fetch_indicator_data
 
 log = structlog.get_logger()
 
-# Configuration for catalog integration
-CATALOG_BASE = os.getenv("CATALOG_BASE", "https://catalog.ourworldindata.org")
 
 
 # Create the indicators MCP server
@@ -37,64 +32,8 @@ mcp = FastMCP(
 )
 
 
-def _build_catalog_info(catalog_path: str) -> Dict[str, str]:
-    """Build Parquet URL & example SQL template from catalogPath.
-
-    Args:
-        catalog_path: Path like 'grapher/biodiversity/2025-04-07/cherry_blossom/cherry_blossom#average_20_years'
-    """
-    # Split on '#' to separate path from column
-    path, column = catalog_path.split("#")
-
-    # Parse the path: channel/namespace/version/dataset_slug/dataset_slug
-    parts = path.split("/")
-    channel, namespace, version, dataset_slug, table_name = parts[0], parts[1], parts[2], parts[3], parts[4]
-
-    parquet_url = f"{CATALOG_BASE}/{channel}/{namespace}/{version}/{dataset_slug}/{table_name}.parquet"
-    sql_tpl = "SELECT country, year, {col} FROM '{url}' " "WHERE country = '??' LIMIT 100".format(
-        col=column, url=parquet_url
-    )
-    return {
-        "parquet_url": parquet_url,
-        "sql_template": sql_tpl,
-    }
 
 
-def _build_rows(data_json: Dict[str, Any], entities_meta: Dict[int, Dict[str, str]]) -> List[Dict[str, Any]]:
-    """Convert the compact OWID arrays into a list[{entity, year, value}]."""
-
-    values = data_json["values"]
-    years = data_json["years"]
-    entity_ids = data_json["entities"]
-
-    # Guard against length mismatch
-    if not (len(values) == len(years) == len(entity_ids)):
-        raise ValueError("Mismatched lengths in OWID data arrays")
-
-    rows: List[Dict[str, Any]] = []
-    append = rows.append
-
-    for v, y, eid in zip(values, years, entity_ids):
-        meta = entities_meta.get(eid)
-        if meta is None:
-            # Skip unknown entity id (should not normally happen)
-            continue
-        append(
-            {
-                "entity": meta["name"],
-                "year": y,
-                "value": smart_round(v),
-            }
-        )
-
-    return rows
-
-
-async def _fetch_json(url: str) -> Dict[str, Any]:
-    async with httpx.AsyncClient(timeout=HTTP_TIMEOUT) as client:
-        resp = await client.get(url)
-        resp.raise_for_status()
-        return resp.json()
 
 
 @mcp.tool
@@ -151,7 +90,7 @@ async def search_indicator(query: str, limit: int = 10) -> List[Dict]:
     for idx, row in enumerate(rows):
         var_id, title, desc, catalog_path, chart_count = row
         log.info("Found indicator", id=var_id, title=title, catalog_path=catalog_path)
-        meta = _build_catalog_info(catalog_path)
+        meta = build_catalog_info(catalog_path)
         meta["chart_count"] = chart_count
         results.append(
             {
@@ -165,6 +104,7 @@ async def search_indicator(query: str, limit: int = 10) -> List[Dict]:
 
     log.info("Search completed", found=len(results))
     return results
+
 
 
 SQL_SELECT_RE = re.compile(r"^\s*select\b", re.IGNORECASE | re.DOTALL)
@@ -232,68 +172,11 @@ async def indicator_resource(indicator_id: int, entity: str | None = None) -> Di
           ]
         }
     """
-
-    # Fetch OWID raw data + metadata concurrently.
-    data_url = f"{OWID_API_BASE}/{indicator_id}.data.json"
-    meta_url = f"{OWID_API_BASE}/{indicator_id}.metadata.json"
-    data_json, metadata = await asyncio.gather(_fetch_json(data_url), _fetch_json(meta_url))
-
-    # Build mapping from numeric id -> {name, code}
-    entities_meta = {
-        ent["id"]: {"name": ent["name"], "code": ent["code"]} for ent in metadata["dimensions"]["entities"]["values"]
-    }
-
-    rows = _build_rows(data_json, entities_meta)
-
-    # Optional server‑side filter for a single entity
-    if entity is not None:
-        ent_lower = entity.lower()
-        # Filter by entity name or code (check against entities_meta for code matching)
-        filtered_rows = []
-        for r in rows:
-            if r["entity"] and r["entity"].lower() == ent_lower:
-                filtered_rows.append(r)
-            else:
-                # Check if entity matches any code in entities_meta
-                for ent_meta in entities_meta.values():
-                    if ent_meta["code"] and ent_meta["code"].lower() == ent_lower and ent_meta["name"] == r["entity"]:
-                        filtered_rows.append(r)
-                        break
-        rows = filtered_rows
-
-    return {"metadata": metadata, "data": rows}
+    return await fetch_indicator_data(indicator_id, entity)
 
 
 # Convenience alias: ``ind://{indicator_id}/{entity}``
 @mcp.resource("ind://{indicator_id}/{entity}")
 async def indicator_resource_for_entity(indicator_id: int, entity: str) -> Dict[str, Any]:
     """Shorthand path that simply forwards to ``indicator_resource`` with ``entity``."""
-    # Fetch OWID raw data + metadata concurrently.
-    data_url = f"{OWID_API_BASE}/{indicator_id}.data.json"
-    meta_url = f"{OWID_API_BASE}/{indicator_id}.metadata.json"
-    data_json, metadata = await asyncio.gather(_fetch_json(data_url), _fetch_json(meta_url))
-
-    # Build mapping from numeric id -> {name, code}
-    entities_meta = {
-        ent["id"]: {"name": ent["name"], "code": ent["code"]} for ent in metadata["dimensions"]["entities"]["values"]
-    }
-
-    rows = _build_rows(data_json, entities_meta)
-
-    # Filter for the specific entity
-    if entity is not None:
-        ent_lower = entity.lower()
-        # Filter by entity name or code (check against entities_meta for code matching)
-        filtered_rows = []
-        for r in rows:
-            if r["entity"] and r["entity"].lower() == ent_lower:
-                filtered_rows.append(r)
-            else:
-                # Check if entity matches any code in entities_meta
-                for ent_meta in entities_meta.values():
-                    if ent_meta["code"] and ent_meta["code"].lower() == ent_lower and ent_meta["name"] == r["entity"]:
-                        filtered_rows.append(r)
-                        break
-        rows = filtered_rows
-
-    return {"metadata": metadata, "data": rows}
+    return await fetch_indicator_data(indicator_id, entity)

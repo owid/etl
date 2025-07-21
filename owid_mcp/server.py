@@ -25,7 +25,7 @@ Dependencies (pip):
 from fastmcp import FastMCP
 
 # Import the modular servers
-from owid_mcp import charts, indicators
+from owid_mcp import charts, indicators, deep_research
 from owid_mcp.config import COMMON_ENTITIES
 
 # ---------------------------------------------------------------------------
@@ -55,6 +55,7 @@ async def setup_server():
     """Setup the server by importing modules."""
     await mcp.import_server(indicators.mcp)
     await mcp.import_server(charts.mcp)
+    await mcp.import_server(deep_research.mcp)
 
 
 # Create an event loop and setup the server
