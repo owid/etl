@@ -42,7 +42,7 @@ def create_test_config():
 def create_test_explorer_config():
     """Create a basic test configuration for explorers."""
     config = create_test_config()
-    config["config"] = {"hasMapTab": True, "chartTypes": ["LineChart"]}
+    config["config"] = {"hasMapTab": True, "chartTypes": ["LineChart", "DiscreteBar"]}
     return config
 
 

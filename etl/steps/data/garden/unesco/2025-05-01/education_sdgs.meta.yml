@@ -11,8 +11,8 @@ definitions:
         map:
           time: 2024
           timeTolerance: 5
-    display:
-      tolerance: 5
+
+  display_tolerance: &display_tolerance 10
 
   # ============================================================================
   # COMMON CONFIGURATION TEMPLATES
@@ -168,6 +168,48 @@ definitions:
         baseColorScheme: Reds
 
   # ============================================================================
+  # PROFICIENCY RATE CONFIGURATIONS
+  # ============================================================================
+
+  proficiency_rate_bins: &proficiency_rate_bins [10,20,30,40,50,60,70,80,90,100]
+
+  grapher_config_proficiency_primary_math: &grapher_config_proficiency_primary_math
+    <<: *common_grapher_config
+    map:
+      <<: *common_grapher_map_config
+      colorScale:
+        binningStrategy: manual
+        customNumericValues: *proficiency_rate_bins
+        baseColorScheme: Blues
+
+  grapher_config_proficiency_primary_reading: &grapher_config_proficiency_primary_reading
+    <<: *common_grapher_config
+    map:
+      <<: *common_grapher_map_config
+      colorScale:
+        binningStrategy: manual
+        customNumericValues: *proficiency_rate_bins
+        baseColorScheme: Greens
+
+  grapher_config_proficiency_secondary_math: &grapher_config_proficiency_secondary_math
+    <<: *common_grapher_config
+    map:
+      <<: *common_grapher_map_config
+      colorScale:
+        binningStrategy: manual
+        customNumericValues: *proficiency_rate_bins
+        baseColorScheme: Oranges
+
+  grapher_config_proficiency_secondary_reading: &grapher_config_proficiency_secondary_reading
+    <<: *common_grapher_config
+    map:
+      <<: *common_grapher_map_config
+      colorScale:
+        binningStrategy: manual
+        customNumericValues: *proficiency_rate_bins
+        baseColorScheme: Purples
+
+  # ============================================================================
   # LITERACY RATE CONFIGURATIONS
   # ============================================================================
 
@@ -262,6 +304,23 @@ definitions:
     - These estimates are produced using a statistical model that draws on these sources, filling gaps where direct observations are missing or inconsistent.
     - Because values are estimated, they may differ from official national figures. Differences in school systems or grade structures can also affect comparability.
 
+  description_key_out_school: &description_key_out_school
+    - Many children and adolescents around the world are not in school, even though they are old enough to be. This indicator shows how many are missing out on education at each stage of the system.
+    - It measures the share of individuals in the official age range for a given level of education who are not enrolled at that level or in any higher level.
+    - These children or adolescents may have never entered school, may have dropped out, or may be starting later than expected.
+    - The indicator is calculated by subtracting the number of enrolled individuals in a specific age group from the total population of that group, and expressing the result as a percentage.
+    - High out-of-school rates signal barriers to access — such as poverty, gender inequality, location, or limited availability of schools — and highlight where more targeted support is needed.
+    - The data comes from administrative school enrolment records and household surveys, which provide age-specific insights when compared to population estimates.
+    - As with all education data, results should be interpreted carefully. Differences in how enrolment is defined, inconsistencies in age reporting, and timing of data collection (such as during holidays or late in the school year) can affect accuracy.
+  desc_key_prof: &desc_key_prof
+    - This indicator measures the share of children or students who achieve minimum proficiency in reading or mathematics by the end of a given education level (primary or lower secondary).
+    - "Minimum proficiency in [reading](#dod:reading-proficiency) and [mathematics](#dod:math-proficiency) is defined differently at each education level:"
+    - "At the end of **primary education**, minimum reading proficiency means students can identify key ideas in simple texts and connect them to their own experiences. In mathematics, it means demonstrating number sense and computation, basic measurement, interpreting simple graphs, spatial orientation, and number patterns."
+    - "At the end of **lower secondary education**, minimum reading proficiency means students can connect ideas across different types of texts, understand the author’s intent, and draw conclusions based on the text. In mathematics, it means applying computation skills, solving real-world problems, interpreting graphs and tables, and using algebraic representations."
+    - "There are two types of estimates: one for all children in the age group, and one for students who are enrolled in school."
+    - Estimates for all children adjust for school completion and enrolment, offering a full population-level view — including those who dropped out or were never enrolled.
+    - Estimates for students reflect outcomes only among those still in school at the end of the education cycle.
+    - Data comes from international assessments such as [TIMSS, PIRLS](https://timssandpirls.bc.edu/), or [PISA](https://www.oecd.org/en/about/programmes/pisa.html), combined with completion and enrolment data from surveys or statistical models.
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
@@ -287,7 +346,7 @@ tables:
           grapher_config: *grapher_config_literacy_adults
         display:
           numDecimalPlaces: 1
-          tolerance: 10
+          tolerance: *display_tolerance
           name: Literacy rate among adults
 
       adult_literacy_rate__population_15plus_years__male__pct__lr_ag15t99_m:
@@ -301,7 +360,7 @@ tables:
           grapher_config: *grapher_config_literacy_male
         display:
           numDecimalPlaces: 1
-          tolerance: 10
+          tolerance: *display_tolerance
           name: Literacy rate among adult men
 
       adult_literacy_rate__population_15plus_years__female__pct__lr_ag15t99_f:
@@ -315,7 +374,7 @@ tables:
           grapher_config: *grapher_config_literacy_female
         display:
           numDecimalPlaces: 1
-          tolerance: 10
+          tolerance: *display_tolerance
           name: Literacy rate among adult women
 
       youth_literacy_rate__population_15_24_years__male__pct__lr_ag15t24_m:
@@ -329,7 +388,7 @@ tables:
           grapher_config: *grapher_config_literacy_male
         display:
           numDecimalPlaces: 1
-          tolerance: 10
+          tolerance: *display_tolerance
           name: Literacy rate among young men
 
       youth_literacy_rate__population_15_24_years__female__pct__lr_ag15t24_f:
@@ -343,7 +402,7 @@ tables:
           grapher_config: *grapher_config_literacy_female
         display:
           numDecimalPlaces: 1
-          tolerance: 10
+          tolerance: *display_tolerance
           name: Literacy rate among young women
 
       elderly_literacy_rate__population_65plus_years__both_sexes__pct__lr_ag65t99:
@@ -357,7 +416,7 @@ tables:
           grapher_config: *grapher_config_literacy_elderly
         display:
           numDecimalPlaces: 1
-          tolerance: 10
+          tolerance: *display_tolerance
           name: Literacy rate among older adults
 
       elderly_literacy_rate__population_65plus_years__male__pct__lr_ag65t99_m:
@@ -371,7 +430,7 @@ tables:
           grapher_config: *grapher_config_literacy_male
         display:
           numDecimalPlaces: 1
-          tolerance: 10
+          tolerance: *display_tolerance
           name: Literacy rate among older adult men
 
       elderly_literacy_rate__population_65plus_years__female__pct__lr_ag65t99_f:
@@ -385,7 +444,7 @@ tables:
           grapher_config: *grapher_config_literacy_female
         display:
           numDecimalPlaces: 1
-          tolerance: 10
+          tolerance: *display_tolerance
           name: Literacy rate among older adult women
 
       youth_literacy_rate__population_15_24_years__both_sexes__pct__lr_ag15t24:
@@ -399,7 +458,7 @@ tables:
           grapher_config: *grapher_config_literacy_youth
         display:
           numDecimalPlaces: 1
-          tolerance: 10
+          tolerance: *display_tolerance
           name: Literacy rate among young people
 
       youth_literacy_rate__population_15_24_years__adjusted_gender_parity_index__gpia__lr_ag15t24_gpia:
@@ -527,16 +586,10 @@ tables:
         description_short: Percentage of children in the official primary school age group who are not enrolled in any level of education.
         unit: "%"
         short_unit: "%"
-        description_key:
-          - Many children who are old enough for primary school are not attending any kind of school — this indicator shows how many are missing out on education.
-          - It captures the share of children in the official primary school age range who are not enrolled in primary or secondary education.
-          - The indicator is calculated by subtracting the number of enrolled primary-age children (regardless of the level of education) from the total number of children in that age group, and expressing the result as a percentage.
-          - These children may have never enrolled, may have dropped out, or may be starting late and not yet entered school.
-          - A high out-of-school rate highlights the need for improved access and targeted policies to reach excluded groups. When disaggregated, the indicator helps identify gaps by sex, location, or socioeconomic status.
-          - The data comes from administrative records and household surveys that collect information on enrolment by single year of age and compare it with population estimates for the same group.
-          - As with all estimates, there are limitations. Differences in data sources, enrolment definitions, and the timing of data collection (especially if late in the school year) can affect accuracy.
+        description_key: *description_key_out_school
         presentation:
           title_public: Out-of-school rate for children of primary school age
+          grapher_config: *grapher_config_enrolment_bugn
         display:
           name: Primary school age
           numDecimalPlaces: 1
@@ -546,15 +599,142 @@ tables:
         description_short: Percentage of adolescents in the official age group for [lower secondary](#dod:lower-secondary-education) education who are not enrolled in school at any level.
         unit: "%"
         short_unit: "%"
-        description_key:
-          - Many adolescents who are old enough for lower secondary school are not enrolled — this indicator shows how many are missing out on education during this critical stage.
-          - It captures the share of children in the official lower secondary age range who are not enrolled in any formal education, including pre-primary, primary, secondary, or tertiary levels.
-          - The indicator is calculated by subtracting the number of enrolled lower secondary-aged adolescents (regardless of the education level they attend) from the total population in that age group, and expressing the result as a percentage.
-          - These adolescents may have never made the transition from primary school, may have dropped out early, or may be late entrants who haven’t yet re-entered the system.
-          - A high out-of-school rate signals the need for better policies and programmes that promote continued schooling through early adolescence, particularly in underserved communities.
-          - The data is drawn from a combination of administrative records on school enrolment by age and household surveys that track participation in education, compared with population estimates for the relevant age group.
-          - As with all education indicators, results should be interpreted with caution — differences in data sources, how enrolment is defined, and the timing of surveys (especially if conducted late in the school year) may affect the accuracy of estimates.
+        description_key: *description_key_out_school
+        presentation:
+          title_public: Out-of-school rate for adolescents of lower secondary school age
+          grapher_config: *grapher_config_enrolment_bugn
         display:
+          name: Lower secondary school age
+          numDecimalPlaces: 1
+
+      out_of_school_rate_for_children_of_primary_school_age__female__pct__rofst_1_f_cp:
+        title: Out-of-school rate for girls of primary school age
+        description_short: Percentage of girls in the official primary school age group who are not enrolled in any level of education.
+        unit: "%"
+        short_unit: "%"
+        description_key: *description_key_out_school
+        presentation:
+          title_public: Out-of-school rate for girls of primary school age
+          grapher_config: *grapher_config_enrolment_purples
+        display:
+          name: Girls
+          numDecimalPlaces: 1
+
+      out_of_school_rate_for_children_of_primary_school_age__male__pct__rofst_1_m_cp:
+        title: Out-of-school rate for boys of primary school age
+        description_short: Percentage of boys in the official primary school age group who are not enrolled in any level of education.
+        unit: "%"
+        short_unit: "%"
+        description_key: *description_key_out_school
+        presentation:
+          title_public: Out-of-school rate for boys of primary school age
+          grapher_config: *grapher_config_enrolment_blues
+        display:
+          name: Boys
+          numDecimalPlaces: 1
+
+      out_of_school_rate_for_adolescents_of_lower_secondary_school_age__female__pct__rofst_2_f_cp:
+        title: Out-of-school rate for girls of lower secondary school age
+        description_short: Percentage of girls in the official age group for [lower secondary](#dod:lower-secondary-education) education who are not enrolled in school at any level.
+        unit: "%"
+        short_unit: "%"
+        description_key: *description_key_out_school
+        presentation:
+          title_public: Out-of-school rate for girls of lower secondary school age
+          grapher_config: *grapher_config_enrolment_purples
+        display:
+          name: Girls
+          numDecimalPlaces: 1
+
+      out_of_school_rate_for_adolescents_of_lower_secondary_school_age__male__pct__rofst_2_m_cp:
+        title: Out-of-school rate for boys of lower secondary school age
+        description_short: Percentage of boys in the official age group for [lower secondary](#dod:lower-secondary-education) education who are not enrolled in school at any level.
+        unit: "%"
+        short_unit: "%"
+        description_key: *description_key_out_school
+        presentation:
+          title_public: Out-of-school rate for boys of lower secondary school age
+          grapher_config: *grapher_config_enrolment_blues
+        display:
+          name: Boys
+          numDecimalPlaces: 1
+
+      out_of_school_rate_for_youth_of_upper_secondary_school_age__both_sexes__pct__rofst_3_cp:
+        title: Out-of-school rate for youth of upper secondary school age
+        description_short: Percentage of youth in the official age group for [upper secondary](#dod:upper-secondary-education) education who are not enrolled in school at any level.
+        unit: "%"
+        short_unit: "%"
+        description_key: *description_key_out_school
+        presentation:
+          title_public: Out-of-school rate for youth of upper secondary school age
+          grapher_config: *grapher_config_enrolment_bugn
+        display:
+          name: Upper secondary school age
+          numDecimalPlaces: 1
+
+      out_of_school_rate_for_youth_of_upper_secondary_school_age__female__pct__rofst_3_f_cp:
+        title: Out-of-school rate for girls of upper secondary school age
+        description_short: Percentage of girls in the official age group for [upper secondary](#dod:upper-secondary-education) education who are not enrolled in school at any level.
+        unit: "%"
+        short_unit: "%"
+        description_key: *description_key_out_school
+        presentation:
+          title_public: Out-of-school rate for girls of upper secondary school age
+          grapher_config: *grapher_config_enrolment_purples
+        display:
+          name: Girls
+          numDecimalPlaces: 1
+
+      out_of_school_rate_for_youth_of_upper_secondary_school_age__male__pct__rofst_3_m_cp:
+        title: Out-of-school rate for boys of upper secondary school age
+        description_short: Percentage of boys in the official age group for [upper secondary](#dod:upper-secondary-education) education who are not enrolled in school at any level.
+        unit: "%"
+        short_unit: "%"
+        description_key: *description_key_out_school
+        presentation:
+          title_public: Out-of-school rate for boys of upper secondary school age
+          grapher_config: *grapher_config_enrolment_blues
+        display:
+          name: Boys
+          numDecimalPlaces: 1
+
+      out_of_school_rate_for_children_one_year_before_the_official_primary_entry_age__both_sexes__pct__rofst_agm1_cp:
+        title: Out-of-school rate for children one year before official primary entry age
+        description_short: Percentage of children one year before the official primary entry age who are not enrolled in pre-primary education.
+        unit: "%"
+        short_unit: "%"
+        description_key: *description_key_out_school
+        presentation:
+          title_public: Out-of-school rate for children one year before official primary entry age
+          grapher_config: *grapher_config_enrolment_greens
+        display:
+          name: Pre-primary age
+          numDecimalPlaces: 1
+
+      out_of_school_rate_for_children_one_year_before_the_official_primary_entry_age__female__pct__rofst_agm1_f_cp:
+        title: Out-of-school rate for girls one year before official primary entry age
+        description_short: Percentage of girls one year before the official primary entry age who are not enrolled in pre-primary education.
+        unit: "%"
+        short_unit: "%"
+        description_key: *description_key_out_school
+        presentation:
+          title_public: Out-of-school rate for girls one year before official primary entry age
+          grapher_config: *grapher_config_enrolment_purples
+        display:
+          name: Girls
+          numDecimalPlaces: 1
+
+      out_of_school_rate_for_children_one_year_before_the_official_primary_entry_age__male__pct__rofst_agm1_m_cp:
+        title: Out-of-school rate for boys one year before official primary entry age
+        description_short: Percentage of boys one year before the official primary entry age who are not enrolled in pre-primary education.
+        unit: "%"
+        short_unit: "%"
+        description_key: *description_key_out_school
+        presentation:
+          title_public: Out-of-school rate for boys one year before official primary entry age
+          grapher_config: *grapher_config_enrolment_blues
+        display:
+          name: Boys
           numDecimalPlaces: 1
 
       # ========================================================================
@@ -593,118 +773,6 @@ tables:
           - Some limitations include potential discrepancies in how countries define or report "usable" or "functional" toilets, and whether cleanliness, maintenance, or disability access are accounted for.
         display:
           numDecimalPlaces: 1
-
-      proportion_of_students_at_the_end_of_lower_secondary_education_achieving_at_least_a_minimum_proficiency_level_in_reading__both_sexes__pct__read_lowersec:
-        title: Share of students at the end of lower secondary education with minimum reading skills
-        description_short: Percentage of students at [lower secondary](#dod:lower-secondary-education) school age meeting minimum reading proficiency by the end of [lower secondary](#dod:lower-secondary-education) education. This means students can connect main ideas across different text types, understand the author’s intentions, and draw conclusions based on the text. This data omits children who don't attend school.
-        unit: "%"
-        short_unit: "%"
-        description_key:
-          - This indicator shows the percentage of students who reach minimum reading proficiency by the end of lower secondary school.
-          - Minimum proficiency at this level means students can connect ideas across different types of texts, understand the author’s intent, and draw basic conclusions.
-          - It only includes students who are still in school — not those who dropped out or were never enrolled.
-          - Reading skills are measured through standardized tests, such as [PISA](https://www.oecd.org/en/about/programmes/pisa.html) or national assessments.
-          - A higher percentage means more students are developing foundational reading skills before finishing lower secondary education.
-          - Differences in assessment tools, coverage, and standards can affect how results are compared across countries.
-        presentation:
-          title_public: Share of students achieving minimum reading proficiency by the end of lower secondary education
-        display:
-          numDecimalPlaces: 1
-          name: Share achieving reading proficiency by end of lower secondary
-
-      proportion_of_students_at_the_end_of_primary_education_achieving_at_least_a_minimum_proficiency_level_in_reading__both_sexes__pct__read_primary:
-        title: Share of students with minimum reading skills by the end of primary school
-        description_short: Percentage of students at [primary](#dod:primary-education) school age meeting minimum reading proficiency by the end of [primary](#dod:primary-education) education. This means students can identify key ideas in texts and connect them to their own experiences. This data omits children who don't attend school.
-        unit: "%"
-        short_unit: "%"
-        description_key:
-          - This indicator shows the percentage of students who reach minimum reading proficiency by the end of primary school.
-          - Minimum reading proficiency at the end of primary school means students can identify key ideas in simple texts and link them to personal experience.
-          - It only includes students who are still in school — not those who dropped out or never enrolled.
-          - Skills are measured through standardized tests, such as [PIRLS](https://www.iea.nl/studies/iea/pirls) or national assessments.
-          - A higher percentage indicates more students are developing essential literacy by the end of primary school.
-          - Cross-country comparisons may be affected by differences in test design and standards.
-        presentation:
-          title_public: Share of students achieving minimum reading proficiency by the end of primary education
-        display:
-          numDecimalPlaces: 1
-          name: Share achieving reading proficiency by end of primary
-
-      proportion_of_children_young_people_at_the_age_of_lower_secondary_education_prepared_for_the_future_in_reading__both_sexes__pct__prepfuture_2_read:
-        title: Share of children achieving minimum reading proficiency by the end of lower secondary age
-        description_short: Percentage of children at [lower secondary](#dod:lower-secondary-education) school age meeting reading comprehension standards, including the ability to connect main ideas across different text types, understand the author’s intentions, and draw conclusions from the text. This data accounts for school completion rates to estimate reading comprehension skills for all children, not just those in school.
-        unit: "%"
-        short_unit: "%"
-        description_key:
-          - This indicator shows the share of all children who reach minimum reading proficiency by the expected age of completing lower secondary education.
-          - Minimum reading proficiency at this level means children can connect ideas across different types of texts, understand the author’s intent, and draw basic conclusions.
-          - It combines the share of children who complete lower secondary education with the share who meet minimum reading standards.
-          - This captures outcomes across the full population — not just students still in school.
-          - A higher percentage suggests that most children are both completing school and acquiring core reading skills.
-          - Data comes from assessments like [PIRLS](https://www.iea.nl/studies/iea/pirls) and completion estimates from surveys or models.
-          - Comparability may be affected by differences in assessments, definitions, and data timing.
-        presentation:
-          title_public: Share of children achieving minimum reading proficiency by the end of lower secondary age
-        display:
-          numDecimalPlaces: 1
-          name: Share achieving reading proficiency by end of lower secondary
-
-      proportion_of_children_young_people_at_the_age_of_primary_education_prepared_for_the_future_in_reading__both_sexes__pct__prepfuture_1_read:
-        title: Share of children achieving minimum reading proficiency by the end of primary age
-        description_short: Percentage of children at [primary](#dod:primary-education) school age meeting minimum reading proficiency by the end of [primary](#dod:primary-education) education. This means children can identify key ideas in texts and connect them to their own experiences. This data accounts for school completion rates to estimate reading comprehension skills for all children, not just those in school.
-        unit: "%"
-        short_unit: "%"
-        description_key:
-          - This indicator shows the share of all children who reach basic reading proficiency by the expected age of completing primary school.
-          - Minimum reading proficiency at the end of primary school means children can identify key ideas in simple texts and link them to personal experience.
-          - It combines the share of children who complete primary school with the share who meet reading standards.
-          - This reflects outcomes for all children — not just those still in school.
-          - A higher value suggests strong access to education and effective early learning.
-          - Data comes from assessments like [PIRLS](https://www.iea.nl/studies/iea/pirls) and completion estimates from surveys or models.
-          - Limitations include differences in assessment tools, definitions, and the timing of data sources.
-        presentation:
-          title_public: Share of children achieving minimum reading proficiency by the end of primary age
-        display:
-          numDecimalPlaces: 1
-          name: Share achieving reading proficiency by end of primary
-
-      proportion_of_children_young_people_at_the_age_of_lower_secondary_education_prepared_for_the_future_in_mathematics__both_sexes__pct__prepfuture_2_math:
-        title: Share of children achieving minimum math proficiency by the end of lower secondary age
-        description_short: Percentage of children at [lower secondary](#dod:lower-secondary-education) school age meeting minimum math proficiency for the end of [lower secondary](#dod:lower-secondary-education) education. This means children can apply algebra, interpret graphs, and solve real-world problems. This data accounts for school completion rates to estimate reading comprehension skills for all children, not just those in school.
-        unit: "%"
-        short_unit: "%"
-        description_key:
-          - This indicator shows the share of all children who reach minimum math proficiency by the expected age of completing lower secondary school.
-          - Minimum math proficiency at this level means demonstrating skills in computation, solving problems, interpreting tables and graphs, and using algebraic representations.
-          - It combines the percentage of children who complete lower secondary school with the percentage who meet the math benchmark.
-          - This provides a fuller picture of learning outcomes — not just for enrolled students, but for the entire age group.
-          - A higher percentage means more children are both staying in school and acquiring core math skills.
-          - Data comes from international assessments such as [TIMSS](https://timssandpirls.bc.edu/), along with completion estimates based on surveys or models.
-          - Comparability may be affected by gaps in data, different assessment tools, and mismatches in timing between sources.
-        presentation:
-          title_public: Share of children achieving minimum math proficiency by the end of lower secondary age
-        display:
-          numDecimalPlaces: 1
-          name: Share achieving math proficiency by end of lower secondary
-
-      proportion_of_children_young_people_at_the_age_of_primary_education_prepared_for_the_future_in_mathematics__both_sexes__pct__prepfuture_1_math:
-        title: Share of children achieving minimum math proficiency by the end of primary age
-        description_short: Percentage of children at [primary](#dod:primary-education) school age meeting minimum math proficiency for the end of [primary](#dod:primary-education) education. This means children can solve basic problems involving number sense, measurement, and interpreting simple data. This data accounts for school completion rates to estimate reading comprehension skills for all children, not just those in school.
-        unit: "%"
-        short_unit: "%"
-        description_key:
-          - This indicator shows the share of all children who reach minimum math proficiency by the expected age of completing primary school.
-          - Minimum math proficiency at this level means demonstrating skills in computation, solving problems, interpreting tables and graphs, and using algebraic representations.
-          - It combines the percentage of children who complete primary school with the percentage who meet the math benchmark.
-          - This reflects outcomes for the full population — not just those still enrolled.
-          - A higher percentage suggests education systems are enabling most children to complete school and build essential math skills.
-          - Data comes from assessments such as [TIMSS](https://timssandpirls.bc.edu/), along with completion estimates based on household surveys or models.
-          - Differences in assessment coverage, definitions of proficiency, and data timing may affect comparisons across countries.
-        presentation:
-          title_public: Share of children achieving minimum math proficiency by the end of primary age
-        display:
-          numDecimalPlaces: 1
-          name: Share achieving math proficiency by end of primary
 
       # ========================================================================
       # Enrolment ratios
@@ -1077,5 +1145,349 @@ tables:
         display:
           numDecimalPlaces: 0
           name: Tertiary
+
+      # ========================================================================
+      # MINIMUM PROFICIENCY RATES - PREPARED FOR THE FUTURE (All Children)
+      # ========================================================================
+
+      proportion_of_children_young_people_at_the_age_of_lower_secondary_education_prepared_for_the_future_in_mathematics__both_sexes__pct__prepfuture_2_math:
+        title: Share of children achieving minimum math proficiency by the end of lower secondary age
+        description_short: Percentage of children at [lower secondary](#dod:lower-secondary-education) school age meeting minimum math proficiency for the end of [lower secondary](#dod:lower-secondary-education) education. This data accounts for school completion rates to estimate mathematical skills for all children, not just those in school.
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_prof
+        presentation:
+          title_public: Share of children achieving minimum math proficiency by the end of lower secondary age
+          grapher_config: *grapher_config_proficiency_secondary_math
+        display:
+          numDecimalPlaces: 1
+          name: End of lower secondary mathematics
+          tolerance: *display_tolerance
+
+      proportion_of_children_young_people_at_the_age_of_lower_secondary_education_prepared_for_the_future_in_mathematics__female__pct__prepfuture_2_math_f:
+        title: Share of girls achieving minimum math proficiency by the end of lower secondary age
+        description_short: Percentage of girls at [lower secondary](#dod:lower-secondary-education) school age meeting minimum math proficiency for the end of [lower secondary](#dod:lower-secondary-education) education. This data accounts for school completion rates to estimate mathematical skills for all girls, not just those in school.
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_prof
+        presentation:
+          title_public: Share of girls achieving minimum math proficiency by the end of lower secondary age
+          grapher_config: *grapher_config_proficiency_secondary_math
+        display:
+          numDecimalPlaces: 1
+          name: Girls - lower secondary mathematics
+          tolerance: *display_tolerance
+
+      proportion_of_children_young_people_at_the_age_of_lower_secondary_education_prepared_for_the_future_in_mathematics__male__pct__prepfuture_2_math_m:
+        title: Share of boys achieving minimum math proficiency by the end of lower secondary age
+        description_short: Percentage of boys at [lower secondary](#dod:lower-secondary-education) school age meeting minimum math proficiency for the end of [lower secondary](#dod:lower-secondary-education) education. This data accounts for school completion rates to estimate mathematical skills for all boys, not just those in school.
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_prof
+        presentation:
+          title_public: Share of boys achieving minimum math proficiency by the end of lower secondary age
+          grapher_config: *grapher_config_proficiency_secondary_math
+        display:
+          numDecimalPlaces: 1
+          name: Boys - lower secondary mathematics
+          tolerance: *display_tolerance
+
+      proportion_of_children_young_people_at_the_age_of_lower_secondary_education_prepared_for_the_future_in_reading__both_sexes__pct__prepfuture_2_read:
+        title: Share of children achieving minimum reading proficiency by the end of lower secondary age
+        description_short: Percentage of children at [lower secondary](#dod:lower-secondary-education) school age meeting reading comprehension standards. This data accounts for school completion rates to estimate reading skills for all children, not just those in school.
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_prof
+        presentation:
+          title_public: Share of children achieving minimum reading proficiency by the end of lower secondary age
+          grapher_config: *grapher_config_proficiency_secondary_reading
+        display:
+          numDecimalPlaces: 1
+          name: End of lower secondary reading
+          tolerance: *display_tolerance
+
+      proportion_of_children_young_people_at_the_age_of_lower_secondary_education_prepared_for_the_future_in_reading__female__pct__prepfuture_2_read_f:
+        title: Share of girls achieving minimum reading proficiency by the end of lower secondary age
+        description_short: Percentage of girls at [lower secondary](#dod:lower-secondary-education) school age meeting reading comprehension standards. This data accounts for school completion rates to estimate reading skills for all girls, not just those in school.
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_prof
+        presentation:
+          title_public: Share of girls achieving minimum reading proficiency by the end of lower secondary age
+          grapher_config: *grapher_config_proficiency_secondary_reading
+        display:
+          numDecimalPlaces: 1
+          name: End of lower secondary reading
+          tolerance: *display_tolerance
+
+      proportion_of_children_young_people_at_the_age_of_lower_secondary_education_prepared_for_the_future_in_reading__male__pct__prepfuture_2_read_m:
+        title: Share of boys achieving minimum reading proficiency by the end of lower secondary age
+        description_short: Percentage of boys at [lower secondary](#dod:lower-secondary-education) school age meeting reading comprehension standards. This data accounts for school completion rates to estimate reading skills for all boys, not just those in school.
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_prof
+        presentation:
+          title_public: Share of boys achieving minimum reading proficiency by the end of lower secondary age
+          grapher_config: *grapher_config_proficiency_secondary_reading
+        display:
+          numDecimalPlaces: 1
+          name: Boys - lower secondary reading
+          tolerance: *display_tolerance
+
+      proportion_of_children_young_people_at_the_age_of_primary_education_prepared_for_the_future_in_mathematics__both_sexes__pct__prepfuture_1_math:
+        title: Share of children achieving minimum math proficiency by the end of primary age
+        description_short: Percentage of children at [primary](#dod:primary-education) school age meeting minimum math proficiency for the end of [primary](#dod:primary-education) education. This data accounts for school completion rates to estimate mathematical skills for all children, not just those in school.
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_prof
+        presentation:
+          title_public: Share of children achieving minimum math proficiency by the end of primary age
+          grapher_config: *grapher_config_proficiency_primary_math
+        display:
+          numDecimalPlaces: 1
+          name: Primary mathematics
+          tolerance: *display_tolerance
+
+      proportion_of_children_young_people_at_the_age_of_primary_education_prepared_for_the_future_in_mathematics__female__pct__prepfuture_1_math_f:
+        title: Share of girls achieving minimum math proficiency by the end of primary age
+        description_short: Percentage of girls at [primary](#dod:primary-education) school age meeting minimum math proficiency for the end of [primary](#dod:primary-education) education. This data accounts for school completion rates to estimate mathematical skills for all girls, not just those in school.
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_prof
+        presentation:
+          title_public: Share of girls achieving minimum math proficiency by the end of primary age
+          grapher_config: *grapher_config_proficiency_primary_math
+        display:
+          numDecimalPlaces: 1
+          name: Girls - primary mathematics
+          tolerance: *display_tolerance
+
+      proportion_of_children_young_people_at_the_age_of_primary_education_prepared_for_the_future_in_mathematics__male__pct__prepfuture_1_math_m:
+        title: Share of boys achieving minimum math proficiency by the end of primary age
+        description_short: Percentage of boys at [primary](#dod:primary-education) school age meeting minimum math proficiency for the end of [primary](#dod:primary-education) education. This data accounts for school completion rates to estimate mathematical skills for all boys, not just those in school.
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_prof
+        presentation:
+          title_public: Share of boys achieving minimum math proficiency by the end of primary age
+          grapher_config: *grapher_config_proficiency_primary_math
+        display:
+          numDecimalPlaces: 1
+          name: Boys - primary mathematics
+          tolerance: *display_tolerance
+
+      proportion_of_children_young_people_at_the_age_of_primary_education_prepared_for_the_future_in_reading__both_sexes__pct__prepfuture_1_read:
+        title: Share of children achieving minimum reading proficiency by the end of primary age
+        description_short: Percentage of children at [primary](#dod:primary-education) school age meeting minimum reading proficiency by the end of [primary](#dod:primary-education) education. This data accounts for school completion rates to estimate reading skills for all children, not just those in school.
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_prof
+        presentation:
+          title_public: Share of children achieving minimum reading proficiency by the end of primary age
+          grapher_config: *grapher_config_proficiency_primary_reading
+        display:
+          numDecimalPlaces: 1
+          name: Primary reading
+          tolerance: *display_tolerance
+
+      proportion_of_children_young_people_at_the_age_of_primary_education_prepared_for_the_future_in_reading__female__pct__prepfuture_1_read_f:
+        title: Share of girls achieving minimum reading proficiency by the end of primary age
+        description_short: Percentage of girls at [primary](#dod:primary-education) school age meeting minimum reading proficiency by the end of [primary](#dod:primary-education) education. This data accounts for school completion rates to estimate reading skills for all girls, not just those in school.
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_prof
+        presentation:
+          title_public: Share of girls achieving minimum reading proficiency by the end of primary age
+          grapher_config: *grapher_config_proficiency_primary_reading
+        display:
+          numDecimalPlaces: 1
+          name: Girls - primary reading
+          tolerance: *display_tolerance
+
+      proportion_of_children_young_people_at_the_age_of_primary_education_prepared_for_the_future_in_reading__male__pct__prepfuture_1_read_m:
+        title: Share of boys achieving minimum reading proficiency by the end of primary age
+        description_short: Percentage of boys at [primary](#dod:primary-education) school age meeting minimum reading proficiency by the end of [primary](#dod:primary-education) education. This data accounts for school completion rates to estimate reading skills for all boys, not just those in school.
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_prof
+        presentation:
+          title_public: Share of boys achieving minimum reading proficiency by the end of primary age
+          grapher_config: *grapher_config_proficiency_primary_reading
+        display:
+          numDecimalPlaces: 1
+          name: Boys - primary reading
+          tolerance: *display_tolerance
+
+      # ========================================================================
+      # MINIMUM PROFICIENCY RATES - STUDENTS ONLY
+      # ========================================================================
+
+      proportion_of_students_at_the_end_of_lower_secondary_education_achieving_at_least_a_minimum_proficiency_level_in_mathematics__both_sexes__pct__math_lowersec:
+        title: Share of students at the end of lower secondary education with minimum math skills
+        description_short: Percentage of students at [lower secondary](#dod:lower-secondary-education) school age meeting minimum math proficiency by the end of [lower secondary](#dod:lower-secondary-education) education. This data omits children who don't attend school.
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_prof
+        presentation:
+          title_public: Share of students achieving minimum math proficiency by the end of lower secondary education
+          grapher_config: *grapher_config_proficiency_secondary_math
+        display:
+          numDecimalPlaces: 1
+          name: Students - lower secondary mathematics
+          tolerance: *display_tolerance
+
+      proportion_of_students_at_the_end_of_lower_secondary_education_achieving_at_least_a_minimum_proficiency_level_in_mathematics__female__pct__math_lowersec_f:
+        title: Share of female students at the end of lower secondary education with minimum math skills
+        description_short: Percentage of female students at [lower secondary](#dod:lower-secondary-education) school age meeting minimum math proficiency by the end of [lower secondary](#dod:lower-secondary-education) education. This data omits girls who don't attend school.
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_prof
+        presentation:
+          title_public: Share of female students achieving minimum math proficiency by the end of lower secondary education
+          grapher_config: *grapher_config_proficiency_secondary_math
+        display:
+          numDecimalPlaces: 1
+          name: Female students - lower secondary mathematics
+          tolerance: *display_tolerance
+
+      proportion_of_students_at_the_end_of_lower_secondary_education_achieving_at_least_a_minimum_proficiency_level_in_mathematics__male__pct__math_lowersec_m:
+        title: Share of male students at the end of lower secondary education with minimum math skills
+        description_short: Percentage of male students at [lower secondary](#dod:lower-secondary-education) school age meeting minimum math proficiency by the end of [lower secondary](#dod:lower-secondary-education) education. This data omits boys who don't attend school.
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_prof
+        presentation:
+          title_public: Share of male students achieving minimum math proficiency by the end of lower secondary education
+          grapher_config: *grapher_config_proficiency_secondary_math
+        display:
+          numDecimalPlaces: 1
+          name: Male students - lower secondary mathematics
+          tolerance: *display_tolerance
+
+      proportion_of_students_at_the_end_of_lower_secondary_education_achieving_at_least_a_minimum_proficiency_level_in_reading__both_sexes__pct__read_lowersec:
+        title: Share of students at the end of lower secondary education with minimum reading skills
+        description_short: Percentage of students at [lower secondary](#dod:lower-secondary-education) school age meeting minimum reading proficiency by the end of [lower secondary](#dod:lower-secondary-education) education. This data omits children who don't attend school.
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_prof
+        presentation:
+          title_public: Share of students achieving minimum reading proficiency by the end of lower secondary education
+          grapher_config: *grapher_config_proficiency_secondary_reading
+        display:
+          numDecimalPlaces: 1
+          name: Students - lower secondary reading
+          tolerance: *display_tolerance
+
+      proportion_of_students_at_the_end_of_lower_secondary_education_achieving_at_least_a_minimum_proficiency_level_in_reading__female__pct__read_lowersec_f:
+        title: Share of female students at the end of lower secondary education with minimum reading skills
+        description_short: Percentage of female students at [lower secondary](#dod:lower-secondary-education) school age meeting minimum reading proficiency by the end of [lower secondary](#dod:lower-secondary-education) education. This data omits girls who don't attend school.
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_prof
+        presentation:
+          title_public: Share of female students achieving minimum reading proficiency by the end of lower secondary education
+          grapher_config: *grapher_config_proficiency_secondary_reading
+        display:
+          numDecimalPlaces: 1
+          name: Female students - lower secondary reading
+          tolerance: *display_tolerance
+
+      proportion_of_students_at_the_end_of_lower_secondary_education_achieving_at_least_a_minimum_proficiency_level_in_reading__male__pct__read_lowersec_m:
+        title: Share of male students at the end of lower secondary education with minimum reading skills
+        description_short: Percentage of male students at [lower secondary](#dod:lower-secondary-education) school age meeting minimum reading proficiency by the end of [lower secondary](#dod:lower-secondary-education) education. This data omits boys who don't attend school.
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_prof
+        presentation:
+          title_public: Share of male students achieving minimum reading proficiency by the end of lower secondary education
+          grapher_config: *grapher_config_proficiency_secondary_reading
+        display:
+          numDecimalPlaces: 1
+          name: Male students - lower secondary reading
+          tolerance: *display_tolerance
+
+      proportion_of_students_at_the_end_of_primary_education_achieving_at_least_a_minimum_proficiency_level_in_mathematics__both_sexes__pct__math_primary:
+        title: Share of students with minimum math skills by the end of primary school
+        description_short: Percentage of students at [primary](#dod:primary-education) school age meeting minimum math proficiency by the end of [primary](#dod:primary-education) education. This data omits children who don't attend school.
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_prof
+        presentation:
+          title_public: Share of students achieving minimum math proficiency by the end of primary education
+          grapher_config: *grapher_config_proficiency_primary_math
+        display:
+          numDecimalPlaces: 1
+          name: Students - primary mathematics
+          tolerance: *display_tolerance
+
+      proportion_of_students_at_the_end_of_primary_education_achieving_at_least_a_minimum_proficiency_level_in_mathematics__female__pct__math_primary_f:
+        title: Share of female students with minimum math skills by the end of primary school
+        description_short: Percentage of female students at [primary](#dod:primary-education) school age meeting minimum math proficiency by the end of [primary](#dod:primary-education) education. This data omits girls who don't attend school.
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_prof
+        presentation:
+          title_public: Share of female students achieving minimum math proficiency by the end of primary education
+          grapher_config: *grapher_config_proficiency_primary_math
+        display:
+          numDecimalPlaces: 1
+          name: Female students - primary mathematics
+          tolerance: *display_tolerance
+
+      proportion_of_students_at_the_end_of_primary_education_achieving_at_least_a_minimum_proficiency_level_in_mathematics__male__pct__math_primary_m:
+        title: Share of male students with minimum math skills by the end of primary school
+        description_short: Percentage of male students at [primary](#dod:primary-education) school age meeting minimum math proficiency by the end of [primary](#dod:primary-education) education. This data omits boys who don't attend school.
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_prof
+        presentation:
+          title_public: Share of male students achieving minimum math proficiency by the end of primary education
+          grapher_config: *grapher_config_proficiency_primary_math
+        display:
+          numDecimalPlaces: 1
+          name: Male students - primary mathematics
+          tolerance: *display_tolerance
+
+      proportion_of_students_at_the_end_of_primary_education_achieving_at_least_a_minimum_proficiency_level_in_reading__both_sexes__pct__read_primary:
+        title: Share of students with minimum reading skills by the end of primary school
+        description_short: Percentage of students at [primary](#dod:primary-education) school age meeting minimum reading proficiency by the end of [primary](#dod:primary-education) education. This data omits children who don't attend school.
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_prof
+        presentation:
+          title_public: Share of students achieving minimum reading proficiency by the end of primary education
+          grapher_config: *grapher_config_proficiency_primary_reading
+        display:
+          numDecimalPlaces: 1
+          name: Students - primary reading
+          tolerance: *display_tolerance
+
+      proportion_of_students_at_the_end_of_primary_education_achieving_at_least_a_minimum_proficiency_level_in_reading__female__pct__read_primary_f:
+        title: Share of female students with minimum reading skills by the end of primary school
+        description_short: Percentage of female students at [primary](#dod:primary-education) school age meeting minimum reading proficiency by the end of [primary](#dod:primary-education) education. This data omits girls who don't attend school.
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_prof
+        presentation:
+          title_public: Share of female students achieving minimum reading proficiency by the end of primary education
+          grapher_config: *grapher_config_proficiency_primary_reading
+        display:
+          numDecimalPlaces: 1
+          name: Female students - primary reading
+          tolerance: *display_tolerance
+
+      proportion_of_students_at_the_end_of_primary_education_achieving_at_least_a_minimum_proficiency_level_in_reading__male__pct__read_primary_m:
+        title: Share of male students with minimum reading skills by the end of primary school
+        description_short: Percentage of male students at [primary](#dod:primary-education) school age meeting minimum reading proficiency by the end of [primary](#dod:primary-education) education. This data omits boys who don't attend school.
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_prof
+        presentation:
+          title_public: Share of male students achieving minimum reading proficiency by the end of primary education
+          grapher_config: *grapher_config_proficiency_primary_reading
+        display:
+          numDecimalPlaces: 1
+          name: Male students - primary reading
+          tolerance: *display_tolerance
 
 
