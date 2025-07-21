@@ -875,30 +875,6 @@ def _format_list_metadata(key: str, value: list) -> str:
         return ", ".join(str(item) for item in value)
 
 
-def _should_skip_export() -> bool:
-    """Check if Google Sheets export should be skipped."""
-    return not CLIENT_SECRET_FILE or not CLIENT_SECRET_FILE.exists() or OWID_ENV.env_local != "dev"
-
-
-def _sanitize_sheet_name(name: str) -> str:
-    """Sanitize sheet name for Google Sheets compatibility."""
-    sanitized = name.replace("/", "_").replace("\\", "_").replace(":", "_")
-    return sanitized[: GSHEET_EXPORT_CONFIG["MAX_SHEET_NAME_LENGTH"]]
-
-
-def _validate_inputs(table: Table, sheet_title: str) -> bool:
-    """Validate inputs for export function."""
-    if not isinstance(table, Table):
-        print("Error: table must be an OWID catalog Table")
-        return False
-
-    if not sheet_title or not sheet_title.strip():
-        print("Error: sheet_title cannot be empty")
-        return False
-
-    return True
-
-
 def _prepare_dataframe(table: Table) -> pd.DataFrame:
     """Convert table to DataFrame and optimize for Google Sheets."""
     df = table.reset_index()
@@ -1055,8 +1031,7 @@ def _create_metadata_dataframes(
             if metadata_rows:
                 # Create DataFrame with proper column headers
                 metadata_df = pd.DataFrame(metadata_rows, columns=["Property", "Value"])
-                clean_name = _sanitize_sheet_name(column_name)
-                metadata_dfs[f"metadata_{clean_name}"] = metadata_df
+                metadata_dfs[f"metadata_{column_name}"] = metadata_df
 
         except Exception as e:
             print(f"Warning: Could not process metadata for column '{column_name}': {e}")
@@ -1076,50 +1051,31 @@ def export_table_to_gsheet(
     metadata_variables: Optional[List[str]] = None,
 ) -> tuple[str, str]:
     """Export a Table to Google Sheets with improved error handling and performance."""
-    import time
+    if not CLIENT_SECRET_FILE or not CLIENT_SECRET_FILE.exists() or OWID_ENV.env_local != "dev":
+        try:
+            # Sanitize sheet title
+            sheet_title = sheet_title.strip()[: GSHEET_EXPORT_CONFIG["MAX_TITLE_LENGTH"]]
 
-    start_time = time.time()
+            # Convert and validate data
+            df = _prepare_dataframe(table)
 
-    try:
-        # Input validation
-        if not _validate_inputs(table, sheet_title):
+            # Create or update sheet
+            sheet = _update_or_create_sheet(sheet_title, folder_id, df, update_existing)
+
+            # Write main data
+            _write_main_data(sheet, df)
+
+            # Add metadata if requested
+            if include_metadata:
+                _add_metadata_tabs(sheet, table, metadata_variables)
+
+            # Set permissions
+            _set_permissions(sheet.sheet_id, role, general_access)
+
+            return sheet.url, sheet.sheet_id
+
+        except Exception as e:
             return "", ""
-
-        # Sanitize sheet title
-        sheet_title = sheet_title.strip()[: GSHEET_EXPORT_CONFIG["MAX_TITLE_LENGTH"]]
-
-        # Early exit if credentials not available
-        if _should_skip_export():
-            print(
-                "Warning: Google API credentials not found or script is not running locally. Skipping Google Sheets export."
-            )
-            return "", ""
-
-        # Convert and validate data
-        df = _prepare_dataframe(table)
-
-        # Create or update sheet
-        sheet = _update_or_create_sheet(sheet_title, folder_id, df, update_existing)
-
-        # Write main data
-        _write_main_data(sheet, df)
-
-        # Add metadata if requested
-        if include_metadata:
-            _add_metadata_tabs(sheet, table, metadata_variables)
-
-        # Set permissions
-        _set_permissions(sheet.sheet_id, role, general_access)
-
-        duration = time.time() - start_time
-        print(f"Export completed in {duration:.2f} seconds")
-
-        return sheet.url, sheet.sheet_id
-
-    except Exception as e:
-        duration = time.time() - start_time
-        print(f"Export failed after {duration:.2f} seconds: {e}")
-        return "", ""
 
 
 @retry_on_network_error()
