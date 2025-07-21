@@ -26,4 +26,4 @@ meta:
 outs:
   - md5: 14ff3b5fabd195862303b10a2e98aff5
     size: 538000
-    path: cder_approvals.xlsx
+    path: cder_approvals.csv

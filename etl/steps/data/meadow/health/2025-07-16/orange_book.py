@@ -29,7 +29,9 @@ def run() -> None:
                 sep="~",
             )
 
-    tb = Table(df)
+    snap_meta = snap.to_table_metadata()
+
+    tb = Table(df, metadata=snap_meta, short_name="orange_book")
 
     # Remove products with higher product number but same Application number and same ingredients as a product with lower product number.
     tb = tb.sort_values("Product_No")
@@ -41,7 +43,7 @@ def run() -> None:
     # Process data.
     #
     # Improve tables format.
-    tables = [tb.format(["country", "year"])]
+    tables = [tb.format(["appl_no", "product_no", "ingredient"])]
 
     #
     # Save outputs.

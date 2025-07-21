@@ -12,10 +12,18 @@ def run() -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = paths.load_dataset("drug_approvals")
+    ds_cder = paths.load_dataset("cder_approvals")
+    # ds_drugs_fda = paths.load_dataset("drugs_approvals")
+    ds_orange_book = paths.load_dataset("orange_book")
+    ds_purple_book = paths.load_dataset("purple_book")
 
     # Read table from meadow dataset.
-    tb = ds_meadow.read("drug_approvals")
+    tb_cder = ds_cder.read("cder_approvals")
+    # tb_drugs_fda_sub = ds_drugs_fda.read("drugs_fda_submissions")
+    # tb_drugs_fda_products = ds_drugs_fda.read("drugs_fda_products")
+    # tb_open_fda = ds_drugs_fda.read("drugs_open_fda")
+    tb_orange_book = ds_orange_book.read("orange_book")
+    tb_purple_book = ds_purple_book.read("purple_book")
 
     #
     # Process data.
@@ -32,7 +40,7 @@ def run() -> None:
     # Save outputs.
     #
     # Initialize a new garden dataset.
-    ds_garden = paths.create_dataset(tables=[tb], default_metadata=ds_meadow.metadata)
+    ds_garden = paths.create_dataset(tables=[tb])
 
     # Save garden dataset.
     ds_garden.save()

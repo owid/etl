@@ -11,7 +11,7 @@ from etl.helpers import PathFinder
 paths = PathFinder(__file__)
 
 
-def results_to_tables(data):
+def results_to_tables(data, snap):
     """Converts results from the JSON data into a structured table format.
     Uses one table for submission data and another for product data.
     """
@@ -57,7 +57,12 @@ def results_to_tables(data):
     # Total missing products: 362, 1.28% of total.
     # Total missing fda information: 16087, 56.68% of total.
 
-    return Table(submissions), Table(products), Table(open_fda)
+    snap_meta = snap.to_table_metadata()
+
+    tb_sub = Table(submissions, metadata=snap_meta, short_name="drugs_fda_submissions")
+    tb_products = Table(products, metadata=snap_meta, short_name="drugs_fda_products")
+    tb_open_fda = Table(open_fda, metadata=snap_meta, short_name="drugs_open_fda")
+    return tb_sub, tb_products, tb_open_fda
 
 
 def run() -> None:
@@ -72,18 +77,17 @@ def run() -> None:
         with z.open("drug-drugsfda-0001-of-0001.json") as f:
             data = json.load(f)
 
-    tb_sub, tb_products, tb_open_fda = results_to_tables(data)
+    tb_sub, tb_products, tb_open_fda = results_to_tables(data, snap)
 
     #
     # Process data.
     #
     # Improve tables format.
 
-    tb_sub = tb_sub.format(["application_number"], short_name="drugs_fda_submissions")
-    tb_products = tb_products.format(["application_number"], short_name="drugs_fda_products")
+    tb_products = tb_products.format(["application_number", "product_number"], short_name="drugs_fda_products")
     tb_open_fda = tb_open_fda.format(["application_number"], short_name="drugs_open_fda")
 
-    tables = [tb_sub, tb_products, tb_open_fda]
+    tables = [tb_products, tb_open_fda]
 
     #
     # Save outputs.
