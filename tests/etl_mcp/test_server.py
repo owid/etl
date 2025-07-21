@@ -7,7 +7,7 @@ import base64
 import pytest
 from fastmcp import Client
 
-from owid_mcp.server import mcp
+from owid_mcp.server_complex import mcp
 
 
 @pytest.mark.asyncio
