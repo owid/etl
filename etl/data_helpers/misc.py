@@ -1,6 +1,7 @@
 """General data tools."""
 
 import math
+import os
 import random
 import time
 from datetime import date, datetime
@@ -37,7 +38,7 @@ GSHEET_EXPORT_CONFIG = {
     },
 }
 DEFAULT_TEAM_FOLDER_NAME = "ETL GSheet Exports"
-OWID_SHARED_FOLDER_ID = "1qH0uBtO5KLvdew8X6u-lF75E4uKHSrjp"  # Folder ID
+OWID_SHARED_FOLDER_ID = os.getenv("OWID_SHARED_FOLDER_ID")
 
 
 def check_known_columns(df: pd.DataFrame, known_cols: list) -> None:
