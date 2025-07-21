@@ -15,25 +15,23 @@ from etl.analytics import (
     get_post_views_by_chart_id,
     get_visualizations_using_data_by_producer,
 )
+from etl.config import (
+    DATA_PRODUCER_REPORT_FOLDER_ID,
+    DATA_PRODUCER_REPORT_HALFYEARLY_TEMPLATE_ID,
+    DATA_PRODUCER_REPORT_QUARTERLY_TEMPLATE_ID,
+    DATA_PRODUCER_REPORT_STATUS_SHEET_ID,
+    DATA_PRODUCER_REPORT_YEARLY_TEMPLATE_ID,
+)
 from etl.data_helpers.misc import humanize_number
 from etl.db import get_engine
 from etl.google import GoogleDoc, GoogleDrive, GoogleSheet
-from etl.notion import get_data_producer_contacts, get_impact_highlights
+from etl.notion import get_data_producer_contacts
 
 # Initialize logger.
 log = get_logger()
 
 # Initialize database engine.
 engine = get_engine()
-
-# Folder ID for reports.
-FOLDER_ID = "1SySOSNXgNLEJe2L1k7985p-zSeUoU4kN"
-
-# Document ID of template.
-TEMPLATE_ID = "149cLrJK9VI-BNjnM-LxnWgbQoB7mwjSpgjO497rzxeU"
-
-# Document ID of reports status sheet.
-STATUS_SHEET_ID = "1CLM4EKiu0DZaNz5BFdDvMvCxbveKUHCsgNd-a4Fumnk"
 
 # Common definitions of quarters.
 QUARTERS = {
@@ -166,7 +164,7 @@ class Report:
 
         # Check if this report already exists in Google Drive
         google_drive = GoogleDrive()
-        files = google_drive.list_files_in_folder(folder_id=FOLDER_ID)
+        files = google_drive.list_files_in_folder(folder_id=DATA_PRODUCER_REPORT_FOLDER_ID)
 
         self.doc_id: str | None = None
         self.pdf_id: str | None = None
@@ -221,7 +219,7 @@ class Report:
     @property
     def folder_link(self) -> str:
         """Get the folder link where reports are stored."""
-        return f"https://drive.google.com/drive/folders/{FOLDER_ID}"
+        return f"https://drive.google.com/drive/folders/{DATA_PRODUCER_REPORT_FOLDER_ID}"
 
     @property
     def exists(self) -> bool:
@@ -243,19 +241,6 @@ class Report:
         else:
             return "Both Google Doc and PDF exist"
 
-    def print_status_with_links(self) -> None:
-        """Get a detailed status including links."""
-        folder_text = f"📁 Folder: {self.folder_link}"
-        if not self.exists:
-            text = "Not created"
-        elif not self.has_pdf:
-            text = f"Google Doc exists (no PDF)\n  📄 Doc: {self.doc_link}\n  {folder_text}"
-        else:
-            text = (
-                f"Both Google Doc and PDF exist\n  📄 Doc: {self.doc_link}\n  📋 PDF: {self.pdf_link}\n  {folder_text}"
-            )
-        log.info(text)
-
     def gather_analytics(self) -> None:
         """Gather analytics data for this report."""
         log.info(f"Gathering analytics for {self.producer} Q{self.quarter} {self.year}")
@@ -270,7 +255,7 @@ class Report:
 
         # Initialize Google Drive and copy template.
         google_drive = GoogleDrive()
-        self.doc_id = google_drive.copy(file_id=TEMPLATE_ID, body={"name": self.title})
+        self.doc_id = google_drive.copy(file_id=DATA_PRODUCER_REPORT_QUARTERLY_TEMPLATE_ID, body={"name": self.title})
         self.google_doc = GoogleDoc(doc_id=self.doc_id)
 
         # Populate the document.
@@ -421,8 +406,11 @@ class Report:
         self.gather_analytics()
 
         # Get impact highlights
-        highlights = get_impact_highlights(producers=[self.producer], min_date=self.min_date, max_date=self.max_date)
-        print_impact_highlights(highlights=highlights)
+        ################################################################################################################
+        # TODO: Uncomment after refactoring.
+        # highlights = get_impact_highlights(producers=[self.producer], min_date=self.min_date, max_date=self.max_date)
+        # print_impact_highlights(highlights=highlights)
+        ################################################################################################################
 
         # Create the report
         self.create_google_doc()
@@ -481,11 +469,19 @@ def print_impact_highlights(highlights: pd.DataFrame) -> None:
     help="Grant permissions to data providers to access PDF file.",
 )
 def run(producer, quarter, year, overwrite_pdf, grant_permissions):
+    # First check if all required definitions of Google Drive, Doc and Sheet IDs are in place.
+    for drive_id in [
+        DATA_PRODUCER_REPORT_FOLDER_ID,
+        DATA_PRODUCER_REPORT_QUARTERLY_TEMPLATE_ID,
+        DATA_PRODUCER_REPORT_HALFYEARLY_TEMPLATE_ID,
+        DATA_PRODUCER_REPORT_YEARLY_TEMPLATE_ID,
+        DATA_PRODUCER_REPORT_STATUS_SHEET_ID,
+    ]:
+        error = "Your .env file should contain all definitions of DATA_PRODUCER_REPORT_*_ID (see .env.example)."
+        assert drive_id != "", error
+
     # Create report instance (it will automatically check for existing reports).
     report = Report(producer, quarter, year)
-
-    # Print status with links.
-    report.print_status_with_links()
 
     if report.exists:
         log.warning(f"Google Doc report already exists for {producer} Q{quarter} {year}")
@@ -522,7 +518,7 @@ def run(producer, quarter, year, overwrite_pdf, grant_permissions):
             "shared with producer on": [None],
         }
     )
-    sheet = GoogleSheet(sheet_id=STATUS_SHEET_ID)
+    sheet = GoogleSheet(sheet_id=DATA_PRODUCER_REPORT_STATUS_SHEET_ID)
     sheet.append_dataframe(df=df, sheet_name="status")
 
 
