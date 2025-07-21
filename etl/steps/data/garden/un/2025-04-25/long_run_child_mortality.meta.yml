@@ -33,6 +33,9 @@ tables:
         title: Source used
         description_short: This variable is a combination of data from Gapminder and UN IGME, this shows the source used for each data point.
         unit: ""
+      source_url:
+        title: Source URL
+        unit: ""
       child_mortality_rate:
         title: Child mortality rate
         unit: deaths per 100 live births
