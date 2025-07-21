@@ -88,7 +88,7 @@ tables:
             <% if counterpart_country == 'Intraregional' %>
             << counterpart_country >> trade balance
             <% elif counterpart_country != 'Intraregional' %>
-            Trade balance with << counterpart_country >>
+             << counterpart_country >>'s trade balance
             <%- endif -%>
 
       share_of_total_trade:
