@@ -56,7 +56,6 @@ def clean_historical_overlaps(tb: Table, country_col="country") -> Table:
 # Column name constants
 EXPORT_COL = "Exports of goods, Free on board (FOB), US dollar"
 IMPORT_COL = "Imports of goods, Cost insurance freight (CIF), US dollar"
-TRADE_BALANCE_COL = "Trade balance goods, US dollar"
 
 SHARE_COLUMNS = [
     "country",
@@ -109,7 +108,7 @@ def calculate_trade_shares(tb: Table) -> Table:
     tb["total_trade_volume"] = tb["total_exports"] + tb["total_imports"]
     tb["bilateral_trade_volume"] = tb[EXPORT_COL] + tb[IMPORT_COL]
 
-    tb["trade_balance_goods__share"] = (tb[TRADE_BALANCE_COL]) / tb["bilateral_trade_volume"] * 100
+    tb["trade_balance_goods__share"] = (tb[EXPORT_COL] - tb[IMPORT_COL]) / tb["bilateral_trade_volume"] * 100
     tb["share_of_total_trade"] = tb["bilateral_trade_volume"] / tb["total_trade_volume"] * 100
 
     return tb
