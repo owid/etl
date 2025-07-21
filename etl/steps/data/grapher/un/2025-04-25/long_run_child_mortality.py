@@ -1,10 +1,13 @@
 """Load a garden dataset and create a grapher dataset."""
 
+from structlog import get_logger
+
 from etl.data_helpers.misc import export_table_to_gsheet, get_team_folder_id
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+log = get_logger()
 
 
 def run() -> None:
@@ -27,8 +30,7 @@ def run() -> None:
         metadata_variables=["child_mortality_rate"],
     )
 
-    print(f"Google Sheet exported successfully. URL: {sheet_url}, ID: {sheet_id}")
-    # Process data.
+    log.info(f"Google Sheet exported successfully. URL: {sheet_url}, ID: {sheet_id}")  # Process data.
     # Dropping columns we only want in the GSheet and not in grapher
     tb = tb.drop(columns=["source_url"])
     tb_sel = tb_sel.drop(columns=["source_url"])

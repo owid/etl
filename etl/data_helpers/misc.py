@@ -11,6 +11,7 @@ from typing import Any, Dict, Iterable, List, Literal, Optional, Set, TypeVar, U
 import owid.catalog.processing as pr
 import pandas as pd
 import plotly.express as px
+from googleapiclient.errors import HttpError
 from owid.catalog import Table
 from owid.datautils import dataframes
 from tqdm.auto import tqdm
@@ -1159,8 +1160,10 @@ def _update_or_create_sheet(
             sheet.clear_sheet_data(first_sheet_name)
             sheet.write_dataframe(df, sheet_name=first_sheet_name)
             return sheet
+    except HttpError as e:
+        print(f"Warning: Google Drive API error while updating existing sheet: {e}")
     except Exception as e:
-        print(f"Warning: Could not update existing sheet: {e}")
+        print(f"Critical: Unexpected error while updating existing sheet: {e}")
 
     # Fallback to creating new sheet in the specified folder
     return _create_google_sheet(sheet_title, folder_id)
@@ -1242,9 +1245,12 @@ def create_or_get_shared_folder(
 
         return folder_id
 
-    except Exception as e:
-        print(f"Warning: Could not create/access folder '{folder_name}': {e}")
+    except HttpError as e:
+        print(f"HTTP error occurred while creating/accessing folder '{folder_name}': {e}")
         return None
+    except Exception as e:
+        print(f"Unexpected error occurred while creating/accessing folder '{folder_name}': {e}")
+        raise
 
 
 def setup_owid_team_folder() -> Optional[str]:

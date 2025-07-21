@@ -905,9 +905,8 @@ class GoogleSheet:
             # If we can't check/create sheets, try to create anyway
             try:
                 self.add_sheet(sheet_name)
-            except Exception:
-                raise RuntimeError(f"Failed to create or clear sheet '{sheet_name}'. Error: {e}")
-
+            except Exception as inner_exception:
+                log.error(f"Failed to add sheet '{sheet_name}' in the inner exception block.", exc_info=inner_exception)
         # Convert DataFrame to list of lists
         values = []
 
