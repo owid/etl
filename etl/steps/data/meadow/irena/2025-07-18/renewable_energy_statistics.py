@@ -72,7 +72,7 @@ def sanity_check_inputs(tables: Dict[str, Table]) -> None:
         .dropna()
         .reset_index(drop=True)
     )
-    error = "Unexpected mismatch between data from 'Country' and 'All Data' sheets."
+    error = "Unexpected mismatch between data from 'Country' and 'Pivot' sheets."
     assert check[check["Sum of Electricity Installed Capacity (MW)"] != check["check"]].empty, error
 
 
