@@ -8,28 +8,28 @@ meta:
       Some technologies include others, following this schema:
 
       - Total renewable capacity (on-grid and off-grid)
-      - Hydropower
-      - Renewable hydropower (including mixed plants)
-      - Pumped storage (note that this is included in total hydropower capacity, but not in total renewable capacity)
-      - Marine energy
-      - Wind energy
-      - Onshore wind energy
-      - Offshore wind energy
-      - Solar energy
-      - Solar photovoltaic
-      - Concentrated solar power
-      - Bioenergy
-      - Solid biofuels and renewable waste
-      - Renewable municipal waste
-      - Bagasse
-      - Other solid biofuels
-      - Liquid biofuels
-      - Biogas
-      - Geothermal
+        - Hydropower
+          - Renewable hydropower (including mixed plants)
+          - Pumped storage (note that this is included in total hydropower capacity, but not in total renewable capacity)
+        - Marine energy
+        - Wind energy
+          - Onshore wind energy
+          - Offshore wind energy
+        - Solar energy
+          - Solar photovoltaic
+          - Concentrated solar power
+        - Bioenergy
+          - Solid biofuels and renewable waste
+            - Renewable municipal waste
+            - Bagasse
+            - Other solid biofuels
+          - Liquid biofuels
+          - Biogas
+        - Geothermal
       - Total off-grid renewable capacity
-      - Off-grid hydropower
-      - Off-grid solar photovoltaic
-      - Other off-grid renewable energy
+        - Off-grid hydropower
+        - Off-grid solar photovoltaic
+        - Other off-grid renewable energy
     citation_full: IRENA - Renewable energy statistics 2025. International Renewable Energy Agency, Abu Dhabi (2025).
     attribution_short: IRENA
     url_main: https://www.irena.org/Publications/2025/Jul/Renewable-energy-statistics-2025
