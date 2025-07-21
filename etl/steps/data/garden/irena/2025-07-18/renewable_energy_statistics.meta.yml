@@ -88,7 +88,7 @@ tables:
       hydropower__total__excl__pumped_storage:
         title: Hydropower capacity (total, excluding pumped storage)
         description_short: |-
-          Total hydropower (on- and off-grid) electricity installed capacity, measured in megawatts. This includes mixed hydro plans, but excludes pumped storage.
+          Total hydropower (on- and off-grid) electricity installed capacity, measured in megawatts. This includes mixed hydro plants, but excludes pumped storage.
         display:
           name: Hydropower (excl. pumped storage)
         presentation:
