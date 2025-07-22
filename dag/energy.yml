@@ -31,6 +31,9 @@ steps:
     - snapshot://uk_beis/2023-12-12/uk_historical_electricity.xls
   data://garden/uk_beis/2023-12-12/uk_historical_electricity:
     - data://meadow/uk_beis/2023-12-12/uk_historical_electricity
+  ######################################################################################################################
+  # The following steps on IRENA's Renewable capacity statistics will be replaced by IRENA's Renewable energy statistics (which contains additional data).
+  # Once IRENA's Renewable power generation costs data is updated, use the latest renewable_energy_statistics garden step and archive all renewable_capacity_statistics steps.
   #
   # IRENA - Renewable electricity capacity.
   #
@@ -53,6 +56,7 @@ steps:
   #
   data://grapher/irena/2024-11-01/renewable_capacity_statistics:
     - data://garden/irena/2024-11-01/renewable_capacity_statistics
+  ######################################################################################################################
   #
   # IRENA - Renewable power generation costs.
   #
@@ -339,3 +343,25 @@ steps:
     - data://garden/energy/2025-06-27/fossil_fuel_production
     - data://garden/energy/2025-06-27/primary_energy_consumption
     - data://garden/energy/2025-06-27/energy_mix
+  #
+  # IRENA - Renewable energy statistics.
+  #
+  data://meadow/irena/2025-07-18/renewable_energy_statistics:
+    - snapshot://irena/2025-07-18/renewable_energy_statistics.xlsx
+  #
+  # IRENA - Renewable energy statistics.
+  #
+  data://garden/irena/2025-07-18/renewable_energy_statistics:
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2025-07-01/income_groups
+    - data://meadow/irena/2025-07-18/renewable_energy_statistics
+  #
+  # IRENA - Renewable energy statistics.
+  #
+  data://grapher/irena/2025-07-18/renewable_capacity_by_technology:
+    - data://garden/irena/2025-07-18/renewable_energy_statistics
+  #
+  # IRENA - Renewable energy statistics.
+  #
+  data://grapher/irena/2025-07-18/renewable_capacity:
+    - data://garden/irena/2025-07-18/renewable_energy_statistics
