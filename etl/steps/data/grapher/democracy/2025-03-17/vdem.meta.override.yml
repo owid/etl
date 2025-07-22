@@ -3,5 +3,7 @@ tables:
     variables:
       corr_publsec_vdem:
         description_key:
+          - |-
+            This index, produced by Varieties of Democracy (V-Dem), is useful if you are interested in bribery and embezzlement in the public sector.
+          - The index is based on assessments by V-Dem's country experts.
           - V-Dem covers many more countries since 1900, which affects regional averages.
-          - T
