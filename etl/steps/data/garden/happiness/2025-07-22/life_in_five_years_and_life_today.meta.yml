@@ -1,0 +1,42 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Happiness & Life Satisfaction
+    processing_level: minor
+
+dataset:
+  update_period_days: 365
+  non_redistributable: true
+
+tables:
+  life_in_five_years_and_life_today:
+    variables:
+      satisfaction_in_5_years:
+        title: Predicted life satisfaction in 5 years
+        unit: ''
+        short_unit: ''
+        description_short: ''
+        display:
+          numDecimalPlaces: 1
+      satisfaction_today:
+        title: Reported life satisfaction today
+        unit: ''
+        short_unit: ''
+        description_short: ''
+        display:
+          numDecimalPlaces: 1
+      n_people_surveyed_in_5_years:
+        title: Number of people polled about their predicted life satisfaction in 5 years
+        unit: 'people'
+        short_unit: ''
+        description_short: ''
+        display:
+          numDecimalPlaces: 0
+      n_people_surveyed_today:
+        title: Number of people polled about their life satisfaction today
+        unit: 'people'
+        short_unit: ''
+        description_short: ''
+        display:
+          numDecimalPlaces: 0

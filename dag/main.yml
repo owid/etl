@@ -745,6 +745,21 @@ steps:
   data://grapher/oecd/2025-07-03/affordable_housing:
     - data://garden/oecd/2025-07-03/affordable_housing
 
+  #
+  # Gallup World Poll: Life in Five Years and Life Today
+  #
+  data-private://meadow/happiness/2025-07-22/life_in_five_years_and_life_today:
+    - snapshot-private://happiness/2025-07-22/life_in_five_years_and_life_today.xlsx
+  #
+  # Gallup World Poll: Life in Five Years and Life Today
+  #
+  data-private://garden/happiness/2025-07-22/life_in_five_years_and_life_today:
+    - data-private://meadow/happiness/2025-07-22/life_in_five_years_and_life_today
+  #
+  # Gallup World Poll: Life in Five Years and Life Today
+  #
+  data-private://grapher/happiness/2025-07-22/life_in_five_years_and_life_today:
+    - data-private://garden/happiness/2025-07-22/life_in_five_years_and_life_today
 
 include:
   - dag/open_numbers.yml
