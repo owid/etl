@@ -1,0 +1,7 @@
+tables:
+  vdem_multi_with_regions:
+    variables:
+      corr_publsec_vdem:
+        description_key:
+          - V-Dem covers many more countries since 1900, which affects regional averages.
+          - T
