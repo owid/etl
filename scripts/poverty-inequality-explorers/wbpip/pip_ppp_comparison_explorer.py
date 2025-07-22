@@ -54,7 +54,7 @@ header_dict = {
     "explorerTitle": f"Poverty - World Bank {ppp_year_old} vs. {ppp_year_current} prices",
     "selection": ["Mozambique", "Nigeria", "Kenya", "Bangladesh", "Bolivia", "World"],
     "explorerSubtitle": f"Compare key poverty indicators from World Bank data in {ppp_year_old} and {ppp_year_current} prices.",
-    "isPublished": "true",
+    "isPublished": "false",
     "googleSheet": f"https://docs.google.com/spreadsheets/d/{sheet_id}",
     "wpBlockId": "57756",
     "entityType": "country or region",
