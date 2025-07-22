@@ -663,8 +663,9 @@ df_graphers["note"] = df_graphers["note"].str.replace(
 )
 
 # Select one default view
+# NOTE: Change line inf prices change
 df_graphers.loc[
-    (df_graphers["ySlugs"] == "headcount_ratio_215")
+    (df_graphers["ySlugs"] == "headcount_ratio_300")
     & (df_graphers["tableSlug"] == f"income_consumption_{ppp_year}")
     & (df_graphers["Show breaks between less comparable surveys Checkbox"] == "false"),
     ["defaultView"],
