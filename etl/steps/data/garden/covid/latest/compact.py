@@ -379,13 +379,13 @@ def add_external_indicators(
     tb_hdr = tb_hdr.rename(columns={"hdi": "human_development_index"})
 
     # PIP
-    tb_pip = ds_pip.read("income_consumption_2017")
-    tb_pip = tb_pip.loc[tb_pip["year"] > 2010, ["country", "year", "headcount_ratio_215"]]
+    tb_pip = ds_pip.read("income_consumption_2021")
+    tb_pip = tb_pip.loc[tb_pip["year"] > 2010, ["country", "year", "headcount_ratio_300"]]
     ## get most recent data
-    cols = ["headcount_ratio_215"]
+    cols = ["headcount_ratio_300"]
     tb_pip = _ffill_and_keep_latest(tb_pip, cols)
     ## rename cols
-    tb_pip = tb_pip.rename(columns={"headcount_ratio_215": "extreme_poverty"})
+    tb_pip = tb_pip.rename(columns={"headcount_ratio_300": "extreme_poverty"})
 
     # WHO
     tb_who = ds_who.read("who")
