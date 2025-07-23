@@ -790,7 +790,7 @@ views:
       subtitle: "{definitions.ppp_adjustment_subtitle} {definitions.spells_subtitle}"
       note: "{definitions.ppp_adjustment_welfare_type_note}"
       hasMapTab: false
-      chartTypes: ["LineChart", "DiscreteBar"]
+      chartTypes: ["LineChart"]
       selectedFacetStrategy: entity
     metadata:
       description_key:
@@ -825,7 +825,7 @@ views:
       subtitle: "{definitions.extreme_poverty_subtitle} {definitions.ppp_adjustment_subtitle} {definitions.spells_subtitle}"
       note: "{definitions.ppp_adjustment_welfare_type_note}"
       hasMapTab: false
-      chartTypes: ["LineChart", "DiscreteBar"]
+      chartTypes: ["LineChart"]
       selectedFacetStrategy: entity
     metadata:
       description_key:
@@ -861,7 +861,7 @@ views:
       subtitle: "{definitions.lmic_poverty_line_subtitle} {definitions.ppp_adjustment_subtitle} {definitions.spells_subtitle}"
       note: "{definitions.ppp_adjustment_welfare_type_note}"
       hasMapTab: false
-      chartTypes: ["LineChart", "DiscreteBar"]
+      chartTypes: ["LineChart"]
       selectedFacetStrategy: entity
     metadata:
       description_key:
@@ -897,7 +897,7 @@ views:
       subtitle: "{definitions.umic_poverty_line_subtitle} {definitions.ppp_adjustment_subtitle} {definitions.spells_subtitle}"
       note: "{definitions.ppp_adjustment_welfare_type_note}"
       hasMapTab: false
-      chartTypes: ["LineChart", "DiscreteBar"]
+      chartTypes: ["LineChart"]
       selectedFacetStrategy: entity
     metadata:
       description_key:
@@ -934,7 +934,7 @@ views:
       subtitle: "{definitions.ppp_adjustment_subtitle} {definitions.spells_subtitle}"
       note: "{definitions.ppp_adjustment_welfare_type_note}"
       hasMapTab: false
-      chartTypes: ["LineChart", "DiscreteBar"]
+      chartTypes: ["LineChart"]
       selectedFacetStrategy: entity
     metadata:
       description_key:
@@ -971,7 +971,7 @@ views:
       subtitle: "{definitions.ppp_adjustment_subtitle} {definitions.spells_subtitle}"
       note: "{definitions.ppp_adjustment_welfare_type_note}"
       hasMapTab: false
-      chartTypes: ["LineChart", "DiscreteBar"]
+      chartTypes: ["LineChart"]
       selectedFacetStrategy: entity
     metadata:
       description_key:
@@ -1008,7 +1008,7 @@ views:
       subtitle: "{definitions.ppp_adjustment_subtitle} {definitions.spells_subtitle}"
       note: "{definitions.ppp_adjustment_welfare_type_note}"
       hasMapTab: false
-      chartTypes: ["LineChart", "DiscreteBar"]
+      chartTypes: ["LineChart"]
       selectedFacetStrategy: entity
     metadata:
       description_key:
@@ -1045,7 +1045,7 @@ views:
       subtitle: "{definitions.ppp_adjustment_subtitle} {definitions.spells_subtitle}"
       note: "{definitions.ppp_adjustment_welfare_type_note}"
       hasMapTab: false
-      chartTypes: ["LineChart", "DiscreteBar"]
+      chartTypes: ["LineChart"]
       selectedFacetStrategy: entity
     metadata:
       description_key:
@@ -1081,7 +1081,7 @@ views:
       subtitle: "{definitions.ppp_adjustment_subtitle} {definitions.spells_subtitle}"
       note: "{definitions.ppp_adjustment_welfare_type_note}"
       hasMapTab: false
-      chartTypes: ["LineChart", "DiscreteBar"]
+      chartTypes: ["LineChart"]
       selectedFacetStrategy: entity
     metadata:
       description_key:
@@ -1116,7 +1116,7 @@ views:
       subtitle: "{definitions.extreme_poverty_subtitle} {definitions.ppp_adjustment_subtitle} {definitions.spells_subtitle}"
       note: "{definitions.ppp_adjustment_welfare_type_note}"
       hasMapTab: false
-      chartTypes: ["LineChart", "DiscreteBar"]
+      chartTypes: ["LineChart"]
       selectedFacetStrategy: entity
     metadata:
       description_key:
@@ -1152,7 +1152,7 @@ views:
       subtitle: "{definitions.lmic_poverty_line_subtitle} {definitions.ppp_adjustment_subtitle} {definitions.spells_subtitle}"
       note: "{definitions.ppp_adjustment_welfare_type_note}"
       hasMapTab: false
-      chartTypes: ["LineChart", "DiscreteBar"]
+      chartTypes: ["LineChart"]
       selectedFacetStrategy: entity
     metadata:
       description_key:
@@ -1188,7 +1188,7 @@ views:
       subtitle: "{definitions.umic_poverty_line_subtitle} {definitions.ppp_adjustment_subtitle} {definitions.spells_subtitle}"
       note: "{definitions.ppp_adjustment_welfare_type_note}"
       hasMapTab: false
-      chartTypes: ["LineChart", "DiscreteBar"]
+      chartTypes: ["LineChart"]
       selectedFacetStrategy: entity
     metadata:
       description_key:
@@ -1225,7 +1225,7 @@ views:
       subtitle: "{definitions.ppp_adjustment_subtitle} {definitions.spells_subtitle}"
       note: "{definitions.ppp_adjustment_welfare_type_note}"
       hasMapTab: false
-      chartTypes: ["LineChart", "DiscreteBar"]
+      chartTypes: ["LineChart"]
       selectedFacetStrategy: entity
     metadata:
       description_key:
@@ -1262,7 +1262,7 @@ views:
       subtitle: "{definitions.ppp_adjustment_subtitle} {definitions.spells_subtitle}"
       note: "{definitions.ppp_adjustment_welfare_type_note}"
       hasMapTab: false
-      chartTypes: ["LineChart", "DiscreteBar"]
+      chartTypes: ["LineChart"]
       selectedFacetStrategy: entity
     metadata:
       description_key:
@@ -1299,7 +1299,7 @@ views:
       subtitle: "{definitions.ppp_adjustment_subtitle} {definitions.spells_subtitle}"
       note: "{definitions.ppp_adjustment_welfare_type_note}"
       hasMapTab: false
-      chartTypes: ["LineChart", "DiscreteBar"]
+      chartTypes: ["LineChart"]
       selectedFacetStrategy: entity
     metadata:
       description_key:
@@ -1336,7 +1336,7 @@ views:
       subtitle: "{definitions.ppp_adjustment_subtitle} {definitions.spells_subtitle}"
       note: "{definitions.ppp_adjustment_welfare_type_note}"
       hasMapTab: false
-      chartTypes: ["LineChart", "DiscreteBar"]
+      chartTypes: ["LineChart"]
       selectedFacetStrategy: entity
     metadata:
       description_key:
