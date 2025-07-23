@@ -16,14 +16,16 @@ tables:
         title: Predicted life satisfaction in 5 years
         unit: ''
         short_unit: ''
-        description_short: ''
+        description_short: |-
+          People were asked the following question: "Please imagine a ladder with steps numbered from 0 at the bottom to 10 at the top. Suppose we say that the top of the ladder represents the best possible life for you, and the bottom of the ladder represents the worst possible life for you. Just your best guess, on which step do you think you will stand on in the future, say about five years from now?"
         display:
           numDecimalPlaces: 1
       satisfaction_today:
         title: Reported life satisfaction today
         unit: ''
         short_unit: ''
-        description_short: ''
+        description_short: |-
+          People were asked the following question: "Please imagine a ladder with steps numbered from 0 at the bottom to 10 at the top. Suppose we say that the top of the ladder represents the best possible life for you, and the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time, assuming that the higher the step the better you feel about your life, and the lower the step the worse you feel about it? Which step comes closest to the way you feel?"
         display:
           numDecimalPlaces: 1
       n_people_surveyed_in_5_years:
