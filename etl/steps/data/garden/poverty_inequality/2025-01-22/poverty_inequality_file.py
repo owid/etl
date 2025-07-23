@@ -11,7 +11,7 @@ paths = PathFinder(__file__)
 # Define PPP year for PIP, LIS and WID
 # NOTE: Change this in case of new PPP versions in the future
 # TODO: Change to 2021 prices
-PPP_YEAR_PIP = 2017
+PPP_YEAR_PIP = 2021
 PPP_YEAR_LIS = 2017
 PPP_YEAR_WID = 2023
 
