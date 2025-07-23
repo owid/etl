@@ -615,7 +615,7 @@ for i in range(len(df_graphers)):
     )
 
     df_graphers_spells.loc[j, "note"] = df_graphers["note"][i]
-    df_graphers_spells.loc[j, "type"] = df_graphers["type"][i]
+    df_graphers_spells.loc[j, "type"] = "LineChart"
     df_graphers_spells.loc[j, "yAxisMin"] = df_graphers["yAxisMin"][i]
     df_graphers_spells.loc[j, "selectedFacetStrategy"] = "entity"
     df_graphers_spells.loc[j, "hasMapTab"] = "false"
