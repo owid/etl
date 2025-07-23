@@ -291,12 +291,12 @@ class Report:
         n_daily_post_views = n_post_views / self.analytics["posts"]["n_days"].max()
 
         # Humanize numbers.
-        n_charts_humanized = humanize_number(n_charts)
-        n_posts_humanized = humanize_number(n_publications)
-        n_chart_views_humanized = humanize_number(n_chart_views)
-        n_daily_chart_views_humanized = humanize_number(n_daily_chart_views)
-        n_post_views_humanized = humanize_number(n_post_views)
-        n_daily_post_views_humanized = humanize_number(n_daily_post_views)
+        n_charts_humanized = humanize_number(n_charts, sig_figs=3)
+        n_posts_humanized = humanize_number(n_publications, sig_figs=3)
+        n_chart_views_humanized = humanize_number(n_chart_views, sig_figs=3)
+        n_daily_chart_views_humanized = humanize_number(n_daily_chart_views, sig_figs=3)
+        n_post_views_humanized = humanize_number(n_post_views, sig_figs=3)
+        n_daily_post_views_humanized = humanize_number(n_daily_post_views, sig_figs=3)
         max_date_humanized = datetime.strptime(f"{self.year}-{PERIODS[self.period]['max_date']}", "%Y-%m-%d").strftime(
             "%B %d, %Y"
         )
