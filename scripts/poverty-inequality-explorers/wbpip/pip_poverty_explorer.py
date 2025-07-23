@@ -112,7 +112,10 @@ for survey in range(len(survey_type)):
         df_tables.loc[j, "unit"] = "%"
         df_tables.loc[j, "shortUnit"] = "%"
         df_tables.loc[j, "type"] = "Numeric"
-        df_tables.loc[j, "colorScaleNumericBins"] = "3;10;20;30;40;50;60;70;80;90;100"
+        if p == 1:
+            df_tables.loc[j, "colorScaleNumericBins"] = "3;10;20;30;40;50;60;70;80;90;100"
+        else:
+            df_tables.loc[j, "colorScaleNumericBins"] = "10;20;30;40;50;60;70;80;90;100"
         df_tables.loc[j, "colorScaleScheme"] = "OrRd"
         df_tables.loc[j, "survey_type"] = survey_type["table_name"][survey]
         j += 1
@@ -135,7 +138,7 @@ for survey in range(len(survey_type)):
         df_tables.loc[j, "shortUnit"] = np.nan
         df_tables.loc[j, "type"] = "Numeric"
         df_tables.loc[j, "colorScaleNumericBins"] = (
-            "100000;300000;1000000;3000000;10000000;30000000;100000000;300000000;1000000000"
+            "100000;300000;1000000;3000000;10000000;30000000;100000000;300000000;1"
         )
         df_tables.loc[j, "colorScaleScheme"] = "Reds"
         df_tables.loc[j, "survey_type"] = survey_type["table_name"][survey]
@@ -180,7 +183,7 @@ for survey in range(len(survey_type)):
         df_tables.loc[j, "unit"] = np.nan
         df_tables.loc[j, "shortUnit"] = np.nan
         df_tables.loc[j, "type"] = "Numeric"
-        df_tables.loc[j, "colorScaleNumericBins"] = "100000;300000;1000000;3000000;10000000;30000000;100000000"
+        df_tables.loc[j, "colorScaleNumericBins"] = "100000;300000;1000000;3000000;10000000;30000000;1"
         df_tables.loc[j, "colorScaleScheme"] = "YlOrBr"
         df_tables.loc[j, "survey_type"] = survey_type["table_name"][survey]
         j += 1
@@ -201,7 +204,7 @@ for survey in range(len(survey_type)):
     df_tables.loc[j, "unit"] = f"international-$ in {ppp_year} prices"
     df_tables.loc[j, "shortUnit"] = "$"
     df_tables.loc[j, "type"] = "Numeric"
-    df_tables.loc[j, "colorScaleNumericBins"] = "1;2;5;10;20;50;100"
+    df_tables.loc[j, "colorScaleNumericBins"] = "1;2;5;10;20;50;1"
     df_tables.loc[j, "colorScaleScheme"] = "BuGn"
     df_tables.loc[j, "survey_type"] = survey_type["table_name"][survey]
     j += 1
@@ -222,7 +225,7 @@ for survey in range(len(survey_type)):
     df_tables.loc[j, "unit"] = f"international-$ in {ppp_year} prices"
     df_tables.loc[j, "shortUnit"] = "$"
     df_tables.loc[j, "type"] = "Numeric"
-    df_tables.loc[j, "colorScaleNumericBins"] = "1;2;5;10;20;50;100"
+    df_tables.loc[j, "colorScaleNumericBins"] = "1;2;5;10;20;50;1"
     df_tables.loc[j, "colorScaleScheme"] = "Blues"
     df_tables.loc[j, "survey_type"] = survey_type["table_name"][survey]
     j += 1
@@ -243,7 +246,7 @@ for survey in range(len(survey_type)):
     df_tables.loc[j, "unit"] = f"international-$ in {ppp_year} prices"
     df_tables.loc[j, "shortUnit"] = "$"
     df_tables.loc[j, "type"] = "Numeric"
-    df_tables.loc[j, "colorScaleNumericBins"] = "1;2;5;10;20;50"
+    df_tables.loc[j, "colorScaleNumericBins"] = "1;2;5;10;20;1"
     df_tables.loc[j, "colorScaleScheme"] = "Purples"
     df_tables.loc[j, "survey_type"] = survey_type["table_name"][survey]
     j += 1
@@ -264,7 +267,7 @@ for survey in range(len(survey_type)):
     df_tables.loc[j, "unit"] = f"international-$ in {ppp_year} prices"
     df_tables.loc[j, "shortUnit"] = "$"
     df_tables.loc[j, "type"] = "Numeric"
-    df_tables.loc[j, "colorScaleNumericBins"] = "1;2;5;10;20;50;100;200"
+    df_tables.loc[j, "colorScaleNumericBins"] = "1;2;5;10;20;50;100;1"
     df_tables.loc[j, "colorScaleScheme"] = "Purples"
     df_tables.loc[j, "survey_type"] = survey_type["table_name"][survey]
     j += 1
@@ -612,7 +615,7 @@ for i in range(len(df_graphers)):
     )
 
     df_graphers_spells.loc[j, "note"] = df_graphers["note"][i]
-    df_graphers_spells.loc[j, "type"] = df_graphers["type"][i]
+    df_graphers_spells.loc[j, "type"] = "LineChart"
     df_graphers_spells.loc[j, "yAxisMin"] = df_graphers["yAxisMin"][i]
     df_graphers_spells.loc[j, "selectedFacetStrategy"] = "entity"
     df_graphers_spells.loc[j, "hasMapTab"] = "false"
