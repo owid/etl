@@ -23,6 +23,8 @@ import pandas as pd
 import structlog
 import yaml
 from fastmcp import FastMCP
+from fastmcp.utilities.types import Image
+from mcp.types import ImageContent
 from pydantic import BaseModel
 
 from owid_mcp.config import HTTP_TIMEOUT
@@ -349,6 +351,69 @@ async def fetch(id: str) -> FetchResult:
             url=id,
             metadata={"error": str(exc)},
         )
+
+
+# ---------------------------------------------------------------------------
+# FETCH_IMAGE TOOL – downloads PNG image from CSV URL
+# ---------------------------------------------------------------------------
+
+
+@mcp.tool
+async def fetch_image(id: str) -> ImageContent:
+    """Download a grapher PNG image by converting CSV URL to PNG URL.
+
+    Takes a CSV URL from search results and converts it to PNG format by replacing
+    the .csv extension with .png, then returns the image as base64-encoded content.
+
+    Args:
+        id: The full grapher CSV URL returned by `search`.
+
+    Returns:
+        ImageContent with base64-encoded PNG data.
+    """
+    log.info("deep‑research.fetch_image", url=id)
+
+    if not id.startswith("http"):
+        # Return a text response for invalid URLs - FastMCP will handle the conversion
+        raise ValueError("Invalid ID (expected URL)")
+
+    # Convert CSV URL to PNG URL by replacing .csv with .png
+    png_url = id.replace('.csv', '.png')
+
+    # Remove CSV-specific query parameters that don't make sense for PNG
+    parsed = urllib.parse.urlparse(png_url)
+    query_params = urllib.parse.parse_qs(parsed.query)
+    
+    # Keep only PNG-relevant parameters
+    png_params = {}
+    if 'country' in query_params:
+        png_params['country'] = query_params['country']
+    if 'time' in query_params:
+        png_params['time'] = query_params['time']
+    
+    # Add chart tab parameter for PNG
+    png_params['tab'] = ['chart']
+    
+    # Reconstruct URL with PNG-appropriate parameters
+    new_query = urllib.parse.urlencode(png_params, doseq=True)
+    png_url = urllib.parse.urlunparse((
+        parsed.scheme, parsed.netloc, parsed.path, 
+        parsed.params, new_query, parsed.fragment
+    ))
+
+    try:
+        async with httpx.AsyncClient(timeout=HTTP_TIMEOUT) as client:
+            resp = await client.get(png_url)
+            resp.raise_for_status()
+            png_bytes = resp.content
+
+        # Use FastMCP Image utility to create proper ImageContent
+        img_obj = Image(data=png_bytes, format="png")
+        return img_obj.to_image_content()
+
+    except Exception as exc:
+        log.warning("deep‑research.fetch_image.error", url=png_url, error=str(exc))
+        raise ValueError(f"Failed to download PNG: {exc}")
 
 
 if __name__ == "__main__":

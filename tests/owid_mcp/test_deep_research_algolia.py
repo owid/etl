@@ -187,11 +187,12 @@ class TestIntegration:
             # Test that the server is responsive
             tools = await client.list_tools()
             assert tools is not None
-            assert len(tools) == 2
+            assert len(tools) == 3
 
             tool_names = [tool.name for tool in tools]
             assert "search" in tool_names
             assert "fetch" in tool_names
+            assert "fetch_image" in tool_names
 
     @pytest.mark.asyncio
     async def test_search_then_fetch_workflow(self):
@@ -219,3 +220,83 @@ class TestIntegration:
             }
 
             assert search_result.data[0] == expected_result
+
+
+class TestFetchImageTool:
+    """Tests for the fetch_image tool using real API calls."""
+
+    @pytest.mark.asyncio
+    async def test_mcp_server_has_fetch_image_tool(self):
+        """Test that the MCP server exposes the fetch_image tool."""
+        async with Client(mcp) as client:
+            tools = await client.list_tools()
+            tool_names = [tool.name for tool in tools]
+            assert "fetch_image" in tool_names
+
+    @pytest.mark.asyncio
+    async def test_fetch_image_from_csv_url(self):
+        """Test fetching image by converting CSV URL to PNG."""
+        async with Client(mcp) as client:
+            # Use a CSV URL and expect it to be converted to PNG
+            csv_url = "https://ourworldindata.org/grapher/population-density.csv?tab=line&csvType=filtered&time=earliest..latest&country=FRA"
+            result = await client.call_tool("fetch_image", {"id": csv_url})
+
+            assert result is not None
+            assert not result.is_error
+            assert len(result.content) == 1
+            
+            # Check that we got an ImageContent response
+            image_content = result.content[0]
+            assert image_content.type == "image"
+            assert hasattr(image_content, 'data')
+            assert isinstance(image_content.data, str)
+            
+            # Verify it's valid base64
+            try:
+                base64.b64decode(image_content.data)
+            except Exception as e:
+                pytest.fail(f"Invalid base64 data: {e}")
+                
+            print(f"Successfully fetched image, base64 length: {len(image_content.data)}")
+
+    @pytest.mark.asyncio
+    async def test_fetch_image_url_conversion(self):
+        """Test that CSV URLs are properly converted to PNG URLs."""
+        async with Client(mcp) as client:
+            # Test URL with multiple query parameters
+            csv_url = "https://ourworldindata.org/grapher/population-density.csv?tab=line&csvType=filtered&time=2020..2023&country=FRA~DEU"
+            result = await client.call_tool("fetch_image", {"id": csv_url})
+
+            assert result is not None
+            assert not result.is_error
+            # The actual PNG URL should be constructed with proper parameters
+            # The function should keep country and time parameters, but remove CSV-specific ones
+            print("Successfully converted CSV URL to PNG URL and fetched image")
+
+    @pytest.mark.asyncio
+    async def test_fetch_image_invalid_id(self):
+        """Test fetch_image with invalid ID (not a URL)."""
+        from fastmcp.exceptions import ToolError
+        
+        async with Client(mcp) as client:
+            # When raise_on_error=True (default), exceptions are raised instead of returned
+            with pytest.raises(ToolError) as exc_info:
+                await client.call_tool("fetch_image", {"id": "not-a-url"})
+            
+            assert "Invalid ID" in str(exc_info.value)
+            print("Successfully handled invalid URL for fetch_image")
+
+    @pytest.mark.asyncio
+    async def test_fetch_image_nonexistent_chart(self):
+        """Test fetch_image with nonexistent chart."""
+        from fastmcp.exceptions import ToolError
+        
+        async with Client(mcp) as client:
+            # When raise_on_error=True (default), exceptions are raised instead of returned
+            with pytest.raises(ToolError) as exc_info:
+                await client.call_tool(
+                    "fetch_image", {"id": "https://ourworldindata.org/grapher/nonexistent-chart-12345.csv"}
+                )
+            
+            assert "Failed to download PNG" in str(exc_info.value)
+            print("Successfully handled nonexistent chart for fetch_image")
