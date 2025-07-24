@@ -16,18 +16,13 @@ def run() -> None:
     ds_garden = paths.load_dataset("luxembourg_income_study")
 
     # Read table from garden dataset.
-    tb_garden = ds_garden["luxembourg_income_study"]
-
-    #
-    # Process data.
-    #
+    tb_garden = ds_garden.read("luxembourg_income_study", reset_index=False)
 
     #
     # Save outputs.
     #
-    with warnings.ignore_warnings([warnings.NoOriginsWarning, warnings.DisplayNameWarning]):
-        ds_garden = paths.create_dataset(
-            tables=[tb_garden], check_variables_metadata=True, default_metadata=ds_garden.metadata
-        )
+    ds_garden = paths.create_dataset(
+        tables=[tb_garden], check_variables_metadata=True, default_metadata=ds_garden.metadata
+    )
 
     ds_garden.save()
