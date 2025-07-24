@@ -153,90 +153,109 @@ async def search(query: str, limit: int = 10) -> List[SearchResult]:
         for countries mentioned in the query.
     """
     log.info("deep‑research.search", query=query, limit=limit)
+    
+    try:
+        payload = {
+            "requests": [
+                {
+                    "indexName": "explorer-views-and-charts",
+                    "attributesToRetrieve": [
+                        "title",
+                        "slug",
+                        "availableEntities",
+                        "variantName",
+                        "type",
+                    ],
+                    "query": query,
+                    "facetFilters": [[], "isIncomeGroupSpecificFM:false"],
+                    "highlightPreTag": "<mark>",
+                    "highlightPostTag": "</mark>",
+                    "facets": ["tags"],
+                    "hitsPerPage": limit,
+                    "page": 0,
+                }
+            ]
+        }
 
-    payload = {
-        "requests": [
-            {
-                "indexName": "explorer-views-and-charts",
-                "attributesToRetrieve": [
-                    "title",
-                    "slug",
-                    "availableEntities",
-                    "variantName",
-                    "type",
-                ],
-                "query": query,
-                "facetFilters": [[], "isIncomeGroupSpecificFM:false"],
-                "highlightPreTag": "<mark>",
-                "highlightPostTag": "</mark>",
-                "facets": ["tags"],
-                "hitsPerPage": limit,
-                "page": 0,
-            }
-        ]
-    }
+        headers = {
+            "x-algolia-api-key": ALGOLIA_API_KEY,
+            "x-algolia-application-id": ALGOLIA_APP_ID,
+            "x-algolia-agent": "OWID-MCP (python)",
+        }
 
-    headers = {
-        "x-algolia-api-key": ALGOLIA_API_KEY,
-        "x-algolia-application-id": ALGOLIA_APP_ID,
-        "x-algolia-agent": "OWID-MCP (python)",
-    }
+        async with httpx.AsyncClient(timeout=HTTP_TIMEOUT) as client:
+            log.info("algolia.request", url=ALGOLIA_URL, payload=payload)
+            resp = await client.post(ALGOLIA_URL, json=payload, headers=headers)
+            resp.raise_for_status()
+            response_data = resp.json()
+            log.info("algolia.response", status=resp.status_code, results_count=len(response_data.get("results", [])))
+            hits = response_data["results"][0].get("hits", [])
+            log.info("algolia.hits", count=len(hits))
 
-    async with httpx.AsyncClient(timeout=HTTP_TIMEOUT) as client:
-        resp = await client.post(ALGOLIA_URL, json=payload, headers=headers)
-        resp.raise_for_status()
-        hits = resp.json()["results"][0].get("hits", [])
+        results: List[SearchResult] = []
+        for i, hit in enumerate(hits):
+            log.info("processing.hit", index=i, slug=hit.get("slug"), title=hit.get("title"))
+            
+            # Not needed
+            available_entities = hit.pop("availableEntities", [])
+            log.info("hit.available_entities", count=len(available_entities))
 
-    results: List[SearchResult] = []
-    for hit in hits:
-        # Not needed
-        del hit["availableEntities"]
-
-        slug = hit["slug"]
-        title = hit.get("title") or slug.replace("-", " ").title()
-        subtitle = (
-            hit.get("_snippetResult", {})
-            .get("subtitle", {})
-            .get("value", "")
-            .replace("<mark>", "")
-            .replace("</mark>", "")
-        )
-
-        # Attempt to deduce countries from highlight results for tighter charts
-        country_codes: List[str] = []
-        for ent in hit.get("_highlightResult", {}).get("availableEntities", []):
-            if ent.get("matchedWords"):
-                country_name = ent["value"].replace("<mark>", "").replace("</mark>", "")
-                country_iso3 = country_name_to_iso3(country_name)
-                if country_iso3:
-                    country_codes.append(country_iso3)
-
-        # &time=earliest..latest probably wrong...
-        grapher_url = f"https://ourworldindata.org/grapher/{slug}.csv?tab=line&csvType=filtered"
-
-        # We need to add this I guess...
-        grapher_url += "&time=earliest..latest"
-
-        # Perhaps we should use this?
-        # https://ourworldindata.org/grapher/population-density.csv?v=1&csvType=filtered&useColumnShortNames=true&tab=line&country=FRA~DEU
-
-        if country_codes:
-            # Format multiple countries as country=FRA~DEU~...
-            country_param = "~".join(country_codes)
-            grapher_url += f"&country={country_param}"
-
-        # NOTE: we could get metadata from https://ourworldindata.org/grapher/urban-area-long-term.metadata.json?v=1&csvType=filtered&useColumnShortNames=true
-        results.append(
-            SearchResult(
-                id=grapher_url,
-                title=title,
-                text=subtitle or title,
-                url=grapher_url,
+            slug = hit["slug"]
+            title = hit.get("title") or slug.replace("-", " ").title()
+            subtitle = (
+                hit.get("_snippetResult", {})
+                .get("subtitle", {})
+                .get("value", "")
+                .replace("<mark>", "")
+                .replace("</mark>", "")
             )
-        )
 
-    log.info("deep‑research.search.done", returned=len(results))
-    return results
+            # Attempt to deduce countries from highlight results for tighter charts
+            country_codes: List[str] = []
+            highlight_entities = hit.get("_highlightResult", {}).get("availableEntities", [])
+            log.info("highlight.entities", count=len(highlight_entities))
+            
+            for ent in highlight_entities:
+                if ent.get("matchedWords"):
+                    country_name = ent["value"].replace("<mark>", "").replace("</mark>", "")
+                    country_iso3 = country_name_to_iso3(country_name)
+                    log.info("country.detection", name=country_name, iso3=country_iso3, matched_words=ent.get("matchedWords"))
+                    if country_iso3:
+                        country_codes.append(country_iso3)
+
+            # &time=earliest..latest probably wrong...
+            grapher_url = f"https://ourworldindata.org/grapher/{slug}.csv?tab=line&csvType=filtered"
+
+            # We need to add this I guess...
+            grapher_url += "&time=earliest..latest"
+
+            # Perhaps we should use this?
+            # https://ourworldindata.org/grapher/population-density.csv?v=1&csvType=filtered&useColumnShortNames=true&tab=line&country=FRA~DEU
+
+            if country_codes:
+                # Format multiple countries as country=FRA~DEU~...
+                country_param = "~".join(country_codes)
+                grapher_url += f"&country={country_param}"
+                log.info("url.with_countries", url=grapher_url, countries=country_codes)
+            else:
+                log.info("url.no_countries", url=grapher_url)
+
+            # NOTE: we could get metadata from https://ourworldindata.org/grapher/urban-area-long-term.metadata.json?v=1&csvType=filtered&useColumnShortNames=true
+            results.append(
+                SearchResult(
+                    id=grapher_url,
+                    title=title,
+                    text=subtitle or title,
+                    url=grapher_url,
+                )
+            )
+
+        log.info("deep‑research.search.done", returned=len(results))
+        return results
+    
+    except Exception as exc:
+        log.error("deep‑research.search.error", query=query, error=str(exc), exc_info=True)
+        return []
 
 
 # ---------------------------------------------------------------------------
