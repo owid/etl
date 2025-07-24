@@ -1,7 +1,7 @@
 """
 Load the three LIS meadow datasets and create one garden dataset, `luxembourg_income_study`.
 
-NOTE: To extract the log of the process (to review sanity checks, for example), run the following command in the terminal:
+NOTE: To extract the log of the process (to review sanity checks, for example), run the following command in the terminal (and set DEBUG = True in the code):
     nohup uv run etl run luxembourg_income_study > output_lis.log 2>&1 &
 
 """
@@ -30,6 +30,9 @@ WELFARE_LIST = ["dhi", "mi", "dhci"]
 
 # Define equivalization
 EQUIVALIZATION_LIST = ["eq", "pc"]
+
+# Set debug mode
+DEBUG = False
 
 # Set table format when printing
 TABLEFMT = "pretty"
@@ -440,11 +443,12 @@ def check_between_0_and_1(tb: Table, variables: list, welfare: list):
 
                 if any_error:
                     # Filter only values lower than 0 or higher than 1
-                    tb_error = tb[mask].copy().reset_index()
-                    paths.log.fatal(
-                        f"""Values for {col} are not between 0 and 1 in {tb_error.m.short_name}:
-                        {_tabulate(tb_error[['country', 'year', col]])}"""
-                    )
+                    tb_error = tb[mask].reset_index()
+                    if DEBUG:
+                        paths.log.fatal(
+                            f"""Values for {col} are not between 0 and 1 in {tb_error.m.short_name}:
+                            {tabulate(tb_error[['country', 'year', col]], headers="keys", tablefmt=TABLEFMT)}"""
+                        )
 
     return tb
 
@@ -470,11 +474,12 @@ def check_shares_sum_100(tb: Table, welfare: list, margin: float):
             any_error = mask.any()
 
             if any_error:
-                tb_error = tb[mask].reset_index(drop=True).copy()
-                paths.log.fatal(
-                    f"""{len(tb_error)} share observations ({w}_{e}) are not adding up to 100% in {tb_error.m.short_name}:
-                    {_tabulate(tb_error[['country', 'year', 'sum_check']].sort_values(by='sum_check', ascending=False).reset_index(drop=True), floatfmt=".1f")}"""
-                )
+                tb_error = tb[mask].reset_index(drop=True)
+                if DEBUG:
+                    paths.log.fatal(
+                        f"""{len(tb_error)} share observations ({w}_{e}) are not adding up to 100% in {tb_error.m.short_name}:
+                        {tabulate(tb_error[['country', 'year', 'sum_check']].sort_values(by='sum_check', ascending=False).reset_index(drop=True), headers="keys", tablefmt=TABLEFMT, floatfmt=".1f")}"""
+                    )
 
     return tb
 
@@ -495,11 +500,12 @@ def check_negative_values(tb: Table):
         any_error = mask.any()
 
         if any_error:
-            tb_error = tb[mask].reset_index(drop=True).copy()
-            paths.log.warning(
-                f"""{len(tb_error)} observations for {v} are negative in {tb_error.m.short_name}:
-                {_tabulate(tb_error[['country', 'year', v]])}"""
-            )
+            tb_error = tb[mask].reset_index(drop=True)
+            if DEBUG:
+                paths.log.warning(
+                    f"""{len(tb_error)} observations for {v} are negative in {tb_error.m.short_name}:
+                    {tabulate(tb_error[['country', 'year', v]], headers="keys", tablefmt=TABLEFMT)}"""
+                )
 
     return tb
 
@@ -537,11 +543,12 @@ def check_monotonicity(tb: Table, metric: list, welfare: list):
                 any_error = mask.any()
 
                 if any_error:
-                    tb_error = tb[mask].reset_index(drop=True).copy()
-                    paths.log.fatal(
-                        f"""{len(tb_error)} observations for {m}_{w}_{e} are not monotonically increasing in {tb_error.m.short_name}:
-                        {_tabulate(tb_error[['country', 'year'] + cols], floatfmt=".2f")}"""
-                    )
+                    tb_error = tb[mask].reset_index(drop=True)
+                    if DEBUG:
+                        paths.log.fatal(
+                            f"""{len(tb_error)} observations for {m}_{w}_{e} are not monotonically increasing in {tb_error.m.short_name}:
+                            {tabulate(tb_error[['country', 'year'] + cols], headers="keys", tablefmt=TABLEFMT, floatfmt=".2f")}"""
+                        )
 
     return tb
 
@@ -599,14 +606,11 @@ def check_avg_between_thr(tb: Table, welfare: list) -> Table:
             any_error = mask.any()
 
             if any_error:
-                tb_error = tb[mask].reset_index(drop=True).copy()
-                paths.log.fatal(
-                    f"""{len(tb_error)} observations for avg {w}_{e} are not between the corresponding thresholds in {tb_error.m.short_name}:
-                    {_tabulate(tb_error[['country', 'year'] + check_cols])}"""
-                )
+                tb_error = tb[mask].reset_index(drop=True)
+                if DEBUG:
+                    paths.log.fatal(
+                        f"""{len(tb_error)} observations for avg {w}_{e} are not between the corresponding thresholds in {tb_error.m.short_name}:
+                        {tabulate(tb_error[['country', 'year'] + check_cols], headers="keys", tablefmt=TABLEFMT)}"""
+                    )
 
     return tb
-
-
-def _tabulate(tb: Table, headers="keys", tablefmt=TABLEFMT, **kwargs):
-    return tabulate(tb, headers=headers, tablefmt=tablefmt, **kwargs)
