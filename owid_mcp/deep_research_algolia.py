@@ -119,8 +119,18 @@ def country_name_to_iso3(name: Optional[str]) -> Optional[str]:
 # Create the Deep‑Research MCP server
 # ---------------------------------------------------------------------------
 
+# NOTE:
+# Because the ChatGPT connector doesn’t perform a session‑ID handshake (it just fires off JSON‑RPC POSTs),
+# you must run your FastMCP server in stateless mode. Otherwise FastMCP won’t recognize the incoming
+# paths and will return 404.
+# NOTE:
+# I don't fully trust the note above, though I couldn't make it work without stateless_http=True. Whenever
+# I run a request from https://platform.openai.com/chat/edit?prompt=pmpt_6881e40843788196aaa9923785c429b20de09e18aac0a654&version=1
+# it successfully makes the first request but the subsequent request fails with 404. So it's likely something
+# about the session ID.
+
 mcp = FastMCP(
-    # stateless_http=True,
+    stateless_http=True,
     name="OWID Deep Research",
     instructions=(
         "Search OWID charts via Algolia and fetch CSV data for Deep‑Research workflows.\n\n"
