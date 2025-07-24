@@ -97,7 +97,7 @@ tables:
       life_expectancy_0:
         title: |-
           Period life expectancy at birth
-        description_short: The [period life expectancy](#dod:period-life-expectancy) at birth, in a given year. Period life expectancy is the number of years the average person born in a certain year would live if they experienced the same chances of dying at each age as people did in that year.
+        description_short: "[Period life expectancy](#dod:period-life-expectancy) is the number of years the average person born in a certain year would live if they experienced the same chances of dying at each age as people did that year."
         description_key:
           - Across the world, people are living longer. In 1900, the global average life expectancy of a newborn was 32 years. By 2021, this had more than doubled to 71 years.
           - Big improvements were achieved by countries [around the world](https://ourworldindata.org/#:~:text=achieved%20by%20countries-,around%20the%20world,-.%20The%20chart%20shows). The chart shows that life expectancy has more than doubled in every region of the world. This improvement is not only due to declining child mortality; life expectancy increased [at all ages](https://ourworldindata.org/#:~:text=life%20expectancy%20increased-,at%20all%20ages,-.).
@@ -116,7 +116,7 @@ tables:
           numDecimalPlaces: 1
         presentation:
           title_public: Life expectancy
-          title_variant: Long run estimates
+          title_variant: Long-run data
           attribution_short: Riley; Zijdeman et al.; HMD; UN WPP
           grapher_config:
             selectedEntityNames: *sel_entities_americas
