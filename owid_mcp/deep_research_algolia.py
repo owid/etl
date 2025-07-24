@@ -128,7 +128,22 @@ mcp = FastMCP(
         "• IMPORTANT: Always include country names in your search query when looking for country-specific data (e.g., 'population France' not just 'population')\n"
         "• The fetch tool returns CSV data with Entity column removed - only Code, Year, and metric columns remain\n"
         "• If fetched data doesn't contain the values you need, inform the user rather than making up data\n"
-        "• Search results automatically filter for mentioned countries when detected in queries"
+        "• Search results automatically filter for mentioned countries when detected in queries\n\n"
+        "SEARCH OPTIMIZATION:\n"
+        "• DO use simple, generic indicator names: 'coal production', 'population density', 'GDP per capita'\n"
+        "• DO include country names directly in queries: 'population France', 'emissions China'\n"
+        "• DO try exact phrase matching with quotes for specific metrics: 'coal production per capita'\n"
+        "• DO use broad terms first, then narrow down if needed\n"
+        "• DON'T include 'OWID' in search queries\n"
+        "• DON'T use overly specific queries like 'coal production per capita France Germany OWID'\n"
+        "• DON'T include terms like 'dataset', 'grapher', 'Our World in Data' in searches\n"
+        "• DON'T include quotes of any kind\n"
+        "• DON'T combine too many filters in a single query\n\n"
+        "SEARCH STRATEGY:\n"
+        "1. Start with simple indicator + country: 'coal production France'\n"
+        "2. If that fails, try just the indicator: 'coal production'\n"
+        "3. Use alternative phrasings: 'Per Capita production coal' instead of 'coal production per capita'\n"
+        "4. Avoid technical terms - search for concepts, not database field names"
     ),
 )
 
@@ -153,7 +168,7 @@ async def search(query: str) -> List[SearchResult]:
     """
     limit = 10  # Fixed limit for deep research compatibility
     log.debug("search.start", query=query, limit=limit)
-    
+
     try:
         payload = {
             "requests": [
@@ -208,7 +223,7 @@ async def search(query: str) -> List[SearchResult]:
             # Attempt to deduce countries from highlight results for tighter charts
             country_codes: List[str] = []
             highlight_entities = hit.get("_highlightResult", {}).get("availableEntities", [])
-            
+
             for ent in highlight_entities:
                 if ent.get("matchedWords"):
                     country_name = ent["value"].replace("<mark>", "").replace("</mark>", "")
@@ -242,7 +257,7 @@ async def search(query: str) -> List[SearchResult]:
 
         log.debug("search.done", returned=len(results))
         return results
-    
+
     except Exception as exc:
         log.error("search.error", query=query, error=str(exc))
         return []
