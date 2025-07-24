@@ -3,8 +3,9 @@ OWID Deep Research MCP Module
 -----------------------------
 Provides **search** and **fetch** tools compatible with OpenAI Deep‑Research.
 
-* `search(query)` returns grapher **CSV URLs** (one per hit).
-* `fetch(id)` downloads that CSV and returns the processed data (Entity column removed).
+* `search(query)` returns grapher **PNG URLs** (one per hit).
+* `fetch(id)` downloads that PNG and returns the **raw image as base‑64** so the
+  Deep‑Research agent can embed or display it inline.
 
 No special `country:` token parsing—each hit already hints at the most relevant
 country via Algolia’s `availableEntities` list.
@@ -12,16 +13,13 @@ country via Algolia’s `availableEntities` list.
 
 import asyncio
 import base64
-import io
 import json
 import urllib.parse
-from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import httpx
-import pandas as pd
+import pycountry
 import structlog
-import yaml
 from fastmcp import FastMCP
 from pydantic import BaseModel
 
@@ -34,10 +32,8 @@ log = structlog.get_logger()
 # Pydantic models for structured responses
 # ---------------------------------------------------------------------------
 
-
 class SearchResult(BaseModel):
     """Search result item following Deep Research specification."""
-
     id: str  # unique ID for the document or search result item
     title: str  # string title for the search result item
     text: str  # relevant snippet of text for the search terms
@@ -46,13 +42,11 @@ class SearchResult(BaseModel):
 
 class FetchResult(BaseModel):
     """Fetch result item following Deep Research specification."""
-
     id: str  # unique ID for the document or search result item
     title: str  # string title for the search result item
     text: str  # full text of the document or item
     url: str  # URL to the document or search result item
     metadata: Optional[Dict[str, Any]] = None  # optional key/value pairing of data
-
 
 # ---------------------------------------------------------------------------
 # Constants & helpers
@@ -61,58 +55,30 @@ ALGOLIA_APP_ID = "ASCB5XMYF2"
 ALGOLIA_API_KEY = "bafe9c4659e5657bf750a38fbee5c269"
 ALGOLIA_URL = f"https://{ALGOLIA_APP_ID.lower()}-dsn.algolia.net/1/indexes/*/queries"
 
-# Global mapping cache
-_NAME_TO_CODE_MAPPING: Optional[Dict[str, str]] = None
-
-
-def _load_regions_mapping() -> Dict[str, str]:
-    """Load OWID regions mapping from YAML file."""
-    global _NAME_TO_CODE_MAPPING
-
-    if _NAME_TO_CODE_MAPPING is not None:
-        return _NAME_TO_CODE_MAPPING
-
-    # Path to the regions file
-    regions_file = (
-        Path(__file__).parent.parent / "etl" / "steps" / "data" / "garden" / "regions" / "2023-01-01" / "regions.yml"
-    )
-
-    mapping: Dict[str, str] = {}
-
-    with open(regions_file, "r", encoding="utf-8") as f:
-        regions = yaml.safe_load(f)
-
-    for region in regions:
-        if not isinstance(region, dict):
-            continue
-
-        code = region.get("code")
-        name = region.get("name")
-
-        if code and name:
-            # Map name to code (case-insensitive)
-            mapping[name.lower()] = code
-
-            # Map aliases to code
-            aliases = region.get("aliases", [])
-            if isinstance(aliases, list):
-                for alias in aliases:
-                    if isinstance(alias, str):
-                        mapping[alias.lower()] = code
-
-    log.info("regions.mapping.loaded", count=len(mapping))
-
-    _NAME_TO_CODE_MAPPING = mapping
-    return mapping
-
 
 def country_name_to_iso3(name: Optional[str]) -> Optional[str]:
-    """Convert country name to ISO-3 code using OWID regions mapping."""
+    """Best‑effort conversion from common country names to ISO‑3 codes."""
     if not name:
         return None
-
-    mapping = _load_regions_mapping()
-    return mapping.get(name.lower())
+    
+    # Manual mappings for OWID-specific entities
+    manual: Dict[str, str] = {
+        "World": "OWID_WRL",
+        "European Union": "OWID_EUN",
+        "OECD": "OWID_OECD",
+        "High income": "OWID_HIN",
+        "Low income": "OWID_LIN",
+    }
+    
+    # Check manual mappings first
+    if name in manual:
+        return manual[name]
+    
+    # Try pycountry lookup
+    try:
+        return pycountry.countries.lookup(name).alpha_3  # type: ignore[attr-defined]
+    except (LookupError, AttributeError):
+        return None
 
 
 # ---------------------------------------------------------------------------
@@ -122,13 +88,9 @@ def country_name_to_iso3(name: Optional[str]) -> Optional[str]:
 mcp = FastMCP(
     name="OWID Deep Research",
     instructions=(
-        "Search OWID charts via Algolia and fetch CSV data for Deep‑Research workflows.\n\n"
-        "USAGE GUIDELINES:\n"
-        "• Use `search` to find relevant grapher datasets, then `fetch` to get CSV data\n"
-        "• IMPORTANT: Always include country names in your search query when looking for country-specific data (e.g., 'population France' not just 'population')\n"
-        "• The fetch tool returns CSV data with Entity column removed - only Code, Year, and metric columns remain\n"
-        "• If fetched data doesn't contain the values you need, inform the user rather than making up data\n"
-        "• Search results automatically filter for mentioned countries when detected in queries"
+        "Search OWID charts via Algolia and fetch PNG charts for Deep‑Research "
+        "workflows. Use `search` to find relevant grapher images and `fetch` to "
+        "download the PNG (base‑64 encoded)."
     ),
 )
 
@@ -139,18 +101,14 @@ mcp = FastMCP(
 
 @mcp.tool
 async def search(query: str, limit: int = 10) -> List[SearchResult]:
-    """Search OWID using Algolia and return grapher CSV URLs.
-
-    IMPORTANT: Include country names in your query for country-specific data.
-    Examples: "population density france", "co2 emissions china", "gdp germany"
+    """Search OWID using Algolia and return grapher PNG URLs.
 
     Args:
-        query: Free‑text query. Always include country names when seeking country data.
+        query: Free‑text query (e.g. "population density france").
         limit: Maximum number of hits to return (<=60).
 
     Returns:
-        List of SearchResult objects with CSV URLs. URLs are automatically filtered
-        for countries mentioned in the query.
+        List of SearchResult objects with id, title, text, and url fields.
     """
     log.info("deep‑research.search", query=query, limit=limit)
 
@@ -210,13 +168,11 @@ async def search(query: str, limit: int = 10) -> List[SearchResult]:
                 break
         country_iso3 = country_name_to_iso3(country_name)
 
-        # &time=earliest..latest probably wrong...
-        grapher_url = f"https://ourworldindata.org/grapher/{slug}.csv?tab=line&csvType=filtered"
-
         if country_iso3:
-            grapher_url += f"&country=~{country_iso3}"
+            grapher_url = f"https://ourworldindata.org/grapher/{slug}.png?tab=chart&country=~{country_iso3}"
+        else:
+            grapher_url = f"https://ourworldindata.org/grapher/{slug}.png?tab=chart"
 
-        # NOTE: we could get metadata from https://ourworldindata.org/grapher/urban-area-long-term.metadata.json?v=1&csvType=filtered&useColumnShortNames=true
         results.append(
             SearchResult(
                 id=grapher_url,
@@ -231,28 +187,19 @@ async def search(query: str, limit: int = 10) -> List[SearchResult]:
 
 
 # ---------------------------------------------------------------------------
-# FETCH TOOL – downloads CSV and processes it
+# FETCH TOOL – downloads PNG and base‑64 encodes it
 # ---------------------------------------------------------------------------
 
 
 @mcp.tool
 async def fetch(id: str) -> FetchResult:
-    """Download a grapher CSV and return the processed data.
-
-    The returned CSV has the Entity column removed and contains only:
-    - Code: Country/region ISO codes
-    - Year: Time period
-    - [Metric columns]: The actual data values
-
-    IMPORTANT: Only provide data that exists in the fetched CSV. Do not hallucinate
-    or interpolate missing values.
+    """Download a grapher PNG and return it as base‑64.
 
     Args:
-        id: The full grapher CSV URL returned by `search`.
+        id: The full grapher URL returned by `search`.
 
     Returns:
-        FetchResult with `text` containing processed CSV data and metadata about
-        the dataset structure.
+        FetchResult with `text` containing the base‑64 PNG.
     """
     log.info("deep‑research.fetch", url=id)
 
@@ -262,37 +209,28 @@ async def fetch(id: str) -> FetchResult:
             title="Invalid ID (expected URL)",
             text="",
             url=id,
-            metadata={"error": "ID must be a grapher CSV URL"},
+            metadata={"error": "ID must be a grapher PNG URL"},
         )
 
     try:
         async with httpx.AsyncClient(timeout=HTTP_TIMEOUT) as client:
             resp = await client.get(id)
             resp.raise_for_status()
-            csv_content = resp.text
+            png_bytes = resp.content
 
-        # Process CSV to remove Entity column
-        df = pd.read_csv(io.StringIO(csv_content))
-        if "Entity" in df.columns:
-            df = df.drop(columns=["Entity"])
-
-        # Convert back to CSV string
-        processed_csv = df.to_csv(index=False)
-
+        b64_png = base64.b64encode(png_bytes).decode("ascii")
         slug = urllib.parse.urlparse(id).path.rsplit("/", 1)[-1].split(".")[0]
         title = slug.replace("-", " ").title()
 
         return FetchResult(
             id=id,
             title=title,
-            text=processed_csv,
+            text=b64_png,
             url=id,
             metadata={
-                "mime": "text/csv",
-                "encoding": "utf-8",
-                "size_bytes": len(processed_csv.encode("utf-8")),
-                "rows": len(df),
-                "columns": list(df.columns),
+                "mime": "image/png",
+                "encoding": "base64",
+                "size_bytes": len(png_bytes),
             },
         )
 
@@ -300,8 +238,8 @@ async def fetch(id: str) -> FetchResult:
         log.warning("deep‑research.fetch.error", url=id, error=str(exc))
         return FetchResult(
             id=id,
-            title=f"Error fetching CSV",
-            text=f"Failed to download CSV: {exc}",
+            title=f"Error fetching image",
+            text=f"Failed to download PNG: {exc}",
             url=id,
             metadata={"error": str(exc)},
         )

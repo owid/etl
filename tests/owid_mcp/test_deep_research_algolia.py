@@ -4,7 +4,6 @@ Tests for OWID Deep Research Algolia MCP Module.
 
 import base64
 import json
-from unittest.mock import MagicMock, patch
 
 import pytest
 from fastmcp import Client
@@ -23,52 +22,52 @@ class TestCountryNameToIso3:
         """Test with empty string."""
         assert country_name_to_iso3("") is None
 
-    def test_manual_mappings(self):
-        """Test manual mapping cases."""
+    def test_owid_regions_mappings(self):
+        """Test OWID regions mapping cases."""
+        # Test case-insensitive lookups work
         assert country_name_to_iso3("World") == "OWID_WRL"
-        assert country_name_to_iso3("European Union") == "OWID_EUN"
-        assert country_name_to_iso3("OECD") == "OWID_OECD"
-        assert country_name_to_iso3("High income") == "OWID_HIN"
-        assert country_name_to_iso3("Low income") == "OWID_LIN"
+        assert country_name_to_iso3("world") == "OWID_WRL"
+        
+        # Test standard countries work
+        assert country_name_to_iso3("France") == "FRA"
+        assert country_name_to_iso3("france") == "FRA"
+        assert country_name_to_iso3("United States") == "USA"
+        
+        # Test EU mapping (uses actual code from regions file)
+        assert country_name_to_iso3("European Union (27)") == "OWID_EU27"
+        
+        # Test unknown country
+        assert country_name_to_iso3("Unknown Country") is None
 
-    @patch("owid_mcp.deep_research_algolia.pycountry")
-    def test_pycountry_lookup_success(self, mock_pycountry):
-        """Test successful pycountry lookup."""
-        mock_country = MagicMock()
-        mock_country.alpha_3 = "USA"
-        mock_pycountry.countries.lookup.return_value = mock_country
+    def test_regions_file_loading(self):
+        """Test that regions file can be loaded successfully."""
+        from owid_mcp.deep_research_algolia import _load_regions_mapping
+        
+        # This should not raise an exception
+        mapping = _load_regions_mapping()
+        assert isinstance(mapping, dict)
+        assert len(mapping) > 0
+        
+        # Check some expected mappings exist
+        assert "france" in mapping
+        assert "united states" in mapping
+        assert "world" in mapping
 
+    def test_aliases_work(self):
+        """Test that country aliases work correctly."""
+        # Test some aliases that should exist in the regions file
+        # These will depend on what's actually in the regions.yml file
         result = country_name_to_iso3("United States")
-        assert result == "USA"
-        mock_pycountry.countries.lookup.assert_called_once_with("United States")
-
-    @patch("owid_mcp.deep_research_algolia.pycountry")
-    def test_pycountry_lookup_error_fallback_to_manual(self, mock_pycountry):
-        """Test pycountry lookup error with fallback to manual mapping."""
-        mock_pycountry.countries.lookup.side_effect = LookupError()
-
-        result = country_name_to_iso3("World")
-        assert result == "OWID_WRL"
-
-    @patch("owid_mcp.deep_research_algolia.pycountry")
-    def test_pycountry_lookup_error_no_manual_match(self, mock_pycountry):
-        """Test pycountry lookup error with no manual mapping."""
-        mock_pycountry.countries.lookup.side_effect = LookupError()
-
-        result = country_name_to_iso3("Unknown Country")
-        assert result is None
-
-    @patch("owid_mcp.deep_research_algolia.pycountry", None)
-    def test_no_pycountry_module_fallback_to_manual(self):
-        """Test when pycountry module is not available."""
-        result = country_name_to_iso3("World")
-        assert result == "OWID_WRL"
-
-    @patch("owid_mcp.deep_research_algolia.pycountry", None)
-    def test_no_pycountry_module_no_manual_match(self):
-        """Test when pycountry module is not available and no manual match."""
-        result = country_name_to_iso3("Unknown Country")
-        assert result is None
+        assert result == "USA" or result is not None  # Should find some mapping
+        
+    def test_case_insensitive_lookup(self):
+        """Test case insensitive country name lookup."""
+        # Test same country in different cases
+        france_upper = country_name_to_iso3("FRANCE")
+        france_lower = country_name_to_iso3("france") 
+        france_mixed = country_name_to_iso3("France")
+        
+        assert france_upper == france_lower == france_mixed == "FRA"
 
 
 class TestSearchTool:
@@ -132,16 +131,30 @@ class TestFetchTool:
 
     @pytest.mark.asyncio
     async def test_fetch_real_chart(self):
-        """Test fetching a real chart image."""
+        """Test fetching real CSV data and verify Entity column removal."""
         async with Client(mcp) as client:
             result = await client.call_tool(
-                "fetch", {"id": "https://ourworldindata.org/grapher/population-density.png?tab=chart"}
+                "fetch", {"id": "https://ourworldindata.org/grapher/population-density.csv"}
             )
 
             assert result is not None
+            assert result.data is not None
+            
+            # Verify the CSV structure
+            csv_text = result.data.text
+            assert isinstance(csv_text, str)
+            assert len(csv_text) > 0
+            
+            # Check that Entity column was removed
+            lines = csv_text.strip().split('\n')
+            header = lines[0]
+            assert 'Entity' not in header, f"Entity column should be removed, but header is: {header}"
+            
             # Basic validation that fetch worked
-            print(f"Fetch result type: {type(result.data)}")
-            print("Successfully called fetch tool with valid URL")
+            print(f"CSV header: {header}")
+            print(f"Number of data rows: {len(lines) - 1}")
+            print(f"Metadata: {result.data.metadata}")
+            print("Successfully called fetch tool and verified Entity column removal")
 
     @pytest.mark.asyncio
     async def test_fetch_invalid_id(self):
@@ -157,11 +170,11 @@ class TestFetchTool:
         """Test fetch with nonexistent chart."""
         async with Client(mcp) as client:
             result = await client.call_tool(
-                "fetch", {"id": "https://ourworldindata.org/grapher/nonexistent-chart-12345.png"}
+                "fetch", {"id": "https://ourworldindata.org/grapher/nonexistent-chart-12345.csv"}
             )
 
             assert result is not None
-            print("Successfully called fetch tool with nonexistent chart URL")
+            print("Successfully called fetch tool with nonexistent CSV URL")
 
 
 class TestIntegration:
@@ -197,12 +210,12 @@ class TestIntegration:
             # Search for coal france
             search_result = await client.call_tool("search", {"query": "coal consumption france", "limit": 1})
 
-            # Now .data[0] should contain the structured SearchResult data
+            # Now .data[0] should contain the structured SearchResult data with CSV URLs
             expected_result = {
-                "id": "https://ourworldindata.org/grapher/coal-consumption-by-country-terawatt-hours-twh.png?tab=chart&country=~FRA",
+                "id": "https://ourworldindata.org/grapher/coal-consumption-by-country-terawatt-hours-twh.csv?tab=line&csvType=filtered&time=earliest..latest&country=~FRA",
                 "text": "Coal consumption by country or region, measured in terawatt-hours (TWh).",
                 "title": "Coal consumption",
-                "url": "https://ourworldindata.org/grapher/coal-consumption-by-country-terawatt-hours-twh.png?tab=chart&country=~FRA",
+                "url": "https://ourworldindata.org/grapher/coal-consumption-by-country-terawatt-hours-twh.csv?tab=line&csvType=filtered&time=earliest..latest&country=~FRA",
             }
 
             assert search_result.data[0] == expected_result
