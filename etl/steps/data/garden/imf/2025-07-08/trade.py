@@ -90,12 +90,12 @@ def run() -> None:
     for table_index, (table_name, table_data) in enumerate(table_subsets):
         processed_table = sh.process_table_subset(table_data)
         if table_name in ["owid_regions", "imf_regions"]:
-            processed_table = processed_table.rename(
-                columns={"country": "counterpart_country", "counterpart_country": "country"}
+            #    processed_table = processed_table.rename(
+            #        columns={"country": "counterpart_country", "counterpart_country": "country"}
+            #    )
+            processed_table.loc[processed_table["country"] == processed_table["counterpart_country"], "country"] = (
+                "Intraregional"
             )
-            processed_table.loc[
-                processed_table["country"] == processed_table["counterpart_country"], "counterpart_country"
-            ] = "Intraregional"
 
         tbs.append(processed_table)
 
