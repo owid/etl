@@ -202,19 +202,28 @@ async def search(query: str, limit: int = 10) -> List[SearchResult]:
             .replace("</mark>", "")
         )
 
-        # Attempt to deduce a country from highlight results for tighter charts
-        country_name: Optional[str] = None
+        # Attempt to deduce countries from highlight results for tighter charts
+        country_codes: List[str] = []
         for ent in hit.get("_highlightResult", {}).get("availableEntities", []):
             if ent.get("matchedWords"):
                 country_name = ent["value"].replace("<mark>", "").replace("</mark>", "")
-                break
-        country_iso3 = country_name_to_iso3(country_name)
+                country_iso3 = country_name_to_iso3(country_name)
+                if country_iso3:
+                    country_codes.append(country_iso3)
 
         # &time=earliest..latest probably wrong...
         grapher_url = f"https://ourworldindata.org/grapher/{slug}.csv?tab=line&csvType=filtered"
 
-        if country_iso3:
-            grapher_url += f"&country=~{country_iso3}"
+        # We need to add this I guess...
+        grapher_url += "&time=earliest..latest"
+
+        # Perhaps we should use this?
+        # https://ourworldindata.org/grapher/population-density.csv?v=1&csvType=filtered&useColumnShortNames=true&tab=line&country=FRA~DEU
+
+        if country_codes:
+            # Format multiple countries as country=FRA~DEU~...
+            country_param = "~".join(country_codes)
+            grapher_url += f"&country={country_param}"
 
         # NOTE: we could get metadata from https://ourworldindata.org/grapher/urban-area-long-term.metadata.json?v=1&csvType=filtered&useColumnShortNames=true
         results.append(
