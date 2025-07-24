@@ -1,0 +1,30 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Gallup World Poll: Life in Five Years and Life Today"
+    description: |-
+      As part of Gallup World Poll, people were asked the following questions related to life satisfaction:
+      - "Please imagine a ladder with steps numbered from 0 at the bottom to 10 at the top. Suppose we say that the top of the ladder represents the best possible life for you, and the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time, assuming that the higher the step the better you feel about your life, and the lower the step the worse you feel about it? Which step comes closest to the way you feel?"
+      - "Please imagine a ladder with steps numbered from 0 at the bottom to 10 at the top. Suppose we say that the top of the ladder represents the best possible life for you, and the bottom of the ladder represents the worst possible life for you. Just your best guess, on which step do you think you will stand on in the future, say about five years from now?"
+    date_published: "2025"
+
+    # Citation
+    producer: Gallup
+    citation_full: |-
+      Gallup World Poll: Life in Five Years and Life Today. Accessed via Gallup Analytics. Copyright © 2025 Gallup, Inc. All rights reserved.
+    attribution_short: Gallup
+
+    # Files
+    url_main: https://wpr.gallup.com/
+    date_accessed: '2025-07-22'
+
+    # License
+    license:
+      name: Copyright © 2025 Gallup, Inc.
+  is_public: false
+outs:
+  - md5: f491fc2809267dc6be5d5365465d358f
+    size: 172989
+    path: life_in_five_years_and_life_today.xlsx
