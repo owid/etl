@@ -50,24 +50,6 @@ steps:
   data://explorers/wid/latest/world_inequality_database:
     - data://garden/wid/2025-03-14/world_inequality_database
 
-  # Luxembourg Income Study
-  data://meadow/lis/2025-01-24/luxembourg_income_study:
-    - snapshot://lis/2025-01-24/lis_keyvars.csv
-    - snapshot://lis/2025-01-24/lis_abs_poverty.csv
-    - snapshot://lis/2025-01-24/lis_distribution.csv
-    - snapshot://lis/2025-01-24/lis_keyvars_adults.csv
-    - snapshot://lis/2025-01-24/lis_abs_poverty_adults.csv
-    - snapshot://lis/2025-01-24/lis_distribution_adults.csv
-    - snapshot://lis/2024-06-13/lis_percentiles.csv
-    - snapshot://lis/2024-06-13/lis_percentiles_adults.csv
-    - data://garden/regions/2023-01-01/regions
-  data://garden/lis/2025-01-24/luxembourg_income_study:
-    - data://meadow/lis/2025-01-24/luxembourg_income_study
-  data://grapher/lis/2025-01-24/luxembourg_income_study:
-    - data://garden/lis/2025-01-24/luxembourg_income_study
-  data://explorers/lis/latest/luxembourg_income_study:
-    - data://garden/lis/2025-01-24/luxembourg_income_study
-
     # Luxembourg Income Study
   data://meadow/lis/2025-07-23/luxembourg_income_study:
     - snapshot://lis/2025-07-23/lis_keyvars.csv
@@ -82,6 +64,8 @@ steps:
   data://garden/lis/2025-07-23/luxembourg_income_study:
     - data://meadow/lis/2025-07-23/luxembourg_income_study
   data://grapher/lis/2025-07-23/luxembourg_income_study:
+    - data://garden/lis/2025-07-23/luxembourg_income_study
+  data://explorers/lis/latest/luxembourg_income_study:
     - data://garden/lis/2025-07-23/luxembourg_income_study
 
   # Poverty and inequality file for inequality comparisons at OWID
