@@ -99,16 +99,18 @@ tables:
           Period life expectancy at birth
         description_short: "[Period life expectancy](#dod:period-life-expectancy) is the number of years the average person born in a certain year would live if they experienced the same chances of dying at each age as people did that year."
         description_key:
-          - Across the world, people are living longer. In 1900, the global average life expectancy of a newborn was 32 years. By 2021, this had more than doubled to 71 years.
-          - Big improvements were achieved by countries [around the world](https://ourworldindata.org/#:~:text=achieved%20by%20countries-,around%20the%20world,-.%20The%20chart%20shows). The chart shows that life expectancy has more than doubled in every region of the world. This improvement is not only due to declining child mortality; life expectancy increased [at all ages](https://ourworldindata.org/#:~:text=life%20expectancy%20increased-,at%20all%20ages,-.).
-          - This visualization shows long-run estimates of life expectancy brought together by our team from several different data sources. It also shows that the [COVID-19 pandemic](https://ourworldindata.org/#:~:text=shows%20that%20the-,COVID%2D19%20pandemic,-led%20to%20reduced) led to reduced life expectancy worldwide.
-          - Period life expectancy is a metric that summarizes death rates across all age groups in one particular year.
-          - It shows how long the average baby born in that year would be expected to live if they experienced the same chances of dying at each age as people did in that year.
-          - Prior to 1950, we used the Human Mortality Database (2024) data combined with Zijdeman (2015). For historical regional data, before 1950, we used Riley's (2005) estimates. From 1950 onwards, we used United Nations World Population Prospects (2024) data.
+          - Across the world, people are living longer. In 1900, the global average life expectancy was 32 years. By 2023, this had more than doubled to 73 years.
+          - Countries around the world made big improvements, and life expectancy more than doubled in every region. This wasn’t just due to falling child mortality; people started living longer at all ages.
+          - Even after World War II, there have been large drops in life expectancy, such as during the Great Leap Forward famine in China, the HIV/AIDS epidemic in sub-Saharan Africa, the Rwandan genocide, or the COVID-19 pandemic.
+          - This chart shows long-run estimates of life expectancy compiled by our team from several data sources.
+          - Period life expectancy is an indicator that summarizes death rates across all age groups in one particular year. It shows how long the average baby born in that year would be expected to live if they experienced the same chances of dying at each age as people did in that year.
+          - Before 1950, for country-level data, we rely on the [Human Mortality Database (2024)](https://www.mortality.org/Data/ZippedDataFiles) combined with [Zijdeman (2015)](https://clio-infra.eu/Indicators/LifeExpectancyatBirthTotal.html). For regional data, we use [Riley (2005)](https://doi.org/10.1111/j.1728-4457.2005.00083.x). From 1950 onward, we use the [United Nations World Population Prospects (2024)](https://population.un.org/wpp/Download/).
         description_processing: |-
-          This chart is a combination of several data sources which we join together. For historical country-level data we use the Human Mortality Database (2024) data combined with Zijdeman et al. (2015).
+          This chart combines data from several sources. For country-level data before 1950, we use the Human Mortality Database (2024) data and Zijdeman et al. (2015). For country-years where these sources overlap, we use the Human Mortality Database.
 
-          For historical regional data, before 1950, we used Riley's (2005) estimates. From 1950 onwards, we use United Nations World Population Prospects (2024) data. The countries included in the regions follow Riley (2005) until 1950 and UN WPP afterwards.
+          For regional data, before 1950, we use Riley's (2005) estimates.
+
+          From 1950 onwards, we use the United Nations World Population Prospects (2024) for both country-level and regional data.
 
         # add a note on what is preferred out of HMD and Zijdeman where they overlap.
         display:
