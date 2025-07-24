@@ -138,7 +138,7 @@ mcp = FastMCP(
 
 
 @mcp.tool
-async def search(query: str, limit: int = 10) -> List[SearchResult]:
+async def search(query: str) -> List[SearchResult]:
     """Search OWID using Algolia and return grapher CSV URLs.
 
     IMPORTANT: Include country names in your query for country-specific data.
@@ -146,13 +146,13 @@ async def search(query: str, limit: int = 10) -> List[SearchResult]:
 
     Args:
         query: Free‑text query. Always include country names when seeking country data.
-        limit: Maximum number of hits to return (<=60).
 
     Returns:
         List of SearchResult objects with CSV URLs. URLs are automatically filtered
         for countries mentioned in the query.
     """
-    log.info("deep‑research.search", query=query, limit=limit)
+    limit = 10  # Fixed limit for deep research compatibility
+    log.debug("search.start", query=query, limit=limit)
     
     try:
         payload = {
@@ -184,21 +184,16 @@ async def search(query: str, limit: int = 10) -> List[SearchResult]:
         }
 
         async with httpx.AsyncClient(timeout=HTTP_TIMEOUT) as client:
-            log.info("algolia.request", url=ALGOLIA_URL, payload=payload)
             resp = await client.post(ALGOLIA_URL, json=payload, headers=headers)
             resp.raise_for_status()
             response_data = resp.json()
-            log.info("algolia.response", status=resp.status_code, results_count=len(response_data.get("results", [])))
             hits = response_data["results"][0].get("hits", [])
-            log.info("algolia.hits", count=len(hits))
+            log.debug("algolia.response", hits_count=len(hits))
 
         results: List[SearchResult] = []
-        for i, hit in enumerate(hits):
-            log.info("processing.hit", index=i, slug=hit.get("slug"), title=hit.get("title"))
-            
+        for hit in hits:
             # Not needed
-            available_entities = hit.pop("availableEntities", [])
-            log.info("hit.available_entities", count=len(available_entities))
+            hit.pop("availableEntities", [])
 
             slug = hit["slug"]
             title = hit.get("title") or slug.replace("-", " ").title()
@@ -213,13 +208,11 @@ async def search(query: str, limit: int = 10) -> List[SearchResult]:
             # Attempt to deduce countries from highlight results for tighter charts
             country_codes: List[str] = []
             highlight_entities = hit.get("_highlightResult", {}).get("availableEntities", [])
-            log.info("highlight.entities", count=len(highlight_entities))
             
             for ent in highlight_entities:
                 if ent.get("matchedWords"):
                     country_name = ent["value"].replace("<mark>", "").replace("</mark>", "")
                     country_iso3 = country_name_to_iso3(country_name)
-                    log.info("country.detection", name=country_name, iso3=country_iso3, matched_words=ent.get("matchedWords"))
                     if country_iso3:
                         country_codes.append(country_iso3)
 
@@ -236,9 +229,6 @@ async def search(query: str, limit: int = 10) -> List[SearchResult]:
                 # Format multiple countries as country=FRA~DEU~...
                 country_param = "~".join(country_codes)
                 grapher_url += f"&country={country_param}"
-                log.info("url.with_countries", url=grapher_url, countries=country_codes)
-            else:
-                log.info("url.no_countries", url=grapher_url)
 
             # NOTE: we could get metadata from https://ourworldindata.org/grapher/urban-area-long-term.metadata.json?v=1&csvType=filtered&useColumnShortNames=true
             results.append(
@@ -250,11 +240,11 @@ async def search(query: str, limit: int = 10) -> List[SearchResult]:
                 )
             )
 
-        log.info("deep‑research.search.done", returned=len(results))
+        log.debug("search.done", returned=len(results))
         return results
     
     except Exception as exc:
-        log.error("deep‑research.search.error", query=query, error=str(exc), exc_info=True)
+        log.error("search.error", query=query, error=str(exc))
         return []
 
 
