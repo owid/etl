@@ -120,7 +120,7 @@ def country_name_to_iso3(name: Optional[str]) -> Optional[str]:
 # ---------------------------------------------------------------------------
 
 mcp = FastMCP(
-    stateless_http=True,
+    # stateless_http=True,
     name="OWID Deep Research",
     instructions=(
         "Search OWID charts via Algolia and fetch CSV data for Deep‑Research workflows.\n\n"
