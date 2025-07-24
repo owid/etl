@@ -14,13 +14,14 @@ def run() -> None:
     ds_garden = paths.load_dataset("drug_approvals")
 
     # Read table from garden dataset.
-    tb = ds_garden.read("drug_approvals", reset_index=False)
+    tb = ds_garden.read("total_drug_approvals", reset_index=False)
+    tb_designations = ds_garden.read("drug_approvals_designations", reset_index=False)
 
     #
     # Save outputs.
     #
     # Initialize a new grapher dataset.
-    ds_grapher = paths.create_dataset(tables=[tb], default_metadata=ds_garden.metadata)
+    ds_grapher = paths.create_dataset(tables=[tb, tb_designations], default_metadata=ds_garden.metadata)
 
     # Save grapher dataset.
     ds_grapher.save()

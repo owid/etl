@@ -1279,15 +1279,10 @@ steps:
     - data://garden/tuberculosis/2025-06-16/laboratories
 
   #
-  # Drug approvals - FDA (Drugs@FDA and CDER Approvals)
-  #
-  data://meadow/health/2025-07-16/drug_approvals:
-    - snapshot://fda/2025-07-15/drugs_at_fda_json.zip
+  # Drug approvals - FDA (CDER Approvals & Purple Book (CBER Approvals))
   data://garden/health/2025-07-16/drug_approvals:
-  #  - data://meadow/health/2025-07-16/drug_approvals
     - data://meadow/health/2025-07-16/cder_approvals
     - data://meadow/health/2025-07-16/purple_book
-    - data://meadow/health/2025-07-16/orange_book
   data://grapher/health/2025-07-16/drug_approvals:
     - data://garden/health/2025-07-16/drug_approvals
   data://meadow/health/2025-07-16/cder_approvals:
@@ -1295,5 +1290,3 @@ steps:
 
   data://meadow/health/2025-07-16/purple_book:
     - snapshot://fda/2025-07-16/purple_book.csv
-  data://meadow/health/2025-07-16/orange_book:
-    - snapshot://fda/2025-07-16/orange_book.zip

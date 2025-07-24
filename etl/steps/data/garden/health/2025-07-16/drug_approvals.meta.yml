@@ -3,7 +3,9 @@ definitions:
   common:
     presentation:
       topic_tags:
-        - Uncategorized
+        - Medicine & Biotechnology
+    processing_level: major
+
 
 
 # Learn more about the available fields:
@@ -13,46 +15,93 @@ dataset:
 
 
 tables:
-  drug_approvals:
+  total_drug_approvals:
     variables:
-      # testing_variable:
-      #   title: Testing variable title
-      #   unit: arbitrary units
-      #   short_unit: au
-      #   description_short: Short description of testing variable.
-      #   description_processing: Description of processing of testing variable.
-      #   description_key: List of key points about the indicator.
-      #   description_from_producer: Description of testing variable from producer.
-      #   processing_level: minor
-      #   type:
-      #   sort:
-      #   presentation:
-      #     attribution:
-      #     attribution_short:
-      #     faqs:
-      #     grapher_config:
-      #     title_public:
-      #     title_variant:
-      #     topic_tags:
-      #   display:
-      #     name: Testing variable
-      #     numDecimalPlaces: 0
-      #     tolerance: 0
-      #     color:
-      #     conversionFactor: 1
-      #     description:
-      #     entityAnnotationsMap: Test annotation
-      #     includeInTable:
-      #     isProjection: false
-      #     unit: arbitrary units
-      #     shortUnit: au
-      #     tableDisplay:
-      #       hideAbsoluteChange:
-      #       hideRelativeChange:
-      #     yearIsDay: false
-      #     zeroDay:
-      #     roundingMode:
-      #     numSignificantFigures:
-      #
-      {}
+      total_approvals:
+        title: Total drug approvals
+        unit: 'approvals'
+        short_unit: ''
+        description_short: |-
+          The total number of new drug approvals in a given year. These include new molecular entities (NMEs) and biologics license applications (BLAs) approved by the FDA. These do not include generics or biosimilars.
+        display:
+          numDecimalPlaces: 0
+        description_processing: |-
+          - This data includes both new molecular entities (NMEs) and biologics license applications (BLAs) approved by the Center for Drug Evaluation and Research (CDER) and the Center for Biologics Evaluation and Research (CBER) of the FDA.
+          - Biologicals approved by the CBER have been extracted from the FDA's "Purple Book", which lists licensed biological products with reference product exclusivity and biosimilarity or interchangeability evaluations.
+          - We removed biosimilars from the dataset by excluding products with a "biosimilar" or "interchangeable" license type as well as products with a reference product listed.
+  drug_approvals_designations:
+    variables:
+      orphan_drug_approvals:
+        title: Orphan drug approvals
+        unit: 'approvals'
+        short_unit: ''
+        description_short: |-
+          The number of orphan drug approvals in a given year. Orphan drugs are those intended to treat rare diseases or conditions that affect fewer than 200,000 people in the United States.
+        display:
+          numDecimalPlaces: 0
+      accelerated_approvals:
+        title: Accelerated approvals
+        unit: 'approvals'
+        short_unit: ''
+        description_short: |-
+          The number of drugs that received accelerated approval in a given year. This pathway allows for earlier approval of drugs that treat serious conditions and fill an unmet medical need.
+        description_from_producer: |-
+          The FDA instituted its Accelerated Approval Program to allow for earlier approval of drugs that treat serious conditions, and fill an unmet medical need based on a surrogate endpoint.  A surrogate endpoint is a marker, such as a laboratory measurement, radiographic image, physical sign or other measure that is thought to predict clinical benefit but is not itself a measure of clinical benefit. The use of a surrogate endpoint can considerably shorten the time required prior to receiving FDA approval.
+
+          Drug companies are still required to conduct studies to confirm the anticipated clinical benefit. If the confirmatory trial shows that the drug actually provides a clinical benefit, then the FDA grants traditional approval for the drug.  If the confirmatory trial does not show that the drug provides clinical benefit, FDA has regulatory procedures in place that could lead to removing the drug from the market.
+        display:
+          numDecimalPlaces: 0
+      breakthrough_therapy_approvals:
+        title: Breakthrough therapy approvals
+        unit: 'approvals'
+        short_unit: ''
+        description_short: |-
+          The number of drugs that received breakthrough therapy designation in a given year. This designation is for drugs that treat serious conditions and have shown preliminary clinical evidence of substantial improvement over existing therapies.
+        display:
+          numDecimalPlaces: 0
+      fast_track_approvals:
+        title: Fast track approvals
+        unit: 'approvals'
+        short_unit: ''
+        description_short: |-
+          The number of drugs that received fast track designation in a given year. This designation is for drugs that treat serious conditions and fill an unmet medical need.
+        description_from_producer: |-
+          Fast track is a process designed to facilitate the development, and expedite the review of drugs to treat serious conditions and fill an unmet medical need.
+
+          Filling an unmet medical need is defined as providing a therapy where none exists or providing a therapy which may be potentially better than available therapy.
+
+          Any drug being developed to treat or prevent a condition with no current therapy obviously is directed at an unmet need. If there are available therapies, a fast track drug must show some advantage over available therapy, such as:
+
+          - Showing superior effectiveness, effect on serious outcomes or improved effect on serious outcomes
+
+          - Avoiding serious side effects of an available therapy
+
+          - Improving the diagnosis of a serious condition where early diagnosis results in an improved outcome
+
+          - Decreasing a clinical significant toxicity of an available therapy that is common and causes discontinuation of treatment
+
+          - Ability to address emerging or anticipated public health need
+
+        display:
+          numDecimalPlaces: 0
+      qualified_infectious_disease_approvals:
+        title: Qualified infectious disease approvals
+        unit: 'approvals'
+        short_unit: ''
+        description_short: |-
+          The number of drugs that received qualified infectious disease product designation in a given year. This designation is for (antibacterial or antifungal) drugs that treat serious or life-threatening infectious diseases.
+        display:
+          numDecimalPlaces: 0
+      vaccine_approvals:
+        title: Vaccine approvals
+        unit: 'approvals'
+        short_unit: ''
+        description_short: |-
+          The number of vaccines approved in a given year. Vaccines are biological preparations that provide acquired immunity to a particular infectious disease.
+        display:
+          numDecimalPlaces: 0
+        description_processing: |-
+          - This data includes vaccines approved by the Center for Biologics Evaluation and Research (CBER) of the FDA.
+          - We identified vaccines by filtering all products with a proper name that contains the word "vaccine". Other categories such as immune globulins were not included.
+
 
