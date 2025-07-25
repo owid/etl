@@ -5,9 +5,6 @@ title:
 default_selection:
   - China
   - United States
-  - Japan
-  - Germany
-  - Peru
 
 dimensions:
   - name: Country
