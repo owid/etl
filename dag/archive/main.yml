@@ -565,6 +565,25 @@ steps:
   data://grapher/ilostat/2023-09-19/average_work_hours:
     - data://garden/ilostat/2023-09-19/average_work_hours
 
+      # Ethnic Power Relations Dataset
+  data://meadow/eth/2023-03-15/growup:
+    - snapshot://eth/2023-03-15/growup.csv
+  data://garden/eth/2023-03-15/ethnic_power_relations:
+    - data://meadow/eth/2023-03-15/growup
+    - data://garden/demography/2023-03-31/population
+    - data://garden/wb/2021-07-01/wb_income
+    - data://garden/regions/2023-01-01/regions
+  data://grapher/eth/2023-03-15/ethnic_power_relations:
+    - data://garden/eth/2023-03-15/ethnic_power_relations
+
+      # World Bank's Women, Business and the Law additional data
+  data://meadow/wb/2023-05-12/women_business_law_additional:
+    - snapshot://wb/2023-05-12/women_business_law_additional.xlsx
+  data://garden/wb/2023-05-12/women_business_law_additional:
+    - data://meadow/wb/2023-05-12/women_business_law_additional
+  data://grapher/wb/2023-05-12/women_business_law_additional:
+    - data://garden/wb/2023-05-12/women_business_law_additional
+
 include:
   # Include all active steps plus all archive steps.
   - dag/main.yml
