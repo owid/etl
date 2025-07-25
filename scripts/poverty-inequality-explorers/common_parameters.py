@@ -149,8 +149,8 @@ PPP_DESCRIPTION_WID = f"The data is measured in international-$ at {PPP_VERSION_
 ####################################################################################################
 # LUXEMBOURG INCOME STUDY
 ####################################################################################################
-SOURCE_NAME_LIS = "Luxembourg Income Study (2024)"
-DATA_PUBLISHED_BY_LIS = "Luxembourg Income Study (LIS) Database, http://www.lisdatacenter.org (multiple countries; December 2024). Luxembourg: LIS."
+SOURCE_NAME_LIS = "Luxembourg Income Study (2025)"
+DATA_PUBLISHED_BY_LIS = "Luxembourg Income Study (LIS) Database, http://www.lisdatacenter.org (multiple countries; June 2025). Luxembourg: LIS."
 SOURCE_LINK_LIS = "https://www.lisdatacenter.org/our-data/lis-database/"
 
 # NOTE: Also update the year here: https://docs.google.com/spreadsheets/d/1wcFsNZCEn_6SJ05BFkXKLUyvCrnigfR8eeemGKgAYsI/edit#gid=329774797

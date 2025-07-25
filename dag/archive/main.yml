@@ -550,6 +550,13 @@ steps:
     - data://garden/demography/2024-07-15/population
   data://grapher/wb/2024-07-29/income_groups:
     - data://garden/wb/2024-07-29/income_groups
+  # ILOstat Average Work Hours
+  data://meadow/ilostat/2023-09-19/average_work_hours:
+    - snapshot://ilostat/2023-09-19/average_work_hours.csv
+  data://garden/ilostat/2023-09-19/average_work_hours:
+    - data://meadow/ilostat/2023-09-19/average_work_hours
+  data://grapher/ilostat/2023-09-19/average_work_hours:
+    - data://garden/ilostat/2023-09-19/average_work_hours
 
 include:
   # Include all active steps plus all archive steps.
