@@ -38,7 +38,7 @@ tables:
           numDecimalPlaces: *decimals
           name: |-
             <% if counterpart_country != 'Intraregional' %>
-            Exports to << counterpart_country >>
+            << counterpart_country >>'s exports
             <% elif counterpart_country == 'Intraregional' %>
             Intraregional exports
             <%- endif -%>
@@ -62,7 +62,7 @@ tables:
           numDecimalPlaces: *decimals
           name: |-
             <% if counterpart_country != 'Intraregional' %>
-            Imports from << counterpart_country >>
+            << counterpart_country >>'s imports
             <% elif counterpart_country == 'Intraregional' %>
             Intraregional imports
             <%- endif -%>
@@ -110,7 +110,8 @@ tables:
           numDecimalPlaces: *decimals
           name: |-
             <% if counterpart_country != 'Intraregional' %>
-            Trade with << counterpart_country >>
+            << counterpart_country >>'s trade
             <% elif counterpart_country == 'Intraregional' %>
             Intraregional trade
             <%- endif -%>
+
