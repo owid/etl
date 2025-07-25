@@ -1029,36 +1029,6 @@ def _extract_origin_attributes(origin, base_display_name: str) -> List[List[str]
     # Return a single row with all the origin information
     return [[base_display_name, formatted_value]]
 
-
-def _create_metadata_dataframes(
-    table: Table, metadata_variables: Optional[List[str]] = None
-) -> Dict[str, pd.DataFrame]:
-    """Create metadata DataFrames for each variable in the table."""
-    metadata_dfs = {}
-
-    variables_to_process = _get_variables_to_process(table, metadata_variables)
-
-    for column_name in variables_to_process:
-        if not (hasattr(table[column_name], "metadata") and table[column_name].metadata):
-            continue
-
-        try:
-            metadata_rows = _extract_metadata_rows(
-                table[column_name].metadata, GSHEET_EXPORT_CONFIG["INCLUDED_METADATA_FIELDS"]
-            )
-
-            if metadata_rows:
-                # Create DataFrame with proper column headers
-                metadata_df = pd.DataFrame(metadata_rows, columns=["Property", "Value"])
-                metadata_dfs[f"metadata_{column_name}"] = metadata_df
-
-        except Exception as e:
-            log.warning(f"Warning: Could not process metadata for column '{column_name}': {e}")
-            continue
-
-    return metadata_dfs
-
-
 def export_table_to_gsheet(
     table: Table,
     sheet_title: str,
@@ -1136,7 +1106,29 @@ def _update_or_create_sheet(
 
 def _add_metadata_tabs(sheet: GoogleSheet, table: Table, metadata_variables: Optional[List[str]]) -> None:
     """Add metadata tabs to the sheet."""
-    metadata_dfs = _create_metadata_dataframes(table, metadata_variables)
+
+    """Create metadata DataFrames for each variable in the table."""
+    metadata_dfs = {}
+
+    variables_to_process = _get_variables_to_process(table, metadata_variables)
+
+    for column_name in variables_to_process:
+        if not (hasattr(table[column_name], "metadata") and table[column_name].metadata):
+            continue
+
+        try:
+            metadata_rows = _extract_metadata_rows(
+                table[column_name].metadata, GSHEET_EXPORT_CONFIG["INCLUDED_METADATA_FIELDS"]
+            )
+
+            if metadata_rows:
+                # Create DataFrame with proper column headers
+                metadata_df = pd.DataFrame(metadata_rows, columns=["Property", "Value"])
+                metadata_dfs[f"metadata_{column_name}"] = metadata_df
+
+        except Exception as e:
+            log.warning(f"Warning: Could not process metadata for column '{column_name}': {e}")
+            continue
     for sheet_name, metadata_df in metadata_dfs.items():
         try:
             sheet.write_dataframe(metadata_df, sheet_name=sheet_name)
