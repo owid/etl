@@ -132,7 +132,7 @@ def calculate_share_surviving_first_five_years(tb_combined: Table) -> Table:
     """
     # Drop out years prior to 1800 and regions that aren't countries
 
-    tb_world = tb_combined[(tb_combined["country"] == "World")].drop(columns=["source", "source_url"])
+    tb_world = tb_combined[(tb_combined["country"] == "World")].drop(columns=["source", "source_url"], errors="ignore")
 
     # Add global labels and calculate the share of children surviving/dying in their first five years
 

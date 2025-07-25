@@ -30,7 +30,7 @@ def run() -> None:
         metadata_variables=["child_mortality_rate"],
     )
 
-    log.info(f"Google Sheet exported successfully. URL: {sheet_url}, ID: {sheet_id}")  # Process data.
+    log.info(f"Google Sheet exported successfully. URL: {sheet_url}, ID: {sheet_id}")
     # Dropping columns we only want in the GSheet and not in grapher
     tb = tb.drop(columns=["source_url"])
     tb_sel = tb_sel.drop(columns=["source_url"])

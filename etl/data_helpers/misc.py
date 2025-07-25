@@ -1058,7 +1058,7 @@ def export_table_to_gsheet(
     """
     if not CLIENT_SECRET_FILE or not CLIENT_SECRET_FILE.exists() or OWID_ENV.env_local != "dev":
         raise RuntimeError(
-            "Google Sheets export is only available in development environment with valid CLIENT_SECRET_FILE"
+            "Google Sheets export is only available in local environment (not staging or prod) with valid CLIENT_SECRET_FILE"
         )
 
     try:
