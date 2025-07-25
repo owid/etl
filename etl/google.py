@@ -1083,11 +1083,7 @@ class GoogleSheet:
 
     @classmethod
     def create_or_update_sheet(
-        cls,
-        title: str,
-        df: pd.DataFrame,
-        folder_id: Optional[str] = None,
-        update_existing: bool = False
+        cls, title: str, df: pd.DataFrame, folder_id: Optional[str] = None, update_existing: bool = False
     ) -> "GoogleSheet":
         """
         Create a new Google Sheet or update an existing one and return a GoogleSheet instance.
