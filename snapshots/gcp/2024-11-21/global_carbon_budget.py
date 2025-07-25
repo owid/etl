@@ -27,7 +27,6 @@ DATA_FILES = [
 
 # Define common metadata fields (to be written to dvc files).
 ATTRIBUTION = "Global Carbon Budget (2024)"
-ATTRIBUTION_SHORT = "GCB"
 CITATION_FULL = """Andrew, R. M., & Peters, G. P. (2024). The Global Carbon Project's fossil CO2 emissions dataset (2024v17) [Data set]. Zenodo. https://doi.org/10.5281/zenodo.13981696
 
 The data files of the Global Carbon Budget can be found at: https://globalcarbonbudget.org/carbonbudget/
@@ -35,22 +34,24 @@ The data files of the Global Carbon Budget can be found at: https://globalcarbon
 For more details, see the original paper:
 Friedlingstein, P., O'Sullivan, M., Jones, M. W., Andrew, R. M., Bakker, D. C. E., Hauck, J., Landschützer, P., Le Quéré, C., Luijkx, I. T., Peters, G. P., Peters, W., Pongratz, J., Schwingshackl, C., Sitch, S., Canadell, J. G., Ciais, P., Jackson, R. B., Alin, S. R., Anthoni, P., Barbero, L., Bates, N. R., Becker, M., Bellouin, N., Decharme, B., Bopp, L., Brasika, I. B. M., Cadule, P., Chamberlain, M. A., Chandra, N., Chau, T.-T.-T., Chevallier, F., Chini, L. P., Cronin, M., Dou, X., Enyo, K., Evans, W., Falk, S., Feely, R. A., Feng, L., Ford, D. J., Gasser, T., Ghattas, J., Gkritzalis, T., Grassi, G., Gregor, L., Gruber, N., Gürses, Ö., Harris, I., Hefner, M., Heinke, J., Houghton, R. A., Hurtt, G. C., Iida, Y., Ilyina, T., Jacobson, A. R., Jain, A., Jarníková, T., Jersild, A., Jiang, F., Jin, Z., Joos, F., Kato, E., Keeling, R. F., Kennedy, D., Klein Goldewijk, K., Knauer, J., Korsbakken, J. I., Körtzinger, A., Lan, X., Lefèvre, N., Li, H., Liu, J., Liu, Z., Ma, L., Marland, G., Mayot, N., McGuire, P. C., McKinley, G. A., Meyer, G., Morgan, E. J., Munro, D. R., Nakaoka, S.-I., Niwa, Y., O'Brien, K. M., Olsen, A., Omar, A. M., Ono, T., Paulsen, M., Pierrot, D., Pocock, K., Poulter, B., Powis, C. M., Rehder, G., Resplandy, L., Robertson, E., Rödenbeck, C., Rosan, T. M., Schwinger, J., Séférian, R., Smallman, T. L., Smith, S. M., Sospedra-Alfonso, R., Sun, Q., Sutton, A. J., Sweeney, C., Takao, S., Tans, P. P., Tian, H., Tilbrook, B., Tsujino, H., Tubiello, F., van der Werf, G. R., van Ooijen, E., Wanninkhof, R., Watanabe, M., Wimart-Rousseau, C., Yang, D., Yang, X., Yuan, W., Yue, X., Zaehle, S., Zeng, J., and Zheng, B.: Global Carbon Budget 2023, Earth Syst. Sci. Data, 15, 5301-5369, https://doi.org/10.5194/essd-15-5301-2023, 2023."""
 
-DESCRIPTION = """The Global Carbon Budget was founded by the Global Carbon Project (GCP) international science team to track the trends in global carbon emissions and sinks and is a key measure of progress towards the goals of the Paris Agreement. It's widely recognized as the most comprehensive report of its kind.
+DESCRIPTION = """The Global Carbon Budget was established by the Global Carbon Project (GCP) to track global carbon emissions and sinks.
 
-The GCP has been publishing estimates of global and national fossil CO2 emissions since 2001. In the first instance these were simple re-publications of data from another source, but over subsequent years refinements have been made in response to feedback and identification of inaccuracies."""
+This dataset makes it possible to assess whether countries are making progress toward the goals of the Paris Agreement and is widely recognized as the most comprehensive report of its kind.
+
+Since 2001, the GCP has published estimates of global and national fossil CO₂ emissions. Initially, these were simple republished data from other sources, but over time, refinements were made based on feedback and correction of inaccuracies.
+"""
 
 
 @click.command()
 @click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
 @click.option("--path-to-folder", prompt=True, type=str, help="Path to local folder where data files are.")
-def main(path_to_folder: str, upload: bool) -> None:
+def run(path_to_folder: str, upload: bool) -> None:
     # Create a new snapshot for each dataset.
     for data_file in DATA_FILES:
         snap = Snapshot(f"gcp/{SNAPSHOT_VERSION}/{data_file}")
 
         # Replace the full citation and description in the metadata.
         snap.metadata.origin.attribution = ATTRIBUTION  # type: ignore
-        snap.metadata.origin.attribution_short = ATTRIBUTION_SHORT  # type: ignore
         snap.metadata.origin.citation_full = CITATION_FULL  # type: ignore
         snap.metadata.origin.description = DESCRIPTION  # type: ignore
 
@@ -68,4 +69,4 @@ def main(path_to_folder: str, upload: bool) -> None:
 
 
 if __name__ == "__main__":
-    main()
+    run()

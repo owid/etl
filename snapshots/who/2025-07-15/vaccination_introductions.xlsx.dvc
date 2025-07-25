@@ -1,0 +1,20 @@
+meta:
+  origin:
+    producer: World Health Organization
+    title: WHO Immunization Data - Vaccination Introductions
+    description: |-
+      The World Health Organization (WHO) provides data on the introduction of vaccines into vaccine schedules for countries around the world. The data is collected through the WHO/UNICEF Joint Reporting Form on Immunization.
+    title_snapshot: WHO Immunization Data - Vaccination Introductions
+    citation_full: Vaccine Introductions - WHO/UNICEF Joint Reporting Form on Immunization (2025), World Health Organization and  UNICEF.
+    attribution_short: WHO
+    url_main: https://immunizationdata.who.int/global?topic=Vaccine-introduction&location=
+    url_download: https://srhdpeuwpubsa-geecgzbpd5h0fueu.z01.azurefd.net/whdh/WIISE/export/vaccine-introduction-data.xlsx
+    date_accessed: "2025-07-15"
+    date_published: "2025-07-15"
+    license:
+      name: CC BY-NC-SA 3.0 IGO
+      url: https://www.who.int/about/policies/publishing/copyright
+outs:
+  - md5: 5ed03e924bd70df65a7d96e40ae98815
+    size: 3700174
+    path: vaccination_introductions.xlsx

@@ -1,0 +1,18 @@
+meta:
+  origin:
+    producer: World Bank
+    title: Income Classifications
+    description: |-
+      Every year, the World Bank Group classifies the world’s economies into four income groups: low, lower-middle, upper-middle, and high. These classifications, updated each year on July 1, are based on the previous year’s Gross National Income (GNI) per capita, expressed in U.S. dollars using the [Atlas method](https://datahelpdesk.worldbank.org/knowledgebase/articles/77933-what-is-the-world-bank-atlas-method).
+    citation_full: World Bank (2025). World Bank Country and Lending Groups.
+    url_main: https://datahelpdesk.worldbank.org/knowledgebase/articles/906519-world-bank-country-and-lending-groups
+    url_download: https://datacatalogfiles.worldbank.org/ddh-published/0037712/DR0095334/OGHIST_2025_07_01.xlsx
+    date_accessed: '2025-07-01'
+    date_published: '2025-07-01'
+    license:
+      name: Creative Commons BY 4.0
+      url: https://www.worldbank.org/en/about/legal/terms-of-use-for-datasets
+outs:
+  - md5: f580e6bd1b15747b99a066cf465e8eca
+    size: 117503
+    path: income_groups.xlsx

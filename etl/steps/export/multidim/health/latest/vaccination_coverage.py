@@ -12,10 +12,17 @@ def run() -> None:
     # NOTE: using load_data=False which only loads metadata significantly speeds this up
     ds = paths.load_dataset("vaccination_coverage")
     tb = ds.read("vaccination_coverage", load_data=False)
+    # Drop out the non-global vaccinations
+    tb = tb.drop(
+        columns=[
+            "coverage__antigen_yfv",
+            "coverage__antigen_mena_c",
+        ]
+    )
 
     common_view_config = {
         "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.005.json",
-        "chartTypes": ["LineChart", "SlopeChart"],
+        "chartTypes": ["LineChart", "SlopeChart", "DiscreteBar"],
         "hasMapTab": True,
         "tab": "chart",
     }
@@ -31,9 +38,9 @@ def run() -> None:
 
     CONFIG_GROUP = {
         "title": {
-            "coverage": "Vaccination coverage",
-            "vaccinated": "Vaccinated one-year-olds",
-            "unvaccinated": "Unvaccinated one-year-olds",
+            "coverage": "Share of children vaccinated, by vaccine",
+            "vaccinated": "Number of children vaccinated, by vaccine",
+            "unvaccinated": "Number of children unvaccinated, by vaccine",
         },
         "subtitle": {
             "coverage": "Share of one-year-olds who have been vaccinated against a disease or a pathogen.",
@@ -51,11 +58,11 @@ def run() -> None:
                     "hasMapTab": False,
                     "addCountryMode": "change-country",
                     "tab": "chart",
-                    "chartTypes": ["SlopeChart", "LineChart"],
+                    "chartTypes": ["SlopeChart", "LineChart", "DiscreteBar"],
                     "selectedFacetStrategy": "entity",
                     "title": "{title}",
                     "subtitle": "{subtitle}",
-                    "note": "This includes [diphtheria](#dod:diphtheria), [pertussis](#dod:pertussis) and [tetanus](#dod:tetanus) (3rd dose), [measles](#dod:measles) (1st dose), [hepatitis B](#dod:hepatitis-virus) (3rd dose), [polio](#dod:polio) (3rd dose), Haemophilus influenzae b (3rd dose), [rubella](#dod:rubella) (1st dose), [rotavirus](#dod:rotavirus) (final dose), and [inactivated polio](#dod:inactivated-polio-vaccine) (first dose).",
+                    "note": "This includes [diphtheria](#dod:diphtheria), [pertussis](#dod:pertussis) and [tetanus](#dod:tetanus) (3rd dose), [measles](#dod:measles) (1st dose), [hepatitis B](#dod:hepatitis-virus) (3rd dose), [polio](#dod:polio) (3rd dose), Haemophilus influenzae b (3rd dose), [rubella](#dod:rubella) (1st dose), [rotavirus](#dod:rotavirus) (final dose), [pneumococcal conjugate](dod:pneumococcal-conjugate-vaccine) (3rd dose), and [inactivated polio](#dod:inactivated-polio-vaccine) (first dose).",
                 },
                 "view_metadata": {
                     "title": "{title}",

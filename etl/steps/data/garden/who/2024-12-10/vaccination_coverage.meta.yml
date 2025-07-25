@@ -8,12 +8,14 @@ definitions:
         selectedEntityNames:
           - World
         hasMapTab: true
+        hideAnnotationFieldsInTitle:
+          time: true
   description_key_standard_one: |-
-    This data represents official WHO/UNICEF estimates of national immunization coverage (WUENIC). The estimates include all WHO Member States, even those that did not report 2023 data. For non-reporting countries, WHO uses statistical methods to extrapolate from previously reported data, ensuring global coverage can be assessed.
+    This chart shows official estimates of national immunization coverage published by the WHO and UNICEF. The estimates include all WHO member states, even those that did not report 2023 data. For non-reporting countries, WHO uses statistical methods to extrapolate from previously reported data, ensuring global coverage can be assessed.
   description_key_standard_two: |-
     Global and regional vaccination coverage is calculated using population-weighted averages. In 2023, approximately 5% of countries did not report data, requiring extrapolation from their 2022 data to maintain complete global estimates.
   description_key_standard_three: |-
-    These estimates synthesize multiple data sources: officially reported administrative data (based on health facility reports), coverage surveys that meet WHO quality criteria, and contextual information about vaccine supply disruptions or schedule changes. The quality and reliability of these estimates depend on the completeness and accuracy of country reporting systems.
+    These estimates combine several sources: official administrative data from health facilities, coverage surveys that meet WHO quality standards, and other relevant information like vaccine supply issues or schedule changes. The accuracy of these estimates depends on how complete and reliable each country’s reporting systems are.
   antigen_age_group: |-
     <% if antigen == "BCG" %>
     newborns
@@ -44,7 +46,11 @@ definitions:
     <%- elif antigen == "IPV2" %>
     one-year-olds
     <%- elif antigen == "MCV2X2" %>
-    two year olds
+    two-year-olds
+    <%- elif antigen == "YFV" %>
+    one-year-olds
+    <%- elif antigen == "MENA_C" %>
+    one-year-olds
     <%- endif %>
   antigen_title: |-
     <% if antigen == "BCG" %>
@@ -70,13 +76,17 @@ definitions:
     <%- elif antigen == "ROTAC" %>
     vaccinated against rotavirus
     <%- elif antigen == "PCV3" %>
-    who have had their third dose of the pneumococcal conjugate vaccine
+    who have had the third dose of the pneumococcal conjugate vaccine
     <%- elif antigen == "IPV1" %>
-    who have had their one dose of the inactivated polio vaccine
+    who have had the one dose of the inactivated polio vaccine
     <%- elif antigen == "IPV2" %>
-    who have had their two doses of the inactivated polio vaccine
+    who have had the two doses of the inactivated polio vaccine
     <%- elif antigen == "MCV2X2" %>
-    who have had their two doses of the measles vaccine
+    who have had the two doses of the measles vaccine
+    <%- elif antigen == "YFV" %>
+    who have had the yellow fever vaccine
+    <%- elif antigen == "MENA_C" %>
+    who have had a meningococcal vaccine
     <%- endif %>
   antigen_title_negative: |-
     <% if antigen == "BCG" %>
@@ -88,7 +98,7 @@ definitions:
     <%- elif antigen == "MCV1" %>
     who have not had the measles vaccine
     <%- elif antigen == "POL3" %>
-    who have not had their third dose of the polio vaccine
+    who have not had the third dose of the polio vaccine
     <%- elif antigen == "RCV1" %>
     who have not been vaccinated against rubella
     <%- elif antigen == "HEPB3" %>
@@ -102,13 +112,17 @@ definitions:
     <%- elif antigen == "ROTAC" %>
     who are not vaccinated against rotavirus
     <%- elif antigen == "PCV3" %>
-    who have not had their third dose of the pneumococcal conjugate vaccine
+    who have not had the third dose of the pneumococcal conjugate vaccine
     <%- elif antigen == "IPV1" %>
     who have not had the inactivated polio vaccine
     <%- elif antigen == "IPV2" %>
     who have not had two doses of the inactivated polio vaccine
     <%- elif antigen == "MCV2X2" %>
-    who have not had two doses of of the measles vaccine
+    who have not had two doses of the measles vaccine
+    <%- elif antigen == "YFV" %>
+    who have not had the yellow fever vaccine
+    <%- elif antigen == "MENA_C" %>
+    who have not had a meningococcal vaccine
     <%- endif %>
   antigen_description: |-
     <% if antigen == "BCG" %>
@@ -118,9 +132,9 @@ definitions:
     <%- elif antigen == "DTPCV3" %>
     three doses of the combined diphtheria, tetanus and [pertussis](#dod:pertussis) vaccine
     <%- elif antigen == "MCV1" %>
-    their first dose of the measles vaccine
+    the first dose of the measles vaccine
     <%- elif antigen == "POL3" %>
-    their third dose of either the oral or inactivated polio vaccine
+    the third dose of either the oral or inactivated polio vaccine
     <%- elif antigen == "RCV1" %>
     one dose of rubella vaccine
     <%- elif antigen == "HEPB3" %>
@@ -132,45 +146,57 @@ definitions:
     <%- elif antigen == "MCV2" %>
     two doses of the measles vaccine
     <%- elif antigen == "ROTAC" %>
-    their final recommended dose (2nd or 3rd) of the rotavirus vaccine
+    the final recommended dose (2nd or 3rd) of the rotavirus vaccine
     <%- elif antigen == "PCV3" %>
-    their third dose of the pneumococcal conjugate vaccine
+    the third dose of the pneumococcal conjugate vaccine
     <%- elif antigen == "IPV1" %>
-    their first dose of the inactivated polio vaccine
+    the first dose of the inactivated polio vaccine
     <%- elif antigen == "IPV2" %>
-    their second dose of the inactivated polio vaccine
+    the second dose of the inactivated polio vaccine
     <%- elif antigen == "MCV2X2" %>
-    their second dose of the measles vaccine
+    the second dose of the measles vaccine
+    <%- elif antigen == "YFV" %>
+    one dose of the yellow fever vaccine
+    <%- elif antigen == "MENA_C" %>
+    a meningococcal vaccine
     <%- endif %>
   antigen_description_key: |-
     <% if antigen == "MCV1" %>
     Measles is one of the most contagious diseases. The first dose of measles vaccine is critical for building immunity. In countries where the national schedule recommends the first dose at 12 months or later based on local epidemiology, these estimates reflect the percentage of children who received their first dose as recommended.
+    <% elif antigen == "BCG" %>
+    The WHO recommends BCG vaccination at birth for all newborns in countries or settings with a high incidence of TB and/or high leprosy burden. Countries with low TB incidence or leprosy burden may choose to selectively vaccinate newborns in high-risk groups.
     <%- elif antigen == "RCV1" %>
-    Coverage estimates are based on WHO and UNICEF data for the first dose of the measles-rubella vaccine. These are taken from measles vaccine data, so country-reported rubella coverage is not used.
+    Rubella coverage estimates are based on WHO and UNICEF data for the first dose of the measles-rubella (MR) vaccine, which is recommended by the WHO.
     <%- elif antigen == "HEPB_BD" %>
-    Estimates of hepatitis B birth dose coverage are produced only for countries with a universal birth dose policy. Estimates are not produced for countries that recommend a birth dose to infants born to HepB virus-infected mothers only or where there is insufficient information to determine whether vaccination is within 24 hours of birth.
+    WHO and UNICEF only estimate coverage of the hepatitis B birth dose (a vaccine given within 24 hours of birth) for countries with a policy to provide this dose for all newborns. They don’t produce estimates for countries that only recommend this dose for babies born to mothers infected with hepatitis B, or for countries where there isn’t enough information to know whether the vaccine is given within 24 hours of birth.
     <%- elif antigen == "PCV3" %>
-    In some countries, coverage may show the percentage of infants who received two doses of pneumococcal vaccine before their first birthday, based on national schedules and disease patterns.
+    In some countries, the vaccine schedule may recommend two doses before the age of one, followed by a booster at a later date. These later doses are also included in this variable.
     <%- elif antigen == "IPV1" %>
-    In countries using both IPV and OPV in their immunization schedules, WHO and UNICEF count any infant under 1 year who received at least one routine dose of IPV in their IPV1 estimates. In countries using only IPV, IPV1 refers to the first IPV dose. These estimates began in 2015 and do not affect the reported coverage for the third polio dose (Pol3). For countries using three doses of IPV, Pol3 coverage equals coverage with three IPV doses. In countries using a mix of IPV and OPV, Pol3 reflects coverage with any third polio vaccine dose, regardless of type.
+    In countries where both types of polio vaccine are used — IPV (inactivated polio vaccine, given as an injection) and OPV (oral polio vaccine, given as drops) — WHO and UNICEF count any baby under 1 year old who received at least one routine dose of IPV in their estimate of “first dose” coverage (meaning the first dose of IPV). In countries that only use IPV, “first dose” simply refers to the first IPV dose given.
     <%- endif %>
   antigen_note: |-
     <% if antigen in ["MCV2", "MCV2X2"] %>
-      Measles is a highly contagious viral disease, most common in young children. Its effects include blindness, inflammation of the brain, severe diarrhea, and severe respiratory infections such as pneumonia. Recommended child's age for MCV2 vaccination varies by country.
+      Measles is a highly contagious viral disease, most common in young children. Its effects include blindness, inflammation of the brain, severe diarrhea, and severe respiratory infections such as pneumonia. The recommended age for the second dose varies by country.
     <%- elif antigen == "MCV1" %>
       Measles is a highly contagious viral disease, most common in young children. Its effects include blindness, inflammation of the brain, severe diarrhea, and severe respiratory infections such as pneumonia.
     <%- elif antigen in ["HEPB3", "HEPB_BD"] %>
       Hepatitis B is a viral infection that attacks the liver and can cause both acute and chronic disease.
     <%- elif antigen == "HIB3" %>
-      Haemophilus influenzae type B is a bacteria responsible for severe pneumonia, meningitis and other invasive diseases almost exclusively in children younger than five years.
+      Haemophilus influenzae type B is a bacterium responsible for severe pneumonia, meningitis and other invasive diseases almost exclusively in children younger than five years.
     <%- elif antigen == "PCV3" %>
-      Streptococcus pneumoniae is a bacterium that causes a number of common diseases including meningitis, septicaemia and pneumonia. It is most common in young children and the elderly.
+      Pneumococcal conjugate vaccines protect against diseases caused by the Streptococcus pneumoniae bacterium. This bacterium causes several common diseases, including meningitis, septicaemia, and pneumonia. It is most common in young children and the elderly.
     <%- elif antigen in ["IPV1", "IPV2","POL3"]  %>
       Polio is a highly infectious viral disease. The polio virus invades the nervous system and can cause irreversible paralysis.
     <%- elif antigen == "RCV1" %>
-      Rubella is a contagious viral infection that occurs most often in children and young adults. Rubella infection in pregnant women may cause fetal death or congenital defects known as congenital rubella syndrome.
+      Rubella is a contagious viral infection that occurs most often in children and young adults. A rubella infection in pregnant women may cause fetal death or congenital defects known as congenital rubella syndrome.
     <%- elif antigen == "ROTAC" %>
-      Rotavirus vaccines became available for the first time in 2006.
+      Rotavirus is a virus that causes severe diarrhea, mostly in infants and young children. It can lead to dehydration and death if not treated.
+    <%- elif antigen == "BCG" %>
+      Coverage estimates include only countries where the WHO recommends vaccination for all newborns. Tuberculosis (TB) is a bacterial infection that primarily affects the lungs but can also affect other parts of the body. It is the leading infectious cause of death worldwide.
+    <%- elif antigen in ["DTPCV1", "DTPCV3"] %>
+      Diphtheria can cause breathing problems, heart failure, paralysis, and even death. Tetanus causes painful muscle stiffness and lockjaw. Pertussis (whooping cough) causes severe coughing fits that can lead to pneumonia, seizures, and brain damage.
+    <%- elif antigen in ["HEPB_BD","HEPB3"] %>
+      Hepatitis B is a viral infection that attacks the liver and can cause both acute and chronic disease.
     <%- endif %>
   antigen_display_name: |-
     <% if antigen == "BCG" %>
@@ -203,6 +229,10 @@ definitions:
     Inactivated polio (IPV2)
     <%- elif antigen == "MCV2X2" %>
     Measles, second dose (MCV2X2)
+    <%- elif antigen == "YFV" %>
+    Yellow fever (YFV)
+    <%- elif antigen == "MENA_C" %>
+    Meningococcal (MENA_C)
     <%- endif %>
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -214,12 +244,12 @@ tables:
     variables:
       coverage:
         title: Share of {definitions.antigen_age_group} {definitions.antigen_title}
-        description_short: The percentage of {definitions.antigen_age_group} who have had {definitions.antigen_description} in a given year.
+        description_short: Share of {definitions.antigen_age_group} who have had {definitions.antigen_description} in a given year.
         description_key:
+          - "{definitions.antigen_description_key}"
           - "{definitions.description_key_standard_one}"
           - "{definitions.description_key_standard_two}"
           - "{definitions.description_key_standard_three}"
-          - "{definitions.antigen_description_key}"
         unit: "%"
         short_unit: "%"
         display:
@@ -246,7 +276,7 @@ tables:
               {definitions.antigen_note}
       vaccinated:
         title: Number of {definitions.antigen_age_group} {definitions.antigen_title}
-        description_short: The number of {definitions.antigen_age_group} who had {definitions.antigen_description} in a given year.
+        description_short: Number of {definitions.antigen_age_group} who had {definitions.antigen_description} in a given year.
         unit: |-
           {definitions.antigen_age_group}
         description_key:
@@ -279,7 +309,7 @@ tables:
                   - 30000000
       unvaccinated:
         title: Number of {definitions.antigen_age_group} {definitions.antigen_title_negative}
-        description_short: The number of {definitions.antigen_age_group} who have not had {definitions.antigen_description} in a given year.
+        description_short: Number of {definitions.antigen_age_group} who have not had {definitions.antigen_description} in a given year.
         unit: |-
           {definitions.antigen_age_group}
         description_key:

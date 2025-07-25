@@ -17,12 +17,12 @@ meta:
     citation_full: |-
       Hersbach, H., Bell, B., Berrisford, P., Biavati, G., Horányi, A., Muñoz Sabater, J., Nicolas, J., Peubey, C., Radu, R., Rozum, I., Schepers, D., Simmons, A., Soci, C., Dee, D., Thépaut, J-N. (2023): ERA5 monthly averaged data on single levels from 1940 to present. Copernicus Climate Change Service (C3S) Climate Data Store (CDS), DOI: 10.24381/cds.f17050d7 (Accessed on 07-April-2025)
     url_main: https://cds.climate.copernicus.eu/datasets/reanalysis-era5-single-levels-monthly-means?tab=overview
-    date_accessed: '2025-06-10'
+    date_accessed: '2025-07-08'
     date_published: '2025-04-07'
     license:
       name: Copernicus License
       url: https://cds.climate.copernicus.eu/datasets/reanalysis-era5-single-levels-monthly-means?tab=overview
 outs:
-  - md5: ba7e145f3c3f46c203db5287c08a9a1e
-    size: 1719449449
+  - md5: 62546545462ba4b03b24b98c3975354a
+    size: 1721107818
     path: surface_temperature.zip

@@ -524,6 +524,46 @@ steps:
     - data://garden/gapminder/2023-09-21/under_five_mortality
   data://grapher/un/2024-09-16/long_run_child_mortality:
     - data://garden/un/2024-09-16/long_run_child_mortality
+      # Integrated Values Survey
+  data://meadow/ivs/2023-11-27/integrated_values_survey:
+    - snapshot://ivs/2023-11-27/integrated_values_survey.csv
+  data://garden/ivs/2023-11-27/integrated_values_survey:
+    - data://meadow/ivs/2023-11-27/integrated_values_survey
+  data://grapher/ivs/2023-11-27/integrated_values_survey:
+    - data://garden/ivs/2023-11-27/integrated_values_survey
+
+      # WB income groups 2023-04-30
+  data://meadow/wb/2023-04-30/income_groups:
+    - snapshot://wb/2023-04-30/income_groups.xlsx
+  data://garden/wb/2023-04-30/income_groups:
+    - data://meadow/wb/2023-04-30/income_groups
+  data://grapher/wb/2023-04-30/income_groups:
+    - data://garden/wb/2023-04-30/income_groups
+
+  # WB income groups 2024-03-11
+  data://meadow/wb/2024-03-11/income_groups:
+    - snapshot://wb/2024-03-11/income_groups.xlsx
+  data://garden/wb/2024-03-11/income_groups:
+    - data://meadow/wb/2024-03-11/income_groups
+  data://grapher/wb/2024-03-11/income_groups:
+    - data://garden/wb/2024-03-11/income_groups
+
+  # WB income groups 2024-07-29
+  data://meadow/wb/2024-07-29/income_groups:
+    - snapshot://wb/2024-07-29/income_groups.xlsx
+  data://garden/wb/2024-07-29/income_groups:
+    - data://meadow/wb/2024-07-29/income_groups
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2024-07-15/population
+  data://grapher/wb/2024-07-29/income_groups:
+    - data://garden/wb/2024-07-29/income_groups
+  # ILOstat Average Work Hours
+  data://meadow/ilostat/2023-09-19/average_work_hours:
+    - snapshot://ilostat/2023-09-19/average_work_hours.csv
+  data://garden/ilostat/2023-09-19/average_work_hours:
+    - data://meadow/ilostat/2023-09-19/average_work_hours
+  data://grapher/ilostat/2023-09-19/average_work_hours:
+    - data://garden/ilostat/2023-09-19/average_work_hours
 
 include:
   # Include all active steps plus all archive steps.

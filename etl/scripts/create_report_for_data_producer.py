@@ -1,4 +1,4 @@
-"""Script to generate a quarterly analytics report for a data producer."""
+"""Script to generate an analytics report for a data producer."""
 
 import re
 from datetime import datetime
@@ -10,15 +10,20 @@ import requests
 from rich_click.rich_command import RichCommand
 from structlog import get_logger
 
-from apps.utils.google import GoogleDoc, GoogleDrive, GoogleSheet
-from apps.utils.notion import get_data_producer_contacts, get_impact_highlights
 from etl.analytics import (
     get_chart_views_by_chart_id,
     get_post_views_by_chart_id,
     get_visualizations_using_data_by_producer,
 )
+from etl.config import (
+    DATA_PRODUCER_REPORT_FOLDER_ID,
+    DATA_PRODUCER_REPORT_STATUS_SHEET_ID,
+    DATA_PRODUCER_REPORT_TEMPLATE_DOC_ID,
+)
 from etl.data_helpers.misc import humanize_number
 from etl.db import get_engine
+from etl.google import GoogleDoc, GoogleDrive, GoogleSheet
+from etl.notion import get_data_producer_contacts, get_impact_highlights
 
 # Initialize logger.
 log = get_logger()
@@ -26,21 +31,15 @@ log = get_logger()
 # Initialize database engine.
 engine = get_engine()
 
-# Folder ID for reports.
-FOLDER_ID = "1SySOSNXgNLEJe2L1k7985p-zSeUoU4kN"
-
-# Document ID of template.
-TEMPLATE_ID = "149cLrJK9VI-BNjnM-LxnWgbQoB7mwjSpgjO497rzxeU"
-
-# Document ID of reports status sheet.
-STATUS_SHEET_ID = "1CLM4EKiu0DZaNz5BFdDvMvCxbveKUHCsgNd-a4Fumnk"
-
-# Common definitions of quarters.
-QUARTERS = {
-    1: {"name": "first", "min_date": "01-01", "max_date": "03-31"},
-    2: {"name": "second", "min_date": "04-01", "max_date": "06-30"},
-    3: {"name": "third", "min_date": "07-01", "max_date": "09-30"},
-    4: {"name": "fourth", "min_date": "10-01", "max_date": "12-31"},
+# Common definitions of periods.
+PERIODS = {
+    "Q1": {"name": "first quarter", "min_date": "01-01", "max_date": "03-31"},
+    "Q2": {"name": "second quarter", "min_date": "04-01", "max_date": "06-30"},
+    "Q3": {"name": "third quarter", "min_date": "07-01", "max_date": "09-30"},
+    "Q4": {"name": "fourth quarter", "min_date": "10-01", "max_date": "12-31"},
+    "H1": {"name": "first half", "min_date": "01-01", "max_date": "06-30"},
+    "H2": {"name": "second half", "min_date": "07-01", "max_date": "12-31"},
+    "Y": {"name": "year", "min_date": "01-01", "max_date": "12-31"},
 }
 
 
@@ -154,19 +153,19 @@ def insert_list_with_links_in_gdoc(google_doc: GoogleDoc, df: pd.DataFrame, plac
 
 
 class Report:
-    """A quarterly analytics report for a data producer."""
+    """An analytics report for a data producer."""
 
-    def __init__(self, producer: str, quarter: int, year: int):
+    def __init__(self, producer: str, period: str, year: int):
         self.producer = producer
-        self.quarter = quarter
+        self.period = period
         self.year = year
-        self.title = f"{year}-Q{quarter} Our World in Data analytics report for {producer}"
-        self.min_date = f"{year}-{QUARTERS[quarter]['min_date']}"
-        self.max_date = f"{year}-{QUARTERS[quarter]['max_date']}"
+        self.title = f"{year}-{period} Our World in Data analytics report for {producer}"
+        self.min_date = f"{year}-{PERIODS[period]['min_date']}"
+        self.max_date = f"{year}-{PERIODS[period]['max_date']}"
 
         # Check if this report already exists in Google Drive
         google_drive = GoogleDrive()
-        files = google_drive.list_files_in_folder(folder_id=FOLDER_ID)
+        files = google_drive.list_files_in_folder(folder_id=DATA_PRODUCER_REPORT_FOLDER_ID)
 
         self.doc_id: str | None = None
         self.pdf_id: str | None = None
@@ -221,7 +220,7 @@ class Report:
     @property
     def folder_link(self) -> str:
         """Get the folder link where reports are stored."""
-        return f"https://drive.google.com/drive/folders/{FOLDER_ID}"
+        return f"https://drive.google.com/drive/folders/{DATA_PRODUCER_REPORT_FOLDER_ID}"
 
     @property
     def exists(self) -> bool:
@@ -243,22 +242,9 @@ class Report:
         else:
             return "Both Google Doc and PDF exist"
 
-    def print_status_with_links(self) -> None:
-        """Get a detailed status including links."""
-        folder_text = f"📁 Folder: {self.folder_link}"
-        if not self.exists:
-            text = "Not created"
-        elif not self.has_pdf:
-            text = f"Google Doc exists (no PDF)\n  📄 Doc: {self.doc_link}\n  {folder_text}"
-        else:
-            text = (
-                f"Both Google Doc and PDF exist\n  📄 Doc: {self.doc_link}\n  📋 PDF: {self.pdf_link}\n  {folder_text}"
-            )
-        log.info(text)
-
     def gather_analytics(self) -> None:
         """Gather analytics data for this report."""
-        log.info(f"Gathering analytics for {self.producer} Q{self.quarter} {self.year}")
+        log.info(f"Gathering analytics for {self.producer} {self.period} {self.year}")
         self.analytics = gather_producer_analytics(
             producer=self.producer, min_date=self.min_date, max_date=self.max_date
         )
@@ -270,7 +256,7 @@ class Report:
 
         # Initialize Google Drive and copy template.
         google_drive = GoogleDrive()
-        self.doc_id = google_drive.copy(file_id=TEMPLATE_ID, body={"name": self.title})
+        self.doc_id = google_drive.copy(file_id=DATA_PRODUCER_REPORT_TEMPLATE_DOC_ID, body={"name": self.title})
         self.google_doc = GoogleDoc(doc_id=self.doc_id)
 
         # Populate the document.
@@ -305,16 +291,18 @@ class Report:
         n_daily_post_views = n_post_views / self.analytics["posts"]["n_days"].max()
 
         # Humanize numbers.
-        n_charts_humanized = humanize_number(n_charts)
-        n_posts_humanized = humanize_number(n_publications)
-        n_chart_views_humanized = humanize_number(n_chart_views)
-        n_daily_chart_views_humanized = humanize_number(n_daily_chart_views)
-        n_post_views_humanized = humanize_number(n_post_views)
-        n_daily_post_views_humanized = humanize_number(n_daily_post_views)
-        max_date_humanized = datetime.strptime(
-            f"{self.year}-{QUARTERS[self.quarter]['max_date']}", "%Y-%m-%d"
-        ).strftime("%B %d, %Y")
-        quarter_date_humanized = f"the {QUARTERS[self.quarter]['name']} quarter of {self.year}"
+        n_charts_humanized = humanize_number(n_charts, sig_figs=3)
+        n_posts_humanized = humanize_number(n_publications, sig_figs=3)
+        n_chart_views_humanized = humanize_number(n_chart_views, sig_figs=3)
+        n_daily_chart_views_humanized = humanize_number(n_daily_chart_views, sig_figs=3)
+        n_post_views_humanized = humanize_number(n_post_views, sig_figs=3)
+        n_daily_post_views_humanized = humanize_number(n_daily_post_views, sig_figs=3)
+        max_date_humanized = datetime.strptime(f"{self.year}-{PERIODS[self.period]['max_date']}", "%Y-%m-%d").strftime(
+            "%B %d, %Y"
+        )
+        period_humanized = (
+            str(self.year) if self.period == "Y" else f"the {PERIODS[self.period]['name']} of {self.year}"
+        )
 
         # Prepare executive summary.
         executive_summary_intro = f"""As of {max_date_humanized}, Our World in Data features your data in"""
@@ -333,13 +321,11 @@ class Report:
         # Replace placeholders.
         replacements = {
             r"{{producer}}": self.producer,
-            r"{{year}}": str(self.year),
-            r"{{quarter}}": str(self.quarter),
+            r"{{period_humanized}}": period_humanized,
             r"{{executive_summary_intro}}": executive_summary_intro,
             r"{{n_charts_humanized}}": n_charts_humanized,
             r"{{n_posts_humanized}}": n_posts_humanized,
             r"{{n_post_views_humanized}}": n_post_views_humanized,
-            r"{{quarter_date_humanized}}": quarter_date_humanized,
             r"{{n_chart_views_humanized}}": n_chart_views_humanized,
             r"{{n_daily_chart_views_humanized}}": n_daily_chart_views_humanized,
             r"{{n_daily_post_views_humanized}}": n_daily_post_views_humanized,
@@ -460,9 +446,9 @@ def print_impact_highlights(highlights: pd.DataFrame) -> None:
     help="Producer name(s).",
 )
 @click.option(
-    "--quarter",
-    type=int,
-    help="Quarter (1, 2, 3, or 4).",
+    "--period",
+    type=click.Choice(["Q1", "Q2", "Q3", "Q4", "H1", "H2", "Y"]),
+    help="Period (Q1, Q2, Q3, Q4, H1, H2, or Y).",
 )
 @click.option(
     "--year",
@@ -480,15 +466,21 @@ def print_impact_highlights(highlights: pd.DataFrame) -> None:
     default=False,
     help="Grant permissions to data providers to access PDF file.",
 )
-def run(producer, quarter, year, overwrite_pdf, grant_permissions):
-    # Create report instance (it will automatically check for existing reports).
-    report = Report(producer, quarter, year)
+def run(producer, period, year, overwrite_pdf, grant_permissions):
+    # First check if all required definitions of Google Drive, Doc and Sheet IDs are in place.
+    for drive_id in [
+        DATA_PRODUCER_REPORT_FOLDER_ID,
+        DATA_PRODUCER_REPORT_TEMPLATE_DOC_ID,
+        DATA_PRODUCER_REPORT_STATUS_SHEET_ID,
+    ]:
+        error = "Your .env file should contain all definitions of DATA_PRODUCER_REPORT_*_ID (see .env.example)."
+        assert drive_id != "", error
 
-    # Print status with links.
-    report.print_status_with_links()
+    # Create report instance (it will automatically check for existing reports).
+    report = Report(producer, period, year)
 
     if report.exists:
-        log.warning(f"Google Doc report already exists for {producer} Q{quarter} {year}")
+        log.warning(f"Google Doc report already exists for {producer} {period} {year}")
         assert report.doc_id is not None
 
         if report.has_pdf:
@@ -507,7 +499,7 @@ def run(producer, quarter, year, overwrite_pdf, grant_permissions):
         return
 
     # Report doesn't exist, create it from scratch
-    log.info(f"Creating new report for {producer} Q{quarter} {year}")
+    log.info(f"Creating new report for {producer} {period} {year}")
     report.create_full_report(overwrite_pdf=overwrite_pdf, grant_permissions=grant_permissions)
 
     # Add new entry in the status sheet.
@@ -515,14 +507,14 @@ def run(producer, quarter, year, overwrite_pdf, grant_permissions):
         {
             "producer": [producer],
             "year": [int(year)],
-            "quarter": [int(quarter)],
+            "period": [period],
             "report": [report.pdf_link],
             "gdoc": [report.doc_link],
             "reviewed": [0],
             "shared with producer on": [None],
         }
     )
-    sheet = GoogleSheet(sheet_id=STATUS_SHEET_ID)
+    sheet = GoogleSheet(sheet_id=DATA_PRODUCER_REPORT_STATUS_SHEET_ID)
     sheet.append_dataframe(df=df, sheet_name="status")
 
 

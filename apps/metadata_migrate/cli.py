@@ -140,7 +140,7 @@ def cli(
         log.info(f"Running ETL for {uri}")
         etl_main(
             dag_path=DAG_FILE,
-            steps=[uri],
+            includes=[uri],
             grapher=False,
         )
 
@@ -267,7 +267,7 @@ def cli(
             config.SUBSET = f"^{col}$"
             etl_main(
                 dag_path=DAG_FILE,
-                steps=[uri],
+                includes=[uri],
                 grapher=True,
             )
 

@@ -23,11 +23,12 @@ def run() -> None:
     # Harmonize country names.
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
+    # Filter for Bribery category with specific indicators
+    bribery_indicators = ["Persons convicted", "Persons prosecuted", "Persons arrested/cautioned/suspected"]
+    tb = tb[(tb["category"] == "Bribery") & (tb["indicator"].isin(bribery_indicators)) & (tb["sex"] == "Total")]
     tb["sex"] = tb["sex"].replace(
         {
             "Total": "all individuals",
-            "Female": "women",
-            "Male": "men",
         }
     )
     tb["age"] = tb["age"].replace(
@@ -35,8 +36,13 @@ def run() -> None:
             "Total": "all ages",
         }
     )
+
+    tb = tb.drop(
+        ["category", "dimension", "age", "sex"],
+        axis=1,
+    )
     # Improve table format.
-    tb = tb.format(["country", "year", "dimension", "indicator", "category", "sex", "age", "unit_of_measurement"])
+    tb = tb.format(["country", "year", "indicator", "unit_of_measurement"])
 
     #
     # Save outputs.

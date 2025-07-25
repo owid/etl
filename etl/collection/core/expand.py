@@ -73,7 +73,7 @@ def expand_config(
             - See examples below for more details.
     common_view_config : Dict[str, Any] | None
         Additional config fields to add to each view, e.g.
-        {"chartTypes": ["LineChart"], "hasMapTab": True, "tab": "map"}
+        {"chartTypes": ["LineChart", "DiscreteBar"], "hasMapTab": True, "tab": "map"}
     indicator_as_dimension: bool
         Set to True to keep the indicator as a dimension. For instance, if you expand a table with multiple - dimensional - indicators (e.g. 'population', 'population_density'), a dimension is added in the config that specifies the indicator. If there are more than one indicators being expanded, the indicator information is kept as a dimension regardless of this flag.
     indicators_slug: str

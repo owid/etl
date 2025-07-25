@@ -61,13 +61,6 @@ steps:
   data://grapher/ilostat/2023-09-19/employment:
     - data://garden/ilostat/2023-09-19/employment
 
-  # ILOstat Average Work Hours
-  data://meadow/ilostat/2023-09-19/average_work_hours:
-    - snapshot://ilostat/2023-09-19/average_work_hours.csv
-  data://garden/ilostat/2023-09-19/average_work_hours:
-    - data://meadow/ilostat/2023-09-19/average_work_hours
-  data://grapher/ilostat/2023-09-19/average_work_hours:
-    - data://garden/ilostat/2023-09-19/average_work_hours
 
   # OECD PISA data on educational attainment in mathematics, science, and reading
   data://meadow/oecd/2023-12-06/pisa:
@@ -177,10 +170,35 @@ steps:
   export://multidim/education/latest/completion_rates:
     - data://grapher/unesco/2025-05-01/education_sdgs
 
-
   #
   # Mdim for education spending
   #
   export://multidim/education/latest/education_spending:
     - data://grapher/unesco/2025-05-01/education_sdgs
     - data://grapher/unesco/2025-05-01/education_opri
+
+  #
+  # Mdim for literacy rates
+  #
+  export://multidim/education/latest/literacy:
+    - data://grapher/unesco/2025-05-01/education_sdgs
+
+  #
+  # Mdim for children out of school
+  #
+  export://multidim/education/latest/children_out_of_school:
+    - data://grapher/unesco/2025-05-01/education_sdgs
+    - data://grapher/unesco/2025-05-01/education_opri
+
+  #
+  # Mdim for proficiency levels in different subjects
+  #
+  export://multidim/education/latest/proficiency:
+    - data://grapher/unesco/2025-05-01/education_sdgs
+
+
+  #
+  # Mdim for PISA scores
+  #
+  export://multidim/education/latest/pisa_performance:
+    - data://grapher/oecd/2023-12-06/pisa

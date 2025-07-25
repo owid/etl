@@ -18,6 +18,7 @@ from collections.abc import Generator
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from contextlib import contextmanager
 from dataclasses import dataclass, field
+from functools import partial
 from glob import glob
 from importlib import import_module
 from pathlib import Path
@@ -47,8 +48,7 @@ from etl.snapshot import Snapshot
 
 log = structlog.get_logger()
 
-Graph = Dict[str, Set[str]]
-DAG = Dict[str, Any]
+DAG = Dict[str, Set[str]]
 
 
 ipynb_lock = fasteners.InterProcessLock(paths.BASE_DIR / ".ipynb_lock")
@@ -59,60 +59,53 @@ INSTANT_METADATA_DIFF = {}
 
 def compile_steps(
     dag: DAG,
-    includes: Optional[List[str]] = None,
-    excludes: Optional[List[str]] = None,
-    downstream: bool = False,
-    only: bool = False,
-    exact_match: bool = False,
+    subdag: DAG,
 ) -> List["Step"]:
     """
     Return the list of steps which, if executed in order, mean that every
     step has its dependencies ready for it.
-    """
-    includes = includes or []
-    excludes = excludes or []
 
+    Parameters
+    ----------
+    dag : DAG
+        The full DAG containing all steps and their complete dependency information.
+        Required to get the full dependencies of each step during parsing.
+    subdag : DAG
+        The filtered subset of steps to execute. Used to determine execution order
+        while maintaining access to complete dependency information from the full DAG.
+
+    Returns
+    -------
+    List[Step]
+        Steps in dependency order, ready for execution.
+    """
     # make sure each step runs after its dependencies
-    steps = to_dependency_order(dag, includes, excludes, downstream=downstream, only=only, exact_match=exact_match)
+    steps = to_dependency_order(subdag)
 
     # parse the steps into Python objects
+    # NOTE: We need the full DAG here to get complete dependencies of each step
     return [parse_step(name, dag) for name in steps]
 
 
-def to_dependency_order(
-    dag: DAG,
-    includes: List[str],
-    excludes: List[str],
-    downstream: bool = False,
-    only: bool = False,
-    exact_match: bool = False,
-) -> List[str]:
+def to_dependency_order(dag: DAG) -> List[str]:
     """
     Organize the steps in dependency order with a topological sort. In other words,
     the resulting list of steps is a valid ordering of steps such that no step is run
     before the steps it depends on. Note: this ordering is not necessarily unique.
     """
-    # Always filter if we have includes OR excludes
-    if includes or excludes:
-        subgraph = filter_to_subgraph(
-            dag, includes, downstream=downstream, only=only, exact_match=exact_match, excludes=excludes
-        )
-    else:
-        subgraph = dag
-
-    in_order = list(graphlib.TopologicalSorter(subgraph).static_order())
+    in_order = list(graphlib.TopologicalSorter(dag).static_order())
 
     return in_order
 
 
 def filter_to_subgraph(
-    graph: Graph,
+    graph: DAG,
     includes: Iterable[str],
     downstream: bool = False,
     only: bool = False,
     exact_match: bool = False,
     excludes: Optional[List[str]] = None,
-) -> Graph:
+) -> DAG:
     """
     Filter the full graph to only the included nodes, and all their dependencies.
 
@@ -168,12 +161,12 @@ def filter_to_subgraph(
     return {step: deps - excluded_steps for step, deps in subgraph.items() if step not in excluded_steps}
 
 
-def traverse(graph: Graph, nodes: Set[str]) -> Graph:
+def traverse(graph: DAG, nodes: Set[str]) -> DAG:
     """
     Use BFS to find all nodes in a graph that are reachable from a given
     subset of nodes.
     """
-    reachable: Graph = defaultdict(set)
+    reachable: DAG = defaultdict(set)
     to_visit = nodes.copy()
 
     while to_visit:
@@ -192,7 +185,7 @@ def _parse_dag_yaml(dag: Dict[str, Any]) -> Dict[str, Any]:
     return {node: set(deps) if deps else set() for node, deps in steps.items()}
 
 
-def reverse_graph(graph: Graph) -> Graph:
+def reverse_graph(graph: DAG) -> DAG:
     """
     Invert the edge direction of a graph.
     """
@@ -207,7 +200,7 @@ def reverse_graph(graph: Graph) -> Graph:
     return dict(g)
 
 
-def graph_nodes(graph: Graph) -> Set[str]:
+def graph_nodes(graph: DAG) -> Set[str]:
     all_steps = set(graph)
     for children in graph.values():
         all_steps.update(children)
@@ -653,13 +646,8 @@ class DataStep(Step):
         env = os.environ.copy()
         env["PATH"] = os.path.expanduser("~/.cargo/bin") + ":" + env["PATH"]
 
-        try:
-            subprocess.check_call(args, env=env)
-        except subprocess.CalledProcessError:
-            # swallow this exception and just exit -- the important stack trace
-            # will already have been printed to stderr
-            print(f'\nCOMMAND: {" ".join(args)}', file=sys.stderr)
-            sys.exit(1)
+        # This might raise subprocess.CalledProcessError
+        subprocess.check_call(args, env=env)
 
     def _run_notebook(self) -> None:
         "Run a parameterised Jupyter notebook."
@@ -1184,17 +1172,18 @@ def _step_is_dirty(s: Step) -> bool:
     return s.is_dirty()
 
 
-def _cached_is_dirty(self: Step, cache: files.RuntimeCache) -> bool:
-    key = str(self)
+def _cached_is_dirty(step: Step, cache: files.RuntimeCache) -> bool:
+    key = str(step)
     if key not in cache:
-        cache.add(key, self._is_dirty())  # type: ignore
-    return cache[key]  # type: ignore
+        cache.add(key, step._is_dirty())
+    return cache[key]
 
 
 def _add_is_dirty_cached(s: Step, cache: files.RuntimeCache) -> None:
     """Save copy of a method to _is_dirty and replace it with a cached version."""
-    s._is_dirty = s.is_dirty  # type: ignore
-    s.is_dirty = lambda s=s: _cached_is_dirty(s, cache)  # type: ignore
+    s._is_dirty = s.is_dirty
+    s._cache = cache
+    s.is_dirty = partial(_cached_is_dirty, s, cache)
     for dep in getattr(s, "dependencies", []):
         _add_is_dirty_cached(dep, cache)
 

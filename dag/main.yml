@@ -8,7 +8,7 @@ steps:
   # Create a step with regions data used by the owid-grapher repository.
   data://external/owid_grapher/latest/regions:
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/wb/2025-07-01/income_groups
   # Create a step with a simplified countries-regions file used by the notebooks repository.
   data://external/notebooks/latest/regions:
     - data://grapher/regions/2023-01-01/regions
@@ -54,7 +54,7 @@ steps:
     - data://garden/worldbank_wdi/2024-05-20/wdi
     - data://garden/demography/2024-07-15/population
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2024-03-11/income_groups
+    - data://garden/wb/2025-07-01/income_groups
   data://grapher/technology/2024-12-23/internet:
     - data://garden/technology/2024-12-23/internet
 
@@ -63,7 +63,7 @@ steps:
     - snapshot://un/2025-05-07/undp_hdr.csv
   data://garden/un/2025-05-07/undp_hdr:
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/wb/2025-07-01/income_groups
     - data://meadow/un/2025-05-07/undp_hdr
   data://grapher/un/2025-05-07/undp_hdr:
     - data://garden/un/2025-05-07/undp_hdr
@@ -125,7 +125,7 @@ steps:
   data://garden/happiness/2025-03-28/happiness:
     - data://meadow/happiness/2025-03-28/happiness
     - data://garden/demography/2024-07-15/population
-    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/wb/2025-07-01/income_groups
     - data://garden/regions/2023-01-01/regions
 
   data://grapher/happiness/2025-03-28/happiness:
@@ -296,14 +296,6 @@ steps:
   data://grapher/state_capacity/2023-11-20/information_capacity_dataset:
     - data://garden/state_capacity/2023-11-10/information_capacity_dataset
 
-  # Integrated Values Survey
-  data://meadow/ivs/2023-11-27/integrated_values_survey:
-    - snapshot://ivs/2023-11-27/integrated_values_survey.csv
-  data://garden/ivs/2023-11-27/integrated_values_survey:
-    - data://meadow/ivs/2023-11-27/integrated_values_survey
-  data://grapher/ivs/2023-11-27/integrated_values_survey:
-    - data://garden/ivs/2023-11-27/integrated_values_survey
-
   # National Human Genome Research Institute - DNA Sequencing Costs
   data://meadow/technology/2023-11-28/dna_sequencing:
     - snapshot://technology/2023-11-28/dna_sequencing.xls
@@ -350,7 +342,7 @@ steps:
   # Missing Data - Suicides
   data://garden/missing_data/2024-03-26/who_md_suicides:
     - data://garden/who/2024-03-24/self_inflicted_injuries
-    - data://garden/wb/2024-03-11/income_groups
+    - data://garden/wb/2025-07-01/income_groups
     - data://garden/regions/2023-01-01/regions
     - data://garden/demography/2023-03-31/population
   data://grapher/missing_data/2024-03-26/who_md_suicides:
@@ -402,7 +394,7 @@ steps:
     - data://meadow/worldbank_wdi/2024-05-20/wdi
     - data://garden/demography/2024-07-15/population
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/wb/2025-07-01/income_groups
 
   data://grapher/worldbank_wdi/2024-05-20/wdi:
     - data://garden/worldbank_wdi/2024-05-20/wdi
@@ -416,7 +408,7 @@ steps:
     - data://meadow/worldbank_wdi/2025-01-24/wdi
     - data://garden/demography/2024-07-15/population
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/wb/2025-07-01/income_groups
 
   data://grapher/worldbank_wdi/2025-01-24/wdi:
     - data://garden/worldbank_wdi/2025-01-24/wdi
@@ -457,24 +449,6 @@ steps:
     - data://garden/homicide/2024-07-30/who_mort_db
   data://grapher/homicide/2024-07-30/homicide_long_run_omm:
     - data://garden/homicide/2024-07-30/homicide_long_run_omm
-
-  # WB income groups 2024-03-11
-  data://meadow/wb/2024-03-11/income_groups:
-    - snapshot://wb/2024-03-11/income_groups.xlsx
-  data://garden/wb/2024-03-11/income_groups:
-    - data://meadow/wb/2024-03-11/income_groups
-  data://grapher/wb/2024-03-11/income_groups:
-    - data://garden/wb/2024-03-11/income_groups
-
-  # WB income groups 2024-07-29
-  data://meadow/wb/2024-07-29/income_groups:
-    - snapshot://wb/2024-07-29/income_groups.xlsx
-  data://garden/wb/2024-07-29/income_groups:
-    - data://meadow/wb/2024-07-29/income_groups
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/demography/2024-07-15/population
-  data://grapher/wb/2024-07-29/income_groups:
-    - data://garden/wb/2024-07-29/income_groups
 
   # Ethnologue
   data-private://meadow/language/2024-07-17/ethnologue:
@@ -674,6 +648,7 @@ steps:
     - snapshot://housing/2025-06-25/knoll_prices.dta
   data://garden/housing/2025-06-25/knoll_prices:
     - data://meadow/housing/2025-06-25/knoll_prices
+    - data://garden/ggdc/2024-04-26/maddison_project_database
   data://grapher/housing/2025-06-25/knoll_prices:
     - data://garden/housing/2025-06-25/knoll_prices
 
@@ -697,14 +672,6 @@ steps:
   data://grapher/pew/2025-06-27/same_sex_marriage:
     - data://garden/pew/2025-06-27/same_sex_marriage
 
-    # WB income groups 2023-04-30
-  data://meadow/wb/2023-04-30/income_groups:
-    - snapshot://wb/2023-04-30/income_groups.xlsx
-  data://garden/wb/2023-04-30/income_groups:
-    - data://meadow/wb/2023-04-30/income_groups
-  data://grapher/wb/2023-04-30/income_groups:
-    - data://garden/wb/2023-04-30/income_groups
-
       # Child Mortality Estimates - UN IGME - to archive
   data://meadow/un/2024-09-11/igme:
     - snapshot://un/2024-09-11/igme.zip
@@ -715,6 +682,71 @@ steps:
     - data://garden/demography/2024-07-15/population
   data://grapher/un/2024-09-11/igme:
     - data://garden/un/2024-09-11/igme
+  # WB income groups 2025-07-01
+  data://meadow/wb/2025-07-01/income_groups:
+    - snapshot://wb/2025-07-01/income_groups.xlsx
+
+  data://garden/wb/2025-07-01/income_groups:
+    - data://meadow/wb/2025-07-01/income_groups
+  data://garden/wb/2025-07-01/income_groups_aggregations:
+    - data://garden/wb/2025-07-01/income_groups
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2024-07-15/population
+
+  data://grapher/wb/2025-07-01/income_groups:
+    - data://garden/wb/2025-07-01/income_groups
+    - data://garden/wb/2025-07-01/income_groups_aggregations
+
+  # Integrated Values Survey
+  data://meadow/ivs/2025-06-27/integrated_values_surveys:
+    - snapshot://ivs/2025-06-27/integrated_values_surveys.csv
+
+  data://garden/ivs/2025-06-27/integrated_values_surveys:
+    - data://meadow/ivs/2025-06-27/integrated_values_surveys
+
+  data://grapher/ivs/2025-06-27/integrated_values_surveys:
+    - data://garden/ivs/2025-06-27/integrated_values_surveys
+
+  #
+  # Media deaths
+  #
+  data://meadow/media_cloud/2025-05-19/media_deaths:
+    - snapshot://media_cloud/2025-05-19/media_deaths.csv
+  data://garden/media_cloud/2025-05-19/media_deaths:
+    - data://meadow/media_cloud/2025-05-19/media_deaths
+    - data://meadow/cdc/2025-05-19/external_causes
+    - data://meadow/cdc/2025-05-19/leading_causes
+  data://grapher/media_cloud/2025-05-19/media_deaths:
+    - data://garden/media_cloud/2025-05-19/media_deaths
+
+  # CDC Wonder - Causes of Death
+  data://meadow/cdc/2025-05-19/leading_causes:
+    - snapshot://cdc/2025-05-19/leading_causes.csv
+  data://meadow/cdc/2025-05-19/external_causes:
+    - snapshot://cdc/2025-05-19/external_causes.csv
+
+  # OECD Affordable Housing Database
+  data://garden/oecd/2025-07-03/affordable_housing:
+    - snapshot://oecd/2025-07-03/affordable_housing_income.xlsx
+    - snapshot://oecd/2025-07-03/affordable_housing.xlsx
+  data://grapher/oecd/2025-07-03/affordable_housing:
+    - data://garden/oecd/2025-07-03/affordable_housing
+
+  #
+  # Gallup World Poll: Life in Five Years and Life Today
+  #
+  data-private://meadow/happiness/2025-07-22/life_in_five_years_and_life_today:
+    - snapshot-private://happiness/2025-07-22/life_in_five_years_and_life_today.xlsx
+  #
+  # Gallup World Poll: Life in Five Years and Life Today
+  #
+  data-private://garden/happiness/2025-07-22/life_in_five_years_and_life_today:
+    - data-private://meadow/happiness/2025-07-22/life_in_five_years_and_life_today
+  #
+  # Gallup World Poll: Life in Five Years and Life Today
+  #
+  data-private://grapher/happiness/2025-07-22/life_in_five_years_and_life_today:
+    - data-private://garden/happiness/2025-07-22/life_in_five_years_and_life_today
 
 include:
   - dag/open_numbers.yml

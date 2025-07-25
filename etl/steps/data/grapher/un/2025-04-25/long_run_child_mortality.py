@@ -17,10 +17,6 @@ def run() -> None:
     tb = ds_garden["long_run_child_mortality"]
     tb_sel = ds_garden["long_run_child_mortality_selected"]
     #
-    # Process data.
-    #
-
-    #
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.

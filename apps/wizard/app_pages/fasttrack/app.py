@@ -349,7 +349,7 @@ else:
                 step = f"{fast_import.dataset.metadata.uri}"
                 etl_main(
                     dag_path=DAG_FASTTRACK_PATH,
-                    steps=[step],
+                    includes=[step],
                     grapher=True,
                     private=not fast_import.dataset.metadata.is_public,
                     workers=1,

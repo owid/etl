@@ -1,9 +1,6 @@
 definitions:
   common:
     processing_level: minor
-    presentation:
-      topic_tags:
-        - Clean Water & Sanitation
 
 dataset:
   update_period_days: 730
@@ -11,6 +8,9 @@ tables:
   _2_4_1__ag_lnd_sust_prxts:
     variables:
       _2_4_1__ag_lnd_sust_prxts:
+        presentation:
+          topic_tags:
+            - Agricultural Production
         description_from_producer: |-
           [PROXY] Progress toward productive and sustainable agriculture, trend score
 
@@ -39,6 +39,8 @@ tables:
           title_public: Share of the population using safely managed sanitation facilities
           title_variant: All areas
           attribution_short: WHO/UNICEF JMP
+          topic_tags:
+            - Clean Water & Sanitation
           grapher_config:
             title: Share of the population using safely managed sanitation facilities
             subtitle: Safely managed sanitation is improved facilities which are not shared with other households and where excreta are safely disposed in situ or transported and treated off-site.
@@ -97,6 +99,8 @@ tables:
         presentation:
           title_public: Share of the population using safely managed drinking water
           attribution_short: WHO/UNICEF JMP
+          topic_tags:
+            - Clean Water & Sanitation
           grapher_config:
             title: Share of the population using safely managed drinking water
             subtitle: A safely managed drinking water service is defined as one located on premises, available when needed and free from contamination.
@@ -148,23 +152,20 @@ tables:
   _16_5_1__iu_cor_brib__both_sexes:
     variables:
       _16_5_1__iu_cor_brib__both_sexes:
-         title: Share of people who said they were recently asked for a bribe or paid one
-         short_unit: "%"
-         unit: "%"
-         description_short: |-
-           Share of respondents who reported having contact with a public official in the past 12 months and paying or being asked to pay a [bribe](#dod:bribery).
-         description_key:
-          - This measure tracks how common bribery is when citizens interact with public officials.
-          - It shows the proportion of people who interacted with a public official in the past year and reported either paying a bribe or being asked to pay one.
-          - Bribes include extra payments, gifts, or favors given in exchange for special treatment from government workers.
-          - The focus is on everyday administrative bribery—the type most citizens face in routine interactions with public officials.
-          - Public officials can hold a legislative, executive, administrative or judicial office, such as customs or police officers, judges, teachers or doctors.
-          - It does not cover high-level political corruption, influence trading, or abuse of power.
-          - Data is collected through national surveys. Respondents report only their own direct experiences, though cases involving middlemen are included. Indirect accounts from other household members are not.
-          - Bribery usually leaves no trace in financial records or documentation. Surveys offer a practical approach for measuring these events.
-          - Many surveys have historically excluded people who were asked for a bribe but refused to pay. This leads to underestimates and could be one reason for lower reported shares in earlier years. More countries are now using standardized methods to address this.
-         description_processing: We’ve chosen not to display the data for Peru and Panama in this indicator, as the value reported by the source appears implausibly low and differs significantly from other sources, such as the Global Corruption Barometer.
-         description_from_producer: |-
+        title: Share of people who said they were recently asked for a bribe or paid one
+        short_unit: "%"
+        unit: "%"
+        description_short: |-
+          Share of respondents who reported having contact with a public official in the past 12 months and paying or being asked to pay a [bribe](#dod:bribery).
+        description_key:
+        - This indicator measures how common bribery is in people’s everyday interactions with public officials. It shows the share of individuals who, in the past year, either paid a bribe or were asked to pay one during contact with a public official.
+        - Bribes can take the form of money, gifts, or favors given in exchange for special treatment. The focus is on petty or administrative bribery — the kind people may face when accessing basic services, such as dealing with the police, schools, or healthcare.
+        - “Public officials” refers to anyone holding a legislative, executive, administrative, or judicial role — including police officers, customs agents, judges, teachers, and doctors. The data does not cover high-level political corruption, trading of influence, or abuse of office.
+        - Data comes primarily from national surveys, where respondents report their own direct experiences. Reports involving intermediaries (e.g. a bribe paid through someone else) are included, but second-hand accounts from other household members are excluded.
+        - When national data is unavailable or insufficient, estimates may draw on [Global Corruption Barometer (GCB)](https://www.transparency.org/en/gcb) data, provided it aligns closely with UNODC definitions. These estimates are reviewed and validated by national authorities, usually through national statistics offices.
+        - In some cases — such as Peru and Panama — UNODC estimates differ significantly from the GCB's figures. These differences may arise from variations in survey scope (e.g. UNODC's surveys inquire about any contact with public officials, while GCB asks about contact concerning a few core services), sample size, how people without recent contact with officials are handled, or how surveys are conducted (e.g. phone vs. in-person).
+        - Earlier surveys often excluded people who were asked for a bribe but refused to pay. This likely led to underestimates of the prevalence of bribery. The UNODC aims to correct this by applying standardised methods across countries.
+        description_from_producer: |-
           This indicator is defined as the percentage of persons who paid at least one bribe (gave a public official money, a gift or counter favour) to a public official, or were asked for a bribe by these public officials, in the last 12 months, as a percentage of persons who had at least one contact with a public official in the same period.
 
           In the International Classification of Crime for Statistical Purposes (ICCS), bribery is defined as: ‘Promising, offering, giving, soliciting, or accepting an undue advantage to or from a public official or a person who directs or works in a private sector entity, directly or indirectly, in order that the person act or refrain from acting in the exercise of his or her official duties’ (ICCS Category 07031).
@@ -178,8 +179,11 @@ tables:
           In the operationalization of the indicator, a list of selected officials and civil servants is used.
 
           Further information available at: https://unstats.un.org/sdgs/metadata/files/Metadata-16-05-01.pdf
-         display:
-           numDecimalPlaces: 1
+        display:
+          numDecimalPlaces: 1
+        presentation:
+          topic_tags:
+            - Corruption
   _17_1_1__gr_g14_gdp:
     variables:
       _17_1_1__gr_g14_gdp:
@@ -187,13 +191,14 @@ tables:
         description_short: Taxes, social contributions, and other revenues such as fines, fees, rent, and income from property or sales included.
         presentation:
           title_public: Government revenues as a share of GDP
+          topic_tags:
+            - Government Spending
           grapher_config:
             note: |-
               Coverage varies by country. Data for [general government](#dod:general-government) (including central, state, and local governments, and social security funds) is used when available. Otherwise, it reflects [consolidated or budgetary central government](#dod:central-government), as reported by each country.
         description_key:
           - Government revenue in this indicator includes all types of revenue, such as taxes, social contributions, grants, and other income. The total revenue is expressed as a percentage of gross domestic product (GDP).
           - This indicator refers to revenues of the [general government](#dod:general-government), which includes all levels of government (central, state, and local) and social security funds. Where general government data is not available, it relies on [consolidated or budgetary central government](#dod:central-government) data, which may not include all levels of government.
-
 
         description_from_producer: |-
           Total government revenue as a proportion of GDP (%)
@@ -218,6 +223,8 @@ tables:
         title: 17.1.2 - Proportion of budgetary central government funded by domestic taxes (%) - GC_GOB_TAXD
         presentation:
           title_public: Share of central government spending funded by taxes
+          topic_tags:
+            - Government Spending
         description_short: Spending refers to the [budgetary central government](#dod:central-government) which includes the core institutions of the national government. Funds only include taxes; Fines, penalties, and most social security contributions are excluded.
         description_key:
           - This indicator measures the share of [central government](#dod:central-government) spending that is covered by domestic tax revenue.
@@ -236,4 +243,3 @@ tables:
           Most of the ministries, departments, agencies, boards, commissions, judicial authorities, legislative bodies, and other entities that make up the budgetary central government are not separate institutional units. This is because they generally do not have the authority to own assets, incur liabilities, or engage in transactions in their own right, including references to standards and classifications, preferably relying on international agreed definitions.
 
           Further information available at: https://unstats.un.org/sdgs/metadata/files/Metadata-17-01-02.pdf
-

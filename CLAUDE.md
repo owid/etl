@@ -164,8 +164,60 @@ These are installed as editable packages (`owid-catalog`, `owid-datautils`, `owi
 
 - Always use `geo.harmonize_countries()` for geographic data
 - Follow the `PathFinder` pattern for step inputs/outputs
-- Use content-based checksums - avoid `--force` unless necessary
+- Using `--force` is usually unnecessary - the step will be re-run if the code changes
 - Test steps with `etl run --dry-run` before execution
 - Use `make sync.catalog` to avoid rebuilding entire catalog locally
 - Check `etl d version-tracker` before major changes
 - VS Code extensions available: `make install-vscode-extensions`
+- Never run --force alone, if you want to force run a step, use --force --only together.
+- When running ETL steps, always use --private flag
+- When running grapher:// step in ETL, always add --grapher flag
+
+## Debugging ETL Data Quality Issues
+
+When ETL steps fail due to data quality issues (NaT values, missing data, missing indicators), always trace the problem upstream through the pipeline stages rather than patching symptoms downstream:
+
+### Systematic Debugging Approach
+
+1. **Check the Snapshot First**: Root cause often lies at the data source level, not ETL logic
+   - Compare snapshot file sizes and date ranges - external providers may truncate or discontinue data feeds
+   - Examine snapshot history: `git log --oneline --follow snapshots/dataset.csv.dvc`
+   - Verify the upstream data source is still providing complete data
+   - Time-based indicators (e.g., `last12m`) will be correctly set to NaN if source data is too old
+
+2. **Trace Through Pipeline Stages**: Work backwards if snapshot data is complete:
+   - **garden** → **meadow** → **snapshot** → **source data**
+   - Load and inspect data at each stage to isolate where the issue originates
+   - Fix at the earliest possible stage
+
+### Example Debugging Commands
+
+```python
+# Examine snapshot data first
+from etl.snapshot import Snapshot
+snap = Snapshot('namespace/version/dataset.csv')
+df = snap.read()
+print(f"Date range: {df.DATE.min()} to {df.DATE.max()}")
+print(f"Null values: {df.DATE.isnull().sum()}")
+
+# Then examine meadow dataset if needed
+from owid.catalog import Dataset
+ds = Dataset('/path/to/meadow/dataset')
+tb = ds['table_name'].reset_index()
+print(f"Garden null values: {tb.date.isnull().sum()}")
+```
+
+### Common Data Quality Issues
+
+- **NaT/null dates**: Often caused by malformed dates in source data or incorrect `dropna()` logic in meadow steps
+- **Missing countries**: Check country mapping files and harmonization logic
+- **Invalid data types**: Verify data conversion and cleaning steps at each stage
+- **Duplicate records**: Examine index formation and deduplication logic
+
+### Best Practices
+
+- **Never patch symptoms**: Don't add workarounds in downstream steps for upstream data issues
+- **Check external data sources first**: ETL logic may be working correctly with stale/incomplete data
+- **Add assertions**: Include data quality checks that fail fast with clear error messages
+- **Document data issues**: Log warnings about data quality problems found during processing
+- **Fix meadow steps**: Most data cleaning should happen in meadow, not garden steps
