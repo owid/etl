@@ -41,9 +41,9 @@ import pandas_gbq
 from google.oauth2 import service_account
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
 from googleapiclient.http import MediaIoBaseUpload
 from structlog import get_logger
-from googleapiclient.errors import HttpError
 
 from etl.config import GOOGLE_APPLICATION_CREDENTIALS
 
