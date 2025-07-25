@@ -1042,7 +1042,7 @@ def export_table_to_gsheet(
     general_access: Literal["anyone", "domain", "user"] = "anyone",
     include_metadata: bool = True,
     metadata_variables: Optional[List[str]] = None,
-) -> tuple[str, str]:
+) -> Optional[tuple[str, str]]:
     """Export a Table to Google Sheets with improved error handling and performance.
 
     Returns
@@ -1056,9 +1056,7 @@ def export_table_to_gsheet(
         If the export fails or if CLIENT_SECRET_FILE is not available in dev environment
     """
     if not CLIENT_SECRET_FILE or not CLIENT_SECRET_FILE.exists() or OWID_ENV.env_local != "dev":
-        raise RuntimeError(
-            "Google Sheets export is only available in local environment (not staging or prod) with valid CLIENT_SECRET_FILE"
-        )
+        return None
 
     try:
         # Sanitize sheet title
