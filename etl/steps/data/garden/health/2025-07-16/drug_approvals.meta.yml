@@ -22,7 +22,7 @@ tables:
         unit: 'approvals'
         short_unit: ''
         description_short: |-
-          The annual number of new drugs approved by the FDA each year. This does not include [generics](#dod:generic-drug), reformulations, or [biosimilars](#dod:biosimilar). It is broken down into [new chemical drugs](#dod:new-molecular-entity), vaccines, and other biologics.
+          The annual number of new drugs approved by the FDA. This is broken down into [new chemical drugs](#dod:new-molecular-entity), new vaccines, and other new biologics such as antibodies and gene therapies. The data does not include [generics](#dod:generic-drug), reformulations, or [biosimilars](#dod:biosimilar).
         display:
           numDecimalPlaces: 0
         description_processing: |-
@@ -32,7 +32,7 @@ tables:
         presentation:
           grapher_config:
             note: |-
-              Biologics are approved as “[BLAs](#dod:biologics-license-application)”, and include vaccines, while chemical drugs are approved as “[NMEs](#dod:new-molecular-entity)”. Data on approvals of chemical drugs are only available from 1984.
+              This data includes “[BLAs](#dod:biologics-license-application)” (used for biologics and vaccines) and “[NMEs](#dod:new-molecular-entity)” (used for chemical drugs). Data on approvals of chemical drugs are only available from 1984.
   drug_approvals_designations:
     variables:
       approvals:
@@ -40,7 +40,7 @@ tables:
         unit: 'approvals'
         short_unit: ''
         description_short: |-
-          The annual number of new drugs approved by the FDA each year that fall under each designation, including [Orphan Drugs](#dod:orphan-drug), [Fast Track](#dod:fda-fast-track), [Accelerated Approval](#dod:fda-accelerated-approval), [Breakthrough Therapy](#dod:breakthrough-therapy), and [Qualified Infectious Disease Product](#dod:qualified-infectious-disease-product).
+          The annual number of new drugs approved by the FDA that fall under each designation, including [Orphan Drugs](#dod:orphan-drug), [Fast Track](#dod:fda-fast-track), [Accelerated Approval](#dod:fda-accelerated-approval), [Breakthrough Therapy](#dod:breakthrough-therapy), and [Qualified Infectious Disease Product](#dod:qualified-infectious-disease-product).
         display:
           numDecimalPlaces: 0
         presentation:
