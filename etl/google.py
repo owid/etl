@@ -887,9 +887,11 @@ class GoogleSheet:
             Whether to include the DataFrame column headers. Default is True.
         value_input_option : str, optional
             How the input data should be interpreted. Options are 'RAW' or 'USER_ENTERED'.
-            Default is 'RAW'.
+            Default is 'USER_ENTERED'.
 
         """
+        from googleapiclient.errors import HttpError
+
         # Check if sheet exists, create if it doesn't
         try:
             existing_sheets = self.get_sheet_names()
@@ -901,12 +903,24 @@ class GoogleSheet:
                 # Clear existing sheet data only if sheet exists
                 self.clear_sheet_data(sheet_name)
 
-        except Exception as e:
-            # If we can't check/create sheets, try to create anyway
-            try:
-                self.add_sheet(sheet_name)
-            except Exception as inner_exception:
-                log.error(f"Failed to add sheet '{sheet_name}' in the inner exception block.", exc_info=inner_exception)
+        except HttpError as e:
+            # Handle Google API HTTP errors (permissions, quota, etc.)
+            if e.resp.status == 400:
+                # Sheet might already exist or bad request
+                log.warning(f"Failed to check/create sheet '{sheet_name}': {e}")
+                try:
+                    self.add_sheet(sheet_name)
+                except HttpError as inner_e:
+                    if inner_e.resp.status == 400:
+                        # Sheet likely already exists, continue
+                        log.info(f"Sheet '{sheet_name}' may already exist, continuing with write operation")
+                    else:
+                        # Re-raise other HTTP errors
+                        raise
+            else:
+                # Re-raise other HTTP errors (403 Forbidden, 404 Not Found, etc.)
+                raise
+
         # Convert DataFrame to list of lists
         values = []
 
