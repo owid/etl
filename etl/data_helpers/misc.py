@@ -957,22 +957,26 @@ def _extract_metadata_rows(metadata_obj, included_fields: set) -> List[List[str]
             # Handle special case for origins - extract attributes for each
             if key == "origins":
                 for origin in value:
-                    # Use attribution_short if available, otherwise fall back to producer
-                    if hasattr(origin, 'attribution_short') and origin.attribution_short:
+                    # Get origin identifier with proper type handling
+                    origin_identifier = None
+
+                    # Try attribution_short first
+                    if hasattr(origin, 'attribution_short') and getattr(origin, 'attribution_short', None):
                         origin_identifier = origin.attribution_short
                     elif isinstance(origin, dict) and origin.get('attribution_short'):
                         origin_identifier = origin['attribution_short']
-                    elif hasattr(origin, 'producer') and origin.producer:
-                        origin_identifier = origin.producer
+                    # Fall back to producer
+                    elif hasattr(origin, 'producer') and getattr(origin, 'producer', None):
+                        origin_identifier = origin['producer']
                     elif isinstance(origin, dict) and origin.get('producer'):
                         origin_identifier = origin['producer']
-                    else:
-                        # Fallback to original display name if no identifier available
-                        origin_display_name = display_name
-                        rows.extend(_extract_origin_attributes(origin, origin_display_name))
-                        continue
 
-                    origin_display_name = f"{display_name} ({origin_identifier})"
+                    # Create display name with identifier or use base name
+                    if origin_identifier:
+                        origin_display_name = f"{display_name} ({origin_identifier})"
+                    else:
+                        origin_display_name = display_name
+
                     rows.extend(_extract_origin_attributes(origin, origin_display_name))
             else:
                 # For other list fields, use the original formatting
@@ -986,7 +990,6 @@ def _extract_metadata_rows(metadata_obj, included_fields: set) -> List[List[str]
             rows.append([display_name, formatted_value])
 
     return rows
-
 
 def _extract_origin_attributes(origin, base_display_name: str) -> List[List[str]]:
     """Extract individual attributes from an Origin object and format them in a single cell."""
@@ -1039,34 +1042,48 @@ def export_table_to_gsheet(
     include_metadata: bool = True,
     metadata_variables: Optional[List[str]] = None,
 ) -> tuple[str, str]:
-    """Export a Table to Google Sheets with improved error handling and performance."""
+    """Export a Table to Google Sheets with improved error handling and performance.
+
+    Returns
+    -------
+    tuple[str, str]
+        A tuple containing (sheet_url, sheet_id)
+
+    Raises
+    ------
+    RuntimeError
+        If the export fails or if CLIENT_SECRET_FILE is not available in dev environment
+    """
     if not CLIENT_SECRET_FILE or not CLIENT_SECRET_FILE.exists() or OWID_ENV.env_local != "dev":
-        try:
-            # Sanitize sheet title
-            sheet_title = sheet_title.strip()[: GSHEET_EXPORT_CONFIG["MAX_TITLE_LENGTH"]]
+        raise RuntimeError(
+            "Google Sheets export is only available in development environment with valid CLIENT_SECRET_FILE"
+        )
 
-            # Convert and validate data
-            df = _prepare_dataframe(table)
+    try:
+        # Sanitize sheet title
+        sheet_title = sheet_title.strip()[: GSHEET_EXPORT_CONFIG["MAX_TITLE_LENGTH"]]
 
-            # Create or update sheet
-            sheet = _update_or_create_sheet(sheet_title, folder_id, df, update_existing)
+        # Convert and validate data
+        df = _prepare_dataframe(table)
 
-            # Write main data
-            sheet.write_dataframe(df)
+        # Create or update sheet
+        sheet = _update_or_create_sheet(sheet_title, folder_id, df, update_existing)
 
-            # Add metadata if requested
-            if include_metadata:
-                _add_metadata_tabs(sheet, table, metadata_variables)
+        # Write main data
+        sheet.write_dataframe(df)
 
-            # Set permissions
-            _set_permissions(sheet.sheet_id, role, general_access)
+        # Add metadata if requested
+        if include_metadata:
+            _add_metadata_tabs(sheet, table, metadata_variables)
 
-            return sheet.url, sheet.sheet_id
+        # Set permissions
+        _set_permissions(sheet.sheet_id, role, general_access)
 
-        except Exception as e:
-            log.error(f"Failed to export table to Google Sheets: {e}")
-            raise RuntimeError(f"Failed to export table to Google Sheets: {e}")
+        return sheet.url, sheet.sheet_id
 
+    except Exception as e:
+        log.error(f"Failed to export table to Google Sheets: {e}")
+        raise RuntimeError(f"Failed to export table to Google Sheets: {e}")
 
 def _update_or_create_sheet(
     sheet_title: str, folder_id: Optional[str], df: pd.DataFrame, update_existing: bool
