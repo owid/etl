@@ -879,7 +879,12 @@ def _format_list_metadata(key: str, value: list) -> str:
 
 def _prepare_dataframe(table: Table) -> pd.DataFrame:
     """Convert table to DataFrame and optimize for Google Sheets."""
-    df = table.reset_index()
+    # Reset index only if it's not the default RangeIndex
+    if not isinstance(table.index, pd.RangeIndex) or table.index.name is not None:
+        df = table.reset_index()
+    else:
+        df = table.copy()
+
     if isinstance(df, Table):
         df = pd.DataFrame(df)
 
@@ -906,7 +911,10 @@ def retry_on_network_error(max_retries: int = 3, base_delay: float = 1.0):
                         and attempt < max_retries - 1
                     ):
                         delay = base_delay * (2**attempt) + random.uniform(0, 1)
-                        log.warning(f"Network error on attempt {attempt + 1}, retrying in {delay:.1f}s...")
+                        log.warning(
+                            f"Network error in function '{func.__name__}' on attempt {attempt + 1}: {str(e)}. "
+                            f"Retrying in {delay:.1f}s..."
+                        )
                         time.sleep(delay)
                         continue
                     raise
@@ -946,17 +954,26 @@ def _extract_metadata_rows(metadata_obj, included_fields: set) -> List[List[str]
         display_name = GSHEET_EXPORT_CONFIG["FIELD_DISPLAY_NAMES"].get(key, key)
 
         if isinstance(value, list):
-            # Handle special case for origins - split into separate rows
+            # Handle special case for origins - extract attributes for each
             if key == "origins":
-                if len(value) == 1:
-                    # Single origin - extract attributes
-                    origin = value[0]
-                    rows.extend(_extract_origin_attributes(origin, display_name))
-                else:
-                    # Multiple origins - extract attributes for each
-                    for i, origin in enumerate(value, 1):
-                        numbered_display_name = f"{display_name} ({i})"
-                        rows.extend(_extract_origin_attributes(origin, numbered_display_name))
+                for origin in value:
+                    # Use attribution_short if available, otherwise fall back to producer
+                    if hasattr(origin, 'attribution_short') and origin.attribution_short:
+                        origin_identifier = origin.attribution_short
+                    elif isinstance(origin, dict) and origin.get('attribution_short'):
+                        origin_identifier = origin['attribution_short']
+                    elif hasattr(origin, 'producer') and origin.producer:
+                        origin_identifier = origin.producer
+                    elif isinstance(origin, dict) and origin.get('producer'):
+                        origin_identifier = origin['producer']
+                    else:
+                        # Fallback to original display name if no identifier available
+                        origin_display_name = display_name
+                        rows.extend(_extract_origin_attributes(origin, origin_display_name))
+                        continue
+
+                    origin_display_name = f"{display_name} ({origin_identifier})"
+                    rows.extend(_extract_origin_attributes(origin, origin_display_name))
             else:
                 # For other list fields, use the original formatting
                 formatted_value = _format_list_metadata(key, value)
@@ -1077,7 +1094,8 @@ def export_table_to_gsheet(
             return sheet.url, sheet.sheet_id
 
         except Exception as e:
-            return "", ""
+            log.error(f"Failed to export table to Google Sheets: {e}")
+            raise RuntimeError(f"Failed to export table to Google Sheets: {e}")
 
 
 def _update_or_create_sheet(
@@ -1170,7 +1188,7 @@ def create_or_get_shared_folder(
         folder_metadata: Dict[str, Any] = {"name": folder_name, "mimeType": "application/vnd.google-apps.folder"}
 
         if parent_folder_id:
-            folder_metadata["parents"] = [parent_folder_id]  # This is correct - parents expects a list
+            folder_metadata["parents"] = [parent_folder_id]
 
         folder = drive.drive_service.files().create(body=folder_metadata, fields="id").execute()
         folder_id = folder.get("id")
@@ -1207,4 +1225,4 @@ def get_team_folder_id() -> Optional[str]:
         except Exception as e:
             log.warning(f"Warning: Cannot access shared folder {OWID_SHARED_FOLDER_ID}: {e}")
 
-    return
+    return None
