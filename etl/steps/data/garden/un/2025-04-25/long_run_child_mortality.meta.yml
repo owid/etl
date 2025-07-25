@@ -53,7 +53,7 @@ tables:
         description_processing: >-
           This indicator is a combination of data from two sources:
             - Gapminder, which provides estimates of child mortality rates for the years 1800 to 2015.
-            - The UN Inter-agency Group for Child Mortality Estimation (UN IGME), provides estimates of child mortality rates, for some countries from 1932 onward.
+            - The UN Inter-agency Group for Child Mortality Estimation (UN IGME) provides estimates of child mortality rates, for some countries from 1932 onward.
 
           For years where data from both sources is available, we prioritize the UN IGME data.
 
