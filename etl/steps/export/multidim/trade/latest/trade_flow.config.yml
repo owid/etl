@@ -27,5 +27,8 @@ dimensions:
       - slug: "share_of_total_trade"
         name: "Share of total trade"
         description: Share of total trade volume (exports plus imports)
+      - slug: side_by_side
+        name: "All types of trade"
+        description: Compare exports and imports side by side
 
 views: []

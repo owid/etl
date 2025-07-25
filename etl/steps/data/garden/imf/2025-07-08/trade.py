@@ -11,15 +11,6 @@ paths = PathFinder(__file__)
 
 REGIONS = ["North America", "South America", "Europe", "Africa", "Asia", "Oceania", "World"]
 
-IMF_REGIONS = [
-    "Latin America and the Caribbean",
-    "Sub-Saharan Africa",
-    "Emerging and Developing Asia",
-    "Middle East and Central Asia",
-    "Advanced Economies",
-    "Emerging and Developing Europe",
-]
-
 
 def run() -> None:
     #
@@ -68,7 +59,6 @@ def run() -> None:
 
     regions_without_world = [region for region in REGIONS if region != "World"]
     tb_owid = tb[(tb["country"].isin(regions_without_world)) & (tb["counterpart_country"].isin(regions_without_world))]
-    tb_imf = tb[tb["country"].isin(IMF_REGIONS) & tb["counterpart_country"].isin(IMF_REGIONS)]
 
     # Define member countries for each OWID region, excluding "World".
     members = set()
@@ -81,7 +71,6 @@ def run() -> None:
     # Define table subsets with descriptive names
     table_subsets = [
         ("owid_regions", tb_owid),
-        ("imf_regions", tb_imf),
         ("owid_world", tb_owid_world),
         ("owid_countries", tb_owid_countries),
     ]
@@ -89,7 +78,7 @@ def run() -> None:
     tbs = []
     for table_index, (table_name, table_data) in enumerate(table_subsets):
         processed_table = sh.process_table_subset(table_data)
-        if table_name in ["owid_regions", "imf_regions"]:
+        if table_name in ["owid_regions"]:
             #    processed_table = processed_table.rename(
             #        columns={"country": "counterpart_country", "counterpart_country": "country"}
             #    )
