@@ -961,15 +961,15 @@ def _extract_metadata_rows(metadata_obj, included_fields: set) -> List[List[str]
                     origin_identifier = None
 
                     # Try attribution_short first
-                    if hasattr(origin, 'attribution_short') and getattr(origin, 'attribution_short', None):
+                    if hasattr(origin, "attribution_short") and getattr(origin, "attribution_short", None):
                         origin_identifier = origin.attribution_short
-                    elif isinstance(origin, dict) and origin.get('attribution_short'):
-                        origin_identifier = origin['attribution_short']
+                    elif isinstance(origin, dict) and origin.get("attribution_short"):
+                        origin_identifier = origin["attribution_short"]
                     # Fall back to producer
-                    elif hasattr(origin, 'producer') and getattr(origin, 'producer', None):
-                        origin_identifier = origin['producer']
-                    elif isinstance(origin, dict) and origin.get('producer'):
-                        origin_identifier = origin['producer']
+                    elif hasattr(origin, "producer") and getattr(origin, "producer", None):
+                        origin_identifier = origin["producer"]
+                    elif isinstance(origin, dict) and origin.get("producer"):
+                        origin_identifier = origin["producer"]
 
                     # Create display name with identifier or use base name
                     if origin_identifier:
@@ -990,6 +990,7 @@ def _extract_metadata_rows(metadata_obj, included_fields: set) -> List[List[str]
             rows.append([display_name, formatted_value])
 
     return rows
+
 
 def _extract_origin_attributes(origin, base_display_name: str) -> List[List[str]]:
     """Extract individual attributes from an Origin object and format them in a single cell."""
@@ -1031,6 +1032,7 @@ def _extract_origin_attributes(origin, base_display_name: str) -> List[List[str]
 
     # Return a single row with all the origin information
     return [[base_display_name, formatted_value]]
+
 
 def export_table_to_gsheet(
     table: Table,
@@ -1084,6 +1086,7 @@ def export_table_to_gsheet(
     except Exception as e:
         log.error(f"Failed to export table to Google Sheets: {e}")
         raise RuntimeError(f"Failed to export table to Google Sheets: {e}")
+
 
 def _update_or_create_sheet(
     sheet_title: str, folder_id: Optional[str], df: pd.DataFrame, update_existing: bool
