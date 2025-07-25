@@ -20,7 +20,7 @@ meta:
     # Files
     url_main: https://epoch.ai/blog/tracking-compute-intensive-ai-models
     url_download: https://epoch.ai/data/epochdb/large_scale_ai_models.csv
-    date_accessed: '2025-07-24'
+    date_accessed: '2025-07-25'
 
     # License
     license:
