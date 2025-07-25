@@ -1082,7 +1082,9 @@ class GoogleSheet:
         return [sheet["title"] for sheet in properties]
 
     @classmethod
-    def create_or_update_sheet(cls, title: str, folder_id: Optional[str] = None, df: pd.DataFrame, update_existing: bool=False) -> "GoogleSheet":
+    def create_or_update_sheet(
+        cls, title: str, df: pd.DataFrame, folder_id: Optional[str] = None, update_existing: bool = False
+    ) -> "GoogleSheet":
         """
         Create a new Google Sheet and return a GoogleSheet instance.
 
@@ -1135,4 +1137,3 @@ class GoogleSheet:
                 log.error(f"Warning: Google Drive API error while updating existing sheet: {e}")
             except Exception as e:
                 log.error(f"Critical: Unexpected error while updating existing sheet: {e}")
-

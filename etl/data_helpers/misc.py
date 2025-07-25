@@ -6,7 +6,7 @@ import random
 import time
 from datetime import date, datetime
 from functools import wraps
-from typing import Any,  Iterable, List, Literal, Optional, Set, TypeVar, Union, cast
+from typing import Any, Iterable, List, Literal, Optional, Set, TypeVar, Union, cast
 
 import owid.catalog.processing as pr
 import pandas as pd
@@ -1143,7 +1143,7 @@ def get_team_folder_id() -> Optional[str]:
 # def create_or_get_shared_folder(
 #    folder_name: str = "ETL GSheet Exports",
 #    parent_folder_id: Optional[str] = None,
-#) -> Optional[str]:
+# ) -> Optional[str]:
 #    """Create or get a shared folder for storing multiple Google Sheets.
 #
 #    Parameters
