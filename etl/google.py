@@ -1083,8 +1083,12 @@ class GoogleSheet:
 
     @classmethod
     def create_or_update_sheet(
-        cls, title: str, df: pd.DataFrame, folder_id: Optional[str] = None, update_existing: bool = False
-    ) -> Optional["GoogleSheet"]:
+        cls,
+        title: str,
+        df: pd.DataFrame,
+        folder_id: Optional[str] = None,
+        update_existing: bool = False
+    ) -> "GoogleSheet":
         """
         Create a new Google Sheet or update an existing one and return a GoogleSheet instance.
 
@@ -1101,9 +1105,13 @@ class GoogleSheet:
 
         Returns
         -------
-        Optional[GoogleSheet]
-            A GoogleSheet instance for the created/updated spreadsheet, or None if operation fails.
+        GoogleSheet
+            A GoogleSheet instance for the created/updated spreadsheet.
 
+        Raises
+        ------
+        RuntimeError
+            If sheet creation or update fails
         """
         if not update_existing:
             try:
@@ -1120,7 +1128,7 @@ class GoogleSheet:
                 return cls(sheet_id)
             except Exception as e:
                 log.error(f"Failed to create new sheet '{title}': {e}")
-                return None
+                raise RuntimeError(f"Failed to create new sheet '{title}': {e}")
         else:
             try:
                 drive = GoogleDrive()
@@ -1160,7 +1168,7 @@ class GoogleSheet:
 
             except HttpError as e:
                 log.error(f"Google Drive API error while updating existing sheet '{title}': {e}")
-                return None
+                raise RuntimeError(f"Google Drive API error while updating existing sheet '{title}': {e}")
             except Exception as e:
                 log.error(f"Unexpected error while updating existing sheet '{title}': {e}")
-                return None
+                raise RuntimeError(f"Unexpected error while updating existing sheet '{title}': {e}")
