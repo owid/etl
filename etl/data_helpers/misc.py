@@ -1068,7 +1068,7 @@ def export_table_to_gsheet(
         df = _prepare_dataframe(table)
 
         # Create or update sheet
-        sheet = GoogleSheet.create_or_update_sheet(sheet_title,  df,folder_id, update_existing)
+        sheet = GoogleSheet.create_or_update_sheet(sheet_title, df, folder_id, update_existing)
 
         # Write main data
         sheet.write_dataframe(df)

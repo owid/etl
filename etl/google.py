@@ -1083,42 +1083,41 @@ class GoogleSheet:
 
     @classmethod
     def create_or_update_sheet(
-        cls, title: str, df: pd.DataFrame, folder_id: Optional[str] = None, update_existing: bool = False
+        cls,
+        sheet_title: str,
+        df: pd.DataFrame,
+        folder_id: Optional[str] = None,
+        update_existing: bool = True,
     ) -> "GoogleSheet":
-        """
-        Create a new Google Sheet and return a GoogleSheet instance.
+        """Create or update a Google Sheet with the given data.
 
         Parameters
         ----------
-        title : str
-            The title of the new spreadsheet.
-        folder_id : str, optional
-            The ID of the folder to create the spreadsheet in. If None, it will be created in the root folder.
+        sheet_title : str
+            Title of the sheet to create or update
+        df : pd.DataFrame
+            DataFrame containing the data to write
+        folder_id : Optional[str], optional
+            ID of the folder to create the sheet in, by default None
+        update_existing : bool, optional
+            Whether to update existing sheet or create new one, by default True
 
         Returns
         -------
         GoogleSheet
-            A GoogleSheet instance for the newly created spreadsheet.
+            The created or updated GoogleSheet instance
 
+        Raises
+        ------
+        RuntimeError
+            If sheet creation or update fails
         """
-        if not update_existing:
-            drive = GoogleDrive()
-
-            # Use the Drive API to create the spreadsheet file
-            file_metadata: Dict[str, Any] = {"name": title, "mimeType": "application/vnd.google-apps.spreadsheet"}
-
-            if folder_id:
-                file_metadata["parents"] = [folder_id]
-
-            spreadsheet = drive.drive_service.files().create(body=file_metadata).execute()
-            sheet_id = spreadsheet["id"]
-            return cls(sheet_id)
-        else:
-            try:
+        try:
+            if update_existing:
+                # Try to find existing sheet
                 drive = GoogleDrive()
-                query = f"name='{title}' and mimeType='application/vnd.google-apps.spreadsheet'"
+                query = f"name='{sheet_title}' and mimeType='application/vnd.google-apps.spreadsheet'"
 
-                # If folder_id is specified, search within that folder
                 if folder_id:
                     query += f" and '{folder_id}' in parents"
 
@@ -1126,14 +1125,20 @@ class GoogleSheet:
                 files = results.get("files", [])
 
                 if files:
-                    sheet = GoogleSheet(files[0]["id"])
-                    # Clear and write to first sheet
-                    sheet_metadata = sheet.sheets_service.spreadsheets().get(spreadsheetId=files[0]["id"]).execute()
-                    first_tab_name = sheet_metadata["sheets"][0]["properties"]["title"]
-                    sheet.clear_sheet_data(first_tab_name)
-                    sheet.write_dataframe(df, sheet_name=first_tab_name)
+                    # Found existing sheet, return it
+                    sheet = cls(files[0]["id"])
+                    log.info(f"Using existing sheet: {sheet_title}")
                     return sheet
-            except HttpError as e:
-                log.error(f"Warning: Google Drive API error while updating existing sheet: {e}")
-            except Exception as e:
-                log.error(f"Critical: Unexpected error while updating existing sheet: {e}")
+
+            # Create new sheet
+            if folder_id:
+                sheet = cls.create_sheet(title=sheet_title, folder_id=folder_id)
+            else:
+                sheet = cls.create_sheet(title=sheet_title)
+
+            log.info(f"Created new sheet: {sheet_title}")
+            return sheet
+
+        except Exception as e:
+            log.error(f"Failed to create or update sheet '{sheet_title}': {e}")
+            raise RuntimeError(f"Failed to create or update sheet '{sheet_title}': {e}")
