@@ -18,17 +18,21 @@ tables:
   total_drug_approvals:
     variables:
       total_approvals:
-        title: Total drug approvals
+        title: New drugs approved by the FDA
         unit: 'approvals'
         short_unit: ''
         description_short: |-
-          The total number of new drug approvals in a given year. These include new molecular entities (NMEs) and biologics license applications (BLAs) approved by the FDA. These do not include generics or biosimilars.
+          The annual number of new drugs approved by the FDA each year. This does not include [generics](#dod:generic-drug), reformulations, or [biosimilars](#dod:biosimilar). It is broken down into [new chemical drugs](#dod:new-molecular-entity), vaccines, and other biologics.
         display:
           numDecimalPlaces: 0
         description_processing: |-
-          - This data includes both new molecular entities (NMEs) and biologics license applications (BLAs) approved by the Center for Drug Evaluation and Research (CDER) and the Center for Biologics Evaluation and Research (CBER) of the FDA.
+          - This data includes both [new molecular entities](#dod:new-molecular-entity) (NMEs) and [biologics license applications](#dod:biologics-license-application) (BLAs) approved by the Center for Drug Evaluation and Research (CDER) and the Center for Biologics Evaluation and Research (CBER) of the FDA.
           - Biologicals approved by the CBER have been extracted from the FDA's "Purple Book", which lists licensed biological products with reference product exclusivity and biosimilarity or interchangeability evaluations.
           - We removed biosimilars from the dataset by excluding products with a "biosimilar" or "interchangeable" license type as well as products with a reference product listed.
+        presentation:
+          grapher_config:
+            note: |-
+              Biologics are approved as “[BLAs](#dod:biologics-license-application)”, and include vaccines, while chemical drugs are approved as “[NMEs](#dod:new-molecular-entity)”. Data on approvals of chemical drugs are only available from 1984.
   drug_approvals_designations:
     variables:
       orphan_drug_approvals:

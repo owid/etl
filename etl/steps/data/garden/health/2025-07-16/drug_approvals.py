@@ -14,7 +14,17 @@ paths = PathFinder(__file__)
 def get_approvals_per_year(tb_cder, tb_purple_book):
     # copy table to avoid modifying original data
     tb_cber = tb_purple_book.copy()
-    tb_cber["application_type"] = "BLA"
+    tb_cder = tb_cder.copy()
+
+    tb_cber["vaccine"] = tb_cber["proper_name"].str.contains("vaccine", case=False, na=False)
+    tb_cber["vaccine"] = tb_cber["vaccine"].apply(lambda x: "New vaccines" if x else "Other new biologics")
+    tb_cber["application_type"] = tb_cber["vaccine"]
+
+    tb_cder = tb_cder.replace(
+        {
+            "New biologics": "Other new biologics",
+        }
+    )
 
     tb = pr.concat(
         [
@@ -24,15 +34,21 @@ def get_approvals_per_year(tb_cder, tb_purple_book):
         ignore_index=True,
     )
 
-    tb = tb.groupby(["approval_year", "application_type"]).size().reset_index(name="approvals")
-    tb["approval_year"] = tb["approval_year"].astype(int)
+    tb_gb = tb.groupby(["approval_year", "application_type"]).size().reset_index(name="approvals").copy_metadata(tb)
+
+    tb_gb["approvals"].m.origins = tb_gb["approval_year"].m.origins.copy()
+
+    tb_cum = tb_gb.groupby("approval_year").sum().reset_index()
+    tb_cum["application_type"] = "Total drug approvals"
+
+    tb = pr.concat([tb_gb, tb_cum], ignore_index=True)
+
     return tb
 
 
-def get_approvals_per_designation(tb_cder, tb_purple_book):
+def get_approvals_per_designation(tb_cder):
     # copy table to avoid modifying original data
     tb_cder_des = tb_cder.copy()
-    tb_cber = tb_purple_book.copy()
 
     # sum over designation columns
     designation_columns = [
@@ -48,27 +64,42 @@ def get_approvals_per_designation(tb_cder, tb_purple_book):
         "Yes",
         "Yes (indication [B] only)",
         "Yes (indication [A] only)",
-        "Yes (indication [B] and [C] only)" "Yes (indications [B] and [C] only)",
+        "Yes (indication [B] and [C] only)",
+        "Yes (indications [B] and [C] only)",
     ]
 
     # convert to 1/0
-    tb_cder_des[designation_columns] = tb_cder_des[designation_columns].apply(
-        lambda x: 1 if str(x) in pos_indications else 0
+    tb_cder_des[designation_columns] = tb_cder_des[designation_columns].isin(pos_indications).astype(int)
+
+    designations = (
+        tb_cder_des.groupby("approval_year")[designation_columns].sum().reset_index().copy_metadata(tb_cder_des)
     )
-    designations = tb_cder_des.groupby("approval_year")[designation_columns].sum().reset_index()
 
-    tb_cber["vaccine"] = (tb_cber["proper_name"].str.contains("vaccine", case=False, na=False)).astype(int)
-    vaccines = tb_cber.groupby("approval_year")["vaccine"].sum().reset_index()
+    # add metadata (i don't know why this is necessary, but it is)
+    for col in designation_columns:
+        designations[col].m.origins = tb_cder_des["approval_year"].m.origins.copy()
 
-    tb_designation = pr.merge(
+    # melt table
+    designations = pr.melt(
         designations,
-        vaccines,
-        on="approval_year",
-        how="outer",
-        suffixes=("", "_vaccine"),
+        id_vars=["approval_year"],
+        value_vars=designation_columns,
+        var_name="designation",
+        value_name="approvals",
     )
 
-    return tb_designation
+    # rename designation values
+    designations = designations.replace(
+        {
+            "orphan_drug_designation": "Orphan Drug",
+            "accelerated_approval": "Accelerated Approval",
+            "breakthrough_therapy_designation": "Breakthrough Therapy",
+            "fast_track_designation": "Fast Track",
+            "qualified_infectious_disease_product": "Qualified Infectious Disease Product",
+        }
+    )
+
+    return designations
 
 
 def run() -> None:
@@ -91,6 +122,7 @@ def run() -> None:
             "nda_bla": "application_type",
         }
     )
+    tb_cder = tb_cder.replace({"BLA": "New biologics", "NDA": "New chemical drugs"})
     tb_purple_book = tb_purple_book.rename(
         columns={
             "bla_number": "application_number",
@@ -112,7 +144,7 @@ def run() -> None:
     tb = get_approvals_per_year(tb_cder, tb_purple_book)
 
     # get approvals per designation
-    tb_designations = get_approvals_per_designation(tb_cder, tb_purple_book)
+    tb_designations = get_approvals_per_designation(tb_cder)
 
     # Format tables
     tb = tb.rename(
@@ -125,18 +157,21 @@ def run() -> None:
     tb_designations = tb_designations.rename(
         columns={
             "approval_year": "year",
-            "orphan_drug_designation": "orphan_drug_approvals",
-            "accelerated_approval": "accelerated_approvals",
-            "breakthrough_therapy_designation": "breakthrough_therapy_approvals",
-            "fast_track_designation": "fast_track_approvals",
-            "qualified_infectious_disease_product": "qualified_infectious_disease_approvals",
-            "vaccine": "vaccine_approvals",
         }
     )
 
+    # get cumulative approvals (in case we want to plot cumulative approvals later)
+    # tb['cumulative_approvals'] = tb.sort_values(['application_type', 'year'])
+    # .groupby('application_type')['total_approvals']
+    # .cumsum()
+
+    # designations['cumulative_approvals'] = designations.sort_values(['designation', 'approval_year'])
+    #  .groupby('designation')['approvals']
+    #  .cumsum()
+
     # Improve table format.
     tb = tb.format(["year", "application_type"], short_name="total_drug_approvals")
-    tb_designations = tb_designations.format(["year"], short_name="drug_approvals_designations")
+    tb_designations = tb_designations.format(["year", "designation"], short_name="drug_approvals_designations")
 
     #
     # Save outputs.
