@@ -26,6 +26,20 @@ def run() -> None:
         dimensions=["counterpart_country", "metric"],
         common_view_config=MULTIDIM_CONFIG,
     )
+    c.group_views(
+        groups=[
+            {
+                "dimension": "metric",
+                "choice_new_slug": "side_by_side",
+                "view_config": {
+                    "hasMapTab": False,
+                    "tab": "chart",
+                    "facettingLabelByYVariables": "counterpart_country",
+                    "selectedFacetStrategy": "metric",
+                },
+            },
+        ]
+    )
     c.sort_choices({"counterpart_country": lambda x: sorted(x)})
 
     # Save & upload
