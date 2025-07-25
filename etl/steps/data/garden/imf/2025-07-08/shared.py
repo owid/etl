@@ -1,3 +1,5 @@
+import numpy as np
+import pandas as pd
 from owid.catalog import Table
 
 
@@ -111,3 +113,137 @@ def calculate_trade_shares(tb: Table) -> Table:
     tb["share_of_total_trade"] = tb["bilateral_trade_volume"] / tb["total_trade_volume"] * 100
 
     return tb
+
+
+def calculate_trade_relationship_shares(tb: Table) -> Table:
+    EXPORT = "Exports of goods, Free on board (FOB), US dollar"
+    IMPORT = "Imports of goods, Cost insurance freight (CIF), US dollar"
+    THRESHOLD = 0.01  # million USD
+
+    # 1. Filter to just export/import, mark “has_trade”
+    df = tb[tb.indicator.isin([EXPORT, IMPORT])].assign(has_trade=lambda d: d.value.fillna(0) > THRESHOLD)
+
+    # 2. Create a symmetric “pair” column by sorting the two country names
+    #    This uses vectorized minimum/maximum on object‑dtypes:
+    c1 = df[["country", "counterpart_country"]]
+    df["pair"] = pd.Series(
+        np.where(
+            c1.country.values < c1.counterpart_country.values,
+            c1.country.values + "--" + c1.counterpart_country.values,
+            c1.counterpart_country.values + "--" + c1.country.values,
+        ),
+        index=df.index,
+    )
+
+    # 3. Count how many directions have trade per (year, pair)
+    active = df[df.has_trade]
+    dir_counts = (
+        active.groupby(["year", "pair"])["country"]
+        .nunique()  # how many unique “origins” per pair-year (1 or 2)
+        .reset_index(name="n_dirs")
+    )
+
+    # 4. Build full set of pairs for every year (so we include non‑trading)
+    all_pairs = df[["year", "pair"]].drop_duplicates()
+
+    status = all_pairs.merge(dir_counts, on=["year", "pair"], how="left").fillna({"n_dirs": 0})
+
+    # 5. Classify and aggregate
+    status["relationship"] = pd.cut(
+        status.n_dirs, bins=[-0.1, 0.1, 1.1, 2.1], labels=["non_trading", "unilateral", "bilateral"]
+    )
+
+    counts = status.groupby(["year", "relationship"]).size().unstack(fill_value=0)
+
+    # 6. Compute shares
+    total = counts.sum(axis=1)
+    shares = counts.divide(total, axis=0).multiply(100)
+    shares = shares.rename(
+        columns={
+            "bilateral": "share_bilateral",
+            "unilateral": "share_unilateral",
+            "non_trading": "share_non_trading",
+        }
+    ).reset_index()
+    for col in ["share_bilateral", "share_unilateral", "share_non_trading"]:
+        shares[col] = shares[col].copy_metadata(tb["value"])
+
+    return shares[["year", "share_bilateral", "share_unilateral", "share_non_trading"]]
+
+
+def calculate_income_level_trade_shares(tb: Table, income_groups_ds) -> Table:
+    """
+    Calculate share of total trade that happens between different income levels.
+    
+    Args:
+        tb: Table with columns ['country', 'counterpart_country', 'year', 'indicator', 'value']
+        income_groups_ds: Dataset containing income group classifications
+        
+    Returns:
+        Table with columns for each income level combination share
+    """
+    EXPORT = "Exports of goods, Free on board (FOB), US dollar"
+    THRESHOLD = 0.01  # million USD
+    
+    tb = tb.copy()
+    
+    # Filter to exports only (to avoid double counting trade flows)
+    exports = tb[(tb["indicator"] == EXPORT) & (tb["value"].fillna(0) > THRESHOLD)]
+    
+    # Get income group mappings
+    income_mapping = income_groups_ds["income_groups"].reset_index()
+    income_mapping = income_mapping[["country", "income_group"]].dropna()
+    
+    # Map income groups to countries and counterpart countries
+    exports = exports.merge(
+        income_mapping.rename(columns={"income_group": "origin_income"}),
+        left_on="country", 
+        right_on="country",
+        how="left"
+    )
+    
+    exports = exports.merge(
+        income_mapping.rename(columns={"income_group": "destination_income"}),
+        left_on="counterpart_country",
+        right_on="country",
+        how="left",
+        suffixes=("", "_dest")
+    )
+    
+    # Drop rows where income group is missing
+    exports = exports.dropna(subset=["origin_income", "destination_income"])
+    
+    # Create income level combinations
+    exports["income_flow"] = exports["origin_income"] + "_to_" + exports["destination_income"]
+    
+    # Calculate total trade value by year and income flow
+    trade_by_flow = exports.groupby(["year", "income_flow"])["value"].sum().reset_index()
+    
+    # Calculate total trade by year
+    total_trade = exports.groupby("year")["value"].sum().reset_index(name="total_value")
+    
+    # Merge and calculate shares
+    trade_shares = trade_by_flow.merge(total_trade, on="year")
+    trade_shares["share"] = (trade_shares["value"] / trade_shares["total_value"]) * 100
+    
+    # Pivot to get shares as separate columns
+    shares_pivot = trade_shares.pivot(
+        index="year", 
+        columns="income_flow", 
+        values="share"
+    ).reset_index().fillna(0)
+    
+    # Rename columns to be more descriptive
+    column_mapping = {}
+    for col in shares_pivot.columns:
+        if col != "year":
+            column_mapping[col] = f"share_trade_{col.lower()}"
+    
+    shares_pivot = shares_pivot.rename(columns=column_mapping)
+    
+    # Copy metadata from original table
+    for col in shares_pivot.columns:
+        if col.startswith("share_trade_"):
+            shares_pivot[col] = shares_pivot[col].copy_metadata(tb["value"])
+    
+    return shares_pivot

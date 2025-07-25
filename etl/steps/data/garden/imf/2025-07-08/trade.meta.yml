@@ -23,7 +23,7 @@ tables:
         title: "Share of total exports of goods (FOB): << counterpart_country >>"
         unit: "%"
         short_unit: "%"
-        description_short: "Exports of goods: << counterpart_country >> as a percentage of the region's total exports of goods."
+        description_short: " Share of << counterpart_country >>'s exports destined for each region."
         description_key:
           - This indicator shows what percentage of a region's total goods exports go to a specific trading partner.
           - Calculated by dividing exports to the counterpart region by total exports to all countries, then multiplying by 100.
@@ -47,7 +47,7 @@ tables:
         title: "Share of total imports of goods (CIF): << counterpart_country >>"
         unit: "%"
         short_unit: "%"
-        description_short: "Imports of goods: << counterpart_country >> as a percentage of the region's total imports of goods."
+        description_short: "Share of << counterpart_country >>'s imports of goods originating from each region."
         description_key:
           - This indicator shows what percentage of a region's total goods imports come from a specific trading partner.
           - Calculated by dividing imports from the counterpart region by total imports from all countries, then multiplying by 100.
@@ -88,14 +88,14 @@ tables:
             <% if counterpart_country == 'Intraregional' %>
             << counterpart_country >> trade balance
             <% elif counterpart_country != 'Intraregional' %>
-             Trade balance with << counterpart_country >>
+            Trade balance with << counterpart_country >>
             <%- endif -%>
 
       share_of_total_trade:
         title: "Share of total trade: << counterpart_country >>"
         unit: "%"
         short_unit: "%"
-        description_short: "Trade: << counterpart_country >> as a percentage of the region's total trade volume (exports plus imports)."
+        description_short: "Share of << counterpart_country >>'s trade as a percentage of the region's total trade volume (exports plus imports)."
         description_key:
           - This indicator shows what percentage of a region's total trade volume is conducted with a specific trading partner.
           - Calculated by dividing bilateral trade volume (exports plus imports with the counterpart country) by total trade volume (exports plus imports with all countries), then multiplying by 100.
@@ -115,3 +115,53 @@ tables:
             Intraregional trade
             <%- endif -%>
 
+      share_bilateral:
+        title: Share of country pairs with bilateral trade
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of bilateral partnerships around the world.
+        description_key:
+          - This indicator shows what percentage of a region's total trade is conducted bilaterally with a specific trading partner.
+          - Calculated by dividing bilateral trade volume (exports plus imports with the counterpart country) by total trade volume (exports plus imports with all countries), then multiplying by 100.
+          - Values sum to 100% across all trading partners for each country-year, providing a complete picture of trade concentration.
+          - A higher percentage indicates greater overall trade dependence on that particular trading partner.
+          - This measure captures the intensity of bilateral economic relationships relative to total trade activity.
+          - Changes over time can reflect shifts in trade relationships, economic integration, or diversification strategies.
+          - Useful for identifying major trading partners and assessing trade concentration risks.
+        display:
+          name: Bilateral
+          numDecimalPlaces: *decimals
+
+      share_unilateral:
+        title: Share of country pairs with unilateral trade
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of unilateral partnerships around the world.
+        description_key:
+          - This indicator shows what percentage of a region's total trade is conducted unilaterally with a specific trading partner.
+          - Calculated by dividing unilateral trade volume (exports or imports with the counterpart country) by total trade volume (exports plus imports with all countries), then multiplying by 100.
+          - Values sum to 100% across all trading partners for each country-year, providing a complete picture of trade concentration.
+          - A higher percentage indicates greater overall trade dependence on that particular trading partner.
+          - This measure captures the intensity of unilateral economic relationships relative to total trade activity.
+          - Changes over time can reflect shifts in trade relationships, economic integration, or diversification strategies.
+          - Useful for identifying major trading partners and assessing trade concentration risks.
+        display:
+          name: Unilateral
+          numDecimalPlaces: *decimals
+
+      share_non_trading:
+        title: Share of country pairs that do not trade with each other
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of non-trading pairs around the world.
+        description_key:
+          - This indicator shows what percentage of a region's total trade is conducted non-tradingly with a specific trading partner.
+          - Calculated by dividing non-trading trade volume (exports or imports with the counterpart country) by total trade volume (exports plus imports with all countries), then multiplying by 100.
+          - Values sum to 100% across all trading partners for each country-year, providing a complete picture of trade concentration.
+          - A higher percentage indicates greater overall trade dependence on that particular trading partner.
+          - This measure captures the intensity of non-trading economic relationships relative to total trade activity.
+          - Changes over time can reflect shifts in trade relationships, economic integration, or diversification strategies.
+          - Useful for identifying major trading partners and assessing trade concentration risks.
+        display:
+          name: Non-trading
+          numDecimalPlaces: *decimals
