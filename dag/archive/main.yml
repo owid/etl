@@ -517,6 +517,13 @@ steps:
   data://grapher/pew/2024-06-03/same_sex_marriage:
     - data://garden/pew/2024-06-03/same_sex_marriage
 
+  # Long-run child mortality, Gapminder + UN IGME - to archive
+  data://garden/un/2024-09-16/long_run_child_mortality:
+    - data://garden/un/2024-09-11/igme
+    - data://garden/gapminder/2023-09-18/under_five_mortality
+    - data://garden/gapminder/2023-09-21/under_five_mortality
+  data://grapher/un/2024-09-16/long_run_child_mortality:
+    - data://garden/un/2024-09-16/long_run_child_mortality
       # Integrated Values Survey
   data://meadow/ivs/2023-11-27/integrated_values_survey:
     - snapshot://ivs/2023-11-27/integrated_values_survey.csv
