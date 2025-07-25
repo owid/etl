@@ -25,13 +25,13 @@ tables:
       value:
         title: |-
           <% if metric == 'exports_of_goods__free_on_board__fob__share' %>
-          Share of country's exports of goods destined for << counterpart_country >>
+          Share of << counterpart_country >>'s exports destined for each country
           <% elif metric == 'imports_of_goods__cost_insurance_freight__cif__share' %>
-          Share of country's imports of goods originating from << counterpart_country >>
+          Share of << counterpart_country >>'s imports of goods originating from each country
           <% elif metric == 'trade_balance_goods__share' %>
-          Country's trade balance of goods with << counterpart_country >>
+          << counterpart_country >>'s trade balance of goods with each country
           <% elif metric == 'share_of_total_trade' %>
-          Share of country's total trade that is with << counterpart_country >>
+          Share of << counterpart_country >>'s total trade that is with each country
           <%- endif -%>
 
 
