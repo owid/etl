@@ -6,12 +6,11 @@ import random
 import time
 from datetime import date, datetime
 from functools import wraps
-from typing import Any, Dict, Iterable, List, Literal, Optional, Set, TypeVar, Union, cast
+from typing import Any,  Iterable, List, Literal, Optional, Set, TypeVar, Union, cast
 
 import owid.catalog.processing as pr
 import pandas as pd
 import plotly.express as px
-from googleapiclient.errors import HttpError
 from owid.catalog import Table
 from owid.datautils import dataframes
 from structlog import get_logger
