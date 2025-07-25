@@ -43,6 +43,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseUpload
 from structlog import get_logger
+from googleapiclient.errors import HttpError
 
 from etl.config import GOOGLE_APPLICATION_CREDENTIALS
 
@@ -1081,7 +1082,7 @@ class GoogleSheet:
         return [sheet["title"] for sheet in properties]
 
     @classmethod
-    def create_sheet(cls, title: str, folder_id: Optional[str] = None) -> "GoogleSheet":
+    def create_or_update_sheet(cls, title: str, folder_id: Optional[str] = None, df: pd.DataFrame, update_existing: bool=False) -> "GoogleSheet":
         """
         Create a new Google Sheet and return a GoogleSheet instance.
 
@@ -1098,15 +1099,40 @@ class GoogleSheet:
             A GoogleSheet instance for the newly created spreadsheet.
 
         """
-        drive = GoogleDrive()
+        if not update_existing:
+            drive = GoogleDrive()
 
-        # Use the Drive API to create the spreadsheet file
-        file_metadata: Dict[str, Any] = {"name": title, "mimeType": "application/vnd.google-apps.spreadsheet"}
+            # Use the Drive API to create the spreadsheet file
+            file_metadata: Dict[str, Any] = {"name": title, "mimeType": "application/vnd.google-apps.spreadsheet"}
 
-        if folder_id:
-            file_metadata["parents"] = [folder_id]
+            if folder_id:
+                file_metadata["parents"] = [folder_id]
 
-        spreadsheet = drive.drive_service.files().create(body=file_metadata).execute()
-        sheet_id = spreadsheet["id"]
+            spreadsheet = drive.drive_service.files().create(body=file_metadata).execute()
+            sheet_id = spreadsheet["id"]
+            return cls(sheet_id)
+        else:
+            try:
+                drive = GoogleDrive()
+                query = f"name='{title}' and mimeType='application/vnd.google-apps.spreadsheet'"
 
-        return cls(sheet_id)
+                # If folder_id is specified, search within that folder
+                if folder_id:
+                    query += f" and '{folder_id}' in parents"
+
+                results = drive.drive_service.files().list(q=query).execute()
+                files = results.get("files", [])
+
+                if files:
+                    sheet = GoogleSheet(files[0]["id"])
+                    # Clear and write to first sheet
+                    sheet_metadata = sheet.sheets_service.spreadsheets().get(spreadsheetId=files[0]["id"]).execute()
+                    first_tab_name = sheet_metadata["sheets"][0]["properties"]["title"]
+                    sheet.clear_sheet_data(first_tab_name)
+                    sheet.write_dataframe(df, sheet_name=first_tab_name)
+                    return sheet
+            except HttpError as e:
+                log.error(f"Warning: Google Drive API error while updating existing sheet: {e}")
+            except Exception as e:
+                log.error(f"Critical: Unexpected error while updating existing sheet: {e}")
+

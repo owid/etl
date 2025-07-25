@@ -1069,7 +1069,7 @@ def export_table_to_gsheet(
         df = _prepare_dataframe(table)
 
         # Create or update sheet
-        sheet = _update_or_create_sheet(sheet_title, folder_id, df, update_existing)
+        sheet = GoogleSheet.create_or_update_sheet(sheet_title, folder_id, df, update_existing)
 
         # Write main data
         sheet.write_dataframe(df)
@@ -1086,42 +1086,6 @@ def export_table_to_gsheet(
     except Exception as e:
         log.error(f"Failed to export table to Google Sheets: {e}")
         raise RuntimeError(f"Failed to export table to Google Sheets: {e}")
-
-
-def _update_or_create_sheet(
-    sheet_title: str, folder_id: Optional[str], df: pd.DataFrame, update_existing: bool
-) -> GoogleSheet:
-    """Update existing sheet or create new one."""
-    if not update_existing:
-        return GoogleSheet.create_sheet(sheet_title, folder_id)
-
-    # Try to find existing sheet in the specified folder
-    try:
-        drive = GoogleDrive()
-        query = f"name='{sheet_title}' and mimeType='application/vnd.google-apps.spreadsheet'"
-
-        # If folder_id is specified, search within that folder
-        if folder_id:
-            query += f" and '{folder_id}' in parents"
-
-        results = drive.drive_service.files().list(q=query).execute()
-        files = results.get("files", [])
-
-        if files:
-            sheet = GoogleSheet(files[0]["id"])
-            # Clear and write to first sheet
-            sheet_metadata = sheet.sheets_service.spreadsheets().get(spreadsheetId=files[0]["id"]).execute()
-            first_tab_name = sheet_metadata["sheets"][0]["properties"]["title"]
-            sheet.clear_sheet_data(first_tab_name)
-            sheet.write_dataframe(df, sheet_name=first_tab_name)
-            return sheet
-    except HttpError as e:
-        log.error(f"Warning: Google Drive API error while updating existing sheet: {e}")
-    except Exception as e:
-        log.error(f"Critical: Unexpected error while updating existing sheet: {e}")
-
-    # Fallback to creating new sheet in the specified folder
-    return GoogleSheet.create_sheet(sheet_title, folder_id)
 
 
 def _add_metadata_tabs(sheet: GoogleSheet, table: Table, metadata_variables: Optional[List[str]]) -> None:
@@ -1162,69 +1126,6 @@ def _set_permissions(sheet_id: str, role: str, general_access: str) -> None:
     drive.set_file_permissions(file_id=sheet_id, role=role, general_access=general_access)
 
 
-def create_or_get_shared_folder(
-    folder_name: str = "ETL GSheet Exports",
-    parent_folder_id: Optional[str] = None,
-) -> Optional[str]:
-    """Create or get a shared folder for storing multiple Google Sheets.
-
-    Parameters
-    ----------
-    folder_name : str
-        Name of the folder to create or find
-    parent_folder_id : Optional[str], optional
-        Parent folder ID, by default None (creates in root)
-
-    Returns
-    -------
-    Optional[str]
-        The folder ID, or None if creation failed
-    """
-    try:
-        drive = GoogleDrive()
-
-        # Search for existing folder
-        query = f"name='{folder_name}' and mimeType='application/vnd.google-apps.folder' and trashed=false"
-        if parent_folder_id:
-            query += f" and '{parent_folder_id}' in parents"
-
-        results = drive.drive_service.files().list(q=query).execute()
-        files = results.get("files", [])
-
-        if files:
-            folder_id = files[0]["id"]
-            log.info(f"Using existing folder: {folder_name} (ID: {folder_id})")
-            return folder_id
-
-        # Create new folder
-        folder_metadata: Dict[str, Any] = {"name": folder_name, "mimeType": "application/vnd.google-apps.folder"}
-
-        if parent_folder_id:
-            folder_metadata["parents"] = [parent_folder_id]
-
-        folder = drive.drive_service.files().create(body=folder_metadata, fields="id").execute()
-        folder_id = folder.get("id")
-
-        if folder_id is None:
-            log.error(f"Failed to create folder: {folder_name}")
-            return None
-
-        # Set permissions for team access
-        drive.set_file_permissions(file_id=folder_id, role="reader", general_access="anyone")
-
-        log.info(f"Created new folder: {folder_name} (ID: {folder_id})")
-        log.info(f"Folder URL: https://drive.google.com/drive/folders/{folder_id}")
-
-        return folder_id
-
-    except HttpError as e:
-        log.error(f"HTTP error occurred while creating/accessing folder '{folder_name}': {e}")
-        return None
-    except Exception as e:
-        log.error(f"Unexpected error occurred while creating/accessing folder '{folder_name}': {e}")
-        raise
-
-
 def get_team_folder_id() -> Optional[str]:
     """Get the team folder ID for OWID ETL exports."""
     # Use the shared folder ID if available
@@ -1238,3 +1139,66 @@ def get_team_folder_id() -> Optional[str]:
             log.warning(f"Warning: Cannot access shared folder {OWID_SHARED_FOLDER_ID}: {e}")
 
     return None
+
+
+# def create_or_get_shared_folder(
+#    folder_name: str = "ETL GSheet Exports",
+#    parent_folder_id: Optional[str] = None,
+#) -> Optional[str]:
+#    """Create or get a shared folder for storing multiple Google Sheets.
+#
+#    Parameters
+#    ----------
+#    folder_name : str
+#        Name of the folder to create or find
+#    parent_folder_id : Optional[str], optional
+#        Parent folder ID, by default None (creates in root)
+#
+#    Returns
+#    -------
+#    Optional[str]
+#        The folder ID, or None if creation failed
+#   """
+#    try:
+#        drive = GoogleDrive()
+#
+#        # Search for existing folder
+#        query = f"name='{folder_name}' and mimeType='application/vnd.google-apps.folder' and trashed=false"
+#        if parent_folder_id:
+#            query += f" and '{parent_folder_id}' in parents"
+#
+#        results = drive.drive_service.files().list(q=query).execute()
+#        files = results.get("files", [])
+#
+#        if files:
+#            folder_id = files[0]["id"]
+#            log.info(f"Using existing folder: {folder_name} (ID: {folder_id})")
+#            return folder_id
+#
+#        # Create new folder
+#        folder_metadata: Dict[str, Any] = {"name": folder_name, "mimeType": "application/vnd.google-apps.folder"}
+#
+#        if parent_folder_id:
+#            folder_metadata["parents"] = [parent_folder_id]
+#
+#        folder = drive.drive_service.files().create(body=folder_metadata, fields="id").execute()
+#        folder_id = folder.get("id")
+#
+#        if folder_id is None:
+#            log.error(f"Failed to create folder: {folder_name}")
+#            return None
+#
+#        # Set permissions for team access
+#        drive.set_file_permissions(file_id=folder_id, role="reader", general_access="anyone")
+#
+#        log.info(f"Created new folder: {folder_name} (ID: {folder_id})")
+#        log.info(f"Folder URL: https://drive.google.com/drive/folders/{folder_id}")
+#
+#        return folder_id
+#
+#    except HttpError as e:
+#        log.error(f"HTTP error occurred while creating/accessing folder '{folder_name}': {e}")
+#        return None
+#    except Exception as e:
+#        log.error(f"Unexpected error occurred while creating/accessing folder '{folder_name}': {e}")
+#        raise
