@@ -14,11 +14,13 @@ import plotly.express as px
 from googleapiclient.errors import HttpError
 from owid.catalog import Table
 from owid.datautils import dataframes
+from structlog import get_logger
 from tqdm.auto import tqdm
 
 from etl.config import OWID_ENV
 from etl.google import CLIENT_SECRET_FILE, GoogleDrive, GoogleSheet
 
+log = get_logger()
 TableOrDataFrame = TypeVar("TableOrDataFrame", pd.DataFrame, Table)
 DIMENSION_COL_NONE = "temporary"
 GSHEET_EXPORT_CONFIG = {
@@ -560,7 +562,7 @@ def compare_tables(
         try:
             compared[column] = compared[column].astype(float)
         except ValueError:
-            print(f"Skipping column {column}, which can't be converted into float.")
+            log.info(f"Skipping column {column}, which can't be converted into float.")
             compared = compared.drop(columns=column, errors="raise")
             columns.remove(column)
 
@@ -904,7 +906,7 @@ def retry_on_network_error(max_retries: int = 3, base_delay: float = 1.0):
                         and attempt < max_retries - 1
                     ):
                         delay = base_delay * (2**attempt) + random.uniform(0, 1)
-                        print(f"Network error on attempt {attempt + 1}, retrying in {delay:.1f}s...")
+                        log.warning(f"Network error on attempt {attempt + 1}, retrying in {delay:.1f}s...")
                         time.sleep(delay)
                         continue
                     raise
@@ -923,7 +925,7 @@ def _get_variables_to_process(table: Table, metadata_variables: Optional[List[st
     variables_to_process = [var for var in metadata_variables if var in table.columns]
     missing_vars = [var for var in metadata_variables if var not in table.columns]
     if missing_vars:
-        print(f"Warning: Variables {missing_vars} not found in table")
+        log.warning(f"Warning: Variables {missing_vars} not found in table")
 
     return variables_to_process
 
@@ -1034,7 +1036,7 @@ def _create_metadata_dataframes(
                 metadata_dfs[f"metadata_{column_name}"] = metadata_df
 
         except Exception as e:
-            print(f"Warning: Could not process metadata for column '{column_name}': {e}")
+            log.warning(f"Warning: Could not process metadata for column '{column_name}': {e}")
             continue
 
     return metadata_dfs
@@ -1063,7 +1065,7 @@ def export_table_to_gsheet(
             sheet = _update_or_create_sheet(sheet_title, folder_id, df, update_existing)
 
             # Write main data
-            _write_main_data(sheet, df)
+            sheet.write_dataframe(df)
 
             # Add metadata if requested
             if include_metadata:
@@ -1078,23 +1080,12 @@ def export_table_to_gsheet(
             return "", ""
 
 
-@retry_on_network_error()
-def _create_google_sheet(sheet_title: str, folder_id: Optional[str]) -> GoogleSheet:
-    """Create Google Sheet with retry logic."""
-    if folder_id:
-        # Create sheet in the specified folder
-        return GoogleSheet.create_sheet(title=sheet_title, folder_id=folder_id)
-    else:
-        # Create sheet in root
-        return GoogleSheet.create_sheet(title=sheet_title)
-
-
 def _update_or_create_sheet(
     sheet_title: str, folder_id: Optional[str], df: pd.DataFrame, update_existing: bool
 ) -> GoogleSheet:
     """Update existing sheet or create new one."""
     if not update_existing:
-        return _create_google_sheet(sheet_title, folder_id)
+        return GoogleSheet.create_sheet(sheet_title, folder_id)
 
     # Try to find existing sheet in the specified folder
     try:
@@ -1112,22 +1103,17 @@ def _update_or_create_sheet(
             sheet = GoogleSheet(files[0]["id"])
             # Clear and write to first sheet
             sheet_metadata = sheet.sheets_service.spreadsheets().get(spreadsheetId=files[0]["id"]).execute()
-            first_sheet_name = sheet_metadata["sheets"][0]["properties"]["title"]
-            sheet.clear_sheet_data(first_sheet_name)
-            sheet.write_dataframe(df, sheet_name=first_sheet_name)
+            first_tab_name = sheet_metadata["sheets"][0]["properties"]["title"]
+            sheet.clear_sheet_data(first_tab_name)
+            sheet.write_dataframe(df, sheet_name=first_tab_name)
             return sheet
     except HttpError as e:
-        print(f"Warning: Google Drive API error while updating existing sheet: {e}")
+        log.error(f"Warning: Google Drive API error while updating existing sheet: {e}")
     except Exception as e:
-        print(f"Critical: Unexpected error while updating existing sheet: {e}")
+        log.error(f"Critical: Unexpected error while updating existing sheet: {e}")
 
     # Fallback to creating new sheet in the specified folder
-    return _create_google_sheet(sheet_title, folder_id)
-
-
-def _write_main_data(sheet: GoogleSheet, df: pd.DataFrame) -> None:
-    """Write main data to the sheet."""
-    sheet.write_dataframe(df)
+    return GoogleSheet.create_sheet(sheet_title, folder_id)
 
 
 def _add_metadata_tabs(sheet: GoogleSheet, table: Table, metadata_variables: Optional[List[str]]) -> None:
@@ -1137,7 +1123,7 @@ def _add_metadata_tabs(sheet: GoogleSheet, table: Table, metadata_variables: Opt
         try:
             sheet.write_dataframe(metadata_df, sheet_name=sheet_name)
         except Exception as e:
-            print(f"Note: Could not create metadata sheet '{sheet_name}': {e}")
+            log.warning(f"Note: Could not create metadata sheet '{sheet_name}': {e}")
 
 
 def _set_permissions(sheet_id: str, role: str, general_access: str) -> None:
@@ -1177,7 +1163,7 @@ def create_or_get_shared_folder(
 
         if files:
             folder_id = files[0]["id"]
-            print(f"Using existing folder: {folder_name} (ID: {folder_id})")
+            log.info(f"Using existing folder: {folder_name} (ID: {folder_id})")
             return folder_id
 
         # Create new folder
@@ -1190,45 +1176,23 @@ def create_or_get_shared_folder(
         folder_id = folder.get("id")
 
         if folder_id is None:
-            print(f"Failed to create folder: {folder_name}")
+            log.error(f"Failed to create folder: {folder_name}")
             return None
 
         # Set permissions for team access
         drive.set_file_permissions(file_id=folder_id, role="reader", general_access="anyone")
 
-        print(f"Created new folder: {folder_name} (ID: {folder_id})")
-        print(f"Folder URL: https://drive.google.com/drive/folders/{folder_id}")
+        log.info(f"Created new folder: {folder_name} (ID: {folder_id})")
+        log.info(f"Folder URL: https://drive.google.com/drive/folders/{folder_id}")
 
         return folder_id
 
     except HttpError as e:
-        print(f"HTTP error occurred while creating/accessing folder '{folder_name}': {e}")
+        log.error(f"HTTP error occurred while creating/accessing folder '{folder_name}': {e}")
         return None
     except Exception as e:
-        print(f"Unexpected error occurred while creating/accessing folder '{folder_name}': {e}")
+        log.error(f"Unexpected error occurred while creating/accessing folder '{folder_name}': {e}")
         raise
-
-
-def setup_owid_team_folder() -> Optional[str]:
-    """Create the main OWID team folder for Google Sheets exports.
-
-    Returns
-    -------
-    Optional[str]
-        The folder ID, or None if creation failed
-    """
-    print("Setting up OWID team folder...")
-
-    # Create main folder only
-    main_folder_id = create_or_get_shared_folder("OWID ETL Exports")
-
-    if main_folder_id:
-        print(f"✅ Team folder created/found: {main_folder_id}")
-        print(f"📁 Folder URL: https://drive.google.com/drive/folders/{main_folder_id}")
-        return main_folder_id
-    else:
-        print("❌ Failed to create team folder")
-        return None
 
 
 def get_team_folder_id() -> Optional[str]:
@@ -1241,8 +1205,6 @@ def get_team_folder_id() -> Optional[str]:
             drive.drive_service.files().get(fileId=OWID_SHARED_FOLDER_ID).execute()
             return OWID_SHARED_FOLDER_ID
         except Exception as e:
-            print(f"Warning: Cannot access shared folder {OWID_SHARED_FOLDER_ID}: {e}")
-            print("Creating personal folder instead...")
+            log.warning(f"Warning: Cannot access shared folder {OWID_SHARED_FOLDER_ID}: {e}")
 
-    # Fallback to creating/finding personal folder
-    return setup_owid_team_folder()
+    return
