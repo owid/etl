@@ -52,7 +52,8 @@ def run() -> None:
     tb_gap_sel["child_mortality_rate"] = tb_gap_sel["child_mortality_rate"].div(10)
     # Remove the early years for Austria - there is a signicant jump in the data in 1830 which suggests an incongruency in method or data availability
     tb_gap_sel = remove_early_years_austria(tb_gap_sel)
-
+    # Add 'World' from full Gapminder dataset to selected Gapminder dataset.
+    tb_gap_sel = add_world_from_gapminder_full_to_selected(tb_gap_full, tb_gap_sel)
     # Combine IGME and Gapminder data with two versions
 
     tb_combined_full = combine_datasets(tb_igme, tb_gap_full, "long_run_child_mortality")
@@ -76,6 +77,19 @@ def run() -> None:
     ds_garden = paths.create_dataset(tables=[tb_combined_full, tb_combined_sel], check_variables_metadata=True)
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def add_world_from_gapminder_full_to_selected(tb_gap_full: Table, tb_gap_sel: Table) -> Table:
+    """
+    The 'full' Gapminder dataset has a much longer time series for the world than the 'selected' Gapminder dataset.
+    We don't tend to promote the 'full' Gapminder dataset as it has a lot of guesses, but as should the global total in this chart - https://ourworldindata.org/grapher/global-child-mortality-timeseries,
+    so I think we can also show it in the 'selected' dataset.
+    """
+    tb_gap_full = tb_gap_full[tb_gap_full["country"] == "World"].drop(columns=["source"])
+    tb_gap_sel = tb_gap_sel[tb_gap_sel["country"] != "World"]
+
+    tb = pr.concat([tb_gap_sel, tb_gap_full], ignore_index=True)
+    return tb
 
 
 def combine_datasets(tb_igme: Table, tb_gap: Table, table_name: str) -> Table:

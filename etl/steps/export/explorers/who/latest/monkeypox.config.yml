@@ -113,6 +113,7 @@ views:
     config:
       title: "Mpox: Cumulative confirmed cases"
       type: LineChart DiscreteBar
+      note: 2,985 cases for the Democratic Republic of the Congo were reported without a date and are not included in this chart.
   - dimensions:
       metric: confirmed_cases
       frequency: daily
@@ -144,6 +145,7 @@ views:
     config:
       title: "Mpox: Cumulative confirmed cases per million people"
       type: LineChart DiscreteBar
+      note: 2,985 cases for the Democratic Republic of the Congo were reported without a date and are not included in this chart.
   - dimensions:
       metric: confirmed_cases
       frequency: _7_day_average
@@ -207,7 +209,7 @@ views:
       hasMapTab: "false"
       minTime: "1433"
       facetYDomain: independent
-      note: As of November 2024, suspected cases are no longer being reported.
+      note: As of November 2024, suspected cases are no longer being reported. 2,985 cases for the Democratic Republic of the Congo were reported without a date and are not included in this chart.
 
   - dimensions:
       metric: confirmed_deaths
