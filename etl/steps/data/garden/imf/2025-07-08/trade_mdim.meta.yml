@@ -1,0 +1,38 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    unit: "%"
+    short_unit: "%"
+    processing_level: major
+    display:
+     numDecimalPlaces: 1
+    presentation:
+      topic_tags:
+        - Trade & Globalization
+
+  decimals: &decimals 1
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  title: International Trade in Goods by partner country
+  update_period_days: 365
+
+
+tables:
+  trade:
+    variables:
+      value:
+        title: |-
+          <% if metric == 'exports_of_goods__free_on_board__fob__share' %>
+          Share of << counterpart_country >>'s exports destined for each country
+          <% elif metric == 'imports_of_goods__cost_insurance_freight__cif__share' %>
+          Share of << counterpart_country >>'s imports of goods originating from each country
+          <% elif metric == 'trade_balance_goods__share' %>
+          << counterpart_country >>'s trade balance of goods with each country
+          <% elif metric == 'share_of_total_trade' %>
+          Share of << counterpart_country >>'s total trade that is with each country
+          <%- endif -%>
+
+
+
