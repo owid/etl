@@ -17,7 +17,7 @@ meta:
     # Files
     url_main: https://www.unwto.org/tourism-statistics/economic-contribution-SDG
     url_download: http://pre-webunwto.s3.eu-west-1.amazonaws.com/s3fs-public/2024-04/Indicator-8_9_1-2022-UN_Tourism_april2024_update.xlsx
-    date_accessed: 2024-08-17
+    date_accessed: '2024-08-17'
 
     # License
     license:
