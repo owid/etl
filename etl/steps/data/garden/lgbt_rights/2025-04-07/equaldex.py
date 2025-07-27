@@ -15,7 +15,7 @@ paths = PathFinder(__file__)
 # Define regions to aggregate
 REGIONS = ["Europe", "Asia", "North America", "South America", "Africa", "Oceania", "World"]
 
-# Define fraction of allowed NaNs per year
+# Define fraction of allowed NaNs per year.
 FRAC_ALLOWED_NANS_PER_YEAR = 0.2
 
 # Create a new list of id for each issue, ordered from more liberal to more restrictive (useful for grapher charts)
@@ -278,9 +278,6 @@ def add_population_weighted_aggregations(
     tb = tb.copy()
 
     tb = geo.add_population_to_table(tb=tb, ds_population=ds_population, warn_on_missing_countries=False)
-
-    # Remove attribution to avoid issues in propagation
-    tb["population"].m.presentation.attribution = None
 
     columns_pop = []
     for col in columns:
