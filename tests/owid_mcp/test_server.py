@@ -1,6 +1,9 @@
+import base64
+
 import pytest
 from fastmcp import Client
 
+from mcp.types import TextResourceContents
 from owid_mcp.server_complex import mcp
 
 
@@ -54,7 +57,10 @@ async def test_indicator_resource():
         # Parse the JSON content
         import json
 
-        data = json.loads(content.text)
+        if isinstance(content, TextResourceContents):
+            data = json.loads(content.text)
+        else:
+            data = json.loads(base64.b64decode(content.blob).decode("utf-8"))
         assert "metadata" in data
         assert "data" in data
         assert isinstance(data["data"], list)
@@ -80,7 +86,10 @@ async def test_indicator_resource_for_entity():
         # Parse the JSON content
         import json
 
-        data = json.loads(content.text)
+        if isinstance(content, TextResourceContents):
+            data = json.loads(content.text)
+        else:
+            data = json.loads(base64.b64decode(content.blob).decode("utf-8"))
         assert "metadata" in data
         assert "data" in data
         assert isinstance(data["data"], list)
@@ -105,7 +114,10 @@ async def test_chart_resource():
         assert str(content.uri) == "chart://population-density"
 
         # Just check that we get some content back (the Response object handling might be different)
-        assert content.text is not None
+        if isinstance(content, TextResourceContents):
+            assert content.text is not None
+        else:
+            assert content.blob is not None
 
 
 @pytest.mark.asyncio
@@ -135,8 +147,7 @@ async def test_cherry_blossom_search_and_sql():
         assert "parquet_url" in metadata
         assert "column" in metadata
 
-        # Extract SQL template and modify it for a specific query
-        sql_template = metadata["sql_template"]
+        # Extract parquet URL and column info
         parquet_url = metadata["parquet_url"]
         column = metadata["column"]
 

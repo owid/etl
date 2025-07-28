@@ -7,6 +7,7 @@ import base64
 import pytest
 from fastmcp import Client
 
+from mcp.types import BlobResourceContents
 from owid_mcp.server_complex import mcp
 
 
@@ -61,5 +62,8 @@ async def test_chart_resource():
         assert str(content.uri) == "chart://population-density"
 
         # Check that it's SVG content
-        svg_text = base64.b64decode(content.blob).decode("utf-8")
+        if isinstance(content, BlobResourceContents):
+            svg_text = base64.b64decode(content.blob).decode("utf-8")
+        else:
+            svg_text = content.text
         assert "<svg" in svg_text or "<!DOCTYPE" in svg_text

@@ -265,16 +265,10 @@ GOOGLE_APPLICATION_CREDENTIALS = env.get("GOOGLE_APPLICATION_CREDENTIALS")
 
 def enable_sentry(enable_logs: bool = False) -> None:
     if SENTRY_DSN:
-        kwargs = {"dsn": SENTRY_DSN}
-
         if enable_logs:
-            kwargs.update(
-                {
-                    "_experiments": {"enable_logs": True},
-                }
-            )
-
-        sentry_sdk.init(**kwargs)
+            sentry_sdk.init(dsn=SENTRY_DSN, _experiments={"enable_logs": True})
+        else:
+            sentry_sdk.init(dsn=SENTRY_DSN)
 
 
 # Wizard config
