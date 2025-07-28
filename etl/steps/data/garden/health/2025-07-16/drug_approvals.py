@@ -44,7 +44,7 @@ def run() -> None:
         lambda x: datetime.strptime(str(x), "%Y-%m-%d %H:%M:%S").year
     )
 
-    # restrict purple book to a) CBER approvals and b) 351(a) applications
+    # restrict purple book to a) CBER approvals and b) 351(a) applications (new biologics)
     tb_purple_book = tb_purple_book[tb_purple_book["center"] == "CBER"].copy()
     tb_purple_book = tb_purple_book[tb_purple_book["application_type"] == "351(a)"]
 
@@ -79,16 +79,6 @@ def run() -> None:
             "approval_year": "year",
         }
     )
-
-    # get cumulative approvals (in case we want to plot cumulative approvals later)
-    # tb['cumulative_approvals'] = tb.sort_values(['application_type', 'year'])
-    # .groupby('application_type')['total_approvals']
-    # .cumsum()
-
-    # designations['cumulative_approvals'] = designations.sort_values(['designation', 'approval_year'])
-    #  .groupby('designation')['approvals']
-    #  .cumsum()
-
     # Improve table format.
     tb = tb.format(["year", "application_type"], short_name="total_drug_approvals")
     tb_designations = tb_designations.format(["year", "designation"], short_name="drug_approvals_designations")

@@ -14,6 +14,7 @@ def run() -> None:
     ds_garden = paths.load_dataset("drug_approvals")
 
     # Read table from garden dataset.
+    # rename dimension to match grapher requirements
     tb = ds_garden.read("total_drug_approvals")
     tb = tb.rename(
         columns={
@@ -22,6 +23,7 @@ def run() -> None:
         errors="raise",
     )
 
+    # rename dimension to match grapher requirements
     tb_designations = ds_garden.read("drug_approvals_designations")
     tb_designations = tb_designations.rename(
         columns={
@@ -30,6 +32,7 @@ def run() -> None:
         errors="raise",
     )
 
+    # format tables
     tb_designations = tb_designations.format(["year", "country"])
     tb = tb.format(["year", "country"])
 
