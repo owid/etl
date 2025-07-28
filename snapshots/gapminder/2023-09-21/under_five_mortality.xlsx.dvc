@@ -1,7 +1,7 @@
 meta:
   origin:
     producer: Gapminder based on UN IGME & UN WPP
-    title: Under-five Mortality
+    title: Child mortality rate under age five
     description: |-
       This file contains data on child mortality rates compiled by Gapminder, based on multiple sources:
       — 1800 to 1950: Gapminder v7  ( In some cases this is also used for years after 1950, see below.) This was compiled and documented by Mattias Lindgren from many sources, but mainly based on www.mortality.org and the series of books called International Historical Statistics  by Brian R Mitchell, which often have historic estimates of Infant mortality rate which were converted to Child mortality through regression. See detailed documentation of v7 below.
@@ -16,8 +16,8 @@ meta:
     version_producer: v11
     url_main: https://docs.google.com/spreadsheets/d/1Av7eps_zEK73-AdbFYEmtTrwFKlfruBYXdrnXAOFVpM/edit#gid=501532268
     url_download: https://docs.google.com/spreadsheets/d/1Av7eps_zEK73-AdbFYEmtTrwFKlfruBYXdrnXAOFVpM/export?format=xlsx
-    date_accessed: '2023-09-21'
-    date_published: '2020-01-30'
+    date_accessed: "2023-09-21"
+    date_published: "2020-01-30"
     license:
       name: CC BY 4.0# License (same as origin.license, for backwards compatibility)
       url: https://docs.google.com/document/d/1-RmthhS2EPMK_HIpnPctcXpB0n7ADSWnXa5Hb3PxNq4/edit
@@ -25,6 +25,6 @@ meta:
     name: CC BY 4.0
     url: https://docs.google.com/document/d/1-RmthhS2EPMK_HIpnPctcXpB0n7ADSWnXa5Hb3PxNq4/edit
 outs:
-  - md5: c24a496eeab65fb3330e30789efe6e0d
+  - md5: 611505656a3bbd4312b50c1d1a7eff79
     size: 1522938
     path: under_five_mortality.xlsx
