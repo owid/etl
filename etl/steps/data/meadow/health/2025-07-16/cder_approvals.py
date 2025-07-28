@@ -6,7 +6,6 @@ from etl.helpers import PathFinder
 paths = PathFinder(__file__)
 
 
-
 def run() -> None:
     #
     # Load inputs.
