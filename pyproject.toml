@@ -72,7 +72,7 @@ dependencies = [
     "sentry-sdk>=2.20.0",
     "fastjsonschema>=2.21.1",
     "mediacloud>=4.4.0",
-    "fastmcp>=2.10.5",
+    "fastmcp>=2.10.6",
 ]
 
 [tool.uv.sources]

@@ -6,9 +6,13 @@ from fastmcp.server.middleware import Middleware, MiddlewareContext
 from sentry_sdk import capture_exception
 from sentry_sdk import logger as sentry_logger
 
+from etl.config import enable_sentry
+
 # Import the modular servers
 from owid_mcp import deep_research, indicators, posts
 from owid_mcp.config import COMMON_ENTITIES
+
+enable_sentry(enable_logs=True)
 
 INSTRUCTIONS = (
     "GENERAL GUIDELINES:\n"
@@ -44,6 +48,7 @@ INSTRUCTIONS_ENTITIES = "• Entity names must match exactly as they appear in O
 # it successfully makes the first request but the subsequent request fails with 404. So it's likely something
 # about the session ID.
 mcp = FastMCP(
+    stateless_http=True,
     name="Our World in Data MCP",
     instructions="\n\n".join(
         [
