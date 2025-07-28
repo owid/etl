@@ -20,14 +20,18 @@ def run() -> None:
     # Read table from garden dataset.
     tb = ds_garden["long_run_child_mortality"]
     tb_sel = ds_garden["long_run_child_mortality_selected"]
-    # Export the table to a Google Sheet.
+    tb_sel['child_mortality_rate'] = tb_sel['child_mortality_rate'].round(2)
+    # Export the table to a Google Sheet
+    # Can only be run locally, not in prod or staging
     team_folder_id = get_team_folder_id()
     sheet_url, sheet_id = export_table_to_gsheet(
         table=tb_sel,
-        sheet_title="Long Run Child Mortality",
+        sheet_title="Long-run child mortality rate",
         update_existing=True,
         folder_id=team_folder_id,
         metadata_variables=["child_mortality_rate"],
+        role="reader",
+        general_access="anyone",
     )
 
     log.info(f"Google Sheet exported successfully. URL: {sheet_url}, ID: {sheet_id}")
