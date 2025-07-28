@@ -1,19 +1,4 @@
 {
-  "mcp": {
-    "servers": {
-      "catalog": {
-          "type": "stdio",
-          "command": ".venv/bin/fastmcp",
-          "args": [
-              "run",
-              "mcp/server.py"
-          ],
-          "dev": {
-            "watch": "mcp/**/*.py",
-          }
-      }
-    }
-  },
   "esbonio.sphinx.confDir": "",
   "files.associations": {
     "*.dvc": "yaml"
@@ -60,20 +45,6 @@
     {
       "file": ".copilot-commit-message-instructions.md"
     }
-  ],
-  "github.copilot.chat.codeGeneration.instructions": [
-    {
-      "file": "CLAUDE.md"
-    },
-    {
-      "file": ".github/instructions/copilot-instructions.md"
-    },
-    {
-      "file": ".github/instructions/garden-metadata.instructions.md"
-    },
-    {
-      "file": ".github/instructions/snapshot-metadata.instructions.md"
-    },
   ],
   "files.exclude": {
     "snapshots/backport": true,

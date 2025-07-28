@@ -48,26 +48,22 @@ def invoke_cli_tool(
     Returns:
         Parsed result from result_parser function
     """
-    try:
-        runner = CliRunner()
+    runner = CliRunner()
 
-        # Build CLI arguments
-        cli_args = args.copy()
+    # Build CLI arguments
+    cli_args = args.copy()
 
-        # Add options
-        for option, value in cli_options.items():
-            if isinstance(value, bool) and value:
-                cli_args.append(f"--{option.replace('_', '-')}")
-            elif value is not None and not isinstance(value, bool):
-                cli_args.extend([f"--{option.replace('_', '-')}", str(value)])
+    # Add options
+    for option, value in cli_options.items():
+        if isinstance(value, bool) and value:
+            cli_args.append(f"--{option.replace('_', '-')}")
+        elif value is not None and not isinstance(value, bool):
+            cli_args.extend([f"--{option.replace('_', '-')}", str(value)])
 
-        # Invoke the CLI
-        result = runner.invoke(cli_command, cli_args, catch_exceptions=False)
+    # Invoke the CLI
+    result = runner.invoke(cli_command, cli_args, catch_exceptions=False)
 
-        return result_parser(result)
-
-    except Exception as e:
-        return result_parser(type("MockResult", (), {"exit_code": 1, "output": str(e), "exception": e})())
+    return result_parser(result)
 
 
 def _get_current_branch() -> str:

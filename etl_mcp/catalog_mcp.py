@@ -45,62 +45,58 @@ def find_table(
     Returns:
         List of TableMetadata objects with table information
     """
-    try:
-        # Use catalog.find to search for tables
-        results = catalog.find(
-            table=table,
-            namespace=namespace,
-            dataset=dataset,
-            version=version,
-            channels=[channel] if channel else ["garden"],
+    # Use catalog.find to search for tables
+    results = catalog.find(
+        table=table,
+        namespace=namespace,
+        dataset=dataset,
+        version=version,
+        channels=[channel] if channel else ["garden"],
+    )
+
+    # Convert results to a list of TableMetadata objects
+    tables = []
+    for _, row in results.iterrows():
+        # Generate download URL from path
+        path = row.get("path")
+        download_url = None
+        if path:
+            download_url = f"https://catalog.ourworldindata.org/{path}.feather"
+
+        # Safe conversion function to handle numpy arrays and other types
+        def safe_convert(value, default=""):
+            if value is None:
+                return default
+            if isinstance(value, np.ndarray):
+                return value.tolist()
+            if hasattr(value, "tolist"):
+                return value.tolist()
+            return str(value)
+
+        # Convert dimensions to list if it's a numpy array
+        dimensions = row.get("dimensions", [])
+        if dimensions is None:
+            dimensions = []
+        elif isinstance(dimensions, np.ndarray):
+            dimensions = dimensions.tolist()
+        elif hasattr(dimensions, "tolist"):
+            dimensions = dimensions.tolist()
+        else:
+            # Force convert to list of strings to avoid serialization issues
+            dimensions = [str(d) for d in dimensions] if dimensions else []
+
+        tables.append(
+            TableMetadata(
+                table=safe_convert(row.get("table")),
+                namespace=safe_convert(row.get("namespace")),
+                dataset=safe_convert(row.get("dataset")),
+                version=safe_convert(row.get("version")),
+                channel=safe_convert(row.get("channel")),
+                path=safe_convert(path) if path else None,
+                download_url=download_url,
+                dimensions=dimensions,
+                description=safe_convert(row.get("description")),
+            )
         )
 
-        # Convert results to a list of TableMetadata objects
-        tables = []
-        for _, row in results.iterrows():
-            # Generate download URL from path
-            path = row.get("path")
-            download_url = None
-            if path:
-                download_url = f"https://catalog.ourworldindata.org/{path}.feather"
-
-            # Safe conversion function to handle numpy arrays and other types
-            def safe_convert(value, default=""):
-                if value is None:
-                    return default
-                if isinstance(value, np.ndarray):
-                    return value.tolist()
-                if hasattr(value, "tolist"):
-                    return value.tolist()
-                return str(value)
-
-            # Convert dimensions to list if it's a numpy array
-            dimensions = row.get("dimensions", [])
-            if dimensions is None:
-                dimensions = []
-            elif isinstance(dimensions, np.ndarray):
-                dimensions = dimensions.tolist()
-            elif hasattr(dimensions, "tolist"):
-                dimensions = dimensions.tolist()
-            else:
-                # Force convert to list of strings to avoid serialization issues
-                dimensions = [str(d) for d in dimensions] if dimensions else []
-
-            tables.append(
-                TableMetadata(
-                    table=safe_convert(row.get("table")),
-                    namespace=safe_convert(row.get("namespace")),
-                    dataset=safe_convert(row.get("dataset")),
-                    version=safe_convert(row.get("version")),
-                    channel=safe_convert(row.get("channel")),
-                    path=safe_convert(path) if path else None,
-                    download_url=download_url,
-                    dimensions=dimensions,
-                    description=safe_convert(row.get("description")),
-                )
-            )
-
-        return tables
-    except Exception as e:
-        # Return empty list on error to avoid breaking the MCP server
-        return []
+    return tables
