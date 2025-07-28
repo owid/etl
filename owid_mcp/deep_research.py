@@ -5,10 +5,7 @@ import structlog
 from fastmcp import FastMCP
 from pydantic import BaseModel
 
-from etl.config import enable_sentry
 from owid_mcp import charts
-
-enable_sentry(enable_logs=True)
 
 log = structlog.get_logger()
 
@@ -79,7 +76,7 @@ async def search(query: str) -> List[SearchResult]:
     try:
         # Call the internal search_chart function from charts module
         chart_results = await charts._search_chart_internal(query)
-        
+
         # Convert ChartSearchResult to SearchResult
         results: List[SearchResult] = []
         for chart_result in chart_results:

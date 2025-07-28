@@ -4,7 +4,7 @@ This is Our World in Data's MCP (Model Context Protocol) server providing access
 
 ## Features
 
-### Deep Research Module (`deep_research_algolia.py`)
+### Deep Research Module (`deep_research.py`)
 
 **Tools:**
 - `search(query)` - Search OWID charts via Algolia, returns CSV URLs filtered by country mentions
@@ -95,7 +95,7 @@ search_results = await search_posts("climate change", limit=5)
 The server uses a modular architecture:
 
 - **`server.py`** - Main FastMCP server that imports and combines modules
-- **`deep_research_algolia.py`** - Algolia-based chart search and CSV/image fetching
+- **`deep_research.py`** - Algolia-based chart search and CSV/image fetching
 - **`indicators.py`** - Direct indicator search and data access
 - **`posts.py`** - Post markdown content retrieval and search
 - **`data_utils.py`** - Shared utilities for data processing and API requests

@@ -135,40 +135,35 @@ async def search_posts(query: str, limit: int = 10) -> Dict[str, Any]:
     """
     log.info("search_posts", query=query, limit=limit)
 
-    try:
-        # Search in titles and content using LIKE
-        sql_query = f"""
-        SELECT
-            slug,
-            content -> '$.title' as title,
-            SUBSTR(markdown, 1, 200) as excerpt
-        FROM posts_gdocs
-        WHERE
-            (content -> '$.title' LIKE '%{query}%' OR markdown LIKE '%{query}%')
-            AND slug IS NOT NULL
-            AND markdown IS NOT NULL
-        ORDER BY
-            CASE WHEN content -> '$.title' LIKE '%{query}%' THEN 1 ELSE 2 END,
-            slug
-        LIMIT {limit}
-        """
+    # Search in titles and content using LIKE
+    sql_query = f"""
+    SELECT
+        slug,
+        content -> '$.title' as title,
+        SUBSTR(markdown, 1, 200) as excerpt
+    FROM posts_gdocs
+    WHERE
+        (content -> '$.title' LIKE '%{query}%' OR markdown LIKE '%{query}%')
+        AND slug IS NOT NULL
+        AND markdown IS NOT NULL
+    ORDER BY
+        CASE WHEN content -> '$.title' LIKE '%{query}%' THEN 1 ELSE 2 END,
+        slug
+    LIMIT {limit}
+    """
 
-        result = await run_sql(sql_query, max_rows=limit)
+    result = await run_sql(sql_query, max_rows=limit)
 
-        posts = []
-        for row in result["rows"]:
-            slug, title, excerpt = row
-            posts.append(
-                {
-                    "slug": slug or "",
-                    "title": title or "",
-                    "excerpt": excerpt or "",
-                    "url": f"https://ourworldindata.org/{slug}" if slug else "",
-                }
-            )
+    posts = []
+    for row in result["rows"]:
+        slug, title, excerpt = row
+        posts.append(
+            {
+                "slug": slug or "",
+                "title": title or "",
+                "excerpt": excerpt or "",
+                "url": f"https://ourworldindata.org/{slug}" if slug else "",
+            }
+        )
 
-        return {"query": query, "results": posts, "count": len(posts)}
-
-    except Exception as e:
-        log.error("search_posts.error", query=query, error=str(e))
-        return {"error": f"Error searching posts: {e}", "results": [], "count": 0}
+    return {"query": query, "results": posts, "count": len(posts)}

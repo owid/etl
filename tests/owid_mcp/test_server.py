@@ -330,3 +330,63 @@ async def test_search_and_fetch_workflow():
             assert parts[1].strip().isdigit()  # year
             # Value might be float, so just check it's not empty
             assert parts[2].strip()  # value
+
+
+@pytest.mark.asyncio
+async def test_search_posts_and_fetch():
+    """Test searching for posts about poverty and fetching the first result."""
+    async with Client(mcp) as client:
+        # Step 1: Search for posts about poverty
+        search_result = await client.call_tool("search_posts", {"query": "poverty", "limit": 5})
+        assert search_result is not None
+        assert search_result.structured_content is not None
+
+        # Check search result structure
+        search_data = search_result.structured_content
+
+        assert "query" in search_data
+        assert "results" in search_data
+        assert "count" in search_data
+        assert search_data["query"] == "poverty"
+
+        assert isinstance(search_data["results"], list)
+        assert search_data["count"] == len(search_data["results"])
+
+        # If we have results, test fetching the first post
+        assert search_data["count"] > 0
+        first_post = search_data["results"][0]
+
+        # Verify search result structure
+        assert "slug" in first_post
+        assert "title" in first_post
+        assert "excerpt" in first_post
+        assert "url" in first_post
+
+        # Step 2: Fetch the full content for the first post
+        post_slug = first_post["slug"]
+        fetch_result = await client.call_tool("fetch_post", {"identifier": post_slug})
+        assert fetch_result is not None
+        assert fetch_result.structured_content is not None
+
+        # Check fetch result structure
+        fetch_data = fetch_result.structured_content
+
+        # Verify successful fetch structure
+        assert "content" in fetch_data
+        assert "metadata" in fetch_data
+
+        # Check metadata structure
+        metadata = fetch_data["metadata"]
+        assert "slug" in metadata
+        assert "title" in metadata
+        assert "length" in metadata
+        assert metadata["slug"] == post_slug
+        assert isinstance(metadata["length"], int)
+        assert metadata["length"] > 0
+
+        # Check that we got actual markdown content
+        content = fetch_data["content"]
+        assert isinstance(content, str)
+        assert len(content) > 0
+
+        print(f"✅ Successfully fetched post: '{metadata['title']}' ({metadata['length']} chars)")
