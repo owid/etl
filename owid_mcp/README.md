@@ -1,19 +1,33 @@
-# Test MCP Server
+# OWID MCP Server
 
-This is a mock MCP server for testing purposes, demonstrating both resources and tools functionality using fastMCP.
+This is Our World in Data's MCP (Model Context Protocol) server providing access to charts, indicators, and data from Our World in Data. It's built using fastMCP and provides both Deep Research functionality and direct indicator access.
 
 ## Features
 
-### Resources
-- `dataset://{dataset_id}` - Get information about specific datasets
-- `test://data/all` - Get all test data
-- `test://data/{category}` - Get test data filtered by category
+### Deep Research Module (`deep_research_algolia.py`)
 
-### Tools
-- `list_datasets()` - List all available datasets
-- `search_data(query, category, min_value, max_value)` - Search test data with filters
-- `calculate_stats(category)` - Calculate statistics for test data
-- `create_sample_data(name, value, category)` - Create new sample data entry
+**Tools:**
+- `search(query)` - Search OWID charts via Algolia, returns CSV URLs filtered by country mentions
+- `fetch(id, time?)` - Download and process CSV data from chart URLs with optional time filtering
+- `fetch_image(id)` - Download PNG chart images by converting CSV URLs to PNG format
+
+### Indicators Module (`indicators.py`)
+
+**Tools:**
+- `search_indicator(query, limit?)` - Search for OWID indicators by name or description
+- `run_sql(query, max_rows?)` - Execute read-only SQL queries against the OWID public Datasette
+
+**Resources:**
+- `ind://{indicator_id}` - Get indicator data and metadata for all entities
+- `ind://{indicator_id}/{entity}` - Get indicator data filtered for specific country/entity
+
+### Shared Utilities (`data_utils.py`)
+
+**Functions:**
+- `make_algolia_request(query, limit)` - Make requests to Algolia search API
+- `country_name_to_iso3(name)` - Convert country names to ISO-3 codes using OWID regions mapping
+- `smart_round(value)` - Apply smart rounding to reduce context waste while preserving precision
+- Various data processing utilities for CSV conversion and metadata handling
 
 ## Running the Server
 
@@ -21,43 +35,71 @@ This is a mock MCP server for testing purposes, demonstrating both resources and
 # Activate virtual environment
 source .venv/bin/activate
 
-# Run the test MCP server
-python -m owid_test_mcp.server
+# Run the OWID MCP server
+fastmcp run owid_mcp/server.py
+
+# Or run with development options
+python -m mcp.server.stdio owid_mcp.server:mcp
 ```
 
-## Testing with LLM
+## Usage Examples
 
-Once the server is running, you can test it by asking an LLM to interact with it. Here are some example prompts:
+### Chart Search and Data Retrieval
+```python
+# Search for population density charts
+search_results = await search("population density france")
 
-### Testing Resources
-1. "Can you show me the available MCP resources?"
-2. "Read the resource `dataset://dataset1`"
-3. "Get all test data from `test://data/all`"
-4. "Show me climate data from `test://data/climate`"
+# Fetch CSV data from the first result
+csv_data = await fetch(search_results[0].id)
 
-### Testing Tools
-1. "Use the MCP tool to list all datasets"
-2. "Search for data containing 'temperature' in the climate category"
-3. "Calculate statistics for the climate category"
-4. "Create a new sample data entry with name 'Wind Speed', value 15.5, category 'climate'"
+# Get chart image
+chart_image = await fetch_image(search_results[0].id)
+```
 
-### Combined Testing
-"List all available datasets, then read the details of dataset1, and finally calculate statistics for climate data"
+### Indicator Search and Access
+```python
+# Search for GDP indicators
+indicators = await search_indicator("GDP per capita", limit=5)
 
-## Sample Data
+# Access indicator data via resource
+indicator_data = await client.read_resource("ind://2118")  # GDP per capita
 
-The server includes sample datasets and test data for demonstration:
+# Get data for specific country
+usa_data = await client.read_resource("ind://2118/USA")
+```
 
-**Datasets:**
-- dataset1: Global Temperature Data (1000 records)
-- dataset2: Population Statistics (195 records)
-- dataset3: Economic Indicators (500 records)
+### SQL Queries
+```python
+# Query the OWID database directly
+results = await run_sql("SELECT id, name FROM variables WHERE name LIKE '%population%' LIMIT 10")
+```
 
-**Test Data:**
-- Climate data: Temperature, Humidity, Pressure
-- Demographics: Population
-- Economics: GDP
+## Architecture
+
+The server uses a modular architecture:
+
+- **`server.py`** - Main FastMCP server that imports and combines modules
+- **`deep_research_algolia.py`** - Algolia-based chart search and CSV/image fetching
+- **`indicators.py`** - Direct indicator search and data access
+- **`data_utils.py`** - Shared utilities for data processing and API requests
+- **`config.py`** - Configuration constants and settings
+
+## Search Optimization Tips
+
+### For Charts (Deep Research)
+- Include country names in queries: "population density france", "co2 emissions china"
+- Use simple, generic terms: "coal production", "gdp per capita"
+- Avoid OWID-specific terms or overly complex queries
+
+### For Indicators
+- Search by concept only: "population density" (not "population density USA")
+- Use `country:` filter for specific countries: "population density country:US"
+- Entity names must match exactly as they appear in OWID
 
 ## Configuration
 
-The server runs on the default MCP port and can be configured through environment variables or command-line arguments as supported by fastMCP.
+Key environment variables and settings are defined in `config.py`:
+- API endpoints and timeouts
+- Database connection settings
+- Common entity mappings
+- Rate limiting and caching parameters

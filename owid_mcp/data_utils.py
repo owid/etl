@@ -5,15 +5,182 @@ Shared utilities for data processing and API interactions across MCP modules.
 """
 
 import asyncio
-from typing import Any, Dict, List
+from pathlib import Path
+from typing import Any, Dict, List, Optional
 
 import httpx
 import structlog
+import yaml
 
 from owid_mcp.config import HTTP_TIMEOUT, OWID_API_BASE
-from owid_mcp.utils import smart_round
 
 log = structlog.get_logger()
+
+# Algolia configuration
+ALGOLIA_APP_ID = "ASCB5XMYF2"
+ALGOLIA_API_KEY = "bafe9c4659e5657bf750a38fbee5c269"
+ALGOLIA_URL = f"https://{ALGOLIA_APP_ID.lower()}-dsn.algolia.net/1/indexes/*/queries"
+
+# Global mapping cache
+_NAME_TO_CODE_MAPPING: Optional[Dict[str, str]] = None
+
+
+def _load_regions_mapping() -> Dict[str, str]:
+    """Load OWID regions mapping from YAML file."""
+    global _NAME_TO_CODE_MAPPING
+
+    if _NAME_TO_CODE_MAPPING is not None:
+        return _NAME_TO_CODE_MAPPING
+
+    # Path to the regions file
+    regions_file = (
+        Path(__file__).parent.parent / "etl" / "steps" / "data" / "garden" / "regions" / "2023-01-01" / "regions.yml"
+    )
+
+    mapping: Dict[str, str] = {}
+
+    with open(regions_file, "r", encoding="utf-8") as f:
+        regions = yaml.safe_load(f)
+
+    for region in regions:
+        if not isinstance(region, dict):
+            continue
+
+        code = region.get("code")
+        name = region.get("name")
+
+        if code and name:
+            # Map name to code (case-insensitive)
+            mapping[name.lower()] = code
+
+            # Map aliases to code
+            aliases = region.get("aliases", [])
+            if isinstance(aliases, list):
+                for alias in aliases:
+                    if isinstance(alias, str):
+                        mapping[alias.lower()] = code
+
+    log.info("regions.mapping.loaded", count=len(mapping))
+
+    _NAME_TO_CODE_MAPPING = mapping
+    return mapping
+
+
+def country_name_to_iso3(name: Optional[str]) -> Optional[str]:
+    """Convert country name to ISO-3 code using OWID regions mapping."""
+    if not name:
+        return None
+
+    mapping = _load_regions_mapping()
+    return mapping.get(name.lower())
+
+
+async def make_algolia_request(query: str, limit: int = 10) -> List[Dict[str, Any]]:
+    """Make a request to Algolia search API and return the hits.
+    
+    Args:
+        query: Search query string
+        limit: Maximum number of results to return
+        
+    Returns:
+        List of search hits from Algolia
+    """
+    log.debug("algolia.request", query=query, limit=limit)
+    
+    payload = {
+        "requests": [
+            {
+                "indexName": "explorer-views-and-charts",
+                "attributesToRetrieve": [
+                    "title",
+                    "slug",
+                    "availableEntities", 
+                    "variantName",
+                    "type",
+                ],
+                "query": query,
+                "facetFilters": [[], "isIncomeGroupSpecificFM:false"],
+                "highlightPreTag": "<mark>",
+                "highlightPostTag": "</mark>",
+                "facets": ["tags"],
+                "hitsPerPage": limit,
+                "page": 0,
+            }
+        ]
+    }
+
+    headers = {
+        "x-algolia-api-key": ALGOLIA_API_KEY,
+        "x-algolia-application-id": ALGOLIA_APP_ID,
+        "x-algolia-agent": "OWID-MCP (python)",
+    }
+
+    async with httpx.AsyncClient(timeout=HTTP_TIMEOUT) as client:
+        resp = await client.post(ALGOLIA_URL, json=payload, headers=headers)
+        resp.raise_for_status()
+        response_data = resp.json()
+        hits = response_data["results"][0].get("hits", [])
+        log.debug("algolia.response", hits_count=len(hits))
+        return hits
+
+
+def smart_round(value: float | None) -> float | None:
+    """Apply smart rounding to reduce context waste while preserving meaningful precision.
+
+    Args:
+        value: The numeric value to round, or None
+
+    Returns:
+        Rounded value according to smart rounding rules, or None if input is None
+
+    Rounding rules:
+    - None values: returned as-is
+    - Integers: preserved as integers
+    - Very small numbers (< 0.001): rounded to 4 significant digits
+    - Small numbers (0.001 - 1): rounded to 3 decimal places
+    - Medium numbers (1 - 1000): rounded to 2 decimal places
+    - Large numbers (1000 - 10000): rounded to 1 decimal place
+    - Very large numbers (>10000): rounded to integers
+    """
+    import math
+    
+    if value is None:
+        return None
+
+    # Check if it's already an integer (no fractional part)
+    if value == int(value):
+        return int(value)
+
+    abs_val = abs(value)
+
+    # Very small numbers (< 0.001): round to 4 significant digits
+    if abs_val < 0.001:
+        if abs_val == 0:
+            return 0
+        # Find the order of magnitude
+        order = math.floor(math.log10(abs_val))
+        precision = 3 - order  # 4 significant digits
+        rounded = round(value, min(precision, 15))  # Cap at 15 decimal places
+        # If rounding results in 0, return the original value with scientific notation
+        if rounded == 0:
+            return value
+        return rounded
+
+    # Small numbers (0.001 - 1): round to 3 decimal places
+    elif abs_val < 1:
+        return round(value, 3)
+
+    # Medium numbers (1 - 1000): round to 2 decimal places
+    elif abs_val < 1000:
+        return round(value, 2)
+
+    # Large numbers (1000+): round to 1 decimal place
+    elif abs_val < 10000:
+        return round(value, 1)
+
+    # Very large numbers: round to nearest integer
+    else:
+        return round(value)
 
 
 def build_rows(data_json: Dict[str, Any], entities_meta: Dict[int, Dict[str, str]]) -> List[Dict[str, Any]]:
@@ -138,65 +305,3 @@ def build_catalog_info(catalog_path: str) -> Dict[str, str]:
     }
 
 
-"""
-Utility functions for the OWID MCP server.
-"""
-
-import math
-
-
-def smart_round(value: float | None) -> float | None:
-    """Apply smart rounding to reduce context waste while preserving meaningful precision.
-
-    Args:
-        value: The numeric value to round, or None
-
-    Returns:
-        Rounded value according to smart rounding rules, or None if input is None
-
-    Rounding rules:
-    - None values: returned as-is
-    - Integers: preserved as integers
-    - Very small numbers (< 0.001): rounded to 4 significant digits
-    - Small numbers (0.001 - 1): rounded to 3 decimal places
-    - Medium numbers (1 - 1000): rounded to 2 decimal places
-    - Large numbers (1000 - 10000): rounded to 1 decimal place
-    - Very large numbers (>10000): rounded to integers
-    """
-    if value is None:
-        return None
-
-    # Check if it's already an integer (no fractional part)
-    if value == int(value):
-        return int(value)
-
-    abs_val = abs(value)
-
-    # Very small numbers (< 0.001): round to 4 significant digits
-    if abs_val < 0.001:
-        if abs_val == 0:
-            return 0
-        # Find the order of magnitude
-        order = math.floor(math.log10(abs_val))
-        precision = 3 - order  # 4 significant digits
-        rounded = round(value, min(precision, 15))  # Cap at 15 decimal places
-        # If rounding results in 0, return the original value with scientific notation
-        if rounded == 0:
-            return value
-        return rounded
-
-    # Small numbers (0.001 - 1): round to 3 decimal places
-    elif abs_val < 1:
-        return round(value, 3)
-
-    # Medium numbers (1 - 1000): round to 2 decimal places
-    elif abs_val < 1000:
-        return round(value, 2)
-
-    # Large numbers (1000+): round to 1 decimal place
-    elif abs_val < 10000:
-        return round(value, 1)
-
-    # Very large numbers: round to nearest integer
-    else:
-        return round(value)

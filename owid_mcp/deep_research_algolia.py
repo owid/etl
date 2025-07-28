@@ -17,13 +17,11 @@ from fastmcp import FastMCP
 from fastmcp.server.middleware import Middleware, MiddlewareContext
 from fastmcp.utilities.types import Image
 from pydantic import BaseModel
-from sentry_sdk import capture_exception
-from sentry_sdk import logger as sentry_logger
 
 from etl.config import enable_sentry
 from mcp.types import ImageContent
 from owid_mcp.config import COMMON_ENTITIES, DATASETTE_BASE, HTTP_TIMEOUT, OWID_API_BASE
-from owid_mcp.data_utils import build_rows, fetch_json, rows_to_csv
+from owid_mcp.data_utils import build_rows, fetch_json, rows_to_csv, country_name_to_iso3, make_algolia_request
 
 enable_sentry(enable_logs=True)
 
@@ -57,100 +55,19 @@ class FetchResult(BaseModel):
 # ---------------------------------------------------------------------------
 # Constants & helpers
 # ---------------------------------------------------------------------------
-ALGOLIA_APP_ID = "ASCB5XMYF2"
-ALGOLIA_API_KEY = "bafe9c4659e5657bf750a38fbee5c269"
-ALGOLIA_URL = f"https://{ALGOLIA_APP_ID.lower()}-dsn.algolia.net/1/indexes/*/queries"
-
-# Global mapping cache
-_NAME_TO_CODE_MAPPING: Optional[Dict[str, str]] = None
 
 # Country filter pattern for indicator search
 COUNTRY_RE = re.compile(r"\bcountry:(\w{2,3})\b", re.IGNORECASE)
 
-
-def _load_regions_mapping() -> Dict[str, str]:
-    """Load OWID regions mapping from YAML file."""
-    global _NAME_TO_CODE_MAPPING
-
-    if _NAME_TO_CODE_MAPPING is not None:
-        return _NAME_TO_CODE_MAPPING
-
-    # Path to the regions file
-    regions_file = (
-        Path(__file__).parent.parent / "etl" / "steps" / "data" / "garden" / "regions" / "2023-01-01" / "regions.yml"
-    )
-
-    mapping: Dict[str, str] = {}
-
-    with open(regions_file, "r", encoding="utf-8") as f:
-        regions = yaml.safe_load(f)
-
-    for region in regions:
-        if not isinstance(region, dict):
-            continue
-
-        code = region.get("code")
-        name = region.get("name")
-
-        if code and name:
-            # Map name to code (case-insensitive)
-            mapping[name.lower()] = code
-
-            # Map aliases to code
-            aliases = region.get("aliases", [])
-            if isinstance(aliases, list):
-                for alias in aliases:
-                    if isinstance(alias, str):
-                        mapping[alias.lower()] = code
-
-    log.info("regions.mapping.loaded", count=len(mapping))
-
-    _NAME_TO_CODE_MAPPING = mapping
-    return mapping
-
-
-def country_name_to_iso3(name: Optional[str]) -> Optional[str]:
-    """Convert country name to ISO-3 code using OWID regions mapping."""
-    if not name:
-        return None
-
-    mapping = _load_regions_mapping()
-    return mapping.get(name.lower())
-
-
-# ---------------------------------------------------------------------------
-# Create the Deep‑Research MCP server
-# ---------------------------------------------------------------------------
-
-# NOTE:
-# Because the ChatGPT connector doesn’t perform a session‑ID handshake (it just fires off JSON‑RPC POSTs),
-# you must run your FastMCP server in stateless mode. Otherwise FastMCP won’t recognize the incoming
-# paths and will return 404.
-# NOTE:
-# I don't fully trust the note above, though I couldn't make it work without stateless_http=True. Whenever
-# I run a request from https://platform.openai.com/chat/edit?prompt=pmpt_6881e40843788196aaa9923785c429b20de09e18aac0a654&version=1
-# it successfully makes the first request but the subsequent request fails with 404. So it's likely something
-# about the session ID.
 
 INSTRUCTIONS = (
     "Search and fetch charts and indicators from Our World in Data..\n\n"
     "AVAILABLE TOOLS:\n"
     "• `search` - Find grapher charts via Algolia, returns CSV URLs\n"
     "• `fetch` - Download CSV data from chart URLs (with optional time filtering)\n"
-    "• `fetch_image` - Download PNG images from chart URLs\n"
+    "• `fetch_chart` - Download PNG images from chart URLs\n"
     "• `search_indicators` - Find indicators by name/description, supports country: filter\n"
     "• `fetch_indicator` - Download indicator data with metadata\n\n"
-    "CHART SEARCH (search/fetch/fetch_image):\n"
-    "• Use `search` to find relevant grapher datasets, then `fetch` to get CSV data\n"
-    "• IMPORTANT: Always include country names in your search query when looking for country-specific data (e.g., 'population France' not just 'population')\n"
-    "• The fetch tool returns CSV data with Entity column removed - only Code, Year, and metric columns remain\n"
-    "• INTERACTIVE CHARTS: Users can view interactive charts by removing '.csv' from search result URLs\n"
-    "  - Always inform users they can open interactive charts using the provided links\n"
-    "  - Example: https://ourworldindata.org/grapher/population-density becomes interactive chart\n"
-    "• ALWAYS be specific with countries and time ranges to minimize data size:\n"
-    "  - Use specific country names in search queries to get filtered results\n"
-    "  - Use time parameter in fetch/fetch_image (e.g., '1990..2010', 'earliest..2010', '1990..latest')\n"
-    "  - Prefer narrow time ranges over full historical data when possible\n\n"
     "INDICATOR SEARCH (search_indicators/fetch_indicator):\n"
     "• Call `search_indicators` to find indicators by their NAME or DESCRIPTION (e.g., 'population density', 'GDP per capita', 'life expectancy')\n"
     "• Do NOT include entity/country names in search queries - search only for the indicator concept itself\n"
@@ -182,39 +99,6 @@ INSTRUCTIONS = (
 mcp = FastMCP()
 
 
-# AI: Move to owid_mcp/server.py
-class RequestLoggingMiddleware(Middleware):
-    async def on_message(self, context: MiddlewareContext, call_next):
-        attributes = {
-            "request_id": str(uuid.uuid4()),
-            "method": context.method,
-            "message": str(context.message),
-        }
-
-        # Log incoming request
-        sentry_logger.info(
-            "request started",
-            attributes=attributes,
-        )
-
-        # handle request
-        try:
-            result = await call_next(context)
-        except Exception as e:
-            capture_exception(e)
-            raise e
-
-        return result
-
-
-# Add the logging middleware
-mcp.add_middleware(RequestLoggingMiddleware())
-
-# ---------------------------------------------------------------------------
-# SEARCH TOOL – Algolia proxy
-# ---------------------------------------------------------------------------
-
-
 @mcp.tool
 async def search(query: str) -> List[SearchResult]:
     """Search OWID using Algolia and return grapher CSV URLs.
@@ -233,40 +117,7 @@ async def search(query: str) -> List[SearchResult]:
     log.debug("search.start", query=query, limit=limit)
 
     try:
-        payload = {
-            "requests": [
-                {
-                    "indexName": "explorer-views-and-charts",
-                    "attributesToRetrieve": [
-                        "title",
-                        "slug",
-                        "availableEntities",
-                        "variantName",
-                        "type",
-                    ],
-                    "query": query,
-                    "facetFilters": [[], "isIncomeGroupSpecificFM:false"],
-                    "highlightPreTag": "<mark>",
-                    "highlightPostTag": "</mark>",
-                    "facets": ["tags"],
-                    "hitsPerPage": limit,
-                    "page": 0,
-                }
-            ]
-        }
-
-        headers = {
-            "x-algolia-api-key": ALGOLIA_API_KEY,
-            "x-algolia-application-id": ALGOLIA_APP_ID,
-            "x-algolia-agent": "OWID-MCP (python)",
-        }
-
-        async with httpx.AsyncClient(timeout=HTTP_TIMEOUT) as client:
-            resp = await client.post(ALGOLIA_URL, json=payload, headers=headers)
-            resp.raise_for_status()
-            response_data = resp.json()
-            hits = response_data["results"][0].get("hits", [])
-            log.debug("algolia.response", hits_count=len(hits))
+        hits = await make_algolia_request(query, limit)
 
         results: List[SearchResult] = []
         for hit in hits:
@@ -412,74 +263,3 @@ async def fetch(id: str, time: Optional[str] = None) -> FetchResult:
             url=fetch_url,
             metadata={"error": str(exc)},
         )
-
-
-# ---------------------------------------------------------------------------
-# FETCH_IMAGE TOOL – downloads PNG image from CSV URL
-# ---------------------------------------------------------------------------
-
-
-@mcp.tool
-async def fetch_image(id: str, time: Optional[str] = None) -> ImageContent:
-    """Download a grapher PNG image by converting CSV URL to PNG URL.
-
-    Takes a CSV URL from search results and converts it to PNG format by replacing
-    the .csv extension with .png, then returns the image as base64-encoded content.
-
-    Args:
-        id: The full grapher CSV URL returned by `search`.
-        time: Optional time range filter (e.g., '1990..2010', 'earliest..2010', '1990..latest').
-
-    Returns:
-        ImageContent with base64-encoded PNG data.
-    """
-    log.info("deep‑research.fetch_image", url=id, time=time)
-
-    if not id.startswith("http"):
-        # Return a text response for invalid URLs - FastMCP will handle the conversion
-        raise ValueError("Invalid ID (expected URL)")
-
-    # Convert CSV URL to PNG URL by replacing .csv with .png
-    png_url = id.replace(".csv", ".png")
-
-    # Remove CSV-specific query parameters that don't make sense for PNG
-    parsed = urllib.parse.urlparse(png_url)
-    query_params = urllib.parse.parse_qs(parsed.query)
-
-    # Keep only PNG-relevant parameters
-    png_params = {}
-    if "country" in query_params:
-        png_params["country"] = query_params["country"]
-
-    # Use time parameter from function argument or existing URL
-    if time:
-        png_params["time"] = [time]
-    elif "time" in query_params:
-        png_params["time"] = query_params["time"]
-
-    # Add chart tab parameter for PNG
-    png_params["tab"] = ["chart"]
-
-    # Reconstruct URL with PNG-appropriate parameters
-    new_query = urllib.parse.urlencode(png_params, doseq=True)
-    png_url = urllib.parse.urlunparse(
-        (parsed.scheme, parsed.netloc, parsed.path, parsed.params, new_query, parsed.fragment)
-    )
-
-    try:
-        async with httpx.AsyncClient(timeout=HTTP_TIMEOUT) as client:
-            resp = await client.get(png_url)
-            resp.raise_for_status()
-            png_bytes = resp.content
-
-        # Use FastMCP Image utility to create proper ImageContent
-        img_obj = Image(data=png_bytes, format="png")
-        return img_obj.to_image_content()
-
-    except Exception as exc:
-        log.warning("deep‑research.fetch_image.error", url=png_url, error=str(exc))
-        raise ValueError(f"Failed to download PNG: {exc}")
-
-
-if __name__ == "__main__":
-    mcp.run()

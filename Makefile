@@ -2,7 +2,7 @@
 #  Makefile
 #
 
-.PHONY: etl docs full lab test-default publish grapher dot watch clean clobber deploy api activate vscode-exclude-archived
+.PHONY: etl docs full lab test-default publish grapher dot watch clean clobber deploy api activate vscode-exclude-archived owid_mcp
 
 include default.mk
 

@@ -7,7 +7,8 @@ import base64
 import pytest
 from fastmcp import Client
 
-from owid_mcp.deep_research_algolia import country_name_to_iso3, mcp
+from owid_mcp.data_utils import country_name_to_iso3
+from owid_mcp.deep_research_algolia import mcp
 
 
 class TestCountryNameToIso3:
@@ -40,7 +41,7 @@ class TestCountryNameToIso3:
 
     def test_regions_file_loading(self):
         """Test that regions file can be loaded successfully."""
-        from owid_mcp.deep_research_algolia import _load_regions_mapping
+        from owid_mcp.data_utils import _load_regions_mapping
 
         # This should not raise an exception
         mapping = _load_regions_mapping()

@@ -1,9 +1,3 @@
-"""
-OWID Indicators MCP Server Module
----------------------------------
-Provides indicator search and data retrieval functionality for Our World in Data.
-"""
-
 import re
 import urllib.parse
 from typing import Any, Dict, List

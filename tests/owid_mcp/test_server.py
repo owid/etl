@@ -4,7 +4,7 @@ import pytest
 from fastmcp import Client
 
 from mcp.types import TextResourceContents
-from owid_mcp.server_complex import mcp
+from owid_mcp.server import mcp
 
 
 @pytest.mark.asyncio
