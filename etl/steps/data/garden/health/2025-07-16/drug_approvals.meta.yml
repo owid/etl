@@ -28,7 +28,7 @@ tables:
         presentation:
           grapher_config:
             note: |-
-              This data includes [biologics license applications (BLAs)](#dod:biologics-license-application)” (used for biologics and vaccines) and “[new molecular entities (NMEs)](#dod:new-molecular-entity)” (used for chemical drugs). Data on approvals of chemical drugs are only available from 1984.
+              This data includes [biologics license applications (BLAs)](#dod:biologics-license-application) (used for biologics and vaccines) and “[new molecular entities (NMEs)](#dod:new-molecular-entity) (used for chemical drugs). Data on approvals of chemical drugs are only available from 1985.
   drug_approvals_designations:
     variables:
       approvals:
@@ -42,7 +42,7 @@ tables:
         presentation:
           grapher_config:
             note: |-
-              Designations can be overlapping; a drug can receive multiple designations or no designation at all. CDER is part of the U.S. Food and Drug Administration (FDA).
+              Designations can be overlapping; a drug can receive multiple designations or no designation at all. CDER is part of the US Food and Drug Administration (FDA).
         description_processing: |-
           - This data only includes drugs approved by the Center for Drug Evaluation and Research (CDER).
 
