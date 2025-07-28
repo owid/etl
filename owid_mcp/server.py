@@ -7,7 +7,7 @@ from sentry_sdk import capture_exception
 from sentry_sdk import logger as sentry_logger
 
 # Import the modular servers
-from owid_mcp import deep_research_algolia, indicators
+from owid_mcp import deep_research_algolia, indicators, posts
 from owid_mcp.config import COMMON_ENTITIES
 
 INSTRUCTIONS = "Entity names must match exactly as they appear in OWID:\n" f"{COMMON_ENTITIES}"
@@ -24,7 +24,7 @@ INSTRUCTIONS = "Entity names must match exactly as they appear in OWID:\n" f"{CO
 mcp = FastMCP(
     stateless_http=True,
     name="Our World in Data MCP",
-    instructions="\n\n".join([deep_research_algolia.INSTRUCTIONS, indicators.INSTRUCTIONS, INSTRUCTIONS]),
+    instructions="\n\n".join([deep_research_algolia.INSTRUCTIONS, indicators.INSTRUCTIONS, posts.INSTRUCTIONS, INSTRUCTIONS]),
 )
 
 
@@ -63,6 +63,7 @@ async def setup_server():
     """Setup the server by importing modules."""
     await mcp.import_server(indicators.mcp)
     await mcp.import_server(deep_research_algolia.mcp)
+    await mcp.import_server(posts.mcp)
 
 
 # Create an event loop and setup the server

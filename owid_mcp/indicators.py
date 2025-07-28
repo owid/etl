@@ -1,13 +1,11 @@
-import re
-import urllib.parse
 from typing import Any, Dict, List
 
-import httpx
 import structlog
 from fastmcp import FastMCP
 
-from owid_mcp.config import DATASETTE_BASE, HTTP_TIMEOUT, MAX_ROWS_DEFAULT, MAX_ROWS_HARD
+from owid_mcp.config import MAX_ROWS_DEFAULT
 from owid_mcp.data_utils import build_catalog_info, fetch_indicator_data
+from owid_mcp.data_utils import run_sql as _run_sql
 
 log = structlog.get_logger()
 
@@ -93,9 +91,7 @@ async def search_indicator(query: str, limit: int = 10) -> List[Dict]:
     return results
 
 
-SQL_SELECT_RE = re.compile(r"^\s*select\b", re.IGNORECASE | re.DOTALL)
-
-
+# Create a tool wrapper for the shared run_sql function
 @mcp.tool
 async def run_sql(query: str, max_rows: int = MAX_ROWS_DEFAULT) -> Dict[str, Any]:
     """Execute a **read‑only** SQL SELECT via the OWID public Datasette.
@@ -111,32 +107,7 @@ async def run_sql(query: str, max_rows: int = MAX_ROWS_DEFAULT) -> Dict[str, Any
     dict
         {"columns": [...], "rows": [[...], ...]}
     """
-    if not SQL_SELECT_RE.match(query):
-        raise ValueError("Only SELECT statements are allowed.")
-    if max_rows < 1 or max_rows > MAX_ROWS_HARD:
-        raise ValueError(f"max_rows must be 1‑{MAX_ROWS_HARD}.")
-
-    # Append/override LIMIT to enforce row cap
-    if re.search(r"\blimit\b", query, re.IGNORECASE):
-        query = re.sub(r"limit\s+\d+", f"LIMIT {max_rows}", query, flags=re.IGNORECASE)
-    else:
-        query = f"{query} LIMIT {max_rows}"
-
-    qs = urllib.parse.urlencode({"sql": query, "_size": "max"})
-    # Remove the .json extension from DATASETTE_BASE since it's already included in config
-    datasette_base = DATASETTE_BASE.replace(".json", "")
-    datasette_url = f"{datasette_base}.json?{qs}"
-
-    async with httpx.AsyncClient(timeout=HTTP_TIMEOUT) as client:
-        resp = await client.get(datasette_url)
-        resp.raise_for_status()
-        js = resp.json()
-
-    return {
-        "columns": js.get("columns", []),
-        "rows": js.get("rows", []),
-        "source": datasette_url,
-    }
+    return await _run_sql(query, max_rows)
 
 
 @mcp.resource("ind://{indicator_id}")
