@@ -40,11 +40,15 @@ INSTRUCTIONS = (
     "• `search_chart` - Find grapher charts via Algolia search\n"
     "• `fetch_chart_data` - Download processed CSV data with optional time filtering\n"
     "• `fetch_chart_image` - Get PNG images of charts\n\n"
+    "INTERACTIVE CHARTS:\n"
+    "• ALWAYS show users the interactive chart links from search results\n"
+    "• Remove '.csv' from URLs to get interactive version\n"
+    "• Example: https://ourworldindata.org/grapher/population-density.csv → https://ourworldindata.org/grapher/population-density\n"
+    "• Tell users they can explore data interactively, change selections, and view different chart types\n\n"
     "USAGE:\n"
     "• Include country names in search: 'population France', 'emissions China'\n"
     "• Use time filtering in fetch (e.g., '1990..2010', 'earliest..2010', '1990..latest')\n"
-    "• Returns CSV with Entity column removed (Code, Year, metrics only)\n"
-    "• Users can view interactive charts by removing '.csv' from URLs"
+    "• Returns CSV with Entity column removed (Code, Year, metrics only)"
 )
 
 mcp = FastMCP()
