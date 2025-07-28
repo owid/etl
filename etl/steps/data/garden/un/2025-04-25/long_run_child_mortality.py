@@ -11,7 +11,6 @@ paths = PathFinder(__file__)
 
 REGIONS = geo.REGIONS
 
-
 def run() -> None:
     #
     # Load inputs.
