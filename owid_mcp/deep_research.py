@@ -122,7 +122,7 @@ async def fetch(id: str) -> FetchResult:
         the dataset structure.
     """
     # Call fetch_chart_data from charts module and convert result to FetchResult
-    chart_result = await charts.fetch_chart_data(id)
+    chart_result = await charts._fetch_chart_data_internal(id)
 
     return FetchResult(
         id=chart_result.id,

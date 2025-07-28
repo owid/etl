@@ -52,8 +52,7 @@ INSTRUCTIONS = (
 mcp = FastMCP()
 
 
-@mcp.tool
-async def fetch_chart_data(id: str, time: Optional[str] = None) -> ChartDataResult:
+async def _fetch_chart_data_internal(id: str, time: Optional[str] = None) -> ChartDataResult:
     """Download a grapher CSV and return the processed data.
 
     The returned CSV has the Entity column removed and contains only:
@@ -136,6 +135,29 @@ async def fetch_chart_data(id: str, time: Optional[str] = None) -> ChartDataResu
             url=fetch_url,
             metadata={"error": str(exc)},
         )
+
+
+@mcp.tool
+async def fetch_chart_data(id: str, time: Optional[str] = None) -> ChartDataResult:
+    """Download a grapher CSV and return the processed data.
+
+    The returned CSV has the Entity column removed and contains only:
+    - Code: Country/region ISO codes
+    - Year: Time period
+    - [Metric columns]: The actual data values
+
+    IMPORTANT: Only provide data that exists in the fetched CSV. Do not hallucinate
+    or interpolate missing values.
+
+    Args:
+        id: The full grapher CSV URL returned by `search`.
+        time: Optional time range filter (e.g., '1990..2010', 'earliest..2010', '1990..latest').
+
+    Returns:
+        ChartDataResult with `text` containing processed CSV data and metadata about
+        the dataset structure.
+    """
+    return await _fetch_chart_data_internal(id, time)
 
 
 @mcp.tool
