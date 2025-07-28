@@ -148,6 +148,13 @@ mcp = FastMCP(
         "• Use `search` to find relevant grapher datasets, then `fetch` to get CSV data\n"
         "• IMPORTANT: Always include country names in your search query when looking for country-specific data (e.g., 'population France' not just 'population')\n"
         "• The fetch tool returns CSV data with Entity column removed - only Code, Year, and metric columns remain\n"
+        "• INTERACTIVE CHARTS: Users can view interactive charts by removing '.csv' from search result URLs\n"
+        "  - Always inform users they can open interactive charts using the provided links\n"
+        "  - Example: https://ourworldindata.org/grapher/population-density becomes interactive chart\n"
+        "• ALWAYS be specific with countries and time ranges to minimize data size:\n"
+        "  - Use specific country names in search queries to get filtered results\n"
+        "  - Use time parameter in fetch/fetch_image (e.g., '1990..2010', 'earliest..2010', '1990..latest')\n"
+        "  - Prefer narrow time ranges over full historical data when possible\n"
         "• If fetched data doesn't contain the values you need, inform the user rather than making up data\n"
         "• Search results automatically filter for mentioned countries when detected in queries\n\n"
         "SEARCH OPTIMIZATION:\n"
@@ -286,9 +293,6 @@ async def search(query: str) -> List[SearchResult]:
             # &time=earliest..latest probably wrong...
             grapher_url = f"https://ourworldindata.org/grapher/{slug}.csv?tab=line&csvType=filtered"
 
-            # We need to add this I guess...
-            grapher_url += "&time=earliest..latest"
-
             # Perhaps we should use this?
             # https://ourworldindata.org/grapher/population-density.csv?v=1&csvType=filtered&useColumnShortNames=true&tab=line&country=FRA~DEU
 
@@ -321,7 +325,7 @@ async def search(query: str) -> List[SearchResult]:
 
 
 @mcp.tool
-async def fetch(id: str) -> FetchResult:
+async def fetch(id: str, time: Optional[str] = None) -> FetchResult:
     """Download a grapher CSV and return the processed data.
 
     The returned CSV has the Entity column removed and contains only:
@@ -334,12 +338,13 @@ async def fetch(id: str) -> FetchResult:
 
     Args:
         id: The full grapher CSV URL returned by `search`.
+        time: Optional time range filter (e.g., '1990..2010', 'earliest..2010', '1990..latest').
 
     Returns:
         FetchResult with `text` containing processed CSV data and metadata about
         the dataset structure.
     """
-    log.info("deep‑research.fetch", url=id)
+    log.info("deep‑research.fetch", url=id, time=time)
 
     if not id.startswith("http"):
         return FetchResult(
@@ -350,9 +355,21 @@ async def fetch(id: str) -> FetchResult:
             metadata={"error": "ID must be a grapher CSV URL"},
         )
 
+    # Add time parameter to URL if provided
+    fetch_url = id
+    if time:
+        # Parse existing URL to add time parameter
+        parsed = urllib.parse.urlparse(id)
+        query_params = urllib.parse.parse_qs(parsed.query)
+        query_params["time"] = [time]
+        new_query = urllib.parse.urlencode(query_params, doseq=True)
+        fetch_url = urllib.parse.urlunparse(
+            (parsed.scheme, parsed.netloc, parsed.path, parsed.params, new_query, parsed.fragment)
+        )
+
     try:
         async with httpx.AsyncClient(timeout=HTTP_TIMEOUT) as client:
-            resp = await client.get(id)
+            resp = await client.get(fetch_url)
             resp.raise_for_status()
             csv_content = resp.text
 
@@ -362,32 +379,33 @@ async def fetch(id: str) -> FetchResult:
             df = df.drop(columns=["Entity"])
 
         # Convert back to CSV string
-        processed_csv = df.to_csv(index=False)
+        processed_csv: str = df.to_csv(index=False)
 
         slug = urllib.parse.urlparse(id).path.rsplit("/", 1)[-1].split(".")[0]
-        title = slug.replace("-", " ").title()
+        title: str = slug.replace("-", " ").title() if slug else "OWID Dataset"
 
         return FetchResult(
             id=id,
             title=title,
             text=processed_csv,
-            url=id,
+            url=fetch_url,
             metadata={
                 "mime": "text/csv",
                 "encoding": "utf-8",
                 "size_bytes": len(processed_csv.encode("utf-8")),
                 "rows": len(df),
                 "columns": list(df.columns),
+                "time_filter": time,
             },
         )
 
     except Exception as exc:  # noqa: BLE001
-        log.warning("deep‑research.fetch.error", url=id, error=str(exc))
+        log.warning("deep‑research.fetch.error", url=fetch_url, error=str(exc))
         return FetchResult(
             id=id,
             title="Error fetching CSV",
             text=f"Failed to download CSV: {exc}",
-            url=id,
+            url=fetch_url,
             metadata={"error": str(exc)},
         )
 
@@ -398,7 +416,7 @@ async def fetch(id: str) -> FetchResult:
 
 
 @mcp.tool
-async def fetch_image(id: str) -> ImageContent:
+async def fetch_image(id: str, time: Optional[str] = None) -> ImageContent:
     """Download a grapher PNG image by converting CSV URL to PNG URL.
 
     Takes a CSV URL from search results and converts it to PNG format by replacing
@@ -406,11 +424,12 @@ async def fetch_image(id: str) -> ImageContent:
 
     Args:
         id: The full grapher CSV URL returned by `search`.
+        time: Optional time range filter (e.g., '1990..2010', 'earliest..2010', '1990..latest').
 
     Returns:
         ImageContent with base64-encoded PNG data.
     """
-    log.info("deep‑research.fetch_image", url=id)
+    log.info("deep‑research.fetch_image", url=id, time=time)
 
     if not id.startswith("http"):
         # Return a text response for invalid URLs - FastMCP will handle the conversion
@@ -427,7 +446,11 @@ async def fetch_image(id: str) -> ImageContent:
     png_params = {}
     if "country" in query_params:
         png_params["country"] = query_params["country"]
-    if "time" in query_params:
+    
+    # Use time parameter from function argument or existing URL
+    if time:
+        png_params["time"] = [time]
+    elif "time" in query_params:
         png_params["time"] = query_params["time"]
 
     # Add chart tab parameter for PNG
