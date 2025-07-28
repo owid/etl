@@ -20,7 +20,7 @@ def run() -> None:
     # Read table from garden dataset.
     tb = ds_garden["long_run_child_mortality"]
     tb_sel = ds_garden["long_run_child_mortality_selected"]
-    tb_sel['child_mortality_rate'] = tb_sel['child_mortality_rate'].round(2)
+    tb_sel["child_mortality_rate"] = tb_sel["child_mortality_rate"].round(2)
     # Export the table to a Google Sheet
     # Can only be run locally, not in prod or staging
     team_folder_id = get_team_folder_id()
