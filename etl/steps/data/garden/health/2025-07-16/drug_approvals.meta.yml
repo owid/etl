@@ -32,18 +32,18 @@ tables:
   drug_approvals_designations:
     variables:
       approvals:
-        title: New drugs approved by the FDA, by designations
+        title: New drugs approved by CDER, by designations
         unit: 'approvals'
         short_unit: ''
         description_short: |-
-          The annual number of new drugs approved by the FDA that fall under each designation, including [Orphan Drugs](#dod:orphan-drug), [Fast Track](#dod:fda-fast-track), [Accelerated Approval](#dod:fda-accelerated-approval), [Breakthrough Therapy](#dod:breakthrough-therapy), and [Qualified Infectious Disease Product](#dod:qualified-infectious-disease-product).
+          The annual number of new drugs approved by the Center for Drug Evaluation and Research (CDER), that fall under each designation, including [Orphan Drugs](#dod:orphan-drug), [Fast Track](#dod:fda-fast-track), [Accelerated Approval](#dod:fda-accelerated-approval), [Breakthrough Therapy](#dod:breakthrough-therapy), and [Qualified Infectious Disease Product](#dod:qualified-infectious-disease-product).
         display:
           numDecimalPlaces: 0
         presentation:
           grapher_config:
             note: |-
-              Designations can be overlapping; a drug can receive multiple designations. Many drugs receive none of these designations.
+              Designations can be overlapping; a drug can receive multiple designations. CDER is part of the U.S. Food and Drug Administration (FDA).
         description_processing: |-
-          - This data includes [new molecular entities](#dod:new-molecular-entity) (NMEs) approved by the Center for Drug Evaluation and Research (CDER) and the Center for Biologics Evaluation and Research (CBER) of the FDA.
+          - This data includes [new molecular entities](#dod:new-molecular-entity) (NMEs) approved by the Center for Drug Evaluation and Research (CDER).
 
 
