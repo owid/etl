@@ -50,21 +50,9 @@ def run() -> None:
 
     # get approvals per year (NMEs, biologics, vaccines)
     tb = get_approvals_per_year(tb_cder, tb_purple_book)
-    tb_total = tb[tb["application_type"] == "All new drug approvals"].copy()
 
     # get approvals per designation
     tb_designations = get_approvals_per_designation(tb_cder)
-
-    # add total drug approvals to designations
-    tb_designations = pr.concat(
-        [
-            tb_designations,
-            tb_total[["approval_year", "application_type", "approvals"]].rename(
-                columns={"application_type": "designation"}
-            ),
-        ],  # type: ignore
-        ignore_index=True,
-    )
 
     # Format tables
     tb = tb.rename(
@@ -156,19 +144,30 @@ def get_approvals_per_designation(tb_cder):
     # convert to 1/0
     tb_cder_des[designation_columns] = tb_cder_des[designation_columns].isin(pos_indications).astype(int)
 
-    designations = (
-        tb_cder_des.groupby("approval_year")[designation_columns].sum().reset_index().copy_metadata(tb_cder_des)
+    # sum designation columns per year
+    designations = tb_cder_des.groupby("approval_year")[designation_columns].sum().reset_index()
+    # sum all designations
+    all_designations = (
+        tb_cder_des[["approval_year", "orphan_drug_designation"]].groupby("approval_year").count().reset_index()
     )
+    all_designations = all_designations.rename(columns={"orphan_drug_designation": "all_approvals"})
+
+    designations = pr.merge(
+        designations,
+        all_designations,
+        on="approval_year",
+        how="left",
+    ).copy_metadata(tb_cder_des)
 
     # add metadata (i don't know why this is necessary, but it is)
-    for col in designation_columns:
+    for col in designation_columns + ["all_approvals"]:
         designations[col].m.origins = tb_cder_des["approval_year"].m.origins.copy()
 
     # melt table
     designations = pr.melt(
         designations,
         id_vars=["approval_year"],
-        value_vars=designation_columns,
+        value_vars=designation_columns + ["all_approvals"],
         var_name="designation",
         value_name="approvals",
     )
@@ -181,6 +180,7 @@ def get_approvals_per_designation(tb_cder):
             "breakthrough_therapy_designation": "Breakthrough therapy approvals",
             "fast_track_designation": "Fast track approvals",
             "qualified_infectious_disease_product": "Qualified infectious disease product approvals",
+            "all_approvals": "All new drug approvals",
         }
     )
 
