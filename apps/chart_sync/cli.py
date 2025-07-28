@@ -51,6 +51,12 @@ log = structlog.get_logger()
     type=bool,
     help="Do not write to target database.",
 )
+@click.option(
+    "--ignore-conflicts/--no-ignore-conflicts",
+    default=False,
+    type=bool,
+    help="Sync approved charts even when conflicts are detected. Useful when syncing between staging servers.",
+)
 def cli(
     source: str,
     target: str,
@@ -58,6 +64,7 @@ def cli(
     include: Optional[str],
     exclude: Optional[str],
     dry_run: bool,
+    ignore_conflicts: bool,
 ) -> None:
     # TODO: keep this docstring in sync with apps/wizard/app_pages/chart_diff/app.py
     """Sync Grapher charts and revisions from an environment to the main environment.
@@ -74,6 +81,7 @@ def cli(
     - You get a notification if the chart **_has been modified on live_** after staging server was created.
     - If the chart is pending in chart-diff, you'll get a warning and Slack notification
     - Deleted charts are **_not synced_**.
+    - Use `--ignore-conflicts` to sync approved charts ignoring conflicts. Useful when syncing between staging servers.
 
     **Considerations on tags:**
 
@@ -96,6 +104,12 @@ def cli(
     ```
     etl chart-sync staging-site-my-branch .env.prod.write --chart-id 123 --dry-run
     ```
+
+    **Example 4:** Ignore conflicts when syncing between staging servers (useful if conflicts with master have already been dealt with in a subbranch server)
+
+    ```
+    etl chart-sync staging-site-my-subbranch staging-site-baseline-branch --ignore-conflicts --dry-run
+    ```
     """
     if _is_commit_sha(source):
         repo = GithubApiRepo(repo_name="etl")
@@ -105,6 +119,13 @@ def cli(
     source_engine = OWIDEnv.from_staging_or_env_file(source).get_engine()
     target_env = OWIDEnv.from_staging_or_env_file(target)
     target_engine = target_env.get_engine()
+
+    # Safety warning when using ignore-conflicts flag
+    if ignore_conflicts:
+        log.warning(
+            "chart_sync.ignore_conflicts_enabled",
+            message="Ignore-conflicts flag is enabled. Approved charts will be synced even if conflicts are detected.",
+        )
 
     # go through Admin API as creating / updating chart has side effects like
     # adding entries to chart_dimensions. We can't directly update it in MySQL
@@ -116,7 +137,12 @@ def cli(
             # NOTE: We're creating two paris of sessions here, it'd be nicer to only create a single one
             cd_loader = ChartDiffsLoader(source_engine, target_engine)
             chart_diffs = cd_loader.get_diffs(
-                config=True, metadata=False, data=False, source_session=source_session, target_session=target_session
+                config=True,
+                metadata=False,
+                data=False,
+                source_session=source_session,
+                target_session=target_session,
+                ignore_conflicts=ignore_conflicts,
             )
 
             if chart_id:

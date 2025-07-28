@@ -285,11 +285,60 @@ def sort_chart_diffs():
 @st.dialog(title="Set all charts to Pending")
 def set_chart_diffs_to_pending(engine: Engine) -> None:
     """Set approval status of all chart diffs to pending."""
-    st.markdown("**Do you want to set all charts-diffs to pending?** this will loose all your progress on reviews.")
+    st.markdown("**Do you want to set all charts-diffs to pending?** this will lose all your progress on reviews.")
+    st.info(
+        "💡 **Note:** This may take a moment. After completed, you may need to refresh the page to see the updated chart statuses."
+    )
     if st.button("Yes", type="primary"):
         with Session(engine) as session:
             for _, chart_diff in st.session_state.chart_diffs.items():
                 chart_diff.unreview(session)
+        st.rerun()
+
+
+@st.dialog(title="Set all pending charts to Approved")
+def set_chart_diffs_to_approved(engine: Engine) -> None:
+    """Set approval status of all pending chart diffs to approved."""
+    pending_non_conflict_count = len(
+        [chart for chart in st.session_state.chart_diffs.values() if chart.is_pending and not chart.in_conflict]
+    )
+    pending_conflict_count = len(
+        [chart for chart in st.session_state.chart_diffs.values() if chart.is_pending and chart.in_conflict]
+    )
+    st.markdown(
+        f"**Do you want to approve all {pending_non_conflict_count} pending (non-conflicted) chart diffs?** This will approve them for sync to production."
+    )
+    if pending_conflict_count > 0:
+        st.warning(
+            f"⚠️ **Note:** {pending_conflict_count} pending charts with conflicts will be skipped. Consider first using the 'Resolve all conflicts' button, or manually inspect them."
+        )
+    st.info(
+        "💡 **Note:** This may take a moment. After completed, you may need to refresh the page to see the updated chart statuses."
+    )
+    if st.button("Yes", type="primary"):
+        with Session(engine) as session:
+            for _, chart_diff in st.session_state.chart_diffs.items():
+                if chart_diff.is_pending and not chart_diff.in_conflict:  # Skip conflicted charts
+                    chart_diff.approve(session)
+        st.rerun()
+
+
+@st.dialog(title="Resolve all conflicts (Accept staging changes)")
+def resolve_all_conflicts_accept_staging(engine: Engine) -> None:
+    """Resolve all conflicts by accepting staging changes and approve charts."""
+    conflict_count = len([chart for chart in st.session_state.chart_diffs.values() if chart.in_conflict])
+    st.markdown(
+        f"**Do you want to resolve all {conflict_count} conflicts by accepting staging changes?** This will override any changes made in production when merging this to production."
+    )
+    st.info(
+        "💡 **Note:** This may take a moment. After completed, you may need to refresh the page to see the updated chart statuses."
+    )
+    if st.button("Yes, accept staging changes", type="primary"):
+        with Session(engine) as session:
+            for _, chart_diff in st.session_state.chart_diffs.items():
+                if chart_diff.in_conflict:
+                    chart_diff.set_conflict_to_resolved(session)
+                    chart_diff.approve(session)
         st.rerun()
 
 
@@ -446,12 +495,26 @@ def _show_options_misc():
     with st.container(border=True):
         st.markdown("Danger zone ⚠️")
         if st.button(
+            "Resolve all conflicts **(Accept staging changes)**",
+            key="resolve-all-conflicts",
+            help="This will accept all staging changes for charts with conflicts. Use with caution!",
+        ):
+            resolve_all_conflicts_accept_staging(SOURCE_ENGINE)
+
+        if st.button(
             "Set all charts to **Pending**",
             key="unapprove-all-charts",
             # on_click=lambda e=SOURCE_ENGINE: set_chart_diffs_to_pending(e),
             help="This sets the status of all chart diffs to 'Pending'. This means that you will need to review them again.",
         ):
             set_chart_diffs_to_pending(SOURCE_ENGINE)
+
+        if st.button(
+            "Set all pending charts to **Approved**",
+            key="approve-all-pending-charts",
+            help="This approves all pending (non-conflicted) chart diffs for sync to production. Charts with conflicts will be skipped.",
+        ):
+            set_chart_diffs_to_approved(SOURCE_ENGINE)
 
 
 def _show_options():

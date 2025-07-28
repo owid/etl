@@ -44,7 +44,7 @@ header_dict = {
     "googleSheet": f"https://docs.google.com/spreadsheets/d/{sheet_id}",
     "wpBlockId": "57756",
     "entityType": "country or region",
-    "pickerColumnSlugs": "headcount_ratio_215 headcount_ratio_365 headcount_ratio_685 headcount_ratio_3000 headcount_215 headcount_365 headcount_685 headcount_3000 headcount_ratio_50_median headcount_50_median",
+    "pickerColumnSlugs": "headcount_ratio_300 headcount_ratio_420 headcount_ratio_830 headcount_ratio_3000 headcount_300 headcount_420 headcount_830 headcount_3000 headcount_ratio_50_median headcount_50_median",
 }
 
 # Index-oriented dataframe
@@ -111,7 +111,10 @@ for survey in range(len(survey_type)):
         df_tables.loc[j, "unit"] = "%"
         df_tables.loc[j, "shortUnit"] = "%"
         df_tables.loc[j, "type"] = "Numeric"
-        df_tables.loc[j, "colorScaleNumericBins"] = "3;10;20;30;40;50;60;70;80;90;100"
+        if p == 1:
+            df_tables.loc[j, "colorScaleNumericBins"] = "3;10;20;30;40;50;60;70;80;90;100"
+        else:
+            df_tables.loc[j, "colorScaleNumericBins"] = "10;20;30;40;50;60;70;80;90;100"
         df_tables.loc[j, "colorScaleScheme"] = "OrRd"
         df_tables.loc[j, "survey_type"] = survey_type["table_name"][survey]
         j += 1
@@ -134,7 +137,7 @@ for survey in range(len(survey_type)):
         df_tables.loc[j, "shortUnit"] = np.nan
         df_tables.loc[j, "type"] = "Numeric"
         df_tables.loc[j, "colorScaleNumericBins"] = (
-            "100000;300000;1000000;3000000;10000000;30000000;100000000;300000000;1000000000"
+            "100000;300000;1000000;3000000;10000000;30000000;100000000;300000000;1"
         )
         df_tables.loc[j, "colorScaleScheme"] = "Reds"
         df_tables.loc[j, "survey_type"] = survey_type["table_name"][survey]
@@ -292,7 +295,7 @@ for survey in range(len(survey_type)):
         df_tables.loc[j, "unit"] = np.nan
         df_tables.loc[j, "shortUnit"] = np.nan
         df_tables.loc[j, "type"] = "Numeric"
-        df_tables.loc[j, "colorScaleNumericBins"] = "100000;300000;1000000;3000000;10000000;30000000;100000000"
+        df_tables.loc[j, "colorScaleNumericBins"] = "100000;300000;1000000;3000000;10000000;30000000;1"
         df_tables.loc[j, "colorScaleScheme"] = "YlOrBr"
         df_tables.loc[j, "survey_type"] = survey_type["table_name"][survey]
         j += 1
@@ -383,7 +386,7 @@ for survey in range(len(survey_type)):
         df_tables.loc[j, "unit"] = "%"
         df_tables.loc[j, "shortUnit"] = "%"
         df_tables.loc[j, "type"] = "Numeric"
-        df_tables.loc[j, "colorScaleNumericBins"] = "5;10;15;20;25;30;35;40;45;50"
+        df_tables.loc[j, "colorScaleNumericBins"] = "5;10;15;20;25;30;35;40;45;1"
         df_tables.loc[j, "colorScaleScheme"] = "YlOrBr"
         df_tables.loc[j, "survey_type"] = survey_type["table_name"][survey]
         j += 1
@@ -643,7 +646,7 @@ for survey in range(len(survey_type)):
     # Headcount ratio (abs) - Multiple lines
     df_graphers.loc[j, "title"] = "Share of population living below a range of poverty lines"
     df_graphers.loc[j, "ySlugs"] = (
-        "headcount_ratio_100 headcount_ratio_215 headcount_ratio_365 headcount_ratio_685 headcount_ratio_1000 headcount_ratio_2000 headcount_ratio_3000 headcount_ratio_4000"
+        "headcount_ratio_100 headcount_ratio_300 headcount_ratio_420 headcount_ratio_830 headcount_ratio_1000 headcount_ratio_2000 headcount_ratio_3000 headcount_ratio_4000"
     )
     df_graphers.loc[j, "Indicator Dropdown"] = "Share in poverty"
     df_graphers.loc[j, "Poverty line Dropdown"] = "Multiple lines"
@@ -666,7 +669,7 @@ for survey in range(len(survey_type)):
     # Headcount (abs) - Multiple lines
     df_graphers.loc[j, "title"] = "Number of people living below a range of poverty lines"
     df_graphers.loc[j, "ySlugs"] = (
-        "headcount_100 headcount_215 headcount_365 headcount_685 headcount_1000 headcount_2000 headcount_3000 headcount_4000"
+        "headcount_100 headcount_300 headcount_420 headcount_830 headcount_1000 headcount_2000 headcount_3000 headcount_4000"
     )
     df_graphers.loc[j, "Indicator Dropdown"] = "Number in poverty"
     df_graphers.loc[j, "Poverty line Dropdown"] = "Multiple lines"
@@ -689,7 +692,7 @@ for survey in range(len(survey_type)):
     # Total shortfall (abs) - Multiple lines
     df_graphers.loc[j, "title"] = "Total shortfall from a range of poverty lines"
     df_graphers.loc[j, "ySlugs"] = (
-        "total_shortfall_100_year total_shortfall_215_year total_shortfall_365_year total_shortfall_685_year total_shortfall_1000_year total_shortfall_2000_year total_shortfall_3000_year total_shortfall_4000_year"
+        "total_shortfall_100_year total_shortfall_300_year total_shortfall_420_year total_shortfall_830_year total_shortfall_1000_year total_shortfall_2000_year total_shortfall_3000_year total_shortfall_4000_year"
     )
     df_graphers.loc[j, "Indicator Dropdown"] = "Total shortfall from poverty line"
     df_graphers.loc[j, "Poverty line Dropdown"] = "Multiple lines"
@@ -712,7 +715,7 @@ for survey in range(len(survey_type)):
     # Average shortfall - $ per day - Multiple lines
     df_graphers.loc[j, "title"] = "Average shortfall from a range of poverty lines"
     df_graphers.loc[j, "ySlugs"] = (
-        "avg_shortfall_100 avg_shortfall_215 avg_shortfall_365 avg_shortfall_685 avg_shortfall_1000 avg_shortfall_2000 avg_shortfall_3000 avg_shortfall_4000"
+        "avg_shortfall_100 avg_shortfall_300 avg_shortfall_420 avg_shortfall_830 avg_shortfall_1000 avg_shortfall_2000 avg_shortfall_3000 avg_shortfall_4000"
     )
     df_graphers.loc[j, "Indicator Dropdown"] = "Average shortfall ($ per day)"
     df_graphers.loc[j, "Poverty line Dropdown"] = "Multiple lines"
@@ -735,7 +738,7 @@ for survey in range(len(survey_type)):
     # Average shortfall (% of poverty line) - Multiple lines
     df_graphers.loc[j, "title"] = "Average shortfall from a range of poverty lines (as a share of the poverty line)"
     df_graphers.loc[j, "ySlugs"] = (
-        "income_gap_ratio_100 income_gap_ratio_215 income_gap_ratio_365 income_gap_ratio_685 income_gap_ratio_1000 income_gap_ratio_2000 income_gap_ratio_3000 income_gap_ratio_4000"
+        "income_gap_ratio_100 income_gap_ratio_300 income_gap_ratio_420 income_gap_ratio_830 income_gap_ratio_1000 income_gap_ratio_2000 income_gap_ratio_3000 income_gap_ratio_4000"
     )
     df_graphers.loc[j, "Indicator Dropdown"] = "Average shortfall (% of poverty line)"
     df_graphers.loc[j, "Poverty line Dropdown"] = "Multiple lines"
@@ -758,7 +761,7 @@ for survey in range(len(survey_type)):
     # Poverty gap index - Multiple lines
     df_graphers.loc[j, "title"] = "Poverty gap index at a range of poverty lines"
     df_graphers.loc[j, "ySlugs"] = (
-        "poverty_gap_index_100 poverty_gap_index_215 poverty_gap_index_365 poverty_gap_index_685 poverty_gap_index_1000 poverty_gap_index_2000 poverty_gap_index_3000 poverty_gap_index_4000"
+        "poverty_gap_index_100 poverty_gap_index_300 poverty_gap_index_420 poverty_gap_index_830 poverty_gap_index_1000 poverty_gap_index_2000 poverty_gap_index_3000 poverty_gap_index_4000"
     )
     df_graphers.loc[j, "Indicator Dropdown"] = "Poverty gap index"
     df_graphers.loc[j, "Poverty line Dropdown"] = "Multiple lines"
@@ -952,7 +955,7 @@ for i in range(len(df_graphers)):
     )
 
     df_graphers_spells.loc[j, "note"] = df_graphers["note"][i]
-    df_graphers_spells.loc[j, "type"] = df_graphers["type"][i]
+    df_graphers_spells.loc[j, "type"] = "LineChart"
     df_graphers_spells.loc[j, "yAxisMin"] = df_graphers["yAxisMin"][i]
     df_graphers_spells.loc[j, "selectedFacetStrategy"] = "entity"
     df_graphers_spells.loc[j, "hasMapTab"] = "false"
@@ -1010,8 +1013,9 @@ df_graphers["note"] = df_graphers["note"].str.replace(
 )
 
 # Select one default view
+# NOTE: Change poverty line if prices change
 df_graphers.loc[
-    (df_graphers["ySlugs"] == "headcount_ratio_215")
+    (df_graphers["ySlugs"] == "headcount_ratio_300")
     & (df_graphers["tableSlug"] == f"income_consumption_{ppp_year}")
     & (df_graphers["Show breaks between less comparable surveys Checkbox"] == "false"),
     ["defaultView"],

@@ -7,7 +7,7 @@ definitions:
     presentation:
       topic_tags:
         - Agricultural Production
-      attribution_short: FAO
+      attribution_short: UN FAO
 
 tables:
   faostat_cisp_flat:

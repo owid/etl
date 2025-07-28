@@ -459,17 +459,6 @@ steps:
   data-private://grapher/language/2024-07-17/ethnologue:
     - data-private://garden/language/2024-07-17/ethnologue
 
-  # Child Mortality Estimates - UN IGME - to archive
-  data://meadow/un/2024-09-11/igme:
-    - snapshot://un/2024-09-11/igme.zip
-  data://garden/un/2024-09-11/igme:
-    - data://meadow/un/2024-09-11/igme
-    - data://garden/un/2018/igme
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/demography/2024-07-15/population
-  data://grapher/un/2024-09-11/igme:
-    - data://garden/un/2024-09-11/igme
-
   # Child Mortality Estimates - UN IGME
   data://meadow/un/2025-03-25/igme:
     - snapshot://un/2025-03-25/igme.zip
@@ -480,14 +469,6 @@ steps:
     - data://garden/demography/2024-07-15/population
   data://grapher/un/2025-03-25/igme:
     - data://garden/un/2025-03-25/igme
-
-  # Long-run child mortality, Gapminder + UN IGME - to archive
-  data://garden/un/2024-09-16/long_run_child_mortality:
-    - data://garden/un/2024-09-11/igme
-    - data://garden/gapminder/2023-09-18/under_five_mortality
-    - data://garden/gapminder/2023-09-21/under_five_mortality
-  data://grapher/un/2024-09-16/long_run_child_mortality:
-    - data://garden/un/2024-09-16/long_run_child_mortality
 
     # Long-run child mortality, Gapminder + UN IGME - to update
   data://garden/un/2025-04-25/long_run_child_mortality:
@@ -652,7 +633,6 @@ steps:
   data://grapher/un/2025-05-15/un_members:
     - data://garden/un/2025-05-15/un_members
 
-
   # UNODC Homicide Data
   data://meadow/unodc/2025-05-28/homicide:
     - snapshot://unodc/2025-05-28/homicide.xlsx
@@ -663,7 +643,6 @@ steps:
   data://grapher/unodc/2025-05-28/homicide:
     - data://garden/unodc/2025-05-28/homicide
 
-
   # Housing prices 1870-2012 (Knoll paper)
   data://meadow/housing/2025-06-25/knoll_prices:
     - snapshot://housing/2025-06-25/knoll_prices.dta
@@ -673,7 +652,6 @@ steps:
   data://grapher/housing/2025-06-25/knoll_prices:
     - data://garden/housing/2025-06-25/knoll_prices
 
-
   # OECD Analytical House Prices
   data://meadow/oecd/2025-06-20/housing_prices:
     - snapshot://oecd/2025-06-20/housing_prices.csv
@@ -681,7 +659,6 @@ steps:
     - data://meadow/oecd/2025-06-20/housing_prices
   data://grapher/oecd/2025-06-20/housing_prices:
     - data://garden/oecd/2025-06-20/housing_prices
-
 
   # Same-Sex Marriage Around the World from Pew Research Center
   data://meadow/pew/2025-06-27/same_sex_marriage:
@@ -695,6 +672,16 @@ steps:
   data://grapher/pew/2025-06-27/same_sex_marriage:
     - data://garden/pew/2025-06-27/same_sex_marriage
 
+      # Child Mortality Estimates - UN IGME - to archive
+  data://meadow/un/2024-09-11/igme:
+    - snapshot://un/2024-09-11/igme.zip
+  data://garden/un/2024-09-11/igme:
+    - data://meadow/un/2024-09-11/igme
+    - data://garden/un/2018/igme
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2024-07-15/population
+  data://grapher/un/2024-09-11/igme:
+    - data://garden/un/2024-09-11/igme
   # WB income groups 2025-07-01
   data://meadow/wb/2025-07-01/income_groups:
     - snapshot://wb/2025-07-01/income_groups.xlsx
@@ -726,13 +713,13 @@ steps:
   data://meadow/media_cloud/2025-05-19/media_deaths:
     - snapshot://media_cloud/2025-05-19/media_deaths.csv
   data://garden/media_cloud/2025-05-19/media_deaths:
-     - data://meadow/media_cloud/2025-05-19/media_deaths
-     - data://meadow/cdc/2025-05-19/external_causes
-     - data://meadow/cdc/2025-05-19/leading_causes
+    - data://meadow/media_cloud/2025-05-19/media_deaths
+    - data://meadow/cdc/2025-05-19/external_causes
+    - data://meadow/cdc/2025-05-19/leading_causes
   data://grapher/media_cloud/2025-05-19/media_deaths:
     - data://garden/media_cloud/2025-05-19/media_deaths
 
-# CDC Wonder - Causes of Death
+  # CDC Wonder - Causes of Death
   data://meadow/cdc/2025-05-19/leading_causes:
     - snapshot://cdc/2025-05-19/leading_causes.csv
   data://meadow/cdc/2025-05-19/external_causes:
@@ -745,6 +732,21 @@ steps:
   data://grapher/oecd/2025-07-03/affordable_housing:
     - data://garden/oecd/2025-07-03/affordable_housing
 
+  #
+  # Gallup World Poll: Life in Five Years and Life Today
+  #
+  data-private://meadow/happiness/2025-07-22/life_in_five_years_and_life_today:
+    - snapshot-private://happiness/2025-07-22/life_in_five_years_and_life_today.xlsx
+  #
+  # Gallup World Poll: Life in Five Years and Life Today
+  #
+  data-private://garden/happiness/2025-07-22/life_in_five_years_and_life_today:
+    - data-private://meadow/happiness/2025-07-22/life_in_five_years_and_life_today
+  #
+  # Gallup World Poll: Life in Five Years and Life Today
+  #
+  data-private://grapher/happiness/2025-07-22/life_in_five_years_and_life_today:
+    - data-private://garden/happiness/2025-07-22/life_in_five_years_and_life_today
 
 include:
   - dag/open_numbers.yml

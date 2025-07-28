@@ -32,22 +32,28 @@ def run(dest_dir: str) -> None:
     #
     # Load inputs.
     #
-    ## Life tables
+    ## Life tables - a combination of HMD and UN WPP
     paths.log.info("reading dataset `life_tables`")
     ds_lt = paths.load_dataset("life_tables")
     tb_lt = ds_lt.read("life_tables")
+    # In this dataset HMD is used before 1950 and UN WPP after 1950.
+    tb_lt.loc[tb_lt["year"] < YEAR_WPP_START, "source"] = "Human Mortality Database"
+    tb_lt.loc[tb_lt["year"] >= YEAR_WPP_START, "source"] = "UN World Population Prospects"
     ## zijdeman_et_al_2015
     paths.log.info("reading dataset `zijdeman_et_al_2015`")
     ds_zi = paths.load_dataset("zijdeman_et_al_2015")
     tb_zi = ds_zi.read("zijdeman_et_al_2015")
+    tb_zi["source"] = "Zijdeman et al."
     ## Riley
     paths.log.info("reading dataset `riley_2005`")
     ds_ri = paths.load_dataset("riley_2005")
     tb_ri = ds_ri.read("riley_2005")
+    tb_ri["source"] = "Riley"
     ## WPP
     paths.log.info("reading dataset `un_wpp`")
     ds_un = paths.load_dataset("un_wpp")
     tb_un = ds_un.read("life_expectancy")
+    tb_un["source"] = "UN World Population Prospects"
 
     #
     # Process data.
@@ -75,6 +81,13 @@ def run(dest_dir: str) -> None:
     # Create three tables: (i) only historical values, (ii) only future values, (iii) all values
     columns_index = ["country", "year", "sex", "age"]
 
+    ## Add source table for period life expectancy at birth
+    tb_source = tb[(tb["sex"] == "total") & (tb["age"] == 0)].copy()
+    tb_source = tb_source[["country", "year", "source"]]
+    origins = tb["life_expectancy"].m.origins
+    tb_source["source"].m.origins = origins
+    tb = tb.drop(columns=["source"])
+
     ## (i) Main table (historical values)
     tb_main = tb.loc[tb["year"] <= YEAR_ESTIMATE_LAST].copy()
 
@@ -96,6 +109,7 @@ def run(dest_dir: str) -> None:
 
     # Format
     tables = [
+        tb_source.format(["country", "year"], short_name="life_expectancy_source"),
         tb_main.format(columns_index, short_name=paths.short_name),
         tb_only_proj.format(columns_index, short_name=f"{paths.short_name}_only_proj"),
         tb_with_proj.format(columns_index, short_name=f"{paths.short_name}_with_proj"),
@@ -125,7 +139,7 @@ def process_lt(tb: Table) -> Table:
     """
     tb = tb.loc[
         (tb["age"].isin(["0", "10", "15", "25", "45", "65", "80"])) & (tb["type"] == "period"),
-        ["country", "year", "sex", "age", "life_expectancy"],
+        ["country", "year", "sex", "age", "life_expectancy", "source"],
     ]
 
     # Assign dtype
@@ -163,7 +177,7 @@ def process_un(tb: Table) -> Table:
     ## columns: country, year, value, sex, age
     tb = tb.loc[
         (tb["year"] > YEAR_ESTIMATE_LAST) & (tb["variant"] == "medium"),
-        ["country", "year", "sex", "age", "life_expectancy"],
+        ["country", "year", "sex", "age", "life_expectancy", "source"],
     ]
 
     # Rename column values
@@ -264,16 +278,21 @@ def combine_tables(tb_lt: Table, tb_un: Table, tb_zi: Table, tb_ri: Table) -> Ta
     tb = tb.loc[~mask]
 
     # Extend tb_0 (only for period)
-    ## Zijdeman: complement country data
+    ## Zijdeman: complement country data - filling in blanks left by HMD and UN WPP
     tb_0 = tb_0.merge(tb_zi, how="outer", on=["country", "year", "sex", "age"], suffixes=("", "_zij"))
     tb_0["life_expectancy"] = tb_0["life_expectancy"].fillna(tb_0["life_expectancy_zij"])
-    tb_0 = tb_0.drop(columns=["life_expectancy_zij"])
+    tb_0["source"] = tb_0["source"].fillna(tb_0["source_zij"])
+    tb_0 = tb_0.drop(columns=["life_expectancy_zij", "source_zij"])
     ## Riley: complement with continent data
     tb_0 = pr.concat([tb_0, tb_ri], ignore_index=True)
 
     # Combine tb_0 with tb
     tb = tb.merge(tb_0, on=["country", "year", "sex", "age"], how="outer", suffixes=("", "_0"))
-
+    tb["source"] = tb["source"].fillna(tb["source_0"])
+    tb = tb.drop(columns=["source_0"])
+    assert all(
+        tb["source"].isin(["Riley", "Zijdeman et al.", "UN World Population Prospects", "Human Mortality Database"])
+    ), "No source found in table!"
     # For some reason, 'sex' is assigned type object
     tb["sex"] = tb["sex"].astype("string")
 

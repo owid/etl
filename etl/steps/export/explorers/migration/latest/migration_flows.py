@@ -22,7 +22,7 @@ def run() -> None:
 
     # Define common view configuration
     common_view_config = {
-        "type": "LineChart",
+        "type": "LineChart DiscreteBar",
         "hasMapTab": True,
         "tab": "map",
         "note": 'For most countries, immigrant means "born in another country". Someone who has gained citizenship in the country they live in is still counted as an immigrant if they were born elsewhere. For some countries, place of birth information is not available; in this case citizenship is used to define whether someone counts as an immigrant.',

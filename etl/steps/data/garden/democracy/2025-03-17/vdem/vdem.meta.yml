@@ -608,6 +608,13 @@ tables:
           Electoral democracy index ({definitions.auxiliary.estimate} estimate)
         description_short: &description_prod_electdem_vdem |-
           {definitions.auxiliary.estimate_title} estimate of the extent to which political leaders are elected under comprehensive suffrage in free and fair elections, and freedoms of association and expression are guaranteed.
+        description_key:
+          - This index, produced by Varieties of Democracy (V-Dem), is useful if you are interested in big and small differences in democracy, want scores for almost all countries, and prefer a narrow understanding of democracy. For data that focuses on big differences in political systems or has a broad understanding of democracy, other sources will be more useful. You can explore these alternatives in our [Key Democracy Charts](https://ourworldindata.org/democracy#all-charts) and [Democracy Data Explorer](https://ourworldindata.org/explorers/democracy?Dataset=Varieties+of+Democracy&Metric=Electoral+democracy&Sub-metric=Main+index&country=ARG~AUS~BWA~CHN~OWID_WRL).
+          - "It takes a narrow view of democracy by focusing on electoral political institutions: broad voting rights and free, fair, and meaningful elections."
+          - The index is based mainly on assessments by V-Dem's country experts. It also uses some factual information coded by its own researchers.
+          - |-
+            It is made up of five sub-indices: [elected officials](https://ourworldindata.org/grapher/elected-political-leaders-index), [free and fair elections](https://ourworldindata.org/grapher/free-and-fair-elections-index), [freedom of expression](https://ourworldindata.org/grapher/freedom-of-expression-index), [freedom of association](https://ourworldindata.org/grapher/freedom-of-association-index), and the [share of adult citizens who have the right to vote](https://ourworldindata.org/grapher/suffrage).
+          - *key_regions
         description_from_producer: |-
           Question: To what extent is the ideal of electoral democracy in its fullest sense achieved?
           Clarification: The electoral principle of democracy seeks to embody the core value of making rulers responsive to citizens, achieved through electoral competition for the electorate's approval under circumstances when suffrage is extensive; political and civil society organizations can operate freely; elections are clean and not marred by fraud or systematic irregularities; and elections affect the composition of the chief executive of the country. In between elections, there is freedom of expression and an independent media capable of presenting alternative views on matters of political relevance. In the V-Dem conceptual scheme, electoral democracy is understood as an essential element of any other conception of representative democracy — liberal, participatory, deliberative, egalitarian, or some other.
@@ -630,10 +637,16 @@ tables:
           <<: *ppt_multi_w_regions
           title_public: Liberal democracy index
         description_key:
-          - Measures how closely countries adhere to liberal democracy, emphasizing protection of individual and minority rights against state and majority tyranny.
-          - Integrates electoral democracy with constitutionally protected civil liberties, strong rule of law, judicial independence, and effective checks and balances.
-          - Higher scores (0-1 scale) indicate stronger achievement of liberal democratic ideals.
+          - This index, produced by Varieties of Democracy (V-Dem), is useful if you are interested in big and small differences in democracy, want scores for almost all countries, and prefer a narrow understanding of democracy. For data that focuses on big differences in political systems or has a broad understanding of democracy, other sources will be more useful. You can explore these alternatives in our [Key Democracy Charts](https://ourworldindata.org/democracy#all-charts) and [Democracy Data Explorer](https://ourworldindata.org/explorers/democracy?Dataset=Varieties+of+Democracy&Metric=Electoral+democracy&Sub-metric=Main+index&country=ARG~AUS~BWA~CHN~OWID_WRL).
+          - It takes a narrow view of democracy by focusing on electoral (free and fair elections) and liberal political institutions (civil rights and protection from the state).
+          - The index is based mainly on assessments by V-Dem's country experts. It also uses some factual information coded by its own researchers.
+          - |-
+            It is made up of eight sub-indices: the [share of adult citizens who have the right to vote](https://ourworldindata.org/grapher/suffrage), [elected officials](https://ourworldindata.org/grapher/elected-political-leaders-index), [free and fair elections](https://ourworldindata.org/grapher/free-and-fair-elections-index), [freedom of expression](https://ourworldindata.org/grapher/freedom-of-expression-index), [freedom of association](https://ourworldindata.org/grapher/freedom-of-association-index), [legislative constraints on the executive](https://ourworldindata.org/grapher/legislative-constraints-on-the-executive-index), [judicial constraints on the executive](https://ourworldindata.org/grapher/judicial-constraints-on-the-executive-index), and [individual liberties and equality before the law](https://ourworldindata.org/grapher/individual-liberties-and-equality-before-the-law-index).
           - *key_regions
+
+          # - Measures how closely countries adhere to liberal democracy, emphasizing protection of individual and minority rights against state and majority tyranny.
+          # - Integrates electoral democracy with constitutionally protected civil liberties, strong rule of law, judicial independence, and effective checks and balances.
+          # - Higher scores (0-1 scale) indicate stronger achievement of liberal democratic ideals.
         description_from_producer: |-
           Question: To what extent is the ideal of liberal democracy achieved?
 
@@ -1132,10 +1145,15 @@ tables:
           <<: *ppt_multi_w_regions
           title_public: Human rights index
         description_key:
-          - The Civil Liberties Index measures the extent to which individuals are free from government-imposed physical harm and unjust restrictions on private and political liberties.
-          - It is a composite index averaging scores on physical violence, political civil liberties, and private civil liberties.
-          - Higher values (on a 0–1 scale) indicate stronger protection of liberal freedoms such as safety, expression, and movement.
+          - This index, produced by Varieties of Democracy (V-Dem), is useful if you are especially interested in all people’s political, civil, and physical integrity rights. For data that focuses on specific groups and people’s economic and social rights, our topic pages on [Women’s Rights](https://ourworldindata.org/women-rights), [LGBT+ Rights](https://ourworldindata.org/lgbt-rights), [Food](https://ourworldindata.org/hunger-and-undernourishment), [Health](https://ourworldindata.org/health-meta), and [Education](https://ourworldindata.org/global-education) will be more useful.
+          - |-
+            It is made up of three sub-indices: [physical integrity rights](https://ourworldindata.org/grapher/physical-integrity-rights-index-vdem), [private civil liberties](https://ourworldindata.org/grapher/private-civil-liberties-index), and [political civil liberties](https://ourworldindata.org/grapher/political-civil-liberties-index).
+          - It is based on assessments by V-Dem's country experts.
           - *key_regions
+          # - The Civil Liberties Index measures the extent to which individuals are free from government-imposed physical harm and unjust restrictions on private and political liberties.
+          # - It is a composite index averaging scores on physical violence, political civil liberties, and private civil liberties.
+          # - Higher values (on a 0–1 scale) indicate stronger protection of liberal freedoms such as safety, expression, and movement.
+
         description_from_producer: |-
           Question: To what extent is civil liberty respected?
 
@@ -1213,10 +1231,14 @@ tables:
           <<: *ppt_multi_w_regions
           title_public: Political corruption index
         description_key:
-          - Measures the extent of political corruption across executive, legislative, judicial, and public sectors.
-          - Includes both petty and grand corruption, such as bribery, embezzlement, and misuse of office.
-          - Higher values (0–1 scale) indicate more pervasive corruption, reversing the typical V-Dem index direction.
+          - This index, produced by Varieties of Democracy (V-Dem), is useful if you are interested in bribery and embezzlement, especially at high levels, want scores for almost all countries, or are also interested in corruption in the more distant past. For data that focuses on people's or firms' everyday experiences and perceptions of corruption, other sources will be more useful. You can explore these alternatives on our [Corruption topic page](https://ourworldindata.org/corruption).
+          - The index is based on assessments by V-Dem's country experts.
+          - |-
+            It is made up of four sub-indices: [executive corruption](https://ourworldindata.org/grapher/executive-corruption-index), [legislative corruption](https://ourworldindata.org/grapher/legislative-corruption-score), [judicial corruption](https://ourworldindata.org/grapher/judicial-corruption-score), and [public sector corruption](https://ourworldindata.org/grapher/public-sector-corruption-index).
           - *key_regions
+          # - Measures the extent of political corruption across executive, legislative, judicial, and public sectors.
+          # - Includes both petty and grand corruption, such as bribery, embezzlement, and misuse of office.
+          # - Higher values (0–1 scale) indicate more pervasive corruption, reversing the typical V-Dem index direction.
         description_from_producer: |-
           Question: How pervasive is political corruption?
 
@@ -1267,6 +1289,13 @@ tables:
           Women's political empowerment index ({definitions.auxiliary.estimate} estimate)
         description_short: |-
           {definitions.auxiliary.estimate_title} estimate of the extent to which women enjoy civil liberties, can participate in civil society, and are represented in politics.
+        description_key:
+          - This index, produced by Varieties of Democracy (V-Dem), is useful if you are especially interested in women's political, civil, and physical integrity rights and want scores for almost all countries. For data that focuses on women's economic and social rights, other sources will be more useful. You can explore these alternatives on our [Women's Rights topic page](https://ourworldindata.org/women-rights).
+          - The index is based mainly on assessments by V-Dem's country experts. It also uses factual information on the share of women in parliament.
+          - |-
+            It is made up of three sub-indices: [women's civil liberties](https://ourworldindata.org/grapher/women-civil-liberties-index), [women's civil society participation](https://ourworldindata.org/grapher/women-civil-society-participation-index), and [women's political participation](https://ourworldindata.org/grapher/women-political-participation-index).
+          - *key_regions
+
         presentation:
           <<: *ppt_multi_w_regions
           title_public: Women's political empowerment index
@@ -1347,9 +1376,11 @@ tables:
           <<: *ppt_multi_w_regions
           title_public: Rule of Law index
         description_key:
-          - Measures how well laws are enforced transparently, impartially, independently, predictably, and equally.
-          - Includes indicators such as judicial independence, compliance with courts, public sector corruption, and access to justice.
-          - Higher values (0–1 scale) indicate stronger adherence to the rule of law.
+          - This index, produced by Varieties of Democracy (V-Dem), combines information on the compliance with the judiciary and high court, independence of lower and higher courts, respect of the executive for the constitution, rigorous and impartial public administration, transparent laws with predictable enforcement, access to justice, judicial accountability, judicial corruption, public sector corruption, and executive corruption.
+          - It is based on assessments by V-Dem’s country experts.
+          # - Measures how well laws are enforced transparently, impartially, independently, predictably, and equally.
+          # - Includes indicators such as judicial independence, compliance with courts, public sector corruption, and access to justice.
+          # - Higher values (0–1 scale) indicate stronger adherence to the rule of law.
           - *key_regions
         description_from_producer: |-
           Question: To what extent are laws transparently, independently, predictably, impartially, and equally enforced, and to what extent do the actions of government officials comply with the law?
@@ -1480,10 +1511,14 @@ tables:
           title_public: Free and fair elections index
           <<: *ppt_multi_w_regions
         description_key:
-          - Measures the extent to which elections are free from fraud, irregularities, intimidation, vote buying, and violence.
-          - Based on indicators such as EMB autonomy/capacity, voter registry quality, and fairness of election procedures.
-          - Higher values (0–1 scale) indicate cleaner, more democratic electoral processes.
+          - This index, produced by Varieties of Democracy (V-Dem), is useful if you are exclusively interested in how free and fair elections are. For data that focuses on how democratic a country's political system is more broadly, other sources will be more useful. You can explore these alternatives in our [Key Democracy Charts](https://ourworldindata.org/democracy#all-charts) and [Democracy Data Explorer](https://ourworldindata.org/explorers/democracy?Dataset=Varieties+of+Democracy&Metric=Electoral+democracy&Sub-metric=Main+index&country=ARG~AUS~BWA~CHN~OWID_WRL).
+          - It is based on assessments by V-Dem's country experts.
+          - It combines information on free and fair elections, the autonomy and capacity of the electoral management body, election voter registry, election vote buying, electoral intimidation by the government, electoral violence by non-state actors, and other voting irregularities.
           - *key_regions
+          # - Measures the extent to which elections are free from fraud, irregularities, intimidation, vote buying, and violence.
+          # - Based on indicators such as EMB autonomy/capacity, voter registry quality, and fairness of election procedures.
+          # - Higher values (0–1 scale) indicate cleaner, more democratic electoral processes.
+          # - *key_regions
         description_from_producer: |-
           Question: To what extent are elections free and fair?
 
@@ -1583,10 +1618,12 @@ tables:
           <<: *ppt_multi_w_regions
           title_public: Freedom of expression index
         description_key:
-          - Measures the extent to which governments respect freedoms of expression, academic and cultural expression, and access to alternative sources of information.
-          - Based on media censorship, harassment of journalists, media bias, self-censorship, freedom of discussion, and pluralism in media perspectives.
-          - Higher values (0–1 scale) indicate broader and more secure access to free and diverse information sources.
+          - This index, produced by Varieties of Democracy (V-Dem), combines information on freedom of discussion, freedom of academic and cultural expression, media censorship, media self-censorship, media bias, harassment of journalists, and the existence of critical and different perspectives in print and broadcast media.
+          - It is based on assessments by V-Dem's country experts.
           - *key_regions
+          # - Measures the extent to which governments respect freedoms of expression, academic and cultural expression, and access to alternative sources of information.
+          # - Based on media censorship, harassment of journalists, media bias, self-censorship, freedom of discussion, and pluralism in media perspectives.
+          # - Higher values (0–1 scale) indicate broader and more secure access to free and diverse information sources.
         description_from_producer: |-
           Question: To what extent does government respect press and media freedom, the freedom of ordinary people to discuss political matters at home and in the public sphere, as well as the freedom of academic and cultural expression?
 
