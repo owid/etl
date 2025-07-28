@@ -15,10 +15,11 @@ import base64
 import io
 import logging
 import os
+import re
 import urllib.parse
 import uuid
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 import httpx
 import pandas as pd
@@ -33,7 +34,8 @@ from sentry_sdk import logger as sentry_logger
 
 from etl.config import enable_sentry
 from mcp.types import ImageContent
-from owid_mcp.config import HTTP_TIMEOUT
+from owid_mcp.config import COMMON_ENTITIES, DATASETTE_BASE, HTTP_TIMEOUT, OWID_API_BASE
+from owid_mcp.data_utils import build_rows, fetch_json, rows_to_csv
 
 enable_sentry(enable_logs=True)
 
@@ -73,6 +75,9 @@ ALGOLIA_URL = f"https://{ALGOLIA_APP_ID.lower()}-dsn.algolia.net/1/indexes/*/que
 
 # Global mapping cache
 _NAME_TO_CODE_MAPPING: Optional[Dict[str, str]] = None
+
+# Country filter pattern for indicator search
+COUNTRY_RE = re.compile(r"\bcountry:(\w{2,3})\b", re.IGNORECASE)
 
 
 def _load_regions_mapping() -> Dict[str, str]:
@@ -143,8 +148,14 @@ mcp = FastMCP(
     stateless_http=True,
     name="OWID Deep Research",
     instructions=(
-        "Search OWID charts via Algolia and fetch CSV data for Deep‑Research workflows.\n\n"
-        "USAGE GUIDELINES:\n"
+        "Search OWID charts and indicators for Deep‑Research workflows.\n\n"
+        "AVAILABLE TOOLS:\n"
+        "• `search` - Find grapher charts via Algolia, returns CSV URLs\n"
+        "• `fetch` - Download CSV data from chart URLs (with optional time filtering)\n"
+        "• `fetch_image` - Download PNG images from chart URLs\n"
+        "• `search_indicators` - Find indicators by name/description, supports country: filter\n"
+        "• `fetch_indicator` - Download indicator data with metadata\n\n"
+        "CHART SEARCH (search/fetch/fetch_image):\n"
         "• Use `search` to find relevant grapher datasets, then `fetch` to get CSV data\n"
         "• IMPORTANT: Always include country names in your search query when looking for country-specific data (e.g., 'population France' not just 'population')\n"
         "• The fetch tool returns CSV data with Entity column removed - only Code, Year, and metric columns remain\n"
@@ -154,12 +165,20 @@ mcp = FastMCP(
         "• ALWAYS be specific with countries and time ranges to minimize data size:\n"
         "  - Use specific country names in search queries to get filtered results\n"
         "  - Use time parameter in fetch/fetch_image (e.g., '1990..2010', 'earliest..2010', '1990..latest')\n"
-        "  - Prefer narrow time ranges over full historical data when possible\n"
+        "  - Prefer narrow time ranges over full historical data when possible\n\n"
+        "INDICATOR SEARCH (search_indicators/fetch_indicator):\n"
+        "• Call `search_indicators` to find indicators by their NAME or DESCRIPTION (e.g., 'population density', 'GDP per capita', 'life expectancy')\n"
+        "• Do NOT include entity/country names in search queries - search only for the indicator concept itself\n"
+        "• Use optional country: filter for specific countries (e.g., 'population density country:US')\n"
+        "• Fetch indicators via returned IDs for all data or country-filtered data\n"
+        "• Entity names must match exactly as they appear in OWID:\n"
+        f"{COMMON_ENTITIES}\n\n"
+        "GENERAL GUIDELINES:\n"
         "• If fetched data doesn't contain the values you need, inform the user rather than making up data\n"
         "• Search results automatically filter for mentioned countries when detected in queries\n\n"
         "SEARCH OPTIMIZATION:\n"
         "• DO use simple, generic indicator names: 'coal production', 'population density', 'GDP per capita'\n"
-        "• DO include country names directly in queries: 'population France', 'emissions China'\n"
+        "• DO include country names directly in chart queries: 'population France', 'emissions China'\n"
         "• DO try exact phrase matching with quotes for specific metrics: 'coal production per capita'\n"
         "• DO use broad terms first, then narrow down if needed\n"
         "• DON'T include 'OWID' in search queries\n"
@@ -168,10 +187,11 @@ mcp = FastMCP(
         "• DON'T include quotes of any kind\n"
         "• DON'T combine too many filters in a single query\n\n"
         "SEARCH STRATEGY:\n"
-        "1. Start with simple indicator + country: 'coal production France'\n"
-        "2. If that fails, try just the indicator: 'coal production'\n"
-        "3. Use alternative phrasings: 'Per Capita production coal' instead of 'coal production per capita'\n"
-        "4. Avoid technical terms - search for concepts, not database field names"
+        "1. For charts: Start with simple indicator + country: 'coal production France'\n"
+        "2. For indicators: Use search_indicators with concept only: 'coal production'\n"
+        "3. If that fails, try just the indicator: 'coal production'\n"
+        "4. Use alternative phrasings: 'Per Capita production coal' instead of 'coal production per capita'\n"
+        "5. Avoid technical terms - search for concepts, not database field names"
     ),
 )
 
@@ -446,7 +466,7 @@ async def fetch_image(id: str, time: Optional[str] = None) -> ImageContent:
     png_params = {}
     if "country" in query_params:
         png_params["country"] = query_params["country"]
-    
+
     # Use time parameter from function argument or existing URL
     if time:
         png_params["time"] = [time]
