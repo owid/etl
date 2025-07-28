@@ -21,15 +21,15 @@ definitions:
     title_public: Life expectancy
     data_used: |-
       <%- if (age == 0) and (sex == 'total') -%>
-      Prior to 1950, we use HMD (2024) data combined with Zijdeman (2015). From 1950 onwards, we use UN WPP (2024) data. For old regional data, we use Riley (2005) estimates.
+      Prior to 1950, we used the Human Mortality Database (2024) data combined with Zijdeman (2015). For historical regional data, before 1950, we used Riley's (2005) estimates. From 1950 onwards, we used United Nations World Population Prospects (2024) data.
       <%- else -%>
-      Prior to 1950, we use HMD (2024) data. From 1950 onwards, we use UN WPP (2024) data.
+      Prior to 1950, we use Human Mortality Database (2024) data. From 1950 onwards, we use United Nations World Population Prospects (2024) data.
       <%- endif -%>
     point_1: |-
       Period life expectancy is a metric that summarizes death rates across all age groups in one particular year.
     point_2: |-
       <%- if age == '0' -%>
-      For a given year, it represents the average lifespan for a hypothetical group of people, if they experienced the same age-specific death rates throughout their whole lives as the age-specific death rates seen in that particular year.
+      It shows how long the average baby born in that year would be expected to live if they experienced the same chances of dying at each age as people did in that year.
       <%- else -%>
       For a given year, it represents the remaining average lifespan for a hypothetical group of people, if they experienced the same age-specific death rates throughout the rest of their lives as the age-specific death rates seen in that particular year.
       <%- endif -%>
@@ -69,7 +69,7 @@ definitions:
       numDecimalPlaces: 1
     unit: years
     short_unit: years
-    processing_level: minor
+    processing_level: major
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
@@ -96,15 +96,35 @@ tables:
 
       life_expectancy_0:
         title: |-
-          {definitions.global.title_base} at birth
-        display: *display_hist
+          Period life expectancy at birth
+        description_short: "[Period life expectancy](#dod:period-life-expectancy) is the number of years the average person born in a certain year would live if they experienced the same chances of dying at each age as people did that year."
+        description_key:
+          - Across the world, people are living longer. In 1900, the global average life expectancy was 32 years. By 2023, this had more than doubled to 73 years.
+          - Countries around the world made big improvements, and life expectancy more than doubled in every region. This wasn’t just due to falling child mortality; people started living longer at all ages.
+          - Even after World War II, there have been large drops in life expectancy, such as during the Great Leap Forward famine in China, the HIV/AIDS epidemic in sub-Saharan Africa, the Rwandan genocide, or the COVID-19 pandemic.
+          - This chart shows long-run estimates of life expectancy compiled by our team from several data sources.
+          - Period life expectancy is an indicator that summarizes death rates across all age groups in one particular year. It shows how long the average baby born in that year would be expected to live if they experienced the same chances of dying at each age as people did in that year.
+          - Before 1950, for country-level data, we rely on the [Human Mortality Database (2024)](https://www.mortality.org/Data/ZippedDataFiles) combined with [Zijdeman (2015)](https://clio-infra.eu/Indicators/LifeExpectancyatBirthTotal.html). For regional data, we use [Riley (2005)](https://doi.org/10.1111/j.1728-4457.2005.00083.x). From 1950 onward, we use the [United Nations World Population Prospects (2024)](https://population.un.org/wpp/Download/).
+        description_processing: |-
+          This chart combines data from several sources. For country-level data before 1950, we use the Human Mortality Database (2024) data and Zijdeman et al. (2015). For country-years where these sources overlap, we use the Human Mortality Database.
+
+          For regional data, before 1950, we use Riley's (2005) estimates.
+
+          From 1950 onwards, we use the United Nations World Population Prospects (2024) for both country-level and regional data.
+
+        # add a note on what is preferred out of HMD and Zijdeman where they overlap.
+        display:
+          name: Life expectancy
+          numDecimalPlaces: 1
         presentation:
-          attribution_short: Various sources
-          title_variant: *title_variant_hist
+          title_public: Life expectancy
+          title_variant: Long-run data
+          attribution_short: Riley; Zijdeman et al.; HMD; UN WPP
           grapher_config:
             selectedEntityNames: *sel_entities_americas
           attribution: |-
-            UN WPP (2024); HMD (2024); Zijdeman et al. (2015); Riley (2005)
+            Riley (2005); Zijdeman et al. (2015); HMD (2024); UN WPP (2024)
+        processing_level: major
 
   # WITH PROJECTIONS
   life_expectancy_with_proj:
@@ -124,7 +144,6 @@ tables:
           {definitions.global.title_base} at birth (with projections)
         display: *display_w_proj
         presentation:
-          attribution_short: Various sources
           title_variant: *title_variant_w_proj
           grapher_config:
             selectedEntityNames: *sel_entities_americas
@@ -164,3 +183,20 @@ tables:
           title_variant: *title_variant_o_proj
           grapher_config:
             selectedEntityNames: *sel_entities_americas
+      ### Source table
+  life_expectancy_source:
+    variables:
+      source:
+        title: Source of life expectancy at birth data
+        description_short: |-
+          The source of the life expectancy at birth data.
+        description_key:
+          - |-
+            The source of the life expectancy at birth data used for each country and year.
+        unit: ""
+        short_unit: ""
+        display:
+          name: Source
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Source
