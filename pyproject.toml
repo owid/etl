@@ -73,8 +73,6 @@ dependencies = [
     "fastjsonschema>=2.21.1",
     "mediacloud>=4.4.0",
     "fastmcp>=2.10.5",
-    "playwright>=1.53.0",
-    "pycountry>=24.6.1",
 ]
 
 [tool.uv.sources]

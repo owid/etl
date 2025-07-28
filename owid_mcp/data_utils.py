@@ -5,6 +5,7 @@ Shared utilities for data processing and API interactions across MCP modules.
 """
 
 import asyncio
+import math
 import re
 import urllib.parse
 from pathlib import Path
@@ -14,7 +15,7 @@ import httpx
 import structlog
 import yaml
 
-from owid_mcp.config import DATASETTE_BASE, HTTP_TIMEOUT, MAX_ROWS_DEFAULT, MAX_ROWS_HARD, OWID_API_BASE
+from owid_mcp.config import CATALOG_BASE, DATASETTE_BASE, HTTP_TIMEOUT, MAX_ROWS_DEFAULT, MAX_ROWS_HARD, OWID_API_BASE
 
 log = structlog.get_logger()
 
@@ -82,16 +83,16 @@ def country_name_to_iso3(name: Optional[str]) -> Optional[str]:
 
 async def make_algolia_request(query: str, limit: int = 10) -> List[Dict[str, Any]]:
     """Make a request to Algolia search API and return the hits.
-    
+
     Args:
         query: Search query string
         limit: Maximum number of results to return
-        
+
     Returns:
         List of search hits from Algolia
     """
     log.debug("algolia.request", query=query, limit=limit)
-    
+
     payload = {
         "requests": [
             {
@@ -99,7 +100,7 @@ async def make_algolia_request(query: str, limit: int = 10) -> List[Dict[str, An
                 "attributesToRetrieve": [
                     "title",
                     "slug",
-                    "availableEntities", 
+                    "availableEntities",
                     "variantName",
                     "type",
                 ],
@@ -190,8 +191,7 @@ def smart_round(value: float | None) -> float | None:
     - Large numbers (1000 - 10000): rounded to 1 decimal place
     - Very large numbers (>10000): rounded to integers
     """
-    import math
-    
+
     if value is None:
         return None
 
@@ -333,8 +333,6 @@ def build_catalog_info(catalog_path: str) -> Dict[str, str]:
     Args:
         catalog_path: Path like 'grapher/biodiversity/2025-04-07/cherry_blossom/cherry_blossom#average_20_years'
     """
-    from owid_mcp.config import CATALOG_BASE
-
     # Split on '#' to separate path from column
     path, column = catalog_path.split("#")
 
@@ -351,5 +349,3 @@ def build_catalog_info(catalog_path: str) -> Dict[str, str]:
         "sql_template": sql_tpl,
         "column": column,
     }
-
-

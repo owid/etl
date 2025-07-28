@@ -3,7 +3,7 @@ import base64
 import pytest
 from fastmcp import Client
 
-from mcp.types import TextResourceContents
+from mcp.types import BlobResourceContents, TextResourceContents
 from owid_mcp.server import mcp
 
 

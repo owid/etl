@@ -10,7 +10,29 @@ from sentry_sdk import logger as sentry_logger
 from owid_mcp import deep_research_algolia, indicators, posts
 from owid_mcp.config import COMMON_ENTITIES
 
-INSTRUCTIONS = "Entity names must match exactly as they appear in OWID:\n" f"{COMMON_ENTITIES}"
+INSTRUCTIONS = (
+    "GENERAL GUIDELINES:\n"
+    "• If fetched data doesn't contain the values you need, inform the user rather than making up data\n"
+    "• Search results automatically filter for mentioned countries when detected in queries\n"
+    "SEARCH OPTIMIZATION:\n"
+    "• DO use simple, generic indicator names: 'coal production', 'population density', 'GDP per capita'\n"
+    "• DO include country names directly in chart queries: 'population France', 'emissions China'\n"
+    "• DO try exact phrase matching with quotes for specific metrics: 'coal production per capita'\n"
+    "• DO use broad terms first, then narrow down if needed\n"
+    "• DON'T include 'OWID' in search queries\n"
+    "• DON'T use overly specific queries like 'coal production per capita France Germany OWID'\n"
+    "• DON'T include terms like 'dataset', 'grapher', 'Our World in Data' in searches\n"
+    "• DON'T include quotes of any kind\n"
+    "• DON'T combine too many filters in a single query\n\n"
+    "SEARCH STRATEGY:\n"
+    "1. For charts: Start with simple indicator + country: 'coal production France'\n"
+    "2. For indicators: Use search_indicators with concept only: 'coal production'\n"
+    "3. If that fails, try just the indicator: 'coal production'\n"
+    "4. Use alternative phrasings: 'Per Capita production coal' instead of 'coal production per capita'\n"
+    "5. Avoid technical terms - search for concepts, not database field names"
+)
+
+INSTRUCTIONS_ENTITIES = "• Entity names must match exactly as they appear in OWID:\n" f"{COMMON_ENTITIES}\n\n"
 
 # NOTE:
 # Because the ChatGPT connector doesn’t perform a session‑ID handshake (it just fires off JSON‑RPC POSTs),
@@ -24,7 +46,15 @@ INSTRUCTIONS = "Entity names must match exactly as they appear in OWID:\n" f"{CO
 mcp = FastMCP(
     stateless_http=True,
     name="Our World in Data MCP",
-    instructions="\n\n".join([deep_research_algolia.INSTRUCTIONS, indicators.INSTRUCTIONS, posts.INSTRUCTIONS, INSTRUCTIONS]),
+    instructions="\n\n".join(
+        [
+            INSTRUCTIONS,
+            deep_research_algolia.INSTRUCTIONS,
+            indicators.INSTRUCTIONS,
+            posts.INSTRUCTIONS,
+            INSTRUCTIONS_ENTITIES,
+        ]
+    ),
 )
 
 

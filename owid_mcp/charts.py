@@ -1,28 +1,13 @@
-import asyncio
-import base64
-import io
-import logging
-import os
-import re
 import urllib.parse
-import uuid
-from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Optional
 
 import httpx
-import pandas as pd
 import structlog
-import yaml
 from fastmcp import FastMCP
-from fastmcp.server.middleware import Middleware, MiddlewareContext
 from fastmcp.utilities.types import Image
-from pydantic import BaseModel
-from sentry_sdk import capture_exception
-from sentry_sdk import logger as sentry_logger
 
-from etl.config import enable_sentry
 from mcp.types import ImageContent
-from owid_mcp.config import COMMON_ENTITIES, DATASETTE_BASE, HTTP_TIMEOUT, OWID_API_BASE
+from owid_mcp.config import HTTP_TIMEOUT
 
 log = structlog.get_logger()
 
@@ -45,7 +30,7 @@ mcp = FastMCP()
 
 
 @mcp.tool
-async def fetch_chart(id: str, time: Optional[str] = None) -> ImageContent:
+async def fetch_chart_image(id: str, time: Optional[str] = None) -> ImageContent:
     """Download a grapher PNG image by converting CSV URL to PNG URL.
 
     Takes a CSV URL from search results and converts it to PNG format by replacing
@@ -58,7 +43,7 @@ async def fetch_chart(id: str, time: Optional[str] = None) -> ImageContent:
     Returns:
         ImageContent with base64-encoded PNG data.
     """
-    log.info("deep‑research.fetch_image", url=id, time=time)
+    log.info("chart.fetch_image", url=id, time=time)
 
     if not id.startswith("http"):
         # Return a text response for invalid URLs - FastMCP will handle the conversion
@@ -102,5 +87,5 @@ async def fetch_chart(id: str, time: Optional[str] = None) -> ImageContent:
         return img_obj.to_image_content()
 
     except Exception as exc:
-        log.warning("deep‑research.fetch_image.error", url=png_url, error=str(exc))
+        log.warning("chart.fetch_image.error", url=png_url, error=str(exc))
         raise ValueError(f"Failed to download PNG: {exc}")

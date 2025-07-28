@@ -20,7 +20,7 @@ from pydantic import BaseModel
 
 from etl.config import enable_sentry
 from mcp.types import ImageContent
-from owid_mcp.config import COMMON_ENTITIES, DATASETTE_BASE, HTTP_TIMEOUT, OWID_API_BASE
+from owid_mcp.config import DATASETTE_BASE, HTTP_TIMEOUT, OWID_API_BASE
 from owid_mcp.data_utils import build_rows, fetch_json, rows_to_csv, country_name_to_iso3, make_algolia_request
 
 enable_sentry(enable_logs=True)
@@ -61,39 +61,15 @@ COUNTRY_RE = re.compile(r"\bcountry:(\w{2,3})\b", re.IGNORECASE)
 
 
 INSTRUCTIONS = (
-    "Search and fetch charts and indicators from Our World in Data..\n\n"
-    "AVAILABLE TOOLS:\n"
+    "CHART SEARCH AND FETCH:\n"
     "• `search` - Find grapher charts via Algolia, returns CSV URLs\n"
-    "• `fetch` - Download CSV data from chart URLs (with optional time filtering)\n"
-    "• `fetch_chart` - Download PNG images from chart URLs\n"
-    "• `search_indicators` - Find indicators by name/description, supports country: filter\n"
-    "• `fetch_indicator` - Download indicator data with metadata\n\n"
-    "INDICATOR SEARCH (search_indicators/fetch_indicator):\n"
-    "• Call `search_indicators` to find indicators by their NAME or DESCRIPTION (e.g., 'population density', 'GDP per capita', 'life expectancy')\n"
-    "• Do NOT include entity/country names in search queries - search only for the indicator concept itself\n"
-    "• Use optional country: filter for specific countries (e.g., 'population density country:US')\n"
-    "• Fetch indicators via returned IDs for all data or country-filtered data\n"
-    "• Entity names must match exactly as they appear in OWID:\n"
-    f"{COMMON_ENTITIES}\n\n"
-    "GENERAL GUIDELINES:\n"
-    "• If fetched data doesn't contain the values you need, inform the user rather than making up data\n"
-    "• Search results automatically filter for mentioned countries when detected in queries\n\n"
-    "SEARCH OPTIMIZATION:\n"
-    "• DO use simple, generic indicator names: 'coal production', 'population density', 'GDP per capita'\n"
-    "• DO include country names directly in chart queries: 'population France', 'emissions China'\n"
-    "• DO try exact phrase matching with quotes for specific metrics: 'coal production per capita'\n"
-    "• DO use broad terms first, then narrow down if needed\n"
-    "• DON'T include 'OWID' in search queries\n"
-    "• DON'T use overly specific queries like 'coal production per capita France Germany OWID'\n"
-    "• DON'T include terms like 'dataset', 'grapher', 'Our World in Data' in searches\n"
-    "• DON'T include quotes of any kind\n"
-    "• DON'T combine too many filters in a single query\n\n"
-    "SEARCH STRATEGY:\n"
-    "1. For charts: Start with simple indicator + country: 'coal production France'\n"
-    "2. For indicators: Use search_indicators with concept only: 'coal production'\n"
-    "3. If that fails, try just the indicator: 'coal production'\n"
-    "4. Use alternative phrasings: 'Per Capita production coal' instead of 'coal production per capita'\n"
-    "5. Avoid technical terms - search for concepts, not database field names"
+    "• `fetch` - Download CSV data from chart URLs (with optional time filtering)\n\n"
+    "USAGE:\n"
+    "• Include country names in search queries for country-specific data: 'population France', 'emissions China'\n"
+    "• Use simple, generic indicator names: 'coal production', 'population density', 'GDP per capita'\n"
+    "• Try broad terms first, then narrow down if needed\n"
+    "• Use time parameter in fetch for filtering (e.g., '1990..2010', 'earliest..2010', '1990..latest')\n"
+    "• The fetch tool returns CSV data with Entity column removed - only Code, Year, and metric columns remain"
 )
 
 mcp = FastMCP()

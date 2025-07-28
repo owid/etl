@@ -1,6 +1,7 @@
 """Configuration for OWID MCP Server."""
 
 import os
+
 import httpx
 
 # Base URLs
