@@ -18,7 +18,7 @@ tables:
         unit: 'approvals'
         short_unit: ''
         description_short: |-
-          The annual number of new drugs approved by the FDA. This is broken down into [new chemical drugs](#dod:new-molecular-entity), new vaccines, and other new biologics such as antibodies and gene therapies. The data does not include [generics](#dod:generic-drug), reformulations, or [biosimilars](#dod:biosimilar).
+          The annual number of new drugs approved by the US Food and Drug Administration (FDA). This is broken down into [new chemical drugs](#dod:new-molecular-entity), new vaccines, and other new biologics such as antibodies and gene therapies. The data does not include [generics](#dod:generic-drug), reformulations, or [biosimilars](#dod:biosimilar).
         display:
           numDecimalPlaces: 0
         description_processing: |-
@@ -32,7 +32,7 @@ tables:
   drug_approvals_designations:
     variables:
       approvals:
-        title: New drugs approved by CDER, by designations
+        title: New drugs approved in the United States, by designations
         unit: 'approvals'
         short_unit: ''
         description_short: |-
@@ -42,8 +42,8 @@ tables:
         presentation:
           grapher_config:
             note: |-
-              Designations can be overlapping; a drug can receive multiple designations. CDER is part of the U.S. Food and Drug Administration (FDA).
+              Designations can be overlapping; a drug can receive multiple designations or no designation at all. CDER is part of the U.S. Food and Drug Administration (FDA).
         description_processing: |-
-          - This data includes [new molecular entities](#dod:new-molecular-entity) (NMEs) approved by the Center for Drug Evaluation and Research (CDER).
+          - This data only includes drugs approved by the Center for Drug Evaluation and Research (CDER).
 
 
