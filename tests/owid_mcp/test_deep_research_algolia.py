@@ -3,7 +3,6 @@ Tests for OWID Deep Research Algolia MCP Module.
 """
 
 import base64
-import json
 
 import pytest
 from fastmcp import Client
@@ -27,27 +26,27 @@ class TestCountryNameToIso3:
         # Test case-insensitive lookups work
         assert country_name_to_iso3("World") == "OWID_WRL"
         assert country_name_to_iso3("world") == "OWID_WRL"
-        
+
         # Test standard countries work
         assert country_name_to_iso3("France") == "FRA"
         assert country_name_to_iso3("france") == "FRA"
         assert country_name_to_iso3("United States") == "USA"
-        
+
         # Test EU mapping (uses actual code from regions file)
         assert country_name_to_iso3("European Union (27)") == "OWID_EU27"
-        
+
         # Test unknown country
         assert country_name_to_iso3("Unknown Country") is None
 
     def test_regions_file_loading(self):
         """Test that regions file can be loaded successfully."""
         from owid_mcp.deep_research_algolia import _load_regions_mapping
-        
+
         # This should not raise an exception
         mapping = _load_regions_mapping()
         assert isinstance(mapping, dict)
         assert len(mapping) > 0
-        
+
         # Check some expected mappings exist
         assert "france" in mapping
         assert "united states" in mapping
@@ -59,14 +58,14 @@ class TestCountryNameToIso3:
         # These will depend on what's actually in the regions.yml file
         result = country_name_to_iso3("United States")
         assert result == "USA" or result is not None  # Should find some mapping
-        
+
     def test_case_insensitive_lookup(self):
         """Test case insensitive country name lookup."""
         # Test same country in different cases
         france_upper = country_name_to_iso3("FRANCE")
-        france_lower = country_name_to_iso3("france") 
+        france_lower = country_name_to_iso3("france")
         france_mixed = country_name_to_iso3("France")
-        
+
         assert france_upper == france_lower == france_mixed == "FRA"
 
 
@@ -139,17 +138,17 @@ class TestFetchTool:
 
             assert result is not None
             assert result.data is not None
-            
+
             # Verify the CSV structure
             csv_text = result.data.text
             assert isinstance(csv_text, str)
             assert len(csv_text) > 0
-            
+
             # Check that Entity column was removed
-            lines = csv_text.strip().split('\n')
+            lines = csv_text.strip().split("\n")
             header = lines[0]
-            assert 'Entity' not in header, f"Entity column should be removed, but header is: {header}"
-            
+            assert "Entity" not in header, f"Entity column should be removed, but header is: {header}"
+
             # Basic validation that fetch worked
             print(f"CSV header: {header}")
             print(f"Number of data rows: {len(lines) - 1}")
@@ -244,19 +243,19 @@ class TestFetchImageTool:
             assert result is not None
             assert not result.is_error
             assert len(result.content) == 1
-            
+
             # Check that we got an ImageContent response
             image_content = result.content[0]
             assert image_content.type == "image"
-            assert hasattr(image_content, 'data')
+            assert hasattr(image_content, "data")
             assert isinstance(image_content.data, str)
-            
+
             # Verify it's valid base64
             try:
                 base64.b64decode(image_content.data)
             except Exception as e:
                 pytest.fail(f"Invalid base64 data: {e}")
-                
+
             print(f"Successfully fetched image, base64 length: {len(image_content.data)}")
 
     @pytest.mark.asyncio
@@ -277,12 +276,12 @@ class TestFetchImageTool:
     async def test_fetch_image_invalid_id(self):
         """Test fetch_image with invalid ID (not a URL)."""
         from fastmcp.exceptions import ToolError
-        
+
         async with Client(mcp) as client:
             # When raise_on_error=True (default), exceptions are raised instead of returned
             with pytest.raises(ToolError) as exc_info:
                 await client.call_tool("fetch_image", {"id": "not-a-url"})
-            
+
             assert "Invalid ID" in str(exc_info.value)
             print("Successfully handled invalid URL for fetch_image")
 
@@ -290,13 +289,13 @@ class TestFetchImageTool:
     async def test_fetch_image_nonexistent_chart(self):
         """Test fetch_image with nonexistent chart."""
         from fastmcp.exceptions import ToolError
-        
+
         async with Client(mcp) as client:
             # When raise_on_error=True (default), exceptions are raised instead of returned
             with pytest.raises(ToolError) as exc_info:
                 await client.call_tool(
                     "fetch_image", {"id": "https://ourworldindata.org/grapher/nonexistent-chart-12345.csv"}
                 )
-            
+
             assert "Failed to download PNG" in str(exc_info.value)
             print("Successfully handled nonexistent chart for fetch_image")

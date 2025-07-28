@@ -13,8 +13,10 @@ country via Algolia’s `availableEntities` list.
 import asyncio
 import base64
 import io
-import json
+import logging
+import os
 import urllib.parse
+import uuid
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -23,11 +25,17 @@ import pandas as pd
 import structlog
 import yaml
 from fastmcp import FastMCP
+from fastmcp.server.middleware import Middleware, MiddlewareContext
 from fastmcp.utilities.types import Image
-from mcp.types import ImageContent
 from pydantic import BaseModel
+from sentry_sdk import capture_exception
+from sentry_sdk import logger as sentry_logger
 
+from etl.config import enable_sentry
+from mcp.types import ImageContent
 from owid_mcp.config import HTTP_TIMEOUT
+
+enable_sentry(enable_logs=True)
 
 log = structlog.get_logger()
 
@@ -159,6 +167,37 @@ mcp = FastMCP(
         "4. Avoid technical terms - search for concepts, not database field names"
     ),
 )
+
+
+# ————————————————
+# 3. FastMCP middleware: log method and payload
+# ————————————————
+class RequestLoggingMiddleware(Middleware):
+    async def on_message(self, context: MiddlewareContext, call_next):
+        attributes = {
+            "request_id": str(uuid.uuid4()),
+            "method": context.method,
+            "message": str(context.message),
+        }
+
+        # Log incoming request
+        sentry_logger.info(
+            "request started",
+            attributes=attributes,
+        )
+
+        # handle request
+        try:
+            result = await call_next(context)
+        except Exception as e:
+            capture_exception(e)
+            raise e
+
+        return result
+
+
+# Add the logging middleware
+mcp.add_middleware(RequestLoggingMiddleware())
 
 # ---------------------------------------------------------------------------
 # SEARCH TOOL – Algolia proxy
@@ -346,7 +385,7 @@ async def fetch(id: str) -> FetchResult:
         log.warning("deep‑research.fetch.error", url=id, error=str(exc))
         return FetchResult(
             id=id,
-            title=f"Error fetching CSV",
+            title="Error fetching CSV",
             text=f"Failed to download CSV: {exc}",
             url=id,
             metadata={"error": str(exc)},
@@ -378,28 +417,27 @@ async def fetch_image(id: str) -> ImageContent:
         raise ValueError("Invalid ID (expected URL)")
 
     # Convert CSV URL to PNG URL by replacing .csv with .png
-    png_url = id.replace('.csv', '.png')
+    png_url = id.replace(".csv", ".png")
 
     # Remove CSV-specific query parameters that don't make sense for PNG
     parsed = urllib.parse.urlparse(png_url)
     query_params = urllib.parse.parse_qs(parsed.query)
-    
+
     # Keep only PNG-relevant parameters
     png_params = {}
-    if 'country' in query_params:
-        png_params['country'] = query_params['country']
-    if 'time' in query_params:
-        png_params['time'] = query_params['time']
-    
+    if "country" in query_params:
+        png_params["country"] = query_params["country"]
+    if "time" in query_params:
+        png_params["time"] = query_params["time"]
+
     # Add chart tab parameter for PNG
-    png_params['tab'] = ['chart']
-    
+    png_params["tab"] = ["chart"]
+
     # Reconstruct URL with PNG-appropriate parameters
     new_query = urllib.parse.urlencode(png_params, doseq=True)
-    png_url = urllib.parse.urlunparse((
-        parsed.scheme, parsed.netloc, parsed.path, 
-        parsed.params, new_query, parsed.fragment
-    ))
+    png_url = urllib.parse.urlunparse(
+        (parsed.scheme, parsed.netloc, parsed.path, parsed.params, new_query, parsed.fragment)
+    )
 
     try:
         async with httpx.AsyncClient(timeout=HTTP_TIMEOUT) as client:
