@@ -18,22 +18,15 @@ from owid_mcp.data_utils import build_catalog_info, fetch_indicator_data
 log = structlog.get_logger()
 
 
-
-# Create the indicators MCP server
-mcp = FastMCP(
-    name="OWID Indicators",
-    instructions=(
-        "Search and fetch indicators from Our World in Data. "
-        "Call `search_indicator` to find indicators by their NAME or DESCRIPTION (e.g., 'population density', 'GDP per capita', 'life expectancy'). "
-        "Do NOT include entity/country names in search queries - search only for the indicator concept itself. "
-        "Fetch indicators via `ind://{id}` for all data or `ind://{id}/{entity}` for specific country/entity data. "
-        "Call `run_sql` to execute read-only SQL SELECT queries against the public Datasette."
-    ),
+INSTRUCTIONS = (
+    "Search and fetch indicators from Our World in Data. "
+    "Call `search_indicator` to find indicators by their NAME or DESCRIPTION (e.g., 'population density', 'GDP per capita', 'life expectancy'). "
+    "Do NOT include entity/country names in search queries - search only for the indicator concept itself. "
+    "Fetch indicators via `ind://{id}` for all data or `ind://{id}/{entity}` for specific country/entity data. "
+    "Call `run_sql` to execute read-only SQL SELECT queries against the public Datasette."
 )
 
-
-
-
+mcp = FastMCP()
 
 
 @mcp.tool
@@ -104,7 +97,6 @@ async def search_indicator(query: str, limit: int = 10) -> List[Dict]:
 
     log.info("Search completed", found=len(results))
     return results
-
 
 
 SQL_SELECT_RE = re.compile(r"^\s*select\b", re.IGNORECASE | re.DOTALL)

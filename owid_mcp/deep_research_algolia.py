@@ -1,15 +1,3 @@
-"""
-OWID Deep Research MCP Module
------------------------------
-Provides **search** and **fetch** tools compatible with OpenAI Deep‑Research.
-
-* `search(query)` returns grapher **CSV URLs** (one per hit).
-* `fetch(id)` downloads that CSV and returns the processed data (Entity column removed).
-
-No special `country:` token parsing—each hit already hints at the most relevant
-country via Algolia’s `availableEntities` list.
-"""
-
 import asyncio
 import base64
 import io
@@ -144,61 +132,57 @@ def country_name_to_iso3(name: Optional[str]) -> Optional[str]:
 # it successfully makes the first request but the subsequent request fails with 404. So it's likely something
 # about the session ID.
 
-mcp = FastMCP(
-    stateless_http=True,
-    name="OWID Deep Research",
-    instructions=(
-        "Search OWID charts and indicators for Deep‑Research workflows.\n\n"
-        "AVAILABLE TOOLS:\n"
-        "• `search` - Find grapher charts via Algolia, returns CSV URLs\n"
-        "• `fetch` - Download CSV data from chart URLs (with optional time filtering)\n"
-        "• `fetch_image` - Download PNG images from chart URLs\n"
-        "• `search_indicators` - Find indicators by name/description, supports country: filter\n"
-        "• `fetch_indicator` - Download indicator data with metadata\n\n"
-        "CHART SEARCH (search/fetch/fetch_image):\n"
-        "• Use `search` to find relevant grapher datasets, then `fetch` to get CSV data\n"
-        "• IMPORTANT: Always include country names in your search query when looking for country-specific data (e.g., 'population France' not just 'population')\n"
-        "• The fetch tool returns CSV data with Entity column removed - only Code, Year, and metric columns remain\n"
-        "• INTERACTIVE CHARTS: Users can view interactive charts by removing '.csv' from search result URLs\n"
-        "  - Always inform users they can open interactive charts using the provided links\n"
-        "  - Example: https://ourworldindata.org/grapher/population-density becomes interactive chart\n"
-        "• ALWAYS be specific with countries and time ranges to minimize data size:\n"
-        "  - Use specific country names in search queries to get filtered results\n"
-        "  - Use time parameter in fetch/fetch_image (e.g., '1990..2010', 'earliest..2010', '1990..latest')\n"
-        "  - Prefer narrow time ranges over full historical data when possible\n\n"
-        "INDICATOR SEARCH (search_indicators/fetch_indicator):\n"
-        "• Call `search_indicators` to find indicators by their NAME or DESCRIPTION (e.g., 'population density', 'GDP per capita', 'life expectancy')\n"
-        "• Do NOT include entity/country names in search queries - search only for the indicator concept itself\n"
-        "• Use optional country: filter for specific countries (e.g., 'population density country:US')\n"
-        "• Fetch indicators via returned IDs for all data or country-filtered data\n"
-        "• Entity names must match exactly as they appear in OWID:\n"
-        f"{COMMON_ENTITIES}\n\n"
-        "GENERAL GUIDELINES:\n"
-        "• If fetched data doesn't contain the values you need, inform the user rather than making up data\n"
-        "• Search results automatically filter for mentioned countries when detected in queries\n\n"
-        "SEARCH OPTIMIZATION:\n"
-        "• DO use simple, generic indicator names: 'coal production', 'population density', 'GDP per capita'\n"
-        "• DO include country names directly in chart queries: 'population France', 'emissions China'\n"
-        "• DO try exact phrase matching with quotes for specific metrics: 'coal production per capita'\n"
-        "• DO use broad terms first, then narrow down if needed\n"
-        "• DON'T include 'OWID' in search queries\n"
-        "• DON'T use overly specific queries like 'coal production per capita France Germany OWID'\n"
-        "• DON'T include terms like 'dataset', 'grapher', 'Our World in Data' in searches\n"
-        "• DON'T include quotes of any kind\n"
-        "• DON'T combine too many filters in a single query\n\n"
-        "SEARCH STRATEGY:\n"
-        "1. For charts: Start with simple indicator + country: 'coal production France'\n"
-        "2. For indicators: Use search_indicators with concept only: 'coal production'\n"
-        "3. If that fails, try just the indicator: 'coal production'\n"
-        "4. Use alternative phrasings: 'Per Capita production coal' instead of 'coal production per capita'\n"
-        "5. Avoid technical terms - search for concepts, not database field names"
-    ),
+INSTRUCTIONS = (
+    "Search and fetch charts and indicators from Our World in Data..\n\n"
+    "AVAILABLE TOOLS:\n"
+    "• `search` - Find grapher charts via Algolia, returns CSV URLs\n"
+    "• `fetch` - Download CSV data from chart URLs (with optional time filtering)\n"
+    "• `fetch_image` - Download PNG images from chart URLs\n"
+    "• `search_indicators` - Find indicators by name/description, supports country: filter\n"
+    "• `fetch_indicator` - Download indicator data with metadata\n\n"
+    "CHART SEARCH (search/fetch/fetch_image):\n"
+    "• Use `search` to find relevant grapher datasets, then `fetch` to get CSV data\n"
+    "• IMPORTANT: Always include country names in your search query when looking for country-specific data (e.g., 'population France' not just 'population')\n"
+    "• The fetch tool returns CSV data with Entity column removed - only Code, Year, and metric columns remain\n"
+    "• INTERACTIVE CHARTS: Users can view interactive charts by removing '.csv' from search result URLs\n"
+    "  - Always inform users they can open interactive charts using the provided links\n"
+    "  - Example: https://ourworldindata.org/grapher/population-density becomes interactive chart\n"
+    "• ALWAYS be specific with countries and time ranges to minimize data size:\n"
+    "  - Use specific country names in search queries to get filtered results\n"
+    "  - Use time parameter in fetch/fetch_image (e.g., '1990..2010', 'earliest..2010', '1990..latest')\n"
+    "  - Prefer narrow time ranges over full historical data when possible\n\n"
+    "INDICATOR SEARCH (search_indicators/fetch_indicator):\n"
+    "• Call `search_indicators` to find indicators by their NAME or DESCRIPTION (e.g., 'population density', 'GDP per capita', 'life expectancy')\n"
+    "• Do NOT include entity/country names in search queries - search only for the indicator concept itself\n"
+    "• Use optional country: filter for specific countries (e.g., 'population density country:US')\n"
+    "• Fetch indicators via returned IDs for all data or country-filtered data\n"
+    "• Entity names must match exactly as they appear in OWID:\n"
+    f"{COMMON_ENTITIES}\n\n"
+    "GENERAL GUIDELINES:\n"
+    "• If fetched data doesn't contain the values you need, inform the user rather than making up data\n"
+    "• Search results automatically filter for mentioned countries when detected in queries\n\n"
+    "SEARCH OPTIMIZATION:\n"
+    "• DO use simple, generic indicator names: 'coal production', 'population density', 'GDP per capita'\n"
+    "• DO include country names directly in chart queries: 'population France', 'emissions China'\n"
+    "• DO try exact phrase matching with quotes for specific metrics: 'coal production per capita'\n"
+    "• DO use broad terms first, then narrow down if needed\n"
+    "• DON'T include 'OWID' in search queries\n"
+    "• DON'T use overly specific queries like 'coal production per capita France Germany OWID'\n"
+    "• DON'T include terms like 'dataset', 'grapher', 'Our World in Data' in searches\n"
+    "• DON'T include quotes of any kind\n"
+    "• DON'T combine too many filters in a single query\n\n"
+    "SEARCH STRATEGY:\n"
+    "1. For charts: Start with simple indicator + country: 'coal production France'\n"
+    "2. For indicators: Use search_indicators with concept only: 'coal production'\n"
+    "3. If that fails, try just the indicator: 'coal production'\n"
+    "4. Use alternative phrasings: 'Per Capita production coal' instead of 'coal production per capita'\n"
+    "5. Avoid technical terms - search for concepts, not database field names"
 )
 
+mcp = FastMCP()
 
-# ————————————————
-# 3. FastMCP middleware: log method and payload
-# ————————————————
+
+# AI: Move to owid_mcp/server.py
 class RequestLoggingMiddleware(Middleware):
     async def on_message(self, context: MiddlewareContext, call_next):
         attributes = {
