@@ -155,7 +155,7 @@ tables:
         short_unit: "%"
         description_short: Share of non-trading pairs around the world.
         description_key:
-          - This indicator shows what percentage of a region's total trade is conducted non-tradingly with a specific trading partner.
+          - This indicator shows what percentage of a region's total trade is conducted with countries that do not engage in trade with each other.
           - Calculated by dividing non-trading trade volume (exports or imports with the counterpart country) by total trade volume (exports plus imports with all countries), then multiplying by 100.
           - Values sum to 100% across all trading partners for each country-year, providing a complete picture of trade concentration.
           - A higher percentage indicates greater overall trade dependence on that particular trading partner.
