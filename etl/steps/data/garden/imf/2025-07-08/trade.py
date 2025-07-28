@@ -120,6 +120,11 @@ def run() -> None:
             )
         tbs.append(processed_table)
 
+    tb_income_total = sh.calculate_income_level_trade_shares(tb_owid_income)
+    tb_income_total = tb_income_total.rename(columns={"income_flow": "country"})
+    tb_income_total["counterpart_country"] = "World"
+    tbs.append(tb_income_total)
+
     tbs.append(trading_partners)
     tb = pr.concat(tbs)
 
