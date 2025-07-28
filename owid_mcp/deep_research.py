@@ -43,11 +43,12 @@ COUNTRY_RE = re.compile(r"\bcountry:(\w{2,3})\b", re.IGNORECASE)
 
 
 INSTRUCTIONS = (
-    "DEEP RESEARCH TOOLS (primarily for ChatGPT integration):\n"
+    "DEEP RESEARCH TOOLS (EXCLUSIVELY for ChatGPT Deep Research):\n"
     "• `search` - Find indicators via Algolia for simplified CSV access\n"
     "• `fetch` - Download processed CSV data from search results\n\n"
-    "NOTE: These tools follow the OpenAI Deep Research specification for ChatGPT integration.\n"
-    "For full MCP clients, prefer the richer indicator and chart tools listed above.\n\n"
+    "NOTE: These tools are designed EXCLUSIVELY for ChatGPT's Deep Research feature.\n"
+    "They follow the OpenAI Deep Research specification and should NOT be used by\n"
+    "other MCP clients. For general MCP clients, use the richer indicator and chart tools.\n\n"
     "INTERACTIVE CHARTS:\n"
     "• Search results include interactive chart URLs - ALWAYS show these to users\n"
     "• Users can explore data interactively by opening the provided links\n\n"
@@ -63,6 +64,8 @@ mcp = FastMCP()
 @mcp.tool
 async def search(query: str) -> List[SearchResult]:
     """Search OWID using Algolia and return grapher CSV URLs.
+    
+    EXCLUSIVELY FOR CHATGPT DEEP RESEARCH - Do not use with other MCP clients.
 
     IMPORTANT: Include country names in your query for country-specific data.
     Examples: "population density france", "co2 emissions china", "gdp germany"
@@ -108,6 +111,8 @@ async def search(query: str) -> List[SearchResult]:
 @mcp.tool
 async def fetch(id: str) -> FetchResult:
     """Download a chart data and return the processed data.
+    
+    EXCLUSIVELY FOR CHATGPT DEEP RESEARCH - Do not use with other MCP clients.
 
     The returned CSV has the Entity column removed and contains only:
     - Code: Country/region ISO codes

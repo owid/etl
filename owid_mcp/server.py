@@ -95,8 +95,9 @@ mcp.add_middleware(RequestLoggingMiddleware())
 async def setup_server():
     """Setup the server by importing modules."""
     await mcp.import_server(indicators.mcp)
-    await mcp.import_server(deep_research.mcp)
     await mcp.import_server(posts.mcp)
+    await mcp.import_server(charts.mcp)
+    await mcp.import_server(deep_research.mcp)
 
 
 # Create an event loop and setup the server
