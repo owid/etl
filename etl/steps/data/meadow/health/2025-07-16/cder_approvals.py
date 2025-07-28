@@ -6,36 +6,6 @@ from etl.helpers import PathFinder
 paths = PathFinder(__file__)
 
 
-COL = [
-    "Proprietary  Name",
-    "Active Ingredient/Moiety",
-    "Applicant",
-    "NDA/BLA",
-    " Application Number(1)",
-    " Application Number(2)",
-    " Application Number(3)",
-    "Dosage Form(1)",
-    "Route of Administration(1)",
-    "Dosage Form(2)",
-    "Route of Administration(2)",
-    "Dosage Form(3)",
-    "Route of Administration(3)",
-    "FDA Receipt Date",
-    "FDA Approval Date",
-    "Approval Year",
-    "Abbreviated Indication(s)",
-    "Approved Use(s)",
-    "Review Designation",
-    "Orphan Drug Designation",
-    "Accelerated Approval",
-    "Breakthrough Therapy Designation",
-    "Fast Track Designation",
-    "Qualified Infectious Disease Product",
-    "Issued a Priority Review Voucher",
-    "Redeemed a Priority Review Voucher",
-    "Notes",
-]
-
 
 def run() -> None:
     #

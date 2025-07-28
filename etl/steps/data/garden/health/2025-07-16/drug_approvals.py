@@ -1,7 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from datetime import datetime
-
+import pandas as pd
 from owid.catalog import processing as pr
 
 from etl.helpers import PathFinder
@@ -40,9 +39,9 @@ def run() -> None:
         }
     )
     # add approval year to purple book
-    tb_purple_book["approval_year"] = tb_purple_book["approval_date"].apply(
-        lambda x: datetime.strptime(str(x), "%Y-%m-%d %H:%M:%S").year
-    )
+    tb_purple_book["approval_year"] = pd.to_datetime(
+        tb_purple_book["approval_date"], format="%Y-%m-%d %H:%M:%S"
+    ).dt.year
 
     # restrict purple book to a) CBER approvals and b) 351(a) applications (new biologics)
     tb_purple_book = tb_purple_book[tb_purple_book["center"] == "CBER"].copy()

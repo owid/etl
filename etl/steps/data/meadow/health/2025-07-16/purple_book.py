@@ -34,7 +34,7 @@ def run() -> None:
     tb = snap.read(header=34)
 
     # Remove products with higher product number but same BLA number as a product with lower product number.
-    # We do this to ensure that we only keep the first product for each BLA number.
+    # Each new drug formulation (e.g., tablet/ capsule, different strength, etc.) is a unique product (which it's own product number), but we care only about the active ingredient (which will be given by the BLA number).
     tb = tb.sort_values("Product Number")
     tb = tb[~tb.duplicated(subset=["BLA Number"], keep="first")]
     tb = tb.sort_values("BLA Number")

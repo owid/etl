@@ -24,11 +24,11 @@ tables:
         description_processing: |-
           - This data includes both [new molecular entities](#dod:new-molecular-entity) (NMEs) and [biologics license applications](#dod:biologics-license-application) (BLAs) approved by the Center for Drug Evaluation and Research (CDER) and the Center for Biologics Evaluation and Research (CBER) of the FDA.
           - Biologicals approved by the CBER have been extracted from the FDA's "Purple Book", which lists licensed biological products with reference product exclusivity and biosimilarity or interchangeability evaluations.
-          - We removed biosimilars from the dataset by excluding products with a "biosimilar" or "interchangeable" license type as well as products with a reference product listed.
+          - We removed [biosimilars](#dod:biosimilar) from the dataset, since we are only focusing on new drugs, by excluding products with a "biosimilar" or "interchangeable" license type as well as products with a reference product listed.
         presentation:
           grapher_config:
             note: |-
-              This data includes “[BLAs](#dod:biologics-license-application)” (used for biologics and vaccines) and “[NMEs](#dod:new-molecular-entity)” (used for chemical drugs). Data on approvals of chemical drugs are only available from 1984.
+              This data includes [biologics license applications (BLAs)](#dod:biologics-license-application)” (used for biologics and vaccines) and “[new molecular entities (NMEs)](#dod:new-molecular-entity)” (used for chemical drugs). Data on approvals of chemical drugs are only available from 1984.
   drug_approvals_designations:
     variables:
       approvals:
