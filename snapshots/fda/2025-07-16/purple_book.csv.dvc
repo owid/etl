@@ -5,7 +5,9 @@ meta:
     # Data product / Snapshot
     title: "Purple Book - Database of Licensed Biological Products"
     description: |-
-      The Purple Book is a database that contains information about all FDA-licensed biological products regulated by the Center for Drug Evaluation and Research (CDER), including licensed biosimilar and interchangeable products, and their reference products. The Purple Book also contains information on all FDA-licensed allergenic, cellular and gene therapy, hematologic, and vaccine products regulated by the Center for Biologics Evaluation and Research (CBER).
+      The Purple Book is a database that contains information about all FDA-licensed biological products regulated by both the Center for Drug Evaluation and Research (CDER) and the Center for Biologics Evaluation and Research (CBER).
+      Products approved by the CBER include all allergenic, cellular and gene therapy, hematologic, and vaccine products regulated by the FDA.
+      The Purple Book does not include chemical drugs, which are approved by the CDER under a New Drug Application (NDA) or Abbreviated New Drug Application (ANDA) licenses.
     date_published: "2025-06-01"
     version_producer: June 2025
 
