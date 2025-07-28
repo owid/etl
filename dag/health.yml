@@ -1271,11 +1271,19 @@ steps:
     - data://garden/demography/2024-07-15/population
   data://grapher/who/2025-07-15/vaccination_coverage:
     - data://garden/who/2025-07-15/vaccination_coverage
+
   # WHO Vaccine Introductions
-  #
   data://meadow/who/2025-07-15/vaccination_introductions:
     - snapshot://who/2025-07-15/vaccination_introductions.xlsx
   data://garden/who/2025-07-15/vaccination_introductions:
     - data://meadow/who/2025-07-15/vaccination_introductions
   data://grapher/who/2025-07-15/vaccination_introductions:
     - data://garden/who/2025-07-15/vaccination_introductions
+
+  # Clinical trials - ClinicalTrials.gov
+  data://meadow/health/2025-07-28/clinical_trials:
+    - snapshot://health/2025-07-28/clinical_trials.csv
+  data://garden/health/2025-07-28/clinical_trials:
+    - data://meadow/health/2025-07-28/clinical_trials
+  data://grapher/health/2025-07-28/clinical_trials:
+    - data://garden/health/2025-07-28/clinical_trials
