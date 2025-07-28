@@ -30,6 +30,9 @@ def run() -> None:
         errors="raise",
     )
 
+    tb_designations = tb_designations.format(["year", "country"])
+    tb = tb.format(["year", "country"])
+
     #
     # Save outputs.
     #
