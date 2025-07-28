@@ -171,79 +171,52 @@ def calculate_trade_relationship_shares(tb: Table) -> Table:
     return shares[["year", "share_bilateral", "share_unilateral", "share_non_trading"]]
 
 
-def calculate_income_level_trade_shares(tb: Table, income_groups_ds) -> Table:
+def calculate_income_level_trade_shares(tb: Table) -> Table:
     """
     Calculate share of total trade that happens between different income levels.
-    
+    Assumes tb is already filtered to income groups only.
+
     Args:
         tb: Table with columns ['country', 'counterpart_country', 'year', 'indicator', 'value']
-        income_groups_ds: Dataset containing income group classifications
-        
+            where country and counterpart_country are income group names
+
     Returns:
         Table with columns for each income level combination share
     """
     EXPORT = "Exports of goods, Free on board (FOB), US dollar"
     THRESHOLD = 0.01  # million USD
-    
+
     tb = tb.copy()
-    
+
     # Filter to exports only (to avoid double counting trade flows)
     exports = tb[(tb["indicator"] == EXPORT) & (tb["value"].fillna(0) > THRESHOLD)]
-    
-    # Get income group mappings
-    income_mapping = income_groups_ds["income_groups"].reset_index()
-    income_mapping = income_mapping[["country", "income_group"]].dropna()
-    
-    # Map income groups to countries and counterpart countries
-    exports = exports.merge(
-        income_mapping.rename(columns={"income_group": "origin_income"}),
-        left_on="country", 
-        right_on="country",
-        how="left"
-    )
-    
-    exports = exports.merge(
-        income_mapping.rename(columns={"income_group": "destination_income"}),
-        left_on="counterpart_country",
-        right_on="country",
-        how="left",
-        suffixes=("", "_dest")
-    )
-    
-    # Drop rows where income group is missing
-    exports = exports.dropna(subset=["origin_income", "destination_income"])
-    
-    # Create income level combinations
-    exports["income_flow"] = exports["origin_income"] + "_to_" + exports["destination_income"]
-    
+
+    # Function to convert income group names to short labels
+    def shorten_income_group(name):
+        if "High-income" in name:
+            return "High"
+        elif "Upper-middle-income" in name:
+            return "Upper middle"
+        elif "Lower-middle-income" in name:
+            return "Lower middle"
+        elif "Low-income" in name:
+            return "Low"
+        else:
+            return name
+
+    # Create income level combinations with shortened names
+    exports["origin_short"] = exports["country"].apply(shorten_income_group)
+    exports["dest_short"] = exports["counterpart_country"].apply(shorten_income_group)
+    exports["income_flow"] = exports["origin_short"] + " to " + exports["dest_short"]
     # Calculate total trade value by year and income flow
     trade_by_flow = exports.groupby(["year", "income_flow"])["value"].sum().reset_index()
-    
     # Calculate total trade by year
     total_trade = exports.groupby("year")["value"].sum().reset_index(name="total_value")
-    
+
     # Merge and calculate shares
     trade_shares = trade_by_flow.merge(total_trade, on="year")
-    trade_shares["share"] = (trade_shares["value"] / trade_shares["total_value"]) * 100
-    
-    # Pivot to get shares as separate columns
-    shares_pivot = trade_shares.pivot(
-        index="year", 
-        columns="income_flow", 
-        values="share"
-    ).reset_index().fillna(0)
-    
-    # Rename columns to be more descriptive
-    column_mapping = {}
-    for col in shares_pivot.columns:
-        if col != "year":
-            column_mapping[col] = f"share_trade_{col.lower()}"
-    
-    shares_pivot = shares_pivot.rename(columns=column_mapping)
-    
-    # Copy metadata from original table
-    for col in shares_pivot.columns:
-        if col.startswith("share_trade_"):
-            shares_pivot[col] = shares_pivot[col].copy_metadata(tb["value"])
-    
-    return shares_pivot
+    trade_shares["share_of_total_trade"] = (trade_shares["value"] / trade_shares["total_value"]) * 100
+
+    trade_shares = trade_shares[["year", "income_flow", "share_of_total_trade"]]
+
+    return trade_shares
