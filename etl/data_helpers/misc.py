@@ -1056,7 +1056,7 @@ def export_table_to_gsheet(
         If the export fails or if CLIENT_SECRET_FILE is not available in dev environment
     """
     if not CLIENT_SECRET_FILE or not CLIENT_SECRET_FILE.exists() or OWID_ENV.env_local != "dev":
-        return None
+        return "", ""
 
     try:
         # Sanitize sheet title
