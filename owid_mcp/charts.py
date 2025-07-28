@@ -36,17 +36,15 @@ class ChartSearchResult(BaseModel):
 
 
 INSTRUCTIONS = (
-    "CHART SEARCH (search/fetch/fetch_chart):\n"
-    "• Use `search` to find relevant grapher datasets, then `fetch` to get CSV data\n"
-    "• IMPORTANT: Always include country names in your search query when looking for country-specific data (e.g., 'population France' not just 'population')\n"
-    "• The fetch tool returns CSV data with Entity column removed - only Code, Year, and metric columns remain\n"
-    "• INTERACTIVE CHARTS: Users can view interactive charts by removing '.csv' from search result URLs\n"
-    "  - Always inform users they can open interactive charts using the provided links\n"
-    "  - Example: https://ourworldindata.org/grapher/population-density becomes interactive chart\n"
-    "• ALWAYS be specific with countries and time ranges to minimize data size:\n"
-    "  - Use specific country names in search queries to get filtered results\n"
-    "  - Use time parameter in fetch/fetch_chart (e.g., '1990..2010', 'earliest..2010', '1990..latest')\n"
-    "  - Prefer narrow time ranges over full historical data when possible\n\n"
+    "CHART TOOLS (alternative to indicator tools):\n"
+    "• `search_chart` - Find grapher charts via Algolia search\n"
+    "• `fetch_chart_data` - Download processed CSV data with optional time filtering\n"
+    "• `fetch_chart_image` - Get PNG images of charts\n\n"
+    "USAGE:\n"
+    "• Include country names in search: 'population France', 'emissions China'\n"
+    "• Use time filtering in fetch (e.g., '1990..2010', 'earliest..2010', '1990..latest')\n"
+    "• Returns CSV with Entity column removed (Code, Year, metrics only)\n"
+    "• Users can view interactive charts by removing '.csv' from URLs"
 )
 
 mcp = FastMCP()

@@ -43,15 +43,15 @@ COUNTRY_RE = re.compile(r"\bcountry:(\w{2,3})\b", re.IGNORECASE)
 
 
 INSTRUCTIONS = (
-    "CHART SEARCH AND FETCH:\n"
-    "• `search` - Find grapher charts via Algolia, returns CSV URLs\n"
-    "• `fetch` - Download CSV data from chart URLs (with optional time filtering)\n\n"
+    "DEEP RESEARCH TOOLS (primarily for ChatGPT integration):\n"
+    "• `search` - Find indicators via Algolia for simplified CSV access\n"
+    "• `fetch` - Download processed CSV data from search results\n\n"
+    "NOTE: These tools follow the OpenAI Deep Research specification for ChatGPT integration.\n"
+    "For full MCP clients, prefer the richer indicator and chart tools listed above.\n\n"
     "USAGE:\n"
-    "• Include country names in search queries for country-specific data: 'population France', 'emissions China'\n"
-    "• Use simple, generic indicator names: 'coal production', 'population density', 'GDP per capita'\n"
-    "• Try broad terms first, then narrow down if needed\n"
-    "• Use time parameter in fetch for filtering (e.g., '1990..2010', 'earliest..2010', '1990..latest')\n"
-    "• The fetch tool returns CSV data with Entity column removed - only Code, Year, and metric columns remain"
+    "• Include country names in search queries: 'population France', 'emissions China'\n"
+    "• Use simple indicator names: 'coal production', 'population density'\n"
+    "• Returns simplified CSV format (Entity column removed)"
 )
 
 mcp = FastMCP()

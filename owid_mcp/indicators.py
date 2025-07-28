@@ -11,11 +11,15 @@ log = structlog.get_logger()
 
 
 INSTRUCTIONS = (
-    "Search and fetch indicators from Our World in Data. "
-    "Call `search_indicator` to find indicators by their NAME or DESCRIPTION (e.g., 'population density', 'GDP per capita', 'life expectancy'). "
-    "Do NOT include entity/country names in search queries - search only for the indicator concept itself. "
-    "Fetch indicators via `ind://{id}` for all data or `ind://{id}/{entity}` for specific country/entity data. "
-    "Call `run_sql` to execute read-only SQL SELECT queries against the public Datasette."
+    "PRIMARY INDICATOR TOOLS (recommended for full MCP clients):\n"
+    "• `search_indicator` - Find indicators with rich metadata and structured search results\n"
+    "• MCP Resources (ind://{id}) - Fetch complete indicator data with full metadata\n"
+    "• `run_sql` - Execute flexible SQL queries for custom data analysis\n\n"
+    "USAGE:\n"
+    "• Search by indicator concept only: 'population density', 'GDP per capita', 'life expectancy'\n"
+    "• Do NOT include country names in search_indicator queries\n"
+    "• Use ind://{id} for all data or ind://{id}/{entity} for specific countries\n"
+    "• Provides richer metadata than simplified CSV tools"
 )
 
 mcp = FastMCP()
