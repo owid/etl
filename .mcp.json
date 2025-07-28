@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "etl": {
+      "type": "stdio",
+      "command": ".venv/bin/fastmcp",
+      "args": [
+        "run",
+        "etl_mcp/server.py"
+      ],
+      "env": {}
+    }
+  }
+}
