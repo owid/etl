@@ -15,7 +15,7 @@ meta:
     attribution_short: FDA
 
     # Files
-    url_main: https://www.fda.gov/drugs/drug-approvals-and-databases/compilation-cder-new-molecular-entity-nme-drug-and-new-biologic-a
+    url_main: https://www.fda.gov/drugs/drug-approvals-and-databases/compilation-cder-new-molecular-entity-nme-drug-and-new-biologic-approvals
     url_download: https://www.fda.gov/media/177921/download?attachment
     date_accessed: '2025-07-16'
 
