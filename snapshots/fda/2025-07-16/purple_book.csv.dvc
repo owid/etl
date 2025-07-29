@@ -1,0 +1,32 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Purple Book - Database of Licensed Biological Products"
+    description: |-
+      The Purple Book is a database that contains information about all FDA-licensed biological products regulated by both the Center for Drug Evaluation and Research (CDER) and the Center for Biologics Evaluation and Research (CBER).
+      Products approved by the CBER include all allergenic, cellular and gene therapy, hematologic, and vaccine products regulated by the FDA.
+      The Purple Book does not include chemical drugs, which are approved by the CDER under a New Drug Application (NDA) or Abbreviated New Drug Application (ANDA) licenses.
+    date_published: "2025-06-01"
+    version_producer: June 2025
+
+    # Citation
+    producer: US Food and Drug Administration
+    citation_full: |-
+      Purple Book - Database of Licensed Biological Products, United States Food and Drug Administration, https://purplebooksearch.fda.gov/ (2025)
+    attribution_short: FDA
+
+    # Files
+    url_main: https://purplebooksearch.fda.gov/about
+    url_download: https://purplebooksearch.fda.gov/files/2025/purplebook-search-june-data-download.csv
+    date_accessed: '2025-07-16'
+
+    # License
+    license:
+      name: CC0
+      url: https://open.fda.gov/license/
+outs:
+  - md5: 61fd75310bb7051ee1c8116156337f59
+    size: 453484
+    path: purple_book.csv
