@@ -1,5 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import logging
 from collections import Counter
 
 import pandas as pd
@@ -7,8 +8,27 @@ import pandas as pd
 from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
+# import logger
+logger = logging.getLogger(__name__)
+
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
+INTERVENTIONS = [
+    "PREVENTION",
+    "DEVICE",
+    "PROCEDURE",
+    "RADIATION",
+    "OTHER",
+    "DIETARY_SUPPLEMENT",
+    "DIAGNOSTIC_TEST",
+    "BEHAVIORAL",
+    "BIOLOGICAL",
+    "DRUG",
+    "BONE VOID FILLER",
+    "GENETIC",
+    "COMBINATION_PRODUCT",
+]
 
 
 def extract_allocation(design_string: str):
@@ -87,22 +107,7 @@ def add_intervention_types(tb):
     """
     Add a column for intervention types based on the 'Interventions' column.
     """
-    interventions = [
-        "PREVENTION",
-        "DEVICE",
-        "PROCEDURE",
-        "RADIATION",
-        "OTHER",
-        "DIETARY_SUPPLEMENT",
-        "DIAGNOSTIC_TEST",
-        "BEHAVIORAL",
-        "BIOLOGICAL",
-        "DRUG",
-        "BONE VOID FILLER",
-        "GENETIC",
-        "COMBINATION_PRODUCT",
-    ]
-    for intervention in interventions:
+    for intervention in INTERVENTIONS:
         tb[intervention] = tb["Interventions"].str.contains(intervention, case=True, na=False).astype("boolean")
 
     return tb
@@ -146,6 +151,8 @@ def run() -> None:
 
     # Load data from snapshot.
     tb = snap.read()
+
+    logger.info(f"Loaded snapshot with {len(tb)} rows.")
 
     tb = tb.drop(
         columns=[
@@ -212,13 +219,31 @@ def run() -> None:
         country_col="primary_location",
     )
 
-    
+    # get all studies by completion year and country
+    tb_trials_per_year = (
+        tb.groupby(["primary_location", "completion_year"], observed=True).size().reset_index(name="n_studies_country")
+    )
 
+    # studies by completion year and sponsor type
+    tb_sponsor_per_year = (
+        tb.groupby(["Funder Type", "completion_year"], observed=True).size().reset_index(name="n_studies_sponsor")
+    )
 
-
+    # get sum of studies by completion year by intervention type
+    tb_intervention_per_year = tb.copy()
+    tb_intervention_per_year[INTERVENTIONS] = tb_intervention_per_year[INTERVENTIONS].astype("Int64")
+    intvt_cols = ["completion_year"] + INTERVENTIONS
+    tb_intervention_per_year = (
+        tb_intervention_per_year[intvt_cols].groupby("completion_year").sum().reset_index()
+    )
 
     # Improve table format.
     tb = tb.format(["country", "year"])
+
+    tables = [
+        tb,
+        tb_trials_per_year,
+    ]
 
     #
     # Save outputs.
