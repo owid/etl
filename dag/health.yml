@@ -1293,9 +1293,8 @@ steps:
     - data://garden/who/2025-07-15/vaccination_introductions
 
   # Clinical trials - ClinicalTrials.gov
-  data://meadow/health/2025-07-28/clinical_trials:
-    - snapshot://health/2025-07-28/clinical_trials.csv
+  # no meadow snapshot, as this is a large dataset
   data://garden/health/2025-07-28/clinical_trials:
-    - data://meadow/health/2025-07-28/clinical_trials
+    - snapshot://health/2025-07-28/clinical_trials.csv
   data://grapher/health/2025-07-28/clinical_trials:
     - data://garden/health/2025-07-28/clinical_trials
