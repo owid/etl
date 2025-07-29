@@ -209,3 +209,9 @@ steps:
   export://multidim/education/latest/teachers:
     - data://grapher/unesco/2025-05-01/education_sdgs
     - data://grapher/worldbank_wdi/2025-01-24/wdi
+
+  #
+  # Mdim for women teachers
+  #
+  export://multidim/education/latest/women_teachers:
+    - data://grapher/unesco/2025-05-01/education_opri

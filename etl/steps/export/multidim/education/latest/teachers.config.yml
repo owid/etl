@@ -2,10 +2,10 @@ title:
   title: Qualified and trained teachers
   title_variant: by level of education and teacher qualification
 default_selection:
-  - Egypt
+  - Vietnam
   - Niger
-  - United Kingdom
-  - Peru
+  - Senegal
+  - Bolivia
 
 dimensions:
   - name: Teacher type
