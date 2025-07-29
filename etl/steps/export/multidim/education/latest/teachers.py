@@ -13,8 +13,8 @@ paths = PathFinder(__file__)
 
 ID_COLUMNS = ["country", "year"]
 
-QUALIFIED_TEACHER_PATTERN = r"percentage_of_qualified_teachers"
-TRAINED_TEACHER_PATTERN = r"se_\w{3}_tcaq_\w{2}"
+QUALIFIED_TEACHER_PATTERN = r"percentage_of_qualified_teachers_in_(pre_primary|primary|lower_secondary|upper_secondary)_education__both_sexes"
+TRAINED_TEACHER_PATTERN = r"^(se_pre_tcaq_zs|se_prm_tcaq_zs|se_sec_tcaq_lo_zs|se_sec_tcaq_up_zs)$"
 
 # Main chart configuration
 MULTIDIM_CONFIG = {
@@ -80,7 +80,7 @@ TEACHER_TYPES = {
     },
     "trained": {
         "title": "Trained teachers",
-        "unit": "percent", 
+        "unit": "percent",
         "y_axis": {"min": 0, "max": 100},
         "description": "shown as a percentage of all teachers in the relevant education level",
         "source_pattern": TRAINED_TEACHER_PATTERN,
@@ -93,11 +93,12 @@ def run() -> None:
     config = paths.load_collection_config()
     tbs_adjusted = []
 
-    for dataset_name in ["education_sdgs", "worldbank_wdi"]:
+    for dataset_name in ["education_sdgs", "wdi"]:
         ds = paths.load_dataset(dataset_name)
         tb = ds.read(dataset_name, load_data=False)
 
         teacher_cols = get_teacher_columns(tb, dataset_name)
+        print(teacher_cols)
         if teacher_cols:
             tb = tb.loc[:, ID_COLUMNS + teacher_cols].copy()
             tb = adjust_dimensions(tb, dataset_name)
@@ -127,17 +128,9 @@ def run() -> None:
 def get_teacher_columns(tb, dataset_name):
     """Filter teacher columns based on dataset source."""
     if dataset_name == "education_sdgs":
-        return [
-            col
-            for col in tb.columns
-            if re.search(QUALIFIED_TEACHER_PATTERN, col, re.IGNORECASE)
-        ]
-    elif dataset_name == "worldbank_wdi":
-        return [
-            col
-            for col in tb.columns
-            if re.search(TRAINED_TEACHER_PATTERN, col, re.IGNORECASE)
-        ]
+        return [col for col in tb.columns if re.search(QUALIFIED_TEACHER_PATTERN, col, re.IGNORECASE)]
+    elif dataset_name == "wdi":
+        return [col for col in tb.columns if re.search(TRAINED_TEACHER_PATTERN, col, re.IGNORECASE)]
     return []
 
 
@@ -167,23 +160,23 @@ def adjust_dimensions(tb, dataset_name):
     def extract_teacher_type(dataset_name):
         if dataset_name == "education_sdgs":
             return "qualified"
-        elif dataset_name == "worldbank_wdi":
+        elif dataset_name == "wdi":
             return "trained"
         return "qualified"  # Default fallback
 
     for col in tb.columns:
         if col in ID_COLUMNS:
             continue
-        
+
         tb[col].metadata.original_short_name = "teachers_qualified_trained"
-        
+
         if dataset_name == "education_sdgs":
             level = extract_level_from_qualified(col)
         else:
             level = extract_level_from_wdi(col)
-            
+
         teacher_type = extract_teacher_type(dataset_name)
-        
+
         tb[col].metadata.dimensions = {
             "level": level,
             "teacher_type": teacher_type,
@@ -241,7 +234,7 @@ def generate_title_by_dimensions(view):
     """Generate chart title based on view dimensions."""
     level = view.dimensions.get("level", "primary")
     teacher_type = view.dimensions.get("teacher_type", "qualified")
-    
+
     level_cfg = EDUCATION_LEVELS.get(level, {})
     teacher_cfg = TEACHER_TYPES.get(teacher_type, {})
     level_term = level_cfg.get("title_term", level)
@@ -262,7 +255,7 @@ def generate_subtitle_by_dimensions(view):
     """Generate chart subtitle based on dimensions."""
     level = view.dimensions.get("level", "primary")
     teacher_type = view.dimensions.get("teacher_type", "qualified")
-    
+
     level_cfg = EDUCATION_LEVELS.get(level, {})
     teacher_cfg = TEACHER_TYPES.get(teacher_type, {})
     age_range = level_cfg.get("age_range", "")
@@ -281,7 +274,7 @@ def edit_indicator_displays(view):
 
     level_display = {
         "pre_primary": "Pre-primary",
-        "primary": "Primary", 
+        "primary": "Primary",
         "lower_secondary": "Lower secondary",
         "upper_secondary": "Upper secondary",
     }
