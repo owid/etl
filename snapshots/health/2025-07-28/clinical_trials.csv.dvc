@@ -17,11 +17,13 @@ meta:
     # Files
     url_main: https://clinicaltrials.gov/about-site/trends-charts
     url_download: https://clinicaltrials.gov/data-api/api
-    date_accessed: 2025-07-28
+    date_accessed: '2025-07-28'
 
     # License
     license:
       name: ClinicalTrials.gov Terms and Conditions
       url: https://clinicaltrials.gov/about-site/terms-conditions
-
-  
+outs:
+  - md5: 61ac32714831ab7ab4476c9fd2711228
+    size: 1779168541
+    path: clinical_trials.csv
