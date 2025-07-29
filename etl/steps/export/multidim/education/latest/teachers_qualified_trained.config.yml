@@ -1,0 +1,43 @@
+title:
+  title: Qualified and trained teachers
+  title_variant: by level of education and teacher qualification
+default_selection:
+  - Egypt
+  - Niger
+  - United Kingdom
+  - Peru
+
+dimensions:
+  - name: Teacher type
+    slug: teacher_type
+    choices:
+      - slug: qualified
+        name: Qualified teachers
+        description: Percentage of teachers who meet the minimum qualifications required to teach at the relevant level.
+      - slug: trained
+        name: Trained teachers
+        description: Percentage of teachers who have received organized teacher training (either pre-service or in-service).
+      - slug: teacher_type_side_by_side
+        name: Qualified and trained teachers
+        description: Compare qualified and trained teachers across education levels.
+
+  - name: Education level
+    slug: level
+    choices:
+      - slug: pre_primary
+        name: Pre-primary education
+        description: Teachers in pre-primary education (typically ages 3-5) who are qualified or trained.
+      - slug: primary
+        name: Primary education
+        description: Teachers in primary education (typically ages 6-11) who are qualified or trained.
+      - slug: lower_secondary
+        name: Lower secondary education
+        description: Teachers in lower secondary education (typically ages 12-14) who are qualified or trained.
+      - slug: upper_secondary
+        name: Upper secondary education
+        description: Teachers in upper secondary education (typically ages 15-17) who are qualified or trained.
+      - slug: level_side_by_side
+        name: All education levels
+        description: Compare teacher qualifications across different education levels.
+
+views: []
