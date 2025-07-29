@@ -242,7 +242,7 @@ def _validate_output_data(tb_combined_full: Table, tb_combined_sel: Table) -> No
         dying_rates = tb_combined_full["share_dying_first_five_years"]
         assert dying_rates.min() >= 0, f"Negative dying share: {dying_rates.min()}"
         assert dying_rates.max() <= 100, f"Dying share exceeds 100%: {dying_rates.max()}"
-    
+
     # Validate regional data consistency and reasonableness
     _validate_regional_data(tb_combined_full, tb_combined_sel)
 
@@ -250,126 +250,134 @@ def _validate_output_data(tb_combined_full: Table, tb_combined_sel: Table) -> No
 def _validate_regional_data(tb_combined_full: Table, tb_combined_sel: Table) -> None:
     """Validate regional data for consistency and reasonable values."""
     expected_regions = {"World", "Asia", "Africa", "Europe", "North America", "South America", "Oceania"}
-    
+
     # Check both datasets for regional coverage
     for tb, name in [(tb_combined_full, "full"), (tb_combined_sel, "selected")]:
         countries = set(tb["country"].unique())
         missing_regions = expected_regions - countries
-        
+
         # Warn about missing regions (not all regions may be present in historical data)
         if missing_regions:
             print(f"Warning: Missing regions in {name} dataset: {missing_regions}")
-    
+
     # Validate regional mortality rates are reasonable based on historical patterns
     for tb, name in [(tb_combined_full, "full"), (tb_combined_sel, "selected")]:
         rate_col = "child_mortality_rate_full" if name == "full" else "child_mortality_rate"
-        
+
         if rate_col not in tb.columns:
             continue
-            
+
         regional_data = tb[tb["country"].isin(expected_regions)]
-        
+
         if len(regional_data) == 0:
             continue
-            
+
         # Check regional mortality rates are within historically observed bounds
         for region in expected_regions:
             region_data = regional_data[regional_data["country"] == region]
-            
+
             if len(region_data) == 0:
                 continue
-                
+
             rates = region_data[rate_col].dropna()
-            
+
             if len(rates) == 0:
                 continue
-            
+
             # Regional-specific validation based on historical patterns
             if region == "Africa":
                 # Africa historically has had higher child mortality rates
                 assert rates.min() >= 0, f"{region}: Negative mortality rate"
                 assert rates.max() <= 80, f"{region}: Unrealistically high mortality rate: {rates.max()}%"
-                
+
             elif region == "Europe":
                 # Europe should have lower rates, especially in recent decades
                 recent_data = region_data[region_data["year"] >= 1950]
                 if len(recent_data) > 0:
                     recent_rates = recent_data[rate_col].dropna()
                     if len(recent_rates) > 0:
-                        assert recent_rates.max() <= 30, f"{region}: Unexpectedly high recent mortality rate: {recent_rates.max()}%"
-                        
+                        assert (
+                            recent_rates.max() <= 30
+                        ), f"{region}: Unexpectedly high recent mortality rate: {recent_rates.max()}%"
+
             elif region == "Asia":
                 # Asia has varied significantly but should be reasonable
                 assert rates.min() >= 0, f"{region}: Negative mortality rate"
                 assert rates.max() <= 70, f"{region}: Unrealistically high mortality rate: {rates.max()}%"
-                
+
             elif region in ["North America", "Oceania"]:
                 # Generally lower mortality rates expected
                 recent_data = region_data[region_data["year"] >= 1950]
                 if len(recent_data) > 0:
                     recent_rates = recent_data[rate_col].dropna()
                     if len(recent_rates) > 0:
-                        assert recent_rates.max() <= 25, f"{region}: Unexpectedly high recent mortality rate: {recent_rates.max()}%"
-            
+                        assert (
+                            recent_rates.max() <= 25
+                        ), f"{region}: Unexpectedly high recent mortality rate: {recent_rates.max()}%"
+
             elif region == "South America":
                 # Moderate rates expected
                 assert rates.min() >= 0, f"{region}: Negative mortality rate"
                 assert rates.max() <= 50, f"{region}: Unrealistically high mortality rate: {rates.max()}%"
-                
+
             elif region == "World":
                 # World average should be reasonable
                 assert rates.min() >= 0, f"{region}: Negative mortality rate"
                 assert rates.max() <= 60, f"{region}: Unrealistically high world average: {rates.max()}%"
-                
+
                 # World rates should show general declining trend over time (allowing for fluctuations)
                 if len(rates) >= 3:
                     # Check that recent decades show improvement compared to early 1900s
                     early_data = region_data[region_data["year"] <= 1920]
                     recent_data = region_data[region_data["year"] >= 1990]
-                    
+
                     if len(early_data) > 0 and len(recent_data) > 0:
                         early_avg = early_data[rate_col].mean()
                         recent_avg = recent_data[rate_col].mean()
-                        
+
                         # Allow for some cases where this might not hold due to data quality/coverage
                         if not (recent_avg < early_avg * 0.8):  # Recent should be at least 20% lower
-                            print(f"Warning: {region} mortality rates haven't improved as expected (early: {early_avg:.1f}%, recent: {recent_avg:.1f}%)")
-    
+                            print(
+                                f"Warning: {region} mortality rates haven't improved as expected (early: {early_avg:.1f}%, recent: {recent_avg:.1f}%)"
+                            )
+
     # Check that regional rates are generally consistent with World being a weighted average
     # Note: We can't do exact population-weighted averages without population data,
     # but we can do basic reasonableness checks
     for tb, name in [(tb_combined_full, "full"), (tb_combined_sel, "selected")]:
         rate_col = "child_mortality_rate_full" if name == "full" else "child_mortality_rate"
-        
+
         if rate_col not in tb.columns:
             continue
-            
+
         # For each year, check that World rate is within reasonable bounds of regional rates
         years_with_world = tb[tb["country"] == "World"]["year"].unique()
-        
+
         for year in years_with_world:
             year_data = tb[tb["year"] == year]
             world_rate = year_data[year_data["country"] == "World"][rate_col]
-            
+
             if len(world_rate) == 0:
                 continue
-                
+
             world_rate = world_rate.iloc[0]
-            
+
             # Get regional rates for the same year
             regional_rates = year_data[
                 year_data["country"].isin(["Asia", "Africa", "Europe", "North America", "South America", "Oceania"])
             ][rate_col].dropna()
-            
+
             if len(regional_rates) >= 2:  # Need at least 2 regions for comparison
                 min_regional = regional_rates.min()
                 max_regional = regional_rates.max()
-                
+
                 # World rate should generally be between min and max regional rates
                 # Allow some tolerance for data quality and missing regions
                 tolerance = 5.0  # 5 percentage points
-                
+
                 if not (min_regional - tolerance <= world_rate <= max_regional + tolerance):
-                    print(f"Warning: World rate ({world_rate:.1f}%) outside regional bounds ({min_regional:.1f}%-{max_regional:.1f}%) in year {year}")
-    
+                    print(
+                        f"Warning: World rate ({world_rate:.1f}%) outside regional bounds ({min_regional:.1f}%-{max_regional:.1f}%) in year {year}"
+                    )
+
     print("Regional data validation completed")
