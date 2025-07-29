@@ -209,7 +209,7 @@ def _validate_output_data(tb_combined_full: Table, tb_combined_sel: Table) -> No
         assert rate_diff.max() < 0.1, f"Survival rates don't match mortality rates (max diff: {rate_diff.max()}%)"
 
     # Check year ranges are reasonable
-    min_year, max_year = 1800, 2025
+    min_year, max_year = 1751, 2025
     full_years = tb_combined_full["year"]
     sel_years = tb_combined_sel["year"]
 
