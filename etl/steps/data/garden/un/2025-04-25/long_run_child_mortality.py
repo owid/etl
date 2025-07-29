@@ -20,7 +20,7 @@ def run() -> None:
     ds_igme = paths.load_dataset("igme")
     ds_gapminder_v11 = paths.load_dataset("under_five_mortality", version="2023-09-21")
     ds_gapminder_v7 = paths.load_dataset("under_five_mortality", version="2023-09-18")
-    
+
     # Perform sanity checks on input datasets
     _validate_input_datasets(ds_igme, ds_gapminder_v11, ds_gapminder_v7)
 
@@ -168,19 +168,19 @@ def _validate_input_datasets(ds_igme, ds_gapminder_v11, ds_gapminder_v7) -> None
     """Validate input datasets for basic integrity checks."""
     # Check that datasets are not empty
     assert len(ds_igme) > 0, "IGME dataset is empty"
-    assert len(ds_gapminder_v11) > 0, "Gapminder v11 dataset is empty"  
+    assert len(ds_gapminder_v11) > 0, "Gapminder v11 dataset is empty"
     assert len(ds_gapminder_v7) > 0, "Gapminder v7 dataset is empty"
-    
+
     # Check IGME data has expected columns
     tb_igme = ds_igme.read("igme")
     required_igme_cols = ["indicator", "sex", "wealth_quintile", "observation_value", "country", "year"]
     missing_cols = [col for col in required_igme_cols if col not in tb_igme.columns]
     assert not missing_cols, f"IGME dataset missing required columns: {missing_cols}"
-    
+
     # Check Gapminder data has expected columns
     tb_gap_v11 = ds_gapminder_v11["under_five_mortality"]
     tb_gap_v7 = ds_gapminder_v7["under_five_mortality_selected"]
-    
+
     assert "child_mortality" in tb_gap_v11.columns, "Gapminder v11 missing 'child_mortality' column"
     assert "under_five_mortality" in tb_gap_v7.columns, "Gapminder v7 missing 'under_five_mortality' column"
     assert "country" in tb_gap_v11.reset_index().columns, "Gapminder v11 missing 'country' column"
@@ -192,13 +192,13 @@ def _validate_output_data(tb_combined_full: Table, tb_combined_sel: Table) -> No
     # Check child mortality rate ranges (should be 0-100%)
     full_rates = tb_combined_full["child_mortality_rate_full"]
     sel_rates = tb_combined_sel["child_mortality_rate"]
-    
+
     # Check for reasonable mortality rate bounds
     assert full_rates.min() >= 0, f"Negative child mortality rate found: {full_rates.min()}"
     assert full_rates.max() <= 100, f"Child mortality rate exceeds 100%: {full_rates.max()}"
     assert sel_rates.min() >= 0, f"Negative child mortality rate found: {sel_rates.min()}"
     assert sel_rates.max() <= 100, f"Child mortality rate exceeds 100%: {sel_rates.max()}"
-    
+
     # Check survival rates are complementary to mortality rates (within 0.1% tolerance)
     world_data = tb_combined_full[tb_combined_full["country"] == "World"]
     if len(world_data) > 0:
@@ -207,36 +207,36 @@ def _validate_output_data(tb_combined_full: Table, tb_combined_sel: Table) -> No
         expected_survival = 100 - mortality_rates
         rate_diff = abs(survival_rates - expected_survival)
         assert rate_diff.max() < 0.1, f"Survival rates don't match mortality rates (max diff: {rate_diff.max()}%)"
-    
+
     # Check year ranges are reasonable
     min_year, max_year = 1800, 2025
     full_years = tb_combined_full["year"]
     sel_years = tb_combined_sel["year"]
-    
+
     assert full_years.min() >= min_year, f"Year too early in full data: {full_years.min()}"
     assert full_years.max() <= max_year, f"Year too late in full data: {full_years.max()}"
     assert sel_years.min() >= min_year, f"Year too early in selected data: {sel_years.min()}"
     assert sel_years.max() <= max_year, f"Year too late in selected data: {sel_years.max()}"
-    
+
     # Check for required countries/regions
     full_countries = set(tb_combined_full["country"].unique())
-    sel_countries = set(tb_combined_sel["country"].unique()) 
-    
+    sel_countries = set(tb_combined_sel["country"].unique())
+
     assert "World" in full_countries, "World data missing from full dataset"
     assert "World" in sel_countries, "World data missing from selected dataset"
-    
+
     # Check source consistency in selected dataset
     valid_sources = {"UN IGME", "Gapminder v11", "Gapminder v7"}
     sel_sources = set(tb_combined_sel["source"].unique())
     invalid_sources = sel_sources - valid_sources
     assert not invalid_sources, f"Invalid sources found: {invalid_sources}"
-    
+
     # Check no duplicate country-year combinations
     full_dupes = tb_combined_full.duplicated(subset=["country", "year"]).sum()
     sel_dupes = tb_combined_sel.duplicated(subset=["country", "year"]).sum()
     assert full_dupes == 0, f"Found {full_dupes} duplicate country-year pairs in full dataset"
     assert sel_dupes == 0, f"Found {sel_dupes} duplicate country-year pairs in selected dataset"
-    
+
     # Check that share variables are percentages (0-100)
     if "share_dying_first_five_years" in tb_combined_full.columns:
         dying_rates = tb_combined_full["share_dying_first_five_years"]
