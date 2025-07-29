@@ -206,6 +206,6 @@ steps:
   #
   # Mdim for qualified/trained teachers
   #
-  export://multidim/education/latest/teachers_qualified_trained:
+  export://multidim/education/latest/teachers:
     - data://grapher/unesco/2025-05-01/education_sdgs
     - data://grapher/worldbank_wdi/2025-01-24/wdi
