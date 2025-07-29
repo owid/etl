@@ -1260,6 +1260,18 @@ steps:
   data://grapher/tuberculosis/2025-06-16/laboratories:
     - data://garden/tuberculosis/2025-06-16/laboratories
 
+  # Drug approvals - FDA (CDER Approvals & Purple Book (CBER Approvals))
+  data://garden/health/2025-07-16/drug_approvals:
+    - data://meadow/health/2025-07-16/cder_approvals
+    - data://meadow/health/2025-07-16/purple_book
+  data://grapher/health/2025-07-16/drug_approvals:
+    - data://garden/health/2025-07-16/drug_approvals
+  data://meadow/health/2025-07-16/cder_approvals:
+    - snapshot://fda/2025-07-16/cder_approvals.csv
+
+  data://meadow/health/2025-07-16/purple_book:
+    - snapshot://fda/2025-07-16/purple_book.csv
+
   # WHO Immunization coverage
   data://meadow/who/2025-07-15/vaccination_coverage:
     - snapshot://who/2025-07-15/vaccination_coverage.xlsx
@@ -1271,8 +1283,8 @@ steps:
     - data://garden/demography/2024-07-15/population
   data://grapher/who/2025-07-15/vaccination_coverage:
     - data://garden/who/2025-07-15/vaccination_coverage
+    
   # WHO Vaccine Introductions
-  #
   data://meadow/who/2025-07-15/vaccination_introductions:
     - snapshot://who/2025-07-15/vaccination_introductions.xlsx
   data://garden/who/2025-07-15/vaccination_introductions:
