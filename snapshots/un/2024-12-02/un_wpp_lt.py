@@ -4,14 +4,14 @@ While this ingest script could be done automatically, as of today (2023-10-02) d
 
 To download this files:
 
-    1. Go to the CSV Format section of UN WPP page: https://population.un.org/wpp/Download/Standard/CSV/
+    1. Go to the CSV Format section of UN WPP page: https://population.un.org/wpp/downloads?folder=Standard%20Projections&group=CSV%20format
     2. Download the Life Tables ZIP files with the estimates (1950-2023):
-        - https://population.un.org/wpp/Download/Files/1_Indicator%20(Standard)/CSV_FILES/WPP2024_Life_Table_Complete_Medium_Both_1950-2023.csv.gz
-        - https://population.un.org/wpp/Download/Files/1_Indicator%20(Standard)/CSV_FILES/WPP2024_Life_Table_Complete_Medium_Female_1950-2023.csv.gz
-        - https://population.un.org/wpp/Download/Files/1_Indicator%20(Standard)/CSV_FILES/WPP2024_Life_Table_Complete_Medium_Male_1950-2023.csv.gz
-        - https://population.un.org/wpp/Download/Files/1_Indicator%20(Standard)/CSV_FILES/WPP2024_Life_Table_Complete_Medium_Both_2024-2100.csv.gz
-        - https://population.un.org/wpp/Download/Files/1_Indicator%20(Standard)/CSV_FILES/WPP2024_Life_Table_Complete_Medium_Female_2024-2100.csv.gz
-        - https://population.un.org/wpp/Download/Files/1_Indicator%20(Standard)/CSV_FILES/WPP2024_Life_Table_Complete_Medium_Male_2024-2100.csv.gz
+        - https://population.un.org/wpp/assets/Excel%20Files/1_Indicator%20(Standard)/CSV_FILES/WPP2024_Life_Table_Complete_Medium_Both_1950-2023.csv.gz
+        - https://population.un.org/wpp/assets/Excel%20Files/1_Indicator%20(Standard)/CSV_FILES/WPP2024_Life_Table_Complete_Medium_Female_1950-2023.csv.gz
+        - https://population.un.org/wpp/assets/Excel%20Files/1_Indicator%20(Standard)/CSV_FILES/WPP2024_Life_Table_Complete_Medium_Male_1950-2023.csv.gz
+        - https://population.un.org/wpp/assets/Excel%20Files/1_Indicator%20(Standard)/CSV_FILES/WPP2024_Life_Table_Complete_Medium_Both_2024-2100.csv.gz
+        - https://population.un.org/wpp/assets/Excel%20Files/1_Indicator%20(Standard)/CSV_FILES/WPP2024_Life_Table_Complete_Medium_Female_2024-2100.csv.gz
+        - https://population.un.org/wpp/assets/Excel%20Files/1_Indicator%20(Standard)/CSV_FILES/WPP2024_Life_Table_Complete_Medium_Male_2024-2100.csv.gz
     3. Run the snapshot script and wait for it to be ingested into S3:
         python snapshots/un/2023-10-02/un_wpp_lt.py --path-to-file-all /path/WPP2022_Life_Table_Complete_Medium_Both_1950-2021.zip --path-to-file-f path/WPP2022_Life_Table_Complete_Medium_Female_1950-2021.zip --path-to-file-m path/WPP2022_Life_Table_Complete_Medium_Male_1950-2021.zip
 
