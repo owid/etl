@@ -93,7 +93,8 @@ tables:
             {definitions.global.title_public} at << 'birth' if (age == 0) else age >><< ', ' + sex + 's' if (sex != 'total') >>
         presentation:
           title_variant: &title_variant_hist << sex + 's, ' if sex != 'total' >>period tables
-
+  life_expectancy_at_birth:
+    variables:
       life_expectancy_0:
         title: |-
           Period life expectancy at birth
@@ -125,6 +126,34 @@ tables:
           attribution: |-
             Riley (2005); Zijdeman et al. (2015); HMD (2024); UN WPP (2024)
         processing_level: major
+      source:
+        title: Source of life expectancy at birth data
+        description_short: |-
+          The source of the life expectancy at birth data.
+        description_key:
+          - |-
+            The source of the life expectancy at birth data used for each country and year.
+        unit: ""
+        short_unit: ""
+        display:
+          name: Source
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Source
+      source_url:
+        title: Source URL of life expectancy at birth data
+        description_short: |-
+          The source URL of the life expectancy at birth data.
+        description_key:
+          - |-
+            The source URL of the life expectancy at birth data used for each country and year.
+        unit: ""
+        short_unit: ""
+        display:
+          name: Source URL
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Source URL
 
   # WITH PROJECTIONS
   life_expectancy_with_proj:
@@ -183,20 +212,3 @@ tables:
           title_variant: *title_variant_o_proj
           grapher_config:
             selectedEntityNames: *sel_entities_americas
-      ### Source table
-  life_expectancy_source:
-    variables:
-      source:
-        title: Source of life expectancy at birth data
-        description_short: |-
-          The source of the life expectancy at birth data.
-        description_key:
-          - |-
-            The source of the life expectancy at birth data used for each country and year.
-        unit: ""
-        short_unit: ""
-        display:
-          name: Source
-          numDecimalPlaces: 0
-        presentation:
-          title_public: Source
