@@ -305,10 +305,8 @@ def add_demography_indicators(tb: Table, ds_pop: Dataset, ds_le: Dataset, ds_wpp
     tb_popd = tb_popd.loc[tb_popd["year"] == 2022, ["country", "population_density"]]
 
     # life exp
-    tb_le = ds_le.read("life_expectancy")
-    tb_le = tb_le.loc[
-        (tb_le["year"] == 2021) & (tb_le["sex"] == "all") & (tb_le["age"] == 0), ["country", "life_expectancy_0"]
-    ]
+    tb_le = ds_le.read("life_expectancy_at_birth")
+    tb_le = tb_le.drop(columns = ['source', 'source_url'])
     tb_le = tb_le.rename(columns={"life_expectancy_0": "life_expectancy"})
     tb_le["country"] = tb_le["country"].replace({"Northern America": "North America"})
 
