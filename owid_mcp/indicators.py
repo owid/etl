@@ -1,9 +1,11 @@
 from typing import Any, Dict, List
+import urllib.parse
 
+import httpx
 import structlog
 from fastmcp import FastMCP
 
-from owid_mcp.config import MAX_ROWS_DEFAULT
+from owid_mcp.config import MAX_ROWS_DEFAULT, HTTP_TIMEOUT, DATASETTE_BASE
 from owid_mcp.data_utils import build_catalog_info, fetch_indicator_data
 from owid_mcp.data_utils import run_sql as _run_sql
 

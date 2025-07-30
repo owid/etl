@@ -101,13 +101,8 @@ async def setup_server():
 
 
 # Create an event loop and setup the server
-try:
-    loop = asyncio.get_event_loop()
-except RuntimeError:
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-
-loop.run_until_complete(setup_server())
+if __name__ != "__main__":
+    asyncio.run(setup_server())
 
 
 # ---------------------------------------------------------------------------
