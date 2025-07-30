@@ -95,36 +95,31 @@ async def fetch_post(identifier: str, include_metadata: bool = False) -> Dict[st
     """
     log.info("fetch_post", identifier=identifier)
 
-    try:
-        post_data = await _fetch_post_by_identifier(identifier)
+    post_data = await _fetch_post_by_identifier(identifier)
 
-        if post_data is None:
-            return {"error": f"No post found with identifier: {identifier}", "content": ""}
+    if post_data is None:
+        return {"error": f"No post found with identifier: {identifier}", "content": ""}
 
-        # Prepare content in markdown format
-        if include_metadata:
-            content = f"# {post_data['title']}\n\nSlug: {post_data['slug']}\n\n{post_data['markdown']}"
-            return {"content": content, "metadata": post_data}
-        else:
-            # Default markdown format
-            return {
-                "content": post_data["markdown"],
-                "metadata": {
-                    "slug": post_data["slug"],
-                    "title": post_data["title"],
-                    "length": len(post_data["markdown"]),
-                },
-            }
-
-    except Exception as e:
-        log.error("fetch_post.error", identifier=identifier, error=str(e))
-        return {"error": f"Error fetching post: {e}", "content": ""}
+    # Prepare content in markdown format
+    if include_metadata:
+        content = f"# {post_data['title']}\n\nSlug: {post_data['slug']}\n\n{post_data['markdown']}"
+        return {"content": content, "metadata": post_data}
+    else:
+        # Default markdown format
+        return {
+            "content": post_data["markdown"],
+            "metadata": {
+                "slug": post_data["slug"],
+                "title": post_data["title"],
+                "length": len(post_data["markdown"]),
+            },
+        }
 
 
 @mcp.tool
 async def search_posts(query: str, limit: int = 10) -> Dict[str, Any]:
     """
-    Search for posts by title or content.
+    Search for articles and data insights by title or content.
 
     Args:
         query: Search term to look for in post titles or content
@@ -140,12 +135,15 @@ async def search_posts(query: str, limit: int = 10) -> Dict[str, Any]:
     SELECT
         slug,
         content -> '$.title' as title,
+        type,
         SUBSTR(markdown, 1, 200) as excerpt
     FROM posts_gdocs
     WHERE
         (content -> '$.title' LIKE '%{query}%' OR markdown LIKE '%{query}%')
         AND slug IS NOT NULL
         AND markdown IS NOT NULL
+        -- exclude fragments
+        AND type not in ('fragment', 'about-page')
     ORDER BY
         CASE WHEN content -> '$.title' LIKE '%{query}%' THEN 1 ELSE 2 END,
         slug
@@ -156,13 +154,23 @@ async def search_posts(query: str, limit: int = 10) -> Dict[str, Any]:
 
     posts = []
     for row in result["rows"]:
-        slug, title, excerpt = row
+        slug, title, excerpt, typ = row
+        slug = slug or ""
+
+        # Create URL
+        if typ == "data-insight":
+            # Data insights have a different URL structure
+            url = f"https://ourworldindata.org/data-insights/{slug}"
+        else:
+            url = f"https://ourworldindata.org/{slug}"
+
         posts.append(
             {
-                "slug": slug or "",
+                "slug": slug,
                 "title": title or "",
                 "excerpt": excerpt or "",
-                "url": f"https://ourworldindata.org/{slug}" if slug else "",
+                "type": typ or "",
+                "url": url,
             }
         )
 

@@ -344,6 +344,8 @@ async def test_search_posts_and_fetch():
         # Check search result structure
         search_data = search_result.structured_content
 
+        __import__("ipdb").set_trace()
+
         assert "query" in search_data
         assert "results" in search_data
         assert "count" in search_data
