@@ -644,7 +644,7 @@ def st_docs():
         **What gets synced for each chart:**
         - **Chart configuration** (title, subtitle, axis labels, chart type, etc.)
         - **Variable mappings** (automatically migrated from staging to production IDs)
-        - **Tags** (only for new charts; existing chart tags are not modified)
+        - **Tags** (tags for charts that are not in chart-diff won't be synced)
         - **Chart metadata** (description, notes, etc.)
 
         **Additional items synced:**
