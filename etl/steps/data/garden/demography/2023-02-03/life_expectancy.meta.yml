@@ -2,7 +2,7 @@ all_sources:
   - un_wpp: &un_source
       name: UN WPP (2022)
       published_by: United Nations, Department of Economic and Social Affairs, Population Division (2022). World Population Prospects 2022, Online Edition
-      url: https://population.un.org/wpp/Download/
+      url: https://population.un.org/wpp/downloads
       owid_data_url: https://walden.owid.io/un/2022-07-11/un_wpp.zip
       date_accessed: "2022-09-09"
       publication_date: "2022-07-11"
@@ -85,17 +85,17 @@ dataset:
 
     **Estimates of Regional and Global Life Expectancy, 1800-2001 - Riley (2005)**
     Historians and demographers have gone to considerable trouble to reconstruct life expectancy in the past in individual countries. This overview collects information from a large body of that work and links estimates for historical populations to those provided by the United Nations, the World Bank, and other sources for 1950-2001. The result is a picture of regional and global life expectancy at birth for selected years from 1800 to 2001. The bibliography of more than 700 sources is published separately on the web.
-  version: '2022-11-30'
+  version: "2022-11-30"
   licenses:
-  - *un_license
-  - *hmd_license
-  - *zijdeman_license
-  - *riley_license
+    - *un_license
+    - *hmd_license
+    - *zijdeman_license
+    - *riley_license
   sources:
-  - *un_source
-  - *hmd_source
-  - *zijdeman_source
-  - *riley_source
+    - *un_source
+    - *hmd_source
+    - *zijdeman_source
+    - *riley_source
 tables:
   historical:
     title: Life Expectancy (various sources) - Historical
@@ -108,9 +108,9 @@ tables:
         unit: years
         short_unit: years
         sources:
-        - *un_source
-        - *zijdeman_source
-        - *riley_source
+          - *un_source
+          - *zijdeman_source
+          - *riley_source
       life_expectancy_15_hist:
         title: Life expectancy at 15 (historical)
         description: "The average number of remaining years of life expected by a hypothetical cohort of individuals who already
@@ -119,8 +119,8 @@ tables:
         unit: years
         short_unit: years
         sources:
-        - *un_source
-        - *hmd_source
+          - *un_source
+          - *hmd_source
       life_expectancy_65_hist:
         title: Life expectancy at 65 (historical)
         description: "The average number of remaining years of life expected by a hypothetical cohort of individuals who already
@@ -129,8 +129,8 @@ tables:
         unit: years
         short_unit: years
         sources:
-        - *un_source
-        - *hmd_source
+          - *un_source
+          - *hmd_source
       life_expectancy_80_hist:
         title: Life expectancy at 80 (historical)
         description: "The average number of remaining years of life expected by a hypothetical cohort of individuals who already
@@ -139,8 +139,8 @@ tables:
         unit: years
         short_unit: years
         sources:
-        - *un_source
-        - *hmd_source
+          - *un_source
+          - *hmd_source
   life_expectancy:
     title: Life Expectancy (various sources)
     variables:
@@ -152,9 +152,9 @@ tables:
         unit: years
         short_unit: years
         sources:
-        - *un_source
-        - *zijdeman_source
-        - *riley_source
+          - *un_source
+          - *zijdeman_source
+          - *riley_source
       life_expectancy_15:
         title: Life expectancy at 15
         description: "The average number of remaining years of life expected by a hypothetical cohort of individuals who already
@@ -163,8 +163,8 @@ tables:
         unit: years
         short_unit: years
         sources:
-        - *un_source
-        - *hmd_source
+          - *un_source
+          - *hmd_source
       life_expectancy_65:
         title: Life expectancy at 65
         description: "The average number of remaining years of life expected by a hypothetical cohort of individuals who already
@@ -173,8 +173,8 @@ tables:
         unit: years
         short_unit: years
         sources:
-        - *un_source
-        - *hmd_source
+          - *un_source
+          - *hmd_source
       life_expectancy_80:
         title: Life expectancy at 80
         description: "The average number of remaining years of life expected by a hypothetical cohort of individuals who already
@@ -183,8 +183,8 @@ tables:
         unit: years
         short_unit: years
         sources:
-        - *un_source
-        - *hmd_source
+          - *un_source
+          - *hmd_source
   projection:
     title: Life Expectancy (various sources) - Projection
     variables:
@@ -196,7 +196,7 @@ tables:
         unit: years
         short_unit: years
         sources:
-        - *un_source
+          - *un_source
       life_expectancy_15_proj:
         title: Life expectancy at 15 (projection)
         description: "The average number of remaining years of life expected by a hypothetical cohort of individuals who already
@@ -205,7 +205,7 @@ tables:
         unit: years
         short_unit: years
         sources:
-        - *un_source
+          - *un_source
       life_expectancy_65_proj:
         title: Life expectancy at 65 (projection)
         description: "The average number of remaining years of life expected by a hypothetical cohort of individuals who already
@@ -214,8 +214,8 @@ tables:
         unit: years
         short_unit: years
         sources:
-        - *un_source
-        - *hmd_source
+          - *un_source
+          - *hmd_source
       life_expectancy_80_proj:
         title: Life expectancy at 80 (projection)
         description: "The average number of remaining years of life expected by a hypothetical cohort of individuals who already
@@ -224,4 +224,4 @@ tables:
         unit: years
         short_unit: years
         sources:
-        - *un_source
+          - *un_source
