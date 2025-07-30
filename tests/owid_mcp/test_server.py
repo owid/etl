@@ -35,7 +35,7 @@ async def test_search_chart_basic_functionality():
     """Test basic functionality of search_chart tool."""
     async with Client(mcp) as client:
         # Test searching for population density charts
-        result = await client.call_tool("search_chart", {"query": "population density"})
+        result = await client.call_tool("search_chart", {"query": "global temperature warming annual"})
         assert result is not None
         # The result should be a list (even if empty)
         assert isinstance(result.data, list)

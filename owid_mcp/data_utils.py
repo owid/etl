@@ -138,7 +138,12 @@ async def make_algolia_request(query: str, limit: int = 10) -> List[Dict[str, An
         "page": 0,
     }
 
-    return await _make_algolia_request_base(request_config, "algolia")
+    hits = await _make_algolia_request_base(request_config, "algolia")
+
+    # Exclude explorerView since we don't have persistent CSV URLs for them
+    hits = [hit for hit in hits if hit.get("type") != "explorerView"]
+
+    return hits
 
 
 async def make_algolia_pages_request(

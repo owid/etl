@@ -52,25 +52,27 @@ async def test_fetch_chart_with_specific_id():
 
 
 @pytest.mark.asyncio
-async def test_fetch_chart_data_directly():
-    """Test calling the charts.fetch_chart_data function directly."""
-    from owid_mcp import charts
+async def test_fetch_chart_data_via_client():
+    """Test calling the fetch_chart_data tool via MCP client."""
+    async with Client(mcp) as client:
+        chart_id = "population-density"
 
-    chart_url = "https://ourworldindata.org/grapher/population-density.csv?tab=line&csvType=filtered&country=FRA"
+        # Test the MCP tool through the client interface
+        result = await client.call_tool("fetch_chart_data", {"id": chart_id})
 
-    # This should test the actual function that's failing
-    result = await charts._fetch_chart_data_internal(chart_url)
+        assert result is not None
+        assert result.structured_content is not None
 
-    assert result is not None
-    assert hasattr(result, "id")
-    assert hasattr(result, "title")
-    assert hasattr(result, "text")
-    assert hasattr(result, "url")
-    assert hasattr(result, "metadata")
+        data = result.structured_content
+        assert "id" in data
+        assert "title" in data
+        assert "text" in data
+        assert "url" in data
+        assert "metadata" in data
 
-    assert result.id == chart_url
-    assert isinstance(result.text, str)
-    assert len(result.text) > 0
+        assert data["id"] == chart_id
+        assert isinstance(data["text"], str)
+        assert len(data["text"]) > 0
 
 
 @pytest.mark.asyncio

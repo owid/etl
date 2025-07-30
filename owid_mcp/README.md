@@ -120,3 +120,7 @@ Key environment variables and settings are defined in `config.py`:
 - Database connection settings
 - Common entity mappings
 - Rate limiting and caching parameters
+
+## Limitations
+
+- We filter explorer views from `search_chart` because they don't have persistent CSV URLs or images.
