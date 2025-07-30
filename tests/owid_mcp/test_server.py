@@ -277,7 +277,6 @@ async def test_search_and_fetch_workflow():
         # Step 2: Get details from search results
         first_result = search_results[0]
         indicator_id = first_result["id"]
-        search_title = first_result["title"]
 
         # Step 3: Fetch full data for the first result
         fetch_result = await client.call_tool("fetch", {"id": indicator_id})
