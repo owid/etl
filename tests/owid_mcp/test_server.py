@@ -344,8 +344,6 @@ async def test_search_posts_and_fetch():
         # Check search result structure
         search_data = search_result.structured_content
 
-        __import__("ipdb").set_trace()
-
         assert "query" in search_data
         assert "results" in search_data
         assert "count" in search_data
@@ -392,3 +390,61 @@ async def test_search_posts_and_fetch():
         assert len(content) > 0
 
         print(f"✅ Successfully fetched post: '{metadata['title']}' ({metadata['length']} chars)")
+
+
+@pytest.mark.asyncio
+async def test_search_posts_algolia_vs_sql():
+    """Test that search_posts works with both SQL and Algolia backends."""
+    async with Client(mcp) as client:
+        query = "poverty"
+        limit = 3
+        
+        # Test SQL search (default)
+        sql_result = await client.call_tool("search_posts", {"query": query, "limit": limit, "use_algolia": False})
+        assert sql_result is not None
+        assert sql_result.structured_content is not None
+        
+        sql_data = sql_result.structured_content
+        assert "query" in sql_data
+        assert "results" in sql_data
+        assert "count" in sql_data
+        assert "search_method" in sql_data
+        assert sql_data["query"] == query
+        assert sql_data["search_method"] == "sql"
+        assert isinstance(sql_data["results"], list)
+        assert sql_data["count"] == len(sql_data["results"])
+        
+        # Test Algolia search
+        algolia_result = await client.call_tool("search_posts", {"query": query, "limit": limit, "use_algolia": True})
+        assert algolia_result is not None
+        assert algolia_result.structured_content is not None
+        
+        algolia_data = algolia_result.structured_content
+        assert "query" in algolia_data
+        assert "results" in algolia_data
+        assert "count" in algolia_data
+        assert "search_method" in algolia_data
+        assert algolia_data["query"] == query
+        assert algolia_data["search_method"] == "algolia"
+        assert isinstance(algolia_data["results"], list)
+        assert algolia_data["count"] == len(algolia_data["results"])
+        
+        # Both should return some results for "poverty"
+        assert sql_data["count"] > 0
+        assert algolia_data["count"] > 0
+        
+        # Check that both return properly structured results
+        for result_set in [sql_data["results"], algolia_data["results"]]:
+            if result_set:  # If we have results
+                first_result = result_set[0]
+                assert "slug" in first_result
+                assert "title" in first_result
+                assert "excerpt" in first_result
+                assert "url" in first_result
+                assert "type" in first_result
+                
+                # URL should be properly formatted
+                assert first_result["url"].startswith("https://ourworldindata.org/")
+        
+        print(f"✅ SQL search returned {sql_data['count']} results")
+        print(f"✅ Algolia search returned {algolia_data['count']} results")

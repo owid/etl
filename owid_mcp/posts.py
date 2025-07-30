@@ -9,7 +9,7 @@ from typing import Any, Dict, Optional
 import structlog
 from fastmcp import FastMCP
 
-from owid_mcp.data_utils import run_sql
+from owid_mcp.data_utils import make_algolia_pages_request, run_sql
 
 log = structlog.get_logger()
 
@@ -116,62 +116,84 @@ async def fetch_post(identifier: str, include_metadata: bool = False) -> Dict[st
         }
 
 
+def _create_post_url(slug: str, typ: str) -> str:
+    """Create URL for a post based on its slug and type."""
+    if typ == "data-insight":
+        return f"https://ourworldindata.org/data-insights/{slug}"
+    else:
+        return f"https://ourworldindata.org/{slug}"
+
+
+def _build_post_result(slug: str, title: str, excerpt: str, typ: str) -> Dict[str, str]:
+    """Build a standardized post result dictionary."""
+    return {
+        "slug": slug,
+        "title": title,
+        "excerpt": excerpt,
+        "type": typ,
+        "url": _create_post_url(slug, typ),
+    }
+
+
 @mcp.tool
-async def search_posts(query: str, limit: int = 10) -> Dict[str, Any]:
+async def search_posts(query: str, limit: int = 10, use_algolia: bool = True) -> Dict[str, Any]:
     """
     Search for articles and data insights by title or content.
 
     Args:
         query: Search term to look for in post titles or content
         limit: Maximum number of results to return (default: 10)
+        use_algolia: Whether to use Algolia search instead of SQL (default: True)
 
     Returns:
         Dict with search results containing slug, title, and excerpt
     """
-    log.info("search_posts", query=query, limit=limit)
+    log.info("search_posts", query=query, limit=limit, use_algolia=use_algolia)
 
-    # Search in titles and content using LIKE
-    sql_query = f"""
-    SELECT
-        slug,
-        content -> '$.title' as title,
-        type,
-        SUBSTR(markdown, 1, 200) as excerpt
-    FROM posts_gdocs
-    WHERE
-        (content -> '$.title' LIKE '%{query}%' OR markdown LIKE '%{query}%')
-        AND slug IS NOT NULL
-        AND markdown IS NOT NULL
-        -- exclude fragments
-        AND type not in ('fragment', 'about-page')
-    ORDER BY
-        CASE WHEN content -> '$.title' LIKE '%{query}%' THEN 1 ELSE 2 END,
-        slug
-    LIMIT {limit}
-    """
+    if use_algolia:
+        # Use Algolia search
+        hits = await make_algolia_pages_request(query, hits_per_page=limit)
+        posts = [
+            _build_post_result(
+                slug=hit.get("slug", ""),
+                title=hit.get("title", ""),
+                excerpt=hit.get("excerpt", ""),
+                typ=hit.get("type", ""),
+            )
+            for hit in hits
+        ]
+        search_method = "algolia"
+    else:
+        # Use SQL search
+        sql_query = f"""
+        SELECT
+            slug,
+            content -> '$.title' as title,
+            type,
+            SUBSTR(markdown, 1, 200) as excerpt
+        FROM posts_gdocs
+        WHERE
+            (content -> '$.title' LIKE '%{query}%' OR markdown LIKE '%{query}%')
+            AND slug IS NOT NULL
+            AND markdown IS NOT NULL
+            -- exclude fragments
+            AND type not in ('fragment', 'about-page')
+        ORDER BY
+            CASE WHEN content -> '$.title' LIKE '%{query}%' THEN 1 ELSE 2 END,
+            slug
+        LIMIT {limit}
+        """
 
-    result = await run_sql(sql_query, max_rows=limit)
+        result = await run_sql(sql_query, max_rows=limit)
+        posts = [
+            _build_post_result(
+                slug=row[0] or "",
+                title=row[1] or "",
+                excerpt=row[3] or "",
+                typ=row[2] or "",
+            )
+            for row in result["rows"]
+        ]
+        search_method = "sql"
 
-    posts = []
-    for row in result["rows"]:
-        slug, title, excerpt, typ = row
-        slug = slug or ""
-
-        # Create URL
-        if typ == "data-insight":
-            # Data insights have a different URL structure
-            url = f"https://ourworldindata.org/data-insights/{slug}"
-        else:
-            url = f"https://ourworldindata.org/{slug}"
-
-        posts.append(
-            {
-                "slug": slug,
-                "title": title or "",
-                "excerpt": excerpt or "",
-                "type": typ or "",
-                "url": url,
-            }
-        )
-
-    return {"query": query, "results": posts, "count": len(posts)}
+    return {"query": query, "results": posts, "count": len(posts), "search_method": search_method}

@@ -81,39 +81,17 @@ def country_name_to_iso3(name: Optional[str]) -> Optional[str]:
     return mapping.get(name.lower())
 
 
-async def make_algolia_request(query: str, limit: int = 10) -> List[Dict[str, Any]]:
-    """Make a request to Algolia search API and return the hits.
+async def _make_algolia_request_base(request_config: Dict[str, Any], log_prefix: str) -> List[Dict[str, Any]]:
+    """Base function for making Algolia API requests.
 
     Args:
-        query: Search query string
-        limit: Maximum number of results to return
+        request_config: The request configuration for the Algolia index
+        log_prefix: Prefix for logging messages
 
     Returns:
         List of search hits from Algolia
     """
-    log.debug("algolia.request", query=query, limit=limit)
-
-    payload = {
-        "requests": [
-            {
-                "indexName": "explorer-views-and-charts",
-                "attributesToRetrieve": [
-                    "title",
-                    "slug",
-                    "availableEntities",
-                    "variantName",
-                    "type",
-                ],
-                "query": query,
-                "facetFilters": [[], "isIncomeGroupSpecificFM:false"],
-                "highlightPreTag": "<mark>",
-                "highlightPostTag": "</mark>",
-                "facets": ["tags"],
-                "hitsPerPage": limit,
-                "page": 0,
-            }
-        ]
-    }
+    payload = {"requests": [request_config]}
 
     headers = {
         "x-algolia-api-key": ALGOLIA_API_KEY,
@@ -126,8 +104,68 @@ async def make_algolia_request(query: str, limit: int = 10) -> List[Dict[str, An
         resp.raise_for_status()
         response_data = resp.json()
         hits = response_data["results"][0].get("hits", [])
-        log.debug("algolia.response", hits_count=len(hits))
+        log.debug(f"{log_prefix}.response", hits_count=len(hits))
         return hits
+
+
+async def make_algolia_request(query: str, limit: int = 10) -> List[Dict[str, Any]]:
+    """Make a request to Algolia search API and return the hits.
+
+    Args:
+        query: Search query string
+        limit: Maximum number of results to return
+
+    Returns:
+        List of search hits from Algolia
+    """
+    log.debug("algolia.request", query=query, limit=limit)
+
+    request_config = {
+        "indexName": "explorer-views-and-charts",
+        "attributesToRetrieve": [
+            "title",
+            "slug",
+            "availableEntities",
+            "variantName",
+            "type",
+        ],
+        "query": query,
+        "facetFilters": [[], "isIncomeGroupSpecificFM:false"],
+        "highlightPreTag": "<mark>",
+        "highlightPostTag": "</mark>",
+        "facets": ["tags"],
+        "hitsPerPage": limit,
+        "page": 0,
+    }
+
+    return await _make_algolia_request_base(request_config, "algolia")
+
+
+async def make_algolia_pages_request(
+    query: str,
+    hits_per_page: int = 10,
+    distinct: bool = True,
+) -> List[Dict[str, Any]]:
+    """Make a request to Algolia pages index and return the hits.
+
+    Args:
+        query: Search query string
+        hits_per_page: Maximum number of results per page to return
+        distinct: Whether to enable distinct results
+
+    Returns:
+        List of search hits from Algolia pages index
+    """
+    log.debug("algolia.pages.request", query=query, hits_per_page=hits_per_page)
+
+    request_config = {
+        "indexName": "pages",
+        "query": query,
+        "hitsPerPage": hits_per_page,
+        "distinct": distinct,
+    }
+
+    return await _make_algolia_request_base(request_config, "algolia.pages")
 
 
 async def run_sql(query: str, max_rows: int = MAX_ROWS_DEFAULT) -> Dict[str, Any]:
