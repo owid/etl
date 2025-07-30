@@ -48,7 +48,7 @@ INSTRUCTIONS = (
     "USAGE:\n"
     "• Include country names in search: 'population France', 'emissions China'\n"
     "• Use time filtering in fetch (e.g., '1990..2010', 'earliest..2010', '1990..latest')\n"
-    "• Returns CSV with Entity column removed (Code, Year, metrics only)"
+    "• Returns CSV with Entity column removed if Code column has no empty values (Code, Year, metrics)"
 )
 
 mcp = FastMCP()
@@ -57,7 +57,8 @@ mcp = FastMCP()
 async def _fetch_chart_data_internal(id: str, time: Optional[str] = None) -> ChartDataResult:
     """Download a grapher CSV and return the processed data.
 
-    The returned CSV has the Entity column removed and contains only:
+    The returned CSV includes:
+    - Entity: Country/region names (removed if Code column has no empty values)
     - Code: Country/region ISO codes
     - Year: Time period
     - [Metric columns]: The actual data values
@@ -84,17 +85,24 @@ async def _fetch_chart_data_internal(id: str, time: Optional[str] = None) -> Cha
             metadata={"error": "ID must be a grapher CSV URL"},
         )
 
-    # Add time parameter to URL if provided
-    fetch_url = id
+    # Parse URL and add required parameters
+    parsed = urllib.parse.urlparse(id)
+    query_params = urllib.parse.parse_qs(parsed.query)
+    
+    # Add tab=line&csvType=filtered if not already present
+    if "tab" not in query_params:
+        query_params["tab"] = ["line"]
+    if "csvType" not in query_params:
+        query_params["csvType"] = ["filtered"]
+    
+    # Add time parameter if provided
     if time:
-        # Parse existing URL to add time parameter
-        parsed = urllib.parse.urlparse(id)
-        query_params = urllib.parse.parse_qs(parsed.query)
         query_params["time"] = [time]
-        new_query = urllib.parse.urlencode(query_params, doseq=True)
-        fetch_url = urllib.parse.urlunparse(
-            (parsed.scheme, parsed.netloc, parsed.path, parsed.params, new_query, parsed.fragment)
-        )
+        
+    new_query = urllib.parse.urlencode(query_params, doseq=True)
+    fetch_url = urllib.parse.urlunparse(
+        (parsed.scheme, parsed.netloc, parsed.path, parsed.params, new_query, parsed.fragment)
+    )
 
     try:
         async with httpx.AsyncClient(timeout=HTTP_TIMEOUT) as client:
@@ -102,16 +110,22 @@ async def _fetch_chart_data_internal(id: str, time: Optional[str] = None) -> Cha
             resp.raise_for_status()
             csv_content = resp.text
 
-        # Process CSV to remove Entity column
+        # Process CSV - remove Entity column if Code column has no empty values
         df = pd.read_csv(io.StringIO(csv_content))
-        if "Entity" in df.columns:
-            df = df.drop(columns=["Entity"])
+        
+        # Check if Code column exists and has no empty/null values
+        if 'Code' in df.columns and 'Entity' in df.columns:
+            # Check for empty, null, or whitespace-only values in Code column
+            code_has_empty = df['Code'].isna().any() or (df['Code'].astype(str).str.strip() == '').any()
+            if not code_has_empty:
+                # Remove Entity column as it's redundant when Code is complete
+                df = df.drop(columns=['Entity'])
 
         # Convert back to CSV string
         processed_csv: str = df.to_csv(index=False)
 
         slug = urllib.parse.urlparse(id).path.rsplit("/", 1)[-1].split(".")[0]
-        title: str = slug.replace("-", " ").title() if slug else "OWID Dataset"
+        title = slug.replace("-", " ").title() if slug else "OWID Dataset"
 
         return ChartDataResult(
             id=id,
@@ -143,7 +157,8 @@ async def _fetch_chart_data_internal(id: str, time: Optional[str] = None) -> Cha
 async def fetch_chart_data(id: str, time: Optional[str] = None) -> ChartDataResult:
     """Download a grapher CSV and return the processed data.
 
-    The returned CSV has the Entity column removed and contains only:
+    The returned CSV includes:
+    - Entity: Country/region names (removed if Code column has no empty values)
     - Code: Country/region ISO codes
     - Year: Time period
     - [Metric columns]: The actual data values
@@ -281,6 +296,8 @@ async def _search_chart_internal(query: str) -> List[ChartSearchResult]:
                 grapher_url += f"&country={country_param}"
 
             # NOTE: we could get metadata from https://ourworldindata.org/grapher/urban-area-long-term.metadata.json?v=1&csvType=filtered&useColumnShortNames=true
+            # TODO: we return grapher_url as id only because of deep research compatibility. Once it starts supporting regular MPC, we should
+            #   stop adding `tab=line&csvType=filtered`
             results.append(
                 ChartSearchResult(
                     id=grapher_url,

@@ -1,11 +1,11 @@
-from typing import Any, Dict, List
 import urllib.parse
+from typing import Any, Dict, List
 
 import httpx
 import structlog
 from fastmcp import FastMCP
 
-from owid_mcp.config import MAX_ROWS_DEFAULT, HTTP_TIMEOUT, DATASETTE_BASE
+from owid_mcp.config import DATASETTE_BASE, HTTP_TIMEOUT, MAX_ROWS_DEFAULT
 from owid_mcp.data_utils import build_catalog_info, fetch_indicator_data
 from owid_mcp.data_utils import run_sql as _run_sql
 
@@ -46,6 +46,11 @@ async def search_indicator(query: str, limit: int = 10) -> List[Dict]:
     - chart_count: number of charts this indicator is used in
 
     Use the resource_uri with ReadMcpResourceTool to get the actual data.
+    
+    IMPORTANT: When using the returned parquet URLs in SQL queries, note that OWID 
+    column names commonly use double underscores (__) as separators, not single 
+    underscores (_). For example: 'coal_production__twh' not 'coal_production_twh'.
+    Check the sql_template in metadata for the correct column name format.
     """
     log.info("Searching indicators", query=query, limit=limit)
 
@@ -57,16 +62,20 @@ async def search_indicator(query: str, limit: int = 10) -> List[Dict]:
         v.catalogPath,
         COALESCE(cd.chart_count, 0) AS chart_count
     FROM variables v
+    JOIN datasets d ON d.id = v.datasetId
     LEFT JOIN (
         SELECT variableId, COUNT(DISTINCT chartId) AS chart_count
         FROM chart_dimensions
         GROUP BY variableId
     ) cd ON cd.variableId = v.id
-    WHERE v.catalogPath IS NOT NULL AND (
+    WHERE
+        v.catalogPath IS NOT NULL
+        AND not d.isArchived
+        AND (
             v.name LIKE :q COLLATE NOCASE
             OR
             v.description LIKE :q COLLATE NOCASE
-    )
+        )
     ORDER BY chart_count DESC, v.name
     LIMIT :limit
     """
