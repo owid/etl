@@ -175,3 +175,10 @@ steps:
   #
   export://explorers/agriculture/latest/crop_yields:
     - data://grapher/agriculture/2025-03-26/attainable_yields
+  #
+  # Long-term food and agriculture trends
+  #
+  data://garden/agriculture/2025-07-30/long_term_food_and_agriculture_trends:
+    - data://garden/faostat/2025-03-17/faostat_fbsc
+    - data://garden/faostat/2025-03-17/faostat_rl
+    - data://garden/regions/2023-01-01/regions

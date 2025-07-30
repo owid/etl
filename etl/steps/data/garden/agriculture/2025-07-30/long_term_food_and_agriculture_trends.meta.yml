@@ -1,0 +1,6 @@
+dataset:
+  update_period_days: 365
+
+tables:
+  long_term_wheat_yields:
+    title: Long-term food and agriculture trends
