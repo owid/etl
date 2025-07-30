@@ -40,7 +40,9 @@ def run(dest_dir: str) -> None:
     tb_lt.loc[tb_lt["year"] < YEAR_WPP_START, "source"] = "Human Mortality Database"
     tb_lt.loc[tb_lt["year"] < YEAR_WPP_START, "source_url"] = "https://www.mortality.org/Data/ZippedDataFiles"
     tb_lt.loc[tb_lt["year"] >= YEAR_WPP_START, "source"] = "UN World Population Prospects"
-    tb_lt.loc[tb_lt["year"] >= YEAR_WPP_START, "source_url"] = "https://population.un.org/wpp/downloads?folder=Standard%20Projections&group=Most%20used"
+    tb_lt.loc[tb_lt["year"] >= YEAR_WPP_START, "source_url"] = (
+        "https://population.un.org/wpp/downloads?folder=Standard%20Projections&group=Most%20used"
+    )
     ## zijdeman_et_al_2015
     paths.log.info("reading dataset `zijdeman_et_al_2015`")
     ds_zi = paths.load_dataset("zijdeman_et_al_2015")
@@ -89,14 +91,13 @@ def run(dest_dir: str) -> None:
     ## Get origins to assign to source in main at birth table
     origins = tb["life_expectancy"].m.origins
 
-
     ## (i) Main table (historical values)
     ## SepaHi, my name's... oh wait, I need to have it.
     tb_main = tb.loc[tb["year"] <= YEAR_ESTIMATE_LAST].copy()
-    tb_main_at_birth = tb_main[tb_main['life_expectancy_0'].notna()].drop(columns = ['sex', 'age', 'life_expectancy'])
+    tb_main_at_birth = tb_main[tb_main["life_expectancy_0"].notna()].drop(columns=["sex", "age", "life_expectancy"])
     tb_main_at_birth["source"].m.origins = origins
-    tb_main_at_birth['source_url'].m.origins = origins
-    tb_main = tb_main[tb_main['life_expectancy'].notna()].drop(columns=['source', "source_url",'life_expectancy_0'])
+    tb_main_at_birth["source_url"].m.origins = origins
+    tb_main = tb_main[tb_main["life_expectancy"].notna()].drop(columns=["source", "source_url", "life_expectancy_0"])
     ## (ii) Only projections
     tb = tb.drop(columns=["source", "source_url"])
     tb_only_proj = tb.loc[tb["year"] > YEAR_ESTIMATE_LAST].copy()
@@ -117,7 +118,7 @@ def run(dest_dir: str) -> None:
     # Format
     tables = [
         tb_main.format(columns_index, short_name=paths.short_name),
-        tb_main_at_birth.format(['country', 'year'], short_name=f"{paths.short_name}_at_birth"),
+        tb_main_at_birth.format(["country", "year"], short_name=f"{paths.short_name}_at_birth"),
         tb_only_proj.format(columns_index, short_name=f"{paths.short_name}_only_proj"),
         tb_with_proj.format(columns_index, short_name=f"{paths.short_name}_with_proj"),
     ]

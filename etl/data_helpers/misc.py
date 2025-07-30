@@ -956,7 +956,7 @@ def _extract_metadata_rows(metadata_obj, included_fields: set) -> List[List[str]
             # Handle special case for origins - extract attributes for each
             if key == "origins":
                 origin_rows = []  # Collect all origin rows first
-                
+
                 for origin in value:
                     # Get origin identifier with proper type handling
                     origin_identifier = None
@@ -979,7 +979,7 @@ def _extract_metadata_rows(metadata_obj, included_fields: set) -> List[List[str]
                         origin_display_name = display_name
 
                     origin_rows.extend(_extract_origin_attributes(origin, origin_display_name))
-                
+
                 # Deduplicate based on the formatted content (after extraction)
                 seen_formatted = set()
                 for row in origin_rows:
@@ -1049,13 +1049,13 @@ def _extract_origin_attributes(origin, base_display_name: str) -> List[List[str]
 
         # Join all attributes with line breaks
         formatted_value = "\n".join(formatted_attributes)
-        
+
         # Create display name for this origin
         if origin_index is not None:
             display_name = f"{base_display_name} #{origin_index + 1}"
         else:
             display_name = base_display_name
-            
+
         return [display_name, formatted_value]
 
     # Handle the origins data structure correctly

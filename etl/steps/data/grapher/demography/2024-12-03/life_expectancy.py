@@ -1,12 +1,13 @@
 """Load a garden dataset and create a grapher dataset."""
-from etl.data_helpers.misc import export_table_to_gsheet, get_team_folder_id
-from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
+from etl.data_helpers.misc import export_table_to_gsheet, get_team_folder_id
+from structlog import get_logger
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 log = get_logger()
+
 
 def run(dest_dir: str) -> None:
     #
@@ -17,13 +18,15 @@ def run(dest_dir: str) -> None:
 
     # Read table from garden dataset.
     tables = list(ds_garden)
-    tb_gsheet = ds_garden['life_expectancy_at_birth'].reset_index()
-    tb_gsheet = tb_gsheet[['country', 'year', 'life_expectancy_0', 'source']].rename(columns={'life_expectancy_0': 'life_expectancy_at_birth'})
+    tb_gsheet = ds_garden["life_expectancy_at_birth"].reset_index()
+    tb_gsheet = tb_gsheet[["country", "year", "life_expectancy_0", "source"]].rename(
+        columns={"life_expectancy_0": "life_expectancy_at_birth"}
+    )
     #
     # Process data.
     team_folder_id = get_team_folder_id()
     sheet_url, sheet_id = export_table_to_gsheet(
-        table=tb_gsheet, # type: ignore
+        table=tb_gsheet,  # type: ignore
         sheet_title="Long-run life expectancy at birth",
         folder_id=team_folder_id,
         metadata_variables=["life_expectancy_at_birth"],
