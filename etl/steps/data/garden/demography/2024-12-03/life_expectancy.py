@@ -92,7 +92,6 @@ def run(dest_dir: str) -> None:
     origins = tb["life_expectancy"].m.origins
 
     ## (i) Main table (historical values)
-    ## SepaHi, my name's... oh wait, I need to have it.
     tb_main = tb.loc[tb["year"] <= YEAR_ESTIMATE_LAST].copy()
     tb_main_at_birth = tb_main[tb_main["life_expectancy_0"].notna()].drop(columns=["sex", "age", "life_expectancy"])
     tb_main_at_birth["source"].m.origins = origins
