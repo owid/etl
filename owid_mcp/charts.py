@@ -20,7 +20,7 @@ class ChartDataResult(BaseModel):
     """Chart data fetch result."""
 
     id: str  # unique ID for the document or search result item
-    title: str  # string title for the search result item
+    # title: str  # string title for the search result item
     text: str  # full text of the document or item
     url: str  # URL to the document or search result item
     metadata: Optional[Dict[str, Any]] = None  # optional key/value pairing of data
@@ -109,11 +109,8 @@ async def fetch_chart_data(id: str, time: Optional[str] = None) -> ChartDataResu
     # Convert back to CSV string
     processed_csv: str = df.to_csv(index=False)
 
-    title = id.replace("-", " ").title()
-
     return ChartDataResult(
         id=id,
-        title=title,
         text=processed_csv,
         url=fetch_url,
         metadata={

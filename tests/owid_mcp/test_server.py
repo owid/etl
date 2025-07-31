@@ -5,7 +5,7 @@ import pandas as pd
 import pytest
 from fastmcp import Client
 
-from mcp.types import TextResourceContents
+from mcp.types import TextResourceContents, TextContent
 from owid_mcp.server import mcp
 
 
@@ -42,27 +42,23 @@ async def test_search_chart_basic_functionality():
 
 
 @pytest.mark.asyncio
-async def test_indicator_resource():
-    """Test indicator resource functionality by fetching an indicator."""
+async def test_fetch_indicator_data_tool():
+    """Test fetch_indicator_data_tool functionality by fetching an indicator."""
     async with Client(mcp) as client:
-        # Test fetching an indicator resource with a known ID
+        # Test fetching indicator data with a known ID
         # Using GDP indicator ID which should exist
-        result = await client.read_resource("ind://2118")
+        result = await client.call_tool("fetch_indicator_data_tool", {"indicator_id": 2118})
         assert result is not None
-        assert isinstance(result, list)
-        assert len(result) == 1
+        assert isinstance(result.content, list)
+        assert len(result.content) == 1
 
-        # Check the resource content
-        content = result[0]
-        assert str(content.uri) == "ind://2118"
-
+        # Check the tool result content
+        content = result.content[0]
+        assert isinstance(content, TextContent)
+        
         # Parse the JSON content
         import json
-
-        if isinstance(content, TextResourceContents):
-            data = json.loads(content.text)
-        else:
-            data = json.loads(base64.b64decode(content.blob).decode("utf-8"))
+        data = json.loads(content.text)
         assert "metadata" in data
         assert "data" in data
         assert isinstance(data["data"], list)
@@ -71,27 +67,24 @@ async def test_indicator_resource():
 
 
 @pytest.mark.asyncio
-async def test_indicator_resource_for_entity():
-    """Test indicator resource for specific entity functionality."""
+async def test_fetch_indicator_data_tool_for_entity():
+    """Test fetch_indicator_data_tool for specific entity functionality."""
     async with Client(mcp) as client:
-        # Test fetching an indicator resource for a specific entity
+        # Test fetching indicator data for a specific entity
         # Using GDP indicator ID with USA entity
-        result = await client.read_resource("ind://2118/USA")
+        result = await client.call_tool("fetch_indicator_data_tool", {"indicator_id": 2118, "entity": "USA"})
         assert result is not None
-        assert isinstance(result, list)
-        assert len(result) == 1
+        assert isinstance(result.content, list)
+        assert len(result.content) == 1
 
-        # Check the resource content
-        content = result[0]
-        assert str(content.uri) == "ind://2118/USA"
-
+        # Check the tool result content
+        content = result.content[0]
+        assert isinstance(content, TextContent)
+        
         # Parse the JSON content
         import json
 
-        if isinstance(content, TextResourceContents):
-            data = json.loads(content.text)
-        else:
-            data = json.loads(base64.b64decode(content.blob).decode("utf-8"))
+        data = json.loads(content.text)
         assert "metadata" in data
         assert "data" in data
         assert isinstance(data["data"], list)

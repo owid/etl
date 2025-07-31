@@ -28,7 +28,7 @@ INSTRUCTIONS = (
     "GENERAL GUIDELINES:\n"
     "• If fetched data doesn't contain the values you need, inform the user rather than making up data\n"
     "• Search results automatically filter for mentioned countries when detected in queries\n"
-    "• Use simple, generic indicator names: 'coal production', 'population density', 'GDP per capita'\n"
+    "• **CRITICAL for search_indicator**: Use only 1-2 simple words: 'coal', 'temperature', 'population' (NOT 'coal production mining')\n"
     "• Include country names in chart queries: 'population France', 'emissions China'\n"
     "• Try broad terms first, then narrow down if needed\n"
     "• Don't include 'OWID' or technical terms in search queries"

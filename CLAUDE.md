@@ -253,4 +253,3 @@ print(f"Garden null values: {tb.date.isnull().sum()}")
 ## Instructions for MCP servers
 - When I ask you to get something from MCP server, don't run a python script, but query the MCP server directly! If it is not available, let me know.
 - If MCP server raises an error, try to fix it in code.
-- For SQL queries using `run_sql`, the most useful tables are: `indicators`, `datasets`, and `entities`.
