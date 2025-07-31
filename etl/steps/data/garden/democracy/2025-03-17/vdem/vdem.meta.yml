@@ -4,14 +4,19 @@ definitions:
       topic_tags:
         - Democracy
     description_processing: |-
-      We expand the years covered by V-Dem further: To expand the time coverage of today's countries and include more of the period when they were still non-sovereign territories, we identified the historical entity they were a part of and used that regime's data whenever available
-
-      For example, V-Dem only provides regime data since Bangladesh's independence in 1971. There is, however, regime data for Pakistan and the colony of India, both of which the current territory of Bangladesh was a part. We, therefore, use the regime data of Pakistan for Bangladesh from 1947 to 1970, and the regime data of India from 1789 to 1946. We did so for all countries with a past or current population of more than one million.
+      {definitions.auxiliary.description_imputes}
   auxiliary:
     description_processing_row: |-
       While RoW covers the years since 1900, we use V-Dem's historical data from 1789 to 1899 to expand the classification's coverage back in time.
 
-      {definitions.common.description_processing}
+      {definitions.auxiliary.description_imputes}
+    description_imputes: |-
+      ## Data imputation
+      We expand the years covered by V-Dem further: To expand the time coverage of today's countries and include more of the period when they were still non-sovereign territories, we identified the historical entity they were a part of and used that regime's data whenever available
+
+      For example, V-Dem only provides regime data since Bangladesh's independence in 1971. There is, however, regime data for Pakistan and the colony of India, both of which the current territory of Bangladesh was a part. We, therefore, use the regime data of Pakistan for Bangladesh from 1947 to 1970, and the regime data of India from 1789 to 1946. We did so for all countries with a past or current population of more than one million.
+
+      For more details on the imputation methodology and which countries are affected, refer to [this file](https://github.com/owid/etl/blob/master/etl/steps/data/garden/democracy/2025-03-17/vdem/vdem.countries_impute.yml).
     estimate: |-
       << "central" if estimate == 'best' else estimate >>
     estimate_title: |-
@@ -63,9 +68,12 @@ tables:
       display:
         numDecimalPlaces: 0
       description_processing: &processing_regions |-
+        ## Region aggregates
         The default regional aggregates (including values for the World) have been estimated by averaging the country values. These are only estimated when data for most countries and populations is available (i.e. 70% for most continents). We have used the list of countries in 1900 as a reference.
 
-        In addition, regional aggregates with names like `Region (population-weighted)` (including values for World) have been estimated by averaging the country values weighted by population. The population values are from the UN WPP 2024 revision dataset. These are only estimated when 70% of people in region have data for the given year.
+        In addition, regional aggregates with names like "Region (population-weighted)"" (including values for World) have been estimated by averaging the country values weighted by population. The population values are from the UN WPP 2024 revision dataset. These are only estimated when 70% of people in region have data for the given year.
+
+        {definitions.auxiliary.description_imputes}
       description_key:
         - *key_regions
         - *key_regions_agg
@@ -120,7 +128,7 @@ tables:
         description_processing: |-
           Converted ratio (0-1) into share (0-100%).
 
-          {definitions.common.description_processing}
+          {definitions.auxiliary.description_imputes}
         presentation:
           <<: *ppt_uni_w_regions
           title_public: Share of population with suffrage
@@ -180,6 +188,8 @@ tables:
 
       This snapshot contains all 500 V-Dem indicators and 245 indices + 57 other indicators from other data sources.
     common:
+      description_processing: |-
+        {definitions.auxiliary.description_imputes}
       display:
         numDecimalPlaces: 0
 
@@ -312,6 +322,8 @@ tables:
             - 2012-2014 Mauritius
           - Shimon Peres:
             - 2007-2013 Israel
+
+          {definitions.auxiliary.description_imputes}
         unit: ""
 
       ## 3.4.3.16 HOG female
@@ -355,6 +367,8 @@ tables:
           Joseph Jacques Jean Chrétien: 1993-2002 Canada
           KåreIsaachsen Willoch: 1981-1985 Norway
           YuriiIvanovych Yekhanurov: 2005 Ukraine
+
+          {definitions.auxiliary.description_imputes}
         unit: ""
 
       ## HOE female (custom)
@@ -374,6 +388,8 @@ tables:
             - If head of state is less powerful than head of government
 
           We derive this indicator from V-Dem indicators: `v2exfemhos`, `v2exfemhog`, `v2ex_hosw`, and `v2ex_hogw`.
+
+          {definitions.auxiliary.description_imputes}
         unit: ""
 
       wom_hoe_vdem: # (corrected)
@@ -392,6 +408,8 @@ tables:
             - If head of state is less powerful than head of government
 
           We derive this indicator from V-Dem indicators: `v2exfemhos`, `v2exfemhog`, `v2ex_hosw`, and `v2ex_hogw`.
+
+          {definitions.auxiliary.description_imputes}
         unit: ""
 
       # Had female HOE ever
@@ -418,6 +436,8 @@ tables:
           We derive this indicator from V-Dem indicators: `v2exfemhos`, `v2exfemhog`, `v2ex_hosw`, and `v2ex_hogw`.
 
           This indicator is only estimated for countries listed in V-Dem in 2024.
+
+          {definitions.auxiliary.description_imputes}
         unit: ""
 
       # Had female democratically elected HOE ever
@@ -444,6 +464,8 @@ tables:
           We derive this indicator from V-Dem indicators: `v2exfemhos`, `v2exfemhog`, `v2ex_hosw`, and `v2ex_hogw`.
 
           In addition, we used the V-Dem indicator `electmulpar_hoe_row_owid`, which is based on V-Dem indicator `v2elmulpar_osp_hoe`, to assess if the country goes through electoral processes to elect the chief executive.
+
+          {definitions.auxiliary.description_imputes}
         unit: ""
 
       wom_parl_vdem_cat: # wom_parl_gr_vdem_owid
@@ -568,6 +590,7 @@ tables:
           - 1 if any of the following indicators was 1: `v2eltype_0`, `v2eltype_1`, `v2eltype_4`, `v2eltype_5`, `v2eltype_6`, or `v2eltype_7`.
           - 0 otherwise (i.e. all previous indicators were 0).
 
+          {definitions.auxiliary.description_imputes}
         unit: ""
         display:
           numDecimalPlaces: 0
@@ -2199,7 +2222,7 @@ tables:
         display:
           numDecimalPlaces: 0
 
-      ## [CUSTOM]
+      ## [CUSTOM] TODOO
       electmulpar_hoe_row_owid:
         title: Multi-party elections for government's chief executive ({definitions.auxiliary.estimate} estimate)
         description_short: |-
@@ -2209,13 +2232,15 @@ tables:
           title_public: Multi-party elections for government's chief executive
         unit: ""
         description_processing: |-
-          {definitions.auxiliary.description_processing_row}
+          While RoW covers the years since 1900, we use V-Dem's historical data from 1789 to 1899 to expand the classification's coverage back in time.
 
           Finally, we make some additional minor changes to the coding rules.
 
           The two most consequential changes we make relate to RoW's identification of whether a country's chief executive is elected. First, one way RoW considers a chief executive to have been elected — even if they are not directly elected or appointed by the legislature — is if they are the head of state, they depend on the approval of the legislature, and there were multi-party elections for the executive. This last part is likely a coding error because to be consistent with RoW's other definitions, this should depend on multi-party legislative, not executive, elections. Only if the legislature has been chosen in multi-party elections does it make an otherwise unelected chief executive—who must be approved by that legislature—dependent on multi-party elections. We correct this error.
 
           Second, RoW considers a chief executive to have been elected if the country had chosen both its legislature and executive in multi-party elections. But this considers some chief executives as elected even if they came to power through force after elections were previously held. Examples include the coup d'états led by Fulgencio Batista in Cuba in 1952 and by Muhammadu Buhari in Nigeria in 1983. We instead consider such chief executives as unelected.
+
+          {definitions.auxiliary.description_imputes}
         display:
           numDecimalPlaces: 0
 
@@ -2228,7 +2253,9 @@ tables:
           <<: *ppt_multi_wo_regions
           title_public: Multiparty elections for legislature
         description_processing: |-
-          Use the value from `v2elmulpar_osp` whenever `v2eltype` is 0, 1, 4 or 5. Otherwise the value is missing.
+          We use the value from `v2elmulpar_osp` whenever `v2eltype` is 0, 1, 4 or 5. Otherwise the value is missing.
+
+          {definitions.auxiliary.description_imputes}
         unit: ""
         display:
           numDecimalPlaces: 0
