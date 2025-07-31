@@ -168,6 +168,7 @@ def run() -> None:
     # We add a note in the description_key of certain indicators (look for "&key_regions" in vdem.meta.yml). This note should only be added to indicators that have data pre-1900. We have manually removed this note from the affected indicators. Here, we just check that the indicators that shouldn't have this note, continue not to have data before 1900.
 
     def _check_1900(tb, cols):
+        """Validate that we know the indicators that only have data since 1900"""
         # Get all columns except 'country' and 'year'
         data_columns = [col for col in tb.columns if col not in ["country", "year"]]
 
@@ -179,22 +180,14 @@ def run() -> None:
         first_years = melted.dropna(subset=["value"]).groupby("indicator")["year"].min()
         cols_found = set(first_years.loc[first_years >= 1900].index)
 
-        assert cols == cols_found
+        assert cols == cols_found, f"Not expected: {cols_found - cols} // Missing: {cols - cols_found}"
 
     _check_1900(
-        tb_uni_without_regions,
-        {
-            "corruption_cpi",
-            "dirpop_vote_vdem",
-            "goveffective_vdem_wbgi",
-            "v2xpas_democracy",
-            "v2xpas_democracy_government",
-            "v2xpas_democracy_opposition",
-            "wom_parl_vdem_cat",
-        },
+        tb_uni_with_regions,
+        set(),
     )
     _check_1900(
-        tb_multi_without_regions,
+        tb_multi_with_regions,
         {
             "counterarg_polch_vdem",
             "delib_vdem",
