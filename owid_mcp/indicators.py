@@ -1,3 +1,4 @@
+import asyncio
 import urllib.parse
 from typing import Any, Dict, List
 
@@ -5,8 +6,8 @@ import httpx
 import structlog
 from fastmcp import FastMCP
 
-from owid_mcp.config import DATASETTE_BASE, HTTP_TIMEOUT, MAX_ROWS_DEFAULT
-from owid_mcp.data_utils import build_catalog_info, fetch_indicator_data
+from owid_mcp.config import DATASETTE_BASE, HTTP_TIMEOUT, MAX_ROWS_DEFAULT, OWID_API_BASE
+from owid_mcp.data_utils import build_catalog_info, build_rows, fetch_json
 from owid_mcp.data_utils import run_sql as _run_sql
 
 log = structlog.get_logger()
@@ -15,14 +16,14 @@ log = structlog.get_logger()
 INSTRUCTIONS = (
     "PRIMARY INDICATOR TOOLS (recommended for full MCP clients):\n"
     "• `search_indicator` - Find indicators with rich metadata and structured search results\n"
-    "• `fetch_indicator_data_tool` - Fetch complete indicator data with full metadata\n"
+    "• `fetch_indicator_data` - Fetch complete indicator data with full metadata\n"
     "• `run_sql` - Execute flexible SQL queries for custom data analysis\n\n"
     "CRITICAL USAGE RULES:\n"
     "• **ONLY use 1-2 simple words for search_indicator**: 'coal', 'temperature', 'population'\n"
     "• **NEVER use complex phrases**: NOT 'coal production mining', NOT 'global temperature warming'\n"
     "• Do NOT include country names in search_indicator queries\n"
     "• If no results, try even simpler single-word alternatives\n"
-    "• Use `fetch_indicator_data_tool` with indicator_id for all data or with entity parameter for specific countries\n"
+    "• Use `fetch_indicator_data` with indicator_id for all data or with entity parameter for specific countries\n"
     "• Provides richer metadata than simplified CSV tools"
 )
 
@@ -52,7 +53,7 @@ async def search_indicator(query: str, limit: int = 10) -> List[Dict]:
     - score: relevance score
     - chart_count: number of charts this indicator is used in
 
-    Use the indicator_id with fetch_indicator_data_tool to get the actual data.
+    Use the indicator_id with fetch_indicator_data to get the actual data.
 
     IMPORTANT: When using the returned parquet URLs in SQL queries, note that OWID
     column names commonly use double underscores (__) as separators, not single
@@ -148,7 +149,7 @@ async def run_sql(query: str, max_rows: int = MAX_ROWS_DEFAULT) -> Dict[str, Any
 
 
 @mcp.tool
-async def fetch_indicator_data_tool(indicator_id: int, entity: str | None = None) -> Dict[str, Any]:
+async def fetch_indicator_data(indicator_id: int, entity: str | None = None) -> Dict[str, Any]:
     """Fetch OWID indicator data and metadata.
 
     Args:
@@ -165,4 +166,31 @@ async def fetch_indicator_data_tool(indicator_id: int, entity: str | None = None
           ]
         }
     """
-    return await fetch_indicator_data(indicator_id, entity)
+    # Fetch OWID raw data + metadata concurrently
+    data_url = f"{OWID_API_BASE}/{indicator_id}.data.json"
+    meta_url = f"{OWID_API_BASE}/{indicator_id}.metadata.json"
+    data_json, metadata = await asyncio.gather(fetch_json(data_url), fetch_json(meta_url))
+
+    # Build mapping from numeric id -> {name, code}
+    entities_meta = {
+        ent["id"]: {"name": ent["name"], "code": ent["code"]} for ent in metadata["dimensions"]["entities"]["values"]
+    }
+
+    rows = build_rows(data_json, entities_meta)
+
+    # Optional server-side filter for a single entity
+    if entity is not None:
+        ent_lower = entity.lower()
+        filtered_rows = []
+        for r in rows:
+            if r["entity"] and r["entity"].lower() == ent_lower:
+                filtered_rows.append(r)
+            else:
+                # Check if entity matches any code in entities_meta
+                for ent_meta in entities_meta.values():
+                    if ent_meta["code"] and ent_meta["code"].lower() == ent_lower and ent_meta["name"] == r["entity"]:
+                        filtered_rows.append(r)
+                        break
+        rows = filtered_rows
+
+    return {"metadata": metadata, "data": rows}

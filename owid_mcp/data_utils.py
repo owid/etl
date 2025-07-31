@@ -4,7 +4,6 @@ OWID Data Utilities
 Shared utilities for data processing and API interactions across MCP modules.
 """
 
-import asyncio
 import math
 import re
 import urllib.parse
@@ -15,7 +14,7 @@ import httpx
 import structlog
 import yaml
 
-from owid_mcp.config import CATALOG_BASE, DATASETTE_BASE, HTTP_TIMEOUT, MAX_ROWS_DEFAULT, MAX_ROWS_HARD, OWID_API_BASE
+from owid_mcp.config import CATALOG_BASE, DATASETTE_BASE, HTTP_TIMEOUT, MAX_ROWS_DEFAULT, MAX_ROWS_HARD
 
 log = structlog.get_logger()
 
@@ -312,44 +311,6 @@ async def fetch_json(url: str) -> Dict[str, Any]:
         return resp.json()
 
 
-async def fetch_indicator_data(indicator_id: int, entity: str | None = None) -> Dict[str, Any]:
-    """Fetch indicator data and metadata for a single indicator ID.
-
-    Args:
-        indicator_id: Numeric OWID indicator id
-        entity: Optional entity name or ISO-3 code for filtering
-
-    Returns:
-        Dictionary with metadata and data keys
-    """
-    # Fetch OWID raw data + metadata concurrently
-    data_url = f"{OWID_API_BASE}/{indicator_id}.data.json"
-    meta_url = f"{OWID_API_BASE}/{indicator_id}.metadata.json"
-    data_json, metadata = await asyncio.gather(fetch_json(data_url), fetch_json(meta_url))
-
-    # Build mapping from numeric id -> {name, code}
-    entities_meta = {
-        ent["id"]: {"name": ent["name"], "code": ent["code"]} for ent in metadata["dimensions"]["entities"]["values"]
-    }
-
-    rows = build_rows(data_json, entities_meta)
-
-    # Optional server-side filter for a single entity
-    if entity is not None:
-        ent_lower = entity.lower()
-        filtered_rows = []
-        for r in rows:
-            if r["entity"] and r["entity"].lower() == ent_lower:
-                filtered_rows.append(r)
-            else:
-                # Check if entity matches any code in entities_meta
-                for ent_meta in entities_meta.values():
-                    if ent_meta["code"] and ent_meta["code"].lower() == ent_lower and ent_meta["name"] == r["entity"]:
-                        filtered_rows.append(r)
-                        break
-        rows = filtered_rows
-
-    return {"metadata": metadata, "data": rows}
 
 
 def rows_to_csv(rows: List[Dict[str, Any]]) -> str:

@@ -1,11 +1,10 @@
-import base64
 import io
 
 import pandas as pd
 import pytest
 from fastmcp import Client
 
-from mcp.types import TextResourceContents, TextContent
+from mcp.types import TextContent
 from owid_mcp.server import mcp
 
 
@@ -55,9 +54,10 @@ async def test_fetch_indicator_data_tool():
         # Check the tool result content
         content = result.content[0]
         assert isinstance(content, TextContent)
-        
+
         # Parse the JSON content
         import json
+
         data = json.loads(content.text)
         assert "metadata" in data
         assert "data" in data
@@ -80,7 +80,7 @@ async def test_fetch_indicator_data_tool_for_entity():
         # Check the tool result content
         content = result.content[0]
         assert isinstance(content, TextContent)
-        
+
         # Parse the JSON content
         import json
 
@@ -99,9 +99,7 @@ async def test_cherry_blossom_search_and_sql():
     """Test searching for cherry blossom indicator and then getting data using run_sql."""
     async with Client(mcp) as client:
         # Search for cherry blossom indicator
-        search_result = await client.call_tool(
-            "search_indicator", {"query": "Day of the year with peak cherry blossom"}
-        )
+        search_result = await client.call_tool("search_indicator", {"query": "cherry blossom"})
         assert search_result is not None
         assert search_result.structured_content is not None
         assert "result" in search_result.structured_content
