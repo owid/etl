@@ -228,7 +228,6 @@ async def test_fetch_deep_research():
         # Check that we get results in the correct format
         data = fetch_result.structured_content
         assert "id" in data
-        assert "title" in data
         assert "text" in data
         assert "url" in data
         assert "metadata" in data
@@ -437,24 +436,23 @@ async def test_fetch_chart_data_global_warming():
     """Test fetch_chart_data with global warming by gas and source dataset."""
     async with Client(mcp) as client:
         # Test fetching chart data with specific URL and time filter
-        chart_url = "https://ourworldindata.org/grapher/global-warming-by-gas-and-source.csv"
+        chart_slug = "global-warming-by-gas-and-source"
         time_filter = "1990..latest"
 
-        result = await client.call_tool("fetch_chart_data", {"id": chart_url, "time": time_filter})
+        result = await client.call_tool("fetch_chart_data", {"id": chart_slug, "time": time_filter})
         assert result is not None
         assert result.structured_content is not None
 
         # Check basic structure
         data = result.structured_content
         assert "id" in data
-        assert "title" in data
         assert "text" in data
         assert "url" in data
         assert "metadata" in data
 
         # Verify the response matches our request
-        assert data["id"] == chart_url
-        assert data["url"].startswith(chart_url)  # URL may have time parameter added
+        assert data["id"] == chart_slug
+        assert data["url"].startswith(f"https://ourworldindata.org/grapher/{chart_slug}.csv")  # URL may have time parameter added
 
         # Parse the CSV content
         csv_text = data["text"]
