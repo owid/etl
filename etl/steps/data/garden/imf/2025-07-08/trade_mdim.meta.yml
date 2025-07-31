@@ -9,7 +9,12 @@ definitions:
     presentation:
       topic_tags:
         - Trade & Globalization
-
+      grapher_config:
+        map:
+          colorScale:
+            binningStrategy: manual
+            customNumericValues: [0,10,20,30,40,50,60]
+            baseColorScheme: Blues
   decimals: &decimals 1
 
 # Learn more about the available fields:
@@ -25,14 +30,13 @@ tables:
       value:
         title: |-
           <% if metric == 'exports_of_goods__free_on_board__fob__share' %>
-          Share of << counterpart_country >>'s exports destined for each country
+          Share of country's exports destined for << counterpart_country >>
           <% elif metric == 'imports_of_goods__cost_insurance_freight__cif__share' %>
-          Share of << counterpart_country >>'s imports of goods originating from each country
+          Share of country's imports of goods originating from  << counterpart_country >>
           <% elif metric == 'trade_balance_goods__share' %>
-          << counterpart_country >>'s trade balance of goods with each country
+          Country's trade balance of goods with << counterpart_country >>
           <% elif metric == 'share_of_total_trade' %>
-          Share of << counterpart_country >>'s total trade that is with each country
+          Share of country's total trade that is with << counterpart_country >>
           <%- endif -%>
-
 
 
