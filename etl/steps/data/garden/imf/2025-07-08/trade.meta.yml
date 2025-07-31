@@ -165,3 +165,35 @@ tables:
         display:
           name: Non-trading
           numDecimalPlaces: *decimals
+
+      share_to_top_import_destination:
+        title: Share of imports coming from the <<counterpart_country>>
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of imports from the  <<counterpart_country>> as a percentage of total imports.
+        description_key:
+          - This indicator shows what percentage of a region's total imports come from the <<counterpart_country>>.
+          - Calculated by dividing imports from the <<counterpart_country>> by total imports from all countries, then multiplying by 100.
+          - Values sum to 100% across all trading partners for each country-year, providing a complete picture of import concentration.
+          - A higher percentage indicates greater import dependence on that specific trading partner.
+          - This measure captures the intensity of import relationships relative to total trade activity.
+          - Changes over time can reflect shifts in trade relationships, economic integration, or diversification strategies.
+          - Useful for identifying major import sources and assessing trade concentration risks.
+        display:
+          numDecimalPlaces: *decimals
+
+      share_to_top_export_destination:
+        title: Share of exports going to the <<counterpart_country>>
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of exports to the  <<counterpart_country>> as a percentage of total exports.
+        description_key:
+          - This indicator shows what percentage of a region's total exports go to the <<counterpart_country>>.
+          - Calculated by dividing exports to the <<counterpart_country>> by total exports to all countries, then multiplying by 100.
+          - Values sum to 100% across all trading partners for each country-year, providing a complete picture of export concentration.
+          - A higher percentage indicates greater export dependence on that specific trading partner.
+          - This measure captures the intensity of export relationships relative to total trade activity.
+          - Changes over time can reflect shifts in trade relationships, economic integration, or diversification strategies.
+          - Useful for identifying major export destinations and assessing trade concentration risks.
+        display:
+          numDecimalPlaces: *decimals
