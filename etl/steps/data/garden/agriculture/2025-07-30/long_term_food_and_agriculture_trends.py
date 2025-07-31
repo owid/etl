@@ -198,22 +198,31 @@ def plot_corrected_data(tb):
         # Uncomment to plot the OWID region (it shouldn't be significantly different to FAO's region).
         # regions_to_plot = [region, f"{region} (FAO)", f"{region} (corrected)"]
         for column in ["food_supply", "population", "agricultural_land"]:
+            unit = {"food_supply": "daily kilocalories", "population": "people", "agricultural_land": "hectares"}[
+                column
+            ]
             _tb = tb[tb["country"].isin(regions_to_plot)][["country", "year", column]].dropna()
             if not _tb.empty:
-                px.line(
+                fig = px.line(
                     _tb,
                     x="year",
                     y=column,
                     color="country",
                     markers=True,
-                    title=f"{region} - {column}",
+                    title=f"{region} - {column.replace('_', ' ').capitalize()}",
                     color_discrete_map={
                         f"{region} (FAO)": "blue",
                         f"{region}": "red",
                         f"{region} (corrected)": "green",
                     },
-                    range_y=[0, None],
-                ).show()
+                    # NOTE: If the upper limit is set to None, when exporting, the png doesn't respect the limits.
+                    range_y=[0, _tb[column].max() * 1.05],
+                ).update_layout(yaxis_title=unit)
+                fig.show()
+
+                # Uncomment to export as png (after doing "uv add kaleido").
+                # from pathlib import Path
+                # fig.write_image(Path.home() / "Downloads" / f"{region}_{column}.png", scale=0.6)
 
 
 def run() -> None:
@@ -281,9 +290,6 @@ def run() -> None:
     ]
     tb = pr.concat([tb] + tables_corrected, ignore_index=True)
 
-    # Uncomment to visually inspect all changes.
-    # plot_corrected_data(tb=tb)
-
     # Sanity check.
     countries_in_regions = set(sum([list(regions[region]) for region in regions if "(corrected)" in region], []))
     other_countries_excluded_from_aggregates = [
@@ -296,6 +302,9 @@ def run() -> None:
     ]
     error = "The list of additional countries excluded from region aggregates has changed."
     assert other_countries_excluded_from_aggregates == OTHER_COUNTRIES_EXCLUDED_FROM_AGGREGATES, error
+
+    # Uncomment to visually inspect all changes.
+    # plot_corrected_data(tb=tb)
 
     # Improve table format.
     tb = tb.format(short_name=paths.short_name)
