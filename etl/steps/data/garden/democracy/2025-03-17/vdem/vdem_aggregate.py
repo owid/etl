@@ -165,6 +165,17 @@ INDICATORS_REGION_AVERAGES = list(chain.from_iterable(INDICATORS_REGION_AVERAGES
 # For a sanity check on table shape
 N_EXPECTED = 196
 
+# Indicators that should not have regional averages pre-1900 [ref: https://github.com/owid/owid-issues/issues/1963#issuecomment-3139107273]
+INDICATORS_NO_AGG_PRE_1900 = [
+    "corruption_vdem",
+    "corr_exec_vdem",
+    "corr_publsec_vdem",
+    "corr_leg_vdem",
+    "corr_jud_vdem",
+    "v2mecorrpt",
+    "v2xnp_client",
+]
+
 
 def run(tb: Table, ds_regions: Dataset, ds_population: Dataset) -> tuple[Table, Table, Table, Table, Table, Table]:
     """Main aggregation pipeline for V-Dem democracy data.
@@ -173,14 +184,14 @@ def run(tb: Table, ds_regions: Dataset, ds_population: Dataset) -> tuple[Table, 
     with regional and global aggregates using two different weighting methods.
 
     Args:
-        tb: Raw V-Dem data table with democracy indicators by country-year
+        tb: Quasi-raw V-Dem data table with democracy indicators by country-year
         ds_regions: Dataset containing regional classifications
         ds_population: Dataset containing population data for weighting
 
     Returns:
         Tuple of 6 tables:
-        - tb_uni_without_regions: Unidimensional indicators, countries only
-        - tb_uni_with_regions: Unidimensional indicators with regional aggregates
+        - tb_uni_without_regions: Uni-dimensional indicators, countries only
+        - tb_uni_with_regions: Uni-dimensional indicators with regional aggregates
         - tb_multi_without_regions: Multidimensional indicators, countries only
         - tb_multi_with_regions: Multidimensional indicators with regional aggregates
         - tb_countries_counts: Country counts by regime type and region
@@ -201,6 +212,10 @@ def run(tb: Table, ds_regions: Dataset, ds_population: Dataset) -> tuple[Table, 
         ds_regions,
         ds_population=ds_population,
     )
+
+    # Remove the world average for them, the regional averages before 1900, and the corresponding note on the data processing (some of them don't have averages) [ref: https://github.com/owid/owid-issues/issues/1963#issuecomment-3139107273]
+    tb_countries_avg.loc[tb_countries_avg["year"] < 1900, INDICATORS_NO_AGG_PRE_1900] = pd.NA
+    tb_population_avg.loc[tb_population_avg["year"] < 1900, INDICATORS_NO_AGG_PRE_1900] = pd.NA
 
     # Prepare main data and split into output tables by dimensionality
     tb_ = tb_.drop(columns=["regime_imputed_country", "regime_imputed", "histname"])
