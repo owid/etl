@@ -78,8 +78,30 @@ COUNTRIES_EXPECTED_TO_MISS_DATA = {
     "Western Sahara",
 }
 
+# Expected list of additional countries that will be excluded from region aggregates due to limited data coverage.
+OTHER_COUNTRIES_EXCLUDED_FROM_AGGREGATES = [
+    "Burundi",
+    "Comoros",
+    "Democratic Republic of Congo",
+    "Libya",
+    "Marshall Islands",
+    "Melanesia",
+    "Micronesia (country)",
+    "Nauru",
+    "Papua New Guinea",
+    "Polynesia",
+    "Seychelles",
+    "Somalia",
+    "South Sudan",
+    "Sudan",
+    "Sudan (former)",
+    "Tonga",
+    "Turkmenistan",
+    "Tuvalu",
+]
 
-def create_corrected_lists_of_region_members(tb_regions):
+
+def create_corrected_lists_of_region_members(tb, tb_regions):
     # List countries in different OWID regions.
     regions = {
         region: sorted(
@@ -159,6 +181,11 @@ def create_corrected_lists_of_region_members(tb_regions):
     # We include them here for convenience.
     regions["North America (corrected)"] = regions["North America"]
     regions["South America (corrected)"] = regions["South America"]
+
+    # For each of the defined regions, remove countries that are not included in the data.
+    countries_informed = set(tb["country"])
+    for region in regions:
+        regions[region] = set(regions[region]) & set(countries_informed)
 
     return regions
 
@@ -242,7 +269,7 @@ def run() -> None:
     tb = pr.concat([tb, tb_north_america_fao], ignore_index=True)
 
     # Create corrected lists of region members.
-    regions = create_corrected_lists_of_region_members(tb_regions=tb_regions)
+    regions = create_corrected_lists_of_region_members(tb=tb, tb_regions=tb_regions)
 
     # Add new definitions of continents, corrected for changes in historical regions and changes in data coverage.
     tables_corrected = [
@@ -256,6 +283,19 @@ def run() -> None:
 
     # Uncomment to visually inspect all changes.
     # plot_corrected_data(tb=tb)
+
+    # Sanity check.
+    countries_in_regions = set(sum([list(regions[region]) for region in regions if "(corrected)" in region], []))
+    other_countries_excluded_from_aggregates = [
+        country
+        for country in sorted(countries_original - countries_in_regions - COUNTRIES_EXPECTED_TO_MISS_DATA)
+        if "(FAO)" not in country
+        if country not in REGIONS
+        if "income" not in country
+        if country not in ["European Union (27)", "World"]
+    ]
+    error = "The list of additional countries excluded from region aggregates has changed."
+    assert other_countries_excluded_from_aggregates == OTHER_COUNTRIES_EXCLUDED_FROM_AGGREGATES, error
 
     # Improve table format.
     tb = tb.format(short_name=paths.short_name)
