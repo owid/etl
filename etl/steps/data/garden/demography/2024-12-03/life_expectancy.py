@@ -33,8 +33,8 @@ SOURCE_URL_MAPPING = {
     "Zijdeman et al.": "https://clio-infra.eu/Indicators/LifeExpectancyatBirthTotal.html",
     "Riley": "https://doi.org/10.1111/j.1728-4457.2005.00083.x",
     "UN World Population Prospects": "https://population.un.org/wpp/downloads?folder=Standard%20Projections&group=Most%20used",
-
 }
+
 
 def run(dest_dir: str) -> None:
     #
@@ -95,8 +95,12 @@ def run(dest_dir: str) -> None:
 
     ## (i) Main table (historical values)
     tb_main = tb.loc[tb["year"] <= YEAR_ESTIMATE_LAST].copy()
-    tb_main_at_birth = tb_main[tb_main["life_expectancy_0"].notna()].drop(columns=["sex", "age", "life_expectancy"]).reset_index(drop=True)
-    tb_main_at_birth['source_url'] = tb_main_at_birth['source'].map(SOURCE_URL_MAPPING)
+    tb_main_at_birth = (
+        tb_main[tb_main["life_expectancy_0"].notna()]
+        .drop(columns=["sex", "age", "life_expectancy"])
+        .reset_index(drop=True)
+    )
+    tb_main_at_birth["source_url"] = tb_main_at_birth["source"].map(SOURCE_URL_MAPPING)
     tb_main_at_birth["source"].m.origins = origins
     tb_main_at_birth["source_url"].m.origins = origins
     tb_main = tb_main[tb_main["life_expectancy"].notna()].drop(columns=["source", "life_expectancy_0"])
