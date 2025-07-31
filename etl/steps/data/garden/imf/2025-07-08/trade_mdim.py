@@ -67,13 +67,11 @@ def run() -> None:
         members.update(geo.list_members_of_region(region=region, ds_regions=ds_regions))
 
     tb_owid_countries = tb[(tb["country"].isin(regions_without_world)) & (tb["counterpart_country"].isin(members))]
-    tb_owid_world = tb[(tb["country"].isin(members)) & (tb["counterpart_country"] == "World")]
     tb_all_countries = tb[(tb["country"].isin(members)) & (tb["counterpart_country"].isin(members))]
 
     # Define table subsets with descriptive names
     table_subsets = [
         ("tb_all_countries", tb_all_countries),
-        ("owid_world", tb_owid_world),
         ("owid_countries", tb_owid_countries),
     ]
 
