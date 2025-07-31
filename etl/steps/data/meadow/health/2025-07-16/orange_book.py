@@ -15,6 +15,14 @@ paths = PathFinder(__file__)
 # 84 x 14 columns
 
 
+def orange_book_approval_year(approval_date):
+    # example approval year: Jun 27, 2025
+    if approval_date == "Approved Prior to Jan 1, 1982":
+        return 1900  # This is a placeholder year for drugs approved before the Orange Book started tracking approvals.
+    else:
+        return pd.to_datetime(approval_date, format="%b %d, %Y", errors="coerce").year
+
+
 def run() -> None:
     #
     # Load inputs.
@@ -32,6 +40,24 @@ def run() -> None:
     snap_meta = snap.to_table_metadata()
 
     tb = Table(df, metadata=snap_meta, short_name="orange_book")
+
+    df_anxiety_meds = pd.read_csv("/Users/tunaacisu/Data/FDA_drugs/Anxiety drugs list - Final.csv")
+
+    # drug_names = df_anxiety_meds["Drug_name"].unique()
+
+    # get minimum year where the drug was approved
+    tb["approval_year"] = tb["Approval_Date"].apply(orange_book_approval_year)
+    df_anxiety_meds["min_approval_year"] = None
+
+    for _, row in df_anxiety_meds.iterrows():
+        # if the drug name is in the anxiety meds list, set the Anxiety_Med column to True
+        drug_name = row["Drug_name"]
+        print(f"Finding {drug_name} minimum approval year...")
+        this_drug = tb[tb.apply(lambda x: drug_name.lower() in x["Ingredient"].lower(), axis=1)]
+        print(f"Found {len(this_drug)} products for {drug_name}.")
+        min_approval_year = this_drug["approval_year"].min()
+        print(f"Minimum approval year for {drug_name} is {min_approval_year}.")
+        df_anxiety_meds.loc[_, "min_approval_year"] = min_approval_year
 
     # Remove products with higher product number but same Application number and same ingredients as a product with lower product number.
     tb = tb.sort_values("Product_No")

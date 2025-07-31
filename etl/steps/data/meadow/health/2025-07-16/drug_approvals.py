@@ -3,7 +3,7 @@
 import json
 import zipfile
 
-from owid.catalog import Table
+import pandas as pd
 
 from etl.helpers import PathFinder
 
@@ -53,16 +53,18 @@ def results_to_tables(data, snap):
 
             products.extend(res_products)
 
+    return products, submissions, open_fda
+
     # Total missing submissions: 2706, 9.53% of total.
     # Total missing products: 362, 1.28% of total.
     # Total missing fda information: 16087, 56.68% of total.
 
-    snap_meta = snap.to_table_metadata()
+    # snap_meta = snap.to_table_metadata()
 
-    tb_sub = Table(submissions, metadata=snap_meta, short_name="drugs_fda_submissions")
-    tb_products = Table(products, metadata=snap_meta, short_name="drugs_fda_products")
-    tb_open_fda = Table(open_fda, metadata=snap_meta, short_name="drugs_open_fda")
-    return tb_sub, tb_products, tb_open_fda
+    # tb_sub = Table(submissions, metadata=snap_meta, short_name="drugs_fda_submissions")
+    # tb_products = Table(products, metadata=snap_meta, short_name="drugs_fda_products")
+    # tb_open_fda = Table(open_fda, metadata=snap_meta, short_name="drugs_open_fda")
+    # return tb_sub, tb_products, tb_open_fda
 
 
 def run() -> None:
@@ -77,23 +79,70 @@ def run() -> None:
         with z.open("drug-drugsfda-0001-of-0001.json") as f:
             data = json.load(f)
 
-    tb_sub, tb_products, tb_open_fda = results_to_tables(data, snap)
+    products, submissions, open_fda = results_to_tables(data, snap)
+    products = pd.DataFrame(products)
+    submissions = pd.DataFrame(submissions)
+    open_fda = pd.DataFrame(open_fda)
 
-    #
-    # Process data.
-    #
-    # Improve tables format.
+    submissions = submissions[submissions["submission_status"] == "AP"]
 
-    tb_products = tb_products.format(["application_number", "product_number"], short_name="drugs_fda_products")
-    tb_open_fda = tb_open_fda.format(["application_number"], short_name="drugs_open_fda")
+    submissions["approval_year"] = submissions["submission_status_date"].apply(lambda x: str(x)[:4])
 
-    tables = [tb_products, tb_open_fda]
+    submissions = submissions[
+        [
+            "application_number",
+            "submission_type",
+            "submission_status_date",
+            "approval_year",
+        ]
+    ]
 
-    #
-    # Save outputs.
-    #
-    # Initialize a new meadow dataset.
-    ds_meadow = paths.create_dataset(tables=tables, default_metadata=snap.metadata)
+    submissions = pd.merge(
+        submissions,
+        products,
+        on="application_number",
+        how="left",
+        suffixes=("_submission", "_product"),
+    )
 
-    # Save meadow dataset.
-    ds_meadow.save()
+    df_anxiety_meds = pd.read_csv("/Users/tunaacisu/Data/FDA_drugs/Anxiety drugs list - Final.csv")
+    df_anxiety_meds = df_anxiety_meds.dropna(subset=["Drug_name"])
+
+    # get minimum year where the drug was approved
+    df_anxiety_meds["min_approval_year"] = None
+    df_anxiety_meds["notes"] = None
+
+    for _, row in df_anxiety_meds.iterrows():
+        # if the drug name is in the anxiety meds list, set the Anxiety_Med column to True
+        drug_name = row["Drug_name"]
+        print(drug_name)
+        print(f"Finding {drug_name} minimum approval year...")
+
+        mask = (
+            submissions["active_ingredients"]
+            .astype(str)  # coerce non-strings
+            .str.lower()
+            .str.contains(drug_name.lower(), na=False)
+        )
+
+        this_drug = submissions[mask]
+        print(f"Found {len(this_drug)} products for {drug_name}.")
+        if this_drug.empty:
+            df_anxiety_meds.loc[_, "min_approval_year"] = None
+            df_anxiety_meds.loc[_, "notes"] = "No products found in the FDA database."
+            continue
+        min_approval_idx = this_drug["approval_year"].idxmin()
+
+        min_approval_year = this_drug.loc[min_approval_idx, "approval_year"]
+        min_approval_brand_name = this_drug.loc[min_approval_idx, "brand_name"]
+        min_approval_marketing_status = this_drug.loc[min_approval_idx, "marketing_status"]
+        min_approval_sponsor_name = this_drug.loc[min_approval_idx, "sponsor_name"]
+        min_approval_appli_no = this_drug.loc[min_approval_idx, "application_number"]
+
+        print(f"Minimum approval year for {drug_name} is {min_approval_year}.")
+        df_anxiety_meds.loc[_, "min_approval_year"] = min_approval_year
+        df_anxiety_meds.loc[_, "notes"] = (
+            f"Brand name: {min_approval_brand_name}, \nMarketing status: {min_approval_marketing_status}, \nSponsor name: {min_approval_sponsor_name}, \nApplication number: {min_approval_appli_no}"
+        )
+
+    df_anxiety_meds.to_csv("/Users/tunaacisu/Data/FDA_drugs/Anxiety_drugs_approval_years.csv", index=False)
