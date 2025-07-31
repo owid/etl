@@ -88,7 +88,7 @@ def process_table_subset(tb: Table) -> Table:
 def calculate_trade_shares(tb: Table) -> Table:
     """Calculate trade shares for a given table."""
     # Calculate total trade for each country-year to compute shares
-    totals = tb.groupby(["counterpart_country", "year"])[[EXPORT_COL, IMPORT_COL]].sum().reset_index()
+    totals = tb.groupby(["country", "year"])[[EXPORT_COL, IMPORT_COL]].sum().reset_index()
 
     # Rename total columns
     totals = totals.rename(
@@ -99,7 +99,7 @@ def calculate_trade_shares(tb: Table) -> Table:
     )
 
     # Merge totals back to main table
-    tb = tb.merge(totals, on=["counterpart_country", "year"], how="left")
+    tb = tb.merge(totals, on=["country", "year"], how="left")
 
     # Calculate shares
     tb["exports_of_goods__free_on_board__fob__share"] = tb[EXPORT_COL] / tb["total_exports"] * 100
