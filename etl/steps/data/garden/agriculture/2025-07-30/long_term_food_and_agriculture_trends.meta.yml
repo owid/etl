@@ -1,6 +1,43 @@
+definitions:
+  common:
+    processing_level: major
+    # description_processing: |-
+    #   - TODO
+    presentation:
+      topic_tags:
+        - Food Supply
+
 dataset:
   update_period_days: 365
 
 tables:
   long_term_food_and_agriculture_trends:
     title: Long-term food and agriculture trends
+    variables:
+      population:
+        title: Population
+        description_short: ''
+        unit: people
+        short_unit: ""
+        display:
+          name: Population
+        presentation:
+          title_public: Population
+      food_supply:
+        title: Daily food supply
+        description_short: Total of all agricultural produce, both crops and livestock.
+        unit: kilocalories per day
+        short_unit: kcal/day
+        display:
+          name: Food supply
+        presentation:
+          title_public: Daily food supply
+      agricultural_land:
+        title: Land area used for agriculture
+        description_short: Land used for cultivation of crops and animal husbandry. The total of areas under cropland and permanent meadows and pastures.
+        unit: hectares
+        short_unit: ha
+        display:
+          name: Agricultural land
+        presentation:
+          title_public: Land area used for agriculture
