@@ -877,7 +877,7 @@ tables:
           Legislative corruption score ({definitions.auxiliary.estimate} estimate)
         presentation:
           <<: *ppt_multi_w_regions
-          title_public: Legislative corruption score
+          title_public: Legislative Corruption Score
         description_from_producer: |-
           Question: Do members of the legislature abuse their position for financial gain?
 
@@ -1014,7 +1014,7 @@ tables:
           V-Dem indicator name: `v2jucorrdc`
         presentation:
           <<: *ppt_multi_w_regions
-          title_public: Judicial corruption score
+          title_public: Judicial Corruption Score
         unit: ""
 
       ## 3.8.2.2 Rigorous and impartial public administration
@@ -1275,7 +1275,7 @@ tables:
           {definitions.auxiliary.estimate_title} estimate of the extent to which a country is affected by political corruption.
         presentation:
           <<: *ppt_multi_w_regions
-          title_public: Political corruption index
+          title_public: Political Corruption Index
         description_key:
           - This index, produced by Varieties of Democracy (V-Dem), is useful if you are interested in bribery and embezzlement, especially at high levels, want scores for almost all countries, or are also interested in corruption in the more distant past. For data that focuses on people's or firms' everyday experiences and perceptions of corruption, other sources will be more useful. You can explore these alternatives on our [Corruption topic page](https://ourworldindata.org/corruption).
           - The index is based on assessments by V-Dem's country experts.
@@ -1304,7 +1304,7 @@ tables:
           Public sector corruption index ({definitions.auxiliary.estimate} estimate)
         presentation:
           <<: *ppt_multi_w_regions
-          title_public: Public sector corruption index
+          title_public: Public Sector Corruption Index
         description_from_producer: |-
           Question: To what extent do public sector employees grant favors in exchange for bribes, kickbacks, or other material inducements, and how often do they steal, embezzle, or misappropriate public funds or other state resources for personal or family use?
 
@@ -1321,7 +1321,7 @@ tables:
           Executive corruption index ({definitions.auxiliary.estimate} estimate)
         presentation:
           <<: *ppt_multi_w_regions
-          title_public: Executive corruption index
+          title_public: Executive Corruption Index
         description_from_producer: |-
           Question: How routinely do members of the executive, or their agents grant favors in exchange for bribes, kickbacks, or other material inducements, and how often do they steal, embezzle, or misappropriate public funds or other state resources for personal or family use?
 
@@ -1986,12 +1986,12 @@ tables:
       ## 3.12.1.10 Media corrupt
       v2mecorrpt:
         title: |-
-          Media corrupt ({definitions.auxiliary.estimate} estimate)
+          Media Corruption Score ({definitions.auxiliary.estimate} estimate)
         description_short: |-
           Gauges the frequency with which journalists, publishers, or broadcasters accept payments to modify news content, indicating the integrity (or corruption) of the media sphere.
         presentation:
           <<: *ppt_multi_w_regions
-          title_public: Media corrupt
+          title_public: Media Corruption Score
         description_from_producer: |-
           Question: Do journalists, publishers, or broadcasters accept payments in exchange for altering news coverage?
 
