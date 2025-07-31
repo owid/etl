@@ -11,7 +11,7 @@ definitions:
 
       {definitions.auxiliary.description_imputes}
     description_imputes: |-
-      ## Data imputation
+      ### Data imputation
       We expand the years covered by V-Dem further: To expand the time coverage of today's countries and include more of the period when they were still non-sovereign territories, we identified the historical entity they were a part of and used that regime's data whenever available
 
       For example, V-Dem only provides regime data since Bangladesh's independence in 1971. There is, however, regime data for Pakistan and the colony of India, both of which the current territory of Bangladesh was a part. We, therefore, use the regime data of Pakistan for Bangladesh from 1947 to 1970, and the regime data of India from 1789 to 1946. We did so for all countries with a past or current population of more than one million.
@@ -24,7 +24,7 @@ definitions:
     key_regions: &key_regions |-
       V-Dem covers many more countries since 1900, which affects regional averages.
     key_regions_agg: &key_regions_agg |-
-      We provide two kinds of averages: country averages and population-weighted averages. Country averages weigh each country equally and give a sense of how the typical country is doing. Population-weighted averages weigh countries with larger populations more and therefore better reflect the average person's experience.
+      We provide two kinds of regional averages: **country averages** and **population-weighted averages**. Country averages weigh each country equally and give a sense of how the typical country is doing. Population-weighted averages weigh countries with larger populations more and therefore better reflect the average person's experience.
 
 dataset:
   title: V-Dem Country-Year (Full + Others)
