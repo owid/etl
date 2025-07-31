@@ -30,6 +30,50 @@ INTERVENTIONS = [
     "COMBINATION_PRODUCT",  # e.g. drug + device
 ]
 
+# Human-readable replacements for coded values
+PHASE_REPLACEMENTS = {
+    "EARLY_PHASE1": "Early phase 1",
+    "PHASE1": "Phase 1",
+    "PHASE2": "Phase 2",
+    "PHASE3": "Phase 3",
+    "PHASE4": "Phase 4",
+    "PHASE1|PHASE2": "Phase 1/2 (combined)",
+    "PHASE2|PHASE3": "Phase 2/3 (combined)",
+}
+
+FUNDER_TYPE_REPLACEMENTS = {
+    "INDIV": "Individual",
+    "NIH": "NIH",
+    "OTHER": "Other",
+    "FED": "Federal",
+    "AMBIG": "Ambiguous",
+    "INDUSTRY": "Industry",
+    "OTHER_GOV": "Other government",
+    "UNKNOWN": "Unknown",
+    "NETWORK": "Network",
+}
+
+STATUS_REPLACEMENTS = {
+    "ENROLLING_BY_INVITATION": "Enrolling by invitation",
+    "RECRUITING": "Recruiting",
+    "TERMINATED": "Terminated",
+    "NOT_YET_RECRUITING": "Not yet recruiting",
+    "COMPLETED": "Completed",
+    "WITHDRAWN": "Withdrawn",
+    "ACTIVE_NOT_RECRUITING": "Active, not recruiting",
+    "AVAILABLE": "Available",
+    "NO_LONGER_AVAILABLE": "No longer available",
+    "SUSPENDED": "Suspended",
+    "APPROVED_FOR_MARKETING": "Approved for marketing",
+    "TEMPORARILY_NOT_AVAILABLE": "Temporarily not available",
+}
+
+STUDY_TYPE_REPLACEMENTS = {
+    "OBSERVATIONAL": "Observational",
+    "INTERVENTIONAL": "Interventional",
+    "EXPANDED_ACCESS": "Expanded access",
+}
+
 
 def extract_allocation(design_string: str):
     """
@@ -183,8 +227,8 @@ def run() -> None:
 
     # get length of study in days
     tb["study_length_days"] = (
-        pd.to_datetime(tb["Completion Date"], errors="coerce", format="mixed", yearfirst=True)
-        - pd.to_datetime(tb["Start Date"], errors="coerce", format="mixed", yearfirst=True)
+        pd.to_datetime(tb["Completion Date"], format="mixed", yearfirst=True)
+        - pd.to_datetime(tb["Start Date"], format="mixed", yearfirst=True)
     ).dt.days
 
     # change appriopriate columns to categorical (to save memory & speed up processing)
@@ -234,16 +278,10 @@ def run() -> None:
     )
 
     # get all studies by completion year and country
-    tb_trials = (
-        tb.groupby(["primary_location", "completion_year"]).size().reset_index(name="n_studies_country")
-    ).copy_metadata(tb)
-    tb_trials["n_studies_country"].m.origins = tb["Phases"].m.origins
+    tb_trials = group_trials_by(tb, ["primary_location", "completion_year"], "n_studies_country", completed_only=True)
 
     # studies by completion year and sponsor type
-    tb_sponsor = (
-        tb.groupby(["Funder Type", "completion_year"]).size().reset_index(name="n_studies_sponsor")
-    ).copy_metadata(tb)
-    tb_sponsor["n_studies_sponsor"].m.origins = tb["Funder Type"].m.origins
+    tb_sponsor = group_trials_by(tb, ["Funder Type", "completion_year"], "n_studies_sponsor", completed_only=True)
 
     # get sum of studies by completion year by intervention type
     tb_interventions = tb.copy()
@@ -253,48 +291,41 @@ def run() -> None:
     tb_interventions[INTERVENTIONS].m.origins = tb["Phases"].m.origins
 
     # get sum of studies by completion year by study type
-    tb_study_type = (
-        tb.groupby(["Study Type", "completion_year"]).size().reset_index(name="n_studies_type")
-    ).copy_metadata(tb)
-    tb_study_type["n_studies_type"].m.origins = tb["Phases"].m.origins
+    tb_study_type = group_trials_by(tb, ["Study Type", "completion_year"], "n_studies_type", completed_only=True)
 
     # get sum of studies by completion year by primary purpose
-    tb_purpose = (
-        tb.groupby(["primary_purpose", "completion_year"]).size().reset_index(name="n_studies_purpose")
-    ).copy_metadata(tb)
-    tb_purpose["n_studies_purpose"].m.origins = tb["Phases"].m.origins
+    tb_purpose = group_trials_by(tb, ["primary_purpose", "completion_year"], "n_studies_purpose", completed_only=True)
 
     # get sum of studies by completion year by status
     tb_status = tb[tb["Study Type"] != "Expanded Access"]
-    tb_status = (
-        tb_status.groupby(["Study Status", "start_year"]).size().reset_index(name="n_studies_status")
-    ).copy_metadata(tb)
-    tb_status["n_studies_status"].m.origins = tb["Phases"].m.origins
+    tb_status = group_trials_by(tb_status, ["Study Status", "start_year"], "n_studies_status")
 
     # get sum of studies by completion year and whether they have results
-    tb_results = (
-        tb.groupby(["Study Results", "start_year"]).size().reset_index(name="n_studies_results")
-    ).copy_metadata(tb)
-    tb_results["n_studies_results"].m.origins = tb["Phases"].m.origins
+    tb_results = group_trials_by(tb, ["Study Results", "start_year"], "n_studies_results")
 
     # get average study length by phase and completion year
-    tb_length = (
-        tb.groupby(["completion_year", "Phases"])["study_length_days"].mean().reset_index(name="avg_study_length_days")
-    ).copy_metadata(tb)
-    tb_length["avg_study_length_days"].m.origins = tb["Phases"].m.origins
+    tb_length = group_trials_by(
+        tb,
+        ["completion_year", "Phases"],
+        "avg_study_length_days",
+        completed_only=True,
+        aggregate_func="mean",
+        avg_col_name="study_length_days",
+    )
 
-    # Improve table format.
+    # make categorical columns human-readable
+    tb_sponsor["Funder Type"] = tb_sponsor["Funder Type"].replace(FUNDER_TYPE_REPLACEMENTS)
+    tb_study_type["Study Type"] = tb_study_type["Study Type"].replace(STUDY_TYPE_REPLACEMENTS)
+    tb_status["Study Status"] = tb_status["Study Status"].replace(STATUS_REPLACEMENTS)
+    tb_length["Phases"] = tb_length["Phases"].replace(PHASE_REPLACEMENTS)
+    # TODO: do this for results as well
+
+    # Improve table formats.
     tb_trials, tb_sponsor, tb_interventions, tb_study_type, tb_purpose, tb_status, tb_results, tb_length = (
         format_tables(
             tb_trials, tb_sponsor, tb_interventions, tb_study_type, tb_purpose, tb_status, tb_results, tb_length
         )
     )
-
-    # TODO: add replacements for entities
-    # {'EARLY_PHASE1', 'PHASE1|PHASE2', 'PHASE4', 'PHASE2', 'PHASE1', 'PHASE3', 'PHASE2|PHASE3'}
-    # {'INDIV', 'NIH', 'OTHER', 'FED', 'AMBIG', 'INDUSTRY', 'OTHER_GOV', 'UNKNOWN', 'NETWORK'}
-    # {'ENROLLING_BY_INVITATION', 'RECRUITING', 'TERMINATED', 'NOT_YET_RECRUITING', 'COMPLETED', 'WITHDRAWN', 'ACTIVE_NOT_RECRUITING', 'AVAILABLE', 'NO_LONGER_AVAILABLE', 'SUSPENDED', 'APPROVED_FOR_MARKETING', 'TEMPORARILY_NOT_AVAILABLE'}
-    # {'OBSERVATIONAL', 'INTERVENTIONAL', 'EXPANDED_ACCESS'}
 
     tables_ls = [
         tb_trials,
@@ -317,16 +348,52 @@ def run() -> None:
     ds_garden.save()
 
 
+def group_trials_by(tb, group_by_cols, new_col_name, completed_only=False, aggregate_func="count", avg_col_name=None):
+    """
+    Group trials by specified columns and count the number of studies.
+    """
+    if completed_only:
+        tb_gb = tb[tb["Study Status"] == "Completed"].copy()
+    else:
+        tb_gb = tb.copy()
+
+    if aggregate_func == "count":
+        tb_gb = (tb.groupby(group_by_cols).size().reset_index(name=new_col_name)).copy_metadata(tb)
+
+    elif aggregate_func == "mean":
+        if avg_col_name is None:
+            raise ValueError("avg_col_name must be provided when aggregate_func is 'mean'")
+        tb_gb = (tb.groupby(group_by_cols)[avg_col_name].mean().reset_index(name=new_col_name)).copy_metadata(tb)
+    else:
+        raise ValueError("aggregate_func must be either 'count' or 'mean'")
+
+    tb_gb[new_col_name].m.origins = tb["Phases"].m.origins
+
+    return tb_gb
+
+
 def format_tables(tb_trials, tb_sponsor, tb_interventions, tb_study_type, tb_purpose, tb_status, tb_results, tb_length):
     # rename the columns in each table to "year" and "country" so they can be used in grapher
-    tb_trials = tb_trials.rename(columns={"completion_year": "year", "primary_location": "country"}, errors="raise")
-    tb_sponsor = tb_sponsor.rename(columns={"completion_year": "year", "Funder Type": "country"}, errors="raise")
-    tb_interventions = tb_interventions.rename(columns={"completion_year": "year"}, errors="raise")
-    tb_study_type = tb_study_type.rename(columns={"completion_year": "year", "Study Type": "country"}, errors="raise")
-    tb_purpose = tb_purpose.rename(columns={"completion_year": "year", "primary_purpose": "country"}, errors="raise")
-    tb_status = tb_status.rename(columns={"start_year": "year", "Study Status": "country"}, errors="raise")
-    tb_results = tb_results.rename(columns={"start_year": "year", "Study Results": "country"}, errors="raise")
-    tb_length = tb_length.rename(columns={"completion_year": "year", "Phases": "country"}, errors="raise")
+    replacement_dict = {
+        "start_year": "year",
+        "completion_year": "year",
+        "primary_location": "country",
+        "Funder Type": "country",
+        "Study Type": "country",
+        "primary_purpose": "country",
+        "Study Status": "country",
+        "Study Results": "country",
+        "Phases": "country",
+    }
+
+    tb_trials = tb_trials.rename(columns=replacement_dict)
+    tb_sponsor = tb_sponsor.rename(columns=replacement_dict)
+    tb_interventions = tb_interventions.rename(columns=replacement_dict)
+    tb_study_type = tb_study_type.rename(columns=replacement_dict)
+    tb_purpose = tb_purpose.rename(columns=replacement_dict)
+    tb_status = tb_status.rename(columns=replacement_dict)
+    tb_results = tb_results.rename(columns=replacement_dict)
+    tb_length = tb_length.rename(columns=replacement_dict)
 
     # set the index to year and country for each table
     tb_trials = tb_trials.format(["year", "country"], short_name="trials_per_year")

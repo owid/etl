@@ -7,7 +7,9 @@ definitions:
     processing_level: major
   notes:
     completion_date: |
-      The clinical trials are sorted by their "completion date", which is the date when the clinical trial is planned to be completed or has been completed.
+      The clinical trials are sorted by their "completion date", which is the date when the clinical trial is has been completed.
+    completed_trials: |
+      The dataset includes only clinical trials that have been marked as "completed" and have a valid "completion date".
 
 dataset:
   update_period_days: 365 # dataset itself is updated continuously, but I think updating it every year is sufficient for us
@@ -18,16 +20,18 @@ tables:
       n_studies_country:
         title: Number of clinical trials
         description_short: |
-          The annual number of clinical trials registered in the ClinicalTrials.gov database for each country. The year given is the year of the trial's (planned or actual) completion date.
+          The annual number of completed clinical trials registered in the ClinicalTrials.gov database for each country. The year given is the year of the trial's completion date.
         unit: trials
         short_unit: ""
         description_processing: |-
           - This data comes from the ClinicalTrials.gov database. Only clinical trials with a "completion_date" are included.
           - If multiple locations are listed, the country with the most locations listed is used. If multiple countries have the same number of locations, the first one listed is used.
+          - If a trial has no locations listed or the country is not specified, the location is set to "Location not specified".
         description_key:
-          - The number of clinical trials registered in the ClinicalTrials.gov database for each country and year.
+          - The number of completed clinical trials registered in the ClinicalTrials.gov database for each country and year.
           - Country location is determined by the country with the most locations listed in the trial. If multiple countries have the same number of locations, the first one listed is used.
-          - The year is the year of the trial's (planned or actual) completion date.
+          - "{definitions.notes.completed_trials}"
+          - The year is the year of the trial's completion date. This is first entered (as a planned completion data) when the trial is first registered, and then updated when the trial is completed.
   sponsor_per_year:
     variables:
       n_studies_sponsor:
@@ -37,32 +41,32 @@ tables:
         unit: trials
         short_unit: ""
         description_processing: |-
-          - This data comes from the ClinicalTrials.gov database. Only clinical trials with a "completion_date" are included.
-          - If multiple sponsors are listed, the sponsor with the most studies is used. If multiple sponsors have the same number of studies, the first one listed is used.
+          - This data comes from the ClinicalTrials.gov database. {{definitions.notes.completed_trials}}
+## TODO: figure out what "OTHER" is in this context
   interventions_per_year:
     variables:
       behavioral:
         title: Number of clinical trials with behavioral interventions
         description_short: |
-          The annual number of clinical trials registered in the ClinicalTrials.gov database that involve behavioral interventions. Behavioral interventions can include lifestyle changes, counseling, or other non-pharmaceutical treatments
+          The annual number of completed clinical trials registered in the ClinicalTrials.gov database that involve behavioral interventions. Behavioral interventions can include lifestyle changes, counseling, or other non-pharmaceutical treatments
         unit: trials
         short_unit: ""
         description_processing: |-
-          - This data comes from the ClinicalTrials.gov database. Only clinical trials with a "completion_date" are included.
+          - This data comes from the ClinicalTrials.gov database. {{definitions.notes.completed_trials}}
           - If multiple interventions are given, the study is counted towards all interventions listed.
       biological:
         title: Number of clinical trials with biological interventions
         description_short: |
-          The annual number of clinical trials registered in the ClinicalTrials.gov database that involve biological interventions. Biological interventions can include vaccines or other biological treatments.
+          The annual number of completed clinical trials registered in the ClinicalTrials.gov database that involve biological interventions. Biological interventions can include vaccines or other biological treatments.
         unit: trials
         short_unit: ""
         description_processing: |-
-          - This data comes from the ClinicalTrials.gov database. Only clinical trials with a "completion_date" are included.
+          - This data comes from the ClinicalTrials.gov database. {{definitions.notes.completed_trials}}
           - If multiple interventions are given, the study is counted towards all interventions listed.
       device:
         title: Number of clinical trials with device-based interventions
         description_short: |
-          The annual number of clinical trials registered in the ClinicalTrials.gov database that involve devices used for treatment. These interventions include the use of medical devices, implants, or other technological treatments.
+          The annual number of completed clinical trials registered in the ClinicalTrials.gov database that involve devices used for treatment. These interventions include the use of medical devices, implants, or other technological treatments.
         unit: trials
         short_unit: ""
         description_processing: |-
@@ -71,7 +75,7 @@ tables:
       drug:
         title: Number of clinical trials with pharmaceutical interventions
         description_short: |
-          The annual number of clinical trials registered in the ClinicalTrials.gov database that involve a pharmaceutical treatment, such as a drug or medication.
+          The annual number of completed clinical trials registered in the ClinicalTrials.gov database that involve a pharmaceutical treatment, such as a drug or medication.
         unit: trials
         short_unit: ""
         description_processing: |-
@@ -80,7 +84,7 @@ tables:
       diagnostic_test:
         title: Number of clinical trials with diagnostic interventions
         description_short: |
-          The annual number of clinical trials registered in the ClinicalTrials.gov database that involve diagnostic interventions. These interventions include tests or procedures used to diagnose a condition.
+          The annual number of completed clinical trials registered in the ClinicalTrials.gov database that involve diagnostic interventions. These interventions include tests or procedures used to diagnose a condition.
         unit: trials
         short_unit: ""
         description_processing: |-
@@ -89,7 +93,7 @@ tables:
       dietary_supplement:
         title: Number of clinical trials with dietary supplement interventions
         description_short: |
-          The annual number of clinical trials registered in the ClinicalTrials.gov database that involve dietary supplements. These interventions include giving patients vitamins, minerals, or other nutritional supplements.
+          The annual number of completed clinical trials registered in the ClinicalTrials.gov database that involve dietary supplements. These interventions include giving patients vitamins, minerals, or other nutritional supplements.
         unit: trials
         short_unit: ""
         description_processing: |-
@@ -98,7 +102,7 @@ tables:
       genetic:
         title: Number of clinical trials with genetic interventions
         description_short: |
-          The annual number of clinical trials registered in the ClinicalTrials.gov database that involve genetic interventions. These interventions include gene transfers, gene therapy, or stem-cell therapy.
+          The annual number of completed clinical trials registered in the ClinicalTrials.gov database that involve genetic interventions. These interventions include gene transfers, gene therapy, or stem-cell therapy.
         unit: trials
         short_unit: ""
         description_processing: |-
@@ -107,7 +111,7 @@ tables:
       procedure:
         title: Number of clinical trials with surgical interventions
         description_short: |
-          The annual number of clinical trials registered in the ClinicalTrials.gov database that involve surgical interventions.
+          The annual number of completed clinical trials registered in the ClinicalTrials.gov database that involve surgical interventions.
         unit: trials
         short_unit: ""
         description_processing: |-
@@ -116,7 +120,7 @@ tables:
       radiation:
         title: Number of clinical trials with radiation interventions
         description_short: |
-          The annual number of clinical trials registered in the ClinicalTrials.gov database that involve radiation as a part of the treatment.
+          The annual number of completed clinical trials registered in the ClinicalTrials.gov database that involve radiation as a part of the treatment.
         unit: trials
         short_unit: ""
         description_processing: |-
@@ -125,7 +129,7 @@ tables:
       other:
         title: Number of clinical trials with other interventions
         description_short: |
-          The annual number of clinical trials registered in the ClinicalTrials.gov database that involve types of interventions that do not fit into any other category.
+          The annual number of completed clinical trials registered in the ClinicalTrials.gov database that involve types of interventions that do not fit into any other category.
         unit: trials
         short_unit: ""
         description_processing: |-
@@ -134,7 +138,7 @@ tables:
       combination_product:
         title: Number of clinical trials with combination product interventions
         description_short: |
-          The annual number of clinical trials registered in the ClinicalTrials.gov database that involve a combination of different types of interventions, e.g a drug and a device or a drug and a procedure.
+          The annual number of completed clinical trials registered in the ClinicalTrials.gov database that involve a combination of different types of interventions, e.g a drug and a device or a drug and a procedure.
         unit: trials
         short_unit: ""
         description_processing: |-
@@ -145,7 +149,7 @@ tables:
       n_studies_type:
         title: Number of clinical trials by study type
         description_short: |
-          The annual number of clinical trials registered in the ClinicalTrials.gov database, by study types. Study types can include interventional studies, observational studies, and expanded access studies.
+          The annual number of completed clinical trials registered in the ClinicalTrials.gov database, by study types. Study types can include interventional studies, observational studies, and expanded access studies.
         unit: trials
         short_unit: ""
         description_processing: |-
@@ -160,7 +164,7 @@ tables:
       n_studies_purpose:
         title: Number of clinical trials by purpose
         description_short: |
-          The annual number of clinical trials registered in the ClinicalTrials.gov database, by purpose. The purpose of a clinical trial refers to the main objective or goal of the study, such as testing a new treatment, comparing treatments, or understanding a disease.
+          The annual number of completed clinical trials registered in the ClinicalTrials.gov database, by purpose. The purpose of a clinical trial refers to the main objective or goal of the study, such as testing a new treatment, comparing treatments, or understanding a disease.
         unit: trials
         short_unit: ""
         description_processing: |-
