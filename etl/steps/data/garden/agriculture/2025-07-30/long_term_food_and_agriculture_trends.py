@@ -1,4 +1,10 @@
-"""This dataset creates region aggregates that are corrected for two issues, namely (1) changes in historical regions, and (2) changes in data coverage. These corrected regions let us visualize long-term trends without having abrupt jumps due to, e.g. the USSR dissolution, or countries being added to the data on arbitrary years."""
+"""This dataset creates region aggregates for important indicators on food and agriculture, corrected for two issues:
+(1) changes in historical regions, and
+(2) changes in data coverage.
+
+These corrected regions let us visualize long-term trends without having abrupt jumps due to, e.g. the USSR dissolution, or countries being added to the data on arbitrary years.
+
+"""
 
 import json
 
@@ -18,7 +24,7 @@ COLUMNS_FBSC = {
     # "total__00002901__food_available_for_consumption__000661__kilocalories" - This comes from FBS.
     # "total__00002901__food_available_for_consumption__000664__kilocalories_per_day" - This was constructed by OWID, by multiplying that same column by the FAO population.
     # Ideally, we could use data directly from FAOSTAT. But the former is only given in FBS, and therefore starts in 2010.
-    "total__00002901__food_available_for_consumption__000664__kilocalories_per_day": "kcal_per_day",
+    "total__00002901__food_available_for_consumption__000664__kilocalories_per_day": "food_supply",
 }
 # Columns from land use dataset.
 COLUMNS_RL = {
@@ -110,11 +116,11 @@ def run() -> None:
     # Remove empty rows.
     tb = tb.dropna(subset=tb.drop(columns=["country", "year"]).columns, how="all").reset_index(drop=True)
 
-    # Original countries in the data.
+    # Original countries in the data (we keep them to later sanity check which countries have been lost).
     countries_original = set(tb["country"])
 
     # Now keep only rows for which we have data for both food supply, and agricultural land.
-    tb = tb.dropna(subset=["agricultural_land", "kcal_per_day"], how="any").reset_index(drop=True)
+    tb = tb.dropna(subset=["agricultural_land", "food_supply"], how="any").reset_index(drop=True)
 
     # Sanity check.
     error = "List of countries that are removed (due to not having data on coincident years for both land use and food supply) has changed. Check and update this list."
@@ -125,7 +131,7 @@ def run() -> None:
     tb_north_america_fao = (
         tb[tb["country"].isin(["Northern America (FAO)", "Central America (FAO)", "Caribbean (FAO)"])]
         .groupby("year", as_index=False)
-        .agg({"fao_population": "sum", "agricultural_land": "sum", "kcal_per_day": "sum"})
+        .agg({"fao_population": "sum", "agricultural_land": "sum", "food_supply": "sum"})
         .assign(**{"country": "North America (FAO)"})
     )
     tb = pr.concat([tb, tb_north_america_fao], ignore_index=True)
@@ -168,7 +174,7 @@ def run() -> None:
     # As a visual check, see the effect in the USSR of removing Turkmenistan.
     # tb_ussr_corrected = tb[(tb["country"].isin(sorted(set(regions["USSR"]) - set(["Turkmenistan"]))))].drop(columns="country").groupby("year", as_index=False).sum().assign(**{"country": "USSR (corrected)"})
     # tb_ussr = tb[(tb["country"] == "USSR")].reset_index(drop=True)
-    # for column in ["fao_population", "agricultural_land", "kcal_per_day"]:
+    # for column in ["fao_population", "agricultural_land", "food_supply"]:
     #     px.line(pr.concat([tb_ussr, tb_ussr_corrected], ignore_index=True), x="year", y=column, markers=True, color="country", range_y=[0, None]).show()
     regions["Europe (corrected)"] = sorted(set(regions["Europe (corrected)"]) - set(["Turkmenistan"]))
     ####################################################################################################################
@@ -209,7 +215,7 @@ def run() -> None:
     tables_corrected = [
         tb[tb["country"].isin(regions[f"{region} (corrected)"])]
         .groupby("year", as_index=False)
-        .agg({"kcal_per_day": "sum", "fao_population": "sum", "agricultural_land": "sum"})
+        .agg({"food_supply": "sum", "fao_population": "sum", "agricultural_land": "sum"})
         .assign(**{"country": f"{region} (corrected)"})
         for region in ["Europe", "Africa", "Asia", "Oceania"]
     ]
@@ -217,7 +223,7 @@ def run() -> None:
 
     # Uncomment to visually inspect all changes.
     # for region in REGIONS:
-    #     for column in ["kcal_per_day", "fao_population", "agricultural_land"]:
+    #     for column in ["food_supply", "fao_population", "agricultural_land"]:
     #         _tb = tb[tb["country"].isin([region, f"{region} (FAO)", f"{region} (corrected)"])][
     #             ["country", "year", column]
     #         ].dropna()
@@ -236,6 +242,9 @@ def run() -> None:
     #                 },
     #                 range_y=[0, None],
     #             ).show()
+
+    # Improve table format.
+    tb = tb.format(short_name=paths.short_name)
 
     #
     # Save outputs.
