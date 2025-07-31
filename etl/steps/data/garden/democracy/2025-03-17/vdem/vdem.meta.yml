@@ -1280,6 +1280,8 @@ tables:
           - This index, produced by Varieties of Democracy (V-Dem), is useful if you are interested in bribery and embezzlement, especially at high levels, want scores for almost all countries, or are also interested in corruption in the more distant past. For data that focuses on people's or firms' everyday experiences and perceptions of corruption, other sources will be more useful. You can explore these alternatives on our [Corruption topic page](https://ourworldindata.org/corruption).
           - The index is based on assessments by V-Dem's country experts.
           - |-
+            Experts can be biased because they may rely on limited networks, be influenced by media narratives, or bring in their own political views. At the same time, they often draw on broader knowledge, follow national politics closely, monitor the media, speak with insiders in government and civil society, and some conduct direct investigations.
+          - |-
             It is made up of four sub-indices: [executive corruption](https://ourworldindata.org/grapher/executive-corruption-index), [legislative corruption](https://ourworldindata.org/grapher/legislative-corruption-score), [judicial corruption](https://ourworldindata.org/grapher/judicial-corruption-score), and [public sector corruption](https://ourworldindata.org/grapher/public-sector-corruption-index).
           - *key_regions
           - *key_regions_agg
