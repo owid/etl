@@ -25,7 +25,7 @@ def run() -> None:
 
     # The USSR in the Statistical Review ends in 1984, and successors start in 1985. Remove those years of successors.
     # Specifically, remove Russia (which is the only one that is relevant for the chart we are working on).
-    tb.loc[(tb["year"] < 1992) & (tb["country"] == "Russia"), "Primary energy consumption (TWh)"] = None
+    tb.loc[(tb["year"] < 1992) & (tb["country"] == "Russia"), "primary_energy_consumption__twh"] = None
 
     # regions = [
     #     "Africa",
