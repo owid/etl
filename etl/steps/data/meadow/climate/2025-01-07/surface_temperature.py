@@ -1,4 +1,4 @@
-"""Load a snapshot and create a meadow dataset."""
+"""Load a snapshot and create a meadow dataset.."""
 
 import tempfile
 import zipfile
