@@ -19,7 +19,7 @@ paths = PathFinder(__file__)
 COLUMNS_FBSC = {
     "country": "country",
     "year": "year",
-    "population__00002501__total_population__both_sexes__000511__thousand_number": "fao_population",
+    "population__00002501__total_population__both_sexes__000511__thousand_number": "population",
     # NOTE: There are two relevant columns, namely:
     # "total__00002901__food_available_for_consumption__000661__kilocalories" - This comes from FBS.
     # "total__00002901__food_available_for_consumption__000664__kilocalories_per_day" - This was constructed by OWID, by multiplying that same column by the FAO population.
@@ -79,63 +79,7 @@ COUNTRIES_EXPECTED_TO_MISS_DATA = {
 }
 
 
-def run() -> None:
-    #
-    # Load inputs.
-    #
-    # Load FAOSTAT combined food balances dataset, and read its main table.
-    # NOTE: It may be necessary to load the meadow FBSH and FBS datasets. For now, try with FBSC.
-    ds_fbsc = paths.load_dataset("faostat_fbsc")
-    tb_fbsc = ds_fbsc.read("faostat_fbsc_flat")
-
-    # Load FAOSTAT land use dataset, and read its main table.
-    ds_rl = paths.load_dataset("faostat_rl")
-    tb_rl = ds_rl.read("faostat_rl_flat")
-
-    # Load regions dataset, and read its main table.
-    ds_regions = paths.load_dataset("regions")
-    tb_regions = ds_regions.read("regions")
-
-    #
-    # Process data.
-    #
-    # Select and rename columns in food balances data.
-    tb_fbsc = (
-        tb_fbsc[list(COLUMNS_FBSC)]
-        .rename(columns=COLUMNS_FBSC, errors="raise")
-        .dropna(how="all")
-        .reset_index(drop=True)
-    )
-
-    # Select and rename columns in land use data.
-    tb_rl = tb_rl[list(COLUMNS_RL)].rename(columns=COLUMNS_RL, errors="raise").dropna(how="all").reset_index(drop=True)
-
-    # Combine both tables.
-    tb = tb_fbsc.merge(tb_rl, on=["country", "year"], how="outer")
-
-    # Remove empty rows.
-    tb = tb.dropna(subset=tb.drop(columns=["country", "year"]).columns, how="all").reset_index(drop=True)
-
-    # Original countries in the data (we keep them to later sanity check which countries have been lost).
-    countries_original = set(tb["country"])
-
-    # Now keep only rows for which we have data for both food supply, and agricultural land.
-    tb = tb.dropna(subset=["agricultural_land", "food_supply"], how="any").reset_index(drop=True)
-
-    # Sanity check.
-    error = "List of countries that are removed (due to not having data on coincident years for both land use and food supply) has changed. Check and update this list."
-    assert countries_original - set(tb["country"]) == COUNTRIES_EXPECTED_TO_MISS_DATA, error
-
-    # FAO doesn't have data for North America. Instead, it has Northern, Central, South, and Caribbean.
-    # For convenience, create a "North America (FAO)" by adding up Northern, Central, and Caribbean.
-    tb_north_america_fao = (
-        tb[tb["country"].isin(["Northern America (FAO)", "Central America (FAO)", "Caribbean (FAO)"])]
-        .groupby("year", as_index=False)
-        .agg({"fao_population": "sum", "agricultural_land": "sum", "food_supply": "sum"})
-        .assign(**{"country": "North America (FAO)"})
-    )
-    tb = pr.concat([tb, tb_north_america_fao], ignore_index=True)
-
+def create_corrected_lists_of_region_members(tb_regions):
     # List countries in different OWID regions.
     regions = {
         region: sorted(
@@ -145,7 +89,7 @@ def run() -> None:
                 ]["name"]
             )
         )
-        for region in ["Africa", "Asia", "Europe", "Oceania", "North America", "South America"]
+        for region in REGIONS
     }
 
     # Add USSR.
@@ -174,7 +118,7 @@ def run() -> None:
     # As a visual check, see the effect in the USSR of removing Turkmenistan.
     # tb_ussr_corrected = tb[(tb["country"].isin(sorted(set(regions["USSR"]) - set(["Turkmenistan"]))))].drop(columns="country").groupby("year", as_index=False).sum().assign(**{"country": "USSR (corrected)"})
     # tb_ussr = tb[(tb["country"] == "USSR")].reset_index(drop=True)
-    # for column in ["fao_population", "agricultural_land", "food_supply"]:
+    # for column in ["population", "agricultural_land", "food_supply"]:
     #     px.line(pr.concat([tb_ussr, tb_ussr_corrected], ignore_index=True), x="year", y=column, markers=True, color="country", range_y=[0, None]).show()
     regions["Europe (corrected)"] = sorted(set(regions["Europe (corrected)"]) - set(["Turkmenistan"]))
     ####################################################################################################################
@@ -211,37 +155,107 @@ def run() -> None:
         )
     )
 
+    # North and South America don't need any corrections.
+    # We include them here for convenience.
+    regions["North America (corrected)"] = regions["North America"]
+    regions["South America (corrected)"] = regions["South America"]
+
+    return regions
+
+
+def plot_corrected_data(tb):
+    import plotly.express as px
+
+    for region in REGIONS:
+        regions_to_plot = [f"{region} (FAO)", f"{region} (corrected)"]
+        # Uncomment to plot the OWID region (it shouldn't be significantly different to FAO's region).
+        # regions_to_plot = [region, f"{region} (FAO)", f"{region} (corrected)"]
+        for column in ["food_supply", "population", "agricultural_land"]:
+            _tb = tb[tb["country"].isin(regions_to_plot)][["country", "year", column]].dropna()
+            if not _tb.empty:
+                px.line(
+                    _tb,
+                    x="year",
+                    y=column,
+                    color="country",
+                    markers=True,
+                    title=f"{region} - {column}",
+                    color_discrete_map={
+                        f"{region} (FAO)": "blue",
+                        f"{region}": "red",
+                        f"{region} (corrected)": "green",
+                    },
+                    range_y=[0, None],
+                ).show()
+
+
+def run() -> None:
+    #
+    # Load inputs.
+    #
+    # Load FAOSTAT combined food balances dataset, and read its main table.
+    # NOTE: It may be necessary to load the meadow FBSH and FBS datasets. For now, try with FBSC.
+    ds_fbsc = paths.load_dataset("faostat_fbsc")
+    tb_fbsc = ds_fbsc.read("faostat_fbsc_flat")
+
+    # Load FAOSTAT land use dataset, and read its main table.
+    ds_rl = paths.load_dataset("faostat_rl")
+    tb_rl = ds_rl.read("faostat_rl_flat")
+
+    # Load regions dataset, and read its main table.
+    ds_regions = paths.load_dataset("regions")
+    tb_regions = ds_regions.read("regions")
+
+    #
+    # Process data.
+    #
+    # Select and rename columns in food balances data.
+    tb_fbsc = tb_fbsc[list(COLUMNS_FBSC)].rename(columns=COLUMNS_FBSC, errors="raise")
+
+    # Select and rename columns in land use data.
+    tb_rl = tb_rl[list(COLUMNS_RL)].rename(columns=COLUMNS_RL, errors="raise")
+
+    # Combine both tables.
+    tb = tb_fbsc.merge(tb_rl, on=["country", "year"], how="outer")
+
+    # Remove empty rows.
+    tb = tb.dropna(subset=tb.drop(columns=["country", "year"]).columns, how="all").reset_index(drop=True)
+
+    # Original countries in the data (we keep them to later sanity check which countries have been lost).
+    countries_original = set(tb["country"])
+
+    # Now keep only rows for which we have data for both food supply, and agricultural land.
+    tb = tb.dropna(subset=["agricultural_land", "food_supply"], how="any").reset_index(drop=True)
+
+    # Sanity check.
+    error = "List of countries that are removed (due to not having data on coincident years for both land use and food supply) has changed. Check and update this list."
+    assert countries_original - set(tb["country"]) == COUNTRIES_EXPECTED_TO_MISS_DATA, error
+
+    # FAO doesn't have data for North America. Instead, it has Northern, Central, South, and Caribbean.
+    # For convenience, create a "North America (FAO)" by adding up Northern, Central, and Caribbean.
+    tb_north_america_fao = (
+        tb[tb["country"].isin(["Northern America (FAO)", "Central America (FAO)", "Caribbean (FAO)"])]
+        .groupby("year", as_index=False)
+        .agg({"population": "sum", "agricultural_land": "sum", "food_supply": "sum"})
+        .assign(**{"country": "North America (FAO)"})
+    )
+    tb = pr.concat([tb, tb_north_america_fao], ignore_index=True)
+
+    # Create corrected lists of region members.
+    regions = create_corrected_lists_of_region_members(tb_regions=tb_regions)
+
     # Add new definitions of continents, corrected for changes in historical regions and changes in data coverage.
     tables_corrected = [
         tb[tb["country"].isin(regions[f"{region} (corrected)"])]
         .groupby("year", as_index=False)
-        .agg({"food_supply": "sum", "fao_population": "sum", "agricultural_land": "sum"})
+        .agg({"food_supply": "sum", "population": "sum", "agricultural_land": "sum"})
         .assign(**{"country": f"{region} (corrected)"})
-        for region in ["Europe", "Africa", "Asia", "Oceania"]
+        for region in REGIONS
     ]
     tb = pr.concat([tb] + tables_corrected, ignore_index=True)
 
     # Uncomment to visually inspect all changes.
-    # for region in REGIONS:
-    #     for column in ["food_supply", "fao_population", "agricultural_land"]:
-    #         _tb = tb[tb["country"].isin([region, f"{region} (FAO)", f"{region} (corrected)"])][
-    #             ["country", "year", column]
-    #         ].dropna()
-    #         if not _tb.empty:
-    #             px.line(
-    #                 _tb,
-    #                 x="year",
-    #                 y=column,
-    #                 color="country",
-    #                 markers=True,
-    #                 title=f"{region} - {column}",
-    #                 color_discrete_map={
-    #                     f"{region} (FAO)": "blue",
-    #                     f"{region}": "red",
-    #                     f"{region} (corrected)": "green",
-    #                 },
-    #                 range_y=[0, None],
-    #             ).show()
+    # plot_corrected_data(tb=tb)
 
     # Improve table format.
     tb = tb.format(short_name=paths.short_name)
