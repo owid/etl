@@ -278,10 +278,10 @@ def run() -> None:
     )
 
     # get all studies by completion year and country
-    tb_trials = group_trials_by(tb, ["primary_location", "completion_year"], "n_studies_country", completed_only=True)
+    tb_trials = group_trials_by(tb, ["primary_location", "completion_year"], "n_studies_country")
 
     # studies by completion year and sponsor type
-    tb_sponsor = group_trials_by(tb, ["Funder Type", "completion_year"], "n_studies_sponsor", completed_only=True)
+    tb_sponsor = group_trials_by(tb, ["Funder Type", "completion_year"], "n_studies_sponsor")
 
     # get sum of studies by completion year by intervention type
     tb_interventions = tb.copy()
@@ -291,26 +291,34 @@ def run() -> None:
     tb_interventions[INTERVENTIONS].m.origins = tb["Phases"].m.origins
 
     # get sum of studies by completion year by study type
-    tb_study_type = group_trials_by(tb, ["Study Type", "completion_year"], "n_studies_type", completed_only=True)
+    tb_study_type = group_trials_by(tb, ["Study Type", "completion_year"], "n_studies_type")
 
     # get sum of studies by completion year by primary purpose
-    tb_purpose = group_trials_by(tb, ["primary_purpose", "completion_year"], "n_studies_purpose", completed_only=True)
+    tb_purpose = group_trials_by(tb, ["primary_purpose", "completion_year"], "n_studies_purpose")
 
     # get sum of studies by completion year by status
     tb_status = tb[tb["Study Type"] != "Expanded Access"]
-    tb_status = group_trials_by(tb_status, ["Study Status", "start_year"], "n_studies_status")
+    tb_status = group_trials_by(tb_status, ["Study Status", "start_year"], "n_studies_status", completed_only=False)
 
     # get sum of studies by completion year and whether they have results
-    tb_results = group_trials_by(tb, ["Study Results", "start_year"], "n_studies_results")
+    tb_results = group_trials_by(tb, ["Study Results", "start_year"], "n_studies_results", completed_only=False)
 
     # get average study length by phase and completion year
     tb_length = group_trials_by(
         tb,
         ["completion_year", "Phases"],
         "avg_study_length_days",
-        completed_only=True,
         aggregate_func="mean",
         avg_col_name="study_length_days",
+    )
+
+    # add average participants by completion year and phase
+    tb_participants = group_trials_by(
+        tb,
+        ["completion_year", "Phases"],
+        "avg_participants",
+        aggregate_func="mean",
+        avg_col_name="Enrollment",
     )
 
     # make categorical columns human-readable
@@ -321,10 +329,26 @@ def run() -> None:
     # TODO: do this for results as well
 
     # Improve table formats.
-    tb_trials, tb_sponsor, tb_interventions, tb_study_type, tb_purpose, tb_status, tb_results, tb_length = (
-        format_tables(
-            tb_trials, tb_sponsor, tb_interventions, tb_study_type, tb_purpose, tb_status, tb_results, tb_length
-        )
+    (
+        tb_trials,
+        tb_sponsor,
+        tb_interventions,
+        tb_study_type,
+        tb_purpose,
+        tb_status,
+        tb_results,
+        tb_length,
+        tb_participants,
+    ) = format_tables(
+        tb_trials,
+        tb_sponsor,
+        tb_interventions,
+        tb_study_type,
+        tb_purpose,
+        tb_status,
+        tb_results,
+        tb_length,
+        tb_participants,
     )
 
     tables_ls = [
@@ -348,7 +372,7 @@ def run() -> None:
     ds_garden.save()
 
 
-def group_trials_by(tb, group_by_cols, new_col_name, completed_only=False, aggregate_func="count", avg_col_name=None):
+def group_trials_by(tb, group_by_cols, new_col_name, completed_only=True, aggregate_func="count", avg_col_name=None):
     """
     Group trials by specified columns and count the number of studies.
     """
@@ -372,7 +396,17 @@ def group_trials_by(tb, group_by_cols, new_col_name, completed_only=False, aggre
     return tb_gb
 
 
-def format_tables(tb_trials, tb_sponsor, tb_interventions, tb_study_type, tb_purpose, tb_status, tb_results, tb_length):
+def format_tables(
+    tb_trials,
+    tb_sponsor,
+    tb_interventions,
+    tb_study_type,
+    tb_purpose,
+    tb_status,
+    tb_results,
+    tb_length,
+    tb_participants,
+):
     # rename the columns in each table to "year" and "country" so they can be used in grapher
     replacement_dict = {
         "start_year": "year",
@@ -394,6 +428,7 @@ def format_tables(tb_trials, tb_sponsor, tb_interventions, tb_study_type, tb_pur
     tb_status = tb_status.rename(columns=replacement_dict)
     tb_results = tb_results.rename(columns=replacement_dict)
     tb_length = tb_length.rename(columns=replacement_dict)
+    tb_participants = tb_length.rename(columns=replacement_dict)
 
     # set the index to year and country for each table
     tb_trials = tb_trials.format(["year", "country"], short_name="trials_per_year")
@@ -404,6 +439,7 @@ def format_tables(tb_trials, tb_sponsor, tb_interventions, tb_study_type, tb_pur
     tb_status = tb_status.format(["year", "country"], short_name="status_per_year")
     tb_results = tb_results.format(["year", "country"], short_name="results_per_year")
     tb_length = tb_length.format(["year", "country"], short_name="length_per_year")
+    tb_participants = tb_participants.format(["year", "country"], short_name="participants_per_year")
 
     return (
         tb_trials,
@@ -414,4 +450,5 @@ def format_tables(tb_trials, tb_sponsor, tb_interventions, tb_study_type, tb_pur
         tb_status,
         tb_results,
         tb_length,
+        tb_participants,
     )
