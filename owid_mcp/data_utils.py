@@ -185,7 +185,7 @@ async def run_sql(query: str, max_rows: int = MAX_ROWS_DEFAULT) -> Dict[str, Any
     Returns
     -------
     dict
-        {"columns": [...], "rows": [[...], ...], "source": datasette_url}
+        {"csv": "actual csv content", "source": datasette_csv_url}
     """
     if not SQL_SELECT_RE.match(query):
         raise ValueError("Only SELECT statements are allowed.")
@@ -201,17 +201,16 @@ async def run_sql(query: str, max_rows: int = MAX_ROWS_DEFAULT) -> Dict[str, Any
     qs = urllib.parse.urlencode({"sql": query, "_size": "max"})
     # Remove the .json extension from DATASETTE_BASE since it's already included in config
     datasette_base = DATASETTE_BASE.replace(".json", "")
-    datasette_url = f"{datasette_base}.json?{qs}"
+    datasette_csv_url = f"{datasette_base}.csv?{qs}"
 
     async with httpx.AsyncClient(timeout=HTTP_TIMEOUT) as client:
-        resp = await client.get(datasette_url)
+        resp = await client.get(datasette_csv_url)
         resp.raise_for_status()
-        js = resp.json()
+        csv_content = resp.text
 
     return {
-        "columns": js.get("columns", []),
-        "rows": js.get("rows", []),
-        "source": datasette_url,
+        "csv": csv_content,
+        "source": datasette_csv_url,
     }
 
 
