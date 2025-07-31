@@ -20,6 +20,60 @@ def run() -> None:
     # Remove unnecessary columns.
     tb = tb_garden.drop(columns=["gdp", "population", "source"], errors="raise")
 
+    ####################################################################################################################
+    # TODO: Remove, temporary code for a specific chart on top energy consumers.
+
+    # The USSR in the Statistical Review ends in 1984, and successors start in 1985. Remove those years of successors.
+    # Specifically, remove Russia (which is the only one that is relevant for the chart we are working on).
+    tb.loc[(tb["year"] < 1992) & (tb["country"] == "Russia"), "Primary energy consumption (TWh)"] = None
+
+    # regions = [
+    #     "Africa",
+    #     "Africa (EI)",
+    #     "Africa (EIA)",
+    #     "Asia",
+    #     "Asia & Oceania (EIA)",
+    #     "Asia Pacific (EI)",
+    #     "CIS (EI)",
+    #     "Central & South America (EIA)",
+    #     "Eastern Europe and Eurasia (EIA)",
+    #     "Eurasia (EIA)",
+    #     "Europe",
+    #     "Europe (EI)",
+    #     "Europe (EIA)",
+    #     "European Union (27)",
+    #     "High-income countries",
+    #     "Lower-middle-income countries",
+    #     "Middle East (EI)",
+    #     "Middle East (EIA)",
+    #     "Non-OECD (EI)",
+    #     "Non-OECD (EIA)",
+    #     "Non-OPEC (EIA)",
+    #     "North America",
+    #     "North America (EI)",
+    #     "OECD (EI)",
+    #     "OECD (EIA)",
+    #     "OPEC (EIA)",
+    #     "Other Asia-Pacific (EIA)",
+    #     "Persian Gulf (EIA)",
+    #     "South America",
+    #     "South and Central America (EI)",
+    #     "Upper-middle-income countries",
+    #     "Western Europe (EIA)",
+    #     "World",
+    # ]
+    # # Find out, for each year, the top five countries in terms of primary energy consumption.
+    # top_consumers = {
+    #     year: tb[(tb["year"] == year) & (~tb["country"].isin(regions))]
+    #     .sort_values(tb.columns[2], ascending=False)
+    #     .iloc[0:5]["country"]
+    #     .tolist()
+    #     for year in sorted(set(tb["year"]))
+    # }
+    # sorted(set(sum(top_consumers.values(), [])))
+
+    ####################################################################################################################
+
     # Format table conveniently.
     tb = tb.format()
 
