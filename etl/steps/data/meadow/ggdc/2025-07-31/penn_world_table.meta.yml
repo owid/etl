@@ -1,0 +1,169 @@
+dataset:
+  title: Penn World Table (GGDC, 2021)
+  description: Penn World Table is a database with information on GDP and its composition, employment, productivity and trade, covering 183 countries between 1950 and 2019.
+  sources:
+    -
+      name: Feenstra et al. (2015), Penn World Table (2021)
+      published_by: Feenstra, R. C., Inklaar, R. and Timmer, M.P. (2015), "The Next Generation of the Penn World Table". American Economic Review, 105(10), 3150-3182
+      publication_year: 2021
+      date_accessed: 2022-11-28
+      url: https://www.rug.nl/ggdc/productivity/pwt/
+
+tables:
+  penn_world_table:
+    variables:
+      rgdpe:
+        title: Expenditure-side real GDP at chained PPPs
+        unit: Million international-$ at 2017 prices
+        short_unit: Million $
+      rgdpo:
+        title: Output-side real GDP at chained PPPs
+        unit: Million international-$ at 2017 prices
+        short_unit: Million $
+      pop:
+        title: Population
+        unit: Million people
+      emp:
+        title: Number of persons engaged
+        unit: Million people
+      avh:
+        title: Average annual hours worked by persons engaged
+        unit: Hours per worker
+      hc:
+        title: Human capital index, based on years of schooling and returns to education
+        unit:
+      ccon:
+        title: Real consumption of households and government, at current PPPs
+        unit: Million international-$ at 2017 prices
+        short_unit: Million $
+      cda:
+        title: Real domestic absorption, (real consumption plus investment), at current PPPs
+        unit: Million international-$ at 2017 prices
+        short_unit: Million $
+      cgdpe:
+        title: Expenditure-side real GDP at current PPPs
+        unit: Million international-$ at 2017 prices
+        short_unit: Million $
+      cgdpo:
+        title: Output-side real GDP at current PPPs
+        unit: Million international-$ at 2017 prices
+        short_unit: Million $
+      cn:
+        title: Capital stock at current PPPs
+        unit: Million international-$ at 2017 prices
+        short_unit: Million $
+      ck:
+        title: Capital services levels at current PPPs (USA=1)
+        unit:
+      ctfp:
+        title: TFP level at current PPPs (USA=1)
+        unit:
+      cwtfp:
+        title: Welfare-relevant TFP levels at current PPPs (USA=1)
+        unit:
+      rgdpna:
+        title: Real GDP at constant 2017 national prices
+        unit: Million international-$ at 2017 prices
+        short_unit: Million $
+      rconna:
+        title: Real consumption at constant 2017 national prices
+        unit: Million international-$ at 2017 prices
+        short_unit: Million $
+      rdana:
+        title: Real domestic absorption at constant 2017 national prices
+        unit: Million international-$ at 2017 prices
+        short_unit: Million $
+      rnna:
+        title: Capital stock at constant 2017 national prices
+        unit: Million international-$ at 2017 prices
+        short_unit: Million $
+      rkna:
+        title: Capital services at constant 2017 national prices (2017=1)
+        unit:
+      rtfpna:
+        title: TFP at constant national prices (2017=1)
+        unit:
+      rwtfpna:
+        title: Welfare-relevant TFP at constant national prices (2017=1)
+        unit:
+      labsh:
+        title: Share of labour compensation in GDP at current national prices
+        unit:
+      irr:
+        title: Real internal rate of return
+        unit:
+      delta:
+        title: Average depreciation rate of the capital stock
+        unit:
+      xr:
+        title: Exchange rate, national currency/USD (market+estimated)
+        unit:
+      pl_con:
+        title: Price level of CCON (PPP/XR), price level of USA GDPo in 2017=1
+        unit:
+      pl_da:
+        title: Price level of CDA (PPP/XR), price level of USA GDPo in 2017=1
+        unit:
+      pl_gdpo:
+        title: Price level of CGDPo (PPP/XR), price level of USA GDPo in 2017=1
+        unit:
+      i_cig:
+        title: "0/1/2/3/4: relative price data for consumption, investment and government is extrapolated (0), benchmark (1), interpolated (2), ICP PPP timeseries: benchmark or interpolated (3) or  ICP PPP timeseries: extrapolated (4)"
+        unit:
+      i_xm:
+        title: "0/1/2: relative price data for exports and imports is extrapolated (0), benchmark (1) or interpolated (2)"
+        unit:
+      i_xr:
+        title: "0/1: the exchange rate is market-based (0) or estimated (1)"
+        unit:
+      i_outlier:
+        title: "0/1: the observation on pl_gdpe or pl_gdpo is not an outlier (0) or an outlier (1)"
+        unit:
+      i_irr:
+        title: "0/1/2/3: the observation for irr is not an outlier (0), may be biased due to a low capital share (1), hit the lower bound of 1 percent (2), or is an outlier (3)"
+        unit:
+      cor_exp:
+        title: "Correlation between expenditure shares of the country and the US (benchmark observations only)"
+        unit:
+      statcap:
+        title: "Statistical capacity indicator (source: World Bank, developing countries only)"
+        unit:
+      csh_c:
+        title: "Share of household consumption at current PPPs"
+        unit:
+      csh_i:
+        title: "Share of gross capital formation at current PPPs"
+        unit:
+      csh_g:
+        title: "Share of government consumption at current PPPs"
+        unit:
+      csh_x:
+        title: Share of merchandise exports at current PPPs
+        unit:
+      csh_m:
+        title: Share of merchandise imports at current PPPs
+        unit:
+      csh_r:
+        title: Share of residual trade and GDP statistical discrepancy at current PPPs
+        unit:
+      pl_c:
+        title: Price level of household consumption,  price level of USA GDPo in 2017=1
+        unit:
+      pl_i:
+        title: Price level of capital formation,  price level of USA GDPo in 2017=1
+        unit:
+      pl_g:
+        title: Price level of government consumption,  price level of USA GDPo in 2017=1
+        unit:
+      pl_x:
+        title: Price level of exports, price level of USA GDPo in 2017=1
+        unit:
+      pl_m:
+        title: Price level of imports, price level of USA GDPo in 2017=1
+        unit:
+      pl_n:
+        title: Price level of the capital stock, price level of USA in 2017=1
+        unit:
+      pl_k:
+        title: Price level of the capital services, price level of USA=1
+        unit:

@@ -1,0 +1,83 @@
+dataset:
+  namespace: ggdc
+  version: 2022-11-28
+  title: Penn World Table 10.0 - National Accounts
+  short_name: penn_world_table_national_accounts
+  description: National Accounts data in current and constant national prices and exchange rate and population data for Penn World Table.
+  sources:
+    -
+      name: Feenstra et al. (2015), Penn World Table 10.0 - National Accounts estimates
+      published_by: Feenstra, R. C., Inklaar, R. and Timmer, M.P. (2015), "The Next Generation of the Penn World Table". American Economic Review, 105(10), 3150-3182
+      publication_year: 2021
+      date_accessed: 2022-11-28
+      url: https://www.rug.nl/ggdc/productivity/pwt/
+
+tables:
+  penn_world_table_national_accounts:
+    variables:
+      country:
+        title: OWID-formatted name of country
+        unit:
+      countrycode:
+        title: 3-letter ISO country code
+        unit:
+      year:
+        title: Year
+        unit:
+      v_c:
+        title: Household consumption at current national prices
+        unit:
+      v_i:
+        title: Investment at current national prices
+        unit:
+      v_g:
+        title: Government consumption at current national prices
+        unit:
+      v_x:
+        title: Exports at current national prices
+        unit:
+      v_m:
+        title: Imports at current national prices
+        unit:
+      v_gdp:
+        title: GDP at current national prices
+        unit:
+      q_c:
+        title: Household consumption at constant national 2017 prices
+        unit:
+      q_i:
+        title: Investment at constant national 2017 prices
+        unit:
+      q_g:
+        title: Government consumption at constant national 2017 prices
+        unit:
+      q_x:
+        title: Exports at constant national 2017 prices
+        unit:
+      q_m:
+        title: Imports at constant national 2017 prices
+        unit:
+      q_gdp:
+        title: GDP at constant national 2017 prices
+        unit:
+      pop:
+        title: Population
+        unit:
+      xr:
+        title: Exchange rate, national currency/USD (market)
+        unit:
+      xr2:
+        title: Exchange rate, national currency/USD (market+estimated)
+        unit:
+      v_gfcf:
+        title: Gross fixed capital formation at current national prices
+        unit:
+      q_gfcf:
+        title: Gross fixed capital formation at constant national prices
+        unit:
+      emp:
+        title: Number of persons engaged
+        unit:
+      avh:
+        title: Average annual hours worked by persons engaged
+        unit:
