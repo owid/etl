@@ -94,10 +94,11 @@ def run() -> None:
         (tb["country"].isin(REGIONS_NO_WORLD_INCOME)) & (tb["counterpart_country"].isin(REGIONS_NO_WORLD_INCOME))
     ]
     tb_owid_income = tb[(tb["country"].isin(INCOME_GROUPS)) & (tb["counterpart_country"].isin(INCOME_GROUPS))]
-    tb_owid_income_world = tb[(tb["country"].isin(INCOME_GROUPS)) & (tb["counterpart_country"] == "World")]
+    tb_owid_income_world = tb[(tb["counterpart_country"].isin(INCOME_GROUPS)) & (tb["country"] == "World")]
 
-    tb_owid_countries = tb[(tb["country"].isin(REGIONS_NO_WORLD_INCOME)) & (tb["counterpart_country"].isin(members))]
-    tb_owid_world = tb[(tb["country"].isin(members)) & (tb["counterpart_country"] == "World")]
+    tb_owid_countries = tb[(tb["country"].isin(members)) & (tb["counterpart_country"].isin(REGIONS_NO_WORLD_INCOME))]
+
+    tb_owid_world = tb[(tb["counterpart_country"].isin(members)) & (tb["country"] == "World")]
 
     # Define table subsets with descriptive names
     table_subsets = [
@@ -111,10 +112,10 @@ def run() -> None:
     for table_index, (table_name, table_data) in enumerate(table_subsets):
         processed_table = sh.process_table_subset(table_data)
         if table_name in ["owid_regions", "owid_income_groups"]:
-            processed_table.loc[processed_table["country"] == processed_table["counterpart_country"], "country"] = (
-                "Intraregional"
-            )
-        if table_name in ["owid_countries"]:
+            processed_table.loc[
+                processed_table["country"] == processed_table["counterpart_country"], "counterpart_country"
+            ] = "Intraregional"
+        if table_name == "owid_world":
             processed_table = processed_table.rename(
                 columns={"country": "counterpart_country", "counterpart_country": "country"}
             )
