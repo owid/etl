@@ -28,6 +28,14 @@ REGION_MAPPING = {
 }
 
 
+SOURCE_URL_MAPPING = {
+    "Human Mortality Database": "https://www.mortality.org/Data/ZippedDataFiles",
+    "Zijdeman et al.": "https://clio-infra.eu/Indicators/LifeExpectancyatBirthTotal.html",
+    "Riley": "https://doi.org/10.1111/j.1728-4457.2005.00083.x",
+    "UN World Population Prospects": "https://population.un.org/wpp/downloads?folder=Standard%20Projections&group=Most%20used",
+}
+
+
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
@@ -38,29 +46,23 @@ def run(dest_dir: str) -> None:
     tb_lt = ds_lt.read("life_tables")
     # In this dataset HMD is used before 1950 and UN WPP after 1950.
     tb_lt.loc[tb_lt["year"] < YEAR_WPP_START, "source"] = "Human Mortality Database"
-    tb_lt.loc[tb_lt["year"] < YEAR_WPP_START, "source_url"] = "https://www.mortality.org/Data/ZippedDataFiles"
     tb_lt.loc[tb_lt["year"] >= YEAR_WPP_START, "source"] = "UN World Population Prospects"
-    tb_lt.loc[tb_lt["year"] >= YEAR_WPP_START, "source_url"] = (
-        "https://population.un.org/wpp/downloads?folder=Standard%20Projections&group=Most%20used"
-    )
+
     ## zijdeman_et_al_2015
     paths.log.info("reading dataset `zijdeman_et_al_2015`")
     ds_zi = paths.load_dataset("zijdeman_et_al_2015")
     tb_zi = ds_zi.read("zijdeman_et_al_2015")
     tb_zi["source"] = "Zijdeman et al."
-    tb_zi["source_url"] = "https://clio-infra.eu/Indicators/LifeExpectancyatBirthTotal.html"
     ## Riley
     paths.log.info("reading dataset `riley_2005`")
     ds_ri = paths.load_dataset("riley_2005")
     tb_ri = ds_ri.read("riley_2005")
     tb_ri["source"] = "Riley"
-    tb_ri["source_url"] = "https://doi.org/10.1111/j.1728-4457.2005.00083.x"
     ## WPP
     paths.log.info("reading dataset `un_wpp`")
     ds_un = paths.load_dataset("un_wpp")
     tb_un = ds_un.read("life_expectancy")
     tb_un["source"] = "UN World Population Prospects"
-    tb_un["source_url"] = "https://population.un.org/wpp/downloads?folder=Standard%20Projections&group=Most%20used"
 
     #
     # Process data.
@@ -93,12 +95,17 @@ def run(dest_dir: str) -> None:
 
     ## (i) Main table (historical values)
     tb_main = tb.loc[tb["year"] <= YEAR_ESTIMATE_LAST].copy()
-    tb_main_at_birth = tb_main[tb_main["life_expectancy_0"].notna()].drop(columns=["sex", "age", "life_expectancy"])
+    tb_main_at_birth = (
+        tb_main[tb_main["life_expectancy_0"].notna()]
+        .drop(columns=["sex", "age", "life_expectancy"])
+        .reset_index(drop=True)
+    )
+    tb_main_at_birth["source_url"] = tb_main_at_birth["source"].map(SOURCE_URL_MAPPING)
     tb_main_at_birth["source"].m.origins = origins
     tb_main_at_birth["source_url"].m.origins = origins
-    tb_main = tb_main[tb_main["life_expectancy"].notna()].drop(columns=["source", "source_url", "life_expectancy_0"])
+    tb_main = tb_main[tb_main["life_expectancy"].notna()].drop(columns=["source", "life_expectancy_0"])
     ## (ii) Only projections
-    tb = tb.drop(columns=["source", "source_url"])
+    tb = tb.drop(columns=["source"])
     tb_only_proj = tb.loc[tb["year"] > YEAR_ESTIMATE_LAST].copy()
     tb_only_proj = _add_suffix_to_indicators(tb_only_proj, "_only_proj", columns_index=columns_index)
     ## Table only with projections should only contain UN as origin
@@ -184,7 +191,7 @@ def process_un(tb: Table) -> Table:
     ## columns: country, year, value, sex, age
     tb = tb.loc[
         (tb["year"] > YEAR_ESTIMATE_LAST) & (tb["variant"] == "medium"),
-        ["country", "year", "sex", "age", "life_expectancy", "source", "source_url"],
+        ["country", "year", "sex", "age", "life_expectancy", "source"],
     ]
 
     # Rename column values
@@ -289,16 +296,14 @@ def combine_tables(tb_lt: Table, tb_un: Table, tb_zi: Table, tb_ri: Table) -> Ta
     tb_0 = tb_0.merge(tb_zi, how="outer", on=["country", "year", "sex", "age"], suffixes=("", "_zij"))
     tb_0["life_expectancy"] = tb_0["life_expectancy"].fillna(tb_0["life_expectancy_zij"])
     tb_0["source"] = tb_0["source"].fillna(tb_0["source_zij"])
-    tb_0["source_url"] = tb_0["source_url"].fillna(tb_0["source_url_zij"])
-    tb_0 = tb_0.drop(columns=["life_expectancy_zij", "source_zij", "source_url_zij"])
+    tb_0 = tb_0.drop(columns=["life_expectancy_zij", "source_zij"])
     ## Riley: complement with continent data
     tb_0 = pr.concat([tb_0, tb_ri], ignore_index=True)
 
     # Combine tb_0 with tb
     tb = tb.merge(tb_0, on=["country", "year", "sex", "age"], how="outer", suffixes=("", "_0"))
     tb["source"] = tb["source"].fillna(tb["source_0"])
-    tb["source_url"] = tb["source_url"].fillna(tb["source_url_0"])
-    tb = tb.drop(columns=["source_0", "source_url_0"])
+    tb = tb.drop(columns=["source_0"])
     assert all(
         tb["source"].isin(["Riley", "Zijdeman et al.", "UN World Population Prospects", "Human Mortality Database"])
     ), "No source found in table!"
