@@ -97,6 +97,7 @@ def run() -> None:
     tb_owid_income_world = tb[(tb["counterpart_country"].isin(INCOME_GROUPS)) & (tb["country"] == "World")]
 
     tb_owid_countries = tb[(tb["country"].isin(members)) & (tb["counterpart_country"].isin(REGIONS_NO_WORLD_INCOME))]
+    tb_all_countries = tb[(tb["country"].isin(members)) & (tb["counterpart_country"].isin(members))]
 
     tb_owid_world = tb[(tb["counterpart_country"].isin(members)) & (tb["country"] == "World")]
 
@@ -122,12 +123,17 @@ def run() -> None:
         tbs.append(processed_table)
 
     tb_income_total = sh.calculate_income_level_trade_shares(tb_owid_income)
+
     tb_income_total = tb_income_total.rename(columns={"income_flow": "country"})
     tb_income_total["counterpart_country"] = "World"
-    tbs.append(tb_income_total)
 
+    top_import_destinations = sh.calculate_top_import_destination_share(tb_all_countries)
+    top_export_destinations = sh.calculate_top_export_destination_share(tb_all_countries)
+    tbs.append(tb_income_total)
     tbs.append(trading_partners)
     tb = pr.concat(tbs)
+    tb = pr.merge(tb, top_import_destinations, on=["country", "year", "counterpart_country"], how="outer")
+    tb = pr.merge(tb, top_export_destinations, on=["country", "year", "counterpart_country"], how="outer")
 
     # Improve table format.
     tb = tb.format(["country", "year", "counterpart_country"])

@@ -220,3 +220,88 @@ def calculate_income_level_trade_shares(tb: Table) -> Table:
     trade_shares = trade_shares[["year", "income_flow", "share_of_total_trade"]]
 
     return trade_shares
+
+
+def calculate_top_import_destination_share(tb) -> Table:
+    """
+    Calculate the share of imports going to the top import destination for each country.
+
+    Args:
+        tb: Table with columns ['country', 'counterpart_country', 'year', 'indicator', 'value']
+
+    Returns:
+        Table with columns ['country', 'year', 'counterpart_country', 'share_to_top_import_destination']
+    """
+    IMPORT = "Imports of goods, Cost insurance freight (CIF), US dollar"
+    THRESHOLD = 0.01  # million USD
+
+    # Filter to imports only and above threshold
+    imports = tb[(tb["indicator"] == IMPORT) & (tb["value"].fillna(0) > THRESHOLD)].copy()
+
+    if imports.empty:
+        return Table()
+
+    # Calculate total imports by country-year
+    total_imports = imports.groupby(["country", "year"])["value"].sum().reset_index(name="total_imports")
+
+    # Find the top import destination for each country-year
+    # Handle potential ties by sorting and taking first occurrence
+    imports_sorted = imports.sort_values(["country", "year", "value"], ascending=[True, True, False])
+    top_destinations = (
+        imports_sorted.groupby(["country", "year"])
+        .first()
+        .reset_index()[["country", "year", "counterpart_country", "value"]]
+        .rename(columns={"value": "imports_to_top_destination"})
+    )
+
+    # Merge with total imports to calculate share
+    result = top_destinations.merge(total_imports, on=["country", "year"])
+    result["share_to_top_import_destination"] = (result["imports_to_top_destination"] / result["total_imports"]) * 100
+
+    # Copy metadata from original value column
+    result["share_to_top_import_destination"] = result["share_to_top_import_destination"].copy_metadata(tb["value"])
+    result["counterpart_country"] = "top exporter"
+    return result[["country", "year", "counterpart_country", "share_to_top_import_destination"]]
+
+
+def calculate_top_export_destination_share(tb) -> Table:
+    """
+    Calculate the share of exports going to the top export destination for each country.
+
+    Args:
+        tb: Table with columns ['country', 'counterpart_country', 'year', 'indicator', 'value']
+
+    Returns:
+        Table with columns ['country', 'year', 'counterpart_country', 'share_to_top_export_destination']
+    """
+    EXPORT = "Exports of goods, Free on board (FOB), US dollar"
+    THRESHOLD = 0.01  # million USD
+
+    # Filter to exports only and above threshold
+    exports = tb[(tb["indicator"] == EXPORT) & (tb["value"].fillna(0) > THRESHOLD)].copy()
+
+    if exports.empty:
+        return Table()
+
+    # Calculate total exports by country-year
+    total_exports = exports.groupby(["country", "year"])["value"].sum().reset_index(name="total_exports")
+
+    # Find the top export destination for each country-year
+    # Handle potential ties by sorting and taking first occurrence
+    exports_sorted = exports.sort_values(["country", "year", "value"], ascending=[True, True, False])
+    top_destinations = (
+        exports_sorted.groupby(["country", "year"])
+        .first()
+        .reset_index()[["country", "year", "counterpart_country", "value"]]
+        .rename(columns={"value": "exports_to_top_destination"})
+    )
+
+    # Merge with total exports to calculate share
+    result = top_destinations.merge(total_exports, on=["country", "year"])
+    result["share_to_top_export_destination"] = (result["exports_to_top_destination"] / result["total_exports"]) * 100
+
+    # Copy metadata from original value column
+    result["share_to_top_export_destination"] = result["share_to_top_export_destination"].copy_metadata(tb["value"])
+    result["counterpart_country"] = "top importer"
+
+    return result[["country", "year", "counterpart_country", "share_to_top_export_destination"]]
