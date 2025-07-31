@@ -1,167 +1,198 @@
+"""Load a meadow dataset and create a garden dataset."""
+
 import numpy as np
-import pandas as pd
-from owid.catalog import Dataset, Table
-from owid.catalog.utils import underscore_table
-from structlog import get_logger
+import owid.catalog.processing as pr
+from owid.catalog import Table
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder
-from etl.paths import DATA_DIR
 
-log = get_logger()
+# Get paths and naming conventions for current step.
+paths = PathFinder(__file__)
 
-# naming conventions
-N = PathFinder(__file__)
+# Define indicators that are expressed in millions (people or currency units).
+INDICATORS_IN_MILLIONS = [
+    "rgdpe",
+    "rgdpo",
+    "cgdpe",
+    "cgdpo",
+    "rgdpna",
+    "ccon",
+    "cda",
+    "cn",
+    "rconna",
+    "rdana",
+    "rnna",
+    "pop",
+    "emp",
+]
+
+# Define indicators that are expressed as shares (0-1)
+INDICATORS_AS_SHARES = [
+    "labsh",
+    "irr",
+    "delta",
+    "csh_c",
+    "csh_i",
+    "csh_g",
+    "csh_x",
+    "csh_m",
+    "csh_r",
+]
+
+# Define GDP indicators
+GDP_INDICATORS = ["rgdpe", "rgdpo", "cgdpe", "cgdpo", "rgdpna"]
+
+# Define excluded countries for trade openness calculation.
+EXCLUDED_COUNTRIES = [
+    "China (alternative inflation series)",
+    "Czechoslovakia",
+    "Netherlands Antilles",
+    "USSR",
+    "Yugoslavia",
+]
 
 
-def run(dest_dir: str) -> None:
-    log.info("penn_world_table.start")
-
-    # read dataset from meadow
-    ds_meadow = Dataset(DATA_DIR / "meadow/ggdc/2022-11-28/penn_world_table")
-    tb_meadow = ds_meadow["penn_world_table"]
-
-    df = pd.DataFrame(tb_meadow)
-
-    # %% [markdown]
-    # ## Adjusting units
-    # A range of variables are provided in millions. Here we multiply by 1,000,000 to express
-    # these in individual units.
-    # %%
-    # Multiplying by 1 million to get $ instead of millions of $
-
-    df[["rgdpe", "rgdpo", "cgdpe", "cgdpo", "rgdpna", "ccon", "cda", "cn", "rconna", "rdana", "rnna"]] *= 1000000
-
-    # Multiplying by 1 million to get "people" instead of "millions of people"
-    df[["pop", "emp"]] *= 1000000
-
-    # Replace rgdpo values of Bermuda with cgdpo values, because of issues with the data
-    # Recommended by Robert Inklaar:
-    # The chaining of reference prices may be causing these problems. Normally, cgdpo and rgdpo are not too different, but with the wild swings and even negative prices for Bermuda, that seems an exception.
-    # Perhaps the most elegant way would be to either using cgdpo for all countries or just for Bermuda.
-
-    df.loc[df["countrycode"] == "BMU", "rgdpo"] = df.loc[df["countrycode"] == "BMU", "cgdpo"]
-
-    # %% [markdown]
-    # A range of variables are provided as shares (0-1), which we multiply by 100 to express as a percentage.
-
-    # %%
-    df[["labsh", "irr", "delta", "csh_c", "csh_i", "csh_g", "csh_x", "csh_m", "csh_r"]] *= 100
-
-    # %% [markdown]
-    # ## GDP per capita variables
-    # Penn World Table do not directly provide GDP per capita. We calculate
-    # these by dividing GDP by the population figures they provide (both now multiplied
-    # by 1,000,000).
-    # %%
-    cols_per_capita = ["rgdpe", "rgdpo", "cgdpe", "cgdpo", "rgdpna"]
-    for col in cols_per_capita:
-        df[f"{col}_pc"] = df[col] / df["pop"]
-
-    # %% [markdown]
-    # ## Labour productivity
-    # We derive a measure of productivity – defined as output per hour worked.
+def run() -> None:
     #
-    # For this we use GDP measured in terms of output and using multiple price benchmarks
-    # (see [this notebook](https://github.com/owid/notebooks/blob/main/BetterDataDocs/PabloArriagada/pwt/notebooks/analysis_notebooks/aux_compare_gdp.py) for a discussion of the different GDP variables available in Penn World Table).
+    # Load inputs.
     #
-    # We divide this GDP variable by the total hours worked – calculated by multiplying the number of
-    # workers by the annual number of hours of work per worker.
+    # Load meadow dataset.
+    ds_meadow = paths.load_dataset("penn_world_table")
+    ds_meadow_na = paths.load_dataset("penn_world_table_national_accounts")
 
-    # %%
-    # Productivity = (rgdpo) / (avh*emp) – NB, both rgdpo and emp have been multiplied by 1,000,000 above.
-    df["productivity"] = df["rgdpo"] / (df["avh"] * df["emp"])
+    # Read table from meadow dataset.
+    tb = ds_meadow.read("penn_world_table")
+    tb_na = ds_meadow_na.read("penn_world_table_national_accounts")
+
+    #
+    # Process data.
+    #
+    # Harmonize country names.
+    tb = geo.harmonize_countries(
+        df=tb,
+        countries_file=paths.country_mapping_path,
+    )
+
+    # Multiply indicators that are expressed in millions by 1,000,000.
+    tb[INDICATORS_IN_MILLIONS] *= 1_000_000
+
+    # Multiply indicators that are expressed as shares by 100 to express as percentages.
+    tb[INDICATORS_AS_SHARES] *= 100
+
+    tb = correct_outliers_in_data(tb=tb)
+
+    tb = calculate_gdp_per_capita_and_productivity(tb=tb)
+
+    tb = calculate_trade_openness(tb=tb, tb_na=tb_na)
+
+    # Improve table format.
+    tb = tb.format(["country", "year"], short_name=paths.short_name)
+
+    #
+    # Save outputs.
+    #
+    # Initialize a new garden dataset.
+    ds_garden = paths.create_dataset(tables=[tb], default_metadata=ds_meadow.metadata)
+
+    # Save garden dataset.
+    ds_garden.save()
+
+
+def correct_outliers_in_data(tb: Table) -> Table:
+    """
+    This function corrects outliers tagged as such in the data. It also replaces data for Bermuda's rgdpo with cgdpo values.
+
+    From Robert Inklaar:
+
+    The chaining of reference prices may be causing these problems. Normally, cgdpo and rgdpo are not too different, but with the wild swings and even negative prices for Bermuda, that seems an exception.
+
+    Perhaps the most elegant way would be to either using cgdpo for all countries or just for Bermuda.
+
+    --
+    Some country/year observations, we label as outliers because indeed the relative price levels become implausible.
+    See the i_outlier variable for those observations and in our documentation we have discussion in what qualifies as an outlier.
+
+    """
+    # Replace `rgdpo` values of Bermuda with `cgdpo` values, because of issues with the data
+    tb.loc[tb["country"] == "Bermuda", "rgdpo"] = tb.loc[tb["country"] == "Bermuda", "cgdpo"]
 
     # Filter dataframe with i_outlier different to "Outlier"
-    # From Robert Inklaar:
-    # Some country/year observations, we label as outliers because indeed the relative price levels become implausible.
-    # See the i_outlier variable for those observations and in our documentation we have discussion in what qualifies as an outlier.
-    df = df[df["i_outlier"] != "Outlier"]
+    tb = tb[tb["i_outlier"] != "Outlier"].reset_index(drop=True)
 
     # Drop i_outlier column
-    df = df.drop(columns=["i_outlier"])
+    tb = tb.drop(columns=["i_outlier"])
 
-    # Harmonize countries from main dataset before merge with national accounts data
-    df = harmonize_countries(df)
+    return tb
 
-    # %% [markdown]
-    # ## Trade openness
-    #
-    # We define trade openness as the share of imports and exports in GDP. The estimation of this variable requires the use of the National Accounts dataset from PWT (see [this notebook](https://htmlpreview.github.io/?https://github.com/owid/notebooks/blob/main/BetterDataDocs/PabloArriagada/pwt/notebooks/analysis_notebooks/compare_trade_shares/compare_trade_shares.html) for more details about the methodology)
-    # %%
-    # The National Accounts dataset is loaded here:
 
-    # read dataset from meadow
-    ds_meadow_na = Dataset(DATA_DIR / "meadow/ggdc/2022-11-28/penn_world_table_national_accounts")
-    tb_meadow_na = ds_meadow_na["penn_world_table_national_accounts"]
+def calculate_gdp_per_capita_and_productivity(tb: Table) -> Table:
+    """
+    Calculate GDP per capita and productivity variables.
+    """
 
-    df_na = pd.DataFrame(tb_meadow_na)
+    # Calculate GDP per capita variables.
+    for col in GDP_INDICATORS:
+        tb[f"{col}_pc"] = tb[col] / tb["pop"]
 
-    # Trade openness in individual countries
-    df_na["trade_openness"] = (df_na["v_x"] + df_na["v_m"]) / df_na["v_gdp"] * 100
+    # Calculate productivity as output per hour worked.
+    tb["productivity"] = tb["rgdpo"] / (tb["avh"] * tb["emp"])
 
-    # The World value for this is just the GDP-weighted average across countries.
+    return tb
 
-    df_na["v_gdp_usd"] = df_na["v_gdp"] / df_na["xr2"]
 
-    # Weighted average (dropping alt China and extinct countries with no data)
+def calculate_trade_openness(tb: Table, tb_na: Table) -> Table:
+    """
+    Calculate trade openness as the imports and exports as a share of GDP, using the National Accounts dataset.
+    """
 
-    excluded_countries = [
-        "China (alternative inflation series)",
-        "Czechoslovakia",
-        "Netherlands Antilles",
-        "USSR",
-        "Yugoslavia",
-    ]
+    # Trade openness in individual countries (doesn't matter to use current national prices)
+    tb_na["trade_openness"] = (tb_na["v_x"] + tb_na["v_m"]) / tb_na["v_gdp"] * 100
 
-    # Create a list of countries available only in the national accounts dataset, with missing v_x and v_m data
+    # Convert v_gdp to USD using exchange rates
+    tb_na["v_gdp_usd"] = tb_na["v_gdp"] / tb_na["xr2"]
 
-    world_trade_openness_na = (
-        df_na[~df_na["country"].isin(excluded_countries)]
-        .dropna(subset=["trade_openness", "v_gdp_usd"], how="all")
-        .groupby("year")
-        .apply(lambda x: np.average(x["trade_openness"], weights=x["v_gdp_usd"]))
+    # Keep only relevant columns
+    tb_na = tb_na[["country", "year", "trade_openness", "v_gdp_usd"]].reset_index(drop=True)
+
+    # Cleaning tb_na from the excluded countries
+    tb_na = tb_na[~tb_na["country"].isin(EXCLUDED_COUNTRIES)].reset_index(drop=True)
+
+    # Drop na values in trade_openness
+    tb_na = tb_na.dropna(subset=["trade_openness"]).reset_index(drop=True)
+
+    # Create tb_na_world for aggregated world trade openness
+    tb_na_world = tb_na.copy()
+
+    # Calculate the product per year of trade_openness and v_gdp_usd
+    tb_na_world["trade_openness_x_v_gdp_usd"] = tb_na_world["trade_openness"] * tb_na_world["v_gdp_usd"]
+
+    # Calculate the sum of trade_openness_x_v_gdp_usd and v_gdp_usd per year
+    tb_na_world = (
+        tb_na_world.groupby("year")
+        .agg(
+            trade_openness_x_v_gdp_usd=("trade_openness_x_v_gdp_usd", "sum"),
+            v_gdp_usd=("v_gdp_usd", "sum"),
+        )
         .reset_index()
     )
 
-    world_trade_openness_na.rename(columns={0: "trade_openness"}, inplace=True)
-    world_trade_openness_na["country"] = "World"
+    # Calculate the trade openness for the world
+    tb_na_world["trade_openness"] = tb_na_world["trade_openness_x_v_gdp_usd"] / tb_na_world["v_gdp_usd"] * 100
 
-    # Cleaning df_na from the excluded countries and countries-years with no trade_openness value
-    df_na = df_na[~df_na["country"].isin(excluded_countries)].dropna(subset=["trade_openness"], how="all").reset_index()
+    # Add country column with "World"
+    tb_na_world["country"] = "World"
+
+    # Remove unnecessary columns
+    tb_na_world = tb_na_world[["country", "year", "trade_openness"]].reset_index(drop=True)
 
     # Concatenate the world data with the rest of entities in the NA dataframe
-    df_na = pd.concat([df_na, world_trade_openness_na], ignore_index=True)
+    tb_na = pr.concat([tb_na, tb_na_world], ignore_index=True)
 
     # Merging both df and df_na (only with trade openness) with a outer join, to get all the non matched countries-years:
-    df = pd.merge(df, df_na[["country", "year", "trade_openness"]], how="outer", on=["country", "year"], sort=True)
-    df = df.drop(columns=["countrycode", "currency_unit"])
+    tb = pr.merge(tb, tb_na[["country", "year", "trade_openness"]], how="outer", on=["country", "year"], sort=True)
 
-    ds_garden = Dataset.create_empty(dest_dir)
-    ds_garden.metadata = ds_meadow.metadata
+    # Drop columns that are not needed in tb
+    tb = tb.drop(columns=["countrycode", "currency_unit"])
 
-    tb_garden = underscore_table(Table(df))
-
-    ds_garden.metadata.update_from_yaml(N.metadata_path)
-    tb_garden.update_metadata_from_yaml(N.metadata_path, "penn_world_table")
-
-    ds_garden.add(tb_garden)
-    ds_garden.save()
-
-    log.info("penn_world_table.end")
-
-
-def harmonize_countries(df: pd.DataFrame) -> pd.DataFrame:
-    unharmonized_countries = df["country"]
-    df = geo.harmonize_countries(df=df, countries_file=str(N.country_mapping_path))
-
-    missing_countries = set(unharmonized_countries[df.country.isnull()])
-    if any(missing_countries):
-        raise RuntimeError(
-            "The following raw country names have not been harmonized. "
-            f"Please: (a) edit {N.country_mapping_path} to include these country "
-            f"names; or (b) add them to {N.excluded_countries_path}."
-            f"Raw country names: {missing_countries}"
-        )
-
-    return df
+    return tb
