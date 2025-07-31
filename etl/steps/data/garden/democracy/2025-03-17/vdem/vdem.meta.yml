@@ -239,7 +239,8 @@ tables:
       # NEW
       num_years_in_electdem: # electdem_exp_row_owid
         title: Experience with electoral democracy
-        description_short: Number of total years in electoral democracy. It sums all periods of electoral democracy.
+        description_short: |-
+          Number of total years in electoral democracy. It sums all periods of electoral democracy.
         description_key: &description_key_num_electdem
           - In electoral democracies, citizens have the right to participate in meaningful, free and fair, and multi-party elections.
         unit: years
@@ -258,7 +259,8 @@ tables:
 
       num_years_in_libdem: # libdem_exp_row_owid
         title: Experience with liberal democracy
-        description_processing: Number of total years in liberal democracy. It sums all periods of liberal democracy.
+        description_short: |-
+          Number of total years in liberal democracy. It sums all periods of liberal democracy.
         description_key: &description_key_num_libdem
           - In liberal democracies, citizens have further individual and minority rights, are equal before the law, and the actions of the executive are constrained by the legislative and the courts.
         unit: years
@@ -272,7 +274,10 @@ tables:
       num_years_in_libdem_consecutive_cat: # libdem_age_group_row_owid
         title: Liberal democracy age group
         description_short: Category of liberal democracies based on the country's age of liberal democracy.
-        description_processing: Number of consecutive years in liberal democracy.
+        description_processing: |-
+          Different categories for different number of consecutive years in liberal democracy.
+
+          {definitions.auxiliary.description_imputes}
         description_key: *description_key_num_libdem
         unit: ""
 
