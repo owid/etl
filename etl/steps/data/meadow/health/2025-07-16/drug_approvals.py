@@ -113,7 +113,6 @@ def run() -> None:
     df_anxiety_meds["notes"] = None
 
     for _, row in df_anxiety_meds.iterrows():
-        # if the drug name is in the anxiety meds list, set the Anxiety_Med column to True
         drug_name = row["Drug_name"]
         print(drug_name)
         print(f"Finding {drug_name} minimum approval year...")
@@ -146,3 +145,4 @@ def run() -> None:
         )
 
     df_anxiety_meds.to_csv("/Users/tunaacisu/Data/FDA_drugs/Anxiety_drugs_approval_years.csv", index=False)
+    print("Anxiety drugs approval years saved to CSV.")
