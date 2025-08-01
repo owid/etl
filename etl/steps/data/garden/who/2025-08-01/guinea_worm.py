@@ -98,8 +98,13 @@ def add_current_year(tb: Table, tb_cases: Table, year: int = CURRENT_YEAR, chang
             if changes_dict[country] == "Certified disease free":
                 cty_dict["year_certified"] = last_year
         else:
-            cty_dict["certification_status"] = cty_row_last_year["certification_status"].values[0]
-            cty_dict["year_certified"] = cty_row_last_year["year_certified"].values[0]
+            if not cty_row_last_year.empty:
+                cty_dict["certification_status"] = cty_row_last_year["certification_status"].values[0]
+                cty_dict["year_certified"] = cty_row_last_year["year_certified"].values[0]
+            else:
+                # Handle the case where no data exists for the previous year
+                cty_dict["certification_status"] = None
+                cty_dict["year_certified"] = None
         # get case numbers for current year
         cases_df = tb_cases.loc[(tb_cases["country"] == country) & (tb_cases["year"] == year)]
         if cases_df.empty:
