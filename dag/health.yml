@@ -1283,7 +1283,7 @@ steps:
     - data://garden/demography/2024-07-15/population
   data://grapher/who/2025-07-15/vaccination_coverage:
     - data://garden/who/2025-07-15/vaccination_coverage
-    
+
   # WHO Vaccine Introductions
   data://meadow/who/2025-07-15/vaccination_introductions:
     - snapshot://who/2025-07-15/vaccination_introductions.xlsx
@@ -1297,7 +1297,7 @@ steps:
   data://garden/who/2025-08-01/guinea_worm_certification:
     - data://meadow/who/2025-08-01/guinea_worm_certification
   data://garden/who/2025-08-01/guinea_worm:
-    - snapshot://fasttrack/2024-06-17/guinea_worm.csv
+    - snapshot://fasttrack/latest/guinea_worm_cases.csv
     - data://garden/who/2025-08-01/guinea_worm_certification
   data://grapher/who/2025-08-01/guinea_worm:
     - data://garden/who/2025-08-01/guinea_worm
