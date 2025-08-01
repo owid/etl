@@ -17,7 +17,7 @@ from apps.chart_animation.cli import (
 )
 from apps.wizard.utils import set_states
 from apps.wizard.utils.components import grapher_chart_from_url, st_horizontal, st_info, url_persist
-from etl.config import OWID_ENV, OWIDEnv
+from etl.config import OWID_ENV
 
 # Initialize log.
 log = get_logger()
