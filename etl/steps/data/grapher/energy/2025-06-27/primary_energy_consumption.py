@@ -24,8 +24,8 @@ def run() -> None:
     # TODO: Remove, temporary code for a specific chart on top energy consumers.
 
     # The USSR in the Statistical Review ends in 1984, and successors start in 1985. Remove those years of successors.
-    # Specifically, remove Russia (which is the only one that is relevant for the chart we are working on).
-    tb.loc[(tb["year"] < 1992) & (tb["country"] == "Russia"), "primary_energy_consumption__twh"] = None
+    # Specifically, remove Russia and Ukraine (the only ones that are relevant for the chart we are working on).
+    tb.loc[(tb["year"] < 1992) & (tb["country"].isin(["Russia", "Ukraine"])), "primary_energy_consumption__twh"] = None
 
     # regions = [
     #     "Africa",
@@ -54,6 +54,7 @@ def run() -> None:
     #     "OECD (EI)",
     #     "OECD (EIA)",
     #     "OPEC (EIA)",
+    #     "Other Americas (EIA)",
     #     "Other Asia-Pacific (EIA)",
     #     "Persian Gulf (EIA)",
     #     "South America",
@@ -70,7 +71,16 @@ def run() -> None:
     #     .tolist()
     #     for year in sorted(set(tb["year"]))
     # }
-    # sorted(set(sum(top_consumers.values(), [])))
+    # top = sorted(set(sum(top_consumers.values(), [])))
+
+    # for year in sorted(set(tb["year"])):
+    #     top_countries = (
+    #         tb[(tb["year"] == year) & (~tb["country"].isin(regions))]
+    #         .sort_values(tb.columns[2], ascending=False)["country"]
+    #         .tolist()
+    #     )
+    #     assert set(top_countries[0:5]) < set(top)
+    #     print(year, f"Top 5: {', '.join(top_countries[0:5])}", f"6th: {top_countries[6]}", f"7th: {top_countries[7]}")
 
     ####################################################################################################################
 
