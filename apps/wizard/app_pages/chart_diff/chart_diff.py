@@ -982,7 +982,6 @@ def modified_charts_on_staging(
         - chartEditedInStaging: True if the chart config has been edited in staging.
     """
     df_config = _modified_chart_configs_on_staging(source_session, target_session, chart_ids=chart_ids)
-    chart_ids = [7675]
     df_data_metadata = _modified_data_metadata_on_staging(source_session, target_session, chart_ids=chart_ids)
 
     df = df_config.join(df_data_metadata, how="outer").fillna(False)
