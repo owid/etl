@@ -122,10 +122,7 @@ def remove_images():
 def get_chart_details(slug):
     """Get chart type from PROD database."""
     # Get environment. If running in prod, just use LIVE db, otherwise use staging-site-master
-    if OWID_ENV.env_local == "production":
-        env = OWID_ENV
-    else:
-        env = OWIDEnv.from_staging("master")
+    env = OWID_ENV
 
     with Session(env.engine) as session:
         chart = gm.Chart.load_chart(session, slug=slug)
