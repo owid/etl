@@ -1,6 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-
 import pandas as pd
 from owid.catalog import Table
 from owid.catalog import processing as pr
@@ -33,7 +32,7 @@ def run() -> None:
     # Process data.
     #
     log.info("guinea_worm_certification.harmonize_countries")
-    tb =  geo.harmonize_countries(
+    tb = geo.harmonize_countries(
         df=tb,
         countries_file=paths.country_mapping_path,
     )
@@ -51,7 +50,7 @@ def run() -> None:
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = paths.create_dataset( tables=[tb], default_metadata=ds_meadow.metadata)
+    ds_garden = paths.create_dataset(tables=[tb], default_metadata=ds_meadow.metadata)
 
     # Save changes in the new garden dataset.
     ds_garden.save()

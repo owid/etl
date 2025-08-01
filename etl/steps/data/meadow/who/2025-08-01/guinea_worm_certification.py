@@ -1,6 +1,5 @@
 """Load a snapshot and create a meadow dataset."""
 
-
 from owid.catalog import Table
 from structlog import get_logger
 
@@ -45,8 +44,8 @@ def run() -> None:
 
 
 def clean_certification_table(tb: Table) -> Table:
-    tb = tb.rename(columns={'Unnamed: 0_level_2': "country",'Unnamed: 24_level_2': "year_certified"})
-    tb['year_certified'] = tb['year_certified'].str.replace(r"Countries certified in", "", regex=True)
+    tb = tb.rename(columns={"Unnamed: 0_level_2": "country", "Unnamed: 24_level_2": "year_certified"})
+    tb["year_certified"] = tb["year_certified"].str.replace(r"Countries certified in", "", regex=True)
 
     tb = tb.replace(
         {
