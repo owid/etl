@@ -1291,11 +1291,12 @@ steps:
     - data://meadow/who/2025-07-15/vaccination_introductions
   data://grapher/who/2025-07-15/vaccination_introductions:
     - data://garden/who/2025-07-15/vaccination_introductions
-  # Guinea worm
+  # Guinea worm certification
   data://meadow/who/2025-08-01/guinea_worm_certification:
     - snapshot://who/2025-08-01/guinea_worm.csv
   data://garden/who/2025-08-01/guinea_worm_certification:
     - data://meadow/who/2025-08-01/guinea_worm_certification
+    # Guinea worm cases
   data://garden/who/2025-08-01/guinea_worm:
     - snapshot://fasttrack/latest/guinea_worm_cases.csv
     - data://garden/who/2025-08-01/guinea_worm_certification
