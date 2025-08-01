@@ -213,7 +213,12 @@ def run(tb: Table, ds_regions: Dataset, ds_population: Dataset) -> tuple[Table, 
         ds_population=ds_population,
     )
 
-    # Remove the world average for them, the regional averages before 1900, and the corresponding note on the data processing (some of them don't have averages) [ref: https://github.com/owid/owid-issues/issues/1963#issuecomment-3139107273]
+    # Remove some regional aggregates [ref: https://github.com/owid/owid-issues/issues/1963#issuecomment-3139107273]
+
+    # World: no global data needed at all.
+    tb_countries_avg.loc[tb_countries_avg["country"] == "World", INDICATORS_NO_AGG_PRE_1900] = pd.NA
+    tb_population_avg.loc[tb_population_avg["country"] == "World", INDICATORS_NO_AGG_PRE_1900] = pd.NA
+    # Regional averages before 1900
     tb_countries_avg.loc[tb_countries_avg["year"] < 1900, INDICATORS_NO_AGG_PRE_1900] = pd.NA
     tb_population_avg.loc[tb_population_avg["year"] < 1900, INDICATORS_NO_AGG_PRE_1900] = pd.NA
 
