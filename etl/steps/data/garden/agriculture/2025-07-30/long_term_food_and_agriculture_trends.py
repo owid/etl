@@ -80,7 +80,10 @@ COUNTRIES_EXPECTED_TO_MISS_DATA = {
 
 # Expected list of additional countries that will be excluded from region aggregates due to limited data coverage.
 OTHER_COUNTRIES_EXCLUDED_FROM_AGGREGATES = [
+    "Bahrain",
+    "Bhutan",
     "Burundi",
+    "Brunei",
     "Comoros",
     "Democratic Republic of Congo",
     "Libya",
@@ -90,11 +93,13 @@ OTHER_COUNTRIES_EXCLUDED_FROM_AGGREGATES = [
     "Nauru",
     "Papua New Guinea",
     "Polynesia",
+    "Qatar",
     "Seychelles",
     "Somalia",
     "South Sudan",
     "Sudan",
     "Sudan (former)",
+    "Syria",
     "Tonga",
     "Turkmenistan",
     "Tuvalu",
@@ -147,19 +152,37 @@ def create_corrected_lists_of_region_members(tb, tb_regions):
 
     # For "Asia (corrected)", add all Asian countries, and remove USSR Asia successors (which are kept in Europe).
     # NOTE: The issue with Turkmenistan mentioned above is irrelevant here, since we remove all USSR Asian successors anyway.
-    regions["Asia (corrected)"] = sorted(set(regions["Asia"]) - set(regions["USSR Asia"]))
+    # Additional issues in FBS: in 2010, data for Brunei is removed (unclear why), and data for Syria is added. Overall, this causes a small increase in Asia's population. Then, in 2019 (unclear why precisely this year), 3 countries are added to the data, namely Bahrain, Qatar, and Bhutan; but this jump is not significant (as they don't make a significant fraction of the Asian population).
+    assert tb[tb["country"].isin(["Brunei"])]["year"].max() == 2009
+    assert tb[tb["country"].isin(["Syria"])]["year"].min() == 2010
+    assert tb[tb["country"].isin(["Bahrain", "Qatar", "Bhutan"])]["year"].min() == 2019
+    regions["Asia (corrected)"] = sorted(
+        set(regions["Asia"]) - set(regions["USSR Asia"]) - set(["Bahrain", "Bhutan", "Brunei", "Qatar", "Syria"])
+    )
 
     # For "Oceania (corrected", remove all countries that are added after 2010 (namely Papua New Guinea, and other small islands that are added in 2019 to food supply data).
+    assert tb[tb["country"].isin(["Papua New Guinea"])]["year"].min() == 2010
+    assert (
+        tb[tb["country"].isin(["Marshall Islands", "Micronesia (country)", "Nauru", "Tonga", "Tuvalu"])]["year"].min()
+        == 2019
+    )
     regions["Oceania (corrected)"] = sorted(
         set(regions["Oceania"])
         - set(["Marshall Islands", "Micronesia (country)", "Nauru", "Papua New Guinea", "Tonga", "Tuvalu"])
     )
 
-    # For "Africa (corrected)", remove countries that are added to the data in FBS, but were not informed in FBSH. Detailed explanation:
-    # - From 2009 to 2010, we switch from FBSH to FBS, and lose data for "Sudan (former)" for 2010 and 2011 (since this entity does not exist in FBS).
-    # - In that transition, we gain data for Burundi, Comoros, Democratic Republic of Congo, Libya, Seychelles, and Somalia. These countries didn’t have data in FBSH, but do have in FBS.
-    # - Then, in 2012 we have data again for Sudan and South Sudan, in FBS.
-    #   NOTE: The issue with missing "Sudan (former)" could be fixed by copying that entity's data from FBSH to FBS for 2010 and 2011. But for now, it's better to remove all data for Sudan, to avoid various jumps.
+    # For "Africa (corrected)":
+    # - From 2009 to 2010, we gain data for Burundi, Comoros, Democratic Republic of Congo, Libya, Seychelles, and Somalia. These countries didn't have data in FBSH, but do have in FBS.
+    # - In 2011, data for Sudan (former) ends, but in 2012 we only have data for Sudan (referring to North Sudan). Unfortunately, data for South Sudan in FBS starts in 2019 (hence we are missing data for South Sudan between 2012 and 2018).
+    assert (
+        tb[
+            tb["country"].isin(["Burundi", "Comoros", "Democratic Republic of Congo", "Libya", "Seychelles", "Somalia"])
+        ]["year"].min()
+        == 2010
+    )
+    assert tb[tb["country"] == "Sudan (former)"]["year"].max() == 2011
+    assert tb[tb["country"] == "Sudan"]["year"].min() == 2012
+    assert tb[tb["country"] == "South Sudan"]["year"].min() == 2019
     regions["Africa (corrected)"] = sorted(
         set(regions["Africa"])
         - set(
@@ -353,6 +376,7 @@ def run() -> None:
     countries_original = set(tb["country"])
 
     # Now keep only rows for which we have data for both food supply, and agricultural land.
+    # This way we ensure that the data coverage of food supply and agricultural land use is the same.
     tb = tb.dropna(subset=["agricultural_land", "food_supply"], how="any").reset_index(drop=True)
 
     # Sanity check.
@@ -370,6 +394,9 @@ def run() -> None:
     tb = pr.concat([tb, tb_north_america_fao], ignore_index=True)
 
     # Create corrected lists of region members.
+    # Before, we ensured that data coverage is the same for food supply and land use.
+    # However, we still have the problem that the series may have abrupt jumps, due to changes in historical regions, and also due to countries being removed or added to the data at different times.
+    # Here we fix some of those issues.
     regions = create_corrected_lists_of_region_members(tb=tb, tb_regions=tb_regions)
 
     # Add new definitions of continents, corrected for changes in historical regions and changes in data coverage.
@@ -393,7 +420,7 @@ def run() -> None:
         if country not in ["European Union (27)", "World"]
     ]
     error = "The list of additional countries excluded from region aggregates has changed."
-    assert other_countries_excluded_from_aggregates == OTHER_COUNTRIES_EXCLUDED_FROM_AGGREGATES, error
+    assert set(other_countries_excluded_from_aggregates) - set(OTHER_COUNTRIES_EXCLUDED_FROM_AGGREGATES) == set(), error
 
     # Uncomment to visually inspect all changes.
     # plot_corrected_data(tb=tb)
