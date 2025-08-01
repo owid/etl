@@ -17,7 +17,7 @@ from apps.chart_animation.cli import (
 )
 from apps.wizard.utils import set_states
 from apps.wizard.utils.components import grapher_chart_from_url, st_horizontal, st_info, url_persist
-from etl.config import OWID_ENV, OWIDEnv
+from etl.config import OWID_ENV
 
 # Initialize log.
 log = get_logger()
@@ -121,13 +121,7 @@ def remove_images():
 
 def get_chart_details(slug):
     """Get chart type from PROD database."""
-    # Get environment. If running in prod, just use LIVE db, otherwise use staging-site-master
-    if OWID_ENV.env_local == "production":
-        env = OWID_ENV
-    else:
-        env = OWIDEnv.from_staging("master")
-
-    with Session(env.engine) as session:
+    with Session(OWID_ENV.engine) as session:
         chart = gm.Chart.load_chart(session, slug=slug)
 
     details = {
