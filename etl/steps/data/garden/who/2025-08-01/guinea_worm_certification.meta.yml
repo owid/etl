@@ -1,4 +1,5 @@
-descriptions:
+definitions:
+  descriptions:
   certification: &certification_description |
     The current and historical values for the status of Guinea worm disease (Dracunculiasis) as certified by the WHO. To be certified as free of guinea worm disease, a country must have reported zero indigenous cases through active surveillance for at least three consecutive years.
 
@@ -36,36 +37,32 @@ all_sources:
       name: World Health Organization
       published_by: World Health Organization
       url: https://web.archive.org/web/20211024081702/https://apps.who.int/dracunculiasis/dradata/html/report_Countries_t0.html
-      date_accessed: '2023-06-29'
+      date_accessed: "2023-06-29"
       publication_year: 2018
   - source_reported_cases: &source_reported_cases
       name: World Health Organization
       published_by: Dracunculiasis Eradication Portal, World Health Organization
-      date_accessed: '2023-06-28'
+      date_accessed: "2023-06-28"
       url: https://www.who.int/teams/control-of-neglected-tropical-diseases/dracunculiasis/dracunculiasis-eradication-portal
-
-
 
 dataset:
   title: Guinea worm reported cases and certification (WHO)
   licenses:
-  - name: CC BY-NC-SA 3.0 IGO
-    url: https://www.who.int/about/policies/publishing/copyright
+    - name: CC BY-NC-SA 3.0 IGO
+      url: https://www.who.int/about/policies/publishing/copyright
   sources:
-  - *source_certification
-  - *source_reported_cases
+    - *source_certification
+    - *source_reported_cases
 tables:
-  guinea_worm_certification:
+  guinea_worm:
     variables:
       year_certified:
         title: Year country is certified free from guinea worm
-        unit: ''
+        unit: ""
         display:
           numDecimalPlaces: 0
-        description:
-          *certification_description
+        description_short: *certification_description
       certification_status:
         title: Certification status over time
-        unit: ''
-        description:
-          *certification_description
+        unit: ""
+        description_short: *certification_description
