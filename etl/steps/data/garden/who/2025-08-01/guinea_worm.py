@@ -19,12 +19,13 @@ CURRENT_YEAR = 2024
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
-    snap_cases = Snapshot("fasttrack/2024-06-17/guinea_worm.csv")
+    snap = paths.load_snapshot("guinea_worm_cases.csv")
 
-    tb_cases = snap_cases.read().astype({"year": int})
+    tb_cases = snap.read().astype({"year": int})
 
     # garden dataset (with certification status of countries)
-    ds_garden = paths.load_dataset(channel="garden", short_name="guinea_worm", version="2023-06-29")
+
+    ds_garden = paths.load_dataset("guinea_worm_certification")
     # Read certification table
     tb_cert = ds_garden["guinea_worm_certification"].reset_index()
 

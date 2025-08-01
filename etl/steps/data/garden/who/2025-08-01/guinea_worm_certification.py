@@ -1,14 +1,13 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import cast
 
 import pandas as pd
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 from owid.catalog import processing as pr
 from structlog import get_logger
 
 from etl.data_helpers import geo
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 log = get_logger()
 
@@ -25,18 +24,16 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = cast(
-        Dataset, paths.load_dependency(short_name="guinea_worm_certification", version="2023-06-29", channel="meadow")
-    )
+    ds_meadow = paths.load_dataset("guinea_worm_certification")
 
     # Read table from meadow dataset.
-    tb = ds_meadow["guinea_worm_certification"]
+    tb = ds_meadow["guinea_worm"].reset_index()
 
     #
     # Process data.
     #
     log.info("guinea_worm_certification.harmonize_countries")
-    tb: Table = geo.harmonize_countries(
+    tb =  geo.harmonize_countries(
         df=tb,
         countries_file=paths.country_mapping_path,
     )
@@ -54,7 +51,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb], default_metadata=ds_meadow.metadata)
+    ds_garden = paths.create_dataset( tables=[tb], default_metadata=ds_meadow.metadata)
 
     # Save changes in the new garden dataset.
     ds_garden.save()
