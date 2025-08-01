@@ -1,58 +1,30 @@
-import owid.catalog.processing as pr
-import pandas as pd
-from structlog import get_logger
+from etl.helpers import PathFinder
 
-from etl.helpers import PathFinder, create_dataset
-
-log = get_logger()
-
-# naming conventions
+# Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
 
-def run(dest_dir: str) -> None:
-    log.info("penn_world_table_national_accounts.start")
-
-    # retrieve raw data
+def run() -> None:
+    #
+    # Load inputs.
+    #
+    # Retrieve snapshot.
     snap = paths.load_snapshot("penn_world_table_national_accounts.xlsx")
-    tb = snap.read_excel(sheet_name="Data")
 
-    # # clean and transform data
-    # tb = clean_data(tb)
+    # Load data from snapshot.
+    tb = snap.read(sheet_name="Data")
 
-    # Read reference dataset for countries and regions
-    tb_countries_regions = paths.load_dataset("regions")["regions"]
+    #
+    # Process data.
+    #
+    # Improve tables format.
+    tables = [tb.format(["countrycode", "year"])]
 
-    # Merge dataset and country dictionary to get the name of the country (and rename it as "country")
-    tb = pr.keep_metadata(pd.merge)(
-        tb, tb_countries_regions[["name", "iso_alpha3"]], left_on="countrycode", right_on="iso_alpha3", how="left"
-    )
-    tb = tb.rename(columns={"name": "country"})
-    tb = tb.drop(columns=["iso_alpha3"])
-    tb = tb.astype({"countrycode": str, "country": str})
+    #
+    # Save outputs.
+    #
+    # Initialize a new meadow dataset.
+    ds_meadow = paths.create_dataset(tables=tables, default_metadata=snap.metadata)
 
-    # Add country names for some specific 3-letter codes
-    tb.loc[tb["countrycode"] == "CH2", ["country"]] = "China (alternative inflation series)"
-    tb.loc[tb["countrycode"] == "CSK", ["country"]] = "Czechoslovakia"
-    tb.loc[tb["countrycode"] == "RKS", ["country"]] = "Kosovo"
-    tb.loc[tb["countrycode"] == "SUN", ["country"]] = "USSR"
-    tb.loc[tb["countrycode"] == "YUG", ["country"]] = "Yugoslavia"
-
-    # underscore all table columns
-    tb = tb.underscore()
-
-    ds = create_dataset(dest_dir, tables=[tb], default_metadata=snap.metadata)
-    ds.save()
-
-    log.info("penn_world_table_national_accounts.end")
-
-
-# def clean_data(df: pd.DataFrame) -> pd.DataFrame:
-#     return df.rename(
-#         columns={
-#             "country": "country",
-#             "year": "year",
-#             "pop": "population",
-#             "gdppc": "gdp",
-#         }
-#     ).drop(columns=["countrycode"])
+    # Save meadow dataset.
+    ds_meadow.save()
