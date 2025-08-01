@@ -13,13 +13,12 @@ from etl.snapshot import Snapshot
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-CURRENT_YEAR = 2023
+CURRENT_YEAR = 2024
 
 
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
-    # fasttrack snapshot (with case numbers for 2024)
     snap_cases = Snapshot("fasttrack/2024-06-17/guinea_worm.csv")
 
     tb_cases = snap_cases.read().astype({"year": int})
