@@ -14,10 +14,10 @@ log = get_logger()
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-LATEST_YEAR = 2022
+LATEST_YEAR = 2024
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     log.info("guinea_worm.start")
 
     #
