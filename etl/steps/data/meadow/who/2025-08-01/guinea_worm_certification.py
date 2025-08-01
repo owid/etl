@@ -2,7 +2,6 @@
 
 from typing import cast
 
-import pandas as pd
 from owid.catalog import Table
 from structlog import get_logger
 
@@ -33,13 +32,13 @@ def run() -> None:
     #
     # Create a new table and ensure all columns are snake-case.
 
-    tb = Table(tb, short_name=paths.short_name, underscore=True)
+    tables = [tb.format(["country"])]
 
     #
     # Save outputs.
     #
     # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = paths.create_dataset(tables=[tb], default_metadata=snap.metadata)
+    ds_meadow = paths.create_dataset(tables=tables, default_metadata=snap.metadata)
 
     # Save changes in the new garden dataset.
     ds_meadow.save()
@@ -48,8 +47,7 @@ def run() -> None:
 
 
 def clean_certification_table(tb: Table) -> Table:
-    tb.columns.values[0] = "country"
-    tb.columns.values[24] = "year_certified"
+    tb = tb.rename(columns={'Unnamed: 0_level_2': "country",'Unnamed: 24_level_2': "year_certified"})
     tb['year_certified'] = tb['year_certified'].str.replace(r"Countries certified in", "", regex=True)
 
     tb = tb.replace(
