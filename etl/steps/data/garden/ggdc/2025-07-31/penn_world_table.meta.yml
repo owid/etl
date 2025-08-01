@@ -1,84 +1,647 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
   common:
+    processing_level: major
+    display: &common-display
+      tolerance: 5
     presentation:
+      attribution_short: Penn World Table
       topic_tags:
         - Economic Growth
+
+  # NOTE: Update in case PWT changes the PPP benchmark year.
+  ppp_year: 2017
+
+  # This is the ID of the Google Doc that contains the FAQs
+  gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+
+  note_ppp_adjustment: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at {definitions.ppp_year} prices, using multiple benchmark years to adjust for differences in the cost of living between countries over time.
+
+  description_short_gdp: Total economic output of a country or region per year.
+  description_short_gdp_per_capita: Average economic output per person in a country or region per year.
+
+  description_key_gdp: Gross domestic product (GDP) is a measure of the total value added from the production of goods and services in a country or region each year.
+  description_key_gdp_per_capita: GDP per capita is GDP divided by population.
+  description_key_medium_run: This indicator provides information on economic growth and income levels in the _medium run_. Some country estimates are available as far back as 1950.
+  description_key_ppp_adjustment: This data is adjusted for inflation and for differences in living costs between countries.
+  description_key_ppp_prices_multiple_benchmarks: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at {definitions.ppp_year} prices, using a multiple benchmark approach that incorporates PPP estimates from all available benchmark years.
+  description_key_ppp_prices_single_benchmark: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at {definitions.ppp_year} prices, using a single benchmark approach that incorporates PPP estimates from the most recent benchmark year.
+  description_key_ppp_prices_national_accounts: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at {definitions.ppp_year} prices, using an approach that ensures consistency with national accounts data.
+
+  description_key_gdp_maddison: For GDP estimates in the very long run, see the [Maddison Project Database's indicator](https://ourworldindata.org/grapher/gdp-maddison-project-database).
+  description_key_gdp_per_capita_maddison: For GDP per capita estimates in the very long run, see the [Maddison Project Database's indicator](https://ourworldindata.org/grapher/gdp-per-capita-maddison-project-database).
+
+  description_key_gdp_worldbank: For more regularly updated estimates of GDP since 1990, see the [World Bank's indicator](https://ourworldindata.org/grapher/gdp-worldbank).
+  description_key_gdp_per_capita_worldbank: For more regularly updated estimates of GDP per capita since 1990, see the [World Bank's indicator](https://ourworldindata.org/grapher/gdp-per-capita-worldbank).
+
+  description_processing_outliers: |-
+    We excluded values considered outliers in the original dataset (`i_outlier = "Outlier"`), due to implausible relative prices (PPPs divided by exchange rates).
+
+  description_processing_bermuda: |-
+    Values for Bermuda have been replaced by different GDP estimates (output side, single price benchmark) due to the unusual changes on prices in this country.
+
+  description_processing_gdp_per_capita: |-
+    We estimated this indicator as the corresponding value of GDP divided by the population of each country, available in the original dataset.
+
+  map_brackets_gdp: &map_brackets_gdp
+    [0, 10000000000, 30000000000, 100000000000, 300000000000, 1000000000000, 3000000000000, 10000000000000, 1]
+  map_brackets_gdp_per_capita: &map_brackets_gdp_per_capita
+    [0, 1000, 2000, 5000, 10000, 20000, 50000, 1]
+
+  selected_entity_names_gdp: &selected_entity_names_gdp
+    [China, United States, India, Japan, Germany, Russia, Brazil, United Kingdom, France, Mexico, Venezuela]
+  selected_entity_names_gdp_per_capita: &selected_entity_names_gdp_per_capita
+    [Germany, United States, China, United Kingdom, Japan, India, France, South Korea]
+
+
 
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
-  update_period_days: 365
+  update_period_days: 550
 
 
 tables:
   penn_world_table:
     variables:
-      # testing_variable:
-      #   title: Testing variable title
-      #   unit: arbitrary units
-      #   short_unit: au
-      #   description_short: Short description of testing variable.
-      #   description_processing: Description of processing of testing variable.
-      #   description_key: List of key points about the indicator.
-      #   description_from_producer: Description of testing variable from producer.
-      #   processing_level: minor
-      #   type:
-      #   sort:
-      #   presentation:
-      #     attribution:
-      #     attribution_short:
-      #     faqs:
-      #     grapher_config:
-      #     title_public:
-      #     title_variant:
-      #     topic_tags:
-      #   display:
-      #     name: Testing variable
-      #     numDecimalPlaces: 0
-      #     tolerance: 0
-      #     color:
-      #     conversionFactor: 1
-      #     description:
-      #     entityAnnotationsMap: Test annotation
-      #     includeInTable:
-      #     isProjection: false
-      #     unit: arbitrary units
-      #     shortUnit: au
-      #     tableDisplay:
-      #       hideAbsoluteChange:
-      #       hideRelativeChange:
-      #     yearIsDay: false
-      #     zeroDay:
-      #     roundingMode:
-      #     numSignificantFigures:
-      #
-      {}
+      rgdpe:
+        title: GDP (expenditure, multiple price benchmarks)
+        unit: international-$ in {definitions.ppp_year} prices
+        short_unit: $
+        description_short: "{definitions.description_short_gdp} {definitions.description_key_ppp_adjustment}"
+        description_key:
+          - "{definitions.description_key_gdp}"
+          - "{definitions.description_key_medium_run}"
+          - "{definitions.description_key_ppp_adjustment}"
+          - "{definitions.description_key_ppp_prices_multiple_benchmarks}"
+          - "{definitions.description_key_gdp_maddison}"
+          - "{definitions.description_key_gdp_worldbank}"
+        description_from_producer: Expenditure-side real GDP at chained PPPs (in mil. 2017US$)
+        description_processing: |-
+          {definitions.description_processing_outliers}
+        presentation:
+          title_variant: In constant international-$
+          faqs:
+            - fragment_id: poverty-international-dollars
+              gdoc_id: "{definitions.gdoc_id}"
+        display:
+          name: GDP
+          numDecimalPlaces: 0
+          <<: *common-display
 
-dataset:
-  namespace: ggdc
-  version: 2022-11-28
-  title: Penn World Table (GGDC, 2021)
-  short_name: penn_world_table
-  description: Penn World Table is a database with information on GDP and its composition, employment, productivity and trade, covering 183 countries between 1950 and 2019.
-  sources:
-    -
-      name: Feenstra et al. (2015), Penn World Table (2021)
-      published_by: Feenstra, R. C., Inklaar, R. and Timmer, M.P. (2015), "The Next Generation of the Penn World Table". American Economic Review, 105(10), 3150-3182
-      description: Data comes from national accounts, ICP PPP estimations, multiple other sources
-      publication_year: 2021
-      publication_date: 2021-06-18
-      date_accessed: 2022-11-28
-      url: https://www.rug.nl/ggdc/productivity/pwt/
+      rgdpo:
+        title: GDP (output, multiple price benchmarks)
+        unit: international-$ in {definitions.ppp_year} prices
+        short_unit: $
+        description_short: "{definitions.description_short_gdp} {definitions.description_key_ppp_adjustment}"
+        description_key:
+          - "{definitions.description_key_gdp}"
+          - "{definitions.description_key_medium_run}"
+          - "{definitions.description_key_ppp_adjustment}"
+          - "{definitions.description_key_ppp_prices_multiple_benchmarks}"
+          - "{definitions.description_key_gdp_maddison}"
+          - "{definitions.description_key_gdp_worldbank}"
+        description_from_producer: Output-side real GDP at chained PPPs (in mil. 2017US$)
+        description_processing: |-
+          {definitions.description_processing_outliers}
 
-info:
-  outliers: |-
-    Values considered outliers from the original dataset (`i_outlier = "Outlier"`) have been excluded from the dataset, due to implausible relative prices (PPPs divided by exchange rates).
+          {definitions.description_processing_bermuda}
+        presentation:
+          title_variant: In constant international-$
+          faqs:
+            - fragment_id: poverty-international-dollars
+              gdoc_id: "{definitions.gdoc_id}"
+          grapher_config:
+            title: Gross domestic product (GDP)
+            subtitle: "{definitions.description_key_ppp_adjustment}"
+            note: "{definitions.note_ppp_adjustment}"
+            variantName: Penn World Table, constant international-$
+            originUrl: https://ourworldindata.org/economic-growth
+            map:
+              colorScale:
+                binningStrategy: manual
+                baseColorScheme: PuBu
+                customNumericValues: *map_brackets_gdp
+            selectedEntityNames: *selected_entity_names_gdp
+            yAxis:
+              canChangeScaleType: true
+              min: 0
+            tab: map
+            hideRelativeToggle: false
+            hasMapTab: true
+        display:
+          name: GDP
+          numDecimalPlaces: 0
+          <<: *common-display
 
-tables:
-  penn_world_table:
-    variables:
+      cgdpe:
+        title: GDP (expenditure, single price benchmark)
+        unit: international-$ in {definitions.ppp_year} prices
+        short_unit: $
+        description_short: "{definitions.description_short_gdp} {definitions.description_key_ppp_adjustment}"
+        description_key:
+          - "{definitions.description_key_gdp}"
+          - "{definitions.description_key_medium_run}"
+          - "{definitions.description_key_ppp_adjustment}"
+          - "{definitions.description_key_ppp_prices_single_benchmark}"
+          - "{definitions.description_key_gdp_per_capita_maddison}"
+          - "{definitions.description_key_gdp_per_capita_worldbank}"
+        description_from_producer: Expenditure-side real GDP at current PPPs (in mil. 2017US$)
+        description_processing: |-
+          {definitions.description_processing_outliers}
+        presentation:
+          title_variant: In constant international-$
+          faqs:
+            - fragment_id: poverty-international-dollars
+              gdoc_id: "{definitions.gdoc_id}"
+        display:
+          name: GDP
+          numDecimalPlaces: 0
+          <<: *common-display
+
+      cgdpo:
+        title: GDP (output, single price benchmark)
+        unit: international-$ in {definitions.ppp_year} prices
+        short_unit: $
+        description_short: "{definitions.description_short_gdp} {definitions.description_key_ppp_adjustment}"
+        description_key:
+          - "{definitions.description_key_gdp}"
+          - "{definitions.description_key_medium_run}"
+          - "{definitions.description_key_ppp_adjustment}"
+          - "{definitions.description_key_ppp_prices_single_benchmark}"
+          - "{definitions.description_key_gdp_per_capita_maddison}"
+          - "{definitions.description_key_gdp_per_capita_worldbank}"
+        description_from_producer: Output-side real GDP at current PPPs (in mil. 2017US$)
+        description_processing: |-
+          {definitions.description_processing_outliers}
+        presentation:
+          title_variant: In constant international-$
+          faqs:
+            - fragment_id: poverty-international-dollars
+              gdoc_id: "{definitions.gdoc_id}"
+        display:
+          name: GDP
+          numDecimalPlaces: 0
+          <<: *common-display
+
+      rgdpna:
+        title: GDP (using national accounts growth rates)
+        unit: international-$ in {definitions.ppp_year} prices
+        short_unit: $
+        description_short: "{definitions.description_short_gdp} {definitions.description_key_ppp_adjustment}"
+        description_key:
+          - "{definitions.description_key_gdp}"
+          - "{definitions.description_key_medium_run}"
+          - "{definitions.description_key_ppp_adjustment}"
+          - "{definitions.description_key_ppp_prices_national_accounts}"
+          - "{definitions.description_key_gdp_maddison}"
+          - "{definitions.description_key_gdp_worldbank}"
+        description_from_producer: Real GDP at constant 2017 national prices (in mil. 2017US$)
+        description_processing: |-
+          {definitions.description_processing_outliers}
+        presentation:
+          title_variant: In constant international-$
+          faqs:
+            - fragment_id: poverty-international-dollars
+              gdoc_id: "{definitions.gdoc_id}"
+        display:
+          name: GDP
+          numDecimalPlaces: 0
+          <<: *common-display
+
+      rgdpe_pc:
+        title: GDP per capita (expenditure, multiple price benchmarks)
+        unit: international-$ in 2017 prices
+        short_unit: $
+        description_short: "{definitions.description_short_gdp_per_capita} {definitions.description_key_ppp_adjustment}"
+        description_key:
+          - "{definitions.description_key_gdp} {definitions.description_key_gdp_per_capita}"
+          - "{definitions.description_key_medium_run}"
+          - "{definitions.description_key_ppp_adjustment}"
+          - "{definitions.description_key_ppp_prices_multiple_benchmarks}"
+          - "{definitions.description_key_gdp_per_capita_maddison}"
+          - "{definitions.description_key_gdp_per_capita_worldbank}"
+        description_processing: |-
+          {definitions.description_processing_gdp_per_capita}
+
+          {definitions.description_processing_outliers}
+        presentation:
+          title_variant: In constant international-$
+          faqs:
+            - fragment_id: poverty-international-dollars
+              gdoc_id: "{definitions.gdoc_id}"
+        display:
+            name: GDP per capita
+            numDecimalPlaces: 0
+            <<: *common-display
+
+      rgdpo_pc:
+        title: GDP per capita (output, multiple price benchmarks)
+        unit: international-$ in 2017 prices
+        short_unit: $
+        description_short: "{definitions.description_short_gdp_per_capita} {definitions.description_key_ppp_adjustment}"
+        description_key:
+          - "{definitions.description_key_gdp} {definitions.description_key_gdp_per_capita}"
+          - "{definitions.description_key_medium_run}"
+          - "{definitions.description_key_ppp_adjustment}"
+          - "{definitions.description_key_ppp_prices_multiple_benchmarks}"
+          - "{definitions.description_key_gdp_per_capita_maddison}"
+          - "{definitions.description_key_gdp_per_capita_worldbank}"
+        description_processing: |-
+          {definitions.description_processing_gdp_per_capita}
+
+          {definitions.description_processing_outliers}
+
+          {definitions.description_processing_bermuda}
+        presentation:
+          title_variant: In constant international-$
+          faqs:
+            - fragment_id: poverty-international-dollars
+              gdoc_id: "{definitions.gdoc_id}"
+          grapher_config:
+            title: GDP per capita
+            subtitle: "{definitions.description_key_ppp_adjustment}"
+            note: "{definitions.note_ppp_adjustment}"
+            variantName: Penn World Table, constant international-$
+            originUrl: https://ourworldindata.org/economic-growth
+            map:
+              colorScale:
+                binningStrategy: manual
+                baseColorScheme: GnBu
+                customNumericValues: *map_brackets_gdp_per_capita
+            selectedEntityNames: *selected_entity_names_gdp_per_capita
+            yAxis:
+              canChangeScaleType: true
+              min: 0
+            tab: map
+            hideRelativeToggle: false
+            hasMapTab: true
+        display:
+            name: GDP per capita
+            numDecimalPlaces: 0
+            <<: *common-display
+
+      cgdpe_pc:
+        title: GDP per capita (expenditure, single price benchmark)
+        unit: international-$ in 2017 prices
+        short_unit: $
+        description_short: "{definitions.description_short_gdp_per_capita} {definitions.description_key_ppp_adjustment}"
+        description_key:
+          - "{definitions.description_key_gdp} {definitions.description_key_gdp_per_capita}"
+          - "{definitions.description_key_medium_run}"
+          - "{definitions.description_key_ppp_adjustment}"
+          - "{definitions.description_key_ppp_prices_single_benchmark}"
+          - "{definitions.description_key_gdp_per_capita_maddison}"
+          - "{definitions.description_key_gdp_per_capita_worldbank}"
+        description_processing: |-
+          {definitions.description_processing_gdp_per_capita}
+
+          {definitions.description_processing_outliers}
+        presentation:
+          title_variant: In constant international-$
+          faqs:
+            - fragment_id: poverty-international-dollars
+              gdoc_id: "{definitions.gdoc_id}"
+        display:
+            name: GDP per capita
+            numDecimalPlaces: 0
+            <<: *common-display
+
+      cgdpo_pc:
+        title: GDP per capita (output, single price benchmark)
+        unit: international-$ in 2017 prices
+        short_unit: $
+        description_short: "{definitions.description_short_gdp_per_capita} {definitions.description_key_ppp_adjustment}"
+        description_key:
+          - "{definitions.description_key_gdp} {definitions.description_key_gdp_per_capita}"
+          - "{definitions.description_key_medium_run}"
+          - "{definitions.description_key_ppp_adjustment}"
+          - "{definitions.description_key_ppp_prices_single_benchmark}"
+          - "{definitions.description_key_gdp_per_capita_maddison}"
+          - "{definitions.description_key_gdp_per_capita_worldbank}"
+        description_processing: |-
+          {definitions.description_processing_gdp_per_capita}
+
+          {definitions.description_processing_outliers}
+        presentation:
+          title_variant: In constant international-$
+          faqs:
+            - fragment_id: poverty-international-dollars
+              gdoc_id: "{definitions.gdoc_id}"
+        display:
+            name: GDP per capita
+            numDecimalPlaces: 0
+            <<: *common-display
+
+      rgdpna_pc:
+        title: GDP per capita (using national accounts growth rates)
+        unit: international-$ in 2017 prices
+        short_unit: $
+        description_short: "{definitions.description_short_gdp_per_capita} {definitions.description_key_ppp_adjustment}"
+        description_key:
+          - "{definitions.description_key_gdp} {definitions.description_key_gdp_per_capita}"
+          - "{definitions.description_key_medium_run}"
+          - "{definitions.description_key_ppp_adjustment}"
+          - "{definitions.description_key_ppp_prices_national_accounts}"
+          - "{definitions.description_key_gdp_per_capita_maddison}"
+          - "{definitions.description_key_gdp_per_capita_worldbank}"
+        description_processing: |-
+          {definitions.description_processing_gdp_per_capita}
+
+          {definitions.description_processing_outliers}
+        presentation:
+          title_variant: In constant international-$
+          faqs:
+            - fragment_id: poverty-international-dollars
+              gdoc_id: "{definitions.gdoc_id}"
+        display:
+            name: GDP per capita
+            numDecimalPlaces: 0
+            <<: *common-display
+
+      pop:
+        title: Population
+        unit: people
+        short_unit: ""
+        description_short: Number of people living in the country.
+        description_from_producer: Population (in millions)
+        display:
+            name: Population
+            numDecimalPlaces: 0
+            <<: *common-display
+
+      emp:
+        title: Number of people in work
+        unit: people
+        short_unit: ""
+        description_short: This is the number of people working in the country (employees and self-employed).
+        description_from_producer: Number of persons engaged (in millions)
+        display:
+            name: Number of people in work
+            numDecimalPlaces: 0
+            <<: *common-display
+
+      avh:
+        title: Average working hours per worker
+        unit: hours per worker
+        short_unit: ""
+        description_short: This is the average sum of hours worked by employees and self-employed people during each year in a country.
+        description_from_producer: Average annual hours worked by persons engaged
+        display:
+            name: Average working hours per worker
+            numDecimalPlaces: 1
+            <<: *common-display
+
+      hc:
+        title: Human capital index
+        unit: ""
+        short_unit: ""
+        description_short: This index combines measures of years of schooling and returns to education.
+        description_key:
+          - This index is based on average years of schooling, linearly interpolated from Barro and Lee (2013), and an assumed rate of return for primary, secondary, and tertiary education, as in Caselli (2005).
+          - The authors note it is an imperfect measure of human capital as differences in the returns to experience and the quality of schooling are not accounted for.
+        description_from_producer: Human capital index, based on years of schooling and returns to education; see [Human capital in PWT9](https://www.rug.nl/ggdc/docs/human_capital_in_pwt_90.pdf).
+        display:
+            name: Human capital index
+            numDecimalPlaces: 1
+            <<: *common-display
+
+      ccon:
+        title: Consumption of households and government (single price benchmark)
+        unit: international-$ in 2017 prices
+        short_unit: $
+        description_short: This is the sum of real household and government consumption. {definitions.description_key_ppp_adjustment}
+        description_key:
+          - "{definitions.description_key_ppp_adjustment}"
+          - "{definitions.description_key_ppp_prices_single_benchmark}"
+        description_from_producer: Real consumption of households and government, at current PPPs (in mil. 2017US$)
+        description_processing: |-
+          {definitions.description_processing_outliers}
+        display:
+           name: Consumption of households and government
+           numDecimalPlaces: 0
+           <<: *common-display
+
+      cda:
+        title: Domestic absorption (single price benchmark)
+        unit: international-$ in 2017 prices
+        short_unit: $
+        description_short: This is estimated as the sum of consumption and investment. Together with trade balance (exports minus imports), it is equal to GDP. {definitions.description_key_ppp_adjustment}
+        description_key:
+          - "{definitions.description_key_ppp_adjustment}"
+          - "{definitions.description_key_ppp_prices_single_benchmark}"
+        description_from_producer: Real domestic absorption, (real consumption plus investment), at current PPPs (in mil. 2017US$)
+        description_processing: |-
+          {definitions.description_processing_outliers}
+        display:
+           name: Consumption plus investment
+           numDecimalPlaces: 0
+           <<: *common-display
+
+      cn:
+        title: Capital stock (single price benchmark)
+        unit: international-$ in 2017 prices
+        short_unit: $
+        description_short: This is estimated from investment in buildings and machinery. {definitions.description_key_ppp_adjustment}
+        description_key:
+          - "{definitions.description_key_ppp_adjustment}"
+          - "{definitions.description_key_ppp_prices_single_benchmark}"
+        description_from_producer: Capital stock at current PPPs (in mil. 2017US$)
+        description_processing: |-
+          {definitions.description_processing_outliers}
+        display:
+          name: Capital stock
+          numDecimalPlaces: 0
+          <<: *common-display
+
+      ck:
+        title: Capital services level (single price benchmark)
+        unit: ""
+        short_unit: ""
+        description_short: Level of capital services, relative to the US (which is set to 1). {definitions.description_key_ppp_adjustment}
+        description_key:
+          - "{definitions.description_key_ppp_adjustment}"
+          - "{definitions.description_key_ppp_prices_single_benchmark}"
+        description_from_producer: Capital services levels at current PPPs (USA=1)
+        description_processing: |-
+          {definitions.description_processing_outliers}
+        display:
+          name: Capital services level
+          numDecimalPlaces: 1
+          <<: *common-display
+
+      ctfp:
+        title: Total factor productivity level (single price benchmark)
+        unit: ""
+        short_unit: ""
+        description_short: This is the level of total factor productivity, relative to the US (which is set to 1). {definitions.description_key_ppp_adjustment}
+        description_key:
+          - This indicator is constructed with estimates of GDP, capital stock, labor input data, labor compensation as share of GDP and labor income or employees and self-employed as share of GDP.
+          - "{definitions.description_key_ppp_adjustment}"
+          - "{definitions.description_key_ppp_prices_single_benchmark}"
+        description_from_producer: TFP level at current PPPs (USA=1)
+        description_processing: |-
+          {definitions.description_processing_outliers}
+        display:
+          name: Total factor productivity level
+          numDecimalPlaces: 1
+          <<: *common-display
+
+      cwtfp:
+        title: Welfare-relevant total factor productivity level (single price benchmark)
+        unit: ""
+        short_unit: ""
+        description_short: This is the level of total factor productivity, relative to the consumption and investment in the US (which is set to 1). {definitions.description_key_ppp_adjustment}
+        description_key:
+          - This indicator is constructed with estimates of consumption and investment, capital stock, labor input data, labor compensation as share of GDP and labor income or employees and self-employed as share of GDP.
+          - "{definitions.description_key_ppp_adjustment}"
+          - "{definitions.description_key_ppp_prices_single_benchmark}"
+        description_from_producer: Welfare-relevant TFP levels at current PPPs (USA=1)
+        description_processing: |-
+          {definitions.description_processing_outliers}
+        display:
+          name: Welfare-relevant total factor productivity level
+          numDecimalPlaces: 1
+          <<: *common-display
+
+      rconna:
+        title: Consumption of households and government (using national accounts)
+        unit: international-$ in 2017 prices
+        short_unit: $
+        description_short: This is the sum of real household and government consumption, used to measure and compare living standards across countries. {definitions.description_key_ppp_adjustment}
+        description_key:
+          - "{definitions.description_key_ppp_adjustment}"
+          - "{definitions.description_key_ppp_prices_national_accounts}"
+        description_from_producer: Real consumption at constant 2017 national prices (in mil. 2017US$)
+        description_processing: |-
+          {definitions.description_processing_outliers}
+        display:
+           name: Consumption of households and government
+           numDecimalPlaces: 0
+           <<: *common-display
+
+      rdana:
+        title: Domestic absorption (using national accounts)
+        unit: international-$ in 2017 prices
+        short_unit: $
+        description_short: This is estimated as the sum of consumption and investment. Together with trade balance (exports minus imports), it is equal to GDP. {definitions.description_key_ppp_adjustment}
+        description_key:
+          - "{definitions.description_key_ppp_adjustment}"
+          - "{definitions.description_key_ppp_prices_national_accounts}"
+        description_from_producer: Real domestic absorption at constant 2017 national prices (in mil. 2017US$)
+        description_processing: |-
+          {definitions.description_processing_outliers}
+        display:
+            name: Domestic absorption
+            numDecimalPlaces: 0
+            <<: *common-display
+
+      rnna:
+        title: Capital stock (using national accounts)
+        unit: international-$ in 2017 prices
+        short_unit: $
+        description_short: This is estimated from investment in buildings and machinery. {definitions.description_key_ppp_adjustment}
+        description_key:
+          - "{definitions.description_key_ppp_adjustment}"
+          - "{definitions.description_key_ppp_prices_national_accounts}"
+        description_from_producer: Capital stock at constant 2017 national prices (in mil. 2017US$)
+        description_processing: |-
+          {definitions.description_processing_outliers}
+        display:
+          name: Capital stock
+          numDecimalPlaces: 0
+          <<: *common-display
+
+      rkna:
+        title: Capital services level (using national accounts)
+        unit: ""
+        short_unit: ""
+        description_short: Level of capital services, relative to the US (which is set to 1). {definitions.description_key_ppp_adjustment}
+        description_key:
+          - "{definitions.description_key_ppp_adjustment}"
+          - "{definitions.description_key_ppp_prices_national_accounts}"
+        description_from_producer: Capital services at constant 2017 national prices (2017=1)
+        description_processing: |-
+          {definitions.description_processing_outliers}
+        display:
+          name: Capital services level
+          numDecimalPlaces: 1
+          <<: *common-display
+
+      rtfpna:
+        title: Total factor productivity level (using national accounts)
+        unit: ""
+        short_unit: ""
+        description_short: This is the level of total factor productivity, relative to the US (which is set to 1). {definitions.description_key_ppp_adjustment}
+        description_key:
+          - This indicator is constructed with estimates of GDP, capital stock, labor input data, labor compensation as share of GDP and labor income or employees and self-employed as share of GDP.
+          - "{definitions.description_key_ppp_adjustment}"
+          - "{definitions.description_key_ppp_prices_national_accounts}"
+        description_from_producer: TFP at constant national prices (2017=1)
+        description_processing: |-
+          {definitions.description_processing_outliers}
+        display:
+          name: Total factor productivity level
+          numDecimalPlaces: 1
+          <<: *common-display
+
+      rwtfpna:
+        title: Welfare-relevant total factor productivity level (using national accounts)
+        unit: ""
+        short_unit: ""
+        description_short: This is the level of total factor productivity, relative to the consumption and investment in the US (which is set to 1). {definitions.description_key_ppp_adjustment}
+        description_key:
+          - This indicator is constructed with estimates of consumption and investment, capital stock, labor input data, labor compensation as share of GDP and labor income or employees and self-employed as share of GDP.
+          - "{definitions.description_key_ppp_adjustment}"
+          - "{definitions.description_key_ppp_prices_national_accounts}"
+        description_from_producer: Welfare-relevant TFP at constant national prices (2017=1)
+        description_processing: |-
+          {definitions.description_processing_outliers}
+        display:
+          name: Welfare-relevant total factor productivity level
+          numDecimalPlaces: 1
+          <<: *common-display
+
+      labsh:
+        title: Labor compensation as share of GDP
+        unit: "%"
+        short_unit: "%"
+        description_short: Labor income of employees and self-employed people divided by [gross domestic product](#dod:gdp), expressed as a percentage.
+        description_from_producer: Share of labour compensation in GDP at current national prices
+        description_processing: |-
+          {definitions.description_processing_outliers}
+        display:
+          name: Labor compensation as share of GDP
+          numDecimalPlaces: 1
+          <<: *common-display
+
+      irr:
+        title: Real internal rate of return
+        unit: "%"
+        short_unit: "%"
+        description_from_producer: Real internal rate of return
+        description_processing: |-
+          {definitions.description_processing_outliers}
+        display:
+          name: Real internal rate of return
+          numDecimalPlaces: 1
+          <<: *common-display
+
+      delta:
+        title: Average depreciation rate of the capital stock
+        unit: "%"
+        short_unit: "%"
+        description_from_producer: Average depreciation rate of the capital stock
+        description_processing: |-
+          {definitions.description_processing_outliers}
+        display:
+          name: Average depreciation rate of the capital stock
+          numDecimalPlaces: 1
+          <<: *common-display
+
+
+
       rgdpe:
         title: GDP (expenditure, multiple price benchmarks)
         unit: international-$ in 2017 prices
