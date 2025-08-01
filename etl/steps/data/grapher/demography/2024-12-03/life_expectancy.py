@@ -20,9 +20,10 @@ def run(dest_dir: str) -> None:
     # Read table from garden dataset.
     tables = list(ds_garden)
     tb_gsheet = ds_garden["life_expectancy_at_birth"].reset_index()
-    tb_gsheet = tb_gsheet[["country", "year", "life_expectancy_0", "source"]].rename(
+    tb_gsheet = tb_gsheet[["country", "year", "life_expectancy_0", "source", "source_url"]].rename(
         columns={"life_expectancy_0": "life_expectancy_at_birth"}
     )
+    tb_gsheet["life_expectancy_at_birth"] = tb_gsheet["life_expectancy_at_birth"].astype(float).round(2)
     #
     # Process data.
     team_folder_id = get_team_folder_id()

@@ -854,11 +854,13 @@ def _modified_data_metadata_on_staging(
     # care about that, because it's not a data/metadata change, but chart config change)
     source_df, target_df = source_df.align(target_df, join="inner")
 
+    # NOTE: turned this off on 2025-08-01 as it can sometimes exclude charts that are relevant, for instance
+    #   when we update regions in production. This should be already handled by changed files above.
     # Only include variables with more recent update in source. If the variable has been updated in target, then
     # exclude it (typically an automatic update or source hasn't been merged with master and it's lagging behind it)
-    ix = source_df.dataLastEditedAt >= target_df.dataLastEditedAt
-    source_df = source_df[ix]
-    target_df = target_df[ix]
+    # ix = source_df.dataLastEditedAt >= target_df.dataLastEditedAt
+    # source_df = source_df[ix]
+    # target_df = target_df[ix]
 
     # Get differences
     diff = pd.DataFrame(
