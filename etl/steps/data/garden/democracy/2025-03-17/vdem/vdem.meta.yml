@@ -4,20 +4,27 @@ definitions:
       topic_tags:
         - Democracy
     description_processing: |-
-      We expand the years covered by V-Dem further: To expand the time coverage of today's countries and include more of the period when they were still non-sovereign territories, we identified the historical entity they were a part of and used that regime's data whenever available
-
-      For example, V-Dem only provides regime data since Bangladesh's independence in 1971. There is, however, regime data for Pakistan and the colony of India, both of which the current territory of Bangladesh was a part. We, therefore, use the regime data of Pakistan for Bangladesh from 1947 to 1970, and the regime data of India from 1789 to 1946. We did so for all countries with a past or current population of more than one million.
+      {definitions.auxiliary.description_imputes}
   auxiliary:
     description_processing_row: |-
       While RoW covers the years since 1900, we use V-Dem's historical data from 1789 to 1899 to expand the classification's coverage back in time.
 
-      {definitions.common.description_processing}
+      {definitions.auxiliary.description_imputes}
+    description_imputes: |-
+      ### Data imputation
+      We expand the years covered by V-Dem further: To expand the time coverage of today's countries and include more of the period when they were still non-sovereign territories, we identified the historical entity they were a part of and used that regime's data whenever available
+
+      For example, V-Dem only provides regime data since Bangladesh's independence in 1971. There is, however, regime data for Pakistan and the colony of India, both of which the current territory of Bangladesh was a part. We, therefore, use the regime data of Pakistan for Bangladesh from 1947 to 1970, and the regime data of India from 1789 to 1946. We did so for all countries with a past or current population of more than one million.
+
+      For more details on the imputation methodology and which countries are affected, refer to [this file](https://github.com/owid/etl/blob/master/etl/steps/data/garden/democracy/2025-03-17/vdem/vdem.countries_impute.yml).
     estimate: |-
       << "central" if estimate == 'best' else estimate >>
     estimate_title: |-
       << "Central" if estimate == 'best' else estimate.title() >>
     key_regions: &key_regions |-
       V-Dem covers many more countries since 1900, which affects regional averages.
+    key_regions_agg: &key_regions_agg |-
+      We provide two kinds of regional averages: **country averages** and **population-weighted averages**. Country averages weigh each country equally and give a sense of how the typical country is doing. Population-weighted averages weigh countries with larger populations more and therefore better reflect the average person's experience.
 
 dataset:
   title: V-Dem Country-Year (Full + Others)
@@ -61,11 +68,15 @@ tables:
       display:
         numDecimalPlaces: 0
       description_processing: &processing_regions |-
+        ### Region aggregates
         The default regional aggregates (including values for the World) have been estimated by averaging the country values. These are only estimated when data for most countries and populations is available (i.e. 70% for most continents). We have used the list of countries in 1900 as a reference.
 
-        In addition, regional aggregates with names like `Region (population-weighted)` (including values for World) have been estimated by averaging the country values weighted by population. The population values are from the UN WPP 2024 revision dataset. These are only estimated when 70% of people in region have data for the given year.
+        In addition, regional aggregates with names like "Region (population-weighted)"" (including values for World) have been estimated by averaging the country values weighted by population. The population values are from the UN WPP 2024 revision dataset. These are only estimated when 70% of people in region have data for the given year.
+
+        {definitions.auxiliary.description_imputes}
       description_key:
         - *key_regions
+        - *key_regions_agg
       presentation: &ppt_uni_w_regions
         grapher_config:
           selectedEntityNames:
@@ -117,7 +128,7 @@ tables:
         description_processing: |-
           Converted ratio (0-1) into share (0-100%).
 
-          {definitions.common.description_processing}
+          {definitions.auxiliary.description_imputes}
         presentation:
           <<: *ppt_uni_w_regions
           title_public: Share of population with suffrage
@@ -135,6 +146,7 @@ tables:
           - Reported as a continuous percentage; higher values indicate greater voter participation.
           - Data sourced from IPU, IFES, IDEA, and various electoral databases.
           - *key_regions
+          - *key_regions_agg
         description_from_producer: |-
           Question: In this national election, what percentage (%) of all registered voters cast a vote according to official results?
 
@@ -176,6 +188,8 @@ tables:
 
       This snapshot contains all 500 V-Dem indicators and 245 indices + 57 other indicators from other data sources.
     common:
+      description_processing: |-
+        {definitions.auxiliary.description_imputes}
       display:
         numDecimalPlaces: 0
 
@@ -225,7 +239,8 @@ tables:
       # NEW
       num_years_in_electdem: # electdem_exp_row_owid
         title: Experience with electoral democracy
-        description_short: Number of total years in electoral democracy. It sums all periods of electoral democracy.
+        description_short: |-
+          Number of total years in electoral democracy. It sums all periods of electoral democracy.
         description_key: &description_key_num_electdem
           - In electoral democracies, citizens have the right to participate in meaningful, free and fair, and multi-party elections.
         unit: years
@@ -244,7 +259,8 @@ tables:
 
       num_years_in_libdem: # libdem_exp_row_owid
         title: Experience with liberal democracy
-        description_processing: Number of total years in liberal democracy. It sums all periods of liberal democracy.
+        description_short: |-
+          Number of total years in liberal democracy. It sums all periods of liberal democracy.
         description_key: &description_key_num_libdem
           - In liberal democracies, citizens have further individual and minority rights, are equal before the law, and the actions of the executive are constrained by the legislative and the courts.
         unit: years
@@ -258,7 +274,10 @@ tables:
       num_years_in_libdem_consecutive_cat: # libdem_age_group_row_owid
         title: Liberal democracy age group
         description_short: Category of liberal democracies based on the country's age of liberal democracy.
-        description_processing: Number of consecutive years in liberal democracy.
+        description_processing: |-
+          Different categories for different number of consecutive years in liberal democracy.
+
+          {definitions.auxiliary.description_imputes}
         description_key: *description_key_num_libdem
         unit: ""
 
@@ -308,6 +327,8 @@ tables:
             - 2012-2014 Mauritius
           - Shimon Peres:
             - 2007-2013 Israel
+
+          {definitions.auxiliary.description_imputes}
         unit: ""
 
       ## 3.4.3.16 HOG female
@@ -351,6 +372,8 @@ tables:
           Joseph Jacques Jean Chrétien: 1993-2002 Canada
           KåreIsaachsen Willoch: 1981-1985 Norway
           YuriiIvanovych Yekhanurov: 2005 Ukraine
+
+          {definitions.auxiliary.description_imputes}
         unit: ""
 
       ## HOE female (custom)
@@ -370,6 +393,8 @@ tables:
             - If head of state is less powerful than head of government
 
           We derive this indicator from V-Dem indicators: `v2exfemhos`, `v2exfemhog`, `v2ex_hosw`, and `v2ex_hogw`.
+
+          {definitions.auxiliary.description_imputes}
         unit: ""
 
       wom_hoe_vdem: # (corrected)
@@ -388,6 +413,8 @@ tables:
             - If head of state is less powerful than head of government
 
           We derive this indicator from V-Dem indicators: `v2exfemhos`, `v2exfemhog`, `v2ex_hosw`, and `v2ex_hogw`.
+
+          {definitions.auxiliary.description_imputes}
         unit: ""
 
       # Had female HOE ever
@@ -414,6 +441,8 @@ tables:
           We derive this indicator from V-Dem indicators: `v2exfemhos`, `v2exfemhog`, `v2ex_hosw`, and `v2ex_hogw`.
 
           This indicator is only estimated for countries listed in V-Dem in 2024.
+
+          {definitions.auxiliary.description_imputes}
         unit: ""
 
       # Had female democratically elected HOE ever
@@ -440,6 +469,8 @@ tables:
           We derive this indicator from V-Dem indicators: `v2exfemhos`, `v2exfemhog`, `v2ex_hosw`, and `v2ex_hogw`.
 
           In addition, we used the V-Dem indicator `electmulpar_hoe_row_owid`, which is based on V-Dem indicator `v2elmulpar_osp_hoe`, to assess if the country goes through electoral processes to elect the chief executive.
+
+          {definitions.auxiliary.description_imputes}
         unit: ""
 
       wom_parl_vdem_cat: # wom_parl_gr_vdem_owid
@@ -564,6 +595,7 @@ tables:
           - 1 if any of the following indicators was 1: `v2eltype_0`, `v2eltype_1`, `v2eltype_4`, `v2eltype_5`, `v2eltype_6`, or `v2eltype_7`.
           - 0 otherwise (i.e. all previous indicators were 0).
 
+          {definitions.auxiliary.description_imputes}
         unit: ""
         display:
           numDecimalPlaces: 0
@@ -578,6 +610,7 @@ tables:
         numDecimalPlaces: 2
       description_key:
         - *key_regions
+        - *key_regions_agg
       presentation: &ppt_multi_w_regions
         title_variant: |-
           <% if estimate != "best" %>
@@ -615,6 +648,7 @@ tables:
           - |-
             It is made up of five sub-indices: [elected officials](https://ourworldindata.org/grapher/elected-political-leaders-index), [free and fair elections](https://ourworldindata.org/grapher/free-and-fair-elections-index), [freedom of expression](https://ourworldindata.org/grapher/freedom-of-expression-index), [freedom of association](https://ourworldindata.org/grapher/freedom-of-association-index), and the [share of adult citizens who have the right to vote](https://ourworldindata.org/grapher/suffrage).
           - *key_regions
+          - *key_regions_agg
         description_from_producer: |-
           Question: To what extent is the ideal of electoral democracy in its fullest sense achieved?
           Clarification: The electoral principle of democracy seeks to embody the core value of making rulers responsive to citizens, achieved through electoral competition for the electorate's approval under circumstances when suffrage is extensive; political and civil society organizations can operate freely; elections are clean and not marred by fraud or systematic irregularities; and elections affect the composition of the chief executive of the country. In between elections, there is freedom of expression and an independent media capable of presenting alternative views on matters of political relevance. In the V-Dem conceptual scheme, electoral democracy is understood as an essential element of any other conception of representative democracy — liberal, participatory, deliberative, egalitarian, or some other.
@@ -643,6 +677,7 @@ tables:
           - |-
             It is made up of eight sub-indices: the [share of adult citizens who have the right to vote](https://ourworldindata.org/grapher/suffrage), [elected officials](https://ourworldindata.org/grapher/elected-political-leaders-index), [free and fair elections](https://ourworldindata.org/grapher/free-and-fair-elections-index), [freedom of expression](https://ourworldindata.org/grapher/freedom-of-expression-index), [freedom of association](https://ourworldindata.org/grapher/freedom-of-association-index), [legislative constraints on the executive](https://ourworldindata.org/grapher/legislative-constraints-on-the-executive-index), [judicial constraints on the executive](https://ourworldindata.org/grapher/judicial-constraints-on-the-executive-index), and [individual liberties and equality before the law](https://ourworldindata.org/grapher/individual-liberties-and-equality-before-the-law-index).
           - *key_regions
+          - *key_regions_agg
 
           # - Measures how closely countries adhere to liberal democracy, emphasizing protection of individual and minority rights against state and majority tyranny.
           # - Integrates electoral democracy with constitutionally protected civil liberties, strong rule of law, judicial independence, and effective checks and balances.
@@ -695,6 +730,8 @@ tables:
 
           V-Dem indicator name: `v2x_delibdem`
         unit: ""
+        description_key:
+          - *key_regions_agg
 
       ## 2.1.5 Egalitarian democracy index
       egaldem_vdem:
@@ -715,6 +752,8 @@ tables:
 
           V-Dem indicator name: `v2x_egaldem`
         unit: ""
+        description_key:
+          - *key_regions_agg
 
       ## 2.2.11 Legislative constraints on the executive index
       legis_constr_vdem:
@@ -829,6 +868,8 @@ tables:
 
           V-Dem indicator name: `v2xeg_eqdr`
         unit: ""
+        description_key:
+          - *key_regions_agg
 
       ## 3.5.1.6 Legislature corrupt activities
       corr_leg_vdem:
@@ -870,7 +911,7 @@ tables:
           - Measures the percentage of female members in the lower (or unicameral) chamber of the national legislature.
           - Values are expressed as a percentage; higher values indicate greater gender representation.
           - Data is compiled from authoritative sources like the Inter-Parliamentary Union and is cleaned to exclude non-bicameral systems.
-          - *key_regions
+          - *key_regions_agg
         description_from_producer: |-
           Question: What percentage (%) of the lower (or unicameral) chamber of the legislature is female?
 
@@ -899,6 +940,8 @@ tables:
 
           V-Dem indicator name: `v2dlcommon`
         unit: ""
+        description_key:
+          - *key_regions_agg
 
       ## 3.6.0.1 Reasoned justification
       justified_polch_vdem:
@@ -922,6 +965,8 @@ tables:
 
           V-Dem indicator name: `v2dlreason`
         unit: ""
+        description_key:
+          - *key_regions_agg
 
       ## 3.6.0.5 Engaged society
       soccons_polch_vdem:
@@ -1150,6 +1195,7 @@ tables:
             It is made up of three sub-indices: [physical integrity rights](https://ourworldindata.org/grapher/physical-integrity-rights-index-vdem), [private civil liberties](https://ourworldindata.org/grapher/private-civil-liberties-index), and [political civil liberties](https://ourworldindata.org/grapher/political-civil-liberties-index).
           - It is based on assessments by V-Dem's country experts.
           - *key_regions
+          - *key_regions_agg
           # - The Civil Liberties Index measures the extent to which individuals are free from government-imposed physical harm and unjust restrictions on private and political liberties.
           # - It is a composite index averaging scores on physical violence, political civil liberties, and private civil liberties.
           # - Higher values (on a 0–1 scale) indicate stronger protection of liberal freedoms such as safety, expression, and movement.
@@ -1236,6 +1282,7 @@ tables:
           - |-
             It is made up of four sub-indices: [executive corruption](https://ourworldindata.org/grapher/executive-corruption-index), [legislative corruption](https://ourworldindata.org/grapher/legislative-corruption-score), [judicial corruption](https://ourworldindata.org/grapher/judicial-corruption-score), and [public sector corruption](https://ourworldindata.org/grapher/public-sector-corruption-index).
           - *key_regions
+          - *key_regions_agg
           # - Measures the extent of political corruption across executive, legislative, judicial, and public sectors.
           # - Includes both petty and grand corruption, such as bribery, embezzlement, and misuse of office.
           # - Higher values (0–1 scale) indicate more pervasive corruption, reversing the typical V-Dem index direction.
@@ -1295,6 +1342,7 @@ tables:
           - |-
             It is made up of three sub-indices: [women's civil liberties](https://ourworldindata.org/grapher/women-civil-liberties-index), [women's civil society participation](https://ourworldindata.org/grapher/women-civil-society-participation-index), and [women's political participation](https://ourworldindata.org/grapher/women-political-participation-index).
           - *key_regions
+          - *key_regions_agg
 
         presentation:
           <<: *ppt_multi_w_regions
@@ -1382,6 +1430,7 @@ tables:
           # - Includes indicators such as judicial independence, compliance with courts, public sector corruption, and access to justice.
           # - Higher values (0–1 scale) indicate stronger adherence to the rule of law.
           - *key_regions
+          - *key_regions_agg
         description_from_producer: |-
           Question: To what extent are laws transparently, independently, predictably, impartially, and equally enforced, and to what extent do the actions of government officials comply with the law?
 
@@ -1458,6 +1507,8 @@ tables:
 
           V-Dem indicator name: `v2dlcountr`
         unit: ""
+        description_key:
+          - *key_regions_agg
 
       # 2.2.17 Deliberative component index
       delib_vdem:
@@ -1481,6 +1532,8 @@ tables:
 
           V-Dem indicator name: `v2xdl_delib`
         unit: ""
+        description_key:
+          - *key_regions_agg
 
       ## 2.2.18 Egalitarian component index
       egal_vdem:
@@ -1500,6 +1553,8 @@ tables:
 
           V-Dem indicator name: `v2x_egal`
         unit: ""
+        description_key:
+          - *key_regions_agg
 
       ## 2.2.6 Clean elections index
       electfreefair_vdem:
@@ -1515,6 +1570,7 @@ tables:
           - It is based on assessments by V-Dem's country experts.
           - It combines information on free and fair elections, the autonomy and capacity of the electoral management body, election voter registry, election vote buying, electoral intimidation by the government, electoral violence by non-state actors, and other voting irregularities.
           - *key_regions
+          - *key_regions_agg
           # - Measures the extent to which elections are free from fraud, irregularities, intimidation, vote buying, and violence.
           # - Based on indicators such as EMB autonomy/capacity, voter registry quality, and fairness of election procedures.
           # - Higher values (0–1 scale) indicate cleaner, more democratic electoral processes.
@@ -1621,6 +1677,7 @@ tables:
           - This index, produced by Varieties of Democracy (V-Dem), combines information on freedom of discussion, freedom of academic and cultural expression, media censorship, media self-censorship, media bias, harassment of journalists, and the existence of critical and different perspectives in print and broadcast media.
           - It is based on assessments by V-Dem's country experts.
           - *key_regions
+          - *key_regions_agg
           # - Measures the extent to which governments respect freedoms of expression, academic and cultural expression, and access to alternative sources of information.
           # - Based on media censorship, harassment of journalists, media bias, self-censorship, freedom of discussion, and pluralism in media perspectives.
           # - Higher values (0–1 scale) indicate broader and more secure access to free and diverse information sources.
@@ -1688,6 +1745,8 @@ tables:
 
           V-Dem indicator name: `v2xca_academ`
         unit: ""
+        description_key:
+          - *key_regions_agg
 
       # 3.12.1.1 Government censorship effort — Media (C)
       v2mecenefm:
@@ -1785,6 +1844,8 @@ tables:
 
           Scale: Ordinal, converted to interval by the measurement model.
         unit: ""
+        description_key:
+          - *key_regions_agg
 
       # 3.15.2.4 Mobilization for autocracy (C)
       v2caautmob:
@@ -1811,6 +1872,8 @@ tables:
 
           V-Dem indicator name: `v2caautmob`
         unit: ""
+        description_key:
+          - *key_regions_agg
 
       # 3.15.1.1 Political polarization (C)
       v2cacamps:
@@ -1837,6 +1900,8 @@ tables:
 
           Indicator nanme: `v2cacamps`
         unit: ""
+        description_key:
+          - *key_regions_agg
 
       # 3.15.1.2 Political violence (C)
       v2caviol:
@@ -1863,6 +1928,8 @@ tables:
 
           V-Dem indicator name: `v2caviol`
         unit: ""
+        description_key:
+          - *key_regions_agg
 
       ## 3.1.3.7 Election vote buying
       v2elvotbuy:
@@ -1937,6 +2004,8 @@ tables:
 
           V-Dem indicator name: `v2mecorrpt`
         unit: ""
+        description_key:
+          - *key_regions_agg
 
       ## 3.15.2.1 Mass mobilization
       v2cagenmob:
@@ -1963,6 +2032,8 @@ tables:
 
           V-Dem indicator name: `v2cagenmob`
         unit: ""
+        description_key:
+          - *key_regions_agg
 
       ## 5.4.2 Clientelism Index
       v2xnp_client:
@@ -2025,6 +2096,8 @@ tables:
 
           V-Dem indicator name: `v2smgovdom`
         unit: ""
+        description_key:
+          - *key_regions_agg
 
   ##################################################################################################
   ##################################################################################################
@@ -2154,7 +2227,7 @@ tables:
         display:
           numDecimalPlaces: 0
 
-      ## [CUSTOM]
+      ## [CUSTOM] TODOO
       electmulpar_hoe_row_owid:
         title: Multi-party elections for government's chief executive ({definitions.auxiliary.estimate} estimate)
         description_short: |-
@@ -2164,13 +2237,15 @@ tables:
           title_public: Multi-party elections for government's chief executive
         unit: ""
         description_processing: |-
-          {definitions.auxiliary.description_processing_row}
+          While RoW covers the years since 1900, we use V-Dem's historical data from 1789 to 1899 to expand the classification's coverage back in time.
 
           Finally, we make some additional minor changes to the coding rules.
 
           The two most consequential changes we make relate to RoW's identification of whether a country's chief executive is elected. First, one way RoW considers a chief executive to have been elected — even if they are not directly elected or appointed by the legislature — is if they are the head of state, they depend on the approval of the legislature, and there were multi-party elections for the executive. This last part is likely a coding error because to be consistent with RoW's other definitions, this should depend on multi-party legislative, not executive, elections. Only if the legislature has been chosen in multi-party elections does it make an otherwise unelected chief executive—who must be approved by that legislature—dependent on multi-party elections. We correct this error.
 
           Second, RoW considers a chief executive to have been elected if the country had chosen both its legislature and executive in multi-party elections. But this considers some chief executives as elected even if they came to power through force after elections were previously held. Examples include the coup d'états led by Fulgencio Batista in Cuba in 1952 and by Muhammadu Buhari in Nigeria in 1983. We instead consider such chief executives as unelected.
+
+          {definitions.auxiliary.description_imputes}
         display:
           numDecimalPlaces: 0
 
@@ -2183,7 +2258,9 @@ tables:
           <<: *ppt_multi_wo_regions
           title_public: Multiparty elections for legislature
         description_processing: |-
-          Use the value from `v2elmulpar_osp` whenever `v2eltype` is 0, 1, 4 or 5. Otherwise the value is missing.
+          We use the value from `v2elmulpar_osp` whenever `v2eltype` is 0, 1, 4 or 5. Otherwise the value is missing.
+
+          {definitions.auxiliary.description_imputes}
         unit: ""
         display:
           numDecimalPlaces: 0
