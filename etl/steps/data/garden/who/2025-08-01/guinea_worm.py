@@ -27,7 +27,7 @@ def run(dest_dir: str) -> None:
 
     ds_garden = paths.load_dataset("guinea_worm_certification")
     # Read certification table
-    tb_cert = ds_garden["guinea_worm_certification"].reset_index()
+    tb_cert = ds_garden["guinea_worm"].reset_index()
 
     #
     # Process data.
