@@ -955,6 +955,8 @@ def _extract_metadata_rows(metadata_obj, included_fields: set) -> List[List[str]
         if isinstance(value, list):
             # Handle special case for origins - extract attributes for each
             if key == "origins":
+                origin_rows = []  # Collect all origin rows first
+
                 for origin in value:
                     # Get origin identifier with proper type handling
                     origin_identifier = None
@@ -966,7 +968,7 @@ def _extract_metadata_rows(metadata_obj, included_fields: set) -> List[List[str]
                         origin_identifier = origin["attribution_short"]
                     # Fall back to producer
                     elif hasattr(origin, "producer") and getattr(origin, "producer", None):
-                        origin_identifier = origin["producer"]
+                        origin_identifier = getattr(origin, "producer")
                     elif isinstance(origin, dict) and origin.get("producer"):
                         origin_identifier = origin["producer"]
 
@@ -976,7 +978,16 @@ def _extract_metadata_rows(metadata_obj, included_fields: set) -> List[List[str]
                     else:
                         origin_display_name = display_name
 
-                    rows.extend(_extract_origin_attributes(origin, origin_display_name))
+                    origin_rows.extend(_extract_origin_attributes(origin, origin_display_name))
+
+                # Deduplicate based on the formatted content (after extraction)
+                seen_formatted = set()
+                for row in origin_rows:
+                    # Use the formatted content (second column) as the deduplication key
+                    formatted_content = row[1] if len(row) > 1 else str(row)
+                    if formatted_content not in seen_formatted:
+                        seen_formatted.add(formatted_content)
+                        rows.append(row)
             else:
                 # For other list fields, use the original formatting
                 formatted_value = _format_list_metadata(key, value)
@@ -992,7 +1003,7 @@ def _extract_metadata_rows(metadata_obj, included_fields: set) -> List[List[str]
 
 
 def _extract_origin_attributes(origin, base_display_name: str) -> List[List[str]]:
-    """Extract individual attributes from an Origin object and format them in a single cell."""
+    """Extract individual attributes from an Origin object or list of Origin objects and format them."""
     # Define the origin attributes we want to show and their display names
     origin_field_mapping = {
         "producer": "Producer",
@@ -1006,31 +1017,59 @@ def _extract_origin_attributes(origin, base_display_name: str) -> List[List[str]
         "date_published": "Date published",
     }
 
-    # Handle both dict and object with __dict__
-    items = origin.items() if isinstance(origin, dict) else origin.__dict__.items()
+    def _process_single_origin(single_origin, origin_index=None):
+        """Process a single origin object and return formatted attributes."""
+        if isinstance(single_origin, dict):
+            items = single_origin.items()
+        else:
+            # For Origin objects, use __dict__ to get all attributes
+            items = single_origin.__dict__.items()
 
-    # Collect all attributes into a single formatted string
-    formatted_attributes = []
+        # Collect all attributes into a single formatted string
+        formatted_attributes = []
 
-    for attr_key, attr_value in items:
-        if attr_value is None or attr_value == "":
-            continue
+        for attr_key, attr_value in items:
+            # Skip None, empty strings, and private attributes
+            if attr_value is None or attr_value == "" or attr_key.startswith("_"):
+                continue
 
-        if attr_key == "license":
-            # Handle license object specially
-            if hasattr(attr_value, "name") and attr_value.name:
-                formatted_attributes.append(f"License: {attr_value.name}")
-            if hasattr(attr_value, "url") and attr_value.url:
-                formatted_attributes.append(f"License URL: {attr_value.url}")
-        elif attr_key in origin_field_mapping:
-            attr_display_name = origin_field_mapping[attr_key]
-            formatted_attributes.append(f"{attr_display_name}: {str(attr_value)}")
+            if attr_key == "license":
+                # Handle License object specially
+                if hasattr(attr_value, "name") and attr_value.name:
+                    formatted_attributes.append(f"License: {attr_value.name}")
+                if hasattr(attr_value, "url") and attr_value.url:
+                    formatted_attributes.append(f"License URL: {attr_value.url}")
+            elif attr_key in origin_field_mapping:
+                attr_display_name = origin_field_mapping[attr_key]
+                # Convert to string and truncate very long descriptions
+                value_str = str(attr_value)
+                if len(value_str) > 500:  # Truncate very long descriptions for readability
+                    value_str = value_str[:500] + "..."
+                formatted_attributes.append(f"{attr_display_name}: {value_str}")
 
-    # Join all attributes with line breaks
-    formatted_value = "\n".join(formatted_attributes)
+        # Join all attributes with line breaks
+        formatted_value = "\n".join(formatted_attributes)
 
-    # Return a single row with all the origin information
-    return [[base_display_name, formatted_value]]
+        # Create display name for this origin
+        if origin_index is not None:
+            display_name = f"{base_display_name} #{origin_index + 1}"
+        else:
+            display_name = base_display_name
+
+        return [display_name, formatted_value]
+
+    # Handle the origins data structure correctly
+    if isinstance(origin, list):
+        # origin is a list of Origin objects - process each one
+        rows = []
+        for i, single_origin in enumerate(origin):
+            row = _process_single_origin(single_origin, i)
+            rows.append(row)
+        return rows
+    else:
+        # Single origin object (dict or Origin object)
+        row = _process_single_origin(origin)
+        return [row]
 
 
 def export_table_to_gsheet(

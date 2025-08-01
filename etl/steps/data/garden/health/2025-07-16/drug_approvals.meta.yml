@@ -21,10 +21,12 @@ tables:
           The annual number of new drugs approved by the US Food and Drug Administration (FDA). This is broken down into [new chemical drugs](#dod:new-chemical-entity), new vaccines, and other new biologics such as antibodies and gene therapies. The data does not include [generics](#dod:generic-drug), reformulations, or [biosimilars](#dod:biosimilar).
         display:
           numDecimalPlaces: 0
+        description_key:
+          - This data includes both [new drug applications](#dod:new-drug-application) (NDAs) and [biologics license applications](#dod:biologics-license-application) (BLAs) approved by the Center for Drug Evaluation and Research (CDER) and the Center for Biologics Evaluation and Research (CBER) of the FDA.
         description_processing: |-
-          - This data includes both [new chemical entities](#dod:new-chemical-entity) (NMEs) and [biologics license applications](#dod:biologics-license-application) (BLAs) approved by the Center for Drug Evaluation and Research (CDER) and the Center for Biologics Evaluation and Research (CBER) of the FDA.
-          - Biologicals approved by the CBER have been extracted from the FDA's "Purple Book", which lists licensed biological products with reference product exclusivity and biosimilarity or interchangeability evaluations.
-          - We removed [biosimilars](#dod:biosimilar) from the dataset, since we are only focusing on new drugs, by excluding products with a "biosimilar" or "interchangeable" license type as well as products with a reference product listed.
+          - Biologicals approved by the CBER have been extracted from the FDA's "Purple Book", which lists all licensed biological products.
+          - CDER approvals (which include some biologics and all chemical drugs) come directly from the "Compilation of CDER NME and New Biologic Approvals" database, which is published by CDER.
+          - This dataset only contains new drugs ([new chemical entities](#dod:new-chemical-entity) and biologics). We removed [biosimilars](#dod:biosimilar) and [generics](#dod:generic-drug) from the dataset, by excluding the "biosimilar" or "interchangeable" license types as well as products with a reference product listed.
         presentation:
           grapher_config:
             note: |-
