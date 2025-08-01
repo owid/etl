@@ -1,6 +1,7 @@
+import pandas as pd
 import yaml
 from owid.catalog.tables import Table, concat
-import pandas as pd
+
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -29,6 +30,12 @@ INDICATORS_AVOID_IMPUTE = [
     "v2mecorrpt",
     "v2xnp_client",
 ]
+
+
+a = {
+    "lala",
+    "lele",
+}
 
 
 def run(tb: Table) -> Table:
