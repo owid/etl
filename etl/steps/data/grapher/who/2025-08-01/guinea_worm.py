@@ -35,6 +35,8 @@ YEAR_CATEGORIES = [
     "Endemic",
 ]
 
+CURRENT_YEAR = 2024
+
 
 def run(dest_dir: str) -> None:
     #
