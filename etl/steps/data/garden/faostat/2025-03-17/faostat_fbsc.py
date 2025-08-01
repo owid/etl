@@ -41,6 +41,8 @@ from etl.helpers import PathFinder
 # First year for which we have data in fbs dataset (it defines the first year when new methodology is used).
 FBS_FIRST_YEAR = 2010
 DATASET_TITLE = f"Food Balances (old methodology before {FBS_FIRST_YEAR}, and new from {FBS_FIRST_YEAR} onwards)"
+# Last year for which we have data in fbsh dataset (used for sanity checks).
+FBSH_LAST_YEAR = 2013
 
 
 def combine_fbsh_and_fbs_datasets(
@@ -78,13 +80,27 @@ def combine_fbsh_and_fbs_datasets(
     tb_fbs = harmonize_items(tb=tb_fbs, dataset_short_name="faostat_fbs")
     tb_fbs = harmonize_elements(tb=tb_fbs, dataset_short_name="faostat_fbs")
 
-    # Ensure there is no overlap in data between the two datasets, and that there is no gap between them.
+    # FBSH and FBS overlap for years 2010, 2011, 2012, and 2013.
+    # We need to remove overlapping data, prioritising FBS.
     assert tb_fbs["year"].min() == FBS_FIRST_YEAR, f"First year of fbs dataset is not {FBS_FIRST_YEAR}"
-    if tb_fbsh["year"].max() >= tb_fbs["year"].min():
-        # There is overlapping data between fbsh and fbs datasets. Prioritising fbs over fbsh."
-        tb_fbsh = tb_fbsh.loc[tb_fbsh["year"] < tb_fbs["year"].min()].reset_index(drop=True)
-    if (tb_fbsh["year"].max() + 1) < tb_fbs["year"].min():
-        log.warning("Data is missing for one or more years between fbsh and fbs datasets.")
+    assert tb_fbsh["year"].max() == FBSH_LAST_YEAR, f"Last year of fbsh dataset is not {FBSH_LAST_YEAR}"
+    # We could simply do:
+    # tb_fbsh = tb_fbsh.loc[(tb_fbsh["year"] < tb_fbs["year"].min())].reset_index(drop=True)
+    # However, we have to handle the special case of Sudan:
+    # In FBSH, there is data for "Sudan (former)", for all years from 1961 to 2011, as well as "Sudan" (which corresponds to North Sudan), for just 2012 and 2013.
+    # However, FBS only has data for "Sudan" (from 2012, corresponding to North Sudan), and "South Sudan" (only from 2019).
+    # This causes that, when combining FBS (from 2010) with FBSH (up to 2009) we lose data for "Sudan (former)" for years 2010 and 2011. This causes a dip in various African indicators for those two years.
+    # The solution is to keep the data for "Sudan (former)" for those two years from FBSH, and append it to FBS after the combination of FBS and FBSH.
+    error = "Data for Sudan (former, north and south) has changed in FBSH or FBS."
+    assert tb_fbsh[tb_fbsh["area"] == "Sudan (former)"]["year"].max() == 2011
+    assert set(tb_fbsh[tb_fbsh["area"] == "Sudan"]["year"]) == {2012, 2013}
+    assert tb_fbs[tb_fbs["area"] == "Sudan (former)"].empty, error
+    assert tb_fbs[tb_fbs["area"] == "Sudan"]["year"].min() == 2012, error
+    assert tb_fbs[tb_fbs["area"] == "South Sudan"]["year"].min() == 2019, error
+    # Remove years from FBSH for which we have data in FBS, but keep all years for Sudan (former).
+    tb_fbsh = tb_fbsh.loc[(tb_fbsh["year"] < tb_fbs["year"].min()) | (tb_fbsh["area"] == "Sudan (former)")].reset_index(
+        drop=True
+    )
 
     # Sanity checks.
     # Ensure the elements that are in fbsh but not in fbs are covered by ITEMS_MAPPING.
@@ -105,6 +121,10 @@ def combine_fbsh_and_fbs_datasets(
     # Concatenate old and new tables.
     # tb_fbsc = dataframes.concatenate([tb_fbsh, tb_fbs]).sort_values(["area", "year"]).reset_index(drop=True)
     tb_fbsc = pr.concat([tb_fbsh, tb_fbs]).sort_values(["area", "year"]).reset_index(drop=True)
+
+    # Sanity check.
+    error = "Found duplicated rows after combining FBSH and FBS."
+    assert tb_fbsc[tb_fbsc.duplicated(subset=["area", "year", "item_code", "element_code"])].empty, error
 
     # Ensure that each element has only one unit and one description.
     error = "Some elements in the combined dataset have more than one unit. Manually check them and consider adding them to ELEMENT_AMENDMENTS."
