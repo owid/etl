@@ -146,8 +146,7 @@ chart_url = url_persist(st.text_input)(
     help="""Paste the URL of the chart you want to animate.
 
 **Considerations**:
-- Only production links work.
-- You can pass the full URL, or skip the https://ourworldindata.org/ bit.
+- You can pass the full URL of a chart in production, in a staging site, or simply pass the "grapher/chart-slug".
 - Some parameters cannot be extracted from the URL (e.g. the type of tab view). But you can modify them afterwards.
     - If coming from Admin, tab view will be extracted correctly!
 """,
