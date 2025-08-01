@@ -16,7 +16,7 @@ log = get_logger()
 paths = PathFinder(__file__)
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     log.info("guinea_worm.start")
 
     #
@@ -26,19 +26,20 @@ def run(dest_dir: str) -> None:
     snap = cast(Snapshot, paths.load_dependency("guinea_worm.csv"))
 
     # Load data from snapshot.
-    df = pd.read_csv(snap.path, skiprows=2)
-    df = clean_certification_table(df).reset_index(drop=True)
+    tb = snap.read(skiprows=2)
+    tb = clean_certification_table(tb).reset_index(drop=True)
     #
     # Process data.
     #
     # Create a new table and ensure all columns are snake-case.
-    tb = Table(df, short_name=paths.short_name, underscore=True)
+
+    tb = Table(tb, short_name=paths.short_name, underscore=True)
 
     #
     # Save outputs.
     #
     # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = create_dataset(dest_dir, tables=[tb], default_metadata=snap.metadata)
+    ds_meadow = paths.create_dataset(tables=[tb], default_metadata=snap.metadata)
 
     # Save changes in the new garden dataset.
     ds_meadow.save()
@@ -46,12 +47,12 @@ def run(dest_dir: str) -> None:
     log.info("guinea_worm.end")
 
 
-def clean_certification_table(df: pd.DataFrame) -> pd.DataFrame:
-    df.columns.values[0] = "country"
-    df.columns.values[24] = "year_certified"
-    df.year_certified = df.year_certified.str.replace(r"Countries certified in", "", regex=True)
+def clean_certification_table(tb: Table) -> Table:
+    tb.columns.values[0] = "country"
+    tb.columns.values[24] = "year_certified"
+    tb['year_certified'] = tb['year_certified'].str.replace(r"Countries certified in", "", regex=True)
 
-    df = df.replace(
+    tb = tb.replace(
         {
             "year_certified": {
                 "Countries at precertification stage": "Pre-certification",
@@ -61,4 +62,4 @@ def clean_certification_table(df: pd.DataFrame) -> pd.DataFrame:
         }
     )
 
-    return df
+    return tb
