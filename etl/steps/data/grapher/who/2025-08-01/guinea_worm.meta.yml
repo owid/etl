@@ -1,0 +1,114 @@
+# NOTE: To learn more about the fields, hover over their names.
+# common origins & descriptions for certification status, specific one for reported cases
+definitions:
+  common:
+    processing_level: major
+    presentation:
+      topic_tags:
+        - Global Health
+        - Neglected Tropical Diseases
+        - Eradication of Diseases
+      attribution: World Health Organization (2024)
+      attribution_short: WHO
+    description_from_producer:
+      Elimination of [dracunculiasis[(#dod:guinea-worm)] is the confirmed absence of the emergence of adult female worms (the interruption of transmission of Dracunculus medinensis)
+      in humans and animals for three consecutive years or longer from a country with such a low risk of reintroduction of the parasite that preventive measures
+      could be reduced to a strict minimum.
+    description_processing:
+        "The current and historical values for the status of Guinea worm disease (Dracunculiasis) as certified by the WHO. To be certified as free of guinea worm disease, a country must have reported zero indigenous cases through active surveillance for at least three consecutive years.
+
+        Data regarding certification status is available at the WHO: https://web.archive.org/web/20211024081702/https://apps.who.int/dracunculiasis/dradata/html/report_Countries_t0.html
+
+        We have added the recent changes to Guinea worm disease certification:
+        - Angola has had endemic statuss since 2020:  https://www.who.int/news/item/23-09-2020-eradicating-dracunculiasis-human-cases-and-animal-infections-decline-as-angola-becomes-endemic
+        - Kenya was certified guinea worm free in 2018: https://www.who.int/news/item/21-03-2018-dracunculiasis-eradication-south-sudan-claims-interruption-of-transmission-in-humans
+        - DRC was certified guinea worm free in 2022: https://www.who.int/news/item/15-12-2022-the-democratic-republic-of-the-congo-certified-free-of-dracunculiasis-transmission-by-who"
+    origins:
+      - title: "Certification status of dracunculiasis eradication"
+        date_published: "2017"
+        producer: World Health Organization
+        attribution_short: WHO
+        citation_full: "World Health Organization. Certification status of dracunculiasis eradication, 2017"
+        url_main: https://web.archive.org/web/20211024081702/https://apps.who.int/dracunculiasis/dradata/html/report_Countries_t0.html
+        date_accessed: "2024-06-17"
+
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+tables:
+  guinea_worm:
+    variables:
+      year_certified:
+        title: Year country was certified free of guinea worm disease
+        unit: ""
+        description_short:
+          To be certified as free of [Guinea worm disease (Dracunculiasis)](#dod:guinea-worm), a country must have reported zero indigenous cases through active surveillance for at least three consecutive years.
+        description_from_producer:
+          Elimination of dracunculiasis is the confirmed absence of the emergence of adult female worms (the interruption of transmission of Dracunculus medinensis)
+          in humans and animals for three consecutive years or longer from a country with such a low risk of reintroduction of the parasite that preventive measures
+          could be reduced to a strict minimum.
+        display:
+          numDecimalPlaces: 0
+      time_frame_certified:
+        title: Time country was certified free of guinea worm disease or status of certification
+        unit: ""
+        description_short:
+          To be certified as free of [Guinea worm disease (Dracunculiasis)](#dod:guinea-worm), a country must have reported zero indigenous cases through active surveillance for at least three consecutive years.
+        type: ordinal
+        sort:
+          - "1997-1999"
+          - "2000s"
+          - "2010s"
+          - "2020s"
+          - "Pre-certification"
+          - "Endemic"
+      certification_status:
+        title: Certification status over time
+        unit: ""
+        description_short:
+          The current and historical values for the status of [Guinea worm disease (Dracunculiasis)](#dod:guinea-worm) as certified by the WHO.
+          To be certified as free of guinea worm disease, a country must have reported zero indigenous cases through active surveillance for at least three consecutive years.
+      guinea_worm_reported_cases:
+        title: Reported cases of guinea worm disease in humans
+        unit: cases
+        description_short: Reported cases of guinea worm disease (Dracunculiasis) as recorded by the WHO.
+        description_from_producer:
+          A case of guinea-worm disease is a person exhibiting a skin lesion with emergence of a Guinea worm,
+          and in which the worm is confirmed in laboratory tests to be D. medinensis. That person is counted as a case
+          only once during the calendar year, i.e. when the first worm emerges from that person.
+        display:
+          numDecimalPlaces: 0
+        origins:
+        - title: "Dracunculiasis eradication: global surveillance summary"
+          date_published: "2024-05-17"
+          producer: World Health Organization
+          attribution_short: WHO
+          citation_full: Weekly Epidemic Report No 20, 2024, 99, 249–269, World Health Organization
+          url_download: https://web.archive.org/web/20240617154248/https://iris.who.int/bitstream/handle/10665/376790/WER9920-249-269.pdf?sequence=1
+          url_main: https://www.who.int/publications/i/item/who-wer-9920-249-269
+          date_accessed: "2024-06-17"
+          version_producer: 2023
+        description_processing:
+          "For Cameroon, Central African Republic, Cote d'Ivoire, Mauritania, Senegal and Yemen the data is from:
+
+          1986-2017: https://web.archive.org/web/20220208133814/https://apps.who.int/dracunculiasis/dradata/html/report_Countries_i2.html
+          2018: Table 1a: https://web.archive.org/web/20230629130727/https://apps.who.int/iris/bitstream/handle/10665/324786/WER9420-233-251.pdf?sequence=1&isAllowed=y
+          2019: Table 1a: https://web.archive.org/web/20230629130619/https://apps.who.int/iris/bitstream/handle/10665/332086/WER9520-209-227-eng-fre.pdf?sequence=1&isAllowed=y
+          2020: Table 1a: https://web.archive.org/web/20230226162934/https://apps.who.int/iris/bitstream/handle/10665/341529/WER9621-173-194-eng-fre.pdf?sequence=1&isAllowed=y
+          2021: Table 1a: https://web.archive.org/web/20230226163027/https://apps.who.int/iris/bitstream/handle/10665/354576/WER9721-22-225-247-eng-fre.pdf?sequence=1&isAllowed=y
+          2022: Table 1a: https://web.archive.org/web/20230629124651/https://apps.who.int/iris/bitstream/handle/10665/367924/WER9820-205-224.pdf?sequence=1&isAllowed=y
+
+          For all other countries we gathered data from the following sources:
+
+          1980-2020: https://www.who.int/teams/control-of-neglected-tropical-diseases/dracunculiasis/dracunculiasis-eradication-portal
+          2021: Table 1a: https://web.archive.org/web/20230226163027/https://apps.who.int/iris/bitstream/handle/10665/354576/WER9721-22-225-247-eng-fre.pdf?sequence=1&isAllowed=y
+          2022: Table 1a: https://web.archive.org/web/20230629124651/https://apps.who.int/iris/bitstream/handle/10665/367924/WER9820-205-224.pdf?sequence=1&isAllowed=y
+          2023: Table 1a: https://iris.who.int/bitstream/handle/10665/376790/WER9920-249-269.pdf?sequence=1
+
+          We calculate global totals as the sum of the number of reported cases in each country."
+
+
