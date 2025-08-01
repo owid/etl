@@ -1,0 +1,20 @@
+meta:
+  origin:
+    producer: Energy Institute
+    title: Statistical Review of World Energy
+    description: The Energy Institute Statistical Review of World Energy analyses data on world energy markets from the prior year.
+    title_snapshot: Statistical Review of World Energy - Consolidated dataset panel format
+    citation_full: Energy Institute - Statistical Review of World Energy (2025).
+    attribution: Energy Institute - Statistical Review of World Energy (2025)
+    attribution_short: Energy Institute
+    url_main: https://www.energyinst.org/statistical-review/
+    url_download: https://www.energyinst.org/__data/assets/file/0011/1659656/panel.csv
+    date_accessed: '2025-06-27'
+    date_published: '2025-06-26'
+    license:
+      name: © Energy Institute 2025
+      url: https://www.energyinst.org/terms
+outs:
+  - md5: 248627efb519df288e4125159d0dd3aa
+    size: 3807339
+    path: statistical_review_of_world_energy.csv

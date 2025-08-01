@@ -305,11 +305,10 @@ def add_demography_indicators(tb: Table, ds_pop: Dataset, ds_le: Dataset, ds_wpp
     tb_popd = tb_popd.loc[tb_popd["year"] == 2022, ["country", "population_density"]]
 
     # life exp
-    tb_le = ds_le.read("life_expectancy")
-    tb_le = tb_le.loc[
-        (tb_le["year"] == 2021) & (tb_le["sex"] == "all") & (tb_le["age"] == 0), ["country", "life_expectancy_0"]
-    ]
+    tb_le = ds_le.read("life_expectancy_at_birth")
+    tb_le = tb_le.drop(columns=["source", "source_url"])
     tb_le = tb_le.rename(columns={"life_expectancy_0": "life_expectancy"})
+    tb_le = tb_le.loc[tb_le["year"] == 2022, ["country", "life_expectancy"]]
     tb_le["country"] = tb_le["country"].replace({"Northern America": "North America"})
 
     # median age
@@ -379,13 +378,13 @@ def add_external_indicators(
     tb_hdr = tb_hdr.rename(columns={"hdi": "human_development_index"})
 
     # PIP
-    tb_pip = ds_pip.read("income_consumption_2017")
-    tb_pip = tb_pip.loc[tb_pip["year"] > 2010, ["country", "year", "headcount_ratio_215"]]
+    tb_pip = ds_pip.read("income_consumption_2021")
+    tb_pip = tb_pip.loc[tb_pip["year"] > 2010, ["country", "year", "headcount_ratio_300"]]
     ## get most recent data
-    cols = ["headcount_ratio_215"]
+    cols = ["headcount_ratio_300"]
     tb_pip = _ffill_and_keep_latest(tb_pip, cols)
     ## rename cols
-    tb_pip = tb_pip.rename(columns={"headcount_ratio_215": "extreme_poverty"})
+    tb_pip = tb_pip.rename(columns={"headcount_ratio_300": "extreme_poverty"})
 
     # WHO
     tb_who = ds_who.read("who")

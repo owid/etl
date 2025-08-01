@@ -1,7 +1,11 @@
 """General data tools."""
 
 import math
+import os
+import random
+import time
 from datetime import date, datetime
+from functools import wraps
 from typing import Any, Iterable, List, Literal, Optional, Set, TypeVar, Union, cast
 
 import owid.catalog.processing as pr
@@ -9,10 +13,34 @@ import pandas as pd
 import plotly.express as px
 from owid.catalog import Table
 from owid.datautils import dataframes
+from structlog import get_logger
 from tqdm.auto import tqdm
 
+from etl.config import OWID_ENV
+from etl.google import CLIENT_SECRET_FILE, GoogleDrive, GoogleSheet
+
+log = get_logger()
 TableOrDataFrame = TypeVar("TableOrDataFrame", pd.DataFrame, Table)
 DIMENSION_COL_NONE = "temporary"
+GSHEET_EXPORT_CONFIG = {
+    "MAX_TITLE_LENGTH": 100,
+    "MAX_SHEET_NAME_LENGTH": 31,
+    "MAX_RETRIES": 3,
+    "RETRY_DELAY": 1.0,
+    "INCLUDED_METADATA_FIELDS": frozenset(
+        {"title", "description_short", "description_key", "description_processing", "origins", "unit"}
+    ),
+    "FIELD_DISPLAY_NAMES": {
+        "title": "Title",
+        "description_short": "Description",
+        "description_key": "What you should know about this data",
+        "description_processing": "Processing steps",
+        "unit": "Unit",
+        "origins": "Data sources",
+    },
+}
+DEFAULT_TEAM_FOLDER_NAME = "ETL GSheet Exports"
+OWID_SHARED_FOLDER_ID = os.getenv("OWID_SHARED_FOLDER_ID")
 
 
 def check_known_columns(df: pd.DataFrame, known_cols: list) -> None:
@@ -533,7 +561,7 @@ def compare_tables(
         try:
             compared[column] = compared[column].astype(float)
         except ValueError:
-            print(f"Skipping column {column}, which can't be converted into float.")
+            log.info(f"Skipping column {column}, which can't be converted into float.")
             compared = compared.drop(columns=column, errors="raise")
             columns.remove(column)
 
@@ -836,3 +864,377 @@ def humanize_number(number, sig_figs=2):
         humanized = f"{value_str} {scale_name}".strip()
 
     return humanized
+
+
+def _format_list_metadata(key: str, value: list) -> str:
+    """Format list metadata based on key type."""
+    if key in ["description_key", "origins", "licenses"]:
+        return "\n".join(str(item) for item in value)
+    elif len(str(value)) > 100:
+        return f"[List with {len(value)} items] {str(value)[:100]}..."
+    else:
+        return ", ".join(str(item) for item in value)
+
+
+def _prepare_dataframe(table: Table) -> pd.DataFrame:
+    """Convert table to DataFrame and optimize for Google Sheets."""
+    # Reset index only if it's not the default RangeIndex
+    if not isinstance(table.index, pd.RangeIndex) or table.index.name is not None:
+        df = table.reset_index()
+    else:
+        df = table.copy()
+
+    if isinstance(df, Table):
+        df = pd.DataFrame(df)
+
+    # Optimize data types for Google Sheets
+    for col in df.columns:
+        if df[col].dtype == "object":
+            df[col] = df[col].astype(str)
+
+    return df
+
+
+def retry_on_network_error(max_retries: int = 3, base_delay: float = 1.0):
+    """Decorator to retry on network/SSL errors."""
+
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            for attempt in range(max_retries):
+                try:
+                    return func(*args, **kwargs)
+                except Exception as e:
+                    if (
+                        any(term in str(e) for term in ["SSL", "EOF", "Connection", "Timeout"])
+                        and attempt < max_retries - 1
+                    ):
+                        delay = base_delay * (2**attempt) + random.uniform(0, 1)
+                        log.warning(
+                            f"Network error in function '{func.__name__}' on attempt {attempt + 1}: {str(e)}. "
+                            f"Retrying in {delay:.1f}s..."
+                        )
+                        time.sleep(delay)
+                        continue
+                    raise
+            return func(*args, **kwargs)
+
+        return wrapper
+
+    return decorator
+
+
+def _get_variables_to_process(table: Table, metadata_variables: Optional[List[str]]) -> List[str]:
+    """Determine which variables to process for metadata export."""
+    if metadata_variables is None:
+        return list(table.columns)
+
+    variables_to_process = [var for var in metadata_variables if var in table.columns]
+    missing_vars = [var for var in metadata_variables if var not in table.columns]
+    if missing_vars:
+        log.warning(f"Warning: Variables {missing_vars} not found in table")
+
+    return variables_to_process
+
+
+def _extract_metadata_rows(metadata_obj, included_fields: set) -> List[List[str]]:
+    """Extract metadata rows from a metadata object, keeping only specified fields."""
+    rows = []
+
+    # Handle both dict and object with __dict__
+    items = metadata_obj.items() if isinstance(metadata_obj, dict) else metadata_obj.__dict__.items()
+
+    for key, value in items:
+        # Only include specified fields that have non-empty values
+        if key not in included_fields or value is None or value == "":
+            continue
+
+        # Get display name
+        display_name = GSHEET_EXPORT_CONFIG["FIELD_DISPLAY_NAMES"].get(key, key)
+
+        if isinstance(value, list):
+            # Handle special case for origins - extract attributes for each
+            if key == "origins":
+                origin_rows = []  # Collect all origin rows first
+
+                for origin in value:
+                    # Get origin identifier with proper type handling
+                    origin_identifier = None
+
+                    # Try attribution_short first
+                    if hasattr(origin, "attribution_short") and getattr(origin, "attribution_short", None):
+                        origin_identifier = origin.attribution_short
+                    elif isinstance(origin, dict) and origin.get("attribution_short"):
+                        origin_identifier = origin["attribution_short"]
+                    # Fall back to producer
+                    elif hasattr(origin, "producer") and getattr(origin, "producer", None):
+                        origin_identifier = getattr(origin, "producer")
+                    elif isinstance(origin, dict) and origin.get("producer"):
+                        origin_identifier = origin["producer"]
+
+                    # Create display name with identifier or use base name
+                    if origin_identifier:
+                        origin_display_name = f"{display_name} ({origin_identifier})"
+                    else:
+                        origin_display_name = display_name
+
+                    origin_rows.extend(_extract_origin_attributes(origin, origin_display_name))
+
+                # Deduplicate based on the formatted content (after extraction)
+                seen_formatted = set()
+                for row in origin_rows:
+                    # Use the formatted content (second column) as the deduplication key
+                    formatted_content = row[1] if len(row) > 1 else str(row)
+                    if formatted_content not in seen_formatted:
+                        seen_formatted.add(formatted_content)
+                        rows.append(row)
+            else:
+                # For other list fields, use the original formatting
+                formatted_value = _format_list_metadata(key, value)
+                rows.append([display_name, formatted_value])
+        elif isinstance(value, dict) and len(str(value)) > 100:
+            formatted_value = f"[{type(value).__name__}] {str(value)[:100]}..."
+            rows.append([display_name, formatted_value])
+        else:
+            formatted_value = str(value)
+            rows.append([display_name, formatted_value])
+
+    return rows
+
+
+def _extract_origin_attributes(origin, base_display_name: str) -> List[List[str]]:
+    """Extract individual attributes from an Origin object or list of Origin objects and format them."""
+    # Define the origin attributes we want to show and their display names
+    origin_field_mapping = {
+        "producer": "Producer",
+        "title": "Title",
+        "description": "Description",
+        "citation_full": "Citation",
+        "attribution_short": "Attribution",
+        "url_main": "Main URL",
+        "url_download": "Download URL",
+        "date_accessed": "Date accessed",
+        "date_published": "Date published",
+    }
+
+    def _process_single_origin(single_origin, origin_index=None):
+        """Process a single origin object and return formatted attributes."""
+        if isinstance(single_origin, dict):
+            items = single_origin.items()
+        else:
+            # For Origin objects, use __dict__ to get all attributes
+            items = single_origin.__dict__.items()
+
+        # Collect all attributes into a single formatted string
+        formatted_attributes = []
+
+        for attr_key, attr_value in items:
+            # Skip None, empty strings, and private attributes
+            if attr_value is None or attr_value == "" or attr_key.startswith("_"):
+                continue
+
+            if attr_key == "license":
+                # Handle License object specially
+                if hasattr(attr_value, "name") and attr_value.name:
+                    formatted_attributes.append(f"License: {attr_value.name}")
+                if hasattr(attr_value, "url") and attr_value.url:
+                    formatted_attributes.append(f"License URL: {attr_value.url}")
+            elif attr_key in origin_field_mapping:
+                attr_display_name = origin_field_mapping[attr_key]
+                # Convert to string and truncate very long descriptions
+                value_str = str(attr_value)
+                if len(value_str) > 500:  # Truncate very long descriptions for readability
+                    value_str = value_str[:500] + "..."
+                formatted_attributes.append(f"{attr_display_name}: {value_str}")
+
+        # Join all attributes with line breaks
+        formatted_value = "\n".join(formatted_attributes)
+
+        # Create display name for this origin
+        if origin_index is not None:
+            display_name = f"{base_display_name} #{origin_index + 1}"
+        else:
+            display_name = base_display_name
+
+        return [display_name, formatted_value]
+
+    # Handle the origins data structure correctly
+    if isinstance(origin, list):
+        # origin is a list of Origin objects - process each one
+        rows = []
+        for i, single_origin in enumerate(origin):
+            row = _process_single_origin(single_origin, i)
+            rows.append(row)
+        return rows
+    else:
+        # Single origin object (dict or Origin object)
+        row = _process_single_origin(origin)
+        return [row]
+
+
+def export_table_to_gsheet(
+    table: Table,
+    sheet_title: str,
+    update_existing: bool = True,
+    folder_id: Optional[str] = None,
+    role: Literal["reader", "commenter", "writer"] = "reader",
+    general_access: Literal["anyone", "domain", "user"] = "anyone",
+    include_metadata: bool = True,
+    metadata_variables: Optional[List[str]] = None,
+) -> Optional[tuple[str, str]]:
+    """Export a Table to Google Sheets with improved error handling and performance.
+
+    Returns
+    -------
+    tuple[str, str]
+        A tuple containing (sheet_url, sheet_id)
+
+    Raises
+    ------
+    RuntimeError
+        If the export fails or if CLIENT_SECRET_FILE is not available in dev environment
+    """
+    if not CLIENT_SECRET_FILE or not CLIENT_SECRET_FILE.exists() or OWID_ENV.env_local != "dev":
+        return "", ""
+
+    try:
+        # Sanitize sheet title
+        sheet_title = sheet_title.strip()[: GSHEET_EXPORT_CONFIG["MAX_TITLE_LENGTH"]]
+
+        # Convert and validate data
+        df = _prepare_dataframe(table)
+
+        # Create or update sheet
+        sheet = GoogleSheet.create_or_update_sheet(sheet_title, df, folder_id, update_existing)
+
+        # Write main data
+        sheet.write_dataframe(df)
+
+        # Add metadata if requested
+        if include_metadata:
+            _add_metadata_tabs(sheet, table, metadata_variables)
+
+        # Set permissions
+        _set_permissions(sheet.sheet_id, role, general_access)
+
+        return sheet.url, sheet.sheet_id
+
+    except Exception as e:
+        log.error(f"Failed to export table to Google Sheets: {e}")
+        raise RuntimeError(f"Failed to export table to Google Sheets: {e}")
+
+
+def _add_metadata_tabs(sheet: GoogleSheet, table: Table, metadata_variables: Optional[List[str]]) -> None:
+    """Add metadata tabs to the sheet."""
+
+    """Create metadata DataFrames for each variable in the table."""
+    metadata_dfs = {}
+
+    variables_to_process = _get_variables_to_process(table, metadata_variables)
+
+    for column_name in variables_to_process:
+        if not (hasattr(table[column_name], "metadata") and table[column_name].metadata):
+            continue
+
+        try:
+            metadata_rows = _extract_metadata_rows(
+                table[column_name].metadata, GSHEET_EXPORT_CONFIG["INCLUDED_METADATA_FIELDS"]
+            )
+
+            if metadata_rows:
+                # Create DataFrame with proper column headers
+                metadata_df = pd.DataFrame(metadata_rows, columns=["Property", "Value"])
+                metadata_dfs[f"metadata_{column_name}"] = metadata_df
+
+        except Exception as e:
+            log.warning(f"Warning: Could not process metadata for column '{column_name}': {e}")
+            continue
+    for sheet_name, metadata_df in metadata_dfs.items():
+        try:
+            sheet.write_dataframe(metadata_df, sheet_name=sheet_name)
+        except Exception as e:
+            log.warning(f"Note: Could not create metadata sheet '{sheet_name}': {e}")
+
+
+def _set_permissions(sheet_id: str, role: str, general_access: str) -> None:
+    """Set permissions for the sheet."""
+    drive = GoogleDrive()
+    drive.set_file_permissions(file_id=sheet_id, role=role, general_access=general_access)
+
+
+def get_team_folder_id() -> Optional[str]:
+    """Get the team folder ID for OWID ETL exports."""
+    # Use the shared folder ID if available
+    if OWID_SHARED_FOLDER_ID:
+        try:
+            # Verify the current user can access this folder
+            drive = GoogleDrive()
+            drive.drive_service.files().get(fileId=OWID_SHARED_FOLDER_ID).execute()
+            return OWID_SHARED_FOLDER_ID
+        except Exception as e:
+            log.warning(f"Warning: Cannot access shared folder {OWID_SHARED_FOLDER_ID}: {e}")
+
+    return None
+
+
+# def create_or_get_shared_folder(
+#    folder_name: str = "ETL GSheet Exports",
+#    parent_folder_id: Optional[str] = None,
+# ) -> Optional[str]:
+#    """Create or get a shared folder for storing multiple Google Sheets.
+#
+#    Parameters
+#    ----------
+#    folder_name : str
+#        Name of the folder to create or find
+#    parent_folder_id : Optional[str], optional
+#        Parent folder ID, by default None (creates in root)
+#
+#    Returns
+#    -------
+#    Optional[str]
+#        The folder ID, or None if creation failed
+#   """
+#    try:
+#        drive = GoogleDrive()
+#
+#        # Search for existing folder
+#        query = f"name='{folder_name}' and mimeType='application/vnd.google-apps.folder' and trashed=false"
+#        if parent_folder_id:
+#            query += f" and '{parent_folder_id}' in parents"
+#
+#        results = drive.drive_service.files().list(q=query).execute()
+#        files = results.get("files", [])
+#
+#        if files:
+#            folder_id = files[0]["id"]
+#            log.info(f"Using existing folder: {folder_name} (ID: {folder_id})")
+#            return folder_id
+#
+#        # Create new folder
+#        folder_metadata: Dict[str, Any] = {"name": folder_name, "mimeType": "application/vnd.google-apps.folder"}
+#
+#        if parent_folder_id:
+#            folder_metadata["parents"] = [parent_folder_id]
+#
+#        folder = drive.drive_service.files().create(body=folder_metadata, fields="id").execute()
+#        folder_id = folder.get("id")
+#
+#        if folder_id is None:
+#            log.error(f"Failed to create folder: {folder_name}")
+#            return None
+#
+#        # Set permissions for team access
+#        drive.set_file_permissions(file_id=folder_id, role="reader", general_access="anyone")
+#
+#        log.info(f"Created new folder: {folder_name} (ID: {folder_id})")
+#        log.info(f"Folder URL: https://drive.google.com/drive/folders/{folder_id}")
+#
+#        return folder_id
+#
+#    except HttpError as e:
+#        log.error(f"HTTP error occurred while creating/accessing folder '{folder_name}': {e}")
+#        return None
+#    except Exception as e:
+#        log.error(f"Unexpected error occurred while creating/accessing folder '{folder_name}': {e}")
+#        raise

@@ -8,15 +8,15 @@ meta:
       United Nations, Department of Economic and Social Affairs, Population Division (1968-2019). World Population Prospects 1968-2019, archive
     attribution: UN, World Population Prospects (1968-2019)
     attribution_short: UN WPP
-    url_main: https://population.un.org/wpp/Download/Archive/Standard/
+    url_main: https://population.un.org/wpp/downloads?folder=Archive&group=Standard%20Projections
     url_download: |-
       https://docs.google.com/spreadsheets/d/e/2PACX-1vTrmu10dRJqFyl6fP95CLFfhJbm4yut09HXIin1Eg66WFVHoq1eNEdsmRL626V8TZONCtjt7Z4vC0RJ/pub?output=csv
-    date_accessed: '2024-07-12'
+    date_accessed: "2024-07-12"
     license:
       name: CC BY 3.0 IGO
       url: http://creativecommons.org/licenses/by/3.0/igo/
   name: Historical World Population Prospects
-  description: ''
+  description: ""
   license: {}
 outs:
   - md5: ba29a58ec015fd3048b4a4ecf57033e5

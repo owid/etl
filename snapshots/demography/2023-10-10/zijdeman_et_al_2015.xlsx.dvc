@@ -21,8 +21,8 @@ meta:
         - Kannisto, V., Nieminen, M. & Turpeinen, O. (1999). Finnish Life Tables since 1751, Demographic Research, 1(1), DOI: 10.4054/DemRes.1999.1.1
 
         For specifics concerning (selections of) the sources, see the R code available in the working paper [here](https://clio-infra.eu/Indicators/LifeExpectancyatBirthTotal.html).
-    date_published: 2014-07-26
-    version_producer: 2
+    date_published: '2014-07-26'
+    version_producer: v2
 
     # Citation
     producer: Zijdeman et al.
@@ -32,15 +32,14 @@ meta:
     # Files
     url_main: https://clio-infra.eu/Indicators/LifeExpectancyatBirthTotal.html
     url_download: https://clio-infra.eu/data/LifeExpectancyatBirth(Total)_Broad.xlsx
-    date_accessed: 2023-10-10
+    date_accessed: '2023-10-10'
 
     # License
     license:
       name: CC0 1.0 Universal
       url: https://datasets.iisg.amsterdam/dataset.xhtml?persistentId=hdl:10622/LKYT53
-
 wdir: ../../../data/snapshots/demography/2023-10-10
 outs:
-  - md5: 2f07837592cb3be6da56647b63b9a831
-    size: 557461
+  - md5: 0fb0818b009069caab5c3ed34d6aa972
+    size: 557460
     path: zijdeman_et_al_2015.xlsx

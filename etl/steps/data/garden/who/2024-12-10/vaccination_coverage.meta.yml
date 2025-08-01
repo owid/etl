@@ -118,7 +118,7 @@ definitions:
     <%- elif antigen == "IPV2" %>
     who have not had two doses of the inactivated polio vaccine
     <%- elif antigen == "MCV2X2" %>
-    who have not had two doses of of the measles vaccine
+    who have not had two doses of the measles vaccine
     <%- elif antigen == "YFV" %>
     who have not had the yellow fever vaccine
     <%- elif antigen == "MENA_C" %>
@@ -166,11 +166,11 @@ definitions:
     <% elif antigen == "BCG" %>
     The WHO recommends BCG vaccination at birth for all newborns in countries or settings with a high incidence of TB and/or high leprosy burden. Countries with low TB incidence or leprosy burden may choose to selectively vaccinate newborns in high-risk groups.
     <%- elif antigen == "RCV1" %>
-    Rubella coverage estimates are based on WHO and UNICEF data for the first dose of the measles-rubella vaccine, as the WHO recommends this combined vaccine.
+    Rubella coverage estimates are based on WHO and UNICEF data for the first dose of the measles-rubella (MR) vaccine, which is recommended by the WHO.
     <%- elif antigen == "HEPB_BD" %>
     WHO and UNICEF only estimate coverage of the hepatitis B birth dose (a vaccine given within 24 hours of birth) for countries with a policy to provide this dose for all newborns. They don’t produce estimates for countries that only recommend this dose for babies born to mothers infected with hepatitis B, or for countries where there isn’t enough information to know whether the vaccine is given within 24 hours of birth.
     <%- elif antigen == "PCV3" %>
-    In some countries the vaccine schedule may recommend two doses in before the age of one and a booster at a later date. These later vaccine schedules are also counted under this variable.
+    In some countries, the vaccine schedule may recommend two doses before the age of one, followed by a booster at a later date. These later doses are also included in this variable.
     <%- elif antigen == "IPV1" %>
     In countries where both types of polio vaccine are used — IPV (inactivated polio vaccine, given as an injection) and OPV (oral polio vaccine, given as drops) — WHO and UNICEF count any baby under 1 year old who received at least one routine dose of IPV in their estimate of “first dose” coverage (meaning the first dose of IPV). In countries that only use IPV, “first dose” simply refers to the first IPV dose given.
     <%- endif %>

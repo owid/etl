@@ -205,7 +205,6 @@ steps:
   data://grapher/cardiovascular_diseases/2023-11-01/deaths_from_cardiovascular_diseases_vs_other:
     - data://garden/cardiovascular_diseases/2023-11-01/deaths_from_cardiovascular_diseases_vs_other
 
-
   # Global Health Observatory (GHO) from WHO
   data://meadow/who/2024-01-03/gho:
     - snapshot://who/2024-01-03/gho.zip
@@ -777,15 +776,6 @@ steps:
   data-private://grapher/antibiotics/2024-12-05/microbe_total_deaths_by_syndrome_amr:
     - data-private://garden/antibiotics/2024-12-05/microbe_total_deaths_by_syndrome_amr
 
-  # WHO Immunization coverage
-  data://meadow/who/2024-12-10/vaccination_coverage:
-    - snapshot://who/2024-12-10/vaccination_coverage.xlsx
-  data://garden/who/2024-12-10/vaccination_coverage:
-    - data://meadow/who/2024-12-10/vaccination_coverage
-    - data://garden/un/2024-07-12/un_wpp
-  data://grapher/who/2024-12-10/vaccination_coverage:
-    - data://garden/who/2024-12-10/vaccination_coverage
-
   #
   # Human height
   #
@@ -797,16 +787,7 @@ steps:
     - data://garden/health/2024-12-31/height
 
   #
-  # WHO Vaccine Introductions
-  #
-  data://meadow/who/2025-01-09/vaccination_introductions:
-    - snapshot://who/2025-01-09/vaccination_introductions.xlsx
-  data://garden/who/2025-01-09/vaccination_introductions:
-    - data://meadow/who/2025-01-09/vaccination_introductions
-  data://grapher/who/2025-01-09/vaccination_introductions:
-    - data://garden/who/2025-01-09/vaccination_introductions
 
-  #
   # WHO vaccine stock out
   #
   data://meadow/who/2025-01-17/vaccine_stock_out:
@@ -1044,9 +1025,9 @@ steps:
 
   # Multi-dim indicators - vaccination coverage
   export://multidim/health/latest/vaccination_coverage:
-    - data://grapher/who/2024-12-10/vaccination_coverage
+    - data://grapher/who/2025-07-15/vaccination_coverage
   export://multidim/health/latest/vaccination_introductions:
-    - data://grapher/who/2025-01-09/vaccination_introductions
+    - data://grapher/who/2025-07-15/vaccination_introductions
 
   # US Pertussis cases - CDC
   #
@@ -1255,6 +1236,7 @@ steps:
     - data://garden/wb/2025-07-01/income_groups
   data://grapher/tuberculosis/2025-06-16/drug_resistance_surveillance:
     - data://garden/tuberculosis/2025-06-16/drug_resistance_surveillance
+
   # Tuberculosis budget - WHO
   data://meadow/tuberculosis/2025-06-16/budget:
     - snapshot://tuberculosis/2025-06-16/budget.csv
@@ -1277,3 +1259,35 @@ steps:
     - data://garden/wb/2025-07-01/income_groups
   data://grapher/tuberculosis/2025-06-16/laboratories:
     - data://garden/tuberculosis/2025-06-16/laboratories
+
+  # Drug approvals - FDA (CDER Approvals & Purple Book (CBER Approvals))
+  data://garden/health/2025-07-16/drug_approvals:
+    - data://meadow/health/2025-07-16/cder_approvals
+    - data://meadow/health/2025-07-16/purple_book
+  data://grapher/health/2025-07-16/drug_approvals:
+    - data://garden/health/2025-07-16/drug_approvals
+  data://meadow/health/2025-07-16/cder_approvals:
+    - snapshot://fda/2025-07-16/cder_approvals.csv
+
+  data://meadow/health/2025-07-16/purple_book:
+    - snapshot://fda/2025-07-16/purple_book.csv
+
+  # WHO Immunization coverage
+  data://meadow/who/2025-07-15/vaccination_coverage:
+    - snapshot://who/2025-07-15/vaccination_coverage.xlsx
+  data://garden/who/2025-07-15/vaccination_coverage:
+    - data://garden/un/2024-07-12/un_wpp
+    - data://garden/wb/2025-07-01/income_groups
+    - data://garden/regions/2023-01-01/regions
+    - data://meadow/who/2025-07-15/vaccination_coverage
+    - data://garden/demography/2024-07-15/population
+  data://grapher/who/2025-07-15/vaccination_coverage:
+    - data://garden/who/2025-07-15/vaccination_coverage
+    
+  # WHO Vaccine Introductions
+  data://meadow/who/2025-07-15/vaccination_introductions:
+    - snapshot://who/2025-07-15/vaccination_introductions.xlsx
+  data://garden/who/2025-07-15/vaccination_introductions:
+    - data://meadow/who/2025-07-15/vaccination_introductions
+  data://grapher/who/2025-07-15/vaccination_introductions:
+    - data://garden/who/2025-07-15/vaccination_introductions

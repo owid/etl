@@ -269,7 +269,7 @@ views:
             colorScaleNumericBins: 0.5;1;2;5;10;20
             colorScaleScheme: PuBu
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       crop: bananas
       metric: actual_yield
@@ -280,7 +280,7 @@ views:
             colorScaleNumericBins: 10;20;30;40;50;60;70
             colorScaleScheme: PuBu
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       crop: barley
       metric: actual_yield
@@ -291,7 +291,7 @@ views:
             colorScaleNumericBins: 1;2;3;4;5;6;7;8
             colorScaleScheme: PuBu
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       crop: barley
       metric: attainable_yield
@@ -314,7 +314,7 @@ views:
             colorScaleNumericBins: 1,,;2,,;3,,;4,,;5,,;6,,
             colorScaleScheme: YlOrRd
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
       note: *attainable_yield_footnote
   - dimensions:
       crop: beans
@@ -326,7 +326,7 @@ views:
             colorScaleNumericBins: 0.5;1;1.5;2;2.5;3;3.5;4
             colorScaleScheme: PuBu
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       crop: cassava
       metric: attainable_yield
@@ -349,7 +349,7 @@ views:
             colorScaleNumericBins: 5;10;15;20;25;30;35;40
             colorScaleScheme: PuBu
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       crop: cassava
       metric: yield_gap
@@ -360,7 +360,7 @@ views:
             colorScaleNumericBins: 1,,;2,,;4,,;6,,;8,,;10,,;15,,
             colorScaleScheme: Oranges
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
       note: *attainable_yield_footnote
   - dimensions:
       crop: cereals
@@ -372,7 +372,7 @@ views:
             colorScaleNumericBins: 1;2;3;4;5;6;7;8;9;10
             colorScaleScheme: PuBu
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       crop: cocoa_beans
       metric: actual_yield
@@ -383,7 +383,7 @@ views:
             colorScaleNumericBins: 0.1;0.2;0.5;1;2;5
             colorScaleScheme: PuBu
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       crop: coffee_beans
       metric: actual_yield
@@ -394,7 +394,7 @@ views:
             colorScaleNumericBins: 0.4;0.8;1.2;1.6;2;2.4;2.8
             colorScaleScheme: PuBu
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       crop: corn__maize
       metric: attainable_yield
@@ -417,7 +417,7 @@ views:
             colorScaleNumericBins: 1;2;5;10;20;50
             colorScaleScheme: PuBu
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       crop: corn__maize
       metric: yield_gap
@@ -428,7 +428,7 @@ views:
             colorScaleNumericBins: 1,,;2,,;3,,;4,,;5,,;6,,;8,,;10,,
             colorScaleScheme: YlOrRd
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
       note: *attainable_yield_footnote
   - dimensions:
       crop: cotton
@@ -452,7 +452,7 @@ views:
             colorScaleNumericBins: 0.5;1;2;5;10
             colorScaleScheme: PuBu
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       crop: cotton
       metric: yield_gap
@@ -463,7 +463,7 @@ views:
             colorScaleNumericBins: 1,,;2,,;3,,;4,,;5,,;6,,
             colorScaleScheme: Purples
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
       note: *attainable_yield_footnote
   - dimensions:
       crop: groundnut
@@ -487,7 +487,7 @@ views:
             colorScaleNumericBins: 0.2;0.5;1;2;5;10
             colorScaleScheme: PuBu
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       crop: groundnut
       metric: yield_gap
@@ -498,7 +498,7 @@ views:
             colorScaleNumericBins: 1,,;2,,;3,,;4,,;5,,;6,,
             colorScaleScheme: YlOrBr
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
       note: *attainable_yield_footnote
   - dimensions:
       crop: lettuce
@@ -510,7 +510,7 @@ views:
             colorScaleNumericBins: 5;10;15;20;25;30;35;40
             colorScaleScheme: PuBu
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       crop: millet
       metric: attainable_yield
@@ -533,7 +533,7 @@ views:
             colorScaleNumericBins: 0.5;1;2;5;10;20
             colorScaleScheme: PuBu
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       crop: millet
       metric: yield_gap
@@ -544,7 +544,7 @@ views:
             colorScaleNumericBins: 0.5,,;1,,;2,,;3,,;4,,
             colorScaleScheme: YlOrBr
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
       note: *attainable_yield_footnote
   - dimensions:
       crop: oats
@@ -557,7 +557,7 @@ views:
             colorScaleNumericBins: 1;2;3;4;5;6;7
             colorScaleScheme: PuBu
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       crop: oil_palm
       metric: attainable_yield
@@ -580,7 +580,7 @@ views:
             colorScaleNumericBins: 4;8;12;16;20
             colorScaleScheme: PuBu
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       crop: oil_palm
       metric: yield_gap
@@ -591,7 +591,7 @@ views:
             colorScaleNumericBins: 5,,;10,,;15,,;20,,;25,,
             colorScaleScheme: OrRd
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
       note: *attainable_yield_footnote
   - dimensions:
       crop: oranges
@@ -603,7 +603,7 @@ views:
             colorScaleNumericBins: 10;20;30;40;50;60
             colorScaleScheme: PuBu
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       crop: peas
       metric: actual_yield
@@ -614,7 +614,7 @@ views:
             colorScaleNumericBins: 0.5;1;1.5;2;2.5;3;3.5;4
             colorScaleScheme: PuBu
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       crop: potato
       metric: attainable_yield
@@ -637,7 +637,7 @@ views:
             colorScaleNumericBins: 5;10;15;20;25;30;35;40;45;50
             colorScaleScheme: PuBu
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       crop: potato
       metric: yield_gap
@@ -648,7 +648,7 @@ views:
             colorScaleNumericBins: 5,,;10,,;15,,;20,,;25,,;30,,
             colorScaleScheme: PuRd
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
       note: *attainable_yield_footnote
   - dimensions:
       crop: rapeseed
@@ -672,7 +672,7 @@ views:
             colorScaleNumericBins: 1;1.5;2;2.5;3;3.5;4
             colorScaleScheme: PuBu
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       crop: rapeseed
       metric: yield_gap
@@ -683,7 +683,7 @@ views:
             colorScaleNumericBins: 0.5,,;1,,;2,,;3,,;4,,
             colorScaleScheme: Oranges
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
       note: *attainable_yield_footnote
   - dimensions:
       crop: rice
@@ -707,7 +707,7 @@ views:
             colorScaleNumericBins: 2;4;6;8;10;12
             colorScaleScheme: PuBu
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       crop: rice
       metric: yield_gap
@@ -718,7 +718,7 @@ views:
             colorScaleNumericBins: 1,,;2,,;4,,;6,,;8,,;10,,
             colorScaleScheme: Reds
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
       note: *attainable_yield_footnote
   - dimensions:
       crop: rye
@@ -742,7 +742,7 @@ views:
             colorScaleNumericBins: 1;2;3;4;5;6
             colorScaleScheme: PuBu
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       crop: rye
       metric: yield_gap
@@ -753,7 +753,7 @@ views:
             colorScaleNumericBins: 1,,;2,,;3,,;4,,;5,,;6,,
             colorScaleScheme: OrRd
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
       note: *attainable_yield_footnote
   - dimensions:
       crop: sorghum
@@ -777,7 +777,7 @@ views:
             colorScaleNumericBins: 0.5;1;1.5;2;2.5;3;3.5;4;4.5;5;5.5
             colorScaleScheme: PuBu
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       crop: sorghum
       metric: yield_gap
@@ -788,7 +788,7 @@ views:
             colorScaleNumericBins: 1,,;2,,;3,,;4,,;5,,;6,,
             colorScaleScheme: PuRd
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
       note: *attainable_yield_footnote
   - dimensions:
       crop: soybean
@@ -812,7 +812,7 @@ views:
             colorScaleNumericBins: 0.5;1;1.5;2;2.5;3;3.5;4
             colorScaleScheme: PuBu
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       crop: soybean
       metric: yield_gap
@@ -823,7 +823,7 @@ views:
             colorScaleNumericBins: 0.5,,;1,,;2,,;3,,;4,,
             colorScaleScheme: PuBuGn
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
       note: *attainable_yield_footnote
   - dimensions:
       crop: sugar_beet
@@ -847,7 +847,7 @@ views:
             colorScaleNumericBins: 20;40;60;80;100
             colorScaleScheme: PuBu
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       crop: sugar_beet
       metric: yield_gap
@@ -858,7 +858,7 @@ views:
             colorScaleNumericBins: 10,,;20,,;30,,;40,,;50,,;60,,;70,,
             colorScaleScheme: Oranges
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
       note: *attainable_yield_footnote
   - dimensions:
       crop: sugar_cane
@@ -882,7 +882,7 @@ views:
             colorScaleNumericBins: 20;40;60;80;100;120
             colorScaleScheme: PuBu
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       crop: sugar_cane
       metric: yield_gap
@@ -893,7 +893,7 @@ views:
             colorScaleNumericBins: 10,,;20,,;30,,;40,,;50,,;60,,;70,,
             colorScaleScheme: Oranges
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
       note: *attainable_yield_footnote
   - dimensions:
       crop: sunflower_seed
@@ -917,7 +917,7 @@ views:
             colorScaleNumericBins: 0.5;1;1.5;2;2.5;3;3.5
             colorScaleScheme: PuBu
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       crop: sunflower_seed
       metric: yield_gap
@@ -928,7 +928,7 @@ views:
             colorScaleNumericBins: 0.5,,;1,,;2,,;3,,;4,,
             colorScaleScheme: YlOrRd
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
       note: *attainable_yield_footnote
   - dimensions:
       crop: tomato
@@ -940,7 +940,7 @@ views:
             colorScaleNumericBins: 10;20;50;100;200;500
             colorScaleScheme: PuBu
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       crop: wheat
       metric: attainable_yield
@@ -963,7 +963,7 @@ views:
             colorScaleNumericBins: 1;2;3;4;5;6;7;8
             colorScaleScheme: PuBu
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
       tab: 'map'
       defaultView: 'true'
   - dimensions:
@@ -976,7 +976,7 @@ views:
             colorScaleNumericBins: 1,,;2,,;3,,;4,,;5,,;6,,
             colorScaleScheme: OrRd
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
       note: *attainable_yield_footnote
   - dimensions:
       crop: chickpeas

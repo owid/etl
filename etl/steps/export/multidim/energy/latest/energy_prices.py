@@ -176,7 +176,7 @@ def run() -> None:
     # Define common view configuration
     common_view_config = {
         "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.005.json",
-        "chartTypes": ["LineChart"],
+        "chartTypes": ["LineChart", "DiscreteBar"],
         "hasMapTab": True,
         "tab": "map",
         "map": {
