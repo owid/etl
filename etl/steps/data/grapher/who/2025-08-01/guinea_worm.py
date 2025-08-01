@@ -49,7 +49,7 @@ def run(dest_dir: str) -> None:
     tb = ds_garden["guinea_worm"].reset_index()
 
     # remove certified year for all years except the current year
-    tb = remove_certified_year(tb, 2023)
+    tb = remove_certified_year(tb, CURRENT_YEAR)
 
     # split "year_certified" in two columns:
     # - time_frame_certified: time frame in which country was certified as disease free (with status messages, Category type)
