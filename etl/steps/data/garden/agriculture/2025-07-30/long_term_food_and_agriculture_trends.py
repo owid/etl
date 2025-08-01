@@ -81,9 +81,10 @@ COUNTRIES_EXPECTED_TO_MISS_DATA = {
 # Expected list of additional countries that will be excluded from region aggregates due to limited data coverage.
 OTHER_COUNTRIES_EXCLUDED_FROM_AGGREGATES = [
     "Bahrain",
+    "Bermuda",
     "Bhutan",
-    "Burundi",
     "Brunei",
+    "Burundi",
     "Comoros",
     "Democratic Republic of Congo",
     "Libya",
@@ -91,6 +92,9 @@ OTHER_COUNTRIES_EXCLUDED_FROM_AGGREGATES = [
     "Melanesia",
     "Micronesia (country)",
     "Nauru",
+    "Netherlands Antilles",
+    "North Korea",
+    "Oman",
     "Papua New Guinea",
     "Polynesia",
     "Qatar",
@@ -148,16 +152,14 @@ def create_corrected_lists_of_region_members(tb, tb_regions):
     # for column in ["population", "agricultural_land", "food_supply"]:
     #     px.line(pr.concat([tb_ussr, tb_ussr_corrected], ignore_index=True), x="year", y=column, markers=True, color="country", range_y=[0, None]).show()
     regions["Europe (corrected)"] = sorted(set(regions["Europe (corrected)"]) - set(["Turkmenistan"]))
-    ####################################################################################################################
 
     # For "Asia (corrected)", add all Asian countries, and remove USSR Asia successors (which are kept in Europe).
     # NOTE: The issue with Turkmenistan mentioned above is irrelevant here, since we remove all USSR Asian successors anyway.
     # Additional issues in FBS: in 2010, data for Brunei is removed (unclear why), and data for Syria is added. Overall, this causes a small increase in Asia's population. Then, in 2019 (unclear why precisely this year), 3 countries are added to the data, namely Bahrain, Qatar, and Bhutan; but this jump is not significant (as they don't make a significant fraction of the Asian population).
-    assert tb[tb["country"].isin(["Brunei"])]["year"].max() == 2009
-    assert tb[tb["country"].isin(["Syria"])]["year"].min() == 2010
-    assert tb[tb["country"].isin(["Bahrain", "Qatar", "Bhutan"])]["year"].min() == 2019
     regions["Asia (corrected)"] = sorted(
-        set(regions["Asia"]) - set(regions["USSR Asia"]) - set(["Bahrain", "Bhutan", "Brunei", "Qatar", "Syria"])
+        set(regions["Asia"])
+        - set(regions["USSR Asia"])
+        - set(["Bahrain", "Bhutan", "Brunei", "North Korea", "Oman", "Qatar", "Syria"])
     )
 
     # For "Oceania (corrected", remove all countries that are added after 2010 (namely Papua New Guinea, and other small islands that are added in 2019 to food supply data).
@@ -193,6 +195,7 @@ def create_corrected_lists_of_region_members(tb, tb_regions):
                 "Libya",
                 "Seychelles",
                 "Somalia",
+                # We exclude Sudan (former), Sudan and South Sudan because the latter is only informed from 2019 on.
                 "Sudan",
                 "South Sudan",
                 "Sudan (former)",
@@ -200,17 +203,100 @@ def create_corrected_lists_of_region_members(tb, tb_regions):
         )
     )
 
-    # North and South America don't need any corrections.
-    # We include them here for convenience.
-    regions["North America (corrected)"] = regions["North America"]
+    # For "North America (corrected)":
+    regions["North America (corrected)"] = sorted(set(regions["North America"]) - {"Bermuda", "Netherlands Antilles"})
+
+    # South America doesn't need any corrections, but we include it here for convenience.
     regions["South America (corrected)"] = regions["South America"]
 
     # For each of the defined regions, remove countries that are not included in the data.
     countries_informed = set(tb["country"])
     for region in regions:
-        regions[region] = set(regions[region]) & set(countries_informed)
+        regions[region] = sorted(set(regions[region]) & set(countries_informed))
 
     return regions
+
+
+def sanity_check_data_coverage(tb, regions):
+    # Check if there are other countries that may have data coverage issues.
+    min_year = tb["year"].min()
+    max_year = tb["year"].max()
+    countries_expected_coverage = {
+        # Changes in historical regions in Europe.
+        "USSR": (min_year, 1991),
+        "Yugoslavia": (min_year, 1991),
+        "Bosnia and Herzegovina": (1992, max_year),
+        "Croatia": (1992, max_year),
+        "North Macedonia": (1992, max_year),
+        "Slovenia": (1992, max_year),
+        "Czechoslovakia": (min_year, 1992),
+        "Czechia": (1993, max_year),
+        "Slovakia": (1993, max_year),
+        "Serbia and Montenegro": (1992, 2005),
+        "Serbia": (2006, max_year),
+        "Montenegro": (2006, max_year),
+        # Additional changes in Europe's data (not related to historical regions).
+        "Belgium-Luxembourg (FAO)": (min_year, 1999),
+        "Belgium": (2000, max_year),
+        "Luxembourg": (2000, max_year),
+        # Changes in historical regions in Africa.
+        "Ethiopia (former)": (min_year, 1992),
+        "Ethiopia": (1993, max_year),
+        "Sudan (former)": (1961, 2011),
+        "Sudan": (2012, max_year),
+        # NOTE: One would expect South Sudan to start in 2012, but it starts in 2019.
+        # Changes in historical regions in North America.
+        # NOTE: Successors of Netherlands Antilles are not informed in the data, hence we exclude it from North America (corrected).
+        "Netherlands Antilles": (min_year, 2009),
+        # Changes in data coverage in Africa.
+        "Seychelles": (2010, max_year),
+        "South Sudan": (2019, max_year),
+        "Democratic Republic of Congo": (2010, max_year),
+        "Comoros": (2010, max_year),
+        "Somalia": (2010, max_year),
+        "Burundi": (2010, max_year),
+        "Libya": (2010, max_year),
+        # Changes in data coverage in Asia.
+        "Brunei": (min_year, 2009),
+        "Syria": (2010, max_year),
+        "Bahrain": (2019, max_year),
+        "Bhutan": (2019, max_year),
+        "Qatar": (2019, max_year),
+        "Oman": (1990, 2021),
+        "North Korea": (min_year, 2018),
+        # Changes in data coverage in North America.
+        "Bermuda": (min_year, 2009),
+        # Changes in data coverage in Oceania.
+        "Marshall Islands": (2019, max_year),
+        "Tonga": (2019, max_year),
+        "Tuvalu": (2019, max_year),
+        "Nauru": (2019, max_year),
+        "Micronesia (country)": (2019, max_year),
+        "Papua New Guinea": (2010, max_year),
+    }
+    # Add USSR successors.
+    countries_expected_coverage.update({country: (1992, max_year) for country in regions["USSR"]})
+    # Add all other countries.
+    remaining_informed_countries = set(
+        tb[
+            tb["country"].isin(
+                regions["Europe"]
+                + regions["Asia"]
+                + regions["Africa"]
+                + regions["North America"]
+                + regions["South America"]
+                + regions["Oceania"]
+            )
+        ]["country"]
+    ) - set(countries_expected_coverage)
+    countries_expected_coverage.update({country: (min_year, max_year) for country in remaining_informed_countries})
+    # Check that the data coverages is as expected.
+    for country, (range_min, range_max) in countries_expected_coverage.items():
+        error = f"Unexpected data coverage for {country}: ({tb[tb['country'] == country]['year'].min()}, {tb[tb['country'] == country]['year'].max()})"
+        assert set(tb[tb["country"] == country]["year"]) == set(range(range_min, range_max + 1)), error
+        # Uncomment for debugging.
+        # if not set(tb[tb["country"] == country]["year"]) == set(range(range_min, range_max + 1)):
+        #     print(f"'{country}': ({tb[tb['country'] == country]['year'].min()}, {tb[tb['country'] == country]['year'].max()}),")
 
 
 def additional_debugging_checks():
@@ -398,6 +484,8 @@ def run() -> None:
     # However, we still have the problem that the series may have abrupt jumps, due to changes in historical regions, and also due to countries being removed or added to the data at different times.
     # Here we fix some of those issues.
     regions = create_corrected_lists_of_region_members(tb=tb, tb_regions=tb_regions)
+
+    sanity_check_data_coverage(tb=tb, regions=regions)
 
     # Add new definitions of continents, corrected for changes in historical regions and changes in data coverage.
     tables_corrected = [
