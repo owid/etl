@@ -130,7 +130,11 @@ def add_year_certified(tb: Table, tb_time_series: Table) -> Table:
                 tb_time_series["country"] == cntry, "certification_status"
             ]
         else:
-            year_certified = int(year_certified)
+            if pd.notna(year_certified) and str(year_certified).isdigit():
+                year_certified = int(year_certified)
+            else:
+                # Handle non-convertible values appropriately
+                year_certified = None
             # years after certification should have the year of certification
             tb_time_series.loc[
                 (tb_time_series["country"] == cntry) & (tb_time_series["year"] >= year_certified),
