@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Feenstra et al. (2015), Penn World Table 10.0
+    description: |-
+      National Accounts data in current and constant national prices and exchange rate and population data for Penn World Table.
+    url: https://www.rug.nl/ggdc/productivity/pwt
+    source_data_url: https://www.rug.nl/ggdc/docs/pwt100-na-data.xlsx
+    publication_date: '2021-06-18'
+    publication_year: 2021
+  name: Penn World Table 10.0 - National Accounts
+  description: |-
+    National Accounts data in current and constant national prices and exchange rate and population data for Penn World Table.
+  license:
+    name: Creative Commons BY 4.0
+    url: https://www.rug.nl/ggdc/productivity/pwt
