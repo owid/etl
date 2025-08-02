@@ -13,7 +13,9 @@ paths = PathFinder(__file__)
 
 ID_COLUMNS = ["country", "year"]
 
-QUALIFIED_TEACHER_PATTERN = r"percentage_of_qualified_teachers_in_(pre_primary|primary|lower_secondary|upper_secondary)_education__both_sexes"
+QUALIFIED_TEACHER_PATTERN = (
+    r"percentage_of_qualified_teachers_in_(pre_primary|primary|lower_secondary|upper_secondary)_education__both_sexes"
+)
 TRAINED_TEACHER_PATTERN = r"^(se_pre_tcaq_zs|se_prm_tcaq_zs|se_sec_tcaq_lo_zs|se_sec_tcaq_up_zs)$"
 
 # Main chart configuration
@@ -98,7 +100,6 @@ def run() -> None:
         tb = ds.read(dataset_name, load_data=False)
 
         teacher_cols = get_teacher_columns(tb, dataset_name)
-        print(teacher_cols)
         if teacher_cols:
             tb = tb.loc[:, ID_COLUMNS + teacher_cols].copy()
             tb = adjust_dimensions(tb, dataset_name)
