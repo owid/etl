@@ -7,6 +7,7 @@ from etl.helpers import PathFinder
 paths = PathFinder(__file__)
 
 # Define PPP year
+# NOTE: Update year when prices change
 PPP_YEAR = 2021
 
 # NOTE: Update lines when prices change
