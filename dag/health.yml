@@ -112,17 +112,24 @@ steps:
   data://grapher/unicef/2023-06-16/diarrhea:
     - data://garden/unicef/2023-06-16/diarrhea
 
-  # Guinea worm
+  # Guinea worm - historical estimates
   data://meadow/who/2023-06-29/guinea_worm_certification:
     - snapshot://who/2023-06-29/guinea_worm.csv
   data://garden/who/2023-06-29/guinea_worm_certification:
     - data://meadow/who/2023-06-29/guinea_worm_certification
 
+  # Guinea worm - to archive
   data://garden/who/2024-06-17/guinea_worm:
     - data://garden/who/2023-06-29/guinea_worm_certification
     - snapshot://fasttrack/2024-06-17/guinea_worm.csv
   data://grapher/who/2024-06-17/guinea_worm:
     - data://garden/who/2024-06-17/guinea_worm
+  # Guinea worm - to update
+  #data://garden/who/2025-04-16/guinea_worm:
+  #  - data://garden/who/2023-06-29/guinea_worm_certification
+  #  - snapshot://fasttrack/2024-06-17/guinea_worm.csv
+  #data://grapher/who/2025-04-16/guinea_worm:
+  #  - data://garden/who/2025-04-16/guinea_worm
 
   # Autopsies WHO-Europe
   data://meadow/who/2023-07-13/autopsy:
@@ -201,7 +208,7 @@ steps:
 
   # WHO Cardiovascular diseases deaths
   data://garden/cardiovascular_diseases/2023-11-01/deaths_from_cardiovascular_diseases_vs_other:
-    - data://garden/who/2024-07-26/mortality_database
+    - data://garden/who/2025-04-17/mortality_database
   data://grapher/cardiovascular_diseases/2023-11-01/deaths_from_cardiovascular_diseases_vs_other:
     - data://garden/cardiovascular_diseases/2023-11-01/deaths_from_cardiovascular_diseases_vs_other
 
@@ -466,7 +473,7 @@ steps:
   data://garden/maternal_mortality/2024-07-08/maternal_mortality:
     - data://garden/gapminder/2024-07-08/maternal_mortality
     - data://garden/un/2024-07-08/maternal_mortality
-    - data://garden/who/2024-07-26/mortality_database
+    - data://garden/who/2025-04-17/mortality_database
     - data://garden/regions/2023-01-01/regions
     - data://garden/wb/2025-07-01/income_groups
     - data://garden/un/2024-07-12/un_wpp
@@ -474,7 +481,15 @@ steps:
   data://grapher/maternal_mortality/2024-07-08/maternal_mortality:
     - data://garden/maternal_mortality/2024-07-08/maternal_mortality
 
-  # WHO Mortality Database
+  # WHO Mortality Database - update
+  data://meadow/who/2025-04-17/mortality_database:
+    - snapshot://who/2025-04-17/mortality_database.feather
+  data://garden/who/2025-04-17/mortality_database:
+    - data://meadow/who/2025-04-17/mortality_database
+  data://grapher/who/2025-04-17/mortality_database:
+    - data://garden/who/2025-04-17/mortality_database
+
+  # WHO Mortality Database - to archive
   data://meadow/who/2024-07-26/mortality_database:
     - snapshot://who/2024-07-26/mortality_database.feather
   data://garden/who/2024-07-26/mortality_database:
