@@ -259,6 +259,21 @@ definitions:
         baseColorScheme: Purples
 
   # ============================================================================
+  # QUALIFIED TEACHERS CONFIGURATIONS
+  # ============================================================================
+
+  qualified_teachers_bins: &qualified_teachers_bins [10,20,30,40,50,60,70,80,90,100]
+
+  grapher_config_qualified_teachers: &grapher_config_qualified_teachers
+    <<: *common_grapher_config
+    map:
+      <<: *common_grapher_map_config
+      colorScale:
+        binningStrategy: manual
+        customNumericValues: *qualified_teachers_bins
+        baseColorScheme: YlOrRd
+
+  # ============================================================================
   # DESCRIPTION TEMPLATES
   # ============================================================================
   desc_key_govt_expenditure_constant_ppp_per_student: &desc_key_govt_expenditure_constant_ppp_per_student
@@ -321,6 +336,15 @@ definitions:
     - Estimates for all children adjust for school completion and enrolment, offering a full population-level view — including those who dropped out or were never enrolled.
     - Estimates for students reflect outcomes only among those still in school at the end of the education cycle.
     - Data comes from international assessments such as [TIMSS, PIRLS](https://timssandpirls.bc.edu/), or [PISA](https://www.oecd.org/en/about/programmes/pisa.html), combined with completion and enrolment data from surveys or statistical models.
+
+  desc_key_qualified_teachers: &desc_key_qualified_teachers
+    - Academically qualified teachers are essential for quality education delivery — this indicator shows what percentage of teachers at each education level have at least the minimum academic qualifications required for teaching their subjects.
+    - It measures the proportion of teachers who have at least the minimum academic qualifications required for teaching their subjects at the relevant level according to national standards.
+    - The indicator is calculated by dividing the number of qualified teachers at a given education level by the total number of teachers at that same level, multiplied by 100.
+    - A high value indicates that students are being taught by teachers who are academically well-qualified in the subjects they teach according to national standards.
+    - The data comes from administrative records collected at schools and other organized learning centers, typically including information on teacher academic credentials and employment status.
+    - National academic qualification requirements can vary widely between countries, which limits the usefulness of cross-country comparisons since the indicator shows the percentage reaching national standards rather than whether teachers in different countries have similar levels of academic qualifications.
+    - This indicator measures academic qualifications specifically, not pedagogical training, though both are important for effective teaching.
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
@@ -1488,6 +1512,66 @@ tables:
         display:
           numDecimalPlaces: 1
           name: Male students - primary reading
+          tolerance: *display_tolerance
+
+      # ========================================================================
+      # QUALIFIED TEACHERS
+      # ========================================================================
+
+      percentage_of_qualified_teachers_in_lower_secondary_education__both_sexes__pct__qutp_2:
+        title: Percentage of qualified teachers in lower secondary education
+        description_short: Share of qualified teachers in [lower secondary education](#dod:lower-secondary-education) who have the minimum academic qualifications required to teach at that level in a given country.
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_qualified_teachers
+        presentation:
+          title_public: Percentage of qualified teachers in lower secondary education
+          grapher_config: *grapher_config_qualified_teachers
+        display:
+          numDecimalPlaces: 1
+          name: Lower secondary education
+          tolerance: *display_tolerance
+
+      percentage_of_qualified_teachers_in_pre_primary_education__both_sexes__pct__qutp_02:
+        title: Percentage of qualified teachers in pre-primary education
+        description_short: Share of qualified teachers in [pre-primary education](#dod:pre-primary-education) who have the minimum academic qualifications required to teach at that level in a given country.
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_qualified_teachers
+        presentation:
+          title_public: Percentage of qualified teachers in pre-primary education
+          grapher_config: *grapher_config_qualified_teachers
+        display:
+          numDecimalPlaces: 1
+          name: Pre-primary education
+          tolerance: *display_tolerance
+
+      percentage_of_qualified_teachers_in_primary_education__both_sexes__pct__qutp_1:
+        title: Percentage of qualified teachers in primary education
+        description_short: Share of qualified teachers in [primary education](#dod:primary-education) who have the minimum academic qualifications required to teach at that level in a given country.
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_qualified_teachers
+        presentation:
+          title_public: Percentage of qualified teachers in primary education
+          grapher_config: *grapher_config_qualified_teachers
+        display:
+          numDecimalPlaces: 1
+          name: Primary education
+          tolerance: *display_tolerance
+
+      percentage_of_qualified_teachers_in_upper_secondary_education__both_sexes__pct__qutp_3:
+        title: Percentage of qualified teachers in upper secondary education
+        description_short: Share of qualified teachers in [upper secondary education](#dod:upper-secondary-education) who have the minimum academic qualifications required to teach at that level in a given country.
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_qualified_teachers
+        presentation:
+          title_public: Percentage of qualified teachers in upper secondary education
+          grapher_config: *grapher_config_qualified_teachers
+        display:
+          numDecimalPlaces: 1
+          name: Upper secondary education
           tolerance: *display_tolerance
 
 

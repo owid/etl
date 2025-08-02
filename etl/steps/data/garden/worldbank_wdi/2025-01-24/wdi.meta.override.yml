@@ -28,6 +28,15 @@ definitions:
     - Similarly, a value of 100% does not necessarily mean all children within a particular age group are enrolled in school; some children could be out-of-school, but gross enrolment rates are boosted by older students being included.
     - The data comes from administrative records, such as school enrolment reports, and from population estimates, usually provided by the United Nations or national sources.
 
+  desc_key_trained_teachers: &desc_key_trained_teachers
+    - Well-trained teachers are essential for quality education delivery — this indicator shows what percentage of teachers at each education level have received at least the minimum organized pedagogical training required for teaching.
+    - It measures the proportion of teachers who have received at least the minimum organized pedagogical teacher training, either pre-service or in-service, required for teaching at the relevant level according to national standards.
+    - The indicator is calculated by dividing the number of trained teachers at a given education level by the total number of teachers at that same level, multiplied by 100.
+    - A high value indicates that most students are being taught by teachers who are pedagogically well-trained to teach according to national standards.
+    - The data comes from administrative records collected at schools and other organized learning centers, typically including information on teacher training credentials and employment status.
+    - National minimum training requirements can vary widely between countries, which limits the usefulness of cross-country comparisons since the indicator shows the percentage reaching national standards rather than whether teachers in different countries have similar levels of training.
+    - This indicator measures pedagogical training specifically, focusing on teaching methods and classroom management skills rather than subject-specific academic qualifications.
+
   description_short_clean_fuels: &description_short_clean_fuels |-
     Access to [clean fuels or technologies](#dod:clean-cooking-fuels) such as natural gas, electricity, and clean cookstoves reduces exposure to indoor air pollutants, a leading cause of death in low-income households.
   description_from_producer_clean_fuels: &description_from_producer_clean_fuels |-
@@ -1003,3 +1012,107 @@ tables:
           numDecimalPlaces: 1
           tolerance: 5
           name: Boys
+
+      ####################################################################################################
+      # Trained Teachers Indicators
+      ####################################################################################################
+
+      se_pre_tcaq_zs:
+        title: Trained teachers in pre-primary education (% of total teachers)
+        unit: '% of teachers'
+        short_unit: '%'
+        description_short: Share of teachers in [pre-primary education](#dod:pre-primary-education) who have received at least the minimum organized pedagogical training required for teaching at that level.
+        description_key: *desc_key_trained_teachers
+        presentation:
+          title_public: Share of trained teachers in pre-primary education
+          topic_tags:
+            - Global Education
+          grapher_config:
+            maxTime: 2024
+            hasMapTab: true
+            map:
+              time: 2024
+              timeTolerance: 5
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [10,20,30,40,50,60,70,80,90,100]
+                baseColorScheme: Oranges
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name: Pre-primary education
+
+      se_prm_tcaq_zs:
+        title: Trained teachers in primary education (% of total teachers)
+        unit: '% of teachers'
+        short_unit: '%'
+        description_short: Share of teachers in [primary education](#dod:primary-education) who have received at least the minimum organized pedagogical training required for teaching at that level.
+        description_key: *desc_key_trained_teachers
+        presentation:
+          title_public: Share of trained teachers in primary education
+          topic_tags:
+            - Global Education
+          grapher_config:
+            maxTime: 2024
+            hasMapTab: true
+            map:
+              time: 2024
+              timeTolerance: 5
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [10,20,30,40,50,60,70,80,90,100]
+                baseColorScheme: Greens
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name: Primary education
+
+      se_sec_tcaq_lo_zs:
+        title: Trained teachers in lower secondary education (% of total teachers)
+        unit: '% of teachers'
+        short_unit: '%'
+        description_short: Share of teachers in [lower secondary education](#dod:lower-secondary-education) who have received at least the minimum organized pedagogical training required for teaching at that level.
+        description_key: *desc_key_trained_teachers
+        presentation:
+          title_public: Share of trained teachers in lower secondary education
+          topic_tags:
+            - Global Education
+          grapher_config:
+            maxTime: 2024
+            hasMapTab: true
+            map:
+              time: 2024
+              timeTolerance: 5
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [10,20,30,40,50,60,70,80,90,100]
+                baseColorScheme: Blues
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name: Lower secondary education
+
+      se_sec_tcaq_up_zs:
+        title: Trained teachers in upper secondary education (% of total teachers)
+        unit: '% of teachers'
+        short_unit: '%'
+        description_short: Share of teachers in [upper secondary education](#dod:upper-secondary-education) who have received at least the minimum organized pedagogical training required for teaching at that level.
+        description_key: *desc_key_trained_teachers
+        presentation:
+          title_public: Share of trained teachers in upper secondary education
+          topic_tags:
+            - Global Education
+          grapher_config:
+            maxTime: 2024
+            hasMapTab: true
+            map:
+              time: 2024
+              timeTolerance: 5
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [10,20,30,40,50,60,70,80,90,100]
+                baseColorScheme: Purples
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name: Upper secondary education

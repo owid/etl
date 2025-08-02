@@ -45,13 +45,13 @@ EDUCATION_LEVELS = {
         "age_range": "primary education (typically ages 6-11)",
     },
     "secondary": {
-        "display_name": "Secondary education", 
+        "display_name": "Secondary education",
         "title_term": "secondary education",
         "age_range": "secondary education (typically ages 12-17)",
     },
     "tertiary": {
         "display_name": "Tertiary education",
-        "title_term": "tertiary education", 
+        "title_term": "tertiary education",
         "age_range": "tertiary education (higher education)",
     },
 }
@@ -60,7 +60,7 @@ EDUCATION_LEVELS = {
 def run() -> None:
     """Main function to process women teachers data and create collection."""
     config = paths.load_collection_config()
-    
+
     ds = paths.load_dataset("education_opri")
     tb = ds.read("education_opri", load_data=False)
 
@@ -91,11 +91,7 @@ def run() -> None:
 
 def get_women_teacher_columns(tb):
     """Filter women teacher columns."""
-    return [
-        col
-        for col in tb.columns
-        if re.search(WOMEN_TEACHER_PATTERN, col, re.IGNORECASE)
-    ]
+    return [col for col in tb.columns if re.search(WOMEN_TEACHER_PATTERN, col, re.IGNORECASE)]
 
 
 def adjust_dimensions(tb):
@@ -113,10 +109,10 @@ def adjust_dimensions(tb):
     for col in tb.columns:
         if col in ID_COLUMNS:
             continue
-        
+
         tb[col].metadata.original_short_name = "women_teachers"
         level = extract_level(col)
-        
+
         tb[col].metadata.dimensions = {
             "level": level,
         }
@@ -190,7 +186,7 @@ def edit_indicator_displays(view):
 
     level_display = {
         "primary": "Primary",
-        "secondary": "Secondary", 
+        "secondary": "Secondary",
         "tertiary": "Tertiary",
     }
 
