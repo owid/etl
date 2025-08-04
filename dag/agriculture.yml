@@ -187,3 +187,19 @@ steps:
   #
   data://grapher/agriculture/2025-07-30/long_term_food_and_agriculture_trends:
     - data://garden/agriculture/2025-07-30/long_term_food_and_agriculture_trends
+  #
+  # Food prices for nutrition - World Bank based on FAO.
+  #
+  data://meadow/wb/2025-08-04/food_prices_for_nutrition:
+    - snapshot://wb/2025-08-04/food_prices_for_nutrition.csv
+  #
+  # Food prices for nutrition - World Bank based on FAO.
+  #
+  data://garden/wb/2025-08-04/food_prices_for_nutrition:
+    - data://meadow/wb/2025-08-04/food_prices_for_nutrition
+    - data://garden/worldbank_wdi/2025-01-24/wdi
+  #
+  # Food prices for nutrition - World Bank based on FAO.
+  #
+  data://grapher/wb/2025-08-04/food_prices_for_nutrition:
+    - data://garden/wb/2025-08-04/food_prices_for_nutrition
