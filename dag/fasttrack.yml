@@ -82,8 +82,6 @@ steps:
     - snapshot://fasttrack/latest/public_support_climate_vlasceanu.csv
   data://grapher/fasttrack/latest/completeness_disaster_emdat:
     - snapshot://fasttrack/latest/completeness_disaster_emdat.csv
-  data-private://grapher/fasttrack/latest/vdem_women_executives:
-    - snapshot://fasttrack/latest/vdem_women_executives.csv
   data://grapher/fasttrack/latest/heat_deaths_zhao:
     - snapshot://fasttrack/latest/heat_deaths_zhao.csv
   data://grapher/fasttrack/latest/aviation_emissions_bergero:
@@ -134,8 +132,6 @@ steps:
     - snapshot-private://fasttrack/latest/draft_joe_top1_diff_1993_2018.csv
   data://grapher/fasttrack/latest/emissions_energy_heating_cooling_iea:
     - snapshot://fasttrack/latest/emissions_energy_heating_cooling_iea.csv
-  data-private://grapher/fasttrack/latest/voter_turnout_by_age__sheet1:
-    - snapshot-private://fasttrack/latest/voter_turnout_by_age__sheet1.csv
   data://grapher/fasttrack/latest/electricity_material_footprint_wang:
     - snapshot://fasttrack/latest/electricity_material_footprint_wang.csv
   data://grapher/fasttrack/latest/breakdown_material_footprint_wang:
@@ -146,8 +142,6 @@ steps:
     - snapshot://fasttrack/latest/hdi_per_co2.csv
   data://grapher/fasttrack/latest/elephant_populations:
     - snapshot://fasttrack/latest/elephant_populations.csv
-  data://grapher/fasttrack/latest/pivot_uk_public_spending:
-    - snapshot://fasttrack/latest/pivot_uk_public_spending.csv
   data://grapher/fasttrack/latest/population_immigrants_diff:
     - snapshot://fasttrack/latest/population_immigrants_diff.csv
   data://grapher/fasttrack/latest/lpi_distribution_wwf:
@@ -253,4 +247,4 @@ steps:
   data://grapher/fasttrack/latest/draft_joe_ipl_data: !!set
     ? snapshot://fasttrack/latest/draft_joe_ipl_data.csv
   data://grapher/fasttrack/latest/guinea_worm_cases: !!set
-    snapshot://fasttrack/latest/guinea_worm_cases.csv:
+    ? snapshot://fasttrack/latest/guinea_worm_cases.csv
