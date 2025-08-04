@@ -1,0 +1,46 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    display:
+     numDecimalPlaces: 1
+    presentation:
+      topic_tags:
+        - Trade & Globalization
+
+  decimals: &decimals 1
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  title: IMF (Asia and China)
+  update_period_days: 365
+
+
+tables:
+  trade:
+    variables:
+      exports_of_goods__free_on_board__fob:
+        title: "Value of exports of goods (FOB):  << counterpart_country >>"
+        unit: US dollars
+        short_unit: $
+
+      imports_of_goods__cost_insurance_freight__cif:
+        title: "Value of imports of goods (CIF):  << counterpart_country >>"
+        unit: US dollars
+        short_unit: $
+
+      exports_of_goods__free_on_board__fob__share:
+        title: "Share of total exports of goods (FOB): << counterpart_country >>"
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: *decimals
+
+      imports_of_goods__cost_insurance_freight__cif__share:
+        title: "Share of total imports of goods (CIF): << counterpart_country >>"
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: *decimals
+
