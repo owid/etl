@@ -1,0 +1,29 @@
+meta:
+  origin:
+    producer: Herforth et al. (2022), adapted by World Bank
+    title: Food Prices for Nutrition
+    description: |-
+      Food Prices for Nutrition provides indicators on the cost and affordability of healthy diets in each country, showing the population's physical and economic access to sufficient quantities of locally available items for an active and healthy life. It also provides indicators on the cost and affordability of an energy-sufficient diet and of a nutrient-adequate diet. These indicators are explained in detail in [the Food Prices for Nutrition DataHub](https://www.worldbank.org/foodpricesfornutrition).
+
+      Version 3.0, estimated in July 2024, uses the 2021 global food retail price data from the International Comparison Program (ICP) and updates the methodology of calculating the affordability indicators, including indicators measuring the ratio between diet costs and international food poverty lines and indicators measuring the share and volume of the population unable to afford each diet, and they are based on the latest Poverty and Inequality Platform (PIP) data expressed in 2017 purchasing power parity dollars (PPP).
+
+      Estimates for the prevalence and number of people unable to afford a healthy diet were imputed for countries with missing information based on their regional and global aggregates. Countries' income classifications at the aggregate reporting level follow the calendar year of 2022 standard (the fiscal year of 2024 of the World Bank).
+
+      Population data are sourced from the United Nations Department of Economic and Social Affairs (UN DESA) 2022 revision of the World Population Prospects and World Development Indicators (WDI) of the World Bank. The WDI source data from:
+      - The United Nations Population Division. World Population Prospects: 2022 Revision.
+      - Census reports and other statistical publications from national statistical offices.
+      - Eurostat: Demographic Statistics.
+      - United Nations Statistical Division. Population and Vital Statistics Report (various years).
+      - U.S. Census Bureau: International Database.
+      - Secretariat of the Pacific Community: Statistics and Demography Programme.
+    citation_full: |-
+      - The World Bank (2024), Food Prices for Nutrition database, version 3.0, updated 24 July 2024. Washington, DC: The World Bank. https://doi.org/10.57966/41AN-KY81
+      - FAO (2024), Cost and Affordability of a Healthy Diet database, updated 24 July 2024. Rome, FAO. https://www.fao.org/faostat/en/#data/CAHD
+    attribution: FAO and World Bank (2024), using data and methods from Herforth et al. (2022)
+    version_producer: '3.0'
+    url_main: https://databank.worldbank.org/source/food-prices-for-nutrition
+    date_accessed: '2025-08-04'
+    date_published: '2024-07-24'
+    license:
+      name: CC BY 4.0
+      url: https://www.worldbank.org/en/about/legal/terms-of-use-for-datasets
