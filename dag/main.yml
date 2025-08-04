@@ -680,6 +680,13 @@ steps:
   export://multidim/trade/latest/trade_flow:
     - data://grapher/imf/2025-07-08/trade_mdim
 
+ # Test Key Regions
+  data://garden/imf/2025-07-08/trade_asia:
+    - data://meadow/imf/2025-07-08/trade
+    - data://garden/regions/2023-01-01/regions
+  data://grapher/imf/2025-07-08/trade_asia:
+    - data://garden/imf/2025-07-08/trade_asia
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
