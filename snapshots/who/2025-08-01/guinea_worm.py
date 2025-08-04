@@ -1,5 +1,6 @@
 """Script to create a snapshot of dataset 'Certification status of dracunculiasis eradication (WHO, 2018)'."""
 
+from io import StringIO
 from pathlib import Path
 
 import click
@@ -34,8 +35,8 @@ def get_certification_table() -> pd.DataFrame:
     url = "https://web.archive.org/web/20211024081702/https://apps.who.int/dracunculiasis/dradata/html/report_Countries_t0.html"
     html_doc = requests.get(url).content
     soup = BeautifulSoup(html_doc, "html.parser")
-    table = soup.findAll("table")[1]
-    df = pd.read_html(str(table))[0]
+    table = soup.find_all("table")[1]
+    df = pd.read_html(StringIO(str(table)))[0]
     return df
 
 
