@@ -4,7 +4,7 @@ definitions:
   gdp_per_capita: GDP per capita is GDP divided by population.
   gni: Gross national income (GNI) is a measure of the total income earned by residents of a country or region each year. It is calculated as GDP plus net income received from abroad, plus taxes (minus subsidies) on production.
   gni_per_capita: GNI per capita is GNI divided by population.
-  ppp_adjustment: This data is adjusted for inflation and for differences in living costs between countries.
+  ppp_adjustment: This data is adjusted for inflation and differences in living costs between countries.
   ppp_prices: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2021 prices.
   inflation_adjustment: This data is adjusted by inflation but _does not_ account for differences in living costs between countries.
   inflation_prices: This data is expressed in constant 2015 US$.
