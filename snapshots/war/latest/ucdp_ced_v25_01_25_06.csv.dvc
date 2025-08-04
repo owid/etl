@@ -1,0 +1,28 @@
+meta:
+  origin:
+    producer: Uppsala Conflict Data Program
+    title: Candidate Events Dataset
+    description: |-
+      The UCDP Candidate Events Dataset (UCDP Candidate) is based on UCDP Georeferenced Event Dataset (UCDP GED), but published at a monthly release cycle. It makes available monthly releases of candidate events data with not more than a month's lag globally. See codebook for similarieties and differences between the two products.
+
+      You can find more notes at https://ucdp.uu.se/downloads/candidateged/ucdp-candidate-codebook1.4.pdf
+    title_snapshot: Candidate Events Dataset (January - June 2025)
+    description_snapshot: |-
+      This is the second (Q1 and Q2) quarterly export in 2025, covering events from January to June 2025.
+    citation_full: |-
+      Hegre, Håvard, Mihai Croicu, Kristine Eck, and Stina Högbladh, July 2020. Introducing the UCDP Candidate Events Dataset”, Research & Politics doi:10.1177/2053168020935257
+
+      Högbladh Stina, 2025, “UCDP Candidate Events Dataset Codebook, v.1.4”, Department of Peace and Conflict Research, Uppsala University.
+    attribution_short: UCDP
+    version_producer: v25.01.25.06
+    url_main: https://ucdp.uu.se/downloads/index.html#candidate
+    url_download: https://ucdp.uu.se/downloads/candidateged/GEDEvent_v25_01_25_06.csv
+    date_accessed: "2025-06-16"
+    date_published: "2025-07-20"
+    license:
+      name: CC BY 4.0
+      url: https://creativecommons.org/licenses/by/4.0/
+outs:
+  - md5: 3bc4808894384660780f1f5eeb3390a1
+    size: 10147956
+    path: ucdp_ced_v25_01_25_06.csv
