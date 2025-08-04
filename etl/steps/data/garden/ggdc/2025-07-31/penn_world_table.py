@@ -52,6 +52,17 @@ EXCLUDED_COUNTRIES = [
     "Yugoslavia",
 ]
 
+# Define data information variables, mostly valuable for processing, but not for presentation
+# NOTE: I exclude `i_outlier` from this list, given that I use it and drop it in the processing.
+DATA_INFO_VARS = [
+    "i_cig",
+    "i_xm",
+    "i_xr",
+    "i_irr",
+    "cor_exp",
+    "statcap",
+]
+
 
 def run() -> None:
     #
@@ -85,6 +96,8 @@ def run() -> None:
     tb = calculate_gdp_per_capita_and_productivity(tb=tb)
 
     tb = calculate_trade_openness(tb=tb, tb_na=tb_na)
+
+    tb = drop_unnecessary_columns(tb=tb)
 
     # Improve table format.
     tb = tb.format(["country", "year"], short_name=paths.short_name)
@@ -194,5 +207,14 @@ def calculate_trade_openness(tb: Table, tb_na: Table) -> Table:
 
     # Drop columns that are not needed in tb
     tb = tb.drop(columns=["countrycode", "currency_unit"])
+
+    return tb
+
+
+def drop_unnecessary_columns(tb: Table) -> Table:
+    """
+    Drop unnecessary columns from the table.
+    """
+    tb = tb.drop(columns=DATA_INFO_VARS)
 
     return tb
