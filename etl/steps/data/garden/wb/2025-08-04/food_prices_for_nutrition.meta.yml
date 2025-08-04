@@ -87,6 +87,8 @@ tables:
         description_key:
           - *description_energy_sufficient_diet
           - *description_key_international_dollars
+        display:
+          numDecimalPlaces: 2
       affordability_of_an_energy_sufficient_diet__ratio_of_cost_to_food_expenditures:
         title: "Affordability of an energy sufficient diet: ratio of cost to food expenditures"
         unit: "%"
@@ -95,6 +97,8 @@ tables:
           Percentage of the cost of an energy sufficient diet to total food expenditure per capita per day from national accounts.
         description_key:
           - *description_energy_sufficient_diet
+        display:
+          numDecimalPlaces: 1
       percent_of_the_population_who_cannot_afford_sufficient_calories:
         title: Share of the population who cannot afford sufficient calories
         unit: "%"
@@ -104,6 +108,8 @@ tables:
         description_key:
           - *description_energy_sufficient_diet
           - *description_key_pct_of_population
+        display:
+          numDecimalPlaces: 1
       affordability_of_an_energy_sufficient_diet__ratio_of_cost_to_the_food_poverty_line:
         title: "Affordability of an energy sufficient diet: ratio of cost to the food poverty line"
         unit: "%"
@@ -113,6 +119,8 @@ tables:
         description_key:
           - *description_energy_sufficient_diet
           - *description_key_poverty_lines
+        display:
+          numDecimalPlaces: 2
       people_who_cannot_afford_sufficient_calories:
         title: Number of people who cannot afford sufficient calories
         unit: people
@@ -123,6 +131,8 @@ tables:
           - *description_energy_sufficient_diet
           - This indicator is calculated as the percentage of a country's population that is unable to afford an energy sufficient diet, multiplied by the country's population.
           - *description_key_number_of_population
+        display:
+          numDecimalPlaces: 0
       cost_of_a_healthy_diet_in_ppp_dollars:
         title: Cost of a healthy diet
         unit: international-$ in 2021 prices per person per day
@@ -135,6 +145,8 @@ tables:
         description_key:
           - *description_healthy_diet
         description_from_producer: *description_from_producer_healthy_diet
+        display:
+          numDecimalPlaces: 2
 
       cost_of_a_healthy_diet_relative_to_the_cost_of_sufficient_energy_from_starchy_staples:
         title: Cost of a healthy diet relative to the cost of sufficient energy from starchy staples
@@ -144,6 +156,8 @@ tables:
           Ratio between the cost of a healthy diet that meets requirements for energy and food-based dietary guidelines and the cost of caloric adequacy that uses only starchy staples to meet energy requirements.
         description_key:
           - *description_healthy_diet
+        display:
+          numDecimalPlaces: 2
       cost_of_animal_source_foods_in_ppp_dollars:
         title: Cost of animal-source foods
         unit: international-$ in 2021 prices per person per day
@@ -153,6 +167,8 @@ tables:
         description_key:
           - *description_healthy_diet
           - *description_key_international_dollars
+        display:
+          numDecimalPlaces: 2
       cost_share_for_animal_sourced_foods_in_a_least_cost_healthy_diet:
         title: Cost share for animal-sourced foods in a least-cost healthy diet
         unit: "%"
@@ -161,6 +177,8 @@ tables:
           Share of costs for the least expensive animal-source foods to meet daily recommendations in food-based dietary guidelines, as a percentage of the total cost of a healthy diet.
         description_key:
           - *description_healthy_diet
+        display:
+          numDecimalPlaces: 1
       cost_of_animal_sourced_foods_relative_to_the_starchy_staples_in_a_least_cost_healthy_diet:
         title: Cost of animal-sourced foods relative to the starchy staples in a least-cost healthy diet
         unit: "%"
@@ -169,6 +187,8 @@ tables:
           Cost of the least expensive animal-source foods as a multiple of the least expensive starchy staples to meet daily recommendations in food-based dietary guidelines.
         description_key:
           - *description_healthy_diet
+        display:
+          numDecimalPlaces: 2
       cost_of_fruits_in_ppp_dollars:
         title: Cost of fruits
         unit: international-$ in 2021 prices per person per day
@@ -178,6 +198,8 @@ tables:
         description_key:
           - *description_healthy_diet
           - *description_key_international_dollars
+        display:
+          numDecimalPlaces: 2
       cost_share_for_fruits_in_a_least_cost_healthy_diet:
         title: Cost share for fruits in a least-cost healthy diet
         unit: "%"
@@ -186,6 +208,8 @@ tables:
           Share of costs for the least expensive fruits to meet daily recommendations in food-based dietary guidelines, as a percentage of the total cost of a healthy diet.
         description_key:
           - *description_healthy_diet
+        display:
+          numDecimalPlaces: 1
       cost_of_fruits_relative_to_the_starchy_staples_in_a_least_cost_healthy_diet:
         title: Cost of fruits relative to the starchy staples in a least-cost healthy diet
         unit: "%"
@@ -194,6 +218,8 @@ tables:
           Cost of the least expensive fruits as a multiple of the least expensive starchy staples to meet daily recommendations in food-based dietary guidelines.
         description_key:
           - *description_healthy_diet
+        display:
+          numDecimalPlaces: 2
       affordability_of_a_healthy_diet__ratio_of_cost_to_food_expenditures:
         title: "Affordability of a healthy diet: ratio of cost to food expenditures"
         unit: "%"
@@ -202,6 +228,8 @@ tables:
           Percentage of the cost of a healthy diet to total food expenditure per capita per day from national accounts.
         description_key:
           - *description_healthy_diet
+        display:
+          numDecimalPlaces: 1
       percent_of_the_population_who_cannot_afford_a_healthy_diet:
         title: Share of the population who cannot afford a healthy diet
         unit: "%"
@@ -211,6 +239,8 @@ tables:
         description_key:
           - *description_healthy_diet
           - *description_key_pct_of_population
+        display:
+          numDecimalPlaces: 1
       cost_of_legumes__nuts_and_seeds_in_ppp_dollars:
         title: Cost of legumes, nuts and seeds
         unit: international-$ in 2021 prices per person per day
@@ -220,6 +250,8 @@ tables:
         description_key:
           - *description_healthy_diet
           - *description_key_international_dollars
+        display:
+          numDecimalPlaces: 2
       cost_share_for_legumes__nuts_and_seeds_in_a_least_cost_healthy_diet:
         title: Cost share for legumes, nuts and seeds in a least-cost healthy diet
         unit: "%"
@@ -228,6 +260,8 @@ tables:
           Share of costs for the least expensive legumes, nuts or seeds to meet daily recommendations in food-based dietary guidelines, as a percentage of the total cost of a healthy diet.
         description_key:
           - *description_healthy_diet
+        display:
+          numDecimalPlaces: 1
       cost_of_legumes__nuts_and_seeds_relative_to_the_starchy_staples_in_a_least_cost_healthy_diet:
         title: Cost of legumes, nuts and seeds relative to the starchy staples in a least-cost healthy diet
         unit: "%"
@@ -236,6 +270,8 @@ tables:
           Cost of the least expensive legumes, nuts and seeds as a multiple of the least expensive starchy staples to meet daily recommendations in food-based dietary guidelines.
         description_key:
           - *description_healthy_diet
+        display:
+          numDecimalPlaces: 2
       cost_of_fats_and_oils_in_ppp_dollars:
         title: Cost of oils and fats
         unit: international-$ in 2021 prices per person per day
@@ -245,6 +281,8 @@ tables:
         description_key:
           - *description_healthy_diet
           - *description_key_international_dollars
+        display:
+          numDecimalPlaces: 2
       cost_share_for_oils_and_fats_in_a_least_cost_healthy_diet:
         title: Cost share for oils and fats in a least-cost healthy diet
         unit: "%"
@@ -253,6 +291,8 @@ tables:
           Share of costs for the least expensive oils or fats to meet daily recommendations in food-based dietary guidelines, as a percentage of the total cost of a healthy diet.
         description_key:
           - *description_healthy_diet
+        display:
+          numDecimalPlaces: 1
       cost_of_oils_and_fats_relative_to_the_starchy_staples_in_a_least_cost_healthy_diet:
         title: Cost of oils and fats relative to the starchy staples in a least-cost healthy diet
         unit: "%"
@@ -261,6 +301,8 @@ tables:
           Cost of the least expensive oils and fats as a multiple of the least expensive starchy staples to meet daily recommendations in food-based dietary guidelines.
         description_key:
           - *description_healthy_diet
+        display:
+          numDecimalPlaces: 2
       affordability_of_a_healthy_diet__ratio_of_cost_to_the_food_poverty_line:
         title: "Affordability of a healthy diet: ratio of cost to the food poverty line"
         unit: "%"
@@ -270,6 +312,8 @@ tables:
         description_key:
           - *description_healthy_diet
           - *description_key_poverty_lines
+        display:
+          numDecimalPlaces: 2
       cost_of_starchy_staples_in_ppp_dollars:
         title: Cost of starchy staples
         unit: international-$ in 2021 prices per person per day
@@ -279,6 +323,8 @@ tables:
         description_key:
           - *description_healthy_diet
           - *description_key_international_dollars
+        display:
+          numDecimalPlaces: 2
       cost_share_for_starchy_staples_in_a_least_cost_healthy_diet:
         title: Cost share for starchy staples in a least-cost healthy diet
         unit: "%"
@@ -287,6 +333,8 @@ tables:
           Share of costs for the least expensive starchy staples to meet daily recommendations in food-based dietary guidelines, as a percentage of the total cost of a healthy diet.
         description_key:
           - *description_healthy_diet
+        display:
+          numDecimalPlaces: 1
       people_who_cannot_afford_a_healthy_diet:
         title: Number of people who cannot afford a healthy diet
         unit: people
@@ -297,6 +345,8 @@ tables:
           - *description_healthy_diet
           - This indicator is calculated as the percentage of a country's population that is unable to afford a healthy diet, multiplied by the country's population.
           - *description_key_number_of_population
+        display:
+          numDecimalPlaces: 0
       cost_of_vegetables_in_ppp_dollars:
         title: Cost of vegetables
         unit: international-$ in 2021 prices per person per day
@@ -306,6 +356,8 @@ tables:
         description_key:
           - *description_healthy_diet
           - *description_key_international_dollars
+        display:
+          numDecimalPlaces: 2
       cost_share_for_vegetables_in_a_least_cost_healthy_diet:
         title: Cost share for vegetables in a least-cost healthy diet
         unit: "%"
@@ -314,6 +366,8 @@ tables:
           Share of costs for the least expensive vegetables to meet daily recommendations in food-based dietary guidelines, as a percentage of the total cost of a healthy diet.
         description_key:
           - *description_healthy_diet
+        display:
+          numDecimalPlaces: 1
       cost_of_vegetables_relative_to_the_starchy_staples_in_a_least_cost_healthy_diet:
         title: Cost of vegetables relative to the starchy staples in a least-cost healthy diet
         unit: "%"
@@ -322,6 +376,8 @@ tables:
           Cost of the least expensive vegetables as a multiple of the least expensive starchy staples to meet daily recommendations in food-based dietary guidelines.
         description_key:
           - *description_healthy_diet
+        display:
+          numDecimalPlaces: 2
       cost_of_a_nutrient_adequate_diet_in_ppp_dollars:
         title: Cost of a nutrient adequate diet
         unit: international-$ in 2021 prices per person per day
@@ -331,6 +387,8 @@ tables:
         description_key:
           - *description_nutrient_adequate_diet
           - *description_key_international_dollars
+        display:
+          numDecimalPlaces: 2
       affordability_of_a_nutrient_adequate_diet__ratio_of_cost_to_food_expenditures:
         title: "Affordability of a nutrient adequate diet: ratio of cost to food expenditures"
         unit: "%"
@@ -339,6 +397,8 @@ tables:
           Percentage of the cost of a nutrient adequate diet to total food expenditure per capita per day from national accounts.
         description_key:
           - *description_nutrient_adequate_diet
+        display:
+          numDecimalPlaces: 1
       percent_of_the_population_who_cannot_afford_nutrient_adequacy:
         title: Share of the population who cannot afford nutrient adequacy
         unit: "%"
@@ -348,6 +408,8 @@ tables:
         description_key:
           - *description_nutrient_adequate_diet
           - *description_key_pct_of_population
+        display:
+          numDecimalPlaces: 1
       affordability_of_a_nutrient_adequate_diet__ratio_of_cost_to_the_food_poverty_line:
         title: "Affordability of a nutrient adequate diet: ratio of cost to the food poverty line"
         unit: "%"
@@ -357,6 +419,8 @@ tables:
         description_key:
           - *description_nutrient_adequate_diet
           - *description_key_poverty_lines
+        display:
+          numDecimalPlaces: 2
       people_who_cannot_afford_nutrient_adequacy:
         title: Number of people who cannot afford nutrient adequacy
         unit: people
@@ -367,9 +431,13 @@ tables:
           - *description_nutrient_adequate_diet
           - This indicator is calculated as the percentage of a country's population that is unable to afford a nutrient-adequate diet, multiplied by the country's population.
           - *description_key_number_of_population
+        display:
+          numDecimalPlaces: 0
       population:
         title: Population according to the World Bank
         unit: people
         short_unit: people
         description_short: |-
           Total population is based on the de facto definition of population, which counts all residents regardless of legal status or citizenship. The values shown are midyear estimates.
+        display:
+          numDecimalPlaces: 0

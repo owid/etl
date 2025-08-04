@@ -14,6 +14,10 @@ def run() -> None:
     ds_garden = paths.load_dataset("food_prices_for_nutrition")
     tb = ds_garden.read("food_prices_for_nutrition", reset_index=False)
 
+    # Remove columns in local currency.
+    # TODO: Consider adding indicators in local currency units to garden metadata. For now, since they are not used, remove them.
+    tb = tb[[column for column in tb.columns if not "in_local_currency_unit" in column]]
+
     #
     # Save outputs.
     #
