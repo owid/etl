@@ -24,7 +24,7 @@ CLASSIFICATION = EXPECTED_CLASSIFICATIONS[-1]
 CPI_BASE_YEAR = 2021
 
 # Alternative attribution for share and number who cannot afford a healthy diet.
-ATTRIBUTION_CANNOT_AFFORD = "FAO and World Bank (2024), using data and methods from Bai et al. (2024)"
+ATTRIBUTION_CANNOT_AFFORD = "FAO and World Bank (2025), using data and methods from Bai et al. (2024)"
 
 
 def adapt_units(tb: Table, tb_wdi: Table) -> Table:
