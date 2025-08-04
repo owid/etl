@@ -17,7 +17,7 @@ meta:
     version_producer: v25.01.25.06
     url_main: https://ucdp.uu.se/downloads/index.html#candidate
     url_download: https://ucdp.uu.se/downloads/candidateged/GEDEvent_v25_01_25_06.csv
-    date_accessed: "2025-06-16"
+    date_accessed: "2025-08-03"
     date_published: "2025-07-20"
     license:
       name: CC BY 4.0
