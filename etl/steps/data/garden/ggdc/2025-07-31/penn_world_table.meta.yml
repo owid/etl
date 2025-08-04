@@ -10,7 +10,7 @@ definitions:
         - Economic Growth
 
   # NOTE: Update in case PWT changes the PPP benchmark year.
-  ppp_year: 2017
+  ppp_year: {definitions.ppp_year}
 
   # This is the ID of the Google Doc that contains the FAQs
   gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
@@ -38,10 +38,18 @@ definitions:
     We excluded values considered outliers in the original dataset (`i_outlier = "Outlier"`), due to implausible relative prices (PPPs divided by exchange rates).
 
   description_processing_bermuda: |-
-    Values for Bermuda have been replaced by different GDP estimates (output side, single price benchmark) due to the unusual changes on prices in this country.
+    We replaced GDP values for Bermuda with different estimates (output side, single price benchmark) due to the unusual changes on prices in this country.
 
   description_processing_gdp_per_capita: |-
     We estimated this indicator as the corresponding value of GDP divided by the population of each country, available in the original dataset.
+
+  description_processing_productivity: |-
+    We calculated productivity by dividing GDP (output side, multiple price benchmarks) by the number of people in work (employees and self-employed) and the average hours they work.
+
+  description_processing_trade_openness: |-
+    We calculated trade openness as the sum of exports and imports divided by GDP, all in local currency units. This data is available in the national accounts dataset of Penn World Table.
+
+    We calculated global trade openness as the weighted average of trade openness across countries, using GDP in market US$ as weights.
 
   map_brackets_gdp: &map_brackets_gdp
     [0, 10000000000, 30000000000, 100000000000, 300000000000, 1000000000000, 3000000000000, 10000000000000, 1]
@@ -77,7 +85,7 @@ tables:
           - "{definitions.description_key_ppp_prices_multiple_benchmarks}"
           - "{definitions.description_key_gdp_maddison}"
           - "{definitions.description_key_gdp_worldbank}"
-        description_from_producer: Expenditure-side real GDP at chained PPPs (in mil. 2017US$)
+        description_from_producer: Expenditure-side real GDP at chained PPPs (in mil. {definitions.ppp_year}US$)
         description_processing: |-
           {definitions.description_processing_outliers}
         presentation:
@@ -102,7 +110,7 @@ tables:
           - "{definitions.description_key_ppp_prices_multiple_benchmarks}"
           - "{definitions.description_key_gdp_maddison}"
           - "{definitions.description_key_gdp_worldbank}"
-        description_from_producer: Output-side real GDP at chained PPPs (in mil. 2017US$)
+        description_from_producer: Output-side real GDP at chained PPPs (in mil. {definitions.ppp_year}US$)
         description_processing: |-
           {definitions.description_processing_outliers}
 
@@ -147,7 +155,7 @@ tables:
           - "{definitions.description_key_ppp_prices_single_benchmark}"
           - "{definitions.description_key_gdp_per_capita_maddison}"
           - "{definitions.description_key_gdp_per_capita_worldbank}"
-        description_from_producer: Expenditure-side real GDP at current PPPs (in mil. 2017US$)
+        description_from_producer: Expenditure-side real GDP at current PPPs (in mil. {definitions.ppp_year}US$)
         description_processing: |-
           {definitions.description_processing_outliers}
         presentation:
@@ -172,7 +180,7 @@ tables:
           - "{definitions.description_key_ppp_prices_single_benchmark}"
           - "{definitions.description_key_gdp_per_capita_maddison}"
           - "{definitions.description_key_gdp_per_capita_worldbank}"
-        description_from_producer: Output-side real GDP at current PPPs (in mil. 2017US$)
+        description_from_producer: Output-side real GDP at current PPPs (in mil. {definitions.ppp_year}US$)
         description_processing: |-
           {definitions.description_processing_outliers}
         presentation:
@@ -197,7 +205,7 @@ tables:
           - "{definitions.description_key_ppp_prices_national_accounts}"
           - "{definitions.description_key_gdp_maddison}"
           - "{definitions.description_key_gdp_worldbank}"
-        description_from_producer: Real GDP at constant 2017 national prices (in mil. 2017US$)
+        description_from_producer: Real GDP at constant {definitions.ppp_year} national prices (in mil. {definitions.ppp_year}US$)
         description_processing: |-
           {definitions.description_processing_outliers}
         presentation:
@@ -212,7 +220,7 @@ tables:
 
       rgdpe_pc:
         title: GDP per capita (expenditure, multiple price benchmarks)
-        unit: international-$ in 2017 prices
+        unit: international-$ in {definitions.ppp_year} prices
         short_unit: $
         description_short: "{definitions.description_short_gdp_per_capita} {definitions.description_key_ppp_adjustment}"
         description_key:
@@ -238,7 +246,7 @@ tables:
 
       rgdpo_pc:
         title: GDP per capita (output, multiple price benchmarks)
-        unit: international-$ in 2017 prices
+        unit: international-$ in {definitions.ppp_year} prices
         short_unit: $
         description_short: "{definitions.description_short_gdp_per_capita} {definitions.description_key_ppp_adjustment}"
         description_key:
@@ -284,7 +292,7 @@ tables:
 
       cgdpe_pc:
         title: GDP per capita (expenditure, single price benchmark)
-        unit: international-$ in 2017 prices
+        unit: international-$ in {definitions.ppp_year} prices
         short_unit: $
         description_short: "{definitions.description_short_gdp_per_capita} {definitions.description_key_ppp_adjustment}"
         description_key:
@@ -310,7 +318,7 @@ tables:
 
       cgdpo_pc:
         title: GDP per capita (output, single price benchmark)
-        unit: international-$ in 2017 prices
+        unit: international-$ in {definitions.ppp_year} prices
         short_unit: $
         description_short: "{definitions.description_short_gdp_per_capita} {definitions.description_key_ppp_adjustment}"
         description_key:
@@ -336,7 +344,7 @@ tables:
 
       rgdpna_pc:
         title: GDP per capita (using national accounts growth rates)
-        unit: international-$ in 2017 prices
+        unit: international-$ in {definitions.ppp_year} prices
         short_unit: $
         description_short: "{definitions.description_short_gdp_per_capita} {definitions.description_key_ppp_adjustment}"
         description_key:
@@ -409,13 +417,13 @@ tables:
 
       ccon:
         title: Consumption of households and government (single price benchmark)
-        unit: international-$ in 2017 prices
+        unit: international-$ in {definitions.ppp_year} prices
         short_unit: $
         description_short: This is the sum of real household and government consumption. {definitions.description_key_ppp_adjustment}
         description_key:
           - "{definitions.description_key_ppp_adjustment}"
           - "{definitions.description_key_ppp_prices_single_benchmark}"
-        description_from_producer: Real consumption of households and government, at current PPPs (in mil. 2017US$)
+        description_from_producer: Real consumption of households and government, at current PPPs (in mil. {definitions.ppp_year}US$)
         description_processing: |-
           {definitions.description_processing_outliers}
         display:
@@ -425,13 +433,13 @@ tables:
 
       cda:
         title: Domestic absorption (single price benchmark)
-        unit: international-$ in 2017 prices
+        unit: international-$ in {definitions.ppp_year} prices
         short_unit: $
         description_short: This is estimated as the sum of consumption and investment. Together with trade balance (exports minus imports), it is equal to GDP. {definitions.description_key_ppp_adjustment}
         description_key:
           - "{definitions.description_key_ppp_adjustment}"
           - "{definitions.description_key_ppp_prices_single_benchmark}"
-        description_from_producer: Real domestic absorption, (real consumption plus investment), at current PPPs (in mil. 2017US$)
+        description_from_producer: Real domestic absorption, (real consumption plus investment), at current PPPs (in mil. {definitions.ppp_year}US$)
         description_processing: |-
           {definitions.description_processing_outliers}
         display:
@@ -441,13 +449,13 @@ tables:
 
       cn:
         title: Capital stock (single price benchmark)
-        unit: international-$ in 2017 prices
+        unit: international-$ in {definitions.ppp_year} prices
         short_unit: $
         description_short: This is estimated from investment in buildings and machinery. {definitions.description_key_ppp_adjustment}
         description_key:
           - "{definitions.description_key_ppp_adjustment}"
           - "{definitions.description_key_ppp_prices_single_benchmark}"
-        description_from_producer: Capital stock at current PPPs (in mil. 2017US$)
+        description_from_producer: Capital stock at current PPPs (in mil. {definitions.ppp_year}US$)
         description_processing: |-
           {definitions.description_processing_outliers}
         display:
@@ -507,13 +515,13 @@ tables:
 
       rconna:
         title: Consumption of households and government (using national accounts)
-        unit: international-$ in 2017 prices
+        unit: international-$ in {definitions.ppp_year} prices
         short_unit: $
-        description_short: This is the sum of real household and government consumption, used to measure and compare living standards across countries. {definitions.description_key_ppp_adjustment}
+        description_short: This is the sum of real household and government consumption. {definitions.description_key_ppp_adjustment}
         description_key:
           - "{definitions.description_key_ppp_adjustment}"
           - "{definitions.description_key_ppp_prices_national_accounts}"
-        description_from_producer: Real consumption at constant 2017 national prices (in mil. 2017US$)
+        description_from_producer: Real consumption at constant {definitions.ppp_year} national prices (in mil. {definitions.ppp_year}US$)
         description_processing: |-
           {definitions.description_processing_outliers}
         display:
@@ -523,13 +531,13 @@ tables:
 
       rdana:
         title: Domestic absorption (using national accounts)
-        unit: international-$ in 2017 prices
+        unit: international-$ in {definitions.ppp_year} prices
         short_unit: $
         description_short: This is estimated as the sum of consumption and investment. Together with trade balance (exports minus imports), it is equal to GDP. {definitions.description_key_ppp_adjustment}
         description_key:
           - "{definitions.description_key_ppp_adjustment}"
           - "{definitions.description_key_ppp_prices_national_accounts}"
-        description_from_producer: Real domestic absorption at constant 2017 national prices (in mil. 2017US$)
+        description_from_producer: Real domestic absorption at constant {definitions.ppp_year} national prices (in mil. {definitions.ppp_year}US$)
         description_processing: |-
           {definitions.description_processing_outliers}
         display:
@@ -539,13 +547,13 @@ tables:
 
       rnna:
         title: Capital stock (using national accounts)
-        unit: international-$ in 2017 prices
+        unit: international-$ in {definitions.ppp_year} prices
         short_unit: $
         description_short: This is estimated from investment in buildings and machinery. {definitions.description_key_ppp_adjustment}
         description_key:
           - "{definitions.description_key_ppp_adjustment}"
           - "{definitions.description_key_ppp_prices_national_accounts}"
-        description_from_producer: Capital stock at constant 2017 national prices (in mil. 2017US$)
+        description_from_producer: Capital stock at constant {definitions.ppp_year} national prices (in mil. {definitions.ppp_year}US$)
         description_processing: |-
           {definitions.description_processing_outliers}
         display:
@@ -561,7 +569,7 @@ tables:
         description_key:
           - "{definitions.description_key_ppp_adjustment}"
           - "{definitions.description_key_ppp_prices_national_accounts}"
-        description_from_producer: Capital services at constant 2017 national prices (2017=1)
+        description_from_producer: Capital services at constant {definitions.ppp_year} national prices ({definitions.ppp_year}=1)
         description_processing: |-
           {definitions.description_processing_outliers}
         display:
@@ -578,7 +586,7 @@ tables:
           - This indicator is constructed with estimates of GDP, capital stock, labor input data, labor compensation as share of GDP and labor income or employees and self-employed as share of GDP.
           - "{definitions.description_key_ppp_adjustment}"
           - "{definitions.description_key_ppp_prices_national_accounts}"
-        description_from_producer: TFP at constant national prices (2017=1)
+        description_from_producer: TFP at constant national prices ({definitions.ppp_year}=1)
         description_processing: |-
           {definitions.description_processing_outliers}
         display:
@@ -595,7 +603,7 @@ tables:
           - This indicator is constructed with estimates of consumption and investment, capital stock, labor input data, labor compensation as share of GDP and labor income or employees and self-employed as share of GDP.
           - "{definitions.description_key_ppp_adjustment}"
           - "{definitions.description_key_ppp_prices_national_accounts}"
-        description_from_producer: Welfare-relevant TFP at constant national prices (2017=1)
+        description_from_producer: Welfare-relevant TFP at constant national prices ({definitions.ppp_year}=1)
         description_processing: |-
           {definitions.description_processing_outliers}
         display:
@@ -640,328 +648,311 @@ tables:
           numDecimalPlaces: 1
           <<: *common-display
 
-
-
-      rgdpe:
-        title: GDP (expenditure, multiple price benchmarks)
-        unit: international-$ in 2017 prices
-        short_unit: $
-        description: |
-          It measures living standards across countries and across years using prices for final goods that are constant across countries and over time.
-          This variable uses ICP PPP benchmarks from multiple years to correct for changing prices over time.
-          {info.outliers}
-        display:
-           name: GDP
-           numDecimalPlaces: 0
-      rgdpo:
-        title: GDP (output, multiple price benchmarks)
-        unit: international-$ in 2017 prices
-        short_unit: $
-        description: |
-          It measures productive capacity across countries and across years using prices for final goods, exports and imports that are constant across countries and over time.
-          This variable uses ICP PPP benchmarks from multiple years to correct for changing prices over time.
-          Values for Bermuda have been replaced by estimates on GDP (output, single price benchmark) due to the unusual changes on prices in this country.
-          {info.outliers}
-        display:
-            name: GDP
-            numDecimalPlaces: 0
-      cgdpe:
-        title: GDP (expenditure, single price benchmark)
-        unit: international-$ in 2017 prices
-        short_unit: $
-        description: |
-          It measures the standards of living across countries in each year by using prices for final goods that are constant across countries.
-          This variable only uses the most recent ICP PPP benchmark.
-          {info.outliers}
-        display:
-           name: GDP
-           numDecimalPlaces: 0
-      cgdpo:
-        title: GDP (output, single price benchmark)
-        unit: international-$ in 2017 prices
-        short_unit: $
-        description: |
-          It measures the productive capacity across countries in each year by using prices for final goods, exports and imports that are constant across countries.
-          This variable only uses the most recent ICP PPP benchmark.
-          {info.outliers}
-        display:
-           name: GDP
-           numDecimalPlaces: 0
-      rgdpna:
-        title: GDP (using national accounts growth rates)
-        unit: international-$ in 2017 prices
-        short_unit: $
-        description: |
-          The difference with the other GDP variables is this is computed based on the growth rate of real GDP from national accounts data for each country. For this reason, this variable is useful for comparing growth of GDP over time in each country.
-          {info.outliers}
-        display:
-           name: GDP
-           numDecimalPlaces: 0
-      rgdpe_pc:
-        title: GDP per capita (expenditure, multiple price benchmarks)
-        unit: international-$ in 2017 prices
-        short_unit: $
-        description: |
-          Estimated as the GDP (expenditure, multiple price benchmarks) divided by the population of each country.
-          This variable uses ICP PPP benchmarks from multiple years to correct for changing prices over time.
-          {info.outliers}
-        display:
-           name: GDP per capita
-           numDecimalPlaces: 0
-      rgdpo_pc:
-        title: GDP per capita (output, multiple price benchmarks)
-        unit: international-$ in 2017 prices
-        short_unit: $
-        description: |
-          Estimated as the GDP (output, multiple price benchmarks) divided by the population of each country.
-          This variable uses ICP PPP benchmarks from multiple years to correct for changing prices over time.
-          Values for Bermuda have been replaced by estimates on GDP per capita (output, single price benchmark) due to the unusual changes on prices in this country.
-          {info.outliers}
-        display:
-           name: GDP per capita
-           numDecimalPlaces: 0
-      cgdpe_pc:
-        title: GDP per capita (expenditure, single price benchmark)
-        unit: international-$ in 2017 prices
-        short_unit: $
-        description: |
-          Estimated as the GDP (expenditure, single price benchmark) divided by the population of each country.
-          The GDP estimate in this variable only uses the most recent ICP PPP benchmark.
-          {info.outliers}
-        display:
-           name: GDP per capita
-           numDecimalPlaces: 0
-      cgdpo_pc:
-        title: GDP per capita (output, single price benchmark)
-        unit: international-$ in 2017 prices
-        short_unit: $
-        description: |
-          Estimated as the GDP (output, single price benchmark) divided by the population of each country.
-          The GDP estimate in this variable only uses the most recent ICP PPP benchmark.
-          {info.outliers}
-        display:
-           name: GDP per capita
-           numDecimalPlaces: 0
-      rgdpna_pc:
-        title: GDP per capita (using national accounts growth rates)
-        unit: international-$ in 2017 prices
-        short_unit: $
-        description: |
-          Estimated as the GDP (using national accounts growth rates) divided by the population of each country.
-          The GDP is computed based on the growth rate of real GDP from national accounts data for each country. For this reason, this variable is useful for comparing growth of GDP over time in each country.
-          {info.outliers}
-        display:
-           name: GDP per capita
-           numDecimalPlaces: 0
-      pop:
-        title: Population
-        unit: people
-        description: Number of people living in the country.
-      emp:
-        title: Number of people in work
-        unit: people
-        description: This is the number of people working in the country (employees and self-employed).
-      avh:
-        title: Annual working hours per worker
-        unit: hours per worker
-        description: It is the average sum of hours worked by employees and self-employed people during each year in a country.
-      hc:
-        title: Human capital index, based on years of schooling and returns to education
-        unit:
-        description: This is based on average years of schooling, linearly interpolated from Barro and Lee (2013), and an assumed rate of return for primary, secondary, and tertiary education, as in Caselli (2005).. The authors note it is an imperfect measure of human capital as differences in the returns to experience (Lagakos et al. 2014) and the quality of schooling (Hanushek and Woessman 2012) are not accounted for.
-      ccon:
-        title: Consumption of households and government (single price benchmark)
-        unit: international-$ in 2017 prices
-        short_unit: $
-        description: |
-          It is the sum of real household and government consumption, used to measure and compare living standards across countries.
-          {info.outliers}
-        display:
-           name: Consumption of households and government
-      cda:
-        title: Domestic absorption (consumption plus investment) (single price benchmark)
-        unit: international-$ in 2017 prices
-        short_unit: $
-        description: |
-          It is computed as real consumption plus real investment. The sum of domestic absorption and the real trade balance generates GDP (expenditure, multiple price benchmarks), the expenditure-side real GDP at chained PPPs.
-          {info.outliers}
-        display:
-           name: Consumption plus investment
-      cn:
-        title: Capital stock (single price benchmark)
-        unit: international-$ in 2017 prices
-        short_unit: $
-        description: |
-          It is estimated from investment by asset in each country, as structures, transport equipment, machinery and also computers, communication equipment and software on selected countries. Prices for these assets are constant across countries each year.
-          {info.outliers}
-        display:
-           name: Capital stock
-      ck:
-        title: Capital services levels at current PPPs (USA=1)
-        unit:
-      ctfp:
-        title: TFP level at current PPPs (USA=1)
-        unit:
-        description: Total factor productivity level, computed with GDP (output, single price benchmark), Capital stock (single price benchmark), labor input data and Share of labor compensation in GDP, the share of labor income of employees and self-employed workers in GDP. It is useful to compare productivity levels across countries in each year.
-      cwtfp:
-        title: Welfare-relevant TFP levels at current PPPs (USA=1)
-        unit:
-        description: Computed from TFP level at current PPPs and the Domestic absorption (consumption plus investment) (single price benchmark), it measures living standards across countries in each year.
-      rconna:
-        title: Consumption of households and government (using national accounts)
-        unit: international-$ in 2017 prices
-        short_unit: $
-        description: |
-          Real household and government consumption at constant national prices. It is useful to compare growth of consumption over time in one country.
-          {info.outliers}
-        display:
-           name: Consumption of households and government
-      rdana:
-        title: Domestic absorption (consumption plus investment) (using national accounts)
-        unit: international-$ in 2017 prices
-        short_unit: $
-        description: |
-          Real consumption plus real investment at constant national prices. It is useful for comparing the growth of the absorption over time in each country.
-          {info.outliers}
-        display:
-           name: Consumption plus investment
-      rnna:
-        title: Capital stock (using national accounts)
-        unit: international-$ in 2017 prices
-        short_unit: $
-        description: |
-          Capital stock at constant national prices, based on investment and prices of structures and equipment. Useful for comparing growth of this variable over time in each country.
-          {info.outliers}
-        display:
-           name: Capital stock
-      rkna:
-        title: Capital services at constant 2017 national prices (2017=1)
-        unit:
-      rtfpna:
-        title: Total factor productivity index (using national accounts) (2017=1)
-        unit: ""
-        description: Total factor productivity level, computed with GDP (using national accounts growth rates), Capital stock (using national accounts), labor input data and Share of labor compensation in GDP, the share of labor income of employees and self-employed workers in GDP. It is useful to compare the growth of productivity over time in each country.
-        display:
-           name: TFP index
-      rwtfpna:
-        title: Welfare-relevant TFP at constant national prices (2017=1)
-        unit:
-        description: Computed from Total factor productivity index (using national accounts) and the Domestic absorption (consumption plus investment) (using national accounts), it is useful for comparing the growth of welfare-relevant productivity over time in each country.
-      labsh:
-        title: Share of labor compensation in GDP
-        unit: "%"
-        short_unit: "%"
-        description: It is the share of labor income of employees and self-employed workers in GDP (output, single price benchmark) and it is used to compare total inputs across countries or over time.
-      irr:
-        title: Real internal rate of return
-        unit: "%"
-        short_unit: "%"
-      delta:
-        title: Average depreciation rate of the capital stock
-        unit: "%"
-        short_unit: "%"
       xr:
-        title: Exchange rate, national currency/USD (market+estimated)
-        unit:
+        title: Exchange rate
+        unit: "national currency / US$"
+        short_unit: ""
+        description_short: Market exchange rate, expressed as the national currency per US dollar. It includes estimated values for countries where no exchange rate is available.
+        description_from_producer: Exchange rate, national currency/USD (market+estimated)
+        description_processing: |-
+          {definitions.description_processing_outliers}
+        display:
+          name: Exchange rate
+          numDecimalPlaces: 1
+          <<: *common-display
+
       pl_con:
-        title: Price level of CCON (PPP/XR), price level of USA GDPo in 2017=1
-        unit:
-        description: Price level of Consumption of households and government, equal to the PPP (ratio of Consumption of households and government (using national accounts) to Consumption of households and government (single price benchmark)) divided by the nominal exchange rate.
+        title: Price level of consumption of households and government
+        unit: "international-$ in {definitions.ppp_year} prices / constant {definitions.ppp_year} US$"
+        short_unit: ""
+        description_short: Price level relative to the US (where 1 represents the US price level of GDP in the year {definitions.ppp_year}).
+        description_key:
+          - "{definitions.description_key_ppp_adjustment}"
+          - "{definitions.description_key_ppp_prices_single_benchmark}"
+        description_from_producer: Price level of CCON (PPP/XR), price level of USA GDPo in 2017=1
+        description_processing: |-
+          {definitions.description_processing_outliers}
+        display:
+          name: Price level of consumption of households and government
+          numDecimalPlaces: 1
+          <<: *common-display
+
       pl_da:
-        title: Price level of CDA (PPP/XR), price level of USA GDPo in 2017=1
-        unit:
-        description: Price level of Domestic absorption (consumption plus investment) and GDP per capita (expenditure, single price benchmark), equal to the PPP (ratio of Domestic absorption (using national accounts) to Domestic absorption (single price benchmark)) divided by the nominal exchange rate
+        title: Price level of domestic absorption
+        unit: "international-$ in {definitions.ppp_year} prices / constant {definitions.ppp_year} US$"
+        short_unit: ""
+        description_short: Price level of the sum of consumption and investment, relative to the US (where 1 represents the US price level of GDP in the year {definitions.ppp_year}).
+        description_key:
+          - "{definitions.description_key_ppp_adjustment}"
+          - "{definitions.description_key_ppp_prices_single_benchmark}"
+        description_from_producer: Price level of CDA (PPP/XR), price level of USA GDPo in 2017=1
+        description_processing: |-
+          {definitions.description_processing_outliers}
+        display:
+          name: Price level of domestic absorption
+          numDecimalPlaces: 1
+          <<: *common-display
+
       pl_gdpo:
-        title: Price level of CGDPo (PPP/XR), price level of USA GDPo in 2017=1
-        unit:
-        description: Price level of GDP (output, single price benchmark), equal to the PPP (ratio of GDP per capita (using national accounts growth rates) to GDP (output, single price benchmark)) divided by the nominal exchange rate
-      i_cig:
-        title: Type of estimation for the relative price data for consumption, investment and government
-        unit:
-        description: "Extrapolated (0), benchmark (1), interpolated (2), ICP PPP timeseries: benchmark or interpolated (3) or  ICP PPP timeseries: extrapolated (4)"
-      i_xm:
-        title: Type of estimation for the relative price data for exports and imports
-        unit:
-        description: Extrapolated (0), benchmark (1) or interpolated (2)
-      i_xr:
-        title: Type of estimation for the exchange rate
-        unit:
-        description: Market-based (0) or estimated (1)
-      i_irr:
-        title: Is the observation for irr an outlier?
-        unit:
-        description: It is not an outlier (0), may be biased due to a low capital share (1), hit the lower bound of 1 percent (2), or is an outlier (3)
-      cor_exp:
-        title: "Correlation between expenditure shares of the country and the US (benchmark observations only)"
-        unit:
-      statcap:
-        title: "Statistical capacity indicator (source: World Bank, developing countries only)"
-        unit:
+        title: Price level of GDP (output side)
+        unit: "international-$ in {definitions.ppp_year} prices / constant {definitions.ppp_year} US$"
+        short_unit: ""
+        description_short: Price level of GDP (output side), relative to the US (where 1 represents the US price level of GDP in the year {definitions.ppp_year}).
+        description_key:
+          - "{definitions.description_key_ppp_adjustment}"
+          - "{definitions.description_key_ppp_prices_single_benchmark}"
+        description_from_producer: Price level of CGDPo (PPP/XR), price level of USA GDPo in 2017=1
+        description_processing: |-
+          {definitions.description_processing_outliers}
+        display:
+          name: Price level of GDP (output side)
+          numDecimalPlaces: 1
+          <<: *common-display
+
       csh_c:
-        title: Share of household consumption in GDP
+        title: Household consumption as a share of GDP
         unit: "%"
         short_unit: "%"
-        description: Share of household consumption in GDP (output, single price benchmark)
+        description_short: Household consumption divided by [gross domestic product](#dod:gdp), expressed as a percentage.
+        description_key:
+          - "{definitions.description_key_ppp_adjustment}"
+          - "{definitions.description_key_ppp_prices_single_benchmark}"
+        description_from_producer: Share of household consumption at current PPPs
+        description_processing: |-
+          {definitions.description_processing_outliers}
+        display:
+          name: Household consumption as a share of GDP
+          numDecimalPlaces: 1
+          <<: *common-display
+
       csh_i:
-        title: Share of gross capital formation in GDP
+        title: Gross capital formation as a share of GDP
         unit: "%"
         short_unit: "%"
-        description: Share of gross capital formation in GDP (output, single price benchmark)
+        description_short: Gross capital formation divided by [gross domestic product](#dod:gdp), expressed as a percentage.
+        description_key:
+          - "{definitions.description_key_ppp_adjustment}"
+          - "{definitions.description_key_ppp_prices_single_benchmark}"
+        description_from_producer: Share of gross capital formation at current PPPs
+        description_processing: |-
+          {definitions.description_processing_outliers}
+        display:
+          name: Gross capital formation as a share of GDP
+          numDecimalPlaces: 1
+          <<: *common-display
+
       csh_g:
-        title: Share of government consumption in GDP
+        title: Government consumption as a share of GDP
         unit: "%"
         short_unit: "%"
-        description: Share of government consumption in GDP (output, single price benchmark)
+        description_short: Government consumption divided by [gross domestic product](#dod:gdp), expressed as a percentage.
+        description_key:
+          - "{definitions.description_key_ppp_adjustment}"
+          - "{definitions.description_key_ppp_prices_single_benchmark}"
+        description_from_producer: Share of government consumption at current PPPs
+        description_processing: |-
+          {definitions.description_processing_outliers}
+        display:
+          name: Government consumption as a share of GDP
+          numDecimalPlaces: 1
+          <<: *common-display
+
       csh_x:
-        title: Share of merchandise exports in GDP
+        title: Exports as a share of GDP
         unit: "%"
         short_unit: "%"
-        description: Share of merchandise exports in GDP (output, single price benchmark)
+        description_short: Merchandise exports divided by [gross domestic product](#dod:gdp), expressed as a percentage.
+        description_key:
+          - "{definitions.description_key_ppp_adjustment}"
+          - "{definitions.description_key_ppp_prices_single_benchmark}"
+        description_from_producer: Share of merchandise exports at current PPPs
+        description_processing: |-
+          {definitions.description_processing_outliers}
+        display:
+          name: Exports as a share of GDP
+          numDecimalPlaces: 1
+          <<: *common-display
+
       csh_m:
-        title: Share of merchandise imports in GDP
+        title: Imports as a share of GDP
         unit: "%"
         short_unit: "%"
-        description: Share of merchandise imports in GDP (output, single price benchmark)
+        description_short: Merchandise imports divided by [gross domestic product](#dod:gdp), expressed as a percentage.
+        description_key:
+          - "{definitions.description_key_ppp_adjustment}"
+          - "{definitions.description_key_ppp_prices_single_benchmark}"
+        description_from_producer: Share of merchandise imports at current PPPs
+        description_processing: |-
+          {definitions.description_processing_outliers}
+        display:
+          name: Imports as a share of GDP
+          numDecimalPlaces: 1
+          <<: *common-display
+
       csh_r:
-        title: Share of residual trade and GDP statistical discrepancy in GDP
+        title: Residual trade and GDP statistical discrepancy as a share of GDP
         unit: "%"
         short_unit: "%"
-        description: Share of residual trade and GDP statistical discrepancy in GDP (output, single price benchmark)
+        description_short: Residual trade and GDP statistical discrepancy divided by [gross domestic product](#dod:gdp), expressed as a percentage.
+        description_key:
+          - "{definitions.description_key_ppp_adjustment}"
+          - "{definitions.description_key_ppp_prices_single_benchmark}"
+        description_from_producer: Share of residual trade and GDP statistical discrepancy at current PPPs
+        description_processing: |-
+          {definitions.description_processing_outliers}
+        display:
+          name: Residual trade and GDP statistical discrepancy as a share of GDP
+          numDecimalPlaces: 1
+          <<: *common-display
+
       pl_c:
-        title: Price level of household consumption,  price level of USA GDPo in 2017=1
-        unit:
-      pl_i:
-        title: Price level of capital formation,  price level of USA GDPo in 2017=1
-        unit:
-      pl_g:
-        title: Price level of government consumption,  price level of USA GDPo in 2017=1
-        unit:
-      pl_x:
-        title: Price level of exports, price level of USA GDPo in 2017=1
-        unit:
-      pl_m:
-        title: Price level of imports, price level of USA GDPo in 2017=1
-        unit:
-      pl_n:
-        title: Price level of the capital stock, price level of USA in 2017=1
-        unit:
-      pl_k:
-        title: Price level of the capital services, price level of USA=1
-        unit:
-      productivity:
-        title: "Productivity: output per hour worked"
-        unit: international-$ in 2017 prices per hour
-        short_unit: $/h
-        description: |
-          It is the GDP (output, multiple price benchmarks) divided by the Annual working hours per worker and the Number of people in work.
-          {info.outliers}
+        title: Price level of household consumption
+        unit: "international-$ in {definitions.ppp_year} prices / constant {definitions.ppp_year} US$"
+        short_unit: ""
+        description_short: Price level of household consumption, relative to the US (where 1 represents the US price level of GDP in the year {definitions.ppp_year}).
+        description_key:
+          - "{definitions.description_key_ppp_adjustment}"
+          - "{definitions.description_key_ppp_prices_single_benchmark}"
+        description_from_producer: Price level of household consumption,  price level of USA GDPo in 2017=1
+        description_processing: |-
+          {definitions.description_processing_outliers}
         display:
-           name: Productivity
-           numDecimalPlaces: 1
+          name: Price level of household consumption
+          numDecimalPlaces: 1
+          <<: *common-display
+
+      pl_i:
+        title: Price level of capital formation
+        unit: "international-$ in {definitions.ppp_year} prices / constant {definitions.ppp_year} US$"
+        short_unit: ""
+        description_short: Price level of capital formation, relative to the US (where 1 represents the US price level of GDP in the year {definitions.ppp_year}).
+        description_key:
+          - "{definitions.description_key_ppp_adjustment}"
+          - "{definitions.description_key_ppp_prices_single_benchmark}"
+        description_from_producer: Price level of capital formation,  price level of USA GDPo in 2017=1
+        description_processing: |-
+          {definitions.description_processing_outliers}
+        display:
+          name: Price level of capital formation
+          numDecimalPlaces: 1
+          <<: *common-display
+
+      pl_g:
+        title: Price level of government consumption
+        unit: "international-$ in {definitions.ppp_year} prices / constant {definitions.ppp_year} US$"
+        short_unit: ""
+        description_short: Price level of government consumption, relative to the US (where 1 represents the US price level of GDP in the year {definitions.ppp_year}).
+        description_key:
+          - "{definitions.description_key_ppp_adjustment}"
+          - "{definitions.description_key_ppp_prices_single_benchmark}"
+        description_from_producer: Price level of government consumption,  price level of USA GDPo in 2017=1
+        description_processing: |-
+          {definitions.description_processing_outliers}
+        display:
+          name: Price level of government consumption
+          numDecimalPlaces: 1
+          <<: *common-display
+
+      pl_x:
+        title: Price level of exports
+        unit: "international-$ in {definitions.ppp_year} prices / constant {definitions.ppp_year} US$"
+        short_unit: ""
+        description_short: Price level of exports, relative to the US (where 1 represents the US price level of GDP in the year {definitions.ppp_year}).
+        description_key:
+          - "{definitions.description_key_ppp_adjustment}"
+          - "{definitions.description_key_ppp_prices_single_benchmark}"
+        description_from_producer: Price level of exports, price level of USA GDPo in 2017=1
+        description_processing: |-
+          {definitions.description_processing_outliers}
+        display:
+          name: Price level of exports
+          numDecimalPlaces: 1
+          <<: *common-display
+
+      pl_m:
+        title: Price level of imports
+        unit: "international-$ in {definitions.ppp_year} prices / constant {definitions.ppp_year} US$"
+        short_unit: ""
+        description_short: Price level of imports, relative to the US (where 1 represents the US price level of GDP in the year {definitions.ppp_year}).
+        description_key:
+          - "{definitions.description_key_ppp_adjustment}"
+          - "{definitions.description_key_ppp_prices_single_benchmark}"
+        description_from_producer: Price level of imports, price level of USA GDPo in 2017=1
+        description_processing: |-
+          {definitions.description_processing_outliers}
+        display:
+          name: Price level of imports
+          numDecimalPlaces: 1
+          <<: *common-display
+
+      pl_n:
+        title: Price level of capital stock
+        unit: "international-$ in {definitions.ppp_year} prices / constant {definitions.ppp_year} US$"
+        short_unit: ""
+        description_short: Price level of capital stock, relative to the US (where 1 represents the US price level in the year {definitions.ppp_year}).
+        description_key:
+          - "{definitions.description_key_ppp_adjustment}"
+          - "{definitions.description_key_ppp_prices_single_benchmark}"
+        description_from_producer: Price level of capital stock, price level of USA GDPo in 2017=1
+        description_processing: |-
+          {definitions.description_processing_outliers}
+        display:
+          name: Price level of capital stock
+          numDecimalPlaces: 1
+          <<: *common-display
+
+      pl_k:
+        title: Price level of capital services
+        unit: "international-$ in {definitions.ppp_year} prices / constant {definitions.ppp_year} US$"
+        short_unit: ""
+        description_short: Price level of capital services, relative to the US (where 1 represents the US price level in the year {definitions.ppp_year}).
+        description_key:
+          - "{definitions.description_key_ppp_adjustment}"
+          - "{definitions.description_key_ppp_prices_single_benchmark}"
+        description_from_producer: Price level of capital services, price level of USA GDPo in 2017=1
+        description_processing: |-
+          {definitions.description_processing_outliers}
+        display:
+          name: Price level of capital services
+          numDecimalPlaces: 1
+          <<: *common-display
+
+      productivity:
+        title: Productivity
+        unit: international-$ in {definitions.ppp_year} prices per hour
+        short_unit: $/h
+        description_short: Productivity is calculated as GDP divided by the total number of hours worked in the economy. {definitions.description_key_ppp_adjustment}
+        description_key:
+          - "{definitions.description_key_ppp_adjustment}"
+          - "{definitions.description_key_ppp_prices_multiple_benchmarks}"
+        description_processing: |-
+          {definitions.description_processing_productivity}
+
+          {definitions.description_processing_outliers}
+
+          {definitions.description_processing_bermuda}
+        presentation:
+          title_variant: In constant international-$
+          faqs:
+            - fragment_id: poverty-international-dollars
+              gdoc_id: "{definitions.gdoc_id}"
+        display:
+          name: Productivity
+          numDecimalPlaces: 1
+          <<: *common-display
+
       trade_openness:
-        title: Trade openness (share of exports and imports in GDP)
+        title: Trade openness
         unit: "%"
         short_unit: "%"
-        description: It is defined as the sum of exports and imports divided by the GDP at current prices.
+        description_short: Trade openness is defined as the sum of exports and imports divided by [gross domestic product](#dod:gdp), expressed as a percentage.
+        description_processing: |-
+          {definitions.description_processing_trade_openness}
+
+          {definitions.description_processing_outliers}
+
+          {definitions.description_processing_bermuda}
         display:
-           name: Trade openness
+          name: Trade openness
+          numDecimalPlaces: 1
+          <<: *common-display
