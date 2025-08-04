@@ -63,7 +63,7 @@ definitions:
     [0, 20, 40, 60, 80, 100, 120, 1]
 
   selected_entity_names_gdp: &selected_entity_names_gdp
-    [China, United States, India, Japan, Germany, Russia, Brazil, United Kingdom, France, Mexico, Venezuela]
+    [China, United States, India, Japan, Germany, Russia, Brazil, United Kingdom, France, Mexico]
   selected_entity_names_gdp_per_capita: &selected_entity_names_gdp_per_capita
     [Germany, United States, China, United Kingdom, Japan, India, France, South Korea]
 
