@@ -10,7 +10,7 @@ definitions:
         - Economic Growth
 
   # NOTE: Update in case PWT changes the PPP benchmark year.
-  ppp_year: {definitions.ppp_year}
+  ppp_year: 2017
 
   # This is the ID of the Google Doc that contains the FAQs
   gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
