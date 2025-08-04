@@ -191,7 +191,7 @@ def calculate_trade_openness(tb: Table, tb_na: Table) -> Table:
     )
 
     # Calculate the trade openness for the world
-    tb_na_world["trade_openness"] = tb_na_world["trade_openness_x_v_gdp_usd"] / tb_na_world["v_gdp_usd"] * 100
+    tb_na_world["trade_openness"] = tb_na_world["trade_openness_x_v_gdp_usd"] / tb_na_world["v_gdp_usd"]
 
     # Add country column with "World"
     tb_na_world["country"] = "World"
