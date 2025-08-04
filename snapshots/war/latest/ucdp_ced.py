@@ -18,10 +18,12 @@ INSTRUCTIONS TO UPDATE SNAPSHOT:
 
     2. Modify its name and edit the fields to reflect the new version (dates, producer's version, links, etc.).
 
+
     3. Update the value of VERSIONS in this script.
         - Variable VERSIONS is a list in case we need to add multiple versions in the future. However, it generally should only contain one version (corresponding to the DVC's that you created in 2), which is the latest cumulated preview data released in the year (e.g. Q1, or Q1+Q2, etc.)
 
-    3. Run the script to download the latest version of the dataset and upload it to Snapshot. python snapshots/war/latest/ucdp_ced.py
+    4. Run the script to download the latest version of the dataset and upload it to Snapshot. python snapshots/war/latest/ucdp_ced.py
+
 
     4. Update the war.yml DAG dependency of `meadow/war/latest/ucdp_ced` to reflect the new version(s) of the DVC file.
 
