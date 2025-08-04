@@ -3,7 +3,7 @@ meta:
     producer: Uppsala Conflict Data Program
     title: Candidate Events Dataset
     description: |-
-      The UCDP Candidate Events Dataset (UCDP Candidate) is based on UCDP Georeferenced Event Dataset (UCDP GED), but published at a monthly release cycle. It makes available monthly releases of candidate events data with not more than a month's lag globally. See codebook for similarieties and differences between the two products.
+      The UCDP Candidate Events Dataset (UCDP Candidate) is based on UCDP Georeferenced Event Dataset (UCDP GED), but published at a monthly release cycle. It makes available monthly releases of candidate events data with not more than a month's lag globally. See codebook for similarities and differences between the two products.
 
       You can find more notes at https://ucdp.uu.se/downloads/candidateged/ucdp-candidate-codebook1.4.pdf
     title_snapshot: Candidate Events Dataset (January - June 2025)
