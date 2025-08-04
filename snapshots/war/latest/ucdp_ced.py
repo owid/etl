@@ -25,13 +25,13 @@ INSTRUCTIONS TO UPDATE SNAPSHOT:
     4. Run the script to download the latest version of the dataset and upload it to Snapshot. python snapshots/war/latest/ucdp_ced.py
 
 
-    4. Update the war.yml DAG dependency of `meadow/war/latest/ucdp_ced` to reflect the new version(s) of the DVC file.
+    5. Update the war.yml DAG dependency of `meadow/war/latest/ucdp_ced` to reflect the new version(s) of the DVC file.
 
-    5. Go to the Meadow step (`meadow/war/latest/ucdp_ced`) , update the snap.read(...), run it
+    6. Go to the Meadow step (`meadow/war/latest/ucdp_ced`) , update the snap.read(...), run it
 
-    6. Go to the Garden step (`garden/war/latest/ucdp_preview`), update `LAST_YEAR`, `LAST_YEAR_PREVIEW` variables if applicable, and run it. Probably you will need to also update `NUM_MISSING_LOCATIONS`.
+    7. Go to the Garden step (`garden/war/latest/ucdp_preview`), update `LAST_YEAR`, `LAST_YEAR_PREVIEW` variables if applicable, and run it. Probably you will need to also update `NUM_MISSING_LOCATIONS`.
 
-    7. Go back to the GitHub issue to address further steps that concern chart and Grapher updates (e.g. subtitle edits).
+    8. Go back to the GitHub issue to address further steps that concern chart and Grapher updates (e.g. subtitle edits).
 """
 
 from pathlib import Path
