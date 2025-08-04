@@ -17,6 +17,8 @@ definitions:
 
   note_ppp_adjustment: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at {definitions.ppp_year} prices, using multiple benchmark years to adjust for differences in living costs between countries over time.
 
+  note_ppp_production: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at {definitions.ppp_year} prices per hour, using multiple benchmark years to adjust for differences in living costs between countries over time.
+
   description_short_gdp: Total economic output of a country or region per year.
   description_short_gdp_per_capita: Average economic output per person in a country or region per year.
 
@@ -55,6 +57,10 @@ definitions:
     [0, 10000000000, 30000000000, 100000000000, 300000000000, 1000000000000, 3000000000000, 10000000000000, 1]
   map_brackets_gdp_per_capita: &map_brackets_gdp_per_capita
     [0, 1000, 2000, 5000, 10000, 20000, 50000, 1]
+  map_brackets_productivity: &map_brackets_productivity
+    [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 1]
+  map_brackets_trade_openness: &map_brackets_trade_openness
+    [0, 20, 40, 60, 80, 100, 1]
 
   selected_entity_names_gdp: &selected_entity_names_gdp
     [China, United States, India, Japan, Germany, Russia, Brazil, United Kingdom, France, Mexico, Venezuela]
@@ -918,7 +924,7 @@ tables:
           <<: *common-display
 
       productivity:
-        title: Productivity
+        title: "Productivity: output per hour worked"
         unit: international-$ in {definitions.ppp_year} prices per hour
         short_unit: $/h
         description_short: Productivity is calculated as GDP divided by the total number of hours worked in the economy. {definitions.description_key_ppp_adjustment}
@@ -936,6 +942,27 @@ tables:
           faqs:
             - fragment_id: poverty-international-dollars
               gdoc_id: "{definitions.gdoc_id}"
+          grapher_config:
+            title: "Productivity: output per hour worked"
+            subtitle: Productivity is measured as [gross domestic product (GDP)](#dod:gdp) per hour of work. {definitions.description_key_ppp_adjustment}
+            note: "{definitions.note_ppp_production}"
+            originUrl: https://ourworldindata.org/economic-growth
+            map:
+              colorScale:
+                binningStrategy: manual
+                baseColorScheme: YlGnBu
+                customNumericValues: *map_brackets_productivity
+            selectedEntityNames: *selected_entity_names_gdp
+            yAxis:
+              min: 0
+              canChangeScaleType: true
+            tab: map
+            hideRelativeToggle: false
+            hasMapTab: true
+            hideAnnotationFieldsInTitle:
+              entity: true
+              time: true
+              changeInPrefix: true
         display:
           name: Productivity
           numDecimalPlaces: 1
@@ -945,13 +972,32 @@ tables:
         title: Trade openness
         unit: "%"
         short_unit: "%"
-        description_short: Trade openness is defined as the sum of exports and imports divided by [gross domestic product](#dod:gdp), expressed as a percentage.
+        description_short: Trade openness is measured as the sum of exports and imports divided by [gross domestic product](#dod:gdp), expressed as a percentage.
         description_processing: |-
           {definitions.description_processing_trade_openness}
 
           {definitions.description_processing_outliers}
 
           {definitions.description_processing_bermuda}
+        presentation:
+          grapher_config:
+            title: Trade openness
+            subtitle: Trade openness is measured as the sum of exports and imports divided by [gross domestic product](#dod:gdp), expressed as a percentage.
+            note: ""
+            originUrl: https://ourworldindata.org/trade-and-globalization
+            map:
+              colorScale:
+                binningStrategy: manual
+                baseColorScheme: Greens
+                customNumericValues: *map_brackets_trade_openness
+            selectedEntityNames: *selected_entity_names_gdp
+            yAxis:
+              min: 0
+            tab: map
+            hasMapTab: true
+            hideAnnotationFieldsInTitle:
+              entity: true
+              time: true
         display:
           name: Trade openness
           numDecimalPlaces: 1
