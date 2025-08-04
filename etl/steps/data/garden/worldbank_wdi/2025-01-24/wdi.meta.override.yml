@@ -29,13 +29,11 @@ definitions:
     - The data comes from administrative records, such as school enrolment reports, and from population estimates, usually provided by the United Nations or national sources.
 
   desc_key_trained_teachers: &desc_key_trained_teachers
-    - Well-trained teachers are essential for quality education delivery — this indicator shows what percentage of teachers at each education level have received at least the minimum organized pedagogical training required for teaching.
-    - It measures the proportion of teachers who have received at least the minimum organized pedagogical teacher training, either pre-service or in-service, required for teaching at the relevant level according to national standards.
-    - The indicator is calculated by dividing the number of trained teachers at a given education level by the total number of teachers at that same level, multiplied by 100.
-    - A high value indicates that most students are being taught by teachers who are pedagogically well-trained to teach according to national standards.
-    - The data comes from administrative records collected at schools and other organized learning centers, typically including information on teacher training credentials and employment status.
-    - National minimum training requirements can vary widely between countries, which limits the usefulness of cross-country comparisons since the indicator shows the percentage reaching national standards rather than whether teachers in different countries have similar levels of training.
-    - This indicator measures pedagogical training specifically, focusing on teaching methods and classroom management skills rather than subject-specific academic qualifications.
+   - Not all teachers receive the same level of preparation before entering the classroom. This indicator measures the percentage of teachers at each education level who have completed at least the minimum organized pedagogical training required for teaching at that level in their country.
+   - It captures the share of teachers who are pedagogically trained, expressed as a percentage of all teachers at that level. For example, if there are 1,000 primary teachers and 850 have completed the required training, the indicator shows 85%.
+   - The "minimum training" refers to whatever organized pedagogical preparation each country requires - pre-service teacher education programs, in-service training courses, or certification requirements that focus on teaching methods rather than subject knowledge.
+   - Values below 100% suggest some teachers are working without the pedagogical training their own country considers necessary. However, cross-country comparisons can be misleading since training requirements vary significantly between nations.
+   - The data comes from administrative records collected at schools and other organized learning centers, typically including information on teacher academic credentials and employment status.
 
   description_short_clean_fuels: &description_short_clean_fuels |-
     Access to [clean fuels or technologies](#dod:clean-cooking-fuels) such as natural gas, electricity, and clean cookstoves reduces exposure to indoor air pollutants, a leading cause of death in low-income households.
