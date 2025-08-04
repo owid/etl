@@ -53,7 +53,7 @@ LAST_YEAR = 2024
 LAST_YEAR_PREVIEW = 2025
 
 # Number of events with no location assigned (see function estimate_metrics_locations)
-NUM_MISSING_LOCATIONS = 1216
+NUM_MISSING_LOCATIONS = 1230
 
 # Catalog path of the main UCDP dataset. NOTE: Change this when there is a new UCDP stable (yearly) release.
 VERSION_UCDP_STABLE = "2025-06-13"
