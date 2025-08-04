@@ -964,7 +964,7 @@ tables:
               time: true
               changeInPrefix: true
         display:
-          name: Productivity
+          name: "Productivity: output per hour worked"
           numDecimalPlaces: 1
           <<: *common-display
 
