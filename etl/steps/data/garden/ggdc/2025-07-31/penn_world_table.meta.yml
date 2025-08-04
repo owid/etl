@@ -399,7 +399,7 @@ tables:
       avh:
         title: Average working hours per worker
         unit: hours per worker
-        short_unit: ""
+        short_unit: h
         description_short: This is the average sum of hours worked by employees and self-employed people during each year in a country.
         description_from_producer: Average annual hours worked by persons engaged
         display:
