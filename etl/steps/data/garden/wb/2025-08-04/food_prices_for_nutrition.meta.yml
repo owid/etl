@@ -78,7 +78,7 @@ tables:
   food_prices_for_nutrition:
     title: Food prices for nutrition
     variables:
-      cost_of_an_energy_sufficient_diet:
+      cost_of_an_energy_sufficient_diet_in_ppp_dollars:
         title: Cost of an energy sufficient diet
         unit: international-$ in 2021 prices per person per day
         short_unit: $
@@ -123,7 +123,7 @@ tables:
           - *description_energy_sufficient_diet
           - This indicator is calculated as the percentage of a country's population that is unable to afford an energy sufficient diet, multiplied by the country's population.
           - *description_key_number_of_population
-      cost_of_a_healthy_diet:
+      cost_of_a_healthy_diet_in_ppp_dollars:
         title: Cost of a healthy diet
         unit: international-$ in 2021 prices per person per day
         short_unit: $
@@ -144,7 +144,7 @@ tables:
           Ratio between the cost of a healthy diet that meets requirements for energy and food-based dietary guidelines and the cost of caloric adequacy that uses only starchy staples to meet energy requirements.
         description_key:
           - *description_healthy_diet
-      cost_of_animal_source_foods:
+      cost_of_animal_source_foods_in_ppp_dollars:
         title: Cost of animal-source foods
         unit: international-$ in 2021 prices per person per day
         short_unit: $
@@ -169,7 +169,7 @@ tables:
           Cost of the least expensive animal-source foods as a multiple of the least expensive starchy staples to meet daily recommendations in food-based dietary guidelines.
         description_key:
           - *description_healthy_diet
-      cost_of_fruits:
+      cost_of_fruits_in_ppp_dollars:
         title: Cost of fruits
         unit: international-$ in 2021 prices per person per day
         short_unit: $
@@ -211,7 +211,7 @@ tables:
         description_key:
           - *description_healthy_diet
           - *description_key_pct_of_population
-      cost_of_legumes__nuts_and_seeds:
+      cost_of_legumes__nuts_and_seeds_in_ppp_dollars:
         title: Cost of legumes, nuts and seeds
         unit: international-$ in 2021 prices per person per day
         short_unit: $
@@ -236,7 +236,7 @@ tables:
           Cost of the least expensive legumes, nuts and seeds as a multiple of the least expensive starchy staples to meet daily recommendations in food-based dietary guidelines.
         description_key:
           - *description_healthy_diet
-      cost_of_oils_and_fats:
+      cost_of_fats_and_oils_in_ppp_dollars:
         title: Cost of oils and fats
         unit: international-$ in 2021 prices per person per day
         short_unit: $
@@ -270,7 +270,7 @@ tables:
         description_key:
           - *description_healthy_diet
           - *description_key_poverty_lines
-      cost_of_starchy_staples:
+      cost_of_starchy_staples_in_ppp_dollars:
         title: Cost of starchy staples
         unit: international-$ in 2021 prices per person per day
         short_unit: $
@@ -297,7 +297,7 @@ tables:
           - *description_healthy_diet
           - This indicator is calculated as the percentage of a country's population that is unable to afford a healthy diet, multiplied by the country's population.
           - *description_key_number_of_population
-      cost_of_vegetables:
+      cost_of_vegetables_in_ppp_dollars:
         title: Cost of vegetables
         unit: international-$ in 2021 prices per person per day
         short_unit: $
@@ -322,7 +322,7 @@ tables:
           Cost of the least expensive vegetables as a multiple of the least expensive starchy staples to meet daily recommendations in food-based dietary guidelines.
         description_key:
           - *description_healthy_diet
-      cost_of_a_nutrient_adequate_diet:
+      cost_of_a_nutrient_adequate_diet_in_ppp_dollars:
         title: Cost of a nutrient adequate diet
         unit: international-$ in 2021 prices per person per day
         short_unit: $
