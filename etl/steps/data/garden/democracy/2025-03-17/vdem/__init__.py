@@ -111,7 +111,8 @@ def run() -> None:
 
     # %% PART 2: IMPUTE
     # The following lines concern imputing steps.
-    # Equivalent to: https://github.com/owid/notebooks/blob/main/BastianHerre/democracy/scripts/vdem_row_impute.do
+    # Based on: https://github.com/owid/notebooks/blob/main/BastianHerre/democracy/scripts/vdem_row_impute.do
+    # Not all indicators should be imputed (more info: https://github.com/owid/etl/pull/4784)
     paths.log.info("2/ Imputing data...")
     tb = impute.run(tb)
 

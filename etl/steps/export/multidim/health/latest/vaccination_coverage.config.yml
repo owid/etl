@@ -3,6 +3,10 @@ title:
   title_variant: by vaccine
 default_selection:
   - World
+topic_tags:
+  - Vaccination
+  - Global Health
+  - Child & Infant Mortality
 dimensions:
   - name: Metric
     slug: metric
