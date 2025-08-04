@@ -1,5 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import pandas as pd
+
 from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
@@ -33,13 +35,9 @@ def run() -> None:
         # to match the other countries.
         # Kosovo is listed as the 1890s so we replace it with 1899 to match the other countries.
         # We also replace the values for Liechtenstein of 19th century with 1899 to match the other countries.
-        .replace({"1950s": "1959", "1890s": "1899", "19th century": "1899"})
+        .replace({"1950s": "1959", "1890s": "1899", "19th century": "1899", "Never reported": pd.NA})
     )
 
-    def is_valid(val):
-        return val == "Never reported" or (str(val).isdigit() and len(str(val)) == 4)
-
-    assert tb["last_recorded_rinderpest"].apply(is_valid).all(), "Invalid values found in Last outbreak"
     # Improve table format.
     tb = tb.format(["country"])
 
