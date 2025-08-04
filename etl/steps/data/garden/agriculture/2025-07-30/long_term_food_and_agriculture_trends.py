@@ -100,9 +100,12 @@ OTHER_COUNTRIES_EXCLUDED_FROM_AGGREGATES = [
     "Qatar",
     "Seychelles",
     "Somalia",
-    "South Sudan",
-    "Sudan",
-    "Sudan (former)",
+    # South Sudan data is missing from 2012 to 2018 (which creates a dip in the data). We could remove "Sudan (former)", "Sudan", and "South Sudan" to correct for this, but I think it's better to accept that abrupt change rather than losing a significant amount of relevant data; the data for the combined Sudan area is otherwise complete from 1961 to the last year informed.
+    # NOTE: Other countries (Libya, DRC, Somalia) also represent a significant area, and it would be preferrable to keep them. But unfortunately, their data starts in 2010, so in those cases it may be better to remove them, to avoid spurious changes in long-term trends.
+    # Similarly, other relevant countries in terms of land area, like Eritrea and Western Sahara, simply have no food supply data, so they are removed from the data (they are removed when we drop nans).
+    # "South Sudan",
+    # "Sudan",
+    # "Sudan (former)",
     "Syria",
     "Tonga",
     "Turkmenistan",
@@ -175,7 +178,7 @@ def create_corrected_lists_of_region_members(tb, tb_regions):
 
     # For "Africa (corrected)":
     # - From 2009 to 2010, we gain data for Burundi, Comoros, Democratic Republic of Congo, Libya, Seychelles, and Somalia. These countries didn't have data in FBSH, but do have in FBS.
-    # - In 2011, data for Sudan (former) ends, but in 2012 we only have data for Sudan (referring to North Sudan). Unfortunately, data for South Sudan in FBS starts in 2019 (hence we are missing data for South Sudan between 2012 and 2018).
+    # - In 2011, data for Sudan (former) ends, but in 2012 we only have data for Sudan (referring to North Sudan). Unfortunately, data for South Sudan in FBS starts in 2019 (hence we are missing data for South Sudan between 2012 and 2018). This causes an abrupt decrease during those years.
     assert (
         tb[
             tb["country"].isin(["Burundi", "Comoros", "Democratic Republic of Congo", "Libya", "Seychelles", "Somalia"])
@@ -195,10 +198,11 @@ def create_corrected_lists_of_region_members(tb, tb_regions):
                 "Libya",
                 "Seychelles",
                 "Somalia",
-                # We exclude Sudan (former), Sudan and South Sudan because the latter is only informed from 2019 on.
-                "Sudan",
-                "South Sudan",
-                "Sudan (former)",
+                # We could exclude Sudan (former), Sudan and South Sudan because the latter is only informed from 2019 on.
+                # But this causes a significant data loss, so it may be better to keep them, despite it creating an abrupt dent in agricultural land between 2012 and 2018.
+                # "Sudan",
+                # "South Sudan",
+                # "Sudan (former)",
             ]
         )
     )
