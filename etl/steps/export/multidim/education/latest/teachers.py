@@ -190,17 +190,14 @@ def adjust_dimensions(tb, dataset_name):
         else:  # education_sdgs
             # UNESCO uses descriptive names - parse education level from column text
             col_lower = col.lower()
-            if "pre" in col_lower or "preprimary" in col_lower:
+            if "pre_primary" in col_lower:
                 return "pre_primary"
-            elif "primary" in col_lower and "lower" not in col_lower and "upper" not in col_lower:
+            elif "primary" in col_lower:
                 return "primary"
-            elif "lower" in col_lower and "secondary" in col_lower:
+            elif "lower_secondary" in col_lower:
                 return "lower_secondary"
-            elif "upper" in col_lower and "secondary" in col_lower:
+            elif "upper_secondary" in col_lower:
                 return "upper_secondary"
-            elif "lower" in col_lower:
-                return "lower_secondary"
-        return "primary"  # Default fallback
 
     # Map dataset source to teacher type dimension
     teacher_type_mapping = {"education_sdgs": "qualified", "wdi": "trained"}
