@@ -13,13 +13,13 @@ dimensions:
     choices:
       - slug: primary
         name: Primary education
-        description: Percentage of teachers who are women in primary education (typically ages 6-11).
+        description: Marks the start of formal schooling, typically for children aged 5 to 7.
       - slug: secondary
         name: Secondary education
-        description: Percentage of teachers who are women in secondary education (typically ages 12-17).
+        description: Marks the stage of education following primary education, typically for children aged 12 to 17.
       - slug: tertiary
         name: Tertiary education
-        description: Percentage of teachers who are women in tertiary education (higher education).
+        description: Formal post-secondary learning, ranging from short vocational programs to university degrees.
       - slug: level_side_by_side
         name: All education levels
         description: Compare the share of women teachers across different education levels.

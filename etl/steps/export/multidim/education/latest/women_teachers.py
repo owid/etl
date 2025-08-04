@@ -76,13 +76,6 @@ def run() -> None:
 
     create_grouped_views(collection)
 
-    collection.set_global_config(
-        config={
-            "title": lambda view: generate_title_by_dimensions(view),
-            "subtitle": lambda view: generate_subtitle_by_dimensions(view),
-        }
-    )
-
     for view in collection.views:
         edit_indicator_displays(view)
 
@@ -129,15 +122,18 @@ def adjust_dimensions(tb):
 def create_grouped_views(collection):
     """Add grouped views for education level comparisons."""
 
-    view_metadata = {
-        "presentation": {"title_public": "{title}"},
-        "description_short": "{subtitle}",
-    }
+    def get_view_metadata(view):
+        """Generate view metadata with actual title and subtitle."""
+        return {
+            "presentation": {"title_public": generate_title_by_dimensions(view)},
+            "description_short": generate_subtitle_by_dimensions(view),
+        }
 
-    def get_view_config(_):
+    def get_view_config(view):
+        """Generate chart configuration for grouped views."""
         return GROUPED_VIEW_CONFIG | {
-            "title": "{title}",
-            "subtitle": "{subtitle}",
+            "title": generate_title_by_dimensions(view),
+            "subtitle": generate_subtitle_by_dimensions(view),
         }
 
     collection.group_views(
@@ -147,38 +143,22 @@ def create_grouped_views(collection):
                 "choice_new_slug": "level_side_by_side",
                 "choices": ["primary", "secondary", "tertiary"],
                 "view_config": get_view_config,
-                "view_metadata": view_metadata,
+                "view_metadata": get_view_metadata,
             },
         ],
-        params={
-            "title": lambda view: generate_title_by_dimensions(view),
-            "subtitle": lambda view: generate_subtitle_by_dimensions(view),
-        },
     )
 
 
 def generate_title_by_dimensions(view):
-    """Generate chart title based on view dimensions."""
-    level = view.dimensions.get("level", "primary")
-    level_cfg = EDUCATION_LEVELS.get(level, {})
-    level_term = level_cfg.get("title_term", level)
-
+    """Generate chart title for grouped views."""
     if view.matches(level="level_side_by_side"):
         return "Share of teachers who are women, by education level"
-    else:
-        return f"Share of teachers who are women in {level_term}"
 
 
 def generate_subtitle_by_dimensions(view):
-    """Generate chart subtitle based on dimensions."""
-    level = view.dimensions.get("level", "primary")
-    level_cfg = EDUCATION_LEVELS.get(level, {})
-    age_range = level_cfg.get("age_range", "")
-
+    """Generate descriptive subtitle for grouped views."""
     if view.matches(level="level_side_by_side"):
-        return "Percentage of teachers who are women across different education levels."
-    else:
-        return f"Percentage of teachers who are women in {age_range}."
+        return "Percentage of teachers who are women across [primary](#dod:primary-education), [secondary](#dod:secondary-education), and [tertiary](#dod:tertiary-education) education levels, shown as a percentage of all teachers."
 
 
 def edit_indicator_displays(view):
