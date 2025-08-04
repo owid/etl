@@ -43,8 +43,6 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load garden dataset
-
-    print(dest_dir)
     ds_garden = paths.load_dataset("guinea_worm")
 
     # Read table from garden dataset.
