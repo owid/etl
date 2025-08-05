@@ -1,0 +1,27 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Working hours (Huberman and Minns, 2007)"
+    description: |-
+      This paper brings a historical perspective to debates on worktime differences across OECD countries, exploiting new data sets on hours of work per week, and days and hours of work per year between 1870 and 2000. We contest the popular view that the divergence in worktimes between Europe and North America and Australia is a recent phenomenon. Since 1870 the decline in weekly and annual hours was consistently greater in the Old World; the New World has had fewer days off for the last 130 years. Labor power and inequality, held to be important determinants of worktime after 1970, had comparable effects in the period before 1913. We find that given their levels of income in 1870 New World workers supplied relatively too many hours of work.
+    date_published: "2023-10-01"
+
+    # Citation
+    producer: Huberman and Minns
+    citation_full: |-
+      Huberman, M., & Minns, C. (2007). The times they are not changin’: Days and hours of work in Old and New Worlds, 1870–2000. Explorations in Economic History, 44(4), 538-567. https://doi.org/10.1016/j.eeh.2007.03.002
+
+    # Files
+    url_main: https://www.sciencedirect.com/science/article/abs/pii/S0014498307000058
+    date_accessed: '2025-08-05'
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://www.sciencedirect.com/science/article/abs/pii/S0014498307000058
+outs:
+  - md5: d01c40916b4b0009cfa31479af8c2427
+    size: 5468
+    path: working_hours_huberman_minns.csv
