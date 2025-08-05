@@ -177,14 +177,14 @@ tables:
                   - 1
             selectedEntityNames:
               - World
-              - South and South-East Asia (MPD)
-              - Sub-Saharan Africa (MPD)
               - Western Europe (MPD)
               - Eastern Europe (MPD)
               - Latin America (MPD)
-              - Middle East (MPD)
               - East Asia (MPD)
               - Western offshoots (MPD)
+              - Sub Saharan Africa (MPD)
+              - South and South East Asia (MPD)
+              - Middle East and North Africa (MPD)
 
       population:
         title: Population
