@@ -12,6 +12,7 @@ definitions:
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
+  title: Working hours OMM
   update_period_days: 365
 
 
