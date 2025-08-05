@@ -9,7 +9,7 @@ For convenience, I only downloaded a csv from an old version of the data availab
 https://admin.owid.io/admin/datasets/234
 
 I renamed the columns have more manageable names:
-country,year,working_hours_week,working_hours_year,weeks_worked,vacation_days
+country,year,working_hours_week,working_hours_year,vacation_days
 
 Upload that file by running this script with the `--path-to-file` option pointing to the csv file.
     python snapshots/working_hours/{version}/huberman_minns.py --path-to-file {path_to_file}

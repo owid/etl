@@ -11,7 +11,7 @@ meta:
     # Citation
     producer: Huberman and Minns
     citation_full: |-
-      Huberman, M., & Minns, C. (2007). The times they are not changin’: Days and hours of work in Old and New Worlds, 1870–2000. Explorations in Economic History, 44(4), 538-567. https://doi.org/10.1016/j.eeh.2007.03.002
+      Huberman, M., & Minns, C. (2007). The times they are not changin’: Days and hours of work in Old and New Worlds, 1870–2000. Explorations in Economic History, 44(4), 538-567. Tables 1, 2, and 3. https://doi.org/10.1016/j.eeh.2007.03.002
 
     # Files
     url_main: https://www.sciencedirect.com/science/article/abs/pii/S0014498307000058
@@ -22,6 +22,6 @@ meta:
       name: CC BY 4.0
       url: https://www.sciencedirect.com/science/article/abs/pii/S0014498307000058
 outs:
-  - md5: d01c40916b4b0009cfa31479af8c2427
-    size: 5468
-    path: working_hours_huberman_minns.csv
+  - md5: fe4761445851e3f490d3985778b77162
+    size: 4915
+    path: huberman_minns.csv
