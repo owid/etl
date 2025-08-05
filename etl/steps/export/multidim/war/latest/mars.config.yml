@@ -1,5 +1,5 @@
 title:
-  title: Data on conflict since 1800
+  title: Data on conflict from 1800 to 2011
   title_variant: "from Project Mars"
 default_selection:
   - World
@@ -20,23 +20,24 @@ dimensions:
       - slug: "death_rate"
         name: "Death rate"
         group: "How deadly are wars?"
-        description: The number of deaths divided by the total population
+        description: Number of deaths divided by the total population
       - slug: "wars_ongoing"
         name: "Number of wars"
         group: "How common are wars?"
         # description: People moving to country
       - slug: "wars_ongoing_country_rate"
         name: "Rate of wars"
-        description: The number of wars divided by the number of countries
+        description: Number of wars divided by the number of countries
         group: "How common are wars?"
 
   - slug: conflict_type
-    name: "Conflict type"
+    name: "War type"
     choices:
       - slug: "all"
         name: "All wars"
       - slug: "all_stacked"
-        name: "All wars (by type)"
+        name: "All, broken down by type"
+        description: "Breakdown between interstate and civil wars"
       - slug: "others (non-civil)"
         name: "Interstate wars"
         # description: People moving to country

@@ -237,11 +237,11 @@ def _set_title(view):
 def _set_subtitle(view):
     dods = get_dods(view.d.conflict_type)
     if view.d.indicator == "deaths":
-        return f"Deaths of combatants due to fighting in {dods} wars. Civilian deaths and deaths of combatants due to disease and starvation resulting from the war are not included."
+        return f"Deaths of combatants due to fighting in {dods}. Civilian deaths and deaths of combatants due to disease and starvation resulting from the war are not included."
     elif view.d.indicator == "death_rate":
-        return f"Deaths of combatants due to fighting, per 100,000 people. Included are {dods} wars. Civilian deaths and deaths of combatants due to disease and starvation resulting from the war are not included."
+        return f"Deaths of combatants due to fighting, per 100,000 people. Included are {dods}. Civilian deaths and deaths of combatants due to disease and starvation resulting from the war are not included."
     elif view.d.indicator == "wars_ongoing":
-        return f"Included are {dods} wars."
+        return f"Included are {dods}."
     elif view.d.indicator == "wars_ongoing_country_rate":
         return f"The number of conflicts divided by the number of all states. This accounts for the changing number of states over time. Included are {dods} wars."
     else:
@@ -263,7 +263,7 @@ def get_conflict_type(ctype):
 
 def get_dods(ctype):
     if ctype in ("all", "all_stacked"):
-        return "[interstate](#dod:interstate-war-mars) and [civil](#dod:civil-war-mars)"
+        return "[interstate](#dod:interstate-war-mars) and [civil](#dod:civil-war-mars) wars"
     elif ctype == "civil war":
         return "[civil wars](#dod:civil-war-mars)"
     elif ctype == "others (non-civil)":
