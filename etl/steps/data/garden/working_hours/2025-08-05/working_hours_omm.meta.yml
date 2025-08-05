@@ -18,7 +18,7 @@ tables:
     variables:
       working_hours_omm:
         title: Working hours per worker
-        unit: hours
+        unit: hours per worker
         short_unit: h
         description_short: Average working hours per worker in a given year.
         description_key:

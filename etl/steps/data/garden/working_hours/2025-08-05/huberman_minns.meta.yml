@@ -20,7 +20,7 @@ tables:
     variables:
       working_hours_week:
         title: Working hours per week
-        unit: hours
+        unit: hours per worker
         short_unit: h
         description_short: Average working hours per week for full-time production workers in non-agricultural activities.
         description_key:
@@ -69,7 +69,7 @@ tables:
 
       working_hours_year:
         title: Working hours per year
-        unit: hours
+        unit: hours per worker
         short_unit: h
         description_short: Average working hours per year for full-time production workers in non-agricultural activities.
         description_key:
