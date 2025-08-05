@@ -6,6 +6,8 @@ definitions:
         - Housing
       grapher_config:
         note: The value for Belgium is constructed from the values of four major cities, namely Antwerp, Bruges, Brussels, and Ghent.
+  notes:
+    historic_records: This is based on archival sources and previous research.
 
 
 # Learn more about the available fields:
@@ -24,84 +26,92 @@ tables:
         short_unit: ""
       real_wage:
         title: Real wages
-        description_short: Real wages, normalized to 1900=100. These values are adjusted for inflation.
+        description_short: Real wages, normalized to 1900=100 and adjusted for inflation.
+        description_key:
+          - This data comes from the paper "The Housing Affordability Revolution" by Korevaar et al. (2023). It provides insights into the long-term trends in housing affordability across various countries, focusing on the ratio of real rents to real wages.
+          - Real wages are based on multiple sources, such as day wages and annual wages of various industries, collective labour agreements, tax documentation and existing wage indices.
+          - The researchers adjusted the raw values for inflation by constructing a long-term consumer price index for each country.
         unit: Index
         short_unit: ""
       real_rent:
         title: Real rents
-        description_short: Real rents, normalized to 1900=100. These values are adjusted for inflation and improvements in quality of the housing stock.
+        description_short: Real rents, normalized to 1900=100. These values are adjusted for inflation and improvements in quality of the housing stock. Quality improvements take into account amenities such as the availability of indoor bathrooms and toilets, kitchens, electricity, and central heating.
+        description_key:
+          - This data comes from the paper "The Housing Affordability Revolution" by Korevaar et al. (2023). It provides insights into the long-term trends in housing affordability across various countries, focusing on the ratio of real rents to real wages.
+          - Real rents are based on multiple sources, such as historical records of rents from institutional accounts, rent control records, tax documentation and existing rent indices.
+          - The researchers adjusted the raw values for inflation by constructing a long-term consumer price index for each country. They also adjusted for improvements in the quality of the housing stock, which includes amenities such as the availability of indoor bathrooms and toilets, kitchens, electricity, and central heating.
         unit: Index
         short_unit: ""
   korevaar_quality:
     variables:
       rooms_per_occupant:
         title: Rooms per occupant
-        description_short: Average number of rooms per occupant of a dwelling.
+        description_short: Average number of rooms per occupant of a dwelling. {{ definitions.notes.historic_records }}
         unit: Rooms per occupant
         short_unit: "rooms"
       surface_m2:
         title: Surface area in square meters
-        description_short: Average surface area of the dwelling in square meters.
+        description_short: Average surface area of the dwelling in square meters. {{ definitions.notes.historic_records }}
         unit: square meters
         short_unit: "m²"
       surface_per_occupant:
         title: Surface area per occupant
-        description_short: Average surface area per occupant in the household, in square meters.
+        description_short: Average surface area per occupant in the household, in square meters. {{ definitions.notes.historic_records }}
         unit: square meters
         short_unit: "m²"
       occupants:
         title: Number of occupants
-        description_short: Average number of occupants in the household.
+        description_short: Average number of occupants in the household. {{ definitions.notes.historic_records }}
         unit: Occupants
         short_unit: ""
       inside_toilet_pct:
         title: Percentage of households with an inside toilet
-        description_short: Percentage of households that have an inside toilet.
+        description_short: Percentage of households that have an inside toilet. {{ definitions.notes.historic_records }}
         unit: "%"
         short_unit: "%"
       bathroom_pct:
         title: Percentage of households with a bathroom
-        description_short: Percentage of households that have a bathroom.
+        description_short: Percentage of households that have a bathroom. {{ definitions.notes.historic_records }}
         unit: "%"
         short_unit: "%"
       central_heating_pct:
         title: Percentage of households with central heating
-        description_short: Percentage of households that have central heating.
+        description_short: Percentage of households that have central heating. {{ definitions.notes.historic_records }}
         unit: "%"
         short_unit: "%"
       water_pct:
         title: Percentage of households with running water
-        description_short: Percentage of households that have running water.
+        description_short: Percentage of households that have running water. {{ definitions.notes.historic_records }}
         unit: "%"
         short_unit: "%"
       electricity_pct:
         title: Percentage of households with electricity
-        description_short: Percentage of households that have electricity.
+        description_short: Percentage of households that have electricity. {{ definitions.notes.historic_records }}
         unit: "%"
         short_unit: "%"
       rooms:
         title: Number of rooms
-        description_short: Average number of rooms in the dwelling.
+        description_short: Average number of rooms in the dwelling. {{ definitions.notes.historic_records }}
         unit: Rooms
         short_unit: "rooms"
       rooms_per_capita:
         title: Rooms per capita
-        description_short: Average number of rooms per capita in the region. This is calculated as the total number of rooms divided by the total number of people living in the city.
+        description_short: Average number of rooms per capita in the region. This is calculated as the total number of rooms divided by the total number of people living in the city. {{ definitions.notes.historic_records }}
         unit: Rooms
         short_unit: "rooms"
       kitchen_greater_than_4m2_pct:
         title: Percentage of households with a kitchen larger than 4 square meters
-        description_short: Percentage of households that have a kitchen larger than 4 square meters.
+        description_short: Percentage of households that have a kitchen larger than 4 square meters. {{ definitions.notes.historic_records }}
         unit: "%"
         short_unit: "%"
       isolation_pct:
         title: Percentage of households with isolation
-        description_short: Percentage of households that have heat isolation.
+        description_short: Percentage of households that have isolation. {{ definitions.notes.historic_records }}
         unit: "%"
         short_unit: "%"
       gas_pct:
         title: Percentage of households with gas
-        description_short: Percentage of households that are connected to the gas network.
+        description_short: Percentage of households that are connected to the gas network. {{ definitions.notes.historic_records }}
         unit: "%"
         short_unit: "%"
 
