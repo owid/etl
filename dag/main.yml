@@ -731,6 +731,16 @@ steps:
   data-private://grapher/happiness/2025-07-22/life_in_five_years_and_life_today:
     - data-private://garden/happiness/2025-07-22/life_in_five_years_and_life_today
 
+  #
+  # Average working hours - Huberman and Minns (2007)
+  #
+  data://meadow/working_hours/2025-08-05/huberman_minns:
+    - snapshot://working_hours/2025-08-05/huberman_minns.csv
+  data://garden/working_hours/2025-08-05/huberman_minns:
+    - data://meadow/working_hours/2025-08-05/huberman_minns
+  data://grapher/working_hours/2025-08-05/huberman_minns:
+    - data://garden/working_hours/2025-08-05/huberman_minns
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml

@@ -1,0 +1,142 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      attribution_short: Huberman and Minns
+      topic_tags:
+        - Working Hours
+    display: &common_display
+      tolerance: 0
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  huberman_minns:
+    variables:
+      working_hours_week:
+        title: Working hours per week
+        unit: hours
+        short_unit: h
+        description_short: Average working hours per week for full-time production workers in non-agricultural activities.
+        description_key:
+          - This data only includes full-time production workers in non-agricultural activities.
+        processing_level: major
+        description_processing: For the year 2000, the value represents the average between males and females.
+        description_from_producer: >-
+          Table 1 collects evidence on the length of the workweek since 1870 for a sample of countries.4 The unit of measurement is weekly hours of full-time production workers (male and
+          female) in non-agricultural activities. These values control for days of work. Our estimates
+          before World War One are taken from establishment level surveys assembled by the U.S.
+          Department of Labor in 1900. Values for 1913 are from various independent sources; where
+          these were not available, hours are predicted based on trends from 1870 to 1900. Huberman
+          (2004) describes the sample, the weights used in calculating national averages from sectoral
+          figures, and the estimation method and other sources behind the 1913 figures. From 1929 to
+          2000 we have taken estimates from the International Labor Organization except where indicated otherwise. The U.S. series from 1929 is an amalgam of individual series constructed by
+          selected authors using different definitions and sources. Our U.S. series approximates the
+          levels and trends found in the Current Population Survey (Sundstrom, 2006).
+
+
+          There are sources of measurement error in the method we have used, not the least
+          because national authorities may have differed in what they recorded. It may be that
+          some authorities reported standard or legal hours, others actual hours. We consider
+          that the series best approximate usual or normal hours the representative production
+          worker would have been engaged for during the year. Statutory work hours came into
+          force in many countries in the interwar years, but the series diverge from the legal
+          norms. As for actual hours, the underlying series do not show the peaks and valleys
+          we would expect to find if workers supplied overtime or faced downtimes because of
+          temporary plant closures. Changes in the composition of the labor force and in work
+          schedules across countries complicate the task of constructing long-run series of average hours per week, but for 100 years these forces had little effect. Part-time work in
+          the period before 1913 and into the interwar years was minimal. Only in the 1970s did
+          a sizeable proportion of the labor force in certain countries begin to work less than
+          full-time (OECD, 1998, 2004). As for women’s hours, these tended to be close to
+          those of men in the early years. The gap between men’s and women’s hours in many
+          countries widened with the rise in female labor force participation in the 1960s. But
+          since 1980 the ratio of men’s to women’s hours has been stable for most countries.
+          The Table reports male and female work hours in 2000. By this date, European
+          men and women worked less than their counterparts elsewhere. Of course, changes
+          in labor supply and the rise in the number of part-timers have affected total hours
+          worked and we control for this in constructing the annual hours of work series below.
+          That said, since our objective is to compare national patterns, Table 1 is a reasonable
+          starting point to examine long-term patterns in average hours worked per week by fulltimers.
+        display:
+          name: Working hours per week
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      working_hours_year:
+        title: Working hours per year
+        unit: hours
+        short_unit: h
+        description_short: Average working hours per year for full-time production workers in non-agricultural activities.
+        description_key:
+          - This data only includes full-time production workers in non-agricultural activities.
+        processing_level: minor
+        description_from_producer: >-
+          Table 3 presents hours of work per year for our sample of countries from 1870 until
+          today. The figures for 1870–1913 are from Huberman (2004) who constructed annual measures of full-time production workers from estimates of the number of weeks worked
+          (adjusted for days absent) and hours per week. The interwar observations have been calculated from Tables 1 and 2 using the same method. The figures for both these periods are
+          consistent with other estimates. From 1950 on, we have taken the series available from the
+          University of Groningen and the Conference Board GGDC Total Economy Database
+          (2005). These figures are estimates of total work hours divided by the number of workers. The splice of datasets is appropriate because of the increase in women’s labor force
+          participation (and the fact that full-time women work a shorter week then men) and the
+          rise of part-time work in the second half of the century. Despite these adjustments,
+          the trend in annual work hours moves in line with that of hours of work per week, giving
+          support to the assumptions underlying Table 1.
+
+
+          The New World labored fewer hours than the Old for most of the last century, but after
+          weighting by population there was little difference between the two regions before 1913.
+        display:
+          name: Working hours per year
+          numDecimalPlaces: 0
+          <<: *common_display
+
+      vacation_days:
+        title: Vacation days per year
+        unit: days
+        short_unit: days
+        description_short: Average vacation days per year for full-time production workers in non-agricultural activities.
+        description_key:
+          - This data only includes full-time production workers in non-agricultural activities.
+        processing_level: minor
+        description_from_producer: >-
+          Table 2 gives the number of days off (vacations and national holidays) over the long
+          twentieth century for our sample of countries. We have taken values for 1870 and 1900
+          from Huberman (2004); those for 1938 to 1990 from a series of contemporary studies of
+          vacation days conducted by the ILO, 1939, 1995, the U.S. Department of Labor (Monthly
+          Labor Review, 1955) and the European Industrial Relations Review (1982); values for
+          2000 are from a variety of sources, including EIRO (2003), the OECD, 2001, 2004, and
+          official websites.
+
+
+          At the outset, days off were rooted in traditional religious and social calendars and
+          there was much sharing of work patterns across the oceans. Immigrants to the U.S. practiced certain Old World customs and rituals (Gutman, 1973), while Europeans adopted
+          May Day, a U.S. creation. But by 1900, if not earlier, the New World had made a break
+          with Old World habits. Firms with greater investments in fixed capital were under pressure
+          to work as many days as possible and this may be part of the explanation of the divergences that emerged. In Catholic Europe many of the religious festivals had been transformed into secular holidays, and while in certain northern European countries the
+          work year was long, the Old World had on average more than twice the number of days
+          off than their offshoots. Everywhere before 1913 paid holidays and vacations were rare;
+          still, the parallels with the late twentieth century are evident: Europeans had more weeks
+          off than the rest of the world.
+        display:
+          name: Vacation days per year
+          numDecimalPlaces: 0
+          <<: *common_display
+
+      weeks_worked:
+        title: Weeks worked per year
+        unit: weeks
+        short_unit: weeks
+        description_short: Average weeks worked per year for full-time production workers in non-agricultural activities.
+        description_key:
+          - This data only includes full-time production workers in non-agricultural activities.
+        processing_level: major
+        description_processing: We calculated this indicator as the number of working hours per year divided by the number of working hours per week.
+        display:
+          name: Weeks worked per year
+          numDecimalPlaces: 1
+          <<: *common_display
