@@ -1306,3 +1306,10 @@ steps:
     - data://meadow/who/2025-07-15/vaccination_introductions
   data://grapher/who/2025-07-15/vaccination_introductions:
     - data://garden/who/2025-07-15/vaccination_introductions
+  # WHO Mortality Database - Cancer specific
+  data://meadow/who/2025-08-05/mortality_database_cancer:
+    - snapshot://who/2025-08-05/mortality_database_cancer.csv
+  data://garden/who/2025-08-05/mortality_database_cancer:
+    - data://meadow/who/2025-08-05/mortality_database_cancer
+  data://grapher/who/2025-08-05/mortality_database_cancer:
+    - data://garden/who/2025-08-05/mortality_database_cancer
