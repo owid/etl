@@ -342,7 +342,7 @@ def _set_subtitle(view):
         if view.d.indicator == "deaths":
             subtitle = subtitle_template.format(placeholder=f" in {dod}")
             if view.matches(conflict_type="all", estimate="best", people="all"):
-                subtitle += " Data for 2025 is incomplete and includes deaths within the first quarter."
+                subtitle += " Data for 2025 is incomplete and includes deaths within the first half of the year."
             return subtitle
         elif view.d.indicator == "death_rate":
             return subtitle_template.format(placeholder=f", per 100,000 people. Included are {dod}")

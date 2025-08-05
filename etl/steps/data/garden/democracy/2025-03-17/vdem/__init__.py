@@ -111,7 +111,8 @@ def run() -> None:
 
     # %% PART 2: IMPUTE
     # The following lines concern imputing steps.
-    # Equivalent to: https://github.com/owid/notebooks/blob/main/BastianHerre/democracy/scripts/vdem_row_impute.do
+    # Based on: https://github.com/owid/notebooks/blob/main/BastianHerre/democracy/scripts/vdem_row_impute.do
+    # Not all indicators should be imputed (more info: https://github.com/owid/etl/pull/4784)
     paths.log.info("2/ Imputing data...")
     tb = impute.run(tb)
 
@@ -164,6 +165,52 @@ def run() -> None:
         keys=["year", "country", "category"], short_name="vdem_population"
     )
 
+    # %% PART 6: Sanity checks
+    # We add a note in the description_key of certain indicators (look for "&key_regions" in vdem.meta.yml). This note should only be added to indicators that have data pre-1900. We have manually removed this note from the affected indicators. Here, we just check that the indicators that shouldn't have this note, continue not to have data before 1900.
+
+    def _check_1900(tb, cols):
+        """Validate that we know the indicators that only have data since 1900"""
+        # Get all columns except 'country' and 'year'
+        data_columns = [col for col in tb.columns if col not in ["country", "year"]]
+
+        # Calculate first year with data for each column using melt + groupby
+        tb_ = tb.reset_index()
+        melted = tb_[["year"] + data_columns].melt(
+            id_vars=["year"], value_vars=data_columns, var_name="indicator", value_name="value"
+        )
+        first_years = melted.dropna(subset=["value"]).groupby("indicator")["year"].min()
+        cols_found = set(first_years.loc[first_years >= 1900].index)
+
+        assert cols == cols_found, f"Not expected: {cols_found - cols} // Missing: {cols - cols_found}"
+
+    _check_1900(
+        tb_uni_with_regions,
+        set(),
+    )
+    _check_1900(
+        tb_multi_with_regions,
+        {
+            "counterarg_polch_vdem",
+            "delib_vdem",
+            "delibdem_vdem",
+            "egal_vdem",
+            "egaldem_vdem",
+            "equal_res_vdem",
+            "justcomgd_polch_vdem",
+            "justified_polch_vdem",
+            "v2caautmob",
+            "v2cacamps",
+            "v2cademmob",
+            "v2cagenmob",
+            "v2caviol",
+            "v2mecorrpt",
+            "v2smgovdom",
+            "v2xca_academ",
+            "wom_parl_vdem",
+        },
+    )
+
+    # %% PART 7: Create list of tables
     tables = [
         # Metadata (former country names, etc.)
         tb_meta,

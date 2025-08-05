@@ -21,6 +21,9 @@ def run() -> None:
     ds_gapminder_v11 = paths.load_dataset("under_five_mortality", version="2023-09-21")
     ds_gapminder_v7 = paths.load_dataset("under_five_mortality", version="2023-09-18")
 
+    # Perform sanity checks on input datasets
+    _validate_input_datasets(ds_igme, ds_gapminder_v11, ds_gapminder_v7)
+
     # Read table from meadow dataset and filter out the main indicator, under five mortality, central estimate, both sexes, all wealth quintiles.
     tb_igme = ds_igme.read("igme", reset_metadata="keep_origins")
     tb_igme = tb_igme[
@@ -70,6 +73,9 @@ def run() -> None:
     tb_combined_full = tb_combined_full.rename(
         columns={"child_mortality_rate": "child_mortality_rate_full"}, errors="raise"
     )
+
+    # Perform sanity checks on final output data
+    _validate_output_data(tb_combined_full, tb_combined_sel)
 
     # Save outputs.
     tb_combined_full = tb_combined_full.drop(columns=["source"]).format(["country", "year"])
@@ -156,3 +162,222 @@ def calculate_share_surviving_first_five_years(tb_combined: Table) -> Table:
     tb_world = tb_world.drop(columns=["child_mortality_rate"])
 
     return tb_world
+
+
+def _validate_input_datasets(ds_igme, ds_gapminder_v11, ds_gapminder_v7) -> None:
+    """Validate input datasets for basic integrity checks."""
+    # Check that datasets are not empty
+    assert len(ds_igme) > 0, "IGME dataset is empty"
+    assert len(ds_gapminder_v11) > 0, "Gapminder v11 dataset is empty"
+    assert len(ds_gapminder_v7) > 0, "Gapminder v7 dataset is empty"
+
+    # Check IGME data has expected columns
+    tb_igme = ds_igme.read("igme")
+    required_igme_cols = ["indicator", "sex", "wealth_quintile", "observation_value", "country", "year"]
+    missing_cols = [col for col in required_igme_cols if col not in tb_igme.columns]
+    assert not missing_cols, f"IGME dataset missing required columns: {missing_cols}"
+
+    # Check Gapminder data has expected columns
+    tb_gap_v11 = ds_gapminder_v11["under_five_mortality"]
+    tb_gap_v7 = ds_gapminder_v7["under_five_mortality_selected"]
+
+    assert "child_mortality" in tb_gap_v11.columns, "Gapminder v11 missing 'child_mortality' column"
+    assert "under_five_mortality" in tb_gap_v7.columns, "Gapminder v7 missing 'under_five_mortality' column"
+    assert "country" in tb_gap_v11.reset_index().columns, "Gapminder v11 missing 'country' column"
+    assert "year" in tb_gap_v11.reset_index().columns, "Gapminder v11 missing 'year' column"
+
+
+def _validate_output_data(tb_combined_full: Table, tb_combined_sel: Table) -> None:
+    """Validate final output data for sanity checks."""
+    # Check child mortality rate ranges (should be 0-100%)
+    full_rates = tb_combined_full["child_mortality_rate_full"]
+    sel_rates = tb_combined_sel["child_mortality_rate"]
+
+    # Check for reasonable mortality rate bounds
+    assert full_rates.min() >= 0, f"Negative child mortality rate found: {full_rates.min()}"
+    assert full_rates.max() <= 100, f"Child mortality rate exceeds 100%: {full_rates.max()}"
+    assert sel_rates.min() >= 0, f"Negative child mortality rate found: {sel_rates.min()}"
+    assert sel_rates.max() <= 100, f"Child mortality rate exceeds 100%: {sel_rates.max()}"
+
+    # Check survival rates are complementary to mortality rates (within 0.1% tolerance)
+    world_data = tb_combined_full[tb_combined_full["country"] == "World"]
+    if len(world_data) > 0:
+        mortality_rates = world_data["child_mortality_rate_full"]
+        survival_rates = world_data["share_surviving_first_five_years"]
+        expected_survival = 100 - mortality_rates
+        rate_diff = abs(survival_rates - expected_survival)
+        assert rate_diff.max() < 0.1, f"Survival rates don't match mortality rates (max diff: {rate_diff.max()}%)"
+
+    # Check year ranges are reasonable
+    min_year, max_year = 1751, 2025
+    full_years = tb_combined_full["year"]
+    sel_years = tb_combined_sel["year"]
+
+    assert full_years.min() >= min_year, f"Year too early in full data: {full_years.min()}"
+    assert full_years.max() <= max_year, f"Year too late in full data: {full_years.max()}"
+    assert sel_years.min() >= min_year, f"Year too early in selected data: {sel_years.min()}"
+    assert sel_years.max() <= max_year, f"Year too late in selected data: {sel_years.max()}"
+
+    # Check for required countries/regions
+    full_countries = set(tb_combined_full["country"].unique())
+    sel_countries = set(tb_combined_sel["country"].unique())
+
+    assert "World" in full_countries, "World data missing from full dataset"
+    assert "World" in sel_countries, "World data missing from selected dataset"
+
+    # Check source consistency in selected dataset
+    valid_sources = {"UN IGME", "Gapminder v11", "Gapminder v7"}
+    sel_sources = set(tb_combined_sel["source"].unique())
+    invalid_sources = sel_sources - valid_sources
+    assert not invalid_sources, f"Invalid sources found: {invalid_sources}"
+
+    # Check no duplicate country-year combinations
+    full_dupes = tb_combined_full.duplicated(subset=["country", "year"]).sum()
+    sel_dupes = tb_combined_sel.duplicated(subset=["country", "year"]).sum()
+    assert full_dupes == 0, f"Found {full_dupes} duplicate country-year pairs in full dataset"
+    assert sel_dupes == 0, f"Found {sel_dupes} duplicate country-year pairs in selected dataset"
+
+    # Check that share variables are percentages (0-100)
+    if "share_dying_first_five_years" in tb_combined_full.columns:
+        dying_rates = tb_combined_full["share_dying_first_five_years"]
+        assert dying_rates.min() >= 0, f"Negative dying share: {dying_rates.min()}"
+        assert dying_rates.max() <= 100, f"Dying share exceeds 100%: {dying_rates.max()}"
+
+    # Validate regional data consistency and reasonableness
+    _validate_regional_data(tb_combined_full, tb_combined_sel)
+
+
+def _validate_regional_data(tb_combined_full: Table, tb_combined_sel: Table) -> None:
+    """Validate regional data for consistency and reasonable values."""
+    expected_regions = {"World", "Asia", "Africa", "Europe", "North America", "South America", "Oceania"}
+
+    # Check both datasets for regional coverage
+    for tb, name in [(tb_combined_full, "full"), (tb_combined_sel, "selected")]:
+        countries = set(tb["country"].unique())
+        missing_regions = expected_regions - countries
+
+        # Warn about missing regions (not all regions may be present in historical data)
+        if missing_regions:
+            print(f"Warning: Missing regions in {name} dataset: {missing_regions}")
+
+    # Validate regional mortality rates are reasonable based on historical patterns
+    for tb, name in [(tb_combined_full, "full"), (tb_combined_sel, "selected")]:
+        rate_col = "child_mortality_rate_full" if name == "full" else "child_mortality_rate"
+
+        if rate_col not in tb.columns:
+            continue
+
+        regional_data = tb[tb["country"].isin(expected_regions)]
+
+        if len(regional_data) == 0:
+            continue
+
+        # Check regional mortality rates are within historically observed bounds
+        for region in expected_regions:
+            region_data = regional_data[regional_data["country"] == region]
+
+            if len(region_data) == 0:
+                continue
+
+            rates = region_data[rate_col].dropna()
+
+            if len(rates) == 0:
+                continue
+
+            # Regional-specific validation based on historical patterns
+            if region == "Africa":
+                # Africa historically has had higher child mortality rates
+                assert rates.min() >= 0, f"{region}: Negative mortality rate"
+                assert rates.max() <= 80, f"{region}: Unrealistically high mortality rate: {rates.max()}%"
+
+            elif region == "Europe":
+                # Europe should have lower rates, especially in recent decades
+                recent_data = region_data[region_data["year"] >= 1950]
+                if len(recent_data) > 0:
+                    recent_rates = recent_data[rate_col].dropna()
+                    if len(recent_rates) > 0:
+                        assert (
+                            recent_rates.max() <= 30
+                        ), f"{region}: Unexpectedly high recent mortality rate: {recent_rates.max()}%"
+
+            elif region == "Asia":
+                # Asia has varied significantly but should be reasonable
+                assert rates.min() >= 0, f"{region}: Negative mortality rate"
+                assert rates.max() <= 70, f"{region}: Unrealistically high mortality rate: {rates.max()}%"
+
+            elif region in ["North America", "Oceania"]:
+                # Generally lower mortality rates expected
+                recent_data = region_data[region_data["year"] >= 1950]
+                if len(recent_data) > 0:
+                    recent_rates = recent_data[rate_col].dropna()
+                    if len(recent_rates) > 0:
+                        assert (
+                            recent_rates.max() <= 25
+                        ), f"{region}: Unexpectedly high recent mortality rate: {recent_rates.max()}%"
+
+            elif region == "South America":
+                # Moderate rates expected
+                assert rates.min() >= 0, f"{region}: Negative mortality rate"
+                assert rates.max() <= 50, f"{region}: Unrealistically high mortality rate: {rates.max()}%"
+
+            elif region == "World":
+                # World average should be reasonable
+                assert rates.min() >= 0, f"{region}: Negative mortality rate"
+                assert rates.max() <= 60, f"{region}: Unrealistically high world average: {rates.max()}%"
+
+                # World rates should show general declining trend over time (allowing for fluctuations)
+                if len(rates) >= 3:
+                    # Check that recent decades show improvement compared to early 1900s
+                    early_data = region_data[region_data["year"] <= 1920]
+                    recent_data = region_data[region_data["year"] >= 1990]
+
+                    if len(early_data) > 0 and len(recent_data) > 0:
+                        early_avg = early_data[rate_col].mean()
+                        recent_avg = recent_data[rate_col].mean()
+
+                        # Allow for some cases where this might not hold due to data quality/coverage
+                        if not (recent_avg < early_avg * 0.8):  # Recent should be at least 20% lower
+                            print(
+                                f"Warning: {region} mortality rates haven't improved as expected (early: {early_avg:.1f}%, recent: {recent_avg:.1f}%)"
+                            )
+
+    # Check that regional rates are generally consistent with World being a weighted average
+    # Note: We can't do exact population-weighted averages without population data,
+    # but we can do basic reasonableness checks
+    for tb, name in [(tb_combined_full, "full"), (tb_combined_sel, "selected")]:
+        rate_col = "child_mortality_rate_full" if name == "full" else "child_mortality_rate"
+
+        if rate_col not in tb.columns:
+            continue
+
+        # For each year, check that World rate is within reasonable bounds of regional rates
+        years_with_world = tb[tb["country"] == "World"]["year"].unique()
+
+        for year in years_with_world:
+            year_data = tb[tb["year"] == year]
+            world_rate = year_data[year_data["country"] == "World"][rate_col]
+
+            if len(world_rate) == 0:
+                continue
+
+            world_rate = world_rate.iloc[0]
+
+            # Get regional rates for the same year
+            regional_rates = year_data[
+                year_data["country"].isin(["Asia", "Africa", "Europe", "North America", "South America", "Oceania"])
+            ][rate_col].dropna()
+
+            if len(regional_rates) >= 2:  # Need at least 2 regions for comparison
+                min_regional = regional_rates.min()
+                max_regional = regional_rates.max()
+
+                # World rate should generally be between min and max regional rates
+                # Allow some tolerance for data quality and missing regions
+                tolerance = 5.0  # 5 percentage points
+
+                if not (min_regional - tolerance <= world_rate <= max_regional + tolerance):
+                    print(
+                        f"Warning: World rate ({world_rate:.1f}%) outside regional bounds ({min_regional:.1f}%-{max_regional:.1f}%) in year {year}"
+                    )
+
+    print("Regional data validation completed")
