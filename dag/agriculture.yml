@@ -55,22 +55,6 @@ steps:
   data://meadow/usda_ers/2025-03-26/food_expenditure_in_us_archive:
     - snapshot://usda_ers/2025-03-26/food_expenditure_in_us_archive.xlsx
   #
-  # Food prices for nutrition - World Bank based on FAO.
-  #
-  data://meadow/wb/2024-09-09/food_prices_for_nutrition:
-    - snapshot://wb/2024-09-09/food_prices_for_nutrition.csv
-  #
-  # Food prices for nutrition - World Bank based on FAO.
-  #
-  data://garden/wb/2024-09-09/food_prices_for_nutrition:
-    - data://meadow/wb/2024-09-09/food_prices_for_nutrition
-    - data://garden/worldbank_wdi/2024-05-20/wdi
-  #
-  # Food prices for nutrition - World Bank based on FAO.
-  #
-  data://grapher/wb/2024-09-09/food_prices_for_nutrition:
-    - data://garden/wb/2024-09-09/food_prices_for_nutrition
-  #
   # Agriculture - Long-run daily calorie supply per person.
   #
   data://garden/agriculture/2025-03-26/daily_calories_per_person:
