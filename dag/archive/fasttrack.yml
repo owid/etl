@@ -89,7 +89,10 @@ steps:
     - snapshot-private://fasttrack/latest/voter_turnout_by_age__sheet1.csv
   data-private://grapher/fasttrack/latest/vdem_women_executives:
     - snapshot://fasttrack/latest/vdem_women_executives.csv
-
+  data-private://grapher/fasttrack/latest/owid_donations:
+    - snapshot-private://fasttrack/latest/owid_donations.csv
+  data://grapher/fasttrack/latest/population_immigrants_diff:
+    - snapshot://fasttrack/latest/population_immigrants_diff.csv
     # Livestock
   data-private://grapher/fasttrack/latest/antibiotic_usage_livestock:
     - snapshot-private://fasttrack/latest/antibiotic_usage_livestock.csv
