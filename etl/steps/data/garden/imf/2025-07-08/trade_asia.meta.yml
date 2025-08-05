@@ -20,16 +20,6 @@ dataset:
 tables:
   trade:
     variables:
-      exports_of_goods__free_on_board__fob:
-        title: "Value of exports of goods (FOB):  << counterpart_country >>"
-        unit: US dollars
-        short_unit: $
-
-      imports_of_goods__cost_insurance_freight__cif:
-        title: "Value of imports of goods (CIF):  << counterpart_country >>"
-        unit: US dollars
-        short_unit: $
-
       exports_of_goods__free_on_board__fob__share:
         title: "Share of total exports of goods (FOB): << counterpart_country >>"
         unit: "%"
@@ -39,6 +29,13 @@ tables:
 
       imports_of_goods__cost_insurance_freight__cif__share:
         title: "Share of total imports of goods (CIF): << counterpart_country >>"
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: *decimals
+
+      share_of_total_trade:
+        title: "Share of total trade volume with << counterpart_country >>"
         unit: "%"
         short_unit: "%"
         display:
