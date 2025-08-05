@@ -30,7 +30,7 @@ from etl.snapshot import Snapshot
 
 # Version for current snapshot dataset.
 SNAPSHOT_VERSION = Path(__file__).parent.name
-LOCAL_DIR = "/Users/fionaspooner/Desktop/who_mort_db/"
+LOCAL_DIR = "/Users/fionaspooner/Downloads/mort_db/"
 log = get_logger()
 
 
