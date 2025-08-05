@@ -619,7 +619,7 @@ tables:
 
       labsh:
         title: Labor compensation as share of GDP
-        unit: "%"
+        unit: "% of GDP"
         short_unit: "%"
         description_short: Labor income of employees and self-employed people divided by [gross domestic product](#dod:gdp), expressed as a percentage.
         description_from_producer: Share of labour compensation in GDP at current national prices
@@ -717,7 +717,7 @@ tables:
 
       csh_c:
         title: Household consumption as a share of GDP
-        unit: "%"
+        unit: "% of GDP"
         short_unit: "%"
         description_short: Household consumption divided by [gross domestic product](#dod:gdp), expressed as a percentage.
         description_key:
@@ -733,7 +733,7 @@ tables:
 
       csh_i:
         title: Gross capital formation as a share of GDP
-        unit: "%"
+        unit: "% of GDP"
         short_unit: "%"
         description_short: Gross capital formation divided by [gross domestic product](#dod:gdp), expressed as a percentage.
         description_key:
@@ -749,7 +749,7 @@ tables:
 
       csh_g:
         title: Government consumption as a share of GDP
-        unit: "%"
+        unit: "% of GDP"
         short_unit: "%"
         description_short: Government consumption divided by [gross domestic product](#dod:gdp), expressed as a percentage.
         description_key:
@@ -765,7 +765,7 @@ tables:
 
       csh_x:
         title: Exports as a share of GDP
-        unit: "%"
+        unit: "% of GDP"
         short_unit: "%"
         description_short: Merchandise exports divided by [gross domestic product](#dod:gdp), expressed as a percentage.
         description_key:
@@ -781,7 +781,7 @@ tables:
 
       csh_m:
         title: Imports as a share of GDP
-        unit: "%"
+        unit: "% of GDP"
         short_unit: "%"
         description_short: Merchandise imports divided by [gross domestic product](#dod:gdp), expressed as a percentage.
         description_key:
@@ -797,7 +797,7 @@ tables:
 
       csh_r:
         title: Residual trade and GDP statistical discrepancy as a share of GDP
-        unit: "%"
+        unit: "% of GDP"
         short_unit: "%"
         description_short: Residual trade and GDP statistical discrepancy divided by [gross domestic product](#dod:gdp), expressed as a percentage.
         description_key:
