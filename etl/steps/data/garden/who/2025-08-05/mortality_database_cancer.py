@@ -76,7 +76,7 @@ def tidy_sex_dimension(tb: Table) -> Table:
     Improve the labelling of the sex column
     """
     sex_dict = {"All": "Both sexes", "Female": "Females", "Male": "Males", "Unknown": "Unknown sex"}
-    tb["sex"] = tb["sex"].cat.rename_categories(lambda x: sex_dict.get(x, x))
+    tb["sex"] = tb["sex"].replace(sex_dict)
     return tb
 
 
@@ -105,5 +105,5 @@ def tidy_age_dimension(tb: Table) -> Table:
         "[All]": "all ages",
     }
 
-    tb["age_group"] = tb["age_group"].cat.rename_categories(lambda x: age_dict.get(x, x))
+    tb["age_group"] = tb["age_group"].replace(age_dict)
     return tb
