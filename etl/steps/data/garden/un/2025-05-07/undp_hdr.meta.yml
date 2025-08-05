@@ -1,0 +1,536 @@
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      attribution_short: UNDP
+      topic_tags:
+        - Human Development Index (HDI)
+      grapher_config:
+        tab: map
+        selectedEntityNames:
+          - World
+
+  gni: Gross national income (GNI) is a measure of the total income earned by residents of a country or region each year. It is calculated as GDP plus net income received from abroad, plus taxes (minus subsidies) on production.
+  gni_per_capita: GNI per capita is GNI divided by population.
+  ppp_adjustment: This data is adjusted for inflation and for differences in living costs between countries.
+  ppp_prices: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2021 prices.
+
+  description_short_gni: Total income earned by residents of a country or region, including income earned abroad.
+  description_short_gni_per_capita: Average income per person earned by residents of a country or region, including income earned abroad.
+  topic_tags_hdi: &topic_tags_hdi
+    - Human Development Index (HDI)
+    - Life Expectancy
+    - Global Education
+    - Economic Growth
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  title: Human Development Report
+  update_period_days: 365
+
+tables:
+  undp_hdr:
+    common:
+      display:
+        numDecimalPlaces: 2
+
+    variables:
+      ###########################################################
+      # 1 Human Development Index
+      ###########################################################
+      hdi_rank:
+        title: HDI Rank
+        unit: ""
+        description_short: |-
+          Country's global rank based on its Human Development Index (HDI) value.
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          topic_tags: *topic_tags_hdi
+
+      ###########################################################
+      # 2 Inequality-adjusted Human Development Index
+      ###########################################################
+      # Inequality in education
+      ineq_edu:
+        title: Inequality in education
+        unit: ""
+        description_short: |-
+          The [Atkinson index](#dod:atkinson) measures inequality on a scale from 0 to 1. Higher values indicate higher inequality. Inequality is measured here in terms of the number of years adults older than 25 participated in formal education.
+        description_key: &description_key_ineq
+          - Measures how unevenly educational attainment is distributed within a country. It is the [Atkinson inequality measure](#dod:atkinson) (ε = 1) applied to years-of-schooling data.
+          - This version of the Atkinson index uses an inequality aversion parameter ε equal to 1. The parameter defines how sensitive the index is to changes in the lower end of the distribution. In this form, the inequality measure is A = 1 - g/μ, where g is the geometric mean and μ is the arithmetic mean of the distribution.
+          - Data are originally sourced from harmonised datasets, including CEDLAS and World Bank (2024), Eurostat's European Union Statistics on Income and Living Conditions (2024), ICF Macro Demographic and Health Surveys (various years), LIS (2024), United Nations Children's Fund Multiple Indicator Cluster Surveys (various years) and UNESCO Institute for Statistics (2024)
+          - This metric is used to estimate the Inequality-adjusted Human Development Index.
+        display:
+          numDecimalPlaces: 2
+        presentation:
+          topic_tags:
+            - Human Development Index (HDI)
+            - Global Education
+
+      # Inequality in income
+      ineq_inc:
+        title: Inequality in income
+        unit: ""
+        description_short: |-
+          The [Atkinson index](#dod:atkinson) measures inequality on a scale from 0 to 1. Higher values indicate higher inequality. Depending on the country and year, the data relates to income measured after taxes and benefits, or to consumption, [per capita](#dod:per-capita).
+        description_key:
+          - Measures the share of the income dimension "lost" because disposable household income (or consumption) is unevenly distributed; it applies the [Atkinson inequality measure](#dod:atkinson) (ε = 1) to individual-level income and discounts the average income index accordingly.
+          - This version of the Atkinson index uses an inequality aversion parameter ε equal to 1. The parameter defines how sensitive the index is to changes in the lower end of the distribution. In this form, the inequality measure is A = 1 - g/μ, where g is the geometric mean and μ is the arithmetic mean of the distribution.
+          - Data is originally sourced from the United Nations University's World Income Inequality Database (UNU-WIDER 2023).
+          - This metric is used to estimate the Inequality-adjusted Human Development Index.
+        # section: Technical note 2 – Inequality-adjusted Human Development Index, Step 1 & Step 2 (pp. 5–6)
+
+        display:
+          numDecimalPlaces: 2
+        presentation:
+          topic_tags:
+            - Human Development Index (HDI)
+            - Economic Growth
+            - Economic Inequality
+
+      # Inequality in life expectancy
+      ineq_le:
+        title: Inequality in life expectancy
+        unit: ""
+        description_short: |-
+          The [Atkinson index](#dod:atkinson) measures inequality on a scale from 0 to 1. Higher values indicate higher inequality. Inequality is measured here in terms of the number of years a newborn would live if age-specific mortality rates in the current year were to stay the same throughout its life.
+        description_key:
+          - Captures the percentage of the life-expectancy index lost because years of life are not shared equally; it applies the [Atkinson inequality measure](#dod:atkinson) to age-specific survival data from complete life tables.
+          - This version of the Atkinson index uses an inequality aversion parameter ε equal to 1, which gives greater weight to premature mortality. The parameter defines how sensitive the index is to changes in the lower end of the distribution. In this form, the inequality measure is A = 1 - g/μ, where g is the geometric mean and μ is the arithmetic mean of the distribution.
+          - Data is originally sourced from from complete life tables provided by UNDESA (2024). Mortality rates and other information are available for each age (0, 1, 2, 3, …. 100+).
+          - This metric is used to estimate the Inequality-adjusted Human Development Index.
+        display:
+          numDecimalPlaces: 2
+        presentation:
+          topic_tags:
+            - Human Development Index (HDI)
+            - Life Expectancy
+
+      # Coefficient of human inequality
+      coef_ineq:
+        title: Coefficient of human inequality
+        unit: ""
+        description_short: |-
+          Unweighted average (i.e. arithmetic mean) of inequalities in health, education and income.
+        description_key:
+          - An unweighted average of inequalities in health, education and income, expressed as the percentage of human development "lost" due to uneven achievements across these three HDI dimensions.
+          - |-
+            Formula: (A_health + A_education + A_income) / 3, where each A_x is the Atkinson inequality measure (ε = 1) for that dimension.
+          - Provides a single percentage figure summarising overall inequality, expressed as the percentage of human development "lost" due to uneven achievements across these three HDI dimensions.
+          - When all inequalities in dimensions are of a similar magnitude, the coefficient of human inequality and the loss in HDI value differ negligibly.
+          - When inequalities differ in magnitude, the loss in HDI value tends to be higher than the coefficient of human inequality.
+          - Data is originally sourced from UNDESA life-table data, international household-survey databases (SEDLAC, DHS, MICS, EU-SILC, LIS) and the UNU-WIDER World Income Inequality Database.
+
+        display:
+          numDecimalPlaces: 2
+        presentation:
+          topic_tags: *topic_tags_hdi
+
+      # Inequality-adjusted HDI
+      ihdi:
+        title: Inequality-adjusted Human Development Index
+        unit: ""
+        description_short: |-
+          The Inequality-adjusted Human Development Index (IHDI) is a summary measure of key dimensions of human development: a long and healthy life, a good education, and a decent standard of living, adjusted for inequalities in these dimensions. Higher values indicate higher and more equal human development.
+        description_key:
+          - The Inequality-adjusted Human Development Index (IHDI) adjusts the Human Development Index (HDI) for inequality in the distribution of each dimension across the population.
+          - It is based on a distribution-sensitive class of composite indices proposed by Foster, Lopez-Calva and Szekely (2005), which draws on the Atkinson (1970) family of inequality measures. It is computed as a geometric mean of inequality-adjusted dimensional indices.
+          - The IHDI accounts for inequalities in HDI dimensions by "discounting" each dimension's average value according to its level of inequality. The IHDI value equals the HDI value when there is no inequality across people but falls below the HDI value as inequality rises. In this sense the IHDI measures the level of human development when inequality is accounted for.
+          - Data is originally sourced from UNDESA complete life tables (health), harmonised household-survey micro-datasets (education) and the UNU-WIDER WIID (income).
+        display:
+          numDecimalPlaces: 3
+        presentation:
+          topic_tags: *topic_tags_hdi
+
+      ###########################################################
+      # 3 Gender Development Index
+      ###########################################################
+
+      # Gender Development Index
+      gdi:
+        title: Gender Development Index
+        unit: ""
+        description_short: |-
+          The Gender Development Index (GDI) measures gender inequalities in the achievement of key dimensions of human development: a long and healthy life, a good education, and a decent standard of living.
+        description_key:
+          - Compares female and male achievements in health, education and command over economic resources by taking the ratio of the female HDI to the male HDI; a value of 1 denotes gender parity, while values below (above) 1 indicate disadvantage for women (men).
+          - It highlights how much human development potential is lost to gender disparities and guides gender‑responsive budgeting.
+          - "The Gender Development Index (GDI) measures gender inequalities in achievement in three basic dimensions of human development: health, measured by female and male life expectancy at birth; education, measured by female and male expected years of schooling for children and female and male mean years of schooling for adults ages 25 years and older; and command over economic resources, measured by female and male estimated earned income."
+          - Values below 1 indicate higher human development for men than women, while values above 1 indicate the opposite. Values close to 1 therefore indicate higher gender equality.
+          - "Interpretable scale: an absolute deviation of, say, 5% means women's HDI is 95 % of men's (or vice-versa)."
+          - Data is originally sourced from UNDESA life tables, DHS/MICS & UIS education surveys, ILO labour data, IMF & World Bank income statistics and HDRO wage-ratio estimates.
+
+        display:
+          numDecimalPlaces: 3
+
+      # GDI Group
+      gdi_group:
+        title: GDI Group
+        unit: ""
+        description_short: |-
+          A categorical indicator that groups countries into five tiers according to how far their Gender Development Index (GDI) deviates from perfect gender parity, facilitating cross-country comparison of gender gaps in human development.
+        description_key:
+          - |-
+            The GDI groups are based on the absolute deviation of GDI from gender parity, 100 × |GDI - 1|.
+            - Group 1: Countries with absolute deviation from gender parity of 2.5 percent or less are considered countries with high equality in HDI achievements between women and men.
+            - Group 2: Countries with absolute deviation from gender parity of 2.5-5 percent are considered countries with medium-high equality in HDI achievements between women and men.
+            - Group 3: Countries with absolute deviation from gender parity of 5-7.5 percent are considered countries with medium equality in HDI achievements between women and men.
+            - Group 4: Countries with absolute deviation from gender parity of 7.5-10 percent are considered countries with medium-low equality in HDI achievements between women and men.
+            - Group 5: Countries with absolute deviation from gender parity of more than 10 percent are considered countries with low equality in HDI achievements between women and men.
+          - Group distributions shift slowly over time, providing a coarse progress tracker towards gender parity in HDI.
+          - Data is originally sourced from the underlying GDI calculations described above.
+        display:
+          numDecimalPlaces: 0
+
+      ###########################################################
+      # 4 Gender Inequality Index
+      ###########################################################
+      # Gender Inequality Index
+      gii:
+        title: Gender Inequality Index
+        unit: ""
+        description_short: |-
+          This index captures gender-based disadvantage in reproductive health, empowerment and the labour market; ranges from 0 (full equality) to 1 (maximum inequality), representing the share of potential human development lost because of gender gaps.
+        description_key:
+          - The Gender Inequality Index (GII) reflects gender-based disadvantage in three dimensions— reproductive health, empowerment and the labour market—for as many countries as data of reasonable quality allow. It shows the loss in potential human development due to inequality between female and male achievements in these dimensions.
+          - It ranges from 0, where women and men fare equally, to 1, where one gender fares as poorly as possible in all measured dimensions.
+          - The GII highlights how unequal opportunities for women and men translate into foregone national human‑development potential.
+          - |-
+            It combines five indicators: maternal mortality ratio, adolescent birth rate, women’s parliamentary seats, secondary‑education attainment, and labour‑force participation (all sex‑disaggregated).
+          - Data is originally sourced from WHO/UNICEF/UNFPA/World Bank, UNDESA, IPU, UNESCO UIS, Barro-Lee, DHS/MICS and ILO datasets.
+        display:
+          numDecimalPlaces: 3
+
+      # GII rank
+      gii_rank:
+        title: GII Rank
+        unit: ""
+        description_short: Country's global rank based on its Gender Inequality Index (GII) value.
+        display:
+          numDecimalPlaces: 0
+
+      ###########################################################
+      # 6 Planetary pressures–adjusted Human Development Index
+      ###########################################################
+      # Planetary pressures–adjusted Human Development Index
+      phdi:
+        title: Planetary pressures-adjusted Human Development Index
+        unit: ""
+        description_short: |-
+          Adjustment of the Human Development Index (HDI) for planetary pressures in the Anthropocene. It discounts the HDI for pressures on the planet to reflect a concern for inter-generational inequality, similar to the Inequality-adjusted HDI adjustment, which is motivated by a concern for intra-generational inequality.
+        description_key:
+          - The Planetary pressures-adjusted Human Development Index (PHDI) discounts the HDI by an adjustment factor based on a country's carbon-dioxide emissions and material footprint, yielding the level of human development achieved when planetary pressures are taken into account.
+          - The PHDI is computed as the product of the HDI and (1 - index of planetary pressures), where (1 - index of planetary pressures) can be seen as an adjustment factor.
+          - The PHDI is the level of human development adjusted by carbon dioxide emissions per capita (production) and material footprint per capita to account for the excessive human pressure on the planet.
+          - The PHDI should be seen as an incentive for transformation. In an ideal scenario, with no pressures on the planet, the PHDI equals the HDI.
+          - However, as pressures increase, the PHDI falls below the HDI. In this sense the PHDI measures the level of human development when planetary pressures are considered.
+          - Data is originally sourced from Global Carbon Project (CO₂) and UNEP Material-Footprint database, alongside standard HDI inputs.
+
+      # Differences between HDI and IHDI
+      diff_hdi_phdi:
+        title: Difference from HDI value
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          Difference in ranks on the PHDI and the HDI is calculated only for countries for which both an PHDI value and an HDI value are calculated. Due to data limitations, PHDI values are calculated for a smaller set of countries.
+        display:
+          numDecimalPlaces: 2
+
+      rankdiff_hdi_phdi:
+        title: Difference from HDI rank
+        unit: ""
+        description_short: |-
+          To calculate the PHDI rank difference from the HDI rank, HDI ranks are recalculated for the set of countries for which an PHDI value is calculated.
+        display:
+          numDecimalPlaces: 0
+
+      mf:
+        title: Material footprint per capita
+        unit: "tonnes per capita"
+        description_short: |-
+          Attribution of global material extraction to domestic final demand of a country. Material footprint is calculated as raw material equivalent of imports plus domestic extraction minus raw material equivalents of exports.
+        description_key:
+          - The total material footprint is the sum of the material footprint for biomass, fossil fuels, metal ores and nonmetal ores.
+          - Material footprint per capita describes the average material use for final demand.
+        description_from_producer: |-
+          UNDP relies on UNEP (2023).
+        display:
+          numDecimalPlaces: 1
+
+      ###########################################################
+      # Others
+      ###########################################################
+      abr:
+        title: Adolescent Birth Rate
+        unit: births per 1,000 women ages 15-19
+        description_short: |-
+          Annual number of births to women aged 15-19 years per 1,000 women in that age group. It is also referred to as the age-specific fertility rate for women aged 15-19.
+        description_from_producer: |-
+          UNDP relies on UNDESA (2022).
+
+      # Maternal mortality rate
+      mmr:
+        title: Maternal mortality ratio
+        unit: "deaths per 100,000 live births"
+        description_short: |-
+          The number of maternal deaths during a given time period per 100,000 live births during the same time period.
+        description_key:
+          - It depicts the risk of maternal death relative to the number of live births and essentially captures the risk of death in a single pregnancy or a single live birth (WHO).
+          - Maternal deaths are defined as "the annual number of female deaths from any cause related to or aggravated by pregnancy or its management (excluding accidental or incidental causes) during pregnancy and childbirth or within 42 days of termination of pregnancy, irrespective of the duration and site of the pregnancy, expressed per 100,000 live births, for a specified time period." (WHO).
+          - Live births are defined as "the complete expulsion or extraction from its mother of a product of conception, irrespective of the duration of the pregnancy, which, after such separation, breathes or shows any other evidence of life such as beating of the heart, pulsation of the umbilical cord, or definite movement of voluntary muscles, whether or not the umbilical cord has been cut or the placenta is attached." (WHO).
+          - (ICD-10) International reporting of maternal mortality For the purpose of international reporting of maternal mortality, only those maternal deaths occurring before the end of the 42-day reference period should be included in the calculation of the various ratios and rates. The recording of later deaths is encouraged to inform national, regional, and global understanding of these events (WHO).
+        description_from_producer: |-
+          UNDP relies on WHO, UNICEF, UNFPA, World Bank Group and UNDESA/Population Division (2023).
+
+      # Others
+      co2_prod:
+        title: Carbon dioxide emissions per capita (production)
+        unit: "tonnes per capita"
+        description_short: |-
+          Carbon dioxide emissions produced as a consequence of human activities (use of coal, oil and gas for combustion and industrial processes, gas flaring and cement manufacture), divided by midyear population. Values are territorial emissions, meaning that emissions are attributed to the country in which they physically occur.
+        description_from_producer: |-
+          Data is originally sourced from UNDESA (2022) by UNDP.
+
+      loss:
+        title: Overall loss
+        short_unit: "%"
+        unit: "%"
+        description_short: |
+          Percentage difference between the IHDI value and the HDI value.
+        display:
+          numDecimalPlaces: 1
+
+      pop_total:
+        title: Total population
+        unit: "people"
+        description_short: |-
+          The total number of people living in a country.
+        display:
+          numDecimalPlaces: 0
+
+  undp_hdr_sex:
+    common:
+      display:
+        numDecimalPlaces: 2
+
+    variables:
+      ###########################################################
+      # 1 Human Development Index
+      ###########################################################
+      hdi:
+        title: |-
+          Human Development Index<% if sex != "total" %> (<<sex>>)<% endif %>
+        unit: ""
+        description_short: |-
+          The Human Development Index (HDI) is a summary measure of key dimensions of human development: a long and healthy life, a good education, and a decent standard of living. Higher values indicate higher human development. <% if sex != "total" %>Only <<sex>> population is considered.<% endif %>
+        description_key:
+          - The Human Development Index (HDI) provides a broad, intuitive measure for comparing overall human progress across countries and over time. A higher HDI implies longer, healthier lives, better education and higher command over resources; however, it does not capture inequality, sustainability or subjective wellbeing
+          - |-
+            It is a composite summary of a country's average achievement in three basic dimensions of human development – health (life expectancy), knowledge (schooling) and material wellbeing (GNI per capita) – combined through a geometric mean into a single 0‑to‑1 score.
+          - |-
+            Each dimension of the HDI is captured by a specific index:
+              - **Healthy life**: Captured by the _Life Expectancy Index_, which is based on life expectancy at birth.
+              - **Good education (knowledge)**: Captured by _Education Index_, which is based on the expected and mean years of schooling.
+              - **Decent standard of living**: Captured by _Gross National Income (GNI) Index_, which is based on the GNI per capita (PPP$).
+          - |-
+            The index is estimated by normalizing and aggregating the above indicators. First, the indicators are brought onto the same scale, ranging from 0 to 1. This is done by setting minimum and maximum values for each indicator. The minimum and maximum values for each indicator are defined as follows:
+              - Life expectancy at birth ranges between 20 and 85 years
+              - Expected years of schooling between 0 and 18 years; Mean years of schooling, between 0 and 15 years
+              - GNI per capita between 100 and 75,000 international-$ at 2021 prices.
+
+          - The HDI is then estimated as the geometric mean of these indices. The education index is the arithmetic mean (average) of the mean years of schooling and expected years of schooling.
+        description_from_producer: |-
+          The Human Development Index (HDI) is a summary measure of average achievement in key dimensions of human development: a long and healthy life, being knowledgeable and having a decent standard of living. The HDI is the geometric mean of normalized indices for each of the three dimensions.
+
+          The health dimension is assessed by life expectancy at birth, the education dimension is measured by mean of years of schooling for adults aged 25 years and more and expected years of schooling for children of school entering age. The standard of living dimension is measured by gross national income per capita. The HDI uses the logarithm of income, to reflect the diminishing importance of income with increasing GNI. The scores for the three HDI dimension indices are then aggregated into a composite index using geometric mean. Refer to Technical notes for more details.
+
+          The HDI can be used to question national policy choices, asking how two countries with the same level of GNI per capita can end up with different human development outcomes. These contrasts can stimulate debate about government policy priorities.
+
+          The HDI simplifies and captures only part of what human development entails. It does not reflect on inequalities, poverty, human security, empowerment, etc. The HDRO provides other composite indices as broader proxy on some of the key issues of human development, inequality, gender disparity and poverty.
+
+          A fuller picture of a country's level of human development requires analysis of other indicators and information presented in the HDR statistical annex.
+        display:
+          numDecimalPlaces: 3
+        presentation:
+          topic_tags: *topic_tags_hdi
+          grapher_config:
+            title: "{tables.undp_hdr_sex.variables.hdi.title}"
+            subtitle: "The Human Development Index (HDI) is a summary measure of key dimensions of human development: a long and healthy life, a good education, and a decent standard of living. Higher values indicate higher human development."
+            originUrl: https://ourworldindata.org/human-development-index/
+            hasMapTab: true
+            tab: map
+            yAxis:
+              max: 1
+              min: 0
+            hideRelativeToggle: false
+            map:
+              time: latest
+              colorScale:
+                baseColorScheme: GnBu
+                binningStrategy: manual
+                legendDescription: ""
+                customNumericValues:
+                  - 1
+                  - 0.4
+                  - 0.5
+                  - 0.6
+                  - 0.7
+                  - 0.8
+                  - 0.9
+                  - 1
+            selectedEntityNames:
+              - United Kingdom
+              - United States
+              - South Korea
+              - India
+              - China
+              - Brazil
+              - Nigeria
+              - Democratic Republic of Congo
+              - Niger
+              - Chile
+
+      ###########################################################
+      # 0 Core indicators
+      #
+      # This indicators are provided by UNDP, and used by them to
+      # estimate their main indicators (e.g. HDI, GII, etc.)
+      ###########################################################
+      le:
+        title: Life expectancy at birth<% if sex != "total" %> (<<sex>>)<% endif %>
+        unit: years
+        short_unit: years
+        description_short: |-
+          Average number of years a<% if sex != "total" %> <<sex>><% endif %> newborn would live if age-specific mortality rates in the current year were to stay the same throughout its life.
+        description_key:
+          - UNDP originally obtained this indicator from UNDESA (2024).
+
+      ## Expected years of schooling
+      eys:
+        title: Expected years of schooling<% if sex == "female" %> among girls<% elif sex == "male" %> among boys<% endif %>
+        unit: years
+        short_unit: years
+        description_short: |-
+          Number of years a<% if sex == "female" %> girl<% elif sex == "male" %> boy<% else %> child<% endif %> of school-entrance-age can expect to receive if the current age-specific enrollment rates persist throughout the child's life.
+        description_key:
+          - Expected years of schooling estimates how long a child starting school today is likely to stay in education, assuming current enrollment patterns continue throughout their schooling years.
+          - It is calculated by combining enrollment rates at each level of education and age group, adjusted for the official age of attendance, resulting in the average number of years a child can expect to complete—including time spent repeating grades.
+          - The measure reflects access to education rather than completion or learning outcomes, and assumes current patterns remain stable over time.
+          - Expected years can be broken down into [pre-primary](#dod:pre-primary-education), [primary](#dod:primary-education), [secondary](#dod:secondary-education), and [tertiary](#dod:tertiary-education), showing the expected time spent at each stage.
+          - A higher value means students are expected to spend more time in school. For example, 2.5 years in pre-primary means most children will attend around 2.5 years of preschool; a country with 15 total expected years but only 0.5 in pre-primary likely has limited access to early childhood education.
+          - "UNDP originally obtained this indicator from: ICF Macro Demographic and Health Surveys (various years), UNESCO Institute for Statistics (2024) and United Nations Children's Fund (UNICEF) Multiple Indicator Cluster Surveys (various years)"
+        presentation:
+          title_public: Expected years of schooling<% if sex == "female" %> among girls<% elif sex == "male" %> among boys<% endif %>
+          grapher_config:
+            maxTime: 2024
+            hasMapTab: true
+            map:
+              time: 2024
+              timeTolerance: 5
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [0, 4, 6, 8, 10, 12, 14, 16, 18]
+                baseColorScheme: <% if sex == "female" %>Purples<% elif sex == "male" %>BuGn<% else %>Blues<% endif %>
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name: <% if sex == "female" %>Girls<% elif sex == "male" %>Boys<% else %>Both genders<% endif %>
+
+      ## Mean years of schooling
+      mys:
+        title: Average years of schooling<% if sex == "female" %> among women<% elif sex == "male" %> among men<% endif %>
+        unit: years
+        short_unit: years
+        description_short: |-
+          Average number of years (excluding years spent repeating individual grades)<% if sex == "female" %> women<% elif sex == "male" %> men<% else %> adults<% endif %> over 25 years participated in formal education.
+        description_key:
+          - Mean years of schooling shows the average number of years that adults in a country have spent in formal education, reflecting the overall educational attainment of the population.
+          - It is calculated based on the highest level of education completed, converted into years—e.g. someone who finished high school is counted as having roughly 12 years of schooling.
+          - The data comes from censuses and surveys of adults aged 25 and older, and includes only formal education starting from primary school.
+          - This indicator captures how much schooling adults have accumulated over their lifetimes, highlighting the results of past investments in education systems.
+          - Higher values suggest a population with stronger educational foundations. However, the measure does not account for education quality, informal learning, or improvements among younger generations who may be better educated than older adults.
+          - In countries with infrequent surveys or outdated census data, the values may not reflect recent progress or changes in educational access.
+          - "UNDP originally obtained this indicator from: Barro and Lee (2018), Eurostat (2024), ICF Macro Demographic and Health Surveys (various years), UNESCO Institute for Statistics (2024) and UNICEF Multiple Indicator Cluster Surveys (various years)."
+        presentation:
+          title_public: Average years of schooling<% if sex == "female" %> among women<% elif sex == "male" %> among men<% endif %>
+          grapher_config:
+            maxTime: 2024
+            hasMapTab: true
+            map:
+              time: 2024
+              timeTolerance: 5
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [0, 2, 4, 6, 8, 10, 12, 14, 16]
+                baseColorScheme: <% if sex == "female" %>Purples<% elif sex == "male" %>BuGn<% else %>Blues<% endif %>
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name: <% if sex == "female" %>Women<% elif sex == "male" %>Men<% else %>Both genders<% endif %>
+
+      ## GNI per capita
+      gni_pc:
+        title: Gross national income per capita<% if sex != "total" %> (<<sex>>)<% endif %>
+        short_unit: $
+        unit: international-$ in 2021 prices
+        description_short: |-
+          {definitions.description_short_gni_per_capita} {definitions.ppp_adjustment}<% if sex != "total" %> Only <<sex>> population is considered.<% endif %>
+        description_key:
+          - "{definitions.gni} {definitions.gni_per_capita}"
+          - This GNI per capita indicator provides information on economic growth and income levels from 1990.
+          - "{definitions.ppp_adjustment}"
+          - "{definitions.ppp_prices}"
+          - Higher GNI per capita typically signals greater average command over resources, but says little about distribution, non‑market production or environmental costs.
+          - Subject to revisions when PPP benchmarks are updated; omits remittances/leakages in informal economies; exchange‑rate mis‑measurement can bias cross‑country comparisons.
+        description_from_producer: |-
+          UNDP relies on IMF (2023), UNDESA (2023), United Nations Statistics Division (2023), World Bank (2023).
+
+          The World Bank's 2023 World Development Indicators database contains estimates of GNI per capita in constant 2021 purchasing power parity (PPP) terms for many countries. For countries missing this indicator (entirely or partly), the Human Development Report Office calculates it by converting GNI per capita in local currency from current to constant terms using two steps. First, the value of GNI per capita in current terms is converted into PPP terms for the base year (2021). Second, a time series of GNI per capita in 2021 PPP constant terms is constructed by applying the real growth rates to the GNI per capita in PPP terms for the base year. The real growth rate is implied by the ratio of the nominal growth of GNI per capita in current local currency terms to the GDP deflator.
+
+          For several countries without a value of GNI per capita in constant 2021 PPP terms for 20 22 reported in the World Development Indicators database, real growth rates of GDP per capita available in the World Development Indicators database or in the International Monetary Fund's Economic Outlook database are applied to the most recent GNI values in constant PPP terms.
+
+          Official PPP conversion rates are produced by the International Comparison Program, whose surveys periodically collect thousands of prices of matched goods and services in many countries. The last round of this exercise refers to 2021 and covered 176 economies.
+        presentation:
+          title_variant: In constant international-$
+
+      # Labour force
+      lfpr:
+        title: Labour force participation rate (<<sex>>)
+        short_unit: "%"
+        unit: "% ages 15 and older"
+        description_short: |-
+          Measures the proportion of a country's <<sex>> working-age population that engages actively in the labour market, either by working or looking for work.
+        description_key:
+          - It provides an indication of the size of the supply of labour available to engage in the production of goods and services, relative to the population at working age (ILOSTAT).
+          - The breakdown of the labour force (formerly known as economically active population) by sex and age group gives a profile of the distribution of the labour force within a country (ILOSTAT).
+          - UNDP originally obtained this data from ILO (2024).
+        display:
+          numDecimalPlaces: 2
+
+      # Parliament seats
+      pr:
+        title: Share of seats in parliament (<<sex>>)
+        short_unit: "%"
+        unit: "% held by <% if sex == 'female' %>women<%else%>men<%endif%>"
+        description_short: |-
+          Share of all seats in parliaments that are held by <<sex>> representatives.
+        description_from_producer: |-
+          UNDP relies on IPU (2024).
+
+      # Secondary Education
+      se:
+        title: Population with at least some secondary education (<<sex>>)
+        short_unit: "%"
+        unit: "% ages 25 and older"
+        description_short: |-
+          The percentage of population (<<sex>>, age 25 and over) with at least completed lower secondary education (ISCED 2 or higher).
+        description_key:
+          - This indicator is calculated by dividing the number of persons (<<sex>>s) aged 25 years and above with completed lower secondary education by the total <<sex>> population of the same age group and multiplying the result by 100.
+          - The UNESCO Institute for Statistics (UIS) educational attainment dataset shows the educational composition of the population aged 25 years and above and hence the stock and quality of human capital within a country.
+          - The dataset also reflects the structure and performance of the education system and its accumulated impact on human capital formation.
+          - "UNDP originally obtained this data from:  Barro and Lee (2018), UNESCO Institute for Statistics (2024) and United Nations Children's Fund Multiple Indicator Cluster Surveys (various years)."
+        display:
+          numDecimalPlaces: 1

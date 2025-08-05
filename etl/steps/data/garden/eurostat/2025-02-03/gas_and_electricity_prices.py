@@ -11,7 +11,7 @@ from owid.datautils.dataframes import map_series
 from structlog import get_logger
 
 from etl.data_helpers import geo
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Initialize log.
 log = get_logger()
@@ -954,7 +954,7 @@ def prepare_hicp(tb_hicp: Table) -> Table:
     return tb_hicp
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -1031,10 +1031,8 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_garden = create_dataset(
-        dest_dir,
+    ds_garden = paths.create_dataset(
         tables=[tb, tb_prices_euro, tb_prices_pps, tb_price_components_euro, tb_price_components_pps],
-        check_variables_metadata=True,
         default_metadata=ds_meadow.metadata,
         yaml_params={"EUROS_YEAR": HICP_BASE_YEAR_NEW, "EUROS_YEAR_ORIGINAL": HICP_BASE_YEAR_ORIGINAL},
     )

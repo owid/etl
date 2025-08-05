@@ -2,23 +2,23 @@
 
 # import owid.catalog.processing as pr
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     paths.log.info("start")
 
     #
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap_24 = paths.load_snapshot(short_name="ucdp_ced_v24_01_24_12.csv")
+    snap_ced = paths.load_snapshot(short_name="ucdp_ced_v25_01_25_06.csv")
 
     # Read as tables
-    tb_24 = snap_24.read_csv()
+    tb_ced = snap_ced.read_csv()
 
     # Use the following code if you need to append additional releases (e.g. monthly or quarterly releases)
     # # Remove spurious columns, sanity checks
@@ -42,7 +42,7 @@ def run(dest_dir: str) -> None:
     # tb = tb.drop_duplicates(subset="id", keep="last")
 
     # Comment the two lines below if you are appending additional releases
-    tb = tb_24.copy()
+    tb = tb_ced.copy()
     tb = tb.drop_duplicates()
 
     # Format table
@@ -55,13 +55,10 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = create_dataset(
-        dest_dir,
+    ds_meadow = paths.create_dataset(
         tables=[tb],
         check_variables_metadata=True,
     )  # type: ignore
 
     # Save changes in the new garden dataset.
     ds_meadow.save()
-
-    paths.log.info("end")

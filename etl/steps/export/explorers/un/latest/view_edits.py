@@ -14,7 +14,7 @@ from typing import Union
 
 import yaml
 
-from etl.collections.explorer import Explorer
+from etl.collection.explorer import Explorer
 
 
 class ViewEditor:
@@ -44,6 +44,8 @@ class ViewEditor:
                 "dependency_ratio",
                 "dependency_ratio",
                 "life_expectancy",
+                "infant_deaths",
+                "child_deaths",
             }:
                 for _, sexes in values["dimensions"].items():
                     if indicator == "population_change":
@@ -185,6 +187,17 @@ class ViewEditor:
                     #     indicator.display = display
                     # else:
                     #     indicator.display = {**indicator.display, **display}
+            elif indicator_name in {"child_deaths", "infant_deaths"}:
+                # Edit display
+                assert v.indicators.y is not None
+                assert len(v.indicators.y) == 1
+
+                # Get dimensions
+                sex = v.dimensions["sex"]
+                age = v.dimensions["age"]
+
+                # Add map colorscheme
+                self._add_map_brackets_display(age, sex, indicator_name, v.indicators.y[0])
 
     def edit_views_fr(self, explorer):
         """Edit fertility rate explorer views."""

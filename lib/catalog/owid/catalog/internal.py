@@ -7,7 +7,7 @@
 import datetime as dt
 import json
 from dataclasses import dataclass
-from typing import Dict, List, Literal
+from typing import Literal
 
 import pandas as pd
 import requests
@@ -72,8 +72,8 @@ class _Indicator:
 @dataclass
 class _GrapherBundle:
     config: dict
-    dimensions: Dict[int, _Indicator]
-    origins: List[dict]
+    dimensions: dict[int, _Indicator]
+    origins: list[dict]
 
     def to_json(self):
         return json.dumps(
@@ -88,7 +88,7 @@ class _GrapherBundle:
         return len(self.to_json())
 
     @property
-    def indicators(self) -> List[_Indicator]:
+    def indicators(self) -> list[_Indicator]:
         return list(self.dimensions.values())
 
     def to_frame(self):

@@ -6,3 +6,13 @@ steps:
     - data://meadow/technology/2024-05-30/mobile_money
   data://grapher/technology/2024-05-30/mobile_money:
     - data://garden/technology/2024-05-30/mobile_money
+
+  #
+  # Findex 2021
+  #
+  data://meadow/wb/2025-05-21/findex:
+    - snapshot://wb/2025-05-21/findex.xlsx
+  data://garden/wb/2025-05-21/findex:
+    - data://meadow/wb/2025-05-21/findex
+  data://grapher/wb/2025-05-21/findex:
+    - data://garden/wb/2025-05-21/findex

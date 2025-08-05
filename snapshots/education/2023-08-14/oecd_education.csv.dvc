@@ -2,8 +2,7 @@ meta:
   origin:
     title: How Was Life? Global Well-being since 1820 - Education
     description: |-
-      The dataset contains two key indicators to describe global educational inequalities since 1820: literacy rates and years of schooling. These indicators are derived from merging two major datasets, primarily based on population census data. The dataset provides an extensive historical perspective on education and its evolution over time.
-    date_published: '2014'
+      The data comes from the How Was Life? Global Well-being Since 1820 report by the OECD. It notes that the concept of literacy has changed over time, which affects how it is measured. In earlier periods, literacy was broadly understood as being “educated” or “learned.” However, by the late 19th century, the definition narrowed to mean the ability to read and write simple texts. This shift in meaning was driven by the spread of mass education, which emphasized basic reading and writing skills for large populations. As a result, historical estimates of literacy are based on differing definitions over time, making it important to interpret the data within its historical context.
     version_producer: '2014'
 
     producer: van Zanden, J. et al.

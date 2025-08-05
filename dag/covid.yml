@@ -30,8 +30,8 @@ steps:
     - data://garden/demography/2024-12-03/life_expectancy
     - data://garden/un/2024-07-12/un_wpp
     # Econ
-    - data://garden/wb/2024-10-07/world_bank_pip
-    - data://garden/un/2024-04-09/undp_hdr
+    - data://garden/wb/2025-06-05/world_bank_pip_legacy
+    - data://garden/un/2025-05-07/undp_hdr
     # Health
     - data://garden/wash/2024-01-06/who
     - data://garden/who/2024-07-30/ghe
@@ -53,7 +53,7 @@ steps:
   data://garden/covid/latest/cases_deaths:
     - data://meadow/covid/latest/cases_deaths
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2024-03-11/income_groups
+    - data://garden/wb/2025-07-01/income_groups
     - data://garden/demography/2024-07-15/population
   data://grapher/covid/latest/cases_deaths:
     - data://garden/covid/latest/cases_deaths
@@ -85,7 +85,7 @@ steps:
     - snapshot://covid/latest/oxcgrt_policy_national_2022.csv
   data://garden/covid/latest/oxcgrt_policy:
     - data://meadow/covid/latest/oxcgrt_policy
-    - data://garden/wb/2024-03-11/income_groups
+    - data://garden/wb/2025-07-01/income_groups
     - data://garden/regions/2023-01-01/regions
   data://grapher/covid/latest/oxcgrt_policy:
     - data://garden/covid/latest/oxcgrt_policy
@@ -192,7 +192,7 @@ steps:
   data://garden/covid/latest/vaccinations_global:
     - data://meadow/covid/latest/vaccinations_global
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2024-03-11/income_groups
+    - data://garden/wb/2025-07-01/income_groups
     - data://garden/demography/2024-07-15/population
   data://grapher/covid/latest/vaccinations_global:
     - data://garden/covid/latest/vaccinations_global

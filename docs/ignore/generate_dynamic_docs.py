@@ -2,7 +2,15 @@
 
 import mkdocs_gen_files
 
-from etl.docs import render_dataset, render_indicator, render_origin, render_table
+from etl.docs import (
+    render_collection,
+    render_collection_view_config,
+    render_collection_view_metadata,
+    render_dataset,
+    render_indicator,
+    render_origin,
+    render_table,
+)
 from etl.paths import BASE_DIR, LIB_DIR
 
 header_metadata = """---
@@ -85,3 +93,39 @@ docs = """
 # Dynamically create the API documentation
 with mkdocs_gen_files.open("api/example-usage.md", "w") as f:
     print(docs_catalog, file=f)
+
+############################################################
+# COLLECTIONS (MULTIDIM)
+############################################################
+
+header_collections = """---
+tags:
+  - Collections
+  - Multidim
+  - Explorers
+---
+
+# Collections reference
+
+!!! warning "AI-Generated Documentation"
+    This documentation was generated with AI assistance and is currently under construction. The content is dynamically generated from `schemas/multidim-schema.json`. If you notice any inconsistencies or missing information, please check the source schema file or report the issue.
+
+Multi-dimensional collections (MDIMs) are interactive data explorers that allow users to explore datasets across multiple dimensions. This reference documents the schema structure for defining collections.
+
+<div class="grid cards" markdown>
+
+- __[Collection](#collection)__ - Main collection configuration
+- __[View Config](#viewconfig)__ - Chart and visualization configuration
+- __[View Metadata](#viewmetadata)__ - Data presentation metadata
+
+</div>
+
+"""
+
+# Combined collections reference
+with mkdocs_gen_files.open("architecture/metadata/reference/collections.md", "w") as f:
+    text_collection = render_collection(level=2)
+    text_view_config = render_collection_view_config(level=2)
+    text_view_metadata = render_collection_view_metadata(level=2)
+    text = header_collections + text_collection + text_view_config + text_view_metadata
+    print(text, file=f)

@@ -48,7 +48,7 @@ main:
 
 # ETL steps
 etl:
-  title: ETL steps
+  title: Create
   description: Create an ETL step.
   steps:
     snapshot:
@@ -68,6 +68,15 @@ etl:
       disable:
         "production": True
         "staging": True
+    collection:
+      title: "Collection"
+      entrypoint: etl_steps/collection.py
+      icon: ":material/collections:"
+      image_url: "https://cdn12.picryl.com/photo/2016/12/31/stamps-collection-philately-backgrounds-textures-0097d9-1024.jpg"
+      description: "MDIMs, Explorers."
+      disable:
+        "production": True
+        "staging": True
     fasttrack:
       title: "Fast Track"
       alias: fasttrack
@@ -76,10 +85,17 @@ etl:
       image_url: "https://upload.wikimedia.org/wikipedia/commons/b/be/Alonso_%28Renault%29_qualifying_at_USGP_2005.jpg"
 
 sections:
-  - title: "Data curation"
+  - title: "Update"
     description: |-
       Updates, data edits, etc.
     apps:
+      - title: "Step upgrader"
+        alias: dashboard
+        entrypoint: app_pages/dashboard/app.py
+        description: Update ETL steps
+        maintainer: "@pablo"
+        icon: ":material/upgrade:"
+        image_url: "https://cdn.pixabay.com/photo/2018/09/04/17/02/indicator-3654257_960_720.jpg"
       - title: "Indicator Upgrader"
         alias: indicator-upgrade
         entrypoint: app_pages/indicator_upgrade/app.py
@@ -87,15 +103,6 @@ sections:
         maintainer: "@lucas"
         icon: ":material/upgrade:"
         image_url: "https://wallpapers.com/images/hd/pokemon-evolution-1920-x-1080-wallpaper-h5u6nbg98e3tibyn.jpg"
-        disable:
-          production: True
-      - title: "Anomalist"
-        alias: anomalist
-        entrypoint: app_pages/anomalist/app.py
-        description: List anomalies in data
-        maintainer: "@lucas"
-        icon: ":material/planner_review:"
-        image_url: "https://www.shutterstock.com/image-illustration/multitude-endless-standing-white-eggs-260nw-310142192.jpg"
         disable:
           production: True
       - title: "Chart Diff"
@@ -125,6 +132,20 @@ sections:
         image_url: "https://images.squarespace-cdn.com/content/v1/5ea8287254c2e00f35d1cc48/1595511684480-6RM6YK3XZGB2SD21GPGP/20140620appletoapplescomparison.jpg"
         disable:
           production: True
+
+  - title: "Data tools"
+    description: |-
+      Control panel for ETL steps.
+    apps:
+      - title: "Anomalist"
+        alias: anomalist
+        entrypoint: app_pages/anomalist/app.py
+        description: List anomalies in data
+        maintainer: "@lucas"
+        icon: ":material/planner_review:"
+        image_url: "https://www.shutterstock.com/image-illustration/multitude-endless-standing-white-eggs-260nw-310142192.jpg"
+        disable:
+          production: True
       - title: "Harmonizer"
         alias: harmonizer
         description: "Harmonize a column of a table"
@@ -132,18 +153,6 @@ sections:
         entrypoint: app_pages/harmonizer/app.py
         icon: ":material/music_note:"
         image_url: "https://www.shutterstock.com/image-vector/abstract-vector-musical-background-music-260nw-485443810.jpg"
-
-  - title: "Data monitoring"
-    description: |-
-      Control panel for ETL steps.
-    apps:
-      - title: "ETL dashboard"
-        alias: dashboard
-        entrypoint: app_pages/dashboard/app.py
-        description: Control panel for ETL steps
-        maintainer: "@pablo"
-        icon: ":material/tv_gen:"
-        image_url: "https://cdn.pixabay.com/photo/2018/09/04/17/02/indicator-3654257_960_720.jpg"
       - title: "Dataset preview"
         alias: datasets
         description: "Preview datasets and their indicators"
@@ -163,13 +172,15 @@ sections:
     description: |-
       Browse our content.
     apps:
-      - title: "Insight search"
-        alias: insight_search
-        description: "Browse DIs"
-        maintainer: "@pablo"
-        entrypoint: app_pages/insight_search/app.py
-        icon: ":material/search:"
-        image_url: "https://img.freepik.com/premium-photo/librarian-cataloging-new-books-library-database_1237301-1719.jpg"
+      # This app is causing a segmentation fault (I couldn't figure out why).
+      # Given that we have the data insights admin search, this app may not be needed anymore.
+      # - title: "Insight search"
+      #   alias: insight_search
+      #   description: "Browse DIs"
+      #   maintainer: "@pablo"
+      #   entrypoint: app_pages/insight_search/app.py
+      #   icon: ":material/search:"
+      #   image_url: "https://img.freepik.com/premium-photo/librarian-cataloging-new-books-library-database_1237301-1719.jpg"
       - title: "Indicator search"
         alias: indicator_search
         description: "Find similar indicators"
@@ -177,7 +188,7 @@ sections:
         entrypoint: app_pages/indicator_search/app.py
         icon: ":material/search:"
         image_url: "https://www.shutterstock.com/image-vector/standard-ph-chart-aqueous-solution-600nw-2007387788.jpg"
-      - title: "Similar charts"
+      - title: "Similar charts (deprecated)"
         alias: similar_charts
         description: "Find similar charts"
         maintainer: "@mojmir"
@@ -273,42 +284,6 @@ sections:
   #       disable:
   #         "production": True
   #         "staging": True
-
-  # - title: "ETL Steps (legacy)"
-  #   description: "Keeping this temporary"
-  #   apps:
-  #     - alias: express
-  #       title: "Express"
-  #       description: "Add all data steps."
-  #       entrypoint: etl_steps_old/express.py
-  #       icon: ":material/bolt:"
-  #       image_url: "https://upload.wikimedia.org/wikipedia/commons/b/b3/Indochinese_leopard.jpg"
-  #       disable:
-  #         "production": True
-  #     - alias: meadow
-  #       title: "Meadow"
-  #       description: "Add meadow step."
-  #       entrypoint: etl_steps_old/meadow.py
-  #       icon: ":material/nature:"
-  #       image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Blumenwiese_bei_Obermaiselstein05.jpg/1024px-Blumenwiese_bei_Obermaiselstein05.jpg"
-  #       disable:
-  #         "production": True
-  #     - alias: garden
-  #       title: "Garden"
-  #       description: "Add garden step."
-  #       entrypoint: etl_steps_old/garden.py
-  #       icon: ":material/deceased:"
-  #       image_url: "https://upload.wikimedia.org/wikipedia/commons/2/27/Butchart_gardens.JPG"
-  #       disable:
-  #         "production": True
-  #     - alias: grapher
-  #       title: "Grapher"
-  #       description: "Add grapher step."
-  #       entrypoint: etl_steps_old/grapher.py
-  #       icon: ":material/database:"
-  #       image_url: "https://pbs.twimg.com/media/EbHwdjwUcAEfen4?format=jpg&name=large"
-  #       disable:
-  #         "production": True
 # legacy:
 #   description: |-
 #     The pages below are legacy now. They are kept in case the new pages are not working properly.

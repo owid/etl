@@ -1,0 +1,94 @@
+definitions:
+  common_views:
+    - config:
+        hasMapTab: true
+        originUrl: ourworldindata.org/ucdp
+        relatedQuestions:
+          text: "How do different approaches measure armed conflicts and their deaths?"
+          url: "https://ourworldindata.org/conflict-data-how-do-researchers-measure-armed-conflicts-and-their-deaths"
+        map:
+          colorScale:
+            baseColorScheme: "OrRd"
+        # tab: "map"
+
+title:
+  title: Data on conflict since 1989
+  title_variant: "from UCDP"
+default_selection:
+  - World
+  - Afghanistan
+  - Democratic Republic of Congo
+  - Ethiopia
+  - Eritrea
+  - Mexico
+  - Rwanda
+  - Syria
+  - Ukraine
+default_dimensions:
+  indicator: deaths
+  conflict_type: all
+  people: all
+  estimate: best
+
+dimensions:
+  - slug: indicator
+    name: Measure
+    choices:
+      - slug: "deaths"
+        name: "Deaths"
+        group: How deadly are conflicts?
+      - slug: "death_rate"
+        name: "Death rate"
+        description: The number of deaths divided by the total population
+        group: How deadly are conflicts?
+      - slug: "num_conflicts"
+        name: "Number of conflicts"
+        group: How common are conflicts?
+
+  - slug: conflict_type
+    name: "Conflict type"
+    choices:
+      - slug: "all"
+        name: "All armed conflicts"
+      - slug: all_stacked
+        name: "All armed conflicts (by type)"
+        description: Breakdown by conflict type
+      - slug: "interstate"
+        name: "Interstate conflicts"
+        description: Between states
+      - slug: "intrastate"
+        name: "Civil conflicts"
+        description: Between a state and another armed group
+      - slug: "non-state conflict"
+        name: "Non-state conflicts"
+        description: Between non-state armed groups
+      - slug: "one-sided violence"
+        name: "Violence against civilians"
+
+  - slug: people
+    name: "Deaths"
+    choices:
+      - slug: "all"
+        name: "All deaths"
+        description: All deaths in armed conflicts
+      - slug: "all_stacked"
+        name: "All deaths (by type)"
+        description: Breakdown by combatants and civilians
+      - slug: na
+        name: "Not applicable"
+
+  - slug: estimate
+    name: "Estimate"
+    choices:
+      - slug: "best"
+        name: "Best estimate only"
+      - slug: best_ci
+        name: Show high and low estimates
+      - slug: "high"
+        name: "High estimate"
+      - slug: "low"
+        name: "Low estimate"
+      - slug: na
+        name: "Not applicable"
+
+views: []

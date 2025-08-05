@@ -1,0 +1,63 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    unit: "%"
+    short_unit: "%"
+    presentation:
+      attribution: Transparency International (2017)
+      topic_tags:
+        - Corruption
+
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  corruption_barometer:
+    variables:
+      value:
+        title: |-
+          <%- if institution == "Not applicable" and question != "Bribary rate" %>
+          << question >>   << answer >>
+          <% elif institution == "Not applicable" and question == "Bribary rate" %>
+          << answer >>
+          <% elif institution != "Not applicable" and question != "Bribary rate" %>
+          << institution >>: << question >>  << answer >>
+          <%- endif -%>
+        description_short: |-
+          <%- if question == "Bribary rate" and answer == "Bribery rate among those who had contact with a public official in the past 12 months" %>
+          Percentage of the population who, in the past 12 months, had contact with a public official and were asked for a bribe.
+          <% elif question == "Bribary rate" and answer == "Bribery rate among all respondents irrespective of contact with a public official in the past 12 months" %>
+          Percentage of the population who were asked for a bribe in the past 12 months.
+          <% elif question == "Bribary rate" and answer == "Contact rate with a public official in the past 12 months" %>
+          Percentage of the population who had contact with a public official in the past 12 months.
+          <% elif question != "Bribary rate" and institution != "Not applicable" %>
+          Percentage of respondents who answered "<< answer >>" to the question "<< question >> << institution >>".
+          <% elif question != "Bribary rate" and institution == "Not applicable" %>
+          Percentage of respondents who answered "<< answer >>" to the question "<< question >>".
+          <%- endif -%>
+        presentation:
+          title_public: |-
+            <%- if question == "How many of the following people do you think are involved in corruption, or haven’t you heard enough about them to say? " and institution != "Not applicable" %>
+            How many of the following people do you think are involved in corruption? << institution >> - "<< answer >>"
+            <%- endif -%>
+          grapher_config:
+            hasMapTab: true
+            map:
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [0,10,20,30,40,50,60,70,80]
+                baseColorScheme: RdPu
+        display:
+          numDecimalPlaces: 1
+          name: |-
+            <%- if question != "Bribary rate" and institution != "Not applicable" %>
+            << institution >>
+            <%- endif -%>
+
+

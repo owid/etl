@@ -81,3 +81,15 @@ steps:
     - snapshot://fasttrack/latest/indonor_oda_costs_oecd.csv
   data://grapher/fasttrack/latest/daily_caloric_supply_fao_historical:
     - snapshot://fasttrack/latest/daily_caloric_supply_fao_historical.csv
+  data://grapher/fasttrack/latest/nature_index_undp:
+    - snapshot://fasttrack/latest/nature_index_undp.csv
+  data://grapher/fasttrack/latest/pivot_uk_public_spending:
+    - snapshot://fasttrack/latest/pivot_uk_public_spending.csv
+  data-private://grapher/fasttrack/latest/voter_turnout_by_age__sheet1:
+    - snapshot-private://fasttrack/latest/voter_turnout_by_age__sheet1.csv
+  data-private://grapher/fasttrack/latest/vdem_women_executives:
+    - snapshot://fasttrack/latest/vdem_women_executives.csv
+
+    # Livestock
+  data-private://grapher/fasttrack/latest/antibiotic_usage_livestock:
+    - snapshot-private://fasttrack/latest/antibiotic_usage_livestock.csv

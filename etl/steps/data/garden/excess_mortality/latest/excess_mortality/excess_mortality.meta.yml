@@ -21,6 +21,7 @@ definitions:
         colorSchemeInvert: true
         baseColorScheme: RdYlBu
         customNumericValues:
+          - -100
           - -50
           - -20
           - -10
@@ -33,7 +34,7 @@ definitions:
     hmd: &origin_hmd
       title: "Human Mortality Database"
       producer: Human Mortality Database
-      date_published: "2024"
+      date_published: "2025"
       url_main: "https://www.mortality.org"
       license:
         name: Creative Commons BY 4.0
@@ -435,7 +436,6 @@ tables:
             map:
               colorScale:
                 <<: *color_scale_counts
-                customNumericMinValue: 0
                 customNumericValues:
                   - 0
                   - 100000
@@ -577,7 +577,7 @@ tables:
           - *origin_wmd
           - *origin_kk
         sources:
-          - name: Human Mortality Database (2024)
+          - name: Human Mortality Database
           - name: World Mortality Dataset (2024)
           - name: Karlinsky and Kobak (2021)
         presentation:

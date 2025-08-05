@@ -1,5 +1,3 @@
-from etl.collections.explorer import combine_config_dimensions, expand_config, hack_metadata_propagation
-
 # from etl.db import get_engine
 from etl.helpers import PathFinder
 
@@ -9,7 +7,6 @@ paths = PathFinder(__file__)
 DISPLAY_SETTINGS = {
     "colorScaleNumericMinValue": 0,
     "colorScaleNumericBins": "1000,,;3000,,;10000,,;30000,,;100000,,;300000,,;1000000,,;0",
-    "colorScaleEqualSizeBins": True,
     "colorScaleScheme": "YlGnBu",
     "colorScaleCategoricalBins": "Selected country,#AF1629,Selected country",
 }
@@ -17,7 +14,7 @@ DISPLAY_SETTINGS = {
 
 def run() -> None:
     # Load configuration from adjacent yaml file.
-    config = paths.load_mdim_config()
+    config = paths.load_collection_config()
 
     # Add views for all dimensions
     ds = paths.load_dataset("migration_stock_flows")
@@ -25,44 +22,28 @@ def run() -> None:
 
     # Define common view configuration
     common_view_config = {
-        "type": "LineChart",
+        "type": "LineChart DiscreteBar",
         "hasMapTab": True,
         "tab": "map",
         "note": 'For most countries, immigrant means "born in another country". Someone who has gained citizenship in the country they live in is still counted as an immigrant if they were born elsewhere. For some countries, place of birth information is not available; in this case citizenship is used to define whether someone counts as an immigrant.',
     }
 
-    # Bake config automatically from table
-    config_new = expand_config(
-        tb,
+    c = paths.create_collection(
+        config=config,
+        tb=tb,
         indicator_names=["migrants"],
         dimensions=["country_select", "metric", "gender"],
         common_view_config=common_view_config,
+        short_name="migration-flows",
+        explorer=True,
     )
-
-    # Combine both sources (basically dimensions and views)
-    config["dimensions"] = combine_config_dimensions(
-        config_dimensions=config_new["dimensions"],
-        config_dimensions_yaml=config.get("dimensions", {}),
-    )
-    config["views"] = config_new["views"]
-
-    # Create explorer
-    explorer = paths.create_explorer(
-        config=config,
-        explorer_name="migration-flows",
-    )
-
-    # Edit order of slugs
-    explorer.sort_choices({"country_select": lambda x: sorted(x)})
+    c.sort_choices({"country_select": lambda x: sorted(x)})
 
     # Set display settings
-    add_display_settings(explorer)
-
-    # HACK
-    hack_metadata_propagation(explorer, [tb])
+    add_display_settings(c)
 
     # Save explorer to DB
-    explorer.save()
+    c.save()
 
 
 def add_display_settings(explorer):

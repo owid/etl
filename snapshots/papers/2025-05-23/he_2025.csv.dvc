@@ -1,0 +1,18 @@
+meta:
+  origin:
+    producer: He, F., Yang, F, & Wang, Y.
+    title: Reconstructing forest and grassland cover changes in China over the past millennium
+    citation_full: |-
+      He F, Yang F, Wang Y. 2025. Reconstructing forest and grassland cover changes in China over the past millennium. Science China Earth Sciences, 68 (1): 94–110, https://doi.org/10.1007/s11430-024-1454-4
+    attribution_short: He et al.
+    url_main: |-
+      https://link.springer.com/article/10.1007/s11430-024-1454-4
+    date_accessed: "2025-05-16"
+    date_published: "2024-11-28"
+    license:
+      name: © 2025 Springer Nature
+      url: https://link.springer.com/termsandconditions
+outs:
+  - md5: acdb755d51a94953443dc6406bc518fd
+    size: 1704
+    path: he_2025.csv

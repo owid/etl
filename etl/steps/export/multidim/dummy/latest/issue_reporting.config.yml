@@ -1,0 +1,32 @@
+title:
+  title: Demo for raising issues with MDIMs
+  title_variant: ""
+default_selection:
+  - World
+
+dimensions:
+  - slug: view
+    name: View
+    choices:
+      - slug: view_1
+        name: With edits
+        description: View with custom edits done for the MDIM. This shows the bug.
+      - slug: view_2
+        name: No edits
+        description: No edits done to the metadata/config.
+
+views:
+  - dimensions:
+      view: view_1
+    indicators:
+      y:
+        - catalogPath: grapher/covid/latest/cases_deaths/cases_deaths#weekly_cases
+    metadata:
+      description_key:
+        - I've manually set just one description key for this view. However, some of the original indicator's description keys are still visible! Namely all but the first one (which has been replaced)
+
+  - dimensions:
+      view: view_2
+    indicators:
+      y:
+        - catalogPath: grapher/covid/latest/cases_deaths/cases_deaths#weekly_cases

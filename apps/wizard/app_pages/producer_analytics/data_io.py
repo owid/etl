@@ -10,18 +10,16 @@ import owid.catalog.processing as pr
 import pandas as pd
 import streamlit as st
 
-from apps.utils.google import read_gbq
 from apps.wizard.app_pages.producer_analytics.utils import GRAPHERS_BASE_URL, MIN_DATE, TODAY
 from apps.wizard.utils.components import st_cache_data
-from etl.config import OWID_ENV
-from etl.snapshot import Snapshot
-from etl.version_tracker import VersionTracker
+from etl.analytics import get_visualizations_using_data_by_producer
+from etl.google import read_gbq
 
 
 @st.cache_data(show_spinner=False)
 def get_analytics(min_date, max_date, excluded_steps):
     # 1/ Relate charts with producers of their data
-    df = get_producers_per_chart(excluded_steps=excluded_steps)
+    df = get_producers_per_chart(excluded_steps=excluded_steps).drop(columns=["chart_id"])
 
     # 2/ Get chart analytics (chart views)
     df_charts = get_chart_views(min_date=min_date, max_date=max_date)
@@ -124,103 +122,10 @@ def get_producers_per_chart(excluded_steps) -> pd.DataFrame:
 
     Additionally, it incorporates the dataset URI and the dataset name of the variable in use by the chart. This will help us exclude certain steps (e.g. population).
 
-    TODO: add support to exclude steps.
     """
-    query = """WITH t_base AS (
-	SELECT
-		cd.chartId chart_id,
-		cf.slug chart_slug,
-		JSON_EXTRACT(cf.full, '$.isPublished') is_published,
-		cd.variableId variable_id,
-		v.name variable_name,
-		d.id dataset_id,
-		d.name dataset_name,
-		d.catalogPath dataset_uri,
-		ov.originId origin_id,
-		o.title origin_name,
-        o.urlMain origin_url,
-		o.producer producer
-	FROM chart_dimensions cd
-	LEFT JOIN charts c ON c.id = cd.chartId
-	LEFT JOIN chart_configs cf ON cf.id = c.configId
-	LEFT JOIN origins_variables ov ON ov.variableId = cd.variableId
-	LEFT JOIN origins o ON o.id = ov.originId
-	LEFT JOIN variables v ON cd.variableId = v.id
-	LEFT JOIN datasets d ON d.id = v.datasetId
-)
-SELECT * FROM t_base
-WHERE origin_id IS NOT NULL
-AND is_published = true;
-"""
-    df = OWID_ENV.read_sql(query)
+    df = get_visualizations_using_data_by_producer(excluded_steps=excluded_steps)
 
-    # Exclude certain steps
-    exclude_steps_regex = "|".join(excluded_steps)
-    excluded_rows = df["dataset_uri"].str.fullmatch(exclude_steps_regex)
-    df = df.loc[~excluded_rows]
-
-    # Add caveat if source is "Various sources"
-    mask_various = df["producer"] == "Various sources"
-    df.loc[mask_various, "producer"] = (
-        df.loc[mask_various, "producer"] + " (" + df.loc[mask_various, "origin_url"] + ")"
-    )
-
-    # Format as expected by following code
-    df = df[["producer", "chart_slug"]].drop_duplicates()
-
-    # Edit chart slug to match the grapher URL
-    df["chart_url"] = GRAPHERS_BASE_URL + df["chart_slug"]
-    df = df.drop(columns=["chart_slug"])
-
-    return df
-
-
-@st.cache_data(show_spinner=False)
-def get_producers_per_chart_old(excluded_steps) -> pd.DataFrame:
-    # Load steps dataframe.
-    df = VersionTracker(exclude_steps=excluded_steps).steps_df
-
-    # Select only active snapshots.
-    df = df[(df["channel"] == "snapshot") & (df["state"] == "active")].reset_index(drop=True)
-
-    # Select only relevant columns.
-    df = df[["step", "all_chart_slugs"]]
-
-    # Load snapshot from step (raw) URI
-    df["snap"] = df["step"].apply(lambda step: Snapshot.from_raw_uri(step))
-
-    # Obtain producer, if applicable, from each snapshot
-    def _obtain_producer(snap, filter_old_sources=True):
-        origin = snap.metadata.origin
-        if (origin is not None) and (snap.metadata.namespace not in ["dummy"]):
-            return snap.metadata.origin.producer  # type: ignore
-
-        # NOTE: Prior to 'origin', we used 'source' to obtain the producer. Set 'filter_old_sources' to False to use this method.
-        if not filter_old_sources:
-            source = snap.metadata.source
-            if source is not None:
-                return snap.metadata.source.name  # type: ignore
-
-    df["producer"] = df["snap"].apply(_obtain_producer)
-
-    # Select only relevant columns.
-    df = df[["all_chart_slugs", "producer"]]
-
-    # Remove rows with no producer.
-    # NOTE: We are ignoring here all snapshots that use SOURCE instead of ORIGIN
-    df = df.dropna(subset=["producer"]).reset_index(drop=True)
-
-    # Ignore the chart id, and keep only the slug.
-    df["all_chart_slugs"] = df["all_chart_slugs"].apply(lambda id_slug: set(slug for _, slug in id_slug))
-
-    # Create a row for each producer-slug pair. Fill with "" (in cases where the producer has no charts).
-    df = df.explode("all_chart_slugs")
-
-    # Remove duplicates.
-    # NOTE: This happens because df contains one row per snapshot. Some grapher datasets come from a combination of multiple snapshots (often from the same producer). We want to count producer-chart pairs only once.
-    df = df.drop_duplicates(subset=["producer", "all_chart_slugs"]).reset_index(drop=True)
-
-    # Add a column for grapher URL.
-    df["chart_url"] = GRAPHERS_BASE_URL + df["all_chart_slugs"]
+    # Select only relevant columns and drop duplicated rows.
+    df = df[["producer", "chart_url", "chart_id"]].drop_duplicates()
 
     return df

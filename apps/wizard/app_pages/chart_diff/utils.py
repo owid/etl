@@ -14,7 +14,8 @@ log = get_logger()
 WARN_MSG = []
 
 SOURCE = OWID_ENV
-assert OWID_ENV.env_remote != "production", "Your .env points to production DB, please use a staging environment."
+
+ANALYTICS_NUM_DAYS = 30
 
 # Try to compare against production DB if possible, otherwise compare against staging-site-master
 if config.ENV_FILE_PROD:
@@ -28,6 +29,7 @@ else:
 
 @st.cache_resource
 def get_engines() -> tuple[Engine, Engine]:
+    assert OWID_ENV.env_remote != "production", "Your .env points to production DB, please use a staging environment."
     return SOURCE.engine, TARGET.engine
 
 
@@ -45,9 +47,9 @@ def prettify_date(chart):
 
 
 @st.cache_data
-def indicators_in_charts(chart_ids: list[int]) -> dict[int, str]:
+def indicators_in_charts(_engine: Engine, chart_ids: list[int]) -> dict[int, str]:
     # Get a list of used indicators in chart diffs
-    with Session(SOURCE.engine) as session:
+    with Session(_engine) as session:
         indicator_ids = gm.ChartDimensions.indicators_in_charts(session, chart_ids)
         rows = gm.Variable.from_id(session, variable_id=list(indicator_ids), columns=["id", "name"])
         return {r.id: r.name for r in rows}  # type: ignore

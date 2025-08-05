@@ -1,4 +1,5 @@
-"""Load a meadow dataset and create a garden dataset."""
+"""Loads relevant smoking indicators from the GHO database and harmonizes them.
+This step includes both smoking prevalence estimates and the MPOWER indicators on tobacco control policies."""
 
 from owid.catalog import processing as pr
 
@@ -12,6 +13,13 @@ REGIONS = [r for r in geo.REGIONS.keys() if r != "European Union (27)"] + ["Worl
 
 LAST_YEAR = 2022
 
+# short table names
+afford_gdp = "affordability_of_cigarettes__percentage_of_gdp_per_capita_required_to_purchase_2000_cigarettes_of_the_most_sold_brand"
+taxes = "taxes_as_a_pct_of_price__total_tax"
+ad_bans = "enforce_bans_on_tobacco_advertising"
+help_quit = "offer_help_to_quit_tobacco_use"
+smoke_free = "number_of_places_smoke_free__national_legislation"
+
 
 def run() -> None:
     #
@@ -24,9 +32,47 @@ def run() -> None:
     ds_population = paths.load_dataset("un_wpp")
 
     # get smoking indicators
-    all_smoking_indicators = [c for c in ds_meadow.table_names if (("smok" in c.lower()) or ("tobac" in c.lower()))]
+    all_rel_indicators = [
+        c for c in ds_meadow.table_names if (("smok" in c.lower()) or ("tobac" in c.lower()) or "tax" in c.lower())
+    ]
 
-    smoking_estimates = [ind for ind in all_smoking_indicators if "estimate" in ind.lower()]
+    smoking_estimates = [ind for ind in all_rel_indicators if "estimate" in ind.lower()]
+
+    # read tables for policy indicators
+    tb_taxes = ds_meadow.read(taxes)
+    tb_ads = ds_meadow.read(ad_bans)
+    tb_quit = ds_meadow.read(help_quit)
+    tb_afford = ds_meadow.read(afford_gdp)
+    tb_smoke_free = ds_meadow.read(smoke_free)
+
+    ### clean up policy indicators
+    # taxes
+    tb_taxes = tb_taxes[tb_taxes["tobacco_and_nicotine_product"] == "Most sold brand of cigarettes (20 sticks)"]
+    tb_taxes = tb_taxes.drop(columns=["tobacco_and_nicotine_product", "comments"], errors="raise")
+
+    # smoke free
+    tb_smoke_free = tb_smoke_free.drop(columns=["comments"], errors="raise")
+
+    # support to quit
+    # 1 means no data available, so should be dropped
+    tb_quit = tb_quit[tb_quit[help_quit] != 1]
+
+    tb_empower = pr.multi_merge(
+        [tb_taxes, tb_ads, tb_quit, tb_afford, tb_smoke_free],  # type: ignore
+        on=["country", "year"],
+        how="outer",
+    )
+
+    tb_empower = tb_empower.rename(
+        columns={
+            afford_gdp: "cig_afford_pct_gdp",
+            taxes: "cig_tax_pct",
+            ad_bans: "tobacco_ad_ban",
+            help_quit: "tobacco_help_quit",
+            smoke_free: "tobacco_smoke_free",
+        },
+        errors="raise",
+    )
 
     tbs = []
 
@@ -44,7 +90,6 @@ def run() -> None:
     tb = pr.multi_merge(tbs, on=["country", "year", "sex"], how="left")
 
     # drop and rename columns
-
     tb = tb.rename(
         columns={
             "estimate_of_current_cigarette_smoking_prevalence__pct": "cig_smoking_pct",
@@ -110,7 +155,6 @@ def run() -> None:
     for rel_ind, abs_ind in ind.items():
         tb.loc[tb["country"].isin(REGIONS), rel_ind] = tb[abs_ind] / tb["population"] * 100
 
-    # dropping age standardized totals, since they are not needed/ misleading
     tb = tb.drop(columns=["cig_smokers_age_std", "tobacco_smokers_age_std", "tobacco_users_age_std", "population"])
 
     tb["cig_smokers"] = tb["cig_smokers"].copy_metadata(tb["cig_smoking_pct"])
@@ -122,12 +166,13 @@ def run() -> None:
 
     # Improve table format.
     tb = tb.format(["country", "year", "sex"], short_name="gho_smoking")
+    tb_empower = tb_empower.format(["country", "year"], short_name="gho_smoking_empower")
 
     #
     # Save outputs.
     #
     # Initialize a new garden dataset.
-    ds_garden = paths.create_dataset(tables=[tb], default_metadata=ds_meadow.metadata)
+    ds_garden = paths.create_dataset(tables=[tb, tb_empower], default_metadata=ds_meadow.metadata)
 
     # Save garden dataset.
     ds_garden.save()

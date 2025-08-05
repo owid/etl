@@ -143,7 +143,8 @@ with st_horizontal(vertical_alignment="flex-end", justify_content="space-between
 if import_method is None:
     st.warning("Select an import method to proceed.")
 else:
-    with st.form("fasttrack-form"):
+    # with st.form("fasttrack-form"):
+    with st.container(border=True):
         existing_google_sheet = None
         placeholder_for_existing_google_sheet = None
         placeholder_for_private = None
@@ -177,7 +178,7 @@ else:
 
         placeholder_for_private = st.empty()
 
-        submitted = st.form_submit_button(
+        submitted = st.button(
             "Submit",
             type="primary",
             use_container_width=True,
@@ -348,7 +349,7 @@ else:
                 step = f"{fast_import.dataset.metadata.uri}"
                 etl_main(
                     dag_path=DAG_FASTTRACK_PATH,
-                    steps=[step],
+                    includes=[step],
                     grapher=True,
                     private=not fast_import.dataset.metadata.is_public,
                     workers=1,

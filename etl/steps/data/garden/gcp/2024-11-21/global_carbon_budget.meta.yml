@@ -1,10 +1,10 @@
 definitions:
   production_emissions_description_key: &production_emissions_description_key
-    - This data is based on territorial emissions, which do not account for emissions embedded in traded goods.
+    - "This data is based on territorial emissions, meaning the emissions produced within a country's borders, but not those from imported goods. For example, emissions from imported steel are counted in the country where the steel is produced. To learn more and look at emissions adjusted for trade, read our article: [How do CO₂ emissions compare when we adjust for trade?](https://ourworldindata.org/consumption-based-co2)"
   traded_emissions_description_key: &traded_emissions_description_key
     - Net CO₂ emissions embedded in trade is the net of CO₂ which is imported or exported via traded goods with an economy. A positive value denotes a country or region is a net importer of CO₂ emissions; a negative value indicates a country is a net exporter.
   international_aviation_description_key: &international_aviation_description_key
-    - Emissions from international aviation and shipping are not included in any country or region's emissions. They are only included in the global total emissions.
+    - Emissions from international aviation and shipping are not included in the data for any individual country or region. They are only counted in the global total.
   consumption_emissions_description_key: &consumption_emissions_description_key
     - Consumption-based emissions attribute the emissions generated in the production of goods and services according to where they were _consumed_, rather than where they were _produced_.
     - "The data is calculated by adjusting 'production-based' emissions (emissions produced domestically) for trade: Consumption-based emissions equals production-based emissions, _minus_ emissions embedded in exports, _plus_ emissions embedded in imports."
@@ -12,14 +12,14 @@ definitions:
     - Consumption-based emissions are not available for all countries because not all countries have sufficient, high-quality trade data. But those without complete data are a small fraction (3%) of the global total.
     - This data measures carbon dioxide (CO₂) emissions from fossil fuels and industry and does not include emissions from land use change, deforestation, soils, or vegetation.
   per_capita_description_key: &per_capita_description_key
-    - Per capita emissions represent the emissions of an average person in a country or region - they are calculated as the total emissions divided by population.
+    - "CO₂ emissions per capita are calculated by dividing emissions by population. They represent the average emissions per person in a country or region. To learn more about how different metrics capture the distribution of CO₂ emissions, read our article: [Per capita, national, historical: how do countries compare on CO2 metrics?](https://ourworldindata.org/co2-emissions-metrics)"
+  per_capita_description_processing: |-
+    - To calculate CO₂ emissions per capita, we divide the original data by a country's estimated population. These estimates come from our population dataset based on [multiple sources](https://ourworldindata.org/population-sources).
   # Common fields to be used in all indicators (unless overridden for specific indicators below).
   common:
     description_processing: &description_processing |
-        - Data on global emissions has been converted from tonnes of carbon to tonnes of carbon dioxide (CO₂) using a conversion factor of 3.664.
-        - Emissions from the Kuwaiti oil fires in 1991 have been included as part of Kuwait's emissions for that year.
-        - Country's share of the global population is calculated using our population dataset, based on [different sources](https://ourworldindata.org/population-sources).
-        - Each country's share of global CO₂ emissions from flaring has been calculated using global CO₂ emissions from flaring provided in the Global Carbon Budget dataset.
+      - Global emissions are converted from tonnes of carbon to tonnes of carbon dioxide (CO₂) using a factor of 3.664. This is the conversion factor [recommended by the Global Carbon Project](https://globalcarbonbudgetdata.org/downloads/jGJH0-data/Global+Carbon+Budget+v2024+Dataset+Descriptions.pdf). It reflects that one tonne of carbon, when fully oxidized, forms 3.664 tonnes of CO₂, based on the relative molecular weights of carbon and oxygen in CO₂.
+      - Emissions from the 1991 Kuwaiti oil fires are included in Kuwait's emissions for that year.
     description_key:
       # NOTE: The description key points are re-defined for each indicator on consumption-based emissions and traded emissions, as well as on per-capita indicators.
       - *production_emissions_description_key
@@ -27,7 +27,6 @@ definitions:
     presentation:
       topic_tags:
       - CO2 & Greenhouse Gas Emissions
-      attribution_short: GCB
     processing_level: major
 
 dataset:
@@ -54,7 +53,7 @@ tables:
           - *consumption_emissions_description_key
           - *international_aviation_description_key
       ##################################################################################################################
-      # Curated indicator for data page.
+      # Curated indicator for data pages.
       consumption_emissions_per_capita:
         title: Per capita consumption-based CO₂ emissions
         description_short: |
@@ -63,7 +62,8 @@ tables:
           - *consumption_emissions_description_key
           - *per_capita_description_key
           - *international_aviation_description_key
-        description_processing: *description_processing
+        description_processing: |
+          {definitions.common.description_processing}{definitions.per_capita_description_processing}
         unit: tonnes per person
         short_unit: t/person
         display:
@@ -100,6 +100,7 @@ tables:
                 baseColorScheme: Reds
                 binningStrategy: manual
                 customNumericValues:
+                  - 0
                   - 1
                   - 2
                   - 5
@@ -121,6 +122,30 @@ tables:
             relatedQuestions:
               - url: https://ourworldindata.org/grapher/consumption-co2-per-capita#faqs
                 text: FAQs on this data
+      emissions_total_per_capita:
+        title: "Annual CO₂ emissions (per capita)"
+        unit: "tonnes per person"
+        short_unit: "t/person"
+        display:
+          shortUnit: t
+          tolerance: 3
+          numSignificantFigures: 3
+        description_short: |
+          Carbon dioxide (CO₂) emissions from [burning fossil fuels and industrial processes](#dod:fossilemissions). This includes emissions from transport, electricity generation, and heating, but not [land-use change](#dod:land-use-change-emissions).
+        description_key:
+          - Carbon dioxide (CO₂) is the primary [greenhouse gas](#dod:ghgemissions) causing climate change.
+          - Global CO₂ emissions have stayed just below five tonnes per person for over a decade. But across countries, emissions vary widely, rising in some, falling in others.
+          - Fossil fuel burning is the main source of CO₂ emissions. This data includes [fossil CO₂ emissions](#dod:fossilemissions) from activities such as transport, electricity generation, and heating.
+          - These figures don't include CO₂ emissions from [changes in land use](#dod:land-use-change-emissions), like deforestation or reforestation.
+          - *international_aviation_description_key
+          - *production_emissions_description_key
+          - The data comes from the Global Carbon Budget. Fossil CO₂ emissions are estimated using national statistics on energy use — such as coal, oil, and gas consumption — and industrial production, particularly cement. These figures are converted into CO₂ emissions using standardized emission factors. For more details, read [the Global Carbon Budget paper](https://doi.org/10.5194/essd-15-5301-2023).
+          - *per_capita_description_key
+        description_processing: |
+          {definitions.common.description_processing}{definitions.per_capita_description_processing}
+        presentation:
+          title_public: CO₂ emissions per capita
+      ##################################################################################################################
       consumption_emissions_per_gdp:
         title: "Annual consumption-based CO₂ emissions per GDP (kg per international-$)"
         unit: "kilograms per international-$"
@@ -423,17 +448,6 @@ tables:
         unit: "kilograms per kilowatt-hour"
         short_unit: "kg/kWh"
         description_short: "Annual total emissions of carbon dioxide (CO₂), including land-use change, measured in kilograms per kilowatt-hour of primary energy consumption."
-      emissions_total_per_capita:
-        title: "Annual CO₂ emissions (per capita)"
-        unit: "tonnes per person"
-        short_unit: "t/person"
-        display:
-          shortUnit: t
-        description_short: "Annual total emissions of carbon dioxide (CO₂), excluding land-use change, measured in tonnes per person."
-        description_key:
-          - *per_capita_description_key
-          - *production_emissions_description_key
-          - *international_aviation_description_key
       emissions_total_per_gdp:
         title: "Annual CO₂ emissions per GDP (kg per international-$)"
         unit: "kilograms per international-$"

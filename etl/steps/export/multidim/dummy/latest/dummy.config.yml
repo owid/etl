@@ -1,0 +1,51 @@
+title:
+  title: Dummy example
+  title_variant: Explore various indicators (DEMO purposes)
+default_selection:
+  - United States
+  - United Kingdom
+  - China
+  - India
+# Both will be filled programmatically.
+dimensions:
+  - slug: indicator
+    name: Indicator
+    description: Relevant COVID-19 indicators
+    choices:
+      - slug: covid_cases
+        name: COVID-19 Cases
+        description: Number of confirmed COVID-19 cases
+        group: Single indicators
+      - slug: covid_deaths
+        name: COVID-19 Deaths
+        description: Number of confirmed COVID-19 deaths
+        group: Single indicators
+      - slug: comparison
+        name: Comparison
+        description: Comparison with other countries or regions
+        group: Comparison of indicators
+
+  - slug: period
+    name: Period
+    description: Time period for data aggregation using rolling averages
+    choices:
+      - slug: weekly
+        name: Weekly
+        description: 7-day rolling average
+      - slug: biweekly
+        name: Biweekly
+        description: 14-day rolling average
+
+  - slug: metric
+    name: Normalization
+    description: Scale of the indicator
+    choices:
+      - slug: absolute
+        name: Absolute number
+        description: Absolute values of the indicator
+      - slug: per_capita
+        name: Per million people
+      - slug: change
+        name: Relative change (%)
+
+views: []

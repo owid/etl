@@ -2,7 +2,7 @@
 
 [![Build status](https://badge.buildkite.com/a25fa2489cb7e1fa69fbe3e4df7d83fd7040a3d5858e72accb.svg)](https://buildkite.com/our-world-in-data/repack-unit-tests)
 [![PyPI version](https://badge.fury.io/py/owid-repack.svg)](https://badge.fury.io/py/owid-repack)
-![](https://img.shields.io/badge/python-3.8|3.9|3.10|3.11-blue.svg)
+![](https://img.shields.io/badge/python-3.10|3.11|3.12|3.13-blue.svg)
 
 _Pack Pandas DataFrames into smaller, more memory efficient types._
 

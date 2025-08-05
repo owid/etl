@@ -4,6 +4,9 @@ definitions:
       topic_tags:
       - Animal Welfare
 
+dataset:
+  title: Animals used for food
+
 tables:
   animals_used_for_food:
     title: Animals used for food

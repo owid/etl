@@ -37,7 +37,7 @@ def get_affected_charts_and_preview(indicator_mapping: Dict[int, int]) -> List[g
     # 1/ Get affected charts
     ########################################################
     # If user submitted variable mapping (i.e. clicked on "Next (2/3)"), then get charts and update them accordingly.
-    with st.spinner("Retrieving charts to be updated. This can take up to 1 minute..."):
+    with st.spinner("Retrieving charts to be updated. This can take up to 1 minute...", show_time=True):
         try:
             log.info("building updaters and getting charts!")
             st.session_state.indicator_mapping = indicator_mapping

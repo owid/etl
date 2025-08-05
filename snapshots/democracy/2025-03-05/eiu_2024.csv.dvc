@@ -5,6 +5,9 @@ meta:
     # Data product / Snapshot
     title: "Democracy Index 2024: What's wrong with representative democracy?"
     description: |-
+      This edition of the Democracy Index records how global democracy fared in 2024. The index is produced by the Economist Intelligence Unit (EIU), the research and analysis division of The Economist Group, which also publishes The Economist newspaper.
+
+      # More details
       The Economist Intelligence Unit's Democracy Index provides a snapshot of the state of democracy in 165 independent states and two territories. This covers almost the entire population of the world and the vast majority of the world's states (microstates are excluded). Scored on a 0-10 scale, the Democracy Index is based on five categories: electoral process and pluralism, functioning of government, political participation, political culture, and civil liberties. Based on its scores on a range of indicators within these categories, each country is classified as one of four types of regime: "full democracy", "flawed democracy", "hybrid regime" or "authoritarian regime".
 
       This edition of the Democracy Index examines the state of global democracy in 2024. The focus of this year's report is why representative democracy is not working for large numbers of citizens around the world. There is a growing consensus that the democratic model developed over the past century is in trouble, but there is less clarity about why people are so disenchanted with their democracies. In 2024, when countries inhabited by more than half of the global population went to the polls, popular disaffection with the performance of government was expressed in an anti-incumbent backlash and rising support for populist insurgents.
@@ -16,7 +19,7 @@ meta:
 
     # Files
     url_main: https://www.eiu.com/n/campaigns/democracy-index-2024/
-    date_accessed: 2025-03-05
+    date_accessed: '2025-03-05'
 
     # License
     license:

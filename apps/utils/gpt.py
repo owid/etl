@@ -14,27 +14,27 @@ log = structlog.get_logger()
 
 
 # GPT
-MODEL_DEFAULT = "gpt-3.5-turbo"
+MODEL_DEFAULT = "gpt-4.1-mini"
 
 # PRICING (per 1,000 tokens)
 ## See pricing list: https://openai.com/api/pricing/ (USD)
 ## See model list: https://platform.openai.com/docs/models/gpt-4-and-gpt-4-turbo
 RATE_DEFAULT_IN = 0.005
 MODEL_EQUIVALENCES = {
-    # "gpt-3.5-turbo": "gpt-3.5-turbo-0125",
     "gpt-3.5-turbo": "gpt-3.5-turbo-0125",
     "gpt-4-turbo-preview": "gpt-4-0125-preview",
     "gpt-4-turbo": "gpt-4-turbo-2024-04-09",
     "gpt-4o": "gpt-4o-2024-08-06",
-    "o1-preview": "o1-preview-2024-09-12",
     "gpt-4o-mini": "gpt-4o-mini-2024-07-18",
+    "gpt-4.1": "gpt-4.1-2025-04-14",
+    "gpt-4.1-mini": "gpt-4.1-mini-2025-04-14",
+    "gpt-4.1-nano": "gpt-4.1-nano-2025-04-14",
+    "o1": "o1-2024-12-17",
+    "o3": "o3-2025-04-16",
+    "o4-mini": "o4-mini-2025-04-16",
 }
 MODEL_RATES_1000_TOKEN = {
     # GPT 3.5
-    "gpt-3.5-turbo-0613": {
-        "in": 1.5 / 1000,
-        "out": 2 / 1000,
-    },
     "gpt-3.5-turbo-0125": {
         "in": 0.5 / 1000,
         "out": 1.5 / 1000,
@@ -58,28 +58,60 @@ MODEL_RATES_1000_TOKEN = {
         "out": 30 / 1000,
     },
     # GPT 4o
-    "gpt-4o-2024-05-13": {
-        "in": 5 / 1000,
-        "out": 15 / 1000,
-    },
     "gpt-4o-2024-08-06": {
         "in": 2.5 / 1000,
         "out": 10 / 1000,
     },
-    # GPTO 4o mini
+    # GPT 4o mini
     "gpt-4o-mini-2024-07-18": {
         "in": 0.150 / 1000,
         "out": 0.600 / 1000,
     },
     # GPT o1
-    "o1-preview-2024-09-12": {
+    "o1-2024-12-17": {
         "in": 15 / 1000,
         "out": 60 / 1000,
+    },
+    # GPT o3
+    "o3-2025-04-16": {
+        "in": 10 / 1000,
+        "out": 40 / 1000,
+    },
+    # GPT o4-mini
+    "o4-mini-2025-04-16": {
+        "in": 1.1 / 1000,
+        "out": 4.4 / 1000,
+    },
+    # GPT 4.1
+    "gpt-4.1-2025-04-14": {
+        "in": 2 / 1000,
+        "out": 8 / 1000,
+    },
+    # GPT 4.1 mini
+    "gpt-4.1-mini-2025-04-14": {
+        "in": 0.4 / 1000,
+        "out": 1.6 / 1000,
+    },
+    # GPT 4.1 nano
+    "gpt-4.1-nano-2025-04-14": {
+        "in": 0.1,
+        "out": 0.4,
     },
 }
 MODEL_RATES_1000_TOKEN = {
     **MODEL_RATES_1000_TOKEN,
     **{new: MODEL_RATES_1000_TOKEN[equivalent] for new, equivalent in MODEL_EQUIVALENCES.items()},
+}
+
+# HACK
+# ref: https://github.com/openai/tiktoken/issues/395
+MODELS_TOKEN_ENCODINGS = {
+    "gpt-4.1": "o200k_base",
+    "gpt-4.1-mini": "o200k_base",
+    "gpt-4.1-nano": "o200k_base",
+    "o1": "o200k_base",
+    "o3": "o200k_base",
+    "o4-mini": "o200k_base",
 }
 
 
@@ -208,6 +240,11 @@ class OpenAIWrapper(OpenAI):
                 **kwargs,
             }
 
+        # Hotfix for temperature values
+        if model in ("o3"):
+            if "temperature" in kwargs:
+                kwargs["temperature"] = 1
+
         # Get chat completion
         chat_completion = self.chat.completions.create(**kwargs)  # type: ignore
 
@@ -242,7 +279,10 @@ def get_number_tokens(text: str, model_name: str) -> int:
 
     More info: https://openai.com/pricing#language-models
     """
-    encoding = tiktoken.encoding_for_model(model_name)
+    if model_name in MODELS_TOKEN_ENCODINGS:
+        encoding = tiktoken.get_encoding(MODELS_TOKEN_ENCODINGS[model_name])
+    else:
+        encoding = tiktoken.encoding_for_model(model_name)
     token_count = len(encoding.encode(text))
     return token_count
 

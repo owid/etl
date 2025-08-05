@@ -50,6 +50,7 @@ tables:
                   - null
                   - null
                 customNumericValues:
+                  - 0
                   - 0.3
                   - 0.5
                   - 1
@@ -58,7 +59,6 @@ tables:
                   - 10
                   - 30
                   - 50
-                customNumericMinValue: 0
               timeTolerance: 0
             selectedEntityNames:
               - United States

@@ -7,7 +7,7 @@ definitions:
     presentation:
       topic_tags:
         - Agricultural Production
-      attribution_short: FAO
+      attribution_short: UN FAO
 
 # NOTE: You can modify all indicators' metadata below.
 # However, it is preferrable to change unit and short_unit in the custom_elements_and_units.csv.
@@ -46,393 +46,198 @@ tables:
               - Europe
               - South America
       almonds__00000221__yield__005412__tonnes_per_hectare:
-        display:
-          name: Almond yields
-          numDecimalPlaces: 2
         presentation:
           title_public: Almond yields
       apples__00000515__area_harvested__005312__hectares:
-        display:
-          name: Land used for apple production
-          numDecimalPlaces: 2
         presentation:
           title_public: Land used for apple production
       apples__00000515__production__005510__tonnes:
-        display:
-          name: Apple production
-          numDecimalPlaces: 2
         presentation:
           title_public: Apple production
       avocados__00000572__production__005510__tonnes:
-        display:
-          name: Avocado production
-          numDecimalPlaces: 2
         presentation:
           title_public: Avocado production
       bananas__00000486__area_harvested__005312__hectares:
-        display:
-          name: Land used for banana production
-          numDecimalPlaces: 2
         presentation:
           title_public: Land used for banana production
       bananas__00000486__production__005510__tonnes:
-        display:
-          name: Banana production
-          numDecimalPlaces: 2
         presentation:
           title_public: Banana production
       bananas__00000486__yield__005412__tonnes_per_hectare:
-        display:
-          name: Banana yields
-          numDecimalPlaces: 2
         presentation:
           title_public: Banana yields
       barley__00000044__area_harvested__005312__hectares:
-        display:
-          name: Land used for barley production
-          numDecimalPlaces: 2
         presentation:
           title_public: Land used for barley production
       barley__00000044__production__005510__tonnes:
-        display:
-          name: Barley production
-          numDecimalPlaces: 2
         presentation:
           title_public: Barley production
       barley__00000044__yield__005412__tonnes_per_hectare:
-        display:
-          name: Barley yields
-          numDecimalPlaces: 2
         presentation:
           title_public: Barley yields
       beans__dry__00000176__area_harvested__005312__hectares:
-        display:
-          name: Land used for bean production
-          numDecimalPlaces: 2
         presentation:
           title_public: Land used for bean production
       beans__dry__00000176__production__005510__tonnes:
-        display:
-          name: Bean production
-          numDecimalPlaces: 2
         presentation:
           title_public: Bean production
       beans__dry__00000176__yield__005412__tonnes_per_hectare:
-        display:
-          name: Bean yields
-          numDecimalPlaces: 2
         presentation:
           title_public: Bean yields
       cashew_nuts__00000217__production__005510__tonnes:
-        display:
-          name: Cashew nut production
-          numDecimalPlaces: 2
         presentation:
           title_public: Cashew nut production
       cashew_nuts__00000217__yield__005412__tonnes_per_hectare:
-        display:
-          name: Cashew nut yields
-          numDecimalPlaces: 2
         presentation:
           title_public: Cashew nut yields
       cassava__00000125__area_harvested__005312__hectares:
-        display:
-          name: Land used for cassava production
-          numDecimalPlaces: 2
         presentation:
           title_public: Land used for cassava production
       cassava__00000125__production__005510__tonnes:
-        display:
-          name: Cassava production
-          numDecimalPlaces: 2
         presentation:
           title_public: Cassava production
       cassava__00000125__yield__005412__tonnes_per_hectare:
-        display:
-          name: Cassava yields
-          numDecimalPlaces: 2
         presentation:
           title_public: Cassava yields
       castor_oil_seed__00000265__area_harvested__005312__hectares:
-        display:
-          name: Land used for castor oil seed production
-          numDecimalPlaces: 2
         presentation:
           title_public: Land used for castor oil seed production
       cattle__00000866__stocks__005111__animals:
-        display:
-          name: Number of cattle
-          numDecimalPlaces: 0
         presentation:
           title_public: Number of cattle
       cereals__00001717__area_harvested__005312__hectares:
-        display:
-          name: Land used for cereal production
-          numDecimalPlaces: 2
         presentation:
           title_public: Land used for cereal production
       cereals__00001717__production__005510__tonnes:
-        display:
-          name: Cereal production
-          numDecimalPlaces: 2
         presentation:
           title_public: Cereal production
       cocoa_beans__00000661__area_harvested__005312__hectares:
-        display:
-          name: Land used for cocoa bean production
-          numDecimalPlaces: 2
         presentation:
           title_public: Land used for cocoa bean production
       cocoa_beans__00000661__production__005510__tonnes:
-        display:
-          name: Cocoa bean production
-          numDecimalPlaces: 2
         presentation:
           title_public: Cocoa bean production
       cocoa_beans__00000661__yield__005412__tonnes_per_hectare:
-        display:
-          name: Cocoa bean yields
-          numDecimalPlaces: 2
         presentation:
           title_public: Cocoa bean yields
       coconut_oil__00000252__production__005510__tonnes:
-        display:
-          name: Coconut oil production
-          numDecimalPlaces: 2
         presentation:
           title_public: Coconut oil production
       coconuts__00000249__area_harvested__005312__hectares:
-        display:
-          name: Land used for coconut production
-          numDecimalPlaces: 2
         presentation:
           title_public: Land used for coconut production
       coffee__green__00000656__production__005510__tonnes:
-        display:
-          name: Coffee bean production
-          numDecimalPlaces: 2
         presentation:
           title_public: Coffee bean production
       coffee__green__00000656__yield__005412__tonnes_per_hectare:
-        display:
-          name: Coffee bean yields
-          numDecimalPlaces: 2
         presentation:
           title_public: Coffee bean yields
       cottonseed_oil__00000331__production__005510__tonnes:
-        display:
-          name: Cottonseed oil production
-          numDecimalPlaces: 2
         presentation:
           title_public: Cottonseed oil production
       eggs__00001783__production__005510__tonnes:
-        display:
-          name: Egg production
-          numDecimalPlaces: 2
         presentation:
           title_public: Egg production
       eggs__00001783__yield__005424__kilograms_per_animal:
-        display:
-          name: Eggs per bird
-          numDecimalPlaces: 2
         presentation:
-          title_public: Eggs per bird
+          title_public: Egg production per bird
       grapes__00000560__production__005510__tonnes:
-        display:
-          name: Grape production
-          numDecimalPlaces: 2
         presentation:
           title_public: Grape production
       groundnut_oil__00000244__production__005510__tonnes:
-        display:
-          name: Groundnut oil production
-          numDecimalPlaces: 2
         presentation:
           title_public: Groundnut oil production
       groundnuts__00000242__area_harvested__005312__hectares:
-        display:
-          name: Land used for groundnut production
-          numDecimalPlaces: 2
         presentation:
           title_public: Land used for groundnut production
       groundnuts__00000242__yield__005412__tonnes_per_hectare:
-        display:
-          name: Groundnut yields
-          numDecimalPlaces: 2
         presentation:
           title_public: Groundnut yields
       karite_nuts__00000263__area_harvested__005312__hectares:
-        display:
-          name: Land used for karite nut production
-          numDecimalPlaces: 2
         presentation:
           title_public: Land used for karite nut production
       lettuce__00000372__yield__005412__tonnes_per_hectare:
-        display:
-          name: Lettuce yields
-          numDecimalPlaces: 2
         presentation:
           title_public: Lettuce yields
       linseed_oil__00000334__production__005510__tonnes:
-        display:
-          name: Linseed oil production
-          numDecimalPlaces: 2
         presentation:
           title_public: Linseed oil production
       linseed__00000333__area_harvested__005312__hectares:
-        display:
-          name: Land used for linseed production
-          numDecimalPlaces: 2
         presentation:
           title_public: Land used for linseed production
       maize_oil__00000060__production__005510__tonnes:
-        display:
-          name: Maize oil production
-          numDecimalPlaces: 2
         presentation:
           title_public: Maize oil production
       maize__00000056__area_harvested__005312__hectares:
-        display:
-          name: Land used for corn production
-          numDecimalPlaces: 2
         presentation:
           title_public: Land used for corn production
       maize__00000056__production__005510__tonnes:
-        display:
-          name: Maize production
-          numDecimalPlaces: 2
         presentation:
           title_public: Maize production
       maize__00000056__yield__005412__tonnes_per_hectare:
-        display:
-          name: Maize yields
-          numDecimalPlaces: 2
         presentation:
           title_public: Maize yields
       meat_of_cattle_with_the_bone__fresh_or_chilled__00000867__producing_or_slaughtered_animals__005320__animals:
-        display:
-          name: Number of cattle slaughtered for meat
-          numDecimalPlaces: 0
         presentation:
           title_public: Number of cattle slaughtered for meat
       meat_of_cattle_with_the_bone__fresh_or_chilled__00000867__yield__005417__kilograms_per_animal:
-        display:
-          name: Cattle meat yield per animal
-          numDecimalPlaces: 2
         presentation:
           title_public: Cattle meat yield per animal
       meat__beef_and_buffalo__00001806__production__005510__tonnes:
-        display:
-          name: Beef and buffalo meat production
-          numDecimalPlaces: 2
         presentation:
           title_public: Beef and buffalo meat production
       meat__camel__00001127__production__005510__tonnes:
-        display:
-          name: Camel meat production
-          numDecimalPlaces: 2
         presentation:
           title_public: Camel meat production
       meat__chicken__00001058__producing_or_slaughtered_animals__005321__animals:
-        display:
-          name: Number of chickens slaughtered for meat
-          numDecimalPlaces: 0
         presentation:
           title_public: Number of chickens slaughtered for meat
       meat__chicken__00001058__production__005510__tonnes:
-        display:
-          name: Chicken meat production
-          numDecimalPlaces: 2
         presentation:
           title_public: Chicken meat production
       meat__chicken__00001058__yield__005424__kilograms_per_animal:
-        display:
-          name: Chicken meat yield per animal
-          numDecimalPlaces: 2
         presentation:
           title_public: Chicken meat yield per animal
       meat__duck__00001069__producing_or_slaughtered_animals__005321__animals:
-        display:
-          name: Number of ducks slaughtered for meat
-          numDecimalPlaces: 0
         presentation:
           title_public: Number of ducks slaughtered for meat
       meat__game__00001163__production__005510__tonnes:
-        display:
-          name: Game meat production
-          numDecimalPlaces: 2
         presentation:
           title_public: Game meat production
       meat__goat__00001017__producing_or_slaughtered_animals__005320__animals:
-        display:
-          name: Number of goats slaughtered for meat
-          numDecimalPlaces: 0
         presentation:
           title_public: Number of goats slaughtered for meat
       meat__horse__00001097__production__005510__tonnes:
-        display:
-          name: Horse meat production
-          numDecimalPlaces: 2
         presentation:
           title_public: Horse meat production
       meat__lamb_and_mutton__00000977__producing_or_slaughtered_animals__005320__animals:
-        display:
-          name: Number of sheep slaughtered for meat
-          numDecimalPlaces: 0
         presentation:
           title_public: Number of sheep slaughtered for meat
       meat__pig__00001035__producing_or_slaughtered_animals__005320__animals:
-        display:
-          name: Number of pigs slaughtered for meat
-          numDecimalPlaces: 0
         presentation:
           title_public: Number of pigs slaughtered for meat
       meat__pig__00001035__production__005510__tonnes:
-        display:
-          name: Pig meat production
-          numDecimalPlaces: 2
         presentation:
           title_public: Pig meat production
       meat__pig__00001035__yield__005417__kilograms_per_animal:
-        display:
-          name: Pig meat yield per animal
-          numDecimalPlaces: 2
         presentation:
           title_public: Pig meat yield per animal
       meat__poultry__00001808__production__005510__tonnes:
-        display:
-          name: Poultry meat production
-          numDecimalPlaces: 2
         presentation:
           title_public: Poultry meat production
       meat__poultry__00001808__yield__005424__kilograms_per_animal:
-        display:
-          name: Poultry meat yield per animal
-          numDecimalPlaces: 2
         presentation:
           title_public: Poultry meat yield per animal
       meat__sheep_and_goat__00001807__production__005510__tonnes:
-        display:
-          name: Sheep and goat meat production
-          numDecimalPlaces: 2
         presentation:
           title_public: Sheep and goat meat production
       meat__total__00001765__production__005510__tonnes:
-        display:
-          name: Total meat production
-          numDecimalPlaces: 2
         presentation:
           title_public: Total meat production
       meat__turkey__00001080__producing_or_slaughtered_animals__005321__animals:
-        display:
-          name: Number of turkeys slaughtered for meat
-          numDecimalPlaces: 0
         presentation:
           title_public: Number of turkeys slaughtered for meat
       milk__00001780__production__005510__tonnes:
-        display:
-          name: Milk production
-          numDecimalPlaces: 2
         presentation:
           title_public: Milk production
       # milk__00001780__yield__005420__kilograms_per_animal:
@@ -443,338 +248,482 @@ tables:
       #   presentation:
       #     title_public: Milk yield per animal
       millet__00000079__yield__005412__tonnes_per_hectare:
-        display:
-          name: Millet yields
-          numDecimalPlaces: 2
         presentation:
           title_public: Millet yields
       olive_oil__00000261__production__005510__tonnes:
-        display:
-          name: Olive oil production
-          numDecimalPlaces: 2
         presentation:
           title_public: Olive oil production
       olives__00000260__area_harvested__005312__hectares:
-        display:
-          name: Land used for olive production
-          numDecimalPlaces: 2
         presentation:
           title_public: Land used for olive production
       oranges__00000490__area_harvested__005312__hectares:
-        display:
-          name: Land used for orange production
-          numDecimalPlaces: 2
         presentation:
           title_public: Land used for orange production
       oranges__00000490__production__005510__tonnes:
-        display:
-          name: Orange production
-          numDecimalPlaces: 2
         presentation:
           title_public: Orange production
       oranges__00000490__yield__005412__tonnes_per_hectare:
-        display:
-          name: Orange yields
-          numDecimalPlaces: 2
         presentation:
           title_public: Orange yields
       palm_fruit_oil__00000254__area_harvested__005312__hectares:
-        display:
-          name: Land used for palm fruit oil production
-          numDecimalPlaces: 2
         presentation:
           title_public: Land used for palm fruit oil production
       palm_fruit_oil__00000254__production__005510__tonnes:
-        display:
-          name: Palm fruit oil production
-          numDecimalPlaces: 2
         presentation:
           title_public: Palm fruit oil production
       palm_fruit_oil__00000254__yield__005412__tonnes_per_hectare:
-        display:
-          name: Palm fruit oil yields
-          numDecimalPlaces: 2
         presentation:
           title_public: Palm fruit oil yields
       palm_kernel_oil__00000258__production__005510__tonnes:
-        display:
-          name: Palm kernel oil production
-          numDecimalPlaces: 2
         presentation:
           title_public: Palm kernel oil production
       palm_oil__00000257__production__005510__tonnes:
-        display:
-          name: Palm oil production
-          numDecimalPlaces: 2
         presentation:
           title_public: Palm oil production
       peas__dry__00000187__area_harvested__005312__hectares:
-        display:
-          name: Land used for pea production
-          numDecimalPlaces: 2
         presentation:
           title_public: Land used for pea production
       peas__dry__00000187__production__005510__tonnes:
-        display:
-          name: Pea production
-          numDecimalPlaces: 2
         presentation:
           title_public: Pea production
       peas__dry__00000187__yield__005412__tonnes_per_hectare:
-        display:
-          name: Pea yields
-          numDecimalPlaces: 2
         presentation:
           title_public: Pea yields
       potatoes__00000116__area_harvested__005312__hectares:
-        display:
-          name: Land used for potato production
-          numDecimalPlaces: 2
         presentation:
           title_public: Land used for potato production
       potatoes__00000116__production__005510__tonnes:
-        display:
-          name: Potato production
-          numDecimalPlaces: 2
         presentation:
           title_public: Potato production
       potatoes__00000116__yield__005412__tonnes_per_hectare:
-        display:
-          name: Potato yields
-          numDecimalPlaces: 2
         presentation:
           title_public: Potato yields
       poultry__00002029__stocks__005112__animals:
-        display:
-          name: Number of poultry birds
-          numDecimalPlaces: 0
         presentation:
           title_public: Number of poultry birds
       rapeseed__00000270__area_harvested__005312__hectares:
-        display:
-          name: Land used for rapeseed production
-          numDecimalPlaces: 2
         presentation:
           title_public: Land used for rapeseed production
       rapeseed__00000270__production__005510__tonnes:
-        display:
-          name: Rapeseed production
-          numDecimalPlaces: 2
         presentation:
           title_public: Rapeseed production
       rapeseed__00000270__yield__005412__tonnes_per_hectare:
-        display:
-          name: Rapeseed yields
-          numDecimalPlaces: 2
         presentation:
           title_public: Rapeseed yields
       rice__00000027__area_harvested__005312__hectares:
-        display:
-          name: Land used for rice production
-          numDecimalPlaces: 2
         presentation:
           title_public: Land used for rice production
       rice__00000027__production__005510__tonnes:
-        display:
-          name: Rice production
-          numDecimalPlaces: 2
         presentation:
           title_public: Rice production
       rice__00000027__yield__005412__tonnes_per_hectare:
-        display:
-          name: Rice yields
-          numDecimalPlaces: 2
         presentation:
           title_public: Rice yields
       rye__00000071__area_harvested__005312__hectares:
-        display:
-          name: Land used for rye production
-          numDecimalPlaces: 2
         presentation:
           title_public: Land used for rye production
       rye__00000071__production__005510__tonnes:
-        display:
-          name: Rye production
-          numDecimalPlaces: 2
         presentation:
           title_public: Rye production
       safflower_seed__00000280__area_harvested__005312__hectares:
-        display:
-          name: Land used for safflower seed production
-          numDecimalPlaces: 2
         presentation:
           title_public: Land used for safflower seed production
       seed_cotton__00000328__area_harvested__005312__hectares:
-        display:
-          name: Land used for seed cotton production
-          numDecimalPlaces: 2
         presentation:
           title_public: Land used for seed cotton production
       seed_cotton__00000328__yield__005412__tonnes_per_hectare:
-        display:
-          name: Seed cotton yields
-          numDecimalPlaces: 2
         presentation:
           title_public: Seed cotton yields
       sesame_seed__00000289__area_harvested__005312__hectares:
-        display:
-          name: Land used for sesame seed production
-          numDecimalPlaces: 2
         presentation:
           title_public: Land used for sesame seed production
       sesame_seed__00000289__production__005510__tonnes:
-        display:
-          name: Sesame seed production
-          numDecimalPlaces: 2
         presentation:
           title_public: Sesame seed production
       sorghum__00000083__yield__005412__tonnes_per_hectare:
-        display:
-          name: Sorghum yields
-          numDecimalPlaces: 2
         presentation:
           title_public: Sorghum yields
       soybeans__00000236__area_harvested__005312__hectares:
-        display:
-          name: Land used for soybean production
-          numDecimalPlaces: 2
         presentation:
           title_public: Land used for soybean production
       soybeans__00000236__production__005510__tonnes:
-        display:
-          name: Soybean production
-          numDecimalPlaces: 2
         presentation:
           title_public: Soybean production
       soybeans__00000236__yield__005412__tonnes_per_hectare:
-        display:
-          name: Soybean yields
-          numDecimalPlaces: 2
         presentation:
           title_public: Soybean yields
       sugar_beet__00000157__area_harvested__005312__hectares:
-        display:
-          name: Land used for sugar beet production
-          numDecimalPlaces: 2
         presentation:
           title_public: Land used for sugar beet production
       sugar_beet__00000157__production__005510__tonnes:
-        display:
-          name: Sugar beet production
-          numDecimalPlaces: 2
         presentation:
           title_public: Sugar beet production
       sugar_cane__00000156__area_harvested__005312__hectares:
-        display:
-          name: Land used for sugar cane production
-          numDecimalPlaces: 2
         presentation:
           title_public: Land used for sugar cane production
       sugar_cane__00000156__production__005510__tonnes:
-        display:
-          name: Sugar cane production
-          numDecimalPlaces: 2
         presentation:
           title_public: Sugar cane production
       sugar_cane__00000156__yield__005412__tonnes_per_hectare:
-        display:
-          name: Sugar cane yields
-          numDecimalPlaces: 2
         presentation:
           title_public: Sugar cane yields
       sunflower_seed__00000267__area_harvested__005312__hectares:
-        display:
-          name: Land used for sunflower seed production
-          numDecimalPlaces: 2
         presentation:
           title_public: Land used for sunflower seed production
       sunflower_seed__00000267__production__005510__tonnes:
-        display:
-          name: Sunflower seed production
-          numDecimalPlaces: 2
         presentation:
           title_public: Sunflower seed production
       sunflower_seed__00000267__yield__005412__tonnes_per_hectare:
-        display:
-          name: Sunflower seed yields
-          numDecimalPlaces: 2
         presentation:
           title_public: Sunflower seed yields
       sweet_potatoes__00000122__production__005510__tonnes:
-        display:
-          name: Sweet potato production
-          numDecimalPlaces: 2
         presentation:
           title_public: Sweet potato production
       swine__pigs__00001034__stocks__005111__animals:
-        display:
-          name: Number of pigs
-          numDecimalPlaces: 0
         presentation:
           title_public: Number of pigs
       tea__00000667__production__005510__tonnes:
-        display:
-          name: Tea production
-          numDecimalPlaces: 2
         presentation:
           title_public: Tea production
       tobacco__00000826__production__005510__tonnes:
-        display:
-          name: Tobacco production
-          numDecimalPlaces: 2
         presentation:
           title_public: Tobacco production
       tomatoes__00000388__area_harvested__005312__hectares:
-        display:
-          name: Land used for tomato production
-          numDecimalPlaces: 2
         presentation:
           title_public: Land used for tomato production
       tomatoes__00000388__production__005510__tonnes:
-        display:
-          name: Tomato production
-          numDecimalPlaces: 2
         presentation:
           title_public: Tomato production
       tomatoes__00000388__yield__005412__tonnes_per_hectare:
-        display:
-          name: Tomato yields
-          numDecimalPlaces: 2
         presentation:
           title_public: Tomato yields
       tung_nuts__00000275__area_harvested__005312__hectares:
-        display:
-          name: Land used for tung nut production
-          numDecimalPlaces: 2
         presentation:
           title_public: Land used for tung nut production
       wheat__00000015__area_harvested__005312__hectares:
-        display:
-          name: Land used for wheat production
-          numDecimalPlaces: 2
         presentation:
           title_public: Land used for wheat production
       wheat__00000015__production__005510__tonnes:
-        display:
-          name: Wheat production
-          numDecimalPlaces: 2
         presentation:
           title_public: Wheat production
       wheat__00000015__yield__005412__tonnes_per_hectare:
-        display:
-          name: Wheat yields
-          numDecimalPlaces: 2
         presentation:
           title_public: Wheat yields
       wine__00000564__production__005510__tonnes:
-        display:
-          name: Wine production
-          numDecimalPlaces: 2
         presentation:
           title_public: Wine production
       yams__00000137__production__005510__tonnes:
-        display:
-          name: Yam production
-          numDecimalPlaces: 2
         presentation:
           title_public: Yam production
+      apples__00000515__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Apple yield
+      apricots__00000526__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Apricot yield
+      areca_nuts__00000226__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Areca nut yield
+      artichokes__00000366__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Artichoke yield
+      asparagus__00000367__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Asparagus yield
+      avocados__00000572__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Avocado yield
+      beans__green__00000414__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Green bean yield
+      blueberries__00000552__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Blueberry yield
+      broad_beans__00000181__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Broad bean yield
+      buckwheat__00000089__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Buckwheat yield
+      cabbages__00000358__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Cabbage yield
+      canary_seed__00000101__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Canary seed yield
+      carrots_and_turnips__00000426__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Carrot and turnip yield
+      castor_oil_seed__00000265__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Castor oil seed yield
+      cauliflowers_and_broccoli__00000393__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Cauliflower and broccoli yield
+      cherries__00000531__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Cherry yield
+      chestnut__00000220__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Chestnut yield
+      chickpeas__00000191__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Chickpea yield
+      chillies_and_peppers__00000689__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Chilies and peppers yield
+      citrus_fruit__00001804__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Citrus fruit yield
+      coconuts__00000249__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Coconut yield
+      cow_peas__00000195__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Cow pea yield
+      cranberries__00000554__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Cranberry yield
+      cucumbers_and_gherkins__00000397__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Cucumber and gherkin yield
+      currants__00000550__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Currant yield
+      dates__00000577__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Date yield
+      eggplants__00000399__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Eggplant yield
+      fibre_crops__00000821__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Fibre crop yield
+      flax__raw_or_retted__00000771__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Flax raw or retted yield
+      fruit__00001738__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Fruit yield
+      garlic__00000406__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Garlic yield
+      grapefruit__00000507__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Grapefruit yield
+      grapes__00000560__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Grape yield
+      green_maize__00000446__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Green maize yield
+      hazelnuts__00000225__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Hazelnut yield
+      hempseed__00000336__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Hempseed yield
+      herbs__00000711__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Yield of herbs
+      jute__00000780__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Jute yield
+      karite_nuts__00000263__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Karite nut yield
+      kiwi__00000592__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Kiwi yield
+      kola_nuts__00000224__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Kola nut yield
+      leeks__00000407__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Leek yield
+      lemons_and_limes__00000497__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Lemon and lime yield
+      lentils__00000201__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Lentil yield
+      linseed__00000333__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Linseed yield
+      mangoes__00000571__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Mango yield
+      melon__00000568__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Melon yield
+      melonseed__00000299__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Melonseed yield
+      mixed_grains__00000103__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Mixed grain yield
+      mustard_seed__00000292__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Mustard seed yield
+      oats__00000075__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Oat yield
+      oilcrops__cake_equivalent__00001841__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Oilcrop yield (cake equivalent)
+      oilcrops__oil_equivalent__00001732__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Oilcrops yield (oil equivalent)
+      okra__00000430__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Okra yield
+      olives__00000260__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Olive yield
+      onions__00000403__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Onion yield
+      papayas__00000600__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Papaya yield
+      peaches_and_nectarines__00000534__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Peach and nectarine yield
+      pears__00000521__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Pear yield
+      peas__green__00000417__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Green pea yield
+      pepper__00000687__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Pepper yield
+      pigeon_peas__00000197__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Pigeon pea yield
+      pineapples__00000574__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Pineapple yield
+      pistachios__00000223__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Pistachio yield
+      plantains__00000489__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Plantain yield
+      plums__00000536__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Plum yield
+      poppy_seeds__00000296__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Poppy seed yield
+      pulses__00001726__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Pulse yield
+      quinoa__00000092__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Quinoa yield
+      raspberries__00000547__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Raspberry yield
+      roots_and_tubers__00001720__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Roots and tubers yield
+      rye__00000071__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Rye yield
+      safflower_seed__00000280__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Safflower seed yield
+      sesame_seed__00000289__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Sesame seed yield
+      spinach__00000373__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Spinach yield
+      strawberries__00000544__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Strawberry yield
+      string_beans__00000423__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: String bean yield
+      sugar_beet__00000157__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Sugar beet yield
+      sugar_crops__00001723__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Sugar crop yield
+      sweet_potatoes__00000122__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Sweet potato yield
+      tangerines__00000495__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Tangerine yield
+      tea__00000667__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Tea yield
+      tobacco__00000826__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Tobacco yield
+      treenuts__00001729__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Treenut yield
+      vegetables__00001735__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Vegetable yield
+      walnuts__00000222__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Walnut yield
+      watermelons__00000567__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Watermelon yield
+      yams__00000137__yield__005412__tonnes_per_hectare:
+        presentation:
+          title_public: Yam yield
+      eggs_from_hens__00001062__eggs_per_bird__005413__eggs_per_bird:
+        presentation:
+          title_public: Number of eggs produced per hen
+      eggs_from_hens__00001062__eggs_produced__005513__eggs:
+        presentation:
+          title_public: Number of eggs produced from hens
+      eggs_from_hens__00001062__eggs_produced__5513pc__eggs_per_capita:
+        presentation:
+          title_public: Egg production from hens per capita
+      eggs_from_hens__00001062__laying__005313__animals:
+        presentation:
+          title_public: Number of laying hens
+      eggs_from_hens__00001062__production__005510__tonnes:
+        presentation:
+          title_public: Egg production from hens
+      eggs_from_hens__00001062__production__5510pc__tonnes_per_capita:
+        presentation:
+          title_public: Egg production from hens per capita
+      eggs_from_hens__00001062__production__5510pe__kilograms_per_capita:
+        presentation:
+          title_public: Egg production from hens per capita
+      eggs_from_hens__00001062__yield__005424__kilograms_per_animal:
+        presentation:
+          title_public: Egg production per hen
+      eggs_from_other_birds__excl__hens__00001091__eggs_per_bird__005413__eggs_per_bird:
+        presentation:
+          title_public: Number of eggs produced per bird (excluding hens)
+      eggs_from_other_birds__excl__hens__00001091__eggs_produced__005513__eggs:
+        presentation:
+          title_public: Number of eggs produced from birds other than hens
+      eggs_from_other_birds__excl__hens__00001091__eggs_produced__5513pc__eggs_per_capita:
+        presentation:
+          title_public: Egg production from birds other than hens per capita
+      eggs_from_other_birds__excl__hens__00001091__laying__005313__animals:
+        presentation:
+          title_public: Number of laying birds (excluding hens)
+      eggs_from_other_birds__excl__hens__00001091__production__005510__tonnes:
+        presentation:
+          title_public: Egg production from birds other than hens
+      eggs_from_other_birds__excl__hens__00001091__production__5510pc__tonnes_per_capita:
+        presentation:
+          title_public: Egg production from birds other than hens per capita
+      eggs_from_other_birds__excl__hens__00001091__production__5510pe__kilograms_per_capita:
+        presentation:
+          title_public: Egg production from birds other than hens per capita
+      eggs_from_other_birds__excl__hens__00001091__yield__005424__kilograms_per_animal:
+        presentation:
+          title_public: Egg production per bird (excluding hens)

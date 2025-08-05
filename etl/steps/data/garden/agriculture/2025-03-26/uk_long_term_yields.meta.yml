@@ -22,7 +22,7 @@ dataset:
 
 tables:
   uk_long_term_yields:
-    title: Long-term yields in the United Kingdom (various sources, 2023b)
+    title: Long-term yields in the United Kingdom
     variables:
       barley_yield:
         title: Barley yields
@@ -38,4 +38,3 @@ tables:
         title: Sugar beet yields
       wheat_yield:
         title: Wheat yields
-

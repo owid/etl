@@ -736,3 +736,75 @@ def _sample_variables(variables: List[gm.Variable], n: int) -> List[gm.Variable]
         new_n=len(sample_ids),
     )
     return [v for v in variables if v.id in sample_ids]
+
+
+def get_anomalies_for_chart_ids(
+    chart_ids: Optional[List[int]] = None, anomaly_types: Optional[Tuple[str, ...]] = ("upgrade_change",)
+) -> pd.DataFrame:
+    """Get datasets of the variables used in a list of charts, given the chart ids.
+
+    NOTE: It's unclear what the most relevant information is for a given chart. For now, get the average anomaly score and average scale score of the datasets of variables used in those charts.
+
+    """
+    # Get a dataframe of chart ids, variable ids (used in those charts), and their datasets ids.
+    query = """SELECT DISTINCT cd.chartId AS chart_id, v.id AS variable_id, v.datasetId AS dataset_id
+    FROM variables v
+    JOIN chart_dimensions cd
+    ON cd.variableId = v.id
+    """
+    if chart_ids:
+        id_list = ", ".join(str(cid) for cid in chart_ids)
+        query += f" AND cd.chartId IN ({id_list})"
+    df = OWID_ENV.read_sql(sql=query)
+
+    # Get all anomalies from DB for the relevant datasets.
+    with Session(OWID_ENV.engine) as session:
+        anomalies = [
+            anomaly
+            for anomaly in gm.Anomaly.load_anomalies(session=session, dataset_id=sorted(set(df["dataset_id"])))
+            if anomaly.anomalyType in anomaly_types  # type: ignore
+        ]
+
+    # Simplify the original dataframe to only contain the charts and datasets for which there are anomalies calculated.
+    dataset_ids_with_anomalies = [anomaly.datasetId for anomaly in anomalies]
+    df = df[df["dataset_id"].isin(dataset_ids_with_anomalies)].reset_index(drop=True)
+
+    # Gather anomalies for all variables, datasets, and anomaly types.
+    df_anomalies_all = [
+        anomaly.dfReduced.assign(**{"dataset_id": anomaly.datasetId, "anomaly_type": anomaly.anomalyType})  # type: ignore
+        for anomaly in anomalies
+    ]
+    if len(df_anomalies_all) == 0:
+        return pd.DataFrame(columns=["chart_id", "score_anomaly", "score_scale", "score_population", "score_mean"])
+
+    df_anomalies = pd.concat(
+        df_anomalies_all,
+        ignore_index=True,
+    ).rename(columns={"anomaly_score": "score_anomaly"})  # type: ignore
+
+    # Add the population score.
+    df_anomalies = add_population_score(df_reduced=df_anomalies)
+
+    # Calculate an average score.
+    df_anomalies["score_mean"] = (
+        df_anomalies["score_anomaly"] + df_anomalies["score_scale"] + df_anomalies["score_population"]
+    ) / 3
+
+    # Select the variables that are used by the given charts, and calculate their average anomaly and scale scores.
+    scores_all = ["score_anomaly", "score_scale", "score_population", "score_mean"]
+    df_anomalies_mean = df_anomalies.groupby(["variable_id"], as_index=False, observed=True).agg(
+        {score: "mean" for score in scores_all}
+    )
+
+    # Check that for each variable id and anomaly type there is only one row.
+    assert df_anomalies_mean[df_anomalies_mean.duplicated(subset=["variable_id"])].empty
+
+    # Add anomalies of each variable and anomaly type to the original dataframe.
+    df_with_anomalies = df.merge(df_anomalies_mean, on=["variable_id"], how="inner")
+    # In the end we need just one anomaly score for each chart.
+    # This would correspond to the maximum anomaly (among all selected anomaly types and variables in the chart).
+    df_with_anomalies = df_with_anomalies.groupby(["chart_id"], as_index=False).agg(
+        {score: "max" for score in scores_all}
+    )
+
+    return df_with_anomalies

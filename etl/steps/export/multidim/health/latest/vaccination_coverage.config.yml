@@ -1,54 +1,62 @@
 title:
-  title: Vaccination coverage
-  title_variant: by vaccine and metric
+  title: Childhood vaccination coverage
+  title_variant: by vaccine
 default_selection:
   - World
+topic_tags:
+  - Vaccination
+  - Global Health
+  - Child & Infant Mortality
 dimensions:
   - name: Metric
     slug: metric
     choices:
       - slug: "coverage"
         name: "Share of children vaccinated"
-      - slug: "unvaccinated"
-        name: "Unvaccinated children"
+        description: "Share of children in the target age-group who have received the specified vaccine"
       - slug: "vaccinated"
-        name: "Vaccinated children"
-  - name: Vaccination
+        name: "Number of children vaccinated"
+        description: "Number of children in the target age-group who have received the specified vaccine"
+      - slug: "unvaccinated"
+        name: "Number of children unvaccinated"
+        description: "Number of children in the target age-group who have not received the specified vaccine"
+
+  - name: Vaccine
     slug: antigen
+    description: "Type of vaccine given to children"
     choices:
+      - slug: comparison
+        name: "Comparison across vaccines"
+        description: "Comparison of multiple vaccines recommended for one-year-olds"
       - slug: "BCG"
-        name: "Tuberculosis vaccine - Bacille Calmette-Guérin (BCG)"
-      - slug: "DTPCV1"
-        name: "Diphtheria, tetanus, and pertussis vaccine (first dose)"
-      - slug: "DTPCV3"
-        name: "Diphtheria, tetanus, and pertussis vaccine (third dose)"
-      - slug: "HEPB3"
-        name: "Hepatitis B vaccine (third dose)"
-      - slug: "HEPB_BD"
-        name: "Hepatitis B vaccine (birth dose)"
-      - slug: "HIB3"
-        name: "Haemophilus influenzae type b vaccine (third dose)"
+        name: "Tuberculosis"
       - slug: "IPV1"
-        name: "Inactivated polio vaccine (IPV) (first dose)"
+        name: "Polio – first dose"
       - slug: "IPV2"
-        name: "Inactivated polio vaccine (IPV) (second dose)"
-      - slug: "MCV1"
-        name: "Measles vaccine (first dose)"
-      - slug: "MCV2"
-        name: "Measles vaccine (second dose)"
-      - slug: "MCV2X2"
-        name: "Measles vaccine (second dose; two-year-olds)"
-      - slug: "MENA_C"
-        name: "Meningococcal conjugate vaccine (last dose)"
-      - slug: "PCV3"
-        name: "Pneumococcal conjugate vaccine (third dose)"
+        name: "Polio – second dose"
       - slug: "POL3"
-        name: "Polio vaccine (third dose)"
+        name: "Polio – third dose"
+      - slug: "MCV1"
+        name: "Measles – first dose"
+      - slug: "MCV2"
+        name: "Measles – second dose"
+      - slug: "MCV2X2"
+        name: "Measles – second dose; two-year-olds"
+      - slug: "DTPCV1"
+        name: "Diphtheria, tetanus, and pertussis – first dose"
+      - slug: "DTPCV3"
+        name: "Diphtheria, tetanus, and pertussis – third dose"
+      - slug: "HEPB_BD"
+        name: "Hepatitis B – birth dose"
+      - slug: "HEPB3"
+        name: "Hepatitis B – third dose"
       - slug: "RCV1"
-        name: "Rubella vaccine (first dose)"
+        name: "Rubella"
       - slug: "ROTAC"
-        name: "Rotavirus vaccine (last dose)"
-      - slug: "YFV"
-        name: "Yellow fever vaccine"
+        name: "Rotavirus"
+      - slug: "HIB3"
+        name: "Haemophilus influenzae type b"
+      - slug: "PCV3"
+        name: "Pneumococcal conjugate"
 
 views: []

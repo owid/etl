@@ -1,0 +1,25 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Eradication of Diseases
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 0
+
+tables:
+  rinderpest:
+    variables:
+      last_recorded_rinderpest:
+        title: Year of last recorded Rinderpest case
+        description_short: "Rinderpest, also known as cattle plague, was a disease that infected ruminant animals, primarily cattle and buffalo. The last outbreak was recorded in Kenya in 2001 and the disease was officially declared eradicated in 2011."
+        description_processing: |-
+          - For Kosovo, the source gives the last case as 1890s, we code this as 1899.
+          - For Liechtenstein, the source gives the last case as the 19th century, we code this as 1899.
+          - For Sao Tome and Principe the source gives the last case as 1950s, we code this as 1959.
+        unit: ""
+        display:
+          numDecimalPlaces: 0

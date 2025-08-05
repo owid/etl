@@ -12,11 +12,14 @@ steps:
     - snapshot://dummy/2020-01-01/dummy_full.csv
   data://garden/dummy/2020-01-01/dummy_full:
     - data://meadow/dummy/2020-01-01/dummy_full
-  data://grapher/dummy/2020-01-01/dummy_full:
-    - data://garden/dummy/2020-01-01/dummy_full
+
   # data://explorers/dummy/2020-01-01/dummy_full:
   #   - data://garden/dummy/2020-01-01/dummy_full
   data://garden/dummy/2023-10-12/dummy_monster:
     - data://garden/dummy/2020-01-01/dummy
-  data://grapher/dummy/2023-10-12/dummy_monster:
-    - data://garden/dummy/2023-10-12/dummy_monster
+
+  export://multidim/dummy/latest/dummy:
+    - export://multidim/covid/latest/covid
+
+  export://multidim/dummy/latest/issue_reporting:
+    - data://grapher/covid/latest/cases_deaths

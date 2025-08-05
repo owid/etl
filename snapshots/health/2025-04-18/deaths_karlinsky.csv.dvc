@@ -1,0 +1,21 @@
+meta:
+  origin:
+    producer: Ariel Karlinksy
+    title: International Completeness of Death Registration 2015-2019
+    description: |-
+      The International Completeness of Death Registration 2015–2019 database (ICDR), produced by Ariel Karlinsky, represents the most comprehensive and up-to-date database on the completeness of death reporting globally.
+
+      The work and sources are documented in detail on GitHub: https://github.com/akarlinsky/death_registration.
+    citation_full: |-
+      Karlinsky, A. (2024). International completeness of death registration. Demographic Research, 50, 1151–1170. https://doi.org/10.4054/DemRes.2024.50.38
+    url_main: https://github.com/akarlinsky/death_registration
+    url_download: https://raw.githubusercontent.com/akarlinsky/death_registration/main/death_reg_final.csv
+    date_accessed: "2025-04-18"
+    date_published: "2024-03-15"
+    license:
+      name: CC BY 4.0
+      url: https://creativecommons.org/licenses/by/4.0/
+outs:
+  - md5: c57e02b53008fb359f2099fc07216fa5
+    size: 62229
+    path: deaths_karlinsky.csv

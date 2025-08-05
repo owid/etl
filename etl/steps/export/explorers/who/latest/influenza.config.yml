@@ -116,7 +116,7 @@ definitions:
     def_2114940264292507114: &def_2114940264292507114 FluID by the World Health Organization (2023)
   common_views:
     - config:
-        timelineMinTime: '-4043'
+        timelineMinTime: "-4043"
 config:
   explorerTitle: Influenza
   explorerSubtitle: Explore global data produced by the World Health Organization on influenza symptoms and cases.
@@ -202,8 +202,8 @@ dimensions:
         name: Sentinel surveillance
       - slug: non_sentinel_surveillance
         name: Non-sentinel surveillance
-      - slug: ''
-        name: ''
+      - slug: na
+        name: ""
     presentation:
       type: dropdown
 views:
@@ -229,7 +229,7 @@ views:
       title: Weekly share of influenza tests that were positive
       subtitle: |-
         People who were tested had a respiratory infection with a fever, cough and onset within the last 10 days. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their strain. The level of testing may vary between countries and over time.
-      type: LineChart
+      type: LineChart DiscreteBar
       note: |-
         The share of positive tests is calculated by dividing the number of tests that were positive to any flu strain by three possible denominators, based on data availability. If both values are available then the denominator is the sum of positive and negative tests; if not then the number specimens processed is used; if neither of those are available then the number of specimens received by the testing facility is used.
   - dimensions:
@@ -254,7 +254,7 @@ views:
       title: Monthly share of influenza tests that were positive
       subtitle: |-
         People who were tested had a respiratory infection with a fever, cough and onset within the last 10 days. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their strain. The level of testing may vary between countries and over time.
-      type: LineChart
+      type: LineChart DiscreteBar
       note: |-
         The share of positive tests is calculated by dividing the number of tests that were positive to any flu strain by three possible denominators, based on data availability. If both values are available then the denominator is the sum of positive and negative tests; if not then the number specimens processed is used; if neither of those are available then the number of specimens received by the testing facility is used.
       defaultView: true
@@ -281,7 +281,7 @@ views:
       title: Weekly share of influenza tests that were positive, sentinel surveillance
       subtitle: |-
         Sentinel surveillance consists of data routinely collected from sites representative of the country's population. People who were tested had a respiratory infection with a fever, cough and onset within the last 10 days. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their strain. The level of testing may vary between countries and over time.
-      type: LineChart
+      type: LineChart DiscreteBar
       note: |-
         The share of positive tests is calculated by dividing the number of tests that were positive to any flu strain by three possible denominators, based on data availability. If both values are available then the denominator is the sum of positive and negative tests; if not then the number specimens processed is used; if neither of those are available then the number of specimens received by the testing facility is used.
   - dimensions:
@@ -306,7 +306,7 @@ views:
       title: Monthly share of influenza tests that were positive, sentinel surveillance
       subtitle: |-
         Sentinel surveillance consists of data routinely collected from sites representative of the country's population. People who were tested had a respiratory infection with a fever, cough and onset within the last 10 days. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their strain. The level of testing may vary between countries and over time.
-      type: LineChart
+      type: LineChart DiscreteBar
       note: |-
         The share of positive tests is calculated by dividing the number of tests that were positive to any flu strain by three possible denominators, based on data availability. If both values are available then the denominator is the sum of positive and negative tests; if not then the number specimens processed is used; if neither of those are available then the number of specimens received by the testing facility is used.
   - dimensions:
@@ -331,7 +331,7 @@ views:
       title: Weekly share of influenza tests that were positive, non-sentinel surveillance
       subtitle: |-
         Non-sentinel surveillance includes data from multiple sources, including outbreak investigation, universal testing, and testing at the point of care. People who were tested had a respiratory infection with a fever, cough and onset within the last 10 days. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their strain. The level of testing may vary between countries and over time.
-      type: LineChart
+      type: LineChart DiscreteBar
       note: |-
         The share of positive tests is calculated by dividing the number of tests that were positive to any flu strain by three possible denominators, based on data availability. If both values are available then the denominator is the sum of positive and negative tests; if not then the number specimens processed is used; if neither of those are available then the number of specimens received by the testing facility is used.
   - dimensions:
@@ -356,7 +356,7 @@ views:
       title: Monthly share of influenza tests that were positive, non-sentinel surveillance
       subtitle: |-
         Non-sentinel surveillance includes data from multiple sources, including outbreak investigation, universal testing, and testing at the point of care. People who were tested had a respiratory infection with a fever, cough and onset within the last 10 days. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their strain. The level of testing may vary between countries and over time.
-      type: LineChart
+      type: LineChart DiscreteBar
       note: |-
         The share of positive tests is calculated by dividing the number of tests that were positive to any flu strain by three possible denominators, based on data availability. If both values are available then the denominator is the sum of positive and negative tests; if not then the number specimens processed is used; if neither of those are available then the number of specimens received by the testing facility is used.
   - dimensions:
@@ -373,7 +373,7 @@ views:
             sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             colorScaleNumericMinValue: 0
-            color: '#8C2D04'
+            color: "#8C2D04"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu#ah1combined_zfilled
@@ -383,7 +383,7 @@ views:
             sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             colorScaleNumericMinValue: 0
-            color: '#CC4C02'
+            color: "#CC4C02"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu#ah3combined_zfilled
@@ -393,7 +393,7 @@ views:
             sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             colorScaleNumericMinValue: 0
-            color: '#EC7014'
+            color: "#EC7014"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu#ah5combined_zfilled
@@ -403,7 +403,7 @@ views:
             sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             colorScaleNumericMinValue: 0
-            color: '#FE9929'
+            color: "#FE9929"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu#ah7n9combined_zfilled
@@ -413,7 +413,7 @@ views:
             sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             colorScaleNumericMinValue: 0
-            color: '#FEC44F'
+            color: "#FEC44F"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu#a_no_subtypecombined_zfilled
@@ -423,7 +423,7 @@ views:
             sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             colorScaleNumericMinValue: 0
-            color: '#FEE391'
+            color: "#FEE391"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu#bviccombined_zfilled
@@ -433,7 +433,7 @@ views:
             sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             colorScaleNumericMinValue: 0
-            color: '#02818A'
+            color: "#02818A"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu#byamcombined_zfilled
@@ -443,7 +443,7 @@ views:
             sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             colorScaleNumericMinValue: 0
-            color: '#67A9CF'
+            color: "#67A9CF"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu#bnotdeterminedcombined_zfilled
@@ -453,7 +453,7 @@ views:
             sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             colorScaleNumericMinValue: 0
-            color: '#BDC9E1'
+            color: "#BDC9E1"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
     config:
@@ -477,7 +477,7 @@ views:
             sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             colorScaleNumericMinValue: 0
-            color: '#8C2D04'
+            color: "#8C2D04"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu_monthly#ah1combined_zfilled
@@ -486,7 +486,7 @@ views:
             sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             colorScaleNumericMinValue: 0
-            color: '#CC4C02'
+            color: "#CC4C02"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu_monthly#ah3combined_zfilled
@@ -495,7 +495,7 @@ views:
             sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             colorScaleNumericMinValue: 0
-            color: '#EC7014'
+            color: "#EC7014"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu_monthly#ah5combined_zfilled
@@ -504,7 +504,7 @@ views:
             sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             colorScaleNumericMinValue: 0
-            color: '#FE9929'
+            color: "#FE9929"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu_monthly#ah7n9combined_zfilled
@@ -513,7 +513,7 @@ views:
             sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             colorScaleNumericMinValue: 0
-            color: '#FEC44F'
+            color: "#FEC44F"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu_monthly#a_no_subtypecombined_zfilled
@@ -522,7 +522,7 @@ views:
             sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             colorScaleNumericMinValue: 0
-            color: '#FEE391'
+            color: "#FEE391"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu_monthly#bviccombined_zfilled
@@ -531,7 +531,7 @@ views:
             sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             colorScaleNumericMinValue: 0
-            color: '#02818A'
+            color: "#02818A"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu_monthly#byamcombined_zfilled
@@ -540,7 +540,7 @@ views:
             sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             colorScaleNumericMinValue: 0
-            color: '#67A9CF'
+            color: "#67A9CF"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu_monthly#bnotdeterminedcombined_zfilled
@@ -549,7 +549,7 @@ views:
             sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             colorScaleNumericMinValue: 0
-            color: '#BDC9E1'
+            color: "#BDC9E1"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
     config:
@@ -573,7 +573,7 @@ views:
             tolerance: 0
             sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
-            color: '#8C2D04'
+            color: "#8C2D04"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu#ah3sentinel_zfilled
@@ -582,7 +582,7 @@ views:
             tolerance: 0
             sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
-            color: '#EC7014'
+            color: "#EC7014"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu#a_no_subtypesentinel_zfilled
@@ -591,7 +591,7 @@ views:
             tolerance: 0
             sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
-            color: '#FEE391'
+            color: "#FEE391"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu#bvicsentinel_zfilled
@@ -600,7 +600,7 @@ views:
             tolerance: 0
             sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
-            color: '#02818A'
+            color: "#02818A"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu#byamsentinel_zfilled
@@ -609,7 +609,7 @@ views:
             tolerance: 0
             sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
-            color: '#67A9CF'
+            color: "#67A9CF"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu#bnotdeterminedsentinel_zfilled
@@ -618,7 +618,7 @@ views:
             tolerance: 0
             sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
-            color: '#BDC9E1'
+            color: "#BDC9E1"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
     config:
@@ -641,7 +641,7 @@ views:
             type: Integer
             sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
-            color: '#8C2D04'
+            color: "#8C2D04"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu_monthly#ah3sentinel_zfilled
@@ -649,7 +649,7 @@ views:
             type: Integer
             sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
-            color: '#EC7014'
+            color: "#EC7014"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu_monthly#a_no_subtypesentinel_zfilled
@@ -657,7 +657,7 @@ views:
             type: Integer
             sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
-            color: '#FEE391'
+            color: "#FEE391"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu_monthly#bvicsentinel_zfilled
@@ -665,7 +665,7 @@ views:
             type: Integer
             sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
-            color: '#02818A'
+            color: "#02818A"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu_monthly#byamsentinel_zfilled
@@ -673,7 +673,7 @@ views:
             type: Integer
             sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
-            color: '#67A9CF'
+            color: "#67A9CF"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu_monthly#bnotdeterminedsentinel_zfilled
@@ -681,7 +681,7 @@ views:
             type: Integer
             sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
-            color: '#BDC9E1'
+            color: "#BDC9E1"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
     config:
@@ -705,7 +705,7 @@ views:
             tolerance: 0
             sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
-            color: '#8C2D04'
+            color: "#8C2D04"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu#ah3nonsentinel_zfilled
@@ -714,7 +714,7 @@ views:
             tolerance: 0
             sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
-            color: '#EC7014'
+            color: "#EC7014"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu#a_no_subtypenonsentinel_zfilled
@@ -723,7 +723,7 @@ views:
             tolerance: 0
             sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
-            color: '#FEE391'
+            color: "#FEE391"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu#bvicnonsentinel_zfilled
@@ -732,7 +732,7 @@ views:
             tolerance: 0
             sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
-            color: '#02818A'
+            color: "#02818A"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu#byamnonsentinel_zfilled
@@ -741,7 +741,7 @@ views:
             tolerance: 0
             sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
-            color: '#67A9CF'
+            color: "#67A9CF"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu#bnotdeterminednonsentinel_zfilled
@@ -750,7 +750,7 @@ views:
             tolerance: 0
             sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
-            color: '#BDC9E1'
+            color: "#BDC9E1"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
     config:
@@ -773,7 +773,7 @@ views:
             type: Integer
             sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
-            color: '#8C2D04'
+            color: "#8C2D04"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu_monthly#ah3nonsentinel_zfilled
@@ -781,7 +781,7 @@ views:
             type: Integer
             sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
-            color: '#EC7014'
+            color: "#EC7014"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu_monthly#a_no_subtypenonsentinel_zfilled
@@ -789,7 +789,7 @@ views:
             type: Integer
             sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
-            color: '#FEE391'
+            color: "#FEE391"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu_monthly#bvicnonsentinel_zfilled
@@ -797,7 +797,7 @@ views:
             type: Integer
             sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
-            color: '#02818A'
+            color: "#02818A"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu_monthly#byamnonsentinel_zfilled
@@ -805,7 +805,7 @@ views:
             type: Integer
             sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
-            color: '#67A9CF'
+            color: "#67A9CF"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu_monthly#bnotdeterminednonsentinel_zfilled
@@ -813,7 +813,7 @@ views:
             type: Integer
             sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
-            color: '#BDC9E1'
+            color: "#BDC9E1"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
     config:
@@ -828,7 +828,7 @@ views:
       confirmed_cases_or_symptoms: confirmed_cases
       metric: confirmed_cases__by_surveillance_type
       interval: weekly
-      surveillance_type: ''
+      surveillance_type: na
     indicators:
       y:
         - catalogPath: flu#inf_allcombined
@@ -868,7 +868,7 @@ views:
       title: Weekly confirmed cases of influenza by surveillance type
       subtitle: |-
         This includes confirmed cases of all influenza strains. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their strain. The level of testing may vary between countries and over time.
-      type: LineChart
+      type: LineChart DiscreteBar
       selectedFacetStrategy: metric
       facetYDomain: independent
       hasMapTab: false
@@ -878,7 +878,7 @@ views:
       confirmed_cases_or_symptoms: confirmed_cases
       metric: confirmed_cases__by_surveillance_type
       interval: monthly
-      surveillance_type: ''
+      surveillance_type: na
     indicators:
       y:
         - catalogPath: flu_monthly#inf_allcombined
@@ -915,7 +915,7 @@ views:
       title: Monthly confirmed cases of influenza by surveillance type
       subtitle: |-
         This includes confirmed cases of all influenza strains. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their strain. The level of testing may vary between countries and over time.
-      type: LineChart
+      type: LineChart DiscreteBar
       selectedFacetStrategy: metric
       facetYDomain: independent
       hasMapTab: false
@@ -943,7 +943,7 @@ views:
       title: Weekly confirmed cases of influenza
       subtitle: |-
         This includes confirmed cases of all influenza strains. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their strain. The level of testing may vary between countries and over time.
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       confirmed_cases_or_symptoms: confirmed_cases
       metric: all_influenza_strains
@@ -965,7 +965,7 @@ views:
       title: Monthly confirmed cases of influenza
       subtitle: |-
         This includes confirmed cases of all influenza strains. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their strain. The level of testing may vary between countries and over time.
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       confirmed_cases_or_symptoms: confirmed_cases
       metric: all_influenza_strains
@@ -988,7 +988,7 @@ views:
       title: Weekly confirmed cases of influenza, sentinel surveillance
       subtitle: |-
         Sentinel surveillance consists of data routinely collected from sites representative of the country's population. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their strain. The level of testing may vary between countries and over time.
-      type: LineChart
+      type: LineChart DiscreteBar
       note: This includes confirmed cases of all influenza strains.
   - dimensions:
       confirmed_cases_or_symptoms: confirmed_cases
@@ -1011,7 +1011,7 @@ views:
       title: Monthly confirmed cases of, sentinel surveillance
       subtitle: |-
         Sentinel surveillance consists of data routinely collected from sites representative of the country's population. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their strain. The level of testing may vary between countries and over time.
-      type: LineChart
+      type: LineChart DiscreteBar
       note: This includes confirmed cases of all influenza strains.
   - dimensions:
       confirmed_cases_or_symptoms: confirmed_cases
@@ -1035,7 +1035,7 @@ views:
       title: Weekly confirmed cases of influenza, non-sentinel surveillance
       subtitle: |-
         Non-sentinel surveillance includes data from multiple sources, including outbreak investigation, universal testing, and testing at the point of care. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their strain. The level of testing may vary between countries and over time.
-      type: LineChart
+      type: LineChart DiscreteBar
       note: This includes confirmed cases of all influenza strains.
   - dimensions:
       confirmed_cases_or_symptoms: confirmed_cases
@@ -1058,13 +1058,13 @@ views:
       title: Monthly confirmed cases of influenza, non-sentinel surveillance
       subtitle: |-
         Non-sentinel surveillance includes data from multiple sources, including outbreak investigation, universal testing, and testing at the point of care. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their strain. The level of testing may vary between countries and over time.
-      type: LineChart
+      type: LineChart DiscreteBar
       note: This includes confirmed cases of all influenza strains.
   - dimensions:
       confirmed_cases_or_symptoms: symptoms
       metric: comparison_of_data_on_respiratory_infections
       interval: weekly
-      surveillance_type: ''
+      surveillance_type: na
     indicators:
       y:
         - catalogPath: flu#reported_ari_cases
@@ -1101,7 +1101,7 @@ views:
       title: Weekly comparison of data on respiratory infections
       subtitle: |-
         Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their strain. The level of testing may vary between countries and over time.
-      type: LineChart
+      type: LineChart DiscreteBar
       selectedFacetStrategy: metric
       facetYDomain: independent
       hasMapTab: false
@@ -1111,7 +1111,7 @@ views:
       confirmed_cases_or_symptoms: symptoms
       metric: comparison_of_data_on_respiratory_infections
       interval: monthly
-      surveillance_type: ''
+      surveillance_type: na
     indicators:
       y:
         - catalogPath: flu_monthly#reported_ari_cases
@@ -1148,7 +1148,7 @@ views:
       title: Monthly comparison of data on respiratory infections
       subtitle: |-
         Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their strain. The level of testing may vary between countries and over time.
-      type: LineChart
+      type: LineChart DiscreteBar
       selectedFacetStrategy: metric
       facetYDomain: independent
       hasMapTab: false
@@ -1158,7 +1158,7 @@ views:
       confirmed_cases_or_symptoms: symptoms
       metric: influenza_like_illnesses
       interval: weekly
-      surveillance_type: ''
+      surveillance_type: na
     indicators:
       y:
         - catalogPath: flu#reported_ili_cases
@@ -1175,12 +1175,12 @@ views:
       title: Weekly reported cases of influenza-like illnesses
       subtitle: |-
         Influenza-like illnesses are defined by the WHO as acute respiratory infections with a fever ≥38ºC, a cough, and onset of symptoms within the last 10 days. This can include diseases other than influenza, such as COVID-19.
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       confirmed_cases_or_symptoms: symptoms
       metric: influenza_like_illnesses
       interval: monthly
-      surveillance_type: ''
+      surveillance_type: na
     indicators:
       y:
         - catalogPath: flu_monthly#reported_ili_cases
@@ -1197,12 +1197,12 @@ views:
       title: Monthly reported cases of influenza-like illnesses
       subtitle: |-
         Influenza-like illnesses are defined by the WHO as acute respiratory infections with a fever ≥38ºC, a cough, and onset of symptoms within the last 10 days. This can include diseases other than influenza, such as COVID-19.
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       confirmed_cases_or_symptoms: symptoms
       metric: acute_respiratory_infections
       interval: weekly
-      surveillance_type: ''
+      surveillance_type: na
     indicators:
       y:
         - catalogPath: flu#reported_ari_cases
@@ -1219,12 +1219,12 @@ views:
       title: Weekly reported cases of acute respiratory infections
       subtitle: |-
         Acute respiratory illnesses are defined by the WHO as sudden/acute onset of ≥1 of the following symptoms: cough, sore throat, shortness of breath, rhinitis; and were judged by a clinician to be due to an infection. This can include diseases other than influenza, such as COVID-19.
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       confirmed_cases_or_symptoms: symptoms
       metric: acute_respiratory_infections
       interval: monthly
-      surveillance_type: ''
+      surveillance_type: na
     indicators:
       y:
         - catalogPath: flu_monthly#reported_ari_cases
@@ -1241,12 +1241,12 @@ views:
       title: Monthly reported cases of acute respiratory infections
       subtitle: |-
         Acute respiratory illnesses are defined by the WHO as sudden/acute onset of ≥1 of the following symptoms: cough, sore throat, shortness of breath, rhinitis; and were judged by a clinician to be due to an infection. This can include diseases other than influenza, such as COVID-19.
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       confirmed_cases_or_symptoms: symptoms
       metric: severe_acute_respiratory_infections
       interval: weekly
-      surveillance_type: ''
+      surveillance_type: na
     indicators:
       y:
         - catalogPath: flu#reported_sari_cases
@@ -1263,12 +1263,12 @@ views:
       title: Weekly reported cases of severe acute respiratory infections
       subtitle: |-
         Severe acute respiratory illnesses are defined by the WHO as acute respiratory infections with history of fever or measured fever of ≥ 38 C°, cough, with onset within the last 10 days, and which require hospitalization. This can include diseases other than influenza, such as COVID-19.
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       confirmed_cases_or_symptoms: symptoms
       metric: severe_acute_respiratory_infections
       interval: monthly
-      surveillance_type: ''
+      surveillance_type: na
     indicators:
       y:
         - catalogPath: flu_monthly#reported_sari_cases
@@ -1285,7 +1285,7 @@ views:
       title: Monthly reported cases of severe acute respiratory infections
       subtitle: |-
         Severe acute respiratory illnesses are defined by the WHO as acute respiratory infections with history of fever or measured fever of ≥ 38 C°, cough, with onset within the last 10 days, and which require hospitalization. This can include diseases other than influenza, such as COVID-19.
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       confirmed_cases_or_symptoms: confirmed_cases
       metric: all_influenza_a
@@ -1308,7 +1308,7 @@ views:
       title: Weekly confirmed cases of influenza A, sentinel surveillance
       subtitle: |-
         Sentinel surveillance consists of data routinely collected from sites representative of the country's population. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their strain. The level of testing may vary between countries and over time.
-      type: LineChart
+      type: LineChart DiscreteBar
       note: This includes confirmed cases of all strains of influenza A virus.
   - dimensions:
       confirmed_cases_or_symptoms: confirmed_cases
@@ -1331,7 +1331,7 @@ views:
       title: Monthly confirmed cases of influenza A, sentinel surveillance
       subtitle: |-
         Sentinel surveillance consists of data routinely collected from sites representative of the country's population. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their strain. The level of testing may vary between countries and over time.
-      type: LineChart
+      type: LineChart DiscreteBar
       note: This includes confirmed cases of all strains of influenza A virus.
   - dimensions:
       confirmed_cases_or_symptoms: confirmed_cases
@@ -1355,7 +1355,7 @@ views:
       title: Weekly confirmed cases of influenza A, non-sentinel surveillance
       subtitle: |-
         Non-sentinel surveillance includes data from multiple sources, including outbreak investigation, universal testing, and testing at the point of care. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their strain. The level of testing may vary between countries and over time.
-      type: LineChart
+      type: LineChart DiscreteBar
       note: This includes confirmed cases of all strains of influenza A virus.
   - dimensions:
       confirmed_cases_or_symptoms: confirmed_cases
@@ -1378,7 +1378,7 @@ views:
       title: Monthly confirmed cases of influenza A, non-sentinel surveillance
       subtitle: |-
         Non-sentinel surveillance includes data from multiple sources, including outbreak investigation, universal testing, and testing at the point of care. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their strain. The level of testing may vary between countries and over time.
-      type: LineChart
+      type: LineChart DiscreteBar
       note: This includes confirmed cases of all strains of influenza A virus.
   - dimensions:
       confirmed_cases_or_symptoms: confirmed_cases
@@ -1402,7 +1402,7 @@ views:
       title: Weekly confirmed cases of influenza A
       subtitle: |-
         This includes confirmed cases of all strains of influenza A virus. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their strain. The level of testing may vary between countries and over time.
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       confirmed_cases_or_symptoms: confirmed_cases
       metric: all_influenza_a
@@ -1424,7 +1424,7 @@ views:
       title: Monthly confirmed cases of influenza A
       subtitle: |-
         This includes confirmed cases of all strains of influenza A virus. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their strain. The level of testing may vary between countries and over time.
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       confirmed_cases_or_symptoms: confirmed_cases
       metric: influenza_a_h1n12009
@@ -1446,7 +1446,7 @@ views:
       title: Weekly confirmed cases of influenza A H1N1 (2009), sentinel surveillance
       subtitle: |-
         Sentinel surveillance consists of data routinely collected from sites representative of the country's population. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their strain. The level of testing may vary between countries and over time. This shows the number of cases that were confirmed to have a strain of influenza A virus related to the H1N1 ("Swine flu") pandemic that emerged in 2009.
-      type: LineChart
+      type: LineChart DiscreteBar
       note: |-
         This shows the number of cases that were confirmed to have a strain of influenza A virus related to the H1N1 ("Swine flu") pandemic that emerged in 2009.
   - dimensions:
@@ -1470,7 +1470,7 @@ views:
       title: Monthly confirmed cases of influenza A H1N1 (2009), sentinel surveillance
       subtitle: |-
         Sentinel surveillance consists of data routinely collected from sites representative of the country's population. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their strain. The level of testing may vary between countries and over time.
-      type: LineChart
+      type: LineChart DiscreteBar
       note: |-
         This shows the number of cases that were confirmed to have a strain of influenza A virus related to the H1N1 ("Swine flu") pandemic that emerged in 2009.
   - dimensions:
@@ -1494,7 +1494,7 @@ views:
       title: Weekly confirmed cases of influenza A H1N1 (2009), non-sentinel surveillance
       subtitle: |-
         Non-sentinel surveillance includes data from multiple sources, including outbreak investigation, universal testing, and testing at the point of care. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their strain. The level of testing may vary between countries and over time. This shows the number of cases that were confirmed to have a strain of influenza A virus related to the H1N1 ("Swine flu") pandemic that emerged in 2009.
-      type: LineChart
+      type: LineChart DiscreteBar
       note: |-
         This shows the number of cases that were confirmed to have a strain of influenza A virus related to the H1N1 ("Swine flu") pandemic that emerged in 2009.
   - dimensions:
@@ -1518,7 +1518,7 @@ views:
       title: Monthly confirmed cases of influenza A H1N1 (2009), non-sentinel surveillance
       subtitle: |-
         Non-sentinel surveillance includes data from multiple sources, including outbreak investigation, universal testing, and testing at the point of care. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their strain. The level of testing may vary between countries and over time. This shows the number of cases that were confirmed to have a strain of influenza A virus related to the H1N1 ("Swine flu") pandemic that emerged in 2009.
-      type: LineChart
+      type: LineChart DiscreteBar
       note: |-
         This shows the number of cases that were confirmed to have a strain of influenza A virus related to the H1N1 ("Swine flu") pandemic that emerged in 2009.
   - dimensions:
@@ -1542,7 +1542,7 @@ views:
       title: Weekly confirmed cases of influenza A H1N1 (2009)
       subtitle: |-
         This shows the number of cases that were confirmed to have a strain of influenza A virus related to the H1N1 ("Swine flu") pandemic that emerged in 2009. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their strain. The level of testing may vary between countries and over time.
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       confirmed_cases_or_symptoms: confirmed_cases
       metric: influenza_a_h1n12009
@@ -1564,7 +1564,7 @@ views:
       title: Monthly confirmed cases of influenza A H1N1 (2009)
       subtitle: |-
         This shows the number of cases that were confirmed to have a strain of influenza A virus related to the H1N1 ("Swine flu") pandemic that emerged in 2009. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their strain. The level of testing may vary between countries and over time.
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       confirmed_cases_or_symptoms: confirmed_cases
       metric: influenza_a_h1
@@ -1586,7 +1586,7 @@ views:
       title: Weekly confirmed cases of influenza A H1
       subtitle: |-
         This shows the number of cases that were confirmed to be of the H1 strain of influenza A virus. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their strain. The level of testing may vary between countries and over time.
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       confirmed_cases_or_symptoms: confirmed_cases
       metric: influenza_a_h1
@@ -1608,7 +1608,7 @@ views:
       title: Monthly confirmed cases of influenza A H1
       subtitle: |-
         This shows the number of cases that were confirmed to be of the H1 strain of influenza A virus. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their strain. The level of testing may vary between countries and over time.
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       confirmed_cases_or_symptoms: confirmed_cases
       metric: influenza_a_h3
@@ -1630,7 +1630,7 @@ views:
       title: Weekly confirmed cases of influenza A H3, sentinel surveillance
       subtitle: |-
         Sentinel surveillance consists of data routinely collected from sites representative of the country's population. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their strain. The level of testing may vary between countries and over time.
-      type: LineChart
+      type: LineChart DiscreteBar
       note: This shows the number of cases that were confirmed to be of the H3 strain of influenza A virus.
   - dimensions:
       confirmed_cases_or_symptoms: confirmed_cases
@@ -1653,7 +1653,7 @@ views:
       title: Monthly confirmed cases of influenza A H3, sentinel surveillance
       subtitle: |-
         Sentinel surveillance consists of data routinely collected from sites representative of the country's population.. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their strain. The level of testing may vary between countries and over time.
-      type: LineChart
+      type: LineChart DiscreteBar
       note: This shows the number of cases that were confirmed to be of the H3 strain of influenza A virus.
   - dimensions:
       confirmed_cases_or_symptoms: confirmed_cases
@@ -1676,7 +1676,7 @@ views:
       title: Weekly confirmed cases of influenza A H3, non-sentinel surveillance
       subtitle: |-
         Non-sentinel surveillance includes data from multiple sources, including outbreak investigation, universal testing, and testing at the point of care. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their strain. The level of testing may vary between countries and over time.
-      type: LineChart
+      type: LineChart DiscreteBar
       note: This shows the number of cases that were confirmed to be of the H3 strain of influenza A virus.
   - dimensions:
       confirmed_cases_or_symptoms: confirmed_cases
@@ -1699,7 +1699,7 @@ views:
       title: Monthly confirmed cases of influenza A H3, non-sentinel surveillance
       subtitle: |-
         Non-sentinel surveillance includes data from multiple sources, including outbreak investigation, universal testing, and testing at the point of care. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their strain. The level of testing may vary between countries and over time.
-      type: LineChart
+      type: LineChart DiscreteBar
       note: This shows the number of cases that were confirmed to be of the H3 strain of influenza A virus.
   - dimensions:
       confirmed_cases_or_symptoms: confirmed_cases
@@ -1722,7 +1722,7 @@ views:
       title: Weekly confirmed cases of influenza A H3
       subtitle: |-
         This shows the number of cases that were confirmed to be of the H3 strain of influenza A virus. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their strain. The level of testing may vary between countries and over time.
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       confirmed_cases_or_symptoms: confirmed_cases
       metric: influenza_a_h3
@@ -1744,7 +1744,7 @@ views:
       title: Monthly confirmed cases of influenza A H3
       subtitle: |-
         This shows the number of cases that were confirmed to be of the H3 strain of influenza A virus. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their strain. The level of testing may vary between countries and over time.
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       confirmed_cases_or_symptoms: confirmed_cases
       metric: influenza_a_h5
@@ -1766,7 +1766,7 @@ views:
       title: Weekly confirmed cases of influenza A H5
       subtitle: |-
         This shows the number of cases that were confirmed to be of the H5 strain of influenza A virus. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their strain. The level of testing may vary between countries and over time.
-      type: LineChart
+      type: LineChart DiscreteBar
       relatedQuestionText: How many cases of H5N1 have been reported?
       relatedQuestionUrl: https://ourworldindata.org/grapher/h5n1-flu-reported-cases
   - dimensions:
@@ -1790,7 +1790,7 @@ views:
       title: Weekly confirmed cases of influenza A H7N9
       subtitle: |-
         This shows the number of cases that were confirmed to be of the H7N9 strain of influenza A virus. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their subtype. The level of testing may vary between countries and over time.
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       confirmed_cases_or_symptoms: confirmed_cases
       metric: influenza_a__unknown_subtype
@@ -1812,7 +1812,7 @@ views:
       title: Weekly confirmed cases of influenza A (unknown subtype), sentinel surveillance
       subtitle: |-
         Sentinel surveillance consists of data routinely collected from sites representative of the country's population. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their strain. The level of testing may vary between countries and over time.
-      type: LineChart
+      type: LineChart DiscreteBar
       note: This shows the number of cases that were confirmed to be influenza A virus, but their subtype was not confirmed.
   - dimensions:
       confirmed_cases_or_symptoms: confirmed_cases
@@ -1835,7 +1835,7 @@ views:
       title: Weekly confirmed cases of influenza A (unknown subtype), non-sentinel surveillance
       subtitle: |-
         Non-sentinel surveillance includes data from multiple sources, including outbreak investigation, universal testing, and testing at the point of care. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their strain. The level of testing may vary between countries and over time.
-      type: LineChart
+      type: LineChart DiscreteBar
       note: This shows the number of cases that were confirmed to be influenza A virus, but their subtype was not confirmed.
   - dimensions:
       confirmed_cases_or_symptoms: confirmed_cases
@@ -1858,7 +1858,7 @@ views:
       title: Weekly confirmed cases of influenza A (unknown subtype)
       subtitle: |-
         This shows the number of cases that were confirmed to be influenza A virus, but their subtype was not confirmed. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their strain. The level of testing may vary between countries and over time.
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       confirmed_cases_or_symptoms: confirmed_cases
       metric: all_influenza_b
@@ -1881,7 +1881,7 @@ views:
       title: Weekly confirmed cases of influenza B, sentinel surveillance
       subtitle: |-
         Sentinel surveillance consists of data routinely collected from sites representative of the country's population. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their strain. The level of testing may vary between countries and over time.
-      type: LineChart
+      type: LineChart DiscreteBar
       note: This includes confirmed cases of all strains of influenza B virus.
   - dimensions:
       confirmed_cases_or_symptoms: confirmed_cases
@@ -1905,7 +1905,7 @@ views:
       title: Weekly confirmed cases of influenza B, non-sentinel surveillance
       subtitle: |-
         Non-sentinel surveillance includes data from multiple sources, including outbreak investigation, universal testing, and testing at the point of care. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their strain. The level of testing may vary between countries and over time.
-      type: LineChart
+      type: LineChart DiscreteBar
       note: This includes confirmed cases of all strains of influenza B virus.
   - dimensions:
       confirmed_cases_or_symptoms: confirmed_cases
@@ -1929,7 +1929,7 @@ views:
       title: Weekly confirmed cases of influenza B
       subtitle: |-
         This includes confirmed cases of all strains of influenza B virus. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their strain. The level of testing may vary between countries and over time.
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       confirmed_cases_or_symptoms: confirmed_cases
       metric: influenza_b_victoria
@@ -1951,7 +1951,7 @@ views:
       title: Weekly confirmed cases of influenza B Victoria, sentinel surveillance
       subtitle: |-
         Sentinel surveillance consists of data routinely collected from sites representative of the country's population. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their strain. The level of testing may vary between countries and over time.
-      type: LineChart
+      type: LineChart DiscreteBar
       note: This shows the number of cases that were confirmed to be of the Victoria lineage of influenza B virus.
   - dimensions:
       confirmed_cases_or_symptoms: confirmed_cases
@@ -1974,7 +1974,7 @@ views:
       title: Weekly confirmed cases of influenza B Victoria, non-sentinel surveillance
       subtitle: |-
         Non-sentinel surveillance includes data from multiple sources, including outbreak investigation, universal testing, and testing at the point of care. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their strain. The level of testing may vary between countries and over time.
-      type: LineChart
+      type: LineChart DiscreteBar
       note: This shows the number of cases that were confirmed to be of the Victoria lineage of influenza B virus.
   - dimensions:
       confirmed_cases_or_symptoms: confirmed_cases
@@ -1997,7 +1997,7 @@ views:
       title: Weekly confirmed cases of influenza B Victoria
       subtitle: |-
         This shows the number of cases that were confirmed to be of the Victoria lineage of influenza B virus. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their strain. The level of testing may vary between countries and over time.
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       confirmed_cases_or_symptoms: confirmed_cases
       metric: influenza_b_yamagata
@@ -2019,7 +2019,7 @@ views:
       title: Weekly confirmed cases of influenza B Yamagata, sentinel surveillance
       subtitle: |-
         Sentinel surveillance consists of data routinely collected from sites representative of the country's population. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their strain. The level of testing may vary between countries and over time.
-      type: LineChart
+      type: LineChart DiscreteBar
       note: This shows the number of cases that were confirmed to be of the Yamagata lineage of influenza B virus.
   - dimensions:
       confirmed_cases_or_symptoms: confirmed_cases
@@ -2042,7 +2042,7 @@ views:
       title: Weekly confirmed cases of influenza B Yamagata, non-sentinel surveillance
       subtitle: |-
         Non-sentinel surveillance includes data from multiple sources, including outbreak investigation, universal testing, and testing at the point of care. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their strain. The level of testing may vary between countries and over time.
-      type: LineChart
+      type: LineChart DiscreteBar
       note: This shows the number of cases that were confirmed to be of the Yamagata lineage of influenza B virus.
   - dimensions:
       confirmed_cases_or_symptoms: confirmed_cases
@@ -2065,7 +2065,7 @@ views:
       title: Weekly confirmed cases of influenza B Yamagata,
       subtitle: |-
         This shows the number of cases that were confirmed to be of the Yamagata lineage of influenza B virus. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their strain. The level of testing may vary between countries and over time.
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       confirmed_cases_or_symptoms: confirmed_cases
       metric: influenza_b__unknown_lineage
@@ -2087,7 +2087,7 @@ views:
       title: Weekly confirmed cases of influenza B (unknown subtype), sentinel surveillance
       subtitle: |-
         Sentinel surveillance consists of data routinely collected from sites representative of the country's population. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their strain. The level of testing may vary between countries and over time.
-      type: LineChart
+      type: LineChart DiscreteBar
       note: This shows the number of cases that were confirmed to be influenza B virus, but their lineage was not determined.
   - dimensions:
       confirmed_cases_or_symptoms: confirmed_cases
@@ -2110,7 +2110,7 @@ views:
       title: Weekly confirmed cases of influenza B (unknown subtype), non-sentinel surveillance
       subtitle: |-
         Non-sentinel surveillance includes data from multiple sources, including outbreak investigation, universal testing, and testing at the point of care. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their strain. The level of testing may vary between countries and over time.
-      type: LineChart
+      type: LineChart DiscreteBar
       note: This shows the number of cases that were confirmed to be influenza B virus, but their lineage was not determined.
   - dimensions:
       confirmed_cases_or_symptoms: confirmed_cases
@@ -2133,7 +2133,7 @@ views:
       title: Weekly confirmed cases of influenza B (unknown subtype)
       subtitle: |-
         This shows the number of cases that were confirmed to be influenza B virus, but their lineage was not determined. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their strain. The level of testing may vary between countries and over time.
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       confirmed_cases_or_symptoms: confirmed_cases
       metric: influenza_a_h5
@@ -2156,7 +2156,7 @@ views:
       title: Monthly confirmed cases of influenza A H5
       subtitle: |-
         This shows the number of cases that were confirmed to be of the H5 strain of influenza A virus. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their strain. The level of testing may vary between countries and over time.
-      type: LineChart
+      type: LineChart DiscreteBar
       relatedQuestionText: How many cases of H5N1 have been reported?
       relatedQuestionUrl: https://ourworldindata.org/grapher/h5n1-flu-reported-cases
   - dimensions:
@@ -2180,7 +2180,7 @@ views:
       title: Monthly confirmed cases of influenza A H7N9
       subtitle: |-
         This shows the number of cases that were confirmed to be of the H7N9 strain of influenza A virus. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their strain. The level of testing may vary between countries and over time.
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       confirmed_cases_or_symptoms: confirmed_cases
       metric: influenza_a__unknown_subtype
@@ -2202,7 +2202,7 @@ views:
       title: Monthly confirmed cases of influenza A (unknown subtype), sentinel surveillance
       subtitle: |-
         Sentinel surveillance consists of data routinely collected from sites representative of the country's population. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their strain. The level of testing may vary between countries and over time.
-      type: LineChart
+      type: LineChart DiscreteBar
       note: This shows the number of cases that were confirmed to be influenza A virus, but their subtype was not confirmed.
   - dimensions:
       confirmed_cases_or_symptoms: confirmed_cases
@@ -2225,7 +2225,7 @@ views:
       title: Monthly confirmed cases of influenza A (unknown subtype), non-sentinel surveillance
       subtitle: |-
         Non-sentinel surveillance includes data from multiple sources, including outbreak investigation, universal testing, and testing at the point of care. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their strain. The level of testing may vary between countries and over time.
-      type: LineChart
+      type: LineChart DiscreteBar
       note: This shows the number of cases that were confirmed to be influenza A virus, but their subtype was not confirmed.
   - dimensions:
       confirmed_cases_or_symptoms: confirmed_cases
@@ -2248,7 +2248,7 @@ views:
       title: Monthly confirmed cases of influenza A (unknown subtype)
       subtitle: |-
         This shows the number of cases that were confirmed to be influenza A virus, but their subtype was not confirmed. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their strain. The level of testing may vary between countries and over time.
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       confirmed_cases_or_symptoms: confirmed_cases
       metric: all_influenza_b
@@ -2270,7 +2270,7 @@ views:
       title: Monthly confirmed cases of influenza B, sentinel surveillance
       subtitle: |-
         Sentinel surveillance consists of data routinely collected from sites representative of the country's population. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their lineage. The level of testing may vary between countries and over time.
-      type: LineChart
+      type: LineChart DiscreteBar
       note: This includes confirmed cases of any lineage of influenza B virus.
   - dimensions:
       confirmed_cases_or_symptoms: confirmed_cases
@@ -2293,7 +2293,7 @@ views:
       title: Monthly confirmed cases of influenza B, non-sentinel surveillance
       subtitle: |-
         Non-sentinel surveillance includes data from multiple sources, including outbreak investigation, universal testing, and testing at the point of care. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their lineage. The level of testing may vary between countries and over time.
-      type: LineChart
+      type: LineChart DiscreteBar
       note: This includes confirmed cases of any lineage of influenza B virus.
   - dimensions:
       confirmed_cases_or_symptoms: confirmed_cases
@@ -2316,7 +2316,7 @@ views:
       title: Monthly confirmed cases of influenza B
       subtitle: |-
         This includes confirmed cases of any lineage of influenza B virus. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their lineage. The level of testing may vary between countries and over time.
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       confirmed_cases_or_symptoms: confirmed_cases
       metric: influenza_b_yamagata
@@ -2338,7 +2338,7 @@ views:
       title: Monthly confirmed cases of influenza B Yamagata, sentinel surveillance
       subtitle: |-
         Sentinel surveillance consists of data routinely collected from sites representative of the country's population. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their strain. The level of testing may vary between countries and over time.
-      type: LineChart
+      type: LineChart DiscreteBar
       note: This shows the number of cases that were confirmed to be of the Yamagata lineage of influenza B virus.
   - dimensions:
       confirmed_cases_or_symptoms: confirmed_cases
@@ -2361,7 +2361,7 @@ views:
       title: Monthly confirmed cases of influenza B Yamagata, non-sentinel surveillance
       subtitle: |-
         Non-sentinel surveillance includes data from multiple sources, including outbreak investigation, universal testing, and testing at the point of care. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their strain. The level of testing may vary between countries and over time.
-      type: LineChart
+      type: LineChart DiscreteBar
       note: This shows the number of cases that were confirmed to be of the Yamagata lineage of influenza B virus.
   - dimensions:
       confirmed_cases_or_symptoms: confirmed_cases
@@ -2384,7 +2384,7 @@ views:
       title: Monthly confirmed cases of influenza B Yamagata
       subtitle: |-
         This shows the number of cases that were confirmed to be of the Yamagata lineage of influenza B virus. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their strain. The level of testing may vary between countries and over time.
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       confirmed_cases_or_symptoms: confirmed_cases
       metric: influenza_b_victoria
@@ -2406,7 +2406,7 @@ views:
       title: Monthly confirmed cases of influenza B Victoria, sentinel surveillance
       subtitle: |-
         Sentinel surveillance consists of data routinely collected from sites representative of the country's population. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their strain. The level of testing may vary between countries and over time.
-      type: LineChart
+      type: LineChart DiscreteBar
       note: This shows the number of cases that were confirmed to be of the Victoria lineage of influenza B virus.
   - dimensions:
       confirmed_cases_or_symptoms: confirmed_cases
@@ -2429,7 +2429,7 @@ views:
       title: Monthly confirmed cases of influenza B Victoria, non-sentinel surveillance
       subtitle: |-
         Non-sentinel surveillance includes data from multiple sources, including outbreak investigation, universal testing, and testing at the point of care. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their strain. The level of testing may vary between countries and over time.
-      type: LineChart
+      type: LineChart DiscreteBar
       note: This shows the number of cases that were confirmed to be of the Victoria lineage of influenza B virus.
   - dimensions:
       confirmed_cases_or_symptoms: confirmed_cases
@@ -2452,7 +2452,7 @@ views:
       title: Monthly confirmed cases of influenza B Victoria
       subtitle: |-
         This shows the number of cases that were confirmed to be of the Victoria lineage of influenza B virus. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their strain. The level of testing may vary between countries and over time.
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       confirmed_cases_or_symptoms: confirmed_cases
       metric: influenza_b__unknown_lineage
@@ -2474,7 +2474,7 @@ views:
       title: Monthly confirmed cases of influenza B (unknown subtype), sentinel surveillance
       subtitle: |-
         Sentinel surveillance consists of data routinely collected from sites representative of the country's population. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their strain. The level of testing may vary between countries and over time.
-      type: LineChart
+      type: LineChart DiscreteBar
       note: This shows the number of cases that were confirmed to be influenza B virus, but their lineage was not determined.
   - dimensions:
       confirmed_cases_or_symptoms: confirmed_cases
@@ -2497,7 +2497,7 @@ views:
       title: Monthly confirmed cases of influenza B (unknown subtype), non-sentinel surveillance
       subtitle: |-
         Non-sentinel surveillance includes data from multiple sources, including outbreak investigation, universal testing, and testing at the point of care. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their strain. The level of testing may vary between countries and over time.
-      type: LineChart
+      type: LineChart DiscreteBar
       note: This shows the number of cases that were confirmed to be influenza B virus, but their lineage was not determined.
   - dimensions:
       confirmed_cases_or_symptoms: confirmed_cases
@@ -2520,4 +2520,4 @@ views:
       title: Monthly confirmed cases of influenza B (unknown subtype)
       subtitle: |-
         This shows the number of cases that were confirmed to be influenza B virus, but their lineage was not determined. Only a fraction of potential cases of influenza are tested by labs to confirm whether they have influenza and to identify their strain. The level of testing may vary between countries and over time.
-      type: LineChart
+      type: LineChart DiscreteBar

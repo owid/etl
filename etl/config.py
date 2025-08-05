@@ -15,6 +15,7 @@ from dataclasses import dataclass, fields
 from os import environ as env
 from pathlib import Path
 from typing import List, Literal, Optional, cast
+from urllib.parse import quote
 
 import git
 import pandas as pd
@@ -186,21 +187,28 @@ DIRTY_STEPS_WORKERS = int(env.get("DIRTY_STEPS_WORKERS", 5))
 # --workers is higher than 1, this will be divided among them
 GRAPHER_INSERT_WORKERS = int(env.get("GRAPHER_WORKERS", 40))
 
-# only upsert indicators matching this filter, this is useful for fast development
-# of data pages for a single indicator
-GRAPHER_FILTER = env.get("GRAPHER_FILTER", None)
+# if a step in ETL fails, keep running the rest of the steps and raise an exception at the end
+# (steps with failing step as dependency won't be run)
+# NOTE: This is potentially useful for nightly builds and for more efficient retries, but if we end up
+#   not using it, it could be as well removed
+CONTINUE_ON_FAILURE = env.get("CONTINUE_ON_FAILURE", "0") in ("True", "true", "1")
+
+# if set, skip the actual garden step and only apply the metadata
+INSTANT = env.get("INSTANT", "0") in ("True", "true", "1")
 
 # if set, always upload grapher data & metadata JSON files even if checksums match
 FORCE_UPLOAD = env.get("FORCE_UPLOAD") in ("True", "true", "1")
 
-# if set, don't delete indicators from MySQL, only append / update new ones
-# you can use this to only process subset of indicators in your step to
-# speed up development. It's up to you how you define filtering logic in your step
+# Filter to speed up development - works as regex for both data processing and grapher upload
+# - In data steps: filters data rows by matching against relevant columns (e.g. causes, indicators)
+#                  this has to be implemented manually
+# - In grapher steps: filters which variables get upserted to MySQL
 SUBSET = env.get("SUBSET", None)
 
 # forbid any individual step from consuming more than this much memory
 # (only enforced on Linux)
-MAX_VIRTUAL_MEMORY_LINUX = 32 * 2**30  # 32 GB
+# 2025-08-01: Increased to 64 GB from 32 GB, it was not enough for garden/agriculture/2025-03-26/daily_calories_per_person
+MAX_VIRTUAL_MEMORY_LINUX = 64 * 2**30  # 64 GB
 
 # increment this to force a full rebuild of all datasets
 ETL_EPOCH = 5
@@ -241,12 +249,16 @@ OWIDBOT_APP_INSTALLATION_ID = env.get("OWIDBOT_APP_INSTALLATION_ID", None)
 # Load github token (only used for creating PRs from the command line).
 GITHUB_TOKEN = env.get("GITHUB_TOKEN", None)
 
+# URL of the Github API, to be used to create a draft pull request in the ETL repos.
+GITHUB_API_BASE = "https://api.github.com/repos/owid/etl"
+GITHUB_API_URL = f"{GITHUB_API_BASE}/pulls"
+
 # IMPORTANT: only use locally, no production use!
 # Skip SSL verify
 TLS_VERIFY = bool(int(env.get("TLS_VERIFY", 1)))
 
 # Default schema for presentation.grapher_config in metadata. Try to keep it up to date with the latest schema.
-DEFAULT_GRAPHER_SCHEMA = "https://files.ourworldindata.org/schemas/grapher-schema.007.json"
+DEFAULT_GRAPHER_SCHEMA = "https://files.ourworldindata.org/schemas/grapher-schema.008.json"
 
 # Google Cloud service account path (used for BigQuery)
 GOOGLE_APPLICATION_CREDENTIALS = env.get("GOOGLE_APPLICATION_CREDENTIALS")
@@ -534,6 +546,10 @@ class OWIDEnv:
         """Get indicator admin url."""
         return f"{self.admin_site}/datapage-preview/{variable_id}/"
 
+    def collection_preview(self, catalog_path: str):
+        encoded_path = quote(catalog_path, safe="")
+        return f"{self.admin_site}/grapher/{encoded_path}/"
+
     def thumb_url(self, slug: str):
         """
         Turn https://ourworldindata.org/grapher/life-expectancy"
@@ -603,3 +619,23 @@ def no_trailing_slash(url: str | None) -> None:
 env_vars = [ADMIN_HOST, TAILSCALE_ADMIN_HOST, DATA_API_URL, BAKED_VARIABLES_PATH, R2_SNAPSHOTS_PUBLIC_READ]
 for env_var in env_vars:
     no_trailing_slash(env_var)
+
+
+# Get Metabase credentials and parameters (for more information, visit the analytics repos).
+METABASE_API_KEY = os.environ.get("METABASE_API_KEY")
+METABASE_URL = os.environ.get("METABASE_URL")
+METABASE_SEMANTIC_LAYER_DATABASE_ID = 2
+########################################################################################################################
+# While users don't have Metadata credentials, default to Datassette.
+FORCE_DATASETTE = (not METABASE_API_KEY) or (not METABASE_URL)
+########################################################################################################################
+# Get Notion credentials.
+NOTION_API_KEY = os.environ.get("NOTION_API_KEY")
+NOTION_IMPACT_HIGHLIGHTS_TABLE_URL = os.environ.get("NOTION_IMPACT_HIGHLIGHTS_TABLE_URL")
+NOTION_DATA_PROVIDERS_CONTACTS_TABLE_URL = os.environ.get("NOTION_DATA_PROVIDERS_CONTACTS_TABLE_URL")
+
+# Google drive IDs for folders, docs and sheets, for the data producer reports project.
+# NOTE: Here we fill all variables with "" if not found to simplify type checks (this way we ensure they are strings).
+DATA_PRODUCER_REPORT_FOLDER_ID = os.environ.get("DATA_PRODUCER_REPORT_FOLDER_ID", "")
+DATA_PRODUCER_REPORT_TEMPLATE_DOC_ID = os.environ.get("DATA_PRODUCER_REPORT_TEMPLATE_DOC_ID", "")
+DATA_PRODUCER_REPORT_STATUS_SHEET_ID = os.environ.get("DATA_PRODUCER_REPORT_STATUS_SHEET_ID", "")

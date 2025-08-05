@@ -36,7 +36,7 @@ DEVICE = set_device()
 @memory.cache
 def get_model(model_name: str = "all-MiniLM-L6-v2") -> SentenceTransformer:
     "Load the pre-trained model."
-    with st.spinner("Loading model..."):
+    with st.spinner("Loading model...", show_time=True):
         model = SentenceTransformer(model_name)
     return model
 
@@ -137,7 +137,7 @@ def get_embeddings(
 # TODO: caching isn't working properly when on different devices
 # @st.cache_data(show_spinner=False, persist="disk", max_entries=1)
 def get_insights_embeddings(_model, insights: list[Dict[str, Any]]) -> list:
-    with st.spinner("Generating embeddings..."):
+    with st.spinner("Generating embeddings...", show_time=True):
         # Combine the title, body and authors of each insight into a single string.
         insights_texts = [
             insight["title"] + " " + insight["raw_text"] + " " + " ".join(insight["authors"]) for insight in insights

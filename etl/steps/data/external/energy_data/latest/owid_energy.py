@@ -20,7 +20,7 @@ import owid.catalog.processing as pr
 from owid.catalog import Dataset, Origin, Table
 
 from etl.data_helpers.geo import add_gdp_to_table, add_population_to_table
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -237,7 +237,7 @@ def combine_tables_data_and_metadata(
     return tb_combined
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load data.
     #
@@ -251,10 +251,10 @@ def run(dest_dir: str) -> None:
     ds_regions = paths.load_dataset("regions")
 
     # Gather all required tables from all datasets.
-    tb_energy_mix = ds_energy_mix["energy_mix"].reset_index()
-    tb_fossil_fuels = ds_fossil_fuels["fossil_fuel_production"].reset_index()
-    tb_primary_energy = ds_primary_energy["primary_energy_consumption"].reset_index()
-    tb_electricity_mix = ds_electricity_mix["electricity_mix"].reset_index()
+    tb_energy_mix = ds_energy_mix.read("energy_mix")
+    tb_fossil_fuels = ds_fossil_fuels.read("fossil_fuel_production")
+    tb_primary_energy = ds_primary_energy.read("primary_energy_consumption")
+    tb_electricity_mix = ds_electricity_mix.read("electricity_mix")
 
     #
     # Process data.
@@ -279,5 +279,5 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb_combined], check_variables_metadata=True)
+    ds_garden = paths.create_dataset(tables=[tb_combined])
     ds_garden.save()

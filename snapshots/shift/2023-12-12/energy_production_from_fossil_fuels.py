@@ -428,7 +428,7 @@ def fetch_all_data_for_all_energy_sources() -> pd.DataFrame:
     type=bool,
     help="Upload dataset to Snapshot",
 )
-def main(upload: bool) -> None:
+def run(upload: bool) -> None:
     # Download all data from Shift as a dataframe.
     energy_data = fetch_all_data_for_all_energy_sources()
 
@@ -438,4 +438,4 @@ def main(upload: bool) -> None:
 
 
 if __name__ == "__main__":
-    main()
+    run()

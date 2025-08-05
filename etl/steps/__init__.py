@@ -4,6 +4,7 @@
 #
 import graphlib
 import hashlib
+import importlib.util
 import inspect
 import json
 import os
@@ -17,9 +18,11 @@ from collections.abc import Generator
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from contextlib import contextmanager
 from dataclasses import dataclass, field
+from functools import partial
 from glob import glob
 from importlib import import_module
 from pathlib import Path
+from types import ModuleType
 from typing import Any, Dict, Iterable, List, Optional, Protocol, Set, cast
 from urllib.parse import urlparse
 
@@ -40,68 +43,69 @@ from etl.config import OWID_ENV, TLS_VERIFY
 from etl.db import get_engine
 from etl.grapher import helpers as gh
 from etl.grapher import model as gm
+from etl.helpers import get_metadata_path
 from etl.snapshot import Snapshot
 
 log = structlog.get_logger()
 
-Graph = Dict[str, Set[str]]
-DAG = Dict[str, Any]
+DAG = Dict[str, Set[str]]
 
 
 ipynb_lock = fasteners.InterProcessLock(paths.BASE_DIR / ".ipynb_lock")
 
+# Dictionary to store metadata changes for each dataset if INSTANT flag is set
+INSTANT_METADATA_DIFF = {}
+
 
 def compile_steps(
     dag: DAG,
-    includes: Optional[List[str]] = None,
-    excludes: Optional[List[str]] = None,
-    downstream: bool = False,
-    only: bool = False,
-    exact_match: bool = False,
+    subdag: DAG,
 ) -> List["Step"]:
     """
     Return the list of steps which, if executed in order, mean that every
     step has its dependencies ready for it.
-    """
-    includes = includes or []
-    excludes = excludes or []
 
+    Parameters
+    ----------
+    dag : DAG
+        The full DAG containing all steps and their complete dependency information.
+        Required to get the full dependencies of each step during parsing.
+    subdag : DAG
+        The filtered subset of steps to execute. Used to determine execution order
+        while maintaining access to complete dependency information from the full DAG.
+
+    Returns
+    -------
+    List[Step]
+        Steps in dependency order, ready for execution.
+    """
     # make sure each step runs after its dependencies
-    steps = to_dependency_order(dag, includes, excludes, downstream=downstream, only=only, exact_match=exact_match)
+    steps = to_dependency_order(subdag)
 
     # parse the steps into Python objects
+    # NOTE: We need the full DAG here to get complete dependencies of each step
     return [parse_step(name, dag) for name in steps]
 
 
-def to_dependency_order(
-    dag: DAG,
-    includes: List[str],
-    excludes: List[str],
-    downstream: bool = False,
-    only: bool = False,
-    exact_match: bool = False,
-) -> List[str]:
+def to_dependency_order(dag: DAG) -> List[str]:
     """
     Organize the steps in dependency order with a topological sort. In other words,
     the resulting list of steps is a valid ordering of steps such that no step is run
     before the steps it depends on. Note: this ordering is not necessarily unique.
     """
-    subgraph = (
-        filter_to_subgraph(dag, includes, downstream=downstream, only=only, exact_match=exact_match)
-        if includes
-        else dag
-    )
-    in_order = list(graphlib.TopologicalSorter(subgraph).static_order())
+    in_order = list(graphlib.TopologicalSorter(dag).static_order())
 
-    # filter out explicit excludes
-    filtered = [s for s in in_order if not any(re.findall(pattern, s) for pattern in excludes)]
-
-    return filtered
+    return in_order
 
 
 def filter_to_subgraph(
-    graph: Graph, includes: Iterable[str], downstream: bool = False, only: bool = False, exact_match: bool = False
-) -> Graph:
+    graph: DAG,
+    includes: Iterable[str],
+    downstream: bool = False,
+    only: bool = False,
+    exact_match: bool = False,
+    excludes: Optional[List[str]] = None,
+) -> DAG:
     """
     Filter the full graph to only the included nodes, and all their dependencies.
 
@@ -112,31 +116,57 @@ def filter_to_subgraph(
     dependent on B).
     """
     all_steps = graph_nodes(graph)
-    if exact_match:
-        included = set(includes) & all_steps
+    includes_list = list(includes)
+
+    # Handle exclusions first - find all steps that should be excluded
+    excluded_steps = set()
+    if excludes:
+        compiled_excludes = [re.compile(p) for p in excludes]
+        for step in all_steps:
+            if any(p.search(step) for p in compiled_excludes):
+                excluded_steps.add(step)
+
+    # Find downstream dependencies of excluded steps that should also be excluded
+    if excluded_steps:
+        downstream_of_excluded = set(traverse(reverse_graph(graph), excluded_steps))
+        excluded_steps.update(downstream_of_excluded)
+
+    # Remove excluded steps from consideration
+    available_steps = all_steps - excluded_steps
+
+    # If includes is empty, include all available steps
+    if not includes_list:
+        included = available_steps
+    elif exact_match:
+        included = set(includes_list) & available_steps
     else:
-        compiled_includes = [re.compile(p) for p in includes]
-        included = {s for s in all_steps if any(p.search(s) for p in compiled_includes)}
+        compiled_includes = [re.compile(p) for p in includes_list]
+        included = {s for s in available_steps if any(p.search(s) for p in compiled_includes)}
 
     if only:
-        # Only include explicitly selected nodes
-        return {step: graph.get(step, set()) & included for step in included}
+        # Only include explicitly selected nodes, but filter out excluded steps
+        return {step: graph.get(step, set()) & included for step in included if step not in excluded_steps}
 
     if downstream:
         # Reverse the graph to find all nodes dependent on included nodes (forward deps)
         forward_deps = set(traverse(reverse_graph(graph), included))
         included = included.union(forward_deps)
+        # Remove any excluded steps from the included set
+        included = included - excluded_steps
 
     # Now traverse the other way to find all dependencies of included nodes (backward deps)
-    return traverse(graph, included)
+    subgraph = traverse(graph, included)
+
+    # Ensure no excluded steps are in the final subgraph
+    return {step: deps - excluded_steps for step, deps in subgraph.items() if step not in excluded_steps}
 
 
-def traverse(graph: Graph, nodes: Set[str]) -> Graph:
+def traverse(graph: DAG, nodes: Set[str]) -> DAG:
     """
     Use BFS to find all nodes in a graph that are reachable from a given
     subset of nodes.
     """
-    reachable: Graph = defaultdict(set)
+    reachable: DAG = defaultdict(set)
     to_visit = nodes.copy()
 
     while to_visit:
@@ -155,7 +185,7 @@ def _parse_dag_yaml(dag: Dict[str, Any]) -> Dict[str, Any]:
     return {node: set(deps) if deps else set() for node, deps in steps.items()}
 
 
-def reverse_graph(graph: Graph) -> Graph:
+def reverse_graph(graph: DAG) -> DAG:
     """
     Invert the edge direction of a graph.
     """
@@ -170,7 +200,7 @@ def reverse_graph(graph: Graph) -> Graph:
     return dict(g)
 
 
-def graph_nodes(graph: Graph) -> Set[str]:
+def graph_nodes(graph: DAG) -> Set[str]:
     all_steps = set(graph)
     for children in graph.values():
         all_steps.update(children)
@@ -403,6 +433,11 @@ class DataStep(Step):
 
         ds_idex_mtime = self._dataset_index_mtime()
 
+        # if INSTANT flag is set, just update the metadata
+        if config.INSTANT and self.channel == "garden":
+            self._run_instant_metadata()
+            return
+
         sp = self._search_path
         if sp.with_suffix(".py").exists() or (sp / "__init__.py").exists():
             if config.DEBUG:
@@ -448,6 +483,10 @@ class DataStep(Step):
             else:
                 raise e
         exp_source_checksum = self.checksum_input()
+
+        # if INSTANT is on, we use _instant suffix in a checksum
+        if config.INSTANT and found_source_checksum:
+            found_source_checksum = found_source_checksum.replace("_instant", "")
 
         if found_source_checksum != exp_source_checksum:
             return True
@@ -514,7 +553,7 @@ class DataStep(Step):
             return [p.as_posix() for p in files.walk(self._search_path)]
 
         # if a dataset is a single file, use [dataset].py and shared* files
-        return glob(self._search_path.as_posix() + ".*") + glob((self._search_path.parent / "shared*").as_posix())
+        return glob(self._search_path.as_posix() + "*") + glob((self._search_path.parent / "shared*").as_posix())
 
     @property
     def _search_path(self) -> Path:
@@ -528,6 +567,44 @@ class DataStep(Step):
     @property
     def _dest_dir(self) -> Path:
         return paths.DATA_DIR / self.path.lstrip("/")
+
+    def _run_instant_metadata(self) -> None:
+        """If INSTANT flag is set, instead of running the whole garden step, just load
+        the existing dataset and update its metadata. This is useful for fast-tracking
+        metadata changes without having to rerun the whole step.
+        """
+
+        meta_path = get_metadata_path(self._dest_dir.as_posix())
+        if not meta_path.exists():
+            return
+
+        ds = catalog.Dataset(self._dest_dir.as_posix())
+
+        # Read metadata before
+        table_meta_before = _load_tables_metadata(ds)
+
+        # Save dataset, but use _instant suffix in the checksum to make sure we
+        # trigger fresh run when not using INSTANT
+        ds.update_metadata(meta_path)
+        ds.metadata.source_checksum = self.checksum_input() + "_instant"
+        ds.save()
+
+        # Read metadata after
+        table_meta_after = _load_tables_metadata(ds)
+
+        INSTANT_METADATA_DIFF[ds.m.short_name] = defaultdict(list)
+
+        for table_name in ds.table_names:
+            # Find variables with metadata changes
+            for var_name in table_meta_before[table_name]["fields"]:
+                if (
+                    table_meta_before[table_name]["fields"][var_name]
+                    != table_meta_after[table_name]["fields"][var_name]
+                ):
+                    log.info("instant.update", table_name=table_name, var_name=var_name)
+                    # Add the variable to a global variable so that we can only rerun changed
+                    # variables in the grapher step
+                    INSTANT_METADATA_DIFF[ds.m.short_name][table_name].append(var_name)
 
     def _run_py_isolated(self) -> None:
         """
@@ -569,13 +646,8 @@ class DataStep(Step):
         env = os.environ.copy()
         env["PATH"] = os.path.expanduser("~/.cargo/bin") + ":" + env["PATH"]
 
-        try:
-            subprocess.check_call(args, env=env)
-        except subprocess.CalledProcessError:
-            # swallow this exception and just exit -- the important stack trace
-            # will already have been printed to stderr
-            print(f'\nCOMMAND: {" ".join(args)}', file=sys.stderr)
-            sys.exit(1)
+        # This might raise subprocess.CalledProcessError
+        subprocess.check_call(args, env=env)
 
     def _run_notebook(self) -> None:
         "Run a parameterised Jupyter notebook."
@@ -606,7 +678,7 @@ class DataStep(Step):
 
     def _download_dataset_from_catalog(self) -> bool:
         """Download the dataset from the catalog if the checksums match. Return True if successful."""
-        url = f"{OWID_CATALOG_URI}/{self.path}/index.json"
+        url = f"{OWID_CATALOG_URI}{self.path}/index.json"
         resp = requests.get(url, verify=TLS_VERIFY)
         if not resp.ok:
             return False
@@ -768,7 +840,7 @@ class GrapherStep(Step):
 
         # dataset exists, but it is possible that we haven't inserted everything into DB
         dataset = self.dataset
-        return db.fetch_db_checksum(dataset) != self.data_step.checksum_input()
+        return db.fetch_db_checksum(dataset) != self.checksum_input()
 
     def run(self) -> None:
         import etl.grapher.to_db as db
@@ -812,9 +884,29 @@ class GrapherStep(Step):
             for table in dataset:
                 assert not table.empty, f"table {table.metadata.short_name} is empty"
 
-                # if GRAPHER_FILTER is set, only upsert matching columns
-                if config.GRAPHER_FILTER:
-                    cols = table.filter(regex=config.GRAPHER_FILTER).columns.tolist()
+                # if SUBSET is set, only upsert matching variables
+                if config.SUBSET:
+                    cols_regex = config.SUBSET
+                # if INSTANT is set, only upsert variables with changed metadata
+                elif config.INSTANT:
+                    dataset_name = dataset.m.short_name
+                    table_name = table.metadata.short_name
+
+                    # dataset wasn't run with instant, rerun it
+                    if dataset_name not in INSTANT_METADATA_DIFF:
+                        cols_regex = None
+                    else:
+                        instant_variables = INSTANT_METADATA_DIFF[dataset_name].get(table_name)
+                        if not instant_variables:
+                            # no changes in table, skip it
+                            continue
+                        else:
+                            cols_regex = "|".join(instant_variables)
+                else:
+                    cols_regex = None
+
+                if cols_regex:
+                    cols = table.filter(regex=cols_regex).columns.tolist()
                     if not cols:
                         continue
                     cols += [c for c in table.columns if c in {"year", "date", "country"} and c not in cols]
@@ -859,7 +951,16 @@ class GrapherStep(Step):
             # wait for all tables to be inserted
             [future.result() for future in as_completed(futures)]
 
-        if not config.GRAPHER_FILTER and not config.SUBSET:
+        # If INSTANT flag is set, don't clean ghost variables, but update the checksum (with _instant suffix)
+        if INSTANT_METADATA_DIFF:
+            db.set_dataset_checksum_and_editedAt(dataset_upsert_results.dataset_id, self.checksum_input())
+
+        # If filtering is on, don't set checksum. Allow the next ETL run to set it
+        elif config.SUBSET:
+            pass
+
+        # Otherwise, clean up ghost resources and set checksum
+        else:
             # cleaning up ghost resources could be unsuccessful if someone renamed short_name of a variable
             # and remapped it in chart-sync. In that case, we cannot delete old variables because they are still
             # needed for remapping. However, we can delete it on next ETL run
@@ -869,12 +970,15 @@ class GrapherStep(Step):
 
             # set checksum and updatedAt timestamps after all data got inserted
             if success:
-                checksum = self.data_step.checksum_input()
+                checksum = self.checksum_input()
             # if cleanup was not successful, don't set checksum and let ETL rerun it on its next try
             else:
                 checksum = "to_be_rerun"
 
             db.set_dataset_checksum_and_editedAt(dataset_upsert_results.dataset_id, checksum)
+
+    def checksum_input(self) -> str:
+        return self.data_step.checksum_input()
 
     def checksum_output(self) -> str:
         """Checksum of a grapher step is the same as checksum of the underyling data://grapher step."""
@@ -951,7 +1055,8 @@ class ExportStep(DataStep):
         ds.save()
 
     def checksum_output(self) -> str:
-        raise NotImplementedError("ExportStep should not be used as an input")
+        # output checksum is checksum of all ingredients
+        return self.checksum_input()
 
     @property
     def _search_path(self) -> Path:
@@ -1067,17 +1172,18 @@ def _step_is_dirty(s: Step) -> bool:
     return s.is_dirty()
 
 
-def _cached_is_dirty(self: Step, cache: files.RuntimeCache) -> bool:
-    key = str(self)
+def _cached_is_dirty(step: Step, cache: files.RuntimeCache) -> bool:
+    key = str(step)
     if key not in cache:
-        cache.add(key, self._is_dirty())  # type: ignore
-    return cache[key]  # type: ignore
+        cache.add(key, step._is_dirty())
+    return cache[key]
 
 
 def _add_is_dirty_cached(s: Step, cache: files.RuntimeCache) -> None:
     """Save copy of a method to _is_dirty and replace it with a cached version."""
-    s._is_dirty = s.is_dirty  # type: ignore
-    s.is_dirty = lambda s=s: _cached_is_dirty(s, cache)  # type: ignore
+    s._is_dirty = s.is_dirty
+    s._cache = cache
+    s.is_dirty = partial(_cached_is_dirty, s, cache)
     for dep in getattr(s, "dependencies", []):
         _add_is_dirty_cached(dep, cache)
 
@@ -1101,18 +1207,63 @@ def isolated_env(
 
     :param keep_modules: regex of modules to keep imported
     """
-    # add module dir to pythonpath
-    sys.path.append(working_dir.as_posix())
-
-    # remember modules that were imported before
+    # Remember original sys.path and modules
+    original_path = sys.path.copy()
     imported_modules = set(sys.modules.keys())
 
-    yield
+    # Create a temporary module registry for this context
+    context_modules: dict[str, ModuleType] = {}
 
-    # unimport modules imported during execution unless they match `keep_modules`
-    for module_name in set(sys.modules.keys()) - imported_modules:
-        if not re.search(keep_modules, module_name):
-            sys.modules.pop(module_name)
+    try:
+        # Insert working_dir at the beginning to give it highest priority
+        # This ensures this process's modules take precedence
+        sys.path.insert(0, working_dir.as_posix())
 
-    # remove module dir from pythonpath
-    sys.path.remove(working_dir.as_posix())
+        # Monkey-patch __import__ to handle relative imports more safely
+        original_import = __builtins__["__import__"]
+
+        def safe_import(name, globals=None, locals=None, fromlist=(), level=0):
+            # For relative imports or modules that might exist in working_dir,
+            # check working_dir first
+            if level == 0 and globals and hasattr(globals.get("__spec__"), "submodule_search_locations"):
+                # Try to load from working_dir first for potential conflicts
+                module_path = working_dir / f"{name}.py"
+                if module_path.exists() and name not in context_modules:
+                    spec = importlib.util.spec_from_file_location(name, module_path)
+                    if spec and spec.loader:
+                        module = importlib.util.module_from_spec(spec)
+                        context_modules[name] = module
+                        sys.modules[name] = module
+                        spec.loader.exec_module(module)
+                        return module
+
+            return original_import(name, globals, locals, fromlist, level)
+
+        __builtins__["__import__"] = safe_import
+
+        yield
+
+    finally:
+        # Restore original import function
+        __builtins__["__import__"] = original_import
+
+        # Restore original sys.path
+        sys.path[:] = original_path
+
+        # Unimport modules imported during execution unless they match `keep_modules`
+        for module_name in set(sys.modules.keys()) - imported_modules:
+            if not re.search(keep_modules, module_name):
+                sys.modules.pop(module_name, None)
+
+        # Clean up context modules
+        for module_name in context_modules:
+            sys.modules.pop(module_name, None)
+
+
+def _load_tables_metadata(ds: catalog.Dataset) -> Dict[str, Dict[str, Any]]:
+    """Load metadata for all tables in a dataset."""
+    table_meta = {}
+    for table_name in ds.table_names:
+        with open(Path(ds.path) / f"{table_name}.meta.json") as f:
+            table_meta[table_name] = json.load(f)
+    return table_meta

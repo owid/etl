@@ -70,7 +70,7 @@ def run(dest_dir: str) -> None:
         log.info("gho.run", label=label)
 
         # Read table from meadow dataset.
-        tb = ds_meadow[label]
+        tb = ds_meadow.read(label, safe_types=False)
         # Exclude archived indicators from garden
         if "_archived" in label or tb.m.title.endswith("(archived)"):
             continue
@@ -229,7 +229,7 @@ def drop_excess_region_sources(tb: pd.DataFrame, priority_regions: list[str]) ->
 def add_region_source_suffix(tb: Table) -> Table:
     """Add region source as suffix to region name, e.g. Africa (WHO)"""
     if "region_source" in tb.columns:
-        tb = drop_excess_region_sources(tb, PRIORITY_OF_REGIONS)
+        tb = drop_excess_region_sources(tb.copy(), PRIORITY_OF_REGIONS)
         ix = tb.region_source.notnull() & (tb.country != "World")
         if ix.any():
             tb["country"] = tb["country"].astype(str)
@@ -273,7 +273,7 @@ def set_indicator(tb: Table, short_name: str, meta: dict[str, str]) -> Table:
     markdown_description = ""
     for heading in HEADINGS_TO_USE:
         if heading in meta:
-            markdown_description += f"##### {heading}\n{meta[heading]}\n\n"
+            markdown_description += f"#### {heading}\n{meta[heading]}\n\n"
     markdown_description = markdown_description.strip()
 
     # Make sure the value is not the same as dimension

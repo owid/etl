@@ -1,6 +1,6 @@
 """Load snapshot of IRENA's Renewable Energy Patents and create a raw data table."""
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get naming conventions.
 paths = PathFinder(__file__)
@@ -16,7 +16,7 @@ COLUMNS = {
 }
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -31,11 +31,11 @@ def run(dest_dir: str) -> None:
     tb = tb[list(COLUMNS)].rename(columns=COLUMNS, errors="raise")
 
     # Set an appropriate index and sort conveniently.
-    tb = tb.set_index(["country", "year", "sector", "technology", "sub_technology"], verify_integrity=True).sort_index()
+    tb = tb.format(keys=["country", "year", "sector", "technology", "sub_technology"])
 
     #
     # Save outputs.
     #
     # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
+    ds_meadow = paths.create_dataset(tables=[tb])
     ds_meadow.save()

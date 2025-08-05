@@ -1,0 +1,177 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  all:
+    description_short: |-
+      <% set per_capita = "" %>
+      <%- if conflict_type == "all" -%>
+      The << estimate >> estimate of the number of deaths of combatants and civilians due to fighting in interstate, intrastate, extrasystemic, non-state conflicts, and one-sided violence that were ongoing that year<< per_capita >>.
+
+      <%- elif conflict_type == "state-based" -%>
+      The << estimate >> estimate of the number of deaths of combatants and civilians due to fighting in interstate, intrastate, and extrasystemic conflicts that were ongoing that year<< per_capita >>.
+
+      <%- elif conflict_type == "intrastate (internationalized)" -%>
+      The << estimate >> estimate of the number of deaths of combatants and civilians due to fighting in internationalized intrastate conflicts that were ongoing that year<< per_capita >>.
+
+      <%- elif conflict_type == "intrastate (non-internationalized)" -%>
+      The << estimate >> estimate of the number of deaths of combatants and civilians due to fighting in non-internationalized intrastate conflicts that were ongoing that year<< per_capita >>.
+
+      <%- elif conflict_type == "one-sided violence" -%>
+      The << estimate >> estimate of the number of deaths of civilians from one-sided violence that was ongoing that year<< per_capita >>.
+
+      <%- elif conflict_type == "non-state conflict" -%>
+      The << estimate >> estimate of the number of deaths of combatants and civilians due to fighting in non-state conflicts that were ongoing that year<< per_capita >>.
+
+      <%- else -%>
+      The << estimate >> estimate of the number of deaths of combatants and civilians due to fighting in << conflict_type >> conflicts that were ongoing that year<< per_capita >>.
+
+      <%- endif -%>
+    description_short_per_capita: <% set per_capita = ", per 100,000 people" %>
+      {definitions.all.description_short}
+    conflict_type_base: |-
+      This includes combatant and civilian deaths due to fighting
+    conflict_type: |-
+      <%- if conflict_type == "all" -%>
+      A conflict involving a state is defined by the Uppsala Conflict Data Program (UCDP) and the Peace Research Institute Oslo (PRIO) as a conflict between two armed groups, at least one of which is a state, that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}.
+
+      <%- elif conflict_type == "state-based" -%>
+      A conflict involving a state is defined by the Uppsala Conflict Data Program (UCDP) and the Peace Research Institute Oslo (PRIO) as a conflict between two armed groups, at least one of which is a state, that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}.
+
+      <%- elif conflict_type == "interstate" -%>
+      An interstate conflict is defined by the Uppsala Conflict Data Program (UCDP) and the Peace Research Institute Oslo (PRIO) as a conflict between states that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}.
+
+      <%- elif conflict_type == "intrastate" -%>
+      An intrastate conflict is defined by the Uppsala Conflict Data Program (UCDP) and the Peace Research Institute Oslo (PRIO) as a conflict between a state and a non-state armed group that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}. If a foreign state is involved, it is called "internationalized", and "non-internationalized" otherwise.
+
+      <%- elif conflict_type == "intrastate (internationalized)" -%>
+      A foreign-backed civil conflict is defined by the Uppsala Conflict Data Program (UCDP) and the Peace Research Institute Oslo (PRIO) as a conflict between a state and a non-state armed group that causes at least 25 deaths during a year, and at least one foreign state is involved in a supporting role. A non-state armed group can be a rebel group, criminal organization, or ethnic group. {definitions.all.conflict_type_base}.
+
+
+      <%- elif conflict_type == "intrastate (non-internationalized)" -%>
+      A domestic civil conflict is defined by the Uppsala Conflict Data Program (UCDP) and the Peace Research Institute Oslo (PRIO) as a conflict between a state and a non-state armed group that causes at least 25 deaths during a year, and no foreign state is involved in a supporting role. A non-state armed group can be a rebel group, criminal organization, or ethnic group. {definitions.all.conflict_type_base}.
+
+      <%- elif conflict_type == "extrasystemic" -%>
+      A colonial conflict is defined by the Uppsala Conflict Data Program (UCDP) and the Peace Research Institute Oslo (PRIO) as a conflict between a state and a non-state armed group that causes at least 25 deaths during a year, and takes place outside of the state's territory. {definitions.all.conflict_type_base}.
+
+      <%- elif conflict_type == "non-state conflict" -%>
+      A non-state conflict is defined by the Uppsala Conflict Data Program (UCDP) and the Peace Research Institute Oslo (PRIO) as a conflict between non-state armed groups, such as rebel groups, criminal organizations, or ethnic groups, that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}.
+
+      <%- elif conflict_type == "one-sided violence" -%>
+      One-sided violence is defined by the Uppsala Conflict Data Program (UCDP) and the Peace Research Institute Oslo (PRIO) as the use of armed force by a state or non-state armed group against civilians that causes at least 25 civilian deaths during a year.
+
+      <%- endif -%>
+    description_key_deaths: &description_key_deaths
+      - |-
+        {definitions.all.conflict_type}
+      - |-
+        <% if conflict_type == "state-based" %>
+        This includes [interstate conflicts](#dod:interstate-ucdp), [civil conflicts](#dod:intrastate-ucdp), and [colonial conflicts](#dod:extrasystemic-ucdp).
+        <%- endif %>
+      - |-
+        [UCDP](https://www.uu.se/en/department/peace-and-conflict-research/research/ucdp/ucdp-methodology) and [PRIO](https://www.semanticscholar.org/paper/Monitoring-Trends-in-Global-Combat%3A-A-New-Dataset-Lacina-Gleditsch/0c4ff27fff986bc30112ac59ad6afbd7b719ad17?p2df) identify conflict deaths based on news reports, other contemporary sources, and academic research.
+    description_key_deaths_best: &description_key_deaths_best
+      - |-
+        {definitions.all.conflict_type}
+      - |-
+        <% if conflict_type == "state-based" %>
+        This includes [interstate conflicts](#dod:interstate-ucdp), [civil conflicts](#dod:intrastate-ucdp), and [colonial conflicts](#dod:extrasystemic-ucdp).
+        <%- endif %>
+      - |-
+        [UCDP](https://www.uu.se/en/department/peace-and-conflict-research/research/ucdp/ucdp-methodology) and [PRIO](https://www.semanticscholar.org/paper/Monitoring-Trends-in-Global-Combat%3A-A-New-Dataset-Lacina-Gleditsch/0c4ff27fff986bc30112ac59ad6afbd7b719ad17?p2df) identify conflict deaths based on news reports, other contemporary sources, and academic research.
+      - |-
+        We show here the "best" death estimates as identified by UCDP and PRIO. They also report high and low estimates.
+
+  common:
+    presentation:
+      topic_tags:
+        - War & Peace
+      grapher_config:
+        selectedEntityNames:
+          - Africa
+          - Americas
+          - Asia and Oceania
+          - Europe
+          - Middle East
+    description_key:
+      - |-
+        {definitions.all.conflict_type}
+    description_processing: |-
+      Data prior to 1989 is sourced from PRIO. Data since 1989 is sourced from UCDP.
+    display:
+      numDecimalPlaces: 0
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+dataset:
+  update_period_days: 365
+  title: UCDP+PRIO, History of war
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+tables:
+  # MAIN INDICATORS
+  ucdp_prio:
+    variables:
+      ##################
+      # Ongoing deaths #
+      ##################
+      number_deaths_ongoing_conflicts:
+        title: Deaths in ongoing conflicts (best estimate)
+        unit: deaths
+        description_short: |-
+          <% set estimate = "best" %>
+          {definitions.all.description_short}
+        description_processing: |-
+          {definitions.common.description_processing}
+
+          For conflict years without a best deaths estimate in the PRIO data, we conservatively coded the low estimate.
+        description_key: *description_key_deaths_best
+
+      number_deaths_ongoing_conflicts_high:
+        title: Deaths in ongoing conflicts (high estimate)
+        unit: deaths
+        description_short: |-
+          <% set estimate = "high" %>
+          {definitions.all.description_short}
+        description_key: *description_key_deaths
+
+      number_deaths_ongoing_conflicts_low:
+        title: Deaths in ongoing conflicts (low estimate)
+        unit: deaths
+        description_short: |-
+          <% set estimate = "low" %>
+          {definitions.all.description_short}
+        description_key: *description_key_deaths
+
+      number_deaths_ongoing_conflicts_per_capita:
+        title: Death rate in ongoing conflicts (best estimate)
+        unit: deaths per 100,000 people
+        description_short: |-
+          <% set estimate = "best" %>
+          {definitions.all.description_short_per_capita}
+        description_processing: |-
+          {definitions.common.description_processing}
+
+          For conflict years without a best deaths estimate in the PRIO data, we conservatively coded the low estimate.
+        description_key: *description_key_deaths_best
+        display:
+          numDecimalPlaces: 1
+
+      number_deaths_ongoing_conflicts_high_per_capita:
+        title: Death rate in ongoing conflicts (high estimate)
+        unit: deaths per 100,000 people
+        description_short: |-
+          <% set estimate = "high" %>
+          {definitions.all.description_short_per_capita}
+        description_key: *description_key_deaths
+        display:
+          numDecimalPlaces: 1
+
+      number_deaths_ongoing_conflicts_low_per_capita:
+        title: Death rate in ongoing conflicts (low estimate)
+        unit: deaths per 100,000 people
+        description_short: |-
+          <% set estimate = "low" %>
+          {definitions.all.description_short_per_capita}
+        description_key: *description_key_deaths
+        display:
+          numDecimalPlaces: 1

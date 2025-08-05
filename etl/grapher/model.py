@@ -61,7 +61,7 @@ from sqlalchemy.dialects.mysql import (
     VARCHAR,
 )
 from sqlalchemy.engine import Engine
-from sqlalchemy.exc import NoResultFound
+from sqlalchemy.exc import NoResultFound, ProgrammingError
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import (  # type: ignore
     DeclarativeBase,
@@ -292,6 +292,22 @@ class Tag(Base):
         return tags
 
 
+class DoD(Base):
+    __tablename__ = "dods"
+    __table_args__ = (
+        ForeignKeyConstraint(["lastUpdatedUserId"], ["users.id"], ondelete="SET NULL", name="dods_ibfk_1"),
+        Index("lastUpdatedUserId", "lastUpdatedUserId"),
+        Index("name", "name", unique=True),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(VARCHAR(512))
+    content: Mapped[str] = mapped_column(VARCHAR(4096))
+    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
+    updatedAt: Mapped[datetime] = mapped_column(DateTime, init=False)
+    lastUpdatedUserId: Mapped[Optional[int]] = mapped_column(Integer)
+
+
 class User(Base):
     __tablename__ = "users"
     __table_args__ = (Index("email", "email", unique=True),)
@@ -336,12 +352,12 @@ class ChartRevisions(Base):
     updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime, init=False)
 
     @classmethod
-    def get_latest(cls, session: Session, chart_id: int, updatedAt=None) -> "ChartRevisions":
-        """query should be: SELECT * FROM chart_revisions WHERE chartId = {self.chart_id} AND updatedAt <= '{timestamp}' ORDER BY updatedAt DESC LIMIT 1 if timestamp is given!"""
+    def get_latest(cls, session: Session, chart_id: int, createdAt=None) -> "ChartRevisions":
+        """query should be: SELECT * FROM chart_revisions WHERE chartId = {self.chart_id} AND createdAt <= '{timestamp}' ORDER BY createdAt DESC LIMIT 1 if timestamp is given!"""
         revision = session.scalars(
             select(cls)
-            .where(and_(cls.chartId == chart_id, cls.updatedAt <= updatedAt) if updatedAt else cls.chartId == chart_id)
-            .order_by(cls.updatedAt.desc())
+            .where(and_(cls.chartId == chart_id, cls.createdAt <= createdAt) if createdAt else cls.chartId == chart_id)
+            .order_by(cls.createdAt.desc())
             .limit(1)
         ).one_or_none()
 
@@ -402,6 +418,7 @@ class Chart(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, init=False)
     configId: Mapped[bytes] = mapped_column(CHAR(36))
+    isInheritanceEnabled: Mapped[int] = mapped_column(TINYINT(1), server_default=text("'1'"))
     createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
     lastEditedAt: Mapped[datetime] = mapped_column(DateTime)
     lastEditedByUserId: Mapped[int] = mapped_column(Integer)
@@ -423,7 +440,10 @@ class Chart(Base):
 
     @hybrid_property
     def config(self) -> dict[str, Any]:  # type: ignore
-        return self.chart_config.full
+        config = self.chart_config.full.copy()
+        # Add isInheritanceEnabled to config so it's included in comparisons
+        config["isInheritanceEnabled"] = bool(self.isInheritanceEnabled)
+        return config
 
     @config.expression
     def config(cls):
@@ -1926,7 +1946,14 @@ class Anomaly(Base):
 
     @classmethod
     def load_anomalies(cls, session: Session, dataset_id: List[int]) -> List["Anomaly"]:
-        return session.scalars(select(cls).where(cls.datasetId.in_(dataset_id))).all()  # type: ignore
+        try:
+            return session.scalars(select(cls).where(cls.datasetId.in_(dataset_id))).all()  # type: ignore
+        except ProgrammingError as e:
+            # anomalies table does not exist (error code 1146), it gets created dynamically
+            # when the first anomaly is created
+            if "1146" in str(e):
+                return []
+            raise
 
 
 class Explorer(Base):
@@ -2007,6 +2034,7 @@ def _infer_variable_type(values: pd.Series) -> VARIABLE_TYPE:
     assert values.notnull().all(), "values must not contain nulls"
     assert values.map(lambda x: isinstance(x, str)).all(), "only works for strings"
     if values.empty:
+        log.warning("_infer_variable_type.mixed_type_detected", reason="empty_values")
         return "mixed"
     try:
         values = pd.to_numeric(values)
@@ -2019,6 +2047,7 @@ def _infer_variable_type(values: pd.Series) -> VARIABLE_TYPE:
             raise NotImplementedError()
     except ValueError:
         if values.map(_is_float).any():
+            log.warning("_infer_variable_type.mixed_type_detected", reason="mixed_numeric_and_string")
             return "mixed"
         else:
             return "string"

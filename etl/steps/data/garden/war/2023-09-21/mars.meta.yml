@@ -9,15 +9,12 @@ definitions:
 
   all:
     conflict_type: |-
-      <%- if conflict_type == "all" -%>
-      A conventional war is a conflict between combatants with differentiated militaries and clear frontlines that causes at least 500 deaths over its duration.
-
-      <%- elif conflict_type == "others (non-civil)" -%>
-      A conventional interstate war is a conflict between states with differentiated militaries and clear frontlines that causes at least 500 deaths over its duration.
-
-      <%- elif conflict_type == "civil war" -%>
+      <%- if conflict_type == "all" %>
+      A war is a conflict between states with differentiated militaries and clear frontlines that causes at least 500 deaths over its duration.
+      <%- elif conflict_type == "others (non-civil)" %>
+      An interstate war is a conflict between states with differentiated militaries and clear frontlines that causes at least 500 deaths over its duration.
+      <%- elif conflict_type == "civil war" %>
       A civil war is a conflict between combatants that were previously part of the same state, but now at least one seeks control or secession. It is fought with differentiated militaries and clear frontlines and causes at least 500 deaths over its duration.
-
       <%- endif -%>
     conflict_type_noncivil: |-
       <%- if conflict_type == "others (non-civil)" -%>
@@ -42,46 +39,34 @@ definitions:
   number_deaths:
     description_short: |-
       <% set per_capita = "" %>
-      <%- if conflict_type == "all" -%>
-      The << estimate >> estimate of the number of deaths<< per_capita >> in all ongoing conventional wars that year.
-
-      <%- elif conflict_type == "others (non-civil)" -%>
-      The << estimate >> estimate of the number of deaths<< per_capita >> in ongoing conventional interstate wars that year.
-
-      <%- elif conflict_type == "civil war" -%>
-      The << estimate >> estimate of the number of deaths<< per_capita >> in ongoing conventional civil wars that year.
-
-      <%- endif -%>
-    description_short_per_capita:
-      <% set per_capita = " per 100,000 people" %>
+      <%- if conflict_type == "all" %>
+      The << estimate >> estimate of the number of deaths<< per_capita >> in all ongoing conventional wars that year
+      <%- elif conflict_type == "others (non-civil)" %>
+      The << estimate >> estimate of the number of deaths<< per_capita >> in ongoing conventional interstate wars that year
+      <%- elif conflict_type == "civil war" %>
+      The << estimate >> estimate of the number of deaths<< per_capita >> in ongoing conventional civil wars that year
+      <%- endif %>
+    description_short_per_capita: <% set per_capita = " per 100,000 people" %>
       {definitions.number_deaths.description_short}
     description_key: &description_key_deaths
       - "{definitions.all.conflict_type}"
-      - "{definitions.all.conflict_type_noncivil}"
-      - "{definitions.all.conflict_types_additional}"
-      - Deaths of combatants due to fighting are included.
-      - |-
-        <%- if conflict_type == "civil war" -%>
-        If a war lasted more than one year, we distributed its deaths evenly across years.
-
-        <%- else -%>
-        If a war lasted more than one year, we distributed its deaths evenly across years. If a war was ongoing in more than one world region, we also evenly distributed its deaths across the regions of the participants.
-
-        <%- endif -%>
+      - If a war lasted more than one year, we distributed its deaths evenly across years.
+      - Project Mars identifies war deaths based on contemporary sources and academic research.
+      - For the two wars that had campaigns within it that were classified as both a civil war and an interstate war, we coded them as interstate wars.
 
   number_ongoing_conflicts:
     description_short: |-
       {definitions.all.conflicts_description}.
     description_key: &description_key_ongoing
       - "{definitions.all.conflict_type}"
-      - "{definitions.all.conflict_type_noncivil}"
-      - "{definitions.all.conflict_types_additional}"
-      - We count a war as ongoing in a region even if the war is also ongoing in other regions. The sum across all regions can therefore be higher than the total number of ongoing wars.
+      - Project Mars identifies war deaths based on contemporary sources and academic research.
+      - For the two wars that had campaigns within it that were classified as both a civil war and an interstate war, we coded them as interstate wars.
+      - A war may be ongoing in multiple regions at the same time. In such cases, we count the war as ongoing in all the affected regions.
 
   number_new_conflicts:
     description_short: |-
       {definitions.all.conflicts_description} for the first time.
-    description_key:  &description_key_new
+    description_key: &description_key_new
       - "{definitions.all.conflict_type}"
       - "{definitions.all.conflict_type_noncivil}"
       - "{definitions.all.conflict_types_additional}"
@@ -98,9 +83,7 @@ definitions:
         <%- endif -%>
       - We count a war as new in a region even if the war started earlier or at the same time in another region. The sum across all regions can therefore be higher than the total number of new wars.
 
-
 tables:
-
   # PARTICIPANT INDICATORS
   mars_country:
     common:
@@ -248,11 +231,10 @@ tables:
         title: Number of new wars per state-pair
         unit: wars per state-pair
         description_short: |-
-            {definitions.number_new_conflicts.description_short}, divided by the number of country-pairs in the region.
+          {definitions.number_new_conflicts.description_short}, divided by the number of country-pairs in the region.
         description_key: *description_key_new
         display:
           numDecimalPlaces: 5
-
 
 dataset:
   title: History of war (Project Mars, 2020)

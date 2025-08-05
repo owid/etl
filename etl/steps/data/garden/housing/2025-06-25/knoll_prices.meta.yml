@@ -1,0 +1,38 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Housing
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  knoll_prices:
+    variables:
+      hpreal:
+        title: "House price index"
+        unit: "Index (1990=100)"
+        short_unit: ""
+        description_short: Long-run data on real house prices, normalized to 1990=100. Real house prices are deflated by the consumer price index (CPI) to account for inflation.
+        description_key:
+          - This long-run dataset consolidates house price data from a variety of sources. Some sources might only include urban areas while others cover the entire nation or some sources include only existing dwellings, while others include both new and existing dwellings. More details can be found in the [original source](https://www.aeaweb.org/articles?id=10.1257/aer.20150501).
+          - House prices are deflated by the consumer price index (CPI) to account for inflation.
+          - The data is normalized to 1990=100. A year with an index of 120 indicates that house prices were 20% higher than in 1990.
+      hp_per_gdp:
+        title: "House price index per GDP per capita"
+        unit: "Index (1990=100)"
+        short_unit: ""
+        description_short: Long-run data on real house prices relative to GDP per capita, normalized to 1990=100. A higher value indicates that house prices are higher compared to GDP per capita, a lower value indicates that house prices are lower compared to GDP per capita than in 1990.
+        description_key:
+          - This long-run dataset consolidates house price data from a variety of sources. Some sources might only include urban areas while others cover the entire nation or some sources include only existing dwellings, while others include both new and existing dwellings. More details can be found in the [original source](https://www.aeaweb.org/articles?id=10.1257/aer.20150501).
+          - Long-run GDP per capita comes from the Maddison Project Database, which provides historical GDP per capita data for a wide range of countries. This is adjusted for inflation and expressed in international dollars to allow for cross-country comparisons.
+          - House prices are deflated by the consumer price index (CPI) to account for inflation.
+          - The data is normalized to 1990=100. A year with an index of 120 indicates that house prices were 20% higher than in 1990, relative to GDP per capita.
+
+

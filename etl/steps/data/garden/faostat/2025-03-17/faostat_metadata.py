@@ -1003,7 +1003,7 @@ def run() -> None:
     #
     # Load data.
     #
-    # Define path to current dataset step file.
+    # Define path to current step file.
     current_step_file = (CURRENT_DIR / "faostat_metadata").with_suffix(".py")
 
     # Get paths and naming conventions for current step.
@@ -1049,11 +1049,11 @@ def run() -> None:
         value_amendments=value_amendments,
     )
 
-    # Create all tables with dataset descriptions, items, element-units, and countries.
+    # Create all tables with dataset descriptions, items, elements-units, and countries.
     datasets_table = create_table(tb=tb_datasets, short_name="datasets", index_cols=["dataset"])
     items_table = create_table(tb=tb_items, short_name="items", index_cols=["dataset", "item_code"])
     elements_table = create_table(tb=tb_elements, short_name="elements", index_cols=["dataset", "element_code"])
-    # NOTE: Since FAO country names sometimes appears in slightly different ways (e.g. "Low income economies" and "Low-income economies"), we cannot set area_code as unique index of the countries table, and need to include fao_country as well.
+    # NOTE: Since FAOSTAT country names sometimes appears in slightly different ways (e.g. "Low income economies" and "Low-income economies"), we cannot set area_code as unique index of the countries table, and need to include fao_country as well.
     countries_table = create_table(tb=tb_countries, short_name="countries", index_cols=["area_code", "fao_country"])
     amendments_table = Table(value_amendments, short_name="amendments").set_index(
         ["dataset", "spurious_value"], verify_integrity=True
@@ -1062,7 +1062,7 @@ def run() -> None:
     #
     # Save outputs.
     #
-    # Initialize a new garden dataset.
+    # Initialize new garden dataset.
     ds_grapher = paths.create_dataset(
         tables=[datasets_table, items_table, elements_table, countries_table, amendments_table],
         repack=False,

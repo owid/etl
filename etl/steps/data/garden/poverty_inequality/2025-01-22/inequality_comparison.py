@@ -20,10 +20,15 @@ from owid.catalog import Dataset, Table
 from structlog import get_logger
 
 from etl.data_helpers import geo
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
+# Define PPP year for PIP
+# NOTE: Change this in case of new PPP versions in the future
+# TODO: Change to 2021 prices
+PPP_YEAR_PIP = 2021
 
 # Initialize logger
 log = get_logger()
@@ -61,20 +66,20 @@ REFERENCE_YEARS = [
 ]
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     # Load dataset and table
     ds_pov_ineq = paths.load_dataset("poverty_inequality_file")
     # NOTE: For now I am keeping the population and regions datasets commented out, because I might use them in the future
     # ds_population = paths.load_dataset("population")
     # ds_regions = paths.load_dataset("regions")
-    ds_pip = paths.load_dataset("world_bank_pip")
+    ds_pip = paths.load_dataset("world_bank_pip_legacy")
     ds_wid = paths.load_dataset("world_inequality_database")
     ds_lis = paths.load_dataset("luxembourg_income_study")
 
     tb = ds_pov_ineq.read("keyvars")
 
     # Load tables from PIP, WID, and LIS datasets (for metadata)
-    tb_pip = ds_pip.read("income_consumption_2017_unsmoothed")
+    tb_pip = ds_pip.read(f"income_consumption_{PPP_YEAR_PIP}_unsmoothed")
     tb_wid = ds_wid.read("world_inequality_database")
     tb_lis = ds_lis.read("luxembourg_income_study")
 
@@ -133,8 +138,8 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(
-        dest_dir, tables=garden_tables, check_variables_metadata=True, default_metadata=ds_pov_ineq.metadata
+    ds_garden = paths.create_dataset(
+        tables=garden_tables, check_variables_metadata=True, default_metadata=ds_pov_ineq.metadata
     )
 
     # Save changes in the new garden dataset.

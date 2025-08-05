@@ -5,7 +5,7 @@ from typing import Any, Dict, List, Optional
 
 import numpy as np
 
-from etl.config import OWID_ENV, OWIDEnv
+from etl.config import DEFAULT_GRAPHER_SCHEMA, OWID_ENV, OWIDEnv
 from etl.grapher.io import ensure_load_variable
 from etl.grapher.model import Variable
 
@@ -32,7 +32,7 @@ CONFIG_BASE = {
     "hideLegend": False,
     "tab": "chart",
     "logo": "owid",
-    "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.007.json",
+    "$schema": DEFAULT_GRAPHER_SCHEMA,
     "showYearLabels": False,
     "id": 807,
     "selectedFacetStrategy": "none",
@@ -42,7 +42,7 @@ CONFIG_BASE = {
     "version": 14,
     "sortOrder": "desc",
     "maxTime": "latest",
-    "chartTypes": ["LineChart"],
+    "chartTypes": ["LineChart", "DiscreteBar"],
     "hideRelativeToggle": True,
     "addCountryMode": "add-country",
     "hideAnnotationFieldsInTitle": {"entity": False, "changeInPrefix": False, "time": False},

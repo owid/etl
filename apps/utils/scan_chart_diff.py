@@ -4,9 +4,9 @@ from rich_click.rich_command import RichCommand
 from sqlalchemy.exc import OperationalError, ProgrammingError
 from structlog import get_logger
 
-from apps.owidbot import github_utils as gh_utils
 from apps.owidbot.cli import cli as owidbot_cli
 from etl import config
+from etl.git_api_helpers import GithubApiRepo
 
 config.enable_sentry()
 
@@ -24,7 +24,8 @@ def cli(dry_run: bool) -> None:
     """Scan all open PRs in the etl repository and run
     `etl owidbot etl/branch --services chart-diff` against them.
     """
-    active_prs = gh_utils.get_prs_from_repo("etl")
+    repo = GithubApiRepo(repo_name="etl")
+    active_prs = repo.get_all_prs()
 
     log.info("scan-chart-diff.init", active_prs=active_prs)
 

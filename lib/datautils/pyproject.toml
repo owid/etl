@@ -1,6 +1,6 @@
 [project]
 name = "owid-datautils"
-version = "0.5.3"
+version = "0.6.0"
 description = "Data utils library by the Data Team at Our World in Data"
 authors = [
     {name = "Our World in Data", email = "tech@ourworldindata.org"},
@@ -12,19 +12,19 @@ keywords = [
     "data utils",
 ]
 license = "MIT"
-requires-python = ">=3.9, <4.0"
+requires-python = ">=3.10, <4.0"
 dependencies = [
-    "pandas>=2.2.1",
-    "boto3>=1.21.16",
+    "pandas>=2.2.3",
+    "boto3>=1.38.23",
     "structlog>=21.5.0",
     "colorama>=0.4.4",
     "gdown>=4.5.2",
     "gsheets>=0.6.1",
     "pydrive2>=1.15.0",
-    "pyarrow>=10.0.1",
+    "pyarrow>=18.0.0",
     "urllib3<2",
     "click>=8.1.7",
-    "py7zr>=0.22.0",
+    "py7zr>=0.22.0"
 ]
 
 [tool.uv]
@@ -35,13 +35,13 @@ dev-dependencies = [
     "furo>=2022.4.7",
     "bumpversion>=0.6.0",
     "watchdog>=2.1.5",
-    "boto3-stubs[s3]>=1.21.16",
+    "boto3-stubs[s3]>=1.38.23",
     "ipdb>=0.13.9",
     "ipykernel>=6.13.0",
     "openpyxl>=3.0.10",
     "lxml>=4.9.1",
     "pyright==1.1.373",
-    "ruff==0.8.2"
+    "ruff==0.8.6"
 ]
 
 [tool.ruff]

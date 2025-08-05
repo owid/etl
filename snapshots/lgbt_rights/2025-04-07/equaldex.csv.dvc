@@ -7,12 +7,12 @@ meta:
     title_snapshot: Equaldex - Historical data
     citation_full: LGBT Rights by Country & Travel Guide | Equaldex. (2025). https://www.equaldex.com/
     url_main: https://www.equaldex.com/
-    date_accessed: '2025-04-07'
+    date_accessed: '2025-05-07'
     date_published: '2025'
     license:
       name: Equaldex Terms and Conditions of Use
       url: https://www.equaldex.com/terms
 outs:
-  - md5: 3c02d147dc37508ac03fcf225f3af278
-    size: 13111929
+  - md5: c3aae30836b98ee742a77a5572d9841b
+    size: 14830841
     path: equaldex.csv

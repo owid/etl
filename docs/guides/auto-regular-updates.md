@@ -15,6 +15,9 @@ In such cases, the processing code remains the same, but the origin data needs t
 
 If you want to keep a dataset up-to-date with the latest data, follow the steps below.
 
+!!! tip "Alternative: Automatic updates via metadata"
+    ETL also provides an automatic update system that runs daily and creates pull requests for snapshots that have the `autoupdate` metadata field in their .dvc files. See [Automatic updates via metadata](autoupdate-cli.md) for more details.
+
 ## Create the data pipeline using `latest` version
 
 Firstly, create the necessary steps to build the dataset (i.e. snapshot, meadow, garden, etc.). Use version `latest` for all of them, to avoid adding duplicate code.
@@ -55,3 +58,7 @@ Simply add a
     command:
     - "sudo su - owid -c 'bash /home/owid/etl/scripts/update-<step>.sh'"
 ```
+
+## See Also
+
+- [Automatic updates via metadata](autoupdate-cli.md) - An alternative approach using metadata in `.dvc` files to enable automatic dataset updates

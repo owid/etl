@@ -1,0 +1,18 @@
+meta:
+  origin:
+    producer: Food and Agriculture Organization of the United Nations Regional Office for Asia and the Pacific
+    title: Vietnam Forestry Outlook Study
+    citation_full: |-
+      Vietnam Forestry Outlook Study. Asia-Pacific Forestry Sector Outlook Study II (APFSOS/WP/2009/09). Food and Agriculture Organization of the United Nations Regional Office for Asia and the Pacific, 2009.
+    attribution_short: FAO
+    url_main: |-
+      https://web.archive.org/web/20230715025310/http://www.fao.org/3/am254e/am254e00.pdf
+    date_accessed: "2025-05-06"
+    date_published: "2009-09-01"
+    license:
+      name: CC BY-NC-SA 3.0 IGO
+      url: http://www.fao.org/contact-us/terms/db-terms-of-use/en
+outs:
+  - md5: 24ad1ab7bcb9bf3f8edc8525894bef28
+    size: 1257
+    path: forest_share.csv

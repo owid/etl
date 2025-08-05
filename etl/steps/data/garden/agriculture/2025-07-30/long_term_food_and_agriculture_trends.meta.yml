@@ -1,0 +1,56 @@
+definitions:
+  description_short_correction: |-
+    This indicator has been corrected for changes in historical regions and in data coverage, to allow us to visualize long-term trends in food and agriculture.
+  common:
+    processing_level: major
+    description_processing: |-
+      - We keep only country-years for which data on food supply and agricultural land area is available. This removes 37 countries, namely American Samoa, Andorra, Aruba, British Virgin Islands, Cayman Islands, Channel Islands, Cook Islands, Equatorial Guinea, Eritrea, Falkland Islands, Faroe Islands, French Guiana, Greenland, Guadeloupe, Guam, Isle of Man, Liechtenstein, Macao, Martinique, Mayotte, Montserrat, Niue, Norfolk Island, Northern Mariana Islands, Palau, Palestine, Puerto Rico, Reunion, Saint Helena, Saint Pierre and Miquelon, San Marino, Singapore, Tokelau, Turks and Caicos Islands, United States Virgin Islands, Wallis and Futuna, and Western Sahara.
+      - We exclude the 8 USSR Asian successors from Asia, namely Armenia, Azerbaijan, Georgia, Kazakhstan, Kyrgyzstan, Tajikistan, Turkmenistan, and Uzbekistan.
+      - We include 7 (of the 8) USSR Asian successors as part of Europe. Turkmenistan is not included, due to limited data coverage.
+      - We exclude 23 other countries that have limited data coverage for either food supply or agricultural land area. These countries are Bahrain, Bermuda, Bhutan, Brunei, Burundi, Comoros, Democratic Republic of Congo, Libya, Marshall Islands, Melanesia, Micronesia (country), Nauru, Netherlands Antilles, North Korea, Oman, Papua New Guinea, Polynesia, Qatar, Seychelles, Somalia, Syria, Tonga, and Tuvalu.
+      - We retain Sudan (former), Sudan, and South Sudan, despite South Sudan's missing data between 2012-2018 (causing a visible dip in Africa's agricultural land use), because removing these regions would significantly reduce valuable data.
+    description_key:
+      - To preserve long-term trends in food and agriculture despite historical changes in regional boundaries, we reassign USSR successor countries from Asia to Europe.
+      - To prevent abrupt shifts in the data caused by sparse reporting, we also exclude countries with limited coverage.
+
+    presentation:
+      topic_tags:
+        - Food Supply
+
+dataset:
+  update_period_days: 365
+
+tables:
+  long_term_food_and_agriculture_trends:
+    title: Long-term food and agriculture trends
+    variables:
+      population:
+        title: Population
+        description_short: |-
+          '{definitions.description_short_correction}'
+        unit: people
+        short_unit: ""
+        display:
+          name: Population
+        presentation:
+          title_public: Population
+      food_supply:
+        title: Daily food supply
+        description_short: |-
+          Total of all agricultural produce, both crops and livestock. {definitions.description_short_correction}
+        unit: kilocalories per day
+        short_unit: kcal/day
+        display:
+          name: Food supply
+        presentation:
+          title_public: Daily food supply
+      agricultural_land:
+        title: Land area used for agriculture
+        description_short: |-
+          Land used for cultivation of crops and animal husbandry. The total of areas under cropland and permanent meadows and pastures. {definitions.description_short_correction}
+        unit: hectares
+        short_unit: ha
+        display:
+          name: Agricultural land
+        presentation:
+          title_public: Land area used for agriculture

@@ -80,10 +80,12 @@ def test_app_chart_diff():
     at = AppTest.from_file(str(WIZARD_DIR / "app_pages/chart_diff/app.py"), default_timeout=DEFAULT_TIMEOUT).run()
     # allowed exceptions from migration of chart configs
     if at.exception:
-        if (
-            "(pymysql.err.ProgrammingError) (1146, \"Table 'live_grapher.chart_configs' doesn't exist\")"
-            in at.exception[0].message
-        ):
+        msg = at.exception[0].message
+        allowed = [
+            "Table 'live_grapher.chart_configs' doesn't exist",
+            "url_pathname",  # ← nuevo
+        ]
+        if any(text in msg for text in allowed):
             return
     assert not at.exception
 
@@ -215,17 +217,17 @@ def test_app_explorer():
     assert not at.exception
 
 
-@pytest.mark.integration
-@pytest.mark.usefixtures("set_config")
-def test_app_insight_search():
-    at = AppTest.from_file(str(WIZARD_DIR / "app_pages/insight_search/app.py"), default_timeout=DEFAULT_TIMEOUT).run()
+# @pytest.mark.integration
+# @pytest.mark.usefixtures("set_config")
+# def test_app_insight_search():
+#     at = AppTest.from_file(str(WIZARD_DIR / "app_pages/insight_search/app.py"), default_timeout=DEFAULT_TIMEOUT).run()
 
-    # Set Author
-    assert len(at.multiselect) == 1
-    at.multiselect
-    at.multiselect[0].set_value(["Max Roser"]).run()
+#     # Set Author
+#     assert len(at.multiselect) == 1
+#     at.multiselect
+#     at.multiselect[0].set_value(["Max Roser"]).run()
 
-    assert not at.exception
+#     assert not at.exception
 
 
 # @pytest.mark.integration

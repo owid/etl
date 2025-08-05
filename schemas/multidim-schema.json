@@ -5,21 +5,150 @@
     "properties": {
         "definitions": {
             "type": "object",
-            "description": "Definitions with anchors that are reused in other parts of the metadata",
+            "title": "Reusable definitions",
+            "description": "Common definitions and configurations that can be referenced across multiple views.",
+            "requirement_level": "optional",
+            "guidelines": [
+                [
+                    "Use to avoid repetition when multiple views share common configuration."
+                ],
+                [
+                    "Definitions can include chart config, metadata, or other reusable objects."
+                ],
+                [
+                    "Reference definitions using JSON Pointer syntax or custom logic."
+                ]
+            ],
             "additionalProperties": true
         },
+        "catalog_path": {
+            "type": "string",
+            "title": "Collection catalog path",
+            "description": "Unique identifier for the collection in the format 'namespace/version/dataset#name'.",
+            "requirement_level": "required",
+            "guidelines": [
+                [
+                    "Must follow the pattern 'namespace/version/dataset#name'."
+                ],
+                [
+                    "Must be unique across all collections."
+                ],
+                [
+                    "Should use descriptive names that identify the collection's purpose."
+                ]
+            ],
+            "examples": [
+                "energy/2024-01-01/energy_mix#renewable_energy",
+                "demography/2023-12-15/population#age_structure"
+            ],
+            "examples_bad": [
+                [
+                    "energy",
+                    "energy/2024-01-01",
+                    "energy/2024-01-01/energy_mix"
+                ],
+                [
+                    "demography",
+                    "population#age_structure"
+                ]
+            ]
+        },
         "grapherConfigSchema": {
-            "description": "URL of a JSON schema for the grapher config.",
-            "type": "string"
+            "type": "string",
+            "title": "Grapher config schema URL",
+            "description": "URL pointing to the JSON schema that validates the grapher configuration.",
+            "requirement_level": "optional",
+            "guidelines": [
+                [
+                    "Should point to the current version of the OWID Grapher schema."
+                ],
+                [
+                    "Used for validation of chart configuration objects."
+                ]
+            ],
+            "examples": [
+                "https://files.ourworldindata.org/schemas/grapher-schema.008.json"
+            ],
+            "examples_bad": [
+                [
+                    "http://invalid-url.com/schema.json",
+                    "grapher-schema.008.json"
+                ]
+            ]
         },
         "title": {
             "type": "object",
+            "title": "Collection title",
+            "description": "Title configuration for the collection display.",
+            "requirement_level": "required",
+            "guidelines": [
+                [
+                    "Both `title` and `title_variant` are required."
+                ],
+                [
+                    "The title should be descriptive and user-friendly."
+                ],
+                [
+                    "The title variant should provide additional context or disambiguation."
+                ]
+            ],
             "properties": {
                 "title": {
-                    "type": "string"
+                    "type": "string",
+                    "title": "Main title",
+                    "description": "Primary title displayed for the collection.",
+                    "requirement_level": "required",
+                    "guidelines": [
+                        [
+                            "Must start with a capital letter."
+                        ],
+                        [
+                            "Must not end with a period."
+                        ],
+                        [
+                            "Should be concise but descriptive."
+                        ],
+                        [
+                            "Should clearly indicate the collection's purpose."
+                        ]
+                    ],
+                    "examples": [
+                        "Energy Mix",
+                        "Global Population Demographics",
+                        "Climate Change Indicators"
+                    ],
+                    "examples_bad": [
+                        [
+                            "energy mix",
+                            "Energy Mix.",
+                            "Energy"
+                        ],
+                        [
+                            "global population demographics",
+                            "Demographics"
+                        ],
+                        [
+                            "climate change indicators",
+                            "Climate"
+                        ]
+                    ]
                 },
                 "title_variant": {
-                    "type": "string"
+                    "type": "string",
+                    "title": "Title variant",
+                    "description": "Additional context or variant information for the title.",
+                    "requirement_level": "required",
+                    "guidelines": [
+                        [
+                            "Must not end with a period."
+                        ],
+                        [
+                            "Should provide disambiguation or additional context."
+                        ],
+                        [
+                            "Should be shorter than the main title."
+                        ]
+                    ]
                 }
             },
             "required": [
@@ -30,49 +159,344 @@
         },
         "default_selection": {
             "type": "array",
+            "title": "Default entity selection",
+            "description": "List of entity names (e.g., countries) selected by default when the collection loads.",
+            "requirement_level": "required",
+            "guidelines": [
+                [
+                    "Must contain at least one entity."
+                ],
+                [
+                    "Entity names must be harmonized country names from the OWID catalog."
+                ],
+                [
+                    "Should include 3-8 entities for optimal visualization."
+                ],
+                [
+                    "Should represent a diverse and meaningful set of entities."
+                ]
+            ],
+            "examples": [
+                "[\"United States\", \"China\", \"Germany\", \"India\"]",
+                "[\"World\"]",
+                "[\"Europe\", \"North America\", \"Asia\"]"
+            ],
+            "examples_bad": [
+                [
+                    "[]",
+                    "[\"USA\", \"PRC\"]"
+                ],
+                [
+                    "[\"Earth\"]",
+                    "[\"Global\"]"
+                ],
+                [
+                    "[\"EU\", \"NA\", \"AS\"]",
+                    "[\"Too many entities...\"]"
+                ]
+            ],
             "items": {
                 "type": "string"
             }
         },
+        "default_dimensions": {
+            "type": "object",
+            "title": "Default dimension selections",
+            "description": "Mapping of dimension slugs to their default choice slugs for the initial view.",
+            "requirement_level": "optional",
+            "guidelines": [
+                [
+                    "Keys must match dimension slugs defined in the `dimensions` array."
+                ],
+                [
+                    "Values must match choice slugs within the corresponding dimension."
+                ],
+                [
+                    "Should only specify dimensions that need non-first-choice defaults."
+                ],
+                [
+                    "All specified dimensions must exist in the dimensions array."
+                ]
+            ],
+            "examples": [
+                "{\"metric\": \"renewable_share\", \"unit\": \"percentage\"}",
+                "{\"age_group\": \"adults\", \"gender\": \"total\"}"
+            ],
+            "examples_bad": [
+                [
+                    "{\"nonexistent_dimension\": \"value\"}",
+                    "{\"metric\": \"nonexistent_choice\"}"
+                ],
+                [
+                    "{\"invalid_dimension\": \"adults\"}",
+                    "{\"age_group\": \"invalid_choice\"}"
+                ]
+            ],
+            "patternProperties": {
+                ".*": {
+                    "type": "string"
+                }
+            }
+        },
+        "dependencies": {
+            "type": "array",
+            "title": "Collection dependencies",
+            "description": "List of dataset URIs that this collection depends on for its indicators.",
+            "requirement_level": "optional",
+            "guidelines": [
+                [
+                    "Used internally to validate that all indicators come from specified datasets."
+                ],
+                [
+                    "Should contain dataset paths in the format 'namespace/version/dataset'."
+                ],
+                [
+                    "Can optionally include protocol prefixes like 'data://garden/namespace/version/dataset'."
+                ],
+                [
+                    "Dependencies are automatically resolved during collection creation if not explicitly provided."
+                ]
+            ],
+            "items": {
+                "type": "string"
+            },
+            "uniqueItems": true,
+            "examples": [
+                "[\"energy/2024-01-01/energy_mix\", \"demography/2023-12-15/population\"]",
+                "[\"data://garden/energy/2024-01-01/energy_mix\"]"
+            ],
+            "examples_bad": [
+                [
+                    "[\"energy/renewable_share\"]",
+                    "[\"incomplete/path\"]"
+                ],
+                [
+                    "[\"data://invalid/format\"]",
+                    "[\"namespace/version\"]"
+                ]
+            ]
+        },
         "topic_tags": {
             "type": "array",
+            "title": "Topic tags",
+            "description": "List of topic categories that this collection relates to.",
+            "requirement_level": "optional",
+            "guidelines": [
+                [
+                    "Must use existing OWID topic tags."
+                ],
+                [
+                    "Should include 1-3 relevant topic tags."
+                ],
+                [
+                    "The first tag should be the most relevant topic."
+                ]
+            ],
+            "examples": [
+                "[\"Energy\"]",
+                "[\"Climate Change\", \"Energy\"]",
+                "[\"Population Growth\", \"Demography\"]"
+            ],
+            "examples_bad": [
+                [
+                    "[\"energy\"]",
+                    "[\"Invalid Topic\"]"
+                ],
+                [
+                    "[\"climate change\", \"energy\"]",
+                    "[\"Too\", \"Many\", \"Tags\"]"
+                ],
+                [
+                    "[\"population growth\", \"demography\"]",
+                    "[\"Nonexistent Topic\"]"
+                ]
+            ],
             "items": {
                 "type": "string"
             }
         },
         "dimensions": {
             "type": "array",
+            "title": "Collection dimensions",
+            "description": "Array of dimension objects that define the filter dropdowns available to users.",
+            "requirement_level": "required",
+            "guidelines": [
+                [
+                    "Must contain at least one dimension."
+                ],
+                [
+                    "Each dimension creates a dropdown filter in the user interface."
+                ],
+                [
+                    "Dimension slugs must be unique within the collection."
+                ],
+                [
+                    "Should be ordered by importance or logical flow."
+                ]
+            ],
             "items": {
                 "type": "object",
+                "title": "Dimension definition",
+                "description": "A single dimension that creates a filter dropdown.",
                 "properties": {
                     "slug": {
-                        "type": "string"
+                        "$ref": "definitions.json#/slug_relaxed",
+                        "title": "Dimension slug",
+                        "description": "Unique identifier for the dimension within the collection.",
+                        "requirement_level": "required",
+                        "guidelines": [
+                            [
+                                "Must be unique within the collection."
+                            ],
+                            [
+                                "Should use snake_case format."
+                            ],
+                            [
+                                "Should be descriptive and concise."
+                            ]
+                        ],
+                        "examples": [
+                            "metric",
+                            "age_group",
+                            "gender",
+                            "income_level"
+                        ],
+                        "examples_bad": [
+                            "Metric",
+                            "AgeGroup",
+                            "GENDER",
+                            "IncomeLevel"
+                        ]
                     },
                     "name": {
-                        "type": "string"
+                        "type": "string",
+                        "title": "Dimension display name",
+                        "description": "Human-readable name shown in the dropdown label.",
+                        "requirement_level": "required",
+                        "guidelines": [
+                            [
+                                "Must start with a capital letter."
+                            ],
+                            [
+                                "Should be concise and descriptive."
+                            ],
+                            [
+                                "Should clearly indicate what the dimension filters."
+                            ]
+                        ],
+                        "examples": [
+                            "Metric",
+                            "Age group",
+                            "Gender",
+                            "Income level"
+                        ],
+                        "examples_bad": [
+                            "metric",
+                            "age group",
+                            "gender",
+                            "income level"
+                        ],
+                        "examples_bad": [
+                            "Metric",
+                            "AgeGroup",
+                            "GENDER",
+                            "IncomeLevel"
+                        ]
                     },
                     "description": {
-                        "type": "string"
+                        "type": "string",
+                        "title": "Dimension description",
+                        "description": "Optional description explaining the dimension's purpose.",
+                        "requirement_level": "optional",
+                        "guidelines": [
+                            [
+                                "Must start with a capital letter."
+                            ],
+                            [
+                                "Must end with a period."
+                            ],
+                            [
+                                "Should provide helpful context for users."
+                            ]
+                        ]
                     },
                     "choices": {
                         "type": "array",
+                        "title": "Dimension choices",
+                        "description": "Array of available choices for this dimension.",
+                        "requirement_level": "required",
+                        "guidelines": [
+                            [
+                                "Must contain at least one choice."
+                            ],
+                            [
+                                "Choice slugs must be unique within the dimension."
+                            ],
+                            [
+                                "Should be ordered logically (e.g., alphabetically, by importance)."
+                            ]
+                        ],
                         "items": {
                             "type": "object",
+                            "title": "Dimension choice",
+                            "description": "A single choice option within a dimension.",
                             "properties": {
                                 "slug": {
-                                    "type": "string"
+                                    "$ref": "definitions.json#/slug_relaxed",
+                                    "title": "Choice slug",
+                                    "description": "Unique identifier for the choice within the dimension.",
+                                    "requirement_level": "required",
+                                    "guidelines": [
+                                        [
+                                            "Must be unique within the dimension."
+                                        ],
+                                        [
+                                            "Should use snake_case format."
+                                        ],
+                                        [
+                                            "Should be descriptive and concise."
+                                        ]
+                                    ]
                                 },
                                 "name": {
-                                    "type": "string"
+                                    "type": "string",
+                                    "title": "Choice display name",
+                                    "description": "Human-readable name shown in the dropdown option.",
+                                    "requirement_level": "required",
+                                    "guidelines": [
+                                        [
+                                            "Must start with a capital letter."
+                                        ],
+                                        [
+                                            "Should be clear and concise."
+                                        ],
+                                        [
+                                            "Should differentiate from other choices."
+                                        ]
+                                    ]
                                 },
                                 "group": {
-                                    "type": "string"
+                                    "type": "string",
+                                    "title": "Choice group",
+                                    "description": "Optional grouping label for organizing choices in the dropdown.",
+                                    "requirement_level": "optional",
+                                    "guidelines": [
+                                        [
+                                            "Should be used when choices naturally group together."
+                                        ],
+                                        [
+                                            "Multiple choices can share the same group."
+                                        ]
+                                    ]
                                 },
                                 "description": {
                                     "type": [
                                         "string",
                                         "null"
-                                    ]
+                                    ],
+                                    "title": "Choice description",
+                                    "description": "Optional description providing additional context for the choice.",
+                                    "requirement_level": "optional"
                                 }
                             },
                             "required": [
@@ -84,18 +508,57 @@
                 },
                 "required": [
                     "slug",
-                    "name"
+                    "name",
+                    "choices"
                 ]
             }
         },
         "views": {
             "type": "array",
+            "title": "Collection views",
+            "description": "Array of view configurations that define specific chart instances.",
+            "requirement_level": "required",
+            "guidelines": [
+                [
+                    "Must contain at least one view."
+                ],
+                [
+                    "Each view represents a specific combination of dimension choices and chart configuration."
+                ],
+                [
+                    "Views are generated automatically based on dimension combinations, but can be customized."
+                ]
+            ],
             "items": {
                 "type": "object",
+                "title": "View configuration",
+                "description": "Configuration for a specific view within the collection.",
                 "additionalProperties": false,
                 "properties": {
                     "dimensions": {
                         "type": "object",
+                        "title": "View dimension selection",
+                        "description": "Mapping of dimension slugs to choice slugs that define this specific view.",
+                        "requirement_level": "required",
+                        "guidelines": [
+                            [
+                                "Keys must match dimension slugs defined in the collection."
+                            ],
+                            [
+                                "Values must match choice slugs within the corresponding dimension."
+                            ],
+                            [
+                                "Must specify a choice for each dimension in the collection."
+                            ]
+                        ],
+                        "examples": [
+                            "{\"metric\": \"renewable_share\", \"unit\": \"percentage\"}",
+                            "{\"age_group\": \"adults\", \"gender\": \"female\"}"
+                        ],
+                        "examples_bad": [
+                            "{\"nonexistent\": \"value\"}",
+                            "{\"invalid_dimension\": \"adults\"}"
+                        ],
                         "patternProperties": {
                             ".*": {
                                 "type": "string"
@@ -104,8 +567,41 @@
                     },
                     "indicators": {
                         "type": "object",
+                        "title": "View indicators",
+                        "description": "Specification of which data indicators to display in this view.",
+                        "requirement_level": "required",
+                        "guidelines": [
+                            [
+                                "The `y` indicator is required for all views."
+                            ],
+                            [
+                                "Other indicators (x, size, color) are optional and depend on chart type."
+                            ],
+                            [
+                                "Indicator values can be either catalog paths (strings) or indicator config objects."
+                            ]
+                        ],
                         "properties": {
                             "y": {
+                                "title": "Y-axis indicator(s)",
+                                "description": "Primary indicator(s) for the Y-axis. Can be a single indicator or array of indicators.",
+                                "requirement_level": "required",
+                                "guidelines": [
+                                    [
+                                        "Must be specified for all views."
+                                    ],
+                                    [
+                                        "Can be a string (catalog path), array of strings/configs, or single config object."
+                                    ]
+                                ],
+                                "examples": [
+                                    "\"energy/2024-01-01/energy_mix#renewable_share\"",
+                                    "[\"dataset/table#var1\", \"dataset/table#var2\"]"
+                                ],
+                                "examples_bad": [
+                                    "\"energy/renewable_share\"",
+                                    "[\"dataset#var1\", \"table#var2\"]"
+                                ],
                                 "oneOf": [
                                     {
                                         "type": "string"
@@ -129,6 +625,17 @@
                                 ]
                             },
                             "x": {
+                                "title": "X-axis indicator",
+                                "description": "Optional indicator for the X-axis (used in scatter plots).",
+                                "requirement_level": "optional",
+                                "guidelines": [
+                                    [
+                                        "Only needed for scatter plot chart types."
+                                    ],
+                                    [
+                                        "Can be a string (catalog path) or indicator config object."
+                                    ]
+                                ],
                                 "oneOf": [
                                     {
                                         "type": "string"
@@ -139,6 +646,17 @@
                                 ]
                             },
                             "size": {
+                                "title": "Size indicator",
+                                "description": "Optional indicator for bubble size (used in scatter plots).",
+                                "requirement_level": "optional",
+                                "guidelines": [
+                                    [
+                                        "Only used with scatter plot chart types."
+                                    ],
+                                    [
+                                        "Can be a string (catalog path) or indicator config object."
+                                    ]
+                                ],
                                 "oneOf": [
                                     {
                                         "type": "string"
@@ -149,6 +667,17 @@
                                 ]
                             },
                             "color": {
+                                "title": "Color indicator",
+                                "description": "Optional indicator for color mapping.",
+                                "requirement_level": "optional",
+                                "guidelines": [
+                                    [
+                                        "Used to color-code data points or lines based on indicator values."
+                                    ],
+                                    [
+                                        "Can be a string (catalog path) or indicator config object."
+                                    ]
+                                ],
                                 "oneOf": [
                                     {
                                         "type": "string"
@@ -165,185 +694,224 @@
                     },
                     "config": {
                         "type": "object",
-                        "description": "A subset of the grapher config.",
+                        "title": "View chart configuration",
+                        "description": "Chart configuration options that override default settings for this view.",
+                        "requirement_level": "optional",
+                        "guidelines": [
+                            [
+                                "Only specify config options that differ from defaults."
+                            ],
+                            [
+                                "Uses a subset of the OWID Grapher configuration schema."
+                            ],
+                            [
+                                "Common options include title, subtitle, chart types, and axis settings."
+                            ]
+                        ],
                         "properties": {
                             "$schema": {
-                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.007.json#/properties/$schema"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/$schema"
                             },
                             "addCountryMode": {
-                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.007.json#/properties/addCountryMode"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/addCountryMode"
                             },
                             "compareEndPointsOnly": {
-                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.007.json#/properties/compareEndPointsOnly"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/compareEndPointsOnly"
                             },
                             "selectedEntityColors": {
-                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.007.json#/properties/selectedEntityColors"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/selectedEntityColors"
                             },
                             "relatedQuestions": {
-                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.007.json#/properties/relatedQuestions"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/relatedQuestions"
                             },
                             "title": {
-                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.007.json#/properties/title"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/title"
                             },
                             "map": {
-                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.007.json#/properties/map"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/map"
                             },
                             "maxTime": {
-                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.007.json#/properties/maxTime"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/maxTime"
                             },
                             "subtitle": {
-                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.007.json#/properties/subtitle"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/subtitle"
                             },
                             "selectedEntityNames": {
-                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.007.json#/properties/selectedEntityNames"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/selectedEntityNames"
                             },
                             "focusedSeriesNames": {
-                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.007.json#/properties/focusedSeriesNames"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/focusedSeriesNames"
                             },
                             "baseColorScheme": {
-                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.007.json#/properties/baseColorScheme"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/baseColorScheme"
                             },
                             "yAxis": {
-                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.007.json#/properties/yAxis"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/yAxis"
                             },
                             "tab": {
-                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.007.json#/properties/tab"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/tab"
                             },
                             "matchingEntitiesOnly": {
-                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.007.json#/properties/matchingEntitiesOnly"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/matchingEntitiesOnly"
                             },
                             "hideLegend": {
-                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.007.json#/properties/hideLegend"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/hideLegend"
                             },
                             "hideLogo": {
-                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.007.json#/properties/hideLogo"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/hideLogo"
                             },
                             "timelineMinTime": {
-                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.007.json#/properties/timelineMinTime"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/timelineMinTime"
                             },
                             "variantName": {
-                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.007.json#/properties/variantName"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/variantName"
                             },
                             "hideTimeline": {
-                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.007.json#/properties/hideTimeline"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/hideTimeline"
                             },
                             "originUrl": {
-                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.007.json#/properties/originUrl"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/originUrl"
                             },
                             "colorScale": {
-                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.007.json#/properties/colorScale"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/colorScale"
                             },
                             "scatterPointLabelStrategy": {
-                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.007.json#/properties/scatterPointLabelStrategy"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/scatterPointLabelStrategy"
                             },
                             "selectedFacetStrategy": {
-                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.007.json#/properties/selectedFacetStrategy"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/selectedFacetStrategy"
                             },
                             "sourceDesc": {
-                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.007.json#/properties/sourceDesc"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/sourceDesc"
                             },
                             "invertColorScheme": {
-                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.007.json#/properties/invertColorScheme"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/invertColorScheme"
                             },
                             "hideRelativeToggle": {
-                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.007.json#/properties/hideRelativeToggle"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/hideRelativeToggle"
                             },
                             "comparisonLines": {
-                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.007.json#/properties/comparisonLines"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/comparisonLines"
                             },
                             "internalNotes": {
-                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.007.json#/properties/internalNotes"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/internalNotes"
                             },
                             "version": {
-                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.007.json#/properties/version"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/version"
                             },
                             "logo": {
-                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.007.json#/properties/logo"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/logo"
                             },
                             "entityType": {
-                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.007.json#/properties/entityType"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/entityType"
                             },
                             "facettingLabelByYVariables": {
-                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.007.json#/properties/facettingLabelByYVariables"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/facettingLabelByYVariables"
                             },
                             "note": {
-                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.007.json#/properties/note"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/note"
                             },
                             "chartTypes": {
-                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.007.json#/properties/chartTypes"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/chartTypes"
                             },
                             "hasMapTab": {
-                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.007.json#/properties/hasMapTab"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/hasMapTab"
                             },
                             "stackMode": {
-                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.007.json#/properties/stackMode"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/stackMode"
                             },
                             "minTime": {
-                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.007.json#/properties/minTime"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/minTime"
                             },
                             "hideAnnotationFieldsInTitle": {
-                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.007.json#/properties/hideAnnotationFieldsInTitle"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/hideAnnotationFieldsInTitle"
                             },
                             "excludedEntityNames": {
-                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.007.json#/properties/excludedEntityNames"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/excludedEntityNames"
                             },
                             "xAxis": {
-                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.007.json#/properties/xAxis"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/xAxis"
                             },
                             "timelineMaxTime": {
-                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.007.json#/properties/timelineMaxTime"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/timelineMaxTime"
                             },
                             "hideConnectedScatterLines": {
-                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.007.json#/properties/hideConnectedScatterLines"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/hideConnectedScatterLines"
                             },
                             "showNoDataArea": {
-                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.007.json#/properties/showNoDataArea"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/showNoDataArea"
                             },
                             "zoomToSelection": {
-                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.007.json#/properties/zoomToSelection"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/zoomToSelection"
                             },
                             "showYearLabels": {
-                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.007.json#/properties/showYearLabels"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/showYearLabels"
                             },
                             "hideTotalValueLabel": {
-                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.007.json#/properties/hideTotalValueLabel"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/hideTotalValueLabel"
                             },
                             "hideScatterLabels": {
-                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.007.json#/properties/hideScatterLabels"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/hideScatterLabels"
                             },
                             "sortBy": {
-                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.007.json#/properties/sortBy"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/sortBy"
                             },
                             "sortOrder": {
-                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.007.json#/properties/sortOrder"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/sortOrder"
                             },
                             "sortColumnSlug": {
-                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.007.json#/properties/sortColumnSlug"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/sortColumnSlug"
                             },
                             "hideFacetControl": {
-                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.007.json#/properties/hideFacetControl"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/hideFacetControl"
                             },
                             "includedEntityNames": {
-                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.007.json#/properties/includedEntityNames"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/includedEntityNames"
                             },
                             "entityTypePlural": {
-                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.007.json#/properties/entityTypePlural"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/entityTypePlural"
                             },
                             "missingDataStrategy": {
-                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.007.json#/properties/missingDataStrategy"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/missingDataStrategy"
                             }
                         },
                         "additionalProperties": false
                     },
                     "metadata": {
-                        "description": "Overrides metadata for the view. Takes precedence over the metadata override for all views.",
+                        "title": "View metadata overrides",
+                        "description": "Metadata overrides specific to this view, taking precedence over collection-level metadata.",
+                        "requirement_level": "optional",
+                        "guidelines": [
+                            [
+                                "Only specify metadata that differs from the collection defaults."
+                            ],
+                            [
+                                "Takes precedence over collection-level metadata overrides."
+                            ],
+                            [
+                                "Uses the same structure as variable metadata in datasets."
+                            ]
+                        ],
                         "$ref": "#/$defs/metadata"
                     }
                 }
             }
         },
         "metadata": {
-            "description": "Override metadata for all views.",
+            "title": "Collection metadata overrides",
+            "description": "Default metadata overrides applied to all views in the collection.",
+            "requirement_level": "optional",
+            "guidelines": [
+                [
+                    "Provides default metadata for all views in the collection."
+                ],
+                [
+                    "Individual view metadata can override these settings."
+                ],
+                [
+                    "Uses the same structure as variable metadata in datasets."
+                ]
+            ],
             "$ref": "#/$defs/metadata"
         }
     },
@@ -356,13 +924,52 @@
     "$defs": {
         "indicatorConfig": {
             "type": "object",
+            "title": "Indicator configuration",
+            "description": "Extended indicator specification with catalog path and display overrides.",
+            "guidelines": [
+                [
+                    "Use when you need to override display settings for an indicator."
+                ],
+                [
+                    "The catalogPath must reference a valid indicator in the OWID catalog."
+                ]
+            ],
             "properties": {
                 "catalogPath": {
-                    "type": "string"
+                    "type": "string",
+                    "title": "Catalog path",
+                    "description": "Full path to the indicator in the OWID catalog.",
+                    "requirement_level": "required",
+                    "guidelines": [
+                        [
+                            "Must follow the format 'dataset/table#variable'."
+                        ],
+                        [
+                            "Must reference an existing indicator in the catalog."
+                        ]
+                    ],
+                    "examples": [
+                        "energy/2024-01-01/energy_mix#renewable_share",
+                        "demography/2023-12-15/population#total_population"
+                    ],
+                    "examples_bad": [
+                        "energy/renewable_share",
+                        "demography/population"
+                    ]
                 },
                 "display": {
-                    "description": "Overrides the display settings for the indicator.",
-                    "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.007.json#/properties/dimensions/items/properties/display"
+                    "title": "Display configuration",
+                    "description": "Display settings that override the indicator's default configuration.",
+                    "requirement_level": "optional",
+                    "guidelines": [
+                        [
+                            "Only specify display options that need to be overridden."
+                        ],
+                        [
+                            "Common overrides include name, unit, and color settings."
+                        ]
+                    ],
+                    "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/dimensions/items/properties/display"
                 }
             },
             "required": [

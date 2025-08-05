@@ -79,6 +79,7 @@ def call_etl_diff(include: str) -> list[str]:
         "diff",
         "REMOTE",
         "data/",
+        "--changed",
         "--include",
         include,
         "--exclude",
@@ -98,6 +99,14 @@ def call_etl_diff(include: str) -> list[str]:
 
     stdout = stdout.decode()
     stderr = stderr.decode()
+
+    # Remove all warnings from stderr
+    stderr = re.sub(r"^.*WARNING.*", "", stderr, flags=re.MULTILINE).strip()
+
+    # Remove certain warnings from stdout
+    stdout = re.sub(
+        r"^.*You're on master branch, using local env instead of STAGING=master*", "", stdout, flags=re.MULTILINE
+    )
 
     if stderr:
         raise Exception(f"Error: {stderr}")

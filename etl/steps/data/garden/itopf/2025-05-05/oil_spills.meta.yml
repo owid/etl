@@ -1,0 +1,221 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Oil Spills
+    processing_level: minor
+    display:
+      numDecimalPlaces: 0
+  footnote_decadal: |-
+   Decadal figures are measured as the annual average over the subsequent ten-year period. For example, the figures for the 1990s is the average from 1990 (inclusive) to 1999.
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+tables:
+  oil_spills:
+    variables:
+      bel_700t:
+        title: Medium oil spills (7–700 tonnes)
+        unit: spills
+        description_short: Spills of 7–700 tonnes of oil.
+        description_key:
+          - Medium oil spills are defined as those involving between 7 and 700 tonnes of oil.
+          - These spills are significant but generally less severe than large spills.
+          - They often result from operational errors or equipment failures.
+
+      ab_700t:
+        title: Large oil spills (>700 tonnes)
+        unit: spills
+        description_short: Spills of more than 700 tonnes of oil.
+        description_key:
+          - Large oil spills involve the release of more than 700 tonnes of oil.
+          - Such spills are typically associated with major incidents like collisions or groundings.
+          - They can have extensive environmental and economic impacts.
+
+      oil_spilled:
+        title: Quantity of oil spilled
+        unit: tonnes
+        short_unit: t
+        description_short: Total quantity of oil spilled.
+        description_key:
+          - Total volume of oil lost to the environment from tanker spills.
+          - Includes oil that was burned, remained in sunken vessels, or otherwise unrecovered.
+          - Annual figures can vary significantly due to the occurrence of large spills.
+
+      allision_collision_causes:
+        title: Collision
+        unit: spills
+        description_key:
+          - Collisions involve two moving vessels striking each other.
+          - Allisions occur when a moving vessel strikes a stationary object.
+
+      equipment_failure_causes:
+        title: Equipment failure
+        unit: spills
+        description_short: Equipment failure includes incidents such as ruptured hoses, broken valves, and faulty pumps.
+        description_key:
+          - Equipment failures can lead to oil spills during loading, unloading, or transit.
+          - Common issues include ruptured hoses, malfunctioning valves, and pump failures.
+
+      fire_explosion_causes:
+        title: Fire/explosion
+        unit: spills
+        description_key:
+          - Fires or explosions on tankers can result in substantial oil spills.
+          - These events may be triggered by equipment malfunctions or external factors.
+
+      grounding_causes:
+        title: Grounding
+        unit: spills
+        description_key:
+          - Grounding occurs when a vessel runs aground, often due to navigational errors.
+
+      hull_failure_causes:
+        title: Hull failure
+        unit: spills
+        description_key:
+          - Hull failures involve structural breaches in the vessel's body.
+          - Causes include corrosion, poor maintenance, or collision impacts.
+
+      other_causes:
+        title: Other causes
+        unit: spills
+        description_short: Events such as heavy weather damage and human error have been categorised as 'Other'.
+        presentation:
+          title_public: Other
+        display:
+          name: Other
+        description_key:
+          - This category includes causes like severe weather, human error, and unknown factors.
+          - Such incidents may not fit into standard classifications but still result in oil spills.
+
+      unknown_causes:
+        title: Unknown causes
+        unit: spills
+        description_short: Spills where the relevant information is not available have been designated as 'Unknown'.
+        presentation:
+          title_public: Unknown
+        display:
+          name: Unknown
+        description_key:
+          - In some cases, the exact cause of an oil spill cannot be determined.
+          - Lack of data or conflicting reports may lead to classification as 'Unknown'.
+
+      loading_discharing_ops:
+        title: Loading/discharging
+        unit: spills
+        description_key:
+          - Spills during loading or discharging operations are often due to equipment failure or human error.
+          - These operations are critical points where oil transfer occurs.
+
+      bunkering_ops:
+        title: Refueling
+        unit: spills
+        description_key:
+          - Refueling operations, or bunkering, can lead to spills if not properly managed.
+          - Common issues include overfilling, hose disconnections, or valve failures.
+
+      other_operations_ops:
+        title: Other operations
+        unit: spills
+        description_short: Other includes operations such as ballasting, de-ballasting, tank cleaning, and when the vessel is underway.
+        presentation:
+          title_public: Other
+        display:
+          name: Other
+        description_key:
+          - This category encompasses various operations like ballasting, tank cleaning, and transit.
+          - Spills can occur during these activities due to procedural lapses or equipment issues.
+
+      unknown_ops:
+        title: Unknown operations
+        unit: spills
+        presentation:
+          title_public: Unknown
+        display:
+          name: Unknown
+        description_key:
+          - In certain incidents, the specific operation during which the spill occurred is not identified.
+          - Lack of detailed records or reporting can lead to this classification.
+
+      at_anchor_inland_ops:
+        title: At anchor (inland)
+        unit: spills
+        description_key:
+          - Spills occurring while the vessel is anchored in inland waters.
+          - Potential causes include equipment failure or unauthorized discharges.
+
+      at_anchor_open_water_ops:
+        title: At anchor (open water)
+        unit: spills
+        description_key:
+          - Spills occurring while the vessel is anchored in open waters.
+          - Challenges include limited access for emergency response.
+
+      underway_inland_ops:
+        title: Underway (inland)
+        unit: spills
+        description_key:
+          - Spills occurring while the vessel is navigating inland waterways.
+          - Navigational challenges and proximity to populated areas increase risks.
+
+      underway_open_water_ops:
+        title: Underway (open water)
+        unit: spills
+        description_key:
+          - Spills occurring while the vessel is in transit on open seas.
+          - Factors include rough weather, equipment failure, or collisions.
+
+      total_ops:
+        title: Total operations
+        unit: spills
+        description_key:
+          - Represents the total number of operational activities recorded.
+          - Includes all categories of operations during which spills occurred.
+
+      decadal_bel_700t:
+        title: Decadal average number of medium oil spills (7–700 tonnes)
+        unit: spills
+        description_key:
+          - Medium oil spills are defined as those involving between 7 and 700 tonnes of oil.
+          - These spills are significant but generally less severe than large spills.
+          - They often result from operational errors or equipment failures.
+        description_processing: |-
+          The decadal average number of medium oil spills is calculated as the average over the subsequent ten-year period. For example, the figures for the 1990s is the average from 1990 (inclusive) to 1999.
+        presentation:
+          grapher_config:
+            note: |-
+              {definitions.footnote_decadal}
+
+      decadal_ab_700t:
+        title: Decadal average number of large oil spills (>700 tonnes)
+        unit: spills
+        description_key:
+          - Large oil spills involve the release of more than 700 tonnes of oil.
+          - Such spills are typically associated with major incidents like collisions or groundings.
+        description_processing: |-
+          The decadal average number of large oil spills is calculated as the average over the subsequent ten-year period. For example, the figures for the 1990s is the average from 1990 (inclusive) to 1999.
+        presentation:
+          grapher_config:
+            note: |-
+              {definitions.footnote_decadal}
+
+      decadal_oil_spilled:
+        title: Decadal average quantity of oil spilled
+        unit: tonnes
+        short_unit: t
+        description_short: Decadal average quantity of oil spilled.
+        description_key:
+          - Decadal average quantity of oil lost to the environment from tanker spills.
+          - Includes oil that was burned, remained in sunken vessels, or otherwise unrecovered.
+        description_processing: |-
+          The decadal average quantity of oil spilled is calculated as the average over the subsequent ten-year period. For example, the figures for the 1990s is the average from 1990 (inclusive) to 1999.
+        presentation:
+          grapher_config:
+            note: |-
+              {definitions.footnote_decadal}

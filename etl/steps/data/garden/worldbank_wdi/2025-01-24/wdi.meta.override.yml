@@ -1,3 +1,4 @@
+# WARNING: Use this file to manually curate WDI indicators. Do NOT use the wdi.meta.yml file (which is generated automatically).
 definitions:
   gdp: Gross domestic product (GDP) is a measure of the total value added from the production of goods and services in a country or region each year.
   gdp_per_capita: GDP per capita is GDP divided by population.
@@ -20,7 +21,23 @@ definitions:
 
     We have also obtained [Our World in Data regional aggregations](https://ourworldindata.org/world-region-map-definitions) of these indicators by calculating a population-weighted average by region. You can see more information about the population data in [this dedicated article about sources](https://ourworldindata.org/population-sources).
 
+  desc_key_ger: &desc_key_ger
+    - Not all students enrol in school at the same age. The gross enrolment ratio includes students enrolled in a certain level of education, regardless of whether they are within the expected age range for that level. It includes students who are younger or older than expected due to late entry, early entry, or grade repetition.
+    - It captures the total number of students enrolled at a specific education level, expressed as a percentage of the population in the official age group for that level. For example, if the official age group for upper secondary school is 15 to 17-year olds, the gross enrolment ratio compares total enrolment at that level (of any age) to the population of 15- to 17-year-olds.
+    - Values can be greater than 100% if students repeat grades or start a particular level of schooling late. In the example above, some 18- or 19 year olds might be included in the total if they started upper secondary school late.
+    - Similarly, a value of 100% does not necessarily mean all children within a particular age group are enrolled in school; some children could be out-of-school, but gross enrolment rates are boosted by older students being included.
+    - The data comes from administrative records, such as school enrolment reports, and from population estimates, usually provided by the United Nations or national sources.
 
+  description_short_clean_fuels: &description_short_clean_fuels |-
+    Access to [clean fuels or technologies](#dod:clean-cooking-fuels) such as natural gas, electricity, and clean cookstoves reduces exposure to indoor air pollutants, a leading cause of death in low-income households.
+  description_from_producer_clean_fuels: &description_from_producer_clean_fuels |-
+    Access to clean fuels and technologies for cooking is the proportion of total population primarily using clean cooking fuels and technologies for cooking. Under WHO guidelines, kerosene is excluded from clean cooking fuels.
+
+    Statistical concept and methodology: Data for access to clean fuels and technologies for cooking are based on the World Health Organization's (WHO) Global Household Energy Database. They are collected among different sources: only data from nationally representative household surveys (including national censuses) were used. Survey sources include Demographic and Health Surveys (DHS) and Living Standards Measurement Surveys (LSMS), Multi-Indicator Cluster Surveys (MICS), the World Health Survey (WHS), other nationally developed and implemented surveys, and various government agencies (for example, ministries of energy and utilities).
+
+    Trends in the proportion of the population using each fuel type are estimated using a single multivariate hierarchical model, with urban and rural disaggregation. Estimates for overall "polluting" fuels (unprocessed biomass, charcoal, coal, and kerosene) and "clean" fuels (gaseous fuels, electricity, as well as an aggregation of any other clean fuels like alcohol) are produced by aggregating estimates of relevant fuel types. The model was used to derive clean fuel use estimates for 191 countries (ref. Stoner, O., Shaddick, G., Economou, T., Gumy, S., Lewis, J., Lucio, I., Ruggeri, G. and Adair-Rohani, H. (2020), Global household energy model: a multivariate hierarchical approach to estimating trends in the use of polluting and clean fuels for cooking. J. R. Stat. Soc. C, 69: 815-839). Countries classified by the World Bank as high income (57 countries) in the 2022 fiscal year are assumed to have universal access to clean fuels and technologies for cooking.
+  description_short_electricity: &description_short_electricity |-
+    Access to electricity means having an electricity source that can provide very basic lighting, and charge a phone or power a radio for 4 hours per day.
 tables:
   wdi:
     variables:
@@ -72,6 +89,7 @@ tables:
                 baseColorScheme: GnBu
                 binningStrategy: manual
                 customNumericValues:
+                  - 0
                   - 1000
                   - 2000
                   - 5000
@@ -79,7 +97,6 @@ tables:
                   - 20000
                   - 50000
                   - 1
-                customNumericMinValue: 0
             selectedEntityNames:
               - United States
               - Germany
@@ -134,6 +151,7 @@ tables:
                 baseColorScheme: PuBu
                 binningStrategy: manual
                 customNumericValues:
+                  - 0
                   - 10000000000
                   - 30000000000
                   - 100000000000
@@ -189,6 +207,7 @@ tables:
                 binningStrategy: manual
                 baseColorScheme: BuGn
                 customNumericValues:
+                  - 0
                   - 1000
                   - 2000
                   - 5000
@@ -270,6 +289,7 @@ tables:
               binningStrategy: manual
               baseColorScheme: GnBu
               customNumericValues:
+                - 0
                 - 1000
                 - 2000
                 - 5000
@@ -329,8 +349,8 @@ tables:
             colorScale:
               binningStrategy: manual
               baseColorScheme: PuBu
-              customNumericMinValue: 0
               customNumericValues:
+                - 0
                 - 10000000000
                 - 30000000000
                 - 100000000000
@@ -503,8 +523,8 @@ tables:
                 baseColorScheme: Blues
                 colorSchemeInvert: false
                 binningStrategy: manual
-                customNumericMinValue: 0
                 customNumericValues:
+                  - 0
                   - 10
                   - 20
                   - 30
@@ -589,8 +609,8 @@ tables:
               colorScale:
                 baseColorScheme: YlOrRd
                 binningStrategy: manual
-                customNumericMinValue: 0
                 customNumericValues:
+                  - 0
                   - 10
                   - 20
                   - 30
@@ -678,8 +698,8 @@ tables:
               colorScale:
                 baseColorScheme: YlOrRd
                 binningStrategy: manual
-                customNumericMinValue: 0
                 customNumericValues:
+                  - 0
                   - 10
                   - 20
                   - 30
@@ -720,14 +740,8 @@ tables:
         title: Access to clean fuels and technologies for cooking (% of population)
         unit: '% of population'
         short_unit: '%'
-        description_short: |-
-          Access to [clean fuels or technologies](#dod:clean-cooking-fuels) such as natural gas, electricity, and clean cookstoves reduces exposure to indoor air pollutants, a leading cause of death in low-income households.
-        description_from_producer: |-
-          Access to clean fuels and technologies for cooking is the proportion of total population primarily using clean cooking fuels and technologies for cooking. Under WHO guidelines, kerosene is excluded from clean cooking fuels.
-
-          Statistical concept and methodology: Data for access to clean fuels and technologies for cooking are based on the World Health Organization's (WHO) Global Household Energy Database. They are collected among different sources: only data from nationally representative household surveys (including national censuses) were used. Survey sources include Demographic and Health Surveys (DHS) and Living Standards Measurement Surveys (LSMS), Multi-Indicator Cluster Surveys (MICS), the World Health Survey (WHS), other nationally developed and implemented surveys, and various government agencies (for example, ministries of energy and utilities).
-
-          Trends in the proportion of the population using each fuel type are estimated using a single multivariate hierarchical model, with urban and rural disaggregation. Estimates for overall "polluting" fuels (unprocessed biomass, charcoal, coal, and kerosene) and "clean" fuels (gaseous fuels, electricity, as well as an aggregation of any other clean fuels like alcohol) are produced by aggregating estimates of relevant fuel types. The model was used to derive clean fuel use estimates for 191 countries (ref. Stoner, O., Shaddick, G., Economou, T., Gumy, S., Lewis, J., Lucio, I., Ruggeri, G. and Adair-Rohani, H. (2020), Global household energy model: a multivariate hierarchical approach to estimating trends in the use of polluting and clean fuels for cooking. J. R. Stat. Soc. C, 69: 815-839). Countries classified by the World Bank as high income (57 countries) in the 2022 fiscal year are assumed to have universal access to clean fuels and technologies for cooking.
+        description_short: *description_short_clean_fuels
+        description_from_producer: *description_from_producer_clean_fuels
         presentation:
           title_public: Share of the population with access to clean fuels for cooking
           attribution: World Health Organization (via World Bank)
@@ -741,13 +755,14 @@ tables:
         title: Access to electricity (% of population)
         unit: '% of population'
         short_unit: '%'
-        description_short: Having access to electricity is defined in international statistics as having an electricity source that can provide very basic lighting, and charge a phone or power a radio for 4 hours per day.
-        description_from_producer: |-
-          Electrification data are collected from industry, national surveys and international sources.
-
-          Statistical concept and methodology: Data for access to electricity are collected among different sources: mostly data from nationally representative household surveys (including national censuses) were used. Survey sources include Demographic and Health Surveys (DHS) and Living Standards Measurement Surveys (LSMS), Multi-Indicator Cluster Surveys (MICS), the World Health Survey (WHS), other nationally developed and implemented surveys, and various government agencies (for example, ministries of energy and utilities). Given the low frequency and the regional distribution of some surveys, a number of countries have gaps in available data.
-
-          To develop the historical evolution and starting point of electrification rates, a simple modeling approach was adopted to fill in the missing data points - around 1990, around 2000, and around 2010. Therefore, a country can have a continuum of zero to three data points. There are 42 countries with zero data point and the weighted regional average was used as an estimate for electrification in each of the data periods. 170 countries have between one and three data points and missing data are estimated by using a model with region, country, and time variables. The model keeps the original observation if data is available for any of the time periods. This modeling approach allowed the estimation of electrification rates for 212 countries over these three time periods (Indicated as \"Estimate\"). Notation \"Assumption\" refers to the assumption of universal access in countries classified as developed by the United Nations. Data begins from the year in which the first survey data is available for each country.
+        description_short: *description_short_electricity
+        description_key:
+          - "Access to electricity improves people's living conditions in many ways. [Light at night](https://ourworldindata.org/light-at-night) makes it possible to get together after sunset; mobile phones allow us to stay in touch with those far away; refrigeration reduces food waste; and household appliances free up time from chores."
+          - This data captures whether people have access to the most basic electricity supply — just enough to provide basic lighting and charge a phone or power a radio for 4 hours per day.
+          - It shows that, especially in several African countries, a large share of the population lacks the benefits of basic electricity.
+          - Universal access to electricity by 2030 is one of the United Nations [Sustainable Development Goals](https://ourworldindata.org/sdgs/affordable-clean-energy#sdg-indicator-7-1-1-access-to-electricity).
+          - "This data comes from the World Bank's World Development Indicators. Estimates are based on national household surveys, census data, and reports from energy providers or government agencies. Where data is missing, values are estimated by the source using a model based on trends across countries, regions, and time. Countries classified as “developed” by the United Nations are assumed to have universal access."
+          - "To learn more, read our article: [Definitions: access to electricity](https://ourworldindata.org/definition-electricity-access)."
         presentation:
           title_public: Share of the population with access to electricity
           attribution: Data compiled from multiple sources by World Bank
@@ -756,7 +771,9 @@ tables:
             - Access to Energy
             - Energy
         processing_level: minor
-
+        display:
+          numSignificantFigures: 2
+          tolerance: 5
       sn_itk_defc_zs:
         title: Prevalence of undernourishment (% of population)
         unit: '% of population'
@@ -789,3 +806,201 @@ tables:
         description_key:
           - This indicator measures a country’s total trade (exports and imports) relative to the size of its economy.
           - Exports of goods and services represent the value of all goods and other market services provided to the rest of the world. Imports represent the value of all goods and other market services received from the rest of the world. In both cases, they include the value of merchandise, freight, insurance, transport, travel, royalties, license fees, and other services, such as communication, construction, financial, information, business, personal, and government services.
+
+      eg_elc_accs_zs_without:
+        title:  Access to electricity (% of population with no access)
+        unit: '% of population'
+        short_unit: '%'
+        description_short: *description_short_electricity
+        description_processing: We calculated the share of the population without access to electricity by subtracting the share of the population with access from 100%.
+        presentation:
+          title_public: Share of the population with no access to electricity
+          attribution: Data compiled from multiple sources by World Bank
+          attribution_short: World Bank
+          topic_tags:
+            - Access to Energy
+            - Energy
+        processing_level: major
+
+      eg_cft_accs_zs_without:
+        title: Access to clean fuels and technologies for cooking (% of population with no access)
+        unit: '% of population'
+        short_unit: '%'
+        description_short: *description_short_clean_fuels
+        description_from_producer: *description_from_producer_clean_fuels
+        description_processing: We calculated the share of the population without access to clean fuels and technologies for cooking by subtracting the share of the population with access from 100%.
+        presentation:
+          title_public: Share of the population with no access to clean fuels for cooking
+          attribution: World Health Organization (via World Bank)
+          attribution_short: World Bank
+          topic_tags:
+            - Access to Energy
+            - Energy
+        processing_level: major
+
+      eg_elc_accs_zs_number:
+        title: Access to electricity (number of people with access)
+        unit: 'people'
+        short_unit: ''
+        description_short: *description_short_electricity
+        description_processing: We calculated the number of people with access to electricity by multiplying the fraction of the population with access by the total population.
+        presentation:
+          title_public: Number of people with access to electricity
+          attribution: Data compiled from multiple sources by World Bank
+          attribution_short: World Bank
+          topic_tags:
+            - Access to Energy
+            - Energy
+        processing_level: major
+
+      eg_elc_accs_zs_without_number:
+        title: Access to electricity (number of people without access)
+        unit: 'people'
+        short_unit: ''
+        description_short: *description_short_electricity
+        description_processing: We calculated the number of people without access to electricity by multiplying the fraction of the population without access by the total population.
+        presentation:
+          title_public: Number of people without access to electricity
+          attribution: Data compiled from multiple sources by World Bank
+          attribution_short: World Bank
+          topic_tags:
+            - Access to Energy
+            - Energy
+        processing_level: major
+
+      eg_cft_accs_zs_number:
+        title: Access to clean fuels and technologies for cooking (number of people with access)
+        unit: 'people'
+        short_unit: ''
+        description_short: *description_short_clean_fuels
+        description_from_producer: *description_from_producer_clean_fuels
+        description_processing: We calculated the number of people with access to clean fuels and technologies for cooking by multiplying the fraction of the population with access by the total population.
+        presentation:
+          title_public: Number of people with access to clean fuels for cooking
+          attribution: World Health Organization (via World Bank)
+          attribution_short: World Bank
+          topic_tags:
+            - Access to Energy
+            - Energy
+        processing_level: major
+
+      eg_cft_accs_zs_without_number:
+        title: Access to clean fuels and technologies for cooking (number of people without access)
+        unit: 'people'
+        short_unit: ''
+        description_short: *description_short_clean_fuels
+        description_from_producer: *description_from_producer_clean_fuels
+        description_processing: We calculated the number of people without access to clean fuels and technologies for cooking by multiplying the fraction of the population without access by the total population.
+        presentation:
+          title_public: Number of people without access to clean fuels for cooking
+          attribution: World Health Organization (via World Bank)
+          attribution_short: World Bank
+          topic_tags:
+            - Access to Energy
+            - Energy
+        processing_level: major
+
+      patents_per_million_people:
+        title: Patent applications per million people
+        description_key:
+          - Patent applications per million people are calculated by Our World in Data based on patent data from the World Bank's World Development Indicators, and population estimates from the United Nations World Population Prospects.
+          - Patents are assigned based on the residence country of the first-named applicant.
+        description_from_producer: |-
+          Patent applications are worldwide patent applications filed through the Patent Cooperation Treaty procedure or with a national patent office for exclusive rights for an invention--a product or process that provides a new way of doing something or offers a new technical solution to a problem. A patent provides protection for the invention to the owner of the patent for a limited period, generally 20 years.
+
+          Resident patent applications are those for which the first-named applicant or assignee is a resident of the State or region concerned. In the case of regional offices such as the European Patent Office, a resident is an applicant from any of the member States of the regional patent convention. Patent data cover applications and grants classified by field of technology. International applications series distinguish four subcategories: a) patents taken out by residents of a country in that country; b) patents taken out in a country by non-residents of that country; c) total patents registered in the country or naming it; d) patents taken out outside a country by its residents. Data on patents granted only distinguish between patents awarded to residents and to non-residents. A patent provides protection for the invention to the owner of the patent for a limited period, generally 20 years. Patent applications are worldwide patent applications filed through the Patent Cooperation Treaty procedure or with a national patent office for exclusive rights for an invention - a product or process that provides a new way of doing something or offers a new technical solution to a problem.
+        short_unit: ""
+        unit: applications per million people
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          topic_tags:
+            - Research & Development
+
+      articles_per_million_people:
+        title: Scientific and technical journal articles per million people
+        description_short: Scientific and technical journal articles per million people. Disciplines include physics, biology, chemistry, mathematics, clinical medicine, biomedical research, engineering and technology, and earth and space sciences.
+        description_key:
+          - Scientific and technical journal articles per million people are calculated by Our World in Data based on article data from the World Bank's World Development Indicators, and population estimates from the United Nations World Population Prospects.
+          - Patents are assigned based on the residence country of the first-named applicant.
+        description_from_producer: |-
+          Scientific and technical journal articles refer to the number of scientific and engineering articles published in the following fields: physics, biology, chemistry, mathematics, clinical medicine, biomedical research, engineering and technology, and earth and space sciences.
+
+          The number of scientific and engineering articles published in the following fields: physics, biology, chemistry, mathematics, clinical medicine, biomedical research, engineering and technology, and earth and space sciences. The NSF considers article counts from a set of journals covered by Science Citation Index (SCI) and Social Sciences Citation Index (SSCI).
+        short_unit: ""
+        unit: articles per million people
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          topic_tags:
+            - Research & Development
+
+      se_pre_enrr:
+        title: Gross enrolment in pre-primary education
+        short_unit: '%'
+        unit: '%'
+        description_short:  Number of children of any age group who are enrolled in [pre-primary education](#dod:pre-primary-education), expressed as a percentage of the total population of the official pre-primary school age.
+        description_key: *desc_key_ger
+        presentation:
+          title_public: Gross enrolment in pre-primary education
+          grapher_config:
+            maxTime: 2024
+            hasMapTab: true
+            map:
+              time: 2024
+              timeTolerance: 5
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [0, 10,20,30,40,50,60,70,80,90,100]
+                baseColorScheme: BuGn
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name: Pre-primary education
+
+      se_pre_enrr_fe:
+        title: Gross enrolment in pre-primary education among girls
+        short_unit: '%'
+        unit: '%'
+        description_short: Number of girls of any age group who are enrolled in [pre-primary education](#dod:pre-primary-education), expressed as a percentage of the total population of girls of the official pre-primary school age.
+        description_key: *desc_key_ger
+        presentation:
+          title_public: Gross enrolment rate in pre-primary education among girls
+          grapher_config:
+            maxTime: 2024
+            hasMapTab: true
+            map:
+              time: 2024
+              timeTolerance: 5
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [0, 10,20,30,40,50,60,70,80,90,100]
+                baseColorScheme: Purples
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name: Girls
+
+      se_pre_enrr_ma:
+        title:  Gross enrolment in pre-primary education among boys
+        short_unit: '%'
+        unit: '%'
+        description_short: Number of boys of any age group who are enrolled in [pre-primary education](#dod:pre-primary-education), expressed as a percentage of the total population of boys of the official pre-primary school age.
+        description_key: *desc_key_ger
+        presentation:
+          title_public: Gross enrolment rate in pre-primary education among boys
+          grapher_config:
+            maxTime: 2024
+            hasMapTab: true
+            map:
+              time: 2024
+              timeTolerance: 5
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [0, 10,20,30,40,50,60,70,80,90,100]
+                baseColorScheme: Blues
+
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name: Boys

@@ -1,0 +1,19 @@
+meta:
+  origin:
+    producer: Demographic and Health Surveys (2025)
+    title: Annual number of DHS surveys conducted
+    citation_full: ICF. Survey Search. The DHS Program website. Funded by USAID. http://www.dhsprogram.com.
+    attribution: Demographic and Health Surveys (2025)
+    attribution_short: DHS (2025)
+    url_main: https://dhsprogram.com/Methodology/Survey-Search.cfm
+    url_download: |-
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vRB3ALUoNia9YB1olT22QN_GP_ClVmcLRvy-3OQwU1jphxApw3muW-COk-vk2IuoA1Gti1get7qGEF5/pub?output=csv
+    date_accessed: '2025-06-20'
+    date_published: '2025'
+  name: Annual number of DHS surveys by type
+  description: The annual number of Demographic and Health Surveys conducted by type of survey
+  license: {}
+outs:
+  - md5: 0fb077b01a636fd9cfcf7494a889d2a2
+    size: 1022
+    path: annual_number_dhs_surveys_by_type.csv

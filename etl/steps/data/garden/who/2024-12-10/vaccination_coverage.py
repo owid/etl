@@ -30,6 +30,30 @@ DENOMINATOR = {
     "MENA_C": "Surviving infants",  # the national annual number of infants surviving their first year of life
 }
 
+# If the vaccine universally recommended in all countries by WHO and UNICEF, set to True.
+# If not, set to False.
+# See this table for details: https://www.who.int/publications/m/item/table1-summary-of-who-position-papers-recommendations-for-routine-immunization
+# Note BCG is quite nuanced
+UNIVERSAL = {
+    "BCG": False,  # Only universally recommended in high TB incidence countries, only at risk groups in other countries
+    "DTPCV1": True,
+    "DTPCV3": True,
+    "MCV1": True,
+    "POL3": True,
+    "RCV1": True,  # All countries that have not yet introduced RCV should plan to do so.
+    "HEPB3": True,
+    "HIB3": True,
+    "HEPB_BD": True,  # Hepatitis B birth dose is recommended in all countries
+    "MCV2": True,  # Measles second dose is recommended in all countries
+    "ROTAC": True,  # Rotavirus vaccine is recommended in all countries
+    "PCV3": True,  # Pneumococcal conjugate vaccine is recommended in all countries
+    "IPV1": True,  # Inactivated polio vaccine is recommended in all countries
+    "IPV2": True,  # Inactivated polio vaccine is recommended in all
+    "YFV": False,  # Yellow fever vaccine is recommended in countries with risk of yellow fever transmission
+    "MCV2X2": True,  # Measles second dose is recommended
+    "MENA_C": False,
+}
+
 
 def run(dest_dir: str) -> None:
     #
@@ -47,7 +71,7 @@ def run(dest_dir: str) -> None:
     tb = geo.harmonize_countries(
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
-    # Keep only data from WUENIC
+    # Keep only data from WUENIC (the estimates by World Health Organization and UNICEF).
     tb = use_only_wuenic_data(tb)
     tb = clean_data(tb)
     # Add denominator column
@@ -75,7 +99,7 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def get_population_of_age_group(ds_population: Dataset, age=str) -> Table:
+def get_population_of_age_group(ds_population: Dataset, age: str) -> Table:
     tb_pop = ds_population.read("population", reset_metadata="keep_origins")
     tb_pop = tb_pop[(tb_pop["age"] == age) & (tb_pop["variant"] == "estimates") & (tb_pop["sex"] == "all")]
     tb_pop = tb_pop[["country", "year", "sex", "age", "variant", "population"]]
@@ -87,7 +111,9 @@ def calculate_one_year_olds_vaccinated(tb: Table, ds_population: Dataset) -> Tab
     Calculate the number of one-year-olds vaccinated for each antigen.
     """
 
-    tb = tb[tb["denominator"] == "Surviving infants"]
+    tb = tb[(tb["denominator"] == "Surviving infants")]
+    # Filter out vaccines that are not universally recommended by WHO and UNICEF
+    tb = tb[tb["antigen"].map(UNIVERSAL)]
     tb_pop = get_population_of_age_group(ds_population=ds_population, age="1")
 
     tb = pr.merge(tb, tb_pop, on=["country", "year"], how="left")
@@ -105,6 +131,8 @@ def calculate_newborns_vaccinated(tb: Table, ds_population: Dataset) -> Table:
     """
 
     tb = tb[tb["denominator"] == "Live births"]
+    # Only calculate for vaccines that are universally recommended by WHO and UNICEF
+    tb = tb[tb["antigen"].map(UNIVERSAL)]
     tb_pop = get_population_of_age_group(ds_population=ds_population, age="0")
 
     tb = pr.merge(tb, tb_pop, on=["country", "year"], how="left")

@@ -6,12 +6,12 @@ definitions:
       attribution: Gapminder (2020); UN Inter-agency Group for Child Mortality Estimation (2024)
 
 dataset:
-  title: Long-run child mortality (Gapminder; UN IGME)
+  title: Long-run child mortality estimates (Gapminder; UN IGME)
 tables:
   long_run_child_mortality:
     variables:
       under_five_mortality:
-        title: Under-five mortality rate (full)
+        title: Child mortality rate (full)
         unit: deaths per 100 live births
         short_unit: "%"
         display:
@@ -30,7 +30,7 @@ tables:
   long_run_child_mortality_selected:
     variables:
       under_five_mortality:
-        title: Under-five mortality rate
+        title: Child mortality rate
         unit: deaths per 100 live births
         short_unit: "%"
         display:
@@ -46,14 +46,14 @@ tables:
 
           We combine the two datasets, for years where both are available, we have a preference for the UN IGME data.
         presentation:
-          title_public: Under-five mortality rate
+          title_public: Child mortality rate
           title_variant: Long-run data
           attribution_short: UN IGME; Gapminder
           grapher_config:
             title: Child mortality rate
             subtitle: The estimated share of newborns who die before reaching the age of five.
             variantName: Long-run data; Gapminder & UN IGME
-            sourceDesc: UN IGME (2023); Gapminder (2015)
+            sourceDesc: Gapminder (2015); UN IGME (2023)
             originUrl: https://ourworldindata.org/child-mortality
             hasMapTab: true
             yAxis:
@@ -70,6 +70,7 @@ tables:
                   - null
                   - null
                 customNumericValues:
+                  - 0
                   - 0.3
                   - 0.5
                   - 1
@@ -78,7 +79,6 @@ tables:
                   - 10
                   - 30
                   - 50
-                customNumericMinValue: 0
               timeTolerance: 0
             selectedEntityNames:
               - United States

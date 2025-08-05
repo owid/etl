@@ -1,0 +1,14 @@
+title:
+  title: Bribery requests for firms
+  title_variant: by type of transaction
+default_selection:
+  - World
+dimensions:
+  - slug: service
+    name: Type of transaction
+    choices:
+      - slug: "side_by_side"
+        name: All transactions
+        description: See all transactions side by side
+
+views: []

@@ -1,0 +1,18 @@
+meta:
+  origin:
+    producer: United Nations
+    title: United Nations member states
+    description: |-
+      This dataset contains the list of member states of the United Nations, with their date of admission.
+    citation_full: |-
+      United Nations - Member States (2025).
+    url_main: https://www.un.org/en/about-us/member-states
+    date_accessed: '2025-05-15'
+    date_published: '2025'
+    license:
+      name: Terms and conditions of use of United Nations websites
+      url: https://www.un.org/en/about-us/terms-of-use
+outs:
+  - md5: f61c684d4ab21d7843efba3ebe992d5a
+    size: 3131
+    path: un_members.csv

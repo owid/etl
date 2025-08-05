@@ -3,6 +3,10 @@
 Notes:
 
     - "Gapminder SG" stands for "Gapminder Systema Globalis"
+    - On regional estimates:
+        - Continents: We re-estimate the values for WPP and Gapminder. For HYDE, we use the original values.
+        - Income groups: TODO
+        - World: We re-estimate the values for . For X, we use the original values.
 """
 
 import json
@@ -25,7 +29,7 @@ from utils import (
 )
 
 from etl.data_helpers import geo
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -40,33 +44,36 @@ COLUMNS_INDEX = [
     "year",
 ]
 
+# Known overlaps between historical and successor regions in the FAOSTAT land area dataset.
+KNOWN_OVERLAPS_IN_LAND_AREA_DATA = [{year: {"Netherlands Antilles", "Aruba"} for year in range(1961, 2011)}]
 
-def run(dest_dir: str) -> None:
-    """Run main code."""
+
+def run() -> None:
     #
     # Load inputs.
     #
     # Load UN WPP dataset.
     ds_un = paths.load_dataset("un_wpp")
-    tb_un = ds_un["population"].reset_index()
+    tb_un = ds_un.read("population")
     # Load HYDE dataset.
     ds_hyde = paths.load_dataset("all_indicators")
-    tb_hyde = ds_hyde["all_indicators"].reset_index()
+    tb_hyde = ds_hyde.read("all_indicators")
     # Load Gapminder dataset
     ds_gapminder = paths.load_dataset("population", namespace="gapminder")
-    tb_gapminder = ds_gapminder["population"].reset_index()
+    tb_gapminder = ds_gapminder.read("population")
     # Load Gapminder SG dataset
     ds_gapminder_sg = paths.load_dataset(short_name="gapminder__systema_globalis", channel="open_numbers")
-    tb_gapminder_sg = ds_gapminder_sg["total_population_with_projections"].reset_index()
+    tb_gapminder_sg = ds_gapminder_sg.read("total_population_with_projections")
 
-    # Load regions table
+    # Load auxiliary datasets:
+    # * Regions
     ds_regions = paths.load_dataset("regions")
-    tb_regions = ds_regions["regions"]
-    # Load income groups table
+    tb_regions = ds_regions.read("regions", reset_index=False)
+    # * Income groups
     ds_income_groups = paths.load_dataset("income_groups")
-    # Load FAO
-    ds_land_area = paths.load_dataset("faostat_rl")
-    tb_land_area = ds_land_area["faostat_rl_flat"].reset_index()
+    # * Land area (FAOSTAT RL)
+    ds_land_area = paths.load_dataset("faostat_rl_auxiliary")
+    tb_land_area = ds_land_area.read("faostat_rl_auxiliary")
 
     #
     # Process data.
@@ -90,10 +97,14 @@ def run(dest_dir: str) -> None:
             {
                 "year": int,
                 "population": "uint64",
+                "source": "string",
             }
         )
         .pipe(add_regions, ds_regions, ds_income_groups)
-        .pipe(add_world)
+    )
+
+    tb = (
+        tb.pipe(add_world)
         .pipe(add_historical_regions, tb_gapminder_sg_former, tb_regions)
         .pipe(fix_anomalies)
         .astype(
@@ -112,9 +123,12 @@ def run(dest_dir: str) -> None:
     )
 
     # Add population density
+    # NOTE: The regions and income groups datasets are used to create region aggregates for land area data.
     tb_density = make_table_density(
         tb_population=tb,
         tb_land_area=tb_land_area,
+        ds_regions=ds_regions,
+        ds_income_groups=ds_income_groups,
     )
 
     # Create auxiliary table
@@ -150,11 +164,7 @@ def run(dest_dir: str) -> None:
     ]
 
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(
-        dest_dir,
-        tables=tables,
-        check_variables_metadata=True,
-    )
+    ds_garden = paths.create_dataset(tables=tables)
 
     # Save changes in the new garden dataset.
     ds_garden.save()
@@ -178,6 +188,15 @@ def format_hyde(tb: Table) -> Table:
     }
     # Rename columns
     tb = tb.rename(columns=columns_rename, errors="raise").loc[:, COLUMS_RELEVANT_POP]
+
+    # Exclude HYDE-specific countries
+    countries_exclude = [
+        "Asia (excl. China and India)",
+        "South America (excl. Brazil)",
+        "Europe (excl. Russia)",
+    ]
+    tb = tb.loc[~tb.country.isin(countries_exclude)]
+
     # Set source identifier
     tb["source"] = "hyde"
     return tb
@@ -358,116 +377,133 @@ def select_source(tb: Table) -> Table:
 def add_regions(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Table:
     """Add continents and income groups."""
     paths.log.info("population: adding regions...")
-    regions = [
-        "Europe",
-        "Asia",
-        "North America",
-        "South America",
-        "Africa",
-        "Oceania",
-        "High-income countries",
-        "Low-income countries",
-        "Lower-middle-income countries",
-        "Upper-middle-income countries",
-        "European Union (27)",
-    ]
-    # make sure to exclude regions if already present
-    tb = tb.loc[~tb["country"].isin(regions)]
+    # 0/ Initial definitions
+    ## Country data needed to estimate region aggregates
+    continents_required = {
+        "Asia": ["China", "India", "Indonesia", "Pakistan", "Bangladesh"],
+        "Africa": ["Nigeria", "Ethiopia", "Egypt"],
+        "North America": ["United States", "Canada", "Mexico"],
+        "South America": ["Brazil", "Argentina", "Colombia", "Peru"],
+        "Oceania": ["Australia", "New Zealand"],
+        "Europe": ["Russia", "Germany", "France", "United Kingdom", "Italy", "Spain"],
+    }
+    regions_required = {
+        "High-income countries": [
+            "United States",
+            "Japan",
+            "Germany",
+            "France",
+            "United Kingdom",
+            "Italy",
+            "South Korea",
+            "Russia",
+        ],
+        "Upper-middle-income countries": [
+            "China",
+            "Brazil",
+            "Indonesia",
+            "Mexico",
+            "Iran",
+        ],
+        "Lower-middle-income countries": [
+            "India",
+            "Pakistan",
+            "Nigeria",
+            "Bangladesh",
+            "Philippines",
+            "Egypt",
+            "Kenya",
+            "Vietnam",
+        ],
+        "Low-income countries": [
+            # "Ethiopia", Currently not classified as low-income by the World Bank, but historically it was.
+            "Democratic Republic of Congo",
+            "Uganda",
+        ],
+        "European Union (27)": ["Germany", "France", "Italy", "Spain"],
+    }
+    continents = list(continents_required.keys())
+    regions = list(regions_required.keys())
+
+    def _aggregate(tb, regions_required_countries):
+        regions_ = list(regions_required_countries.keys())
+        tb_agg = geo.add_regions_to_table(
+            tb=tb,
+            regions=regions_,
+            aggregations={"population": "sum", "source": lambda x: "; ".join(sorted(set(x)))},  # type: ignore
+            ds_regions=ds_regions,
+            ds_income_groups=ds_income_groups,
+            num_allowed_nans_per_year=None,
+            frac_allowed_nans_per_year=0.2,
+            countries_that_must_have_data=regions_required_countries,
+        )
+        tb_agg = tb_agg.loc[tb_agg["country"].isin(regions_)]
+        tb_agg = tb_agg.dropna(subset=["population"])
+        return tb_agg
+
+    # Exclude regions and keep continents (<1800), exclude regions+continents (≥1800)
+    tb = tb.loc[
+        ~((tb["year"] < YEAR_START_GAPMINDER) & (tb["country"].isin(regions)))
+        & ~((tb["year"] >= YEAR_START_GAPMINDER) & tb["country"].isin(regions + continents))
+    ].copy()
 
     # keep sources per countries, remove from tb
-    # remove from tb: otherwsie geo.add_region_aggregates will add this column too
-    sources = tb.loc[:, ["country", "year", "source"]].copy()
-    tb = tb.drop(columns=["source"])
+    # remove from tb: otherwise geo.add_region_aggregates will add this column too
+    # sources = tb.loc[:, ["country", "year", "source"]].copy()
+    # tb = tb.drop(columns=["source"])
 
-    # Build table specifically for estimating regions: (1) no historical regions, (2) interpolation of country values
-
-    ## (1) remove historical regions
-    ## This is because it looks like historical countries are being considered when estimating values for regions.
+    # Get rid of historical regions
+    ## Otherwise this are counted when estimating region values, and may lead to double-counts
     tb_regions = ds_regions["regions"]
     historical_regions = set(tb_regions.loc[tb_regions["is_historical"], "name"])
-    tb_aggregates = tb.loc[~tb["country"].isin(historical_regions)].copy()
+    tb_agg = tb.loc[~tb["country"].isin(historical_regions)].copy()
 
-    ## (2) interpolate population for countries
-    tb_aggregates = geo.interpolate_table(tb_aggregates, "country", "year")
-
+    # 1/ Estimate aggregates for HYDE ------
+    ## <1800 and exclude regions (keep continents)
+    tb_agg_hyde = tb_agg.loc[tb_agg["year"] < YEAR_START_GAPMINDER].copy()
     # re-estimate region aggregates
-    aggregations = {"population": "sum"}
-    tb_aggregates = geo.add_regions_to_table(
-        tb=tb_aggregates,
-        regions=regions,
-        aggregations=aggregations,
-        ds_regions=ds_regions,
-        ds_income_groups=ds_income_groups,
-        num_allowed_nans_per_year=None,
-        frac_allowed_nans_per_year=0.2,
-        countries_that_must_have_data={
-            # Continents
-            "Asia": ["China", "India", "Indonesia", "Pakistan", "Bangladesh"],
-            "Africa": ["Nigeria", "Ethiopia", "Egypt"],
-            "North America": ["United States", "Canada", "Mexico"],
-            "South America": ["Brazil", "Argentina", "Colombia", "Peru"],
-            "Oceania": ["Australia", "New Zealand"],
-            "Europe": ["Russia", "Germany", "France", "United Kingdom", "Italy", "Spain"],
-            # Income groups
-            "High-income countries": [
-                "United States",
-                "Japan",
-                "Germany",
-                "France",
-                "United Kingdom",
-                "Italy",
-                "South Korea",
-            ],
-            "Upper-middle-income countries": [
-                "China",
-                "Brazil",
-                "Indonesia",
-                "Russia",
-                "Mexico",
-            ],
-            "Lower-middle-income countries": [
-                "India",
-                "Pakistan",
-                "Nigeria",
-                "Bangladesh",
-                "Philippines",
-                "Egypt",
-                "Kenya",
-                "Philippines",
-                "Vietnam",
-                "Iran",
-            ],
-            "Low-income countries": [
-                "Ethiopia",
-                "Democratic Republic of Congo",
-                "Uganda",
-            ],
-        },
+    tb_agg_hyde = _aggregate(
+        tb=tb_agg_hyde,
+        regions_required_countries=regions_required,
     )
-    tb_aggregates = tb_aggregates.loc[tb_aggregates["country"].isin(regions)]
 
-    # Add historical countries back
-    tb = pr.concat([tb, tb_aggregates], ignore_index=True)
+    # 2/ Estimate aggregates post-HYDE (Gapminder + WPP) ------
+    ## ≥1800 and exclude regions + continents
+    tb_agg = tb_agg.loc[tb_agg["year"] >= YEAR_START_GAPMINDER].copy()
 
-    # tb = tb.loc[
-    #     (
-    #         (tb["country"].isin(regions) & (tb["year"] < 1800) & (tb["year"] % 100 != 0))
-    #         | (tb["country"].isin(regions) & (tb["year"] < 1800) & (tb["year"] % 10 != 0))
-    #     )
+    # Interpolate table
+    # Keep track of original sources for merging back later
+    sources_agg = tb_agg.loc[:, ["country", "year", "source"]].copy()
 
-    # ]
+    tb_agg = geo.interpolate_table(
+        tb_agg.loc[tb_agg["year"] >= YEAR_START_GAPMINDER, ["country", "year", "population"]],
+        "country",
+        "year",
+    )
 
-    # add sources back
-    # these are only added to countries, not aggregates
-    tb = tb.merge(sources, on=["country", "year"], how="left")
+    # Add source column back to interpolated data
+    tb_agg = tb_agg.merge(sources_agg, on=["country", "year"], how="left")
+    ## Previous interpolation left some sources empty (NA)
+    tb_agg.loc[(tb_agg["year"] < YEAR_START_GAPMINDER) & tb_agg["source"].isna(), "source"] = SOURCES_NAMES["hyde"]
+    tb_agg.loc[
+        (tb_agg["year"] >= YEAR_START_GAPMINDER) & (tb_agg["year"] < YEAR_START_WPP) & tb_agg["source"].isna(), "source"
+    ] = SOURCES_NAMES["gapminder"]
+    tb_agg.loc[(tb_agg["year"] > YEAR_START_WPP) & tb_agg["source"].isna(), "source"] = SOURCES_NAMES["unwpp"]
+    # re-estimate region aggregates
+    tb_agg = _aggregate(
+        tb=tb_agg,
+        regions_required_countries=regions_required | continents_required,
+    )
 
-    # add sources for region aggregates
-    # this is done by taking the union of all sources for countries in the region
-    for region in regions:
-        members = geo.list_members_of_region(region, ds_regions, ds_income_groups)
-        s = tb.loc[tb["country"].isin(members), "source"].unique()
-        sources_region = sorted(s)
-        tb.loc[tb["country"] == region, "source"] = "; ".join(sources_region)
+    # 3/ Combine aggregates with original data
+    tb = pr.concat([tb, tb_agg, tb_agg_hyde], ignore_index=True)
+
+    # Ensure all rows have source
+    assert tb["source"].notna().all(), "Some rows do not have a source!"
+    vals = tb.loc[tb["country"].isin(continents) & (tb["year"] < YEAR_START_GAPMINDER), "source"].unique()
+    assert (
+        len(vals) == 1 and vals[0] == SOURCES_NAMES["hyde"]
+    ), f"Unexpected sources for continents before {YEAR_START_GAPMINDER}!"
     return tb
 
 
@@ -496,11 +532,11 @@ def add_world(tb: Table) -> Table:
     ), "World data found in HYDE outside of [-10000, 1940]!"
 
     # Filter 'World' in HYDE for period [1800, 1950]
-    tb_world = tb.loc[
-        (tb["country"] == "World") & (tb["year"] > YEAR_START_HYDE) & (tb["year"] < YEAR_START_GAPMINDER)
-    ].copy()
+    # tb_world = tb.loc[
+    #     (tb["country"] == "World") & (tb["year"] > YEAR_START_HYDE) & (tb["year"] < YEAR_START_GAPMINDER)
+    # ].copy()
 
-    # Estimate World using reigons
+    # Estimate World using regions
     continents = [
         "Europe",
         "Asia",
@@ -509,17 +545,19 @@ def add_world(tb: Table) -> Table:
         "Africa",
         "Oceania",
     ]
-    # Estimate "World" population for years without HYDE and UN WPP data
+    # Estimate "World" population for years without UN WPP data. Previously we avoided doing it so for HYDE, but then we could have sum(regions) != World for that period, which is odd.
+    mask = (tb["year"] < YEAR_START_WPP) & (tb["year"] >= YEAR_START_GAPMINDER)
     tb_world = (
-        tb_world[
-            (tb_world["country"].isin(continents))
-            & (tb_world["year"] > YEAR_START_HYDE)
-            & (tb_world["year"] < YEAR_START_WPP)
-        ]
+        tb[(tb["country"].isin(continents)) & mask]
         .groupby("year", as_index=False)["population"]
         .sum(numeric_only=True)
         .assign(country="World")
     )
+
+    # Remove 'World' from tb
+    tb = tb.loc[~(mask & (tb["country"] == "World"))]
+
+    # Merge original tb (without World pre-WPP) with World estimates (pre-WPP)
     tb = pr.concat([tb, tb_world], ignore_index=True).sort_values(["country", "year"])
 
     # add sources for world
@@ -637,9 +675,23 @@ def generate_auxiliary_table(tb: Table) -> Table:
 ######################
 # Population density
 ######################
-def make_table_density(tb_population: Table, tb_land_area: Table) -> Table:
+def make_table_density(
+    tb_population: Table, tb_land_area: Table, ds_regions: Dataset, ds_income_groups: Dataset
+) -> Table:
     """Create a table with population density data."""
     paths.log.info("build population density table")
+
+    # Add region aggregates to land area data.
+    # NOTE: This wasn't done in the corresponding FAOSTAT RL auxiliary step to avoid circular dependencies.
+    tb_land_area = geo.add_regions_to_table(
+        tb=tb_land_area,
+        ds_regions=ds_regions,
+        ds_income_groups=ds_income_groups,
+        num_allowed_nans_per_year=None,
+        frac_allowed_nans_per_year=None,
+        accepted_overlaps=KNOWN_OVERLAPS_IN_LAND_AREA_DATA,
+    )
+
     # We use land area of countries as they are defined today (latest reported value)
     column_area = "land_area__00006601__area__005110__hectares"
     tb_land_area = (

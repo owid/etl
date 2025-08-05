@@ -60,6 +60,7 @@ tables:
                 baseColorScheme: OrRd
                 binningStrategy: manual
                 customNumericValues:
+                  - 0
                   - 5
                   - 10
                   - 15

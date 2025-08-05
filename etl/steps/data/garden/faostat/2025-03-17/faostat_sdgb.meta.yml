@@ -7,7 +7,7 @@ definitions:
     presentation:
       topic_tags:
         - Agricultural Production
-      attribution_short: FAO
+      attribution_short: UN FAO
 
 # NOTE: You can modify all indicators' metadata below.
 # However, it is preferrable to change unit and short_unit in the custom_elements_and_units.csv.
@@ -15,27 +15,45 @@ definitions:
 tables:
   faostat_sdgb_flat:
     variables:
+      ##################################################################################################################
+      # Curated data page.
+      _2_1_1_prevalence_of_undernourishment__000000000024000__value__006121__percent:
+        description_short: |
+          Share of the population whose daily food intake does not provide enough energy to maintain a normal, active, and healthy life.
+        presentation:
+          title_public: Share of people who are undernourished
+          grapher_config:
+            note: |
+              The FAO reports all values below 2.5% as "<2.5%" due to high uncertainty at very low levels of undernourishment.
+        description_key:
+          - "[Hunger](https://ourworldindata.org/hunger-and-undernourishment) has been a severe problem throughout history. For most people, growing enough food to feed their family was a daily struggle. Food shortages, malnutrition, and [famines](https://ourworldindata.org/famines) were common around the world."
+          - This data estimates the share of people who are undernourished — those whose daily energy (calorie) intake is too low to support a normal, active, and healthy life.
+          - "Undernourishment is determined solely by whether a person gets enough calories. It does not account for the quality or diversity of their diet. Therefore, it is only one aspect of malnutrition, a broader term that captures other deficiencies, such as micronutrients."
+          - Minimum calorie needs vary by sex, age, body size, and activity level. Researchers use demographic data to account for these differences in each country's estimates.
+          - The data is published by the Food and Agriculture Organization of the United Nations (FAO). It is based on a statistical model that combines national food supply data, demographic projections, and, where available, household food consumption surveys. To reduce short-term variability on country-level data, the FAO sets the values for a given year to the average of the last three years.
+          - Many countries, especially high-income ones, are shown at 2.5% because the FAO reports values between 0% and 2.5% as "<2.5%", due to uncertainty at very low levels of undernourishment.
+          - "The world has made significant progress in reducing undernourishment. However, this data shows we are still far from ending hunger: nearly 1 in 10 people globally don't get enough to eat. Hunger worsened during the COVID-19 pandemic and remains a major challenge."
+        # The following description was manually extracted from the excel file that can be downloaded from https://www.fao.org/faostat/en/#data/SDGB (by clicking on Related Documents -> Metadata).
+        # NOTE: We currently don't have access to this important information in our faostat_metadat step. Maybe there's a way to programmatically extract it.
+        description_from_producer: |-
+          ### Sustainable Development Goals
+          Goal 2: End hunger, achieve food security and improved nutrition and promote sustainable agriculture.
+
+          Target 2.1: By 2030, end hunger and ensure access by all people, in particular the poor and people in vulnerable situations, including infants, to safe, nutritious and sufficient food all year round.
+
+          Indicator 2.1.1: Prevalence of undernourishment
+
+          - Definition: The prevalence of undernourishment (PoU) (French: pourcentage de sous-alimentation; Spanish: porcentaje de sub-alimentación; Italian: prevalenza di sotto-alimentazione) is an estimate of the proportion of the population whose habitual food consumption is insufficient to provide the dietary energy levels that are required to maintain a normal active and healthy life. It is expressed as a percentage.
+          - Concepts: Undernourishment is defined as the condition by which a person has access, on a regular basis, to the amount of food that are insufficient to provide the energy required for conducting a normal, healthy and active life, given his or her own dietary energy requirements. Though strictly related, “undernourishment” as defined here is different from the physical conditions of “malnutrition” and “undernutrition” as it refers to the condition of insufficient intake of food, rather than to the outcome in terms of nutritional status. In French, Spanish and Italian the difference is marked by the use of the terms alimentation, alimentación, or alimentazione, instead of nutrition, nutrición or nutrizione, in the name of the indicator. A more appropriate expression in English that would render the precise meaning of the indicator might have been “prevalence of under-feeding” but by now the term “undernourishment” has long been associated with the indicator. While the undernourishment condition applies to individuals, due to conceptual and data-related considerations, the indicator can only be referred to a population, or group of individuals. The prevalence of undernourishment is thus an estimate of the percentage of individuals in a group that are in that condition, but it does not allow for the identification of which individuals in the group are, in fact, undernourished.
+      ##################################################################################################################
       _12_3_1a_food_loss_percentage__000000000024044__value__006121__percent:
-        display:
-          name: Share of food lost in post-harvest processes
-          numDecimalPlaces: 2
         presentation:
           title_public: Share of food lost in post-harvest processes
       _2_1_1_number_of_undernourished_people__000000000024001__value__006132__millions:
         display:
-          name: Number of people that are undernourished
           numDecimalPlaces: 0
         presentation:
           title_public: Number of people that are undernourished
-      _2_1_1_prevalence_of_undernourishment__000000000024000__value__006121__percent:
-        display:
-          name: Share of people that are undernourished
-          numDecimalPlaces: 2
-        presentation:
-          title_public: Share of people that are undernourished
       _2_1_2_prevalence_of_severe_food_insecurity__both_sexes_or_no_breakdown_by_sex__all_age_ranges_or_no_breakdown_by_age__no_breakdown_by_urbanisation__00000024003_ttt__value__006121__percent:
-        display:
-          name: Severe food insecurity
-          numDecimalPlaces: 2
         presentation:
           title_public: Share of the population defined as severely food insecure

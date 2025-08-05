@@ -15,12 +15,13 @@ def run() -> None:
 
     # Read table from garden dataset.
     tb = ds_garden.read("gho_smoking", reset_index=False)
+    tb_empower = ds_garden.read("gho_smoking_empower", reset_index=False)
 
     #
     # Save outputs.
     #
     # Initialize a new grapher dataset.
-    ds_grapher = paths.create_dataset(tables=[tb], default_metadata=ds_garden.metadata)
+    ds_grapher = paths.create_dataset(tables=[tb, tb_empower], default_metadata=ds_garden.metadata)
 
     # Save grapher dataset.
     ds_grapher.save()

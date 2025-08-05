@@ -1,13 +1,22 @@
 definitions:
   common:
     processing_level: minor
-    presentation:
-      topic_tags:
-        - Clean Water & Sanitation
 
 dataset:
   update_period_days: 730
 tables:
+  _2_4_1__ag_lnd_sust_prxts:
+    variables:
+      _2_4_1__ag_lnd_sust_prxts:
+        presentation:
+          topic_tags:
+            - Agricultural Production
+        description_from_producer: |-
+          [PROXY] Progress toward productive and sustainable agriculture, trend score
+
+          Further information available at: https://unstats.un.org/sdgs/metadata/files/Metadata-02-04-01.pdf and https://unstats.un.org/sdgs/metadata/files/Metadata-02-04-01proxy.pdf.
+
+          This indicator is a proxy variable. The rationale behind reporting a proxy as well as the methodology of the proxy variable can be found at: https://unstats.un.org/sdgs/files/meetings/iaeg-sdgs-meeting-14/7b_rev_Indicator_2.4.1_proxy_presentation_FAO.pdf
   _6_2_1__sh_san_safe__all_areas:
     variables:
       _6_2_1__sh_san_safe__all_areas:
@@ -30,6 +39,8 @@ tables:
           title_public: Share of the population using safely managed sanitation facilities
           title_variant: All areas
           attribution_short: WHO/UNICEF JMP
+          topic_tags:
+            - Clean Water & Sanitation
           grapher_config:
             title: Share of the population using safely managed sanitation facilities
             subtitle: Safely managed sanitation is improved facilities which are not shared with other households and where excreta are safely disposed in situ or transported and treated off-site.
@@ -55,6 +66,7 @@ tables:
                   -
                   -
                 customNumericValues:
+                  - 0
                   - 10
                   - 20
                   - 30
@@ -65,7 +77,6 @@ tables:
                   - 80
                   - 90
                   - 100
-                customNumericMinValue: 0
             selectedEntityNames:
               - Northern Africa (UN)
               - Sub-Saharan Africa (UN)
@@ -88,6 +99,8 @@ tables:
         presentation:
           title_public: Share of the population using safely managed drinking water
           attribution_short: WHO/UNICEF JMP
+          topic_tags:
+            - Clean Water & Sanitation
           grapher_config:
             title: Share of the population using safely managed drinking water
             subtitle: A safely managed drinking water service is defined as one located on premises, available when needed and free from contamination.
@@ -113,6 +126,7 @@ tables:
                   -
                   -
                 customNumericValues:
+                  - 0
                   - 10
                   - 20
                   - 30
@@ -123,7 +137,6 @@ tables:
                   - 80
                   - 90
                   - 100
-                customNumericMinValue: 0
               timeTolerance: 3
             selectedEntityNames:
               - Northern Africa (UN)
@@ -135,3 +148,98 @@ tables:
               - Europe and Northern America (UN)
               - Eastern and South-Eastern Asia (UN)
             $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
+
+  _16_5_1__iu_cor_brib__both_sexes:
+    variables:
+      _16_5_1__iu_cor_brib__both_sexes:
+        title: Share of people who said they were recently asked for a bribe or paid one
+        short_unit: "%"
+        unit: "%"
+        description_short: |-
+          Share of respondents who reported having contact with a public official in the past 12 months and paying or being asked to pay a [bribe](#dod:bribery).
+        description_key:
+        - This indicator measures how common bribery is in people’s everyday interactions with public officials. It shows the share of individuals who, in the past year, either paid a bribe or were asked to pay one during contact with a public official.
+        - Bribes can take the form of money, gifts, or favors given in exchange for special treatment. The focus is on petty or administrative bribery — the kind people may face when accessing basic services, such as dealing with the police, schools, or healthcare.
+        - “Public officials” refers to anyone holding a legislative, executive, administrative, or judicial role — including police officers, customs agents, judges, teachers, and doctors. The data does not cover high-level political corruption, trading of influence, or abuse of office.
+        - Data comes primarily from national surveys, where respondents report their own direct experiences. Reports involving intermediaries (e.g. a bribe paid through someone else) are included, but second-hand accounts from other household members are excluded.
+        - When national data is unavailable or insufficient, estimates may draw on [Global Corruption Barometer (GCB)](https://www.transparency.org/en/gcb) data, provided it aligns closely with UNODC definitions. These estimates are reviewed and validated by national authorities, usually through national statistics offices.
+        - In some cases — such as Peru and Panama — UNODC estimates differ significantly from the GCB's figures. These differences may arise from variations in survey scope (e.g. UNODC's surveys inquire about any contact with public officials, while GCB asks about contact concerning a few core services), sample size, how people without recent contact with officials are handled, or how surveys are conducted (e.g. phone vs. in-person).
+        - Earlier surveys often excluded people who were asked for a bribe but refused to pay. This likely led to underestimates of the prevalence of bribery. The UNODC aims to correct this by applying standardised methods across countries.
+        description_from_producer: |-
+          This indicator is defined as the percentage of persons who paid at least one bribe (gave a public official money, a gift or counter favour) to a public official, or were asked for a bribe by these public officials, in the last 12 months, as a percentage of persons who had at least one contact with a public official in the same period.
+
+          In the International Classification of Crime for Statistical Purposes (ICCS), bribery is defined as: ‘Promising, offering, giving, soliciting, or accepting an undue advantage to or from a public official or a person who directs or works in a private sector entity, directly or indirectly, in order that the person act or refrain from acting in the exercise of his or her official duties’ (ICCS Category 07031).
+
+          This definition is based on definitions of bribery of national public officials, bribery of foreign public officials and official of international organisations and bribery in the private sector that are contained in the United Nations Convention against Corruption (articles 15, 16, and 21). While the concept of bribery is broader, as it includes also actions such as promising or offering, and it covers both public and private sector, this indicator focuses on specific forms of bribery that are more measurable (the giving and/or requesting of bribes) and it limits the scope to the public sector.
+
+          The concept of undue advantage is operationalized by reference to giving of money (in addition to an official fee), gifts or provision of a service requested/offered by/to a public official in exchange for a special treatment. This indicator captures the often called ‘administrative bribery’, which is often intended as the type of bribery affecting citizens in their dealings with public administrations and/or civil servants.
+
+          For this indicator, public official refers to persons holding a legislative, executive, administrative or judicial office.
+
+          In the operationalization of the indicator, a list of selected officials and civil servants is used.
+
+          Further information available at: https://unstats.un.org/sdgs/metadata/files/Metadata-16-05-01.pdf
+        display:
+          numDecimalPlaces: 1
+        presentation:
+          topic_tags:
+            - Corruption
+  _17_1_1__gr_g14_gdp:
+    variables:
+      _17_1_1__gr_g14_gdp:
+        title: 17.1.1 - Total government revenue as a proportion of GDP (%) - GR_G14_GDP
+        description_short: Taxes, social contributions, and other revenues such as fines, fees, rent, and income from property or sales included.
+        presentation:
+          title_public: Government revenues as a share of GDP
+          topic_tags:
+            - Government Spending
+          grapher_config:
+            note: |-
+              Coverage varies by country. Data for [general government](#dod:general-government) (including central, state, and local governments, and social security funds) is used when available. Otherwise, it reflects [consolidated or budgetary central government](#dod:central-government), as reported by each country.
+        description_key:
+          - Government revenue in this indicator includes all types of revenue, such as taxes, social contributions, grants, and other income. The total revenue is expressed as a percentage of gross domestic product (GDP).
+          - This indicator refers to revenues of the [general government](#dod:general-government), which includes all levels of government (central, state, and local) and social security funds. Where general government data is not available, it relies on [consolidated or budgetary central government](#dod:central-government) data, which may not include all levels of government.
+
+        description_from_producer: |-
+          Total government revenue as a proportion of GDP (%)
+
+          #### Definition:
+
+          Revenue is defined as an increase in net worth resulting from a transaction. It is a fiscal indicator for assessing the sustainability of fiscal activities.
+
+          General government units have four types of revenue. The major types of revenue are taxes, social contributions, grants, and other revenue. Of these, compulsory levies and transfers are the main sources of revenue for most general government units.
+
+          In particular, taxes are compulsory, unrequited amounts receivable by government units from institutional units.
+          Social contributions are actual or imputed revenue receivable by social insurance schemes to make provision for social insurance benefits payable.
+          Grants are transfers receivable by government units from other resident or non-resident government units or international organizations, and that do not meet the definition of a tax, subsidy, or social contribution.
+
+          Other revenue is all revenue receivable excluding taxes, social contributions, and grants. Other revenue comprises: (i)
+          property income; (ii) sales of goods and services; (iii) fines, penalties, and forfeits; (iv) transfers not elsewhere classified; and (v) premiums, fees, and claims related to non-life insurance and standardized guarantee schemes.
+
+          Further information available at: https://unstats.un.org/sdgs/metadata/files/Metadata-17-01-01.pdf
+  _17_1_2__gc_gob_taxd:
+    variables:
+      _17_1_2__gc_gob_taxd:
+        title: 17.1.2 - Proportion of budgetary central government funded by domestic taxes (%) - GC_GOB_TAXD
+        presentation:
+          title_public: Share of central government spending funded by taxes
+          topic_tags:
+            - Government Spending
+        description_short: Spending refers to the [budgetary central government](#dod:central-government) which includes the core institutions of the national government. Funds only include taxes; Fines, penalties, and most social security contributions are excluded.
+        description_key:
+          - This indicator measures the share of [central government](#dod:central-government) spending that is covered by domestic tax revenue.
+          - Government expenditures refer to the budgetary central government. These are all institutions that are directly financed through the main central government budget, such as the core ministries, departments and agencies.
+          - This indicator does not include other sources of government revenue, such as grants, loans, fines, penalties, and most social security contributions.
+        description_from_producer: |-
+          Proportion of domestic budgetary central government expenditure funded by taxes (%)
+
+          #### Definition:
+          Budgetary central government is an institutional unit of the general government sector particularly important in terms of size and power, particularly the power to exercise control over many other units and entities.
+
+          The budgetary central government is often a single unit of the central government that encompasses the fundamental activities of the national executive, legislative, and judiciary powers. This component of general government is usually covered by the main (or general) budget.
+
+          The budgetary central government’s revenue (and expense) are normally regulated and controlled by a ministry of finance, or its functional equivalent, by means of a budget approved by the legislature.
+
+          Most of the ministries, departments, agencies, boards, commissions, judicial authorities, legislative bodies, and other entities that make up the budgetary central government are not separate institutional units. This is because they generally do not have the authority to own assets, incur liabilities, or engage in transactions in their own right, including references to standards and classifications, preferably relying on international agreed definitions.
+
+          Further information available at: https://unstats.un.org/sdgs/metadata/files/Metadata-17-01-02.pdf

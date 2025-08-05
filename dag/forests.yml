@@ -14,6 +14,48 @@ steps:
   data://garden/forests/2024-07-10/tree_cover_loss_by_driver:
     - data://meadow/forests/2024-07-10/tree_cover_loss_by_driver
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2023-04-30/income_groups
+    - data://garden/wb/2025-07-01/income_groups
   data://grapher/forests/2024-07-10/tree_cover_loss_by_driver:
     - data://garden/forests/2024-07-10/tree_cover_loss_by_driver
+
+  # Forest Share combined sources
+  data://garden/forests/2025-05-08/forest_share:
+    - snapshot://papers/2025-05-30/scottish_government.csv
+    - snapshot://defra/2025-05-06/forest_share.csv
+    - snapshot://fao/2025-05-07/forest_share.csv
+    - snapshot://forest_research/2025-05-06/forest_share.csv
+    - snapshot://papers/2025-05-07/france_forest_share.csv
+    - snapshot://papers/2025-05-07/japan_forest_share.csv
+    - snapshot://papers/2025-05-07/taiwan_forest_share.csv
+    - snapshot://papers/2025-05-08/mather_2004.csv
+    - snapshot://papers/2025-05-13/kleinn_2000.csv
+    - snapshot://papers/2025-05-23/he_2025.csv
+    - snapshot://papers/2025-05-08/soo_bae_et_al_2012.csv
+    - snapshot://usda_fs/2025-05-07/forest_share.csv
+    - data://garden/fao/2025-05-09/fra_forest_extent
+  data://grapher/forests/2025-05-09/forest_share:
+    - data://garden/forests/2025-05-08/forest_share
+
+  # Forest Share combined historical sources for external channnel
+  data://external/forests/latest/forest_share:
+    - snapshot://papers/2025-05-30/scottish_government.csv
+    - snapshot://defra/2025-05-06/forest_share.csv
+    - snapshot://fao/2025-05-07/forest_share.csv
+    - snapshot://forest_research/2025-05-06/forest_share.csv
+    - snapshot://papers/2025-05-07/france_forest_share.csv
+    - snapshot://papers/2025-05-07/japan_forest_share.csv
+    - snapshot://papers/2025-05-07/taiwan_forest_share.csv
+    - snapshot://papers/2025-05-08/mather_2004.csv
+    - snapshot://papers/2025-05-13/kleinn_2000.csv
+    - snapshot://papers/2025-05-23/he_2025.csv
+    - snapshot://papers/2025-05-08/soo_bae_et_al_2012.csv
+    - snapshot://usda_fs/2025-05-07/forest_share.csv
+
+  #
+  # FAO Forest Resources Assessment (FRA) data
+  #
+  data://meadow/fao/2025-05-09/fra_forest_extent:
+    - snapshot://fao/2025-05-09/fra_forest_extent.xlsx
+  data://garden/fao/2025-05-09/fra_forest_extent:
+    - data://meadow/fao/2025-05-09/fra_forest_extent
+    - data://garden/faostat/2025-03-17/faostat_rl

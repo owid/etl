@@ -8,12 +8,13 @@ from structlog import get_logger
 from apps.utils.gpt import GPTQuery, OpenAIWrapper, get_cost_and_tokens
 from apps.wizard.app_pages.expert.prompts import SYSTEM_PROMPT_GENERIC
 from apps.wizard.utils.db import WizardDB
+from etl.config import GITHUB_API_URL
 
 # Logger
 log = get_logger()
 
 # GPT model
-MODEL_NAME = "gpt-4o"
+MODEL_NAME = "gpt-4.1"
 
 
 def get_json_url(url: str):
@@ -29,7 +30,7 @@ def get_json_url(url: str):
 def get_latest_pr_data():
     """Get latest PR data."""
     # Access repo and get latest PR data
-    url = "https://api.github.com/repos/owid/etl/pulls?state=closed'"
+    url = f"{GITHUB_API_URL}?state=closed'"
     data = get_json_url(url)
     # Clean
     data = _clean_pr_data(data)

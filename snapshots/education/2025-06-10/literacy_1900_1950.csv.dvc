@@ -1,0 +1,31 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Progress of literacy in various countries
+    description: |-
+      This dataset presents UNESCO’s first global survey of adult illiteracy, based on census and official government data from 26 countries. Countries were included if they had illiteracy data for at least three census years since around 1900. The dataset uses the most recent available figures and shows how literacy levels changed over time in the first half of the 20th century.
+
+      The study notes that countries defined and measured literacy in different ways. Some counted people as literate if they could read or write; others required more, like writing a letter or reading a passage. In some places, being able to sign one’s name was enough; in others, it was not. The age at which people were counted also varied—from as young as 5 to as old as 15.
+
+      These differences make it hard to compare literacy rates across countries or even across time within a country. People who could only read or only write were classified differently depending on local rules. Other issues, like missing data and unclear definitions, add to the difficulty. Despite these limits, the dataset offers important insights into global literacy patterns during this period.
+    date_published: "1953"
+
+    # Citation
+    producer: UNESCO
+    citation_full: |-
+      UNESCO. (1953). Progress of literacy in various countries: a preliminary statistical study of available census data since 1900. United Nations Educational, Scientific and Cultural Organization.
+
+    # Files
+    url_main: https://unesdoc.unesco.org/ark:/48223/pf0000002898
+    date_accessed: '2025-06-10'
+
+    # License
+    license:
+      name: CC BY 3.0 IGO
+      url: https://databrowser.uis.unesco.org/terms-and-conditions
+outs:
+  - md5: 1ff2d3171fd3ee18e7adaef1b2569425
+    size: 24669
+    path: literacy_1900_1950.csv

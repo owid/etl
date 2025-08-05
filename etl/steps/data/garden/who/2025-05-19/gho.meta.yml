@@ -1,0 +1,64 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Global Health
+
+dataset:
+  # title: WHO Global Health Observatory
+  title: Global Health Observatory - World Health Organization
+  update_period_days: 365
+
+tables:
+  # Custom OOMs
+  neonatal_tetanus__number_of_reported_cases:
+    variables:
+      neonatal_tetanus__number_of_reported_cases_per_million:
+        title: Neonatal tetanus - number of reported cases per million
+        unit: cases per million
+        description_short: Confirmed neonatal tetanus cases per million.
+        description_from_producer: |-
+          #### Definition
+          Confirmed neonatal tetanus cases per million.
+
+          #### Method of estimation
+          WHO compiles neonatal tetanus data as reported by national authorities. Our World In Data converts this into a rate by standardising with our population variable.
+
+  proportion_of_population_with_primary_reliance_on_clean_fuels_and_technologies_for_cooking__pct:
+    variables:
+      proportion_of_population_without_primary_reliance_on_clean_fuels_and_technologies_for_cooking__pct:
+        title: Proportion of population without primary reliance on clean fuels and technologies for cooking (%)
+        description_short: |-
+          Proportion of population without primary reliance on clean fuels and technology is calculated as the number of people unable to use clean fuels and technologies for cooking, heating and lighting divided by total population reporting that any cooking, heating or lighting, expressed as percentage. “Clean” is defined by the emission rate targets and specific fuel recommendations (i.e. against unprocessed coal and kerosene) included in the normative guidance WHO guidelines for indoor air quality: household fuel combustion.
+        description_from_producer: |-
+          #### Rationale
+          The use of solid fuels and kerosene in households is associated with increased mortality from acute lower respiratory, chronic obstructive pulmonary disease, stroke, ischaemic heart disease, and lung cancer.
+
+          #### Definition
+          Proportion of population without primary reliance on clean fuels and technology is calculated as the number of people unable to use clean fuels and technologies for cooking, heating and lighting divided by total population reporting that any cooking, heating or lighting, expressed as percentage. “Clean” is defined by the emission rate targets and specific fuel recommendations (i.e. against unprocessed coal and kerosene) included in the normative guidance WHO guidelines for indoor air quality: household fuel combustion.
+
+          #### Method of measurement
+          The indicator is calculated as the number of people unable to use clean fuels and technologies divided by total population, expressed as a percentage. Based on the recommendations included in the WHO Guidelines for indoor air quality: household fuel combustion, the fuels and technologies that are considered clean include electricity, natural gas, liquified petroleum gas, biogas, ethanol, and solar.
+
+          #### Method of estimation
+          A non-parametrical statistical model based on household survey data and time as inputs is applied to derive estimates. For further information on the model, see Stoner O et al, 2020: Global Household Energy Model: A Multivariate Hierarchical Approach to Estimating Trends in the Use of Polluting and Clean Fuels for Cooking (see link below). Input data for the model is found in the WHO Household Energy Database. This database compiles data from nationally-representative surveys and censuses that provide estimates of primary cooking fuels and technologies. In cases where estimates of the population not cooking at home, with missing data or cooking with other fuels are provided, these populations are removed from the denominator for estimation purposes. The population data source is the 2018 Revision of World Urbanization Prospects.
+
+  population_with_primary_reliance_on_clean_fuels_and_technologies_for_cooking__in_millions:
+    variables:
+      population_without_primary_reliance_on_clean_fuels_and_technologies_for_cooking__in_millions:
+        title: Population without primary reliance on clean fuels and technologies for cooking (in millions)
+        description_short: |-
+          The population who are not able to rely on clean fuels and technologies as the primary source of domestic energy for cooking.
+        description_from_producer: |-
+          #### Rationale
+          The use of solid fuels and kerosene in households is associated with increased mortality from acute lower respiratory, chronic obstructive pulmonary disease, stroke, ischaemic heart disease, and lung cancer.
+
+          #### Definition
+          The population who are not able to rely on clean fuels and technologies as the primary source of domestic energy for cooking.
+
+          #### Method of measurement
+          The indicator is calculated as the total population minus the number of people using clean fuels and technologies. Based on the recommendations included in the WHO Guidelines for indoor air quality: household fuel combustion, the fuels and technologies that are considered clean include electricity, natural gas, liquified petroleum gas, biogas, ethanol, and solar.
+
+          #### Method of estimation
+          Modelled estimates. A non-parametrical statistical model based on household survey data and time as inputs is applied to derive estimates. For further information on the model, see Stoner O et al, 2020: Global Household Energy Model: A Multivariate Hierarchical Approach to Estimating Trends in the Use of Polluting and Clean Fuels for Cooking (see link below).
+          Input data for the model is found in the WHO Household Energy Database. This database compiles data from nationally-representative surveys and censuses that provide estimates of primary cooking fuels and technologies. In cases where estimates of the population not cooking at home, with missing data or cooking with other fuels are provided, these populations are removed from the denominator for estimation purposes. The population data is calculated by OWID and is available at: https://ourworldindata.org/grapher/population-past-future

@@ -7,7 +7,7 @@ import owid.catalog.processing as pr
 from owid.catalog import Dataset, Table
 
 from etl.data_helpers import geo
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -22,6 +22,12 @@ EXPECTED_MISSING_COUNTRIES_IN_LATEST_RELEASE = {
     "Yugoslavia",
 }
 
+# Define French overseas territories where we want to assign the same income group as France
+FRENCH_OVERSEAS_TERRITORIES = [
+    "French Guiana",
+    "French Southern Territories",
+]
+
 # Define regions to aggregate
 REGIONS = ["Europe", "Asia", "North America", "South America", "Africa", "Oceania", "World"]
 
@@ -29,7 +35,7 @@ REGIONS = ["Europe", "Asia", "North America", "South America", "Africa", "Oceani
 FRAC_ALLOWED_NANS_PER_YEAR = 0.2
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -55,7 +61,7 @@ def run(dest_dir: str) -> None:
     tb = tb.drop(columns=["country_code"], errors="raise")
 
     # Create an additional table for the classification of the latest year available.
-    tb_latest = tb.reset_index().drop_duplicates(subset=["country"], keep="last")
+    tb_latest = tb.reset_index(drop=True).drop_duplicates(subset=["country"], keep="last")
 
     # Rename new table.
     tb_latest.metadata.short_name = "income_groups_latest"
@@ -78,17 +84,36 @@ def run(dest_dir: str) -> None:
         missing_data_on_columns=False,
     )
 
+    # Assign the same income group as France to the French overseas territories.
+    tb = assign_french_overseas_group_same_as_france(
+        tb=tb,
+        list_of_territories=FRENCH_OVERSEAS_TERRITORIES,
+    )
+    tb_latest = assign_french_overseas_group_same_as_france(
+        tb=tb_latest,
+        list_of_territories=FRENCH_OVERSEAS_TERRITORIES,
+    )
+
     # Set an appropriate index and sort conveniently.
     tb = tb.format(["country", "year"])
 
     # Set an appropriate index and sort conveniently.
     tb_latest = tb_latest.format(["country"])
 
+    # Find the version of the current World Bank's classification.
+    origin = tb_latest["classification"].metadata.origins[0]
+    assert origin.producer == "World Bank", "Unexpected list of origins."
+    year_world_bank_classification = origin.date_published.split("-")[0]
+
     #
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb, tb_latest], default_metadata=ds_meadow.metadata)
+    ds_garden = paths.create_dataset(
+        tables=[tb, tb_latest],
+        default_metadata=ds_meadow.metadata,
+        yaml_params={"year_world_bank_classification": year_world_bank_classification},
+    )
     ds_garden.save()
 
 
@@ -226,5 +251,35 @@ def add_country_counts_and_population_by_status(
 
     # Merge the two tables
     tb = pr.merge(tb, tb_regions, on=["country", "year"], how="outer")
+
+    return tb
+
+
+def assign_french_overseas_group_same_as_france(tb: Table, list_of_territories: List[str]) -> Table:
+    """
+    Assign the same income group as France to the French overseas territories.
+    """
+
+    tb = tb.copy()
+
+    # Filter the rows where we have data for France
+    tb_france = tb[tb["country"] == "France"].reset_index(drop=True)
+
+    # # Keep only the columns we need
+    # tb_france = tb_france[["year", "classification"]]
+
+    tb_french_overseas = Table()
+
+    for territory in list_of_territories:
+        tb_territory = tb_france.copy()
+
+        # Add country
+        tb_territory["country"] = territory
+
+        # Concatenate the two tables
+        tb_french_overseas = pr.concat([tb_french_overseas, tb_territory], ignore_index=True)
+
+    # Concatenate the two tables
+    tb = pr.concat([tb, tb_french_overseas], ignore_index=True)
 
     return tb

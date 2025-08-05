@@ -1,0 +1,21 @@
+meta:
+  origin:
+    producer: UNESCO Institute for Statistics
+    title: UNESCO Institute for Statistics (UIS) - Education
+    description: |-
+      The UNESCO Institute for Statistics (UIS) is the official and trusted source of internationally-comparable data on education, science, culture and communication. As the official statistical agency of UNESCO, the UIS produces a wide range of state-of-the-art databases to fuel the policies and investments needed to transform lives and propel the world towards its development goals. The UIS provides free access to data for all UNESCO countries and regional groupings from 1970 to the most recent year available.
+    title_snapshot: UNESCO Institute for Statistics (UIS) - Education (OPRI)
+    description_snapshot: This snapshot is for the Other Policy Relevant Indicators dataset.
+    citation_full: UNESCO Institute for Statistics (UIS), Education, https://uis.unesco.org/bdds, 2025
+    attribution_short: UIS
+    url_main: https://databrowser.uis.unesco.org/resources/bulk
+    url_download: https://uis.unesco.org/sites/default/files/documents/bdds/022025/OPRI.zip
+    date_accessed: '2025-05-01'
+    date_published: '2025-02-01'
+    license:
+      name: CC BY 3.0 IGO
+      url: https://databrowser.uis.unesco.org/terms-and-conditions
+outs:
+  - md5: c9777d87ea2aa2c0b2a5cabeb7fc7396
+    size: 57738581
+    path: education_opri.zip

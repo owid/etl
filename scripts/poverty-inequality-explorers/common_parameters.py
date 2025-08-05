@@ -3,7 +3,7 @@ import textwrap
 import pandas as pd
 
 from apps.chart_sync.admin_api import AdminAPI
-from etl.config import OWID_ENV
+from etl.config import OWID_ENV, STAGING
 
 # NOTE: Don't forget to update the consumption and income spells for PIP
 # Check this by running this on the playground Jupyter notebook in garden:
@@ -27,21 +27,34 @@ from etl.config import OWID_ENV
 ####################################################################################################
 COLOR_SCALE_NUMERIC_MIN_VALUE = 0
 TOLERANCE = 5
-COLOR_SCALE_EQUAL_SIZEBINS = "true"
 NEW_LINE = "\\n\\n"
 Y_AXIS_MIN = 0
 
 ####################################################################################################
 # WORLD BANK POVERTY AND INEQUALITY PLATFORM
 ####################################################################################################
-SOURCE_NAME_PIP = "World Bank Poverty and Inequality Platform (2024)"
-DATA_PUBLISHED_BY_PIP = "World Bank (2024). Poverty and Inequality Platform (version 20240627_2017 and 20240627_2011) [Data set]. World Bank Group. https://pip.worldbank.org/."
+SOURCE_NAME_PIP = "World Bank Poverty and Inequality Platform (2025)"
+# TODO: Update the PIP versions here
+DATA_PUBLISHED_BY_PIP = "World Bank (2025). Poverty and Inequality Platform (version 20250401_2021 and 20250401_2017) [Data set]. World Bank Group. https://pip.worldbank.org/."
 SOURCE_LINK_PIP = "https://pip.worldbank.org"
-CONSUMPTION_SPELLS_PIP = 7
+CONSUMPTION_SPELLS_PIP = 8
 INCOME_SPELLS_PIP = 8
 
+# Define PPP versions
+# TODO: Update the PPP versions here
+PPP_VERSIONS_PIP = [2017, 2021]
 
-INCOME_OR_CONSUMPTION_PIP = "Depending on the country and year, the data relates to income measured after taxes and benefits, or to consumption, per capita. 'Per capita' means that the incomes of each household are attributed equally to each member of the household (including children)."
+# Define old and current PPP version
+PPP_VERSION_OLD_PIP = PPP_VERSIONS_PIP[0]
+PPP_VERSION_CURRENT_PIP = PPP_VERSIONS_PIP[1]
+
+# Define PPP to use for comparisons with LIS
+# NOTE: Update the PPP version here
+# TODO: Update the PPP version here
+PPP_VERSION_COMPARISON_PIP = PPP_VERSION_OLD_PIP
+
+
+INCOME_OR_CONSUMPTION_PIP = "Depending on the country and year, the data relates to income (measured after taxes and benefits) or to consumption, per capita. 'Per capita' means that the incomes of each household are attributed equally to each member of the household (including children)."
 NON_MARKET_DESCRIPTION_PIP = "Non-market sources of income, including food grown by subsistence farmers for their own consumption, are taken into account."
 NOWCAST_REGIONS_DESCRIPTION = "Regional and global estimates are extrapolated up until the year of the data release using GDP growth estimates and forecasts. For more details about the methodology, please refer to the [World Bank PIP documentation](https://datanalytics.worldbank.org/PIP-Methodology/lineupestimates.html#nowcasts)."
 
@@ -75,40 +88,40 @@ PROCESSING_DESCRIPTION_PIP_BASE = NEW_LINE.join(
 PROCESSING_DESCRIPTION_PIP = NEW_LINE.join(
     [
         PROCESSING_DESCRIPTION_PIP_BASE,
-        "If you would like to see the original data with _all_ available income and consumption data points shown separately, you can do so by selecting _Income surveys only_ or _Consumption surveys only_ in the Household survey data type dropdown or by clicking on _Show breaks between less comparable surveys_. You can also download this data in our [complete dataset](https://github.com/owid/poverty-data#a-global-dataset-of-poverty-and-inequality-measures-prepared-by-our-world-in-data-from-the-world-banks-poverty-and-inequality-platform-pip-database) of the World Bank PIP data.",
+        "If you would like to see the original data with _all_ available income and consumption data points shown separately, you can do so by selecting _Income surveys only_ or _Consumption surveys only_ in the Household survey data type dropdown or by clicking on _Show breaks between less comparable surveys_.",
     ]
 )
 
 PROCESSING_DESCRIPTION_PIP_PPP_COMPARISON = NEW_LINE.join(
     [
         PROCESSING_DESCRIPTION_PIP_BASE,
-        "If you would like to see the original data with _all_ available income and consumption data points shown separately, you can do so in our [Poverty Data Explorer](https://ourworldindata.org/explorers/poverty-explorer?Indicator=Share+in+poverty&Poverty+line=%2410+per+day&Household+survey+data+type=Show+data+from+both+income+and+consumption+surveys&Show+breaks+between+less+comparable+surveys=true&country=ROU~CHN~BLR~PER). You can also download this data in our [complete dataset](https://github.com/owid/poverty-data#a-global-dataset-of-poverty-and-inequality-measures-prepared-by-our-world-in-data-from-the-world-banks-poverty-and-inequality-platform-pip-database) of the World Bank PIP data.",
+        "If you would like to see the original data with _all_ available income and consumption data points shown separately, you can do so in our [Poverty Data Explorer](https://ourworldindata.org/explorers/poverty-explorer?Indicator=Share+in+poverty&Poverty+line=%2410+per+day&Household+survey+data+type=Show+data+from+both+income+and+consumption+surveys&Show+breaks+between+less+comparable+surveys=true&country=ROU~CHN~BLR~PER).",
     ]
 )
 
 PROCESSING_DESCRIPTION_PIP_INCOMES_ACROSS_DISTRIBUTION = NEW_LINE.join(
     [
         PROCESSING_DESCRIPTION_PIP_BASE,
-        "If you would like to see the original data with _all_ available income and consumption data points shown separately, you can do so in our [Incomes Across the Distribution - World Bank Data Explorer](https://ourworldindata.org/explorers/incomes-across-distribution-wb?Indicator=Decile+thresholds&Decile=9+%28richest%29&Household+survey+data+type=Show+data+from+both+income+and+consumption+surveys&Period=Day&Show+breaks+between+less+comparable+surveys=true&country=ROU~CHN~BLR~PER). You can also download this data in our [complete dataset](https://github.com/owid/poverty-data#a-global-dataset-of-poverty-and-inequality-measures-prepared-by-our-world-in-data-from-the-world-banks-poverty-and-inequality-platform-pip-database) of the World Bank PIP data.",
+        "If you would like to see the original data with _all_ available income and consumption data points shown separately, you can do so in our [Incomes Across the Distribution - World Bank Data Explorer](https://ourworldindata.org/explorers/incomes-across-distribution-wb?Indicator=Decile+thresholds&Decile=9+%28richest%29&Household+survey+data+type=Show+data+from+both+income+and+consumption+surveys&Period=Day&Show+breaks+between+less+comparable+surveys=true&country=ROU~CHN~BLR~PER).",
     ]
 )
 
 PROCESSING_DESCRIPTION_PIP_INEQUALITY = NEW_LINE.join(
     [
         PROCESSING_DESCRIPTION_PIP_BASE,
-        "If you would like to see the original data with _all_ available income and consumption data points shown separately, you can do so in our [Inequality - World Bank Data Explorer](https://ourworldindata.org/explorers/inequality-wb?country=ROU~CHN~BLR~PER&Indicator=Gini+coefficient&Household+survey+data+type=Show+data+from+both+income+and+consumption+surveys&Show+breaks+between+less+comparable+surveys=true). You can also download this data in our [complete dataset](https://github.com/owid/poverty-data#a-global-dataset-of-poverty-and-inequality-measures-prepared-by-our-world-in-data-from-the-world-banks-poverty-and-inequality-platform-pip-database) of the World Bank PIP data.",
+        "If you would like to see the original data with _all_ available income and consumption data points shown separately, you can do so in our [Inequality - World Bank Data Explorer](https://ourworldindata.org/explorers/inequality-wb?country=ROU~CHN~BLR~PER&Indicator=Gini+coefficient&Household+survey+data+type=Show+data+from+both+income+and+consumption+surveys&Show+breaks+between+less+comparable+surveys=true).",
     ]
 )
 
 PROCESSING_DESCRIPTION_PIP_POVERTY = NEW_LINE.join(
     [
         PROCESSING_DESCRIPTION_PIP_BASE,
-        "If you would like to see the original data with _all_ available income and consumption data points shown separately, you can do so in our [Poverty - World Bank Data Explorer](https://ourworldindata.org/explorers/poverty-wb?Indicator=Share+in+poverty&Poverty+line=%2410+per+day&Household+survey+data+type=Show+data+from+both+income+and+consumption+surveys&Show+breaks+between+less+comparable+surveys=true&country=ROU~CHN~BLR~PER). You can also download this data in our [complete dataset](https://github.com/owid/poverty-data#a-global-dataset-of-poverty-and-inequality-measures-prepared-by-our-world-in-data-from-the-world-banks-poverty-and-inequality-platform-pip-database) of the World Bank PIP data.",
+        "If you would like to see the original data with _all_ available income and consumption data points shown separately, you can do so in our [Poverty - World Bank Data Explorer](https://ourworldindata.org/explorers/poverty-wb?Indicator=Share+in+poverty&Poverty+line=%2410+per+day&Household+survey+data+type=Show+data+from+both+income+and+consumption+surveys&Show+breaks+between+less+comparable+surveys=true&country=ROU~CHN~BLR~PER).",
     ]
 )
 
-PPP_DESCRIPTION_PIP_2017 = "The data is measured in international-$ at 2017 prices – this adjusts for inflation and for differences in living costs between countries."
-PPP_DESCRIPTION_PIP_2011 = "The data is measured in international-$ at 2011 prices – this adjusts for inflation and for differences in living costs between countries."
+PPP_DESCRIPTION_PIP_OLD = f"The data is measured in international-$ at {PPP_VERSIONS_PIP[0]} prices – this adjusts for inflation and for differences in living costs between countries."
+PPP_DESCRIPTION_PIP_CURRENT = f"The data is measured in international-$ at {PPP_VERSIONS_PIP[1]} prices – this adjusts for inflation and for differences in living costs between countries."
 
 ####################################################################################################
 # WORLD INEQUALITY DATABASE
@@ -118,7 +131,7 @@ DATA_PUBLISHED_BY_WID = "World Inequality Database (WID), https://wid.world"
 SOURCE_LINK_WID = "https://wid.world"
 
 # NOTE: Also update the year here: https://docs.google.com/spreadsheets/d/1wcFsNZCEn_6SJ05BFkXKLUyvCrnigfR8eeemGKgAYsI/edit#gid=329774797
-PPP_YEAR_WID = 2023
+PPP_VERSION_WID = 2023
 
 ADDITIONAL_DESCRIPTION_WID = NEW_LINE.join(
     [
@@ -131,14 +144,17 @@ POST_TAX_WID = "In the case of national post-tax income, when the data sources a
 
 ADDITIONAL_DESCRIPTION_WID_POST_TAX = NEW_LINE.join([ADDITIONAL_DESCRIPTION_WID, POST_TAX_WID])
 
-PPP_DESCRIPTION_WID = f"The data is measured in international-$ at {PPP_YEAR_WID} prices – this adjusts for inflation and for differences in living costs between countries."
+PPP_DESCRIPTION_WID = f"The data is measured in international-$ at {PPP_VERSION_WID} prices – this adjusts for inflation and for differences in living costs between countries."
 
 ####################################################################################################
 # LUXEMBOURG INCOME STUDY
 ####################################################################################################
-SOURCE_NAME_LIS = "Luxembourg Income Study (2024)"
-DATA_PUBLISHED_BY_LIS = "Luxembourg Income Study (LIS) Database, http://www.lisdatacenter.org (multiple countries; December 2024). Luxembourg: LIS."
+SOURCE_NAME_LIS = "Luxembourg Income Study (2025)"
+DATA_PUBLISHED_BY_LIS = "Luxembourg Income Study (LIS) Database, http://www.lisdatacenter.org (multiple countries; June 2025). Luxembourg: LIS."
 SOURCE_LINK_LIS = "https://www.lisdatacenter.org/our-data/lis-database/"
+
+# NOTE: Also update the year here: https://docs.google.com/spreadsheets/d/1wcFsNZCEn_6SJ05BFkXKLUyvCrnigfR8eeemGKgAYsI/edit#gid=329774797
+PPP_VERSION_LIS = 2017
 
 NOTES_TITLE_LIS = "NOTES ON HOW WE PROCESSED THIS INDICATOR"
 
@@ -157,12 +173,18 @@ PROCESSING_POVERTY_LIS = "We obtain poverty indicators by using [Stata’s povde
 PROCESSING_GINI_MEAN_MEDIAN_LIS = "We obtain Gini coefficients by using [Stata’s ineqdec0 function](https://ideas.repec.org/c/boc/bocode/s366007.html). We set weights as the product between the number of household members (nhhmem) and the normalized household weight (hwgt). We also calculate mean and median values from this function.."
 PROCESSING_DISTRIBUTION_LIS = "Income shares and thresholds by decile are obtained by using [Stata’s sumdist function](https://ideas.repec.org/c/boc/bocode/s366005.html). We set weights as the product between the number of household members (nhhmem) and the normalized household weight (hwgt) and the number of quantile groups as 10. We estimate threshold ratios, share ratios and averages by decile in Python after processing in the LISSY platform."
 
-PPP_DESCRIPTION_LIS = "The data is measured in international-$ at 2017 prices – this adjusts for inflation and for differences in living costs between countries."
+PPP_DESCRIPTION_LIS = f"The data is measured in international-$ at {PPP_VERSION_LIS} prices – this adjusts for inflation and for differences in living costs between countries."
 
 RELATIVE_POVERTY_DESCRIPTION_LIS = "This is a measure of _relative_ poverty – it captures the share of people whose income is low by the standards typical in their own country."
 
 
 def upsert_to_db(explorer_name: str, content: str) -> None:
+    # If on a staging server, change link to CSVs
+    if STAGING:
+        content = content.replace(
+            "https://catalog.ourworldindata.org/explorers", f"http://staging-site-{STAGING}:8881/explorers"
+        )
+
     # Upsert config via Admin API
     admin_api = AdminAPI(OWID_ENV)
     admin_api.put_explorer_config(explorer_name, content)

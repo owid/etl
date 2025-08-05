@@ -14,7 +14,7 @@ from sqlalchemy.orm import Session
 from structlog import get_logger
 
 from apps.wizard.utils.components import grapher_chart
-from etl.collections.explorer_legacy import ExplorerLegacy
+from etl.collection.explorer.legacy import ExplorerLegacy
 from etl.config import OWID_ENV
 from etl.data_helpers.misc import round_to_nearest_power_of_ten, round_to_shifted_power_of_ten, round_to_sig_figs
 from etl.grapher.model import Entity, Explorer, Variable

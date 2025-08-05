@@ -21,7 +21,7 @@ import pandas as pd
 import structlog
 from detected_anomalies import handle_anomalies
 from owid import repack  # type: ignore
-from owid.catalog import Dataset, Table, Variable, VariablePresentationMeta
+from owid.catalog import Dataset, Table, Variable, VariablePresentationMeta, warnings
 from owid.catalog.utils import underscore
 from owid.datautils import dataframes
 from tqdm.auto import tqdm
@@ -336,13 +336,11 @@ FLAGS_RANKING = (
 # Additional descriptions.
 
 # Additional explanation to append to element description for variables that were originally given per capita.
-WAS_PER_CAPITA_ADDED_ELEMENT_DESCRIPTION = (
-    "Originally given per-capita, and converted into total figures by " "multiplying by population (given by FAO)."
-)
+WAS_PER_CAPITA_ADDED_ELEMENT_DESCRIPTION = "* This data was originally given per-capita by FAOSTAT. We converted this data into total figures by multiplying by FAOSTAT's population.\n"
 # Additional explanation to append to element description for created per-capita variables.
 NEW_PER_CAPITA_ADDED_ELEMENT_DESCRIPTION = (
-    "Per-capita values are obtained by dividing the original values by the "
-    "population (either provided by FAO or by OWID)."
+    "* Per-capita values were obtained by dividing total figures by Our World in Data's population.\n"
+    "* For regions defined by FAOSTAT, per-capita values were calculated using FAOSTAT's original population data, if available.\n"
 )
 
 # Additional text to include in the metadata title of the output wide table.
@@ -605,17 +603,19 @@ def prepare_dataset_description(fao_description: str, owid_description: str) -> 
     return description
 
 
-def prepare_variable_description(item: str, element: str, item_description: str, element_description: str) -> str:
-    """Prepare variable description by combining item and element names and descriptions.
+def prepare_description_from_producer(
+    fao_item: str, fao_element: str, item_description: str, element_description: str
+) -> str:
+    """Prepare description from producer by combining the original item and element names and descriptions.
 
-    This will be used in the variable metadata of the wide table, and shown in grapher SOURCES tab.
+    This will be used in the variable metadata of the wide table.
 
     Parameters
     ----------
-    item : str
-        Item name.
-    element : str
-        Element name.
+    fao_item : str
+        Original FAOSTAT item name.
+    fao_element : str
+        Original FAOSTAT element name.
     item_description : str
         Item description.
     element_description : str
@@ -624,13 +624,14 @@ def prepare_variable_description(item: str, element: str, item_description: str,
     Returns
     -------
     description : str
-        Variable description.
+        Variable as described by FAOSTAT.
+
     """
-    description = f"Item: {item}\n\n"
+    description = f"Item: {fao_item}\n\n"
     if len(item_description) > 0:
         description += f"Description: {item_description}\n"
 
-    description += f"\nMetric: {element}\n\n"
+    description += f"\nMetric: {fao_element}\n\n"
     if len(element_description) > 0:
         description += f"Description: {element_description}"
 
@@ -1337,13 +1338,8 @@ def convert_variables_given_per_capita_to_total_value(tb: Table, elements_metada
         tb.loc[per_capita_mask, "value"] = tb[per_capita_mask]["value"] * tb[per_capita_mask]["fao_population"]
 
         # Include an additional description to all elements that were converted from per capita to total variables.
-        if "" not in tb["element_description"].cat.categories:
-            tb["element_description"] = tb["element_description"].cat.add_categories([""])
-        tb.loc[per_capita_mask, "element_description"] = tb.loc[per_capita_mask, "element_description"].fillna("")
-        tb["element_description"] = dataframes.apply_on_categoricals(
-            [tb.element_description, per_capita_mask.astype("category")],
-            lambda desc, mask: f"{desc} {WAS_PER_CAPITA_ADDED_ELEMENT_DESCRIPTION}".lstrip() if mask else f"{desc}",
-        )
+        tb.loc[per_capita_mask, "description_processing"] = tb.loc[per_capita_mask, "description_processing"].fillna("")
+        tb.loc[per_capita_mask, "description_processing"] += WAS_PER_CAPITA_ADDED_ELEMENT_DESCRIPTION
 
     return tb
 
@@ -1356,6 +1352,7 @@ def add_per_capita_variables(tb: Table, elements_metadata: Table) -> Table:
       custom_elements_and_units.csv file.
     * The new variables will have the same element codes as the original per-capita variables, with 'pc' appended to
     the number.
+    * For all OWID countries and regions, the data will be divided by OWID's population dataset. For "FAO" regions, the data will be divided by the FAO population, if it's given in the current dataset; if not given, those regions will not have per capita data.
 
     Parameters
     ----------
@@ -1416,10 +1413,9 @@ def add_per_capita_variables(tb: Table, elements_metadata: Table) -> Table:
 
         # Add "per capita" to all units.
         per_capita_data["unit"] = per_capita_data["unit"].cat.rename_categories(lambda c: f"{c} per capita")
-        # Include an additional note in the description on affected elements.
-        per_capita_data["element_description"] = per_capita_data["element_description"].cat.rename_categories(
-            lambda c: f"{c} {NEW_PER_CAPITA_ADDED_ELEMENT_DESCRIPTION}"
-        )
+        # Include an additional note in the processing description on affected elements.
+        per_capita_data["description_processing"] = per_capita_data["description_processing"].fillna("")
+        per_capita_data["description_processing"] += NEW_PER_CAPITA_ADDED_ELEMENT_DESCRIPTION
         # Add new rows with per capita variables to data.
         tb_with_pc_variables = dataframes.concatenate(
             [tb_with_pc_variables, per_capita_data], ignore_index=True
@@ -1429,6 +1425,112 @@ def add_per_capita_variables(tb: Table, elements_metadata: Table) -> Table:
     tb_with_pc_variables = tb_with_pc_variables.copy_metadata(from_table=tb)
 
     return tb_with_pc_variables
+
+
+def add_modified_variables(tb: Table, dataset_short_name: str) -> Table:
+    # For convenience, create additional indicators in different units.
+    tb = tb.copy()
+    # NOTE: A new (arbitrary) element code will be assigned (ending in "pe", as per capita edited), which is an edited version of the given per capita element code.
+    additional_elements = {
+        "faostat_fbsc": [
+            {
+                # Food supply per day in grams (currently, there is only supply per year in kg).
+                "element_code_old": "0645pc",
+                "element_code": "0645pe",
+                "factor": 1000 / 365,
+                "unit": "grams per day per capita",
+                "unit_short_name": "g",
+            },
+            {
+                # Imports per capita in kg (currently, there is only imports per capita in tonnes).
+                "element_code_old": "5611pc",
+                "element_code": "5611pe",
+                "factor": 1000,
+                "unit": "kilograms per capita",
+                "unit_short_name": "kg",
+            },
+            {
+                # Exports per capita in kg (currently, there is only exports per capita in tonnes).
+                "element_code_old": "5911pc",
+                "element_code": "5911pe",
+                "factor": 1000,
+                "unit": "kilograms per capita",
+                "unit_short_name": "kg",
+            },
+            {
+                # Domestic supply per capita in kg (currently, there is only domestic supply per capita in tonnes).
+                "element_code_old": "5301pc",
+                "element_code": "5301pe",
+                "factor": 1000,
+                "unit": "kilograms per capita",
+                "unit_short_name": "kg",
+            },
+            {
+                # Food per capita in kg (currently, there is only food per capita in tonnes).
+                "element_code_old": "5142pc",
+                "element_code": "5142pe",
+                "factor": 1000,
+                "unit": "kilograms per capita",
+                "unit_short_name": "kg",
+            },
+            {
+                # Feed per capita in kg (currently, there is only feed per capita in tonnes).
+                "element_code_old": "5521pc",
+                "element_code": "5521pe",
+                "factor": 1000,
+                "unit": "kilograms per capita",
+                "unit_short_name": "kg",
+            },
+            {
+                # Other uses per capita in kg (currently, there is only other uses per capita in tonnes).
+                "element_code_old": "5154pc",
+                "element_code": "5154pe",
+                "factor": 1000,
+                "unit": "kilograms per capita",
+                "unit_short_name": "kg",
+            },
+            {
+                # Waste per capita in kg (currently, there is only waste per capita in tonnes).
+                "element_code_old": "5123pc",
+                "element_code": "5123pe",
+                "factor": 1000,
+                "unit": "kilograms per capita",
+                "unit_short_name": "kg",
+            },
+        ],
+        "faostat_qcl": [
+            {
+                # Production per capita in kg (currently, there is only production per capita in tonnes).
+                "element_code_old": "5510pc",
+                "element_code": "5510pe",
+                "factor": 1000,
+                "unit": "kilograms per capita",
+                "unit_short_name": "kg",
+            },
+            {
+                # Area harvested per capita in m2 (currently, there is only area harvested per capita in hectares).
+                "element_code_old": "5312pc",
+                "element_code": "5312pe",
+                "factor": 10000,
+                "unit": "square meters per capita",
+                "unit_short_name": "m²",
+            },
+        ],
+    }
+
+    for element in additional_elements.get(dataset_short_name, []):
+        _tb = tb[tb["element_code"] == element["element_code_old"]].reset_index(drop=True)
+        _tb["value"] *= element["factor"]
+        _tb["unit"] = element["unit"]
+        _tb["unit_short_name"] = element["unit_short_name"]
+        _tb["element_code"] = element["element_code"]
+        # Add new rows to the original table.
+        tb = pr.concat(
+            [tb, _tb.astype({"unit": "category", "unit_short_name": "category", "element_code": "category"})],
+            ignore_index=True,
+        )
+
+    return tb
 
 
 def clean_data_values(values: Variable, amendments: Dict[str, str]) -> Variable:
@@ -1542,6 +1644,9 @@ def clean_data(
 
         # Add FAO population as an additional column (if given in the original data).
         tb = add_fao_population_if_given(tb)
+
+    # Ensure a description processing column exists.
+    tb["description_processing"] = None
 
     # Convert variables that were given per-capita to total value.
     tb = convert_variables_given_per_capita_to_total_value(tb, elements_metadata=elements_metadata)
@@ -1723,8 +1828,8 @@ def prepare_wide_table(tb: Table) -> Table:
     if "item_description" in tb.columns:
         # Construct a human-readable variable description (for the variable metadata).
         tb["variable_description"] = dataframes.apply_on_categoricals(
-            [tb.item, tb.element, tb.item_description, tb.element_description],
-            prepare_variable_description,
+            [tb.fao_item, tb.fao_element, tb.item_description, tb.element_description],
+            prepare_description_from_producer,
         )
     else:
         # This is the case for faostat_qv since the last update.
@@ -1732,13 +1837,11 @@ def prepare_wide_table(tb: Table) -> Table:
 
     # Pivot over long dataframe to generate a wide dataframe with country-year as index, and as many columns as
     # unique elements in "variable_name" (which should be as many as combinations of item-elements).
-    # Note: We include area_code in the index for completeness, but by construction country-year should not have
-    # duplicates.
     # Note: `pivot` operation is usually faster on categorical columns
     log.info("prepare_wide_table.pivot", shape=tb.shape)
     # Create a wide table with just the data values.
     tb_wide = tb.pivot(
-        index=["area_code", "country", "year"],
+        index=["country", "year"],
         columns=["variable_name"],
         values="value",
     )
@@ -1776,14 +1879,17 @@ def prepare_wide_table(tb: Table) -> Table:
         tb_wide[column].metadata.display = {"name": variable_name_mapping[column]}
         tb_wide[column].metadata.presentation = VariablePresentationMeta(title_public=variable_name_mapping[column])
 
+    # Add processing description.
+    variable_name_mapping = _variable_name_map(tb, "description_processing", enforce_unique=False)
+    for column in tb_wide.columns:
+        tb_wide[column].metadata.description_processing = variable_name_mapping.get(column)
+
     # Ensure columns have the optimal dtypes, but codes are categories.
     log.info("prepare_wide_table.optimize_table_dtypes", shape=tb_wide.shape)
     tb_wide = optimize_table_dtypes(table=tb_wide.reset_index())
 
     # Sort columns and rows conveniently.
-    tb_wide = tb_wide.set_index(["country", "year"], verify_integrity=True)
-    tb_wide = tb_wide[["area_code"] + sorted([column for column in tb_wide.columns if column != "area_code"])]
-    tb_wide = tb_wide.sort_index(level=["country", "year"]).sort_index()
+    tb_wide = tb_wide.format(sort_columns=True)
 
     # Make all column names snake_case.
     variable_to_short_name = {
@@ -1793,6 +1899,10 @@ def prepare_wide_table(tb: Table) -> Table:
     }
     tb_wide = tb_wide.rename(columns=variable_to_short_name, errors="raise")
 
+    # Remove columns that only contain nans and zeros.
+    with warnings.ignore_warnings():
+        tb_wide = tb_wide.loc[:, ~(tb_wide.fillna(0).sum() == 0)]
+
     # Sanity check.
     number_of_infinities = np.isinf(tb_wide.select_dtypes(include=np.number).fillna(0)).values.sum()
     assert number_of_infinities == 0, f"There are {number_of_infinities} infinity values in the wide table."
@@ -1800,12 +1910,15 @@ def prepare_wide_table(tb: Table) -> Table:
     return tb_wide
 
 
-def _variable_name_map(data: Table, column: str) -> Dict[str, str]:
+def _variable_name_map(data: Table, column: str, enforce_unique: bool = True) -> Dict[str, str]:
     """Extract map {variable name -> column} from dataframe and make sure it is unique (i.e. ensure that one variable
     does not map to two distinct values)."""
     pivot = data.dropna(subset=[column]).groupby(["variable_name"], observed=True)[column].apply(set)
-    assert all(pivot.map(len) == 1)
-    return pivot.map(lambda x: list(x)[0]).to_dict()  # type: ignore
+    if enforce_unique:
+        assert all(pivot.map(len) == 1)
+        return pivot.map(lambda x: list(x)[0]).to_dict()  # type: ignore
+    else:
+        return pivot.map(lambda x: "".join(dict.fromkeys(x))).to_dict()  # type: ignore
 
 
 def parse_amendments_table(amendments: Table, dataset_short_name: str):
@@ -1848,6 +1961,454 @@ def sanity_check_custom_units(tb_wide: Table, ds_garden: Dataset) -> None:
             log.warning(
                 f"\nShort unit changed after parsing the meta.yml file.\ncolumn: '{column}'\nold: '{short_unit_old}'\nnew: '{short_unit_new}'\n{common_message}"
             )
+
+
+def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
+    # Improve metadata in wide table (this, unfortunately, cannot easily be achieved in the long table).
+    # def prepare_public_titles(item: str, element: str, unit: str) -> str:
+
+    ITEM_NAME_REPLACEMENTS = {
+        "faostat_qcl": {
+            # Meat items.
+            "00001765": "All meat",  # From faostat_qcl - 'Meat, total' (previously 'Meat, total').
+            "00001069": "Duck meat",  # From faostat_qcl - 'Meat of ducks, fresh or chilled' (previously 'Meat, duck').
+            "00001806": "Beef and buffalo meat",  # From faostat_qcl - 'Meat, beef and buffalo' (previously 'Meat, beef and buffalo').
+            "00001097": "Horse meat",  # From faostat_qcl - 'Horse meat, fresh or chilled' (previously 'Meat, horse').
+            "00001808": "Poultry meat",  # From faostat_qcl - 'Meat, poultry' (previously 'Meat, poultry').
+            "00000977": "Lamb and mutton meat",  # From faostat_qcl - 'Meat, lamb and mutton' (previously 'Meat, lamb and mutton').
+            "00001127": "Camel meat",  # From faostat_qcl - 'Meat of camels, fresh or chilled' (previously 'Meat, camel').
+            "00001080": "Turkey meat",  # From faostat_qcl - 'Meat of turkeys, fresh or chilled' (previously 'Meat, turkey').
+            "00001108": "Donkey meat",  # From faostat_qcl - 'Meat of asses, fresh or chilled' (previously 'Meat, ass').
+            "00001073": "Goose meat",  # From faostat_qcl - 'Meat of geese, fresh or chilled' (previously 'Meat, goose and guinea fowl').
+            "00001035": "Pig meat",  # From faostat_qcl - 'Meat of pig with the bone, fresh or chilled' (previously 'Meat, pig').
+            "00001163": "Game meat",  # From faostat_qcl - 'Game meat, fresh, chilled or frozen' (previously 'Meat, game').
+            "00001807": "Sheep and goat meat",  # From faostat_qcl - 'Meat, sheep and goat' (previously 'Meat, sheep and goat').
+            "00001141": "Rabbit and hare meat",  # From faostat_qcl - 'Meat of rabbits and hares, fresh or chilled' (previously 'Meat, rabbit').
+            "00001058": "Chicken meat",  # From faostat_qcl - 'Meat of chickens, fresh or chilled' (previously 'Meat, chicken').
+            "00000947": "Buffalo meat",  # From faostat_qcl - 'Meat of buffalo, fresh or chilled' (previously 'Meat, buffalo').
+            "00001111": "Mule meat",  # From faostat_qcl - 'Meat of mules, fresh or chilled' (previously 'Meat, mule').
+            "00001017": "Goat meat",  # From faostat_qcl - 'Meat of goat, fresh or chilled' (previously 'Meat, goat').
+            "00000867": "Cattle meat with the bone",  # From faostat_qcl - "Meat of cattle with the bone, fresh or chilled".
+            "00001158": "Other domestic camelid meat meat",  # From faostat_qcl - "Meat of other domestic camelids, fresh or chilled".
+            "00001151": "Other domestic rodent meat",  # From faostat_qcl - "Meat of other domestic rodents, fresh or chilled".
+            "00001089": "Pigeon and other bird meat",  # From faostat_qcl - "Meat of pigeons and other birds n.e.c., fresh, chilled or frozen".
+            "00001166": "Other mammal meat",  # From faostat_qcl - "Other meat of mammals, fresh or chilled".
+            # Fat.
+            "00001019": "Unrendered goat fat",  # From faostat_qcl - 'Goat fat, unrendered' (previously 'Fat, goats').
+            "00000869": "Unrendered cattle fat",  # From faostat_qcl - 'Cattle fat, unrendered' (previously 'Fat, cattle').
+            "00001129": "Camel fat",  # From faostat_qcl - 'Fat of camels' (previously 'Fat, camels').
+            "00000949": "Unrendered buffalo fat",  # From faostat_qcl - 'Buffalo fat, unrendered' (previously 'Fat, buffaloes').
+            "00001037": "Pig fat",  # From faostat_qcl - 'Fat of pigs' (previously 'Fat, pigs').
+            "00000979": "Unrendered sheep fat",  # From faostat_qcl - 'Sheep fat, unrendered' (previously 'Fat, sheep').
+            "00001043": "Rendered pig fat",  # From faostat_qcl - "Pig fat, rendered".
+            # Offals.
+            "00000868": "Cattle offal",  # From faostat_qcl - 'Offals, cattle' (previously 'Offals, cattle').
+            "00001098": "Horses and other equines offal",  # From faostat_qcl - 'Edible offals of horses and other equines,  fresh, chilled or frozen' (previously 'Offals, horses').
+            "00000978": "Sheep offal",  # From faostat_qcl - 'Offals, sheep' (previously 'Offals, sheep').
+            "00000948": "Buffalo offal",  # From faostat_qcl - 'Offals, buffaloes' (previously 'Offals, buffaloes').
+            "00001128": "Camel offal",  # From faostat_qcl - 'Offals, camels' (previously 'Offals, camels').
+            "00001036": "Pig offal",  # From faostat_qcl - 'Offals, pigs' (previously 'Offals, pigs').
+            "00001018": "Goat offal",  # From faostat_qcl - 'Offals, goats' (previously 'Offals, goats').
+            # Seeds.
+            "00000289": "Sesame seeds",  # From faostat_qcl - 'Sesame seed' (previously 'Sesame seed').
+            "00000267": "Sunflower seeds",  # From faostat_qcl - 'Sunflower seed' (previously 'Sunflower seed').
+            "00000292": "Mustard seeds",  # From faostat_qcl - 'Mustard seed' (previously 'Mustard seed').
+            "00000101": "Canary seeds",  # From faostat_qcl - 'Canary seed' (previously 'Canary seed').
+            "00000280": "Safflower seeds",  # From faostat_qcl - 'Safflower seed' (previously 'Safflower seed').
+            "00000328": "Unginned cotton seeds",  # From faostat_qcl - 'Seed cotton, unginned' (previously 'Seed cotton').
+            "00000333": "Linseed",  # From faostat_qcl - 'Linseed' (previously 'Linseed').
+            "00000336": "Hempseed",  # From faostat_qcl - 'Hempseed' (previously 'Hempseed').
+            "00000329": "Cotton seed",  # From faostat_qcl - 'Cotton seed' (previously 'Cottonseed').
+            "00000270": "Rape or colza seed",  # From faostat_qcl - 'Rape or colza seed' (previously 'Rapeseed').
+            "00000299": "Melonseed",  # From faostat_qcl - 'Melonseed' (previously 'Melonseed').
+            # Other.
+            "00001107": "Donkeys",  # From faostat_qcl - 'Asses'.
+            "00001034": "Pigs",  # From faostat_qcl - 'Swine / pigs'.
+            "00001091": "Eggs (from other birds)",  # From faostat_qcl - 'Eggs from other birds (excl. hens)' (previously 'Eggs from other birds (excl. hens)').
+            "00001062": "Eggs (from hens)",  # From faostat_qcl - 'Eggs from hens' (previously 'Eggs from hens').
+            "00001783": "Eggs (from hens and other birds)",  # From faostat_qcl - 'Eggs' (previously 'Eggs Primary').
+            "00000176": "Dry beans",  # From faostat_qcl - 'Beans, dry' (previously 'Beans, dry').
+            "00000201": "Dry lentils",  # From faostat_qcl - 'Lentils, dry' (previously 'Lentils').
+            "00000216": "Brazil nuts",  # From faostat_qcl - 'Brazil nuts, in shell' (previously 'Brazil nuts, with shell').
+            "00001804": "Citrus fruit",  # From faostat_qcl - 'Citrus Fruit' (previously 'Citrus Fruit').
+            "00000656": "Green coffee",  # From faostat_qcl - 'Coffee, green' (previously 'Coffee, green').
+            "00000995": "Sheep skins",  # From faostat_qcl - 'Skins, sheep' (previously 'Skins, sheep').
+            "00001025": "Goat skins",  # From faostat_qcl - 'Skins, goat' (previously 'Skins, goat').
+            "00000771": "Raw or retted flax",  # From faostat_qcl - 'Flax, raw or retted' (previously 'Flax fibre').
+            "00000220": "Chestnuts",  # From faostat_qcl - 'Chestnuts, in shell' (previously 'Chestnut').
+            "00000417": "Green peas",  # From faostat_qcl - 'Peas, green' (previously 'Peas, green').
+            "00001732": "Oilcrops (oil equivalent)",  # From faostat_qcl - 'Oilcrops, Oil Equivalent' (previously 'Oilcrops, Oil Equivalent').
+            "00000223": "Pistachios",  # From faostat_qcl - 'Pistachios, in shell' (previously 'Pistachios').
+            "00000187": "Dry peas",  # From faostat_qcl - 'Peas, dry' (previously 'Peas, dry').
+            "00001841": "Oilcrops (cake equivalent)",  # From faostat_qcl - 'Oilcrops, Cake Equivalent' (previously 'Oilcrops, Cake Equivalent').
+            "00000125": "Fresh cassava",  # From faostat_qcl - 'Cassava, fresh' (previously 'Cassava').
+            "00000197": "Dry pigeon peas",  # From faostat_qcl - 'Pigeon peas, dry' (previously 'Pigeon peas').
+            "00000249": "Coconuts",  # From faostat_qcl - 'Coconuts, in shell' (previously 'Coconuts').
+            "00000780": "Raw or retted jute",  # From faostat_qcl - 'Jute, raw or retted' (previously 'Jute').
+            "00000162": "Raw sugar",  # From faostat_qcl - 'Sugar (raw)' (previously 'Sugar (raw)').
+            "00000056": "Maize (corn)",  # From faostat_qcl - 'Maize (corn)' (previously 'Maize').
+            "00000414": "Green beans",  # From faostat_qcl - 'Other beans, green' (previously 'Beans, green').
+            "00000592": "Kiwi",  # From faostat_qcl - 'Kiwi' (previously 'Kiwi').
+            "00000800": "Other raw agave fibres",  # From faostat_qcl - "Agave fibres, raw, n.e.c.".
+            "00000203": "Dry bambara beans",  # From faostat_qcl - "Bambara beans, dry".
+            "00000051": "Malted beer of barley",  # From faostat_qcl - "Beer of barley, malted".
+            "00000420": "Green broad and horse beans",  # From faostat_qcl - "Broad beans and horse beans, green".
+            "00000899": "Dry buttermilk",  # From faostat_qcl - "Buttermilk, dry".
+            "00000955": "Fresh or processed cheese from buffalo milk",  # From faostat_qcl - "Cheese from milk of buffalo, fresh or processed".
+            "00001021": "Fresh or processed cheese from goat milk",  # From faostat_qcl - "Cheese from milk of goats, fresh or processed".
+            "00000984": "Fresh or processed cheese from sheep milk",  # From faostat_qcl - "Cheese from milk of sheep, fresh or processed".
+            "00000693": "Raw cinnamon and cinnamon tree flowers",  # From faostat_qcl - "Cinnamon and cinnamon-tree flowers, raw".
+            "00000698": "Raw cloves (whole stems)",  # From faostat_qcl - "Cloves (whole stems), raw".
+            "00000813": "Raw coir",  # From faostat_qcl - "Coir, raw".
+            "00000885": "Fresh cream",  # From faostat_qcl - "Cream, fresh".
+            "00017530": "Fibre crops (fibre equivalent)",  # From faostat_qcl - "Fibre Crops, Fibre Equivalent".
+            "00000720": "Raw ginger",  # From faostat_qcl - "Ginger, raw".
+            "00000778": "Raw kapok fibre",  # From faostat_qcl - "Kapok fibre, raw".
+            "00000402": "Green onions and shallots",  # From faostat_qcl - "Onions and shallots, green".
+            "00000512": "Other citrus fruit",  # From faostat_qcl - "Other citrus fruit, n.e.c.".
+            "00000619": "Other fruits",  # From faostat_qcl - "Other fruits, n.e.c.".
+            "00000339": "Other oil seeds",  # From faostat_qcl - "Other oil seeds, n.e.c.".
+            "00000603": "Other tropical fruits",  # From faostat_qcl - "Other tropical fruits, n.e.c.".
+            "00000463": "Other fresh vegetables",  # From faostat_qcl - "Other vegetables, fresh n.e.c.".
+            "00000748": "Peppermint and spearmint",  # From faostat_qcl - "Peppermint, spearmint".
+            "00000788": "Raw or retted ramie",  # From faostat_qcl - "Ramie, raw or retted".
+            "00000789": "Raw sisal",  # From faostat_qcl - "Sisal, raw".
+            "00001809": "Dry skim milk and buttermilk",  # From faostat_qcl - "Skim Milk & Buttermilk, Dry".
+            "00000896": "Condensed skim milk",  # From faostat_qcl - "Skim milk, condensed".
+            "00000895": "Evaporated skim milk",  # From faostat_qcl - "Skim milk, evaporated".
+            "00000777": "Raw or retted true hemp",  # From faostat_qcl - "True hemp, raw or retted".
+            "00000692": "Raw vanilla",  # From faostat_qcl - "Vanilla, raw".
+            "00000890": "Condensed whey",  # From faostat_qcl - "Whey, condensed".
+            "00000889": "Consdensed whole milk",  # From faostat_qcl - "Whole milk, condensed".
+            "00000894": "Evaporated whole milk",  # From faostat_qcl - "Whole milk, evaporated".
+            # Other odd cases (they would need to be manually fixed, I'll leave them for now).
+            # "00000809": "abaca manila hemp raw",  # From faostat_qcl - "Abaca, manila hemp, raw".
+            # "00000839": "balata gutta percha guayule chicle and similar natural gums in primary forms or in plates sheets or strip",  # From faostat_qcl - "Balata, gutta-percha, guayule, chicle and similar natural gums in primary forms or in plates, sheets or strip".
+            # "00000401": "chillies and peppers green capsicum spp and pimenta spp",  # From faostat_qcl - "Chillies and peppers, green (Capsicum spp. and Pimenta spp.)".
+            # "00000149": "edible roots and tubers with high starch or inulin content n e c fresh",  # From faostat_qcl - "Edible roots and tubers with high starch or inulin content, n.e.c., fresh".
+            # "00000675": "green tea not fermented black tea fermented and partly fermented tea in immediate packings of a content not exceeding 3 kg",  # From faostat_qcl - "Green tea (not fermented), black tea (fermented) and partly fermented tea, in immediate packings of a content not exceeding 3 kg".
+            # "00000782": "kenaf and other textile bast fibres raw or retted",  # From faostat_qcl - "Kenaf, and other textile bast fibres, raw or retted".
+            # "00000702": "nutmeg mace cardamoms raw",  # From faostat_qcl - "Nutmeg, mace, cardamoms, raw".
+            # "00000234": "other nuts excluding wild edible nuts and groundnuts in shell n e c",  # From faostat_qcl - "Other nuts (excluding wild edible nuts and groundnuts), in shell, n.e.c.".
+            # "00000723": "other stimulant spice and aromatic crops n e c",  # From faostat_qcl - "Other stimulant, spice and aromatic crops, n.e.c.".
+            # "00000394": "pumpkins squash and gourds",  # From faostat_qcl - "Pumpkins, squash and gourds".
+            # "00000754": "pyrethrum dried flowers",  # From faostat_qcl - "Pyrethrum, dried flowers".
+            # "00001176": "snails fresh chilled frozen dried salted or in brine except sea snails",  # From faostat_qcl - "Snails, fresh, chilled, frozen, dried, salted or in brine, except sea snails".
+        },
+        "faostat_fbsc": {
+            # Meat.
+            "00002943": "All meat",  # From faostat_fbsc - 'Meat, total' (previously 'Meat, total').
+            "00002734": "Poultry meat",  # From faostat_fbsc - 'Meat, poultry' (previously 'Meat, poultry').
+            "00002731": "Beef and buffalo meat",  # From faostat_fbsc - 'Bovine meat'.
+            "00002732": "Sheep and goat meat",  # From faostat_fbsc - 'Meat, sheep and goat' (previously 'Meat, sheep and goat').
+            "00002733": "Pig meat",  # From faostat_fbsc - 'Pork' (previously 'Pork').
+            "00002768": "Aquatic mammals meat",  # From faostat_fbsc - "Meat, Aquatic Mammals".
+            # Seeds.
+            "00002557": "Sunflower seeds",  # From faostat_fbsc - 'Sunflower seed' (previously 'Sunflower seed').
+            "00002561": "Sesame seeds",  # From faostat_fbsc - 'Sesame seed' (previously 'Sesame seed').
+            "00002559": "Cottonseed",  # From faostat_fbsc - 'Cottonseed' (previously 'Cottonseed').
+            # Other.
+            "00002901": "All food",  # From faostat_fbsc - 'Total' (previously 'Total').
+            "00002737": "Raw animal fats",  # From faostat_fbsc - 'Animal fats' (previously 'Animal fats').
+            "00002946": "Animal fats",  # From faostat_fbsc - 'Animal fats group'.
+            "00002546": "Dry beans",  # From faostat_fbsc - 'Beans, dry' (previously 'Beans, dry').
+            "00002514": "Corn",  # From faostat_fbsc - 'Maize' (previously 'Maize').
+            "00002547": "Dry peas",  # From faostat_fbsc - 'Peas, dry' (previously 'Peas, dry').
+            "00002769": "Other aquatic animals",  # From faostat_fbsc - 'Aquatic animals, other'.
+            "00002961": "Other aquatic products",  # From faostat_fbsc - 'Aquatic products, other'.
+            "00002657": "Fermented beverages",  # From faostat_fbsc - 'Beverages, fermented'.
+            "00002520": "Other cereals",  # From faostat_fbsc - 'Cereals, other'.
+            "00002659": "Non-consumable alcohol",  # From faostat_fbsc - "Alcohol, Non-Food".
+            "00002614": "Other citrus",  # From faostat_fbsc - "Citrus, Other".
+            "00002781": "Fish body oil",  # From faostat_fbsc - "Fish, Body Oil".
+            "00002782": "Fish liver oil",  # From faostat_fbsc - "Fish, Liver Oil".
+            "00002625": "Other fruits",  # From faostat_fbsc - "Fruits, Other".
+            "00002764": "Other marine fish",  # From faostat_fbsc - "Marine Fish, Other".
+            "00002735": "Other meat",  # From faostat_fbsc - "Meat, Other".
+            "00002767": "Other molluscs",  # From faostat_fbsc - "Molluscs, Other".
+            "00002570": "Other oilcrops",  # From faostat_fbsc - "Oilcrops, Other".
+            "00002534": "Other roots",  # From faostat_fbsc - "Roots, Other".
+            "00002645": "Other spices",  # From faostat_fbsc - "Spices, Other".
+            "00002543": "Other sweeteners",  # From faostat_fbsc - "Sweeteners, Other".
+            "00002605": "Other vegetables",  # From faostat_fbsc - "Vegetables, Other".
+            "00002586": "Other oilcrop oils",  # From faostat_fbsc - "Oilcrops Oil, Other".
+            "00002549": "Other pulses and products",  # From faostat_fbsc - "Pulses, Other and products".
+            # NOTE: It's unclear what the difference is between the following two, but for now, they are not used in the explorer.
+            "00002924": "All alcoholic beverages",  # From faostat_fbsc - 'Alcoholic Beverages'.
+            "00002658": "Alcoholic beverages",  # From faostat_fbsc - 'Beverages, alcoholic'.
+        },
+    }
+
+    for column in tb_wide.columns:
+        item, item_code, element, element_code, unit = sum(
+            [[j.strip() for j in i.split("|")] for i in tb_wide[column].metadata.title.split("||")], []
+        )
+
+        # Replace item names in special cases.
+        if dataset_short_name in ITEM_NAME_REPLACEMENTS:
+            item = ITEM_NAME_REPLACEMENTS[dataset_short_name].get(item_code, item)
+
+        # Ensure items don't have arbitrary capital letters.
+        item = item.capitalize()
+
+        # First define default metadata values:
+        display_name = f"{item} - {element} ({unit})"
+        title = display_name
+        description_short = None
+        num_decimal_places = 2
+
+        # A few additional definitions.
+        description_short_food_available = "Quantity that is available for consumption at the end of the supply chain. It does not account for consumer waste, so the quantity that is actually consumed may be lower."
+
+        # Now redefine the title for special cases:
+        if dataset_short_name == "faostat_fbsc":
+            if element_code == "0645pc":
+                # "0645pc",  # Food available for consumption (kilograms per year per capita)
+                assert unit == "kilograms per year per capita"
+                title = f"Yearly per capita supply of {item.lower()}"
+                description_short = description_short_food_available
+            elif element_code == "0645pe":
+                # "0645pe",  # Food available for consumption (grams per day per capita) - created in the garden faostat_fbsc step.
+                assert unit == "grams per day per capita"
+                title = f"Daily per capita supply of {item.lower()}"
+                description_short = description_short_food_available
+            elif element_code == "0664pc":
+                # "0664pc",  # Food available for consumption (kilocalories per day per capita)
+                assert unit == "kilocalories per day per capita"
+                title = f"Daily per capita supply of calories from {item.lower()}"
+                description_short = description_short_food_available
+            elif element_code == "0674pc":
+                # "0674pc",  # Food available for consumption (grams of protein per day per capita)
+                assert unit == "grams of protein per day per capita"
+                title = f"Daily per capita supply of proteins from {item.lower()}"
+                description_short = description_short_food_available
+            elif element_code == "0684pc":
+                # "0684pc",  # Food available for consumption (grams of fat per day per capita)
+                assert unit == "grams of fat per day per capita"
+                title = f"Daily per capita supply of fat from {item.lower()}"
+                description_short = description_short_food_available
+            elif element_code == "005142":
+                # "005142",  # Food (tonnes)
+                assert unit == "tonnes"
+                title = f"{item} used for direct human food"
+                description_short = "Quantity that is allocated for direct consumption as human food, rather than allocation to animal feed or industrial uses."
+            elif element_code == "5142pc":
+                # "5142pc",  # Food (tonnes per capita)
+                assert unit == "tonnes per capita"
+                title = f"{item} used for direct human food per capita"
+                description_short = "Quantity that is allocated for direct consumption as human food, rather than allocation to animal feed or industrial uses."
+            elif element_code == "5142pe":
+                # "5142pe",  # Food (kilograms per capita)
+                assert unit == "kilograms per capita"
+                title = f"{item} used for direct human food per capita"
+                description_short = "Quantity that is allocated for direct consumption as human food, rather than allocation to animal feed or industrial uses."
+            elif element_code == "005521":
+                # "005521",  # Feed (tonnes)
+                assert unit == "tonnes"
+                title = f"{item} used for animal feed"
+            elif element_code == "5521pc":
+                # "5521pc",  # Feed (tonnes per capita)
+                assert unit == "tonnes per capita"
+                title = f"{item} used for animal feed per capita"
+                description_short = "Quantity allocated to feed livestock."
+            elif element_code == "5521pe":
+                # "5521pe",  # Feed (kilograms per capita)
+                assert unit == "kilograms per capita"
+                title = f"{item} used for animal feed per capita"
+                description_short = "Quantity allocated to feed livestock."
+            elif element_code == "005154":
+                # "005154",  # Other uses (non-food) (tonnes)
+                assert unit == "tonnes"
+                title = f"{item} allocated to other uses"
+                description_short = "Quantity allocated to industrial uses such as biofuel, pharmaceuticals or textile products, as well as other non-food uses like pet food."
+            elif element_code == "5154pc":
+                # "5154pc",  # Other uses (tonnes per capita)
+                assert unit == "tonnes per capita"
+                title = f"{item} allocated to other uses per capita"
+                description_short = "Quantity allocated to industrial uses such as biofuel, pharmaceuticals or textile products, as well as other non-food uses like pet food."
+            elif element_code == "5154pe":
+                # "5154pe",  # Other uses (kilograms per capita)
+                assert unit == "kilograms per capita"
+                title = f"{item} allocated to other uses per capita"
+                description_short = "Quantity allocated to industrial uses such as biofuel, pharmaceuticals or textile products, as well as other non-food uses like pet food."
+            elif element_code == "005123":
+                # "005123",  # Waste in supply chain (tonnes)
+                assert unit == "tonnes"
+                title = f"{item} wasted in supply chains"
+                description_short = "Quantity that is lost or wasted in supply chains through poor handling, spoiling, lack of refrigeration and damage from the field to retail. It does not include consumer waste."
+            elif element_code == "5123pc":
+                # "5123pc",  # Waste in supply chain (tonnes per capita)
+                assert unit == "tonnes per capita"
+                title = f"{item} wasted in supply chains per capita"
+                description_short = "Quantity that is lost or wasted in supply chains through poor handling, spoiling, lack of refrigeration and damage from the field to retail. It does not include consumer waste."
+            elif element_code == "5123pe":
+                # "5123pe",  # Waste in supply chain (kilograms per capita)
+                assert unit == "kilograms per capita"
+                title = f"{item} wasted in supply chains per capita"
+                description_short = "Quantity that is lost or wasted in supply chains through poor handling, spoiling, lack of refrigeration and damage from the field to retail. It does not include consumer waste."
+            elif element_code == "005301":
+                # "005301",  # Domestic supply (tonnes)
+                assert unit == "tonnes"
+                title = f"Domestic supply of {item.lower()}"
+                description_short = "Quantity of a commodity available for use within a country after accounting for trade and stock changes. It is calculated as production plus imports, minus exports, and adjusted for changes in stocks."
+            elif element_code == "5301pc":
+                # "5301pc",  # Domestic supply (tonnes per capita)
+                assert unit == "tonnes per capita"
+                title = f"Per capita domestic supply of {item.lower()}"
+                description_short = "Quantity of a commodity available for use within a country after accounting for trade and stock changes. It is calculated as production plus imports, minus exports, and adjusted for changes in stocks."
+            elif element_code == "5301pe":
+                # "5301pe",  # Domestic supply (kilograms per capita)
+                assert unit == "kilograms per capita"
+                title = f"Per capita domestic supply of {item.lower()}"
+            elif element_code == "005611":
+                # "005611",  # Imports (tonnes)
+                assert unit == "tonnes"
+                title = f"Imports of {item.lower()}"
+            elif element_code == "5611pc":
+                # "5611pc",  # Imports (tonnes per capita)
+                assert unit == "tonnes per capita"
+                title = f"Per capita imports of {item.lower()}"
+            elif element_code == "5611pe":
+                # "5611pe",  # Imports (kilograms per capita)
+                assert unit == "kilograms per capita"
+                title = f"Per capita imports of {item.lower()}"
+            elif element_code == "005911":
+                # "005911",  # Exports (tonnes)
+                assert unit == "tonnes"
+                title = f"Exports of {item.lower()}"
+            elif element_code == "5911pc":
+                # "5911pc",  # Exports (tonnes per capita)
+                assert unit == "tonnes per capita"
+                title = f"Per capita exports of {item.lower()}"
+            elif element_code == "5911pe":
+                # "5911pe",  # Exports (kilograms per capita)
+                assert unit == "kilograms per capita"
+                title = f"Per capita exports of {item.lower()}"
+            elif element_code == "005131":
+                # "005131",  # Processing (tonnes)
+                assert unit == "tonnes"
+                title = f"Processing of {item.lower()}"
+        elif dataset_short_name == "faostat_qcl":
+            if element_code == "005510":
+                # "005510",  # Production (tonnes).
+                assert unit == "tonnes"
+                title = f"Production of {item.lower()}"
+                num_decimal_places = 0
+            elif element_code == "5510pc":
+                # "5510pc",  # Production per capita (tonnes per capita).
+                assert unit == "tonnes per capita"
+                title = f"Per capita production of {item.lower()}"
+            elif element_code == "5510pe":
+                # "5510pe",  # Production per capita (kilograms per capita).
+                assert unit == "kilograms per capita"
+                title = f"Per capita production of {item.lower()}"
+            elif element_code == "005412":
+                # "005412",  # Yield (tonnes per hectare).
+                assert unit == "tonnes per hectare"
+                title = f"Yield of {item.lower()}"
+                description_short = (
+                    "Yield is the amount produced per unit of land used, measured in tonnes per hectare."
+                )
+            elif element_code in ["005417", "005424"]:
+                # "005417",  # Yield (kilograms per animal).
+                # "005424",  # Yield (kilograms per animal).
+                assert unit == "kilograms per animal"
+                title = f"Production of {item.lower()} per animal"
+            elif element_code == "005312":
+                # "005312",  # Area harvested (hectares).
+                assert unit == "hectares"
+                title = f"Land used to produce {item.lower()}"
+            elif element_code == "5312pc":
+                # "5312pc",  # Area harvested per capita (hectares per capita).
+                title = f"Per capita land used to produce {item.lower()}"
+            elif element_code == "5312pe":
+                # "5312pe",  # Area harvested per capita (square meteres per capita).
+                title = f"Per capita land used to produce {item.lower()}"
+            elif element_code in ["005320", "005321"]:
+                # "005320",  # Producing or slaughtered animals (animals).
+                # "005321",  # Producing or slaughtered animals (animals).
+                assert unit == "animals"
+                title = f"Animals slaughtered to produce {item.lower()}"
+                num_decimal_places = 0
+            elif element_code in ["5320pc", "5321pc"]:
+                # "5320pc",  # Producing or slaughtered animals per capita (animals per capita).
+                # "5321pc",  # Producing or slaughtered animals per capita (animals per capita).
+                assert unit == "animals per capita"
+                title = f"Animals slaughtered per capita to produce {item.lower()}"
+            elif element_code == "005413":
+                # "005413",  # Eggs per bird (eggs per bird).
+                # NOTE: There are only two items for this element: eggs from hens and eggs from other birds.
+                assert unit == "eggs per bird"
+                if item == "00001062":
+                    title = "Number of eggs per hen"
+                elif item == "00001091":
+                    title = "Number of eggs per bird (excluding hens)"
+            elif element_code == "005313":
+                # "005313",  # Laying (animals).
+                assert unit == "animals"
+                title = f"Laying animals to produce {item.lower()}"
+            elif element_code == "005513":
+                # "005513",  # Eggs produced (eggs).
+                assert unit == "eggs"
+                # NOTE: The only items are eggs from hens and eggs from other birds.
+                title = f"Number of {item.lower()} produced"
+            elif element_code == "005318":
+                # "005318",  # Milk animals (animals).
+                assert unit == "animals"
+                title = f"Number of animals used to produce {item.lower()}"
+            elif element_code == "005111":
+                # "005111",  # Stocks (animals)
+                assert unit == "animals"
+                title = f"Live {item.lower()}"
+                num_decimal_places = 0
+
+        # Override titles in special cases:
+        if item_code == "00002901":
+            if element_code == "0664pc":
+                assert unit == "kilocalories per day per capita"
+                title = "Total daily supply of calories per person"
+            elif element_code == "0674pc":
+                assert unit == "grams of protein per day per capita"
+                title = "Total daily supply of protein per person"
+            elif element_code == "0684pc":
+                assert unit == "grams of fat per day per capita"
+                title = "Total daily supply of fat per person"
+
+        # Add a text to the short description of some items that require further explanation.
+        description_short_by_item_code = {
+            "00001841": "Oilseed cake is the residue from oil extraction, commonly used as animal feed.",
+            "00001732": "Oil equivalent is a measurement of oil extracted from oil-bearing crops.",
+            "00000226": "The areca nut is the seed of the areca palm, and is commonly referred to as betel nut.",
+            "00001717": "Cereals include wheat, rice, maize, barley, oats, rye, millet, sorghum, buckwheat, and mixed grains.",
+            "00000656": "Green coffee beans are coffee seeds (beans) that have not yet been roasted.",
+            "00001780": "Milk represents the raw equivalents of all dairy products including cheese, yoghurt, cream and milk consumed as the final product.",
+            "00002551": "Nuts is the sum of all nut crops including brazil nuts, cashews, almonds, walnuts, pistachios, and areca nuts.",
+            "00002911": "Pulses are the edible seeds of plants in the legume family.",
+            "00001720": "Roots and tubers are a category of crops including cassava, potatoes, sweet potatoes, yams, and yautia.",
+            "00000162": "Raw sugar is the total quantity of sugar product yielded from sugar cane and sugar beet crops, expressed in its raw equivalents.",
+            "00001723": "Sugar crops is the sum of sugar cane and sugar beet.",
+            "00002901": "This is the total of all agricultural produce, both crops and livestock.",
+        }
+        if item_code in description_short_by_item_code:
+            description_short = description_short + " " if description_short else ""
+            description_short += description_short_by_item_code[item_code]
+
+        if dataset_short_name == "faostat_fbsc":
+            # Add footnote to mention the change in methodology between FBSH and FBS, which often causes abrupt jumps in 2010.
+            tb_wide[column].metadata.presentation.grapher_config = {
+                "note": "FAOSTAT applies a methodological change from the year 2010 onwards."
+            }
+
+        # Update metadata.
+        tb_wide[column].display["name"] = display_name
+        tb_wide[column].display["numDecimalPlaces"] = num_decimal_places
+        tb_wide[column].metadata.presentation.title_public = title
+        tb_wide[column].metadata.description_short = description_short
+
+        # Remove duplicate lines in processing description.
+        processing = tb_wide[column].metadata.description_processing
+        if processing is not None:
+            tb_wide[column].metadata.description_processing = "\n".join(list(dict.fromkeys(processing.split("\n"))))
 
 
 def run(dest_dir: str) -> None:
@@ -1920,19 +2481,23 @@ def run(dest_dir: str) -> None:
     # Handle detected anomalies in the data.
     tb, anomaly_descriptions = handle_anomalies(dataset_short_name=dataset_short_name, tb=tb)
 
+    # For convenience, create additional indicators in different units.
+    tb = add_modified_variables(tb=tb, dataset_short_name=dataset_short_name)
+
     # Create a long table (with item code and element code as part of the index).
     tb_long = prepare_long_table(tb=tb)
 
     # Create a wide table (with only country and year as index).
     tb_wide = prepare_wide_table(tb=tb)
 
+    # Improve metadata (of wide table).
+    improve_metadata(tb_wide=tb_wide, dataset_short_name=dataset_short_name)
+
     # Check that column "value" has an origin (other columns are not as important and may not have origins).
     error = f"Column 'value' of the long table of {dataset_short_name} must have one origin."
     assert len(tb_long["value"].metadata.origins) == 1, error
     error = f"All value columns of the wide table of {dataset_short_name} must have one origin."
-    assert all(
-        [len(tb_wide[column].metadata.origins) == 1 for column in tb_wide.columns if column not in ["area_code"]]
-    ), error
+    assert all([len(tb_wide[column].metadata.origins) == 1 for column in tb_wide.columns]), error
 
     #
     # Save outputs.

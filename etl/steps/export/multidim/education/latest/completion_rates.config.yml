@@ -1,0 +1,40 @@
+title:
+  title: School completion rates
+  title_variant: by level of education and gender
+default_selection:
+  - Niger
+  - Turkey
+  - Peru
+  - South Sudan
+
+dimensions:
+  - slug: level
+    name: Education level
+    choices:
+      - slug: primary
+        name: Primary
+        description: Marks the start of formal schooling, typically for children aged 5 to 7.
+      - slug: lower_secondary
+        name: Lower secondary
+        description: For students generally aged 11 to 14.
+      - slug: upper_secondary
+        name: Upper secondary
+        description: For students generally aged 15 to 18.
+      - slug: level_side_by_side
+        name: All levels
+        description: Compare completion rates across all education levels.
+
+  - slug: sex
+    name: Gender
+    choices:
+      - slug: both
+        name: Both genders
+      - slug: girls
+        name: Girls
+      - slug: boys
+        name: Boys
+      - slug: "sex_side_by_side"
+        name: Girls and boys
+        description: Compare genders
+
+views: []

@@ -1,0 +1,60 @@
+title:
+  title: Data on conflict since 1800
+  title_variant: "from Project Mars"
+default_selection:
+  - World
+
+default_dimensions:
+  indicator: deaths
+  conflict_type: all_stacked
+  estimate: low
+
+dimensions:
+  - slug: indicator
+    name: Measure
+    choices:
+      - slug: "deaths"
+        name: "Deaths"
+        group: "How deadly are wars?"
+        # description: People moving away from country
+      - slug: "death_rate"
+        name: "Death rate"
+        group: "How deadly are wars?"
+        description: The number of deaths divided by the total population
+      - slug: "wars_ongoing"
+        name: "Number of wars"
+        group: "How common are wars?"
+        # description: People moving to country
+      - slug: "wars_ongoing_country_rate"
+        name: "Rate of wars"
+        description: The number of wars divided by the number of countries
+        group: "How common are wars?"
+
+  - slug: conflict_type
+    name: "Conflict type"
+    choices:
+      - slug: "all"
+        name: "All wars"
+      - slug: "all_stacked"
+        name: "All wars (by type)"
+      - slug: "others (non-civil)"
+        name: "Interstate wars"
+        # description: People moving to country
+      - slug: "civil war"
+        name: "Civil wars"
+        # description: People moving to country
+
+  - slug: estimate
+    name: "Estimate"
+    choices:
+      - slug: low
+        name: Low estimate only
+      - slug: high
+        name: High estimate
+      - slug: na
+        name: "Not applicable"
+        # description: "Not applicable"
+      - slug: low_high
+        name: "Low and high estimates"
+
+views: []

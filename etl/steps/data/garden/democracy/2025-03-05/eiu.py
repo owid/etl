@@ -75,7 +75,7 @@ def run() -> None:
     ##################################################
 
     # Add regions to main table
-    tb = concat([tb, tb_avg_countries], ignore_index=True)
+    tb = concat([tb, tb_avg_countries, tb_avg_w_countries], ignore_index=True)
 
     #
     # Save outputs.
@@ -84,7 +84,6 @@ def run() -> None:
         tb.format(["country", "year"]),
         tb_num_countries.format(["country", "year", "category"], short_name="num_countries"),
         tb_num_people.format(["country", "year", "category"], short_name="num_people"),
-        tb_avg_w_countries.format(["country", "year"], short_name="avg_pop"),
     ]
 
     # Create a new garden dataset with the same metadata as the meadow dataset.
@@ -172,7 +171,14 @@ def get_country_data(tb: Table, ds_regions: Dataset) -> Tuple[Table, Table]:
 
     # 2/ COUNTRY-AVERAGE INDICATORS
     tb_avg = tb.copy()
-    indicators_avg = ["democracy_eiu"]
+    indicators_avg = [
+        "democracy_eiu",
+        "pol_part_eiu",
+        "dem_culture_eiu",
+        "elect_freefair_eiu",
+        "funct_gov_eiu",
+        "civlib_eiu",
+    ]
 
     # Keep only relevant columns
     tb_avg = tb_avg.loc[:, ["year", "country"] + indicators_avg]
@@ -248,7 +254,14 @@ def get_population_data(tb: Table, ds_regions: Dataset, ds_population: Dataset) 
 
     # 2/ COUNTRY-AVERAGE INDICATORS
     tb_avg = tb.copy()
-    indicators_avg = ["democracy_eiu"]
+    indicators_avg = [
+        "democracy_eiu",
+        "pol_part_eiu",
+        "dem_culture_eiu",
+        "elect_freefair_eiu",
+        "funct_gov_eiu",
+        "civlib_eiu",
+    ]
 
     # Keep only relevant columns
     tb_avg = tb_avg.loc[:, ["year", "country"] + indicators_avg]
@@ -277,11 +290,16 @@ def get_population_data(tb: Table, ds_regions: Dataset, ds_population: Dataset) 
     # Keep only certain year range
     # tb_avg = tb_avg.loc[tb_avg["year"].between(YEAR_AGG_MIN, YEAR_AGG_MAX)]
 
-    tb_avg = tb_avg.rename(
-        columns={
-            "democracy_eiu": "democracy_eiu_weighted",
-        }
-    )
+    # tb_avg = tb_avg.rename(
+    #     columns={
+    #         "democracy_eiu": "democracy_eiu_weighted",
+    #     }
+    # )
+
+    # tb_avg should only contain regions, not countries
+    assert tb_avg["country"].isin(set(tb["country"])).sum() == 0
+    tb_avg["country"] = tb_avg["country"] + " (population-weighted)"
+
     return tb_ppl, tb_avg
 
 

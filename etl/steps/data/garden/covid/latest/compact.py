@@ -7,7 +7,7 @@ import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Dataset, Table
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -190,7 +190,7 @@ for i in INDICATORS:
         break
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -201,7 +201,7 @@ def run(dest_dir: str) -> None:
     ds_regions = paths.load_dataset("regions")
     ds_wdi = paths.load_dataset("wdi")
     ds_hdr = paths.load_dataset("undp_hdr")
-    ds_pip = paths.load_dataset("world_bank_pip")
+    ds_pip = paths.load_dataset("world_bank_pip_legacy")
     ds_who = paths.load_dataset("who")
     ds_ghe = paths.load_dataset("ghe")
 
@@ -258,8 +258,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(
-        dest_dir,
+    ds_garden = paths.create_dataset(
         tables=[tb],
         check_variables_metadata=True,
         formats=["csv", "feather"],
@@ -299,22 +298,21 @@ def add_test_units(tb: Table) -> Table:
 def add_demography_indicators(tb: Table, ds_pop: Dataset, ds_le: Dataset, ds_wpp: Dataset) -> Table:
     # population, pop density
 
-    tb_pop = ds_pop["population"].reset_index()
+    tb_pop = ds_pop.read("population")
     tb_pop = tb_pop.loc[tb_pop["year"] == 2022, ["country", "population"]]
 
-    tb_popd = ds_pop["population_density"].reset_index()
+    tb_popd = ds_pop.read("population_density")
     tb_popd = tb_popd.loc[tb_popd["year"] == 2022, ["country", "population_density"]]
 
     # life exp
-    tb_le = ds_le["life_expectancy"].reset_index()
-    tb_le = tb_le.loc[
-        (tb_le["year"] == 2021) & (tb_le["sex"] == "all") & (tb_le["age"] == 0), ["country", "life_expectancy_0"]
-    ]
+    tb_le = ds_le.read("life_expectancy_at_birth")
+    tb_le = tb_le.drop(columns=["source", "source_url"])
     tb_le = tb_le.rename(columns={"life_expectancy_0": "life_expectancy"})
+    tb_le = tb_le.loc[tb_le["year"] == 2022, ["country", "life_expectancy"]]
     tb_le["country"] = tb_le["country"].replace({"Northern America": "North America"})
 
     # median age
-    tb_age = ds_wpp["median_age"].reset_index()
+    tb_age = ds_wpp.read("median_age")
     tb_age = tb_age.loc[
         (tb_age["year"] == 2022)
         & (tb_age["sex"] == "all")
@@ -331,7 +329,7 @@ def add_demography_indicators(tb: Table, ds_pop: Dataset, ds_le: Dataset, ds_wpp
 
 
 def add_region_indicators(tb: Table, ds_regions: Dataset) -> Table:
-    tb_regions = ds_regions["regions"].reset_index()
+    tb_regions = ds_regions.read("regions")
     ## continent
     tb_cont = tb_regions.loc[tb_regions["region_type"] == "continent", ["name", "members"]]  # .explode("members")
     tb_cont["members"] = tb_cont["members"].astype("string").apply(lambda x: literal_eval(x))
@@ -358,7 +356,7 @@ def add_external_indicators(
 
     # WDI
     ## filter latest years
-    tb_wdi = ds_wdi["wdi"].reset_index()
+    tb_wdi = ds_wdi.read("wdi")
     tb_wdi = tb_wdi.loc[
         tb_wdi["year"] > 2010, ["country", "year", "ny_gdp_pcap_pp_kd", "sh_sta_diab_zs", "sh_med_beds_zs"]
     ]
@@ -375,21 +373,21 @@ def add_external_indicators(
     )
 
     # HDR
-    tb_hdr = ds_hdr["undp_hdr"].reset_index()
-    tb_hdr = tb_hdr.loc[tb_hdr["year"] == 2022, ["country", "hdi"]]
+    tb_hdr = ds_hdr.read("undp_hdr_sex")
+    tb_hdr = tb_hdr.loc[(tb_hdr["year"] == 2022) & (tb_hdr["year"] == "total"), ["country", "hdi"]]
     tb_hdr = tb_hdr.rename(columns={"hdi": "human_development_index"})
 
     # PIP
-    tb_pip = ds_pip["income_consumption_2017"].reset_index()
-    tb_pip = tb_pip.loc[tb_pip["year"] > 2010, ["country", "year", "headcount_ratio_215"]]
+    tb_pip = ds_pip.read("income_consumption_2021")
+    tb_pip = tb_pip.loc[tb_pip["year"] > 2010, ["country", "year", "headcount_ratio_300"]]
     ## get most recent data
-    cols = ["headcount_ratio_215"]
+    cols = ["headcount_ratio_300"]
     tb_pip = _ffill_and_keep_latest(tb_pip, cols)
     ## rename cols
-    tb_pip = tb_pip.rename(columns={"headcount_ratio_215": "extreme_poverty"})
+    tb_pip = tb_pip.rename(columns={"headcount_ratio_300": "extreme_poverty"})
 
     # WHO
-    tb_who = ds_who["who"].reset_index()
+    tb_who = ds_who.read("who")
     tb_who = tb_who.loc[(tb_who["year"] > 2010) & (tb_who["residence"] == "Total"), ["country", "year", "hyg_bas"]]
     ## get most recent data
     cols = ["hyg_bas"]
@@ -398,7 +396,7 @@ def add_external_indicators(
     tb_who = tb_who.rename(columns={"hyg_bas": "handwashing_facilities"})
 
     # GHE
-    tb_ghe = ds_ghe["ghe"].reset_index()
+    tb_ghe = ds_ghe.read("ghe")
     # death_rate100k__age_group_age_standardized__sex_both_sexes__cause_cardiovascular_diseases
     tb_ghe = tb_ghe.loc[
         (tb_ghe["year"] > 2010)

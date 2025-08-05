@@ -2,11 +2,13 @@ from typing import Any, Dict, List, Optional
 
 import requests
 
+from etl.config import DEFAULT_GRAPHER_SCHEMA
 from etl.files import read_json_schema
 from etl.paths import SCHEMAS_DIR
 
 SNAPSHOT_SCHEMA = read_json_schema(path=SCHEMAS_DIR / "snapshot-schema.json")
 DATASET_SCHEMA = read_json_schema(path=SCHEMAS_DIR / "dataset-schema.json")
+MULTIDIM_SCHEMA = read_json_schema(path=SCHEMAS_DIR / "multidim-schema.json")
 TEMPLATE_PROPERTY = """
 {name}
 
@@ -76,7 +78,7 @@ def render_prop_doc(prop: Dict[str, Any], prop_name: str, level: int = 1, top_le
         **{
             "name": prop_title,
             "type": type_,
-            "description": prop["description"],
+            "description": prop.get("description", "No description available."),
             "requirement_level": requirement_level,
             "guidelines": guidelines,
             "examples": examples,
@@ -110,9 +112,14 @@ def render_props_recursive(
             return text
 
         if "properties" not in prop and "additionalProperties" in prop:
-            props_children = prop["additionalProperties"]["properties"]
-            if not render_top_as_scalar:
-                prop_name = f"{prop_name}[]"
+            # Check if additionalProperties is a dict with properties
+            if isinstance(prop["additionalProperties"], dict) and "properties" in prop["additionalProperties"]:
+                props_children = prop["additionalProperties"]["properties"]
+                if not render_top_as_scalar:
+                    prop_name = f"{prop_name}[]"
+            else:
+                # additionalProperties is just True or a simple type - skip
+                return text
         elif "properties" in prop:
             props_children = prop["properties"]
         else:
@@ -304,3 +311,44 @@ def render_grapher_config() -> str:
     {grapher_config}
     """
     return grapher_config
+
+
+def render_collection(level: int = 1) -> str:
+    """Render documentation for Collection (multidim) schema."""
+    # Use the generic recursive rendering like other schema functions
+    collection = MULTIDIM_SCHEMA
+    documentation = render_props_recursive(
+        collection,
+        "collection",
+        level,
+        "",
+        ignore_fields=[
+            "collection.views.config",  # Too detailed, reference external schema
+            "collection.views.metadata",  # Too detailed, reference external schema
+        ],
+    )
+    return documentation
+
+
+def render_collection_view_config(level: int = 1) -> str:
+    """Render documentation for Collection view config."""
+    # Extract the config property from the views schema
+    views_config = MULTIDIM_SCHEMA["properties"]["views"]["items"]["properties"]["config"]
+    documentation = render_props_recursive(views_config, "view.config", level, "", render_top_as_scalar=False)
+
+    # Add reference to full grapher schema
+    documentation += f"\n\nFor the complete list of available configuration options, see the [Grapher schema]({DEFAULT_GRAPHER_SCHEMA}).\n\n"
+
+    return documentation
+
+
+def render_collection_view_metadata(level: int = 1) -> str:
+    """Render documentation for Collection view metadata."""
+    # Extract the metadata property from the views schema
+    views_metadata = MULTIDIM_SCHEMA["properties"]["views"]["items"]["properties"]["metadata"]
+    documentation = render_props_recursive(views_metadata, "view.metadata", level, "", render_top_as_scalar=False)
+
+    # Add reference to full dataset schema
+    documentation += "\n\nFor the complete metadata structure, see the [Dataset schema](https://files.ourworldindata.org/schemas/dataset-schema.json).\n\n"
+
+    return documentation

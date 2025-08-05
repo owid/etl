@@ -3,13 +3,13 @@
 import owid.catalog.processing as pr
 from owid.catalog import Table
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -84,22 +84,30 @@ def run(dest_dir: str) -> None:
     tb_cpi_inv = tb_cpi_inv.format(["year", "country"])
 
     # Split into seperate tables to be able to create datapages by restructuring the data
-    tb_generative = tb_cpi_inv[["generative_ai"]].copy()
+    tb_generative = tb_cpi_inv.loc[:, ["generative_ai"]].copy()
     tb_generative.metadata.short_name = "ai_investment_generative"
 
-    tb_companies = tb_cpi_inv[["companies"]].copy()
+    tb_companies = tb_cpi_inv.loc[:, ["companies"]].copy()
     tb_companies.metadata.short_name = "ai_new_companies"
 
     tb_private_investment = create_private_investment_table(tb_cpi_inv)
     tb_corporate_investment = create_corporate_investment(tb_cpi_inv)
 
+    tb_total_privata_data_page = tb_cpi_inv.loc[:, ["private_investment"]].copy()
+    tb_total_privata_data_page.metadata.short_name = "ai_total_investment_private"
+
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(
-        dest_dir,
-        tables=[tb_generative, tb_private_investment, tb_corporate_investment, tb_companies],
+    ds_garden = paths.create_dataset(
+        tables=[
+            tb_generative,
+            tb_private_investment,
+            tb_corporate_investment,
+            tb_companies,
+            tb_total_privata_data_page,
+        ],
         check_variables_metadata=True,
         default_metadata=snap.metadata,
     )

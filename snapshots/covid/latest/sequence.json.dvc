@@ -22,13 +22,13 @@ meta:
       Emma B. Hodcroft. 2021. "CoVariants: SARS-CoV-2 Mutations and Variants of Interest." https://covariants.org/
     url_main: https://www.gisaid.org/
     url_download: https://raw.githubusercontent.com/hodcroftlab/covariants/master/web/public/data/perCountryData.json
-    date_accessed: 2024-08-24
-    date_published: 2024-08-24
+    date_accessed: 2025-08-05
+    date_published: 2025-06-18
     license:
       name: GISAID EpiFlu Database Access Agreement
       url: https://gisaid.org/terms-of-use/
   is_public: false
 outs:
-  - md5: 1ecb44a0946404df5b52bd83c3c54811
-    size: 24798821
+  - md5: ac0ebb136aa498f7ccbdb7bd1cc2cb9b
+    size: 32908153
     path: sequence.json

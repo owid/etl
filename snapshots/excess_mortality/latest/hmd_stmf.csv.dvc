@@ -1,6 +1,6 @@
 meta:
   source:
-    name: Human Mortality Database (2024)
+    name: Human Mortality Database
     description: |-
       In response to the COVID-19 pandemic, the HMD team decided to establish a new data resource: Short-term Mortality Fluctuations (STMF) data series. Objective and internationally comparable data are crucial to determine the effectiveness of different strategies used to address epidemics. Weekly death counts provide the most objective and comparable way of assessing the scale of short-term mortality elevations across countries and time. More details about this data project can be found in the recently published paper (https://www.nature.com/articles/s41597-021-01019-1).
 
@@ -13,12 +13,12 @@ meta:
       HMD provides an online STMF visualization toolkit (https://mpidr.shinyapps.io/stmortality).
     url: https://www.mortality.org/Data/STMF
     source_data_url: https://www.mortality.org/File/GetDocument/Public/STMF/Outputs/stmf.csv
-    date_accessed: 2025-04-15
-    publication_date: 2025-03-26
+    date_accessed: 2025-08-05
+    publication_date: 2025-07-28
     publication_year: 2025
     published_by: |-
       HMD. Human Mortality Database. Max Planck Institute for Demographic Research (Germany), University of California, Berkeley (USA), and French Institute for Demographic Studies (France). Available at www.mortality.org.
-  name: Short-Term Mortality Fluctuations (HMD, 2024)
+  name: Short-Term Mortality Fluctuations (HMD)
   description: |-
     In response to the COVID-19 pandemic, the HMD team decided to establish a new data resource: Short-term Mortality Fluctuations (STMF) data series. Objective and internationally comparable data are crucial to determine the effectiveness of different strategies used to address epidemics. Weekly death counts provide the most objective and comparable way of assessing the scale of short-term mortality elevations across countries and time. More details about this data project can be found in the recently published paper (https://www.nature.com/articles/s41597-021-01019-1).
 
@@ -33,6 +33,6 @@ meta:
     name: Creative Commons BY 4.0
     url: https://www.mortality.org/Data/UserAgreement
 outs:
-  - md5: 2411d8e1bb607db360661eebcfaffd0d
-    size: 21541746
+  - md5: 65659594876c269284e91528c195d037
+    size: 21861556
     path: hmd_stmf.csv

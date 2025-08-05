@@ -206,6 +206,18 @@ deaths:
     100+:
       all: 100;300;1000;3000;10000;30000;100000;300000;1
 
+infant_deaths:
+  color: "OrRd"
+  dimensions:
+    "0":
+      all: 300;1000;3000;10000;30000;100000;300000;1
+
+child_deaths:
+  color: "OrRd"
+  dimensions:
+    0-4:
+      all: 1000;3000;10000;30000;100000;300000;1000000;1
+
 death_rate:
   color: "OrRd"
   dimensions:

@@ -1,13 +1,13 @@
 """Generate aggregated table for total yearly and cumulative number of notable AI systems in each category of researcher affiliation."""
 
 from etl.catalog_helpers import last_date_accessed
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     paths.log.info("epoch_aggregates_affiliation.start")
 
     #
@@ -62,8 +62,7 @@ def run(dest_dir: str) -> None:
     #
     # Save outputs.
     #
-    ds_garden = create_dataset(
-        dest_dir,
+    ds_garden = paths.create_dataset(
         tables=[tb_agg],
         yaml_params={"date_accessed": last_date_accessed(tb), "year": last_date_accessed(tb)[-4:]},
     )

@@ -9,6 +9,10 @@ set -e
 
 start_time=$(date +%s)
 
+echo '--- Wildfires are now updated via autoupdate'
+
+exit 0;
+
 echo '--- Update wildfires'
 cd /home/owid/etl
 

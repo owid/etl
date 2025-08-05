@@ -417,6 +417,15 @@ steps:
   data://grapher/artificial_intelligence/2023-07-25/cset:
     - data://garden/artificial_intelligence/2023-07-25/cset
 
+  data://meadow/artificial_intelligence/2024-07-16/cset:
+    - snapshot://artificial_intelligence/2024-07-16/cset.csv
+  data://garden/artificial_intelligence/2024-07-16/cset:
+    - data://meadow/artificial_intelligence/2024-07-16/cset
+    - data://garden/demography/2024-07-15/population
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/bls/2025-04-12/us_consumer_prices
+  data://grapher/artificial_intelligence/2024-07-16/cset:
+    - data://garden/artificial_intelligence/2024-07-16/cset
   ########################
   # Papers with Code
   ########################
@@ -580,7 +589,9 @@ steps:
   data://grapher/artificial_intelligence/2023-06-14/ai_all_conferences:
     - data://garden/artificial_intelligence/2023-06-14/ai_all_conferences
 
-  # AI robots
+  # AI Index Report 2023 - AI robots
+  data://meadow/artificial_intelligence/2023-06-14/ai_robots:
+    - snapshot://artificial_intelligence/2023-06-14/ai_robots.csv
   data://garden/artificial_intelligence/2023-06-14/ai_robots:
     - data://meadow/artificial_intelligence/2023-06-14/ai_robots
   data://grapher/artificial_intelligence/2023-06-14/ai_robots:
@@ -671,8 +682,6 @@ steps:
     - data://garden/artificial_intelligence/2024-06-28/ai_bills
 
   # AI Index Report 2024 -  AI robots
-  data://garden/artificial_intelligence/2024-06-28/ai_robots:
-    - snapshot://artificial_intelligence/2024-06-28/ai_robots.csv
   data://grapher/artificial_intelligence/2024-06-28/ai_robots:
     - data://garden/artificial_intelligence/2024-06-28/ai_robots
 
@@ -692,3 +701,16 @@ steps:
   # Grapher dataset for generative investment in AI and number of companies
   data://grapher/artificial_intelligence/2024-06-28/ai_investment_generative_companies:
     - data://garden/artificial_intelligence/2024-06-28/ai_investment
+
+  # AI Index Report 2024 - AI strategies
+  data://garden/artificial_intelligence/2024-06-28/ai_strategies:
+    - snapshot://artificial_intelligence/2024-06-28/ai_strategies.csv
+    - data://garden/regions/2023-01-01/regions
+  data://grapher/artificial_intelligence/2024-06-28/ai_strategies:
+    - data://garden/artificial_intelligence/2024-06-28/ai_strategies
+
+  # AI Index Report 2024 - AI PhDs
+  data://garden/artificial_intelligence/2024-06-28/ai_phds:
+    - snapshot://artificial_intelligence/2024-06-28/ai_phds.csv
+  data://grapher/artificial_intelligence/2024-06-28/ai_phds:
+    - data://garden/artificial_intelligence/2024-06-28/ai_phds

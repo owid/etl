@@ -24,7 +24,7 @@ import pandas as pd
 from owid.catalog import Table
 from structlog import get_logger
 
-from apps.owidbot import github_utils as gh
+from etl.git_api_helpers import GithubApiRepo
 from etl.helpers import PathFinder
 from etl.paths import BASE_DIR
 
@@ -238,14 +238,15 @@ def run(dest_dir: str) -> None:
 
         prepare_and_save_outputs(tb, codebook=codebook, temp_dir_path=temp_dir_path)
 
-        gh.create_branch_if_not_exists(repo_name="co2-data", branch=branch, dry_run=dry_run)
+        repo = GithubApiRepo(repo_name="co2-data")
+
+        repo.create_branch_if_not_exists(branch=branch, dry_run=dry_run)
 
         # Commit csv files to the repos.
         for file_name in ["owid-co2-data.csv", "owid-co2-codebook.csv", "README.md"]:
             with (temp_dir_path / file_name).open("r") as file_content:
-                gh.commit_file_to_github(
+                repo.commit_file_to_github(
                     file_content.read(),
-                    repo_name="co2-data",
                     file_path=file_name,
                     commit_message=":bar_chart: Automated update",
                     branch=branch,

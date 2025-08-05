@@ -11,13 +11,17 @@ def run() -> None:
     # Load inputs.
     #
     # Load grapher config from YAML.
-    config = paths.load_explorer_config()
+    config = paths.load_collection_config()
 
     #
     # Save outputs.
     #
     # Initialize a new explorer.
-    ds_explorer = paths.create_explorer(config=config, explorer_name="crop-yields", avoid_duplicate_hack=True)
+    c = paths.create_collection(
+        config=config,
+        short_name="crop-yields",
+        explorer=True,
+    )
 
     # Save explorer.
-    ds_explorer.save(tolerate_extra_indicators=True)
+    c.save(tolerate_extra_indicators=True)

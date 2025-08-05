@@ -58,7 +58,10 @@ def main(upload: bool) -> None:
     snap = Snapshot(f"climate/{SNAPSHOT_VERSION}/weekly_wildfires.csv")
 
     # Load existing snapshot for comparison at the end of the script.
-    orig_snapshot_df = snap.read()
+    try:
+        orig_snapshot_df = snap.read()
+    except FileNotFoundError:
+        orig_snapshot_df = None
 
     # Initialize an empty list to hold DataFrames for wildfire data.
     dfs_fires = []
@@ -175,7 +178,7 @@ def main(upload: bool) -> None:
     # Combine both fires and emissions data into a final DataFrame.
     df_final = pd.concat([dfs_fires, dfs_emissions])
 
-    if len(df_final) < len(orig_snapshot_df):
+    if orig_snapshot_df is not None and len(df_final) < len(orig_snapshot_df):
         raise ValueError(
             f"New snapshot has fewer rows ({len(df_final)}) than the original snapshot {len(orig_snapshot_df)}. API could be down or data is missing."
         )

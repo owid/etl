@@ -1,0 +1,16 @@
+meta:
+  origin:
+    producer: Unknown
+    title: Unknown
+    citation_full: Unknown
+    version_producer: Local CSV
+    url_main: https://unknown.com
+    url_download: financial_inclusion_table.csv
+    date_accessed: '2025-05-09'
+    date_published: '2025-05-09'
+  name: DRAFT financial_inclusion_table
+  description: ''
+outs:
+  - md5: 32be7b236d2cf79ef99bef1834c13670
+    size: 22952
+    path: financial_inclusion_table.csv

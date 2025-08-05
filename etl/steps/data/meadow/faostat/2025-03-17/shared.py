@@ -136,7 +136,7 @@ def prepare_output_data(tb: Table) -> Table:
     ]
     # Select only columns that are found in the table.
     columns_to_keep = list(set(columns_to_keep) & set(tb.columns))
-    tb = tb[columns_to_keep]
+    tb = tb.loc[:, columns_to_keep]
 
     # Set index columns depending on what columns are available in the table.
     # Note: "Recipient Country Code" appears only in faostat_fa, and seems to replace "Area Code".

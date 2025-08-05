@@ -191,7 +191,7 @@ def render_step_selection():
         st.segmented_control(
             "Express?",
             ["express"],
-            format_func=lambda _: ":material/bolt: Use express mode",
+            format_func=lambda _: ":material/bolt: Select all",
             label_visibility="hidden",
             help="Express mode will create all steps at once.",
             # default=default,
@@ -213,21 +213,16 @@ def render_form_main():
     # Namespace
     #
     with col1:
-        custom_label = "Custom namespace..."
-        APP_STATE.st_selectbox_responsive(
+        APP_STATE.st_widget(
             st_widget=st.selectbox,
-            custom_label=custom_label,
             key="namespace",
             label="Namespace",
             help="Institution or topic name",
             options=OPTIONS_NAMESPACES,
             default_last=dummy_values["namespace"] if APP_STATE.args.dummy_data else OPTIONS_NAMESPACES[0],
             on_change=edit_field,
+            accept_new_options=True,
         )
-        if APP_STATE.vars.get("namespace") == custom_label:
-            namespace_key = "namespace_custom"
-        else:
-            namespace_key = "namespace"
 
     #
     # Short name (meadow, garden, grapher)
@@ -264,14 +259,14 @@ def render_form_main():
     #
     sorted_dag = sorted(
         dag_files,
-        key=lambda file_name: fuzz.ratio(file_name.replace(".yml", ""), APP_STATE.vars[namespace_key]),
+        key=lambda file_name: fuzz.ratio(file_name.replace(".yml", ""), APP_STATE.vars["namespace"]),
         reverse=True,
     )
     sorted_dag = [
         dag_not_add_option,
         *sorted_dag,
     ]
-    if sorted_dag[1].replace(".yml", "") == APP_STATE.vars[namespace_key]:
+    if sorted_dag[1].replace(".yml", "") == APP_STATE.vars["namespace"]:
         default_value = sorted_dag[1]
     else:
         default_value = ""
@@ -298,7 +293,7 @@ def render_form_main():
             if USING_TAGS_DEFAULT:
                 label += f"\n\n:red[Using a 2025 February snapshot of the tags. Couldn't connect to database `{DB_NAME}` in host `{DB_HOST}`.]"
 
-            namespace = APP_STATE.vars[namespace_key].replace("_", " ")
+            namespace = APP_STATE.vars["namespace"].replace("_", " ")
             default_last = None
             for tag in tag_list:
                 if namespace.lower() == tag.lower():
@@ -338,11 +333,9 @@ def render_form_main():
                 on_change=edit_field,
             )
 
-    return namespace_key
-
 
 @st.fragment
-def render_form_dependencies(namespace_key):
+def render_form_dependencies():
     if "meadow" in st.session_state["data.steps_to_create"]:
         with st_horizontal(vertical_alignment="center", justify_content="space-between"):
             st.markdown("#### Dependencies")
@@ -354,7 +347,7 @@ def render_form_dependencies(namespace_key):
             )
 
         # Render snapshot selector
-        render_snapshot_selection(namespace_key)
+        render_snapshot_selection()
 
     if any(step in st.session_state["data.steps_to_create"] for step in ["garden", "grapher"]):
         st.markdown("###### OPTIONAL extra dependencies")
@@ -372,7 +365,7 @@ def render_form_dependencies(namespace_key):
                 )
 
 
-def render_snapshot_selection(namespace_key):
+def render_snapshot_selection():
     def similarity_snap(uri):
         # Extract individual URI parts
         pattern = r"(?:snapshot(?:-private)?://)([^/]+)/([^/]+)/([^/.]+)\.\w+"
@@ -384,10 +377,10 @@ def render_snapshot_selection(namespace_key):
             return 0
 
         # Compare with current values
-        if namespace == APP_STATE.vars[namespace_key]:
+        if namespace == APP_STATE.vars["namespace"]:
             namespace_score = 150
         else:
-            namespace_score = fuzz.ratio(namespace, APP_STATE.vars[namespace_key])
+            namespace_score = fuzz.ratio(namespace, APP_STATE.vars["namespace"])
         if short_name == APP_STATE.vars["short_name"]:
             short_name_score = 150
         else:
@@ -464,13 +457,13 @@ def render_form():
     # Main options
     #
     with st.container(border=True):
-        namespace_key = render_form_main()
+        render_form_main()
 
     #
     # Meadow options: pick snapshot
     #
     with st.container(border=True):
-        render_form_dependencies(namespace_key)
+        render_form_dependencies()
 
     #
     # Others
@@ -484,7 +477,7 @@ def render_form():
 #########################################################
 st_multiselect_wider()
 # TITLE
-st.title(":material/bolt: Data **:gray[Create steps]**")
+st.title(":material/table: Data **:gray[Create steps]**")
 
 # SELECT MODE
 step_selected = render_step_selection()

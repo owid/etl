@@ -69,6 +69,7 @@ tables:
                 baseColorScheme: PuBu
                 binningStrategy: manual
                 customNumericValues:
+                  - 0
                   - 10
                   - 20
                   - 30

@@ -1,0 +1,39 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Global Education
+    unit: "%"
+    short_unit: "%"
+    description_key:
+      - Most countries in this historical dataset measured literacy from age 10 and older, but there's quite a bit of variation.
+      - Some, like Belgium and Brazil, only looked at people aged 15 and older. Argentina used both 7+ and 14+ across different periods. A few countries measured literacy across all ages.
+      - Current data from UNESCO and other organizations tends to assess literacy across adults aged 15+, which has become the modern standard.  This shift toward focusing on adults makes sense — by age 15, most people have had the opportunity to complete basic schooling and their literacy skills are more likely to reflect their permanent educational attainment rather than being still in development.
+      - Users should be aware of these different methodologies when comparing across years and countries.
+    display:
+        numDecimalPlaces: 1
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  literacy_1900_1950:
+    variables:
+      literacy_rate:
+        title: Literacy rate
+        description_short: Share of the population who can read and write a short, simple statement on their everyday life.
+        description_processing: Literacy rates were not directly reported by the source. Instead, they were derived from illiteracy rates by subtracting estimated illiteracy rate from 100%.
+
+      illiteracy_rate:
+        title: Illiteracy rate
+        description_short: Share of the population who cannot read and write a short, simple statement on their everyday life.
+
+      age:
+        title: Age group
+        unit: "years"
+        short_unit: ""
+        description_short: Age group of the population for which the literacy rate is reported.

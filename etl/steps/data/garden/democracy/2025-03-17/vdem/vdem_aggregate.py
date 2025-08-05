@@ -1,7 +1,22 @@
-"""Load a meadow dataset and create a garden dataset."""
+"""V-Dem Democracy Dataset Aggregation Pipeline.
+
+This module processes V-Dem democracy indicators and creates multiple aggregated datasets:
+1. Country-based aggregates (counts and averages by region)
+2. Population-weighted aggregates (counts and averages by region)
+3. Unified tables with and without regional data
+4. Tables split by indicator dimensionality (uni vs multi-dimensional)
+
+The main workflow:
+- Takes raw V-Dem data with democracy indicators by country-year
+- Creates dummy variables for categorical indicators
+- Aggregates to regional and global levels using two methods:
+  * Simple country averages (each country weighted equally)
+  * Population-weighted averages (larger countries weighted more)
+- Produces final tables suitable for charting and analysis
+"""
 
 from itertools import chain
-from typing import Dict, Optional, Tuple, cast
+from typing import cast
 
 import pandas as pd
 from owid.catalog import Dataset, Table
@@ -14,7 +29,9 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-# REGION AGGREGATES
+# REGION DEFINITIONS FOR AGGREGATION
+# Defines which countries belong to each region, including historical entities
+# that may not be in standard regional classifications
 REGIONS = {
     "Africa": {
         "additional_members": [
@@ -54,69 +71,214 @@ REGIONS = {
     },
     "Oceania": {},
 }
-# Indicators for which we estimate region-averages
+
+# THRESHOLDS to consider a region as having enough data for aggregation.
+## Share of countries in region required to estimate regional averages
+THRESHOLD_SHARE_COUNTRIES = 2 / 3
+## Share of people living regions required to estimate regional averages
+THRESHOLD_SHARE_POPULATION = 2 / 3
+
+# Reference year for coverage of countries
+REFERENCE_YEAR = 1900
+
+# INDICATORS FOR REGIONAL AVERAGING
+# These V-Dem indicators will have regional averages calculated using both
+# simple country averages and population-weighted averages
 _indicators_avg = [
-    "electdem_vdem",
-    "libdem_vdem",
-    "participdem_vdem",
-    "delibdem_vdem",
-    "egaldem_vdem",
     "civ_libs_vdem",
+    "civ_soc_str_vdem",
+    "civsoc_particip_vdem",
+    "corr_exec_vdem",
+    "corr_jud_vdem",
+    "corr_leg_vdem",
+    "corr_publsec_vdem",
+    "corruption_vdem",
+    "counterarg_polch_vdem",
+    "civ_libs_vdem",
+    "civ_soc_str_vdem",
+    "delib_vdem",
+    "delibdem_vdem",
+    "dom_auton_vdem",
+    "egal_vdem",
+    "egaldem_vdem",
+    "electdem_vdem",
+    "electfreefair_vdem",
+    "electoff_vdem",
+    "elitecons_polch_vdem",
+    "equal_access_vdem",
+    "equal_res_vdem",
+    "equal_rights_vdem",
+    "freeassoc_vdem",
+    "freeexpr_vdem",
+    "indiv_libs_vdem",
+    "int_auton_vdem",
+    "judicial_constr_vdem",
+    "justcomgd_polch_vdem",
+    "justified_polch_vdem",
+    "legis_constr_vdem",
+    "lib_vdem",
+    "libdem_vdem",
+    "locelect_vdem",
+    "particip_vdem",
+    "participdem_vdem",
+    "personalism_vdem",
     "phys_integr_libs_vdem",
     "pol_libs_vdem",
     "priv_libs_vdem",
+    "public_admin_vdem",
+    "regelect_vdem",
+    "rule_of_law_vdem",
+    "soccons_polch_vdem",
+    "socgr_civ_libs_vdem",
+    "socgr_pow_vdem",
+    "suffr_vdem",
+    "terr_contr_vdem",
+    "turnout_total_vdem",
+    "turnout_vdem",
     "wom_emp_vdem",
     "wom_civ_libs_vdem",
     "wom_civ_soc_vdem",
+    "wom_emp_vdem",
+    "wom_parl_vdem",
     "wom_pol_par_vdem",
-    "socgr_civ_libs_vdem",
-    "socgr_pow_vdem",
-    "terr_contr_vdem",
-    "rule_of_law_vdem",
-    "public_admin_vdem",
-    "int_auton_vdem",
-    "dom_auton_vdem",
-    "corruption_vdem",
-    "corr_publsec_vdem",
-    "corr_exec_vdem",
-    "corr_leg_vdem",
-    "corr_jud_vdem",
-    "personalism_vdem",
-    "civ_soc_str_vdem",
+    # New
+    "v2xca_academ",
+    "v2mecenefm",
+    "v2meharjrn",
+    "v2meslfcen",
+    "v2cademmob",
+    "v2caautmob",
+    "v2cacamps",
+    "v2caviol",
+    # New 2025-05-26
+    "v2mebias",
+    "v2smgovdom",
+    "v2cagenmob",
+    "v2xcl_prpty",
+    "v2mecorrpt",
+    "v2xnp_client",
+    "v2elvotbuy",
 ]
 INDICATORS_REGION_AVERAGES = [[f"{ind_name}{dim}" for dim in ["", "_low", "_high"]] for ind_name in _indicators_avg]
 INDICATORS_REGION_AVERAGES = list(chain.from_iterable(INDICATORS_REGION_AVERAGES)) + ["wom_parl_vdem"]
 
+# For a sanity check on table shape
+N_EXPECTED = 196
 
-def run(tb: Table, ds_regions: Dataset, ds_population: Dataset) -> Tuple[Table, Table, Table, Table, Table]:
-    # Create table with sums and averages
-    tb_countries_counts, tb_countries_avg = make_table_countries(tb, ds_regions)
+# Indicators that should not have regional averages pre-1900 [ref: https://github.com/owid/owid-issues/issues/1963#issuecomment-3139107273]
+INDICATORS_NO_AGG_PRE_1900 = [
+    "corruption_vdem",
+    "corr_exec_vdem",
+    "corr_publsec_vdem",
+    "corr_leg_vdem",
+    "corr_jud_vdem",
+    "v2mecorrpt",
+    "v2xnp_client",
+]
 
-    # Create table with population-weighted averages
-    tb_population_counts, tb_population_avg = make_table_population(tb, ds_regions, ds_population=ds_population)
 
-    # Consolidate main table with additional regional aggregates
-    tb_uni, tb_multi_without_regions, tb_multi_with_regions = make_main_tables(tb, tb_countries_avg, tb_population_avg)
+def run(tb: Table, ds_regions: Dataset, ds_population: Dataset) -> tuple[Table, Table, Table, Table, Table, Table]:
+    """Main aggregation pipeline for V-Dem democracy data.
 
-    # Only have one origin in tb_multi_with_regions
+    Processes raw V-Dem democracy indicators and creates multiple aggregated datasets
+    with regional and global aggregates using two different weighting methods.
+
+    Args:
+        tb: Quasi-raw V-Dem data table with democracy indicators by country-year
+        ds_regions: Dataset containing regional classifications
+        ds_population: Dataset containing population data for weighting
+
+    Returns:
+        Tuple of 6 tables:
+        - tb_uni_without_regions: Uni-dimensional indicators, countries only
+        - tb_uni_with_regions: Uni-dimensional indicators with regional aggregates
+        - tb_multi_without_regions: Multidimensional indicators, countries only
+        - tb_multi_with_regions: Multidimensional indicators with regional aggregates
+        - tb_countries_counts: Country counts by regime type and region
+        - tb_population_counts: Population counts by regime type and region
+
+    Example:
+        Input: Raw V-Dem data with indicators like electoff_vdem, civ_libs_vdem
+        Output: 6 tables ready for charting with country and regional data
+    """
+    tb_ = tb.copy()
+
+    # Create country-based aggregates (each country weighted equally)
+    tb_countries_counts, tb_countries_avg = make_table_countries(tb_, ds_regions)
+
+    # Create population-weighted aggregates (larger countries have more weight)
+    tb_population_counts, tb_population_avg = make_table_population(
+        tb_,
+        ds_regions,
+        ds_population=ds_population,
+    )
+
+    # Remove some regional aggregates [ref: https://github.com/owid/owid-issues/issues/1963#issuecomment-3139107273]
+
+    # World: no global data needed at all.
+    tb_countries_avg.loc[tb_countries_avg["country"] == "World", INDICATORS_NO_AGG_PRE_1900] = pd.NA
+    tb_population_avg.loc[tb_population_avg["country"] == "World", INDICATORS_NO_AGG_PRE_1900] = pd.NA
+    # Regional averages before 1900
+    tb_countries_avg.loc[tb_countries_avg["year"] < 1900, INDICATORS_NO_AGG_PRE_1900] = pd.NA
+    tb_population_avg.loc[tb_population_avg["year"] < 1900, INDICATORS_NO_AGG_PRE_1900] = pd.NA
+
+    # Prepare main data and split into output tables by dimensionality
+    tb_ = tb_.drop(columns=["regime_imputed_country", "regime_imputed", "histname"])
+    tb_uni_without_regions, tb_uni_with_regions, tb_multi_without_regions, tb_multi_with_regions = make_main_tables(
+        tb_, tb_countries_avg, tb_population_avg
+    )
+
+    # Ensure consistent metadata origins across all columns (V-Dem as data source)
+    # For multidimensional indicators table
     origin = tb_multi_with_regions["civ_libs_vdem"].m.origins[0]
     assert origin.producer == "V-Dem", "Assigned origin should be V-Dem!"
     for col in tb_multi_with_regions.columns:
         tb_multi_with_regions[col].metadata.origins = [origin]
+    # For unidimensional indicators table
+    origin = tb_uni_with_regions["electoff_vdem"].m.origins[0]
+    assert origin.producer == "V-Dem", "Assigned origin should be V-Dem!"
+    for col in tb_uni_with_regions.columns:
+        tb_uni_with_regions[col].metadata.origins = [origin]
 
-    return tb_uni, tb_multi_without_regions, tb_multi_with_regions, tb_countries_counts, tb_population_counts
+    return (
+        tb_uni_without_regions,
+        tb_uni_with_regions,
+        tb_multi_without_regions,
+        tb_multi_with_regions,
+        tb_countries_counts,
+        tb_population_counts,
+    )
 
 
 # %% NUM_COUNTRIES TABLES
-def make_table_countries(tb: Table, ds_regions: Dataset) -> Tuple[Table, Table]:
-    """Estimate number of countries in X and averages over countries for each region."""
+def make_table_countries(tb: Table, ds_regions: Dataset) -> tuple[Table, Table]:
+    """Create country-based regional aggregates using simple averages.
+
+    Generates two types of regional aggregates:
+    1. Country counts by regime type (e.g., number of democracies in Europe)
+    2. Simple averages of democracy indicators (each country weighted equally)
+
+    Args:
+        tb: V-Dem data table with country-year observations
+        ds_regions: Dataset containing regional classifications
+
+    Returns:
+        Tuple of (counts_table, averages_table):
+        - counts_table: Number of countries in each category by region-year
+        - averages_table: Simple averages of democracy indicators by region-year
+
+    Example:
+        Input: V-Dem data for USA, Canada, Mexico with democracy scores
+        Output: North America average democracy score (USA + Canada + Mexico) / 3
+    """
     # Remove imputed countries (they did not exist, so should not count them!)
     tb_ = tb.loc[~tb["regime_imputed"]].copy()
 
-    # Convert country to string
+    # Convert country to string for consistency
     tb_["country"] = tb_["country"].astype("string")
 
-    # Sanity check: all countries are in the regions
+    # Validate that all countries in data are assigned to regions
+    # This prevents missing countries from being ignored in regional aggregates
     members_tracked = set()
     for region, region_props in REGIONS.items():
         members_tracked |= set(
@@ -139,7 +301,21 @@ def make_table_countries(tb: Table, ds_regions: Dataset) -> Tuple[Table, Table]:
 
 
 def make_table_countries_counts(tb: Table, ds_regions: Dataset) -> Table:
-    """Get region indicators of type "Number of countries"."""
+    """Calculate number of countries in each regime category by region.
+
+    Creates dummy variables for regime types and aggregates by region to count
+    how many countries fall into each category (e.g., liberal democracy, autocracy).
+
+    Args:
+        tb: V-Dem data with regime classifications
+        ds_regions: Dataset for regional aggregation
+
+    Returns:
+        Table with country counts by regime type and region-year
+
+    Example:
+        Output: "5 countries in Europe are liberal democracies in 2020"
+    """
     tb_ = tb.copy()
     # Generate dummy indicators
     tb_ = make_table_with_dummies(tb_)
@@ -148,7 +324,7 @@ def make_table_countries_counts(tb: Table, ds_regions: Dataset) -> Table:
     tb_ = add_regions_and_global_aggregates(tb_, ds_regions)
 
     # Sanity check on output shape
-    assert tb_.shape[1] == 52, "Unexpected number of columns."
+    assert tb_.shape[1] == 60, f"Unexpected number of columns {tb_.shape[1]}."
 
     # Wide to long format
     tb_ = from_wide_to_long(tb_)
@@ -160,35 +336,84 @@ def make_table_countries_counts(tb: Table, ds_regions: Dataset) -> Table:
     ] = float("nan")
 
     # Remove data pre-1900 for num_countries_wom_parl
-    tb_.loc[tb_["year"] < 1900, "num_countries_wom_parl"] = float("nan")
+    tb_.loc[tb_["year"] < REFERENCE_YEAR, "num_countries_wom_parl"] = float("nan")
 
     return tb_
 
 
 def make_table_countries_avg(tb: Table, ds_regions: Dataset) -> Table:
-    """Get region indicators of type "Average of countries"."""
+    """Calculate simple regional averages of democracy indicators.
+
+    Computes unweighted averages where each country contributes equally,
+    regardless of population size (e.g., Luxembourg = Germany = 1 vote).
+
+    Args:
+        tb: V-Dem data with democracy indicators
+        ds_regions: Dataset for regional aggregation
+
+    Returns:
+        Table with regional averages of democracy indicators
+
+    Example:
+        Europe average civil liberties = (Germany_score + France_score + ...) / num_countries
+    """
     tb_ = tb.copy()
 
     # Keep only relevant columns
-    tb_ = tb_.loc[:, ["year", "country"] + INDICATORS_REGION_AVERAGES]
+    cols_indicators = [col for col in tb_.columns if col in INDICATORS_REGION_AVERAGES]
+    tb_ = tb_.loc[:, ["year", "country"] + cols_indicators]
+
+    # TODO: aggregations encodes the logic of: "estimate mean if >70% of 1900 countries are present in the region"
+    # Get list of countries in regions in 1900
+    tb_1900 = tb_.loc[tb_["year"] == REFERENCE_YEAR, ["country"]]
+    countries_to_continent = geo.countries_to_continent_mapping(
+        ds_regions=ds_regions,
+        regions=REGIONS,
+        exclude_historical_countries=False,
+        include_historical_regions_in_income_groups=True,
+    )
+    tb_1900["continent"] = tb_1900["country"].map(countries_to_continent)
+    countries_must_have_data = tb_1900.groupby("continent")["country"].agg(list).to_dict()
+    frac_must_have_data = {region: THRESHOLD_SHARE_COUNTRIES for region in countries_must_have_data.keys()} | {
+        "Europe": 0.1
+    }
 
     # Estimate region aggregates
     tb_ = add_regions_and_global_aggregates(
         tb=tb_,
         ds_regions=ds_regions,
-        aggregations={k: "mean" for k in INDICATORS_REGION_AVERAGES},  # type: ignore
-        aggregations_world={k: "mean" for k in INDICATORS_REGION_AVERAGES},  # type: ignore
+        aggregations={k: "mean" for k in cols_indicators},  # type: ignore
+        aggregations_world={k: "mean" for k in cols_indicators},  # type: ignore
+        countries_must_have_data=countries_must_have_data,
+        frac_must_have_data=frac_must_have_data,
     )
 
     # Sanity check on output shape
-    assert tb_.shape[1] == 84, "Unexpected number of columns."
+    assert tb_.shape[1] == N_EXPECTED, f"Unexpected number of columns. Expected {N_EXPECTED} but found {tb_.shape[1]}"
 
     return tb_
 
 
 # %% POPULATION TABLES
-def make_table_population(tb: Table, ds_regions: Dataset, ds_population: Dataset) -> Tuple[Table, Table]:
-    """Estimate number of people in X regime, and averages over countries for each region."""
+def make_table_population(tb: Table, ds_regions: Dataset, ds_population: Dataset) -> tuple[Table, Table]:
+    """Create population-weighted regional aggregates.
+
+    Generates two types of population-based aggregates:
+    1. Total population living under each regime type by region
+    2. Population-weighted averages of democracy indicators
+
+    Args:
+        tb: V-Dem data table
+        ds_regions: Dataset for regional aggregation
+        ds_population: Population data for weighting
+
+    Returns:
+        Tuple of (population_counts, population_weighted_averages)
+
+    Example:
+        Input: Germany (80M people, score=0.8), Luxembourg (0.6M people, score=0.9)
+        Output: Europe weighted average = (80M*0.8 + 0.6M*0.9) / 80.6M = 0.801
+    """
     tb_ = tb.copy()
 
     # Drop historical countries (don't want to double-count population)
@@ -206,11 +431,26 @@ def make_table_population(tb: Table, ds_regions: Dataset, ds_population: Dataset
 
 
 def make_table_population_counts(tb: Table, ds_regions: Dataset, ds_population: Dataset) -> Table:
-    """Estimate number of people in X regime."""
+    """Calculate total population living under each regime type by region.
+
+    Multiplies dummy variables by population data to count people instead of countries.
+    Provides population-based perspective on democracy prevalence.
+
+    Args:
+        tb: V-Dem data with regime classifications
+        ds_regions: Regional classification dataset
+        ds_population: Population data for weighting
+
+    Returns:
+        Table with population counts by regime type and region
+
+    Example:
+        Output: "500 million people live in liberal democracies in Europe"
+    """
     tb_ = tb.copy()
 
     # Get dummy indicators
-    tb_ = make_table_with_dummies(tb_)
+    tb_ = make_table_with_dummies(tb_, people_living_in=True)
 
     # Add population in dummies (population value replaces 1, 0 otherwise)
     tb_ = add_population_in_dummies(
@@ -254,7 +494,7 @@ def make_table_population_counts(tb: Table, ds_regions: Dataset, ds_population: 
     )
 
     # Sanity check on output shape
-    assert tb_.shape[1] == 52, "Unexpected number of columns."
+    assert tb_.shape[1] == 61, f"Unexpected number of columns {tb_.shape[1]}."
 
     # Long format
     tb_ = from_wide_to_long(tb_)
@@ -270,6 +510,9 @@ def make_table_population_counts(tb: Table, ds_regions: Dataset, ds_population: 
             "num_countries_wom_parl": "population_wom_parl",
             "num_countries_years_in_electdem": "population_years_in_electdem",
             "num_countries_years_in_libdem": "population_years_in_libdem",
+            "num_countries_natelect": "population_natelect",
+            "num_countries_wom_hoe_ever": "population_wom_hoe_ever",
+            "num_countries_wom_hoe_ever_demelect": "population_wom_hoe_ever_demelect",
         }
     )
 
@@ -282,17 +525,37 @@ def make_table_population_counts(tb: Table, ds_regions: Dataset, ds_population: 
 
 
 def make_table_population_avg(tb: Table, ds_regions: Dataset, ds_population: Dataset) -> Table:
-    """Get region/world average estimates on some indicators."""
+    """Calculate population-weighted regional averages of democracy indicators.
+
+    Weights each country by its population when calculating regional averages,
+    giving larger countries more influence in the regional score.
+
+    Args:
+        tb: V-Dem data with democracy indicators
+        ds_regions: Regional classification dataset
+        ds_population: Population data for weighting
+
+    Returns:
+        Table with population-weighted regional averages
+
+    Example:
+        China (1.4B people) has more weight than Singapore (6M people) in Asia average
+    """
     tb_ = tb.copy()
 
     # Keep only relevant columns
-    tb_ = tb_.loc[:, ["year", "country"] + INDICATORS_REGION_AVERAGES]
+    cols_indicators = [col for col in tb_.columns if col in INDICATORS_REGION_AVERAGES]
+    tb_ = tb_.loc[:, ["year", "country"] + cols_indicators]
+
+    # Initialize table to estimate (%) of population covered
+    tb_pop = tb_.copy()
+    cols_to_transform = [col for col in tb_.columns if col not in ["year", "country"]]
+    tb_pop[cols_to_transform] = tb_pop[cols_to_transform].notna().astype(int)
 
     # Add population in dummies (population value replaces 1, 0 otherwise)
-    tb_ = add_population_in_dummies(
-        tb_,
-        ds_population,
-        expected_countries_without_population=[
+    kwargs_dummies = {
+        "ds_population": ds_population,
+        "expected_countries_without_population": [
             # Germany
             "Baden",
             "Bavaria",
@@ -321,18 +584,22 @@ def make_table_population_avg(tb: Table, ds_regions: Dataset, ds_population: Dat
             "Democratic Republic of Vietnam",
             "Republic of Vietnam",
         ],
-        drop_population=False,
-    )
+        "drop_population": False,
+    }
+    tb_ = add_population_in_dummies(tb_, **kwargs_dummies)
 
     # Get region aggregates
+    kwargs_agg = {
+        "ds_regions": ds_regions,
+        "aggregations": {k: "sum" for k in cols_indicators} | {"population": "sum"},
+        "min_num_values_per_year": 1,  # Ensure at least one country contributes to the average
+    }
     tb_ = add_regions_and_global_aggregates(
         tb=tb_,
-        ds_regions=ds_regions,
-        aggregations={k: "sum" for k in INDICATORS_REGION_AVERAGES} | {"population": "sum"},  # type: ignore
-        min_num_values_per_year=1,
+        **kwargs_agg,
     )
 
-    # Normalize by region's populatino
+    # Normalize by region's population
     columns_index = ["year", "country"]
     columns_indicators = [col for col in tb_.columns if col not in columns_index + ["population"]]
     tb_[columns_indicators] = tb_[columns_indicators].div(tb_["population"], axis=0)
@@ -341,15 +608,44 @@ def make_table_population_avg(tb: Table, ds_regions: Dataset, ds_population: Dat
     # Rename columns
     # tb_ = tb_.rename(columns={col: f"popw_{col}" for col in INDICATORS_REGION_AVERAGES})
     # Sanity check on output shape
-    assert tb_.shape[1] == 84, "Unexpected number of columns."
+    assert tb_.shape[1] == N_EXPECTED, f"Unexpected number of columns. Expected {N_EXPECTED} but found {tb_.shape[1]}"
+
+    # Filter by coverage of people
+    ## Get dummy table
+    tb_pop = add_population_in_dummies(tb_pop, **kwargs_dummies)
+    # tb_pop = tb_pop.drop(columns=["population"])
+    ## Get population covered (absolute)
+    tb_pop = add_regions_and_global_aggregates(
+        tb=tb_pop,
+        **kwargs_agg,
+    )
+    ## Get population covered (%)
+    tb_pop.loc[:, columns_indicators] = tb_pop.loc[:, columns_indicators].div(tb_pop["population"], axis=0)
+    tb_pop = tb_pop.drop(columns="population")
+    ## Get flag if population coverage is above threshold
+    tb_pop[columns_indicators] = tb_pop[columns_indicators] >= THRESHOLD_SHARE_POPULATION
+
+    # Filter tb_ by population coverage
+    tb_[columns_indicators] = tb_[columns_indicators].where(tb_pop[columns_indicators])
 
     return tb_
 
 
 def expand_observations_without_leading_to_duplicates(tb: Table) -> Table:
-    """Expand observations (accounting for overlaps between former and current countries).
+    """Handle country transitions to avoid double-counting population.
 
-    If the data has data for "USSR" and "Russia" for the same year, we should drop the "USSR" row.
+    Manages historical country transitions (e.g., USSR→Russia, West/East Germany→Germany)
+    to ensure population isn't double-counted during transition periods.
+
+    Args:
+        tb: V-Dem data with potential country overlaps
+
+    Returns:
+        Table with resolved country transitions and no duplicate population
+
+    Example:
+        Input: Both "USSR" and "Russia" data for 1991
+        Output: Only "Russia" data for 1991 (USSR dropped to avoid double-counting)
     """
     # Extend observations to have all country-years
     tb = expand_observations(tb)
@@ -403,18 +699,41 @@ def expand_observations_without_leading_to_duplicates(tb: Table) -> Table:
 
 
 # %% MAIN TABLES
-def make_main_tables(tb: Table, tb_countries_avg: Table, tb_population_avg: Table) -> Tuple[Table, Table, Table]:
-    """Integrate the indicators from region aggregates and add dimensions to indicators.
+def make_main_tables(tb: Table, tb_countries_avg: Table, tb_population_avg: Table) -> tuple[Table, Table, Table, Table]:
+    """Create final tables combining country data with regional aggregates.
 
-    This method generates three tables:
+    Splits indicators into uni-dimensional vs multidimensional, then combines
+    country-level data with both simple and population-weighted regional averages.
 
-        - Unidimensional indicators: Table with uni-dimensional indicators and without regional data.
-        - Multidimensional indicators without regions: Table with multi-dimensional indicators and without regional data.
-        - Multidimensional indicators with regions: Table with multi-dimensional indicators and with regional data.
+    Args:
+        tb: Base country-level V-Dem data
+        tb_countries_avg: Simple regional averages
+        tb_population_avg: Population-weighted regional averages
 
-        Note: We have estimated regional aggregates with two methods: 'simple mean' or 'population-weighted mean'. We add both flavours, and differentiate them with an additional dimension. (see column `aggregate_method`).
+    Returns:
+        Tuple of 4 tables:
+        - Uni-dimensional indicators without regions (country data only)
+        - Uni-dimensional indicators with regions (includes regional aggregates)
+        - Multidimensional indicators without regions
+        - Multidimensional indicators with regions
+
+    Example:
+        Unidimensional: Single democracy score per country-year
+        Multidimensional: Democracy score with confidence intervals (low/best/high)
     """
-    # Re-shape tables with region averages (WIDE -> LONG)
+    # 0/ Sanity check on regions
+    assert set(tb_countries_avg["country"].unique()) == REGIONS.keys() | {
+        "World"
+    }, "Countries in tb_countries_avg do not match defined regions!"
+    assert set(tb_population_avg["country"].unique()) == REGIONS.keys() | {
+        "World"
+    }, "Countries in tb_countries_avg do not match defined regions!"
+
+    # 1/ Get uni- and multi-dimensional indicator tables
+    ## It puts indicators that have '_low' in the name in the multi-dimensional table. It also formats it into "long format", so to have a new column `estimate`.
+    tb_uni, tb_multi = _split_into_uni_and_multi(tb)
+
+    # 2/ Re-shape tables with region averages (WIDE -> LONG)
     tb_countries_avg = from_wide_to_long(
         tb_countries_avg,
         indicator_name_callback=lambda x: x.replace("_low", "").replace("_high", ""),
@@ -431,33 +750,84 @@ def make_main_tables(tb: Table, tb_countries_avg: Table, tb_population_avg: Tabl
         tb_countries_avg
     ), "Columns in tb_population_avg and tb_countries_avg do not match!"
 
-    # Get uni- and multi-dimensional indicator tables
-    tb_uni, tb_multi = _split_into_uni_and_multi(tb)
+    # 3/ Get columns of indicators with region data, based on whether they have estimates (dimension estimate) or not
+    columns_uni = [
+        col
+        for col in tb_uni.columns
+        if (col in tb_countries_avg.columns and col not in {"country", "year", "estimate"})
+    ]
+    columns_multi = [
+        col
+        for col in tb_multi.columns
+        if (col in tb_countries_avg.columns and col not in {"country", "year", "estimate"})
+    ]
 
-    # Split multi-dimensional in two: table with region aggregates, table without
-    columns_index = ["year", "country", "estimate"]
-    tb_multi_with_regions = tb_multi[tb_population_avg.columns].copy()
-    tb_multi_without_regions = tb_multi.drop(
-        columns=[col for col in tb_population_avg.columns if col not in columns_index]
-    ).copy()
+    # 4/ Bake tb_uni_*
+    ## Initiate two tables with and without regions
+    cols_index = ["country", "year"]
+    tb_uni_with_regions = tb_uni.loc[:, cols_index + columns_uni].copy()
+    tb_uni_without_regions = tb_uni.drop(columns=columns_uni).copy()
 
-    # Merge multi-dimensional table with region aggregates.
-    # Since there are two ways of estimating the regional aggregates, we create two versions of the indicators
-    tb_multi_with_regions["aggregate_method"] = "average"
-    # tb_multi_with_regions_popw = tb_multi_with_regions.copy()
-    # tb_multi_with_regions_popw["aggregate_method"] = "population-weighted average"
-    tb_countries_avg["aggregate_method"] = "average"
-    tb_population_avg["aggregate_method"] = "population-weighted average"
-    # Combine
-    tb_multi_with_regions = concat([tb_multi_with_regions, tb_countries_avg, tb_population_avg], ignore_index=True)
+    ## Get columns from tb_*_avg tables relevant
+    tb_countries_avg_uni = tb_countries_avg.loc[:, cols_index + columns_uni].dropna(subset=columns_uni, how="all")
+    tb_population_avg_uni = tb_population_avg.loc[:, cols_index + columns_uni].dropna(subset=columns_uni, how="all")
 
-    return tb_uni, tb_multi_without_regions, tb_multi_with_regions
+    ## Add suffix (population-weighted) where applicable
+    tb_population_avg_uni["country"] = tb_population_avg_uni["country"] + " (population-weighted)"
+
+    ## Concatenate and create tb_uni_with_regions
+    tb_uni_with_regions = concat(
+        [
+            tb_uni_with_regions,
+            tb_countries_avg_uni,
+            tb_population_avg_uni,
+        ],
+        ignore_index=True,
+    )
+
+    # 5/ Bake tb_multi_*
+    ## Initiate two tables with and without regions
+    cols_index = ["country", "year", "estimate"]
+    tb_multi_with_regions = tb_multi.loc[:, cols_index + columns_multi].copy()
+    tb_multi_without_regions = tb_multi.drop(columns=columns_multi).copy()
+
+    ## Get columns from tb_*_avg tables relevant
+    tb_countries_avg_multi = tb_countries_avg.loc[:, cols_index + columns_multi].dropna(subset=columns_multi, how="all")
+    tb_population_avg_multi = tb_population_avg.loc[:, cols_index + columns_multi].dropna(
+        subset=columns_multi, how="all"
+    )
+
+    ## Add suffix (population-weighted) where applicable
+    tb_population_avg_multi["country"] = tb_population_avg_multi["country"] + " (population-weighted)"
+
+    ## Concatenate and create tb_uni_with_regions
+    tb_multi_with_regions = concat(
+        [
+            tb_multi_with_regions,
+            tb_countries_avg_multi,
+            tb_population_avg_multi,
+        ],
+        ignore_index=True,
+    )
+    return tb_uni_without_regions, tb_uni_with_regions, tb_multi_without_regions, tb_multi_with_regions
 
 
-def _split_into_uni_and_multi(tb: Table) -> Tuple[Table, Table]:
-    """Split a table into two: one with uni-dimensional indicators, and one with multi-dimensional indicators.
+def _split_into_uni_and_multi(tb: Table) -> tuple[Table, Table]:
+    """Split indicators into unidimensional vs multidimensional tables.
 
-    The table with multi-dimensional indicators will have an additional column (`category`) to differentiate between the different dimension values.
+    Separates democracy indicators based on whether they have confidence intervals.
+    Multidimensional indicators have "_low" and "_high" variants representing
+    uncertainty bounds around the main estimate.
+
+    Args:
+        tb: V-Dem data with mixed indicator types
+
+    Returns:
+        Tuple of (unidimensional_table, multidimensional_table)
+
+    Example:
+        Unidimensional: electoff_vdem (single score)
+        Multidimensional: civ_libs_vdem, civ_libs_vdem_low, civ_libs_vdem_high
     """
     # Get list of indicators with multi-dimensions (and with one dimension)
     index = ["country", "year"]
@@ -502,8 +872,20 @@ def _split_into_uni_and_multi(tb: Table) -> Tuple[Table, Table]:
 
 
 def _add_note_on_region_averages(tb: Table) -> Table:
+    """Add explanatory note about regional averaging methodology.
+
+    Appends a description to indicator metadata explaining that regional values
+    are calculated by averaging country-level values within each region.
+
+    Args:
+        tb: Table with regional averages
+
+    Returns:
+        Table with updated metadata descriptions
+    """
     note = "We have estimated the values for regions by averaging the values from the countries in the region."
-    for col in INDICATORS_REGION_AVERAGES:
+    cols_indicators = [col for col in tb.columns if col in INDICATORS_REGION_AVERAGES]
+    for col in cols_indicators:
         if tb[col].metadata.description_processing:
             tb[col].metadata.description_processing += f"\n\n{note}"
         else:
@@ -515,17 +897,40 @@ def _add_note_on_region_averages(tb: Table) -> Table:
 def add_regions_and_global_aggregates(
     tb: Table,
     ds_regions: Dataset,
-    aggregations: Optional[Dict[str, str]] = None,
-    min_num_values_per_year: Optional[int] = None,
-    aggregations_world: Optional[Dict[str, str]] = None,
+    aggregations: dict[str, str] | None = None,
+    min_num_values_per_year: int | None = None,
+    aggregations_world: dict[str, str] | None = None,
+    countries_must_have_data: dict[str, list[str]] | None = None,
+    frac_must_have_data: dict[str, float] | None = None,
 ) -> Table:
-    """Add regions, and world aggregates."""
+    """Add regional and global aggregates to country-level data.
+
+    Calculates regional aggregates using specified aggregation methods
+    (sum, mean, etc.) and adds a global "World" aggregate.
+
+    Args:
+        tb: Country-level data table
+        ds_regions: Regional classification dataset
+        aggregations: Method for regional aggregation (default: sum)
+        min_num_values_per_year: Minimum countries needed for regional estimate
+        aggregations_world: Method for world aggregation (default: sum)
+
+    Returns:
+        Table with only regional and world aggregates (country data removed)
+
+    Example:
+        Input: Country data for Germany, France, Italy...
+        Output: Regional data for Europe, World
+    """
+    # Estimate region aggregates
     tb_regions = geo.add_regions_to_table(
         tb.copy(),
         ds_regions,
         regions=REGIONS,
         aggregations=aggregations,
         min_num_values_per_year=min_num_values_per_year,
+        countries_that_must_have_data=countries_must_have_data,
+        frac_countries_that_must_have_data=frac_must_have_data,
     )
     tb_regions = tb_regions.loc[tb_regions["country"].isin(REGIONS.keys())]
 
@@ -539,30 +944,25 @@ def add_regions_and_global_aggregates(
     return tb
 
 
-def make_table_with_dummies(tb: Table) -> Table:
-    """Format table to have dummy indicators.
+def make_table_with_dummies(tb: Table, people_living_in: bool = False) -> Table:
+    """Convert categorical indicators to dummy variables for aggregation.
 
-    From a table with categorical indicators, create a new table with dummy indicator for each indicator-category pair.
+    Transforms categorical variables (like regime types) into binary dummy variables
+    to enable counting how many countries fall into each category.
 
-    Example input:
+    Args:
+        tb: V-Dem data with categorical indicators
+        people_living_in: True if we are counting people instead of countries. In that case, the time-serie might contain additional rows (NA most likely) after expanding observations.
 
-    | year | country |  regime   | regime_amb |
-    |------|---------|-----------|------------|
-    | 2000 |   USA   |     1     |      0     |
-    | 2000 |   CAN   |     0     |      1     |
-    | 2000 |   DEU   |    NaN    |      NaN   |
+    Returns:
+        Table with binary dummy variables for each category
 
+    Example:
+        Input: regime_type = ["democracy", "autocracy", "democracy"]
+        Output: regime_democracy = [1, 0, 1], regime_autocracy = [0, 1, 0]
 
-    Example output:
-
-    | year | country | regime_0 | regime_1 | regime_-1 | regime_amb_0 | regime_amb_0 | regime_amb_-1 |
-    |------|---------|----------|----------|-----------|--------------|--------------|---------------|
-    | 2000 |   USA   |    0     |    1     |     0     |      1       |      0       |       0       |
-    | 2000 |   CAN   |    1     |    0     |     0     |      0       |      1       |       0       |
-    | 2000 |   DEU   |    0     |    0     |     1     |      0       |      0       |       1       |
-
-    Note that '-1' denotes NA (missing value) category.
-
+    Note:
+        Missing values are coded as "-1" category to track data availability.
     """
     tb_ = tb.copy()
 
@@ -668,6 +1068,36 @@ def make_table_with_dummies(tb: Table) -> Table:
             },
             "has_na": True,
         },
+        {
+            "name": "held_national_election",
+            "name_new": "num_countries_natelect",
+            "values_expected": {
+                "0": "didn't hold a national election",
+                "1": "held a national election",
+            },
+            "has_na": False,
+            "has_na_once_expanded": True,
+        },
+        {
+            "name": "wom_hoe_ever",
+            "name_new": "num_countries_wom_hoe_ever",
+            "values_expected": {
+                "0": "no",
+                "1": "yes",
+            },
+            "has_na": True,
+            "has_na_once_expanded": True,
+        },
+        {
+            "name": "wom_hoe_ever_dem",
+            "name_new": "num_countries_wom_hoe_ever_demelect",
+            "values_expected": {
+                "0": "no",
+                "1": "yes",
+            },
+            "has_na": True,
+            "has_na_once_expanded": True,
+        },
     ]
 
     # Convert to string
@@ -678,9 +1108,17 @@ def make_table_with_dummies(tb: Table) -> Table:
     for indicator in indicators:
         values_expected = indicator["values_expected"]
         # Check and fix NA (convert NAs to -1 category)
-        if indicator["has_na"]:
+        ## Should use one flag or another depending on whether we are counting people or countries
+        ## If counting people (people_living_in=True), we should use `has_na_once_expanded` flag, otherwise `has_na`
+        ## Else, if we are counting countries, we should use `has_na` flag
+        if people_living_in:
+            has_na = indicator.get("has_na_once_expanded", indicator["has_na"])
+        else:
+            has_na = indicator["has_na"]
+
+        if has_na:
             # Assert that there are actually NaNs
-            assert tb_[indicator["name"]].isna().any(), "No NA found!"
+            assert tb_[indicator["name"]].isna().any(), f"No NA found for indicator {indicator['name']}!"
             # If NA, we should not have category '-1', otherwise these would get merged!
             assert "-1" not in set(
                 tb_[indicator["name"]].unique()
@@ -692,7 +1130,7 @@ def make_table_with_dummies(tb: Table) -> Table:
             else:
                 values_expected |= {"-1"}
         else:
-            assert not tb_[indicator["name"]].isna().any(), "NA found!"
+            assert not tb_[indicator["name"]].isna().any(), f"NA found for {indicator['name']}!"
 
         values_found = set(tb_[indicator["name"]].unique())
         assert values_found == set(

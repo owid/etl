@@ -19,3 +19,63 @@ steps:
     - data://meadow/democracy/2023-03-02/vdem
   data://grapher/democracy/2023-03-02/vdem:
     - data://garden/democracy/2023-03-02/vdem
+
+  # Episodes of Regime Transition (2024)
+  data://meadow/democracy/2024-05-01/ert:
+    - snapshot://democracy/2024-05-01/ert.csv
+  data://garden/democracy/2024-03-07/ert:
+    - data://meadow/democracy/2024-05-01/ert
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2023-03-31/population
+  data://grapher/democracy/2024-05-01/ert:
+    - data://garden/democracy/2024-03-07/ert
+
+  # Lexical Index (2023)
+  data://meadow/democracy/2024-05-09/lexical_index:
+    - snapshot://democracy/2024-05-09/lexical_index.xlsx
+  data://garden/democracy/2024-03-07/lexical_index:
+    - data://meadow/democracy/2024-05-09/lexical_index
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2023-03-31/population
+  data://grapher/democracy/2024-05-09/lexical_index:
+    - data://garden/democracy/2024-03-07/lexical_index
+  # Lexical Index (2024)
+  data://meadow/democracy/2025-05-29/lexical_index:
+    - snapshot://democracy/2025-05-29/lexical_index.xlsx
+  data://garden/democracy/2025-05-29/lexical_index:
+    - data://garden/demography/2024-07-15/population
+    - data://meadow/democracy/2025-05-29/lexical_index
+    - data://garden/regions/2023-01-01/regions
+  data://grapher/democracy/2025-05-29/lexical_index:
+    - data://garden/democracy/2025-05-29/lexical_index
+
+  # Freedom House (2024)
+  data://meadow/democracy/2024-05-16/fh:
+    - snapshot://democracy/2024-05-16/fh_scores.xlsx
+    - snapshot://democracy/2024-05-16/fh_ratings.xlsx
+  data://garden/democracy/2024-03-07/fh:
+    - data://meadow/democracy/2024-05-16/fh
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2023-03-31/population
+  data://grapher/democracy/2024-05-16/fh:
+    - data://garden/democracy/2024-03-07/fh
+
+    # Varieties of Democracy (2024)
+  data://meadow/democracy/2024-03-07/vdem:
+    - snapshot://democracy/2024-03-18/vdem.zip
+  data://garden/democracy/2024-03-07/vdem:
+    - data://meadow/democracy/2024-03-07/vdem
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2023-03-31/population
+  data://grapher/democracy/2024-03-07/vdem:
+    - data://garden/democracy/2024-03-07/vdem
+
+  # Boix-Miller-Rosato (2013)
+  data://meadow/democracy/2024-03-07/bmr:
+    - snapshot://democracy/2024-03-07/bmr.csv
+  data://garden/democracy/2024-03-07/bmr:
+    - data://meadow/democracy/2024-03-07/bmr
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2023-03-31/population
+  data://grapher/democracy/2024-03-07/bmr:
+    - data://garden/democracy/2024-03-07/bmr

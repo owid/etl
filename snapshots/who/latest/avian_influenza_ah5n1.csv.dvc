@@ -1,7 +1,7 @@
 meta:
   origin:
-    producer: WHO, Global Influenza Programme
     title: Human Cases with Highly Pathogenic Avian Influenza A/H5N1
+    producer: WHO, Global Influenza Programme
     description: |-
       This dataset contains all human infections with HPAI A(H5N1​​​​​) bird flu virus reported to the World Health Organization (WHO), since the first human cases in 1997.
 
@@ -12,12 +12,12 @@ meta:
       Human Cases with Highly Pathogenic Avian Influenza A/H5N1. World Health Organization, Global Influenza Programme; 2024. Licence: CC BY-NC-SA 3.0 IGO. Retrieved from CDC May 23, 2024.
     attribution_short: WHO
     url_main: https://www.cdc.gov/bird-flu/php/avian-flu-summary/chart-epi-curve-ah5n1.html
-    date_accessed: 2025-01-28
-    date_published: "2024-10-26"
+    date_accessed: 2025-05-26
+    date_published: "2025-05-22"
     license:
       name: CC BY-NC-SA 3.0 IGO
       url: https://www.who.int/about/policies/publishing/copyright
 outs:
-  - md5: dbc9712739ab5f0e2020935685d21c1d
-    size: 25088
+  - md5: 8af1225d4c3c7adc5787e2f4c2eb6620
+    size: 26159
     path: avian_influenza_ah5n1.csv

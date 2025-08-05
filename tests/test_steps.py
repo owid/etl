@@ -26,7 +26,6 @@ from etl.steps import (
     DataStepPrivate,
     SnapshotStep,
     Step,
-    compile_steps,
     filter_to_subgraph,
     get_etag,
     isolated_env,
@@ -99,8 +98,8 @@ def temporary_step() -> Iterator[str]:
 
 def test_dependency_ordering():
     "Check that a dependency will be scheduled to run before things that need it."
-    dag = {"a": ["b", "c"], "b": ["c"]}
-    assert to_dependency_order(dag, [], []) == ["c", "b", "a"]
+    dag = {"a": {"b", "c"}, "b": {"c"}}
+    assert to_dependency_order(dag) == ["c", "b", "a"]
 
 
 def test_dependency_filtering():
@@ -121,18 +120,68 @@ def test_dependency_filtering():
     }
 
 
-@patch("etl.steps.parse_step")
-def test_selection_selects_parents(parse_step):
-    "When you pick a step, it should select everything that step depends on."
-    parse_step.side_effect = lambda name, _: DummyStep(name)  # type: ignore
+def test_dependency_filtering_with_excludes():
+    """Test that excludes properly remove steps and their downstream dependencies."""
+    dag = {
+        "f": {"e"},  # f depends on e
+        "e": {"d"},  # e depends on d
+        "d": {"c"},  # d depends on c
+        "c": {"b"},  # c depends on b
+        "b": {"a"},  # b depends on a
+        "a": set(),  # a has no dependencies
+        "g": {"a"},  # g also depends on a (parallel branch)
+    }
 
-    dag = {"a": ["b"], "d": ["a"], "c": ["a"]}
+    # Test excluding step "c" - should also exclude "d", "e", "f" (downstream dependencies)
+    # but keep "a", "b", "g" (not dependent on c)
+    result = filter_to_subgraph(dag, ["a", "b", "c", "d", "e", "f", "g"], excludes=["c"])
+    expected = {
+        "a": set(),
+        "b": {"a"},
+        "g": {"a"},
+    }
+    assert result == expected
 
-    # selecting "d" should cause "b" -> "a" -> "d" to all be selected
-    #                            "c" to be ignored
-    steps = compile_steps(dag, ["d"], [])
-    assert len(steps) == 3
-    assert set(s.path for s in steps) == {"b", "a", "d"}
+    # Test excluding with regex pattern
+    result = filter_to_subgraph(dag, ["a", "b", "c", "d", "e", "f", "g"], excludes=["[cd]"])
+    expected = {
+        "a": set(),
+        "b": {"a"},
+        "g": {"a"},
+    }
+    assert result == expected
+
+    # Test excluding step "a" - should exclude everything since all depend on "a"
+    result = filter_to_subgraph(dag, ["a", "b", "c", "d", "e", "f", "g"], excludes=["a"])
+    expected = {}
+    assert result == expected
+
+    # Test excludes with empty includes (should include all except excluded and their downstream)
+    result = filter_to_subgraph(dag, [], excludes=["c"])
+    expected = {
+        "a": set(),
+        "b": {"a"},
+        "g": {"a"},
+    }
+    assert result == expected
+
+
+def test_dependency_filtering_empty_includes_with_excludes():
+    """Test that excludes work properly when includes is empty."""
+    dag = {
+        "step1": set(),
+        "step2": {"step1"},
+        "step3": {"step2"},
+        "step4": set(),
+    }
+
+    # When includes is empty but excludes has values, should exclude specified steps and their downstream
+    result = filter_to_subgraph(dag, [], excludes=["step2"])
+    expected = {
+        "step1": set(),
+        "step4": set(),
+    }
+    assert result == expected
 
 
 class DummyStep(Step):  # type: ignore

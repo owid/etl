@@ -81,7 +81,7 @@ ANOMALY_TYPE_NAMES = {k: v["tag_name"] for k, v in ANOMALY_TYPES.items()}
 ANOMALY_TYPES_TO_DETECT = tuple(ANOMALY_TYPES.keys())
 
 # GPT
-MODEL_NAME = "gpt-4o"
+MODEL_NAME = "gpt-4.1"
 
 # Map sorting strategy to name to show in UI.
 SORTING_STRATEGIES = {
@@ -596,13 +596,14 @@ with st.form(key="dataset_search"):
     query_dataset_ids = [int(v) for v in st.query_params.get_all("anomalist_datasets_selected")]
 
     st.session_state.anomalist_datasets_selected = st.multiselect(
-        "Select datasets",
+        label="Select datasets",
         # options=cached.load_dataset_uris(),
         options=DATASETS_ALL.keys(),
         # max_selections=1,
         default=query_dataset_ids or DATASETS_NEW.keys(),
-        format_func=DATASETS_ALL.get,
+        format_func=lambda x: DATASETS_ALL[x],
     )
+
     st.query_params["anomalist_datasets_selected"] = st.session_state.anomalist_datasets_selected  # type: ignore
 
     st.form_submit_button(
@@ -617,7 +618,7 @@ with st.form(key="dataset_search"):
 # If anomalies for dataset already exist in DB, load them. Warn user that these are being loaded from DB
 if not st.session_state.anomalist_anomalies or st.session_state.anomalist_datasets_submitted:
     # 3.1/ Check if anomalies are already there in DB
-    with st.spinner("Loading anomalies (already detected) from database..."):
+    with st.spinner("Loading anomalies (already detected) from database...", show_time=True):
         st.session_state.anomalist_anomalies = WizardDB.load_anomalies(st.session_state.anomalist_datasets_selected)
 
     # Load indicators in selected datasets
@@ -636,7 +637,7 @@ if not st.session_state.anomalist_anomalies or st.session_state.anomalist_datase
         # Reset flag
         st.session_state.anomalist_anomalies_out_of_date = False
 
-        with st.spinner("Scanning for anomalies... This can take some time."):
+        with st.spinner("Scanning for anomalies... This can take some time.", show_time=True):
             anomaly_detection(
                 anomaly_types=ANOMALY_TYPES_TO_DETECT,
                 variable_ids=variable_ids,

@@ -812,5 +812,15 @@
       }
     },
     "additionalProperties": false
+  },
+  "slug": {
+    "type": "string",
+    "pattern": "^[a-z][a-z0-9_]*$|^_[a-z0-9][a-z0-9_]*$",
+    "description": "A slug is a URL-friendly version of a string, typically snake_case (only alphanumeric values and underscore '_'). Can't start with a number."
+  },
+  "slug_relaxed": {
+    "type": "string",
+    "pattern": ".*[a-zA-Z0-9].*",
+    "description": "A slug is a URL-friendly version of a string, typically snake_case (only alphanumeric values and underscore '_'). Can't start with a number."
   }
 }

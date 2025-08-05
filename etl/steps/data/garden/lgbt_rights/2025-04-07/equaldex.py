@@ -7,7 +7,7 @@ from owid.catalog import Dataset, Table, VariableMeta, VariablePresentationMeta
 from owid.datautils.dataframes import map_series
 
 from etl.data_helpers import geo
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -56,7 +56,7 @@ CATEGORIES_RENAMING = {
         "Married couples only": "Married couples only",
         "Second parent adoption only": "Second parent adoption only",
         "Varies by Region": "Varies by region",
-        "Single only": "Single only",
+        "Single only": "Individual only",
         "Ambiguous": "Ambiguous",
         "Illegal": "Illegal",
     },
@@ -151,7 +151,7 @@ CATEGORIES_RENAMING = {
 }
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -181,11 +181,6 @@ def run(dest_dir: str) -> None:
 
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
-    # NOTE: Correcting data for France in changing_gender to "Legal, surgery required" between 1992 and 2018
-    tb.loc[(tb["country"] == "France") & (tb["year"] >= 1992) & (tb["year"] < 2018), "changing_gender"] = (
-        "Legal, surgery required"
-    )
-
     # Select only sovereign countries
     tb = select_only_sovereign_countries(tb=tb, tb_sovereign_countries=tb_sovereign_countries)
 
@@ -214,9 +209,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
-    )
+    ds_garden = paths.create_dataset(tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata)
 
     # Save changes in the new garden dataset.
     ds_garden.save()
@@ -426,7 +419,7 @@ def add_metadata_for_aggregated_columns(col: str, status: str, count_or_pop: str
         meta = VariableMeta(
             title=f"{col.capitalize()} - {status.capitalize()} (Population)",
             description_short=f"Population of countries with the status '{status}' for {col}.",
-            unit="persons",
+            unit="people",
             short_unit="",
             sort=[],
             origins=origins,
@@ -463,6 +456,12 @@ def select_only_sovereign_countries(tb: Table, tb_sovereign_countries: Table) ->
     tb_sovereign_countries = tb_sovereign_countries.drop(columns=["year"])
 
     # Merge the two tables
-    tb = pr.merge(tb, tb_sovereign_countries, on=["country"], how="inner")
+    tb_with_sovereign = pr.merge(tb, tb_sovereign_countries, on=["country"], how="inner")
+
+    # NOTE: This is a fix to include Greenland data
+    # Add Greenland data back from tb
+    tb_greenland = tb[tb["country"] == "Greenland"].reset_index(drop=True)
+
+    tb = pr.concat([tb_with_sovereign, tb_greenland], ignore_index=True)
 
     return tb

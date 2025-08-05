@@ -1,0 +1,17 @@
+dataset:
+  title: DRAFT account_ownership_by_region
+  description: ''
+tables:
+  account_ownership_by_region:
+    variables:
+      share_with_mobile_money:
+        title: share_with_mobile_money
+        unit: ''
+      share_without_mobile_money:
+        title: share_without_mobile_money
+        unit: ''
+    dimensions:
+      - name: country
+        slug: country
+      - name: year
+        slug: year

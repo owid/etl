@@ -102,8 +102,8 @@ tables:
                 baseColorScheme: Blues
                 colorSchemeInvert: false
                 binningStrategy: manual
-                customNumericMinValue: 0
                 customNumericValues:
+                  - 0
                   - 10
                   - 20
                   - 30
@@ -190,8 +190,8 @@ tables:
               colorScale:
                 baseColorScheme: YlOrRd
                 binningStrategy: manual
-                customNumericMinValue: 0
                 customNumericValues:
+                  - 0
                   - 10
                   - 20
                   - 30
@@ -282,8 +282,8 @@ tables:
               colorScale:
                 baseColorScheme: YlOrRd
                 binningStrategy: manual
-                customNumericMinValue: 0
                 customNumericValues:
+                  - 0
                   - 10
                   - 20
                   - 30
@@ -367,6 +367,7 @@ tables:
                 baseColorScheme: GnBu
                 binningStrategy: manual
                 customNumericValues:
+                  - 0
                   - 1000
                   - 2000
                   - 5000
@@ -374,7 +375,6 @@ tables:
                   - 20000
                   - 50000
                   - 100000
-                customNumericMinValue: 0
             selectedEntityNames:
               - United States
               - Germany
@@ -431,6 +431,7 @@ tables:
                 baseColorScheme: PuBu
                 binningStrategy: manual
                 customNumericValues:
+                  - 0
                   - 10000000000
                   - 30000000000
                   - 100000000000

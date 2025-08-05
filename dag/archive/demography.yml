@@ -136,3 +136,7 @@ steps:
 
   data://explorers/un/2022/un_wpp:
     - data://garden/un/2022-07-11/un_wpp
+
+  # Fariss
+  data://grapher/demography/2023-12-20/population_fariss:
+    - data://garden/demography/2023-12-20/population_fariss

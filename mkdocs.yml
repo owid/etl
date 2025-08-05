@@ -224,6 +224,7 @@ nav:
           - Harmonize country names: "guides/harmonize-countries.md"
           - Backport from database: "guides/backport.md"
           - Regular updates: "guides/auto-regular-updates.md"
+          - Automatic updates via metadata: "guides/autoupdate-cli.md"
           - Pull requests: "guides/pull-requests.md"
           - Tips when working with ETL: "guides/etl-tips.md"
           - Metadata in data pages: "guides/metadata-play.md"
@@ -255,6 +256,7 @@ nav:
   - Metadata:
       - Metadata: "architecture/metadata/index.md"
       - Reference: "architecture/metadata/reference/index.md"
+      - Collections reference: "architecture/metadata/reference/collections.md"
       - Working with Metadata:
           - Structuring YAML file: "architecture/metadata/structuring-yaml.md"
           - Data Pages Workflow: "architecture/metadata/data_pages_workflow.md"
@@ -267,5 +269,6 @@ nav:
       - Charts API: "api/chart-api.md"
       - ETL catalog API: "api/catalog-api.md"
       - Example API usage: "api/example-usage.md"
+      - Querying data via Datasette: "api/datasette.md"
       - Maintenance: "api/maintenance.md"
       - COVID-19: "api/covid.md"

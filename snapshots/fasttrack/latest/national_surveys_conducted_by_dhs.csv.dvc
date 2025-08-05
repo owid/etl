@@ -1,0 +1,18 @@
+meta:
+  origin:
+    producer: Demographic and Health Surveys
+    title: Demographic and Health Surveys - number of countries surveyed
+    citation_full: ICF. Survey Search. The DHS Program website. Funded by USAID. http://www.dhsprogram.com.
+    attribution: Demographic and Health Surveys (2025)
+    attribution_short: DHS (2025)
+    url_main: https://dhsprogram.com/Methodology/Survey-Search.cfm
+    url_download: |-
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vSDXrkhAKySWrhkhRagFZ2nZ-Pq6ZHNBkT3uSx4MZBEvRg1c_aspfCoUUswzKSnewK1bVTrVl9vQfAo/pub?output=csv
+    date_accessed: '2025-06-20'
+  name: Number of national surveys in Demographic and Health Surveys
+  description: The cumulative number of surveys conducted per country in the Demographic and Health surveys since it began in 1984.
+  license: {}
+outs:
+  - md5: c709cb457904de0e5041071fc07482e0
+    size: 3368
+    path: national_surveys_conducted_by_dhs.csv

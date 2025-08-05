@@ -67,7 +67,6 @@ SUBGROUPS = {
         "name": "Development",
         "commands": {
             "version-tracker": "etl.version_tracker.run_version_tracker_checks",
-            "prune": "etl.prune.prune_cli",
             "publish": "etl.publish.publish_cli",
             "reindex": "etl.reindex.reindex_cli",
             "run-python-step": "etl.run_python_step.main",
@@ -194,6 +193,12 @@ GROUPS = (
             "name": "Anomalist",
             "commands": {
                 "anomalist": "apps.anomalist.cli.cli",
+            },
+        },
+        {
+            "name": "Autoupdate",
+            "commands": {
+                "autoupdate": "apps.autoupdate.cli.cli",
             },
         },
     ]

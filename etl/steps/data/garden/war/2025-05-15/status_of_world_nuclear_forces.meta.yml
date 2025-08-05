@@ -1,0 +1,45 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Nuclear Weapons
+        - War & Peace
+    description_key:
+      - The exact number of countries' warheads is secret, and the estimates are based on publicly available information, historical records, and occasional leaks.
+      - Warheads vary substantially in their destructing power.
+    unit: warheads
+    short_unit: ""
+    processing_level: minor
+    display:
+      numDecimalPlaces: 0
+
+dataset:
+  update_period_days: 365
+
+tables:
+  status_of_world_nuclear_forces:
+    variables:
+      deployed_nonstrategic:
+        title: Number of deployed nonstrategic nuclear warheads
+        description_short: |-
+          Deployed warheads are those on ballistic missiles or bomber bases. Nonstrategic or tactical warheads are those for use on the battlefield.
+      deployed_strategic:
+        title: Number of deployed strategic nuclear warheads
+        description_short: |-
+          Deployed warheads are those on ballistic missiles or bomber bases. Strategic warheads are those for use away from the battlefield, such as against military bases, arms industries, or infrastructure.
+      reserve_nondeployed:
+        title: Number of nondeployed nuclear warheads in reserve
+        description_short: |-
+          Nondeployed or reserve warheads are those not on ballistic missiles or bomber bases.
+      stockpile:
+        title: Number of nuclear warheads in stockpile
+        description_short: |-
+          Estimated number of nuclear warheads except for those that are queued for dismantlement.
+      retired:
+        title: Number of retired nuclear warheads
+        description_short: |-
+          Estimated number of retired nuclear warheads queued for dismantlement.
+      inventory:
+        title: Total number of nuclear warheads
+        description_short: |-
+          Estimated number of all nuclear warheads, be they deployed strategic, deployed nonstrategic, nondeployed, or retired.

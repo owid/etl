@@ -1,0 +1,333 @@
+tables:
+  flunet:
+    variables:
+      hemisphere:
+        title: Hemisphere
+        unit: ''
+      date:
+        title: Date
+        unit: ''
+      ah1n12009nonsentinel:
+        title: A H1N12009 - Non-sentinel surveillance
+        unit: confirmed cases
+        display:
+          numDecimalPlaces: 0
+      ah1n12009notdefined:
+        title: A H1N12009 - Not defined surveillance
+        unit: confirmed cases
+        display:
+          numDecimalPlaces: 0
+      ah1n12009sentinel:
+        title: A H1N12009 - Sentinel surveillance
+        unit: confirmed cases
+        display:
+          numDecimalPlaces: 0
+      ah1nonsentinel:
+        title: A H1 - Non-sentinel surveillance
+        unit: confirmed cases
+        display:
+          numDecimalPlaces: 0
+      ah1notdefined:
+        title: A H1 - Not defined surveillance
+        unit: confirmed cases
+        display:
+          numDecimalPlaces: 0
+      ah1sentinel:
+        title: A H1 - Sentinel surveillance
+        unit: confirmed cases
+        display:
+          numDecimalPlaces: 0
+      ah3nonsentinel:
+        title: A H3 - Non-sentinel surveillance
+        unit: confirmed cases
+        display:
+          numDecimalPlaces: 0
+      ah3notdefined:
+        title: A H3 - Not defined surveillance
+        unit: confirmed cases
+        display:
+          numDecimalPlaces: 0
+      ah3sentinel:
+        title: A H3 - Sentinel surveillance
+        unit: confirmed cases
+        display:
+          numDecimalPlaces: 0
+      ah5nonsentinel:
+        title: A H5 - Non-sentinel surveillance
+        unit: confirmed cases
+        display:
+          numDecimalPlaces: 0
+      ah5notdefined:
+        title: A H5 - Not defined surveillance
+        unit: confirmed cases
+        display:
+          numDecimalPlaces: 0
+      ah5sentinel:
+        title: A H5 - Sentinel surveillance
+        unit: confirmed cases
+        display:
+          numDecimalPlaces: 0
+      ah7n9nonsentinel:
+        title: A H7N9 - Non-sentinel surveillance
+        unit: confirmed cases
+        display:
+          numDecimalPlaces: 0
+      ah7n9notdefined:
+        title: A H7N9 - Not defined surveillance
+        unit: confirmed cases
+        display:
+          numDecimalPlaces: 0
+      ah7n9sentinel:
+        title: A H7N9 - Sentinel surveillance
+        unit: confirmed cases
+        display:
+          numDecimalPlaces: 0
+      a_no_subtypenonsentinel:
+        title: A (unknown subtype) - Non-sentinel surveillance
+        unit: confirmed cases
+        display:
+          numDecimalPlaces: 0
+      a_no_subtypenotdefined:
+        title: A (unknown subtype) - Not defined surveillance
+        unit: confirmed cases
+        display:
+          numDecimalPlaces: 0
+      a_no_subtypesentinel:
+        title: A (unknown subtype) - Sentinel surveillance
+        unit: confirmed cases
+        display:
+          numDecimalPlaces: 0
+      inf_anonsentinel:
+        title: Influenza A - Non-sentinel surveillance
+        unit: confirmed cases
+        display:
+          numDecimalPlaces: 0
+      inf_anotdefined:
+        title: Influenza A - Not defined surveillance
+        unit: confirmed cases
+        display:
+          numDecimalPlaces: 0
+      inf_asentinel:
+        title: Influenza A - Sentinel surveillance
+        unit: confirmed cases
+        display:
+          numDecimalPlaces: 0
+      byamnonsentinel:
+        title: B Yamagata - Non-sentinel surveillance
+        unit: confirmed cases
+        display:
+          numDecimalPlaces: 0
+      byamnotdefined:
+        title: B Yamagata - Not defined surveillance
+        unit: confirmed cases
+        display:
+          numDecimalPlaces: 0
+      byamsentinel:
+        title: B Yamagata - Sentinel surveillance
+        unit: confirmed cases
+        display:
+          numDecimalPlaces: 0
+      bnotdeterminednonsentinel:
+        title: B (unknown lineage) - Non-sentinel surveillance
+        unit: confirmed cases
+        display:
+          numDecimalPlaces: 0
+      bnotdeterminednotdefined:
+        title: B (unknown lineage) - Not defined surveillance
+        unit: confirmed cases
+        display:
+          numDecimalPlaces: 0
+      bnotdeterminedsentinel:
+        title: B (unknown lineage) - Sentinel surveillance
+        unit: confirmed cases
+        display:
+          numDecimalPlaces: 0
+      bvicnonsentinel:
+        title: B Victoria - Non-sentinel surveillance
+        unit: confirmed cases
+        display:
+          numDecimalPlaces: 0
+      bvicnotdefined:
+        title: B Victoria - Not defined surveillance
+        unit: confirmed cases
+        display:
+          numDecimalPlaces: 0
+      bvicsentinel:
+        title: B Victoria - Sentinel surveillance
+        unit: confirmed cases
+        display:
+          numDecimalPlaces: 0
+      inf_bnonsentinel:
+        title: Influenza B - Non-sentinel surveillance
+        unit: confirmed cases
+        display:
+          numDecimalPlaces: 0
+      inf_bnotdefined:
+        title: Influenza B - Not defined surveillance
+        unit: confirmed cases
+        display:
+          numDecimalPlaces: 0
+      inf_bsentinel:
+        title: Influenza B - Sentinel surveillance
+        unit: confirmed cases
+        display:
+          numDecimalPlaces: 0
+      inf_allnonsentinel:
+        title: All strains - Non-sentinel surveillance
+        unit: confirmed cases
+        display:
+          numDecimalPlaces: 0
+      inf_allnotdefined:
+        title: All strains - Not defined surveillance
+        unit: confirmed cases
+        display:
+          numDecimalPlaces: 0
+      inf_allsentinel:
+        title: All strains - Sentinel surveillance
+        unit: confirmed cases
+        display:
+          numDecimalPlaces: 0
+      inf_negativenonsentinel:
+        title: Negative tests - Non-sentinel surveillance
+        unit: confirmed cases
+        display:
+          numDecimalPlaces: 0
+      inf_negativenotdefined:
+        title: Negative tests - Not defined surveillance
+        unit: confirmed cases
+        display:
+          numDecimalPlaces: 0
+      inf_negativesentinel:
+        title: Negative tests - Sentinel surveillance
+        unit: confirmed cases
+        display:
+          numDecimalPlaces: 0
+      spec_processed_nbnonsentinel:
+        title: Specimens processed - Non-sentinel surveillance
+        unit: specimens
+        display:
+          numDecimalPlaces: 0
+      spec_processed_nbnotdefined:
+        title: Specimens processed - Not defined surveillance
+        unit: specimens
+        display:
+          numDecimalPlaces: 0
+      spec_processed_nbsentinel:
+        title: Specimens processed - Sentinel surveillance
+        unit: specimens
+        display:
+          numDecimalPlaces: 0
+      spec_received_nbnonsentinel:
+        title: Specimens received - Non-sentinel surveillance
+        unit: specimens
+        display:
+          numDecimalPlaces: 0
+      spec_received_nbnotdefined:
+        title: Specimens received - Not defined surveillance
+        unit: specimens
+        display:
+          numDecimalPlaces: 0
+      spec_received_nbsentinel:
+        title: Specimens received - Sentinel surveillance
+        unit: specimens
+        display:
+          numDecimalPlaces: 0
+      ah1n12009combined:
+        title: A H1N12009 - All types of surveillance
+        unit: confirmed cases
+        display:
+          numDecimalPlaces: 0
+      ah1combined:
+        title: A H1 - All types of surveillance
+        unit: confirmed cases
+        display:
+          numDecimalPlaces: 0
+      ah3combined:
+        title: A H3 - All types of surveillance
+        unit: confirmed cases
+        display:
+          numDecimalPlaces: 0
+      ah5combined:
+        title: A H5 - All types of surveillance
+        unit: confirmed cases
+        display:
+          numDecimalPlaces: 0
+      ah7n9combined:
+        title: A H7N9 - All types of surveillance
+        unit: confirmed cases
+        display:
+          numDecimalPlaces: 0
+      a_no_subtypecombined:
+        title: A (unknown subtype) - All types of surveillance
+        unit: confirmed cases
+        display:
+          numDecimalPlaces: 0
+      inf_acombined:
+        title: Influenza A - All types of surveillance
+        unit: confirmed cases
+        display:
+          numDecimalPlaces: 0
+      byamcombined:
+        title: B Yamagata - All types of surveillance
+        unit: confirmed cases
+        display:
+          numDecimalPlaces: 0
+      bnotdeterminedcombined:
+        title: B (unknown lineage) - All types of surveillance
+        unit: confirmed cases
+        display:
+          numDecimalPlaces: 0
+      bviccombined:
+        title: B Victoria - All types of surveillance
+        unit: confirmed cases
+        display:
+          numDecimalPlaces: 0
+      inf_bcombined:
+        title: Influenza B - All types of surveillance
+        unit: confirmed cases
+        display:
+          numDecimalPlaces: 0
+      inf_allcombined:
+        title: All strains - All types of surveillance
+        unit: confirmed cases
+        display:
+          numDecimalPlaces: 0
+      inf_negativecombined:
+        title: Negative tests - All types of surveillance
+        unit: confirmed cases
+        display:
+          numDecimalPlaces: 0
+      spec_processed_nbcombined:
+        title: Specimens processed - All types of surveillance
+        unit: specimens
+        display:
+          numDecimalPlaces: 0
+      spec_received_nbcombined:
+        title: Specimens received - All types of surveillance
+        unit: specimens
+        display:
+          numDecimalPlaces: 0
+      pcnt_possentinel:
+        title: Share of positive tests - Sentinel surveillance
+        unit: '%'
+        display:
+          numDecimalPlaces: 3
+        short_unit: '%'
+      pcnt_posnonsentinel:
+        title: Share of positive tests - Non-sentinel surveillance
+        unit: '%'
+        display:
+          numDecimalPlaces: 3
+        short_unit: '%'
+      pcnt_posnotdefined:
+        title: Share of positive tests - Not defined surveillance
+        unit: '%'
+        display:
+          numDecimalPlaces: 3
+        short_unit: '%'
+      pcnt_poscombined:
+        title: Share of positive tests - All types of surveillance
+        unit: '%'
+        display:
+          numDecimalPlaces: 3
+        short_unit: '%'

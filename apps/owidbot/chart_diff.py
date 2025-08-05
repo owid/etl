@@ -6,8 +6,7 @@ from structlog import get_logger
 from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiffsLoader
 from etl.config import OWIDEnv, get_container_name
 from etl.db import production_or_master_engine
-
-from . import github_utils as gh_utils
+from etl.git_api_helpers import GithubApiRepo
 
 log = get_logger()
 
@@ -20,9 +19,11 @@ class ChartDiffStatus:
 
 
 def create_check_run(repo_name: str, branch: str, charts_df: pd.DataFrame, dry_run: bool = False) -> None:
-    access_token = gh_utils.github_app_access_token()
-    repo = gh_utils.get_repo(repo_name, access_token=access_token)
-    pr = gh_utils.get_pr(repo, branch)
+    # Create a GitHub API repo instance using app authentication
+    github_repo = GithubApiRepo(repo_name=repo_name, use_app_auth=True)
+
+    # Get the PR for this branch
+    pr = github_repo.get_pr(branch)
     if not pr:
         log.warning(f"No open pull request found for branch {branch}")
         return
@@ -30,19 +31,17 @@ def create_check_run(repo_name: str, branch: str, charts_df: pd.DataFrame, dry_r
     # Get the latest commit of the pull request
     latest_commit = pr.get_commits().reversed[0]
 
+    # Get the status for the chart diff
     status = chart_diff_status(charts_df)
 
     if not dry_run:
-        # Create the check run and complete it in a single command
-        repo.create_check_run(
-            name="owidbot/chart-diff",
+        # Create the check run
+        github_repo.create_check_run(
             head_sha=latest_commit.sha,
-            status="completed",
+            name="owidbot/chart-diff",
             conclusion=status.status_conclusion,
-            output={
-                "title": status.status_title,
-                "summary": format_chart_diff(charts_df),
-            },
+            title=status.status_title,
+            summary=format_chart_diff(charts_df),
         )
 
 

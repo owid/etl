@@ -1,0 +1,5 @@
+steps:
+  data://grapher/dummy/2020-01-01/dummy_full:
+    - data://garden/dummy/2020-01-01/dummy_full
+  data://grapher/dummy/2023-10-12/dummy_monster:
+    - data://garden/dummy/2023-10-12/dummy_monster

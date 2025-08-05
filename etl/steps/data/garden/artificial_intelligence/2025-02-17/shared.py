@@ -1,7 +1,7 @@
 import owid.catalog.processing as pr
 from owid.catalog import Table
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 
 def preprocess_data(tb: Table, index_columns: list, pivot_column: str, value_column: str) -> Table:
@@ -46,7 +46,7 @@ def preprocess_data(tb: Table, index_columns: list, pivot_column: str, value_col
 
 
 def load_and_process_dataset(
-    file_indicator: str, column_to_process: list, dest_dir: str, paths: PathFinder, perform_merge: bool = False
+    file_indicator: str, column_to_process: list, paths: PathFinder, perform_merge: bool = False
 ):
     """
     Loads a dataset, processes it, and creates a new garden dataset.
@@ -54,7 +54,6 @@ def load_and_process_dataset(
     Args:
     - file_indicator: The unique part of the dataset name to load.
     - column_to_process: List of column names to process. Pass one column for simple processing, pass two for merging.
-    - dest_dir: Destination directory to save the new dataset.
     - paths: An instance of PathFinder to get dataset paths.
     - perform_merge: Boolean indicating whether to merge two processed tables. Default is False.
     """
@@ -75,7 +74,7 @@ def load_and_process_dataset(
     tb_to_save = tb_to_save.format(["date", "name"])
 
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb_to_save], default_metadata=ds_meadow.metadata)
+    ds_garden = paths.create_dataset(tables=[tb_to_save], default_metadata=ds_meadow.metadata)
 
     # Save changes in the new garden dataset.
     ds_garden.save()

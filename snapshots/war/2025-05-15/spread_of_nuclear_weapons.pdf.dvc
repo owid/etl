@@ -1,0 +1,25 @@
+meta:
+  origin:
+    producer: Bleek
+    title: Spread of Nuclear Weapons
+    description: |-
+      This dataset provides information on nuclear weapons states.
+
+      More details can be found in [the original document by Bleek (2017)](https://www.belfercenter.org/sites/default/files/pantheon_files/files/publication/When%20Did%20%28and%20Didn%27t%29%20States%20Proliferate%3F_1.pdf).
+    citation_full: |-
+      Philipp C. Bleek, "When Did (and Didn't) States Proliferate? Chronicling the Spread of Nuclear Weapons", Discussion Paper (Cambridge, MA: Project on Managing the Atom, Belfer Center for Science and International Affairs, Harvard Kennedy School and the James Martin Center for Nonproliferation Studies, Middlebury Institute of International Studies, Monterey, CA., June 2017).
+    attribution_short: Bleek
+    url_main: |-
+      https://www.belfercenter.org/sites/default/files/pantheon_files/files/publication/When%20Did%20%28and%20Didn%27t%29%20States%20Proliferate%3F_1.pdf
+    url_download: |-
+      https://www.belfercenter.org/sites/default/files/pantheon_files/files/publication/When%20Did%20%28and%20Didn%27t%29%20States%20Proliferate%3F_1.pdf
+    date_accessed: '2025-05-15'
+    date_published: '2017-06-13'
+    license:
+      name: Copyright 2017, President and Fellows of Harvard College
+      url: |-
+        https://www.belfercenter.org/sites/default/files/pantheon_files/files/publication/When%20Did%20%28and%20Didn%27t%29%20States%20Proliferate%3F_1.pdf
+outs:
+  - md5: 46ffcdd3c9b40e718a45411c0e2acab2
+    size: 728103
+    path: spread_of_nuclear_weapons.pdf

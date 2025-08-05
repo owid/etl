@@ -8,7 +8,7 @@ The data is copied from "FIGURE 42. GLOBAL TRENDS IN RENEWABLE ENERGY INVESTMENT
 
 import owid.catalog.processing as pr
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # naming conventions
 paths = PathFinder(__file__)
@@ -16,7 +16,7 @@ paths = PathFinder(__file__)
 EXTRACTED_DATA_FILE = paths.directory / "renewable_energy_investments.data.csv"
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load data.
     #
@@ -39,14 +39,11 @@ def run(dest_dir: str) -> None:
     tb = tb.assign(**{"country": "World"})
 
     # Set an appropriate index and sort conveniently.
-    tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
-
-    # Update table short name.
-    tb.metadata.short_name = paths.short_name
+    tb = tb.format(["country", "year"], short_name=paths.short_name)
 
     #
     # Save outputs.
     #
     # Create a new meadow dataset.
-    ds_meadow = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
+    ds_meadow = paths.create_dataset(tables=[tb])
     ds_meadow.save()

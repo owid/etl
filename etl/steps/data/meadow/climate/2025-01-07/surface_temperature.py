@@ -1,4 +1,4 @@
-"""Load a snapshot and create a meadow dataset."""
+"""Load a snapshot and create a meadow dataset.."""
 
 import tempfile
 import zipfile
@@ -14,7 +14,7 @@ from shapely.geometry import mapping
 from structlog import get_logger
 from tqdm import tqdm
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 from etl.snapshot import Snapshot
 
 # Get paths and naming conventions for current step.
@@ -65,7 +65,7 @@ def _load_shapefile(file_path: str, shapefile: str) -> pd.DataFrame:
     return shapefile[["geometry", "country"]]  # type: ignore
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     # Activates the usage of the global context. Using this option can enhance the performance
     # of initializing objects in single-threaded applications.
     pyproj.set_use_global_context(True)  # type: ignore
@@ -183,7 +183,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=snap.metadata)
+    ds_meadow = paths.create_dataset(tables=[tb], check_variables_metadata=True, default_metadata=snap.metadata)
 
     # Save changes in the new garden dataset.
     ds_meadow.save()

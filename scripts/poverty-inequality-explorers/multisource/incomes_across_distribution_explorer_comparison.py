@@ -6,6 +6,9 @@ import pandas as pd
 
 from ..common_parameters import *
 
+# NOTE: Define this for both PIP and LIS, to use the same year
+ppp_year_pip_lis = PPP_VERSION_COMPARISON_PIP
+
 # ## Google sheets auxiliar data
 # These spreadsheets provide with different details depending on each type of welfare measure or tables considered.
 
@@ -14,12 +17,12 @@ from ..common_parameters import *
 sheet_id = "1wcFsNZCEn_6SJ05BFkXKLUyvCrnigfR8eeemGKgAYsI"
 
 # Merged sheet (this contains PIP, WID and LIS dataset information together in one file)
-sheet_name = "merged_tables"
+sheet_name = f"merged_tables_{ppp_year_pip_lis}"
 url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={sheet_name}"
 merged_tables = pd.read_csv(url, keep_default_na=False)
 
 # Source checkbox covers all the possible combinations to get for the multi-source selector
-sheet_name = "source_checkbox"
+sheet_name = f"source_checkbox_{ppp_year_pip_lis}"
 url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={sheet_name}"
 source_checkbox = pd.read_csv(url, keep_default_na=False, dtype={"pip": "str", "wid": "str", "lis": "str"})
 
@@ -146,7 +149,7 @@ header_dict = {
         "China",
     ],
     "explorerSubtitle": "Compare World Bank, WID, and LIS data on the distribution of incomes.",
-    "isPublished": "true",
+    "isPublished": "false",
     "googleSheet": "",
     "wpBlockId": "57742",
     "entityType": "country or region",
@@ -161,7 +164,7 @@ df_header = df_header[0].apply(pd.Series)
 # ## Tables
 # Variables are grouped by type of welfare to iterate by different survey types at the same time. The output is the list of all the variables being used in the explorer, with metadata.
 # ### Tables for variables not showing breaks between surveys
-# These variables consider a continous series, without breaks due to changes in surveys' methodology
+# These variables consider a continuous series, without breaks due to changes in surveys' methodology
 
 
 ###########################################################################################
@@ -172,7 +175,6 @@ dataPublishedBy = DATA_PUBLISHED_BY_PIP
 sourceLink = SOURCE_LINK_PIP
 colorScaleNumericMinValue = COLOR_SCALE_NUMERIC_MIN_VALUE
 tolerance = TOLERANCE
-colorScaleEqualSizeBins = COLOR_SCALE_EQUAL_SIZEBINS
 tableSlug = "poverty_inequality"
 new_line = NEW_LINE
 
@@ -180,8 +182,9 @@ additional_description = ADDITIONAL_DESCRIPTION_PIP_COMPARISON
 
 notes_title = NOTES_TITLE_PIP
 
+
 processing_description = PROCESSING_DESCRIPTION_PIP_INCOMES_ACROSS_DISTRIBUTION
-ppp_description = PPP_DESCRIPTION_PIP_2017
+ppp_description = PPP_DESCRIPTION_PIP_CURRENT
 
 # Table generation
 df_tables_pip = pd.DataFrame()
@@ -213,7 +216,7 @@ for tab in range(len(pip_tables)):
             processing_description,
         ]
     )
-    df_tables_pip.loc[j, "unit"] = "international-$ in 2017 prices"
+    df_tables_pip.loc[j, "unit"] = f"international-$ in {ppp_year_pip_lis} prices"
     df_tables_pip.loc[j, "shortUnit"] = "$"
     df_tables_pip.loc[j, "type"] = "Numeric"
     df_tables_pip.loc[j, "colorScaleNumericBins"] = "1;2;5;10;20;50;100;100.0001"
@@ -232,7 +235,7 @@ for tab in range(len(pip_tables)):
             processing_description,
         ]
     )
-    df_tables_pip.loc[j, "unit"] = "international-$ in 2017 prices"
+    df_tables_pip.loc[j, "unit"] = f"international-$ in {ppp_year_pip_lis} prices"
     df_tables_pip.loc[j, "shortUnit"] = "$"
     df_tables_pip.loc[j, "type"] = "Numeric"
     df_tables_pip.loc[j, "colorScaleNumericBins"] = "1;2;5;10;20;50;100;100.0001"
@@ -252,7 +255,7 @@ for tab in range(len(pip_tables)):
                 processing_description,
             ]
         )
-        df_tables_pip.loc[j, "unit"] = "international-$ in 2017 prices"
+        df_tables_pip.loc[j, "unit"] = f"international-$ in {ppp_year_pip_lis} prices"
         df_tables_pip.loc[j, "shortUnit"] = "$"
         df_tables_pip.loc[j, "type"] = "Numeric"
         df_tables_pip.loc[j, "colorScaleNumericBins"] = "1;2;5;10;20;50;100;100.0001"
@@ -272,7 +275,7 @@ for tab in range(len(pip_tables)):
                 processing_description,
             ]
         )
-        df_tables_pip.loc[j, "unit"] = "international-$ in 2017 prices"
+        df_tables_pip.loc[j, "unit"] = f"international-$ in {ppp_year_pip_lis} prices"
         df_tables_pip.loc[j, "shortUnit"] = "$"
         df_tables_pip.loc[j, "type"] = "Numeric"
         df_tables_pip.loc[j, "colorScaleNumericBins"] = "1;2;5;10;20;50;100;100.0001"
@@ -312,7 +315,7 @@ for tab in range(len(pip_tables)):
                 processing_description,
             ]
         )
-        df_tables_pip.loc[j, "unit"] = "international-$ in 2017 prices"
+        df_tables_pip.loc[j, "unit"] = f"international-$ in {ppp_year_pip_lis} prices"
         df_tables_pip.loc[j, "shortUnit"] = "$"
         df_tables_pip.loc[j, "type"] = "Numeric"
         df_tables_pip.loc[j, "colorScaleNumericBins"] = pip_income_aggregation.scale[agg]
@@ -332,7 +335,7 @@ for tab in range(len(pip_tables)):
                 processing_description,
             ]
         )
-        df_tables_pip.loc[j, "unit"] = "international-$ in 2017 prices"
+        df_tables_pip.loc[j, "unit"] = f"international-$ in {ppp_year_pip_lis} prices"
         df_tables_pip.loc[j, "shortUnit"] = "$"
         df_tables_pip.loc[j, "type"] = "Numeric"
         df_tables_pip.loc[j, "colorScaleNumericBins"] = pip_income_aggregation.scale[agg]
@@ -355,7 +358,7 @@ for tab in range(len(pip_tables)):
                     processing_description,
                 ]
             )
-            df_tables_pip.loc[j, "unit"] = "international-$ in 2017 prices"
+            df_tables_pip.loc[j, "unit"] = f"international-$ in {ppp_year_pip_lis} prices"
             df_tables_pip.loc[j, "shortUnit"] = "$"
             df_tables_pip.loc[j, "type"] = "Numeric"
             df_tables_pip.loc[j, "colorScaleNumericBins"] = pip_income_aggregation.scale[agg]
@@ -380,7 +383,7 @@ for tab in range(len(pip_tables)):
                     processing_description,
                 ]
             )
-            df_tables_pip.loc[j, "unit"] = "international-$ in 2017 prices"
+            df_tables_pip.loc[j, "unit"] = f"international-$ in {ppp_year_pip_lis} prices"
             df_tables_pip.loc[j, "shortUnit"] = "$"
             df_tables_pip.loc[j, "type"] = "Numeric"
             df_tables_pip.loc[j, "colorScaleNumericBins"] = pip_income_aggregation.scale[agg]
@@ -396,7 +399,6 @@ df_tables_pip["dataPublishedBy"] = dataPublishedBy
 df_tables_pip["sourceLink"] = sourceLink
 df_tables_pip["colorScaleNumericMinValue"] = colorScaleNumericMinValue
 df_tables_pip["tolerance"] = tolerance
-df_tables_pip["colorScaleEqualSizeBins"] = colorScaleEqualSizeBins
 
 ###########################################################################################
 # WORLD INEQUALITY DATABASE (WID)
@@ -409,11 +411,12 @@ dataPublishedBy = DATA_PUBLISHED_BY_WID
 sourceLink = SOURCE_LINK_WID
 colorScaleNumericMinValue = COLOR_SCALE_NUMERIC_MIN_VALUE
 tolerance = TOLERANCE
-colorScaleEqualSizeBins = COLOR_SCALE_EQUAL_SIZEBINS
 new_line = NEW_LINE
 
 additional_description = ADDITIONAL_DESCRIPTION_WID
 ppp_description = PPP_DESCRIPTION_WID
+
+ppp_year_wid = PPP_VERSION_WID
 
 df_tables_wid = pd.DataFrame()
 j = 0
@@ -438,7 +441,7 @@ for tab in range(len(merged_tables)):
                 additional_description,
             ]
         )
-        df_tables_wid.loc[j, "unit"] = f"international-$ in {PPP_YEAR_WID} prices"
+        df_tables_wid.loc[j, "unit"] = f"international-$ in {ppp_year_wid} prices"
         df_tables_wid.loc[j, "shortUnit"] = "$"
         df_tables_wid.loc[j, "type"] = "Numeric"
         # df_tables_wid.loc[j, "colorScaleNumericBins"] = wid_welfare["scale_mean"][wel]
@@ -456,7 +459,7 @@ for tab in range(len(merged_tables)):
                 additional_description,
             ]
         )
-        df_tables_wid.loc[j, "unit"] = f"international-$ in {PPP_YEAR_WID} prices"
+        df_tables_wid.loc[j, "unit"] = f"international-$ in {ppp_year_wid} prices"
         df_tables_wid.loc[j, "shortUnit"] = "$"
         df_tables_wid.loc[j, "type"] = "Numeric"
         # df_tables_wid.loc[j, "colorScaleNumericBins"] = wid_welfare["scale_median"][wel]
@@ -475,7 +478,7 @@ for tab in range(len(merged_tables)):
                     additional_description,
                 ]
             )
-            df_tables_wid.loc[j, "unit"] = f"international-$ in {PPP_YEAR_WID} prices"
+            df_tables_wid.loc[j, "unit"] = f"international-$ in {ppp_year_wid} prices"
             df_tables_wid.loc[j, "shortUnit"] = "$"
             df_tables_wid.loc[j, "type"] = "Numeric"
             # df_tables_wid.loc[j, "colorScaleNumericBins"] = wid_deciles9["scale_thr"][
@@ -496,7 +499,7 @@ for tab in range(len(merged_tables)):
                     additional_description,
                 ]
             )
-            df_tables_wid.loc[j, "unit"] = f"international-$ in {PPP_YEAR_WID} prices"
+            df_tables_wid.loc[j, "unit"] = f"international-$ in {ppp_year_wid} prices"
             df_tables_wid.loc[j, "shortUnit"] = "$"
             df_tables_wid.loc[j, "type"] = "Numeric"
             # df_tables_wid.loc[j, "colorScaleNumericBins"] = wid_deciles10["scale_avg"][
@@ -540,7 +543,7 @@ for tab in range(len(merged_tables)):
                     additional_description,
                 ]
             )
-            df_tables_wid.loc[j, "unit"] = f"international-$ in {PPP_YEAR_WID} prices"
+            df_tables_wid.loc[j, "unit"] = f"international-$ in {ppp_year_wid} prices"
             df_tables_wid.loc[j, "shortUnit"] = "$"
             df_tables_wid.loc[j, "type"] = "Numeric"
             # df_tables_wid.loc[j, "colorScaleNumericBins"] = wid_welfare["scale_mean"][
@@ -565,7 +568,7 @@ for tab in range(len(merged_tables)):
                     additional_description,
                 ]
             )
-            df_tables_wid.loc[j, "unit"] = f"international-$ in {PPP_YEAR_WID} prices"
+            df_tables_wid.loc[j, "unit"] = f"international-$ in {ppp_year_wid} prices"
             df_tables_wid.loc[j, "shortUnit"] = "$"
             df_tables_wid.loc[j, "type"] = "Numeric"
             # df_tables_wid.loc[j, "colorScaleNumericBins"] = wid_welfare["scale_median"][
@@ -591,7 +594,7 @@ for tab in range(len(merged_tables)):
                         additional_description,
                     ]
                 )
-                df_tables_wid.loc[j, "unit"] = f"international-$ in {PPP_YEAR_WID} prices"
+                df_tables_wid.loc[j, "unit"] = f"international-$ in {ppp_year_wid} prices"
                 df_tables_wid.loc[j, "shortUnit"] = "$"
                 df_tables_wid.loc[j, "type"] = "Numeric"
                 # df_tables_wid.loc[j, "colorScaleNumericBins"] = wid_deciles9[
@@ -617,7 +620,7 @@ for tab in range(len(merged_tables)):
                         additional_description,
                     ]
                 )
-                df_tables_wid.loc[j, "unit"] = f"international-$ in {PPP_YEAR_WID} prices"
+                df_tables_wid.loc[j, "unit"] = f"international-$ in {ppp_year_wid} prices"
                 df_tables_wid.loc[j, "shortUnit"] = "$"
                 df_tables_wid.loc[j, "type"] = "Numeric"
                 # df_tables_wid.loc[j, "colorScaleNumericBins"] = wid_deciles10[
@@ -636,7 +639,6 @@ df_tables_wid["dataPublishedBy"] = dataPublishedBy
 df_tables_wid["sourceLink"] = sourceLink
 df_tables_wid["colorScaleNumericMinValue"] = colorScaleNumericMinValue
 df_tables_wid["tolerance"] = tolerance
-df_tables_wid["colorScaleEqualSizeBins"] = colorScaleEqualSizeBins
 
 ###########################################################################################
 # LUXEMBOURG INCOME STUDY (LIS)
@@ -646,7 +648,6 @@ dataPublishedBy = DATA_PUBLISHED_BY_LIS
 sourceLink = SOURCE_LINK_LIS
 colorScaleNumericMinValue = COLOR_SCALE_NUMERIC_MIN_VALUE
 tolerance = TOLERANCE
-colorScaleEqualSizeBins = COLOR_SCALE_EQUAL_SIZEBINS
 new_line = NEW_LINE
 
 notes_title = NOTES_TITLE_LIS
@@ -680,7 +681,7 @@ for tab in range(len(merged_tables)):
                     processing_gini_mean_median,
                 ]
             )
-            df_tables_lis.loc[j, "unit"] = "international-$ in 2017 prices"
+            df_tables_lis.loc[j, "unit"] = f"international-$ in {ppp_year_pip_lis} prices"
             df_tables_lis.loc[j, "shortUnit"] = "$"
             df_tables_lis.loc[j, "type"] = "Numeric"
             df_tables_lis.loc[j, "colorScaleNumericBins"] = lis_welfare["scale_mean"][wel]
@@ -702,7 +703,7 @@ for tab in range(len(merged_tables)):
                     processing_gini_mean_median,
                 ]
             )
-            df_tables_lis.loc[j, "unit"] = "international-$ in 2017 prices"
+            df_tables_lis.loc[j, "unit"] = f"international-$ in {ppp_year_pip_lis} prices"
             df_tables_lis.loc[j, "shortUnit"] = "$"
             df_tables_lis.loc[j, "type"] = "Numeric"
             df_tables_lis.loc[j, "colorScaleNumericBins"] = lis_welfare["scale_median"][wel]
@@ -727,7 +728,7 @@ for tab in range(len(merged_tables)):
                         processing_distribution,
                     ]
                 )
-                df_tables_lis.loc[j, "unit"] = "international-$ in 2017 prices"
+                df_tables_lis.loc[j, "unit"] = f"international-$ in {ppp_year_pip_lis} prices"
                 df_tables_lis.loc[j, "shortUnit"] = "$"
                 df_tables_lis.loc[j, "type"] = "Numeric"
                 # df_tables_lis.loc[j, "colorScaleNumericBins"] = lis_deciles9[
@@ -754,7 +755,7 @@ for tab in range(len(merged_tables)):
                         processing_distribution,
                     ]
                 )
-                df_tables_lis.loc[j, "unit"] = "international-$ in 2017 prices"
+                df_tables_lis.loc[j, "unit"] = f"international-$ in {ppp_year_pip_lis} prices"
                 df_tables_lis.loc[j, "shortUnit"] = "$"
                 df_tables_lis.loc[j, "type"] = "Numeric"
                 # df_tables_lis.loc[j, "colorScaleNumericBins"] = lis_deciles10[
@@ -808,7 +809,7 @@ for tab in range(len(merged_tables)):
                         processing_gini_mean_median,
                     ]
                 )
-                df_tables_lis.loc[j, "unit"] = "international-$ in 2017 prices"
+                df_tables_lis.loc[j, "unit"] = f"international-$ in {ppp_year_pip_lis} prices"
                 df_tables_lis.loc[j, "shortUnit"] = "$"
                 df_tables_lis.loc[j, "type"] = "Numeric"
                 # df_tables_lis.loc[j, "colorScaleNumericBins"] = lis_welfare[
@@ -837,7 +838,7 @@ for tab in range(len(merged_tables)):
                         processing_gini_mean_median,
                     ]
                 )
-                df_tables_lis.loc[j, "unit"] = "international-$ in 2017 prices"
+                df_tables_lis.loc[j, "unit"] = f"international-$ in {ppp_year_pip_lis} prices"
                 df_tables_lis.loc[j, "shortUnit"] = "$"
                 df_tables_lis.loc[j, "type"] = "Numeric"
                 # df_tables_lis.loc[j, "colorScaleNumericBins"] = lis_welfare[
@@ -867,7 +868,7 @@ for tab in range(len(merged_tables)):
                             processing_distribution,
                         ]
                     )
-                    df_tables_lis.loc[j, "unit"] = "international-$ in 2017 prices"
+                    df_tables_lis.loc[j, "unit"] = f"international-$ in {ppp_year_pip_lis} prices"
                     df_tables_lis.loc[j, "shortUnit"] = "$"
                     df_tables_lis.loc[j, "type"] = "Numeric"
                     # df_tables_lis.loc[j, "colorScaleNumericBins"] = lis_deciles9[
@@ -897,7 +898,7 @@ for tab in range(len(merged_tables)):
                             processing_distribution,
                         ]
                     )
-                    df_tables_lis.loc[j, "unit"] = "international-$ in 2017 prices"
+                    df_tables_lis.loc[j, "unit"] = f"international-$ in {ppp_year_pip_lis} prices"
                     df_tables_lis.loc[j, "shortUnit"] = "$"
                     df_tables_lis.loc[j, "type"] = "Numeric"
                     # df_tables_lis.loc[j, "colorScaleNumericBins"] = lis_deciles10[
@@ -917,7 +918,6 @@ df_tables_lis["dataPublishedBy"] = dataPublishedBy
 df_tables_lis["sourceLink"] = sourceLink
 df_tables_lis["colorScaleNumericMinValue"] = colorScaleNumericMinValue
 df_tables_lis["tolerance"] = tolerance
-df_tables_lis["colorScaleEqualSizeBins"] = colorScaleEqualSizeBins
 
 # Remove all the rows that have the "equivalized" value in the equivalized column
 df_tables_lis = df_tables_lis[df_tables_lis["equivalized"] != "equivalized"].reset_index(drop=True)

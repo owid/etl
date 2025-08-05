@@ -74,6 +74,7 @@ tables:
                   -
                   -
                 customNumericValues:
+                  - 0
                   - 10
                   - 20
                   - 30
@@ -84,7 +85,6 @@ tables:
                   - 80
                   - 90
                   - 100
-                customNumericMinValue: 0
             selectedEntityNames:
               - Northern Africa (UN)
               - Sub-Saharan Africa (UN)
@@ -135,6 +135,7 @@ tables:
                   -
                   -
                 customNumericValues:
+                  - 0
                   - 10
                   - 20
                   - 30
@@ -145,7 +146,6 @@ tables:
                   - 80
                   - 90
                   - 100
-                customNumericMinValue: 0
               timeTolerance: 3
             selectedEntityNames:
               - Northern Africa (UN)

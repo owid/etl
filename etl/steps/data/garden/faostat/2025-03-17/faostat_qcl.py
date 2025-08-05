@@ -9,12 +9,14 @@ from shared import (
     CURRENT_DIR,
     FLAG_MULTIPLE_FLAGS,
     REGIONS_TO_ADD,
+    add_modified_variables,
     add_per_capita_variables,
     add_regions,
     clean_data,
     handle_anomalies,
     harmonize_elements,
     harmonize_items,
+    improve_metadata,
     log,
     parse_amendments_table,
     prepare_long_table,
@@ -80,10 +82,10 @@ SLAUGHTERED_ANIMALS_UNIT = "animals"
 SLAUGHTERED_ANIMALS_UNIT_SHORT_NAME = "animals"
 # Text to be added to the dataset description (after the description of anomalies).
 SLAUGHTERED_ANIMALS_ADDITIONAL_DESCRIPTION = (
-    "\n\nFAO does not provide data for the total number of slaughtered animals "
+    "* FAO does not provide data for the total number of slaughtered animals "
     "to produce meat. We calculate this metric by adding up the number of slaughtered animals of all meat groups. "
     "However, when data for slaughtered poultry (which usually outnumbers other meat groups) is not provided, we do "
-    "not calculate the total (to avoid spurious dips in the data)."
+    "not calculate the total (to avoid spurious dips in the data).\n"
 )
 
 
@@ -249,6 +251,7 @@ def add_slaughtered_animals_to_meat_total(tb: Table) -> Table:
             "country",
             "year",
             "population_with_data",
+            "description_processing",
         ],
         aggregations={
             "value": "sum",
@@ -287,6 +290,8 @@ def add_slaughtered_animals_to_meat_total(tb: Table) -> Table:
     animals["item_description"] = total_meat_item_description
     animals["fao_item"] = total_meat_fao_item
     animals["fao_unit_short_name"] = SLAUGHTERED_ANIMALS_FAO_UNIT_SHORT_NAME
+    animals["description_processing"] = animals["description_processing"].fillna("")
+    animals["description_processing"] += SLAUGHTERED_ANIMALS_ADDITIONAL_DESCRIPTION
 
     log.info(f"Adding {len(animals)} rows with the total number of slaughtered animals for meat.")
 
@@ -459,6 +464,29 @@ def add_yield_to_aggregate_regions(tb: Table) -> Table:
     return combined_data
 
 
+def sanity_check_qcl_inputs(tb):
+    # A few specific sanity checks for QCL.
+    # The elements for production and yield of eggs are given both in weight, and in numbers (which is unusual).
+    # We will rename the element to avoid confusion between the two Production metrics.
+    # Here, assert that those elements are not used for anything else, so we can rename them appropriately.
+    error = "Expected element 005513 (Production) to have only items related to eggs."
+    assert tb[tb["element_code"] == "005513"][["item_code", "unit"]].drop_duplicates().to_dict(orient="list") == {
+        "item_code": [
+            "00001062",  # Hen eggs in shell, fresh
+            "00001091",  # Eggs from other birds in shell, fresh, n.e.c.
+        ],
+        "unit": ["1000 No", "1000 No"],
+    }, error
+    error = "Expected element 005413 (Yield) to have only items related to eggs."
+    assert tb[tb["element_code"] == "005413"][["item_code", "unit"]].drop_duplicates().to_dict(orient="list") == {
+        "item_code": [
+            "00001062",  # Hen eggs in shell, fresh
+            "00001091",  # Eggs from other birds in shell, fresh, n.e.c.
+        ],
+        "unit": ["No/An", "No/An"],
+    }, error
+
+
 def run() -> None:
     #
     # Load data.
@@ -504,6 +532,9 @@ def run() -> None:
     tb = harmonize_items(tb=tb, dataset_short_name=dataset_short_name)
     tb = harmonize_elements(tb=tb, dataset_short_name=dataset_short_name)
 
+    # A few specific sanity checks for QCL.
+    sanity_check_qcl_inputs(tb=tb)
+
     # Prepare data.
     tb = clean_data(
         tb=tb,
@@ -538,11 +569,17 @@ def run() -> None:
     # Handle detected anomalies in the data.
     tb, anomaly_descriptions = handle_anomalies(dataset_short_name=dataset_short_name, tb=tb)
 
+    # For convenience, create additional indicators in different units.
+    tb = add_modified_variables(tb=tb, dataset_short_name=dataset_short_name)
+
     # Create a long table (with item code and element code as part of the index).
     tb_long = prepare_long_table(tb=tb)
 
     # Create a wide table (with only country and year as index).
     tb_wide = prepare_wide_table(tb=tb)
+
+    # Improve metadata (of wide table).
+    improve_metadata(tb_wide=tb_wide, dataset_short_name=dataset_short_name)
 
     # Check that column "value" has an origin (other columns are not as important and may not have origins).
     error = f"Column 'value' of the long table of {dataset_short_name} must have one origin."
@@ -573,9 +610,7 @@ def run() -> None:
 
     # Update dataset metadata.
     # The following description is not publicly shown in charts; it is only visible when accessing the catalog.
-    ds_garden.metadata.description = (
-        dataset_metadata["owid_dataset_description"] + anomaly_descriptions + SLAUGHTERED_ANIMALS_ADDITIONAL_DESCRIPTION
-    )
+    ds_garden.metadata.description = dataset_metadata["owid_dataset_description"] + anomaly_descriptions
 
     # Create garden dataset.
     ds_garden.save()

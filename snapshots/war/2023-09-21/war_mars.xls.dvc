@@ -19,8 +19,7 @@ meta:
     producer: Jason Lyall
     citation_full: |-
       Lyall, Jason. Divided Armies: Inequality and Battlefield Performance in Modern War (Princeton, NJ: Princeton University Press, 2020)
-    attribution: Jason Lyall - Project Mars (2020)
-
+    attribution: Jason Lyall, Project Mars (2020)
     # Files
     url_main: https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/DUO7IE
     url_download: https://dataverse.harvard.edu/api/access/datafile/5857675
@@ -33,6 +32,6 @@ meta:
 
 wdir: ../../../data/snapshots/war/2023-09-21
 outs:
-- md5: 2ef660345fcdf5efabc14416c540a155
-  size: 1200128
-  path: war_mars.xls
+  - md5: 2ef660345fcdf5efabc14416c540a155
+    size: 1200128
+    path: war_mars.xls

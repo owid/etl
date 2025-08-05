@@ -1,0 +1,27 @@
+meta:
+  origin:
+    producer: IRENA
+    title: Renewable Energy Patents
+    description: |-
+      Data on renewable energy patents.
+      This dataset provides comprehensive, but by no means exhaustive information on patents filed for renewable energy worldwide.
+      Data for the most recent years are not complete due to a lag between the filing date and the time at which the patents are officially published.
+      Further information can be found on [IRENA INSPIRE](https://inspire.irena.org/).
+    citation_full: |-
+      International Renewable Energy Agency (IRENA) INSPIRE Platform (2025). Available at: https://inspire.irena.org/
+
+      Data are based on EPO PATSTAT 2024 Autumn edition and on the Climate Change Mitigation Technologies (Y02) classification by EPO.
+    attribution: IRENA - INSPIRE Platform (2025)
+    attribution_short: IRENA
+    url_main: https://www.irena.org/Data/View-data-by-topic/Innovation-and-Technology/Patents-Evolution
+    # Data sharepoint link:
+    # https://irena.sharepoint.com/:x:/s/statistics-public/ET2l9BUWLM5EsH4mZBnqpl4BpU3run3MJbwgYWW64PQR7A
+    date_accessed: '2025-06-20'
+    date_published: '2025-02-04'
+    license:
+      name: © IRENA 2025
+      url: https://inspire.irena.org/
+outs:
+  - md5: e9b0bc8626d82ae41b1e1b848c32a6c9
+    size: 2579178
+    path: renewable_energy_patents.csv

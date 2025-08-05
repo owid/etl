@@ -24,6 +24,8 @@ DATA_GRAPHER_DIR = DATA_DIR / "grapher"
 
 # Export folder
 EXPORT_DIR = BASE_DIR / "export"
+EXPORT_MDIMS_DIR = EXPORT_DIR / "multidim"
+EXPORT_EXPLORER_DIR = EXPORT_DIR / "explorers"
 
 # Snapshots
 SNAPSHOTS_DIR = BASE_DIR / "snapshots"

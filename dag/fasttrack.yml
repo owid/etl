@@ -42,8 +42,6 @@ steps:
     - snapshot://fasttrack/latest/whm_treatment_gap_anxiety_disorders.csv
   data-private://grapher/fasttrack/latest/pain_hours_hen_systems:
     - snapshot-private://fasttrack/latest/pain_hours_hen_systems.csv
-  data-private://grapher/fasttrack/latest/antibiotic_usage_livestock:
-    - snapshot-private://fasttrack/latest/antibiotic_usage_livestock.csv
   data://grapher/fasttrack/2023-08-07/pain_hours_days_hen_systems:
     - snapshot://fasttrack/2023-08-07/pain_hours_days_hen_systems.csv
   data-private://grapher/fasttrack/latest/historical_france_mortality_cause:
@@ -84,8 +82,6 @@ steps:
     - snapshot://fasttrack/latest/public_support_climate_vlasceanu.csv
   data://grapher/fasttrack/latest/completeness_disaster_emdat:
     - snapshot://fasttrack/latest/completeness_disaster_emdat.csv
-  data-private://grapher/fasttrack/latest/vdem_women_executives:
-    - snapshot://fasttrack/latest/vdem_women_executives.csv
   data://grapher/fasttrack/latest/heat_deaths_zhao:
     - snapshot://fasttrack/latest/heat_deaths_zhao.csv
   data://grapher/fasttrack/latest/aviation_emissions_bergero:
@@ -124,8 +120,8 @@ steps:
     - snapshot://fasttrack/latest/cumulative_lives_saved_vaccination_shattock.csv
   data://grapher/fasttrack/latest/heat_deaths_climate_historical:
     - snapshot://fasttrack/latest/heat_deaths_climate_historical.csv
-  data://grapher/fasttrack/latest/cumulative_conflict_deaths_ucdp:
-    - snapshot://fasttrack/latest/cumulative_conflict_deaths_ucdp.csv
+  data://grapher/fasttrack/latest/cumulative_conflict_deaths_ucdp: !!set
+    ? snapshot://fasttrack/latest/cumulative_conflict_deaths_ucdp.csv
   data://grapher/fasttrack/latest/air_conditioning_rate_iea:
     - snapshot://fasttrack/latest/air_conditioning_rate_iea.csv
   data://grapher/fasttrack/latest/projections_air_conditioners_iea:
@@ -136,8 +132,6 @@ steps:
     - snapshot-private://fasttrack/latest/draft_joe_top1_diff_1993_2018.csv
   data://grapher/fasttrack/latest/emissions_energy_heating_cooling_iea:
     - snapshot://fasttrack/latest/emissions_energy_heating_cooling_iea.csv
-  data-private://grapher/fasttrack/latest/voter_turnout_by_age__sheet1:
-    - snapshot-private://fasttrack/latest/voter_turnout_by_age__sheet1.csv
   data://grapher/fasttrack/latest/electricity_material_footprint_wang:
     - snapshot://fasttrack/latest/electricity_material_footprint_wang.csv
   data://grapher/fasttrack/latest/breakdown_material_footprint_wang:
@@ -146,12 +140,8 @@ steps:
     - snapshot://fasttrack/latest/rock_metal_ratio_nassar_wang.csv
   data://grapher/fasttrack/latest/hdi_per_co2:
     - snapshot://fasttrack/latest/hdi_per_co2.csv
-  data://grapher/fasttrack/latest/nature_index_undp:
-    - snapshot://fasttrack/latest/nature_index_undp.csv
   data://grapher/fasttrack/latest/elephant_populations:
     - snapshot://fasttrack/latest/elephant_populations.csv
-  data://grapher/fasttrack/latest/pivot_uk_public_spending:
-    - snapshot://fasttrack/latest/pivot_uk_public_spending.csv
   data://grapher/fasttrack/latest/population_immigrants_diff:
     - snapshot://fasttrack/latest/population_immigrants_diff.csv
   data://grapher/fasttrack/latest/lpi_distribution_wwf:
@@ -232,3 +222,29 @@ steps:
     - snapshot://fasttrack/latest/cdc_measles.csv
   data://grapher/fasttrack/latest/world_bank_pip_filled:
     - snapshot://fasttrack/latest/world_bank_pip_filled.csv
+  data://grapher/fasttrack/latest/financial_inclusion_table:
+    - snapshot://fasttrack/latest/financial_inclusion_table.csv
+  data://grapher/fasttrack/latest/extended_financial_inclusion_table:
+    - snapshot://fasttrack/latest/extended_financial_inclusion_table.csv
+  data://grapher/fasttrack/latest/global_findex_2021:
+    - snapshot://fasttrack/latest/global_findex_2021.csv
+  data://grapher/fasttrack/latest/bank_account_selected_countries_global_findex_2021:
+    - snapshot://fasttrack/latest/bank_account_selected_countries_global_findex_2021.csv
+  data://grapher/fasttrack/latest/account_ownership_by_region:
+    - snapshot://fasttrack/latest/account_ownership_by_region.csv
+  data://grapher/fasttrack/latest/uk_road_deaths_ons: !!set
+    ? snapshot://fasttrack/latest/uk_road_deaths_ons.csv
+  data://grapher/fasttrack/latest/national_surveys_conducted_by_dhs:
+    - snapshot://fasttrack/latest/national_surveys_conducted_by_dhs.csv
+  data://grapher/fasttrack/latest/un_mmeig_countries_dhs_only_source:
+    - snapshot://fasttrack/latest/un_mmeig_countries_dhs_only_source.csv
+  data://grapher/fasttrack/latest/annual_number_dhs_surveys_by_type:
+    - snapshot://fasttrack/latest/annual_number_dhs_surveys_by_type.csv
+  data://grapher/fasttrack/latest/countries_dhs_surveys_ongoing_before_termination:
+    - snapshot://fasttrack/latest/countries_dhs_surveys_ongoing_before_termination.csv
+  data://grapher/fasttrack/latest/material_footprint_end_use_eu: !!set
+    ? snapshot://fasttrack/latest/material_footprint_end_use_eu.csv
+  data://grapher/fasttrack/latest/draft_joe_ipl_data: !!set
+    ? snapshot://fasttrack/latest/draft_joe_ipl_data.csv
+  data://grapher/fasttrack/latest/guinea_worm_cases: !!set
+    ? snapshot://fasttrack/latest/guinea_worm_cases.csv

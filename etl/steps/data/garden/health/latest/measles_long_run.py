@@ -46,7 +46,7 @@ def run(dest_dir: str) -> None:
         tables=[tb],
         check_variables_metadata=True,
         # Use the metadata from the current snapshot to update the subtitle.
-        yaml_params={"year": last_date_published(tb_curr)[-4:], "update_date": last_date_published(tb_curr)},
+        yaml_params={"year": last_date_published(tb_curr)[-4:], "latest_date_published": last_date_published(tb_curr)},
     )
 
     # Save changes in the new garden dataset.

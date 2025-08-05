@@ -3,6 +3,9 @@ definitions:
     presentation:
       topic_tags:
         - War & Peace
+      grapher_config:
+        note: &preliminary_note |-
+          Data for the latest year is based on quarterly reports from the source. These come with a higher level of uncertainty, and in many cases can be underestimates.
     display:
       numDecimalPlaces: 0
 
@@ -12,39 +15,39 @@ definitions:
       This includes combatant and civilian deaths due to fighting
     conflict_type: |-
       <%- if conflict_type == "all" -%>
-      An armed conflict is a disagreement between organized groups, or between one organized group and civilians, that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}.
+      An armed conflict is defined by the Uppsala Conflict Data Program (UCDP) as a disagreement between organized groups, or between one organized group and civilians, that causes at least 25 deaths during a year. This includes combatant and civilian deaths due to fighting.
 
       <%- elif conflict_type == "state-based" -%>
-      A state-based conflict is a conflict between two armed groups, at least one of which is a state, that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}.
+      A state-based conflict is defined by the Uppsala Conflict Data Program (UCDP) as a conflict between two armed groups, at least one of which is a state, that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}.
 
       <%- elif conflict_type == "interstate" -%>
-      An interstate conflict is a conflict between states that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}.
+      An interstate conflict is defined by the Uppsala Conflict Data Program (UCDP) as a conflict between states that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}.
 
       <%- elif conflict_type == "intrastate" -%>
-      An intrastate conflict is a conflict between a state and a non-state armed group that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}. If a foreign state is involved, it is called "internationalized", and "non-internationalized" otherwise.
+      A civil conflict is defined by the Uppsala Conflict Data Program (UCDP) as a conflict between a state and a non-state armed group that causes at least 25 deaths during a year. A non-state armed group can be a rebel group, criminal organization, or ethnic group. Foreign states can still be involved in a supporting role. {definitions.all.conflict_type_base}.
 
       <%- elif conflict_type == "intrastate (internationalized)" -%>
-      An internationalized intrastate conflict is a conflict between a state and a non-state armed group, with involvement of a foreign state, that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}.
+      A foreign-backed civil conflict is defined by the Uppsala Conflict Data Program (UCDP) as a conflict between a state and a non-state armed group that causes at least 25 deaths during a year, and at least one foreign state is involved in a supporting role. A non-state armed group can be a rebel group, criminal organization, or ethnic group. {definitions.all.conflict_type_base}.
 
       <%- elif conflict_type == "intrastate (non-internationalized)" -%>
-      An non-internationalized intrastate conflict is a conflict between a state and a non-state armed group, without involvement of a foreign state, that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}.
+      A domestic civil conflict is defined by the Uppsala Conflict Data Program (UCDP) as a conflict between a state and a non-state armed group that causes at least 25 deaths during a year, and no foreign state is involved in a supporting role. A non-state armed group can be a rebel group, criminal organization, or ethnic group. {definitions.all.conflict_type_base}.
 
       <%- elif conflict_type == "extrasystemic" -%>
-      An extrasystemic conflict is a conflict between a state and a non-state armed group outside its territory that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}.
+      A colonial conflict is defined by the Uppsala Conflict Data Program (UCDP) as a conflict between a state and a non-state armed group that causes at least 25 deaths during a year, and takes place outside of the state's territory. {definitions.all.conflict_type_base}.
 
       <%- elif conflict_type == "non-state conflict" -%>
-      A non-state conflict is a conflict between non-state armed groups, such as rebel groups, criminal organizations, or ethnic groups, that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}.
+      A non-state conflict is defined by the Uppsala Conflict Data Program (UCDP) as a conflict between non-state armed groups, such as rebel groups, criminal organizations, or ethnic groups, that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}.
 
       <%- elif conflict_type == "one-sided violence" -%>
-      One-sided violence is the use of armed force by a state or non-state armed group against civilians that causes at least 25 civilian deaths during a year.
+      One-sided violence is defined by the Uppsala Conflict Data Program (UCDP) as the use of armed force by a state or non-state armed group against civilians that causes at least 25 civilian deaths during a year.
 
       <%- endif -%>
     location_conflicts_method: |-
-      UCDP provides geographical coordinates of each conflict event. We have mapped these coordinates to countries by means of the Natural Earth dataset.
+      UCDP provides geographical coordinates of each conflict event. We have mapped these coordinates to countries by means of the geoBoundaries dataset.
 
       In some instances, the event's coordinates fall within the borders of a country. Other times, the event's coordinates fall outside the borders of a country. In the latter case, we have mapped the event to the country that is closest to the event's coordinates.
 
-      Conflict event with id "53238" and relid "PAK-2003-1-345-88" was assigned to "Siachen Glacier" by Natural Earth. We have mapped it to "Pakistan" following the text in the `where_description` field from the Natural Earth data, which refers to "Giang sector in Siachen, Pakistani Kashmir".
+      Conflict event with id "53238" and relid "PAK-2003-1-345-88" was assigned to "Siachen-Saltoro" by geoBoundaries. We have mapped it to "Pakistan" following the text in the `where_description` field from the UCDP data, which refers to "Giang sector in Siachen, Pakistani Kashmir".
 
   # Fields used for number of deaths indicators
   number_deaths:
@@ -74,8 +77,30 @@ definitions:
       <%- endif -%>
     description_short_per_capita: <% set per_capita = ", per 100,000 people" %>
       {definitions.number_deaths.description_short}
+    key_point_pre_1: &key_point_pre_1 |-
+      UCDP's data for 2025 is preliminary. This means the number of deaths may be too low because more information becomes available later, or they may be too high because some events are later found not to be part of an armed conflict. We still show this data to provide more up-to-date information, but figures on this chart may change in the future if UCDP revises its estimates.
+    key_point_pre_2: &key_point_pre_2 |-
+      We use UCDP's quarterly [Candidate Events Datasets](https://ucdp.uu.se/downloads/) for the preliminary data. We add data for the first quarter of the current year in May, for the second quarter in August, for the third quarter in November, and for the fourth quarter in February.
     description_key: &description_key_deaths
       - "{definitions.all.conflict_type}"
+      - |-
+        <% if conflict_type == "all" -%>
+        This includes [interstate conflicts](#dod:interstate-ucdp), [civil conflicts](#dod:intrastate-ucdp), [colonial conflicts](#dod:extrasystemic-ucdp), [non-state conflicts](#dod:nonstate-ucdp), and [violence against civilians](#dod:onesided-ucdp).
+        <%- endif %>
+      - UCDP identifies conflict deaths [based on news reports, other contemporary sources, and academic research](https://www.uu.se/en/department/peace-and-conflict-research/research/ucdp/ucdp-methodology).
+      - *key_point_pre_1
+      - *key_point_pre_2
+
+    description_key_best: &description_key_deaths_best
+      - "{definitions.all.conflict_type}"
+      - |-
+        <% if conflict_type == "all" -%>
+        This includes [interstate conflicts](#dod:interstate-ucdp), [civil conflicts](#dod:intrastate-ucdp), [colonial conflicts](#dod:extrasystemic-ucdp), [non-state conflicts](#dod:nonstate-ucdp), and [violence against civilians](#dod:onesided-ucdp).
+        <%- endif %>
+      - UCDP identifies conflict deaths [based on news reports, other contemporary sources, and academic research](https://www.uu.se/en/department/peace-and-conflict-research/research/ucdp/ucdp-methodology).
+      - *key_point_pre_1
+      - *key_point_pre_2
+      - "We show here the \"best\" death estimates as identified by UCDP. They also report high and low estimates."
 
   number_deaths_type:
     description_short: |-
@@ -133,7 +158,14 @@ definitions:
       <%- endif -%>
     description_key: &description_key_ongoing
       - "{definitions.all.conflict_type}"
-      - We count a conflict as ongoing in a region even if the conflict is also ongoing in other regions. The sum across all regions can therefore be higher than the total number of ongoing conflicts.
+      # - We count a conflict as ongoing in a region even if the conflict is also ongoing in other regions. The sum across all regions can therefore be higher than the total number of ongoing conflicts.
+      - |-
+        <% if conflict_type == "all" %>
+        This includes [interstate conflicts](#dod:interstate-ucdp), [civil conflicts](#dod:intrastate-ucdp), [colonial conflicts](#dod:extrasystemic-ucdp), [non-state conflicts](#dod:nonstate-ucdp), and [violence against civilians](#dod:onesided-ucdp).
+        <%- elif conflict_type == "state-based" -%>
+        This includes [interstate conflicts](#dod:interstate-ucdp), [civil conflicts](#dod:intrastate-ucdp), and [colonial conflicts](#dod:extrasystemic-ucdp).
+        <%- endif %>
+      - UCDP identifies conflict deaths based on news reports, other contemporary sources, and academic research.
 
   number_new_conflicts:
     description_short: "{definitions.number_ongoing_conflicts.description_short}"
@@ -154,7 +186,7 @@ tables:
   ucdp_preview_country:
     common:
       presentation:
-        attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2024)
+        attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2025)
       description_key:
         - "{definitions.all.conflict_type}"
         - A country is considered to participate in a conflict if they were a primary participant, which refers to those participants that have the main disagreement of the conflict.
@@ -263,113 +295,18 @@ tables:
 
           <%- endif -%>
 
-      number_deaths:
-        title: Deaths in ongoing conflicts in a country (best estimate)
-        unit: "deaths"
-        description_short: |-
-          <% set estimate = "best" %>
-          {definitions.number_deaths.description_short}
-
-      number_deaths_low:
-        title: Deaths in ongoing conflicts in a country (low estimate)
-        unit: "deaths"
-        description_short: |-
-          <% set estimate = "low" %>
-          {definitions.number_deaths.description_short}
-
-      number_deaths_high:
-        title: Deaths in ongoing conflicts in a country (high estimate)
-        unit: "deaths"
-        description_short: |-
-          <% set estimate = "high" %>
-          {definitions.number_deaths.description_short}
-
-      number_deaths_combatants:
-        title: Deaths of combatants in ongoing conflicts in a country
-        unit: "deaths"
-        description_short: |-
-          <% set people_type = "combatants" %>
-          {definitions.number_deaths_type.description_short}
-
-      number_deaths_civilians:
-        title: Deaths of civilians in ongoing conflicts in a country
-        unit: "deaths"
-        description_short: |-
-          <% set people_type = "civilians" %>
-          {definitions.number_deaths_type.description_short}
-
-      number_deaths_unknown:
-        title: Deaths of unknown type in ongoing conflicts in a country
-        unit: "deaths"
-        description_short: |-
-          <% set people_type = "unknown type" %>
-          {definitions.number_deaths_type.description_short}
-
-      death_rate:
-        title: Death rate in ongoing conflicts in a country (best estimate)
-        unit: "deaths per 100,000 people"
-        display:
-          numDecimalPlaces: 1
-        description_short: |-
-          <% set estimate = "best" %>
-          {definitions.number_deaths.description_short_per_capita}
-
-      death_rate_low:
-        title: Death rate in ongoing conflicts in a country (low estimate)
-        unit: "deaths per 100,000 people"
-        display:
-          numDecimalPlaces: 1
-        description_short: |-
-          <% set estimate = "low" %>
-          {definitions.number_deaths.description_short_per_capita}
-
-      death_rate_high:
-        title: Death rate in ongoing conflicts in a country (high estimate)
-        unit: "deaths per 100,000 people"
-        display:
-          numDecimalPlaces: 1
-        description_short: |-
-          <% set estimate = "high" %>
-          {definitions.number_deaths.description_short_per_capita}
-
-      # death_rate_combatants:
-      #   title: Death rate of combatants in ongoing conflicts in a country
-      #   unit: "deaths per 100,000 people"
-      #   display:
-      #     numDecimalPlaces: 1
-      #   description_short: |-
-      #     <% set people_type = "combatants" %>
-      #     {definitions.number_deaths_type.description_short_per_capita}
-
-      # death_rate_civilians:
-      #   title: Death rate of civilians in ongoing conflicts in a country
-      #   unit: "deaths per 100,000 people"
-      #   display:
-      #     numDecimalPlaces: 1
-      #   description_short: |-
-      #     <% set people_type = "civilians" %>
-      #     {definitions.number_deaths_type.description_short_per_capita}
-
-      # death_rate_unknown:
-      #   title: Death rate of unknown type in ongoing conflicts in a country
-      #   unit: "deaths per 100,000 people"
-      #   display:
-      #     numDecimalPlaces: 1
-      #   description_short: |-
-      #     <% set people_type = "unknown type" %>
-      #     {definitions.number_deaths_type.description_short_per_capita}
-
-  # MAIN INDICATORS
   ucdp_preview:
     common:
       presentation:
         grapher_config:
+          note: *preliminary_note
           selectedEntityNames:
             - Africa
             - Americas
             - Asia and Oceania
             - Europe
             - Middle East
+
     variables:
       ##################
       # Ongoing deaths #
@@ -381,7 +318,16 @@ tables:
         description_short: |-
           <% set estimate = "best" %>
           {definitions.number_deaths.description_short}
-        description_key: *description_key_deaths
+        description_key: *description_key_deaths_best
+        description_processing: |-
+          {definitions.all.location_conflicts_method}
+        presentation:
+          grapher_config:
+            note: *preliminary_note
+            map:
+              colorScale:
+                binningStrategy: "manual"
+                customNumericValues: [0, 10, 100, 1000, 10000, 100000]
 
       number_deaths_ongoing_conflicts_high:
         title: Deaths in ongoing conflicts (high estimate)
@@ -390,6 +336,8 @@ tables:
           <% set estimate = "high" %>
           {definitions.number_deaths.description_short}
         description_key: *description_key_deaths
+        description_processing: |-
+          {definitions.all.location_conflicts_method}
 
       number_deaths_ongoing_conflicts_low:
         title: Deaths in ongoing conflicts (low estimate)
@@ -398,6 +346,8 @@ tables:
           <% set estimate = "low" %>
           {definitions.number_deaths.description_short}
         description_key: *description_key_deaths
+        description_processing: |-
+          {definitions.all.location_conflicts_method}
 
       ## Deaths by type
       number_deaths_ongoing_conflicts_civilians:
@@ -407,6 +357,8 @@ tables:
           <% set people_type = "civilians" %>
           {definitions.number_deaths_type.description_short}
         description_key: *description_key_deaths_type
+        description_processing: |-
+          {definitions.all.location_conflicts_method}
 
       number_deaths_ongoing_conflicts_combatants:
         title: Deaths of combatants in ongoing conflicts
@@ -415,6 +367,8 @@ tables:
           <% set people_type = "combatants" %>
           {definitions.number_deaths_type.description_short}
         description_key: *description_key_deaths_type
+        description_processing: |-
+          {definitions.all.location_conflicts_method}
 
       number_deaths_ongoing_conflicts_unknown:
         title: Deaths of unknown type in ongoing conflicts
@@ -423,6 +377,8 @@ tables:
           <% set people_type = "unknown type" %>
           {definitions.number_deaths_type.description_short}
         description_key: *description_key_deaths_type
+        description_processing: |-
+          {definitions.all.location_conflicts_method}
 
       ## Deaths per capita
       number_deaths_ongoing_conflicts_per_capita:
@@ -431,11 +387,18 @@ tables:
         description_short: |-
           <% set estimate = "best" %>
           {definitions.number_deaths.description_short_per_capita}
-        description_key: *description_key_deaths
+        description_key: *description_key_deaths_best
         display:
           numDecimalPlaces: 1
+        description_processing: |-
+          {definitions.all.location_conflicts_method}
         presentation:
-          attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2024)
+          grapher_config:
+            note: *preliminary_note
+            map:
+              colorScale:
+                binningStrategy: "manual"
+                customNumericValues: [0, 0.1, 0.3, 1, 3, 10, 30, 100]
 
       number_deaths_ongoing_conflicts_high_per_capita:
         title: Death rate in ongoing conflicts (high estimate)
@@ -446,6 +409,8 @@ tables:
         description_key: *description_key_deaths
         display:
           numDecimalPlaces: 1
+        description_processing: |-
+          {definitions.all.location_conflicts_method}
 
       number_deaths_ongoing_conflicts_low_per_capita:
         title: Death rate in ongoing conflicts (low estimate)
@@ -453,39 +418,11 @@ tables:
         description_short: |-
           <% set estimate = "low" %>
           {definitions.number_deaths.description_short_per_capita}
-        description_key: *description_key_deaths_type
+        description_key: *description_key_deaths
         display:
           numDecimalPlaces: 1
-
-      # number_deaths_ongoing_conflicts_civilians_per_capita:
-      #   title: Death rate from civilians in ongoing conflicts
-      #   unit: deaths
-      #   description_short: |-
-      #     <% set people_type = "civilians" %>
-      #     {definitions.number_deaths_type.description_short_per_capita}
-      #   description_key: *description_key_deaths_type
-      #   display:
-      #     numDecimalPlaces: 1
-
-      # number_deaths_ongoing_conflicts_combatants_per_capita:
-      #   title: Death rate from combatants ongoing conflicts
-      #   unit: deaths
-      #   description_short: |-
-      #     <% set people_type = "combatants" %>
-      #     {definitions.number_deaths_type.description_short_per_capita}
-      #   description_key: *description_key_deaths_type
-      #   display:
-      #     numDecimalPlaces: 1
-
-      # number_deaths_ongoing_conflicts_unknown_per_capita:
-      #   title: Death rate from unknown type in ongoing conflicts
-      #   unit: deaths
-      #   description_short: |-
-      #     <% set people_type = "unknown type" %>
-      #     {definitions.number_deaths_type.description_short_per_capita}
-      #   description_key: *description_key_deaths
-      #   display:
-      #     numDecimalPlaces: 1
+        description_processing: |-
+          {definitions.all.location_conflicts_method}
 
       #####################
       # Ongoing conflicts #
@@ -498,9 +435,14 @@ tables:
         description_key: *description_key_ongoing
         presentation:
           grapher_config:
+            note: *preliminary_note
             selectedEntityNames:
               - World
-          attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2024)
+            map:
+              colorScale:
+                binningStrategy: "manual"
+                customNumericValues: [0, 1, 2, 5, 10]
+          attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2025); geoBoundaries (2023)
 
       number_ongoing_conflicts_per_country:
         title: Number of ongoing conflicts per state
@@ -511,7 +453,7 @@ tables:
         display:
           numDecimalPlaces: 3
         presentation:
-          attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2024)
+          attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2025)
 
       number_ongoing_conflicts_per_country_pair:
         title: Number of ongoing conflicts per state-pair
@@ -522,7 +464,7 @@ tables:
         display:
           numDecimalPlaces: 5
         presentation:
-          attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2024)
+          attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2025)
 
       #################
       # New conflicts #
@@ -534,7 +476,7 @@ tables:
           {definitions.number_new_conflicts.description_short}
         description_key: *description_key_new
         presentation: # TODO
-          attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2024)
+          attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2025)
 
       number_new_conflicts_per_country:
         title: Number of new conflicts per state
@@ -545,7 +487,7 @@ tables:
         display:
           numDecimalPlaces: 3
         presentation:
-          attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2024)
+          attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2025)
 
       number_new_conflicts_per_country_pair:
         title: Number of new conflicts per state-pair
@@ -556,12 +498,12 @@ tables:
         display:
           numDecimalPlaces: 5
         presentation:
-          attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2024)
+          attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2025)
 
 dataset:
   title: UCDP, History of war (preview)
   description: |-
-    This dataset provides information on armed conflicts, using data from the UCDP Georeferenced Event Dataset (version 24.1), the UCDP/PRIO Armed Conflict Dataset (version 24.1), the UCDP Battle-Related Deaths Dataset (version 24.1), and the UCDP Candidate Event Dataset (version 24.X).
+    This dataset provides information on armed conflicts, using data from the UCDP Georeferenced Event Dataset (version 25.1), the UCDP/PRIO Armed Conflict Dataset (version 25.1), the UCDP Battle-Related Deaths Dataset (version 25.1), and the UCDP Candidate Event Dataset (version 25.0.X).
 
     Its difference with the main "UCDP, History of war" dataset is that it includes data up to the latest available, using preliminary data from the UCDP Candidate Event Dataset.
 

@@ -33,60 +33,218 @@ dimensions:
     choices:
       - slug: almonds
         name: Almonds
+      - slug: apples
+        name: Apples
+      - slug: apricots
+        name: Apricots
+      - slug: artichokes
+        name: Artichokes
+      - slug: asparagus
+        name: Asparagus
+      - slug: avocados
+        name: Avocados
       - slug: bananas
         name: Bananas
       - slug: barley
         name: Barley
       - slug: beans
         name: Beans
+      - slug: blueberries
+        name: Blueberries
+      - slug: broad_beans
+        name: Broad beans
+      - slug: buckwheat
+        name: Buckwheat
+      - slug: cabbages
+        name: Cabbages
+      - slug: carrots_and_turnips
+        name: Carrots and turnips
+      - slug: cashew_nuts
+        name: Cashews
       - slug: cassava
         name: Cassava
+      - slug: cauliflowers_and_broccoli
+        name: Cauliflowers and broccoli
       - slug: cereals
         name: Cereals
+      - slug: cherries
+        name: Cherries
+      - slug: chestnut
+        name: Chestnuts
+      - slug: chickpeas
+        name: Chickpeas
+      - slug: chillies_and_peppers
+        name: Chilies and peppers
+      - slug: cinnamon_and_cinnamon_tree_flowers__raw
+        name: Cinnamon
+      - slug: citrus_fruit
+        name: Citrus fruit
+      - slug: cloves__whole_stems__raw
+        name: Cloves
       - slug: cocoa_beans
         name: Cocoa beans
+      - slug: coconuts
+        name: Coconuts
       - slug: coffee_beans
         name: Coffee beans
       - slug: corn__maize
         name: Corn (maize)
       - slug: cotton
         name: Cotton
+      - slug: cow_peas
+        name: Cowpeas
+      - slug: cranberries
+        name: Cranberries
+      - slug: cucumbers_and_gherkins
+        name: Cucumbers and gherkins
+      - slug: currants
+        name: Currants
+      - slug: dates
+        name: Dates
+      - slug: eggplants
+        name: Eggplants
+      - slug: figs
+        name: Figs
+      - slug: fruit
+        name: Fruit
+      - slug: garlic
+        name: Garlic
+      - slug: ginger__raw
+        name: Ginger
+      - slug: grapefruit
+        name: Grapefruit
+      - slug: grapes
+        name: Grapes
+      - slug: beans__green
+        name: Green beans
+      - slug: chillies_and_peppers__green__capsicum_spp__and_pimenta_spp_
+        name: Green chilies and peppers
+      - slug: onions_and_shallots__green
+        name: Green onions and shallots
+      - slug: peas__green
+        name: Green peas
       - slug: groundnut
         name: Groundnut
+      - slug: hazelnuts
+        name: Hazelnuts
+      - slug: hempseed
+        name: Hempseed
+      - slug: herbs
+        name: Herbs
+      - slug: kiwi
+        name: Kiwi
+      - slug: leeks
+        name: Leeks
+      - slug: lemons_and_limes
+        name: Lemons and limes
+      - slug: lentils
+        name: Lentils
       - slug: lettuce
         name: Lettuce
+      - slug: linseed
+        name: Linseed
+      - slug: mangoes
+        name: Mangoes
+      - slug: melon
+        name: Melon
       - slug: millet
         name: Millet
+      - slug: mustard_seed
+        name: Mustard seed
       - slug: oats
         name: Oats
       - slug: oil_palm
         name: Oil palm
+      - slug: okra
+        name: Okra
+      - slug: olives
+        name: Olives
+      - slug: onions
+        name: Onions
       - slug: oranges
         name: Oranges
+      - slug: papayas
+        name: Papayas
+      - slug: peaches_and_nectarines
+        name: Peaches and nectarines
+      - slug: pears
+        name: Pears
       - slug: peas
         name: Peas
+      - slug: pepper
+        name: Pepper (spice)
+      - slug: persimmons
+        name: Persimmons
+      - slug: pineapples
+        name: Pineapples
+      - slug: pistachios
+        name: Pistachios
+      - slug: plantains
+        name: Plantains
+      - slug: plums
+        name: Plums
       - slug: potato
         name: Potato
+      - slug: pulses
+        name: Pulses
+      - slug: quinces
+        name: Quinces
+      - slug: quinoa
+        name: Quinoa
       - slug: rapeseed
         name: Rapeseed
+      - slug: raspberries
+        name: Raspberries
       - slug: rice
         name: Rice
+      - slug: roots_and_tubers
+        name: Roots and tubers
       - slug: rye
         name: Rye
+      - slug: safflower_seed
+        name: Safflower seed
+      - slug: sesame_seed
+        name: Sesame seed
       - slug: sorghum
         name: Sorghum
       - slug: soybean
         name: Soybean
+      - slug: spinach
+        name: Spinach
+      - slug: strawberries
+        name: Strawberries
       - slug: sugar_beet
         name: Sugar beet
       - slug: sugar_cane
         name: Sugar cane
+      - slug: sugar_crops
+        name: Sugar crops
       - slug: sunflower_seed
         name: Sunflower seed
+      - slug: sweet_potatoes
+        name: Sweet potatoes
+      - slug: tangerines
+        name: Tangerines
+      - slug: tobacco
+        name: Tobacco
       - slug: tomato
         name: Tomato
+      - slug: treenuts
+        name: Treenuts
+      - slug: triticale
+        name: Triticale
+      - slug: vanilla__raw
+        name: Vanilla
+      - slug: vegetables
+        name: Vegetables
+      - slug: walnuts
+        name: Walnuts
+      - slug: watermelons
+        name: Watermelons
       - slug: wheat
         name: Wheat
+      - slug: yams
+        name: Yams
     presentation:
       type: dropdown
   - slug: metric
@@ -111,7 +269,7 @@ views:
             colorScaleNumericBins: 0.5;1;2;5;10;20
             colorScaleScheme: PuBu
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       crop: bananas
       metric: actual_yield
@@ -122,7 +280,7 @@ views:
             colorScaleNumericBins: 10;20;30;40;50;60;70
             colorScaleScheme: PuBu
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       crop: barley
       metric: actual_yield
@@ -133,7 +291,7 @@ views:
             colorScaleNumericBins: 1;2;3;4;5;6;7;8
             colorScaleScheme: PuBu
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       crop: barley
       metric: attainable_yield
@@ -156,7 +314,7 @@ views:
             colorScaleNumericBins: 1,,;2,,;3,,;4,,;5,,;6,,
             colorScaleScheme: YlOrRd
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
       note: *attainable_yield_footnote
   - dimensions:
       crop: beans
@@ -168,7 +326,7 @@ views:
             colorScaleNumericBins: 0.5;1;1.5;2;2.5;3;3.5;4
             colorScaleScheme: PuBu
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       crop: cassava
       metric: attainable_yield
@@ -191,7 +349,7 @@ views:
             colorScaleNumericBins: 5;10;15;20;25;30;35;40
             colorScaleScheme: PuBu
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       crop: cassava
       metric: yield_gap
@@ -202,7 +360,7 @@ views:
             colorScaleNumericBins: 1,,;2,,;4,,;6,,;8,,;10,,;15,,
             colorScaleScheme: Oranges
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
       note: *attainable_yield_footnote
   - dimensions:
       crop: cereals
@@ -214,7 +372,7 @@ views:
             colorScaleNumericBins: 1;2;3;4;5;6;7;8;9;10
             colorScaleScheme: PuBu
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       crop: cocoa_beans
       metric: actual_yield
@@ -225,7 +383,7 @@ views:
             colorScaleNumericBins: 0.1;0.2;0.5;1;2;5
             colorScaleScheme: PuBu
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       crop: coffee_beans
       metric: actual_yield
@@ -236,7 +394,7 @@ views:
             colorScaleNumericBins: 0.4;0.8;1.2;1.6;2;2.4;2.8
             colorScaleScheme: PuBu
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       crop: corn__maize
       metric: attainable_yield
@@ -259,7 +417,7 @@ views:
             colorScaleNumericBins: 1;2;5;10;20;50
             colorScaleScheme: PuBu
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       crop: corn__maize
       metric: yield_gap
@@ -270,7 +428,7 @@ views:
             colorScaleNumericBins: 1,,;2,,;3,,;4,,;5,,;6,,;8,,;10,,
             colorScaleScheme: YlOrRd
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
       note: *attainable_yield_footnote
   - dimensions:
       crop: cotton
@@ -294,7 +452,7 @@ views:
             colorScaleNumericBins: 0.5;1;2;5;10
             colorScaleScheme: PuBu
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       crop: cotton
       metric: yield_gap
@@ -305,7 +463,7 @@ views:
             colorScaleNumericBins: 1,,;2,,;3,,;4,,;5,,;6,,
             colorScaleScheme: Purples
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
       note: *attainable_yield_footnote
   - dimensions:
       crop: groundnut
@@ -329,7 +487,7 @@ views:
             colorScaleNumericBins: 0.2;0.5;1;2;5;10
             colorScaleScheme: PuBu
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       crop: groundnut
       metric: yield_gap
@@ -340,7 +498,7 @@ views:
             colorScaleNumericBins: 1,,;2,,;3,,;4,,;5,,;6,,
             colorScaleScheme: YlOrBr
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
       note: *attainable_yield_footnote
   - dimensions:
       crop: lettuce
@@ -352,7 +510,7 @@ views:
             colorScaleNumericBins: 5;10;15;20;25;30;35;40
             colorScaleScheme: PuBu
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       crop: millet
       metric: attainable_yield
@@ -375,7 +533,7 @@ views:
             colorScaleNumericBins: 0.5;1;2;5;10;20
             colorScaleScheme: PuBu
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       crop: millet
       metric: yield_gap
@@ -386,7 +544,7 @@ views:
             colorScaleNumericBins: 0.5,,;1,,;2,,;3,,;4,,
             colorScaleScheme: YlOrBr
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
       note: *attainable_yield_footnote
   - dimensions:
       crop: oats
@@ -395,10 +553,11 @@ views:
       y:
         - catalogPath: attainable_yields#oats_yield
           display:
+            name: Oat yield
             colorScaleNumericBins: 1;2;3;4;5;6;7
             colorScaleScheme: PuBu
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       crop: oil_palm
       metric: attainable_yield
@@ -421,7 +580,7 @@ views:
             colorScaleNumericBins: 4;8;12;16;20
             colorScaleScheme: PuBu
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       crop: oil_palm
       metric: yield_gap
@@ -432,7 +591,7 @@ views:
             colorScaleNumericBins: 5,,;10,,;15,,;20,,;25,,
             colorScaleScheme: OrRd
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
       note: *attainable_yield_footnote
   - dimensions:
       crop: oranges
@@ -444,7 +603,7 @@ views:
             colorScaleNumericBins: 10;20;30;40;50;60
             colorScaleScheme: PuBu
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       crop: peas
       metric: actual_yield
@@ -455,7 +614,7 @@ views:
             colorScaleNumericBins: 0.5;1;1.5;2;2.5;3;3.5;4
             colorScaleScheme: PuBu
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       crop: potato
       metric: attainable_yield
@@ -478,7 +637,7 @@ views:
             colorScaleNumericBins: 5;10;15;20;25;30;35;40;45;50
             colorScaleScheme: PuBu
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       crop: potato
       metric: yield_gap
@@ -489,7 +648,7 @@ views:
             colorScaleNumericBins: 5,,;10,,;15,,;20,,;25,,;30,,
             colorScaleScheme: PuRd
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
       note: *attainable_yield_footnote
   - dimensions:
       crop: rapeseed
@@ -513,7 +672,7 @@ views:
             colorScaleNumericBins: 1;1.5;2;2.5;3;3.5;4
             colorScaleScheme: PuBu
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       crop: rapeseed
       metric: yield_gap
@@ -524,7 +683,7 @@ views:
             colorScaleNumericBins: 0.5,,;1,,;2,,;3,,;4,,
             colorScaleScheme: Oranges
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
       note: *attainable_yield_footnote
   - dimensions:
       crop: rice
@@ -548,7 +707,7 @@ views:
             colorScaleNumericBins: 2;4;6;8;10;12
             colorScaleScheme: PuBu
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       crop: rice
       metric: yield_gap
@@ -559,7 +718,7 @@ views:
             colorScaleNumericBins: 1,,;2,,;4,,;6,,;8,,;10,,
             colorScaleScheme: Reds
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
       note: *attainable_yield_footnote
   - dimensions:
       crop: rye
@@ -583,7 +742,7 @@ views:
             colorScaleNumericBins: 1;2;3;4;5;6
             colorScaleScheme: PuBu
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       crop: rye
       metric: yield_gap
@@ -594,7 +753,7 @@ views:
             colorScaleNumericBins: 1,,;2,,;3,,;4,,;5,,;6,,
             colorScaleScheme: OrRd
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
       note: *attainable_yield_footnote
   - dimensions:
       crop: sorghum
@@ -618,7 +777,7 @@ views:
             colorScaleNumericBins: 0.5;1;1.5;2;2.5;3;3.5;4;4.5;5;5.5
             colorScaleScheme: PuBu
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       crop: sorghum
       metric: yield_gap
@@ -629,7 +788,7 @@ views:
             colorScaleNumericBins: 1,,;2,,;3,,;4,,;5,,;6,,
             colorScaleScheme: PuRd
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
       note: *attainable_yield_footnote
   - dimensions:
       crop: soybean
@@ -653,7 +812,7 @@ views:
             colorScaleNumericBins: 0.5;1;1.5;2;2.5;3;3.5;4
             colorScaleScheme: PuBu
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       crop: soybean
       metric: yield_gap
@@ -664,7 +823,7 @@ views:
             colorScaleNumericBins: 0.5,,;1,,;2,,;3,,;4,,
             colorScaleScheme: PuBuGn
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
       note: *attainable_yield_footnote
   - dimensions:
       crop: sugar_beet
@@ -688,7 +847,7 @@ views:
             colorScaleNumericBins: 20;40;60;80;100
             colorScaleScheme: PuBu
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       crop: sugar_beet
       metric: yield_gap
@@ -699,7 +858,7 @@ views:
             colorScaleNumericBins: 10,,;20,,;30,,;40,,;50,,;60,,;70,,
             colorScaleScheme: Oranges
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
       note: *attainable_yield_footnote
   - dimensions:
       crop: sugar_cane
@@ -723,7 +882,7 @@ views:
             colorScaleNumericBins: 20;40;60;80;100;120
             colorScaleScheme: PuBu
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       crop: sugar_cane
       metric: yield_gap
@@ -734,7 +893,7 @@ views:
             colorScaleNumericBins: 10,,;20,,;30,,;40,,;50,,;60,,;70,,
             colorScaleScheme: Oranges
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
       note: *attainable_yield_footnote
   - dimensions:
       crop: sunflower_seed
@@ -758,7 +917,7 @@ views:
             colorScaleNumericBins: 0.5;1;1.5;2;2.5;3;3.5
             colorScaleScheme: PuBu
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       crop: sunflower_seed
       metric: yield_gap
@@ -769,7 +928,7 @@ views:
             colorScaleNumericBins: 0.5,,;1,,;2,,;3,,;4,,
             colorScaleScheme: YlOrRd
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
       note: *attainable_yield_footnote
   - dimensions:
       crop: tomato
@@ -781,7 +940,7 @@ views:
             colorScaleNumericBins: 10;20;50;100;200;500
             colorScaleScheme: PuBu
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
   - dimensions:
       crop: wheat
       metric: attainable_yield
@@ -804,7 +963,7 @@ views:
             colorScaleNumericBins: 1;2;3;4;5;6;7;8
             colorScaleScheme: PuBu
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
       tab: 'map'
       defaultView: 'true'
   - dimensions:
@@ -817,5 +976,601 @@ views:
             colorScaleNumericBins: 1,,;2,,;3,,;4,,;5,,;6,,
             colorScaleScheme: OrRd
     config:
-      type: LineChart
+      type: LineChart DiscreteBar
       note: *attainable_yield_footnote
+  - dimensions:
+      crop: chickpeas
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#chickpeas_yield
+          display:
+            name: Chickpea yield
+  - dimensions:
+      crop: kiwi
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#kiwi_yield
+  - dimensions:
+      crop: linseed
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#linseed_yield
+  - dimensions:
+      crop: leeks
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#leeks_yield
+          display:
+            name: Leek yield
+  - dimensions:
+      crop: tangerines
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#tangerines_yield
+          display:
+            name: Tangerine yield
+  - dimensions:
+      crop: avocados
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#avocados_yield
+          display:
+            name: Avocado yield
+  - dimensions:
+      crop: papayas
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#papayas_yield
+          display:
+            name: Papaya yield
+  - dimensions:
+      crop: hempseed
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#hempseed_yield
+  - dimensions:
+      crop: cow_peas
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#cow_peas_yield
+          display:
+            name: Cowpea yield
+  - dimensions:
+      crop: cinnamon_and_cinnamon_tree_flowers__raw
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#cinnamon_and_cinnamon_tree_flowers__raw_yield
+          display:
+            name: Cinnamon yield
+  - dimensions:
+      crop: chillies_and_peppers
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#chillies_and_peppers_yield
+          display:
+            name: Chilies and peppers yield
+  - dimensions:
+      crop: lemons_and_limes
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#lemons_and_limes_yield
+          display:
+            name: Lemon and lime yield
+  - dimensions:
+      crop: pepper
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#pepper_yield
+          display:
+            name: Pepper yield (spice)
+  - dimensions:
+      crop: tobacco
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#tobacco_yield
+  - dimensions:
+      crop: carrots_and_turnips
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#carrots_and_turnips_yield
+          display:
+            name: Carrot and turnip yield
+  - dimensions:
+      crop: garlic
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#garlic_yield
+  - dimensions:
+      crop: eggplants
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#eggplants_yield
+          display:
+            name: Eggplant yield
+  - dimensions:
+      crop: raspberries
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#raspberries_yield
+          display:
+            name: Raspberry yield
+  - dimensions:
+      crop: cherries
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#cherries_yield
+          display:
+            name: Cherry yield
+  - dimensions:
+      crop: fruit
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#fruit_yield
+  - dimensions:
+      crop: plums
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#plums_yield
+          display:
+            name: Plum yield
+  - dimensions:
+      crop: triticale
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#triticale_yield
+          display:
+            name: Triticale yield
+  - dimensions:
+      crop: sweet_potatoes
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#sweet_potatoes_yield
+          display:
+            name: Sweet potato yield
+  - dimensions:
+      crop: beans__green
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#beans__green_yield
+          display:
+            name: Green bean yield
+  - dimensions:
+      crop: chestnut
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#chestnut_yield
+  - dimensions:
+      crop: lentils
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#lentils_yield
+          display:
+            name: Lentil yield
+  - dimensions:
+      crop: citrus_fruit
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#citrus_fruit_yield
+  - dimensions:
+      crop: peas__green
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#peas__green_yield
+          display:
+            name: Green pea yield
+  - dimensions:
+      crop: mangoes
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#mangoes_yield
+          display:
+            name: Mango yield
+  - dimensions:
+      crop: pineapples
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#pineapples_yield
+          display:
+            name: Pineapple yield
+  - dimensions:
+      crop: quinces
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#quinces_yield
+          display:
+            name: Quince yield
+  - dimensions:
+      crop: vanilla__raw
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#vanilla__raw_yield
+          display:
+            name: Vanilla yield
+  - dimensions:
+      crop: strawberries
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#strawberries_yield
+          display:
+            name: Strawberry yield
+  - dimensions:
+      crop: vegetables
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#vegetables_yield
+          display:
+            name: Vegetable yield
+  - dimensions:
+      crop: buckwheat
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#buckwheat_yield
+  - dimensions:
+      crop: cashew_nuts
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#cashew_nuts_yield
+          display:
+            name: Cashew yield
+  - dimensions:
+      crop: apricots
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#apricots_yield
+          display:
+            name: Apricot yield
+  - dimensions:
+      crop: olives
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#olives_yield
+          display:
+            name: Olive yield
+  - dimensions:
+      crop: cloves__whole_stems__raw
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#cloves__whole_stems__raw_yield
+          display:
+            name: Clove yield
+  - dimensions:
+      crop: artichokes
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#artichokes_yield
+          display:
+            name: Artichoke yield
+  - dimensions:
+      crop: persimmons
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#persimmons_yield
+          display:
+            name: Persimmon yield
+  - dimensions:
+      crop: okra
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#okra_yield
+  - dimensions:
+      crop: cranberries
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#cranberries_yield
+          display:
+            name: Cranberry yield
+  - dimensions:
+      crop: onions_and_shallots__green
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#onions_and_shallots__green_yield
+          display:
+            name: Green onion and shallot yield
+  - dimensions:
+      crop: figs
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#figs_yield
+          display:
+            name: Fig yield
+  - dimensions:
+      crop: hazelnuts
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#hazelnuts_yield
+          display:
+            name: Hazelnut yield
+  - dimensions:
+      crop: pistachios
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#pistachios_yield
+          display:
+            name: Pistachio yield
+  - dimensions:
+      crop: grapes
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#grapes_yield
+          display:
+            name: Grape yield
+  - dimensions:
+      crop: onions
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#onions_yield
+          display:
+            name: Onion yield
+  - dimensions:
+      crop: safflower_seed
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#safflower_seed_yield
+  - dimensions:
+      crop: cucumbers_and_gherkins
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#cucumbers_and_gherkins_yield
+          display:
+            name: Cucumber and gherkin yield
+  - dimensions:
+      crop: sesame_seed
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#sesame_seed_yield
+  - dimensions:
+      crop: asparagus
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#asparagus_yield
+  - dimensions:
+      crop: yams
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#yams_yield
+          display:
+            name: Yam yield
+  - dimensions:
+      crop: herbs
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#herbs_yield
+          display:
+            name: Herb yield
+  - dimensions:
+      crop: plantains
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#plantains_yield
+          display:
+            name: Plantain yield
+  - dimensions:
+      crop: watermelons
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#watermelons_yield
+          display:
+            name: Watermelon yield
+  - dimensions:
+      crop: cauliflowers_and_broccoli
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#cauliflowers_and_broccoli_yield
+          display:
+            name: Cauliflower and broccoli yield
+  - dimensions:
+      crop: spinach
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#spinach_yield
+  - dimensions:
+      crop: currants
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#currants_yield
+          display:
+            name: Currant yield
+  - dimensions:
+      crop: chillies_and_peppers__green__capsicum_spp__and_pimenta_spp_
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#chillies_and_peppers__green__capsicum_spp__and_pimenta_spp__yield
+          display:
+            name: Green chilies and peppers yield
+  - dimensions:
+      crop: quinoa
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#quinoa_yield
+  - dimensions:
+      crop: coconuts
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#coconuts_yield
+          display:
+            name: Coconut yield
+  - dimensions:
+      crop: blueberries
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#blueberries_yield
+          display:
+            name: Blueberry yield
+  - dimensions:
+      crop: pulses
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#pulses_yield
+          display:
+            name: Pulse yield
+  - dimensions:
+      crop: melon
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#melon_yield
+  - dimensions:
+      crop: treenuts
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#treenuts_yield
+          display:
+            name: Treenut yield
+  - dimensions:
+      crop: apples
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#apples_yield
+          display:
+            name: Apple yield
+  - dimensions:
+      crop: grapefruit
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#grapefruit_yield
+  - dimensions:
+      crop: walnuts
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#walnuts_yield
+          display:
+            name: Walnut yield
+  - dimensions:
+      crop: broad_beans
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#broad_beans_yield
+          display:
+            name: Broad bean yield
+  - dimensions:
+      crop: cabbages
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#cabbages_yield
+          display:
+            name: Cabbage yield
+  - dimensions:
+      crop: peaches_and_nectarines
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#peaches_and_nectarines_yield
+          display:
+            name: Peach and nectarine yield
+  - dimensions:
+      crop: mustard_seed
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#mustard_seed_yield
+  - dimensions:
+      crop: roots_and_tubers
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#roots_and_tubers_yield
+          display:
+            name: Roots and tubers yield
+  - dimensions:
+      crop: pears
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#pears_yield
+          display:
+            name: Pear yield
+  - dimensions:
+      crop: sugar_crops
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#sugar_crops_yield
+          display:
+            name: Sugar crop yield
+  - dimensions:
+      crop: ginger__raw
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#ginger__raw_yield
+          display:
+            name: Ginger yield
+  - dimensions:
+      crop: dates
+      metric: actual_yield
+    indicators:
+      y:
+        - catalogPath: attainable_yields#dates_yield
+          display:
+            name: Date yield

@@ -133,9 +133,11 @@ class AnomalyUpgradeChange(AnomalyDetector):
 
         for variable_id_old, variable_id_new in variable_mapping.items():
             # Define the scale as the difference between the old and new values, as a fraction of the range of values of the new variable.
-            df_scale[variable_id_new] = abs(df[variable_id_new] - df[variable_id_old]) / (
-                df[variable_id_new].max() - df[variable_id_new].min()
-            )
+            # NOTE: We clip the scale to a maximum of 1, to avoid large values in edge cases
+            # (e.g. if the new variable has become a constant value, the division by zero becomes inf).
+            df_scale[variable_id_new] = (
+                abs(df[variable_id_new] - df[variable_id_old]) / (df[variable_id_new].max() - df[variable_id_new].min())
+            ).clip(upper=1)
 
         return df_scale
 
