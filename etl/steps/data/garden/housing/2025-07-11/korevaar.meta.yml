@@ -40,6 +40,7 @@ tables:
           - This data comes from the paper "The Housing Affordability Revolution" by Korevaar et al. (2023). It provides insights into the long-term trends in housing affordability across various countries, focusing on the ratio of real rents to real wages.
           - Real rents are based on multiple sources, such as historical records of rents from institutional accounts, rent control records, tax documentation and existing rent indices.
           - The researchers adjusted the raw values for inflation by constructing a long-term consumer price index for each country. They also adjusted for improvements in the quality of the housing stock, which includes amenities such as the availability of indoor bathrooms and toilets, kitchens, electricity, and central heating.
+          - In Paris, strict rent controls kept real rents extremely low until 1948, boosting affordability but making it hard to find housing. A major reform that year ended the system, leading to a return to more typical rent levels.
         unit: Index
         short_unit: ""
   korevaar_quality:
