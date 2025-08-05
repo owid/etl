@@ -13,6 +13,9 @@ definitions:
 
   ppp_year: 2011
 
+  note_ppp_adjustment: |-
+    This data is expressed in [international-$](#dod:int_dollar_abbreviation) at {definitions.ppp_year} prices.
+
   description_key_attribution: The Maddison Project Database is based on the work of many researchers who have produced estimates of economic growth and population for individual countries. The full list of sources for this historical data is given in [the original dataset](https://dataverse.nl/api/access/datafile/421302).
   description_key_gdp: Gross domestic product (GDP) is a measure of the total value added from the production of goods and services in a country or region each year.
   description_key_gdp_per_capita: GDP per capita is GDP divided by population.
@@ -64,8 +67,7 @@ tables:
             subtitle: >-
               {definitions.description_key_ppp_adjustment}
             note: >-
-              This is expressed in [international-$](#dod:int_dollar_abbreviation) at {definitions.ppp_year}
-              prices.
+              {definitions.note_ppp_adjustment}
             hideRelativeToggle: false
             hasMapTab: true
             tab: map
@@ -150,8 +152,7 @@ tables:
             subtitle: >-
               {definitions.description_key_ppp_adjustment}
             note: >-
-              This data is expressed in [international-$](#dod:int_dollar_abbreviation) at
-              {definitions.ppp_year} prices.
+              {definitions.note_ppp_adjustment}
             hideRelativeToggle: false
             hasMapTab: true
             tab: map
