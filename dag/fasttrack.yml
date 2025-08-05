@@ -140,8 +140,6 @@ steps:
     - snapshot://fasttrack/latest/hdi_per_co2.csv
   data://grapher/fasttrack/latest/elephant_populations:
     - snapshot://fasttrack/latest/elephant_populations.csv
-  data://grapher/fasttrack/latest/population_immigrants_diff:
-    - snapshot://fasttrack/latest/population_immigrants_diff.csv
   data://grapher/fasttrack/latest/lpi_distribution_wwf:
     - snapshot://fasttrack/latest/lpi_distribution_wwf.csv
   data-private://grapher/fasttrack/latest/de_sanjose_2019_hpv_cancers:
