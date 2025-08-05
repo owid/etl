@@ -2,8 +2,9 @@
 
 import numpy as np
 import pandas as pd
-import owid.catalog.processing as pr
 from structlog import get_logger
+
+import owid.catalog.processing as pr
 from owid.catalog import Table
 
 from etl.data_helpers import geo
@@ -277,7 +278,7 @@ def _validate_temporal_patterns(tb: Table) -> None:
     assert tb["year"].max() <= max_year, f"Year too late: {tb['year'].max()}"
 
     # Check for major jumps in cancer death counts
-    for country in ["World", "United States", "China", "India"]:
+    for country in ["United States", "China", "India"]:
         country_data = tb[
             (tb["country"] == country)
             & (tb["cause"] == "Malignant neoplasms")
@@ -321,16 +322,10 @@ def _validate_country_coverage(tb: Table) -> None:
         "Japan",
         "Brazil",
         "Russia",
-        "World",
     }
     missing_major = major_countries - countries
     if missing_major:
         log.warning("Missing major countries/entities", missing=list(missing_major))
-
-    # Validate World totals exist
-    world_data = tb[tb["country"] == "World"]
-    if len(world_data) == 0:
-        log.warning("No World aggregate data found")
 
 
 def _validate_data_completeness(tb: Table) -> None:
@@ -343,7 +338,7 @@ def _validate_data_completeness(tb: Table) -> None:
         log.warning("High proportion of missing death counts", missing_pct=f"{missing_deaths/total_records*100:.2f}%")
 
     # Check temporal completeness for major countries
-    for country in ["World", "United States", "Germany", "Japan"]:
+    for country in ["United States", "Germany", "Japan"]:
         country_data = tb[tb["country"] == country]
         if len(country_data) == 0:
             continue
