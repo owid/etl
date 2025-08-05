@@ -20,6 +20,7 @@ COMMON_CONFIG = {
     "hideAnnotationFieldsInTitle": {
         "time": True,
     },
+    "chartTypes": ["StackedBar"],
 }
 
 
@@ -32,9 +33,13 @@ def run() -> None:
 
     # Load grapher dataset.
     ds = paths.load_dataset("ucdp")
-    tb = ds.read("ucdp", load_data=False)
+    tb = ds.read("ucdp")
     ds_pre = paths.load_dataset("ucdp_preview")
-    tb_pre = ds_pre.read("ucdp_preview", load_data=False)
+    tb_pre = ds_pre.read("ucdp_preview")
+
+    # Check years
+    assert tb["year"].max() == 2024
+    assert tb_pre["year"].max() == 2025
 
     # Filter unnecessary columns
     tb = tb.filter(regex="^country|^year|^number_deaths_ongoing|^number_ongoing_conflicts__")
@@ -112,7 +117,7 @@ def run() -> None:
                 "dimension": "estimate",
                 "choices": ["low", "high", "best"],
                 "choice_new_slug": "best_ci",
-                "view_config": COMMON_CONFIG | {"hasMapTab": False},
+                "view_config": COMMON_CONFIG | {"hasMapTab": False, "chartTypes": ["LineChart"]},
                 "view_metadata": {"description_key": lambda view: _set_description_key(view, tb)},
             },
         ]
@@ -172,6 +177,10 @@ def run() -> None:
                     "yAxis": {
                         "facetDomain": "independent",
                     },
+                    "map": {
+                        "time": 2024,
+                    },
+                    "hideTimeline": True,
                 },
             }
         ]
@@ -274,7 +283,7 @@ def _set_description_key(view, tb):
     keys = tb[column].m.description_key
 
     if (view.d.estimate == "best_ci") or (view.d.indicator == "num_conflicts"):
-        assert keys[-1].startswith("'Best' death estimates")
+        assert keys[-1].startswith('We show here the "best" death')
         keys = keys[:-1] + [None]
 
     return keys
@@ -308,7 +317,7 @@ def _set_subtitle(view):
     """Set subtitle based on view dimensions."""
     if view.d.conflict_type == "one-sided violence":
         if view.d.indicator == "num_conflicts":
-            return "Included are cases of [one-sided violence against civilians](#dod:onesided-ucdp) that were ongoing that year."
+            return "Included are cases of [one-sided violence against civilians](#dod:onesided-ucdp)."
         return f"Reported deaths of civilians due to [one-sided violence](#dod:onesided-ucdp) that was ongoing that year{', per 100,000 people' if view.d.indicator=='death_rate' else ''}. Deaths due to disease and starvation resulting from one-sided violence are not included."
 
     # DoD
@@ -327,29 +336,28 @@ def _set_subtitle(view):
 
     if view.d.indicator in ("deaths", "death_rate"):
         # Subtitle template
-        subtitle_template = "Reported deaths of combatants and civilians due to fighting{placeholder} that were ongoing that year. Deaths due to disease and starvation resulting from the conflict are not included."
+        subtitle_template = "Reported deaths of combatants and civilians due to fighting{placeholder}. Deaths due to disease and starvation resulting from the conflict are not included."
 
         # Define subtitle
         if view.d.indicator == "deaths":
             subtitle = subtitle_template.format(placeholder=f" in {dod}")
             if view.matches(conflict_type="all", estimate="best", people="all"):
-                subtitle += " The data for 2025 is preliminary and was last updated in June 2025."
+                subtitle += " Data for 2025 is incomplete and includes deaths within the first half of the year."
             return subtitle
         elif view.d.indicator == "death_rate":
             return subtitle_template.format(placeholder=f", per 100,000 people. Included are {dod}")
     elif view.d.indicator == "num_conflicts":
-        return f"Included are {dod} that were ongoing that year."
+        return f"Included are {dod}."
     return ""
 
 
 def _set_note(view):
     """Set subtitle based on view dimensions."""
-    note = ""
     if view.d.estimate == "best_ci":
-        note = "'Best' estimates as identified by UCDP."
+        return '"Best" estimates as identified by UCDP.'
     elif view.d.indicator == "num_conflicts":
-        note = "Some conflicts affect several countries and regions. The sum across all countries and regions can therefore be higher than the total number."
-    return note
+        return "Some conflicts affect several countries and regions. The sum across all countries and regions can therefore be higher than the total number."
+    return None
 
 
 def _get_conflict_name(view, choice_names):

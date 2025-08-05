@@ -181,7 +181,7 @@ def run() -> None:
     config["views"] = multidim.expand_config(
         tb_annual,
         dimensions=["frequency", "source", "unit"],
-        additional_config={"chartTypes": ["LineChart"], "hasMapTab": True, "tab": "map"},
+        additional_config={"chartTypes": ["LineChart", "DiscreteBar"], "hasMapTab": True, "tab": "map"},
     )
 
     #

@@ -65,6 +65,7 @@
     - "NGA"
     - "OWID_ERE"
     - "OWID_OFS"
+    - "OWID_SDN"
     - "REU"
     - "RWA"
     - "SDN"
@@ -394,6 +395,7 @@
     - "Congo, Rep."
     - "Congo-Brazzaville"
     - "Republic of Congo"
+    - "Congo Brazzaville"
 
 - code: "COK"
   name: "Cook Islands"
@@ -457,6 +459,7 @@
     - "Democratic Republic of the Congo"
     - "Zaire/ Congo , Dem. Rep."
     - "Congo, Democratic Republic"
+    - "Congo (Kinshasa)"
 
 - code: "DNK"
   name: "Denmark"
@@ -777,6 +780,7 @@
     - "Hong Kong SAR, China"
     - "Hong Kong Special Administrative Region (China)"
     - "Hong Kong, China"
+    - "Hong Kong S.A.R. of China"
 
 - code: "HUN"
   name: "Hungary"
@@ -951,6 +955,7 @@
   aliases:
     - "Rep. of Moldova"
     - "Republic of Moldova"
+    - "Moldova, Republic of"
   related:
     - "OWID_TRS"
 
@@ -982,6 +987,8 @@
 - code: "OWID_NAG"
   name: "Nagorno-Karabakh"
   region_type: "other"
+  aliases:
+    - "Nagorno-Karabakh Region"
 
 - code: "NAM"
   name: "Namibia"
@@ -1000,6 +1007,8 @@
     - "ABW"
     - "CUW"
     - "SXM"
+  aliases:
+    - "Netherlands (Kingdom of the)"
 
 - code: "ANT"
   name: "Netherlands Antilles"
@@ -1382,6 +1391,8 @@
 - code: "OWID_SML"
   name: "Somaliland"
   region_type: "other"
+  aliases:
+    - "Somaliland region"
 
 - code: "ZAF"
   name: "South Africa"

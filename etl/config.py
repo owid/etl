@@ -207,7 +207,8 @@ SUBSET = env.get("SUBSET", None)
 
 # forbid any individual step from consuming more than this much memory
 # (only enforced on Linux)
-MAX_VIRTUAL_MEMORY_LINUX = 32 * 2**30  # 32 GB
+# 2025-08-01: Increased to 64 GB from 32 GB, it was not enough for garden/agriculture/2025-03-26/daily_calories_per_person
+MAX_VIRTUAL_MEMORY_LINUX = 64 * 2**30  # 64 GB
 
 # increment this to force a full rebuild of all datasets
 ETL_EPOCH = 5
@@ -632,3 +633,9 @@ FORCE_DATASETTE = (not METABASE_API_KEY) or (not METABASE_URL)
 NOTION_API_KEY = os.environ.get("NOTION_API_KEY")
 NOTION_IMPACT_HIGHLIGHTS_TABLE_URL = os.environ.get("NOTION_IMPACT_HIGHLIGHTS_TABLE_URL")
 NOTION_DATA_PROVIDERS_CONTACTS_TABLE_URL = os.environ.get("NOTION_DATA_PROVIDERS_CONTACTS_TABLE_URL")
+
+# Google drive IDs for folders, docs and sheets, for the data producer reports project.
+# NOTE: Here we fill all variables with "" if not found to simplify type checks (this way we ensure they are strings).
+DATA_PRODUCER_REPORT_FOLDER_ID = os.environ.get("DATA_PRODUCER_REPORT_FOLDER_ID", "")
+DATA_PRODUCER_REPORT_TEMPLATE_DOC_ID = os.environ.get("DATA_PRODUCER_REPORT_TEMPLATE_DOC_ID", "")
+DATA_PRODUCER_REPORT_STATUS_SHEET_ID = os.environ.get("DATA_PRODUCER_REPORT_STATUS_SHEET_ID", "")

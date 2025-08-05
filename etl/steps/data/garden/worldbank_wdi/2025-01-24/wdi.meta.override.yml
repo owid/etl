@@ -4,7 +4,7 @@ definitions:
   gdp_per_capita: GDP per capita is GDP divided by population.
   gni: Gross national income (GNI) is a measure of the total income earned by residents of a country or region each year. It is calculated as GDP plus net income received from abroad, plus taxes (minus subsidies) on production.
   gni_per_capita: GNI per capita is GNI divided by population.
-  ppp_adjustment: This data is adjusted for inflation and for differences in living costs between countries.
+  ppp_adjustment: This data is adjusted for inflation and differences in living costs between countries.
   ppp_prices: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2021 prices.
   inflation_adjustment: This data is adjusted by inflation but _does not_ account for differences in living costs between countries.
   inflation_prices: This data is expressed in constant 2015 US$.
@@ -71,7 +71,8 @@ tables:
               gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
           grapher_config:
             title: GDP per capita
-            subtitle: This data is adjusted for inflation and for differences in living costs between countries.
+            subtitle: "{definitions.ppp_adjustment}"
+            note: "{definitions.ppp_prices}"
             variantName: In constant international-$ – World Bank
             originUrl: https://ourworldindata.org/economic-growth
             hasMapTab: true
@@ -106,7 +107,6 @@ tables:
               - Japan
               - China
               - India
-            note: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2021 prices.
 
       ny_gdp_mktp_pp_kd:
         title: GDP, PPP (constant 2021 international $)
@@ -135,9 +135,8 @@ tables:
               gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
           grapher_config:
             title: Gross domestic product (GDP)
-            subtitle: |
-              This data is adjusted for inflation and differences in living costs between countries.
-            note: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2021 prices.
+            subtitle: "{definitions.ppp_adjustment}"
+            note: "{definitions.ppp_prices}"
             hideRelativeToggle: false
             hasMapTab: true
             tab: map
@@ -198,8 +197,8 @@ tables:
               gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
           grapher_config:
             title: Gross national income (GNI) per capita
-            subtitle: Gross national income (GNI) measures the total income earned by residents of a country, including income earned abroad. This data is adjusted for inflation and differences in living costs between countries.
-            note: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2021 prices.
+            subtitle: Gross national income (GNI) measures the total income earned by residents of a country, including income earned abroad. {definitions.ppp_adjustment}
+            note: "{definitions.ppp_prices}"
             variantName: World Bank
             originUrl: https://ourworldindata.org/economic-growth
             map:

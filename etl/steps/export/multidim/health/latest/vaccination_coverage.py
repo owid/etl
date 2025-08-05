@@ -22,7 +22,7 @@ def run() -> None:
 
     common_view_config = {
         "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.005.json",
-        "chartTypes": ["LineChart", "SlopeChart"],
+        "chartTypes": ["LineChart", "SlopeChart", "DiscreteBar"],
         "hasMapTab": True,
         "tab": "chart",
     }
@@ -58,7 +58,7 @@ def run() -> None:
                     "hasMapTab": False,
                     "addCountryMode": "change-country",
                     "tab": "chart",
-                    "chartTypes": ["SlopeChart", "LineChart"],
+                    "chartTypes": ["SlopeChart", "LineChart", "DiscreteBar"],
                     "selectedFacetStrategy": "entity",
                     "title": "{title}",
                     "subtitle": "{subtitle}",

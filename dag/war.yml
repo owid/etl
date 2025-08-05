@@ -52,7 +52,7 @@ steps:
 
   # UCDP (+preview)
   data://meadow/war/latest/ucdp_ced:
-    - snapshot://war/latest/ucdp_ced_v25_01_25_03.csv
+    - snapshot://war/latest/ucdp_ced_v25_01_25_06.csv
   data://garden/war/latest/ucdp_preview:
     - data://meadow/war/2025-06-13/ucdp
     - data://garden/war/2025-06-13/ucdp

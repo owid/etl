@@ -37,7 +37,7 @@ def get_shiny_data():
 
     if response.status_code == 200:
         soup = BeautifulSoup(response.text, "html.parser")
-        section = soup.find(id="daily-data-same-format-as-deprecated-api")
+        section = soup.find(id="daily-data")
 
         # Then find the button inside it
         if section:

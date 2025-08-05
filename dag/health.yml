@@ -158,7 +158,7 @@ steps:
     - data://garden/regions/2023-01-01/regions
     - data://meadow/health/2025-01-22/unaids
     - data://meadow/health/2023-08-22/unaids_deaths_averted_art
-    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/wb/2025-07-01/income_groups
 
   data://grapher/health/2025-01-22/unaids:
     - data://garden/health/2025-01-22/unaids
@@ -204,7 +204,6 @@ steps:
     - data://garden/who/2024-07-26/mortality_database
   data://grapher/cardiovascular_diseases/2023-11-01/deaths_from_cardiovascular_diseases_vs_other:
     - data://garden/cardiovascular_diseases/2023-11-01/deaths_from_cardiovascular_diseases_vs_other
-
 
   # Global Health Observatory (GHO) from WHO
   data://meadow/who/2024-01-03/gho:
@@ -252,7 +251,7 @@ steps:
   data://garden/who/2024-04-08/polio:
     - data://meadow/who/2024-04-08/polio_afp
     - data://garden/who/2024-04-09/polio_historical
-    - data://garden/wb/2023-04-30/income_groups
+    - data://garden/wb/2025-07-01/income_groups
     - data://garden/regions/2023-01-01/regions
     - data://garden/demography/2023-03-31/population
     - snapshot://fasttrack/latest/gpei.csv
@@ -459,7 +458,7 @@ steps:
   data://garden/un/2024-07-08/maternal_mortality:
     - data://meadow/un/2024-07-08/maternal_mortality
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2023-04-30/income_groups
+    - data://garden/wb/2025-07-01/income_groups
   data://grapher/un/2024-07-08/maternal_mortality:
     - data://garden/un/2024-07-08/maternal_mortality
 
@@ -469,7 +468,7 @@ steps:
     - data://garden/un/2024-07-08/maternal_mortality
     - data://garden/who/2024-07-26/mortality_database
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2023-04-30/income_groups
+    - data://garden/wb/2025-07-01/income_groups
     - data://garden/un/2024-07-12/un_wpp
     - data://garden/demography/2024-07-15/population
   data://grapher/maternal_mortality/2024-07-08/maternal_mortality:
@@ -777,15 +776,6 @@ steps:
   data-private://grapher/antibiotics/2024-12-05/microbe_total_deaths_by_syndrome_amr:
     - data-private://garden/antibiotics/2024-12-05/microbe_total_deaths_by_syndrome_amr
 
-  # WHO Immunization coverage
-  data://meadow/who/2024-12-10/vaccination_coverage:
-    - snapshot://who/2024-12-10/vaccination_coverage.xlsx
-  data://garden/who/2024-12-10/vaccination_coverage:
-    - data://meadow/who/2024-12-10/vaccination_coverage
-    - data://garden/un/2024-07-12/un_wpp
-  data://grapher/who/2024-12-10/vaccination_coverage:
-    - data://garden/who/2024-12-10/vaccination_coverage
-
   #
   # Human height
   #
@@ -797,16 +787,7 @@ steps:
     - data://garden/health/2024-12-31/height
 
   #
-  # WHO Vaccine Introductions
-  #
-  data://meadow/who/2025-01-09/vaccination_introductions:
-    - snapshot://who/2025-01-09/vaccination_introductions.xlsx
-  data://garden/who/2025-01-09/vaccination_introductions:
-    - data://meadow/who/2025-01-09/vaccination_introductions
-  data://grapher/who/2025-01-09/vaccination_introductions:
-    - data://garden/who/2025-01-09/vaccination_introductions
 
-  #
   # WHO vaccine stock out
   #
   data://meadow/who/2025-01-17/vaccine_stock_out:
@@ -1044,9 +1025,9 @@ steps:
 
   # Multi-dim indicators - vaccination coverage
   export://multidim/health/latest/vaccination_coverage:
-    - data://grapher/who/2024-12-10/vaccination_coverage
+    - data://grapher/who/2025-07-15/vaccination_coverage
   export://multidim/health/latest/vaccination_introductions:
-    - data://grapher/who/2025-01-09/vaccination_introductions
+    - data://grapher/who/2025-07-15/vaccination_introductions
 
   # US Pertussis cases - CDC
   #
@@ -1170,7 +1151,7 @@ steps:
   data://garden/who/2025-04-07/gho_smoking:
     - data://garden/who/2024-01-03/gho
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/wb/2025-07-01/income_groups
     - data://garden/un/2024-07-12/un_wpp
   data://grapher/who/2025-04-07/gho_smoking:
     - data://garden/who/2025-04-07/gho_smoking
@@ -1212,7 +1193,7 @@ steps:
     - data://meadow/tuberculosis/2025-06-06/burden_estimates
     - data://garden/demography/2024-07-15/population
     - snapshot://tuberculosis/2025-06-06/data_dictionary.csv
-    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/wb/2025-07-01/income_groups
     - data://garden/regions/2023-01-01/regions
   data://grapher/tuberculosis/2025-06-06/burden_estimates:
     - data://garden/tuberculosis/2025-06-06/burden_estimates
@@ -1231,7 +1212,7 @@ steps:
     - data://meadow/tuberculosis/2025-06-16/burden_disaggregated
     - data://garden/demography/2024-07-15/population
     - snapshot://tuberculosis/2025-06-06/data_dictionary.csv
-    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/wb/2025-07-01/income_groups
     - data://garden/regions/2023-01-01/regions
   data://grapher/tuberculosis/2025-06-16/burden_disaggregated:
     - data://garden/tuberculosis/2025-06-16/burden_disaggregated
@@ -1252,9 +1233,10 @@ steps:
     - data://meadow/tuberculosis/2025-06-16/drug_resistance_surveillance
     - snapshot://tuberculosis/2025-06-06/data_dictionary.csv
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/wb/2025-07-01/income_groups
   data://grapher/tuberculosis/2025-06-16/drug_resistance_surveillance:
     - data://garden/tuberculosis/2025-06-16/drug_resistance_surveillance
+
   # Tuberculosis budget - WHO
   data://meadow/tuberculosis/2025-06-16/budget:
     - snapshot://tuberculosis/2025-06-16/budget.csv
@@ -1262,7 +1244,7 @@ steps:
     - data://meadow/tuberculosis/2025-06-16/budget
     - data://garden/regions/2023-01-01/regions
     - snapshot://tuberculosis/2025-06-06/data_dictionary.csv
-    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/wb/2025-07-01/income_groups
   data://grapher/tuberculosis/2025-06-16/budget:
     - data://garden/tuberculosis/2025-06-16/budget
 
@@ -1274,6 +1256,38 @@ steps:
     - snapshot://tuberculosis/2025-06-06/data_dictionary.csv
     - data://garden/un/2024-07-12/un_wpp
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/wb/2025-07-01/income_groups
   data://grapher/tuberculosis/2025-06-16/laboratories:
     - data://garden/tuberculosis/2025-06-16/laboratories
+
+  # Drug approvals - FDA (CDER Approvals & Purple Book (CBER Approvals))
+  data://garden/health/2025-07-16/drug_approvals:
+    - data://meadow/health/2025-07-16/cder_approvals
+    - data://meadow/health/2025-07-16/purple_book
+  data://grapher/health/2025-07-16/drug_approvals:
+    - data://garden/health/2025-07-16/drug_approvals
+  data://meadow/health/2025-07-16/cder_approvals:
+    - snapshot://fda/2025-07-16/cder_approvals.csv
+
+  data://meadow/health/2025-07-16/purple_book:
+    - snapshot://fda/2025-07-16/purple_book.csv
+
+  # WHO Immunization coverage
+  data://meadow/who/2025-07-15/vaccination_coverage:
+    - snapshot://who/2025-07-15/vaccination_coverage.xlsx
+  data://garden/who/2025-07-15/vaccination_coverage:
+    - data://garden/un/2024-07-12/un_wpp
+    - data://garden/wb/2025-07-01/income_groups
+    - data://garden/regions/2023-01-01/regions
+    - data://meadow/who/2025-07-15/vaccination_coverage
+    - data://garden/demography/2024-07-15/population
+  data://grapher/who/2025-07-15/vaccination_coverage:
+    - data://garden/who/2025-07-15/vaccination_coverage
+    
+  # WHO Vaccine Introductions
+  data://meadow/who/2025-07-15/vaccination_introductions:
+    - snapshot://who/2025-07-15/vaccination_introductions.xlsx
+  data://garden/who/2025-07-15/vaccination_introductions:
+    - data://meadow/who/2025-07-15/vaccination_introductions
+  data://grapher/who/2025-07-15/vaccination_introductions:
+    - data://garden/who/2025-07-15/vaccination_introductions
