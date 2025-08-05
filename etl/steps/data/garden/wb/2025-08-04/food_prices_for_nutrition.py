@@ -127,6 +127,10 @@ def run() -> None:
     # Set an appropriate index and sort conveniently.
     tb = tb.format()
 
+    # Since the 2025 update, the dataset includes costs in local currency units.
+    # For now, since they are not used, remove them.
+    tb = tb[[column for column in tb.columns if "in_local_currency_unit" not in column]]
+
     #
     # Save outputs.
     #
