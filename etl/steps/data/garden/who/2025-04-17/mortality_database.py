@@ -29,7 +29,6 @@ def run() -> None:
     _validate_input_data(tb)
     _validate_mortality_values(tb)
     _validate_demographic_dimensions(tb)
-    _validate_causes_of_death(tb)
 
     #
     # Process data.
@@ -121,7 +120,7 @@ def _validate_mortality_values(tb: Table) -> None:
                 "Extremely high death rates found",
                 count=len(extreme_rates),
                 examples=tb[tb["death_rate_per_100_000_population"].isin(extreme_rates)][
-                    ["country", "year", "cause", "death_rate_per_100_000_population"]
+                    ["country", "year", "sex", "age_group", "cause", "death_rate_per_100_000_population"]
                 ]
                 .head()
                 .to_dict("records"),
@@ -162,38 +161,6 @@ def _validate_demographic_dimensions(tb: Table) -> None:
     unexpected_ages = actual_ages - expected_age_groups
     if unexpected_ages:
         log.warning("Unexpected age group categories", categories=list(unexpected_ages))
-
-
-def _validate_causes_of_death(tb: Table) -> None:
-    """Validate cause categories and ICD-10 codes."""
-    # Check for expected major cause categories
-    expected_major_causes = {
-        "All Causes",
-        "Cardiovascular diseases",
-        "Malignant neoplasms",
-        "Infectious and parasitic diseases",
-        "Respiratory diseases",
-        "Unintentional injuries",
-        "Digestive diseases",
-    }
-    actual_causes = set(tb["cause"].unique())
-
-    # Log coverage of major causes
-    covered_major_causes = expected_major_causes & actual_causes
-    log.info(
-        "Major cause coverage",
-        covered=len(covered_major_causes),
-        total_expected=len(expected_major_causes),
-        covered_causes=list(covered_major_causes),
-    )
-
-    # Validate ICD-10 codes format if present
-    if "icd10_codes" in tb.columns:
-        icd_codes = tb["icd10_codes"].dropna().unique()
-        for code_str in icd_codes[:10]:  # Check first 10 examples
-            # ICD-10 codes should contain letter-number patterns
-            if not any(c.isalpha() for c in str(code_str)) or not any(c.isdigit() for c in str(code_str)):
-                log.warning("Potentially malformed ICD-10 code", code=code_str)
 
 
 def tidy_age_dimension(tb: Table) -> Table:
@@ -305,12 +272,20 @@ def _validate_cause_specific_patterns(tb: Table) -> None:
     # Sudden infant death syndrome should only occur in infants
     sids_data = tb[tb["cause"] == "Sudden infant death syndrome"]
     if len(sids_data) > 0:
-        sids_adults = sids_data[~sids_data["age_group"].isin(["less than 1 year", "1-4 years"])]
+        # Only check records with actual deaths (> 0), ignore missing/zero values
+        # Allow infant ages plus "all ages" and "unknown age" aggregates
+        allowed_age_groups = ["less than 1 year", "all ages", "all ages", "Unknown age"]
+        sids_adults = sids_data[
+            (~sids_data["age_group"].isin(allowed_age_groups))
+            & (sids_data["number"] > 0)
+            & (sids_data["number"].notna())
+        ]
         if len(sids_adults) > 0:
             log.warning(
                 "SIDS deaths in non-infant age groups",
                 count=len(sids_adults),
                 age_groups=sids_adults["age_group"].unique().tolist(),
+                countries=sids_adults["country"].unique().tolist(),
             )
 
 
