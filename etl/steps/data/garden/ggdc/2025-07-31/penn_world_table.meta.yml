@@ -499,7 +499,7 @@ tables:
           {definitions.description_processing_outliers}
         display:
           name: Total factor productivity level
-          numDecimalPlaces: 1
+          numDecimalPlaces: 2
           <<: *common-display
 
       cwtfp:
@@ -516,7 +516,7 @@ tables:
           {definitions.description_processing_outliers}
         display:
           name: Welfare-relevant total factor productivity level
-          numDecimalPlaces: 1
+          numDecimalPlaces: 2
           <<: *common-display
 
       rconna:
@@ -597,7 +597,7 @@ tables:
           {definitions.description_processing_outliers}
         display:
           name: Total factor productivity level
-          numDecimalPlaces: 1
+          numDecimalPlaces: 2
           <<: *common-display
 
       rwtfpna:
@@ -614,7 +614,7 @@ tables:
           {definitions.description_processing_outliers}
         display:
           name: Welfare-relevant total factor productivity level
-          numDecimalPlaces: 1
+          numDecimalPlaces: 2
           <<: *common-display
 
       labsh:
