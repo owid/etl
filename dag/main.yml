@@ -715,6 +715,19 @@ steps:
   data://grapher/oecd/2025-07-03/affordable_housing:
     - data://garden/oecd/2025-07-03/affordable_housing
 
+
+  # Housing indicators from Korevaar et al.
+  #
+  data://meadow/housing/2025-07-11/korevaar:
+    - snapshot://housing/2025-07-11/korevaar.xlsx
+  data://garden/housing/2025-07-11/korevaar:
+    - data://meadow/housing/2025-07-11/korevaar
+    - data://meadow/housing/2025-07-11/korevaar_quality
+  data://grapher/housing/2025-07-11/korevaar:
+    - data://garden/housing/2025-07-11/korevaar
+  data://meadow/housing/2025-07-11/korevaar_quality:
+    - snapshot://housing/2025-07-11/korevaar_quality.xlsx
+
   #
   # Gallup World Poll: Life in Five Years and Life Today
   #
