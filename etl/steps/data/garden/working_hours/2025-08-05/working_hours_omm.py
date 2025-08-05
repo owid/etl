@@ -26,8 +26,6 @@ def run() -> None:
     #
     tb = merge_tables(tb_pwt, tb_hm)
 
-    print(tb)
-
     # Improve table format.
     tb = tb.format(["country", "year"], short_name=paths.short_name)
 
