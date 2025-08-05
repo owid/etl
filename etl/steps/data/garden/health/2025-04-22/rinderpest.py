@@ -35,7 +35,7 @@ def run() -> None:
         # to match the other countries.
         # Kosovo is listed as the 1890s so we replace it with 1899 to match the other countries.
         # We also replace the values for Liechtenstein of 19th century with 1899 to match the other countries.
-        .replace({"1950s": "1959", "1890s": "1899", "19th century": "1899", "Never reported": pd.NA})
+        .replace({"1950s": "1959", "1890s": "1899", "19th century": "1899", "Never reported": "0"})
     )
 
     # Improve table format.
