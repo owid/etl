@@ -10,36 +10,38 @@ definitions:
       numDecimalPlaces: 0
 
   all:
+    ucdp_linked: |-
+      [Uppsala Conflict Data Program (UCDP)](https://ucdp.uu.se/)
     # Explanation of each conflict type
     conflict_type_base: |-
       This includes combatant and civilian deaths due to fighting
     conflict_type: |-
       <%- if conflict_type == "all" -%>
-      An armed conflict is defined by the Uppsala Conflict Data Program (UCDP) as a disagreement between organized groups, or between one organized group and civilians, that causes at least 25 deaths during a year. This includes combatant and civilian deaths due to fighting.
+      An armed conflict is defined by the {definitions.all.ucdp_linked} as a disagreement between organized groups, or between one organized group and civilians, that causes at least 25 deaths during a year. This includes combatant and civilian deaths due to fighting.
 
       <%- elif conflict_type == "state-based" -%>
-      A state-based conflict is defined by the Uppsala Conflict Data Program (UCDP) as a conflict between two armed groups, at least one of which is a state, that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}.
+      A state-based conflict is defined by the {definitions.all.ucdp_linked} as a conflict between two armed groups, at least one of which is a state, that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}.
 
       <%- elif conflict_type == "interstate" -%>
-      An interstate conflict is defined by the Uppsala Conflict Data Program (UCDP) as a conflict between states that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}.
+      An interstate conflict is defined by the {definitions.all.ucdp_linked} as a conflict between states that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}.
 
       <%- elif conflict_type == "intrastate" -%>
-      A civil conflict is defined by the Uppsala Conflict Data Program (UCDP) as a conflict between a state and a non-state armed group that causes at least 25 deaths during a year. A non-state armed group can be a rebel group, criminal organization, or ethnic group. Foreign states can still be involved in a supporting role. {definitions.all.conflict_type_base}.
+      A civil conflict is defined by the {definitions.all.ucdp_linked} as a conflict between a state and a non-state armed group that causes at least 25 deaths during a year. A non-state armed group can be a rebel group, criminal organization, or ethnic group. Foreign states can still be involved in a supporting role. {definitions.all.conflict_type_base}.
 
       <%- elif conflict_type == "intrastate (internationalized)" -%>
-      A foreign-backed civil conflict is defined by the Uppsala Conflict Data Program (UCDP) as a conflict between a state and a non-state armed group that causes at least 25 deaths during a year, and at least one foreign state is involved in a supporting role. A non-state armed group can be a rebel group, criminal organization, or ethnic group. {definitions.all.conflict_type_base}.
+      A foreign-backed civil conflict is defined by the {definitions.all.ucdp_linked} as a conflict between a state and a non-state armed group that causes at least 25 deaths during a year, and at least one foreign state is involved in a supporting role. A non-state armed group can be a rebel group, criminal organization, or ethnic group. {definitions.all.conflict_type_base}.
 
       <%- elif conflict_type == "intrastate (non-internationalized)" -%>
-      A domestic civil conflict is defined by the Uppsala Conflict Data Program (UCDP) as a conflict between a state and a non-state armed group that causes at least 25 deaths during a year, and no foreign state is involved in a supporting role. A non-state armed group can be a rebel group, criminal organization, or ethnic group. {definitions.all.conflict_type_base}.
+      A domestic civil conflict is defined by the {definitions.all.ucdp_linked} as a conflict between a state and a non-state armed group that causes at least 25 deaths during a year, and no foreign state is involved in a supporting role. A non-state armed group can be a rebel group, criminal organization, or ethnic group. {definitions.all.conflict_type_base}.
 
       <%- elif conflict_type == "extrasystemic" -%>
-      A colonial conflict is defined by the Uppsala Conflict Data Program (UCDP) as a conflict between a state and a non-state armed group that causes at least 25 deaths during a year, and takes place outside of the state's territory. {definitions.all.conflict_type_base}.
+      A colonial conflict is defined by the {definitions.all.ucdp_linked} as a conflict between a state and a non-state armed group that causes at least 25 deaths during a year, and takes place outside of the state's territory. {definitions.all.conflict_type_base}.
 
       <%- elif conflict_type == "non-state conflict" -%>
-      A non-state conflict is defined by the Uppsala Conflict Data Program (UCDP) as a conflict between non-state armed groups, such as rebel groups, criminal organizations, or ethnic groups, that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}.
+      A non-state conflict is defined by the {definitions.all.ucdp_linked} as a conflict between non-state armed groups, such as rebel groups, criminal organizations, or ethnic groups, that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}.
 
       <%- elif conflict_type == "one-sided violence" -%>
-      One-sided violence is defined by the Uppsala Conflict Data Program (UCDP) as the use of armed force by a state or non-state armed group against civilians that causes at least 25 civilian deaths during a year.
+      One-sided violence is defined by the {definitions.all.ucdp_linked} as the use of armed force by a state or non-state armed group against civilians that causes at least 25 civilian deaths during a year.
 
       <%- endif -%>
     location_conflicts_method: |-
@@ -100,7 +102,7 @@ definitions:
       - UCDP identifies conflict deaths [based on news reports, other contemporary sources, and academic research](https://www.uu.se/en/department/peace-and-conflict-research/research/ucdp/ucdp-methodology).
       - *key_point_pre_1
       - *key_point_pre_2
-      - "We show here the \"best\" death estimates as identified by UCDP. They also report high and low estimates."
+      - 'We show here the "best" death estimates as identified by UCDP. They also report high and low estimates.'
 
   number_deaths_type:
     description_short: |-
@@ -323,11 +325,34 @@ tables:
           {definitions.all.location_conflicts_method}
         presentation:
           grapher_config:
-            note: *preliminary_note
             map:
               colorScale:
-                binningStrategy: "manual"
-                customNumericValues: [0, 10, 100, 1000, 10000, 100000]
+                baseColorScheme: OrRd
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 0.99
+                  - 10
+                  - 100
+                  - 1000
+                  - 10000
+                  - 10000
+                customNumericLabels:
+                  - "0"
+                  - null
+                  - null
+                  - null
+                  - null
+                  - null
+                  - null
+                customNumericColorsActive: true
+                customNumericColors:
+                  - "#e8f4ea"
+                  - null
+                  - null
+                  - null
+                  - null
+                  - null
 
       number_deaths_ongoing_conflicts_high:
         title: Deaths in ongoing conflicts (high estimate)
@@ -398,7 +423,7 @@ tables:
             map:
               colorScale:
                 binningStrategy: "manual"
-                customNumericValues: [0, 0.1, 0.3, 1, 3, 10, 30, 100]
+                customNumericValues: [0, 0.1, 0.3, 1, 3, 10, 30, 100, 100]
 
       number_deaths_ongoing_conflicts_high_per_capita:
         title: Death rate in ongoing conflicts (high estimate)
@@ -441,7 +466,7 @@ tables:
             map:
               colorScale:
                 binningStrategy: "manual"
-                customNumericValues: [0, 1, 2, 5, 10]
+                customNumericValues: [0, 1, 2, 5, 10, 10]
           attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2025); geoBoundaries (2023)
 
       number_ongoing_conflicts_per_country:
