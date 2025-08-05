@@ -1,6 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-import owid.catalog.processing as pr
 import shared as sh
 from owid.catalog import Table
 
@@ -10,7 +9,18 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-REGIONS_OF_INTEREST = ["European Union (IMF)", "Europe", "China", "United States", "Asia"]
+REGIONS_OF_INTEREST = [
+    "European Union (IMF)",
+    "China",
+    "United States",
+    "North America",
+    "South America",
+    "Africa",
+    "Asia",
+    "Europe",
+    "Asia (excl. China)",
+    "Oceania",
+]
 REGIONS_OWID = ["North America", "South America", "Europe", "Africa", "Asia", "Oceania"]
 # Column name constants
 EXPORT_COL = "Exports of goods, Free on board (FOB), US dollar"
@@ -66,17 +76,49 @@ def run() -> None:
         country_col="country",
         regions=REGIONS_OWID + ["World"],
     )
+
+    # Create "Asia - China" region by aggregating Asian countries excluding China
+    asia_members = geo.list_members_of_region(region="Asia", ds_regions=ds_regions)
+    asia_minus_china_members = [country for country in asia_members if country != "China"]
+
+    # Add Asia - China as a region for both country columns
+    tb = geo.add_region_aggregates(
+        tb,
+        region="Asia (excl. China)",
+        countries_in_region=asia_minus_china_members,
+        index_columns=["country", "year", "indicator", "counterpart_country"],
+        country_col="counterpart_country",
+    )
+
+    tb = geo.add_region_aggregates(
+        tb,
+        region="Asia (excl. China)",
+        countries_in_region=asia_minus_china_members,
+        index_columns=["country", "year", "indicator", "counterpart_country"],
+        country_col="country",
+    )
+
     # Define member countries for each OWID region, excluding "World".
     members = set()
     for region in REGIONS_OWID:
         members.update(geo.list_members_of_region(region=region, ds_regions=ds_regions))
 
     tb = tb[
-        (tb["country"].isin(list(members) + REGIONS_OWID + ["European Union (IMF)"]))
+        (tb["country"].isin(list(members) + REGIONS_OF_INTEREST))
         & (tb["counterpart_country"].isin(REGIONS_OF_INTEREST + ["World"]))
     ]
-
     tb = calculate_trade_shares_as_share_world(tb)
+    tb.loc[tb["country"] == tb["counterpart_country"], "counterpart_country"] = "Intraregional"
+    tb = tb[
+        [
+            "country",
+            "year",
+            "counterpart_country",
+            "exports_of_goods__free_on_board__fob__share",
+            "imports_of_goods__cost_insurance_freight__cif__share",
+            "share_of_total_trade",
+        ]
+    ].copy()
 
     # Improve table format.
     tb = tb.format(["country", "year", "counterpart_country"])
@@ -111,35 +153,17 @@ def calculate_trade_shares_as_share_world(tb: Table) -> Table:
             }
         )
     )
-    print(world_totals)
-
-    # 2) Remove the world‐total rows from the main table
     tb = tb[tb["counterpart_country"] != "World"]
 
-    # 2) Merge those world‐totals back onto every row for that country‐year
+    # Merge totals back to main table
     tb = tb.merge(world_totals, on=["country", "year"], how="left")
 
     # 3) Now compute shares exactly as before
     tb["exports_of_goods__free_on_board__fob__share"] = tb[EXPORT_COL] / tb["total_exports"] * 100
     tb["imports_of_goods__cost_insurance_freight__cif__share"] = tb[IMPORT_COL] / tb["total_imports"] * 100
-    print(tb.columns)
-    tb = tb[
-        [
-            "country",
-            "year",
-            "counterpart_country",
-            EXPORT_COL,
-            IMPORT_COL,
-            "exports_of_goods__free_on_board__fob__share",
-            "imports_of_goods__cost_insurance_freight__cif__share",
-        ]
-    ].copy()
+    tb["total_trade_volume"] = tb["total_exports"] + tb["total_imports"]
+    tb["bilateral_trade_volume"] = tb[EXPORT_COL] + tb[IMPORT_COL]
 
-    tb = tb.rename(
-        columns={
-            EXPORT_COL: "exports_of_goods__free_on_board__fob",
-            IMPORT_COL: "imports_of_goods__cost_insurance_freight__cif",
-        }
-    )
+    tb["share_of_total_trade"] = tb["bilateral_trade_volume"] / tb["total_trade_volume"] * 100
 
     return tb
