@@ -27,9 +27,9 @@ tables:
       #   unit: arbitrary units
       #   short_unit: au
       #   description_short: Short description of testing variable.
+      #   description_key: List of key points about the indicator.
       #   processing_level: minor
       #   description_processing: Description of processing of testing variable.
-      #   description_key: List of key points about the indicator.
       #   description_from_producer: Description of testing variable from producer.
       #   type:
       #   sort:

@@ -741,6 +741,16 @@ steps:
   data://grapher/working_hours/2025-08-05/huberman_minns:
     - data://garden/working_hours/2025-08-05/huberman_minns
 
+
+  #
+  # Working hours OMM
+  #
+  data://garden/working_hours/2025-08-05/working_hours_omm:
+    - data://garden/ggdc/2025-07-31/penn_world_table
+    - data://garden/working_hours/2025-08-05/huberman_minns
+  data://grapher/working_hours/2025-08-05/working_hours_omm:
+    - data://garden/working_hours/2025-08-05/working_hours_omm
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml

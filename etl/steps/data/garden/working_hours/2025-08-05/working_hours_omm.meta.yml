@@ -1,0 +1,35 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Working Hours
+      attribution_short: Huberman and Minns, Penn World Table
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  working_hours_omm:
+    variables:
+      working_hours_omm:
+        title: Working hours per worker
+        unit: hours
+        short_unit: h
+        description_short: Average working hours per worker in a given year.
+        description_key:
+          - This indicator combines data from Huberman and Minns (2007) (between 1870 and 1938) with the Penn World Table (1950 onward).
+          - "The definitions of working hours differ between the sources: while Huberman and Minns focus on full-time production workers in non-agricultural activities, Penn World Table data includes all employees and self-employed people in the economy."
+          - Even considering these differences, the data from Huberman and Minns represent a good approximation of the average working hours in the past.
+        processing_level: major
+        description_processing: |-
+          We selected the data from Huberman and Minns (2007) for the period between 1870 and 1938, and combined it with the entire Penn World Table dataset (indicator `avh`).
+        display:
+          name: Working hours per worker
+          numDecimalPlaces: 0
+          tolerance: 5
+
