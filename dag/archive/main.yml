@@ -596,6 +596,11 @@ steps:
   data://grapher/ggdc/2022-11-28/penn_world_table:
     - data://garden/ggdc/2022-11-28/penn_world_table
 
+  data://garden/ggdc/2020-10-01/ggdc_maddison:
+    - snapshot://ggdc/2020-10-01/ggdc_maddison.xlsx
+  data://grapher/ggdc/2020-10-01/ggdc_maddison:
+    - data://garden/ggdc/2020-10-01/ggdc_maddison
+
 include:
   # Include all active steps plus all archive steps.
   - dag/main.yml
@@ -622,3 +627,4 @@ include:
   - dag/archive/migration.yml
   - dag/archive/redistribution.yml
   - dag/archive/wizard.yml
+  - dag/archive/growth.yml
