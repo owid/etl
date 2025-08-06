@@ -500,13 +500,6 @@ steps:
   data://grapher/who/2024-07-30/ghe:
     - data://garden/who/2024-07-30/ghe
 
-  # WHO Mortality Database - Cancer specific
-  data://meadow/who/2024-08-06/mortality_database_cancer:
-    - snapshot://who/2024-08-06/mortality_database_cancer.csv
-  data://garden/who/2024-08-06/mortality_database_cancer:
-    - data://meadow/who/2024-08-06/mortality_database_cancer
-  data://grapher/who/2024-08-06/mortality_database_cancer:
-    - data://garden/who/2024-08-06/mortality_database_cancer
   # Most common cancers
   data://garden/who/2024-08-06/mortality_database_cancer_most_common:
     - data://garden/who/2025-08-05/mortality_database_cancer
