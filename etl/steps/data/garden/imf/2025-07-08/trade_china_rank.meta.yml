@@ -1,0 +1,30 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: major
+    display:
+     numDecimalPlaces: 1
+    presentation:
+      topic_tags:
+        - Trade & Globalization
+
+  decimals: &decimals 1
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  title: IMF (China's Rank)
+  update_period_days: 365
+
+
+tables:
+  trade:
+    variables:
+      china_import_rank:
+        title: "China's rank in imports of goods (CIF)"
+        unit: rank
+        short_unit: ''
+      united_states_import_rank:
+        title: "United States' rank in imports of goods (CIF)"
+        unit: rank
+        short_unit: ''
