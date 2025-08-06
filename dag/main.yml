@@ -417,15 +417,6 @@ steps:
   data://grapher/un/2024-06-24/sdg_regions:
     - data://garden/un/2024-06-24/sdg_regions
 
-  # WHO Mort DB Homicides
-  data://meadow/homicide/2024-07-30/who_mort_db:
-    - snapshot://homicide/2024-07-30/who_mort_db.csv
-  data://garden/homicide/2024-07-30/who_mort_db:
-    - data://meadow/homicide/2024-07-30/who_mort_db
-    - data://garden/un/2022-07-11/un_wpp
-  data://grapher/homicide/2024-07-30/who_mort_db:
-    - data://garden/homicide/2024-07-30/who_mort_db
-
   # Homicide - OMM
   data://garden/homicide/2024-07-30/homicide_long_run_omm:
     - snapshot://fasttrack/2023-01-03/long_term_homicide_rates_in_europe.csv
