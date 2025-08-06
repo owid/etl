@@ -22,7 +22,7 @@ tables:
         unit: deaths per 100,000 population
         short_unit: ''
         description_short: Reported annual death rate from self-inflicted injuries per 100,000 people, based on the [underlying cause](#dod:underlying-cause-of-death) listed on death certificates.
-        description_from_producer: Underlying causes of death grouped under this heading are those grouped under the ICD codes X60-X84, Y870.
+        description_from_producer: Underlying causes of death grouped under this heading are those grouped under the ICD codes X60-X84, Y87.0.
         display:
           numDecimalPlaces: 1
 
