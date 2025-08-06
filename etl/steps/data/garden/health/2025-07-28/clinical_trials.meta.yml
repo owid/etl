@@ -4,6 +4,8 @@ definitions:
     presentation:
       topic_tags:
         - Medicine & Biotechnology
+    display:
+          numDecimalPlaces: 0
     processing_level: major
   notes:
     completion_date: |
@@ -205,11 +207,24 @@ tables:
         unit: days
         short_unit: days
         description_processing: |-
-          - The completion date is the year when the trial was completed.
           - The average length is calculated by taking the difference between the start date and completion date of each trial, grouped by phase and completion year.
         description_key:
           - "{definitions.notes.completed_trials}"
-          - Clinical trials are conducted in different phases of the development of a new treatment or intervention, such as [Early phase 1](#dod:early-phase-one-trial), [phase 1](#dod:phase-one-trial), [phase 2](#dod:phase-two-trial), [phase 3](#dod:phase-three-trial), or [phase 4](#dod:phase-four-trial).
+          - Clinical trials are conducted in different phases of the development of a new treatment or intervention, such as [early phase 1](#dod:early-phase-one-trial), [phase 1](#dod:phase-one-trial), [phase 2](#dod:phase-two-trial), [phase 3](#dod:phase-three-trial), or [phase 4](#dod:phase-four-trial).
           - Phase 1 trials test the safety and dosage of a new treatment, phase 2 trials test the effectiveness and side effects, and phase 3 trials compare the new treatment to standard treatments.
           - \"Phase 1/phase 2\" trials are a combination of phase 1 and phase 2 trials, and "phase 2/phase 3" trials are a combination of phase 2 and phase 3 trials.
           - The average length is calculated by taking the difference between the start date and completion date of each trial, grouped by phase and completion year.
+  participants_per_year:
+    variables:
+      avg_participants:
+        title: Average number of participants in clinical trials
+        description_short: |
+          The average number of participants in completed clinical trials registered in the [ClinicalTrials.gov](#dod:clinical-trials-gov) database, grouped by phase and completion year. The phase refers to the phase of drug development the drug is currently in ([early phase 1](#dod:early-phase-one-trial), [phase 1](#dod:phase-one-trial), [phase 2](#dod:phase-two-trial), [phase 3](#dod:phase-three-trial) or [phase 4](#dod:phase-four-trial)). Some trials also combine phases e.g. have a combined "phase 1/2" trial.
+        unit: participants
+        short_unit: ""
+        description_key:
+          - "{definitions.notes.completed_trials}"
+          - Clinical trials are conducted in different phases of the development of a new treatment or intervention, such as [early phase 1](#dod:early-phase-one-trial), [phase 1](#dod:phase-one-trial), [phase 2](#dod:phase-two-trial), [phase 3](#dod:phase-three-trial), or [phase 4](#dod:phase-four-trial).
+          - Phase 1 trials test the safety and dosage of a new treatment, phase 2 trials test the effectiveness and side effects, and phase 3 trials compare the new treatment to standard treatments.
+          - \"Phase 1/phase 2\" trials are a combination of phase 1 and phase 2 trials, and "phase 2/phase 3" trials are a combination of phase 2 and phase 3 trials.
+          - The average number of participants is calculated by adding all participants for each phase and completion year, and dividing by the number of trials in that phase and year.

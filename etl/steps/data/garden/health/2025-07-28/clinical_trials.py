@@ -74,6 +74,8 @@ STUDY_TYPE_REPLACEMENTS = {
     "EXPANDED_ACCESS": "Expanded access",
 }
 
+RESULTS_REPLACEMENTS = {"NO": "No results posted on CT.gov", "YES": "Results posted on CT.gov"}
+
 
 def extract_allocation(design_string: str):
     """
@@ -327,7 +329,8 @@ def run() -> None:
     tb_study_type["Study Type"] = tb_study_type["Study Type"].replace(STUDY_TYPE_REPLACEMENTS)
     tb_status["Study Status"] = tb_status["Study Status"].replace(STATUS_REPLACEMENTS)
     tb_length["Phases"] = tb_length["Phases"].replace(PHASE_REPLACEMENTS)
-    # TODO: do this for results as well
+    tb_participants["Phases"] = tb_participants["Phases"].replace(PHASE_REPLACEMENTS)
+    tb_results["Study Results"] = tb_results["Study Results"].replace(RESULTS_REPLACEMENTS)
 
     # Improve table formats.
     (
@@ -361,6 +364,7 @@ def run() -> None:
         tb_status,
         tb_results,
         tb_length,
+        tb_participants,
     ]
 
     #
@@ -428,7 +432,7 @@ def format_tables(
     tb_status = tb_status.rename(columns=replacement_dict)
     tb_results = tb_results.rename(columns=replacement_dict)
     tb_length = tb_length.rename(columns=replacement_dict)
-    tb_participants = tb_length.rename(columns=replacement_dict)
+    tb_participants = tb_participants.rename(columns=replacement_dict)
 
     # set the index to year and country for each table
     tb_trials = tb_trials.format(["year", "country"], short_name="trials_per_year")

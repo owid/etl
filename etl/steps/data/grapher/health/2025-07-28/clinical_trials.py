@@ -22,9 +22,10 @@ def run() -> None:
     tb_status_per_year = ds_garden.read("status_per_year", reset_index=False)
     tb_length_per_year = ds_garden.read("length_per_year", reset_index=False)
     tb_intervention_per_year = ds_garden.read("interventions_per_year")
+    tb_results_per_year = ds_garden.read("results_per_year", reset_index=False)
+    tb_participants_per_year = ds_garden.read("participants_per_year", reset_index=False)
 
     tb_intervention_per_year["country"] = "World"
-
     tb_intervention_per_year = tb_intervention_per_year.format(["year", "country"])
 
     tables_ls = [
@@ -35,6 +36,8 @@ def run() -> None:
         tb_purpose_per_year,
         tb_status_per_year,
         tb_length_per_year,
+        tb_results_per_year,
+        tb_participants_per_year,
     ]
     #
     # Save outputs.
