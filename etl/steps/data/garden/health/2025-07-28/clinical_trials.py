@@ -378,7 +378,7 @@ def group_trials_by(tb, group_by_cols, new_col_name, completed_only=True, aggreg
     Group trials by specified columns and count the number of studies.
     """
     if completed_only:
-        tb_gb = tb[tb["Study Status"] == "Completed"].copy()
+        tb_gb = tb[tb["Study Status"] == "COMPLETED"].copy()
     else:
         tb_gb = tb.copy()
 
