@@ -66,7 +66,7 @@ steps:
   data://garden/health/2023-04-18/wgm_mental_health:
     - data://meadow/health/2023-04-18/wgm_mental_health
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2021-07-01/wb_income
+    - data://garden/wb/2025-07-01/income_groups
   data://grapher/health/2023-04-19/wgm_mental_health:
     - data://garden/health/2023-04-18/wgm_mental_health
   # WGM 2018
@@ -75,7 +75,7 @@ steps:
   data://garden/health/2023-04-25/wgm_2018:
     - data://meadow/health/2023-04-25/wgm_2018
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2021-07-01/wb_income
+    - data://garden/wb/2025-07-01/income_groups
   data://grapher/health/2023-04-26/wgm_2018:
     - data://garden/health/2023-04-25/wgm_2018
 
@@ -100,7 +100,7 @@ steps:
     - data://garden/who/2025-05-19/gho
     - snapshot://fasttrack/2023-05-31/cholera.csv
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2021-07-01/wb_income
+    - data://garden/wb/2025-07-01/income_groups
   data://grapher/who/2023-06-01/cholera:
     - data://garden/who/2023-06-01/cholera
 
