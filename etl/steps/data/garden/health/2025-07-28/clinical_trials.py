@@ -377,18 +377,17 @@ def group_trials_by(tb, group_by_cols, new_col_name, completed_only=True, aggreg
     """
     Group trials by specified columns and count the number of studies.
     """
+    tb_gb = tb.copy()
     if completed_only:
-        tb_gb = tb[tb["Study Status"] == "COMPLETED"].copy()
-    else:
-        tb_gb = tb.copy()
+        tb_gb = tb_gb[tb_gb["Study Status"] == "COMPLETED"]
 
     if aggregate_func == "count":
-        tb_gb = (tb.groupby(group_by_cols).size().reset_index(name=new_col_name)).copy_metadata(tb)
+        tb_gb = (tb_gb.groupby(group_by_cols).size().reset_index(name=new_col_name)).copy_metadata(tb)
 
     elif aggregate_func == "mean":
         if avg_col_name is None:
             raise ValueError("avg_col_name must be provided when aggregate_func is 'mean'")
-        tb_gb = (tb.groupby(group_by_cols)[avg_col_name].mean().reset_index(name=new_col_name)).copy_metadata(tb)
+        tb_gb = (tb_gb.groupby(group_by_cols)[avg_col_name].mean().reset_index(name=new_col_name)).copy_metadata(tb)
     else:
         raise ValueError("aggregate_func must be either 'count' or 'mean'")
 
