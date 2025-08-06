@@ -435,7 +435,7 @@ def _validate_regional_aggregation(tb: Table, metadata: dict) -> None:
                     world_data = year_data[year_data["country"] == "World"]
                     
                     if len(regional_data) == len(regions) and len(world_data) == 1:
-                        regional_total = regional_data[var_name].sum()
+                        regional_total = regional_data[var_name].sum(skipna=True)
                         world_total = world_data[var_name].iloc[0]
                         
                         # Allow small tolerance for rounding differences
