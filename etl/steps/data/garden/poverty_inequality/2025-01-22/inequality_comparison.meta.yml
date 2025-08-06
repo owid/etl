@@ -23,7 +23,7 @@ definitions:
       2. The same reporting level (first national, then urban, then rural, then different).
 
   description_processing_reduced_set: |-
-    Additionally, this dataset includes only the countries that are available in both the World Bank Poverty and Inequality Platform and the World Inequality Database. We applied this restriction so we can compare the results across these two sources more effectively.
+    Finally, this dataset includes only the countries that are available in both the World Bank Poverty and Inequality Platform and the World Inequality Database. We applied this restriction so we can compare the results across these two sources more effectively.
 
 
 # Learn more about the available fields:
