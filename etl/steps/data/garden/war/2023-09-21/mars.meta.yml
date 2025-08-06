@@ -8,13 +8,21 @@ definitions:
     processing_level: major
 
   all:
+    faq_why_not_country_data: |-
+      The conflict-level data by Project Mars cannot be neatly mapped to individual countries, which is why we only present aggregated data for the world and world regions.
+    deaths_method: |-
+      Project Mars identifies war deaths based on contemporary sources and academic research.
+    wars_multitype: |-
+      Project Mars considers wars "MNF in Lebanon, 1982-1984" and "Afghan War I, 1996-2001" to have had elements of both an interstate and a civil war. We have treated them overall as interstate wars to make our charts simpler.
+    mars_linked: |-
+      [Project Mars](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/DUO7IE)
     conflict_type: |-
       <%- if conflict_type == "all" %>
-      A war is a conflict between states with differentiated militaries and clear frontlines that causes at least 500 deaths over its duration.
+      A war is defined by {definitions.all.mars_linked} as a conflict between states with differentiated militaries and clear frontlines that causes at least 500 deaths over its duration.
       <%- elif conflict_type == "others (non-civil)" %>
-      An interstate war is a conflict between states with differentiated militaries and clear frontlines that causes at least 500 deaths over its duration.
+      An interstate war is defined by {definitions.all.mars_linked} as a conflict between states with differentiated militaries and clear frontlines that causes at least 500 deaths over its duration.
       <%- elif conflict_type == "civil war" %>
-      A civil war is a conflict between combatants that were previously part of the same state, but now at least one seeks control or secession. It is fought with differentiated militaries and clear frontlines and causes at least 500 deaths over its duration.
+      A civil war is defined by {definitions.all.mars_linked} as a conflict between combatants that were previously part of the same state, but now at least one seeks control or secession. It is fought with differentiated militaries and clear frontlines and causes at least 500 deaths over its duration.
       <%- endif -%>
     conflict_type_noncivil: |-
       <%- if conflict_type == "others (non-civil)" -%>
@@ -51,17 +59,19 @@ definitions:
     description_key: &description_key_deaths
       - "{definitions.all.conflict_type}"
       - If a war lasted more than one year, we distributed its deaths evenly across years.
-      - Project Mars identifies war deaths based on contemporary sources and academic research.
-      - For the two wars that had campaigns within it that were classified as both a civil war and an interstate war, we coded them as interstate wars.
+      - "{definitions.all.deaths_method}"
+      - "{definitions.all.wars_multitype}"
+      - "{definitions.all.faq_why_not_country_data}"
 
   number_ongoing_conflicts:
     description_short: |-
       {definitions.all.conflicts_description}.
     description_key: &description_key_ongoing
       - "{definitions.all.conflict_type}"
-      - Project Mars identifies war deaths based on contemporary sources and academic research.
-      - For the two wars that had campaigns within it that were classified as both a civil war and an interstate war, we coded them as interstate wars.
+      - "{definitions.all.deaths_method}"
+      - "{definitions.all.wars_multitype}"
       - A war may be ongoing in multiple regions at the same time. In such cases, we count the war as ongoing in all the affected regions.
+      - "{definitions.all.faq_why_not_country_data}"
 
   number_new_conflicts:
     description_short: |-
