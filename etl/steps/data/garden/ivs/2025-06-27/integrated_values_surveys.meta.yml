@@ -6,12 +6,14 @@ definitions:
       topic_tags:
         - Trust
     processing_level: major
+    description_key:
+      - The years in the data represent the latest year of each Integrated Values Surveys wave, which is not necessarily the year of the survey. For example, the 2022 wave (IVS wave 7) includes surveys conducted between 2017 and 2022.
     description_processing: |
-      We collected the data by merging the World Values Survey and the European Values Study, following the methodology described in the [Integrated Values Surveys website](https://www.worldvaluessurvey.org/WVSEVStrend.jsp).
+      We collected the data by merging the World Values Survey and the European Values Study, following the methodology described in the [Integrated Values Surveys (IVS) website](https://www.worldvaluessurvey.org/WVSEVStrend.jsp).
 
-      We processed the indicators from microdata of the Integrated Values Surveys (IVS) using Stata. Weights are applied for each country.
+      We processed the indicators from microdata of the IVS using Stata. Weights are applied for each country.
 
-      We calculated regional aggregations for some indicators, by weighting each country by its population size.
+      We processed the years in the data to represent the latest year of each IVS wave, which is not necessarily the year of the survey. For example, the 2022 wave (IVS wave 7) includes surveys conducted between 2017 and 2022.
     display: &common-display
       numDecimalPlaces: 1
       tolerance: 5
