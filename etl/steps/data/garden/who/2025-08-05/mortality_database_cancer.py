@@ -43,8 +43,8 @@ def run() -> None:
     # Calculate death rates for  combined age groups.
     # The death rate is per 100,000 population, so we reverse-calculate the population size.
     tb["estimated_population"] = tb["number"] / tb["death_rate_per_100_000_population"] * 100000
-    tb = add_age_group_aggregate(tb, ["less than 1 year", "1-4 years"], "< 5 years")
-    tb = add_age_group_aggregate(tb, ["less than 1 year", "1-4 years", "5-9 years"], "< 10 years")
+    tb = add_age_group_aggregate(tb, ["less than 1 year", "1-4 years"], "<5 years")
+    tb = add_age_group_aggregate(tb, ["less than 1 year", "1-4 years", "5-9 years"], "<10 years")
     tb = tb.drop(columns=["estimated_population"])
 
     # Final validation BEFORE formatting
@@ -56,7 +56,9 @@ def run() -> None:
 
     # Format table (sets indexes) - do this AFTER validation
     tb = tb.format(["country", "year", "sex", "age_group", "cause", "icd10_codes"])
-    ds_garden = paths.create_dataset(tables=[tb], check_variables_metadata=False, default_metadata=ds_meadow.metadata)
+    ds_garden = paths.create_dataset(
+        tables=[tb], check_variables_metadata=False, default_metadata=ds_meadow.metadata, repack=False
+    )
     # Save changes in the new garden dataset.
     ds_garden.save()
     log.info("WHO cancer mortality database processing completed successfully")
@@ -85,7 +87,7 @@ def add_age_group_aggregate(tb: Table, age_groups: list[str], label: str) -> Tab
     # Recalculate the death rate for the new age group
     tb_filtered["death_rate_per_100_000_population"] = (
         tb_filtered["number"] / tb_filtered["estimated_population"] * 100000
-    )
+    ).fillna(0)
 
     # Assign new age group label
     tb_filtered["age_group"] = label
@@ -175,7 +177,6 @@ def _validate_cancer_mortality_values(tb: Table) -> None:
             )
 
 
-
 def _validate_demographic_dimensions(tb: Table) -> None:
     """Validate sex and age group categories."""
     expected_sex_categories = {"All", "Female", "Male", "Unknown"}
@@ -235,7 +236,7 @@ def _validate_demographic_dimensions(tb: Table) -> None:
             "85+ years",
             "Unknown age",
         }
-    
+
     actual_ages = set(tb["age_group"].unique())
     unexpected_ages = actual_ages - expected_age_groups
     if unexpected_ages:
