@@ -1,0 +1,55 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Mental Health
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+  title: WHO Mortality Database - Self-inflicted injuries
+
+tables:
+  self_inflicted_injuries:
+    variables:
+
+      death_rate_per_100_000_population:
+        title: Death rate from self-inflicted injuries per 100,000 population
+        unit: deaths per 100,000 population
+        short_unit: ''
+        description_short: Reported annual death rate from self-inflicted injuries per 100,000 people, based on the [underlying cause](#dod:underlying-cause-of-death) listed on death certificates.
+        description_from_producer: Underlying causes of death grouped under this heading are those grouped under the ICD codes X60-X84, Y870.
+        display:
+          numDecimalPlaces: 1
+
+      number:
+        title: Number of deaths from self-inflicted injuries
+        unit: ''
+        short_unit: ''
+        description_short: Number of deaths from self-inflicted injuries in the total population, based on the [underlying cause](#dod:underlying-cause-of-death) listed on death certificates.
+        description_from_producer: Number of deaths from purposely self-inflicted injuries, in the total population.  Underlying causes of death grouped under this heading are those grouped under the ICD codes X60-X84, Y870.
+        display:
+          numDecimalPlaces: 0
+
+      percentage_of_cause_specific_deaths_out_of_total_deaths:
+        title: Percentage of deaths from self-inflicted injuries out of total deaths
+        unit: '%'
+        short_unit: '%'
+        description_short: Percentage of deaths from self-inflicted injuries out of all deaths in the population, based on the [underlying cause](#dod:underlying-cause-of-death) listed on death certificates.
+        description_from_producer: Underlying causes of death grouped under this heading are those grouped under the ICD codes X60-X84, Y870.
+        display:
+          numDecimalPlaces: 2
+
+      age_standardized_death_rate_per_100_000_standard_population:
+        title: Age-standardized death rate from self-inflicted injuries per 100,000 population
+        description_short: Reported annual death rate from self-inflicted injuries per 100,000 people, based on the [underlying cause](#dod:underlying-cause-of-death) listed on death certificates. To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized).
+        unit: deaths per 100,000 population
+        short_unit: ''
+        description_from_producer: The data is standardized using the WHO standard population. Underlying causes of death grouped under this heading are those grouped under the ICD codes X60-X84, Y870.
+        display:
+          numDecimalPlaces: 1
+

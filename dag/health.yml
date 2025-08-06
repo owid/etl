@@ -1298,3 +1298,10 @@ steps:
     - data://meadow/who/2025-08-06/icd_codes
   data://grapher/who/2025-08-06/icd_codes:
     - data://garden/who/2025-08-06/icd_codes
+  # Suicides based on WHO Mortality Database
+  data://meadow/who/2025-08-06/self_inflicted_injuries:
+    - snapshot://who/2025-08-06/self_inflicted_injuries.csv
+  data://garden/who/2025-08-06/self_inflicted_injuries:
+    - data://meadow/who/2025-08-06/self_inflicted_injuries
+  data://grapher/who/2025-08-06/self_inflicted_injuries:
+    - data://garden/who/2025-08-06/self_inflicted_injuries
