@@ -19,12 +19,6 @@ steps:
   data://garden/gapminder/2023-03-31/population:
     - data://meadow/gapminder/2023-03-31/population
 
-  # Others
-  data://meadow/wb/2021-07-01/wb_income:
-    - snapshot://wb/2021-07-01/wb_income.xlsx
-  data://garden/wb/2021-07-01/wb_income:
-    - data://meadow/wb/2021-07-01/wb_income
-
   data://garden/ggdc/2020-10-01/ggdc_maddison:
     - snapshot://ggdc/2020-10-01/ggdc_maddison.xlsx
   data://grapher/ggdc/2020-10-01/ggdc_maddison:
@@ -164,7 +158,7 @@ steps:
     - snapshot://harvard/2023-09-18/colonial_dates_dataset.csv
   data://garden/harvard/2023-09-18/colonial_dates_dataset:
     - data://meadow/harvard/2023-09-18/colonial_dates_dataset
-    - data://garden/wb/2021-07-01/wb_income
+    - data://garden/wb/2025-07-01/income_groups
     - data://garden/regions/2023-01-01/regions
     - data://garden/demography/2023-03-31/population
   data://grapher/harvard/2023-09-18/colonial_dates_dataset:
@@ -244,7 +238,7 @@ steps:
     - snapshot://state_capacity/2023-10-19/state_capacity_dataset.dta
   data://garden/state_capacity/2023-10-19/state_capacity_dataset:
     - data://meadow/state_capacity/2023-10-19/state_capacity_dataset
-    - data://garden/wb/2021-07-01/wb_income
+    - data://garden/wb/2025-07-01/income_groups
     - data://garden/regions/2023-01-01/regions
     - data://garden/demography/2023-03-31/population
   data://grapher/state_capacity/2023-10-19/state_capacity_dataset:
@@ -255,7 +249,7 @@ steps:
     - snapshot://un/2023-10-30/un_members.csv
   data://garden/un/2023-10-30/un_members:
     - data://meadow/un/2023-10-30/un_members
-    - data://garden/wb/2021-07-01/wb_income
+    - data://garden/wb/2025-07-01/income_groups
     - data://garden/regions/2023-01-01/regions
     - data://garden/demography/2023-03-31/population
   data://grapher/un/2023-10-30/un_members:
@@ -274,7 +268,7 @@ steps:
     - snapshot://state_capacity/2023-11-10/information_capacity_dataset.dta
   data://garden/state_capacity/2023-11-10/information_capacity_dataset:
     - data://meadow/state_capacity/2023-11-10/information_capacity_dataset
-    - data://garden/wb/2021-07-01/wb_income
+    - data://garden/wb/2025-07-01/income_groups
     - data://garden/regions/2023-01-01/regions
   data://grapher/state_capacity/2023-11-20/information_capacity_dataset:
     - data://garden/state_capacity/2023-11-10/information_capacity_dataset
@@ -599,7 +593,7 @@ steps:
     - snapshot://un/2025-05-15/un_members.csv
   # United Nations members
   data://garden/un/2025-05-15/un_members:
-    - data://garden/wb/2021-07-01/wb_income
+    - data://garden/wb/2025-07-01/income_groups
     - data://garden/demography/2024-07-15/population
     - data://meadow/un/2025-05-15/un_members
     - data://garden/regions/2023-01-01/regions
