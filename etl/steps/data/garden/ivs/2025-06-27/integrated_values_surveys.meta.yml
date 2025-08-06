@@ -7,7 +7,7 @@ definitions:
         - Trust
     processing_level: major
     description_key:
-      - The years in the data represent the latest year of each Integrated Values Surveys wave, which is not necessarily the year of the survey. For example, the 2022 wave (IVS wave 7) includes surveys conducted between 2017 and 2022.
+      - The years in the data represent the latest year of each Integrated Values Surveys wave, which is not necessarily the year of the survey. For example, the 2022 wave (IVS wave 7) includes surveys conducted between 2017 and 2022. This is done to improve comparability across waves.
     description_processing: |
       We collected the data by merging the World Values Survey and the European Values Study, following the methodology described in the [Integrated Values Surveys (IVS) website](https://www.worldvaluessurvey.org/WVSEVStrend.jsp).
 
