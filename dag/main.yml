@@ -429,7 +429,7 @@ steps:
   # Homicide - OMM
   data://garden/homicide/2024-07-30/homicide_long_run_omm:
     - snapshot://fasttrack/2023-01-03/long_term_homicide_rates_in_europe.csv
-    - data://garden/homicide/2024-07-30/who_mort_db
+    - data://garden/homicide/2025-08-06/who_mort_db
   data://grapher/homicide/2024-07-30/homicide_long_run_omm:
     - data://garden/homicide/2024-07-30/homicide_long_run_omm
 
@@ -715,7 +715,6 @@ steps:
   data://grapher/oecd/2025-07-03/affordable_housing:
     - data://garden/oecd/2025-07-03/affordable_housing
 
-
   # Housing indicators from Korevaar et al.
   #
   data://meadow/housing/2025-07-11/korevaar:
@@ -747,11 +746,9 @@ steps:
   # WHO Mort DB Homicides
   data://meadow/homicide/2025-08-06/who_mort_db:
     - snapshot://homicide/2025-08-06/who_mort_db.csv
-
   data://garden/homicide/2025-08-06/who_mort_db:
     - data://garden/un/2024-07-12/un_wpp
     - data://meadow/homicide/2025-08-06/who_mort_db
-
   data://grapher/homicide/2025-08-06/who_mort_db:
     - data://garden/homicide/2025-08-06/who_mort_db
 

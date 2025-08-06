@@ -5,7 +5,7 @@ from structlog import get_logger
 
 from etl.data_helpers import geo
 from etl.data_helpers.population import add_population
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 log = get_logger()
 
