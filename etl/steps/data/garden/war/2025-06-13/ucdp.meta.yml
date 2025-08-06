@@ -328,9 +328,11 @@ tables:
                   - 100
                   - 1000
                   - 10000
-                  - 10000
+                  - 100000
+                  - 1
                 customNumericLabels:
                   - "0"
+                  - null
                   - null
                   - null
                   - null
@@ -340,6 +342,7 @@ tables:
                 customNumericColorsActive: true
                 customNumericColors:
                   - "#e8f4ea"
+                  - null
                   - null
                   - null
                   - null
@@ -414,7 +417,7 @@ tables:
             map:
               colorScale:
                 binningStrategy: "manual"
-                customNumericValues: [0, 0.1, 0.3, 1, 3, 10, 30, 100, 100]
+                customNumericValues: [0, 0.1, 0.3, 1, 3, 10, 30, 100, 1]
 
       number_deaths_ongoing_conflicts_high_per_capita:
         title: Death rate in ongoing conflicts (high estimate)
@@ -456,7 +459,7 @@ tables:
             map:
               colorScale:
                 binningStrategy: "manual"
-                customNumericValues: [0, 1, 2, 5, 10, 10]
+                customNumericValues: [0, 1, 2, 5, 10, 1]
           attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2025); geoBoundaries (2023)
 
       number_ongoing_conflicts_per_country:

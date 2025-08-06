@@ -79,6 +79,10 @@ definitions:
       <%- endif -%>
     description_short_per_capita: <% set per_capita = ", per 100,000 people" %>
       {definitions.number_deaths.description_short}
+    key_point_1: |-
+      This includes [interstate conflicts](#dod:interstate-ucdp), [civil conflicts](#dod:intrastate-ucdp), [non-state conflicts](#dod:nonstate-ucdp), [violence against civilians](#dod:onesided-ucdp), and [colonial conflicts](#dod:extrasystemic-ucdp).
+    key_point_2: |-
+      UCDP identifies conflict deaths [based on news reports, other contemporary sources, and academic research](https://www.uu.se/en/department/peace-and-conflict-research/research/ucdp/ucdp-methodology).
     key_point_pre_1: &key_point_pre_1 |-
       UCDP's data for 2025 is preliminary. This means the number of deaths may be too low because more information becomes available later, or they may be too high because some events are later found not to be part of an armed conflict. We still show this data to provide more up-to-date information, but figures on this chart may change in the future if UCDP revises its estimates.
     key_point_pre_2: &key_point_pre_2 |-
@@ -87,9 +91,9 @@ definitions:
       - "{definitions.all.conflict_type}"
       - |-
         <% if conflict_type == "all" -%>
-        This includes [interstate conflicts](#dod:interstate-ucdp), [civil conflicts](#dod:intrastate-ucdp), [colonial conflicts](#dod:extrasystemic-ucdp), [non-state conflicts](#dod:nonstate-ucdp), and [violence against civilians](#dod:onesided-ucdp).
+        {definitions.number_deaths.key_point_1}
         <%- endif %>
-      - UCDP identifies conflict deaths [based on news reports, other contemporary sources, and academic research](https://www.uu.se/en/department/peace-and-conflict-research/research/ucdp/ucdp-methodology).
+      - "{definitions.number_deaths.key_point_2}"
       - *key_point_pre_1
       - *key_point_pre_2
 
@@ -97,9 +101,9 @@ definitions:
       - "{definitions.all.conflict_type}"
       - |-
         <% if conflict_type == "all" -%>
-        This includes [interstate conflicts](#dod:interstate-ucdp), [civil conflicts](#dod:intrastate-ucdp), [colonial conflicts](#dod:extrasystemic-ucdp), [non-state conflicts](#dod:nonstate-ucdp), and [violence against civilians](#dod:onesided-ucdp).
+        {definitions.number_deaths.key_point_1}
         <%- endif %>
-      - UCDP identifies conflict deaths [based on news reports, other contemporary sources, and academic research](https://www.uu.se/en/department/peace-and-conflict-research/research/ucdp/ucdp-methodology).
+      - "{definitions.number_deaths.key_point_2}"
       - *key_point_pre_1
       - *key_point_pre_2
       - 'We show here the "best" death estimates as identified by UCDP. They also report high and low estimates.'
@@ -163,7 +167,7 @@ definitions:
       # - We count a conflict as ongoing in a region even if the conflict is also ongoing in other regions. The sum across all regions can therefore be higher than the total number of ongoing conflicts.
       - |-
         <% if conflict_type == "all" %>
-        This includes [interstate conflicts](#dod:interstate-ucdp), [civil conflicts](#dod:intrastate-ucdp), [colonial conflicts](#dod:extrasystemic-ucdp), [non-state conflicts](#dod:nonstate-ucdp), and [violence against civilians](#dod:onesided-ucdp).
+        {definitions.number_deaths.key_point_1}
         <%- elif conflict_type == "state-based" -%>
         This includes [interstate conflicts](#dod:interstate-ucdp), [civil conflicts](#dod:intrastate-ucdp), and [colonial conflicts](#dod:extrasystemic-ucdp).
         <%- endif %>

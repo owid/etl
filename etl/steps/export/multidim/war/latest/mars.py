@@ -243,7 +243,7 @@ def _set_subtitle(view):
     elif view.d.indicator == "wars_ongoing":
         return f"Included are {dods}."
     elif view.d.indicator == "wars_ongoing_country_rate":
-        return f"The number of conflicts divided by the number of all states. This accounts for the changing number of states over time. Included are {dods} wars."
+        return f"The number of conflicts divided by the number of all states. This accounts for the changing number of states over time. Included are {dods}."
     else:
         raise ValueError(f"Unknown indicator {view.d.indicator}")
 
