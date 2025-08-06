@@ -285,6 +285,7 @@ def run() -> None:
 
     # get sum of studies by completion year by intervention type
     tb_interventions = tb.copy()
+    tb_interventions = tb_interventions[tb_interventions["Study Status"] == "COMPLETED"]
     tb_interventions[INTERVENTIONS] = tb_interventions[INTERVENTIONS].astype("Int64")
     intvt_cols = ["completion_year"] + INTERVENTIONS
     tb_interventions = tb_interventions[intvt_cols].groupby("completion_year").sum().reset_index().copy_metadata(tb)
@@ -297,7 +298,7 @@ def run() -> None:
     tb_purpose = group_trials_by(tb, ["primary_purpose", "completion_year"], "n_studies_purpose")
 
     # get sum of studies by completion year by status
-    tb_status = tb[tb["Study Type"] != "Expanded Access"]
+    tb_status = tb[tb["Study Type"] != "EXPANDED_ACCESS"].copy()
     tb_status = group_trials_by(tb_status, ["Study Status", "start_year"], "n_studies_status", completed_only=False)
 
     # get sum of studies by completion year and whether they have results
