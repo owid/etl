@@ -10,3 +10,9 @@ steps:
   data://grapher/un/2024-07-16/migrant_stock:
     - data://garden/un/2024-07-16/migrant_stock
 
+      # Migration distances
+  data://garden/migration/2024-11-19/migration_distance:
+    - data://garden/un/2025-03-12/migrant_stock
+    - data://garden/geography/2023-11-28/nat_earth_110
+  data://grapher/migration/2024-11-19/migration_distance:
+    - data://garden/migration/2024-11-19/migration_distance
