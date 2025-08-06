@@ -791,15 +791,6 @@ steps:
     - data://garden/who/2025-01-17/vaccine_stock_out
 
   #
-  # WHO Mortality Database - Vaccine Preventable
-  data://meadow/who/2025-01-17/mortality_database_vaccine_preventable:
-    - snapshot://who/2025-01-17/mortality_database_vaccine_preventable.csv
-  data://garden/who/2025-01-17/mortality_database_vaccine_preventable:
-    - data://meadow/who/2025-01-17/mortality_database_vaccine_preventable
-  data://grapher/who/2025-01-17/mortality_database_vaccine_preventable:
-    - data://garden/who/2025-01-17/mortality_database_vaccine_preventable
-
-  #
   # US Long-run measles
   #
   data://meadow/health/2025-01-22/measles_state_level:
@@ -904,7 +895,7 @@ steps:
 
   # Measles deaths long run
   data://garden/health/2025-02-20/measles_deaths_long_run:
-    - data://garden/who/2025-01-17/mortality_database_vaccine_preventable
+    - data://garden/who/2025-08-06/mortality_database_vaccine_preventable
     - data://garden/health/2025-02-20/measles_deaths_census_bureau
     - data://garden/health/2025-02-20/measles_deaths_public_health_reports
     - data://garden/demography/2024-07-15/population
@@ -1012,7 +1003,7 @@ steps:
     - data://garden/public_health_reports/2025-03-04/diphtheria_deaths
     - data://garden/us_census_bureau/2025-03-04/diphtheria_deaths
     - data://garden/demography/2024-07-15/population
-    - data://garden/who/2025-01-17/mortality_database_vaccine_preventable
+    - data://garden/who/2025-08-06/mortality_database_vaccine_preventable
   data://grapher/health/2025-03-04/diphtheria_deaths:
     - data://garden/health/2025-03-04/diphtheria_deaths
 
@@ -1045,7 +1036,7 @@ steps:
   #
   data://garden/health/2025-03-06/pertussis_deaths:
     - data://garden/us_census_bureau/2025-03-06/pertussis_deaths
-    - data://garden/who/2025-01-17/mortality_database_vaccine_preventable
+    - data://garden/who/2025-08-06/mortality_database_vaccine_preventable
     - data://garden/demography/2024-07-15/population
   data://grapher/health/2025-03-06/pertussis_deaths:
     - data://garden/health/2025-03-06/pertussis_deaths
@@ -1298,3 +1289,18 @@ steps:
     - data://meadow/who/2025-08-06/icd_codes
   data://grapher/who/2025-08-06/icd_codes:
     - data://garden/who/2025-08-06/icd_codes
+  # Suicides based on WHO Mortality Database
+  data://meadow/who/2025-08-06/self_inflicted_injuries:
+    - snapshot://who/2025-08-06/self_inflicted_injuries.csv
+  data://garden/who/2025-08-06/self_inflicted_injuries:
+    - data://meadow/who/2025-08-06/self_inflicted_injuries
+  data://grapher/who/2025-08-06/self_inflicted_injuries:
+    - data://garden/who/2025-08-06/self_inflicted_injuries
+  #
+  # WHO Mortality Database - Vaccine Preventable
+  data://meadow/who/2025-08-06/mortality_database_vaccine_preventable:
+    - snapshot://who/2025-08-06/mortality_database_vaccine_preventable.csv
+  data://garden/who/2025-08-06/mortality_database_vaccine_preventable:
+    - data://meadow/who/2025-08-06/mortality_database_vaccine_preventable
+  data://grapher/who/2025-08-06/mortality_database_vaccine_preventable:
+    - data://garden/who/2025-08-06/mortality_database_vaccine_preventable

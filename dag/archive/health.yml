@@ -458,3 +458,12 @@ steps:
     - data://garden/un/2022-07-11/un_wpp
   data://grapher/homicide/2024-07-30/who_mort_db:
     - data://garden/homicide/2024-07-30/who_mort_db
+
+  #
+  # WHO Mortality Database - Vaccine Preventable
+  data://meadow/who/2025-01-17/mortality_database_vaccine_preventable:
+    - snapshot://who/2025-01-17/mortality_database_vaccine_preventable.csv
+  data://garden/who/2025-01-17/mortality_database_vaccine_preventable:
+    - data://meadow/who/2025-01-17/mortality_database_vaccine_preventable
+  data://grapher/who/2025-01-17/mortality_database_vaccine_preventable:
+    - data://garden/who/2025-01-17/mortality_database_vaccine_preventable
