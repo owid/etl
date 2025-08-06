@@ -85,9 +85,9 @@ def add_age_group_aggregate(tb: Table, age_groups: list[str], label: str) -> Tab
     )
 
     # Recalculate the death rate for the new age group
-    tb_filtered["death_rate_per_100_000_population"] = (
-        tb_filtered["number"] / tb_filtered["estimated_population"] * 100000
-    ).fillna(0)
+    death_rate = tb_filtered["number"] / tb_filtered["estimated_population"] * 100000
+    # Replace both NaN and infinite values with 0
+    tb_filtered["death_rate_per_100_000_population"] = death_rate.replace([np.inf, -np.inf], 0).fillna(0)
 
     # Assign new age group label
     tb_filtered["age_group"] = label
