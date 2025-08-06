@@ -68,7 +68,7 @@ steps:
     - data://garden/worldbank_wdi/2025-01-24/wdi
     - data://garden/un/2024-07-12/un_wpp
     - data://garden/un/2024-09-11/igme
-    - data://garden/who/2024-07-26/mortality_database
+    - data://garden/who/2025-04-17/mortality_database
     - data://garden/wash/2024-01-06/who
     - data://garden/tourism/2024-08-17/unwto
     - data://garden/ggdc/2025-07-31/penn_world_table
