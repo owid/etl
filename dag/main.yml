@@ -744,6 +744,17 @@ steps:
   data-private://grapher/happiness/2025-07-22/life_in_five_years_and_life_today:
     - data-private://garden/happiness/2025-07-22/life_in_five_years_and_life_today
 
+  # WHO Mort DB Homicides
+  data://meadow/homicide/2025-08-06/who_mort_db:
+    - snapshot://homicide/2025-08-06/who_mort_db.csv
+
+  data://garden/homicide/2025-08-06/who_mort_db:
+    - data://garden/un/2024-07-12/un_wpp
+    - data://meadow/homicide/2025-08-06/who_mort_db
+
+  data://grapher/homicide/2025-08-06/who_mort_db:
+    - data://garden/homicide/2025-08-06/who_mort_db
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
