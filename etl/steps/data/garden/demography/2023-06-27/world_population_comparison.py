@@ -32,7 +32,6 @@ def run(dest_dir: str) -> None:
     tb.metadata.short_name = P.short_name
 
     # add table, update metadata from *.meta.yml and save
-    print(tb)
     ds = create_dataset(dest_dir, tables=[tb])
     ds.save()
     log.info("world_population_comparison: end")
