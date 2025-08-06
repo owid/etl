@@ -489,22 +489,6 @@ steps:
   data://grapher/who/2025-04-17/mortality_database:
     - data://garden/who/2025-04-17/mortality_database
 
-  # WHO Mortality Database - to archive
-  data://meadow/who/2024-07-26/mortality_database:
-    - snapshot://who/2024-07-26/mortality_database.feather
-  data://garden/who/2024-07-26/mortality_database:
-    - data://meadow/who/2024-07-26/mortality_database
-  data://grapher/who/2024-07-26/mortality_database:
-    - data://garden/who/2024-07-26/mortality_database
-
-  # WHO ICD codes
-  data://meadow/who/2024-07-29/icd_codes:
-    - snapshot://who/2024-07-29/icd_codes.zip
-  data://garden/who/2024-07-29/icd_codes:
-    - data://meadow/who/2024-07-29/icd_codes
-  data://grapher/who/2024-07-29/icd_codes:
-    - data://garden/who/2024-07-29/icd_codes
-
   # WHO Global Health Estimates
   data://meadow/who/2024-07-30/ghe:
     - snapshot://who/2024-07-30/ghe.feather
@@ -516,18 +500,12 @@ steps:
   data://grapher/who/2024-07-30/ghe:
     - data://garden/who/2024-07-30/ghe
 
-  # WHO Mortality Database - Cancer specific
-  data://meadow/who/2024-08-06/mortality_database_cancer:
-    - snapshot://who/2024-08-06/mortality_database_cancer.csv
-  data://garden/who/2024-08-06/mortality_database_cancer:
-    - data://meadow/who/2024-08-06/mortality_database_cancer
-  data://grapher/who/2024-08-06/mortality_database_cancer:
-    - data://garden/who/2024-08-06/mortality_database_cancer
-
+  # Most common cancers
   data://garden/who/2024-08-06/mortality_database_cancer_most_common:
-    - data://garden/who/2024-08-06/mortality_database_cancer
+    - data://garden/who/2025-08-05/mortality_database_cancer
   data://grapher/who/2024-08-06/mortality_database_cancer_most_common:
     - data://garden/who/2024-08-06/mortality_database_cancer_most_common
+    # Mpox (Monkeypox) - WHO
   data://meadow/who/latest/monkeypox:
     - snapshot://who/latest/monkeypox.csv
   data://garden/who/latest/monkeypox:
@@ -1298,7 +1276,7 @@ steps:
     - data://garden/demography/2024-07-15/population
   data://grapher/who/2025-07-15/vaccination_coverage:
     - data://garden/who/2025-07-15/vaccination_coverage
-    
+
   # WHO Vaccine Introductions
   data://meadow/who/2025-07-15/vaccination_introductions:
     - snapshot://who/2025-07-15/vaccination_introductions.xlsx
@@ -1306,3 +1284,17 @@ steps:
     - data://meadow/who/2025-07-15/vaccination_introductions
   data://grapher/who/2025-07-15/vaccination_introductions:
     - data://garden/who/2025-07-15/vaccination_introductions
+  # WHO Mortality Database - Cancer specific
+  data://meadow/who/2025-08-05/mortality_database_cancer:
+    - snapshot://who/2025-08-05/mortality_database_cancer.csv
+  data://garden/who/2025-08-05/mortality_database_cancer:
+    - data://meadow/who/2025-08-05/mortality_database_cancer
+  data://grapher/who/2025-08-05/mortality_database_cancer:
+    - data://garden/who/2025-08-05/mortality_database_cancer
+  # WHO ICD codes
+  data://meadow/who/2025-08-06/icd_codes:
+    - snapshot://who/2025-08-06/icd_codes.zip
+  data://garden/who/2025-08-06/icd_codes:
+    - data://meadow/who/2025-08-06/icd_codes
+  data://grapher/who/2025-08-06/icd_codes:
+    - data://garden/who/2025-08-06/icd_codes
