@@ -449,3 +449,12 @@ steps:
     - data://meadow/who/2024-08-06/mortality_database_cancer
   data://grapher/who/2024-08-06/mortality_database_cancer:
     - data://garden/who/2024-08-06/mortality_database_cancer
+
+  # WHO Mort DB Homicides
+  data://meadow/homicide/2024-07-30/who_mort_db:
+    - snapshot://homicide/2024-07-30/who_mort_db.csv
+  data://garden/homicide/2024-07-30/who_mort_db:
+    - data://meadow/homicide/2024-07-30/who_mort_db
+    - data://garden/un/2022-07-11/un_wpp
+  data://grapher/homicide/2024-07-30/who_mort_db:
+    - data://garden/homicide/2024-07-30/who_mort_db
