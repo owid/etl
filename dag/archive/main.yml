@@ -596,6 +596,12 @@ steps:
   data://grapher/ggdc/2022-11-28/penn_world_table:
     - data://garden/ggdc/2022-11-28/penn_world_table
 
+      # Old World Bank income groups classification
+  data://meadow/wb/2021-07-01/wb_income:
+    - snapshot://wb/2021-07-01/wb_income.xlsx
+  data://garden/wb/2021-07-01/wb_income:
+    - data://meadow/wb/2021-07-01/wb_income
+
 include:
   # Include all active steps plus all archive steps.
   - dag/main.yml

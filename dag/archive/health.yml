@@ -467,9 +467,3 @@ steps:
     - data://meadow/who/2025-01-17/mortality_database_vaccine_preventable
   data://grapher/who/2025-01-17/mortality_database_vaccine_preventable:
     - data://garden/who/2025-01-17/mortality_database_vaccine_preventable
-
-      # Old World Bank income groups classification
-  data://meadow/wb/2021-07-01/wb_income:
-    - snapshot://wb/2021-07-01/wb_income.xlsx
-  data://garden/wb/2021-07-01/wb_income:
-    - data://meadow/wb/2021-07-01/wb_income
