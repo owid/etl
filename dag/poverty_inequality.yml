@@ -157,16 +157,6 @@ steps:
     - data://meadow/wb/2025-06-11/harmonized_national_poverty_lines
   data://grapher/wb/2025-06-11/harmonized_national_poverty_lines:
     - data://garden/wb/2025-06-11/harmonized_national_poverty_lines
-  #
-  # Poverty projections from the World Bank's Global Poverty Revisited report (2021 PPPs)
-  #
-  data://meadow/wb/2025-06-18/poverty_projections:
-    - snapshot://wb/2025-06-18/poverty_projections.dta
-    - snapshot://wb/2025-06-18/poverty_aggregates.dta
-  data://garden/wb/2025-06-18/poverty_projections:
-    - data://meadow/wb/2025-06-18/poverty_projections
-  data://grapher/wb/2025-06-18/poverty_projections:
-    - data://garden/wb/2025-06-18/poverty_projections
 
   #
   # Poverty projections in 2021 prices up to 2050

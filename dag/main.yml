@@ -74,17 +74,19 @@ steps:
   data://garden/ggdc/2022-12-23/maddison_database:
     - data://meadow/ggdc/2022-12-23/maddison_database
 
-  # Penn World Table
-  data://meadow/ggdc/2022-11-28/penn_world_table:
-    - snapshot://ggdc/2021-06-18/penn_world_table.xlsx
-  data://meadow/ggdc/2022-11-28/penn_world_table_national_accounts:
-    - snapshot://ggdc/2021-06-18/penn_world_table_national_accounts.xlsx
+    # Penn World Table
+  data://meadow/ggdc/2025-07-31/penn_world_table:
+    - snapshot://ggdc/2025-07-31/penn_world_table.xlsx
+  data://meadow/ggdc/2025-07-31/penn_world_table_national_accounts:
     - data://garden/regions/2023-01-01/regions
-  data://garden/ggdc/2022-11-28/penn_world_table:
-    - data://meadow/ggdc/2022-11-28/penn_world_table
-    - data://meadow/ggdc/2022-11-28/penn_world_table_national_accounts
-  data://grapher/ggdc/2022-11-28/penn_world_table:
-    - data://garden/ggdc/2022-11-28/penn_world_table
+    - snapshot://ggdc/2025-07-31/penn_world_table_national_accounts.xlsx
+  data://garden/ggdc/2025-07-31/penn_world_table_national_accounts:
+    - data://meadow/ggdc/2025-07-31/penn_world_table_national_accounts
+  data://garden/ggdc/2025-07-31/penn_world_table:
+    - data://garden/ggdc/2025-07-31/penn_world_table_national_accounts
+    - data://meadow/ggdc/2025-07-31/penn_world_table
+  data://grapher/ggdc/2025-07-31/penn_world_table:
+    - data://garden/ggdc/2025-07-31/penn_world_table
 
   # Microprocessor trend data
   data://meadow/technology/2023-03-08/microprocessor_trend:
@@ -248,17 +250,6 @@ steps:
   data://grapher/state_capacity/2023-10-19/state_capacity_dataset:
     - data://garden/state_capacity/2023-10-19/state_capacity_dataset
 
-  # United Nations members
-  data://meadow/un/2023-10-30/un_members:
-    - snapshot://un/2023-10-30/un_members.csv
-  data://garden/un/2023-10-30/un_members:
-    - data://meadow/un/2023-10-30/un_members
-    - data://garden/wb/2021-07-01/wb_income
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/demography/2023-03-31/population
-  data://grapher/un/2023-10-30/un_members:
-    - data://garden/un/2023-10-30/un_members
-
   # World Bank - Worldwide Bureaucracy Indicators
   data://meadow/wb/2023-11-21/worldwide_bureaucracy_indicators:
     - snapshot://wb/2023-11-21/worldwide_bureaucracy_indicators.csv
@@ -415,19 +406,10 @@ steps:
   data://grapher/un/2024-06-24/sdg_regions:
     - data://garden/un/2024-06-24/sdg_regions
 
-  # WHO Mort DB Homicides
-  data://meadow/homicide/2024-07-30/who_mort_db:
-    - snapshot://homicide/2024-07-30/who_mort_db.csv
-  data://garden/homicide/2024-07-30/who_mort_db:
-    - data://meadow/homicide/2024-07-30/who_mort_db
-    - data://garden/un/2022-07-11/un_wpp
-  data://grapher/homicide/2024-07-30/who_mort_db:
-    - data://garden/homicide/2024-07-30/who_mort_db
-
   # Homicide - OMM
   data://garden/homicide/2024-07-30/homicide_long_run_omm:
     - snapshot://fasttrack/2023-01-03/long_term_homicide_rates_in_europe.csv
-    - data://garden/homicide/2024-07-30/who_mort_db
+    - data://garden/homicide/2025-08-06/who_mort_db
   data://grapher/homicide/2024-07-30/homicide_long_run_omm:
     - data://garden/homicide/2024-07-30/homicide_long_run_omm
 
@@ -537,10 +519,10 @@ steps:
     - data://garden/worldbank_wdi/2025-01-24/wdi
     - data://garden/un/2024-07-12/un_wpp
     - data://garden/un/2024-09-11/igme
-    - data://garden/who/2024-07-26/mortality_database
+    - data://garden/who/2025-04-17/mortality_database
     - data://garden/wash/2024-01-06/who
     - data://garden/tourism/2024-08-17/unwto
-    - data://garden/ggdc/2022-11-28/penn_world_table
+    - data://garden/ggdc/2025-07-31/penn_world_table
     - data://garden/wb/2024-11-04/edstats
     - data://garden/unesco/2025-05-01/education_sdgs
     - data://garden/happiness/2025-03-28/happiness
@@ -713,6 +695,18 @@ steps:
   data://grapher/oecd/2025-07-03/affordable_housing:
     - data://garden/oecd/2025-07-03/affordable_housing
 
+  # Housing indicators from Korevaar et al.
+  #
+  data://meadow/housing/2025-07-11/korevaar:
+    - snapshot://housing/2025-07-11/korevaar.xlsx
+  data://garden/housing/2025-07-11/korevaar:
+    - data://meadow/housing/2025-07-11/korevaar
+    - data://meadow/housing/2025-07-11/korevaar_quality
+  data://grapher/housing/2025-07-11/korevaar:
+    - data://garden/housing/2025-07-11/korevaar
+  data://meadow/housing/2025-07-11/korevaar_quality:
+    - snapshot://housing/2025-07-11/korevaar_quality.xlsx
+
   #
   # Gallup World Poll: Life in Five Years and Life Today
   #
@@ -728,6 +722,15 @@ steps:
   #
   data-private://grapher/happiness/2025-07-22/life_in_five_years_and_life_today:
     - data-private://garden/happiness/2025-07-22/life_in_five_years_and_life_today
+
+  # WHO Mort DB Homicides
+  data://meadow/homicide/2025-08-06/who_mort_db:
+    - snapshot://homicide/2025-08-06/who_mort_db.csv
+  data://garden/homicide/2025-08-06/who_mort_db:
+    - data://garden/un/2024-07-12/un_wpp
+    - data://meadow/homicide/2025-08-06/who_mort_db
+  data://grapher/homicide/2025-08-06/who_mort_db:
+    - data://garden/homicide/2025-08-06/who_mort_db
 
 include:
   - dag/open_numbers.yml
