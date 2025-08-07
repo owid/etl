@@ -1,0 +1,28 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Papers with code"
+    description: |-
+      Papers with Code links machine learning papers to their corresponding code implementations and benchmark results. It includes metadata on research papers (title, authors, abstract), associated GitHub repositories, ML tasks (e.g. classification, translation), evaluation results on standard datasets, and leaderboards for state-of-the-art performance.
+    date_published: "2025-08-07"
+
+    # Citation
+    producer: Papers with Code
+    citation_full: |-
+      Papers with Code (2025)
+
+    # Files
+    url_main: https://github.com/paperswithcode/paperswithcode-data?tab=readme-ov-file
+    url_download: https://production-media.paperswithcode.com/about/evaluation-tables.json.gz
+    date_accessed: '2025-08-07'
+
+    # License
+    license:
+      name: CC BY-SA 4.0
+      url: https://github.com/paperswithcode/paperswithcode-data?tab=readme-ov-file
+outs:
+  - md5: 69b5caf7930fd320e40546229ab0bbdc
+    size: 21833195
+    path: papers_with_code.gz

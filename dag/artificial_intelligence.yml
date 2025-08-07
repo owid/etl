@@ -213,3 +213,13 @@ steps:
   data://grapher/artificial_intelligence/2023-07-07/semiconductors_cset:
     - data://garden/artificial_intelligence/2023-07-07/semiconductors_cset
 
+  
+  #
+  # TODO: add step name (just something recognizable)
+  #
+  data://meadow/artificial_intelligence/2025-08-07/papers_with_code:
+    - snapshot://artificial_intelligence/2025-08-07/papers_with_code.gz
+  data://garden/artificial_intelligence/2025-08-07/papers_with_code:
+    - data://meadow/artificial_intelligence/2025-08-07/papers_with_code
+  data://grapher/artificial_intelligence/2025-08-07/papers_with_code:
+    - data://garden/artificial_intelligence/2025-08-07/papers_with_code
