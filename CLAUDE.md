@@ -338,8 +338,8 @@ def _validate_against_metadata(tb: Table, metadata: dict) -> None:
                 desc = var_meta['description'].lower()
                 if 'percentage' in desc or 'rate' in desc:
                     # Apply percentage validation (0-100)
-                    assert tb[var_name].min() >= 0, f"{var_name}: Negative rate found"
-                    assert tb[var_name].max() <= 100, f"{var_name}: Rate exceeds 100%"
+                    assert tb[var_name].min(skipna=True) >= 0, f"{var_name}: Negative rate found"
+                    assert tb[var_name].max(skipna=True) <= 100, f"{var_name}: Rate exceeds 100%"
 ```
 
 ### Standard Validation Categories
@@ -435,7 +435,7 @@ def _validate_regional_aggregation(tb: Table, metadata: dict) -> None:
                     world_data = year_data[year_data["country"] == "World"]
                     
                     if len(regional_data) == len(regions) and len(world_data) == 1:
-                        regional_total = regional_data[var_name].sum()
+                        regional_total = regional_data[var_name].sum(skipna=True)
                         world_total = world_data[var_name].iloc[0]
                         
                         # Allow small tolerance for rounding differences
