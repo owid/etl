@@ -1,9 +1,15 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
   common:
+    processing_level: major
+    unit: '%'
+    short_unit: '%'
     presentation:
       topic_tags:
         - Artificial Intelligence
+    display:
+      numDecimalPlaces: 1
+
 
 
 # Learn more about the available fields:
@@ -15,44 +21,41 @@ dataset:
 tables:
   papers_with_code:
     variables:
-      # testing_variable:
-      #   title: Testing variable title
-      #   unit: arbitrary units
-      #   short_unit: au
-      #   description_short: Short description of testing variable.
-      #   description_processing: Description of processing of testing variable.
-      #   description_key: List of key points about the indicator.
-      #   description_from_producer: Description of testing variable from producer.
-      #   processing_level: minor
-      #   type:
-      #   sort:
-      #   presentation:
-      #     attribution:
-      #     attribution_short:
-      #     faqs:
-      #     grapher_config:
-      #     title_public:
-      #     title_variant:
-      #     topic_tags:
-      #   display:
-      #     name: Testing variable
-      #     numDecimalPlaces: 0
-      #     tolerance: 0
-      #     color:
-      #     conversionFactor: 1
-      #     description:
-      #     entityAnnotationsMap: Test annotation
-      #     includeInTable:
-      #     isProjection: false
-      #     unit: arbitrary units
-      #     shortUnit: au
-      #     tableDisplay:
-      #       hideAbsoluteChange:
-      #       hideRelativeChange:
-      #     yearIsDay: false
-      #     zeroDay:
-      #     roundingMode:
-      #     numSignificantFigures:
-      #
-      {}
+      competitions_pass_1:
+        title: Coding competitions
+        description_key:
+          - This benchmark measures the accuracy of models in coding competitions based on the APPS benchmark. The APPS benchmark focuses on coding ability and problem-solving in a natural language context. It aims to replicate the evaluation process used for human programmers by presenting coding problems in unrestricted natural language and assessing the correctness of solutions.
+          - The coding tasks included in this benchmark are sourced from open-access coding websites such as Codeforces and Kattis. These tasks span a range of difficulty levels, from introductory to collegiate competition level. The benchmark evaluates the accuracy of models in solving programming tasks specifically designed for coding competitions.
+
+      interviews_pass_1:
+        title: Coding interviews
+        description_key:
+          - This benchmark assesses the accuracy of models in coding interviews based on the APPS benchmark. The APPS benchmark focuses on coding ability and problem-solving in a natural language context, simulating the evaluation process employed during human programmer interviews. It presents coding problems in unrestricted natural language and evaluates the correctness of solutions.
+          - The coding tasks within this benchmark are sourced from open-access coding websites such as Codeforces and Kattis. These tasks cover a spectrum of difficulty levels, ranging from introductory to collegiate competition level. The benchmark measures the accuracy of models in solving programming tasks specifically tailored for coding interviews.
+
+      top_1_accuracy:
+        title: Top-1 accuracy
+        description_key:
+          - The top-1 accuracy measure is used to assess how frequently a model's absolute top prediction matches the correct answer from a given set of options.
+          - "Here's an example to illustrate what this benchmark tests: Imagine an image classification model that is presented with an image of an animal. The model assigns probabilities to each potential label and generates its highest-confidence prediction. For instance, when analyzing an image, the model might predict 'Cat' as the most probable label. To evaluate the model's accuracy using the top-1 measure, researchers compare this prediction with the correct label. If the model's top prediction matches the correct label (e.g., if the actual animal in the image is indeed a cat), then the model's prediction is considered correct according to the top-1 accuracy metric. On the other hand, if the model's top prediction does not match the correct label (e.g., if the image shows a dog, but the model predicts a cat), then the model's prediction is considered incorrect based on the top-1 accuracy measure. To calculate the top-1 accuracy, researchers analyze the model's performance on a large dataset where the correct labels are known. They determine the percentage of examples in the dataset where the model's highest-confidence prediction matches the actual label."
+          - This measure provides a focused evaluation of the model's ability to make accurate predictions by considering only its absolute top guess.
+
+      top_5_accuracy:
+        title: Top-5 accuracy
+        description_key:
+          - The top-5 accuracy measure assesses how frequently the correct answer appears within a model's top 5 predictions from a given set of options.
+          - This metric is more lenient than top-1 accuracy as it considers whether the correct label is among the model's five highest-confidence predictions rather than just the single highest prediction.
+          - This measure provides insight into the model's ability to identify the correct answer within a small set of its most confident predictions.
+
+      average_mmlu_accuracy:
+        title: All knowledge tests
+        description_key:
+          - This benchmark assesses the average accuracy of models across all subjects based on the MMLU benchmark.
+          - The MMLU benchmark covers a wide range of 57 subjects, including STEM, humanities, social sciences, and more. It encompasses subjects of varying difficulty levels, spanning from elementary concepts to advanced professional topics. This comprehensive benchmark assesses not only world knowledge but also problem-solving abilities.
+
+      math_accuracy:
+        title: Performance on math and problem-solving tasks
+        description_key:
+          - This benchmark assesses the accuracy of models on math and problem solving tasks based on the MATH benchmark.
+          - The MATH benchmark consists of 12,500 challenging competition mathematics problems. Each problem in MATH has a full step-by-step solution which can be used to teach models to generate answer derivations and explanations.
 
