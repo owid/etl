@@ -177,3 +177,6 @@ steps:
     - data://meadow/wb/2025-08-07/world_bank_pip
   data://grapher/wb/2025-08-07/world_bank_pip:
     - data://garden/wb/2025-08-07/world_bank_pip
+  # Legacy PIP pipeline
+  data://garden/wb/2025-08-07/world_bank_pip_legacy:
+    - data://meadow/wb/2025-08-07/world_bank_pip
