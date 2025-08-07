@@ -11,7 +11,7 @@ definitions:
     completion_date: |
       The clinical trials are sorted by their "completion date", which is the date when the clinical trial is has been completed.
     completed_trials: |
-      This data comes from the [ClinicalTrials.gov](#dod:clinical-trials-gov) database and is sorted by completion year. It only includes clinical trials that have been marked as "completed" and have a valid "completion date".
+      This data comes from the [ClinicalTrials.gov](#dod:clinical-trials-gov) database and is sorted by completion year. It only includes interventional or observational clinical trials that have been marked as "completed" and have a valid "completion date". Expanded access studies, which provide access to investigational drugs or devices for patients with serious conditions who do not have other treatment options, are not included in this data. 
 
 dataset:
   update_period_days: 365 # dataset itself is updated continuously, but I think updating it every year is sufficient for us
@@ -153,9 +153,9 @@ tables:
         unit: trials
         short_unit: ""
         description_processing: |-
-          - {{definitions.notes.completed_trials}}
+          - This data comes from the [ClinicalTrials.gov](#dod:clinical-trials-gov) database and is sorted by completion year. It only includes clinical trials with a valid "completion date".
         description_key:
-          - "{definitions.notes.completed_trials}"
+          - This data comes from the [ClinicalTrials.gov](#dod:clinical-trials-gov) database and is sorted by completion year. It only includes clinical trials with a valid "completion date".
           - Interventional studies involve testing new treatments or interventions and comparing them to a baseline or other treatments.
           - Observational studies observe patients and collect data on participants without an intervention.
           - Expanded access studies provide access to investigational drugs or devices for patients with serious conditions who do not have other treatment options.
@@ -196,6 +196,9 @@ tables:
         title: Number of clinical trials with results posted
         description_short: |
           The annual number of clinical trials registered in the [ClinicalTrials.gov](#dod:clinical-trials-gov) database that have results posted. The trials are grouped by the start year of the trial.
+        description_key:
+          - If a trial has results posted, it means that the results of the trial have been published in the [ClinicalTrials.gov](#dod:clinical-trials-gov) database.
+          - If a trial has no results posted, it can mean multiple things. The trial may be ongoing or have been terminated without completion. It can also mean that the trial has been completed, but the results are not yet available or have not been published. Finally it can also mean that the results have been published elsewhere (e.g. in a scientific journal) but have not been added to the ClinicalTrials.gov database.
         unit: trials
         short_unit: ""
   length_per_year:

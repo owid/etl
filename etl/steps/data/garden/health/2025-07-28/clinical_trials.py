@@ -294,8 +294,12 @@ def run() -> None:
     tb_interventions[INTERVENTIONS].m.origins = tb["Phases"].m.origins
 
     # get sum of studies by completion year by study type
-    tb_study_type = group_trials_by(tb, ["Study Type", "completion_year"], "n_studies_type")
-
+    tb_study_type = tb[
+        tb["Study Status"].isin(
+            ["COMPLETED", "AVAILABLE", "NO_LONGER_AVAILABLE", "APPROVED_FOR_MARKETING", "TEMPORARILY_NOT_AVAILABLE"]
+        )
+    ].copy()
+    tb_study_type = group_trials_by(tb, ["Study Type", "completion_year"], "n_studies_type", completed_only=False)
     # get sum of studies by completion year by primary purpose
     tb_purpose = group_trials_by(tb, ["primary_purpose", "completion_year"], "n_studies_purpose")
 
