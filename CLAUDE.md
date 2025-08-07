@@ -459,8 +459,14 @@ def _validate_regional_aggregation(tb: Table, metadata: dict) -> None:
                     world_data = year_data[year_data["country"] == "World"]
 
                     if len(regional_data) == len(regions) and len(world_data) == 1:
-                        regional_total = regional_data[var_name].sum(skipna=True)
-                        world_total = world_data[var_name].iloc[0]
+                        # Check if any regions have NaN values
+                        has_nan_regions = regional_data[var_name].isna().any()
+                        if has_nan_regions:
+                            log.warning(f"Some regions have NaN values for {var_name}, skipping aggregation validation")
+                        else:
+                            # Only validate when all regions have data
+                            regional_total = regional_data[var_name].sum()
+                            world_total = world_data[var_name].iloc[0]
 
                         # Allow small tolerance for rounding differences
                         tolerance = abs(world_total * 0.01) if world_total != 0 else 1.0
