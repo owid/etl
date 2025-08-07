@@ -468,9 +468,9 @@ def _validate_regional_aggregation(tb: Table, metadata: dict) -> None:
                             regional_total = regional_data[var_name].sum()
                             world_total = world_data[var_name].iloc[0]
 
-                        # Allow small tolerance for rounding differences
-                        tolerance = abs(world_total * 0.01) if world_total != 0 else 1.0
-                        assert abs(regional_total - world_total) <= tolerance, \
+                            # Allow small tolerance for rounding differences
+                            tolerance = abs(world_total * 0.01) if world_total != 0 else 1.0
+                            assert abs(regional_total - world_total) <= tolerance, \
                             f"{var_name} regional totals don't match World in {year}: {regional_total:.1f} vs {world_total:.1f}"
 
 def _is_additive_variable(var_meta: dict) -> bool:
