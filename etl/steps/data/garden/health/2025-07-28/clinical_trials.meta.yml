@@ -2,6 +2,12 @@
 definitions:
   common:
     presentation:
+      grapher_config:
+        maxTime: 2024
+        timelineMinTime: 1997
+        timelineMaxTime: 2025
+        note: |-
+          There can be a delay in the registration of trials to the database, so the latest years might not have a complete count of trials yet.
       topic_tags:
         - Medicine & Biotechnology
     display:
@@ -11,7 +17,7 @@ definitions:
     completion_date: |
       The clinical trials are sorted by their "completion date", which is the date when the clinical trial is has been completed.
     completed_trials: |
-      This data comes from the [ClinicalTrials.gov](#dod:clinical-trials-gov) database and is sorted by completion year. It only includes interventional or observational clinical trials that have been marked as "completed" and have a valid "completion date". Expanded access studies, which provide access to investigational drugs or devices for patients with serious conditions who do not have other treatment options, are not included in this data. 
+      This data comes from the [ClinicalTrials.gov](#dod:clinical-trials-gov) database and is sorted by completion year. It only includes interventional or observational clinical trials that have been marked as "completed" and have a valid "completion date". Expanded access studies, which provide access to investigational drugs or devices for patients with serious conditions who do not have other treatment options, are not included in this data.
 
 dataset:
   update_period_days: 365 # dataset itself is updated continuously, but I think updating it every year is sufficient for us
@@ -52,7 +58,7 @@ tables:
         unit: trials
         short_unit: ""
         description_processing: |-
-          -{{definitions.notes.completed_trials}}
+          - {{definitions.notes.completed_trials}}
           - If multiple interventions are given, the study is counted towards all interventions listed.
       biological:
         title: Number of clinical trials with biological interventions
@@ -61,7 +67,7 @@ tables:
         unit: trials
         short_unit: ""
         description_processing: |-
-          -{{definitions.notes.completed_trials}}
+          - {{definitions.notes.completed_trials}}
           - If multiple interventions are given, the study is counted towards all interventions listed.
       device:
         title: Number of clinical trials with device-based interventions
@@ -70,7 +76,7 @@ tables:
         unit: trials
         short_unit: ""
         description_processing: |-
-          -{{definitions.notes.completed_trials}}
+          - {{definitions.notes.completed_trials}}
           - If multiple interventions are given, the study is counted towards all interventions listed.
       drug:
         title: Number of clinical trials with pharmaceutical interventions
@@ -149,7 +155,8 @@ tables:
       n_studies_type:
         title: Number of clinical trials by study type
         description_short: |
-          The annual number of completed clinical trials registered in the [ClinicalTrials.gov](#dod:clinical-trials-gov) database, by study types. Study types can include interventional studies, observational studies, and expanded access studies.
+          The annual number of completed clinical trials registered in the [ClinicalTrials.gov](#dod:clinical-trials-gov) database, by study types. Study types include interventional (when people are given a treatment or intervention), observational (when people are tracked without intervention), and expanded access studies (when people with serious conditions are given experimental treatments).
+
         unit: trials
         short_unit: ""
         description_processing: |-
@@ -169,7 +176,6 @@ tables:
         short_unit: ""
         description_processing: |-
           - {{definitions.notes.completed_trials}}
-          - If multiple purposes are listed, the purpose with the most studies is used. If multiple purposes have the same number of studies, the first one listed is used.
         description_key:
           - "{definitions.notes.completed_trials}"
           - The purpose of a clinical trial refers to the main objective or goal of the study, such as testing a new treatment, comparing treatments, or understanding a disease.
@@ -186,19 +192,23 @@ tables:
           - This data comes from the [ClinicalTrials.gov](#dod:clinical-trials-gov) database. Only clinical trials with a "start_date" are included.
         description_key:
           - "{definitions.notes.completed_trials}"
-          - Studies are currently active if they are "not yet recruiting", "enrolling by invitation", "recruiting" or "active, not recruiting", which means they have finished recruiting participants but are still collecting data.
+          - Studies are currently active if they are "not yet recruiting", "enrolling by invitation" , "recruiting" or "active, not recruiting".
+          - \"Enrolling by invitation" means the study is not open to the general public. In this case the researchers conducting the study are focusing on a specific group of people and are inviting them to participate in the study.
+          - \"Active, not recruiting" means the study has finished recruiting participants but is still collecting data.
           - Studies are finished if they are "completed", "terminated", or "withdrawn". Completed studies have been finished, terminated studies have been stopped before completion, and withdrawn studies have been stopped before enrolling participants.
-          - Studies which are "suspended" have been put on hold and are not currently recruiting or enrolling participants. They may resume later.
-          - Studies, that provide access to promising investigational treatment for patients with serious conditions who do not have other treatment options (expanded access), have different statuses and are not included here.
+          - Studies which are "paused/suspended" have been put on hold and are not currently recruiting or enrolling participants. They may resume later.
+          - Studies that provide access to promising investigational treatment for patients with serious conditions (expanded access studies) are not included here.
   results_per_year:
     variables:
       n_studies_results:
         title: Number of clinical trials with results posted
         description_short: |
-          The annual number of clinical trials registered in the [ClinicalTrials.gov](#dod:clinical-trials-gov) database that have results posted. The trials are grouped by the start year of the trial.
+          The annual number of completed clinical trials registered in the [ClinicalTrials.gov](#dod:clinical-trials-gov) database that have results posted. Registering trial results is important for transparency and accountability.
         description_key:
+          - "{definitions.notes.completed_trials}"
           - If a trial has results posted, it means that the results of the trial have been published in the [ClinicalTrials.gov](#dod:clinical-trials-gov) database.
-          - If a trial has no results posted, it can mean multiple things. The trial may be ongoing or have been terminated without completion. It can also mean that the trial has been completed, but the results are not yet available or have not been published. Finally it can also mean that the results have been published elsewhere (e.g. in a scientific journal) but have not been added to the ClinicalTrials.gov database.
+          - If a trial has no results posted, it could be that the trial has been completed, but the results are not yet available or have not been published. It can also mean that the results have been published elsewhere (e.g. in a scientific journal) but have not been added to the ClinicalTrials.gov database.
+          - Registering trial results is important for transparency and accountability. Most US-regulated clinical trials are legally required to report results on ClinicalTrials.gov, except for Phase 1 trials, observational studies, and trials conducted entirely outside the U.S. without FDA oversight.
         unit: trials
         short_unit: ""
   length_per_year:
@@ -206,28 +216,35 @@ tables:
       avg_study_length_days:
         title: Average study length by phase and completion year
         description_short: |
-          The average length of clinical trials by phase and completion year. The phase refers to the phase of drug development the drug is currently in ([early phase 1](#dod:early-phase-one-trial), [phase 1](#dod:phase-one-trial), [phase 2](#dod:phase-two-trial), [phase 3](#dod:phase-three-trial) or [phase 4](#dod:phase-four-trial)). Some trials also combine phases e.g. have a combined "phase 1/2" trial.
+          The median length of completed clinical trials by phase. The phase refers to the phase of drug development the drug is currently in ([early phase 1](#dod:early-phase-one-trial), [phase 1](#dod:phase-one-trial), [phase 2](#dod:phase-two-trial), [phase 3](#dod:phase-three-trial) or [phase 4](#dod:phase-four-trial)). The study length is the time from start date to completion date, given in days.
         unit: days
         short_unit: days
         description_processing: |-
-          - The average length is calculated by taking the difference between the start date and completion date of each trial, grouped by phase and completion year.
+          - First we calculate the length of each trial by taking the difference between the start date and completion date of each trial.
+          - Then we group the trials by phase and completion year, and calculate the [median](#dod:median) length of each group.
         description_key:
           - "{definitions.notes.completed_trials}"
           - Clinical trials are conducted in different phases of the development of a new treatment or intervention, such as [early phase 1](#dod:early-phase-one-trial), [phase 1](#dod:phase-one-trial), [phase 2](#dod:phase-two-trial), [phase 3](#dod:phase-three-trial), or [phase 4](#dod:phase-four-trial).
           - Phase 1 trials test the safety and dosage of a new treatment, phase 2 trials test the effectiveness and side effects, and phase 3 trials compare the new treatment to standard treatments.
           - \"Phase 1/phase 2\" trials are a combination of phase 1 and phase 2 trials, and "phase 2/phase 3" trials are a combination of phase 2 and phase 3 trials.
           - The average length is calculated by taking the difference between the start date and completion date of each trial, grouped by phase and completion year.
+        presentation:
+          grapher_config:
+            note: |-
+              There can be a delay in the registration of trials to the database, so the latest years might not have a complete count of trials yet. The year shown is the completion year of the study.
   participants_per_year:
     variables:
       avg_participants:
         title: Average number of participants in clinical trials
         description_short: |
-          The average number of participants in completed clinical trials registered in the [ClinicalTrials.gov](#dod:clinical-trials-gov) database, grouped by phase and completion year. The phase refers to the phase of drug development the drug is currently in ([early phase 1](#dod:early-phase-one-trial), [phase 1](#dod:phase-one-trial), [phase 2](#dod:phase-two-trial), [phase 3](#dod:phase-three-trial) or [phase 4](#dod:phase-four-trial)). Some trials also combine phases e.g. have a combined "phase 1/2" trial.
+          The median number of participants in completed clinical trials registered in the [ClinicalTrials.gov](#dod:clinical-trials-gov) database, grouped by phase and completion year. The phase refers to the phase of drug development the drug is currently in ([early phase 1](#dod:early-phase-one-trial), [phase 1](#dod:phase-one-trial), [phase 2](#dod:phase-two-trial), [phase 3](#dod:phase-three-trial) or [phase 4](#dod:phase-four-trial)).
         unit: participants
         short_unit: ""
+        description_processing: |-
+          - We group the trials by phase and completion year, and calculate the [median](#dod:median) number of participants in each group.
         description_key:
           - "{definitions.notes.completed_trials}"
           - Clinical trials are conducted in different phases of the development of a new treatment or intervention, such as [early phase 1](#dod:early-phase-one-trial), [phase 1](#dod:phase-one-trial), [phase 2](#dod:phase-two-trial), [phase 3](#dod:phase-three-trial), or [phase 4](#dod:phase-four-trial).
           - Phase 1 trials test the safety and dosage of a new treatment, phase 2 trials test the effectiveness and side effects, and phase 3 trials compare the new treatment to standard treatments.
           - \"Phase 1/phase 2\" trials are a combination of phase 1 and phase 2 trials, and "phase 2/phase 3" trials are a combination of phase 2 and phase 3 trials.
-          - The average number of participants is calculated by adding all participants for each phase and completion year, and dividing by the number of trials in that phase and year.
+          - The median number of participants is calculated by grouping the trials by phase and completion year, and then taking the middle value of the number of participants in each group.

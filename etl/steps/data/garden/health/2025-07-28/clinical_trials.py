@@ -63,7 +63,7 @@ STATUS_REPLACEMENTS = {
     "ACTIVE_NOT_RECRUITING": "Active, not recruiting",
     "AVAILABLE": "Available",
     "NO_LONGER_AVAILABLE": "No longer available",
-    "SUSPENDED": "Suspended",
+    "SUSPENDED": "Paused/suspended",
     "APPROVED_FOR_MARKETING": "Approved for marketing",
     "TEMPORARILY_NOT_AVAILABLE": "Temporarily not available",
 }
@@ -308,14 +308,14 @@ def run() -> None:
     tb_status = group_trials_by(tb_status, ["Study Status", "start_year"], "n_studies_status", completed_only=False)
 
     # get sum of studies by completion year and whether they have results
-    tb_results = group_trials_by(tb, ["Study Results", "start_year"], "n_studies_results", completed_only=False)
+    tb_results = group_trials_by(tb, ["Study Results", "completion_year"], "n_studies_results", completed_only=True)
 
     # get average study length by phase and completion year
     tb_length = group_trials_by(
         tb,
         ["completion_year", "Phases"],
         "avg_study_length_days",
-        aggregate_func="mean",
+        aggregate_func="median",
         avg_col_name="study_length_days",
     )
 
@@ -324,7 +324,7 @@ def run() -> None:
         tb,
         ["completion_year", "Phases"],
         "avg_participants",
-        aggregate_func="mean",
+        aggregate_func="median",
         avg_col_name="Enrollment",
     )
 
@@ -392,12 +392,12 @@ def group_trials_by(tb, group_by_cols, new_col_name, completed_only=True, aggreg
     if aggregate_func == "count":
         tb_gb = (tb_gb.groupby(group_by_cols).size().reset_index(name=new_col_name)).copy_metadata(tb)
 
-    elif aggregate_func == "mean":
+    elif aggregate_func == "median":
         if avg_col_name is None:
-            raise ValueError("avg_col_name must be provided when aggregate_func is 'mean'")
-        tb_gb = (tb_gb.groupby(group_by_cols)[avg_col_name].mean().reset_index(name=new_col_name)).copy_metadata(tb)
+            raise ValueError("avg_col_name must be provided when aggregate_func is 'median'")
+        tb_gb = (tb_gb.groupby(group_by_cols)[avg_col_name].median().reset_index(name=new_col_name)).copy_metadata(tb)
     else:
-        raise ValueError("aggregate_func must be either 'count' or 'mean'")
+        raise ValueError("aggregate_func must be either 'count' or 'median'")
 
     tb_gb[new_col_name].m.origins = tb["Phases"].m.origins
 

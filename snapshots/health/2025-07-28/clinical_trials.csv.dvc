@@ -9,9 +9,9 @@ meta:
     date_published: "2025"
 
     # Citation
-    producer: US National Institutes of Health
+    producer: ClinicalTrials.gov
     citation_full: |-
-      National Library of Medicine (US), National Center for Biotechnology Information, ClinicalTrials.gov. U.S. National Institutes of Health, https://clinicaltrials.gov/ (2025) 
+      National Library of Medicine (US), National Center for Biotechnology Information, ClinicalTrials.gov. U.S. National Institutes of Health, https://clinicaltrials.gov/ (2025)
     attribution_short: NIH
 
     # Files
