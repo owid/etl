@@ -3,6 +3,7 @@
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 # Individual Preferences
+
 - @~/.claude/instructions/etl.md
 
 ## Architecture Overview
@@ -22,6 +23,7 @@ This is Our World in Data's ETL system - a content-addressable data pipeline wit
 ### Step Execution System
 
 Steps are content-addressable with automatic dirty detection:
+
 ```python
 # Standard garden step pattern
 from etl.helpers import PathFinder, create_dataset
@@ -41,6 +43,7 @@ def run(dest_dir: str) -> None:
 ### Catalog System
 
 Built on **owid.catalog** library:
+
 - **Dataset**: Container for multiple tables with shared metadata
 - **Table**: pandas.DataFrame subclass with rich metadata per column
 - **Variable**: pandas.Series subclass with variable-specific metadata
@@ -50,6 +53,7 @@ Built on **owid.catalog** library:
 ### DAG Dependencies
 
 YAML-based dependency graphs in `dag/` directory:
+
 - Content-based dirty detection skips unchanged steps
 - Topological sorting ensures proper execution order
 - Supports partial execution with `--only`, `--downstream` flags
@@ -57,6 +61,7 @@ YAML-based dependency graphs in `dag/` directory:
 ## Development Commands
 
 ### Essential Commands
+
 ```bash
 # Core ETL operations
 make etl                    # Run garden steps only
@@ -79,6 +84,7 @@ make lab                   # Start Jupyter Lab
 ```
 
 ### ETL CLI Commands
+
 ```bash
 # Main execution
 etl run [steps...]         # Run specific ETL steps
@@ -102,26 +108,32 @@ pytest tests/test_etl_step_code.py::test_step_name  # Test single step
 ## Key Development Patterns
 
 ### Geographic Harmonization
+
 Use `geo.harmonize_countries()` for standardization:
+
 ```python
 from etl.data_helpers import geo
 tb = geo.harmonize_countries(tb, countries_file=paths.country_mapping_path)
 ```
 
 ### Metadata Management
+
 Tables inherit and propagate metadata:
+
 ```python
 tb = tb.format(short_name="table_name")  # Sets table metadata
 tb["column"] = tb["column"].replace_metadata(unit="percent", short_unit="%")
 ```
 
 ### Creating New Steps
+
 1. Use Wizard UI (`make wizard`) for guided creation
 2. Or follow existing patterns in `etl/steps/data/[stage]/[namespace]/`
 3. Add dependencies to appropriate DAG file in `dag/`
 4. Steps follow URI pattern: `data://[stage]/[namespace]/[version]/[name]`
 
 ### Testing Steps
+
 ```bash
 # Test specific step
 etl run --dry-run data://garden/namespace/version/dataset
@@ -137,11 +149,13 @@ pytest tests/test_steps.py -m integration
 ## Configuration
 
 ### Environment Variables
+
 - `OWID_ENV`: dev/staging/production environment
 - `.env`: Local environment configuration
 - Database connections managed via `etl.config.OWID_ENV`
 
 ### Key Files
+
 - `dag/main.yml`: Main DAG dependencies
 - `dag/[topic].yml`: Topic-specific dependencies
 - `etl/config.py`: Runtime configuration
@@ -150,6 +164,7 @@ pytest tests/test_steps.py -m integration
 ## Libraries Structure
 
 ### Core Libraries (`lib/`)
+
 - **catalog**: Dataset/table/variable management with metadata
 - **datautils**: Data processing utilities and helpers
 - **repack**: Data packaging and compression tools
@@ -157,6 +172,7 @@ pytest tests/test_steps.py -m integration
 These are installed as editable packages (`owid-catalog`, `owid-datautils`, `owid-repack`).
 
 ### Apps vs Core ETL
+
 - **Core ETL** (`etl/`): Step execution engine, catalog management, DAG processing
 - **Apps** (`apps/`): Extended functionality - Wizard, chart sync, anomaly detection, maintenance tools
 
@@ -180,6 +196,7 @@ When ETL steps fail due to data quality issues (NaT values, missing data, missin
 ### Systematic Debugging Approach
 
 1. **Check the Snapshot First**: Root cause often lies at the data source level, not ETL logic
+
    - Compare snapshot file sizes and date ranges - external providers may truncate or discontinue data feeds
    - Examine snapshot history: `git log --oneline --follow snapshots/dataset.csv.dvc`
    - Verify the upstream data source is still providing complete data
@@ -222,15 +239,14 @@ print(f"Garden null values: {tb.date.isnull().sum()}")
 - **Document data issues**: Log warnings about data quality problems found during processing
 - **Fix meadow steps**: Most data cleaning should happen in meadow, not garden steps
 
-## Individual Preferences
-- @~/.claude/instructions/etl.md
-
 ## OWID-Specific Data Conventions
 
 ### Regional Classifications
+
 Our World in Data uses these standard regions:
+
 - **Africa**
-- **Europe** 
+- **Europe**
 - **Asia**
 - **Oceania**
 - **North America**
@@ -239,13 +255,16 @@ Our World in Data uses these standard regions:
 **Important**: These six regions should aggregate to the **World** total for additive variables (raw counts, totals) but NOT for rates, averages, or intensive variables. Use the metadata file to determine if a variable should be additive.
 
 ### Income Group Classifications
+
 We also use World Bank income groups:
+
 - **High-income countries**
-- **Upper-middle-income countries**  
+- **Upper-middle-income countries**
 - **Lower-middle-income countries**
 - **Low-income countries**
 
 **Important**: These four income groups should:
+
 - **For additive variables**: Sum to the **World** total (like regional aggregation)
 - **For rates/averages**: The **World** value should fall within the range of these income groups (not necessarily be their average, as it's population-weighted)
 
@@ -276,7 +295,7 @@ log = get_logger()
 def _validate_input_datasets(*datasets) -> None:
     """Validate input datasets for basic integrity checks."""
     # Check datasets aren't empty
-    # Verify required columns exist  
+    # Verify required columns exist
     # Check data types are expected
     # Validate key constraints
 
@@ -290,7 +309,7 @@ def _validate_output_data(tb_final: Table) -> None:
 def _validate_domain_specific_logic(tb: Table) -> None:
     """Domain-specific validation based on subject matter expertise."""
     # Regional/country-specific validation
-    # Historical pattern validation  
+    # Historical pattern validation
     # Cross-variable consistency checks
     # Outlier detection and flagging
 ```
@@ -315,24 +334,24 @@ def _validate_against_metadata(tb: Table, metadata: dict) -> None:
     """Validate table against metadata specifications."""
     if not metadata or 'tables' not in metadata:
         return
-        
+
     for table_name, table_meta in metadata['tables'].items():
         if 'variables' not in table_meta:
             continue
-            
+
         for var_name, var_meta in table_meta['variables'].items():
             if var_name not in tb.columns:
                 continue
-                
+
             # Check units match expectations
             if 'unit' in var_meta:
                 log.info(f"Expected unit for {var_name}: {var_meta['unit']}")
-                
+
             # Validate against specified ranges
             if 'display' in var_meta and 'numDecimalPlaces' in var_meta['display']:
                 expected_decimals = var_meta['display']['numDecimalPlaces']
                 # Validate decimal precision matches expectation
-                
+
             # Use description to inform validation logic
             if 'description' in var_meta:
                 desc = var_meta['description'].lower()
@@ -345,6 +364,7 @@ def _validate_against_metadata(tb: Table, metadata: dict) -> None:
 ### Standard Validation Categories
 
 **1. Basic Data Integrity**
+
 ```python
 # Dataset completeness
 assert len(tb) > 0, "Dataset is empty"
@@ -361,6 +381,7 @@ assert pd.api.types.is_numeric_dtype(tb["indicator_value"]), "Indicator should b
 ```
 
 **2. Value Range Validation**
+
 ```python
 # Reasonable bounds based on domain knowledge
 assert tb["life_expectancy"].min() >= 20, f"Unrealistically low life expectancy: {tb['life_expectancy'].min()}"
@@ -377,6 +398,7 @@ assert tb["year"].max() <= max_year, f"Year too late: {tb['year'].max()}"
 ```
 
 **3. Temporal Consistency**
+
 ```python
 # Check for reasonable temporal trends
 world_data = tb[tb["country"] == "World"].sort_values("year")
@@ -388,13 +410,14 @@ if len(world_data) >= 10:
 ```
 
 **4. Regional/Geographic Validation**
+
 ```python
 # Region-specific validation based on historical patterns
 for region in ["Africa", "Europe", "Asia", "World"]:
     region_data = tb[tb["country"] == region]
     if len(region_data) == 0:
         continue
-        
+
     rates = region_data["child_mortality_rate"].dropna()
     if region == "Europe":
         # Europe should have lower recent mortality rates
@@ -407,37 +430,38 @@ for region in ["Africa", "Europe", "Asia", "World"]:
 ### OWID-Specific Validation Functions
 
 **Regional Aggregation Validation**
+
 ```python
 def _validate_regional_aggregation(tb: Table, metadata: dict) -> None:
     """Validate that additive variables aggregate correctly from regions to World."""
     regions = ["Africa", "Europe", "Asia", "Oceania", "North America", "South America"]
-    
+
     if not metadata or 'tables' not in metadata:
         return
-        
+
     for table_name, table_meta in metadata['tables'].items():
         if 'variables' not in table_meta:
             continue
-            
+
         for var_name, var_meta in table_meta['variables'].items():
             if var_name not in tb.columns:
                 continue
-                
+
             # Check if variable should be additive based on metadata
             is_additive = _is_additive_variable(var_meta)
-            
+
             if is_additive:
                 # Validate regional aggregation for additive variables
                 for year in tb["year"].unique():
                     year_data = tb[tb["year"] == year]
-                    
+
                     regional_data = year_data[year_data["country"].isin(regions)]
                     world_data = year_data[year_data["country"] == "World"]
-                    
+
                     if len(regional_data) == len(regions) and len(world_data) == 1:
                         regional_total = regional_data[var_name].sum(skipna=True)
                         world_total = world_data[var_name].iloc[0]
-                        
+
                         # Allow small tolerance for rounding differences
                         tolerance = abs(world_total * 0.01) if world_total != 0 else 1.0
                         assert abs(regional_total - world_total) <= tolerance, \
@@ -448,22 +472,22 @@ def _is_additive_variable(var_meta: dict) -> bool:
     # Check unit for clues about additivity
     unit = var_meta.get('unit', '').lower()
     description = var_meta.get('description', '').lower()
-    
+
     # Additive indicators (should sum across regions)
     additive_keywords = ['total', 'number', 'count', 'deaths', 'cases', 'population', 'people']
     # Non-additive indicators (rates, averages, percentages)
     non_additive_keywords = ['rate', 'per capita', 'percentage', 'percent', '%', 'ratio', 'average', 'mean', 'expectancy']
-    
+
     # Check for non-additive keywords first (more specific)
     if any(keyword in unit for keyword in non_additive_keywords) or \
        any(keyword in description for keyword in non_additive_keywords):
         return False
-        
+
     # Check for additive keywords
     if any(keyword in unit for keyword in additive_keywords) or \
        any(keyword in description for keyword in additive_keywords):
         return True
-        
+
     # Default to non-additive if unclear (safer assumption)
     return False
 ```
@@ -476,27 +500,27 @@ def _is_additive_variable(var_meta: dict) -> bool:
 def run() -> None:
     # Load metadata if available
     metadata = _load_metadata_if_available(Path(__file__).parent)
-    
+
     # Load inputs
     ds_input = paths.load_dataset("input_data")
-    
+
     # Validate inputs immediately after loading
     log.info("Validating input datasets")
     _validate_input_datasets(ds_input)
-    
+
     # Process data
     tb = process_data(ds_input)
     tb = geo.harmonize_countries(tb, countries_file=paths.country_mapping_path)
-    
+
     # CRITICAL: Validate outputs BEFORE formatting (before .format() call)
     log.info("Validating processed data")
     _validate_output_data(tb)
     _validate_against_metadata(tb, metadata)
     _validate_regional_aggregation(tb, metadata)
-    
+
     # Format table (sets indexes) - do this AFTER validation
     tb = tb.format(["country", "year"])
-    
+
     # Save outputs
     ds_garden = paths.create_dataset(tables=[tb])
     ds_garden.save()
@@ -505,22 +529,26 @@ def run() -> None:
 ### Common Validation Patterns by Data Type
 
 **Health/Mortality Data:**
+
 - Rates between 0-100%, life expectancy 20-120 years
 - Historical improvement trends expected
 - Regional patterns based on development levels
 
 **Economic Data:**
+
 - GDP/income should be positive, reasonable growth rates
 - Inflation rates can be negative but extreme values need checking
 - Currency units and scale factors validated
 
 **Population Data:**
+
 - Population counts positive, reasonable growth rates
 - Age distributions sum correctly
 - Migration data balances between countries
 
 **Environmental Data:**
-- Temperature, precipitation within physical bounds  
+
+- Temperature, precipitation within physical bounds
 - Emission factors positive with reasonable country totals
 - Time series consistency for monitoring data
 
