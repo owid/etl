@@ -165,3 +165,14 @@ steps:
     - data://meadow/lis/2025-01-24/luxembourg_income_study
   data://grapher/lis/2025-01-24/luxembourg_income_study:
     - data://garden/lis/2025-01-24/luxembourg_income_study
+
+  #
+  # Poverty projections from the World Bank's Global Poverty Revisited report (2021 PPPs)
+  #
+  data://meadow/wb/2025-06-18/poverty_projections:
+    - snapshot://wb/2025-06-18/poverty_projections.dta
+    - snapshot://wb/2025-06-18/poverty_aggregates.dta
+  data://garden/wb/2025-06-18/poverty_projections:
+    - data://meadow/wb/2025-06-18/poverty_projections
+  data://grapher/wb/2025-06-18/poverty_projections:
+    - data://garden/wb/2025-06-18/poverty_projections
