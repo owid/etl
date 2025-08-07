@@ -213,7 +213,7 @@ def run(live_api: bool) -> None:
     # Add relative poverty indicators and decile thresholds to the key indicators file
     df = add_relative_poverty_and_decile_thresholds(df, df_relative, df_percentiles, wb_api)
 
-    df_filled = add_filled_data(df, df_percentiles)
+    df_filled = add_filled_data(df, wb_api)
 
 
 class WB_API:
