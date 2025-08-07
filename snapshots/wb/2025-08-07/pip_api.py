@@ -1842,6 +1842,10 @@ def add_filled_data(df: pd.DataFrame, wb_api: WB_API) -> pd.DataFrame:
     # Remove region_name column
     df_filled = df_filled.drop(columns=["region_name"])
 
+    # Add the column filled to identify if the data is filled or not
+    df["filled"] = False
+    df_filled["filled"] = True
+
     # Concatenate with the original df
     df = pd.concat([df, df_filled], ignore_index=True)
 
