@@ -20,13 +20,9 @@ def run() -> None:
     #
     # Process data.
     #
-    # Harmonize country names.
-    tb = geo.harmonize_countries(
-        df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
-    )
-
+    tb = tb.rename(columns={"model_name": "country", "paper_date": "date"})
     # Improve table format.
-    tb = tb.format(["country", "year"])
+    tb = tb.format(["country", "date"])
 
     #
     # Save outputs.

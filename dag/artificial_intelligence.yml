@@ -225,8 +225,9 @@ steps:
     - data://garden/artificial_intelligence/2025-08-25/robotaxis
 
 
+
   #
-  # TODO: add step name (just something recognizable)
+  # Papers with Code datasets
   #
   data://meadow/artificial_intelligence/2025-08-07/papers_with_code:
     - snapshot://artificial_intelligence/2025-08-07/papers_with_code.gz
