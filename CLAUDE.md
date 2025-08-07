@@ -338,8 +338,8 @@ def _validate_against_metadata(tb: Table, metadata: dict) -> None:
                 desc = var_meta['description'].lower()
                 if 'percentage' in desc or 'rate' in desc:
                     # Apply percentage validation (0-100)
-                    assert tb[var_name].min() >= 0, f"{var_name}: Negative rate found"
-                    assert tb[var_name].max() <= 100, f"{var_name}: Rate exceeds 100%"
+                    assert tb[var_name].min(skipna=True) >= 0, f"{var_name}: Negative rate found"
+                    assert tb[var_name].max(skipna=True) <= 100, f"{var_name}: Rate exceeds 100%"
 ```
 
 ### Standard Validation Categories
