@@ -213,6 +213,8 @@ def run(live_api: bool) -> None:
     # Add relative poverty indicators and decile thresholds to the key indicators file
     df = add_relative_poverty_and_decile_thresholds(df, df_relative, df_percentiles, wb_api)
 
+    df_filled = add_filled_data(df, df_percentiles)
+
 
 class WB_API:
     def __init__(self, api_address, check_health=False):
@@ -1781,6 +1783,68 @@ def add_regional_definitions(wb_api: WB_API, df: pd.DataFrame) -> pd.DataFrame:
     log.info("Regional definitions generated from API.")
 
     return df
+
+
+def add_filled_data(df: pd.DataFrame, wb_api: WB_API) -> pd.DataFrame:
+    """
+    Add filled data for China and India to the key indicators file.
+    """
+
+    # Obtain latest versions of the PIP dataset
+    versions = pip_versions(wb_api)
+
+    # Initialize empty lists to store filled data for countries and regions
+    df_country_filled = []
+    df_region_filled = []
+
+    # Read filled data for countries
+    for ppp_version, povlines in POVLINES_DICT.items():
+        for povline in povlines:
+            # Query filled data
+            df_country_filled_by_povline = pip_query_country(
+                wb_api,
+                popshare_or_povline="povline",
+                value=povline / 100,
+                versions=versions,
+                country_code="all",
+                year="all",
+                fill_gaps="true",
+                welfare_type="all",
+                reporting_level="all",
+                ppp_version=ppp_version,
+                download="true",
+            )
+
+            df_region_filled_by_povline = pip_query_region(
+                wb_api,
+                popshare_or_povline="povline",
+                value=povline / 100,
+                versions=versions,
+                country_code="all",
+                year="all",
+                welfare_type="all",
+                reporting_level="all",
+                ppp_version=ppp_version,
+                download="true",
+            )
+
+            # Append filled data for the current povline
+            df_country_filled.append(df_country_filled_by_povline)
+            df_region_filled.append(df_region_filled_by_povline)
+
+    # Concatenate all filled data for countries and regions
+    df_country_filled = pd.concat(df_country_filled, ignore_index=True)
+    df_region_filled = pd.concat(df_region_filled, ignore_index=True)
+
+    # Concatenate filled data for countries and regions
+    df_filled = pd.concat([df_country_filled, df_region_filled], ignore_index=True)
+
+    # Export df_filled to csv
+    df_filled.to_csv(f"{CACHE_DIR}/world_bank_pip_filled.csv", index=False)
+
+    log.info("Filled data for countries and regions extracted.")
+
+    return df_filled
 
 
 if __name__ == "__main__":
