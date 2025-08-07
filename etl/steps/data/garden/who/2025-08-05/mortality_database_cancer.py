@@ -1,8 +1,11 @@
 """Load a meadow dataset and create a garden dataset."""
 
+from pathlib import Path
+
 import numpy as np
 import owid.catalog.processing as pr
 import pandas as pd
+import yaml
 from owid.catalog import Table
 from structlog import get_logger
 
@@ -49,7 +52,6 @@ def run() -> None:
 
     # Final validation BEFORE formatting
     log.info("Validating processed data")
-    _validate_cancer_causes(tb)
     _validate_cancer_age_patterns(tb)
     _validate_temporal_patterns(tb)
     _validate_data_completeness(tb)
@@ -241,28 +243,6 @@ def _validate_demographic_dimensions(tb: Table) -> None:
     unexpected_ages = actual_ages - expected_age_groups
     if unexpected_ages:
         log.warning("Unexpected age group categories", categories=list(unexpected_ages))
-
-
-def _validate_cancer_causes(tb: Table) -> None:
-    """Validate cancer cause categories."""
-    cancer_causes = set(tb["cause"].unique())
-
-    # Log what cancer types are covered
-    log.info("Cancer causes in dataset", count=len(cancer_causes), causes=list(cancer_causes)[:10])  # Show first 10
-
-    # Check for expected major cancer types
-    expected_major_cancers = {
-        "Malignant neoplasms",
-        "Lung cancer",
-        "Breast cancer",
-        "Colorectal cancer",
-        "Stomach cancer",
-        "Liver cancer",
-        "Prostate cancer",
-    }
-    covered_cancers = expected_major_cancers & cancer_causes
-    if covered_cancers:
-        log.info("Major cancer types covered", covered=list(covered_cancers))
 
 
 def _validate_cancer_age_patterns(tb: Table) -> None:

@@ -9,7 +9,7 @@ Please work on the step located at: `etl/steps/data/garden/$ARGUMENTS.py` and it
 Please follow these requirements:
 - Add comprehensive validation functions following the patterns in CLAUDE.md
 - Include basic data integrity, value range validation, temporal consistency, and domain-specific checks
-- Use the metadata file (*.meta.yml) to inform validation logic where available
+- Use the metadata file (*.meta.yml) to understand the variables and their expected characteristics
 - Integrate validation calls into the main run() function BEFORE the .format() call
 - Add structured logging for clear visibility into data quality issues
 - Follow the import organization and code style conventions
