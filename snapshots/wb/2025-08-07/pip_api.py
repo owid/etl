@@ -1842,12 +1842,15 @@ def add_filled_data(df: pd.DataFrame, wb_api: WB_API) -> pd.DataFrame:
     # Remove region_name column
     df_filled = df_filled.drop(columns=["region_name"])
 
+    # Concatenate with the original df
+    df = pd.concat([df, df_filled], ignore_index=True)
+
     # Export df_filled to csv
-    df_filled.to_csv(f"{CACHE_DIR}/world_bank_pip_filled.csv", index=False)
+    df.to_csv(f"{CACHE_DIR}/world_bank_pip.csv", index=False)
 
-    log.info("Filled data for countries and regions extracted.")
+    log.info("Filled data for countries and regions included. Now we are really done :)")
 
-    return df_filled
+    return df
 
 
 if __name__ == "__main__":
