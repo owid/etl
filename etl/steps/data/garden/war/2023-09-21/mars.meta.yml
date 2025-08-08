@@ -13,7 +13,7 @@ definitions:
     deaths_method: |-
       Project Mars identifies war deaths based on contemporary sources and academic research.
     wars_multitype: |-
-      Project Mars considers wars "MNF in Lebanon, 1982-1984" and "Afghan War I, 1996-2001" to have had elements of both an interstate and a civil war. We have treated them overall as interstate wars to make our charts simpler.
+      Project Mars considers the 1982-1984 war in Lebanon and the Afghan War from 1996-2001 to have had elements of both an interstate and a civil war. We have treated them overall as interstate wars to make our charts simpler.
     mars_linked: |-
       [Project Mars](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/DUO7IE)
     conflict_type: |-
