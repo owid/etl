@@ -34,7 +34,7 @@ def run() -> None:
     tb_percentiles["welfare_type"] = tb_percentiles["welfare_type"].astype("string")
 
     # Set index and sort
-    tb = tb.format(["ppp_version", "poverty_line", "country", "year", "reporting_level", "welfare_type"])
+    tb = tb.format(["ppp_version", "filled", "poverty_line", "country", "year", "reporting_level", "welfare_type"])
     tb_percentiles = tb_percentiles.format(
         ["ppp_version", "country", "year", "reporting_level", "welfare_type", "percentile"]
     )

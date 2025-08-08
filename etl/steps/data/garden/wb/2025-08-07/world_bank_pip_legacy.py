@@ -332,6 +332,12 @@ def run() -> None:
 
 
 def process_data(tb: Table) -> Table:
+    # Select only non-filled data (filled=False)
+    tb = tb[tb["filled"] == False]
+
+    # Drop filled column
+    tb = tb.drop(columns=["filled"], errors="raise")
+
     # rename columns
     tb = tb.rename(columns={"headcount": "headcount_ratio", "poverty_gap": "poverty_gap_index"}, errors="raise")
 
