@@ -381,7 +381,7 @@ if st.session_state["show_form"]:
         render_fields_from_schema(SCHEMA_ORIGIN, "origin", categories=ACCEPTED_CATEGORIES)
 
         # 3) Submit
-        submitted = st.form_submit_button("Submit", type="primary", use_container_width=True, on_click=update_state)
+        submitted = st.form_submit_button("Submit", type="primary", width="stretch", on_click=update_state)
 
 else:
     submitted = False
@@ -440,7 +440,7 @@ if submitted:
             )
 
             st.markdown("#### 3. Proceed to next step")
-            st_wizard_page_link("data", use_container_width=True, border=True)
+            st_wizard_page_link("data", width="stretch", border=True)
 
         # User message
         st.toast("Templates generated. Read the next steps.", icon="✅")

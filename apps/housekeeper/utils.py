@@ -9,7 +9,7 @@ from etl.db import read_sql
 from etl.grapher import model as gm
 
 # System prompt to summarize chart information
-MODEL = "gpt-4.1"
+MODEL_DEFAULT = "gpt-5"
 SYSTEM_PROMPT = f"""We are reviewing a chart that was created some time ago. We want to understand if we can unpublish it from the site, in order to reduce the amount of charts that we have (and hence helping with the maintenance), keep it as-is, improve it and keep it etc.
 
 Your job is to briefly summarize what the chart is about, and to provide some context about the variables used in the chart. You can also check the chart's history to see if it has been edited recently, and the number of views in the last year that it gets (consider that the median of the chart views in last year is ~1300 views; i.e. half of the charts get less than 1300 views). Fewer-than median doesn't imply that we should unpublish, but together with other indicators can help us to decide. Note that some charts may have few visits because they were published very recently, so you should also consider the date of publication. Also, if it has been edited often and recently, it is a good indicator that the chart is still relevant and useful.
@@ -110,7 +110,7 @@ def get_chart_summary(chart):
             cost = round(gpt_response.cost, 4)
         else:
             cost = "unknown"
-        return f"*🤖 Summary* (AI-generated with {MODEL})\n{gpt_response.message_content}\n\n(Cost: {cost} $)"
+        return f"*🤖 Summary* (AI-generated with {MODEL_DEFAULT})\n{gpt_response.message_content}\n\n(Cost: {cost} $)"
 
 
 def ask_gpt(user_prompt) -> GPTResponse | None:
@@ -123,7 +123,7 @@ def ask_gpt(user_prompt) -> GPTResponse | None:
         ],
         temperature=0,
     )
-    gpt_response = api.query_gpt(query=query, model=MODEL)
+    gpt_response = api.query_gpt(query=query, model=MODEL_DEFAULT)
     return gpt_response
 
 
