@@ -82,7 +82,7 @@ def get_affected_charts_and_preview(indicator_mapping: Dict[int, int]) -> List[g
             # Button to finally submit the revisions
             st.button(
                 label="🚀 Update charts (3/3)",
-                use_container_width=True,
+                width="stretch",
                 type="primary",
                 on_click=trigger_chart_submission,
             )

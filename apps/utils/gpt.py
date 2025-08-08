@@ -17,8 +17,8 @@ log = structlog.get_logger()
 MODEL_DEFAULT = "gpt-4.1-mini"
 
 # PRICING (per 1,000 tokens)
-## See pricing list: https://openai.com/api/pricing/ (USD)
-## See model list: https://platform.openai.com/docs/models/gpt-4-and-gpt-4-turbo
+## See pricing list: https://openai.com/api/pricing/ (USD) // Detailed: https://platform.openai.com/docs/pricing
+## See model list: https://platform.openai.com/docs/models
 RATE_DEFAULT_IN = 0.005
 MODEL_EQUIVALENCES = {
     "gpt-3.5-turbo": "gpt-3.5-turbo-0125",
@@ -32,6 +32,9 @@ MODEL_EQUIVALENCES = {
     "o1": "o1-2024-12-17",
     "o3": "o3-2025-04-16",
     "o4-mini": "o4-mini-2025-04-16",
+    "gpt-5": "gpt-5-2025-08-07",
+    "gpt-5-mini": "gpt-5-mini-2025-08-07",
+    "gpt-5-nano": "gpt-5-nano-2025-08-07",
 }
 MODEL_RATES_1000_TOKEN = {
     # GPT 3.5
@@ -97,6 +100,19 @@ MODEL_RATES_1000_TOKEN = {
         "in": 0.1,
         "out": 0.4,
     },
+    # GPT 5
+    "gpt-5-2025-08-07": {
+        "in": 1.25 / 1000,
+        "out": 10 / 1000,
+    },
+    "gpt-5-mini-2025-08-07": {
+        "in": 0.25 / 1000,
+        "out": 2 / 1000,
+    },
+    "gpt-5-nano-2025-08-07": {
+        "in": 0.05 / 1000,
+        "out": 0.4 / 1000,
+    },
 }
 MODEL_RATES_1000_TOKEN = {
     **MODEL_RATES_1000_TOKEN,
@@ -112,6 +128,9 @@ MODELS_TOKEN_ENCODINGS = {
     "o1": "o200k_base",
     "o3": "o200k_base",
     "o4-mini": "o200k_base",
+    "gpt-5": "o200k_base",
+    "gpt-5-mini": "o200k_base",
+    "gpt-5-nano": "o200k_base",
 }
 
 

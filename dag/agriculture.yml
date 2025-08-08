@@ -187,3 +187,13 @@ steps:
   #
   data://grapher/agriculture/2025-07-30/long_term_food_and_agriculture_trends:
     - data://garden/agriculture/2025-07-30/long_term_food_and_agriculture_trends
+  #
+  # Decoupling of agricultural production and land use
+  #
+  data://garden/agriculture/2025-08-06/decoupling_food_production_and_land_use:
+    - data://garden/faostat/2025-03-17/faostat_fbsc
+    - data://garden/faostat/2025-03-17/faostat_rl
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2024-07-15/population
+  data://grapher/agriculture/2025-08-06/decoupling_food_production_and_land_use:
+    - data://garden/agriculture/2025-08-06/decoupling_food_production_and_land_use

@@ -39,7 +39,7 @@ MAX_DIFF_LINES = 100
 
 def _show_options():
     """Show options pane."""
-    with st.popover("⚙️ Options", use_container_width=True):
+    with st.popover("⚙️ Options", width="stretch"):
         col1, col2, col3 = st.columns(3)
         with col1:
             url_persist(st.toggle)(

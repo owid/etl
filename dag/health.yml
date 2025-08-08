@@ -1304,3 +1304,11 @@ steps:
     - data://meadow/who/2025-08-06/mortality_database_vaccine_preventable
   data://grapher/who/2025-08-06/mortality_database_vaccine_preventable:
     - data://garden/who/2025-08-06/mortality_database_vaccine_preventable
+
+  # GCO cancer over time (cervical)
+  data://meadow/cancer/2025-08-08/gco_cancer_over_time_cervical:
+    - snapshot://cancer/2025-08-08/gco_cancer_over_time_cervical.csv
+  data://garden/cancer/2025-08-08/gco_cancer_over_time_cervical:
+    - data://meadow/cancer/2025-08-08/gco_cancer_over_time_cervical
+  data://grapher/cancer/2025-08-08/gco_cancer_over_time_cervical:
+    - data://garden/cancer/2025-08-08/gco_cancer_over_time_cervical
