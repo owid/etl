@@ -333,7 +333,7 @@ def run() -> None:
 
 def process_data(tb: Table) -> Table:
     # Select only non-filled data (filled=False)
-    tb = tb[tb["filled"] == False]
+    tb = tb[~tb["filled"]]
 
     # Drop filled column
     tb = tb.drop(columns=["filled"], errors="raise")
