@@ -430,6 +430,9 @@ def run() -> None:
     # Overall, the estimates on total production (in kcal) per country agree very well (except for a few countries, more significantly Iceland).
     # sanity_check_compare_with_hong_et_al(tb_grouped=tb_grouped)
 
+    # Remove unnecessary columns.
+    tb = tb.drop(columns=["conversion", "item_code", "item_description"], errors="raise")
+
     # Improve table formats.
     tb_grouped = tb_grouped.format(["country", "year"], short_name="decoupling_food_production_and_land_use_total")
     tb = tb.format(keys=["country", "year", "item"], short_name=paths.short_name)
@@ -438,5 +441,5 @@ def run() -> None:
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_garden = paths.create_dataset(tables=[tb, tb_grouped])
+    ds_garden = paths.create_dataset(tables=[tb, tb_grouped], default_metadata=ds_fbsc.metadata)
     ds_garden.save()
