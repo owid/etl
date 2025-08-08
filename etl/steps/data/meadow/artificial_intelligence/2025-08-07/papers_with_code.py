@@ -2,6 +2,8 @@
 
 import gzip
 import json
+import re
+from datetime import datetime
 
 import pandas as pd
 from owid.catalog.tables import Table, _add_table_and_variables_metadata_to_table
@@ -36,7 +38,10 @@ def run() -> None:
     )
 
     df_image = extract_task_dataset(data, "Image Classification", "ImageNet")
+    df_image = df_image.sort_values(by=["paper_date"])
     df_image = df_image[["model_name", "paper_date", "Top 1 Accuracy", "Top 5 Accuracy"]]
+    print(df_image)
+
     df_image = df_image.groupby(["model_name", "paper_date"])[["Top 1 Accuracy", "Top 5 Accuracy"]].max().reset_index()
 
     df_language = extract_task_dataset(data, "Multi-task Language Understanding", "MML")
@@ -123,12 +128,16 @@ def extract_task_dataset(json_data, target_task, target_dataset):
         rows = sota_data.get("rows", [])
 
         for row in rows:
+            # Debug: Print all available keys in the row
+            # Print raw paper_date for debugging
+            raw_date = row.get("paper_date", "")
+
             record = {
                 "task": target_task,
                 "dataset": target_dataset,
                 "model_name": row.get("model_name", ""),
                 "paper_title": row.get("paper_title", ""),
-                "paper_date": row.get("paper_date", ""),
+                "paper_date": raw_date,  # Use raw date for now
                 "paper_url": row.get("paper_url", ""),
                 "uses_additional_data": row.get("uses_additional_data", False),
             }

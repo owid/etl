@@ -72,6 +72,7 @@ def group_sort_filter(tb, column):
     grouped = tb.groupby(["paper_date", "model_name"]).agg({column: "max"})
     grouped = grouped.dropna(subset=[column]).reset_index()
     grouped = grouped.sort_values(by="paper_date")
+    print(grouped)
     max_performing = grouped.groupby("paper_date")[column].idxmax()
     best_daily_models = grouped.loc[max_performing]
     best_daily_models = best_daily_models.sort_values(by="paper_date")
