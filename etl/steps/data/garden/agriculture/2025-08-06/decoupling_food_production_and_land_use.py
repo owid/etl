@@ -239,7 +239,7 @@ def sanity_check_compare_with_hong_et_al(tb_grouped):
         warn_on_unused_mappings=True,
     )
     check = pd.DataFrame(tb_grouped)[["country", "year", "production_energy", "agricultural_land"]].merge(
-        df, how="inner", on=["country", "year"]
+        df, how="left", on=["country", "year"]
     )
     check["pct_food"] = (
         100 * abs(check["production_energy"] - check["production_energy_hong"]) / check["production_energy_hong"]
@@ -261,16 +261,17 @@ def sanity_check_compare_with_hong_et_al(tb_grouped):
         .melt(id_vars=["country", "year"], value_name=value_name)
     )
     for country in sorted(set(check["country"])):
-        _plot = plot[plot["country"] == country]
-        px.line(
-            _plot,
-            x="year",
-            y=value_name,
-            color="variable",
-            markers=True,
-            title=country,
-            range_y=(0, _plot[value_name].max() * 1.05),
-        ).show()
+        _plot = plot[plot["country"] == country].dropna()
+        if len(set(_plot["variable"])) == 2:
+            px.line(
+                _plot,
+                x="year",
+                y=value_name,
+                color="variable",
+                markers=True,
+                title=country,
+                range_y=(0, _plot[value_name].max() * 1.05),
+            ).show()
     # In terms of food production, most countries agree reasonably well with Hong et al (2021); in fact better than expected, given that FAOSTAT has probably changed since the publication of that paper.
     # Cases with significant discrepancies Indonesia, Hong-Kong, or Malaysia. And one where the difference is particularly significant is Iceland.
     # Land use differs significantly more, but I suppose that's also mostly due to changes in FAOSTAT RL data.
