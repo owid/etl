@@ -281,13 +281,21 @@ def _set_description_key(view, tb_ucdp, tb_up):
     elif view.d.indicator == "wars_ongoing":
         ctype = view.d.conflict_type.replace(" ", "_").replace("-", "_").replace("(", "_").lower().strip(")")
         keys = tb_ucdp[f"number_ongoing_conflicts__conflict_type_{ctype}"].metadata.description_key + [TEXT_KEY_EXTRA]
-        keys[0] = keys[0].replace(UCDP_ONLY, UCDP_AND_PRIO)
     elif view.d.indicator == "wars_ongoing_country_rate":
         ctype = view.d.conflict_type.replace(" ", "_").replace("-", "_").replace("(", "_").lower().strip(")")
         keys = tb_ucdp[f"number_ongoing_conflicts_per_country__conflict_type_{ctype}"].metadata.description_key + [
             TEXT_KEY_EXTRA
         ]
-        keys[0] = keys[0].replace(UCDP_ONLY, UCDP_AND_PRIO)
+
+    if keys is not None:
+        for i, key in enumerate(keys):
+            key = key.replace(UCDP_ONLY, UCDP_AND_PRIO)
+            key = key.replace(
+                "UCDP identifies",
+                "[UCDP](https://www.uu.se/en/department/peace-and-conflict-research/research/ucdp/ucdp-methodology) and [PRIO](https://www.semanticscholar.org/paper/Monitoring-Trends-in-Global-Combat%3A-A-New-Dataset-Lacina-Gleditsch/0c4ff27fff986bc30112ac59ad6afbd7b719ad17?p2df) identify",
+            )
+            keys[i] = key
+
     return keys
 
 
