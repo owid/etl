@@ -350,7 +350,7 @@ if st.session_state.chart_animation_show_image_settings:
                 first_frame=first_frame,
             )
             # GIF preview.
-            st.image(str(st.session_state.chart_animation_file), use_container_width=True)
+            st.image(str(st.session_state.chart_animation_file), width="stretch")
             st_info('Animation preview. Right click and "Save Image As..." to download it.')
         else:
             st.session_state.chart_animation_file = create_mp4_from_images(

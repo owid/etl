@@ -34,7 +34,7 @@ def st_show_home():
                 "expert",
                 label="Questions about ETL or Grapher? Ask the expert!",
                 help="Ask the expert any documentation question!",
-                use_container_width=True,
+                width="stretch",
                 border=True,
             )
         with cols[1]:
@@ -42,7 +42,7 @@ def st_show_home():
                 "analytics",
                 label="OWID Analytics",
                 help="Learn more with the OWID Analytics dashboard. It redirects you to another internal site.",
-                use_container_width=True,
+                width="stretch",
                 border=True,
             )
 
