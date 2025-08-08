@@ -411,16 +411,27 @@ def add_top_1_percentile(tb: Table, tb_percentiles: Table) -> Table:
         columns={"share": "top1_share", "avg": "top1_avg"}, errors="raise"
     )
 
+    tb_filled, tb_unfilled = separate_filled_and_unfilled_data(tb=tb)
+
     # Merge with the main table
-    tb = pr.merge(
-        tb, tb_percentiles_thr, on=["ppp_version", "country", "year", "reporting_level", "welfare_type"], how="left"
+    tb_unfilled = pr.merge(
+        tb_unfilled,
+        tb_percentiles_thr,
+        on=["ppp_version", "country", "year", "reporting_level", "welfare_type"],
+        how="left",
     )
-    tb = pr.merge(
-        tb, tb_percentiles_share, on=["ppp_version", "country", "year", "reporting_level", "welfare_type"], how="left"
+    tb_unfilled = pr.merge(
+        tb_unfilled,
+        tb_percentiles_share,
+        on=["ppp_version", "country", "year", "reporting_level", "welfare_type"],
+        how="left",
     )
 
     # Now I can calculate the share of the top 90-99%
-    tb["top90_99_share"] = tb["decile10_share"] - tb["top1_share"]
+    tb_unfilled["top90_99_share"] = tb_unfilled["decile10_share"] - tb_unfilled["top1_share"]
+
+    # Concatenate the filled and unfilled tables
+    tb = pr.concat([tb_filled, tb_unfilled], ignore_index=True)
 
     return tb
 
@@ -485,6 +496,7 @@ def create_stacked_variables(tb: Table) -> Tuple[Table, list, list]:
             "country",
             "year",
             "welfare_type",
+            "filled",
             "ppp_version",
             "poverty_line",
             "headcount_ratio",
@@ -496,7 +508,7 @@ def create_stacked_variables(tb: Table) -> Tuple[Table, list, list]:
     # Pivot
     tb_pivot = pivot_table(
         tb=tb_pivot,
-        index=["country", "year", "welfare_type"],
+        index=["country", "year", "welfare_type", "filled"],
         columns=["ppp_version", "poverty_line"],
     )
 
@@ -574,14 +586,16 @@ def create_stacked_variables(tb: Table) -> Tuple[Table, list, list]:
 
     # Stack table
     tb_pivot = unpivot_table(
-        tb=tb_pivot.reset_index(), index=["country", "year", "welfare_type"], level=["ppp_version", "poverty_line"]
+        tb=tb_pivot.reset_index(),
+        index=["country", "year", "welfare_type", "filled"],
+        level=["ppp_version", "poverty_line"],
     )
 
     # Merge with tb
     tb = pr.merge(
         tb,
         tb_pivot,
-        on=["country", "year", "welfare_type", "poverty_line", "ppp_version"],
+        on=["country", "year", "welfare_type", "filled", "poverty_line", "ppp_version"],
         how="outer",
     )
 
@@ -625,7 +639,7 @@ def sanity_checks(
     """
 
     # Define index for pivot
-    index = ["country", "year", "welfare_type"]
+    index = ["country", "year", "welfare_type", "filled"]
 
     # Pivot
     tb_pivot = pivot_table(tb=tb, index=index, columns=["ppp_version", "poverty_line"])
@@ -922,9 +936,11 @@ def inc_or_cons_data(tb: Table) -> Tuple[Table, Table]:
     Separate income and consumption data
     """
 
+    tb_filled, tb_unfilled = separate_filled_and_unfilled_data(tb=tb)
+
     # Make a copy of the table
-    tb_spells = tb.copy()
-    tb_no_spells = tb.copy()
+    tb_spells = tb_unfilled.copy()
+    tb_no_spells = tb_unfilled.copy()
 
     # Generate tb_inc_spells and tb_cons_spells
     tb_inc_spells = tb_spells[tb_spells["welfare_type"] == "income"].reset_index(drop=True)
@@ -943,16 +959,17 @@ def inc_or_cons_data(tb: Table) -> Tuple[Table, Table]:
     check_jumps_in_grapher_dataset(tb_no_spells_smooth)
 
     # Add the column table, identifying the type of table to use in Grapher
-    # tb_spells["table"] = "Income or consumption with spells"
     tb_inc_spells["table"] = "Income with spells"
     tb_cons_spells["table"] = "Consumption with spells"
     tb_no_spells["table"] = "Income or consumption"
     tb_inc_no_spells["table"] = "Income"
     tb_cons_no_spells["table"] = "Consumption"
     tb_no_spells_smooth["table"] = "Income or consumption consolidated"
+    tb_filled["table"] = "Income or consumption intra/extrapolated"
 
     # Also, rename welfare_type to "Income or consumption" for tb_no_spells_smooth
     tb_no_spells_smooth["welfare_type"] = "income or consumption"
+    tb_filled["welfare_type"] = "income or consumption"
 
     # Fill missing values in welfare_type for tb_no_spells
     tb_no_spells["welfare_type"] = tb_no_spells["welfare_type"].fillna("income or consumption")
@@ -960,15 +977,19 @@ def inc_or_cons_data(tb: Table) -> Tuple[Table, Table]:
     # Concatenate all these tables
     tb = pr.concat(
         [
-            # tb_spells,
             tb_inc_spells,
             tb_cons_spells,
             tb_no_spells,
             tb_inc_no_spells,
             tb_cons_no_spells,
+            tb_filled,
         ],
         ignore_index=True,
     )
+
+    # Remove filled column
+    tb = tb.drop(columns=["filled"], errors="raise")
+    tb_no_spells_smooth = tb_no_spells_smooth.drop(columns=["filled"], errors="raise")
 
     return tb, tb_no_spells_smooth
 
@@ -1364,7 +1385,7 @@ def make_distributional_indicators_long(tb: Table) -> Table:
     tb_base = tb_base[tb_base["poverty_line"].isin(ipl_list)].reset_index(drop=True)
 
     # Define index columns
-    index_columns = ["country", "year", "welfare_type", "ppp_version"]
+    index_columns = ["country", "year", "welfare_type", "ppp_version", "filled"]
 
     # SHARE
     # Define share columns
@@ -1452,7 +1473,7 @@ def make_relative_poverty_long(tb: Table) -> Table:
     tb_relative = tb_relative[tb_relative["poverty_line"].isin(ipl_list)].reset_index(drop=True)
 
     # Define index columns
-    index_columns = ["country", "year", "welfare_type", "ppp_version"]
+    index_columns = ["country", "year", "welfare_type", "ppp_version", "filled"]
 
     # Define relative poverty columns. They are all the columns that contain "_median"
     rel_pov_columns = [col for col in tb.columns if "_median" in col]
@@ -1505,7 +1526,7 @@ def make_poverty_line_null_for_non_dimensional_indicators(tb: Table) -> Table:
     ].reset_index(drop=True)
 
     # Define index columns
-    index_columns = ["country", "year", "welfare_type", "ppp_version", "poverty_line", "decile"]
+    index_columns = ["country", "year", "welfare_type", "ppp_version", "filled", "poverty_line", "decile"]
 
     # Select the columns we want
     tb_non_dimensional = tb_non_dimensional[index_columns + INDICATORS_NOT_DEPENDENT_ON_POVLINES_NOR_DECILES]
@@ -1532,7 +1553,21 @@ def make_cpi_not_depending_on_ppp(tb: Table) -> Table:
     # Extract last key from POVLINES_DICT, so we can filter for the latest ppp year
     current_ppp_year = list(POVLINES_DICT.keys())[-1]
 
-    # Make all the cpi values different from the current ppp year to None
+    # Make all the cpi values different from the current ppp year None
     tb.loc[tb["ppp_version"] != current_ppp_year, "cpi"] = pd.NA
 
     return tb
+
+
+def separate_filled_and_unfilled_data(tb: Table) -> Tuple[Table, Table]:
+    """
+    Separate filled and unfilled data.
+
+    Sometimes, some data processing is needed only for unfilled data and we need to separate the data to achieve that.
+    As I am doing it several times in the script, I prefer to create a function for that.
+    """
+
+    tb_filled = tb[tb["filled"]].copy()
+    tb_unfilled = tb[~tb["filled"]].copy()
+
+    return tb_filled, tb_unfilled

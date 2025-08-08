@@ -193,8 +193,18 @@ definitions:
 
   description_key_nowcasts: |-
     <% if survey_comparability == "No spells" %>
+    <% if table != "Income or consumption intra/extrapolated" %>
     Regional and global estimates are extrapolated up until the year of the data release using GDP growth estimates and forecasts. For more details about the methodology, please refer to the [World Bank PIP documentation](https://datanalytics.worldbank.org/PIP-Methodology/lineupestimates.html#nowcasts).
-    <% endif %>
+    <%- else %>
+    Country estimates are interpolated and extrapolated up until the year of the data release using GDP growth estimates and forecasts. This data is then used to produce regional and global aggregates available for each year. For more details about the methodology, please refer to the [World Bank PIP documentation](https://datanalytics.worldbank.org/PIP-Methodology/lineupestimates.html).
+    <%- endif %>
+    <%- endif %>
+
+  description_key_filled: |-
+    <% if table == "Income or consumption intra/extrapolated" %>
+    Country estimates are interpolated between available surveys and extrapolated until the year of the data release using GDP growth estimates and forecasts. For more details about the methodology, please refer to the [World Bank PIP documentation](https://datanalytics.worldbank.org/PIP-Methodology/lineupestimates.html#nowcasts).
+    <%- endif %>
+
 
   prosperity_gap_threshold: |-
     <% if ppp_version == 2017 %>
