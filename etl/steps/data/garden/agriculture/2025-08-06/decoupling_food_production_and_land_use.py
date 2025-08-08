@@ -277,6 +277,109 @@ def sanity_check_compare_with_hong_et_al(tb_grouped):
     # Land use differs significantly more, but I suppose that's also mostly due to changes in FAOSTAT RL data.
 
 
+def show_decoupled_countries(
+    food_column,
+    tb_fbsc,
+    tb_grouped,
+    min_food_pct_change=5,
+    min_land_pct_change=5,
+    max_net_share_imports=20,
+    max_net_share_median_over_years=10,
+):
+    import plotly.express as px
+
+    year_max = tb_grouped["year"].max()
+    year_min = tb_grouped["year"].min()
+
+    # Calculate the share of net annual imports of each country-year.
+    # This is, for each country-year (after aggregating all the main food item groups):
+    # 100 * | imports - exports | / domestic supply
+    # Relevant element codes:
+    # 005611: Imports (tonnes)
+    # 005911: Exports (tonnes)
+    # 005511: Production (tonnes)
+    # Instead of production, it may be more appropriate to use domestic supply instead (Domestic supply = Production + Imports − Exports ± Stock changes).
+    # 005301: Domestic supply (tonnes)
+    imports = (
+        tb_fbsc[
+            (tb_fbsc["item_code"].isin(sorted(set(sum([items for _, items in FOOD_GROUPS_FBSC.items()], [])))))
+            & (tb_fbsc["element_code"].isin(["005611", "005911", "005301"]))
+        ]
+        .reset_index(drop=True)
+        .groupby(["country", "year", "element"], as_index=False)
+        .agg({"value": "sum"})
+        .pivot(index=["country", "year"], columns=["element"], join_column_levels_with="_")
+        .format()
+        .reset_index()
+    )
+    # Calculate the net import share (share of domestic production that is imported).
+    imports["net_import_share"] = (
+        100 * (imports["value_imports"] - imports["value_exports"]) / imports["value_domestic_supply"]
+    )
+
+    check = tb_grouped.copy()
+    # Add column of net imports share.
+    if max_net_share_median_over_years is None:
+        check = check.merge(imports, on=["country", "year"], how="left")
+    else:
+        # Instead of simply imposing a maximum net import share, we impose a maximum median (over the last 10 years) net import share, for each country.
+        imports = (
+            imports[(imports["year"] > (year_max - max_net_share_median_over_years))]
+            .groupby("country", as_index=False)
+            .agg({"net_import_share": "median"})
+        )
+        check = check.merge(imports, on=["country"], how="left")
+    check = check.merge(check[(check["year"] == year_min)], how="left", on=["country"], suffixes=("", "_baseline"))
+    check[f"{food_column}_change"] = (
+        100 * (check[food_column] - check[f"{food_column}_baseline"]) / check[f"{food_column}_baseline"]
+    )
+    check["agricultural_land_change"] = (
+        100 * (check["agricultural_land"] - check["agricultural_land_baseline"]) / check["agricultural_land_baseline"]
+    )
+    # List countries that could be added to the chart as examples of decoupling.
+    # Sort them by land use relative change.
+    _check = check[check["year"] == year_max]
+    if food_column == "production_energy":
+        decoupled = (
+            _check[
+                (_check["agricultural_land_change"] <= -min_land_pct_change)
+                & (_check[f"{food_column}_change"] >= min_food_pct_change)
+            ]
+            .dropna(subset=[f"{food_column}_change", "agricultural_land_change"], how="any")
+            .sort_values("agricultural_land_change")["country"]
+            .unique()
+            .tolist()
+        )
+    else:
+        decoupled = (
+            _check[
+                (_check["net_import_share"] <= max_net_share_imports)
+                & (_check["agricultural_land_change"] <= -min_land_pct_change)
+                & (_check[f"{food_column}_change"] >= min_food_pct_change)
+            ]
+            .dropna(subset=[f"{food_column}_change", "agricultural_land_change"], how="any")
+            .sort_values("agricultural_land_change")["country"]
+            .unique()
+            .tolist()
+        )
+    # Remove regions.
+    decoupled = [country for country in decoupled if "(FAO)" not in country if country not in geo.REGIONS]
+    # Plot decoupling curves for those countries.
+    columns = [f"{food_column}_change", "agricultural_land_change"]
+    for country in sorted(decoupled):
+        px.line(
+            check[check["country"] == country][["year"] + columns].melt(id_vars=["year"]),
+            x="year",
+            y="value",
+            color="variable",
+            markers=True,
+            title=country,
+        ).show()
+
+    # Print resulting list of decoupled countries.
+    print(", ".join(decoupled))
+
+
 def run() -> None:
     #
     # Load inputs.
@@ -433,6 +536,29 @@ def run() -> None:
 
     # Remove unnecessary columns.
     tb = tb.drop(columns=["conversion", "item_code", "item_description"], errors="raise")
+
+    ####################################################################################################################
+    # Conclusions:
+    # This is the list of countries for which:
+    # - Agricultural production increased by >= 5% in the latest year with respect to 1961.
+    # - Agricultural land use decreased by >= 5% in the latest year with respect to 1961.
+    # Hong Kong, Cyprus, Italy, Greece, Poland, Sweden, Hungary, Austria, New Zealand, South Korea, Australia, Guyana, Netherlands, Iran, Chile, Mongolia, Spain, Eswatini, Finland, France, Denmark, United Kingdom, Jordan, Germany, Switzerland, Argentina, Uruguay, Romania, Kiribati, Taiwan, Iceland, Bulgaria, Algeria, United States, Albania, Canada
+    # show_decoupled_countries(food_column="production_energy", tb_fbsc=tb_fbsc, tb_grouped=tb_grouped, min_food_pct_change=5, min_land_pct_change=5)
+
+    # This is the list of countries for which:
+    # - Food supply increased by >= 5% in the latest year with respect to 1961.
+    # - Agricultural land use decreased by >= 5% in the latest year with respect to 1961.
+    # - The median net import share over the last 10 years is < 20%.
+    # Italy, Greece, Poland, Hungary, Austria, New Zealand, Australia, Guyana, Iran, Chile, Spain, Eswatini, France, Denmark, Germany, Argentina, Uruguay, Romania, Mauritius, Kiribati, Iceland, United States, Albania, Canada
+    # show_decoupled_countries(food_column="food_energy", tb_fbsc=tb_fbsc, tb_grouped=tb_grouped, min_food_pct_change=5, min_land_pct_change=5, max_net_share_imports=20, max_net_share_median_over_years=10)
+
+    # This is the list of countries for which:
+    # - Food supply increased by >= 5% in the latest year with respect to 1961.
+    # - Agricultural land use decreased by >= 5% in the latest year with respect to 1961.
+    # - The net import share is < 20% every year.
+    # Greece, Poland, Hungary, Austria, New Zealand, Australia, Guyana, Iran, Chile, Spain, Eswatini, France, Denmark, Germany, Argentina, Uruguay, Romania, Kiribati, Iceland, United States, Albania, Canada
+    # show_decoupled_countries(food_column="food_energy", tb_fbsc=tb_fbsc, tb_grouped=tb_grouped, min_food_pct_change=5, min_land_pct_change=5, max_net_share_imports=20, max_net_share_median_over_years=None)
+    ####################################################################################################################
 
     # Improve table formats.
     tb_grouped = tb_grouped.format(["country", "year"], short_name="decoupling_food_production_and_land_use_total")
