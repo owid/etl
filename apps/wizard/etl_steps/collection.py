@@ -129,7 +129,7 @@ with st.container(border=True):
     st.button(
         label="Submit",
         type="primary",
-        use_container_width=True,
+        width="stretch",
         on_click=submit_form,
     )
 

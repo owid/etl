@@ -143,7 +143,7 @@ def grapher_chart_from_url(chart_url: str, height=600):
             style="width: 100%; height: 600px; border: 0px none;"
             allow="web-share; clipboard-write"></iframe>
     """
-    return st.components.v1.html(chart_animation_iframe_html, height=height)  # type: ignore
+    return components.html(chart_animation_iframe_html, height=height, width=1.6 * height)  # type: ignore
 
 
 def explorer_chart(
@@ -173,7 +173,7 @@ def explorer_chart(
     """
 
     # Render the HTML
-    return st.components.v1.html(HTML, height=height)  # type: ignore
+    return st.components.v1.html(HTML, height=height, width=1.6 * height)  # type: ignore
 
 
 def mdim_chart(url: str, view: dict, height: int = 600, default_display: Optional[str] = None):
@@ -194,7 +194,7 @@ def mdim_chart(url: str, view: dict, height: int = 600, default_display: Optiona
     """
 
     # Render the HTML
-    return st.components.v1.html(HTML, height=height)  # type: ignore
+    return st.components.v1.html(HTML, height=height, width=1.6 * height)  # type: ignore
 
 
 def _chart_html(chart_config: Dict[str, Any], owid_env: OWIDEnv, height=600, **kwargs):
@@ -228,7 +228,7 @@ def _chart_html(chart_config: Dict[str, Any], owid_env: OWIDEnv, height=600, **k
     </div>
     """
 
-    components.html(HTML, height=height, **kwargs)
+    components.html(HTML, height=height, width=int(1.6 * height), **kwargs)
 
 
 def tag_in_md(tag_name: str, color: str, icon: Optional[str] = None):
