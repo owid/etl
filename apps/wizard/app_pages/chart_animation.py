@@ -16,7 +16,7 @@ from apps.chart_animation.cli import (
     get_years_in_chart,
 )
 from apps.wizard.utils import set_states
-from apps.wizard.utils.components import grapher_chart_from_url, st_horizontal, st_info, url_persist
+from apps.wizard.utils.components import grapher_chart_from_url, st_info, url_persist
 from etl.config import OWID_ENV
 
 # Initialize log.
@@ -211,7 +211,7 @@ if st.session_state.chart_animation_show_image_settings:
                 chart_url, slug, all_years=st.session_state.chart_animation_years
             )
 
-            with st_horizontal():
+            with st.container(horizontal=True):
                 tab = st.segmented_control(
                     "Select tab", ["map", "chart"], format_func=add_icons_to_tabs, default=query_parameters["tab"]
                 )
@@ -219,6 +219,7 @@ if st.session_state.chart_animation_show_image_settings:
                     "Maximum number of years",
                     value=MAX_NUM_YEARS,
                     help="Maximum number of years to generate images for (to avoid too many API call).",
+                    # width=30,
                 )
 
             # Create a slider to select min and max years.
@@ -239,7 +240,7 @@ if st.session_state.chart_animation_show_image_settings:
 
     # 2.2/ SHOW OPTIONS FOR IMAGE GENERATION
     with st.expander("**Output settings**", expanded=True):
-        with st_horizontal():
+        with st.container(horizontal=True):
             # Choose: GIF or Video
             output_type = st.segmented_control(
                 "Output format",
@@ -282,7 +283,7 @@ if st.session_state.chart_animation_show_image_settings:
                 help="Some charts may have duplicate frames. If checked, these frames will be shown.",
             )
 
-            with st_horizontal():
+            with st.container(horizontal=True, horizontal_alignment="distribute"):
                 duration = st.number_input(
                     "Duration (ms)",
                     value=200,
@@ -350,7 +351,7 @@ if st.session_state.chart_animation_show_image_settings:
                 first_frame=first_frame,
             )
             # GIF preview.
-            st.image(str(st.session_state.chart_animation_file), width="stretch")
+            st.image(str(st.session_state.chart_animation_file), use_container_width=True)
             st_info('Animation preview. Right click and "Save Image As..." to download it.')
         else:
             st.session_state.chart_animation_file = create_mp4_from_images(
