@@ -14,7 +14,7 @@ from etl.config import GITHUB_API_URL
 log = get_logger()
 
 # GPT model
-MODEL_NAME = "gpt-4.1"
+MODEL_DEFAULT = "gpt-5"
 
 
 def get_json_url(url: str):
@@ -106,10 +106,10 @@ def ask_gpt(df) -> Tuple[str, float, int]:
             {"role": "user", "content": USER_PROMPT},
         ]
     )
-    response = api.query_gpt(query=query, model=MODEL_NAME)
+    response = api.query_gpt(query=query, model=MODEL_DEFAULT)
 
     summary = response.message_content  # type: ignore
-    cost, num_tokens = get_cost_and_tokens(SYSTEM_PROMPT + USER_PROMPT, summary, MODEL_NAME)
+    cost, num_tokens = get_cost_and_tokens(SYSTEM_PROMPT + USER_PROMPT, summary, MODEL_DEFAULT)
     return summary, cost, num_tokens  # type: ignore
 
 

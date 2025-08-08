@@ -26,7 +26,7 @@ from etl.config import OWID_ENV
 from etl.grapher.io import variable_metadata_df_from_s3
 
 # GPT model default
-MODEL_DEFAULT = "gpt-4.1"
+MODEL_DEFAULT = "gpt-5"
 
 # How to display the various chart review statuses
 DISPLAY_STATE_OPTIONS = {

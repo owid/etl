@@ -50,16 +50,17 @@ def ask_gpt(query, model):
 
 
 # GPT CONFIG
-MODEL_DEFAULT = "gpt-4.1"
+MODEL_DEFAULT = "gpt-5"
 MODELS_AVAILABLE = {
-    "gpt-4.1": "GPT-4.1",  # IN: US$2.00 / 1M tokens; OUT: US$8.00 / 1M tokens
-    "o4-mini": "GPT o4-mini",  # IN: US$1.10 / 1M tokens; OUT: US$4.40 / 1M tokens
+    "gpt-5": "GPT-5",  # IN: US$1.25 / 1M tokens; OUT: US$10.00 / 1M tokens
+    "gpt-5-mini": "GPT-5 mini",  # IN: US$0.25 / 1M tokens; OUT: US$2.00 / 1M tokens
     "gpt-4o": "GPT-4o",  # IN: US$5.00 / 1M tokens; OUT: US$15.00 / 1M tokens
+    "o4-mini": "GPT o4-mini",  # IN: US$1.10 / 1M tokens; OUT: US$4.40 / 1M tokens
     # "gpt-4-turbo": "GPT-4 Turbo",  # IN: US$10.00 / 1M tokens; OUT: US$30.00 / 1M tokens  (gpt-4-turbo-2024-04-09)
 }
 MODELS_AVAILABLE_LIST = list(MODELS_AVAILABLE.keys())
 # Some models don't support certain arguments (I think these are the "mini" ones)
-MODELS_DIFFERENT_API = {"o4-mini"}
+MODELS_DIFFERENT_API = {"o4-mini", "gpt-5", "gpt-5-mini"}
 
 
 # CATEGORY FOR CHAT
@@ -146,8 +147,7 @@ options = [
     Options.PRINCIPLES,
 ]
 # NOTE: using pills is a good viz (https://github.com/jrieke/streamlit-pills). however, existing tool does not have an on_change options, which is basic if we want to reset some values from session_state
-with st.container(border=True):
-    st.markdown("**Settings**")
+with st.expander(f"**Model and context** :gray[(default is {MODEL_DEFAULT})]", icon=":material/settings:"):
     st.segmented_control(
         label="Choose a category for the question",
         options=options,
@@ -200,6 +200,7 @@ with st.container(border=True):
             index=MODELS_AVAILABLE_LIST.index(MODEL_DEFAULT),
             help="[Pricing](https://openai.com/api/pricing) | [Model list](https://platform.openai.com/docs/models/)",
         )
+        st.session_state["model_name"] = model_name
     ## See pricing list: https://openai.com/api/pricing (USD)
     ## See model list: https://platform.openai.com/docs/models/
     with col2:
@@ -287,8 +288,6 @@ with container_chat:
         # Display assistant response in chat message container
         with container_response:
             with st.chat_message("assistant"):
-                print("EEEE-----------------------")
-                print(model_name)
                 # Ask GPT (stream)
                 if model_name in MODELS_DIFFERENT_API:
                     stream = api.chat.completions.create(
