@@ -36,7 +36,7 @@ def run() -> None:
     tb_up = ds_up.read("ucdp_prio")
     ## UCDP
     ds_u = paths.load_dataset("ucdp")
-    tb_ucdp = ds_u.read("ucdp", load_data=False)
+    tb_ucdp = ds_u.read("ucdp", load_data=True)
 
     # Filter unnecessary columns
     tb_ucdp = tb_ucdp.filter(regex="^country|^year|^number_ongoing_conflicts")
@@ -255,6 +255,8 @@ def edit_faust(c, tb_ucdp, tb_up, region_names):
 
 
 def _set_description_key(view, tb_ucdp, tb_up):
+    UCDP_ONLY = "[Uppsala Conflict Data Program (UCDP)](https://ucdp.uu.se/)"
+    UCDP_AND_PRIO = f"{UCDP_ONLY} and the [Peace Research Institute Oslo (PRIO)](https://www.prio.org/data/1)"
     keys = None
     if (view.d.conflict_type == "state_based_stacked") or (view.d.estimate == "best_ci"):
         if view.d.indicator == "deaths":
@@ -279,11 +281,13 @@ def _set_description_key(view, tb_ucdp, tb_up):
     elif view.d.indicator == "wars_ongoing":
         ctype = view.d.conflict_type.replace(" ", "_").replace("-", "_").replace("(", "_").lower().strip(")")
         keys = tb_ucdp[f"number_ongoing_conflicts__conflict_type_{ctype}"].metadata.description_key + [TEXT_KEY_EXTRA]
+        keys[0] = keys[0].replace(UCDP_ONLY, UCDP_AND_PRIO)
     elif view.d.indicator == "wars_ongoing_country_rate":
         ctype = view.d.conflict_type.replace(" ", "_").replace("-", "_").replace("(", "_").lower().strip(")")
         keys = tb_ucdp[f"number_ongoing_conflicts_per_country__conflict_type_{ctype}"].metadata.description_key + [
             TEXT_KEY_EXTRA
         ]
+        keys[0] = keys[0].replace(UCDP_ONLY, UCDP_AND_PRIO)
     return keys
 
 
