@@ -1,4 +1,7 @@
-"""TODO: Properly describe once it's finished. And move this explanation to the gdoc."""
+"""Create a dataset with indicators on food production (in kilocalories) and agricultural land use (in hectares).
+
+The goal is to create a visualization showing which countries have managed to decouple food production and land use.
+"""
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder
@@ -180,18 +183,110 @@ FOOD_GROUPS_FBSC = {
 }
 
 
+def sanity_check_compare_with_hong_et_al(tb_grouped):
+    # Compare my estimated totals for production energy with those from the Hong et al. (2021) paper, in terms of production calories and land use.
+    from pathlib import Path
+
+    import pandas as pd
+    import plotly.express as px
+    from owid.datautils.dataframes import map_series
+
+    from etl.paths import STEP_DIR
+
+    # Extract the version of the fbsc step from the dependency uri.
+    fbsc_version = [step.split("/")[4] for step in paths.dependencies if "faostat_fbsc" in step][0]
+
+    # Load data from a local file. The file can be downloaded from:
+    # https://figshare.com/articles/dataset/Global_and_regional_drivers_of_land-use_emissions_in_1961-2017/12248735?file=26174975
+    # Specifically tab "8.1.AgProd" for agricultural production, and "9.1.AgLand" for agricultural land use.
+    df_food = pd.read_excel(Path.home() / "Downloads/LUE_Data_CALUE.xlsx", sheet_name="8.1.AgProd")
+    df_land = pd.read_excel(Path.home() / "Downloads/LUE_Data_CALUE.xlsx", sheet_name="9.1.AgLand")
+    # Reformat and combine sheets.
+    df_food = df_food.rename(
+        columns={column: column.replace("Area", "country").replace("Y", "") for column in df_food.columns}
+    ).melt(id_vars=["country"], var_name="year", value_name="production_energy_hong")
+    df_land = df_land.rename(
+        columns={column: column.replace("Area", "country").replace("Y", "") for column in df_land.columns}
+    ).melt(id_vars=["country"], var_name="year", value_name="agricultural_land_hong")
+    df = df_food.merge(df_land, on=["country", "year"], how="outer")
+    df["year"] = df["year"].astype(int)
+
+    # Harmonize country names using the same file as in the FAOSTAT steps.
+    countries_file = STEP_DIR / f"data/garden/faostat/{fbsc_version}/faostat.countries.json"
+    excluded_countries_file = STEP_DIR / f"data/garden/faostat/{fbsc_version}/faostat.excluded_countries.json"
+    df = geo.harmonize_countries(
+        df,
+        countries_file=countries_file,
+        excluded_countries_file=excluded_countries_file,
+        warn_on_unknown_excluded_countries=False,
+        warn_on_unused_countries=False,
+        warn_on_missing_countries=True,
+    )
+    # Missing mappings:
+    df["country"] = map_series(
+        df["country"],
+        mapping={
+            "China- mainland": "China",
+            "China- Macao SAR": "Macao",
+            "Turkey": "Turkey",
+            "United Kingdom": "United Kingdom",
+            "Netherlands": "Netherlands",
+            "Saint Helena- Ascension and Tristan da Cunha": "Saint Helena",
+            "China- Taiwan Province of": "Taiwan",
+            "China- Hong Kong SAR": "Hong Kong",
+        },
+        warn_on_missing_mappings=False,
+        warn_on_unused_mappings=True,
+    )
+    check = pd.DataFrame(tb_grouped)[["country", "year", "production_energy", "agricultural_land"]].merge(
+        df, how="inner", on=["country", "year"]
+    )
+    check["pct_food"] = (
+        100 * abs(check["production_energy"] - check["production_energy_hong"]) / check["production_energy_hong"]
+    )
+    check["pct_land"] = (
+        100 * abs(check["agricultural_land"] - check["agricultural_land_hong"]) / check["agricultural_land_hong"]
+    )
+    error = "Expected percentage difference between our production energy and that from Hong et al. (2021) to agree within ~10%"
+    assert check["pct_food"].median() < 11, error
+    error = "Expected percentage difference between our agricultural land and that from Hong et al. (2021) to agree within ~14%"
+    assert check["pct_land"].median() < 14, error
+    # Choose to plot food production or land use.
+    variable = "production_energy"
+    # variable = "agricultural_land"
+    value_name = f"{variable.replace('_', ' ')} of all food items / kcal"
+    plot = (
+        check[["country", "year", variable, f"{variable}_hong"]]
+        .rename(columns={variable: "OWID", f"{variable}_hong": "Hong et al. (2021)"})
+        .melt(id_vars=["country", "year"], value_name=value_name)
+    )
+    for country in sorted(set(check["country"])):
+        _plot = plot[plot["country"] == country]
+        px.line(
+            _plot,
+            x="year",
+            y=value_name,
+            color="variable",
+            markers=True,
+            title=country,
+            range_y=(0, _plot[value_name].max() * 1.05),
+        ).show()
+    # In terms of food production, most countries agree reasonably well with Hong et al (2021); in fact better than expected, given that FAOSTAT has probably changed since the publication of that paper.
+    # Cases with significant discrepancies Indonesia, Hong-Kong, or Malaysia. And one where the difference is particularly significant is Iceland.
+    # Land use differs significantly more, but I suppose that's also mostly due to changes in FAOSTAT RL data.
+
+
 def run() -> None:
     #
     # Load inputs.
     #
     # Load FAOSTAT combined food balances dataset, and read its main table.
-    # NOTE: It may be necessary to load the meadow FBSH and FBS datasets. For now, try with FBSC.
     ds_fbsc = paths.load_dataset("faostat_fbsc")
     tb_fbsc = ds_fbsc.read("faostat_fbsc")
 
-    # # Load regions dataset, and read its main table.
-    # ds_regions = paths.load_dataset("regions")
-    # tb_regions = ds_regions.read("regions")
+    # Load FAOSTAT land use dataset, and read its main table.
+    ds_rl = paths.load_dataset("faostat_rl")
+    tb_rl = ds_rl.read("faostat_rl")
 
     # Load population dataset.
     ds_population = paths.load_dataset("population")
@@ -199,7 +294,15 @@ def run() -> None:
     #
     # Process data.
     #
-    # Select relevant elements.
+    # Select relevant elements from land use data.
+    # Item code "Agricultural land" (00006610).
+    # Element code "Area" (005110) in hectares.
+    tb_rl = tb_rl[(tb_rl["element_code"] == "005110") & (tb_rl["item_code"] == "00006610")].reset_index(drop=True)
+    error = "Units of area have changed."
+    assert set(tb_rl["unit"]) == {"hectares"}, error
+    tb_rl = tb_rl[["country", "year", "value"]].rename(columns={"value": "agricultural_land"}, errors="raise")
+
+    # Select relevant elements of food production.
     tb = tb_fbsc[(tb_fbsc["element_code"].isin(ELEMENT_CODES))].reset_index(drop=True)
 
     # Sanity check.
@@ -290,7 +393,10 @@ def run() -> None:
         tb[tb["item_code"].isin(ITEM_CODES)]
         .groupby(["country", "year"], as_index=False)
         .agg({column: "sum" for column in ["food_quantity", "food_energy", "production", "production_energy"]})
-        .assign(**{"item": "Total"})
+    )
+    # For convenience, add population again to this table.
+    tb_grouped = geo.add_population_to_table(
+        tb=tb_grouped, ds_population=ds_population, warn_on_missing_countries=False
     )
 
     # Sanity check.
@@ -314,81 +420,23 @@ def run() -> None:
         "Seychelles",
     }
 
-    ####################################################################################################################
-    # TODO: Consider moving elsewhere, or otherwise keeping it inside a sanity check function.
-    # Compare my estimated totals for production energy with those from the Hong et al. (2021) paper, in terms of production calories.
-    # Compare my estimates on caloric supply (from FBSC correcting for historical changes and data availability changes) with the data from https://figshare.com/articles/dataset/Global_and_regional_drivers_of_land-use_emissions_in_1961-2017/12248735?file=26174975
-    # Specifically tab "8.1.AgProd".
-    from pathlib import Path
+    # Combine data on total food production with agricultural land.
+    _n_rows_before = len(tb_grouped)
+    tb_grouped = tb_grouped.merge(tb_rl, how="inner", on=["country", "year"])
+    error = "Unexpected number of rows lost when merging production and land use."
+    assert 100 * (_n_rows_before - len(tb_grouped)) / _n_rows_before < 0.5, error
 
-    import pandas as pd
+    # Uncomment to compare the resulting production energy content with the estimate from the Hong et al. (2021) paper.
+    # Overall, the estimates on total production (in kcal) per country agree very well (except for a few countries, more significantly Iceland).
+    # sanity_check_compare_with_hong_et_al(tb_grouped=tb_grouped)
 
-    from etl.paths import STEP_DIR
-
-    df = pd.read_excel(Path.home() / "Downloads/LUE_Data_CALUE.xlsx", sheet_name="8.1.AgProd")
-    df = df.rename(columns={column: column.replace("Area", "country").replace("Y", "") for column in df.columns})
-    df = df.melt(id_vars=["country"], var_name="year", value_name="production_energy_hong")
-    df["year"] = df["year"].astype(int)
-    countries_file = STEP_DIR / f"data/garden/faostat/{ds_fbsc.metadata.version}/faostat.countries.json"
-    excluded_countries_file = (
-        STEP_DIR / f"data/garden/faostat/{ds_fbsc.metadata.version}/faostat.excluded_countries.json"
-    )
-    df = geo.harmonize_countries(
-        df,
-        countries_file=countries_file,
-        excluded_countries_file=excluded_countries_file,
-        warn_on_unknown_excluded_countries=False,
-        warn_on_unused_countries=False,
-        warn_on_missing_countries=True,
-    )
-    # Missing mappings:
-    from owid.datautils.dataframes import map_series
-
-    df["country"] = map_series(
-        df["country"],
-        mapping={
-            "China- mainland": "China",
-            "China- Macao SAR": "Macao",
-            "Turkey": "Turkey",
-            "United Kingdom": "United Kingdom",
-            "Netherlands": "Netherlands",
-            "Saint Helena- Ascension and Tristan da Cunha": "Saint Helena",
-            "China- Taiwan Province of": "Taiwan",
-            "China- Hong Kong SAR": "Hong Kong",
-        },
-        warn_on_missing_mappings=False,
-        warn_on_unused_mappings=True,
-    )
-    check = pd.DataFrame(tb_grouped)[["country", "year", "production_energy"]].merge(
-        df, how="inner", on=["country", "year"]
-    )
-    check["pct"] = (
-        100 * abs(check["production_energy"] - check["production_energy_hong"]) / check["production_energy_hong"]
-    )
-    error = "Expected percentage difference between our production energy and that from Hong et al. (2021) to agree within ~10%"
-    assert check["pct"].median() < 11, error
-    # value_name = "production of all food items / kcal"
-    # plot = (
-    #     check[["country", "year", "production_energy", "production_energy_hong"]]
-    #     .rename(columns={"production_energy": "OWID", "production_energy_hong": "Hong et al. (2021)"})
-    #     .melt(id_vars=["country", "year"], value_name=value_name)
-    # )
-    # for country in sorted(set(check["country"])):
-    #     _plot = plot[plot["country"] == country]
-    #     px.line(_plot, x="year", y=value_name, color="variable", markers=True, title=country, range_y=(0, _plot[value_name].max() * 1.05)).show()
-    # Most countries agree reasonably well (better than expected, given that FAOSTAT has probably changed since the publication of Hong et al. in 2021).
-    # Cases with significant discrepancies Indonesia, Hong-Kong, or Malaysia. And one where the difference is particularly significant is Iceland.
-
-    ####################################################################################################################
-
-    # TODO: Consider adding the output of this step to the long_term_food_and_agriculture_trends step.
-
-    # Improve table format.
+    # Improve table formats.
+    tb_grouped = tb_grouped.format(["country", "year"], short_name="decoupling_food_production_and_land_use_total")
     tb = tb.format(keys=["country", "year", "item"], short_name=paths.short_name)
 
     #
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_garden = paths.create_dataset(tables=[tb])
+    ds_garden = paths.create_dataset(tables=[tb, tb_grouped])
     ds_garden.save()
