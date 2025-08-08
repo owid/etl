@@ -36,7 +36,7 @@ def run() -> None:
     tb_up = ds_up.read("ucdp_prio")
     ## UCDP
     ds_u = paths.load_dataset("ucdp")
-    tb_ucdp = ds_u.read("ucdp", load_data=True)
+    tb_ucdp = ds_u.read("ucdp", load_data=False)
 
     # Filter unnecessary columns
     tb_ucdp = tb_ucdp.filter(regex="^country|^year|^number_ongoing_conflicts")
