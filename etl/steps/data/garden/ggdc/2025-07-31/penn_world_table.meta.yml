@@ -36,8 +36,8 @@ definitions:
   description_key_tfp_indicators: This indicator is constructed with estimates of GDP, capital stock, labor input data, and labor income of employees and self-employed as share of GDP.
   description_key_wtfp_indicators: This indicator is constructed with estimates of consumption and investment, capital stock, labor input data, and labor income of employees and self-employed as share of GDP.
 
-  description_key_index_us: This indicator is expressed as an index relative to the US, which is set to 1. This means that a value of 1 indicates that the country has the same level of total factor productivity as the US in the given year.
-  description_key_index_country:
+  description_key_index_us: This indicator is expressed as an index relative to the US, which is set to 1. This means that a value of 1 indicates that the country has the same level as the US in the given year.
+  description_key_index_country: This indicator is expressed as an index relative to each country's value in {definitions.ppp_year}, which is set to 1. This means that a value of 1 indicates that the country has the same level as it did in {definitions.ppp_year}.
 
   description_key_gdp_maddison: For GDP estimates in the very long run, see the [Maddison Project Database's indicator](https://ourworldindata.org/grapher/gdp-maddison-project-database).
   description_key_gdp_per_capita_maddison: For GDP per capita estimates in the very long run, see the [Maddison Project Database's indicator](https://ourworldindata.org/grapher/gdp-per-capita-maddison-project-database).
