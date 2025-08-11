@@ -30,6 +30,15 @@ definitions:
   description_key_ppp_prices_single_benchmark: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at {definitions.ppp_year} prices, using a single benchmark approach that incorporates PPP estimates from the most recent benchmark year.
   description_key_ppp_prices_national_accounts: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at {definitions.ppp_year} prices, using an approach that ensures consistency with national accounts data.
 
+  description_key_tfp: Total factor productivity (TFP) is an estimate of how efficiently an economy turns its inputs into outputs. It is defined as the part of GDP not explained by capital (machines, buildings, infrastructure) or labor input.
+  description_key_wtfp: Total factor productivity (TFP) is an estimate of how efficiently an economy turns its inputs into outputs. It is defined as the part of the output not explained by capital (machines, buildings, infrastructure) or labor input. This indicator is "welfare-relevant" because the output considered is not GDP, but the sum of consumption (by households and government) and investment.
+
+  description_key_tfp_indicators: This indicator is constructed with estimates of GDP, capital stock, labor input data, and labor income of employees and self-employed as share of GDP.
+  description_key_wtfp_indicators: This indicator is constructed with estimates of consumption and investment, capital stock, labor input data, and labor income of employees and self-employed as share of GDP.
+
+  description_key_index_us: This indicator is expressed as an index relative to the US, which is set to 1. This means that a value of 1 indicates that the country has the same level of total factor productivity as the US in the given year.
+  description_key_index_country:
+
   description_key_gdp_maddison: For GDP estimates in the very long run, see the [Maddison Project Database's indicator](https://ourworldindata.org/grapher/gdp-maddison-project-database).
   description_key_gdp_per_capita_maddison: For GDP per capita estimates in the very long run, see the [Maddison Project Database's indicator](https://ourworldindata.org/grapher/gdp-per-capita-maddison-project-database).
 
@@ -475,6 +484,7 @@ tables:
         short_unit: ""
         description_short: Level of capital services, relative to the US (which is set to 1). {definitions.description_key_ppp_adjustment}
         description_key:
+          - "{definitions.description_key_index_us}"
           - "{definitions.description_key_ppp_adjustment}"
           - "{definitions.description_key_ppp_prices_single_benchmark}"
         description_from_producer: Capital services levels at current PPPs (USA=1)
@@ -491,7 +501,9 @@ tables:
         short_unit: ""
         description_short: This is the level of total factor productivity, relative to the US (which is set to 1). {definitions.description_key_ppp_adjustment}
         description_key:
-          - This indicator is constructed with estimates of GDP, capital stock, labor input data, labor compensation as share of GDP and labor income or employees and self-employed as share of GDP.
+          - "{definitions.description_key_tfp}"
+          - "{definitions.description_key_tfp_indicators}"
+          - "{definitions.description_key_index_us}"
           - "{definitions.description_key_ppp_adjustment}"
           - "{definitions.description_key_ppp_prices_single_benchmark}"
         description_from_producer: TFP level at current PPPs (USA=1)
@@ -506,9 +518,11 @@ tables:
         title: Welfare-relevant total factor productivity level (single price benchmark)
         unit: ""
         short_unit: ""
-        description_short: This is the level of total factor productivity, relative to the consumption and investment in the US (which is set to 1). {definitions.description_key_ppp_adjustment}
+        description_short: This is the level of welfare-relevant total factor productivity, relative to the the US (which is set to 1). {definitions.description_key_ppp_adjustment}
         description_key:
-          - This indicator is constructed with estimates of consumption and investment, capital stock, labor input data, labor compensation as share of GDP and labor income or employees and self-employed as share of GDP.
+          - "{definitions.description_key_wtfp}"
+          - "{definitions.description_key_wtfp_indicators}"
+          - "{definitions.description_key_index_us}"
           - "{definitions.description_key_ppp_adjustment}"
           - "{definitions.description_key_ppp_prices_single_benchmark}"
         description_from_producer: Welfare-relevant TFP levels at current PPPs (USA=1)
@@ -571,8 +585,9 @@ tables:
         title: Capital services level (using national accounts)
         unit: ""
         short_unit: ""
-        description_short: Level of capital services, relative to the US (which is set to 1). {definitions.description_key_ppp_adjustment}
+        description_short: Level of capital services, relative to each country's value in {definitions.ppp_year} (which is set to 1). {definitions.description_key_ppp_adjustment}
         description_key:
+          - "{definitions.description_key_index_country}"
           - "{definitions.description_key_ppp_adjustment}"
           - "{definitions.description_key_ppp_prices_national_accounts}"
         description_from_producer: Capital services at constant {definitions.ppp_year} national prices ({definitions.ppp_year}=1)
@@ -587,9 +602,11 @@ tables:
         title: Total factor productivity level (using national accounts)
         unit: ""
         short_unit: ""
-        description_short: This is the level of total factor productivity, relative to the US (which is set to 1). {definitions.description_key_ppp_adjustment}
+        description_short: This is the level of total factor productivity, relative to each country's value in {definitions.ppp_year} (which is set to 1). {definitions.description_key_ppp_adjustment}
         description_key:
-          - This indicator is constructed with estimates of GDP, capital stock, labor input data, labor compensation as share of GDP and labor income or employees and self-employed as share of GDP.
+          - "{definitions.description_key_tfp}"
+          - "{definitions.description_key_tfp_indicators}"
+          - "{definitions.description_key_index_country}"
           - "{definitions.description_key_ppp_adjustment}"
           - "{definitions.description_key_ppp_prices_national_accounts}"
         description_from_producer: TFP at constant national prices ({definitions.ppp_year}=1)
@@ -604,9 +621,11 @@ tables:
         title: Welfare-relevant total factor productivity level (using national accounts)
         unit: ""
         short_unit: ""
-        description_short: This is the level of total factor productivity, relative to the consumption and investment in the US (which is set to 1). {definitions.description_key_ppp_adjustment}
+        description_short: This is the level of welfare-relevant total factor productivity, relative to each country's value in {definitions.ppp_year} (which is set to 1). {definitions.description_key_ppp_adjustment}
         description_key:
-          - This indicator is constructed with estimates of consumption and investment, capital stock, labor input data, labor compensation as share of GDP and labor income or employees and self-employed as share of GDP.
+          - "{definitions.description_key_wtfp}"
+          - "{definitions.description_key_wtfp_indicators}"
+          - "{definitions.description_key_index_country}"
           - "{definitions.description_key_ppp_adjustment}"
           - "{definitions.description_key_ppp_prices_national_accounts}"
         description_from_producer: Welfare-relevant TFP at constant national prices ({definitions.ppp_year}=1)
@@ -899,7 +918,7 @@ tables:
         description_key:
           - "{definitions.description_key_ppp_adjustment}"
           - "{definitions.description_key_ppp_prices_single_benchmark}"
-        description_from_producer: Price level of capital stock, price level of USA GDPo in 2017=1
+        description_from_producer: Price level of the capital stock, price level of USA in 2017=1
         description_processing: |-
           {definitions.description_processing_outliers}
         display:
@@ -915,7 +934,7 @@ tables:
         description_key:
           - "{definitions.description_key_ppp_adjustment}"
           - "{definitions.description_key_ppp_prices_single_benchmark}"
-        description_from_producer: Price level of capital services, price level of USA GDPo in 2017=1
+        description_from_producer: Price level of the capital services, price level of USA=1
         description_processing: |-
           {definitions.description_processing_outliers}
         display:
