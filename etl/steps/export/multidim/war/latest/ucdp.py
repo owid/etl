@@ -72,11 +72,6 @@ def run() -> None:
             assert v.indicators.y is not None
             v.indicators.y[0].display = {"name": choice_names[v.d.conflict_type]}
 
-        if v.matches(indicator="deaths", conflict_type="all", estimate="best", people="all"):
-            assert v.indicators.y is not None
-            assert len(v.indicators.y) == 1
-            v.indicators.y[0].catalogPath = v.indicators.y[0].catalogPath.replace(tb.m.uri, tb_pre.m.uri)
-
     # Aggregate views
     c.group_views(
         groups=[
@@ -146,6 +141,12 @@ def run() -> None:
     for view in c.views:
         # Edit FAUST in charts with CI (color, display names). Indicator-level.
         edit_indicator_displays(view)
+
+        # Replace UCDP with UCDP (preliminary) where applicable
+        if view.matches(indicator="deaths", conflict_type="all", estimate="best", people="all"):
+            assert view.indicators.y is not None
+            assert len(view.indicators.y) == 1
+            view.indicators.y[0].catalogPath = view.indicators.y[0].catalogPath.replace(tb.m.uri, tb_pre.m.uri)
 
     # Edit view configs
     c.set_global_config(
@@ -318,7 +319,7 @@ def _set_subtitle(view):
     if view.d.conflict_type == "one-sided violence":
         if view.d.indicator == "num_conflicts":
             return "Included are cases of [one-sided violence against civilians](#dod:onesided-ucdp)."
-        return f"Reported deaths of civilians due to [one-sided violence](#dod:onesided-ucdp) that was ongoing that year{', per 100,000 people' if view.d.indicator=='death_rate' else ''}. Deaths due to disease and starvation resulting from one-sided violence are not included."
+        return f"Reported deaths of civilians due to [one-sided violence](#dod:onesided-ucdp){', per 100,000 people' if view.d.indicator=='death_rate' else ''}. Deaths due to disease and starvation resulting from one-sided violence are not included."
 
     # DoD
     if view.d.conflict_type == "all":
