@@ -46,13 +46,16 @@ tables:
         display:
           numDecimalPlaces: 0
         description_key: &population-key
-          - Population is the most commonly used metric throughout Our World in Data. It is used directly to understand population growth over time or indirectly to calculate per-capita adjustments, which enables meaningful comparisons between countries of different sizes.
+          - Population is the most commonly used metric throughout Our World in Data. It is used directly to understand population growth over time or indirectly to calculate per-capita adjustments, making it easier to compare countries of different sizes.
           - |-
-            This indicator has been constructed by combining data from multiple sources, each covering different time periods.
-              - Sources used: HYDE v3.3 (2023) for historical estimates from 10,000 BCE to 1799; Gapminder v7 (2022) for 1800-1949; UN World Population Prospects (2024) for 1950 onwards; Gapminder Systema Globalis (2023) for data on former countries (Yugoslavia, USSR, etc.)
-              - Discontinuities may occur at the boundaries between data sources due to methodological differences in data collection and estimation procedures.
-              - You can read more about the sources and methodology in our [Population Sources article](https://ourworldindata.org/population-sources). We also provide a [table of sources](https://ourworldindata.org/grapher/sources-population-dataset) that shows the source for each country-year in the dataset.
-          - Our regional aggregates are calculated by summing individual country populations, except for pre-1800 continental estimates where we rely on HYDE's original regional data to ensure historical consistency.
+            This indicator has been constructed by combining data from multiple sources covering different periods.
+              - HYDE v3.3 (2023): Historical estimates from 10,000 BCE to 1799
+              - Gapminder v7 (2022): for 1800-1949
+              - UN World Population Prospects (2024): for 1950 onwards
+              - Gapminder Systema Globalis (2023): Additional source for data on former countries (Yugoslavia, USSR, etc.)
+          - Breaks in the data may occur at the boundaries between data sources due to methodological differences in how the data was collected and estimated.
+          - You can read more about the sources and methodology in our [Population Sources article](https://ourworldindata.org/population-sources). We also provide a [table of sources](https://ourworldindata.org/grapher/sources-population-dataset) that shows the source for each country-year in the dataset.
+          - Our regional aggregates (continents, income groups, etc.) are calculated by summing individual country populations. For years before 1800, we relied on HYDE's original data for continents to ensure historical consistency.
 
       world_pop_share:
         title: Share of world population
