@@ -114,8 +114,7 @@ markdown_extensions:
   - pymdownx.critic
   - pymdownx.emoji:
       emoji_index: !!python/name:materialx.emoji.twemoji
-      emoji_generator:
-        !!python/name:materialx.emoji.to_svg # The Details extension supercharges the Admonition extension, making the resulting call-outs collapsible, allowing them to be opened and closed by the user. ref: https://squidfunk.github.io/mkdocs-material/setup/extensions/python-markdown-extensions/#details
+      emoji_generator: !!python/name:materialx.emoji.to_svg # The Details extension supercharges the Admonition extension, making the resulting call-outs collapsible, allowing them to be opened and closed by the user. ref: https://squidfunk.github.io/mkdocs-material/setup/extensions/python-markdown-extensions/#details
 
 
   - pymdownx.details
@@ -218,7 +217,7 @@ nav:
           - MDIMs and Explorers: "guides/data-work/mdims.md"
           - Export data: "guides/data-work/export-data.md"
           - Access archived data: "guides/data-work/access-archived-data.md"
-          - GSheets for OMMs: "guides/data-work/create-sheets-omm.md"
+          - GSheets for OMMs: "guides/data-work/create-gsheets-omm.md"
       - Admin:
           - Wizard: "guides/wizard.md"
           - CLI: "guides/etl-cli.md"
