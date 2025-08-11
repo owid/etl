@@ -596,6 +596,10 @@ steps:
   data://grapher/ggdc/2022-11-28/penn_world_table:
     - data://garden/ggdc/2022-11-28/penn_world_table
 
+  data://garden/ggdc/2020-10-01/ggdc_maddison:
+    - snapshot://ggdc/2020-10-01/ggdc_maddison.xlsx
+  data://grapher/ggdc/2020-10-01/ggdc_maddison:
+    - data://garden/ggdc/2020-10-01/ggdc_maddison
       # United Nations members
   data://meadow/un/2023-10-30/un_members:
     - snapshot://un/2023-10-30/un_members.csv
@@ -633,3 +637,4 @@ include:
   - dag/archive/migration.yml
   - dag/archive/redistribution.yml
   - dag/archive/wizard.yml
+  - dag/archive/growth.yml
