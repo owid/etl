@@ -2,8 +2,13 @@
 Script to create a snapshot of dataset.
 
 The file originally comes from the Huberman and Minns paper, available here
+
+Final version
 https://www.sciencedirect.com/science/article/abs/pii/S0014498307000058
 https://personal.lse.ac.uk/minns/huberman_minns_eeh_2007.pdf
+
+Working paper
+https://ideas.repec.org/p/iis/dispap/iiisdp95.html
 
 For convenience, I only downloaded a csv from an old version of the data available in OWID:
 https://admin.owid.io/admin/datasets/234

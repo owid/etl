@@ -3,24 +3,24 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: "Working hours (Huberman and Minns, 2007)"
+    title: "Working hours (Huberman and Minns, 2005)"
     description: |-
-      This paper brings a historical perspective to debates on worktime differences across OECD countries, exploiting new data sets on hours of work per week, and days and hours of work per year between 1870 and 2000. We contest the popular view that the divergence in worktimes between Europe and North America and Australia is a recent phenomenon. Since 1870 the decline in weekly and annual hours was consistently greater in the Old World; the New World has had fewer days off for the last 130 years. Labor power and inequality, held to be important determinants of worktime after 1970, had comparable effects in the period before 1913. We find that given their levels of income in 1870 New World workers supplied relatively too many hours of work.
-    date_published: "2007-10-01"
+      This paper brings a long-term perspective to the debate on the causes of worktime differences among OECD countries. Exploiting new data sets on hours of work per week, days at work per year, and annual work hours between 1870 and 2000, we challenge the conventional view that Europeans began to labor fewer hours than Americans only in the 1980s. Like Australians and Canadians, Americans tended to work longer hours, after controlling for income, beginning around 1900. Labor power and inequality, which are held to be important determinants of worktime after 1970, had comparable effects in the period before 1913. To explain the longstanding predisposition of the New World to give more labor time, we examine the effects of three initial factors in 1870, culture, human capital, and geography on hours of work in 2000. We find that geography – the low population density of the New World that has led to shorter commutes and lower fixed costs of getting to work – has had an enduring impact on supply of labor time.
+    date_published: "2005-10-01"
 
     # Citation
     producer: Huberman and Minns
     citation_full: |-
-      Huberman, M., & Minns, C. (2007). The times they are not changin’: Days and hours of work in Old and New Worlds, 1870–2000. Explorations in Economic History, 44(4), 538-567. Tables 1, 2, and 3. https://doi.org/10.1016/j.eeh.2007.03.002
+      Huberman, M., & Minns, C. (2005). Hours of Work in Old and New Worlds: The Long View, 1870-2000. The Institute for International Integration Studies Discussion Paper Series iiisdp95, IIIS.
 
     # Files
-    url_main: https://www.sciencedirect.com/science/article/abs/pii/S0014498307000058
+    url_main: https://ideas.repec.org/p/iis/dispap/iiisdp95.html
     date_accessed: '2025-08-05'
 
     # License
     license:
-      name: CC BY 4.0
-      url: https://www.sciencedirect.com/science/article/abs/pii/S0014498307000058
+      name: © 2005 Huberman and Minns
+      url: https://ideas.repec.org/p/iis/dispap/iiisdp95.html
 outs:
   - md5: fe4761445851e3f490d3985778b77162
     size: 4915
