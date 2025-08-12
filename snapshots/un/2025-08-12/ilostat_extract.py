@@ -3,6 +3,8 @@ DATA EXTRACTION FOR THE WORLD BANK POVERTY AND INEQUALITY PLATFORM (PIP) API
 
 This code generates ILOSTAT data for all countries and aggregations in a combined file
 
+I modified the code that Mojmir implemented for requests in the PIP API available in the script snapshots/wb/{version}/pip_api.py
+
 To run this code from scratch,
     - (If you want) Connect to the staging server of this pull request:
         - Hit Cmd + Shift + P and select Remote-SSH: Connect to Host
