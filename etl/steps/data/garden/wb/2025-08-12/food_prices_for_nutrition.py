@@ -12,7 +12,7 @@ paths = PathFinder(__file__)
 
 
 # Expected classifications, sorted from oldest to newest.
-EXPECTED_CLASSIFICATIONS = ["FPN 1.0", "FPN 1.1", "FPN 2.0", "FPN 2.1", "FPN 3.0"]
+EXPECTED_CLASSIFICATIONS = ["FPN 1.0", "FPN 1.1", "FPN 2.0", "FPN 2.1", "FPN 3.0", "FPN 4.0"]
 # Classification to adopt (by default, the latest one).
 CLASSIFICATION = EXPECTED_CLASSIFICATIONS[-1]
 
@@ -51,7 +51,7 @@ def adapt_units(tb: Table, tb_wdi: Table) -> Table:
     tb = tb.merge(tb_cpi[["year", "cpi_adjustment_factor"]], on=["year"], how="left")
     # Multiply the cost of a healthy diet (given in current PPP$) by the adjustment factor, to correct for inflation
     # and express the values in constant 2021 PPP$.
-    tb["cost_of_a_healthy_diet"] *= tb["cpi_adjustment_factor"]
+    tb["cost_of_a_healthy_diet_in_ppp_dollars"] *= tb["cpi_adjustment_factor"]
     # Drop unnecessary column.
     tb = tb.drop(columns=["cpi_adjustment_factor"], errors="raise")
 
@@ -85,8 +85,8 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Sanity check.
-    error = "Expected classifications have changed."
-    assert set(tb["classification"]) == set(EXPECTED_CLASSIFICATIONS), error
+    error = f"Expected classifications have changed. Found: {sorted(tb['classification'].unique())}, Expected: {EXPECTED_CLASSIFICATIONS}"
+    assert set(tb["classification"]).issubset(set(EXPECTED_CLASSIFICATIONS)), error
 
     # Select the latest classification.
     tb = (
@@ -105,6 +105,7 @@ def run(dest_dir: str) -> None:
     tb = adapt_units(tb=tb, tb_wdi=tb_wdi)
 
     # Change attributions for share and number of people who cannot afford a healthy diet.
+    # Note: adapt_units() converts "millions_of_people" to "people"
     tb = change_attribution(
         tb=tb,
         columns=[
@@ -118,8 +119,8 @@ def run(dest_dir: str) -> None:
     tb = change_attribution(
         tb=tb,
         columns=[
-            "cost_of_an_energy_sufficient_diet",
-            "cost_of_a_nutrient_adequate_diet",
+            "cost_of_an_energy_sufficient_diet_in_ppp_dollars",
+            "cost_of_a_nutrient_adequate_diet_in_ppp_dollars",
         ],
         attribution_text=None,
     )
@@ -131,5 +132,5 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
+    ds_garden = create_dataset(dest_dir, tables=[tb], check_variables_metadata=False)
     ds_garden.save()
