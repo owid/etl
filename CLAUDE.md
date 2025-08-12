@@ -215,6 +215,12 @@ Note: The `etl pr` creates a new branch but does NOT automatically commit files 
 - When running ETL steps, always use --private flag
 - When running grapher:// step in ETL, always add --grapher flag
 
+### Exception Handling
+- **NEVER** catch, log, and re-raise exceptions (`except Exception: log.error(e); raise`)
+- Let exceptions propagate naturally with their original stack traces
+- Only catch specific exceptions when you can meaningfully handle them
+- Avoid `except Exception` - it masks real problems
+
 ## Debugging ETL Data Quality Issues
 
 When ETL steps fail due to data quality issues (NaT values, missing data, missing indicators), always trace the problem upstream through the pipeline stages rather than patching symptoms downstream:
