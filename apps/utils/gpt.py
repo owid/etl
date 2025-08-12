@@ -260,7 +260,7 @@ class OpenAIWrapper(OpenAI):
             }
 
         # Hotfix for temperature values
-        if model in ("o3"):
+        if model in {"o3"} or model.startswith("gpt-5"):
             if "temperature" in kwargs:
                 kwargs["temperature"] = 1
 
