@@ -28,6 +28,14 @@ REGION_MAPPING = {
 }
 
 
+SOURCE_URL_MAPPING = {
+    "Human Mortality Database": "https://www.mortality.org/Data/ZippedDataFiles",
+    "Zijdeman et al.": "https://clio-infra.eu/Indicators/LifeExpectancyatBirthTotal.html",
+    "Riley": "https://doi.org/10.1111/j.1728-4457.2005.00083.x",
+    "UN World Population Prospects": "https://population.un.org/wpp/downloads?folder=Standard%20Projections&group=Most%20used",
+}
+
+
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
@@ -39,6 +47,7 @@ def run(dest_dir: str) -> None:
     # In this dataset HMD is used before 1950 and UN WPP after 1950.
     tb_lt.loc[tb_lt["year"] < YEAR_WPP_START, "source"] = "Human Mortality Database"
     tb_lt.loc[tb_lt["year"] >= YEAR_WPP_START, "source"] = "UN World Population Prospects"
+
     ## zijdeman_et_al_2015
     paths.log.info("reading dataset `zijdeman_et_al_2015`")
     ds_zi = paths.load_dataset("zijdeman_et_al_2015")
@@ -81,17 +90,22 @@ def run(dest_dir: str) -> None:
     # Create three tables: (i) only historical values, (ii) only future values, (iii) all values
     columns_index = ["country", "year", "sex", "age"]
 
-    ## Add source table for period life expectancy at birth
-    tb_source = tb[(tb["sex"] == "total") & (tb["age"] == 0)].copy()
-    tb_source = tb_source[["country", "year", "source"]]
+    ## Get origins to assign to source in main at birth table
     origins = tb["life_expectancy"].m.origins
-    tb_source["source"].m.origins = origins
-    tb = tb.drop(columns=["source"])
 
     ## (i) Main table (historical values)
     tb_main = tb.loc[tb["year"] <= YEAR_ESTIMATE_LAST].copy()
-
+    tb_main_at_birth = (
+        tb_main[tb_main["life_expectancy_0"].notna()]
+        .drop(columns=["sex", "age", "life_expectancy"])
+        .reset_index(drop=True)
+    )
+    tb_main_at_birth["source_url"] = tb_main_at_birth["source"].map(SOURCE_URL_MAPPING)
+    tb_main_at_birth["source"].m.origins = origins
+    tb_main_at_birth["source_url"].m.origins = origins
+    tb_main = tb_main[tb_main["life_expectancy"].notna()].drop(columns=["source", "life_expectancy_0"])
     ## (ii) Only projections
+    tb = tb.drop(columns=["source"])
     tb_only_proj = tb.loc[tb["year"] > YEAR_ESTIMATE_LAST].copy()
     tb_only_proj = _add_suffix_to_indicators(tb_only_proj, "_only_proj", columns_index=columns_index)
     ## Table only with projections should only contain UN as origin
@@ -109,8 +123,8 @@ def run(dest_dir: str) -> None:
 
     # Format
     tables = [
-        tb_source.format(["country", "year"], short_name="life_expectancy_source"),
         tb_main.format(columns_index, short_name=paths.short_name),
+        tb_main_at_birth.format(["country", "year"], short_name=f"{paths.short_name}_at_birth"),
         tb_only_proj.format(columns_index, short_name=f"{paths.short_name}_only_proj"),
         tb_with_proj.format(columns_index, short_name=f"{paths.short_name}_with_proj"),
     ]

@@ -584,6 +584,33 @@ steps:
   data://grapher/wb/2023-05-12/women_business_law_additional:
     - data://garden/wb/2023-05-12/women_business_law_additional
 
+      # Penn World Table
+  data://meadow/ggdc/2022-11-28/penn_world_table:
+    - snapshot://ggdc/2021-06-18/penn_world_table.xlsx
+  data://meadow/ggdc/2022-11-28/penn_world_table_national_accounts:
+    - snapshot://ggdc/2021-06-18/penn_world_table_national_accounts.xlsx
+    - data://garden/regions/2023-01-01/regions
+  data://garden/ggdc/2022-11-28/penn_world_table:
+    - data://meadow/ggdc/2022-11-28/penn_world_table
+    - data://meadow/ggdc/2022-11-28/penn_world_table_national_accounts
+  data://grapher/ggdc/2022-11-28/penn_world_table:
+    - data://garden/ggdc/2022-11-28/penn_world_table
+
+  data://garden/ggdc/2020-10-01/ggdc_maddison:
+    - snapshot://ggdc/2020-10-01/ggdc_maddison.xlsx
+  data://grapher/ggdc/2020-10-01/ggdc_maddison:
+    - data://garden/ggdc/2020-10-01/ggdc_maddison
+      # United Nations members
+  data://meadow/un/2023-10-30/un_members:
+    - snapshot://un/2023-10-30/un_members.csv
+  data://garden/un/2023-10-30/un_members:
+    - data://meadow/un/2023-10-30/un_members
+    - data://garden/wb/2021-07-01/wb_income
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2023-03-31/population
+  data://grapher/un/2023-10-30/un_members:
+    - data://garden/un/2023-10-30/un_members
+
 include:
   # Include all active steps plus all archive steps.
   - dag/main.yml
@@ -610,3 +637,4 @@ include:
   - dag/archive/migration.yml
   - dag/archive/redistribution.yml
   - dag/archive/wizard.yml
+  - dag/archive/growth.yml

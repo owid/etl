@@ -39,7 +39,7 @@ dimensions:
         group: How deadly are conflicts?
       - slug: "death_rate"
         name: "Death rate"
-        description: The number of deaths divided by the total population
+        description: Number of deaths divided by the total population
         group: How deadly are conflicts?
       - slug: "num_conflicts"
         name: "Number of conflicts"
@@ -51,8 +51,8 @@ dimensions:
       - slug: "all"
         name: "All armed conflicts"
       - slug: all_stacked
-        name: "All armed conflicts (by type)"
-        description: Breakdown by conflict type
+        name: "All, broken down by type"
+        description: Breakdown between interstate, civil, non-state, and violence against civilians
       - slug: "interstate"
         name: "Interstate conflicts"
         description: Between states
@@ -72,7 +72,7 @@ dimensions:
         name: "All deaths"
         description: All deaths in armed conflicts
       - slug: "all_stacked"
-        name: "All deaths (by type)"
+        name: "All, broken down by combatants and civilians"
         description: Breakdown by combatants and civilians
       - slug: na
         name: "Not applicable"
