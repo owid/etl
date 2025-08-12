@@ -45,7 +45,7 @@ def run() -> None:
     tb = add_year_certified(tb, tb_time_series)
 
     tb["year_certified"] = tb["year_certified"].astype("str")
-    tb = tb.set_index(["country", "year"])
+    tb = tb.format(["country", "year"])
     #
     # Save outputs.
     #
@@ -130,7 +130,7 @@ def add_year_certified(tb: Table, tb_time_series: Table) -> Table:
                 tb_time_series["country"] == cntry, "certification_status"
             ]
         else:
-            if pd.notna(year_certified) and str(year_certified).isdigit():
+            if pd.notna(year_certified) and str(year_certified).strip().isdigit():
                 year_certified = int(year_certified)
             else:
                 # Handle non-convertible values appropriately
