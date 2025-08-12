@@ -1,3 +1,4 @@
+!.claude/
 .coverage
 **/__pycache__
 .virtual_documents

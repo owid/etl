@@ -1,37 +1,55 @@
 # Dataset Update
 
-### Create PR and update steps
+## Phase 1: Initial Update (REQUIRED - Execute automatically)
 
-1. First create a draft PR using `etl pr` command from the current branch and `data` category
+1. **Create draft PR** using `etl pr` command with a short branch name (max 28 chars for database compatibility)
    ```bash
-   # Create PR with title and category
-   etl pr "Update World Bank food prices dataset" data --base-branch [current branch]
-   # Categories: data, bug, refactor, enhance, feature, docs, chore, style, wip, tests
+   etl pr "Update [Dataset Name] dataset" data --work-branch data-[org]-[dataset]
+   # Example: etl pr "Update World Bank food prices dataset" data --work-branch data-wb-foodprices
+   # Keep branch name under 28 characters to avoid database hostname issues
    ```
-2. Use the `etl update snapshot://` command with `--include-usages` to copy the dataset to the new version. For instance
+
+2. **Update dataset** with `--include-usages` to copy to new version
    ```bash
    etl update snapshot://#$ARGUMENTS --include-usages
    ```
-3. Run snapshot with `etls`, e.g. `etls #$ARGUMENTS`
-4. Run `etlr` with `--grapher` to execute the updated steps. It's ok if it fails, don't fix it!
-5. Commit changes and push to the PR branch
-6. Ask user for review and permission to continue with fixing steps
 
-### Fix steps
+3. **Run snapshot step**
+   ```bash
+   etls #$ARGUMENTS
+   ```
 
-1. If `etlr` failed, investigate the error and try to fix it.
-2. Update the metadata YAML file to match the new column structure if necessary.
-3. Summarise the changes in the PR description.
+4. **Test ETL pipeline** - Run `etlr` with `--grapher`. It's OK if it fails initially!
+   ```bash
+   etlr [dataset] --grapher
+   ```
 
-### Upgrade indicators (Optional)
+5. **Commit and push initial changes**
+   ```bash
+   git add .
+   git commit -m "Update dataset to new version"
+   git push origin [branch-name]
+   ```
 
-**Ask user first**: "Do you want to upgrade chart indicators to use the new dataset version? This will update all existing charts that use indicators from the old dataset to reference the new dataset indicators."
+## Phase 2: Fix Issues (REQUIRED - Execute automatically)
 
-If the user confirms, proceed with indicator upgrade:
+1. **Fix any ETL failures** by investigating errors and updating code
+2. **Update metadata YAML files** to match new column structure if necessary
+3. **Test full pipeline** until `etlr --grapher` succeeds
+4. **Update PR description** with a summary of changes
+5. **Commit and push all fixes**
+
+## Phase 3: Indicator Upgrade (ASK USER FIRST - Do NOT execute automatically)
+
+**⚠️ STOP HERE and ask user**: "Do you want to upgrade chart indicators to use the new dataset version? This will update all existing charts that use indicators from the old dataset to reference the new dataset indicators."
+
+**Only proceed if user explicitly confirms.**
+
+### If user confirms, proceed with indicator upgrade:
 
 1. **Find dataset pairs** using their shortName:
    ```sql
-   mysql -h staging-site-data-wb-foodprices-nutrition -u owid --port 3306 -D owid -e "SELECT id, catalogPath, name FROM datasets WHERE shortName = 'dataset_short_name' AND NOT isArchived ORDER BY id;"
+   mysql -h staging-site-[branch] -u owid --port 3306 -D owid -e "SELECT id, catalogPath, name FROM datasets WHERE shortName = 'dataset_short_name' AND NOT isArchived ORDER BY id;"
    ```
 
 2. **Analyze indicator mappings** using the corrected SQL from the Indicator Upgrader section below.
@@ -74,7 +92,7 @@ The indicator upgrader tool helps systematically update charts when datasets are
 First, identify the old and new dataset versions using their shortName:
 
 ```sql
-mysql -h staging-site-data-wb-foodprices-nutrition -u owid --port 3306 -D owid -e "SELECT id, catalogPath, name FROM datasets WHERE shortName = 'dataset_short_name' AND NOT isArchived ORDER BY id;"
+mysql -h staging-site-[branch] -u owid --port 3306 -D owid -e "SELECT id, catalogPath, name FROM datasets WHERE shortName = 'dataset_short_name' AND NOT isArchived ORDER BY id;"
 ```
 
 This will show all versions of the dataset with their IDs and catalog paths.
@@ -84,7 +102,7 @@ This will show all versions of the dataset with their IDs and catalog paths.
 Use this SQL to find perfect matches and unmapped indicators between datasets:
 
 ```sql
-mysql -h staging-site-data-wb-foodprices-nutrition -u owid --port 3306 -D owid -e "
+mysql -h staging-site-[branch] -u owid --port 3306 -D owid -e "
 SELECT
     v_new.id AS new_id,
     v_old.id AS old_id,
@@ -147,7 +165,7 @@ Use this improved 3-step process to add variable mappings systematically:
 #### Step 1: Create Table Structure
 
 ```sql
-mysql -h staging-site-data-wb-foodprices-nutrition -u owid --port 3306 -D owid -e "
+mysql -h staging-site-[branch] -u owid --port 3306 -D owid -e "
 CREATE TABLE wiz__variable_mapping (
     id_old INT NOT NULL,
     id_new INT NOT NULL,
@@ -165,7 +183,7 @@ CREATE TABLE wiz__variable_mapping (
 #### Step 2: Insert Perfect Matches with SQL
 
 ```sql
-mysql -h staging-site-data-wb-foodprices-nutrition -u owid --port 3306 -D owid -e "
+mysql -h staging-site-[branch] -u owid --port 3306 -D owid -e "
 INSERT INTO wiz__variable_mapping (id_old, id_new, timestamp, dataset_id_old, dataset_id_new, comments)
 SELECT
     v_old.id AS id_old,
@@ -192,7 +210,7 @@ ON v_old.name = v_new.name;
 Check for unmapped indicators:
 
 ```sql
-mysql -h staging-site-data-wb-foodprices-nutrition -u owid --port 3306 -D owid -e "
+mysql -h staging-site-[branch] -u owid --port 3306 -D owid -e "
 SELECT
     v_old.id AS old_id,
     v_old.name AS old_name
