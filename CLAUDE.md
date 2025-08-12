@@ -136,6 +136,20 @@ pytest tests/test_steps.py -m integration
 
 ## Configuration
 
+### Python Environment
+- **Virtual Environment**: This project uses a Python virtual environment (`.venv/`)
+- **Activation**: Always activate the virtual environment before running commands:
+  ```bash
+  source .venv/bin/activate  # Activate virtual environment
+  ```
+- **Package Management**: Always use `uv` package manager instead of `pip`
+  ```bash
+  uv add package_name     # Add a new package
+  uv remove package_name  # Remove a package
+  uv sync                 # Sync dependencies
+  ```
+- **IMPORTANT**: Never install packages with `pip install` - always ask first, then use `uv` if approved
+
 ### Environment Variables
 - `OWID_ENV`: dev/staging/production environment
 - `.env`: Local environment configuration
@@ -159,6 +173,34 @@ These are installed as editable packages (`owid-catalog`, `owid-datautils`, `owi
 ### Apps vs Core ETL
 - **Core ETL** (`etl/`): Step execution engine, catalog management, DAG processing
 - **Apps** (`apps/`): Extended functionality - Wizard, chart sync, anomaly detection, maintenance tools
+
+## Running ETL Steps
+Use `etlr` to run ETL steps:
+
+### Basic Usage
+- Run steps matching a pattern: `etlr biodiversity/2025-06-28/cherry_blossom`
+- Run with grapher upload: `etlr biodiversity/2025-06-28/cherry_blossom --grapher`
+- Dry run (preview): `etlr biodiversity/2025-06-28/cherry_blossom --dry-run`
+- Force re-run: `etlr biodiversity/2025-06-28/cherry_blossom --force`
+
+### Key Options
+- `--grapher/-g`: Upload datasets to grapher database (OWID staff only)
+- `--dry-run`: Preview steps without running them
+- `--force/-f`: Re-run steps even if up-to-date
+- `--only/-o`: Run only selected step (no dependencies)
+- `--downstream/-d`: Include downstream dependencies
+- `--exact-match/-x`: Steps must exactly match arguments
+
+
+## Git Workflow
+Create PR first, then commit files:
+
+1. **Create PR**: Use `etl pr` CLI (creates new branch)
+2. **Check status**: `git status` to see modified/untracked files
+3. **Add files**: `git add .` or `git add <specific-files>`
+4. **Commit**: `git commit -m "Description of changes"`
+
+Note: The `etl pr` creates a new branch but does NOT automatically commit files - you must commit manually after creating the PR.
 
 ## Important Development Notes
 
@@ -221,3 +263,18 @@ print(f"Garden null values: {tb.date.isnull().sum()}")
 - **Add assertions**: Include data quality checks that fail fast with clear error messages
 - **Document data issues**: Log warnings about data quality problems found during processing
 - **Fix meadow steps**: Most data cleaning should happen in meadow, not garden steps
+
+
+## Important Development Notes
+
+- Always use `geo.harmonize_countries()` for geographic data
+- Follow the `PathFinder` pattern for step inputs/outputs
+- Using `--force` is usually unnecessary - the step will be re-run if the code changes
+- Test steps with `etl run --dry-run` before execution
+- Use `make sync.catalog` to avoid rebuilding entire catalog locally
+- Check `etl d version-tracker` before major changes
+- VS Code extensions available: `make install-vscode-extensions`
+- **ALWAYS run `make check` before committing** - formats code, fixes linting issues, and runs type checks
+- SQL queries enclose in triple quotes for readability
+
+- When running etlr, always use PREFER_DOWNLOAD=1 prefix
