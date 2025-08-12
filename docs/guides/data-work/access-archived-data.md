@@ -1,7 +1,3 @@
----
-status: new
----
-
 Sometimes, you may need to access archived datasets or snapshots and compare them with current datasets. Here are the recommended approaches:
 
 ---

@@ -6,9 +6,9 @@ definitions:
       {definitions.aux.description_imputes}
     description_processing_corruption: |-
       ### Region aggregates
-      The default regional aggregates (including values for the World) have been estimated by averaging the country values. These are only estimated since 1900 and when data for most countries and populations is available (i.e. 70% for most continents). We have used the list of countries in 1900 as a reference.
+      The default regional aggregates have been estimated by averaging the country values. These are only estimated since 1900 and when data for most countries and populations is available (i.e. 70% for most continents). We have used the list of countries in 1900 as a reference.
 
-      In addition, regional aggregates with names like "Region (population-weighted)"" (including values for World) have been estimated by averaging the country values weighted by population. The population values are from the UN WPP 2024 revision dataset. These are only estimated when 70% of people in region have data for the given year.
+      In addition, regional aggregates with names like "Region (population-weighted)" have been estimated by averaging the country values weighted by population. The population values are from the UN WPP 2024 revision dataset. These are only estimated when 70% of people in region have data for the given year.
     description_imputes: |-
       ### Data imputation
       We expand the years covered by V-Dem further: To expand the time coverage of today's countries and include more of the period when they were still non-sovereign territories, we identified the historical entity they were a part of and used that regime's data whenever available
@@ -76,7 +76,7 @@ tables:
         ### Region aggregates
         The default regional aggregates (including values for the World) have been estimated by averaging the country values. These are only estimated when data for most countries and populations is available (i.e. 70% for most continents). We have used the list of countries in 1900 as a reference.
 
-        In addition, regional aggregates with names like "Region (population-weighted)"" (including values for World) have been estimated by averaging the country values weighted by population. The population values are from the UN WPP 2024 revision dataset. These are only estimated when 70% of people in region have data for the given year.
+        In addition, regional aggregates with names like "Region (population-weighted)" (including values for World) have been estimated by averaging the country values weighted by population. The population values are from the UN WPP 2024 revision dataset. These are only estimated when 70% of people in region have data for the given year.
 
         {definitions.aux.description_imputes}
       description_key:

@@ -52,7 +52,7 @@ steps:
 
   # UCDP (+preview)
   data://meadow/war/latest/ucdp_ced:
-    - snapshot://war/latest/ucdp_ced_v25_01_25_03.csv
+    - snapshot://war/latest/ucdp_ced_v25_01_25_06.csv
   data://garden/war/latest/ucdp_preview:
     - data://meadow/war/2025-06-13/ucdp
     - data://garden/war/2025-06-13/ucdp
@@ -213,7 +213,7 @@ steps:
     - snapshot://war/2024-01-23/prohibition.csv
   data://garden/war/2024-01-23/nuclear_weapons_treaties:
     - data://meadow/war/2024-01-23/nuclear_weapons_treaties
-    - data://garden/un/2023-10-30/un_members
+    - data://garden/un/2025-05-15/un_members
   data://grapher/war/2024-01-23/nuclear_weapons_treaties:
     - data://garden/war/2024-01-23/nuclear_weapons_treaties
   data://grapher/war/2024-01-23/nuclear_weapons_treaties_country_counts:
