@@ -86,7 +86,7 @@ def run(dest_dir: str) -> None:
     #
     # Reset index to make classification accessible as a column.
     tb = tb.reset_index()
-    
+
     # Sanity check.
     available_classifications = set(tb["classification"])
     error = f"Expected classifications have changed. Available: {sorted(available_classifications)}, Expected: {EXPECTED_CLASSIFICATIONS}"

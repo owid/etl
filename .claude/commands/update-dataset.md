@@ -18,6 +18,36 @@
 2. Update the metadata YAML file to match the new column structure if necessary.
 3. Summarise the changes in the PR description.
 
+### Upgrade indicators (Optional)
+
+**Ask user first**: "Do you want to upgrade chart indicators to use the new dataset version? This will update all existing charts that use indicators from the old dataset to reference the new dataset indicators."
+
+If the user confirms, proceed with indicator upgrade:
+
+1. **Find dataset pairs** using their shortName:
+   ```sql
+   mysql -h staging-site-data-wb-foodprices-nutrition -u owid --port 3306 -D owid -e "SELECT id, catalogPath, name FROM datasets WHERE shortName = 'dataset_short_name' AND NOT isArchived ORDER BY id;"
+   ```
+
+2. **Analyze indicator mappings** using the corrected SQL from the Indicator Upgrader section below.
+
+3. **Add variable mappings** using the 3-step process:
+   - Step 1: Create table structure
+   - Step 2: Insert perfect matches with SQL  
+   - Step 3: Add manual mappings if needed (see detailed process below)
+
+4. **Test with dry-run**:
+   ```bash
+   python apps/wizard/app_pages/indicator_upgrade/charts_update.py --dry-run
+   ```
+
+5. **Execute upgrade** if dry-run looks good:
+   ```bash
+   python apps/wizard/app_pages/indicator_upgrade/charts_update.py
+   ```
+
+6. **Verify results**: Check that all charts were successfully updated.
+
 ### Common issues when data structure changes
 
 - **Column name changes**: If columns are renamed/split (e.g., single cost → local currency + PPP), update:

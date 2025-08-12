@@ -101,6 +101,22 @@ pytest tests/test_etl_step_code.py::test_step_name  # Test single step
 
 ## Key Development Patterns
 
+### CLI Tools
+Always use Click instead of ArgumentParser for CLI scripts:
+```python
+import click
+
+@click.command()
+@click.option("--dry-run", is_flag=True, help="Preview changes without applying them")
+@click.option("--output", "-o", help="Output file path")  
+def main(dry_run: bool, output: str):
+    """Brief description of what the CLI does."""
+    # Implementation here
+    
+if __name__ == "__main__":
+    main()
+```
+
 ### Geographic Harmonization
 Use `geo.harmonize_countries()` for standardization:
 ```python
