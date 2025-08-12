@@ -8,7 +8,7 @@ definitions:
         - Global Health
         - Neglected Tropical Diseases
         - Eradication of Diseases
-      attribution: World Health Organization (2024)
+      attribution: World Health Organization (2025)
       attribution_short: WHO
     description_from_producer:
       Elimination of [dracunculiasis[(#dod:guinea-worm)] is the confirmed absence of the emergence of adult female worms (the interruption of transmission of Dracunculus medinensis)
@@ -80,14 +80,14 @@ tables:
           numDecimalPlaces: 0
         origins:
           - title: "Dracunculiasis eradication: global surveillance summary"
-            date_published: "2024-05-17"
+            date_published: "2025-05-16"
             producer: World Health Organization
             attribution_short: WHO
-            citation_full: Weekly Epidemic Report No 20, 2024, 99, 249–269, World Health Organization
-            url_download: https://web.archive.org/web/20240617154248/https://iris.who.int/bitstream/handle/10665/376790/WER9920-249-269.pdf?sequence=1
-            url_main: https://www.who.int/publications/i/item/who-wer-9920-249-269
-            date_accessed: "2024-06-17"
-            version_producer: 2023
+            citation_full: Weekly Epidemic Report No 20, 2025, 100, 165-191, World Health Organization
+            url_download: https://iris.who.int/bitstream/handle/10665/381456/WER10020-21-165-191.pdf?sequence=1&isAllowed=y
+            url_main: https://iris.who.int/handle/10665/381456
+            date_accessed: "2025-08-12"
+            version_producer: 2025
         description_processing:
           "For Cameroon, Central African Republic, Cote d'Ivoire, Mauritania, Senegal and Yemen the data is from:
 
@@ -104,5 +104,6 @@ tables:
           2021: Table 1a: https://web.archive.org/web/20230226163027/https://apps.who.int/iris/bitstream/handle/10665/354576/WER9721-22-225-247-eng-fre.pdf?sequence=1&isAllowed=y
           2022: Table 1a: https://web.archive.org/web/20230629124651/https://apps.who.int/iris/bitstream/handle/10665/367924/WER9820-205-224.pdf?sequence=1&isAllowed=y
           2023: Table 1a: https://iris.who.int/bitstream/handle/10665/376790/WER9920-249-269.pdf?sequence=1
+          2024: Table 1a: https://iris.who.int/bitstream/handle/10665/381456/WER10020-21-165-191.pdf?sequence=1&isAllowed=y
 
           We calculate global totals as the sum of the number of reported cases in each country."
