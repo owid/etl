@@ -123,7 +123,7 @@ def date_col_to_year(df: pd.DataFrame, col_name: str) -> pd.Series:
     """
     Convert a date column to a year column.
     """
-    return pd.to_datetime(df[col_name], errors="raise", format="mixed", yearfirst=True).dt.year.astype("Int64")
+    return pd.to_datetime(df[col_name], errors="coerce", format="mixed", yearfirst=True).dt.year.astype("Int64")
 
 
 def get_most_common(lst):
