@@ -3,373 +3,461 @@ definitions:
     processing_level: minor
     presentation:
       topic_tags:
-        - Food Prices
-        - Poverty
-  description_key_pct_of_population: &description_key_pct_of_population
-    # Original description:
-    # The indicator expresses the percentage of the total population unable to afford an energy sufficient diet in a given country and year. A diet is considered unaffordable when the diet cost plus expenditures for basic non-food needs exceed income per capita per day. The expenditures for basic non-food needs are calculated as average non-food expenditure shares of low-income consumer multipled by internaitonal poverty lines set by the World Bank. The non-food expenditure share is 37% and 44% in low-income and lower-middle-income countries for the second quintile of consumers, and 54% in upper-middle-and-high-income countries for the first quintile of consumers, according to household surveys compiled by the World Bank. The international poverty lines are $2.15/day for low-income countries, $3.65/day for lower-middle-income countries, $6.85/day for upper-middle-income countries, and $24.36/day for high-income countries, in 2017PPP$. Countries' income classifications follow the calendar year of 2021 standard (fiscal year of 2023 of the World Bank), which is the base year of the latest ICP cycle. Income data are provided by the World Bank’s Poverty and Inequality Platform. A value of zero indicates a null or a small number rounded down at the current precision level.
-    - Non-food expenses are estimated by looking at how much low-income people typically spend on things like housing, clothing, and transportation.
-    - This amount is calculated as the average share of non-food expenditure for a low-income consumer, multiplied by the international poverty line.
-    - "The average share of non-food expenditure is based on the spending habits of specific income groups (quintiles):
+      - Food Prices
+      - Poverty
+  description_key_pct_of_population: &id002
+  - Non-food expenses are estimated by looking at how much low-income people typically spend on things like housing, clothing, and transportation.
+  - This amount is calculated as the average share of non-food expenditure for a low-income consumer, multiplied by the international poverty line.
+  - 'The average share of non-food expenditure is based on the spending habits of specific income groups (quintiles):
 
-      - In upper-middle-income and high-income countries, the first quintile of consumers is considered (the poorest 20% of consumers), where people spend around 54% of their income on non-food needs.
+    - In upper-middle-income and high-income countries, the first quintile of consumers is considered (the poorest 20% of consumers), where people spend around 54% of their income on non-food needs.
 
-      - In low-income and lower-middle-income countries, the second quintile is considered (the second lowest 20% of consumers), where people spend about 37% and 44% of their income on non-food needs, respectively."
-    - "The international poverty lines (in [international-$](#dod:int_dollar_abbreviation) at 2017 prices) are:
+    - In low-income and lower-middle-income countries, the second quintile is considered (the second lowest 20% of consumers), where people spend about 37% and 44% of their income on non-food needs, respectively.'
+  - 'The international poverty lines (in [international-$](#dod:int_dollar_abbreviation) at 2017 prices) are:
 
-      - For low-income countries: $2.15/day.
+    - For low-income countries: $2.15/day.
 
-      - For lower-middle-income countries: $3.65/day.
+    - For lower-middle-income countries: $3.65/day.
 
-      - For upper-middle-income countries: $6.85/day.
+    - For upper-middle-income countries: $6.85/day.
 
-      - For high-income countries: $24.36/day."
-    - A value of zero indicates a null or a small number rounded down at the current precision level.
-  description_key_number_of_population: &description_key_number_of_population
-    - Population counts all residents regardless of legal status or citizenship.
-    - A value of zero indicates a null or a small number rounded down at the current precision level.
-  description_key_poverty_lines: &description_key_poverty_lines
-    # Original description:
-    # The ratio of the cost of an energy sufficient diet to the food poverty lines, defined as $1.35/day for low-income countries (63% of the international poverty line of $2.15/day in 2017 PPP$), $2.04/day for lower-middle-income countries (56% of the international poverty line of $3.65/day in 2017 PPP$), $3.15/day for upper-middle-income countries (46% of the international poverty line of $6.85/day in 2017 PPP$), and $11.2/day (46% of the international poverty line of $24.36/day in 2017 PPP$). The percentages (63%, 56%, and 46%) represent the average food expenditure shares in the second quintile of consumers in low-income and lower-middle-income countries, and the first quintile of consumers in upper-middle-and-high-income countries, according to household surveys compiled by the World Bank. Countries' income classifications follow the calendar year of 2021 standard (fiscal year of 2023 of the World Bank), which is the base year of the latest ICP cycle.
-    - "Poverty lines are defined (in [international-$](#dod:int_dollar_abbreviation) at 2017 prices) as follows:
+    - For high-income countries: $24.36/day.'
+  - A value of zero indicates a null or a small number rounded down at the current precision level.
+  description_key_number_of_population: &id004
+  - Population counts all residents regardless of legal status or citizenship.
+  - A value of zero indicates a null or a small number rounded down at the current precision level.
+  description_key_poverty_lines: &id003
+  - 'Poverty lines are defined (in [international-$](#dod:int_dollar_abbreviation) at 2017 prices) as follows:
 
-      - For low-income countries, $1.35/day (63% of the international poverty line of $2.15/day).
+    - For low-income countries, $1.35/day (63% of the international poverty line of $2.15/day).
 
-      - For lower-middle-income countries, $2.04/day (56% of the international poverty line of $3.65/day).
+    - For lower-middle-income countries, $2.04/day (56% of the international poverty line of $3.65/day).
 
-      - For upper-middle-income countries, $3.15/day (46% of the international poverty line of $6.85/day).
+    - For upper-middle-income countries, $3.15/day (46% of the international poverty line of $6.85/day).
 
-      - For high-income countries, $11.2/day (46% of the international poverty line of $24.36/day)."
-    - These percentages (63%, 56%, and 46%) represent the average food expenditure shares in the first quintile (the poorest 20th of the population) of consumers in upper-middle-income and high-income countries, and the second quintile of consumers in low-income and lower-middle-income countries, according to household surveys compiled by the World Bank.
-  # Original descriptions (from https://www.worldbank.org/en/programs/icp/brief/foodpricesfornutrition#3):
-  # - Cost of a Healthy Diet: A healthy diet meets nutritional standards set by dietary guidelines, with sufficient diversity and quantity within and between food groups to achieve nutrient adequacy and protect against diet-related diseases. To measure access and affordability, the cost of meeting food-based dietary guidelines is computed using the least expensive foods available in each category at each place and time (see "Methods and options to monitor the cost and affordability of a healthy diet globally" and "Brief note: Methods and data sources" (Herforth et al. 2022) ). The cost of a healthy diet is the preferred indicator of diet costs as it uses the most affordable foods available at local markets to meet dietary needs for an active and healthy life, using standards adopted by national governments around the world. Total cost per day can be disaggregated by food group, showing the cost per day of the least expensive locally available items in each food group (fruits; vegetables; starchy staples; animal-source foods; legumes, nuts, and seeds; and oils and fats)
-  # - Cost of a Nutrient Adequate Diet: A nutrient adequate diet meets all essential nutrient requirements, with sufficient diversity and quantity of locally available foods to stay within the upper and lower bounds for total protein, fats, and carbohydrates as well as essential vitamins and minerals required to avoid nutrient deficiencies or toxicity. Computation of the least-cost nutrient adequate diet requires linear programming optimization modeling, and is based on nutrient requirements only, rather than food groups specified in dietary guidelines.
-  # - Cost of an Energy Sufficient Diet: An energy sufficient diet provides enough of a starchy staple food for day-to-day subsistence, without either nutrient adequacy or adherence to dietary guidelines. The least-cost version of this subsistence diet uses the most affordable locally available starchy staple, achieving energy balance but not nutrient adequacy or other dietary needs.
-  description_healthy_diet: &description_healthy_diet |-
-    A healthy diet meets nutritional standards set by dietary guidelines, with sufficient diversity and quantity within and between food groups to achieve nutrient adequacy and protect against diet-related diseases.
-  description_nutrient_adequate_diet: &description_nutrient_adequate_diet |-
-    A nutrient adequate diet meets all essential nutrient requirements, with sufficient diversity and quantity of locally available foods to stay within the upper and lower bounds for total protein, fats, and carbohydrates as well as essential vitamins and minerals required to avoid nutrient deficiencies or toxicity.
-  description_energy_sufficient_diet: &description_energy_sufficient_diet |-
-    An energy sufficient diet provides enough of a starchy staple food for day-to-day subsistence, without either nutrient adequacy or adherence to dietary guidelines.
-  description_key_international_dollars: &description_key_international_dollars |-
-    The data is measured in international-$ at 2021 prices - this adjusts for inflation and for differences in the cost of living between countries.
-
-  description_from_producer_healthy_diet: &description_from_producer_healthy_diet |-
-    The Cost of a Healthy Diet indicator provides a globally standardized metric to monitor food environments,  measuring a population’s access to sufficient food for an active and healthy life. For this metric, access to healthy diets is measured using the least expensive locally available items in sufficient quantities to meet national governments’ food-based dietary guidelines.  For global monitoring, commonalities among those guidelines are represented by a Healthy Diet Basket, specifying a target number and quantity of eleven items balanced across six nutritionally defined food groups. The items selected in each country to meet the global Healthy Diet Basket standard generally also achieve nutrient adequacy, at a similar cost to meeting an individual country’s own national dietary guidelines.
-
-    _Limitations and exceptions_
-
-    Item prices for the global Cost of a Healthy Diet indicator are reported by each national statistical organization through the International Comparison Program, intending to show the country’s annual average cost for commonly consumed foods being sold in multiple countries. Food item availability and price at any one time and place could differ from this average. Also, prices are reported in local currency units, and then adjusted for inflation over time and price levels across countries using national Consumer Price Indexes and Purchasing Power Parity exchange rates that may not exactly match currency values used in any one time and place.
-
-    _Statistical concept and methodology_
-
-    The Cost of a Healthy Diet is a new kind of price index developed by the Food Prices for Nutrition project, based on matching item descriptions to food composition data then selecting the lowest cost options to meet dietary requirements. The initial methods were first published as a background paper for the UN agencies’ State of Food Security and Nutrition in the World Report 2020 and revised for the 2022 and 2024 editions of that same report.
-
+    - For high-income countries, $11.2/day (46% of the international poverty line of $24.36/day).'
+  - These percentages (63%, 56%, and 46%) represent the average food expenditure shares in the first quintile (the poorest 20th of the population) of consumers in upper-middle-income and high-income countries,
+    and the second quintile of consumers in low-income and lower-middle-income countries, according to household surveys compiled by the World Bank.
+  description_healthy_diet: A healthy diet meets nutritional standards set by dietary guidelines, with sufficient diversity and quantity within and between food groups to achieve nutrient adequacy and protect
+    against diet-related diseases.
+  description_nutrient_adequate_diet: A nutrient adequate diet meets all essential nutrient requirements, with sufficient diversity and quantity of locally available foods to stay within the upper and lower
+    bounds for total protein, fats, and carbohydrates as well as essential vitamins and minerals required to avoid nutrient deficiencies or toxicity.
+  description_energy_sufficient_diet: An energy sufficient diet provides enough of a starchy staple food for day-to-day subsistence, without either nutrient adequacy or adherence to dietary guidelines.
+  description_key_international_dollars: The data is measured in international-$ at 2021 prices - this adjusts for inflation and for differences in the cost of living between countries.
+  description_from_producer_healthy_diet: "The Cost of a Healthy Diet indicator provides a globally standardized metric to monitor food environments,  measuring a population\u2019s access to sufficient\
+    \ food for an active and healthy life. For this metric, access to healthy diets is measured using the least expensive locally available items in sufficient quantities to meet national governments\u2019\
+    \ food-based dietary guidelines.  For global monitoring, commonalities among those guidelines are represented by a Healthy Diet Basket, specifying a target number and quantity of eleven items balanced\
+    \ across six nutritionally defined food groups. The items selected in each country to meet the global Healthy Diet Basket standard generally also achieve nutrient adequacy, at a similar cost to meeting\
+    \ an individual country\u2019s own national dietary guidelines.\n\n_Limitations and exceptions_\n\nItem prices for the global Cost of a Healthy Diet indicator are reported by each national statistical\
+    \ organization through the International Comparison Program, intending to show the country\u2019s annual average cost for commonly consumed foods being sold in multiple countries. Food item availability\
+    \ and price at any one time and place could differ from this average. Also, prices are reported in local currency units, and then adjusted for inflation over time and price levels across countries using\
+    \ national Consumer Price Indexes and Purchasing Power Parity exchange rates that may not exactly match currency values used in any one time and place.\n\n_Statistical concept and methodology_\n\nThe\
+    \ Cost of a Healthy Diet is a new kind of price index developed by the Food Prices for Nutrition project, based on matching item descriptions to food composition data then selecting the lowest cost\
+    \ options to meet dietary requirements. The initial methods were first published as a background paper for the UN agencies\u2019 State of Food Security and Nutrition in the World Report 2020 and revised\
+    \ for the 2022 and 2024 editions of that same report."
 dataset:
   update_period_days: 365
-  description: |-
-    This dataset is based on the methodology developed in Herforth et al. (2022), which is a background paper for the UN agencies' annual report on The State of Food Security and Nutrition in the World 2022 (https://www.fao.org/publications/sofi). It is based on data on prices for locally available food items from the World Bank's International Comparison Program (ICP) (https://icp.worldbank.org/) matched to other data on food composition and dietary requirements.
+  description: 'This dataset is based on the methodology developed in Herforth et al. (2022), which is a background paper for the UN agencies'' annual report on The State of Food Security and Nutrition
+    in the World 2022 (https://www.fao.org/publications/sofi). It is based on data on prices for locally available food items from the World Bank''s International Comparison Program (ICP) (https://icp.worldbank.org/)
+    matched to other data on food composition and dietary requirements.
 
-    The nutritional requirements used in this study are in line with the WHO's recommendations for the median woman of reproductive age. The authors note two key two reasons for this:
-    (1) Requirements fall roughly at the median of the entire population distribution, in the sense that least-cost diets to meet energy and nutrient requirements for people in this reference group approximate the median level of least costs for all sex-age groups over the entire life cycle. This reference group is therefore a good representation of the population as a whole.
-    (2) Women of reproductive age are typically a nutritionally vulnerable population group, as seen in their increased risk of dietary inadequacies (due to social practices and norms that often disadvantage them in terms of access to food), which have important consequences for themselves and their children. Previous studies have also based their analyses on this reference group.
 
+    The nutritional requirements used in this study are in line with the WHO''s recommendations for the median woman of reproductive age. The authors note two key two reasons for this:
+
+    (1) Requirements fall roughly at the median of the entire population distribution, in the sense that least-cost diets to meet energy and nutrient requirements for people in this reference group approximate
+    the median level of least costs for all sex-age groups over the entire life cycle. This reference group is therefore a good representation of the population as a whole.
+
+    (2) Women of reproductive age are typically a nutritionally vulnerable population group, as seen in their increased risk of dietary inadequacies (due to social practices and norms that often disadvantage
+    them in terms of access to food), which have important consequences for themselves and their children. Previous studies have also based their analyses on this reference group.'
 tables:
   food_prices_for_nutrition:
     title: Food prices for nutrition
     variables:
-      cost_of_an_energy_sufficient_diet:
+      cost_of_an_energy_sufficient_diet_in_ppp_dollars:
         title: Cost of an energy sufficient diet
         unit: international-$ in 2021 prices per person per day
         short_unit: $
-        description_short: |-
-          Cost of the least expensive starchy staple for energy balance for a representative person at 2,330 kcal/day. This data is adjusted for inflation and for differences in the cost of living between countries.
-        description_key:
-          - *description_energy_sufficient_diet
-          - *description_key_international_dollars
+        description_short: Cost of the least expensive starchy staple for energy balance for a representative person at 2,330 kcal/day. This data is adjusted for inflation and for differences in the cost
+          of living between countries.
+        description_key: &id001
+        - An energy sufficient diet provides enough of a starchy staple food for day-to-day subsistence, without either nutrient adequacy or adherence to dietary guidelines.
+        - The data is measured in international-$ at 2021 prices - this adjusts for inflation and for differences in the cost of living between countries.
+      cost_of_an_energy_sufficient_diet_in_local_currency_unit:
+        title: Cost of an energy sufficient diet (LCU)
+        unit: local currency units per person per day
+        short_unit: LCU
+        description_short: Cost of the least expensive starchy staple for energy balance for a representative person at 2,330 kcal/day. This data is expressed in local currency units and is not adjusted
+          for differences in the cost of living between countries.
+        description_key: *id001
       affordability_of_an_energy_sufficient_diet__ratio_of_cost_to_food_expenditures:
-        title: "Affordability of an energy sufficient diet: ratio of cost to food expenditures"
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Percentage of the cost of an energy sufficient diet to total food expenditure per capita per day from national accounts.
+        title: 'Affordability of an energy sufficient diet: ratio of cost to food expenditures'
+        unit: '%'
+        short_unit: '%'
+        description_short: Percentage of the cost of an energy sufficient diet to total food expenditure per capita per day from national accounts.
         description_key:
-          - *description_energy_sufficient_diet
+        - An energy sufficient diet provides enough of a starchy staple food for day-to-day subsistence, without either nutrient adequacy or adherence to dietary guidelines.
       percent_of_the_population_who_cannot_afford_sufficient_calories:
         title: Share of the population who cannot afford sufficient calories
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Percentage of the total population unable to afford an energy sufficient diet. A diet is considered unaffordable when its cost plus expenditures for basic non-food needs exceed income per capita per day.
+        unit: '%'
+        short_unit: '%'
+        description_short: Percentage of the total population unable to afford an energy sufficient diet. A diet is considered unaffordable when its cost plus expenditures for basic non-food needs exceed
+          income per capita per day.
         description_key:
-          - *description_energy_sufficient_diet
-          - *description_key_pct_of_population
+        - An energy sufficient diet provides enough of a starchy staple food for day-to-day subsistence, without either nutrient adequacy or adherence to dietary guidelines.
+        - *id002
       affordability_of_an_energy_sufficient_diet__ratio_of_cost_to_the_food_poverty_line:
-        title: "Affordability of an energy sufficient diet: ratio of cost to the food poverty line"
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Percentage of the cost of an energy sufficient diet to the food poverty lines.
+        title: 'Affordability of an energy sufficient diet: ratio of cost to the food poverty line'
+        unit: '%'
+        short_unit: '%'
+        description_short: Percentage of the cost of an energy sufficient diet to the food poverty lines.
         description_key:
-          - *description_energy_sufficient_diet
-          - *description_key_poverty_lines
+        - An energy sufficient diet provides enough of a starchy staple food for day-to-day subsistence, without either nutrient adequacy or adherence to dietary guidelines.
+        - *id003
       people_who_cannot_afford_sufficient_calories:
         title: Number of people who cannot afford sufficient calories
         unit: people
-        short_unit: ""
-        description_short: |-
-          Total number of people who cannot afford an energy-sufficient diet.
+        short_unit: ''
+        description_short: Total number of people who cannot afford an energy-sufficient diet.
         description_key:
-          - *description_energy_sufficient_diet
-          - This indicator is calculated as the percentage of a country's population that is unable to afford an energy sufficient diet, multiplied by the country's population.
-          - *description_key_number_of_population
-      cost_of_a_healthy_diet:
+        - An energy sufficient diet provides enough of a starchy staple food for day-to-day subsistence, without either nutrient adequacy or adherence to dietary guidelines.
+        - This indicator is calculated as the percentage of a country's population that is unable to afford an energy sufficient diet, multiplied by the country's population.
+        - *id004
+      cost_of_a_healthy_diet_in_ppp_dollars:
         title: Cost of a healthy diet
         unit: international-$ in 2021 prices per person per day
         short_unit: $
         processing_level: major
-        description_processing: |-
-          - Costs have been adjusted for inflation by multiplying the cost for a given year by CPI(BASE_YEAR) / CPI(year), where CPI is the United States' Consumer Price Index and the base year is 2021.
-        description_short: |-
-          Cost of purchasing the least expensive locally available foods to meet requirements for energy and food-based dietary guidelines, for a representative person within energy balance at 2,330 kcal/day. This data is adjusted for inflation and for differences in the cost of living between countries.
-        description_key:
-          - *description_healthy_diet
-        description_from_producer: *description_from_producer_healthy_diet
-
+        description_processing: '- Costs have been adjusted for inflation by multiplying the cost for a given year by CPI(BASE_YEAR) / CPI(year), where CPI is the United States'' Consumer Price Index and
+          the base year is 2021.'
+        description_short: Cost of purchasing the least expensive locally available foods to meet requirements for energy and food-based dietary guidelines, for a representative person within energy balance
+          at 2,330 kcal/day. This data is adjusted for inflation and for differences in the cost of living between countries.
+        description_key: &id005
+        - A healthy diet meets nutritional standards set by dietary guidelines, with sufficient diversity and quantity within and between food groups to achieve nutrient adequacy and protect against diet-related
+          diseases.
+        description_from_producer: "The Cost of a Healthy Diet indicator provides a globally standardized metric to monitor food environments,  measuring a population\u2019s access to sufficient food for\
+          \ an active and healthy life. For this metric, access to healthy diets is measured using the least expensive locally available items in sufficient quantities to meet national governments\u2019\
+          \ food-based dietary guidelines.  For global monitoring, commonalities among those guidelines are represented by a Healthy Diet Basket, specifying a target number and quantity of eleven items\
+          \ balanced across six nutritionally defined food groups. The items selected in each country to meet the global Healthy Diet Basket standard generally also achieve nutrient adequacy, at a similar\
+          \ cost to meeting an individual country\u2019s own national dietary guidelines.\n\n_Limitations and exceptions_\n\nItem prices for the global Cost of a Healthy Diet indicator are reported by each\
+          \ national statistical organization through the International Comparison Program, intending to show the country\u2019s annual average cost for commonly consumed foods being sold in multiple countries.\
+          \ Food item availability and price at any one time and place could differ from this average. Also, prices are reported in local currency units, and then adjusted for inflation over time and price\
+          \ levels across countries using national Consumer Price Indexes and Purchasing Power Parity exchange rates that may not exactly match currency values used in any one time and place.\n\n_Statistical\
+          \ concept and methodology_\n\nThe Cost of a Healthy Diet is a new kind of price index developed by the Food Prices for Nutrition project, based on matching item descriptions to food composition\
+          \ data then selecting the lowest cost options to meet dietary requirements. The initial methods were first published as a background paper for the UN agencies\u2019 State of Food Security and\
+          \ Nutrition in the World Report 2020 and revised for the 2022 and 2024 editions of that same report."
+      cost_of_a_healthy_diet_in_local_currency_unit:
+        title: Cost of a healthy diet (LCU)
+        unit: local currency units per person per day
+        short_unit: LCU
+        processing_level: major
+        description_processing: '- Costs have been adjusted for inflation by multiplying the cost for a given year by CPI(BASE_YEAR) / CPI(year), where CPI is the United States'' Consumer Price Index and
+          the base year is 2021.'
+        description_short: Cost of purchasing the least expensive locally available foods to meet requirements for energy and food-based dietary guidelines, for a representative person within energy balance
+          at 2,330 kcal/day. This data is expressed in local currency units and is not adjusted for differences in the cost of living between countries.
+        description_key: *id005
+        description_from_producer: "The Cost of a Healthy Diet indicator provides a globally standardized metric to monitor food environments,  measuring a population\u2019s access to sufficient food for\
+          \ an active and healthy life. For this metric, access to healthy diets is measured using the least expensive locally available items in sufficient quantities to meet national governments\u2019\
+          \ food-based dietary guidelines.  For global monitoring, commonalities among those guidelines are represented by a Healthy Diet Basket, specifying a target number and quantity of eleven items\
+          \ balanced across six nutritionally defined food groups. The items selected in each country to meet the global Healthy Diet Basket standard generally also achieve nutrient adequacy, at a similar\
+          \ cost to meeting an individual country\u2019s own national dietary guidelines.\n\n_Limitations and exceptions_\n\nItem prices for the global Cost of a Healthy Diet indicator are reported by each\
+          \ national statistical organization through the International Comparison Program, intending to show the country\u2019s annual average cost for commonly consumed foods being sold in multiple countries.\
+          \ Food item availability and price at any one time and place could differ from this average. Also, prices are reported in local currency units, and then adjusted for inflation over time and price\
+          \ levels across countries using national Consumer Price Indexes and Purchasing Power Parity exchange rates that may not exactly match currency values used in any one time and place.\n\n_Statistical\
+          \ concept and methodology_\n\nThe Cost of a Healthy Diet is a new kind of price index developed by the Food Prices for Nutrition project, based on matching item descriptions to food composition\
+          \ data then selecting the lowest cost options to meet dietary requirements. The initial methods were first published as a background paper for the UN agencies\u2019 State of Food Security and\
+          \ Nutrition in the World Report 2020 and revised for the 2022 and 2024 editions of that same report."
       cost_of_a_healthy_diet_relative_to_the_cost_of_sufficient_energy_from_starchy_staples:
         title: Cost of a healthy diet relative to the cost of sufficient energy from starchy staples
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Ratio between the cost of a healthy diet that meets requirements for energy and food-based dietary guidelines and the cost of caloric adequacy that uses only starchy staples to meet energy requirements.
+        unit: '%'
+        short_unit: '%'
+        description_short: Ratio between the cost of a healthy diet that meets requirements for energy and food-based dietary guidelines and the cost of caloric adequacy that uses only starchy staples to
+          meet energy requirements.
         description_key:
-          - *description_healthy_diet
-      cost_of_animal_source_foods:
+        - A healthy diet meets nutritional standards set by dietary guidelines, with sufficient diversity and quantity within and between food groups to achieve nutrient adequacy and protect against diet-related
+          diseases.
+      cost_of_animal_source_foods_in_ppp_dollars:
         title: Cost of animal-source foods
         unit: international-$ in 2021 prices per person per day
         short_unit: $
-        description_short: |-
-          Cost of purchasing the least expensive locally available animal-source foods to meet daily intake levels recommended in food-based dietary guidelines. Animal-source foods are one of the six food groups within the Healthy Diet Basket. This data is adjusted for inflation and for differences in the cost of living between countries.
-        description_key:
-          - *description_healthy_diet
-          - *description_key_international_dollars
+        description_short: Cost of purchasing the least expensive locally available animal-source foods to meet daily intake levels recommended in food-based dietary guidelines. Animal-source foods are
+          one of the six food groups within the Healthy Diet Basket. This data is adjusted for inflation and for differences in the cost of living between countries.
+        description_key: &id006
+        - A healthy diet meets nutritional standards set by dietary guidelines, with sufficient diversity and quantity within and between food groups to achieve nutrient adequacy and protect against diet-related
+          diseases.
+        - The data is measured in international-$ at 2021 prices - this adjusts for inflation and for differences in the cost of living between countries.
+      cost_of_animal_source_foods_in_local_currency_unit:
+        title: Cost of animal-source foods (LCU)
+        unit: local currency units per person per day
+        short_unit: LCU
+        description_short: Cost of purchasing the least expensive locally available animal-source foods to meet daily intake levels recommended in food-based dietary guidelines. Animal-source foods are
+          one of the six food groups within the Healthy Diet Basket. This data is expressed in local currency units and is not adjusted for differences in the cost of living between countries.
+        description_key: *id006
       cost_share_for_animal_sourced_foods_in_a_least_cost_healthy_diet:
         title: Cost share for animal-sourced foods in a least-cost healthy diet
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of costs for the least expensive animal-source foods to meet daily recommendations in food-based dietary guidelines, as a percentage of the total cost of a healthy diet.
+        unit: '%'
+        short_unit: '%'
+        description_short: Share of costs for the least expensive animal-source foods to meet daily recommendations in food-based dietary guidelines, as a percentage of the total cost of a healthy diet.
         description_key:
-          - *description_healthy_diet
+        - A healthy diet meets nutritional standards set by dietary guidelines, with sufficient diversity and quantity within and between food groups to achieve nutrient adequacy and protect against diet-related
+          diseases.
       cost_of_animal_sourced_foods_relative_to_the_starchy_staples_in_a_least_cost_healthy_diet:
         title: Cost of animal-sourced foods relative to the starchy staples in a least-cost healthy diet
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Cost of the least expensive animal-source foods as a multiple of the least expensive starchy staples to meet daily recommendations in food-based dietary guidelines.
+        unit: '%'
+        short_unit: '%'
+        description_short: Cost of the least expensive animal-source foods as a multiple of the least expensive starchy staples to meet daily recommendations in food-based dietary guidelines.
         description_key:
-          - *description_healthy_diet
-      cost_of_fruits:
+        - A healthy diet meets nutritional standards set by dietary guidelines, with sufficient diversity and quantity within and between food groups to achieve nutrient adequacy and protect against diet-related
+          diseases.
+      cost_of_fruits_in_ppp_dollars:
         title: Cost of fruits
         unit: international-$ in 2021 prices per person per day
         short_unit: $
-        description_short: |-
-          Cost of purchasing the least expensive locally available fruits to meet daily intake levels recommended in food-based dietary guidelines. Fruits are one of the six food groups within the Healthy Diet Basket. This data is adjusted for inflation and for differences in the cost of living between countries.
-        description_key:
-          - *description_healthy_diet
-          - *description_key_international_dollars
+        description_short: Cost of purchasing the least expensive locally available fruits to meet daily intake levels recommended in food-based dietary guidelines. Fruits are one of the six food groups
+          within the Healthy Diet Basket. This data is adjusted for inflation and for differences in the cost of living between countries.
+        description_key: &id007
+        - A healthy diet meets nutritional standards set by dietary guidelines, with sufficient diversity and quantity within and between food groups to achieve nutrient adequacy and protect against diet-related
+          diseases.
+        - The data is measured in international-$ at 2021 prices - this adjusts for inflation and for differences in the cost of living between countries.
+      cost_of_fruits_in_local_currency_unit:
+        title: Cost of fruits (LCU)
+        unit: local currency units per person per day
+        short_unit: LCU
+        description_short: Cost of purchasing the least expensive locally available fruits to meet daily intake levels recommended in food-based dietary guidelines. Fruits are one of the six food groups
+          within the Healthy Diet Basket. This data is expressed in local currency units and is not adjusted for differences in the cost of living between countries.
+        description_key: *id007
       cost_share_for_fruits_in_a_least_cost_healthy_diet:
         title: Cost share for fruits in a least-cost healthy diet
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of costs for the least expensive fruits to meet daily recommendations in food-based dietary guidelines, as a percentage of the total cost of a healthy diet.
+        unit: '%'
+        short_unit: '%'
+        description_short: Share of costs for the least expensive fruits to meet daily recommendations in food-based dietary guidelines, as a percentage of the total cost of a healthy diet.
         description_key:
-          - *description_healthy_diet
+        - A healthy diet meets nutritional standards set by dietary guidelines, with sufficient diversity and quantity within and between food groups to achieve nutrient adequacy and protect against diet-related
+          diseases.
       cost_of_fruits_relative_to_the_starchy_staples_in_a_least_cost_healthy_diet:
         title: Cost of fruits relative to the starchy staples in a least-cost healthy diet
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Cost of the least expensive fruits as a multiple of the least expensive starchy staples to meet daily recommendations in food-based dietary guidelines.
+        unit: '%'
+        short_unit: '%'
+        description_short: Cost of the least expensive fruits as a multiple of the least expensive starchy staples to meet daily recommendations in food-based dietary guidelines.
         description_key:
-          - *description_healthy_diet
+        - A healthy diet meets nutritional standards set by dietary guidelines, with sufficient diversity and quantity within and between food groups to achieve nutrient adequacy and protect against diet-related
+          diseases.
       affordability_of_a_healthy_diet__ratio_of_cost_to_food_expenditures:
-        title: "Affordability of a healthy diet: ratio of cost to food expenditures"
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Percentage of the cost of a healthy diet to total food expenditure per capita per day from national accounts.
+        title: 'Affordability of a healthy diet: ratio of cost to food expenditures'
+        unit: '%'
+        short_unit: '%'
+        description_short: Percentage of the cost of a healthy diet to total food expenditure per capita per day from national accounts.
         description_key:
-          - *description_healthy_diet
+        - A healthy diet meets nutritional standards set by dietary guidelines, with sufficient diversity and quantity within and between food groups to achieve nutrient adequacy and protect against diet-related
+          diseases.
       percent_of_the_population_who_cannot_afford_a_healthy_diet:
         title: Share of the population who cannot afford a healthy diet
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Percentage of the total population unable to afford a healthy diet. A diet is considered unaffordable when the diet cost plus expenditures for basic non-food needs exceed income per capita per day.
+        unit: '%'
+        short_unit: '%'
+        description_short: Percentage of the total population unable to afford a healthy diet. A diet is considered unaffordable when the diet cost plus expenditures for basic non-food needs exceed income
+          per capita per day.
         description_key:
-          - *description_healthy_diet
-          - *description_key_pct_of_population
-      cost_of_legumes__nuts_and_seeds:
+        - A healthy diet meets nutritional standards set by dietary guidelines, with sufficient diversity and quantity within and between food groups to achieve nutrient adequacy and protect against diet-related
+          diseases.
+        - *id002
+      cost_of_legumes__nuts_and_seeds_in_ppp_dollars:
         title: Cost of legumes, nuts and seeds
         unit: international-$ in 2021 prices per person per day
         short_unit: $
-        description_short: |-
-          Cost of purchasing the least expensive locally available legumes, nuts and seeds to meet daily intake levels recommended in food-based dietary guidelines. Legumes, nuts and seeds are one of the six food groups within the Healthy Diet Basket. This data is adjusted for inflation and for differences in the cost of living between countries.
-        description_key:
-          - *description_healthy_diet
-          - *description_key_international_dollars
+        description_short: Cost of purchasing the least expensive locally available legumes, nuts and seeds to meet daily intake levels recommended in food-based dietary guidelines. Legumes, nuts and seeds
+          are one of the six food groups within the Healthy Diet Basket. This data is adjusted for inflation and for differences in the cost of living between countries.
+        description_key: &id008
+        - A healthy diet meets nutritional standards set by dietary guidelines, with sufficient diversity and quantity within and between food groups to achieve nutrient adequacy and protect against diet-related
+          diseases.
+        - The data is measured in international-$ at 2021 prices - this adjusts for inflation and for differences in the cost of living between countries.
+      cost_of_legumes__nuts_and_seeds_in_local_currency_unit:
+        title: Cost of legumes, nuts and seeds (LCU)
+        unit: local currency units per person per day
+        short_unit: LCU
+        description_short: Cost of purchasing the least expensive locally available legumes, nuts and seeds to meet daily intake levels recommended in food-based dietary guidelines. Legumes, nuts and seeds
+          are one of the six food groups within the Healthy Diet Basket. This data is expressed in local currency units and is not adjusted for differences in the cost of living between countries.
+        description_key: *id008
       cost_share_for_legumes__nuts_and_seeds_in_a_least_cost_healthy_diet:
         title: Cost share for legumes, nuts and seeds in a least-cost healthy diet
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of costs for the least expensive legumes, nuts or seeds to meet daily recommendations in food-based dietary guidelines, as a percentage of the total cost of a healthy diet.
+        unit: '%'
+        short_unit: '%'
+        description_short: Share of costs for the least expensive legumes, nuts or seeds to meet daily recommendations in food-based dietary guidelines, as a percentage of the total cost of a healthy diet.
         description_key:
-          - *description_healthy_diet
+        - A healthy diet meets nutritional standards set by dietary guidelines, with sufficient diversity and quantity within and between food groups to achieve nutrient adequacy and protect against diet-related
+          diseases.
       cost_of_legumes__nuts_and_seeds_relative_to_the_starchy_staples_in_a_least_cost_healthy_diet:
         title: Cost of legumes, nuts and seeds relative to the starchy staples in a least-cost healthy diet
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Cost of the least expensive legumes, nuts and seeds as a multiple of the least expensive starchy staples to meet daily recommendations in food-based dietary guidelines.
+        unit: '%'
+        short_unit: '%'
+        description_short: Cost of the least expensive legumes, nuts and seeds as a multiple of the least expensive starchy staples to meet daily recommendations in food-based dietary guidelines.
         description_key:
-          - *description_healthy_diet
-      cost_of_oils_and_fats:
+        - A healthy diet meets nutritional standards set by dietary guidelines, with sufficient diversity and quantity within and between food groups to achieve nutrient adequacy and protect against diet-related
+          diseases.
+      cost_of_fats_and_oils_in_ppp_dollars:
         title: Cost of oils and fats
         unit: international-$ in 2021 prices per person per day
         short_unit: $
-        description_short: |-
-          Cost of purchasing the least expensive locally available fats or oils to meet daily intake levels recommended in food-based dietary guidelines. Fats and oils are one of the six food groups within the Healthy Diet Basket. This data is adjusted for inflation and for differences in the cost of living between countries.
-        description_key:
-          - *description_healthy_diet
-          - *description_key_international_dollars
+        description_short: Cost of purchasing the least expensive locally available fats or oils to meet daily intake levels recommended in food-based dietary guidelines. Fats and oils are one of the six
+          food groups within the Healthy Diet Basket. This data is adjusted for inflation and for differences in the cost of living between countries.
+        description_key: &id009
+        - A healthy diet meets nutritional standards set by dietary guidelines, with sufficient diversity and quantity within and between food groups to achieve nutrient adequacy and protect against diet-related
+          diseases.
+        - The data is measured in international-$ at 2021 prices - this adjusts for inflation and for differences in the cost of living between countries.
+      cost_of_fats_and_oils_in_local_currency_unit:
+        title: Cost of oils and fats (LCU)
+        unit: local currency units per person per day
+        short_unit: LCU
+        description_short: Cost of purchasing the least expensive locally available fats or oils to meet daily intake levels recommended in food-based dietary guidelines. Fats and oils are one of the six
+          food groups within the Healthy Diet Basket. This data is expressed in local currency units and is not adjusted for differences in the cost of living between countries.
+        description_key: *id009
       cost_share_for_oils_and_fats_in_a_least_cost_healthy_diet:
         title: Cost share for oils and fats in a least-cost healthy diet
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of costs for the least expensive oils or fats to meet daily recommendations in food-based dietary guidelines, as a percentage of the total cost of a healthy diet.
+        unit: '%'
+        short_unit: '%'
+        description_short: Share of costs for the least expensive oils or fats to meet daily recommendations in food-based dietary guidelines, as a percentage of the total cost of a healthy diet.
         description_key:
-          - *description_healthy_diet
+        - A healthy diet meets nutritional standards set by dietary guidelines, with sufficient diversity and quantity within and between food groups to achieve nutrient adequacy and protect against diet-related
+          diseases.
       cost_of_oils_and_fats_relative_to_the_starchy_staples_in_a_least_cost_healthy_diet:
         title: Cost of oils and fats relative to the starchy staples in a least-cost healthy diet
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Cost of the least expensive oils and fats as a multiple of the least expensive starchy staples to meet daily recommendations in food-based dietary guidelines.
+        unit: '%'
+        short_unit: '%'
+        description_short: Cost of the least expensive oils and fats as a multiple of the least expensive starchy staples to meet daily recommendations in food-based dietary guidelines.
         description_key:
-          - *description_healthy_diet
+        - A healthy diet meets nutritional standards set by dietary guidelines, with sufficient diversity and quantity within and between food groups to achieve nutrient adequacy and protect against diet-related
+          diseases.
       affordability_of_a_healthy_diet__ratio_of_cost_to_the_food_poverty_line:
-        title: "Affordability of a healthy diet: ratio of cost to the food poverty line"
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Percentage of the cost of a healthy diet to the food poverty lines.
+        title: 'Affordability of a healthy diet: ratio of cost to the food poverty line'
+        unit: '%'
+        short_unit: '%'
+        description_short: Percentage of the cost of a healthy diet to the food poverty lines.
         description_key:
-          - *description_healthy_diet
-          - *description_key_poverty_lines
-      cost_of_starchy_staples:
+        - A healthy diet meets nutritional standards set by dietary guidelines, with sufficient diversity and quantity within and between food groups to achieve nutrient adequacy and protect against diet-related
+          diseases.
+        - *id003
+      cost_of_starchy_staples_in_ppp_dollars:
         title: Cost of starchy staples
         unit: international-$ in 2021 prices per person per day
         short_unit: $
-        description_short: |-
-          Cost of purchasing the least expensive locally available starchy staples to meet daily intake levels recommended in food-based dietary guidelines. Starchy staples are one of the six food groups within the Healthy Diet Basket. This data is adjusted for inflation and for differences in the cost of living between countries.
-        description_key:
-          - *description_healthy_diet
-          - *description_key_international_dollars
+        description_short: Cost of purchasing the least expensive locally available starchy staples to meet daily intake levels recommended in food-based dietary guidelines. Starchy staples are one of the
+          six food groups within the Healthy Diet Basket. This data is adjusted for inflation and for differences in the cost of living between countries.
+        description_key: &id010
+        - A healthy diet meets nutritional standards set by dietary guidelines, with sufficient diversity and quantity within and between food groups to achieve nutrient adequacy and protect against diet-related
+          diseases.
+        - The data is measured in international-$ at 2021 prices - this adjusts for inflation and for differences in the cost of living between countries.
+      cost_of_starchy_staples_in_local_currency_unit:
+        title: Cost of starchy staples (LCU)
+        unit: local currency units per person per day
+        short_unit: LCU
+        description_short: Cost of purchasing the least expensive locally available starchy staples to meet daily intake levels recommended in food-based dietary guidelines. Starchy staples are one of the
+          six food groups within the Healthy Diet Basket. This data is expressed in local currency units and is not adjusted for differences in the cost of living between countries.
+        description_key: *id010
       cost_share_for_starchy_staples_in_a_least_cost_healthy_diet:
         title: Cost share for starchy staples in a least-cost healthy diet
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of costs for the least expensive starchy staples to meet daily recommendations in food-based dietary guidelines, as a percentage of the total cost of a healthy diet.
+        unit: '%'
+        short_unit: '%'
+        description_short: Share of costs for the least expensive starchy staples to meet daily recommendations in food-based dietary guidelines, as a percentage of the total cost of a healthy diet.
         description_key:
-          - *description_healthy_diet
+        - A healthy diet meets nutritional standards set by dietary guidelines, with sufficient diversity and quantity within and between food groups to achieve nutrient adequacy and protect against diet-related
+          diseases.
       people_who_cannot_afford_a_healthy_diet:
         title: Number of people who cannot afford a healthy diet
         unit: people
-        short_unit: ""
-        description_short: |-
-          Total number of people who cannot afford a healthy diet in a given country and year.
+        short_unit: ''
+        description_short: Total number of people who cannot afford a healthy diet in a given country and year.
         description_key:
-          - *description_healthy_diet
-          - This indicator is calculated as the percentage of a country's population that is unable to afford a healthy diet, multiplied by the country's population.
-          - *description_key_number_of_population
-      cost_of_vegetables:
+        - A healthy diet meets nutritional standards set by dietary guidelines, with sufficient diversity and quantity within and between food groups to achieve nutrient adequacy and protect against diet-related
+          diseases.
+        - This indicator is calculated as the percentage of a country's population that is unable to afford a healthy diet, multiplied by the country's population.
+        - *id004
+      cost_of_vegetables_in_ppp_dollars:
         title: Cost of vegetables
         unit: international-$ in 2021 prices per person per day
         short_unit: $
-        description_short: |-
-          Cost of purchasing the least expensive locally available vegetables to meet daily intake levels recommended in food-based dietary guidelines. Vegetables are one of the six food groups within the Healthy Diet Basket. This data is adjusted for inflation and for differences in the cost of living between countries.
-        description_key:
-          - *description_healthy_diet
-          - *description_key_international_dollars
+        description_short: Cost of purchasing the least expensive locally available vegetables to meet daily intake levels recommended in food-based dietary guidelines. Vegetables are one of the six food
+          groups within the Healthy Diet Basket. This data is adjusted for inflation and for differences in the cost of living between countries.
+        description_key: &id011
+        - A healthy diet meets nutritional standards set by dietary guidelines, with sufficient diversity and quantity within and between food groups to achieve nutrient adequacy and protect against diet-related
+          diseases.
+        - The data is measured in international-$ at 2021 prices - this adjusts for inflation and for differences in the cost of living between countries.
+      cost_of_vegetables_in_local_currency_unit:
+        title: Cost of vegetables (LCU)
+        unit: local currency units per person per day
+        short_unit: LCU
+        description_short: Cost of purchasing the least expensive locally available vegetables to meet daily intake levels recommended in food-based dietary guidelines. Vegetables are one of the six food
+          groups within the Healthy Diet Basket. This data is expressed in local currency units and is not adjusted for differences in the cost of living between countries.
+        description_key: *id011
       cost_share_for_vegetables_in_a_least_cost_healthy_diet:
         title: Cost share for vegetables in a least-cost healthy diet
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Share of costs for the least expensive vegetables to meet daily recommendations in food-based dietary guidelines, as a percentage of the total cost of a healthy diet.
+        unit: '%'
+        short_unit: '%'
+        description_short: Share of costs for the least expensive vegetables to meet daily recommendations in food-based dietary guidelines, as a percentage of the total cost of a healthy diet.
         description_key:
-          - *description_healthy_diet
+        - A healthy diet meets nutritional standards set by dietary guidelines, with sufficient diversity and quantity within and between food groups to achieve nutrient adequacy and protect against diet-related
+          diseases.
       cost_of_vegetables_relative_to_the_starchy_staples_in_a_least_cost_healthy_diet:
         title: Cost of vegetables relative to the starchy staples in a least-cost healthy diet
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Cost of the least expensive vegetables as a multiple of the least expensive starchy staples to meet daily recommendations in food-based dietary guidelines.
+        unit: '%'
+        short_unit: '%'
+        description_short: Cost of the least expensive vegetables as a multiple of the least expensive starchy staples to meet daily recommendations in food-based dietary guidelines.
         description_key:
-          - *description_healthy_diet
-      cost_of_a_nutrient_adequate_diet:
+        - A healthy diet meets nutritional standards set by dietary guidelines, with sufficient diversity and quantity within and between food groups to achieve nutrient adequacy and protect against diet-related
+          diseases.
+      cost_of_a_nutrient_adequate_diet_in_ppp_dollars:
         title: Cost of a nutrient adequate diet
         unit: international-$ in 2021 prices per person per day
         short_unit: $
-        description_short: |-
-          Cost of the least expensive locally-available foods for nutrient adequacy for a representative person within upper and lower bounds for 23 essential macro- and micronutrients plus energy balance at 2,330 kcal/day. This data is adjusted for inflation and for differences in the cost of living between countries.
-        description_key:
-          - *description_nutrient_adequate_diet
-          - *description_key_international_dollars
+        description_short: Cost of the least expensive locally-available foods for nutrient adequacy for a representative person within upper and lower bounds for 23 essential macro- and micronutrients
+          plus energy balance at 2,330 kcal/day. This data is adjusted for inflation and for differences in the cost of living between countries.
+        description_key: &id012
+        - A nutrient adequate diet meets all essential nutrient requirements, with sufficient diversity and quantity of locally available foods to stay within the upper and lower bounds for total protein,
+          fats, and carbohydrates as well as essential vitamins and minerals required to avoid nutrient deficiencies or toxicity.
+        - The data is measured in international-$ at 2021 prices - this adjusts for inflation and for differences in the cost of living between countries.
+      cost_of_a_nutrient_adequate_diet_in_local_currency_unit:
+        title: Cost of a nutrient adequate diet (LCU)
+        unit: local currency units per person per day
+        short_unit: LCU
+        description_short: Cost of the least expensive locally-available foods for nutrient adequacy for a representative person within upper and lower bounds for 23 essential macro- and micronutrients
+          plus energy balance at 2,330 kcal/day. This data is expressed in local currency units and is not adjusted for differences in the cost of living between countries.
+        description_key: *id012
       affordability_of_a_nutrient_adequate_diet__ratio_of_cost_to_food_expenditures:
-        title: "Affordability of a nutrient adequate diet: ratio of cost to food expenditures"
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Percentage of the cost of a nutrient adequate diet to total food expenditure per capita per day from national accounts.
+        title: 'Affordability of a nutrient adequate diet: ratio of cost to food expenditures'
+        unit: '%'
+        short_unit: '%'
+        description_short: Percentage of the cost of a nutrient adequate diet to total food expenditure per capita per day from national accounts.
         description_key:
-          - *description_nutrient_adequate_diet
+        - A nutrient adequate diet meets all essential nutrient requirements, with sufficient diversity and quantity of locally available foods to stay within the upper and lower bounds for total protein,
+          fats, and carbohydrates as well as essential vitamins and minerals required to avoid nutrient deficiencies or toxicity.
       percent_of_the_population_who_cannot_afford_nutrient_adequacy:
         title: Share of the population who cannot afford nutrient adequacy
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Percentage of the total population unable to afford a nutrient adequate diet. A diet is considered unaffordable when the diet cost plus expenditures for basic non-food needs exceed income per capita per day.
+        unit: '%'
+        short_unit: '%'
+        description_short: Percentage of the total population unable to afford a nutrient adequate diet. A diet is considered unaffordable when the diet cost plus expenditures for basic non-food needs exceed
+          income per capita per day.
         description_key:
-          - *description_nutrient_adequate_diet
-          - *description_key_pct_of_population
+        - A nutrient adequate diet meets all essential nutrient requirements, with sufficient diversity and quantity of locally available foods to stay within the upper and lower bounds for total protein,
+          fats, and carbohydrates as well as essential vitamins and minerals required to avoid nutrient deficiencies or toxicity.
+        - *id002
       affordability_of_a_nutrient_adequate_diet__ratio_of_cost_to_the_food_poverty_line:
-        title: "Affordability of a nutrient adequate diet: ratio of cost to the food poverty line"
-        unit: "%"
-        short_unit: "%"
-        description_short: |-
-          Percentage of the cost of a nutrient adequate diet to the food poverty lines.
+        title: 'Affordability of a nutrient adequate diet: ratio of cost to the food poverty line'
+        unit: '%'
+        short_unit: '%'
+        description_short: Percentage of the cost of a nutrient adequate diet to the food poverty lines.
         description_key:
-          - *description_nutrient_adequate_diet
-          - *description_key_poverty_lines
+        - A nutrient adequate diet meets all essential nutrient requirements, with sufficient diversity and quantity of locally available foods to stay within the upper and lower bounds for total protein,
+          fats, and carbohydrates as well as essential vitamins and minerals required to avoid nutrient deficiencies or toxicity.
+        - *id003
       people_who_cannot_afford_nutrient_adequacy:
         title: Number of people who cannot afford nutrient adequacy
         unit: people
-        short_unit: ""
-        description_short: |-
-          Total number of people who cannot afford a nutrient adequate diet.
+        short_unit: ''
+        description_short: Total number of people who cannot afford a nutrient adequate diet.
         description_key:
-          - *description_nutrient_adequate_diet
-          - This indicator is calculated as the percentage of a country's population that is unable to afford a nutrient-adequate diet, multiplied by the country's population.
-          - *description_key_number_of_population
+        - A nutrient adequate diet meets all essential nutrient requirements, with sufficient diversity and quantity of locally available foods to stay within the upper and lower bounds for total protein,
+          fats, and carbohydrates as well as essential vitamins and minerals required to avoid nutrient deficiencies or toxicity.
+        - This indicator is calculated as the percentage of a country's population that is unable to afford a nutrient-adequate diet, multiplied by the country's population.
+        - *id004
       population:
         title: Population according to the World Bank
         unit: people
         short_unit: people
-        description_short: |-
-          Total population is based on the de facto definition of population, which counts all residents regardless of legal status or citizenship. The values shown are midyear estimates.
+        description_short: Total population is based on the de facto definition of population, which counts all residents regardless of legal status or citizenship. The values shown are midyear estimates.
