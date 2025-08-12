@@ -206,8 +206,8 @@ steps:
   # Food prices for nutrition - World Bank based on FAO.
   #
   data://garden/wb/2025-08-12/food_prices_for_nutrition:
-    - data://meadow/wb/2025-08-12/food_prices_for_nutrition
     - data://garden/worldbank_wdi/2025-01-24/wdi
+    - data://meadow/wb/2025-08-12/food_prices_for_nutrition
   #
   # Food prices for nutrition - World Bank based on FAO.
   #
