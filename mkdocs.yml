@@ -218,7 +218,7 @@ nav:
           - MDIMs and Explorers: "guides/data-work/mdims.md"
           - Export data: "guides/data-work/export-data.md"
           - Access archived data: "guides/data-work/access-archived-data.md"
-          - Create a public GSheet from ETL: "guides/data-work/create-gsheet.md"
+          - Publish indicator and metadata with GSheet: "guides/data-work/create-gsheet.md"
       - Admin:
           - Wizard: "guides/wizard.md"
           - CLI: "guides/etl-cli.md"
