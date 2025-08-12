@@ -243,4 +243,4 @@ steps:
   data://grapher/fasttrack/latest/draft_joe_ipl_data: !!set
     ? snapshot://fasttrack/latest/draft_joe_ipl_data.csv
   data://grapher/fasttrack/latest/guinea_worm_cases: !!set
-    ? snapshot://fasttrack/latest/guinea_worm_cases.csv
+    snapshot://fasttrack/latest/guinea_worm_cases.csv:
