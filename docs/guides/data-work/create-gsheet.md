@@ -6,7 +6,9 @@ status: new
 
 For some metrics we compile multiple sources in order to create a single variable, AKA an OWID Maintained Metric (OMM). In these cases we should create a publicly available Google Sheet that contains for each data point the sources used, the values, and any notes that are relevant to the data point.
 
-To this end, we have implemented the function `etl.data_helpers.misc.export_table_to_gsheet`, which exports a table with all the source details to a Google Sheet.
+To this end, we have implemented the function `etl.data_helpers.misc.export_table_to_gsheet`, which exports a spreadsheet with all the source details to a Google Sheet.
+
+This function works best for single variables that have been heavily annotated, e.g. a source or note for each country-year row.
 
 Learn how to use it from the existing examples in ETL:
 
