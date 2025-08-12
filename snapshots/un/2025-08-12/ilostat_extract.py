@@ -57,7 +57,7 @@ TIMEOUT = 500
 def run() -> None:
     df_toc = ilostat_table_of_contents()
 
-    df = extract_all_files_and_concatenate(df_toc)
+    extract_all_files_and_concatenate(df_toc)
 
 
 @retry(wait=wait_random_exponential(multiplier=1), stop=stop_after_attempt(MAX_REPEATS))
@@ -160,7 +160,7 @@ def ilostat_table_of_contents(download: bool = True) -> pd.DataFrame:
     return df
 
 
-def extract_all_files_and_concatenate(df_toc: pd.DataFrame) -> pd.DataFrame:
+def extract_all_files_and_concatenate(df_toc: pd.DataFrame) -> None:
     """
     Extract all files listed in the table of contents and concatenate them into a single DataFrame.
     """
@@ -184,7 +184,7 @@ def extract_all_files_and_concatenate(df_toc: pd.DataFrame) -> pd.DataFrame:
 
     log.info("All files extracted and concatenated")
 
-    return df
+    return None
 
 
 if __name__ == "__main__":
