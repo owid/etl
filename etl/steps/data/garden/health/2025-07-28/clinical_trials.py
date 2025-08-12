@@ -42,15 +42,15 @@ PHASE_REPLACEMENTS = {
 }
 
 FUNDER_TYPE_REPLACEMENTS = {
-    "INDIV": "Individual",
+    "INDIV": "Other",
     "NIH": "NIH",
     "OTHER": "Other",
-    "FED": "Federal",
-    "AMBIG": "Ambiguous",
+    "FED": "Federal agency",
+    "AMBIG": "Other",
     "INDUSTRY": "Industry",
-    "OTHER_GOV": "Other government",
+    "OTHER_GOV": "Other",
     "UNKNOWN": "Unknown",
-    "NETWORK": "Network",
+    "NETWORK": "Other",
 }
 
 STATUS_REPLACEMENTS = {
@@ -238,6 +238,7 @@ def run() -> None:
     tb["Sex"] = tb["Sex"].astype("category")
     tb["Age"] = tb["Age"].astype("category")
     tb["Phases"] = tb["Phases"].astype("category")
+    tb["Funder Type"] = tb["Funder Type"].map(FUNDER_TYPE_REPLACEMENTS)
     tb["Funder Type"] = tb["Funder Type"].astype("category")
     tb["Study Type"] = tb["Study Type"].astype("category")
     tb["Study Results"] = tb["Study Results"].astype("category")
@@ -301,9 +302,11 @@ def run() -> None:
     ].copy()
     tb_study_type = group_trials_by(tb, ["Study Type", "completion_year"], "n_studies_type", completed_only=False)
     # get sum of studies by completion year by primary purpose
-    tb_purpose = group_trials_by(tb, ["primary_purpose", "completion_year"], "n_studies_purpose")
 
-    # get sum of studies by completion year by status
+    tb_purpose = tb[tb["Study Type"] == "INTERVENTIONAL"].copy()
+    tb_purpose = group_trials_by(tb_purpose, ["primary_purpose", "completion_year"], "n_studies_purpose")
+
+    # get sum of studies by start year by status
     tb_status = tb[tb["Study Type"] != "EXPANDED_ACCESS"].copy()
     tb_status = group_trials_by(tb_status, ["Study Status", "start_year"], "n_studies_status", completed_only=False)
 
@@ -329,7 +332,6 @@ def run() -> None:
     )
 
     # make categorical columns human-readable
-    tb_sponsor["Funder Type"] = tb_sponsor["Funder Type"].replace(FUNDER_TYPE_REPLACEMENTS)
     tb_study_type["Study Type"] = tb_study_type["Study Type"].replace(STUDY_TYPE_REPLACEMENTS)
     tb_status["Study Status"] = tb_status["Study Status"].replace(STATUS_REPLACEMENTS)
     tb_length["Phases"] = tb_length["Phases"].replace(PHASE_REPLACEMENTS)
