@@ -125,7 +125,9 @@ def run(dest_dir: str) -> None:
         attribution_text=None,
     )
 
-    # Set an appropriate index and sort conveniently.
+    # Drop any unwanted index column and set appropriate index.
+    if "index" in tb.columns:
+        tb = tb.drop(columns=["index"])
     tb = tb.format(["country", "year"])
 
     #

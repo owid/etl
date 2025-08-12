@@ -8,7 +8,7 @@
    etl update snapshot://#$ARGUMENTS --include-usages
    ```
 3. Run snapshot with `etls`, e.g. `etls #$ARGUMENTS`
-4. Run `etlr` with `--grapher` to execute the updated steps. It's ok if it fails!
+4. Run `etlr` with `--grapher` to execute the updated steps. It's ok if it fails, don't fix it!
 5. Commit changes and push to the PR branch
 6. Ask user for review and permission to continue with fixing steps
 
