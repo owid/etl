@@ -156,7 +156,6 @@ def run_snapshot_script(script_path: Path, upload: bool, path_to_file: Optional[
         # Check if it's a click command
         if isinstance(main_func, click.Command):
             # It's a click command, call it with command line args
-            log.info("Running snapshot script", script_path=script_path, method="main() click command")
             args = []
             if not upload:
                 args.append("--skip-upload")
@@ -180,7 +179,6 @@ def run_snapshot_script(script_path: Path, upload: bool, path_to_file: Optional[
                 kwargs["path_to_file"] = path_to_file
 
             # Call main with appropriate arguments
-            log.info("Running snapshot script", script_path=script_path, method="main() function")
             try:
                 main_func(**kwargs)
             except TypeError as e:
@@ -202,7 +200,6 @@ def run_snapshot_script(script_path: Path, upload: bool, path_to_file: Optional[
         if "path_to_file" in sig.parameters and path_to_file is not None:
             kwargs["path_to_file"] = path_to_file
 
-        log.info("Running snapshot script", script_path=script_path, method="run() function")
         try:
             run_func(**kwargs)
         except TypeError as e:
