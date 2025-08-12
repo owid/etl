@@ -218,7 +218,7 @@ nav:
           - MDIMs and Explorers: "guides/data-work/mdims.md"
           - Export data: "guides/data-work/export-data.md"
           - Access archived data: "guides/data-work/access-archived-data.md"
-          - GSheets for OMMs: "guides/data-work/gsheets.md"
+          - GSheets for OWID Maintained Metrics (OMMs): "guides/data-work/create-gsheets-omm.md"
       - Admin:
           - Wizard: "guides/wizard.md"
           - CLI: "guides/etl-cli.md"
