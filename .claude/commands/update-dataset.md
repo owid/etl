@@ -3,6 +3,11 @@
 ### Create PR and update steps
 
 1. First create a draft PR using `etl pr` command with a proper branch name and `data` category
+   ```bash
+   # Create PR with title and category  
+   etl pr "Update World Bank food prices dataset" data
+   # Categories: data, bug, refactor, enhance, feature, docs, chore, style, wip, tests
+   ```
 2. Use the `etl update snapshot://` command with `--include-usages` to copy the dataset to the new version. For instance
    ```bash
    etl update snapshot://#$ARGUMENTS --include-usages
