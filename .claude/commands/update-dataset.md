@@ -2,10 +2,10 @@
 
 ### Create PR and update steps
 
-1. First create a draft PR using `etl pr` command with a proper branch name and `data` category
+1. First create a draft PR using `etl pr` command from the current branch and `data` category
    ```bash
-   # Create PR with title and category  
-   etl pr "Update World Bank food prices dataset" data
+   # Create PR with title and category
+   etl pr "Update World Bank food prices dataset" data --base-branch [current branch]
    # Categories: data, bug, refactor, enhance, feature, docs, chore, style, wip, tests
    ```
 2. Use the `etl update snapshot://` command with `--include-usages` to copy the dataset to the new version. For instance
@@ -38,7 +38,7 @@ If the user confirms, proceed with indicator upgrade:
 
 3. **Add variable mappings** using the 3-step process:
    - Step 1: Create table structure
-   - Step 2: Insert perfect matches with SQL  
+   - Step 2: Insert perfect matches with SQL
    - Step 3: Add manual mappings if needed (see detailed process below)
 
 4. **Test with dry-run**:
@@ -167,14 +167,14 @@ CREATE TABLE wiz__variable_mapping (
 ```sql
 mysql -h staging-site-data-wb-foodprices-nutrition -u owid --port 3306 -D owid -e "
 INSERT INTO wiz__variable_mapping (id_old, id_new, timestamp, dataset_id_old, dataset_id_new, comments)
-SELECT 
+SELECT
     v_old.id AS id_old,
     v_new.id AS id_new,
     NOW() AS timestamp,
     [OLD_DATASET_ID] AS dataset_id_old,
     [NEW_DATASET_ID] AS dataset_id_new,
     'Perfect name match - automated' AS comments
-FROM 
+FROM
     (SELECT DISTINCT v.id, v.name
      FROM variables v
      INNER JOIN chart_dimensions cd ON v.id = cd.variableId
@@ -193,15 +193,15 @@ Check for unmapped indicators:
 
 ```sql
 mysql -h staging-site-data-wb-foodprices-nutrition -u owid --port 3306 -D owid -e "
-SELECT 
+SELECT
     v_old.id AS old_id,
     v_old.name AS old_name
-FROM 
+FROM
     (SELECT DISTINCT v.id, v.name
      FROM variables v
      INNER JOIN chart_dimensions cd ON v.id = cd.variableId
      WHERE v.datasetId = [OLD_DATASET_ID]) v_old
-LEFT JOIN 
+LEFT JOIN
     wiz__variable_mapping vm ON v_old.id = vm.id_old
 WHERE vm.id_old IS NULL
 ORDER BY v_old.name;
