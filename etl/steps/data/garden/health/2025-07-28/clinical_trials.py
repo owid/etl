@@ -77,46 +77,6 @@ STUDY_TYPE_REPLACEMENTS = {
 RESULTS_REPLACEMENTS = {"NO": "No results posted on CT.gov", "YES": "Results posted on CT.gov"}
 
 
-def extract_allocation(design_string: str):
-    """
-    Extract the allocation type from the study design string.
-    """
-    if pd.isna(design_string):
-        return pd.NA
-    if "Allocation:" not in design_string:
-        return pd.NA
-    if "Allocation: RANDOMIZED" in design_string:
-        return "Randomized"
-    elif "Allocation: NON_RANDOMIZED" in design_string:
-        return "Non-Randomized"
-    elif "Allocation: NA" in design_string:
-        return "Not Applicable"
-    else:
-        return pd.NA
-
-
-def extract_intervention_type(interventions_string: str):
-    """
-    Extract the intervention type from the interventions string.
-    """
-    if pd.isna(interventions_string):
-        return pd.NA
-    if "Intervention Type:" not in interventions_string:
-        return pd.NA
-    elif "Intervention Model: PARALLEL" in interventions_string:
-        return "Parallel"
-    elif "Intervention Model: SINGLE_GROUP" in interventions_string:
-        return "Single Group"
-    elif "Intervention Model: SEQUENTIAL" in interventions_string:
-        return "Sequential"
-    elif "Intervention Model: CROSSOVER" in interventions_string:
-        return "Crossover"
-    elif "Intervention Model: FACTORIAL" in interventions_string:
-        return "Factorial"
-    else:
-        return pd.NA
-
-
 def extract_primary_purpose(purpose_string: str):
     """
     Extract the primary purpose from the study design string.
@@ -247,15 +207,9 @@ def run() -> None:
     tb["primary_location"] = tb["Locations"].apply(extract_primary_location)
     tb["primary_location"] = tb["primary_location"].astype("category")
 
-    # extract study design information
-    # masking is not used as it is not super informative
-    # observational model and time perspective are not filled in
+    # extract primary purpose from study design and set as categorical
     tb["primary_purpose"] = tb["Study Design"].apply(extract_primary_purpose)
     tb["primary_purpose"] = tb["primary_purpose"].astype("category")
-    tb["intervention_type"] = tb["Interventions"].apply(extract_intervention_type)
-    tb["intervention_type"] = tb["intervention_type"].astype("category")
-    tb["allocation"] = tb["Study Design"].apply(extract_allocation)
-    tb["allocation"] = tb["allocation"].astype("category")
 
     # Add intervention types as boolean columns
     tb = add_intervention_types(tb)
