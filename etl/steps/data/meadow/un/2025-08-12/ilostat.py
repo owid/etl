@@ -16,8 +16,6 @@ def run() -> None:
     # Load data from snapshot.
     tb = snap.read()
 
-    print(tb)
-
     #
     # Process data.
     #
