@@ -16,10 +16,13 @@ meta:
 
     # Files
     url_main: https://ilostat.ilo.org/
-    date_accessed: 2025-08-12
+    date_accessed: '2025-08-12'
 
     # License
     license:
       name: CC BY 4.0
       url: https://www.ilo.org/rights-and-permissions#data
-
+outs:
+  - md5: fe98fe36961dd75957688e0720b1c503
+    size: 669659844
+    path: ilostat.parquet
