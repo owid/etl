@@ -254,7 +254,9 @@ def run() -> None:
             ["COMPLETED", "AVAILABLE", "NO_LONGER_AVAILABLE", "APPROVED_FOR_MARKETING", "TEMPORARILY_NOT_AVAILABLE"]
         )
     ].copy()
-    tb_study_type = group_trials_by(tb, ["Study Type", "completion_year"], "n_studies_type", completed_only=False)
+    tb_study_type = group_trials_by(
+        tb_study_type, ["Study Type", "completion_year"], "n_studies_type", completed_only=False
+    )
     # get sum of studies by completion year by primary purpose
 
     tb_purpose = tb[tb["Study Type"] == "INTERVENTIONAL"].copy()
