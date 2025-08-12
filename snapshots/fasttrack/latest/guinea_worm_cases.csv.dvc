@@ -7,16 +7,16 @@ meta:
     attribution_short: who
     url_main: https://www.who.int/teams/control-of-neglected-tropical-diseases/dracunculiasis/dracunculiasis-eradication-portal
     url_download: |-
-      https://docs.google.com/spreadsheets/d/e/2PACX-1vRzLpxIjUOF2R16MwWq31IeDK-yzpRBdFPwglqv_ak8Rsvj5-UoyQFUzi__A3082SLR1XCejAIcVl2-/pub?output=csv
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vTZ2rDbgMZNaWbxwPyowjbCTO75AHy6eLKefxohJKLiFEoBAvcNMmR3EBDebXpUWU25lKprFLEORQy7/pub?output=csv
     date_accessed: '2025-08-12'
     license:
       name: CC BY-NC-SA 3.0 IGO
       url: https://www.who.int/about/policies/publishing/copyright
   name: Guinea worm reported cases
   description: |-
-    Reported cases of guinea worm disease (dracunculiasis) as recorded by WHO. 
+    Reported cases of guinea worm disease (dracunculiasis) as recorded by WHO.
 
-    For Cameroon, Central African Republic, Cote d'Ivoire, Mauritania, Senegal and Yemen data is gathered from: 
+    For Cameroon, Central African Republic, Cote d'Ivoire, Mauritania, Senegal and Yemen data is gathered from:
 
     1986-2017: https://web.archive.org/web/20220208133814/https://apps.who.int/dracunculiasis/dradata/html/report_Countries_i2.html
     2018: Table 1a: https://web.archive.org/web/20230629130727/https://apps.who.int/iris/bitstream/handle/10665/324786/WER9420-233-251.pdf?sequence=1&isAllowed=y
@@ -25,9 +25,9 @@ meta:
     2021: Table 1a: https://web.archive.org/web/20230226163027/https://apps.who.int/iris/bitstream/handle/10665/354576/WER9721-22-225-247-eng-fre.pdf?sequence=1&isAllowed=y
     2022: Table 1a: https://web.archive.org/web/20230629124651/https://apps.who.int/iris/bitstream/handle/10665/367924/WER9820-205-224.pdf?sequence=1&isAllowed=y
     2023: Table 1a: https://web.archive.org/web/20240617154248/https://iris.who.int/bitstream/handle/10665/376790/WER9920-249-269.pdf?sequence=1
-    2024: https://www.cartercenter.org/resources/gallery/images/highres/guinea-worm-current-case-count-chart.pdf 
+    2024: https://www.cartercenter.org/resources/gallery/images/highres/guinea-worm-current-case-count-chart.pdf
 
-    For all other countries data is gathered from the following sources: 
+    For all other countries data is gathered from the following sources:
 
     1980-2020: https://www.who.int/teams/control-of-neglected-tropical-diseases/dracunculiasis/dracunculiasis-eradication-portal
     2021: Table 1a: https://web.archive.org/web/20230226163027/https://apps.who.int/iris/bitstream/handle/10665/354576/WER9721-22-225-247-eng-fre.pdf?sequence=1&isAllowed=y
