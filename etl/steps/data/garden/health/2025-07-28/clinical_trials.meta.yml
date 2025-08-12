@@ -17,7 +17,7 @@ definitions:
     processing_level: major
   notes:
     completed_trials: |
-      This data comes from the [ClinicalTrials.gov](#dod:clinical-trials-gov) database and is sorted by completion year. It only includes interventional or observational clinical trials that have been marked as "completed" and have a valid "completion date". Expanded access studies, which provide access to investigational drugs or devices for patients with serious conditions who do not have other treatment options, are not included in this data.
+      This data comes from the [ClinicalTrials.gov](#dod:clinical-trials-gov) database. It only includes interventional or observational clinical trials that are marked as "completed" and have a valid "completion date". Expanded access studies, which provide access to investigational drugs or devices for patients with serious conditions, are not included in this data.
 
 dataset:
   update_period_days: 365 # dataset itself is updated continuously, but I think updating it every year is sufficient for us
