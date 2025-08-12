@@ -1,0 +1,11 @@
+steps:
+
+  #
+  # ILOSTAT
+  #
+  data://meadow/un/2025-08-12/ilostat:
+    - snapshot://un/2025-08-12/ilostat.parquet
+  data://garden/un/2025-08-12/ilostat:
+    - data://meadow/un/2025-08-12/ilostat
+  data://grapher/un/2025-08-12/ilostat:
+    - data://garden/un/2025-08-12/ilostat
