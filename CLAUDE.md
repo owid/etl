@@ -265,6 +265,24 @@ print(f"Garden null values: {tb.date.isnull().sum()}")
 - **Fix meadow steps**: Most data cleaning should happen in meadow, not garden steps
 
 
+## Database Access
+
+### MySQL Connection
+Can execute SQL queries directly using the staging database:
+```bash
+mysql -h staging-site-branch -u owid --port 3306 -D owid -e "SELECT query"
+```
+
+Example queries:
+```sql
+-- Find datasets by shortName
+SELECT id, catalogPath, name FROM datasets WHERE shortName = 'dataset_name' AND NOT isArchived;
+
+-- Check variables in dataset
+SELECT id, name FROM variables WHERE datasetId = 12345;
+```
+
+
 ## Important Development Notes
 
 - Always use `geo.harmonize_countries()` for geographic data
