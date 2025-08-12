@@ -7,6 +7,7 @@ import concurrent.futures
 import datetime as dt
 import json
 import urllib.error
+import urllib.parse
 from typing import Any, Dict, List, Optional, Tuple
 
 import pandas as pd
@@ -419,6 +420,14 @@ def _get_data_url(dataset_meta: pd.DataFrame, url: str) -> str:
     data_url = dataset_meta.set_index(0)[1].to_dict().get("external_csv")
 
     if data_url and not pd.isnull(data_url):
+        # Validate the external CSV URL
+        try:
+            parsed = urllib.parse.urlparse(data_url)
+            if not parsed.scheme or not parsed.netloc:
+                raise ValidationError(f"Invalid URL format in cell external_csv: {data_url}")
+        except Exception:
+            raise ValidationError(f"Invalid URL format in cell external_csv: {data_url}")
+
         # files on Google Drive need modified link for downloading raw csv
         if "drive.google.com" in data_url:
             data_url = (
