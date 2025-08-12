@@ -12,7 +12,7 @@ paths = PathFinder(__file__)
 
 
 # Expected classifications, sorted from oldest to newest.
-EXPECTED_CLASSIFICATIONS = ["FPN 1.0", "FPN 1.1", "FPN 2.0", "FPN 2.1", "FPN 3.0"]
+EXPECTED_CLASSIFICATIONS = ["FPN 1.0", "FPN 1.1", "FPN 2.0", "FPN 2.1", "FPN 3.0", "FPN 4.0"]
 # Classification to adopt (by default, the latest one).
 CLASSIFICATION = EXPECTED_CLASSIFICATIONS[-1]
 
@@ -51,7 +51,7 @@ def adapt_units(tb: Table, tb_wdi: Table) -> Table:
     tb = tb.merge(tb_cpi[["year", "cpi_adjustment_factor"]], on=["year"], how="left")
     # Multiply the cost of a healthy diet (given in current PPP$) by the adjustment factor, to correct for inflation
     # and express the values in constant 2021 PPP$.
-    tb["cost_of_a_healthy_diet"] *= tb["cpi_adjustment_factor"]
+    tb["cost_of_a_healthy_diet_in_ppp_dollars"] *= tb["cpi_adjustment_factor"]
     # Drop unnecessary column.
     tb = tb.drop(columns=["cpi_adjustment_factor"], errors="raise")
 
@@ -84,16 +84,17 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
+    # Reset index to make classification accessible as a column.
+    tb = tb.reset_index()
+    
     # Sanity check.
-    error = "Expected classifications have changed."
-    assert set(tb["classification"]) == set(EXPECTED_CLASSIFICATIONS), error
+    available_classifications = set(tb["classification"])
+    error = f"Expected classifications have changed. Available: {sorted(available_classifications)}, Expected: {EXPECTED_CLASSIFICATIONS}"
+    assert available_classifications.issubset(set(EXPECTED_CLASSIFICATIONS)), error
+    assert CLASSIFICATION in available_classifications, f"Latest classification '{CLASSIFICATION}' not found in data."
 
     # Select the latest classification.
-    tb = (
-        tb[tb["classification"] == CLASSIFICATION]
-        .drop(columns=["classification"], errors="raise")
-        .reset_index(drop=True)
-    )
+    tb = tb[tb["classification"] == CLASSIFICATION].drop(columns=["classification"]).reset_index(drop=True)
 
     # Rename columns conveniently.
     tb = tb.rename(columns={"economy": "country"}, errors="raise")
@@ -118,14 +119,14 @@ def run(dest_dir: str) -> None:
     tb = change_attribution(
         tb=tb,
         columns=[
-            "cost_of_an_energy_sufficient_diet",
-            "cost_of_a_nutrient_adequate_diet",
+            "cost_of_an_energy_sufficient_diet_in_ppp_dollars",
+            "cost_of_a_nutrient_adequate_diet_in_ppp_dollars",
         ],
         attribution_text=None,
     )
 
     # Set an appropriate index and sort conveniently.
-    tb = tb.format()
+    tb = tb.format(["country", "year"])
 
     #
     # Save outputs.

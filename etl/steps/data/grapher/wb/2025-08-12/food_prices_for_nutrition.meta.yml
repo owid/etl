@@ -1,7 +1,10 @@
 tables:
   food_prices_for_nutrition:
     variables:
-      cost_of_an_energy_sufficient_diet:
+      cost_of_an_energy_sufficient_diet_in_local_currency_unit:
+        display:
+          numDecimalPlaces: 2
+      cost_of_an_energy_sufficient_diet_in_ppp_dollars:
         display:
           numDecimalPlaces: 2
       affordability_of_an_energy_sufficient_diet__ratio_of_cost_to_food_expenditures:
@@ -16,13 +19,19 @@ tables:
       people_who_cannot_afford_sufficient_calories:
         display:
           numDecimalPlaces: 0
-      cost_of_a_healthy_diet:
+      cost_of_a_healthy_diet_in_local_currency_unit:
+        display:
+          numDecimalPlaces: 2
+      cost_of_a_healthy_diet_in_ppp_dollars:
         display:
           numDecimalPlaces: 2
       cost_of_a_healthy_diet_relative_to_the_cost_of_sufficient_energy_from_starchy_staples:
         display:
           numDecimalPlaces: 2
-      cost_of_animal_source_foods:
+      cost_of_animal_source_foods_in_local_currency_unit:
+        display:
+          numDecimalPlaces: 2
+      cost_of_animal_source_foods_in_ppp_dollars:
         display:
           numDecimalPlaces: 2
       cost_share_for_animal_sourced_foods_in_a_least_cost_healthy_diet:
@@ -85,7 +94,10 @@ tables:
       cost_of_vegetables_relative_to_the_starchy_staples_in_a_least_cost_healthy_diet:
         display:
           numDecimalPlaces: 2
-      cost_of_a_nutrient_adequate_diet:
+      cost_of_a_nutrient_adequate_diet_in_local_currency_unit:
+        display:
+          numDecimalPlaces: 2
+      cost_of_a_nutrient_adequate_diet_in_ppp_dollars:
         display:
           numDecimalPlaces: 2
       affordability_of_a_nutrient_adequate_diet__ratio_of_cost_to_food_expenditures:
