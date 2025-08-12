@@ -7,8 +7,6 @@ tables:
         unit: ""
         display:
           numDecimalPlaces: 0
-        description_from_producer: |-
-          {definitions.certification}
       certification_status:
         title: Certification status over time
         description_short: |-
