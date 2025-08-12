@@ -24,17 +24,17 @@ This is Our World in Data's ETL system - a content-addressable data pipeline wit
 Steps are content-addressable with automatic dirty detection:
 ```python
 # Standard garden step pattern
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 from etl.data_helpers import geo
 
 paths = PathFinder(__file__)
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     ds_input = paths.load_dataset("input_dataset")
     tb = ds_input["table_name"].reset_index()
     tb = geo.harmonize_countries(tb, countries_file=paths.country_mapping_path)
     tb = tb.format(short_name=paths.short_name)
-    ds_garden = create_dataset(dest_dir, tables=[tb])
+    ds_garden = paths.create_dataset(tables=[tb])
     ds_garden.save()
 ```
 
@@ -108,11 +108,10 @@ import click
 
 @click.command()
 @click.option("--dry-run", is_flag=True, help="Preview changes without applying them")
-@click.option("--output", "-o", help="Output file path")  
 def main(dry_run: bool, output: str):
     """Brief description of what the CLI does."""
     # Implementation here
-    
+
 if __name__ == "__main__":
     main()
 ```
