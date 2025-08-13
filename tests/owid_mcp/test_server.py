@@ -452,7 +452,9 @@ async def test_fetch_chart_data_global_warming():
 
         # Verify the response matches our request
         assert data["id"] == chart_slug
-        assert data["url"].startswith(f"https://ourworldindata.org/grapher/{chart_slug}.csv")  # URL may have time parameter added
+        assert data["url"].startswith(
+            f"https://ourworldindata.org/grapher/{chart_slug}.csv"
+        )  # URL may have time parameter added
 
         # Parse the CSV content
         csv_text = data["text"]

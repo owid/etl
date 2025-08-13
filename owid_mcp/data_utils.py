@@ -14,14 +14,18 @@ import httpx
 import structlog
 import yaml
 
-from owid_mcp.config import CATALOG_BASE, DATASETTE_BASE, HTTP_TIMEOUT, MAX_ROWS_DEFAULT, MAX_ROWS_HARD
+from owid_mcp.config import (
+    ALGOLIA_API_KEY,
+    ALGOLIA_APP_ID,
+    ALGOLIA_URL,
+    CATALOG_BASE,
+    DATASETTE_BASE,
+    HTTP_TIMEOUT,
+    MAX_ROWS_DEFAULT,
+    MAX_ROWS_HARD,
+)
 
 log = structlog.get_logger()
-
-# Algolia configuration
-ALGOLIA_APP_ID = "ASCB5XMYF2"
-ALGOLIA_API_KEY = "bafe9c4659e5657bf750a38fbee5c269"
-ALGOLIA_URL = f"https://{ALGOLIA_APP_ID.lower()}-dsn.algolia.net/1/indexes/*/queries"
 
 # Global mapping cache
 _NAME_TO_CODE_MAPPING: Optional[Dict[str, str]] = None
@@ -39,7 +43,14 @@ def _load_regions_mapping() -> Dict[str, str]:
 
     # Path to the regions file
     regions_file = (
-        Path(__file__).parent.parent / "etl" / "steps" / "data" / "garden" / "regions" / "2023-01-01" / "regions.yml"
+        Path(__file__).parent.parent
+        / "etl"
+        / "steps"
+        / "data"
+        / "garden"
+        / "regions"
+        / "2023-01-01"
+        / "regions.yml"
     )
 
     mapping: Dict[str, str] = {}
@@ -80,7 +91,9 @@ def country_name_to_iso3(name: Optional[str]) -> Optional[str]:
     return mapping.get(name.lower())
 
 
-async def _make_algolia_request_base(request_config: Dict[str, Any], log_prefix: str) -> List[Dict[str, Any]]:
+async def _make_algolia_request_base(
+    request_config: Dict[str, Any], log_prefix: str
+) -> List[Dict[str, Any]]:
     """Base function for making Algolia API requests.
 
     Args:
@@ -272,7 +285,9 @@ def smart_round(value: float | None) -> float | None:
         return round(value)
 
 
-def build_rows(data_json: Dict[str, Any], entities_meta: Dict[int, Dict[str, str]]) -> List[Dict[str, Any]]:
+def build_rows(
+    data_json: Dict[str, Any], entities_meta: Dict[int, Dict[str, str]]
+) -> List[Dict[str, Any]]:
     """Convert the compact OWID arrays into a list[{entity, year, value}]."""
 
     values = data_json["values"]
@@ -310,8 +325,6 @@ async def fetch_json(url: str) -> Dict[str, Any]:
         return resp.json()
 
 
-
-
 def rows_to_csv(rows: List[Dict[str, Any]]) -> str:
     """Convert data rows to CSV format."""
     if not rows:
@@ -341,11 +354,18 @@ def build_catalog_info(catalog_path: str) -> Dict[str, str]:
 
     # Parse the path: channel/namespace/version/dataset_slug/dataset_slug
     parts = path.split("/")
-    channel, namespace, version, dataset_slug, table_name = parts[0], parts[1], parts[2], parts[3], parts[4]
+    channel, namespace, version, dataset_slug, table_name = (
+        parts[0],
+        parts[1],
+        parts[2],
+        parts[3],
+        parts[4],
+    )
 
     parquet_url = f"{CATALOG_BASE}/{channel}/{namespace}/{version}/{dataset_slug}/{table_name}.parquet"
-    sql_tpl = "SELECT country, year, {col} FROM '{url}' " "WHERE country = '??' LIMIT 100".format(
-        col=column, url=parquet_url
+    sql_tpl = (
+        "SELECT country, year, {col} FROM '{url}' "
+        "WHERE country = '??' LIMIT 100".format(col=column, url=parquet_url)
     )
     return {
         "parquet_url": parquet_url,

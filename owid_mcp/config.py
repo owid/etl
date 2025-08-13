@@ -5,10 +5,19 @@ import os
 import httpx
 
 # Base URLs
-DATASETTE_BASE = os.getenv("OWID_DATASETTE_BASE", "https://datasette-public.owid.io/owid.json")
-OWID_API_BASE = os.getenv("OWID_API_BASE", "https://api.ourworldindata.org/v1/indicators")
+DATASETTE_BASE = os.getenv(
+    "OWID_DATASETTE_BASE", "https://datasette-public.owid.io/owid.json"
+)
+OWID_API_BASE = os.getenv(
+    "OWID_API_BASE", "https://api.ourworldindata.org/v1/indicators"
+)
 GRAPHER_BASE = os.getenv("GRAPHER_BASE", "https://ourworldindata.org/grapher")
 CATALOG_BASE = os.getenv("CATALOG_BASE", "https://catalog.ourworldindata.org")
+
+# Algolia configuration
+ALGOLIA_APP_ID = os.getenv("ALGOLIA_APP_ID", "ASCB5XMYF2")
+ALGOLIA_API_KEY = os.getenv("ALGOLIA_API_KEY", "bafe9c4659e5657bf750a38fbee5c269")
+ALGOLIA_URL = f"https://{ALGOLIA_APP_ID.lower()}-dsn.algolia.net/1/indexes/*/queries"
 
 # HTTP configuration
 HTTP_TIMEOUT = httpx.Timeout(10.0)
