@@ -33,6 +33,7 @@ You can delete the file after this.
 
 import io
 from pathlib import Path
+from typing import Literal
 
 import pandas as pd
 import requests
@@ -61,11 +62,39 @@ PARENT_DIR = Path(__file__).parent.absolute()
 MAX_REPEATS = 15
 TIMEOUT = 500
 
+# Define expected datasets
+EXPECTED_DATASETS = [
+    "ILOEST",
+    "LFS",
+    "ILOSDG",
+    "GEND",
+    "DLMI",
+    "YouthSTATS",
+    "CHILD",
+    "EMI",
+    "PROFILES",
+    "RURBAN",
+    "COND",
+    "ILMS",
+    "WORK",
+    "OSH",
+    "PRICES",
+    "IRdata",
+]
+
+# Define datasets to drop
+DATASETS_TO_DROP = [
+    "WORK",
+    "OSH",
+    "PRICES",
+    "IRdata",
+]
+
 
 def run() -> None:
-    df_toc = ilostat_table_of_contents()
+    df = extract_all_files_and_concatenate()
 
-    extract_all_files_and_concatenate(df_toc)
+    df = exclude_datasets(df)
 
 
 @retry(wait=wait_random_exponential(multiplier=1), stop=stop_after_attempt(MAX_REPEATS))
@@ -133,10 +162,10 @@ def ilostat_query_country(
 
     if download:
         # make sure the directory exists. If not, create it
-        Path(f"{CACHE_DIR}/ilostat_data").mkdir(parents=True, exist_ok=True)
+        Path(f"{CACHE_DIR}/ilostat_data/data_by_country/").mkdir(parents=True, exist_ok=True)
         # Save to parquet
         df.to_parquet(
-            f"{CACHE_DIR}/ilostat_data/ilostat_country_{country}.parquet",
+            f"{CACHE_DIR}/ilostat_data/data_by_country/ilostat_country_{country}.parquet",
             index=False,
         )
 
@@ -145,57 +174,124 @@ def ilostat_query_country(
     return df
 
 
-def ilostat_table_of_contents(download: bool = True) -> pd.DataFrame:
+def ilostat_table_of_contents(type: Literal["country", "indicator"]) -> pd.DataFrame:
     """
     Get the table of contents from ILOSTAT
     This table contains the list of countries and level of detail (annual, quarterly, monthly)
     """
+    if type == "country":
+        url = "https://rplumber.ilo.org/metadata/toc/ref_area/?lang=en&type=code&format=.parquet"
+    elif type == "indicator":
+        url = "https://rplumber.ilo.org/metadata/toc/indicator/?lang=en&format=.parquet"
 
-    url = "https://rplumber.ilo.org/metadata/toc/ref_area/?lang=en&type=code&format=.parquet"
     df = fetch_file(url)
 
-    if download:
-        # make sure the directory exists. If not, create it
-        Path(f"{CACHE_DIR}/ilostat_data").mkdir(parents=True, exist_ok=True)
-        # Save to parquet
-        df.to_parquet(
-            f"{CACHE_DIR}/ilostat_data/ilostat_table_of_contents.parquet",
-            index=False,
-        )
+    # make sure the directory exists. If not, create it
+    Path(f"{CACHE_DIR}/ilostat_data").mkdir(parents=True, exist_ok=True)
 
-    log.info("Table of contents extracted")
+    # Save to parquet
+    df.to_parquet(
+        f"{CACHE_DIR}/ilostat_data/ilostat_table_of_contents_{type}.parquet",
+        index=False,
+    )
+
+    log.info(f"Table of contents extracted: {type}")
 
     return df
 
 
-def extract_all_files_and_concatenate(df_toc: pd.DataFrame) -> None:
+def extract_all_files_and_concatenate() -> pd.DataFrame:
     """
     Extract all files listed in the table of contents and concatenate them into a single DataFrame.
     """
 
-    # Filter only for freq=A annual
-    df_toc = df_toc[df_toc["freq"] == "A"].reset_index(drop=True)
+    # Check if file in {CACHE_DIR}/ilostat_data_full.parquet" exists
+    # It's better to do this check, since the extraction and concatenation takes time
+    if Path(f"{CACHE_DIR}/ilostat_data/ilostat_data_full.parquet").exists():
+        log.info("File ilostat_data_full.parquet already exists, skipping extraction")
 
-    # Get a list of countries from the id column
-    countries = list(df_toc["id"].unique())
+        df = pd.read_parquet(f"{CACHE_DIR}/ilostat_data/ilostat_data_full.parquet")
 
-    dfs = []
-    for country in tqdm(countries, desc="Extracting data from countries"):
-        df = ilostat_query_country(country)
-        dfs.append(df)
+        return df
+    else:
+        df_toc_country = ilostat_table_of_contents(type="country")
 
-    # Concatenate all these files into a unique one
-    df = pd.concat(dfs, ignore_index=True)
+        # Filter only for freq=A annual
+        df_toc_country = df_toc_country[df_toc_country["freq"] == "A"].reset_index(drop=True)
 
-    # Repack the dataframe to optimize columns
-    df = repack_frame(df)
+        # Get a list of countries from the id column
+        countries = list(df_toc_country["id"].unique())
 
-    # Export file as csv and parquet
-    df.to_parquet(f"{PARENT_DIR}/ilostat_data.parquet", index=False)
+        dfs = []
+        for country in tqdm(countries, desc="Extracting data from countries"):
+            df = ilostat_query_country(country)
+            dfs.append(df)
 
-    log.info("All files extracted and concatenated")
+        # Concatenate all these files into a unique one
+        df = pd.concat(dfs, ignore_index=True)
 
-    return None
+        # Repack the dataframe to optimize columns
+        df = repack_frame(df)
+
+        # Export file as csv and parquet
+        df.to_parquet(f"{CACHE_DIR}/ilostat_data/ilostat_data_full.parquet", index=False)
+
+        log.info("Full data extracted and concatenated")
+
+    return df
+
+
+def exclude_datasets(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Exclude unwanted datasets from the DataFrame.
+    """
+
+    # Extract table of contents for indicators
+    df_toc_indicator = ilostat_table_of_contents(type="indicator")
+
+    # Keep only indicators where freq=A
+    df_toc_indicator = df_toc_indicator[df_toc_indicator["freq"] == "A"].reset_index(drop=True)
+
+    # Keep only datasets with non-missing database
+    df_toc_indicator = df_toc_indicator[
+        (df_toc_indicator["database"] != "NA") & (df_toc_indicator["database"].notna())
+    ].reset_index(drop=True)
+
+    # Assert that all expected databases are present, and there is no new dataset
+    assert set(EXPECTED_DATASETS).issubset(set(df_toc_indicator["database"].unique())), log.error(
+        "Missing expected datasets in the DataFrame",
+        missing_datasets=set(EXPECTED_DATASETS).difference(set(df_toc_indicator["database"].unique())),
+    )
+    assert not set(df_toc_indicator["database"].unique()).difference(set(EXPECTED_DATASETS)), log.error(
+        "Unexpected datasets found in the DataFrame",
+        unexpected_datasets=set(df_toc_indicator["database"].unique()).difference(set(EXPECTED_DATASETS)),
+    )
+
+    # Keep only datasets to drop
+    df_toc_indicator = df_toc_indicator[df_toc_indicator["database"].isin(DATASETS_TO_DROP)].reset_index(drop=True)
+
+    # Create a list of the indicators to drop
+    indicators_to_drop = list(df_toc_indicator["indicator"].unique())
+
+    # Calculate length of the DataFrame
+    length_before = len(df)
+
+    # Drop indicators
+    df = df[~df["indicator"].isin(indicators_to_drop)].reset_index(drop=True)
+
+    # Calculate length after
+    length_after = len(df)
+
+    log.info(f"Excluded datasets: {DATASETS_TO_DROP}")
+    log.info(
+        f"Removed {(length_before - length_after):,} rows from the DataFrame. Now there are {length_after:,} rows."
+    )
+
+    df.to_parquet(f"{PARENT_DIR}/ilostat.parquet", index=False)
+
+    log.info("DataFrame with excluded datasets saved to ilostat.parquet")
+
+    return df
 
 
 if __name__ == "__main__":

@@ -14,7 +14,7 @@ def run() -> None:
     snap = paths.load_snapshot("ilostat.parquet")
 
     # Load data from snapshot.
-    tb = snap.read()
+    tb = snap.read(safe_types=False)
 
     #
     # Process data.
