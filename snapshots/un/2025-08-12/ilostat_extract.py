@@ -39,6 +39,7 @@ import requests
 from botocore.exceptions import ClientError
 from joblib import Memory
 from owid.catalog.s3_utils import connect_r2_cached
+from owid.repack import repack_frame
 from structlog import get_logger
 from tenacity import retry
 from tenacity.stop import stop_after_attempt
@@ -185,6 +186,9 @@ def extract_all_files_and_concatenate(df_toc: pd.DataFrame) -> None:
 
     # Concatenate all these files into a unique one
     df = pd.concat(dfs, ignore_index=True)
+
+    # Repack the dataframe to optimize columns
+    df = repack_frame(df)
 
     # Export file as csv and parquet
     df.to_parquet(f"{PARENT_DIR}/ilostat_data.parquet", index=False)
