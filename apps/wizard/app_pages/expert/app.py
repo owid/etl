@@ -13,11 +13,13 @@ from structlog import get_logger
 from apps.utils.gpt import OpenAIWrapper, get_cost_and_tokens
 from apps.wizard.app_pages.expert.prompts import (
     SYSTEM_PROMPT_DATASETTE,
-    SYSTEM_PROMPT_FULL,
     SYSTEM_PROMPT_GUIDES,
+    SYSTEM_PROMPT_INTRO,
     SYSTEM_PROMPT_METADATA,
-    SYSTEM_PROMPT_PRINCIPLES,
-    SYSTEM_PROMPT_START,
+)
+from apps.wizard.app_pages.expert.prompts_dynamic import (
+    SYSTEM_PROMPT_DATABASE,
+    SYSTEM_PROMPT_FULL,
 )
 from apps.wizard.utils import set_states
 from apps.wizard.utils.db import DB_IS_SET_UP, WizardDB
@@ -28,6 +30,14 @@ st.set_page_config(
     page_icon="🪄",
 )
 
+# "Summarize your knowledge from your system prompt into one short sentence"
+# SYSTEM_PROMPT_GUIDES      70925   299632
+# SYSTEM_PROMPT_INTRO       26500   109799
+# SYSTEM_PROMPT_PRINCIPLES  17821   75429
+# SYSTEM_PROMPT_METADATA    13609   54469
+# SYSTEM_PROMPT_START       9195    34678
+# SYSTEM_PROMPT_DATASETTE   3917    14850
+# SYSTEM_PROMPT_DATABASE    256     934
 
 # LOG
 log = get_logger()
@@ -68,12 +78,12 @@ MODELS_DIFFERENT_API = {"o4-mini", "gpt-5", "gpt-5-mini"}
 class Options:
     """Chat categories."""
 
+    FULL = "**⭐️ All**"
     DATASETTE = "Datasette"
-    METADATA = "Metadata"
-    START = "Env set up"
-    GUIDES = "Tools, APIs, and guides"
-    PRINCIPLES = "Design principles"
-    FULL = "All docs"
+    DATABASE = "Analytics"
+    METADATA = "ETL Metadata"
+    INTRO = "Introduction"
+    GUIDES = "Learn more"
     DEBUG = "Debug"
 
 
@@ -99,21 +109,21 @@ def get_system_prompt() -> str:
         case Options.METADATA:
             log.info("Switching to 'Metadata' system prompt.")
             system_prompt = SYSTEM_PROMPT_METADATA
-        case Options.START:
-            log.info("Switching to 'Getting started' system prompt.")
-            system_prompt = SYSTEM_PROMPT_START
+        case Options.INTRO:
+            log.info("Switching to 'Getting started'/Design principles system prompt.")
+            system_prompt = SYSTEM_PROMPT_INTRO
         case Options.GUIDES:
             log.info("Switching to 'Guides' system prompt.")
             system_prompt = SYSTEM_PROMPT_GUIDES
-        case Options.PRINCIPLES:
-            log.info("Switching to 'Design principles' system prompt.")
-            system_prompt = SYSTEM_PROMPT_PRINCIPLES
         case Options.FULL:
             log.warning("Switching to 'All' system prompt.")
             system_prompt = SYSTEM_PROMPT_FULL
         case Options.DATASETTE:
             log.warning("Switching to 'DATASETTE' system prompt.")
             system_prompt = SYSTEM_PROMPT_DATASETTE
+        case Options.DATABASE:
+            log.warning("Switching to 'DATABASE' system prompt.")
+            system_prompt = SYSTEM_PROMPT_DATABASE
         case Options.DEBUG:
             log.warning("Switching to 'DEBUG' system prompt.")
             system_prompt = ""
@@ -140,46 +150,48 @@ container_chat = st.container()
 # Category for the chat
 options = [
     Options.FULL,
-    Options.DATASETTE,
+    # Options.DATASETTE,
+    Options.DATABASE,
     Options.METADATA,
-    Options.START,
+    Options.INTRO,
     Options.GUIDES,
-    Options.PRINCIPLES,
 ]
 # NOTE: using pills is a good viz (https://github.com/jrieke/streamlit-pills). however, existing tool does not have an on_change options, which is basic if we want to reset some values from session_state
-with st.expander(f"**Model and context** :gray[(default is {MODEL_DEFAULT})]", icon=":material/settings:"):
-    st.segmented_control(
-        label="Choose a category for the question",
-        options=options,
-        default=options[0],
-        help="Choosing a domain reduces the cost of the query to chatGPT, since only a subset of the documentation will be used in the query (i.e. fewer tokens used).",
-        key="category_gpt",
-        on_change=reset_messages,
-    )
+with st.expander(f"**Model** :gray[(default is {MODEL_DEFAULT})]", icon=":material/settings:"):
+    with st.container(horizontal=True, vertical_alignment="bottom"):
+        st.segmented_control(
+            label="Choose a category for the question",
+            options=options,
+            default=options[0],
+            help="Choosing a specific domain reduces the cost of the query to chatGPT, because only a subset of the documentation (i.e. fewer tokens used) will be used in the query.",
+            key="category_gpt",
+            on_change=reset_messages,
+            width="stretch",
+        )
 
-    ## EXAMPLE QUERIES
-    if st.session_state["category_gpt"] == Options.DATASETTE:
-        EXAMPLE_QUERIES = [
-            "> Which are our top 10 articles by pageviews?",
-            "> How many charts do we have that use only a single indicator?",
-            "> Do we have datasets whose indicators are not used in any chart?",
-        ]
-    else:
-        EXAMPLE_QUERIES = [
-            "> In the metadata yaml file, which field should I use to disable the map tap view?",
-            "> In the metadata yaml file, how can I define a common `description_processing` that affects all indicators in a specific table?"
-            "> What is the difference between `description_key` and `description_from_producer`? Be concise.",
-            "> Is the following snapshot title correct? 'Cherry Blossom Full Blook Dates in Kyoto, Japan'",
-            "> What is the difference between an Origin and Dataset?",
-        ]
-    with st.popover("See examples"):
-        for example in EXAMPLE_QUERIES:
-            st.markdown(example)
+        ## EXAMPLE QUERIES
+        if st.session_state["category_gpt"] in {Options.DATASETTE, Options.DATABASE}:
+            EXAMPLE_QUERIES = [
+                "> Which are our top 10 articles by pageviews?",
+                "> How many charts do we have that use only a single indicator?",
+                "> Do we have datasets whose indicators are not used in any chart?",
+            ]
+        else:
+            EXAMPLE_QUERIES = [
+                "> In the metadata yaml file, which field should I use to disable the map tap view?",
+                "> In the metadata yaml file, how can I define a common `description_processing` that affects all indicators in a specific table?"
+                "> What is the difference between `description_key` and `description_from_producer`? Be concise.",
+                "> Is the following snapshot title correct? 'Cherry Blossom Full Blook Dates in Kyoto, Japan'",
+                "> What is the difference between an Origin and Dataset?",
+            ]
+        with st.popover("See examples"):
+            for example in EXAMPLE_QUERIES:
+                st.markdown(example)
 
     # Sidebar with GPT config
     st.session_state.analytics = st.session_state.get("analytics", True)
     # with st.container():
-    st.divider()
+    # st.divider()
     # st.divider()
     # st.toggle(
     #     label="Collect data for analytics",
@@ -191,19 +203,18 @@ with st.expander(f"**Model and context** :gray[(default is {MODEL_DEFAULT})]", i
     #     ),
     #     help="If enabled, we will collect usage data to improve the app. \n\nThis **is really helpful to improve** how we query chat GPT: E.g. which system prompt to use, optimise costs, and much more 😊. \n\nData collected: questions, responses and feedback submitted. \n\nYou can see how this data is collected [here](https://github.com/owid/etl/blob/master/apps/wizard/utils/db.py). \n\nRecords are anonymous.",
     # )
-    col1, col2, col3 = st.columns(3, vertical_alignment="center")
-    with col1:
+    with st.container(horizontal=True, vertical_alignment="bottom"):
         model_name = st.selectbox(
-            label="Select GPT model",
+            label=":material/memory: Select model",
             options=MODELS_AVAILABLE_LIST,
             format_func=lambda x: MODELS_AVAILABLE[x],
             index=MODELS_AVAILABLE_LIST.index(MODEL_DEFAULT),
             help="[Pricing](https://openai.com/api/pricing) | [Model list](https://platform.openai.com/docs/models/)",
         )
         st.session_state["model_name"] = model_name
-    ## See pricing list: https://openai.com/api/pricing (USD)
-    ## See model list: https://platform.openai.com/docs/models/
-    with col2:
+
+        ## See pricing list: https://openai.com/api/pricing (USD)
+        ## See model list: https://platform.openai.com/docs/models/
         max_tokens = int(
             st.number_input(
                 "Max tokens",
@@ -215,20 +226,23 @@ with st.expander(f"**Model and context** :gray[(default is {MODEL_DEFAULT})]", i
             )
         )
 
-    with col3:
+        if model_name not in MODELS_DIFFERENT_API:
+            temperature = st.slider(
+                "Temperature",
+                min_value=0.0,
+                max_value=2.0,
+                value=1.0 if model_name in MODELS_DIFFERENT_API else 0.15,
+                step=0.01,
+                help="What sampling temperature to use, between 0 and 2. Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic.",
+            )
+        else:
+            temperature = 1.0
+
         use_reduced_context = st.toggle(
-            "Reduced context window",
+            "Reduced context",
             value=False,
             help="If checked, only the last user message will be accounted (i.e less tokens and therefore cheaper).",
         )
-    temperature = st.slider(
-        "Temperature",
-        min_value=0.0,
-        max_value=2.0,
-        value=1.0 if model_name in MODELS_DIFFERENT_API else 0.15,
-        step=0.01,
-        help="What sampling temperature to use, between 0 and 2. Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic.",
-    )
 
     st.button(
         label=":material/restart_alt: Clear chat",
