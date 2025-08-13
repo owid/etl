@@ -4,6 +4,7 @@ references:
 - https://docs.streamlit.io/knowledge-base/tutorials/build-conversational-apps#build-a-chatgpt-like-app
 """
 
+import time
 from typing import Any, Dict, cast
 
 import streamlit as st
@@ -219,7 +220,7 @@ with st.expander(f"**Model** :gray[(default is {MODEL_DEFAULT})]", icon=":materi
             st.number_input(
                 "Max tokens",
                 min_value=32,
-                max_value=4096,
+                max_value=4 * 4096,
                 value=4096,
                 step=32,
                 help="The maximum number of tokens in the response.",
@@ -306,6 +307,9 @@ with container_chat:
         # Display assistant response in chat message container
         with container_response:
             with st.chat_message("assistant"):
+                # Start timer
+                start_time = time.time()
+
                 # Ask GPT (stream)
                 if model_name in MODELS_DIFFERENT_API:
                     stream = api.chat.completions.create(
@@ -325,6 +329,10 @@ with container_chat:
                     )
                 st.session_state.response = cast(str, st.write_stream(stream))
 
+                # End timer and store duration
+                end_time = time.time()
+                st.session_state.response_time = end_time - start_time
+
             # Add new response by the System
             st.session_state.messages.append({"role": "assistant", "content": st.session_state.response})
 
@@ -337,7 +345,12 @@ with container_chat:
         # Get cost & tokens
         text_in = "\n".join([m["content"] for m in st.session_state.messages])
         cost, num_tokens = get_cost_and_tokens(text_in, st.session_state.response, cast(str, model_name))
-        cost_msg = f"**:material/paid:** ≥{cost:.4f} USD (≥{num_tokens:,} tokens), using **{MODELS_AVAILABLE[st.session_state['model_name']]}**"
+
+        # Format response time
+        response_time = getattr(st.session_state, "response_time", 0)
+        time_msg = f"⏱️ {response_time:.2f}s"
+
+        cost_msg = f"≥{cost:.4f} USD (≥{num_tokens:,} tokens), {time_msg}, using **{MODELS_AVAILABLE[st.session_state['model_name']]}**"
         st.session_state.cost_last = cost
 
         if DB_IS_SET_UP and st.session_state.analytics:
@@ -350,8 +363,9 @@ with container_chat:
             )
         # Show cost below feedback
         with container_response:
-            with st.container(horizontal_alignment="right"):
-                st.info(cost_msg)
+            with st.container(horizontal=True, horizontal_alignment="right"):
+                # st.info(cost_msg, icon=":material/paid:")
+                st.markdown(f":blue-badge[:small[:material/paid: {cost_msg}]]")
 
     # DEBUG
     # st.write([m for m in st.session_state.messages if m["role"] != "system"])
