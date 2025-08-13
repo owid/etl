@@ -337,7 +337,7 @@ with container_chat:
         # Get cost & tokens
         text_in = "\n".join([m["content"] for m in st.session_state.messages])
         cost, num_tokens = get_cost_and_tokens(text_in, st.session_state.response, cast(str, model_name))
-        cost_msg = f"**Cost**: ≥{cost} USD.\n\n **Tokens**: ≥{num_tokens}."
+        cost_msg = f"**:material/paid:** ≥{cost:.4f} USD (≥{num_tokens:,} tokens), using **{MODELS_AVAILABLE[st.session_state['model_name']]}**"
         st.session_state.cost_last = cost
 
         if DB_IS_SET_UP and st.session_state.analytics:
@@ -350,7 +350,8 @@ with container_chat:
             )
         # Show cost below feedback
         with container_response:
-            st.info(cost_msg)
+            with st.container(horizontal_alignment="right"):
+                st.info(cost_msg)
 
     # DEBUG
     # st.write([m for m in st.session_state.messages if m["role"] != "system"])
