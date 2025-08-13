@@ -60,7 +60,7 @@ def render_indicator_mapping(search_form) -> Dict[int, int]:
 
             # 2/ Map indicators
             # Show columns with indicators that were automatically (and manually) mapped
-            indicator_upgrades_shown = st_show_indicator_upgrades(
+            st_show_indicator_upgrades(
                 indicator_ups=indicator_upgrades,
                 pagination_key="pagination_indicator_mapping",
                 indicator_id_to_display=indicator_id_to_display,
@@ -73,18 +73,18 @@ def render_indicator_mapping(search_form) -> Dict[int, int]:
                 type="primary",
                 width="stretch",
                 on_click=set_states_after_submitting,
-                help="Only indicators in this page will be submitted. If you want to map molre indicators at once, make the number of elements per page bigger.",
+                help="All indicators from all pages will be submitted with your current selections.",
             )
 
             if st.session_state.submitted_indicators:
                 # Define mapping of indicators
                 indicator_mapping = {
                     iu.id_old: iu.id_new_selected
-                    for iu in indicator_upgrades_shown
+                    for iu in indicator_upgrades
                     if not iu.skip and iu.id_new_selected is not None
                 }
                 # test = [
-                #     {"old": iu.id_old, "new": iu.id_new_selected, "skip": iu.skip} for iu in indicator_upgrades_shown
+                #     {"old": iu.id_old, "new": iu.id_new_selected, "skip": iu.skip} for iu in indicator_upgrades
                 # ]
                 # st.write(test)
     return indicator_mapping
