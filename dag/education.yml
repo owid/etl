@@ -61,13 +61,6 @@ steps:
   data://grapher/ilostat/2023-09-19/employment:
     - data://garden/ilostat/2023-09-19/employment
 
-  # ILOstat Average Work Hours
-  data://meadow/ilostat/2023-09-19/average_work_hours:
-    - snapshot://ilostat/2023-09-19/average_work_hours.csv
-  data://garden/ilostat/2023-09-19/average_work_hours:
-    - data://meadow/ilostat/2023-09-19/average_work_hours
-  data://grapher/ilostat/2023-09-19/average_work_hours:
-    - data://garden/ilostat/2023-09-19/average_work_hours
 
   # OECD PISA data on educational attainment in mathematics, science, and reading
   data://meadow/oecd/2023-12-06/pisa:
@@ -209,3 +202,16 @@ steps:
   #
   export://multidim/education/latest/pisa_performance:
     - data://grapher/oecd/2023-12-06/pisa
+
+  #
+  # Mdim for qualified/trained teachers
+  #
+  export://multidim/education/latest/teachers:
+    - data://grapher/unesco/2025-05-01/education_sdgs
+    - data://grapher/worldbank_wdi/2025-01-24/wdi
+
+  #
+  # Mdim for women teachers
+  #
+  export://multidim/education/latest/women_teachers:
+    - data://grapher/unesco/2025-05-01/education_opri

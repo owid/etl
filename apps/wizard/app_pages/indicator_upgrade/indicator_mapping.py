@@ -71,7 +71,7 @@ def render_indicator_mapping(search_form) -> Dict[int, int]:
             st.button(
                 label="Next (2/3)",
                 type="primary",
-                use_container_width=True,
+                width="stretch",
                 on_click=set_states_after_submitting,
                 help="Only indicators in this page will be submitted. If you want to map molre indicators at once, make the number of elements per page bigger.",
             )

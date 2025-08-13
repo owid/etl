@@ -29,54 +29,56 @@ definitions:
       {definitions.all.description_short}
     conflict_type_base: |-
       This includes combatant and civilian deaths due to fighting
+    ucdp_prio_linked: |-
+      [Uppsala Conflict Data Program (UCDP)](https://ucdp.uu.se/) and the [Peace Research Institute Oslo (PRIO)](https://www.prio.org/data/1)
     conflict_type: |-
       <%- if conflict_type == "all" -%>
-      A conflict involving a state is defined by the Uppsala Conflict Data Program (UCDP) and the Peace Research Institute Oslo (PRIO) as a conflict between two armed groups, at least one of which is a state, that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}.
+      A conflict involving a state is defined by the {definitions.all.ucdp_prio_linked} as a conflict between two armed groups, at least one of which is a state, that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}.
 
       <%- elif conflict_type == "state-based" -%>
-      A conflict involving a state is defined by the Uppsala Conflict Data Program (UCDP) and the Peace Research Institute Oslo (PRIO) as a conflict between two armed groups, at least one of which is a state, that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}.
+      A conflict involving a state is defined by the {definitions.all.ucdp_prio_linked} as a conflict between two armed groups, at least one of which is a state, that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}.
 
       <%- elif conflict_type == "interstate" -%>
-      An interstate conflict is defined by the Uppsala Conflict Data Program (UCDP) and the Peace Research Institute Oslo (PRIO) as a conflict between states that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}.
+      An interstate conflict is defined by the {definitions.all.ucdp_prio_linked} as a conflict between states that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}.
 
       <%- elif conflict_type == "intrastate" -%>
-      An intrastate conflict is defined by the Uppsala Conflict Data Program (UCDP) and the Peace Research Institute Oslo (PRIO) as a conflict between a state and a non-state armed group that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}. If a foreign state is involved, it is called "internationalized", and "non-internationalized" otherwise.
+      An intrastate conflict is defined by the {definitions.all.ucdp_prio_linked} as a conflict between a state and a non-state armed group that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}. If a foreign state is involved, it is called "internationalized", and "non-internationalized" otherwise.
 
       <%- elif conflict_type == "intrastate (internationalized)" -%>
-      A foreign-backed civil conflict is defined by the Uppsala Conflict Data Program (UCDP) and the Peace Research Institute Oslo (PRIO) as a conflict between a state and a non-state armed group that causes at least 25 deaths during a year, and at least one foreign state is involved in a supporting role. A non-state armed group can be a rebel group, criminal organization, or ethnic group. {definitions.all.conflict_type_base}.
+      A foreign-backed civil conflict is defined by the {definitions.all.ucdp_prio_linked} as a conflict between a state and a non-state armed group that causes at least 25 deaths during a year, and at least one foreign state is involved in a supporting role. A non-state armed group can be a rebel group, criminal organization, or ethnic group. {definitions.all.conflict_type_base}.
 
 
       <%- elif conflict_type == "intrastate (non-internationalized)" -%>
-      A domestic civil conflict is defined by the Uppsala Conflict Data Program (UCDP) and the Peace Research Institute Oslo (PRIO) as a conflict between a state and a non-state armed group that causes at least 25 deaths during a year, and no foreign state is involved in a supporting role. A non-state armed group can be a rebel group, criminal organization, or ethnic group. {definitions.all.conflict_type_base}.
+      A domestic civil conflict is defined by the {definitions.all.ucdp_prio_linked} as a conflict between a state and a non-state armed group that causes at least 25 deaths during a year, and no foreign state is involved in a supporting role. A non-state armed group can be a rebel group, criminal organization, or ethnic group. {definitions.all.conflict_type_base}.
 
       <%- elif conflict_type == "extrasystemic" -%>
-      A colonial conflict is defined by the Uppsala Conflict Data Program (UCDP) and the Peace Research Institute Oslo (PRIO) as a conflict between a state and a non-state armed group that causes at least 25 deaths during a year, and takes place outside of the state's territory. {definitions.all.conflict_type_base}.
+      A colonial conflict is defined by the {definitions.all.ucdp_prio_linked} as a conflict between a state and a non-state armed group that causes at least 25 deaths during a year, and takes place outside of the state's territory. {definitions.all.conflict_type_base}.
 
       <%- elif conflict_type == "non-state conflict" -%>
-      A non-state conflict is defined by the Uppsala Conflict Data Program (UCDP) and the Peace Research Institute Oslo (PRIO) as a conflict between non-state armed groups, such as rebel groups, criminal organizations, or ethnic groups, that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}.
+      A non-state conflict is defined by the {definitions.all.ucdp_prio_linked} as a conflict between non-state armed groups, such as rebel groups, criminal organizations, or ethnic groups, that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}.
 
       <%- elif conflict_type == "one-sided violence" -%>
-      One-sided violence is defined by the Uppsala Conflict Data Program (UCDP) and the Peace Research Institute Oslo (PRIO) as the use of armed force by a state or non-state armed group against civilians that causes at least 25 civilian deaths during a year.
+      One-sided violence is defined by the {definitions.all.ucdp_prio_linked} as the use of armed force by a state or non-state armed group against civilians that causes at least 25 civilian deaths during a year.
 
       <%- endif -%>
+    state_based_clarification: |-
+      <% if conflict_type == "state-based" %>
+      This includes [interstate conflicts](#dod:interstate-ucdp), [civil conflicts](#dod:intrastate-ucdp), and [colonial conflicts](#dod:extrasystemic-ucdp).
+      <%- endif %>
+    methodology: |-
+      [UCDP](https://www.uu.se/en/department/peace-and-conflict-research/research/ucdp/ucdp-methodology) and [PRIO](https://www.semanticscholar.org/paper/Monitoring-Trends-in-Global-Combat%3A-A-New-Dataset-Lacina-Gleditsch/0c4ff27fff986bc30112ac59ad6afbd7b719ad17?p2df) identify conflict deaths based on news reports, other contemporary sources, and academic research.
+    faq_why_not_country_data: |-
+      PRIO's conflict-level data cannot be neatly mapped to individual countries, which is why we only present aggregated data for the world and world regions.
     description_key_deaths: &description_key_deaths
-      - |-
-        {definitions.all.conflict_type}
-      - |-
-        <% if conflict_type == "state-based" %>
-        This includes [interstate conflicts](#dod:interstate-ucdp), [civil conflicts](#dod:intrastate-ucdp), and [colonial conflicts](#dod:extrasystemic-ucdp).
-        <%- endif %>
-      - |-
-        [UCDP](https://www.uu.se/en/department/peace-and-conflict-research/research/ucdp/ucdp-methodology) and [PRIO](https://www.semanticscholar.org/paper/Monitoring-Trends-in-Global-Combat%3A-A-New-Dataset-Lacina-Gleditsch/0c4ff27fff986bc30112ac59ad6afbd7b719ad17?p2df) identify conflict deaths based on news reports, other contemporary sources, and academic research.
+      - "{definitions.all.conflict_type}"
+      - "{definitions.all.state_based_clarification}"
+      - "{definitions.all.methodology}"
+      - "{definitions.all.faq_why_not_country_data}"
     description_key_deaths_best: &description_key_deaths_best
-      - |-
-        {definitions.all.conflict_type}
-      - |-
-        <% if conflict_type == "state-based" %>
-        This includes [interstate conflicts](#dod:interstate-ucdp), [civil conflicts](#dod:intrastate-ucdp), and [colonial conflicts](#dod:extrasystemic-ucdp).
-        <%- endif %>
-      - |-
-        [UCDP](https://www.uu.se/en/department/peace-and-conflict-research/research/ucdp/ucdp-methodology) and [PRIO](https://www.semanticscholar.org/paper/Monitoring-Trends-in-Global-Combat%3A-A-New-Dataset-Lacina-Gleditsch/0c4ff27fff986bc30112ac59ad6afbd7b719ad17?p2df) identify conflict deaths based on news reports, other contemporary sources, and academic research.
+      - "{definitions.all.conflict_type}"
+      - "{definitions.all.state_based_clarification}"
+      - "{definitions.all.methodology}"
+      - "{definitions.all.faq_why_not_country_data}"
       - |-
         We show here the "best" death estimates as identified by UCDP and PRIO. They also report high and low estimates.
 

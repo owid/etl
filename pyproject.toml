@@ -73,6 +73,7 @@ dependencies = [
     "fastjsonschema>=2.21.1",
     "mediacloud>=4.4.0",
     "fastmcp>=2.10.6",
+    "pyproj>=3.7.1",
 ]
 
 [tool.uv.sources]
@@ -124,7 +125,7 @@ api = [
     "joblib>=1.3.2",
 ]
 wizard = [
-    "streamlit>=1.46.0",
+    "streamlit>=1.48.0",
     "streamlit-aggrid>=0.3.4.post3",
     "streamlit-ace>=0.1.1",
     "streamlit-extras>=0.3.6",
@@ -132,7 +133,6 @@ wizard = [
     "pygwalker>=0.4.9",
     "plotly>=5.23.0",
     "geographiclib>=2.0",
-    "pyproj>=3.6.1",
     "streamlit-feedback>=0.1.3",
     "statsmodels>=0.14.4",
     # Starting from PyTorch 2.3.0, the minimum requirement for macOS is macOS 11.0+ ARM64. Some poor people on the team still use it. Jeez...
@@ -154,6 +154,7 @@ wizard = [
 etl = 'apps.cli:cli'
 etlwiz = 'apps.wizard.cli:cli'
 etlr = 'etl.command:main_cli'
+etls = 'etl.snapshot_command:snapshot_cli'
 etlp = 'apps.pr.cli:cli'
 etl-wizard = 'apps.wizard.cli:cli'
 compare = 'etl.compare:cli'

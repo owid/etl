@@ -181,7 +181,7 @@ else:
         submitted = st.button(
             "Submit",
             type="primary",
-            use_container_width=True,
+            width="stretch",
             on_click=lambda: set_states(
                 {
                     "to_be_submitted": True,
@@ -289,7 +289,7 @@ else:
                 proceed_1 = st.form_submit_button(
                     "Proceed",
                     type="primary",
-                    use_container_width=True,
+                    width="stretch",
                     on_click=lambda: set_states(
                         {
                             "to_be_submitted_confirmed_1": True,

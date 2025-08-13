@@ -207,7 +207,8 @@ SUBSET = env.get("SUBSET", None)
 
 # forbid any individual step from consuming more than this much memory
 # (only enforced on Linux)
-MAX_VIRTUAL_MEMORY_LINUX = 32 * 2**30  # 32 GB
+# 2025-08-01: Increased to 64 GB from 32 GB, it was not enough for garden/agriculture/2025-03-26/daily_calories_per_person
+MAX_VIRTUAL_MEMORY_LINUX = 64 * 2**30  # 64 GB
 
 # increment this to force a full rebuild of all datasets
 ETL_EPOCH = 5

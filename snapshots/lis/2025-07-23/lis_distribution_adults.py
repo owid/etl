@@ -17,12 +17,16 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
     type=bool,
     help="Upload dataset to Snapshot",
 )
-def main(upload: bool) -> None:
+@click.option("--path-to-file", prompt=True, type=str, help="Path to local data file.")
+def main(path_to_file: str, upload: bool) -> None:
     # Create a new snapshot.
-    snap = Snapshot(f"artificial_intelligence/{SNAPSHOT_VERSION}/ai_adoption.csv")
+    snap = Snapshot(f"lis/{SNAPSHOT_VERSION}/lis_distribution_adults.csv")
 
-    # Download data from source.
-    snap.download_from_source()
+    # Ensure destination folder exists.
+    snap.path.parent.mkdir(exist_ok=True, parents=True)
+
+    # Copy local data file to snapshots data folder.
+    snap.path.write_bytes(Path(path_to_file).read_bytes())
 
     # Add file to DVC and upload to S3.
     snap.dvc_add(upload=upload)

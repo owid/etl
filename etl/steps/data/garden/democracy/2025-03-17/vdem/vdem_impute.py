@@ -1,3 +1,4 @@
+import pandas as pd
 import yaml
 from owid.catalog.tables import Table, concat
 
@@ -19,6 +20,21 @@ IMPUTED_OVERLAPS_EXPECTED = {
     "Serbia": 29,
     "Slovakia": 6,
     "Uzbekistan": 47,
+}
+INDICATORS_AVOID_IMPUTE = [
+    "corruption_vdem",
+    "corr_exec_vdem",
+    "corr_publsec_vdem",
+    "corr_leg_vdem",
+    "corr_jud_vdem",
+    "v2mecorrpt",
+    "v2xnp_client",
+]
+
+
+a = {
+    "lala",
+    "lele",
 }
 
 
@@ -71,6 +87,9 @@ def run(tb: Table) -> Table:
                 ), f"Unexpected overlap for {imp['country']}"
                 # Drop
                 tb_ = tb_[~tb_["year"].isin(merged["year"])]
+
+            # Avoid imputing certain indicators
+            tb_[INDICATORS_AVOID_IMPUTE] = pd.NA
 
             tb_imputed.append(tb_)
 

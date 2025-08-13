@@ -3,7 +3,7 @@ Load a meadow dataset and create a garden dataset.
 
 When running this step in an update, be sure to check all the outputs and logs to ensure the data is correct.
 
-NOTE: To extract the log of the process (to review sanity checks, for example), run the following command in the terminal:
+NOTE: To extract the log of the process (to review sanity checks, for example), run the following command in the terminal (and set DEBUG = True in the code):
     nohup uv run etl run world_bank_pip > output_pip.log 2>&1 &
 
 """
