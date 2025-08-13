@@ -413,6 +413,7 @@ class SnapshotForm(StepForm):
     file_extension: str
     is_private: bool
     dataset_manual_import: bool
+    dvc_only: bool = False
 
     # origin
     title: str
