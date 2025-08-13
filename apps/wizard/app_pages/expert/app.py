@@ -364,8 +364,4 @@ with container_chat:
         # Show cost below feedback
         with container_response:
             with st.container(horizontal=True, horizontal_alignment="right"):
-                # st.info(cost_msg, icon=":material/paid:")
                 st.markdown(f":blue-badge[:small[:material/paid: {cost_msg}]]")
-
-    # DEBUG
-    # st.write([m for m in st.session_state.messages if m["role"] != "system"])
