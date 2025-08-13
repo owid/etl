@@ -1,0 +1,15 @@
+dataset:
+  update_period_days: 365
+tables:
+  guinea_worm:
+    variables:
+      year_certified:
+        title: Year country is certified free from guinea worm
+        unit: ""
+        display:
+          numDecimalPlaces: 0
+        description_short: The year in which a country was certified free of [Guinea worm disease (Dracunculiasis)](#dod:guinea-worm) by the WHO.
+      certification_status:
+        title: Certification status over time
+        unit: ""
+        description_short: The current and historical values for the status of [Guinea worm disease (Dracunculiasis)](#dod:guinea-worm) as certified by the WHO.
