@@ -56,6 +56,7 @@
   "chat.mcp.enabled": true,
   "chat.mcp.discovery.enabled": true,
   "chat.mcp.autostart": "newAndOutdated",
+  "ruff.configuration": "${workspaceFolder}/pyproject.toml",
 
   // Settings for the "Run Until Cursor" extension
   "runUntilCursor.execDelay": 100,    // Delay before executing code (default: 100ms)

@@ -134,25 +134,26 @@ async def test_cherry_blossom_search_and_sql():
         assert sql_result.structured_content is not None
 
         result_data = sql_result.structured_content
-        assert "columns" in result_data
-        assert "rows" in result_data
+        assert "csv" in result_data
         assert "source" in result_data
 
-        # Check that we got some data back
-        assert len(result_data["columns"]) > 0
-        assert len(result_data["rows"]) > 0
+        # Check that we got some CSV data back
+        csv_content = result_data["csv"]
+        assert len(csv_content) > 0
 
-        # Check that the columns include what we expect
-        columns = result_data["columns"]
-        assert "country" in columns
-        assert "year" in columns
-        assert column in columns
+        # Parse CSV to check structure
+        lines = csv_content.strip().split('\n')
+        assert len(lines) > 1  # Should have header + data
+
+        # Check header contains expected columns
+        header = lines[0]
+        assert "country" in header.lower()
+        assert "year" in header.lower()
+        assert column in header.lower()
 
         # Check that we got Japan data
-        rows = result_data["rows"]
-        for row in rows:
-            country_idx = columns.index("country")
-            assert row[country_idx] == "Japan"
+        for line in lines[1:]:  # Skip header
+            assert "Japan" in line
 
 
 @pytest.mark.asyncio
@@ -167,14 +168,21 @@ async def test_run_sql_basic():
         assert result.structured_content is not None
 
         result_data = result.structured_content
-        assert "columns" in result_data
-        assert "rows" in result_data
+        assert "csv" in result_data
         assert "source" in result_data
 
         # Check basic structure
-        assert result_data["columns"] == ["id", "name"]
-        assert len(result_data["rows"]) <= 5
-        assert len(result_data["rows"]) > 0
+        csv_content = result_data["csv"]
+        assert len(csv_content) > 0
+        
+        # Parse CSV to check structure
+        lines = csv_content.strip().split('\n')
+        assert len(lines) > 1  # Should have header + data
+        assert len(lines) <= 6  # Header + max 5 rows
+        
+        # Check header
+        header = lines[0]
+        assert header.strip() == "id,name"
 
 
 @pytest.mark.asyncio
