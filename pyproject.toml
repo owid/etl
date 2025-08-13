@@ -74,7 +74,6 @@ dependencies = [
     "mediacloud>=4.4.0",
     "fastmcp>=2.10.6",
     "pyproj>=3.7.1",
-    "mcp>=1.11.0",
 ]
 
 [tool.uv.sources]
@@ -174,9 +173,6 @@ extend-exclude = [
     "*cookiecutter",
     "*.ipynb",
 ]
-
-[tool.ruff.lint.isort]
-known-first-party = ["owid_mcp", "etl"]
 
 [build-system]
 requires = ["hatchling"]
