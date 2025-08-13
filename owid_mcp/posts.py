@@ -9,7 +9,11 @@ from typing import Any, Dict, Optional
 import structlog
 from fastmcp import FastMCP
 
-from owid_mcp.data_utils import make_algolia_pages_request, run_sql
+from owid_mcp.data_utils import (
+    make_algolia_pages_request,
+    parse_csv_to_structured,
+    run_sql,
+)
 
 log = structlog.get_logger()
 
@@ -50,9 +54,10 @@ async def _fetch_post_by_identifier(identifier: str) -> Optional[Dict[str, Any]]
         query = f"SELECT slug, content -> '$.title' as title, markdown FROM posts_gdocs WHERE slug = '{identifier}'"
         result = await run_sql(query, max_rows=1)
 
-    # Check if we got results
-    if result["rows"]:
-        row = result["rows"][0]
+    # Parse CSV result and check if we got results
+    structured = parse_csv_to_structured(result["csv"])
+    if structured["rows"]:
+        row = structured["rows"][0]
         return {
             "slug": row[0] if row[0] else "",
             "title": row[1] if row[1] else "",
@@ -69,8 +74,9 @@ async def _fetch_post_by_identifier(identifier: str) -> Optional[Dict[str, Any]]
         query = f"SELECT slug, content -> '$.title' as title, markdown FROM posts_gdocs WHERE id = '{identifier}'"
         result = await run_sql(query, max_rows=1)
 
-    if result["rows"]:
-        row = result["rows"][0]
+    structured = parse_csv_to_structured(result["csv"])
+    if structured["rows"]:
+        row = structured["rows"][0]
         return {
             "slug": row[0] if row[0] else "",
             "title": row[1] if row[1] else "",
@@ -136,7 +142,9 @@ def _build_post_result(slug: str, title: str, excerpt: str, typ: str) -> Dict[st
 
 
 @mcp.tool
-async def search_posts(query: str, limit: int = 10, use_algolia: bool = True) -> Dict[str, Any]:
+async def search_posts(
+    query: str, limit: int = 10, use_algolia: bool = True
+) -> Dict[str, Any]:
     """
     Search for articles and data insights by title or content.
 
@@ -185,6 +193,7 @@ async def search_posts(query: str, limit: int = 10, use_algolia: bool = True) ->
         """
 
         result = await run_sql(sql_query, max_rows=limit)
+        structured = parse_csv_to_structured(result["csv"])
         posts = [
             _build_post_result(
                 slug=row[0] or "",
@@ -192,8 +201,13 @@ async def search_posts(query: str, limit: int = 10, use_algolia: bool = True) ->
                 excerpt=row[3] or "",
                 typ=row[2] or "",
             )
-            for row in result["rows"]
+            for row in structured["rows"]
         ]
         search_method = "sql"
 
-    return {"query": query, "results": posts, "count": len(posts), "search_method": search_method}
+    return {
+        "query": query,
+        "results": posts,
+        "count": len(posts),
+        "search_method": search_method,
+    }

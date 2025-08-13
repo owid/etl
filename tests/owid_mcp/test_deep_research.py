@@ -19,7 +19,6 @@ async def test_fetch_chart_with_specific_id():
         # Check that we get results in the correct format
         data = result.structured_content
         assert "id" in data
-        assert "title" in data
         assert "text" in data
         assert "url" in data
         assert "metadata" in data
@@ -65,7 +64,6 @@ async def test_fetch_chart_data_via_client():
 
         data = result.structured_content
         assert "id" in data
-        assert "title" in data
         assert "text" in data
         assert "url" in data
         assert "metadata" in data

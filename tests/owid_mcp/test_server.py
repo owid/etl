@@ -46,7 +46,7 @@ async def test_fetch_indicator_data_tool():
     async with Client(mcp) as client:
         # Test fetching indicator data with a known ID
         # Using GDP indicator ID which should exist
-        result = await client.call_tool("fetch_indicator_data_tool", {"indicator_id": 2118})
+        result = await client.call_tool("fetch_indicator_data", {"indicator_id": 2118})
         assert result is not None
         assert isinstance(result.content, list)
         assert len(result.content) == 1
@@ -72,7 +72,7 @@ async def test_fetch_indicator_data_tool_for_entity():
     async with Client(mcp) as client:
         # Test fetching indicator data for a specific entity
         # Using GDP indicator ID with USA entity
-        result = await client.call_tool("fetch_indicator_data_tool", {"indicator_id": 2118, "entity": "USA"})
+        result = await client.call_tool("fetch_indicator_data", {"indicator_id": 2118, "entity": "USA"})
         assert result is not None
         assert isinstance(result.content, list)
         assert len(result.content) == 1

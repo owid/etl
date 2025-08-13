@@ -4,6 +4,8 @@ OWID Data Utilities
 Shared utilities for data processing and API interactions across MCP modules.
 """
 
+import csv
+import io
 import math
 import re
 import urllib.parse
@@ -156,6 +158,32 @@ async def make_algolia_request(query: str, limit: int = 10) -> List[Dict[str, An
     hits = [hit for hit in hits if hit.get("type") != "explorerView"]
 
     return hits
+
+
+def parse_csv_to_structured(csv_content: str) -> Dict[str, Any]:
+    """Parse CSV content into structured data with columns and rows.
+    
+    Args:
+        csv_content: CSV text content
+        
+    Returns:
+        Dict with "columns" (list of column names) and "rows" (list of lists)
+    """
+    if not csv_content.strip():
+        return {"columns": [], "rows": []}
+    
+    # Use csv module to properly parse CSV content
+    reader = csv.reader(io.StringIO(csv_content))
+    rows = list(reader)
+    
+    if not rows:
+        return {"columns": [], "rows": []}
+    
+    # First row contains column names
+    columns = rows[0]
+    data_rows = rows[1:] if len(rows) > 1 else []
+    
+    return {"columns": columns, "rows": data_rows}
 
 
 async def make_algolia_pages_request(

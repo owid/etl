@@ -34,7 +34,10 @@ INSTRUCTIONS = (
     "• Don't include 'OWID' or technical terms in search queries"
 )
 
-INSTRUCTIONS_ENTITIES = "• Entity names must match exactly as they appear in OWID:\n" f"{COMMON_ENTITIES}\n\n"
+INSTRUCTIONS_ENTITIES = (
+    "• Entity names must match exactly as they appear in OWID:\n"
+    f"{COMMON_ENTITIES}\n\n"
+)
 
 # NOTE:
 # Because the ChatGPT connector doesn’t perform a session‑ID handshake (it just fires off JSON‑RPC POSTs),
@@ -61,7 +64,6 @@ mcp = FastMCP(
 )
 
 
-# AI: Move to owid_mcp/server.py
 class RequestLoggingMiddleware(Middleware):
     async def on_message(self, context: MiddlewareContext, call_next):
         attributes = {

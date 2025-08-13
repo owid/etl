@@ -6,7 +6,12 @@ import httpx
 import structlog
 from fastmcp import FastMCP
 
-from owid_mcp.config import DATASETTE_BASE, HTTP_TIMEOUT, MAX_ROWS_DEFAULT, OWID_API_BASE
+from owid_mcp.config import (
+    DATASETTE_BASE,
+    HTTP_TIMEOUT,
+    MAX_ROWS_DEFAULT,
+    OWID_API_BASE,
+)
 from owid_mcp.data_utils import build_catalog_info, build_rows, fetch_json
 from owid_mcp.data_utils import run_sql as _run_sql
 
@@ -61,19 +66,23 @@ async def search_indicator(query: str, limit: int = 10) -> List[Dict]:
     Check the sql_template in metadata for the correct column name format.
     """
     log.info("Searching indicators", query=query, limit=limit)
-    
+
     # Warn if query is too complex
     word_count = len(query.split())
     if word_count > 2:
-        log.warning(f"Query '{query}' has {word_count} words. Consider simpler terms like 'coal' or 'temperature' for better results.")
+        log.warning(
+            f"Query '{query}' has {word_count} words. Consider simpler terms like 'coal' or 'temperature' for better results."
+        )
         # Return helpful error for overly complex queries
-        return [{
-            "title": f"Error: Query too complex ({word_count} words)",
-            "indicator_id": 0,
-            "snippet": f"Please use 1-2 simple words instead of '{query}'. Try 'coal' instead of 'coal production mining'.",
-            "score": 0.0,
-            "metadata": {"error": True}
-        }]
+        return [
+            {
+                "title": f"Error: Query too complex ({word_count} words)",
+                "indicator_id": 0,
+                "snippet": f"Please use 1-2 simple words instead of '{query}'. Try 'coal' instead of 'coal production mining'.",
+                "score": 0.0,
+                "metadata": {"error": True},
+            }
+        ]
 
     sql = """
     SELECT
@@ -143,13 +152,15 @@ async def run_sql(query: str, max_rows: int = MAX_ROWS_DEFAULT) -> Dict[str, Any
     Returns
     -------
     dict
-        {"columns": [...], "rows": [[...], ...]}
+        {"csv": "actual csv content", "source": datasette_csv_url}
     """
     return await _run_sql(query, max_rows)
 
 
 @mcp.tool
-async def fetch_indicator_data(indicator_id: int, entity: str | None = None) -> Dict[str, Any]:
+async def fetch_indicator_data(
+    indicator_id: int, entity: str | None = None
+) -> Dict[str, Any]:
     """Fetch OWID indicator data and metadata.
 
     Args:
@@ -169,11 +180,14 @@ async def fetch_indicator_data(indicator_id: int, entity: str | None = None) -> 
     # Fetch OWID raw data + metadata concurrently
     data_url = f"{OWID_API_BASE}/{indicator_id}.data.json"
     meta_url = f"{OWID_API_BASE}/{indicator_id}.metadata.json"
-    data_json, metadata = await asyncio.gather(fetch_json(data_url), fetch_json(meta_url))
+    data_json, metadata = await asyncio.gather(
+        fetch_json(data_url), fetch_json(meta_url)
+    )
 
     # Build mapping from numeric id -> {name, code}
     entities_meta = {
-        ent["id"]: {"name": ent["name"], "code": ent["code"]} for ent in metadata["dimensions"]["entities"]["values"]
+        ent["id"]: {"name": ent["name"], "code": ent["code"]}
+        for ent in metadata["dimensions"]["entities"]["values"]
     }
 
     rows = build_rows(data_json, entities_meta)
@@ -188,7 +202,11 @@ async def fetch_indicator_data(indicator_id: int, entity: str | None = None) -> 
             else:
                 # Check if entity matches any code in entities_meta
                 for ent_meta in entities_meta.values():
-                    if ent_meta["code"] and ent_meta["code"].lower() == ent_lower and ent_meta["name"] == r["entity"]:
+                    if (
+                        ent_meta["code"]
+                        and ent_meta["code"].lower() == ent_lower
+                        and ent_meta["name"] == r["entity"]
+                    ):
                         filtered_rows.append(r)
                         break
         rows = filtered_rows
