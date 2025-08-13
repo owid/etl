@@ -15,7 +15,7 @@ def run() -> None:
     ds_meadow = paths.load_dataset("ilostat")
 
     # Read table from meadow dataset.
-    tb = ds_meadow.read("ilostat")
+    tb = ds_meadow.read("ilostat", safe_types=False)
 
     #
     # Process data.
