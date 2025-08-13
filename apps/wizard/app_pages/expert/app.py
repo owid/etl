@@ -187,9 +187,6 @@ with st.expander(f"**Model** :gray[(default is {MODEL_DEFAULT})]", icon=":materi
         with st.popover("Examples"):
             for example in EXAMPLE_QUERIES:
                 st.markdown(example)
-        with st.popover("Prompt"):
-            prompt = get_system_prompt()
-            st.text(prompt)
 
     # Sidebar with GPT config
     st.session_state.analytics = st.session_state.get("analytics", True)
@@ -247,11 +244,15 @@ with st.expander(f"**Model** :gray[(default is {MODEL_DEFAULT})]", icon=":materi
             help="If checked, only the last user message will be accounted (i.e less tokens and therefore cheaper).",
         )
 
-    st.button(
-        label=":material/restart_alt: Clear chat",
-        on_click=reset_messages,
-        # type="tertiary",
-    )
+    with st.container(horizontal=True, vertical_alignment="bottom"):
+        st.button(
+            label=":material/restart_alt: Clear chat",
+            on_click=reset_messages,
+            # type="tertiary",
+        )
+        with st.popover("Inspect system prompt", icon=":material/text_snippet:"):
+            prompt = get_system_prompt()
+            st.text(prompt)
 
 
 with container_chat:

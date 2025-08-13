@@ -18,7 +18,7 @@ load_env()
 
 ######### SYSTEM PROMPTS #########
 # Analytics
-# @st.cache_data(ttl=60 * 5, show_spinner="Loading analytics documentation...", show_time=True)
+@st.cache_data(ttl=60 * 5, show_spinner="Loading analytics documentation...", show_time=True)
 def cached_docs():
     """Cache the analytics documentation (5 minutes)."""
     from apps.wizard.app_pages.expert.read_analytics import get_analytics_db_docs_as_text
@@ -38,8 +38,13 @@ Database Expert is designed to effectively utilize the provided database schema,
 
 The schema is provided in yaml below. The top level array represents the tables, with a "name" field and an optional "description" field. The columns are listed under the "columns" key, and also have a "name" field and an optional "description" field. There are some descriptions that will have the string "TODO". These are placeholders for future documentation, but for now we don't have it.
 
+```
 {ANALYTICS_DOCS}
+```
 
+Your job is to create a SQL query for the user that answers their question given the schema above. You may ask the user for clarification, e.g. if it is unclear if unpublished items should be included (when applicable) or if there is ambiguity in which tables to use to answer a question.
+
+Upon generating a query, Database Expert will always provide the SQL query both as text and as a clickable Datasette link, formatted for the user's convenience. The datasette URL is http://analytics/private and the database name is owid. An example query to get all rows from the articles table is this one that demonstrates the escaping: `http://analytics/private?sql=select+*+from+articles` Remember, you cannot actually run the SQL query, you are just to output the query as text and a datasette link that will run that query!
 
 
 """
