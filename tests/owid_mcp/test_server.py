@@ -142,7 +142,7 @@ async def test_cherry_blossom_search_and_sql():
         assert len(csv_content) > 0
 
         # Parse CSV to check structure
-        lines = csv_content.strip().split('\n')
+        lines = csv_content.strip().split("\n")
         assert len(lines) > 1  # Should have header + data
 
         # Check header contains expected columns
@@ -174,12 +174,12 @@ async def test_run_sql_basic():
         # Check basic structure
         csv_content = result_data["csv"]
         assert len(csv_content) > 0
-        
+
         # Parse CSV to check structure
-        lines = csv_content.strip().split('\n')
+        lines = csv_content.strip().split("\n")
         assert len(lines) > 1  # Should have header + data
         assert len(lines) <= 6  # Header + max 5 rows
-        
+
         # Check header
         header = lines[0]
         assert header.strip() == "id,name"
