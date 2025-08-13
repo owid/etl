@@ -68,7 +68,7 @@ def get_analytics_db_docs(max_workers: int = 10) -> List[Dict[str, Any]]:
         try:
             # Try decoded_content first (faster)
             file_content = file_info.decoded_content.decode("utf-8")
-        except:
+        except Exception:
             # Fallback to API call
             file_content = repo.fetch_file_content(file_info.path, branch)
 
