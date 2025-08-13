@@ -204,7 +204,7 @@ async def _fetch_chart_data_internal(id: str, time: Optional[str] = None) -> Fet
             df = df.drop(columns=["Entity"])
 
     # Convert back to CSV string
-    processed_csv: str = df.to_csv(index=False)
+    processed_csv: str = df.to_csv(index=False)  # type: ignore
 
     slug = urllib.parse.urlparse(id).path.rsplit("/", 1)[-1].split(".")[0]
     title = slug.replace("-", " ").title() if slug else "OWID Dataset"

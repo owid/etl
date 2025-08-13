@@ -142,9 +142,7 @@ def _build_post_result(slug: str, title: str, excerpt: str, typ: str) -> Dict[st
 
 
 @mcp.tool
-async def search_posts(
-    query: str, limit: int = 10, use_algolia: bool = True
-) -> Dict[str, Any]:
+async def search_posts(query: str, limit: int = 10, use_algolia: bool = True) -> Dict[str, Any]:
     """
     Search for articles and data insights by title or content.
 

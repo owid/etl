@@ -5,12 +5,8 @@ import os
 import httpx
 
 # Base URLs
-DATASETTE_BASE = os.getenv(
-    "OWID_DATASETTE_BASE", "https://datasette-public.owid.io/owid.json"
-)
-OWID_API_BASE = os.getenv(
-    "OWID_API_BASE", "https://api.ourworldindata.org/v1/indicators"
-)
+DATASETTE_BASE = os.getenv("OWID_DATASETTE_BASE", "https://datasette-public.owid.io/owid.json")
+OWID_API_BASE = os.getenv("OWID_API_BASE", "https://api.ourworldindata.org/v1/indicators")
 GRAPHER_BASE = os.getenv("GRAPHER_BASE", "https://ourworldindata.org/grapher")
 CATALOG_BASE = os.getenv("CATALOG_BASE", "https://catalog.ourworldindata.org")
 

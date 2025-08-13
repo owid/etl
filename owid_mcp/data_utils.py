@@ -45,14 +45,7 @@ def _load_regions_mapping() -> Dict[str, str]:
 
     # Path to the regions file
     regions_file = (
-        Path(__file__).parent.parent
-        / "etl"
-        / "steps"
-        / "data"
-        / "garden"
-        / "regions"
-        / "2023-01-01"
-        / "regions.yml"
+        Path(__file__).parent.parent / "etl" / "steps" / "data" / "garden" / "regions" / "2023-01-01" / "regions.yml"
     )
 
     mapping: Dict[str, str] = {}
@@ -93,9 +86,7 @@ def country_name_to_iso3(name: Optional[str]) -> Optional[str]:
     return mapping.get(name.lower())
 
 
-async def _make_algolia_request_base(
-    request_config: Dict[str, Any], log_prefix: str
-) -> List[Dict[str, Any]]:
+async def _make_algolia_request_base(request_config: Dict[str, Any], log_prefix: str) -> List[Dict[str, Any]]:
     """Base function for making Algolia API requests.
 
     Args:
@@ -162,27 +153,27 @@ async def make_algolia_request(query: str, limit: int = 10) -> List[Dict[str, An
 
 def parse_csv_to_structured(csv_content: str) -> Dict[str, Any]:
     """Parse CSV content into structured data with columns and rows.
-    
+
     Args:
         csv_content: CSV text content
-        
+
     Returns:
         Dict with "columns" (list of column names) and "rows" (list of lists)
     """
     if not csv_content.strip():
         return {"columns": [], "rows": []}
-    
+
     # Use csv module to properly parse CSV content
     reader = csv.reader(io.StringIO(csv_content))
     rows = list(reader)
-    
+
     if not rows:
         return {"columns": [], "rows": []}
-    
+
     # First row contains column names
     columns = rows[0]
     data_rows = rows[1:] if len(rows) > 1 else []
-    
+
     return {"columns": columns, "rows": data_rows}
 
 
@@ -313,9 +304,7 @@ def smart_round(value: float | None) -> float | None:
         return round(value)
 
 
-def build_rows(
-    data_json: Dict[str, Any], entities_meta: Dict[int, Dict[str, str]]
-) -> List[Dict[str, Any]]:
+def build_rows(data_json: Dict[str, Any], entities_meta: Dict[int, Dict[str, str]]) -> List[Dict[str, Any]]:
     """Convert the compact OWID arrays into a list[{entity, year, value}]."""
 
     values = data_json["values"]
@@ -391,9 +380,8 @@ def build_catalog_info(catalog_path: str) -> Dict[str, str]:
     )
 
     parquet_url = f"{CATALOG_BASE}/{channel}/{namespace}/{version}/{dataset_slug}/{table_name}.parquet"
-    sql_tpl = (
-        "SELECT country, year, {col} FROM '{url}' "
-        "WHERE country = '??' LIMIT 100".format(col=column, url=parquet_url)
+    sql_tpl = "SELECT country, year, {col} FROM '{url}' " "WHERE country = '??' LIMIT 100".format(
+        col=column, url=parquet_url
     )
     return {
         "parquet_url": parquet_url,

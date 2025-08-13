@@ -111,7 +111,7 @@ async def fetch_chart_data(id: str, time: Optional[str] = None, countries: Optio
             df = df.drop(columns=["Entity"])
 
     # Convert back to CSV string
-    processed_csv: str = df.to_csv(index=False)
+    processed_csv: str = df.to_csv(index=False)  # type: ignore
 
     return ChartDataResult(
         id=id,

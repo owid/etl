@@ -158,9 +158,7 @@ async def run_sql(query: str, max_rows: int = MAX_ROWS_DEFAULT) -> Dict[str, Any
 
 
 @mcp.tool
-async def fetch_indicator_data(
-    indicator_id: int, entity: str | None = None
-) -> Dict[str, Any]:
+async def fetch_indicator_data(indicator_id: int, entity: str | None = None) -> Dict[str, Any]:
     """Fetch OWID indicator data and metadata.
 
     Args:
@@ -180,14 +178,11 @@ async def fetch_indicator_data(
     # Fetch OWID raw data + metadata concurrently
     data_url = f"{OWID_API_BASE}/{indicator_id}.data.json"
     meta_url = f"{OWID_API_BASE}/{indicator_id}.metadata.json"
-    data_json, metadata = await asyncio.gather(
-        fetch_json(data_url), fetch_json(meta_url)
-    )
+    data_json, metadata = await asyncio.gather(fetch_json(data_url), fetch_json(meta_url))
 
     # Build mapping from numeric id -> {name, code}
     entities_meta = {
-        ent["id"]: {"name": ent["name"], "code": ent["code"]}
-        for ent in metadata["dimensions"]["entities"]["values"]
+        ent["id"]: {"name": ent["name"], "code": ent["code"]} for ent in metadata["dimensions"]["entities"]["values"]
     }
 
     rows = build_rows(data_json, entities_meta)
@@ -202,11 +197,7 @@ async def fetch_indicator_data(
             else:
                 # Check if entity matches any code in entities_meta
                 for ent_meta in entities_meta.values():
-                    if (
-                        ent_meta["code"]
-                        and ent_meta["code"].lower() == ent_lower
-                        and ent_meta["name"] == r["entity"]
-                    ):
+                    if ent_meta["code"] and ent_meta["code"].lower() == ent_lower and ent_meta["name"] == r["entity"]:
                         filtered_rows.append(r)
                         break
         rows = filtered_rows
