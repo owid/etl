@@ -36,7 +36,7 @@ def generate_documentation(pages_md: List[str]) -> str:
 
 
 ######### SYSTEM PROMPTS #########
-NOTE = """To help you with this task, find below the required ETL documentation. Each documentation page is separated by '{PAGE_SEPARATOR}', followed by the path to the page "_page: <page_path>_". The documentation content is given as markdown text (suitable for mkdocs).
+NOTE = f"""To help you with this task, find below the required ETL documentation. Each documentation page is separated by '{PAGE_SEPARATOR}', followed by the path to the page "_page: <page_path>_" (or documentation file). The documentation content is mostly given as markdown text (suitable for mkdocs).
 """
 # ONLY METADATA
 ## Metadata reference
@@ -628,8 +628,7 @@ Upon generating a query, Datasette Oracle will always provide the SQL query both
 
 # GENERIC
 
-SYSTEM_PROMPT_GENERIC = f"""
-{NOTE}
+SYSTEM_PROMPT_GENERIC = f"""{NOTE}
 
 {PAGES_TEXT}
 

@@ -184,9 +184,12 @@ with st.expander(f"**Model** :gray[(default is {MODEL_DEFAULT})]", icon=":materi
                 "> Is the following snapshot title correct? 'Cherry Blossom Full Blook Dates in Kyoto, Japan'",
                 "> What is the difference between an Origin and Dataset?",
             ]
-        with st.popover("See examples"):
+        with st.popover("Examples"):
             for example in EXAMPLE_QUERIES:
                 st.markdown(example)
+        with st.popover("Prompt"):
+            prompt = get_system_prompt()
+            st.text(prompt)
 
     # Sidebar with GPT config
     st.session_state.analytics = st.session_state.get("analytics", True)

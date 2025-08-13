@@ -97,7 +97,7 @@ def get_analytics_db_docs(max_workers: int = 10) -> List[Dict[str, Any]]:
     return yaml_contents
 
 
-def get_analytics_db_docs_as_text() -> str:
+def get_analytics_db_docs_as_text(max_workers: int = 10) -> str:
     """
     Read analytics semantic YAML files and return them as a single YAML string.
 
@@ -105,7 +105,7 @@ def get_analytics_db_docs_as_text() -> str:
         YAML string containing all table documentation
     """
     # Get the transformed data
-    tables_data = get_analytics_db_docs()
+    tables_data = get_analytics_db_docs(max_workers)
 
     # Convert back to YAML string
     return yaml.dump(tables_data, default_flow_style=False, sort_keys=False, indent=2)
