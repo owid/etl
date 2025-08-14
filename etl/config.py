@@ -264,11 +264,12 @@ DEFAULT_GRAPHER_SCHEMA = "https://files.ourworldindata.org/schemas/grapher-schem
 GOOGLE_APPLICATION_CREDENTIALS = env.get("GOOGLE_APPLICATION_CREDENTIALS")
 
 
-def enable_sentry() -> None:
+def enable_sentry(enable_logs: bool = False) -> None:
     if SENTRY_DSN:
-        sentry_sdk.init(
-            dsn=SENTRY_DSN,
-        )
+        if enable_logs:
+            sentry_sdk.init(dsn=SENTRY_DSN, _experiments={"enable_logs": True})
+        else:
+            sentry_sdk.init(dsn=SENTRY_DSN)
 
 
 # Wizard config
