@@ -18,6 +18,7 @@ def _transform_table_docs_yaml(yaml_data: Dict[str, Any], tb_name: str) -> Dict[
 
     Args:
         yaml_data: Raw YAML data dictionary
+        tb_name: Name of the table being transformed
 
     Returns:
         Transformed dictionary with keys: name, description, fields
