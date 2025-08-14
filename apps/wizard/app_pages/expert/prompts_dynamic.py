@@ -1,4 +1,4 @@
-""" "Get prompts for GPT-interaction."""
+"""Get prompts for GPT-interaction."""
 
 import glob
 
