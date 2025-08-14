@@ -67,6 +67,16 @@ MODELS_AVAILABLE_LIST = list(MODELS_AVAILABLE.keys())
 # Some models don't support certain arguments (I think these are the "mini" ones)
 MODELS_DIFFERENT_API = {"o4-mini", "gpt-5", "gpt-5-mini"}
 
+########### MODELS (PyDantic AI)
+# See all of them in https://github.com/pydantic/pydantic-ai/blob/master/pydantic_ai_slim/pydantic_ai/models/__init__.py
+MODELS_PYDANTIC = {
+    'openai:gpt-5': "GPT-5",
+    'openai:gpt-5-mini': "GPT-5 mini",
+    'openai:gpt-4o': "GPT-4o",
+    'openai:o3': "GPT o3",
+    'anthropic:claude-sonnet-4-0': "Claude Sonnet 4.0",
+    'google-gla:gemini-2.5-flash': "Gemini 2.5 Flash",
+}
 
 # CATEGORY FOR CHAT
 # Chat category-switching
@@ -163,8 +173,8 @@ def config_model():
     # Model
     model_name = st.selectbox(
         label=":material/memory: Select model",
-        options=MODELS_AVAILABLE_LIST,
-        format_func=lambda x: MODELS_AVAILABLE[x],
+        options=list(MODELS_PYDANTIC.keys()),
+        format_func=lambda x: MODELS_PYDANTIC[x],
         index=MODELS_AVAILABLE_LIST.index(MODEL_DEFAULT),
         help="[Pricing](https://openai.com/api/pricing) | [Model list](https://platform.openai.com/docs/models/)",
     )
@@ -181,7 +191,7 @@ def config_model():
     )
     # Temperature
     if model_name not in MODELS_DIFFERENT_API:
-        temperature = st.slider(
+        temperature = st.number_input(
             "Temperature",
             min_value=0.0,
             max_value=2.0,
@@ -193,7 +203,7 @@ def config_model():
         temperature = 1.0
     # Reduced context
     use_reduced_context = st.toggle(
-        "Reduced context",
+        "Low context",
         value=False,
         help="If checked, only the last user message will be accounted (i.e less tokens and therefore cheaper).",
     )
@@ -234,8 +244,13 @@ with st.expander(f"**Model** :gray[(default is {MODEL_DEFAULT})]", icon=":materi
 # CHAT INTERFACE
 with container_chat:
     # Pydantic AI Agent
+    # agent = Agent(
+    #     model=st.session_state["expert_config"]["model_name"],
+    #     system_prompt=get_system_prompt(),
+    # )
+
     agent = Agent(
-        "openai:gpt-4o",
+        model="openai:gpt-5-mini",
         system_prompt=get_system_prompt(),
     )
 
@@ -266,7 +281,7 @@ with container_chat:
     # React to user input
     if prompt := st.chat_input("Ask me any question!"):
         st.session_state.feedback_key += 1
-        print("Agent working...")
+        st.toast("Agent working...", icon=":material/robot:")
         # Display user message in chat message container
         with container_response:
             with st.chat_message("user", avatar=":material/person:"):
@@ -288,16 +303,34 @@ with container_chat:
                 start_time = time.time()
 
                 # Put agent to work
-                def agent_stream():
-                    stream = agent.run_stream(prompt)
-                    for message in stream:
-                        if message is not None:
-                            yield message
+                async def agent_stream():
+                    async with agent.run_stream(prompt) as result:
+                        # """Stream agent response."""
+                        # Yield each message from the stream
+                        async for message in result.stream_text(delta=True):
+                            if message is not None:
+                                yield message
 
-                text = agent.run_sync(prompt)
+                    # At the very end, after the streaming is complete
+                    # Capture the usage information in session state
+                    if hasattr(result, 'usage'):
+                        st.session_state['last_usage'] = result.usage()
 
-                st.text(text)
-                # st.session_state.response = cast(str, st.write_stream(agent_stream))
+                # text = agent.run_sync(prompt)
+
+                # st.text(text)
+                st.session_state.response = cast(str, st.write_stream(agent_stream))
+
+                if 'last_usage' in st.session_state:
+                    st.info(st.session_state['last_usage'])
+                # We'll gather partial text to show incrementally
+                # partial_text = ""
+                # message_placeholder = st.empty()
+
+                # # Render partial text as it arrives
+                # async for chunk in result.stream_text(delta=True):
+                #     partial_text += chunk
+                #     message_placeholder.markdown(partial_text)
 
                 # End timer and store duration
                 end_time = time.time()
@@ -311,21 +344,22 @@ with container_chat:
 
             print("finished asking GPT...")
 
-    if st.session_state.response:
-        # Get cost & tokens
-        text_in = "\n".join([m["content"] for m in st.session_state.messages])
-        cost, num_tokens = get_cost_and_tokens(
-            text_in, st.session_state.response, cast(str, st.session_state["expert_config"]["model_name"])
-        )
 
-        # Format response time
-        response_time = getattr(st.session_state, "response_time", 0)
-        time_msg = f"⏱️ {response_time:.2f}s"
+    # if st.session_state.response:
+    #     # Get cost & tokens
+    #     text_in = "\n".join([m["content"] for m in st.session_state.messages])
+    #     cost, num_tokens = get_cost_and_tokens(
+    #         text_in, st.session_state.response, cast(str, st.session_state["expert_config"]["model_name"])
+    #     )
 
-        cost_msg = f"≥{cost:.4f} USD (≥{num_tokens:,} tokens), {time_msg}, using **{MODELS_AVAILABLE[st.session_state['model_name']]}**"
-        st.session_state.cost_last = cost
+    #     # Format response time
+    #     response_time = getattr(st.session_state, "response_time", 0)
+    #     time_msg = f"⏱️ {response_time:.2f}s"
 
-        # Show cost below feedback
-        with container_response:
-            with st.container(horizontal=True, horizontal_alignment="right"):
-                st.markdown(f":blue-badge[:small[:material/paid: {cost_msg}]]")
+    #     cost_msg = f"≥{cost:.4f} USD (≥{num_tokens:,} tokens), {time_msg}, using **{MODELS_AVAILABLE[st.session_state['model_name']]}**"
+    #     st.session_state.cost_last = cost
+
+    #     # Show cost below feedback
+    #     with container_response:
+    #         with st.container(horizontal=True, horizontal_alignment="right"):
+    #             st.markdown(f":blue-badge[:small[:material/paid: {cost_msg}]]")
