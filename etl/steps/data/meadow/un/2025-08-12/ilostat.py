@@ -44,17 +44,17 @@ def run() -> None:
     # Improve tables format.
     tables = [
         tb.format(["ref_area", "source", "indicator", "sex", "classif1", "classif2", "time"]),
-        tb_toc_country.format(["id"]),
-        tb_dic_classif1.format(["classif1"]),
-        tb_dic_classif2.format(["classif2"]),
-        tb_dic_indicator.format(["indicator"]),
-        tb_dic_note_classif.format(["note_classif"]),
-        tb_dic_note_indicator.format(["note_indicator"]),
-        tb_dic_note_source.format(["note_source"]),
-        tb_dic_obs_status.format(["obs_status"]),
-        tb_dic_ref_area.format(["ref_area"]),
-        tb_dic_sex.format(["sex"]),
-        tb_dic_source.format(["source"]),
+        tb_toc_country.format(["id"], short_name="table_of_contents_country"),
+        tb_dic_classif1.format(["classif1"], short_name="dictionary_classif1"),
+        tb_dic_classif2.format(["classif2"], short_name="dictionary_classif2"),
+        tb_dic_indicator.format(["indicator"], short_name="dictionary_indicator"),
+        tb_dic_note_classif.format(["note_classif"], short_name="dictionary_note_classif"),
+        tb_dic_note_indicator.format(["note_indicator"], short_name="dictionary_note_indicator"),
+        tb_dic_note_source.format(["note_source"], short_name="dictionary_note_source"),
+        tb_dic_obs_status.format(["obs_status"], short_name="dictionary_obs_status"),
+        tb_dic_ref_area.format(["ref_area"], short_name="dictionary_ref_area"),
+        tb_dic_sex.format(["sex"], short_name="dictionary_sex"),
+        tb_dic_source.format(["source"], short_name="dictionary_source"),
     ]
 
     #
