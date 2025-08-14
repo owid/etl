@@ -17,7 +17,7 @@ log = structlog.get_logger()
 
 
 class ChartDataResult(BaseModel):
-    """Chart data fetch result........"""
+    """Chart data fetch result."""
 
     id: str  # unique ID for the document or search result item
     # title: str  # string title for the search result item
