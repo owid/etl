@@ -250,7 +250,7 @@ with container_chat:
     # )
 
     agent = Agent(
-        model="openai:gpt-5-mini",
+        model=st.session_state["expert_config"]["model_name"],
         system_prompt=get_system_prompt(),
     )
 
@@ -281,7 +281,6 @@ with container_chat:
     # React to user input
     if prompt := st.chat_input("Ask me any question!"):
         st.session_state.feedback_key += 1
-        st.toast("Agent working...", icon=":material/robot:")
         # Display user message in chat message container
         with container_response:
             with st.chat_message("user", avatar=":material/person:"):
@@ -303,6 +302,7 @@ with container_chat:
                 start_time = time.time()
 
                 # Put agent to work
+                st.toast(f"Agent working, model {agent.model.model_name}...", icon=":material/robot:")
                 async def agent_stream():
                     async with agent.run_stream(prompt) as result:
                         # """Stream agent response."""
@@ -323,6 +323,8 @@ with container_chat:
 
                 if 'last_usage' in st.session_state:
                     st.info(st.session_state['last_usage'])
+                    st.info(agent.model)
+                    st.info(agent.model.model_name)
                 # We'll gather partial text to show incrementally
                 # partial_text = ""
                 # message_placeholder = st.empty()
