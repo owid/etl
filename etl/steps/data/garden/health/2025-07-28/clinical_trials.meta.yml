@@ -193,9 +193,9 @@ tables:
         unit: trials
         short_unit: ""
         description_processing: |-
-          - {definitions.notes.completed_trials}
+          - This data comes from the [ClinicalTrials.gov](#dod:clinical-trials-gov) database. It only includes interventional clinical trials that are marked as "completed" and have a valid "completion date".
         description_key:
-          - "{definitions.notes.completed_trials}"
+          - This data comes from the [ClinicalTrials.gov](#dod:clinical-trials-gov) database. It only includes interventional clinical trials that are marked as "completed" and have a valid "completion date".
           - The purpose of a clinical trial refers to the main objective or goal of the study, such as testing a new treatment, comparing treatments, or understanding a disease.
           - Possible purposes include testing a new treatment (drug or device), improving diagnostics, preventing disease, or understanding a disease.
         description_from_producer: |-
@@ -245,7 +245,7 @@ tables:
       avg_study_length_days:
         title: Average study length by phase
         description_short: |
-          The median length of completed clinical trials by phase. The phase refers to the phase of drug development the drug is currently in ([early phase 1](#dod:early-phase-one-trial), [phase 1](#dod:phase-one-trial), [phase 2](#dod:phase-two-trial), [phase 3](#dod:phase-three-trial) or [phase 4](#dod:phase-four-trial)). The study length is the time from start date to completion date, given in days.
+          Median length of completed clinical trials by phase. The phase refers to the phase of drug development the drug is currently in ([early phase 1](#dod:early-phase-one-trial), [phase 1](#dod:phase-one-trial), [phase 2](#dod:phase-two-trial), [phase 3](#dod:phase-three-trial) or [phase 4](#dod:phase-four-trial)). The study length is the time from start date to completion date, given in days.
         unit: days
         short_unit: days
         description_processing: |-
@@ -254,7 +254,9 @@ tables:
         description_key:
           - "{definitions.notes.completed_trials}"
           - Clinical trials are conducted in different phases of the development of a new treatment or intervention, such as [early phase 1](#dod:early-phase-one-trial), [phase 1](#dod:phase-one-trial), [phase 2](#dod:phase-two-trial), [phase 3](#dod:phase-three-trial), or [phase 4](#dod:phase-four-trial).
+          - Early phase 1 trials are exploratory trials that test the effect of an intervention on the human body, often with a small number of participants. Not every treatment has an early phase 1 trial.
           - Phase 1 trials test the safety and dosage of a new treatment, phase 2 trials test the effectiveness and side effects, and phase 3 trials compare the new treatment to standard treatments.
+          - Phase 4 trials are conducted after a treatment has been approved and are used to monitor the long-term effects and side-effects of the treatment. Not every treatment has a phase 4 trial.
           - \"Phase 1/phase 2\" trials are a combination of phase 1 and phase 2 trials, and "phase 2/phase 3" trials are a combination of phase 2 and phase 3 trials.
           - The average length is calculated by taking the difference between the start date and completion date of each trial, grouped by phase and completion year.
   participants_per_year:
