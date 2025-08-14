@@ -73,6 +73,7 @@ dependencies = [
     "fastjsonschema>=2.21.1",
     "mediacloud>=4.4.0",
     "pyproj>=3.7.1",
+    "pydantic-ai>=0.4.3",
 ]
 
 [tool.uv.sources]
