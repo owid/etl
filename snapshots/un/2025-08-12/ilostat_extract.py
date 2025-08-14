@@ -21,13 +21,47 @@ To run this code from scratch,
 
 The entire script, with extraction and file generation takes about 20 minutes.
 
-When the code finishes, you will have the following file in this folder:
+When the code finishes, you will have the following files in this folder:
     - ilostat_data.parquet
+    - ilostat_dictionary_classif1.parquet
+    - ilostat_dictionary_classif2.parquet
+    - ilostat_dictionary_indicator.parquet
+    - ilostat_dictionary_note_classif.parquet
+    - ilostat_dictionary_note_indicator.parquet
+    - ilostat_dictionary_note_source.parquet
+    - ilostat_dictionary_obs_status.parquet
+    - ilostat_dictionary_ref_area.parquet
+    - ilostat_dictionary_sex.parquet
+    - ilostat_dictionary_source.parquet
+    - ilostat_table_of_contents_country.parquet
 
 Now you can run
-    etls ilostat --path-to-file snapshots/wb/{version}/ilostat_data.parquet
+    etls ilostat --path-to-file snapshots/un/2025-08-12/ilostat.parquet
+    etls ilostat_dictionary_classif1 --path-to-file snapshots/un/2025-08-12/ilostat_dictionary_classif1.parquet
+    etls ilostat_dictionary_classif2 --path-to-file snapshots/un/2025-08-12/ilostat_dictionary_classif2.parquet
+    etls ilostat_dictionary_indicator --path-to-file snapshots/un/2025-08-12/ilostat_dictionary_indicator.parquet
+    etls ilostat_dictionary_note_classif --path-to-file snapshots/un/2025-08-12/ilostat_dictionary_note_classif.parquet
+    etls ilostat_dictionary_note_indicator --path-to-file snapshots/un/2025-08-12/ilostat_dictionary_note_indicator.parquet
+    etls ilostat_dictionary_note_source --path-to-file snapshots/un/2025-08-12/ilostat_dictionary_note_source.parquet
+    etls ilostat_dictionary_obs_status --path-to-file snapshots/un/2025-08-12/ilostat_dictionary_obs_status.parquet
+    etls ilostat_dictionary_ref_area --path-to-file snapshots/un/2025-08-12/ilostat_dictionary_ref_area.parquet
+    etls ilostat_dictionary_sex --path-to-file snapshots/un/2025-08-12/ilostat_dictionary_sex.parquet
+    etls ilostat_dictionary_source --path-to-file snapshots/un/2025-08-12/ilostat_dictionary_source.parquet
+    etls ilostat_table_of_contents_country --path-to-file snapshots/un/2025-08-12/ilostat_table_of_contents_country.parquet
 
 You can delete the file after this.
+    rm -rf snapshots/un/2025-08-12/ilostat.parquet
+    rm -rf snapshots/un/2025-08-12/ilostat_dictionary_classif1.parquet
+    rm -rf snapshots/un/2025-08-12/ilostat_dictionary_classif2.parquet
+    rm -rf snapshots/un/2025-08-12/ilostat_dictionary_indicator.parquet
+    rm -rf snapshots/un/2025-08-12/ilostat_dictionary_note_classif.parquet
+    rm -rf snapshots/un/2025-08-12/ilostat_dictionary_note_indicator.parquet
+    rm -rf snapshots/un/2025-08-12/ilostat_dictionary_note_source.parquet
+    rm -rf snapshots/un/2025-08-12/ilostat_dictionary_obs_status.parquet
+    rm -rf snapshots/un/2025-08-12/ilostat_dictionary_ref_area.parquet
+    rm -rf snapshots/un/2025-08-12/ilostat_dictionary_sex.parquet
+    rm -rf snapshots/un/2025-08-12/ilostat_dictionary_source.parquet
+    rm -rf snapshots/un/2025-08-12/ilostat_table_of_contents_country.parquet
 
 """
 
@@ -90,8 +124,24 @@ DATASETS_TO_DROP = [
     "IRdata",
 ]
 
+# Define dictionaries to extract
+DICTIONARIES_TO_EXTRACT = [
+    "classif1",
+    "classif2",
+    "indicator",
+    "note_classif",
+    "note_indicator",
+    "note_source",
+    "obs_status",
+    "ref_area",
+    "sex",
+    "source",
+]
+
 
 def run() -> None:
+    export_dictionaries_and_table_of_contents()
+
     df = extract_all_files_and_concatenate()
 
     df = exclude_datasets(df)
@@ -200,6 +250,43 @@ def ilostat_table_of_contents(type: Literal["country", "indicator"]) -> pd.DataF
     return df
 
 
+def ilostat_dictionary(
+    type: Literal[
+        "classif1",
+        "classif2",
+        "indicator",
+        "note_classif",
+        "note_indicator",
+        "note_source",
+        "obs_status",
+        "ref_area",
+        "sex",
+        "source",
+    ],
+) -> pd.DataFrame:
+    """
+    Get dictionary tables from ILOSTAT
+    They provide more information about dimensional columns
+    """
+
+    url = f"https://rplumber.ilo.org/metadata/dic/?var={type}&lang=en&format=.parquet"
+
+    df = fetch_file(url)
+
+    # make sure the directory exists. If not, create it
+    Path(f"{CACHE_DIR}/ilostat_data").mkdir(parents=True, exist_ok=True)
+
+    # Save to parquet
+    df.to_parquet(
+        f"{CACHE_DIR}/ilostat_data/ilostat_table_of_contents_{type}.parquet",
+        index=False,
+    )
+
+    log.info(f"Dictionary extracted: {type}")
+
+    return df
+
+
 def extract_all_files_and_concatenate() -> pd.DataFrame:
     """
     Extract all files listed in the table of contents and concatenate them into a single DataFrame.
@@ -292,6 +379,24 @@ def exclude_datasets(df: pd.DataFrame) -> pd.DataFrame:
     log.info("DataFrame with excluded datasets saved to ilostat.parquet")
 
     return df
+
+
+def export_dictionaries_and_table_of_contents() -> None:
+    """
+    Export dictionaries that expand on the information provided on the main dataset.
+    Also export the table of content for countries, because it includes info on the ILO regions and subregions
+    """
+
+    # Export dictionaries
+    for dictionary in DICTIONARIES_TO_EXTRACT:
+        df = ilostat_dictionary(type=dictionary)
+        df.to_parquet(f"{PARENT_DIR}/ilostat_dictionary_{dictionary}.parquet", index=False)
+
+    # Export table of contents for countries
+    df_toc_country = ilostat_table_of_contents(type="country")
+    df_toc_country.to_parquet(f"{PARENT_DIR}/ilostat_table_of_contents_country.parquet", index=False)
+
+    log.info("Dictionaries and table of contents exported successfully")
 
 
 if __name__ == "__main__":
