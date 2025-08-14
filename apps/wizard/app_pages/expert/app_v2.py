@@ -70,13 +70,14 @@ MODELS_DIFFERENT_API = {"o4-mini", "gpt-5", "gpt-5-mini"}
 ########### MODELS (PyDantic AI)
 # See all of them in https://github.com/pydantic/pydantic-ai/blob/master/pydantic_ai_slim/pydantic_ai/models/__init__.py
 MODELS_PYDANTIC = {
-    'openai:gpt-5': "GPT-5",
-    'openai:gpt-5-mini': "GPT-5 mini",
-    'openai:gpt-4o': "GPT-4o",
-    'openai:o3': "GPT o3",
-    'anthropic:claude-sonnet-4-0': "Claude Sonnet 4.0",
-    'google-gla:gemini-2.5-flash': "Gemini 2.5 Flash",
+    "openai:gpt-5": "GPT-5",
+    "openai:gpt-5-mini": "GPT-5 mini",
+    "openai:gpt-4o": "GPT-4o",
+    "openai:o3": "GPT o3",
+    "anthropic:claude-sonnet-4-0": "Claude Sonnet 4.0",
+    "google-gla:gemini-2.5-flash": "Gemini 2.5 Flash",
 }
+
 
 # CATEGORY FOR CHAT
 # Chat category-switching
@@ -303,6 +304,7 @@ with container_chat:
 
                 # Put agent to work
                 st.toast(f"Agent working, model {agent.model.model_name}...", icon=":material/robot:")
+
                 async def agent_stream():
                     async with agent.run_stream(prompt) as result:
                         # """Stream agent response."""
@@ -313,16 +315,16 @@ with container_chat:
 
                     # At the very end, after the streaming is complete
                     # Capture the usage information in session state
-                    if hasattr(result, 'usage'):
-                        st.session_state['last_usage'] = result.usage()
+                    if hasattr(result, "usage"):
+                        st.session_state["last_usage"] = result.usage()
 
                 # text = agent.run_sync(prompt)
 
                 # st.text(text)
                 st.session_state.response = cast(str, st.write_stream(agent_stream))
 
-                if 'last_usage' in st.session_state:
-                    st.info(st.session_state['last_usage'])
+                if "last_usage" in st.session_state:
+                    st.info(st.session_state["last_usage"])
                     st.info(agent.model)
                     st.info(agent.model.model_name)
                 # We'll gather partial text to show incrementally
@@ -345,7 +347,6 @@ with container_chat:
             # st.session_state.prompt = prompt
 
             print("finished asking GPT...")
-
 
     # if st.session_state.response:
     #     # Get cost & tokens
