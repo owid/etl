@@ -29,7 +29,6 @@ help:
 	@echo '  make api   		Start the ETL API on port 8081'
 	@echo '  make fasttrack 	Start Fast-track on port 8082'
 	@echo '  make chart-sync 	Start Chart-sync on port 8083'
-	@echo '  make owid-mcp-setup 	Set up MCP servers for Claude from .mcp.json'
 	@echo '  make test      	Run all linting and unit tests'
 	@echo '  make test-all  	Run all linting and unit tests (including for modules in lib/)'
 	@echo '  make vscode-exclude-archived  Exclude archived steps from VSCode user settings'
