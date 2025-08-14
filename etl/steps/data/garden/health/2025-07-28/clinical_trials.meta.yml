@@ -6,7 +6,7 @@ definitions:
         # data goes further than that, but CT.gov has only been established in 2000 with data imported from 1997
         # also data for 2025 is not yet complete, so we limit the timeline to 1997-2024
         maxTime: 2024
-        timelineMinTime: 1997
+        timelineMinTime: 2000
         timelineMaxTime: 2024
         note: |-
           ClinicalTrials.gov was established in 2000 and data on trials starting before that is incomplete. There can also be a delay in registration, so latest years might not have complete data yet.
