@@ -71,3 +71,37 @@ class UpdateIndicatorRequest(BaseModel):
 
     class Config:
         extra = Extra.forbid
+
+
+class SemanticSearchRequest(BaseModel):
+    """JSON schema for semantic search request."""
+
+    query: str
+    limit: int = 10
+
+    class Config:
+        extra = Extra.forbid
+
+
+class SemanticSearchResult(BaseModel):
+    """JSON schema for individual semantic search result."""
+
+    title: str
+    indicator_id: int
+    snippet: str
+    score: float
+    metadata: Dict[str, Any]
+
+    class Config:
+        extra = Extra.forbid
+
+
+class SemanticSearchResponse(BaseModel):
+    """JSON schema for semantic search response."""
+
+    results: List[SemanticSearchResult]
+    query: str
+    total_results: int
+
+    class Config:
+        extra = Extra.forbid

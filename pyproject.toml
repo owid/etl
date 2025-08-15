@@ -119,7 +119,7 @@ dev-dependencies = [
 
 [project.optional-dependencies]
 api = [
-    "fastapi>=0.109.0",
+    "fastapi>=0.115.0",
     "uvicorn[standard]>=0.25.0",
     "slack-sdk>=3.26.2",
     "joblib>=1.3.2",
@@ -140,7 +140,13 @@ wizard = [
     # error: distribution torch==2.2.2 @ registry+https://pypi.org/simple can't be installed because it doesn't have a source distribution or wheel for the current platform
     "torch<2.3.0; python_version < '3.13'",
     "torch>=2.6.0; python_version >= '3.13'",
-    "sentence-transformers>=2.2.2",
+    # Compatible versions for huggingface ecosystem - pinned together for compatibility
+    # sentence-transformers 2.2.2 requires huggingface-hub >=0.15.1,<1.0.0
+    # transformers >=4.35.0 requires huggingface-hub >=0.30.0 (incompatible with cached_download import)
+    # huggingface-hub 0.25.0 is the latest version that supports deprecated imports like cached_download
+    "sentence-transformers==2.2.2",
+    "huggingface-hub==0.25.0",
+    "transformers<4.35.0",
     "moviepy>=2.1.1",
     "pandas-gbq>=0.25.0",
     "wfork-streamlit-profiler>=0.2.7",
