@@ -6,17 +6,6 @@ from typing import Any, Dict, List, Optional
 from apps.wizard.app_pages.indicator_search.data import Indicator, _get_data_indicators_from_db
 from apps.wizard.utils.embeddings import EmbeddingsModel, get_model
 
-
-def build_catalog_info(catalog_path: str) -> Dict[str, Any]:
-    """Extract catalog metadata from path."""
-    if not catalog_path or catalog_path == "NULL":
-        return {}
-
-    return {
-        "catalog_path": catalog_path,
-    }
-
-
 # Global variables to store preloaded data and initialization state
 _indicators: Optional[List[Indicator]] = None
 _embeddings_model: Optional[EmbeddingsModel[Indicator]] = None
@@ -66,8 +55,9 @@ def search_indicators(query: str, limit: int = 10) -> List[Dict[str, Any]]:
     # Format results
     results = []
     for indicator in sorted_indicators[:limit]:
-        meta = build_catalog_info(indicator.catalogPath)
-        meta["chart_count"] = indicator.n_charts
+        metadata: Dict[str, Any] = {"chart_count": indicator.n_charts}
+        if indicator.catalogPath and indicator.catalogPath != "NULL":
+            metadata["catalog_path"] = indicator.catalogPath
 
         results.append(
             {
@@ -75,7 +65,7 @@ def search_indicators(query: str, limit: int = 10) -> List[Dict[str, Any]]:
                 "indicator_id": indicator.variableId,
                 "snippet": (indicator.description or "")[:160],
                 "score": float(indicator.similarity or 0.0),
-                "metadata": meta,
+                "metadata": metadata,
             }
         )
 
