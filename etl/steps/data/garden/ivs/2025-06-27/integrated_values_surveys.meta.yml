@@ -972,18 +972,18 @@ tables:
         title: "It is important to this person to think up new ideas and be creative: Like me (aggregate)"
         description_short: '% of respondents replying "very much like me", "like me" or "somewhat like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to think up new ideas and be creative".'
         display:
-          name: "Like me: Important to think up new ideas"
+          name: "Very much like me/Like me/Somewhat like me: Important to think up new ideas"
           <<: *common-display
 
       not_like_me_agg_new_ideas:
         title: "It is important to this person to think up new ideas and be creative: Not like me (aggregate)"
         description_short: '% of respondents replying "not like me" or "not at all like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to think up new ideas and be creative".'
         display:
-          name: "Not like me: Important to think up new ideas"
+          name: "Not like me/Not at all like me: Important to think up new ideas"
           <<: *common-display
 
       very_much_like_me_new_ideas:
-        title: "It is important to this person to think up new ideas and be creative: Very much like me (aggregate)"
+        title: "It is important to this person to think up new ideas and be creative: Very much like me"
         description_short: '% of respondents replying "very much like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to think up new ideas and be creative".'
         display:
           name: "Very much like me: Important to think up new ideas"
@@ -1043,18 +1043,18 @@ tables:
         title: "It is important to this person to be rich: Like me (aggregate)"
         description_short: '% of respondents replying "very much like me", "like me" or "somewhat like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to be rich".'
         display:
-          name: "Like me: Important to be rich"
+          name: "Very much like me/Like me/Somewhat like me: Important to be rich"
           <<: *common-display
 
       not_like_me_agg_rich:
         title: "It is important to this person to be rich: Not like me (aggregate)"
         description_short: '% of respondents replying "not like me" or "not at all like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to be rich".'
         display:
-          name: "Not like me: Important to be rich"
+          name: "Not like me/Not at all like me: Important to be rich"
           <<: *common-display
 
       very_much_like_me_rich:
-        title: "It is important to this person to be rich: Very much like me (aggregate)"
+        title: "It is important to this person to be rich: Very much like me"
         description_short: '% of respondents replying "very much like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to be rich".'
         display:
           name: "Very much like me: Important to be rich"
@@ -1114,14 +1114,14 @@ tables:
         title: "It is important to this person living in secure surroundings: Like me (aggregate)"
         description_short: '% of respondents replying "very much like me", "like me" or "somewhat like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person living in secure surroundings".'
         display:
-          name: "Like me: Important living in secure surroundings"
+          name: "Very much like me/Like me/Somewhat like me: Important living in secure surroundings"
           <<: *common-display
 
       not_like_me_agg_secure:
         title: "It is important to this person living in secure surroundings: Not like me (aggregate)"
         description_short: '% of respondents replying "not like me" or "not at all like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person living in secure surroundings".'
         display:
-          name: "Not like me: Important living in secure surroundings"
+          name: "Not like me/Not at all like me: Important living in secure surroundings"
           <<: *common-display
 
       very_much_like_me_secure:
@@ -1185,14 +1185,14 @@ tables:
         title: "It is important to this person to have a good time: Like me (aggregate)"
         description_short: '% of respondents replying "very much like me", "like me" or "somewhat like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to have a good time".'
         display:
-          name: "Like me: Important to have a good time"
+          name: "Very much like me/Like me/Somewhat like me: Important to have a good time"
           <<: *common-display
 
       not_like_me_agg_good_time:
         title: "It is important to this person to have a good time: Not like me (aggregate)"
         description_short: '% of respondents replying "not like me" or "not at all like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to have a good time".'
         display:
-          name: "Not like me: Important to have a good time"
+          name: "Not like me/Not at all like me: Important to have a good time"
           <<: *common-display
 
       very_much_like_me_good_time:
@@ -1256,14 +1256,14 @@ tables:
         title: "It is important to this person to help the people nearby: Like me (aggregate)"
         description_short: '% of respondents replying "very much like me", "like me" or "somewhat like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to help the people nearby".'
         display:
-          name: "Like me: Important to help the people nearby"
+          name: "Very much like me/Like me/Somewhat like me: Important to help the people nearby"
           <<: *common-display
 
       not_like_me_agg_help_others:
         title: "It is important to this person to help the people nearby: Not like me (aggregate)"
         description_short: '% of respondents replying "not like me" or "not at all like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to help the people nearby".'
         display:
-          name: "Not like me: Important to help the people nearby"
+          name: "Not like me/Not at all like me: Important to help the people nearby"
           <<: *common-display
 
       very_much_like_me_help_others:
@@ -1327,14 +1327,14 @@ tables:
         title: "It is important to this person being very successful: Like me (aggregate)"
         description_short: '% of respondents replying "very much like me", "like me" or "somewhat like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person being very successful".'
         display:
-          name: "Like me: Important being very successful"
+          name: "Very much like me/Like me/Somewhat like me: Important being very successful"
           <<: *common-display
 
       not_like_me_agg_success:
         title: "It is important to this person being very successful: Not like me (aggregate)"
         description_short: '% of respondents replying "not like me" or "not at all like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person being very successful".'
         display:
-          name: "Not like me: Important being very successful"
+          name: "Not like me/Not at all like me: Important being very successful"
           <<: *common-display
 
       very_much_like_me_success:
@@ -1398,14 +1398,14 @@ tables:
         title: "It is important to this person adventure and taking risks: Like me (aggregate)"
         description_short: '% of respondents replying "very much like me", "like me" or "somewhat like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person adventure and taking risks".'
         display:
-          name: "Like me: Important taking risks"
+          name: "Very much like me/Like me/Somewhat like me: Important taking risks"
           <<: *common-display
 
       not_like_me_agg_risks:
         title: "It is important to this person adventure and taking risks: Not like me (aggregate)"
         description_short: '% of respondents replying "not like me" or "not at all like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person adventure and taking risks".'
         display:
-          name: "Not like me: Important taking risks"
+          name: "Not like me/Not at all like me: Important taking risks"
           <<: *common-display
 
       very_much_like_me_risks:
@@ -1469,14 +1469,14 @@ tables:
         title: "It is important to this person to always behave properly: Like me (aggregate)"
         description_short: '% of respondents replying "very much like me", "like me" or "somewhat like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to always behave properly".'
         display:
-          name: "Like me: Important to always behave properly"
+          name: "Very much like me/Like me/Somewhat like me: Important to always behave properly"
           <<: *common-display
 
       not_like_me_agg_behave:
         title: "It is important to this person to always behave properly: Not like me (aggregate)"
         description_short: '% of respondents replying "not like me" or "not at all like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to always behave properly".'
         display:
-          name: "Not like me: Important to always behave properly"
+          name: "Not like me/Not at all like me: Important to always behave properly"
           <<: *common-display
 
       very_much_like_me_behave:
@@ -1540,14 +1540,14 @@ tables:
         title: "It is important to this person looking after the environment: Like me (aggregate)"
         description_short: '% of respondents replying "very much like me", "like me" or "somewhat like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person looking after the environment".'
         display:
-          name: "Like me: Important looking after the environment"
+          name: "Very much like me/Like me/Somewhat like me: Important looking after the environment"
           <<: *common-display
 
       not_like_me_agg_respect_environment:
         title: "It is important to this person looking after the environment: Not like me (aggregate)"
         description_short: '% of respondents replying "not like me" or "not at all like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person looking after the environment".'
         display:
-          name: "Not like me: Important looking after the environment"
+          name: "Not like me/Not at all like me: Important looking after the environment"
           <<: *common-display
 
       very_much_like_me_respect_environment:
@@ -1611,14 +1611,14 @@ tables:
         title: "It is important to this person tradition: Like me (aggregate)"
         description_short: '% of respondents replying "very much like me", "like me" or "somewhat like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person tradition".'
         display:
-          name: "Like me: Important tradition"
+          name: "Very much like me/Like me/Somewhat like me: Important tradition"
           <<: *common-display
 
       not_like_me_agg_tradition:
         title: "It is important to this person tradition: Not like me (aggregate)"
         description_short: '% of respondents replying "not like me" or "not at all like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person tradition".'
         display:
-          name: "Not like me: Important tradition"
+          name: "Not like me/Not at all like me: Important tradition"
           <<: *common-display
 
       very_much_like_me_tradition:
@@ -1755,14 +1755,14 @@ tables:
         title: "Work is a duty towards society: Agree (aggregate)"
         description_short: '% of respondents replying "agree" or "strongly agree" when asked "Do you agree or disagree with the following statements? Work is a duty towards society".'
         display:
-          name: "Work is a duty towards society: Agree"
+          name: "Work is a duty towards society: Agree/Strongly agree"
           <<: *common-display
 
       disagree_agg_work_is_a_duty:
         title: "Work is a duty towards society: Disagree (aggregate)"
         description_short: '% of respondents replying "disagree" or "strongly disagree" when asked "Do you agree or disagree with the following statements? Work is a duty towards society".'
         display:
-          name: "Work is a duty towards society: Disagree"
+          name: "Work is a duty towards society: Disagree/Strongly disagree"
           <<: *common-display
 
       strongly_agree_work_is_a_duty:
@@ -1819,14 +1819,14 @@ tables:
         title: "Work should come first: Agree (aggregate)"
         description_short: '% of respondents replying "agree" or "strongly agree" when asked "Do you agree or disagree with the following statements? Work should always come first, even if it means less spare time".'
         display:
-          name: "Work should come first: Agree"
+          name: "Work should come first: Agree/Strongly agree"
           <<: *common-display
 
       disagree_agg_work_should_come_first:
         title: "Work should come first: Disagree (aggregate)"
         description_short: '% of respondents replying "disagree" or "strongly disagree" when asked "Do you agree or disagree with the following statements? Work should always come first, even if it means less spare time".'
         display:
-          name: "Work should come first: Disagree"
+          name: "Work should come first: Disagree/Strongly disagree"
           <<: *common-display
 
       strongly_agree_work_should_come_first:
@@ -1930,17 +1930,17 @@ tables:
 
 
       never_just_agg_claiming_benefits:
-        title: "Claiming government benefits to which you are not entitled: Never justifiable (aggregate)"
+        title: "Claiming government benefits to which you are not entitled: Not justifiable (aggregate)"
         description_short: '% of respondents replying 1 to 4 in a scale from 1 to 10 when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Claiming government benefits to which you are not entitled". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
-          name: "Claiming benefits: Never justifiable"
+          name: "Claiming benefits: Not justifiable"
           <<: *common-display
 
       always_just_agg_claiming_benefits:
-        title: "Claiming government benefits to which you are not entitled: Always justifiable (aggregate)"
+        title: "Claiming government benefits to which you are not entitled: Justifiable (aggregate)"
         description_short: '% of respondents replying 6 to 10 in a scale from 1 to 10 when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Claiming government benefits to which you are not entitled". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
-          name: "Claiming benefits: Always justifiable"
+          name: "Claiming benefits: Justifiable"
           <<: *common-display
 
       never_just_claiming_benefits:
@@ -1989,17 +1989,17 @@ tables:
 
 
       never_just_agg_stealing_property:
-        title: "Stealing property: Never justifiable (aggregate)"
+        title: "Stealing property: Not justifiable (aggregate)"
         description_short: '% of respondents replying 1 to 4 in a scale from 1 to 10 when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Stealing property". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
-          name: "Stealing property: Never justifiable"
+          name: "Stealing property: Not justifiable"
           <<: *common-display
 
       always_just_agg_stealing_property:
-        title: "Stealing property: Always justifiable (aggregate)"
+        title: "Stealing property: Justifiable (aggregate)"
         description_short: '% of respondents replying 6 to 10 in a scale from 1 to 10 when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Stealing property". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
-          name: "Stealing property: Always justifiable"
+          name: "Stealing property: Justifiable"
           <<: *common-display
 
       never_just_stealing_property:
@@ -2048,17 +2048,17 @@ tables:
 
 
       never_just_agg_parents_beating_children:
-        title: "Parents beating children: Never justifiable (aggregate)"
+        title: "Parents beating children: Not justifiable (aggregate)"
         description_short: '% of respondents replying 1 to 4 in a scale from 1 to 10 when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Parents beating their children". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
-          name: "Parents beating children: Never justifiable"
+          name: "Parents beating children: Not justifiable"
           <<: *common-display
 
       always_just_agg_parents_beating_children:
-        title: "Parents beating children: Always justifiable (aggregate)"
+        title: "Parents beating children: Justifiable (aggregate)"
         description_short: '% of respondents replying 6 to 10 in a scale from 1 to 10 when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Parents beating their children". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
-          name: "Parents beating children: Always justifiable"
+          name: "Parents beating children: Justifiable"
           <<: *common-display
 
       never_just_parents_beating_children:
@@ -2107,17 +2107,17 @@ tables:
 
 
       never_just_agg_violence_against_other_people:
-        title: "Violence against other people: Never justifiable (aggregate)"
+        title: "Violence against other people: Not justifiable (aggregate)"
         description_short: '% of respondents replying 1 to 4 in a scale from 1 to 10 when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Violence against other people". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
-          name: "Violence against other people: Never justifiable"
+          name: "Violence against other people: Not justifiable"
           <<: *common-display
 
       always_just_agg_violence_against_other_people:
-        title: "Violence against other people: Always justifiable (aggregate)"
+        title: "Violence against other people: Justifiable (aggregate)"
         description_short: '% of respondents replying 6 to 10 in a scale from 1 to 10 when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Violence against other people". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
-          name: "Violence against other people: Always justifiable"
+          name: "Violence against other people: Justifiable"
           <<: *common-display
 
       never_just_violence_against_other_people:
@@ -2166,17 +2166,17 @@ tables:
 
 
       never_just_agg_avoiding_fare_on_public_transport:
-        title: "Avoiding a fare on public transport: Never justifiable (aggregate)"
+        title: "Avoiding a fare on public transport: Not justifiable (aggregate)"
         description_short: '% of respondents replying 1 to 4 in a scale from 1 to 10 when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Avoiding a fare on public transport". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
-          name: "Avoiding a fare on public transport: Never justifiable"
+          name: "Avoiding a fare on public transport: Not justifiable"
           <<: *common-display
 
       always_just_agg_avoiding_fare_on_public_transport:
-        title: "Avoiding a fare on public transport: Always justifiable (aggregate)"
+        title: "Avoiding a fare on public transport: Justifiable (aggregate)"
         description_short: '% of respondents replying 6 to 10 in a scale from 1 to 10 when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Avoiding a fare on public transport". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
-          name: "Avoiding a fare on public transport: Always justifiable"
+          name: "Avoiding a fare on public transport: Justifiable"
           <<: *common-display
 
       never_just_avoiding_fare_on_public_transport:
@@ -2225,17 +2225,17 @@ tables:
 
 
       never_just_agg_cheating_on_taxes:
-        title: "Cheating on taxes: Never justifiable (aggregate)"
+        title: "Cheating on taxes: Not justifiable (aggregate)"
         description_short: '% of respondents replying 1 to 4 in a scale from 1 to 10 when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Cheating on taxes". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
-          name: "Cheating on taxes: Never justifiable"
+          name: "Cheating on taxes: Not justifiable"
           <<: *common-display
 
       always_just_agg_cheating_on_taxes:
-        title: "Cheating on taxes: Always justifiable (aggregate)"
+        title: "Cheating on taxes: Justifiable (aggregate)"
         description_short: '% of respondents replying 6 to 10 in a scale from 1 to 10 when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Cheating on taxes". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
-          name: "Cheating on taxes: Always justifiable"
+          name: "Cheating on taxes: Justifiable"
           <<: *common-display
 
       never_just_cheating_on_taxes:
@@ -2284,17 +2284,17 @@ tables:
 
 
       never_just_agg_accepting_a_bribe:
-        title: "Accepting a bribe in the course of their duties: Never justifiable (aggregate)"
+        title: "Accepting a bribe in the course of their duties: Not justifiable (aggregate)"
         description_short: '% of respondents replying 1 to 4 in a scale from 1 to 10 when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Accepting a bribe in the course of their duties". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
-          name: "Accepting a bribe: Never justifiable"
+          name: "Accepting a bribe: Not justifiable"
           <<: *common-display
 
       always_just_agg_accepting_a_bribe:
-        title: "Accepting a bribe in the course of their duties: Always justifiable (aggregate)"
+        title: "Accepting a bribe in the course of their duties: Justifiable (aggregate)"
         description_short: '% of respondents replying 6 to 10 in a scale from 1 to 10 when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Accepting a bribe in the course of their duties". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
-          name: "Accepting a bribe: Always justifiable"
+          name: "Accepting a bribe: Justifiable"
           <<: *common-display
 
       never_just_accepting_a_bribe:
@@ -2343,17 +2343,17 @@ tables:
 
 
       never_just_agg_homosexuality:
-        title: "Homosexuality: Never justifiable (aggregate)"
+        title: "Homosexuality: Not justifiable (aggregate)"
         description_short: '% of respondents replying 1 to 4 in a scale from 1 to 10 when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Homosexuality". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
-          name: "Homosexuality: Never justifiable"
+          name: "Homosexuality: Not justifiable"
           <<: *common-display
 
       always_just_agg_homosexuality:
-        title: "Homosexuality: Always justifiable (aggregate)"
+        title: "Homosexuality: Justifiable (aggregate)"
         description_short: '% of respondents replying 6 to 10 in a scale from 1 to 10 when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Homosexuality". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
-          name: "Homosexuality: Always justifiable"
+          name: "Homosexuality: Justifiable"
           <<: *common-display
 
       never_just_homosexuality:
@@ -2402,17 +2402,17 @@ tables:
 
 
       never_just_agg_prostitution:
-        title: "Prostitution: Never justifiable (aggregate)"
+        title: "Prostitution: Not justifiable (aggregate)"
         description_short: '% of respondents replying 1 to 4 in a scale from 1 to 10 when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Prostitution". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
-          name: "Prostitution: Never justifiable"
+          name: "Prostitution: Not justifiable"
           <<: *common-display
 
       always_just_agg_prostitution:
-        title: "Prostitution: Always justifiable (aggregate)"
+        title: "Prostitution: Justifiable (aggregate)"
         description_short: '% of respondents replying 6 to 10 in a scale from 1 to 10 when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Prostitution". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
-          name: "Prostitution: Always justifiable"
+          name: "Prostitution: Justifiable"
           <<: *common-display
 
       never_just_prostitution:
@@ -2461,17 +2461,17 @@ tables:
 
 
       never_just_agg_abortion:
-        title: "Abortion: Never justifiable (aggregate)"
+        title: "Abortion: Not justifiable (aggregate)"
         description_short: '% of respondents replying 1 to 4 in a scale from 1 to 10 when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Abortion". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
-          name: "Abortion: Never justifiable"
+          name: "Abortion: Not justifiable"
           <<: *common-display
 
       always_just_agg_abortion:
-        title: "Abortion: Always justifiable (aggregate)"
+        title: "Abortion: Justifiable (aggregate)"
         description_short: '% of respondents replying 6 to 10 in a scale from 1 to 10 when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Abortion". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
-          name: "Abortion: Always justifiable"
+          name: "Abortion: Justifiable"
           <<: *common-display
 
       never_just_abortion:
@@ -2520,17 +2520,17 @@ tables:
 
 
       never_just_agg_divorce:
-        title: "Divorce: Never justifiable (aggregate)"
+        title: "Divorce: Not justifiable (aggregate)"
         description_short: '% of respondents replying 1 to 4 in a scale from 1 to 10 when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Divorce". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
-          name: "Divorce: Never justifiable"
+          name: "Divorce: Not justifiable"
           <<: *common-display
 
       always_just_agg_divorce:
-        title: "Divorce: Always justifiable (aggregate)"
+        title: "Divorce: Justifiable (aggregate)"
         description_short: '% of respondents replying 6 to 10 in a scale from 1 to 10 when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Divorce". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
-          name: "Divorce: Always justifiable"
+          name: "Divorce: Justifiable"
           <<: *common-display
 
       never_just_divorce:
@@ -2579,17 +2579,17 @@ tables:
 
 
       never_just_agg_euthanasia:
-        title: "Euthanasia: Never justifiable (aggregate)"
+        title: "Euthanasia: Not justifiable (aggregate)"
         description_short: '% of respondents replying 1 to 4 in a scale from 1 to 10 when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Euthanasia". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
-          name: "Euthanasia: Never justifiable"
+          name: "Euthanasia: Not justifiable"
           <<: *common-display
 
       always_just_agg_euthanasia:
-        title: "Euthanasia: Always justifiable (aggregate)"
+        title: "Euthanasia: Justifiable (aggregate)"
         description_short: '% of respondents replying 6 to 10 in a scale from 1 to 10 when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Euthanasia". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
-          name: "Euthanasia: Always justifiable"
+          name: "Euthanasia: Justifiable"
           <<: *common-display
 
       never_just_euthanasia:
@@ -2638,17 +2638,17 @@ tables:
 
 
       never_just_agg_suicide:
-        title: "Suicide: Never justifiable (aggregate)"
+        title: "Suicide: Not justifiable (aggregate)"
         description_short: '% of respondents replying 1 to 4 in a scale from 1 to 10 when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Suicide". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
-          name: "Suicide: Never justifiable"
+          name: "Suicide: Not justifiable"
           <<: *common-display
 
       always_just_agg_suicide:
-        title: "Suicide: Always justifiable (aggregate)"
+        title: "Suicide: Justifiable (aggregate)"
         description_short: '% of respondents replying 10 in a scale from 1 to 10 when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Suicide". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
-          name: "Suicide: Always justifiable"
+          name: "Suicide: Justifiable"
           <<: *common-display
 
       never_just_suicide:
@@ -2697,17 +2697,17 @@ tables:
 
 
       never_just_agg_having_casual_sex:
-        title: "Having casual sex: Never justifiable (aggregate)"
+        title: "Having casual sex: Not justifiable (aggregate)"
         description_short: '% of respondents replying 1 to 4 in a scale from 1 to 10 when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Having casual sex". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
-          name: "Having casual sex: Never justifiable"
+          name: "Having casual sex: Not justifiable"
           <<: *common-display
 
       always_just_agg_having_casual_sex:
-        title: "Having casual sex: Always justifiable (aggregate)"
+        title: "Having casual sex: Justifiable (aggregate)"
         description_short: '% of respondents replying 10 in a scale from 1 to 10 when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Having casual sex". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
-          name: "Having casual sex: Always justifiable"
+          name: "Having casual sex: Justifiable"
           <<: *common-display
 
       never_just_having_casual_sex:
@@ -2756,17 +2756,17 @@ tables:
 
 
       never_just_agg_sex_before_marriage:
-        title: "Sex before marriage: Never justifiable (aggregate)"
+        title: "Sex before marriage: Not justifiable (aggregate)"
         description_short: '% of respondents replying 1 to 4 in a scale from 1 to 10 when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Sex before marriage". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
-          name: "Sex before marriage: Never justifiable"
+          name: "Sex before marriage: Not justifiable"
           <<: *common-display
 
       always_just_agg_sex_before_marriage:
-        title: "Sex before marriage: Always justifiable (aggregate)"
+        title: "Sex before marriage: Justifiable (aggregate)"
         description_short: '% of respondents replying 10 in a scale from 1 to 10 when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Sex before marriage". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
-          name: "Sex before marriage: Always justifiable"
+          name: "Sex before marriage: Justifiable"
           <<: *common-display
 
       never_just_sex_before_marriage:
@@ -2815,17 +2815,17 @@ tables:
 
 
       never_just_agg_invitro_fertilization:
-        title: "Invitro fertilization: Never justifiable (aggregate)"
+        title: "Invitro fertilization: Not justifiable (aggregate)"
         description_short: '% of respondents replying 1 to 4 in a scale from 1 to 10 when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Invitro fertilization". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
-          name: "Invitro fertilization: Never justifiable"
+          name: "Invitro fertilization: Not justifiable"
           <<: *common-display
 
       always_just_agg_invitro_fertilization:
-        title: "Invitro fertilization: Always justifiable (aggregate)"
+        title: "Invitro fertilization: Justifiable (aggregate)"
         description_short: '% of respondents replying 10 in a scale from 1 to 10 when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Invitro fertilization". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
-          name: "Invitro fertilization: Always justifiable"
+          name: "Invitro fertilization: Justifiable"
           <<: *common-display
 
       never_just_invitro_fertilization:
@@ -2874,17 +2874,17 @@ tables:
 
 
       never_just_agg_death_penalty:
-        title: "Death penalty: Never justifiable (aggregate)"
+        title: "Death penalty: Not justifiable (aggregate)"
         description_short: '% of respondents replying 1 to 4 in a scale from 1 to 10 when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Death penalty". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
-          name: "Death penalty: Never justifiable"
+          name: "Death penalty: Not justifiable"
           <<: *common-display
 
       always_just_agg_death_penalty:
-        title: "Death penalty: Always justifiable (aggregate)"
+        title: "Death penalty: Justifiable (aggregate)"
         description_short: '% of respondents replying 6 to 10 in a scale from 1 to 10 when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Death penalty". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
-          name: "Death penalty: Always justifiable"
+          name: "Death penalty: Justifiable"
           <<: *common-display
 
       never_just_death_penalty:
@@ -2933,17 +2933,17 @@ tables:
 
 
       never_just_agg_man_beating_wife:
-        title: "Man beating wife: Never justifiable (aggregate)"
+        title: "Man beating wife: Not justifiable (aggregate)"
         description_short: '% of respondents replying 1 to 4 in a scale from 1 to 10 when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Man beating wife". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
-          name: "Man beating wife: Never justifiable"
+          name: "Man beating wife: Not justifiable"
           <<: *common-display
 
       always_just_agg_man_beating_wife:
-        title: "Man beating wife: Always justifiable (aggregate)"
+        title: "Man beating wife: Justifiable (aggregate)"
         description_short: '% of respondents replying 6 to 10 in a scale from 1 to 10 when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Man beating wife". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
-          name: "Man beating wife: Always justifiable"
+          name: "Man beating wife: Justifiable"
           <<: *common-display
 
       never_just_man_beating_wife:
@@ -2992,17 +2992,17 @@ tables:
 
 
       never_just_agg_political_violence:
-        title: "Political violence: Never justifiable (aggregate)"
+        title: "Political violence: Not justifiable (aggregate)"
         description_short: '% of respondents replying 1 to 4 in a scale from 1 to 10 when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Political violence". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
-          name: "Political violence: Never justifiable"
+          name: "Political violence: Not justifiable"
           <<: *common-display
 
       always_just_agg_political_violence:
-        title: "Political violence: Always justifiable (aggregate)"
+        title: "Political violence: Justifiable (aggregate)"
         description_short: '% of respondents replying 6 to 10 in a scale from 1 to 10 when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Political violence". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
-          name: "Political violence: Always justifiable"
+          name: "Political violence: Justifiable"
           <<: *common-display
 
       never_just_political_violence:
@@ -3729,14 +3729,14 @@ tables:
         title: "Homosexual couples are as good parents as other couples: Agree (aggregate)"
         description_short: '% of respondents replying "strongly agree" or "agree" when asked "Do you agree, disagree or neither agree nor disagree with the following statements?" When the statement is "Homosexual couples are as good parents as other couples".'
         display:
-          name: "Homosexual couples are as good parents as other couples: Agree (aggregate)"
+          name: "Homosexual couples are as good parents as other couples: Agree/Strongly agree"
           <<: *common-display
 
       disagree_agg_homosx_prnts:
         title: "Homosexual couples are as good parents as other couples: Disagree (aggregate)"
         description_short: '% of respondents replying "strongly disagree" or "disagree" when asked "Do you agree, disagree or neither agree nor disagree with the following statements?" When the statement is "Homosexual couples are as good parents as other couples".'
         display:
-          name: "Homosexual couples are as good parents as other couples: Disagree (aggregate)"
+          name: "Homosexual couples are as good parents as other couples: Disagree/Strongly disagree"
           <<: *common-display
 
       strongly_agree_homosx_prnts:
@@ -4014,25 +4014,25 @@ tables:
         title: "Democracy - Governments tax the rich and subsidize the poor: Not essential (aggregate)"
         description_short: '% of respondents replying 1 to 4 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "Governments tax the rich and subsidize the poor". It also includes the answer "It is against democracy", spontaneously given by some respondents.'
         display:
-          name: "Governments tax the rich and subsidize the poor: Not essential (aggregate)"
+          name: "Governments tax the rich and subsidize the poor: Not essential for democracy"
           <<: *common-display
       essential_dem_agg_governments_tax_the_rich_and_subsidize_the_poor:
         title: "Democracy - Governments tax the rich and subsidize the poor: Essential (aggregate)"
         description_short: '% of respondents replying 6 to 10 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "Governments tax the rich and subsidize the poor".'
         display:
-          name: "Governments tax the rich and subsidize the poor: Essential (aggregate)"
+          name: "Governments tax the rich and subsidize the poor: Essential for democracy"
           <<: *common-display
       not_essential_dem_governments_tax_the_rich_and_subsidize_the_poor:
         title: "Democracy - Governments tax the rich and subsidize the poor: Not essential"
         description_short: '% of respondents replying 1 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "Governments tax the rich and subsidize the poor". It also includes the answer "It is against democracy", spontaneously given by some respondents.'
         display:
-          name: "Governments tax the rich and subsidize the poor: Not essential"
+          name: "Governments tax the rich and subsidize the poor: Not essential for democracy"
           <<: *common-display
       essential_dem_governments_tax_the_rich_and_subsidize_the_poor:
         title: "Democracy - Governments tax the rich and subsidize the poor: Essential"
         description_short: '% of respondents replying 10 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "Governments tax the rich and subsidize the poor".'
         display:
-          name: "Governments tax the rich and subsidize the poor: Essential"
+          name: "Governments tax the rich and subsidize the poor: Essential for democracy"
           <<: *common-display
       neutral_essential_dem_governments_tax_the_rich_and_subsidize_the_poor:
         title: "Democracy - Governments tax the rich and subsidize the poor: Neutral"
@@ -4065,25 +4065,25 @@ tables:
         title: "Democracy - Religious authorities interpret the laws: Not essential (aggregate)"
         description_short: '% of respondents replying 1 to 4 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "Religious authorities interpret the laws". It also includes the answer "It is against democracy", spontaneously given by some respondents.'
         display:
-          name: "Religious authorities interpret the laws: Not essential (aggregate)"
+          name: "Religious authorities interpret the laws: Not essential for democracy"
           <<: *common-display
       essential_dem_agg_religious_authorities_interpret_the_laws:
         title: "Democracy - Religious authorities interpret the laws: Essential (aggregate)"
         description_short: '% of respondents replying 6 to 10 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "Religious authorities interpret the laws".'
         display:
-          name: "Religious authorities interpret the laws: Essential (aggregate)"
+          name: "Religious authorities interpret the laws: Essential for democracy"
           <<: *common-display
       not_essential_dem_religious_authorities_interpret_the_laws:
         title: "Democracy - Religious authorities interpret the laws: Not essential"
         description_short: '% of respondents replying 1 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "Religious authorities interpret the laws". It also includes the answer "It is against democracy", spontaneously given by some respondents.'
         display:
-          name: "Religious authorities interpret the laws: Not essential"
+          name: "Religious authorities interpret the laws: Not essential for democracy"
           <<: *common-display
       essential_dem_religious_authorities_interpret_the_laws:
         title: "Democracy - Religious authorities interpret the laws: Essential"
         description_short: '% of respondents replying 10 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "Religious authorities interpret the laws".'
         display:
-          name: "Religious authorities interpret the laws: Essential"
+          name: "Religious authorities interpret the laws: Essential for democracy"
           <<: *common-display
       neutral_essential_dem_religious_authorities_interpret_the_laws:
         title: "Democracy - Religious authorities interpret the laws: Neutral"
@@ -4116,25 +4116,25 @@ tables:
         title: "Democracy - People choose their leaders in free elections: Not essential (aggregate)"
         description_short: '% of respondents replying 1 to 4 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "People choose their leaders in free elections". It also includes the answer "It is against democracy", spontaneously given by some respondents.'
         display:
-          name: "People choose their leaders in free elections: Not essential (aggregate)"
+          name: "People choose their leaders in free elections: Not essential for democracy"
           <<: *common-display
       essential_dem_agg_people_choose_their_leaders_in_free_elections:
         title: "Democracy - People choose their leaders in free elections: Essential (aggregate)"
         description_short: '% of respondents replying 6 to 10 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "People choose their leaders in free elections".'
         display:
-          name: "People choose their leaders in free elections: Essential (aggregate)"
+          name: "People choose their leaders in free elections: Essential for democracy"
           <<: *common-display
       not_essential_dem_people_choose_their_leaders_in_free_elections:
         title: "Democracy - People choose their leaders in free elections: Not essential"
         description_short: '% of respondents replying 1 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "People choose their leaders in free elections". It also includes the answer "It is against democracy", spontaneously given by some respondents.'
         display:
-          name: "People choose their leaders in free elections: Not essential"
+          name: "People choose their leaders in free elections: Not essential for democracy"
           <<: *common-display
       essential_dem_people_choose_their_leaders_in_free_elections:
         title: "Democracy - People choose their leaders in free elections: Essential"
         description_short: '% of respondents replying 10 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "People choose their leaders in free elections".'
         display:
-          name: "People choose their leaders in free elections: Essential"
+          name: "People choose their leaders in free elections: Essential for democracy"
           <<: *common-display
       neutral_essential_dem_people_choose_their_leaders_in_free_elections:
         title: "Democracy - People choose their leaders in free elections: Neutral"
@@ -4167,25 +4167,25 @@ tables:
         title: "Democracy - People receive state aid for unemployment: Not essential (aggregate)"
         description_short: '% of respondents replying 1 to 4 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "People receive state aid for unemployment". It also includes the answer "It is against democracy", spontaneously given by some respondents.'
         display:
-          name: "People receive state aid for unemployment: Not essential (aggregate)"
+          name: "People receive state aid for unemployment: Not essential for democracy"
           <<: *common-display
       essential_dem_agg_people_receive_state_aid_for_unemployment:
         title: "Democracy - People receive state aid for unemployment: Essential (aggregate)"
         description_short: '% of respondents replying 6 to 10 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "People receive state aid for unemployment".'
         display:
-          name: "People receive state aid for unemployment: Essential (aggregate)"
+          name: "People receive state aid for unemployment: Essential for democracy"
           <<: *common-display
       not_essential_dem_people_receive_state_aid_for_unemployment:
         title: "Democracy - People receive state aid for unemployment: Not essential"
         description_short: '% of respondents replying 1 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "People receive state aid for unemployment". It also includes the answer "It is against democracy", spontaneously given by some respondents.'
         display:
-          name: "People receive state aid for unemployment: Not essential"
+          name: "People receive state aid for unemployment: Not essential for democracy"
           <<: *common-display
       essential_dem_people_receive_state_aid_for_unemployment:
         title: "Democracy - People receive state aid for unemployment: Essential"
         description_short: '% of respondents replying 10 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "People receive state aid for unemployment".'
         display:
-          name: "People receive state aid for unemployment: Essential"
+          name: "People receive state aid for unemployment: Essential for democracy"
           <<: *common-display
       neutral_essential_dem_people_receive_state_aid_for_unemployment:
         title: "Democracy - People receive state aid for unemployment: Neutral"
@@ -4218,25 +4218,25 @@ tables:
         title: "Democracy - The army takes over when government is incompetent: Not essential (aggregate)"
         description_short: '% of respondents replying 1 to 4 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "The army takes over when government is incompetent". It also includes the answer "It is against democracy", spontaneously given by some respondents.'
         display:
-          name: "The army takes over when government is incompetent: Not essential (aggregate)"
+          name: "The army takes over when government is incompetent: Not essential for democracy"
           <<: *common-display
       essential_dem_agg_army_takes_over_when_government_is_incompetent:
         title: "Democracy - The army takes over when government is incompetent: Essential (aggregate)"
         description_short: '% of respondents replying 6 to 10 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "The army takes over when government is incompetent".'
         display:
-          name: "The army takes over when government is incompetent: Essential (aggregate)"
+          name: "The army takes over when government is incompetent: Essential for democracy"
           <<: *common-display
       not_essential_dem_army_takes_over_when_government_is_incompetent:
         title: "Democracy - The army takes over when government is incompetent: Not essential"
         description_short: '% of respondents replying 1 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "The army takes over when government is incompetent". It also includes the answer "It is against democracy", an answer spontaneously given by some respondents.'
         display:
-          name: "The army takes over when government is incompetent: Not essential"
+          name: "The army takes over when government is incompetent: Not essential for democracy"
           <<: *common-display
       essential_dem_army_takes_over_when_government_is_incompetent:
         title: "Democracy - The army takes over when government is incompetent: Essential"
         description_short: '% of respondents replying 10 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "The army takes over when government is incompetent".'
         display:
-          name: "The army takes over when government is incompetent: Essential"
+          name: "The army takes over when government is incompetent: Essential for democracy"
           <<: *common-display
       neutral_essential_dem_army_takes_over_when_government_is_incompetent:
         title: "Democracy - The army takes over when government is incompetent: Neutral"
@@ -4269,25 +4269,25 @@ tables:
         title: "Democracy - Civil rights protect people’s liberty from state oppression: Not essential (aggregate)"
         description_short: '% of respondents replying 1 to 4 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "Civil rights protect people’s liberty from state oppression". It also includes the answer "It is against democracy", spontaneously given by some respondents.'
         display:
-          name: "Civil rights protect people’s liberty from state oppression: Not essential (aggregate)"
+          name: "Civil rights protect people’s liberty from state oppression: Not essential for democracy"
           <<: *common-display
       essential_dem_agg_civil_rights_protects_peoples_liberty_against_oppression:
         title: "Democracy - Civil rights protect people’s liberty from state oppression: Essential (aggregate)"
         description_short: '% of respondents replying 6 to 10 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "Civil rights protect people’s liberty from state oppression".'
         display:
-          name: "Civil rights protect people’s liberty from state oppression: Essential (aggregate)"
+          name: "Civil rights protect people’s liberty from state oppression: Essential for democracy"
           <<: *common-display
       not_essential_dem_civil_rights_protects_peoples_liberty_against_oppression:
         title: "Democracy - Civil rights protect people’s liberty from state oppression: Not essential"
         description_short: '% of respondents replying 1 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "Civil rights protect people’s liberty from state oppression". It also includes the answer "It is against democracy", spontaneously given by some respondents.'
         display:
-          name: "Civil rights protect people’s liberty from state oppression: Not essential"
+          name: "Civil rights protect people’s liberty from state oppression: Not essential for democracy"
           <<: *common-display
       essential_dem_civil_rights_protects_peoples_liberty_against_oppression:
         title: "Democracy - Civil rights protect people’s liberty from state oppression: Essential"
         description_short: '% of respondents replying 10 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "Civil rights protect people’s liberty from state oppression".'
         display:
-          name: "Civil rights protect people’s liberty from state oppression: Essential"
+          name: "Civil rights protect people’s liberty from state oppression: Essential for democracy"
           <<: *common-display
       neutral_essential_dem_civil_rights_protects_peoples_liberty_against_oppression:
         title: "Democracy - Civil rights protect people’s liberty from state oppression: Neutral"
@@ -4320,25 +4320,25 @@ tables:
         title: "Democracy - Women have the same rights as men: Not essential (aggregate)"
         description_short: '% of respondents replying 1 to 4 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "Women have the same rights as men". It also includes the answer "It is against democracy", spontaneously given by some respondents.'
         display:
-          name: "Women have the same rights as men: Not essential (aggregate)"
+          name: "Women have the same rights as men: Not essential for democracy"
           <<: *common-display
       essential_dem_agg_women_have_the_same_rights_as_men:
         title: "Democracy - Women have the same rights as men: Essential (aggregate)"
         description_short: '% of respondents replying 6 to 10 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "Women have the same rights as men".'
         display:
-          name: "Women have the same rights as men: Essential (aggregate)"
+          name: "Women have the same rights as men: Essential for democracy"
           <<: *common-display
       not_essential_dem_women_have_the_same_rights_as_men:
         title: "Democracy - Women have the same rights as men: Not essential"
         description_short: '% of respondents replying 1 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "Women have the same rights as men". It also includes the answer "It is against democracy", spontaneously given by some respondents.'
         display:
-          name: "Women have the same rights as men: Not essential"
+          name: "Women have the same rights as men: Not essential for democracy"
           <<: *common-display
       essential_dem_women_have_the_same_rights_as_men:
         title: "Democracy - Women have the same rights as men: Essential"
         description_short: '% of respondents replying 6 to 10 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "Women have the same rights as men".'
         display:
-          name: "Women have the same rights as men: Essential"
+          name: "Women have the same rights as men: Essential for democracy"
           <<: *common-display
       neutral_essential_dem_women_have_the_same_rights_as_men:
         title: "Democracy - Women have the same rights as men: Neutral"
@@ -4371,25 +4371,25 @@ tables:
         title: "Democracy - The state makes people´s incomes equal: Not essential (aggregate)"
         description_short: '% of respondents replying 1 to 4 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "The state makes people´s incomes equal". It also includes the answer "It is against democracy", spontaneously given by some respondents.'
         display:
-          name: "The state makes people´s incomes equal: Not essential (aggregate)"
+          name: "The state makes people´s incomes equal: Not essential for democracy"
           <<: *common-display
       essential_dem_agg_the_state_makes_peoples_incomes_equal:
         title: "Democracy - The state makes people´s incomes equal: Essential (aggregate)"
         description_short: '% of respondents replying 6 to 10 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "The state makes people´s incomes equal".'
         display:
-          name: "The state makes people´s incomes equal: Essential (aggregate)"
+          name: "The state makes people´s incomes equal: Essential for democracy"
           <<: *common-display
       not_essential_dem_the_state_makes_peoples_incomes_equal:
         title: "Democracy - The state makes people´s incomes equal: Not essential"
         description_short: '% of respondents replying 1 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "The state makes people´s incomes equal". It also includes the answer "It is against democracy", spontaneously given by some respondents.'
         display:
-          name: "The state makes people´s incomes equal: Not essential"
+          name: "The state makes people´s incomes equal: Not essential for democracy"
           <<: *common-display
       essential_dem_the_state_makes_peoples_incomes_equal:
         title: "Democracy - The state makes people´s incomes equal: Essential"
         description_short: '% of respondents replying 10 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "The state makes people´s incomes equal".'
         display:
-          name: "The state makes people´s incomes equal: Essential"
+          name: "The state makes people´s incomes equal: Essential for democracy"
           <<: *common-display
       neutral_essential_dem_the_state_makes_peoples_incomes_equal:
         title: "Democracy - The state makes people´s incomes equal: Neutral"
@@ -4422,25 +4422,25 @@ tables:
         title: "Democracy - People obey their rulers: Not essential (aggregate)"
         description_short: '% of respondents replying 1 to 4 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "People obey their rulers". It also includes the answer "It is against democracy", spontaneously given by some respondents.'
         display:
-          name: "People obey their rulers: Not essential (aggregate)"
+          name: "People obey their rulers: Not essential for democracy"
           <<: *common-display
       essential_dem_agg_people_obey_their_rulers:
         title: "Democracy - People obey their rulers: Essential (aggregate)"
         description_short: '% of respondents replying 6 to 10 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "People obey their rulers".'
         display:
-          name: "People obey their rulers: Essential (aggregate)"
+          name: "People obey their rulers: Essential for democracy"
           <<: *common-display
       not_essential_dem_people_obey_their_rulers:
         title: "Democracy - People obey their rulers: Not essential"
         description_short: '% of respondents replying 1 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "People obey their rulers". It also includes the answer "It is against democracy", spontaneously given by some respondents.'
         display:
-          name: "People obey their rulers: Not essential"
+          name: "People obey their rulers: Not essential for democracy"
           <<: *common-display
       essential_dem_people_obey_their_rulers:
         title: "Democracy - People obey their rulers: Essential"
         description_short: '% of respondents replying 10 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "People obey their rulers".'
         display:
-          name: "People obey their rulers: Essential"
+          name: "People obey their rulers: Essential for democracy"
           <<: *common-display
       neutral_essential_dem_people_obey_their_rulers:
         title: "Democracy - People obey their rulers: Neutral"
