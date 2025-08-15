@@ -195,17 +195,6 @@ with container_chat:
                     st.markdown(
                         f":green-badge[:small[{cost_msg}]] :blue-badge[:small[{tokens_msg}]] :gray-badge[:small[{time_msg}]] :gray-badge[:small[{model_name}]]"
                     )
-
-                    # st.info(agent.model)
-                # We'll gather partial text to show incrementally
-                # partial_text = ""
-                # message_placeholder = st.empty()
-
-                # # Render partial text as it arrives
-                # async for chunk in result.stream_text(delta=True):
-                #     partial_text += chunk
-                #     message_placeholder.markdown(partial_text)
-
                 # End timer and store duration
                 end_time = time.time()
                 st.session_state.response_time = end_time - start_time
