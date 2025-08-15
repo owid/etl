@@ -8,6 +8,7 @@ import time
 from typing import cast
 
 import streamlit as st
+from pydantic_ai import Agent
 from structlog import get_logger
 
 from apps.wizard.app_pages.expert.agent import agent
@@ -95,28 +96,28 @@ def config_model():
         help="[Pricing](https://openai.com/api/pricing) | [Model list](https://platform.openai.com/docs/models/)",
     )
     # Max tokens
-    max_tokens = int(
-        st.number_input(
-            "Max tokens",
-            min_value=32,
-            max_value=4 * 4096,
-            value=4096,
-            step=32,
-            help="The maximum number of tokens in the response.",
-        )
-    )
-    # Reduced context
-    use_reduced_context = st.toggle(
-        "Low context",
-        value=False,
-        help="If checked, only the last user message will be accounted (i.e less tokens and therefore cheaper).",
-    )
+    # max_tokens = int(
+    #     st.number_input(
+    #         "Max tokens",
+    #         min_value=32,
+    #         max_value=4 * 4096,
+    #         value=4096,
+    #         step=32,
+    #         help="The maximum number of tokens in the response.",
+    #     )
+    # )
+    # # Reduced context
+    # use_reduced_context = st.toggle(
+    #     "Low context",
+    #     value=False,
+    #     help="If checked, only the last user message will be accounted (i.e less tokens and therefore cheaper).",
+    # )
 
     # Add to session state
     st.session_state["expert_config"]["model_name"] = model_name
-    st.session_state["expert_config"]["max_tokens"] = max_tokens
+    # st.session_state["expert_config"]["max_tokens"] = max_tokens
     st.session_state["expert_config"]["temperature"] = 1
-    st.session_state["expert_config"]["use_reduced_context"] = use_reduced_context
+    # st.session_state["expert_config"]["use_reduced_context"] = use_reduced_context
 
 
 def config_others():
@@ -135,16 +136,20 @@ container_chat = st.container()
 ### LLM CONFIG
 with st.expander("**Model config**", icon=":material/settings:"):
     # 1/ Category
-    with st.container(horizontal=True, vertical_alignment="bottom"):
-        config_category()
+    # with st.container(horizontal=True, vertical_alignment="bottom"):
+    #     config_category()
     # 2/ Model
     st.session_state.analytics = st.session_state.get("analytics", True)
     with st.container(horizontal=True, vertical_alignment="bottom"):
         config_model()
     # 3/ Others
-    with st.container(horizontal=True, vertical_alignment="bottom"):
-        config_others()
+    # with st.container(horizontal=True, vertical_alignment="bottom"):
+    #     config_others()
 
+from pydantic_ai import Agent, RunContext
+from pydantic_ai.agent import CallToolsNode
+from pydantic_ai.messages import PartDeltaEvent, TextPartDelta
+from pydantic_graph.nodes import BaseNode, End
 
 # CHAT INTERFACE
 with container_chat:
@@ -216,6 +221,47 @@ with container_chat:
                     if hasattr(result, "usage"):
                         st.session_state["last_usage"] = result.usage()
 
+                async def agent_stream2():
+                    # ref: https://github.com/pydantic/pydantic-ai/issues/1007#issuecomment-2963469441
+                    async with agent.iter(
+                        prompt,
+                        model=st.session_state["expert_config"]["model_name"],
+                    ) as run:
+                        nodes = []
+                        # """Stream agent response."""
+                        # Yield each message from the stream
+                        async for node in run:
+                            nodes.append(node)
+                            if Agent.is_model_request_node(node):
+                                is_final_synthesis_node = any(
+                                    isinstance(prev_node, CallToolsNode) for prev_node in nodes
+                                )  # Heuristic: check if tools were called before
+                                print(f"--- ModelRequestNode (Is Final Synthesis? {is_final_synthesis_node}) ---")
+                                async with node.stream(run.ctx) as request_stream:
+                                    async for event in request_stream:
+                                        print(f"Request Event: Data: {event!r}")
+                                        # Specifically track TextPartDelta for the final node
+                                        if (
+                                            is_final_synthesis_node
+                                            and isinstance(event, PartDeltaEvent)
+                                            and isinstance(event.delta, TextPartDelta)
+                                        ):
+                                            yield event.delta.content_delta
+
+                            elif Agent.is_call_tools_node(node):
+                                print("--- CallToolsNode ---")
+                                async with node.stream(run.ctx) as handle_stream:
+                                    async for event in handle_stream:
+                                        print(f"Call Event: Data: {event!r}")
+
+                    # At the very end, after the streaming is complete
+                    # Capture the usage information in session state
+                    if hasattr(run, "usage"):
+                        st.session_state["last_usage"] = run.usage()
+
+                    # if not yielded:
+                    #     raise exceptions.AgentRunError("Agent run finished without producing a final result")
+
                 # text = agent.run_sync(prompt)
 
                 # st.text(text)
@@ -243,7 +289,7 @@ with container_chat:
             # Add prompt to session state
             # st.session_state.prompt = prompt
 
-            print("finished asking GPT...")
+            print("finished asking LLM...")
 
     # if st.session_state.response:
     #     # Get cost & tokens

@@ -73,17 +73,6 @@ METADATA_REFERENCE = f"""
 {render_grapher_config()}
 """
 
-## Metadata usage
-PAGES_MD = glob.glob(str(DOCS_DIR) + "/architecture/metadata/structuring-yaml/**/*.md", recursive=True) + glob.glob(
-    str(DOCS_DIR) + "/*.md"
-)
-PAGES_TEXT = generate_documentation(PAGES_MD)
-METADATA_USAGE = f"""
-{NOTE}
-
-{PAGES_TEXT}
-"""
-
 ## Complete Metadata prompt
 SYSTEM_PROMPT_METADATA = f"""
 As an expert in OWID's metadata structure, you'll respond to inquiries about its structure, comprising four main entities: Origin, Dataset, Table, and Indicator (Variable). Datasets group together Tables, which are akin to pandas DataFrames but include extra metadata, and Tables feature Indicators as columns. Indicators may be linked to multiple Origins, identifying the data's sources. Detailed explanations of each entity follow, separated by '------'.
