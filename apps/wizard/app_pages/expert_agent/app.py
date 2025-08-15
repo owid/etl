@@ -8,11 +8,10 @@ import time
 from typing import cast
 
 import streamlit as st
-from pydantic_ai import Agent
 from structlog import get_logger
 
-from apps.wizard.app_pages.expert.agent import agent
-from apps.wizard.app_pages.expert.model_settings import CHAT_CATEGORIES
+from apps.wizard.app_pages.expert_agent.agent import agent_stream2
+from apps.wizard.app_pages.expert_agent.utils import estimate_llm_cost
 from etl.config import load_env
 
 st.set_page_config(
@@ -72,20 +71,6 @@ def reset_messages() -> None:
     st.exception(Exception("This hasn't been implemented yet"))
 
 
-# Configuration functions
-def config_category():
-    # CONFIG part 1: category
-    st.segmented_control(
-        label="Choose a category for the question",
-        options=CHAT_CATEGORIES,
-        default=CHAT_CATEGORIES[1],
-        help="Choosing a specific domain reduces the cost of the query to chatGPT, because only a subset of the documentation (i.e. fewer tokens used) will be used in the query.",
-        key="category_gpt",
-        on_change=reset_messages,
-        width="stretch",
-    )
-
-
 def config_model():
     # Model
     model_name = st.selectbox(
@@ -95,23 +80,6 @@ def config_model():
         index=MODELS_AVAILABLE_LIST.index(MODEL_DEFAULT),
         help="[Pricing](https://openai.com/api/pricing) | [Model list](https://platform.openai.com/docs/models/)",
     )
-    # Max tokens
-    # max_tokens = int(
-    #     st.number_input(
-    #         "Max tokens",
-    #         min_value=32,
-    #         max_value=4 * 4096,
-    #         value=4096,
-    #         step=32,
-    #         help="The maximum number of tokens in the response.",
-    #     )
-    # )
-    # # Reduced context
-    # use_reduced_context = st.toggle(
-    #     "Low context",
-    #     value=False,
-    #     help="If checked, only the last user message will be accounted (i.e less tokens and therefore cheaper).",
-    # )
 
     # Add to session state
     st.session_state["expert_config"]["model_name"] = model_name
@@ -135,9 +103,6 @@ container_chat = st.container()
 
 ### LLM CONFIG
 with st.expander("**Model config**", icon=":material/settings:"):
-    # 1/ Category
-    # with st.container(horizontal=True, vertical_alignment="bottom"):
-    #     config_category()
     # 2/ Model
     st.session_state.analytics = st.session_state.get("analytics", True)
     with st.container(horizontal=True, vertical_alignment="bottom"):
@@ -146,10 +111,6 @@ with st.expander("**Model config**", icon=":material/settings:"):
     # with st.container(horizontal=True, vertical_alignment="bottom"):
     #     config_others()
 
-from pydantic_ai import Agent, RunContext
-from pydantic_ai.agent import CallToolsNode
-from pydantic_ai.messages import PartDeltaEvent, TextPartDelta
-from pydantic_graph.nodes import BaseNode, End
 
 # CHAT INTERFACE
 with container_chat:
@@ -205,70 +166,36 @@ with container_chat:
                     icon=":material/robot:",
                 )
 
-                async def agent_stream():
-                    async with agent.run_stream(
-                        prompt,
-                        model=st.session_state["expert_config"]["model_name"],
-                    ) as result:
-                        # """Stream agent response."""
-                        # Yield each message from the stream
-                        async for message in result.stream_text(delta=True):
-                            if message is not None:
-                                yield message
+                # Stream the agent response
+                st.session_state.response = cast(str, st.write_stream(agent_stream2(prompt)))
 
-                    # At the very end, after the streaming is complete
-                    # Capture the usage information in session state
-                    if hasattr(result, "usage"):
-                        st.session_state["last_usage"] = result.usage()
-
-                async def agent_stream2():
-                    # ref: https://github.com/pydantic/pydantic-ai/issues/1007#issuecomment-2963469441
-                    async with agent.iter(
-                        prompt,
-                        model=st.session_state["expert_config"]["model_name"],
-                    ) as run:
-                        nodes = []
-                        # """Stream agent response."""
-                        # Yield each message from the stream
-                        async for node in run:
-                            nodes.append(node)
-                            if Agent.is_model_request_node(node):
-                                is_final_synthesis_node = any(
-                                    isinstance(prev_node, CallToolsNode) for prev_node in nodes
-                                )  # Heuristic: check if tools were called before
-                                print(f"--- ModelRequestNode (Is Final Synthesis? {is_final_synthesis_node}) ---")
-                                async with node.stream(run.ctx) as request_stream:
-                                    async for event in request_stream:
-                                        print(f"Request Event: Data: {event!r}")
-                                        # Specifically track TextPartDelta for the final node
-                                        if (
-                                            is_final_synthesis_node
-                                            and isinstance(event, PartDeltaEvent)
-                                            and isinstance(event.delta, TextPartDelta)
-                                        ):
-                                            yield event.delta.content_delta
-
-                            elif Agent.is_call_tools_node(node):
-                                print("--- CallToolsNode ---")
-                                async with node.stream(run.ctx) as handle_stream:
-                                    async for event in handle_stream:
-                                        print(f"Call Event: Data: {event!r}")
-
-                    # At the very end, after the streaming is complete
-                    # Capture the usage information in session state
-                    if hasattr(run, "usage"):
-                        st.session_state["last_usage"] = run.usage()
-
-                    # if not yielded:
-                    #     raise exceptions.AgentRunError("Agent run finished without producing a final result")
-
-                # text = agent.run_sync(prompt)
-
-                # st.text(text)
-                st.session_state.response = cast(str, st.write_stream(agent_stream))
+                # End timer and store duration
+                end_time = time.time()
+                st.session_state.response_time = end_time - start_time
 
                 if "last_usage" in st.session_state:
-                    st.info(st.session_state["last_usage"])
+                    # st.markdown(st.session_state.last_usage)
+                    cost = estimate_llm_cost(
+                        model_name=st.session_state["expert_config"]["model_name"],
+                        input_tokens=st.session_state.last_usage.request_tokens,
+                        output_tokens=st.session_state.last_usage.response_tokens,
+                    )
+
+                    # Build message
+                    response_time = getattr(st.session_state, "response_time", 0)
+                    time_msg = f":material/timer: {response_time:.2f}s"
+                    num_tokens_in = st.session_state.last_usage.request_tokens
+                    num_tokens_out = st.session_state.last_usage.response_tokens
+                    num_tokens = st.session_state.last_usage.total_tokens
+                    model_name = st.session_state["expert_config"]["model_name"]
+                    cost_msg = f":material/paid: ~{cost:.4f} USD"
+                    tokens_msg = f"{num_tokens:,} tokens (IN: {num_tokens_in}, OUT: {num_tokens_out})"
+
+                    # Print message
+                    st.markdown(
+                        f":green-badge[:small[{cost_msg}]] :blue-badge[:small[{tokens_msg}]] :gray-badge[:small[{time_msg}]] :gray-badge[:small[{model_name}]]"
+                    )
+
                     # st.info(agent.model)
                 # We'll gather partial text to show incrementally
                 # partial_text = ""

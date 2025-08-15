@@ -1,11 +1,18 @@
 from pathlib import Path
-from typing import Literal
+from typing import AsyncGenerator, Literal
 
 import streamlit as st
 import yaml
 from pydantic_ai import Agent
-from pydantic_ai.mcp import MCPServerStdio
+from pydantic_ai.agent import CallToolsNode
+from pydantic_ai.messages import (
+    PartDeltaEvent,
+    PartStartEvent,
+    TextPart,
+    TextPartDelta,
+)
 
+from apps.wizard.app_pages.expert_agent.utils import CURRENT_DIR
 from etl.docs import (
     render_collection,
     render_dataset,
@@ -16,8 +23,6 @@ from etl.docs import (
 )
 from etl.files import ruamel_dump, ruamel_load
 from etl.paths import BASE_DIR, DOCS_DIR
-
-CURRENT_DIR = Path(__file__).parent
 
 #######################################################
 # LOAD KNOWLEDGE BASE
@@ -32,7 +37,7 @@ SYSTEM_PROMPT = CONTEXT["system_prompt"]
 @st.cache_data(show_spinner="Loading analytics documentation...", show_time=True)
 def cached_analytics_docs():
     """Cache the analytics documentation (5 minutes)."""
-    from apps.wizard.app_pages.expert.read_analytics import get_analytics_db_docs
+    from apps.wizard.app_pages.expert_agent.read_analytics import get_analytics_db_docs
 
     docs = get_analytics_db_docs(max_workers=10)
 
@@ -75,6 +80,86 @@ agent = Agent(
     retries=2,
     # mcp_servers=[server],
 )
+
+#######################################################
+# STREAMING
+#######################################################
+
+
+async def agent_stream(prompt: str) -> AsyncGenerator[str, None]:
+    """Stream agent response using run_stream.
+
+    Args:
+        prompt: The user prompt to process
+
+    Yields:
+        str: Text chunks from the agent response
+    """
+    async with agent.run_stream(
+        prompt,
+        model=st.session_state["expert_config"]["model_name"],
+    ) as result:
+        # Yield each message from the stream
+        async for message in result.stream_text(delta=True):
+            if message is not None:
+                yield message
+
+    # At the very end, after the streaming is complete
+    # Capture the usage information in session state
+    if hasattr(result, "usage"):
+        st.session_state["last_usage"] = result.usage()
+
+
+async def agent_stream2(prompt: str) -> AsyncGenerator[str, None]:
+    """Stream agent response using iter method with detailed event handling.
+
+    Args:
+        prompt: The user prompt to process
+
+    Yields:
+        str: Text chunks from the agent response
+
+    Reference: https://github.com/pydantic/pydantic-ai/issues/1007#issuecomment-2963469441
+    """
+    async with agent.iter(
+        prompt,
+        model=st.session_state["expert_config"]["model_name"],
+    ) as run:
+        nodes = []
+        # Yield each message from the stream
+        async for node in run:
+            nodes.append(node)
+            if Agent.is_model_request_node(node):
+                is_final_synthesis_node = any(
+                    isinstance(prev_node, CallToolsNode) for prev_node in nodes
+                )  # Heuristic: check if tools were called before
+                print(f"--- ModelRequestNode (Is Final Synthesis? {is_final_synthesis_node}) ---")
+                async with node.stream(run.ctx) as request_stream:
+                    async for event in request_stream:
+                        print(f"Request Event: Data: {event!r}")
+                        # Specifically track TextPartDelta for the final node
+                        if (
+                            # is_final_synthesis_node and
+                            isinstance(event, PartDeltaEvent) and isinstance(event.delta, TextPartDelta)
+                        ):
+                            yield event.delta.content_delta
+                        elif (
+                            # is_final_synthesis_node and
+                            isinstance(event, PartStartEvent) and isinstance(event.part, TextPart)
+                        ):
+                            yield event.part.content
+
+            elif Agent.is_call_tools_node(node):
+                print("--- CallToolsNode ---")
+                async with node.stream(run.ctx) as handle_stream:
+                    async for event in handle_stream:
+                        print(f"Call Event: Data: {event!r}")
+
+    # At the very end, after the streaming is complete
+    # Capture the usage information in session state
+    if hasattr(run, "usage"):
+        st.session_state["last_usage"] = run.usage()
+
 
 #######################################################
 # TOOLS

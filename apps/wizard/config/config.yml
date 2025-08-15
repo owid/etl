@@ -43,7 +43,7 @@ main:
     maintainer:
       - "@lucas"
       - "@daniel"
-    entrypoint: app_pages/expert/app_v2.py
+    entrypoint: app_pages/expert_agent/app.py
     icon: ":material/smart_toy:"
   analytics:
     title: "Analytics (external)"
