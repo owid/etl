@@ -2794,7 +2794,7 @@
     - "TUV"
     - "WLF"
 - code: UNSDG_ANZ
-  name: Australia and New Zealand (UNSDG)
+  name: Australia and New Zealand (UN SDG)
   region_type: "aggregate"
   defined_by: unsdg
   members:
@@ -2805,7 +2805,7 @@
     - "NZL"
     - "NFK"
 - code: UNSDG_CSA
-  name: Central and Southern Asia (UNSDG)
+  name: Central and Southern Asia (UN SDG)
   region_type: "aggregate"
   defined_by: unsdg
   members:
@@ -2824,7 +2824,7 @@
     - "TKM"
     - "UZB"
 - code: UNSDG_ESEA
-  name: Eastern and South-Eastern Asia (UNSDG)
+  name: Eastern and South-Eastern Asia (UN SDG)
   region_type: "aggregate"
   defined_by: unsdg
   members:
@@ -2847,7 +2847,7 @@
     - "THA"
     - "VNM"
 - code: UNSDG_ENA
-  name: "Europe and Northern America (UNSDG)"
+  name: "Europe and Northern America (UN SDG)"
   region_type: "aggregate"
   defined_by: unsdg
   members:
@@ -2908,7 +2908,7 @@
     - "USA"
     - "VAT"
 - code: UNSDG_LAC
-  name: "Latin America and the Caribbean (UNSDG)"
+  name: "Latin America and the Caribbean (UN SDG)"
   region_type: "aggregate"
   defined_by: unsdg
   members:
@@ -2965,7 +2965,7 @@
     - "URY"
     - "VEN"
 - code: UNSDG_NAWA
-  name: Northern Africa and Western Asia (UNSDG)
+  name: Northern Africa and Western Asia (UN SDG)
   region_type: "aggregate"
   defined_by: unsdg
   members:
@@ -2995,7 +2995,7 @@
     - "ESH"
     - "YEM"
 - code: UNSDG_OC
-  name: "Oceania (UNSDG)"
+  name: "Oceania (UN SDG)"
   region_type: "aggregate"
   defined_by: unsdg
   members:
@@ -3023,7 +3023,7 @@
     - "VUT"
     - "WLF"
 - code: UNSDG_SSA
-  name: "Sub-Saharan Africa (UNSDG)"
+  name: "Sub-Saharan Africa (UN SDG)"
   region_type: "aggregate"
   defined_by: unsdg
   members:
