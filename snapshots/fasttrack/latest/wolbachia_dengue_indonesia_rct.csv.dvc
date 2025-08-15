@@ -1,0 +1,17 @@
+meta:
+  origin:
+    producer: Indriani et al. (2020)
+    title: wolbachia_dengue_indonesia_rct
+    citation_full: |-
+      Indriani C, Tantowijoyo W, Rancès E et al. Reduced dengue incidence following deployments of Wolbachia-infected Aedes aegypti in Yogyakarta, Indonesia: a quasi-experimental trial using controlled interrupted time series analysis [version 1; peer review: 2 approved]. Gates Open Res 2020, 4:50
+    url_main: https://gatesopenresearch.org/articles/4-50/v1
+    url_download: |-
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vSluDt4mYB9OC8cth3eKEa835iKd7BWfLPXqDqYgNV-aoslw2610Jm1IAV51B1kW5DSQbT3i220ASEc/pub?output=csv
+    date_accessed: '2025-08-15'
+  name: Wolbachia impact on dengue in Indonesia (Indriani et al. 2020)
+  description: ''
+  license: {}
+outs:
+  - md5: 2dd96c5893acc321d45ec010f64ea6b0
+    size: 4996
+    path: wolbachia_dengue_indonesia_rct.csv
