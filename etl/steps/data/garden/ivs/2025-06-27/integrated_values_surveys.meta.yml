@@ -4336,7 +4336,7 @@ tables:
           <<: *common-display
       essential_dem_women_have_the_same_rights_as_men:
         title: "Democracy - Women have the same rights as men: Essential"
-        description_short: '% of respondents replying 7 to 10 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "Women have the same rights as men".'
+        description_short: '% of respondents replying 10 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "Women have the same rights as men".'
         display:
           name: "Women have the same rights as men: Essential for democracy"
           <<: *common-display
