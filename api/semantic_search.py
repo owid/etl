@@ -1,6 +1,5 @@
 """Semantic search functionality for OWID indicators - API version."""
 
-import asyncio
 import threading
 from typing import Any, Dict, List, Optional
 
@@ -46,7 +45,7 @@ def _initialize_semantic_search():
         model = get_model()
         _embeddings_model = EmbeddingsModel(model)
         _embeddings_model.fit(_indicators)
-        
+
         _initialization_complete = True
     except Exception as e:
         _initialization_error = str(e)
@@ -63,10 +62,10 @@ def search_indicators(query: str, limit: int = 10) -> List[Dict[str, Any]]:
     """Search indicators using the preloaded model."""
     if not _initialization_complete:
         raise RuntimeError("Semantic search model is still initializing. Please wait and try again.")
-    
+
     if _initialization_error:
         raise RuntimeError(f"Semantic search initialization failed: {_initialization_error}")
-    
+
     if _embeddings_model is None:
         raise RuntimeError("Semantic search model not initialized")
 
