@@ -4,16 +4,16 @@ references:
 - https://docs.streamlit.io/knowledge-base/tutorials/build-conversational-apps#build-a-chatgpt-like-app
 """
 
-import time
-from typing import cast
-
 import streamlit as st
+import time
+
 from structlog import get_logger
+from typing import cast
 
 from apps.wizard.app_pages.expert.model_settings import CHAT_CATEGORIES
 from apps.wizard.app_pages.expert.agent import agent
-
 from etl.config import load_env
+
 
 st.set_page_config(
     page_title="Wizard: Ask the Expert",
@@ -134,7 +134,7 @@ def config_others():
 container_chat = st.container()
 
 ### LLM CONFIG
-with st.expander(f"**Model config**", icon=":material/settings:"):
+with st.expander("**Model config**", icon=":material/settings:"):
     # 1/ Category
     with st.container(horizontal=True, vertical_alignment="bottom"):
         config_category()

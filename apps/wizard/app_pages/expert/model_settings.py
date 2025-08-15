@@ -1,3 +1,5 @@
+from structlog import get_logger
+
 from apps.wizard.app_pages.expert.prompts import (
     SYSTEM_PROMPT_DATASETTE,
     SYSTEM_PROMPT_GUIDES,
@@ -8,7 +10,6 @@ from apps.wizard.app_pages.expert.prompts_dynamic import (
     SYSTEM_PROMPT_DATABASE,
     SYSTEM_PROMPT_FULL,
 )
-from structlog import get_logger
 
 # LOG
 log = get_logger()
