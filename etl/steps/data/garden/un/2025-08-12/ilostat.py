@@ -37,6 +37,8 @@ def run() -> None:
         errors="raise",
     )
 
+    tb = add_ilo_regions(tb=tb, tb_regions=tb_regions)
+
     # Harmonize country names.
     tb = geo.harmonize_countries(
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
