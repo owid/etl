@@ -148,6 +148,7 @@ wizard = [
     "tokenizers==0.21.1; python_version < '3.13'",
     # Settings for 3.13
     "torch>=2.6.0; python_version >= '3.13'",
+    "sentence-transformers>=2.2.2; python_version >= '3.13'",
     "moviepy>=2.1.1",
     "pandas-gbq>=0.25.0",
     "wfork-streamlit-profiler>=0.2.7",
