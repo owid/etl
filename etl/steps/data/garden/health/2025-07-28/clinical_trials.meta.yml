@@ -28,7 +28,7 @@ tables:
       n_studies_country:
         title: Number of clinical trials
         description_short: |
-          Annual number of completed clinical trials registered in the [ClinicalTrials.gov](#dod:clinical-trials-gov) database for each country. Registration in the ClinicalTrials database in the is mandatory for trials in the United States, but voluntary for other countries.
+          Annual number of completed clinical trials registered in the [ClinicalTrials.gov](#dod:clinical-trials-gov) database for each country. Registration in the ClinicalTrials database is mandatory for trials in the United States, but voluntary for other countries.
         unit: trials
         short_unit: ""
         description_processing: |-
