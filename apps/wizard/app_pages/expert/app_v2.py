@@ -8,20 +8,11 @@ import time
 from typing import cast
 
 import streamlit as st
-from pydantic_ai import Agent
 from structlog import get_logger
 
-from apps.utils.gpt import OpenAIWrapper, get_cost_and_tokens
-from apps.wizard.app_pages.expert.prompts import (
-    SYSTEM_PROMPT_DATASETTE,
-    SYSTEM_PROMPT_GUIDES,
-    SYSTEM_PROMPT_INTRO,
-    SYSTEM_PROMPT_METADATA,
-)
-from apps.wizard.app_pages.expert.prompts_dynamic import (
-    SYSTEM_PROMPT_DATABASE,
-    SYSTEM_PROMPT_FULL,
-)
+from apps.wizard.app_pages.expert.model_settings import CHAT_CATEGORIES
+from apps.wizard.app_pages.expert.agent import agent
+
 from etl.config import load_env
 
 st.set_page_config(
@@ -29,24 +20,12 @@ st.set_page_config(
     page_icon="🪄",
 )
 
-# "Summarize your knowledge from your system prompt into one short sentence"
-# SYSTEM_PROMPT_GUIDES      70925   299632
-# SYSTEM_PROMPT_INTRO       26500   109799
-# SYSTEM_PROMPT_PRINCIPLES  17821   75429
-# SYSTEM_PROMPT_METADATA    13609   54469
-# SYSTEM_PROMPT_START       9195    34678
-# SYSTEM_PROMPT_DATASETTE   3917    14850
-# SYSTEM_PROMPT_DATABASE    256     934
-
 # LOG
 log = get_logger()
 
 # PAGE CONFIG
 ## Title/subtitle
-st.title(":rainbow[:material/lightbulb_2:] Expert :gray[v2]")
-st.markdown(
-    "Ask the Expert any questions about ETL! Alternatively, visit [**our documentation ↗**](https://docs.owid.io/projects/etl])."
-)
+st.title(":material/smart_toy: Expert :small[:rainbow[agent mode]]")
 
 ## Load variables
 load_env()
@@ -54,75 +33,37 @@ load_env()
 # SESSION STATE
 st.session_state.setdefault("expert_config", {})
 
-# GPT CONFIG
-MODEL_DEFAULT = "gpt-5"
+# Models
+## See all of them in https://github.com/pydantic/pydantic-ai/blob/master/pydantic_ai_slim/pydantic_ai/models/__init__.py
+MODEL_DEFAULT = "openai:gpt-5-mini"
 MODELS_AVAILABLE = {
-    "gpt-5": "GPT-5",  # IN: US$1.25 / 1M tokens; OUT: US$10.00 / 1M tokens
-    "gpt-5-mini": "GPT-5 mini",  # IN: US$0.25 / 1M tokens; OUT: US$2.00 / 1M tokens
-    "gpt-4o": "GPT-4o",  # IN: US$5.00 / 1M tokens; OUT: US$15.00 / 1M tokens
-    "o4-mini": "GPT o4-mini",  # IN: US$1.10 / 1M tokens; OUT: US$4.40 / 1M tokens
-    # "gpt-4-turbo": "GPT-4 Turbo",  # IN: US$10.00 / 1M tokens; OUT: US$30.00 / 1M tokens  (gpt-4-turbo-2024-04-09)
-}
-MODELS_AVAILABLE_LIST = list(MODELS_AVAILABLE.keys())
-# Some models don't support certain arguments (I think these are the "mini" ones)
-MODELS_DIFFERENT_API = {"o4-mini", "gpt-5", "gpt-5-mini"}
-
-########### MODELS (PyDantic AI)
-# See all of them in https://github.com/pydantic/pydantic-ai/blob/master/pydantic_ai_slim/pydantic_ai/models/__init__.py
-MODELS_PYDANTIC = {
-    "openai:gpt-5": "GPT-5",
     "openai:gpt-5-mini": "GPT-5 mini",
+    "openai:gpt-5": "GPT-5",
     "openai:gpt-4o": "GPT-4o",
     "openai:o3": "GPT o3",
     "anthropic:claude-sonnet-4-0": "Claude Sonnet 4.0",
     "google-gla:gemini-2.5-flash": "Gemini 2.5 Flash",
 }
+MODELS_AVAILABLE_LIST = list(MODELS_AVAILABLE.keys())
+
+# Sample questions
+SAMPLE_QUESTIONS = [
+    "Which are our top 10 articles by pageviews?",
+    "How many charts do we have that use only a single indicator?",
+    "Do we have datasets whose indicators are not used in any chart?",
+    "In the metadata yaml file, which field should I use to disable the map tap view?",
+    "In the metadata yaml file, how can I define a common `description_processing` that affects all indicators in a specific table?"
+    "What is the difference between `description_key` and `description_from_producer`? Be concise.",
+    "Is the following snapshot title correct? 'Cherry Blossom Full Blook Dates in Kyoto, Japan'",
+    "What is the difference between an Origin and Dataset?",
+]
 
 
-# CATEGORY FOR CHAT
-# Chat category-switching
-class Options:
-    """Chat categories."""
+def sample_question() -> str:
+    """Sample a random question from SAMPLE_QUESTIONS."""
+    import random
 
-    FULL = "**⭐️ All**"
-    DATASETTE = "Datasette"
-    DATABASE = "Analytics"
-    METADATA = "ETL Metadata"
-    INTRO = "Introduction"
-    GUIDES = "Learn more"
-    DEBUG = "Debug"
-
-
-# Switch category function
-def get_system_prompt() -> str:
-    """Get appropriate system prompt."""
-    # Choose context to provide to GPT
-    match st.session_state["category_gpt"]:
-        case Options.METADATA:
-            log.info("Switching to 'Metadata' system prompt.")
-            system_prompt = SYSTEM_PROMPT_METADATA
-        case Options.INTRO:
-            log.info("Switching to 'Getting started'/Design principles system prompt.")
-            system_prompt = SYSTEM_PROMPT_INTRO
-        case Options.GUIDES:
-            log.info("Switching to 'Guides' system prompt.")
-            system_prompt = SYSTEM_PROMPT_GUIDES
-        case Options.FULL:
-            log.warning("Switching to 'All' system prompt.")
-            system_prompt = SYSTEM_PROMPT_FULL
-        case Options.DATASETTE:
-            log.warning("Switching to 'DATASETTE' system prompt.")
-            system_prompt = SYSTEM_PROMPT_DATASETTE
-        case Options.DATABASE:
-            log.warning("Switching to 'DATABASE' system prompt.")
-            system_prompt = SYSTEM_PROMPT_DATABASE
-        case Options.DEBUG:
-            log.warning("Switching to 'DEBUG' system prompt.")
-            system_prompt = ""
-        case _:
-            log.info("Nothing selected. Switching to 'All' system prompt.")
-            system_prompt = SYSTEM_PROMPT_FULL
-    return system_prompt
+    return random.choice(SAMPLE_QUESTIONS)
 
 
 # Reset chat history
@@ -131,51 +72,26 @@ def reset_messages() -> None:
     st.exception(Exception("This hasn't been implemented yet"))
 
 
+# Configuration functions
 def config_category():
     # CONFIG part 1: category
-    options = [
-        Options.FULL,
-        Options.DATABASE,
-        Options.METADATA,
-        Options.INTRO,
-        Options.GUIDES,
-    ]
     st.segmented_control(
         label="Choose a category for the question",
-        options=options,
-        default=options[0],
+        options=CHAT_CATEGORIES,
+        default=CHAT_CATEGORIES[1],
         help="Choosing a specific domain reduces the cost of the query to chatGPT, because only a subset of the documentation (i.e. fewer tokens used) will be used in the query.",
         key="category_gpt",
         on_change=reset_messages,
         width="stretch",
     )
 
-    ## EXAMPLE QUERIES
-    if st.session_state["category_gpt"] in {Options.DATASETTE, Options.DATABASE}:
-        EXAMPLE_QUERIES = [
-            "> Which are our top 10 articles by pageviews?",
-            "> How many charts do we have that use only a single indicator?",
-            "> Do we have datasets whose indicators are not used in any chart?",
-        ]
-    else:
-        EXAMPLE_QUERIES = [
-            "> In the metadata yaml file, which field should I use to disable the map tap view?",
-            "> In the metadata yaml file, how can I define a common `description_processing` that affects all indicators in a specific table?"
-            "> What is the difference between `description_key` and `description_from_producer`? Be concise.",
-            "> Is the following snapshot title correct? 'Cherry Blossom Full Blook Dates in Kyoto, Japan'",
-            "> What is the difference between an Origin and Dataset?",
-        ]
-    with st.popover("Examples"):
-        for example in EXAMPLE_QUERIES:
-            st.markdown(example)
-
 
 def config_model():
     # Model
     model_name = st.selectbox(
         label=":material/memory: Select model",
-        options=list(MODELS_PYDANTIC.keys()),
-        format_func=lambda x: MODELS_PYDANTIC[x],
+        options=MODELS_AVAILABLE_LIST,
+        format_func=lambda x: MODELS_AVAILABLE[x],
         index=MODELS_AVAILABLE_LIST.index(MODEL_DEFAULT),
         help="[Pricing](https://openai.com/api/pricing) | [Model list](https://platform.openai.com/docs/models/)",
     )
@@ -190,18 +106,6 @@ def config_model():
             help="The maximum number of tokens in the response.",
         )
     )
-    # Temperature
-    if model_name not in MODELS_DIFFERENT_API:
-        temperature = st.number_input(
-            "Temperature",
-            min_value=0.0,
-            max_value=2.0,
-            value=1.0 if model_name in MODELS_DIFFERENT_API else 0.15,
-            step=0.01,
-            help="What sampling temperature to use, between 0 and 2. Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic.",
-        )
-    else:
-        temperature = 1.0
     # Reduced context
     use_reduced_context = st.toggle(
         "Low context",
@@ -212,7 +116,7 @@ def config_model():
     # Add to session state
     st.session_state["expert_config"]["model_name"] = model_name
     st.session_state["expert_config"]["max_tokens"] = max_tokens
-    st.session_state["expert_config"]["temperature"] = temperature
+    st.session_state["expert_config"]["temperature"] = 1
     st.session_state["expert_config"]["use_reduced_context"] = use_reduced_context
 
 
@@ -221,15 +125,16 @@ def config_others():
         label=":material/restart_alt: Clear chat",
         on_click=reset_messages,
     )
-    with st.popover("Inspect system prompt", icon=":material/text_snippet:"):
-        prompt = get_system_prompt()
-        st.text(prompt)
 
 
+##################################################################
+# UI starts here
+##################################################################
+# Allocate container for chat
 container_chat = st.container()
 
 ### LLM CONFIG
-with st.expander(f"**Model** :gray[(default is {MODEL_DEFAULT})]", icon=":material/settings:"):
+with st.expander(f"**Model config**", icon=":material/settings:"):
     # 1/ Category
     with st.container(horizontal=True, vertical_alignment="bottom"):
         config_category()
@@ -244,19 +149,6 @@ with st.expander(f"**Model** :gray[(default is {MODEL_DEFAULT})]", icon=":materi
 
 # CHAT INTERFACE
 with container_chat:
-    # Pydantic AI Agent
-    # agent = Agent(
-    #     model=st.session_state["expert_config"]["model_name"],
-    #     system_prompt=get_system_prompt(),
-    # )
-
-    agent = Agent(
-        model=st.session_state["expert_config"]["model_name"],
-        system_prompt=get_system_prompt(),
-    )
-
-    # api = OpenAIWrapper()
-
     # Initialize chat history
     # if "messages" not in st.session_state:
     #     reset_messages()
@@ -280,7 +172,8 @@ with container_chat:
     container_response = st.container()
 
     # React to user input
-    if prompt := st.chat_input("Ask me any question!"):
+    # sample_question()
+    if prompt := st.chat_input(placeholder="Ask me anything"):
         st.session_state.feedback_key += 1
         # Display user message in chat message container
         with container_response:
@@ -303,10 +196,16 @@ with container_chat:
                 start_time = time.time()
 
                 # Put agent to work
-                st.toast(f"Agent working, model {agent.model.model_name}...", icon=":material/robot:")
+                st.toast(
+                    f"Agent working, model {st.session_state["expert_config"]["model_name"]}...",
+                    icon=":material/robot:",
+                )
 
                 async def agent_stream():
-                    async with agent.run_stream(prompt) as result:
+                    async with agent.run_stream(
+                        prompt,
+                        model=st.session_state["expert_config"]["model_name"],
+                    ) as result:
                         # """Stream agent response."""
                         # Yield each message from the stream
                         async for message in result.stream_text(delta=True):
@@ -325,8 +224,7 @@ with container_chat:
 
                 if "last_usage" in st.session_state:
                     st.info(st.session_state["last_usage"])
-                    st.info(agent.model)
-                    st.info(agent.model.model_name)
+                    # st.info(agent.model)
                 # We'll gather partial text to show incrementally
                 # partial_text = ""
                 # message_placeholder = st.empty()

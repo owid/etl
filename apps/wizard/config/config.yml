@@ -38,13 +38,13 @@ main:
     entrypoint: app_pages/expert/app.py
     icon: ":material/lightbulb_2:"
   expert2:
-    title: "Expert v2"
+    title: "Expertic"
     description: "Ask the expert ETL questions!"
     maintainer:
       - "@lucas"
       - "@daniel"
     entrypoint: app_pages/expert/app_v2.py
-    icon: ":material/lightbulb_2:"
+    icon: ":material/smart_toy:"
   analytics:
     title: "Analytics (external)"
     description: "Learn more about OWID in Data!"
