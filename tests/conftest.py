@@ -81,9 +81,7 @@ def mock_etl_api_responses():
                     "snippet": "Population per square kilometer of land area",
                     "score": 0.95,
                     "metadata": {
-                        "namespace": "demography",
-                        "version": "2023-03-31",
-                        "dataset": "population",
+                        "catalog_path": "grapher/demography/2023-03-31/population/population#population_density",
                         "chart_count": 42
                     }
                 }
@@ -99,9 +97,7 @@ def mock_etl_api_responses():
                     "snippet": "Date when cherry blossoms reach full bloom in Japan",
                     "score": 0.95,
                     "metadata": {
-                        "namespace": "biodiversity",
-                        "version": "2025-06-28",
-                        "dataset": "cherry_blossom",
+                        "catalog_path": "grapher/biodiversity/2025-06-28/cherry_blossom/cherry_blossom#cherry_blossom_date",
                         "chart_count": 5,
                         "sql_template": "SELECT country, year, cherry_blossom_date FROM '{parquet_url}' WHERE country = 'Japan'",
                         "parquet_url": "https://catalog.ourworldindata.org/biodiversity/2025-06-28/cherry_blossom/cherry_blossom.parquet",
@@ -120,9 +116,7 @@ def mock_etl_api_responses():
                     "snippet": "Generic test indicator",
                     "score": 0.5,
                     "metadata": {
-                        "namespace": "test",
-                        "version": "2024-01-01",
-                        "dataset": "test",
+                        "catalog_path": "grapher/test/2024-01-01/test/test#test_indicator",
                         "chart_count": 1
                     }
                 }
@@ -150,7 +144,7 @@ def mock_httpx_post(monkeypatch, mock_etl_api_responses):
     
     async def mock_post(self, url, **kwargs):
         # Return our mock response for ETL API calls
-        if "etl.owid.io" in url or "indicators/search" in url:
+        if "etl.owid.io" in url or "search/indicators" in url:
             # Get the query from the request body
             json_data = kwargs.get("json", {})
             query = json_data.get("query", "default")

@@ -20,7 +20,7 @@ async def semantic_search_indicators(query: str, limit: int = 10) -> List[Dict[s
     """
     # Make HTTP request to the ETL API
     async with httpx.AsyncClient(timeout=HTTP_TIMEOUT) as client:
-        response = await client.post(f"{ETL_API_URL}/indicators/search", json={"query": query, "limit": limit})
+        response = await client.post(f"{ETL_API_URL}/search/indicators", json={"query": query, "limit": limit})
         response.raise_for_status()
         data = response.json()
 

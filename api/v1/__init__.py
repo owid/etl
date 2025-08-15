@@ -85,7 +85,7 @@ def update_indicator(update_request: UpdateIndicatorRequest, background_tasks: B
     return {"yaml": yaml_str}
 
 
-@v1.post("/api/v1/indicators/search", response_model=SemanticSearchResponse)
+@v1.post("/api/v1/search/indicators", response_model=SemanticSearchResponse)
 async def search_indicators_semantic(request: SemanticSearchRequest) -> SemanticSearchResponse:
     """
     Search for indicators using semantic similarity.
@@ -112,7 +112,7 @@ async def search_indicators_semantic(request: SemanticSearchRequest) -> Semantic
     return SemanticSearchResponse(results=results, query=request.query, total_results=len(results))
 
 
-@v1.get("/api/v1/indicators/search/info")
+@v1.get("/api/v1/search/indicators/info")
 async def get_semantic_search_info():
     """Get information about the semantic search model status."""
     return get_model_info()

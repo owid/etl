@@ -12,18 +12,9 @@ def build_catalog_info(catalog_path: str) -> Dict[str, Any]:
     if not catalog_path or catalog_path == "NULL":
         return {}
 
-    # Remove grapher/ prefix if present
-    path = catalog_path.replace("grapher/", "")
-    parts = path.split("/")
-
-    if len(parts) >= 3:
-        return {
-            "namespace": parts[0],
-            "version": parts[1],
-            "dataset": parts[2],
-        }
-
-    return {}
+    return {
+        "catalog_path": catalog_path,
+    }
 
 
 # Global variables to store preloaded data and initialization state
