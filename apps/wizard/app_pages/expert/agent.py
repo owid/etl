@@ -1,6 +1,5 @@
-from pydantic_ai import Agent
-from apps.wizard.app_pages.expert.model_settings import get_system_prompt
 import streamlit as st
+from pydantic_ai import Agent
 
 
 @st.cache_data(show_spinner="Loading analytics documentation...", show_time=True)
@@ -25,7 +24,7 @@ def cached_docs():
 
 SUMMARY, TABLE_SUMMARY = cached_docs()
 
-SYSTEM_PROMPT_DATABASE = f"""
+SYSTEM_PROMPT_DATABASE = """
 ## Context
 We have our main user database "Semantic Layer", which is based on DuckDB. It is the result of careful curation of our other more raw databases. It is intended to be used mostly for analytics purposes.
 

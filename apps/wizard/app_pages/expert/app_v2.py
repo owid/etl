@@ -4,16 +4,15 @@ references:
 - https://docs.streamlit.io/knowledge-base/tutorials/build-conversational-apps#build-a-chatgpt-like-app
 """
 
-import streamlit as st
 import time
-
-from structlog import get_logger
 from typing import cast
 
-from apps.wizard.app_pages.expert.model_settings import CHAT_CATEGORIES
-from apps.wizard.app_pages.expert.agent import agent
-from etl.config import load_env
+import streamlit as st
+from structlog import get_logger
 
+from apps.wizard.app_pages.expert.agent import agent
+from apps.wizard.app_pages.expert.model_settings import CHAT_CATEGORIES
+from etl.config import load_env
 
 st.set_page_config(
     page_title="Wizard: Ask the Expert",
