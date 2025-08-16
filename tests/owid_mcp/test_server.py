@@ -3,8 +3,8 @@ import io
 import pandas as pd
 import pytest
 from fastmcp import Client
-from mcp.types import TextContent
 
+from mcp.types import TextContent
 from owid_mcp.server import mcp
 
 
