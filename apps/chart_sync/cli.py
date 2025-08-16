@@ -85,7 +85,7 @@ def cli(
 
     **Considerations on tags:**
 
-    - Tags are synced only for **_new charts_**, any edits to tags in existing charts are ignored.
+    - Tags are synced for both **_new and existing charts_**.
 
     **Example 1:** Run chart-sync in dry-run mode to see what charts will be updated
 
@@ -206,9 +206,11 @@ def cli(
                     # Change has been approved, update the chart
                     if diff.is_approved:
                         log.info("chart_sync.chart_update", slug=chart_slug, chart_id=chart_id)
+                        chart_tags = diff.source_chart.tags(source_session)
                         charts_synced += 1
                         if not dry_run:
                             target_api.update_chart(chart_id, migrated_config, user_id=user_id)
+                            target_api.set_tags(chart_id, chart_tags, user_id=user_id)
 
                     # Rejected chart diff
                     elif diff.is_rejected:
