@@ -1275,6 +1275,14 @@ steps:
     - data://meadow/who/2025-07-15/vaccination_introductions
   data://grapher/who/2025-07-15/vaccination_introductions:
     - data://garden/who/2025-07-15/vaccination_introductions
+
+  # Clinical trials - ClinicalTrials.gov
+  # no meadow snapshot, as this is a large dataset
+  data://garden/health/2025-07-28/clinical_trials:
+    - snapshot://health/2025-07-28/clinical_trials.csv
+  data://grapher/health/2025-07-28/clinical_trials:
+    - data://garden/health/2025-07-28/clinical_trials
+
   # Guinea worm certification
   data://meadow/who/2025-08-01/guinea_worm_certification:
     - snapshot://who/2025-08-01/guinea_worm.csv
@@ -1286,6 +1294,7 @@ steps:
     - data://garden/who/2025-08-01/guinea_worm_certification
   data://grapher/who/2025-08-01/guinea_worm:
     - data://garden/who/2025-08-01/guinea_worm
+
   # WHO Mortality Database - Cancer specific
   data://meadow/who/2025-08-05/mortality_database_cancer:
     - snapshot://who/2025-08-05/mortality_database_cancer.csv
