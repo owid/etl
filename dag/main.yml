@@ -356,14 +356,6 @@ steps:
   data://grapher/aviation_safety_network/2024-06-05/aviation_statistics:
     - data://garden/aviation_safety_network/2024-06-05/aviation_statistics
 
-  # UN Regions
-  data://meadow/un/2024-06-24/sdg_regions:
-    - snapshot://un/2024-06-24/sdg_regions.csv
-  data://garden/un/2024-06-24/sdg_regions:
-    - data://meadow/un/2024-06-24/sdg_regions
-  data://grapher/un/2024-06-24/sdg_regions:
-    - data://garden/un/2024-06-24/sdg_regions
-
   # Homicide - OMM
   data://garden/homicide/2024-07-30/homicide_long_run_omm:
     - snapshot://fasttrack/2023-01-03/long_term_homicide_rates_in_europe.csv
