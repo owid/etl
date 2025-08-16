@@ -65,3 +65,90 @@ def mock_expected_direct_usages():
     }
 
     return mock_expected_direct_usages_dict
+
+
+@pytest.fixture
+def mock_etl_api_responses():
+    """Mock responses for ETL API semantic search based on query."""
+    return {
+        "population": {
+            "results": [
+                {
+                    "title": "Population density",
+                    "indicator_id": 12345,
+                    "snippet": "Population per square kilometer of land area",
+                    "score": 0.95,
+                    "metadata": {
+                        "catalog_path": "grapher/demography/2023-03-31/population/population#population_density",
+                        "chart_count": 42,
+                    },
+                }
+            ],
+            "query": "population",
+            "total_results": 1,
+        },
+        "cherry blossom": {
+            "results": [
+                {
+                    "title": "Cherry blossom flowering date",
+                    "indicator_id": 67890,
+                    "snippet": "Date when cherry blossoms reach full bloom in Japan",
+                    "score": 0.95,
+                    "metadata": {
+                        "catalog_path": "grapher/biodiversity/2025-06-28/cherry_blossom/cherry_blossom#cherry_blossom_date",
+                        "chart_count": 5,
+                        "sql_template": "SELECT country, year, cherry_blossom_date FROM '{parquet_url}' WHERE country = 'Japan'",
+                        "parquet_url": "https://catalog.ourworldindata.org/biodiversity/2025-06-28/cherry_blossom/cherry_blossom.parquet",
+                        "column": "cherry_blossom_date",
+                    },
+                }
+            ],
+            "query": "cherry blossom",
+            "total_results": 1,
+        },
+        "default": {
+            "results": [
+                {
+                    "title": "Test indicator",
+                    "indicator_id": 99999,
+                    "snippet": "Generic test indicator",
+                    "score": 0.5,
+                    "metadata": {"catalog_path": "grapher/test/2024-01-01/test/test#test_indicator", "chart_count": 1},
+                }
+            ],
+            "query": "default",
+            "total_results": 1,
+        },
+    }
+
+
+class MockResponse:
+    def __init__(self, json_data):
+        self._json_data = json_data
+
+    def json(self):
+        return self._json_data
+
+    def raise_for_status(self):
+        pass
+
+
+@pytest.fixture(autouse=True)
+def mock_httpx_post(monkeypatch, mock_etl_api_responses):
+    """Mock httpx POST requests to ETL API."""
+
+    async def mock_post(self, url, **kwargs):
+        # Return our mock response for ETL API calls
+        if "etl.owid.io" in url or "search/indicators" in url:
+            # Get the query from the request body
+            json_data = kwargs.get("json", {})
+            query = json_data.get("query", "default")
+
+            # Return appropriate mock response based on query
+            response = mock_etl_api_responses.get(query, mock_etl_api_responses["default"])
+            return MockResponse(response)
+        # For other URLs, return a generic mock
+        return MockResponse({"error": "Unexpected URL in test"})
+
+    # Mock httpx.AsyncClient.post method
+    monkeypatch.setattr("httpx.AsyncClient.post", mock_post)

@@ -1,6 +1,6 @@
 from typing import Any, Dict, List, Literal, Optional, Union
 
-from pydantic import BaseModel, Extra
+from pydantic import BaseModel
 
 from .. import utils
 
@@ -12,7 +12,7 @@ class Presentation(BaseModel):
     attributionShort: Optional[str] = None
 
     class Config:
-        extra = Extra.forbid
+        extra = "forbid"
 
     def to_meta_dict(self) -> Dict[str, Any]:
         d = {
@@ -39,7 +39,7 @@ class Indicator(BaseModel):
     updatePeriodDays: Union[int, Literal[""], None] = None
 
     class Config:
-        extra = Extra.forbid
+        extra = "forbid"
 
     def to_meta_dict(self) -> Dict[str, Any]:
         d = {
@@ -70,4 +70,38 @@ class UpdateIndicatorRequest(BaseModel):
     triggerETL: bool = False
 
     class Config:
-        extra = Extra.forbid
+        extra = "forbid"
+
+
+class SemanticSearchRequest(BaseModel):
+    """JSON schema for semantic search request."""
+
+    query: str
+    limit: int = 10
+
+    class Config:
+        extra = "forbid"
+
+
+class SemanticSearchResult(BaseModel):
+    """JSON schema for individual semantic search result."""
+
+    title: str
+    indicator_id: int
+    snippet: str
+    score: float
+    metadata: Dict[str, Any]
+
+    class Config:
+        extra = "forbid"
+
+
+class SemanticSearchResponse(BaseModel):
+    """JSON schema for semantic search response."""
+
+    results: List[SemanticSearchResult]
+    query: str
+    total_results: int
+
+    class Config:
+        extra = "forbid"

@@ -9,6 +9,7 @@ DATASETTE_BASE = os.getenv("OWID_DATASETTE_BASE", "https://datasette-public.owid
 OWID_API_BASE = os.getenv("OWID_API_BASE", "https://api.ourworldindata.org/v1/indicators")
 GRAPHER_BASE = os.getenv("GRAPHER_BASE", "https://ourworldindata.org/grapher")
 CATALOG_BASE = os.getenv("CATALOG_BASE", "https://catalog.ourworldindata.org")
+ETL_API_URL = os.getenv("ETL_API_URL", "https://etl.owid.io/api/v1")
 
 # Algolia configuration
 ALGOLIA_APP_ID = os.getenv("ALGOLIA_APP_ID", "ASCB5XMYF2")

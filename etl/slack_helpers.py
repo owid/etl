@@ -25,6 +25,11 @@ def send_slack_message(
 
     If there is an error with the image upload, the message will be sent without the image.
     """
+    # If no Slack token is configured, just print the message
+    if config.SLACK_API_TOKEN is None:
+        print(f"[SLACK {channel}] {message}")
+        return None  # type: ignore
+
     # Send message + image
     if image_url or image_path:
         img_response = upload_image(image_url=image_url, image_path=image_path)
