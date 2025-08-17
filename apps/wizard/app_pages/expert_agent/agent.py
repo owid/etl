@@ -2,7 +2,6 @@ import urllib.parse
 from pathlib import Path
 from typing import AsyncGenerator, Literal
 
-import pandas as pd
 import requests
 import streamlit as st
 import yaml
@@ -186,7 +185,7 @@ async def get_context(category_name: Literal["analytics", "metadata", "docs"]) -
     Returns:
         str: The context for the specified category.
     """
-    st.toast("**Tool use**: `get_context`", icon=":material/smart_toy:")
+    st.toast(f"**Tool use**: `get_context`, `{category_name}`", icon=":material/smart_toy:")
     return CONTEXT["context"][category_name]
 
 

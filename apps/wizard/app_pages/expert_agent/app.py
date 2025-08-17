@@ -9,7 +9,7 @@ import time
 from typing import cast
 
 import streamlit as st
-from pydantic_ai.messages import ModelRequest
+from pydantic_core import to_json
 from structlog import get_logger
 
 from apps.wizard.app_pages.expert_agent.agent import agent_stream2
@@ -24,6 +24,9 @@ st.set_page_config(
 # LOG
 log = get_logger()
 
+# Config
+AVATAR_PERSON = ":material/person:"
+
 ## Load variables
 load_env()
 
@@ -34,7 +37,7 @@ st.session_state.setdefault("response", None)
 
 # Models
 ## See all of them in https://github.com/pydantic/pydantic-ai/blob/master/pydantic_ai_slim/pydantic_ai/models/__init__.py
-MODEL_DEFAULT = "openai:gpt-5"
+MODEL_DEFAULT = "openai:gpt-5-mini"
 
 # Sample questions
 SAMPLE_QUESTIONS = [
@@ -64,6 +67,7 @@ def reset_messages() -> None:
     """Reset messages to default."""
     st.session_state["agent_messages"] = []
 
+
 def show_usage(response_time: float):
     if "last_usage" in st.session_state:
         # st.markdown(st.session_state.last_usage)
@@ -87,35 +91,74 @@ def show_usage(response_time: float):
             f":green-badge[:small[{cost_msg}]] :blue-badge[:small[{tokens_msg}]] :gray-badge[:small[{time_msg}]] :gray-badge[:small[{model_name}]]"
         )
 
-def show_reasoning_details():
-    with st.expander("**Reasoning details**", expanded=False, icon=":material/auto_awesome:"):
+
+def _load_history_messages():
+    messages = []
+    if "agent_result" in st.session_state:
         messages = st.session_state["agent_result"].all_messages_json()
         messages = json.loads(messages)
-        for message in messages:
+    return messages
+
+
+def show_reasoning_details():
+    with st.expander("**Reasoning details**", expanded=False, icon=":material/auto_awesome:"):
+        messages = _load_history_messages()
+        num_parts = sum(len(message["parts"]) for message in messages)
+        counter_parts = 0
+        counter_questions = 0
+        for _, message in enumerate(messages):
             parts = message["parts"]
-            kind = {"request": "Agent request", "response": "LLM response"}.get(
-                message["kind"], message["kind"]
-            )
-            for part in parts:
+            kind = {"request": "Agent request", "response": "LLM response"}.get(message["kind"], message["kind"])
+            for _, part in enumerate(parts):
+                counter_parts += 1
                 part_kind = part["part_kind"]
-                title = f"**{kind}** - {part_kind}"
+                title = f"({counter_parts}/{num_parts}) **{kind}** - {part_kind}"
                 if "tool_name" in part:
                     title += f" `{part['tool_name']}`"
+                if part_kind == "user-prompt":
+                    counter_questions += 1
+                    st.badge(f"Question {counter_questions}")
                 with st.expander(title):
                     st.write(part)
+
 
 def register_message_history():
     agent_messages = [msg for msg in st.session_state["agent_result"].new_messages()]
     ## TEST: only keep user/system prompts and final responses
-    filtered_messages = []
-    for msg in agent_messages:
-        if hasattr(msg, "parts") and any(part.part_kind in ("user-prompt") for part in msg.parts):
-            # Only keep messages that are user prompts
-            filtered_messages.append(msg)
-        elif hasattr(msg, "kind") and msg.kind == "response":
-            # Keep only response messages
-            filtered_messages.append(msg)
+    # filtered_messages = []
+    # for msg in agent_messages:
+    #     if hasattr(msg, "parts") and any(part.part_kind in ("user-prompt") for part in msg.parts):
+    #         # Only keep messages that are user prompts
+    #         filtered_messages.append(msg)
+    #     elif hasattr(msg, "kind") and msg.kind == "response":
+    #         # Keep only response messages
+    #         filtered_messages.append(msg)
     st.session_state["agent_messages"].extend(agent_messages)
+
+
+def show_history_chat():
+    # Load messages
+    messages = st.session_state["agent_messages"]
+    messages = to_json(messages)
+    messages = json.loads(messages)
+    # Display messages
+    for message in messages:
+        parts = message["parts"]
+        kind = message["kind"]
+        for part in parts:
+            part_kind = part["part_kind"]
+            if (kind == "request") and (part_kind == "user-prompt"):
+                if "content" in part:
+                    with st.chat_message("user", avatar=AVATAR_PERSON):
+                        st.markdown(part["content"])
+                else:
+                    st.toast("**Warning**: Error rendering message history.", icon=":material/warning:")
+            elif (kind == "response") and (part_kind == "text"):
+                if "content" in part:
+                    with st.chat_message("assistant"):
+                        st.markdown(part["content"])
+                else:
+                    st.toast("**Warning**: Error rendering message history.", icon=":material/warning:")
 
 
 def show_settings_menu():
@@ -126,7 +169,7 @@ def show_settings_menu():
             format_func=lambda x: MODELS_DISPLAY[x],
             index=MODELS_AVAILABLE_LIST.index(MODEL_DEFAULT),
             help="[Pricing](https://openai.com/api/pricing) | [Model list](https://platform.openai.com/docs/models/)",
-            key="expert_model_name"
+            key="expert_model_name",
             # on_change=lambda: st.session_state.setdefault("expert_config", {}).update({"model_name": st.session_state["expert_model_name"]}),
         )
         st.session_state["expert_config"]["model_name"] = model_name
@@ -136,11 +179,14 @@ def show_settings_menu():
             on_click=reset_messages,
         )
 
+
 ##################################################################
 # UI starts here
 ##################################################################
 # Title
-container = st.container(horizontal=True, horizontal_alignment="left", vertical_alignment="bottom", width="stretch")
+container = st.container(
+    horizontal=True, horizontal_alignment="left", vertical_alignment="center", width="stretch", border=False
+)
 with container:
     ## Title/subtitle
     st.title(":rainbow[:material/smart_toy:] Expert")
@@ -151,14 +197,17 @@ with container:
         show_settings_menu()
 
 # Arrange chat input
-prompt = st.chat_input(placeholder=f"Ask me anything)")
+prompt = st.chat_input(placeholder="Ask anything")
 
 # React to user input
 if prompt:
-    # Display user message in chat message container
-    with st.chat_message("user", avatar=":material/person:"):
-        st.markdown(prompt)
+    # Display history of messages
+    if "agent_messages" in st.session_state:
+        show_history_chat()
 
+    # Display user message in chat message container
+    with st.chat_message("user", avatar=AVATAR_PERSON):
+        st.markdown(prompt)
 
     # Display assistant response in chat message container
     with st.chat_message("assistant"):
@@ -189,6 +238,4 @@ if prompt:
             # Add messages to history
             register_message_history()
 
-
         print("finished asking LLM...")
-
