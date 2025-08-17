@@ -232,7 +232,7 @@ with container_chat:
                         if hasattr(msg, "parts") and any(part.part_kind in ("user-prompt") for part in msg.parts):
                             # Only keep messages that are user prompts
                             filtered_messages.append(msg)
-                        elif hasattr(msg, "kind") and msg["kind"] == "response":
+                        elif hasattr(msg, "kind") and msg.kind == "response":
                             # Keep only response messages
                             filtered_messages.append(msg)
                     st.session_state["agent_messages"].extend(agent_messages)
