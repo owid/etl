@@ -62,7 +62,7 @@ def sample_question() -> str:
 # Reset chat history
 def reset_messages() -> None:
     """Reset messages to default."""
-    st.exception(Exception("This hasn't been implemented yet"))
+    st.session_state["agent_messages"] = []
 
 
 def config_model():
@@ -102,8 +102,8 @@ with st.expander("**Model config**", icon=":material/settings:"):
     with st.container(horizontal=True, vertical_alignment="bottom"):
         config_model()
     # 3/ Others
-    # with st.container(horizontal=True, vertical_alignment="bottom"):
-    #     config_others()
+    with st.container(horizontal=True, vertical_alignment="bottom"):
+        config_others()
 
 
 # CHAT INTERFACE
