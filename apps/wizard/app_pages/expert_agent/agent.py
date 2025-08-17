@@ -115,7 +115,7 @@ async def agent_stream(prompt: str, model_name: str) -> AsyncGenerator[str, None
         st.session_state["last_usage"] = result.usage()
 
 
-async def agent_stream2(prompt: str, model_name: str) -> AsyncGenerator[str, None]:
+async def agent_stream2(prompt: str, model_name: str, message_history) -> AsyncGenerator[str, None]:
     """Stream agent response using iter method with detailed event handling.
 
     It uses a more sophisticated approach, to support streaming with models other than OpenAI. Reference: https://github.com/pydantic/pydantic-ai/issues/1007#issuecomment-2963469441
@@ -130,6 +130,7 @@ async def agent_stream2(prompt: str, model_name: str) -> AsyncGenerator[str, Non
     async with agent.iter(
         prompt,
         model=model_name,
+        message_history=message_history,
     ) as run:
         nodes = []
         # Yield each message from the stream
@@ -165,6 +166,8 @@ async def agent_stream2(prompt: str, model_name: str) -> AsyncGenerator[str, Non
     # Capture the usage information using callback or session state
     if hasattr(run, "usage"):
         st.session_state["last_usage"] = run.usage()
+    if hasattr(run, "result"):
+        st.session_state["agent_result"] = run.result
 
 
 #######################################################
@@ -183,7 +186,7 @@ async def get_context(category_name: Literal["analytics", "metadata", "docs"]) -
     Returns:
         str: The context for the specified category.
     """
-    st.toast("**Tool use**: `get_context`", icon=":material/robot:")
+    st.toast("**Tool use**: `get_context`", icon=":material/smart_toy:")
     return CONTEXT["context"][category_name]
 
 
@@ -207,7 +210,7 @@ async def get_docs_index() -> str:
     Returns:
         str: The documentation index. List of available section and pages.
     """
-    st.toast("**Tool use**: `get_docs_index`", icon=":material/robot:")
+    st.toast("**Tool use**: `get_docs_index`", icon=":material/smart_toy:")
     docs = ruamel_dump(DOCS_INDEX["nav"])
     return docs
 
@@ -230,7 +233,7 @@ async def get_docs_page(file_path: str) -> str:
     Returns:
         str: The documentation for the specified file_path.
     """
-    st.toast(f"**Tool use**: `get_docs_page`, `file_path='{file_path}'`", icon=":material/robot:")
+    st.toast(f"**Tool use**: `get_docs_page`, `file_path='{file_path}'`", icon=":material/smart_toy:")
     if (DOCS_DIR / file_path).exists():
         docs = read_page_md(DOCS_DIR / file_path)
     else:
@@ -243,10 +246,12 @@ async def get_docs_page(file_path: str) -> str:
 async def get_db_tables() -> str:
     """Get an overview of the database tables. Retrieve the names of the tables in the database, along with their short descriptions.
 
+    Some table tables have description "TODO". That's because we haven't documented them yet.
+
     Returns:
         str: Table short descriptions in format "table1: ...\ntable2: ...".
     """
-    st.toast("**Tool use**: `get_db_tables`", icon=":material/robot:")
+    st.toast("**Tool use**: `get_db_tables`", icon=":material/smart_toy:")
     return ANALYTICS_DB_OVERVIEW
 
 
@@ -254,13 +259,15 @@ async def get_db_tables() -> str:
 async def get_db_table_fields(tb_name: str) -> str:
     """Retrieve the documentation of the columns of database table "tb_name".
 
+    Some table columns have description "TODO". That's because we haven't documented them yet.
+
     Args:
         tb_name: Name of the table
 
     Returns:
         str: Table documentation as string, mapping column names to their descriptions. E.g. "column1: description1\ncolumn2: description2".
     """
-    st.toast(f"**Tool use**: `get_db_table_fields`, `table='{tb_name}'`", icon=":material/robot:")
+    st.toast(f"**Tool use**: `get_db_table_fields`, `table='{tb_name}'`", icon=":material/smart_toy:")
     if tb_name not in ANALYTICS_DB_TABLE_DETAILS:
         print("Table not found:", tb_name)
         print("Available tables:", sorted(ANALYTICS_DB_TABLE_DETAILS.keys()))
@@ -281,7 +288,7 @@ async def get_api_reference_metadata(
     Returns:
         str: Metadata for the specified object type.
     """
-    st.toast(f"**Tool use**: `get_db_table_fields`, `object_name='{object_name}'`", icon=":material/robot:")
+    st.toast(f"**Tool use**: `get_db_table_fields`, `object_name='{object_name}'`", icon=":material/smart_toy:")
     match object_name:
         case "dataset":
             return render_dataset()
@@ -315,7 +322,7 @@ async def generate_url_to_datasette(query: str) -> str:
     Returns:
         str: URL to the Datasette instance with the query. The URL links to a datasette preview with the SQL query and its results.
     """
-    st.toast("**Tool use**: `generate_url_to_datasette`", icon=":material/robot:")
+    st.toast("**Tool use**: `generate_url_to_datasette`", icon=":material/smart_toy:")
     return _generate_url_to_datasette(query)
 
 
@@ -333,7 +340,7 @@ async def validate_datasette_query(query: str) -> str:
     Returns:
         str: Validation result message. If the query is not valid, it will return an error message. Use it to improve the query!
     """
-    st.toast("**Tool use**: `validate_datasette_query`", icon=":material/robot:")
+    st.toast("**Tool use**: `validate_datasette_query`", icon=":material/smart_toy:")
     url = _generate_url_to_datasette(f"{query}")
     url = url.replace(ANALYTICS_URL, ANALYTICS_URL + ".json")
     response = requests.get(url).json()
@@ -360,7 +367,7 @@ async def get_data_from_datasette(query: str) -> str:
     Returns:
         pd.DataFrame: DataFrame with the results of the query.
     """
-    st.toast("**Tool use**: `get_data_from_datasette`", icon=":material/robot:")
+    st.toast("**Tool use**: `get_data_from_datasette`", icon=":material/smart_toy:")
     df = read_datasette(query, use_https=False)
     if df.empty:
         return ""

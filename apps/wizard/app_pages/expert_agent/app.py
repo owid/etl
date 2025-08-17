@@ -4,10 +4,12 @@ references:
 - https://docs.streamlit.io/knowledge-base/tutorials/build-conversational-apps#build-a-chatgpt-like-app
 """
 
+import json
 import time
 from typing import cast
 
 import streamlit as st
+from pydantic_ai.messages import ModelRequest
 from structlog import get_logger
 
 from apps.wizard.app_pages.expert_agent.agent import agent_stream2
@@ -31,6 +33,7 @@ load_env()
 
 # SESSION STATE
 st.session_state.setdefault("expert_config", {})
+st.session_state.setdefault("agent_messages", [])
 
 # Models
 ## See all of them in https://github.com/pydantic/pydantic-ai/blob/master/pydantic_ai_slim/pydantic_ai/models/__init__.py
@@ -154,7 +157,7 @@ with container_chat:
                 # Put agent to work
                 st.toast(
                     f"Agent working, model {st.session_state["expert_config"]["model_name"]}...",
-                    icon=":material/robot:",
+                    icon=":material/smart_toy:",
                 )
 
                 # Stream the agent response
@@ -162,6 +165,7 @@ with container_chat:
                 stream = agent_stream2(
                     prompt,
                     model_name=st.session_state["expert_config"]["model_name"],
+                    message_history=st.session_state["agent_messages"],
                 )
 
                 # Option 2: Avoid st.session_state by passing parameters explicitly
@@ -178,6 +182,7 @@ with container_chat:
                 end_time = time.time()
                 st.session_state.response_time = end_time - start_time
 
+                # Show cost and other details
                 if "last_usage" in st.session_state:
                     # st.markdown(st.session_state.last_usage)
                     cost = estimate_llm_cost(
@@ -200,9 +205,37 @@ with container_chat:
                     st.markdown(
                         f":green-badge[:small[{cost_msg}]] :blue-badge[:small[{tokens_msg}]] :gray-badge[:small[{time_msg}]] :gray-badge[:small[{model_name}]]"
                     )
-                # End timer and store duration
-                end_time = time.time()
-                st.session_state.response_time = end_time - start_time
+
+                # Agent execution details
+                if "agent_result" in st.session_state:
+                    with st.expander("**Agent reasoning details**", expanded=False, icon=":material/auto_awesome:"):
+                        messages = st.session_state["agent_result"].all_messages_json()
+                        messages = json.loads(messages)
+                        for message in messages:
+                            parts = message["parts"]
+                            kind = {"request": "Agent request", "response": "LLM response"}.get(
+                                message["kind"], message["kind"]
+                            )
+                            for part in parts:
+                                part_kind = part["part_kind"]
+                                title = f"**{kind}** - {part_kind}"
+                                if "tool_name" in part:
+                                    title += f" `{part['tool_name']}`"
+                                with st.expander(title):
+                                    st.write(part)
+
+                    # Add messages to history
+                    agent_messages = [msg for msg in st.session_state["agent_result"].new_messages()]
+                    ## TEST: only keep user/system prompts and final responses
+                    filtered_messages = []
+                    for msg in agent_messages:
+                        if hasattr(msg, "parts") and any(part.part_kind in ("user-prompt") for part in msg.parts):
+                            # Only keep messages that are user prompts
+                            filtered_messages.append(msg)
+                        elif hasattr(msg, "kind") and msg["kind"] == "response":
+                            # Keep only response messages
+                            filtered_messages.append(msg)
+                    st.session_state["agent_messages"].extend(agent_messages)
 
             # Add new response by the System
             # st.session_state.messages.append({"role": "assistant", "content": st.session_state.response})
