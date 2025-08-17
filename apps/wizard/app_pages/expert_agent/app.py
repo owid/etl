@@ -11,7 +11,7 @@ import streamlit as st
 from structlog import get_logger
 
 from apps.wizard.app_pages.expert_agent.agent import agent_stream2
-from apps.wizard.app_pages.expert_agent.utils import estimate_llm_cost
+from apps.wizard.app_pages.expert_agent.utils import MODELS_AVAILABLE_LIST, MODELS_DISPLAY, estimate_llm_cost
 from etl.config import load_env
 
 st.set_page_config(
@@ -34,16 +34,7 @@ st.session_state.setdefault("expert_config", {})
 
 # Models
 ## See all of them in https://github.com/pydantic/pydantic-ai/blob/master/pydantic_ai_slim/pydantic_ai/models/__init__.py
-MODEL_DEFAULT = "openai:gpt-5-mini"
-MODELS_AVAILABLE = {
-    "openai:gpt-5-mini": "GPT-5 mini",
-    "openai:gpt-5": "GPT-5",
-    "openai:gpt-4o": "GPT-4o",
-    "openai:o3": "GPT o3",
-    "anthropic:claude-sonnet-4-0": "Claude Sonnet 4.0",
-    "google-gla:gemini-2.5-flash": "Gemini 2.5 Flash",
-}
-MODELS_AVAILABLE_LIST = list(MODELS_AVAILABLE.keys())
+MODEL_DEFAULT = "openai:gpt-5"
 
 # Sample questions
 SAMPLE_QUESTIONS = [
@@ -76,7 +67,7 @@ def config_model():
     model_name = st.selectbox(
         label=":material/memory: Select model",
         options=MODELS_AVAILABLE_LIST,
-        format_func=lambda x: MODELS_AVAILABLE[x],
+        format_func=lambda x: MODELS_DISPLAY[x],
         index=MODELS_AVAILABLE_LIST.index(MODEL_DEFAULT),
         help="[Pricing](https://openai.com/api/pricing) | [Model list](https://platform.openai.com/docs/models/)",
     )
@@ -167,7 +158,21 @@ with container_chat:
                 )
 
                 # Stream the agent response
-                st.session_state.response = cast(str, st.write_stream(agent_stream2(prompt)))
+                # Option 1: Keep existing behavior (uses st.session_state internally)
+                stream = agent_stream2(
+                    prompt,
+                    model_name=st.session_state["expert_config"]["model_name"],
+                )
+
+                # Option 2: Avoid st.session_state by passing parameters explicitly
+                # model_name = st.session_state["expert_config"]["model_name"]
+                # def usage_handler(usage_info):
+                #     st.session_state["last_usage"] = usage_info
+                # stream = agent_stream2(prompt, model_name=model_name, usage_callback=usage_handler)
+                st.session_state.response = cast(
+                    str,
+                    st.write_stream(stream),
+                )
 
                 # End timer and store duration
                 end_time = time.time()

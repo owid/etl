@@ -13,12 +13,12 @@ models:
     cost:
       in: 1.25
       out: 10.00
-  - name: "opopenai:gpt-4.1"
-    display_name: "GPT-4o"
+  - name: "openai:gpt-4.1"
+    display_name: "GPT-4.1"
     cost:
       in: 2.00
       out: 8.00
-  - name: "opopenai:gpt-4o"
+  - name: "openai:gpt-4o"
     display_name: "GPT-4o"
     cost:
       in: 2.50
