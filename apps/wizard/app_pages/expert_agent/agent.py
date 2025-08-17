@@ -334,14 +334,14 @@ async def validate_datasette_query(query: str) -> str:
         str: Validation result message. If the query is not valid, it will return an error message. Use it to improve the query!
     """
     st.toast("**Tool use**: `validate_datasette_query`", icon=":material/robot:")
-    url = _generate_url_to_datasette(f"{query} LIMIT 1")
+    url = _generate_url_to_datasette(f"{query}")
     url = url.replace(ANALYTICS_URL, ANALYTICS_URL + ".json")
     response = requests.get(url).json()
     if response["ok"]:
         if ("rows" not in response) or not isinstance(response["rows"], list):
             text = "Query is invalid! Check for correctness, it must be DuckDB compatible! Seems like no rows were returned."
         if len(response["rows"]) == 0:
-            text = "Query is valid, but no results found. It might be intended, or an unexpected error. Check the query for correctness. It must be DuckDB compatible!"
+            text = "Query is valid, but no results found."
         else:
             text = "Query is valid!"
     else:
@@ -353,6 +353,8 @@ async def validate_datasette_query(query: str) -> str:
 async def get_data_from_datasette(query: str) -> str:
     """Execute a query in the semantic layer in Datasette and get the actual data results.
 
+    This only shows the first 10 rows of the result, as a markdown table.
+
     Args:
         query: Query to Datasette instance.
     Returns:
@@ -363,7 +365,7 @@ async def get_data_from_datasette(query: str) -> str:
     if df.empty:
         return ""
 
-    result = df.head().to_markdown(index=False)
+    result = df.head(10).to_markdown(index=False)
     if result is None:
         return ""
     return result
