@@ -37,7 +37,7 @@ def get_application():
     )
 
     _app.add_middleware(
-        SentryAsgiMiddleware,
+        SentryAsgiMiddleware,  # type: ignore
     )
 
     return _app

@@ -1338,7 +1338,7 @@ version = "0.1.0"
 source = { editable = "." }
 dependencies = [
     { name = "cdsapi" },
-    { name = "cfgrib" },
+    { name = "cfgrib", marker = "sys_platform != 'darwin' or platform_release >= '22'" },
     { name = "click" },
     { name = "deprecated" },
     { name = "earthengine-api" },
@@ -1471,7 +1471,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "cdsapi", specifier = ">=0.7.4" },
-    { name = "cfgrib", specifier = ">=0.9.15.0" },
+    { name = "cfgrib", marker = "sys_platform != 'darwin' or platform_release >= '22'", specifier = ">=0.9.15.0" },
     { name = "click", specifier = ">=8.0.1" },
     { name = "deprecated", specifier = ">=1.2.14" },
     { name = "earthengine-api", specifier = ">=0.1.411" },
