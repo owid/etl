@@ -29,20 +29,19 @@ main:
     maintainer: "@lucas"
     entrypoint: home.py
     icon: ":material/home:"
+  # expert:
+  #   title: "Expert"
+  #   description: "Ask the expert ETL questions!"
+  #   maintainer:
+  #     - "@lucas"
+  #     - "@daniel"
+  #   entrypoint: app_pages/expert/app.py
+  #   icon: ":material/lightbulb_2:"
   expert:
     title: "Expert"
     description: "Ask the expert ETL questions!"
     maintainer:
       - "@lucas"
-      - "@daniel"
-    entrypoint: app_pages/expert/app.py
-    icon: ":material/lightbulb_2:"
-  expert2:
-    title: "Expertic"
-    description: "Ask the expert ETL questions!"
-    maintainer:
-      - "@lucas"
-      - "@daniel"
     entrypoint: app_pages/expert_agent/app.py
     icon: ":material/smart_toy:"
   analytics:
