@@ -99,7 +99,7 @@ agent = Agent(
     instructions=SYSTEM_PROMPT,
     retries=2,
     model_settings=settings,
-    # toolsets=[mcp_server_prod],
+    toolsets=[mcp_server_prod],
 )
 
 
