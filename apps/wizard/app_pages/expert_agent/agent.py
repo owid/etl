@@ -2,7 +2,7 @@ import urllib.parse
 from pathlib import Path
 from typing import AsyncGenerator, Literal
 
-import logfire
+# import logfire
 import requests
 import streamlit as st
 import yaml
@@ -29,8 +29,8 @@ from etl.docs import (
 from etl.files import ruamel_dump, ruamel_load
 from etl.paths import BASE_DIR, DOCS_DIR
 
-logfire.configure()
-logfire.instrument_pydantic_ai()
+# logfire.configure()
+# logfire.instrument_pydantic_ai()
 
 #######################################################
 # LOAD KNOWLEDGE BASE
