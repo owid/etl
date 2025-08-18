@@ -254,7 +254,7 @@ tables:
           - "{definitions.notes.completed_trials}"
           - If a trial has results posted, it means that the results of the trial have been published in the [ClinicalTrials.gov](#dod:clinical-trials-gov) database.
           - If a trial has no results posted, it could be that the trial has been completed, but the results are not yet available or have not been published. It can also mean that the results have been published elsewhere (e.g. in a scientific journal) but have not been added to the ClinicalTrials.gov database.
-          - Registering trial results is important for transparency and accountability. Most US-regulated clinical trials are legally required to report results on ClinicalTrials.gov, except for Phase 1 trials, [observational trials](#dod:observational-trial), and trials conducted entirely outside the U.S. without FDA oversight.
+          - Registering trial results is important for transparency and accountability. Most US-regulated clinical trials are legally required to report results on ClinicalTrials.gov, except for [Phase 1 trials](#dod:phase-one-trial), [observational trials](#dod:observational-trial), and trials conducted entirely outside the U.S. without FDA oversight.
           - "{definitions.notes.countries}"
         unit: trials
         short_unit: ""
