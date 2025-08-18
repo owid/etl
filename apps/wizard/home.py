@@ -159,7 +159,7 @@ def st_show_home():
     #########################
     # Legacy
     #########################
-    st.divider()
+    # st.divider()
 
     if "legacy" in WIZARD_CONFIG:
         section_legacy = WIZARD_CONFIG["legacy"]
