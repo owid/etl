@@ -7,9 +7,9 @@ import pandas as pd
 import structlog
 from fastmcp import FastMCP
 from fastmcp.utilities.types import Image
+from mcp.types import ImageContent
 from pydantic import BaseModel
 
-from mcp.types import ImageContent
 from owid_mcp.config import HTTP_TIMEOUT
 from owid_mcp.data_utils import make_algolia_request
 
