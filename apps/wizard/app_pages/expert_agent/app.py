@@ -273,7 +273,7 @@ if prompt:
     with st.chat_message("assistant"):
         # Notify user that agent is working
         st.toast(
-            f"Agent working, model {st.session_state["expert_config"]["model_name"]}...",
+            f"Agent working, model {st.session_state['expert_config']['model_name']}...",
             icon=":material/smart_toy:",
         )
         start_time = time.time()
