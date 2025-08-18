@@ -34,10 +34,8 @@ load_env()
 # SESSION STATE
 st.session_state.setdefault("expert_config", {})
 st.session_state.setdefault("agent_messages", [])
-st.session_state.setdefault("response", None)
 st.session_state.setdefault("recommended_question", None)
 st.session_state.setdefault("expert_use_mcp", False)
-
 # Models
 ## See all of them in https://github.com/pydantic/pydantic-ai/blob/master/pydantic_ai_slim/pydantic_ai/models/__init__.py
 MODEL_DEFAULT = "openai:gpt-5-mini"
@@ -62,18 +60,40 @@ def show_usage(response_time: float):
         )
 
         # Build message
-        time_msg = f":material/timer: {response_time:.2f}s"
+        time_msg = f"{response_time:.2f}s"
         num_tokens_in = st.session_state.last_usage.request_tokens
         num_tokens_out = st.session_state.last_usage.response_tokens
         num_tokens = st.session_state.last_usage.total_tokens
         model_name = st.session_state["expert_config"]["model_name"]
-        cost_msg = f":material/paid: ~{cost:.4f} USD"
+        cost_msg = f"~{cost:.4f} USD"
         tokens_msg = f"{num_tokens:,} tokens (IN: {num_tokens_in}, OUT: {num_tokens_out})"
 
         # Print message
-        st.markdown(
-            f":green-badge[:small[{cost_msg}]] :blue-badge[:small[{tokens_msg}]] :gray-badge[:small[{time_msg}]] :gray-badge[:small[{model_name}]]"
-        )
+        with st.container(horizontal=True, vertical_alignment="bottom", horizontal_alignment="left"):
+            # Cost
+            st.markdown(
+                f":green-badge[:small[:material/paid: {cost_msg}]]",
+                help="Accumulated cost of the interaction with the LLM.",
+                width="content",
+            )
+            # Tokens
+            st.markdown(
+                f":blue-badge[:small[{tokens_msg}]]",
+                help="Accumulated number of tokens of the interaction with the LLM.",
+                width="content",
+            )
+            # Timer
+            st.badge(
+                time_msg,
+                color="gray",
+                icon=":material/timer:",
+            )
+            # Model name
+            st.badge(
+                model_name,
+                color="gray",
+                icon=":material/memory:",
+            )
 
 
 def _load_history_messages():
@@ -84,26 +104,35 @@ def _load_history_messages():
     return messages
 
 
+# @st.fragment
 def show_reasoning_details():
     with st.expander("**Reasoning details**", expanded=False, icon=":material/auto_awesome:"):
-        messages = _load_history_messages()
-        num_parts = sum(len(message["parts"]) for message in messages)
-        counter_parts = 0
-        counter_questions = 0
-        for _, message in enumerate(messages):
-            parts = message["parts"]
-            kind = {"request": "Agent request", "response": "LLM response"}.get(message["kind"], message["kind"])
-            for _, part in enumerate(parts):
-                counter_parts += 1
-                part_kind = part["part_kind"]
-                title = f"({counter_parts}/{num_parts}) **{kind}** - {part_kind}"
-                if "tool_name" in part:
-                    title += f" `{part['tool_name']}`"
-                if part_kind == "user-prompt":
-                    counter_questions += 1
-                    st.badge(f"Question {counter_questions}")
-                with st.expander(title):
-                    st.write(part)
+        show_reasoning_details_dialog()
+    # btn = st.button("**Reasoning details**", icon=":material/auto_awesome:")
+    # if btn:
+    #     show_reasoning_details_dialog()
+
+
+# @st.dialog(title="**:material/auto_awesome: Reasoning details**", width="large",)
+def show_reasoning_details_dialog():
+    messages = _load_history_messages()
+    num_parts = sum(len(message["parts"]) for message in messages)
+    counter_parts = 0
+    counter_questions = 0
+    for _, message in enumerate(messages):
+        parts = message["parts"]
+        kind = {"request": "Agent request", "response": "LLM response"}.get(message["kind"], message["kind"])
+        for _, part in enumerate(parts):
+            counter_parts += 1
+            part_kind = part["part_kind"]
+            title = f"({counter_parts}/{num_parts}) **{kind}** - {part_kind}"
+            if "tool_name" in part:
+                title += f" `{part['tool_name']}`"
+            if part_kind == "user-prompt":
+                counter_questions += 1
+                st.badge(f"Question {counter_questions}")
+            with st.expander(title):
+                st.write(part)
 
 
 def register_message_history():
@@ -185,31 +214,31 @@ def show_settings_menu():
 
 
 def show_suggestions():
-    with st.spinner("Generating recommended questions..."):
-        # t0 = time.time()
-        chat_history = build_history_chat()
-        text = ""
-        for msg in chat_history:
-            text += f"{msg['kind']}\n========\n{msg['content']}\n"  # type: ignore
+    # with st.spinner("Generating recommended questions..."):
+    # t0 = time.time()
+    chat_history = build_history_chat()
+    text = ""
+    for msg in chat_history:
+        text += f"{msg['kind']}\n========\n{msg['content']}\n"  # type: ignore
 
-        result = asyncio.run(
-            recommender_agent.run(
-                user_prompt=text,
-            )
+    result = asyncio.run(
+        recommender_agent.run(
+            user_prompt=text,
         )
-        with st.container(border=False):
-            st.markdown("**Suggestions**")
-            for question in result.output:
-                st.button(
-                    question,
-                    on_click=lambda q=question: st.session_state.update({"recommended_question": q}),
-                    icon=":material/assistant:",
-                    width="stretch",
-                )
-            # st.badge(
-            #     f"Generated in {time.time() - t0:.2f}s",
-            #     color="primary",
-            # )
+    )
+    with st.container(border=False):
+        st.markdown("**What would you like next?**")
+        for question in result.output:
+            st.button(
+                question,
+                on_click=lambda q=question: st.session_state.update({"recommended_question": q}),
+                icon=":material/assistant:",
+                width="stretch",
+            )
+        # st.badge(
+        #     f"Generated in {time.time() - t0:.2f}s",
+        #     color="primary",
+        # )
 
 
 ##################################################################
@@ -236,12 +265,12 @@ prompt = st.chat_input(
 if st.session_state["recommended_question"]:
     prompt = st.session_state["recommended_question"]
 
+# Display history of messages
+if "agent_messages" in st.session_state:
+    show_history_chat()
+
 # React to user input
 if prompt:
-    # Display history of messages
-    if "agent_messages" in st.session_state:
-        show_history_chat()
-
     # Display user message in chat message container
     with st.chat_message("user", avatar=AVATAR_PERSON):
         st.markdown(prompt)
@@ -256,7 +285,7 @@ if prompt:
         start_time = time.time()
 
         # Agent to work, and stream its output
-        stream = agent_stream2(
+        stream = agent_stream(
             prompt,
             model_name=st.session_state["expert_config"]["model_name"],
             message_history=st.session_state["agent_messages"],
@@ -266,21 +295,27 @@ if prompt:
             st.write_stream(stream),
         )
 
-        # Show cost and other details
-        show_usage(response_time=time.time() - start_time)
-
-        if "agent_result" in st.session_state:
-            # Agent execution details
-            show_reasoning_details()
-            # Add messages to history
-            register_message_history()
-
+        response_time = time.time() - start_time
         print("finished asking LLM...")
 
-        # Get recommendations
-        try:
-            show_suggestions()
-        except Exception as _:
-            pass
+        # Show usage and reasoning details
+        container_summary = st.container(border=True)
+        ## Show cost and other details
+        with container_summary:
+            show_usage(response_time=response_time)
 
-        st.session_state["recommended_question"] = None
+        if "agent_result" in st.session_state:
+            ## Agent execution details
+            with container_summary:
+                show_reasoning_details()
+            ## Add messages to history
+            register_message_history()
+
+    # Get recommendations
+    # with st.spinner("Generating recommended questions..."):
+    try:
+        show_suggestions()
+    except Exception as _:
+        pass
+
+    st.session_state["recommended_question"] = None
