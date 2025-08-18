@@ -18,6 +18,8 @@ definitions:
   notes:
     completed_trials: |
       This data comes from the [ClinicalTrials.gov](#dod:clinical-trials-gov) database. It only includes interventional or observational clinical trials that are marked as "completed" and have a valid "completion date". Expanded access studies, which provide access to investigational drugs or devices for patients with serious conditions, are not included in this data.
+    countries: |-
+      Registration in the ClinicalTrials.gov database is mandatory for trials in the United States and for treatments that seek FDA approval, but voluntary for other trials conducted in other countries.
 
 dataset:
   update_period_days: 365 # dataset itself is updated continuously, but I think updating it every year is sufficient for us
@@ -48,6 +50,7 @@ tables:
         short_unit: ""
         description_key:
           - "{definitions.notes.completed_trials}"
+          - "{definitions.notes.countries}"
           - ClinicalTrials.gov has four categories for sponsors, but offers the option to classify as "Network", "Other Governmental Organization" or "Individual" as well. As these are not officially defined categories, but rather subcategories of the "Other" category, they are grouped under "Other" in this dataset.
         description_from_producer: |-
           Funder type describes the organization that provides funding or support for a clinical study. This support may include activities related to funding, design, implementation, data analysis, or reporting. Organizations listed as sponsors and collaborators for a study are considered the funders of the study. ClinicalTrials.gov refers to four types of funders:
@@ -65,9 +68,10 @@ tables:
         unit: trials
         short_unit: ""
         description_key:
-          - "{definitions.notes.completed_trials}"
           - Behavioral interventions are non-pharmaceutical treatments that focus on changing behaviors or habits. They can include lifestyle changes, counseling, or other non-pharmaceutical treatments.
           - If multiple interventions are given, the study is counted towards all interventions listed.
+          - "{definitions.notes.completed_trials}"
+          - "{definitions.notes.countries}"
       biological:
         title: Number of clinical trials with biological interventions
         description_short: |
@@ -75,9 +79,10 @@ tables:
         unit: trials
         short_unit: ""
         description_key:
-          - "{definitions.notes.completed_trials}"
           - Biological interventions are treatments that involve giving biological products to participants. These can include vaccines, blood products, or other biological treatments.
           - If multiple interventions are given, the study is counted towards all interventions listed.
+          - "{definitions.notes.completed_trials}"
+          - "{definitions.notes.countries}"
       device:
         title: Number of clinical trials with device-based interventions
         description_short: |
@@ -85,9 +90,10 @@ tables:
         unit: trials
         short_unit: ""
         description_key:
-          - "{definitions.notes.completed_trials}"
           - Device-based interventions involve the use of medical devices, implants, or other technological treatments. These can include pacemakers, prosthetics, or other medical devices. Using a placebo device also counts as a device-based intervention.
           - If multiple interventions are given, the study is counted towards all interventions listed.
+          - "{definitions.notes.completed_trials}"
+          - "{definitions.notes.countries}"
       drug:
         title: Number of clinical trials with pharmaceutical interventions
         description_short: |
@@ -95,9 +101,10 @@ tables:
         unit: trials
         short_unit: ""
         description_key:
-          - "{definitions.notes.completed_trials}"
           - Pharmaceutical interventions involve giving participants a chemical drug or medication. Using a placebo drug also counts as a pharmaceutical intervention.
           - If multiple interventions are given, the study is counted towards all interventions listed.
+          - "{definitions.notes.completed_trials}"
+          - "{definitions.notes.countries}"
       diagnostic_test:
         title: Number of clinical trials with diagnostic interventions
         description_short: |
@@ -105,9 +112,10 @@ tables:
         unit: trials
         short_unit: ""
         description_key:
-          - "{definitions.notes.completed_trials}"
           - Diagnostic interventions involve tests or procedures used to diagnose a condition. These can include blood tests, in vitro diagnostic tests, imaging tests, or other diagnostic procedures.
           - If multiple interventions are given, the study is counted towards all interventions listed.
+          - "{definitions.notes.completed_trials}"
+          - "{definitions.notes.countries}"
       dietary_supplement:
         title: Number of clinical trials with dietary supplement interventions
         description_short: |
@@ -115,9 +123,10 @@ tables:
         unit: trials
         short_unit: ""
         description_key:
-          - "{definitions.notes.completed_trials}"
           - Dietary supplement interventions involve giving participants vitamins, minerals, or other nutritional supplements.
           - If multiple interventions are given, the study is counted towards all interventions listed.
+          - "{definitions.notes.completed_trials}"
+          - "{definitions.notes.countries}"
       genetic:
         title: Number of clinical trials with genetic interventions
         description_short: |
@@ -125,9 +134,10 @@ tables:
         unit: trials
         short_unit: ""
         description_key:
-          - "{definitions.notes.completed_trials}"
           - Genetic interventions involve treating patients with a gene-based therapy, including gene transfers, recombinant DNA or stem-cell therapy.
           - If multiple interventions are given, the study is counted towards all interventions listed.
+          - "{definitions.notes.completed_trials}"
+          - "{definitions.notes.countries}"
       procedure:
         title: Number of clinical trials with surgical interventions
         description_short: |
@@ -135,9 +145,10 @@ tables:
         unit: trials
         short_unit: ""
         description_key:
-          - "{definitions.notes.completed_trials}"
           - Surgical interventions involve procedures that are performed on patients, such as surgeries or other invasive procedures.
           - If multiple interventions are given, the study is counted towards all interventions listed.
+          - "{definitions.notes.completed_trials}"
+          - "{definitions.notes.countries}"
       radiation:
         title: Number of clinical trials with radiation interventions
         description_short: |
@@ -145,9 +156,10 @@ tables:
         unit: trials
         short_unit: ""
         description_key:
-          - "{definitions.notes.completed_trials}"
           - Radiation interventions involve the use of radiation as a part of the treatment, such as radiation therapy for cancer.
           - If multiple interventions are given, the study is counted towards all interventions listed.
+          - "{definitions.notes.completed_trials}"
+          - "{definitions.notes.countries}"
       other:
         title: Number of clinical trials with other interventions
         description_short: |
@@ -155,9 +167,10 @@ tables:
         unit: trials
         short_unit: ""
         description_key:
-          - "{definitions.notes.completed_trials}"
           - Other interventions include types of interventions that do not fit into any other category. Since the interventions are categorized by the researchers conducting the study, it can also include interventions that could fit into other categories or combinations of interventions.
           - If multiple interventions are given, the study is counted towards all interventions listed.
+          - "{definitions.notes.completed_trials}"
+          - "{definitions.notes.countries}"
       combination_product:
         title: Number of clinical trials with combination product interventions
         description_short: |
@@ -165,9 +178,10 @@ tables:
         unit: trials
         short_unit: ""
         description_key:
-          - "{definitions.notes.completed_trials}"
           - Combination product interventions involve a combination of different types of interventions, such as a drug and a device or a drug and a procedure. Some researchers do not use this category, but rather categorize the intervention by the main type of intervention used.
           - If multiple interventions are given, the study is counted towards all interventions listed.
+          - "{definitions.notes.completed_trials}"
+          - "{definitions.notes.countries}"
   study_type_per_year:
     variables:
       n_studies_type:
@@ -184,6 +198,7 @@ tables:
           - Interventional studies involve testing new treatments or interventions and comparing them to a baseline or other treatments.
           - Observational studies observe patients and collect data on participants without an intervention.
           - Expanded access studies provide access to investigational drugs or devices for patients with serious conditions who do not have other treatment options.
+          - "{definitions.notes.countries}"
   purpose_per_year:
     variables:
       n_studies_purpose:
@@ -198,6 +213,7 @@ tables:
           - This data comes from the [ClinicalTrials.gov](#dod:clinical-trials-gov) database. It only includes interventional clinical trials that are marked as "completed" and have a valid "completion date".
           - The purpose of a clinical trial refers to the main objective or goal of the study, such as testing a new treatment, comparing treatments, or understanding a disease.
           - Possible purposes include testing a new treatment (drug or device), improving diagnostics, preventing disease, or understanding a disease.
+          - "{definitions.notes.countries}"
         description_from_producer: |-
           The main objective of the intervention(s) being evaluated by the clinical trial.
 
@@ -227,6 +243,7 @@ tables:
           - Studies are finished if they are "completed", "terminated", or "withdrawn". Completed studies have been finished, terminated studies have been stopped before completion, and withdrawn studies have been stopped before enrolling participants.
           - Studies which are "paused/suspended" have been put on hold and are not currently recruiting or enrolling participants. They may resume later.
           - Studies that provide access to promising investigational treatment for patients with serious conditions (expanded access studies) are not included here.
+          - "{definitions.notes.countries}"
   results_per_year:
     variables:
       n_studies_results:
@@ -238,6 +255,7 @@ tables:
           - If a trial has results posted, it means that the results of the trial have been published in the [ClinicalTrials.gov](#dod:clinical-trials-gov) database.
           - If a trial has no results posted, it could be that the trial has been completed, but the results are not yet available or have not been published. It can also mean that the results have been published elsewhere (e.g. in a scientific journal) but have not been added to the ClinicalTrials.gov database.
           - Registering trial results is important for transparency and accountability. Most US-regulated clinical trials are legally required to report results on ClinicalTrials.gov, except for Phase 1 trials, observational studies, and trials conducted entirely outside the U.S. without FDA oversight.
+          - "{definitions.notes.countries}"
         unit: trials
         short_unit: ""
   length_per_year:
@@ -252,13 +270,14 @@ tables:
           - First we calculate the length of each trial by taking the difference between the start date and completion date of each trial.
           - Then we group the trials by phase and completion year, and calculate the [median](#dod:median) length of each group.
         description_key:
-          - "{definitions.notes.completed_trials}"
           - Clinical trials are conducted in different phases of the development of a new treatment or intervention, such as [early phase 1](#dod:early-phase-one-trial), [phase 1](#dod:phase-one-trial), [phase 2](#dod:phase-two-trial), [phase 3](#dod:phase-three-trial), or [phase 4](#dod:phase-four-trial).
           - Early phase 1 trials are exploratory trials that test the effect of an intervention on the human body, often with a small number of participants. Not every treatment has an early phase 1 trial.
           - Phase 1 trials test the safety and dosage of a new treatment, phase 2 trials test the effectiveness and side effects, and phase 3 trials compare the new treatment to standard treatments.
           - Phase 4 trials are conducted after a treatment has been approved and are used to monitor the long-term effects and side-effects of the treatment. Not every treatment has a phase 4 trial.
           - \"Phase 1/phase 2\" trials are a combination of phase 1 and phase 2 trials, and "phase 2/phase 3" trials are a combination of phase 2 and phase 3 trials.
           - The average length is calculated by taking the difference between the start date and completion date of each trial, grouped by phase and completion year.
+          - "{definitions.notes.completed_trials}"
+          - "{definitions.notes.countries}"
   participants_per_year:
     variables:
       avg_participants:
@@ -270,8 +289,9 @@ tables:
         description_processing: |-
           - We group the trials by phase and completion year, and calculate the [median](#dod:median) number of participants in each group.
         description_key:
-          - "{definitions.notes.completed_trials}"
           - Clinical trials are conducted in different phases of the development of a new treatment or intervention, such as [early phase 1](#dod:early-phase-one-trial), [phase 1](#dod:phase-one-trial), [phase 2](#dod:phase-two-trial), [phase 3](#dod:phase-three-trial), or [phase 4](#dod:phase-four-trial).
           - Phase 1 trials test the safety and dosage of a new treatment, phase 2 trials test the effectiveness and side effects, and phase 3 trials compare the new treatment to standard treatments.
           - \"Phase 1/phase 2\" trials are a combination of phase 1 and phase 2 trials, and "phase 2/phase 3" trials are a combination of phase 2 and phase 3 trials.
           - The median number of participants is calculated by grouping the trials by phase and completion year, and then taking the middle value of the number of participants in each group.
+          - "{definitions.notes.completed_trials}"
+          - "{definitions.notes.countries}"
