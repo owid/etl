@@ -358,7 +358,7 @@ async def get_api_reference_metadata(
     Returns:
         str: Metadata for the specified object type.
     """
-    st.toast(f"**Tool use**: `get_db_table_fields(object_name='{object_name}')`", icon=":material/smart_toy:")
+    st.toast(f"**Tool use**: `get_api_reference_metadata(object_name='{object_name}')`", icon=":material/smart_toy:")
     match object_name:
         case "dataset":
             return render_dataset()
@@ -417,8 +417,8 @@ async def validate_datasette_query(query: str) -> str:
     if response["ok"]:
         if ("rows" not in response) or not isinstance(response["rows"], list):
             text = "Query is invalid! Check for correctness, it must be DuckDB compatible! Seems like no rows were returned."
-        if len(response["rows"]) == 0:
-            text = "Query is valid, but no results found."
+        elif len(response["rows"]) == 0:
+            text = "Query is valid, but it returned no results."
         else:
             text = "Query is valid!"
     else:
