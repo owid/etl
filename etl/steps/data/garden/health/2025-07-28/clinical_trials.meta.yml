@@ -17,7 +17,7 @@ definitions:
     processing_level: major
   notes:
     completed_trials: |
-      This data comes from the [ClinicalTrials.gov](#dod:clinical-trials-gov) database. It only includes [interventional-trial](#dod:interventional-trial) or [observational-trial](#dod:observational-trial) clinical trials that are marked as "completed" and have a valid "completion date". [Expanded access studies](#dod:expanded-access), which provide access to investigational drugs or devices for patients with serious conditions, are not included in this data.
+      This data comes from the [ClinicalTrials.gov](#dod:clinical-trials-gov) database. It only includes [interventional](#dod:interventional-trial) or [observational](#dod:observational-trial) clinical trials that are marked as "completed" and have a valid "completion date". [Expanded access studies](#dod:expanded-access), which provide access to investigational drugs or devices for patients with serious conditions, are not included in this data.
     countries: |-
       Registration in the ClinicalTrials.gov database is mandatory for trials in the United States and for treatments that seek FDA approval, but voluntary for other trials conducted in other countries.
 
