@@ -1,8 +1,8 @@
 import urllib.parse
 from pathlib import Path
-from typing import AsyncGenerator, Literal
+from typing import AsyncGenerator, List, Literal
 
-# import logfire
+import logfire
 import requests
 import streamlit as st
 import yaml
@@ -18,6 +18,7 @@ from pydantic_ai.messages import (
 
 from apps.wizard.app_pages.expert_agent.utils import CURRENT_DIR
 from etl.analytics import ANALYTICS_URL, clean_sql_query, read_datasette
+from etl.config import LOGFIRE_TOKEN_EXPERT
 from etl.docs import (
     render_collection,
     render_dataset,
@@ -29,8 +30,8 @@ from etl.docs import (
 from etl.files import ruamel_dump, ruamel_load
 from etl.paths import BASE_DIR, DOCS_DIR
 
-# logfire.configure()
-# logfire.instrument_pydantic_ai()
+logfire.configure(token=LOGFIRE_TOKEN_EXPERT)
+logfire.instrument_pydantic_ai()
 
 #######################################################
 # LOAD KNOWLEDGE BASE
@@ -162,47 +163,35 @@ async def agent_stream(prompt: str, model_name: str, message_history) -> AsyncGe
         st.session_state["last_usage"] = result.usage()
 
 
-async def agent_stream2(prompt: str, model_name: str, message_history) -> AsyncGenerator[str, None]:
-    """Stream agent response using iter method with detailed event handling.
-
-    It uses a more sophisticated approach, to support streaming with models other than OpenAI. Reference: https://github.com/pydantic/pydantic-ai/issues/1007#issuecomment-2963469441
-
-    Args:
-        prompt: The user prompt to process
-        model_name: The model to use.
-    Yields:
-        str: Text chunks from the agent response
-    """
+async def _collect_agent_stream2(prompt: str, model_name: str, message_history) -> List[str]:
+    """Collect all chunks from agent_stream2 in one async context to avoid task switching issues."""
+    chunks = []
     model = _get_model_from_name(model_name)
-    # Use provided model_name or fall back to session state
+    
     async with agent.iter(
         prompt,
         model=model,
         message_history=message_history,
     ) as run:
         nodes = []
-        # Yield each message from the stream
         async for node in run:
             nodes.append(node)
             if Agent.is_model_request_node(node):
                 is_final_synthesis_node = any(
                     isinstance(prev_node, CallToolsNode) for prev_node in nodes
-                )  # Heuristic: check if tools were called before
+                )
                 print(f"--- ModelRequestNode (Is Final Synthesis? {is_final_synthesis_node}) ---")
                 async with node.stream(run.ctx) as request_stream:
                     async for event in request_stream:
                         print(f"Request Event: Data: {event!r}")
-                        # Specifically track TextPartDelta for the final node
                         if (
-                            # is_final_synthesis_node and
                             isinstance(event, PartDeltaEvent) and isinstance(event.delta, TextPartDelta)
                         ):
-                            yield event.delta.content_delta
+                            chunks.append(event.delta.content_delta)
                         elif (
-                            # is_final_synthesis_node and
                             isinstance(event, PartStartEvent) and isinstance(event.part, TextPart)
                         ):
-                            yield event.part.content
+                            chunks.append(event.part.content)
 
             elif Agent.is_call_tools_node(node):
                 print("--- CallToolsNode ---")
@@ -210,12 +199,34 @@ async def agent_stream2(prompt: str, model_name: str, message_history) -> AsyncG
                     async for event in handle_stream:
                         print(f"Call Event Data: {event!r}")
 
-    # At the very end, after the streaming is complete
-    # Capture the usage information using callback or session state
-    if hasattr(run, "usage"):
-        st.session_state["last_usage"] = run.usage()
-    if hasattr(run, "result"):
-        st.session_state["agent_result"] = run.result
+        # Capture usage and result info
+        if hasattr(run, "usage"):
+            st.session_state["last_usage"] = run.usage()
+        if hasattr(run, "result"):
+            st.session_state["agent_result"] = run.result
+    
+    return chunks
+
+
+async def agent_stream2(prompt: str, model_name: str, message_history) -> AsyncGenerator[str, None]:
+    """Stream agent response using iter method with Streamlit-compatible wrapper.
+    
+    This version collects all chunks in one async context first, then yields them
+    to avoid async context manager issues with Streamlit's task switching.
+    
+    Args:
+        prompt: The user prompt to process
+        model_name: The model to use.
+    Yields:
+        str: Text chunks from the agent response
+    """
+    # Collect all chunks first to avoid async context issues with Streamlit
+    chunks = await _collect_agent_stream2(prompt, model_name, message_history)
+    
+    # Yield chunks one by one
+    for chunk in chunks:
+        if chunk:  # Only yield non-empty chunks
+            yield chunk
 
 
 #######################################################
