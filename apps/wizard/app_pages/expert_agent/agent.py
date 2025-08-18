@@ -18,6 +18,7 @@ from pydantic_ai.models.openai import OpenAIResponsesModelSettings
 
 from apps.wizard.app_pages.expert_agent.utils import CURRENT_DIR
 from etl.analytics import ANALYTICS_URL, clean_sql_query, read_datasette
+from etl.config import GOOGLE_API_KEY
 from etl.docs import (
     render_collection,
     render_dataset,
@@ -110,7 +111,10 @@ agent = Agent(
 )
 
 # Agent for recommending follow-up questions
-MODEL_SUGGESTIONS = "openai:gpt-5-mini"
+if GOOGLE_API_KEY:
+    MODEL_SUGGESTIONS = "google-gla:gemini-2.5-flash"
+else:
+    MODEL_SUGGESTIONS = "openai:gpt-5-mini"
 recommender_agent = Agent(
     model=MODEL_SUGGESTIONS,
     instructions="""You will get a conversation history. Based on it, recommend 3 follow-up questions that the user could ask next. The questions should be short, concise, to the point, and should be framed as if the user was asking them. Example: 'How many articles did we publish in 2025?'. Two questions should be related to the conversation, and on should be more tangential to explore a different topic, but still concrete.""",
