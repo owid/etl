@@ -45,7 +45,7 @@ main:
     entrypoint: app_pages/expert_agent/app.py
     icon: ":material/smart_toy:"
   analytics:
-    title: "Analytics (external)"
+    title: "Metabase"
     description: "Learn more about OWID in Data!"
     maintainer:
       - "@bobbie"
