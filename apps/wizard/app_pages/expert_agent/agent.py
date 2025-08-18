@@ -8,7 +8,7 @@ import streamlit as st
 import yaml
 from pydantic_ai import Agent
 from pydantic_ai.agent import CallToolsNode
-from pydantic_ai.mcp import MCPServerSSE, MCPServerStdio, MCPServerStreamableHTTP
+from pydantic_ai.mcp import MCPServerStdio, MCPServerStreamableHTTP, MCPServerSSE
 from pydantic_ai.messages import (
     PartDeltaEvent,
     PartStartEvent,
@@ -70,10 +70,11 @@ with open(BASE_DIR / "mkdocs.yml", "r") as f:
 DOCS_INDEX = dict(DOCS_INDEX)
 
 #######################################################
-# AGENT
+# MCPs
 #######################################################
 
 # MCP
+## Dev
 mcp_server = MCPServerStdio(
     command=str(BASE_DIR / ".venv" / "bin" / "fastmcp"),
     args=[
@@ -81,38 +82,54 @@ mcp_server = MCPServerStdio(
         str(BASE_DIR / "owid_mcp" / "server.py"),
     ],
 )
+## Prod
 mcp_server_prod = MCPServerStreamableHTTP(
     url="https://mcp.owid.io/mcp",
 )
 
+## Trying to tweak the settings for OpenAI responses
 from pydantic_ai.models.openai import OpenAIResponsesModelSettings
-
 settings = OpenAIResponsesModelSettings(
-    openai_reasoning_effort="low",
+    # openai_reasoning_effort="low",
     # openai_reasoning_summary="detailed",
     openai_truncation="auto",
 )
 
+## Use MCPs or not based on user input
+if st.session_state["expert_use_mcp"]:
+    # Use MCP server for the agent
+    toolsets = [mcp_server_prod]
+else:
+    # Use local MCP server for the agent
+    toolsets = []
 
-# Pydantic AI Agent
+
+#######################################################
+# AGENTS
+#######################################################
+
+# Main Agent
 agent = Agent(
     instructions=SYSTEM_PROMPT,
     retries=2,
     model_settings=settings,
-    # toolsets=[mcp_server_prod],
+    toolsets=toolsets,
 )
 
-
+# Agent for recommending follow-up questions
 recommender_agent = Agent(
     model="openai:gpt-4o-mini",
     instructions="""You will get a conversation history. Based on it, recommend 3 follow-up questions that the user could ask next. The questions should be short, concise, to the point, and should be framed as if the user was asking them. Example: 'How many articles did we publish in 2025?'. Two questions should be related to the conversation, and on should be more tangential to explore a different topic, but still concrete.""",
     output_type=list[str],
+    retries=2,
 )
 
+# Agent for summarizing the conversation. Currently not in use.
 summarize_agent = Agent(
     # "openai:gpt-5-nano",
     instructions="""You will get a chat history between a user and an LLM. Summarize the content shared by the two parties.""",
     output_type=str,
+    retries=2,
 )
 
 #######################################################

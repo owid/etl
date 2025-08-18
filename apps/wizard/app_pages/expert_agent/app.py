@@ -36,6 +36,7 @@ st.session_state.setdefault("expert_config", {})
 st.session_state.setdefault("agent_messages", [])
 st.session_state.setdefault("response", None)
 st.session_state.setdefault("recommended_question", None)
+st.session_state.setdefault("expert_use_mcp", False)
 
 # Models
 ## See all of them in https://github.com/pydantic/pydantic-ai/blob/master/pydantic_ai_slim/pydantic_ai/models/__init__.py
@@ -170,6 +171,12 @@ def show_settings_menu():
             # on_change=lambda: st.session_state.setdefault("expert_config", {}).update({"model_name": st.session_state["expert_model_name"]}),
         )
         st.session_state["expert_config"]["model_name"] = model_name
+    st.toggle(
+        label="Use OWID mcp",
+        value=False,
+        key="expert_use_mcp",
+        help="Use OWID's MCP server to access our data and tools.",
+    )
     with st.container(horizontal=True, vertical_alignment="bottom"):
         st.button(
             label=":material/clear_all: Clear chat",
