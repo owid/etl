@@ -1,3 +1,4 @@
+import httpx
 import pytest
 
 
@@ -95,11 +96,11 @@ def mock_etl_api_responses():
                     "snippet": "Date when cherry blossoms reach full bloom in Japan",
                     "score": 0.95,
                     "metadata": {
-                        "catalog_path": "grapher/biodiversity/2025-06-28/cherry_blossom/cherry_blossom#cherry_blossom_date",
+                        "catalog_path": "grapher/biodiversity/2025-04-07/cherry_blossom/cherry_blossom#full_flowering_date",
                         "chart_count": 5,
-                        "sql_template": "SELECT country, year, cherry_blossom_date FROM '{parquet_url}' WHERE country = 'Japan'",
-                        "parquet_url": "https://catalog.ourworldindata.org/biodiversity/2025-06-28/cherry_blossom/cherry_blossom.parquet",
-                        "column": "cherry_blossom_date",
+                        "sql_template": "SELECT country, year, full_flowering_date FROM '{parquet_url}' WHERE country = 'Japan'",
+                        "parquet_url": "https://catalog.ourworldindata.org/grapher/biodiversity/2025-04-07/cherry_blossom/cherry_blossom.parquet",
+                        "column": "full_flowering_date",
                     },
                 }
             ],
@@ -123,8 +124,9 @@ def mock_etl_api_responses():
 
 
 class MockResponse:
-    def __init__(self, json_data):
+    def __init__(self, json_data, text_data=None):
         self._json_data = json_data
+        self.text = text_data or "country,year,value\nJapan,2023,100\nJapan,2022,95\n"
 
     def json(self):
         return self._json_data
@@ -135,11 +137,14 @@ class MockResponse:
 
 @pytest.fixture(autouse=True)
 def mock_httpx_post(monkeypatch, mock_etl_api_responses):
-    """Mock httpx POST requests to ETL API."""
+    """Mock only ETL API semantic search POST requests."""
+
+    # Store original method
+    original_post = httpx.AsyncClient.post
 
     async def mock_post(self, url, **kwargs):
-        # Return our mock response for ETL API calls
-        if "etl.owid.io" in url or "search/indicators" in url:
+        # Only mock ETL API semantic search calls
+        if "etl.owid.io" in url and "search/indicators" in url:
             # Get the query from the request body
             json_data = kwargs.get("json", {})
             query = json_data.get("query", "default")
@@ -147,8 +152,9 @@ def mock_httpx_post(monkeypatch, mock_etl_api_responses):
             # Return appropriate mock response based on query
             response = mock_etl_api_responses.get(query, mock_etl_api_responses["default"])
             return MockResponse(response)
-        # For other URLs, return a generic mock
-        return MockResponse({"error": "Unexpected URL in test"})
 
-    # Mock httpx.AsyncClient.post method
+        # For all other URLs, let the real request go through
+        return await original_post(self, url, **kwargs)
+
+    # Mock only POST method
     monkeypatch.setattr("httpx.AsyncClient.post", mock_post)

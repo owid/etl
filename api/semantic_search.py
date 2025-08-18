@@ -5,6 +5,7 @@ from typing import Any, Dict, List, Optional
 
 from apps.wizard.app_pages.indicator_search.data import Indicator, _get_data_indicators_from_db
 from apps.wizard.utils.embeddings import EmbeddingsModel, get_model
+from owid_mcp.data_utils import build_catalog_info
 
 # Global variables to store preloaded data and initialization state
 _indicators: Optional[List[Indicator]] = None
@@ -56,8 +57,17 @@ def search_indicators(query: str, limit: int = 10) -> List[Dict[str, Any]]:
     results = []
     for indicator in sorted_indicators[:limit]:
         metadata: Dict[str, Any] = {"chart_count": indicator.n_charts}
+
         if indicator.catalogPath and indicator.catalogPath != "NULL":
             metadata["catalog_path"] = indicator.catalogPath
+            # Add SQL-related fields if catalog path contains '#' (column info)
+            if "#" in indicator.catalogPath:
+                try:
+                    catalog_info = build_catalog_info(indicator.catalogPath)
+                    metadata.update(catalog_info)
+                except (ValueError, IndexError):
+                    # Skip if catalog path format is invalid
+                    pass
 
         results.append(
             {

@@ -200,7 +200,7 @@ class EmbeddingsModel(Generic[TDoc]):
                 score = (score + 1) / 2
             elif typ == "euclidean":
                 # distance = torch.cdist(embeddings, input_embedding)
-                score = util.euclidean_sim(embeddings, input_embedding)
+                score = util.euclidean_sim(embeddings, input_embedding)  # type: ignore
                 score = 1 / (1 - score)  # Normalize to [0, 1]
             else:
                 raise ValueError(f"Invalid similarity type: {typ}")
