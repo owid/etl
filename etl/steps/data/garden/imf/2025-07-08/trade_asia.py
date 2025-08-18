@@ -34,6 +34,8 @@ def run() -> None:
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("trade")
     ds_regions = paths.load_dataset("regions")
+    ds_wdi = paths.load_dataset("wdi")
+    ds_population = paths.load_dataset("population")
 
     # Read table from meadow dataset.
     tb = ds_meadow.read("trade")
@@ -109,6 +111,9 @@ def run() -> None:
     ]
     tb = calculate_trade_shares_as_share_world(tb)
     tb.loc[tb["country"] == tb["counterpart_country"], "counterpart_country"] = "Intraregional"
+    # Calculate China imports as share of GDP
+    tb = add_china_imports_share_of_gdp(tb, ds_wdi, ds_population)
+
     tb = tb[
         [
             "country",
@@ -117,6 +122,7 @@ def run() -> None:
             "exports_of_goods__free_on_board__fob__share",
             "imports_of_goods__cost_insurance_freight__cif__share",
             "share_of_total_trade",
+            "china_imports_share_of_gdp",
         ]
     ].copy()
 
@@ -145,24 +151,24 @@ def calculate_trade_shares_as_share_world(tb: Table) -> Table:
 
     # Remove overlapping regions to ensure shares sum to 100%
     # Strategy: Replace overlapping regions with non-overlapping ones systematically
-    
+
     # Step 1: Handle Asia vs Asia (excl. China)
-    # For China as country: keep "Asia", remove "Asia (excl. China)" (China can't trade with itself)  
+    # For China as country: keep "Asia", remove "Asia (excl. China)" (China can't trade with itself)
     # For all other countries: keep "Asia (excl. China)", remove "Asia"
     china_asia_excl_mask = (tb["country"] == "China") & (tb["counterpart_country"] == "Asia (excl. China)")
     tb = tb[~china_asia_excl_mask]
-    
+
     non_china_asia_mask = (tb["country"] != "China") & (tb["counterpart_country"] == "Asia")
     tb = tb[~non_china_asia_mask]
-    
-    # Step 2: Handle Europe vs European Union (IMF)  
+
+    # Step 2: Handle Europe vs European Union (IMF)
     # Keep Europe, remove European Union (IMF) since Europe is broader and more complete
     eu_mask = tb["counterpart_country"] == "European Union (IMF)"
     tb = tb[~eu_mask]
-    
+
     # Step 3: Handle North America vs United States
     # Keep North America, remove United States since North America includes US + Canada + Mexico
-    us_mask = tb["counterpart_country"] == "United States" 
+    us_mask = tb["counterpart_country"] == "United States"
     tb = tb[~us_mask]
 
     # 1) Calculate totals from the filtered regions instead of using World totals
@@ -179,11 +185,11 @@ def calculate_trade_shares_as_share_world(tb: Table) -> Table:
             }
         )
     )
-    
+
     # Remove world totals since we're not using them
     tb = tb[tb["counterpart_country"] != "World"]
 
-    # Merge filtered totals back to main table  
+    # Merge filtered totals back to main table
     tb = tb.merge(filtered_totals, on=["country", "year"], how="left")
 
     # 3) Now compute shares exactly as before
@@ -205,10 +211,15 @@ def _verify_shares_sum_to_100(tb: Table) -> None:
 
     # Expected counterpart regions after deduplication
     expected_counterparts = {
-        "China", "Asia (excl. China)", "Europe", "North America", 
-        "South America", "Africa", "Oceania"
+        "China",
+        "Asia (excl. China)",
+        "Europe",
+        "North America",
+        "South America",
+        "Africa",
+        "Oceania",
     }
-    
+
     # Check all countries in the data
     all_countries = tb["country"].unique()
     tolerance = 1e-10  # Very small tolerance for floating point precision errors
@@ -219,9 +230,9 @@ def _verify_shares_sum_to_100(tb: Table) -> None:
         # Check all years for this country
         for year in country_data["year"].unique():
             year_data = country_data[country_data["year"] == year]
-            
+
             actual_counterparts = set(year_data["counterpart_country"].unique())
-            
+
             # Special case: China should have "Asia" instead of "Asia (excl. China)"
             if country == "China":
                 expected_for_china = expected_counterparts.copy()
@@ -230,7 +241,7 @@ def _verify_shares_sum_to_100(tb: Table) -> None:
                 expected_set = expected_for_china
             else:
                 expected_set = expected_counterparts
-            
+
             # Only verify shares for countries with complete regional coverage
             if actual_counterparts == expected_set:
                 export_sum = year_data["exports_of_goods__free_on_board__fob__share"].sum()
@@ -258,3 +269,43 @@ def _verify_shares_sum_to_100(tb: Table) -> None:
                         print(f"   Missing: {missing}")
                     if extra:
                         print(f"   Extra: {extra}")
+
+
+def add_china_imports_share_of_gdp(tb: Table, ds_wdi, ds_population) -> Table:
+    """Add China imports as share of GDP for all countries."""
+
+    # Load GDP per capita and population data
+    tb_gdp_pc = ds_wdi.read("wdi")
+    tb_population = ds_population.read("population")
+    # Filter for GDP per capita indicator
+    tb_gdp_pc = tb_gdp_pc[["country", "year", "ny_gdp_pcap_cd"]].copy()
+
+    # Filter population data
+    tb_population = tb_population[["country", "year", "population"]].copy()
+
+    # Calculate total GDP = GDP per capita * population
+    gdp_data = tb_gdp_pc.merge(tb_population, on=["country", "year"], how="inner")
+    gdp_data["gdp_total"] = gdp_data["ny_gdp_pcap_cd"] * gdp_data["population"]
+    gdp_data = gdp_data[["country", "year", "gdp_total"]].copy()
+    # Get China imports for each country-year
+    china_imports = tb[
+        (tb["counterpart_country"] == "China") & (tb["imports_of_goods__cost_insurance_freight__cif__share"].notna())
+    ][["country", "year", IMPORT_COL]].copy()
+    china_imports = china_imports.rename(columns={IMPORT_COL: "china_imports_value"})
+
+    # Merge GDP data with China imports
+    china_gdp_data = gdp_data.merge(china_imports, on=["country", "year"], how="left")
+
+    # Calculate China imports as share of GDP (as percentage)
+    china_gdp_data["china_imports_share_of_gdp"] = (
+        china_gdp_data["china_imports_value"] / china_gdp_data["gdp_total"] * 100
+    )
+
+    # Keep only the calculated share
+    china_gdp_data = china_gdp_data[["country", "year", "china_imports_share_of_gdp"]]
+    china_gdp_data["counterpart_country"] = "China"
+    print(china_gdp_data)
+
+    # Merge back to main table
+    tb = tb.merge(china_gdp_data, on=["country", "year", "counterpart_country"], how="left")
+    return tb

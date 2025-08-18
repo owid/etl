@@ -41,3 +41,10 @@ tables:
         display:
           numDecimalPlaces: *decimals
 
+      china_imports_share_of_gdp:
+        title: "China imports as share of GDP"
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: *decimals
+
