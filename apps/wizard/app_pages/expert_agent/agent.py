@@ -2,11 +2,13 @@ import urllib.parse
 from pathlib import Path
 from typing import AsyncGenerator, Literal
 
+import logfire
 import requests
 import streamlit as st
 import yaml
 from pydantic_ai import Agent
 from pydantic_ai.agent import CallToolsNode
+from pydantic_ai.mcp import MCPServerSSE, MCPServerStdio, MCPServerStreamableHTTP
 from pydantic_ai.messages import (
     PartDeltaEvent,
     PartStartEvent,
@@ -26,6 +28,9 @@ from etl.docs import (
 )
 from etl.files import ruamel_dump, ruamel_load
 from etl.paths import BASE_DIR, DOCS_DIR
+
+logfire.configure()
+logfire.instrument_pydantic_ai()
 
 #######################################################
 # LOAD KNOWLEDGE BASE
@@ -69,19 +74,45 @@ DOCS_INDEX = dict(DOCS_INDEX)
 #######################################################
 
 # MCP
-# server = MCPServerStdio(
-#     command=".venv/bin/fastmcp",
-#     args=[
-#         "run",
-#         "owid_mcp/server.py",
-#     ],
-# )
+mcp_server = MCPServerStdio(
+    command=str(BASE_DIR / ".venv" / "bin" / "fastmcp"),
+    args=[
+        "run",
+        str(BASE_DIR / "owid_mcp" / "server.py"),
+    ],
+)
+mcp_server_prod = MCPServerStreamableHTTP(
+    url="https://mcp.owid.io/mcp",
+)
+
+from pydantic_ai.models.openai import OpenAIResponsesModelSettings
+
+settings = OpenAIResponsesModelSettings(
+    openai_reasoning_effort="low",
+    # openai_reasoning_summary="detailed",
+    openai_truncation="auto",
+)
+
 
 # Pydantic AI Agent
 agent = Agent(
-    system_prompt=SYSTEM_PROMPT,
+    instructions=SYSTEM_PROMPT,
     retries=2,
-    # mcp_servers=[server],
+    model_settings=settings,
+    # toolsets=[mcp_server_prod],
+)
+
+
+recommender_agent = Agent(
+    model="openai:gpt-4o-mini",
+    instructions="""You will get a conversation history. Based on it, recommend 3 follow-up questions that the user could ask next. The questions should be short, concise, to the point, and should be framed as if the user was asking them. Example: 'How many articles did we publish in 2025?'. Two questions should be related to the conversation, and on should be more tangential to explore a different topic, but still concrete.""",
+    output_type=list[str],
+)
+
+summarize_agent = Agent(
+    # "openai:gpt-5-nano",
+    instructions="""You will get a chat history between a user and an LLM. Summarize the content shared by the two parties.""",
+    output_type=str,
 )
 
 #######################################################
@@ -89,7 +120,22 @@ agent = Agent(
 #######################################################
 
 
-async def agent_stream(prompt: str, model_name: str) -> AsyncGenerator[str, None]:
+def _get_model_from_name(model_name: str):
+    if model_name == "llama3.2":
+        from pydantic_ai.models.openai import OpenAIModel
+        from pydantic_ai.providers.ollama import OllamaProvider
+
+        model = OpenAIModel(
+            model_name="llama3.2",
+            provider=OllamaProvider(base_url="http://localhost:11434/v1"),
+        )
+
+    else:
+        model = model_name
+    return model
+
+
+async def agent_stream(prompt: str, model_name: str, message_history) -> AsyncGenerator[str, None]:
     """Stream agent response using run_stream.
 
     Args:
@@ -99,9 +145,11 @@ async def agent_stream(prompt: str, model_name: str) -> AsyncGenerator[str, None
     Yields:
         str: Text chunks from the agent response
     """
+    model = _get_model_from_name(model_name)
     async with agent.run_stream(
         prompt,
-        model=model_name,  # type: ignore
+        model=model,  # type: ignore
+        message_history=message_history,
     ) as result:
         # Yield each message from the stream
         async for message in result.stream_text(delta=True):
@@ -125,10 +173,11 @@ async def agent_stream2(prompt: str, model_name: str, message_history) -> AsyncG
     Yields:
         str: Text chunks from the agent response
     """
+    model = _get_model_from_name(model_name)
     # Use provided model_name or fall back to session state
     async with agent.iter(
         prompt,
-        model=model_name,
+        model=model,
         message_history=message_history,
     ) as run:
         nodes = []
@@ -356,13 +405,14 @@ async def validate_datasette_query(query: str) -> str:
 
 
 @agent.tool_plain(docstring_format="google")
-async def get_data_from_datasette(query: str) -> str:
+async def get_data_from_datasette(query: str, num_rows: int = 10) -> str:
     """Execute a query in the semantic layer in Datasette and get the actual data results.
 
     This only shows the first 10 rows of the result, as a markdown table.
 
     Args:
         query: Query to Datasette instance.
+        num_rows: Number of rows to return. Defaults to 10. Too many rows may increase the tokens. Be mindful when increasing this number.
     Returns:
         pd.DataFrame: DataFrame with the results of the query.
     """
@@ -371,7 +421,7 @@ async def get_data_from_datasette(query: str) -> str:
     if df.empty:
         return ""
 
-    result = df.head(10).to_markdown(index=False)
+    result = df.head(num_rows).to_markdown(index=False)
     if result is None:
         return ""
     return result

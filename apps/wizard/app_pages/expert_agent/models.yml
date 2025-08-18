@@ -60,3 +60,9 @@ models:
     cost:
       in: 0.30
       out: 2.50
+  # Others
+  - name: llama3.2
+    display_name: "Llama 3.2 (local)"
+    cost:
+      in: 0
+      out: 0

@@ -4,6 +4,7 @@ references:
 - https://docs.streamlit.io/knowledge-base/tutorials/build-conversational-apps#build-a-chatgpt-like-app
 """
 
+import asyncio
 import json
 import time
 from typing import cast
@@ -12,7 +13,7 @@ import streamlit as st
 from pydantic_core import to_json
 from structlog import get_logger
 
-from apps.wizard.app_pages.expert_agent.agent import agent_stream2
+from apps.wizard.app_pages.expert_agent.agent import agent_stream, agent_stream2, recommender_agent
 from apps.wizard.app_pages.expert_agent.utils import MODELS_AVAILABLE_LIST, MODELS_DISPLAY, estimate_llm_cost
 from etl.config import load_env
 
@@ -34,34 +35,16 @@ load_env()
 st.session_state.setdefault("expert_config", {})
 st.session_state.setdefault("agent_messages", [])
 st.session_state.setdefault("response", None)
+st.session_state.setdefault("recommended_question", None)
 
 # Models
 ## See all of them in https://github.com/pydantic/pydantic-ai/blob/master/pydantic_ai_slim/pydantic_ai/models/__init__.py
 MODEL_DEFAULT = "openai:gpt-5-mini"
 
-# Sample questions
-SAMPLE_QUESTIONS = [
-    "Which are our top 10 articles by pageviews?",
-    "How many charts do we have that use only a single indicator?",
-    "Do we have datasets whose indicators are not used in any chart?",
-    "In the metadata yaml file, which field should I use to disable the map tap view?",
-    "In the metadata yaml file, how can I define a common `description_processing` that affects all indicators in a specific table?"
-    "What is the difference between `description_key` and `description_from_producer`? Be concise.",
-    "Is the following snapshot title correct? 'Cherry Blossom Full Blook Dates in Kyoto, Japan'",
-    "What is the difference between an Origin and Dataset?",
-]
-
 
 ##################################################################
 # Functions
 ##################################################################
-def sample_question() -> str:
-    """Sample a random question from SAMPLE_QUESTIONS."""
-    import random
-
-    return random.choice(SAMPLE_QUESTIONS)
-
-
 # Reset chat history
 def reset_messages() -> None:
     """Reset messages to default."""
@@ -136,12 +119,13 @@ def register_message_history():
     st.session_state["agent_messages"].extend(agent_messages)
 
 
-def show_history_chat():
+def build_history_chat():
     # Load messages
     messages = st.session_state["agent_messages"]
     messages = to_json(messages)
     messages = json.loads(messages)
     # Display messages
+    chat_history = []
     for message in messages:
         parts = message["parts"]
         kind = message["kind"]
@@ -149,16 +133,29 @@ def show_history_chat():
             part_kind = part["part_kind"]
             if (kind == "request") and (part_kind == "user-prompt"):
                 if "content" in part:
-                    with st.chat_message("user", avatar=AVATAR_PERSON):
-                        st.markdown(part["content"])
-                else:
-                    st.toast("**Warning**: Error rendering message history.", icon=":material/warning:")
+                    chat_history.append(
+                        {
+                            "kind": "user",
+                            "content": part["content"],
+                        }
+                    )
             elif (kind == "response") and (part_kind == "text"):
                 if "content" in part:
-                    with st.chat_message("assistant"):
-                        st.markdown(part["content"])
-                else:
-                    st.toast("**Warning**: Error rendering message history.", icon=":material/warning:")
+                    chat_history.append(
+                        {
+                            "kind": "assistant",
+                            "content": part["content"],
+                        }
+                    )
+    return chat_history
+
+
+def show_history_chat():
+    chat_history = build_history_chat()
+    for message in chat_history:
+        avatar = AVATAR_PERSON if message["kind"] == "user" else None
+        with st.chat_message(message["kind"], avatar=avatar):
+            st.markdown(message["content"])
 
 
 def show_settings_menu():
@@ -180,6 +177,34 @@ def show_settings_menu():
         )
 
 
+def show_suggestions():
+    with st.spinner("Generating recommended questions..."):
+        # t0 = time.time()
+        chat_history = build_history_chat()
+        text = ""
+        for msg in chat_history:
+            text += f"{msg['kind']}\n========\n{msg['content']}\n"  # type: ignore
+
+        result = asyncio.run(
+            recommender_agent.run(
+                user_prompt=text,
+            )
+        )
+        with st.container(border=False):
+            st.markdown("**Suggestions**")
+            for question in result.output:
+                st.button(
+                    question,
+                    on_click=lambda q=question: st.session_state.update({"recommended_question": q}),
+                    icon=":material/assistant:",
+                    width="stretch",
+                )
+            # st.badge(
+            #     f"Generated in {time.time() - t0:.2f}s",
+            #     color="primary",
+            # )
+
+
 ##################################################################
 # UI starts here
 ##################################################################
@@ -197,7 +222,12 @@ with container:
         show_settings_menu()
 
 # Arrange chat input
-prompt = st.chat_input(placeholder="Ask anything")
+prompt = st.chat_input(
+    placeholder="Ask anything",
+)
+
+if st.session_state["recommended_question"]:
+    prompt = st.session_state["recommended_question"]
 
 # React to user input
 if prompt:
@@ -239,3 +269,11 @@ if prompt:
             register_message_history()
 
         print("finished asking LLM...")
+
+        # Get recommendations
+        try:
+            show_suggestions()
+        except Exception as _:
+            pass
+
+        st.session_state["recommended_question"] = None
