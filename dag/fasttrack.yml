@@ -245,4 +245,6 @@ steps:
   data://grapher/fasttrack/latest/guinea_worm_cases:
     - snapshot://fasttrack/latest/guinea_worm_cases.csv
   data://grapher/fasttrack/latest/breakdown_material_footprint_eu: !!set
-    snapshot://fasttrack/latest/breakdown_material_footprint_eu.csv:
+    ? snapshot://fasttrack/latest/breakdown_material_footprint_eu.csv
+  data://grapher/fasttrack/latest/wolbachia_dengue_indonesia_rct: !!set
+    snapshot://fasttrack/latest/wolbachia_dengue_indonesia_rct.csv:
