@@ -684,6 +684,8 @@ steps:
   data://garden/imf/2025-07-08/trade_asia:
     - data://meadow/imf/2025-07-08/trade
     - data://garden/regions/2023-01-01/regions
+    - data://garden/worldbank_wdi/2025-01-24/wdi
+    - data://garden/demography/2024-07-15/population
   data://grapher/imf/2025-07-08/trade_asia:
     - data://garden/imf/2025-07-08/trade_asia
 
