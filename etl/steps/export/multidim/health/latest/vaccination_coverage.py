@@ -25,7 +25,7 @@ def run() -> None:
         "chartTypes": ["LineChart", "SlopeChart", "DiscreteBar"],
         "hasMapTab": True,
         "tab": "chart",
-        "yAxis": {min: 0},
+        "yAxis": {"min": 0},
     }
     # Create and save collection
     c = paths.create_collection(
