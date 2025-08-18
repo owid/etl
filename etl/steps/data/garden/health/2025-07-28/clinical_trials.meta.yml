@@ -45,7 +45,7 @@ tables:
       n_studies_sponsor:
         title: Number of clinical trials by sponsor
         description_short: |
-          Annual number of clinical trials globally registered in the [ClinicalTrials.gov](#dod:clinical-trials-gov) database, by sponsor type. ClinicalTrials.gov has four sponsor categories: Trials funded by the National Institutes of Health (NIH), other US federal agencies (e.g., [FDA](#dod:us-fda), industry (e.g., pharmaceutical companies), and other sponsors (e.g., non-US governments, academic institutions, non-profits, and other people or entities)."
+          Annual number of clinical trials globally registered in the [ClinicalTrials.gov](#dod:clinical-trials-gov) database, by sponsor type. ClinicalTrials.gov has four sponsor categories: Trials funded by the National Institutes of Health (NIH), other US federal agencies (e.g., [FDA](#dod:us-fda), industry (e.g., pharmaceutical companies), and other sponsors (e.g., non-US governments, academic institutions, non-profits, and other people or entities).
         unit: trials
         short_unit: ""
         description_key:
