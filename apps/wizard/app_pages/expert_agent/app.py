@@ -13,7 +13,7 @@ import streamlit as st
 from pydantic_core import to_json
 from structlog import get_logger
 
-from apps.wizard.app_pages.expert_agent.agent import agent_stream, agent_stream2, recommender_agent
+from apps.wizard.app_pages.expert_agent.agent import agent_stream2, recommender_agent
 from apps.wizard.app_pages.expert_agent.utils import MODELS_AVAILABLE_LIST, MODELS_DISPLAY, estimate_llm_cost
 from etl.config import load_env
 
@@ -72,7 +72,7 @@ def show_usage(response_time: float):
         with st.container(horizontal=True, vertical_alignment="bottom", horizontal_alignment="left"):
             # Cost
             st.markdown(
-                f":green-badge[:small[:material/paid: {cost_msg}]]",
+                f":blue-badge[:small[:material/paid: {cost_msg}]]",
                 help="Accumulated cost of the interaction with the LLM.",
                 width="content",
             )
@@ -85,7 +85,7 @@ def show_usage(response_time: float):
             # Timer
             st.badge(
                 time_msg,
-                color="gray",
+                color="blue",
                 icon=":material/timer:",
             )
             # Model name
@@ -204,7 +204,7 @@ def show_settings_menu():
         label="Use OWID mcp",
         value=False,
         key="expert_use_mcp",
-        help="Use OWID's MCP server to access our data and tools.",
+        help="**:material/warning: EXPERIMENTAL**! Use OWID's MCP server to access our data and tools.",
     )
     with st.container(horizontal=True, vertical_alignment="bottom"):
         st.button(
@@ -221,11 +221,10 @@ def show_suggestions():
     for msg in chat_history:
         text += f"{msg['kind']}\n========\n{msg['content']}\n"  # type: ignore
 
-    result = asyncio.run(
-        recommender_agent.run(
-            user_prompt=text,
-        )
+    result = recommender_agent.run_sync(
+        user_prompt=text,
     )
+
     with st.container(border=False):
         st.markdown("**What would you like next?**")
         for question in result.output:
@@ -235,10 +234,6 @@ def show_suggestions():
                 icon=":material/assistant:",
                 width="stretch",
             )
-        # st.badge(
-        #     f"Generated in {time.time() - t0:.2f}s",
-        #     color="primary",
-        # )
 
 
 ##################################################################
@@ -251,7 +246,7 @@ container = st.container(
 with container:
     ## Title/subtitle
     st.title(":rainbow[:material/smart_toy:] Expert")
-    st.badge("agent mode", color="primary")
+    # st.badge("agent mode", color="primary")
     # Settings
     model_name = MODELS_DISPLAY.get(st.session_state.get("expert_model_name", MODEL_DEFAULT))
     with st.popover(f"{model_name}", icon=":material/settings:", help="Model settings"):
@@ -285,7 +280,7 @@ if prompt:
         start_time = time.time()
 
         # Agent to work, and stream its output
-        stream = agent_stream(
+        stream = agent_stream2(
             prompt,
             model_name=st.session_state["expert_config"]["model_name"],
             message_history=st.session_state["agent_messages"],
@@ -312,7 +307,6 @@ if prompt:
             register_message_history()
 
     # Get recommendations
-    # with st.spinner("Generating recommended questions..."):
     try:
         show_suggestions()
     except Exception as _:
