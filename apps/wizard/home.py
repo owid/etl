@@ -32,7 +32,6 @@ def st_show_home():
         )
         st.caption(f"streamlit {st.__version__}", width="content")
 
-
     # Generic tools
     ## Default styling for the cards (Wizard apps are presented as cards)
     default_styles = {
