@@ -8,17 +8,18 @@ import streamlit as st
 import yaml
 from pydantic_ai import Agent
 from pydantic_ai.agent import CallToolsNode
-from pydantic_ai.mcp import MCPServerSSE, MCPServerStdio, MCPServerStreamableHTTP
+from pydantic_ai.mcp import MCPServerStreamableHTTP
 from pydantic_ai.messages import (
     PartDeltaEvent,
     PartStartEvent,
     TextPart,
     TextPartDelta,
 )
+from pydantic_ai.models.openai import OpenAIResponsesModelSettings
 
 from apps.wizard.app_pages.expert_agent.utils import CURRENT_DIR
 from etl.analytics import ANALYTICS_URL, clean_sql_query, read_datasette
-from etl.config import LOGFIRE_TOKEN_EXPERT
+from etl.config import GOOGLE_API_KEY, LOGFIRE_TOKEN_EXPERT
 from etl.docs import (
     render_collection,
     render_dataset,
@@ -71,49 +72,59 @@ with open(BASE_DIR / "mkdocs.yml", "r") as f:
 DOCS_INDEX = dict(DOCS_INDEX)
 
 #######################################################
-# AGENT
+# MCPs
 #######################################################
 
-# MCP
-mcp_server = MCPServerStdio(
-    command=str(BASE_DIR / ".venv" / "bin" / "fastmcp"),
-    args=[
-        "run",
-        str(BASE_DIR / "owid_mcp" / "server.py"),
-    ],
-)
+# OWID Prod MCP server
 mcp_server_prod = MCPServerStreamableHTTP(
     url="https://mcp.owid.io/mcp",
 )
 
-from pydantic_ai.models.openai import OpenAIResponsesModelSettings
-
+## Trying to tweak the settings for OpenAI responses
 settings = OpenAIResponsesModelSettings(
-    openai_reasoning_effort="low",
+    # openai_reasoning_effort="low",
     # openai_reasoning_summary="detailed",
     openai_truncation="auto",
 )
 
 
-# Pydantic AI Agent
+## Use MCPs or not based on user input
+def get_toolsets():
+    if ("expert_use_mcp" in st.session_state) and st.session_state["expert_use_mcp"]:
+        # Use MCP server for the agent
+        return [mcp_server_prod]
+    return []
+
+
+#######################################################
+# AGENTS
+#######################################################
+
+# Main Agent
 agent = Agent(
     instructions=SYSTEM_PROMPT,
     retries=2,
     model_settings=settings,
-    toolsets=[mcp_server_prod],
 )
 
-
+# Agent for recommending follow-up questions
+if GOOGLE_API_KEY:
+    MODEL_SUGGESTIONS = "google-gla:gemini-2.5-flash"
+else:
+    MODEL_SUGGESTIONS = "openai:gpt-5-mini"
 recommender_agent = Agent(
-    model="openai:gpt-4o-mini",
+    model=MODEL_SUGGESTIONS,
     instructions="""You will get a conversation history. Based on it, recommend 3 follow-up questions that the user could ask next. The questions should be short, concise, to the point, and should be framed as if the user was asking them. Example: 'How many articles did we publish in 2025?'. Two questions should be related to the conversation, and on should be more tangential to explore a different topic, but still concrete.""",
     output_type=list[str],
+    retries=2,
 )
 
+# Agent for summarizing the conversation. Currently not in use.
 summarize_agent = Agent(
     # "openai:gpt-5-nano",
     instructions="""You will get a chat history between a user and an LLM. Summarize the content shared by the two parties.""",
     output_type=str,
+    retries=2,
 )
 
 #######################################################
@@ -151,6 +162,7 @@ async def agent_stream(prompt: str, model_name: str, message_history) -> AsyncGe
         prompt,
         model=model,  # type: ignore
         message_history=message_history,
+        toolsets=get_toolsets(),  # type: ignore
     ) as result:
         # Yield each message from the stream
         async for message in result.stream_text(delta=True):
@@ -165,13 +177,20 @@ async def agent_stream(prompt: str, model_name: str, message_history) -> AsyncGe
 
 async def _collect_agent_stream2(prompt: str, model_name: str, message_history) -> List[str]:
     """Collect all chunks from agent_stream2 in one async context to avoid task switching issues."""
+    toolsets = get_toolsets()
+    print("===========================================")
+    print("Toolsets available")
+    print(toolsets)
+    print("===========================================")
+
     chunks = []
     model = _get_model_from_name(model_name)
-    
+
     async with agent.iter(
         prompt,
         model=model,
         message_history=message_history,
+        toolsets=toolsets,  # type: ignore
     ) as run:
         nodes = []
         async for node in run:
@@ -204,16 +223,16 @@ async def _collect_agent_stream2(prompt: str, model_name: str, message_history) 
             st.session_state["last_usage"] = run.usage()
         if hasattr(run, "result"):
             st.session_state["agent_result"] = run.result
-    
+
     return chunks
 
 
 async def agent_stream2(prompt: str, model_name: str, message_history) -> AsyncGenerator[str, None]:
     """Stream agent response using iter method with Streamlit-compatible wrapper.
-    
+
     This version collects all chunks in one async context first, then yields them
     to avoid async context manager issues with Streamlit's task switching.
-    
+
     Args:
         prompt: The user prompt to process
         model_name: The model to use.
@@ -222,7 +241,7 @@ async def agent_stream2(prompt: str, model_name: str, message_history) -> AsyncG
     """
     # Collect all chunks first to avoid async context issues with Streamlit
     chunks = await _collect_agent_stream2(prompt, model_name, message_history)
-    
+
     # Yield chunks one by one
     for chunk in chunks:
         if chunk:  # Only yield non-empty chunks
@@ -245,7 +264,7 @@ async def get_context(category_name: Literal["analytics", "metadata", "docs"]) -
     Returns:
         str: The context for the specified category.
     """
-    st.toast(f"**Tool use**: `get_context`, `{category_name}`", icon=":material/smart_toy:")
+    st.toast(f"**Tool use**: `get_context(category_name={category_name})`", icon=":material/smart_toy:")
     return CONTEXT["context"][category_name]
 
 
@@ -292,7 +311,7 @@ async def get_docs_page(file_path: str) -> str:
     Returns:
         str: The documentation for the specified file_path.
     """
-    st.toast(f"**Tool use**: `get_docs_page`, `file_path='{file_path}'`", icon=":material/smart_toy:")
+    st.toast(f"**Tool use**: `get_docs_page (file_path='{file_path}')`", icon=":material/smart_toy:")
     if (DOCS_DIR / file_path).exists():
         docs = read_page_md(DOCS_DIR / file_path)
     else:
@@ -326,7 +345,7 @@ async def get_db_table_fields(tb_name: str) -> str:
     Returns:
         str: Table documentation as string, mapping column names to their descriptions. E.g. "column1: description1\ncolumn2: description2".
     """
-    st.toast(f"**Tool use**: `get_db_table_fields`, `table='{tb_name}'`", icon=":material/smart_toy:")
+    st.toast(f"**Tool use**: `get_db_table_fields(table='{tb_name}')`", icon=":material/smart_toy:")
     if tb_name not in ANALYTICS_DB_TABLE_DETAILS:
         print("Table not found:", tb_name)
         print("Available tables:", sorted(ANALYTICS_DB_TABLE_DETAILS.keys()))
@@ -347,7 +366,7 @@ async def get_api_reference_metadata(
     Returns:
         str: Metadata for the specified object type.
     """
-    st.toast(f"**Tool use**: `get_db_table_fields`, `object_name='{object_name}'`", icon=":material/smart_toy:")
+    st.toast(f"**Tool use**: `get_api_reference_metadata(object_name='{object_name}')`", icon=":material/smart_toy:")
     match object_name:
         case "dataset":
             return render_dataset()
@@ -406,8 +425,8 @@ async def validate_datasette_query(query: str) -> str:
     if response["ok"]:
         if ("rows" not in response) or not isinstance(response["rows"], list):
             text = "Query is invalid! Check for correctness, it must be DuckDB compatible! Seems like no rows were returned."
-        if len(response["rows"]) == 0:
-            text = "Query is valid, but no results found."
+        elif len(response["rows"]) == 0:
+            text = "Query is valid, but it returned no results."
         else:
             text = "Query is valid!"
     else:
