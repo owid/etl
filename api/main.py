@@ -1,8 +1,11 @@
+from contextlib import asynccontextmanager
+
 import structlog
 from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from sentry_sdk.integrations.asgi import SentryAsgiMiddleware
 
+from api.semantic_search import initialize_semantic_search_async
 from api.v1 import v1
 from etl import config
 from etl.db import get_engine
@@ -15,8 +18,15 @@ config.enable_sentry()
 engine = get_engine()
 
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Initialize semantic search on API startup."""
+    initialize_semantic_search_async()
+    yield
+
+
 def get_application():
-    _app = FastAPI(title="ETL API")
+    _app = FastAPI(title="ETL API", lifespan=lifespan)
 
     _app.add_middleware(
         CORSMiddleware,
