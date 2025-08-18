@@ -1,5 +1,3 @@
-# Steps for conflict data
-# https://github.com/owid/owid-issues/issues/449
 steps:
   # Transcriptions
   data://garden/war/2023-01-18/bouthoul_carrere_1978:
@@ -235,26 +233,6 @@ steps:
   # UNODA - Treaties Database.
   data://grapher/war/2025-05-15/nuclear_weapons_treaties_country_counts:
     - data://garden/war/2025-05-15/nuclear_weapons_treaties
-  # Bleek - Spread of Nuclear Weapons.
-  data://meadow/war/2025-05-15/spread_of_nuclear_weapons:
-    - snapshot://war/2025-05-15/spread_of_nuclear_weapons.pdf
-  # Bleek - Spread of Nuclear Weapons.
-  data://garden/war/2025-05-15/spread_of_nuclear_weapons:
-    - data://meadow/war/2025-05-15/spread_of_nuclear_weapons
-  # Nuclear Threat Initiative - Overview.
-  data://meadow/war/2025-05-15/nuclear_threat_initiative_overview:
-    - snapshot://war/2025-05-15/nuclear_threat_initiative_overview.csv
-  # Nuclear Threat Initiative - Overview.
-  data://garden/war/2025-05-15/nuclear_threat_initiative_overview:
-    - data://meadow/war/2025-05-15/nuclear_threat_initiative_overview
-  # Bleek and Nuclear Threat Initiative - Nuclear Weapons Proliferation.
-  data://garden/war/2025-05-15/nuclear_weapons_proliferation:
-    - data://garden/war/2025-05-15/nuclear_threat_initiative_overview
-    - data://garden/war/2025-05-15/spread_of_nuclear_weapons
-    - data://garden/regions/2023-01-01/regions
-  # Bleek and Nuclear Threat Initiative - Nuclear Weapons Proliferation.
-  data://grapher/war/2025-05-15/nuclear_weapons_proliferation:
-    - data://garden/war/2025-05-15/nuclear_weapons_proliferation
   # The Strategic Nuclear Forces Dataset (Suh).
   data://meadow/war/2025-05-15/strategic_nuclear_forces:
     - snapshot://war/2025-05-15/strategic_nuclear_forces__monadic.xlsx
