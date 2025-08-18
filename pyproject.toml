@@ -74,7 +74,7 @@ dependencies = [
     "mediacloud>=4.4.0",
     "fastmcp>=2.10.6",
     "pyproj>=3.7.1",
-    "pydantic-ai>=0.7.2",
+    "pydantic-ai>=0.7.2; sys_platform != 'darwin' or platform_release >= '22.0'",
     "logfire>=4.3.3",
 ]
 
@@ -145,9 +145,13 @@ wizard = [
     # sentence-transformers 2.2.2 requires huggingface-hub >=0.15.1,<1.0.0
     # transformers >=4.35.0 requires huggingface-hub >=0.30.0 (incompatible with cached_download import)
     # huggingface-hub 0.25.0 is the latest version that supports deprecated imports like cached_download
-    "sentence-transformers==2.2.2; python_version < '3.13'",
-    "huggingface-hub==0.25.0; python_version < '3.13'",
-    "tokenizers==0.21.1; python_version < '3.13'",
+    "sentence-transformers==2.2.2; python_version < '3.13' and sys_platform == 'darwin' and platform_release < '22.0'",
+    "huggingface-hub==0.25.0; python_version < '3.13' and sys_platform == 'darwin' and platform_release < '22.0'",
+    "tokenizers==0.21.1; python_version < '3.13' and sys_platform == 'darwin' and platform_release < '22.0'",
+    # Latest versions for non-macOS12 systems
+    "sentence-transformers>=2.2.2; python_version < '3.13' and (sys_platform != 'darwin' or platform_release >= '22.0')",
+    "huggingface-hub>=0.15.1; python_version < '3.13' and (sys_platform != 'darwin' or platform_release >= '22.0')",
+    "tokenizers>=0.15.0; python_version < '3.13' and (sys_platform != 'darwin' or platform_release >= '22.0')",
     # Settings for 3.13
     "torch>=2.6.0; python_version >= '3.13'",
     "sentence-transformers>=2.2.2; python_version >= '3.13'",
