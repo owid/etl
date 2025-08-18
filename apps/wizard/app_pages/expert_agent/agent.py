@@ -196,20 +196,14 @@ async def _collect_agent_stream2(prompt: str, model_name: str, message_history) 
         async for node in run:
             nodes.append(node)
             if Agent.is_model_request_node(node):
-                is_final_synthesis_node = any(
-                    isinstance(prev_node, CallToolsNode) for prev_node in nodes
-                )
+                is_final_synthesis_node = any(isinstance(prev_node, CallToolsNode) for prev_node in nodes)
                 print(f"--- ModelRequestNode (Is Final Synthesis? {is_final_synthesis_node}) ---")
                 async with node.stream(run.ctx) as request_stream:
                     async for event in request_stream:
                         print(f"Request Event: Data: {event!r}")
-                        if (
-                            isinstance(event, PartDeltaEvent) and isinstance(event.delta, TextPartDelta)
-                        ):
+                        if isinstance(event, PartDeltaEvent) and isinstance(event.delta, TextPartDelta):
                             chunks.append(event.delta.content_delta)
-                        elif (
-                            isinstance(event, PartStartEvent) and isinstance(event.part, TextPart)
-                        ):
+                        elif isinstance(event, PartStartEvent) and isinstance(event.part, TextPart):
                             chunks.append(event.part.content)
 
             elif Agent.is_call_tools_node(node):
