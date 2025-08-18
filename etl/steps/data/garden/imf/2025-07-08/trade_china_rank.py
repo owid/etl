@@ -129,7 +129,7 @@ def run() -> None:
 
     tb_china = get_country_import_ranking(tb_all_countries, "China")
     tb_us = get_country_import_ranking(tb_all_countries, "United States")
-    tb = tb_us.merge(tb_china, on=["country", "year"], how="left")
+    tb = tb_us.merge(tb_china, on=["country", "year"], how="outer")
 
     # Improve table format.
     tb = tb.format(["country", "year"])

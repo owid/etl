@@ -149,35 +149,10 @@ def calculate_trade_shares_as_share_world(tb: Table) -> Table:
     tb[EXPORT_COL] = tb[EXPORT_COL] * 1_000_000
     tb[IMPORT_COL] = tb[IMPORT_COL] * 1_000_000
 
-    # Remove overlapping regions to ensure shares sum to 100%
-    # Strategy: Replace overlapping regions with non-overlapping ones systematically
-
-    # Step 1: Handle Asia vs Asia (excl. China)
-    # For China as country: keep "Asia", remove "Asia (excl. China)" (China can't trade with itself)
-    # For all other countries: keep "Asia (excl. China)", remove "Asia"
-    china_asia_excl_mask = (tb["country"] == "China") & (tb["counterpart_country"] == "Asia (excl. China)")
-    tb = tb[~china_asia_excl_mask]
-
-    non_china_asia_mask = (tb["country"] != "China") & (tb["counterpart_country"] == "Asia")
-    tb = tb[~non_china_asia_mask]
-
-    # Step 2: Handle Europe vs European Union (IMF)
-    # Keep Europe, remove European Union (IMF) since Europe is broader and more complete
-    eu_mask = tb["counterpart_country"] == "European Union (IMF)"
-    tb = tb[~eu_mask]
-
-    # Step 3: Handle North America vs United States
-    # Keep North America, remove United States since North America includes US + Canada + Mexico
-    us_mask = tb["counterpart_country"] == "United States"
-    tb = tb[~us_mask]
-
-    # 1) Calculate totals from the filtered regions instead of using World totals
-    # This ensures shares add up to 100% for the regions we actually include
-    filtered_totals = (
-        tb[tb["counterpart_country"] != "World"]
-        .groupby(["country", "year"])[[EXPORT_COL, IMPORT_COL]]
-        .sum()
-        .reset_index()
+    # 1) Extract the world‐total rows and rename their export/import columns
+    world_totals = (
+        tb[tb["counterpart_country"] == "World"]
+        .loc[:, ["country", "year", EXPORT_COL, IMPORT_COL]]
         .rename(
             columns={
                 EXPORT_COL: "total_exports",
@@ -188,9 +163,7 @@ def calculate_trade_shares_as_share_world(tb: Table) -> Table:
 
     # Remove world totals since we're not using them
     tb = tb[tb["counterpart_country"] != "World"]
-
-    # Merge filtered totals back to main table
-    tb = tb.merge(filtered_totals, on=["country", "year"], how="left")
+    tb = tb.merge(world_totals, on=["country", "year"], how="left")
 
     # 3) Now compute shares exactly as before
     tb["exports_of_goods__free_on_board__fob__share"] = tb[EXPORT_COL] / tb["total_exports"] * 100
