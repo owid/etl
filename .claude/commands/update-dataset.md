@@ -23,7 +23,7 @@
    ```bash
    # First ensure old snapshot is loaded (don't use etls!)
    etlr snapshot://[old-version]/[dataset-name]
-   
+
    # Then compare both snapshot files programmatically
    # Read both old and new snapshot files to understand structural changes
    ```
@@ -46,11 +46,67 @@
 
 ## Phase 2: Fix Issues (REQUIRED - Execute automatically)
 
-1. **Fix any ETL failures** by investigating errors and updating code
-2. **Update metadata YAML files** to match new column structure if necessary
-3. **Test full pipeline** until `etlr --grapher` succeeds
-4. **Update PR description** with a summary of changes
-5. **Commit and push all fixes**
+### Phase 2A: Meadow Step Fixes
+
+1. **Fix meadow step** - Run and fix parsing errors until meadow step succeeds
+   ```bash
+   etlr data://meadow/[namespace]/[version]/[dataset]
+   ```
+
+2. **Compare meadow data differences** - Analyze changes from old version
+   ```bash
+   etl diff REMOTE data/ --include "meadow/[namespace]/.*/[dataset]" --verbose
+   ```
+
+3. **Review and document differences** - If differences are expected:
+   - Add summary of key changes to PR description in collapsed block
+   - Continue to Phase 2B if differences look reasonable
+
+4. **Commit meadow fixes**
+   ```bash
+   git add .
+   git commit -m "Fix meadow step parsing for new data format"
+   git push origin [branch-name]
+   ```
+
+### Phase 2B: Garden Step Fixes
+
+1. **Fix garden step** - Run and fix any garden-specific errors
+   ```bash
+   etlr data://garden/[namespace]/[version]/[dataset]
+   ```
+
+2. **Compare garden data differences** - Analyze processed data changes
+   ```bash
+   etl diff REMOTE data/ --include "garden/[namespace]/.*/[dataset]" --verbose
+   ```
+
+3. **Review garden differences** - Verify processing logic is working correctly
+   - Check that transformations are applied properly to new data structure
+   - Ensure indicator names and metadata are consistent
+
+4. **Commit garden fixes**
+   ```bash
+   git add .
+   git commit -m "Fix garden step processing for updated dataset"
+   git push origin [branch-name]
+   ```
+
+### Phase 2C: Complete Pipeline
+
+1. **Test full pipeline** until `etlr --grapher` succeeds
+   ```bash
+   etlr [dataset] --grapher
+   ```
+
+2. **Update metadata YAML files** if necessary to match new column structure
+
+3. **Final commit and PR update**
+   ```bash
+   git add .
+   git commit -m "Complete dataset update - full pipeline working"
+   git push origin [branch-name]
+   ```
 
 ## Phase 3: Indicator Upgrade (ASK USER FIRST - Do NOT execute automatically)
 
