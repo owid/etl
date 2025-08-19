@@ -21,6 +21,7 @@ GROUPED_VIEW_CONFIG = MULTIDIM_CONFIG | {
     "hasMapTab": False,
     "tab": "chart",
     "selectedFacetStrategy": "entity",
+    "hideFacetControl": False,
 }
 
 # Age group configurations - maps internal age group keys to column detection and display formatting

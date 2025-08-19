@@ -44,6 +44,7 @@ MULTIDIM_CONFIG = {
     "hasMapTab": True,
     "tab": "map",
     "addCountryMode": "add-country",
+    "hideFacetControl": False,
 }
 
 # Grouped view chart configuration

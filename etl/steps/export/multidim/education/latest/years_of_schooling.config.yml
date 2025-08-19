@@ -20,8 +20,8 @@ dimensions:
         name: Average years of schooling
         description: The average number of completed years of education of a population
       - slug: learning_adjusted_years_schooling
-        name: Learning adjusted years of schooling
-        description: Learning-adjusted years of schooling is the expected years of schooling adjusted for quality of learning
+        name: Learning-adjusted years of schooling
+        description: Expected years of schooling adjusted for quality of learning
   - slug: level
     name: Education level
     choices:

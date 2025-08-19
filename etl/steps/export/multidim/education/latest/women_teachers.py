@@ -31,6 +31,7 @@ GROUPED_VIEW_CONFIG = MULTIDIM_CONFIG | {
     "tab": "chart",
     "yAxis": {"min": 0, "max": 100, "facetDomain": "independent"},
     "selectedFacetStrategy": "entity",
+    "hideFacetControl": False,
     "addCountryMode": "add-country",
 }
 

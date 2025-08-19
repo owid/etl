@@ -56,14 +56,14 @@ METRIC_MAPPINGS = {
 
 METRIC_DESCRIPTION_MAP = {
     "expected_years_schooling": {
-        "primary": "Expected years of schooling measures the total years a child entering [primary](#dod:primary-education) education is expected to remain in primary school, including time spent repeating grades.",
-        "preprimary": "Expected years of schooling measures the total years a child entering [pre-primary](#dod:pre-primary-education) education is expected to remain in pre-primary school, including time spent repeating grades.",
-        "secondary": "Expected years of schooling measures the total years a child entering [secondary](#dod:secondary-education) education is expected to remain in secondary school, including time spent repeating grades.",
-        "tertiary": "Expected years of schooling measures the total years a person entering [tertiary](#dod:tertiary-education) education is expected to remain in tertiary education, including time spent repeating courses.",
-        "all": "Expected years of schooling measures the total years a child entering school is expected to remain in education, including time spent repeating grades.",
-        "level_side_by_side": "Expected years of schooling measures the total years a child is expected to remain in each education level, including time spent repeating grades.",
+        "primary": "Total years a child entering [primary](#dod:primary-education) education is expected to remain in primary school, based on current enrollment patterns and including time spent repeating grades.",
+        "preprimary": "Total years a child entering [pre-primary](#dod:pre-primary-education) education is expected to remain in pre-primary school, based on current enrollment patterns and including time spent repeating grades.",
+        "secondary": "Total years a child entering [secondary](#dod:secondary-education) education is expected to remain in secondary school, based on current enrollment patterns and including time spent repeating grades.",
+        "tertiary": "Total years a person entering [tertiary](#dod:tertiary-education) education is expected to remain in tertiary education, based on current enrollment patterns and including time spent repeating courses.",
+        "all": "Total years a child entering school is expected to remain in education across all levels, from pre-primary through tertiary, based on current enrollment patterns and including time spent repeating grades.",
+        "level_side_by_side": "Total years a child is expected to remain at each education level (pre-primary, primary, secondary, and tertiary), based on current enrollment patterns and including time spent repeating grades.",
     },
-    "average_years_schooling": "Average years of schooling measures how many years of education adults aged 25 and older have actually completed, excluding any repeated grades.",
+    "average_years_schooling": "Average years of formal education that adults aged 25 and older have completed in their lifetime. This measures educational attainment of the adult population and excludes time spent repeating grades.",
     "learning_adjusted_years_schooling": "[Learning-adjusted years of schooling](#dod:lays) captures both educational quantity and quality by scaling expected schooling years based on how much students actually learn.",
 }
 
@@ -160,6 +160,7 @@ def run() -> None:
                     "hasMapTab": False,
                     "tab": "chart",
                     "selectedFacetStrategy": "entity",
+                    "hideFacetControl": False,
                 },
             },
             {
@@ -174,6 +175,7 @@ def run() -> None:
                     "tab": "chart",
                     "chartTypes": ["StackedArea"],
                     "selectedFacetStrategy": "entity",
+                    "hideFacetControl": False,
                 },
             },
         ]
