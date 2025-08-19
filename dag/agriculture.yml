@@ -197,19 +197,3 @@ steps:
     - data://garden/demography/2024-07-15/population
   data://grapher/agriculture/2025-08-06/decoupling_food_production_and_land_use:
     - data://garden/agriculture/2025-08-06/decoupling_food_production_and_land_use
-  #
-  # Food prices for nutrition - World Bank based on FAO.
-  #
-  data://meadow/wb/2025-08-12/food_prices_for_nutrition:
-    - snapshot://wb/2025-08-12/food_prices_for_nutrition.csv
-  #
-  # Food prices for nutrition - World Bank based on FAO.
-  #
-  data://garden/wb/2025-08-12/food_prices_for_nutrition:
-    - data://garden/worldbank_wdi/2025-01-24/wdi
-    - data://meadow/wb/2025-08-12/food_prices_for_nutrition
-  #
-  # Food prices for nutrition - World Bank based on FAO.
-  #
-  data://grapher/wb/2025-08-12/food_prices_for_nutrition:
-    - data://garden/wb/2025-08-12/food_prices_for_nutrition
