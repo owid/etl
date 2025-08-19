@@ -112,7 +112,7 @@ def generate_pricing_text():
                 "Output (USD/1M tokens)",
             ]
         ]
-    except Exception as e:  # type: ignore
+    except Exception as _:  # type: ignore
         return "Error generating pricing table: {e}"
 
     table = df.to_markdown(index=False, tablefmt="pipe", floatfmt=".2f")
