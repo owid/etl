@@ -3,6 +3,9 @@ title:
   title_variant: by level of education and gender
 default_selection:
   - World
+  - Niger
+  - Indonesia
+  - Peru
 dimensions:
   - slug: enrolment_type
     name: Metric

@@ -105,8 +105,12 @@ def run() -> None:
         }
     )
 
-    # Edit display names
+    # Edit display names and set view metadata for all views
     for view in c.views:
+        # Set view metadata for all views
+        view.metadata = {
+            "description_short": view.config["subtitle"],
+        }
         edit_indicator_displays(view)
 
     # Save collection
@@ -197,7 +201,6 @@ def create_grouped_views(collection):
     """Add grouped views for gender and age group comparisons."""
     view_metadata = {
         "presentation": {"title_public": "{title}"},
-        "description_short": "{subtitle}",
     }
     view_config = GROUPED_VIEW_CONFIG | {
         "title": "{title}",

@@ -360,7 +360,7 @@ tables:
         description_key: *desc_literacy
         presentation:
           title_public: Literacy rate among young men aged 15–24
-          grapher_config: *grapher_config_literacy_adults
+          grapher_config: *grapher_config_literacy_youth
         display:
           numDecimalPlaces: 1
           tolerance: *display_tolerance
@@ -374,7 +374,7 @@ tables:
         description_key: *desc_literacy
         presentation:
           title_public: Literacy rate among young women aged 15–24
-          grapher_config: *grapher_config_literacy_adults
+          grapher_config: *grapher_config_literacy_youth
         display:
           numDecimalPlaces: 1
           tolerance: *display_tolerance
@@ -402,7 +402,7 @@ tables:
         description_key: *desc_literacy
         presentation:
           title_public: Literacy rate among older adult men aged 65+
-          grapher_config: *grapher_config_literacy_adults
+          grapher_config: *grapher_config_literacy_elderly
         display:
           numDecimalPlaces: 1
           tolerance: *display_tolerance
@@ -416,7 +416,7 @@ tables:
         description_key: *desc_literacy
         presentation:
           title_public: Literacy rate among older adult women aged 65+
-          grapher_config: *grapher_config_literacy_adults
+          grapher_config: *grapher_config_literacy_elderly
         display:
           numDecimalPlaces: 1
           tolerance: *display_tolerance
