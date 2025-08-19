@@ -15,9 +15,8 @@ from concurrent.futures import FIRST_COMPLETED, Future, ProcessPoolExecutor, Thr
 from functools import partial
 from graphlib import TopologicalSorter
 from multiprocessing import Manager
-from os import environ
 from pathlib import Path
-from typing import Any, Callable, Dict, Iterator, List, Optional
+from typing import Any, Callable, Dict, List, Optional
 
 import rich_click as click
 import structlog
@@ -480,21 +479,21 @@ def exec_steps(steps: List[Step], strict: Optional[bool] = None) -> None:
         try:
             time_taken = timed_run(lambda: step.run())
         except Exception as e:
-                # log which step failed and re-raise the exception, otherwise it gets lost
-                # in logs and we don't know which step failed
-                log.error("step_failed", step=str(step))
-                if config.CONTINUE_ON_FAILURE:
-                    failing_steps.append(step)
-                    exceptions.append(e)
-                    skipped_steps.append(step)
-                    click.echo(click.style("FAILED", fg="red"))
-                    continue
-                else:
-                    raise e
-            execution_times[str(step)] = time_taken
+            # log which step failed and re-raise the exception, otherwise it gets lost
+            # in logs and we don't know which step failed
+            log.error("step_failed", step=str(step))
+            if config.CONTINUE_ON_FAILURE:
+                failing_steps.append(step)
+                exceptions.append(e)
+                skipped_steps.append(step)
+                click.echo(click.style("FAILED", fg="red"))
+                continue
+            else:
+                raise e
+        execution_times[str(step)] = time_taken
 
-            click.echo(f"{click.style('OK', fg='blue')}{_create_expected_time_message(time_taken)}")
-            print()
+        click.echo(f"{click.style('OK', fg='blue')}{_create_expected_time_message(time_taken)}")
+        print()
 
         # Write the recorded execution times to the file after all steps have been executed
         _write_execution_times(execution_times)
@@ -699,8 +698,6 @@ def _get_execution_time(step_name: str) -> Optional[float]:
 def enumerate_steps(steps: List[Step]) -> None:
     for i, step in enumerate(steps, 1):
         print(f"{i}. {step}{_create_expected_time_message(_get_execution_time(str(step)))}")
-
-
 
 
 def timed_run(f: Callable[[], Any]) -> float:

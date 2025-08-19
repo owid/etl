@@ -3,7 +3,6 @@
 #
 
 import json
-import os
 import random
 import shutil
 import tempfile
@@ -112,8 +111,6 @@ def test_add_table():
         assert t2.metadata.primary_key == t.metadata.primary_key
         assert t2.equals_table(t)
         assert t2.metadata.dataset == ds.metadata
-
-
 
 
 def test_add_table_without_primary_key():

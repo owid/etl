@@ -28,8 +28,6 @@ def test_sub_dag_import():
     assert any(["sub_dag_step" in step for step in load_dag("tests/data/dag.yml")]), "sub-dag steps not found"
 
 
-
-
 def get_all_steps(filename: Union[str, Path] = paths.DEFAULT_DAG_FILE) -> List[Step]:
     dag = load_dag(filename)
 
