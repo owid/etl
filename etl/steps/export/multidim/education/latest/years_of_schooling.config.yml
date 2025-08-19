@@ -1,42 +1,48 @@
 title:
   title: Years of schooling
   title_variant: by level of education and gender
+topic_tags:
+  - Global Education
 default_selection:
   - Germany
+  - United States
+  - Iran
+  - Turkey
+
 dimensions:
   - slug: metric_type
     name: Metric
     choices:
       - slug: expected_years_schooling
         name: Expected years of schooling
-        description: The number of years a person is expected to spend in school or university, including years spent on repetition.
+        description: The number of years a person is expected to spend in school or university, including years spent on repetition
       - slug: average_years_schooling
         name: Average years of schooling
-        description: The average number of completed years of education of a population.
+        description: The average number of completed years of education of a population
       - slug: learning_adjusted_years_schooling
-        name: Learning adjusted years of schooling
-        description: Learning-adjusted years of schooling is the expected years of schooling adjusted for quality of learning.
+        name: Learning-adjusted years of schooling
+        description: Expected years of schooling adjusted for quality of learning
   - slug: level
     name: Education level
     choices:
       - slug: all
         name: Total
-        description: Total years across all education levels.
+        description: Total years across all education levels
       - slug: preprimary
         name: Pre-primary
-        description: Often provided through kindergarten or nursery for children ages around 3 to 5.
+        description: Often provided through kindergarten or nursery for children ages around 3 to 5
       - slug: primary
         name: Primary
-        description: Marks the start of formal schooling, typically for children aged 5 to 7.
+        description: Marks the start of formal schooling, typically for children aged 5 to 7
       - slug: secondary
         name: Secondary
-        description: For students generally aged 11 to 18.
+        description: For students generally aged 11 to 18
       - slug: tertiary
         name: Tertiary
-        description: Formal post-secondary learning, ranging from short vocational programs to university degrees.
+        description: Formal post-secondary learning, ranging from short vocational programs to university degrees
       - slug: level_side_by_side
         name: All levels
-        description: Compare expected years across all education levels.
+        description: Compare expected years across all education levels
 
   - slug: sex
     name: Gender
@@ -44,11 +50,11 @@ dimensions:
       - slug: both
         name: Both genders
       - slug: girls
-        name: Girls/women
+        name: Girls
       - slug: boys
-        name: Boys/men
+        name: Boys
       - slug: "sex_side_by_side"
-        name: Girls and boys
-        description: Compare genders
+        name: Girls vs. boys
+        description: Compare years of schooling between boys and girls
 
 views: []
