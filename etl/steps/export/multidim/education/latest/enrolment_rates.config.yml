@@ -10,12 +10,12 @@ dimensions:
   - slug: enrolment_type
     name: Metric
     choices:
-      - slug: gross_enrolment
-        name: Gross enrolment
-        description: Includes children of any age entering that level of education
       - slug: net_enrolment
         name: Net enrolment
         description: Only includes children within the official age group
+      - slug: gross_enrolment
+        name: Gross enrolment
+        description: Includes children of any age entering that level of education
   - slug: level
     name: Education level
     choices:
