@@ -231,18 +231,45 @@ async def run_sql(query: str, max_rows: int = MAX_ROWS_DEFAULT) -> Dict[str, Any
         query = f"{query} LIMIT {max_rows}"
 
     qs = urllib.parse.urlencode({"sql": query, "_size": "max"})
-    # Remove the .json extension from DATASETTE_BASE since it's already included in config
-    datasette_base = DATASETTE_BASE.replace(".json", "")
-    datasette_csv_url = f"{datasette_base}.csv?{qs}"
+    # Use JSON endpoint for better error handling
+    datasette_json_url = f"{DATASETTE_BASE}?{qs}"
 
     async with httpx.AsyncClient(timeout=HTTP_TIMEOUT) as client:
-        resp = await client.get(datasette_csv_url)
-        resp.raise_for_status()
-        csv_content = resp.text
+        resp = await client.get(datasette_json_url)
+
+        json_data = resp.json()
+
+        # Check if there's an error in the JSON response
+        if "error" in json_data and json_data["error"] is not None:
+            error_msg = json_data["error"]
+
+            # Handle specific case: missing column error like "['\"abc\"']"
+            if isinstance(error_msg, str) and error_msg.startswith("['") and error_msg.endswith("']"):
+                # Extract column name from string like "['\"abc\"']"
+                column_name = error_msg[2:-2].strip("\"'")  # Remove ['"] and quotes
+                if column_name:
+                    raise ValueError(
+                        f"SQL Error: Column '{column_name}' does not exist in the table. "
+                        f"You can check columns with: SELECT column_name FROM information_schema.columns WHERE table_name = 'table_name';"
+                    )
+
+            # For all other errors, just pass through the original message
+            raise ValueError(f"SQL Query Error: {error_msg}")
+
+        # Success - convert JSON to CSV format
+        rows = json_data["rows"]
+        columns = json_data["columns"]
+
+        # Create CSV content using csv module
+        output = io.StringIO()
+        writer = csv.writer(output)
+        writer.writerow(columns)  # Header
+        writer.writerows(rows)  # Data rows
+        csv_content = output.getvalue()
 
     return {
         "csv": csv_content,
-        "source": datasette_csv_url,
+        "source": datasette_json_url,
     }
 
 
