@@ -31,7 +31,10 @@ DATE_MIN = "2024-11-01"
 # Current date.
 DATE_MAX = str(datetime.today().date())
 # Base url for Datasette csv queries.
-ANALYTICS_CSV_URL = "http://analytics.owid.io/analytics.csv"
+DATASETTE_URL = "http://analytics.owid.io"
+ANALYTICS_URL = f"{DATASETTE_URL}/analytics"
+ANALYTICS_CSV_URL = f"{ANALYTICS_URL}.csv"
+ANALYTICS_JSON_URL = f"{ANALYTICS_URL}.json"
 
 # Maximum number of rows that a single Datasette csv call can return.
 MAX_DATASETTE_N_ROWS = 10000
@@ -161,7 +164,10 @@ def clean_sql_query(sql: str) -> str:
 
 
 def read_datasette(
-    sql: str, datasette_csv_url: str = ANALYTICS_CSV_URL, chunk_size: int = MAX_DATASETTE_N_ROWS
+    sql: str,
+    datasette_csv_url: str = ANALYTICS_CSV_URL,
+    chunk_size: int = MAX_DATASETTE_N_ROWS,
+    use_https: bool = True,
 ) -> pd.DataFrame:
     """
     Execute a query in the Datasette semantic layer.
@@ -184,6 +190,9 @@ def read_datasette(
         DataFrame containing the results of the query.
 
     """
+    if use_https:
+        datasette_csv_url = datasette_csv_url.replace("http://", "https://")
+
     # Check if the query contains a LIMIT clause.
     limit_match = re.search(r"\bLIMIT\s+(\d+)(?:\s+OFFSET\s+(\d+))?\b", sql, re.IGNORECASE)
 

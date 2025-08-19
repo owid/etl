@@ -185,25 +185,31 @@ class UIChartProducerAnalytics:
         )
 
         # Update traces to use custom hover text
-        for trace in fig.data:
-            if hasattr(trace, "type") and trace.type == "scatter" and (trace.y is not None):
-                chart_slug = trace.name  # Get the name of the line (Chart slug)
+        for i, trace in enumerate(fig.data):
+            if (
+                hasattr(trace, "type")
+                and hasattr(trace, "y")
+                and getattr(trace, "type") == "scatter"
+                and (getattr(trace, "y") is not None)
+            ):
+                chart_slug = getattr(trace, "name")  # Get the name of the line (Chart slug)
+                trace_y = getattr(trace, "y")
                 if chart_slug == "Total":
-                    trace.update(
+                    fig.data[i].update(
                         # legendgroup="Total",
                         showlegend=True,
                         name="<b>All charts</b>",
                         customdata=[
-                            f"<b>{chart_slug}</b><br>{int(views)} views" for views in trace.y
+                            f"<b>{chart_slug}</b><br>{int(views)} views" for views in trace_y
                         ],  # Custom hover text for each point
                         hovertemplate="%{customdata}<extra></extra>",
                     )
                 else:
-                    trace.update(
+                    fig.data[i].update(
                         # legendgroup="Charts",
                         showlegend=True,
                         customdata=[
-                            f"<b>{chart_slug}</b><br>{int(views)} views" for views in trace.y
+                            f"<b>{chart_slug}</b><br>{int(views)} views" for views in trace_y
                         ],  # Custom hover text for each point
                         hovertemplate="%{customdata}<extra></extra>",
                     )

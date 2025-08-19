@@ -4,6 +4,7 @@ import pandas as pd
 import streamlit as st
 
 from apps.utils.gpt import OpenAIWrapper
+from apps.wizard.utils.components import st_title_with_expert
 from apps.wizard.utils.insights import (
     fetch_chart_data,
     get_grapher_thumbnail,
@@ -24,7 +25,10 @@ st.set_page_config(
     page_title="Data insight robot",
     page_icon="🪄",
 )
-st.title(":material/lightbulb: Data insighter")
+st_title_with_expert(
+    "Data insighter",
+    icon=":material/lightbulb:",
+)
 
 
 def get_trajectory_prompt(conn, base_prompt: str, slug: str, codes: bool = False) -> Tuple[str, pd.DataFrame]:

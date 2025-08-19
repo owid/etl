@@ -1,18 +1,19 @@
 meta:
   origin:
-    producer: World Health Organization
-    title: Dracunculiasis Eradication Portal
+    producer: who
+    title: World Health Organization
     citation_full: Dracunculiasis Eradication Portal, World Health Organization (2025)
     attribution: World Health Organization
     attribution_short: who
     url_main: https://www.who.int/teams/control-of-neglected-tropical-diseases/dracunculiasis/dracunculiasis-eradication-portal
     url_download: |-
-      https://docs.google.com/spreadsheets/d/e/2PACX-1vRzLpxIjUOF2R16MwWq31IeDK-yzpRBdFPwglqv_ak8Rsvj5-UoyQFUzi__A3082SLR1XCejAIcVl2-/pub?output=csv
-    date_accessed: '2025-08-04'
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vRGSN-kxFpK-5xdu1Yn9JULRyrMjwIUVwKP6kN5zetR27JOm6WOBm2PVICUcrCwbu699GsjuCaW8aqJ/pub?output=csv
+    date_accessed: '2025-08-12'
     license:
       name: CC BY-NC-SA 3.0 IGO
       url: https://www.who.int/about/policies/publishing/copyright
-  name: Guinea worm reported cases
+    description: Dracunculiasis Eradication Portal
+  name: 'Guinea worm cases '
   description: |-
     Reported cases of guinea worm disease (dracunculiasis) as recorded by WHO. 
 
@@ -40,6 +41,6 @@ meta:
     name: CC BY-NC-SA 3.0 IGO
     url: https://www.who.int/about/policies/publishing/copyright
 outs:
-  - md5: 551d74c5421b6b914e889fbaf1a9ed75
-    size: 13428
+  - md5: 28f028affdf33fa4e9f96fdd5ea6754e
+    size: 13518
     path: guinea_worm_cases.csv

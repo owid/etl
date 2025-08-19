@@ -11,9 +11,9 @@ from apps.utils.files import generate_step
 from apps.wizard import utils
 from apps.wizard.etl_steps.forms import SnapshotForm
 from apps.wizard.etl_steps.utils import COOKIE_SNAPSHOT, MD_SNAPSHOT, SCHEMA_ORIGIN
-from apps.wizard.utils.components import preview_file, st_wizard_page_link
+from apps.wizard.utils.components import preview_file, st_title_with_expert, st_wizard_page_link
 from etl.docs import examples_to_markdown, faqs_to_markdown, guidelines_to_markdown
-from etl.paths import BASE_DIR, SNAPSHOTS_DIR
+from etl.paths import SNAPSHOTS_DIR
 
 #########################################################
 # CONSTANTS #############################################
@@ -21,6 +21,7 @@ from etl.paths import BASE_DIR, SNAPSHOTS_DIR
 st.set_page_config(
     page_title="Wizard: Snapshot",
     page_icon="🪄",
+    layout="centered",
 )
 # Lists with fields of special types. By default, fields are text inputs.
 FIELD_TYPES_TEXTAREA = [
@@ -241,6 +242,15 @@ def render_fields_init():
             default_last=False,
         )
 
+        # Create only DVC file?
+        APP_STATE.st_widget(
+            st.toggle,
+            label="Create only DVC file (no Python script)",
+            help="Check if you want to create only the .dvc metadata file without a Python script. Use this for simple snapshots that only need metadata.",
+            key="dvc_only",
+            default_last=False,
+        )
+
 
 def render_fields_from_schema(
     schema: Dict[str, Any],
@@ -346,12 +356,23 @@ def run_snap_step() -> None:
     st.session_state["run_step"] = True
 
 
+def create_snapshot_command(form: SnapshotForm, manual_import_file: Optional[str] = None) -> str:
+    """Create the command string for running a snapshot step."""
+    snapshot_path = f"{form.namespace}/{form.snapshot_version}/{form.short_name}"
+    command = f"etls {snapshot_path}"
+    if form.dataset_manual_import and manual_import_file:
+        command += f" --path-to-file {manual_import_file}"
+    elif form.dataset_manual_import:
+        command += " --path-to-file **relative_path_of_file**"
+    return command
+
+
 #########################################################
 # MAIN ##################################################
 #########################################################
 
 # TITLE
-st.title(":material/photo_camera: Snapshot **:gray[Create step]**")
+st_title_with_expert("Snapshot **:gray[Create step]**", icon=":material/photo_camera:")
 
 # SIDEBAR
 with st.sidebar:
@@ -408,9 +429,15 @@ if submitted:
             SNAPSHOTS_DIR / form.namespace / form.snapshot_version / f"{form.short_name}.{form.file_extension}.dvc"
         )
 
+        # If DVC-only mode is enabled, remove the generated Python script
+        if form.dvc_only:
+            if ingest_path.exists():
+                ingest_path.unlink()
+
         # Preview generated
         st.subheader("Generated files")
-        preview_file(ingest_path, "python")
+        if ingest_path.exists():
+            preview_file(ingest_path, "python")
         preview_file(meta_path, "yaml")
 
         # Display next steps
@@ -422,7 +449,12 @@ if submitted:
         with st.expander("⏭️ **Next steps**", expanded=True):
             # 1/ Verification
             st.markdown("#### 1. Verification")
-            st.markdown("Verify that generated files are correct and update them if necessary.")
+            if form.dvc_only:
+                st.markdown(
+                    "Verify that the generated .dvc metadata file is correct and update it if necessary. No Python script was created since you selected DVC-only mode."
+                )
+            else:
+                st.markdown("Verify that generated files are correct and update them if necessary.")
             # 2/ Run snapshot step
             st.markdown("#### 2. Run snapshot step")
             if form.dataset_manual_import:
@@ -430,11 +462,12 @@ if submitted:
                     label="Select local file to import", placeholder="path/to/file.csv", key="snapshot_file"
                 )
             st.button("Run snapshot step", key="run_snapshot_step", on_click=run_snap_step)  # type: ignore
+
             st.markdown(
                 f"""
             You can also run the step from the command line:
             ```bash
-            python {ingest_path.relative_to(BASE_DIR)} {manual_import_instructions}
+            {create_snapshot_command(form)}
             ```
             """
             )
@@ -460,14 +493,13 @@ if submitted:
 if st.session_state["run_step"]:
     # Get form
     form = cast(SnapshotForm, SnapshotForm.from_state())
-    # Get snapshot script path
-    script_path = f"{SNAPSHOTS_DIR}/{form.namespace}/{form.snapshot_version}/{form.short_name}.py"
 
-    # Build command
-    commands = ["uv", "run", "python", script_path]
+    # Build command using new etls command
+    snapshot_identifier = f"{form.namespace}/{form.snapshot_version}/{form.short_name}"
+    commands = ["uv", "run", "etls", snapshot_identifier]
     if form.dataset_manual_import:
         # Get snapshot local file
-        commands.extend(["-f", st.session_state["snapshot_file"]])
+        commands.extend(["--path-to-file", st.session_state["snapshot_file"]])
     command_str = f"`{' '.join(commands)}`"
 
     # Run step

@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "owid": {
+      "type": "http",
+      "url": "https://mcp.owid.io/mcp"
+    },
+    "owid-dev": {
+      "type": "stdio",
+      "command": ".venv/bin/fastmcp",
+      "args": [
+        "run",
+        "owid_mcp/server.py"
+      ],
+      "env": {}
+    }
+  }
+}

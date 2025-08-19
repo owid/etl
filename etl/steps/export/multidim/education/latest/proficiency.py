@@ -15,7 +15,7 @@ MULTIDIM_CONFIG = {
     "yAxis": {"min": 0, "max": 100},
     "hasMapTab": True,
     "tab": "map",
-    "addCountryMode": "change-country",
+    "addCountryMode": "add-country",
 }
 
 # Common grouped view configuration
@@ -23,6 +23,7 @@ GROUPED_VIEW_CONFIG = MULTIDIM_CONFIG | {
     "hasMapTab": False,
     "tab": "chart",
     "selectedFacetStrategy": "entity",
+    "hideFacetControl": False,
 }
 
 # Education level configurations
@@ -86,6 +87,18 @@ for level_key, config in EDUCATION_LEVELS.items():
 SUBJECT_KEYWORDS = {config["keywords"]: key for key, config in SUBJECTS.items()}
 SEX_KEYWORDS = {"both_sexes": "both", "male": "male", "female": "female"}
 
+# DOD link mappings for education levels
+LEVEL_DOD_LINKS = {
+    "primary": "primary-education",
+    "lower_secondary": "lower-secondary-education",
+}
+
+# Display name mappings for education levels
+LEVEL_DISPLAY_NAMES = {
+    "primary": "primary",
+    "lower_secondary": "lower secondary",
+}
+
 # Exclusion patterns for column filtering
 EXCLUSION_PATTERNS = [
     "urban",
@@ -138,8 +151,12 @@ def run() -> None:
         }
     )
 
-    # Edit display names
+    # Edit display names and set view metadata
     for view in c.views:
+        # Set view metadata for all views
+        view.metadata = {
+            "description_short": view.config["subtitle"],
+        }
         edit_indicator_displays(view)
 
     # Save collection
@@ -326,7 +343,7 @@ def generate_subtitle_by_dimensions(view):
         primary_reading = EDUCATION_LEVELS["primary"]["reading_desc"]
         secondary_reading = EDUCATION_LEVELS["lower_secondary"]["reading_desc"]
 
-        return f"The share of children who achieve the minimum [math](#dod:math-proficiency) and [reading](#dod:reading-proficiency) proficiency at different stages of education. For mathematics: at [primary](#dod:primary-education) level, students can {primary_math}; at [lower-secondary](#dod:lower-secondary-education) level, students {secondary_math}. For reading: at primary level, children can {primary_reading}; at lower-secondary level, children can {secondary_reading}."
+        return f"The share of children who achieve the minimum [math](#dod:math-proficiency) and [reading](#dod:reading-proficiency) proficiency at different stages of education. For mathematics: at [primary](#dod:primary-education) level, students can {primary_math}; at [lower secondary](#dod:lower-secondary-education) level, students {secondary_math}. For reading: at primary level, children can {primary_reading}; at lower-secondary level, children can {secondary_reading}."
 
     elif view.matches(level="level_side_by_side"):
         desc_key = "math_desc" if subject == "mathematics" else "reading_desc"
@@ -334,26 +351,32 @@ def generate_subtitle_by_dimensions(view):
         secondary_desc = EDUCATION_LEVELS["lower_secondary"][desc_key]
         subject_link = "math" if subject == "mathematics" else "reading"
 
-        return f"The share of children who achieve minimum [{subject_link}](#dod:{subject_link}-proficiency) proficiency at different education levels. At [primary](#dod:primary-education) level, {'students' if subject == 'mathematics' else 'children'} can {primary_desc}. At [lower-secondary](#dod:lower-secondary-education) level, {'students' if subject == 'mathematics' else 'children'} can {secondary_desc}."
+        return f"The share of children who achieve minimum [{subject_link}](#dod:{subject_link}-proficiency) proficiency at different education levels. At [primary](#dod:primary-education) level, {'students' if subject == 'mathematics' else 'children'} can {primary_desc}. At [lower secondary](#dod:lower-secondary-education) level, {'students' if subject == 'mathematics' else 'children'} can {secondary_desc}."
 
     elif view.matches(subject="subject_side_by_side"):
         math_desc = level_config.get("math_desc", "")
         reading_desc = level_config.get("reading_desc", "")
 
-        return f"The share of children who achieve minimum proficiency by the end of [{level}](#dod:{level}-education) education. For [math](#dod:math-proficiency), students can {math_desc}. For [reading](#dod:reading-proficiency), children can {reading_desc}."
+        level_dod = LEVEL_DOD_LINKS.get(level, f"{level}-education")
+        level_display = LEVEL_DISPLAY_NAMES.get(level, level)
+        return f"The share of children who achieve minimum proficiency by the end of [{level_display}](#dod:{level_dod}) education. For [math](#dod:math-proficiency), students can {math_desc}. For [reading](#dod:reading-proficiency), children can {reading_desc}."
 
     elif view.matches(population="population_side_by_side"):
         proficiency_desc = get_proficiency_desc(subject)
         subject_link = "math" if subject == "mathematics" else "reading"
 
-        return f"The share of children who achieve minimum [{subject_link}](#dod:{subject_link}-proficiency) proficiency by the end of [{level}](#dod:{level}-education) education, where {'students' if subject == 'mathematics' else 'children'} can {proficiency_desc}. Compares all children in the age group versus only those enrolled in school."
+        level_dod = LEVEL_DOD_LINKS.get(level, f"{level}-education")
+        level_display = LEVEL_DISPLAY_NAMES.get(level, level)
+        return f"The share of children who achieve minimum [{subject_link}](#dod:{subject_link}-proficiency) proficiency by the end of [{level_display}](#dod:{level_dod}) education, where {'students' if subject == 'mathematics' else 'children'} can {proficiency_desc}. Compares all children in the age group versus only those enrolled in school."
 
     else:
         proficiency_desc = get_proficiency_desc(subject)
         subject_link = "math" if subject == "mathematics" else "reading"
         population_context = population_config.get("context", "")
 
-        return f"The share of children who achieve minimum [{subject_link}](#dod:{subject_link}-proficiency) proficiency by the end of [{level}](#dod:{level}-education) education, where {'students' if subject == 'mathematics' else 'children'} can {proficiency_desc}. {population_context}"
+        level_dod = LEVEL_DOD_LINKS.get(level, f"{level}-education")
+        level_display = LEVEL_DISPLAY_NAMES.get(level, level)
+        return f"The share of children who achieve minimum [{subject_link}](#dod:{subject_link}-proficiency) proficiency by the end of [{level_display}](#dod:{level_dod}) education, where {'students' if subject == 'mathematics' else 'children'} can {proficiency_desc}. {population_context}"
 
 
 def edit_indicator_displays(view):
