@@ -71,7 +71,9 @@ dependencies = [
     "sentry-sdk>=2.20.0",
     "fastjsonschema>=2.21.1",
     "mediacloud>=4.4.0",
-    "fastmcp>=2.10.6",
+    # NOTE: higher versions cause errors when running this on staging server (maybe even locally)
+    # fastmcp run owid_mcp/server.py --transport=http  --host=0.0.0.0 --port=8080
+    "fastmcp<=2.10.6",
     "pyproj>=3.7.1",
     "pydantic-ai>=0.7.2",
     "logfire[fastapi,httpx]>=4.3.3",
