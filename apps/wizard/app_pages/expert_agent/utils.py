@@ -5,6 +5,14 @@ import yaml
 CURRENT_DIR = Path(__file__).parent
 
 
+# Load available models
+with open(CURRENT_DIR / "models.yml", "r") as f:
+    MODELS = yaml.safe_load(f)
+MODELS_DISPLAY = {m["name"]: m["display_name"] for m in MODELS["models"]}
+MODELS_COST = {m["name"]: m["cost"] for m in MODELS["models"]}
+MODELS_AVAILABLE_LIST = list(MODELS_DISPLAY.keys())
+
+
 def estimate_llm_cost(model_name: str, input_tokens: int, output_tokens: int) -> float:
     """Estimate the cost of an LLM interaction.
 
@@ -35,6 +43,88 @@ def estimate_llm_cost(model_name: str, input_tokens: int, output_tokens: int) ->
     output_cost = _calculate_tiered_cost(cost_config["out"], output_tokens)
 
     return input_cost + output_cost
+
+
+def generate_pricing_text():
+    """
+    Input example:
+    ```
+    {'models':
+        [
+            {
+                'name': 'openai:gpt-5',
+                'display_name': 'GPT-5',
+                'cost': {'in': 1.25, 'out': 10.0}
+            },
+        {
+            'name': 'openai:gpt-5-mini',
+            'display_name': 'GPT-5 mini',
+            'cost': {'in': 0.25, 'out': 2.0}
+        }
+        ]
+    }
+    ```
+
+    OUTPUT is a markdown table with the following format:
+    ```
+    | Model | Input (USD/1M tokens) | Output (USD/1M tokens) |
+    |-------|-----------------------|------------------------|
+    | GPT-5 | 1.25                  | 10.0                   |
+    | GPT-5 mini | 0.25             | 2.0                    |
+    ```
+    """
+
+    def _bake_cost(cost_config):
+        """Helper function to format cost configuration."""
+        if isinstance(cost_config, (int, float)):
+            return f"{cost_config:.2f}"
+        elif isinstance(cost_config, dict) and "value" in cost_config and "brackets" in cost_config:
+            text = []
+            values = cost_config["value"]
+            brackets = cost_config["brackets"]
+            assert len(values) == len(brackets), "Values and brackets must match in length"
+            for i, (value, bracket) in enumerate(zip(values, brackets)):
+                if isinstance(value, (int, float)):
+                    if i == len(brackets) - 1:
+                        value = f"{value:.2f}"
+                        text_part = f"{value} (≥{bracket:,} tokens)"
+                    else:
+                        value = f"{value:.2f}"
+                        text_part = f"{value} ({brackets[i]:,} ≤ {brackets[i + 1]:,} tokens)"
+                    text.append(text_part)
+                else:
+                    raise ValueError(f"Invalid value type: {value}")
+            text = ", ".join(text)
+            return text
+        else:
+            return str(cost_config)
+
+    import pandas as pd
+
+    try:
+        df = pd.DataFrame(MODELS["models"])
+        df["Input (USD/1M tokens)"] = df["cost"].apply(lambda x: _bake_cost(x["in"]))
+        df["Output (USD/1M tokens)"] = df["cost"].apply(lambda x: _bake_cost(x["out"]))
+        df = df.rename(columns={"display_name": "Model"})[
+            [
+                "Model",
+                "Input (USD/1M tokens)",
+                "Output (USD/1M tokens)",
+            ]
+        ]
+    except Exception as e:  # type: ignore
+        return "Error generating pricing table: {e}"
+
+    table = df.to_markdown(index=False, tablefmt="pipe", floatfmt=".2f")
+
+    pricing_links = [
+        "[OpenAI Pricing](https://openai.com/api/pricing)",
+        "[Anthropic Pricing](https://www.anthropic.com/pricing#api)",
+        "[Google Cloud Pricing](https://ai.google.dev/pricing)",
+    ]
+
+    text = f"##### Pricing \n{table}\n\nUp-to-date pricing links:\n- {'\n- '.join(pricing_links)}"
+    return text
 
 
 def _calculate_tiered_cost(cost_config, tokens: int) -> float:
@@ -83,11 +173,3 @@ def _calculate_tiered_cost(cost_config, tokens: int) -> float:
         return total_cost
 
     raise ValueError(f"Invalid cost configuration: {cost_config}")
-
-
-# Load available models
-with open(CURRENT_DIR / "models.yml", "r") as f:
-    MODELS = yaml.safe_load(f)
-MODELS_DISPLAY = {m["name"]: m["display_name"] for m in MODELS["models"]}
-MODELS_COST = {m["name"]: m["cost"] for m in MODELS["models"]}
-MODELS_AVAILABLE_LIST = list(MODELS_DISPLAY.keys())

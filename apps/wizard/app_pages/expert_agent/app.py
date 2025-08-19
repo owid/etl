@@ -13,7 +13,12 @@ from pydantic_core import to_json
 from structlog import get_logger
 
 from apps.wizard.app_pages.expert_agent.agent import agent_stream2, recommender_agent
-from apps.wizard.app_pages.expert_agent.utils import MODELS_AVAILABLE_LIST, MODELS_DISPLAY, estimate_llm_cost
+from apps.wizard.app_pages.expert_agent.utils import (
+    MODELS_AVAILABLE_LIST,
+    MODELS_DISPLAY,
+    estimate_llm_cost,
+    generate_pricing_text,
+)
 from etl.config import load_env
 
 st.set_page_config(
@@ -194,7 +199,7 @@ def show_settings_menu():
             options=MODELS_AVAILABLE_LIST,
             format_func=lambda x: MODELS_DISPLAY[x],
             index=MODELS_AVAILABLE_LIST.index(MODEL_DEFAULT),
-            help="[Pricing](https://openai.com/api/pricing) | [Model list](https://platform.openai.com/docs/models/)",
+            help=generate_pricing_text(),
             key="expert_model_name",
             # on_change=lambda: st.session_state.setdefault("expert_config", {}).update({"model_name": st.session_state["expert_model_name"]}),
         )
