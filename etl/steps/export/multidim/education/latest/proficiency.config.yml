@@ -7,7 +7,7 @@ default_selection:
   - United States
   - Chile
   - Morocco
-  - Vietnam
+  - Turkey
 
 dimensions:
   - slug: subject
