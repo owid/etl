@@ -25,7 +25,7 @@ def st_show_home():
         st.title("Wizard 🪄")
         st_wizard_page_link(
             "expert",
-            label=":rainbow[**Ask the Expert**]",
+            label=":orange-background[:rainbow[**Ask the Expert**]]",
             help="Ask the expert any documentation question!",
             width="content",
             border=False,
