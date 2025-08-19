@@ -385,7 +385,7 @@ def combine_global_and_national_data(tb_costs_global: Table, tb_costs_national: 
     )
 
     # Improve table format.
-    tb_combined = tb_combined.format(sort_columns=True)
+    tb_combined = tb_combined.format(sort_columns=True, short_name="renewable_power_generation_costs")
 
     # Add units.
     for column in tb_combined.columns:

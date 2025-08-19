@@ -31,6 +31,8 @@ paths = PathFinder(__file__)
 LATEST_YEAR = 2023
 # Convert 2004 USD and 2013 USD to LATEST_YEAR USD , using
 # https://www.usinflationcalculator.com/
+# 2004 USD to 2023 USD: approximately 1.61
+# 2013 USD to 2023 USD: approximately 1.31
 USD2004_TO_USDLATEST = 1.61
 USD2013_TO_USDLATEST = 1.31
 
@@ -102,7 +104,10 @@ def prepare_cost_data(tb_nemet: Table, tb_irena_cost: Table, tb_farmer_lafond: T
     tb_irena_cost = tb_irena_cost.drop(columns="country", errors="raise")
 
     tb_irena_cost["cost_source"] = "IRENA"
-    # Costs are given in latest year "USD/W", so we do not need to correct them.
+    # Costs are given in 2024 USD/W (from meadow step), but we need to convert to latest year (2023 USD)
+    # Convert from 2024 USD to 2023 USD using deflator of approximately 0.97
+    tb_irena_cost["cost"] *= 0.97
+    tb_irena_cost["cost"].metadata.unit = f"constant {LATEST_YEAR} US$ per watt"
 
     # Combine Nemet (2009) and Farmer & Lafond (2016), prioritizing the former.
     combined = combine_two_overlapping_dataframes(df1=tb_nemet_cost, df2=tb_farmer_lafond, index_columns="year")
