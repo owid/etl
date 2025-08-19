@@ -75,7 +75,7 @@ dependencies = [
     "mediacloud>=4.4.0",
     "fastmcp>=2.10.6",
     "pyproj>=3.7.1",
-    "pydantic-ai>=0.7.2",
+    "pydantic-ai>=0.7.3",
     "logfire[fastapi,httpx]>=4.3.3",
 ]
 
