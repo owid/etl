@@ -75,24 +75,6 @@ definitions:
         customNumericValues: *school_life_expectancy_preprimary_bins
         baseColorScheme: Blues
 
-  grapher_config_sle_preprimary_purples: &grapher_config_sle_preprimary_purples
-    <<: *common_grapher_config
-    map:
-      <<: *common_grapher_map_config
-      colorScale:
-        binningStrategy: manual
-        customNumericValues: *school_life_expectancy_preprimary_bins
-        baseColorScheme: Purples
-
-  grapher_config_sle_preprimary_bugn: &grapher_config_sle_preprimary_bugn
-    <<: *common_grapher_config
-    map:
-      <<: *common_grapher_map_config
-      colorScale:
-        binningStrategy: manual
-        customNumericValues: *school_life_expectancy_preprimary_bins
-        baseColorScheme: BuGn
-
   grapher_config_sle_primary_blues: &grapher_config_sle_primary_blues
     <<: *common_grapher_config
     map:
@@ -101,24 +83,6 @@ definitions:
         binningStrategy: manual
         customNumericValues: *school_life_expectancy_primary_bins
         baseColorScheme: Blues
-
-  grapher_config_sle_primary_purples: &grapher_config_sle_primary_purples
-    <<: *common_grapher_config
-    map:
-      <<: *common_grapher_map_config
-      colorScale:
-        binningStrategy: manual
-        customNumericValues: *school_life_expectancy_primary_bins
-        baseColorScheme: Purples
-
-  grapher_config_sle_primary_bugn: &grapher_config_sle_primary_bugn
-    <<: *common_grapher_config
-    map:
-      <<: *common_grapher_map_config
-      colorScale:
-        binningStrategy: manual
-        customNumericValues: *school_life_expectancy_primary_bins
-        baseColorScheme: BuGn
 
   grapher_config_sle_secondary_blues: &grapher_config_sle_secondary_blues
     <<: *common_grapher_config
@@ -129,24 +93,6 @@ definitions:
         customNumericValues: *school_life_expectancy_secondary_bins
         baseColorScheme: Blues
 
-  grapher_config_sle_secondary_purples: &grapher_config_sle_secondary_purples
-    <<: *common_grapher_config
-    map:
-      <<: *common_grapher_map_config
-      colorScale:
-        binningStrategy: manual
-        customNumericValues: *school_life_expectancy_secondary_bins
-        baseColorScheme: Purples
-
-  grapher_config_sle_secondary_bugn: &grapher_config_sle_secondary_bugn
-    <<: *common_grapher_config
-    map:
-      <<: *common_grapher_map_config
-      colorScale:
-        binningStrategy: manual
-        customNumericValues: *school_life_expectancy_secondary_bins
-        baseColorScheme: BuGn
-
   grapher_config_sle_tertiary_blues: &grapher_config_sle_tertiary_blues
     <<: *common_grapher_config
     map:
@@ -156,23 +102,7 @@ definitions:
         customNumericValues: *school_life_expectancy_tertiary_bins
         baseColorScheme: Blues
 
-  grapher_config_sle_tertiary_purples: &grapher_config_sle_tertiary_purples
-    <<: *common_grapher_config
-    map:
-      <<: *common_grapher_map_config
-      colorScale:
-        binningStrategy: manual
-        customNumericValues: *school_life_expectancy_tertiary_bins
-        baseColorScheme: Purples
-
-  grapher_config_sle_tertiary_bugn: &grapher_config_sle_tertiary_bugn
-    <<: *common_grapher_config
-    map:
-      <<: *common_grapher_map_config
-      colorScale:
-        binningStrategy: manual
-        customNumericValues: *school_life_expectancy_tertiary_bins
-        baseColorScheme: BuGn
+  # ============================================================================
 
   grapher_config_per_student_spending_total: &grapher_config_per_student_spending_total
     <<: *common_grapher_config
@@ -1112,7 +1042,7 @@ tables:
         description_key: *desc_key_sle
         presentation:
           title_public: School life expectancy in pre-primary education among girls
-          grapher_config: *grapher_config_sle_preprimary_purples
+          grapher_config: *grapher_config_sle_preprimary_blues
         display:
           numDecimalPlaces: 1
           name: Girls
@@ -1124,7 +1054,7 @@ tables:
         description_key: *desc_key_sle
         presentation:
           title_public: School life expectancy in pre-primary education among boys
-          grapher_config: *grapher_config_sle_preprimary_bugn
+          grapher_config: *grapher_config_sle_preprimary_blues
         display:
           numDecimalPlaces: 1
           name: Boys
@@ -1148,7 +1078,7 @@ tables:
         description_key: *desc_key_sle
         presentation:
           title_public: School life expectancy in primary education among girls
-          grapher_config: *grapher_config_sle_primary_purples
+          grapher_config: *grapher_config_sle_primary_blues
         display:
           numDecimalPlaces: 1
           name: Girls
@@ -1160,7 +1090,7 @@ tables:
         description_key: *desc_key_sle
         presentation:
           title_public: School life expectancy in primary education among boys
-          grapher_config: *grapher_config_sle_primary_bugn
+          grapher_config: *grapher_config_sle_primary_blues
         display:
           numDecimalPlaces: 1
           name: Boys
@@ -1184,7 +1114,7 @@ tables:
         description_key: *desc_key_sle
         presentation:
           title_public: School life expectancy in secondary education among girls
-          grapher_config: *grapher_config_sle_secondary_purples
+          grapher_config: *grapher_config_sle_secondary_blues
         display:
           numDecimalPlaces: 1
           name: Girls
@@ -1196,7 +1126,7 @@ tables:
         description_key: *desc_key_sle
         presentation:
           title_public: School life expectancy in secondary education among boys
-          grapher_config: *grapher_config_sle_secondary_bugn
+          grapher_config: *grapher_config_sle_secondary_blues
         display:
           numDecimalPlaces: 1
           name: Boys
@@ -1220,7 +1150,7 @@ tables:
         description_key: *desc_key_sle
         presentation:
           title_public: School life expectancy in tertiary education among girls
-          grapher_config: *grapher_config_sle_tertiary_purples
+          grapher_config: *grapher_config_sle_tertiary_blues
         display:
           numDecimalPlaces: 1
           name: Girls
@@ -1232,7 +1162,7 @@ tables:
         description_key: *desc_key_sle
         presentation:
           title_public: School life expectancy in tertiary education among boys
-          grapher_config: *grapher_config_sle_tertiary_bugn
+          grapher_config: *grapher_config_sle_tertiary_blues
         display:
           numDecimalPlaces: 1
           name: Boys

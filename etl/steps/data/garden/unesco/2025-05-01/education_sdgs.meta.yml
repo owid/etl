@@ -143,34 +143,7 @@ definitions:
 
   proficiency_rate_bins: &proficiency_rate_bins [10,20,30,40,50,60,70,80,90,100]
 
-  grapher_config_proficiency_primary_math: &grapher_config_proficiency_primary_math
-    <<: *common_grapher_config
-    map:
-      <<: *common_grapher_map_config
-      colorScale:
-        binningStrategy: manual
-        customNumericValues: *proficiency_rate_bins
-        baseColorScheme: Blues
-
-  grapher_config_proficiency_primary_reading: &grapher_config_proficiency_primary_reading
-    <<: *common_grapher_config
-    map:
-      <<: *common_grapher_map_config
-      colorScale:
-        binningStrategy: manual
-        customNumericValues: *proficiency_rate_bins
-        baseColorScheme: Greens
-
-  grapher_config_proficiency_secondary_math: &grapher_config_proficiency_secondary_math
-    <<: *common_grapher_config
-    map:
-      <<: *common_grapher_map_config
-      colorScale:
-        binningStrategy: manual
-        customNumericValues: *proficiency_rate_bins
-        baseColorScheme: Oranges
-
-  grapher_config_proficiency_secondary_reading: &grapher_config_proficiency_secondary_reading
+  grapher_config_proficiency_reading: &grapher_config_proficiency_reading
     <<: *common_grapher_config
     map:
       <<: *common_grapher_map_config
@@ -178,6 +151,15 @@ definitions:
         binningStrategy: manual
         customNumericValues: *proficiency_rate_bins
         baseColorScheme: Purples
+
+  grapher_config_proficiency_math: &grapher_config_proficiency_math
+    <<: *common_grapher_config
+    map:
+      <<: *common_grapher_map_config
+      colorScale:
+        binningStrategy: manual
+        customNumericValues: *proficiency_rate_bins
+        baseColorScheme: Blues
 
   # ============================================================================
   # LITERACY RATE CONFIGURATIONS
@@ -280,11 +262,12 @@ definitions:
     - High out-of-school rates signal barriers to access — such as poverty, gender inequality, location, or limited availability of schools — and highlight where more targeted support is needed.
     - The data comes from administrative school enrolment records and household surveys, which provide age-specific insights when compared to population estimates.
     - As with all education data, results should be interpreted carefully. Differences in how enrolment is defined, inconsistencies in age reporting, and timing of data collection (such as during holidays or late in the school year) can affect accuracy.
+
   desc_key_prof: &desc_key_prof
     - This indicator measures the share of children or students who achieve minimum proficiency in reading or mathematics by the end of a given education level (primary or lower secondary).
     - "Minimum proficiency in [reading](#dod:reading-proficiency) and [mathematics](#dod:math-proficiency) is defined differently at each education level:"
-    - "At the end of **primary education**, minimum reading proficiency means students can identify key ideas in simple texts and connect them to their own experiences. In mathematics, it means demonstrating number sense and computation, basic measurement, interpreting simple graphs, spatial orientation, and number patterns."
-    - "At the end of **lower secondary education**, minimum reading proficiency means students can connect ideas across different types of texts, understand the author’s intent, and draw conclusions based on the text. In mathematics, it means applying computation skills, solving real-world problems, interpreting graphs and tables, and using algebraic representations."
+    - "At the end of **[primary education](#dod:primary-education)**, minimum reading proficiency means students can identify key ideas in simple texts and connect them to their own experiences. In mathematics, it means demonstrating number sense and computation, basic measurement, interpreting simple graphs, spatial orientation, and number patterns."
+    - "At the end of **[lower secondary](#dod:lower-secondary-education)**, minimum reading proficiency means students can connect ideas across different types of texts, understand the author’s intent, and draw conclusions based on the text. In mathematics, it means applying computation skills, solving real-world problems, interpreting graphs and tables, and using algebraic representations."
     - "There are two types of estimates: one for all children in the age group, and one for students who are enrolled in school."
     - Estimates for all children adjust for school completion and enrolment, offering a full population-level view — including those who dropped out or were never enrolled.
     - Estimates for students reflect outcomes only among those still in school at the end of the education cycle.
@@ -1133,7 +1116,7 @@ tables:
         description_key: *desc_key_prof
         presentation:
           title_public: Share of children achieving minimum math proficiency by the end of lower secondary age
-          grapher_config: *grapher_config_proficiency_secondary_math
+          grapher_config: *grapher_config_proficiency_math
         display:
           numDecimalPlaces: 1
           name: End of lower secondary mathematics
@@ -1147,7 +1130,7 @@ tables:
         description_key: *desc_key_prof
         presentation:
           title_public: Share of girls achieving minimum math proficiency by the end of lower secondary age
-          grapher_config: *grapher_config_proficiency_secondary_math
+          grapher_config: *grapher_config_proficiency_math
         display:
           numDecimalPlaces: 1
           name: Girls - lower secondary mathematics
@@ -1161,7 +1144,7 @@ tables:
         description_key: *desc_key_prof
         presentation:
           title_public: Share of boys achieving minimum math proficiency by the end of lower secondary age
-          grapher_config: *grapher_config_proficiency_secondary_math
+          grapher_config: *grapher_config_proficiency_math
         display:
           numDecimalPlaces: 1
           name: Boys - lower secondary mathematics
@@ -1175,7 +1158,7 @@ tables:
         description_key: *desc_key_prof
         presentation:
           title_public: Share of children achieving minimum reading proficiency by the end of lower secondary age
-          grapher_config: *grapher_config_proficiency_secondary_reading
+          grapher_config: *grapher_config_proficiency_reading
         display:
           numDecimalPlaces: 1
           name: End of lower secondary reading
@@ -1189,7 +1172,7 @@ tables:
         description_key: *desc_key_prof
         presentation:
           title_public: Share of girls achieving minimum reading proficiency by the end of lower secondary age
-          grapher_config: *grapher_config_proficiency_secondary_reading
+          grapher_config: *grapher_config_proficiency_reading
         display:
           numDecimalPlaces: 1
           name: End of lower secondary reading
@@ -1203,7 +1186,7 @@ tables:
         description_key: *desc_key_prof
         presentation:
           title_public: Share of boys achieving minimum reading proficiency by the end of lower secondary age
-          grapher_config: *grapher_config_proficiency_secondary_reading
+          grapher_config: *grapher_config_proficiency_reading
         display:
           numDecimalPlaces: 1
           name: Boys - lower secondary reading
@@ -1217,7 +1200,7 @@ tables:
         description_key: *desc_key_prof
         presentation:
           title_public: Share of children achieving minimum math proficiency by the end of primary age
-          grapher_config: *grapher_config_proficiency_primary_math
+          grapher_config: *grapher_config_proficiency_math
         display:
           numDecimalPlaces: 1
           name: Primary mathematics
@@ -1231,7 +1214,7 @@ tables:
         description_key: *desc_key_prof
         presentation:
           title_public: Share of girls achieving minimum math proficiency by the end of primary age
-          grapher_config: *grapher_config_proficiency_primary_math
+          grapher_config: *grapher_config_proficiency_math
         display:
           numDecimalPlaces: 1
           name: Girls - primary mathematics
@@ -1245,7 +1228,7 @@ tables:
         description_key: *desc_key_prof
         presentation:
           title_public: Share of boys achieving minimum math proficiency by the end of primary age
-          grapher_config: *grapher_config_proficiency_primary_math
+          grapher_config: *grapher_config_proficiency_math
         display:
           numDecimalPlaces: 1
           name: Boys - primary mathematics
@@ -1259,7 +1242,7 @@ tables:
         description_key: *desc_key_prof
         presentation:
           title_public: Share of children achieving minimum reading proficiency by the end of primary age
-          grapher_config: *grapher_config_proficiency_primary_reading
+          grapher_config: *grapher_config_proficiency_reading
         display:
           numDecimalPlaces: 1
           name: Primary reading
@@ -1273,7 +1256,7 @@ tables:
         description_key: *desc_key_prof
         presentation:
           title_public: Share of girls achieving minimum reading proficiency by the end of primary age
-          grapher_config: *grapher_config_proficiency_primary_reading
+          grapher_config: *grapher_config_proficiency_reading
         display:
           numDecimalPlaces: 1
           name: Girls - primary reading
@@ -1287,7 +1270,7 @@ tables:
         description_key: *desc_key_prof
         presentation:
           title_public: Share of boys achieving minimum reading proficiency by the end of primary age
-          grapher_config: *grapher_config_proficiency_primary_reading
+          grapher_config: *grapher_config_proficiency_reading
         display:
           numDecimalPlaces: 1
           name: Boys - primary reading
@@ -1305,7 +1288,7 @@ tables:
         description_key: *desc_key_prof
         presentation:
           title_public: Share of students achieving minimum math proficiency by the end of lower secondary education
-          grapher_config: *grapher_config_proficiency_secondary_math
+          grapher_config: *grapher_config_proficiency_math
         display:
           numDecimalPlaces: 1
           name: Students - lower secondary mathematics
@@ -1319,7 +1302,7 @@ tables:
         description_key: *desc_key_prof
         presentation:
           title_public: Share of female students achieving minimum math proficiency by the end of lower secondary education
-          grapher_config: *grapher_config_proficiency_secondary_math
+          grapher_config: *grapher_config_proficiency_math
         display:
           numDecimalPlaces: 1
           name: Female students - lower secondary mathematics
@@ -1333,7 +1316,7 @@ tables:
         description_key: *desc_key_prof
         presentation:
           title_public: Share of male students achieving minimum math proficiency by the end of lower secondary education
-          grapher_config: *grapher_config_proficiency_secondary_math
+          grapher_config: *grapher_config_proficiency_math
         display:
           numDecimalPlaces: 1
           name: Male students - lower secondary mathematics
@@ -1347,7 +1330,7 @@ tables:
         description_key: *desc_key_prof
         presentation:
           title_public: Share of students achieving minimum reading proficiency by the end of lower secondary education
-          grapher_config: *grapher_config_proficiency_secondary_reading
+          grapher_config: *grapher_config_proficiency_reading
         display:
           numDecimalPlaces: 1
           name: Students - lower secondary reading
@@ -1361,7 +1344,7 @@ tables:
         description_key: *desc_key_prof
         presentation:
           title_public: Share of female students achieving minimum reading proficiency by the end of lower secondary education
-          grapher_config: *grapher_config_proficiency_secondary_reading
+          grapher_config: *grapher_config_proficiency_reading
         display:
           numDecimalPlaces: 1
           name: Female students - lower secondary reading
@@ -1375,7 +1358,7 @@ tables:
         description_key: *desc_key_prof
         presentation:
           title_public: Share of male students achieving minimum reading proficiency by the end of lower secondary education
-          grapher_config: *grapher_config_proficiency_secondary_reading
+          grapher_config: *grapher_config_proficiency_reading
         display:
           numDecimalPlaces: 1
           name: Male students - lower secondary reading
@@ -1389,7 +1372,7 @@ tables:
         description_key: *desc_key_prof
         presentation:
           title_public: Share of students achieving minimum math proficiency by the end of primary education
-          grapher_config: *grapher_config_proficiency_primary_math
+          grapher_config: *grapher_config_proficiency_math
         display:
           numDecimalPlaces: 1
           name: Students - primary mathematics
@@ -1403,7 +1386,7 @@ tables:
         description_key: *desc_key_prof
         presentation:
           title_public: Share of female students achieving minimum math proficiency by the end of primary education
-          grapher_config: *grapher_config_proficiency_primary_math
+          grapher_config: *grapher_config_proficiency_math
         display:
           numDecimalPlaces: 1
           name: Female students - primary mathematics
@@ -1417,7 +1400,7 @@ tables:
         description_key: *desc_key_prof
         presentation:
           title_public: Share of male students achieving minimum math proficiency by the end of primary education
-          grapher_config: *grapher_config_proficiency_primary_math
+          grapher_config: *grapher_config_proficiency_math
         display:
           numDecimalPlaces: 1
           name: Male students - primary mathematics
@@ -1431,7 +1414,7 @@ tables:
         description_key: *desc_key_prof
         presentation:
           title_public: Share of students achieving minimum reading proficiency by the end of primary education
-          grapher_config: *grapher_config_proficiency_primary_reading
+          grapher_config: *grapher_config_proficiency_reading
         display:
           numDecimalPlaces: 1
           name: Students - primary reading
@@ -1445,7 +1428,7 @@ tables:
         description_key: *desc_key_prof
         presentation:
           title_public: Share of female students achieving minimum reading proficiency by the end of primary education
-          grapher_config: *grapher_config_proficiency_primary_reading
+          grapher_config: *grapher_config_proficiency_reading
         display:
           numDecimalPlaces: 1
           name: Female students - primary reading
@@ -1459,7 +1442,7 @@ tables:
         description_key: *desc_key_prof
         presentation:
           title_public: Share of male students achieving minimum reading proficiency by the end of primary education
-          grapher_config: *grapher_config_proficiency_primary_reading
+          grapher_config: *grapher_config_proficiency_reading
         display:
           numDecimalPlaces: 1
           name: Male students - primary reading

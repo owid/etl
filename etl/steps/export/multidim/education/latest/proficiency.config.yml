@@ -5,9 +5,9 @@ topic_tags:
   - Global Education
 default_selection:
   - United States
-  - Germany
-  - Iran
-  - Turkey
+  - Chile
+  - Morocco
+  - Vietnam
 
 dimensions:
   - slug: subject
