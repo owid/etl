@@ -475,7 +475,7 @@ def st_title_with_expert(title: str, icon: str | None = None, **kwargs):
         st.title(title, **kwargs)
         st_wizard_page_link(
             alias="expert",
-            label=":orange-background[:rainbow[**Ask the Expert**]]",
+            label=":rainbow[**Ask the Expert**]",
             help="Ask the expert any documentation question!",
             width="content",
             border=False,
