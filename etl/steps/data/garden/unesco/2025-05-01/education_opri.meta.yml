@@ -11,8 +11,6 @@ definitions:
         map:
           time: 2024
           timeTolerance: 5
-    display:
-      tolerance: 5
 
   # ============================================================================
   # COMMON CONFIGURATION TEMPLATES
@@ -38,6 +36,16 @@ definitions:
 
   # Per-student spending bins (in international dollars per student)
   per_student_spending_bins: &per_student_spending_bins [500, 1000, 5000, 10000,15000,20000,25000]
+
+  # Female teachers grapher configuration
+  female_teachers_grapher_config: &female_teachers_grapher_config
+    <<: *common_grapher_config
+    map:
+      <<: *common_grapher_map_config
+      colorScale:
+        binningStrategy: manual
+        customNumericValues: *enrolment_rate_bins
+        baseColorScheme: Greens
 
   # Common enrollment and education indicator configurations
   grapher_config_enrolment_bugn: &grapher_config_enrolment_bugn
@@ -184,6 +192,45 @@ definitions:
         binningStrategy: manual
         customNumericValues: *per_student_spending_bins
         baseColorScheme: YlOrRd
+
+  # Out-of-school children configurations
+  out_of_school_children_bins: &out_of_school_children_bins [10000, 50000, 100000, 500000, 1000000, 5000000, 10000000, 50000000]
+
+  grapher_config_out_of_school_children_reds: &grapher_config_out_of_school_children_reds
+    <<: *common_grapher_config
+    map:
+      <<: *common_grapher_map_config
+      colorScale:
+        binningStrategy: manual
+        customNumericValues: *out_of_school_children_bins
+        baseColorScheme: Reds
+
+  grapher_config_out_of_school_children_oranges: &grapher_config_out_of_school_children_oranges
+    <<: *common_grapher_config
+    map:
+      <<: *common_grapher_map_config
+      colorScale:
+        binningStrategy: manual
+        customNumericValues: *out_of_school_children_bins
+        baseColorScheme: Oranges
+
+  grapher_config_out_of_school_children_purples: &grapher_config_out_of_school_children_purples
+    <<: *common_grapher_config
+    map:
+      <<: *common_grapher_map_config
+      colorScale:
+        binningStrategy: manual
+        customNumericValues: *out_of_school_children_bins
+        baseColorScheme: Purples
+
+  grapher_config_out_of_school_children_blues: &grapher_config_out_of_school_children_blues
+    <<: *common_grapher_config
+    map:
+      <<: *common_grapher_map_config
+      colorScale:
+        binningStrategy: manual
+        customNumericValues: *out_of_school_children_bins
+        baseColorScheme: Blues
   # ============================================================================
   # INDICATOR-SPECIFIC GRAPHER CONFIGURATIONS
   # ============================================================================
@@ -313,34 +360,14 @@ definitions:
     - A higher value means students are expected to spend more time in school. For example, 2.5 years in pre-primary means most children will attend around 2.5 years of preschool; a country with 15 total expected years but only 0.5 in pre-primary likely has limited access to early childhood education.
 
   # Out-of-school descriptions
-  desc_key_prim_out_school: &desc_key_prim_out_school
-    - This indicator shows the share of children who are the right age for primary school but are not enrolled in primary or secondary education.
-    - It focuses on those in the official primary age range — typically 6 to 11 years old — who are not attending any formal level of education.
-    - Some may have never entered school, others may have dropped out, or they may not yet have started due to delayed entry.
-    - Children who are the right age for primary but are already in secondary school are considered enrolled and are not counted as out of school.
-    - The indicator is calculated by subtracting the number of primary-age children enrolled in primary or secondary education from the total in that age group.
-    - Data sources include enrolment records from school systems and household surveys that help identify children not captured in administrative data.
-    - Estimates may be affected by inconsistencies between sources, late school entry, or surveys conducted at different times of year.
-    - Children who are enrolled but not attending regularly may not always be captured correctly, depending on how data is collected and defined.
-
-  deck_key_low_out_school: &deck_key_low_out_school
-    - This indicator shows the share of adolescents who are the right age for lower secondary school but are not enrolled at that level.
-    - It focuses specifically on those within the official lower secondary age range — usually 12 to 14 or 13 to 15 — who are not attending lower secondary education.
-    - These adolescents may still be in primary school, may have dropped out, or may not be enrolled at any level.
-    - The value is calculated by comparing the number of lower secondary-age children enrolled in lower secondary education to the total number of children in that age group.
-    - Data comes from administrative enrolment records and household surveys, which allow tracking by age and education level.
-    - Estimates may be affected by mismatches between population and enrolment data, late school entry, or misreporting of enrolment levels.
-    - Children enrolled in a different level than expected for their age are included in this indicator, even if they are technically still in school.
-
-  desc_key_up_out_school: &desc_key_up_out_school
-    - This indicator shows the share of young people who are the right age for upper secondary school but are not enrolled at that level.
-    - It focuses on those within the official upper secondary age range — typically 15 to 17 or 16 to 18 — who are not attending upper secondary education.
-    - These children may still be in lower levels of school, may have left school entirely, or may not have transitioned to upper secondary after completing lower secondary.
-    - The value is calculated by subtracting the number of upper secondary-age students enrolled at the upper secondary level from the total number in that age group.
-    - Data is drawn from school records and household surveys that match enrolment levels to student age.
-    - Inconsistencies in definitions of enrolment, age reporting, or school level classifications may affect the estimates.
-    - Children who are in school but enrolled below their age-appropriate level are included in this indicator.
-
+  desc_key_out_school: &desc_key_out_school
+    - Many children and adolescents around the world are not in school, even though they are old enough to be. This indicator shows how many are missing out on education at each stage of the system.
+    - It measures the number of individuals in the official age range for a given level of education who are not enrolled at that level or in any higher level.
+    - These children or adolescents may have never entered school, may have dropped out, or may be starting later than expected.
+    - The indicator is calculated by subtracting the number of enrolled individuals in a specific age group from the total population of that group, and expressing the result as a percentage.
+    - High out-of-school rates signal barriers to access — such as poverty, gender inequality, location, or limited availability of schools — and highlight where more targeted support is needed.
+    - The data comes from administrative school enrolment records and household surveys, which provide age-specific insights when compared to population estimates.
+    - As with all education data, results should be interpreted carefully. Differences in how enrolment is defined, inconsistencies in age reporting, and timing of data collection (such as during holidays or late in the school year) can affect accuracy.
   # Education system descriptions
   desc_key_private_enrolment: &desc_key_private_enrolment
     - In many countries, education is provided not only by the government but also by private institutions — this indicator shows how much of total enrolment is taking place in privately run schools or educational programmes.
@@ -368,6 +395,14 @@ definitions:
     - Despite adjustments, differences between survey responses and national education structures may affect comparability. Incomplete data — such as missing age, attendance status, or grade — are excluded from the calculation.
     - Even with these limitations, the total net attendance rate is a valuable measure of school participation that complements enrolment data and helps track progress toward universal access to education.
 
+  # Female teachers descriptions
+  desc_key_female_teachers: &desc_key_female_teachers
+   - Teachers play a central role in shaping learning environments. This indicator shows what share of the teaching workforce at each education level is made up of women.
+   - It measures the number of female teachers as a percentage of all teachers at that education level, whether they work full-time or part-time, and whether they teach in person or remotely.
+   - The definition focuses on people who are actively teaching students and excludes school administrators like principals who don't teach, as well as volunteers or occasional workers.
+   - A value around 50% suggests roughly equal numbers of male and female teachers. Higher percentages mean women make up a larger share of the workforce, while lower values might indicate barriers to women entering teaching.
+   - The data comes from administrative records like school censuses or national education registries that track teacher numbers by gender and education level.
+
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
@@ -386,9 +421,10 @@ tables:
         title: Out-of-school children of primary school age
         unit: "children"
         description_short: Children in the official primary school age range who are not enrolled in either [primary](#dod:primary-education) or [secondary](#dod:secondary-education) education.
-        description_key: *desc_key_prim_out_school
+        description_key: *desc_key_out_school
         presentation:
           title_public: Out-of-school children of primary school age
+          grapher_config: *grapher_config_out_of_school_children_reds
         display:
           name: Primary
           numDecimalPlaces: 0
@@ -397,9 +433,10 @@ tables:
         title: Out-of-school girls of primary school age
         unit: "girls"
         description_short: Girls in the official primary school age range who are not enrolled in either [primary](#dod:primary-education) or [secondary](#dod:secondary-education) education.
-        description_key: *desc_key_prim_out_school
+        description_key: *desc_key_out_school
         presentation:
           title_public: Out-of-school girls of primary school age
+          grapher_config: *grapher_config_out_of_school_children_purples
         display:
           name: Girls
           numDecimalPlaces: 0
@@ -408,9 +445,10 @@ tables:
         title: Out-of-school boys of primary school age
         unit: "boys"
         description_short: Boys in the official primary school age range who are not enrolled in either [primary](#dod:primary-education) or [secondary](#dod:secondary-education) education.
-        description_key: *desc_key_prim_out_school
+        description_key: *desc_key_out_school
         presentation:
           title_public: Out-of-school boys of primary school age
+          grapher_config: *grapher_config_out_of_school_children_blues
         display:
           name: Boys
           numDecimalPlaces: 0
@@ -419,22 +457,108 @@ tables:
         title: Out-of-school children of lower secondary school age
         unit: "children"
         description_short: Children in the official lower secondary school age range who are not enrolled in [lower secondary](#dod:lower-secondary-education) education.
-        description_key: *deck_key_low_out_school
+        description_key: *desc_key_out_school
         presentation:
           title_public: Out-of-school children of lower secondary school age
+          grapher_config: *grapher_config_out_of_school_children_reds
         display:
           name: Lower secondary
+          numDecimalPlaces: 0
+
+      out_of_school_adolescents_of_lower_secondary_school_age__female__number:
+        title: Out-of-school girls of lower secondary school age
+        unit: "girls"
+        description_short: Girls in the official lower secondary school age range who are not enrolled in [lower secondary](#dod:lower-secondary-education) education.
+        description_key: *desc_key_out_school
+        presentation:
+          title_public: Out-of-school girls of lower secondary school age
+          grapher_config: *grapher_config_out_of_school_children_purples
+        display:
+          name: Girls
+          numDecimalPlaces: 0
+
+      out_of_school_adolescents_of_lower_secondary_school_age__male__number:
+        title: Out-of-school boys of lower secondary school age
+        unit: "boys"
+        description_short: Boys in the official lower secondary school age range who are not enrolled in [lower secondary](#dod:lower-secondary-education) education.
+        description_key: *desc_key_out_school
+        presentation:
+          title_public: Out-of-school boys of lower secondary school age
+          grapher_config: *grapher_config_out_of_school_children_blues
+        display:
+          name: Boys
+          numDecimalPlaces: 0
+
+      out_of_school_children__one_year_before_the_official_primary_entry_age__both_sexes__number:
+        title: Out-of-school children one year before official primary entry age
+        unit: "children"
+        description_short: Children who are one year before the official primary entry age who are not enrolled in pre-primary education.
+        description_key: *desc_key_out_school
+        presentation:
+          title_public: Out-of-school children one year before official primary entry age
+          grapher_config: *grapher_config_out_of_school_children_oranges
+        display:
+          name: Pre-primary
+          numDecimalPlaces: 0
+
+      out_of_school_children__one_year_before_the_official_primary_entry_age__female__number:
+        title: Out-of-school girls one year before official primary entry age
+        unit: "girls"
+        description_short: Girls who are one year before the official primary entry age who are not enrolled in pre-primary education.
+        description_key: *desc_key_out_school
+        presentation:
+          title_public: Out-of-school girls one year before official primary entry age
+          grapher_config: *grapher_config_out_of_school_children_purples
+        display:
+          name: Girls
+          numDecimalPlaces: 0
+
+      out_of_school_children__one_year_before_the_official_primary_entry_age__male__number:
+        title: Out-of-school boys one year before official primary entry age
+        unit: "boys"
+        description_short: Boys who are one year before the official primary entry age who are not enrolled in pre-primary education.
+        description_key: *desc_key_out_school
+        presentation:
+          title_public: Out-of-school boys one year before official primary entry age
+          grapher_config: *grapher_config_out_of_school_children_blues
+        display:
+          name: Boys
           numDecimalPlaces: 0
 
       out_of_school_youth_of_upper_secondary_school_age__both_sexes__number:
         title: Out-of-school children of upper secondary school age
         unit: "children"
-        description_short: Children in the official upper secondary school age range who are not enrolled [upper secondary](#dod:upper-secondary-education) education.
-        description_key: *desc_key_up_out_school
+        description_short: Children in the official upper secondary school age range who are not enrolled in [upper secondary](#dod:upper-secondary-education) education.
+        description_key: *desc_key_out_school
         presentation:
           title_public: Out-of-school children of upper secondary school age
+          grapher_config: *grapher_config_out_of_school_children_reds
         display:
           name: Upper secondary
+          numDecimalPlaces: 0
+
+      out_of_school_youth_of_upper_secondary_school_age__female__number:
+        title: Out-of-school girls of upper secondary school age
+        unit: "girls"
+        description_short: Girls in the official upper secondary school age range who are not enrolled in [upper secondary](#dod:upper-secondary-education) education.
+        description_key: *desc_key_out_school
+        presentation:
+          title_public: Out-of-school girls of upper secondary school age
+          grapher_config: *grapher_config_out_of_school_children_purples
+        display:
+          name: Girls
+          numDecimalPlaces: 0
+
+      out_of_school_youth_of_upper_secondary_school_age__male__number:
+        title: Out-of-school boys of upper secondary school age
+        unit: "boys"
+        description_short: Boys in the official upper secondary school age range who are not enrolled in [upper secondary](#dod:upper-secondary-education) education.
+        description_key: *desc_key_out_school
+        presentation:
+          title_public: Out-of-school boys of upper secondary school age
+          grapher_config: *grapher_config_out_of_school_children_blues
+        display:
+          name: Boys
           numDecimalPlaces: 0
 
       # ========================================================================
@@ -688,61 +812,42 @@ tables:
         display:
           numDecimalPlaces: 1
 
+
       percentage_of_teachers_in_primary_education_who_are_female__pct:
         title: Share of primary school teachers who are women
         description_short: Percentage of female teachers among all teachers at the [primary](#dod:primary-education) education level during a given school year.
         unit: "%"
         short_unit: "%"
-        description_key:
-          - Teachers play a central role in shaping learning environments — this indicator shows what share of the teaching workforce in primary education is made up of women.
-          - It captures the percentage of teachers in primary education who are female, calculated by dividing the number of female teachers by the total number of teachers (male and female) at the primary level and multiplying by 100.
-          - A value close to 50% indicates gender parity in the primary teaching workforce. Higher values suggest that women are more strongly represented, while lower values may signal barriers to their participation in teaching.
-          - The data come from administrative records, typically based on school censuses or national education staff registries that report the number of teachers by sex and education level.
-          - This indicator helps assess the gender balance in the teaching profession and may highlight areas where there is a need for policy action or incentives to support women’s participation in teaching.
-          - It is disaggregated by level of education and may be further refined by programme type, grade, or institutional setting.
-          - Where possible, part-time teaching staff should be converted to full-time equivalent (FTE) positions to ensure consistent comparison across different types of employment contracts.
-          - While this indicator provides insight into gender representation, it does not measure teacher qualifications, performance, or the quality of teaching.
-          - Limitations may arise if part-time staff are not converted to FTE, or if the data exclude private or informal education institutions. Consistency in reporting between male and female teacher counts is also essential.
-          - Despite these challenges, the percentage of female teachers in primary education is a key measure of gender representation in the education workforce and can support broader efforts toward inclusive and equitable education systems.
+        description_key: *desc_key_female_teachers
         display:
           numDecimalPlaces: 1
+          tolerance: 10
+        presentation:
+          grapher_config: *female_teachers_grapher_config
 
       percentage_of_teachers_in_secondary_education_who_are_female__pct:
         title: Share of secondary school teachers who are women
         description_short: Percentage of female teachers among all teachers at the [secondary](#dod:secondary-education) education level during a given school year.
         unit: "%"
         short_unit: "%"
-        description_key:
-          - Teachers play a central role in shaping learning environments — this indicator shows what share of the teaching workforce in secondary education is made up of women.
-          - It captures the percentage of teachers at the secondary level (including both lower and upper secondary) who are female, calculated by dividing the number of female teachers by the total number of teachers and multiplying by 100.
-          - A value close to 50% indicates gender parity, while values above or below that threshold reflect gender imbalances in the secondary teaching profession.
-          - The data come from school censuses or education management systems that record teaching staff by sex and education level.
-          - This indicator is useful for monitoring gender equality in the teaching profession and for identifying areas where women may face barriers to participating in education roles beyond the primary level.
-          - The indicator can be disaggregated further by grade, subject area, or full-time/part-time status, where data allow.
-          - When feasible, part-time teachers should be converted to full-time equivalents (FTE) to ensure comparability.
-          - While this indicator reflects gender representation, it does not provide information on teacher qualifications, working conditions, or the quality of instruction.
-          - Nonetheless, the share of secondary school teachers who are women remains an important measure for assessing inclusion and balance in the education workforce.
+        description_key: *desc_key_female_teachers
         display:
           numDecimalPlaces: 1
+          tolerance: 10
+        presentation:
+          grapher_config: *female_teachers_grapher_config
 
       percentage_of_teachers_in_tertiary_education_who_are_female__pct:
         title: Share of tertiary school teachers who are women
         description_short: Percentage of female academic staff among all academic staff at the [tertiary](#dod:tertiary-education) education level during a given school year.
         unit: "%"
         short_unit: "%"
-        description_key:
-          - Women are underrepresented in many academic and research fields — this indicator shows what share of the teaching workforce in tertiary education is made up of women.
-          - It captures the percentage of teachers in tertiary education who are female, calculated by dividing the number of female teachers by the total number of teachers (male and female) at the tertiary level and multiplying by 100.
-          - A value close to 50% reflects gender parity, while lower values highlight gaps in representation that may be shaped by structural, cultural, or institutional barriers to women’s academic careers.
-          - The data come from administrative sources, including higher education institutions and national education databases, which report teaching staff numbers by sex and [International Standard Classification of Education )](https://uis.unesco.org/en/topic/international-standard-classification-education-isced) level.
-          - This indicator is useful for tracking gender equality in academic employment, particularly in faculty and teaching roles across universities and other post-secondary institutions.
-          - It is disaggregated by level of education, and where available, may be further broken down by type of institution, field of study, or academic rank.
-          - Full-time equivalent (FTE) adjustments should be made where part-time teachers are present to ensure consistency in comparison across countries and systems.
-          - This indicator reflects gender distribution, not the quality of teaching, academic rank, or research output — additional indicators are needed to assess these dimensions.
-          - Limitations include variation in how countries classify tertiary teachers, whether data include private institutions, and whether gender is reported for all categories of teaching staff.
-          - Still, the percentage of female teachers in tertiary education remains a critical measure of gender balance in higher education and helps inform policies to support equal representation at all levels of academia.
+        description_key: *desc_key_female_teachers
         display:
           numDecimalPlaces: 1
+          tolerance: 10
+        presentation:
+          grapher_config: *female_teachers_grapher_config
 
       # ========================================================================
       # NET ENROLMENT RATES (by education level and gender)

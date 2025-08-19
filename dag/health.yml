@@ -112,17 +112,24 @@ steps:
   data://grapher/unicef/2023-06-16/diarrhea:
     - data://garden/unicef/2023-06-16/diarrhea
 
-  # Guinea worm
+  # Guinea worm - historical estimates
   data://meadow/who/2023-06-29/guinea_worm_certification:
     - snapshot://who/2023-06-29/guinea_worm.csv
   data://garden/who/2023-06-29/guinea_worm_certification:
     - data://meadow/who/2023-06-29/guinea_worm_certification
 
+  # Guinea worm - to archive
   data://garden/who/2024-06-17/guinea_worm:
     - data://garden/who/2023-06-29/guinea_worm_certification
     - snapshot://fasttrack/2024-06-17/guinea_worm.csv
   data://grapher/who/2024-06-17/guinea_worm:
     - data://garden/who/2024-06-17/guinea_worm
+  # Guinea worm - to update
+  #data://garden/who/2025-04-16/guinea_worm:
+  #  - data://garden/who/2023-06-29/guinea_worm_certification
+  #  - snapshot://fasttrack/2024-06-17/guinea_worm.csv
+  #data://grapher/who/2025-04-16/guinea_worm:
+  #  - data://garden/who/2025-04-16/guinea_worm
 
   # Autopsies WHO-Europe
   data://meadow/who/2023-07-13/autopsy:
@@ -158,7 +165,7 @@ steps:
     - data://garden/regions/2023-01-01/regions
     - data://meadow/health/2025-01-22/unaids
     - data://meadow/health/2023-08-22/unaids_deaths_averted_art
-    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/wb/2025-07-01/income_groups
 
   data://grapher/health/2025-01-22/unaids:
     - data://garden/health/2025-01-22/unaids
@@ -201,17 +208,9 @@ steps:
 
   # WHO Cardiovascular diseases deaths
   data://garden/cardiovascular_diseases/2023-11-01/deaths_from_cardiovascular_diseases_vs_other:
-    - data://garden/who/2024-07-26/mortality_database
+    - data://garden/who/2025-04-17/mortality_database
   data://grapher/cardiovascular_diseases/2023-11-01/deaths_from_cardiovascular_diseases_vs_other:
     - data://garden/cardiovascular_diseases/2023-11-01/deaths_from_cardiovascular_diseases_vs_other
-
-  # WHO Medical Devices Atlas
-  data://meadow/who/2023-11-01/who_statins:
-    - snapshot://who/2023-11-01/who_statins.csv
-  data://garden/who/2023-11-01/who_statins:
-    - data://meadow/who/2023-11-01/who_statins
-  data://grapher/who/2023-11-01/who_statins:
-    - data://garden/who/2023-11-01/who_statins
 
   # Global Health Observatory (GHO) from WHO
   data://meadow/who/2024-01-03/gho:
@@ -259,7 +258,7 @@ steps:
   data://garden/who/2024-04-08/polio:
     - data://meadow/who/2024-04-08/polio_afp
     - data://garden/who/2024-04-09/polio_historical
-    - data://garden/wb/2023-04-30/income_groups
+    - data://garden/wb/2025-07-01/income_groups
     - data://garden/regions/2023-01-01/regions
     - data://garden/demography/2023-03-31/population
     - snapshot://fasttrack/latest/gpei.csv
@@ -466,7 +465,7 @@ steps:
   data://garden/un/2024-07-08/maternal_mortality:
     - data://meadow/un/2024-07-08/maternal_mortality
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2023-04-30/income_groups
+    - data://garden/wb/2025-07-01/income_groups
   data://grapher/un/2024-07-08/maternal_mortality:
     - data://garden/un/2024-07-08/maternal_mortality
 
@@ -474,29 +473,21 @@ steps:
   data://garden/maternal_mortality/2024-07-08/maternal_mortality:
     - data://garden/gapminder/2024-07-08/maternal_mortality
     - data://garden/un/2024-07-08/maternal_mortality
-    - data://garden/who/2024-07-26/mortality_database
+    - data://garden/who/2025-04-17/mortality_database
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2023-04-30/income_groups
+    - data://garden/wb/2025-07-01/income_groups
     - data://garden/un/2024-07-12/un_wpp
     - data://garden/demography/2024-07-15/population
   data://grapher/maternal_mortality/2024-07-08/maternal_mortality:
     - data://garden/maternal_mortality/2024-07-08/maternal_mortality
 
-  # WHO Mortality Database
-  data://meadow/who/2024-07-26/mortality_database:
-    - snapshot://who/2024-07-26/mortality_database.feather
-  data://garden/who/2024-07-26/mortality_database:
-    - data://meadow/who/2024-07-26/mortality_database
-  data://grapher/who/2024-07-26/mortality_database:
-    - data://garden/who/2024-07-26/mortality_database
-
-  # WHO ICD codes
-  data://meadow/who/2024-07-29/icd_codes:
-    - snapshot://who/2024-07-29/icd_codes.zip
-  data://garden/who/2024-07-29/icd_codes:
-    - data://meadow/who/2024-07-29/icd_codes
-  data://grapher/who/2024-07-29/icd_codes:
-    - data://garden/who/2024-07-29/icd_codes
+  # WHO Mortality Database - update
+  data://meadow/who/2025-04-17/mortality_database:
+    - snapshot://who/2025-04-17/mortality_database.feather
+  data://garden/who/2025-04-17/mortality_database:
+    - data://meadow/who/2025-04-17/mortality_database
+  data://grapher/who/2025-04-17/mortality_database:
+    - data://garden/who/2025-04-17/mortality_database
 
   # WHO Global Health Estimates
   data://meadow/who/2024-07-30/ghe:
@@ -509,18 +500,12 @@ steps:
   data://grapher/who/2024-07-30/ghe:
     - data://garden/who/2024-07-30/ghe
 
-  # WHO Mortality Database - Cancer specific
-  data://meadow/who/2024-08-06/mortality_database_cancer:
-    - snapshot://who/2024-08-06/mortality_database_cancer.csv
-  data://garden/who/2024-08-06/mortality_database_cancer:
-    - data://meadow/who/2024-08-06/mortality_database_cancer
-  data://grapher/who/2024-08-06/mortality_database_cancer:
-    - data://garden/who/2024-08-06/mortality_database_cancer
-
+  # Most common cancers
   data://garden/who/2024-08-06/mortality_database_cancer_most_common:
-    - data://garden/who/2024-08-06/mortality_database_cancer
+    - data://garden/who/2025-08-05/mortality_database_cancer
   data://grapher/who/2024-08-06/mortality_database_cancer_most_common:
     - data://garden/who/2024-08-06/mortality_database_cancer_most_common
+    # Mpox (Monkeypox) - WHO
   data://meadow/who/latest/monkeypox:
     - snapshot://who/latest/monkeypox.csv
   data://garden/who/latest/monkeypox:
@@ -784,15 +769,6 @@ steps:
   data-private://grapher/antibiotics/2024-12-05/microbe_total_deaths_by_syndrome_amr:
     - data-private://garden/antibiotics/2024-12-05/microbe_total_deaths_by_syndrome_amr
 
-  # WHO Immunization coverage
-  data://meadow/who/2024-12-10/vaccination_coverage:
-    - snapshot://who/2024-12-10/vaccination_coverage.xlsx
-  data://garden/who/2024-12-10/vaccination_coverage:
-    - data://meadow/who/2024-12-10/vaccination_coverage
-    - data://garden/un/2024-07-12/un_wpp
-  data://grapher/who/2024-12-10/vaccination_coverage:
-    - data://garden/who/2024-12-10/vaccination_coverage
-
   #
   # Human height
   #
@@ -804,16 +780,7 @@ steps:
     - data://garden/health/2024-12-31/height
 
   #
-  # WHO Vaccine Introductions
-  #
-  data://meadow/who/2025-01-09/vaccination_introductions:
-    - snapshot://who/2025-01-09/vaccination_introductions.xlsx
-  data://garden/who/2025-01-09/vaccination_introductions:
-    - data://meadow/who/2025-01-09/vaccination_introductions
-  data://grapher/who/2025-01-09/vaccination_introductions:
-    - data://garden/who/2025-01-09/vaccination_introductions
 
-  #
   # WHO vaccine stock out
   #
   data://meadow/who/2025-01-17/vaccine_stock_out:
@@ -822,15 +789,6 @@ steps:
     - data://meadow/who/2025-01-17/vaccine_stock_out
   data://grapher/who/2025-01-17/vaccine_stock_out:
     - data://garden/who/2025-01-17/vaccine_stock_out
-
-  #
-  # WHO Mortality Database - Vaccine Preventable
-  data://meadow/who/2025-01-17/mortality_database_vaccine_preventable:
-    - snapshot://who/2025-01-17/mortality_database_vaccine_preventable.csv
-  data://garden/who/2025-01-17/mortality_database_vaccine_preventable:
-    - data://meadow/who/2025-01-17/mortality_database_vaccine_preventable
-  data://grapher/who/2025-01-17/mortality_database_vaccine_preventable:
-    - data://garden/who/2025-01-17/mortality_database_vaccine_preventable
 
   #
   # US Long-run measles
@@ -937,7 +895,7 @@ steps:
 
   # Measles deaths long run
   data://garden/health/2025-02-20/measles_deaths_long_run:
-    - data://garden/who/2025-01-17/mortality_database_vaccine_preventable
+    - data://garden/who/2025-08-06/mortality_database_vaccine_preventable
     - data://garden/health/2025-02-20/measles_deaths_census_bureau
     - data://garden/health/2025-02-20/measles_deaths_public_health_reports
     - data://garden/demography/2024-07-15/population
@@ -1045,15 +1003,15 @@ steps:
     - data://garden/public_health_reports/2025-03-04/diphtheria_deaths
     - data://garden/us_census_bureau/2025-03-04/diphtheria_deaths
     - data://garden/demography/2024-07-15/population
-    - data://garden/who/2025-01-17/mortality_database_vaccine_preventable
+    - data://garden/who/2025-08-06/mortality_database_vaccine_preventable
   data://grapher/health/2025-03-04/diphtheria_deaths:
     - data://garden/health/2025-03-04/diphtheria_deaths
 
   # Multi-dim indicators - vaccination coverage
   export://multidim/health/latest/vaccination_coverage:
-    - data://grapher/who/2024-12-10/vaccination_coverage
+    - data://grapher/who/2025-07-15/vaccination_coverage
   export://multidim/health/latest/vaccination_introductions:
-    - data://grapher/who/2025-01-09/vaccination_introductions
+    - data://grapher/who/2025-07-15/vaccination_introductions
 
   # US Pertussis cases - CDC
   #
@@ -1078,7 +1036,7 @@ steps:
   #
   data://garden/health/2025-03-06/pertussis_deaths:
     - data://garden/us_census_bureau/2025-03-06/pertussis_deaths
-    - data://garden/who/2025-01-17/mortality_database_vaccine_preventable
+    - data://garden/who/2025-08-06/mortality_database_vaccine_preventable
     - data://garden/demography/2024-07-15/population
   data://grapher/health/2025-03-06/pertussis_deaths:
     - data://garden/health/2025-03-06/pertussis_deaths
@@ -1177,7 +1135,7 @@ steps:
   data://garden/who/2025-04-07/gho_smoking:
     - data://garden/who/2024-01-03/gho
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/wb/2025-07-01/income_groups
     - data://garden/un/2024-07-12/un_wpp
   data://grapher/who/2025-04-07/gho_smoking:
     - data://garden/who/2025-04-07/gho_smoking
@@ -1219,7 +1177,7 @@ steps:
     - data://meadow/tuberculosis/2025-06-06/burden_estimates
     - data://garden/demography/2024-07-15/population
     - snapshot://tuberculosis/2025-06-06/data_dictionary.csv
-    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/wb/2025-07-01/income_groups
     - data://garden/regions/2023-01-01/regions
   data://grapher/tuberculosis/2025-06-06/burden_estimates:
     - data://garden/tuberculosis/2025-06-06/burden_estimates
@@ -1238,7 +1196,7 @@ steps:
     - data://meadow/tuberculosis/2025-06-16/burden_disaggregated
     - data://garden/demography/2024-07-15/population
     - snapshot://tuberculosis/2025-06-06/data_dictionary.csv
-    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/wb/2025-07-01/income_groups
     - data://garden/regions/2023-01-01/regions
   data://grapher/tuberculosis/2025-06-16/burden_disaggregated:
     - data://garden/tuberculosis/2025-06-16/burden_disaggregated
@@ -1259,9 +1217,10 @@ steps:
     - data://meadow/tuberculosis/2025-06-16/drug_resistance_surveillance
     - snapshot://tuberculosis/2025-06-06/data_dictionary.csv
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/wb/2025-07-01/income_groups
   data://grapher/tuberculosis/2025-06-16/drug_resistance_surveillance:
     - data://garden/tuberculosis/2025-06-16/drug_resistance_surveillance
+
   # Tuberculosis budget - WHO
   data://meadow/tuberculosis/2025-06-16/budget:
     - snapshot://tuberculosis/2025-06-16/budget.csv
@@ -1269,7 +1228,7 @@ steps:
     - data://meadow/tuberculosis/2025-06-16/budget
     - data://garden/regions/2023-01-01/regions
     - snapshot://tuberculosis/2025-06-06/data_dictionary.csv
-    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/wb/2025-07-01/income_groups
   data://grapher/tuberculosis/2025-06-16/budget:
     - data://garden/tuberculosis/2025-06-16/budget
 
@@ -1281,6 +1240,95 @@ steps:
     - snapshot://tuberculosis/2025-06-06/data_dictionary.csv
     - data://garden/un/2024-07-12/un_wpp
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/wb/2025-07-01/income_groups
   data://grapher/tuberculosis/2025-06-16/laboratories:
     - data://garden/tuberculosis/2025-06-16/laboratories
+
+  # Drug approvals - FDA (CDER Approvals & Purple Book (CBER Approvals))
+  data://garden/health/2025-07-16/drug_approvals:
+    - data://meadow/health/2025-07-16/cder_approvals
+    - data://meadow/health/2025-07-16/purple_book
+  data://grapher/health/2025-07-16/drug_approvals:
+    - data://garden/health/2025-07-16/drug_approvals
+  data://meadow/health/2025-07-16/cder_approvals:
+    - snapshot://fda/2025-07-16/cder_approvals.csv
+
+  data://meadow/health/2025-07-16/purple_book:
+    - snapshot://fda/2025-07-16/purple_book.csv
+
+  # WHO Immunization coverage
+  data://meadow/who/2025-07-15/vaccination_coverage:
+    - snapshot://who/2025-07-15/vaccination_coverage.xlsx
+  data://garden/who/2025-07-15/vaccination_coverage:
+    - data://garden/un/2024-07-12/un_wpp
+    - data://garden/wb/2025-07-01/income_groups
+    - data://garden/regions/2023-01-01/regions
+    - data://meadow/who/2025-07-15/vaccination_coverage
+    - data://garden/demography/2024-07-15/population
+  data://grapher/who/2025-07-15/vaccination_coverage:
+    - data://garden/who/2025-07-15/vaccination_coverage
+
+  # WHO Vaccine Introductions
+  data://meadow/who/2025-07-15/vaccination_introductions:
+    - snapshot://who/2025-07-15/vaccination_introductions.xlsx
+  data://garden/who/2025-07-15/vaccination_introductions:
+    - data://meadow/who/2025-07-15/vaccination_introductions
+  data://grapher/who/2025-07-15/vaccination_introductions:
+    - data://garden/who/2025-07-15/vaccination_introductions
+
+  # Clinical trials - ClinicalTrials.gov
+  # no meadow snapshot, as this is a large dataset
+  data://garden/health/2025-07-28/clinical_trials:
+    - snapshot://health/2025-07-28/clinical_trials.csv
+  data://grapher/health/2025-07-28/clinical_trials:
+    - data://garden/health/2025-07-28/clinical_trials
+
+  # Guinea worm certification
+  data://meadow/who/2025-08-01/guinea_worm_certification:
+    - snapshot://who/2025-08-01/guinea_worm.csv
+  data://garden/who/2025-08-01/guinea_worm_certification:
+    - data://meadow/who/2025-08-01/guinea_worm_certification
+    # Guinea worm cases
+  data://garden/who/2025-08-01/guinea_worm:
+    - snapshot://fasttrack/latest/guinea_worm_cases.csv
+    - data://garden/who/2025-08-01/guinea_worm_certification
+  data://grapher/who/2025-08-01/guinea_worm:
+    - data://garden/who/2025-08-01/guinea_worm
+
+  # WHO Mortality Database - Cancer specific
+  data://meadow/who/2025-08-05/mortality_database_cancer:
+    - snapshot://who/2025-08-05/mortality_database_cancer.csv
+  data://garden/who/2025-08-05/mortality_database_cancer:
+    - data://meadow/who/2025-08-05/mortality_database_cancer
+  data://grapher/who/2025-08-05/mortality_database_cancer:
+    - data://garden/who/2025-08-05/mortality_database_cancer
+  # WHO ICD codes
+  data://meadow/who/2025-08-06/icd_codes:
+    - snapshot://who/2025-08-06/icd_codes.zip
+  data://garden/who/2025-08-06/icd_codes:
+    - data://meadow/who/2025-08-06/icd_codes
+  data://grapher/who/2025-08-06/icd_codes:
+    - data://garden/who/2025-08-06/icd_codes
+  # Suicides based on WHO Mortality Database
+  data://meadow/who/2025-08-06/self_inflicted_injuries:
+    - snapshot://who/2025-08-06/self_inflicted_injuries.csv
+  data://garden/who/2025-08-06/self_inflicted_injuries:
+    - data://meadow/who/2025-08-06/self_inflicted_injuries
+  data://grapher/who/2025-08-06/self_inflicted_injuries:
+    - data://garden/who/2025-08-06/self_inflicted_injuries
+  #
+  # WHO Mortality Database - Vaccine Preventable
+  data://meadow/who/2025-08-06/mortality_database_vaccine_preventable:
+    - snapshot://who/2025-08-06/mortality_database_vaccine_preventable.csv
+  data://garden/who/2025-08-06/mortality_database_vaccine_preventable:
+    - data://meadow/who/2025-08-06/mortality_database_vaccine_preventable
+  data://grapher/who/2025-08-06/mortality_database_vaccine_preventable:
+    - data://garden/who/2025-08-06/mortality_database_vaccine_preventable
+
+  # GCO cancer over time (cervical)
+  data://meadow/cancer/2025-08-08/gco_cancer_over_time_cervical:
+    - snapshot://cancer/2025-08-08/gco_cancer_over_time_cervical.csv
+  data://garden/cancer/2025-08-08/gco_cancer_over_time_cervical:
+    - data://meadow/cancer/2025-08-08/gco_cancer_over_time_cervical
+  data://grapher/cancer/2025-08-08/gco_cancer_over_time_cervical:
+    - data://garden/cancer/2025-08-08/gco_cancer_over_time_cervical

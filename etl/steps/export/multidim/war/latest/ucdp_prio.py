@@ -20,7 +20,10 @@ COMMON_CONFIG = {
     },
     "entityType": "region",
     "entityTypePlural": "regions",
+    "chartTypes": ["StackedBar"],
 }
+
+TEXT_KEY_EXTRA = "PRIO's conflict-level data cannot be neatly mapped to individual countries, which is why we only present aggregated data for the world and world regions."
 
 
 def run() -> None:
@@ -98,6 +101,7 @@ def run() -> None:
                 "view_config": COMMON_CONFIG
                 | {
                     "selectedFacetStrategy": "entity",
+                    "chartTypes": ["LineChart"],
                 },
             },
         ]
@@ -112,7 +116,12 @@ def run() -> None:
 
     # Edit FAUST
     region_names = tb_up.dropna(subset="number_deaths_ongoing_conflicts__conflict_type_all")["country"].unique()
-    edit_faust(c, tb_ucdp, tb_up, region_names)
+    edit_faust(
+        c,
+        tb_ucdp,
+        tb_up,
+        region_names,
+    )
 
     # Save & upload
     c.save()
@@ -215,6 +224,13 @@ def edit_faust(c, tb_ucdp, tb_up, region_names):
         # Edit FAUST in charts with CI (color, display names). Indicator-level.
         edit_indicator_displays(view)
 
+        # Set color to red if there is only one line in the chart
+        if (view.indicators.y is not None) and (len(view.indicators.y) == 1):
+            if view.indicators.y[0].display is None:
+                view.indicators.y[0].display = {"color": "#B13507"}
+            else:
+                view.indicators.y[0].display["color"] = "#B13507"
+
     c.set_global_config(
         {
             "title": lambda view: _set_title(view, choice_names),
@@ -239,6 +255,9 @@ def edit_faust(c, tb_ucdp, tb_up, region_names):
 
 
 def _set_description_key(view, tb_ucdp, tb_up):
+    UCDP_ONLY = "[Uppsala Conflict Data Program (UCDP)](https://ucdp.uu.se/)"
+    UCDP_AND_PRIO = f"{UCDP_ONLY} and the [Peace Research Institute Oslo (PRIO)](https://www.prio.org/data/1)"
+    keys = None
     if (view.d.conflict_type == "state_based_stacked") or (view.d.estimate == "best_ci"):
         if view.d.indicator == "deaths":
             keys = tb_up["number_deaths_ongoing_conflicts__conflict_type_state_based"].metadata.description_key
@@ -247,18 +266,37 @@ def _set_description_key(view, tb_ucdp, tb_up):
                 "number_deaths_ongoing_conflicts_per_capita__conflict_type_state_based"
             ].metadata.description_key
         elif view.d.indicator == "wars_ongoing":
-            keys = tb_ucdp["number_ongoing_conflicts__conflict_type_all"].metadata.description_key
+            keys = tb_ucdp["number_ongoing_conflicts__conflict_type_all"].metadata.description_key + [TEXT_KEY_EXTRA]
         elif view.d.indicator == "wars_ongoing_country_rate":
-            keys = tb_ucdp["number_ongoing_conflicts_per_country__conflict_type_all"].metadata.description_key
+            keys = tb_ucdp["number_ongoing_conflicts_per_country__conflict_type_all"].metadata.description_key + [
+                TEXT_KEY_EXTRA
+            ]
         else:
             raise ValueError(f"Unknown indicator: {view.d.indicator}")
 
-        # return
         if view.d.estimate == "best_ci":
-            assert keys[-1].startswith("'Best' death estimates")
-            keys = keys[:-1]  # + [None]
-        return keys
-    return None
+            assert keys[-1].startswith('We show here the "best" death')
+            keys = keys[:-1]
+
+    elif view.d.indicator == "wars_ongoing":
+        ctype = view.d.conflict_type.replace(" ", "_").replace("-", "_").replace("(", "_").lower().strip(")")
+        keys = tb_ucdp[f"number_ongoing_conflicts__conflict_type_{ctype}"].metadata.description_key + [TEXT_KEY_EXTRA]
+    elif view.d.indicator == "wars_ongoing_country_rate":
+        ctype = view.d.conflict_type.replace(" ", "_").replace("-", "_").replace("(", "_").lower().strip(")")
+        keys = tb_ucdp[f"number_ongoing_conflicts_per_country__conflict_type_{ctype}"].metadata.description_key + [
+            TEXT_KEY_EXTRA
+        ]
+
+    if keys is not None:
+        for i, key in enumerate(keys):
+            key = key.replace(UCDP_ONLY, UCDP_AND_PRIO)
+            key = key.replace(
+                "UCDP identifies",
+                "[UCDP](https://www.uu.se/en/department/peace-and-conflict-research/research/ucdp/ucdp-methodology) and [PRIO](https://www.semanticscholar.org/paper/Monitoring-Trends-in-Global-Combat%3A-A-New-Dataset-Lacina-Gleditsch/0c4ff27fff986bc30112ac59ad6afbd7b719ad17?p2df) identify",
+            )
+            keys[i] = key
+
+    return keys
 
 
 def _set_title(view, choice_names):
@@ -277,16 +315,16 @@ def _set_title(view, choice_names):
 
 def _set_subtitle(view):
     dods = _set_dods(view)
-    subtitle_deaths = f"Reported deaths of combatants and civilians due to fighting{{placeholder}} {dods} conflicts that were ongoing that year. Deaths due to disease and starvation resulting from the conflict are not included."
+    subtitle_deaths = f"Reported deaths of combatants and civilians due to fighting{{placeholder}} {dods}. Deaths due to disease and starvation resulting from the conflict are not included."
 
     if view.d.indicator == "deaths":
         return subtitle_deaths.format(placeholder=" in")
     elif view.d.indicator == "death_rate":
         return subtitle_deaths.format(placeholder=", per 100,000 people. Included are")
     elif view.d.indicator == "wars_ongoing":
-        return f"Included are {dods} conflicts that were ongoing that year."
+        return f"Included are {dods}."
     elif view.d.indicator == "wars_ongoing_country_rate":
-        return f"The number of conflicts divided by the number of all states. This accounts for the changing number of states over time. Included are {dods} conflicts that were ongoing that year."
+        return f"The number of conflicts divided by the number of all states. This accounts for the changing number of states over time. Included are {dods}."
     else:
         raise ValueError(f"Unknown indicator: {view.d.indicator}")
 
@@ -316,9 +354,7 @@ def edit_indicator_displays(view):
 def _set_dods(view):
     # DoD
     if view.d.conflict_type in ("state-based", "state_based_stacked"):
-        dods = (
-            "[interstate](#dod:interstate-ucdp), [civil](#dod:intrastate-ucdp), and [colonial](#dod:extrasystemic-ucdp)"
-        )
+        dods = "[interstate](#dod:interstate-ucdp), [civil](#dod:intrastate-ucdp), and [colonial](#dod:extrasystemic-ucdp) conflicts"
     elif view.d.conflict_type == "interstate":
         dods = "[interstate conflicts](#dod:interstate-ucdp)"
     elif view.d.conflict_type == "intrastate (internationalized)":
@@ -347,4 +383,4 @@ def _set_note(view):
     if view.d.indicator in ("wars_ongoing", "wars_ongoing_country_rate"):
         return "Some conflicts affect several regions. The sum across all regions can therefore be higher than the total number."
     if view.d.indicator in ("deaths", "death_rate") and (view.d.estimate == "best_ci"):
-        return "'Best' estimates as identified by UCDP and PRIO."
+        return '"Best" estimates as identified by UCDP and PRIO.'

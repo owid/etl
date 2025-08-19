@@ -271,10 +271,10 @@ class FasttrackImport:
         snapshot_uri = ds_meta.uri.replace("grapher/", "")
         if ds_meta.is_public:
             to_remove = private_data_step
-            to_add = {public_data_step: [f"snapshot://{snapshot_uri}.csv"]}
+            to_add = {public_data_step: {f"snapshot://{snapshot_uri}.csv"}}
         else:
             to_remove = public_data_step
-            to_add = {private_data_step: [f"snapshot-private://{snapshot_uri}.csv"]}
+            to_add = {private_data_step: {f"snapshot-private://{snapshot_uri}.csv"}}
 
         # Remove the step from the DAG
         wizard_utils.remove_from_dag(to_remove, DAG_FASTTRACK_PATH)

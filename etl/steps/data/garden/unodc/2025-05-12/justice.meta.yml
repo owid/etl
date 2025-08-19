@@ -2,11 +2,14 @@
 definitions:
   common:
     description_key:
-        - Bribery cases progress slowly through justice systems, creating significant timing mismatches in the data. Individuals arrested in one year are typically prosecuted the following year and may not be convicted until several years later. This extended timeline means arrest and conviction data from the same year reflect entirely different groups of cases at different stages of the process, making direct comparisons misleading.
-        - Each component of the justice system maintains separate recording systems that capture information at different stages and using different criteria. Police document cases when investigations begin, prosecutors when formal charges are filed, and courts when cases are heard and decided. These disconnected systems create data gaps that complicate efforts to track individual cases through the entire process from arrest to final disposition.
-        - Bribery cases present unique prosecution challenges due to their inherent complexity. These crimes frequently involve sophisticated criminal networks, organized crime connections, and require specialized investigative resources and expertise that many justice systems lack. This complexity results in higher case attrition rates compared to conventional crimes, with more cases being dropped or dismissed at various stages of the process.
-        - Countries employ different approaches to data collection, classification, and reporting that affect comparability. Some nations implement the "principal offence rule" where only the most serious crime is counted when multiple offenses occur together. Data completeness varies significantly across countries, and adherence to international reporting standards like the [International Classification of Crime for Statistical Purposes (ICCS)](https://www.unodc.org/unodc/en/data-and-analysis/statistics/iccs.html) remains inconsistent, leading to definitional and methodological differences.
-        - Apparent anomalies in the data, such as prosecution rates exceeding arrest rates in certain countries, typically reflect these systematic data collection challenges rather than actual procedural irregularities.
+      - Justice data is difficult to compare across countries and over time due to differences in legal systems, data collection methods, and reporting practices.
+      - Cases can move slowly through the justice system. Arrests in one year often lead to prosecutions the next, and convictions years later. As a result, arrest and conviction data from the same year reflect different cases, making direct comparisons misleading.
+      - Different agencies — police, prosecutors, and courts — often keep separate records. This creates gaps that make it hard to track individual cases from arrest to final outcome.
+      - Bribery cases are especially complex. They often involve criminal networks and require specialist expertise that many justice systems lack, leading to higher rates of case dismissal compared to other crimes.
+      - Countries use different data collection approaches. Some use the "principal offence rule," counting only the most serious crime when multiple offenses occur together. Adherence to international standards like the [International Classification of Crime for Statistical Purposes (ICCS)](https://www.unodc.org/unodc/en/data-and-analysis/statistics/iccs.html) also varies.
+      - Apparent anomalies — such as prosecution rates that exceed arrest rates — usually reflect differences in data collection, not irregularities in legal procedures.
+      - Arrest, prosecution and conviction rates are shaped by how strongly laws are enforced, how crimes are reported, and what societies consider worth reporting. In places where bribery is normalised, it is often not seen as serious enough to report.
+      - Trends within countries can still be useful, especially when compared with survey data on [bribery prevalence](https://ourworldindata.org/grapher/bribery-prevalence-un). However, these trends may reflect changes in policing or reporting willingness, not just actual crime levels.
     presentation:
       topic_tags:
         - Corruption
@@ -22,17 +25,13 @@ tables:
   justice:
     variables:
       value:
-        title: << indicator >>  - << category.lower() >> << age.lower() >> << sex.lower() >> (<< unit_of_measurement.lower() >>)
+        title: << indicator >> in bribery cases (<< unit_of_measurement.lower() >>)
         description_short: |-
-          <%- if indicator == "Criminal Justice Personnel"%>
-          Nationally reported number of criminal justice personnel, including judges, prosecutors, and public defenders.
-          <% elif indicator == "Persons brought before criminal courts" and category.lower() == "bribery" %>
-          The number of people brought before criminal courts for alleged bribery offences, as reported by national authorities. Bribery cases include those involving attempts to influence public or private sector decision-making through undue advantages.
-          <% elif indicator == "Persons convicted" and category.lower() == "bribery" %>
+          <% if indicator == "Persons convicted" %>
           The number of people found guilty of crimes by the courts, as reported by national authorities. Bribery cases include those involving attempts to influence public or private sector decision-making through undue advantages.
-          <% elif indicator == "Persons prosecuted" and category.lower() == "bribery" %>
+          <% elif indicator == "Persons prosecuted" %>
           The number of people formally charged with crimes, as reported by national authorities. Bribery cases include those involving attempts to influence public or private sector decision-making through undue advantages.
-          <% elif indicator == "Persons arrested/cautioned/suspected" and category.lower() == "bribery" %>
+          <% elif indicator == "Persons arrested/cautioned/suspected" %>
           The number of people arrested, given formal warnings, or identified as suspects, as reported by national authorities. Bribery cases include those involving attempts to influence public or private sector decision-making through undue advantages.
           <%- endif -%>
         unit: |-
@@ -41,3 +40,19 @@ tables:
           <% elif unit_of_measurement.lower() == "rate per 100,000 population" %>
           people per 100,000 population
           <%- endif -%>
+        presentation:
+          title_public: |-
+            <%- if unit_of_measurement.lower() == "counts" %>
+            << indicator >> in bribery cases (<< unit_of_measurement.lower() >>)
+            <% elif unit_of_measurement.lower() == "rate per 100,000 population" %>
+            << indicator >> in bribery cases (<< unit_of_measurement.lower() >>)
+            <%- endif -%>
+        display:
+          name:
+            <% if indicator == "Persons convicted" %>
+            Convictions
+            <% elif indicator == "Persons prosecuted" %>
+            Prosecutions
+            <% elif indicator == "Persons arrested/cautioned/suspected" %>
+            Arrests, cautions or suspicions
+            <%- endif -%>

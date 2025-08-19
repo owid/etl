@@ -1,0 +1,70 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Housing
+    processing_level: minor
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+  title: OECD Affordable Housing Database (AHD) - Housing Costs
+
+
+tables:
+  housing_costs_burden:
+    variables:
+      hc_burden:
+        title: Housing Cost Burden as a share of disposable income
+        description_short: |
+          <% if tenure_type == "All tenures" %>
+            The share of disposable income that the median households in << quintile.lower() >> spend on rent or mortgage payments.
+          <% elif tenure_type == "Rent (private and subsidized)" %>
+            The share of disposable income that the median renters (private and subsidized) in << quintile.lower() >> spend on rent.
+          <% elif tenure_type == "Rent (private)" %>
+            The share of disposable income that the median renters (on the private market) in << quintile.lower() >> spend on rent.
+          <% elif tenure_type == "Rent (subsidized)" %>
+            The share of disposable income that the median renters with subsidized housing costs (e.g. in social housing) spend on rent.
+          <% elif tenure_type == "Owner with mortgage" %>
+            The share of disposable income that the median homeowners in << quintile.lower() >> spend on their mortgage payments, including interest and principal repayments.
+          <% endif %>
+        description_from_producer: "Median of the mortgage burden (principal repayment and interest payments) or rent burden (private market and subsidized rent) as a share of disposable income, in percent"
+        unit: "%"
+        short_unit: "%"
+        description_processing: We removed data for Germany in 2020 due to the COVID-19 pandemic causing disruption to data collection.
+      hc_overburden:
+        title: Housing Cost Overburden
+        description_short: |
+          <% if tenure_type == "All tenures" %>
+            The share of households in << quintile.lower() >> that spend more than 40% of their disposable income on rent or mortgage costs.
+          <% elif tenure_type == "Rent (private and subsidized)" %>
+            The share of renters (private and subsidized) in << quintile.lower() >> that spend more than 40% of their disposable income on rent.
+          <% elif tenure_type == "Rent (private)" %>
+            The share of renters (on the private market) in << quintile.lower() >> that spend more than 40% of their disposable income on rent.
+          <% elif tenure_type == "Rent (subsidized)" %>
+            The share of renters with subsidized housing costs (e.g. in social housing) in << quintile.lower() >> that spend more than 40% of their disposable income on rent.
+          <% elif tenure_type == "Owner with mortgage" %>
+            The share of homeowners in << quintile.lower() >> that spend more than 40% of their disposable income on their mortgage payments, including interest and principal repayments.
+          <% endif %>
+        description_from_producer: "Share of population spending more than 40% of disposable income on mortgage and rent, in percent"
+        description_processing: We removed data for Germany in 2020 due to the COVID-19 pandemic causing disruption to data collection.
+        unit: "%"
+        short_unit: "%"
+  housing_costs_share:
+    variables:
+      hc_share:
+        title: Housing Cost Share
+        description_short: |
+          The percentage of overall consumption that households spend on housing costs. This includes rent, bills such as electricity, gas and water and maintenance and repair costs.
+        description_from_producer: "Housing expenditure as share of final consumption expenditure of households"
+        unit: "%"
+        short_unit: "%"
+        presentation:
+          grapher_config:
+            note: |
+              For owner-occupied housing imputed rents are used to estimate the cost of housing. This means that the share of total expenditure is estimated as if homeowners were renting their own homes, instead of the actual costs they are paying e.g. for their mortgage.
+
+

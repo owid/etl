@@ -1,9 +1,22 @@
+# WARNING: Use this file to manually curate WDI indicators. Do NOT use the wdi.meta.yml file (which is generated automatically).
 definitions:
+  # Trained teachers map configuration
+  trained_teachers_grapher_config: &trained_teachers_grapher_config
+    maxTime: 2024
+    hasMapTab: true
+    map:
+      time: 2024
+      timeTolerance: 5
+      colorScale:
+        binningStrategy: manual
+        customNumericValues: [10,20,30,40,50,60,70,80,90,100]
+        baseColorScheme: Blues
+
   gdp: Gross domestic product (GDP) is a measure of the total value added from the production of goods and services in a country or region each year.
   gdp_per_capita: GDP per capita is GDP divided by population.
   gni: Gross national income (GNI) is a measure of the total income earned by residents of a country or region each year. It is calculated as GDP plus net income received from abroad, plus taxes (minus subsidies) on production.
   gni_per_capita: GNI per capita is GNI divided by population.
-  ppp_adjustment: This data is adjusted for inflation and for differences in living costs between countries.
+  ppp_adjustment: This data is adjusted for inflation and differences in living costs between countries.
   ppp_prices: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2021 prices.
   inflation_adjustment: This data is adjusted by inflation but _does not_ account for differences in living costs between countries.
   inflation_prices: This data is expressed in constant 2015 US$.
@@ -27,6 +40,13 @@ definitions:
     - Similarly, a value of 100% does not necessarily mean all children within a particular age group are enrolled in school; some children could be out-of-school, but gross enrolment rates are boosted by older students being included.
     - The data comes from administrative records, such as school enrolment reports, and from population estimates, usually provided by the United Nations or national sources.
 
+  desc_key_trained_teachers: &desc_key_trained_teachers
+   - Not all teachers receive the same level of preparation before entering the classroom. This indicator measures the percentage of teachers at each education level who have completed at least the minimum organized pedagogical training required for teaching at that level in their country.
+   - It captures the share of teachers who are pedagogically trained, expressed as a percentage of all teachers at that level. For example, if there are 1,000 primary teachers and 850 have completed the required training, the indicator shows 85%.
+   - The "minimum training" refers to whatever organized pedagogical preparation each country requires - pre-service teacher education programs, in-service training courses, or certification requirements that focus on teaching methods rather than subject knowledge.
+   - Values below 100% suggest some teachers are working without the pedagogical training their own country considers necessary. However, cross-country comparisons can be misleading since training requirements vary significantly between nations.
+   - The data comes from administrative records collected at schools and other organized learning centers, typically including information on teacher academic credentials and employment status.
+
   description_short_clean_fuels: &description_short_clean_fuels |-
     Access to [clean fuels or technologies](#dod:clean-cooking-fuels) such as natural gas, electricity, and clean cookstoves reduces exposure to indoor air pollutants, a leading cause of death in low-income households.
   description_from_producer_clean_fuels: &description_from_producer_clean_fuels |-
@@ -36,13 +56,7 @@ definitions:
 
     Trends in the proportion of the population using each fuel type are estimated using a single multivariate hierarchical model, with urban and rural disaggregation. Estimates for overall "polluting" fuels (unprocessed biomass, charcoal, coal, and kerosene) and "clean" fuels (gaseous fuels, electricity, as well as an aggregation of any other clean fuels like alcohol) are produced by aggregating estimates of relevant fuel types. The model was used to derive clean fuel use estimates for 191 countries (ref. Stoner, O., Shaddick, G., Economou, T., Gumy, S., Lewis, J., Lucio, I., Ruggeri, G. and Adair-Rohani, H. (2020), Global household energy model: a multivariate hierarchical approach to estimating trends in the use of polluting and clean fuels for cooking. J. R. Stat. Soc. C, 69: 815-839). Countries classified by the World Bank as high income (57 countries) in the 2022 fiscal year are assumed to have universal access to clean fuels and technologies for cooking.
   description_short_electricity: &description_short_electricity |-
-    Having access to electricity is defined in international statistics as having an electricity source that can provide very basic lighting, and charge a phone or power a radio for 4 hours per day.
-  description_from_producer_electricity: &description_from_producer_electricity |-
-    Electrification data are collected from industry, national surveys and international sources.
-
-    Statistical concept and methodology: Data for access to electricity are collected among different sources: mostly data from nationally representative household surveys (including national censuses) were used. Survey sources include Demographic and Health Surveys (DHS) and Living Standards Measurement Surveys (LSMS), Multi-Indicator Cluster Surveys (MICS), the World Health Survey (WHS), other nationally developed and implemented surveys, and various government agencies (for example, ministries of energy and utilities). Given the low frequency and the regional distribution of some surveys, a number of countries have gaps in available data.
-
-    To develop the historical evolution and starting point of electrification rates, a simple modeling approach was adopted to fill in the missing data points - around 1990, around 2000, and around 2010. Therefore, a country can have a continuum of zero to three data points. There are 42 countries with zero data point and the weighted regional average was used as an estimate for electrification in each of the data periods. 170 countries have between one and three data points and missing data are estimated by using a model with region, country, and time variables. The model keeps the original observation if data is available for any of the time periods. This modeling approach allowed the estimation of electrification rates for 212 countries over these three time periods (Indicated as \"Estimate\"). Notation \"Assumption\" refers to the assumption of universal access in countries classified as developed by the United Nations. Data begins from the year in which the first survey data is available for each country.
+    Access to electricity means having an electricity source that can provide very basic lighting, and charge a phone or power a radio for 4 hours per day.
 tables:
   wdi:
     variables:
@@ -76,7 +90,8 @@ tables:
               gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
           grapher_config:
             title: GDP per capita
-            subtitle: This data is adjusted for inflation and for differences in living costs between countries.
+            subtitle: "{definitions.ppp_adjustment}"
+            note: "{definitions.ppp_prices}"
             variantName: In constant international-$ – World Bank
             originUrl: https://ourworldindata.org/economic-growth
             hasMapTab: true
@@ -111,7 +126,6 @@ tables:
               - Japan
               - China
               - India
-            note: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2021 prices.
 
       ny_gdp_mktp_pp_kd:
         title: GDP, PPP (constant 2021 international $)
@@ -140,9 +154,8 @@ tables:
               gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
           grapher_config:
             title: Gross domestic product (GDP)
-            subtitle: |
-              This data is adjusted for inflation and differences in living costs between countries.
-            note: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2021 prices.
+            subtitle: "{definitions.ppp_adjustment}"
+            note: "{definitions.ppp_prices}"
             hideRelativeToggle: false
             hasMapTab: true
             tab: map
@@ -203,8 +216,8 @@ tables:
               gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
           grapher_config:
             title: Gross national income (GNI) per capita
-            subtitle: Gross national income (GNI) measures the total income earned by residents of a country, including income earned abroad. This data is adjusted for inflation and differences in living costs between countries.
-            note: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2021 prices.
+            subtitle: Gross national income (GNI) measures the total income earned by residents of a country, including income earned abroad. {definitions.ppp_adjustment}
+            note: "{definitions.ppp_prices}"
             variantName: World Bank
             originUrl: https://ourworldindata.org/economic-growth
             map:
@@ -761,7 +774,13 @@ tables:
         unit: '% of population'
         short_unit: '%'
         description_short: *description_short_electricity
-        description_from_producer: *description_from_producer_electricity
+        description_key:
+          - "Access to electricity improves people's living conditions in many ways. [Light at night](https://ourworldindata.org/light-at-night) makes it possible to get together after sunset; mobile phones allow us to stay in touch with those far away; refrigeration reduces food waste; and household appliances free up time from chores."
+          - This data captures whether people have access to the most basic electricity supply — just enough to provide basic lighting and charge a phone or power a radio for 4 hours per day.
+          - It shows that, especially in several African countries, a large share of the population lacks the benefits of basic electricity.
+          - Universal access to electricity by 2030 is one of the United Nations [Sustainable Development Goals](https://ourworldindata.org/sdgs/affordable-clean-energy#sdg-indicator-7-1-1-access-to-electricity).
+          - "This data comes from the World Bank's World Development Indicators. Estimates are based on national household surveys, census data, and reports from energy providers or government agencies. Where data is missing, values are estimated by the source using a model based on trends across countries, regions, and time. Countries classified as “developed” by the United Nations are assumed to have universal access."
+          - "To learn more, read our article: [Definitions: access to electricity](https://ourworldindata.org/definition-electricity-access)."
         presentation:
           title_public: Share of the population with access to electricity
           attribution: Data compiled from multiple sources by World Bank
@@ -770,7 +789,9 @@ tables:
             - Access to Energy
             - Energy
         processing_level: minor
-
+        display:
+          numSignificantFigures: 2
+          tolerance: 5
       sn_itk_defc_zs:
         title: Prevalence of undernourishment (% of population)
         unit: '% of population'
@@ -809,7 +830,6 @@ tables:
         unit: '% of population'
         short_unit: '%'
         description_short: *description_short_electricity
-        description_from_producer: *description_from_producer_electricity
         description_processing: We calculated the share of the population without access to electricity by subtracting the share of the population with access from 100%.
         presentation:
           title_public: Share of the population with no access to electricity
@@ -841,7 +861,6 @@ tables:
         unit: 'people'
         short_unit: ''
         description_short: *description_short_electricity
-        description_from_producer: *description_from_producer_electricity
         description_processing: We calculated the number of people with access to electricity by multiplying the fraction of the population with access by the total population.
         presentation:
           title_public: Number of people with access to electricity
@@ -857,7 +876,6 @@ tables:
         unit: 'people'
         short_unit: ''
         description_short: *description_short_electricity
-        description_from_producer: *description_from_producer_electricity
         description_processing: We calculated the number of people without access to electricity by multiplying the fraction of the population without access by the total population.
         presentation:
           title_public: Number of people without access to electricity
@@ -1004,3 +1022,71 @@ tables:
           numDecimalPlaces: 1
           tolerance: 5
           name: Boys
+
+      ####################################################################################################
+      # Trained Teachers Indicators
+      ####################################################################################################
+
+      se_pre_tcaq_zs:
+        title: Trained teachers in pre-primary education (% of total teachers)
+        unit: '% of teachers'
+        short_unit: '%'
+        description_short: Share of teachers in [pre-primary education](#dod:pre-primary-education) who have received at least the minimum organized pedagogical training required for teaching at that level, shown as a percentage of all teachers.
+        description_key: *desc_key_trained_teachers
+        presentation:
+          title_public: Share of trained teachers in pre-primary education
+          topic_tags:
+            - Global Education
+          grapher_config: *trained_teachers_grapher_config
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name: Pre-primary education
+
+      se_prm_tcaq_zs:
+        title: Trained teachers in primary education (% of total teachers)
+        unit: '% of teachers'
+        short_unit: '%'
+        description_short: Share of teachers in [primary education](#dod:primary-education) who have received at least the minimum organized pedagogical training required for teaching at that level, shown as a percentage of all teachers.
+        description_key: *desc_key_trained_teachers
+        presentation:
+          title_public: Share of trained teachers in primary education
+          topic_tags:
+            - Global Education
+          grapher_config: *trained_teachers_grapher_config
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name: Primary education
+
+      se_sec_tcaq_lo_zs:
+        title: Trained teachers in lower secondary education (% of total teachers)
+        unit: '% of teachers'
+        short_unit: '%'
+        description_short: Share of teachers in [lower secondary education](#dod:lower-secondary-education) who have received at least the minimum organized pedagogical training required for teaching at that level, shown as a percentage of all teachers.
+        description_key: *desc_key_trained_teachers
+        presentation:
+          title_public: Share of trained teachers in lower secondary education
+          topic_tags:
+            - Global Education
+          grapher_config: *trained_teachers_grapher_config
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name: Lower secondary education
+
+      se_sec_tcaq_up_zs:
+        title: Trained teachers in upper secondary education (% of total teachers)
+        unit: '% of teachers'
+        short_unit: '%'
+        description_short: Share of teachers in [upper secondary education](#dod:upper-secondary-education) who have received at least the minimum organized pedagogical training required for teaching at that level, shown as a percentage of all teachers.
+        description_key: *desc_key_trained_teachers
+        presentation:
+          title_public: Share of trained teachers in upper secondary education
+          topic_tags:
+            - Global Education
+          grapher_config: *trained_teachers_grapher_config
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name: Upper secondary education

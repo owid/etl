@@ -1,7 +1,3 @@
----
-status: new
----
-
 !!! warning "This is a work in progress"
 
     This page has been created to collect some practices when working with ETL that can be helpful for all the team to know.

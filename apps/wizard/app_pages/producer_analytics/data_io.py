@@ -10,10 +10,10 @@ import owid.catalog.processing as pr
 import pandas as pd
 import streamlit as st
 
-from apps.utils.google import read_gbq
 from apps.wizard.app_pages.producer_analytics.utils import GRAPHERS_BASE_URL, MIN_DATE, TODAY
 from apps.wizard.utils.components import st_cache_data
 from etl.analytics import get_visualizations_using_data_by_producer
+from etl.google import read_gbq
 
 
 @st.cache_data(show_spinner=False)

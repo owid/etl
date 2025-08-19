@@ -12,6 +12,7 @@ from jsonschema.exceptions import ValidationError
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import Session
 
+from api.semantic_search import get_model_info, search_indicators
 from apps.backport.datasync.datasync import upload_gzip_dict
 from etl import config, paths
 from etl.command import main as etl_main
@@ -22,7 +23,13 @@ from etl.metadata_export import merge_or_create_yaml, reorder_fields
 from etl.paths import SCHEMAS_DIR
 
 from .. import utils
-from .schemas import Indicator, UpdateIndicatorRequest
+from .schemas import (
+    Indicator,
+    SemanticSearchRequest,
+    SemanticSearchResponse,
+    SemanticSearchResult,
+    UpdateIndicatorRequest,
+)
 
 log = structlog.get_logger()
 
@@ -75,6 +82,39 @@ def update_indicator(update_request: UpdateIndicatorRequest, background_tasks: B
         background_tasks.add_task(_trigger_etl, db_indicator, update_request.dryRun)
 
     return {"yaml": yaml_str}
+
+
+@v1.post("/api/v1/search/indicators", response_model=SemanticSearchResponse)
+async def search_indicators_semantic(request: SemanticSearchRequest) -> SemanticSearchResponse:
+    """
+    Search for indicators using semantic similarity.
+
+    This endpoint performs semantic search on OWID indicators using preloaded embeddings
+    and returns the most relevant results.
+    """
+    # Perform semantic search using preloaded model
+    raw_results = search_indicators(request.query, request.limit)
+
+    # Convert results to API schema format
+    results = []
+    for result in raw_results:
+        results.append(
+            SemanticSearchResult(
+                title=result["title"],
+                indicator_id=result["indicator_id"],
+                snippet=result["snippet"],
+                score=result["score"],
+                metadata=result["metadata"],
+            )
+        )
+
+    return SemanticSearchResponse(results=results, query=request.query, total_results=len(results))
+
+
+@v1.get("/api/v1/search/indicators/info")
+async def get_semantic_search_info():
+    """Get information about the semantic search model status."""
+    return get_model_info()
 
 
 def _generate_yaml_string(meta_dict: Dict[str, Any], override_yml_path: Path) -> str:
@@ -160,7 +200,7 @@ def _commit_and_push(file_path: Path, commit_message: str) -> None:
 def _trigger_etl(db_indicator: gm.Variable, dry_run: bool) -> None:
     config.SUBSET = f"^{db_indicator.shortName}$"
     etl_main(
-        steps=[str(db_indicator.catalogPath).rsplit("/", 1)[0]],
+        includes=[str(db_indicator.catalogPath).rsplit("/", 1)[0]],
         grapher=True,
         workers=1,
         dry_run=dry_run,

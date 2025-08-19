@@ -26,7 +26,7 @@ from etl.config import OWID_ENV
 from etl.grapher.io import variable_metadata_df_from_s3
 
 # GPT model default
-MODEL_DEFAULT = "gpt-4.1"
+MODEL_DEFAULT = "gpt-5"
 
 # How to display the various chart review statuses
 DISPLAY_STATE_OPTIONS = {
@@ -637,7 +637,7 @@ class ChartDiffShow:
         # Copy link
         if self.show_link:
             # with col3:
-            query_params = f"chart_id={self.diff.chart_id}"
+            query_params = f"chart_id={self.diff.chart_id}&show_reviewed="
             # st.caption(f"**{OWID_ENV.wizard_url}?{query_params}**")
             if OWID_ENV.wizard_url != OWID_ENV.wizard_url_remote:
                 url = f"{OWID_ENV.wizard_url_remote}/chart-diff?{query_params}"

@@ -6,6 +6,9 @@ applyTo: "**"
 
 This repository contains the ETL (Extract, Transform, Load) system for Our World in Data. It processes, versions, and maintains datasets from various sources.
 
+## Custom instructions
+- NEVER query MCP servers with custom python code, just ask the MCP server directly. If it is not running, let me know.
+
 ## Architecture
 - We use a DAG-based workflow with YAML configuration files in the `dag/` directory
 - Processing happens in channels: Snapshot → Meadow → Garden → Grapher
@@ -19,7 +22,8 @@ This repository contains the ETL (Extract, Transform, Load) system for Our World
 - Document functions and classes with docstrings
 - Add appropriate metadata to datasets according to our metadata schema
 - Write unit tests for new functionality
-- Imports should be always at the top of the file
+- Imports should be placed at the top of the file
+- Let the errors propagate without try-catch block, don't catch them and re-raise with a generic message
 
 ## Process for Creating ETL Steps
 1. Create a snapshot of the raw data

@@ -38,7 +38,7 @@ influenza_config = {
                     "subtitle": "Acute...",
                     "ySlugs": "reported_ari_cases",
                     "tableSlug": "flu_weekly",
-                    "type": "LineChart",
+                    "type": "LineChart DiscreteBar",
                     "Confirmed cases or Symptoms Radio": "Symptoms",
                     "Metric Dropdown": "Acute respiratory infections",
                     "Interval Radio": "Weekly",
@@ -49,7 +49,7 @@ influenza_config = {
                     "subtitle": "Acute...",
                     "ySlugs": "reported_ari_cases",
                     "tableSlug": "flu_monthly",
-                    "type": "LineChart",
+                    "type": "LineChart DiscreteBar",
                     "Confirmed cases or Symptoms Radio": "Symptoms",
                     "Metric Dropdown": "Acute respiratory infections",
                     "Interval Radio": "Monthly",
@@ -173,7 +173,7 @@ views:
     config:
       title: Weekly reported cases of acute respiratory infections
       subtitle: Acute...
-      type: LineChart
+      type: LineChart DiscreteBar
       timelineMinTime: -4043
   - dimensions:
       confirmed_cases_or_symptoms: symptoms
@@ -196,7 +196,7 @@ views:
     config:
       title: Monthly reported cases of acute respiratory infections
       subtitle: Acute...
-      type: LineChart
+      type: LineChart DiscreteBar
       timelineMinTime: -4043
 """.strip()
 
@@ -225,8 +225,8 @@ hasMapTab	true
 pickerColumnSlugs	Country
 graphers
 	yVariableIds	Confirmed cases or Symptoms Radio	Metric Dropdown	Interval Radio	title	subtitle	type	timelineMinTime
-	grapher/who/latest/flu/flu#reported_ari_cases	Symptoms	Acute respiratory infections	Weekly	Weekly reported cases of acute respiratory infections	Acute...	LineChart	-4043
-	grapher/who/latest/flu/flu_monthly#reported_ari_cases	Symptoms	Acute respiratory infections	Monthly	Monthly reported cases of acute respiratory infections	Acute...	LineChart	-4043
+	grapher/who/latest/flu/flu#reported_ari_cases	Symptoms	Acute respiratory infections	Weekly	Weekly reported cases of acute respiratory infections	Acute...	LineChart DiscreteBar	-4043
+	grapher/who/latest/flu/flu_monthly#reported_ari_cases	Symptoms	Acute respiratory infections	Monthly	Monthly reported cases of acute respiratory infections	Acute...	LineChart DiscreteBar	-4043
 
 columns
 	catalogPath	additionalInfo	colorScaleNumericMinValue	colorScaleScheme	dataPublishedBy	name	sourceLink	sourceName	tolerance	type	unit
@@ -249,8 +249,8 @@ hasMapTab	true
 pickerColumnSlugs	Country
 graphers
 	yVariableIds	Metric Dropdown	Interval Radio	title	subtitle	type	timelineMinTime
-	grapher/who/latest/flu/flu#reported_ari_cases	Acute respiratory infections	Weekly	Weekly reported cases of acute respiratory infections	Acute...	LineChart	-4043
-	grapher/who/latest/flu/flu_monthly#reported_ari_cases	Acute respiratory infections	Monthly	Monthly reported cases of acute respiratory infections	Acute...	LineChart	-4043
+	grapher/who/latest/flu/flu#reported_ari_cases	Acute respiratory infections	Weekly	Weekly reported cases of acute respiratory infections	Acute...	LineChart DiscreteBar	-4043
+	grapher/who/latest/flu/flu_monthly#reported_ari_cases	Acute respiratory infections	Monthly	Monthly reported cases of acute respiratory infections	Acute...	LineChart DiscreteBar	-4043
 
 columns
 	catalogPath	additionalInfo	colorScaleNumericMinValue	colorScaleScheme	dataPublishedBy	name	sourceLink	sourceName	tolerance	type	unit

@@ -1,5 +1,4 @@
-#
-
+# WARNING: Do NOT use this file to manually curate WDI indicators (since this file is generated automatically). Use the wdi.meta.override.yml file instead.
 dataset:
   update_period_days: 365
 tables:

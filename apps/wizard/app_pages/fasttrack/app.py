@@ -181,7 +181,7 @@ else:
         submitted = st.button(
             "Submit",
             type="primary",
-            use_container_width=True,
+            width="stretch",
             on_click=lambda: set_states(
                 {
                     "to_be_submitted": True,
@@ -289,7 +289,7 @@ else:
                 proceed_1 = st.form_submit_button(
                     "Proceed",
                     type="primary",
-                    use_container_width=True,
+                    width="stretch",
                     on_click=lambda: set_states(
                         {
                             "to_be_submitted_confirmed_1": True,
@@ -349,7 +349,7 @@ else:
                 step = f"{fast_import.dataset.metadata.uri}"
                 etl_main(
                     dag_path=DAG_FASTTRACK_PATH,
-                    steps=[step],
+                    includes=[step],
                     grapher=True,
                     private=not fast_import.dataset.metadata.is_public,
                     workers=1,

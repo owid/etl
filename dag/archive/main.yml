@@ -517,6 +517,13 @@ steps:
   data://grapher/pew/2024-06-03/same_sex_marriage:
     - data://garden/pew/2024-06-03/same_sex_marriage
 
+  # Long-run child mortality, Gapminder + UN IGME - to archive
+  data://garden/un/2024-09-16/long_run_child_mortality:
+    - data://garden/un/2024-09-11/igme
+    - data://garden/gapminder/2023-09-18/under_five_mortality
+    - data://garden/gapminder/2023-09-21/under_five_mortality
+  data://grapher/un/2024-09-16/long_run_child_mortality:
+    - data://garden/un/2024-09-16/long_run_child_mortality
       # Integrated Values Survey
   data://meadow/ivs/2023-11-27/integrated_values_survey:
     - snapshot://ivs/2023-11-27/integrated_values_survey.csv
@@ -524,6 +531,85 @@ steps:
     - data://meadow/ivs/2023-11-27/integrated_values_survey
   data://grapher/ivs/2023-11-27/integrated_values_survey:
     - data://garden/ivs/2023-11-27/integrated_values_survey
+
+      # WB income groups 2023-04-30
+  data://meadow/wb/2023-04-30/income_groups:
+    - snapshot://wb/2023-04-30/income_groups.xlsx
+  data://garden/wb/2023-04-30/income_groups:
+    - data://meadow/wb/2023-04-30/income_groups
+  data://grapher/wb/2023-04-30/income_groups:
+    - data://garden/wb/2023-04-30/income_groups
+
+  # WB income groups 2024-03-11
+  data://meadow/wb/2024-03-11/income_groups:
+    - snapshot://wb/2024-03-11/income_groups.xlsx
+  data://garden/wb/2024-03-11/income_groups:
+    - data://meadow/wb/2024-03-11/income_groups
+  data://grapher/wb/2024-03-11/income_groups:
+    - data://garden/wb/2024-03-11/income_groups
+
+  # WB income groups 2024-07-29
+  data://meadow/wb/2024-07-29/income_groups:
+    - snapshot://wb/2024-07-29/income_groups.xlsx
+  data://garden/wb/2024-07-29/income_groups:
+    - data://meadow/wb/2024-07-29/income_groups
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2024-07-15/population
+  data://grapher/wb/2024-07-29/income_groups:
+    - data://garden/wb/2024-07-29/income_groups
+  # ILOstat Average Work Hours
+  data://meadow/ilostat/2023-09-19/average_work_hours:
+    - snapshot://ilostat/2023-09-19/average_work_hours.csv
+  data://garden/ilostat/2023-09-19/average_work_hours:
+    - data://meadow/ilostat/2023-09-19/average_work_hours
+  data://grapher/ilostat/2023-09-19/average_work_hours:
+    - data://garden/ilostat/2023-09-19/average_work_hours
+
+      # Ethnic Power Relations Dataset
+  data://meadow/eth/2023-03-15/growup:
+    - snapshot://eth/2023-03-15/growup.csv
+  data://garden/eth/2023-03-15/ethnic_power_relations:
+    - data://meadow/eth/2023-03-15/growup
+    - data://garden/demography/2023-03-31/population
+    - data://garden/wb/2021-07-01/wb_income
+    - data://garden/regions/2023-01-01/regions
+  data://grapher/eth/2023-03-15/ethnic_power_relations:
+    - data://garden/eth/2023-03-15/ethnic_power_relations
+
+      # World Bank's Women, Business and the Law additional data
+  data://meadow/wb/2023-05-12/women_business_law_additional:
+    - snapshot://wb/2023-05-12/women_business_law_additional.xlsx
+  data://garden/wb/2023-05-12/women_business_law_additional:
+    - data://meadow/wb/2023-05-12/women_business_law_additional
+  data://grapher/wb/2023-05-12/women_business_law_additional:
+    - data://garden/wb/2023-05-12/women_business_law_additional
+
+      # Penn World Table
+  data://meadow/ggdc/2022-11-28/penn_world_table:
+    - snapshot://ggdc/2021-06-18/penn_world_table.xlsx
+  data://meadow/ggdc/2022-11-28/penn_world_table_national_accounts:
+    - snapshot://ggdc/2021-06-18/penn_world_table_national_accounts.xlsx
+    - data://garden/regions/2023-01-01/regions
+  data://garden/ggdc/2022-11-28/penn_world_table:
+    - data://meadow/ggdc/2022-11-28/penn_world_table
+    - data://meadow/ggdc/2022-11-28/penn_world_table_national_accounts
+  data://grapher/ggdc/2022-11-28/penn_world_table:
+    - data://garden/ggdc/2022-11-28/penn_world_table
+
+  data://garden/ggdc/2020-10-01/ggdc_maddison:
+    - snapshot://ggdc/2020-10-01/ggdc_maddison.xlsx
+  data://grapher/ggdc/2020-10-01/ggdc_maddison:
+    - data://garden/ggdc/2020-10-01/ggdc_maddison
+      # United Nations members
+  data://meadow/un/2023-10-30/un_members:
+    - snapshot://un/2023-10-30/un_members.csv
+  data://garden/un/2023-10-30/un_members:
+    - data://meadow/un/2023-10-30/un_members
+    - data://garden/wb/2021-07-01/wb_income
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2023-03-31/population
+  data://grapher/un/2023-10-30/un_members:
+    - data://garden/un/2023-10-30/un_members
 
 include:
   # Include all active steps plus all archive steps.
@@ -551,3 +637,4 @@ include:
   - dag/archive/migration.yml
   - dag/archive/redistribution.yml
   - dag/archive/wizard.yml
+  - dag/archive/growth.yml

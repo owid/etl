@@ -158,16 +158,13 @@ tables:
         description_short: |-
           Share of respondents who reported having contact with a public official in the past 12 months and paying or being asked to pay a [bribe](#dod:bribery).
         description_key:
-          - This measure tracks how common bribery is when citizens interact with public officials.
-          - It shows the proportion of people who interacted with a public official in the past year and reported either paying a bribe or being asked to pay one.
-          - Bribes include extra payments, gifts, or favors given in exchange for special treatment from government workers.
-          - The focus is on everyday administrative bribery—the type most citizens face in routine interactions with public officials.
-          - Public officials can hold a legislative, executive, administrative or judicial office, such as customs or police officers, judges, teachers or doctors.
-          - It does not cover high-level political corruption, influence trading, or abuse of power.
-          - Data is collected through national surveys. Respondents report only their own direct experiences, though cases involving middlemen are included. Indirect accounts from other household members are not.
-          - Some country estimates — such as those for Peru and Panama — differ from other sources like the [Global Corruption Barometer](https://www.transparency.org/en/gcb), potentially reflecting differences in methodology or reporting patterns.
-          - Bribery usually leaves no trace in financial records or documentation. Surveys offer a practical approach for measuring these events.
-          - Many surveys have historically excluded people who were asked for a bribe but refused to pay. This leads to underestimates and could be one reason for lower reported shares in earlier years. More countries are now using standardized methods to address this.
+        - This indicator measures how common bribery is in people’s everyday interactions with public officials. It shows the share of individuals who, in the past year, either paid a bribe or were asked to pay one during contact with a public official.
+        - Bribes can take the form of money, gifts, or favors given in exchange for special treatment. The focus is on petty or administrative bribery — the kind people may face when accessing basic services, such as dealing with the police, schools, or healthcare.
+        - “Public officials” refers to anyone holding a legislative, executive, administrative, or judicial role — including police officers, customs agents, judges, teachers, and doctors. The data does not cover high-level political corruption, trading of influence, or abuse of office.
+        - Data comes primarily from national surveys, where respondents report their own direct experiences. Reports involving intermediaries (e.g. a bribe paid through someone else) are included, but second-hand accounts from other household members are excluded.
+        - When national data is unavailable or insufficient, estimates may draw on [Global Corruption Barometer (GCB)](https://www.transparency.org/en/gcb) data, provided it aligns closely with UNODC definitions. These estimates are reviewed and validated by national authorities, usually through national statistics offices.
+        - In some cases — such as Peru and Panama — UNODC estimates differ significantly from the GCB's figures. These differences may arise from variations in survey scope (e.g. UNODC's surveys inquire about any contact with public officials, while GCB asks about contact concerning a few core services), sample size, how people without recent contact with officials are handled, or how surveys are conducted (e.g. phone vs. in-person).
+        - Earlier surveys often excluded people who were asked for a bribe but refused to pay. This likely led to underestimates of the prevalence of bribery. The UNODC aims to correct this by applying standardised methods across countries.
         description_from_producer: |-
           This indicator is defined as the percentage of persons who paid at least one bribe (gave a public official money, a gift or counter favour) to a public official, or were asked for a bribe by these public officials, in the last 12 months, as a percentage of persons who had at least one contact with a public official in the same period.
 

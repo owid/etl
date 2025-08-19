@@ -18,14 +18,14 @@ dimensions:
         group: How deadly are conflicts?
       - slug: "death_rate"
         name: "Death rate"
-        description: The number of deaths divided by the total population
+        description: Number of deaths divided by the total population
         group: How deadly are conflicts?
       - slug: "wars_ongoing"
         name: "Number of conflicts"
         group: How common are conflicts?
       - slug: "wars_ongoing_country_rate"
         name: "Conflict rate"
-        description: The number of conflicts divided by the number of countries
+        description: Number of conflicts divided by the number of countries
         group: How common are conflicts?
   - slug: conflict_type
     name: "Conflict type"
@@ -34,8 +34,8 @@ dimensions:
         name: "All involving states"
         # description: All conflicts involving states
       - slug: "state_based_stacked"
-        name: "All involving states (by type)"
-        description: Breakdown by conflict type
+        name: "All, broken down by type"
+        description: Breakdown between interstate, foreign-backed civil, domestic civil, and colonial conflicts
       - slug: "interstate"
         name: "Interstate conflicts"
         description: Between states

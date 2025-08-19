@@ -4,6 +4,7 @@ from http.client import RemoteDisconnected
 from typing import Dict, List
 from urllib.error import URLError
 
+import click
 import pandas as pd
 import streamlit as st
 from structlog import get_logger
@@ -82,7 +83,7 @@ def get_affected_charts_and_preview(indicator_mapping: Dict[int, int]) -> List[g
             # Button to finally submit the revisions
             st.button(
                 label="🚀 Update charts (3/3)",
-                use_container_width=True,
+                width="stretch",
                 type="primary",
                 on_click=trigger_chart_submission,
             )
@@ -190,3 +191,121 @@ def undo_upgrade_dialog():
         )
     else:
         st.markdown("No indicator mapping found. Nothing to undo.")
+
+
+# CLI FUNCTIONS
+def get_affected_charts_cli(indicator_mapping: Dict[int, int]) -> List[gm.Chart]:
+    """Get affected charts for CLI (without Streamlit dependencies)."""
+    log.info("Finding affected charts...")
+    charts = find_charts_from_variable_ids(set(indicator_mapping.keys()))
+    log.info(f"Found {len(charts)} affected charts")
+    return charts
+
+
+def push_new_charts_cli(charts: List[gm.Chart], indicator_mapping: Dict[int, int], dry_run: bool = False) -> None:
+    """Update charts in the database (CLI version)."""
+    if not charts:
+        log.warning("No charts to update")
+        return
+
+    if dry_run:
+        log.info(f"DRY RUN: Would update {len(charts)} charts with indicator mapping: {indicator_mapping}")
+        for chart in charts:
+            chart_url = OWID_ENV.chart_site(chart.slug) if chart.slug else f"Chart {chart.id}"
+            log.info(f"DRY RUN: Would update chart {chart.id} - {chart_url}")
+        return
+
+    log.info(f"Updating {len(charts)} charts...")
+
+    # Get grapher user
+    from apps.wizard.utils.cached import get_grapher_user
+
+    grapher_user_id = get_grapher_user().id
+
+    # API to interact with the admin tool
+    api = AdminAPI(OWID_ENV, grapher_user_id=grapher_user_id)
+
+    # Update charts
+    for i, chart in enumerate(charts):
+        log.info(f"Updating chart {chart.id} ({i+1}/{len(charts)})")
+
+        # Update chart config
+        config_new = update_chart_config(
+            chart.config,
+            indicator_mapping,
+            get_schema_from_url(chart.config["$schema"]),
+        )
+
+        # Push new chart to DB
+        if chart.id:
+            chart_id = chart.id
+        elif "id" in chart.config:
+            chart_id = chart.config["id"]
+        else:
+            raise ValueError(f"Chart {chart} does not have an ID in config.")
+
+        api.update_chart(chart_id=chart_id, chart_config=config_new)
+        log.info(f"Successfully updated chart {chart_id}")
+
+    log.info(f"Successfully updated {len(charts)} charts")
+
+
+def save_variable_mapping_cli(
+    indicator_mapping: Dict[int, int], dataset_id_new: int, dataset_id_old: int, comments: str = ""
+) -> None:
+    """Save variable mapping to database (CLI version)."""
+    WizardDB.add_variable_mapping(
+        mapping=indicator_mapping,
+        dataset_id_new=dataset_id_new,
+        dataset_id_old=dataset_id_old,
+        comments=comments,
+    )
+    log.info(f"Saved variable mapping to database: {len(indicator_mapping)} mappings")
+
+
+def cli_upgrade_indicators(dry_run: bool = False) -> None:
+    """Main CLI function to upgrade indicators using existing variable mapping in DB."""
+    log.info("Starting indicator upgrade from existing variable mapping in database")
+
+    # 1. Load variable mapping from database
+    indicator_mapping = WizardDB.get_variable_mapping()
+
+    if not indicator_mapping:
+        log.error("No variable mappings found in database. Cannot proceed.")
+        log.error("Use the Streamlit UI to create a variable mapping first, or manually add one to the database.")
+        return
+
+    log.info(f"Found {len(indicator_mapping)} variable mappings:")
+    log.info(f"{pd.DataFrame(list(indicator_mapping.items()), columns=['old_id', 'new_id'])}")
+
+    # 2. Get affected charts
+    charts = get_affected_charts_cli(indicator_mapping)
+
+    if not charts:
+        log.warning("No charts affected by this mapping")
+        return
+
+    # 3. Show affected charts
+    log.info("Affected charts:")
+    for chart in charts:
+        chart_url = OWID_ENV.chart_site(chart.slug) if chart.slug else f"Chart {chart.id}"
+        log.info(f"  - Chart {chart.id}: {chart_url}")
+
+    # 4. Update charts
+    push_new_charts_cli(charts, indicator_mapping, dry_run=dry_run)
+
+    if not dry_run:
+        log.info("Indicator upgrade completed successfully!")
+    else:
+        log.info("DRY RUN completed - no changes made")
+
+
+@click.command()
+@click.option("--dry-run", is_flag=True, help="Preview changes without applying them")
+def main(dry_run: bool):
+    """CLI tool for upgrading chart indicators using existing variable mapping in database."""
+    cli_upgrade_indicators(dry_run=dry_run)
+
+
+if __name__ == "__main__":
+    main()

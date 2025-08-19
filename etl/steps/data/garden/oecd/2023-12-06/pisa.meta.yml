@@ -1,11 +1,216 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
   common:
+    processing_level: minor
+    description_key:
+      - The Programme for International Student Assessment (PISA) is an international survey that assesses the skills and knowledge of 15-year-old students. It provides a snapshot of how well education systems around the world are preparing young people for adult life.
+      - PISA is run every three years and tests students in reading, mathematics, and science. It doesn't just assess what students know — it focuses on how well they can use this knowledge to solve problems they might encounter in the real world. For example, can they interpret a bus timetable, reason through a scientific scenario, or compare prices to make a budget?
+      - Each student sits a two-hour computer-based test. Results are summarised as average scores for each country, and are designed to be comparable over time.
+      - "The scores are standardized to make comparisons easier: across OECD countries, the average score was set to 500 in the first year each subject was assessed (reading in 2000, mathematics in 2003, science in 2006). Most countries score somewhere between 300 and 600, although scores outside this range are possible."
+      - Higher scores indicate better performance — but comparing countries should be done carefully. Many factors affect student performance, including income, teacher quality, classroom time, and parental education. Cultural differences can also play a role in how students approach the test.
+      - PISA gives policymakers, researchers, and educators a way to evaluate their education systems and learn from others. But as with all such comparisons, it's important to consider the wider context behind the numbers.
     presentation:
       topic_tags:
         - Global Education
+      grapher_config:
+        hasMapTab: true
+        maxTime: 2022
+        map:
+          time: 2022
+          timeTolerance: 3
+
+
+  # ============================================================================
+  # COMMON CONFIGURATION TEMPLATES
+  # ============================================================================
+
+  # Base grapher configuration templates
+  common_grapher_config: &common_grapher_config
+    maxTime: 2022
+    hasMapTab: true
+
+  common_grapher_map_config: &common_grapher_map_config
+    time: 2022
+    timeTolerance: 3
+
+  # ============================================================================
+  # VALUE RANGES (BINS) FOR PISA SCORES
+  # ============================================================================
+
+  pisa_score_bins: &pisa_score_bins [300,340,380,420,460,500,540]
+
+  # ============================================================================
+  # PISA SCORE CONFIGURATIONS
+  # ============================================================================
+
+  grapher_config_pisa_math: &grapher_config_pisa_math
+    <<: *common_grapher_config
+    map:
+      <<: *common_grapher_map_config
+      colorScale:
+        binningStrategy: manual
+        customNumericValues: *pisa_score_bins
+        baseColorScheme: Blues
+
+  grapher_config_pisa_science: &grapher_config_pisa_science
+    <<: *common_grapher_config
+    map:
+      <<: *common_grapher_map_config
+      colorScale:
+        binningStrategy: manual
+        customNumericValues: *pisa_score_bins
+        baseColorScheme: Greens
+
+  grapher_config_pisa_reading: &grapher_config_pisa_reading
+    <<: *common_grapher_config
+    map:
+      <<: *common_grapher_map_config
+      colorScale:
+        binningStrategy: manual
+        customNumericValues: *pisa_score_bins
+        baseColorScheme: Oranges
+
+  grapher_config_pisa_boys: &grapher_config_pisa_boys
+    <<: *common_grapher_config
+    map:
+      <<: *common_grapher_map_config
+      colorScale:
+        binningStrategy: manual
+        customNumericValues: *pisa_score_bins
+        baseColorScheme: Blues
+
+  grapher_config_pisa_girls: &grapher_config_pisa_girls
+    <<: *common_grapher_config
+    map:
+      <<: *common_grapher_map_config
+      colorScale:
+        binningStrategy: manual
+        customNumericValues: *pisa_score_bins
+        baseColorScheme: Purples
+
+
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
 dataset:
   update_period_days: 365
+
+tables:
+  pisa_math_boys_girls:
+    variables:
+      pisa_math_average_boys:
+        title: Average performance of 15-year-old boys in mathematics
+        unit: score
+        short_unit: ""
+        description_short: Assessed through the PISA mathematics scale, which measures how well someone can use math to solve everyday problems and understand the role of math in the real world.
+        display:
+          tolerance: 3
+          name: Mathematics
+          numDecimalPlaces: 0
+        presentation:
+          grapher_config: *grapher_config_pisa_boys
+          title_public: PISA mathematics scores for boys
+
+      pisa_math_average_girls:
+        title: Average performance of 15-year-old girls in mathematics
+        unit: score
+        short_unit: ""
+        description_short: Assessed through the PISA mathematics scale, which measures how well someone can use math to solve everyday problems and understand the role of math in the real world.
+        display:
+          tolerance: 3
+          name: Mathematics
+          numDecimalPlaces: 0
+        presentation:
+          grapher_config: *grapher_config_pisa_girls
+          title_public: PISA mathematics scores for girls
+
+      pisa_science_average_boys:
+        title: Average performance of 15-year-old boys in science
+        unit: score
+        short_unit: ""
+        description_short: Assessed through the PISA science scale, which assesses how comfortable and knowledgeable someone is with science topics, focusing on their ability to discuss and think about scientific issues in everyday life.
+        display:
+          tolerance: 3
+          name: Science
+          numDecimalPlaces: 0
+        presentation:
+          grapher_config: *grapher_config_pisa_boys
+          title_public: PISA science scores for boys
+
+      pisa_science_average_girls:
+        title: Average performance of 15-year-old girls in science
+        unit: score
+        short_unit: ""
+        description_short: Assessed through the PISA science scale, which assesses how comfortable and knowledgeable someone is with science topics, focusing on their ability to discuss and think about scientific issues in everyday life.
+        display:
+          tolerance: 3
+          name: Science
+          numDecimalPlaces: 0
+        presentation:
+          grapher_config: *grapher_config_pisa_girls
+          title_public: PISA science scores for girls
+
+      pisa_reading_average_boys:
+        title: Average performance of 15-year-old boys in reading
+        unit: score
+        short_unit: ""
+        description_short: Assessed through the PISA reading scale, which measures how well someone can understand and use written information to learn new things and be a part of society.
+        display:
+          tolerance: 3
+          name: Reading
+          numDecimalPlaces: 0
+        presentation:
+          grapher_config: *grapher_config_pisa_boys
+          title_public: PISA reading scores for boys
+
+      pisa_reading_average_girls:
+        title: Average performance of 15-year-old girls in reading
+        unit: score
+        short_unit: ""
+        description_short: Assessed through the PISA reading scale, which measures how well someone can understand and use written information to learn new things and be a part of society.
+        display:
+          tolerance: 3
+          name: Reading
+          numDecimalPlaces: 0
+        presentation:
+          grapher_config: *grapher_config_pisa_girls
+          title_public: PISA reading scores for girls
+
+      pisa_math_all_average:
+        title: Average performance of 15-year-old students in mathematics
+        unit: score
+        short_unit: ""
+        description_short: Assessed through the PISA mathematics scale, which measures how well someone can use math to solve everyday problems and understand the role of math in the real world.
+        display:
+          tolerance: 3
+          name: Mathematics
+          numDecimalPlaces: 0
+        presentation:
+          grapher_config: *grapher_config_pisa_math
+          title_public: PISA mathematics scores for all students
+
+      pisa_science_all_average:
+        title: Average performance of 15-year-old students in science
+        unit: score
+        short_unit: ""
+        description_short: Assessed through the PISA science scale, which assesses how comfortable and knowledgeable someone is with science topics, focusing on their ability to discuss and think about scientific issues in everyday life.
+        display:
+          tolerance: 3
+          name: Science
+          numDecimalPlaces: 0
+        presentation:
+          grapher_config: *grapher_config_pisa_science
+          title_public: PISA science scores for all students
+
+      pisa_reading_all_average:
+        title: Average performance of 15-year-old students in reading
+        unit: score
+        short_unit: ""
+        description_short: Assessed through the PISA reading scale, which measures how well someone can understand and use written information to learn new things and be a part of society.
+        display:
+          tolerance: 3
+          name: Reading
+          numDecimalPlaces: 0
+        presentation:
+          grapher_config: *grapher_config_pisa_reading
+          title_public: PISA reading scores for all students
