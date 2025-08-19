@@ -1,7 +1,13 @@
-"""Script to create a snapshot of dataset. Loads data from the EFFIS API and creates a snapshot of the dataset with weekly wildire numbers, area burnt and emissions.
-This script generates data from 2003-2023. The data for the year 2024 and above will be processed separately to avoid long processing times."""
+"""
+Script to create a snapshot of dataset.
+Loads data from the EFFIS API and creates a snapshot of the dataset with weekly wildfire numbers, area burnt and emissions.
+This script generates data for the years 2024 and above. Historical data (2003–2023) is processed separately.
+"""
 
 import datetime as dt
+import json
+import subprocess
+import time
 from datetime import datetime
 from pathlib import Path
 
@@ -51,6 +57,87 @@ COUNTRIES = {
 }
 
 
+def fetch_with_curl(url: str) -> dict:
+    """Fallback method using curl with retry logic."""
+    try:
+        result = subprocess.run(
+            [
+                "curl",
+                "--fail",
+                "--retry",
+                "5",
+                "--retry-all-errors",
+                "--retry-delay",
+                "2",
+                "--silent",
+                "--show-error",
+                url,
+            ],
+            capture_output=True,
+            text=True,
+            timeout=120,
+        )
+
+        if result.returncode != 0:
+            raise Exception(f"curl failed with code {result.returncode}: {result.stderr}")
+
+        return json.loads(result.stdout)
+    except subprocess.TimeoutExpired:
+        raise Exception("curl request timed out after 120 seconds")
+    except json.JSONDecodeError as e:
+        raise Exception(f"Failed to parse JSON from curl response: {e}")
+
+
+def fetch_with_retry(url: str, max_retries: int = 3, timeout: int = 30) -> dict:
+    """Fetch data from API with retry logic and comprehensive error handling."""
+    headers = {"User-Agent": "Mozilla/5.0"}
+
+    # First try with requests
+    for attempt in range(max_retries):
+        try:
+            response = requests.get(url, headers=headers, timeout=timeout)
+            response.raise_for_status()
+            data = response.json()
+            return data
+        except requests.exceptions.Timeout:
+            log.warning(f"Timeout for {url}, attempt {attempt + 1}/{max_retries}")
+        except requests.exceptions.ConnectionError:
+            log.warning(f"Connection error for {url}, attempt {attempt + 1}/{max_retries}")
+        except requests.exceptions.HTTPError as e:
+            if response.status_code in [500, 502, 503, 504]:
+                log.warning(f"Server error {response.status_code} for {url}, attempt {attempt + 1}/{max_retries}")
+            elif response.status_code in [403, 429]:
+                log.warning(
+                    f"Rate limit/forbidden {response.status_code} for {url}, attempt {attempt + 1}/{max_retries}"
+                )
+            elif response.status_code == 404:
+                log.info(f"No data available (404) for {url}")
+                return {}  # Return empty dict to signal no data available
+            else:
+                log.error(f"HTTP error {response.status_code} for {url}: {e}")
+                raise
+        except requests.exceptions.JSONDecodeError:
+            log.warning(f"JSON decode error for {url}, attempt {attempt + 1}/{max_retries}")
+        except Exception as e:
+            log.error(f"Unexpected error for {url}: {e}")
+            raise
+
+        if attempt < max_retries - 1:
+            delay = max(2 ** (attempt + 1), 4)  # Start at 4s, then 8s, 16s...
+            delay = min(delay, 12)  # Cap at 12 seconds
+            log.info(f"Waiting {delay}s before retry...")
+            time.sleep(delay)
+
+    # If requests failed, try with curl as fallback
+    log.info(f"Requests failed for {url}, trying curl fallback...")
+    try:
+        return fetch_with_curl(url)
+    except Exception as e:
+        log.error(f"Both requests and curl failed for {url}: {e}")
+        # Exit script if we can't fetch data after all retries and fallback
+        exit(1)
+
+
 @click.command()
 @click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
 def main(upload: bool) -> None:
@@ -67,18 +154,18 @@ def main(upload: bool) -> None:
     dfs_fires = []
     for YEAR in YEARS:
         # Iterate through each country in the COUNTRIES dictionary.
-        for country, country_name in tqdm(
+        for country, _ in tqdm(
             COUNTRIES.items(), desc=f"Processing number of fires and area burnt data for countries {YEAR}"
         ):
             # Format the API request URL for weekly wildfire data with current country and year.
             base_url = "https://api2.effis.emergency.copernicus.eu/statistics/v2/gwis/weekly?country={country_code}&year={year}"
-
             url = base_url.format(country_code=country, year=YEAR)
 
-            # timeout after 30s, they have occasional outages
-            response = requests.get(url, timeout=30)
-            if response.status_code == 200:
-                data = response.json()
+            try:
+                data = fetch_with_retry(url)
+                if not data:  # Empty dict returned for 404s
+                    log.info(f"No fires data available for {country} {YEAR}")
+                    continue
 
                 # Extract the weekly wildfire data.
                 banfweekly = data["banfweekly"]
@@ -126,25 +213,33 @@ def main(upload: bool) -> None:
 
                 # Append the processed DataFrame to the list of fire DataFrames.
                 dfs_fires.append(df_all)
+            except Exception as e:
+                log.error(f"Failed to process fires data for {country} {YEAR}: {e}")
+                continue
+
+            # Short delay between requests to avoid rate limiting
+            time.sleep(0.5)
 
     # Combine all individual fire DataFrames into one.
+    if not dfs_fires:
+        raise ValueError("No fires data was successfully fetched from any country/year combination")
     dfs_fires = pd.concat(dfs_fires)
+    log.info(f"Successfully fetched fires data for {len(dfs_fires)} records")
 
     # Similar process as above is repeated for emissions data, stored in `dfs_emissions`.
     dfs_emissions = []
     for YEAR in YEARS:
         # Iterate through each country for emission data.
-        for country, country_name in tqdm(
-            COUNTRIES.items(), desc=f"Processing emissions data for countries for year {YEAR}"
-        ):
+        for country, _ in tqdm(COUNTRIES.items(), desc=f"Processing emissions data for countries for year {YEAR}"):
             # Format the API request URL for weekly emissions data.
             base_url = "https://api2.effis.emergency.copernicus.eu/statistics/v2/emissions/weekly?country={country_code}&year={year}"
-
             url = base_url.format(country_code=country, year=YEAR)
-            response = requests.get(url)
-            if response.status_code == 200:
-                # Parse the emissions data from the JSON response.
-                data = response.json()
+
+            try:
+                data = fetch_with_retry(url)
+                if not data:  # Empty dict returned for 404s
+                    log.info(f"No emissions data available for {country} {YEAR}")
+                    continue
 
                 # Extract and process the weekly emissions data.
                 emiss_weekly = data["emissionsweekly"]
@@ -171,9 +266,15 @@ def main(upload: bool) -> None:
                 df_all = pd.concat([df, df_cum])
                 # Append to the list of emissions DataFrames.
                 dfs_emissions.append(df_all)
+            except Exception as e:
+                log.error(f"Failed to process emissions data for {country} {YEAR}: {e}")
+                continue
 
     # Combine all emissions DataFrames into one.
+    if not dfs_emissions:
+        raise ValueError("No emissions data was successfully fetched from any country/year combination")
     dfs_emissions = pd.concat(dfs_emissions)
+    log.info(f"Successfully fetched emissions data for {len(dfs_emissions)} records")
 
     # Combine both fires and emissions data into a final DataFrame.
     df_final = pd.concat([dfs_fires, dfs_emissions])
