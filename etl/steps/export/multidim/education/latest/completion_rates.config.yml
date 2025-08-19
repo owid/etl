@@ -1,6 +1,8 @@
 title:
   title: School completion rates
   title_variant: by level of education and gender
+topic_tags:
+  - Global Education
 default_selection:
   - Niger
   - Turkey
@@ -34,7 +36,7 @@ dimensions:
       - slug: boys
         name: Boys
       - slug: "sex_side_by_side"
-        name: Girls and boys
+        name: Girls vs. boys
         description: Compare genders
 
 views: []

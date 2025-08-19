@@ -1,6 +1,8 @@
 title:
   title: Share of teachers who are women
   title_variant: by level of education
+topic_tags:
+  - Global Education
 default_selection:
   - Egypt
   - Niger

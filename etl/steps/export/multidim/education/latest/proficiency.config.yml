@@ -1,6 +1,8 @@
 title:
   title: Learning outcomes in reading and mathematics
   title_variant: by education level, subject, and gender
+topic_tags:
+  - Global Education
 default_selection:
   - United States
   - Germany
@@ -55,7 +57,7 @@ dimensions:
       - slug: male
         name: Boys
       - slug: sex_side_by_side
-        name: Boys and girls
+        name: Girls vs. boys
         description: Compare proficiency between boys and girls
 
 

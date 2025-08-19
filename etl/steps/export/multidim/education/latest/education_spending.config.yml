@@ -1,6 +1,8 @@
 title:
   title: Government spending on education
   title_variant: by spending type and level of education
+topic_tags:
+  - Global Education
 default_selection:
   - United States
   - Brazil

@@ -1,6 +1,8 @@
 title:
   title: Average academic performance of 15-year-olds
   title_variant: by subject and gender
+topic_tags:
+  - Global Education
 default_selection:
   - Finland
   - Singapore
@@ -37,6 +39,6 @@ dimensions:
         name: Boys
         description: Academic performance among boys
       - slug: sex_side_by_side
-        name: Girls and boys
+        name: Girls vs. boys
         description: Compare performance between boys and girls
 views: []

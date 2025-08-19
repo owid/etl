@@ -1,8 +1,14 @@
 title:
   title: Years of schooling
   title_variant: by level of education and gender
+topic_tags:
+  - Global Education
 default_selection:
   - Germany
+  - United States
+  - Iran
+  - Turkey
+
 dimensions:
   - slug: metric_type
     name: Metric
@@ -44,11 +50,11 @@ dimensions:
       - slug: both
         name: Both genders
       - slug: girls
-        name: Girls/women
+        name: Girls
       - slug: boys
-        name: Boys/men
+        name: Boys
       - slug: "sex_side_by_side"
-        name: Girls and boys
+        name: Girls vs. boys
         description: Compare genders
 
 views: []

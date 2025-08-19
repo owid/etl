@@ -1,6 +1,8 @@
 title:
   title: Children out of school
   title_variant: by level of education and gender
+topic_tags:
+  - Global Education
 default_selection:
   - Egypt
   - Niger
@@ -47,7 +49,7 @@ dimensions:
       - slug: female
         name: Girls
       - slug: sex_side_by_side
-        name: Girls and Boys
+        name: Girls vs. boys
         description: Compare school participation across different education levels
 
 views: []
