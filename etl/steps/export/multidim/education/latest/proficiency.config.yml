@@ -58,7 +58,7 @@ dimensions:
         name: Boys
       - slug: sex_side_by_side
         name: Girls vs. boys
-        description: Compare proficiency between boys and girls
+        description: Compare learning outcomes between boys and girls
 
 
 views: []

@@ -48,6 +48,6 @@ dimensions:
         description: Formal post-secondary learning, ranging from short vocational programs to university degrees
       - slug: level_side_by_side
         name: All levels
-        description: Compare spending at different education levels
+        description: Compare spending across different education levels
 
 views: []

@@ -37,6 +37,6 @@ dimensions:
         name: Men
       - slug: sex_side_by_side
         name: Men vs. women
-        description: Compare literacy rates between genders
+        description: Compare literacy rates between men and women
 
 views: []

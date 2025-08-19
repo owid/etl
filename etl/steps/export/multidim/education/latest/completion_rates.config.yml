@@ -37,6 +37,6 @@ dimensions:
         name: Boys
       - slug: "sex_side_by_side"
         name: Girls vs. boys
-        description: Compare genders
+        description: Compare completion rates between girls and boys
 
 views: []

@@ -31,14 +31,11 @@ dimensions:
     choices:
       - slug: both
         name: Both genders
-        description: Academic performance for all students regardless of gender
       - slug: girls
         name: Girls
-        description: Academic performance among girls
       - slug: boys
         name: Boys
-        description: Academic performance among boys
       - slug: sex_side_by_side
         name: Girls vs. boys
-        description: Compare performance between boys and girls
+        description: Compare academic performance between boys and girls
 views: []
