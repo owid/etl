@@ -1,4 +1,5 @@
 import asyncio
+import threading
 import uuid
 
 import logfire
@@ -117,10 +118,20 @@ async def setup_server():
     await mcp.import_server(deep_research.mcp)
 
 
-# Create an event loop and setup the server
+# Setup the server when imported (not when run as main)
+def _setup_server_sync():
+    """Synchronously setup the server by creating a new event loop."""
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    loop.run_until_complete(setup_server())
+    loop.close()
+
 
 if __name__ != "__main__":
-    asyncio.run(setup_server())
+    # Run setup in a separate thread to avoid event loop conflicts
+    setup_thread = threading.Thread(target=_setup_server_sync)
+    setup_thread.start()
+    setup_thread.join()
 
 
 # ---------------------------------------------------------------------------
