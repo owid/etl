@@ -12,7 +12,6 @@ import sys
 import time
 from collections.abc import MutableMapping
 from concurrent.futures import FIRST_COMPLETED, Future, ProcessPoolExecutor, ThreadPoolExecutor, wait
-from contextlib import contextmanager
 from functools import partial
 from graphlib import TopologicalSorter
 from multiprocessing import Manager
@@ -477,14 +476,10 @@ def exec_steps(steps: List[Step], strict: Optional[bool] = None) -> None:
 
         print(f"--- {i}. {step}{_create_expected_time_message(_get_execution_time(step_name=str(step)))}")
 
-        # Determine strictness level for the current step
-        strict = _detect_strictness_level(step, strict)
-
-        with strictness_level(strict):
-            # Execute the step and measure the time taken
-            try:
-                time_taken = timed_run(lambda: step.run())
-            except Exception as e:
+        # Execute the step and measure the time taken
+        try:
+            time_taken = timed_run(lambda: step.run())
+        except Exception as e:
                 # log which step failed and re-raise the exception, otherwise it gets lost
                 # in logs and we don't know which step failed
                 log.error("step_failed", step=str(step))
@@ -659,13 +654,11 @@ def _exec_step_job(
     """
     print(f"--- Starting {step_name}{_create_expected_time_message(_get_execution_time(step_name))}")
     step = step_lookup[step_name]
-    strict = _detect_strictness_level(step, strict)
-    with strictness_level(strict):
-        try:
-            execution_times[step_name] = timed_run(lambda: step.run())
-        except Exception:
-            log.error("step_failed", step=step_name)
-            raise
+    try:
+        execution_times[step_name] = timed_run(lambda: step.run())
+    except Exception:
+        log.error("step_failed", step=step_name)
+        raise
     print(f"--- Finished {step_name} ({execution_times[step_name]:.1f}s)")
 
 
@@ -708,33 +701,6 @@ def enumerate_steps(steps: List[Step]) -> None:
         print(f"{i}. {step}{_create_expected_time_message(_get_execution_time(str(step)))}")
 
 
-def _detect_strictness_level(step: Step, strict: Optional[bool] = None) -> bool:
-    # honour the command-line argument over anything else
-    if strict is not None:
-        return strict
-
-    # only data steps can be strict, and only after meadow
-    if not isinstance(step, DataStep) or step.channel in ("meadow", "open_numbers"):
-        return False
-
-    # now it depends on the version
-    # TODO fix the "latest" cases as well
-    return step.version != "latest" and step.version >= config.STRICT_AFTER
-
-
-@contextmanager
-def strictness_level(strict: bool) -> Iterator[None]:
-    # start from a clean slate
-    if "OWID_STRICT" in environ:
-        del environ["OWID_STRICT"]
-
-    if strict:
-        # enable strict mode
-        environ["OWID_STRICT"] = "true"
-
-    yield
-
-    # no need to clean up
 
 
 def timed_run(f: Callable[[], Any]) -> float:

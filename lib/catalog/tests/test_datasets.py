@@ -14,7 +14,6 @@ from os import rmdir
 from os.path import exists, join
 from pathlib import Path
 from typing import Any
-from unittest.mock import patch
 
 import pandas as pd
 import pytest
@@ -115,18 +114,9 @@ def test_add_table():
         assert t2.metadata.dataset == ds.metadata
 
 
-@patch.dict(os.environ, {})
+
+
 def test_add_table_without_primary_key():
-    t = mock_table().reset_index()
-
-    with temp_dataset_dir() as dirname:
-        ds = Dataset.create_empty(dirname)
-        with pytest.warns(UserWarning):
-            ds.add(t)
-
-
-@patch.dict(os.environ, {"OWID_STRICT": "1"})
-def test_add_table_without_primary_key_strict_mode():
     t = mock_table().reset_index()
 
     with temp_dataset_dir() as dirname:
@@ -135,7 +125,6 @@ def test_add_table_without_primary_key_strict_mode():
             ds.add(t)
 
 
-@patch.dict(os.environ, {"OWID_STRICT": "1"})
 def test_add_table_without_unique_index():
     t = Table(pd.DataFrame({"a": [1, 1], "b": [1, 2]}).set_index("a"))
 

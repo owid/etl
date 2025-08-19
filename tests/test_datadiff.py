@@ -1,5 +1,3 @@
-import os
-from unittest.mock import patch
 
 import pandas as pd
 from owid.catalog import Dataset, DatasetMeta, Table
@@ -22,14 +20,13 @@ def _create_datasets(tmp_path):
     return ds_a, ds_b
 
 
-@patch.dict(os.environ, {"OWID_STRICT": ""})
 def test_DatasetDiff_summary(tmp_path):
     ds_a, ds_b = _create_datasets(tmp_path)
 
-    tab_a = Table(pd.DataFrame({"a": [1, 2]}), short_name="tab")
+    tab_a = Table(pd.DataFrame({"a": [1, 2]}).set_index("a"), short_name="tab")
     tab_a.metadata.description = "tab"
 
-    tab_b = Table(pd.DataFrame({"a": [1, 3], "b": ["a", "b"]}), short_name="tab")
+    tab_b = Table(pd.DataFrame({"a": [1, 3], "b": ["a", "b"]}).set_index("a"), short_name="tab")
     tab_b["a"].metadata.description = "col a"
 
     ds_a.add(tab_a)
@@ -47,12 +44,11 @@ def test_DatasetDiff_summary(tmp_path):
     ]
 
 
-@patch.dict(os.environ, {"OWID_STRICT": ""})
 def test_new_data(tmp_path):
     ds_a, ds_b = _create_datasets(tmp_path)
 
-    tab_a = Table({"country": ["UK", "US"], "a": [1, 3]}, short_name="tab")
-    tab_b = Table({"country": ["UK", "US", "FR"], "a": [1, 2, 3]}, short_name="tab")
+    tab_a = Table(pd.DataFrame({"country": ["UK", "US"], "a": [1, 3]}).set_index("country"), short_name="tab")
+    tab_b = Table(pd.DataFrame({"country": ["UK", "US", "FR"], "a": [1, 2, 3]}).set_index("country"), short_name="tab")
 
     ds_a.add(tab_a)
     ds_b.add(tab_b)
