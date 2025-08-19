@@ -19,13 +19,25 @@
    etls #$ARGUMENTS
    ```
 
-4. **Test ETL pipeline** - Run `etlr` with `--grapher`. **EXPECTED TO FAIL INITIALLY** - this is normal when updating datasets!
+4. **Compare snapshots and document changes** - Analyze differences between old and new data files
+   ```bash
+   # First ensure old snapshot is loaded (don't use etls!)
+   etlr snapshot://[old-version]/[dataset-name]
+   
+   # Then compare both snapshot files programmatically
+   # Read both old and new snapshot files to understand structural changes
+   ```
+   - Document key differences (sheet names, column headers, data ranges, format changes)
+   - Add comparison summary to PR description for reviewers
+   - This helps understand what ETL fixes will be needed in Phase 2
+
+5. **Test ETL pipeline** - Run `etlr` with `--grapher`. **EXPECTED TO FAIL INITIALLY** - this is normal when updating datasets!
    ```bash
    etlr [dataset] --grapher
    ```
    **NOTE: Don't try to fix errors in this step - failures are expected and normal. Just run it and move on to commit the initial changes.**
 
-5. **Commit and push initial changes**
+6. **Commit and push initial changes**
    ```bash
    git add .
    git commit -m "Update dataset to new version"
