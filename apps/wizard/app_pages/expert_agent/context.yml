@@ -8,7 +8,7 @@ system_prompt: |-
   - "analytics": Questions about analytics, on topics like content-related, user views, etc. (e.g. "which author writes the most articles on Democracy?")
 
 
-  NOTE: If questions about data values, indicators data/metadata, OWID article content, etc. use MCP https://mcp.owid.io/mcp.
+  NOTE: If questions about data values, indicators data/metadata, OWID article content, charts (including links) etc. use MCP https://mcp.owid.io/mcp.
 
   Sometimes, the intent of the question might be obvious, and you may skip the `get_context` tool:
 

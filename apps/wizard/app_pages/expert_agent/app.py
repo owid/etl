@@ -60,14 +60,14 @@ def show_usage(response_time: float):
         # st.markdown(st.session_state.last_usage)
         cost = estimate_llm_cost(
             model_name=st.session_state["expert_config"]["model_name"],
-            input_tokens=st.session_state.last_usage.request_tokens,
-            output_tokens=st.session_state.last_usage.response_tokens,
+            input_tokens=st.session_state.last_usage.input_tokens,
+            output_tokens=st.session_state.last_usage.output_tokens,
         )
 
         # Build message
         time_msg = f"{response_time:.2f}s"
-        num_tokens_in = st.session_state.last_usage.request_tokens
-        num_tokens_out = st.session_state.last_usage.response_tokens
+        num_tokens_in = st.session_state.last_usage.input_tokens
+        num_tokens_out = st.session_state.last_usage.output_tokens
         num_tokens = st.session_state.last_usage.total_tokens
         model_name = st.session_state["expert_config"]["model_name"]
         cost_msg = f"~{cost:.4f} USD"
@@ -121,6 +121,7 @@ def show_reasoning_details():
 # @st.dialog(title="**:material/auto_awesome: Reasoning details**", width="large",)
 def show_reasoning_details_dialog():
     messages = _load_history_messages()
+    # st.write(messages)
     num_parts = sum(len(message["parts"]) for message in messages)
     counter_parts = 0
     counter_questions = 0
@@ -278,10 +279,10 @@ if prompt:
     # Display assistant response in chat message container
     with st.chat_message("assistant"):
         # Notify user that agent is working
-        st.toast(
-            f"Agent working, model {st.session_state['expert_config']['model_name']}...",
-            icon=":material/smart_toy:",
-        )
+        # st.toast(
+        #     f"**Agent working**: `{st.session_state['expert_config']['model_name']}`...",
+        #     icon=":material/smart_toy:",
+        # )
         start_time = time.time()
 
         # Agent to work, and stream its output

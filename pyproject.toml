@@ -75,7 +75,7 @@ dependencies = [
     # fastmcp run owid_mcp/server.py --transport=http  --host=0.0.0.0 --port=8080
     "fastmcp<=2.10.6",
     "pyproj>=3.7.1",
-    "pydantic-ai>=0.7.2",
+    "pydantic-ai>=0.7.3",
     "logfire[fastapi,httpx]>=4.3.3",
 ]
 
