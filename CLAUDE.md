@@ -24,17 +24,17 @@ This is Our World in Data's ETL system - a content-addressable data pipeline wit
 Steps are content-addressable with automatic dirty detection:
 ```python
 # Standard garden step pattern
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 from etl.data_helpers import geo
 
 paths = PathFinder(__file__)
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     ds_input = paths.load_dataset("input_dataset")
     tb = ds_input["table_name"].reset_index()
     tb = geo.harmonize_countries(tb, countries_file=paths.country_mapping_path)
     tb = tb.format(short_name=paths.short_name)
-    ds_garden = create_dataset(dest_dir, tables=[tb])
+    ds_garden = paths.create_dataset(tables=[tb])
     ds_garden.save()
 ```
 
@@ -108,7 +108,6 @@ import click
 
 @click.command()
 @click.option("--dry-run", is_flag=True, help="Preview changes without applying them")
-@click.option("--output", "-o", help="Output file path")
 def main(dry_run: bool, output: str):
     """Brief description of what the CLI does."""
     # Implementation here
@@ -316,11 +315,4 @@ SELECT id, name FROM variables WHERE datasetId = 12345;
 - VS Code extensions available: `make install-vscode-extensions`
 - **ALWAYS run `make check` before committing** - formats code, fixes linting issues, and runs type checks
 - SQL queries enclose in triple quotes for readability
-
 - When running etlr, always use PREFER_DOWNLOAD=1 prefix
-
-
-## Instructions for MCP servers
-- When I ask you to get something from MCP server, don't run a python script, but query the MCP server directly! If it is not available, let me know.
-- Run MCP servers with: `source .venv/bin/activate && python -m mcp.server`
-- If MCP server raises an error, try to fix it in code.
