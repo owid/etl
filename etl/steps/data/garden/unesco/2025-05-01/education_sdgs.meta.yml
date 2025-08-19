@@ -265,7 +265,7 @@ definitions:
 
   desc_key_prof: &desc_key_prof
     - This indicator measures the share of children or students who achieve minimum proficiency in reading or mathematics by the end of a given education level (primary or lower secondary).
-    - "Minimum proficiency in [reading](#dod:reading-proficiency) and [mathematics](#dod:math-proficiency) is defined differently at each education level:"
+    - "Minimum proficiency in [reading](#dod:reading-proficiency) and [mathematics](#dod:math-proficiency) is defined differently at each education level."
     - "At the end of **[primary education](#dod:primary-education)**, minimum reading proficiency means students can identify key ideas in simple texts and connect them to their own experiences. In mathematics, it means demonstrating number sense and computation, basic measurement, interpreting simple graphs, spatial orientation, and number patterns."
     - "At the end of **[lower secondary](#dod:lower-secondary-education)**, minimum reading proficiency means students can connect ideas across different types of texts, understand the author’s intent, and draw conclusions based on the text. In mathematics, it means applying computation skills, solving real-world problems, interpreting graphs and tables, and using algebraic representations."
     - "There are two types of estimates: one for all children in the age group, and one for students who are enrolled in school."
