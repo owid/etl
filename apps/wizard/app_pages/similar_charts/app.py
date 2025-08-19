@@ -6,7 +6,13 @@ from structlog import get_logger
 
 from apps.wizard.app_pages.similar_charts import data, scoring
 from apps.wizard.utils import embeddings as emb
-from apps.wizard.utils.components import Pagination, st_horizontal, st_multiselect_wider, url_persist
+from apps.wizard.utils.components import (
+    Pagination,
+    st_horizontal,
+    st_multiselect_wider,
+    st_title_with_expert,
+    url_persist,
+)
 from etl.config import OWID_ENV
 
 # Initialize log.
@@ -113,7 +119,7 @@ scoring_model = get_and_fit_model(charts)
 ########################################################################################################################
 
 # Streamlit app layout.
-st.title(":material/search: Similar charts")
+st_title_with_expert("Similar charts", icon=":material/search:")
 
 st.warning(
     "This app has been deprecated by the simplified Related charts app.",

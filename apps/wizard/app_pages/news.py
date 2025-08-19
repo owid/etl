@@ -4,12 +4,16 @@ from datetime import datetime
 
 import streamlit as st
 
+from apps.wizard.utils.components import st_title_with_expert
 from apps.wizard.utils.db import DB_IS_SET_UP, WizardDB
 from etl.config import ENV_IS_REMOTE
 
 # Page config
 st.set_page_config(page_title="Wizard: News", page_icon="🪄")
-st.title(":material/newspaper: News")
+st_title_with_expert(
+    title="News",
+    icon="material/newspaper",
+)
 st.markdown("Find news and updates from the [etl project](https://github.com/owid/etl).")
 
 # Only run this on live!
