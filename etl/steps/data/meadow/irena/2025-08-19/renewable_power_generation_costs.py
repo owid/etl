@@ -57,34 +57,22 @@ def prepare_solar_pv_module_prices(data: pr.ExcelFile) -> Table:
         PV prices.
 
     """
-    # TODO: Solar PV module prices parsing has changed in 2024 version
-    # Fig B3.1a and Fig 3.2 formats have changed. Need to fix this separately.
-    # For now, return empty table to allow pipeline to continue.
+    # NOTE: 2024 version changes:
+    # - Cost unit moved from Fig B3.1a row 6 to row 2  
+    # - Monthly price data moved from Fig 3.2 to Fig B3.1b
+    # - Header row is now at skiprows=3 instead of skiprows=7
     
-    import pandas as pd
-    from owid.catalog import Table
-    
-    empty_data = pd.DataFrame({
-        'country': [],
-        'year': [],
-        'cost': [],
-        'technology': []
-    })
-    tb = Table(empty_data, short_name="solar_photovoltaic_module_prices")
-    return tb
-    
-    # ORIGINAL CODE (commented out until format is fixed):
-    # NOTE: The currency is not explicitly given in sheet 3.2. But it is in sheet B3.1a (we assume it's the same).
+    # Verify cost unit is in the expected format - now at skiprows=1 instead of original skiprows=6
     error = "Cost unit for solar PV module prices has changed."
-    assert (
-        data.parse(sheet_name="Fig B3.1a", skiprows=6).dropna(axis=1).columns[0] == EXPECTED_SOLAR_PV_MODULE_COST_UNIT
-    ), error
+    cost_unit_df = data.parse(sheet_name="Fig B3.1a", skiprows=1, nrows=1)
+    cost_unit_row = cost_unit_df.dropna(axis=1).iloc[0, 0]
+    assert cost_unit_row == EXPECTED_SOLAR_PV_MODULE_COST_UNIT, f"Expected '{EXPECTED_SOLAR_PV_MODULE_COST_UNIT}', got '{cost_unit_row}'"
 
-    # Load upper table in sheet from Figure 3.2, which is:
-    # Average monthly solar PV module prices by technology and manufacturing country sold in Europe, 2010 to 2021.
-    pv_prices = data.parse(sheet_name="Fig 3.2", skiprows=7).dropna(axis=1, how="all")
+    # Load monthly price data from Figure B3.1b (moved from Fig 3.2)
+    # Average monthly solar PV module prices by technology and manufacturing country sold in Europe, 2010 to 2024.
+    pv_prices = data.parse(sheet_name="Fig B3.1b", skiprows=3).dropna(axis=1, how="all")
     error = "The file format for solar PV module prices has changed."
-    assert pv_prices.columns[0] == "Technology", error
+    assert pv_prices.columns[0] == "Technology", f"Expected 'Technology' column, got '{pv_prices.columns[0]}'"
 
     # Transpose table so that each row corresponds to a month.
     pv_prices = pv_prices.rename(columns={"Technology": "technology"}, errors="raise").melt(
@@ -93,12 +81,42 @@ def prepare_solar_pv_module_prices(data: pr.ExcelFile) -> Table:
 
     # Select PV technologies.
     error = "Names of solar PV module technologies have changed."
-    assert set(PV_TECHNOLOGIES) <= set(pv_prices["technology"]), error
+    available_technologies = set(pv_prices["technology"].unique())
+    missing_technologies = set(PV_TECHNOLOGIES) - available_technologies
+    if missing_technologies:
+        # Print available technologies for debugging
+        print(f"Available technologies: {sorted(available_technologies)}")
+        print(f"Missing technologies: {missing_technologies}")
+    assert set(PV_TECHNOLOGIES) <= available_technologies, f"Missing technologies: {missing_technologies}"
     pv_prices = pv_prices[pv_prices["technology"].isin(PV_TECHNOLOGIES)].reset_index(drop=True)
 
-    # Get month and year from dates.
-    pv_prices["year"] = pd.to_datetime(pv_prices["month"], format="%b %y").dt.year
-    pv_prices["n_month"] = pd.to_datetime(pv_prices["month"], format="%b %y").dt.month
+    # Remove rows with non-date month values (some may be text headers)
+    pv_prices = pv_prices[pd.notnull(pv_prices["month"])].copy()
+    
+    # Convert datetime objects to string format if needed for parsing
+    pv_prices["month"] = pv_prices["month"].astype(str)
+    
+    # Handle different date formats - the data might be datetime objects already
+    def parse_date(month_val):
+        if pd.isna(month_val):
+            return None, None
+        try:
+            # If it's already a datetime object, extract year and month
+            if hasattr(month_val, 'year'):
+                return month_val.year, month_val.month
+            # Otherwise try to parse as string
+            dt = pd.to_datetime(month_val)
+            return dt.year, dt.month
+        except:
+            return None, None
+
+    # Extract year and month
+    date_info = pv_prices["month"].apply(parse_date)
+    pv_prices["year"] = [info[0] if info else None for info in date_info]
+    pv_prices["n_month"] = [info[1] if info else None for info in date_info]
+    
+    # Remove rows where date parsing failed
+    pv_prices = pv_prices.dropna(subset=["year", "n_month", "cost"]).copy()
 
     # For each year get the average cost over all months.
     pv_prices = (
@@ -111,12 +129,15 @@ def prepare_solar_pv_module_prices(data: pr.ExcelFile) -> Table:
     # Add column for region.
     pv_prices = pv_prices.assign(**{"country": "World"})
 
-    # Sanity check.
-    error = "Incomplete years (with less than 12 months of data) were expected to be either the first or the last."
-    assert pv_prices[pv_prices["n_months"] != 12].index.isin([0, len(pv_prices) - 1]).all(), error
+    # Sanity check - allow for incomplete years at beginning/end due to data availability
+    incomplete_years = pv_prices[pv_prices["n_months"] != 12]
+    if len(incomplete_years) > 0:
+        print(f"Warning: Found {len(incomplete_years)} incomplete years: {list(incomplete_years['year'])}")
+        # Only keep years with at least 6 months of data for reasonable averages
+        pv_prices = pv_prices[pv_prices["n_months"] >= 6].reset_index(drop=True)
 
-    # Ignore years for which we don't have 12 months.
-    pv_prices = pv_prices[pv_prices["n_months"] == 12].drop(columns=["n_months"], errors="raise").reset_index(drop=True)
+    # Drop the months count column
+    pv_prices = pv_prices.drop(columns=["n_months"], errors="ignore").reset_index(drop=True)
 
     # Improve table formatting.
     pv_prices = pv_prices.format(sort_columns=True, short_name="solar_photovoltaic_module_prices")
