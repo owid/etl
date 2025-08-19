@@ -1,5 +1,6 @@
 from contextlib import asynccontextmanager
 
+import logfire
 import structlog
 from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
@@ -49,6 +50,12 @@ app = get_application()
 # see https://github.com/tiangolo/fastapi/discussions/8577 (even the latest versions didn't help)
 app.include_router(v1)
 
+if config.LOGFIRE_TOKEN_ETL_API:
+    logfire.configure(token=config.LOGFIRE_TOKEN_ETL_API)
+    logfire.instrument_fastapi(app)
+else:
+    logfire.configure(send_to_logfire=False)
+
 
 @app.middleware("http")
 async def slack_middleware(request: Request, call_next):
@@ -72,10 +79,14 @@ async def slack_middleware(request: Request, call_next):
 
     log.info("response", method=request.method, url=str(request.url), status_code=response.status_code, body=res_body)
 
-    send_slack_message(
-        "#metadata-updates",
-        format_slack_message(request.method, request.url, response.status_code, req_body.decode(), res_body.decode()),
-    )
+    # Send requests to Slack
+    if "search/indicators" not in str(request.url):
+        send_slack_message(
+            "#metadata-updates",
+            format_slack_message(
+                request.method, request.url, response.status_code, req_body.decode(), res_body.decode()
+            ),
+        )
 
     return Response(
         content=res_body,
