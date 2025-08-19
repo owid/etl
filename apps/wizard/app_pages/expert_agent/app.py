@@ -207,7 +207,7 @@ def show_settings_menu():
         st.session_state["expert_config"]["model_name"] = model_name
     st.toggle(
         label="Use OWID mcp",
-        value=False,
+        value=True,
         key="expert_use_mcp",
         help="Use MCPs to access and interact with OWID's data. :material/warning: Note: This feature is new, disable it if you are experiencing any issues.",
     )
