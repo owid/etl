@@ -148,6 +148,10 @@ def run() -> None:
     )
 
     for view in collection.views:
+        # Set view metadata for all views
+        view.metadata = {
+            "description_short": view.config["subtitle"],
+        }
         edit_indicator_displays(view)
 
     collection.save()

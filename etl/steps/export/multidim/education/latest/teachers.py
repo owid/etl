@@ -140,7 +140,7 @@ def run() -> None:
     # Add grouped views for side-by-side comparisons
     create_grouped_views(collection)
 
-    # Clean up indicator display names for better chart labels
+    # Clean up indicator display names for better chart labels and set view metadata
     for view in collection.views:
         edit_indicator_displays(view)
 

@@ -60,8 +60,8 @@ METRIC_DESCRIPTION_MAP = {
         "preprimary": "Total years a child entering [pre-primary](#dod:pre-primary-education) education is expected to remain in pre-primary school, based on current enrollment patterns and including time spent repeating grades.",
         "secondary": "Total years a child entering [secondary](#dod:secondary-education) education is expected to remain in secondary school, based on current enrollment patterns and including time spent repeating grades.",
         "tertiary": "Total years a person entering [tertiary](#dod:tertiary-education) education is expected to remain in tertiary education, based on current enrollment patterns and including time spent repeating courses.",
-        "all": "Total years a child entering school is expected to remain in education across all levels, from pre-primary through tertiary, based on current enrollment patterns and including time spent repeating grades.",
-        "level_side_by_side": "Total years a child is expected to remain at each education level (pre-primary, primary, secondary, and tertiary), based on current enrollment patterns and including time spent repeating grades.",
+        "all": "Total years a child entering school is expected to remain in education across all levels, from [pre-primary](#dod:pre-primary-education) through [tertiary](#dod:tertiary-education), based on current enrollment patterns and including time spent repeating grades.",
+        "level_side_by_side": "Total years a child is expected to remain at each education level, based on current enrollment patterns and including time spent repeating grades.",
     },
     "average_years_schooling": "Average years of formal education that adults aged 25 and older have completed in their lifetime. This measures educational attainment of the adult population and excludes time spent repeating grades.",
     "learning_adjusted_years_schooling": "[Learning-adjusted years of schooling](#dod:lays) captures both educational quantity and quality by scaling expected schooling years based on how much students actually learn.",
@@ -202,9 +202,12 @@ def run() -> None:
             view.metadata = {
                 "presentation": {
                     "title_public": view.config["title"],
-                },
-                "description_short": view.config["subtitle"],
+                }
             }
+        # Set description_short to be the same as the subtitle
+        view.metadata = {
+            "description_short": view.config["subtitle"],
+        }
         edit_indicator_displays(view)
 
     #
