@@ -1,6 +1,6 @@
 import urllib.parse
 from pathlib import Path
-from typing import AsyncGenerator, List, Literal
+from typing import Any, AsyncGenerator, List, Literal
 
 import logfire
 import requests
@@ -8,7 +8,7 @@ import streamlit as st
 import yaml
 from pydantic_ai import Agent
 from pydantic_ai.agent import CallToolsNode
-from pydantic_ai.mcp import MCPServerStreamableHTTP
+from pydantic_ai.mcp import CallToolFunc, MCPServerStreamableHTTP, ToolResult
 from pydantic_ai.messages import (
     PartDeltaEvent,
     PartStartEvent,
@@ -16,6 +16,7 @@ from pydantic_ai.messages import (
     TextPartDelta,
 )
 from pydantic_ai.models.openai import OpenAIResponsesModelSettings
+from pydantic_ai.tools import RunContext
 
 from apps.wizard.app_pages.expert_agent.utils import CURRENT_DIR
 from etl.analytics import ANALYTICS_URL, clean_sql_query, read_datasette
@@ -75,9 +76,22 @@ DOCS_INDEX = dict(DOCS_INDEX)
 # MCPs
 #######################################################
 
+
+async def process_tool_call(
+    ctx: RunContext[int],
+    call_tool: CallToolFunc,
+    name: str,
+    tool_args: dict[str, Any],
+) -> ToolResult:
+    """A tool call processor that passes along the deps."""
+    st.toast(f"**MCP**: `owid_mcp(name={name})`", icon=":material/compare_arrows:")
+    return await call_tool(name, tool_args, {"deps": ctx.deps})
+
+
 # OWID Prod MCP server
 mcp_server_prod = MCPServerStreamableHTTP(
     url="https://mcp.owid.io/mcp",
+    process_tool_call=process_tool_call,
 )
 
 ## Trying to tweak the settings for OpenAI responses
@@ -258,7 +272,7 @@ async def get_context(category_name: Literal["analytics", "metadata", "docs"]) -
     Returns:
         str: The context for the specified category.
     """
-    st.toast(f"**Tool use**: `get_context(category_name={category_name})`", icon=":material/smart_toy:")
+    st.toast(f"**Tool use**: `get_context(category_name={category_name})`", icon=":material/calculate:")
     return CONTEXT["context"][category_name]
 
 
@@ -282,7 +296,7 @@ async def get_docs_index() -> str:
     Returns:
         str: The documentation index. List of available section and pages.
     """
-    st.toast("**Tool use**: `get_docs_index`", icon=":material/smart_toy:")
+    st.toast("**Tool use**: `get_docs_index`", icon=":material/calculate:")
     docs = ruamel_dump(DOCS_INDEX["nav"])
     return docs
 
@@ -305,7 +319,7 @@ async def get_docs_page(file_path: str) -> str:
     Returns:
         str: The documentation for the specified file_path.
     """
-    st.toast(f"**Tool use**: `get_docs_page (file_path='{file_path}')`", icon=":material/smart_toy:")
+    st.toast(f"**Tool use**: `get_docs_page (file_path='{file_path}')`", icon=":material/calculate:")
     if (DOCS_DIR / file_path).exists():
         docs = read_page_md(DOCS_DIR / file_path)
     else:
@@ -323,7 +337,7 @@ async def get_db_tables() -> str:
     Returns:
         str: Table short descriptions in format "table1: ...\ntable2: ...".
     """
-    st.toast("**Tool use**: `get_db_tables`", icon=":material/smart_toy:")
+    st.toast("**Tool use**: `get_db_tables`", icon=":material/calculate:")
     return ANALYTICS_DB_OVERVIEW
 
 
@@ -339,7 +353,7 @@ async def get_db_table_fields(tb_name: str) -> str:
     Returns:
         str: Table documentation as string, mapping column names to their descriptions. E.g. "column1: description1\ncolumn2: description2".
     """
-    st.toast(f"**Tool use**: `get_db_table_fields(table='{tb_name}')`", icon=":material/smart_toy:")
+    st.toast(f"**Tool use**: `get_db_table_fields(table='{tb_name}')`", icon=":material/calculate:")
     if tb_name not in ANALYTICS_DB_TABLE_DETAILS:
         print("Table not found:", tb_name)
         print("Available tables:", sorted(ANALYTICS_DB_TABLE_DETAILS.keys()))
@@ -360,7 +374,7 @@ async def get_api_reference_metadata(
     Returns:
         str: Metadata for the specified object type.
     """
-    st.toast(f"**Tool use**: `get_api_reference_metadata(object_name='{object_name}')`", icon=":material/smart_toy:")
+    st.toast(f"**Tool use**: `get_api_reference_metadata(object_name='{object_name}')`", icon=":material/calculate:")
     match object_name:
         case "dataset":
             return render_dataset()
@@ -394,7 +408,7 @@ async def generate_url_to_datasette(query: str) -> str:
     Returns:
         str: URL to the Datasette instance with the query. The URL links to a datasette preview with the SQL query and its results.
     """
-    st.toast("**Tool use**: `generate_url_to_datasette`", icon=":material/smart_toy:")
+    st.toast("**Tool use**: `generate_url_to_datasette`", icon=":material/calculate:")
     return _generate_url_to_datasette(query)
 
 
@@ -412,7 +426,7 @@ async def validate_datasette_query(query: str) -> str:
     Returns:
         str: Validation result message. If the query is not valid, it will return an error message. Use it to improve the query!
     """
-    st.toast("**Tool use**: `validate_datasette_query`", icon=":material/smart_toy:")
+    st.toast("**Tool use**: `validate_datasette_query`", icon=":material/calculate:")
     url = _generate_url_to_datasette(f"{query}")
     url = url.replace(ANALYTICS_URL, ANALYTICS_URL + ".json")
     response = requests.get(url).json()
@@ -440,7 +454,7 @@ async def get_data_from_datasette(query: str, num_rows: int = 10) -> str:
     Returns:
         pd.DataFrame: DataFrame with the results of the query.
     """
-    st.toast("**Tool use**: `get_data_from_datasette`", icon=":material/smart_toy:")
+    st.toast("**Tool use**: `get_data_from_datasette`", icon=":material/calculate:")
     df = read_datasette(query, use_https=False)
     if df.empty:
         return ""
