@@ -39,7 +39,7 @@ load_env()
 st.session_state.setdefault("expert_config", {})
 st.session_state.setdefault("agent_messages", [])
 st.session_state.setdefault("recommended_question", None)
-st.session_state.setdefault("expert_use_mcp", True)
+# st.session_state.setdefault("expert_use_mcp", True)
 # Models
 ## See all of them in https://github.com/pydantic/pydantic-ai/blob/master/pydantic_ai_slim/pydantic_ai/models/__init__.py
 MODEL_DEFAULT = "openai:gpt-5-mini"

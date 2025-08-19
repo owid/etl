@@ -10,7 +10,13 @@ from structlog import get_logger
 
 from apps.wizard.app_pages.related_charts import data, scoring
 from apps.wizard.utils import embeddings as emb
-from apps.wizard.utils.components import st_cache_data, st_horizontal, st_multiselect_wider, url_persist
+from apps.wizard.utils.components import (
+    st_cache_data,
+    st_horizontal,
+    st_multiselect_wider,
+    st_title_with_expert,
+    url_persist,
+)
 from etl import paths
 from etl.config import OWID_ENV
 from etl.db import get_engine
@@ -203,7 +209,7 @@ top_100_charts = sorted(charts, key=lambda x: x.views_365d, reverse=True)[:100] 
 # SIDEBAR / SEARCH
 ########################################################################################################################
 
-st.title(":material/search: Related charts")
+st_title_with_expert("Related charts", icon=":material/search:")
 
 col1, col2 = st.columns(2)
 with col2:
