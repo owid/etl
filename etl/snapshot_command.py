@@ -156,7 +156,7 @@ def run_snapshot_script(script_path: Path, upload: bool, path_to_file: Optional[
     # Check what functions are available
     func = None
     func_name = None
-    
+
     if hasattr(module, "main"):
         func = getattr(module, "main")
         func_name = "main"
@@ -170,7 +170,9 @@ def run_snapshot_script(script_path: Path, upload: bool, path_to_file: Optional[
     _call_snapshot_function(func, func_name, script_path, upload, path_to_file)
 
 
-def _call_snapshot_function(func, func_name: str, script_path: Path, upload: bool, path_to_file: Optional[str] = None) -> None:
+def _call_snapshot_function(
+    func, func_name: str, script_path: Path, upload: bool, path_to_file: Optional[str] = None
+) -> None:
     """Call a snapshot function, handling both click commands and regular functions."""
     # Check if it's a click command
     if isinstance(func, (click.Command, Command)):

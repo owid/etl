@@ -239,10 +239,13 @@ Note: The `etl pr` creates a new branch but does NOT automatically commit files 
 ### Never Mask Underlying Issues
 - **NEVER** return empty tables or default values to "fix" data parsing failures
 - **NEVER** silently skip errors or missing data without clear explanation
+- **NEVER** comment out code to temporarily bypass problems - fix the underlying issue instead
 - **BAD**: `return Table(pd.DataFrame({'col': []}))` - hides the real problem
 - **BAD**: `try: parse_data() except: return empty_table` - masks what's broken
+- **BAD**: `# return extract_data()  # Commented out due to format change` - commenting out code to avoid errors
 - **GOOD**: Let the error happen and provide clear diagnostic information
 - **GOOD**: `raise ValueError("Sheet 'Fig 3.2' format changed - skiprows needs updating from 7 to X")`
+- **GOOD**: Update the code to handle the new data format correctly
 - **If you don't know what to do - ASK THE USER instead of masking the issue**
 - Silent failures make debugging exponentially harder and create technical debt
 

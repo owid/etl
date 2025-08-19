@@ -58,20 +58,20 @@ def prepare_solar_pv_module_prices(data: pr.ExcelFile) -> Table:
 
     """
     # NOTE: 2024 version changes:
-    # - Cost unit moved from Fig B3.1a row 6 to row 2  
+    # - Cost unit moved from Fig B3.1a row 6 to row 2
     # - Monthly price data moved from Fig 3.2 to Fig B3.1b
     # - Header row is now at skiprows=3 instead of skiprows=7
-    
+
     # Verify cost unit is in the expected format - now at skiprows=1 instead of original skiprows=6
-    error = "Cost unit for solar PV module prices has changed."
     cost_unit_df = data.parse(sheet_name="Fig B3.1a", skiprows=1, nrows=1)
     cost_unit_row = cost_unit_df.dropna(axis=1).iloc[0, 0]
-    assert cost_unit_row == EXPECTED_SOLAR_PV_MODULE_COST_UNIT, f"Expected '{EXPECTED_SOLAR_PV_MODULE_COST_UNIT}', got '{cost_unit_row}'"
+    assert (
+        cost_unit_row == EXPECTED_SOLAR_PV_MODULE_COST_UNIT
+    ), f"Expected '{EXPECTED_SOLAR_PV_MODULE_COST_UNIT}', got '{cost_unit_row}'"
 
     # Load monthly price data from Figure B3.1b (moved from Fig 3.2)
     # Average monthly solar PV module prices by technology and manufacturing country sold in Europe, 2010 to 2024.
     pv_prices = data.parse(sheet_name="Fig B3.1b", skiprows=3).dropna(axis=1, how="all")
-    error = "The file format for solar PV module prices has changed."
     assert pv_prices.columns[0] == "Technology", f"Expected 'Technology' column, got '{pv_prices.columns[0]}'"
 
     # Transpose table so that each row corresponds to a month.
@@ -80,7 +80,6 @@ def prepare_solar_pv_module_prices(data: pr.ExcelFile) -> Table:
     )
 
     # Select PV technologies.
-    error = "Names of solar PV module technologies have changed."
     available_technologies = set(pv_prices["technology"].unique())
     missing_technologies = set(PV_TECHNOLOGIES) - available_technologies
     if missing_technologies:
@@ -92,29 +91,29 @@ def prepare_solar_pv_module_prices(data: pr.ExcelFile) -> Table:
 
     # Remove rows with non-date month values (some may be text headers)
     pv_prices = pv_prices[pd.notnull(pv_prices["month"])].copy()
-    
+
     # Convert datetime objects to string format if needed for parsing
     pv_prices["month"] = pv_prices["month"].astype(str)
-    
+
     # Handle different date formats - the data might be datetime objects already
     def parse_date(month_val):
         if pd.isna(month_val):
             return None, None
         try:
             # If it's already a datetime object, extract year and month
-            if hasattr(month_val, 'year'):
+            if hasattr(month_val, "year"):
                 return month_val.year, month_val.month
             # Otherwise try to parse as string
             dt = pd.to_datetime(month_val)
             return dt.year, dt.month
-        except:
+        except Exception:
             return None, None
 
     # Extract year and month
     date_info = pv_prices["month"].apply(parse_date)
     pv_prices["year"] = [info[0] if info else None for info in date_info]
     pv_prices["n_month"] = [info[1] if info else None for info in date_info]
-    
+
     # Remove rows where date parsing failed
     pv_prices = pv_prices.dropna(subset=["year", "n_month", "cost"]).copy()
 
@@ -231,7 +230,10 @@ def extract_global_cost_for_all_sources_from_excel_file(data: pr.ExcelFile) -> T
     error = "The file format for geothermal LCOE has changed."
     geothermal_header = data.parse("Fig 6.1", skiprows=19).columns[1]
     # Accept either 2023 or 2024 USD for geothermal as the data may lag
-    assert geothermal_header in [f"LCOE ({EXPECTED_LCOE_UNIT})", "LCOE (2023 USD/kWh)"], f"Expected LCOE header, got: {geothermal_header}"
+    assert geothermal_header in [
+        f"LCOE ({EXPECTED_LCOE_UNIT})",
+        "LCOE (2023 USD/kWh)",
+    ], f"Expected LCOE header, got: {geothermal_header}"
     geothermal = (
         data.parse("Fig 6.1", skiprows=20)
         .drop(columns="Unnamed: 0", errors="raise")
@@ -292,98 +294,83 @@ def extract_country_cost_from_excel_file(data: pr.ExcelFile) -> Table:
     tb : Table
         LCOE for different energy sources.
     """
-    # TODO: The country-level data structure has changed significantly in the 2024 version.
-    # The sheets Fig. 3.11 and Fig. 3.12 no longer exist. Need to find the new country-level data sheets.
-    # For now, return an empty table to allow the pipeline to continue.
-    
-    import pandas as pd
-    from owid.catalog import Table
-    
-    # Return empty table with expected structure
-    empty_data = pd.DataFrame({
-        'country': [],
-        'year': [],
-        'cost': [],
-        'technology': []
-    })
-    tb = Table(empty_data)
-    return tb
-    
-    # ORIGINAL CODE (commented out until we find the new sheets):
-    # Extract LCOE for specific countries and technologies (those that are available in original data).
+    # Extract LCOE for specific countries and technologies from the 2024 version sheets.
 
-    # Solar photovoltaic.
-    # NOTE: For some reason, sheet 3.11 contains LCOE from 2010 to 2023 for 15 countries, and 3.12 contains LCOE from 2018 to 2023 for 19 countries.
-    #  So, let's take both, check that they are consistent, and concatenate them.
-    # solar_pv = data.parse("Fig. 3.11", skiprows=5).dropna(how="all", axis=1)
-    solar_pv = solar_pv.rename(columns={solar_pv.columns[0]: "country"}, errors="raise").melt(
-        id_vars="country", var_name="year", value_name="cost"
-    )
-    # Keep only rows of LCOE, and drop year changes and empty rows.
-    solar_pv = solar_pv[~solar_pv["year"].astype(str).str.startswith("%")].dropna().reset_index(drop=True)
+    # Solar photovoltaic - Fig. 3.10: Utility-scale solar PV weighted average cost of electricity in selected countries
+    # Unit verification - expect LCOE (2024 USD/kWh) but verify from context
+    # The data structure: skiprows=2 to get to years header, countries start from row 3
+    solar_pv = data.parse("Fig. 3.10", skiprows=2).dropna(how="all", axis=1)
 
-    # Load additional data.
-    solar_pv_extra = data.parse("Fig. 3.12", skiprows=8)
-    # Drop empty columns and unnecessary regions column.
-    solar_pv_extra = solar_pv_extra.drop(
-        columns=[column for column in solar_pv_extra.columns if "Unnamed" in str(column)], errors="raise"
-    ).drop(columns="Region", errors="raise")
-    solar_pv_extra = solar_pv_extra.rename(columns={"Country": "country"}, errors="raise").melt(
-        id_vars="country", var_name="year", value_name="cost"
-    )
+    # Drop the last column which contains percentage change
+    if solar_pv.columns[-1] and "%" in str(solar_pv.columns[-1]):
+        solar_pv = solar_pv.drop(columns=solar_pv.columns[-1])
 
-    # Check that, where both tables overlap, they are consistent.
-    error = "Expected coincident country-years to have the same LCOE in sheets 3.11 and 3.12."
-    check = solar_pv.merge(solar_pv_extra, on=["country", "year"], how="inner")
-    # NOTE: Consider relaxing this to coincide within a certain tolerance, if this fails.
-    assert (check["cost_x"] == check["cost_y"]).all(), error
-    # Concatenate both tables and drop duplicates and empty rows.
-    solar_pv = (
-        pr.concat([solar_pv, solar_pv_extra], ignore_index=True)
-        .drop_duplicates(subset=["country", "year"])
-        .dropna()
-        .reset_index(drop=True)
-    )
+    # Rename the country column (should be column index 0, which contains country names)
+    solar_pv = solar_pv.rename(columns={solar_pv.columns[0]: "country"}, errors="raise")
 
-    # Onshore wind.
-    # NOTE: There is country-level LCOE data in sheets 2.12 and 2.13 (for smaller markets).
-    #  Fetch both and concatenate them.
-    error = "The file format for onshore wind LCOE has changed."
-    assert data.parse("Fig 2.12", skiprows=3).columns[1] == f"LCOE ({EXPECTED_LCOE_UNIT})", error
-    # NOTE: Column "Country" appears twice, so drop one of them.
-    onshore_wind = (
-        data.parse("Fig 2.12", skiprows=6)
-        .dropna(how="all", axis=1)
-        .drop(columns=["Country.1"])
-        .rename(columns={"Country": "country"}, errors="raise")
-        .melt(id_vars="country", var_name="year", value_name="cost")
-    )
-    # Keep only rows of LCOE, and drop year changes and empty rows.
-    onshore_wind = onshore_wind[~onshore_wind["year"].astype(str).str.startswith("%")].dropna().reset_index(drop=True)
+    # Keep only country and year columns - year columns should be numeric
+    columns_to_keep = ["country"] + [
+        col for col in solar_pv.columns if col != "country" and isinstance(col, (int, float))
+    ]
+    solar_pv = solar_pv[columns_to_keep]
 
-    error = "The file format for country-level onshore wind LCOE for smaller markets has changed."
-    assert data.parse("Fig 2.13", skiprows=3).columns[1] == f"LCOE ({EXPECTED_LCOE_UNIT})", error
-    onshore_wind_extra = (
-        data.parse("Fig 2.13", skiprows=6)
-        .dropna(how="all", axis=1)
-        .rename(columns={"Country": "country"}, errors="raise")
-        .melt(id_vars="country", var_name="year", value_name="cost")
-        .dropna()
-        .reset_index(drop=True)
-    )
+    # Melt to long format
+    solar_pv = solar_pv.melt(id_vars="country", var_name="year", value_name="cost")
 
-    # Check that there is no overlap between countries in the two tables.
-    # NOTE: If there is, then change this to check that the values on coincident country-years are consistent.
-    error = "Expected no overlap between countries in sheets 2.12 and 2.13."
-    assert set(onshore_wind["country"]).isdisjoint(set(onshore_wind_extra["country"])), error
+    # Keep only valid data rows (remove rows with NaN countries and costs)
+    solar_pv = solar_pv.dropna(subset=["country", "cost"]).reset_index(drop=True)
 
-    # Combine onshore wind data.
-    onshore_wind_combined = pr.concat([onshore_wind, onshore_wind_extra], ignore_index=True)
+    # Filter out any non-country rows (sometimes there are summary rows)
+    solar_pv = solar_pv[solar_pv["country"].notna() & (solar_pv["country"] != "")].reset_index(drop=True)
 
-    # Add a technology column and concatenate different technologies.
+    # Onshore wind - Fig 2.15: Weighted average LCOE of commissioned onshore wind projects in top markets
+    # Unit: LCOE (2024 USD/kWh) - verified from sheet
+    # Verify unit is as expected
+    unit_check = data.parse("Fig 2.15", skiprows=2)
+    unit_cell = unit_check.iloc[0, 1]  # Should contain "LCOE (2024 USD/kWh)"
+    assert unit_cell == f"LCOE ({EXPECTED_LCOE_UNIT})", f"Expected '{EXPECTED_LCOE_UNIT}' but found '{unit_cell}'"
+
+    # Load country data - skiprows=6 gets us to the header row with years as column names
+    onshore_wind = data.parse("Fig 2.15", skiprows=6).dropna(how="all", axis=1)
+
+    # Rename country column - for skiprows=6, this should be "Country" column (column 0)
+    onshore_wind = onshore_wind.rename(columns={onshore_wind.columns[0]: "country"}, errors="raise")
+
+    # Keep only country and year columns - year columns are strings like "2010", "2011", etc.
+    year_columns = [col for col in onshore_wind.columns if col != "country" and str(col).isdigit()]
+    columns_to_keep = ["country"] + year_columns
+    onshore_wind = onshore_wind[columns_to_keep]
+
+    # Melt to long format
+    onshore_wind = onshore_wind.melt(id_vars="country", var_name="year", value_name="cost")
+
+    # Keep only valid data rows
+    onshore_wind = onshore_wind.dropna(subset=["country", "cost"]).reset_index(drop=True)
+
+    # Filter out any non-country rows (including the header row "Country")
+    onshore_wind = onshore_wind[
+        onshore_wind["country"].notna() & (onshore_wind["country"] != "") & (onshore_wind["country"] != "Country")
+    ].reset_index(drop=True)
+
+    # Add technology columns and concatenate
     solar_pv["technology"] = "Solar photovoltaic"
-    onshore_wind_combined["technology"] = "Onshore wind"
-    combined = pr.concat([solar_pv, onshore_wind_combined], ignore_index=True)
+    onshore_wind["technology"] = "Onshore wind"
+
+    # Ensure proper data types
+    solar_pv["country"] = solar_pv["country"].astype(str)
+    solar_pv["technology"] = solar_pv["technology"].astype(str)
+    solar_pv["year"] = solar_pv["year"].astype(int)
+    solar_pv["cost"] = solar_pv["cost"].astype(float)
+
+    onshore_wind["country"] = onshore_wind["country"].astype(str)
+    onshore_wind["technology"] = onshore_wind["technology"].astype(str)
+    onshore_wind["year"] = onshore_wind["year"].astype(int)
+    onshore_wind["cost"] = onshore_wind["cost"].astype(float)
+
+    # Convert to Tables before concatenating
+    solar_pv_table = Table(solar_pv)
+    onshore_wind_table = Table(onshore_wind)
+    combined = pr.concat([solar_pv_table, onshore_wind_table], ignore_index=True)
 
     return combined
 
