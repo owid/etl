@@ -60,14 +60,14 @@ def show_usage(response_time: float):
         # st.markdown(st.session_state.last_usage)
         cost = estimate_llm_cost(
             model_name=st.session_state["expert_config"]["model_name"],
-            input_tokens=st.session_state.last_usage.request_tokens,
-            output_tokens=st.session_state.last_usage.response_tokens,
+            input_tokens=st.session_state.last_usage.input_tokens,
+            output_tokens=st.session_state.last_usage.output_tokens,
         )
 
         # Build message
         time_msg = f"{response_time:.2f}s"
-        num_tokens_in = st.session_state.last_usage.request_tokens
-        num_tokens_out = st.session_state.last_usage.response_tokens
+        num_tokens_in = st.session_state.last_usage.input_tokens
+        num_tokens_out = st.session_state.last_usage.output_tokens
         num_tokens = st.session_state.last_usage.total_tokens
         model_name = st.session_state["expert_config"]["model_name"]
         cost_msg = f"~{cost:.4f} USD"
