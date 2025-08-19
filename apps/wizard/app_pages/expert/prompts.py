@@ -36,7 +36,7 @@ def generate_documentation(pages_md: List[str]) -> str:
 
 
 ######### SYSTEM PROMPTS #########
-NOTE = """To help you with this task, find below the required ETL documentation. Each documentation page is separated by '{PAGE_SEPARATOR}', followed by the path to the page "_page: <page_path>_". The documentation content is given as markdown text (suitable for mkdocs).
+NOTE = f"""To help you with this task, find below the required ETL documentation. Each documentation page is separated by '{PAGE_SEPARATOR}', followed by the path to the page "_page: <page_path>_" (or documentation file). The documentation content is mostly given as markdown text (suitable for mkdocs).
 """
 # ONLY METADATA
 ## Metadata reference
@@ -95,6 +95,32 @@ As an expert in OWID's documentation, you'll respond to inquiries about some of 
 {PAGES_TEXT}
 """
 
+# DESIGN PRINCIPLES
+PAGES_MD = glob.glob(str(DOCS_DIR) + "/architecture/**/*.md", recursive=True)
+PAGES_MD = [p for p in PAGES_MD if "metadata/reference" not in p]
+PAGES_TEXT = generate_documentation(PAGES_MD)
+SYSTEM_PROMPT_PRINCIPLES = f"""
+As an expert in OWID's documentation, you'll respond to inquiries about some of its content. In particular, on the theoretical framework of it (i.e. the design principles).
+
+{NOTE}
+
+{PAGES_TEXT}
+"""
+
+# INTRO
+PAGES_MD_START = glob.glob(str(DOCS_DIR) + "/getting-started/**/*.md", recursive=True) + glob.glob(
+    str(DOCS_DIR) + "/*.md"
+)
+PAGES_MD_DESIGN = glob.glob(str(DOCS_DIR) + "/architecture/**/*.md", recursive=True)
+PAGES_MD_DESIGN = [p for p in PAGES_MD_DESIGN if "metadata/reference" not in p]
+PAGES_TEXT = generate_documentation(PAGES_MD_START + PAGES_MD_DESIGN)
+SYSTEM_PROMPT_INTRO = f"""
+As an expert in OWID's documentation, you'll respond to inquiries about some of its content. In particular, on getting started with setting up the environment or the theoretical framework of it (i.e. the design principles).
+
+{NOTE}
+
+{PAGES_TEXT}
+"""
 
 # GUIDES
 PAGES_MD = (
@@ -111,47 +137,6 @@ As an expert in OWID's documentation, you'll respond to inquiries about some of 
 {PAGES_TEXT}
 """
 
-# DESIGN PRINCIPLES
-PAGES_MD = glob.glob(str(DOCS_DIR) + "/architecture/**/*.md", recursive=True)
-PAGES_MD = [p for p in PAGES_MD if "metadata/reference" not in p]
-PAGES_TEXT = generate_documentation(PAGES_MD)
-SYSTEM_PROMPT_PRINCIPLES = f"""
-As an expert in OWID's documentation, you'll respond to inquiries about some of its content. In particular, on the theoretical framework of it (i.e. the design principles).
-
-{NOTE}
-
-{PAGES_TEXT}
-"""
-
-# FULL
-PAGES_MD = glob.glob(str(DOCS_DIR) + "/**/*.md", recursive=True)
-PAGES_TEXT = generate_documentation(PAGES_MD)
-SYSTEM_PROMPT_FULL = f"""
-As an expert in OWID's documentation, you'll respond to inquiries about various aspects of it including: setting up the working environment, design principles of ETL, the metadata structure (and its four main entities: Origin, Dataset, Table, and Indicator).
-
-{NOTE}
-
-{PAGES_TEXT}
-
-{PAGE_SEPARATOR}
-page: architecture/metadata/reference/index.md
-
-{METADATA_REFERENCE}
-"""
-
-
-# GENERIC
-
-SYSTEM_PROMPT_GENERIC = f"""
-{NOTE}
-
-{PAGES_TEXT}
-
-{PAGE_SEPARATOR}
-page: architecture/metadata/reference/index.md
-
-{METADATA_REFERENCE}
-"""
 
 # DATASETTE ORACLE
 # TODO: Schema should be auto-generated. Maybe extract from http://analytics/private.json? Problem: how can one get the variable names linking tables?
@@ -638,4 +623,18 @@ For questions about posts, articles, topic pages and so on, posts_unified is usu
 Your job is to create a SQL query for the user that answers their question given the schema above. You may ask the user for clarification, e.g. if it is unclear if unpublished items should be included (when applicable) or if there is ambiguity in which tables to use to answer a question.
 
 Upon generating a query, Datasette Oracle will always provide the SQL query both as text and as a clickable Datasette link, formatted for the user's convenience. The datasette URL is http://analytics/private and the database name is owid. An example query to get all rows from the algolia_searches_by_week table is this one that demonstrates the escaping: `http://analytics/private?sql=select+*+from+algolia_searches_by_week` Remember, you cannot actually run the SQL query, you are just to output the query as text and a datasette link that will run that query!
+"""
+
+
+# GENERIC
+
+SYSTEM_PROMPT_GENERIC = f"""{NOTE}
+
+{PAGES_TEXT}
+
+{PAGE_SEPARATOR}
+_page: architecture/metadata/reference/index.md
+
+{METADATA_REFERENCE}
+
 """

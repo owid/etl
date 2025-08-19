@@ -165,6 +165,10 @@ pytest tests/test_steps.py -m integration
   uv sync                 # Sync dependencies
   ```
 - **IMPORTANT**: Never install packages with `pip install` - always ask first, then use `uv` if approved
+<<<<<<< HEAD
+=======
+- **MCP Server**: Run MCP servers with: `source .venv/bin/activate && python -m mcp.server`
+>>>>>>> origin/master
 
 ### Environment Variables
 - `OWID_ENV`: dev/staging/production environment
@@ -287,6 +291,7 @@ print(f"Garden null values: {tb.date.isnull().sum()}")
 - **Fix meadow steps**: Most data cleaning should happen in meadow, not garden steps
 
 
+<<<<<<< HEAD
 ## Database Access
 
 ### MySQL Connection
@@ -305,6 +310,8 @@ SELECT id, name FROM variables WHERE datasetId = 12345;
 ```
 
 
+=======
+>>>>>>> origin/master
 ## Important Development Notes
 
 - Always use `geo.harmonize_countries()` for geographic data
@@ -317,4 +324,10 @@ SELECT id, name FROM variables WHERE datasetId = 12345;
 - **ALWAYS run `make check` before committing** - formats code, fixes linting issues, and runs type checks
 - SQL queries enclose in triple quotes for readability
 
+<<<<<<< HEAD
 - When running etlr, always use PREFER_DOWNLOAD=1 prefix
+=======
+## Instructions for MCP servers
+- When I ask you to get something from MCP server, don't run a python script, but query the MCP server directly! If it is not available, let me know.
+- If MCP server raises an error, try to fix it in code.
+>>>>>>> origin/master
