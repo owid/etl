@@ -315,4 +315,4 @@ SELECT id, name FROM variables WHERE datasetId = 12345;
 - VS Code extensions available: `make install-vscode-extensions`
 - **ALWAYS run `make check` before committing** - formats code, fixes linting issues, and runs type checks
 - SQL queries enclose in triple quotes for readability
-- When running etlr, always use PREFER_DOWNLOAD=1 prefix
+- When running **etlr**, always use PREFER_DOWNLOAD=1 prefix (don't use it for **etls** command)

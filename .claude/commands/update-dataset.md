@@ -19,10 +19,11 @@
    etls #$ARGUMENTS
    ```
 
-4. **Test ETL pipeline** - Run `etlr` with `--grapher`. It's OK if it fails initially!
+4. **Test ETL pipeline** - Run `etlr` with `--grapher`. **EXPECTED TO FAIL INITIALLY** - this is normal when updating datasets!
    ```bash
    etlr [dataset] --grapher
    ```
+   **NOTE: Don't try to fix errors in this step - failures are expected and normal. Just run it and move on to commit the initial changes.**
 
 5. **Commit and push initial changes**
    ```bash
