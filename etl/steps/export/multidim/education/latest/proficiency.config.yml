@@ -10,6 +10,17 @@ default_selection:
   - Turkey
 
 dimensions:
+  - slug: subject
+    name: Subject
+    choices:
+      - slug: mathematics
+        name: Mathematics
+      - slug: reading
+        name: Reading
+      - slug: subject_side_by_side
+        name: Mathematics vs. reading
+        description: Compare learning outcomes across subjects
+
   - slug: level
     name: Education level
     choices:
@@ -20,7 +31,7 @@ dimensions:
         name: End of lower secondary education
         description: Typically for children aged 14 to 15 years old
       - slug: level_side_by_side
-        name: All education levels
+        name: End of primary vs. lower secondary education
         description: Compare proficiency rates across all education levels
 
   - slug: population
@@ -33,19 +44,8 @@ dimensions:
         name: All children
         description: Includes all children in the relevant age group, not just those enrolled in school
       - slug: population_side_by_side
-        name: Children and students
+        name: Children vs. students
         description: Compare learning outcomes between all children and just those students who are enrolled
-
-  - slug: subject
-    name: Subject
-    choices:
-      - slug: mathematics
-        name: Mathematics
-      - slug: reading
-        name: Reading
-      - slug: subject_side_by_side
-        name: All subjects
-        description: Compare learning outcomes across subjects
 
   - slug: sex
     name: Gender

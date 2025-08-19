@@ -23,7 +23,7 @@ dimensions:
         name: Older people
         description: Older adults aged 65 years and older
       - slug: age_side_by_side
-        name: All age groups
+        name: Age group comparison
         description: Compare literacy rates across different age groups
 
   - slug: sex

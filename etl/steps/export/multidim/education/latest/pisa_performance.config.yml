@@ -23,7 +23,7 @@ dimensions:
         name: Reading
         description: Reading scores measuring reading comprehension and literacy skills
       - slug: subject_side_by_side
-        name: All subjects
+        name: Compare subjects
         description: Compare performance across subjects
 
   - slug: sex
