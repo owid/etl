@@ -41,7 +41,9 @@ def get_username():
 
 def load_env():
     if env.get("ENV", "").startswith("."):
-        raise ValueError(f"ENV was replaced by ENV_FILE, please use ENV_FILE={env['ENV']} ... instead.")
+        raise ValueError(
+            f"ENV was replaced by ENV_FILE, please use ENV_FILE={env['ENV']} ... instead."
+        )
 
     load_dotenv(ENV_FILE)
 
@@ -119,10 +121,14 @@ else:
 
 # Production checks
 if DATA_API_ENV == "production":
-    assert DB_IS_PRODUCTION, "DB_NAME must be set to live_grapher when publishing to production"
+    assert (
+        DB_IS_PRODUCTION
+    ), "DB_NAME must be set to live_grapher when publishing to production"
 
 if DB_IS_PRODUCTION:
-    assert DATA_API_ENV == "production", "DATA_API_ENV must be set to production when publishing to live_grapher"
+    assert (
+        DATA_API_ENV == "production"
+    ), "DATA_API_ENV must be set to production when publishing to live_grapher"
 
 
 def load_STAGING() -> Optional[str]:
@@ -137,7 +143,9 @@ def load_STAGING() -> Optional[str]:
     elif STAGING == "1":
         branch_name = git.Repo(BASE_DIR).active_branch.name
         if branch_name == "master":
-            log.warning("You're on master branch, using local env instead of STAGING=master")
+            log.warning(
+                "You're on master branch, using local env instead of STAGING=master"
+            )
             return None
         else:
             return branch_name
@@ -227,7 +235,10 @@ FASTTRACK_COMMIT = env.get("FASTTRACK_COMMIT") in ("True", "true", "1")
 # if True, commit to monkeypox repository from export step
 MONKEYPOX_COMMIT = env.get("MONKEYPOX_COMMIT") in ("True", "true", "1")
 
-ADMIN_HOST = env.get("ADMIN_HOST", f"http://staging-site-{STAGING}" if STAGING else "http://localhost:3030")
+ADMIN_HOST = env.get(
+    "ADMIN_HOST",
+    f"http://staging-site-{STAGING}" if STAGING else "http://localhost:3030",
+)
 
 # Tailscale address of Admin, this cannot be just `http://owid-admin-prod`
 # because that would resolve to LXC container instead of the actual server
@@ -260,7 +271,9 @@ GITHUB_API_URL = f"{GITHUB_API_BASE}/pulls"
 TLS_VERIFY = bool(int(env.get("TLS_VERIFY", 1)))
 
 # Default schema for presentation.grapher_config in metadata. Try to keep it up to date with the latest schema.
-DEFAULT_GRAPHER_SCHEMA = "https://files.ourworldindata.org/schemas/grapher-schema.008.json"
+DEFAULT_GRAPHER_SCHEMA = (
+    "https://files.ourworldindata.org/schemas/grapher-schema.008.json"
+)
 
 # Google Cloud service account path (used for BigQuery)
 GOOGLE_APPLICATION_CREDENTIALS = env.get("GOOGLE_APPLICATION_CREDENTIALS")
@@ -303,7 +316,9 @@ class Config:
                 config_dict[field.name] = env_dict.get(field.name)
             else:
                 if field.name not in env_dict:
-                    raise KeyError(f"Field {field.name} not found in env file {env_file}!")
+                    raise KeyError(
+                        f"Field {field.name} not found in env file {env_file}!"
+                    )
                 config_dict[field.name] = env_dict[field.name]
         return cls(**config_dict)  # type: ignore
 
@@ -337,7 +352,9 @@ class OWIDEnv:
         """Environment one's in. Only works if remote and local environment are the same."""
         if self.env_remote == self.env_local:
             return self.env_remote
-        raise ValueError(f"env_remote ({self.env_remote}) and env_local ({self.env_local}) are different.")
+        raise ValueError(
+            f"env_remote ({self.env_remote}) and env_local ({self.env_local}) are different."
+        )
 
     @property
     def env_local(self) -> OWIDEnvType:
@@ -439,7 +456,9 @@ class OWIDEnv:
             return self.env_remote
         elif self.env_remote == "staging":
             return f"{self.conf.DB_HOST}"
-        raise ValueError(f"Unknown env_remote (DB_NAME/DB_USER={self.conf.DB_NAME}/{self.conf.DB_USER})")
+        raise ValueError(
+            f"Unknown env_remote (DB_NAME/DB_USER={self.conf.DB_NAME}/{self.conf.DB_USER})"
+        )
 
     @property
     def base_site(self) -> str | None:
@@ -594,7 +613,9 @@ class OWIDEnv:
                     result = [pd.read_sql(s, con, *args, **kwargs) for s in sql]
                     return result
             elif isinstance(self.engine, Session):
-                result = [pd.read_sql(s, self.engine.bind, *args, **kwargs) for s in sql]
+                result = [
+                    pd.read_sql(s, self.engine.bind, *args, **kwargs) for s in sql
+                ]
                 return result
             else:
                 raise ValueError(f"Unsupported engine type {type(self.engine)}")
@@ -619,7 +640,13 @@ def no_trailing_slash(url: str | None) -> None:
         raise ValueError(f"Env {url} should not have a trailing slash.")
 
 
-env_vars = [ADMIN_HOST, TAILSCALE_ADMIN_HOST, DATA_API_URL, BAKED_VARIABLES_PATH, R2_SNAPSHOTS_PUBLIC_READ]
+env_vars = [
+    ADMIN_HOST,
+    TAILSCALE_ADMIN_HOST,
+    DATA_API_URL,
+    BAKED_VARIABLES_PATH,
+    R2_SNAPSHOTS_PUBLIC_READ,
+]
 for env_var in env_vars:
     no_trailing_slash(env_var)
 
@@ -634,14 +661,24 @@ FORCE_DATASETTE = (not METABASE_API_KEY) or (not METABASE_URL)
 ########################################################################################################################
 # Get Notion credentials.
 NOTION_API_KEY = os.environ.get("NOTION_API_KEY")
-NOTION_IMPACT_HIGHLIGHTS_TABLE_URL = os.environ.get("NOTION_IMPACT_HIGHLIGHTS_TABLE_URL")
-NOTION_DATA_PROVIDERS_CONTACTS_TABLE_URL = os.environ.get("NOTION_DATA_PROVIDERS_CONTACTS_TABLE_URL")
+NOTION_IMPACT_HIGHLIGHTS_TABLE_URL = os.environ.get(
+    "NOTION_IMPACT_HIGHLIGHTS_TABLE_URL"
+)
+NOTION_DATA_PROVIDERS_CONTACTS_TABLE_URL = os.environ.get(
+    "NOTION_DATA_PROVIDERS_CONTACTS_TABLE_URL"
+)
 
 # Google drive IDs for folders, docs and sheets, for the data producer reports project.
 # NOTE: Here we fill all variables with "" if not found to simplify type checks (this way we ensure they are strings).
 DATA_PRODUCER_REPORT_FOLDER_ID = os.environ.get("DATA_PRODUCER_REPORT_FOLDER_ID", "")
-DATA_PRODUCER_REPORT_TEMPLATE_DOC_ID = os.environ.get("DATA_PRODUCER_REPORT_TEMPLATE_DOC_ID", "")
-DATA_PRODUCER_REPORT_STATUS_SHEET_ID = os.environ.get("DATA_PRODUCER_REPORT_STATUS_SHEET_ID", "")
+DATA_PRODUCER_REPORT_TEMPLATE_DOC_ID = os.environ.get(
+    "DATA_PRODUCER_REPORT_TEMPLATE_DOC_ID", ""
+)
+DATA_PRODUCER_REPORT_STATUS_SHEET_ID = os.environ.get(
+    "DATA_PRODUCER_REPORT_STATUS_SHEET_ID", ""
+)
 
 # Logfire for LLM observability
 LOGFIRE_TOKEN_EXPERT = env.get("LOGFIRE_TOKEN_EXPERT")
+LOGFIRE_TOKEN_MCP = env.get("LOGFIRE_TOKEN_MCP")
+LOGFIRE_TOKEN_ETL_API = env.get("LOGFIRE_TOKEN_ETL_API")

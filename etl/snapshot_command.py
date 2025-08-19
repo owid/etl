@@ -83,9 +83,13 @@ def find_snapshot_script(dataset_name: str) -> Optional[Path]:
         else:
             return None
 
-    # Remove .py extension if present
-    if dataset_name.endswith(".py"):
-        dataset_name = dataset_name[:-3]
+    # Remove any file extension if present (e.g., .py, .csv, .xlsx)
+    if "." in dataset_name and not dataset_name.startswith("snapshots/"):
+        # Only strip extension if it's not a full path starting with snapshots/
+        # Find the last dot and check if it's likely a file extension
+        dot_index = dataset_name.rfind(".")
+        if dot_index > dataset_name.rfind("/"):  # Extension is after the last slash
+            dataset_name = dataset_name[:dot_index]
 
     # Count the number of path separators to determine the type of path
     path_parts = dataset_name.split("/")
@@ -219,9 +223,12 @@ def run_snapshot_dvc_only(dataset_name: str, upload: bool, path_to_file: Optiona
         # Remove snapshots/ prefix
         dataset_name = dataset_name[10:]  # len("snapshots/") = 10
 
-    # Remove .py extension if present (from failed script search)
-    if dataset_name.endswith(".py"):
-        dataset_name = dataset_name[:-3]
+    # Remove any file extension if present (from failed script search)
+    if "." in dataset_name:
+        # Find the last dot and check if it's likely a file extension
+        dot_index = dataset_name.rfind(".")
+        if dot_index > dataset_name.rfind("/"):  # Extension is after the last slash
+            dataset_name = dataset_name[:dot_index]
 
     # Convert partial path to full URI by finding the .dvc file
     path_parts = dataset_name.split("/")

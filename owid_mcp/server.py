@@ -2,18 +2,30 @@ import asyncio
 import threading
 import uuid
 
+import logfire
 from fastmcp import FastMCP
 from fastmcp.server.middleware import Middleware, MiddlewareContext
 from sentry_sdk import capture_exception
 from sentry_sdk import logger as sentry_logger
 
-from etl.config import enable_sentry
+from etl.config import LOGFIRE_TOKEN_MCP, enable_sentry
 
 # Import the modular servers
 from owid_mcp import charts, deep_research, indicators, posts
 from owid_mcp.config import COMMON_ENTITIES
 
 enable_sentry(enable_logs=True)
+
+if LOGFIRE_TOKEN_MCP:
+    logfire.configure(token=LOGFIRE_TOKEN_MCP, service_name="owid_mcp")
+    logfire.instrument_httpx()
+
+    # logging.basicConfig(
+    #     handlers=[logfire.LogfireLoggingHandler()],
+    #     level=logging.INFO,
+    # )
+else:
+    logfire.configure(send_to_logfire=False)
 
 INSTRUCTIONS = (
     "RECOMMENDED TOOLS (for full MCP clients):\n"
@@ -63,24 +75,30 @@ mcp = FastMCP(
 
 class RequestLoggingMiddleware(Middleware):
     async def on_message(self, context: MiddlewareContext, call_next):
-        attributes = {
+        attrs = {
             "request_id": str(uuid.uuid4()),
             "method": context.method,
-            "message": str(context.message),
+            **context.message.__dict__,
         }
 
-        # Log incoming request
-        sentry_logger.info(
-            "request started",
-            attributes=attributes,
-        )
+        # Put every MCP call inside a Logfire span so it shows up as a trace
+        msg = str(context.method)
+        if attrs.get("name"):
+            msg += " - " + attrs["name"]
+        with logfire.span(msg, **attrs):
+            # Log incoming request
+            sentry_logger.info(
+                "request started",
+                attributes=attrs,
+            )
 
-        # handle request
-        try:
-            result = await call_next(context)
-        except Exception as e:
-            capture_exception(e)
-            raise e
+            # handle request
+            try:
+                result = await call_next(context)
+            except Exception as e:
+                capture_exception(e)
+                logfire.exception("request failed", **attrs)
+                raise e
 
         return result
 
