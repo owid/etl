@@ -278,10 +278,10 @@ if prompt:
     # Display assistant response in chat message container
     with st.chat_message("assistant"):
         # Notify user that agent is working
-        st.toast(
-            f"**Agent working**: Using model `{st.session_state['expert_config']['model_name']}`...",
-            icon=":material/smart_toy:",
-        )
+        # st.toast(
+        #     f"**Agent working**: `{st.session_state['expert_config']['model_name']}`...",
+        #     icon=":material/smart_toy:",
+        # )
         start_time = time.time()
 
         # Agent to work, and stream its output

@@ -252,6 +252,9 @@ async def agent_stream2(prompt: str, model_name: str, message_history) -> AsyncG
     # Collect all chunks first to avoid async context issues with Streamlit
     # with st.spinner("Asking LLM...", show_time=True):
     with st.status("Talking with the expert...", expanded=False) as status:
+        st.markdown(
+            f"**:material/smart_toy: Agent working**: `{st.session_state['expert_config']['model_name']}`",
+        )
         chunks = await _collect_agent_stream2(
             prompt,
             model_name,
