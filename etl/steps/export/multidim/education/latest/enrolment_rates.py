@@ -143,11 +143,13 @@ def run() -> None:
         # Generate dynamic subtitle
         if level and enrolment_type:
             view.config["subtitle"] = generate_subtitle_by_level(level, sex, enrolment_type)
-        
+
         # Add footnote for gross enrolment ratio
         if enrolment_type == "gross_enrolment":
-            view.config["note"] = "Values may exceed 100% when children who are older or younger than the official age group also enroll."
-        
+            view.config["note"] = (
+                "Values may exceed 100% when children who are older or younger than the official age group also enroll."
+            )
+
         if sex == "sex_side_by_side" or level == "level_side_by_side":
             view.metadata = {
                 "presentation": {
