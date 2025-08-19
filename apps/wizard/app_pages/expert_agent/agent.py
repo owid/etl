@@ -85,7 +85,9 @@ async def process_tool_call(
     tool_args: dict[str, Any],
 ) -> ToolResult:
     """A tool call processor that passes along the deps."""
-    st.markdown(f"**:material/schema: MCP**: Querying OWID MCP, method `{name}`")  # , icon=":material/compare_arrows:")
+    st.markdown(
+        f"**:material/compare_arrows: MCP**: Querying OWID MCP, method `{name}`"
+    )  # , icon=":material/compare_arrows:")
     return await call_tool(name, tool_args, {"deps": ctx.deps})
 
 
