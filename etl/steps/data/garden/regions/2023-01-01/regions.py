@@ -132,7 +132,7 @@ def run(dest_dir: str) -> None:
     tb_regions = tb_regions.astype({"is_historical": bool})
 
     # Set an appropriate index and sort conveniently.
-    tb_regions = tb_regions.set_index("code", verify_integrity=True).sort_index()
+    tb_regions = tb_regions.format("code")
 
     #
     # Save outputs.
