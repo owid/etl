@@ -34,7 +34,7 @@ load_env()
 st.session_state.setdefault("expert_config", {})
 st.session_state.setdefault("agent_messages", [])
 st.session_state.setdefault("recommended_question", None)
-st.session_state.setdefault("expert_use_mcp", False)
+st.session_state.setdefault("expert_use_mcp", True)
 # Models
 ## See all of them in https://github.com/pydantic/pydantic-ai/blob/master/pydantic_ai_slim/pydantic_ai/models/__init__.py
 MODEL_DEFAULT = "openai:gpt-5-mini"
@@ -201,9 +201,9 @@ def show_settings_menu():
         st.session_state["expert_config"]["model_name"] = model_name
     st.toggle(
         label="Use OWID mcp",
-        value=False,
+        value=True,
         key="expert_use_mcp",
-        help="**:material/warning: EXPERIMENTAL**! Use OWID's MCP server to access our data and tools.",
+        help="Use MCPs to access and interact with OWID's data. :material/warning: Note: This feature is new, disable it if you are experiencing any issues.",
     )
     with st.container(horizontal=True, vertical_alignment="bottom"):
         st.button(
