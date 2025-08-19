@@ -262,7 +262,7 @@ definitions:
     - Literacy is a foundational skill. Children need to learn to read so that they can read to learn. When we fail to teach this foundational skill, people have fewer opportunities to lead the rich and interesting lives that a good education offers.
     - This indicator measures the percentage of people who can read and write a simple sentence about their daily life. It’s calculated as the number of people in a given age group who report being able to do so, divided by the total number in that group. UNESCO tracks this across different generations – including youth, adults, and older people – to show how literacy is changing over time.
     - Most of the data comes from national surveys. In some countries, people are asked directly whether they can read and write; in others, they take a short test.
-    - In many high-income countries, literacy rates reached near-universal levels by the late 20th century. As a result, regular tracking has been scaled back, since changes are small and less relevant for education policy.
+    - In many high–income countries, literacy rates reached near–universal levels by the late 20th century. As a result, regular tracking has been scaled back, since changes are small and less relevant for education policy.
     - This data tells us whether someone can read and write at a very basic level – for example, reading simple sentences or writing their name. But it doesn’t tell us whether they can use reading and writing in everyday life, like filling out a job application or reading health instructions. Those kinds of skills take more years of schooling and are much harder to measure, especially when comparing across countries and over time.
 
   desc_key_completion_rate: &desc_key_completion_rate

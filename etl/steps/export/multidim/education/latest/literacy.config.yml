@@ -14,7 +14,7 @@ dimensions:
     name: Age group
     choices:
       - slug: adult
-        name: Adults
+        name: All adults
         description: Adults aged 15 years and older
       - slug: youth
         name: Young people
