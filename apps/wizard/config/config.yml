@@ -195,13 +195,6 @@ sections:
         entrypoint: app_pages/indicator_search/app.py
         icon: ":material/search:"
         image_url: "https://www.shutterstock.com/image-vector/standard-ph-chart-aqueous-solution-600nw-2007387788.jpg"
-      - title: "Similar charts (deprecated)"
-        alias: similar_charts
-        description: "Find similar charts"
-        maintainer: "@mojmir"
-        entrypoint: app_pages/similar_charts/app.py
-        icon: ":material/bar_chart:"
-        image_url: "https://media.istockphoto.com/id/1296381479/vector/set-of-simple-infographic-graphs-and-charts-data-visualization-statistics-and-business.jpg?s=612x612&w=0&k=20&c=JpEoP-6w16OwVC49Sq2PEI8-dHF1CZnm7rHyL5DoxqA="
       - title: "Related charts"
         alias: related_charts
         description: "Find related charts"
@@ -291,14 +284,14 @@ sections:
   #       disable:
   #         "production": True
   #         "staging": True
-# legacy:
-#   description: |-
-#     The pages below are legacy now. They are kept in case the new pages are not working properly.
-#   apps:
-#     - title:
-#       alias:
-#       entrypoint:
-#       description:
-#       maintainer:
-#       icon:
-#       image_url:
+legacy:
+  description: |-
+    The pages below are legacy now. They are kept in case the new pages are not working properly.
+  apps:
+    - title: "Similar charts (deprecated)"
+      alias: similar_charts
+      description: "Find similar charts"
+      maintainer: "@mojmir"
+      entrypoint: app_pages/similar_charts/app.py
+      icon: ":material/bar_chart:"
+      image_url: "https://media.istockphoto.com/id/1296381479/vector/set-of-simple-infographic-graphs-and-charts-data-visualization-statistics-and-business.jpg?s=612x612&w=0&k=20&c=JpEoP-6w16OwVC49Sq2PEI8-dHF1CZnm7rHyL5DoxqA="

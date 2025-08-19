@@ -21,6 +21,7 @@ from etl.paths import SNAPSHOTS_DIR
 st.set_page_config(
     page_title="Wizard: Snapshot",
     page_icon="🪄",
+    layout="centered",
 )
 # Lists with fields of special types. By default, fields are text inputs.
 FIELD_TYPES_TEXTAREA = [

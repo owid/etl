@@ -24,6 +24,7 @@ from etl.config import load_env
 st.set_page_config(
     page_title="Wizard: Ask the Expert",
     page_icon="🪄",
+    layout="centered",
 )
 
 # LOG

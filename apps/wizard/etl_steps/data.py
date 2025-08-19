@@ -35,6 +35,7 @@ from etl.paths import DATA_DIR, SNAPSHOTS_DIR
 st.set_page_config(
     page_title="Wizard: Data Step",
     page_icon="🪄",
+    layout="centered",
 )
 st.session_state.submit_form = st.session_state.get("submit_form", False)
 st.session_state["data.steps_to_create"] = st.session_state.get("data.steps_to_create", [])

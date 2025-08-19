@@ -67,6 +67,7 @@ APP_STATE = wizard_utils.AppState()
 st_title_with_expert(
     "Fast-Track import",
     icon=":material/fast_forward:",
+    layout="centered",
 )
 st.markdown(
     """

@@ -9,6 +9,7 @@ from apps.wizard.utils.components import preview_file, st_title_with_expert
 st.set_page_config(
     page_title="Wizard: Collection Step",
     page_icon="🪄",
+    layout="centered",
 )
 
 
