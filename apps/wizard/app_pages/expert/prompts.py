@@ -1,4 +1,15 @@
-""" "Get prompts for GPT-interaction."""
+""" "Get prompts for GPT-interaction.
+
+# "Summarize your knowledge from your system prompt into one short sentence"
+# SYSTEM_PROMPT_GUIDES      70925   299632
+# SYSTEM_PROMPT_INTRO       26500   109799
+# SYSTEM_PROMPT_PRINCIPLES  17821   75429
+# SYSTEM_PROMPT_METADATA    13609   54469
+# SYSTEM_PROMPT_START       9195    34678
+# SYSTEM_PROMPT_DATASETTE   3917    14850
+# SYSTEM_PROMPT_DATABASE    256     934
+
+"""
 
 import glob
 from typing import List
@@ -60,17 +71,6 @@ METADATA_REFERENCE = f"""
 #### `variable.presentation.grapher_config`
 
 {render_grapher_config()}
-"""
-
-## Metadata usage
-PAGES_MD = glob.glob(str(DOCS_DIR) + "/architecture/metadata/structuring-yaml/**/*.md", recursive=True) + glob.glob(
-    str(DOCS_DIR) + "/*.md"
-)
-PAGES_TEXT = generate_documentation(PAGES_MD)
-METADATA_USAGE = f"""
-{NOTE}
-
-{PAGES_TEXT}
 """
 
 ## Complete Metadata prompt

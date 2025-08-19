@@ -15,7 +15,13 @@ from apps.wizard.app_pages.explorer_diff.utils import (
     _set_page_config,
     truncate_lines,
 )
-from apps.wizard.utils.components import explorer_chart, st_horizontal, st_wizard_page_link, url_persist
+from apps.wizard.utils.components import (
+    explorer_chart,
+    st_horizontal,
+    st_title_with_expert,
+    st_wizard_page_link,
+    url_persist,
+)
 from etl.config import OWID_ENV
 from etl.db import get_engine, read_sql
 from etl.grapher import model as gm
@@ -246,8 +252,9 @@ def display_explorer_comparison(explorer_slug: str):
 
 def main():
     st.warning("This application is currently in beta. We greatly appreciate your feedback and suggestions!")
-    st.title(
-        ":material/difference: Explorer Diff",
+    st_title_with_expert(
+        "Explorer Diff",
+        icon=":material/difference:",
         help=f"""
 **Explorer diff** is a page that compares explorer between [`production`](http://owid.cloud) and your [`{OWID_ENV.name}`]({OWID_ENV.admin_site}) environment.
 """,

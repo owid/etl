@@ -14,7 +14,7 @@ from apps.wizard.app_pages.dashboard.utils import (
     load_steps_df,
     load_steps_df_to_display,
 )
-from apps.wizard.utils.components import st_horizontal
+from apps.wizard.utils.components import st_horizontal, st_title_with_expert
 
 st.set_page_config(
     page_title="Wizard: ETL Dashboard",
@@ -46,7 +46,7 @@ log = get_logger()
 ########################################
 # HEADER: title, description
 ########################################
-st.title(":material/tv_gen: Step upgrader")
+st_title_with_expert("Step upgrader", icon=":material/tv_gen:")
 
 tutorial_html = f"""
 **Example:** Updating a specific Grapher dataset.

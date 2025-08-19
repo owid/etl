@@ -54,12 +54,6 @@ st.markdown(
 load_env()
 
 
-@st.cache_data(show_spinner=True)
-def ask_gpt(query, model):
-    response = api.query_gpt(query, model=model)
-    return response
-
-
 # GPT CONFIG
 MODEL_DEFAULT = "gpt-5"
 MODELS_AVAILABLE = {
