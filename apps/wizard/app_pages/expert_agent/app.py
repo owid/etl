@@ -121,6 +121,7 @@ def show_reasoning_details():
 # @st.dialog(title="**:material/auto_awesome: Reasoning details**", width="large",)
 def show_reasoning_details_dialog():
     messages = _load_history_messages()
+    # st.write(messages)
     num_parts = sum(len(message["parts"]) for message in messages)
     counter_parts = 0
     counter_questions = 0

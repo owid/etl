@@ -209,6 +209,8 @@ async def _collect_agent_stream2(prompt: str, model_name: str, message_history) 
     ) as run:
         nodes = []
         async for node in run:
+            # print(f"--------------------------")
+            # print(node)
             nodes.append(node)
             if Agent.is_model_request_node(node):
                 # is_final_synthesis_node = any(isinstance(prev_node, CallToolsNode) for prev_node in nodes)
