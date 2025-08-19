@@ -27,7 +27,11 @@ from etl.command import main as etl_main
 from etl.paths import DAG_DIR
 
 # Page config
-st.set_page_config(page_title="Wizard: Import data via Fast-Track", page_icon="🪄")
+st.set_page_config(
+    page_title="Wizard: Import data via Fast-Track",
+    page_icon="🪄",
+    layout="centered",
+)
 
 
 # Reset states
@@ -67,7 +71,6 @@ APP_STATE = wizard_utils.AppState()
 st_title_with_expert(
     "Fast-Track import",
     icon=":material/fast_forward:",
-    layout="centered",
 )
 st.markdown(
     """
