@@ -236,6 +236,16 @@ Note: The `etl pr` creates a new branch but does NOT automatically commit files 
 - Only catch specific exceptions when you can meaningfully handle them
 - Avoid `except Exception` - it masks real problems
 
+### Never Mask Underlying Issues
+- **NEVER** return empty tables or default values to "fix" data parsing failures
+- **NEVER** silently skip errors or missing data without clear explanation
+- **BAD**: `return Table(pd.DataFrame({'col': []}))` - hides the real problem
+- **BAD**: `try: parse_data() except: return empty_table` - masks what's broken
+- **GOOD**: Let the error happen and provide clear diagnostic information
+- **GOOD**: `raise ValueError("Sheet 'Fig 3.2' format changed - skiprows needs updating from 7 to X")`
+- **If you don't know what to do - ASK THE USER instead of masking the issue**
+- Silent failures make debugging exponentially harder and create technical debt
+
 ## Debugging ETL Data Quality Issues
 
 When ETL steps fail due to data quality issues (NaT values, missing data, missing indicators), always trace the problem upstream through the pipeline stages rather than patching symptoms downstream:

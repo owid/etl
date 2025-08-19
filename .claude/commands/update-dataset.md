@@ -137,6 +137,14 @@
 
 ### Common issues when data structure changes
 
+- **⚠️ SILENT FAILURES WARNING**: Never return empty tables as workarounds! If data parsing fails, the function should either:
+  - Fix the parsing logic to handle the new format, OR  
+  - Raise a clear error with specific details about what changed, OR
+  - Add a clear log warning explaining why data is missing
+  - **BAD**: `return Table(pd.DataFrame({'col': []}))` - silently masks the real issue
+  - **GOOD**: `raise ValueError("Sheet 'Fig 3.2' format changed - need to update skiprows from X to Y")`
+  - Empty tables hide data quality issues and make debugging much harder for future updates
+
 - **Column name changes**: If columns are renamed/split (e.g., single cost → local currency + PPP), update:
   - Python code references in garden step
   - Garden metadata YAML (`food_prices_for_nutrition.meta.yml`)
