@@ -211,7 +211,8 @@ SUBSET = env.get("SUBSET", None)
 MAX_VIRTUAL_MEMORY_LINUX = 64 * 2**30  # 64 GB
 
 # increment this to force a full rebuild of all datasets
-ETL_EPOCH = 5
+# TODO: undo this!
+ETL_EPOCH = 6
 
 # any garden or grapher dataset after this date will have strict mode enabled
 STRICT_AFTER = "2023-06-25"
