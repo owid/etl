@@ -14,12 +14,23 @@
    etl update snapshot://#$ARGUMENTS --include-usages
    ```
 
-3. **Run snapshot step**
+3. **Commit and push initial changes**
+   ```bash
+   git add .
+   git commit -m "Update dataset to new version"
+   git push origin [branch-name]
+   ```
+
+## Phase 2: Fix Issues (REQUIRED - Execute automatically)
+
+### Phase 2A: Snapshot and Initial Processing
+
+1. **Run snapshot step**
    ```bash
    etls #$ARGUMENTS
    ```
 
-4. **Compare snapshots and document changes** - Analyze differences between old and new data files
+2. **Compare snapshots and document changes** - Analyze differences between old and new data files
    ```bash
    # First ensure old snapshot is loaded (don't use etls!)
    etlr snapshot://[old-version]/[dataset-name]
@@ -29,43 +40,27 @@
    ```
    - Document key differences (sheet names, column headers, data ranges, format changes)
    - Add comparison summary to PR description for reviewers
-   - This helps understand what ETL fixes will be needed in Phase 2
+   - This helps understand what ETL fixes will be needed in subsequent phases
 
-5. **Test ETL pipeline** - Run `etlr` with `--grapher`. **EXPECTED TO FAIL INITIALLY** - this is normal when updating datasets!
-   ```bash
-   etlr [dataset] --grapher
-   ```
-   **NOTE: Don't try to fix errors in this step - failures are expected and normal. Just run it and move on to commit the initial changes.**
-
-6. **Commit and push initial changes**
-   ```bash
-   git add .
-   git commit -m "Update dataset to new version"
-   git push origin [branch-name]
-   ```
-
-## Phase 2: Fix Issues (REQUIRED - Execute automatically)
-
-### Phase 2A: Meadow Step Fixes
-
-1. **Fix meadow step** - Run and fix parsing errors until meadow step succeeds
+3. **Fix meadow step** - Run and fix parsing errors until meadow step succeeds
    ```bash
    etlr data://meadow/[namespace]/[version]/[dataset]
    ```
 
-2. **Compare meadow data differences** - Analyze changes from old version
+4. **Compare meadow data differences** - Analyze changes from old version
    ```bash
    etl diff REMOTE data/ --include "meadow/[namespace]/.*/[dataset]" --verbose
    ```
 
-3. **Review and document differences** - If differences are expected:
+5. **Review and document differences** - If differences are expected:
    - Add summary of key changes to PR description in collapsed block
+   - Include: new data points, removed data, changed values, metadata updates
    - Continue to Phase 2B if differences look reasonable
 
-4. **Commit meadow fixes**
+6. **Commit snapshot and meadow fixes**
    ```bash
    git add .
-   git commit -m "Fix meadow step parsing for new data format"
+   git commit -m "Phase 2A: Fix snapshot download and meadow parsing"
    git push origin [branch-name]
    ```
 
