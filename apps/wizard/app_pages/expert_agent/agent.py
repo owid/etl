@@ -91,7 +91,7 @@ async def process_tool_call(
 # OWID Prod MCP server
 mcp_server_prod = MCPServerStreamableHTTP(
     url="https://mcp.owid.io/mcp",
-    # process_tool_call=process_tool_call,
+    process_tool_call=process_tool_call,
 )
 
 ## Trying to tweak the settings for OpenAI responses
