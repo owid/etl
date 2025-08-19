@@ -91,7 +91,7 @@ async def process_tool_call(
 # OWID Prod MCP server
 mcp_server_prod = MCPServerStreamableHTTP(
     url="https://mcp.owid.io/mcp",
-    process_tool_call=process_tool_call,
+    # process_tool_call=process_tool_call,
 )
 
 ## Trying to tweak the settings for OpenAI responses
@@ -210,21 +210,22 @@ async def _collect_agent_stream2(prompt: str, model_name: str, message_history) 
         async for node in run:
             nodes.append(node)
             if Agent.is_model_request_node(node):
-                is_final_synthesis_node = any(isinstance(prev_node, CallToolsNode) for prev_node in nodes)
-                print(f"--- ModelRequestNode (Is Final Synthesis? {is_final_synthesis_node}) ---")
+                # is_final_synthesis_node = any(isinstance(prev_node, CallToolsNode) for prev_node in nodes)
+                # print(f"--- ModelRequestNode (Is Final Synthesis? {is_final_synthesis_node}) ---")
                 async with node.stream(run.ctx) as request_stream:
                     async for event in request_stream:
-                        print(f"Request Event: Data: {event!r}")
+                        # print(f"Request Event: Data: {event!r}")
                         if isinstance(event, PartDeltaEvent) and isinstance(event.delta, TextPartDelta):
                             chunks.append(event.delta.content_delta)
                         elif isinstance(event, PartStartEvent) and isinstance(event.part, TextPart):
                             chunks.append(event.part.content)
 
             elif Agent.is_call_tools_node(node):
-                print("--- CallToolsNode ---")
+                # print("--- CallToolsNode ---")
                 async with node.stream(run.ctx) as handle_stream:
                     async for event in handle_stream:
-                        print(f"Call Event Data: {event!r}")
+                        pass
+                        # print(f"Call Event Data: {event!r}")
 
         # Capture usage and result info
         if hasattr(run, "usage"):
