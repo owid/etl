@@ -123,7 +123,8 @@ def generate_pricing_text():
         "[Google Cloud Pricing](https://ai.google.dev/pricing)",
     ]
 
-    text = f"##### Pricing \n{table}\n\nUp-to-date pricing links:\n- {'\n- '.join(pricing_links)}"
+    pricing_list = "\n- ".join(pricing_links)
+    text = f"##### Pricing \n{table}\n\nUp-to-date pricing links:\n- {pricing_list}"
     return text
 
 
