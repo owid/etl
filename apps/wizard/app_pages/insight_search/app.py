@@ -3,7 +3,13 @@ from structlog import get_logger
 
 from apps.wizard.app_pages.insight_search import data
 from apps.wizard.utils import embeddings as emb
-from apps.wizard.utils.components import Pagination, st_horizontal, st_multiselect_wider, tag_in_md
+from apps.wizard.utils.components import (
+    Pagination,
+    st_horizontal,
+    st_multiselect_wider,
+    st_title_with_expert,
+    tag_in_md,
+)
 
 # Initialize log.
 log = get_logger()
@@ -90,7 +96,10 @@ authors = get_authors_with_DIs(insights)
 ########################################################################################################################
 
 # Streamlit app layout.
-st.title(":material/search: DI search")
+st_title_with_expert(
+    "DI search",
+    icon=":material/search:",
+)
 
 # Other interesting links
 with st.popover("Additional resources"):

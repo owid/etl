@@ -16,7 +16,13 @@ from apps.wizard import utils
 from apps.wizard.etl_steps.forms import DataForm
 from apps.wizard.etl_steps.instructions import render_instructions
 from apps.wizard.etl_steps.utils import STEP_NAME_PRESENT, TAGS_DEFAULT, dag_files, dag_not_add_option
-from apps.wizard.utils.components import config_style_html, preview_file, st_horizontal, st_multiselect_wider
+from apps.wizard.utils.components import (
+    config_style_html,
+    preview_file,
+    st_horizontal,
+    st_multiselect_wider,
+    st_title_with_expert,
+)
 from etl.config import DB_HOST, DB_NAME
 from etl.db import get_session
 from etl.paths import DATA_DIR, SNAPSHOTS_DIR
@@ -29,6 +35,7 @@ from etl.paths import DATA_DIR, SNAPSHOTS_DIR
 st.set_page_config(
     page_title="Wizard: Data Step",
     page_icon="🪄",
+    layout="centered",
 )
 st.session_state.submit_form = st.session_state.get("submit_form", False)
 st.session_state["data.steps_to_create"] = st.session_state.get("data.steps_to_create", [])
@@ -477,7 +484,7 @@ def render_form():
 #########################################################
 st_multiselect_wider()
 # TITLE
-st.title(":material/table: Data **:gray[Create steps]**")
+st_title_with_expert("Data **:gray[Create steps]**", icon=":material/table:")
 
 # SELECT MODE
 step_selected = render_step_selection()
