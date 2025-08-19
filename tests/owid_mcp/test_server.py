@@ -557,26 +557,27 @@ async def test_run_sql_invalid_column_error():
         # The SQL should fail with a clear error message
         # Use raise_on_error=False to get the error in the result instead of raising an exception
         try:
-            result = await client.call_tool("run_sql", {"query": sql_query})
+            await client.call_tool("run_sql", {"query": sql_query})
             # If no exception was raised, the tool should have returned an error
             assert False, "Expected the SQL query to fail but it succeeded"
         except Exception as e:
             # Check that the error message is helpful for LLM understanding
             error_text = str(e).lower()
-            
+
             # Should mention that it's a column issue
             assert "column" in error_text or "field" in error_text
-            
+
             # Should mention the specific column name that failed
             assert "abc" in error_text
-            
+
             # Should provide guidance about available tables or suggest next steps
-            assert ("variables" in error_text or "datasets" in error_text or "entities" in error_text) or \
-                   ("available" in error_text or "schema" in error_text or "table" in error_text)
-                   
+            assert ("variables" in error_text or "datasets" in error_text or "entities" in error_text) or (
+                "available" in error_text or "schema" in error_text or "table" in error_text
+            )
+
             # Should be clear it's an SQL error, not a generic error
             assert "sql" in error_text or "query" in error_text
-            
+
             print(f"✅ Got expected error message: {str(e)}")
 
 
@@ -588,15 +589,17 @@ async def test_run_sql_syntax_error():
         sql_query = "SELECT name FROM variables WHERE"  # Missing condition after WHERE
 
         try:
-            result = await client.call_tool("run_sql", {"query": sql_query})
+            await client.call_tool("run_sql", {"query": sql_query})
             assert False, "Expected the SQL query to fail but it succeeded"
         except Exception as e:
             error_text = str(e).lower()
-            
+
             # Should mention that it's an SQL error
             assert "sql" in error_text or "query" in error_text or "syntax" in error_text
-            
+
             # Should provide helpful information about the error
-            assert "error" in error_text and ("invalid" in error_text or "unexpected" in error_text or "syntax" in error_text)
-            
+            assert "error" in error_text and (
+                "invalid" in error_text or "unexpected" in error_text or "syntax" in error_text
+            )
+
             print(f"✅ Got expected syntax error message: {str(e)}")
