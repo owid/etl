@@ -13,30 +13,30 @@ dimensions:
     choices:
       - slug: mathematics
         name: Mathematics
-        description: Mathematics scores measuring mathematical literacy and problem-solving skills.
+        description: Mathematics scores measuring mathematical literacy and problem-solving skills
       - slug: science
         name: Science
-        description: Science scores measuring scientific literacy and understanding.
+        description: Science scores measuring scientific literacy and understanding
       - slug: reading
         name: Reading
-        description: Reading scores measuring reading comprehension and literacy skills.
+        description: Reading scores measuring reading comprehension and literacy skills
       - slug: subject_side_by_side
         name: All subjects
-        description: Compare performance across subjects.
+        description: Compare performance across subjects
 
   - slug: sex
     name: Gender
     choices:
       - slug: both
         name: Both genders
-        description: Academic performance for all students regardless of gender.
+        description: Academic performance for all students regardless of gender
       - slug: girls
         name: Girls
-        description: Academic performance among girls.
+        description: Academic performance among girls
       - slug: boys
         name: Boys
-        description: Academic performance among boys.
+        description: Academic performance among boys
       - slug: sex_side_by_side
         name: Girls and boys
-        description: Compare performance between boys and girls.
+        description: Compare performance between boys and girls
 views: []

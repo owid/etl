@@ -13,15 +13,15 @@ dimensions:
     choices:
       - slug: primary
         name: Primary education
-        description: Marks the start of formal schooling, typically for children aged 5 to 7.
+        description: Marks the start of formal schooling, typically for children aged 5 to 7
       - slug: secondary
         name: Secondary education
-        description: Marks the stage of education following primary education, typically for children aged 12 to 17.
+        description: Marks the stage of education following primary education, typically for children aged 12 to 17
       - slug: tertiary
         name: Tertiary education
-        description: Formal post-secondary learning, ranging from short vocational programs to university degrees.
+        description: Formal post-secondary learning, ranging from short vocational programs to university degrees
       - slug: level_side_by_side
         name: All education levels
-        description: Compare the share of women teachers across different education levels.
+        description: Compare the share of women teachers across different education levels
 
 views: []

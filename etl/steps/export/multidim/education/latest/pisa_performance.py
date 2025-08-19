@@ -13,7 +13,7 @@ MULTIDIM_CONFIG = {
     "yAxis": {"min": 350, "max": 550},
     "hasMapTab": True,
     "tab": "map",
-    "addCountryMode": "change-country",
+    "addCountryMode": "add-country",
 }
 
 # Common grouped view configuration

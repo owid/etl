@@ -12,40 +12,40 @@ dimensions:
     choices:
       - slug: gdp_share
         name: Education spending as a share of GDP
-        description: Education spending as a share of gross domestic product (GDP).
+        description: Education spending as a share of gross domestic product (GDP)
       - slug: per_student
         name: Education spending per student
-        description: The total amount the government spends on education per student.
+        description: The total amount the government spends on education per student
       - slug: total_government
         name: Education spending as a share of total government spending
-        description: Education's share of total government spending.
+        description: Education's share of total government spending
       - slug: constant_ppp
         name: Total government spending on education
-        description: The total amount the government spends on education.
+        description: The total amount the government spends on education
 
   - slug: level
     name: Education level
     choices:
       - slug: all
         name: Total
-        description: Government spending across all education levels combined.
+        description: Government spending across all education levels combined
       - slug: preprimary
         name: Pre-primary
-        description: Often provided through kindergarten or nursery for children ages around 3 to 5.
+        description: Often provided through kindergarten or nursery for children ages around 3 to 5
       - slug: primary
         name: Primary
-        description: Marks the start of formal schooling, typically for children aged 5 to 7.
+        description: Marks the start of formal schooling, typically for children aged 5 to 7
       - slug: lower_secondary
         name: Lower secondary
-        description: For students generally aged 11 to 14.
+        description: For students generally aged 11 to 14
       - slug: upper_secondary
         name: Upper secondary
-        description: For students generally aged 15 to 18.
+        description: For students generally aged 15 to 18
       - slug: tertiary
         name: Tertiary
-        description: Formal post-secondary learning, ranging from short vocational programs to university degrees.
+        description: Formal post-secondary learning, ranging from short vocational programs to university degrees
       - slug: level_side_by_side
         name: All levels
-        description: Compare spending at different education levels.
+        description: Compare spending at different education levels
 
 views: []

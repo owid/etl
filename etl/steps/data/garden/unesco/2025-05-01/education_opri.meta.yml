@@ -45,35 +45,25 @@ definitions:
       colorScale:
         binningStrategy: manual
         customNumericValues: *enrolment_rate_bins
-        baseColorScheme: Greens
+        baseColorScheme: YlGnBu
 
-  # Common enrollment and education indicator configurations
-  grapher_config_enrolment_bugn: &grapher_config_enrolment_bugn
+  grapher_config_enrolment_ylgnbu: &grapher_config_enrolment_ylgnbu
     <<: *common_grapher_config
     map:
       <<: *common_grapher_map_config
       colorScale:
         binningStrategy: manual
         customNumericValues: *enrolment_rate_bins
-        baseColorScheme: BuGn
+        baseColorScheme: YlGnBu
 
-  grapher_config_enrolment_blues: &grapher_config_enrolment_blues
+  grapher_config_enrolment_pubugn: &grapher_config_enrolment_pubugn
     <<: *common_grapher_config
     map:
       <<: *common_grapher_map_config
       colorScale:
         binningStrategy: manual
         customNumericValues: *enrolment_rate_bins
-        baseColorScheme: Blues
-
-  grapher_config_enrolment_purples: &grapher_config_enrolment_purples
-    <<: *common_grapher_config
-    map:
-      <<: *common_grapher_map_config
-      colorScale:
-        binningStrategy: manual
-        customNumericValues: *enrolment_rate_bins
-        baseColorScheme: Purples
+        baseColorScheme: PuBuGn
 
   # School life expectancy configurations
   grapher_config_sle_preprimary_blues: &grapher_config_sle_preprimary_blues
@@ -334,13 +324,13 @@ definitions:
     - It compares children enrolled at the correct level for their age to the total population in that same age group. For example, if primary education is for ages 6 to 11, it measures how many 6- to 11-year-olds are actually enrolled in primary school.
     - The highest possible value is 100%, which would mean all children of the right age are enrolled where they should be. High rates indicate that most children are progressing through school at the expected pace.
     - Values cannot exceed 100% because it excludes over-age and under-age students. However, small discrepancies between enrolment records and population data can occasionally push rates slightly above 100%.
-    - A rate of 90% doesn't necessarily mean 10% of children are out of school entirely - some may be enrolled at different levels (either higher or lower) than expected for their age, but these students aren't counted in the net rate.
+    - A rate of 90% doesn't necessarily mean 10% of children are out of school entirely — some may be enrolled at different levels (either higher or lower) than expected for their age, but these students aren't counted in the net rate.
     - The data comes from school administrative records that track enrolment by individual age, combined with population estimates from national statistics offices or UN sources.
 
   desc_key_ger: &desc_key_ger
     - Not all students enrol in school at the same age. The gross enrolment ratio includes students enrolled in a certain level of education, regardless of whether they are within the expected age range for that level. It includes students who are younger or older than expected due to late entry, early entry, or grade repetition.
     - It captures the total number of students enrolled at a specific education level, expressed as a percentage of the population in the official age group for that level. For example, if the official age group for upper secondary school is 15 to 17-year olds, the gross enrolment ratio compares total enrolment at that level (of any age) to the population of 15- to 17-year-olds.
-    - Values can be greater than 100% if students repeat grades or start a particular level of schooling late. In the example above, some 18- or 19 year olds might be included in the total if they started upper secondary school late.
+    - Values can be greater than 100% if students repeat grades or start a particular level of schooling late. For example, if the official age group for upper secondary school is 15 to 17-year olds, some 18- or 19 year olds might be included in the total if they started upper secondary school late.
     - Similarly, a value of 100% does not necessarily mean all children within a particular age group are enrolled in school; some children could be out-of-school, but gross enrolment rates are boosted by older students being included.
     - The data comes from administrative records, such as school enrolment reports, and from population estimates, usually provided by the United Nations or national sources.
 
@@ -861,7 +851,7 @@ tables:
         description_key: *desc_key_net_enr
         presentation:
           title_public:  Net enrolment rate in primary education
-          grapher_config: *grapher_config_enrolment_bugn
+          grapher_config: *grapher_config_enrolment_ylgnbu
         display:
           numDecimalPlaces: 1
           name: Primary education
@@ -874,7 +864,7 @@ tables:
         description_key: *desc_key_net_enr
         presentation:
           title_public:  Net enrolment rate in primary education among boys
-          grapher_config: *grapher_config_enrolment_blues
+          grapher_config: *grapher_config_enrolment_ylgnbu
         display:
           numDecimalPlaces: 1
           name: Boys
@@ -887,7 +877,7 @@ tables:
         description_key: *desc_key_net_enr
         presentation:
           title_public:  Net enrolment rate in primary education among girls
-          grapher_config: *grapher_config_enrolment_purples
+          grapher_config: *grapher_config_enrolment_ylgnbu
         display:
           numDecimalPlaces: 1
           name: Girls
@@ -900,7 +890,7 @@ tables:
         description_key: *desc_key_net_enr
         presentation:
           title_public:  Net enrolment rate in lower secondary education
-          grapher_config: *grapher_config_enrolment_bugn
+          grapher_config: *grapher_config_enrolment_ylgnbu
         display:
           numDecimalPlaces: 1
           name: Lower secondary education
@@ -913,7 +903,7 @@ tables:
         description_key: *desc_key_net_enr
         presentation:
           title_public:  Net enrolment rate in lower secondary education among boys
-          grapher_config: *grapher_config_enrolment_blues
+          grapher_config: *grapher_config_enrolment_ylgnbu
         display:
           numDecimalPlaces: 1
           name: Boys
@@ -926,7 +916,7 @@ tables:
         description_key: *desc_key_net_enr
         presentation:
           title_public:  Net enrolment rate in lower secondary education among girls
-          grapher_config: *grapher_config_enrolment_purples
+          grapher_config: *grapher_config_enrolment_ylgnbu
         display:
           numDecimalPlaces: 1
           name: Girls
@@ -939,7 +929,7 @@ tables:
         description_key: *desc_key_net_enr
         presentation:
           title_public:  Net enrolment rate in upper secondary education
-          grapher_config: *grapher_config_enrolment_bugn
+          grapher_config: *grapher_config_enrolment_ylgnbu
         display:
           numDecimalPlaces: 1
           name: Upper secondary education
@@ -952,7 +942,7 @@ tables:
         description_key: *desc_key_net_enr
         presentation:
           title_public:  Net enrolment rate in upper secondary education among boys
-          grapher_config: *grapher_config_enrolment_blues
+          grapher_config: *grapher_config_enrolment_ylgnbu
         display:
           numDecimalPlaces: 1
           name: Boys
@@ -965,7 +955,7 @@ tables:
         description_key: *desc_key_net_enr
         presentation:
           title_public:  Net enrolment rate in upper secondary education among girls
-          grapher_config: *grapher_config_enrolment_purples
+          grapher_config: *grapher_config_enrolment_ylgnbu
         display:
           numDecimalPlaces: 1
           name: Girls
@@ -982,7 +972,7 @@ tables:
         description_key: *desc_key_ger
         presentation:
           title_public:  Gross enrolment ratio in primary education
-          grapher_config: *grapher_config_enrolment_bugn
+          grapher_config: *grapher_config_enrolment_pubugn
         display:
           numDecimalPlaces: 1
           name: Primary education
@@ -995,7 +985,7 @@ tables:
         description_key: *desc_key_ger
         presentation:
           title_public:  Gross enrolment ratio in primary education among boys
-          grapher_config: *grapher_config_enrolment_blues
+          grapher_config: *grapher_config_enrolment_pubugn
         display:
           numDecimalPlaces: 1
           name: Boys
@@ -1008,7 +998,7 @@ tables:
         description_key: *desc_key_ger
         presentation:
           title_public:  Gross enrolment ratio in primary education among girls
-          grapher_config: *grapher_config_enrolment_purples
+          grapher_config: *grapher_config_enrolment_pubugn
         display:
           numDecimalPlaces: 1
           name: Girls
@@ -1021,7 +1011,7 @@ tables:
         description_key: *desc_key_ger
         presentation:
           title_public:  Gross enrolment ratio in lower secondary education
-          grapher_config: *grapher_config_enrolment_bugn
+          grapher_config: *grapher_config_enrolment_pubugn
         display:
           numDecimalPlaces: 1
           name: Lower secondary education
@@ -1034,7 +1024,7 @@ tables:
         description_key: *desc_key_ger
         presentation:
           title_public:  Gross enrolment ratio in lower secondary education among boys
-          grapher_config: *grapher_config_enrolment_blues
+          grapher_config: *grapher_config_enrolment_pubugn
         display:
           numDecimalPlaces: 1
           name: Boys
@@ -1047,7 +1037,7 @@ tables:
         description_key: *desc_key_ger
         presentation:
           title_public:  Gross enrolment ratio in lower secondary education among girls
-          grapher_config: *grapher_config_enrolment_purples
+          grapher_config: *grapher_config_enrolment_pubugn
         display:
           numDecimalPlaces: 1
           name: Girls
@@ -1060,7 +1050,7 @@ tables:
         description_key: *desc_key_ger
         presentation:
           title_public:  Gross enrolment ratio in upper secondary education
-          grapher_config: *grapher_config_enrolment_bugn
+          grapher_config: *grapher_config_enrolment_pubugn
         display:
           numDecimalPlaces: 1
           name:  Upper secondary education
@@ -1073,7 +1063,7 @@ tables:
         description_key: *desc_key_ger
         presentation:
           title_public:  Gross enrolment ratio in upper secondary education among girls
-          grapher_config: *grapher_config_enrolment_purples
+          grapher_config: *grapher_config_enrolment_pubugn
         display:
           numDecimalPlaces: 1
           name: Girls
@@ -1086,7 +1076,7 @@ tables:
         description_key: *desc_key_ger
         presentation:
           title_public:  Gross enrolment ratio in upper secondary education among boys
-          grapher_config: *grapher_config_enrolment_blues
+          grapher_config: *grapher_config_enrolment_pubugn
         display:
           numDecimalPlaces: 1
           name: Boys

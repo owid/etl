@@ -45,7 +45,7 @@ GROUPED_VIEW_CONFIG = MULTIDIM_CONFIG | {
     "tab": "chart",  # Default to chart view
     "yAxis": {"min": 0, "max": 100, "facetDomain": "independent"},  # Percentage scale
     "selectedFacetStrategy": "entity",  # Allow entity selection
-    "addCountryMode": "change-country",  # Change country instead of adding
+    "addCountryMode": "add-country",  # Allow adding countries for easier comparison
 }
 
 # --------------------- #

@@ -13,26 +13,26 @@ dimensions:
     choices:
       - slug: primary
         name: End of primary education
-        description: Typically for children aged 11 to 12 years old.
+        description: Typically for children aged 11 to 12 years old
       - slug: lower_secondary
         name: End of lower secondary education
-        description: Typically for children aged 14 to 15 years old.
+        description: Typically for children aged 14 to 15 years old
       - slug: level_side_by_side
         name: All education levels
-        description: Compare proficiency rates across all education levels.
+        description: Compare proficiency rates across all education levels
 
   - slug: population
     name: Who is included
     choices:
       - slug: students
         name: Students
-        description: Includes only students enrolled in school.
+        description: Includes only students enrolled in school
       - slug: all_children
         name: All children
-        description: Includes all children in the relevant age group, not just those enrolled in school.
+        description: Includes all children in the relevant age group, not just those enrolled in school
       - slug: population_side_by_side
         name: Children and students
-        description: Compare learning outcomes between all children and just those students who are enrolled.
+        description: Compare learning outcomes between all children and just those students who are enrolled
 
   - slug: subject
     name: Subject
@@ -43,7 +43,7 @@ dimensions:
         name: Reading
       - slug: subject_side_by_side
         name: All subjects
-        description: Compare learning outcomes across subjects.
+        description: Compare learning outcomes across subjects
 
   - slug: sex
     name: Gender
@@ -56,7 +56,7 @@ dimensions:
         name: Boys
       - slug: sex_side_by_side
         name: Boys and girls
-        description: Compare proficiency between boys and girls.
+        description: Compare proficiency between boys and girls
 
 
 views: []

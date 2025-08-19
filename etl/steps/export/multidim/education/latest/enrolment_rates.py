@@ -11,7 +11,7 @@ MULTIDIM_CONFIG = {
     "tab": "map",
     "originUrl": "ourworldindata.org/education",
     "hideAnnotationFieldsInTitle": {"time": True},
-    "addCountryMode": "change-country",
+    "addCountryMode": "add-country",
     "yAxis": {"min": 0, "max": 100},
 }
 
@@ -103,7 +103,7 @@ def run() -> None:
                     "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.005.json",
                     "originUrl": "ourworldindata.org/education",
                     "hideAnnotationFieldsInTitle": {"time": True},
-                    "addCountryMode": "change-country",
+                    "addCountryMode": "add-country",
                     "hasMapTab": False,
                     "tab": "chart",
                     "selectedFacetStrategy": "entity",
@@ -117,7 +117,7 @@ def run() -> None:
                     "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.005.json",
                     "originUrl": "ourworldindata.org/education",
                     "hideAnnotationFieldsInTitle": {"time": True},
-                    "addCountryMode": "change-country",
+                    "addCountryMode": "add-country",
                     "hasMapTab": False,
                     "tab": "chart",
                     "selectedFacetStrategy": "entity",
@@ -143,6 +143,11 @@ def run() -> None:
         # Generate dynamic subtitle
         if level and enrolment_type:
             view.config["subtitle"] = generate_subtitle_by_level(level, sex, enrolment_type)
+        
+        # Add footnote for gross enrolment ratio
+        if enrolment_type == "gross_enrolment":
+            view.config["note"] = "Values may exceed 100% when children who are older or younger than the official age group also enroll."
+        
         if sex == "sex_side_by_side" or level == "level_side_by_side":
             view.metadata = {
                 "presentation": {

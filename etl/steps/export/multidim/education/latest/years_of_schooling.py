@@ -12,7 +12,7 @@ MULTIDIM_CONFIG = {
     "tab": "map",
     "originUrl": "ourworldindata.org/education",
     "hideAnnotationFieldsInTitle": {"time": True},
-    "addCountryMode": "change-country",
+    "addCountryMode": "add-country",
 }
 
 # Common mappings for title and subtitle generation
@@ -156,7 +156,7 @@ def run() -> None:
                 "view_config": {
                     "originUrl": "ourworldindata.org/education",
                     "hideAnnotationFieldsInTitle": {"time": True},
-                    "addCountryMode": "change-country",
+                    "addCountryMode": "add-country",
                     "hasMapTab": False,
                     "tab": "chart",
                     "selectedFacetStrategy": "entity",
@@ -169,7 +169,7 @@ def run() -> None:
                 "view_config": {
                     "originUrl": "ourworldindata.org/education",
                     "hideAnnotationFieldsInTitle": {"time": True},
-                    "addCountryMode": "change-country",
+                    "addCountryMode": "add-country",
                     "hasMapTab": False,
                     "tab": "chart",
                     "chartTypes": ["StackedArea"],

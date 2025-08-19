@@ -13,7 +13,7 @@ MULTIDIM_CONFIG = {
     "yAxis": {"min": 0, "max": 100},
     "hasMapTab": True,
     "tab": "map",
-    "addCountryMode": "change-country",
+    "addCountryMode": "add-country",
 }
 
 # Common grouped view configuration
@@ -224,7 +224,7 @@ def generate_subtitle_by_level(view):
     if not level_term:
         raise ValueError(f"Unknown education level: {level}")
 
-    return f"The share of {gender_term} who are 3 to 5 years older than the official age for the last grade of {level_term} education who have successfully completed it. This broader age band is used to include children who started school late or had to resit particular years."
+    return f"The share of {gender_term} who are three to five years older than the official age for the last grade of {level_term} education who have successfully completed it. This broader age band is used to include children who started school late or had to resit particular years."
 
 
 def edit_indicator_displays(view):
