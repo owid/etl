@@ -1332,3 +1332,19 @@ steps:
     - data://meadow/neglected_tropical_diseases/2025-08-20/lymphatic_filariasis
   data://grapher/neglected_tropical_diseases/2025-08-20/lymphatic_filariasis:
     - data://garden/neglected_tropical_diseases/2025-08-20/lymphatic_filariasis
+
+  # Schistosomiasis
+  data://meadow/neglected_tropical_diseases/2025-08-20/schistosomiasis:
+    - snapshot://neglected_tropical_diseases/2025-08-20/schistosomiasis.xlsx
+  data://garden/neglected_tropical_diseases/2025-08-20/schistosomiasis:
+    - data://garden/regions/2023-01-01/regions
+    - data://meadow/neglected_tropical_diseases/2025-08-20/schistosomiasis
+  data://grapher/neglected_tropical_diseases/2025-08-20/schistosomiasis:
+    - data://garden/neglected_tropical_diseases/2025-08-20/schistosomiasis
+  # Neglected Tropical Diseases Funding
+  data://meadow/neglected_tropical_diseases/2025-08-20/funding:
+    - snapshot://neglected_tropical_diseases/2025-08-20/funding.xlsx
+  data://garden/neglected_tropical_diseases/2025-08-20/funding:
+    - data://meadow/neglected_tropical_diseases/2025-08-20/funding
+  data://grapher/neglected_tropical_diseases/2025-08-20/funding:
+    - data://garden/neglected_tropical_diseases/2025-08-20/funding
