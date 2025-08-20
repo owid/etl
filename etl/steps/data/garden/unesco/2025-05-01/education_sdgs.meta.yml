@@ -82,14 +82,14 @@ definitions:
   # EXPENDITURE CONFIGURATIONS
   # ============================================================================
 
-  grapher_config_expenditure: &grapher_config_expenditure
+  grapher_config_expenditure_gdp: &grapher_config_expenditure_gdp
     <<: *common_grapher_config
     map:
       <<: *common_grapher_map_config
       colorScale:
         binningStrategy: manual
         customNumericValues: *expenditure_bins
-        baseColorScheme: BuGn
+        baseColorScheme: Blues
 
   grapher_config_expenditure_total: &grapher_config_expenditure_total
     <<: *common_grapher_config
@@ -988,6 +988,7 @@ tables:
         display:
           numDecimalPlaces: 1
           name: Total across all levels of education
+          tolerance: 10
 
       combined_expenditure_share_gdp:
         title: Public spending on education as a share of GDP (historical and recent)
@@ -1005,10 +1006,11 @@ tables:
           General government expenditure on education (current, capital, and transfers) is expressed as a percentage of GDP. It includes expenditure funded by transfers from international sources to government. General government usually refers to local, regional and central governments.
         presentation:
           title_public: Public spending on education as a share of GDP
-          grapher_config: *grapher_config_expenditure
+          grapher_config: *grapher_config_expenditure_gdp
         display:
           numDecimalPlaces: 1
           name: Total across all levels of education
+          tolerance: 10
 
       # ========================================================================
       # GOVERNMENT EXPENDITURE IN CONSTANT PPP DOLLARS PER STUDENT (by education level)
@@ -1026,6 +1028,7 @@ tables:
         display:
           numDecimalPlaces: 0
           name: Pre-primary
+          tolerance: 10
 
       initial_government_funding_per_primary_student__constant_pppdollar__xunit_pppconst_1_fsgov_ffntr:
         title: Government spending on primary education per student
@@ -1039,6 +1042,7 @@ tables:
         display:
           numDecimalPlaces: 0
           name: Primary
+          tolerance: 10
 
       initial_government_funding_per_lower_secondary_student__constant_pppdollar__xunit_pppconst_2_fsgov_ffntr:
         title: Government spending on lower secondary education per student
@@ -1052,6 +1056,7 @@ tables:
         display:
           numDecimalPlaces: 0
           name: Lower secondary
+          tolerance: 10
 
       initial_government_funding_per_upper_secondary_student__constant_pppdollar__xunit_pppconst_3_fsgov_ffntr:
         title: Government spending on upper secondary education per student
@@ -1065,6 +1070,7 @@ tables:
         display:
           numDecimalPlaces: 0
           name: Upper secondary
+          tolerance: 10
 
       initial_government_funding_per_tertiary_student__constant_pppdollar__xunit_pppconst_5t8_fsgov_ffntr:
         title: Government spending on tertiary education per student
@@ -1078,6 +1084,7 @@ tables:
         display:
           numDecimalPlaces: 0
           name: Tertiary
+          tolerance: 10
 
       # ========================================================================
       # MINIMUM PROFICIENCY RATES - PREPARED FOR THE FUTURE (All Children)

@@ -26,7 +26,7 @@ definitions:
 
   # Value ranges for different indicator types
   enrolment_rate_bins: &enrolment_rate_bins [10,20,30,40,50,60,70,80,90,100]
-  gdp_share_bins: &gdp_share_bins [0,0.2,0.4,0.6,0.8,1.2,1.4,1.6,1.8,2]
+  gdp_share_bins: &gdp_share_bins [0,0.4,0.8,1.2,1.6,2,2]
   school_life_expectancy_preprimary_bins: &school_life_expectancy_preprimary_bins [0.5,1,1.5,2,2.5,3,3.5,4]
   school_life_expectancy_primary_bins: &school_life_expectancy_primary_bins [2,3,4,5,6,7,8,9]
   school_life_expectancy_secondary_bins: &school_life_expectancy_secondary_bins [1,2,3,4,5,6,7,8]
@@ -155,7 +155,7 @@ definitions:
       colorScale:
         binningStrategy: manual
         customNumericValues: *expenditure_bins_by_level
-        baseColorScheme: Greens
+        baseColorScheme: YlGnBu
 
   grapher_config_spending_total: &grapher_config_spending_total
     <<: *common_grapher_config
@@ -164,7 +164,7 @@ definitions:
       colorScale:
         binningStrategy: manual
         customNumericValues: *expenditure_bins_total
-        baseColorScheme: Greens
+        baseColorScheme: YlGnBu
 
   # Education spending as share of GDP configuration
   grapher_config_gdp_share: &grapher_config_gdp_share
@@ -1162,6 +1162,7 @@ tables:
           grapher_config: *grapher_config_gdp_share
         display:
           numDecimalPlaces: 1
+          tolerance: 10
 
       government_expenditure_on_primary_education_as_a_percentage_of_gdp__pct:
         title: Government spending on primary education as share of GDP
@@ -1174,6 +1175,7 @@ tables:
           grapher_config: *grapher_config_gdp_share
         display:
           numDecimalPlaces: 1
+          tolerance: 10
 
       government_expenditure_on_lower_secondary_education_as_a_percentage_of_gdp__pct:
         title: Government spending on lower secondary education as share of GDP
@@ -1186,6 +1188,7 @@ tables:
           grapher_config: *grapher_config_gdp_share
         display:
           numDecimalPlaces: 1
+          tolerance: 10
 
       government_expenditure_on_upper_secondary_education_as_a_percentage_of_gdp__pct:
         title: Government spending on upper secondary education as share of GDP
@@ -1198,6 +1201,7 @@ tables:
           grapher_config: *grapher_config_gdp_share
         display:
           numDecimalPlaces: 1
+          tolerance: 10
 
       government_expenditure_on_secondary_education_as_a_percentage_of_gdp__pct:
         title: Government spending on secondary education as share of GDP
@@ -1210,6 +1214,7 @@ tables:
           grapher_config: *grapher_config_gdp_share
         display:
           numDecimalPlaces: 1
+          tolerance: 10
 
       government_expenditure_on_tertiary_education_as_a_percentage_of_gdp__pct:
         title: Government spending on tertiary education as share of GDP
@@ -1222,6 +1227,7 @@ tables:
           grapher_config: *grapher_config_gdp_share
         display:
           numDecimalPlaces: 1
+          tolerance: 10
 
       # ========================================================================
       # GOVERNMENT EXPENDITURE IN CONSTANT PPP DOLLARS (by education level)
@@ -1239,6 +1245,7 @@ tables:
         display:
           numDecimalPlaces: 0
           name: Pre-primary
+          tolerance: 10
 
       government_expenditure_on_primary_education__constant_pppdollar__millions:
         title: Government spending on primary education
@@ -1252,6 +1259,7 @@ tables:
         display:
           numDecimalPlaces: 0
           name: Primary
+          tolerance: 10
 
       government_expenditure_on_lower_secondary_education__constant_pppdollar__millions:
         title: Government spending on lower secondary education
@@ -1265,6 +1273,7 @@ tables:
         display:
           numDecimalPlaces: 0
           name: Lower secondary
+          tolerance: 10
 
       government_expenditure_on_upper_secondary_education__constant_pppdollar__millions:
         title: Government spending on upper secondary education
@@ -1278,6 +1287,7 @@ tables:
         display:
           numDecimalPlaces: 0
           name: Upper secondary
+          tolerance: 10
 
       government_expenditure_on_tertiary_education__constant_pppdollar__millions:
         title: Government spending on tertiary education
@@ -1291,6 +1301,7 @@ tables:
         display:
           numDecimalPlaces: 0
           name: Tertiary
+          tolerance: 10
 
       government_expenditure_on_education__constant_pppdollar__millions:
         title: Government spending on education
@@ -1304,6 +1315,7 @@ tables:
         display:
           numDecimalPlaces: 0
           name: Total across all levels
+          tolerance: 10
 
       government_expenditure_on_education__pppdollar__millions:
         title: Government spending on education in purchasing power parity (PPP) dollars
@@ -1313,7 +1325,7 @@ tables:
         description_key: *desc_key_govt_expenditure_constant_ppp
         display:
           numDecimalPlaces: 0
-
+          tolerance: 10
 
       # ========================================================================
       # GOVERNMENT EXPENDITURE IN CONSTANT PPP DOLLARS PER STUDENT (by education level)
