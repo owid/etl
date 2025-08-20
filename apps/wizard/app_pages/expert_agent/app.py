@@ -6,8 +6,10 @@ references:
 
 import json
 import time
+from datetime import datetime
 from typing import cast
 
+import pytz
 import streamlit as st
 from pydantic_core import to_json
 from structlog import get_logger
@@ -109,15 +111,6 @@ def _load_history_messages():
     return messages
 
 
-# @st.fragment
-def show_reasoning_details():
-    with st.expander("**Reasoning details**", expanded=False, icon=":material/auto_awesome:"):
-        show_reasoning_details_dialog()
-    # btn = st.button("**Reasoning details**", icon=":material/auto_awesome:")
-    # if btn:
-    #     show_reasoning_details_dialog()
-
-
 # @st.dialog(title="**:material/auto_awesome: Reasoning details**", width="large",)
 def show_reasoning_details_dialog():
     messages = _load_history_messages()
@@ -139,6 +132,35 @@ def show_reasoning_details_dialog():
                 st.badge(f"Question {counter_questions}")
             with st.expander(title):
                 st.write(part)
+
+
+@st.fragment
+def show_debugging_details():
+    messages = _load_history_messages()
+    config = st.session_state.get("expert_config", {})
+    mcp_use = st.session_state.get("expert_use_mcp", None)
+    usage = st.session_state.get("last_usage", {})
+    if usage != {}:
+        usage = to_json(usage)
+        usage = json.loads(usage)
+
+    data = {
+        "model_config": config,
+        "mcp_use": mcp_use,
+        "num_messages": len(messages),
+        "messages": messages,
+        "usage": usage,
+    }
+    json_string = json.dumps(data)
+
+    st.download_button(
+        label="Download session (JSON)",
+        data=json_string,
+        file_name=f"session-expert-{datetime.now(pytz.utc).strftime('%Y%m%d_%H%M_%s')}.json",
+        mime="application/json",
+        icon=":material/download:",
+        help="Download the session data as a JSON file for debugging purposes.\n\n**:material/warning: This file contains your session chat history, model configuration, and usage statistics. Don't share this file with the public, as it may contain sensitive information.**",
+    )
 
 
 def register_message_history():
@@ -308,7 +330,17 @@ if prompt:
         if "agent_result" in st.session_state:
             ## Agent execution details
             with container_summary:
-                show_reasoning_details()
+                container_buttons = st.container(
+                    horizontal=True, vertical_alignment="bottom", horizontal_alignment="distribute"
+                )
+                with container_buttons:
+                    with st.popover(
+                        "**Reasoning details**",
+                        icon=":material/auto_awesome:",
+                        width="stretch",
+                    ):
+                        show_reasoning_details_dialog()
+                    show_debugging_details()
             ## Add messages to history
             register_message_history()
 

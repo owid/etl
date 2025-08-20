@@ -5,8 +5,10 @@ topic_tags:
   - Global Education
 default_selection:
   - United States
-  - Brazil
   - India
+  - Peru
+  - Turkey
+  - South Africa
 
 dimensions:
   - slug: spending_type
