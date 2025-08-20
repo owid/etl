@@ -40,8 +40,11 @@ definitions:
 
   description_key_gdp_per_capita_introduction: GDP per capita is a comprehensive measure of people's average income. It helps compare income levels across countries and track how they change over time. It is especially useful for understanding trends in economic growth and living standards.
   description_key_gdp_per_capita_definition: GDP per capita is calculated as the value of all final goods and services produced each year in a country (the [gross domestic product](#dod:gdp)), divided by the population. It represents the average economic output per person.
-  description_key_gdp_per_capita_inequality: This data is expressed in constant international dollars to adjust for inflation and differences in living costs between countries. Read more in our article, [_What are international dollars?_](https://ourworldindata.org/international-dollars)
+  description_key_gdp_per_capita_inequality: This indicator shows the large inequality between people in different countries. In the poorest countries, average incomes are below $1,000 per year; in rich countries, they are more than 50 times higher.
+  description_key_ppp: This data is expressed in constant international dollars to adjust for inflation and differences in living costs between countries. Read more in our article, [_What are international dollars?_](https://ourworldindata.org/international-dollars)
   description_key_gdp_per_capita_mention_mpd: This data comes from the World Bank and starts in 1990. For estimates going back several centuries, explore our chart of GDP per capita from the [Maddison Project Database](https://ourworldindata.org/grapher/gdp-per-capita-maddison-project-database).
+
+  subtitle_gdp_per_capita: GDP per capita is a country's [gross domestic product](#dod:gdp) divided by its population.
 
   description_processing_gdp_constant: |-
     We constructed estimates of GDP and GDP per capita in constant 2021 US$ by taking the corresponding series in current US$ and applying them the growth rates of the series in constant local currency units, adjusted by the base year (2021). This is [the same methodology](https://datahelpdesk.worldbank.org/knowledgebase/articles/114943-how-do-you-derive-constant-price-series-in-usd) followed by the World Bank to obtain the series in constant 2015 US$.
@@ -104,6 +107,7 @@ tables:
           - "{definitions.description_key_gdp_per_capita_introduction}"
           - "{definitions.description_key_gdp_per_capita_definition}"
           - "{definitions.description_key_gdp_per_capita_inequality}"
+          - "{definitions.description_key_ppp}"
           - "{definitions.description_key_gdp_per_capita_mention_mpd}"
         processing_level: minor
         presentation:
@@ -117,7 +121,7 @@ tables:
               gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
           grapher_config:
             title: GDP per capita
-            subtitle: "{definitions.ppp_adjustment}"
+            subtitle: "{definitions.subtitle_gdp_per_capita} {definitions.ppp_adjustment}"
             note: "{definitions.ppp_prices}"
             variantName: In constant international-$ – World Bank
             originUrl: https://ourworldindata.org/economic-growth
