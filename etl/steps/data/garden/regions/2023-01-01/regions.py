@@ -114,6 +114,12 @@ def run(dest_dir: str) -> None:
     # Run sanity checks on input data.
     run_sanity_checks(df=df)
 
+    # Replace members that are aggregates
+    dag = df.set_index("code")["members"].to_dict()
+    ddag = {k: v if isinstance(v, list)  else [] for k, v in dag.items()}
+
+    # df = replace_members(df)
+
     # Create a table of legacy codes (ensuring all numeric codes are integer).
     df_codes = df_codes.astype(
         {code: pd.Int64Dtype() for code in ["cow_code", "imf_code", "legacy_country_id", "legacy_entity_id"]}

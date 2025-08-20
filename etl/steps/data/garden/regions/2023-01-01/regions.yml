@@ -2177,6 +2177,7 @@
 # UN M49
 # https://unstats.un.org/unsd/methodology/m49/
 ##########
+
 ## In this Taiwan and Kosovo are not recognized and part of China and Serbia respectively
 ## Africa
 - code: UNSD_AFR
@@ -2557,7 +2558,7 @@
   region_type: "aggregate"
   defined_by: unsd
   members:
-    - UNSD_AUS
+    - UNSD_ANZ
     - UNSD_MEL
     - UNSD_MIC
     - UNSD_POL
