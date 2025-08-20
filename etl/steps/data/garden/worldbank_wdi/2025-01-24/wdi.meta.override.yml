@@ -38,6 +38,19 @@ definitions:
   description_short_gni: Total income earned by residents of a country or region, including income earned abroad.
   description_short_gni_per_capita: Average income per person earned by residents of a country or region, including income earned abroad.
 
+  # description_key_gdp_introduction: "[Gross domestic product](#dod:gdp) (GDP) is a comprehensive measure of countries' total income. It helps compare income levels across countries and track how they change over time. It is especially useful for understanding trends in economic growth and living standards."
+  description_key_gdp_definition: "[Gross domestic product](#dod:gdp) (GDP) is calculated as the value of all final goods and services produced each year in a country. It represents the total economic output of a country or region."
+  description_key_gdp_mention_mpd: This data comes from the World Bank and starts in 1990. For estimates going back several centuries, explore our chart of GDP from the [Maddison Project Database](https://ourworldindata.org/grapher/gdp-maddison-project-database).
+
+  description_key_gdp_per_capita_introduction: GDP per capita is a comprehensive measure of people's average income. It helps compare income levels across countries and track how they change over time. It is especially useful for understanding trends in economic growth and living standards.
+  description_key_gdp_per_capita_definition: GDP per capita is calculated as the value of all final goods and services produced each year in a country (the [gross domestic product](#dod:gdp)), divided by the population. It represents the average economic output per person.
+  description_key_gdp_per_capita_inequality: This indicator shows the large inequality between people in different countries. In the poorest countries, average incomes are below $1,000 per year; in rich countries, they are more than 50 times higher.
+  description_key_gdp_per_capita_mention_mpd: This data comes from the World Bank and starts in 1990. For estimates going back several centuries, explore our chart of GDP per capita from the [Maddison Project Database](https://ourworldindata.org/grapher/gdp-per-capita-maddison-project-database).
+
+  description_key_ppp: This data is expressed in constant international dollars to adjust for inflation and differences in living costs between countries. Read more in our article, [_What are international dollars?_](https://ourworldindata.org/international-dollars)
+
+  subtitle_gdp_per_capita: GDP per capita is a country's [gross domestic product](#dod:gdp) divided by its population.
+
   description_processing_gdp_constant: |-
     We constructed estimates of GDP and GDP per capita in constant 2021 US$ by taking the corresponding series in current US$ and applying them the growth rates of the series in constant local currency units, adjusted by the base year (2021). This is [the same methodology](https://datahelpdesk.worldbank.org/knowledgebase/articles/114943-how-do-you-derive-constant-price-series-in-usd) followed by the World Bank to obtain the series in constant 2015 US$.
 
@@ -69,6 +82,17 @@ definitions:
     Trends in the proportion of the population using each fuel type are estimated using a single multivariate hierarchical model, with urban and rural disaggregation. Estimates for overall "polluting" fuels (unprocessed biomass, charcoal, coal, and kerosene) and "clean" fuels (gaseous fuels, electricity, as well as an aggregation of any other clean fuels like alcohol) are produced by aggregating estimates of relevant fuel types. The model was used to derive clean fuel use estimates for 191 countries (ref. Stoner, O., Shaddick, G., Economou, T., Gumy, S., Lewis, J., Lucio, I., Ruggeri, G. and Adair-Rohani, H. (2020), Global household energy model: a multivariate hierarchical approach to estimating trends in the use of polluting and clean fuels for cooking. J. R. Stat. Soc. C, 69: 815-839). Countries classified by the World Bank as high income (57 countries) in the 2022 fiscal year are assumed to have universal access to clean fuels and technologies for cooking.
   description_short_electricity: &description_short_electricity |-
     Access to electricity means having an electricity source that can provide very basic lighting, and charge a phone or power a radio for 4 hours per day.
+
+  map_brackets_gdp: &map_brackets_gdp
+    [0, 10000000000, 30000000000, 100000000000, 300000000000, 1000000000000, 3000000000000, 10000000000000, 1]
+  map_brackets_gdp_per_capita: &map_brackets_gdp_per_capita
+    [0, 1000, 2000, 5000, 10000, 20000, 50000, 1]
+
+  selected_entity_names_gdp: &selected_entity_names_gdp
+    [United States, Germany, United Kingdom, Brazil, South Korea, Japan, China, India, Ethiopia, Russia]
+  selected_entity_names_gdp_per_capita: &selected_entity_names_gdp_per_capita
+    [United States, Germany, United Kingdom, Brazil, South Korea, Japan, China, India, Ethiopia, Russia]
+
 tables:
   wdi:
     variables:
@@ -85,11 +109,11 @@ tables:
           tolerance: 5
         description_short: "{definitions.description_short_gdp_per_capita} {definitions.ppp_adjustment}"
         description_key:
-          - "{definitions.gdp} {definitions.gdp_per_capita}"
-          - This GDP per capita indicator provides information on economic growth and income levels from 1990.
-          - "{definitions.ppp_adjustment}"
-          - "{definitions.ppp_prices}"
-          - For GDP per capita estimates in the long run, explore the [Maddison Project Database's indicator](https://ourworldindata.org/grapher/gdp-per-capita-maddison).
+          - "{definitions.description_key_gdp_per_capita_introduction}"
+          - "{definitions.description_key_gdp_per_capita_definition}"
+          - "{definitions.description_key_gdp_per_capita_inequality}"
+          - "{definitions.description_key_ppp}"
+          - "{definitions.description_key_gdp_per_capita_mention_mpd}"
         processing_level: minor
         presentation:
           title_public: GDP per capita
@@ -102,7 +126,7 @@ tables:
               gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
           grapher_config:
             title: GDP per capita
-            subtitle: "{definitions.ppp_adjustment}"
+            subtitle: "{definitions.subtitle_gdp_per_capita} {definitions.ppp_adjustment}"
             note: "{definitions.ppp_prices}"
             variantName: In constant international-$ – World Bank
             originUrl: https://ourworldindata.org/economic-growth
@@ -120,24 +144,8 @@ tables:
               colorScale:
                 baseColorScheme: GnBu
                 binningStrategy: manual
-                customNumericValues:
-                  - 0
-                  - 1000
-                  - 2000
-                  - 5000
-                  - 10000
-                  - 20000
-                  - 50000
-                  - 1
-            selectedEntityNames:
-              - United States
-              - Germany
-              - United Kingdom
-              - France
-              - South Korea
-              - Japan
-              - China
-              - India
+                customNumericValues: *map_brackets_gdp_per_capita
+            selectedEntityNames: *selected_entity_names_gdp_per_capita
 
       ny_gdp_mktp_pp_kd:
         title: GDP, PPP (constant 2021 international $)
@@ -149,11 +157,10 @@ tables:
           tolerance: 5
         description_short: "{definitions.description_short_gdp} {definitions.ppp_adjustment}"
         description_key:
-          - "{definitions.gdp}"
-          - This GDP indicator provides information on economic growth and income levels from 1990.
-          - "{definitions.ppp_adjustment}"
-          - "{definitions.ppp_prices}"
-          - For GDP estimates in the long run, explore the [Maddison Project Database's indicator](https://ourworldindata.org/grapher/gdp-maddison-project-database).
+
+          - "{definitions.description_key_gdp_definition}"
+          - "{definitions.description_key_ppp}"
+          - "{definitions.description_key_gdp_mention_mpd}"
         processing_level: minor
         presentation:
           title_public: Gross domestic product (GDP)
@@ -180,27 +187,8 @@ tables:
               colorScale:
                 baseColorScheme: PuBu
                 binningStrategy: manual
-                customNumericValues:
-                  - 0
-                  - 10000000000
-                  - 30000000000
-                  - 100000000000
-                  - 300000000000
-                  - 1000000000000
-                  - 3000000000000
-                  - 10000000000000
-                  - 1
-            selectedEntityNames:
-              - China
-              - United States
-              - Japan
-              - United Kingdom
-              - Brazil
-              - India
-              - Germany
-              - Russia
-              - France
-              - Mexico
+                customNumericValues: *map_brackets_gdp
+            selectedEntityNames: *selected_entity_names_gdp
 
       ny_gnp_pcap_pp_kd:
         title: GNI per capita, PPP (constant 2021 international $)
@@ -236,24 +224,8 @@ tables:
               colorScale:
                 binningStrategy: manual
                 baseColorScheme: BuGn
-                customNumericValues:
-                  - 0
-                  - 1000
-                  - 2000
-                  - 5000
-                  - 10000
-                  - 20000
-                  - 50000
-                  - 1
-            selectedEntityNames:
-              - United States
-              - Germany
-              - France
-              - United Kingdom
-              - South Korea
-              - Japan
-              - India
-              - China
+                customNumericValues: *map_brackets_gdp_per_capita
+            selectedEntityNames: *selected_entity_names_gdp_per_capita
             yAxis:
               canChangeScaleType: true
               min: 0
@@ -318,34 +290,19 @@ tables:
             colorScale:
               binningStrategy: manual
               baseColorScheme: GnBu
-              customNumericValues:
-                - 0
-                - 1000
-                - 2000
-                - 5000
-                - 10000
-                - 20000
-                - 50000
-                - 1
-        selectedEntityNames:
-          - United States
-          - Germany
-          - United Kingdom
-          - South Korea
-          - France
-          - Japan
-          - China
-          - India
-        yAxis:
-          canChangeScaleType: true
-          min: 0
-        tab: map
-        hideRelativeToggle: false
-        hasMapTab: true
-        hideAnnotationFieldsInTitle:
-          entity: true
-          time: true
-          changeInPrefix: true
+              customNumericValues: *map_brackets_gdp_per_capita
+          selectedEntityNames: *selected_entity_names_gdp_per_capita
+
+          yAxis:
+            canChangeScaleType: true
+            min: 0
+          tab: map
+          hideRelativeToggle: false
+          hasMapTab: true
+          hideAnnotationFieldsInTitle:
+            entity: true
+            time: true
+            changeInPrefix: true
 
       ny_gdp_mktp_kd:
         title: GDP (constant 2015 US$)
@@ -379,27 +336,8 @@ tables:
             colorScale:
               binningStrategy: manual
               baseColorScheme: PuBu
-              customNumericValues:
-                - 0
-                - 10000000000
-                - 30000000000
-                - 100000000000
-                - 300000000000
-                - 1000000000000
-                - 3000000000000
-                - 10000000000000
-                - 1
-          selectedEntityNames:
-            - United States
-            - China
-            - India
-            - Mexico
-            - France
-            - Japan
-            - Germany
-            - Russia
-            - Brazil
-            - United Kingdom
+              customNumericValues: *map_brackets_gdp
+          selectedEntityNames: *selected_entity_names_gdp
           yAxis:
             canChangeScaleType: true
             min: 0
