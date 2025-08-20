@@ -4,7 +4,14 @@ definitions:
     presentation:
       topic_tags:
         - Global Education
-
+    description_key:
+      - Harmonized learning outcomes combine student test results into scores that can be compared across countries.
+      - This data includes developing countries that are often missing from major international tests by incorporating regional assessments.
+      - The data combines well-known international tests like [TIMSS, PIRLS](https://timssandpirls.bc.edu/), and [PISA](https://www.oecd.org/en/about/programmes/pisa.html) with regional tests like [SACMEQ](https://healtheducationresources.unesco.org/organizations/southern-and-eastern-africa-consortium-monitoring-educational-quality-sacmeq).
+      - Test scores are adjusted using statistical methods so they can be compared fairly across different subjects, grade levels, and testing years.
+      - This creates a dataset where countries can be compared on the same scale, accounting for differences in when tests were taken and what grades were tested.
+      - The scoring system is based on TIMSS standards where 300 points represents basic skills and 625 points shows advanced performance.
+      - Higher scores mean students in that country typically perform better on these academic tests, though the tests don't cover all subjects or age groups.
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
@@ -15,12 +22,13 @@ tables:
   harmonized_scores:
     variables:
       harmonized_test_scores:
-        title: Harmonized test scores (<< sex >>)
+        title: Harmonized test scores among << sex >>
         description_short: Average learning outcomes correspond to [harmonized](#dod:harmonized-scores) test scores across standardized, psychometrically-robust international and regional student achievement tests.
         unit: "score"
 
+
       normalized_hci:
-        title: Normalized  harmonized test scores (<< sex >>)
+        title: Normalized  harmonized test scores among << sex >>
         unit: index
         description_short: The quality of schooling is assessed using the [harmonized learning scores](#dod:harmonized-scores), adjusted relative to the country with the highest performance, in this instance, Singapore.
         description_processing: Harmonized test scores are normalized to the country with the highest performance, in this case, Singapore. The normalization process involves dividing the country's score by the highest score.

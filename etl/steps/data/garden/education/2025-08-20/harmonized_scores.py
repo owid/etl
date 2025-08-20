@@ -19,6 +19,7 @@ def run(dest_dir: str) -> None:
     # Find the maximum value in the 'harmonized_test_scores' column
     max_value = tb["harmonized_test_scores"].max()
 
+    tb["sex"] = tb["sex"].replace({"Total": "all students", "Male": "male students", "Female": "female students"})
     # Normalize every value in the 'harmonized_test_scores' column by the maximum value (How many years of effective learning do you get for every year of education)
     tb["normalized_hci"] = tb["harmonized_test_scores"] / max_value
 
