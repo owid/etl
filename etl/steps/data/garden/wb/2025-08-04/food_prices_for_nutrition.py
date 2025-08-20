@@ -135,6 +135,14 @@ def adjust_currencies(tb: Table, tb_wdi: Table) -> Table:
     assert set(check[check["pct"] > 10]["country"]) == {"Palestine", "Somalia", "Zimbabwe"}
     ####################################################################################################################
 
+    # For the PPP year, given that current and constant costs should be identical, fill nans in constant PPP costs with current PPP costs.
+    # NOTE: This recovers data points that were lost during the conversion from LCU to constant PPP$.
+    for column in tb.columns:
+        if "in_constant_ppp_dollars" in column:
+            column_current_ppp = column.replace("in_constant_ppp_dollars", "in_current_ppp_dollars")
+            _mask = tb["year"] == PPP_YEAR
+            tb.loc[_mask, column_constant_ppp] = tb[_mask][column_constant_ppp].fillna(tb[_mask][column_current_ppp])
+
     # Drop unnecessary columns.
     tb = tb.drop(columns=["cpi_adjustment_factor", "pa_nus_prvt_pp"], errors="raise")
 
