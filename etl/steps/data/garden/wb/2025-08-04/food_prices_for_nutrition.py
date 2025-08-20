@@ -54,9 +54,9 @@ def adjust_currencies(tb: Table, tb_wdi: Table) -> Table:
     # https://en.wikipedia.org/wiki/Sierra_Leonean_leone
     # As of 1 July 2022, the ISO 4217 code is SLE due to a redenomination of the old leone (SLL) at a rate of SLL 1000 to SLE 1.
     # Correct those costs by dividing by 1000.
-    for diet in ["a_nutrient_adequate", "an_energy_sufficient", "a_healthy"]:
-        columns = [f"cost_of_{diet}_diet_in_local_currency_unit"]
-        tb.loc[(tb["country"].isin(["Sierra Leone"])), columns] /= 1000
+    for column in tb.columns:
+        if column.startswith("cost_of_") and ("in_local_currency_unit" in column):
+            tb.loc[(tb["country"].isin(["Sierra Leone"])), column] /= 1000
 
     # For Liberia, the resulting cost of a healthy diet is also much higher than other countries (over 500 PPP$).
     # In this case, it seems to me that the PPP conversion factor (from https://data.worldbank.org/indicator/PA.NUS.PRVT.PP?locations=LR ) may not be given in LCU per international-$, but rather in USD per international-$.
