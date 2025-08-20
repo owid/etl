@@ -111,7 +111,6 @@ def adjust_currencies(tb: Table, tb_wdi: Table) -> Table:
         # check.sort_values("pct", ascending=False)[["country", "year"] + columns + ["pct"]].head(20)
         # Indeed, costs calculated in 2021 PPP$ coincide reasonably well with the ones given originally in "ppp_dollars".
         # However, this is not the case for specific countries.
-        # TODO: Mention to data providers the following exceptions, where the check fails.
         assert set(check[check["pct"] > 10]["country"]) == {"Palestine"}
 
     # The cost of a healthy diet, however, is given for multiple years, and it seems that the cost in "ppp_dollars" corresponds to **current*** PPP$ (not constant PPP$).
@@ -131,7 +130,6 @@ def adjust_currencies(tb: Table, tb_wdi: Table) -> Table:
     # check.sort_values("pct", ascending=False)[["country", "year"] + columns + ["pct"]].head(60)
     # Indeed, the cost converted from LCU into current PPP$ coincides reasonably well with the original cost in "ppp_dollars".
     # However, this is not the case for specific countries.
-    # TODO: Mention to data providers the following exceptions, where the check fails.
     assert set(check[check["pct"] > 10]["country"]) == {"Palestine", "Somalia", "Zimbabwe"}
     ####################################################################################################################
 
@@ -230,10 +228,8 @@ def run() -> None:
     # Adapt units.
     tb = adapt_units(tb=tb)
 
-    # Correct for inflation.
+    # Correct for inflation and other related data issues.
     tb = adjust_currencies(tb=tb, tb_wdi=tb_wdi)
-
-    # TODO: Consider forward filling missing PPP correction factors (and CPI?) to avoid losing all cost data for 2024.
 
     # Change attributions for share and number of people who cannot afford a healthy diet.
     tb = change_attribution(
