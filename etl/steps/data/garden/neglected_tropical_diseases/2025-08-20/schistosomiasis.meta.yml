@@ -16,19 +16,19 @@ tables:
     variables:
       population_requiring_pc_for_sch_annually:
         title: Population requiring preventive chemotherapy annually
-        description_short: "Population requiring preventive chemotherapy for schistosomiasis."
+        description_short: "Population requiring [preventive chemotherapy](#dod:preventive-chemotherapy) for schistosomiasis."
         unit: "people"
         display:
           numDecimalPlaces: 0
       sac_population_requiring_pc_for_sch_annually:
         title: School-age children population requiring preventive chemotherapy annually
-        description_short: "School-age children population requiring preventive chemotherapy for schistosomiasis."
+        description_short: "School-age children population requiring [preventive chemotherapy](#dod:preventive-chemotherapy) for schistosomiasis."
         unit: "school-age children"
         display:
           numDecimalPlaces: 0
       number_of_people_targeted:
         title: Number of people targeted
-        description_short: "Number of people targeted for preventive chemotherapy for schistosomiasis."
+        description_short: "Number of people targeted for [preventive chemotherapy](#dod:preventive-chemotherapy) for schistosomiasis."
         unit: "people"
         display:
           numDecimalPlaces: 0
@@ -46,7 +46,7 @@ tables:
           numDecimalPlaces: 0
       programme_coverage__pct:
         title: Programme coverage
-        description_short: "Programme coverage for preventive chemotherapy for schistosomiasis."
+        description_short: "Programme coverage for [preventive chemotherapy](#dod:preventive-chemotherapy) for schistosomiasis."
         unit: "%"
         display:
           numDecimalPlaces: 1
