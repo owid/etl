@@ -241,7 +241,7 @@ class AnomalyGaussianProcessOutlier(AnomalyDetector):
         mean_pred, std_pred = gp.predict(X_normalized, return_std=True)  # type: ignore
 
         # Denormalize
-        mean_pred = mean_pred * y_std + y_mean
+        mean_pred = mean_pred * y_std + y_mean  # type: ignore
         std_pred = std_pred * y_std  # type: ignore
 
         return mean_pred, std_pred
