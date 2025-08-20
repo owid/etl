@@ -196,7 +196,6 @@ steps:
   export://multidim/education/latest/proficiency:
     - data://grapher/unesco/2025-05-01/education_sdgs
 
-
   #
   # Mdim for PISA scores
   #
@@ -216,9 +215,9 @@ steps:
   export://multidim/education/latest/women_teachers:
     - data://grapher/unesco/2025-05-01/education_opri
 
-
-
+  #
   # Harmonized test scores
+  #
   data://meadow/education/2025-08-20/harmonized_scores:
     - snapshot://education/2025-08-20/harmonized_scores.csv
   data://garden/education/2025-08-20/harmonized_scores:

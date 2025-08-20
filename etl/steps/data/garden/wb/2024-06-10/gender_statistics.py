@@ -175,6 +175,11 @@ def add_metadata(tb: Table, metadata_tb: Table):
             if metadata["source"] == "World Bank: Women, Business and the Law. https://wbl.worldbank.org/":
                 meta.origins[0].producer = "World Bank - Women, Business and the Law"
 
+            # Change the source for the Learning Adjusted Years of Schooling (LAYS) indicators
+            if "HD.HCI.LAYS" in column:
+                print(meta.origins[0].producer)
+                meta.origins[0].producer = "World Bank based on methodology in Filmer et al. (2018)"
+                print(meta.origins[0].producer)
             # Convert the 'name' variable to lowercase to make text matching easier
             name_lower = tb[column].title.lower()
 
