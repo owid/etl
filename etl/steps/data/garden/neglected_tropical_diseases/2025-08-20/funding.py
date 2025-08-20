@@ -4,7 +4,7 @@ Load a meadow dataset and create a garden dataset.
 
 from typing import List
 
-import numpy as np
+import pandas as pd
 from owid.catalog import Table
 from owid.catalog import processing as pr
 from structlog import get_logger
@@ -15,29 +15,34 @@ log = get_logger()
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
-# Picking out just the NTDs from the dataset
+# Picking out just the NTDs from the dataset - NTDs according to WHO
 NTDS = [
     "Buruli ulcer",
+    "Kinetoplastid diseases - Chagas' disease",
+    "Chikungunya",  # New
     "Dengue",
-    "Helminth infections (worms & flukes) - Hookworm (ancylostomiasis & necatoriasis)",
+    "Hookworm (ancylostomiasis & necatoriasis)",
+    "Kinetoplastid diseases - Leishmaniasis",
+    "Leprosy",
     "Helminth infections (worms & flukes) - Lymphatic filariasis (elephantiasis)",
     "Helminth infections (worms & flukes) - Multiple helminth infections",
+    "Kinetoplastid diseases - Multiple kinetoplastid diseases",
+    "Mycetoma",
     "Helminth infections (worms & flukes) - Onchocerciasis (river blindness)",
     "Helminth infections (worms & flukes) - Roundworm (ascariasis)",
+    "Scabies",
     "Helminth infections (worms & flukes) - Schistosomiasis (bilharziasis)",
+    "Kinetoplastid diseases - Sleeping sickness (HAT)",
+    "Snakebite envenoming",
     "Helminth infections (worms & flukes) - Strongyloidiasis & other intestinal roundworms",
     "Helminth infections (worms & flukes) - Tapeworm (taeniasis / cysticercosis)",
-    "Helminth infections (worms & flukes) - Whipworm (trichuriasis)",
-    "Kinetoplastid diseases - Chagas' disease",
-    "Kinetoplastid diseases - Leishmaniasis",
-    "Kinetoplastid diseases - Multiple kinetoplastid diseases",
-    "Kinetoplastid diseases - Sleeping sickness (HAT)",
-    "Leprosy",
-    "Mycetoma",
-    "Scabies",
-    "Snakebite envenoming",
     "Trachoma",
+    "Helminth infections (worms & flukes) - Whipworm (trichuriasis)",
     "Yaws",
+    # "Dracunculiasis",
+    # "Echinococcosis",
+    # "Foodborne trematodiases",
+    # "Human African trypanosomiasis",
 ]
 
 
@@ -106,7 +111,7 @@ def aggregate_malaria(tb: Table, groupby_cols: List[str], index_cols: List[str])
     tb_malaria["disease"] = "Malaria - all types"
     # Adding the combined malaria types back to the original table
     tb = pr.concat([tb, tb_malaria], ignore_index=True)
-    tb = tb.set_index(["country", "year"] + index_cols, verify_integrity=True)
+    tb = tb.format(["country", "year"] + index_cols, verify_integrity=True)
 
     return tb
 
@@ -127,7 +132,7 @@ def aggregate_products(tb: Table) -> Table:
     assert len(missing_keys) == 0, f"Missing keys in replacement_dict: {missing_keys}"
     # Going round the houses to replace the values in the product column to aggregate them
     tb["product"] = tb["product"].astype(str).replace(replacement_dict)
-    tb["product"] = tb["product"].replace("nan", np.nan)
+    tb["product"] = tb["product"].replace("nan", pd.NA)
     tb["product"] = tb["product"].astype("category")
 
     return tb
@@ -140,7 +145,7 @@ def format_table(tb: Table, group: List[str], index_col: List[str], short_name: 
     tb = tb.groupby(group, observed=True)["amount__usd"].sum().reset_index()
     tb = tb.dropna(subset=index_col, how="any")
     tb["country"] = "World"
-    tb = tb.set_index(["country", "year"] + index_col, verify_integrity=False)
+    tb = tb.format(["country", "year"] + index_col, verify_integrity=False)
     tb.metadata.short_name = short_name
 
     return tb
