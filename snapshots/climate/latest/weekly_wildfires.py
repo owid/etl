@@ -161,61 +161,57 @@ def main(upload: bool) -> None:
             base_url = "https://api2.effis.emergency.copernicus.eu/statistics/v2/gwis/weekly?country={country_code}&year={year}"
             url = base_url.format(country_code=country, year=YEAR)
 
-            try:
-                data = fetch_with_retry(url)
-                if not data:  # Empty dict returned for 404s
-                    log.info(f"No fires data available for {country} {YEAR}")
-                    continue
-
-                # Extract the weekly wildfire data.
-                banfweekly = data["banfweekly"]
-                # Convert the weekly data into a pandas DataFrame.
-                df = pd.DataFrame(banfweekly)
-                # Select and rename relevant columns, and calculate the 'month_day' column.
-                df = df[["mddate", "events", "area_ha"]]
-                df["month_day"] = [date[4:6] + "-" + date[6:] for date in df["mddate"]]
-
-                # Add 'year' and 'country' columns with the current iteration values.
-                df["year"] = YEAR
-                df["country"] = COUNTRIES[country]
-
-                # Reshape the DataFrame to have a consistent format for analysis, separating 'events' and 'area_ha' into separate rows.
-                df_melted = pd.melt(
-                    df,
-                    id_vars=["country", "year", "month_day"],
-                    value_vars=["events", "area_ha"],
-                    var_name="indicator",
-                    value_name="value",
-                )
-
-                # Extract the cumulative wildfire data.
-                banfcumulative = data["banfcumulative"]
-                # Convert the cumulative data into a pandas DataFrame.
-                df_cum = pd.DataFrame(banfcumulative)
-                # Similar processing as above for the cumulative data.
-                df_cum = df_cum[["mddate", "events", "area_ha"]]
-                df_cum["month_day"] = [date[4:6] + "-" + date[6:] for date in df_cum["mddate"]]
-                df_cum["year"] = YEAR
-                df_cum["country"] = COUNTRIES[country]
-
-                # Reshape the cumulative DataFrame to match the format of the weekly data, marking indicators as cumulative.
-                df_melted_cum = pd.melt(
-                    df_cum,
-                    id_vars=["country", "year", "month_day"],
-                    value_vars=["events", "area_ha"],
-                    var_name="indicator",
-                    value_name="value",
-                )
-                df_melted_cum["indicator"] = df_melted_cum["indicator"].apply(lambda x: x + "_cumulative")
-
-                # Concatenate the weekly and cumulative data into a single DataFrame.
-                df_all = pd.concat([df_melted, df_melted_cum])
-
-                # Append the processed DataFrame to the list of fire DataFrames.
-                dfs_fires.append(df_all)
-            except Exception as e:
-                log.error(f"Failed to process fires data for {country} {YEAR}: {e}")
+            data = fetch_with_retry(url)
+            if not data:  # Empty dict returned for 404s
+                log.info(f"No fires data available for {country} {YEAR}")
                 continue
+
+            # Extract the weekly wildfire data.
+            banfweekly = data["banfweekly"]
+            # Convert the weekly data into a pandas DataFrame.
+            df = pd.DataFrame(banfweekly)
+            # Select and rename relevant columns, and calculate the 'month_day' column.
+            df = df[["mddate", "events", "area_ha"]]
+            df["month_day"] = [date[4:6] + "-" + date[6:] for date in df["mddate"]]
+
+            # Add 'year' and 'country' columns with the current iteration values.
+            df["year"] = YEAR
+            df["country"] = COUNTRIES[country]
+
+            # Reshape the DataFrame to have a consistent format for analysis, separating 'events' and 'area_ha' into separate rows.
+            df_melted = pd.melt(
+                df,
+                id_vars=["country", "year", "month_day"],
+                value_vars=["events", "area_ha"],
+                var_name="indicator",
+                value_name="value",
+            )
+
+            # Extract the cumulative wildfire data.
+            banfcumulative = data["banfcumulative"]
+            # Convert the cumulative data into a pandas DataFrame.
+            df_cum = pd.DataFrame(banfcumulative)
+            # Similar processing as above for the cumulative data.
+            df_cum = df_cum[["mddate", "events", "area_ha"]]
+            df_cum["month_day"] = [date[4:6] + "-" + date[6:] for date in df_cum["mddate"]]
+            df_cum["year"] = YEAR
+            df_cum["country"] = COUNTRIES[country]
+
+            # Reshape the cumulative DataFrame to match the format of the weekly data, marking indicators as cumulative.
+            df_melted_cum = pd.melt(
+                df_cum,
+                id_vars=["country", "year", "month_day"],
+                value_vars=["events", "area_ha"],
+                var_name="indicator",
+                value_name="value",
+            )
+            df_melted_cum["indicator"] = df_melted_cum["indicator"].apply(lambda x: x + "_cumulative")
+
+            # Concatenate the weekly and cumulative data into a single DataFrame.
+            df_all = pd.concat([df_melted, df_melted_cum])
+
+            # Append the processed DataFrame to the list of fire DataFrames.
+            dfs_fires.append(df_all)
 
             # Short delay between requests to avoid rate limiting
             time.sleep(0.5)
@@ -235,40 +231,36 @@ def main(upload: bool) -> None:
             base_url = "https://api2.effis.emergency.copernicus.eu/statistics/v2/emissions/weekly?country={country_code}&year={year}"
             url = base_url.format(country_code=country, year=YEAR)
 
-            try:
-                data = fetch_with_retry(url)
-                if not data:  # Empty dict returned for 404s
-                    log.info(f"No emissions data available for {country} {YEAR}")
-                    continue
-
-                # Extract and process the weekly emissions data.
-                emiss_weekly = data["emissionsweekly"]
-                df = pd.DataFrame(emiss_weekly)
-                df["month_day"] = [date[4:6] + "-" + date[6:] for date in df["dt"]]
-
-                # Select relevant columns and rename for consistency.
-                df = df[["plt", "month_day", "curv"]]
-                df["year"] = YEAR
-                df["country"] = COUNTRIES[country]
-                df = df.rename(columns={"plt": "indicator", "curv": "value"})
-
-                # Process cumulative emissions data similarly.
-                emiss_cumulative = data["emissionsweeklycum"]
-                df_cum = pd.DataFrame(emiss_cumulative)
-                df_cum["month_day"] = [date[4:6] + "-" + date[6:] for date in df_cum["dt"]]
-                df_cum = df_cum[["plt", "month_day", "curv"]]
-                df_cum["year"] = YEAR
-                df_cum["country"] = COUNTRIES[country]
-                df_cum = df_cum.rename(columns={"plt": "indicator", "curv": "value"})
-                df_cum["indicator"] = df_cum["indicator"].apply(lambda x: x + "_cumulative")
-
-                # Concatenate weekly and cumulative emissions data.
-                df_all = pd.concat([df, df_cum])
-                # Append to the list of emissions DataFrames.
-                dfs_emissions.append(df_all)
-            except Exception as e:
-                log.error(f"Failed to process emissions data for {country} {YEAR}: {e}")
+            data = fetch_with_retry(url)
+            if not data:  # Empty dict returned for 404s
+                log.info(f"No emissions data available for {country} {YEAR}")
                 continue
+
+            # Extract and process the weekly emissions data.
+            emiss_weekly = data["emissionsweekly"]
+            df = pd.DataFrame(emiss_weekly)
+            df["month_day"] = [date[4:6] + "-" + date[6:] for date in df["dt"]]
+
+            # Select relevant columns and rename for consistency.
+            df = df[["plt", "month_day", "curv"]]
+            df["year"] = YEAR
+            df["country"] = COUNTRIES[country]
+            df = df.rename(columns={"plt": "indicator", "curv": "value"})
+
+            # Process cumulative emissions data similarly.
+            emiss_cumulative = data["emissionsweeklycum"]
+            df_cum = pd.DataFrame(emiss_cumulative)
+            df_cum["month_day"] = [date[4:6] + "-" + date[6:] for date in df_cum["dt"]]
+            df_cum = df_cum[["plt", "month_day", "curv"]]
+            df_cum["year"] = YEAR
+            df_cum["country"] = COUNTRIES[country]
+            df_cum = df_cum.rename(columns={"plt": "indicator", "curv": "value"})
+            df_cum["indicator"] = df_cum["indicator"].apply(lambda x: x + "_cumulative")
+
+            # Concatenate weekly and cumulative emissions data.
+            df_all = pd.concat([df, df_cum])
+            # Append to the list of emissions DataFrames.
+            dfs_emissions.append(df_all)
 
     # Combine all emissions DataFrames into one.
     if not dfs_emissions:
