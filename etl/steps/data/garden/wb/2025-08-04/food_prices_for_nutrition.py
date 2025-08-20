@@ -48,6 +48,24 @@ def adapt_units(tb: Table) -> Table:
 
 
 def adjust_currencies(tb: Table, tb_wdi: Table) -> Table:
+    ####################################################################################################################
+    # For Sierra Leone, LCU costs seem to be a factor of 1000 too high in the new update.
+    # This may be due to the 2022 change in the value of the leone:
+    # https://en.wikipedia.org/wiki/Sierra_Leonean_leone
+    # As of 1 July 2022, the ISO 4217 code is SLE due to a redenomination of the old leone (SLL) at a rate of SLL 1000 to SLE 1.
+    # Correct those costs by dividing by 1000.
+    for diet in ["a_nutrient_adequate", "an_energy_sufficient", "a_healthy"]:
+        columns = [f"cost_of_{diet}_diet_in_local_currency_unit"]
+        tb.loc[(tb["country"].isin(["Sierra Leone"])), columns] /= 1000
+
+    # For Liberia, the resulting cost of a healthy diet is also much higher than other countries (over 500 PPP$).
+    # In this case, it seems to me that the PPP conversion factor (from https://data.worldbank.org/indicator/PA.NUS.PRVT.PP?locations=LR ) may not be given in LCU per international-$, but rather in USD per international-$.
+    # To correct for this, convert those USD to LCU using a conversion factor from another WDI indicator (https://data.worldbank.org/indicator/PA.NUS.FCRF?locations=LR).
+    tb_wdi.loc[(tb_wdi["country"].isin(["Liberia"])), "pa_nus_prvt_pp"] *= tb_wdi.loc[
+        (tb_wdi["country"].isin(["Liberia"])), "pa_nus_fcrf"
+    ]
+    ####################################################################################################################
+
     # From WDI, get CPI.
     tb_cpi = tb_wdi[["country", "year", "fp_cpi_totl"]].reset_index(drop=True)
     # Get the value of CPI for the base year.
@@ -94,7 +112,7 @@ def adjust_currencies(tb: Table, tb_wdi: Table) -> Table:
         # Indeed, costs calculated in 2021 PPP$ coincide reasonably well with the ones given originally in "ppp_dollars".
         # However, this is not the case for specific countries.
         # TODO: Mention to data providers the following exceptions, where the check fails.
-        assert set(check[check["pct"] > 10]["country"]) == {"Liberia", "Palestine", "Sierra Leone"}
+        assert set(check[check["pct"] > 10]["country"]) == {"Palestine"}
 
     # The cost of a healthy diet, however, is given for multiple years, and it seems that the cost in "ppp_dollars" corresponds to **current*** PPP$ (not constant PPP$).
     # To confirm this, convert costs in local currency units into PPP$.
@@ -114,7 +132,7 @@ def adjust_currencies(tb: Table, tb_wdi: Table) -> Table:
     # Indeed, the cost converted from LCU into current PPP$ coincides reasonably well with the original cost in "ppp_dollars".
     # However, this is not the case for specific countries.
     # TODO: Mention to data providers the following exceptions, where the check fails.
-    assert set(check[check["pct"] > 10]["country"]) == {"Liberia", "Palestine", "Sierra Leone", "Somalia", "Zimbabwe"}
+    assert set(check[check["pct"] > 10]["country"]) == {"Palestine", "Somalia", "Zimbabwe"}
     ####################################################################################################################
 
     # Drop unnecessary columns.
