@@ -15,11 +15,6 @@ def run() -> None:
 
     # Read table from garden dataset.
     tb = ds_garden["schistosomiasis"]
-
-    #
-    # Process data.
-    #
-
     #
     # Save outputs.
     #
