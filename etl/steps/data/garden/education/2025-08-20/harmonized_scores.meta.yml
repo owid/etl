@@ -1,0 +1,26 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Global Education
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  harmonized_scores:
+    variables:
+      harmonized_test_scores:
+        title: Harmonized test scores (<< sex >>)
+        description_short: Average learning outcomes correspond to [harmonized](#dod:harmonized-scores) test scores across standardized, psychometrically-robust international and regional student achievement tests.
+        unit: "score"
+
+      normalized_hci:
+        title: Normalized  harmonized test scores (<< sex >>)
+        unit: index
+        description_short: The quality of schooling is assessed using the [harmonized learning scores](#dod:harmonized-scores), adjusted relative to the country with the highest performance, in this instance, Singapore.
+        description_processing: Harmonized test scores are normalized to the country with the highest performance, in this case, Singapore. The normalization process involves dividing the country's score by the highest score.
