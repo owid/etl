@@ -22,12 +22,15 @@ CLASSIFICATION = EXPECTED_CLASSIFICATIONS[-1]
 # This is done by multiplying the cost in a given YEAR by the ratio CPI(BASE_YEAR) / CPI(YEAR).
 # Base year for CPI corrections.
 CPI_BASE_YEAR = 2021
+# In the latest update, all prices are given in both local currency unit and "ppp dollars". However, it's not specified whether the latter mean constant 2021 PPP$, or current PPP$. Later on we confirm that they are indeed current PPP$, and convert them to constant. This is relevant, specifically, for the cost of a healthy diet (since all other diets are informed for just a single year).
+# Specify the constant PPP year.
+PPP_YEAR = 2021
 
 # Alternative attribution for share and number who cannot afford a healthy diet.
 ATTRIBUTION_CANNOT_AFFORD = "FAO and World Bank (2025), using data and methods from Bai et al. (2024)"
 
 
-def adapt_units(tb: Table, tb_wdi: Table) -> Table:
+def adapt_units(tb: Table) -> Table:
     # Change units from million people to people.
     for column in [column for column in tb.columns if column.startswith("millions_of_people")]:
         tb[column] *= 1e6
@@ -41,19 +44,81 @@ def adapt_units(tb: Table, tb_wdi: Table) -> Table:
     ]:
         tb[column] *= 100
 
-    # Get CPI from WDI.
-    tb_cpi = tb_wdi[tb_wdi["country"] == "United States"][["year", "fp_cpi_totl"]].reset_index(drop=True)
+    return tb
+
+
+def adjust_currencies(tb: Table, tb_wdi: Table) -> Table:
+    # From WDI, get CPI.
+    tb_cpi = tb_wdi[["country", "year", "fp_cpi_totl"]].reset_index(drop=True)
     # Get the value of CPI for the base year.
-    cpi_base_value = tb_cpi[tb_cpi["year"] == CPI_BASE_YEAR]["fp_cpi_totl"].item()
-    # Create an adjustment factor.
-    tb_cpi["cpi_adjustment_factor"] = cpi_base_value / tb_cpi["fp_cpi_totl"]
+    cpi_base_value = tb_cpi[tb_cpi["year"] == CPI_BASE_YEAR][["country", "fp_cpi_totl"]].dropna().reset_index(drop=True)
+    # Create an adjustment factor for each country.
+    tb_cpi = tb_cpi.merge(cpi_base_value, on=["country"], how="left", suffixes=("", "_base"))
+    tb_cpi["cpi_adjustment_factor"] = tb_cpi["fp_cpi_totl_base"] / tb_cpi["fp_cpi_totl"]
     # Add CPI column to main table.
-    tb = tb.merge(tb_cpi[["year", "cpi_adjustment_factor"]], on=["year"], how="left")
-    # Multiply the cost of a healthy diet (given in current PPP$) by the adjustment factor, to correct for inflation
-    # and express the values in constant 2021 PPP$.
-    tb["cost_of_a_healthy_diet_in_ppp_dollars"] *= tb["cpi_adjustment_factor"]
-    # Drop unnecessary column.
-    tb = tb.drop(columns=["cpi_adjustment_factor"], errors="raise")
+    tb = tb.merge(tb_cpi[["country", "year", "cpi_adjustment_factor"]], on=["country", "year"], how="left")
+
+    # From WDI, get PPP conversion factor for private consumption.
+    tb_ppp = tb_wdi[tb_wdi["year"] == PPP_YEAR][["country", "pa_nus_prvt_pp"]].dropna()
+    # Add PPP conversion factors to main table.
+    tb = tb.merge(tb_ppp, on="country", how="left")
+
+    # Multiply costs given in local currency units by the adjustment factor, to correct for inflation.
+    # Then convert to (constant) PPP dollars.
+    for column in tb.columns:
+        if "in_current_ppp_dollars" in column:
+            column_lcu = column.replace("in_current_ppp_dollars", "in_local_currency_unit")
+            column_constant_ppp = column.replace("in_current_ppp_dollars", "in_constant_ppp_dollars")
+            tb[column_constant_ppp] = tb[column_lcu] * tb["cpi_adjustment_factor"] / tb["pa_nus_prvt_pp"]
+
+    ####################################################################################################################
+    # Sanity checks.
+
+    # Check data coverage is as expected.
+    # All cost columns are given for just a single year (as of the 2025 update, that year is 2021), except the cost of a healthy diet, which is given for multiple years.
+    for column in tb.columns:
+        if ("cost_of_a" in column) and ("relative" not in column):
+            if "healthy" not in column:
+                assert set(tb.dropna(subset=column)["year"]) == {PPP_YEAR}
+            else:
+                assert len(set(tb.dropna(subset=column)["year"])) > 1
+
+    # Check that PPP dollars are as expected.
+    for diet in ["a_nutrient_adequate", "an_energy_sufficient", "a_healthy"]:
+        # Check that the costs originally given in the data in "ppp_dollars" coincide (within a certain percentage) with the ones calculated by me (for the specific year that is informed for all three diets).
+        columns = [f"cost_of_{diet}_diet_in_constant_ppp_dollars", f"cost_of_{diet}_diet_in_current_ppp_dollars"]
+        check = tb[tb["year"] == PPP_YEAR].dropna(subset=columns)
+        check["pct"] = 100 * abs(check[columns[0]] - check[columns[1]]) / check[columns[0]]
+        # Uncomment to inspect values:
+        # check.sort_values("pct", ascending=False)[["country", "year"] + columns + ["pct"]].head(20)
+        # Indeed, costs calculated in 2021 PPP$ coincide reasonably well with the ones given originally in "ppp_dollars".
+        # However, this is not the case for specific countries.
+        # TODO: Mention to data providers the following exceptions, where the check fails.
+        assert set(check[check["pct"] > 10]["country"]) == {"Liberia", "Palestine", "Sierra Leone"}
+
+    # The cost of a healthy diet, however, is given for multiple years, and it seems that the cost in "ppp_dollars" corresponds to **current*** PPP$ (not constant PPP$).
+    # To confirm this, convert costs in local currency units into PPP$.
+    check = tb.copy()
+    # Drop the old PPP conversion factors for 2021, and add PPP conversion factors for all years.
+    check = check.drop(columns=["pa_nus_prvt_pp"]).merge(
+        tb_wdi[["country", "year", "pa_nus_prvt_pp"]].dropna(), on=["country", "year"], how="left"
+    )
+    check["cost_of_a_healthy_diet_in_current_ppp_dollars_owid"] = (
+        check["cost_of_a_healthy_diet_in_local_currency_unit"] / check["pa_nus_prvt_pp"]
+    )
+    columns = ["cost_of_a_healthy_diet_in_current_ppp_dollars_owid", "cost_of_a_healthy_diet_in_current_ppp_dollars"]
+    check = check.dropna(subset=columns)
+    check["pct"] = 100 * abs(check[columns[0]] - check[columns[1]]) / check[columns[0]]
+    # Uncomment to inspect values.
+    # check.sort_values("pct", ascending=False)[["country", "year"] + columns + ["pct"]].head(60)
+    # Indeed, the cost converted from LCU into current PPP$ coincides reasonably well with the original cost in "ppp_dollars".
+    # However, this is not the case for specific countries.
+    # TODO: Mention to data providers the following exceptions, where the check fails.
+    assert set(check[check["pct"] > 10]["country"]) == {"Liberia", "Palestine", "Sierra Leone", "Somalia", "Zimbabwe"}
+    ####################################################################################################################
+
+    # Drop unnecessary columns.
+    tb = tb.drop(columns=["cpi_adjustment_factor", "pa_nus_prvt_pp"], errors="raise")
 
     return tb
 
@@ -98,11 +163,25 @@ def run() -> None:
     # Rename columns conveniently.
     tb = tb.rename(columns={"economy": "country"}, errors="raise")
 
+    # Rename PPP columns to clarify their meaning.
+    # NOTE: The cost of a nutrient adequate and an energy sufficient diets are given only for a single year, and therefore it is irrelevant that PPP are current PPP$. However, for the cost of a healthy diet, this distinction is relevant. We sanity check these assumptions later on.
+    tb = tb.rename(
+        columns={
+            column: column.replace("in_ppp_dollars", "in_current_ppp_dollars")
+            for column in tb.columns
+            if "ppp" in column
+        },
+        errors="raise",
+    )
+
     # Harmonize country names.
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
-    # Adapt units and correct for inflation.
-    tb = adapt_units(tb=tb, tb_wdi=tb_wdi)
+    # Adapt units.
+    tb = adapt_units(tb=tb)
+
+    # Correct for inflation.
+    tb = adjust_currencies(tb=tb, tb_wdi=tb_wdi)
 
     # Change attributions for share and number of people who cannot afford a healthy diet.
     tb = change_attribution(
@@ -114,22 +193,27 @@ def run() -> None:
         attribution_text=ATTRIBUTION_CANNOT_AFFORD,
     )
 
-    # Remove attributions for cost_of_an_energy_sufficient_diet and cost_of_a_nutrient_adequate_diet
-    tb = change_attribution(
-        tb=tb,
-        columns=[
-            "cost_of_an_energy_sufficient_diet_in_ppp_dollars",
-            "cost_of_a_nutrient_adequate_diet_in_ppp_dollars",
-        ],
-        attribution_text=None,
-    )
+    # Remove attributions for cost_of_an_energy_sufficient_diet and cost_of_a_nutrient_adequate_diet.
+    for diet in ["an_energy_sufficient", "a_nutrient_adequate"]:
+        for currency in ["in_current_ppp_dollars", "in_constant_ppp_dollars", "in_local_currency_unit"]:
+            tb = change_attribution(
+                tb=tb,
+                columns=[f"cost_of_{diet}_diet_{currency}"],
+                attribution_text=None,
+            )
 
     # Set an appropriate index and sort conveniently.
     tb = tb.format()
 
     # Since the 2025 update, the dataset includes costs in local currency units.
     # For now, since they are not used, remove them.
-    tb = tb[[column for column in tb.columns if "in_local_currency_unit" not in column]]
+    # TODO: Remove this, keep all those columns in the garden step, add their metadata, and then (for now) drop them in the grapher step.
+    columns_to_drop = [
+        column
+        for column in tb.columns
+        if (("in_local_currency_unit" in column) or ("in_current_ppp_dollars" in column))
+    ]
+    tb = tb.drop(columns=columns_to_drop, errors="raise")
 
     #
     # Save outputs.
