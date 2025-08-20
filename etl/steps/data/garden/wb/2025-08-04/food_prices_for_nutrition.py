@@ -143,8 +143,32 @@ def adjust_currencies(tb: Table, tb_wdi: Table) -> Table:
             _mask = tb["year"] == PPP_YEAR
             tb.loc[_mask, column] = tb[_mask][column].fillna(tb[_mask][column_current_ppp])
 
+    # For the cost of a healthy diet (for which we have data for multiple years) of income groups and the World, we only have data in current PPP$. This happens because there is no local currency for those regions.
+    # So, to avoid missing all that data, use the US CPI and convert current PPP dollars to constant PPP dollars.
+    # Get CPI from WDI.
+    tb_cpi = tb_wdi[tb_wdi["country"] == "United States"][["year", "fp_cpi_totl"]].reset_index(drop=True)
+    # Get the value of CPI for the base year.
+    cpi_base_value = tb_cpi[tb_cpi["year"] == CPI_BASE_YEAR]["fp_cpi_totl"].item()
+    # Create an adjustment factor.
+    tb_cpi["cpi_adjustment_factor_us"] = cpi_base_value / tb_cpi["fp_cpi_totl"]
+    # Add CPI column to main table.
+    tb = tb.merge(tb_cpi[["year", "cpi_adjustment_factor_us"]], on=["year"], how="left")
+    # For income groups and the World, multiply the cost of a healthy diet (given in current PPP$) by the adjustment factor, to correct for inflation, and express the values in constant 2021 PPP$.
+    _mask = tb["country"].isin(
+        [
+            "Low-income countries",
+            "Lower-middle-income countries",
+            "Upper-middle-income countries",
+            "High-income countries",
+            "World",
+        ]
+    )
+    tb.loc[_mask, "cost_of_a_healthy_diet_in_constant_ppp_dollars"] = (
+        tb.loc[_mask, "cost_of_a_healthy_diet_in_current_ppp_dollars"] * tb.loc[_mask]["cpi_adjustment_factor_us"]
+    )
+
     # Drop unnecessary columns.
-    tb = tb.drop(columns=["cpi_adjustment_factor", "pa_nus_prvt_pp"], errors="raise")
+    tb = tb.drop(columns=["cpi_adjustment_factor", "cpi_adjustment_factor_us", "pa_nus_prvt_pp"], errors="raise")
 
     return tb
 
@@ -208,6 +232,8 @@ def run() -> None:
 
     # Correct for inflation.
     tb = adjust_currencies(tb=tb, tb_wdi=tb_wdi)
+
+    # TODO: Consider forward filling missing PPP correction factors (and CPI?) to avoid losing all cost data for 2024.
 
     # Change attributions for share and number of people who cannot afford a healthy diet.
     tb = change_attribution(
