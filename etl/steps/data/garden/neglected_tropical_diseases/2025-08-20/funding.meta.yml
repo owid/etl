@@ -7,7 +7,7 @@ definitions:
         - Global Health
         #- Neglected Tropical Diseases
       grapher_config:
-        note: "This data is expressed in constant constant 2022 US$."
+        note: "This data is expressed in constant 2022 US$."
         selectedEntityNames: ["World"]
     display:
       numDecimalPlaces: 0
