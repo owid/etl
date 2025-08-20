@@ -141,7 +141,7 @@ def adjust_currencies(tb: Table, tb_wdi: Table) -> Table:
         if "in_constant_ppp_dollars" in column:
             column_current_ppp = column.replace("in_constant_ppp_dollars", "in_current_ppp_dollars")
             _mask = tb["year"] == PPP_YEAR
-            tb.loc[_mask, column_constant_ppp] = tb[_mask][column_constant_ppp].fillna(tb[_mask][column_current_ppp])
+            tb.loc[_mask, column] = tb[_mask][column].fillna(tb[_mask][column_current_ppp])
 
     # Drop unnecessary columns.
     tb = tb.drop(columns=["cpi_adjustment_factor", "pa_nus_prvt_pp"], errors="raise")
