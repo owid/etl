@@ -82,14 +82,14 @@ definitions:
   # EXPENDITURE CONFIGURATIONS
   # ============================================================================
 
-  grapher_config_expenditure: &grapher_config_expenditure
+  grapher_config_expenditure_gdp: &grapher_config_expenditure_gdp
     <<: *common_grapher_config
     map:
       <<: *common_grapher_map_config
       colorScale:
         binningStrategy: manual
         customNumericValues: *expenditure_bins
-        baseColorScheme: YlOrBr
+        baseColorScheme: Blues
 
   grapher_config_expenditure_total: &grapher_config_expenditure_total
     <<: *common_grapher_config
@@ -98,44 +98,18 @@ definitions:
       colorScale:
         binningStrategy: manual
         customNumericValues: *expenditure_total_bins
-        baseColorScheme: YlOrBr
+        baseColorScheme: BuGn
 
   # Per-student spending configurations (using per-student bins)
-  grapher_config_per_student_spending_preprimary: &grapher_config_per_student_spending_preprimary
+  grapher_config_per_student_spending: &grapher_config_per_student_spending
     <<: *common_grapher_config
     map:
       <<: *common_grapher_map_config
       colorScale:
         binningStrategy: manual
         customNumericValues: *per_student_spending_bins
-        baseColorScheme: Oranges
+        baseColorScheme: Purples
 
-  grapher_config_per_student_spending_primary: &grapher_config_per_student_spending_primary
-    <<: *common_grapher_config
-    map:
-      <<: *common_grapher_map_config
-      colorScale:
-        binningStrategy: manual
-        customNumericValues: *per_student_spending_bins
-        baseColorScheme: Blues
-
-  grapher_config_per_student_spending_secondary: &grapher_config_per_student_spending_secondary
-    <<: *common_grapher_config
-    map:
-      <<: *common_grapher_map_config
-      colorScale:
-        binningStrategy: manual
-        customNumericValues: *per_student_spending_bins
-        baseColorScheme: Greens
-
-  grapher_config_per_student_spending_tertiary: &grapher_config_per_student_spending_tertiary
-    <<: *common_grapher_config
-    map:
-      <<: *common_grapher_map_config
-      colorScale:
-        binningStrategy: manual
-        customNumericValues: *per_student_spending_bins
-        baseColorScheme: Reds
 
   # ============================================================================
   # PROFICIENCY RATE CONFIGURATIONS
@@ -983,9 +957,12 @@ tables:
         display:
           numDecimalPlaces: 1
 
+      # ========================================================================
+      # Expenditure on education
+      # ========================================================================
       expenditure_on_education_as_a_percentage_of_total_government_expenditure__pct__xgovexp_imf:
         title: Expenditure on education as share of government spending
-        description_short: Percentage of total [general government](#dod:general-government) spending (across all sectors) that is allocated to education, across all levels.
+        description_short: Percentage of total [general government](#dod:general-government) spending (across all sectors) that is allocated to education.
         unit: "%"
         short_unit: "%"
         description_key:
@@ -998,28 +975,26 @@ tables:
           grapher_config: *grapher_config_expenditure_total
         display:
           numDecimalPlaces: 1
-
-      # ========================================================================
-      # Expenditure on education
-      # ========================================================================
+          name: Total across all levels of education
 
       government_expenditure_on_education_as_a_percentage_of_gdp__pct__xgdp_fsgov:
         title: Government spending on education as share of GDP
         unit: "% of GDP"
         short_unit: "%"
-        description_short: Total [general government](#dod:general-government) spending on all levels of education, given as a share of [gross domestic product](#dod:gdp).
+        description_short: Total [general government](#dod:general-government) spending on all levels of education, expressed as a percentage of [GDP](#dod:gdp).
         description_key: *desc_key_govt_expenditure_gdp_share
         presentation:
           title_public: Government spending on education as share of GDP
         display:
           numDecimalPlaces: 1
           name: Total across all levels of education
+          tolerance: 10
 
       combined_expenditure_share_gdp:
         title: Public spending on education as a share of GDP (historical and recent)
         unit: "% of GDP"
         short_unit: "%"
-        description_short: Total [general government](#dod:general-government) spending on all levels of education, given as a share of [gross domestic product](#dod:gdp).
+        description_short: Total [general government](#dod:general-government) spending on all levels of education, expressed as a percentage of [GDP](#dod:gdp).
         description_key: *desc_key_govt_expenditure_gdp_share
         description_processing: |-
           **Historical expenditure data:**
@@ -1031,10 +1006,12 @@ tables:
           General government expenditure on education (current, capital, and transfers) is expressed as a percentage of GDP. It includes expenditure funded by transfers from international sources to government. General government usually refers to local, regional and central governments.
         presentation:
           title_public: Public spending on education as a share of GDP
-          grapher_config: *grapher_config_expenditure
+          grapher_config: *grapher_config_expenditure_gdp
         display:
           numDecimalPlaces: 1
           name: Total across all levels of education
+          tolerance: 10
+
       # ========================================================================
       # GOVERNMENT EXPENDITURE IN CONSTANT PPP DOLLARS PER STUDENT (by education level)
       # ========================================================================
@@ -1047,10 +1024,11 @@ tables:
         description_key: *desc_key_govt_expenditure_constant_ppp_per_student
         presentation:
           title_public: Government spending on pre-primary education per student (international-$)
-          grapher_config: *grapher_config_per_student_spending_preprimary
+          grapher_config: *grapher_config_per_student_spending
         display:
           numDecimalPlaces: 0
           name: Pre-primary
+          tolerance: 10
 
       initial_government_funding_per_primary_student__constant_pppdollar__xunit_pppconst_1_fsgov_ffntr:
         title: Government spending on primary education per student
@@ -1060,10 +1038,11 @@ tables:
         description_key: *desc_key_govt_expenditure_constant_ppp_per_student
         presentation:
           title_public: Government spending on primary education per student (international-$)
-          grapher_config: *grapher_config_per_student_spending_primary
+          grapher_config: *grapher_config_per_student_spending
         display:
           numDecimalPlaces: 0
           name: Primary
+          tolerance: 10
 
       initial_government_funding_per_lower_secondary_student__constant_pppdollar__xunit_pppconst_2_fsgov_ffntr:
         title: Government spending on lower secondary education per student
@@ -1073,10 +1052,11 @@ tables:
         description_key: *desc_key_govt_expenditure_constant_ppp_per_student
         presentation:
           title_public: Government spending on lower secondary education per student (international-$)
-          grapher_config: *grapher_config_per_student_spending_secondary
+          grapher_config: *grapher_config_per_student_spending
         display:
           numDecimalPlaces: 0
           name: Lower secondary
+          tolerance: 10
 
       initial_government_funding_per_upper_secondary_student__constant_pppdollar__xunit_pppconst_3_fsgov_ffntr:
         title: Government spending on upper secondary education per student
@@ -1086,10 +1066,11 @@ tables:
         description_key: *desc_key_govt_expenditure_constant_ppp_per_student
         presentation:
           title_public: Government spending on upper secondary education per student (international-$)
-          grapher_config: *grapher_config_per_student_spending_secondary
+          grapher_config: *grapher_config_per_student_spending
         display:
           numDecimalPlaces: 0
           name: Upper secondary
+          tolerance: 10
 
       initial_government_funding_per_tertiary_student__constant_pppdollar__xunit_pppconst_5t8_fsgov_ffntr:
         title: Government spending on tertiary education per student
@@ -1099,10 +1080,11 @@ tables:
         description_key: *desc_key_govt_expenditure_constant_ppp_per_student
         presentation:
           title_public: Government spending on tertiary education per student (international-$)
-          grapher_config: *grapher_config_per_student_spending_tertiary
+          grapher_config: *grapher_config_per_student_spending
         display:
           numDecimalPlaces: 0
           name: Tertiary
+          tolerance: 10
 
       # ========================================================================
       # MINIMUM PROFICIENCY RATES - PREPARED FOR THE FUTURE (All Children)

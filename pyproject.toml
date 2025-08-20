@@ -83,7 +83,6 @@ dependencies = [
 owid-catalog = { path = "lib/catalog", editable = true }
 owid-datautils = { path = "lib/datautils", editable = true }
 owid-repack = { path = "lib/repack", editable = true }
-sqlacodegen = { git = "https://github.com/agronholm/sqlacodegen.git" }
 
 [tool.uv]
 dev-dependencies = [
@@ -110,7 +109,6 @@ dev-dependencies = [
     "mkdocs-glightbox>=0.3.7",
     "memory-profiler>=0.61.0",
     "line-profiler>=4.1.3",
-    "sqlacodegen",
     # unpinning those would introduce tons of type errors
     "pyright==1.1.373",
     "pandas-stubs==1.2.0.62",
@@ -118,6 +116,7 @@ dev-dependencies = [
     "ipdb>=0.13.13",
     "commentjson>=0.9.0",
     "pytest-asyncio>=1.0.0",
+    "sqlacodegen>=3.1.0",
 ]
 
 [project.optional-dependencies]
