@@ -2,7 +2,7 @@
 
 Go to this url: https://gfinderdata.impactglobalhealth.org/pages/data-visualisations/allNeglectedDiseases
 
-Click on the download button to download the data as an Excel file.
+Click on the download all data button in the bottom left corner to download the data as an Excel file.
 """
 
 from pathlib import Path
