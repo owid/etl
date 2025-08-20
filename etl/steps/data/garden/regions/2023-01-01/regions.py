@@ -5,6 +5,7 @@ Find more details in the README in `docs/data/regions.md`.
 """
 
 import json
+from graphlib import TopologicalSorter
 
 import pandas as pd
 import yaml
@@ -115,8 +116,20 @@ def run(dest_dir: str) -> None:
     run_sanity_checks(df=df)
 
     # Replace members that are aggregates
-    dag = df.set_index("code")["members"].to_dict()
-    ddag = {k: v if isinstance(v, list)  else [] for k, v in dag.items()}
+    dag = df.dropna(subset="members").set_index("code")["members"].to_dict()
+    ts = TopologicalSorter(dag)
+    regions_ordered = tuple(ts.static_order())
+    for region in regions_ordered:
+        assert region in dag, f"Region {region} not found in the DAG."
+        members = dag.get(region)
+        new_members = []
+        for member in members:
+            assert member in dag, f"Member {member} of region {region} not found in the DAG."
+            m = dag.get(member, [])
+            new_members.extend(m)
+
+        pass
+    # r = [dag[res] for res in results]
 
     # df = replace_members(df)
 
