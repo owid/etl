@@ -6,9 +6,10 @@ references:
 
 import json
 import time
-from datetime import UTC, datetime
+from datetime import datetime
 from typing import cast
 
+import pytz
 import streamlit as st
 from pydantic_core import to_json
 from structlog import get_logger
@@ -155,7 +156,7 @@ def show_debugging_details():
     st.download_button(
         label="Download session (JSON)",
         data=json_string,
-        file_name=f"session-expert-{datetime.now(UTC).strftime('%Y%m%d_%H%M_%s')}.json",
+        file_name=f"session-expert-{datetime.now(pytz.utc).strftime('%Y%m%d_%H%M_%s')}.json",
         mime="application/json",
         icon=":material/download:",
         help="Download the session data as a JSON file for debugging purposes.\n\n**:material/warning: This file contains your session chat history, model configuration, and usage statistics. Don't share this file with the public, as it may contain sensitive information.**",
