@@ -205,9 +205,9 @@ def run() -> None:
     # Set an appropriate index and sort conveniently.
     tb = tb.format()
 
-    # Since the 2025 update, the dataset includes costs in local currency units.
-    # For now, since they are not used, remove them.
-    # TODO: Remove this, keep all those columns in the garden step, add their metadata, and then (for now) drop them in the grapher step.
+    # The costs in the original data (since the 2025 update) was given in local currency unit, and in current PPP$.
+    # In this step, we added costs in constant PPP$.
+    # For simplicity, since we are only using costs in constant PPP$, remove other cost columns.
     columns_to_drop = [
         column
         for column in tb.columns
