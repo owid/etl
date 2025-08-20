@@ -104,14 +104,6 @@ definitions:
 
   # ============================================================================
 
-  grapher_config_per_student_spending_total: &grapher_config_per_student_spending_total
-    <<: *common_grapher_config
-    map:
-      <<: *common_grapher_map_config
-      colorScale:
-        binningStrategy: manual
-        customNumericValues: *per_student_spending_bins
-        baseColorScheme: YlOrRd
 
   # Out-of-school children configurations
   out_of_school_children_bins: &out_of_school_children_bins [10000, 50000, 100000, 500000, 1000000, 5000000, 10000000, 50000000]
@@ -156,25 +148,7 @@ definitions:
   # ============================================================================
 
   # Education spending configurations (constant PPP dollars)
-  grapher_config_spending_preprimary: &grapher_config_spending_preprimary
-    <<: *common_grapher_config
-    map:
-      <<: *common_grapher_map_config
-      colorScale:
-        binningStrategy: manual
-        customNumericValues: *expenditure_bins_by_level
-        baseColorScheme: Oranges
-
-  grapher_config_spending_primary: &grapher_config_spending_primary
-    <<: *common_grapher_config
-    map:
-      <<: *common_grapher_map_config
-      colorScale:
-        binningStrategy: manual
-        customNumericValues: *expenditure_bins_by_level
-        baseColorScheme: Blues
-
-  grapher_config_spending_lower_secondary: &grapher_config_spending_lower_secondary
+  grapher_config_spending_by_level: &grapher_config_spending_by_level
     <<: *common_grapher_config
     map:
       <<: *common_grapher_map_config
@@ -183,25 +157,6 @@ definitions:
         customNumericValues: *expenditure_bins_by_level
         baseColorScheme: Greens
 
-  grapher_config_spending_upper_secondary: &grapher_config_spending_upper_secondary
-    <<: *common_grapher_config
-    map:
-      <<: *common_grapher_map_config
-      colorScale:
-        binningStrategy: manual
-        customNumericValues: *expenditure_bins_by_level
-        baseColorScheme: Purples
-
-  grapher_config_spending_tertiary: &grapher_config_spending_tertiary
-    <<: *common_grapher_config
-    map:
-      <<: *common_grapher_map_config
-      colorScale:
-        binningStrategy: manual
-        customNumericValues: *expenditure_bins_by_level
-        baseColorScheme: Reds
-
-
   grapher_config_spending_total: &grapher_config_spending_total
     <<: *common_grapher_config
     map:
@@ -209,7 +164,7 @@ definitions:
       colorScale:
         binningStrategy: manual
         customNumericValues: *expenditure_bins_total
-        baseColorScheme: YlOrRd
+        baseColorScheme: Greens
 
   # Education spending as share of GDP configuration
   grapher_config_gdp_share: &grapher_config_gdp_share
@@ -219,7 +174,16 @@ definitions:
       colorScale:
         binningStrategy: manual
         customNumericValues: *gdp_share_bins
-        baseColorScheme: YlOrBr
+        baseColorScheme: Blues
+
+  grapher_config_per_student_spending_total: &grapher_config_per_student_spending_total
+    <<: *common_grapher_config
+    map:
+      <<: *common_grapher_map_config
+      colorScale:
+        binningStrategy: manual
+        customNumericValues: *per_student_spending_bins
+        baseColorScheme: Purples
 
   # ============================================================================
   # DESCRIPTIONS
@@ -1271,7 +1235,7 @@ tables:
         description_key: *desc_key_govt_expenditure_constant_ppp
         presentation:
           title_public: Government spending on pre-primary education (international-$)
-          grapher_config: *grapher_config_spending_preprimary
+          grapher_config: *grapher_config_spending_by_level
         display:
           numDecimalPlaces: 0
           name: Pre-primary
@@ -1284,7 +1248,7 @@ tables:
         description_key: *desc_key_govt_expenditure_constant_ppp
         presentation:
           title_public: Government spending on primary education (international-$)
-          grapher_config: *grapher_config_spending_primary
+          grapher_config: *grapher_config_spending_by_level
         display:
           numDecimalPlaces: 0
           name: Primary
@@ -1297,7 +1261,7 @@ tables:
         description_key: *desc_key_govt_expenditure_constant_ppp
         presentation:
           title_public: Government spending on lower secondary education (international-$)
-          grapher_config: *grapher_config_spending_lower_secondary
+          grapher_config: *grapher_config_spending_by_level
         display:
           numDecimalPlaces: 0
           name: Lower secondary
@@ -1310,7 +1274,7 @@ tables:
         description_key: *desc_key_govt_expenditure_constant_ppp
         presentation:
           title_public: Government spending on upper secondary education (international-$)
-          grapher_config: *grapher_config_spending_upper_secondary
+          grapher_config: *grapher_config_spending_by_level
         display:
           numDecimalPlaces: 0
           name: Upper secondary
@@ -1323,7 +1287,7 @@ tables:
         description_key: *desc_key_govt_expenditure_constant_ppp
         presentation:
           title_public: Government spending on tertiary education (international-$)
-          grapher_config: *grapher_config_spending_tertiary
+          grapher_config: *grapher_config_spending_by_level
         display:
           numDecimalPlaces: 0
           name: Tertiary
