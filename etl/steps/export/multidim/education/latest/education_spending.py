@@ -233,10 +233,10 @@ SPENDING_TYPE_MAPPINGS = {
         "per_student": "per student",
     },
     "subtitle": {
-        "gdp_share": "as a percentage of [gross domestic product (GDP)](#dod:gdp)",
-        "constant_ppp": "in constant [international-$](#dod:int_dollar_abbreviation)",
-        "total_government": "as a percentage of total government expenditure",
-        "per_student": "per student in constant [international-$](#dod:int_dollar_abbreviation)",
+        "gdp_share": "expressed as a percentage of [GDP](#dod:gdp)",
+        "constant_ppp": "expressed in constant [international-$](#dod:int_dollar_abbreviation)",
+        "total_government": "expressed as a percentage of total government expenditure",
+        "per_student": "per student, expressed in constant [international-$](#dod:int_dollar_abbreviation)",
     },
 }
 
@@ -251,13 +251,13 @@ LEVEL_MAPPINGS = {
         "level_side_by_side": "education by level",
     },
     "subtitle": {
-        "preprimary": "[pre-primary](#dod:pre-primary-education) education",
-        "primary": "[primary](#dod:primary-education) education",
-        "lower_secondary": "[lower secondary](#dod:lower-secondary-education) education",
-        "upper_secondary": "[upper secondary](#dod:upper-secondary-education) education",
-        "tertiary": "[tertiary](#dod:tertiary-education) education",
-        "all": "education across all levels",
-        "level_side_by_side": "[pre-primary](#dod:pre-primary-education), [primary](#dod:primary-education), [lower secondary](#dod:lower-secondary-education), [upper secondary](#dod:upper-secondary-education), and [tertiary](#dod:tertiary-education) education",
+        "preprimary": "[pre-primary](#dod:pre-primary-education) education,",
+        "primary": "[primary](#dod:primary-education) education,",
+        "lower_secondary": "[lower secondary](#dod:lower-secondary-education) education,",
+        "upper_secondary": "[upper secondary](#dod:upper-secondary-education) education,",
+        "tertiary": "[tertiary](#dod:tertiary-education) education,",
+        "all": "education across all levels,",
+        "level_side_by_side": "[pre-primary](#dod:pre-primary-education), [primary](#dod:primary-education), [lower secondary](#dod:lower-secondary-education), [upper secondary](#dod:upper-secondary-education), and [tertiary](#dod:tertiary-education) education,",
     },
 }
 

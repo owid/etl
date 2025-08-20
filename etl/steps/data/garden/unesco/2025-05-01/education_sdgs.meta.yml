@@ -962,7 +962,7 @@ tables:
       # ========================================================================
       expenditure_on_education_as_a_percentage_of_total_government_expenditure__pct__xgovexp_imf:
         title: Expenditure on education as share of government spending
-        description_short: Percentage of total [general government](#dod:general-government) spending (across all sectors) that is allocated to education, across all levels.
+        description_short: Percentage of total [general government](#dod:general-government) spending (across all sectors) that is allocated to education.
         unit: "%"
         short_unit: "%"
         description_key:
@@ -981,7 +981,7 @@ tables:
         title: Government spending on education as share of GDP
         unit: "% of GDP"
         short_unit: "%"
-        description_short: Total [general government](#dod:general-government) spending on all levels of education, given as a share of [gross domestic product](#dod:gdp).
+        description_short: Total [general government](#dod:general-government) spending on all levels of education, expressed as a percentage of [GDP](#dod:gdp).
         description_key: *desc_key_govt_expenditure_gdp_share
         presentation:
           title_public: Government spending on education as share of GDP
@@ -994,7 +994,7 @@ tables:
         title: Public spending on education as a share of GDP (historical and recent)
         unit: "% of GDP"
         short_unit: "%"
-        description_short: Total [general government](#dod:general-government) spending on all levels of education, given as a share of [gross domestic product](#dod:gdp).
+        description_short: Total [general government](#dod:general-government) spending on all levels of education, expressed as a percentage of [GDP](#dod:gdp).
         description_key: *desc_key_govt_expenditure_gdp_share
         description_processing: |-
           **Historical expenditure data:**
