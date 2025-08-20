@@ -15,7 +15,7 @@ meta:
     producer: Lakner et al.
     citation_full: |-
       Lakner, C., Genoni, M. E., Stemmler, H., Yonzan, N., & Tetteh Baah, S. K. (2024). Reproducibility package for Poverty, Prosperity and Planet Report 2024, updated using Poverty and Inequality Platform (version June 2025). World Bank. https://doi.org/10.60572/KGE4-CX54
-    attribution: Lakner et al. (2024) (updated June 2025)
+    attribution: Lakner et al. (2024) (updated using World Bank PIP in June 2025)
 
     # Files
     url_main: https://reproducibility.worldbank.org/index.php/catalog/189/

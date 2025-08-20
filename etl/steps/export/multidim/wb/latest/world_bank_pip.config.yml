@@ -1,6 +1,8 @@
 title:
   title: Poverty indicators
   title_variant: World Bank
+topic_tags:
+  - Poverty
 default_selection:
   - Mozambique
   - Zambia

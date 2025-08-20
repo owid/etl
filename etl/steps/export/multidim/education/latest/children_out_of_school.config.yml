@@ -1,6 +1,8 @@
 title:
   title: Children out of school
   title_variant: by level of education and gender
+topic_tags:
+  - Global Education
 default_selection:
   - Egypt
   - Niger
@@ -13,29 +15,29 @@ dimensions:
     choices:
       - slug: rate
         name: Share (%)
-        description: Percentage of children out of school in the relevant age group.
+        description: Percentage of children out of school in the relevant age group
       - slug: number
         name: Number
-        description: Total number of children out of school.
+        description: Total number of children out of school
 
   - name: Education level
     slug: level
     choices:
       - slug: pre_primary
         name: Pre-primary education
-        description: Children one year before official primary entry age (typically age 5) who are not enrolled in school.
+        description: Children one year before official primary entry age (typically age 5) who are not enrolled in school
       - slug: primary
         name: Primary education
-        description: Children of primary school age (typically 6-11 years) who are not enrolled in school.
+        description: Children of primary school age (typically 6-11 years) who are not enrolled in school
       - slug: lower_secondary
         name: Lower secondary education
-        description: Children of lower secondary school age (typically 12-14 years) who are not enrolled in school.
+        description: Children of lower secondary school age (typically 12-14 years) who are not enrolled in school
       - slug: upper_secondary
         name: Upper secondary education
-        description: Children of upper secondary school age (typically 15-17 years) who are not enrolled in school.
+        description: Children of upper secondary school age (typically 15-17 years) who are not enrolled in school
       - slug: level_side_by_side
         name: All education levels
-        description: Compare how girls and boys differ in school participation.
+        description: Compare how girls and boys differ in school participation
 
   - name: Gender
     slug: sex
@@ -47,7 +49,7 @@ dimensions:
       - slug: female
         name: Girls
       - slug: sex_side_by_side
-        name: Girls and Boys
-        description: Compare school participation across different education levels.
+        name: Girls vs. boys
+        description: Compare school participation between girls and boys
 
 views: []

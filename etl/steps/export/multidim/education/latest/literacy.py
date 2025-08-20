@@ -13,7 +13,7 @@ MULTIDIM_CONFIG = {
     "yAxis": {"min": 0, "max": 100},
     "hasMapTab": True,
     "tab": "map",
-    "addCountryMode": "change-country",
+    "addCountryMode": "add-country",
 }
 
 # Common grouped view configuration
@@ -21,6 +21,7 @@ GROUPED_VIEW_CONFIG = MULTIDIM_CONFIG | {
     "hasMapTab": False,
     "tab": "chart",
     "selectedFacetStrategy": "entity",
+    "hideFacetControl": False,
 }
 
 # Age group configurations - maps internal age group keys to column detection and display formatting
@@ -105,8 +106,12 @@ def run() -> None:
         }
     )
 
-    # Edit display names
+    # Edit display names and set view metadata for all views
     for view in c.views:
+        # Set view metadata for all views
+        view.metadata = {
+            "description_short": view.config["subtitle"],
+        }
         edit_indicator_displays(view)
 
     # Save collection
@@ -197,7 +202,6 @@ def create_grouped_views(collection):
     """Add grouped views for gender and age group comparisons."""
     view_metadata = {
         "presentation": {"title_public": "{title}"},
-        "description_short": "{subtitle}",
     }
     view_config = GROUPED_VIEW_CONFIG | {
         "title": "{title}",
@@ -270,7 +274,7 @@ def _get_gender_specific_subtitle(age_group, gender_term):
     prefix = age_config.get("gender_prefix", "")
     age_range = age_config.get("age_range", "")
 
-    return f"Share of {prefix}{gender_term} aged {age_range} who can read and write a short, simple sentence with understanding."
+    return f"Share of {prefix}{gender_term} aged {age_range} who can read and write a simple sentence about their daily life."
 
 
 def _get_sex_side_by_side_subtitle(age_group):
@@ -280,9 +284,11 @@ def _get_sex_side_by_side_subtitle(age_group):
     age_range = age_config.get("age_range", "")
 
     if prefix:
-        return f"Share of {prefix}women and men aged {age_range} who can read and write a short, simple sentence with understanding."
+        return f"Share of {prefix}women and men aged {age_range} who can read and write a simple sentence about their daily life."
     else:
-        return f"Share of women and men aged {age_range} who can read and write a short, simple sentence with understanding."
+        return (
+            f"Share of women and men aged {age_range} who can read and write a simple sentence about their daily life."
+        )
 
 
 def generate_subtitle_by_age_and_gender(view):
@@ -293,9 +299,9 @@ def generate_subtitle_by_age_and_gender(view):
     if age_group == "age_side_by_side":
         age_descriptions = _get_age_descriptions_by_gender(sex)
         if age_descriptions:
-            return f"Share of {age_descriptions} who can read and write a short, simple sentence with understanding."
+            return f"Share of {age_descriptions} who can read and write a simple sentence about their daily life."
         else:
-            return "Share of adults, young people, and older adults who can read and write a short, simple sentence with understanding."
+            return "Share of adults, young people, and older adults who can read and write a simple sentence about their daily life."
 
     elif sex == "sex_side_by_side":
         return _get_sex_side_by_side_subtitle(age_group)
@@ -303,7 +309,7 @@ def generate_subtitle_by_age_and_gender(view):
     elif sex == "both":
         age_config = AGE_GROUPS.get(age_group, {})
         age_range = age_config.get("age_range", "")
-        return f"Share of {age_config.get('title_term', 'adults')} aged {age_range} who can read and write a short, simple sentence with understanding."
+        return f"Share of {age_config.get('title_term', 'adults')} aged {age_range} who can read and write a simple sentence about their daily life."
 
     else:
         # For specific genders

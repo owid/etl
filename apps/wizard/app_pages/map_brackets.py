@@ -13,7 +13,7 @@ from owid.datautils.common import ExceptionFromDocstring
 from sqlalchemy.orm import Session
 from structlog import get_logger
 
-from apps.wizard.utils.components import grapher_chart
+from apps.wizard.utils.components import grapher_chart, st_title_with_expert
 from etl.collection.explorer.legacy import ExplorerLegacy
 from etl.config import OWID_ENV
 from etl.data_helpers.misc import round_to_nearest_power_of_ten, round_to_shifted_power_of_ten, round_to_sig_figs
@@ -887,7 +887,7 @@ st.set_page_config(
     page_icon="🪄",
     # initial_sidebar_state="collapsed",
 )
-st.title(":material/map: Map bracketer")
+st_title_with_expert("Map bracketer", icon=":material/map:")
 with st.popover("ℹ️ Learn about it"):
     st.markdown(
         "This tool will find optimal map brackets for a specific variable, and let you manually edit it in a way that is consistent with our guidelines."

@@ -199,7 +199,7 @@ def build_dataset_form(df: pd.DataFrame, similarity_names: Dict[str, Any]) -> "S
     submitted_datasets = st.button(
         "Next (1/3)",
         type="primary",
-        use_container_width=True,
+        width="stretch",
     )
 
     # If user clicks on next, proceed
