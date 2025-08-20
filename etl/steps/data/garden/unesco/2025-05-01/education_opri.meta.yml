@@ -26,7 +26,7 @@ definitions:
 
   # Value ranges for different indicator types
   enrolment_rate_bins: &enrolment_rate_bins [10,20,30,40,50,60,70,80,90,100]
-  gdp_share_bins: &gdp_share_bins [0,0.2,0.4,0.6,0.8,1.2,1.4,1.6,1.8,2]
+  gdp_share_bins: &gdp_share_bins [0,0.2,0.4,0.6,0.8,1,1.2,1.4,1.4]
   school_life_expectancy_preprimary_bins: &school_life_expectancy_preprimary_bins [0.5,1,1.5,2,2.5,3,3.5,4]
   school_life_expectancy_primary_bins: &school_life_expectancy_primary_bins [2,3,4,5,6,7,8,9]
   school_life_expectancy_secondary_bins: &school_life_expectancy_secondary_bins [1,2,3,4,5,6,7,8]
@@ -104,14 +104,6 @@ definitions:
 
   # ============================================================================
 
-  grapher_config_per_student_spending_total: &grapher_config_per_student_spending_total
-    <<: *common_grapher_config
-    map:
-      <<: *common_grapher_map_config
-      colorScale:
-        binningStrategy: manual
-        customNumericValues: *per_student_spending_bins
-        baseColorScheme: YlOrRd
 
   # Out-of-school children configurations
   out_of_school_children_bins: &out_of_school_children_bins [10000, 50000, 100000, 500000, 1000000, 5000000, 10000000, 50000000]
@@ -156,51 +148,14 @@ definitions:
   # ============================================================================
 
   # Education spending configurations (constant PPP dollars)
-  grapher_config_spending_preprimary: &grapher_config_spending_preprimary
+  grapher_config_spending_by_level: &grapher_config_spending_by_level
     <<: *common_grapher_config
     map:
       <<: *common_grapher_map_config
       colorScale:
         binningStrategy: manual
         customNumericValues: *expenditure_bins_by_level
-        baseColorScheme: Oranges
-
-  grapher_config_spending_primary: &grapher_config_spending_primary
-    <<: *common_grapher_config
-    map:
-      <<: *common_grapher_map_config
-      colorScale:
-        binningStrategy: manual
-        customNumericValues: *expenditure_bins_by_level
-        baseColorScheme: Blues
-
-  grapher_config_spending_lower_secondary: &grapher_config_spending_lower_secondary
-    <<: *common_grapher_config
-    map:
-      <<: *common_grapher_map_config
-      colorScale:
-        binningStrategy: manual
-        customNumericValues: *expenditure_bins_by_level
-        baseColorScheme: Greens
-
-  grapher_config_spending_upper_secondary: &grapher_config_spending_upper_secondary
-    <<: *common_grapher_config
-    map:
-      <<: *common_grapher_map_config
-      colorScale:
-        binningStrategy: manual
-        customNumericValues: *expenditure_bins_by_level
-        baseColorScheme: Purples
-
-  grapher_config_spending_tertiary: &grapher_config_spending_tertiary
-    <<: *common_grapher_config
-    map:
-      <<: *common_grapher_map_config
-      colorScale:
-        binningStrategy: manual
-        customNumericValues: *expenditure_bins_by_level
-        baseColorScheme: Reds
-
+        baseColorScheme: YlGnBu
 
   grapher_config_spending_total: &grapher_config_spending_total
     <<: *common_grapher_config
@@ -209,7 +164,7 @@ definitions:
       colorScale:
         binningStrategy: manual
         customNumericValues: *expenditure_bins_total
-        baseColorScheme: YlOrRd
+        baseColorScheme: YlGnBu
 
   # Education spending as share of GDP configuration
   grapher_config_gdp_share: &grapher_config_gdp_share
@@ -219,7 +174,16 @@ definitions:
       colorScale:
         binningStrategy: manual
         customNumericValues: *gdp_share_bins
-        baseColorScheme: YlOrBr
+        baseColorScheme: Blues
+
+  grapher_config_per_student_spending_total: &grapher_config_per_student_spending_total
+    <<: *common_grapher_config
+    map:
+      <<: *common_grapher_map_config
+      colorScale:
+        binningStrategy: manual
+        customNumericValues: *per_student_spending_bins
+        baseColorScheme: Purples
 
   # ============================================================================
   # DESCRIPTIONS
@@ -1189,7 +1153,7 @@ tables:
 
       government_expenditure_on_pre_primary_education_as_a_percentage_of_gdp__pct:
         title: Government spending on pre-primary education as share of GDP
-        description_short: Total [general government](#dod:general-government) spending on [pre-primary education](#dod:pre-primary-education), encompassing all levels and types of spending, as a percentage of [GDP](#dod:gdp), including funds from international government transfers.
+        description_short: Total [general government](#dod:general-government) spending on [pre-primary education](#dod:pre-primary-education), expressed as a percentage of [GDP](#dod:gdp).
         unit: "% of GDP"
         short_unit: "%"
         description_key: *desc_key_govt_expenditure_gdp_share
@@ -1198,10 +1162,11 @@ tables:
           grapher_config: *grapher_config_gdp_share
         display:
           numDecimalPlaces: 1
+          tolerance: 10
 
       government_expenditure_on_primary_education_as_a_percentage_of_gdp__pct:
         title: Government spending on primary education as share of GDP
-        description_short: Total [general government](#dod:general-government) spending on [primary education](#dod:primary-education), encompassing all levels and types of spending, as a percentage of [GDP](#dod:gdp), including funds from international government transfers.
+        description_short: Total [general government](#dod:general-government) spending on [primary education](#dod:primary-education), expressed as a percentage of [GDP](#dod:gdp).
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_govt_expenditure_gdp_share
@@ -1210,10 +1175,11 @@ tables:
           grapher_config: *grapher_config_gdp_share
         display:
           numDecimalPlaces: 1
+          tolerance: 10
 
       government_expenditure_on_lower_secondary_education_as_a_percentage_of_gdp__pct:
         title: Government spending on lower secondary education as share of GDP
-        description_short: Total [general government](#dod:general-government) spending on [lower secondary education](#dod:lower-secondary-education), encompassing all levels and types of spending, as a percentage of [GDP](#dod:gdp), including funds from international government transfers.
+        description_short: Total [general government](#dod:general-government) spending on [lower secondary education](#dod:lower-secondary-education), expressed as a percentage of [GDP](#dod:gdp).
         unit: "% of GDP"
         short_unit: "%"
         description_key: *desc_key_govt_expenditure_gdp_share
@@ -1222,10 +1188,11 @@ tables:
           grapher_config: *grapher_config_gdp_share
         display:
           numDecimalPlaces: 1
+          tolerance: 10
 
       government_expenditure_on_upper_secondary_education_as_a_percentage_of_gdp__pct:
         title: Government spending on upper secondary education as share of GDP
-        description_short: Total [general government](#dod:general-government) spending on [upper secondary education](#dod:upper-secondary-education), encompassing all levels and types of spending, as a percentage of [GDP](#dod:gdp), including funds from international government transfers.
+        description_short: Total [general government](#dod:general-government) spending on [upper secondary education](#dod:upper-secondary-education), expressed as a percentage of [GDP](#dod:gdp).
         unit: "% of GDP"
         short_unit: "%"
         description_key: *desc_key_govt_expenditure_gdp_share
@@ -1234,10 +1201,11 @@ tables:
           grapher_config: *grapher_config_gdp_share
         display:
           numDecimalPlaces: 1
+          tolerance: 10
 
       government_expenditure_on_secondary_education_as_a_percentage_of_gdp__pct:
         title: Government spending on secondary education as share of GDP
-        description_short: Total [general government](#dod:general-government) spending on [lower secondary](#dod:lower-secondary-education) and [upper secondary](#dod:upper-secondary-education) education (including local, regional, central, current, capital, and transfers) as a percentage of [GDP](#dod:gdp), inclusive of international transfers.
+        description_short: Total [general government](#dod:general-government) spending on [lower secondary](#dod:lower-secondary-education) and [upper secondary](#dod:upper-secondary-education) education, expressed as a percentage of [GDP](#dod:gdp).
         unit: "% of GDP"
         short_unit: "%"
         description_key: *desc_key_govt_expenditure_gdp_share
@@ -1246,10 +1214,11 @@ tables:
           grapher_config: *grapher_config_gdp_share
         display:
           numDecimalPlaces: 1
+          tolerance: 10
 
       government_expenditure_on_tertiary_education_as_a_percentage_of_gdp__pct:
         title: Government spending on tertiary education as share of GDP
-        description_short: Total [general government](#dod:general-government) spending on [tertiary education](#dod:tertiary-education), encompassing all levels and types of spending, as a percentage of [GDP](#dod:gdp), including funds from international government transfers.
+        description_short: Total [general government](#dod:general-government) spending on [tertiary education](#dod:tertiary-education), expressed as a percentage of [GDP](#dod:gdp).
         unit: "% of GDP"
         short_unit: "%"
         description_key: *desc_key_govt_expenditure_gdp_share
@@ -1258,6 +1227,7 @@ tables:
           grapher_config: *grapher_config_gdp_share
         display:
           numDecimalPlaces: 1
+          tolerance: 10
 
       # ========================================================================
       # GOVERNMENT EXPENDITURE IN CONSTANT PPP DOLLARS (by education level)
@@ -1265,72 +1235,77 @@ tables:
 
       government_expenditure_on_pre_primary_education__constant_pppdollar__millions:
         title: Government spending on pre-primary education
-        description_short:  Total [general government](#dod:general-government) spending on [pre-primary education](#dod:pre-primary-education), including all levels and types of spending, expressed in constant [international-$](#dod:int_dollar_abbreviation).
+        description_short:  Total [general government](#dod:general-government) spending on [pre-primary education](#dod:pre-primary-education), expressed in constant [international-$](#dod:int_dollar_abbreviation).
         unit: "international-$"
         short_unit: "$"
         description_key: *desc_key_govt_expenditure_constant_ppp
         presentation:
           title_public: Government spending on pre-primary education (international-$)
-          grapher_config: *grapher_config_spending_preprimary
+          grapher_config: *grapher_config_spending_by_level
         display:
           numDecimalPlaces: 0
           name: Pre-primary
+          tolerance: 10
 
       government_expenditure_on_primary_education__constant_pppdollar__millions:
         title: Government spending on primary education
-        description_short: Total [general government](#dod:general-government) spending on [primary education](#dod:primary-education), including all levels and types of spending, expressed in constant [international-$](#dod:int_dollar_abbreviation).
+        description_short: Total [general government](#dod:general-government) spending on [primary education](#dod:primary-education), expressed in constant [international-$](#dod:int_dollar_abbreviation).
         unit: "international-$"
         short_unit: "$"
         description_key: *desc_key_govt_expenditure_constant_ppp
         presentation:
           title_public: Government spending on primary education (international-$)
-          grapher_config: *grapher_config_spending_primary
+          grapher_config: *grapher_config_spending_by_level
         display:
           numDecimalPlaces: 0
           name: Primary
+          tolerance: 10
 
       government_expenditure_on_lower_secondary_education__constant_pppdollar__millions:
         title: Government spending on lower secondary education
-        description_short: Total [general government](#dod:general-government) spending on [lower secondary education](#dod:lower-secondary-education), including all levels and types of spending, expressed in constant [international-$](#dod:int_dollar_abbreviation).
+        description_short: Total [general government](#dod:general-government) spending on [lower secondary education](#dod:lower-secondary-education), expressed in constant [international-$](#dod:int_dollar_abbreviation).
         unit: "international-$"
         short_unit: "$"
         description_key: *desc_key_govt_expenditure_constant_ppp
         presentation:
           title_public: Government spending on lower secondary education (international-$)
-          grapher_config: *grapher_config_spending_lower_secondary
+          grapher_config: *grapher_config_spending_by_level
         display:
           numDecimalPlaces: 0
           name: Lower secondary
+          tolerance: 10
 
       government_expenditure_on_upper_secondary_education__constant_pppdollar__millions:
         title: Government spending on upper secondary education
-        description_short: Total [general government](#dod:general-government) spending on [upper secondary education](#dod:upper-secondary-education), including all levels and types of spending, expressed in constant [international-$](#dod:int_dollar_abbreviation).
+        description_short: Total [general government](#dod:general-government) spending on [upper secondary education](#dod:upper-secondary-education), expressed in constant [international-$](#dod:int_dollar_abbreviation).
         unit: "international-$"
         short_unit: "$"
         description_key: *desc_key_govt_expenditure_constant_ppp
         presentation:
           title_public: Government spending on upper secondary education (international-$)
-          grapher_config: *grapher_config_spending_upper_secondary
+          grapher_config: *grapher_config_spending_by_level
         display:
           numDecimalPlaces: 0
           name: Upper secondary
+          tolerance: 10
 
       government_expenditure_on_tertiary_education__constant_pppdollar__millions:
         title: Government spending on tertiary education
-        description_short: Total [general government](#dod:general-government) spending on [tertiary education](#dod:tertiary-education), including all levels and types of spending, expressed in constant [international-$](#dod:int_dollar_abbreviation).
+        description_short: Total [general government](#dod:general-government) spending on [tertiary education](#dod:tertiary-education), expressed in constant [international-$](#dod:int_dollar_abbreviation).
         unit: "international-$"
         short_unit: "$"
         description_key: *desc_key_govt_expenditure_constant_ppp
         presentation:
           title_public: Government spending on tertiary education (international-$)
-          grapher_config: *grapher_config_spending_tertiary
+          grapher_config: *grapher_config_spending_by_level
         display:
           numDecimalPlaces: 0
           name: Tertiary
+          tolerance: 10
 
       government_expenditure_on_education__constant_pppdollar__millions:
         title: Government spending on education
-        description_short: Total [general government](#dod:general-government) spending on education across all levels, including all types of spending, expressed in constant [international-$](#dod:int_dollar_abbreviation).
+        description_short: Total [general government](#dod:general-government) spending on education across all levels, expressed in constant [international-$](#dod:int_dollar_abbreviation).
         unit: "international-$"
         short_unit: "$"
         description_key: *desc_key_govt_expenditure_constant_ppp
@@ -1340,16 +1315,17 @@ tables:
         display:
           numDecimalPlaces: 0
           name: Total across all levels
+          tolerance: 10
 
       government_expenditure_on_education__pppdollar__millions:
         title: Government spending on education in purchasing power parity (PPP) dollars
-        description_short: Total [general government](#dod:general-government) spending on education across all levels, including all types of spending, expressed in [international-$](#dod:int_dollar_abbreviation).
+        description_short: Total [general government](#dod:general-government) spending on education across all levels, expressed in [international-$](#dod:int_dollar_abbreviation).
         unit: "international-$"
         short_unit: "$"
         description_key: *desc_key_govt_expenditure_constant_ppp
         display:
           numDecimalPlaces: 0
-
+          tolerance: 10
 
       # ========================================================================
       # GOVERNMENT EXPENDITURE IN CONSTANT PPP DOLLARS PER STUDENT (by education level)
@@ -1357,7 +1333,7 @@ tables:
 
       government_expenditure_on_education_per_student__total_across_all_levels__constant_pppdollar:
         title: Government spending on education per student across all levels
-        description_short: Total [general government](#dod:general-government) spending on education across all levels, including all types of spending, per student, expressed in constant [international-$](#dod:int_dollar_abbreviation).
+        description_short: Total [general government](#dod:general-government) spending on education across all levels, per student, expressed in constant [international-$](#dod:int_dollar_abbreviation).
         unit: "international-$"
         short_unit: "$"
         description_key: *desc_key_govt_expenditure_constant_ppp_per_student
@@ -1368,3 +1344,4 @@ tables:
         display:
           numDecimalPlaces: 0
           name: Total across all levels
+          tolerance: 10
