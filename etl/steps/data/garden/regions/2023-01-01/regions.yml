@@ -2180,15 +2180,15 @@
 
 ## In this Taiwan and Kosovo are not recognized and part of China and Serbia respectively
 ## Africa
-- code: UNSD_AFR
+- code: UNM49_AFR
   name: "Africa (UN)"
   region_type: "aggregate"
   defined_by: unsd
   members:
-    - UNSD_NAF
-    - UNSD_SSA
+    - UNM49_NAF
+    - UNM49_SSA
 ### Northern America
-- code: UNSD_NAF
+- code: UNM49_NAF
   name: "Northern Africa (UN)"
   region_type: "aggregate"
   defined_by: unsd
@@ -2201,17 +2201,17 @@
     - "TUN"
     - "ESH"
 ### Sub-Saharan Africa
-- code: UNSD_SSA
+- code: UNM49_SSA
   name: "Sub-Saharan Africa (UN)"
   region_type: "aggregate"
   defined_by: unsd
   members:
-    - UNSD_EAF
-    - UNSD_MAF
-    - UNSD_SAF
-    - UNSD_WAF
+    - UNM49_EAF
+    - UNM49_MAF
+    - UNM49_SAF
+    - UNM49_WAF
 #### members
-- code: UNSD_EAF
+- code: UNM49_EAF
   name: "Eastern Africa (UN)"
   region_type: "aggregate"
   defined_by: unsd
@@ -2238,7 +2238,7 @@
     - "TZA"
     - "ZMB"
     - "ZWE"
-- code: UNSD_MAF
+- code: UNM49_MAF
   name: "Middle Africa (UN)"
   region_type: "aggregate"
   defined_by: unsd
@@ -2252,7 +2252,7 @@
     - "GNQ"
     - "GAB"
     - "STP"
-- code: UNSD_SAF
+- code: UNM49_SAF
   name: "Southern Africa (UN)"
   region_type: "aggregate"
   defined_by: unsd
@@ -2262,7 +2262,7 @@
     - "NAM"
     - "ZAF"
     - "SWZ"
-- code: UNSD_WAF
+- code: UNM49_WAF
   name: "Western Africa (UN)"
   region_type: "aggregate"
   defined_by: unsd
@@ -2286,15 +2286,15 @@
     - "TGO"
 
 ## Americas
-- code: UNSD_AMR
+- code: UNM49_AMR
   name: "Americas (UN)"
   region_type: "aggregate"
   defined_by: unsd
   members:
-    - UNSD_NAM
-    - UNSD_SSA
+    - UNM49_NAM
+    - UNM49_SSA
 ### Northern America
-- code: UNSD_NAM
+- code: UNM49_NAM
   name: "Northern America (UN)"
   region_type: "aggregate"
   defined_by: unsd
@@ -2305,16 +2305,16 @@
     - "SPM"
     - "USA"
 ### Latin America and the Caribbean
-- code: UNSD_LAC
+- code: UNM49_LAC
   name: "Latin America and the Caribbean (UN)"
   region_type: "aggregate"
   defined_by: unsd
   members:
-    - UNSD_CAR
-    - UNSD_CAM
-    - UNSD_SAM
+    - UNM49_CAR
+    - UNM49_CAM
+    - UNM49_SAM
 #### members
-- code: UNSD_CAR
+- code: UNM49_CAR
   name: "Caribbean (UN)"
   region_type: "aggregate"
   defined_by: unsd
@@ -2347,7 +2347,7 @@
     - "TCA"
     - "VGB"
     - "VIR"
-- code: UNSD_CAM
+- code: UNM49_CAM
   name: "Central America (UN)"
   region_type: "aggregate"
   defined_by: unsd
@@ -2360,7 +2360,7 @@
     - "MEX"
     - "NIC"
     - "PAN"
-- code: UNSD_SAM
+- code: UNM49_SAM
   name: "South America (UN)"
   region_type: "aggregate"
   defined_by: unsd
@@ -2383,18 +2383,18 @@
     - "VEN"
 
 ## Asia
-- code: UNSD_ASI
+- code: UNM49_ASI
   name: "Asia (UN)"
   region_type: "aggregate"
   defined_by: unsd
   members:
-    - UNSD_CAS
-    - UNSD_EAS
-    - UNSD_SEA
-    - UNSD_SAS
-    - UNSD_WAS
+    - UNM49_CAS
+    - UNM49_EAS
+    - UNM49_SEA
+    - UNM49_SAS
+    - UNM49_WAS
 ### members
-- code: UNSD_CAS
+- code: UNM49_CAS
   name: "Central Asia (UN)"
   region_type: "aggregate"
   defined_by: unsd
@@ -2404,7 +2404,7 @@
     - "TJK"
     - "TKM"
     - "UZB"
-- code: UNSD_EAS
+- code: UNM49_EAS
   name: "Eastern Asia (UN)"
   region_type: "aggregate"
   defined_by: unsd
@@ -2416,7 +2416,7 @@
     - "MNG"
     - "PRK"
     - "KOR"
-- code: UNSD_SEA
+- code: UNM49_SEA
   name: "South-eastern Asia (UN)"
   region_type: "aggregate"
   defined_by: unsd
@@ -2432,7 +2432,7 @@
     - "SGP"
     - "THA"
     - "VNM"
-- code: UNSD_SAS
+- code: UNM49_SAS
   name: "Southern Asia (UN)"
   region_type: "aggregate"
   defined_by: unsd
@@ -2446,7 +2446,7 @@
     - "NPL"
     - "PAK"
     - "LKA"
-- code: UNSD_WAS
+- code: UNM49_WAS
   name: "Western Asia (UN)"
   region_type: "aggregate"
   defined_by: unsd
@@ -2470,17 +2470,17 @@
     - "YEM"
 
 ## Europe
-- code: UNSD_EUR
+- code: UNM49_EUR
   name: "Europe (UN)"
   region_type: "aggregate"
   defined_by: unsd
   members:
-    - UNSD_EEU
-    - UNSD_NEU
-    - UNSD_SEU
-    - UNSD_WEU
+    - UNM49_EEU
+    - UNM49_NEU
+    - UNM49_SEU
+    - UNM49_WEU
 ### members
-- code: UNSD_EEU
+- code: UNM49_EEU
   name: "Eastern Europe (UN)"
   region_type: "aggregate"
   defined_by: unsd
@@ -2495,7 +2495,7 @@
     - "RUS"
     - "SVK"
     - "UKR"
-- code: UNSD_NEU
+- code: UNM49_NEU
   name: "Northern Europe (UN)"
   region_type: "aggregate"
   defined_by: unsd
@@ -2516,7 +2516,7 @@
     - "SJM"
     - "SWE"
     - "GBR"
-- code: UNSD_SEU
+- code: UNM49_SEU
   name: "Southern Europe (UN)"
   region_type: "aggregate"
   defined_by: unsd
@@ -2537,7 +2537,7 @@
     - "ESP"
     - "MKD"
     - "VAT"
-- code: UNSD_WEU
+- code: UNM49_WEU
   name: "Western Europe (UN)"
   region_type: "aggregate"
   defined_by: unsd
@@ -2553,17 +2553,17 @@
     - "CHE"
 
 ## Oceania
-- code: UNSD_OCE
+- code: UNM49_OCE
   name: "Oceania (UN)"
   region_type: "aggregate"
   defined_by: unsd
   members:
-    - UNSD_ANZ
-    - UNSD_MEL
-    - UNSD_MIC
-    - UNSD_POL
+    - UNM49_ANZ
+    - UNM49_MEL
+    - UNM49_MIC
+    - UNM49_POL
 ### members
-- code: UNSD_ANZ
+- code: UNM49_ANZ
   name: "Australia and New Zealand (UN)"
   region_type: "aggregate"
   defined_by: unsd
@@ -2574,7 +2574,7 @@
     - "HMD"
     - "NZL"
     - "NFK"
-- code: UNSD_MEL
+- code: UNM49_MEL
   name: "Melanesia (UN)"
   region_type: "aggregate"
   defined_by: unsd
@@ -2584,7 +2584,7 @@
     - "PNG"
     - "SLB"
     - "VUT"
-- code: UNSD_MIC
+- code: UNM49_MIC
   name: "Micronesia (UN)"
   region_type: "aggregate"
   defined_by: unsd
@@ -2597,7 +2597,7 @@
     - "MNP"
     - "PLW"
     - "UMI"
-- code: UNSD_POL
+- code: UNM49_POL
   name: "Polynesia (UN)"
   region_type: "aggregate"
   defined_by: unsd
