@@ -145,10 +145,6 @@ def run(dest_dir: str) -> None:
     # Replace members that are aggregates
     df = replace_aggregate_members(df)
 
-    # r = [dag[res] for res in results]
-
-    # df = replace_members(df)
-
     # Create a table of legacy codes (ensuring all numeric codes are integer).
     df_codes = df_codes.astype(
         {code: pd.Int64Dtype() for code in ["cow_code", "imf_code", "legacy_country_id", "legacy_entity_id"]}

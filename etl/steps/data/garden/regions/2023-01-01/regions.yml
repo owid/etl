@@ -1,4 +1,8 @@
 # Region definitions (see more details in the description of the 'regions' garden step).
+#
+# Future improvements: https://github.com/owid/etl/issues
+#
+#
 # Each region must contain the following fields:
 # * code: Region code (unique for each region).
 # * name: Region name.
@@ -2183,15 +2187,15 @@
 - code: UNM49_AFR
   name: "Africa (UN)"
   region_type: "aggregate"
-  defined_by: unsd
+  defined_by: un_m49_1
   members:
     - UNM49_NAF
     - UNM49_SSA
-### Northern America
+### Northern Africa
 - code: UNM49_NAF
   name: "Northern Africa (UN)"
   region_type: "aggregate"
-  defined_by: unsd
+  defined_by: un_m49_2
   members:
     - "DZA"
     - "EGY"
@@ -2204,7 +2208,7 @@
 - code: UNM49_SSA
   name: "Sub-Saharan Africa (UN)"
   region_type: "aggregate"
-  defined_by: unsd
+  defined_by: un_m49_2
   members:
     - UNM49_EAF
     - UNM49_MAF
@@ -2214,7 +2218,7 @@
 - code: UNM49_EAF
   name: "Eastern Africa (UN)"
   region_type: "aggregate"
-  defined_by: unsd
+  defined_by: un_m49_3
   members:
     - "IOT"
     - "BDI"
@@ -2241,7 +2245,7 @@
 - code: UNM49_MAF
   name: "Middle Africa (UN)"
   region_type: "aggregate"
-  defined_by: unsd
+  defined_by: un_m49_3
   members:
     - "AGO"
     - "CMR"
@@ -2255,7 +2259,7 @@
 - code: UNM49_SAF
   name: "Southern Africa (UN)"
   region_type: "aggregate"
-  defined_by: unsd
+  defined_by: un_m49_3
   members:
     - "BWA"
     - "LSO"
@@ -2265,7 +2269,7 @@
 - code: UNM49_WAF
   name: "Western Africa (UN)"
   region_type: "aggregate"
-  defined_by: unsd
+  defined_by: un_m49_3
   members:
     - "BEN"
     - "BFA"
@@ -2289,15 +2293,15 @@
 - code: UNM49_AMR
   name: "Americas (UN)"
   region_type: "aggregate"
-  defined_by: unsd
+  defined_by: un_m49_1
   members:
     - UNM49_NAM
-    - UNM49_SSA
+    - UNM49_LAC
 ### Northern America
 - code: UNM49_NAM
   name: "Northern America (UN)"
   region_type: "aggregate"
-  defined_by: unsd
+  defined_by: un_m49_2
   members:
     - "BMU"
     - "CAN"
@@ -2308,7 +2312,7 @@
 - code: UNM49_LAC
   name: "Latin America and the Caribbean (UN)"
   region_type: "aggregate"
-  defined_by: unsd
+  defined_by: un_m49_2
   members:
     - UNM49_CAR
     - UNM49_CAM
@@ -2317,7 +2321,7 @@
 - code: UNM49_CAR
   name: "Caribbean (UN)"
   region_type: "aggregate"
-  defined_by: unsd
+  defined_by: un_m49_3
   members:
     - "AIA"
     - "ATG"
@@ -2350,7 +2354,7 @@
 - code: UNM49_CAM
   name: "Central America (UN)"
   region_type: "aggregate"
-  defined_by: unsd
+  defined_by: un_m49_3
   members:
     - "BLZ"
     - "CRI"
@@ -2363,7 +2367,7 @@
 - code: UNM49_SAM
   name: "South America (UN)"
   region_type: "aggregate"
-  defined_by: unsd
+  defined_by: un_m49_3
   members:
     - "ARG"
     - "BOL"
@@ -2386,7 +2390,7 @@
 - code: UNM49_ASI
   name: "Asia (UN)"
   region_type: "aggregate"
-  defined_by: unsd
+  defined_by: un_m49_1
   members:
     - UNM49_CAS
     - UNM49_EAS
@@ -2397,7 +2401,7 @@
 - code: UNM49_CAS
   name: "Central Asia (UN)"
   region_type: "aggregate"
-  defined_by: unsd
+  defined_by: un_m49_2
   members:
     - "KAZ"
     - "KGZ"
@@ -2407,7 +2411,7 @@
 - code: UNM49_EAS
   name: "Eastern Asia (UN)"
   region_type: "aggregate"
-  defined_by: unsd
+  defined_by: un_m49_2
   members:
     - "CHN"
     - "HKG"
@@ -2419,7 +2423,7 @@
 - code: UNM49_SEA
   name: "South-eastern Asia (UN)"
   region_type: "aggregate"
-  defined_by: unsd
+  defined_by: un_m49_2
   members:
     - "BRN"
     - "KHM"
@@ -2435,7 +2439,7 @@
 - code: UNM49_SAS
   name: "Southern Asia (UN)"
   region_type: "aggregate"
-  defined_by: unsd
+  defined_by: un_m49_2
   members:
     - "AFG"
     - "BGD"
@@ -2449,7 +2453,7 @@
 - code: UNM49_WAS
   name: "Western Asia (UN)"
   region_type: "aggregate"
-  defined_by: unsd
+  defined_by: un_m49_2
   members:
     - "ARM"
     - "AZE"
@@ -2473,7 +2477,7 @@
 - code: UNM49_EUR
   name: "Europe (UN)"
   region_type: "aggregate"
-  defined_by: unsd
+  defined_by: un_m49_1
   members:
     - UNM49_EEU
     - UNM49_NEU
@@ -2483,7 +2487,7 @@
 - code: UNM49_EEU
   name: "Eastern Europe (UN)"
   region_type: "aggregate"
-  defined_by: unsd
+  defined_by: un_m49_2
   members:
     - "BLR"
     - "BGR"
@@ -2498,7 +2502,7 @@
 - code: UNM49_NEU
   name: "Northern Europe (UN)"
   region_type: "aggregate"
-  defined_by: unsd
+  defined_by: un_m49_2
   members:
     - "ALA"
     - "DNK"
@@ -2519,7 +2523,7 @@
 - code: UNM49_SEU
   name: "Southern Europe (UN)"
   region_type: "aggregate"
-  defined_by: unsd
+  defined_by: un_m49_2
   members:
     - "ALB"
     - "AND"
@@ -2540,7 +2544,7 @@
 - code: UNM49_WEU
   name: "Western Europe (UN)"
   region_type: "aggregate"
-  defined_by: unsd
+  defined_by: un_m49_2
   members:
     - "AUT"
     - "BEL"
@@ -2556,7 +2560,7 @@
 - code: UNM49_OCE
   name: "Oceania (UN)"
   region_type: "aggregate"
-  defined_by: unsd
+  defined_by: un_m49_1
   members:
     - UNM49_ANZ
     - UNM49_MEL
@@ -2566,7 +2570,7 @@
 - code: UNM49_ANZ
   name: "Australia and New Zealand (UN)"
   region_type: "aggregate"
-  defined_by: unsd
+  defined_by: un_m49_2
   members:
     - "AUS"
     - "CXR"
@@ -2577,7 +2581,7 @@
 - code: UNM49_MEL
   name: "Melanesia (UN)"
   region_type: "aggregate"
-  defined_by: unsd
+  defined_by: un_m49_2
   members:
     - "FJI"
     - "NCL"
@@ -2587,7 +2591,7 @@
 - code: UNM49_MIC
   name: "Micronesia (UN)"
   region_type: "aggregate"
-  defined_by: unsd
+  defined_by: un_m49_2
   members:
     - "GUM"
     - "KIR"
@@ -2600,7 +2604,7 @@
 - code: UNM49_POL
   name: "Polynesia (UN)"
   region_type: "aggregate"
-  defined_by: unsd
+  defined_by: un_m49_2
   members:
     - "ASM"
     - "COK"
@@ -2612,6 +2616,46 @@
     - "TON"
     - "TUV"
     - "WLF"
+
+##########
+# UN (Generic)
+##########
+- code: UN_AFR
+  name: "Africa (UN)"
+  region_type: "aggregate"
+  defined_by: un
+  members:
+    - UNM49_AFR
+- code: UN_NAM
+  name: "Northern America (UN)"
+  region_type: "aggregate"
+  defined_by: un
+  members:
+    - UNM49_NAM
+- code: UN_LAC
+  name: "Latin America and the Caribbean (UN)"
+  region_type: "aggregate"
+  defined_by: un
+  members:
+    - UNM49_LAC
+- code: UN_ASI
+  name: "Asia (UN)"
+  region_type: "aggregate"
+  defined_by: un
+  members:
+    - UNM49_ASI
+- code: UN_EUR
+  name: "Europe (UN)"
+  region_type: "aggregate"
+  defined_by: un
+  members:
+    - UNM49_EUR
+- code: UN_OCE
+  name: "Oceania (UN)"
+  region_type: "aggregate"
+  defined_by: un
+  members:
+    - UNM49_OCE
 
 ##########
 # UN SDG

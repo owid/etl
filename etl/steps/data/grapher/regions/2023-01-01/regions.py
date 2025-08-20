@@ -6,11 +6,12 @@ https://ourworldindata.org/world-region-map-definitions
 """
 
 import json
+from typing import cast
 
 from owid.catalog import Origin, Table
 from structlog import get_logger
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Initialize logger.
 log = get_logger()
@@ -25,8 +26,20 @@ CURRENT_YEAR = int(paths.version.split("-")[0])
 # Define a common origin for all columns in the output table.
 COMMON_ORIGIN = Origin(producer="Our World in Data", title="Regions")
 
+# Institution mapping. TODO: Should be moved to regions.yml
+INSTITUTION_MAPPING = {
+    "owid": "OWID",
+    "un_m49_1": "UN M49 (1)",
+    "un_m49_2": "UN M49 (2)",
+    "un_m49_3": "UN M49 (3)",
+    "un": "UN",
+    "wb": "WB",
+    "who": "WHO",
+    "unsdg": "UN SDG",
+}
 
-def run(dest_dir: str) -> None:
+
+def run() -> None:
     #
     # Load inputs.
     #
@@ -80,9 +93,10 @@ def run(dest_dir: str) -> None:
         tb_regions = tb_regions.merge(_tb_regions, on="country", how="left", validate="one_to_one")
 
         # Add metadata for the new column.
-        tb_regions[f"{institution}_region"].metadata.origins = [COMMON_ORIGIN]
-        tb_regions[f"{institution}_region"].metadata.title = f"World regions according to {institution.upper()}"
-        tb_regions[f"{institution}_region"].metadata.unit = ""
+        tb_regions = _add_metadata(
+            cast(Table, tb_regions),
+            institution,
+        )
 
     # Remove unnecessary columns.
     tb_regions = tb_regions.drop(
@@ -103,5 +117,30 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
-    ds_grapher = create_dataset(dest_dir, tables=[tb_regions])
+    ds_grapher = paths.create_dataset(tables=[tb_regions])
     ds_grapher.save()
+
+
+def _add_metadata(tb: Table, institution: str) -> Table:
+    institution_name = INSTITUTION_MAPPING.get(institution, institution)
+    tb[f"{institution}_region"].metadata.origins = [COMMON_ORIGIN]
+    tb[f"{institution}_region"].metadata.title = f"World regions according to {institution_name}"
+    tb[f"{institution}_region"].metadata.unit = ""
+    return tb
+
+
+def process_un_definitions(tb: Table) -> Table:
+    """UN provides various definitions of regions, which we need to process.
+
+    - Level 1: High-level, broad regions. E.g. "Americas"
+    - Level 2: More granular regions. E.g. "Latin America and the Caribbean", "Northern America"
+    - Level 3: Even more granular regions. E.g. "Caribbean", "Central America"
+
+    Problem: Not all regions are broken down into all three levels. E.g. "Europe" is a level 1 region, which has level 2 breakdown, but no 3 breakdown.
+
+    Solution: Propagate definitions downstream when missing.
+    """
+    # Propagate definitions downstream.
+    tb["un_m49_2_region"] = tb["un_m49_2_region"].fillna(tb["un_m49_1_region"])
+    tb["un_m49_3_region"] = tb["un_m49_3_region"].fillna(tb["un_m49_2_region"])
+    return tb
