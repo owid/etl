@@ -6,7 +6,7 @@ from etl.helpers import PathFinder, create_dataset
 paths = PathFinder(__file__)
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -22,8 +22,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
-    ds_grapher = create_dataset(
-        dest_dir,
+    ds_grapher = paths.create_dataset(
         tables=[tb_disease, tb_disease_product, tb_product, tb_product_ntd],
         check_variables_metadata=True,
         default_metadata=ds_garden.metadata,

@@ -9,7 +9,7 @@ from owid.catalog import Table
 from owid.catalog import processing as pr
 from structlog import get_logger
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 log = get_logger()
 
@@ -41,7 +41,7 @@ NTDS = [
 ]
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     log.info("funding.start")
     #
     # Load inputs.
@@ -81,8 +81,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(
-        dest_dir,
+    ds_garden = paths.create_dataset(
         tables=[tb_disease, tb_product, tb_disease_product, tb_product_ntd],
         check_variables_metadata=True,
         default_metadata=ds_meadow.metadata,
@@ -142,7 +141,6 @@ def format_table(tb: Table, group: List[str], index_col: List[str], short_name: 
     tb = tb.dropna(subset=index_col, how="any")
     tb["country"] = "World"
     tb = tb.set_index(["country", "year"] + index_col, verify_integrity=False)
-    # tb = tb.pivot(index="year", columns=pivot_col, values="amount__usd")
     tb.metadata.short_name = short_name
 
     return tb
