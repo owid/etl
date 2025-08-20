@@ -37,7 +37,7 @@ definitions:
   # VALUE RANGES (BINS) FOR PISA SCORES
   # ============================================================================
 
-  pisa_score_bins: &pisa_score_bins [300,340,380,420,460,500,540]
+  pisa_score_bins: &pisa_score_bins [340,380,420,460,500,500]
 
   # ============================================================================
   # PISA SCORE CONFIGURATIONS
@@ -68,24 +68,6 @@ definitions:
       colorScale:
         binningStrategy: manual
         customNumericValues: *pisa_score_bins
-        baseColorScheme: Oranges
-
-  grapher_config_pisa_boys: &grapher_config_pisa_boys
-    <<: *common_grapher_config
-    map:
-      <<: *common_grapher_map_config
-      colorScale:
-        binningStrategy: manual
-        customNumericValues: *pisa_score_bins
-        baseColorScheme: Blues
-
-  grapher_config_pisa_girls: &grapher_config_pisa_girls
-    <<: *common_grapher_config
-    map:
-      <<: *common_grapher_map_config
-      colorScale:
-        binningStrategy: manual
-        customNumericValues: *pisa_score_bins
         baseColorScheme: Purples
 
 
@@ -108,7 +90,7 @@ tables:
           name: Mathematics
           numDecimalPlaces: 0
         presentation:
-          grapher_config: *grapher_config_pisa_boys
+          grapher_config: *grapher_config_pisa_math
           title_public: PISA mathematics scores for boys
 
       pisa_math_average_girls:
@@ -121,7 +103,7 @@ tables:
           name: Mathematics
           numDecimalPlaces: 0
         presentation:
-          grapher_config: *grapher_config_pisa_girls
+          grapher_config: *grapher_config_pisa_math
           title_public: PISA mathematics scores for girls
 
       pisa_science_average_boys:
@@ -134,7 +116,7 @@ tables:
           name: Science
           numDecimalPlaces: 0
         presentation:
-          grapher_config: *grapher_config_pisa_boys
+          grapher_config: *grapher_config_pisa_science
           title_public: PISA science scores for boys
 
       pisa_science_average_girls:
@@ -147,7 +129,7 @@ tables:
           name: Science
           numDecimalPlaces: 0
         presentation:
-          grapher_config: *grapher_config_pisa_girls
+          grapher_config: *grapher_config_pisa_science
           title_public: PISA science scores for girls
 
       pisa_reading_average_boys:
@@ -160,7 +142,7 @@ tables:
           name: Reading
           numDecimalPlaces: 0
         presentation:
-          grapher_config: *grapher_config_pisa_boys
+          grapher_config: *grapher_config_pisa_reading
           title_public: PISA reading scores for boys
 
       pisa_reading_average_girls:
@@ -173,7 +155,7 @@ tables:
           name: Reading
           numDecimalPlaces: 0
         presentation:
-          grapher_config: *grapher_config_pisa_girls
+          grapher_config: *grapher_config_pisa_reading
           title_public: PISA reading scores for girls
 
       pisa_math_all_average:

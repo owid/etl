@@ -12,6 +12,18 @@ definitions:
         customNumericValues: [10,20,30,40,50,60,70,80,90,100]
         baseColorScheme: Blues
 
+  # Gross enrolment ratio configuration
+  grapher_config_enrolment_pubugn: &grapher_config_enrolment_pubugn
+    maxTime: 2024
+    hasMapTab: true
+    map:
+      time: 2024
+      timeTolerance: 5
+      colorScale:
+        binningStrategy: manual
+        customNumericValues: [0, 10,20,30,40,50,60,70,80,90,100]
+        baseColorScheme: PuBuGn
+
   gdp: Gross domestic product (GDP) is a measure of the total value added from the production of goods and services in a country or region each year.
   gdp_per_capita: GDP per capita is GDP divided by population.
   gni: Gross national income (GNI) is a measure of the total income earned by residents of a country or region each year. It is calculated as GDP plus net income received from abroad, plus taxes (minus subsidies) on production.
@@ -36,7 +48,7 @@ definitions:
   desc_key_ger: &desc_key_ger
     - Not all students enrol in school at the same age. The gross enrolment ratio includes students enrolled in a certain level of education, regardless of whether they are within the expected age range for that level. It includes students who are younger or older than expected due to late entry, early entry, or grade repetition.
     - It captures the total number of students enrolled at a specific education level, expressed as a percentage of the population in the official age group for that level. For example, if the official age group for upper secondary school is 15 to 17-year olds, the gross enrolment ratio compares total enrolment at that level (of any age) to the population of 15- to 17-year-olds.
-    - Values can be greater than 100% if students repeat grades or start a particular level of schooling late. In the example above, some 18- or 19 year olds might be included in the total if they started upper secondary school late.
+    - Values can be greater than 100% if students repeat grades or start a particular level of schooling late. For example, if the official age group for upper secondary school is 15 to 17-year olds, some 18- or 19 year olds might be included in the total if they started upper secondary school late.
     - Similarly, a value of 100% does not necessarily mean all children within a particular age group are enrolled in school; some children could be out-of-school, but gross enrolment rates are boosted by older students being included.
     - The data comes from administrative records, such as school enrolment reports, and from population estimates, usually provided by the United Nations or national sources.
 
@@ -961,16 +973,7 @@ tables:
         description_key: *desc_key_ger
         presentation:
           title_public: Gross enrolment in pre-primary education
-          grapher_config:
-            maxTime: 2024
-            hasMapTab: true
-            map:
-              time: 2024
-              timeTolerance: 5
-              colorScale:
-                binningStrategy: manual
-                customNumericValues: [0, 10,20,30,40,50,60,70,80,90,100]
-                baseColorScheme: BuGn
+          grapher_config: *grapher_config_enrolment_pubugn
         display:
           numDecimalPlaces: 1
           tolerance: 5
@@ -984,16 +987,7 @@ tables:
         description_key: *desc_key_ger
         presentation:
           title_public: Gross enrolment rate in pre-primary education among girls
-          grapher_config:
-            maxTime: 2024
-            hasMapTab: true
-            map:
-              time: 2024
-              timeTolerance: 5
-              colorScale:
-                binningStrategy: manual
-                customNumericValues: [0, 10,20,30,40,50,60,70,80,90,100]
-                baseColorScheme: Purples
+          grapher_config: *grapher_config_enrolment_pubugn
         display:
           numDecimalPlaces: 1
           tolerance: 5
@@ -1007,16 +1001,7 @@ tables:
         description_key: *desc_key_ger
         presentation:
           title_public: Gross enrolment rate in pre-primary education among boys
-          grapher_config:
-            maxTime: 2024
-            hasMapTab: true
-            map:
-              time: 2024
-              timeTolerance: 5
-              colorScale:
-                binningStrategy: manual
-                customNumericValues: [0, 10,20,30,40,50,60,70,80,90,100]
-                baseColorScheme: Blues
+          grapher_config: *grapher_config_enrolment_pubugn
 
         display:
           numDecimalPlaces: 1

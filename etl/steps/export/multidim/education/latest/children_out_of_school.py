@@ -44,6 +44,7 @@ MULTIDIM_CONFIG = {
     "hasMapTab": True,
     "tab": "map",
     "addCountryMode": "add-country",
+    "hideFacetControl": False,
 }
 
 # Grouped view chart configuration
@@ -52,7 +53,7 @@ GROUPED_VIEW_CONFIG = MULTIDIM_CONFIG | {
     "tab": "chart",
     "yAxis": {"min": 0, "facetDomain": "independent"},
     "selectedFacetStrategy": "entity",
-    "addCountryMode": "change-country",
+    "addCountryMode": "add-country",
 }
 
 # --------------------- #
@@ -147,6 +148,10 @@ def run() -> None:
     )
 
     for view in collection.views:
+        # Set view metadata for all views
+        view.metadata = {
+            "description_short": view.config["subtitle"],
+        }
         edit_indicator_displays(view)
 
     collection.save()

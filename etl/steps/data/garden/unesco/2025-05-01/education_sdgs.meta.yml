@@ -42,85 +42,54 @@ definitions:
   # ENROLLMENT CONFIGURATIONS (Primary, Secondary, Pre-primary)
   # ============================================================================
 
-  grapher_config_enrolment_bugn: &grapher_config_enrolment_bugn
-    <<: *common_grapher_config
-    map:
-      <<: *common_grapher_map_config
-      colorScale:
-        binningStrategy: manual
-        customNumericValues: *enrolment_rate_bins
-        baseColorScheme: BuGn
 
-  grapher_config_enrolment_blues: &grapher_config_enrolment_blues
+  grapher_config_enrolment_ylgnbu: &grapher_config_enrolment_ylgnbu
     <<: *common_grapher_config
     map:
       <<: *common_grapher_map_config
       colorScale:
         binningStrategy: manual
         customNumericValues: *enrolment_rate_bins
-        baseColorScheme: Blues
+        baseColorScheme: YlGnBu
 
-  grapher_config_enrolment_purples: &grapher_config_enrolment_purples
+  grapher_config_enrolment_pubugn: &grapher_config_enrolment_pubugn
     <<: *common_grapher_config
     map:
       <<: *common_grapher_map_config
       colorScale:
         binningStrategy: manual
         customNumericValues: *enrolment_rate_bins
-        baseColorScheme: Purples
+        baseColorScheme: PuBuGn
 
-  grapher_config_enrolment_greens: &grapher_config_enrolment_greens
+  grapher_out_of_school_reds: &grapher_out_of_school_reds
     <<: *common_grapher_config
     map:
       <<: *common_grapher_map_config
       colorScale:
         binningStrategy: manual
-        customNumericValues: *enrolment_rate_bins
+        customNumericValues: [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50]
+        baseColorScheme: Reds
+
+  grapher_completion: &grapher_completion
+    <<: *common_grapher_config
+    map:
+      <<: *common_grapher_map_config
+      colorScale:
+        binningStrategy: manual
+        customNumericValues: [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
         baseColorScheme: Greens
-
-  # ============================================================================
-  # TERTIARY ENROLLMENT CONFIGURATIONS
-  # ============================================================================
-
-  grapher_config_tertiary_bugn: &grapher_config_tertiary_bugn
-    <<: *common_grapher_config
-    map:
-      <<: *common_grapher_map_config
-      colorScale:
-        binningStrategy: manual
-        customNumericValues: *tertiary_enrollment_bins
-        baseColorScheme: BuGn
-
-  grapher_config_tertiary_blues: &grapher_config_tertiary_blues
-    <<: *common_grapher_config
-    map:
-      <<: *common_grapher_map_config
-      colorScale:
-        binningStrategy: manual
-        customNumericValues: *tertiary_enrollment_bins
-        baseColorScheme: Blues
-
-  grapher_config_tertiary_purples: &grapher_config_tertiary_purples
-    <<: *common_grapher_config
-    map:
-      <<: *common_grapher_map_config
-      colorScale:
-        binningStrategy: manual
-        customNumericValues: *tertiary_enrollment_bins
-        baseColorScheme: Purples
-
   # ============================================================================
   # EXPENDITURE CONFIGURATIONS
   # ============================================================================
 
-  grapher_config_expenditure: &grapher_config_expenditure
+  grapher_config_expenditure_gdp: &grapher_config_expenditure_gdp
     <<: *common_grapher_config
     map:
       <<: *common_grapher_map_config
       colorScale:
         binningStrategy: manual
         customNumericValues: *expenditure_bins
-        baseColorScheme: YlOrBr
+        baseColorScheme: Blues
 
   grapher_config_expenditure_total: &grapher_config_expenditure_total
     <<: *common_grapher_config
@@ -129,43 +98,18 @@ definitions:
       colorScale:
         binningStrategy: manual
         customNumericValues: *expenditure_total_bins
-        baseColorScheme: YlOrBr
+        baseColorScheme: BuGn
+
   # Per-student spending configurations (using per-student bins)
-  grapher_config_per_student_spending_preprimary: &grapher_config_per_student_spending_preprimary
+  grapher_config_per_student_spending: &grapher_config_per_student_spending
     <<: *common_grapher_config
     map:
       <<: *common_grapher_map_config
       colorScale:
         binningStrategy: manual
         customNumericValues: *per_student_spending_bins
-        baseColorScheme: Oranges
+        baseColorScheme: Purples
 
-  grapher_config_per_student_spending_primary: &grapher_config_per_student_spending_primary
-    <<: *common_grapher_config
-    map:
-      <<: *common_grapher_map_config
-      colorScale:
-        binningStrategy: manual
-        customNumericValues: *per_student_spending_bins
-        baseColorScheme: Blues
-
-  grapher_config_per_student_spending_secondary: &grapher_config_per_student_spending_secondary
-    <<: *common_grapher_config
-    map:
-      <<: *common_grapher_map_config
-      colorScale:
-        binningStrategy: manual
-        customNumericValues: *per_student_spending_bins
-        baseColorScheme: Greens
-
-  grapher_config_per_student_spending_tertiary: &grapher_config_per_student_spending_tertiary
-    <<: *common_grapher_config
-    map:
-      <<: *common_grapher_map_config
-      colorScale:
-        binningStrategy: manual
-        customNumericValues: *per_student_spending_bins
-        baseColorScheme: Reds
 
   # ============================================================================
   # PROFICIENCY RATE CONFIGURATIONS
@@ -173,34 +117,7 @@ definitions:
 
   proficiency_rate_bins: &proficiency_rate_bins [10,20,30,40,50,60,70,80,90,100]
 
-  grapher_config_proficiency_primary_math: &grapher_config_proficiency_primary_math
-    <<: *common_grapher_config
-    map:
-      <<: *common_grapher_map_config
-      colorScale:
-        binningStrategy: manual
-        customNumericValues: *proficiency_rate_bins
-        baseColorScheme: Blues
-
-  grapher_config_proficiency_primary_reading: &grapher_config_proficiency_primary_reading
-    <<: *common_grapher_config
-    map:
-      <<: *common_grapher_map_config
-      colorScale:
-        binningStrategy: manual
-        customNumericValues: *proficiency_rate_bins
-        baseColorScheme: Greens
-
-  grapher_config_proficiency_secondary_math: &grapher_config_proficiency_secondary_math
-    <<: *common_grapher_config
-    map:
-      <<: *common_grapher_map_config
-      colorScale:
-        binningStrategy: manual
-        customNumericValues: *proficiency_rate_bins
-        baseColorScheme: Oranges
-
-  grapher_config_proficiency_secondary_reading: &grapher_config_proficiency_secondary_reading
+  grapher_config_proficiency_reading: &grapher_config_proficiency_reading
     <<: *common_grapher_config
     map:
       <<: *common_grapher_map_config
@@ -208,6 +125,15 @@ definitions:
         binningStrategy: manual
         customNumericValues: *proficiency_rate_bins
         baseColorScheme: Purples
+
+  grapher_config_proficiency_math: &grapher_config_proficiency_math
+    <<: *common_grapher_config
+    map:
+      <<: *common_grapher_map_config
+      colorScale:
+        binningStrategy: manual
+        customNumericValues: *proficiency_rate_bins
+        baseColorScheme: Blues
 
   # ============================================================================
   # LITERACY RATE CONFIGURATIONS
@@ -238,25 +164,8 @@ definitions:
       colorScale:
         binningStrategy: manual
         customNumericValues: *literacy_rate_bins
-        baseColorScheme: OrRd
-
-  grapher_config_literacy_male: &grapher_config_literacy_male
-    <<: *common_grapher_config
-    map:
-      <<: *common_grapher_map_config
-      colorScale:
-        binningStrategy: manual
-        customNumericValues: *literacy_rate_bins
         baseColorScheme: Blues
 
-  grapher_config_literacy_female: &grapher_config_literacy_female
-    <<: *common_grapher_config
-    map:
-      <<: *common_grapher_map_config
-      colorScale:
-        binningStrategy: manual
-        customNumericValues: *literacy_rate_bins
-        baseColorScheme: Purples
 
   # ============================================================================
   # QUALIFIED TEACHERS CONFIGURATIONS
@@ -293,7 +202,7 @@ definitions:
   desc_key_ger: &desc_key_ger
     - Not all students enrol in school at the same age. The gross enrolment ratio includes students enrolled in a certain level of education, regardless of whether they are within the expected age range for that level. It includes students who are younger or older than expected due to late entry, early entry, or grade repetition.
     - It captures the total number of students enrolled at a specific education level, expressed as a percentage of the population in the official age group for that level. For example, if the official age group for upper secondary school is 15 to 17-year olds, the gross enrolment ratio compares total enrolment at that level (of any age) to the population of 15- to 17-year-olds.
-    - Values can be greater than 100% if students repeat grades or start a particular level of schooling late. In the example above, some 18- or 19 year olds might be included in the total if they started upper secondary school late.
+    - Values can be greater than 100% if students repeat grades or start a particular level of schooling late. For example, if the official age group for upper secondary school is 15 to 17-year olds, some 18- or 19 year olds might be included in the total if they started upper secondary school late.
     - Similarly, a value of 100% does not necessarily mean all children within a particular age group are enrolled in school; some children could be out-of-school, but gross enrolment rates are boosted by older students being included.
     - The data comes from administrative records, such as school enrolment reports, and from population estimates, usually provided by the United Nations or national sources.
 
@@ -302,18 +211,18 @@ definitions:
     - It compares children enrolled at the correct level for their age to the total population in that same age group. For example, if primary education is for ages 6 to 11, it measures how many 6- to 11-year-olds are actually enrolled in primary school.
     - The highest possible value is 100%, which would mean all children of the right age are enrolled where they should be. High rates indicate that most children are progressing through school at the expected pace.
     - Values cannot exceed 100% because it excludes over-age and under-age students. However, small discrepancies between enrolment records and population data can occasionally push rates slightly above 100%.
-    - A rate of 90% doesn't necessarily mean 10% of children are out of school entirely - some may be enrolled at different levels (either higher or lower) than expected for their age, but these students aren't counted in the net rate.
+    - A rate of 90% doesn't necessarily mean 10% of children are out of school entirely — some may be enrolled at different levels (either higher or lower) than expected for their age, but these students aren't counted in the net rate.
     - The data comes from school administrative records that track enrolment by individual age, combined with population estimates from national statistics offices or UN sources.
 
   desc_literacy: &desc_literacy
     - Literacy is a foundational skill. Children need to learn to read so that they can read to learn. When we fail to teach this foundational skill, people have fewer opportunities to lead the rich and interesting lives that a good education offers.
     - This indicator measures the percentage of people who can read and write a simple sentence about their daily life. It’s calculated as the number of people in a given age group who report being able to do so, divided by the total number in that group. UNESCO tracks this across different generations – including youth, adults, and older people – to show how literacy is changing over time.
     - Most of the data comes from national surveys. In some countries, people are asked directly whether they can read and write; in others, they take a short test.
-    - In many high-income countries, literacy rates reached near-universal levels by the late 20th century. As a result, regular tracking has been scaled back, since changes are small and less relevant for education policy.
+    - In many high–income countries, literacy rates reached near–universal levels by the late 20th century. As a result, regular tracking has been scaled back, since changes are small and less relevant for education policy.
     - This data tells us whether someone can read and write at a very basic level – for example, reading simple sentences or writing their name. But it doesn’t tell us whether they can use reading and writing in everyday life, like filling out a job application or reading health instructions. Those kinds of skills take more years of schooling and are much harder to measure, especially when comparing across countries and over time.
 
   desc_key_completion_rate: &desc_key_completion_rate
-    - This indicator estimates what share of children complete a given level of education, even if they do so later than the expected age. It is measured as the share of children 3 to 5 years older than the official age for the last grade of a particular education level who have successfully completed it.
+    - This indicator estimates the share of children who complete a given level of education, even if they do so later than the expected age.
     - For example, if the official age of completion for primary school is 11 years old, a child who completes it at 14 years old would still be included. This is to account for the fact that some children may start school late, or have to repeat years.
     - The data sources include household surveys, censuses, and administrative records, with modelled adjustments to improve comparability across countries.
     - These estimates are produced using a statistical model that draws on these sources, filling gaps where direct observations are missing or inconsistent.
@@ -327,11 +236,12 @@ definitions:
     - High out-of-school rates signal barriers to access — such as poverty, gender inequality, location, or limited availability of schools — and highlight where more targeted support is needed.
     - The data comes from administrative school enrolment records and household surveys, which provide age-specific insights when compared to population estimates.
     - As with all education data, results should be interpreted carefully. Differences in how enrolment is defined, inconsistencies in age reporting, and timing of data collection (such as during holidays or late in the school year) can affect accuracy.
+
   desc_key_prof: &desc_key_prof
     - This indicator measures the share of children or students who achieve minimum proficiency in reading or mathematics by the end of a given education level (primary or lower secondary).
-    - "Minimum proficiency in [reading](#dod:reading-proficiency) and [mathematics](#dod:math-proficiency) is defined differently at each education level:"
-    - "At the end of **primary education**, minimum reading proficiency means students can identify key ideas in simple texts and connect them to their own experiences. In mathematics, it means demonstrating number sense and computation, basic measurement, interpreting simple graphs, spatial orientation, and number patterns."
-    - "At the end of **lower secondary education**, minimum reading proficiency means students can connect ideas across different types of texts, understand the author’s intent, and draw conclusions based on the text. In mathematics, it means applying computation skills, solving real-world problems, interpreting graphs and tables, and using algebraic representations."
+    - "Minimum proficiency in [reading](#dod:reading-proficiency) and [mathematics](#dod:math-proficiency) is defined differently at each education level."
+    - "At the end of **[primary education](#dod:primary-education)**, minimum reading proficiency means students can identify key ideas in simple texts and connect them to their own experiences. In mathematics, it means demonstrating number sense and computation, basic measurement, interpreting simple graphs, spatial orientation, and number patterns."
+    - "At the end of **[lower secondary](#dod:lower-secondary-education)**, minimum reading proficiency means students can connect ideas across different types of texts, understand the author’s intent, and draw conclusions based on the text. In mathematics, it means applying computation skills, solving real-world problems, interpreting graphs and tables, and using algebraic representations."
     - "There are two types of estimates: one for all children in the age group, and one for students who are enrolled in school."
     - Estimates for all children adjust for school completion and enrolment, offering a full population-level view — including those who dropped out or were never enrolled.
     - Estimates for students reflect outcomes only among those still in school at the end of the education cycle.
@@ -379,7 +289,7 @@ tables:
         description_key: *desc_literacy
         presentation:
           title_public: Literacy rate among adult men aged 15+
-          grapher_config: *grapher_config_literacy_male
+          grapher_config: *grapher_config_literacy_adults
         display:
           numDecimalPlaces: 1
           tolerance: *display_tolerance
@@ -393,7 +303,7 @@ tables:
         description_key: *desc_literacy
         presentation:
           title_public: Literacy rate among adult women aged 15+
-          grapher_config: *grapher_config_literacy_female
+          grapher_config: *grapher_config_literacy_adults
         display:
           numDecimalPlaces: 1
           tolerance: *display_tolerance
@@ -407,7 +317,7 @@ tables:
         description_key: *desc_literacy
         presentation:
           title_public: Literacy rate among young men aged 15–24
-          grapher_config: *grapher_config_literacy_male
+          grapher_config: *grapher_config_literacy_youth
         display:
           numDecimalPlaces: 1
           tolerance: *display_tolerance
@@ -421,7 +331,7 @@ tables:
         description_key: *desc_literacy
         presentation:
           title_public: Literacy rate among young women aged 15–24
-          grapher_config: *grapher_config_literacy_female
+          grapher_config: *grapher_config_literacy_youth
         display:
           numDecimalPlaces: 1
           tolerance: *display_tolerance
@@ -449,7 +359,7 @@ tables:
         description_key: *desc_literacy
         presentation:
           title_public: Literacy rate among older adult men aged 65+
-          grapher_config: *grapher_config_literacy_male
+          grapher_config: *grapher_config_literacy_elderly
         display:
           numDecimalPlaces: 1
           tolerance: *display_tolerance
@@ -463,7 +373,7 @@ tables:
         description_key: *desc_literacy
         presentation:
           title_public: Literacy rate among older adult women aged 65+
-          grapher_config: *grapher_config_literacy_female
+          grapher_config: *grapher_config_literacy_elderly
         display:
           numDecimalPlaces: 1
           tolerance: *display_tolerance
@@ -611,7 +521,7 @@ tables:
         description_key: *description_key_out_school
         presentation:
           title_public: Out-of-school rate for children of primary school age
-          grapher_config: *grapher_config_enrolment_bugn
+          grapher_config: *grapher_out_of_school_reds
         display:
           name: Primary school age
           numDecimalPlaces: 1
@@ -624,7 +534,7 @@ tables:
         description_key: *description_key_out_school
         presentation:
           title_public: Out-of-school rate for adolescents of lower secondary school age
-          grapher_config: *grapher_config_enrolment_bugn
+          grapher_config: *grapher_out_of_school_reds
         display:
           name: Lower secondary school age
           numDecimalPlaces: 1
@@ -637,7 +547,7 @@ tables:
         description_key: *description_key_out_school
         presentation:
           title_public: Out-of-school rate for girls of primary school age
-          grapher_config: *grapher_config_enrolment_purples
+          grapher_config: *grapher_out_of_school_reds
         display:
           name: Girls
           numDecimalPlaces: 1
@@ -650,7 +560,7 @@ tables:
         description_key: *description_key_out_school
         presentation:
           title_public: Out-of-school rate for boys of primary school age
-          grapher_config: *grapher_config_enrolment_blues
+          grapher_config: *grapher_out_of_school_reds
         display:
           name: Boys
           numDecimalPlaces: 1
@@ -663,7 +573,7 @@ tables:
         description_key: *description_key_out_school
         presentation:
           title_public: Out-of-school rate for girls of lower secondary school age
-          grapher_config: *grapher_config_enrolment_purples
+          grapher_config: *grapher_out_of_school_reds
         display:
           name: Girls
           numDecimalPlaces: 1
@@ -676,7 +586,7 @@ tables:
         description_key: *description_key_out_school
         presentation:
           title_public: Out-of-school rate for boys of lower secondary school age
-          grapher_config: *grapher_config_enrolment_blues
+          grapher_config: *grapher_out_of_school_reds
         display:
           name: Boys
           numDecimalPlaces: 1
@@ -689,7 +599,7 @@ tables:
         description_key: *description_key_out_school
         presentation:
           title_public: Out-of-school rate for youth of upper secondary school age
-          grapher_config: *grapher_config_enrolment_bugn
+          grapher_config: *grapher_out_of_school_reds
         display:
           name: Upper secondary school age
           numDecimalPlaces: 1
@@ -702,7 +612,7 @@ tables:
         description_key: *description_key_out_school
         presentation:
           title_public: Out-of-school rate for girls of upper secondary school age
-          grapher_config: *grapher_config_enrolment_purples
+          grapher_config: *grapher_out_of_school_reds
         display:
           name: Girls
           numDecimalPlaces: 1
@@ -715,7 +625,7 @@ tables:
         description_key: *description_key_out_school
         presentation:
           title_public: Out-of-school rate for boys of upper secondary school age
-          grapher_config: *grapher_config_enrolment_blues
+          grapher_config: *grapher_out_of_school_reds
         display:
           name: Boys
           numDecimalPlaces: 1
@@ -728,7 +638,7 @@ tables:
         description_key: *description_key_out_school
         presentation:
           title_public: Out-of-school rate for children one year before official primary entry age
-          grapher_config: *grapher_config_enrolment_greens
+          grapher_config: *grapher_out_of_school_reds
         display:
           name: Pre-primary age
           numDecimalPlaces: 1
@@ -741,7 +651,7 @@ tables:
         description_key: *description_key_out_school
         presentation:
           title_public: Out-of-school rate for girls one year before official primary entry age
-          grapher_config: *grapher_config_enrolment_purples
+          grapher_config: *grapher_out_of_school_reds
         display:
           name: Girls
           numDecimalPlaces: 1
@@ -754,7 +664,7 @@ tables:
         description_key: *description_key_out_school
         presentation:
           title_public: Out-of-school rate for boys one year before official primary entry age
-          grapher_config: *grapher_config_enrolment_blues
+          grapher_config: *grapher_out_of_school_reds
         display:
           name: Boys
           numDecimalPlaces: 1
@@ -808,7 +718,7 @@ tables:
         description_key: *desc_key_ger
         presentation:
           title_public: Gross enrolment ratio in tertiary education
-          grapher_config: *grapher_config_tertiary_bugn
+          grapher_config: *grapher_config_enrolment_pubugn
         display:
           numDecimalPlaces: 1
           name: Tertiary education
@@ -821,7 +731,7 @@ tables:
         description_key: *desc_key_ger
         presentation:
           title_public: Gross enrolment ratio in tertiary education among women
-          grapher_config: *grapher_config_tertiary_purples
+          grapher_config: *grapher_config_enrolment_pubugn
         display:
           numDecimalPlaces: 1
           name: Women
@@ -834,7 +744,7 @@ tables:
         description_key: *desc_key_ger
         presentation:
           title_public: Gross enrolment ratio in tertiary education among men
-          grapher_config: *grapher_config_tertiary_blues
+          grapher_config: *grapher_config_enrolment_pubugn
         display:
           numDecimalPlaces: 1
           name: Men
@@ -847,7 +757,7 @@ tables:
         description_key: *desc_key_net_enr
         presentation:
           title_public: Net enrolment rate in pre-primary education
-          grapher_config: *grapher_config_enrolment_bugn
+          grapher_config: *grapher_config_enrolment_ylgnbu
         display:
           numDecimalPlaces: 1
           name: Pre-primary education
@@ -860,7 +770,7 @@ tables:
         description_key: *desc_key_net_enr
         presentation:
           title_public: Net enrolment rate in pre-primary education among girls
-          grapher_config: *grapher_config_enrolment_purples
+          grapher_config: *grapher_config_enrolment_ylgnbu
         display:
           numDecimalPlaces: 1
           name: Girls
@@ -873,7 +783,7 @@ tables:
         description_key: *desc_key_net_enr
         presentation:
           title_public: Net enrolment rate in pre-primary education among boys
-          grapher_config: *grapher_config_enrolment_blues
+          grapher_config: *grapher_config_enrolment_ylgnbu
         display:
           numDecimalPlaces: 1
           name: Boys
@@ -884,117 +794,117 @@ tables:
 
       completion_rate__primary_education__both_sexes__pct__modelled_data__cr_mod_1:
         title: Completion rate in primary education
-        description_short: The share of children who are 3 to 5 years older than the official age for the last grade of [primary education](#dod:primary-education) education who have successfully completed it. This broader age band is used to include children who started school late or had to resit particular years.
+        description_short: The share of children who are three to five years older than the official age for the last grade of [primary education](#dod:primary-education) education who have successfully completed it. This broader age band is used to include children who started school late or had to resit particular years.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_completion_rate
         presentation:
           title_public: Completion rate in primary education
-          grapher_config: *grapher_config_enrolment_greens
+          grapher_config: *grapher_completion
         display:
           name: Primary education
           numDecimalPlaces: 1
 
       completion_rate__lower_secondary_education__both_sexes__pct__modelled_data__cr_mod_2:
         title: Completion rate in lower secondary education
-        description_short: The share of children who are 3 to 5 years older than the official age for the last grade of [lower secondary education](#dod:lower-secondary-education) education who have successfully completed it. This broader age band is used to include children who started school late or had to resit particular years.
+        description_short: The share of children who are three to five years older than the official age for the last grade of [lower secondary education](#dod:lower-secondary-education) education who have successfully completed it. This broader age band is used to include children who started school late or had to resit particular years.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_completion_rate
         presentation:
           title_public: Completion rate in lower secondary education
-          grapher_config: *grapher_config_enrolment_greens
+          grapher_config: *grapher_completion
         display:
           name: Lower secondary education
           numDecimalPlaces: 1
 
       completion_rate__upper_secondary_education__both_sexes__pct__modelled_data__cr_mod_3:
         title: Completion rate in upper secondary education
-        description_short: The share of children who are 3 to 5 years older than the official age for the last grade of [upper secondary education](#dod:upper-secondary-education) education who have successfully completed it. This broader age band is used to include children who started school late or had to resit particular years.
+        description_short: The share of children who are three to five years older than the official age for the last grade of [upper secondary education](#dod:upper-secondary-education) education who have successfully completed it. This broader age band is used to include children who started school late or had to resit particular years.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_completion_rate
         presentation:
           title_public: Completion rate in upper secondary education
-          grapher_config: *grapher_config_enrolment_greens
+          grapher_config: *grapher_completion
         display:
           name: Upper secondary education
           numDecimalPlaces: 1
 
       completion_rate__lower_secondary_education__female__pct__modelled_data__cr_mod_2_f:
         title: Completion rate in lower secondary education among girls
-        description_short: The share of girls who are 3 to 5 years older than the official age for the last grade of [lower secondary education](#dod:lower-secondary-education) education who have successfully completed it. This broader age band is used to include children who started school late or had to resit particular years.
+        description_short: The share of girls who are three to five years older than the official age for the last grade of [lower secondary education](#dod:lower-secondary-education) education who have successfully completed it. This broader age band is used to include children who started school late or had to resit particular years.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_completion_rate
         presentation:
           title_public: Completion rate in lower secondary education among girls
-          grapher_config: *grapher_config_enrolment_purples
+          grapher_config: *grapher_completion
         display:
           name: Girls
           numDecimalPlaces: 1
 
       completion_rate__primary_education__female__pct__modelled_data__cr_mod_1_f:
         title: Completion rate in primary education among girls
-        description_short: The share of girls who are 3 to 5 years older than the official age for the last grade of [primary education](#dod:primary-education) education who have successfully completed it. This broader age band is used to include children who started school late or had to resit particular years.
+        description_short: The share of girls who are three to five years older than the official age for the last grade of [primary education](#dod:primary-education) education who have successfully completed it. This broader age band is used to include children who started school late or had to resit particular years.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_completion_rate
         presentation:
           title_public: Completion rate in primary education among girls
-          grapher_config: *grapher_config_enrolment_purples
+          grapher_config: *grapher_completion
         display:
           name: Girls
           numDecimalPlaces: 1
 
       completion_rate__upper_secondary_education__female__pct__modelled_data__cr_mod_3_f:
         title: Completion rate in upper secondary education among girls
-        description_short: The share of girls who are 3 to 5 years older than the official age for the last grade of [upper secondary education](#dod:upper-secondary-education) education who have successfully completed it. This broader age band is used to include children who started school late or had to resit particular years.
+        description_short: The share of girls who are three to five years older than the official age for the last grade of [upper secondary education](#dod:upper-secondary-education) education who have successfully completed it. This broader age band is used to include children who started school late or had to resit particular years.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_completion_rate
         presentation:
           title_public: Completion rate in upper secondary education among girls
-          grapher_config: *grapher_config_enrolment_purples
+          grapher_config: *grapher_completion
         display:
           name: Girls
           numDecimalPlaces: 1
 
       completion_rate__lower_secondary_education__male__pct__modelled_data__cr_mod_2_m:
         title: Completion rate in lower secondary education among boys
-        description_short: The share of boys who are 3 to 5 years older than the official age for the last grade of [lower secondary education](#dod:lower-secondary-education) education who have successfully completed it. This broader age band is used to include children who started school late or had to resit particular years.
+        description_short: The share of boys who are three to five years older than the official age for the last grade of [lower secondary education](#dod:lower-secondary-education) education who have successfully completed it. This broader age band is used to include children who started school late or had to resit particular years.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_completion_rate
         presentation:
           title_public: Completion rate in lower secondary education among boys
-          grapher_config: *grapher_config_enrolment_blues
+          grapher_config: *grapher_completion
         display:
           name: Boys
           numDecimalPlaces: 1
 
       completion_rate__primary_education__male__pct__modelled_data__cr_mod_1_m:
         title: Completion rate in primary education among boys
-        description_short: The share of boys who are 3 to 5 years older than the official age for the last grade of [primary education](#dod:primary-education) education who have successfully completed it. This broader age band is used to include children who started school late or had to resit particular years.
+        description_short: The share of boys who are three to five years older than the official age for the last grade of [primary education](#dod:primary-education) education who have successfully completed it. This broader age band is used to include children who started school late or had to resit particular years.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_completion_rate
         presentation:
           title_public: Completion rate in primary education among boys
-          grapher_config: *grapher_config_enrolment_blues
+          grapher_config: *grapher_completion
         display:
           name: Boys
           numDecimalPlaces: 1
 
       completion_rate__upper_secondary_education__male__pct__modelled_data__cr_mod_3_m:
         title: Completion rate in upper secondary education among boys
-        description_short: The share of boys who are 3 to 5 years older than the official age for the last grade of [upper secondary education](#dod:upper-secondary-education) education who have successfully completed it. This broader age band is used to include children who started school late or had to resit particular years.
+        description_short: The share of boys who are three to five years older than the official age for the last grade of [upper secondary education](#dod:upper-secondary-education) education who have successfully completed it. This broader age band is used to include children who started school late or had to resit particular years.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_completion_rate
         presentation:
           title_public: Completion rate in upper secondary education among boys
-          grapher_config: *grapher_config_enrolment_blues
+          grapher_config: *grapher_completion
         display:
           name: Boys
           numDecimalPlaces: 1
@@ -1047,9 +957,12 @@ tables:
         display:
           numDecimalPlaces: 1
 
+      # ========================================================================
+      # Expenditure on education
+      # ========================================================================
       expenditure_on_education_as_a_percentage_of_total_government_expenditure__pct__xgovexp_imf:
         title: Expenditure on education as share of government spending
-        description_short: Percentage of total [general government](#dod:general-government) spending (across all sectors) that is allocated to education, across all levels.
+        description_short: Percentage of total [general government](#dod:general-government) spending (across all sectors) that is allocated to education.
         unit: "%"
         short_unit: "%"
         description_key:
@@ -1062,28 +975,26 @@ tables:
           grapher_config: *grapher_config_expenditure_total
         display:
           numDecimalPlaces: 1
-
-      # ========================================================================
-      # Expenditure on education
-      # ========================================================================
+          name: Total across all levels of education
 
       government_expenditure_on_education_as_a_percentage_of_gdp__pct__xgdp_fsgov:
         title: Government spending on education as share of GDP
         unit: "% of GDP"
         short_unit: "%"
-        description_short: Total [general government](#dod:general-government) spending on all levels of education, given as a share of [gross domestic product](#dod:gdp).
+        description_short: Total [general government](#dod:general-government) spending on all levels of education, expressed as a percentage of [GDP](#dod:gdp).
         description_key: *desc_key_govt_expenditure_gdp_share
         presentation:
           title_public: Government spending on education as share of GDP
         display:
           numDecimalPlaces: 1
           name: Total across all levels of education
+          tolerance: 10
 
       combined_expenditure_share_gdp:
         title: Public spending on education as a share of GDP (historical and recent)
         unit: "% of GDP"
         short_unit: "%"
-        description_short: Total [general government](#dod:general-government) spending on all levels of education, given as a share of [gross domestic product](#dod:gdp).
+        description_short: Total [general government](#dod:general-government) spending on all levels of education, expressed as a percentage of [GDP](#dod:gdp).
         description_key: *desc_key_govt_expenditure_gdp_share
         description_processing: |-
           **Historical expenditure data:**
@@ -1095,10 +1006,12 @@ tables:
           General government expenditure on education (current, capital, and transfers) is expressed as a percentage of GDP. It includes expenditure funded by transfers from international sources to government. General government usually refers to local, regional and central governments.
         presentation:
           title_public: Public spending on education as a share of GDP
-          grapher_config: *grapher_config_expenditure
+          grapher_config: *grapher_config_expenditure_gdp
         display:
           numDecimalPlaces: 1
           name: Total across all levels of education
+          tolerance: 10
+
       # ========================================================================
       # GOVERNMENT EXPENDITURE IN CONSTANT PPP DOLLARS PER STUDENT (by education level)
       # ========================================================================
@@ -1111,10 +1024,11 @@ tables:
         description_key: *desc_key_govt_expenditure_constant_ppp_per_student
         presentation:
           title_public: Government spending on pre-primary education per student (international-$)
-          grapher_config: *grapher_config_per_student_spending_preprimary
+          grapher_config: *grapher_config_per_student_spending
         display:
           numDecimalPlaces: 0
           name: Pre-primary
+          tolerance: 10
 
       initial_government_funding_per_primary_student__constant_pppdollar__xunit_pppconst_1_fsgov_ffntr:
         title: Government spending on primary education per student
@@ -1124,10 +1038,11 @@ tables:
         description_key: *desc_key_govt_expenditure_constant_ppp_per_student
         presentation:
           title_public: Government spending on primary education per student (international-$)
-          grapher_config: *grapher_config_per_student_spending_primary
+          grapher_config: *grapher_config_per_student_spending
         display:
           numDecimalPlaces: 0
           name: Primary
+          tolerance: 10
 
       initial_government_funding_per_lower_secondary_student__constant_pppdollar__xunit_pppconst_2_fsgov_ffntr:
         title: Government spending on lower secondary education per student
@@ -1137,10 +1052,11 @@ tables:
         description_key: *desc_key_govt_expenditure_constant_ppp_per_student
         presentation:
           title_public: Government spending on lower secondary education per student (international-$)
-          grapher_config: *grapher_config_per_student_spending_secondary
+          grapher_config: *grapher_config_per_student_spending
         display:
           numDecimalPlaces: 0
           name: Lower secondary
+          tolerance: 10
 
       initial_government_funding_per_upper_secondary_student__constant_pppdollar__xunit_pppconst_3_fsgov_ffntr:
         title: Government spending on upper secondary education per student
@@ -1150,10 +1066,11 @@ tables:
         description_key: *desc_key_govt_expenditure_constant_ppp_per_student
         presentation:
           title_public: Government spending on upper secondary education per student (international-$)
-          grapher_config: *grapher_config_per_student_spending_secondary
+          grapher_config: *grapher_config_per_student_spending
         display:
           numDecimalPlaces: 0
           name: Upper secondary
+          tolerance: 10
 
       initial_government_funding_per_tertiary_student__constant_pppdollar__xunit_pppconst_5t8_fsgov_ffntr:
         title: Government spending on tertiary education per student
@@ -1163,10 +1080,11 @@ tables:
         description_key: *desc_key_govt_expenditure_constant_ppp_per_student
         presentation:
           title_public: Government spending on tertiary education per student (international-$)
-          grapher_config: *grapher_config_per_student_spending_tertiary
+          grapher_config: *grapher_config_per_student_spending
         display:
           numDecimalPlaces: 0
           name: Tertiary
+          tolerance: 10
 
       # ========================================================================
       # MINIMUM PROFICIENCY RATES - PREPARED FOR THE FUTURE (All Children)
@@ -1180,7 +1098,7 @@ tables:
         description_key: *desc_key_prof
         presentation:
           title_public: Share of children achieving minimum math proficiency by the end of lower secondary age
-          grapher_config: *grapher_config_proficiency_secondary_math
+          grapher_config: *grapher_config_proficiency_math
         display:
           numDecimalPlaces: 1
           name: End of lower secondary mathematics
@@ -1194,7 +1112,7 @@ tables:
         description_key: *desc_key_prof
         presentation:
           title_public: Share of girls achieving minimum math proficiency by the end of lower secondary age
-          grapher_config: *grapher_config_proficiency_secondary_math
+          grapher_config: *grapher_config_proficiency_math
         display:
           numDecimalPlaces: 1
           name: Girls - lower secondary mathematics
@@ -1208,7 +1126,7 @@ tables:
         description_key: *desc_key_prof
         presentation:
           title_public: Share of boys achieving minimum math proficiency by the end of lower secondary age
-          grapher_config: *grapher_config_proficiency_secondary_math
+          grapher_config: *grapher_config_proficiency_math
         display:
           numDecimalPlaces: 1
           name: Boys - lower secondary mathematics
@@ -1222,7 +1140,7 @@ tables:
         description_key: *desc_key_prof
         presentation:
           title_public: Share of children achieving minimum reading proficiency by the end of lower secondary age
-          grapher_config: *grapher_config_proficiency_secondary_reading
+          grapher_config: *grapher_config_proficiency_reading
         display:
           numDecimalPlaces: 1
           name: End of lower secondary reading
@@ -1236,7 +1154,7 @@ tables:
         description_key: *desc_key_prof
         presentation:
           title_public: Share of girls achieving minimum reading proficiency by the end of lower secondary age
-          grapher_config: *grapher_config_proficiency_secondary_reading
+          grapher_config: *grapher_config_proficiency_reading
         display:
           numDecimalPlaces: 1
           name: End of lower secondary reading
@@ -1250,7 +1168,7 @@ tables:
         description_key: *desc_key_prof
         presentation:
           title_public: Share of boys achieving minimum reading proficiency by the end of lower secondary age
-          grapher_config: *grapher_config_proficiency_secondary_reading
+          grapher_config: *grapher_config_proficiency_reading
         display:
           numDecimalPlaces: 1
           name: Boys - lower secondary reading
@@ -1264,7 +1182,7 @@ tables:
         description_key: *desc_key_prof
         presentation:
           title_public: Share of children achieving minimum math proficiency by the end of primary age
-          grapher_config: *grapher_config_proficiency_primary_math
+          grapher_config: *grapher_config_proficiency_math
         display:
           numDecimalPlaces: 1
           name: Primary mathematics
@@ -1278,7 +1196,7 @@ tables:
         description_key: *desc_key_prof
         presentation:
           title_public: Share of girls achieving minimum math proficiency by the end of primary age
-          grapher_config: *grapher_config_proficiency_primary_math
+          grapher_config: *grapher_config_proficiency_math
         display:
           numDecimalPlaces: 1
           name: Girls - primary mathematics
@@ -1292,7 +1210,7 @@ tables:
         description_key: *desc_key_prof
         presentation:
           title_public: Share of boys achieving minimum math proficiency by the end of primary age
-          grapher_config: *grapher_config_proficiency_primary_math
+          grapher_config: *grapher_config_proficiency_math
         display:
           numDecimalPlaces: 1
           name: Boys - primary mathematics
@@ -1306,7 +1224,7 @@ tables:
         description_key: *desc_key_prof
         presentation:
           title_public: Share of children achieving minimum reading proficiency by the end of primary age
-          grapher_config: *grapher_config_proficiency_primary_reading
+          grapher_config: *grapher_config_proficiency_reading
         display:
           numDecimalPlaces: 1
           name: Primary reading
@@ -1320,7 +1238,7 @@ tables:
         description_key: *desc_key_prof
         presentation:
           title_public: Share of girls achieving minimum reading proficiency by the end of primary age
-          grapher_config: *grapher_config_proficiency_primary_reading
+          grapher_config: *grapher_config_proficiency_reading
         display:
           numDecimalPlaces: 1
           name: Girls - primary reading
@@ -1334,7 +1252,7 @@ tables:
         description_key: *desc_key_prof
         presentation:
           title_public: Share of boys achieving minimum reading proficiency by the end of primary age
-          grapher_config: *grapher_config_proficiency_primary_reading
+          grapher_config: *grapher_config_proficiency_reading
         display:
           numDecimalPlaces: 1
           name: Boys - primary reading
@@ -1352,7 +1270,7 @@ tables:
         description_key: *desc_key_prof
         presentation:
           title_public: Share of students achieving minimum math proficiency by the end of lower secondary education
-          grapher_config: *grapher_config_proficiency_secondary_math
+          grapher_config: *grapher_config_proficiency_math
         display:
           numDecimalPlaces: 1
           name: Students - lower secondary mathematics
@@ -1366,7 +1284,7 @@ tables:
         description_key: *desc_key_prof
         presentation:
           title_public: Share of female students achieving minimum math proficiency by the end of lower secondary education
-          grapher_config: *grapher_config_proficiency_secondary_math
+          grapher_config: *grapher_config_proficiency_math
         display:
           numDecimalPlaces: 1
           name: Female students - lower secondary mathematics
@@ -1380,7 +1298,7 @@ tables:
         description_key: *desc_key_prof
         presentation:
           title_public: Share of male students achieving minimum math proficiency by the end of lower secondary education
-          grapher_config: *grapher_config_proficiency_secondary_math
+          grapher_config: *grapher_config_proficiency_math
         display:
           numDecimalPlaces: 1
           name: Male students - lower secondary mathematics
@@ -1394,7 +1312,7 @@ tables:
         description_key: *desc_key_prof
         presentation:
           title_public: Share of students achieving minimum reading proficiency by the end of lower secondary education
-          grapher_config: *grapher_config_proficiency_secondary_reading
+          grapher_config: *grapher_config_proficiency_reading
         display:
           numDecimalPlaces: 1
           name: Students - lower secondary reading
@@ -1408,7 +1326,7 @@ tables:
         description_key: *desc_key_prof
         presentation:
           title_public: Share of female students achieving minimum reading proficiency by the end of lower secondary education
-          grapher_config: *grapher_config_proficiency_secondary_reading
+          grapher_config: *grapher_config_proficiency_reading
         display:
           numDecimalPlaces: 1
           name: Female students - lower secondary reading
@@ -1422,7 +1340,7 @@ tables:
         description_key: *desc_key_prof
         presentation:
           title_public: Share of male students achieving minimum reading proficiency by the end of lower secondary education
-          grapher_config: *grapher_config_proficiency_secondary_reading
+          grapher_config: *grapher_config_proficiency_reading
         display:
           numDecimalPlaces: 1
           name: Male students - lower secondary reading
@@ -1436,7 +1354,7 @@ tables:
         description_key: *desc_key_prof
         presentation:
           title_public: Share of students achieving minimum math proficiency by the end of primary education
-          grapher_config: *grapher_config_proficiency_primary_math
+          grapher_config: *grapher_config_proficiency_math
         display:
           numDecimalPlaces: 1
           name: Students - primary mathematics
@@ -1450,7 +1368,7 @@ tables:
         description_key: *desc_key_prof
         presentation:
           title_public: Share of female students achieving minimum math proficiency by the end of primary education
-          grapher_config: *grapher_config_proficiency_primary_math
+          grapher_config: *grapher_config_proficiency_math
         display:
           numDecimalPlaces: 1
           name: Female students - primary mathematics
@@ -1464,7 +1382,7 @@ tables:
         description_key: *desc_key_prof
         presentation:
           title_public: Share of male students achieving minimum math proficiency by the end of primary education
-          grapher_config: *grapher_config_proficiency_primary_math
+          grapher_config: *grapher_config_proficiency_math
         display:
           numDecimalPlaces: 1
           name: Male students - primary mathematics
@@ -1478,7 +1396,7 @@ tables:
         description_key: *desc_key_prof
         presentation:
           title_public: Share of students achieving minimum reading proficiency by the end of primary education
-          grapher_config: *grapher_config_proficiency_primary_reading
+          grapher_config: *grapher_config_proficiency_reading
         display:
           numDecimalPlaces: 1
           name: Students - primary reading
@@ -1492,7 +1410,7 @@ tables:
         description_key: *desc_key_prof
         presentation:
           title_public: Share of female students achieving minimum reading proficiency by the end of primary education
-          grapher_config: *grapher_config_proficiency_primary_reading
+          grapher_config: *grapher_config_proficiency_reading
         display:
           numDecimalPlaces: 1
           name: Female students - primary reading
@@ -1506,7 +1424,7 @@ tables:
         description_key: *desc_key_prof
         presentation:
           title_public: Share of male students achieving minimum reading proficiency by the end of primary education
-          grapher_config: *grapher_config_proficiency_primary_reading
+          grapher_config: *grapher_config_proficiency_reading
         display:
           numDecimalPlaces: 1
           name: Male students - primary reading

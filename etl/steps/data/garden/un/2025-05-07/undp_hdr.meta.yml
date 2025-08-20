@@ -432,8 +432,8 @@ tables:
               timeTolerance: 5
               colorScale:
                 binningStrategy: manual
-                customNumericValues: [0, 4, 6, 8, 10, 12, 14, 16, 18]
-                baseColorScheme: <% if sex == "female" %>Purples<% elif sex == "male" %>BuGn<% else %>Blues<% endif %>
+                customNumericValues: [0, 2, 4, 6, 8, 10, 12, 14, 14]
+                baseColorScheme: Blues
         display:
           numDecimalPlaces: 1
           tolerance: 5
@@ -464,8 +464,8 @@ tables:
               timeTolerance: 5
               colorScale:
                 binningStrategy: manual
-                customNumericValues: [0, 2, 4, 6, 8, 10, 12, 14, 16]
-                baseColorScheme: <% if sex == "female" %>Purples<% elif sex == "male" %>BuGn<% else %>Blues<% endif %>
+                customNumericValues: [0, 2, 4, 6, 8, 10, 12, 14, 14]
+                baseColorScheme: Purples
         display:
           numDecimalPlaces: 1
           tolerance: 5
