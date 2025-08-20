@@ -94,6 +94,33 @@ def run_sanity_checks(df: pd.DataFrame) -> None:
     assert len(aliases_duplicated) == 0, error
 
 
+def replace_aggregate_members(df: pd.DataFrame):
+    """Programmatically replace members that are aggregates with their members.
+
+    It uses TopologicalSorter to ensure that the order of replacements is correct. This allows for recursive replacements, and checks that there are no cycles in the graph of regions. E.g. that region A doesn't contain region B, which contains region A.
+    """
+    REGIONS_DO_NOT_REPLACE = [
+        "OWID_WRL",
+    ]
+
+    dag = df.dropna(subset="members").set_index("code")["members"].to_dict()
+    ts = TopologicalSorter(dag)
+    regions_ordered = tuple(ts.static_order())
+    for region in regions_ordered:
+        members = dag.get(region, None)
+        if members:
+            new_members = []
+            for member in members:
+                m = dag.get(member, [member])
+                new_members.extend(m)
+
+            dag[region] = new_members
+
+    mask = ~df["code"].isin(REGIONS_DO_NOT_REPLACE)
+    df.loc[mask, "members"] = df.loc[mask, "code"].map(dag).fillna(df.loc[mask, "members"])
+    return df
+
+
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
@@ -116,19 +143,8 @@ def run(dest_dir: str) -> None:
     run_sanity_checks(df=df)
 
     # Replace members that are aggregates
-    dag = df.dropna(subset="members").set_index("code")["members"].to_dict()
-    ts = TopologicalSorter(dag)
-    regions_ordered = tuple(ts.static_order())
-    for region in regions_ordered:
-        assert region in dag, f"Region {region} not found in the DAG."
-        members = dag.get(region)
-        new_members = []
-        for member in members:
-            assert member in dag, f"Member {member} of region {region} not found in the DAG."
-            m = dag.get(member, [])
-            new_members.extend(m)
+    df = replace_aggregate_members(df)
 
-        pass
     # r = [dag[res] for res in results]
 
     # df = replace_members(df)
