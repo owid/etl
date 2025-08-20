@@ -477,3 +477,11 @@ steps:
     - data://garden/regions/2023-01-01/regions
   data://grapher/neglected_tropical_diseases/2024-05-02/lymphatic_filariasis:
     - data://garden/neglected_tropical_diseases/2024-05-02/lymphatic_filariasis
+    # Schistosomiasis
+  data://meadow/neglected_tropical_diseases/2024-05-02/schistosomiasis:
+    - snapshot://neglected_tropical_diseases/2024-05-02/schistosomiasis.xlsx
+  data://garden/neglected_tropical_diseases/2024-05-02/schistosomiasis:
+    - data://meadow/neglected_tropical_diseases/2024-05-02/schistosomiasis
+    - data://garden/regions/2023-01-01/regions
+  data://grapher/neglected_tropical_diseases/2024-05-02/schistosomiasis:
+    - data://garden/neglected_tropical_diseases/2024-05-02/schistosomiasis

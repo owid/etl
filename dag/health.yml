@@ -307,15 +307,6 @@ steps:
   data-private://grapher/ihme_gbd/2024-05-20/impairments:
     - data-private://garden/ihme_gbd/2024-05-20/impairments
 
-  # Schistosomiasis
-  data://meadow/neglected_tropical_diseases/2024-05-02/schistosomiasis:
-    - snapshot://neglected_tropical_diseases/2024-05-02/schistosomiasis.xlsx
-  data://garden/neglected_tropical_diseases/2024-05-02/schistosomiasis:
-    - data://meadow/neglected_tropical_diseases/2024-05-02/schistosomiasis
-    - data://garden/regions/2023-01-01/regions
-  data://grapher/neglected_tropical_diseases/2024-05-02/schistosomiasis:
-    - data://garden/neglected_tropical_diseases/2024-05-02/schistosomiasis
-
   # Neglected Tropical Diseases Funding
   data://meadow/neglected_tropical_diseases/2024-05-18/funding:
     - snapshot://neglected_tropical_diseases/2024-05-18/funding.xlsx
@@ -1341,6 +1332,7 @@ steps:
     - data://meadow/neglected_tropical_diseases/2025-08-20/schistosomiasis
   data://grapher/neglected_tropical_diseases/2025-08-20/schistosomiasis:
     - data://garden/neglected_tropical_diseases/2025-08-20/schistosomiasis
+
   # Neglected Tropical Diseases Funding
   data://meadow/neglected_tropical_diseases/2025-08-20/funding:
     - snapshot://neglected_tropical_diseases/2025-08-20/funding.xlsx
