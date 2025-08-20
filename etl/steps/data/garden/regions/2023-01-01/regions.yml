@@ -1,18 +1,18 @@
 # Region definitions (see more details in the description of the 'regions' garden step).
 # Each region must contain the following fields:
-# code: Region code (unique for each region).
-# name: Region name.
+# * code: Region code (unique for each region).
+# * name: Region name.
 #
 # Additionally, each region can contain the following fields:
-# short_name: Short version of the region name. If not given, 'name' will be used.
-# region_type: Region type (country, continent, aggregate, other). If not given, 'country' will be used.
-# defined_by: Institution that used the region in a dataset. If not given, 'owid' will be used.
-# is_historical: True if region does not exist anymore. If not given, False will be used.
-# end_year: Last year when a historical region existed. If not given, pd.NA will be used.
-# successors: List of successors of a historical region. If not given, an empty list will be used.
-# members: List of members of the region. If not given, an empty list will be used.
-# aliases: List of alternative names for the region. If not given, an empty list will be used.
-# related: List of related members of the region. If not given, an empty list will be used.
+# * short_name: Short version of the region name. If not given, 'name' will be used.
+# * region_type: Region type (country, continent, aggregate, other). If not given, 'country' will be used.
+# * defined_by: Institution that used the region in a dataset. If not given, 'owid' will be used.
+# * is_historical: True if region does not exist anymore. If not given, False will be used.
+# * end_year: Last year when a historical region existed. If not given, pd.NA will be used.
+# * successors: List of successors of a historical region. If not given, an empty list will be used.
+# * members: List of members of the region. If not given, an empty list will be used. If it contains a member that is an aggregate (e.g. "UNM49_NAF"), it will be replaced by its members. See "UNM49_AFR" for an example.
+# * aliases: List of alternative names for the region. If not given, an empty list will be used.
+# * related: List of related members of the region. If not given, an empty list will be used.
 - code: "AFG"
   name: "Afghanistan"
 - code: "ALA"
