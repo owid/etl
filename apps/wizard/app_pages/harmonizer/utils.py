@@ -9,6 +9,7 @@ import streamlit as st
 from owid.catalog import Dataset
 
 from apps.wizard.utils import get_datasets_in_etl, set_states
+from apps.wizard.utils.components import st_title_with_expert
 from etl.config import ENV_IS_REMOTE
 from etl.harmonize import Harmonizer
 from etl.paths import STEP_DIR
@@ -190,7 +191,7 @@ def show_manual_mapping(harmonizer, entity, i, border=False):
 
 def render(step_uri):
     # Page config
-    st.title(":material/music_note: Entity Harmonizer")
+    st_title_with_expert("Entity Harmonizer", icon=":material/music_note:")
 
     # Set states
     st.session_state["show_all"] = st.session_state.get("show_all", False)

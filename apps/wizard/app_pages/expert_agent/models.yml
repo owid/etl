@@ -1,0 +1,68 @@
+## See all of them in https://github.com/pydantic/pydantic-ai/blob/master/pydantic_ai_slim/pydantic_ai/models/__init__.py
+#
+models:
+  # OpenAI models
+  ## Cost: https://platform.openai.com/docs/pricing?latest-pricing=standard
+  - name: "openai:gpt-5"
+    display_name: "GPT-5"
+    cost:
+      in: 1.25
+      out: 10.00
+  - name: "openai:gpt-5-mini"
+    display_name: "GPT-5 mini"
+    cost: # In USD per 1M tokens
+      in: 0.25
+      out: 2.00
+  - name: "openai:gpt-4.1"
+    display_name: "GPT-4.1"
+    cost:
+      in: 2.00
+      out: 8.00
+  - name: "openai:gpt-4o"
+    display_name: "GPT-4o"
+    cost:
+      in: 2.50
+      out: 10.00
+  - name: "openai:o3"
+    display_name: "o3"
+    cost:
+      in: 2.00
+      out: 8.00
+  # Anthropic models
+  ## Cost: https://www.anthropic.com/pricing#api
+  - name: "anthropic:claude-sonnet-4-0"
+    display_name: "Claude Sonnet 4.0"
+    cost:
+      in:
+        value: [3, 6]
+        brackets: [0, 200_000]
+      out:
+        value: [15, 22.50]
+        brackets: [0, 200_000]
+  # - name: "anthropic:claude-3-5-haiku-latest"
+  #   display_name: "Claude 3.5 Haiku"
+  #   cost:
+  #     in: 0.8
+  #     out: 4
+  # Google models
+  ## Cost: https://ai.google.dev/pricing
+  - name: "google-gla:gemini-2.5-pro"
+    display_name: "Gemini 2.5 Pro"
+    cost:
+      in:
+        value: [1.25, 2.50]
+        brackets: [0, 200_000]
+      out:
+        value: [10, 15]
+        brackets: [0, 200_000]
+  - name: "google-gla:gemini-2.5-flash"
+    display_name: "Gemini 2.5 Flash"
+    cost:
+      in: 0.30
+      out: 2.50
+  # Others
+  # - name: llama3.2
+  #   display_name: "Llama 3.2 (local)"
+  #   cost:
+  #     in: 0
+  #     out: 0

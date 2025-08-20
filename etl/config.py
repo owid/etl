@@ -227,7 +227,10 @@ FASTTRACK_COMMIT = env.get("FASTTRACK_COMMIT") in ("True", "true", "1")
 # if True, commit to monkeypox repository from export step
 MONKEYPOX_COMMIT = env.get("MONKEYPOX_COMMIT") in ("True", "true", "1")
 
-ADMIN_HOST = env.get("ADMIN_HOST", f"http://staging-site-{STAGING}" if STAGING else "http://localhost:3030")
+ADMIN_HOST = env.get(
+    "ADMIN_HOST",
+    f"http://staging-site-{STAGING}" if STAGING else "http://localhost:3030",
+)
 
 # Tailscale address of Admin, this cannot be just `http://owid-admin-prod`
 # because that would resolve to LXC container instead of the actual server
@@ -236,6 +239,8 @@ TAILSCALE_ADMIN_HOST = "http://owid-admin-prod.tail6e23.ts.net"
 SENTRY_DSN = env.get("SENTRY_DSN")
 
 OPENAI_API_KEY = env.get("OPENAI_API_KEY", None)
+ANTHROPIC_API_KEY = env.get("ANTHROPIC_API_KEY", None)
+GOOGLE_API_KEY = env.get("GOOGLE_API_KEY", None)
 
 OWIDBOT_ACCESS_TOKEN = env.get("OWIDBOT_ACCESS_TOKEN", None)
 
@@ -264,11 +269,12 @@ DEFAULT_GRAPHER_SCHEMA = "https://files.ourworldindata.org/schemas/grapher-schem
 GOOGLE_APPLICATION_CREDENTIALS = env.get("GOOGLE_APPLICATION_CREDENTIALS")
 
 
-def enable_sentry() -> None:
+def enable_sentry(enable_logs: bool = False) -> None:
     if SENTRY_DSN:
-        sentry_sdk.init(
-            dsn=SENTRY_DSN,
-        )
+        if enable_logs:
+            sentry_sdk.init(dsn=SENTRY_DSN, _experiments={"enable_logs": True})
+        else:
+            sentry_sdk.init(dsn=SENTRY_DSN)
 
 
 # Wizard config
@@ -616,7 +622,13 @@ def no_trailing_slash(url: str | None) -> None:
         raise ValueError(f"Env {url} should not have a trailing slash.")
 
 
-env_vars = [ADMIN_HOST, TAILSCALE_ADMIN_HOST, DATA_API_URL, BAKED_VARIABLES_PATH, R2_SNAPSHOTS_PUBLIC_READ]
+env_vars = [
+    ADMIN_HOST,
+    TAILSCALE_ADMIN_HOST,
+    DATA_API_URL,
+    BAKED_VARIABLES_PATH,
+    R2_SNAPSHOTS_PUBLIC_READ,
+]
 for env_var in env_vars:
     no_trailing_slash(env_var)
 
@@ -639,3 +651,8 @@ NOTION_DATA_PROVIDERS_CONTACTS_TABLE_URL = os.environ.get("NOTION_DATA_PROVIDERS
 DATA_PRODUCER_REPORT_FOLDER_ID = os.environ.get("DATA_PRODUCER_REPORT_FOLDER_ID", "")
 DATA_PRODUCER_REPORT_TEMPLATE_DOC_ID = os.environ.get("DATA_PRODUCER_REPORT_TEMPLATE_DOC_ID", "")
 DATA_PRODUCER_REPORT_STATUS_SHEET_ID = os.environ.get("DATA_PRODUCER_REPORT_STATUS_SHEET_ID", "")
+
+# Logfire for LLM observability
+LOGFIRE_TOKEN_EXPERT = env.get("LOGFIRE_TOKEN_EXPERT")
+LOGFIRE_TOKEN_MCP = env.get("LOGFIRE_TOKEN_MCP")
+LOGFIRE_TOKEN_ETL_API = env.get("LOGFIRE_TOKEN_ETL_API")

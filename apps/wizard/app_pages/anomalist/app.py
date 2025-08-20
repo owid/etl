@@ -39,6 +39,7 @@ from apps.wizard.utils.components import (
     grapher_chart,
     st_horizontal,
     st_multiselect_wider,
+    st_title_with_expert,
     tag_in_md,
     url_persist,
 )
@@ -81,7 +82,7 @@ ANOMALY_TYPE_NAMES = {k: v["tag_name"] for k, v in ANOMALY_TYPES.items()}
 ANOMALY_TYPES_TO_DETECT = tuple(ANOMALY_TYPES.keys())
 
 # GPT
-MODEL_NAME = "gpt-4.1"
+MODEL_DEFAULT = "gpt-5"
 
 # Map sorting strategy to name to show in UI.
 SORTING_STRATEGIES = {
@@ -166,7 +167,7 @@ def llm_ask(df: pd.DataFrame):
         "AI Summary",
         on_click=lambda: llm_dialog(df),
         icon=":material/robot:",
-        help=f"Ask GPT {MODEL_NAME} to summarize the anomalies. This is experimental.",
+        help=f"Ask GPT {MODEL_DEFAULT} to summarize the anomalies. This is experimental.",
     )
 
 
@@ -276,24 +277,24 @@ def ask_llm_for_summary(df: pd.DataFrame):
     ]
 
     text_in = "\n".join([m["content"][0]["text"] for m in messages])
-    num_tokens = get_number_tokens(text_in, MODEL_NAME)
+    num_tokens = get_number_tokens(text_in, MODEL_DEFAULT)
 
     # Check if the number of tokens is within limits
     if num_tokens > 128_000:
         st.warning(
-            f"There are too many tokens in the GPT query to model {MODEL_NAME}. The query has {num_tokens} tokens, while the maximum allowed is 128,000. We will support this in the future. Raise this issue to re-prioritize it."
+            f"There are too many tokens in the GPT query to model {MODEL_DEFAULT}. The query has {num_tokens} tokens, while the maximum allowed is 128,000. We will support this in the future. Raise this issue to re-prioritize it."
         )
     else:
         # Ask GPT (stream)
         stream = client.chat.completions.create(
-            model=MODEL_NAME,
+            model=MODEL_DEFAULT,
             messages=messages,  # type: ignore
             max_tokens=3000,
             stream=True,
         )
         response = cast(str, st.write_stream(stream))
 
-        cost, num_tokens = get_cost_and_tokens(text_in, response, cast(str, MODEL_NAME))
+        cost, num_tokens = get_cost_and_tokens(text_in, response, cast(str, MODEL_DEFAULT))
         cost_msg = f"**Cost**: ≥{cost} USD.\n\n **Tokens**: ≥{num_tokens}."
         st.info(cost_msg)
 
@@ -585,8 +586,10 @@ create_tables()
 
 # 1/ PAGE TITLE
 # Show title
-st.title(":material/planner_review: Anomalist")
-
+st_title_with_expert(
+    "Anomalist",
+    icon=":material/planner_review:",
+)
 
 # 2/ DATASET FORM
 # Ask user to select datasets. By default, we select the new datasets (those that are new in the current PR compared to master).

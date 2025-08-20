@@ -1,0 +1,45 @@
+title:
+  title: Qualified and trained teachers
+  title_variant: by level of education and teacher qualification
+topic_tags:
+  - Global Education
+default_selection:
+  - Vietnam
+  - Niger
+  - Senegal
+  - Colombia
+
+dimensions:
+  - name: Teacher type
+    slug: teacher_type
+    choices:
+      - slug: qualified
+        name: Qualified teachers
+        description: Teachers who have the minimum academic background required to teach their subjects
+      - slug: trained
+        name: Trained teachers
+        description: Teachers who have received organized pedagogical training to learn how to teach
+      - slug: teacher_type_side_by_side
+        name: Qualified and trained teachers
+        description: Compare qualified and trained teachers across education levels
+
+  - name: Education level
+    slug: level
+    choices:
+      - slug: pre_primary
+        name: Pre-primary
+        description: Often provided through kindergarten or nursery for children ages around 3 to 5
+      - slug: primary
+        name: Primary
+        description: Marks the start of formal schooling, typically for children aged 5 to 7
+      - slug: lower_secondary
+        name: Lower secondary
+        description: For students generally aged 11 to 14
+      - slug: upper_secondary
+        name: Upper secondary
+        description: For students generally aged 15 to 18
+      - slug: level_side_by_side
+        name: All education levels
+        description: Compare teacher preparation rates from pre-primary through upper secondary education
+
+views: []

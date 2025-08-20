@@ -6,7 +6,7 @@ from structlog import get_logger
 
 from apps.wizard.app_pages.indicator_search import data
 from apps.wizard.utils import embeddings as emb
-from apps.wizard.utils.components import st_horizontal, st_multiselect_wider, url_persist
+from apps.wizard.utils.components import st_horizontal, st_multiselect_wider, st_title_with_expert, url_persist
 from etl.config import OWID_ENV
 
 # Initialize log.
@@ -140,7 +140,7 @@ model = get_and_fit_model(indicators)
 ########################################################################################################################
 
 # Streamlit app layout.
-st.title(":material/search: Indicator search")
+st_title_with_expert("Indicator search", icon=":material/search:")
 
 # Box for input text.
 input_string = url_persist(st.text_input)(
