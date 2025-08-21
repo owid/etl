@@ -63,7 +63,21 @@ async def test_fetch_indicator_data_tool():
         assert "data" in data
         assert isinstance(data["data"], list)
 
-        assert data["data"][0] == {"entity": "Vanuatu", "value": 5.39, "year": 1961}
+        # Check first entity has the new efficient format
+        first_entity = data["data"][0]
+        assert "entity" in first_entity
+        assert "years" in first_entity
+        assert "values" in first_entity
+        assert isinstance(first_entity["years"], list)
+        assert isinstance(first_entity["values"], list)
+        assert len(first_entity["years"]) == len(first_entity["values"])
+        
+        # Check that Vanuatu is present with 1961 data point having value 5.39
+        vanuatu_data = next((entity for entity in data["data"] if entity["entity"] == "Vanuatu"), None)
+        assert vanuatu_data is not None
+        assert 1961 in vanuatu_data["years"]
+        idx_1961 = vanuatu_data["years"].index(1961)
+        assert vanuatu_data["values"][idx_1961] == 5.39
 
 
 @pytest.mark.asyncio

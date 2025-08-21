@@ -361,6 +361,51 @@ def build_rows(data_json: Dict[str, Any], entities_meta: Dict[int, Dict[str, str
     return rows
 
 
+def build_efficient_rows(data_json: Dict[str, Any], entities_meta: Dict[int, Dict[str, str]]) -> List[Dict[str, Any]]:
+    """Convert the compact OWID arrays into an efficient grouped format.
+
+    Returns a list of entities, each with years and values arrays:
+    [
+        {
+            "entity": "Africa (FAO)",
+            "years": [1961, 1962, 1963],
+            "values": [4191055, 4718410, 4248436]
+        },
+        ...
+    ]
+    """
+    values = data_json["values"]
+    years = data_json["years"]
+    entity_ids = data_json["entities"]
+
+    # Guard against length mismatch
+    if not (len(values) == len(years) == len(entity_ids)):
+        raise ValueError("Mismatched lengths in OWID data arrays")
+
+    # Group data by entity
+    entity_data: Dict[str, Dict[str, list]] = {}
+
+    for v, y, eid in zip(values, years, entity_ids):
+        meta = entities_meta.get(eid)
+        if meta is None:
+            # Skip unknown entity id (should not normally happen)
+            continue
+
+        entity_name = meta["name"]
+        if entity_name not in entity_data:
+            entity_data[entity_name] = {"years": [], "values": []}
+
+        entity_data[entity_name]["years"].append(y)
+        entity_data[entity_name]["values"].append(smart_round(v))
+
+    # Convert to list format
+    result = []
+    for entity_name, data in entity_data.items():
+        result.append({"entity": entity_name, "years": data["years"], "values": data["values"]})
+
+    return result
+
+
 async def fetch_json(url: str) -> Dict[str, Any]:
     """Fetch JSON data from a URL."""
     async with httpx.AsyncClient(timeout=HTTP_TIMEOUT) as client:

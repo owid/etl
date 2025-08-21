@@ -8,7 +8,7 @@ from owid_mcp.config import (
     MAX_ROWS_DEFAULT,
     OWID_API_BASE,
 )
-from owid_mcp.data_utils import build_rows, fetch_json
+from owid_mcp.data_utils import build_efficient_rows, fetch_json
 from owid_mcp.data_utils import run_sql as _run_sql
 from owid_mcp.semantic_search import semantic_search_indicators
 
@@ -102,7 +102,11 @@ async def fetch_indicator_data(indicator_id: int, entity: str | None = None) -> 
         {
           "metadata": { <OWID metadata> },
           "data": [
-              {"entity": "United States", "year": 2019, "value": 36.0},
+              {
+                "entity": "Africa (FAO)",
+                "years": [1961, 1962, 1963, 1964, 1965],
+                "values": [4191055, 4718410, 4248436, 4495870, 4723099]
+              },
               ...
           ]
         }
@@ -117,7 +121,7 @@ async def fetch_indicator_data(indicator_id: int, entity: str | None = None) -> 
         ent["id"]: {"name": ent["name"], "code": ent["code"]} for ent in metadata["dimensions"]["entities"]["values"]
     }
 
-    rows = build_rows(data_json, entities_meta)
+    rows = build_efficient_rows(data_json, entities_meta)
 
     # Optional server-side filter for a single entity
     if entity is not None:
@@ -133,5 +137,9 @@ async def fetch_indicator_data(indicator_id: int, entity: str | None = None) -> 
                         filtered_rows.append(r)
                         break
         rows = filtered_rows
+
+    # Filter metadata
+    metadata.pop("dimensions", None)
+    metadata.pop("origins", None)
 
     return {"metadata": metadata, "data": rows}
