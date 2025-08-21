@@ -78,8 +78,16 @@ tables:
   food_prices_for_nutrition:
     title: Food prices for nutrition
     variables:
-      cost_of_an_energy_sufficient_diet:
-        title: Cost of an energy sufficient diet
+      cost_of_an_energy_sufficient_diet_in_local_currency_unit:
+        title: Cost of an energy sufficient diet in local currency unit
+        unit: local currency units per person per day
+        short_unit: LCU
+        description_short: |-
+          Cost of the least expensive starchy staple for energy balance for a representative person at 2,330 kcal/day, in local currency units.
+        description_key:
+          - *description_energy_sufficient_diet
+      cost_of_an_energy_sufficient_diet_in_ppp_dollars:
+        title: Cost of an energy sufficient diet in PPP dollars
         unit: international-$ in 2021 prices per person per day
         short_unit: $
         description_short: |-
@@ -114,17 +122,29 @@ tables:
           - *description_energy_sufficient_diet
           - *description_key_poverty_lines
       people_who_cannot_afford_sufficient_calories:
-        title: Number of people who cannot afford sufficient calories
-        unit: people
+        title: Number of people who cannot afford sufficient calories (millions)
+        unit: millions of people
         short_unit: ""
         description_short: |-
-          Total number of people who cannot afford an energy-sufficient diet.
+          Total number of people who cannot afford an energy-sufficient diet, in millions.
         description_key:
           - *description_energy_sufficient_diet
           - This indicator is calculated as the percentage of a country's population that is unable to afford an energy sufficient diet, multiplied by the country's population.
           - *description_key_number_of_population
-      cost_of_a_healthy_diet:
-        title: Cost of a healthy diet
+      cost_of_a_healthy_diet_in_local_currency_unit:
+        title: Cost of a healthy diet in local currency unit
+        unit: local currency units per person per day
+        short_unit: LCU
+        processing_level: major
+        description_processing: |-
+          - Costs have been adjusted for inflation by multiplying the cost for a given year by CPI(BASE_YEAR) / CPI(year), where CPI is the United States' Consumer Price Index and the base year is 2021.
+        description_short: |-
+          Cost of purchasing the least expensive locally available foods to meet requirements for energy and food-based dietary guidelines, for a representative person within energy balance at 2,330 kcal/day, in local currency units.
+        description_key:
+          - *description_healthy_diet
+        description_from_producer: *description_from_producer_healthy_diet
+      cost_of_a_healthy_diet_in_ppp_dollars:
+        title: Cost of a healthy diet in PPP dollars
         unit: international-$ in 2021 prices per person per day
         short_unit: $
         processing_level: major
@@ -144,8 +164,16 @@ tables:
           Ratio between the cost of a healthy diet that meets requirements for energy and food-based dietary guidelines and the cost of caloric adequacy that uses only starchy staples to meet energy requirements.
         description_key:
           - *description_healthy_diet
-      cost_of_animal_source_foods:
-        title: Cost of animal-source foods
+      cost_of_animal_source_foods_in_local_currency_unit:
+        title: Cost of animal-source foods in local currency unit
+        unit: local currency units per person per day
+        short_unit: LCU
+        description_short: |-
+          Cost of purchasing the least expensive locally available animal-source foods to meet daily intake levels recommended in food-based dietary guidelines. Animal-source foods are one of the six food groups within the Healthy Diet Basket, in local currency units.
+        description_key:
+          - *description_healthy_diet
+      cost_of_animal_source_foods_in_ppp_dollars:
+        title: Cost of animal-source foods in PPP dollars
         unit: international-$ in 2021 prices per person per day
         short_unit: $
         description_short: |-
@@ -169,8 +197,16 @@ tables:
           Cost of the least expensive animal-source foods as a multiple of the least expensive starchy staples to meet daily recommendations in food-based dietary guidelines.
         description_key:
           - *description_healthy_diet
-      cost_of_fruits:
-        title: Cost of fruits
+      cost_of_fruits_in_local_currency_unit:
+        title: Cost of fruits in local currency unit
+        unit: local currency units per person per day
+        short_unit: LCU
+        description_short: |-
+          Cost of purchasing the least expensive locally available fruits to meet daily intake levels recommended in food-based dietary guidelines. Fruits are one of the six food groups within the Healthy Diet Basket, in local currency units.
+        description_key:
+          - *description_healthy_diet
+      cost_of_fruits_in_ppp_dollars:
+        title: Cost of fruits in PPP dollars
         unit: international-$ in 2021 prices per person per day
         short_unit: $
         description_short: |-
@@ -211,8 +247,16 @@ tables:
         description_key:
           - *description_healthy_diet
           - *description_key_pct_of_population
-      cost_of_legumes__nuts_and_seeds:
-        title: Cost of legumes, nuts and seeds
+      cost_of_legumes__nuts_and_seeds_in_local_currency_unit:
+        title: Cost of legumes, nuts and seeds in local currency unit
+        unit: local currency units per person per day
+        short_unit: LCU
+        description_short: |-
+          Cost of purchasing the least expensive locally available legumes, nuts and seeds to meet daily intake levels recommended in food-based dietary guidelines. Legumes, nuts and seeds are one of the six food groups within the Healthy Diet Basket, in local currency units.
+        description_key:
+          - *description_healthy_diet
+      cost_of_legumes__nuts_and_seeds_in_ppp_dollars:
+        title: Cost of legumes, nuts and seeds in PPP dollars
         unit: international-$ in 2021 prices per person per day
         short_unit: $
         description_short: |-
@@ -236,8 +280,16 @@ tables:
           Cost of the least expensive legumes, nuts and seeds as a multiple of the least expensive starchy staples to meet daily recommendations in food-based dietary guidelines.
         description_key:
           - *description_healthy_diet
-      cost_of_oils_and_fats:
-        title: Cost of oils and fats
+      cost_of_fats_and_oils_in_local_currency_unit:
+        title: Cost of fats and oils in local currency unit
+        unit: local currency units per person per day
+        short_unit: LCU
+        description_short: |-
+          Cost of purchasing the least expensive locally available fats or oils to meet daily intake levels recommended in food-based dietary guidelines. Fats and oils are one of the six food groups within the Healthy Diet Basket, in local currency units.
+        description_key:
+          - *description_healthy_diet
+      cost_of_fats_and_oils_in_ppp_dollars:
+        title: Cost of fats and oils in PPP dollars
         unit: international-$ in 2021 prices per person per day
         short_unit: $
         description_short: |-
@@ -270,8 +322,16 @@ tables:
         description_key:
           - *description_healthy_diet
           - *description_key_poverty_lines
-      cost_of_starchy_staples:
-        title: Cost of starchy staples
+      cost_of_starchy_staples_in_local_currency_unit:
+        title: Cost of starchy staples in local currency unit
+        unit: local currency units per person per day
+        short_unit: LCU
+        description_short: |-
+          Cost of purchasing the least expensive locally available starchy staples to meet daily intake levels recommended in food-based dietary guidelines. Starchy staples are one of the six food groups within the Healthy Diet Basket, in local currency units.
+        description_key:
+          - *description_healthy_diet
+      cost_of_starchy_staples_in_ppp_dollars:
+        title: Cost of starchy staples in PPP dollars
         unit: international-$ in 2021 prices per person per day
         short_unit: $
         description_short: |-
@@ -288,17 +348,25 @@ tables:
         description_key:
           - *description_healthy_diet
       people_who_cannot_afford_a_healthy_diet:
-        title: Number of people who cannot afford a healthy diet
-        unit: people
+        title: Number of people who cannot afford a healthy diet (millions)
+        unit: millions of people
         short_unit: ""
         description_short: |-
-          Total number of people who cannot afford a healthy diet in a given country and year.
+          Total number of people who cannot afford a healthy diet in a given country and year, in millions.
         description_key:
           - *description_healthy_diet
           - This indicator is calculated as the percentage of a country's population that is unable to afford a healthy diet, multiplied by the country's population.
           - *description_key_number_of_population
-      cost_of_vegetables:
-        title: Cost of vegetables
+      cost_of_vegetables_in_local_currency_unit:
+        title: Cost of vegetables in local currency unit
+        unit: local currency units per person per day
+        short_unit: LCU
+        description_short: |-
+          Cost of purchasing the least expensive locally available vegetables to meet daily intake levels recommended in food-based dietary guidelines. Vegetables are one of the six food groups within the Healthy Diet Basket, in local currency units.
+        description_key:
+          - *description_healthy_diet
+      cost_of_vegetables_in_ppp_dollars:
+        title: Cost of vegetables in PPP dollars
         unit: international-$ in 2021 prices per person per day
         short_unit: $
         description_short: |-
@@ -322,8 +390,16 @@ tables:
           Cost of the least expensive vegetables as a multiple of the least expensive starchy staples to meet daily recommendations in food-based dietary guidelines.
         description_key:
           - *description_healthy_diet
-      cost_of_a_nutrient_adequate_diet:
-        title: Cost of a nutrient adequate diet
+      cost_of_a_nutrient_adequate_diet_in_local_currency_unit:
+        title: Cost of a nutrient adequate diet in local currency unit
+        unit: local currency units per person per day
+        short_unit: LCU
+        description_short: |-
+          Cost of the least expensive locally-available foods for nutrient adequacy for a representative person within upper and lower bounds for 23 essential macro- and micronutrients plus energy balance at 2,330 kcal/day, in local currency units.
+        description_key:
+          - *description_nutrient_adequate_diet
+      cost_of_a_nutrient_adequate_diet_in_ppp_dollars:
+        title: Cost of a nutrient adequate diet in PPP dollars
         unit: international-$ in 2021 prices per person per day
         short_unit: $
         description_short: |-
@@ -358,11 +434,11 @@ tables:
           - *description_nutrient_adequate_diet
           - *description_key_poverty_lines
       people_who_cannot_afford_nutrient_adequacy:
-        title: Number of people who cannot afford nutrient adequacy
-        unit: people
+        title: Number of people who cannot afford nutrient adequacy (millions)
+        unit: millions of people
         short_unit: ""
         description_short: |-
-          Total number of people who cannot afford a nutrient adequate diet.
+          Total number of people who cannot afford a nutrient adequate diet, in millions.
         description_key:
           - *description_nutrient_adequate_diet
           - This indicator is calculated as the percentage of a country's population that is unable to afford a nutrient-adequate diet, multiplied by the country's population.
