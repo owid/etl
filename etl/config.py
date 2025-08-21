@@ -227,7 +227,10 @@ FASTTRACK_COMMIT = env.get("FASTTRACK_COMMIT") in ("True", "true", "1")
 # if True, commit to monkeypox repository from export step
 MONKEYPOX_COMMIT = env.get("MONKEYPOX_COMMIT") in ("True", "true", "1")
 
-ADMIN_HOST = env.get("ADMIN_HOST", f"http://staging-site-{STAGING}" if STAGING else "http://localhost:3030")
+ADMIN_HOST = env.get(
+    "ADMIN_HOST",
+    f"http://staging-site-{STAGING}" if STAGING else "http://localhost:3030",
+)
 
 # Tailscale address of Admin, this cannot be just `http://owid-admin-prod`
 # because that would resolve to LXC container instead of the actual server
@@ -236,6 +239,8 @@ TAILSCALE_ADMIN_HOST = "http://owid-admin-prod.tail6e23.ts.net"
 SENTRY_DSN = env.get("SENTRY_DSN")
 
 OPENAI_API_KEY = env.get("OPENAI_API_KEY", None)
+ANTHROPIC_API_KEY = env.get("ANTHROPIC_API_KEY", None)
+GOOGLE_API_KEY = env.get("GOOGLE_API_KEY", None)
 
 OWIDBOT_ACCESS_TOKEN = env.get("OWIDBOT_ACCESS_TOKEN", None)
 
@@ -617,7 +622,13 @@ def no_trailing_slash(url: str | None) -> None:
         raise ValueError(f"Env {url} should not have a trailing slash.")
 
 
-env_vars = [ADMIN_HOST, TAILSCALE_ADMIN_HOST, DATA_API_URL, BAKED_VARIABLES_PATH, R2_SNAPSHOTS_PUBLIC_READ]
+env_vars = [
+    ADMIN_HOST,
+    TAILSCALE_ADMIN_HOST,
+    DATA_API_URL,
+    BAKED_VARIABLES_PATH,
+    R2_SNAPSHOTS_PUBLIC_READ,
+]
 for env_var in env_vars:
     no_trailing_slash(env_var)
 

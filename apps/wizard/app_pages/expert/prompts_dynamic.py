@@ -18,7 +18,7 @@ load_env()
 
 ######### SYSTEM PROMPTS #########
 # Analytics
-@st.cache_data(ttl=60 * 5, show_spinner="Loading analytics documentation...", show_time=True)
+@st.cache_data(ttl=60 * 10, show_spinner="Loading analytics documentation...", show_time=True)
 def cached_docs():
     """Cache the analytics documentation (5 minutes)."""
     from apps.wizard.app_pages.expert.read_analytics import get_analytics_db_docs_as_text

@@ -11,7 +11,7 @@ MULTIDIM_CONFIG = {
     "tab": "map",
     "originUrl": "ourworldindata.org/education",
     "hideAnnotationFieldsInTitle": {"time": True},
-    "addCountryMode": "change-country",
+    "addCountryMode": "add-country",
     "yAxis": {"min": 0, "max": 100},
 }
 
@@ -103,10 +103,11 @@ def run() -> None:
                     "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.005.json",
                     "originUrl": "ourworldindata.org/education",
                     "hideAnnotationFieldsInTitle": {"time": True},
-                    "addCountryMode": "change-country",
+                    "addCountryMode": "add-country",
                     "hasMapTab": False,
                     "tab": "chart",
                     "selectedFacetStrategy": "entity",
+                    "hideFacetControl": False,
                     "yAxis": {"min": 0, "max": 100},
                 },
             },
@@ -117,10 +118,11 @@ def run() -> None:
                     "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.005.json",
                     "originUrl": "ourworldindata.org/education",
                     "hideAnnotationFieldsInTitle": {"time": True},
-                    "addCountryMode": "change-country",
+                    "addCountryMode": "add-country",
                     "hasMapTab": False,
                     "tab": "chart",
                     "selectedFacetStrategy": "entity",
+                    "hideFacetControl": False,
                     "yAxis": {"min": 0, "max": 100},
                 },
             },
@@ -143,12 +145,23 @@ def run() -> None:
         # Generate dynamic subtitle
         if level and enrolment_type:
             view.config["subtitle"] = generate_subtitle_by_level(level, sex, enrolment_type)
+
+        # Add footnote for gross enrolment ratio
+        if enrolment_type == "gross_enrolment":
+            view.config["note"] = (
+                "Values may exceed 100% when children who are older or younger than the official age group also enroll."
+            )
+
+        # Set view metadata for all views
+        view.metadata = {
+            "description_short": view.config["subtitle"],
+        }
+
         if sex == "sex_side_by_side" or level == "level_side_by_side":
             view.metadata = {
                 "presentation": {
                     "title_public": view.config["title"],
-                },
-                "description_short": view.config["subtitle"],
+                }
             }
 
         edit_indicator_displays(view)
@@ -253,8 +266,22 @@ LEVEL_MAPPINGS = {
 }
 
 ENROLMENT_TYPE_MAP = {
-    "net_enrolment": "This is shown as the [net enrolment ratio](#dod:net-enrolment-ratio)",
-    "gross_enrolment": "This is shown as the [gross enrolment ratio](#dod:gross-enrolment-ratio)",
+    "net_enrolment": {
+        "both": "This is shown as the [net enrolment ratio](#dod:net-enrolment-ratio) — the percentage of children of official {level} school age who are enrolled in {level} education.",
+        "boys": "This is shown as the [net enrolment ratio](#dod:net-enrolment-ratio) for boys — the percentage of boys of official {level} school age who are enrolled in {level} education.",
+        "girls": "This is shown as the [net enrolment ratio](#dod:net-enrolment-ratio) for girls — the percentage of girls of official {level} school age who are enrolled in {level} education.",
+        "tertiary_both": "This is shown as the [net enrolment ratio](#dod:net-enrolment-ratio) — the percentage of people of official {level} age who are enrolled in {level} education.",
+        "tertiary_men": "This is shown as the [net enrolment ratio](#dod:net-enrolment-ratio) for men — the percentage of men of official {level} age who are enrolled in {level} education.",
+        "tertiary_women": "This is shown as the [net enrolment ratio](#dod:net-enrolment-ratio) for women — the percentage of women of official {level} age who are enrolled in {level} education.",
+    },
+    "gross_enrolment": {
+        "both": "This is shown as the [gross enrolment ratio](#dod:gross-enrolment-ratio) — the number of children of any age group who are enrolled in {level} education, expressed as a percentage of the total population of the official {level} school age.",
+        "boys": "This is shown as the [gross enrolment ratio](#dod:gross-enrolment-ratio) for boys — the number of boys of any age group who are enrolled in {level} education, expressed as a percentage of the total population of boys of official {level} school age.",
+        "girls": "This is shown as the [gross enrolment ratio](#dod:gross-enrolment-ratio) for girls — the number of girls of any age group who are enrolled in {level} education, expressed as a percentage of the total population of girls of official {level} school age.",
+        "tertiary_both": "This is shown as the [gross enrolment ratio](#dod:gross-enrolment-ratio) — the number of people of any age group who are enrolled in {level} education, expressed as a percentage of the total population of the official {level} age.",
+        "tertiary_men": "This is shown as the [gross enrolment ratio](#dod:gross-enrolment-ratio) for men — the number of men of any age group who are enrolled in {level} education, expressed as a percentage of the total population of men of official {level} age.",
+        "tertiary_women": "This is shown as the [gross enrolment ratio](#dod:gross-enrolment-ratio) for women — the number of women of any age group who are enrolled in {level} education, expressed as a percentage of the total population of women of official {level} age.",
+    },
 }
 
 
@@ -282,18 +309,37 @@ def generate_title_by_gender_and_level(sex, level):
 def generate_subtitle_by_level(level, sex, enrolment_type):
     """Generate subtitle based on education level, gender, and enrollment type with links."""
     level_term = LEVEL_MAPPINGS["subtitle"].get(level, "")
-    gender_term = _get_gender_term(sex, level, "subtitle")
-    enrolment_description = ENROLMENT_TYPE_MAP.get(enrolment_type, "")
 
     if not level_term:
         raise ValueError(f"Unknown education level: {level}")
-    if not enrolment_description:
+
+    # Get the appropriate description key based on level and gender
+    if level == "tertiary":
+        if sex == "boys":
+            gender_key = "tertiary_men"
+        elif sex == "girls":
+            gender_key = "tertiary_women"
+        else:
+            gender_key = "tertiary_both"
+    else:
+        if sex == "boys":
+            gender_key = "boys"
+        elif sex == "girls":
+            gender_key = "girls"
+        else:
+            gender_key = "both"
+
+    # Get the appropriate description template
+    if enrolment_type not in ENROLMENT_TYPE_MAP:
         raise ValueError(f"Unknown enrolment type: {enrolment_type}")
 
-    if level_term and gender_term:
-        return f"{enrolment_description} for {gender_term} in {level_term} education."
-    elif level_term:
-        return f"{enrolment_description} for {level_term} education."
+    if gender_key not in ENROLMENT_TYPE_MAP[enrolment_type]:
+        raise ValueError(f"Unknown gender key: {gender_key}")
+
+    description_template = ENROLMENT_TYPE_MAP[enrolment_type][gender_key]
+
+    # Format the template with the level term
+    return description_template.format(level=level_term)
 
 
 def edit_indicator_displays(view):

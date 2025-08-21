@@ -31,6 +31,11 @@
    git push origin [branch-name]
    ```
 
+4. **Update PR description**
+   - Get the PR number and last commit hash from the initial update
+   - Add a link to show changes made after the initial update `https://github.com/owid/etl/pull/[pr_number]/files/[last_commit]..HEAD`
+
+
 ## Phase 2: Fix Issues (REQUIRED - Execute automatically)
 
 ### Phase 2A: Snapshot and Initial Processing

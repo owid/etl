@@ -20,31 +20,17 @@ MAX_COLS_PER_ROW = 3
 
 def st_show_home():
     # Page config
-    cols = st.columns([10, 3], vertical_alignment="center")
-    with cols[0]:
+    container = st.container(border=False, horizontal=True, vertical_alignment="bottom")
+    with container:
         st.title("Wizard 🪄")
-    with cols[1]:
-        st.caption(f"streamlit {st.__version__}")
-
-    # Relevant links
-    with st.container(border=False):
-        cols = st.columns(2, vertical_alignment="center")
-        with cols[0]:
-            st_wizard_page_link(
-                "expert",
-                label="Questions about ETL or Grapher? Ask the expert!",
-                help="Ask the expert any documentation question!",
-                width="stretch",
-                border=True,
-            )
-        with cols[1]:
-            st_wizard_page_link(
-                "analytics",
-                label="OWID Analytics",
-                help="Learn more with the OWID Analytics dashboard. It redirects you to another internal site.",
-                width="stretch",
-                border=True,
-            )
+        st_wizard_page_link(
+            "expert",
+            label=":rainbow[**Ask the Expert**]",
+            help="Ask the expert any documentation question!",
+            width="content",
+            border=False,
+        )
+        st.caption(f"streamlit {st.__version__}", width="content")
 
     # Generic tools
     ## Default styling for the cards (Wizard apps are presented as cards)
@@ -172,7 +158,7 @@ def st_show_home():
     #########################
     # Legacy
     #########################
-    st.divider()
+    # st.divider()
 
     if "legacy" in WIZARD_CONFIG:
         section_legacy = WIZARD_CONFIG["legacy"]

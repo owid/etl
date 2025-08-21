@@ -1,4 +1,9 @@
-"""Script to create a snapshot of dataset."""
+"""Script to create a snapshot of dataset.
+
+Go to this url: https://gfinderdata.impactglobalhealth.org/pages/data-visualisations/allNeglectedDiseases
+
+Click on the download button to download the data as an Excel file.
+"""
 
 from pathlib import Path
 
