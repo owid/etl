@@ -1,0 +1,30 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Human Capital Index - Harmonized Test Scores
+    description: |-
+      This indicator reflects student achievement levels across major international testing programs, standardized for comparability. Harmonized test scores are measured in TIMSS-equivalent units, where a score of 300 represents minimal attainment, and 625 indicates advanced attainment. Test scores are included from the following programs: TIMSS/PIRLS, PISA, PISA+TIMSS/PIRLS, SACMEQ, PASEC, LLECE, PILNA, EGRA, and EGRANR. The methodology is detailed in Patrinos and Angrist (2018), Global Dataset on Education Quality: A Review and Update (2000-2017). Name in source: Harmonized Test Scores.
+    date_published: "2024"
+
+    # Citation
+    producer: World Bank
+    citation_full: |-
+      World Bank. Human Capital Project (HCP). Human Capital Index - Harmonized Test Scores. https://www.worldbank.org/en/publication/human-capital
+
+    # Files
+    url_main: https://www.worldbank.org/en/publication/human-capital
+    url_download: https://data360files.worldbank.org/data360-data/data/WB_HCP/WB_HCP_TEST_WIDEF.csv
+
+    date_accessed: '2025-08-20'
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://creativecommons.org/licenses/by/4.0/
+
+outs:
+  - md5: 3c52fe301295a8d460882d7dc64598aa
+    size: 103758
+    path: harmonized_scores.csv
