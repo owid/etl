@@ -26,7 +26,7 @@ def test_DatasetDiff_summary(tmp_path):
     tab_a.metadata.description = "tab"
 
     tab_b = Table(pd.DataFrame({"a": [1, 3], "b": ["a", "b"]}).set_index("a"), short_name="tab")
-    tab_b["a"].metadata.description = "col a"
+    tab_b.index.name = "a"
 
     ds_a.add(tab_a)
     ds_b.add(tab_b)
@@ -38,8 +38,8 @@ def test_DatasetDiff_summary(tmp_path):
     assert out == [
         "[white]= Dataset [b]garden/n/v/ds[/b]",
         "\t[yellow]~ Table [b]tab[/b] (changed [u]metadata[/u])",
-        "\t\t[yellow]~ Column [b]a[/b] (changed [u]metadata[/u], changed [u]data[/u])",
-        "\t\t[green]+ Column [b]b[/b]",
+        "\t\t[yellow]~ Dim [b]a[/b]",
+        "\t\t[yellow]~ Column [b]b[/b] (new [u]data[/u], changed [u]data[/u])",
     ]
 
 
