@@ -109,6 +109,8 @@ def run() -> None:
 
     # Downstream
     # tb_regions = process_un_definitions(tb_regions)
+    mask = tb_regions["un_m49_3_region"].isna()
+    tb_regions.loc[mask, "un_m49_3_region"] = "nan"
     # tb_regions.loc[:, "un_m49_2_region"] = tb_regions.loc[:, "un_m49_2_region"].fillna(tb_regions["un_m49_1_region"])
     # tb_regions["un_m49_3_region"] = tb_regions["un_m49_3_region"].fillna(tb_regions["un_m49_2_region"])
     # tb_regions.loc[:, "un_m49_3_region"] = "lal"
@@ -137,7 +139,7 @@ def _add_metadata(tb: Table, institution: str) -> Table:
     return tb
 
 
-def process_un_definitions(tb: Table | pd.DataFrame) -> Table:
+def process_un_definitions(tb) -> Table:
     """UN provides various definitions of regions, which we need to process.
 
     - Level 1: High-level, broad regions. E.g. "Americas"
@@ -149,10 +151,8 @@ def process_un_definitions(tb: Table | pd.DataFrame) -> Table:
     Solution: Propagate definitions downstream when missing.
     """
     # Propagate definitions downstream.
-    tb.loc[:, "un_m49_2_region"] = (
-        tb.loc[:, "un_m49_2_region"].fillna(tb["un_m49_1_region"]).copy_metdata(tb.loc[:, "un_m49_2_region"])
-    )
-    tb.loc[:, "un_m49_3_region"] = (
-        tb.loc[:, "un_m49_3_region"].fillna(tb["un_m49_2_region"]).copy_metdata(tb.loc[:, "un_m49_3_region"])
-    )
+    mask = tb["un_m49_2_region"].isna()
+    tb.loc[mask, "un_m49_2_region"] = tb.loc[:, "un_m49_1_region"]
+    mask = tb["un_m49_3_region"].isna()
+    tb.loc[mask, "un_m49_3_region"] = "nan"
     return cast(Table, tb)
