@@ -2,19 +2,19 @@
 
 ## Phase 1: Initial Update and PR (REQUIRED - Execute automatically)
 
-1. **Create draft PR** using `etl pr` command with a short branch name (max 28 chars for database compatibility). 
-   
+1. **Create draft PR** using `etl pr` command with a short branch name (max 28 chars for database compatibility).
+
    **⚠️ CRITICAL: Check current branch first!** If we're not on **master** branch, MUST add `--base-branch [current-branch]` flag:
    ```bash
    # First check current branch
    git branch --show-current
-   
+
    # If on master branch:
    etl pr "Update [Dataset Name] dataset" data --work-branch data-[org]-[dataset]
-   
+
    # If NOT on master branch (MOST COMMON):
    etl pr "Update [Dataset Name] dataset" data --work-branch data-[org]-[dataset] --base-branch [current-branch]
-   
+
    # Example: etl pr "Update World Bank food prices dataset" data --work-branch data-wb-foodprices --base-branch data-irena-costs
    # Keep branch name under 28 characters to avoid database hostname issues
    ```
@@ -352,3 +352,27 @@ The CLI tool will:
 2. Find all affected charts
 3. Update chart configurations with new indicator IDs
 4. Show progress and results
+
+### Verifying Upgrade Results
+
+After completing the indicator upgrade, verify that all charts have been successfully migrated:
+
+#### Step 1: Check for charts still using old indicators
+
+```sql
+mysql -h staging-site-[branch] -u owid --port 3306 -D owid -e "
+SELECT DISTINCT c.id
+FROM charts c
+INNER JOIN chart_dimensions cd ON c.id = cd.chartId
+INNER JOIN variables v ON cd.variableId = v.id
+WHERE v.datasetId = [OLD_DATASET_ID]
+ORDER BY c.id;
+"
+```
+
+This should return **no results** if the upgrade was successful.
+
+#### Expected Results:
+- **Step 1**: 0 charts using old indicators (successful migration)
+
+If Step 1 shows any charts, the upgrade was incomplete and needs investigation.
