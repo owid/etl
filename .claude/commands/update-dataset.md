@@ -2,7 +2,7 @@
 
 ## Phase 1: Initial Update and PR (REQUIRED - Execute automatically)
 
-1. **Create draft PR** using `etl pr` command with a short branch name (max 28 chars for database compatibility)
+1. **Create draft PR** using `etl pr` command with a short branch name (max 28 chars for database compatibility). If we're not on **master** branch, add flag `--base-branch [current-branch]` to the command
    ```bash
    etl pr "Update [Dataset Name] dataset" data --work-branch data-[org]-[dataset]
    # Example: etl pr "Update World Bank food prices dataset" data --work-branch data-wb-foodprices
