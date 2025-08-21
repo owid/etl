@@ -236,6 +236,19 @@ Note: The `etl pr` creates a new branch but does NOT automatically commit files 
 - Only catch specific exceptions when you can meaningfully handle them
 - Avoid `except Exception` - it masks real problems
 
+### Never Mask Underlying Issues
+- **NEVER** return empty tables or default values to "fix" data parsing failures
+- **NEVER** silently skip errors or missing data without clear explanation
+- **NEVER** comment out code to temporarily bypass problems - fix the underlying issue instead
+- **BAD**: `return Table(pd.DataFrame({'col': []}))` - hides the real problem
+- **BAD**: `try: parse_data() except: return empty_table` - masks what's broken
+- **BAD**: `# return extract_data()  # Commented out due to format change` - commenting out code to avoid errors
+- **GOOD**: Let the error happen and provide clear diagnostic information
+- **GOOD**: `raise ValueError("Sheet 'Fig 3.2' format changed - skiprows needs updating from 7 to X")`
+- **GOOD**: Update the code to handle the new data format correctly
+- **If you don't know what to do - ASK THE USER instead of masking the issue**
+- Silent failures make debugging exponentially harder and create technical debt
+
 ## Debugging ETL Data Quality Issues
 
 When ETL steps fail due to data quality issues (NaT values, missing data, missing indicators), always trace the problem upstream through the pipeline stages rather than patching symptoms downstream:
@@ -315,4 +328,4 @@ SELECT id, name FROM variables WHERE datasetId = 12345;
 - VS Code extensions available: `make install-vscode-extensions`
 - **ALWAYS run `make check` before committing** - formats code, fixes linting issues, and runs type checks
 - SQL queries enclose in triple quotes for readability
-- When running etlr, always use PREFER_DOWNLOAD=1 prefix
+- When running **etlr**, always use PREFER_DOWNLOAD=1 prefix (don't use it for **etls** command)
