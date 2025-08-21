@@ -8,6 +8,7 @@ https://ourworldindata.org/world-region-map-definitions
 import json
 from typing import cast
 
+import pandas as pd
 from owid.catalog import Origin, Table
 from structlog import get_logger
 
@@ -104,7 +105,12 @@ def run() -> None:
     )
 
     # Add a year column
-    tb_regions["year"] = CURRENT_YEAR
+    tb_regions.loc[:, "year"] = CURRENT_YEAR
+
+    # Downstream
+    # tb_regions = process_un_definitions(tb_regions)
+    # tb_regions.loc[:, "un_m49_2_region"] = tb_regions.loc[:, "un_m49_2_region"].fillna(tb_regions["un_m49_1_region"])
+    tb_regions.loc[:, "un_m49_3_region"] = tb_regions.loc[:, "un_m49_3_region"].fillna("la")
 
     # Update the table's metadata
     # NOTE: It would be better to do this in garden.
@@ -129,7 +135,7 @@ def _add_metadata(tb: Table, institution: str) -> Table:
     return tb
 
 
-def process_un_definitions(tb: Table) -> Table:
+def process_un_definitions(tb: Table | pd.DataFrame) -> Table:
     """UN provides various definitions of regions, which we need to process.
 
     - Level 1: High-level, broad regions. E.g. "Americas"
@@ -141,6 +147,6 @@ def process_un_definitions(tb: Table) -> Table:
     Solution: Propagate definitions downstream when missing.
     """
     # Propagate definitions downstream.
-    tb["un_m49_2_region"] = tb["un_m49_2_region"].fillna(tb["un_m49_1_region"])
-    tb["un_m49_3_region"] = tb["un_m49_3_region"].fillna(tb["un_m49_2_region"])
-    return tb
+    tb.loc[:, "un_m49_2_region"] = tb.loc[:, "un_m49_2_region"].fillna(tb["un_m49_1_region"])
+    tb.loc[:, "un_m49_3_region"] = tb.loc[:, "un_m49_3_region"].fillna(tb["un_m49_2_region"])
+    return cast(Table, tb)
