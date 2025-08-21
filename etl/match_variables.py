@@ -87,6 +87,21 @@ log = get_logger()
         " variable at most [--max-suggestions] suggestions will be listed."
     ),
 )
+@click.option(
+    "--no-interactive",
+    is_flag=True,
+    default=False,
+    help=(
+        "Skip interactive prompts and automatically map variables based on similarity threshold."
+        " Best matches above the threshold will be selected automatically."
+    ),
+)
+@click.option(
+    "--auto-threshold",
+    type=float,
+    default=80.0,
+    help="Similarity threshold (0-100) for automatic mapping when --no-interactive is used. Default: 80.0",
+)
 def main_cli(
     old_dataset_name: str,
     new_dataset_name: str,
@@ -94,6 +109,8 @@ def main_cli(
     add_identical_pairs: bool,
     similarity_name: str,
     max_suggestions: int,
+    no_interactive: bool,
+    auto_threshold: float,
 ) -> None:
     """Match variable IDs from an old dataset to a new dataset's.
 
@@ -109,6 +126,8 @@ def main_cli(
         similarity_name=similarity_name,
         output_file=output_file,
         max_suggestions=int(max_suggestions),
+        no_interactive=no_interactive,
+        auto_threshold=auto_threshold,
     )
 
 
@@ -119,6 +138,8 @@ def main(
     match_identical: bool = MATCH_IDENTICAL,
     similarity_name: str = SIMILARITY_NAME,
     max_suggestions: int = N_MAX_SUGGESTIONS,
+    no_interactive: bool = False,
+    auto_threshold: float = 80.0,
 ) -> None:
     if os.path.isdir(output_file):
         raise ValueError(f"`output_file` ({output_file}) should point to a JSON file ('*.json') and not a directory!")
@@ -135,14 +156,23 @@ def main(
         # Get all variables from new dataset.
         new_indicators = get_variables_in_dataset(db_conn=db_conn, dataset_id=new_dataset_id, only_used_in_charts=False)
 
-    # Manually map old variable names to new variable names.
-    mapping = map_old_and_new_indicators(
-        old_indicators=old_indicators,
-        new_indicators=new_indicators,
-        match_identical=match_identical,
-        similarity_name=similarity_name,
-        max_suggestions=max_suggestions,
-    )
+    # Map old variable names to new variable names.
+    if no_interactive:
+        mapping = map_old_and_new_indicators_auto(
+            old_indicators=old_indicators,
+            new_indicators=new_indicators,
+            match_identical=match_identical,
+            similarity_name=similarity_name,
+            auto_threshold=auto_threshold,
+        )
+    else:
+        mapping = map_old_and_new_indicators(
+            old_indicators=old_indicators,
+            new_indicators=new_indicators,
+            match_identical=match_identical,
+            similarity_name=similarity_name,
+            max_suggestions=max_suggestions,
+        )
 
     # Display summary.
     display_summary(old_indicators=old_indicators, new_indicators=new_indicators, mapping=mapping)
@@ -187,6 +217,81 @@ def map_old_and_new_indicators(
     return mapping
 
 
+def map_old_and_new_indicators_auto(
+    old_indicators: pd.DataFrame,
+    new_indicators: pd.DataFrame,
+    match_identical: bool = True,
+    similarity_name: str = "partial_ratio",
+    auto_threshold: float = 80.0,
+) -> pd.DataFrame:
+    """Map old variables to new variables automatically based on similarity threshold.
+
+    Parameters
+    ----------
+    old_indicators : pd.DataFrame
+        Table of old variable names (column 'name') and ids (column 'id').
+    new_indicators : pd.DataFrame
+        Table of new variable names (column 'name') and ids (column 'id').
+    match_identical : bool
+        True to automatically match variables that have identical names in both datasets.
+    similarity_name: str
+        Similarity function name. Must be in `SIMILARITY_NAMES`.
+    auto_threshold: float
+        Minimum similarity score (0-100) to automatically create a mapping.
+
+    Returns
+    -------
+    mapping : pd.DataFrame
+        Mapping table from old variable name and id to new variable name and id.
+    """
+    # Get initial mapping (identical matches)
+    mapping, missing_old, missing_new = preliminary_mapping(old_indicators, new_indicators, match_identical)
+
+    # Get suggestions for mapping
+    suggestions = find_mapping_suggestions(missing_old, missing_new, similarity_name)
+
+    # Automatically map based on threshold
+    mappings = [mapping]
+    used_new_ids = set(mapping["id_new"].tolist())
+
+    for suggestion in suggestions:
+        name_old = suggestion["old"]["name_old"]
+        id_old = suggestion["old"]["id_old"]
+        candidates = suggestion["new"]
+
+        # Filter out already used new indicators
+        candidates = candidates[~candidates["id_new"].isin(used_new_ids)]
+
+        if len(candidates) > 0:
+            best_match = candidates.iloc[0]  # Already sorted by similarity
+            similarity_score = best_match["similarity"]
+
+            if similarity_score >= auto_threshold:
+                # Add this mapping
+                new_mapping = pd.DataFrame(
+                    {
+                        "id_old": [id_old],
+                        "name_old": [name_old],
+                        "id_new": [best_match["id_new"]],
+                        "name_new": [best_match["name_new"]],
+                    }
+                )
+                mappings.append(new_mapping)
+                used_new_ids.add(best_match["id_new"])
+
+                log.info(
+                    f"Auto-mapped '{name_old}' -> '{best_match['name_new']}' (similarity: {similarity_score:.1f}%)"
+                )
+
+    # Combine all mappings
+    if mappings:
+        final_mapping = pd.concat(mappings, ignore_index=True)
+    else:
+        final_mapping = pd.DataFrame()
+
+    return final_mapping
+
+
 def display_summary(old_indicators: pd.DataFrame, new_indicators: pd.DataFrame, mapping: pd.DataFrame) -> None:
     """Display summary of the result of the mapping.
 
@@ -201,7 +306,7 @@ def display_summary(old_indicators: pd.DataFrame, new_indicators: pd.DataFrame, 
 
     """
     print("Matched pairs:")
-    for i, row in mapping.iterrows():
+    for _, row in mapping.iterrows():
         print(f"\n  {row['name_old']} ({row['id_old']})")
         print(f"  {row['name_new']} ({row['id_new']})")
 
@@ -209,13 +314,13 @@ def display_summary(old_indicators: pd.DataFrame, new_indicators: pd.DataFrame, 
     unmatched_new = new_indicators[~new_indicators["name"].isin(mapping["name_new"])].reset_index(drop=True)
     if len(unmatched_old) > 0:
         print("\nUnmatched variables in the old dataset:")
-        for i, row in unmatched_old.iterrows():
+        for _, row in unmatched_old.iterrows():
             print(f"  {row['name']} ({row['id']})")
     else:
         print("\nAll variables in the old dataset have been matched.")
     if len(unmatched_new) > 0:
         print("\nUnmatched variables in the new dataset:")
-        for i, row in unmatched_new.iterrows():
+        for _, row in unmatched_new.iterrows():
             print(f"  {row['name']} ({row['id']})")
     else:
         print("\nAll variables in the new dataset have been matched.")
