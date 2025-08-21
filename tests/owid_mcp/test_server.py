@@ -59,21 +59,19 @@ async def test_fetch_indicator_data_tool():
         import json
 
         data = json.loads(content.text)
-        assert "metadata" in data
-        assert "data" in data
-        assert isinstance(data["data"], list)
+        assert isinstance(data, list)
 
         # Check first entity has the new efficient format
-        first_entity = data["data"][0]
+        first_entity = data[0]
         assert "entity" in first_entity
         assert "years" in first_entity
         assert "values" in first_entity
         assert isinstance(first_entity["years"], list)
         assert isinstance(first_entity["values"], list)
         assert len(first_entity["years"]) == len(first_entity["values"])
-        
+
         # Check that Vanuatu is present with 1961 data point having value 5.39
-        vanuatu_data = next((entity for entity in data["data"] if entity["entity"] == "Vanuatu"), None)
+        vanuatu_data = next((entity for entity in data if entity["entity"] == "Vanuatu"), None)
         assert vanuatu_data is not None
         assert 1961 in vanuatu_data["years"]
         idx_1961 = vanuatu_data["years"].index(1961)
@@ -99,13 +97,42 @@ async def test_fetch_indicator_data_tool_for_entity():
         import json
 
         data = json.loads(content.text)
-        assert "metadata" in data
-        assert "data" in data
-        assert isinstance(data["data"], list)
+        assert isinstance(data, list)
 
         # Check that all data points are for USA
-        for row in data["data"]:
+        for row in data:
             assert row["entity"].lower() == "united states"
+
+
+@pytest.mark.asyncio
+async def test_fetch_indicator_metadata_tool():
+    """Test fetch_indicator_metadata_tool functionality by fetching metadata for an indicator."""
+    async with Client(mcp) as client:
+        # Test fetching indicator metadata with a known ID
+        # Using GDP indicator ID which should exist
+        result = await client.call_tool("fetch_indicator_metadata", {"indicator_id": 2118})
+        assert result is not None
+        assert isinstance(result.content, list)
+        assert len(result.content) == 1
+
+        # Check the tool result content
+        content = result.content[0]
+        assert isinstance(content, TextContent)
+
+        # Parse the JSON content
+        import json
+
+        metadata = json.loads(content.text)
+        assert isinstance(metadata, dict)
+
+        # Check that basic metadata fields are present
+        assert "id" in metadata
+        assert metadata["id"] == 2118
+        assert "name" in metadata or "title" in metadata
+
+        # Check that dimensions and origins were filtered out
+        assert "dimensions" not in metadata
+        assert "origins" not in metadata
 
 
 @pytest.mark.asyncio

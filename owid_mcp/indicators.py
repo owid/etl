@@ -18,7 +18,8 @@ log = structlog.get_logger()
 INSTRUCTIONS = (
     "PRIMARY INDICATOR TOOLS (recommended for full MCP clients):\n"
     "• `search_indicator` - Find indicators using semantic search with rich metadata\n"
-    "• `fetch_indicator_data` - Fetch complete indicator data with full metadata\n"
+    "• `fetch_indicator_data` - Fetch indicator data only in efficient format\n"
+    "• `fetch_indicator_metadata` - Fetch indicator metadata only\n"
     "• `run_sql` - Execute flexible SQL queries for custom data analysis\n\n"
     "SEMANTIC SEARCH USAGE:\n"
     "• Use natural language queries: 'coal production', 'global temperature', 'population density'\n"
@@ -26,6 +27,7 @@ INSTRUCTIONS = (
     "• Do NOT include country names in search_indicator queries\n"
     "• The search uses semantic similarity to find conceptually related indicators\n"
     "• Use `fetch_indicator_data` with indicator_id for all data or with entity parameter for specific countries\n"
+    "• Use `fetch_indicator_metadata` to get metadata separately if needed\n"
     "• Provides richer metadata than simplified CSV tools"
 )
 
@@ -90,26 +92,44 @@ async def run_sql(query: str, max_rows: int = MAX_ROWS_DEFAULT) -> Dict[str, Any
 
 
 @mcp.tool
-async def fetch_indicator_data(indicator_id: int, entity: str | None = None) -> Dict[str, Any]:
-    """Fetch OWID indicator data and metadata.
+async def fetch_indicator_metadata(indicator_id: int) -> Dict[str, Any]:
+    """Fetch OWID indicator metadata only.
+
+    Args:
+        indicator_id: Numeric OWID indicator id (e.g. 2118)
+
+    Returns:
+        Dict containing filtered metadata for the indicator
+    """
+    # Fetch metadata only
+    meta_url = f"{OWID_API_BASE}/{indicator_id}.metadata.json"
+    metadata = await fetch_json(meta_url)
+
+    # Filter metadata to remove large dimensions and origins data
+    metadata.pop("dimensions", None)
+    metadata.pop("origins", None)
+
+    return metadata
+
+
+@mcp.tool
+async def fetch_indicator_data(indicator_id: int, entity: str | None = None) -> List[Dict[str, Any]]:
+    """Fetch OWID indicator data only.
 
     Args:
         indicator_id: Numeric OWID indicator id (e.g. 2118)
         entity: Optional entity name or ISO-3 code. If provided, returns only rows matching that entity (case-insensitive)
 
     Returns:
-        Dict with 'metadata' and 'data' keys:
-        {
-          "metadata": { <OWID metadata> },
-          "data": [
-              {
-                "entity": "Africa (FAO)",
-                "years": [1961, 1962, 1963, 1964, 1965],
-                "values": [4191055, 4718410, 4248436, 4495870, 4723099]
-              },
-              ...
-          ]
-        }
+        List of entities with years and values arrays:
+        [
+            {
+              "entity": "Africa (FAO)",
+              "years": [1961, 1962, 1963, 1964, 1965],
+              "values": [4191055, 4718410, 4248436, 4495870, 4723099]
+            },
+            ...
+        ]
     """
     # Fetch OWID raw data + metadata concurrently
     data_url = f"{OWID_API_BASE}/{indicator_id}.data.json"
@@ -138,8 +158,4 @@ async def fetch_indicator_data(indicator_id: int, entity: str | None = None) -> 
                         break
         rows = filtered_rows
 
-    # Filter metadata
-    metadata.pop("dimensions", None)
-    metadata.pop("origins", None)
-
-    return {"metadata": metadata, "data": rows}
+    return rows
