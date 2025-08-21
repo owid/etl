@@ -62,10 +62,10 @@ async def search_indicator(query: str, limit: int = 10) -> List[Dict]:
 
     Use the indicator_id with fetch_indicator_data to get the actual data.
 
-    IMPORTANT: When using the returned parquet URLs in SQL queries, note that OWID
+    IMPORTANT: When using the returned SQL template in queries, note that OWID
     column names commonly use double underscores (__) as separators, not single
     underscores (_). For example: 'coal_production__twh' not 'coal_production_twh'.
-    Check the sql_template in metadata for the correct column name format.
+    Check the run_sql_template in metadata for the correct column name format.
     """
     return await semantic_search_indicators(query, limit)
 

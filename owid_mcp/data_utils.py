@@ -457,6 +457,6 @@ def build_catalog_info(catalog_path: str) -> Dict[str, str]:
     )
     return {
         "parquet_url": parquet_url,
-        "sql_template": sql_tpl,
+        "run_sql_template": sql_tpl,
         "column": column,
     }
