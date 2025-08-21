@@ -29,15 +29,15 @@ async def semantic_search_indicators(query: str, limit: int = 10) -> List[Dict[s
     for result in data["results"]:
         # Filter and rename metadata fields
         metadata = result["metadata"].copy()
-        
+
         # Remove catalog_path and parquet_url as they're contained in sql_template
         metadata.pop("catalog_path", None)
         metadata.pop("parquet_url", None)
-        
+
         # Rename sql_template to run_sql_template
         if "sql_template" in metadata:
             metadata["run_sql_template"] = metadata.pop("sql_template")
-        
+
         results.append(
             {
                 "title": result["title"],

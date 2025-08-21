@@ -162,13 +162,13 @@ async def test_cherry_blossom_search_and_sql():
         # Verify the structure of the template (without executing SQL since it has placeholder issues)
         column = metadata["column"]
         run_sql_template = metadata["run_sql_template"]
-        
+
         # Check that template contains expected parts
         assert "SELECT" in run_sql_template
         assert column in run_sql_template
         assert "FROM" in run_sql_template
         assert "WHERE" in run_sql_template
-        
+
         # Verify column is a reasonable cherry blossom related field name
         assert any(word in column.lower() for word in ["date", "flowering", "bloom", "cherry"])
 
