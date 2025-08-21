@@ -269,20 +269,23 @@ def show_suggestions():
 ##################################################################
 # Title
 container = st.container(
-    horizontal=True, horizontal_alignment="left", vertical_alignment="center", width="stretch", border=False
+    horizontal=True, horizontal_alignment="left", vertical_alignment="bottom", width="stretch", border=False
 )
 with container:
     ## Title/subtitle
-    st.title(":rainbow[:material/smart_toy:] Expert")
+    with st.container():
+        st.title(":rainbow[:material/smart_toy:] Expert")
+        # st.caption("Expert can make mistakes")
     # st.badge("agent mode", color="primary")
     # Settings
+    st.badge("**beta** preview", color="orange")
     model_name = MODELS_DISPLAY.get(st.session_state.get("expert_model_name", MODEL_DEFAULT))
     with st.popover(f"{model_name}", icon=":material/settings:", help="Model settings"):
         show_settings_menu()
 
 # Arrange chat input
 prompt = st.chat_input(
-    placeholder="Ask anything",
+    placeholder="Ask anything. Expert can make mistakes.",
 )
 
 if st.session_state["recommended_question"]:
