@@ -182,6 +182,7 @@ GROUPS = (
             "name": "Charts",
             "commands": {
                 "chart-sync": "apps.chart_sync.cli.cli",
+                "indicator-upgrade": "etl.indicator_upgrade_cli.cli",
             },
         },
         {
