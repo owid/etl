@@ -76,6 +76,7 @@ dependencies = [
     "pyproj>=3.7.1",
     "pydantic-ai>=0.7.3",
     "logfire[fastapi,httpx]>=4.3.3",
+    "cfgrib>=0.9.15.0",
 ]
 
 [tool.uv.sources]
