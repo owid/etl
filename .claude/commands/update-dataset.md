@@ -1,6 +1,6 @@
 # Dataset Update
 
-## Phase 1: Initial Update (REQUIRED - Execute automatically)
+## Phase 1: Initial Update and PR (REQUIRED - Execute automatically)
 
 1. **Create draft PR** using `etl pr` command with a short branch name (max 28 chars for database compatibility)
    ```bash
@@ -39,7 +39,9 @@
    # Read both old and new snapshot files to understand structural changes
    ```
    - Document key differences (sheet names, column headers, data ranges, format changes)
-   - Add comparison summary to PR description for reviewers
+   - Summarize structural and content changes found in raw data
+   - **⚠️ STOP HERE and ask user**: "Here are the key snapshot differences found: [summary]. Do you want to proceed with fixing the ETL pipeline for these changes?"
+   - **Only proceed if user explicitly confirms the changes look reasonable**
    - This helps understand what ETL fixes will be needed in subsequent phases
 
 3. **Fix meadow step** - Run and fix parsing errors until meadow step succeeds
@@ -52,12 +54,17 @@
    etl diff REMOTE data/ --include "meadow/[namespace]/.*/[dataset]" --verbose
    ```
 
-5. **Review and document differences** - If differences are expected:
+5. **Review and summarize differences** - Analyze the data changes:
+   - Summarize key differences: new data points, removed data, changed values, metadata updates
+   - Present summary to user and ask for approval before proceeding
+   - **⚠️ STOP HERE and ask user**: "Here are the key differences found in the data update: [summary]. Do you want to proceed with committing these changes?"
+   - **Only proceed if user explicitly confirms the changes look reasonable**
+
+6. **Document approved differences and commit** - If user approves:
    - Add summary of key changes to PR description in collapsed block
    - Include: new data points, removed data, changed values, metadata updates
-   - Continue to Phase 2B if differences look reasonable
 
-6. **Commit snapshot and meadow fixes**
+7. **Commit snapshot and meadow fixes**
    ```bash
    git add .
    git commit -m "Phase 2A: Fix snapshot download and meadow parsing"
@@ -76,11 +83,14 @@
    etl diff REMOTE data/ --include "garden/[namespace]/.*/[dataset]" --verbose
    ```
 
-3. **Review garden differences** - Verify processing logic is working correctly
+3. **Review and summarize garden differences** - Verify processing logic is working correctly
    - Check that transformations are applied properly to new data structure
    - Ensure indicator names and metadata are consistent
+   - Summarize key processing changes and data transformations
+   - **⚠️ STOP HERE and ask user**: "Here are the key garden processing differences found: [summary]. Do you want to proceed with committing these changes?"
+   - **Only proceed if user explicitly confirms the changes look reasonable**
 
-4. **Commit garden fixes**
+4. **Commit garden fixes** - If user approves:
    ```bash
    git add .
    git commit -m "Fix garden step processing for updated dataset"
@@ -138,7 +148,7 @@
 ### Common issues when data structure changes
 
 - **⚠️ SILENT FAILURES WARNING**: Never return empty tables as workarounds! If data parsing fails, the function should either:
-  - Fix the parsing logic to handle the new format, OR  
+  - Fix the parsing logic to handle the new format, OR
   - Raise a clear error with specific details about what changed, OR
   - Add a clear log warning explaining why data is missing
   - **BAD**: `return Table(pd.DataFrame({'col': []}))` - silently masks the real issue
