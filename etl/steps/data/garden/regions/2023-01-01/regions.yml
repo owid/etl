@@ -1307,6 +1307,7 @@
     - "SEN"
     - "SHN"
     - "SLE"
+    - "OWID_SML"
     - "SOM"
     - "SSD"
     - "STP"
@@ -1321,10 +1322,12 @@
     - "ZMB"
     - "ZWE"
     - "WSM"
+    - "OWID_ZAN"
 - code: "OWID_ASI"
   name: "Asia"
   region_type: "continent"
   members:
+    - "OWID_ABK"
     - "AFG"
     - "ARE"
     - "ARM"
@@ -1359,6 +1362,7 @@
     - "MMR"
     - "MNG"
     - "MYS"
+    - "OWID_NAG"
     - "NPL"
     - "OMN"
     - "OWID_DRV"
@@ -1374,6 +1378,7 @@
     - "QAT"
     - "SAU"
     - "SGP"
+    - "OWID_SOS"
     - "SYR"
     - "THA"
     - "TJK"
@@ -1389,6 +1394,7 @@
   name: "Europe"
   region_type: "continent"
   members:
+    - "OWID_AKD"
     - "ALA"
     - "ALB"
     - "AND"
@@ -1398,6 +1404,7 @@
     - "BIH"
     - "BLR"
     - "CHE"
+    - "OWID_CIS"
     - "CYP"
     - "CZE"
     - "DEU"
@@ -1451,11 +1458,13 @@
     - "PRT"
     - "ROU"
     - "RUS"
+    - "SJM"
     - "SMR"
     - "SRB"
     - "SVK"
     - "SVN"
     - "SWE"
+    - "OWID_TRS"
     - "UKR"
     - "VAT"
 - code: "OWID_NAM"
@@ -2616,46 +2625,6 @@
     - "TON"
     - "TUV"
     - "WLF"
-
-##########
-# UN (Generic)
-##########
-- code: UN_AFR
-  name: "Africa (UN)"
-  region_type: "aggregate"
-  defined_by: un
-  members:
-    - UNM49_AFR
-- code: UN_NAM
-  name: "Northern America (UN)"
-  region_type: "aggregate"
-  defined_by: un
-  members:
-    - UNM49_NAM
-- code: UN_LAC
-  name: "Latin America and the Caribbean (UN)"
-  region_type: "aggregate"
-  defined_by: un
-  members:
-    - UNM49_LAC
-- code: UN_ASI
-  name: "Asia (UN)"
-  region_type: "aggregate"
-  defined_by: un
-  members:
-    - UNM49_ASI
-- code: UN_EUR
-  name: "Europe (UN)"
-  region_type: "aggregate"
-  defined_by: un
-  members:
-    - UNM49_EUR
-- code: UN_OCE
-  name: "Oceania (UN)"
-  region_type: "aggregate"
-  defined_by: un
-  members:
-    - UNM49_OCE
 
 ##########
 # UN SDG
