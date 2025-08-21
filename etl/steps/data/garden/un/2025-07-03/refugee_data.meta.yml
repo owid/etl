@@ -88,7 +88,7 @@ tables:
       refugees_per_1000:
         title: Refugees by country of origin per 1,000 people
         description_short: |-
-         [People](#dod:refugee) who fled their country of origin, per 1000 people in that country. Refugees are people who are who are in need of international protection because of serious threats against which the authorities of their home country cannot or will not protect them.
+         [People](#dod:refugee) who fled their country of origin and are in need of international protection. This data is given per 1,000 people in their country of origin and shows how many people fled a country as a proportion of its current population.
         description_from_producer: "{definitions.description_refugee}"
         display:
           numDecimalPlaces: 1
@@ -101,7 +101,7 @@ tables:
       refugees_per_100k:
         title: Refugees by country of origin per 100,000 people
         description_short: |-
-          [People](#dod:refugee) who fled their country of origin, per 100,000 people in that country. This includes all refugees from this country, not just the people who left their origin country this year.
+          [People](#dod:refugee) who fled their country of origin and are in need of international protection. This data is given per 100,000 people in their country of origin and shows how many people fled a country as a proportion of its current population.
         description_from_producer: "{definitions.description_refugee}"
         display:
           numDecimalPlaces: 1
@@ -200,13 +200,10 @@ tables:
       refugees:
         title: Refugees by country of asylum
         description_short: |-
-          [People](#dod:refugee) who fled their country of origin because of serious threats against which the authorities of their home country cannot or will not protect them.
+          [People](#dod:refugee) who fled their country of origin because of serious threats against which the authorities of their home country cannot or will not protect them. This includes all refugees, not just those who arrived that year.
         description_from_producer: "{definitions.description_refugee}"
         description_key:
           - "{definitions.description_refugee_general}"
-        presentation:
-          grapher_config:
-            note: "{definitions.footnote_refugees_asylum}"
       refugees_per_1000:
         title: Refugees by country of asylum per 1,000 people
         description_short: |-
@@ -221,7 +218,7 @@ tables:
           grapher_config:
             note: "{definitions.footnote_refugees_asylum}"
       refugees_per_100k:
-        title: Refugees by destination per 100,000 people
+        title: Refugees by country of asylum per 100,000 people
         description_short: |-
           [People](#dod:refugee) who fled their country of origin because of serious threats against which the authorities of their home country cannot or will not protect them. This data is given per 100,000 people living in the country of asylum and shows the how many refugees live in a country proportionate to its total population.
         description_from_producer: "{definitions.description_refugee}"
@@ -236,11 +233,8 @@ tables:
       asylum_seekers:
         title: Asylum seekers by country they live in
         description_short: |-
-          [People](#dod:asylumseeker) who fled their country of origin and are in need of international protection, but have not yet been granted asylum in the country.
+          [People](#dod:asylumseeker) who fled their country of origin and are in need of international protection, but have not yet been granted asylum in the country. This includes all asylum seekers, not just those who applied for asylum that year.
         description_from_producer: "{definitions.description_asylum}"
-        presentation:
-          grapher_config:
-            note: "{definitions.footnote_asylum_asylum}"
       asylum_seekers_per_100k:
         title: Asylum seekers by country they live in per 100,000 people
         description_short: |-
