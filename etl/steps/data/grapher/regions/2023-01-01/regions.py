@@ -110,7 +110,9 @@ def run() -> None:
     # Downstream
     # tb_regions = process_un_definitions(tb_regions)
     # tb_regions.loc[:, "un_m49_2_region"] = tb_regions.loc[:, "un_m49_2_region"].fillna(tb_regions["un_m49_1_region"])
-    tb_regions.loc[:, "un_m49_3_region"] = tb_regions.loc[:, "un_m49_3_region"].fillna("la")
+    # tb_regions["un_m49_3_region"] = tb_regions["un_m49_3_region"].fillna(tb_regions["un_m49_2_region"])
+    # tb_regions.loc[:, "un_m49_3_region"] = "lal"
+    # tb_regions.loc[:, "un_m49_3_region"].fillna("la")
 
     # Update the table's metadata
     # NOTE: It would be better to do this in garden.
@@ -147,6 +149,10 @@ def process_un_definitions(tb: Table | pd.DataFrame) -> Table:
     Solution: Propagate definitions downstream when missing.
     """
     # Propagate definitions downstream.
-    tb.loc[:, "un_m49_2_region"] = tb.loc[:, "un_m49_2_region"].fillna(tb["un_m49_1_region"])
-    tb.loc[:, "un_m49_3_region"] = tb.loc[:, "un_m49_3_region"].fillna(tb["un_m49_2_region"])
+    tb.loc[:, "un_m49_2_region"] = (
+        tb.loc[:, "un_m49_2_region"].fillna(tb["un_m49_1_region"]).copy_metdata(tb.loc[:, "un_m49_2_region"])
+    )
+    tb.loc[:, "un_m49_3_region"] = (
+        tb.loc[:, "un_m49_3_region"].fillna(tb["un_m49_2_region"]).copy_metdata(tb.loc[:, "un_m49_3_region"])
+    )
     return cast(Table, tb)
