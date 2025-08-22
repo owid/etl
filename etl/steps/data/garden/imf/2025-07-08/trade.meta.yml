@@ -1,7 +1,7 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
   common:
-    processing_level: minor
+    processing_level: major
     display:
      numDecimalPlaces: 1
     presentation:
@@ -19,181 +19,72 @@ dataset:
 tables:
   trade:
     variables:
+      imports_of_goods__cost_insurance_freight__cif__us_dollar:
+        title: "Imports of goods (CIF): << counterpart_country >>"
+        unit: "current US$"
+        short_unit: "US$"
+        display:
+          numDecimalPlaces: 0
+
+      exports_of_goods__free_on_board__fob__us_dollar:
+        title: "Exports of goods (FOB): << counterpart_country >>"
+        unit: "current US$"
+        short_unit: "US$"
+        display:
+          numDecimalPlaces: 0
+
       exports_of_goods__free_on_board__fob__share:
         title: "Share of total exports of goods (FOB): << counterpart_country >>"
         unit: "%"
         short_unit: "%"
-        description_short: " Share of << counterpart_country >>'s exports destined for each region."
-        description_key:
-          - This indicator shows what percentage of a region's total goods exports go to a specific trading partner.
-          - Calculated by dividing exports to the counterpart region by total exports to all countries, then multiplying by 100.
-          - Based on Free on Board (FOB) valuation, which includes the value of goods plus all costs of bringing them to the border of the exporting country.
-          - Values sum to 100% across all trading partners for each country-year, providing a complete picture of export concentration.
-          - A higher percentage indicates greater trade dependence on that particular trading partner for exports.
-          - Changes over time can reflect shifts in trade relationships, economic policies, or competitive dynamics.
-          - Data is derived from customs records and official trade statistics compiled by national statistical offices.
-        presentation:
-          title_public: "Share of total exports of goods (FOB): << counterpart_country >>"
         display:
           numDecimalPlaces: *decimals
-          name: |-
-            <% if counterpart_country != 'Intraregional' %>
-            << counterpart_country >>'s exports
-            <% elif counterpart_country == 'Intraregional' %>
-            Intraregional exports
-            <%- endif -%>
 
       imports_of_goods__cost_insurance_freight__cif__share:
         title: "Share of total imports of goods (CIF): << counterpart_country >>"
         unit: "%"
         short_unit: "%"
-        description_short: "Share of << counterpart_country >>'s imports of goods originating from each region."
-        description_key:
-          - This indicator shows what percentage of a region's total goods imports come from a specific trading partner.
-          - Calculated by dividing imports from the counterpart region by total imports from all countries, then multiplying by 100.
-          - Based on Cost, Insurance, and Freight (CIF) valuation, which includes the total cost of bringing goods to the importing region's border.
-          - Values sum to 100% across all trading partners for each country-year, showing the complete import composition.
-          - A higher percentage indicates greater import dependence on that particular trading partner.
-          - Changes can reflect diversification strategies, supply chain shifts, or changes in trade agreements.
-          - Data is compiled from customs declarations and import documentation by national statistical offices.
-        presentation:
-          title_public: "Share of total imports of goods (CIF): << counterpart_country >>"
         display:
           numDecimalPlaces: *decimals
-          name: |-
-            <% if counterpart_country != 'Intraregional' %>
-            << counterpart_country >>'s imports
-            <% elif counterpart_country == 'Intraregional' %>
-            Intraregional imports
-            <%- endif -%>
-
-      trade_balance_goods__share:
-        title: "Trade balance of goods: << counterpart_country >> as share of total trade volume"
-        unit: "%"
-        short_unit: "%"
-        description_short: "Net trade in goods: << counterpart_country >> as a percentage of the region's total trade volume (exports plus imports)."
-        description_key:
-          - This indicator shows the trade balance with a specific partner relative to the region's overall trade activity.
-          - Calculated as the trade balance (exports minus imports) divided by total trade volume (exports plus imports), then multiplied by 100.
-          - A positive value indicates a trade surplus with that partner relative to total trade size, while negative indicates a deficit.
-          - Unlike absolute trade balances, this measure accounts for the overall scale of trade activity.
-          - Values closer to zero indicate more balanced trade relationships relative to total trade volume.
-          - This measure helps identify which trading relationships contribute most significantly to overall trade imbalances.
-          - Provides insight into trade concentration and dependency beyond simple bilateral balance measures.
-        presentation:
-          title_public: "Trade balance of goods: << counterpart_country >> as share of total trade volume"
-        display:
-          numDecimalPlaces: *decimals
-          name:  |-
-            <% if counterpart_country == 'Intraregional' %>
-            << counterpart_country >> trade balance
-            <% elif counterpart_country != 'Intraregional' %>
-            Trade balance with << counterpart_country >>
-            <%- endif -%>
 
       share_of_total_trade:
-        title: "Share of total trade: << counterpart_country >>"
+        title: "Share of total trade volume with << counterpart_country >>"
         unit: "%"
         short_unit: "%"
-        description_short: "Share of << counterpart_country >>'s trade as a percentage of the region's total trade volume (exports plus imports)."
-        description_key:
-          - This indicator shows what percentage of a region's total trade volume is conducted with a specific trading partner.
-          - Calculated by dividing bilateral trade volume (exports plus imports with the counterpart country) by total trade volume (exports plus imports with all countries), then multiplying by 100.
-          - Values sum to 100% across all trading partners for each country-year, providing a complete picture of trade concentration.
-          - A higher percentage indicates greater overall trade dependence on that particular trading partner.
-          - This measure captures the total economic relationship intensity, considering both export and import flows.
-          - Changes over time can reflect shifts in trade relationships, economic integration, or diversification strategies.
-          - Useful for identifying major trading partners and assessing trade concentration risks.
-        presentation:
-          title_public: "Share of total trade: << counterpart_country >>"
         display:
           numDecimalPlaces: *decimals
-          name: |-
-            <% if counterpart_country != 'Intraregional' %>
-            << counterpart_country >>'s trade
-            <% elif counterpart_country == 'Intraregional' %>
-            Intraregional trade
-            <%- endif -%>
 
-      share_bilateral:
-        title: Share of country pairs with bilateral trade
+      china_imports_share_of_gdp:
+        title: "China imports as share of GDP"
         unit: "%"
         short_unit: "%"
-        description_short: Share of bilateral partnerships around the world.
-        description_key:
-          - This indicator shows what percentage of a region's total trade is conducted bilaterally with a specific trading partner.
-          - Calculated by dividing bilateral trade volume (exports plus imports with the counterpart country) by total trade volume (exports plus imports with all countries), then multiplying by 100.
-          - Values sum to 100% across all trading partners for each country-year, providing a complete picture of trade concentration.
-          - A higher percentage indicates greater overall trade dependence on that particular trading partner.
-          - This measure captures the intensity of bilateral economic relationships relative to total trade activity.
-          - Changes over time can reflect shifts in trade relationships, economic integration, or diversification strategies.
-          - Useful for identifying major trading partners and assessing trade concentration risks.
         display:
-          name: Bilateral
+          numDecimalPlaces: *decimals
+
+      import_rank:
+        title: "<< counterpart_country >> rank in imports of goods (CIF)"
+        unit: rank
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      share_bilateral:
+        title: "Share of bilateral trading relationships"
+        unit: "%"
+        short_unit: "%"
+        display:
           numDecimalPlaces: *decimals
 
       share_unilateral:
-        title: Share of country pairs with unilateral trade
+        title: "Share of unilateral trading relationships"
         unit: "%"
         short_unit: "%"
-        description_short: Share of unilateral partnerships around the world.
-        description_key:
-          - This indicator shows what percentage of a region's total trade is conducted unilaterally with a specific trading partner.
-          - Calculated by dividing unilateral trade volume (exports or imports with the counterpart country) by total trade volume (exports plus imports with all countries), then multiplying by 100.
-          - Values sum to 100% across all trading partners for each country-year, providing a complete picture of trade concentration.
-          - A higher percentage indicates greater overall trade dependence on that particular trading partner.
-          - This measure captures the intensity of unilateral economic relationships relative to total trade activity.
-          - Changes over time can reflect shifts in trade relationships, economic integration, or diversification strategies.
-          - Useful for identifying major trading partners and assessing trade concentration risks.
         display:
-          name: Unilateral
           numDecimalPlaces: *decimals
 
       share_non_trading:
-        title: Share of country pairs that do not trade with each other
+        title: "Share of non-trading relationships"
         unit: "%"
         short_unit: "%"
-        description_short: Share of non-trading pairs around the world.
-        description_key:
-          - This indicator shows what percentage of a region's total trade is conducted with countries that do not engage in trade with each other.
-          - Calculated by dividing non-trading trade volume (exports or imports with the counterpart country) by total trade volume (exports plus imports with all countries), then multiplying by 100.
-          - Values sum to 100% across all trading partners for each country-year, providing a complete picture of trade concentration.
-          - A higher percentage indicates greater overall trade dependence on that particular trading partner.
-          - This measure captures the intensity of non-trading economic relationships relative to total trade activity.
-          - Changes over time can reflect shifts in trade relationships, economic integration, or diversification strategies.
-          - Useful for identifying major trading partners and assessing trade concentration risks.
-        display:
-          name: Non-trading
-          numDecimalPlaces: *decimals
-
-      share_to_top_import_destination:
-        title: Share of imports coming from the <<counterpart_country>>
-        unit: "%"
-        short_unit: "%"
-        description_short: Share of imports from the  <<counterpart_country>> as a percentage of total imports.
-        description_key:
-          - This indicator shows what percentage of a region's total imports come from the <<counterpart_country>>.
-          - Calculated by dividing imports from the <<counterpart_country>> by total imports from all countries, then multiplying by 100.
-          - Values sum to 100% across all trading partners for each country-year, providing a complete picture of import concentration.
-          - A higher percentage indicates greater import dependence on that specific trading partner.
-          - This measure captures the intensity of import relationships relative to total trade activity.
-          - Changes over time can reflect shifts in trade relationships, economic integration, or diversification strategies.
-          - Useful for identifying major import sources and assessing trade concentration risks.
-        display:
-          numDecimalPlaces: *decimals
-
-      share_to_top_export_destination:
-        title: Share of exports going to the <<counterpart_country>>
-        unit: "%"
-        short_unit: "%"
-        description_short: Share of exports to the  <<counterpart_country>> as a percentage of total exports.
-        description_key:
-          - This indicator shows what percentage of a region's total exports go to the <<counterpart_country>>.
-          - Calculated by dividing exports to the <<counterpart_country>> by total exports to all countries, then multiplying by 100.
-          - Values sum to 100% across all trading partners for each country-year, providing a complete picture of export concentration.
-          - A higher percentage indicates greater export dependence on that specific trading partner.
-          - This measure captures the intensity of export relationships relative to total trade activity.
-          - Changes over time can reflect shifts in trade relationships, economic integration, or diversification strategies.
-          - Useful for identifying major export destinations and assessing trade concentration risks.
         display:
           numDecimalPlaces: *decimals
