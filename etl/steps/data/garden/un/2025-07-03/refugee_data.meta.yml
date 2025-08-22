@@ -71,20 +71,16 @@ definitions:
 dataset:
   update_period_days: 365
 
-
 tables:
   refugee_data_origin:
     variables:
       refugees:
         title: Refugees by country of origin
         description_short: |-
-          [People](#dod:refugee) who fled their country of origin because of serious threats against which the authorities of their home country cannot or will not protect them.
+          [People](#dod:refugee) who fled their country of origin because of serious threats against which the authorities of their home country cannot or will not protect them. This includes all refugees, not just those who fled that year.
         description_from_producer: "{definitions.description_refugee}"
         description_key:
           - "{definitions.description_refugee_general}"
-        presentation:
-          grapher_config:
-            note: "{definitions.footnote_refugees}"
       refugees_per_1000:
         title: Refugees by country of origin per 1,000 people
         description_short: |-
@@ -200,7 +196,7 @@ tables:
       refugees:
         title: Refugees by country of asylum
         description_short: |-
-          [People](#dod:refugee) who fled their country of origin because of serious threats against which the authorities of their home country cannot or will not protect them. This includes all refugees, not just those who arrived that year.
+          [People](#dod:refugee) who fled their country of origin because of serious threats against which the authorities of their home country cannot or will not protect them. This includes all refugees who live in this country, not just those who arrived that year.
         description_from_producer: "{definitions.description_refugee}"
         description_key:
           - "{definitions.description_refugee_general}"
