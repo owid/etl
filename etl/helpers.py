@@ -362,12 +362,17 @@ class PathFinder:
                 ds_income_groups = self.load_dataset("income_groups")
             except NoMatchingStepsAmongDependencies:
                 ds_income_groups = None
+            try:
+                ds_population = self.load_dataset("population")
+            except NoMatchingStepsAmongDependencies:
+                ds_population = None
 
             self._regions = Regions(
                 ds_regions=ds_regions,
                 ds_income_groups=ds_income_groups,
+                ds_population=ds_population,
                 countries_file=self.country_mapping_path,
-                auto_load_regions=False,
+                auto_load_datasets=False,
             )
         return self._regions
 
