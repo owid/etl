@@ -28,7 +28,7 @@ CURRENT_YEAR = int(paths.version.split("-")[0])
 COMMON_ORIGIN = Origin(producer="Our World in Data", title="Regions")
 
 # Institution mapping. TODO: Should be moved to regions.yml
-INSTITUTION_MAPPING = {
+LEGACY_INSTITUTION_MAPPING = {
     "owid": "OWID",
     "un_m49_1": "UN M49 (1)",
     "un_m49_2": "UN M49 (2)",
@@ -37,6 +37,77 @@ INSTITUTION_MAPPING = {
     "wb": "WB",
     "who": "WHO",
     "unsdg": "UN SDG",
+}
+ORIGIN_UN_M49 = Origin(
+    producer="United Nations, Statistics Division",
+    title="Standard country or area codes for statistical use (M49)",
+    url_main="https://unstats.un.org/unsd/methodology/m49/",
+    description="""The list of geographic regions presents the composition of geographical regions used by the Statistics Division in its publications and databases. Each country or area is shown in one region only. These geographic regions are based on continental regions; which are further subdivided into sub-regions and intermediary regions drawn as to obtain greater homogeneity in sizes of population, demographic circumstances and accuracy of demographic statistics.""",
+)
+ORIGIN_WB = Origin(
+    producer="World Bank",
+    title="World Bank Country and Lending Groups",
+    url_main="https://datahelpdesk.worldbank.org/knowledgebase/articles/906519-world-bank-country-and-lending-groups",
+)
+ORIGINS_WHO = Origin(
+    producer="World Health Organization",
+    title="Countries/areas by WHO region",
+    url_main="https://apps.who.int/violence-info/Countries%20and%20areas%20by%20WHO%20region%20-%2012bfe12.pdf",
+)
+ORIGINS_SDG = Origin(
+    producer="United Nations, Sustainable Development Goals",
+    title="Regional groupings used in Report and Statistical Annex",
+    url_main="https://unstats.un.org/sdgs/indicators/regional-groups/",
+)
+INSTITUTIONS = {
+    "owid": {
+        "name": "Our World in Data",
+        "acronym": "OWID",
+        "origins": [COMMON_ORIGIN],
+        "description": "Regions defined by Our World in Data, which are used in OWID charts and maps.",
+    },
+    "un_m49_1": {
+        "name": "United Nations M49 (1)",
+        "acronym": "UN M49 (1)",
+        "description": "Level-1 broad regions defined by the United Nations.",
+        "origins": [ORIGIN_UN_M49],
+    },
+    "un_m49_2": {
+        "name": "United Nations M49 (2)",
+        "acronym": "UN M49 (2)",
+        "description": "Level-2 regions defined by the United Nations.",
+        "origins": [ORIGIN_UN_M49],
+    },
+    "un_m49_3": {
+        "name": "United Nations M49 (3)",
+        "acronym": "UN M49 (3)",
+        "description": "Level-3 (most granular) regions defined by the United Nations.",
+        "origins": [ORIGIN_UN_M49],
+    },
+    "un": {
+        "name": "United Nations",
+        "acronym": "UN",
+        "description": "Regions defined by the United Nations, which are used across the UN including UN WPP.",
+        "origins": [ORIGIN_UN_M49],
+    },
+    "wb": {
+        "name": "World Bank",
+        "acronym": "WB",
+        "description": "Regions as defined by the World Bank.",
+        "origins": [ORIGIN_WB],
+    },
+    "who": {
+        "name": "World Health Organization",
+        "acronym": "WHO",
+        "description": "Regions as defined by the World Health Organization.",
+        "origins": [ORIGINS_WHO],
+    },
+    "unsdg": {
+        "name": "United Nations Sustainable Development Goals",
+        "acronym": "UN SDG",
+        "description": "Regions as defined by the United Nations Sustainable Development Goals.",
+        "origins": [ORIGINS_SDG],
+    },
 }
 
 
@@ -129,11 +200,16 @@ def run() -> None:
     ds_grapher.save()
 
 
-def _add_metadata(tb: Table, institution: str) -> Table:
-    institution_name = INSTITUTION_MAPPING.get(institution, institution)
-    tb[f"{institution}_region"].metadata.origins = [COMMON_ORIGIN]
-    tb[f"{institution}_region"].metadata.title = f"World regions according to {institution_name}"
-    tb[f"{institution}_region"].metadata.unit = ""
+def _add_metadata(tb: Table, institution_alias: str) -> Table:
+    assert institution_alias in INSTITUTIONS, f"Unknown institution: {institution_alias}"
+    institution = INSTITUTIONS[institution_alias]
+
+    # Get short name
+    assert "acronym" in institution, f"Missing short_name for institution: {institution_alias}"
+    tb[f"{institution_alias}_region"].metadata.origins = institution.get("origins", [COMMON_ORIGIN])
+    tb[f"{institution_alias}_region"].metadata.title = f"World regions according to {institution['acronym']}"
+    tb[f"{institution_alias}_region"].metadata.description = institution.get("description", "")
+    tb[f"{institution_alias}_region"].metadata.unit = ""
     return tb
 
 
