@@ -276,7 +276,7 @@ def add_china_imports_share_of_gdp(tb: Table, ds_wdi, ds_population) -> Table:
     tb_population = tb_population[["country", "year", "population"]].copy()
 
     # Calculate total GDP = GDP per capita * population
-    gdp_data = tb_gdp_pc.merge(tb_population, on=["country", "year"], how="inner")
+    gdp_data = pr.merge(tb_gdp_pc, tb_population, on=["country", "year"], how="inner")
     gdp_data["gdp_total"] = gdp_data["ny_gdp_pcap_cd"] * gdp_data["population"]
     gdp_data = gdp_data[["country", "year", "gdp_total"]].copy()
     # Get China imports for each country-year
@@ -286,7 +286,7 @@ def add_china_imports_share_of_gdp(tb: Table, ds_wdi, ds_population) -> Table:
     china_imports = china_imports.rename(columns={IMPORT_COL: "china_imports_value"})
 
     # Merge GDP data with China imports
-    china_gdp_data = gdp_data.merge(china_imports, on=["country", "year"], how="left")
+    china_gdp_data = pr.merge(gdp_data, china_imports, on=["country", "year"], how="inner")
 
     # Calculate China imports as share of GDP (as percentage)
     china_gdp_data["china_imports_share_of_gdp"] = (
@@ -295,10 +295,10 @@ def add_china_imports_share_of_gdp(tb: Table, ds_wdi, ds_population) -> Table:
 
     # Keep only the calculated share
     china_gdp_data = china_gdp_data[["country", "year", "china_imports_share_of_gdp"]]
-    china_gdp_data["counterpart_country"] = "China"
+    print(china_gdp_data)
 
     # Merge back to main table
-    tb = tb.merge(china_gdp_data, on=["country", "year", "counterpart_country"], how="left")
+    tb = pr.concat([tb, china_gdp_data], ignore_index=True)
     return tb
 
 
