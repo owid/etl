@@ -226,7 +226,6 @@ def process_un_definitions(tb) -> Table:
         mask = tb[f"un_m49_{i+1}_region"].isna()
         tb.loc[mask, f"un_m49_{i+1}_region"] = tb.loc[mask, f"un_m49_{i}_region"]
 
-
     # Create new definition
     ## Get rows where "Americas" should be replaced with "Latin America and the Caribbean" and "Northern America"
     mask = tb["un_m49_2_region"].str.contains("America", na=False)
