@@ -45,12 +45,14 @@ class DatasetDiff:
         tables: Optional[str] = None,
         print: Callable = rich.print,
         snippet: bool = False,
+        country: Optional[str] = None,
     ):
         """
         :param cols: Only compare columns matching pattern
         :param tables: Only compare tables matching pattern
         :param print: Function to print the diff summary. Defaults to rich.print.
         :param snippet: Print snippet for loading both tables
+        :param country: Filter tables by country if it is in the index
         """
         assert ds_a or ds_b, "At least one Dataset must be provided"
         self.ds_a = ds_a
@@ -60,6 +62,17 @@ class DatasetDiff:
         self.cols = cols
         self.tables = tables
         self.snippet = snippet
+        self.country = country
+
+    def _filter_table_by_country(self, table: Table) -> Table:
+        """Filter table by country if country is in the index."""
+        if "country" in table.index.names:
+            country_mask = table.index.get_level_values("country") == self.country
+            return table.loc[country_mask].copy()
+        elif "entity" in table.index.names:
+            country_mask = table.index.get_level_values("entity") == self.country
+            return table.loc[country_mask].copy()
+        return table
 
     def _diff_datasets(self, ds_a: Optional[Dataset], ds_b: Optional[Dataset]):
         if ds_a and ds_b:
@@ -134,6 +147,11 @@ tb = {_snippet_dataset(ds_b, table_name)}
                 if new_index_cols:
                     table_a = table_a.set_index(new_index_cols)
                     table_b = table_b.set_index(new_index_cols)
+
+            # filter tables by country if specified and country is in the index
+            if self.country:
+                table_a = self._filter_table_by_country(table_a)
+                table_b = self._filter_table_by_country(table_b)
 
             # if using default index, it is possible that we have non-determinstic order
             # try sorting by the first two columns
@@ -218,6 +236,7 @@ tb = {_snippet_dataset(ds_b, table_name)}
                     col_b = table_b[col]
 
                     # sort origins
+                    # NOTE: they're excluded from _column_metadata_dict anyway
                     for tab in (table_a, table_b):
                         tab[col].m.origins = sorted(
                             tab[col].m.origins, key=lambda x: (x.title or "", x.title_snapshot or "")
@@ -346,6 +365,11 @@ class RemoteDataset:
     help="Print code snippet for loading both tables, useful for debugging in notebook",
 )
 @click.option(
+    "--country",
+    type=str,
+    help="Filter tables by country if it is in the index.",
+)
+@click.option(
     "--workers",
     "-w",
     type=int,
@@ -363,6 +387,7 @@ def cli(
     exclude: Optional[str],
     verbose: bool,
     snippet: bool,
+    country: Optional[str],
     workers: int,
 ) -> None:
     """Compare all datasets from two catalogs and print out a summary of their differences.
@@ -464,6 +489,7 @@ def cli(
                         print=lambda x: lines.append(x),
                         verbose=verbose,
                         snippet=snippet,
+                        country=country,
                     )
                     differ.summary()
                     return lines
@@ -498,7 +524,14 @@ def cli(
 
             try:
                 differ = DatasetDiff(
-                    ds_a, ds_b, tables=tables, cols=cols, print=_append_and_print, verbose=verbose, snippet=snippet
+                    ds_a,
+                    ds_b,
+                    tables=tables,
+                    cols=cols,
+                    print=_append_and_print,
+                    verbose=verbose,
+                    snippet=snippet,
+                    country=country,
                 )
                 differ.summary()
             except DatasetError as e:
@@ -557,6 +590,9 @@ def _dict_diff(dict_a: Dict[str, Any], dict_b: Dict[str, Any], tabs: int = 0, co
     lines = difflib.ndiff(meta_a.splitlines(keepends=True), meta_b.splitlines(keepends=True))  # type: ignore
     # do not print lines that are identical
     lines = [line for line in lines if not line.startswith("  ")]
+
+    # do not print ? lines
+    lines = [line for line in lines if not line.strip().startswith("? ")]
 
     # add color
     if color:
@@ -762,6 +798,12 @@ def _table_metadata_dict(tab: Table) -> Dict[str, Any]:
     """Extract metadata from Table object, prune and and return it as a dictionary"""
     d = tab.metadata.to_dict()
 
+    # collect unique origins from all columns
+    origins = set()
+    for col in tab.columns:
+        origins.update(tab[col].metadata.origins)
+    d["origins"] = sorted(origins, key=lambda x: (x.title or "", x.title_snapshot or ""))
+
     # add columns
     # d["columns"] = {}
     # for col in tab.columns:
@@ -777,6 +819,10 @@ def _table_metadata_dict(tab: Table) -> Dict[str, Any]:
 
 def _column_metadata_dict(meta: VariableMeta) -> Dict[str, Any]:
     d = meta.to_dict()
+
+    # remove origins, they're displayed on table level
+    d.pop("origins", None)
+
     # remove noise
     d.pop("processing_log", None)
     for source in d.get("sources", []):
