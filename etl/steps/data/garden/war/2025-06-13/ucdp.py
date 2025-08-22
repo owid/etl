@@ -1122,21 +1122,32 @@ def _sanity_check_prio_conflict_types(tb_prio: Table):
     - Only transitions accepted between intrastate conflicts.
     - The same conflict is only expected to have one type in a year.
     """
-    # Define expected combinations of conflict_types for a conflict. Typically, only in the intrastate domain
-    TRANSITIONS_EXPECTED = {"{3, 4}"}
+    # Define expected combinations of conflict_types for a conflict. Typically, only in the intrastate domain. The format is a set of strings, where the strings are a combination of numeric codes for conflict types. E.g. "34" means that the conflict has been classified as type 3 and type 4 at some point in its lifetime.
+    TRANSITIONS_EXPECTED = {"34"}
     # Get conflicts with more than one conflict type assigned to them over their lifetime
-    conflict_type_transitions = tb_prio.groupby("conflict_id")["type_of_conflict"].apply(set)
-    transitions = conflict_type_transitions[conflict_type_transitions.apply(len) > 1].drop_duplicates()
+    conflict_type_transitions = (
+        tb_prio.groupby("conflict_id")["type_of_conflict"]
+        .apply(lambda x: "".join(sorted(set(map(str, map(int, x))))))
+        .astype("string")
+    )
     # Extract unique combinations of conflict_types for a conflict
-    transitions = set(transitions.astype(str))
-    transitions_unk = transitions - TRANSITIONS_EXPECTED
+    transitions = conflict_type_transitions.loc[conflict_type_transitions.str.len() > 1].drop_duplicates().tolist()
+
+    # Validate found transitions (`transitions`) with expected ones (`TRANSITIONS_EXPECTED`)
+    for transition in transitions:
+        assert transition in TRANSITIONS_EXPECTED, f"Unexpected transition found: {transition}!"
+        TRANSITIONS_EXPECTED.remove(transition)
+
+    # Validate that there are missing transitions (expected but not found)
+    if TRANSITIONS_EXPECTED:
+        raise AssertionError(
+            f"Some expected transitions were not found: {TRANSITIONS_EXPECTED}! Review `TRANSITIONS_EXPECTED` variable."
+        )
 
     # Check if different regions categorise the conflict differently in the same year
     assert not (
         tb_prio.groupby(["conflict_id", "year"])["type_of_conflict"].nunique() > 1
-    ).any(), "Seems like the conflict has multiple types for a single year! Is it categorised differently depending on the region?"
-
-    assert not transitions_unk, f"Unknown transitions found: {transitions_unk}"
+    ).any(), "Seems like a conflict has multiple types for a single year! Is it categorised differently depending on the region?"
 
 
 # Estimate metrics
