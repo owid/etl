@@ -425,7 +425,6 @@
   aliases:
     - "Cura\u00c3\u00a7ao"
     - "Cura\u00e7ao"
-    - "Curacao "
 
 - code: "CYP"
   name: "Cyprus"
@@ -460,7 +459,6 @@
     - "Democratic Republic of the Congo"
     - "Zaire/ Congo , Dem. Rep."
     - "Congo, Democratic Republic"
-    - "Dem. Rep. of the Congo"
     - "Congo (Kinshasa)"
 
 - code: "DNK"
@@ -803,7 +801,6 @@
     - "Iran, Isl.Rep.of"
     - "Iran, Islamic Rep."
     - "Iran, Islamic Republic Of"
-    - "Iran (Islamic Rep. of)"
 
 - code: "IRQ"
   name: "Iraq"
@@ -865,7 +862,6 @@
     - "Lao People's DR"
     - "Lao People's Democratic Republic"
     - "Lao People's Democratic Republic (the)"
-    - "Lao People's Dem. Rep."
 
 - code: "LVA"
   name: "Latvia"
@@ -1113,7 +1109,6 @@
     - "Korea (the Democratic People's Republic of)"
     - "Korea, Dem. People's Rep."
     - "Korea, Dem. P.R. of"
-    - "Dem. People's Rep. of Korea"
 
 - code: "MKD"
   name: "North Macedonia"
@@ -1433,7 +1428,6 @@
     - "Korea, Republic Of"
     - "Republic of Korea"
     - "Korea (Rep. of)"
-    - "Rep. of Korea"
 
 - code: "OWID_SOS"
   name: "South Ossetia"
@@ -1507,7 +1501,6 @@
     - "U.R. of Tanzania: Mainland"
     - "United Republic of Tanzania"
     - "Tanganyka (German East Africa)"
-    - "United Rep. of Tanzania"
   related:
     - "OWID_ZAN"
 
