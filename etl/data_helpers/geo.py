@@ -1539,7 +1539,7 @@ class Regions:
     ):
         self._ds_regions = ds_regions
         self._ds_income_groups = ds_income_groups
-        self._countries_file = countries_file
+        self.countries_file = countries_file
         self._region_cache: dict[str, Region] = {}
         self._informed_countries_cache: dict[tuple, set[str]] = {}
         # If auto_load_regions is True and no ds_regions is passed, load the latest regions dataset (and idem for ds_income_groups).
@@ -1627,6 +1627,26 @@ class Regions:
 
         return regions
 
+    def harmonizer(self, tb: Table, country_col: str = "country", institution: str | None = None) -> None:
+        """Harmonize region names interactively and save mapping to a *.countries.json file (defined by countries_file).
+
+        This tool is meant to be used from a notebook or an interactive window.
+        """
+        from etl.harmonize import harmonize_ipython
+
+        if self.countries_file is None:
+            raise ValueError(
+                "A path to a countries file needs to be defined before using harmonizer. Add countries_file argument when initializing Regions."
+            )
+        harmonize_ipython(
+            tb=tb,
+            column=country_col,
+            output_file=self.countries_file,
+            # paths: Optional[PathFinder] = None,
+            # num_suggestions: int = 100,
+            institution=institution,
+        )
+
     def harmonize_names(
         self,
         tb: Table,
@@ -1638,13 +1658,18 @@ class Regions:
         show_full_warning: bool = True,
         excluded_countries_file: Path | str | None = None,
     ) -> Table:
-        """Harmonize country names using the countries mapping file."""
-        if self._countries_file is None:
+        """Harmonize country names in a table using the countries mapping file."""
+        if self.countries_file is None:
             raise ValueError("countries_file must be provided to use harmonize_countries")
+
+        if not Path(self.countries_file).exists():
+            raise ValueError(
+                "A country mapping must exist before using regions.harmonize_countries. Use regions.harmonizer first."
+            )
 
         return harmonize_countries(
             df=tb,
-            countries_file=self._countries_file,
+            countries_file=self.countries_file,
             excluded_countries_file=excluded_countries_file,
             country_col=country_col,
             warn_on_missing_countries=warn_on_missing_countries,

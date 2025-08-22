@@ -366,7 +366,7 @@ class PathFinder:
             self._regions = Regions(
                 ds_regions=ds_regions,
                 ds_income_groups=ds_income_groups,
-                countries_file=self.country_mapping_path if self.country_mapping_path.exists() else None,
+                countries_file=self.country_mapping_path,
                 auto_load_regions=False,
             )
         return self._regions
