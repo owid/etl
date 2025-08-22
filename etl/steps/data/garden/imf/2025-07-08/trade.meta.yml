@@ -86,5 +86,12 @@ tables:
         title: "Share of non-trading relationships"
         unit: "%"
         short_unit: "%"
+        description_key:
+          - This indicator shows the percentage of potential country pairs worldwide that have no trade relationship with each other.
+          - Calculated by identifying country pairs with zero recorded trade volume and expressing them as a percentage of all possible country pairs.
+          - Values represent the extent of global trade network gaps, highlighting potential untapped trade opportunities.
+          - A higher percentage indicates more country pairs that don't engage in trade with each other.
+          - This measure captures the fragmentation of the global trade network.
+          - Changes over time can reflect expanding trade networks, new trade relationships, or increasing global economic integration.
         display:
           numDecimalPlaces: *decimals
