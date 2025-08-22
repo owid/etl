@@ -1527,6 +1527,9 @@ class Regions:
     # WARNING: This tool is under development, don't start using it just yet!
     ####################################################################################################################
 
+    TODO: The main thing missing in the current implementation, to start adding significant value with respect to the status quo, is to keep track of informed countries when creating aggregates (to then use that information to e.g. construct per capita indicators). In the most general case, I could store, for each column and year (or in principle other dimensions, except country), which countries were informed. This could be done with a dictionary, e.g. {col1: {2010: [Albania, Croatia, ...], {2011: [Bulgaria, ...], col2: {...}, ...}. This information could then be accessed to calculate population of the subset of regions for each column-year. However, this approach may not scale well.
+    There is a simpler alternative, which would be useful specifically for per-capita indicators. We could store a side table, with a row for each year (or other dimensions except country), and a column for each indicator for which region aggregates were created. We would then use this information in add_per_capita() to divide only by the informed population.
+
     """
 
     def __init__(
@@ -1534,12 +1537,13 @@ class Regions:
         ds_regions: Dataset | None = None,
         ds_income_groups: Dataset | None = None,
         countries_file: Path | str | None = None,
-        # TODO: Add excluded countries file.
+        excluded_countries_file: Path | str | None = None,
         auto_load_regions: bool = True,
     ):
         self._ds_regions = ds_regions
         self._ds_income_groups = ds_income_groups
         self.countries_file = countries_file
+        self.excluded_countries_file = excluded_countries_file
         self._region_cache: dict[str, Region] = {}
         self._informed_countries_cache: dict[tuple, set[str]] = {}
         # If auto_load_regions is True and no ds_regions is passed, load the latest regions dataset (and idem for ds_income_groups).
@@ -1598,7 +1602,7 @@ class Regions:
             self._region_cache[name] = Region(name=name, members=members)
         return self._region_cache[name]
 
-    def get_regions(self, names: list[str] | None = None, as_dict: bool = False) -> list[Region] | dict[str, Region]:
+    def get_regions(self, names: list[str] | None = None, as_dict: bool = False) -> list[Region] | dict[str, list[str]]:
         """Get multiple regions.
 
         Parameters
@@ -1606,12 +1610,12 @@ class Regions:
         names : list[str] or None
             List of region names to get. If None, returns all available regions.
         as_dict : bool
-            If True, return dict mapping names to Region objects.
-            If False, return list of Region objects.
+            If True, return a dictionary of region and members.
+            If False, return a list of Region objects.
 
         Returns
         -------
-        list[Region] or dict[str, Region]
+        list[Region] or dict[str, list[str]]
             Region objects as requested format.
         """
         if names is None:
@@ -1623,7 +1627,7 @@ class Regions:
 
         if as_dict:
             # Optionally, make the output a dictionary, for convenience.
-            regions = {region.name: region for region in regions}
+            regions = {region.name: region.members for region in regions}
 
         return regions
 
@@ -1656,7 +1660,6 @@ class Regions:
         warn_on_unused_countries: bool = True,
         warn_on_unknown_excluded_countries: bool = True,
         show_full_warning: bool = True,
-        excluded_countries_file: Path | str | None = None,
     ) -> Table:
         """Harmonize country names in a table using the countries mapping file."""
         if self.countries_file is None:
@@ -1670,7 +1673,7 @@ class Regions:
         return harmonize_countries(
             df=tb,
             countries_file=self.countries_file,
-            excluded_countries_file=excluded_countries_file,
+            excluded_countries_file=self.excluded_countries_file,
             country_col=country_col,
             warn_on_missing_countries=warn_on_missing_countries,
             make_missing_countries_nan=make_missing_countries_nan,
