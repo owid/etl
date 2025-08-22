@@ -1170,8 +1170,8 @@
   successors:
     - "CZE"
     - "SVK"
-    - "ERI"
-    - "ETH"
+    - "CZE"
+    - "SVK"
 - code: "OWID_SRM"
   name: "Serbia and Montenegro"
   is_historical: True
