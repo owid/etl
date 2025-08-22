@@ -64,6 +64,7 @@ def combine_datasets() -> pd.DataFrame:
             "broad_cause_group": "Noncommunicable diseases",
         },
         "Digestive diseases": {"icd_codes": "K20-K92", "broad_cause_group": "Noncommunicable diseases"},
+        "Genitourinary diseases": {"icd_codes": "N00-N64, N75-N98", "broad_cause_group": "Noncommunicable diseases"},
         "Ill-defined injuries": {"icd_codes": "Y10-Y34, Y872", "broad_cause_group": "Injuries"},
         "Infectious and parasitic diseases": {
             "icd_codes": "A00-B99, G00-G04, G14, N70-N73, P37.3, P37.4",
