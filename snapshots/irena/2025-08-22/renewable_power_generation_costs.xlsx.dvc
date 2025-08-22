@@ -2,12 +2,16 @@ meta:
   origin:
     producer: IRENA
     title: Renewable Power Generation Costs
-    citation_full: IRENA - Renewable Power Generation Costs in 2023. International Renewable Energy Agency, Abu Dhabi (2024).
+    citation_full: IRENA - Renewable Power Generation Costs in 2024. International Renewable Energy Agency, Abu Dhabi (2025).
     attribution_short: IRENA
-    url_main: https://www.irena.org/Publications/2024/Sep/Renewable-Power-Generation-Costs-in-2023
-    url_download: https://www.irena.org/-/media/Files/IRENA/Agency/Publication/2024/Sep/IRENA-Datafile-RenPwrGenCosts-in-2023-v1.xlsx
+    url_main: https://www.irena.org/Publications/2025/Jul/Renewable-Power-Generation-Costs-in-2024
+    url_download: https://www.irena.org/-/media/Files/IRENA/Agency/Publication/2025/Jul/IRENA-Datafile-RenPwrGenCosts-in-2024.xlsx
     date_accessed: '2025-08-22'
-    date_published: '2024-09-01'
+    date_published: '2025-07-01'
     license:
-      name: ©IRENA 2024
-      url: https://www.irena.org/Publications/2024/Sep/Renewable-Power-Generation-Costs-in-2023
+      name: ©IRENA 2025
+      url: https://www.irena.org/Publications/2025/Jul/Renewable-Power-Generation-Costs-in-2024
+outs:
+  - md5: 59f37d526445e3080f79edcb10254afb
+    size: 12773553
+    path: renewable_power_generation_costs.xlsx

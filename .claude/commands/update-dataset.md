@@ -1,49 +1,14 @@
 # Dataset Update
 
-## Phase 1: Initial Update and PR (REQUIRED - Execute automatically)
-
-Create a a draft PR for dataset update, run `etl update` and update PR description.
-
-You should be given catalog path of a dataset [namespace]/[version]/[short_name].
-
-1. **Create draft PR** using `etl pr` command with a short branch name (max 28 chars for database compatibility).
-
-   **⚠️ CRITICAL: Check current branch first!** If we're not on **master** branch, MUST add `--base-branch [current-branch]` flag:
-   ```bash
-   # First check current branch
-   git branch --show-current
-
-   # If on master branch:
-   etl pr "Update [namespace]/[version]/[short_name]" data --work-branch update-[short_name]
-
-   # If NOT on master branch (MOST COMMON):
-   etl pr "Update [namespace]/[version]/[short_name]" data --work-branch update-[short_name] --base-branch [current-branch]
-   ```
-
-2. **Update dataset** with `--include-usages` to copy to new version
-   ```bash
-   etl update snapshot://[namespace]/[version]/[short_name] --include-usages
-   ```
-
-3. **Commit and push initial changes**
-   ```bash
-   git add .
-   git commit -m "Update dataset to new version"
-   git push origin [branch-name]
-   ```
-
-4. **Update PR description**
-   - Get the PR number and last commit hash from the initial update
-   - Add a link to show changes made after the initial update `https://github.com/owid/etl/pull/[pr_number]/files/[last_commit]..HEAD`
-
-
 ## Phase 2: Fix Issues (REQUIRED - Execute automatically)
 
 ### Phase 2A: Snapshot and Initial Processing
 
+Run snapshot step, compare it with the old snapshot, ask user if they want to proceed and if yes, commit and update PR with a collapsable section "Snapshot difference".
+
 1. **Run snapshot step**
    ```bash
-   etls #$ARGUMENTS
+   etls [namespace]/[version]/[short_name]
    ```
 
 2. **Compare snapshots and document changes** - Analyze differences between old and new data files
@@ -177,9 +142,6 @@ You should be given catalog path of a dataset [namespace]/[version]/[short_name]
   - Grapher metadata YAML (if exists)
 - **Index issues**: Check for unwanted `index` columns from `reset_index()` - ensure proper indexing with `tb.format(["country", "year"])`
 - **Metadata validation**: Use error messages as guide - they show exactly which variables to add/remove from YAML files
-- **Snapshot metadata**: Check if version info needs updating in `.dvc` file:
-  - Update `version_producer`, `date_published`, and years in citations if newer version available
-  - Keep your own `date_accessed` but align version info with the actual data
 
 ## Indicator Upgrader
 
