@@ -17,13 +17,20 @@ from owid.datautils.dataframes import groupby_agg, map_series
 from owid.datautils.io.json import load_json
 from structlog import get_logger
 
-from etl.paths import DATA_DIR, LATEST_REGIONS_DATASET_PATH
+from etl.paths import DATA_DIR, LATEST_INCOME_DATASET_PATH, LATEST_REGIONS_DATASET_PATH
 
 # Initialize logger.
 log = get_logger()
 
 TableOrDataFrame = TypeVar("TableOrDataFrame", pd.DataFrame, Table)
 
+# Default income groups.
+INCOME_GROUPS = {
+    "Low-income countries": {},
+    "Upper-middle-income countries": {},
+    "Lower-middle-income countries": {},
+    "High-income countries": {},
+}
 # Default regions when creating region aggregates.
 REGIONS = {
     # Default continents.
@@ -33,17 +40,14 @@ REGIONS = {
     "North America": {},
     "Oceania": {},
     "South America": {},
-    # Income groups.
-    "Low-income countries": {},
-    "Upper-middle-income countries": {},
-    "Lower-middle-income countries": {},
-    "High-income countries": {},
     # Other special regions.
     "European Union (27)": {},
     # TODO: Consider adding also the historical regions to EU (27) definition.
     # That could be done in the regions dataset, or here, by defining:
     # {"European Union (27)": {"additional_members": ["East Germany", "West Germany", "Czechoslovakia", ...]}}
 }
+# Add income groups to default regions.
+REGIONS.update(INCOME_GROUPS)
 
 ########################################################################################################################
 # DEPRECATED: Default parameters when using "auto" mode when imposing a list of countries that must be informed, when
@@ -1502,3 +1506,237 @@ def countries_to_income_mapping(ds_regions: Dataset, ds_income: Dataset):
         countries_to_continent |= {m: region for m in members}
 
     return countries_to_continent
+
+
+class Region:
+    """Represents a single geographical region with its members."""
+
+    def __init__(self, name: str, members: list[str]):
+        self.name = name
+        self.members = members
+        # TODO: Add more attributes (e.g. codes).
+
+    def __repr__(self):
+        return f"Region(name='{self.name}', members={len(self.members)})"
+
+
+class Regions:
+    """Manages geographical regions and their aggregations with enhanced functionality.
+
+    ####################################################################################################################
+    # WARNING: This tool is under development, don't start using it just yet!
+    ####################################################################################################################
+
+    """
+
+    def __init__(
+        self,
+        ds_regions: Dataset | None = None,
+        ds_income_groups: Dataset | None = None,
+        countries_file: Path | str | None = None,
+        # TODO: Add excluded countries file.
+        auto_load_regions: bool = True,
+    ):
+        self._ds_regions = ds_regions
+        self._ds_income_groups = ds_income_groups
+        self._countries_file = countries_file
+        self._region_cache: dict[str, Region] = {}
+        self._informed_countries_cache: dict[tuple, set[str]] = {}
+        # If auto_load_regions is True and no ds_regions is passed, load the latest regions dataset (and idem for ds_income_groups).
+        # NOTE: This parameter will be False when Regions is loaded from PathFinder; that way we impose that regions (and/or income_groups) must be among dependencies.
+        self.auto_load_regions = auto_load_regions
+
+    @property
+    def ds_regions(self) -> Dataset:
+        """Regions dataset."""
+        if self._ds_regions is None:
+            if self.auto_load_regions:
+                # Auto-load from default location (for standalone usage).
+                self._ds_regions = Dataset(LATEST_REGIONS_DATASET_PATH)
+            else:
+                # For ETL work, raise an error if the regions dataset is not among dependencies of the current step.
+                raise ValueError(
+                    "Regions dataset could not be loaded. If this is part of an ETL step, add the latest regions dataset to the list of dependencies."
+                )
+        return self._ds_regions
+
+    @property
+    def ds_income_groups(self) -> Dataset | None:
+        """Income groups dataset."""
+        if self._ds_income_groups is None:
+            if self.auto_load_regions:
+                # Auto-load from default location (for standalone usage).
+                self._ds_income_groups = Dataset(LATEST_INCOME_DATASET_PATH)
+            else:
+                # For ETL work, raise an error if the income groups dataset is not among dependencies of the current step.
+                raise ValueError(
+                    "Income groups dataset could not be loaded. If this is part of an ETL step, add the latest income groups dataset to the list of dependencies."
+                )
+        return self._ds_income_groups
+
+    def get_region(self, name: str) -> Region:
+        """Get region members.
+
+        Parameters
+        ----------
+        name : str
+            Region name (e.g., "Africa", "Europe", "High-income countries").
+
+        Returns
+        -------
+        Region
+            Region object with name and members list.
+        """
+        if name not in self._region_cache:
+            members = list_members_of_region(
+                region=name,
+                ds_regions=self.ds_regions,
+                # Load income groups only if necessary (and raise an error if not among dependencies).
+                ds_income_groups=self.ds_income_groups if name in INCOME_GROUPS else None,
+                include_historical_regions_in_income_groups=True,
+            )
+            self._region_cache[name] = Region(name=name, members=members)
+        return self._region_cache[name]
+
+    def get_regions(self, names: list[str] | None = None, as_dict: bool = False) -> list[Region] | dict[str, Region]:
+        """Get multiple regions.
+
+        Parameters
+        ----------
+        names : list[str] or None
+            List of region names to get. If None, returns all available regions.
+        as_dict : bool
+            If True, return dict mapping names to Region objects.
+            If False, return list of Region objects.
+
+        Returns
+        -------
+        list[Region] or dict[str, Region]
+            Region objects as requested format.
+        """
+        if names is None:
+            # Get all available regions.
+            names = list(REGIONS.keys())
+
+        # Create a list of individual Region objects.
+        regions = [self.get_region(name) for name in names]
+
+        if as_dict:
+            # Optionally, make the output a dictionary, for convenience.
+            regions = {region.name: region for region in regions}
+
+        return regions
+
+    def harmonize_names(
+        self,
+        tb: Table,
+        country_col: str = "country",
+        warn_on_missing_countries: bool = True,
+        make_missing_countries_nan: bool = False,
+        warn_on_unused_countries: bool = True,
+        warn_on_unknown_excluded_countries: bool = True,
+        show_full_warning: bool = True,
+        excluded_countries_file: Path | str | None = None,
+    ) -> Table:
+        """Harmonize country names using the countries mapping file."""
+        if self._countries_file is None:
+            raise ValueError("countries_file must be provided to use harmonize_countries")
+
+        return harmonize_countries(
+            df=tb,
+            countries_file=self._countries_file,
+            excluded_countries_file=excluded_countries_file,
+            country_col=country_col,
+            warn_on_missing_countries=warn_on_missing_countries,
+            make_missing_countries_nan=make_missing_countries_nan,
+            warn_on_unused_countries=warn_on_unused_countries,
+            warn_on_unknown_excluded_countries=warn_on_unknown_excluded_countries,
+            show_full_warning=show_full_warning,
+        )
+
+    def add_aggregates(
+        self,
+        tb: Table,
+        regions: list[str] | dict[str, Any] | None = None,
+        aggregations: dict[str, str] | None = None,
+        index_columns: list[str] | None = None,
+        num_allowed_nans_per_year: int | None = None,
+        frac_allowed_nans_per_year: float | None = None,
+        min_num_values_per_year: int | None = None,
+        country_col: str = "country",
+        year_col: str = "year",
+        keep_original_region_with_suffix: str | None = None,
+        check_for_region_overlaps: bool = True,
+        accepted_overlaps: list[dict[int, set[str]]] | None = None,
+        ignore_overlaps_of_zeros: bool = False,
+        subregion_type: str = "successors",
+        countries_that_must_have_data: dict[str, list[str]] | None = None,
+        frac_countries_that_must_have_data: dict[str, float] | None = None,
+    ) -> Table:
+        """Add region aggregates to a table."""
+        # Call the existing function but store informed countries info
+        # TODO: Track informed countries for each region-year-indicator combination, to enable smarter per-capita calculations. For now, simply keep the status-quo operation.
+        result = add_regions_to_table(
+            tb=tb,
+            ds_regions=self.ds_regions,
+            ds_income_groups=self.ds_income_groups,
+            regions=regions,
+            aggregations=aggregations,
+            index_columns=index_columns,
+            num_allowed_nans_per_year=num_allowed_nans_per_year,
+            frac_allowed_nans_per_year=frac_allowed_nans_per_year,
+            min_num_values_per_year=min_num_values_per_year,
+            country_col=country_col,
+            year_col=year_col,
+            keep_original_region_with_suffix=keep_original_region_with_suffix,
+            check_for_region_overlaps=check_for_region_overlaps,
+            accepted_overlaps=accepted_overlaps,
+            ignore_overlaps_of_zeros=ignore_overlaps_of_zeros,
+            subregion_type=subregion_type,
+            countries_that_must_have_data=countries_that_must_have_data,
+            frac_countries_that_must_have_data=frac_countries_that_must_have_data,
+        )
+
+        return result
+
+    def add_per_capita(
+        self,
+        tb: Table,
+        columns: list[str],
+        population_col: str = "population",
+        suffix: str = "_per_capita",
+        prefix: str = "",
+    ) -> Table:
+        """Add per-capita indicators.
+
+        Parameters
+        ----------
+        tb : Table
+            Table where per-capita indicators will be created.
+        columns : list[str]
+            Columns to convert to per-capita.
+        population_col : str
+            Column name with population data.
+        suffix : str
+            Suffix to append to the original column names to create the name of the new per-capita column.
+        prefix : str
+            Prefix to prepend to the original column names to create the name of the new per-capita column.
+
+        Returns
+        -------
+        Table
+            Table with additional per-capita columns.
+        """
+        tb_result = tb.copy()
+
+        # TODO: We should add another property for ds_population (similar to ds_regions), to lazy load the population dataset (and ensure it's among dependencies, when run from an ETL step).
+
+        # TODO: Consider the case where per-capita indicators already exist, but we want to add them just for region aggregates (which is the main use of this function).
+
+        for col in columns:
+            new_col_name = f"{prefix}{col}{suffix}"
+
+            # TODO: For now, use a simple division, assuming population is in the table. We should somehow track informed countries to calculate population of only countries that contributed to the aggregate.
+            tb_result[new_col_name] = tb_result[col] / tb_result[population_col]
+
+        return tb_result
