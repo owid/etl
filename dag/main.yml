@@ -668,33 +668,11 @@ steps:
   data://garden/imf/2025-07-08/trade:
     - data://meadow/imf/2025-07-08/trade
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2025-07-01/income_groups
+    - data://garden/demography/2024-07-15/population
+    - data://garden/worldbank_wdi/2025-01-24/wdi
   data://grapher/imf/2025-07-08/trade:
     - data://garden/imf/2025-07-08/trade
- # Test MDIM
-  data://garden/imf/2025-07-08/trade_mdim:
-    - data://meadow/imf/2025-07-08/trade
-    - data://garden/regions/2023-01-01/regions
-  data://grapher/imf/2025-07-08/trade_mdim:
-    - data://garden/imf/2025-07-08/trade_mdim
-  export://multidim/trade/latest/trade_flow:
-    - data://grapher/imf/2025-07-08/trade_mdim
-
- # Test Key Regions
-  data://garden/imf/2025-07-08/trade_asia:
-    - data://meadow/imf/2025-07-08/trade
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/worldbank_wdi/2025-01-24/wdi
-    - data://garden/demography/2024-07-15/population
-  data://grapher/imf/2025-07-08/trade_asia:
-    - data://garden/imf/2025-07-08/trade_asia
-
- # Test China rank
-  data://garden/imf/2025-07-08/trade_china_rank:
-    - data://meadow/imf/2025-07-08/trade
-    - data://garden/regions/2023-01-01/regions
-  data://grapher/imf/2025-07-08/trade_china_rank:
-    - data://garden/imf/2025-07-08/trade_china_rank
+ #
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
