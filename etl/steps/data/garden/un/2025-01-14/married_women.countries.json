@@ -243,7 +243,7 @@
   "Lower-middle-income countries": "Lower-middle-income countries",
   "Melanesia": "Melanesia",
   "Middle Africa": "Middle Africa (UN)",
-  "No income group available": "No income group available (UN)",
+  "No income group available": "No income group available",
   "Northern Africa": "Northern Africa (UN)",
   "Northern Africa and Western Asia": "Northern Africa and Western Asia (UN)",
   "Northern America": "North America (UN)",
@@ -266,5 +266,4 @@
   "Western Asia": "Western Asia (UN)",
   "Western Europe": "Western Europe (UN)",
   "Micronesia": "Micronesia (UN)"
-
 }
