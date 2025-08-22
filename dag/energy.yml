@@ -365,7 +365,6 @@ steps:
   #
   data://grapher/irena/2025-07-18/renewable_capacity:
     - data://garden/irena/2025-07-18/renewable_energy_statistics
-  ######################################################################################################################
   #
   # IRENA - Renewable power generation costs.
   #
