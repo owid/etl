@@ -26,7 +26,7 @@ from gapminder_sg import (
     load_gapminder_sys_glob_former,
 )
 from hyde import load_hyde
-from owid.catalog import Table
+from owid.catalog import Dataset, Table
 from structlog import get_logger
 from unwpp import load_unwpp
 
@@ -58,7 +58,7 @@ def run(dest_dir: str) -> None:
     ds_regions = paths.load_dataset("regions")
     tb_regions = ds_regions["regions"]
 
-    tb = make_table(tb_regions)
+    tb = make_table(tb_regions, ds_regions)
 
     # keep original table with all origins, population table has only one origin
     # defined in YAML file
@@ -74,11 +74,11 @@ def run(dest_dir: str) -> None:
     log.info("population.end")
 
 
-def make_table(tb_regions: Table) -> Table:
+def make_table(tb_regions: Table, ds_regions: Dataset) -> Table:
     tb = (
         load_data()
         .pipe(select_source)
-        .pipe(add_regions)
+        .pipe(add_regions, ds_regions)
         .pipe(add_world)
         .pipe(add_historical_regions, tb_regions)
         .pipe(fix_anomalies)
@@ -144,7 +144,7 @@ def _assert_unique(df: Table, subset: List[str]) -> None:
         raise AssertionError(f"Duplicate rows:\n {diff}")
 
 
-def add_regions(df: Table) -> Table:
+def add_regions(df: Table, ds_regions: Dataset) -> Table:
     """Add continents and income groups."""
     log.info("population: adding regions...")
     regions = [
@@ -191,7 +191,7 @@ def add_regions(df: Table) -> Table:
     # add sources for region aggregates
     # this is done by taking the union of all sources for countries in the region
     for region in regions:
-        members = geo.list_countries_in_region(region)
+        members = geo.list_members_of_region(region=region, ds_regions=ds_regions)
         s = df.loc[df["country"].isin(members), "source"].unique()
         sources_region = sorted(s)
         df.loc[df["country"] == region, "source"] = "; ".join(sources_region)
