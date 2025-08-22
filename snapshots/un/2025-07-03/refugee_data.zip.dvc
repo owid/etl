@@ -19,7 +19,7 @@ meta:
 
     # Files
     url_main: https://www.unhcr.org/refugee-statistics/download/?v2url=e7088f
-    url_download: h https://www.unhcr.org/refugee-statistics/file-download/?v2url=e7088f
+    url_download: https://www.unhcr.org/refugee-statistics/file-download/?v2url=e7088f
     date_accessed: '2025-07-03'
 
     # License
