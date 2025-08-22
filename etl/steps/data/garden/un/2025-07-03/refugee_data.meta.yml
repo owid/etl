@@ -153,7 +153,7 @@ tables:
       hst:
         title: People in host communities by country of origin
         description_short: |-
-          A [host community](#dod:host-community) is a community that hosts many people who had to flee their home. These people (e.g., [refugees](#dod:refugee or [displaced people](#dod:internally-displaced) could live in camps, integrated into households, or independently within the community.
+          A [host community](#dod:host-community) is a community that hosts many people who had to flee their home. These people (e.g., [refugees](#dod:refugee) or [displaced people](#dod:internally-displaced) could live in camps, integrated into households, or independently within the community.
         description_from_producer: "{definitions.description_host_community}"
       ooc:
         title: Other persons of concern by country of origin
