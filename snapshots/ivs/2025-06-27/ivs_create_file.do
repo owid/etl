@@ -14,6 +14,31 @@ INSTRUCTIONS
 	5.	Delete csv file
 	6.	Run `etl integrated_values_survey`
 
+
+To explore options for each question
+
+use Integrated_values_surveys_1981-2022, clear
+
+global democracy_questions E111_01 E115 E116 E117 E224 E225 E226 E227 E228 E229 E233 E233A E233B E235 E236 E266
+
+global democracy_satisfied E111_01
+
+global democracy_very_good_bery_bad E115 E116 E117
+
+global democracy_essential_char E224 E225 E226 E227 E228 E229 E233 E233A E233B
+
+global democracy_importance E235
+
+global democracy_democraticness E236
+
+global democracy_elections_makes_diff E266
+
+foreach var in $democracy_questions {
+	di "`var'"
+	tab `var'
+	label list `var'
+}
+
 */
 
 
@@ -437,10 +462,10 @@ gen equality_eq_ineq = 0
 replace equality_eq_ineq = 1 if E035 <= 4
 
 gen neutral_eq_ineq = 0
-replace neutral_eq_ineq = 1 if E035 == 5
+replace neutral_eq_ineq = 1 if E035 == 5 | E035 == 6
 
 gen inequality_eq_ineq = 0
-replace inequality_eq_ineq = 1 if E035 >= 6 & E035 <=10
+replace inequality_eq_ineq = 1 if E035 >= 7 & E035 <=10
 
 gen dont_know_eq_ineq = 0
 replace dont_know_eq_ineq = 1 if E035 == .a
@@ -717,7 +742,7 @@ foreach var in $justifiable_questions {
 	replace never_just_agg_`var' = 1 if `var' <= 4
 
 	gen always_just_agg_`var' = 0
-	replace always_just_agg_`var' = 1 if `var' >= 6 & `var' <= 10
+	replace always_just_agg_`var' = 1 if `var' >= 7 & `var' <= 10
 
 	gen never_just_`var' = 0
 	replace never_just_`var' = 1 if `var' == 1
@@ -726,7 +751,7 @@ foreach var in $justifiable_questions {
 	replace always_just_`var' = 1 if `var' == 10
 
 	gen neutral_`var' = 0
-	replace neutral_`var' = 1 if `var' == 5
+	replace neutral_`var' = 1 if `var' == 5 | `var' == 6
 
 	gen dont_know_`var' = 0
 	replace dont_know_`var' = 1 if `var' == .a
@@ -974,7 +999,7 @@ gen not_satisfied_democracy = 0
 replace not_satisfied_democracy = 1 if $democracy_satisfied <= 4
 
 gen satisfied_democracy = 0
-replace satisfied_democracy = 1 if $democracy_satisfied >= 6 & $democracy_satisfied <= 10
+replace satisfied_democracy = 1 if $democracy_satisfied >= 7 & $democracy_satisfied <= 10
 
 gen not_satisfied_at_all_democracy = 0
 replace not_satisfied_at_all_democracy = 1 if $democracy_satisfied == 1
@@ -983,7 +1008,7 @@ gen satisfied_completely_democracy = 0
 replace satisfied_completely_democracy = 1 if $democracy_satisfied == 10
 
 gen neutral_satisfied_democracy = 0
-replace neutral_satisfied_democracy = 1 if $democracy_satisfied == 5
+replace neutral_satisfied_democracy = 1 if $democracy_satisfied == 5 | $democracy_satisfied == 6
 
 gen dont_know_satisfied_democracy = 0
 replace dont_know_satisfied_democracy = 1 if $democracy_satisfied == .a
@@ -1084,7 +1109,7 @@ foreach var in $democracy_essential_char {
 	replace not_essential_dem_agg_`var' = 1 if `var' <= 4 //Note that I am including the spontaneous "it is against democracy" answer
 
 	gen essential_dem_agg_`var' = 0
-	replace essential_dem_agg_`var' = 1 if `var' >= 6 & `var' <= 10
+	replace essential_dem_agg_`var' = 1 if `var' >= 7 & `var' <= 10
 
 	gen not_essential_dem_`var' = 0
 	replace not_essential_dem_`var' = 1 if `var' == 1 | `var' == 0 //Note that I am including the spontaneous "it is against democracy" answer
@@ -1093,7 +1118,7 @@ foreach var in $democracy_essential_char {
 	replace essential_dem_`var' = 1 if `var' == 10
 
 	gen neutral_essential_dem_`var' = 0
-	replace neutral_essential_dem_`var' = 1 if `var' == 5
+	replace neutral_essential_dem_`var' = 1 if `var' == 5 | `var' == 6
 
 	gen dont_know_`var' = 0
 	replace dont_know_`var' = 1 if `var' == .a
@@ -1140,7 +1165,7 @@ gen not_important_democracy = 0
 replace not_important_democracy = 1 if $democracy_importance <= 4
 
 gen important_democracy = 0
-replace important_democracy = 1 if $democracy_importance >= 6 & $democracy_importance <= 10
+replace important_democracy = 1 if $democracy_importance >= 7 & $democracy_importance <= 10
 
 gen not_at_all_important_democracy = 0
 replace not_at_all_important_democracy = 1 if $democracy_importance == 1
@@ -1149,7 +1174,7 @@ gen absolutely_important_democracy = 0
 replace absolutely_important_democracy = 1 if $democracy_importance == 10
 
 gen neutral_important_democracy = 0
-replace neutral_important_democracy = 1 if $democracy_importance == 5
+replace neutral_important_democracy = 1 if $democracy_importance == 5 | $democracy_importance == 6
 
 gen dont_know_important_democracy = 0
 replace dont_know_important_democracy = 1 if $democracy_importance == .a
@@ -1195,7 +1220,7 @@ gen not_democratic = 0
 replace not_democratic = 1 if $democracy_democraticness <= 4
 
 gen yes_democratic = 0
-replace yes_democratic = 1 if $democracy_democraticness >= 6 & $democracy_democraticness <= 10
+replace yes_democratic = 1 if $democracy_democraticness >= 7 & $democracy_democraticness <= 10
 
 gen not_at_all_democratic = 0
 replace not_at_all_democratic = 1 if $democracy_democraticness == 1
@@ -1204,7 +1229,7 @@ gen completely_democratic = 0
 replace completely_democratic = 1 if $democracy_democraticness == 10
 
 gen neutral_democratic = 0
-replace neutral_democratic = 1 if $democracy_democraticness == 5
+replace neutral_democratic = 1 if $democracy_democraticness == 5 | $democracy_democraticness == 6
 
 gen dont_know_democratic = 0
 replace dont_know_democratic = 1 if $democracy_democraticness == .a

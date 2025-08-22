@@ -255,6 +255,8 @@ def edit_faust(c, tb_ucdp, tb_up, region_names):
 
 
 def _set_description_key(view, tb_ucdp, tb_up):
+    UCDP_ONLY = "[Uppsala Conflict Data Program (UCDP)](https://ucdp.uu.se/)"
+    UCDP_AND_PRIO = f"{UCDP_ONLY} and the [Peace Research Institute Oslo (PRIO)](https://www.prio.org/data/1)"
     keys = None
     if (view.d.conflict_type == "state_based_stacked") or (view.d.estimate == "best_ci"):
         if view.d.indicator == "deaths":
@@ -284,6 +286,16 @@ def _set_description_key(view, tb_ucdp, tb_up):
         keys = tb_ucdp[f"number_ongoing_conflicts_per_country__conflict_type_{ctype}"].metadata.description_key + [
             TEXT_KEY_EXTRA
         ]
+
+    if keys is not None:
+        for i, key in enumerate(keys):
+            key = key.replace(UCDP_ONLY, UCDP_AND_PRIO)
+            key = key.replace(
+                "UCDP identifies",
+                "[UCDP](https://www.uu.se/en/department/peace-and-conflict-research/research/ucdp/ucdp-methodology) and [PRIO](https://www.semanticscholar.org/paper/Monitoring-Trends-in-Global-Combat%3A-A-New-Dataset-Lacina-Gleditsch/0c4ff27fff986bc30112ac59ad6afbd7b719ad17?p2df) identify",
+            )
+            keys[i] = key
+
     return keys
 
 

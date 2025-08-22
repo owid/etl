@@ -79,6 +79,9 @@ SHELL_FORM_STYLE = questionary.Style(
     ]
 )
 
+# LLM
+MODEL_DEFAULT = "gpt-5-mini"
+
 
 @click.command(
     name="pr",
@@ -438,5 +441,5 @@ def summarize_title_llm(title) -> str:
     sys_prompt = "You are given a title of a pull request. I need a 2-3 keyword summary, separated by a space. These words will be used to create a branch name."
     api = OpenAIWrapper()
     log.info("Querying GPT!")
-    response = api.query_gpt_fast(title, sys_prompt, model="gpt-4o-mini")
+    response = api.query_gpt_fast(title, sys_prompt, model=MODEL_DEFAULT)
     return response

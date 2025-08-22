@@ -1,5 +1,29 @@
 # WARNING: Use this file to manually curate WDI indicators. Do NOT use the wdi.meta.yml file (which is generated automatically).
 definitions:
+  # Trained teachers map configuration
+  trained_teachers_grapher_config: &trained_teachers_grapher_config
+    maxTime: 2024
+    hasMapTab: true
+    map:
+      time: 2024
+      timeTolerance: 5
+      colorScale:
+        binningStrategy: manual
+        customNumericValues: [10,20,30,40,50,60,70,80,90,100]
+        baseColorScheme: Blues
+
+  # Gross enrolment ratio configuration
+  grapher_config_enrolment_pubugn: &grapher_config_enrolment_pubugn
+    maxTime: 2024
+    hasMapTab: true
+    map:
+      time: 2024
+      timeTolerance: 5
+      colorScale:
+        binningStrategy: manual
+        customNumericValues: [0, 10,20,30,40,50,60,70,80,90,100]
+        baseColorScheme: PuBuGn
+
   gdp: Gross domestic product (GDP) is a measure of the total value added from the production of goods and services in a country or region each year.
   gdp_per_capita: GDP per capita is GDP divided by population.
   gni: Gross national income (GNI) is a measure of the total income earned by residents of a country or region each year. It is calculated as GDP plus net income received from abroad, plus taxes (minus subsidies) on production.
@@ -14,6 +38,19 @@ definitions:
   description_short_gni: Total income earned by residents of a country or region, including income earned abroad.
   description_short_gni_per_capita: Average income per person earned by residents of a country or region, including income earned abroad.
 
+  # description_key_gdp_introduction: "[Gross domestic product](#dod:gdp) (GDP) is a comprehensive measure of countries' total income. It helps compare income levels across countries and track how they change over time. It is especially useful for understanding trends in economic growth and living standards."
+  description_key_gdp_definition: "[Gross domestic product](#dod:gdp) (GDP) is calculated as the value of all final goods and services produced each year in a country. It represents the total economic output of a country or region."
+  description_key_gdp_mention_mpd: This data comes from the World Bank and starts in 1990. For estimates going back several centuries, explore our chart of GDP from the [Maddison Project Database](https://ourworldindata.org/grapher/gdp-maddison-project-database).
+
+  description_key_gdp_per_capita_introduction: GDP per capita is a comprehensive measure of people's average income. It helps compare income levels across countries and track how they change over time. It is especially useful for understanding trends in economic growth and living standards.
+  description_key_gdp_per_capita_definition: GDP per capita is calculated as the value of all final goods and services produced each year in a country (the [gross domestic product](#dod:gdp)), divided by the population. It represents the average economic output per person.
+  description_key_gdp_per_capita_inequality: This indicator shows the large inequality between people in different countries. In the poorest countries, average incomes are below $1,000 per year; in rich countries, they are more than 50 times higher.
+  description_key_gdp_per_capita_mention_mpd: This data comes from the World Bank and starts in 1990. For estimates going back several centuries, explore our chart of GDP per capita from the [Maddison Project Database](https://ourworldindata.org/grapher/gdp-per-capita-maddison-project-database).
+
+  description_key_ppp: This data is expressed in constant international dollars to adjust for inflation and differences in living costs between countries. Read more in our article, [What are international dollars?](https://ourworldindata.org/international-dollars)
+
+  subtitle_gdp_per_capita: GDP per capita is a country's [gross domestic product](#dod:gdp) divided by its population.
+
   description_processing_gdp_constant: |-
     We constructed estimates of GDP and GDP per capita in constant 2021 US$ by taking the corresponding series in current US$ and applying them the growth rates of the series in constant local currency units, adjusted by the base year (2021). This is [the same methodology](https://datahelpdesk.worldbank.org/knowledgebase/articles/114943-how-do-you-derive-constant-price-series-in-usd) followed by the World Bank to obtain the series in constant 2015 US$.
 
@@ -24,9 +61,16 @@ definitions:
   desc_key_ger: &desc_key_ger
     - Not all students enrol in school at the same age. The gross enrolment ratio includes students enrolled in a certain level of education, regardless of whether they are within the expected age range for that level. It includes students who are younger or older than expected due to late entry, early entry, or grade repetition.
     - It captures the total number of students enrolled at a specific education level, expressed as a percentage of the population in the official age group for that level. For example, if the official age group for upper secondary school is 15 to 17-year olds, the gross enrolment ratio compares total enrolment at that level (of any age) to the population of 15- to 17-year-olds.
-    - Values can be greater than 100% if students repeat grades or start a particular level of schooling late. In the example above, some 18- or 19 year olds might be included in the total if they started upper secondary school late.
+    - Values can be greater than 100% if students repeat grades or start a particular level of schooling late. For example, if the official age group for upper secondary school is 15 to 17-year olds, some 18- or 19 year olds might be included in the total if they started upper secondary school late.
     - Similarly, a value of 100% does not necessarily mean all children within a particular age group are enrolled in school; some children could be out-of-school, but gross enrolment rates are boosted by older students being included.
     - The data comes from administrative records, such as school enrolment reports, and from population estimates, usually provided by the United Nations or national sources.
+
+  desc_key_trained_teachers: &desc_key_trained_teachers
+   - Not all teachers receive the same level of preparation before entering the classroom. This indicator measures the percentage of teachers at each education level who have completed at least the minimum organized pedagogical training required for teaching at that level in their country.
+   - It captures the share of teachers who are pedagogically trained, expressed as a percentage of all teachers at that level. For example, if there are 1,000 primary teachers and 850 have completed the required training, the indicator shows 85%.
+   - The "minimum training" refers to whatever organized pedagogical preparation each country requires - pre-service teacher education programs, in-service training courses, or certification requirements that focus on teaching methods rather than subject knowledge.
+   - Values below 100% suggest some teachers are working without the pedagogical training their own country considers necessary. However, cross-country comparisons can be misleading since training requirements vary significantly between nations.
+   - The data comes from administrative records collected at schools and other organized learning centers, typically including information on teacher academic credentials and employment status.
 
   description_short_clean_fuels: &description_short_clean_fuels |-
     Access to [clean fuels or technologies](#dod:clean-cooking-fuels) such as natural gas, electricity, and clean cookstoves reduces exposure to indoor air pollutants, a leading cause of death in low-income households.
@@ -38,6 +82,17 @@ definitions:
     Trends in the proportion of the population using each fuel type are estimated using a single multivariate hierarchical model, with urban and rural disaggregation. Estimates for overall "polluting" fuels (unprocessed biomass, charcoal, coal, and kerosene) and "clean" fuels (gaseous fuels, electricity, as well as an aggregation of any other clean fuels like alcohol) are produced by aggregating estimates of relevant fuel types. The model was used to derive clean fuel use estimates for 191 countries (ref. Stoner, O., Shaddick, G., Economou, T., Gumy, S., Lewis, J., Lucio, I., Ruggeri, G. and Adair-Rohani, H. (2020), Global household energy model: a multivariate hierarchical approach to estimating trends in the use of polluting and clean fuels for cooking. J. R. Stat. Soc. C, 69: 815-839). Countries classified by the World Bank as high income (57 countries) in the 2022 fiscal year are assumed to have universal access to clean fuels and technologies for cooking.
   description_short_electricity: &description_short_electricity |-
     Access to electricity means having an electricity source that can provide very basic lighting, and charge a phone or power a radio for 4 hours per day.
+
+  map_brackets_gdp: &map_brackets_gdp
+    [0, 10000000000, 30000000000, 100000000000, 300000000000, 1000000000000, 3000000000000, 10000000000000, 1]
+  map_brackets_gdp_per_capita: &map_brackets_gdp_per_capita
+    [0, 1000, 2000, 5000, 10000, 20000, 50000, 1]
+
+  selected_entity_names_gdp: &selected_entity_names_gdp
+    [United States, Germany, United Kingdom, Brazil, South Korea, Japan, China, India, Ethiopia, Russia]
+  selected_entity_names_gdp_per_capita: &selected_entity_names_gdp_per_capita
+    [United States, Germany, United Kingdom, Brazil, South Korea, Japan, China, India, Ethiopia, Russia]
+
 tables:
   wdi:
     variables:
@@ -54,11 +109,11 @@ tables:
           tolerance: 5
         description_short: "{definitions.description_short_gdp_per_capita} {definitions.ppp_adjustment}"
         description_key:
-          - "{definitions.gdp} {definitions.gdp_per_capita}"
-          - This GDP per capita indicator provides information on economic growth and income levels from 1990.
-          - "{definitions.ppp_adjustment}"
-          - "{definitions.ppp_prices}"
-          - For GDP per capita estimates in the long run, explore the [Maddison Project Database's indicator](https://ourworldindata.org/grapher/gdp-per-capita-maddison).
+          - "{definitions.description_key_gdp_per_capita_introduction}"
+          - "{definitions.description_key_gdp_per_capita_definition}"
+          - "{definitions.description_key_gdp_per_capita_inequality}"
+          - "{definitions.description_key_ppp}"
+          - "{definitions.description_key_gdp_per_capita_mention_mpd}"
         processing_level: minor
         presentation:
           title_public: GDP per capita
@@ -71,7 +126,7 @@ tables:
               gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
           grapher_config:
             title: GDP per capita
-            subtitle: "{definitions.ppp_adjustment}"
+            subtitle: "{definitions.subtitle_gdp_per_capita} {definitions.ppp_adjustment}"
             note: "{definitions.ppp_prices}"
             variantName: In constant international-$ – World Bank
             originUrl: https://ourworldindata.org/economic-growth
@@ -89,24 +144,8 @@ tables:
               colorScale:
                 baseColorScheme: GnBu
                 binningStrategy: manual
-                customNumericValues:
-                  - 0
-                  - 1000
-                  - 2000
-                  - 5000
-                  - 10000
-                  - 20000
-                  - 50000
-                  - 1
-            selectedEntityNames:
-              - United States
-              - Germany
-              - United Kingdom
-              - France
-              - South Korea
-              - Japan
-              - China
-              - India
+                customNumericValues: *map_brackets_gdp_per_capita
+            selectedEntityNames: *selected_entity_names_gdp_per_capita
 
       ny_gdp_mktp_pp_kd:
         title: GDP, PPP (constant 2021 international $)
@@ -118,11 +157,10 @@ tables:
           tolerance: 5
         description_short: "{definitions.description_short_gdp} {definitions.ppp_adjustment}"
         description_key:
-          - "{definitions.gdp}"
-          - This GDP indicator provides information on economic growth and income levels from 1990.
-          - "{definitions.ppp_adjustment}"
-          - "{definitions.ppp_prices}"
-          - For GDP estimates in the long run, explore the [Maddison Project Database's indicator](https://ourworldindata.org/grapher/gdp-maddison-project-database).
+
+          - "{definitions.description_key_gdp_definition}"
+          - "{definitions.description_key_ppp}"
+          - "{definitions.description_key_gdp_mention_mpd}"
         processing_level: minor
         presentation:
           title_public: Gross domestic product (GDP)
@@ -149,27 +187,8 @@ tables:
               colorScale:
                 baseColorScheme: PuBu
                 binningStrategy: manual
-                customNumericValues:
-                  - 0
-                  - 10000000000
-                  - 30000000000
-                  - 100000000000
-                  - 300000000000
-                  - 1000000000000
-                  - 3000000000000
-                  - 10000000000000
-                  - 1
-            selectedEntityNames:
-              - China
-              - United States
-              - Japan
-              - United Kingdom
-              - Brazil
-              - India
-              - Germany
-              - Russia
-              - France
-              - Mexico
+                customNumericValues: *map_brackets_gdp
+            selectedEntityNames: *selected_entity_names_gdp
 
       ny_gnp_pcap_pp_kd:
         title: GNI per capita, PPP (constant 2021 international $)
@@ -205,24 +224,8 @@ tables:
               colorScale:
                 binningStrategy: manual
                 baseColorScheme: BuGn
-                customNumericValues:
-                  - 0
-                  - 1000
-                  - 2000
-                  - 5000
-                  - 10000
-                  - 20000
-                  - 50000
-                  - 1
-            selectedEntityNames:
-              - United States
-              - Germany
-              - France
-              - United Kingdom
-              - South Korea
-              - Japan
-              - India
-              - China
+                customNumericValues: *map_brackets_gdp_per_capita
+            selectedEntityNames: *selected_entity_names_gdp_per_capita
             yAxis:
               canChangeScaleType: true
               min: 0
@@ -287,34 +290,19 @@ tables:
             colorScale:
               binningStrategy: manual
               baseColorScheme: GnBu
-              customNumericValues:
-                - 0
-                - 1000
-                - 2000
-                - 5000
-                - 10000
-                - 20000
-                - 50000
-                - 1
-        selectedEntityNames:
-          - United States
-          - Germany
-          - United Kingdom
-          - South Korea
-          - France
-          - Japan
-          - China
-          - India
-        yAxis:
-          canChangeScaleType: true
-          min: 0
-        tab: map
-        hideRelativeToggle: false
-        hasMapTab: true
-        hideAnnotationFieldsInTitle:
-          entity: true
-          time: true
-          changeInPrefix: true
+              customNumericValues: *map_brackets_gdp_per_capita
+          selectedEntityNames: *selected_entity_names_gdp_per_capita
+
+          yAxis:
+            canChangeScaleType: true
+            min: 0
+          tab: map
+          hideRelativeToggle: false
+          hasMapTab: true
+          hideAnnotationFieldsInTitle:
+            entity: true
+            time: true
+            changeInPrefix: true
 
       ny_gdp_mktp_kd:
         title: GDP (constant 2015 US$)
@@ -348,27 +336,8 @@ tables:
             colorScale:
               binningStrategy: manual
               baseColorScheme: PuBu
-              customNumericValues:
-                - 0
-                - 10000000000
-                - 30000000000
-                - 100000000000
-                - 300000000000
-                - 1000000000000
-                - 3000000000000
-                - 10000000000000
-                - 1
-          selectedEntityNames:
-            - United States
-            - China
-            - India
-            - Mexico
-            - France
-            - Japan
-            - Germany
-            - Russia
-            - Brazil
-            - United Kingdom
+              customNumericValues: *map_brackets_gdp
+          selectedEntityNames: *selected_entity_names_gdp
           yAxis:
             canChangeScaleType: true
             min: 0
@@ -942,16 +911,7 @@ tables:
         description_key: *desc_key_ger
         presentation:
           title_public: Gross enrolment in pre-primary education
-          grapher_config:
-            maxTime: 2024
-            hasMapTab: true
-            map:
-              time: 2024
-              timeTolerance: 5
-              colorScale:
-                binningStrategy: manual
-                customNumericValues: [0, 10,20,30,40,50,60,70,80,90,100]
-                baseColorScheme: BuGn
+          grapher_config: *grapher_config_enrolment_pubugn
         display:
           numDecimalPlaces: 1
           tolerance: 5
@@ -965,16 +925,7 @@ tables:
         description_key: *desc_key_ger
         presentation:
           title_public: Gross enrolment rate in pre-primary education among girls
-          grapher_config:
-            maxTime: 2024
-            hasMapTab: true
-            map:
-              time: 2024
-              timeTolerance: 5
-              colorScale:
-                binningStrategy: manual
-                customNumericValues: [0, 10,20,30,40,50,60,70,80,90,100]
-                baseColorScheme: Purples
+          grapher_config: *grapher_config_enrolment_pubugn
         display:
           numDecimalPlaces: 1
           tolerance: 5
@@ -988,18 +939,77 @@ tables:
         description_key: *desc_key_ger
         presentation:
           title_public: Gross enrolment rate in pre-primary education among boys
-          grapher_config:
-            maxTime: 2024
-            hasMapTab: true
-            map:
-              time: 2024
-              timeTolerance: 5
-              colorScale:
-                binningStrategy: manual
-                customNumericValues: [0, 10,20,30,40,50,60,70,80,90,100]
-                baseColorScheme: Blues
+          grapher_config: *grapher_config_enrolment_pubugn
 
         display:
           numDecimalPlaces: 1
           tolerance: 5
           name: Boys
+
+      ####################################################################################################
+      # Trained Teachers Indicators
+      ####################################################################################################
+
+      se_pre_tcaq_zs:
+        title: Trained teachers in pre-primary education (% of total teachers)
+        unit: '% of teachers'
+        short_unit: '%'
+        description_short: Share of teachers in [pre-primary education](#dod:pre-primary-education) who have received at least the minimum organized pedagogical training required for teaching at that level, shown as a percentage of all teachers.
+        description_key: *desc_key_trained_teachers
+        presentation:
+          title_public: Share of trained teachers in pre-primary education
+          topic_tags:
+            - Global Education
+          grapher_config: *trained_teachers_grapher_config
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name: Pre-primary education
+
+      se_prm_tcaq_zs:
+        title: Trained teachers in primary education (% of total teachers)
+        unit: '% of teachers'
+        short_unit: '%'
+        description_short: Share of teachers in [primary education](#dod:primary-education) who have received at least the minimum organized pedagogical training required for teaching at that level, shown as a percentage of all teachers.
+        description_key: *desc_key_trained_teachers
+        presentation:
+          title_public: Share of trained teachers in primary education
+          topic_tags:
+            - Global Education
+          grapher_config: *trained_teachers_grapher_config
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name: Primary education
+
+      se_sec_tcaq_lo_zs:
+        title: Trained teachers in lower secondary education (% of total teachers)
+        unit: '% of teachers'
+        short_unit: '%'
+        description_short: Share of teachers in [lower secondary education](#dod:lower-secondary-education) who have received at least the minimum organized pedagogical training required for teaching at that level, shown as a percentage of all teachers.
+        description_key: *desc_key_trained_teachers
+        presentation:
+          title_public: Share of trained teachers in lower secondary education
+          topic_tags:
+            - Global Education
+          grapher_config: *trained_teachers_grapher_config
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name: Lower secondary education
+
+      se_sec_tcaq_up_zs:
+        title: Trained teachers in upper secondary education (% of total teachers)
+        unit: '% of teachers'
+        short_unit: '%'
+        description_short: Share of teachers in [upper secondary education](#dod:upper-secondary-education) who have received at least the minimum organized pedagogical training required for teaching at that level, shown as a percentage of all teachers.
+        description_key: *desc_key_trained_teachers
+        presentation:
+          title_public: Share of trained teachers in upper secondary education
+          topic_tags:
+            - Global Education
+          grapher_config: *trained_teachers_grapher_config
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name: Upper secondary education

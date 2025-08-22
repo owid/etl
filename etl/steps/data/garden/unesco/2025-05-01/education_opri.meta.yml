@@ -11,8 +11,6 @@ definitions:
         map:
           time: 2024
           timeTolerance: 5
-    display:
-      tolerance: 5
 
   # ============================================================================
   # COMMON CONFIGURATION TEMPLATES
@@ -28,7 +26,7 @@ definitions:
 
   # Value ranges for different indicator types
   enrolment_rate_bins: &enrolment_rate_bins [10,20,30,40,50,60,70,80,90,100]
-  gdp_share_bins: &gdp_share_bins [0,0.2,0.4,0.6,0.8,1.2,1.4,1.6,1.8,2]
+  gdp_share_bins: &gdp_share_bins [0,0.2,0.4,0.6,0.8,1,1.2,1.4,1.4]
   school_life_expectancy_preprimary_bins: &school_life_expectancy_preprimary_bins [0.5,1,1.5,2,2.5,3,3.5,4]
   school_life_expectancy_primary_bins: &school_life_expectancy_primary_bins [2,3,4,5,6,7,8,9]
   school_life_expectancy_secondary_bins: &school_life_expectancy_secondary_bins [1,2,3,4,5,6,7,8]
@@ -39,33 +37,33 @@ definitions:
   # Per-student spending bins (in international dollars per student)
   per_student_spending_bins: &per_student_spending_bins [500, 1000, 5000, 10000,15000,20000,25000]
 
-  # Common enrollment and education indicator configurations
-  grapher_config_enrolment_bugn: &grapher_config_enrolment_bugn
+  # Female teachers grapher configuration
+  female_teachers_grapher_config: &female_teachers_grapher_config
     <<: *common_grapher_config
     map:
       <<: *common_grapher_map_config
       colorScale:
         binningStrategy: manual
         customNumericValues: *enrolment_rate_bins
-        baseColorScheme: BuGn
+        baseColorScheme: YlGnBu
 
-  grapher_config_enrolment_blues: &grapher_config_enrolment_blues
+  grapher_config_enrolment_ylgnbu: &grapher_config_enrolment_ylgnbu
     <<: *common_grapher_config
     map:
       <<: *common_grapher_map_config
       colorScale:
         binningStrategy: manual
         customNumericValues: *enrolment_rate_bins
-        baseColorScheme: Blues
+        baseColorScheme: YlGnBu
 
-  grapher_config_enrolment_purples: &grapher_config_enrolment_purples
+  grapher_config_enrolment_pubugn: &grapher_config_enrolment_pubugn
     <<: *common_grapher_config
     map:
       <<: *common_grapher_map_config
       colorScale:
         binningStrategy: manual
         customNumericValues: *enrolment_rate_bins
-        baseColorScheme: Purples
+        baseColorScheme: PuBuGn
 
   # School life expectancy configurations
   grapher_config_sle_preprimary_blues: &grapher_config_sle_preprimary_blues
@@ -77,24 +75,6 @@ definitions:
         customNumericValues: *school_life_expectancy_preprimary_bins
         baseColorScheme: Blues
 
-  grapher_config_sle_preprimary_purples: &grapher_config_sle_preprimary_purples
-    <<: *common_grapher_config
-    map:
-      <<: *common_grapher_map_config
-      colorScale:
-        binningStrategy: manual
-        customNumericValues: *school_life_expectancy_preprimary_bins
-        baseColorScheme: Purples
-
-  grapher_config_sle_preprimary_bugn: &grapher_config_sle_preprimary_bugn
-    <<: *common_grapher_config
-    map:
-      <<: *common_grapher_map_config
-      colorScale:
-        binningStrategy: manual
-        customNumericValues: *school_life_expectancy_preprimary_bins
-        baseColorScheme: BuGn
-
   grapher_config_sle_primary_blues: &grapher_config_sle_primary_blues
     <<: *common_grapher_config
     map:
@@ -103,24 +83,6 @@ definitions:
         binningStrategy: manual
         customNumericValues: *school_life_expectancy_primary_bins
         baseColorScheme: Blues
-
-  grapher_config_sle_primary_purples: &grapher_config_sle_primary_purples
-    <<: *common_grapher_config
-    map:
-      <<: *common_grapher_map_config
-      colorScale:
-        binningStrategy: manual
-        customNumericValues: *school_life_expectancy_primary_bins
-        baseColorScheme: Purples
-
-  grapher_config_sle_primary_bugn: &grapher_config_sle_primary_bugn
-    <<: *common_grapher_config
-    map:
-      <<: *common_grapher_map_config
-      colorScale:
-        binningStrategy: manual
-        customNumericValues: *school_life_expectancy_primary_bins
-        baseColorScheme: BuGn
 
   grapher_config_sle_secondary_blues: &grapher_config_sle_secondary_blues
     <<: *common_grapher_config
@@ -131,24 +93,6 @@ definitions:
         customNumericValues: *school_life_expectancy_secondary_bins
         baseColorScheme: Blues
 
-  grapher_config_sle_secondary_purples: &grapher_config_sle_secondary_purples
-    <<: *common_grapher_config
-    map:
-      <<: *common_grapher_map_config
-      colorScale:
-        binningStrategy: manual
-        customNumericValues: *school_life_expectancy_secondary_bins
-        baseColorScheme: Purples
-
-  grapher_config_sle_secondary_bugn: &grapher_config_sle_secondary_bugn
-    <<: *common_grapher_config
-    map:
-      <<: *common_grapher_map_config
-      colorScale:
-        binningStrategy: manual
-        customNumericValues: *school_life_expectancy_secondary_bins
-        baseColorScheme: BuGn
-
   grapher_config_sle_tertiary_blues: &grapher_config_sle_tertiary_blues
     <<: *common_grapher_config
     map:
@@ -158,32 +102,8 @@ definitions:
         customNumericValues: *school_life_expectancy_tertiary_bins
         baseColorScheme: Blues
 
-  grapher_config_sle_tertiary_purples: &grapher_config_sle_tertiary_purples
-    <<: *common_grapher_config
-    map:
-      <<: *common_grapher_map_config
-      colorScale:
-        binningStrategy: manual
-        customNumericValues: *school_life_expectancy_tertiary_bins
-        baseColorScheme: Purples
+  # ============================================================================
 
-  grapher_config_sle_tertiary_bugn: &grapher_config_sle_tertiary_bugn
-    <<: *common_grapher_config
-    map:
-      <<: *common_grapher_map_config
-      colorScale:
-        binningStrategy: manual
-        customNumericValues: *school_life_expectancy_tertiary_bins
-        baseColorScheme: BuGn
-
-  grapher_config_per_student_spending_total: &grapher_config_per_student_spending_total
-    <<: *common_grapher_config
-    map:
-      <<: *common_grapher_map_config
-      colorScale:
-        binningStrategy: manual
-        customNumericValues: *per_student_spending_bins
-        baseColorScheme: YlOrRd
 
   # Out-of-school children configurations
   out_of_school_children_bins: &out_of_school_children_bins [10000, 50000, 100000, 500000, 1000000, 5000000, 10000000, 50000000]
@@ -228,51 +148,14 @@ definitions:
   # ============================================================================
 
   # Education spending configurations (constant PPP dollars)
-  grapher_config_spending_preprimary: &grapher_config_spending_preprimary
+  grapher_config_spending_by_level: &grapher_config_spending_by_level
     <<: *common_grapher_config
     map:
       <<: *common_grapher_map_config
       colorScale:
         binningStrategy: manual
         customNumericValues: *expenditure_bins_by_level
-        baseColorScheme: Oranges
-
-  grapher_config_spending_primary: &grapher_config_spending_primary
-    <<: *common_grapher_config
-    map:
-      <<: *common_grapher_map_config
-      colorScale:
-        binningStrategy: manual
-        customNumericValues: *expenditure_bins_by_level
-        baseColorScheme: Blues
-
-  grapher_config_spending_lower_secondary: &grapher_config_spending_lower_secondary
-    <<: *common_grapher_config
-    map:
-      <<: *common_grapher_map_config
-      colorScale:
-        binningStrategy: manual
-        customNumericValues: *expenditure_bins_by_level
-        baseColorScheme: Greens
-
-  grapher_config_spending_upper_secondary: &grapher_config_spending_upper_secondary
-    <<: *common_grapher_config
-    map:
-      <<: *common_grapher_map_config
-      colorScale:
-        binningStrategy: manual
-        customNumericValues: *expenditure_bins_by_level
-        baseColorScheme: Purples
-
-  grapher_config_spending_tertiary: &grapher_config_spending_tertiary
-    <<: *common_grapher_config
-    map:
-      <<: *common_grapher_map_config
-      colorScale:
-        binningStrategy: manual
-        customNumericValues: *expenditure_bins_by_level
-        baseColorScheme: Reds
-
+        baseColorScheme: YlGnBu
 
   grapher_config_spending_total: &grapher_config_spending_total
     <<: *common_grapher_config
@@ -281,7 +164,7 @@ definitions:
       colorScale:
         binningStrategy: manual
         customNumericValues: *expenditure_bins_total
-        baseColorScheme: YlOrRd
+        baseColorScheme: YlGnBu
 
   # Education spending as share of GDP configuration
   grapher_config_gdp_share: &grapher_config_gdp_share
@@ -291,7 +174,16 @@ definitions:
       colorScale:
         binningStrategy: manual
         customNumericValues: *gdp_share_bins
-        baseColorScheme: YlOrBr
+        baseColorScheme: Blues
+
+  grapher_config_per_student_spending_total: &grapher_config_per_student_spending_total
+    <<: *common_grapher_config
+    map:
+      <<: *common_grapher_map_config
+      colorScale:
+        binningStrategy: manual
+        customNumericValues: *per_student_spending_bins
+        baseColorScheme: Purples
 
   # ============================================================================
   # DESCRIPTIONS
@@ -326,13 +218,13 @@ definitions:
     - It compares children enrolled at the correct level for their age to the total population in that same age group. For example, if primary education is for ages 6 to 11, it measures how many 6- to 11-year-olds are actually enrolled in primary school.
     - The highest possible value is 100%, which would mean all children of the right age are enrolled where they should be. High rates indicate that most children are progressing through school at the expected pace.
     - Values cannot exceed 100% because it excludes over-age and under-age students. However, small discrepancies between enrolment records and population data can occasionally push rates slightly above 100%.
-    - A rate of 90% doesn't necessarily mean 10% of children are out of school entirely - some may be enrolled at different levels (either higher or lower) than expected for their age, but these students aren't counted in the net rate.
+    - A rate of 90% doesn't necessarily mean 10% of children are out of school entirely — some may be enrolled at different levels (either higher or lower) than expected for their age, but these students aren't counted in the net rate.
     - The data comes from school administrative records that track enrolment by individual age, combined with population estimates from national statistics offices or UN sources.
 
   desc_key_ger: &desc_key_ger
     - Not all students enrol in school at the same age. The gross enrolment ratio includes students enrolled in a certain level of education, regardless of whether they are within the expected age range for that level. It includes students who are younger or older than expected due to late entry, early entry, or grade repetition.
     - It captures the total number of students enrolled at a specific education level, expressed as a percentage of the population in the official age group for that level. For example, if the official age group for upper secondary school is 15 to 17-year olds, the gross enrolment ratio compares total enrolment at that level (of any age) to the population of 15- to 17-year-olds.
-    - Values can be greater than 100% if students repeat grades or start a particular level of schooling late. In the example above, some 18- or 19 year olds might be included in the total if they started upper secondary school late.
+    - Values can be greater than 100% if students repeat grades or start a particular level of schooling late. For example, if the official age group for upper secondary school is 15 to 17-year olds, some 18- or 19 year olds might be included in the total if they started upper secondary school late.
     - Similarly, a value of 100% does not necessarily mean all children within a particular age group are enrolled in school; some children could be out-of-school, but gross enrolment rates are boosted by older students being included.
     - The data comes from administrative records, such as school enrolment reports, and from population estimates, usually provided by the United Nations or national sources.
 
@@ -386,6 +278,14 @@ definitions:
     - When survey data is collected within five months of the school year’s start, the recorded age is used as-is.
     - Despite adjustments, differences between survey responses and national education structures may affect comparability. Incomplete data — such as missing age, attendance status, or grade — are excluded from the calculation.
     - Even with these limitations, the total net attendance rate is a valuable measure of school participation that complements enrolment data and helps track progress toward universal access to education.
+
+  # Female teachers descriptions
+  desc_key_female_teachers: &desc_key_female_teachers
+   - Teachers play a central role in shaping learning environments. This indicator shows what share of the teaching workforce at each education level is made up of women.
+   - It measures the number of female teachers as a percentage of all teachers at that education level, whether they work full-time or part-time, and whether they teach in person or remotely.
+   - The definition focuses on people who are actively teaching students and excludes school administrators like principals who don't teach, as well as volunteers or occasional workers.
+   - A value around 50% suggests roughly equal numbers of male and female teachers. Higher percentages mean women make up a larger share of the workforce, while lower values might indicate barriers to women entering teaching.
+   - The data comes from administrative records like school censuses or national education registries that track teacher numbers by gender and education level.
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -796,61 +696,42 @@ tables:
         display:
           numDecimalPlaces: 1
 
+
       percentage_of_teachers_in_primary_education_who_are_female__pct:
         title: Share of primary school teachers who are women
         description_short: Percentage of female teachers among all teachers at the [primary](#dod:primary-education) education level during a given school year.
         unit: "%"
         short_unit: "%"
-        description_key:
-          - Teachers play a central role in shaping learning environments — this indicator shows what share of the teaching workforce in primary education is made up of women.
-          - It captures the percentage of teachers in primary education who are female, calculated by dividing the number of female teachers by the total number of teachers (male and female) at the primary level and multiplying by 100.
-          - A value close to 50% indicates gender parity in the primary teaching workforce. Higher values suggest that women are more strongly represented, while lower values may signal barriers to their participation in teaching.
-          - The data come from administrative records, typically based on school censuses or national education staff registries that report the number of teachers by sex and education level.
-          - This indicator helps assess the gender balance in the teaching profession and may highlight areas where there is a need for policy action or incentives to support women’s participation in teaching.
-          - It is disaggregated by level of education and may be further refined by programme type, grade, or institutional setting.
-          - Where possible, part-time teaching staff should be converted to full-time equivalent (FTE) positions to ensure consistent comparison across different types of employment contracts.
-          - While this indicator provides insight into gender representation, it does not measure teacher qualifications, performance, or the quality of teaching.
-          - Limitations may arise if part-time staff are not converted to FTE, or if the data exclude private or informal education institutions. Consistency in reporting between male and female teacher counts is also essential.
-          - Despite these challenges, the percentage of female teachers in primary education is a key measure of gender representation in the education workforce and can support broader efforts toward inclusive and equitable education systems.
+        description_key: *desc_key_female_teachers
         display:
           numDecimalPlaces: 1
+          tolerance: 10
+        presentation:
+          grapher_config: *female_teachers_grapher_config
 
       percentage_of_teachers_in_secondary_education_who_are_female__pct:
         title: Share of secondary school teachers who are women
         description_short: Percentage of female teachers among all teachers at the [secondary](#dod:secondary-education) education level during a given school year.
         unit: "%"
         short_unit: "%"
-        description_key:
-          - Teachers play a central role in shaping learning environments — this indicator shows what share of the teaching workforce in secondary education is made up of women.
-          - It captures the percentage of teachers at the secondary level (including both lower and upper secondary) who are female, calculated by dividing the number of female teachers by the total number of teachers and multiplying by 100.
-          - A value close to 50% indicates gender parity, while values above or below that threshold reflect gender imbalances in the secondary teaching profession.
-          - The data come from school censuses or education management systems that record teaching staff by sex and education level.
-          - This indicator is useful for monitoring gender equality in the teaching profession and for identifying areas where women may face barriers to participating in education roles beyond the primary level.
-          - The indicator can be disaggregated further by grade, subject area, or full-time/part-time status, where data allow.
-          - When feasible, part-time teachers should be converted to full-time equivalents (FTE) to ensure comparability.
-          - While this indicator reflects gender representation, it does not provide information on teacher qualifications, working conditions, or the quality of instruction.
-          - Nonetheless, the share of secondary school teachers who are women remains an important measure for assessing inclusion and balance in the education workforce.
+        description_key: *desc_key_female_teachers
         display:
           numDecimalPlaces: 1
+          tolerance: 10
+        presentation:
+          grapher_config: *female_teachers_grapher_config
 
       percentage_of_teachers_in_tertiary_education_who_are_female__pct:
         title: Share of tertiary school teachers who are women
         description_short: Percentage of female academic staff among all academic staff at the [tertiary](#dod:tertiary-education) education level during a given school year.
         unit: "%"
         short_unit: "%"
-        description_key:
-          - Women are underrepresented in many academic and research fields — this indicator shows what share of the teaching workforce in tertiary education is made up of women.
-          - It captures the percentage of teachers in tertiary education who are female, calculated by dividing the number of female teachers by the total number of teachers (male and female) at the tertiary level and multiplying by 100.
-          - A value close to 50% reflects gender parity, while lower values highlight gaps in representation that may be shaped by structural, cultural, or institutional barriers to women’s academic careers.
-          - The data come from administrative sources, including higher education institutions and national education databases, which report teaching staff numbers by sex and [International Standard Classification of Education )](https://uis.unesco.org/en/topic/international-standard-classification-education-isced) level.
-          - This indicator is useful for tracking gender equality in academic employment, particularly in faculty and teaching roles across universities and other post-secondary institutions.
-          - It is disaggregated by level of education, and where available, may be further broken down by type of institution, field of study, or academic rank.
-          - Full-time equivalent (FTE) adjustments should be made where part-time teachers are present to ensure consistency in comparison across countries and systems.
-          - This indicator reflects gender distribution, not the quality of teaching, academic rank, or research output — additional indicators are needed to assess these dimensions.
-          - Limitations include variation in how countries classify tertiary teachers, whether data include private institutions, and whether gender is reported for all categories of teaching staff.
-          - Still, the percentage of female teachers in tertiary education remains a critical measure of gender balance in higher education and helps inform policies to support equal representation at all levels of academia.
+        description_key: *desc_key_female_teachers
         display:
           numDecimalPlaces: 1
+          tolerance: 10
+        presentation:
+          grapher_config: *female_teachers_grapher_config
 
       # ========================================================================
       # NET ENROLMENT RATES (by education level and gender)
@@ -864,7 +745,7 @@ tables:
         description_key: *desc_key_net_enr
         presentation:
           title_public:  Net enrolment rate in primary education
-          grapher_config: *grapher_config_enrolment_bugn
+          grapher_config: *grapher_config_enrolment_ylgnbu
         display:
           numDecimalPlaces: 1
           name: Primary education
@@ -877,7 +758,7 @@ tables:
         description_key: *desc_key_net_enr
         presentation:
           title_public:  Net enrolment rate in primary education among boys
-          grapher_config: *grapher_config_enrolment_blues
+          grapher_config: *grapher_config_enrolment_ylgnbu
         display:
           numDecimalPlaces: 1
           name: Boys
@@ -890,7 +771,7 @@ tables:
         description_key: *desc_key_net_enr
         presentation:
           title_public:  Net enrolment rate in primary education among girls
-          grapher_config: *grapher_config_enrolment_purples
+          grapher_config: *grapher_config_enrolment_ylgnbu
         display:
           numDecimalPlaces: 1
           name: Girls
@@ -903,7 +784,7 @@ tables:
         description_key: *desc_key_net_enr
         presentation:
           title_public:  Net enrolment rate in lower secondary education
-          grapher_config: *grapher_config_enrolment_bugn
+          grapher_config: *grapher_config_enrolment_ylgnbu
         display:
           numDecimalPlaces: 1
           name: Lower secondary education
@@ -916,7 +797,7 @@ tables:
         description_key: *desc_key_net_enr
         presentation:
           title_public:  Net enrolment rate in lower secondary education among boys
-          grapher_config: *grapher_config_enrolment_blues
+          grapher_config: *grapher_config_enrolment_ylgnbu
         display:
           numDecimalPlaces: 1
           name: Boys
@@ -929,7 +810,7 @@ tables:
         description_key: *desc_key_net_enr
         presentation:
           title_public:  Net enrolment rate in lower secondary education among girls
-          grapher_config: *grapher_config_enrolment_purples
+          grapher_config: *grapher_config_enrolment_ylgnbu
         display:
           numDecimalPlaces: 1
           name: Girls
@@ -942,7 +823,7 @@ tables:
         description_key: *desc_key_net_enr
         presentation:
           title_public:  Net enrolment rate in upper secondary education
-          grapher_config: *grapher_config_enrolment_bugn
+          grapher_config: *grapher_config_enrolment_ylgnbu
         display:
           numDecimalPlaces: 1
           name: Upper secondary education
@@ -955,7 +836,7 @@ tables:
         description_key: *desc_key_net_enr
         presentation:
           title_public:  Net enrolment rate in upper secondary education among boys
-          grapher_config: *grapher_config_enrolment_blues
+          grapher_config: *grapher_config_enrolment_ylgnbu
         display:
           numDecimalPlaces: 1
           name: Boys
@@ -968,7 +849,7 @@ tables:
         description_key: *desc_key_net_enr
         presentation:
           title_public:  Net enrolment rate in upper secondary education among girls
-          grapher_config: *grapher_config_enrolment_purples
+          grapher_config: *grapher_config_enrolment_ylgnbu
         display:
           numDecimalPlaces: 1
           name: Girls
@@ -985,7 +866,7 @@ tables:
         description_key: *desc_key_ger
         presentation:
           title_public:  Gross enrolment ratio in primary education
-          grapher_config: *grapher_config_enrolment_bugn
+          grapher_config: *grapher_config_enrolment_pubugn
         display:
           numDecimalPlaces: 1
           name: Primary education
@@ -998,7 +879,7 @@ tables:
         description_key: *desc_key_ger
         presentation:
           title_public:  Gross enrolment ratio in primary education among boys
-          grapher_config: *grapher_config_enrolment_blues
+          grapher_config: *grapher_config_enrolment_pubugn
         display:
           numDecimalPlaces: 1
           name: Boys
@@ -1011,7 +892,7 @@ tables:
         description_key: *desc_key_ger
         presentation:
           title_public:  Gross enrolment ratio in primary education among girls
-          grapher_config: *grapher_config_enrolment_purples
+          grapher_config: *grapher_config_enrolment_pubugn
         display:
           numDecimalPlaces: 1
           name: Girls
@@ -1024,7 +905,7 @@ tables:
         description_key: *desc_key_ger
         presentation:
           title_public:  Gross enrolment ratio in lower secondary education
-          grapher_config: *grapher_config_enrolment_bugn
+          grapher_config: *grapher_config_enrolment_pubugn
         display:
           numDecimalPlaces: 1
           name: Lower secondary education
@@ -1037,7 +918,7 @@ tables:
         description_key: *desc_key_ger
         presentation:
           title_public:  Gross enrolment ratio in lower secondary education among boys
-          grapher_config: *grapher_config_enrolment_blues
+          grapher_config: *grapher_config_enrolment_pubugn
         display:
           numDecimalPlaces: 1
           name: Boys
@@ -1050,7 +931,7 @@ tables:
         description_key: *desc_key_ger
         presentation:
           title_public:  Gross enrolment ratio in lower secondary education among girls
-          grapher_config: *grapher_config_enrolment_purples
+          grapher_config: *grapher_config_enrolment_pubugn
         display:
           numDecimalPlaces: 1
           name: Girls
@@ -1063,7 +944,7 @@ tables:
         description_key: *desc_key_ger
         presentation:
           title_public:  Gross enrolment ratio in upper secondary education
-          grapher_config: *grapher_config_enrolment_bugn
+          grapher_config: *grapher_config_enrolment_pubugn
         display:
           numDecimalPlaces: 1
           name:  Upper secondary education
@@ -1076,7 +957,7 @@ tables:
         description_key: *desc_key_ger
         presentation:
           title_public:  Gross enrolment ratio in upper secondary education among girls
-          grapher_config: *grapher_config_enrolment_purples
+          grapher_config: *grapher_config_enrolment_pubugn
         display:
           numDecimalPlaces: 1
           name: Girls
@@ -1089,7 +970,7 @@ tables:
         description_key: *desc_key_ger
         presentation:
           title_public:  Gross enrolment ratio in upper secondary education among boys
-          grapher_config: *grapher_config_enrolment_blues
+          grapher_config: *grapher_config_enrolment_pubugn
         display:
           numDecimalPlaces: 1
           name: Boys
@@ -1125,7 +1006,7 @@ tables:
         description_key: *desc_key_sle
         presentation:
           title_public: School life expectancy in pre-primary education among girls
-          grapher_config: *grapher_config_sle_preprimary_purples
+          grapher_config: *grapher_config_sle_preprimary_blues
         display:
           numDecimalPlaces: 1
           name: Girls
@@ -1137,7 +1018,7 @@ tables:
         description_key: *desc_key_sle
         presentation:
           title_public: School life expectancy in pre-primary education among boys
-          grapher_config: *grapher_config_sle_preprimary_bugn
+          grapher_config: *grapher_config_sle_preprimary_blues
         display:
           numDecimalPlaces: 1
           name: Boys
@@ -1161,7 +1042,7 @@ tables:
         description_key: *desc_key_sle
         presentation:
           title_public: School life expectancy in primary education among girls
-          grapher_config: *grapher_config_sle_primary_purples
+          grapher_config: *grapher_config_sle_primary_blues
         display:
           numDecimalPlaces: 1
           name: Girls
@@ -1173,7 +1054,7 @@ tables:
         description_key: *desc_key_sle
         presentation:
           title_public: School life expectancy in primary education among boys
-          grapher_config: *grapher_config_sle_primary_bugn
+          grapher_config: *grapher_config_sle_primary_blues
         display:
           numDecimalPlaces: 1
           name: Boys
@@ -1197,7 +1078,7 @@ tables:
         description_key: *desc_key_sle
         presentation:
           title_public: School life expectancy in secondary education among girls
-          grapher_config: *grapher_config_sle_secondary_purples
+          grapher_config: *grapher_config_sle_secondary_blues
         display:
           numDecimalPlaces: 1
           name: Girls
@@ -1209,7 +1090,7 @@ tables:
         description_key: *desc_key_sle
         presentation:
           title_public: School life expectancy in secondary education among boys
-          grapher_config: *grapher_config_sle_secondary_bugn
+          grapher_config: *grapher_config_sle_secondary_blues
         display:
           numDecimalPlaces: 1
           name: Boys
@@ -1233,7 +1114,7 @@ tables:
         description_key: *desc_key_sle
         presentation:
           title_public: School life expectancy in tertiary education among girls
-          grapher_config: *grapher_config_sle_tertiary_purples
+          grapher_config: *grapher_config_sle_tertiary_blues
         display:
           numDecimalPlaces: 1
           name: Girls
@@ -1245,7 +1126,7 @@ tables:
         description_key: *desc_key_sle
         presentation:
           title_public: School life expectancy in tertiary education among boys
-          grapher_config: *grapher_config_sle_tertiary_bugn
+          grapher_config: *grapher_config_sle_tertiary_blues
         display:
           numDecimalPlaces: 1
           name: Boys
@@ -1272,7 +1153,7 @@ tables:
 
       government_expenditure_on_pre_primary_education_as_a_percentage_of_gdp__pct:
         title: Government spending on pre-primary education as share of GDP
-        description_short: Total [general government](#dod:general-government) spending on [pre-primary education](#dod:pre-primary-education), encompassing all levels and types of spending, as a percentage of [GDP](#dod:gdp), including funds from international government transfers.
+        description_short: Total [general government](#dod:general-government) spending on [pre-primary education](#dod:pre-primary-education), expressed as a percentage of [GDP](#dod:gdp).
         unit: "% of GDP"
         short_unit: "%"
         description_key: *desc_key_govt_expenditure_gdp_share
@@ -1281,10 +1162,11 @@ tables:
           grapher_config: *grapher_config_gdp_share
         display:
           numDecimalPlaces: 1
+          tolerance: 10
 
       government_expenditure_on_primary_education_as_a_percentage_of_gdp__pct:
         title: Government spending on primary education as share of GDP
-        description_short: Total [general government](#dod:general-government) spending on [primary education](#dod:primary-education), encompassing all levels and types of spending, as a percentage of [GDP](#dod:gdp), including funds from international government transfers.
+        description_short: Total [general government](#dod:general-government) spending on [primary education](#dod:primary-education), expressed as a percentage of [GDP](#dod:gdp).
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_govt_expenditure_gdp_share
@@ -1293,10 +1175,11 @@ tables:
           grapher_config: *grapher_config_gdp_share
         display:
           numDecimalPlaces: 1
+          tolerance: 10
 
       government_expenditure_on_lower_secondary_education_as_a_percentage_of_gdp__pct:
         title: Government spending on lower secondary education as share of GDP
-        description_short: Total [general government](#dod:general-government) spending on [lower secondary education](#dod:lower-secondary-education), encompassing all levels and types of spending, as a percentage of [GDP](#dod:gdp), including funds from international government transfers.
+        description_short: Total [general government](#dod:general-government) spending on [lower secondary education](#dod:lower-secondary-education), expressed as a percentage of [GDP](#dod:gdp).
         unit: "% of GDP"
         short_unit: "%"
         description_key: *desc_key_govt_expenditure_gdp_share
@@ -1305,10 +1188,11 @@ tables:
           grapher_config: *grapher_config_gdp_share
         display:
           numDecimalPlaces: 1
+          tolerance: 10
 
       government_expenditure_on_upper_secondary_education_as_a_percentage_of_gdp__pct:
         title: Government spending on upper secondary education as share of GDP
-        description_short: Total [general government](#dod:general-government) spending on [upper secondary education](#dod:upper-secondary-education), encompassing all levels and types of spending, as a percentage of [GDP](#dod:gdp), including funds from international government transfers.
+        description_short: Total [general government](#dod:general-government) spending on [upper secondary education](#dod:upper-secondary-education), expressed as a percentage of [GDP](#dod:gdp).
         unit: "% of GDP"
         short_unit: "%"
         description_key: *desc_key_govt_expenditure_gdp_share
@@ -1317,10 +1201,11 @@ tables:
           grapher_config: *grapher_config_gdp_share
         display:
           numDecimalPlaces: 1
+          tolerance: 10
 
       government_expenditure_on_secondary_education_as_a_percentage_of_gdp__pct:
         title: Government spending on secondary education as share of GDP
-        description_short: Total [general government](#dod:general-government) spending on [lower secondary](#dod:lower-secondary-education) and [upper secondary](#dod:upper-secondary-education) education (including local, regional, central, current, capital, and transfers) as a percentage of [GDP](#dod:gdp), inclusive of international transfers.
+        description_short: Total [general government](#dod:general-government) spending on [lower secondary](#dod:lower-secondary-education) and [upper secondary](#dod:upper-secondary-education) education, expressed as a percentage of [GDP](#dod:gdp).
         unit: "% of GDP"
         short_unit: "%"
         description_key: *desc_key_govt_expenditure_gdp_share
@@ -1329,10 +1214,11 @@ tables:
           grapher_config: *grapher_config_gdp_share
         display:
           numDecimalPlaces: 1
+          tolerance: 10
 
       government_expenditure_on_tertiary_education_as_a_percentage_of_gdp__pct:
         title: Government spending on tertiary education as share of GDP
-        description_short: Total [general government](#dod:general-government) spending on [tertiary education](#dod:tertiary-education), encompassing all levels and types of spending, as a percentage of [GDP](#dod:gdp), including funds from international government transfers.
+        description_short: Total [general government](#dod:general-government) spending on [tertiary education](#dod:tertiary-education), expressed as a percentage of [GDP](#dod:gdp).
         unit: "% of GDP"
         short_unit: "%"
         description_key: *desc_key_govt_expenditure_gdp_share
@@ -1341,6 +1227,7 @@ tables:
           grapher_config: *grapher_config_gdp_share
         display:
           numDecimalPlaces: 1
+          tolerance: 10
 
       # ========================================================================
       # GOVERNMENT EXPENDITURE IN CONSTANT PPP DOLLARS (by education level)
@@ -1348,72 +1235,77 @@ tables:
 
       government_expenditure_on_pre_primary_education__constant_pppdollar__millions:
         title: Government spending on pre-primary education
-        description_short:  Total [general government](#dod:general-government) spending on [pre-primary education](#dod:pre-primary-education), including all levels and types of spending, expressed in constant [international-$](#dod:int_dollar_abbreviation).
+        description_short:  Total [general government](#dod:general-government) spending on [pre-primary education](#dod:pre-primary-education), expressed in constant [international-$](#dod:int_dollar_abbreviation).
         unit: "international-$"
         short_unit: "$"
         description_key: *desc_key_govt_expenditure_constant_ppp
         presentation:
           title_public: Government spending on pre-primary education (international-$)
-          grapher_config: *grapher_config_spending_preprimary
+          grapher_config: *grapher_config_spending_by_level
         display:
           numDecimalPlaces: 0
           name: Pre-primary
+          tolerance: 10
 
       government_expenditure_on_primary_education__constant_pppdollar__millions:
         title: Government spending on primary education
-        description_short: Total [general government](#dod:general-government) spending on [primary education](#dod:primary-education), including all levels and types of spending, expressed in constant [international-$](#dod:int_dollar_abbreviation).
+        description_short: Total [general government](#dod:general-government) spending on [primary education](#dod:primary-education), expressed in constant [international-$](#dod:int_dollar_abbreviation).
         unit: "international-$"
         short_unit: "$"
         description_key: *desc_key_govt_expenditure_constant_ppp
         presentation:
           title_public: Government spending on primary education (international-$)
-          grapher_config: *grapher_config_spending_primary
+          grapher_config: *grapher_config_spending_by_level
         display:
           numDecimalPlaces: 0
           name: Primary
+          tolerance: 10
 
       government_expenditure_on_lower_secondary_education__constant_pppdollar__millions:
         title: Government spending on lower secondary education
-        description_short: Total [general government](#dod:general-government) spending on [lower secondary education](#dod:lower-secondary-education), including all levels and types of spending, expressed in constant [international-$](#dod:int_dollar_abbreviation).
+        description_short: Total [general government](#dod:general-government) spending on [lower secondary education](#dod:lower-secondary-education), expressed in constant [international-$](#dod:int_dollar_abbreviation).
         unit: "international-$"
         short_unit: "$"
         description_key: *desc_key_govt_expenditure_constant_ppp
         presentation:
           title_public: Government spending on lower secondary education (international-$)
-          grapher_config: *grapher_config_spending_lower_secondary
+          grapher_config: *grapher_config_spending_by_level
         display:
           numDecimalPlaces: 0
           name: Lower secondary
+          tolerance: 10
 
       government_expenditure_on_upper_secondary_education__constant_pppdollar__millions:
         title: Government spending on upper secondary education
-        description_short: Total [general government](#dod:general-government) spending on [upper secondary education](#dod:upper-secondary-education), including all levels and types of spending, expressed in constant [international-$](#dod:int_dollar_abbreviation).
+        description_short: Total [general government](#dod:general-government) spending on [upper secondary education](#dod:upper-secondary-education), expressed in constant [international-$](#dod:int_dollar_abbreviation).
         unit: "international-$"
         short_unit: "$"
         description_key: *desc_key_govt_expenditure_constant_ppp
         presentation:
           title_public: Government spending on upper secondary education (international-$)
-          grapher_config: *grapher_config_spending_upper_secondary
+          grapher_config: *grapher_config_spending_by_level
         display:
           numDecimalPlaces: 0
           name: Upper secondary
+          tolerance: 10
 
       government_expenditure_on_tertiary_education__constant_pppdollar__millions:
         title: Government spending on tertiary education
-        description_short: Total [general government](#dod:general-government) spending on [tertiary education](#dod:tertiary-education), including all levels and types of spending, expressed in constant [international-$](#dod:int_dollar_abbreviation).
+        description_short: Total [general government](#dod:general-government) spending on [tertiary education](#dod:tertiary-education), expressed in constant [international-$](#dod:int_dollar_abbreviation).
         unit: "international-$"
         short_unit: "$"
         description_key: *desc_key_govt_expenditure_constant_ppp
         presentation:
           title_public: Government spending on tertiary education (international-$)
-          grapher_config: *grapher_config_spending_tertiary
+          grapher_config: *grapher_config_spending_by_level
         display:
           numDecimalPlaces: 0
           name: Tertiary
+          tolerance: 10
 
       government_expenditure_on_education__constant_pppdollar__millions:
         title: Government spending on education
-        description_short: Total [general government](#dod:general-government) spending on education across all levels, including all types of spending, expressed in constant [international-$](#dod:int_dollar_abbreviation).
+        description_short: Total [general government](#dod:general-government) spending on education across all levels, expressed in constant [international-$](#dod:int_dollar_abbreviation).
         unit: "international-$"
         short_unit: "$"
         description_key: *desc_key_govt_expenditure_constant_ppp
@@ -1423,16 +1315,17 @@ tables:
         display:
           numDecimalPlaces: 0
           name: Total across all levels
+          tolerance: 10
 
       government_expenditure_on_education__pppdollar__millions:
         title: Government spending on education in purchasing power parity (PPP) dollars
-        description_short: Total [general government](#dod:general-government) spending on education across all levels, including all types of spending, expressed in [international-$](#dod:int_dollar_abbreviation).
+        description_short: Total [general government](#dod:general-government) spending on education across all levels, expressed in [international-$](#dod:int_dollar_abbreviation).
         unit: "international-$"
         short_unit: "$"
         description_key: *desc_key_govt_expenditure_constant_ppp
         display:
           numDecimalPlaces: 0
-
+          tolerance: 10
 
       # ========================================================================
       # GOVERNMENT EXPENDITURE IN CONSTANT PPP DOLLARS PER STUDENT (by education level)
@@ -1440,7 +1333,7 @@ tables:
 
       government_expenditure_on_education_per_student__total_across_all_levels__constant_pppdollar:
         title: Government spending on education per student across all levels
-        description_short: Total [general government](#dod:general-government) spending on education across all levels, including all types of spending, per student, expressed in constant [international-$](#dod:int_dollar_abbreviation).
+        description_short: Total [general government](#dod:general-government) spending on education across all levels, per student, expressed in constant [international-$](#dod:int_dollar_abbreviation).
         unit: "international-$"
         short_unit: "$"
         description_key: *desc_key_govt_expenditure_constant_ppp_per_student
@@ -1451,3 +1344,4 @@ tables:
         display:
           numDecimalPlaces: 0
           name: Total across all levels
+          tolerance: 10

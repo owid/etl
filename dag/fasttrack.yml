@@ -228,8 +228,8 @@ steps:
     - snapshot://fasttrack/latest/bank_account_selected_countries_global_findex_2021.csv
   data://grapher/fasttrack/latest/account_ownership_by_region:
     - snapshot://fasttrack/latest/account_ownership_by_region.csv
-  data://grapher/fasttrack/latest/uk_road_deaths_ons: !!set
-    ? snapshot://fasttrack/latest/uk_road_deaths_ons.csv
+  data://grapher/fasttrack/latest/uk_road_deaths_ons:
+    - snapshot://fasttrack/latest/uk_road_deaths_ons.csv
   data://grapher/fasttrack/latest/national_surveys_conducted_by_dhs:
     - snapshot://fasttrack/latest/national_surveys_conducted_by_dhs.csv
   data://grapher/fasttrack/latest/un_mmeig_countries_dhs_only_source:
@@ -238,9 +238,13 @@ steps:
     - snapshot://fasttrack/latest/annual_number_dhs_surveys_by_type.csv
   data://grapher/fasttrack/latest/countries_dhs_surveys_ongoing_before_termination:
     - snapshot://fasttrack/latest/countries_dhs_surveys_ongoing_before_termination.csv
-  data://grapher/fasttrack/latest/material_footprint_end_use_eu: !!set
-    ? snapshot://fasttrack/latest/material_footprint_end_use_eu.csv
-  data://grapher/fasttrack/latest/draft_joe_ipl_data: !!set
-    ? snapshot://fasttrack/latest/draft_joe_ipl_data.csv
-  data://grapher/fasttrack/latest/guinea_worm_cases: !!set
-    ? snapshot://fasttrack/latest/guinea_worm_cases.csv
+  data://grapher/fasttrack/latest/material_footprint_end_use_eu:
+    - snapshot://fasttrack/latest/material_footprint_end_use_eu.csv
+  data://grapher/fasttrack/latest/draft_joe_ipl_data:
+    - snapshot://fasttrack/latest/draft_joe_ipl_data.csv
+  data://grapher/fasttrack/latest/guinea_worm_cases:
+    - snapshot://fasttrack/latest/guinea_worm_cases.csv
+  data://grapher/fasttrack/latest/breakdown_material_footprint_eu: !!set
+    ? snapshot://fasttrack/latest/breakdown_material_footprint_eu.csv
+  data://grapher/fasttrack/latest/wolbachia_dengue_indonesia_rct: !!set
+    snapshot://fasttrack/latest/wolbachia_dengue_indonesia_rct.csv:

@@ -59,7 +59,7 @@ def render_action_update():
             help="Update all steps in the **Operations list**.",
             type="primary",
             icon=":material/play_circle:",
-            # use_container_width=True,
+            # width="stretch",
         )
 
     # Button to execute the update command and show its output.
@@ -123,7 +123,7 @@ def render_action_execute(steps_df: pd.DataFrame):
             help="Run ETL on all data steps in the **Operations list** (and optionally also execute snapshots).",
             type="primary",
             icon=":material/play_circle:",
-            # use_container_width=True,
+            # width="stretch",
         )
 
         # Button to execute the update command and show its output.
@@ -172,7 +172,7 @@ def render_action_archive():
             help="Move archivable steps in the **Operations list** to their corresponding archive dag.",
             type="primary",
             icon=":material/play_circle:",
-            # use_container_width=True,
+            # width="stretch",
         )
 
     # Button to execute the update command and show its output.

@@ -21,13 +21,17 @@ from apps.wizard.app_pages.fasttrack.utils import (
     UPDATE_GSHEET,
     set_states,
 )
-from apps.wizard.utils.components import config_style_html, preview_file, st_horizontal
+from apps.wizard.utils.components import config_style_html, preview_file, st_horizontal, st_title_with_expert
 from etl import config
 from etl.command import main as etl_main
 from etl.paths import DAG_DIR
 
 # Page config
-st.set_page_config(page_title="Wizard: Import data via Fast-Track", page_icon="🪄")
+st.set_page_config(
+    page_title="Wizard: Import data via Fast-Track",
+    page_icon="🪄",
+    layout="centered",
+)
 
 
 # Reset states
@@ -64,7 +68,10 @@ APP_STATE = wizard_utils.AppState()
 # MAIN ###################################################
 ##########################################################
 # TITLE & description
-st.title(":material/fast_forward: Fast-Track import")
+st_title_with_expert(
+    "Fast-Track import",
+    icon=":material/fast_forward:",
+)
 st.markdown(
     """
             Fast-track is a tool for importing datasets from Google Sheets. The idea is to keep all data and metadata there, and use this interface to import or update the data in grapher database where it can be used to create charts. Fast-track also commits your work to [ETL repository](https://github.com/owid/etl) where you can further process your data with Python.
@@ -181,7 +188,7 @@ else:
         submitted = st.button(
             "Submit",
             type="primary",
-            use_container_width=True,
+            width="stretch",
             on_click=lambda: set_states(
                 {
                     "to_be_submitted": True,
@@ -289,7 +296,7 @@ else:
                 proceed_1 = st.form_submit_button(
                     "Proceed",
                     type="primary",
-                    use_container_width=True,
+                    width="stretch",
                     on_click=lambda: set_states(
                         {
                             "to_be_submitted_confirmed_1": True,

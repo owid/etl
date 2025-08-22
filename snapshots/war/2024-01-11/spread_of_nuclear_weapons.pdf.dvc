@@ -7,7 +7,7 @@ meta:
     description: |-
       This dataset provides information on nuclear weapons states.
 
-      More details can be found in [the original document by Bleek (2017)](https://www.belfercenter.org/sites/default/files/files/publication/When%20Did%20%28and%20Didn%27t%29%20States%20Proliferate%3F_1.pdf).
+      More details can be found in [the original document by Bleek (2017)](https://www.belfercenter.org/sites/default/files/pantheon_files/files/publication/When%20Did%20%28and%20Didn%27t%29%20States%20Proliferate%3F_1.pdf).
     date_published: 2017-06-13
 
     # Citation
@@ -17,14 +17,14 @@ meta:
     attribution_short: Bleek
 
     # Files
-    url_main: https://www.belfercenter.org/sites/default/files/files/publication/When%20Did%20%28and%20Didn%27t%29%20States%20Proliferate%3F_1.pdf
-    url_download: https://www.belfercenter.org/sites/default/files/files/publication/When%20Did%20%28and%20Didn%27t%29%20States%20Proliferate%3F_1.pdf
+    url_main: https://www.belfercenter.org/publication/when-did-and-didnt-states-proliferate
+    url_download: https://www.belfercenter.org/sites/default/files/pantheon_files/files/publication/When%20Did%20%28and%20Didn%27t%29%20States%20Proliferate%3F_1.pdf
     date_accessed: 2024-01-11
 
     # License
     license:
       name: Copyright 2017, President and Fellows of Harvard College
-      url: https://www.belfercenter.org/sites/default/files/files/publication/When%20Did%20%28and%20Didn%27t%29%20States%20Proliferate%3F_1.pdf
+      url: https://www.belfercenter.org/sites/default/files/pantheon_files/files/publication/When%20Did%20%28and%20Didn%27t%29%20States%20Proliferate%3F_1.pdf
 
 wdir: ../../../data/snapshots/war/2024-01-11
 outs:

@@ -140,7 +140,7 @@ def processing_part_2(data, dataset_meta, variables_meta_dict, origin, dataset_u
             st.form_submit_button(
                 "Continue",
                 type="primary",
-                use_container_width=True,
+                width="stretch",
                 on_click=lambda: set_states({"to_be_submitted_confirmed_2": True}),
             )
     else:

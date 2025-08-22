@@ -602,6 +602,12 @@ steps:
   data://garden/wb/2021-07-01/wb_income:
     - data://meadow/wb/2021-07-01/wb_income
 
+    # Old Maddison Project Database
+  data://garden/ggdc/2020-10-01/ggdc_maddison:
+    - snapshot://ggdc/2020-10-01/ggdc_maddison.xlsx
+  data://grapher/ggdc/2020-10-01/ggdc_maddison:
+    - data://garden/ggdc/2020-10-01/ggdc_maddison
+
       # United Nations members
   data://meadow/un/2023-10-30/un_members:
     - snapshot://un/2023-10-30/un_members.csv
@@ -612,6 +618,14 @@ steps:
     - data://garden/demography/2023-03-31/population
   data://grapher/un/2023-10-30/un_members:
     - data://garden/un/2023-10-30/un_members
+
+    # UN Regions
+  data://meadow/un/2024-06-24/sdg_regions:
+    - snapshot://un/2024-06-24/sdg_regions.csv
+  data://garden/un/2024-06-24/sdg_regions:
+    - data://meadow/un/2024-06-24/sdg_regions
+  data://grapher/un/2024-06-24/sdg_regions:
+    - data://garden/un/2024-06-24/sdg_regions
 
 include:
   # Include all active steps plus all archive steps.
@@ -639,3 +653,4 @@ include:
   - dag/archive/migration.yml
   - dag/archive/redistribution.yml
   - dag/archive/wizard.yml
+  - dag/archive/growth.yml

@@ -307,25 +307,6 @@ steps:
   data-private://grapher/ihme_gbd/2024-05-20/impairments:
     - data-private://garden/ihme_gbd/2024-05-20/impairments
 
-  # WHO Preventive Chemotherapy - Neglected Tropical Diseases
-  # Lymphatic filariasis
-  data://meadow/neglected_tropical_diseases/2024-05-02/lymphatic_filariasis:
-    - snapshot://neglected_tropical_diseases/2024-05-02/lymphatic_filariasis.xlsx
-  data://garden/neglected_tropical_diseases/2024-05-02/lymphatic_filariasis:
-    - data://meadow/neglected_tropical_diseases/2024-05-02/lymphatic_filariasis
-    - data://garden/regions/2023-01-01/regions
-  data://grapher/neglected_tropical_diseases/2024-05-02/lymphatic_filariasis:
-    - data://garden/neglected_tropical_diseases/2024-05-02/lymphatic_filariasis
-
-  # Schistosomiasis
-  data://meadow/neglected_tropical_diseases/2024-05-02/schistosomiasis:
-    - snapshot://neglected_tropical_diseases/2024-05-02/schistosomiasis.xlsx
-  data://garden/neglected_tropical_diseases/2024-05-02/schistosomiasis:
-    - data://meadow/neglected_tropical_diseases/2024-05-02/schistosomiasis
-    - data://garden/regions/2023-01-01/regions
-  data://grapher/neglected_tropical_diseases/2024-05-02/schistosomiasis:
-    - data://garden/neglected_tropical_diseases/2024-05-02/schistosomiasis
-
   # Neglected Tropical Diseases Funding
   data://meadow/neglected_tropical_diseases/2024-05-18/funding:
     - snapshot://neglected_tropical_diseases/2024-05-18/funding.xlsx
@@ -1275,6 +1256,26 @@ steps:
     - data://meadow/who/2025-07-15/vaccination_introductions
   data://grapher/who/2025-07-15/vaccination_introductions:
     - data://garden/who/2025-07-15/vaccination_introductions
+
+  # Clinical trials - ClinicalTrials.gov
+  # no meadow snapshot, as this is a large dataset
+  data://garden/health/2025-07-28/clinical_trials:
+    - snapshot://health/2025-07-28/clinical_trials.csv
+  data://grapher/health/2025-07-28/clinical_trials:
+    - data://garden/health/2025-07-28/clinical_trials
+
+  # Guinea worm certification
+  data://meadow/who/2025-08-01/guinea_worm_certification:
+    - snapshot://who/2025-08-01/guinea_worm.csv
+  data://garden/who/2025-08-01/guinea_worm_certification:
+    - data://meadow/who/2025-08-01/guinea_worm_certification
+    # Guinea worm cases
+  data://garden/who/2025-08-01/guinea_worm:
+    - snapshot://fasttrack/latest/guinea_worm_cases.csv
+    - data://garden/who/2025-08-01/guinea_worm_certification
+  data://grapher/who/2025-08-01/guinea_worm:
+    - data://garden/who/2025-08-01/guinea_worm
+
   # WHO Mortality Database - Cancer specific
   data://meadow/who/2025-08-05/mortality_database_cancer:
     - snapshot://who/2025-08-05/mortality_database_cancer.csv
@@ -1304,3 +1305,38 @@ steps:
     - data://meadow/who/2025-08-06/mortality_database_vaccine_preventable
   data://grapher/who/2025-08-06/mortality_database_vaccine_preventable:
     - data://garden/who/2025-08-06/mortality_database_vaccine_preventable
+
+  # GCO cancer over time (cervical)
+  data://meadow/cancer/2025-08-08/gco_cancer_over_time_cervical:
+    - snapshot://cancer/2025-08-08/gco_cancer_over_time_cervical.csv
+  data://garden/cancer/2025-08-08/gco_cancer_over_time_cervical:
+    - data://meadow/cancer/2025-08-08/gco_cancer_over_time_cervical
+  data://grapher/cancer/2025-08-08/gco_cancer_over_time_cervical:
+    - data://garden/cancer/2025-08-08/gco_cancer_over_time_cervical
+
+  # WHO Preventive Chemotherapy - Neglected Tropical Diseases
+  # Lymphatic filariasis
+  data://meadow/neglected_tropical_diseases/2025-08-20/lymphatic_filariasis:
+    - snapshot://neglected_tropical_diseases/2025-08-20/lymphatic_filariasis.xlsx
+  data://garden/neglected_tropical_diseases/2025-08-20/lymphatic_filariasis:
+    - data://garden/regions/2023-01-01/regions
+    - data://meadow/neglected_tropical_diseases/2025-08-20/lymphatic_filariasis
+  data://grapher/neglected_tropical_diseases/2025-08-20/lymphatic_filariasis:
+    - data://garden/neglected_tropical_diseases/2025-08-20/lymphatic_filariasis
+
+  # Schistosomiasis
+  data://meadow/neglected_tropical_diseases/2025-08-20/schistosomiasis:
+    - snapshot://neglected_tropical_diseases/2025-08-20/schistosomiasis.xlsx
+  data://garden/neglected_tropical_diseases/2025-08-20/schistosomiasis:
+    - data://garden/regions/2023-01-01/regions
+    - data://meadow/neglected_tropical_diseases/2025-08-20/schistosomiasis
+  data://grapher/neglected_tropical_diseases/2025-08-20/schistosomiasis:
+    - data://garden/neglected_tropical_diseases/2025-08-20/schistosomiasis
+
+  # Neglected Tropical Diseases Funding
+  data://meadow/neglected_tropical_diseases/2025-08-20/funding:
+    - snapshot://neglected_tropical_diseases/2025-08-20/funding.xlsx
+  data://garden/neglected_tropical_diseases/2025-08-20/funding:
+    - data://meadow/neglected_tropical_diseases/2025-08-20/funding
+  data://grapher/neglected_tropical_diseases/2025-08-20/funding:
+    - data://garden/neglected_tropical_diseases/2025-08-20/funding

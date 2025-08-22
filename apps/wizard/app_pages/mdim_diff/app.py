@@ -15,7 +15,13 @@ from apps.wizard.app_pages.explorer_diff.utils import (
     _set_page_config,
     truncate_lines,
 )
-from apps.wizard.utils.components import mdim_chart, st_horizontal, st_wizard_page_link, url_persist
+from apps.wizard.utils.components import (
+    mdim_chart,
+    st_horizontal,
+    st_title_with_expert,
+    st_wizard_page_link,
+    url_persist,
+)
 from etl.config import OWID_ENV
 from etl.db import read_sql
 from etl.files import yaml_dump
@@ -38,7 +44,7 @@ MAX_DIFF_LINES = 100
 
 def _show_options():
     """Show options pane."""
-    with st.popover("⚙️ Options", use_container_width=True):
+    with st.popover("⚙️ Options", width="stretch"):
         col1, col2, col3 = st.columns(3)
         with col1:
             url_persist(st.toggle)(
@@ -227,8 +233,9 @@ def display_mdim_comparison(source_mdim):
 
 def main():
     st.warning("This application is currently in beta. We greatly appreciate your feedback and suggestions!")
-    st.title(
-        ":material/difference: MDIM Diff",
+    st_title_with_expert(
+        "MDIM Diff",
+        icon=":material/difference:",
         help=f"""
 **MDIM diff** is a page that compares mdims between [`production`](http://owid.cloud) and your [`{OWID_ENV.name}`]({OWID_ENV.admin_site}) environment.
 """,

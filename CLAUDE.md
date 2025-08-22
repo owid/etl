@@ -24,17 +24,17 @@ This is Our World in Data's ETL system - a content-addressable data pipeline wit
 Steps are content-addressable with automatic dirty detection:
 ```python
 # Standard garden step pattern
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 from etl.data_helpers import geo
 
 paths = PathFinder(__file__)
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     ds_input = paths.load_dataset("input_dataset")
     tb = ds_input["table_name"].reset_index()
     tb = geo.harmonize_countries(tb, countries_file=paths.country_mapping_path)
     tb = tb.format(short_name=paths.short_name)
-    ds_garden = create_dataset(dest_dir, tables=[tb])
+    ds_garden = paths.create_dataset(tables=[tb])
     ds_garden.save()
 ```
 
@@ -101,6 +101,21 @@ pytest tests/test_etl_step_code.py::test_step_name  # Test single step
 
 ## Key Development Patterns
 
+### CLI Tools
+Always use Click instead of ArgumentParser for CLI scripts:
+```python
+import click
+
+@click.command()
+@click.option("--dry-run", is_flag=True, help="Preview changes without applying them")
+def main(dry_run: bool, output: str):
+    """Brief description of what the CLI does."""
+    # Implementation here
+
+if __name__ == "__main__":
+    main()
+```
+
 ### Geographic Harmonization
 Use `geo.harmonize_countries()` for standardization:
 ```python
@@ -136,6 +151,20 @@ pytest tests/test_steps.py -m integration
 
 ## Configuration
 
+### Python Environment
+- **Virtual Environment**: This project uses a Python virtual environment (`.venv/`)
+- **Activation**: Always activate the virtual environment before running commands:
+  ```bash
+  source .venv/bin/activate  # Activate virtual environment
+  ```
+- **Package Management**: Always use `uv` package manager instead of `pip`
+  ```bash
+  uv add package_name     # Add a new package
+  uv remove package_name  # Remove a package
+  uv sync                 # Sync dependencies
+  ```
+- **IMPORTANT**: Never install packages with `pip install` - always ask first, then use `uv` if approved
+
 ### Environment Variables
 - `OWID_ENV`: dev/staging/production environment
 - `.env`: Local environment configuration
@@ -160,6 +189,34 @@ These are installed as editable packages (`owid-catalog`, `owid-datautils`, `owi
 - **Core ETL** (`etl/`): Step execution engine, catalog management, DAG processing
 - **Apps** (`apps/`): Extended functionality - Wizard, chart sync, anomaly detection, maintenance tools
 
+## Running ETL Steps
+Use `etlr` to run ETL steps:
+
+### Basic Usage
+- Run steps matching a pattern: `etlr biodiversity/2025-06-28/cherry_blossom`
+- Run with grapher upload: `etlr biodiversity/2025-06-28/cherry_blossom --grapher`
+- Dry run (preview): `etlr biodiversity/2025-06-28/cherry_blossom --dry-run`
+- Force re-run: `etlr biodiversity/2025-06-28/cherry_blossom --force`
+
+### Key Options
+- `--grapher/-g`: Upload datasets to grapher database (OWID staff only)
+- `--dry-run`: Preview steps without running them
+- `--force/-f`: Re-run steps even if up-to-date
+- `--only/-o`: Run only selected step (no dependencies)
+- `--downstream/-d`: Include downstream dependencies
+- `--exact-match/-x`: Steps must exactly match arguments
+
+
+## Git Workflow
+Create PR first, then commit files:
+
+1. **Create PR**: Use `etl pr` CLI (creates new branch)
+2. **Check status**: `git status` to see modified/untracked files
+3. **Add files**: `git add .` or `git add <specific-files>`
+4. **Commit**: `git commit -m "Description of changes"`
+
+Note: The `etl pr` creates a new branch but does NOT automatically commit files - you must commit manually after creating the PR.
+
 ## Important Development Notes
 
 - Always use `geo.harmonize_countries()` for geographic data
@@ -172,6 +229,25 @@ These are installed as editable packages (`owid-catalog`, `owid-datautils`, `owi
 - Never run --force alone, if you want to force run a step, use --force --only together.
 - When running ETL steps, always use --private flag
 - When running grapher:// step in ETL, always add --grapher flag
+
+### Exception Handling
+- **NEVER** catch, log, and re-raise exceptions (`except Exception: log.error(e); raise`)
+- Let exceptions propagate naturally with their original stack traces
+- Only catch specific exceptions when you can meaningfully handle them
+- Avoid `except Exception` - it masks real problems
+
+### Never Mask Underlying Issues
+- **NEVER** return empty tables or default values to "fix" data parsing failures
+- **NEVER** silently skip errors or missing data without clear explanation
+- **NEVER** comment out code to temporarily bypass problems - fix the underlying issue instead
+- **BAD**: `return Table(pd.DataFrame({'col': []}))` - hides the real problem
+- **BAD**: `try: parse_data() except: return empty_table` - masks what's broken
+- **BAD**: `# return extract_data()  # Commented out due to format change` - commenting out code to avoid errors
+- **GOOD**: Let the error happen and provide clear diagnostic information
+- **GOOD**: `raise ValueError("Sheet 'Fig 3.2' format changed - skiprows needs updating from 7 to X")`
+- **GOOD**: Update the code to handle the new data format correctly
+- **If you don't know what to do - ASK THE USER instead of masking the issue**
+- Silent failures make debugging exponentially harder and create technical debt
 
 ## Debugging ETL Data Quality Issues
 
@@ -221,3 +297,35 @@ print(f"Garden null values: {tb.date.isnull().sum()}")
 - **Add assertions**: Include data quality checks that fail fast with clear error messages
 - **Document data issues**: Log warnings about data quality problems found during processing
 - **Fix meadow steps**: Most data cleaning should happen in meadow, not garden steps
+
+
+## Database Access
+
+### MySQL Connection
+Can execute SQL queries directly using the staging database:
+```bash
+mysql -h staging-site-branch -u owid --port 3306 -D owid -e "SELECT query"
+```
+
+Example queries:
+```sql
+-- Find datasets by shortName
+SELECT id, catalogPath, name FROM datasets WHERE shortName = 'dataset_name' AND NOT isArchived;
+
+-- Check variables in dataset
+SELECT id, name FROM variables WHERE datasetId = 12345;
+```
+
+
+## Important Development Notes
+
+- Always use `geo.harmonize_countries()` for geographic data
+- Follow the `PathFinder` pattern for step inputs/outputs
+- Using `--force` is usually unnecessary - the step will be re-run if the code changes
+- Test steps with `etl run --dry-run` before execution
+- Use `make sync.catalog` to avoid rebuilding entire catalog locally
+- Check `etl d version-tracker` before major changes
+- VS Code extensions available: `make install-vscode-extensions`
+- **ALWAYS run `make check` before committing** - formats code, fixes linting issues, and runs type checks
+- SQL queries enclose in triple quotes for readability
+- When running **etlr**, always use PREFER_DOWNLOAD=1 prefix (don't use it for **etls** command)
