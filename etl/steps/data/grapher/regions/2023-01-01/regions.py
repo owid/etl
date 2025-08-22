@@ -8,7 +8,7 @@ https://ourworldindata.org/world-region-map-definitions
 import json
 from typing import cast
 
-import pandas as pd
+# import pandas as pd
 from owid.catalog import Origin, Table
 from structlog import get_logger
 
@@ -108,9 +108,7 @@ def run() -> None:
     tb_regions.loc[:, "year"] = CURRENT_YEAR
 
     # Downstream
-    # tb_regions = process_un_definitions(tb_regions)
-    mask = tb_regions["un_m49_3_region"].isna()
-    tb_regions.loc[mask, "un_m49_3_region"] = "nan"
+    tb_regions = process_un_definitions(tb_regions)
     # tb_regions.loc[:, "un_m49_2_region"] = tb_regions.loc[:, "un_m49_2_region"].fillna(tb_regions["un_m49_1_region"])
     # tb_regions["un_m49_3_region"] = tb_regions["un_m49_3_region"].fillna(tb_regions["un_m49_2_region"])
     # tb_regions.loc[:, "un_m49_3_region"] = "lal"
@@ -151,8 +149,16 @@ def process_un_definitions(tb) -> Table:
     Solution: Propagate definitions downstream when missing.
     """
     # Propagate definitions downstream.
-    mask = tb["un_m49_2_region"].isna()
-    tb.loc[mask, "un_m49_2_region"] = tb.loc[:, "un_m49_1_region"]
-    mask = tb["un_m49_3_region"].isna()
-    tb.loc[mask, "un_m49_3_region"] = "nan"
+    for i in range(1, 3):
+        mask = tb[f"un_m49_{i+1}_region"].isna()
+        tb.loc[mask, f"un_m49_{i+1}_region"] = tb.loc[:, f"un_m49_{i}_region"]
+
+    # Create new definition
+    ## Get rows where "Americas" should be replaced with "Latin America and the Caribbean" and "Northern America"
+    mask = tb["un_m49_2_region"].str.contains("America", na=False)
+    assert tb.loc[mask, "un_m49_2_region"].nunique() == 2, "There should be only two Americas in UN M49 level 2."
+    ## Create new column
+    tb.loc[:, "un_region"] = tb.loc[:, "un_m49_1_region"].copy()
+    tb.loc[mask, "un_region"] = tb.loc[mask, "un_m49_2_region"].copy()
+    tb = _add_metadata(tb, "un")
     return cast(Table, tb)
