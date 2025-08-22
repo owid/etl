@@ -221,9 +221,11 @@ def process_un_definitions(tb) -> Table:
     Solution: Propagate definitions downstream when missing.
     """
     # Propagate definitions downstream.
+
     for i in range(1, 3):
         mask = tb[f"un_m49_{i+1}_region"].isna()
-        tb.loc[mask, f"un_m49_{i+1}_region"] = tb.loc[:, f"un_m49_{i}_region"]
+        tb.loc[mask, f"un_m49_{i+1}_region"] = tb.loc[mask, f"un_m49_{i}_region"]
+
 
     # Create new definition
     ## Get rows where "Americas" should be replaced with "Latin America and the Caribbean" and "Northern America"
