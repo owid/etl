@@ -24,46 +24,42 @@ paths = PathFinder(__file__)
 # Note that this year will be ignored in the charts, but it is required by grapher.
 CURRENT_YEAR = int(paths.version.split("-")[0])
 
-# Define a common origin for all columns in the output table.
-COMMON_ORIGIN = Origin(producer="Our World in Data", title="Regions")
 
-# Institution mapping. TODO: Should be moved to regions.yml
-LEGACY_INSTITUTION_MAPPING = {
-    "owid": "OWID",
-    "un_m49_1": "UN M49 (1)",
-    "un_m49_2": "UN M49 (2)",
-    "un_m49_3": "UN M49 (3)",
-    "un": "UN",
-    "wb": "WB",
-    "who": "WHO",
-    "unsdg": "UN SDG",
-}
+# Institution mapping. Contains names, descriptions, origins, etc. TODO: Should probably live somewhere else (Garden? regions.yml?)
+## Origins
+DATE_ACCESSED = "2025-08-22"
+OWID_ORIGIN = Origin(producer="Our World in Data", title="Regions")
 ORIGIN_UN_M49 = Origin(
     producer="United Nations, Statistics Division",
     title="Standard country or area codes for statistical use (M49)",
     url_main="https://unstats.un.org/unsd/methodology/m49/",
     description="""The list of geographic regions presents the composition of geographical regions used by the Statistics Division in its publications and databases. Each country or area is shown in one region only. These geographic regions are based on continental regions; which are further subdivided into sub-regions and intermediary regions drawn as to obtain greater homogeneity in sizes of population, demographic circumstances and accuracy of demographic statistics.""",
+    date_accessed=DATE_ACCESSED,
 )
 ORIGIN_WB = Origin(
     producer="World Bank",
     title="World Bank Country and Lending Groups",
     url_main="https://datahelpdesk.worldbank.org/knowledgebase/articles/906519-world-bank-country-and-lending-groups",
+    date_accessed=DATE_ACCESSED,
 )
 ORIGINS_WHO = Origin(
     producer="World Health Organization",
     title="Countries/areas by WHO region",
     url_main="https://apps.who.int/violence-info/Countries%20and%20areas%20by%20WHO%20region%20-%2012bfe12.pdf",
+    date_accessed=DATE_ACCESSED,
 )
 ORIGINS_SDG = Origin(
     producer="United Nations, Sustainable Development Goals",
     title="Regional groupings used in Report and Statistical Annex",
     url_main="https://unstats.un.org/sdgs/indicators/regional-groups/",
+    date_accessed=DATE_ACCESSED,
 )
+## Reference dictionary
 INSTITUTIONS = {
     "owid": {
         "name": "Our World in Data",
         "acronym": "OWID",
-        "origins": [COMMON_ORIGIN],
+        "origins": [OWID_ORIGIN],
         "description": "Regions defined by Our World in Data, which are used in OWID charts and maps.",
     },
     "un_m49_1": {
@@ -206,7 +202,7 @@ def _add_metadata(tb: Table, institution_alias: str) -> Table:
 
     # Get short name
     assert "acronym" in institution, f"Missing short_name for institution: {institution_alias}"
-    tb[f"{institution_alias}_region"].metadata.origins = institution.get("origins", [COMMON_ORIGIN])
+    tb[f"{institution_alias}_region"].metadata.origins = institution.get("origins", [OWID_ORIGIN])
     tb[f"{institution_alias}_region"].metadata.title = f"World regions according to {institution['acronym']}"
     tb[f"{institution_alias}_region"].metadata.description = institution.get("description", "")
     tb[f"{institution_alias}_region"].metadata.unit = ""
