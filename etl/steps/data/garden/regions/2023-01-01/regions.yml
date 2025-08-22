@@ -931,6 +931,8 @@
   aliases:
     - "Svalbard & Jan Mayen Isl."
     - "Svalbard and Jan Mayen Islands"
+  related:
+    - "NOR"
 - code: "OWID_TRS"
   name: "Transnistria"
   region_type: "other"
@@ -1102,6 +1104,8 @@
     - "Eritrea and Ethiopia"
   end_year: 1993
   successors:
+    - "ETH"
+    - "ERI"
 # Vietnam
 - code: "OWID_DRV"
   name: "Democratic Republic of Vietnam"
