@@ -348,6 +348,30 @@ class PathFinder:
         return catalog.Dataset(paths.DATA_DIR / f"garden/{self.namespace}/{self.version}/{self.short_name}")
 
     @property
+    def regions(self):
+        """Get Regions helper for the specific use of an ETL step."""
+        # Import Regions here to avoid circular imports.
+        from etl.data_helpers.geo import Regions
+
+        if not hasattr(self, "_regions"):
+            try:
+                ds_regions = self.load_dataset("regions")
+            except NoMatchingStepsAmongDependencies:
+                ds_regions = None
+            try:
+                ds_income_groups = self.load_dataset("income_groups")
+            except NoMatchingStepsAmongDependencies:
+                ds_income_groups = None
+
+            self._regions = Regions(
+                ds_regions=ds_regions,
+                ds_income_groups=ds_income_groups,
+                countries_file=self.country_mapping_path if self.country_mapping_path.exists() else None,
+                auto_load_regions=False,
+            )
+        return self._regions
+
+    @property
     def snapshot_dir(self) -> Path:
         return paths.SNAPSHOTS_DIR / self.namespace / self.version
 
