@@ -8,6 +8,7 @@ from typing import Optional
 
 import rich_click as click
 import structlog
+from click.core import Command
 
 from etl import paths
 from etl.snapshot import Snapshot
@@ -153,49 +154,43 @@ def run_snapshot_script(script_path: Path, upload: bool, path_to_file: Optional[
             sys.path.remove(script_dir)
 
     # Check what functions are available
+    func = None
+    func_name = None
+
     if hasattr(module, "main"):
-        # Script has main() function
-        main_func = getattr(module, "main")
-
-        # Check if it's a click command
-        if isinstance(main_func, click.Command):
-            # It's a click command, call it with command line args
-            args = []
-            if not upload:
-                args.append("--skip-upload")
-            if path_to_file is not None:
-                args.extend(["--path-to-file", path_to_file])
-
-            try:
-                # Call the click command with parsed arguments
-                main_func(args, standalone_mode=False)
-            except Exception as e:
-                raise click.ClickException(f"Error calling main() click command: {e}")
-        else:
-            # Regular function - check its signature
-            sig = inspect.signature(main_func)
-
-            # Build arguments based on function signature
-            kwargs = {}
-            if "upload" in sig.parameters:
-                kwargs["upload"] = upload
-            if "path_to_file" in sig.parameters and path_to_file is not None:
-                kwargs["path_to_file"] = path_to_file
-
-            # Call main with appropriate arguments
-            try:
-                main_func(**kwargs)
-            except TypeError as e:
-                if path_to_file is not None and "path_to_file" not in sig.parameters:
-                    raise click.ClickException(
-                        f"Script {script_path} main() function doesn't accept --path-to-file argument"
-                    )
-                raise click.ClickException(f"Error calling main(): {e}")
-
+        func = getattr(module, "main")
+        func_name = "main"
     elif hasattr(module, "run"):
-        # Script has run() function
-        run_func = getattr(module, "run")
-        sig = inspect.signature(run_func)
+        func = getattr(module, "run")
+        func_name = "run"
+    else:
+        raise click.ClickException(f"Script {script_path} must have either a main() or run() function")
+
+    # Call the function (either main or run)
+    _call_snapshot_function(func, func_name, script_path, upload, path_to_file)
+
+
+def _call_snapshot_function(
+    func, func_name: str, script_path: Path, upload: bool, path_to_file: Optional[str] = None
+) -> None:
+    """Call a snapshot function, handling both click commands and regular functions."""
+    # Check if it's a click command
+    if isinstance(func, (click.Command, Command)):
+        # It's a click command, call it with command line args
+        args = []
+        if not upload:
+            args.append("--skip-upload")
+        if path_to_file is not None:
+            args.extend(["--path-to-file", path_to_file])
+
+        try:
+            # Call the click command with parsed arguments
+            func(args, standalone_mode=False)
+        except Exception as e:
+            raise click.ClickException(f"Error calling {func_name}() click command: {e}")
+    else:
+        # Regular function - check its signature
+        sig = inspect.signature(func)
 
         # Build arguments based on function signature
         kwargs = {}
@@ -205,15 +200,13 @@ def run_snapshot_script(script_path: Path, upload: bool, path_to_file: Optional[
             kwargs["path_to_file"] = path_to_file
 
         try:
-            run_func(**kwargs)
+            func(**kwargs)
         except TypeError as e:
             if path_to_file is not None and "path_to_file" not in sig.parameters:
                 raise click.ClickException(
-                    f"Script {script_path} run() function doesn't accept --path-to-file argument"
+                    f"Script {script_path} {func_name}() function doesn't accept --path-to-file argument"
                 )
-            raise click.ClickException(f"Error calling run(): {e}")
-    else:
-        raise click.ClickException(f"Script {script_path} must have either a main() or run() function")
+            raise click.ClickException(f"Error calling {func_name}(): {e}")
 
 
 def run_snapshot_dvc_only(dataset_name: str, upload: bool, path_to_file: Optional[str] = None) -> None:
