@@ -76,6 +76,9 @@ def find_snapshot_script(dataset_name: str) -> Optional[Path]:
     Returns:
         Path to the .py script file, or None if not found
     """
+    # Remove snapshot:// prefix if supplied by user
+    dataset_name = dataset_name.removeprefix("snapshot://")
+
     # Handle full file path with snapshots/ prefix and .py extension
     if dataset_name.startswith("snapshots/") and dataset_name.endswith(".py"):
         script_path = Path(dataset_name)

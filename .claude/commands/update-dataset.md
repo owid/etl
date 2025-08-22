@@ -2,6 +2,10 @@
 
 ## Phase 1: Initial Update and PR (REQUIRED - Execute automatically)
 
+Create a a draft PR for dataset update, run `etl update` and update PR description.
+
+You should be given catalog path of a dataset [namespace]/[version]/[short_name].
+
 1. **Create draft PR** using `etl pr` command with a short branch name (max 28 chars for database compatibility).
 
    **⚠️ CRITICAL: Check current branch first!** If we're not on **master** branch, MUST add `--base-branch [current-branch]` flag:
@@ -10,18 +14,15 @@
    git branch --show-current
 
    # If on master branch:
-   etl pr "Update [Dataset Name] dataset" data --work-branch data-[org]-[dataset]
+   etl pr "Update [namespace]/[version]/[short_name]" data --work-branch update-[short_name]
 
    # If NOT on master branch (MOST COMMON):
-   etl pr "Update [Dataset Name] dataset" data --work-branch data-[org]-[dataset] --base-branch [current-branch]
-
-   # Example: etl pr "Update World Bank food prices dataset" data --work-branch data-wb-foodprices --base-branch data-irena-costs
-   # Keep branch name under 28 characters to avoid database hostname issues
+   etl pr "Update [namespace]/[version]/[short_name]" data --work-branch update-[short_name] --base-branch [current-branch]
    ```
 
 2. **Update dataset** with `--include-usages` to copy to new version
    ```bash
-   etl update snapshot://#$ARGUMENTS --include-usages
+   etl update snapshot://[namespace]/[version]/[short_name] --include-usages
    ```
 
 3. **Commit and push initial changes**
