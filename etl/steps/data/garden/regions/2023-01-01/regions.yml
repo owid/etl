@@ -1170,8 +1170,6 @@
   successors:
     - "CZE"
     - "SVK"
-    - "ERI"
-    - "ETH"
 - code: "OWID_SRM"
   name: "Serbia and Montenegro"
   is_historical: True
@@ -1325,7 +1323,6 @@
     - "ZAF"
     - "ZMB"
     - "ZWE"
-    - "WSM"
     - "OWID_ZAN"
 - code: "OWID_ASI"
   name: "Asia"
@@ -1547,6 +1544,7 @@
     - "UMI"
     - "VUT"
     - "WLF"
+    - "WSM"
 - code: "OWID_SAM"
   name: "South America"
   region_type: "continent"
