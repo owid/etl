@@ -33,12 +33,33 @@ def run() -> None:
     tb["returned_idps"] = tb["returned_idps"].where(tb["year"] >= 1997, pd.NA)
 
     if VERBOSE:
-        # there are 85 rows with refugees who have the same country of origin and asylum
+        # there are 83 rows with refugees who have the same country of origin and asylum
         r_same = tb[(tb["country_of_origin"] == tb["country_of_asylum"]) & (tb["refugees"] > 0)]
         print(len(r_same), "rows with refugees who have the same country of origin and asylum")
+        # there are 19 rows with asylum seekers who have the same country of origin and asylum:
+        a_same = tb[(tb["country_of_origin"] == tb["country_of_asylum"]) & (tb["asylum_seekers"] > 0)]
+        print(len(a_same), "rows with asylum seekers who have the same country of origin and asylum")
         # if country of origin and asylum are different idps are always 0 or nan
         idp = tb[(tb["country_of_origin"] != tb["country_of_asylum"]) & (tb["idps"] > 0)]
         print(len(idp), "rows with idps who have different country of origin and asylum")
+
+    # remove (for now) refugees and asylum seekers with the same country of origin and asylum
+    msk_r = (
+        (tb["country_of_origin"] == tb["country_of_asylum"])
+        & (tb["refugees"] > 0)
+        & (tb["country_of_origin"] != "Unknown")
+    )
+    msk_a = (
+        (tb["country_of_origin"] == tb["country_of_asylum"])
+        & (tb["asylum_seekers"] > 0)
+        & (tb["country_of_origin"] != "Unknown")
+    )
+    tb = tb[~(msk_r)]
+    tb = tb[~(msk_a)]
+
+    # remove (for now) china after 2020 because of weird measurements
+    msk_china = (tb["country_of_asylum"] == "China") & (tb["year"] > 2020)
+    tb = tb[~(msk_china)]
 
     tb_origin = (
         tb.drop(columns=["country_of_asylum"])
