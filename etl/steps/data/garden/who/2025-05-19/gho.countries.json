@@ -299,13 +299,13 @@
   "Central Asia (UN)": "Central Asia (UN)",
   "Eastern Europe (UN)": "Eastern Europe (UN)",
   "Northern America (UN)": "Northern America (UN)",
-  "East Asia & Pacific (WB)": "East Asia & Pacific (WB)",
+  "East Asia & Pacific (WB)": "East Asia and Pacific (WB)",
   "Latin America and the Caribbean (UN SDG)": "Latin America and the Caribbean (UN SDG)",
   "Oceania (UN)": "Oceania (UN)",
   "Northern America (UN SDG)": "Northern America (UN SDG)",
   "Sub-Saharan Africa (WB)": "Sub-Saharan Africa (WB)",
   "Europe and Northern America (UN SDG)": "Europe and Northern America (UN SDG)",
-  "Latin America & Caribbean (WB)": "Latin America & Caribbean (WB)",
+  "Latin America & Caribbean (WB)": "Latin America and Caribbean (WB)",
   "Europe (UN)": "Europe (UN)",
   "Western Asia and Northern Africa (UN SDG)": "Western Asia and Northern Africa (UN SDG)",
   "Oceania (UN SDG)": "Oceania (UN SDG)",
@@ -313,14 +313,13 @@
   "Latin America and Caribbean (UN)": "Latin America and Caribbean (UN)",
   "Eastern Asia and South-eastern Asia (UN SDG)": "Eastern Asia and South-eastern Asia (UN SDG)",
   "Africa (UN)": "Africa (UN)",
-  "Middle East & North Africa (WB)": "Middle East & North Africa (WB)",
+  "Middle East & North Africa (WB)": "Middle East and North Africa (WB)",
   "Asia (UN)": "Asia (UN)",
   "North America (WB)": "North America (WB)",
-  "Europe & Central Asia (WB)": "Europe & Central Asia (WB)",
+  "Europe & Central Asia (WB)": "Europe and Central Asia (WB)",
   "Sub-Saharan Africa (UN SDG)": "Sub-Saharan Africa (UN SDG)",
   "South Asia (WB)": "South Asia (WB)",
   "Europe (UN SDG)": "Europe (UN SDG)",
-
   "Oceania excluding Australia and New Zealand (UN SDG)": "Oceania excluding Australia and New Zealand (UN SDG)",
   "Australia and New Zealand (UN SDG)": "Australia and New Zealand (UN SDG)",
   "Southern Asia (UN SDG)": "Southern Asia (UN SDG)",
@@ -342,8 +341,6 @@
   "Latin America and Caribbean (UNICEF)": "Latin America and Caribbean (UNICEF)",
   "Least developed countries/areas (UNICEF)": "Least developed countries/areas (UNICEF)",
   "Eastern and Southern Africa (UNICEF)": "Eastern and Southern Africa (UNICEF)",
-
   "Caucasus and Central Asia (UN SDG)": "Caucasus and Central Asia (UN SDG)",
-
   "Channel Islands (UN)": "Channel Islands"
 }
