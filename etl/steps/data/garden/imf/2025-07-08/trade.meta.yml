@@ -95,3 +95,10 @@ tables:
           - Changes over time can reflect expanding trade networks, new trade relationships, or increasing global economic integration.
         display:
           numDecimalPlaces: *decimals
+
+      top_partner_category:
+        title: "Top partner category"
+        unit: category
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
