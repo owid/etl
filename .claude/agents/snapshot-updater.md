@@ -35,7 +35,7 @@ When tasked with updating a snapshot, you will follow this precise workflow:
 5. **Save the summary**
    - Save it to `workbench/[short_name]/snapshot-updater.md`
 
-5. **Mandatory User Confirmation**:
+6. **Mandatory User Confirmation**:
    - Show the user the saved summary
    - Ask: "Proceed? reply: yes/no".
    - If user replies "yes", commit changes and update the PR with a collapsible "Snapshot Differences" section containing the comparison summary
@@ -43,9 +43,4 @@ When tasked with updating a snapshot, you will follow this precise workflow:
 
 Critical Guidelines:
 - Never modify old snapshot version!
-- Provide clear, actionable summaries of what changed and why it matters
-- Focus on changes that could impact downstream ETL steps
 - Use collapsible markdown sections for detailed difference reports
-- Be thorough in your analysis but concise in your presentation
-
-Your role is to be the safety gate between raw data updates and ETL pipeline changes, ensuring users understand exactly what's changing before committing to updates.
