@@ -1,5 +1,7 @@
 """Load a meadow dataset and create a garden dataset for IMF trade data focusing on Asia and China."""
 
+from collections import Counter
+
 import numpy as np
 import owid.catalog.processing as pr
 import pandas as pd
@@ -88,6 +90,9 @@ def run() -> None:
         ]
     ].copy()
     tb = pr.concat([tb, trading_partners], ignore_index=True)
+
+    tb_rank = get_top_partner(tb_all_countries)
+    tb = pr.merge(tb, tb_rank, on=["country", "year", "counterpart_country"], how="left")
 
     # Add import rankings for China and US
     tb_china = get_country_import_ranking(tb_all_countries, "China")
@@ -254,13 +259,9 @@ def _verify_shares_sum_to_100(tb: Table) -> None:
             else:
                 # Just warn about incomplete coverage, don't assert
                 missing = expected_set - actual_counterparts
-                extra = actual_counterparts - expected_set
-                if missing or extra:
+                if missing:
                     print(f"⚠️  {country} {year}: Incomplete regional coverage.")
-                    if missing:
-                        print(f"   Missing: {missing}")
-                    if extra:
-                        print(f"   Extra: {extra}")
+                    print(f"   Missing: {missing}")
 
 
 def add_china_imports_share_of_gdp(tb: Table, ds_wdi, ds_population) -> Table:
@@ -295,7 +296,6 @@ def add_china_imports_share_of_gdp(tb: Table, ds_wdi, ds_population) -> Table:
 
     # Keep only the calculated share
     china_gdp_data = china_gdp_data[["country", "year", "china_imports_share_of_gdp"]]
-    print(china_gdp_data)
 
     # Merge back to main table
     tb = pr.concat([tb, china_gdp_data], ignore_index=True)
@@ -403,6 +403,85 @@ def clean_historical_overlaps(tb: Table, country_col="country") -> Table:
         tb_cleaned = tb_cleaned[~mask]
 
     return tb_cleaned
+
+
+def get_top_partner(
+    tb: Table,
+) -> Table:
+    """
+    Get the top trading partner for each country-year and classify based on global frequency.
+
+    Args:
+        tb: Trade data table
+
+    Returns:
+        Table with top partner classification for each country-year
+    """
+    # Filter for import data only
+    import_data = tb[tb["indicator"] == IMPORT_COL].copy()
+
+    # Create results list
+    partner_results = []
+    unique_top_partners = set()  # For collecting unique top partner countries
+
+    # Group by country and year to rank importers
+    for (country, year), group in import_data.groupby(["country", "year"]):
+        # Sort by import value descending to get rankings, excluding NaN values
+        ranked_partners = group.dropna(subset=["value"]).sort_values("value", ascending=False).reset_index(drop=True)
+
+        # Collect unique top partners data since 1990s (for analysis)
+        if len(ranked_partners) > 0:
+            top_partner = ranked_partners.iloc[0]["counterpart_country"]
+            unique_top_partners.add(top_partner)
+
+    # Count how many countries each partner appears as top partner for
+    partner_country_counts = {}
+    for (country, year), group in import_data.groupby(["country", "year"]):
+        ranked_partners = group.dropna(subset=["value"]).sort_values("value", ascending=False).reset_index(drop=True)
+        if len(ranked_partners) > 0:
+            top_partner = ranked_partners.iloc[0]["counterpart_country"]
+            if country == "China":
+                print(f"China {year}: Top partner = {top_partner}, value = {ranked_partners.iloc[0]['value']}")
+            if top_partner not in partner_country_counts:
+                partner_country_counts[top_partner] = set()
+            partner_country_counts[top_partner].add(country)
+
+    # Get top 10 partners by number of countries they're top partner for
+    partner_counts_by_countries = {partner: len(countries) for partner, countries in partner_country_counts.items()}
+    top_10_partners = [partner for partner, _ in Counter(partner_counts_by_countries).most_common(10)]
+    print(f"Top 10 partners by number of countries they're top partner for: {top_10_partners}")
+    print(f"Partner counts by countries: {dict(Counter(partner_counts_by_countries).most_common(10))}")
+
+    # Create classification for each country-year
+    for (country, year), group in import_data.groupby(["country", "year"]):
+        # Sort by import value descending to get rankings, excluding NaN values
+        ranked_partners = group.dropna(subset=["value"]).sort_values("value", ascending=False).reset_index(drop=True)
+
+        if len(ranked_partners) > 0:
+            top_partner_for_year = ranked_partners.iloc[0]["counterpart_country"]
+
+            # Classify as top 10 or "Other"
+            if top_partner_for_year in top_10_partners:
+                category = top_partner_for_year
+            else:
+                category = "Other"
+
+            partner_results.append(
+                {
+                    "country": country,
+                    "year": year,
+                    "top_partner_category": category,
+                }
+            )
+
+    # Convert to Table
+    result_tb = Table(partner_results).copy_metadata(tb)
+    for col in result_tb.columns:
+        if col not in ["country", "year"]:
+            result_tb[col] = result_tb[col].copy_metadata(tb["value"])
+
+    result_tb["counterpart_country"] = "World"
+    return result_tb
 
 
 def get_country_import_ranking(tb: Table, target_country: str) -> Table:
