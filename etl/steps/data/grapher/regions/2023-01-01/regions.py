@@ -9,7 +9,7 @@ import json
 from typing import cast
 
 # import pandas as pd
-from owid.catalog import Origin, Table
+from owid.catalog import Table
 from structlog import get_logger
 
 from etl.helpers import PathFinder
