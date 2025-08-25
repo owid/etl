@@ -15,8 +15,12 @@ tables:
     variables:
       cost:
         title: Solar photovoltaic module price
+        description_short: |-
+          This data is expressed in US dollars per watt, adjusted for inflation.
         presentation:
           title_public: Solar photovoltaic module price
+          grapher_config:
+            note: "Data is expressed in constant {LATEST_YEAR} US$ per watt."
       cost_source:
         title: Source for each value of cost data
         unit: ''
