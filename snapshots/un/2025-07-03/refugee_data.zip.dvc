@@ -3,15 +3,13 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: Refugee Population Statistics Database
+    title: "Refugee Population Statistics Database"
     description: |-
       The database contains information about forcibly displaced populations spanning more than 70 years of statistical activities. It covers displaced populations such as refugees, asylum-seekers and internally displaced people, including their demographics. Stateless people are also included, most of who have never been displaced. The database also reflects the different types of solutions for displaced populations such as repatriation or resettlement.
 
       It includes UNHCR data collected through its annual statistical activities with some data going back as far as 1951, the year UNHCR was created.
-    date_published: "2024-06-13"
-    title_snapshot: Refugee Population Statistics Database - Resettlements and Repatriation
-    description_snapshot: |-
-      Includes data on different types of solutions for displaced populations such as repatriation, resettlements or naturalization.
+    date_published: "2025-06-12"
+    version_producer: Annual statistics for 2024
 
     # Citation
     producer: UNHCR
@@ -20,16 +18,15 @@ meta:
     attribution_short: UNHCR
 
     # Files
-    url_main: https://www.unhcr.org/refugee-statistics
-    url_download: https://api.unhcr.org/population/v1/solutions/?limit=20&dataset=solutions&displayType=totals&columns%5B%5D=returned_refugees&columns%5B%5D=returned_idps&columns%5B%5D=resettlement&columns%5B%5D=naturalisation&yearFrom=1951&yearTo=2023&coo_all=true&coa_all=true&populationType=unrwa&uat=refugee-statistics%2Fbuild&download=true&_gl=1*q2i4un*_rup_ga*MTUyMDQ1MDk2NS4xNzIxMjExMTUz*_rup_ga_EVDQTJ4LMY*MTcyMTk5NjY1MS43LjEuMTcyMTk5NzU3Mi42MC4wLjA.*_ga*MTUyMDQ1MDk2NS4xNzIxMjExMTUz*_ga_BHDVL2BSVK*MTcyMTk5NjY1MS44LjEuMTcyMTk5NzU3Mi42MC4wLjA.
-    date_accessed: 2024-07-25
+    url_main: https://www.unhcr.org/refugee-statistics/download/?v2url=e7088f
+    url_download: https://www.unhcr.org/refugee-statistics/file-download/?v2url=e7088f
+    date_accessed: '2025-07-03'
 
     # License
     license:
       name: CC BY 4.0
       url: https://www.unhcr.org/what-we-do/reports-and-publications/data-and-statistics/terms-use-datasets
-
 outs:
-  - md5: f65a9223c4acdcbbe2979f38928564a8
-    size: 120083
-    path: resettlement.zip
+  - md5: 46b46f1182f1f8b7ccf337301de41830
+    size: 1546741
+    path: refugee_data.zip
