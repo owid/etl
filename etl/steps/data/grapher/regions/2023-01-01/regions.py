@@ -82,7 +82,7 @@ INSTITUTIONS = {
     },
     "un": {
         "name": "United Nations (Deprecated)",
-        "acronym": "UN",
+        "acronym": "UN (Deprecated)",
         "description": "[Don't use this indicator, use UN M49 ones]. Regions defined by the United Nations, which are used across the UN including UN WPP.",
         "origins": [ORIGIN_UN_M49],
     },
