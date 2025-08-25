@@ -8,14 +8,12 @@ from unittest.mock import mock_open, patch
 
 import numpy as np
 import pandas as pd
-import pytest
 from owid.catalog import Dataset, Table
 from owid.datautils import dataframes
 from pytest import warns
 from structlog.testing import capture_logs
 
 from etl.data_helpers import geo
-from etl.paths import LATEST_REGIONS_DATASET_PATH
 
 mock_countries = {
     "country_02": "Country 2",
