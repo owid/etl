@@ -1,6 +1,9 @@
 definitions:
   common:
-    processing_level: minor
+    processing_level: major
+    description_processing: |-
+      - The resulting costs are compiled from two IRENA reports: Renewable Power Generation Costs in 2023 (for data prior to 2010) and Renewable Power Generation Costs in 2024 (for data from 2010 onwards).
+      - Data from the Renewable Power Generation Costs in 2023 report has been adjusted to constant 2024 US dollars using a conversion factor of 1.03, based on [the US Inflation Calculator](https://www.usinflationcalculator.com/).
     presentation:
       topic_tags:
         - Energy
