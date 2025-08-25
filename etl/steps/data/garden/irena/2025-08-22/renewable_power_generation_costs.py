@@ -44,7 +44,6 @@ def run() -> None:
     #
     # Process data.
     #
-
     # Column by column in the old table, convert to constant USD$ of the latest year.
     for column in tb_old.drop(columns=["country", "year"]).columns:
         # Sanity check, given that this step requires a manual input, (the conversion above).
