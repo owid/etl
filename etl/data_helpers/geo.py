@@ -1788,7 +1788,10 @@ class Regions:
         result = add_regions_to_table(
             tb=tb,
             ds_regions=self.ds_regions,
-            ds_income_groups=self.ds_income_groups,
+            # If any of the regions is an income group, load income groups dataset (and raise an error if it is not among dependencies); otherwise, set ds_income_groups as None, to ignore the income groups dataset.
+            ds_income_groups=self.ds_income_groups
+            if (regions is not None) and any(set(regions).intersection(set(INCOME_GROUPS)))
+            else None,
             regions=regions,
             aggregations=aggregations,
             index_columns=index_columns,
