@@ -81,9 +81,9 @@ INSTITUTIONS = {
         "origins": [ORIGIN_UN_M49],
     },
     "un": {
-        "name": "United Nations",
-        "acronym": "UN",
-        "description": "Regions defined by the United Nations, which are used across the UN including UN WPP.",
+        "name": "United Nations (Deprecated)",
+        "acronym": "UN (Deprecated)",
+        "description": "[Don't use this indicator, use UN M49 ones]. Regions defined by the United Nations, which are used across the UN including UN WPP.",
         "origins": [ORIGIN_UN_M49],
     },
     "wb": {
@@ -210,21 +210,16 @@ def _add_metadata(tb: Table, institution_alias: str) -> Table:
 
 
 def process_un_definitions(tb) -> Table:
-    """UN provides various definitions of regions, which we need to process.
+    """This functions will be deprecated.
 
-    - Level 1: High-level, broad regions. E.g. "Americas"
-    - Level 2: More granular regions. E.g. "Latin America and the Caribbean", "Northern America"
-    - Level 3: Even more granular regions. E.g. "Caribbean", "Central America"
-
-    Problem: Not all regions are broken down into all three levels. E.g. "Europe" is a level 1 region, which has level 2 breakdown, but no 3 breakdown.
-
-    Solution: Propagate definitions downstream when missing.
+    Its tasks were:
+    - [no longer doing] Propagate definitions downstream. (Let's not do it, might be confusing)
+    - [will stop doing soon] Create new definition "un_region" that replaces "Americas" with "Latin America and the Caribbean" and "Northern America".
     """
-    # Propagate definitions downstream.
-
-    for i in range(1, 3):
-        mask = tb[f"un_m49_{i+1}_region"].isna()
-        tb.loc[mask, f"un_m49_{i+1}_region"] = tb.loc[mask, f"un_m49_{i}_region"]
+    # Propagate definitions downstream. (Let's not do it, might be confusing)
+    # for i in range(1, 3):
+    #     mask = tb[f"un_m49_{i+1}_region"].isna()
+    #     tb.loc[mask, f"un_m49_{i+1}_region"] = tb.loc[mask, f"un_m49_{i}_region"]
 
     # Create new definition
     ## Get rows where "Americas" should be replaced with "Latin America and the Caribbean" and "Northern America"
