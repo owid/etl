@@ -1,0 +1,165 @@
+definitions:
+  common:
+    unit: ""
+  date_accessed: &date_accessed "2025-08-22"
+  origins_un_m49: &origins_un_m49
+    producer: United Nations, Statistics Division
+    title: Standard country or area codes for statistical use (M49)
+    url_main: https://unstats.un.org/unsd/methodology/m49/
+    description: |-
+      The list of geographic regions presents the composition of geographical regions used by the Statistics Division in its publications and databases. Each country or area is shown in one region only. These geographic regions are based on continental regions; which are further subdivided into sub-regions and intermediary regions drawn as to obtain greater homogeneity in sizes of population, demographic circumstances and accuracy of demographic statistics.
+
+      The assignment of countries or areas to specific groupings is for statistical convenience and does not imply any assumption regarding political or other affiliation of countries or territories by the United Nations.
+    date_accessed: *date_accessed
+  origins_wb_regions: &origins_wb_regions
+    producer: World Bank
+    title: World Bank Country and Lending Groups
+    url_main: https://datahelpdesk.worldbank.org/knowledgebase/articles/906519-world-bank-country-and-lending-groups
+    date_accessed: *date_accessed
+  origins_who_regions: &origins_who_regions
+    producer: World Health Organization
+    title: Countries/areas by WHO region
+    url_main: https://apps.who.int/violence-info/Countries%20and%20areas%20by%20WHO%20region%20-%2012bfe12.pdf
+    date_accessed: *date_accessed
+  origins_un_sdg: &origins_un_sdg
+    producer: United Nations, Sustainable Development Goals
+    title: Regional groupings used in Report and Statistical Annex
+    url_main: https://unstats.un.org/sdgs/indicators/regional-groups/
+    date_accessed: *date_accessed
+
+tables:
+  regions:
+    variables:
+      # OWID
+      owid_region:
+        title: World regions according to OWID
+        description_short: |-
+          Regions defined by Our World in Data, which are used in OWID charts and maps.
+        type: ordinal
+        sort:
+          - "North America"
+          - "Latin America and the Caribbean"
+          - "Africa"
+          - "Europe"
+          - "Asia"
+          - "Oceania"
+        origins:
+          - producer: Our World in Data
+            title: Regions
+
+      # UN
+      un_m49_1_region:
+        title: World regions according to UN M49 (1)
+        description_short: |-
+          Level-1 broad regions defined by the United Nations.
+        type: ordinal
+        sort:
+          - Americas (UN)
+          - Africa (UN)
+          - Europe (UN)
+          - Asia (UN)
+          - Oceania (UN)
+        origins:
+          - *origins_un_m49
+      un_m49_2_region:
+        title: World regions according to UN M49 (2)
+        description_short: |-
+          Level-2 regions defined by the United Nations.
+        type: ordinal
+        sort:
+          # Americas
+          - Northern America (UN)
+          - Latin America and the Caribbean (UN)
+          # Africa
+          - Sub-Saharan Africa (UN)
+          - Northern Africa (UN)
+          # Europe
+          - Southern Europe (UN)
+          - Western Europe (UN)
+          - Northern Europe (UN)
+          - Eastern Europe (UN)
+          # Asia
+          - Western Asia (UN)
+          - Central Asia (UN)
+          - Southern Asia (UN)
+          - Eastern Asia (UN)
+          - South-eastern Asia (UN)
+          # Oceania
+          - Australia and New Zealand (UN)
+          - Melanesia (UN)
+          - Micronesia (UN)
+          - Polynesia (UN)
+        origins:
+          - *origins_un_m49
+      un_m49_3_region:
+        title: World regions according to UN M49 (3)
+        description_short: |-
+          Level-3 (most granular) regions defined by the United Nations.
+        type: ordinal
+        sort:
+          - "Central America (UN)"
+          - "Caribbean (UN)"
+          - "South America (UN)"
+          - "Western Africa (UN)"
+          - "Middle Africa (UN)"
+          - "Southern Africa (UN)"
+          - "Eastern Africa (UN)"
+        origins:
+          - *origins_un_m49
+      un_region:
+        title: "[DEPRECATED] World regions according to the UN"
+        description_short: |-
+          [Don't use this indicator, use UN M49 ones]. Regions defined by the United Nations, which are used across the UN including UN WPP.
+        origins:
+          - *origins_un_m49
+
+      # UN SDG
+      unsdg_region:
+        title: World regions according to UN SDG
+        description_short: |-
+          Regions as defined by the United Nations Sustainable Development Goals.
+        type: ordinal
+        sort:
+          - Europe and Northern America (UN SDG)
+          - Latin America and the Caribbean (UN SDG)
+          - Sub-Saharan Africa (UN SDG)
+          - Northern Africa and Western Asia (UN SDG)
+          - Central and Southern Asia (UN SDG)
+          - Eastern and South-Eastern Asia (UN SDG)
+          - Australia and New Zealand (UN SDG)
+          - Oceania (UN SDG)
+        origins:
+          - *origins_un_sdg
+
+      # World Bank
+      wb_region:
+        title: World regions according to WB
+        description_short: |-
+          Regions as defined by the World Bank.
+        type: ordinal
+        sort:
+          - North America (WB)
+          - Latin America and Caribbean (WB)
+          - Sub-Saharan Africa (WB)
+          - Middle East and North Africa (WB)
+          - Europe and Central Asia (WB)
+          - South Asia (WB)
+          - East Asia and Pacific (WB)
+        origins:
+          - *origins_wb_regions
+
+      # WHO
+      who_region:
+        title: World regions according to WHO
+        description_short: |-
+          Regions as defined by the World Health Organization.
+        type: ordinal
+        sort:
+          - Americas (WHO)
+          - Africa (WHO)
+          - Eastern Mediterranean (WHO)
+          - Europe (WHO)
+          - South-East Asia (WHO)
+          - Western Pacific (WHO)
+        origins:
+          - *origins_who_regions
