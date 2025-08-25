@@ -28,11 +28,13 @@ paths = PathFinder(__file__)
 
 # Conversion factors.
 # IRENA costs are given in the latest year's USD, so we convert other costs to the same currency.
-LATEST_YEAR = 2023
+LATEST_YEAR = 2024
 # Convert 2004 USD and 2013 USD to LATEST_YEAR USD , using
 # https://www.usinflationcalculator.com/
-USD2004_TO_USDLATEST = 1.61
-USD2013_TO_USDLATEST = 1.31
+# "If in 2004 I purchased an item for  $ 1.00 then in {LATEST_YEAR} that same item would cost:"
+USD2004_TO_USDLATEST = 1.66
+# "If in 2013 I purchased an item for  $ 1.00 then in {LATEST_YEAR} that same item would cost:"
+USD2013_TO_USDLATEST = 1.35
 
 
 def prepare_capacity_data(tb_nemet: Table, tb_irena_capacity: Table) -> Table:
