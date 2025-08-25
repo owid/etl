@@ -106,12 +106,12 @@ def download_and_extract_csv_files(urls: List[str]) -> List[pd.DataFrame]:
 
                             # Clean empty strings and whitespace
                             df = df.replace("", pd.NA).replace(r"^\s*$", pd.NA, regex=True)
-                            
+
                             # Remove rows with NaNs in key columns
                             key_cols = ["Year", "Month", "TotalTrips", "TotalPassengersCarried", "TotalPMT"]
                             cols_to_check = [col for col in key_cols if col in df.columns]
                             df = df.dropna(subset=cols_to_check)
-                            
+
                             # Skip if no data remains after cleaning
                             if df.empty:
                                 print(f"Skipping {csv_file.name} - no valid data after removing NaNs")
