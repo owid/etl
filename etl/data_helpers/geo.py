@@ -1813,8 +1813,15 @@ class Regions:
         tb: Table,
         columns: list[str],
         population_col: str = "population",
+        country_col: str = "country",
+        year_col: str = "year",
         suffix: str = "_per_capita",
         prefix: str = "",
+        drop_population: bool | None = None,
+        warn_on_missing_countries: bool = True,
+        show_full_warning: bool = True,
+        interpolate_missing_population: bool = False,
+        expected_countries_without_population: list[str] | None = None,
     ) -> Table:
         """Add per-capita indicators.
 
@@ -1825,11 +1832,28 @@ class Regions:
         columns : list[str]
             Columns to convert to per-capita.
         population_col : str
-            Column name with population data.
+            Column name with population data. If it doesn't exist, it will be added (and if so, the population dataset should be among the dependencies of the current step).
+        country_col : str
+            Country column name expected in the table.
+        year_col : str
+            Year column name expected in the table.
         suffix : str
             Suffix to append to the original column names to create the name of the new per-capita column.
         prefix : str
             Prefix to prepend to the original column names to create the name of the new per-capita column.
+        drop_population : bool or None
+            True to drop the population column after creating per capita indicators. If None, population column will be dropped only if it wasn't already given in the original table.
+        warn_on_missing_countries : bool
+            True to warn about countries that appear in original table but not in the population dataset.
+        show_full_warning : bool
+            True to display list of countries in warning messages.
+        interpolate_missing_population : bool
+            True to linearly interpolate population on years that are presented in tb, but for which we do not have
+            population data; otherwise False to keep missing population data as nans.
+            For example, if interpolate_missing_population is True and tb has data for all years between 1900 and 1910,
+            but population is only given for 1900 and 1910, population will be linearly interpolated between those years.
+        expected_countries_without_population : list
+            Countries that are expected to not have population (that should be ignored if warnings are activated).
 
         Returns
         -------
@@ -1838,8 +1862,22 @@ class Regions:
         """
         tb_result = tb.copy()
 
-        # TODO: We should add another property for ds_population (similar to ds_regions), to lazy load the population dataset (and ensure it's among dependencies, when run from an ETL step).
+        # Check if population was originally given in the data.
+        was_population_in_table = population_col in tb_result.columns
 
+        # Add population to table, if not there yet.
+        if not was_population_in_table:
+            tb_result = add_population_to_table(
+                tb=tb,
+                ds_population=self.ds_population,  # type: ignore
+                country_col=country_col,
+                year_col=year_col,
+                population_col=population_col,
+                warn_on_missing_countries=warn_on_missing_countries,
+                show_full_warning=show_full_warning,
+                interpolate_missing_population=interpolate_missing_population,
+                expected_countries_without_population=expected_countries_without_population,
+            )
         # TODO: Consider the case where per-capita indicators already exist, but we want to add them just for region aggregates (which is the main use of this function).
 
         for col in columns:
@@ -1847,5 +1885,12 @@ class Regions:
 
             # TODO: For now, use a simple division, assuming population is in the table. We should somehow track informed countries to calculate population of only countries that contributed to the aggregate.
             tb_result[new_col_name] = tb_result[col] / tb_result[population_col]
+
+        if drop_population is None:
+            # If parameter drop_population is not specified (namely, if it is None), then drop population column only if it wasn't already in the original table.
+            drop_population = not was_population_in_table
+
+        if drop_population:
+            tb_result = tb_result.drop(columns=population_col, errors="raise")
 
         return tb_result
