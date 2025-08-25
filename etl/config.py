@@ -10,6 +10,7 @@ only important for OWID staff.
 import os
 import pwd
 import re
+import sys
 import warnings
 from dataclasses import dataclass, fields
 from os import environ as env
@@ -129,15 +130,20 @@ def load_STAGING() -> Optional[str]:
     # if STAGING is used, override ENV values
     STAGING = env.get("STAGING")
 
+    # Check if we're running via etl d run-python-step (suppress warnings)
+    is_run_python_step = len(sys.argv) >= 3 and sys.argv[1:3] == ["d", "run-python-step"]
+
     # ENV_FILE takes precedence over STAGING
     if STAGING and ENV_FILE != BASE_DIR / ".env":
-        log.warning("Both ENV_FILE and STAGING is set, STAGING will be ignored.")
+        if not is_run_python_step:
+            log.warning("Both ENV_FILE and STAGING is set, STAGING will be ignored.")
         return None
     # if STAGING=1, use branch name
     elif STAGING == "1":
         branch_name = git.Repo(BASE_DIR).active_branch.name
         if branch_name == "master":
-            log.warning("You're on master branch, using local env instead of STAGING=master")
+            if not is_run_python_step:
+                log.warning("You're on master branch, using local env instead of STAGING=master")
             return None
         else:
             return branch_name
