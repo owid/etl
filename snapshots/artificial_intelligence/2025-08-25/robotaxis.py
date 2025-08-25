@@ -65,7 +65,7 @@ def download_and_extract_csv_files(urls: List[str]) -> List[pd.DataFrame]:
     all_dataframes = []
 
     for url in urls:
-        print(f"Processing {url}")
+        paths.log.info(f"Processing {url}")
 
         try:
             # Download the zip file
@@ -83,19 +83,32 @@ def download_and_extract_csv_files(urls: List[str]) -> List[pd.DataFrame]:
                 with zipfile.ZipFile(zip_path, "r") as zip_ref:
                     zip_ref.extractall(temp_path)
 
-                # Find all CSV files recursively
+                # Check for nested zip files and extract them too
+                nested_zips = list(temp_path.rglob("*.zip"))
+                for nested_zip in nested_zips:
+                    try:
+                        nested_extract_path = nested_zip.parent / nested_zip.stem
+                        nested_extract_path.mkdir(exist_ok=True)
+                        with zipfile.ZipFile(nested_zip, "r") as nested_ref:
+                            nested_ref.extractall(nested_extract_path)
+                        paths.log.info(f"Extracted nested zip: {nested_zip.name}")
+                    except Exception as e:
+                        paths.log.info(f"Failed to extract nested zip {nested_zip.name}: {e}")
+                        continue
+
+                # Find all CSV files recursively (including from nested zips)
                 csv_files = list(temp_path.rglob("*.csv"))
 
                 for csv_file in csv_files:
                     try:
-                        df = pd.read_csv(csv_file)
+                        df = pd.read_csv(csv_file, low_memory=False)
 
                         if "TotalPMT" in df.columns:
-                            print(f"Found TotalPMT in {csv_file.name}")
+                            paths.log.info(f"Found TotalPMT in {csv_file.name}")
 
                             # Check if TotalPMT column has actual values
                             if df["TotalPMT"].replace("", pd.NA).replace(r"^\s*$", pd.NA, regex=True).dropna().empty:
-                                print(f"Skipping {csv_file.name} - TotalPMT column has no values")
+                                paths.log.info(f"Skipping {csv_file.name} - TotalPMT column has no values")
                                 continue
 
                             # Extract only required columns if they exist
@@ -114,7 +127,7 @@ def download_and_extract_csv_files(urls: List[str]) -> List[pd.DataFrame]:
 
                             # Skip if no data remains after cleaning
                             if df.empty:
-                                print(f"Skipping {csv_file.name} - no valid data after removing NaNs")
+                                paths.log.info(f"Skipping {csv_file.name} - no valid data after removing NaNs")
                                 continue
 
                             # Extract TCPID from filename if missing
@@ -122,7 +135,7 @@ def download_and_extract_csv_files(urls: List[str]) -> List[pd.DataFrame]:
                                 tcpid_match = re.search(r"(PSG\d+)", csv_file.name)
                                 if tcpid_match:
                                     df["TCPID"] = tcpid_match.group(1)
-                                    print(f"Added TCPID {tcpid_match.group(1)} from filename")
+                                    paths.log.info(f"Added TCPID {tcpid_match.group(1)} from filename")
 
                             # Add source file info for tracking
                             df["source_file"] = csv_file.name
@@ -130,11 +143,11 @@ def download_and_extract_csv_files(urls: List[str]) -> List[pd.DataFrame]:
                             all_dataframes.append(df)
 
                     except Exception as e:
-                        print(f"Error reading {csv_file.name}: {e}")
+                        paths.log.info(f"Error reading {csv_file.name}: {e}")
                         continue
 
         except Exception as e:
-            print(f"Error processing {url}: {e}")
+            paths.log.info(f"Error processing {url}: {e}")
             continue
 
     return all_dataframes

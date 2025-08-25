@@ -26,6 +26,6 @@ meta:
       url: https://www.cpuc.ca.gov/about-cpuc/conditions-of-use
 
 outs:
-  - md5: d765163fad7608ce9faef6548fbe1039
-    size: 13311
+  - md5: feda602c546fd4b014393d45a9494490
+    size: 27288
     path: robotaxis.csv

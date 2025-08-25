@@ -39,7 +39,7 @@ def run() -> None:
         tb = tb.groupby(["Year", "Month"], observed=False)[numeric_cols].sum().reset_index()
 
         # Create date column from year and month (using first day of month)
-        tb["date"] = pd.to_datetime(tb[["Year", "Month"]].assign(day=1))
+        tb["date"] = pd.to_datetime(tb[["Year", "Month"]].assign(day=1)) + pd.offsets.MonthEnd(1)
 
         # Drop individual Year and Month columns
         tb = tb.drop(columns=["Year", "Month"])
