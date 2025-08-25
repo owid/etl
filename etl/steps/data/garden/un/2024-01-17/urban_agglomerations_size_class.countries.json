@@ -1,5 +1,3 @@
-
-
 {
   "AFRICA": "Africa (UN)",
   "ASIA": "Asia (UN)",
@@ -216,16 +214,16 @@
   "Eastern Africa": "Eastern Africa (UN)",
   "Eastern Asia": "Eastern Asia (UN)",
   "Eastern Europe": "Eastern Europe (UN)",
-  "High-income countries": "High-income countries (UN)",
+  "High-income countries": "High-income countries",
   "LATIN AMERICA AND THE CARIBBEAN": "Latin America and the Caribbean (UN)",
   "Least developed countries": "Least developed countries (UN)",
   "Less developed regions": "Less developed regions (UN)",
   "Less developed regions, excluding China": "Less developed regions, excluding China (UN)",
   "Less developed regions, excluding least developed countries": "Less developed regions, excluding least developed countries (UN)",
-  "Low-income countries": "Low-income countries (UN)",
-  "Lower-middle-income countries": "Lower-middle-income countries (UN)",
+  "Low-income countries": "Low-income countries",
+  "Lower-middle-income countries": "Lower-middle-income countries",
   "Middle Africa": "Middle Africa (UN)",
-  "Middle-income countries": "Middle-income countries (UN)",
+  "Middle-income countries": "Middle-income countries",
   "More developed regions": "More developed regions (UN)",
   "NORTHERN AMERICA": "North America (UN)",
   "Northern Africa": "Northern Africa (UN)",
@@ -236,8 +234,8 @@
   "Southern Asia": "Southern Asia (UN)",
   "Southern Europe": "Southern Europe (UN)",
   "Sub-Saharan Africa": "Sub-Saharan Africa (UN)",
-  "Upper-middle-income countries": "Upper-middle-income countries (UN)",
+  "Upper-middle-income countries": "Upper-middle-income countries",
   "Western Africa": "Western Africa (UN)",
   "Western Asia": "Western Asia (UN)",
-  "Western Europe": "Western Europe: (UN)"
+  "Western Europe": "Western Europe (UN)"
 }
