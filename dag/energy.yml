@@ -375,6 +375,7 @@ steps:
   #
   data://garden/irena/2025-08-22/renewable_power_generation_costs:
     - data://meadow/irena/2025-08-22/renewable_power_generation_costs
+    - data://meadow/irena/2024-11-15/renewable_power_generation_costs
   #
   # IRENA - Renewable power generation costs.
   #
