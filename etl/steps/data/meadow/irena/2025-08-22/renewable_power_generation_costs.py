@@ -58,7 +58,6 @@ def prepare_solar_pv_module_prices(data: pr.ExcelFile) -> Table:
 
     """
     # NOTE: The currency is not explicitly given in sheet B3.1b. But it is in sheet B3.1a (we assume it's the same).
-    # TODO: Again, missing data.
     error = "Cost unit for solar PV module prices has changed."
     assert (
         data.parse(sheet_name="Fig B3.1a", skiprows=2).dropna(axis=1).columns[0] == EXPECTED_SOLAR_PV_MODULE_COST_UNIT
@@ -150,18 +149,20 @@ def extract_global_cost_for_all_sources_from_excel_file(data: pr.ExcelFile) -> T
     solar_pv["technology"] = "Solar photovoltaic"
 
     # Onshore wind.
-    # TODO: The old sheet used to have data since 1984. Now it's only from 2010. Consider using the old snapshot. The new data can be extracted from Fig B2.1.
-    # error = "The file format for onshore wind LCOE has changed."
-    # # NOTE: Sheet 2.1 contains LCOE only from 2010, whereas 2.11 contains LCOE from 1984.
-    # assert data.parse("Fig 2.11", skiprows=2).columns[1] == f"LCOE ({EXPECTED_LCOE_UNIT})", error
-    # onshore_wind = (
-    #     data.parse("Fig 2.11", skiprows=3)
-    #     .drop(columns="Unnamed: 0", errors="raise")
-    #     .rename(  # type: ignore
-    #         columns={"Year": "year", "Weighted average": "cost"}, errors="raise"
-    #     )
-    # )
-    # onshore_wind["technology"] = "Onshore wind"
+    # NOTE: The old sheet used to have data since 1984. Now it's only from 2010.
+    error = "The file format for onshore wind LCOE has changed."
+    assert data.parse("Fig 2.14", skiprows=2).columns[1] == f"LCOE ({EXPECTED_LCOE_UNIT})", error
+    onshore_wind = (
+        data.parse("Fig 2.14", skiprows=3)
+        .rename(columns={"Unnamed: 1": "metric"}, errors="raise")
+        .drop(columns="Unnamed: 0", errors="raise")
+    )
+    assert onshore_wind.iloc[1, 0] == "Weighted average", error
+    onshore_wind = onshore_wind.melt(id_vars="metric", var_name="year", value_name="cost")
+    onshore_wind = (
+        onshore_wind[onshore_wind["metric"] == "Weighted average"].drop(columns=["metric"]).reset_index(drop=True)
+    )
+    onshore_wind["technology"] = "Onshore wind"
 
     # Concentrated solar power.
     error = "The file format for CSP LCOE has changed."
@@ -177,17 +178,23 @@ def extract_global_cost_for_all_sources_from_excel_file(data: pr.ExcelFile) -> T
     csp["technology"] = "Concentrated solar power"
 
     # Offshore wind.
-    # TODO: Similar issue to onshore wind.
-    # error = "The file format for offshore wind LCOE has changed."
-    # assert data.parse("Fig 4.11", skiprows=1).columns[1] == EXPECTED_LCOE_UNIT, error
-    # offshore_wind = data.parse("Fig 4.11", skiprows=3).rename(  # type: ignore
-    #     columns={"Year": "year", "Weighted average": "cost"}, errors="raise"
-    # )[["year", "cost"]]
-    # offshore_wind["technology"] = "Offshore wind"
+    # NOTE: The old sheet used to have data since 2000. Now it's only from 2010.
+    error = "The file format for offshore wind LCOE has changed."
+    assert data.parse("Fig 4.12", skiprows=4).columns[1] == f"LCOE ({EXPECTED_LCOE_UNIT})", error
+    offshore_wind = (
+        data.parse("Fig 4.12", skiprows=5)
+        .rename(columns={"Unnamed: 1": "metric"}, errors="raise")
+        .drop(columns="Unnamed: 0", errors="raise")
+    )
+    assert offshore_wind.iloc[1, 0] == "Weighted average", error
+    offshore_wind = offshore_wind.melt(id_vars="metric", var_name="year", value_name="cost")
+    offshore_wind = (
+        offshore_wind[offshore_wind["metric"] == "Weighted average"].drop(columns=["metric"]).reset_index(drop=True)
+    )
+    offshore_wind["technology"] = "Offshore wind"
 
     # Geothermal.
-    # NOTE: Sheet 8.1 contains LCOE only from 2010, whereas 8.4 contains LCOE from 2007.
-    # TODO: Here, we are also missing some years (old data started in 2007).
+    # NOTE: The old sheet used to have data since 2007. Now it's only from 2010.
     error = "The file format for geothermal LCOE has changed."
     assert data.parse("Fig 7.4", skiprows=3).columns[1] == f"LCOE ({EXPECTED_LCOE_UNIT})", error
     geothermal = data.parse("Fig 7.4", skiprows=5).rename(
@@ -222,9 +229,7 @@ def extract_global_cost_for_all_sources_from_excel_file(data: pr.ExcelFile) -> T
     hydropower["technology"] = "Hydropower"
 
     # Concatenate all sources into one table.
-    # TODO: Add missing data.
-    # tb = pr.concat([solar_pv, onshore_wind, csp, offshore_wind, geothermal, bioenergy, hydropower], ignore_index=True)
-    tb = pr.concat([solar_pv, csp, geothermal, bioenergy, hydropower], ignore_index=True)
+    tb = pr.concat([solar_pv, onshore_wind, csp, offshore_wind, geothermal, bioenergy, hydropower], ignore_index=True)
 
     # Add country column.
     tb["country"] = "World"
@@ -250,8 +255,7 @@ def extract_country_cost_from_excel_file(data: pr.ExcelFile) -> Table:
     # Extract LCOE for specific countries and technologies (those that are available in original data).
 
     # Solar photovoltaic.
-    # NOTE: For some reason, sheet 3.10 contains LCOE from 2010 to 2023 for 15 countries, and 3.12 contains LCOE from 2018 to 2023 for 19 countries.
-    #  So, let's take both, check that they are consistent, and concatenate them.
+    # NOTE: The old sheet used to have data for some additional countries.
     solar_pv = data.parse("Fig. 3.10", skiprows=2).dropna(how="all", axis=1)
     solar_pv = solar_pv.rename(columns={solar_pv.columns[0]: "country"}, errors="raise").melt(
         id_vars="country", var_name="year", value_name="cost"
@@ -259,33 +263,10 @@ def extract_country_cost_from_excel_file(data: pr.ExcelFile) -> Table:
     # Keep only rows of LCOE, and drop year changes and empty rows.
     solar_pv = solar_pv[~solar_pv["year"].astype(str).str.startswith("%")].dropna().reset_index(drop=True)
 
-    # Load additional data.
-    # TODO: This data is missing. Consider taking from previous snapshot.
-    # solar_pv_extra = data.parse("Fig. 3.12", skiprows=8)
-    # # Drop empty columns and unnecessary regions column.
-    # solar_pv_extra = solar_pv_extra.drop(
-    #     columns=[column for column in solar_pv_extra.columns if "Unnamed" in str(column)], errors="raise"
-    # ).drop(columns="Region", errors="raise")
-    # solar_pv_extra = solar_pv_extra.rename(columns={"Country": "country"}, errors="raise").melt(
-    #     id_vars="country", var_name="year", value_name="cost"
-    # )
-    # Check that, where both tables overlap, they are consistent.
-    # error = "Expected coincident country-years to have the same LCOE in sheets 3.11 and 3.12."
-    # check = solar_pv.merge(solar_pv_extra, on=["country", "year"], how="inner")
-    # NOTE: Consider relaxing this to coincide within a certain tolerance, if this fails.
-    # assert (check["cost_x"] == check["cost_y"]).all(), error
-    # Concatenate both tables and drop duplicates and empty rows.
-    # solar_pv = (
-    #     pr.concat([solar_pv, solar_pv_extra], ignore_index=True)
-    #     .drop_duplicates(subset=["country", "year"])
-    #     .dropna()
-    #     .reset_index(drop=True)
-    # )
-
     # Onshore wind.
-    # NOTE: There is country-level LCOE data in sheets 2.12 and 2.13 (for smaller markets).
-    #  Fetch both and concatenate them.
-    # TODO: Again, missing data.
+    # Fetch data for top markets and smaller markets and concatenate them.
+    # Onshore wind - Top markets.
+    # NOTE: The old sheet used to have data since 1984.
     error = "The file format for onshore wind LCOE has changed."
     assert data.parse("Fig 2.15", skiprows=3).columns[1] == f"LCOE ({EXPECTED_LCOE_UNIT})", error
     # NOTE: Column "Country" appears twice, so drop one of them.
@@ -299,7 +280,8 @@ def extract_country_cost_from_excel_file(data: pr.ExcelFile) -> Table:
     # Keep only rows of LCOE, and drop year changes and empty rows.
     onshore_wind = onshore_wind[~onshore_wind["year"].astype(str).str.startswith("%")].dropna().reset_index(drop=True)
 
-    # TODO: Again, missing data.
+    # Onshore wind - Smaller markets.
+    # NOTE: The old sheet used to have data since 1994.
     error = "The file format for country-level onshore wind LCOE for smaller markets has changed."
     assert data.parse("Fig 2.16", skiprows=3).columns[1] == f"LCOE ({EXPECTED_LCOE_UNIT})", error
     onshore_wind_extra = (
@@ -313,7 +295,7 @@ def extract_country_cost_from_excel_file(data: pr.ExcelFile) -> Table:
 
     # Check that there is no overlap between countries in the two tables.
     # NOTE: If there is, then change this to check that the values on coincident country-years are consistent.
-    error = "Expected no overlap between countries in sheets 2.12 and 2.13."
+    error = "Expected no overlap between countries in sheets 2.15 and 2.16."
     assert set(onshore_wind["country"]).isdisjoint(set(onshore_wind_extra["country"])), error
 
     # Combine onshore wind data.
