@@ -15,12 +15,6 @@ tables:
       description_key:
       - Levelized cost of energy (LCOE) estimates the average cost per unit of energy generated across the lifetime of a new power plant. It is measured in US$ per kilowatt-hour.
     variables:
-      bioenergy:
-        title: Bioenergy levelized cost of energy
-        display:
-          name: Bioenergy
-        presentation:
-          title_public: Bioenergy levelized cost of energy
       concentrated_solar_power:
         title: Concentrated solar power levelized cost of energy
         display:
@@ -57,7 +51,7 @@ tables:
           name: Solar photovoltaic
         presentation:
           title_public: Solar photovoltaic levelized cost of energy
-  solar_photovoltaic_module_prices:
+  solar_pv_module_prices:
     title: Solar photovoltaic module prices
     variables:
       cost:

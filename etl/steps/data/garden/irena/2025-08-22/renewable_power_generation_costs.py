@@ -14,7 +14,7 @@ def run() -> None:
     # Load meadow dataset and read its tables.
     ds_meadow = paths.load_dataset("renewable_power_generation_costs")
     tb = ds_meadow.read("renewable_power_generation_costs", safe_types=False)
-    tb_solar_pv = ds_meadow.read("solar_photovoltaic_module_prices", reset_index=False, safe_types=False)
+    tb_solar_pv = ds_meadow.read("solar_pv_module_prices", reset_index=False, safe_types=False)
 
     #
     # Process data.

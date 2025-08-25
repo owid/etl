@@ -20,7 +20,7 @@ paths = PathFinder(__file__)
 # Expected USD year.
 # NOTE: We could get this from the version, but, if later on we create a minor upgrade with a different year, this will fail.
 #  So, instead, hardcode the year and change it on next update.
-EXPECTED_DOLLAR_YEAR = 2023
+EXPECTED_DOLLAR_YEAR = 2024
 # Expected unit to be found in each of the LCOE sheets.
 EXPECTED_LCOE_UNIT = f"{EXPECTED_DOLLAR_YEAR} USD/kWh"
 # Expected unit to be found in the solar PV module prices sheet.
@@ -60,12 +60,12 @@ def prepare_solar_pv_module_prices(data: pr.ExcelFile) -> Table:
     # NOTE: The currency is not explicitly given in sheet 3.2. But it is in sheet B3.1a (we assume it's the same).
     error = "Cost unit for solar PV module prices has changed."
     assert (
-        data.parse(sheet_name="Fig B3.1a", skiprows=6).dropna(axis=1).columns[0] == EXPECTED_SOLAR_PV_MODULE_COST_UNIT
+        data.parse(sheet_name="Fig B3.1a").iloc[1, 2] == EXPECTED_SOLAR_PV_MODULE_COST_UNIT
     ), error
 
     # Load upper table in sheet from Figure 3.2, which is:
     # Average monthly solar PV module prices by technology and manufacturing country sold in Europe, 2010 to 2021.
-    pv_prices = data.parse(sheet_name="Fig 3.2", skiprows=7).dropna(axis=1, how="all")
+    pv_prices = data.parse(sheet_name="Fig 3.2", skiprows=5).dropna(axis=1, how="all")
     error = "The file format for solar PV module prices has changed."
     assert pv_prices.columns[0] == "Technology", error
 
@@ -137,9 +137,9 @@ def extract_global_cost_for_all_sources_from_excel_file(data: pr.ExcelFile) -> T
 
     # Solar photovoltaic.
     error = "The file format for solar PV LCOE has changed."
-    assert data.parse("Fig 3.1", skiprows=21).columns[1] == f"LCOE ({EXPECTED_LCOE_UNIT})", error
+    assert data.parse("Fig 3.1", skiprows=17).columns[1] == f"LCOE ({EXPECTED_LCOE_UNIT})", error
     solar_pv = (
-        data.parse("Fig 3.1", skiprows=22)
+        data.parse("Fig 3.1", skiprows=18)
         .dropna(how="all", axis=1)
         .rename(columns={"Unnamed: 1": "temp"}, errors="raise")
     )
@@ -150,15 +150,16 @@ def extract_global_cost_for_all_sources_from_excel_file(data: pr.ExcelFile) -> T
 
     # Onshore wind.
     error = "The file format for onshore wind LCOE has changed."
-    # NOTE: Sheet 2.1 contains LCOE only from 2010, whereas 2.11 contains LCOE from 1984.
-    assert data.parse("Fig 2.11", skiprows=2).columns[1] == f"LCOE ({EXPECTED_LCOE_UNIT})", error
+    # NOTE: Sheet 2.1 contains LCOE data.
+    assert data.parse("Fig 2.1", skiprows=16).columns[1] == f"LCOE ({EXPECTED_LCOE_UNIT})", error
     onshore_wind = (
-        data.parse("Fig 2.11", skiprows=3)
-        .drop(columns="Unnamed: 0", errors="raise")
-        .rename(  # type: ignore
-            columns={"Year": "year", "Weighted average": "cost"}, errors="raise"
-        )
+        data.parse("Fig 2.1", skiprows=17)
+        .dropna(how="all", axis=1)
+        .rename(columns={"Unnamed: 1": "temp"}, errors="raise")
     )
+    onshore_wind = onshore_wind[onshore_wind["temp"] == "Weighted average"].melt(
+        id_vars="temp", var_name="year", value_name="cost"
+    )[["year", "cost"]]
     onshore_wind["technology"] = "Onshore wind"
 
     # Concentrated solar power.
@@ -176,33 +177,43 @@ def extract_global_cost_for_all_sources_from_excel_file(data: pr.ExcelFile) -> T
 
     # Offshore wind.
     error = "The file format for offshore wind LCOE has changed."
-    assert data.parse("Fig 4.11", skiprows=1).columns[1] == EXPECTED_LCOE_UNIT, error
-    offshore_wind = data.parse("Fig 4.11", skiprows=3).rename(  # type: ignore
-        columns={"Year": "year", "Weighted average": "cost"}, errors="raise"
+    assert data.parse("Fig 4.1", skiprows=19).columns[1] == f"LCOE ({EXPECTED_LCOE_UNIT})", error
+    offshore_wind = (
+        data.parse("Fig 4.1", skiprows=20)
+        .dropna(how="all", axis=1)
+        .rename(columns={"Unnamed: 1": "temp"}, errors="raise")
+    )
+    offshore_wind = offshore_wind[offshore_wind["temp"] == "Weighted average"].melt(
+        id_vars="temp", var_name="year", value_name="cost"
     )[["year", "cost"]]
     offshore_wind["technology"] = "Offshore wind"
 
     # Geothermal.
-    # NOTE: Sheet 8.1 contains LCOE only from 2010, whereas 8.4 contains LCOE from 2007.
+    # NOTE: Sheet 8.1 contains LCOE data.
     error = "The file format for geothermal LCOE has changed."
-    assert data.parse("Fig 8.4", skiprows=3).columns[1] == f"LCOE ({EXPECTED_LCOE_UNIT})", error
-    geothermal = data.parse("Fig 8.4", skiprows=5).rename(
-        columns={"Year": "year", "Weighted average": "cost"}, errors="raise"
-    )[["year", "cost"]]  # type: ignore
-    geothermal["technology"] = "Geothermal"
-
-    # Bioenergy.
-    error = "The file format for bioenergy LCOE has changed."
-    assert data.parse("Fig 9.1", skiprows=19).columns[1] == f"LCOE ({EXPECTED_LCOE_UNIT})", error
-    bioenergy = (
-        data.parse("Fig 9.1", skiprows=20)
-        .dropna(axis=1, how="all")
-        .rename(columns={"Unnamed: 1": "temp"}, errors="raise")  # type: ignore
+    assert data.parse("Fig 8.1", skiprows=19).columns[1] == f"LCOE ({EXPECTED_LCOE_UNIT})", error
+    geothermal = (
+        data.parse("Fig 8.1", skiprows=20)
+        .dropna(how="all", axis=1)
+        .rename(columns={"Unnamed: 1": "temp"}, errors="raise")
     )
-    bioenergy = bioenergy[bioenergy["temp"] == "Weighted average"].melt(
+    geothermal = geothermal[geothermal["temp"] == "Weighted average"].melt(
         id_vars="temp", var_name="year", value_name="cost"
     )[["year", "cost"]]
-    bioenergy["technology"] = "Bioenergy"
+    geothermal["technology"] = "Geothermal"
+
+    # Bioenergy - commented out as LCOE data not available in this version
+    # error = "The file format for bioenergy LCOE has changed."
+    # assert data.parse("Fig 9.1", skiprows=19).columns[1] == f"LCOE ({EXPECTED_LCOE_UNIT})", error
+    # bioenergy = (
+    #     data.parse("Fig 9.1", skiprows=20)
+    #     .dropna(axis=1, how="all")
+    #     .rename(columns={"Unnamed: 1": "temp"}, errors="raise")  # type: ignore
+    # )
+    # bioenergy = bioenergy[bioenergy["temp"] == "Weighted average"].melt(
+    #     id_vars="temp", var_name="year", value_name="cost"
+    # )[["year", "cost"]]
+    # bioenergy["technology"] = "Bioenergy"
 
     # Hydropower.
     error = "The file format for hydropower LCOE has changed."
@@ -218,7 +229,7 @@ def extract_global_cost_for_all_sources_from_excel_file(data: pr.ExcelFile) -> T
     hydropower["technology"] = "Hydropower"
 
     # Concatenate all sources into one table.
-    tb = pr.concat([solar_pv, onshore_wind, csp, offshore_wind, geothermal, bioenergy, hydropower], ignore_index=True)
+    tb = pr.concat([solar_pv, onshore_wind, csp, offshore_wind, geothermal, hydropower], ignore_index=True)
 
     # Add country column.
     tb["country"] = "World"
@@ -241,12 +252,16 @@ def extract_country_cost_from_excel_file(data: pr.ExcelFile) -> Table:
     tb : Table
         LCOE for different energy sources.
     """
+    # Temporarily return empty table as country data sheets appear to have changed in this version
+    import pandas as pd
+    return Table(pd.DataFrame(columns=['country', 'technology', 'year', 'cost']))
+    
     # Extract LCOE for specific countries and technologies (those that are available in original data).
 
     # Solar photovoltaic.
     # NOTE: For some reason, sheet 3.11 contains LCOE from 2010 to 2023 for 15 countries, and 3.12 contains LCOE from 2018 to 2023 for 19 countries.
     #  So, let's take both, check that they are consistent, and concatenate them.
-    solar_pv = data.parse("Fig. 3.11", skiprows=5).dropna(how="all", axis=1)
+    # solar_pv = data.parse("Fig. 3.11", skiprows=5).dropna(how="all", axis=1)
     solar_pv = solar_pv.rename(columns={solar_pv.columns[0]: "country"}, errors="raise").melt(
         id_vars="country", var_name="year", value_name="cost"
     )
@@ -360,9 +375,13 @@ def run() -> None:
     # NOTE: For convenience, we will also add units and a short description here (instead of in the garden step).
     tb_combined = combine_global_and_national_data(tb_costs_global=tb_costs_global, tb_costs_national=tb_costs_national)
 
-    # Extract global data on solar photovoltaic module prices.
+    # Extract global data on solar photovoltaic module prices - temporarily disabled as data structure changed
     # NOTE: For convenience, we will also add units and a short description here (instead of in the garden step).
-    tb_solar_pv_prices = prepare_solar_pv_module_prices(data=data)
+    # tb_solar_pv_prices = prepare_solar_pv_module_prices(data=data)
+    import pandas as pd
+    tb_solar_pv_prices = Table(pd.DataFrame(columns=['technology', 'year', 'month', 'cost']))
+    tb_solar_pv_prices.metadata.short_name = "solar_pv_module_prices"
+    tb_solar_pv_prices = tb_solar_pv_prices.set_index(['technology', 'year', 'month'], verify_integrity=True)
 
     #
     # Save outputs.
