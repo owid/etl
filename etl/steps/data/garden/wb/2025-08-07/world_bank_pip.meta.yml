@@ -148,7 +148,6 @@ definitions:
     {definitions.poverty_line}
     <%- endif %>
 
-
   table: |-
     <% if table == "Income or consumption" %>
     <<table>> (<<welfare_type>>)
@@ -205,15 +204,13 @@ definitions:
     Country estimates are interpolated between available surveys and extrapolated until the year of the data release using GDP growth estimates and forecasts. For more details about the methodology, please refer to the [World Bank PIP documentation](https://datanalytics.worldbank.org/PIP-Methodology/lineupestimates.html#nowcasts).
     <%- endif %>
 
-
   prosperity_gap_threshold: |-
     <% if ppp_version == 2017 %>
     $25
     <%- elif ppp_version == 2021 %>
     $28
     <%- endif %>
-  description_key_prosperity_gap : The _prosperity gap_ indicator measures how much income would need to be multiplied to ensure everyone reaches a standard of prosperity, which is defined as {definitions.prosperity_gap_threshold} per person per day. This gives a sense of how far global incomes are from a basic prosperity standard.
-
+  description_key_prosperity_gap: The _prosperity gap_ indicator measures how much income would need to be multiplied to ensure everyone reaches a standard of prosperity, which is defined as {definitions.prosperity_gap_threshold} per person per day. This gives a sense of how far global incomes are from a basic prosperity standard.
   societal_poverty_line_intercept: |-
     <% if ppp_version == 2017 %>
     1.15
@@ -498,8 +495,7 @@ definitions:
     [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
     <%- endif %>
 
-  map_brackets_headcount: &map_brackets_headcount
-    <% if poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
+  map_brackets_headcount: &map_brackets_headcount <% if poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
     [0, 100000, 300000, 1000000, 3000000, 10000000, 30000000, 1]
     <%- else %>
     [0, 100000, 300000, 1000000, 3000000, 10000000, 30000000, 100000000, 300000000, 1]
@@ -557,8 +553,7 @@ definitions:
     [0, 5, 10 , 15, 20, 25, 30, 35, 40]
     <%- endif %>
 
-  map_brackets_income_gap_ratio: &map_brackets_income_gap_ratio
-    <% if poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
+  map_brackets_income_gap_ratio: &map_brackets_income_gap_ratio <% if poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
     [5, 10, 15, 20, 25, 30, 35, 40, 45, 1]
     <%- else %>
     [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
@@ -586,8 +581,7 @@ definitions:
     [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
     <%- endif %>
 
-  map_brackets_avg: &map_brackets_avg
-    <% if decile in [1, 2, 3, 4] %>
+  map_brackets_avg: &map_brackets_avg <% if decile in [1, 2, 3, 4] %>
     [0, 1, 2, 5, 10, 20, 1]
     <%- elif decile in [5, 6, 7, 8] %>
     [0, 1, 2, 5, 10, 20, 50, 1]
@@ -597,8 +591,7 @@ definitions:
     [0, 1, 2, 5, 10, 20, 50, 100, 200, 1]
     <%- endif %>
 
-  map_brackets_share: &map_brackets_share
-    <% if decile in [1] %>
+  map_brackets_share: &map_brackets_share <% if decile in [1] %>
     [0, 1, 2, 3, 4, 1]
     <%- elif decile in [2] %>
     [0, 1, 2, 3, 4, 5, 1]
@@ -620,8 +613,7 @@ definitions:
     [100, 20, 25, 30, 35, 40, 45, 1]
     <%- endif %>
 
-  map_brackets_thr: &map_brackets_thr
-    <% if decile in [1, 2, 3] %>
+  map_brackets_thr: &map_brackets_thr <% if decile in [1, 2, 3] %>
     [0, 1, 2, 5, 10, 20, 1]
     <% elif decile in [4, 5, 6, 7] %>
     [0, 1, 2, 5, 10, 20, 50, 1]
@@ -684,12 +676,10 @@ definitions:
 dataset:
   update_period_days: 180
 
-
 tables:
   world_bank_pip:
     variables:
-
-    # POVERTY
+      # POVERTY
 
       headcount_ratio:
         title: Share of population in poverty ({definitions.poverty_line_a_day}, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
@@ -734,7 +724,6 @@ tables:
                 customNumericValues: *map_brackets_headcount_ratio
             selectedEntityNames: *entity_names_poverty
 
-
       headcount_ratio_above:
         title: Share of population not in poverty (above {definitions.poverty_line_a_day}, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: "%"
@@ -752,9 +741,9 @@ tables:
         description_from_producer: |-
           Number of people living on less than a day at <<ppp_version>> PPP is calculated by multiplying the poverty rate and the population. As a result of revisions in PPP exchange rates, poverty rates for individual countries cannot be compared with poverty rates reported in earlier editions.
         display:
-            name: Share of population not in poverty (above {definitions.poverty_line_a_day})
-            numDecimalPlaces: 1
-            <<: *common_display
+          name: Share of population not in poverty (above {definitions.poverty_line_a_day})
+          numDecimalPlaces: 1
+          <<: *common_display
 
       headcount_ratio_between:
         title: Share of population in poverty (between {definitions.poverty_line_a_day}, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
@@ -1333,7 +1322,6 @@ tables:
           topic_tags:
             - Economic Inequality
 
-
       mld:
         title: Mean log deviation (<<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: ""
@@ -1795,6 +1783,15 @@ tables:
           - Some economies, mostly high-income economies, are excluded from the geographical regions and are included as a separate group referred to as _other high income_ (or _industrialized economies_ or _rest of the world_ in earlier publications).
         description_processing: |-
           {definitions.description_processing_main}
+        type: ordinal
+        sort:
+          - Latin America and the Caribbean
+          - Sub-Saharan Africa
+          - Middle East and North Africa
+          - Europe and Central Asia
+          - South Asia
+          - East Asia and Pacific
+          - Other high income countries
         display:
           name: World Bank PIP region
           numDecimalPlaces: 0
@@ -1844,4 +1841,3 @@ tables:
           name: Threshold (percentile <<percentile>>)
           numDecimalPlaces: 2
           <<: *common_display
-

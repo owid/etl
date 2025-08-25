@@ -27,13 +27,10 @@ definitions:
   description_short_gdp: Total economic output of a country or region per year.
   description_short_gdp_per_capita: Average economic output per person in a country or region per year.
 
-
-
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 1091
-
 
 tables:
   maddison_project_database:
@@ -195,11 +192,11 @@ tables:
         description_key:
           - "{definitions.description_key_attribution}"
         description_from_producer: |-
-         To extend the population estimates up to 2022, we used the Conference Board's Total Economy Database (TED) and the US Census Bureau’s International Database 2022.
+          To extend the population estimates up to 2022, we used the Conference Board's Total Economy Database (TED) and the US Census Bureau’s International Database 2022.
 
-         As Palestine is not included in US Census Bureau’s International Database 2022, we used the growth rate for the West Bank to extend the population estimates for Palestine. Further, for Burundi, Benin, El Salvador, Guinea, Guinea-Bissau, Honduras, Montenegro, Serbia and Swaziland, we used the US Census Bureau’s International Database 2022 for the period 1950–2021.
+          As Palestine is not included in US Census Bureau’s International Database 2022, we used the growth rate for the West Bank to extend the population estimates for Palestine. Further, for Burundi, Benin, El Salvador, Guinea, Guinea-Bissau, Honduras, Montenegro, Serbia and Swaziland, we used the US Census Bureau’s International Database 2022 for the period 1950–2021.
 
-         Finally, we have extended the series for the former Czechoslovakia, the former Soviet Union, and former Yugoslavia, based on GDP and population data for their successor states.
+          Finally, we have extended the series for the former Czechoslovakia, the former Soviet Union, and former Yugoslavia, based on GDP and population data for their successor states.
         display:
           name: Population
           <<: *common-display
@@ -217,7 +214,17 @@ tables:
         display:
           name: Region
           <<: *common-display
+        type: ordinal
+        sort:
+          - Western Offshoots
+          - Latin America
+          - Sub Saharan Africa
+          - Middle East and North Africa
+          - Western Europe
+          - Eastern Europe
+          - South and South East Asia
+          - East Asia
+
         presentation:
           title_public: World regions according to Maddison Project Database
           title_variant: Historical data
-
