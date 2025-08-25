@@ -262,6 +262,8 @@ def extract_country_cost_from_excel_file(data: pr.ExcelFile) -> Table:
     )
     # Keep only rows of LCOE, and drop year changes and empty rows.
     solar_pv = solar_pv[~solar_pv["year"].astype(str).str.startswith("%")].dropna().reset_index(drop=True)
+    # To avoid duplicate rows, fix country name (it's Türkiye in this sheet, but Turkey elsewhere).
+    solar_pv["country"] = solar_pv["country"].replace("Türkiye", "Turkey")
 
     # Onshore wind.
     # Fetch data for top markets and smaller markets and concatenate them.
