@@ -1522,18 +1522,31 @@ class Regions:
     # WARNING: This tool is under development, don't start using it just yet!
     ####################################################################################################################
 
-    TODO: I'll dump here some thoughts and ideas:
-    * The main thing missing in the current implementation, to start adding significant value with respect to the status quo, is to keep track of informed countries when creating aggregates (to then use that information to e.g. construct per capita indicators). In the most general case, I could store, for each column and year (or in principle other dimensions, except country), which countries were informed. This could be done with a dictionary, e.g. {col1: {2010: [Albania, Croatia, ...], {2011: [Bulgaria, ...], col2: {...}, ...}. This information could then be accessed to calculate population of the subset of regions for each column-year. However, this approach may not scale well.
-    There is a simpler alternative, which would be useful specifically for per-capita indicators. We could store a side table, with a row for each year (or other dimensions except country), and a column for each indicator for which region aggregates were created. We would then use this information in add_per_capita() to divide only by the informed population.
-    * I thought we could actually have Regions as part of owid.catalog; it would be a convenient tool for anyone. A user could just do `from owid.catalog import Regions; Regions.get_region("Africa").members`. It could potentially fetch other things, like population or GDP (by default, it could load the latest data using catalog.find_latest). Then, here we could have a separate object dedicated to the regions of a given table, called, e.g. RegionAggregator. But I thought that idea would be more complicated, and possibly premature generalization.
-    * We have already identified some issues with add_region_aggregates (used by add_regions_to_table). See https://github.com/owid/etl/issues/3071 where we noticed that countries_that_must_have_data doesn't work as expected. Currently, what that function does is (1) create aggregates and (2) make nan certain values, all in the same function. One alternative possibility would be to split the process, to:
-    1. Create the aggregates in the usual way (groupby and agg, properly handling nans). This produces a table with as many rows as regions x years.
-    2. Create one auxiliary table that contains as many rows as regions x years, and as many columns as aggregates defined. Each cell contains the list of countries informed.
-      - Note that this may not scale well!
-      - This table can be stored and used later for other purposes, e.g. to calculate informed population and then create per capita indicators.
-    3. We then make nan cells where certain conditions are not fulfilled, e.g. that certain countries are not informed.
-    4. We append that resulting table of regions to the original table.
-    NOTES: In the idea above, we assume year as the only dimension other than countries; but this could be generalized to any number of dimensions.
+    TODO:
+    * The main thing missing in the current implementation, to start adding significant value with respect to the status quo, is to keep track of informed countries when creating aggregates (to then use that information to e.g. construct per capita indicators). Currently, what add_regions_to_table function does is (1) create aggregates and (2) make nan certain values. We could split the process with two methods of Regions, to:
+    1. Create the aggregates in the usual way (possibly handling nans?).
+    2. We then make nan cells where certain conditions are not fulfilled, e.g. that certain countries are not informed (and maybe where there were too many nans?).
+    To achieve 2, we need to store auxiliary coverage information:
+    - Storing region coverage info as a dictionary:
+        We could store, for each column and year (or in principle other dimensions, except country), which countries were informed. This could be done with a a dictionary, e.g. {col1: {2010: {[Albania, Croatia, ...], {2011: [Bulgaria, ...], col2: {...}, ...}. This information could then be accessed to calculate population of the subset of regions for each column-year. However, this approach may not scale well.
+    - Storing region coverage info as an auxiliary table:
+        Create an auxiliary sparse table that keeps the index of the original table, and 1s where there was data, and 0s on nans. With this:
+        - Use auxiliary table to remove aggregations where certain countries countries_that_must_have_data were not informed (NOTE that this is currently not working well in our current tooling, see https://github.com/owid/etl/issues/3071). Possible algorithm:
+            1. Select columns in the auxiliary table for which region aggregates were created.
+            2. For each column (except index columns) replace the values in the column by the product of the original values times the country column.
+            3. Create region aggregates with the auxiliary table (in a similar way as the original table was used to create region aggregates), using a special aggregate function that returns 1 if the expected list of countries that needs to be informed is fully contained in the set of countries in a group, otherwise 0.
+            4. Left join the original table with the aggregated auxiliary table on country-year, use suffixes ("", "_complete"). This will add, for each column in the original table (for which there is a region aggregate), a column that is 1 if the aggregate is to be kept, and 0 otherwise.
+            5. Multiply each of the original columns by their corresponding "_complete" column, to remove incomplete aggregates.
+            NOTE: We could apply similar conditions using this method, e.g. maximum number or fraction of nans per group (although this is already implemented in our current tooling).
+        - Use auxiliary table to create accurate per capita indicators. Possible algorithm:
+            1. Select columns in the auxiliary table for which region aggregates were created.
+            2. Merge auxiliary table with population on country-year, to add a "population" column.
+            3. For each column (except "population" and index columns) replace the values in the column by the product of the original column times population.
+            4. Create region aggregates with the auxiliary table in the same way as the original table was used to create region aggregates.
+            5. Left join the original table with the aggregated auxiliary table on country-year, use suffixes ("", "_population"). This will add a column of informed population for each column.
+            6. To create per capita indicators, divide each column by its corresponding column_population.
+            NOTE: The above process could in principle be applied to other indicators, not just population. This could be useful to calculate yield (as production / area).
+    * The methods of Regions should be ideally applicable to tables with multiple dimensions, and tables in both long and wide format. Some of the issues above could be handled more easily by transforming the wide table into a long format one.
 
     """
 
