@@ -38,7 +38,7 @@ tables:
         type: ordinal
         sort:
           - "North America"
-          - "Latin America and the Caribbean"
+          - "South America"
           - "Africa"
           - "Europe"
           - "Asia"
