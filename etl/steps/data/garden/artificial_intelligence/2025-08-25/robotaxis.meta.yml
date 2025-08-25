@@ -1,0 +1,32 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Artificial Intelligence
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  robotaxis:
+    variables:
+      totaltrips:
+        title: Total Trips
+        unit: trips
+        description_short: Total number of trips made by robotaxis.
+
+      totalpassengerscarried:
+        title: Total Passengers Carried
+        unit: passengers
+        description_short: Total number of passengers carried by robotaxis.
+
+      totalpmt:
+        title: Total Passenger Miles Traveled
+        unit: miles
+        short_unit: m
+        description_short: Total passenger miles traveled by robotaxis.
