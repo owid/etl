@@ -19,14 +19,20 @@ tables:
         title: Total Trips
         unit: trips
         description_short: Total number of trips made by robotaxis.
+        display:
+          numDecimalPlaces: 0
 
       totalpassengerscarried:
         title: Total Passengers Carried
         unit: passengers
         description_short: Total number of passengers carried by robotaxis.
+        display:
+          numDecimalPlaces: 0
 
       totalpmt:
         title: Total Passenger Miles Traveled
         unit: miles
         short_unit: m
         description_short: Total passenger miles traveled by robotaxis.
+        display:
+          numDecimalPlaces: 0

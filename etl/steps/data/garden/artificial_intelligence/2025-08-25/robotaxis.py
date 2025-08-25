@@ -19,7 +19,7 @@ def run() -> None:
     #
     # Process data.
     #
-    tb["country"] = "United States"
+    tb["country"] = "California"
 
     # Improve table format.
     tb = tb.format(["country", "date"])
