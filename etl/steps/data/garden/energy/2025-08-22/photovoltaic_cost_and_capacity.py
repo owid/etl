@@ -136,8 +136,8 @@ def run() -> None:
     tb_farmer_lafond = ds_farmer_lafond.read("farmer_lafond_2016")
 
     # Load IRENA dataset on capacity from garden and read its main table.
-    ds_irena_capacity = paths.load_dataset("renewable_capacity_statistics")
-    tb_irena_capacity = ds_irena_capacity.read("renewable_capacity_statistics")
+    ds_irena_capacity = paths.load_dataset("renewable_energy_statistics")
+    tb_irena_capacity = ds_irena_capacity.read("renewable_energy_statistics")
 
     # Load IRENA dataset on cost from garden and read its main table.
     ds_irena_cost = paths.load_dataset("renewable_power_generation_costs")
