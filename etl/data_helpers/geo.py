@@ -1713,8 +1713,11 @@ class Regions:
             Regions as requested format.
         """
         if names is None:
-            # Get all available regions.
-            names = list(REGIONS.keys())
+            # Get all available continents, aggregates, and income groups.
+            names = sorted(
+                set(self.tb_regions[self.tb_regions["region_type"].isin(["continent", "aggregate"])]["name"])
+                | set(REGIONS)
+            )
 
         if only_members:
             # Create a dictionary of members of each region.
@@ -1821,7 +1824,7 @@ class Regions:
         frac_countries_that_must_have_data: dict[str, float] | None = None,
     ) -> Table:
         """Add region aggregates to a table."""
-        # TODO: There are known issues in the following table, it would be good to create a new simplified one.
+        # TODO: There are known issues in the following function, it would be good to create a new simplified one.
         result = add_regions_to_table(
             tb=tb,
             ds_regions=self.ds_regions,
@@ -1937,9 +1940,13 @@ class Regions:
 
         if only_informed_countries_in_regions:
             # TODO: It may feel awkward to pass aggregations to add_per_capita (which has nothing to do with aggregations); we could consider creating a RegionAggregator object, connected to a specific table (with certain index columns, and aggregations). For now, let's keep it simple.
-            # TODO: Note that "World" is often informed in the data, so we don't create an aggregate for it. However, we often then divide by the entire world population, even though, almost certainly, not all countries are informed. Fixing this case should be a priority.
             aggregations = {c: "sum" for c in columns}
-            regions = [region for region in set(tb["country"]) if region in REGIONS]
+            # Note that "World" is often informed in the data, so we don't create an aggregate for it (that's why it's not included in REGIONS by default). However, we often then divide by the entire world population, even though, almost certainly, not all countries are informed.
+            # Instead of relying on REGIONS (which doesn't include World or other aggregates), select all possible aggregates, continents, and income groups found in the data.
+            # TODO: Consider making this an attribute of Regions.
+            all_regions = list(self.get_regions(only_members=True))
+            # regions = [region for region in set(tb["country"]) if region in REGIONS]
+            regions = [region for region in set(tb["country"]) if region in all_regions]
             # Create an auxiliary table of informed population.
             # For a given column, each row contains the population of the corresponding region on the corresponding year, or a zero, if that column-row was originally nan.
             tb_coverage = self._create_coverage_table(
