@@ -655,7 +655,7 @@ steps:
   data://meadow/homicide/2025-08-06/who_mort_db:
     - snapshot://homicide/2025-08-06/who_mort_db.csv
   data://garden/homicide/2025-08-06/who_mort_db:
-    - data://garden/un/2024-07-12/un_wpp
+    - data://garden/un/2022-07-11/un_wpp
     - data://meadow/homicide/2025-08-06/who_mort_db
   data://grapher/homicide/2025-08-06/who_mort_db:
     - data://garden/homicide/2025-08-06/who_mort_db
