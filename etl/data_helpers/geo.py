@@ -1937,6 +1937,7 @@ class Regions:
 
         if only_informed_countries_in_regions:
             # TODO: It may feel awkward to pass aggregations to add_per_capita (which has nothing to do with aggregations); we could consider creating a RegionAggregator object, connected to a specific table (with certain index columns, and aggregations). For now, let's keep it simple.
+            # TODO: Note that "World" is often informed in the data, so we don't create an aggregate for it. However, we often then divide by the entire world population, even though, almost certainly, not all countries are informed. Fixing this case should be a priority.
             aggregations = {c: "sum" for c in columns}
             regions = [region for region in set(tb["country"]) if region in REGIONS]
             # Create an auxiliary table of informed population.
@@ -1982,9 +1983,7 @@ class Regions:
             if only_informed_countries_in_regions:
                 # Drop columns of informed population.
                 tb_result = tb_result.drop(
-                    columns=[
-                        column for column in tb_result.columns if column.endswith(suffix_informed_population) in column
-                    ],
+                    columns=[column for column in tb_result.columns if column.endswith(suffix_informed_population)],
                     errors="raise",
                 )
 
