@@ -18,7 +18,7 @@ tables:
       totaltrips:
         title: Monthly completed trips by robotaxis
         unit: trips
-        description_short: Total number of passenger trips completed by autonomous vehicles operating as paid taxi services.
+        description_short: The total number of completed passenger trips each month in California’s paid driverless taxi services.
         description_key:
           - This counts completed passenger trips in California's paid robotaxi services that are approved to operate.
           - Only includes trips where passengers actually rode in the vehicle and paid for the service.
@@ -30,7 +30,7 @@ tables:
       totalpassengerscarried:
         title: Monthly number of people who rode in robotaxis
         unit: passengers
-        description_short: Total number of people who took a trip in a self-driving taxi service.
+        description_short: The total number of passengers traveling each month in California’s paid driverless taxi services.
         description_key:
           - This counts all passengers who rode in California's paid robotaxi services that are approved to operate.
           - Each person is counted once per trip, so if someone takes multiple trips, they're counted multiple times.
@@ -44,7 +44,7 @@ tables:
         title: Monthly distance traveled by robotaxi passengers
         unit: miles
         short_unit: m
-        description_short: Total monthly distance traveled by passengers in California's paid self-driving taxi service, calculated by multiplying the number of passengers by the distance they traveled.
+        description_short: The total distance that passengers travel each month in California’s paid driverless taxi services, calculated by summing, across all trips, the number of passengers multiplied by the miles each one travels.
         description_key:
           - This measures how far people have traveled in paid robotaxi trips that are approved to operate in California.
           - The calculation multiplies passengers by distance. So if 3 people share a 5-mile ride, that's 15 passenger-miles. For rides where passengers get in or out partway, each part of the trip is counted based on how many people were actually in the car.
