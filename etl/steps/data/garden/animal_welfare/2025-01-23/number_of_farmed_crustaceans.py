@@ -58,6 +58,11 @@ def run() -> None:
     # Select and rename columns.
     tb = tb[list(COLUMNS)].rename(columns=COLUMNS, errors="raise")
 
+    ####################################################################################################################
+    # TODO: Remove, temporary code. Uncomment for testing. Here we introduce some arbitrary nans to check how region aggregates change.
+    # tb.loc[(tb["country"] == "China") & (tb["year"] == 2020), "n_farmed_crustaceans_low"] = None
+    ####################################################################################################################
+
     # Harmonize country names.
     tb = paths.regions.harmonize_names(tb=tb)
 
@@ -78,6 +83,8 @@ def run() -> None:
         tb=tb,
         columns=["n_farmed_crustaceans_low", "n_farmed_crustaceans", "n_farmed_crustaceans_high"],
         warn_on_missing_countries=False,
+        # TODO: Remove, temporary code. Uncomment to add columns of *_informed_population.
+        # drop_population=False,
     )
 
     # Run sanity checks on outputs.

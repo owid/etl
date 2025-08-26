@@ -1776,6 +1776,31 @@ class Regions:
             show_full_warning=show_full_warning,
         )
 
+    @staticmethod
+    def _create_coverage_table(
+        tb: Table,
+        index_columns: list[str] | None = None,
+        columns: list[str] | None = None,
+        reference_column: str | None = None,
+    ) -> Table:
+        """Create data coverage table with the same shape as the original table."""
+        if index_columns is None:
+            index_columns = ["country", "year"]
+
+        if columns is None:
+            columns = [column for column in tb.columns if column not in index_columns]
+
+        # Create a data coverage table, which is 0 if a given cell in the original table was nan, and 1 otherwise.
+        tb_coverage = tb[index_columns + columns].notnull()
+
+        # Replace index columns by their original values.
+        tb_coverage[index_columns] = tb[index_columns].copy()
+
+        if reference_column:
+            tb_coverage[columns] = tb_coverage[columns].multiply(tb[reference_column], axis=0)
+
+        return cast(Table, tb_coverage)
+
     def add_aggregates(
         self,
         tb: Table,
@@ -1796,8 +1821,7 @@ class Regions:
         frac_countries_that_must_have_data: dict[str, float] | None = None,
     ) -> Table:
         """Add region aggregates to a table."""
-        # Call the existing function but store informed countries info
-        # TODO: Track informed countries for each region-year-indicator combination, to enable smarter per-capita calculations. For now, simply keep the status-quo operation.
+        # TODO: There are known issues in the following table, it would be good to create a new simplified one.
         result = add_regions_to_table(
             tb=tb,
             ds_regions=self.ds_regions,
@@ -1827,12 +1851,15 @@ class Regions:
     def add_per_capita(
         self,
         tb: Table,
-        columns: list[str],
+        only_informed_countries_in_regions: bool = True,
+        columns: list[str] | None = None,
+        index_columns: list[str] | None = None,
         population_col: str = "population",
         country_col: str = "country",
         year_col: str = "year",
-        suffix: str = "_per_capita",
         prefix: str = "",
+        suffix: str = "_per_capita",
+        suffix_informed_population: str = "_informed_population",
         drop_population: bool | None = None,
         warn_on_missing_countries: bool = True,
         show_full_warning: bool = True,
@@ -1845,18 +1872,25 @@ class Regions:
         ----------
         tb : Table
             Table where per-capita indicators will be created.
-        columns : list[str]
-            Columns to convert to per-capita.
+        only_informed_countries_in_regions : bool
+            True to construct per-capita indicators of regions taking into account the data coverage of that region each year. For example, if "Africa" is among countries, the population of Africa will be calculated, for each indicator, based on the African countries informed each year for that indicator. Otherwise, if only_informed_countries_in_regions is False, the indicator will be divided by the entire population of Africa each year, regardless of data coverage.
+        columns : list[str] or None
+            Columns to convert to per-capita. If None, all columns except country and year will be used.
+        index_columns : list[str] or None
+            Names of index columns (usually ["country", "year"]). Aggregations will be done on groups defined by these
+            columns (excluding the country column). A country and a year column should always be included.
         population_col : str
             Column name with population data. If it doesn't exist, it will be added (and if so, the population dataset should be among the dependencies of the current step).
         country_col : str
             Country column name expected in the table.
         year_col : str
             Year column name expected in the table.
-        suffix : str
-            Suffix to append to the original column names to create the name of the new per-capita column.
         prefix : str
             Prefix to prepend to the original column names to create the name of the new per-capita column.
+        suffix : str
+            Suffix to append to the original column names to create the name of the new per-capita column.
+        suffix_informed_population : str
+            Suffix to use for auxiliary columns of informed population. Only relevant if only_informed_countries_in_regions is True.
         drop_population : bool or None
             True to drop the population column after creating per capita indicators. If None, population column will be dropped only if it wasn't already given in the original table.
         warn_on_missing_countries : bool
@@ -1881,6 +1915,12 @@ class Regions:
         # Check if population was originally given in the data.
         was_population_in_table = population_col in tb_result.columns
 
+        if index_columns is None:
+            index_columns = [country_col, year_col]
+
+        if columns is None:
+            columns = [column for column in tb_result.columns if column not in index_columns + [population_col]]
+
         # Add population to table, if not there yet.
         if not was_population_in_table:
             tb_result = add_population_to_table(
@@ -1894,13 +1934,44 @@ class Regions:
                 interpolate_missing_population=interpolate_missing_population,
                 expected_countries_without_population=expected_countries_without_population,
             )
-        # TODO: Consider the case where per-capita indicators already exist, but we want to add them just for region aggregates (which is the main use of this function).
+
+        if only_informed_countries_in_regions:
+            # TODO: It may feel awkward to pass aggregations to add_per_capita (which has nothing to do with aggregations); we could consider creating a RegionAggregator object, connected to a specific table (with certain index columns, and aggregations). For now, let's keep it simple.
+            aggregations = {c: "sum" for c in columns}
+            regions = [region for region in set(tb["country"]) if region in REGIONS]
+            # Create an auxiliary table of informed population.
+            # For a given column, each row contains the population of the corresponding region on the corresponding year, or a zero, if that column-row was originally nan.
+            tb_coverage = self._create_coverage_table(
+                tb=tb_result, index_columns=index_columns, reference_column=population_col
+            )
+
+            # TODO: This is convoluted, we should rethink this approach.
+            tb_population_informed = add_regions_to_table(
+                tb=tb_coverage.drop(columns=[population_col]),
+                ds_regions=self.ds_regions,
+                # If any of the regions is an income group, load income groups dataset (and raise an error if it is not among dependencies); otherwise, set ds_income_groups as None, to ignore the income groups dataset.
+                ds_income_groups=self.ds_income_groups
+                if (regions is not None) and any(set(regions).intersection(set(INCOME_GROUPS)))
+                else None,
+                regions=regions,
+                aggregations=aggregations,
+                index_columns=index_columns,
+                country_col=country_col,
+                year_col=year_col,
+            )
+
+            tb_result = tb_result.merge(
+                tb_population_informed, on=index_columns, how="left", suffixes=("", "_informed_population")
+            )
 
         for col in columns:
             new_col_name = f"{prefix}{col}{suffix}"
-
-            # TODO: For now, use a simple division, assuming population is in the table. We should somehow track informed countries to calculate population of only countries that contributed to the aggregate.
-            tb_result[new_col_name] = tb_result[col] / tb_result[population_col]
+            if only_informed_countries_in_regions:
+                # Divide the original column by the population of informed countries in the region each year.
+                tb_result[new_col_name] = tb_result[col] / tb_result[f"{col}{suffix_informed_population}"]
+            else:
+                # Divide the original column by the population of the region, regardless of the coverage.
+                tb_result[new_col_name] = tb_result[col] / tb_result[population_col]
 
         if drop_population is None:
             # If parameter drop_population is not specified (namely, if it is None), then drop population column only if it wasn't already in the original table.
@@ -1908,5 +1979,13 @@ class Regions:
 
         if drop_population:
             tb_result = tb_result.drop(columns=population_col, errors="raise")
+            if only_informed_countries_in_regions:
+                # Drop columns of informed population.
+                tb_result = tb_result.drop(
+                    columns=[
+                        column for column in tb_result.columns if column.endswith(suffix_informed_population) in column
+                    ],
+                    errors="raise",
+                )
 
         return tb_result
