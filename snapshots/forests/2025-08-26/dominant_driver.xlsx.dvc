@@ -1,0 +1,41 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+# This data was sent by David Gibbs from Global Forest Watch - World Resources Institute over email to Fiona on 2024-08-06.
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Tree Cover Loss by Dominant Driver
+    description: |-
+      This data set includes tree cover loss by driver. Statistics were calculated from annual tree cover loss (Hansen et al. 2013), categorized by driver (Sims et al. 2025). Sims et al. 2025 classifies the dominant driver at 1 km resolution from 2001-2024. The dominant driver is defined as the direct driver that caused the majority of of tree cover loss within each 1 km cell over the time period. Years correspond to the loss year of the annual tree cover loss data (Hansen et al. 2013).
+
+      The tree cover loss data was produced by the University of Maryland's GLAD laboratory in partnership with Google (Hansen et al. 2013). Tree cover loss is defined as “stand replacement disturbance” which is considered to be clearing of at least half of tree cover within a 30-meter pixel.
+
+      Tree cover loss by dominant driver was produced by WRI and Google DeepMind (Sims et al. 2025). Driver categories are defined as follows:
+
+      - Permanent agriculture: Long-term, permanent tree cover loss for small- to large-scale agriculture.
+      - Hard commodities: Loss due to the establishment or expansion of mining or energy infrastructure.
+      - Shifting cultivation: Tree cover loss due to small- to medium-scale clearing for temporary cultivation that is later abandoned and followed by subsequent regrowth of secondary forest or vegetation.
+      - Logging: Forest management and logging activities occurring within managed, natural or semi-natural forests and plantations, often with evidence of forest regrowth or planting in subsequent years.
+      - Wildfire: Tree cover loss due to fire with no visible human conversion or agricultural activity afterward. Fires may be started by natural causes (e.g. lightning) or may be related to human activities (accidental or deliberate).
+      - Settlements and infrastructure: Tree cover loss due to expansion and intensification of roads, settlements, urban areas, or built infrastructure (not associated with other classes).
+      - Other natural disturbances: Tree cover loss due to other non-fire natural disturbances (e.g., landslides, insect outbreaks, river meandering). If loss due to natural causes is followed by salvage or sanitation logging, it is classified as forest management.
+    date_published: "2025-07-01"
+    # Citation
+    producer: Global Forest Watch
+    citation_full: |-
+      - Sims, M., R. Stanimirova, A. Raichuk, M. Neumann et al. 2025. "Global Drivers of Forest Loss at 1 km Resolution." Environmental Research Letters. https://doi.org/10.1088/1748-9326/add606.  Available online from: https://datasets.wri.org/datasets/dominant-drivers-of-tree-cover-loss-at-1km
+      - Hansen, M.C., P.V. Potapov, R. Moore, et al. 2013. "High-Resolution Global Maps of 21st-Century Forest Cover Change." Science 342: 850–53. DOI: 10.1126/science.1244693. Data available on-line from: https://glad.earthengine.app/view/global-forest-change.
+      - Global Administrative Areas Database, version 4.1. Available at http://gadm.org/
+    attribution_short: GFW
+    # Files
+    url_main: https://datasets.wri.org/datasets/dominant-drivers-of-tree-cover-loss-at-1km
+    date_accessed: '2025-08-27'
+
+    # License
+    license:
+      name: Creative Commons Attribution
+      url: https://datasets.wri.org/datasets/dominant-drivers-of-tree-cover-loss-at-1km
+outs:
+  - md5: 1edf5137c1cff2fa05d18b948257af9f
+    size: 471563
+    path: dominant_driver.xlsx
