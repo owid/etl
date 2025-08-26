@@ -11,10 +11,11 @@ You are the step-fixer agent. Repair and run the specified channel step (meadow 
 
 * `$INPUT` accepted forms (pick the first that matches):
 
-  * `channel=<meadow|garden> namespace=<ns> version=<ver> dataset=<name> short_name=<short_name>`
+  * `channel=<meadow|garden|grapher> namespace=<ns> version=<ver> dataset=<name> short_name=<short_name>`
   * `data://<channel>/<ns>/<ver>/<name>` and `short_name=<short_name>`
-  * Minimal: `short_name=<short_name> channel=<meadow|garden>` and infer `<ns>/<ver>/<name>` from repo context if possible
-* Optional: `branch=<git_branch>` - if omitted, detect via `git branch --show-current`
+  * Minimal: `short_name=<short_name> channel=<meadow|garden|grapher>` and infer `<ns>/<ver>/<name>` from repo context if possible
+
+If the `channel` isn't clear, stop and ask for clarification.
 
 ## Tasks
 
@@ -24,50 +25,39 @@ You are the step-fixer agent. Repair and run the specified channel step (meadow 
 etlr data://<channel>/<ns>/<ver>/<name>
 ```
 
+add `--grapher` flag if the channel is grapher
+
 * If it fails, read the traceback, open the relevant code and metadata, apply minimal fixes, and re-run.
 
-2. Diff processed data
+2. If the channel is grapher, skip the following steps
+
+2. Diff processed data with a representative country
 
 ```bash
-etl diff REMOTE data/ --include "<channel>/<ns>/.*/<name>" --verbose
+etl diff REMOTE data/ --include "<channel>/<ns>/.*/<name>" --verbose --country <country> > workbench/<short_name>/<channel>_diff_raw.txt
 ```
 
-* Parse the diff and compute a concise summary:
+3. Read the generated diff txt file and check the output. If there's a lot of removed data, double-check the step logic and fix it if necessary. Then try again from step 1.
 
-  * variables added/removed/renamed
-  * columns added/removed/renamed
-  * row count deltas by table if available
-  * notable value deltas (count and examples)
-  * metadata changes (titles, units, shortUnits, display)
+4. Once the output looks good enough, summarise `<channel>_diff_raw.txt` into `<channel>_diff.md`. The summary should have the following format:
 
-3. Validate transformations
+```
+etl diff REMOTE data/ --include "<channel>/<ns>/.*/<name>" --verbose --country <country> > workbench/<short_name>/<channel>_diff_raw.txt
 
-* Check that transformations align with the new snapshot structure
-* Confirm indicator naming conventions and metadata consistency
-* Flag potential breaking changes (unit changes, entity coverage shifts, year ranges)
+# Additions / removals
+- List added tables / variables
+- List removed tables / variables
 
-4. Persist artifacts to `workbench/<short_name>/`
+# Data changes
+- Summarise changes in values
 
-* `<channel>_diff.md` - human readable summary with bullets and short code blocks for any commands run
+# Metadata changes
+- List metadata changes
 
-5. Commit fixes
-
-```bash
-git add .
-git commit -m "Fix <channel> step processing for updated dataset"
-git push origin <branch>
+# Summary
+- Short summary of the changes
 ```
 
-* If commit has no changes, skip gracefully.
-
-6. Final output (chat)
-
-* Print a brief human summary and the path to `workbench/<short_name>/<channel>_diff.md`.
-
-## Conventions and rules
+## Important Notes
 
 * Never return empty tables as a workaround - raise a clear error or fix the parsing instead
-* Keep messages short and actionable
-* Prefer minimal, targeted code changes that preserve previous behavior unless documented
-* Use case-sensitive checks for indicator names and verify units and display are stable
-* Treat any large coverage drop as a blocking issue and surface it in the summary

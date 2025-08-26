@@ -51,8 +51,3 @@ tables:
           name: Solar photovoltaic
         presentation:
           title_public: Solar photovoltaic levelized cost of energy
-  solar_pv_module_prices:
-    title: Solar photovoltaic module prices
-    variables:
-      cost:
-        title: Solar photovoltaic module prices

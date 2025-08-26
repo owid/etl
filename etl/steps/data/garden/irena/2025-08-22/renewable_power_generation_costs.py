@@ -14,7 +14,6 @@ def run() -> None:
     # Load meadow dataset and read its tables.
     ds_meadow = paths.load_dataset("renewable_power_generation_costs")
     tb = ds_meadow.read("renewable_power_generation_costs", safe_types=False)
-    tb_solar_pv = ds_meadow.read("solar_pv_module_prices", reset_index=False, safe_types=False)
 
     #
     # Process data.
@@ -29,5 +28,5 @@ def run() -> None:
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_garden = paths.create_dataset(tables=[tb, tb_solar_pv], default_metadata=ds_meadow.metadata)
+    ds_garden = paths.create_dataset(tables=[tb], default_metadata=ds_meadow.metadata)
     ds_garden.save()
