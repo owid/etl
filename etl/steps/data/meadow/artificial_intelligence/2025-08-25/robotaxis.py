@@ -34,10 +34,10 @@ def run() -> None:
                 tb[col] = tb[col].astype(str).str.replace(",", "").replace("", None)
                 tb[col] = pd.to_numeric(tb[col], errors="coerce")
                 tb[col].metadata.origins = tb["Year"].metadata.origins
-
+        # Drop rows that are *completely identical* across all columns
+        tb = tb.drop_duplicates()
         # Group by Year and Month, sum the numeric columns
-        tb = tb.groupby(["Year", "Month"], observed=False)[numeric_cols].sum().reset_index()
-
+        tb = tb.groupby(["Year", "Month"])[numeric_cols].sum().reset_index()
         # Create date column from year and month (using first day of month)
         tb["date"] = pd.to_datetime(tb[["Year", "Month"]].assign(day=1)) + pd.offsets.MonthEnd(1)
 
