@@ -17,7 +17,7 @@ from etl.helpers import PathFinder
 
 paths = PathFinder(__file__)
 
-# List of all zip URLs to download and process
+# List of all zip URLs to download and process (find them here https://www.cpuc.ca.gov/regulatory-services/licensing/transportation-licensing-and-analysis-branch/autonomous-vehicle-programs/quarterly-reporting)
 ZIP_URLS = [
     "https://www.cpuc.ca.gov/-/media/cpuc-website/files/uploadedfiles/cpucwebsite/content/licensing/autovehicle/2022-av-deployment---0901-1130.zip",
     "https://www.cpuc.ca.gov/-/media/cpuc-website/files/uploadedfiles/cpucwebsite/content/licensing/autovehicle/2022-av-deployment--0601-0831-revised.zip",
@@ -65,89 +65,67 @@ def download_and_extract_csv_files(urls: List[str]) -> List[pd.DataFrame]:
     all_dataframes = []
 
     for url in urls:
-        paths.log.info(f"Processing {url}")
+        # Download the zip file
+        response = requests.get(url, timeout=30)
+        response.raise_for_status()
 
-        try:
-            # Download the zip file
-            response = requests.get(url, timeout=30)
-            response.raise_for_status()
+        # Create temporary directory for extraction
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_path = Path(temp_dir)
 
-            # Create temporary directory for extraction
-            with tempfile.TemporaryDirectory() as temp_dir:
-                temp_path = Path(temp_dir)
+            # Save and extract zip file
+            zip_path = temp_path / "data.zip"
+            zip_path.write_bytes(response.content)
 
-                # Save and extract zip file
-                zip_path = temp_path / "data.zip"
-                zip_path.write_bytes(response.content)
+            with zipfile.ZipFile(zip_path, "r") as zip_ref:
+                zip_ref.extractall(temp_path)
 
-                with zipfile.ZipFile(zip_path, "r") as zip_ref:
-                    zip_ref.extractall(temp_path)
+            # Check for nested zip files and extract them too
+            nested_zips = list(temp_path.rglob("*.zip"))
+            for nested_zip in nested_zips:
+                nested_extract_path = nested_zip.parent / nested_zip.stem
+                nested_extract_path.mkdir(exist_ok=True)
+                with zipfile.ZipFile(nested_zip, "r") as nested_ref:
+                    nested_ref.extractall(nested_extract_path)
 
-                # Check for nested zip files and extract them too
-                nested_zips = list(temp_path.rglob("*.zip"))
-                for nested_zip in nested_zips:
-                    try:
-                        nested_extract_path = nested_zip.parent / nested_zip.stem
-                        nested_extract_path.mkdir(exist_ok=True)
-                        with zipfile.ZipFile(nested_zip, "r") as nested_ref:
-                            nested_ref.extractall(nested_extract_path)
-                        paths.log.info(f"Extracted nested zip: {nested_zip.name}")
-                    except Exception as e:
-                        paths.log.info(f"Failed to extract nested zip {nested_zip.name}: {e}")
+            # Find all CSV files recursively (including from nested zips)
+            csv_files = list(temp_path.rglob("*.csv"))
+
+            for csv_file in csv_files:
+                df = pd.read_csv(csv_file, low_memory=False)
+
+                if "TotalPMT" in df.columns:
+                    # Check if TotalPMT column has actual values
+                    if df["TotalPMT"].replace("", pd.NA).replace(r"^\s*$", pd.NA, regex=True).dropna().empty:
                         continue
 
-                # Find all CSV files recursively (including from nested zips)
-                csv_files = list(temp_path.rglob("*.csv"))
+                    # Extract only required columns if they exist
+                    required_cols = ["Year", "Month", "TotalTrips", "TotalPassengersCarried", "TotalPMT"]
+                    available_cols = [col for col in required_cols if col in df.columns]
 
-                for csv_file in csv_files:
-                    try:
-                        df = pd.read_csv(csv_file, low_memory=False)
+                    df = df[available_cols].copy()
 
-                        if "TotalPMT" in df.columns:
-                            paths.log.info(f"Found TotalPMT in {csv_file.name}")
+                    # Clean empty strings and whitespace
+                    df = df.replace("", pd.NA).replace(r"^\s*$", pd.NA, regex=True)
 
-                            # Check if TotalPMT column has actual values
-                            if df["TotalPMT"].replace("", pd.NA).replace(r"^\s*$", pd.NA, regex=True).dropna().empty:
-                                paths.log.info(f"Skipping {csv_file.name} - TotalPMT column has no values")
-                                continue
+                    # Remove rows with NaNs in key columns
+                    key_cols = ["Year", "Month", "TotalTrips", "TotalPassengersCarried", "TotalPMT"]
+                    cols_to_check = [col for col in key_cols if col in df.columns]
+                    df = df.dropna(subset=cols_to_check)
 
-                            # Extract only required columns if they exist
-                            required_cols = ["Year", "Month", "TotalTrips", "TotalPassengersCarried", "TotalPMT"]
-                            available_cols = [col for col in required_cols if col in df.columns]
-
-                            df = df[available_cols].copy()
-
-                            # Clean empty strings and whitespace
-                            df = df.replace("", pd.NA).replace(r"^\s*$", pd.NA, regex=True)
-
-                            # Remove rows with NaNs in key columns
-                            key_cols = ["Year", "Month", "TotalTrips", "TotalPassengersCarried", "TotalPMT"]
-                            cols_to_check = [col for col in key_cols if col in df.columns]
-                            df = df.dropna(subset=cols_to_check)
-
-                            # Skip if no data remains after cleaning
-                            if df.empty:
-                                paths.log.info(f"Skipping {csv_file.name} - no valid data after removing NaNs")
-                                continue
-
-                            # Extract TCPID from filename if missing
-                            if "TCPID" not in df.columns:
-                                tcpid_match = re.search(r"(PSG\d+)", csv_file.name)
-                                if tcpid_match:
-                                    df["TCPID"] = tcpid_match.group(1)
-                                    paths.log.info(f"Added TCPID {tcpid_match.group(1)} from filename")
-
-                            # Add source file info for tracking
-                            df["source_file"] = csv_file.name
-                            df["source_url"] = url
-                            all_dataframes.append(df)
-
-                    except Exception as e:
-                        paths.log.info(f"Error reading {csv_file.name}: {e}")
+                    # Skip if no data remains after cleaning
+                    if df.empty:
                         continue
 
-        except Exception as e:
-            paths.log.info(f"Error processing {url}: {e}")
-            continue
+                    # Extract TCPID from filename if missing
+                    if "TCPID" not in df.columns:
+                        tcpid_match = re.search(r"(PSG\d+)", csv_file.name)
+                        if tcpid_match:
+                            df["TCPID"] = tcpid_match.group(1)
+
+                    # Add source file info for tracking
+                    df["source_file"] = csv_file.name
+                    df["source_url"] = url
+                    all_dataframes.append(df)
 
     return all_dataframes

@@ -4,7 +4,7 @@ definitions:
     presentation:
       topic_tags:
         - Artificial Intelligence
-
+    description_processing: We combined trip data from all approved robotaxi companies in California. Both Cruise and Waymo are included until September 2024. After that, only Waymo remains, as Cruise ended its service.
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -16,23 +16,39 @@ tables:
   robotaxis:
     variables:
       totaltrips:
-        title: Total Trips
+        title: Monthly completed trips by robotaxis
         unit: trips
-        description_short: Total number of trips made by robotaxis.
+        description_short: Total number of passenger trips completed by autonomous vehicles operating as paid taxi services.
+        description_key:
+          - This counts completed passenger trips in California's paid robotaxi services that are approved to operate.
+          - Only includes trips where passengers actually rode in the vehicle and paid for the service.
+          - Excludes empty cars driving between pickups, test rides, and any non-passenger travel.
+          - Originally both Cruise and Waymo reported this data. Cruise stopped operating in late 2023 due to safety and regulatory issues. From 2024 onward, Waymo is the only company authorized to operate paid robotaxi services in California and the sole reporter of this data.
         display:
           numDecimalPlaces: 0
 
       totalpassengerscarried:
-        title: Total Passengers Carried
+        title: Monthly number of people who rode in robotaxis
         unit: passengers
-        description_short: Total number of passengers carried by robotaxis.
+        description_short: Total number of people who took a trip in a self-driving taxi service.
+        description_key:
+          - This counts all passengers who rode in California's paid robotaxi services that are approved to operate.
+          - Each person is counted once per trip, so if someone takes multiple trips, they're counted multiple times.
+          - For shared rides, each passenger in the vehicle is counted separately. Safety drivers (when present) are not counted as passengers.
+          - Excludes empty cars driving between pickups, test rides, and any non-passenger travel.
+          - Originally both Cruise and Waymo reported this data. Cruise stopped operating in late 2023 due to safety and regulatory issues. From 2024 onward, Waymo is the only company authorized to operate paid robotaxi services in California and the sole reporter of this data.
         display:
           numDecimalPlaces: 0
 
       totalpmt:
-        title: Total Passenger Miles Traveled
+        title: Monthly distance traveled by robotaxi passengers
         unit: miles
         short_unit: m
-        description_short: Total passenger miles traveled by robotaxis.
+        description_short: Total monthly distance traveled by passengers in California's paid self-driving taxi service, calculated by multiplying the number of passengers by the distance they traveled.
+        description_key:
+          - This measures how far people have traveled in paid robotaxi trips that are approved to operate in California.
+          - The calculation multiplies passengers by distance. So if 3 people share a 5-mile ride, that's 15 passenger-miles. For rides where passengers get in or out partway, each part of the trip is counted based on how many people were actually in the car.
+          - Excludes empty cars driving between pickups, test rides, and any non-passenger travel.
+          - Originally both Cruise and Waymo reported this data. Cruise stopped operating in late 2023 due to safety and regulatory issues. From 2024 onward, Waymo is the only company authorized to operate paid robotaxi services in California and the sole reporter of this data.
         display:
           numDecimalPlaces: 0
