@@ -1,0 +1,86 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Forests & Deforestation
+      grapher_config:
+        note: |-
+          Improvements in the detection of tree cover loss due to the incorporation of new satellite data and methodology changes between 2011 and 2015 may result in higher estimates of loss in recent years compared to earlier years.
+    unit: hectares
+    short_unit: ha
+    processing_level: major
+    description_processing: |-
+      - Time-series gridded data (30m x 30m) of tree cover loss in areas where canopy density was greater than or equal to 30% in 2000 was extracted and cross-referenced with gridded data (10km x 10km) on the dominant driver of deforestation in each area, based on [Curtis et al 2018](https://science.sciencemag.org/content/361/6407/1108).
+      - Individual grid cells may have more than one driver of tree cover loss, and drivers may vary over time.
+  title_tree_cover_loss_ha: |-
+    <% if category == "Hard commodities" %>
+      Tree cover loss driven by the mining or energy industry
+    <% elif category == "Logging" %>
+      Tree cover loss driven by logging
+    <% elif category == "Other natural disturbances" %>
+      Tree cover loss driven by non-fire natural disturbances
+    <% elif category == "Permanent agriculture" %>
+      Tree cover loss driven by agriculture
+    <% elif category == "Settlements & Infrastructure" %>
+      Tree cover loss driven by settlements and infrastructure
+    <% elif category == "Shifting cultivation" %>
+      Tree cover loss driven by shifting cultivation
+    <% elif category == "Wildfire" %>
+      Tree cover loss driven by wildfire
+    <% elif category == "Total" %>
+      Tree cover loss driven by all causes
+    <%- endif -%>
+  description_short_tree_cover_loss_ha: |-
+    <% if category == "Hard commodities" %>
+      [Tree cover loss](#dod:tree-cover-loss) due to the establishment or expansion of mining or energy infrastructure.
+    <% elif category == "Logging" %>
+      [Tree cover loss](#dod:tree-cover-loss) due to forest management and logging activities occurring within managed, natural or semi-natural forests and plantations, often with evidence of forest regrowth or planting in subsequent years.
+    <% elif category == "Other natural disturbances" %>
+       [Tree cover loss](#dod:tree-cover-loss) due to other non-fire natural disturbances such as landslides, insect outbreaks, river meandering.
+    <% elif category == "Permanent agriculture" %>
+      Long-term, permanent [tree cover loss](#dod:tree-cover-loss) for small- to large-scale agriculture.
+    <% elif category == "Settlements & Infrastructure" %>
+      [Tree cover loss](#dod:tree-cover-loss)  due to the expansion and intensification of roads, settlements, urban areas, or other built infrastructure.
+    <% elif category == "Shifting cultivation" %>
+      [Tree cover loss](#dod:tree-cover-loss) due to small- to medium-scale clearing for temporary cultivation that is later abandoned and followed by subsequent regrowth of secondary forest or vegetation.
+    <% elif category == "Wildfire" %>
+      [Tree cover loss](#dod:tree-cover-loss) due to fire with no visible human conversion or agricultural activity afterward. Fires may be started by natural causes (e.g. lightning) or may be related to human activities (accidental or deliberate).
+    <% elif category == "Total" %>
+      [Tree cover loss](#dod:tree-cover-loss) driven by all causes.
+    <%- endif -%>
+  display_name_tree_cover_loss_ha: |-
+    <% if category == "Hard commodities" %>
+      Mining or energy infrastructure
+    <% elif category == "Logging" %>
+      Logging
+    <% elif category == "Other natural disturbances" %>
+      Other natural disturbances
+    <% elif category == "Permanent agriculture" %>
+      Permanent agriculture
+    <% elif category == "Settlements & Infrastructure" %>
+      Settlements and infrastructure
+    <% elif category == "Shifting cultivation" %>
+      Shifting cultivation
+    <% elif category == "Wildfire" %>
+      Wildfire
+    <% elif category == "Total" %>
+      Total
+    <%- endif -%>
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+tables:
+  tree_cover_loss_by_driver:
+    variables:
+      tree_cover_loss_ha:
+        title: |-
+          { definitions.title_tree_cover_loss_ha }
+        description_short: |-
+          { definitions.description_short_tree_cover_loss_ha }
+        display:
+          name: |-
+            { definitions.display_name_tree_cover_loss_ha }
