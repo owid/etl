@@ -41,13 +41,18 @@ def run() -> None:
     tb = geo.harmonize_countries(
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
-    tb_total = tb.groupby(["country", "year"])['tree_cover_loss_ha'].sum(numeric_only=True).reset_index()
+    tb_total = tb.groupby(["country", "year"])["tree_cover_loss_ha"].sum(numeric_only=True).reset_index()
     tb_total["category"] = "Total"
 
     tb = pr.concat([tb, tb_total], ignore_index=True)
 
     tb = geo.add_regions_to_table(
-        tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups, regions=REGIONS, min_num_values_per_year=1, index_columns=['country', 'year', 'category']
+        tb,
+        ds_regions=ds_regions,
+        ds_income_groups=ds_income_groups,
+        regions=REGIONS,
+        min_num_values_per_year=1,
+        index_columns=["country", "year", "category"],
     )
     tb = tb.format(["country", "year", "category"])
 
