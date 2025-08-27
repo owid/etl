@@ -40,7 +40,7 @@ def run() -> None:
     tb = geo.harmonize_countries(
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
-    tb_total = tb.groupby(["country","year"]).sum(numeric_only=True).reset_index()
+    tb_total = tb.groupby(["country", "year"]).sum(numeric_only=True).reset_index()
     tb_total["category"] = "Total"
 
     tb = pr.concat([tb, tb_total], ignore_index=True)
@@ -54,9 +54,7 @@ def run() -> None:
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = paths.create_dataset(
-        tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
-    )
+    ds_garden = paths.create_dataset(tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata)
 
     # Save changes in the new garden dataset.
     ds_garden.save()
