@@ -6,7 +6,7 @@ meta:
     # Data product / Snapshot
     title: Tree Cover Loss by Dominant Driver
     description: |-
-      This data set includes tree cover loss by driver. Statistics were calculated from annual tree cover loss (Hansen et al. 2013), categorized by driver (Sims et al. 2025). Sims et al. 2025 classifies the dominant driver at 1 km resolution from 2001-2024. The dominant driver is defined as the direct driver that caused the majority of of tree cover loss within each 1 km cell over the time period. Years correspond to the loss year of the annual tree cover loss data (Hansen et al. 2013).
+      This data set includes tree cover loss by driver. Statistics were calculated from annual tree cover loss (Hansen et al. 2013), categorized by driver (Sims et al. 2025). Sims et al. 2025 classifies the dominant driver at 1 km resolution from 2001-2024. The dominant driver is defined as the direct driver that caused the majority of tree cover loss within each 1 km cell over the time period. Years correspond to the loss year of the annual tree cover loss data (Hansen et al. 2013).
 
       The tree cover loss data was produced by the University of Maryland's GLAD laboratory in partnership with Google (Hansen et al. 2013). Tree cover loss is defined as “stand replacement disturbance” which is considered to be clearing of at least half of tree cover within a 30-meter pixel.
 
@@ -29,7 +29,7 @@ meta:
     attribution_short: GFW
     # Files
     url_main: https://datasets.wri.org/datasets/dominant-drivers-of-tree-cover-loss-at-1km
-    date_accessed: '2025-08-27'
+    date_accessed: "2025-08-27"
 
     # License
     license:
