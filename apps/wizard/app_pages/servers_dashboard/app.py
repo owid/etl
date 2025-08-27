@@ -68,7 +68,9 @@ with col3:
 with col4:
     host_mem_stats = stats["host_memory_stats"]
     if host_mem_stats is not None:
-        mem_display = f"{host_mem_stats['used_gb']:.0f}/{host_mem_stats['total_gb']:.0f} GB ({host_mem_stats['usage_pct']:.1f}%)"
+        mem_display = (
+            f"{host_mem_stats['used_gb']:.0f}/{host_mem_stats['total_gb']:.0f} GB ({host_mem_stats['usage_pct']:.1f}%)"
+        )
         st.metric("gaia-1 Memory", mem_display)
     else:
         st.metric("gaia-1 Memory", "N/A")
@@ -155,6 +157,7 @@ else:
             ),
         },
         hide_index=True,
+        height=600,
     )
 
     # Server Management section
