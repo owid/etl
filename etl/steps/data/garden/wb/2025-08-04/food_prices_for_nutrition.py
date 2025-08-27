@@ -154,6 +154,30 @@ def sanity_check_adjustments(tb: Table, tb_wdi: Table) -> None:
     # However, this is not the case for specific countries.
     assert set(check[check["pct"] > 10]["country"]) == {"Palestine", "Somalia", "Zimbabwe"}
 
+    # Other sanity checks.
+    for column in tb.columns:
+        if column.startswith("cost_of_"):
+            assert (tb[column] > 0).all(), f"{column} has non-positive values"
+
+    error = "The cost of a healthy diet was expected to be larger than the cost of a nutrient-adequate diet."
+    assert (
+        tb["cost_of_a_healthy_diet_in_constant_ppp_dollars"]
+        >= tb["cost_of_a_nutrient_adequate_diet_in_constant_ppp_dollars"]
+    ).all(), error
+
+    error = "The cost of a nutrient-adequate diet was expected to be larger than the cost of an energy-sufficient diet."
+    assert (
+        tb["cost_of_a_nutrient_adequate_diet_in_constant_ppp_dollars"]
+        >= tb["cost_of_an_energy_sufficient_diet_in_constant_ppp_dollars"]
+    ).all()
+
+    column = "cost_of_a_healthy_diet_in_constant_ppp_dollars"
+    check = tb.dropna(subset=column).sort_values(["country", "year"]).reset_index(drop=True)
+    check["pct_change"] = abs(check.groupby("country")[column].pct_change())
+    abrupt_changes = check[check["pct_change"].abs() > 0.4]
+    error = "Abrupt variation in the cost of a healthy diet in unexpected countries."
+    assert set(abrupt_changes["country"]) == {"Lebanon", "Sudan", "South Sudan"}, error
+
 
 def change_attribution(tb: Table, columns: List[str], attribution_text: str) -> Table:
     """
