@@ -16,10 +16,11 @@ paths = PathFinder(__file__)
 # IRENA costs are given in the latest year's USD, so we convert other costs to the same currency.
 LATEST_YEAR = 2024
 PREVIOUS_YEAR = LATEST_YEAR - 1
-# Convert costs to constant {LATEST_YEAR} USD, using
-# https://www.usinflationcalculator.com/
-# "If in {PREVIOUS_YEAR} I purchased an item for  $ 1.00 then in {LATEST_YEAR} that same item would cost:"
-USDPREVIOUS_TO_USDLATEST = 1.03
+# Convert costs to constant {LATEST_YEAR} USD, using the World Bank's GDP deflator:
+# https://data.worldbank.org/indicator/NY.GDP.DEFL.ZS.AD?end=2024&locations=US&start=1990&view=chart&year=2024
+# I downloaded the CSV file, and took the values for the last two years for the US, namely 122.27 (for 2023), and 125.23 (for 2024).
+# The resulting factor is the result of dividing the value for 2024 by the value for 2023:
+USDPREVIOUS_TO_USDLATEST = 1.024
 
 
 def run() -> None:
@@ -64,5 +65,7 @@ def run() -> None:
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_garden = paths.create_dataset(tables=[tb, tb_solar_pv], default_metadata=ds_meadow.metadata)
+    ds_garden = paths.create_dataset(
+        tables=[tb, tb_solar_pv], default_metadata=ds_meadow.metadata, yaml_params={"LATEST_YEAR": LATEST_YEAR}
+    )
     ds_garden.save()

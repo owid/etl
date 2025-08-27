@@ -3,7 +3,7 @@ definitions:
     processing_level: major
     description_processing: |-
       - The resulting costs are compiled from two IRENA reports: Renewable Power Generation Costs in 2024 (primarily for data from 2010 onwards) and Renewable Power Generation Costs in 2023 (for earlier data not included in the latest report).
-      - Data from the Renewable Power Generation Costs in 2023 report (expressed in constant 2023 US dollars) was multiplied by a factor of 1.03, to convert to constant 2024 US dollars assuming a 3% inflation rate, based on [the US Inflation Calculator](https://www.usinflationcalculator.com/).
+      - Data from the Renewable Power Generation Costs in 2023 report (expressed in constant 2023 US dollars) was converted to constant 2024 US dollars using the US GDP deflator, to account for the effects of inflation. The deflator data is available from the [World Bank World Development Indicators](https://data.worldbank.org/indicator/NY.GDP.DEFL.ZS?locations=US).
     presentation:
       topic_tags:
         - Energy
@@ -17,6 +17,8 @@ tables:
     common:
       description_key:
       - Levelized cost of energy (LCOE) estimates the average cost per unit of energy generated across the lifetime of a new power plant. It is measured in US$ per kilowatt-hour.
+      unit: "constant {LATEST_YEAR} US$ per kilowatt-hour"
+      short_unit: "$/kWh"
     variables:
       bioenergy:
         title: Bioenergy levelized cost of energy
@@ -62,6 +64,9 @@ tables:
           title_public: Solar photovoltaic levelized cost of energy
   solar_photovoltaic_module_prices:
     title: Solar photovoltaic module prices
+    common:
+      unit: "constant {LATEST_YEAR} US$ per watt"
+      short_unit: "$/W"
     variables:
       cost:
         title: Solar photovoltaic module prices
