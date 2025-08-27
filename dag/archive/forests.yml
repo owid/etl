@@ -1,3 +1,4 @@
+steps:
 # Dominant Driver of Forest Loss
 data://meadow/forests/2024-07-10/tree_cover_loss_by_driver:
   - snapshot://forests/2024-08-07/dominant_driver.xlsx
