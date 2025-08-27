@@ -51,7 +51,7 @@ def fetch_host_memory_stats(host: str = "gaia-1") -> Tuple[Optional[Dict], Optio
 
         # Memory calculations
         total_bytes = int(mem_line[1])
-        used_bytes = int(mem_line[2])
+        # used_bytes = int(mem_line[2])
         available_bytes = int(mem_line[6]) if len(mem_line) >= 7 else int(mem_line[3])
 
         # Calculate "actually used" memory (total - available)
@@ -322,7 +322,7 @@ def get_display_columns() -> Dict[str, str]:
     return {
         "status_indicator": "Status",
         "origin": "Origin",
-        "branch": "Branch", 
+        "branch": "Branch",
         "memory_display": "Memory",
         "days_old": "Age (days)",
         "unified_commit": "Last Commit",
@@ -347,7 +347,7 @@ def prepare_display_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     # Create unified commit column based on origin
     def get_unified_commit_info(row):
         origin = row.get("origin", "").lower()
-        
+
         if origin == "etl":
             # Use ETL commit for ETL-only servers
             return format_commit_info(row["etl_last_commit"], row["etl_days_old"])
@@ -358,7 +358,7 @@ def prepare_display_dataframe(df: pd.DataFrame) -> pd.DataFrame:
             # For mixed origins (e.g., "owid-grapher,etl"), use the latest commit
             etl_date = row["etl_commit_parsed"]
             grapher_date = row["grapher_commit_parsed"]
-            
+
             # Handle NaT/None values
             if pd.isna(etl_date) and pd.isna(grapher_date):
                 return "❓ No commits found"
@@ -375,11 +375,15 @@ def prepare_display_dataframe(df: pd.DataFrame) -> pd.DataFrame:
         else:
             # Default fallback - try ETL first, then Grapher
             etl_commit = row["etl_last_commit"]
-            if not pd.isna(etl_commit) and etl_commit not in ["Container not running", "Unable to retrieve", "No git repository found"]:
+            if not pd.isna(etl_commit) and etl_commit not in [
+                "Container not running",
+                "Unable to retrieve",
+                "No git repository found",
+            ]:
                 return format_commit_info(row["etl_last_commit"], row["etl_days_old"])
             else:
                 return format_commit_info(row["grapher_last_commit"], row["grapher_days_old"])
-    
+
     display_df["unified_commit"] = display_df.apply(get_unified_commit_info, axis=1)
 
     # For progress bar, we need the actual GB values
@@ -402,10 +406,10 @@ def prepare_display_dataframe(df: pd.DataFrame) -> pd.DataFrame:
 def reset_mysql_database(server_name: str) -> Tuple[bool, str]:
     """
     Reset the MySQL database for a staging server by running 'make refresh' in owid-grapher.
-    
+
     Args:
         server_name: Full server name (e.g., staging-site-branch-name)
-        
+
     Returns:
         Tuple of (success, message)
     """
@@ -413,24 +417,24 @@ def reset_mysql_database(server_name: str) -> Tuple[bool, str]:
         # SSH into the server and run make refresh in owid-grapher directory
         cmd = f"ssh owid@{server_name} 'cd owid-grapher && make refresh'"
         log.info("Resetting MySQL database via make refresh", command=cmd, server=server_name)
-        
+
         result = subprocess.run(
             cmd,
             shell=True,
             capture_output=True,
             text=True,
-            timeout=1800  # 30 minute timeout for make refresh (can take very long)
+            timeout=1800,  # 30 minute timeout for make refresh (can take very long)
         )
-        
+
         if result.returncode != 0:
             error_msg = f"MySQL reset failed with return code {result.returncode}: {result.stderr}"
             log.error("MySQL reset failed", error=error_msg, server=server_name, stdout=result.stdout)
             return False, error_msg
-        
+
         success_msg = f"MySQL database successfully refreshed for {server_name}"
         log.info("MySQL reset completed", server=server_name)
         return True, success_msg
-        
+
     except subprocess.TimeoutExpired:
         error_msg = "MySQL reset timed out after 30 minutes"
         log.error("MySQL reset timeout", server=server_name)
@@ -444,10 +448,10 @@ def reset_mysql_database(server_name: str) -> Tuple[bool, str]:
 def destroy_server(server_name: str) -> Tuple[bool, str]:
     """
     Destroy a staging server completely.
-    
+
     Args:
         server_name: Full server name (e.g., staging-site-branch-name)
-        
+
     Returns:
         Tuple of (success, message)
     """
@@ -455,24 +459,24 @@ def destroy_server(server_name: str) -> Tuple[bool, str]:
         # Command to destroy the LXC container
         cmd = f"LXC_HOST=gaia-1 owid-lxc destroy {server_name}"
         log.info("Destroying server", command=cmd, server=server_name)
-        
+
         result = subprocess.run(
             cmd,
             shell=True,
             capture_output=True,
             text=True,
-            timeout=120  # 2 minute timeout for destruction
+            timeout=120,  # 2 minute timeout for destruction
         )
-        
+
         if result.returncode != 0:
             error_msg = f"Server destruction failed with return code {result.returncode}: {result.stderr}"
             log.error("Server destruction failed", error=error_msg, server=server_name)
             return False, error_msg
-        
+
         success_msg = f"Server {server_name} successfully destroyed"
         log.info("Server destruction completed", server=server_name)
         return True, success_msg
-        
+
     except subprocess.TimeoutExpired:
         error_msg = "Server destruction timed out after 2 minutes"
         log.error("Server destruction timeout", server=server_name)

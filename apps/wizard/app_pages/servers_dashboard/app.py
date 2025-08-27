@@ -191,7 +191,7 @@ else:
                     st.markdown("- Drop and recreate the MySQL database")
                     st.markdown("- Import the latest data from staging")
 
-                    st.warning("⏱️ **This process takdes about 5 minutes to complete!**")
+                    st.warning("⏱️ **This process takes about 5 minutes to complete!**")
                     st.error("⚠️ **All current database data including charts and indicators will be lost!**")
 
                     col1, col2 = st.columns(2)
@@ -296,7 +296,3 @@ with st.expander("ℹ️ About this Dashboard"):
 
     **Branch Names**: The 'staging-site-' prefix is automatically removed for cleaner display.
     """)
-
-# Footer with last update time
-st.markdown("---")
-st.caption(f"Last updated: {st.session_state.get('last_update', 'Unknown')} | Data cached for 5 minutes")
