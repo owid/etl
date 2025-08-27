@@ -78,9 +78,9 @@ tables:
     variables:
       tree_cover_loss_ha:
         title: |-
-          { definitions.title_tree_cover_loss_ha }
+          {definitions.title_tree_cover_loss_ha}
         description_short: |-
-          { definitions.description_short_tree_cover_loss_ha }
+          {definitions.description_short_tree_cover_loss_ha}
         display:
           name: |-
-            { definitions.display_name_tree_cover_loss_ha }
+            {definitions.display_name_tree_cover_loss_ha}
