@@ -4,6 +4,13 @@ from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+# Detailed colors for grouped views
+COLOR_BOYS = "#BC8E5A"
+COLOR_GIRLS = "#970046"
+
+COLOR_ADULT = "#3498DB"
+COLOR_YOUTH = "#2ECC71"
+COLOR_ELDERLY = "#E74C3C"
 
 # Common configuration for all charts
 MULTIDIM_CONFIG = {
@@ -214,14 +221,26 @@ def create_grouped_views(collection):
                 "dimension": "sex",
                 "choice_new_slug": "sex_side_by_side",
                 "choices": ["female", "male"],
-                "view_config": view_config,
+                "view_config": view_config
+                | {"map": {"colorScale": {"customCategoryColors": {"Women": COLOR_GIRLS, "Men": COLOR_BOYS}}}},
                 "view_metadata": view_metadata,
             },
             {
                 "dimension": "age_group",
                 "choice_new_slug": "age_side_by_side",
                 "choices": {"adult", "youth", "elderly"},
-                "view_config": view_config,
+                "view_config": view_config
+                | {
+                    "map": {
+                        "colorScale": {
+                            "customCategoryColors": {
+                                "All adults": COLOR_ADULT,
+                                "Young people": COLOR_YOUTH,
+                                "Older people": COLOR_ELDERLY,
+                            }
+                        }
+                    }
+                },
                 "view_metadata": view_metadata,
             },
         ],

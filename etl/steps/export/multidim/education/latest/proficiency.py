@@ -7,6 +7,20 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+
+# Detailed colors for grouped views
+COLOR_PRIMARY = "#883039"
+COLOR_LOWER_SECONDARY = "#578145"
+
+COLOR_BOYS = "#BC8E5A"
+COLOR_GIRLS = "#970046"
+
+COLOR_MATHEMATICS = "#9B59B6"
+COLOR_READING = "#E67E22"
+
+COLOR_ALL_CHILDREN = "#578145"
+COLOR_STUDENTS = "#883039"
+
 # Common configuration for all charts
 MULTIDIM_CONFIG = {
     "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.008.json",
@@ -252,28 +266,59 @@ def create_grouped_views(collection):
                 "dimension": "sex",
                 "choice_new_slug": "sex_side_by_side",
                 "choices": ["female", "male"],
-                "view_config": view_config,
+                "view_config": view_config
+                | {"map": {"colorScale": {"customCategoryColors": {"Girls": COLOR_GIRLS, "Boys": COLOR_BOYS}}}},
                 "view_metadata": view_metadata,
             },
             {
                 "dimension": "level",
                 "choice_new_slug": "level_side_by_side",
                 "choices": ["primary", "lower_secondary"],
-                "view_config": view_config,
+                "view_config": view_config
+                | {
+                    "map": {
+                        "colorScale": {
+                            "customCategoryColors": {
+                                "End of primary education": COLOR_PRIMARY,
+                                "End of lower secondary education": COLOR_LOWER_SECONDARY,
+                            }
+                        }
+                    }
+                },
                 "view_metadata": view_metadata,
             },
             {
                 "dimension": "subject",
                 "choice_new_slug": "subject_side_by_side",
                 "choices": ["mathematics", "reading"],
-                "view_config": view_config,
+                "view_config": view_config
+                | {
+                    "map": {
+                        "colorScale": {
+                            "customCategoryColors": {
+                                "Mathematics": COLOR_MATHEMATICS,
+                                "Reading": COLOR_READING,
+                            }
+                        }
+                    }
+                },
                 "view_metadata": view_metadata,
             },
             {
                 "dimension": "population",
                 "choice_new_slug": "population_side_by_side",
                 "choices": ["all_children", "students"],
-                "view_config": view_config,
+                "view_config": view_config
+                | {
+                    "map": {
+                        "colorScale": {
+                            "customCategoryColors": {
+                                "All children": COLOR_ALL_CHILDREN,
+                                "Students": COLOR_STUDENTS,
+                            }
+                        }
+                    }
+                },
                 "view_metadata": view_metadata,
             },
         ],

@@ -6,6 +6,16 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Detailed colors for grouped views
+COLOR_PREPRIMARY = "#4C6A9C"
+COLOR_PRIMARY = "#883039"
+COLOR_LOWER_SECONDARY = "#578145"
+COLOR_UPPER_SECONDARY = "#B13507"
+COLOR_TERTIARY = "#B16214"
+
+COLOR_BOYS = "#BC8E5A"
+COLOR_GIRLS = "#970046"
+
 MULTIDIM_CONFIG = {
     "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.008.json",
     "hasMapTab": True,
@@ -161,6 +171,7 @@ def run() -> None:
                     "tab": "chart",
                     "selectedFacetStrategy": "entity",
                     "hideFacetControl": False,
+                    "map": {"colorScale": {"customCategoryColors": {"Girls": COLOR_GIRLS, "Boys": COLOR_BOYS}}},
                 },
             },
             {
@@ -176,6 +187,16 @@ def run() -> None:
                     "chartTypes": ["StackedArea"],
                     "selectedFacetStrategy": "entity",
                     "hideFacetControl": False,
+                    "map": {
+                        "colorScale": {
+                            "customCategoryColors": {
+                                "Pre-primary": COLOR_PREPRIMARY,
+                                "Primary": COLOR_PRIMARY,
+                                "Secondary": COLOR_LOWER_SECONDARY,
+                                "Tertiary": COLOR_TERTIARY,
+                            }
+                        }
+                    },
                 },
             },
         ]

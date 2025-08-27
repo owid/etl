@@ -5,6 +5,15 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Detailed colors for grouped views
+COLOR_PRIMARY = "#883039"
+COLOR_LOWER_SECONDARY = "#578145"
+COLOR_UPPER_SECONDARY = "#B13507"
+COLOR_TERTIARY = "#B16214"
+
+COLOR_BOYS = "#BC8E5A"
+COLOR_GIRLS = "#970046"
+
 # Common configuration for all charts
 MULTIDIM_CONFIG = {
     "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.008.json",
@@ -158,13 +167,25 @@ def create_grouped_views(collection):
                 "dimension": "sex",
                 "choice_new_slug": "sex_side_by_side",
                 "choices": ["girls", "boys"],
-                "view_config": view_config,
+                "view_config": view_config
+                | {"map": {"colorScale": {"customCategoryColors": {"Girls": COLOR_GIRLS, "Boys": COLOR_BOYS}}}},
                 "view_metadata": view_metadata,
             },
             {
                 "dimension": "level",
                 "choice_new_slug": "level_side_by_side",
-                "view_config": view_config,
+                "view_config": view_config
+                | {
+                    "map": {
+                        "colorScale": {
+                            "customCategoryColors": {
+                                "Primary": COLOR_PRIMARY,
+                                "Lower secondary": COLOR_LOWER_SECONDARY,
+                                "Upper secondary": COLOR_UPPER_SECONDARY,
+                            }
+                        }
+                    }
+                },
                 "view_metadata": view_metadata,
             },
         ],

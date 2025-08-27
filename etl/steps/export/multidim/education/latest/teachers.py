@@ -16,6 +16,20 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Detailed colors for grouped views
+COLOR_PREPRIMARY = "#4C6A9C"
+COLOR_PRIMARY = "#883039"
+COLOR_LOWER_SECONDARY = "#578145"
+COLOR_UPPER_SECONDARY = "#B13507"
+COLOR_TERTIARY = "#B16214"
+
+COLOR_BOYS = "#BC8E5A"
+COLOR_GIRLS = "#970046"
+
+# Teacher type colors
+COLOR_QUALIFIED = "#3498DB"
+COLOR_TRAINED = "#E67E22"
+
 # --------------------- #
 #   Constants & Config  #
 # --------------------- #
@@ -254,10 +268,28 @@ def create_grouped_views(collection):
 
     def get_view_config(view):
         """Generate chart configuration for grouped views."""
-        return GROUPED_VIEW_CONFIG | {
+        config = GROUPED_VIEW_CONFIG | {
             "title": generate_title_by_dimensions(view),
             "subtitle": generate_subtitle_by_dimensions(view),
         }
+
+        # Add colors for grouped views
+        if view.get("dimension") == "teacher_type":
+            config["map"] = {
+                "colorScale": {"customCategoryColors": {"Qualified": COLOR_QUALIFIED, "Trained": COLOR_TRAINED}}
+            }
+        elif view.get("dimension") == "level":
+            config["map"] = {
+                "colorScale": {
+                    "customCategoryColors": {
+                        "Primary": COLOR_PRIMARY,
+                        "Lower secondary": COLOR_LOWER_SECONDARY,
+                        "Upper secondary": COLOR_UPPER_SECONDARY,
+                    }
+                }
+            }
+
+        return config
 
     collection.group_views(
         groups=[

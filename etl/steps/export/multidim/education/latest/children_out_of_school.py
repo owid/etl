@@ -7,6 +7,16 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Detailed colors for grouped views
+COLOR_PREPRIMARY = "#4C6A9C"
+COLOR_PRIMARY = "#883039"
+COLOR_LOWER_SECONDARY = "#578145"
+COLOR_UPPER_SECONDARY = "#B13507"
+COLOR_TERTIARY = "#B16214"
+
+COLOR_BOYS = "#BC8E5A"
+COLOR_GIRLS = "#970046"
+
 # --------------------- #
 #   Constants & Config  #
 # --------------------- #
@@ -218,10 +228,26 @@ def create_grouped_views(collection):
     }
 
     def get_view_config(view):
-        return GROUPED_VIEW_CONFIG | {
+        config = GROUPED_VIEW_CONFIG | {
             "title": "{title}",
             "subtitle": "{subtitle}",
         }
+
+        # Add colors for grouped views
+        if view.get("dimension") == "sex":
+            config["map"] = {"colorScale": {"customCategoryColors": {"Girls": COLOR_GIRLS, "Boys": COLOR_BOYS}}}
+        elif view.get("dimension") == "level":
+            config["map"] = {
+                "colorScale": {
+                    "customCategoryColors": {
+                        "Primary": COLOR_PRIMARY,
+                        "Lower secondary": COLOR_LOWER_SECONDARY,
+                        "Upper secondary": COLOR_UPPER_SECONDARY,
+                    }
+                }
+            }
+
+        return config
 
     collection.group_views(
         groups=[

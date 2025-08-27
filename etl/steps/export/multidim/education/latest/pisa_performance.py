@@ -5,6 +5,19 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Detailed colors:
+# Detailed colors for grouped views
+COLOR_PREPRIMARY = "#4C6A9C"
+COLOR_PRIMARY = "#883039"
+COLOR_LOWER_SECONDARY = "#578145"
+COLOR_UPPER_SECONDARY = "#B13507"
+COLOR_TERTIARY = "#B16214"
+COLOR_BOYS = "#BC8E5A"
+COLOR_GIRLS = "#970046"
+COLOR_MATHEMATICS = "#9B59B6"
+COLOR_READING = "#E67E22"
+COLOR_SCIENCE = "#1ABC9C"
+
 # Common configuration for all charts
 MULTIDIM_CONFIG = {
     "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.008.json",
@@ -184,14 +197,26 @@ def create_grouped_views(collection):
                 "dimension": "sex",
                 "choice_new_slug": "sex_side_by_side",
                 "choices": ["girls", "boys"],
-                "view_config": view_config,
+                "view_config": view_config
+                | {"map": {"colorScale": {"customCategoryColors": {"Girls": COLOR_GIRLS, "Boys": COLOR_BOYS}}}},
                 "view_metadata": view_metadata,
             },
             {
                 "dimension": "subject",
                 "choice_new_slug": "subject_side_by_side",
                 "choices": ["mathematics", "science", "reading"],
-                "view_config": view_config,
+                "view_config": view_config
+                | {
+                    "map": {
+                        "colorScale": {
+                            "customCategoryColors": {
+                                "Mathematics": COLOR_MATHEMATICS,
+                                "Science": COLOR_SCIENCE,
+                                "Reading": COLOR_READING,
+                            }
+                        }
+                    }
+                },
                 "view_metadata": view_metadata,
             },
         ],
