@@ -12,7 +12,7 @@ from structlog import get_logger
 log = get_logger()
 
 
-@st.cache_data(ttl=300)  # Cache for 5 minutes to avoid hammering the server
+@st.cache_data(ttl=300, show_spinner=False)  # Cache for 5 minutes to avoid hammering the server
 def fetch_host_memory_stats(host: str = "gaia-1") -> Tuple[Optional[Dict], Optional[str]]:
     """
     Fetch host memory statistics from the LXC host.
@@ -84,7 +84,7 @@ def fetch_host_memory_stats(host: str = "gaia-1") -> Tuple[Optional[Dict], Optio
         return None, error_msg
 
 
-@st.cache_data(ttl=300)  # Cache for 5 minutes to avoid hammering the server
+@st.cache_data(ttl=300, show_spinner=False)  # Cache for 5 minutes to avoid hammering the server
 def fetch_lxc_servers_data(host: str = "gaia-1") -> Tuple[Optional[pd.DataFrame], Optional[str]]:
     """
     Fetch LXC server information from the specified host.

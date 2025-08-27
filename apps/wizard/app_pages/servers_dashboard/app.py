@@ -11,7 +11,7 @@ from apps.wizard.app_pages.servers_dashboard.utils import (
     prepare_display_dataframe,
     reset_mysql_database,
 )
-from apps.wizard.utils.components import st_horizontal
+from apps.wizard.utils.components import st_title_with_expert
 
 # Configure page
 st.set_page_config(
@@ -24,11 +24,11 @@ st.set_page_config(
 log = get_logger()
 
 # Header
-st.title("🖥️ Staging Servers Dashboard")
+st_title_with_expert("Staging Servers Dashboard", icon=":material/computer:")
 st.markdown("Monitor all LXC staging servers on **gaia-1** with real-time metrics and status information.")
 
 # Add refresh button and auto-refresh controls
-with st_horizontal():
+with st.container(horizontal=True, vertical_alignment="bottom"):
     if st.button("🔄 Refresh Data", type="primary"):
         st.cache_data.clear()  # Clear cache to force refresh
         st.rerun()
@@ -36,7 +36,7 @@ with st_horizontal():
     st.markdown("*Data cached for 5 minutes*")
 
 # Fetch server data and host memory stats
-with st.spinner("Fetching staging server data..."):
+with st.spinner("Fetching staging server data...", show_time=True):
     servers_df, error = fetch_lxc_servers_data()
     host_memory_stats, host_memory_error = fetch_host_memory_stats()
 
