@@ -29,7 +29,7 @@ st.markdown("Monitor all LXC staging servers on **gaia-1** with real-time metric
 
 # Add refresh button and auto-refresh controls
 with st.container(horizontal=True, vertical_alignment="bottom"):
-    if st.button("🔄 Refresh Data", type="primary"):
+    if st.button("Refresh Data", type="primary", icon=":material/autorenew:"):
         st.cache_data.clear()  # Clear cache to force refresh
         st.rerun()
 
