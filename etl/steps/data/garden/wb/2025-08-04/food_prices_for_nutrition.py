@@ -48,24 +48,6 @@ def adapt_units(tb: Table) -> Table:
 
 
 def adjust_currencies(tb: Table, tb_wdi: Table) -> Table:
-    ####################################################################################################################
-    # For Sierra Leone, LCU costs seem to be a factor of 1000 too high in the new update.
-    # This may be due to the 2022 change in the value of the leone:
-    # https://en.wikipedia.org/wiki/Sierra_Leonean_leone
-    # As of 1 July 2022, the ISO 4217 code is SLE due to a redenomination of the old leone (SLL) at a rate of SLL 1000 to SLE 1.
-    # Correct those costs by dividing by 1000.
-    for column in tb.columns:
-        if column.startswith("cost_of_") and ("in_local_currency_unit" in column):
-            tb.loc[(tb["country"].isin(["Sierra Leone"])), column] /= 1000
-
-    # For Liberia, the resulting cost of a healthy diet is also much higher than other countries (over 500 PPP$).
-    # In this case, it seems to me that the PPP conversion factor (from https://data.worldbank.org/indicator/PA.NUS.PRVT.PP?locations=LR ) may not be given in LCU per international-$, but rather in USD per international-$.
-    # To correct for this, convert those USD to LCU using a conversion factor from another WDI indicator (https://data.worldbank.org/indicator/PA.NUS.FCRF?locations=LR).
-    tb_wdi.loc[(tb_wdi["country"].isin(["Liberia"])), "pa_nus_prvt_pp"] *= tb_wdi.loc[
-        (tb_wdi["country"].isin(["Liberia"])), "pa_nus_fcrf"
-    ]
-    ####################################################################################################################
-
     # From WDI, get CPI.
     tb_cpi = tb_wdi[["country", "year", "fp_cpi_totl"]].reset_index(drop=True)
     # Get the value of CPI for the base year.
@@ -76,72 +58,21 @@ def adjust_currencies(tb: Table, tb_wdi: Table) -> Table:
     # Add CPI column to main table.
     tb = tb.merge(tb_cpi[["country", "year", "cpi_adjustment_factor"]], on=["country", "year"], how="left")
 
-    # From WDI, get PPP conversion factor for private consumption.
-    tb_ppp = tb_wdi[tb_wdi["year"] == PPP_YEAR][["country", "pa_nus_prvt_pp"]].dropna()
-    # Add PPP conversion factors to main table.
-    tb = tb.merge(tb_ppp, on="country", how="left")
-
-    # Multiply costs given in local currency units by the adjustment factor, to correct for inflation.
-    # Then convert to (constant) PPP dollars.
-    for column in tb.columns:
-        if "in_current_ppp_dollars" in column:
-            column_lcu = column.replace("in_current_ppp_dollars", "in_local_currency_unit")
-            column_constant_ppp = column.replace("in_current_ppp_dollars", "in_constant_ppp_dollars")
-            tb[column_constant_ppp] = tb[column_lcu] * tb["cpi_adjustment_factor"] / tb["pa_nus_prvt_pp"]
-
-    ####################################################################################################################
-    # Sanity checks.
-
-    # Check data coverage is as expected.
-    # All cost columns are given for just a single year (as of the 2025 update, that year is 2021), except the cost of a healthy diet, which is given for multiple years.
-    for column in tb.columns:
-        if ("cost_of_a" in column) and ("relative" not in column):
-            if "healthy" not in column:
-                assert set(tb.dropna(subset=column)["year"]) == {PPP_YEAR}
-            else:
-                assert len(set(tb.dropna(subset=column)["year"])) > 1
-
-    # Check that PPP dollars are as expected.
-    for diet in ["a_nutrient_adequate", "an_energy_sufficient", "a_healthy"]:
-        # Check that the costs originally given in the data in "ppp_dollars" coincide (within a certain percentage) with the ones calculated by me (for the specific year that is informed for all three diets).
-        columns = [f"cost_of_{diet}_diet_in_constant_ppp_dollars", f"cost_of_{diet}_diet_in_current_ppp_dollars"]
-        check = tb[tb["year"] == PPP_YEAR].dropna(subset=columns)
-        check["pct"] = 100 * abs(check[columns[0]] - check[columns[1]]) / check[columns[0]]
-        # Uncomment to inspect values:
-        # check.sort_values("pct", ascending=False)[["country", "year"] + columns + ["pct"]].head(20)
-        # Indeed, costs calculated in 2021 PPP$ coincide reasonably well with the ones given originally in "ppp_dollars".
-        # However, this is not the case for specific countries.
-        assert set(check[check["pct"] > 10]["country"]) == {"Palestine"}
-
-    # The cost of a healthy diet, however, is given for multiple years, and it seems that the cost in "ppp_dollars" corresponds to **current*** PPP$ (not constant PPP$).
-    # To confirm this, convert costs in local currency units into PPP$.
-    check = tb.copy()
-    # Drop the old PPP conversion factors for 2021, and add PPP conversion factors for all years.
-    check = check.drop(columns=["pa_nus_prvt_pp"]).merge(
-        tb_wdi[["country", "year", "pa_nus_prvt_pp"]].dropna(), on=["country", "year"], how="left"
-    )
-    check["cost_of_a_healthy_diet_in_current_ppp_dollars_owid"] = (
-        check["cost_of_a_healthy_diet_in_local_currency_unit"] / check["pa_nus_prvt_pp"]
-    )
-    columns = ["cost_of_a_healthy_diet_in_current_ppp_dollars_owid", "cost_of_a_healthy_diet_in_current_ppp_dollars"]
-    check = check.dropna(subset=columns)
-    check["pct"] = 100 * abs(check[columns[0]] - check[columns[1]]) / check[columns[0]]
-    # Uncomment to inspect values.
-    # check.sort_values("pct", ascending=False)[["country", "year"] + columns + ["pct"]].head(60)
-    # Indeed, the cost converted from LCU into current PPP$ coincides reasonably well with the original cost in "ppp_dollars".
-    # However, this is not the case for specific countries.
-    assert set(check[check["pct"] > 10]["country"]) == {"Palestine", "Somalia", "Zimbabwe"}
-    ####################################################################################################################
+    # Convert costs in current PPP$ into constant PPP$.
+    for col in tb.columns:
+        if col.endswith("in_current_ppp_dollars"):
+            col_const = col.replace("in_current_ppp_dollars", "in_constant_ppp_dollars")
+            tb[col_const] = tb[col] * tb["cpi_adjustment_factor"]
 
     # For the PPP year, given that current and constant costs should be identical, fill nans in constant PPP costs with current PPP costs.
-    # NOTE: This recovers data points that were lost during the conversion from LCU to constant PPP$.
+    # NOTE: This recovers data points that were lost during the conversion to constant PPP$.
     for column in tb.columns:
         if "in_constant_ppp_dollars" in column:
             column_current_ppp = column.replace("in_constant_ppp_dollars", "in_current_ppp_dollars")
             _mask = tb["year"] == PPP_YEAR
             tb.loc[_mask, column] = tb[_mask][column].fillna(tb[_mask][column_current_ppp])
 
-    # For the cost of a healthy diet (for which we have data for multiple years) of income groups and the World, we only have data in current PPP$. This happens because there is no local currency for those regions.
+    # For the cost of a healthy diet (for which we have data for multiple years) of income groups and the World, we don't have CPI adjustment factors.
     # So, to avoid missing all that data, use the US CPI and convert current PPP dollars to constant PPP dollars.
     # Get CPI from WDI.
     tb_cpi = tb_wdi[tb_wdi["country"] == "United States"][["year", "fp_cpi_totl"]].reset_index(drop=True)
@@ -166,9 +97,62 @@ def adjust_currencies(tb: Table, tb_wdi: Table) -> Table:
     )
 
     # Drop unnecessary columns.
-    tb = tb.drop(columns=["cpi_adjustment_factor", "cpi_adjustment_factor_us", "pa_nus_prvt_pp"], errors="raise")
+    tb = tb.drop(columns=["cpi_adjustment_factor", "cpi_adjustment_factor_us"], errors="raise")
 
     return tb
+
+
+def sanity_check_adjustments(tb: Table, tb_wdi: Table) -> None:
+    # Check data coverage is as expected.
+    # All cost columns are given for just a single year (as of the 2025 update, that year is 2021), except the cost of a healthy diet, which is given for multiple years.
+    for column in tb.columns:
+        if ("cost_of_a" in column) and ("relative" not in column):
+            if "healthy" not in column:
+                assert set(tb.dropna(subset=column)["year"]) == {PPP_YEAR}
+            else:
+                assert len(set(tb.dropna(subset=column)["year"])) > 1
+
+    # Check that PPP dollars are as expected.
+    for diet in ["a_nutrient_adequate", "an_energy_sufficient", "a_healthy"]:
+        # Check that the costs originally given in the data in "ppp_dollars" coincide with the ones calculated by me (for the specific year that is informed for all three diets).
+        columns = [f"cost_of_{diet}_diet_in_constant_ppp_dollars", f"cost_of_{diet}_diet_in_current_ppp_dollars"]
+        check = tb[tb["year"] == PPP_YEAR].dropna(subset=columns)
+        # Indeed, costs calculated in 2021 PPP$ coincide exactly with the ones given originally in "ppp_dollars".
+        assert (check[columns[0]] == check[columns[1]]).all()
+
+    # The cost of a healthy diet, however, is given for multiple years, and it seems that the cost in "ppp_dollars" corresponds to **current*** PPP$ (not constant PPP$).
+    # To confirm this, convert costs in local currency units into PPP$.
+    check = tb.copy()
+    tb_wdi_check = tb_wdi.copy()
+    # For Sierra Leone, LCU costs seem to be a factor of 1000 too high in the new update.
+    # This may be due to the 2022 change in the value of the leone:
+    # https://en.wikipedia.org/wiki/Sierra_Leonean_leone
+    # As of 1 July 2022, the ISO 4217 code is SLE due to a redenomination of the old leone (SLL) at a rate of SLL 1000 to SLE 1.
+    # Correct those costs by dividing by 1000.
+    for column in check.columns:
+        if column.startswith("cost_of_") and ("in_local_currency_unit" in column):
+            check.loc[(check["country"].isin(["Sierra Leone"])), column] /= 1000
+    # For Liberia, the resulting cost of a healthy diet is also much higher than other countries (over 500 PPP$).
+    # In this case, it seems to me that the PPP conversion factor (from https://data.worldbank.org/indicator/PA.NUS.PRVT.PP?locations=LR ) may not be given in LCU per international-$, but rather in USD per international-$.
+    # To correct for this, convert those USD to LCU using a conversion factor from another WDI indicator (https://data.worldbank.org/indicator/PA.NUS.FCRF?locations=LR).
+    tb_wdi_check.loc[(tb_wdi_check["country"].isin(["Liberia"])), "pa_nus_prvt_pp"] *= tb_wdi_check.loc[
+        (tb_wdi_check["country"].isin(["Liberia"])), "pa_nus_fcrf"
+    ]
+    # Add PPP conversion factors for all years.
+    check = check.merge(
+        tb_wdi_check[["country", "year", "pa_nus_prvt_pp"]].dropna(), on=["country", "year"], how="left"
+    )
+    check["cost_of_a_healthy_diet_in_current_ppp_dollars_owid"] = (
+        check["cost_of_a_healthy_diet_in_local_currency_unit"] / check["pa_nus_prvt_pp"]
+    )
+    columns = ["cost_of_a_healthy_diet_in_current_ppp_dollars_owid", "cost_of_a_healthy_diet_in_current_ppp_dollars"]
+    check = check.dropna(subset=columns)
+    check["pct"] = 100 * abs(check[columns[0]] - check[columns[1]]) / check[columns[0]]
+    # Uncomment to inspect values.
+    # check.sort_values("pct", ascending=False)[["country", "year"] + columns + ["pct"]].head(60)
+    # Indeed, the cost converted from LCU into current PPP$ coincides reasonably well with the original cost in "ppp_dollars".
+    # However, this is not the case for specific countries.
+    assert set(check[check["pct"] > 10]["country"]) == {"Palestine", "Somalia", "Zimbabwe"}
 
 
 def change_attribution(tb: Table, columns: List[str], attribution_text: str) -> Table:
@@ -230,6 +214,9 @@ def run() -> None:
 
     # Correct for inflation and other related data issues.
     tb = adjust_currencies(tb=tb, tb_wdi=tb_wdi)
+
+    # Sanity check currency adjustments.
+    sanity_check_adjustments(tb=tb, tb_wdi=tb_wdi)
 
     # Change attributions for share and number of people who cannot afford a healthy diet.
     tb = change_attribution(
