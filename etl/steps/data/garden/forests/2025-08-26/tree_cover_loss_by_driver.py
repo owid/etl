@@ -1,8 +1,9 @@
 """Load a meadow dataset and create a garden dataset."""
 
+from owid.catalog import processing as pr
+
 from etl.data_helpers import geo
 from etl.helpers import PathFinder
-from owid.catalog import processing as pr
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
