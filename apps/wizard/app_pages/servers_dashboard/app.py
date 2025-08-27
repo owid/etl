@@ -4,10 +4,12 @@ import streamlit as st
 from structlog import get_logger
 
 from apps.wizard.app_pages.servers_dashboard.utils import (
+    destroy_server,
     fetch_host_memory_stats,
     fetch_lxc_servers_data,
     get_server_summary_stats,
     prepare_display_dataframe,
+    reset_mysql_database,
 )
 from apps.wizard.utils.components import st_horizontal
 
@@ -56,7 +58,7 @@ if host_memory_error:
 st.subheader("📊 Summary")
 stats = get_server_summary_stats(servers_df, host_memory_stats)
 
-col1, col2, col3, col4 = st.columns(4)
+col1, col2, col3, col4, col5 = st.columns(5)
 with col1:
     st.metric("Total Servers", stats["total_servers"])
 with col2:
@@ -64,11 +66,18 @@ with col2:
 with col3:
     st.metric("Stopped", stats["stopped_servers"], delta=None, delta_color="inverse")
 with col4:
-    host_mem_pct = stats["host_memory_usage_pct"]
-    if host_mem_pct is not None:
-        st.metric("gaia-1 Memory", f"{host_mem_pct:.1f}%")
+    host_mem_stats = stats["host_memory_stats"]
+    if host_mem_stats is not None:
+        mem_display = f"{host_mem_stats['used_gb']:.0f}/{host_mem_stats['total_gb']:.0f} GB ({host_mem_stats['usage_pct']:.1f}%)"
+        st.metric("gaia-1 Memory", mem_display)
     else:
         st.metric("gaia-1 Memory", "N/A")
+with col5:
+    if host_mem_stats is not None and host_mem_stats.get("swap_total_gb", 0) > 0:
+        swap_display = f"{host_mem_stats['swap_used_gb']:.0f}/{host_mem_stats['swap_total_gb']:.0f} GB ({host_mem_stats['swap_usage_pct']:.1f}%)"
+        st.metric("gaia-1 Swap", swap_display)
+    else:
+        st.metric("gaia-1 Swap", "N/A")
 
 # Prepare data for display
 display_df = prepare_display_dataframe(servers_df)
@@ -81,15 +90,14 @@ with col1:
     status_filter = st.selectbox("Status", options=["All", "Running", "Stopped"], index=0)
 
 with col2:
+    # Extract unique origins for filter
+    all_origins = servers_df["origin"].unique()
+    origin_filter = st.multiselect("Origins", options=sorted(all_origins), default=[])
+
+with col3:
     # Extract unique branches for filter (excluding full container names)
     all_branches = servers_df["branch"].unique()
     branch_filter = st.multiselect("Branches", options=sorted(all_branches), default=[])
-
-with col3:
-    # Memory usage filter
-    memory_filter = st.selectbox(
-        "Memory Usage", options=["All", "High (>80%)", "Medium (40-80%)", "Low (<40%)"], index=0
-    )
 
 # Apply filters
 filtered_df = display_df.copy()
@@ -99,24 +107,17 @@ if status_filter != "All":
     status_symbol = "🟢" if status_filter == "Running" else "🔴"
     filtered_df = filtered_df[filtered_df["Status"] == status_symbol]
 
+# Origin filter
+if origin_filter:
+    # Map back to original server data for filtering
+    origin_mask = servers_df["origin"].isin(origin_filter)
+    filtered_df = filtered_df[origin_mask]
+
 # Branch filter
 if branch_filter:
     # Map back to original server data for filtering
-    original_mask = servers_df["branch"].isin(branch_filter)
-    filtered_df = filtered_df[original_mask]
-
-# Memory filter
-if memory_filter != "All":
-    if memory_filter == "High (>80%)":
-        memory_mask = servers_df["memory_usage_pct"] > 80
-    elif memory_filter == "Medium (40-80%)":
-        memory_mask = (servers_df["memory_usage_pct"] >= 40) & (servers_df["memory_usage_pct"] <= 80)
-    else:  # Low (<40%)
-        memory_mask = servers_df["memory_usage_pct"] < 40
-
-    # Handle NaN values (stopped containers)
-    memory_mask = memory_mask.fillna(False)
-    filtered_df = filtered_df[memory_mask]
+    branch_mask = servers_df["branch"].isin(branch_filter)
+    filtered_df = filtered_df[branch_mask]
 
 # Display filtered results count
 if len(filtered_df) != len(display_df):
@@ -134,6 +135,7 @@ else:
         use_container_width=True,
         column_config={
             "Status": st.column_config.TextColumn("Status", help="Server running status", width="small"),
+            "Origin": st.column_config.TextColumn("Origin", help="Server origin (etl, grapher, etc.)", width="small"),
             "Branch": st.column_config.TextColumn(
                 "Branch", help="Git branch name (staging-site- prefix removed)", width="medium"
             ),
@@ -148,11 +150,8 @@ else:
             "Age (days)": st.column_config.NumberColumn(
                 "Age (days)", help="Days since container was created", format="%d days", width="small"
             ),
-            "ETL Commit": st.column_config.TextColumn(
-                "ETL Commit", help="Last ETL commit timestamp and age", width="medium"
-            ),
-            "Grapher Commit": st.column_config.TextColumn(
-                "Grapher Commit", help="Last Grapher commit timestamp and age", width="medium"
+            "Last Commit": st.column_config.TextColumn(
+                "Last Commit", help="Most recent relevant commit based on server origin", width="medium"
             ),
         },
         hide_index=True,
@@ -185,9 +184,11 @@ else:
 
                     st.markdown("---")
                     st.markdown("**This will:**")
-                    st.markdown("- Drop existing MySQL database")
-                    st.markdown("- Recreate it from the most recent snapshot")
+                    st.markdown("- Run `make refresh` in the owid-grapher directory")
+                    st.markdown("- Drop and recreate the MySQL database")
+                    st.markdown("- Import the latest data from staging")
 
+                    st.warning("⏱️ **This process takdes about 5 minutes to complete!**")
                     st.error("⚠️ **All current database data including charts and indicators will be lost!**")
 
                     col1, col2 = st.columns(2)
@@ -196,8 +197,17 @@ else:
                             st.rerun()
                     with col2:
                         if st.button("🗄️ Reset MySQL", type="primary", use_container_width=True):
-                            st.success("MySQL reset initiated (placeholder - not implemented yet)")
-                            st.info("This feature will be implemented in a future update.")
+                            with st.spinner("Resetting MySQL database... This may take 5 minutes", show_time=True):
+                                success, message = reset_mysql_database(server_name)
+
+                            if success:
+                                st.success(f"✅ {message}")
+                                st.info("🎉 MySQL database has been refreshed with the latest data!")
+                                # Clear cache to refresh data on next load
+                                st.cache_data.clear()
+                            else:
+                                st.error(f"❌ MySQL reset failed: {message}")
+                                st.info("Please check the server logs or try again later.")
 
                 show_mysql_reset_modal()
 
@@ -220,8 +230,24 @@ else:
                             st.rerun()
                     with col2:
                         if st.button("💥 DESTROY SERVER", type="primary", use_container_width=True):
-                            st.success("Server destruction initiated (placeholder - not implemented yet)")
-                            st.info("This feature will be implemented in a future update.")
+                            with st.spinner("Destroying server...", show_time=True):
+                                success, message = destroy_server(server_name)
+
+                            if success:
+                                st.success(f"✅ {message}")
+                                st.info(
+                                    "Server has been completely destroyed. It will be recreated on the next commit to this branch."
+                                )
+                                # Clear cache to refresh data on next load
+                                st.cache_data.clear()
+                                # Wait a moment then refresh the page
+                                import time
+
+                                time.sleep(2)
+                                st.rerun()
+                            else:
+                                st.error(f"❌ Server destruction failed: {message}")
+                                st.info("Please check the server status or try again later.")
 
                 show_destroy_modal()
 

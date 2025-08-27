@@ -36,23 +36,39 @@ def fetch_host_memory_stats(host: str = "gaia-1") -> Tuple[Optional[Dict], Optio
 
         # Parse free command output
         lines = result.stdout.strip().split("\n")
-        if len(lines) < 2:
-            return None, "Invalid free command output"
+        if len(lines) < 3:
+            return None, "Invalid free command output - missing swap line"
 
         # Parse memory line (second line)
         mem_line = lines[1].split()
         if len(mem_line) < 3:
             return None, "Could not parse memory information"
 
+        # Parse swap line (third line)
+        swap_line = lines[2].split()
+        if len(swap_line) < 3:
+            return None, "Could not parse swap information"
+
+        # Memory calculations
         total_bytes = int(mem_line[1])
         used_bytes = int(mem_line[2])
         available_bytes = int(mem_line[6]) if len(mem_line) >= 7 else int(mem_line[3])
 
+        # Calculate "actually used" memory (total - available)
+        actually_used_bytes = total_bytes - available_bytes
+
+        # Swap calculations
+        swap_total_bytes = int(swap_line[1])
+        swap_used_bytes = int(swap_line[2])
+
         memory_stats = {
             "total_gb": round(total_bytes / (1024**3), 1),
-            "used_gb": round(used_bytes / (1024**3), 1),
+            "used_gb": round(actually_used_bytes / (1024**3), 1),
             "available_gb": round(available_bytes / (1024**3), 1),
-            "usage_pct": round((used_bytes / total_bytes) * 100, 1),
+            "usage_pct": round((actually_used_bytes / total_bytes) * 100, 1),
+            "swap_total_gb": round(swap_total_bytes / (1024**3), 1),
+            "swap_used_gb": round(swap_used_bytes / (1024**3), 1),
+            "swap_usage_pct": round((swap_used_bytes / swap_total_bytes) * 100, 1) if swap_total_bytes > 0 else 0,
         }
 
         log.info("Successfully fetched host memory stats", stats=memory_stats, host=host)
@@ -255,7 +271,7 @@ def get_server_summary_stats(df: pd.DataFrame, host_memory_stats: Optional[Dict]
         "running_servers": len(running_servers),
         "stopped_servers": len(df[df["status"] == "Stopped"]),
         "total_memory_gb": running_servers["memory_used_gb"].sum() if not running_servers.empty else 0,
-        "host_memory_usage_pct": host_memory_stats["usage_pct"] if host_memory_stats else None,
+        "host_memory_stats": host_memory_stats,
     }
 
 
@@ -305,11 +321,11 @@ def get_display_columns() -> Dict[str, str]:
     """
     return {
         "status_indicator": "Status",
-        "branch": "Branch",
+        "origin": "Origin",
+        "branch": "Branch", 
         "memory_display": "Memory",
         "days_old": "Age (days)",
-        "etl_last_commit": "ETL Commit",
-        "grapher_last_commit": "Grapher Commit",
+        "unified_commit": "Last Commit",
     }
 
 
@@ -328,13 +344,43 @@ def prepare_display_dataframe(df: pd.DataFrame) -> pd.DataFrame:
 
     display_df = df.copy()
 
-    # Format commit information
-    display_df["etl_last_commit"] = display_df.apply(
-        lambda row: format_commit_info(row["etl_last_commit"], row["etl_days_old"]), axis=1
-    )
-    display_df["grapher_last_commit"] = display_df.apply(
-        lambda row: format_commit_info(row["grapher_last_commit"], row["grapher_days_old"]), axis=1
-    )
+    # Create unified commit column based on origin
+    def get_unified_commit_info(row):
+        origin = row.get("origin", "").lower()
+        
+        if origin == "etl":
+            # Use ETL commit for ETL-only servers
+            return format_commit_info(row["etl_last_commit"], row["etl_days_old"])
+        elif origin == "owid-grapher":
+            # Use Grapher commit for Grapher-only servers
+            return format_commit_info(row["grapher_last_commit"], row["grapher_days_old"])
+        elif "owid-grapher" in origin and "etl" in origin:
+            # For mixed origins (e.g., "owid-grapher,etl"), use the latest commit
+            etl_date = row["etl_commit_parsed"]
+            grapher_date = row["grapher_commit_parsed"]
+            
+            # Handle NaT/None values
+            if pd.isna(etl_date) and pd.isna(grapher_date):
+                return "❓ No commits found"
+            elif pd.isna(etl_date):
+                return format_commit_info(row["grapher_last_commit"], row["grapher_days_old"])
+            elif pd.isna(grapher_date):
+                return format_commit_info(row["etl_last_commit"], row["etl_days_old"])
+            else:
+                # Compare dates and use the latest
+                if etl_date >= grapher_date:
+                    return format_commit_info(row["etl_last_commit"], row["etl_days_old"])
+                else:
+                    return format_commit_info(row["grapher_last_commit"], row["grapher_days_old"])
+        else:
+            # Default fallback - try ETL first, then Grapher
+            etl_commit = row["etl_last_commit"]
+            if not pd.isna(etl_commit) and etl_commit not in ["Container not running", "Unable to retrieve", "No git repository found"]:
+                return format_commit_info(row["etl_last_commit"], row["etl_days_old"])
+            else:
+                return format_commit_info(row["grapher_last_commit"], row["grapher_days_old"])
+    
+    display_df["unified_commit"] = display_df.apply(get_unified_commit_info, axis=1)
 
     # For progress bar, we need the actual GB values
     # The ProgressColumn will show the bar based on value/max_value ratio, but display the actual GB value
@@ -351,3 +397,87 @@ def prepare_display_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     display_df = display_df[display_columns].rename(columns=column_mapping)
 
     return display_df
+
+
+def reset_mysql_database(server_name: str) -> Tuple[bool, str]:
+    """
+    Reset the MySQL database for a staging server by running 'make refresh' in owid-grapher.
+    
+    Args:
+        server_name: Full server name (e.g., staging-site-branch-name)
+        
+    Returns:
+        Tuple of (success, message)
+    """
+    try:
+        # SSH into the server and run make refresh in owid-grapher directory
+        cmd = f"ssh owid@{server_name} 'cd owid-grapher && make refresh'"
+        log.info("Resetting MySQL database via make refresh", command=cmd, server=server_name)
+        
+        result = subprocess.run(
+            cmd,
+            shell=True,
+            capture_output=True,
+            text=True,
+            timeout=1800  # 30 minute timeout for make refresh (can take very long)
+        )
+        
+        if result.returncode != 0:
+            error_msg = f"MySQL reset failed with return code {result.returncode}: {result.stderr}"
+            log.error("MySQL reset failed", error=error_msg, server=server_name, stdout=result.stdout)
+            return False, error_msg
+        
+        success_msg = f"MySQL database successfully refreshed for {server_name}"
+        log.info("MySQL reset completed", server=server_name)
+        return True, success_msg
+        
+    except subprocess.TimeoutExpired:
+        error_msg = "MySQL reset timed out after 30 minutes"
+        log.error("MySQL reset timeout", server=server_name)
+        return False, error_msg
+    except Exception as e:
+        error_msg = f"Unexpected error during MySQL reset: {str(e)}"
+        log.error("MySQL reset error", error=error_msg, server=server_name)
+        return False, error_msg
+
+
+def destroy_server(server_name: str) -> Tuple[bool, str]:
+    """
+    Destroy a staging server completely.
+    
+    Args:
+        server_name: Full server name (e.g., staging-site-branch-name)
+        
+    Returns:
+        Tuple of (success, message)
+    """
+    try:
+        # Command to destroy the LXC container
+        cmd = f"LXC_HOST=gaia-1 owid-lxc destroy {server_name}"
+        log.info("Destroying server", command=cmd, server=server_name)
+        
+        result = subprocess.run(
+            cmd,
+            shell=True,
+            capture_output=True,
+            text=True,
+            timeout=120  # 2 minute timeout for destruction
+        )
+        
+        if result.returncode != 0:
+            error_msg = f"Server destruction failed with return code {result.returncode}: {result.stderr}"
+            log.error("Server destruction failed", error=error_msg, server=server_name)
+            return False, error_msg
+        
+        success_msg = f"Server {server_name} successfully destroyed"
+        log.info("Server destruction completed", server=server_name)
+        return True, success_msg
+        
+    except subprocess.TimeoutExpired:
+        error_msg = "Server destruction timed out after 2 minutes"
+        log.error("Server destruction timeout", server=server_name)
+        return False, error_msg
+    except Exception as e:
+        error_msg = f"Unexpected error during server destruction: {str(e)}"
+        log.error("Server destruction error", error=error_msg, server=server_name)
+        return False, error_msg

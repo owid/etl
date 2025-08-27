@@ -139,16 +139,6 @@ sections:
         image_url: "https://images.squarespace-cdn.com/content/v1/5ea8287254c2e00f35d1cc48/1595511684480-6RM6YK3XZGB2SD21GPGP/20140620appletoapplescomparison.jpg"
         disable:
           production: True
-      - title: "Servers Dashboard"
-        alias: servers-dashboard
-        entrypoint: app_pages/servers_dashboard/app.py
-        description: Monitor all LXC staging servers with real-time metrics
-        maintainer: "@mojmir"
-        icon: ":material/computer:"
-        image_url: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
-        disable:
-          production: True
-          staging: True
 
   - title: "Data tools"
     description: |-
@@ -269,6 +259,15 @@ sections:
         entrypoint: app_pages/owidle.py
         icon: ":material/videogame_asset:"
         image_url: "https://t3.ftcdn.net/jpg/06/26/23/36/360_F_626233679_tesiSRP9Jinq5wS0ZgbdJ6k5adupmgKl.jpg"
+      - title: "Servers Dashboard"
+        alias: servers-dashboard
+        entrypoint: app_pages/servers_dashboard/app.py
+        description: Monitor all LXC staging servers with real-time metrics
+        maintainer: "@mojmir"
+        icon: ":material/computer:"
+        image_url: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
+        disable:
+          staging: true
 
   # - title: "Metadata"
   #   description: |-
