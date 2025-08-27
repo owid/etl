@@ -17,17 +17,26 @@ tables:
         title: Solar photovoltaic module price
         description_short: |-
           This data is expressed in US dollars per watt, adjusted for inflation.
+        unit: "constant {LATEST_YEAR} US$ per watt"
+        short_unit: "$/W"
+        display:
+          name: Solar PV module cost
+          shortUnit: "$"
         presentation:
           title_public: Solar photovoltaic module price
           grapher_config:
             note: "Data is expressed in constant {LATEST_YEAR} US$ per watt."
+        description_processing: |-
+          - Photovoltaic cost data between 1975 and 2003 has been taken from Nemet (2009), between 2004 and 2009 from Farmer & Lafond (2016), and since 2010 from IRENA.
+          - Prices from Nemet (2009) and Farmer & Lafond (2016) have been converted to {LATEST_YEAR} US$ using the US GDP deflator, to account for the effects of inflation. The deflator data is available from the [World Bank World Development Indicators](https://data.worldbank.org/indicator/NY.GDP.DEFL.ZS?locations=US).
       cost_source:
         title: Source for each value of cost data
         unit: ''
       cumulative_capacity:
         title: Solar photovoltaic cumulative capacity
+        display:
+          name: Cumulative installed solar PV capacity
         presentation:
-          # NOTE: A title_public is needed, since a display.name is defined (it's propagated from one of the combined datasets, namely farmer_lafond_2016).
           title_public: Solar photovoltaic cumulative capacity
       cumulative_capacity_source:
         title: Source for each value of cumulative capacity data

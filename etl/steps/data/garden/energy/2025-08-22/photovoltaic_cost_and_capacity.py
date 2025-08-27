@@ -29,12 +29,12 @@ paths = PathFinder(__file__)
 # Conversion factors.
 # IRENA costs are given in the latest year's USD, so we convert other costs to the same currency.
 LATEST_YEAR = 2024
-# Convert 2004 USD and 2013 USD to LATEST_YEAR USD , using
-# https://www.usinflationcalculator.com/
-# "If in 2004 I purchased an item for  $ 1.00 then in {LATEST_YEAR} that same item would cost:"
-USD2004_TO_USDLATEST = 1.66
-# "If in 2013 I purchased an item for  $ 1.00 then in {LATEST_YEAR} that same item would cost:"
-USD2013_TO_USDLATEST = 1.35
+# Convert 2004 USD and 2013 USD to LATEST_YEAR USD using the World Bank's GDP deflator:
+# https://data.worldbank.org/indicator/NY.GDP.DEFL.ZS.AD?locations=US
+# Download the excel file, and divide the value for the latest year by the value of 2004 (79.0769459998626):
+USD2004_TO_USDLATEST = 1.58
+# Similarly, divide the value for the latest year by the value of 2013 (94.7705183765681):
+USD2013_TO_USDLATEST = 1.32
 
 
 def prepare_capacity_data(tb_nemet: Table, tb_irena_capacity: Table) -> Table:
@@ -105,6 +105,8 @@ def prepare_cost_data(tb_nemet: Table, tb_irena_cost: Table, tb_farmer_lafond: T
 
     tb_irena_cost["cost_source"] = "IRENA"
     # Costs are given in latest year "USD/W", so we do not need to correct them.
+    error = "IRENA data has changed, prices may need to be deflated to the latest year."
+    assert tb_irena_cost["year"].max() == LATEST_YEAR, error
 
     # Combine Nemet (2009) and Farmer & Lafond (2016), prioritizing the former.
     combined = combine_two_overlapping_dataframes(df1=tb_nemet_cost, df2=tb_farmer_lafond, index_columns="year")
@@ -113,10 +115,6 @@ def prepare_cost_data(tb_nemet: Table, tb_irena_cost: Table, tb_farmer_lafond: T
     combined = combine_two_overlapping_dataframes(df1=tb_irena_cost, df2=combined, index_columns="year")
 
     # Improve metadata.
-    combined[
-        "cost"
-    ].metadata.description_processing = f"Photovoltaic cost data between 1975 and 2003 has been taken from Nemet (2009), between 2004 and 2009 from Farmer & Lafond (2016), and since 2010 from IRENA. Prices from Nemet (2009) and Farmer & Lafond (2016) have been converted to {LATEST_YEAR} US$ using: https://www.usinflationcalculator.com/"
-
     # Since sources column has been manually created, it does not have metadata. Copy origins from another column.
     combined["cost_source"].metadata.origins = combined["cost"].metadata.origins.copy()
 
@@ -148,10 +146,6 @@ def run() -> None:
     #
     # Create a table of cumulative solar photovoltaic capacity, by combining Nemet (2009) and IRENA data.
     cumulative_capacity = prepare_capacity_data(tb_nemet=tb_nemet, tb_irena_capacity=tb_irena_capacity)
-
-    # Sanity check.
-    error = "IRENA data has changed, prices may need to be deflated to the latest year."
-    assert tb_irena_cost["year"].max() == LATEST_YEAR, error
 
     # Create a table of solar photovoltaic cost, by combining Nemet (2009), Farmer & Lafond (2016) and IRENA data.
     cost = prepare_cost_data(tb_nemet=tb_nemet, tb_irena_cost=tb_irena_cost, tb_farmer_lafond=tb_farmer_lafond)
