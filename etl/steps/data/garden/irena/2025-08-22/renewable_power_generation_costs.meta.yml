@@ -1,0 +1,82 @@
+definitions:
+  common:
+    processing_level: major
+    description_processing: |-
+      - The resulting costs are compiled from two IRENA reports: Renewable Power Generation Costs in 2024 (primarily for data from 2010 onwards) and Renewable Power Generation Costs in 2023 (for earlier data not included in the latest report).
+      - Data from the Renewable Power Generation Costs in 2023 report (expressed in constant 2023 US dollars) was converted to constant 2024 US dollars using the US GDP deflator, to account for the effects of inflation. The deflator data is available from the [World Bank World Development Indicators](https://data.worldbank.org/indicator/NY.GDP.DEFL.ZS?locations=US).
+    presentation:
+      topic_tags:
+        - Energy
+  # Display short unit to show in charts of costs per kilowatt-hour.
+  displayShortUnit: &display-short-unit-usd-per-kwh "$"
+
+dataset:
+  update_period_days: 365
+
+tables:
+  renewable_power_generation_costs:
+    title: Renewable power generation costs
+    common:
+      description_key:
+      - Levelized cost of energy (LCOE) estimates the average cost per unit of energy generated across the lifetime of a new power plant. It is measured in US$ per kilowatt-hour.
+      unit: "constant {LATEST_YEAR} US$ per kilowatt-hour"
+      short_unit: "$/kWh"
+    variables:
+      bioenergy:
+        title: Bioenergy levelized cost of energy
+        display:
+          name: Bioenergy
+          shortUnit: *display-short-unit-usd-per-kwh
+        presentation:
+          title_public: Bioenergy levelized cost of energy
+      concentrated_solar_power:
+        title: Concentrated solar power levelized cost of energy
+        display:
+          name: Concentrated solar power
+          shortUnit: *display-short-unit-usd-per-kwh
+        presentation:
+          title_public: Concentrated solar power levelized cost of energy
+      geothermal:
+        title: Geothermal levelized cost of energy
+        display:
+          name: Geothermal
+          shortUnit: *display-short-unit-usd-per-kwh
+        presentation:
+          title_public: Geothermal levelized cost of energy
+      hydropower:
+        title: Hydropower levelized cost of energy
+        display:
+          name: Hydropower
+          shortUnit: *display-short-unit-usd-per-kwh
+        presentation:
+          title_public: Hydropower levelized cost of energy
+      offshore_wind:
+        title: Offshore wind levelized cost of energy
+        display:
+          name: Offshore wind
+          shortUnit: *display-short-unit-usd-per-kwh
+        presentation:
+          title_public: Offshore wind levelized cost of energy
+      onshore_wind:
+        title: Onshore wind levelized cost of energy
+        display:
+          name: Onshore wind
+          shortUnit: *display-short-unit-usd-per-kwh
+        presentation:
+          title_public: Onshore wind levelized cost of energy
+      solar_photovoltaic:
+        title: Solar photovoltaic levelized cost of energy
+        display:
+          name: Solar photovoltaic
+          shortUnit: *display-short-unit-usd-per-kwh
+        presentation:
+          title_public: Solar photovoltaic levelized cost of energy
+  solar_photovoltaic_module_prices:
+    title: Solar photovoltaic module prices
+    variables:
+      cost:
+        title: Solar photovoltaic module prices
+        unit: "constant {LATEST_YEAR} US$ per watt"
+        short_unit: "$/W"
+        display:
+          shortUnit: "$"
