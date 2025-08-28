@@ -27,7 +27,9 @@ GROUPED_VIEW_CONFIG = MULTIDIM_CONFIG | {
     "hasMapTab": False,
     "tab": "chart",
     "selectedFacetStrategy": "entity",
+    "chartTypes": ["StackedBar"],
 }
+
 
 # Column patterns for education spending indicators
 SPENDING_PATTERNS = {
