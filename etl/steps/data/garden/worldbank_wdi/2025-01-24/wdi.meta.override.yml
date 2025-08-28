@@ -70,8 +70,10 @@ definitions:
   desc_key_trained_teachers: &desc_key_trained_teachers
    - Not all teachers receive the same level of preparation before entering the classroom. This indicator measures the percentage of teachers at each education level who have completed at least the minimum organized pedagogical training required for teaching at that level in their country.
    - It captures the share of teachers who are pedagogically trained, expressed as a percentage of all teachers at that level. For example, if there are 1,000 primary teachers and 850 have completed the required training, the indicator shows 85%.
-   - The "minimum training" refers to whatever organized pedagogical preparation each country requires - pre-service teacher education programs, in-service training courses, or certification requirements that focus on teaching methods rather than subject knowledge.
+   - The "minimum training" refers to whatever organized pedagogical preparation each country requires — pre-service teacher education programs, in-service training courses, or certification requirements that focus on teaching methods rather than subject knowledge.
    - Values below 100% suggest some teachers are working without the pedagogical training their own country considers necessary. However, cross-country comparisons can be misleading since training requirements vary significantly between nations.
+   - This indicator does not account for differences in teachers' experience, professional status, teaching methods, materials, or classroom conditions — all of which affect the quality of teaching and learning. Some teachers without formal training may also acquire equivalent skills through professional experience.
+   - The reference years reflect the school year. In countries where the school year spans two calendar years (e.g. September 2010 to June 2011), the reference year is the year in which the school year ended (2011 in this example).
    - The data comes from administrative records collected at schools and other organized learning centers, typically including information on teacher academic credentials and employment status.
 
   description_short_clean_fuels: &description_short_clean_fuels |-

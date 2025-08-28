@@ -96,11 +96,13 @@ TEACHER_TYPES = {
     "qualified": {
         "title": "Qualified teachers",  # Display title
         "description": "academic qualifications",  # Short description for subtitles
+        "full_description": "who meet the minimum academic qualifications required in the subject they teach at that level in a given country",
         "catalog_key": "qualified",  # Key to match in catalog paths
     },
     "trained": {
         "title": "Trained teachers",
         "description": "pedagogical training",
+        "full_description": "who have received at least the minimum organized pedagogical training required for teaching at that level",
         "catalog_key": "tcaq",  # WDI uses "tcaq" in column names
     },
 }
@@ -326,21 +328,33 @@ def generate_subtitle_by_dimensions(view):
     Creates subtitles that:
     1. Use proper DOD links for education levels
     2. Explain what qualified vs trained means for grouped views
-    3. Include "shown as a percentage of all teachers" for clarity
+    3. Include "shown as a percentage of all teachers teaching at this level" for clarity
+    4. Adjust text based on whether it's qualified or trained teachers
     """
 
     if view.matches(level="level_side_by_side"):
-        # Education level comparison: build comma-separated list with "and" at the end
+        # Education level comparison: get the specific teacher type
+        teacher_type = view.dimensions["teacher_type"]
+        teacher_cfg = TEACHER_TYPES.get(teacher_type, {})
+        teacher_full_description = teacher_cfg.get("full_description", "qualifications")
+
+        # Build comma-separated list with "and" at the end
         education_levels = ", ".join([config["subtitle_link"] for config in EDUCATION_LEVELS.values()])
         education_levels = education_levels.rsplit(", ", 1)  # Split on last comma to add "and"
         education_levels = " and ".join(education_levels)  # Join with "and"
-        return f"Share of teachers with academic qualifications (qualified) and pedagogical training (trained) across {education_levels}, shown as a percentage of all teachers."
+
+        return f"Share of teachers {teacher_full_description} across {education_levels} education, shown as a percentage of all teachers teaching at each level."
 
     elif view.matches(teacher_type="teacher_type_side_by_side"):
         # Teacher type comparison: get specific education level link
         level = view.dimensions.get("level", "primary")
         education_level = EDUCATION_LEVELS.get(level, EDUCATION_LEVELS["primary"])["subtitle_link"]
-        return f"Share of teachers with academic qualifications (qualified) and pedagogical training (trained) in {education_level}, shown as a percentage of all teachers."
+
+        # Get full descriptions for both teacher types
+        qualified_desc = TEACHER_TYPES["qualified"]["full_description"]
+        trained_desc = TEACHER_TYPES["trained"]["full_description"]
+
+        return f"Share of teachers {qualified_desc} (qualified) and teachers {trained_desc} (trained) in {education_level} education, shown as a percentage of all teachers teaching at this level."
 
 
 def edit_indicator_displays(view):
