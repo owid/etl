@@ -1977,12 +1977,11 @@ class Regions:
             Regions as requested format.
         """
         if names is None:
-            # Get all available continents, aggregates, and income groups.
-            names = sorted(
-                set(self.tb_regions[self.tb_regions["region_type"].isin(["continent", "aggregate"])]["name"])
-                | set(REGIONS)
-            )
-
+            # Get the full list of names of continents and aggregates (which includes World) and income groups.
+            names = self.regions_all
+            # If income groups cannot be loaded, remove them from the list.
+            if (self._ds_income_groups is None) and not self.auto_load_datasets:
+                names = sorted(set(names) - set(INCOME_GROUPS))
         if only_members:
             # Create a dictionary of members of each region.
             regions = {name: self.get_region(name)["members"] for name in names}
@@ -1994,9 +1993,12 @@ class Regions:
 
     @property
     def regions_all(self) -> list[str]:
-        # Complete list of aggregates and continents (including World) in the regions dataset.
+        # Complete list of names of region that are aggregates (including World) or continents in the regions dataset, and income groups.
         if self._regions_all is None:
-            self._regions_all = list(self.get_regions(only_members=True))
+            self._regions_all = sorted(
+                set(self.tb_regions[self.tb_regions["region_type"].isin(["continent", "aggregate"])]["name"])
+                | set(INCOME_GROUPS)
+            )
         return self._regions_all
 
     def harmonizer(self, tb: Table, country_col: str = "country", institution: str | None = None) -> None:
@@ -2061,9 +2063,7 @@ class Regions:
         return RegionAggregator(
             ds_regions=self.ds_regions,
             regions=regions,
-            # TODO: Fix issue with regions_all argument. Currently, calculating it requires income groups. The problem is that get_regions() attempts to load income groups. I suppose get_regions() should only include income groups if they can be loaded.
-            # regions_all=self.regions_all,
-            regions_all=list(REGIONS),
+            regions_all=self.regions_all,
             ds_income_groups=self._ds_income_groups,
             ds_population=self._ds_population,
             index_columns=index_columns,
