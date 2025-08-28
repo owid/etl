@@ -5,6 +5,16 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Detailed colors:
+COLOR_PREPRIMARY = "#D73C50"
+COLOR_PRIMARY = "#4C6A9C"
+COLOR_LOWER_SECONDARY = "#883039"
+COLOR_UPPER_SECONDARY = "#578145"
+COLOR_TERTIARY = "#B16214"
+
+COLOR_BOYS = "#00847E"
+COLOR_GIRLS = "#E56E5A"
+
 # Common configuration for all charts
 MULTIDIM_CONFIG = {
     "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.008.json",
@@ -158,13 +168,25 @@ def create_grouped_views(collection):
                 "dimension": "sex",
                 "choice_new_slug": "sex_side_by_side",
                 "choices": ["girls", "boys"],
-                "view_config": view_config,
+                "view_config": view_config
+                | {"map": {"colorScale": {"customCategoryColors": {"Girls": COLOR_GIRLS, "Boys": COLOR_BOYS}}}},
                 "view_metadata": view_metadata,
             },
             {
                 "dimension": "level",
                 "choice_new_slug": "level_side_by_side",
-                "view_config": view_config,
+                "view_config": view_config
+                | {
+                    "map": {
+                        "colorScale": {
+                            "customCategoryColors": {
+                                "Primary": COLOR_PRIMARY,
+                                "Lower secondary": COLOR_LOWER_SECONDARY,
+                                "Upper secondary": COLOR_UPPER_SECONDARY,
+                            }
+                        }
+                    }
+                },
                 "view_metadata": view_metadata,
             },
         ],
@@ -229,19 +251,35 @@ def generate_subtitle_by_level(view):
 
 
 def edit_indicator_displays(view):
-    """Edit display names for the grouped views."""
-    if view.dimensions.get("level") != "level_side_by_side" or view.indicators.y is None:
+    """Edit display names and colors for the grouped views."""
+    if view.indicators.y is None:
         return
 
-    # Display name mappings for education levels
-    DISPLAY_NAMES = {
-        "primary": "Primary",
-        "lower_secondary": "Lower secondary",
-        "upper_secondary": "Upper secondary",
-    }
+    # Handle level side-by-side views (education levels)
+    if view.dimensions.get("level") == "level_side_by_side":
+        # Display name and color mappings for education levels
+        LEVEL_CONFIG = {
+            "primary": {"name": "Primary", "color": COLOR_PRIMARY},
+            "lower_secondary": {"name": "Lower secondary", "color": COLOR_LOWER_SECONDARY},
+            "upper_secondary": {"name": "Upper secondary", "color": COLOR_UPPER_SECONDARY},
+        }
 
-    for indicator in view.indicators.y:
-        for level_key, display_name in DISPLAY_NAMES.items():
-            if level_key in indicator.catalogPath:
-                indicator.display = {"name": display_name}
-                break
+        for indicator in view.indicators.y:
+            for level_key, config in LEVEL_CONFIG.items():
+                if level_key in indicator.catalogPath:
+                    indicator.display = {"name": config["name"], "color": config["color"]}
+                    break
+
+    # Handle sex side-by-side views (gender)
+    elif view.dimensions.get("sex") == "sex_side_by_side":
+        # Display name and color mappings for gender
+        GENDER_CONFIG = {
+            "f": {"name": "Girls", "color": COLOR_GIRLS},
+            "m": {"name": "Boys", "color": COLOR_BOYS},
+        }
+
+        for indicator in view.indicators.y:
+            for gender_key, config in GENDER_CONFIG.items():
+                if f"__{gender_key}__" in indicator.catalogPath:
+                    indicator.display = {"name": config["name"], "color": config["color"]}
+                    break
