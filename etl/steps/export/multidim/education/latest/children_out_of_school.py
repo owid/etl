@@ -283,27 +283,30 @@ def generate_subtitle_by_dimensions(view):
 
     level_cfg = EDUCATION_LEVELS.get(level, {})
     gender_term = GENDERS.get(sex, "children")
-    age_range = level_cfg.get("age_range", "")
     title_term = level_cfg.get("title_term", "")
 
     if metric == "rate":
-        if sex == "both" or view.matches(sex="sex_side_by_side"):
-            desc = "expressed as a percentage of the total population of children in that age group"
+        if view.matches(level="level_side_by_side"):
+            if sex == "both" or view.matches(sex="sex_side_by_side"):
+                return "Children across different education levels, shown as the share of children in the official age group for each level who are not enrolled."
+            else:
+                return f"{gender_term.title()} across different education levels, shown as the share of {gender_term} in the official age group for each level who are not enrolled."
         else:
-            desc = f"expressed as a percentage of the total population of {gender_term} in that age group"
-    else:
-        desc = (
-            f"shown as the total number of children not enrolled in {title_term} school"
-            if view.matches(sex="sex_side_by_side")
-            else ""
-        )
-
-    if view.matches(level="level_side_by_side"):
-        return f"{gender_term.title()} not enrolled in school across different education levels, {desc}."
-    elif view.matches(sex="sex_side_by_side"):
-        return f"Children of {age_range} not enrolled in school, {desc}."
-    else:
-        return f"{gender_term.title()} of {age_range} not enrolled in school, {desc}."
+            if sex == "both" or view.matches(sex="sex_side_by_side"):
+                return f"Children not enrolled in {title_term}, expressed as the share of children in the official age group for that level."
+            else:
+                return f"{gender_term.title()} not enrolled in {title_term}, expressed as the share of {gender_term} in the official age group for that level."
+    else:  # number case
+        if view.matches(level="level_side_by_side"):
+            if sex == "both" or view.matches(sex="sex_side_by_side"):
+                return "The total number of children not enrolled in each level or in any higher level of education."
+            else:
+                return f"{gender_term.title()} across different education levels, shown as the total number of {gender_term} not enrolled in each level or in any higher level of education."
+        else:
+            if sex == "both" or view.matches(sex="sex_side_by_side"):
+                return f"The total number of children not enrolled in {title_term} or in any higher level of education."
+            else:
+                return f"The total number of {gender_term} not enrolled in {title_term} or in any higher level of education."
 
 
 def edit_indicator_displays(view):

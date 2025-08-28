@@ -26,7 +26,7 @@ definitions:
     timeTolerance: 10
 
   # Value ranges for different indicator types
-  enrolment_rate_bins: &enrolment_rate_bins [0,10,20,30,40,50,60,70,80,90,100]
+  enrolment_rate_bins: &enrolment_rate_bins [0,10,20,30,40,50,60,70,80,90,100,100]
   gdp_share_bins: &gdp_share_bins [0,0.2,0.4,0.6,0.8,1,1.2,1.4,1.4]
   school_life_expectancy_preprimary_bins: &school_life_expectancy_preprimary_bins [0,0.5,1,1.5,2,2.5,3,3.5,4]
   school_life_expectancy_primary_bins: &school_life_expectancy_primary_bins [0,1,2,3,4,5,6,7,8,9]
@@ -107,7 +107,7 @@ definitions:
 
 
   # Out-of-school children configurations
-  out_of_school_children_bins: &out_of_school_children_bins [10000, 50000, 100000, 500000, 1000000, 5000000, 10000000, 50000000]
+  out_of_school_children_bins: &out_of_school_children_bins [0, 30000, 100000, 300000, 1000000, 3000000, 1]
 
   grapher_config_out_of_school_children_reds: &grapher_config_out_of_school_children_reds
     <<: *common_grapher_config
@@ -313,6 +313,7 @@ tables:
         display:
           name: Primary
           numDecimalPlaces: 0
+          tolerance: *display_tolerance
 
       out_of_school_children_of_primary_school_age__female__number:
         title: Out-of-school girls of primary school age
@@ -325,6 +326,7 @@ tables:
         display:
           name: Girls
           numDecimalPlaces: 0
+          tolerance: *display_tolerance
 
       out_of_school_children_of_primary_school_age__male__number:
         title: Out-of-school boys of primary school age
@@ -337,6 +339,7 @@ tables:
         display:
           name: Boys
           numDecimalPlaces: 0
+          tolerance: *display_tolerance
 
       out_of_school_adolescents_of_lower_secondary_school_age__both_sexes__number:
         title: Out-of-school children of lower secondary school age
@@ -349,6 +352,7 @@ tables:
         display:
           name: Lower secondary
           numDecimalPlaces: 0
+          tolerance: *display_tolerance
 
       out_of_school_adolescents_of_lower_secondary_school_age__female__number:
         title: Out-of-school girls of lower secondary school age
@@ -361,6 +365,7 @@ tables:
         display:
           name: Girls
           numDecimalPlaces: 0
+          tolerance: *display_tolerance
 
       out_of_school_adolescents_of_lower_secondary_school_age__male__number:
         title: Out-of-school boys of lower secondary school age
@@ -373,6 +378,7 @@ tables:
         display:
           name: Boys
           numDecimalPlaces: 0
+          tolerance: *display_tolerance
 
       out_of_school_children__one_year_before_the_official_primary_entry_age__both_sexes__number:
         title: Out-of-school children one year before official primary entry age
@@ -385,6 +391,7 @@ tables:
         display:
           name: Pre-primary
           numDecimalPlaces: 0
+          tolerance: *display_tolerance
 
       out_of_school_children__one_year_before_the_official_primary_entry_age__female__number:
         title: Out-of-school girls one year before official primary entry age
@@ -397,6 +404,7 @@ tables:
         display:
           name: Girls
           numDecimalPlaces: 0
+          tolerance: *display_tolerance
 
       out_of_school_children__one_year_before_the_official_primary_entry_age__male__number:
         title: Out-of-school boys one year before official primary entry age
@@ -409,6 +417,7 @@ tables:
         display:
           name: Boys
           numDecimalPlaces: 0
+          tolerance: *display_tolerance
 
       out_of_school_youth_of_upper_secondary_school_age__both_sexes__number:
         title: Out-of-school children of upper secondary school age
@@ -421,6 +430,7 @@ tables:
         display:
           name: Upper secondary
           numDecimalPlaces: 0
+          tolerance: *display_tolerance
 
       out_of_school_youth_of_upper_secondary_school_age__female__number:
         title: Out-of-school girls of upper secondary school age
@@ -433,6 +443,7 @@ tables:
         display:
           name: Girls
           numDecimalPlaces: 0
+          tolerance: *display_tolerance
 
       out_of_school_youth_of_upper_secondary_school_age__male__number:
         title: Out-of-school boys of upper secondary school age
@@ -445,6 +456,7 @@ tables:
         display:
           name: Boys
           numDecimalPlaces: 0
+          tolerance: *display_tolerance
 
       # ========================================================================
       # EDUCATIONAL ATTAINMENT (mean years of schooling and gender parity)

@@ -21,7 +21,7 @@ definitions:
       timeTolerance: 10
       colorScale:
         binningStrategy: manual
-        customNumericValues: [0,10,20,30,40,50,60,70,80,90,100]
+        customNumericValues: [0,10,20,30,40,50,60,70,80,90,100,100]
         baseColorScheme: PuBuGn
 
   gdp: Gross domestic product (GDP) is a measure of the total value added from the production of goods and services in a country or region each year.
@@ -964,7 +964,7 @@ tables:
         display:
           numDecimalPlaces: 1
           tolerance: 5
-          name: Pre-primary education
+          name: Pre-primary
 
       se_prm_tcaq_zs:
         title: Trained teachers in primary education (% of total teachers)
@@ -980,7 +980,7 @@ tables:
         display:
           numDecimalPlaces: 1
           tolerance: 5
-          name: Primary education
+          name: Primary
 
       se_sec_tcaq_lo_zs:
         title: Trained teachers in lower secondary education (% of total teachers)
@@ -996,7 +996,7 @@ tables:
         display:
           numDecimalPlaces: 1
           tolerance: 5
-          name: Lower secondary education
+          name: Lower secondary
 
       se_sec_tcaq_up_zs:
         title: Trained teachers in upper secondary education (% of total teachers)
@@ -1012,4 +1012,4 @@ tables:
         display:
           numDecimalPlaces: 1
           tolerance: 5
-          name: Upper secondary education
+          name: Upper secondary

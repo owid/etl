@@ -31,7 +31,7 @@ definitions:
   # VALUE RANGES (BINS) FOR DIFFERENT INDICATOR TYPES
   # ============================================================================
 
-  enrolment_rate_bins: &enrolment_rate_bins [0,10,20,30,40,50,60,70,80,90,100]
+  enrolment_rate_bins: &enrolment_rate_bins [0,10,20,30,40,50,60,70,80,90,100,100]
   expenditure_bins: &expenditure_bins [1,2,3,4,5,6,7,8]
   expenditure_total_bins: &expenditure_total_bins [0,4,8,12,16,20,24]
   per_student_spending_bins: &per_student_spending_bins [500, 1000, 5000, 10000,15000,20000,25000]
@@ -66,7 +66,7 @@ definitions:
       <<: *common_grapher_map_config
       colorScale:
         binningStrategy: manual
-        customNumericValues: [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50]
+        customNumericValues: [0, 10, 20, 30, 40, 50, 60, 60]
         baseColorScheme: Reds
 
   grapher_completion: &grapher_completion
@@ -170,7 +170,7 @@ definitions:
   # QUALIFIED TEACHERS CONFIGURATIONS
   # ============================================================================
 
-  qualified_teachers_bins: &qualified_teachers_bins [10,20,30,40,50,60,70,80,90,100]
+  qualified_teachers_bins: &qualified_teachers_bins [0,10,20,30,40,50,60,70,80,90,100]
 
   grapher_config_qualified_teachers: &grapher_config_qualified_teachers
     <<: *common_grapher_config
@@ -229,9 +229,9 @@ definitions:
 
   description_key_out_school: &description_key_out_school
     - Many children and adolescents around the world are not in school, even though they are old enough to be. This indicator shows how many are missing out on education at each stage of the system.
-    - It measures the share of individuals in the official age range for a given level of education who are not enrolled at that level or in any higher level.
+    - It measures the share of individuals in the official age range for a given level of education who are not enrolled at that level of education.
     - These children or adolescents may have never entered school, may have dropped out, or may be starting later than expected.
-    - The indicator is calculated by subtracting the number of enrolled individuals in a specific age group from the total population of that group, and expressing the result as a percentage.
+    - A share of 10% for children out of primary school means that 90% of all 6- to 11-year-olds are enrolled in primary education.
     - High out-of-school rates signal barriers to access — such as poverty, gender inequality, location, or limited availability of schools — and highlight where more targeted support is needed.
     - The data comes from administrative school enrolment records and household surveys, which provide age-specific insights when compared to population estimates.
     - As with all education data, results should be interpreted carefully. Differences in how enrolment is defined, inconsistencies in age reporting, and timing of data collection (such as during holidays or late in the school year) can affect accuracy.
@@ -524,6 +524,7 @@ tables:
         display:
           name: Primary school age
           numDecimalPlaces: 1
+          tolerance: *display_tolerance
 
       out_of_school_rate_for_adolescents_of_lower_secondary_school_age__both_sexes__pct__rofst_2_cp:
         title: Out-of-school rate for adolescents of lower secondary school age
@@ -537,6 +538,7 @@ tables:
         display:
           name: Lower secondary school age
           numDecimalPlaces: 1
+          tolerance: *display_tolerance
 
       out_of_school_rate_for_children_of_primary_school_age__female__pct__rofst_1_f_cp:
         title: Out-of-school rate for girls of primary school age
@@ -550,6 +552,7 @@ tables:
         display:
           name: Girls
           numDecimalPlaces: 1
+          tolerance: *display_tolerance
 
       out_of_school_rate_for_children_of_primary_school_age__male__pct__rofst_1_m_cp:
         title: Out-of-school rate for boys of primary school age
@@ -563,6 +566,7 @@ tables:
         display:
           name: Boys
           numDecimalPlaces: 1
+          tolerance: *display_tolerance
 
       out_of_school_rate_for_adolescents_of_lower_secondary_school_age__female__pct__rofst_2_f_cp:
         title: Out-of-school rate for girls of lower secondary school age
@@ -576,6 +580,7 @@ tables:
         display:
           name: Girls
           numDecimalPlaces: 1
+          tolerance: *display_tolerance
 
       out_of_school_rate_for_adolescents_of_lower_secondary_school_age__male__pct__rofst_2_m_cp:
         title: Out-of-school rate for boys of lower secondary school age
@@ -589,6 +594,7 @@ tables:
         display:
           name: Boys
           numDecimalPlaces: 1
+          tolerance: *display_tolerance
 
       out_of_school_rate_for_youth_of_upper_secondary_school_age__both_sexes__pct__rofst_3_cp:
         title: Out-of-school rate for youth of upper secondary school age
@@ -602,6 +608,7 @@ tables:
         display:
           name: Upper secondary school age
           numDecimalPlaces: 1
+          tolerance: *display_tolerance
 
       out_of_school_rate_for_youth_of_upper_secondary_school_age__female__pct__rofst_3_f_cp:
         title: Out-of-school rate for girls of upper secondary school age
@@ -615,6 +622,7 @@ tables:
         display:
           name: Girls
           numDecimalPlaces: 1
+          tolerance: *display_tolerance
 
       out_of_school_rate_for_youth_of_upper_secondary_school_age__male__pct__rofst_3_m_cp:
         title: Out-of-school rate for boys of upper secondary school age
@@ -628,6 +636,7 @@ tables:
         display:
           name: Boys
           numDecimalPlaces: 1
+          tolerance: *display_tolerance
 
       out_of_school_rate_for_children_one_year_before_the_official_primary_entry_age__both_sexes__pct__rofst_agm1_cp:
         title: Out-of-school rate for children one year before official primary entry age
@@ -641,6 +650,7 @@ tables:
         display:
           name: Pre-primary age
           numDecimalPlaces: 1
+          tolerance: *display_tolerance
 
       out_of_school_rate_for_children_one_year_before_the_official_primary_entry_age__female__pct__rofst_agm1_f_cp:
         title: Out-of-school rate for girls one year before official primary entry age
@@ -654,6 +664,7 @@ tables:
         display:
           name: Girls
           numDecimalPlaces: 1
+          tolerance: *display_tolerance
 
       out_of_school_rate_for_children_one_year_before_the_official_primary_entry_age__male__pct__rofst_agm1_m_cp:
         title: Out-of-school rate for boys one year before official primary entry age
@@ -667,6 +678,7 @@ tables:
         display:
           name: Boys
           numDecimalPlaces: 1
+          tolerance: *display_tolerance
 
       # ========================================================================
       # BASIC SERVICES IN SCHOOLS

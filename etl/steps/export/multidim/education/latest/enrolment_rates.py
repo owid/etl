@@ -286,7 +286,7 @@ LEVEL_MAPPINGS = {
 
 NET_TEMPLATE = (
     "This is shown as the [net enrolment ratio](#dod:net-enrolment-ratio){suffix} — "
-    "the share of {subject} of official {level_dod} age who are enrolled in {level_plain} education."
+    "the share of {subject} of official {level_plain} age who are enrolled in {level_dod} education."
 )
 
 NET_GROUPED_TEMPLATE = (
@@ -451,8 +451,6 @@ def generate_subtitle_by_level(level, sex, enrolment_type):
 
 def edit_indicator_displays(view):
     """Edit display names and colors for the grouped views."""
-    if view.indicators.y is None:
-        return
 
     # Handle level side-by-side views (education levels)
     if view.matches(level="level_side_by_side"):
@@ -488,7 +486,7 @@ def edit_indicator_displays(view):
                     break
 
     # Handle sex side-by-side views (gender)
-    if view.matches(level="sex_side_by_side"):
+    if view.matches(sex="sex_side_by_side"):
         # Display name and color mappings for gender
         GENDER_CONFIG = {
             "male": {"name": "Boys", "color": COLOR_BOYS, "patterns": ["__male__", "_ma"]},
