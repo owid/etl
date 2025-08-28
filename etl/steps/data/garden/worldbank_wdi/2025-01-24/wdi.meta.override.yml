@@ -6,10 +6,10 @@ definitions:
     hasMapTab: true
     map:
       time: 2024
-      timeTolerance: 5
+      timeTolerance: 10
       colorScale:
         binningStrategy: manual
-        customNumericValues: [10,20,30,40,50,60,70,80,90,100]
+        customNumericValues: [0,10,20,30,40,50,60,70,80,90,100]
         baseColorScheme: Blues
 
   # Gross enrolment ratio configuration
@@ -18,10 +18,10 @@ definitions:
     hasMapTab: true
     map:
       time: 2024
-      timeTolerance: 5
+      timeTolerance: 10
       colorScale:
         binningStrategy: manual
-        customNumericValues: [0, 10,20,30,40,50,60,70,80,90,100]
+        customNumericValues: [0,10,20,30,40,50,60,70,80,90,100]
         baseColorScheme: PuBuGn
 
   gdp: Gross domestic product (GDP) is a measure of the total value added from the production of goods and services in a country or region each year.
@@ -59,11 +59,11 @@ definitions:
     We have also obtained [Our World in Data regional aggregations](https://ourworldindata.org/world-region-map-definitions) of these indicators by calculating a population-weighted average by region. You can see more information about the population data in [this dedicated article about sources](https://ourworldindata.org/population-sources).
 
   desc_key_ger: &desc_key_ger
-    - Not all students enrol in school at the same age. The gross enrolment ratio includes students enrolled in a certain level of education, regardless of whether they are within the expected age range for that level. It includes students who are younger or older than expected due to late entry, early entry, or grade repetition.
-    - It captures the total number of students enrolled at a specific education level, expressed as a percentage of the population in the official age group for that level. For example, if the official age group for upper secondary school is 15 to 17-year olds, the gross enrolment ratio compares total enrolment at that level (of any age) to the population of 15- to 17-year-olds.
-    - Values can be greater than 100% if students repeat grades or start a particular level of schooling late. For example, if the official age group for upper secondary school is 15 to 17-year olds, some 18- or 19 year olds might be included in the total if they started upper secondary school late.
-    - Similarly, a value of 100% does not necessarily mean all children within a particular age group are enrolled in school; some children could be out-of-school, but gross enrolment rates are boosted by older students being included.
-    - The data comes from administrative records, such as school enrolment reports, and from population estimates, usually provided by the United Nations or national sources.
+    - The gross enrollment ratio counts all students in a school level, no matter their age. This includes students who are younger or older than usual because they started late, started early, or repeated grades.
+    - It captures the total number of students enrolled at a specific education level, expressed as a percentage of the population in the official age group for that level. For example, if primary school is for 6- to 11-year-olds, the gross enrollment ratio compares total enrollment (of any age) to the population of 6- to 11-year-olds.
+    - Values can exceed 100% if students repeat grades or start late. For example, primary school might include some 12- or 13-year-olds who started late or repeated grades.
+    - A value of 100% does not necessarily mean all children in the age group are enrolled; some could be out of school, but the ratio is boosted by older students being included.
+    - The data comes from administrative records, such as school enrollment reports, and population estimates, usually from the United Nations or national sources.
 
   desc_key_trained_teachers: &desc_key_trained_teachers
    - Not all teachers receive the same level of preparation before entering the classroom. This indicator measures the percentage of teachers at each education level who have completed at least the minimum organized pedagogical training required for teaching at that level in their country.

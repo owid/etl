@@ -19,7 +19,14 @@ paths = PathFinder(__file__)
 # --------------------- #
 #   Constants & Config  #
 # --------------------- #
+# Color constants for education levels and gender
+COLOR_PREPRIMARY = "#D73C50"
+COLOR_PRIMARY = "#4C6A9C"
+COLOR_LOWER_SECONDARY = "#883039"
+COLOR_UPPER_SECONDARY = "#578145"
 
+COLOR_QUALIFIED = "#00847E"
+COLOR_TRAINED = "#E56E5A"
 # Standard columns present in all datasets
 ID_COLUMNS = ["country", "year"]
 
@@ -45,7 +52,6 @@ GROUPED_VIEW_CONFIG = MULTIDIM_CONFIG | {
     "tab": "chart",  # Default to chart view
     "yAxis": {"min": 0, "max": 100, "facetDomain": "independent"},  # Percentage scale
     "selectedFacetStrategy": "entity",  # Allow entity selection
-    "hideFacetControl": False,
     "addCountryMode": "add-country",  # Allow adding countries for easier comparison
 }
 
@@ -327,23 +333,40 @@ def generate_subtitle_by_dimensions(view):
 
 
 def edit_indicator_displays(view):
-    """Clean up indicator display names for better chart labels in grouped views.
+    """Clean up indicator display names and colors for better chart labels in grouped views.
 
-    Sets concise, readable names for indicators in grouped views:
-    - Level comparisons: "Primary", "Secondary", etc.
-    - Teacher type comparisons: "Qualified teachers", "Trained teachers"
+    Sets concise, readable names and appropriate colors for indicators in grouped views:
+    - Level comparisons: "Primary", "Secondary", etc. with level-specific colors
+    - Teacher type comparisons: "Qualified teachers", "Trained teachers" with type-specific colors
     """
+
+    # Color mappings for education levels
+    level_colors = {
+        "pre_primary": COLOR_PREPRIMARY,
+        "primary": COLOR_PRIMARY,
+        "lower_secondary": COLOR_LOWER_SECONDARY,
+        "upper_secondary": COLOR_UPPER_SECONDARY,
+    }
+
+    # Color mappings for teacher types
+    teacher_type_colors = {
+        "qualified": COLOR_QUALIFIED,
+        "trained": COLOR_TRAINED,
+    }
 
     for ind in view.indicators.y:
         if view.matches(level="level_side_by_side"):
-            # Education level comparison: use short education level names
+            # Education level comparison: use short education level names and colors
             for level, config in EDUCATION_LEVELS.items():
                 if level in ind.catalogPath:
-                    ind.display = {"name": config["display_name"]}
+                    ind.display = {"name": config["display_name"], "color": level_colors.get(level, COLOR_PRIMARY)}
                     break
         elif view.matches(teacher_type="teacher_type_side_by_side"):
-            # Teacher type comparison: use teacher type titles
-            for config in TEACHER_TYPES.values():  # Don't need the key, just configs
+            # Teacher type comparison: use teacher type titles and colors
+            for teacher_type, config in TEACHER_TYPES.items():
                 if config["catalog_key"] in ind.catalogPath:
-                    ind.display = {"name": config["title"]}
+                    ind.display = {
+                        "name": config["title"],
+                        "color": teacher_type_colors.get(teacher_type, COLOR_QUALIFIED),
+                    }
                     break

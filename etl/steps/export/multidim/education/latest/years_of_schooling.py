@@ -6,6 +6,17 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Color constants for education levels and gender
+COLOR_PREPRIMARY = "#D73C50"
+COLOR_PRIMARY = "#4C6A9C"
+COLOR_SECONDARY = "#578145"
+COLOR_TERTIARY = "#B16214"
+COLOR_ALL_LEVELS = "#6C7B7F"  # Gray color for "All levels"
+
+COLOR_BOYS = "#00847E"
+COLOR_GIRLS = "#E56E5A"
+
+
 MULTIDIM_CONFIG = {
     "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.008.json",
     "hasMapTab": True,
@@ -160,7 +171,6 @@ def run() -> None:
                     "hasMapTab": False,
                     "tab": "chart",
                     "selectedFacetStrategy": "entity",
-                    "hideFacetControl": False,
                 },
             },
             {
@@ -175,7 +185,6 @@ def run() -> None:
                     "tab": "chart",
                     "chartTypes": ["StackedArea"],
                     "selectedFacetStrategy": "entity",
-                    "hideFacetControl": False,
                 },
             },
         ]
@@ -196,7 +205,7 @@ def run() -> None:
 
         # Generate dynamic subtitle
         if level and metric_type:
-            view.config["subtitle"] = generate_subtitle_by_level(level, metric_type)
+            view.config["subtitle"] = generate_subtitle_by_level(level, metric_type, sex)
 
         if sex == "sex_side_by_side" or level == "level_side_by_side":
             view.metadata = {
@@ -332,8 +341,8 @@ def generate_title_by_gender_level_and_metric(sex, level, metric_type):
         return f"{metric_term} among {gender_term} in {level_term}"
 
 
-def generate_subtitle_by_level(level, metric_type):
-    """Generate subtitle based on education level and metric type with links."""
+def generate_subtitle_by_level(level, metric_type, sex=None):
+    """Generate subtitle based on education level, metric type, and gender with links."""
     # For expected years of schooling, get level-specific description
     if metric_type == "expected_years_schooling":
         metric_description = METRIC_DESCRIPTION_MAP[metric_type].get(level, "")
@@ -341,31 +350,63 @@ def generate_subtitle_by_level(level, metric_type):
             raise ValueError(f"Unknown education level for expected years of schooling: {level}")
         return metric_description
     else:
-        # For other metrics, use the general description
+        # For other metrics, use the general description and make it gender-specific if applicable
         metric_description = METRIC_DESCRIPTION_MAP.get(metric_type, "")
         if not metric_description:
             raise ValueError(f"Unknown metric type: {metric_type}")
+
+        # Make gender-specific adjustments for average_years_schooling and learning_adjusted_years_schooling
+        if (
+            sex
+            and sex in ["boys", "girls"]
+            and metric_type in ["average_years_schooling", "learning_adjusted_years_schooling"]
+        ):
+            if metric_type == "average_years_schooling":
+                if sex == "boys":
+                    return "Average years of formal education that men aged 25 and older have completed in their lifetime. This measures educational attainment of the adult male population and excludes time spent repeating grades."
+                elif sex == "girls":
+                    return "Average years of formal education that women aged 25 and older have completed in their lifetime. This measures educational attainment of the adult female population and excludes time spent repeating grades."
+            elif metric_type == "learning_adjusted_years_schooling":
+                if sex == "boys":
+                    return "[Learning-adjusted years of schooling](#dod:lays) for boys captures both educational quantity and quality by scaling expected schooling years based on how much male students actually learn."
+                elif sex == "girls":
+                    return "[Learning-adjusted years of schooling](#dod:lays) for girls captures both educational quantity and quality by scaling expected schooling years based on how much female students actually learn."
+
         return metric_description
 
 
 def edit_indicator_displays(view):
-    """Edit display names for the grouped views."""
-    if view.dimensions["level"] == "level_side_by_side":
-        assert view.indicators.y is not None
-        for indicator in view.indicators.y:
-            display_name = None
-            if "expectancy__primary" in indicator.catalogPath:
-                display_name = "Primary"
-            elif "expectancy__pre_primary" in indicator.catalogPath:
-                display_name = "Pre-primary"
-            elif "secondary" in indicator.catalogPath:
-                display_name = "Secondary"
-            elif "tertiary" in indicator.catalogPath:
-                display_name = "Tertiary"
-            elif "all" in indicator.catalogPath or "eys" in indicator.catalogPath or "mys" in indicator.catalogPath:
-                display_name = "All levels"
+    """Edit display names and colors for the grouped views."""
 
-            if display_name:
-                indicator.display = {
-                    "name": display_name,
-                }
+    # Handle level side-by-side views (education levels)
+    if view.dimensions["level"] == "level_side_by_side":
+        # Display name and color mappings for education levels
+        LEVEL_CONFIG = {
+            "pre_primary": {"name": "Pre-primary", "color": COLOR_PREPRIMARY, "patterns": ["expectancy__pre_primary"]},
+            "primary": {"name": "Primary", "color": COLOR_PRIMARY, "patterns": ["expectancy__primary"]},
+            "secondary": {"name": "Secondary", "color": COLOR_SECONDARY, "patterns": ["secondary"]},
+            "tertiary": {"name": "Tertiary", "color": COLOR_TERTIARY, "patterns": ["tertiary"]},
+        }
+
+        for indicator in view.indicators.y:
+            for level_key, config in LEVEL_CONFIG.items():
+                if any(pattern in indicator.catalogPath for pattern in config["patterns"]):
+                    indicator.display = {"name": config["name"], "color": config["color"]}
+                    break
+
+    # Handle sex side-by-side views (gender)
+    elif view.dimensions["sex"] == "sex_side_by_side":
+        # Display name and color mappings for gender
+        GENDER_CONFIG = {
+            "male": {"name": "Boys", "color": COLOR_BOYS, "patterns": ["__male__", "_ma"]},
+            "female": {"name": "Girls", "color": COLOR_GIRLS, "patterns": ["__female__", "_fe"]},
+        }
+
+        for indicator in view.indicators.y:
+            for gender_key, config in GENDER_CONFIG.items():
+                if any(
+                    pattern in indicator.catalogPath or indicator.catalogPath.endswith(pattern)
+                    for pattern in config["patterns"]
+                ):
+                    indicator.display = {"name": config["name"], "color": config["color"]}
+                    break

@@ -147,12 +147,12 @@ tables:
             hasMapTab: true
             map:
               time: 2024
-              timeTolerance: 5
+              timeTolerance: 10
               colorScale:
                 binningStrategy: manual
                 customNumericValues: [0,2,4,6,8,10,12,12]
                 baseColorScheme: Greens
         display:
           numDecimalPlaces: 1
-          tolerance: 5
+          tolerance: 10
           name: Boys

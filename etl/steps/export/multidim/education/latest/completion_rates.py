@@ -5,8 +5,7 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-# Detailed colors:
-COLOR_PREPRIMARY = "#D73C50"
+# Detailed colors
 COLOR_PRIMARY = "#4C6A9C"
 COLOR_LOWER_SECONDARY = "#883039"
 COLOR_UPPER_SECONDARY = "#578145"
@@ -31,7 +30,6 @@ GROUPED_VIEW_CONFIG = MULTIDIM_CONFIG | {
     "hasMapTab": False,
     "tab": "chart",
     "selectedFacetStrategy": "entity",
-    "hideFacetControl": False,
 }
 
 # Column filtering patterns
@@ -252,11 +250,9 @@ def generate_subtitle_by_level(view):
 
 def edit_indicator_displays(view):
     """Edit display names and colors for the grouped views."""
-    if view.indicators.y is None:
-        return
 
     # Handle level side-by-side views (education levels)
-    if view.dimensions.get("level") == "level_side_by_side":
+    if view.matches(level="level_side_by_side"):
         # Display name and color mappings for education levels
         LEVEL_CONFIG = {
             "primary": {"name": "Primary", "color": COLOR_PRIMARY},
@@ -271,11 +267,11 @@ def edit_indicator_displays(view):
                     break
 
     # Handle sex side-by-side views (gender)
-    elif view.dimensions.get("sex") == "sex_side_by_side":
+    elif view.matches(sex="sex_side_by_side"):
         # Display name and color mappings for gender
         GENDER_CONFIG = {
-            "f": {"name": "Girls", "color": COLOR_GIRLS},
-            "m": {"name": "Boys", "color": COLOR_BOYS},
+            "female": {"name": "Girls", "color": COLOR_GIRLS},
+            "male": {"name": "Boys", "color": COLOR_BOYS},
         }
 
         for indicator in view.indicators.y:

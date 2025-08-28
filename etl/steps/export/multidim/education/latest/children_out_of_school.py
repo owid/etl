@@ -10,6 +10,15 @@ paths = PathFinder(__file__)
 # --------------------- #
 #   Constants & Config  #
 # --------------------- #
+# Color constants for education levels and gender
+COLOR_PREPRIMARY = "#D73C50"
+COLOR_PRIMARY = "#4C6A9C"
+COLOR_LOWER_SECONDARY = "#883039"
+COLOR_UPPER_SECONDARY = "#578145"
+COLOR_TERTIARY = "#B16214"
+
+COLOR_BOYS = "#00847E"
+COLOR_GIRLS = "#E56E5A"
 
 ID_COLUMNS = ["country", "year"]
 
@@ -44,7 +53,6 @@ MULTIDIM_CONFIG = {
     "hasMapTab": True,
     "tab": "map",
     "addCountryMode": "add-country",
-    "hideFacetControl": False,
 }
 
 # Grouped view chart configuration
@@ -299,29 +307,28 @@ def generate_subtitle_by_dimensions(view):
 
 
 def edit_indicator_displays(view):
-    """Clean up indicator display names for grouped views."""
+    """Clean up indicator display names and colors for grouped views."""
 
     level_display = {
-        "pre_primary": "Pre-primary",
-        "primary": "Primary",
-        "lower_secondary": "Lower secondary",
-        "upper_secondary": "Upper secondary",
+        "pre_primary": {"name": "Pre-primary", "color": COLOR_PREPRIMARY},
+        "primary": {"name": "Primary", "color": COLOR_PRIMARY},
+        "lower_secondary": {"name": "Lower secondary", "color": COLOR_LOWER_SECONDARY},
+        "upper_secondary": {"name": "Upper secondary", "color": COLOR_UPPER_SECONDARY},
     }
 
     sex_display = {
-        "_male": "Boys",
-        "_female": "Girls",
-        "both": "Both genders",
+        "_male": {"name": "Boys", "color": COLOR_BOYS},
+        "_female": {"name": "Girls", "color": COLOR_GIRLS},
     }
 
     for ind in view.indicators.y:
         if view.matches(level="level_side_by_side"):
-            for k, v in level_display.items():
+            for k, config in level_display.items():
                 if k in ind.catalogPath:
-                    ind.display = {"name": v}
+                    ind.display = {"name": config["name"], "color": config["color"]}
                     break
         elif view.matches(sex="sex_side_by_side"):
-            for k, v in sex_display.items():
+            for k, config in sex_display.items():
                 if k in ind.catalogPath:
-                    ind.display = {"name": v}
+                    ind.display = {"name": config["name"], "color": config["color"]}
                     break

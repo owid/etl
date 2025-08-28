@@ -10,7 +10,8 @@ definitions:
         maxTime: 2024
         map:
           time: 2024
-          timeTolerance: 5
+          timeTolerance: 10
+  display_tolerance: &display_tolerance 10
 
   # ============================================================================
   # COMMON CONFIGURATION TEMPLATES
@@ -22,15 +23,15 @@ definitions:
     hasMapTab: true
   common_grapher_map_config: &common_grapher_map_config
     time: 2024
-    timeTolerance: 5
+    timeTolerance: 10
 
   # Value ranges for different indicator types
-  enrolment_rate_bins: &enrolment_rate_bins [10,20,30,40,50,60,70,80,90,100]
+  enrolment_rate_bins: &enrolment_rate_bins [0,10,20,30,40,50,60,70,80,90,100]
   gdp_share_bins: &gdp_share_bins [0,0.2,0.4,0.6,0.8,1,1.2,1.4,1.4]
-  school_life_expectancy_preprimary_bins: &school_life_expectancy_preprimary_bins [0.5,1,1.5,2,2.5,3,3.5,4]
-  school_life_expectancy_primary_bins: &school_life_expectancy_primary_bins [2,3,4,5,6,7,8,9]
-  school_life_expectancy_secondary_bins: &school_life_expectancy_secondary_bins [1,2,3,4,5,6,7,8]
-  school_life_expectancy_tertiary_bins: &school_life_expectancy_tertiary_bins [0.5,1,1.5,2,2.5,3,4,5]
+  school_life_expectancy_preprimary_bins: &school_life_expectancy_preprimary_bins [0,0.5,1,1.5,2,2.5,3,3.5,4]
+  school_life_expectancy_primary_bins: &school_life_expectancy_primary_bins [0,1,2,3,4,5,6,7,8,9]
+  school_life_expectancy_secondary_bins: &school_life_expectancy_secondary_bins [0,1,2,3,4,5,6,7,8]
+  school_life_expectancy_tertiary_bins: &school_life_expectancy_tertiary_bins [0,0.5,1,1.5,2,2.5,3,4,5]
   expenditure_bins_total: &expenditure_bins_total   [500000000, 1000000000, 5000000000, 10000000000, 50000000000, 100000000000, 500000000000, 1000000000000]
   expenditure_bins_by_level: &expenditure_bins_by_level   [500000000, 1000000000, 5000000000, 10000000000, 50000000000, 100000000000]
 
@@ -214,19 +215,18 @@ definitions:
 
   # Enrollment and attendance descriptions
   desc_key_net_enr: &desc_key_net_enr
-    - The net enrolment rate shows what percentage of children are enrolled at the education level intended for their age. Unlike gross enrolment, it only counts students who are within the official age range for that level.
-    - It compares children enrolled at the correct level for their age to the total population in that same age group. For example, if primary education is for ages 6 to 11, it measures how many 6- to 11-year-olds are actually enrolled in primary school.
+    - The net enrolment rate shows what percentage of children are enrolled at the education level intended for their age.
+    - It compares children enrolled at the correct level for their age to the total population in that same age group. For example, a primary school net enrolment of 90% means 90% of children between the ages of 6 and 11 years are enrolled in primary school. Children who are not enrolled in school or are enrolled at another education level (pre-primary school) are not counted here.
     - The highest possible value is 100%, which would mean all children of the right age are enrolled where they should be. High rates indicate that most children are progressing through school at the expected pace.
-    - Values cannot exceed 100% because it excludes over-age and under-age students. However, small discrepancies between enrolment records and population data can occasionally push rates slightly above 100%.
     - A rate of 90% doesn't necessarily mean 10% of children are out of school entirely — some may be enrolled at different levels (either higher or lower) than expected for their age, but these students aren't counted in the net rate.
     - The data comes from school administrative records that track enrolment by individual age, combined with population estimates from national statistics offices or UN sources.
 
   desc_key_ger: &desc_key_ger
-    - Not all students enrol in school at the same age. The gross enrolment ratio includes students enrolled in a certain level of education, regardless of whether they are within the expected age range for that level. It includes students who are younger or older than expected due to late entry, early entry, or grade repetition.
-    - It captures the total number of students enrolled at a specific education level, expressed as a percentage of the population in the official age group for that level. For example, if the official age group for upper secondary school is 15 to 17-year olds, the gross enrolment ratio compares total enrolment at that level (of any age) to the population of 15- to 17-year-olds.
-    - Values can be greater than 100% if students repeat grades or start a particular level of schooling late. For example, if the official age group for upper secondary school is 15 to 17-year olds, some 18- or 19 year olds might be included in the total if they started upper secondary school late.
-    - Similarly, a value of 100% does not necessarily mean all children within a particular age group are enrolled in school; some children could be out-of-school, but gross enrolment rates are boosted by older students being included.
-    - The data comes from administrative records, such as school enrolment reports, and from population estimates, usually provided by the United Nations or national sources.
+    - The gross enrollment ratio counts all students in a school level, no matter their age. This includes students who are younger or older than usual because they started late, started early, or repeated grades.
+    - It captures the total number of students enrolled at a specific education level, expressed as a percentage of the population in the official age group for that level. For example, if primary school is for 6- to 11-year-olds, the gross enrollment ratio compares total enrollment (of any age) to the population of 6- to 11-year-olds.
+    - Values can exceed 100% if students repeat grades or start late. For example, primary school might include some 12- or 13-year-olds who started late or repeated grades.
+    - A value of 100% does not necessarily mean all children in the age group are enrolled; some could be out of school, but the ratio is boosted by older students being included.
+    - The data comes from administrative records, such as school enrollment reports, and population estimates, usually from the United Nations or national sources.
 
   # Educational attainment descriptions
   desc_key_mye: &desc_key_mye
@@ -252,6 +252,7 @@ definitions:
     - High out-of-school rates signal barriers to access — such as poverty, gender inequality, location, or limited availability of schools — and highlight where more targeted support is needed.
     - The data comes from administrative school enrolment records and household surveys, which provide age-specific insights when compared to population estimates.
     - As with all education data, results should be interpreted carefully. Differences in how enrolment is defined, inconsistencies in age reporting, and timing of data collection (such as during holidays or late in the school year) can affect accuracy.
+
   # Education system descriptions
   desc_key_private_enrolment: &desc_key_private_enrolment
     - In many countries, education is provided not only by the government but also by private institutions — this indicator shows how much of total enrolment is taking place in privately run schools or educational programmes.
@@ -705,7 +706,7 @@ tables:
         description_key: *desc_key_female_teachers
         display:
           numDecimalPlaces: 1
-          tolerance: 10
+          tolerance: *display_tolerance
         presentation:
           grapher_config: *female_teachers_grapher_config
 
@@ -717,7 +718,7 @@ tables:
         description_key: *desc_key_female_teachers
         display:
           numDecimalPlaces: 1
-          tolerance: 10
+          tolerance: *display_tolerance
         presentation:
           grapher_config: *female_teachers_grapher_config
 
@@ -729,7 +730,7 @@ tables:
         description_key: *desc_key_female_teachers
         display:
           numDecimalPlaces: 1
-          tolerance: 10
+          tolerance: *display_tolerance
         presentation:
           grapher_config: *female_teachers_grapher_config
 
@@ -1162,7 +1163,7 @@ tables:
           grapher_config: *grapher_config_gdp_share
         display:
           numDecimalPlaces: 1
-          tolerance: 10
+          tolerance: *display_tolerance
 
       government_expenditure_on_primary_education_as_a_percentage_of_gdp__pct:
         title: Government spending on primary education as share of GDP
@@ -1175,7 +1176,7 @@ tables:
           grapher_config: *grapher_config_gdp_share
         display:
           numDecimalPlaces: 1
-          tolerance: 10
+          tolerance: *display_tolerance
 
       government_expenditure_on_lower_secondary_education_as_a_percentage_of_gdp__pct:
         title: Government spending on lower secondary education as share of GDP
@@ -1188,7 +1189,7 @@ tables:
           grapher_config: *grapher_config_gdp_share
         display:
           numDecimalPlaces: 1
-          tolerance: 10
+          tolerance: *display_tolerance
 
       government_expenditure_on_upper_secondary_education_as_a_percentage_of_gdp__pct:
         title: Government spending on upper secondary education as share of GDP
@@ -1201,7 +1202,7 @@ tables:
           grapher_config: *grapher_config_gdp_share
         display:
           numDecimalPlaces: 1
-          tolerance: 10
+          tolerance: *display_tolerance
 
       government_expenditure_on_secondary_education_as_a_percentage_of_gdp__pct:
         title: Government spending on secondary education as share of GDP
@@ -1214,7 +1215,7 @@ tables:
           grapher_config: *grapher_config_gdp_share
         display:
           numDecimalPlaces: 1
-          tolerance: 10
+          tolerance: *display_tolerance
 
       government_expenditure_on_tertiary_education_as_a_percentage_of_gdp__pct:
         title: Government spending on tertiary education as share of GDP
@@ -1227,7 +1228,7 @@ tables:
           grapher_config: *grapher_config_gdp_share
         display:
           numDecimalPlaces: 1
-          tolerance: 10
+          tolerance: *display_tolerance
 
       # ========================================================================
       # GOVERNMENT EXPENDITURE IN CONSTANT PPP DOLLARS (by education level)
@@ -1245,7 +1246,7 @@ tables:
         display:
           numDecimalPlaces: 0
           name: Pre-primary
-          tolerance: 10
+          tolerance: *display_tolerance
 
       government_expenditure_on_primary_education__constant_pppdollar__millions:
         title: Government spending on primary education
@@ -1259,7 +1260,7 @@ tables:
         display:
           numDecimalPlaces: 0
           name: Primary
-          tolerance: 10
+          tolerance: *display_tolerance
 
       government_expenditure_on_lower_secondary_education__constant_pppdollar__millions:
         title: Government spending on lower secondary education
@@ -1273,7 +1274,7 @@ tables:
         display:
           numDecimalPlaces: 0
           name: Lower secondary
-          tolerance: 10
+          tolerance: *display_tolerance
 
       government_expenditure_on_upper_secondary_education__constant_pppdollar__millions:
         title: Government spending on upper secondary education
@@ -1287,7 +1288,7 @@ tables:
         display:
           numDecimalPlaces: 0
           name: Upper secondary
-          tolerance: 10
+          tolerance: *display_tolerance
 
       government_expenditure_on_tertiary_education__constant_pppdollar__millions:
         title: Government spending on tertiary education
@@ -1301,7 +1302,7 @@ tables:
         display:
           numDecimalPlaces: 0
           name: Tertiary
-          tolerance: 10
+          tolerance: *display_tolerance
 
       government_expenditure_on_education__constant_pppdollar__millions:
         title: Government spending on education
@@ -1315,7 +1316,8 @@ tables:
         display:
           numDecimalPlaces: 0
           name: Total across all levels
-          tolerance: 10
+          tolerance: *display_tolerance
+
 
       government_expenditure_on_education__pppdollar__millions:
         title: Government spending on education in purchasing power parity (PPP) dollars
@@ -1325,7 +1327,8 @@ tables:
         description_key: *desc_key_govt_expenditure_constant_ppp
         display:
           numDecimalPlaces: 0
-          tolerance: 10
+          tolerance: *display_tolerance
+
 
       # ========================================================================
       # GOVERNMENT EXPENDITURE IN CONSTANT PPP DOLLARS PER STUDENT (by education level)
@@ -1344,4 +1347,5 @@ tables:
         display:
           numDecimalPlaces: 0
           name: Total across all levels
-          tolerance: 10
+          tolerance: *display_tolerance
+

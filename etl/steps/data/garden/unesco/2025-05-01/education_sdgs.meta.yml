@@ -10,7 +10,7 @@ definitions:
         maxTime: 2024
         map:
           time: 2024
-          timeTolerance: 5
+          timeTolerance: 10
 
   display_tolerance: &display_tolerance 10
 
@@ -25,18 +25,17 @@ definitions:
 
   common_grapher_map_config: &common_grapher_map_config
     time: 2024
-    timeTolerance: 5
+    timeTolerance: 10
 
   # ============================================================================
   # VALUE RANGES (BINS) FOR DIFFERENT INDICATOR TYPES
   # ============================================================================
 
-  enrolment_rate_bins: &enrolment_rate_bins [10,20,30,40,50,60,70,80,90,100]
-  tertiary_enrollment_bins: &tertiary_enrollment_bins [5,10,20,30,40,50,60,80]
+  enrolment_rate_bins: &enrolment_rate_bins [0,10,20,30,40,50,60,70,80,90,100]
   expenditure_bins: &expenditure_bins [1,2,3,4,5,6,7,8]
   expenditure_total_bins: &expenditure_total_bins [0,4,8,12,16,20,24]
   per_student_spending_bins: &per_student_spending_bins [500, 1000, 5000, 10000,15000,20000,25000]
-  literacy_rate_bins: &literacy_rate_bins [10,20,30,40,50,60,70,80,90,100]
+  literacy_rate_bins: &literacy_rate_bins [0,10,20,30,40,50,60,70,80,90,100]
 
   # ============================================================================
   # ENROLLMENT CONFIGURATIONS (Primary, Secondary, Pre-primary)
@@ -199,18 +198,18 @@ definitions:
    - A higher percentage means a larger share of national resources is allocated to education, which may indicate political commitment or policy prioritization. But it doesn’t necessarily mean higher spending per student or better outcomes. Countries with lower GDPs might have high percentages but limited resources in absolute terms.
    - This indicator is useful for understanding how education fits within the broader picture of government spending and national development. It should be interpreted alongside measures like per-student spending and enrolment rates.
 
+  # Enrollment and attendance descriptions
   desc_key_ger: &desc_key_ger
-    - Not all students enrol in school at the same age. The gross enrolment ratio includes students enrolled in a certain level of education, regardless of whether they are within the expected age range for that level. It includes students who are younger or older than expected due to late entry, early entry, or grade repetition.
-    - It captures the total number of students enrolled at a specific education level, expressed as a percentage of the population in the official age group for that level. For example, if the official age group for upper secondary school is 15 to 17-year olds, the gross enrolment ratio compares total enrolment at that level (of any age) to the population of 15- to 17-year-olds.
-    - Values can be greater than 100% if students repeat grades or start a particular level of schooling late. For example, if the official age group for upper secondary school is 15 to 17-year olds, some 18- or 19 year olds might be included in the total if they started upper secondary school late.
-    - Similarly, a value of 100% does not necessarily mean all children within a particular age group are enrolled in school; some children could be out-of-school, but gross enrolment rates are boosted by older students being included.
-    - The data comes from administrative records, such as school enrolment reports, and from population estimates, usually provided by the United Nations or national sources.
+    - The gross enrollment ratio counts all students in a school level, no matter their age. This includes students who are younger or older than usual because they started late, started early, or repeated grades.
+    - It captures the total number of students enrolled at a specific education level, expressed as a percentage of the population in the official age group for that level. For example, if primary school is for 6- to 11-year-olds, the gross enrollment ratio compares total enrollment (of any age) to the population of 6- to 11-year-olds.
+    - Values can exceed 100% if students repeat grades or start late. For example, primary school might include some 12- or 13-year-olds who started late or repeated grades.
+    - A value of 100% does not necessarily mean all children in the age group are enrolled; some could be out of school, but the ratio is boosted by older students being included.
+    - The data comes from administrative records, such as school enrollment reports, and population estimates, usually from the United Nations or national sources.
 
   desc_key_net_enr: &desc_key_net_enr
-    - The net enrolment rate shows what percentage of children are enrolled at the education level intended for their age. Unlike gross enrolment, it only counts students who are within the official age range for that level.
-    - It compares children enrolled at the correct level for their age to the total population in that same age group. For example, if primary education is for ages 6 to 11, it measures how many 6- to 11-year-olds are actually enrolled in primary school.
+    - The net enrolment rate shows what percentage of children are enrolled at the education level intended for their age.
+    - It compares children enrolled at the correct level for their age to the total population in that same age group. For example, a primary school net enrolment of 90% means 90% of children between the ages of 6 and 11 years are enrolled in primary school. Children who are not enrolled in school or are enrolled at another education level (pre-primary school) are not counted here.
     - The highest possible value is 100%, which would mean all children of the right age are enrolled where they should be. High rates indicate that most children are progressing through school at the expected pace.
-    - Values cannot exceed 100% because it excludes over-age and under-age students. However, small discrepancies between enrolment records and population data can occasionally push rates slightly above 100%.
     - A rate of 90% doesn't necessarily mean 10% of children are out of school entirely — some may be enrolled at different levels (either higher or lower) than expected for their age, but these students aren't counted in the net rate.
     - The data comes from school administrative records that track enrolment by individual age, combined with population estimates from national statistics offices or UN sources.
 
