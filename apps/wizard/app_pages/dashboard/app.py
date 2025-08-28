@@ -46,7 +46,7 @@ log = get_logger()
 ########################################
 # HEADER: title, description
 ########################################
-st_title_with_expert("Step upgrader", icon=":material/tv_gen:")
+st_title_with_expert("Step upgrader", icon=":material/upgrade:")
 
 tutorial_html = f"""
 **Example:** Updating a specific Grapher dataset.
@@ -82,10 +82,8 @@ _ = check_db()
 
 # Load the steps dataframe.
 with st.spinner("Loading steps details from ETL and DB...", show_time=True):
-    steps_df = load_steps_df(reload_key=st.session_state["reload_key"])
-
-# Simplify the steps dataframe to show only the relevant columns.
-steps_info = _get_steps_info(steps_df)
+    # Also get simplified version, to show only the relevant columns.
+    steps_df, steps_info = load_steps_df(reload_key=st.session_state["reload_key"])
 
 
 ########################################
