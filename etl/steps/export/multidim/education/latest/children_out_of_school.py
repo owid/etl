@@ -146,10 +146,26 @@ def run() -> None:
     )
 
     for view in collection.views:
+        # Update title and subtitle based on view dimensions
+        sex = view.dimensions["sex"]
+        level = view.dimensions["level"]
         # Set view metadata for all views
-        view.metadata = {
-            "description_short": view.config["subtitle"],
-        }
+        if sex == "sex_side_by_side" or level == "level_side_by_side":
+            view.metadata = {
+                "description_from_producer": "",
+                "description_short": view.config["subtitle"],
+                "presentation": {
+                    "title_public": view.config["title"],
+                },
+            }
+        else:
+            # Only updated description_short for other views
+            view.metadata = {
+                "description_short": view.config["subtitle"],
+                "presentation": {
+                    "title_public": view.config["title"],
+                },
+            }
         edit_indicator_displays(view)
 
     collection.save()

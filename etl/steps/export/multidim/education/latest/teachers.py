@@ -148,6 +148,17 @@ def run() -> None:
 
     # Clean up indicator display names for better chart labels and set view metadata
     for view in collection.views:
+        level = view.dimensions["level"]
+        teacher_type = view.dimensions["teacher_type"]
+        if level == "level_side_by_side" or teacher_type == "teacher_type_side_by_side":
+            view.metadata = {
+                "description_from_producer": "",
+                "description_short": view.config["subtitle"],
+                "presentation": {
+                    "title_public": view.config["title"],
+                },
+            }
+
         edit_indicator_displays(view)
 
     collection.save()

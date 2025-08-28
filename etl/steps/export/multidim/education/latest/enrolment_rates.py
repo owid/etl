@@ -172,6 +172,9 @@ def run() -> None:
             # Only updated description_short for other views
             view.metadata = {
                 "description_short": view.config["subtitle"],
+                "presentation": {
+                    "title_public": view.config["title"],
+                },
             }
 
         edit_indicator_displays(view)

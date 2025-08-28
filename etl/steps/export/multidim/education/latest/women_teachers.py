@@ -81,6 +81,16 @@ def run() -> None:
     create_grouped_views(collection)
 
     for view in collection.views:
+        level = view.dimensions["level"]
+        if level == "level_side_by_side":
+            view.metadata = {
+                "description_from_producer": "",
+                "description_short": view.config["subtitle"],
+                "presentation": {
+                    "title_public": view.config["title"],
+                },
+            }
+
         edit_indicator_displays(view)
 
     collection.save()
