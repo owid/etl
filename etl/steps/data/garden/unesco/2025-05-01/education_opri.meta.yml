@@ -26,17 +26,18 @@ definitions:
     timeTolerance: 10
 
   # Value ranges for different indicator types
-  enrolment_rate_bins: &enrolment_rate_bins [0,10,20,30,40,50,60,70,80,90,100,100]
-  gdp_share_bins: &gdp_share_bins [0,0.2,0.4,0.6,0.8,1,1.2,1.4,1.4]
-  school_life_expectancy_preprimary_bins: &school_life_expectancy_preprimary_bins [0,0.5,1,1.5,2,2.5,3,3.5,4]
-  school_life_expectancy_primary_bins: &school_life_expectancy_primary_bins [0,1,2,3,4,5,6,7,8,9]
-  school_life_expectancy_secondary_bins: &school_life_expectancy_secondary_bins [0,1,2,3,4,5,6,7,8]
-  school_life_expectancy_tertiary_bins: &school_life_expectancy_tertiary_bins [0,0.5,1,1.5,2,2.5,3,4,5]
-  expenditure_bins_total: &expenditure_bins_total   [500000000, 1000000000, 5000000000, 10000000000, 50000000000, 100000000000, 500000000000, 1000000000000]
-  expenditure_bins_by_level: &expenditure_bins_by_level   [500000000, 1000000000, 5000000000, 10000000000, 50000000000, 100000000000]
+  enrolment_rate_bins: &enrolment_rate_bins [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 1]
+  gdp_share_bins: &gdp_share_bins [0, 0.2, 0.4, 0.6, 0.8, 1, 1.2, 1.4, 1.4, 1]
+  school_life_expectancy_preprimary_bins: &school_life_expectancy_preprimary_bins [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 1]
+  school_life_expectancy_primary_bins: &school_life_expectancy_primary_bins [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 1]
+  school_life_expectancy_secondary_bins: &school_life_expectancy_secondary_bins [0, 1, 2, 3, 4, 5, 6, 7, 8, 1]
+  school_life_expectancy_tertiary_bins: &school_life_expectancy_tertiary_bins [0, 0.5, 1, 1.5, 2, 2.5, 3, 4, 5, 1]
+  expenditure_bins_total: &expenditure_bins_total   [0,500000000, 1000000000, 5000000000, 10000000000, 50000000000, 100000000000, 500000000000, 1000000000000, 1]
+  expenditure_bins_by_level: &expenditure_bins_by_level   [0,500000000, 1000000000, 5000000000, 10000000000, 50000000000, 100000000000, 1]
 
   # Per-student spending bins (in international dollars per student)
-  per_student_spending_bins: &per_student_spending_bins [500, 1000, 5000, 10000,15000,20000,25000]
+  per_student_spending_bins: &per_student_spending_bins [0, 500, 1000, 5000, 10000, 15000, 20000, 25000, 1]
+  out_of_school_children_bins: &out_of_school_children_bins [0, 30000, 100000, 300000, 1000000, 3000000, 1]
 
   # Female teachers grapher configuration
   female_teachers_grapher_config: &female_teachers_grapher_config
@@ -107,8 +108,6 @@ definitions:
 
 
   # Out-of-school children configurations
-  out_of_school_children_bins: &out_of_school_children_bins [0, 30000, 100000, 300000, 1000000, 3000000, 1]
-
   grapher_config_out_of_school_children_reds: &grapher_config_out_of_school_children_reds
     <<: *common_grapher_config
     map:

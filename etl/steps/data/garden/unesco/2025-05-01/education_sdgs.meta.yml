@@ -31,12 +31,14 @@ definitions:
   # VALUE RANGES (BINS) FOR DIFFERENT INDICATOR TYPES
   # ============================================================================
 
-  enrolment_rate_bins: &enrolment_rate_bins [0,10,20,30,40,50,60,70,80,90,100,100]
-  expenditure_bins: &expenditure_bins [1,2,3,4,5,6,7,8]
-  expenditure_total_bins: &expenditure_total_bins [0,4,8,12,16,20,24]
-  per_student_spending_bins: &per_student_spending_bins [500, 1000, 5000, 10000,15000,20000,25000]
-  literacy_rate_bins: &literacy_rate_bins [0,10,20,30,40,50,60,70,80,90,100]
-
+  enrolment_rate_bins: &enrolment_rate_bins [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 1]
+  expenditure_bins: &expenditure_bins [0, 1, 2, 3, 4, 5, 6, 7, 8, 1]
+  expenditure_total_bins: &expenditure_total_bins [0, 4, 8, 12, 16, 20, 24, 1]
+  per_student_spending_bins: &per_student_spending_bins [0, 500, 1000, 5000, 10000, 15000, 20000, 25000, 1]
+  literacy_rate_bins: &literacy_rate_bins [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+  qualified_teachers_bins: &qualified_teachers_bins [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+  proficiency_rate_bins: &proficiency_rate_bins [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+  out_of_school_bins: &out_of_school_bins [0, 10, 20, 30, 40, 50, 60, 1]
   # ============================================================================
   # ENROLLMENT CONFIGURATIONS (Primary, Secondary, Pre-primary)
   # ============================================================================
@@ -66,7 +68,7 @@ definitions:
       <<: *common_grapher_map_config
       colorScale:
         binningStrategy: manual
-        customNumericValues: [0, 10, 20, 30, 40, 50, 60, 60]
+        customNumericValues: *out_of_school_bins
         baseColorScheme: Reds
 
   grapher_completion: &grapher_completion
@@ -75,7 +77,7 @@ definitions:
       <<: *common_grapher_map_config
       colorScale:
         binningStrategy: manual
-        customNumericValues: [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+        customNumericValues: *enrolment_rate_bins
         baseColorScheme: Greens
   # ============================================================================
   # EXPENDITURE CONFIGURATIONS
@@ -113,8 +115,6 @@ definitions:
   # ============================================================================
   # PROFICIENCY RATE CONFIGURATIONS
   # ============================================================================
-
-  proficiency_rate_bins: &proficiency_rate_bins [10,20,30,40,50,60,70,80,90,100]
 
   grapher_config_proficiency_reading: &grapher_config_proficiency_reading
     <<: *common_grapher_config
@@ -170,7 +170,6 @@ definitions:
   # QUALIFIED TEACHERS CONFIGURATIONS
   # ============================================================================
 
-  qualified_teachers_bins: &qualified_teachers_bins [0,10,20,30,40,50,60,70,80,90,100]
 
   grapher_config_qualified_teachers: &grapher_config_qualified_teachers
     <<: *common_grapher_config
@@ -999,7 +998,7 @@ tables:
         display:
           numDecimalPlaces: 1
           name: Total across all levels of education
-          tolerance: 10
+          tolerance: *display_tolerance
 
       combined_expenditure_share_gdp:
         title: Public spending on education as a share of GDP (historical and recent)
@@ -1021,7 +1020,7 @@ tables:
         display:
           numDecimalPlaces: 1
           name: Total across all levels of education
-          tolerance: 10
+          tolerance: *display_tolerance
 
       # ========================================================================
       # GOVERNMENT EXPENDITURE IN CONSTANT PPP DOLLARS PER STUDENT (by education level)
@@ -1039,7 +1038,7 @@ tables:
         display:
           numDecimalPlaces: 0
           name: Pre-primary
-          tolerance: 10
+          tolerance: *display_tolerance
 
       initial_government_funding_per_primary_student__constant_pppdollar__xunit_pppconst_1_fsgov_ffntr:
         title: Government spending on primary education per student
@@ -1053,7 +1052,7 @@ tables:
         display:
           numDecimalPlaces: 0
           name: Primary
-          tolerance: 10
+          tolerance: *display_tolerance
 
       initial_government_funding_per_lower_secondary_student__constant_pppdollar__xunit_pppconst_2_fsgov_ffntr:
         title: Government spending on lower secondary education per student
@@ -1067,7 +1066,7 @@ tables:
         display:
           numDecimalPlaces: 0
           name: Lower secondary
-          tolerance: 10
+          tolerance: *display_tolerance
 
       initial_government_funding_per_upper_secondary_student__constant_pppdollar__xunit_pppconst_3_fsgov_ffntr:
         title: Government spending on upper secondary education per student
@@ -1081,7 +1080,7 @@ tables:
         display:
           numDecimalPlaces: 0
           name: Upper secondary
-          tolerance: 10
+          tolerance: *display_tolerance
 
       initial_government_funding_per_tertiary_student__constant_pppdollar__xunit_pppconst_5t8_fsgov_ffntr:
         title: Government spending on tertiary education per student
@@ -1095,7 +1094,7 @@ tables:
         display:
           numDecimalPlaces: 0
           name: Tertiary
-          tolerance: 10
+          tolerance: *display_tolerance
 
       # ========================================================================
       # MINIMUM PROFICIENCY RATES - PREPARED FOR THE FUTURE (All Children)
