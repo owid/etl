@@ -185,6 +185,9 @@ def run() -> None:
 
         # Create a copy of the config to avoid shared references
         view.config = view.config.copy()
+        # Add footnote for gross enrolment ratio
+        if metric_type == "average_years_schooling":
+            view.config["note"] = "Formal education is [primary](#dod:primary-education) or higher."
 
         # Generate dynamic title
         if sex and level and metric_type:
@@ -333,8 +336,6 @@ def generate_title_by_gender_level_and_metric(sex, level, metric_type):
 
 
 def generate_subtitle_by_level(level, metric_type, sex=None):
-    """Generate OWID-style subtitle for education charts."""
-
     # Helper functions for subject terms
     def get_subject(sex_key, is_adult=False):
         if is_adult:
@@ -393,9 +394,8 @@ def generate_subtitle_by_level(level, metric_type, sex=None):
         # Specific education level
         else:
             level_link = LEVEL_MAPPINGS["subtitle"].get(level, level)
-            level_name = level_link.split("]")[0].replace("[", "") if "[" in level_link else level
             target = get_child_subject(sex) if sex in {"boys", "girls"} else "a child"
-            scope = f"in {level_name.lower()} education"
+            scope = f"in {level_link} education"
             return expected_description(target, scope)
 
 
