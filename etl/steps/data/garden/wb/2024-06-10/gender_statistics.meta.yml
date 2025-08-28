@@ -6,12 +6,11 @@ definitions:
         - Global Education
 
   desc_key_lays: &desc_key_lays
-    - Students around the world spend different amounts of time in school and receive a different quality of education while they’re there. This indicator combines both the quantity and quality of education into a single measure.
-    - It reflects the number of years of schooling that would be equivalent to those completed in a benchmark country, accounting for differences in learning achievement between education systems.
-    - The measure is calculated by multiplying average years of schooling by a learning adjustment factor, which compares a country's test performance to that of a high-performing benchmark country.
-    - Learning-adjusted years of schooling are derived using international assessments such as TIMSS (Trends in International Mathematics and Science Study), with learning productivity measured as test scores divided by years of schooling preceding the assessment. Since it relies on test scores from specific grades and subjects, it may not fully capture all aspects of education quality or learning across different areas of knowledge.
-    - A country with higher learning-adjusted years has either more years of schooling, better learning outcomes per year, or both.
-
+   - This indicator combines the quantity and quality of education into a single measure.
+   - It shows how many years of schooling in a high-performing system are equivalent to the education a student receives in their country.
+   - The calculation multiplies expected years of schooling by a learning adjustment factor based on international test performance.
+   - Countries are compared against a benchmark for advanced learning; higher-performing countries get higher adjustments, and lower-performing ones get lower adjustments.
+   - It captures both access to schooling and learning effectiveness, showing whether students spend time in school productively.
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
 dataset:

@@ -231,18 +231,19 @@ definitions:
 
   # Educational attainment descriptions
   desc_key_mye: &desc_key_mye
-    - Mean years of schooling shows the average number of years that adults in a country have spent in formal education, giving us a picture of how educated the population is overall.
-    - This number is calculated by asking adults about the highest level of school they completed, then figuring out how many years that typically takes. For example, someone who finished high school might have about 12 years of schooling.
-    - This indicator measures how much education adults have accumulated over their lifetimes, showing the results of past investments in schools and learning.
-    - The data comes from surveys and censuses where adults aged 25 and older report their educational background. Only formal schooling from primary school onwards is counted.
-    - Higher numbers mean adults in that country have generally stayed in school longer, showing stronger educational foundations. However, this doesn't tell us about the quality of education, learning outside of school, or whether younger people today are getting better education than the average suggests.
+    - This indicator shows the average number of years that adults in a country have spent in formal education.
+    - It reflects the overall educational attainment of the population based on what they have already completed
+    - The calculation converts each person's highest completed education level into years - for example, someone who finished high school counts as having roughly 12 years of schooling, while someone who never attended school counts as 0 years
+    - The data comes from censuses and surveys of adults aged 25 and older, including only formal education starting from primary school
+    - This indicator captures how much schooling adults have accumulated over their lifetimes, showing the results of past investments in education systems
+    - Higher values indicate a population with stronger educational foundations, but the measure does not account for education quality or informal learning
+    - The data may not reflect recent progress in countries with infrequent surveys or outdated census information
 
   desc_key_sle: &desc_key_sle
-    - Expected years of schooling estimates how long a child starting school today is likely to stay in education, assuming current enrollment patterns continue throughout their schooling years.
-    - It is calculated by combining enrollment rates at each level of education and age group, adjusted for the official age of attendance, resulting in the average number of years a child can expect to complete—including time spent repeating grades.
-    - The measure reflects access to education rather than completion or learning outcomes, and assumes current patterns remain stable over time.
-    - Expected years can be broken down into [pre-primary](#dod:pre-primary-education), [primary](#dod:primary-education), [secondary](#dod:secondary-education), and [tertiary](#dod:tertiary-education), showing the expected time spent at each stage.
-    - A higher value means students are expected to spend more time in school. For example, 2.5 years in pre-primary means most children will attend around 2.5 years of preschool; a country with 15 total expected years but only 0.5 in pre-primary likely has limited access to early childhood education.
+     - This indicator shows how many years a student starting school in that year is expected to spend in education.  It's based on the enrollment patterns observed in that country in that specific year.
+     - The calculation looks at how many students are enrolled at each age and education level, then estimates how long a new student would stay in school if those patterns continued. This includes time spent repeating grades, not just the official length of each school level.
+     - It measures participation in schooling - how long students are likely to stay in school - rather than whether they actually learn or graduate.
+     - Higher numbers mean students spend more years in school, either because the official school system is longer or because many students repeat grades.
 
   # Out-of-school descriptions
   desc_key_out_school: &desc_key_out_school
