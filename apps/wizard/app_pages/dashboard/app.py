@@ -9,7 +9,6 @@ from apps.wizard.app_pages.dashboard.preview import render_preview_list
 from apps.wizard.app_pages.dashboard.selection import render_selection_list
 from apps.wizard.app_pages.dashboard.utils import (
     _create_html_button,
-    _get_steps_info,
     check_db,
     load_steps_df,
     load_steps_df_to_display,
