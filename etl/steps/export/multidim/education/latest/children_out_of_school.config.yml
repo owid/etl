@@ -15,10 +15,10 @@ dimensions:
     choices:
       - slug: rate
         name: Share (%)
-        description: Percentage of children out of school in the relevant age group
+        description: Percentage of children who are not in school
       - slug: number
         name: Number
-        description: Total number of children out of school
+        description: Total number of children who are not in school
 
   - name: Education level
     slug: level

@@ -68,30 +68,35 @@ GROUPED_VIEW_CONFIG = MULTIDIM_CONFIG | {
 #      Dimensions       #
 # --------------------- #
 
+
 EDUCATION_LEVELS = {
     "primary": {
         "keywords": ["primary_school_age"],
         "display_name": "Primary education",
-        "title_term": "primary school age",
-        "age_range": "primary school age (typically 6–11 years)",
+        "title_term": "primary",
+        "age_range": "of primary school age (typically 6–11 years)",
+        "dod_term": "primary-education",
     },
     "lower_secondary": {
         "keywords": ["lower_secondary_school_age"],
         "display_name": "Lower secondary education",
-        "title_term": "lower secondary school age",
-        "age_range": "lower secondary school age (typically 12–14 years)",
+        "title_term": "lower secondary",
+        "age_range": "of lower secondary school age (typically 12–14 years)",
+        "dod_term": "lower-secondary-education",
     },
     "upper_secondary": {
         "keywords": ["upper_secondary_school_age"],
         "display_name": "Upper secondary education",
-        "title_term": "upper secondary school age",
-        "age_range": "upper secondary school age (typically 15–17 years)",
+        "title_term": "upper secondary",
+        "age_range": "of upper secondary school age (typically 15–17 years)",
+        "dod_term": "upper-secondary-education",
     },
     "pre_primary": {
         "keywords": ["one_year_before_the_official_primary_entry_age"],
         "display_name": "Pre-primary education",
-        "title_term": "pre-primary age",
+        "title_term": "pre-primary",
         "age_range": "one year before official primary entry age (typically age 5)",
+        "dod_term": "pre-primary-education",
     },
 }
 
@@ -108,21 +113,6 @@ GENDERS = {
     "male": "boys",
     "female": "girls",
     "sex_side_by_side": "boys and girls",
-}
-
-METRIC_TYPES = {
-    "rate": {
-        "title": "Share of children out of school",
-        "unit": "percent",
-        "y_axis": {"min": 0, "max": 100},
-        "description": "shown as a percentage of children in the relevant age group",
-    },
-    "number": {
-        "title": "Number of children out of school",
-        "unit": "children",
-        "y_axis": {"min": 0},
-        "description": "shown as the total number of children not enrolled in school",
-    },
 }
 
 
@@ -262,21 +252,38 @@ def generate_title_by_dimensions(view):
     metric = view.dimensions.get("metric_type", "rate")
     gender_term = GENDERS.get(sex, "children")
     level_cfg = EDUCATION_LEVELS.get(level, {})
-    age_term = level_cfg.get("title_term", level)
+    title_term = level_cfg.get("title_term", "")
 
-    if view.matches(level="level_side_by_side"):
+    # ---- RATE ----
+    if metric == "rate":
+        if view.matches(level="level_side_by_side"):
+            return f"{gender_term.title()} of official age for each level of education who are not in school"
         if view.matches(sex="sex_side_by_side"):
-            return f"{METRIC_TYPES[metric]['title']}, by education level and gender"
+            return f"Share of girls and boys who are not in {title_term} school"
         else:
-            return f"{METRIC_TYPES[metric]['title']} for {gender_term}, by education level"
-    elif view.matches(sex="sex_side_by_side"):
-        return f"{METRIC_TYPES[metric]['title']} for children of {age_term}, by gender"
+            return f"Share of {gender_term} who are not in {title_term} school"
+
+    # ---- NUMBER ----
     else:
-        return f"{METRIC_TYPES[metric]['title']} for {gender_term} of {age_term}"
+        if view.matches(level="level_side_by_side"):
+            return f"Number of {gender_term} of official age for each level of education who are not in school"
+        else:
+            return f"Number of {gender_term} who are not in {title_term} school"
+
+
+def _dod_link(level_cfg):
+    """Return markdown link [title_term](#dod:slug) if dod_term exists."""
+    title = level_cfg.get("title_term", "")
+    dod_term = level_cfg.get("dod_term")
+    if dod_term:
+        # Use first occurrence of the key term (primary / secondary etc.)
+        short_label = title.split(" school age")[0] if "school age" in title else title
+        return f"[{short_label}](#dod:{dod_term})"
+    return title
 
 
 def generate_subtitle_by_dimensions(view):
-    """Generate chart subtitle based on dimensions."""
+    """Generate chart subtitle with DOD links included."""
     level = view.dimensions.get("level", "primary")
     sex = view.dimensions.get("sex", "both")
     metric = view.dimensions.get("metric_type", "rate")
@@ -284,29 +291,41 @@ def generate_subtitle_by_dimensions(view):
     level_cfg = EDUCATION_LEVELS.get(level, {})
     gender_term = GENDERS.get(sex, "children")
     title_term = level_cfg.get("title_term", "")
+    age_range = level_cfg.get("age_range", "")
+    dod_link = _dod_link(level_cfg)
 
+    # Determine scope
+    term_lower = title_term.lower()
+    if "upper secondary" in term_lower:
+        scope = f"{dod_link}"
+    elif "lower secondary" in term_lower:
+        scope = f"{dod_link}"
+    elif "primary" in term_lower and "before" not in term_lower:
+        scope = f"{dod_link}"
+    elif "pre-primary" in term_lower:
+        scope = f"{dod_link}"
+    else:
+        scope = dod_link or title_term
+
+    # ---- RATE ----
     if metric == "rate":
         if view.matches(level="level_side_by_side"):
-            if sex == "both" or view.matches(sex="sex_side_by_side"):
-                return "Children across different education levels, shown as the share of children in the official age group for each level who are not enrolled."
-            else:
-                return f"{gender_term.title()} across different education levels, shown as the share of {gender_term} in the official age group for each level who are not enrolled."
+            return (
+                f"{gender_term.title()} of official age for each level of education not enrolled at that level of education, "
+                f"expressed as a percentage of the total population of {gender_term} in that age group."
+            )
         else:
-            if sex == "both" or view.matches(sex="sex_side_by_side"):
-                return f"Children not enrolled in {title_term}, expressed as the share of children in the official age group for that level."
-            else:
-                return f"{gender_term.title()} not enrolled in {title_term}, expressed as the share of {gender_term} in the official age group for that level."
-    else:  # number case
+            return (
+                f"{gender_term.title()} {age_range} not enrolled in {scope} education, "
+                f"expressed as a percentage of the total population of {gender_term} in that age group."
+            )
+
+    # ---- NUMBER ----
+    else:
         if view.matches(level="level_side_by_side"):
-            if sex == "both" or view.matches(sex="sex_side_by_side"):
-                return "The total number of children not enrolled in each level or in any higher level of education."
-            else:
-                return f"{gender_term.title()} across different education levels, shown as the total number of {gender_term} not enrolled in each level or in any higher level of education."
+            return f"{gender_term.title()} of official age for each level of education not enrolled in that level of education or higher."
         else:
-            if sex == "both" or view.matches(sex="sex_side_by_side"):
-                return f"The total number of children not enrolled in {title_term} or in any higher level of education."
-            else:
-                return f"The total number of {gender_term} not enrolled in {title_term} or in any higher level of education."
+            return f"{gender_term.title()} {age_range} not enrolled in {scope} education or higher."
 
 
 def edit_indicator_displays(view):
