@@ -1515,7 +1515,51 @@ def countries_to_income_mapping(ds_regions: Dataset, ds_income: Dataset):
     return countries_to_continent
 
 
-class TableWithRegions:
+def _load_ds_or_raise(ds_name: str, ds_path: Path, auto_load: bool) -> Dataset:
+    if auto_load:
+        # Auto-load from default location (for standalone usage).
+        return Dataset(ds_path)
+    else:
+        # For ETL work, raise an error if the dataset is not among dependencies of the current step.
+        raise ValueError(
+            f"{ds_name} dataset could not be loaded. If this is part of an ETL step, add the latest version of the dataset to the list of dependencies."
+        )
+
+
+class RegionAggregator:
+    """Manages operations on tables that have, or need to have, region aggregates.
+
+    ####################################################################################################################
+    # WARNING: This tool is under development, don't start using it just yet!
+    ####################################################################################################################
+
+    The aggregator is typically created through the `Regions.create_region_aggregator()` method, which pre-configures it with the necessary inputs.
+
+    Parameters
+    ----------
+    ds_regions : Dataset
+        Regions dataset.
+    ds_income_groups : Dataset, optional
+        Income groups dataset.
+    ds_population : Dataset, optional
+        Population dataset.
+    regions_all : list of str
+        Complete list of all regions (continents, aggregates, income groups, and the World) defined in the regions dataset.
+    aggregations : dict of {str: Any}, optional
+        Mapping of column names to aggregation methods (e.g., 'sum', 'mean'). If None, defaults to 'sum' for all non-index columns.
+    regions : list of str or dict of {str: Any}, optional
+        Specific regions to include in aggregations. If None, uses default regions (continents and income groups).
+    index_columns : list of str, optional
+        Names of index columns. If None, defaults to [country_col, year_col].
+    country_col : str, default 'country'
+        Name of the country column in the data.
+    year_col : str, default 'year'
+        Name of the year column in the data.
+    population_col : str, default 'population'
+        Name of the population column.
+
+    """
+
     def __init__(
         self,
         ds_regions: Dataset,
@@ -1529,12 +1573,12 @@ class TableWithRegions:
         year_col: str = "year",
         population_col: str = "population",
     ):
-        self.ds_regions = ds_regions
-        self.ds_income_groups = ds_income_groups
+        self._ds_regions = ds_regions
+        self._ds_income_groups = ds_income_groups
+        self._ds_population = ds_population
         self.aggregations = aggregations
         self.regions = regions
         self.regions_all = regions_all
-        self.ds_population = ds_population
         self.country_col = country_col
         self.year_col = year_col
         self.population_col = population_col
@@ -1549,6 +1593,33 @@ class TableWithRegions:
             self.index_columns = [self.country_col, self.year_col]
         else:
             self.index_columns = index_columns
+
+    @property
+    def ds_regions(self) -> Dataset:
+        """Regions dataset."""
+        if self._ds_regions is None:
+            self._ds_regions = _load_ds_or_raise(
+                ds_name="Regions", ds_path=LATEST_REGIONS_DATASET_PATH, auto_load=False
+            )
+        return self._ds_regions
+
+    @property
+    def ds_income_groups(self) -> Dataset | None:
+        """Income groups dataset."""
+        if self._ds_income_groups is None:
+            self._ds_income_groups = _load_ds_or_raise(
+                ds_name="Income groups", ds_path=LATEST_INCOME_DATASET_PATH, auto_load=False
+            )
+        return self._ds_income_groups
+
+    @property
+    def ds_population(self) -> Dataset | None:
+        """Population dataset."""
+        if self._ds_population is None:
+            self._ds_population = _load_ds_or_raise(
+                ds_name="Population", ds_path=LATEST_POPULATION_DATASET_PATH, auto_load=False
+            )
+        return self._ds_population
 
     def _create_coverage_table(
         self, tb: Table, columns: list[str] | None = None, reference_column: str | None = None
@@ -1643,15 +1714,6 @@ class TableWithRegions:
             True to construct per-capita indicators of regions taking into account the data coverage of that region each year. For example, if "Africa" is among countries, the population of Africa will be calculated, for each indicator, based on the African countries informed each year for that indicator. Otherwise, if only_informed_countries_in_regions is False, the indicator will be divided by the entire population of Africa each year, regardless of data coverage.
         columns : list[str] or None
             Columns to convert to per-capita. If None, all columns except country and year will be used.
-        index_columns : list[str] or None
-            Names of index columns (usually ["country", "year"]). Aggregations will be done on groups defined by these
-            columns (excluding the country column). A country and a year column should always be included.
-        population_col : str
-            Column name with population data. If it doesn't exist, it will be added (and if so, the population dataset should be among the dependencies of the current step).
-        country_col : str
-            Country column name expected in the table.
-        year_col : str
-            Year column name expected in the table.
         prefix : str
             Prefix to prepend to the original column names to create the name of the new per-capita column.
         suffix : str
@@ -1764,32 +1826,6 @@ class Regions:
     # WARNING: This tool is under development, don't start using it just yet!
     ####################################################################################################################
 
-    TODO:
-    * The main thing missing in the current implementation, to start adding significant value with respect to the status quo, is to keep track of informed countries when creating aggregates (to then use that information to e.g. construct per capita indicators). Currently, what add_regions_to_table function does is (1) create aggregates and (2) make nan certain values. We could split the process with two methods of Regions, to:
-    1. Create the aggregates in the usual way (possibly handling nans?).
-    2. We then make nan cells where certain conditions are not fulfilled, e.g. that certain countries are not informed (and maybe where there were too many nans?).
-    To achieve 2, we need to store auxiliary coverage information:
-    - Storing region coverage info as a dictionary:
-        We could store, for each column and year (or in principle other dimensions, except country), which countries were informed. This could be done with a a dictionary, e.g. {col1: {2010: {[Albania, Croatia, ...], {2011: [Bulgaria, ...], col2: {...}, ...}. This information could then be accessed to calculate population of the subset of regions for each column-year. However, this approach may not scale well.
-    - Storing region coverage info as an auxiliary table:
-        Create an auxiliary sparse table that keeps the index of the original table, and 1s where there was data, and 0s on nans. With this:
-        - Use auxiliary table to remove aggregations where certain countries countries_that_must_have_data were not informed (NOTE that this is currently not working well in our current tooling, see https://github.com/owid/etl/issues/3071). Possible algorithm:
-            1. Select columns in the auxiliary table for which region aggregates were created.
-            2. For each column (except index columns) replace the values in the column by the product of the original values times the country column.
-            3. Create region aggregates with the auxiliary table (in a similar way as the original table was used to create region aggregates), using a special aggregate function that returns 1 if the expected list of countries that needs to be informed is fully contained in the set of countries in a group, otherwise 0.
-            4. Left join the original table with the aggregated auxiliary table on country-year, use suffixes ("", "_complete"). This will add, for each column in the original table (for which there is a region aggregate), a column that is 1 if the aggregate is to be kept, and 0 otherwise.
-            5. Multiply each of the original columns by their corresponding "_complete" column, to remove incomplete aggregates.
-            NOTE: We could apply similar conditions using this method, e.g. maximum number or fraction of nans per group (although this is already implemented in our current tooling).
-        - Use auxiliary table to create accurate per capita indicators. Possible algorithm:
-            1. Select columns in the auxiliary table for which region aggregates were created.
-            2. Merge auxiliary table with population on country-year, to add a "population" column.
-            3. For each column (except "population" and index columns) replace the values in the column by the product of the original column times population.
-            4. Create region aggregates with the auxiliary table in the same way as the original table was used to create region aggregates.
-            5. Left join the original table with the aggregated auxiliary table on country-year, use suffixes ("", "_population"). This will add a column of informed population for each column.
-            6. To create per capita indicators, divide each column by its corresponding column_population.
-            NOTE: The above process could in principle be applied to other indicators, not just population. This could be useful to calculate yield (as production / area).
-    * The methods of Regions should be ideally applicable to tables with multiple dimensions, and tables in both long and wide format. Some of the issues above could be handled more easily by transforming the wide table into a long format one.
-
     """
 
     def __init__(
@@ -1824,15 +1860,28 @@ class Regions:
     def ds_regions(self) -> Dataset:
         """Regions dataset."""
         if self._ds_regions is None:
-            if self.auto_load_datasets:
-                # Auto-load from default location (for standalone usage).
-                self._ds_regions = Dataset(LATEST_REGIONS_DATASET_PATH)
-            else:
-                # For ETL work, raise an error if the regions dataset is not among dependencies of the current step.
-                raise ValueError(
-                    "Regions dataset could not be loaded. If this is part of an ETL step, add the latest regions dataset to the list of dependencies."
-                )
+            self._ds_regions = _load_ds_or_raise(
+                ds_name="Regions", ds_path=LATEST_REGIONS_DATASET_PATH, auto_load=self.auto_load_datasets
+            )
         return self._ds_regions
+
+    @property
+    def ds_income_groups(self) -> Dataset | None:
+        """Income groups dataset."""
+        if self._ds_income_groups is None:
+            self._ds_income_groups = _load_ds_or_raise(
+                ds_name="Income groups", ds_path=LATEST_INCOME_DATASET_PATH, auto_load=self.auto_load_datasets
+            )
+        return self._ds_income_groups
+
+    @property
+    def ds_population(self) -> Dataset | None:
+        """Population dataset."""
+        if self._ds_population is None:
+            self._ds_population = _load_ds_or_raise(
+                ds_name="Population", ds_path=LATEST_POPULATION_DATASET_PATH, auto_load=self.auto_load_datasets
+            )
+        return self._ds_population
 
     @property
     def tb_regions(self) -> Table:
@@ -1840,20 +1889,6 @@ class Regions:
         if self._tb_regions is None:
             self._tb_regions = self.ds_regions.read("regions")
         return self._tb_regions
-
-    @property
-    def ds_income_groups(self) -> Dataset | None:
-        """Income groups dataset."""
-        if self._ds_income_groups is None:
-            if self.auto_load_datasets:
-                # Auto-load from default location (for standalone usage).
-                self._ds_income_groups = Dataset(LATEST_INCOME_DATASET_PATH)
-            else:
-                # For ETL work, raise an error if the income groups dataset is not among dependencies of the current step.
-                raise ValueError(
-                    "Income groups dataset could not be loaded. If this is part of an ETL step, add the latest income groups dataset to the list of dependencies."
-                )
-        return self._ds_income_groups
 
     @property
     def tb_income_groups(self) -> Table:
@@ -1868,20 +1903,6 @@ class Regions:
         if self._tb_income_groups_latest is None:
             self._tb_income_groups_latest = self.ds_income_groups.read("income_groups_latest")  # type: ignore
         return self._tb_income_groups_latest
-
-    @property
-    def ds_population(self) -> Dataset | None:
-        """Population dataset."""
-        if self._ds_population is None:
-            if self.auto_load_datasets:
-                # Auto-load from default location (for standalone usage).
-                self._ds_population = Dataset(LATEST_POPULATION_DATASET_PATH)
-            else:
-                # For ETL work, raise an error if the population dataset is not among dependencies of the current step.
-                raise ValueError(
-                    "Population dataset could not be loaded. If this is part of an ETL step, add the latest population dataset to the list of dependencies."
-                )
-        return self._ds_population
 
     @property
     def tb_population(self) -> Table:
@@ -2036,13 +2057,15 @@ class Regions:
         country_col: str = "country",
         year_col: str = "year",
         population_col: str = "population",
-    ) -> TableWithRegions:
-        return TableWithRegions(
+    ) -> RegionAggregator:
+        return RegionAggregator(
             ds_regions=self.ds_regions,
             regions=regions,
-            regions_all=self.regions_all,
-            ds_income_groups=self.ds_income_groups,
-            ds_population=self.ds_population,
+            # TODO: Fix issue with regions_all argument. Currently, calculating it requires income groups. The problem is that get_regions() attempts to load income groups. I suppose get_regions() should only include income groups if they can be loaded.
+            # regions_all=self.regions_all,
+            regions_all=list(REGIONS),
+            ds_income_groups=self._ds_income_groups,
+            ds_population=self._ds_population,
             index_columns=index_columns,
             country_col=country_col,
             year_col=year_col,
