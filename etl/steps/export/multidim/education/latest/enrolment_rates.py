@@ -162,15 +162,17 @@ def run() -> None:
 
         if sex == "sex_side_by_side" or level == "level_side_by_side":
             view.metadata = {
+                "description_from_producer": "",
+                "description_short": view.config["subtitle"],
                 "presentation": {
                     "title_public": view.config["title"],
-                }
+                },
             }
-
-        # Ensure subtitles are the same as description_short
-        view.metadata = {
-            "description_short": view.config["subtitle"],
-        }
+        else:
+            # Only updated description_short for other views
+            view.metadata = {
+                "description_short": view.config["subtitle"],
+            }
 
         edit_indicator_displays(view)
 
@@ -285,62 +287,46 @@ LEVEL_MAPPINGS = {
 }
 
 NET_TEMPLATE = (
-    "Shown as the [net enrolment ratio](#dod:net-enrolment-ratio){suffix} — "
+    "Shown as the [net enrolment ratio](#dod:net-enrolment-ratio) — "
     "the share of {subject} of {level_plain} who are enrolled in {level_dod} education."
 )
 
 NET_GROUPED_TEMPLATE = (
-    "Shown as the [net enrolment ratio](#dod:net-enrolment-ratio){suffix} — "
-    "the share of {subject} within the official school-age group who are enrolled at the relevant level of education {population_suffix}."
+    "Shown for each level of education as the [net enrolment ratio](#dod:net-enrolment-ratio) — "
+    "the share of {subject} within the official school-age group who are enrolled in the relevant level of education."
 )
 
 GROSS_TEMPLATE = (
-    "Shown as the [gross enrolment ratio](#dod:gross-enrolment-ratio){suffix} — "
+    "Shown as the [gross enrolment ratio](#dod:gross-enrolment-ratio) — "
     "the number of {subject}, regardless of their age, who are enrolled in {level_dod} education, "
     "expressed as a percentage of {population} of {level_plain}."
 )
 
 GROSS_GROUPED_TEMPLATE = (
-    "Shown as the [gross enrolment ratio](#dod:gross-enrolment-ratio){suffix} — "
+    "Shown for each level of education as the [gross enrolment ratio](#dod:gross-enrolment-ratio) — "
     "the number of {subject}, regardless of their age, who are enrolled at that level of education, "
     "expressed as a percentage of the official school-age population {population_suffix}."
 )
 
 ENROLMENT_TYPE_MAP = {
     "net_enrolment": {
-        "both": NET_TEMPLATE.format(
-            suffix="", subject="children", level_dod="{level_dod}", level_plain="{level_plain}"
-        ),
-        "boys": NET_TEMPLATE.format(
-            suffix=" for boys", subject="boys", level_dod="{level_dod}", level_plain="{level_plain}"
-        ),
+        "both": NET_TEMPLATE.format(subject="children", level_dod="{level_dod}", level_plain="{level_plain}"),
+        "boys": NET_TEMPLATE.format(subject="boys", level_dod="{level_dod}", level_plain="{level_plain}"),
         "girls": NET_TEMPLATE.format(
-            suffix=" for girls",
             subject="girls",
             level_dod="{level_dod}",
             level_plain="{level_plain}",
         ),
-        "tertiary_both": NET_TEMPLATE.format(
-            suffix="", subject="people", level_dod="{level_dod}", level_plain="{level_plain}"
-        ),
-        "tertiary_men": NET_TEMPLATE.format(
-            suffix=" for men", subject="men", level_dod="{level_dod}", level_plain="{level_plain}"
-        ),
+        "tertiary_both": NET_TEMPLATE.format(subject="people", level_dod="{level_dod}", level_plain="{level_plain}"),
+        "tertiary_men": NET_TEMPLATE.format(subject="men", level_dod="{level_dod}", level_plain="{level_plain}"),
         "tertiary_women": NET_TEMPLATE.format(
-            suffix=" for women",
             subject="women",
             level_dod="{level_dod}",
             level_plain="{level_plain}",
         ),
-        "both_grouped": NET_GROUPED_TEMPLATE.format(
-            suffix="", subject="children", population_suffix="for each level of education"
-        ),
-        "boys_grouped": NET_GROUPED_TEMPLATE.format(
-            suffix=" for boys", subject="boys", population_suffix="of boys for each level of education"
-        ),
-        "girls_grouped": NET_GROUPED_TEMPLATE.format(
-            suffix=" for girls", subject="girls", population_suffix="of girls for each level of education"
-        ),
+        "both_grouped": NET_GROUPED_TEMPLATE.format(subject="children", population_suffix="of children"),
+        "boys_grouped": NET_GROUPED_TEMPLATE.format(subject="boys", population_suffix="of boys"),
+        "girls_grouped": NET_GROUPED_TEMPLATE.format(subject="girls", population_suffix="of girls"),
     },
     "gross_enrolment": {
         "both": GROSS_TEMPLATE.format(
@@ -377,14 +363,10 @@ ENROLMENT_TYPE_MAP = {
             level_plain="{level_plain}",
             population="women",
         ),
-        "both_grouped": GROSS_GROUPED_TEMPLATE.format(
-            suffix="", subject="children", population_suffix="for each level of education"
-        ),
-        "boys_grouped": GROSS_GROUPED_TEMPLATE.format(
-            suffix=" for boys", subject="boys", population_suffix="of boys for each level of education"
-        ),
+        "both_grouped": GROSS_GROUPED_TEMPLATE.format(suffix="", subject="children", population_suffix="of children"),
+        "boys_grouped": GROSS_GROUPED_TEMPLATE.format(suffix=" for boys", subject="boys", population_suffix="of boys"),
         "girls_grouped": GROSS_GROUPED_TEMPLATE.format(
-            suffix=" for girls", subject="girls", population_suffix="of girls for each level of education"
+            suffix=" for girls", subject="girls", population_suffix="of girls"
         ),
     },
 }

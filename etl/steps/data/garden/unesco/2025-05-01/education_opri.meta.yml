@@ -221,11 +221,13 @@ definitions:
     - The data comes from school administrative records that track enrolment by individual age, combined with population estimates from national statistics offices or UN sources.
 
   desc_key_ger: &desc_key_ger
-    - The gross enrollment ratio counts all students in a school level, no matter their age. This includes students who are younger or older than usual because they started late, started early, or repeated grades.
-    - It captures the total number of students enrolled at a specific education level, expressed as a percentage of the population in the official age group for that level. For example, if primary school is for 6- to 11-year-olds, the gross enrollment ratio compares total enrollment (of any age) to the population of 6- to 11-year-olds.
-    - Values can exceed 100% if students repeat grades or start late. For example, primary school might include some 12- or 13-year-olds who started late or repeated grades.
-    - A value of 100% does not necessarily mean all children in the age group are enrolled; some could be out of school, but the ratio is boosted by older students being included.
-    - The data comes from administrative records, such as school enrollment reports, and population estimates, usually from the United Nations or national sources.
+    - The gross enrollment ratio counts all students enrolled at a specific education level, regardless of their age. This includes students who are younger or older than the official age range because they started school early, started late, or repeated grades.
+    - It measures the total number of students of any age enrolled at an education level as a percentage of the population in the official age group for that level. For example, if primary school is designed for ages 6-11, the gross enrollment ratio compares total primary enrollment (all ages) to the population of 6- to 11-year-olds.
+    - Values can exceed 100% when students repeat grades or start late. For instance, primary school enrollment might include 12- or 13-year-olds who started late or repeated grades, pushing the ratio above 100%.
+    - A value of 100% does not guarantee that all children in the official age group are enrolled in school; some may be out of school entirely, but the ratio appears high due to older students being counted in the total.
+    - Values much lower than 100% indicate that many children of the official age are not enrolled at the expected education level - they may be out of school entirely, enrolled at a different level, or have never started school.
+    - Values much higher than 100% can indicate educational challenges such as high grade repetition rates, late school entry, or inefficient progression through the system.
+    - The data comes from administrative records such as school enrollment reports, combined with population estimates typically sourced from the United Nations or national statistical offices.
 
   # Educational attainment descriptions
   desc_key_mye: &desc_key_mye
