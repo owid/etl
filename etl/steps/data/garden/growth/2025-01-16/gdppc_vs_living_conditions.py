@@ -23,6 +23,27 @@ log = get_logger()
 # Define most recent year, so we don't process projections
 MOST_RECENT_YEAR = 2024
 
+# Define columns to filter and categories I want to select
+COLUMNS_AND_CATEGORIES = {
+    "un_wpp": {"sex": "all", "age": 0, "variant": "estimates"},
+    "igme": {
+        "indicator": "Child mortality rate",
+        "sex": "Total",
+        "wealth_quintile": "Total",
+        "unit_of_measure": "Deaths per 100 live births",
+    },
+    "mortality": {
+        "sex": "Both sexes",
+        "age_group": "all ages",
+        "cause": "Maternal conditions",
+        "icd10_codes": "O00-O99",
+    },
+    "who": {
+        "residence": "Total",
+    },
+    "harmonized_scores": {"sex": "all students"},
+}
+
 
 def run() -> None:
     #
@@ -36,7 +57,8 @@ def run() -> None:
     ds_wash = paths.load_dataset("who")
     ds_unwto = paths.load_dataset("unwto")
     ds_pwt = paths.load_dataset("penn_world_table")
-    ds_edstats = paths.load_dataset("edstats")
+    ds_harmonized_scores = paths.load_dataset("harmonized_scores")
+    ds_gender = paths.load_dataset("gender_statistics")
     ds_unesco = paths.load_dataset("education_sdgs")
     ds_happiness = paths.load_dataset("happiness")
     ds_population = paths.load_dataset("population")
@@ -50,7 +72,8 @@ def run() -> None:
     tb_wash = ds_wash.read("who")
     tb_unwto = ds_unwto.read("unwto")
     tb_pwt = ds_pwt.read("penn_world_table")
-    tb_edstats = ds_edstats.read("edstats")
+    tb_harmonized_scores = ds_harmonized_scores.read("harmonized_scores")
+    tb_gender = ds_gender.read("gender_statistics")
     tb_unesco = ds_unesco.read("education_sdgs")
     tb_happiness = ds_happiness.read("happiness")
 
@@ -64,65 +87,88 @@ def run() -> None:
             "ny_gdp_pcap_pp_kd": "gdp_per_capita",
             "sh_med_phys_zs": "physicians_per_1000_people",
             "eg_elc_accs_zs": "access_to_electricity",
-        }
+        },
+        errors="raise",
     )
 
     # UN WPP
-    tb_un_wpp = tb_un_wpp[
-        (tb_un_wpp["sex"] == "all") & (tb_un_wpp["age"] == 0) & (tb_un_wpp["variant"] == "estimates")
-    ].reset_index(drop=True)
+    check_columns_and_categories(tb=tb_un_wpp, table_name="un_wpp")
+    tb_un_wpp = filter_table(tb=tb_un_wpp, table_name="un_wpp")
     tb_un_wpp = tb_un_wpp[["country", "year", "life_expectancy"]]
 
     # IGME
-    tb_igme = tb_igme[
-        (tb_igme["indicator"] == "Under-five mortality rate")
-        & (tb_igme["sex"] == "Total")
-        & (tb_igme["wealth_quintile"] == "Total")
-        & (tb_igme["unit_of_measure"] == "Deaths per 100 live births")
-    ].reset_index(drop=True)
-    tb_igme = tb_igme[["country", "year", "obs_value"]].rename(columns={"obs_value": "child_mortality_rate"})
+    check_columns_and_categories(tb=tb_igme, table_name="igme")
+    tb_igme = filter_table(tb=tb_igme, table_name="igme")
+    tb_igme = tb_igme[["country", "year", "observation_value"]].rename(
+        columns={"observation_value": "child_mortality_rate"}, errors="raise"
+    )
 
     # Mortality Database
-    tb_mortality = tb_mortality[
-        (tb_mortality["sex"] == "Both sexes")
-        & (tb_mortality["age_group"] == "all ages")
-        & (tb_mortality["cause"] == "Maternal conditions")
-        & (tb_mortality["icd10_codes"] == "O00-O99")
-    ].reset_index(drop=True)
+    check_columns_and_categories(tb=tb_mortality, table_name="mortality")
+    tb_mortality = filter_table(tb=tb_mortality, table_name="mortality")
     tb_mortality = tb_mortality[
         ["country", "year", "age_standardized_death_rate_per_100_000_standard_population"]
-    ].rename(columns={"age_standardized_death_rate_per_100_000_standard_population": "maternal_death_rate"})
+    ].rename(
+        columns={"age_standardized_death_rate_per_100_000_standard_population": "maternal_death_rate"}, errors="raise"
+    )
 
     # WHO
-    tb_wash = tb_wash[tb_wash["residence"] == "Total"].reset_index(drop=True)
-    tb_wash = tb_wash[["country", "year", "wat_imp"]].rename(columns={"wat_imp": "access_to_improved_drinking_water"})
+    check_columns_and_categories(tb=tb_wash, table_name="who")
+    tb_wash = filter_table(tb=tb_wash, table_name="who")
+    tb_wash = tb_wash[["country", "year", "wat_imp"]].rename(
+        columns={"wat_imp": "access_to_improved_drinking_water"}, errors="raise"
+    )
 
     # UNWTO
     tb_unwto = tb_unwto[["country", "year", "out_tour_departures_ovn_vis_tourists_per_1000"]].rename(
-        columns={"out_tour_departures_ovn_vis_tourists_per_1000": "tourist_departures_per_1000_people"}
+        columns={"out_tour_departures_ovn_vis_tourists_per_1000": "tourist_departures_per_1000_people"}, errors="raise"
     )
 
     # Penn World Table
-    tb_pwt = tb_pwt[["country", "year", "avh"]].rename(columns={"avh": "average_working_hours"})
+    tb_pwt = tb_pwt[["country", "year", "avh"]].rename(columns={"avh": "average_working_hours"}, errors="raise")
 
-    # Edstats
-    tb_edstats = tb_edstats[["country", "year", "learning_adjusted_years_of_school", "harmonized_test_scores"]]
+    # Harmonized test scores
+    check_columns_and_categories(tb=tb_harmonized_scores, table_name="harmonized_scores")
+    tb_harmonized_scores = filter_table(tb=tb_harmonized_scores, table_name="harmonized_scores")
+    tb_harmonized_scores = tb_harmonized_scores[["country", "year", "harmonized_test_scores"]]
+
+    # WB Gender Statistics
+    tb_gender = tb_gender[["country", "year", "hd_hci_lays"]]
+    tb_gender = tb_gender.rename(
+        columns={
+            "hd_hci_lays": "learning_adjusted_years_of_school",
+        },
+        errors="raise",
+    )
 
     # UNESCO
     tb_unesco = tb_unesco[
         ["country", "year", "adult_literacy_rate__population_15plus_years__both_sexes__pct__lr_ag15t99"]
     ].rename(
-        columns={"adult_literacy_rate__population_15plus_years__both_sexes__pct__lr_ag15t99": "adult_literacy_rate"}
+        columns={"adult_literacy_rate__population_15plus_years__both_sexes__pct__lr_ag15t99": "adult_literacy_rate"},
+        errors="raise",
     )
 
     # Happiness
     tb_happiness = tb_happiness[["country", "year", "cantril_ladder_score"]].rename(
-        columns={"cantril_ladder_score": "happiness_score"}
+        columns={"cantril_ladder_score": "happiness_score"}, errors="raise"
     )
 
     # Merge all the tables
     tb = pr.multi_merge(
-        [tb_wdi, tb_un_wpp, tb_igme, tb_mortality, tb_wash, tb_unwto, tb_pwt, tb_edstats, tb_unesco, tb_happiness],
+        [
+            tb_wdi,
+            tb_un_wpp,
+            tb_igme,
+            tb_mortality,
+            tb_wash,
+            tb_unwto,
+            tb_pwt,
+            tb_harmonized_scores,
+            tb_gender,
+            tb_unesco,
+            tb_happiness,
+        ],
         on=["country", "year"],
         how="outer",
     )
@@ -227,5 +273,36 @@ def add_regions_columns(tb: Table, ds_regions: Dataset) -> Table:
 
     # Keep only the rows where region is not missing
     tb = tb.dropna(subset=["region"]).reset_index(drop=True)
+
+    return tb
+
+
+def check_columns_and_categories(tb: Table, table_name: str) -> None:
+    """
+    Check that all columns and categories exist in the table.
+    """
+
+    for col, cat in COLUMNS_AND_CATEGORIES[table_name].items():
+        if col not in tb.columns:
+            raise ValueError(
+                f"Column {col} not found in {table_name} table. Columns available are: {tb.columns.tolist()}"
+            )
+        if cat not in tb[col].values:
+            raise ValueError(
+                f"Category {cat} not found in column {col} of {table_name} table. Categories available are: {tb[col].unique().tolist()}"
+            )
+
+    return None
+
+
+def filter_table(tb: Table, table_name: str) -> Table:
+    """
+    Filter the table based on the filters for each column, available on COLUMNS_AND_CATEGORIES
+    """
+
+    for col, cat in COLUMNS_AND_CATEGORIES[table_name].items():
+        tb = tb[tb[col] == cat]
+
+    tb = tb.reset_index(drop=True)
 
     return tb
