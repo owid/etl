@@ -1527,7 +1527,9 @@ def _load_ds_or_raise(ds_name: str, ds_path: Path, auto_load: bool) -> Dataset:
 
 
 class Regions:
-    """Manages geographical regions and their aggregations with enhanced functionality.
+    """Convenience tool to handle operations related to regions (countries, continents, aggregates, and income groups).
+
+    It can also be used in the context of an ETL data step, e.g. to generate the country name harmonization file, or to apply that harmonization to a table.
 
     ####################################################################################################################
     # WARNING: This tool is under development, don't start using it just yet!
@@ -1719,14 +1721,13 @@ class Regions:
             raise ValueError(
                 "A path to a countries file needs to be defined before using harmonizer. Add countries_file argument when initializing Regions."
             )
-        harmonize_ipython(
-            tb=tb,
-            column=country_col,
-            output_file=self.countries_file,
-            # paths: Optional[PathFinder] = None,
-            # num_suggestions: int = 100,
-            institution=institution,
-        )
+        else:
+            harmonize_ipython(
+                tb=tb,
+                column=country_col,
+                output_file=self.countries_file,
+                institution=institution,
+            )
 
     def harmonize_names(
         self,
