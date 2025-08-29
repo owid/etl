@@ -1,0 +1,16 @@
+definitions:
+  common:
+    processing_level: minor
+
+dataset:
+  update_period_days: 180
+
+tables:
+  wdi_cpi:
+    # TODO: Write metadata.
+    variables:
+      cpi:
+        title: TODO
+        unit: ""
+        short_unit: ""
+        description_short: TODO

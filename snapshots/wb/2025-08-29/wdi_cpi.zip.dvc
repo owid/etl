@@ -1,0 +1,23 @@
+meta:
+  origin:
+    # TODO: Fill out metadata.
+    producer: TODO
+    title: TODO
+    description: |-
+      TODO
+    citation_full: |-
+      TODO
+    version_producer: TODO
+    url_main: https://data.worldbank.org/indicator/FP.CPI.TOTL
+    # NOTE: Despite specifying the format CSV, the link downloads a zip folder (containing a csv file).
+    url_download: https://api.worldbank.org/v2/en/indicator/FP.CPI.TOTL?downloadformat=csv
+    date_accessed: '2025-08-29'
+    # NOTE: The date of update appears in the header of the downloaded csv file (inside a zip folder).
+    date_published: '2025-07-01'
+    license:
+      name: CC BY 4.0
+      url: https://data.worldbank.org/indicator/FP.CPI.TOTL
+outs:
+  - md5: fee9d47d0809d96bfbba1eb046a55d36
+    size: 94910
+    path: wdi_cpi.zip

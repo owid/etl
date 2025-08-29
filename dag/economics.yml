@@ -1,0 +1,10 @@
+steps:
+  # World Bank - WDI (specifically CPI series).
+  data://meadow/wb/2025-08-29/wdi_cpi:
+    - snapshot://wb/2025-08-29/wdi_cpi.zip
+  # World Bank - WDI (specifically CPI series).
+  data://garden/wb/2025-08-29/wdi_cpi:
+    - data://meadow/wb/2025-08-29/wdi_cpi
+  # OWID - OWID Deflator.
+  data://garden/economics/2025-08-29/owid_deflator:
+    - data://garden/wb/2025-08-29/wdi_cpi
