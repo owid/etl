@@ -17,8 +17,8 @@ def run() -> None:
     # Load inputs.
     #
     # Load meadow dataset and read its table.
-    ds_meadow = paths.load_dataset("wdi_cpi")
-    tb_meadow = ds_meadow.read("wdi_cpi")
+    ds_meadow = paths.load_dataset("wdi_prices")
+    tb_meadow = ds_meadow.read("wdi_prices")
 
     #
     # Process data.
