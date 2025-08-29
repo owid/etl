@@ -58,28 +58,31 @@ if host_memory_error:
 st.subheader("📊 Summary")
 stats = get_server_summary_stats(servers_df, host_memory_stats)
 
-col1, col2, col3, col4, col5 = st.columns(5)
-with col1:
+with st.container(horizontal=True):
+    # Number of servers
     st.metric("Total Servers", stats["total_servers"])
-with col2:
+    # Number of running servers
     st.metric("Running", stats["running_servers"], delta=None, delta_color="normal")
-with col3:
+    # Number of stopped servers
     st.metric("Stopped", stats["stopped_servers"], delta=None, delta_color="inverse")
-with col4:
+
+    # Memory
+    default_display = "N/A"
+    ## Gaia memory usage
     host_mem_stats = stats["host_memory_stats"]
     if host_mem_stats is not None:
         mem_display = (
             f"{host_mem_stats['used_gb']:.0f}/{host_mem_stats['total_gb']:.0f} GB ({host_mem_stats['usage_pct']:.1f}%)"
         )
-        st.metric("gaia-1 Memory", mem_display)
     else:
-        st.metric("gaia-1 Memory", "N/A")
-with col5:
+        mem_display = default_display
+    st.metric("gaia-1 Memory", mem_display)
+    ## Gaia swap usage
     if host_mem_stats is not None and host_mem_stats.get("swap_total_gb", 0) > 0:
         swap_display = f"{host_mem_stats['swap_used_gb']:.0f}/{host_mem_stats['swap_total_gb']:.0f} GB ({host_mem_stats['swap_usage_pct']:.1f}%)"
-        st.metric("gaia-1 Swap", swap_display)
     else:
-        st.metric("gaia-1 Swap", "N/A")
+        swap_display = default_display
+    st.metric("gaia-1 Swap", swap_display)
 
 # Prepare data for display
 display_df = prepare_display_dataframe(servers_df)
