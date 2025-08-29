@@ -8,12 +8,14 @@ from unittest.mock import mock_open, patch
 
 import numpy as np
 import pandas as pd
+import pytest
 from owid.catalog import Dataset, Table
 from owid.datautils import dataframes
 from pytest import warns
 from structlog.testing import capture_logs
 
 from etl.data_helpers import geo
+from etl.paths import LATEST_REGIONS_DATASET_PATH
 
 mock_countries = {
     "country_02": "Country 2",
@@ -1564,3 +1566,38 @@ class TestAddRegionsToTable(unittest.TestCase):
             .reset_index(drop=True)
         )
         assert tb_out.equals(tb_expected)
+
+
+class TestCreateTableOfRegionsAndSubregions(unittest.TestCase):
+    @pytest.mark.integration
+    def test_regions_table_has_unique_members(self):
+        """Test that create_table_of_regions_and_subregions produces a table with unique members in each row."""
+        # Load the regions dataset
+        ds_regions = Dataset(LATEST_REGIONS_DATASET_PATH)
+
+        # Create the regions table
+        tb_regions = geo.create_table_of_regions_and_subregions(ds_regions=ds_regions)
+
+        # Check each row for duplicate members
+        duplicate_info = []
+        for idx, row in tb_regions.iterrows():
+            region = row.name if hasattr(row, "name") else idx
+            members = row["members"]
+
+            if members is not None and isinstance(members, list):
+                # Check for duplicates within this row's members list
+                seen = set()
+                duplicates = []
+                for member in members:
+                    if member in seen:
+                        duplicates.append(member)
+                    seen.add(member)
+
+                if duplicates:
+                    duplicate_info.append(f"Region '{region}' has duplicate members: {duplicates}")
+
+        if duplicate_info:
+            self.fail("Found duplicate members within region rows:\n" + "\n".join(duplicate_info))
+
+        # If we get here, the test passed
+        self.assertTrue(True, "All members are unique within each region")

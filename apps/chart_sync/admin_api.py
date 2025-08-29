@@ -158,6 +158,10 @@ class AdminAPI(object):
         return js
 
     def put_explorer_config(self, slug: str, tsv: str, user_id: Optional[int] = None) -> dict:
+        # TODO: too many requests to Admin API -> MySQL are failing, fix it
+        log.warning("Explorer config update is turned off until we fix Admin API")
+        return {}
+
         # Retry in case we're restarting Admin on staging server
         url = self.owid_env.admin_api + f"/explorers/{slug}"
         resp = requests_with_retry().put(
@@ -220,7 +224,7 @@ def create_session_id(owid_env: OWIDEnv, grapher_user_id: int) -> str:
 
 def requests_with_retry() -> requests.Session:
     s = requests.Session()
-    retries = Retry(total=5, backoff_factor=1, status_forcelist=[502])
+    retries = Retry(total=5, backoff_factor=1, status_forcelist=[502, 504])
     s.mount("http://", HTTPAdapter(max_retries=retries))
     s.mount("https://", HTTPAdapter(max_retries=retries))
     return s

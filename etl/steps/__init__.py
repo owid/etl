@@ -646,8 +646,16 @@ class DataStep(Step):
         env = os.environ.copy()
         env["PATH"] = os.path.expanduser("~/.cargo/bin") + ":" + env["PATH"]
 
-        # This might raise subprocess.CalledProcessError
-        subprocess.check_call(args, env=env)
+        # Run the command and show only the actual error output, not subprocess wrapper
+        try:
+            subprocess.run(args, env=env, capture_output=True, text=True, check=True)
+        except subprocess.CalledProcessError as e:
+            # Print the actual error instead of subprocess wrapper
+            if e.stdout:
+                print(e.stdout, file=sys.stdout, end="")
+            if e.stderr:
+                print(e.stderr, file=sys.stderr, end="")
+            sys.exit(e.returncode)
 
     def _run_notebook(self) -> None:
         "Run a parameterised Jupyter notebook."
@@ -762,7 +770,7 @@ class SnapshotStep(Step):
 
     def run(self) -> None:
         snap = Snapshot(self.path)
-        snap.pull(force=True)
+        snap.pull(force=True, retries=3)
 
     def is_dirty(self) -> bool:
         snap = Snapshot(self.path)

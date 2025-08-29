@@ -1,4 +1,4 @@
-"""Step that pushes the global-food explorer (tsv content) to DB, to create the global-food (indicator-based) explorer."""
+"""Step that pushes the global-food explorer (tsv content) to DB, to create the global-food (indicator-based) explorer.."""
 
 from copy import deepcopy
 from typing import Any, Callable, Dict, Optional
