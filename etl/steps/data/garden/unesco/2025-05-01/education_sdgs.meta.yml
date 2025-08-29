@@ -184,7 +184,7 @@ definitions:
   # DESCRIPTION TEMPLATES
   # ============================================================================
   desc_key_govt_expenditure_constant_ppp_per_student: &desc_key_govt_expenditure_constant_ppp_per_student
-    - This indicator shows how much a government spends per student per year at a particular level of education, expressed in constant[international-$](#dod:int_dollar_abbreviation).
+    - This indicator shows how much a government spends per student per year at a particular level of education, expressed in constant [international-$](#dod:int_dollar_abbreviation).
     - It is calculated by dividing total annual government spending by the number of students currently enrolled, and then adjusted for inflation and differences in purchasing power between countries. This makes it possible to compare annual investment levels across education systems and over time.
     - It includes all forms of public education spending — from teacher salaries and textbooks to school maintenance, capital projects like building classrooms, and external funding from international donors that flows through government budgets.
     - Figures are initially reported in local currency, then converted using purchasing power parity (PPP) exchange rates and adjusted to a constant base year. This ensures the numbers reflect real resource commitments rather than changes in local prices or currency fluctuations.
