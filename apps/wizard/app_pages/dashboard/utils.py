@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any, Dict, Tuple
 
 import pandas as pd
 import streamlit as st
@@ -92,7 +92,7 @@ def check_db():
 
 
 @st.cache_data(show_spinner=False)
-def load_steps_df(reload_key: int) -> pd.DataFrame:
+def load_steps_df(reload_key: int) -> Tuple[pd.DataFrame, Dict[str, Any]]:
     """Generate and load the steps dataframe.
 
     This is just done once, at the beginning.
@@ -126,14 +126,15 @@ def load_steps_df(reload_key: int) -> pd.DataFrame:
 
     steps_df = steps_df.drop(columns=["db_dataset_name", "db_dataset_id"], errors="raise")
 
-    return steps_df
+    steps_info = _get_steps_info(steps_df)
+    return steps_df, steps_info
 
 
 @st.cache_data
 def load_steps_df_to_display(show_all_channels: bool, reload_key: int) -> pd.DataFrame:
     """Load the steps dataframe, and filter it according to the user's choice."""
     # Load all data
-    df = load_steps_df(reload_key=reload_key)
+    df, _ = load_steps_df(reload_key=reload_key)
 
     # If toggle is not shown, pre-filter the DataFrame to show only rows where "channel" equals "grapher"
     if not show_all_channels:
@@ -204,7 +205,6 @@ def unselect_step(step: str):
     st.session_state.selected_steps.remove(step)
 
 
-@st.cache_data
 def _get_steps_info(steps_df) -> Dict[str, Any]:
     """From given list of selected steps, get details for each step.
     df: DataFrame with selected steps. It is usually the grid_response["selected_rows"].
