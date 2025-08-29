@@ -999,7 +999,6 @@ def _modified_tags_on_staging(
         query_source = query_source.replace("GROUP BY", where_charts + " GROUP BY")
         params["chart_ids"] = tuple(chart_ids)
 
-    __import__("ipdb").set_trace()
     source_df = read_sql(query_source, source_session, params=params)
 
     # no charts, return empty dataframe
