@@ -23,6 +23,9 @@ log = get_logger()
 # Define most recent year, so we don't process projections
 MOST_RECENT_YEAR = 2024
 
+# Enable indicator years range or not
+ENABLE_INDICATOR_YEARS_RANGE = True
+
 # Define columns to filter and categories I want to select
 COLUMNS_AND_CATEGORIES = {
     "un_wpp": {"sex": "all", "age": 0, "variant": "estimates"},
@@ -232,7 +235,8 @@ def select_most_recent_data(tb: Table) -> Table:
         latest_year = tb_indicator["year"].max()
         earliest_year = tb_indicator["year"].min()
 
-        log.info(f"The indicator {indicator} ranges between {earliest_year} and {latest_year}.")
+        if ENABLE_INDICATOR_YEARS_RANGE:
+            log.info(f"The indicator {indicator} ranges between {earliest_year} and {latest_year}.")
 
         # Drop year column
         tb_indicator = tb_indicator.drop(columns=["year"])
