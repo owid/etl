@@ -23,17 +23,105 @@ st.set_page_config(
 
 log = get_logger()
 
+
+# Functions
+def handle_delta_memory(used_pct, ss_key):
+    last_value = st.session_state["servers_metric_metrics"].get(ss_key)
+    if last_value is None:
+        delta = None
+    else:
+        delta = used_pct - last_value
+        if abs(delta) <= 0.1:
+            delta = None
+        else:
+            delta = f"{delta:.2f}%"
+    st.session_state["servers_metric_metrics"][ss_key] = used_pct
+    return delta
+
+
+def st_metric_memory(label, stats, help, used_gb_key, total_gb_key, used_pct_key, last_stat_key: str):
+    default_display = "N/A"
+    ## Gaia memory usage
+    delta = None
+    if (stats is not None) and stats.get(total_gb_key, 0) > 0:
+        used_pct = stats[used_pct_key]
+        ### Get delta from last fetch
+        delta = handle_delta_memory(used_pct, last_stat_key)
+        ### Build display message
+        mem_display = f"{used_pct:.1f}% ({stats[used_gb_key]:.0f}/{stats[total_gb_key]:.0f} GB)"
+    else:
+        mem_display = default_display
+    st.metric(
+        label,
+        mem_display,
+        delta=delta,
+        help=help,
+    )
+
+
+def st_metric_int(stats, value_key, **kwargs):
+    # Sanity check
+    assert "delta" not in kwargs, "Delta should not be provided, it is calculated automatically."
+    assert value_key in stats, f"{value_key} not found in stats."
+    # Estimate delta
+    value = stats[value_key]
+    last_value = st.session_state["servers_metric_metrics"].get(value_key)
+    diff_value = value - last_value if last_value is not None else None
+    diff_value = diff_value if diff_value != 0 else None  # No delta if no change
+    # Store last value
+    st.session_state["servers_metric_metrics"][value_key] = value
+
+    # Add value
+    kwargs["value"] = stats[value_key]
+
+    # Display metric
+    st.metric(
+        delta=diff_value,
+        **kwargs,
+    )
+
+
+# Session state
+st.session_state.setdefault("servers_metric_metrics", {})
+
+st.session_state.setdefault("servers_metric_memory", None)
+st.session_state.setdefault("servers_metric_swap", None)
+
+
 # Header
 st_title_with_expert("Staging Servers Dashboard", icon=":material/computer:")
-st.markdown("Monitor all LXC staging servers on **gaia-1** with real-time metrics and status information.")
 
 # Add refresh button and auto-refresh controls
-with st.container(horizontal=True, vertical_alignment="bottom"):
-    if st.button("Refresh Data", type="primary", icon=":material/autorenew:"):
-        st.cache_data.clear()  # Clear cache to force refresh
-        st.rerun()
+with st.container(horizontal=True, vertical_alignment="bottom", horizontal_alignment="distribute"):
+    with st.container(horizontal=True, vertical_alignment="bottom"):
+        if st.button("Refresh Data", type="primary", icon=":material/autorenew:"):
+            st.cache_data.clear()  # Clear cache to force refresh
+            st.rerun()
+        st.badge("Data cached for 5 minutes", color="primary", icon=":material/info:")
 
-    st.markdown("*Data cached for 5 minutes*")
+    # Additional information section
+    with st.popover("ℹ️ About this Dashboard"):
+        st.markdown("""
+        **Data Source**: This dashboard fetches real-time data from LXC containers using the `owid-lxc` command.
+
+        **Status Indicators**:
+        - 🟢 **Running**: Container is active and operational
+        - 🔴 **Stopped**: Container is stopped or inactive
+
+        **Commit Status**:
+        - ✅ **Today/Recent**: Commits within the last week
+        - ⚠️ **Warning**: Commits older than 7 days
+        - ❌ **Old**: Commits much older or containers not accessible
+        - ❓ **Unknown**: Unable to determine commit status
+
+        **Memory Usage**:
+        - Only running containers show memory usage
+        - Percentage calculated as (used / total) * 100
+
+        **Refresh**: Data is cached for 5 minutes to avoid overwhelming the LXC host. Click 'Refresh Data' to fetch latest information.
+
+        **Branch Names**: The 'staging-site-' prefix is automatically removed for cleaner display.
+        """)
 
 # Fetch server data and host memory stats
 with st.spinner("Fetching staging server data...", show_time=True):
@@ -55,40 +143,56 @@ if host_memory_error:
     st.warning(f"Could not fetch host memory stats: {host_memory_error}")
 
 # Display summary statistics
-st.subheader("📊 Summary")
 stats = get_server_summary_stats(servers_df, host_memory_stats)
 
-with st.container(horizontal=True):
+with st.container(horizontal=True, border=True):
     # Number of servers
-    st.metric("Total Servers", stats["total_servers"])
+    st_metric_int(
+        stats=stats,
+        label="Total Servers",
+        value_key="total_servers",
+    )
     # Number of running servers
-    st.metric("Running", stats["running_servers"], delta=None, delta_color="normal")
+    st_metric_int(
+        stats=stats,
+        label="Running",
+        value_key="running_servers",
+    )
     # Number of stopped servers
-    st.metric("Stopped", stats["stopped_servers"], delta=None, delta_color="inverse")
+    st_metric_int(
+        stats=stats,
+        label="Stopped",
+        value_key="stopped_servers",
+        delta_color="inverse",
+    )
 
     # Memory
-    default_display = "N/A"
     ## Gaia memory usage
-    host_mem_stats = stats["host_memory_stats"]
-    if host_mem_stats is not None:
-        mem_display = (
-            f"{host_mem_stats['used_gb']:.0f}/{host_mem_stats['total_gb']:.0f} GB ({host_mem_stats['usage_pct']:.1f}%)"
-        )
-    else:
-        mem_display = default_display
-    st.metric("gaia-1 Memory", mem_display)
+    st_metric_memory(
+        label="gaia-1 Memory",
+        stats=stats["host_memory_stats"],
+        help="RAM used on Gaia. Arrow indicates if the usage has increased or decreased since last fetch.",
+        used_gb_key="used_gb",
+        total_gb_key="total_gb",
+        used_pct_key="usage_pct",
+        last_stat_key="servers_metric_memory",
+    )
     ## Gaia swap usage
-    if host_mem_stats is not None and host_mem_stats.get("swap_total_gb", 0) > 0:
-        swap_display = f"{host_mem_stats['swap_used_gb']:.0f}/{host_mem_stats['swap_total_gb']:.0f} GB ({host_mem_stats['swap_usage_pct']:.1f}%)"
-    else:
-        swap_display = default_display
-    st.metric("gaia-1 Swap", swap_display)
+    st_metric_memory(
+        label="gaia-1 Swap",
+        stats=stats["host_memory_stats"],
+        help="Swap memory used on Gaia. Arrow indicates if the usage has increased or decreased since last fetch.",
+        used_gb_key="swap_usage_pct",
+        total_gb_key="swap_total_gb",
+        used_pct_key="swap_usage_pct",
+        last_stat_key="servers_metric_swap",
+    )
 
 # Prepare data for display
 display_df = prepare_display_dataframe(servers_df)
 
 # Filter controls
-st.subheader("🔍 Filters")
+st.subheader("🖥️ Staging Servers")
 col1, col2, col3 = st.columns(3)
 
 with col1:
@@ -128,9 +232,7 @@ if branch_filter:
 if len(filtered_df) != len(display_df):
     st.info(f"Showing {len(filtered_df)} of {len(display_df)} servers")
 
-# Main servers table
-st.subheader("🖥️ Staging Servers")
-
+# Display data table
 if filtered_df.empty:
     st.warning("No servers match the current filters.")
 else:
@@ -275,27 +377,3 @@ else:
             st.markdown("**SSH Access:**")
             ssh_cmd = f"ssh owid@{server_name}"
             st.code(ssh_cmd, language="bash")
-
-# Additional information section
-with st.expander("ℹ️ About this Dashboard"):
-    st.markdown("""
-    **Data Source**: This dashboard fetches real-time data from LXC containers using the `owid-lxc` command.
-
-    **Status Indicators**:
-    - 🟢 **Running**: Container is active and operational
-    - 🔴 **Stopped**: Container is stopped or inactive
-
-    **Commit Status**:
-    - ✅ **Today/Recent**: Commits within the last week
-    - ⚠️ **Warning**: Commits older than 7 days
-    - ❌ **Old**: Commits much older or containers not accessible
-    - ❓ **Unknown**: Unable to determine commit status
-
-    **Memory Usage**:
-    - Only running containers show memory usage
-    - Percentage calculated as (used / total) * 100
-
-    **Refresh**: Data is cached for 5 minutes to avoid overwhelming the LXC host. Click 'Refresh Data' to fetch latest information.
-
-    **Branch Names**: The 'staging-site-' prefix is automatically removed for cleaner display.
-    """)
