@@ -192,8 +192,9 @@ definitions:
    - This is one of the most useful measures for understanding how governments fund education relative to the size of their student population. It’s especially helpful when comparing countries with different overall budgets or economic conditions.
 
   desc_key_govt_expenditure_gdp_share: &desc_key_govt_expenditure_gdp_share
-   - This indicator shows the share of a country’s economic output (GDP) that is spent on education. It reflects how much of the national budget is directed toward education relative to the size of the economy.
+   - This indicator shows the share of a country’s economic output (GDP) that is spent on education. This indicator shows the share of a country’s total economic output (GDP) that is spent on education. It reflects the scale of education spending relative to the size of the economy.
    - It includes all government spending at the relevant education level — from central, regional, and local authorities — and covers both current and capital expenditures.
+   - It covers all types of public education spending — including teacher salaries, textbooks, school maintenance, capital projects such as building classrooms, and even external funding from international donors that is channeled through government budgets.
    - A higher percentage means a larger share of national resources is allocated to education, which may indicate political commitment or policy prioritization. But it doesn’t necessarily mean higher spending per student or better outcomes. Countries with lower GDPs might have high percentages but limited resources in absolute terms.
    - This indicator is useful for understanding how education fits within the broader picture of government spending and national development. It should be interpreted alongside measures like per-student spending and enrolment rates.
 

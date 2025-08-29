@@ -16,6 +16,21 @@ COLOR_ALL_LEVELS = "#6C7B7F"  # Gray color for "All levels"
 COLOR_BOYS = "#00847E"
 COLOR_GIRLS = "#E56E5A"
 
+# Color constants for metric types
+COLOR_EXPECTED_YEARS = "#4C6A9C"  # Blue
+COLOR_AVERAGE_YEARS = "#B16214"  # Orange
+COLOR_LEARNING_ADJUSTED = "#578145"  # Green
+
+# Used in metric type side-by-side comparison views
+METRIC_TYPE_DESCRIPTION_KEY = [
+    "These three measures capture different aspects of educational participation and achievement across the lifespan.",
+    "**Average years of schooling** measures the actual educational attainment of adults aged 25 and older - the average number of years they have completed in formal education. This reflects past educational outcomes.",
+    "**Expected years of schooling** shows how many years a child starting school can expect to spend in education if current enrollment patterns continue. This is a forward-looking measure based on current school participation rates.",
+    "**Learning-adjusted years of schooling** combines quantity and quality of education, adjusting expected years by learning outcomes from international assessments. It accounts for the fact that similar years of schooling can yield different learning results.",
+    "Together, these three numbers show us: how many years of education today's adults completed (average), how many years we expect new students to spend in school (expected), and how many years of schooling new students will get when we adjust those years for how much they actually learn (learning-adjusted).",
+    "Data comes from administrative school records, household surveys, and international learning assessments.",
+]
+
 
 MULTIDIM_CONFIG = {
     "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.008.json",
@@ -28,15 +43,40 @@ MULTIDIM_CONFIG = {
 
 # Common mappings for title and subtitle generation
 GENDER_MAPPINGS = {
-    "title": {"both": "children", "boys": "boys", "girls": "girls", "sex_side_by_side": "girls and boys"},
-    "subtitle": {"both": "children", "boys": "boys", "girls": "girls", "sex_side_by_side": "boys and girls"},
-    "tertiary": {"both": "young people", "boys": "men", "girls": "women", "sex_side_by_side": "men and women"},
-    "average_years_schooling": {"both": "adults", "boys": "men", "girls": "women", "sex_side_by_side": "men and women"},
+    "title": {
+        "both": "children",
+        "boys": "boys",
+        "girls": "girls",
+        "sex_side_by_side": "girls and boys",
+        "metric_type_side_by_side": "children",
+    },
+    "subtitle": {
+        "both": "children",
+        "boys": "boys",
+        "girls": "girls",
+        "sex_side_by_side": "boys and girls",
+        "metric_type_side_by_side": "children",
+    },
+    "tertiary": {
+        "both": "young people",
+        "boys": "men",
+        "girls": "women",
+        "sex_side_by_side": "men and women",
+        "metric_type_side_by_side": "young people",
+    },
+    "average_years_schooling": {
+        "both": "adults",
+        "boys": "men",
+        "girls": "women",
+        "sex_side_by_side": "men and women",
+        "metric_type_side_by_side": "adults",
+    },
     "learning_adjusted_years_schooling": {
         "both": "children",
         "boys": "boys",
         "girls": "girls",
         "sex_side_by_side": "boys and girls",
+        "metric_type_side_by_side": "children",
     },
 }
 
@@ -48,6 +88,7 @@ LEVEL_MAPPINGS = {
         "tertiary": "tertiary education",
         "all": "all education levels",
         "level_side_by_side": "education",
+        "metric_type_side_by_side": "education",
     },
     "subtitle": {
         "primary": "[primary](#dod:primary-education)",
@@ -174,6 +215,20 @@ def run() -> None:
                     "selectedFacetStrategy": "entity",
                 },
             },
+            {
+                "dimension": "metric_type",
+                "choice_new_slug": "metric_type_side_by_side",
+                "choices": ["expected_years_schooling", "average_years_schooling", "learning_adjusted_years_schooling"],
+                "exclude": {"level": ["preprimary", "primary", "secondary", "tertiary"]},
+                "view_config": {
+                    "originUrl": "ourworldindata.org/education",
+                    "hideAnnotationFieldsInTitle": {"time": True},
+                    "addCountryMode": "add-country",
+                    "hasMapTab": False,
+                    "tab": "chart",
+                    "selectedFacetStrategy": "entity",
+                },
+            },
         ]
     )
 
@@ -203,6 +258,15 @@ def run() -> None:
                 "description_short": view.config["subtitle"],
                 "presentation": {
                     "title_public": view.config["title"],
+                },
+            }
+        elif metric_type == "metric_type_side_by_side":
+            view.metadata = {
+                "description_from_producer": "",
+                "description_short": view.config["subtitle"],
+                "presentation": {
+                    "title_public": view.config["title"],
+                    "description_key": METRIC_TYPE_DESCRIPTION_KEY,
                 },
             }
         else:
@@ -320,22 +384,35 @@ def generate_title_by_gender_level_and_metric(sex, level, metric_type):
     """Generate title based on gender, education level, and metric type."""
     gender_term = _get_gender_term(sex, level, "title", metric_type)
     level_term = LEVEL_MAPPINGS["title"].get(level, "")
-    metric_term = METRIC_MAPPINGS.get(metric_type, "")
 
     if not level_term:
         raise ValueError(f"Unknown education level: {level}")
-    if not metric_term:
-        raise ValueError(f"Unknown metric type: {metric_type}")
 
-    if level == "level_side_by_side":
+    # Handle grouped views first
+    if metric_type == "metric_type_side_by_side":
+        return f"Years of schooling among {gender_term}, by measure"
+    elif level == "level_side_by_side":
+        metric_term = METRIC_MAPPINGS.get(metric_type, "")
+        if not metric_term:
+            raise ValueError(f"Unknown metric type: {metric_type}")
         return f"{metric_term} among {gender_term} by education level"
-    elif level == "all":
-        return f"{metric_term} among {gender_term}"
     else:
-        return f"{metric_term} among {gender_term} in {level_term}"
+        # Regular views - look up metric type
+        metric_term = METRIC_MAPPINGS.get(metric_type, "")
+        if not metric_term:
+            raise ValueError(f"Unknown metric type: {metric_type}")
+
+        if level == "all":
+            return f"{metric_term} among {gender_term}"
+        else:
+            return f"{metric_term} among {gender_term} in {level_term}"
 
 
 def generate_subtitle_by_level(level, metric_type, sex=None):
+    # Handle metric type side-by-side case
+    if metric_type == "metric_type_side_by_side":
+        return "Average years show how many years of education today's adults completed, expected years indicate how long new students are likely to stay in school, and [learning-adjusted years of schooling](#dod:lays) predict how many effective years of schooling new students would receive once adjusted for how much they learn."
+
     # Helper functions for subject terms
     def get_subject(sex_key, is_adult=False):
         if is_adult:
@@ -432,5 +509,28 @@ def edit_indicator_displays(view):
                     pattern in indicator.catalogPath or indicator.catalogPath.endswith(pattern)
                     for pattern in config["patterns"]
                 ):
+                    indicator.display = {"name": config["name"], "color": config["color"]}
+                    break
+
+    # Handle metric type side-by-side views (different schooling measures)
+    elif view.dimensions["metric_type"] == "metric_type_side_by_side":
+        # Display name and color mappings for metric types
+        METRIC_TYPE_CONFIG = {
+            "expected": {
+                "name": "Expected years",
+                "color": COLOR_EXPECTED_YEARS,
+                "patterns": ["eys", "school_life_expectancy"],
+            },
+            "average": {"name": "Average years", "color": COLOR_AVERAGE_YEARS, "patterns": ["mys"]},
+            "learning_adjusted": {
+                "name": "Learning-adjusted years",
+                "color": COLOR_LEARNING_ADJUSTED,
+                "patterns": ["hd_hci_lays"],
+            },
+        }
+
+        for indicator in view.indicators.y:
+            for config in METRIC_TYPE_CONFIG.values():
+                if any(pattern in indicator.catalogPath for pattern in config["patterns"]):
                     indicator.display = {"name": config["name"], "color": config["color"]}
                     break

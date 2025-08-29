@@ -16,8 +16,8 @@ COLOR_BOYS = "#00847E"
 COLOR_GIRLS = "#E56E5A"
 
 # Color constants for enrolment types
-COLOR_NET_ENROLMENT = "#4C6A9C"
-COLOR_GROSS_ENROLMENT = "#B16214"
+COLOR_NET_ENROLMENT = "#883039"
+COLOR_GROSS_ENROLMENT = "#4C6A9C"
 
 # Used in enrolment type side-by-side comparison views
 ENROLLMENT_TYPE_DESCRIPTION_KEY = [
@@ -206,11 +206,7 @@ def run() -> None:
                 "Values may exceed 100% when children who are older or younger than the official age group also enroll."
             )
 
-        if (
-            sex == "sex_side_by_side"
-            or level == "level_side_by_side"
-            or enrolment_type == "enrolment_type_side_by_side"
-        ):
+        if sex == "sex_side_by_side" or level == "level_side_by_side":
             view.metadata = {
                 "description_from_producer": "",
                 "description_short": view.config["subtitle"],
@@ -218,8 +214,15 @@ def run() -> None:
                     "title_public": view.config["title"],
                 },
             }
-            if enrolment_type == "enrolment_type_side_by_side":
-                view.metadata["description_key"] = ENROLLMENT_TYPE_DESCRIPTION_KEY
+        elif enrolment_type == "enrolment_type_side_by_side":
+            view.metadata = {
+                "description_from_producer": "",
+                "description_short": view.config["subtitle"],
+                "presentation": {
+                    "title_public": view.config["title"],
+                    "description_key": ENROLLMENT_TYPE_DESCRIPTION_KEY,
+                },
+            }
         else:
             # Only updated description_short for other views
             view.metadata = {
