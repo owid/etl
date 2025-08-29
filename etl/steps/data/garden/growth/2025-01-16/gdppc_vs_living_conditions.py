@@ -41,10 +41,16 @@ COLUMNS_AND_CATEGORIES = {
         "cause": "Maternal conditions",
         "icd10_codes": "O00-O99",
     },
-    "who": {
-        "residence": "Total",
-    },
+    "wash": {"residence": "Total"},
     "harmonized_scores": {"sex": "all students"},
+    "gho": {"sex": "both sexes"},
+    "pip": {
+        "ppp_version": 2021,
+        "poverty_line": "No poverty line",
+        "welfare_type": "income or consumption",
+        "table": "Income or consumption consolidated",
+        "survey_comparability": "No spells",
+    },
 }
 
 
@@ -64,6 +70,8 @@ def run() -> None:
     ds_gender = paths.load_dataset("gender_statistics")
     ds_unesco = paths.load_dataset("education_sdgs")
     ds_happiness = paths.load_dataset("happiness")
+    ds_gho = paths.load_dataset("gho")
+    ds_pip = paths.load_dataset("world_bank_pip")
     ds_population = paths.load_dataset("population")
     ds_regions = paths.load_dataset("regions")
 
@@ -79,6 +87,10 @@ def run() -> None:
     tb_gender = ds_gender.read("gender_statistics")
     tb_unesco = ds_unesco.read("education_sdgs")
     tb_happiness = ds_happiness.read("happiness")
+    tb_gho = ds_gho.read(
+        "stunting_prevalence_among_children_under_5_years_of_age__pct_height_for_age__lt__2_sd__model_based_estimates"
+    )
+    tb_pip = ds_pip.read("world_bank_pip")
 
     #
     # Process data.
@@ -115,9 +127,9 @@ def run() -> None:
         columns={"age_standardized_death_rate_per_100_000_standard_population": "maternal_death_rate"}, errors="raise"
     )
 
-    # WHO
-    check_columns_and_categories(tb=tb_wash, table_name="who")
-    tb_wash = filter_table(tb=tb_wash, table_name="who")
+    # WHO WASH
+    check_columns_and_categories(tb=tb_wash, table_name="wash")
+    tb_wash = filter_table(tb=tb_wash, table_name="wash")
     tb_wash = tb_wash[["country", "year", "wat_imp"]].rename(
         columns={"wat_imp": "access_to_improved_drinking_water"}, errors="raise"
     )
@@ -157,6 +169,30 @@ def run() -> None:
         columns={"cantril_ladder_score": "happiness_score"}, errors="raise"
     )
 
+    # WHO GHO
+    check_columns_and_categories(tb=tb_gho, table_name="gho")
+    tb_gho = filter_table(tb=tb_gho, table_name="gho")
+    tb_gho = tb_gho[
+        [
+            "country",
+            "year",
+            "stunting_prevalence_among_children_under_5_years_of_age__pct_height_for_age__lt__2_sd__model_based_estimates",
+        ]
+    ].rename(
+        columns={
+            "stunting_prevalence_among_children_under_5_years_of_age__pct_height_for_age__lt__2_sd__model_based_estimates": "share_children_stunting"
+        },
+        errors="raise",
+    )
+
+    # World Bank PIP
+    check_columns_and_categories(tb=tb_pip, table_name="pip")
+    tb_pip = filter_table(tb=tb_pip, table_name="pip")
+    tb_pip = tb_pip[["country", "year", "mean", "median"]].rename(
+        columns={"mean": "mean_income", "median": "median_income"},
+        errors="raise",
+    )
+
     # Merge all the tables
     tb = pr.multi_merge(
         [
@@ -171,6 +207,8 @@ def run() -> None:
             tb_gender,
             tb_unesco,
             tb_happiness,
+            tb_gho,
+            tb_pip,
         ],
         on=["country", "year"],
         how="outer",
@@ -250,7 +288,7 @@ def select_most_recent_data(tb: Table) -> Table:
 
 def add_regions_columns(tb: Table, ds_regions: Dataset) -> Table:
     """
-    Add region columns to the table.
+    Add region columns to the table and keep only the countries that are in the regions dataset.
     """
 
     tb_regions = geo.create_table_of_regions_and_subregions(ds_regions=ds_regions)

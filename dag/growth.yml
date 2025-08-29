@@ -76,5 +76,7 @@ steps:
     - data://garden/wb/2024-06-10/gender_statistics
     - data://garden/unesco/2025-05-01/education_sdgs
     - data://garden/happiness/2025-03-28/happiness
+    - data://garden/who/2025-05-19/gho
+    - data://garden/wb/2025-08-07/world_bank_pip
     - data://garden/demography/2024-07-15/population
     - data://garden/regions/2023-01-01/regions
