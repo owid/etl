@@ -262,7 +262,7 @@ sections:
       - title: "Servers Dashboard"
         alias: servers-dashboard
         entrypoint: app_pages/servers_dashboard/app.py
-        description: Monitor all LXC staging servers with real-time metrics
+        description: Real-time monitoring of our LXC staging servers
         maintainer: "@mojmir"
         icon: ":material/computer:"
         image_url: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
