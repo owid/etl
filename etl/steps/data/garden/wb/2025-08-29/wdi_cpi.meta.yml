@@ -7,10 +7,19 @@ dataset:
 
 tables:
   wdi_cpi:
-    # TODO: Write metadata.
     variables:
       cpi:
-        title: TODO
+        # WDI ID: FP.CPI.TOTL
+        title: Consumer price index (2010 = 100)
         unit: ""
         short_unit: ""
-        description_short: TODO
+        description_short: |-
+          Index of the prices of consumption goods and services, relative to the reference year 2010. The index is set to 100 in 2010, and values in other years reflect changes in average prices compared to that year.
+        description_from_producer: |-
+          A general and continuing increase in an economy's price level is called inflation. The increase in the average prices of goods and services in the economy should be distinguished from a change in the relative prices of individual goods and services. Generally accompanying an overall increase in the price level is a change in the structure of relative prices, but it is only the average increase, not the relative price changes, that constitutes inflation. A commonly used measure of inflation is the consumer price index, which measures the prices of a representative basket of goods and services purchased by a typical household. The consumer price index is usually calculated on the basis of periodic surveys of consumer prices. Other price indices are derived implicitly from indexes of current and constant price series.
+
+          # Limitations and exceptions:
+          Consumer price indexes should be interpreted with caution. The definition of a household, the basket of goods, and the geographic (urban or rural) and income group coverage of consumer price surveys can vary widely by country. In addition, weights are derived from household expenditure surveys, which, for budgetary reasons, tend to be conducted infrequently in developing countries, impairing comparability over time. Although useful for measuring consumer price inflation within a country, consumer price indexes are of less value in comparing countries.
+
+          # Statistical Concept and Methodology:
+          Consumer Prices Indices are compiled in accordance with international standards: Consumer Price Index Manual, 2020 or 2004 version. Specific information on how countries compile their CPI statistics can be found on the IMF website: dsbb.imf.org Statistical concept(s): The conceptual basis of a consumer price index series is to measure the rate at which prices of consumption goods and services are changing from one period to another.
