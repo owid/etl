@@ -710,10 +710,14 @@ class ChartDiffsLoader:
         config: bool | None = None,
         data: bool | None = None,
         metadata: bool | None = None,
+        tags: bool | None = None,
     ) -> pd.DataFrame:
         """DataFrame with charts details."""
         return self.df[
-            (self.df.configEdited & config) | (self.df.dataEdited & data) | (self.df.metadataEdited & metadata)
+            (self.df.configEdited & config)
+            | (self.df.dataEdited & data)
+            | (self.df.metadataEdited & metadata)
+            | (self.df.tagsEdited & tags)
         ]
 
     def get_diffs(
@@ -721,6 +725,7 @@ class ChartDiffsLoader:
         config: bool = True,
         data: bool = False,
         metadata: bool = False,
+        tags: bool = False,
         sync: bool = False,
         chart_ids: Optional[List[int]] = None,
         source_session: Optional[Session] = None,
@@ -733,7 +738,7 @@ class ChartDiffsLoader:
         if sync:
             self.df = self.load_df(chart_ids=chart_ids)
         # Get ids of charts with relevant changes
-        df_charts = self.get_charts_df(config, data, metadata)
+        df_charts = self.get_charts_df(config, data, metadata, tags)
 
         if source_session and target_session:
             chart_diffs = ChartDiff.from_charts_df(
@@ -962,12 +967,74 @@ def _modified_chart_configs_on_staging(
     return diff[["configEdited", "chartEditedInStaging"]]
 
 
+@log_time
+def _modified_tags_on_staging(
+    source_session: Session, target_session: Session, chart_ids: Optional[List[int]] = None
+) -> pd.DataFrame:
+    """Get charts with modified tags by comparing chart_tags table."""
+    TIMESTAMP_STAGING_CREATION = get_staging_creation_time(source_session)
+
+    # Get chart tags from source that have been updated since staging creation
+    base_q = """
+    select
+        ct.chartId,
+        GROUP_CONCAT(ct.tagId ORDER BY ct.tagId) as tagIds
+    from chart_tags as ct
+    join charts as c on ct.chartId = c.id
+    where
+    """
+    where = """
+        -- only compare charts that have been updated on staging server
+        c.lastEditedAt >= %(timestamp_staging_creation)s
+    """
+    query_source = base_q + where + " GROUP BY ct.chartId"
+    params = {"timestamp_staging_creation": TIMESTAMP_STAGING_CREATION}
+
+    # Add filter for chart IDs
+    if chart_ids is not None:
+        where_charts = """
+            -- filter and get only charts with given IDs
+            and ct.chartId in %(chart_ids)s
+        """
+        query_source = query_source.replace("GROUP BY", where_charts + " GROUP BY")
+        params["chart_ids"] = tuple(chart_ids)
+
+    source_df = read_sql(query_source, source_session, params=params)
+
+    # no charts, return empty dataframe
+    if source_df.empty:
+        return pd.DataFrame(columns=["chartId", "tagsEdited"]).set_index("chartId")
+
+    # Get tags from target for the same charts
+    where = """
+        ct.chartId in %(chart_ids)s
+    """
+    target_df = read_sql(
+        base_q + where + " GROUP BY ct.chartId", target_session, params={"chart_ids": tuple(source_df.chartId.unique())}
+    )
+
+    source_df = source_df.set_index("chartId")
+    target_df = target_df.set_index("chartId")
+
+    # align dataframes with left join (so that source has non-null values)
+    source_df, target_df = source_df.align(target_df, join="left")
+
+    # Compare tag sets - if tagIds are different, tags have been edited
+    diff = pd.DataFrame(index=source_df.index)
+    diff["tagsEdited"] = source_df["tagIds"] != target_df["tagIds"]
+
+    # Include charts where tags were added/removed (null vs non-null)
+    diff["tagsEdited"] = diff["tagsEdited"] | (source_df["tagIds"].isnull() != target_df["tagIds"].isnull())
+
+    return diff[["tagsEdited"]]
+
+
 def modified_charts_on_staging(
     source_session: Session, target_session: Session, chart_ids: Optional[List[int]] = None
 ) -> pd.DataFrame:
     """Get charts that have been modified in staging.
 
-    - It includes charts with different config, data or metadata checksums.
+    - It includes charts with different config, data, metadata checksums, or tags.
     - It detects changes by comparing updatedAt timestamps to staging creation time.
 
     Optionally, you can provide a list of chart IDs to filter the results.
@@ -977,14 +1044,16 @@ def modified_charts_on_staging(
         - dataEdited: True if data checksum has changed
         - metadataEdited: True if metadata checksum has changed
         - configEdited: True if config has changed
+        - tagsEdited: True if tags have changed
 
         TESTING:
         - chartEditedInStaging: True if the chart config has been edited in staging.
     """
     df_config = _modified_chart_configs_on_staging(source_session, target_session, chart_ids=chart_ids)
     df_data_metadata = _modified_data_metadata_on_staging(source_session, target_session, chart_ids=chart_ids)
+    df_tags = _modified_tags_on_staging(source_session, target_session, chart_ids=chart_ids)
 
-    df = df_config.join(df_data_metadata, how="outer").fillna(False)
+    df = df_config.join(df_data_metadata, how="outer").join(df_tags, how="outer").fillna(False)
 
     return df
 
@@ -996,7 +1065,7 @@ def get_chart_diffs_from_grapher(
 
     This means, checking for chart changes in the database.
 
-    Changes in charts can be due to: chart config changes, changes in indicator timeseries, in indicator metadata, etc.
+    Changes in charts can be due to: chart config changes, changes in indicator timeseries, in indicator metadata, tag changes, etc.
     """
     chart_diffs = ChartDiffsLoader(
         source_engine,
@@ -1005,6 +1074,7 @@ def get_chart_diffs_from_grapher(
         config=True,
         metadata=True,
         data=True,
+        tags=True,
     )
 
     chart_diffs = {chart.chart_id: chart for chart in chart_diffs}
