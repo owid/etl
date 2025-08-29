@@ -67,13 +67,14 @@ steps:
   data://garden/growth/2025-01-16/gdppc_vs_living_conditions:
     - data://garden/worldbank_wdi/2025-01-24/wdi
     - data://garden/un/2024-07-12/un_wpp
-    - data://garden/un/2024-09-11/igme
+    - data://garden/un/2025-03-25/igme
     - data://garden/who/2025-04-17/mortality_database
     - data://garden/wash/2024-01-06/who
     - data://garden/tourism/2024-08-17/unwto
     - data://garden/ggdc/2025-07-31/penn_world_table
-    - data://garden/wb/2024-11-04/edstats
+    - data://garden/education/2025-08-20/harmonized_scores
+    - data://garden/wb/2024-06-10/gender_statistics
     - data://garden/unesco/2025-05-01/education_sdgs
     - data://garden/happiness/2025-03-28/happiness
-    - data://garden/demography/2023-03-31/population
+    - data://garden/demography/2024-07-15/population
     - data://garden/regions/2023-01-01/regions
