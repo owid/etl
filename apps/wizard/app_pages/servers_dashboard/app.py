@@ -182,7 +182,7 @@ with st.container(horizontal=True, border=True):
         label="gaia-1 Swap",
         stats=stats["host_memory_stats"],
         help="Swap memory used on Gaia. Arrow indicates if the usage has increased or decreased since last fetch.",
-        used_gb_key="swap_usage_pct",
+        used_gb_key="swap_used_gb",
         total_gb_key="swap_total_gb",
         used_pct_key="swap_usage_pct",
         last_stat_key="servers_metric_swap",
