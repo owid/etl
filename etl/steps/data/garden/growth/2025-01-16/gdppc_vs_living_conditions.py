@@ -21,7 +21,7 @@ paths = PathFinder(__file__)
 log = get_logger()
 
 # Define most recent year, so we don't process projections
-MOST_RECENT_YEAR = 2024
+MOST_RECENT_YEAR = 2023
 
 # Enable indicator years range or not
 ENABLE_INDICATOR_YEARS_RANGE = True
@@ -216,9 +216,9 @@ def run() -> None:
 
     tb = geo.add_population_to_table(tb=tb, ds_population=ds_population, warn_on_missing_countries=False)
 
-    tb = select_most_recent_data(tb)
-
     tb = add_regions_columns(tb, ds_regions)
+
+    tb = select_most_recent_data(tb)
 
     tb = tb.format(["country"], short_name="gdppc_vs_living_conditions")
 
@@ -257,11 +257,8 @@ def select_most_recent_data(tb: Table) -> Table:
 
         if latest_year > MOST_RECENT_YEAR:
             log.warning(
-                f"Indicator {indicator} has data for until year {latest_year}, which is higher than {MOST_RECENT_YEAR}. We keep only data until {MOST_RECENT_YEAR}."
+                f"Indicator {indicator} has data for until year {latest_year}, which is higher than {MOST_RECENT_YEAR}."
             )
-
-            # Drop rows with year higher than MOST_RECENT_YEAR
-            tb_indicator = tb_indicator[tb_indicator["year"] <= MOST_RECENT_YEAR].reset_index(drop=True)
 
         # Select all the rows where the data is at most 10 years old (MOST_RECENT_YEAR - 10)
         tb_indicator = tb_indicator[tb_indicator["year"] >= MOST_RECENT_YEAR - 10].reset_index(drop=True)
