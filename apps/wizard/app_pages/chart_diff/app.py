@@ -404,12 +404,12 @@ def _show_options_filters():
             default = ["new", "config"]
         st.multiselect(
             label="Chart change types",
-            options=["new", "data", "metadata", "config"],  # type: ignore
+            options=["new", "data", "metadata", "config", "tags"],  # type: ignore
             format_func=lambda x: x if x == "new" else f"{x} modified",
             default=default,  # type: ignore
             key="chart-diff-change-type",
-            help="Show new charts or modified ones with changes in data, metadata, or config.",
-            placeholder="config, data, metadata",
+            help="Show new charts or modified ones with changes in data, metadata, config, or tags.",
+            placeholder="config, data, metadata, tags",
         )
         st.multiselect(
             label="Chart IDs",

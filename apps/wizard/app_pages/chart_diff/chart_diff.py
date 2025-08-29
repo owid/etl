@@ -148,6 +148,7 @@ class ChartDiff:
         # approval_status: gm.CHART_DIFF_STATUS | str,
         modified_checksum: Optional[pd.DataFrame] = None,
         edited_in_staging: Optional[bool] = None,
+        tags_edited: Optional[bool] = None,
         error: Optional[str] = None,
         chart_views: Optional[float] = None,
         score_indicators_anomalies: Optional[float] = None,
@@ -168,6 +169,7 @@ class ChartDiff:
         self.chart_id = source_chart.id
         self.modified_checksum = modified_checksum
         self.edited_in_staging = edited_in_staging
+        self.tags_edited = tags_edited
 
         # Get revisions
         if df_approvals is None:
@@ -310,6 +312,7 @@ class ChartDiff:
             - data: changes in data
             - metadata: changes in metadata
             - config: changes in chart config
+            - tags: changes in chart tags
 
         If the chartdiff concerns a new chart, this returns an empty list.
         """
@@ -326,6 +329,9 @@ class ChartDiff:
                 #   data / metadata changes
                 if self.edited_in_staging and self.target_chart and not self.configs_are_equal():
                     self._change_types.append("config")
+                # Check for tag changes
+                if self.tags_edited:
+                    self._change_types.append("tags")
 
                 # TODO: Should uncomment this maybe?
                 # assert self._change_types != [], "No changes detected!"
@@ -413,8 +419,10 @@ class ChartDiff:
             # Was the chart edited in Staging?
             if chart_id in df_charts.index:
                 edited_in_staging = df_charts.loc[chart_id, "chartEditedInStaging"]
+                tags_edited = df_charts.loc[chart_id, "tagsEdited"] if "tagsEdited" in df_charts.columns else None
             else:
                 edited_in_staging = None
+                tags_edited = None
 
             # Are there any errors?
             # Creating new chart, but slug already exists in target
@@ -443,6 +451,7 @@ class ChartDiff:
                 conflict=conflict,
                 modified_checksum=modified_checksum,
                 edited_in_staging=edited_in_staging,
+                tags_edited=tags_edited,
                 error=error,
                 chart_views=chart_views_score,
                 score_indicators_anomalies=chart_anomalies_score,
@@ -687,10 +696,10 @@ class ChartDiff:
 class ChartDiffsLoader:
     """Detect charts that differ between staging and production and load them."""
 
-    def __init__(self, source_engine: Engine, target_engine: Engine):
+    def __init__(self, source_engine: Engine, target_engine: Engine, chart_ids: List[int] | None = None):
         self.source_engine = source_engine
         self.target_engine = target_engine
-        self.df = self.load_df()
+        self.df = self.load_df(chart_ids=chart_ids)
 
         # Cache
         self._diffs: List[ChartDiff] | None = None
@@ -983,10 +992,12 @@ def _modified_tags_on_staging(
     join charts as c on ct.chartId = c.id
     where
     """
-    where = """
-        -- only compare charts that have been updated on staging server
-        c.lastEditedAt >= %(timestamp_staging_creation)s
-    """
+    # TODO: settings tags don't update lastEditedAt, we can uncomment it once we enable that
+    where = "1 = 1"
+    # where = """
+    #     -- only compare charts that have been updated on staging server
+    #     c.lastEditedAt >= %(timestamp_staging_creation)s
+    # """
     query_source = base_q + where + " GROUP BY ct.chartId"
     params = {"timestamp_staging_creation": TIMESTAMP_STAGING_CREATION}
 
@@ -1055,6 +1066,8 @@ def modified_charts_on_staging(
 
     df = df_config.join(df_data_metadata, how="outer").join(df_tags, how="outer").fillna(False)
 
+    df.loc[df.tagsEdited, "chartEditedInStaging"] = True
+
     return df
 
 
@@ -1102,6 +1115,31 @@ def configs_are_equal(config_1: Dict[str, Any], config_2: Dict[str, Any], verbos
     if verbose:
         log.warning("Configurations differ")
         diff = difflib.unified_diff(config_1_str.splitlines(), config_2_str.splitlines(), lineterm="")
+
+        # Print the diff
+        for line in diff:
+            print(line)
+
+    return False
+
+
+def tags_are_equal(tags_1: List[Dict[str, Any]], tags_2: List[Dict[str, Any]], verbose=False) -> bool:
+    """Compare two lists of chart tags."""
+    # Sort tags by id for consistent comparison
+    tags_1_sorted = sorted(tags_1, key=lambda x: x.get('id', 0))
+    tags_2_sorted = sorted(tags_2, key=lambda x: x.get('id', 0))
+
+    # Use pretty print to convert tag lists to strings for comparison
+    tags_1_str = pprint.pformat(tags_1_sorted, sort_dicts=True)
+    tags_2_str = pprint.pformat(tags_2_sorted, sort_dicts=True)
+
+    # Compare the string representations
+    if tags_1_str == tags_2_str:
+        return True
+
+    if verbose:
+        log.warning("Tags differ")
+        diff = difflib.unified_diff(tags_1_str.splitlines(), tags_2_str.splitlines(), lineterm="")
 
         # Print the diff
         for line in diff:

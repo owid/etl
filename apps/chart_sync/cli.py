@@ -11,7 +11,7 @@ from rich_click.rich_command import RichCommand
 from sqlalchemy.orm import Session
 
 from apps.chart_sync.admin_api import AdminAPI
-from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiff, ChartDiffsLoader, configs_are_equal
+from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiff, ChartDiffsLoader, configs_are_equal, tags_are_equal
 from apps.wizard.utils import get_staging_creation_time
 from etl import config
 from etl.config import OWIDEnv, get_container_name
@@ -135,9 +135,10 @@ def cli(
         with Session(target_engine) as target_session:
             # Get all chart diffs between source and target
             # NOTE: We're creating two paris of sessions here, it'd be nicer to only create a single one
-            cd_loader = ChartDiffsLoader(source_engine, target_engine)
+            cd_loader = ChartDiffsLoader(source_engine, target_engine, chart_ids=[chart_id] if chart_id else None)
             chart_diffs = cd_loader.get_diffs(
                 config=True,
+                tags=True,
                 metadata=False,
                 data=False,
                 source_session=source_session,
@@ -190,11 +191,19 @@ def cli(
 
                 # Get user who edited the chart
                 user_id = diff.source_chart.lastEditedByUserId
+                
+                # Get source chart tags (needed for both new and existing charts)
+                source_tags = diff.source_chart.tags(source_session)
 
                 # Chart in target exists, update it
                 if diff.target_chart:
-                    # Configs are equal, no need to update
-                    if configs_are_equal(migrated_config, diff.target_chart.config):
+                    # Check if configs and tags are equal
+                    target_tags = diff.target_chart.tags(target_session)
+                    configs_equal = configs_are_equal(migrated_config, diff.target_chart.config)
+                    tags_equal = tags_are_equal(source_tags, target_tags)
+                    
+                    # Skip if both configs and tags are equal
+                    if configs_equal and tags_equal:
                         log.info(
                             "chart_sync.skip",
                             slug=diff.target_chart.slug,
@@ -206,11 +215,10 @@ def cli(
                     # Change has been approved, update the chart
                     if diff.is_approved:
                         log.info("chart_sync.chart_update", slug=chart_slug, chart_id=chart_id)
-                        chart_tags = diff.source_chart.tags(source_session)
                         charts_synced += 1
                         if not dry_run:
                             target_api.update_chart(chart_id, migrated_config, user_id=user_id)
-                            target_api.set_tags(chart_id, chart_tags, user_id=user_id)
+                            target_api.set_tags(chart_id, source_tags, user_id=user_id)
 
                     # Rejected chart diff
                     elif diff.is_rejected:
@@ -232,14 +240,12 @@ def cli(
 
                 # Chart is new, create it
                 else:
-                    chart_tags = diff.source_chart.tags(source_session)
-
                     # New chart has been approved
                     if diff.is_approved:
                         charts_synced += 1
                         if not dry_run:
                             resp = target_api.create_chart(migrated_config, user_id=user_id)
-                            target_api.set_tags(resp["chartId"], chart_tags, user_id=user_id)
+                            target_api.set_tags(resp["chartId"], source_tags, user_id=user_id)
                         else:
                             resp = {"chartId": None}
                         log.info(
