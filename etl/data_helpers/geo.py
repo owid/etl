@@ -1526,6 +1526,240 @@ def _load_ds_or_raise(ds_name: str, ds_path: Path, auto_load: bool) -> Dataset:
         )
 
 
+class Regions:
+    """Manages geographical regions and their aggregations with enhanced functionality.
+
+    ####################################################################################################################
+    # WARNING: This tool is under development, don't start using it just yet!
+    ####################################################################################################################
+
+    """
+
+    def __init__(
+        self,
+        ds_regions: Dataset | None = None,
+        ds_income_groups: Dataset | None = None,
+        ds_population: Dataset | None = None,
+        countries_file: Path | str | None = None,
+        excluded_countries_file: Path | str | None = None,
+        auto_load_datasets: bool = True,
+    ):
+        # Initialize some hidden attributes to allow for lazy-loading of datasets and tables.
+        self._ds_regions = ds_regions
+        self._tb_regions = None
+        self._ds_income_groups = ds_income_groups
+        self._tb_income_groups = None
+        self._tb_income_groups_latest = None
+        self._ds_population = ds_population
+        self._tb_population = None
+        self._regions_all = None
+
+        # Other attributes.
+        self.countries_file = countries_file
+        self.excluded_countries_file = excluded_countries_file
+        self._region_cache: dict[str, dict[str, Any]] = {}
+        self._informed_countries_cache: dict[tuple, set[str]] = {}
+        # If auto_load_datasets is True and no ds_regions is passed, load the latest regions dataset (and idem for ds_income_groups).
+        # NOTE: This parameter will be False when Regions is loaded from PathFinder; that way we impose that regions (and/or income_groups) must be among dependencies.
+        self.auto_load_datasets = auto_load_datasets
+
+    @property
+    def ds_regions(self) -> Dataset:
+        """Regions dataset."""
+        if self._ds_regions is None:
+            self._ds_regions = _load_ds_or_raise(
+                ds_name="Regions", ds_path=LATEST_REGIONS_DATASET_PATH, auto_load=self.auto_load_datasets
+            )
+        return self._ds_regions
+
+    @property
+    def ds_income_groups(self) -> Dataset | None:
+        """Income groups dataset."""
+        if self._ds_income_groups is None:
+            self._ds_income_groups = _load_ds_or_raise(
+                ds_name="Income groups", ds_path=LATEST_INCOME_DATASET_PATH, auto_load=self.auto_load_datasets
+            )
+        return self._ds_income_groups
+
+    @property
+    def ds_population(self) -> Dataset | None:
+        """Population dataset."""
+        if self._ds_population is None:
+            self._ds_population = _load_ds_or_raise(
+                ds_name="Population", ds_path=LATEST_POPULATION_DATASET_PATH, auto_load=self.auto_load_datasets
+            )
+        return self._ds_population
+
+    @property
+    def tb_regions(self) -> Table:
+        """Main table from the regions dataset."""
+        if self._tb_regions is None:
+            self._tb_regions = self.ds_regions.read("regions")
+        return self._tb_regions
+
+    @property
+    def tb_income_groups(self) -> Table:
+        """Table of the income groups dataset that contains income groups classification over the years (not just the latest classification)."""
+        if self._tb_income_groups is None:
+            self._tb_income_groups = self.ds_income_groups.read("income_groups")  # type: ignore
+        return self._tb_income_groups
+
+    @property
+    def tb_income_groups_latest(self) -> Table:
+        """Table of the income groups dataset that contains the latest income groups classification."""
+        if self._tb_income_groups_latest is None:
+            self._tb_income_groups_latest = self.ds_income_groups.read("income_groups_latest")  # type: ignore
+        return self._tb_income_groups_latest
+
+    @property
+    def tb_population(self) -> Table:
+        """Main table from the population dataset."""
+        if self._tb_population is None:
+            self._tb_population = self.ds_population.read("population")  # type: ignore
+        return self._tb_population
+
+    def get_region(self, name: str) -> dict:
+        """Get region members and other information.
+
+        Parameters
+        ----------
+        name : str
+            Region name (e.g., "Africa", "Europe", "High-income countries").
+
+        Returns
+        -------
+        dict
+            Region members and other information.
+        """
+        if name not in self._region_cache:
+            # Find if given region exists.
+            if name in INCOME_GROUPS:
+                # Start with a default empty dictionary.
+                region_dict = {column: None for column in self.tb_regions.columns}
+                # Fill with some information.
+                region_dict.update(
+                    {  # type: ignore
+                        "code": INCOME_GROUPS_ENTITY_CODES[name],
+                        "name": name,
+                        "region_type": "income_group",
+                        "defined_by": "wb",
+                        "is_historical": False,
+                    }
+                )
+            else:
+                # Try to find region name in the regions table.
+                _region = self.tb_regions[self.tb_regions["name"] == name]
+                if _region.empty:
+                    raise ValueError(f"Region {name} not found")
+                # NOTE: If we decide to accept multiple regions with the same name, we could disambiguate by defined_by.
+                assert len(_region) == 1, f"Multiple regions found for name {name}"
+                region_dict = _region.iloc[0].to_dict()
+            # For now, use the existing function to extract members, which has some additional logic.
+            region_dict["members"] = list_members_of_region(  # type: ignore
+                region=name,
+                ds_regions=self.ds_regions,
+                # Load income groups only if necessary (and raise an error if not among dependencies).
+                ds_income_groups=self.ds_income_groups if name in INCOME_GROUPS else None,
+                include_historical_regions_in_income_groups=True,
+            )
+
+            self._region_cache[name] = region_dict
+        return self._region_cache[name]
+
+    def get_regions(
+        self, names: list[str] | None = None, only_members: bool = False
+    ) -> dict[str, Any] | dict[str, list[str]]:
+        """Get multiple regions.
+
+        Parameters
+        ----------
+        names : list[str] or None
+            List of region names to get. If None, returns all available regions.
+        only_members : dict[str, Any]
+            True to return only members of regions, e.g. {"Africa": ["Algeria", "Angola", ...], "Asia": ["Afghanistan", ...], ...}.
+
+        Returns
+        -------
+        dict[str, list[str]]
+            Regions as requested format.
+        """
+        if names is None:
+            # Get the full list of names of continents and aggregates (which includes World) and income groups.
+            names = self.regions_all
+            # If income groups cannot be loaded, remove them from the list.
+            if (self._ds_income_groups is None) and not self.auto_load_datasets:
+                names = sorted(set(names) - set(INCOME_GROUPS))
+        if only_members:
+            # Create a dictionary of members of each region.
+            regions = {name: self.get_region(name)["members"] for name in names}
+        else:
+            # Create a dictionary of individual region dictionaries with all information.
+            regions = {name: self.get_region(name) for name in names}
+
+        return regions
+
+    @property
+    def regions_all(self) -> list[str]:
+        # Complete list of names of region that are aggregates (including World) or continents in the regions dataset, and income groups.
+        if self._regions_all is None:
+            self._regions_all = sorted(
+                set(self.tb_regions[self.tb_regions["region_type"].isin(["continent", "aggregate"])]["name"])
+                | set(INCOME_GROUPS)
+            )
+        return self._regions_all
+
+    def harmonizer(self, tb: Table, country_col: str = "country", institution: str | None = None) -> None:
+        """Harmonize region names interactively and save mapping to a *.countries.json file (defined by countries_file).
+
+        This tool is meant to be used from a notebook or an interactive window.
+        """
+        from etl.harmonize import harmonize_ipython
+
+        if self.countries_file is None:
+            raise ValueError(
+                "A path to a countries file needs to be defined before using harmonizer. Add countries_file argument when initializing Regions."
+            )
+        harmonize_ipython(
+            tb=tb,
+            column=country_col,
+            output_file=self.countries_file,
+            # paths: Optional[PathFinder] = None,
+            # num_suggestions: int = 100,
+            institution=institution,
+        )
+
+    def harmonize_names(
+        self,
+        tb: Table,
+        country_col: str = "country",
+        warn_on_missing_countries: bool = True,
+        make_missing_countries_nan: bool = False,
+        warn_on_unused_countries: bool = True,
+        warn_on_unknown_excluded_countries: bool = True,
+        show_full_warning: bool = True,
+    ) -> Table:
+        """Harmonize country names in a table using the countries mapping file."""
+        if self.countries_file is None:
+            raise ValueError("countries_file must be provided to use harmonize_countries")
+
+        if not Path(self.countries_file).exists():
+            raise ValueError(
+                "A country mapping must exist before using regions.harmonize_countries. Use regions.harmonizer first."
+            )
+
+        return harmonize_countries(
+            df=tb,
+            countries_file=self.countries_file,
+            excluded_countries_file=self.excluded_countries_file,
+            country_col=country_col,
+            warn_on_missing_countries=warn_on_missing_countries,
+            make_missing_countries_nan=make_missing_countries_nan,
+            warn_on_unused_countries=warn_on_unused_countries,
+            warn_on_unknown_excluded_countries=warn_on_unknown_excluded_countries,
+            show_full_warning=show_full_warning,
+        )
+
+
 class RegionAggregator:
     """Manages operations on tables that have, or need to have, region aggregates.
 
@@ -1843,7 +2077,6 @@ class RegionAggregator:
                 )
 
             # List members of the region.
-            # TODO: Should we use Regions here? If we create circular dependencies, we may consider creating the instances of region aggregates outside of Regions (maybe it could be done in PathFinder). That way RegionAggregator would depend on Regions, but Regions would not use RegionAggregator anywhere.
             members = list_members_of_region(
                 region=region,
                 ds_regions=self.ds_regions,
@@ -2003,258 +2236,3 @@ class RegionAggregator:
                 )
 
         return tb_result
-
-
-class Regions:
-    """Manages geographical regions and their aggregations with enhanced functionality.
-
-    ####################################################################################################################
-    # WARNING: This tool is under development, don't start using it just yet!
-    ####################################################################################################################
-
-    """
-
-    def __init__(
-        self,
-        ds_regions: Dataset | None = None,
-        ds_income_groups: Dataset | None = None,
-        ds_population: Dataset | None = None,
-        countries_file: Path | str | None = None,
-        excluded_countries_file: Path | str | None = None,
-        auto_load_datasets: bool = True,
-    ):
-        # Initialize some hidden attributes to allow for lazy-loading of datasets and tables.
-        self._ds_regions = ds_regions
-        self._tb_regions = None
-        self._ds_income_groups = ds_income_groups
-        self._tb_income_groups = None
-        self._tb_income_groups_latest = None
-        self._ds_population = ds_population
-        self._tb_population = None
-        self._regions_all = None
-
-        # Other attributes.
-        self.countries_file = countries_file
-        self.excluded_countries_file = excluded_countries_file
-        self._region_cache: dict[str, dict[str, Any]] = {}
-        self._informed_countries_cache: dict[tuple, set[str]] = {}
-        # If auto_load_datasets is True and no ds_regions is passed, load the latest regions dataset (and idem for ds_income_groups).
-        # NOTE: This parameter will be False when Regions is loaded from PathFinder; that way we impose that regions (and/or income_groups) must be among dependencies.
-        self.auto_load_datasets = auto_load_datasets
-
-    @property
-    def ds_regions(self) -> Dataset:
-        """Regions dataset."""
-        if self._ds_regions is None:
-            self._ds_regions = _load_ds_or_raise(
-                ds_name="Regions", ds_path=LATEST_REGIONS_DATASET_PATH, auto_load=self.auto_load_datasets
-            )
-        return self._ds_regions
-
-    @property
-    def ds_income_groups(self) -> Dataset | None:
-        """Income groups dataset."""
-        if self._ds_income_groups is None:
-            self._ds_income_groups = _load_ds_or_raise(
-                ds_name="Income groups", ds_path=LATEST_INCOME_DATASET_PATH, auto_load=self.auto_load_datasets
-            )
-        return self._ds_income_groups
-
-    @property
-    def ds_population(self) -> Dataset | None:
-        """Population dataset."""
-        if self._ds_population is None:
-            self._ds_population = _load_ds_or_raise(
-                ds_name="Population", ds_path=LATEST_POPULATION_DATASET_PATH, auto_load=self.auto_load_datasets
-            )
-        return self._ds_population
-
-    @property
-    def tb_regions(self) -> Table:
-        """Main table from the regions dataset."""
-        if self._tb_regions is None:
-            self._tb_regions = self.ds_regions.read("regions")
-        return self._tb_regions
-
-    @property
-    def tb_income_groups(self) -> Table:
-        """Table of the income groups dataset that contains income groups classification over the years (not just the latest classification)."""
-        if self._tb_income_groups is None:
-            self._tb_income_groups = self.ds_income_groups.read("income_groups")  # type: ignore
-        return self._tb_income_groups
-
-    @property
-    def tb_income_groups_latest(self) -> Table:
-        """Table of the income groups dataset that contains the latest income groups classification."""
-        if self._tb_income_groups_latest is None:
-            self._tb_income_groups_latest = self.ds_income_groups.read("income_groups_latest")  # type: ignore
-        return self._tb_income_groups_latest
-
-    @property
-    def tb_population(self) -> Table:
-        """Main table from the population dataset."""
-        if self._tb_population is None:
-            self._tb_population = self.ds_population.read("population")  # type: ignore
-        return self._tb_population
-
-    def get_region(self, name: str) -> dict:
-        """Get region members and other information.
-
-        Parameters
-        ----------
-        name : str
-            Region name (e.g., "Africa", "Europe", "High-income countries").
-
-        Returns
-        -------
-        dict
-            Region members and other information.
-        """
-        if name not in self._region_cache:
-            # Find if given region exists.
-            if name in INCOME_GROUPS:
-                # Start with a default empty dictionary.
-                region_dict = {column: None for column in self.tb_regions.columns}
-                # Fill with some information.
-                region_dict.update(
-                    {  # type: ignore
-                        "code": INCOME_GROUPS_ENTITY_CODES[name],
-                        "name": name,
-                        "region_type": "income_group",
-                        "defined_by": "wb",
-                        "is_historical": False,
-                    }
-                )
-            else:
-                # Try to find region name in the regions table.
-                _region = self.tb_regions[self.tb_regions["name"] == name]
-                if _region.empty:
-                    raise ValueError(f"Region {name} not found")
-                # NOTE: If we decide to accept multiple regions with the same name, we could disambiguate by defined_by.
-                assert len(_region) == 1, f"Multiple regions found for name {name}"
-                region_dict = _region.iloc[0].to_dict()
-            # For now, use the existing function to extract members, which has some additional logic.
-            region_dict["members"] = list_members_of_region(  # type: ignore
-                region=name,
-                ds_regions=self.ds_regions,
-                # Load income groups only if necessary (and raise an error if not among dependencies).
-                ds_income_groups=self.ds_income_groups if name in INCOME_GROUPS else None,
-                include_historical_regions_in_income_groups=True,
-            )
-
-            self._region_cache[name] = region_dict
-        return self._region_cache[name]
-
-    def get_regions(
-        self, names: list[str] | None = None, only_members: bool = False
-    ) -> dict[str, Any] | dict[str, list[str]]:
-        """Get multiple regions.
-
-        Parameters
-        ----------
-        names : list[str] or None
-            List of region names to get. If None, returns all available regions.
-        only_members : dict[str, Any]
-            True to return only members of regions, e.g. {"Africa": ["Algeria", "Angola", ...], "Asia": ["Afghanistan", ...], ...}.
-
-        Returns
-        -------
-        dict[str, list[str]]
-            Regions as requested format.
-        """
-        if names is None:
-            # Get the full list of names of continents and aggregates (which includes World) and income groups.
-            names = self.regions_all
-            # If income groups cannot be loaded, remove them from the list.
-            if (self._ds_income_groups is None) and not self.auto_load_datasets:
-                names = sorted(set(names) - set(INCOME_GROUPS))
-        if only_members:
-            # Create a dictionary of members of each region.
-            regions = {name: self.get_region(name)["members"] for name in names}
-        else:
-            # Create a dictionary of individual region dictionaries with all information.
-            regions = {name: self.get_region(name) for name in names}
-
-        return regions
-
-    @property
-    def regions_all(self) -> list[str]:
-        # Complete list of names of region that are aggregates (including World) or continents in the regions dataset, and income groups.
-        if self._regions_all is None:
-            self._regions_all = sorted(
-                set(self.tb_regions[self.tb_regions["region_type"].isin(["continent", "aggregate"])]["name"])
-                | set(INCOME_GROUPS)
-            )
-        return self._regions_all
-
-    def harmonizer(self, tb: Table, country_col: str = "country", institution: str | None = None) -> None:
-        """Harmonize region names interactively and save mapping to a *.countries.json file (defined by countries_file).
-
-        This tool is meant to be used from a notebook or an interactive window.
-        """
-        from etl.harmonize import harmonize_ipython
-
-        if self.countries_file is None:
-            raise ValueError(
-                "A path to a countries file needs to be defined before using harmonizer. Add countries_file argument when initializing Regions."
-            )
-        harmonize_ipython(
-            tb=tb,
-            column=country_col,
-            output_file=self.countries_file,
-            # paths: Optional[PathFinder] = None,
-            # num_suggestions: int = 100,
-            institution=institution,
-        )
-
-    def harmonize_names(
-        self,
-        tb: Table,
-        country_col: str = "country",
-        warn_on_missing_countries: bool = True,
-        make_missing_countries_nan: bool = False,
-        warn_on_unused_countries: bool = True,
-        warn_on_unknown_excluded_countries: bool = True,
-        show_full_warning: bool = True,
-    ) -> Table:
-        """Harmonize country names in a table using the countries mapping file."""
-        if self.countries_file is None:
-            raise ValueError("countries_file must be provided to use harmonize_countries")
-
-        if not Path(self.countries_file).exists():
-            raise ValueError(
-                "A country mapping must exist before using regions.harmonize_countries. Use regions.harmonizer first."
-            )
-
-        return harmonize_countries(
-            df=tb,
-            countries_file=self.countries_file,
-            excluded_countries_file=self.excluded_countries_file,
-            country_col=country_col,
-            warn_on_missing_countries=warn_on_missing_countries,
-            make_missing_countries_nan=make_missing_countries_nan,
-            warn_on_unused_countries=warn_on_unused_countries,
-            warn_on_unknown_excluded_countries=warn_on_unknown_excluded_countries,
-            show_full_warning=show_full_warning,
-        )
-
-    # TODO: I'm not sure if this is a good idea. It seems convenient, but it's likely that RegionAggregator will end up using Regions under the hood, which is a bit circular. One simple option is that Regions doesn't call RegionAggregator at all. It could be PathFinder in charge of making it convenient o create instances of RegionAggregator with the right arguments. That way RegionAggregator would depend on Regions, but Regions would not use RegionAggregator anywhere.
-    def create_table_aggregator(
-        self,
-        regions: list[str] | dict[str, Any] | None = None,
-        index_columns: list[str] | None = None,
-        country_col: str = "country",
-        year_col: str = "year",
-        population_col: str = "population",
-    ) -> RegionAggregator:
-        return RegionAggregator(
-            ds_regions=self.ds_regions,
-            regions=regions,
-            regions_all=self.regions_all,
-            ds_income_groups=self._ds_income_groups,
-            ds_population=self._ds_population,
-            index_columns=index_columns,
-            country_col=country_col,
-            year_col=year_col,
-            population_col=population_col,
-        )

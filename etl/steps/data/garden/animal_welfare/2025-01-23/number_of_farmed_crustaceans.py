@@ -72,7 +72,7 @@ def run() -> None:
         tb[column] = tb[column].replace("< 1", "0.5").astype("Float64") * 1e6
 
     # Add region aggregates.
-    tb_agg = paths.regions.create_table_aggregator(regions=REGIONS_TO_ADD)
+    tb_agg = paths.region_aggregator(regions=REGIONS_TO_ADD)
     tb = tb_agg.add_aggregates(tb=tb, min_num_values_per_year=1)
 
     # Add per capita number of farmed decapod crustaceans.

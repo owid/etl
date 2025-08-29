@@ -29,6 +29,7 @@ from etl.collection import Collection, CollectionSet
 from etl.collection.core.create import Listable, create_collection
 from etl.collection.explorer import Explorer, ExplorerLegacy, create_explorer_legacy
 from etl.dag_helpers import load_dag
+from etl.data_helpers.geo import RegionAggregator, Regions
 from etl.grapher.helpers import grapher_checks
 from etl.snapshot import Snapshot, SnapshotMeta
 
@@ -350,9 +351,6 @@ class PathFinder:
     @property
     def regions(self):
         """Get Regions helper for the specific use of an ETL step."""
-        # Import Regions here to avoid circular imports.
-        from etl.data_helpers.geo import Regions
-
         if not hasattr(self, "_regions"):
             try:
                 ds_regions = self.load_dataset("regions")
@@ -375,6 +373,16 @@ class PathFinder:
                 auto_load_datasets=False,
             )
         return self._regions
+
+    def region_aggregator(self, **kwargs) -> RegionAggregator:
+        """Create a RegionAggregator with step-specific defaults."""
+        return RegionAggregator(
+            ds_regions=self.regions.ds_regions,
+            ds_income_groups=self.regions._ds_income_groups,
+            ds_population=self.regions._ds_population,
+            regions_all=self.regions.regions_all,
+            **kwargs,
+        )
 
     @property
     def snapshot_dir(self) -> Path:
