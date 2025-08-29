@@ -992,12 +992,10 @@ def _modified_tags_on_staging(
     join charts as c on ct.chartId = c.id
     where
     """
-    # TODO: settings tags don't update lastEditedAt, we can uncomment it once we enable that
-    where = "1 = 1"
-    # where = """
-    #     -- only compare charts that have been updated on staging server
-    #     c.lastEditedAt >= %(timestamp_staging_creation)s
-    # """
+    where = """
+        -- only compare charts that have been updated on staging server
+        c.lastEditedAt >= %(timestamp_staging_creation)s
+    """
     query_source = base_q + where + " GROUP BY ct.chartId"
     params = {"timestamp_staging_creation": TIMESTAMP_STAGING_CREATION}
 
@@ -1126,8 +1124,8 @@ def configs_are_equal(config_1: Dict[str, Any], config_2: Dict[str, Any], verbos
 def tags_are_equal(tags_1: List[Dict[str, Any]], tags_2: List[Dict[str, Any]], verbose=False) -> bool:
     """Compare two lists of chart tags."""
     # Sort tags by id for consistent comparison
-    tags_1_sorted = sorted(tags_1, key=lambda x: x.get('id', 0))
-    tags_2_sorted = sorted(tags_2, key=lambda x: x.get('id', 0))
+    tags_1_sorted = sorted(tags_1, key=lambda x: x.get("id", 0))
+    tags_2_sorted = sorted(tags_2, key=lambda x: x.get("id", 0))
 
     # Use pretty print to convert tag lists to strings for comparison
     tags_1_str = pprint.pformat(tags_1_sorted, sort_dicts=True)
