@@ -770,7 +770,7 @@ class SnapshotStep(Step):
 
     def run(self) -> None:
         snap = Snapshot(self.path)
-        snap.pull(force=True)
+        snap.pull(force=True, retries=3)
 
     def is_dirty(self) -> bool:
         snap = Snapshot(self.path)
