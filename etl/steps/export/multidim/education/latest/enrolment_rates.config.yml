@@ -18,6 +18,9 @@ dimensions:
       - slug: gross_enrolment
         name: Gross enrolment
         description: Includes children of any age entering that level of education
+      - slug: enrolment_type_side_by_side
+        name: Both metrics
+        description: Compare net and gross enrolment rates
   - slug: level
     name: Education level
     choices:

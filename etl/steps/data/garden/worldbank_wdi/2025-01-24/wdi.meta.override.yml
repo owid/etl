@@ -6,10 +6,10 @@ definitions:
     hasMapTab: true
     map:
       time: 2024
-      timeTolerance: 5
+      timeTolerance: 10
       colorScale:
         binningStrategy: manual
-        customNumericValues: [10,20,30,40,50,60,70,80,90,100]
+        customNumericValues: [0,10,20,30,40,50,60,70,80,90,100]
         baseColorScheme: Blues
 
   # Gross enrolment ratio configuration
@@ -18,10 +18,10 @@ definitions:
     hasMapTab: true
     map:
       time: 2024
-      timeTolerance: 5
+      timeTolerance: 10
       colorScale:
         binningStrategy: manual
-        customNumericValues: [0, 10,20,30,40,50,60,70,80,90,100]
+        customNumericValues: [0,10,20,30,40,50,60,70,80,90,100,1]
         baseColorScheme: PuBuGn
 
   gdp: Gross domestic product (GDP) is a measure of the total value added from the production of goods and services in a country or region each year.
@@ -59,17 +59,21 @@ definitions:
     We have also obtained [Our World in Data regional aggregations](https://ourworldindata.org/world-region-map-definitions) of these indicators by calculating a population-weighted average by region. You can see more information about the population data in [this dedicated article about sources](https://ourworldindata.org/population-sources).
 
   desc_key_ger: &desc_key_ger
-    - Not all students enrol in school at the same age. The gross enrolment ratio includes students enrolled in a certain level of education, regardless of whether they are within the expected age range for that level. It includes students who are younger or older than expected due to late entry, early entry, or grade repetition.
-    - It captures the total number of students enrolled at a specific education level, expressed as a percentage of the population in the official age group for that level. For example, if the official age group for upper secondary school is 15 to 17-year olds, the gross enrolment ratio compares total enrolment at that level (of any age) to the population of 15- to 17-year-olds.
-    - Values can be greater than 100% if students repeat grades or start a particular level of schooling late. For example, if the official age group for upper secondary school is 15 to 17-year olds, some 18- or 19 year olds might be included in the total if they started upper secondary school late.
-    - Similarly, a value of 100% does not necessarily mean all children within a particular age group are enrolled in school; some children could be out-of-school, but gross enrolment rates are boosted by older students being included.
-    - The data comes from administrative records, such as school enrolment reports, and from population estimates, usually provided by the United Nations or national sources.
+    - The gross enrolment ratio counts all students enrolled at a specific education level, regardless of their age. This includes students who are younger or older than the official age range because they started school early, started late, or repeated grades.
+    - It measures the total number of students of any age enrolled at an education level as a percentage of the population in the official age group for that level. For example, if primary school is designed for ages 6-11, the gross enrolment ratio compares total primary enrolment (all ages) to the population of 6- to 11-year-olds.
+    - Values can exceed 100% when students repeat grades or start late. For instance, primary school enrolment might include 12- or 13-year-olds who started late or repeated grades, pushing the ratio above 100%.
+    - A value of 100% does not guarantee that all children in the official age group are enrolled in school; some may be out of school entirely, but the ratio appears high due to older students being counted in the total.
+    - Values much lower than 100% indicate that many children of the official age are not enrolled at the expected education level - they may be out of school entirely, enrolled at a different level, or have never started school.
+    - Values much higher than 100% can indicate educational challenges such as high grade repetition rates, late school entry, or inefficient progression through the system.
+    - The data comes from administrative records such as school enrolment reports, combined with population estimates typically sourced from the United Nations or national statistical offices.
 
   desc_key_trained_teachers: &desc_key_trained_teachers
    - Not all teachers receive the same level of preparation before entering the classroom. This indicator measures the percentage of teachers at each education level who have completed at least the minimum organized pedagogical training required for teaching at that level in their country.
    - It captures the share of teachers who are pedagogically trained, expressed as a percentage of all teachers at that level. For example, if there are 1,000 primary teachers and 850 have completed the required training, the indicator shows 85%.
-   - The "minimum training" refers to whatever organized pedagogical preparation each country requires - pre-service teacher education programs, in-service training courses, or certification requirements that focus on teaching methods rather than subject knowledge.
+   - The "minimum training" refers to whatever organized pedagogical preparation each country requires — pre-service teacher education programs, in-service training courses, or certification requirements that focus on teaching methods rather than subject knowledge.
    - Values below 100% suggest some teachers are working without the pedagogical training their own country considers necessary. However, cross-country comparisons can be misleading since training requirements vary significantly between nations.
+   - This indicator does not account for differences in teachers' experience, professional status, teaching methods, materials, or classroom conditions — all of which affect the quality of teaching and learning. Some teachers without formal training may also acquire equivalent skills through professional experience.
+   - The reference years reflect the school year. In countries where the school year spans two calendar years (e.g. September 2010 to June 2011), the reference year is the year in which the school year ended (2011 in this example).
    - The data comes from administrative records collected at schools and other organized learning centers, typically including information on teacher academic credentials and employment status.
 
   description_short_clean_fuels: &description_short_clean_fuels |-
@@ -964,7 +968,7 @@ tables:
         display:
           numDecimalPlaces: 1
           tolerance: 5
-          name: Pre-primary education
+          name: Pre-primary
 
       se_prm_tcaq_zs:
         title: Trained teachers in primary education (% of total teachers)
@@ -980,7 +984,7 @@ tables:
         display:
           numDecimalPlaces: 1
           tolerance: 5
-          name: Primary education
+          name: Primary
 
       se_sec_tcaq_lo_zs:
         title: Trained teachers in lower secondary education (% of total teachers)
@@ -996,7 +1000,7 @@ tables:
         display:
           numDecimalPlaces: 1
           tolerance: 5
-          name: Lower secondary education
+          name: Lower secondary
 
       se_sec_tcaq_up_zs:
         title: Trained teachers in upper secondary education (% of total teachers)
@@ -1012,4 +1016,4 @@ tables:
         display:
           numDecimalPlaces: 1
           tolerance: 5
-          name: Upper secondary education
+          name: Upper secondary
