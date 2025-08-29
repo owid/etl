@@ -15,6 +15,20 @@ COLOR_TERTIARY = "#B16214"
 COLOR_BOYS = "#00847E"
 COLOR_GIRLS = "#E56E5A"
 
+# Color constants for enrolment types
+COLOR_NET_ENROLMENT = "#4C6A9C"
+COLOR_GROSS_ENROLMENT = "#B16214"
+
+# Used in enrolment type side-by-side comparison views
+ENROLLMENT_TYPE_DESCRIPTION_KEY = [
+    "Net and gross enrolment ratios measure school participation from different perspectives, providing complementary insights into education systems.",
+    "**Net enrolment** shows what percentage of children are enrolled at the education level intended for their age. It compares children enrolled at the correct level to the total population in that age group. The maximum value is 100%.",
+    "**Gross enrolment** counts all students enrolled at a specific education level, regardless of age. It includes students who started early, late, or repeated grades. Values can exceed 100% when older or younger students are enrolled.",
+    "High net enrolment indicates children are progressing at the expected pace. High gross enrolment above 100% may signal grade repetition or late school entry.",
+    "Low net enrolment suggests children are out of school or enrolled at different levels than expected for their age. Low gross enrolment indicates many children of the official age are not enrolled at the expected level.",
+    "Data comes from school administrative records tracking enrolment by age, combined with population estimates from national statistics offices or UN sources.",
+]
+
 MULTIDIM_CONFIG = {
     "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.008.json",
     "hasMapTab": True,
@@ -134,6 +148,22 @@ def run() -> None:
                     "yAxis": {"min": 0, "max": 100},
                 },
             },
+            {
+                "dimension": "enrolment_type",
+                "choice_new_slug": "enrolment_type_side_by_side",
+                "choices": ["net_enrolment", "gross_enrolment"],
+                "exclude": {"level": ["tertiary"]},
+                "view_config": {
+                    "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.005.json",
+                    "originUrl": "ourworldindata.org/education",
+                    "hideAnnotationFieldsInTitle": {"time": True},
+                    "addCountryMode": "add-country",
+                    "hasMapTab": False,
+                    "tab": "chart",
+                    "selectedFacetStrategy": "entity",
+                    "yAxis": {"min": 0, "max": 100},
+                },
+            },
         ]
     )
 
@@ -148,7 +178,23 @@ def run() -> None:
 
         # Generate dynamic title
         if sex and level:
-            view.config["title"] = generate_title_by_gender_and_level(sex, level)
+            if enrolment_type == "enrolment_type_side_by_side":
+                # For enrolment type grouping, get the actual level from the view's indicators
+                actual_level = None
+                for indicator in view.indicators.y:
+                    if hasattr(indicator, "metadata") and hasattr(indicator.metadata, "dimensions"):
+                        if "level" in indicator.metadata.dimensions:
+                            actual_level = indicator.metadata.dimensions["level"]
+                            break
+
+                if actual_level:
+                    gender_term = _get_gender_term(sex, actual_level, "title")
+                    level_name = LEVEL_MAPPINGS["title"].get(actual_level, actual_level)
+                    view.config["title"] = f"Share of {gender_term} enrolled in {level_name}, by enrolment measure"
+                else:
+                    view.config["title"] = generate_title_by_gender_and_level(sex, level)
+            else:
+                view.config["title"] = generate_title_by_gender_and_level(sex, level)
 
         # Generate dynamic subtitle
         if level and enrolment_type:
@@ -160,7 +206,11 @@ def run() -> None:
                 "Values may exceed 100% when children who are older or younger than the official age group also enroll."
             )
 
-        if sex == "sex_side_by_side" or level == "level_side_by_side":
+        if (
+            sex == "sex_side_by_side"
+            or level == "level_side_by_side"
+            or enrolment_type == "enrolment_type_side_by_side"
+        ):
             view.metadata = {
                 "description_from_producer": "",
                 "description_short": view.config["subtitle"],
@@ -168,6 +218,8 @@ def run() -> None:
                     "title_public": view.config["title"],
                 },
             }
+            if enrolment_type == "enrolment_type_side_by_side":
+                view.metadata["description_key"] = ENROLLMENT_TYPE_DESCRIPTION_KEY
         else:
             # Only updated description_short for other views
             view.metadata = {
@@ -254,9 +306,27 @@ def adjust_dimensions_enrolment(tb):
 
 # Common mappings used by both title and subtitle functions
 GENDER_MAPPINGS = {
-    "title": {"both": "children", "boys": "boys", "girls": "girls", "sex_side_by_side": "children"},
-    "subtitle": {"both": "children", "boys": "boys", "girls": "girls", "sex_side_by_side": "boys and girls"},
-    "tertiary": {"both": "people", "boys": "men", "girls": "women", "sex_side_by_side": "people"},
+    "title": {
+        "both": "children",
+        "boys": "boys",
+        "girls": "girls",
+        "sex_side_by_side": "children",
+        "enrolment_type_side_by_side": "children",
+    },
+    "subtitle": {
+        "both": "children",
+        "boys": "boys",
+        "girls": "girls",
+        "sex_side_by_side": "boys and girls",
+        "enrolment_type_side_by_side": "children",
+    },
+    "tertiary": {
+        "both": "people",
+        "boys": "men",
+        "girls": "women",
+        "sex_side_by_side": "people",
+        "enrolment_type_side_by_side": "people",
+    },
 }
 
 LEVEL_MAPPINGS = {
@@ -267,6 +337,7 @@ LEVEL_MAPPINGS = {
         "upper_secondary": "upper secondary school",
         "tertiary": "tertiary education",
         "level_side_by_side": "school",
+        "enrolment_type_side_by_side": "{level_name}",
     },
     "subtitle": {
         "primary": "[primary](#dod:primary-education)",
@@ -277,6 +348,7 @@ LEVEL_MAPPINGS = {
         "level_side_by_side": "[pre-primary](#dod:pre-primary-education), [primary](#dod:primary-education), [lower secondary](#dod:lower-secondary-education), [upper secondary](#dod:upper-secondary-education), and [tertiary](#dod:tertiary-education)",
         "level_side_by_side_gross": "[pre-primary](#dod:pre-primary-education), [primary](#dod:primary-education), [lower secondary](#dod:lower-secondary-education), [upper secondary](#dod:upper-secondary-education), and [tertiary](#dod:tertiary-education)",
         "level_side_by_side_net": "[pre-primary](#dod:pre-primary-education), [primary](#dod:primary-education), [lower secondary](#dod:lower-secondary-education), and [upper secondary](#dod:upper-secondary-education)",
+        "enrolment_type_side_by_side": "{level_dod}",
     },
     "plain": {
         "primary": "primary school age (between 5 and 7 years old)",
@@ -286,6 +358,7 @@ LEVEL_MAPPINGS = {
         "tertiary": "tertiary education age (typically between 18 and 22 years old)",
         "level_side_by_side_gross": "pre-primary, primary, lower secondary, upper secondary, and tertiary",
         "level_side_by_side_net": "pre-primary, primary, lower secondary, and upper secondary",
+        "enrolment_type_side_by_side": "{level_plain}",
     },
 }
 
@@ -309,6 +382,13 @@ GROSS_GROUPED_TEMPLATE = (
     "Shown for each level of education as the [gross enrolment ratio](#dod:gross-enrolment-ratio) — "
     "the number of {subject}, regardless of their age, who are enrolled at that level of education, "
     "expressed as a percentage of the official school-age population {population_suffix}."
+)
+
+ENROLMENT_TYPE_TEMPLATE = (
+    "Comparing [net](#dod:net-enrolment-ratio) and [gross enrolment ratios](#dod:gross-enrolment-ratio) "
+    "for {subject} in {level_dod} education. Net enrolment shows the share of {subject} of {level_plain} "
+    "who are enrolled, while gross enrolment includes all {subject} regardless of age, expressed as a "
+    "percentage of {population} of the same age group."
 )
 
 ENROLMENT_TYPE_MAP = {
@@ -372,6 +452,26 @@ ENROLMENT_TYPE_MAP = {
             suffix=" for girls", subject="girls", population_suffix="of girls"
         ),
     },
+    "enrolment_type_side_by_side": {
+        "both": ENROLMENT_TYPE_TEMPLATE.format(
+            subject="children", level_dod="{level_dod}", level_plain="{level_plain}", population="the population"
+        ),
+        "boys": ENROLMENT_TYPE_TEMPLATE.format(
+            subject="boys", level_dod="{level_dod}", level_plain="{level_plain}", population="boys"
+        ),
+        "girls": ENROLMENT_TYPE_TEMPLATE.format(
+            subject="girls", level_dod="{level_dod}", level_plain="{level_plain}", population="girls"
+        ),
+        "tertiary_both": ENROLMENT_TYPE_TEMPLATE.format(
+            subject="people", level_dod="{level_dod}", level_plain="{level_plain}", population="the population"
+        ),
+        "tertiary_men": ENROLMENT_TYPE_TEMPLATE.format(
+            subject="men", level_dod="{level_dod}", level_plain="{level_plain}", population="men"
+        ),
+        "tertiary_women": ENROLMENT_TYPE_TEMPLATE.format(
+            subject="women", level_dod="{level_dod}", level_plain="{level_plain}", population="women"
+        ),
+    },
 }
 
 
@@ -385,19 +485,46 @@ def _get_gender_term(sex, level, context="title"):
 def generate_title_by_gender_and_level(sex, level):
     """Generate title based on gender and education level."""
     gender_term = _get_gender_term(sex, level, "title")
-    level_term = LEVEL_MAPPINGS["title"].get(level, "")
-
-    if not level_term:
-        raise ValueError(f"Unknown education level: {level}")
 
     if level == "level_side_by_side":
         return f"Share of {gender_term} enrolled in school, by education level"
+    elif level == "enrolment_type_side_by_side":
+        # For enrolment type grouping, we need to determine the actual level
+        # This will be handled dynamically in the main loop where we have access to the view
+        return "Share of {gender_term} enrolled in {level_name}, by enrolment measure"
+
+    level_term = LEVEL_MAPPINGS["title"].get(level, "")
+    if not level_term:
+        raise ValueError(f"Unknown education level: {level}")
 
     return f"Share of {gender_term} enrolled in {level_term}"
 
 
 def generate_subtitle_by_level(level, sex, enrolment_type):
-    """Generate subtitle based on education level, gender, and enrollment type with links."""
+    """Generate subtitle based on education level, gender, and enrolment type with links."""
+
+    # Handle enrolment type side-by-side case
+    if enrolment_type == "enrolment_type_side_by_side":
+        # Get the appropriate description key based on gender and level
+        if level == "tertiary":
+            if sex == "boys":
+                gender_key = "tertiary_men"
+            elif sex == "girls":
+                gender_key = "tertiary_women"
+            else:
+                gender_key = "tertiary_both"
+        else:
+            if sex == "boys":
+                gender_key = "boys"
+            elif sex == "girls":
+                gender_key = "girls"
+            else:
+                gender_key = "both"
+
+        description_template = ENROLMENT_TYPE_MAP["enrolment_type_side_by_side"][gender_key]
+        level_term_linked = LEVEL_MAPPINGS["subtitle"].get(level, "")
+        level_term_plain = LEVEL_MAPPINGS["plain"].get(level, "")
+        return description_template.format(level_dod=level_term_linked, level_plain=level_term_plain)
 
     # Get the appropriate description key based on level and gender
     if level == "level_side_by_side":
@@ -479,7 +606,7 @@ def edit_indicator_displays(view):
         }
 
         for indicator in view.indicators.y:
-            for level_key, config in LEVEL_CONFIG.items():
+            for config in LEVEL_CONFIG.values():
                 if any(pattern in indicator.catalogPath for pattern in config["patterns"]):
                     indicator.display = {"name": config["name"], "color": config["color"]}
                     break
@@ -493,10 +620,28 @@ def edit_indicator_displays(view):
         }
 
         for indicator in view.indicators.y:
-            for gender_key, config in GENDER_CONFIG.items():
+            for config in GENDER_CONFIG.values():
                 if any(
                     pattern in indicator.catalogPath or indicator.catalogPath.endswith(pattern)
                     for pattern in config["patterns"]
                 ):
+                    indicator.display = {"name": config["name"], "color": config["color"]}
+                    break
+
+    # Handle enrolment type side-by-side views (net vs gross)
+    if view.matches(enrolment_type="enrolment_type_side_by_side"):
+        # Display name and color mappings for enrolment types
+        ENROLMENT_TYPE_CONFIG = {
+            "net": {"name": "Net enrolment", "color": COLOR_NET_ENROLMENT, "patterns": ["net_enrolment"]},
+            "gross": {
+                "name": "Gross enrolment",
+                "color": COLOR_GROSS_ENROLMENT,
+                "patterns": ["gross_enrolment", "pre_enrr"],
+            },
+        }
+
+        for indicator in view.indicators.y:
+            for config in ENROLMENT_TYPE_CONFIG.values():
+                if any(pattern in indicator.catalogPath for pattern in config["patterns"]):
                     indicator.display = {"name": config["name"], "color": config["color"]}
                     break

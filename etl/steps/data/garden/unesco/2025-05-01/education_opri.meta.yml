@@ -221,13 +221,13 @@ definitions:
     - The data comes from school administrative records that track enrolment by individual age, combined with population estimates from national statistics offices or UN sources.
 
   desc_key_ger: &desc_key_ger
-    - The gross enrollment ratio counts all students enrolled at a specific education level, regardless of their age. This includes students who are younger or older than the official age range because they started school early, started late, or repeated grades.
-    - It measures the total number of students of any age enrolled at an education level as a percentage of the population in the official age group for that level. For example, if primary school is designed for ages 6-11, the gross enrollment ratio compares total primary enrollment (all ages) to the population of 6- to 11-year-olds.
-    - Values can exceed 100% when students repeat grades or start late. For instance, primary school enrollment might include 12- or 13-year-olds who started late or repeated grades, pushing the ratio above 100%.
+    - The gross enrolment ratio counts all students enrolled at a specific education level, regardless of their age. This includes students who are younger or older than the official age range because they started school early, started late, or repeated grades.
+    - It measures the total number of students of any age enrolled at an education level as a percentage of the population in the official age group for that level. For example, if primary school is designed for ages 6-11, the gross enrolment ratio compares total primary enrolment (all ages) to the population of 6- to 11-year-olds.
+    - Values can exceed 100% when students repeat grades or start late. For instance, primary school enrolment might include 12- or 13-year-olds who started late or repeated grades, pushing the ratio above 100%.
     - A value of 100% does not guarantee that all children in the official age group are enrolled in school; some may be out of school entirely, but the ratio appears high due to older students being counted in the total.
     - Values much lower than 100% indicate that many children of the official age are not enrolled at the expected education level - they may be out of school entirely, enrolled at a different level, or have never started school.
     - Values much higher than 100% can indicate educational challenges such as high grade repetition rates, late school entry, or inefficient progression through the system.
-    - The data comes from administrative records such as school enrollment reports, combined with population estimates typically sourced from the United Nations or national statistical offices.
+    - The data comes from administrative records such as school enrolment reports, combined with population estimates typically sourced from the United Nations or national statistical offices.
 
   # Educational attainment descriptions
   desc_key_mye: &desc_key_mye
@@ -240,7 +240,7 @@ definitions:
     - The data may not reflect recent progress in countries with infrequent surveys or outdated census information
 
   desc_key_sle: &desc_key_sle
-     - This indicator shows how many years a student starting school in that year is expected to spend in education.  It's based on the enrollment patterns observed in that country in that specific year.
+     - This indicator shows how many years a student starting school in that year is expected to spend in education.  It's based on the enrolment patterns observed in that country in that specific year.
      - The calculation looks at how many students are enrolled at each age and education level, then estimates how long a new student would stay in school if those patterns continued. This includes time spent repeating grades, not just the official length of each school level.
      - It measures participation in schooling - how long students are likely to stay in school - rather than whether they actually learn or graduate.
      - Higher numbers mean students spend more years in school, either because the official school system is longer or because many students repeat grades.
@@ -637,8 +637,8 @@ tables:
       # ========================================================================
 
       total_net_enrolment_rate__primary__adjusted_gender_parity_index__gpia:
-        title: Net enrollment rates in primary education, adjusted gender parity index
-        description_short: An [adjusted gender parity index](#dod:adjusted-gpi) of 1 indicates equal net enrollment rates in [primary](#dod:primary-education) school between boys and girls. Values below 1 favor boys, and above 1 favor girls.
+        title: Net enrolment rates in primary education, adjusted gender parity index
+        description_short: An [adjusted gender parity index](#dod:adjusted-gpi) of 1 indicates equal net enrolment rates in [primary](#dod:primary-education) school between boys and girls. Values below 1 favor boys, and above 1 favor girls.
         unit: "index"
         description_key:
           - Boys and girls don’t always have equal access to primary education — this indicator shows how close we are to gender parity in age-appropriate school enrolment.
@@ -655,7 +655,7 @@ tables:
 
       total_net_enrolment_rate__lower_secondary__adjusted_gender_parity_index__gpia:
         title: Net enrolment rates in lower secondary education, adjusted gender parity index
-        description_short: An [adjusted gender parity index](#dod:adjusted-gpi) of 1 indicates equal net enrollment rates in [lower secondary](#dod:lower-secondary-education) school between boys and girls. Values below 1 favor boys, and above 1 favor girls.
+        description_short: An [adjusted gender parity index](#dod:adjusted-gpi) of 1 indicates equal net enrolment rates in [lower secondary](#dod:lower-secondary-education) school between boys and girls. Values below 1 favor boys, and above 1 favor girls.
         unit: "index"
         description_key:
           - Boys and girls don’t always have equal access to lower secondary education — this indicator shows how close we are to gender parity in age-appropriate school enrolment at that level.
@@ -1004,7 +1004,7 @@ tables:
 
       school_life_expectancy__pre_primary__both_sexes__years:
         title: School life expectancy in pre-primary education
-        description_short: Expected number of years a child of school entrance age is likely to spend in [pre-primary](#dod:pre-primary-education) education based on current enrollment patterns.
+        description_short: Expected number of years a child of school entrance age is likely to spend in [pre-primary](#dod:pre-primary-education) education based on current enrolment patterns.
         unit: "years"
         description_key: *desc_key_sle
         presentation:
@@ -1016,7 +1016,7 @@ tables:
 
       school_life_expectancy__pre_primary__female__years:
         title: School life expectancy in pre-primary education among girls
-        description_short: Expected number of years a girl of school entrance age is likely to spend in [pre-primary](#dod:pre-primary-education) education based on current enrollment patterns.
+        description_short: Expected number of years a girl of school entrance age is likely to spend in [pre-primary](#dod:pre-primary-education) education based on current enrolment patterns.
         unit: "years"
         description_key: *desc_key_sle
         presentation:
@@ -1028,7 +1028,7 @@ tables:
 
       school_life_expectancy__pre_primary__male__years:
         title: School life expectancy in pre-primary education among boys
-        description_short: Expected number of years a boy of school entrance age is likely to spend in [pre-primary](#dod:pre-primary-education) education based on current enrollment patterns.
+        description_short: Expected number of years a boy of school entrance age is likely to spend in [pre-primary](#dod:pre-primary-education) education based on current enrolment patterns.
         unit: "years"
         description_key: *desc_key_sle
         presentation:
@@ -1040,7 +1040,7 @@ tables:
 
       school_life_expectancy__primary__both_sexes__years:
         title: School life expectancy in primary education
-        description_short: Expected number of years a child of school entrance age is likely to spend in [primary](#dod:primary-education) education based on current enrollment patterns.
+        description_short: Expected number of years a child of school entrance age is likely to spend in [primary](#dod:primary-education) education based on current enrolment patterns.
         unit: "years"
         description_key: *desc_key_sle
         presentation:
@@ -1052,7 +1052,7 @@ tables:
 
       school_life_expectancy__primary__female__years:
         title: School life expectancy in primary education among girls
-        description_short: Expected number of years a girl of school entrance age is likely to spend in [primary](#dod:primary-education) education based on current enrollment patterns.
+        description_short: Expected number of years a girl of school entrance age is likely to spend in [primary](#dod:primary-education) education based on current enrolment patterns.
         unit: "years"
         description_key: *desc_key_sle
         presentation:
@@ -1064,7 +1064,7 @@ tables:
 
       school_life_expectancy__primary__male__years:
         title: School life expectancy in primary education among boys
-        description_short: Expected number of years a boy of school entrance age is likely to spend in [primary](#dod:primary-education) education based on current enrollment patterns.
+        description_short: Expected number of years a boy of school entrance age is likely to spend in [primary](#dod:primary-education) education based on current enrolment patterns.
         unit: "years"
         description_key: *desc_key_sle
         presentation:
@@ -1076,7 +1076,7 @@ tables:
 
       school_life_expectancy__secondary__both_sexes__years:
         title: School life expectancy in secondary education
-        description_short: Expected number of years a child of school entrance age is likely to spend in [secondary](#dod:secondary-education) education based on current enrollment patterns.
+        description_short: Expected number of years a child of school entrance age is likely to spend in [secondary](#dod:secondary-education) education based on current enrolment patterns.
         unit: "years"
         description_key: *desc_key_sle
         presentation:
@@ -1088,7 +1088,7 @@ tables:
 
       school_life_expectancy__secondary__female__years:
         title: School life expectancy in secondary education among girls
-        description_short: Expected number of years a girl of school entrance age is likely to spend in [secondary](#dod:secondary-education) education based on current enrollment patterns.
+        description_short: Expected number of years a girl of school entrance age is likely to spend in [secondary](#dod:secondary-education) education based on current enrolment patterns.
         unit: "years"
         description_key: *desc_key_sle
         presentation:
@@ -1100,7 +1100,7 @@ tables:
 
       school_life_expectancy__secondary__male__years:
         title: School life expectancy in secondary education among boys
-        description_short: Expected number of years a boy of school entrance age is likely to spend in [secondary](#dod:secondary-education) education based on current enrollment patterns.
+        description_short: Expected number of years a boy of school entrance age is likely to spend in [secondary](#dod:secondary-education) education based on current enrolment patterns.
         unit: "years"
         description_key: *desc_key_sle
         presentation:
@@ -1112,7 +1112,7 @@ tables:
 
       school_life_expectancy__tertiary__both_sexes__years:
         title: School life expectancy in tertiary education
-        description_short: Expected number of years a child of school entrance age is likely to spend in [tertiary](#dod:tertiary-education) education based on current enrollment patterns.
+        description_short: Expected number of years a child of school entrance age is likely to spend in [tertiary](#dod:tertiary-education) education based on current enrolment patterns.
         unit: "years"
         description_key: *desc_key_sle
         presentation:
@@ -1124,7 +1124,7 @@ tables:
 
       school_life_expectancy__tertiary__female__years:
         title: School life expectancy in tertiary education among girls
-        description_short: Expected number of years a girl of school entrance age is likely to spend in [tertiary](#dod:tertiary-education) education based on current enrollment patterns.
+        description_short: Expected number of years a girl of school entrance age is likely to spend in [tertiary](#dod:tertiary-education) education based on current enrolment patterns.
         unit: "years"
         description_key: *desc_key_sle
         presentation:
@@ -1136,7 +1136,7 @@ tables:
 
       school_life_expectancy__tertiary__male__years:
         title: School life expectancy in tertiary education among boys
-        description_short: Expected number of years a boy of school entrance age is likely to spend in [tertiary](#dod:tertiary-education) education based on current enrollment patterns.
+        description_short: Expected number of years a boy of school entrance age is likely to spend in [tertiary](#dod:tertiary-education) education based on current enrolment patterns.
         unit: "years"
         description_key: *desc_key_sle
         presentation:
