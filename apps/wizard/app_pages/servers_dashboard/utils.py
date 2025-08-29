@@ -110,7 +110,7 @@ def fetch_lxc_servers_data(host: str = "gaia-1") -> Tuple[Optional[pd.DataFrame]
 
         if result.returncode != 0:
             error_msg = f"Command failed with return code {result.returncode}: {result.stderr}"
-            log.error("LXC command failed", error=error_msg, stdout=result.stdout)
+            log.error("LXC command failed", cmd=cmd, error=error_msg, stdout=result.stdout)
             return None, error_msg
 
         # Parse JSON response
