@@ -374,14 +374,25 @@ class PathFinder:
             )
         return self._regions
 
-    def region_aggregator(self, **kwargs) -> RegionAggregator:
-        """Create a RegionAggregator with step-specific defaults."""
+    def region_aggregator(
+        self,
+        regions: list[str] | dict[str, Any] | None = None,
+        index_columns: list[str] | None = None,
+        country_col: str = "country",
+        year_col: str = "year",
+        population_col: str = "population",
+    ) -> RegionAggregator:
+        """Create a RegionAggregator that will be used on a specific table."""
         return RegionAggregator(
+            regions=regions,
             ds_regions=self.regions.ds_regions,
             ds_income_groups=self.regions._ds_income_groups,
             ds_population=self.regions._ds_population,
             regions_all=self.regions.regions_all,
-            **kwargs,
+            index_columns=index_columns,
+            country_col=country_col,
+            year_col=year_col,
+            population_col=population_col,
         )
 
     @property
