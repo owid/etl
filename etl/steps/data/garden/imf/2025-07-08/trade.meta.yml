@@ -1,0 +1,104 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: major
+    display:
+     numDecimalPlaces: 1
+    presentation:
+      topic_tags:
+        - Trade & Globalization
+
+  decimals: &decimals 1
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  trade:
+    variables:
+      imports_of_goods__cost_insurance_freight__cif__us_dollar:
+        title: "Imports of goods (CIF): << counterpart_country >>"
+        unit: "current US$"
+        short_unit: "US$"
+        display:
+          numDecimalPlaces: 0
+
+      exports_of_goods__free_on_board__fob__us_dollar:
+        title: "Exports of goods (FOB): << counterpart_country >>"
+        unit: "current US$"
+        short_unit: "US$"
+        display:
+          numDecimalPlaces: 0
+
+      exports_of_goods__free_on_board__fob__share:
+        title: "Share of total exports of goods (FOB): << counterpart_country >>"
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: *decimals
+
+      imports_of_goods__cost_insurance_freight__cif__share:
+        title: "Share of total imports of goods (CIF): << counterpart_country >>"
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: *decimals
+
+      share_of_total_trade:
+        title: "Share of total trade volume with << counterpart_country >>"
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: *decimals
+
+      china_imports_share_of_gdp:
+        title: "China imports as share of GDP"
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: *decimals
+
+      import_rank:
+        title: "<< counterpart_country >> rank in imports of goods (CIF)"
+        unit: rank
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      share_bilateral:
+        title: "Share of bilateral trading relationships"
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: *decimals
+
+      share_unilateral:
+        title: "Share of unilateral trading relationships"
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: *decimals
+
+      share_non_trading:
+        title: "Share of non-trading relationships"
+        unit: "%"
+        short_unit: "%"
+        description_key:
+          - This indicator shows the percentage of potential country pairs worldwide that have no trade relationship with each other.
+          - Calculated by identifying country pairs with zero recorded trade volume and expressing them as a percentage of all possible country pairs.
+          - Values represent the extent of global trade network gaps, highlighting potential untapped trade opportunities.
+          - A higher percentage indicates more country pairs that don't engage in trade with each other.
+          - This measure captures the fragmentation of the global trade network.
+          - Changes over time can reflect expanding trade networks, new trade relationships, or increasing global economic integration.
+        display:
+          numDecimalPlaces: *decimals
+
+      top_partner_category:
+        title: "Top partner category"
+        unit: category
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
