@@ -71,7 +71,6 @@ import owid.catalog.processing as pr
 from owid.catalog import Table
 from owid.datautils.dataframes import map_series
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -338,12 +337,6 @@ def run() -> None:
     ds_meadow = paths.load_dataset("renewable_energy_statistics")
     tb = ds_meadow.read("renewable_energy_statistics")
 
-    # Load regions dataset.
-    ds_regions = paths.load_dataset("regions")
-
-    # Load income groups dataset.
-    ds_income_groups = paths.load_dataset("income_groups")
-
     #
     # Process data.
     #
@@ -354,7 +347,7 @@ def run() -> None:
     tb = tb.dropna(subset="capacity").reset_index(drop=True)
 
     # Harmonize country names.
-    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+    tb = paths.regions.harmonize_names(tb=tb)
 
     # Get original global data (used for sanity checks).
     tb_global = tb[(tb["country"] == "World")][["group_technology", "year", "capacity"]].reset_index(drop=True)
@@ -366,12 +359,10 @@ def run() -> None:
     tb = remap_categories(tb=tb)
 
     # Add region aggregates.
-    tb = geo.add_regions_to_table(
+    tb = paths.regions.add_aggregates(
         tb,
         index_columns=["country", "year", "producer_type", "technology"],
         regions=REGIONS,
-        ds_regions=ds_regions,
-        ds_income_groups=ds_income_groups,
         min_num_values_per_year=1,
     )
 
