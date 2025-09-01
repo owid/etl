@@ -59,7 +59,7 @@ Persistence:
 1) PR and branch setup — use dataset-update-pr subagent
    - Create or reuse a draft PR and work branch.
    - Compute `new_version = TODAY (YYYY-MM-DD)`.
-   - Run `etl update snapshot://<namespace>/<new_version>/<short_name> --include-usages` under this subagent’s rules.
+   - Run subagent `dataset-update-pr` with `<namespace>/<new_version>/<short_name>`
    - Ensure branch length < 28 chars if interacting with DB-backed systems.
 
 2) Snapshot update & compare — use snapshot-updater subagent
