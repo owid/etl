@@ -39,7 +39,6 @@ definitions:
 dataset:
   update_period_days: 365
 
-
 tables:
   maternal_mortality:
     variables:
@@ -60,11 +59,11 @@ tables:
         short_unit: ""
         display:
           numDecimalPlaces: 1
-          entityAnnotationsMap: 'United States: Values from 2003–2017 affected by measurement change'
+          entityAnnotationsMap: "United States: Values from 2003–2017 affected by measurement change"
         description_from_producer: |-
           {definitions.description_methodology}
 
-      mm_rate:
+      mmr_rate:
         title: Estimated maternal mortality rate
         description_short: |-
           The estimated maternal mortality rate is the number of maternal deaths per 100,000 women of reproductive age (15-49 years old).
@@ -72,7 +71,7 @@ tables:
         short_unit: ""
         display:
           numDecimalPlaces: 1
-          entityAnnotationsMap: 'United States: Values from 2003–2017 affected by measurement change'
+          entityAnnotationsMap: "United States: Values from 2003–2017 affected by measurement change"
 
         description_from_producer: |-
           {definitions.description_methodology}
@@ -147,7 +146,6 @@ tables:
         short_unit: ""
         display:
           numDecimalPlaces: 0
-          entityAnnotationsMap: 'United States: Values from 2003–2017 affected by measurement change'
+          entityAnnotationsMap: "United States: Values from 2003–2017 affected by measurement change"
         description_from_producer: |-
           {definitions.description_methodology}
-

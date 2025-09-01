@@ -55,7 +55,6 @@ def run() -> None:
 
     # Add origins to columns.
     tb = add_origins(tb, DATA_COLS)
-    tb = tb.rename(columns={"mmr_rate": "mm_rate"})
 
     aggr = {"maternal_deaths": "sum", "births": "sum", "hiv_related_indirect_maternal_deaths": "sum"}
     tb = geo.add_regions_to_table(
