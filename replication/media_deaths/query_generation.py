@@ -5,13 +5,26 @@ function create_query_str(query_dict, proximity=1000) - This function takes the 
 function create_queries_by_cause(dict_queries) - This function takes the dictionary of all causes of death and all query terms and creates a string query (by calling create_query_str) for each cause of death).
 function create_full_queries() - This function creates the full queries for all causes of death. The output is a dictionary of the form {cause_of_death: query_string}
 
+function create_single_keyword_queries() - This function creates queries that take all articles with even a single mention into account for all causes of death. The output is a dictionary of the form {cause_of_death: single_keyword_query_string}
+
 The full queries can also be found in the methodology document here: [TODO: link to methodology document]
 """
+
 
 def create_full_queries():
     queries = create_queries()
     queries = create_queries_by_cause(queries)
     return queries
+
+
+def create_single_keyword_queries():
+    queries = create_queries()
+    single_keyword_queries = {}
+    for cause, query_dict in queries.items():
+        single_terms = query_dict["single_terms"]
+        if single_terms:
+            single_keyword_queries[cause] = f'"{" OR ".join(single_terms)}"'
+    return single_keyword_queries
 
 
 def create_query_str(query_dict, proximity=1000):

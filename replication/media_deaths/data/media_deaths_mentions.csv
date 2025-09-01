@@ -1,0 +1,61 @@
+cause,mentions,source,year
+heart disease,436,The New York Times,2023
+cancer,625,The New York Times,2023
+accidents,1489,The New York Times,2023
+stroke,119,The New York Times,2023
+respiratory,212,The New York Times,2023
+alzheimers,131,The New York Times,2023
+diabetes,220,The New York Times,2023
+kidney,63,The New York Times,2023
+liver,49,The New York Times,2023
+covid,822,The New York Times,2023
+suicide,580,The New York Times,2023
+influenza,241,The New York Times,2023
+drug overdose,1152,The New York Times,2023
+homicide,6469,The New York Times,2023
+terrorism,2813,The New York Times,2023
+heart disease,337,The Washington Post,2023
+cancer,554,The Washington Post,2023
+accidents,697,The Washington Post,2023
+stroke,119,The Washington Post,2023
+respiratory,148,The Washington Post,2023
+alzheimers,161,The Washington Post,2023
+diabetes,158,The Washington Post,2023
+kidney,51,The Washington Post,2023
+liver,38,The Washington Post,2023
+covid,932,The Washington Post,2023
+suicide,394,The Washington Post,2023
+influenza,235,The Washington Post,2023
+drug overdose,1119,The Washington Post,2023
+homicide,5418,The Washington Post,2023
+terrorism,1451,The Washington Post,2023
+heart disease,446,Fox News,2023
+cancer,735,Fox News,2023
+accidents,1189,Fox News,2023
+stroke,153,Fox News,2023
+respiratory,115,Fox News,2023
+alzheimers,185,Fox News,2023
+diabetes,112,Fox News,2023
+kidney,32,Fox News,2023
+liver,41,Fox News,2023
+covid,1160,Fox News,2023
+suicide,801,Fox News,2023
+influenza,232,Fox News,2023
+drug overdose,1896,Fox News,2023
+homicide,10170,Fox News,2023
+terrorism,2140,Fox News,2023
+heart disease,14845,US Collection,2023
+cancer,29785,US Collection,2023
+accidents,25656,US Collection,2023
+stroke,4065,US Collection,2023
+respiratory,5501,US Collection,2023
+alzheimers,5723,US Collection,2023
+diabetes,6735,US Collection,2023
+kidney,1922,US Collection,2023
+liver,2441,US Collection,2023
+covid,42957,US Collection,2023
+suicide,16425,US Collection,2023
+influenza,7270,US Collection,2023
+drug overdose,36557,US Collection,2023
+homicide,187274,US Collection,2023
+terrorism,37731,US Collection,2023
