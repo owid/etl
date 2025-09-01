@@ -1,7 +1,6 @@
 from typing import Any
 from unittest import mock
 
-import boto3
 from pytest import raises
 
 from owid.datautils.decorators import enable_file_download
@@ -52,16 +51,10 @@ class TestEnableDownload:
         func("http://example.ourworldindata.org/test.json")
 
     @mock.patch(
-        "owid.datautils.s3.S3.download_from_s3",
+        "owid.catalog.s3_utils.download",
         return_value=None,
     )
-    @mock.patch(
-        "owid.datautils.s3.check_for_aws_profile",
-        return_value=None,
-    )
-    @mock.patch.object(boto3.Session, "__init__", return_value=None)
-    @mock.patch.object(boto3.Session, "client", return_value="client")
-    def test_download_s3_args(self, mock_download, mock_check_s3, mock_boto_1, mock_boto_2):
+    def test_download_s3_args(self, mock_download):
         func = enable_file_download(path_arg_name="path")(_test_local_file)
         func("s3://example.com/file.json")
 
