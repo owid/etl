@@ -21,9 +21,11 @@ def create_single_keyword_queries():
     queries = create_queries()
     single_keyword_queries = {}
     for cause, query_dict in queries.items():
-        single_terms = query_dict["single_terms"]
-        if single_terms:
-            single_keyword_queries[cause] = f'"{" OR ".join(single_terms)}"'
+        query_str = ""
+        for term in query_dict["single_terms"][:-1]:
+            query_str += f'"{term}" OR '
+        query_str += f'"{query_dict["single_terms"][-1]}"'
+        single_keyword_queries[cause] = query_str
     return single_keyword_queries
 
 
