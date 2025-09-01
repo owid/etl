@@ -5,6 +5,13 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Color constants
+COLOR_PREPRIMARY = "#D73C50"
+COLOR_PRIMARY = "#4C6A9C"
+COLOR_LOWER_SECONDARY = "#883039"
+COLOR_UPPER_SECONDARY = "#578145"
+COLOR_TERTIARY = "#B16214"
+
 # Common configuration for all charts
 MULTIDIM_CONFIG = {
     "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.008.json",
@@ -19,9 +26,10 @@ MULTIDIM_CONFIG = {
 GROUPED_VIEW_CONFIG = MULTIDIM_CONFIG | {
     "hasMapTab": False,
     "tab": "chart",
-    "selectedFacetStrategy": "metric",
-    "hideFacetControl": False,
+    "selectedFacetStrategy": "entity",
+    "chartTypes": ["StackedBar"],
 }
+
 
 # Column patterns for education spending indicators
 SPENDING_PATTERNS = {
@@ -31,7 +39,7 @@ SPENDING_PATTERNS = {
         "government_expenditure_on_lower_secondary_education_as_a_percentage_of_gdp__pct",
         "government_expenditure_on_upper_secondary_education_as_a_percentage_of_gdp__pct",
         "government_expenditure_on_tertiary_education_as_a_percentage_of_gdp__pct",
-        "combined_expenditure_share_gdp",
+        "government_expenditure_on_education_as_a_percentage_of_gdp__pct__xgdp_fsgov",
     ],
     "constant_ppp": [
         "government_expenditure_on_pre_primary_education__constant_pppdollar__millions",
@@ -110,7 +118,8 @@ def get_spending_columns(tb):
 
     for pattern_list in SPENDING_PATTERNS.values():
         for pattern in pattern_list:
-            matching_cols = [col for col in tb.columns if pattern in col]
+            # Use exact matching to avoid selecting columns that contain the pattern as a substring
+            matching_cols = [col for col in tb.columns if col == pattern]
             spending_cols.extend(matching_cols)
 
     return spending_cols
@@ -128,11 +137,11 @@ def adjust_dimensions(tb):
         "lower_secondary": "lower_secondary",
         "upper_secondary": "upper_secondary",
         "tertiary": "tertiary",
+        "on_education_as_a_percentage_of_gdp": "all",
     }
 
     SPENDING_TYPE_KEYWORDS = {
         "percentage_of_gdp": "gdp_share",
-        "share_gdp": "gdp_share",
         "constant_pppdollar__millions": "constant_ppp",
         "total_government_expenditure": "total_government",
         "per_student": "per_student",
@@ -168,7 +177,7 @@ def adjust_dimensions(tb):
                 spending_type = "constant_ppp"
             elif "total_government" in col:
                 spending_type = "total_government"
-            elif "combined" in col:
+            elif "on_education_as_a_percentage_of_gdp" in col:
                 spending_type = "gdp_share"
 
         # Set indicator name
@@ -295,30 +304,27 @@ def generate_subtitle_by_spending_type_and_level(view):
     if not level_term:
         raise ValueError(f"Unknown education level: {level}")
 
-    return f"Total [general government](#dod:general-government) spending on {level_term} {spending_term}."
+    return f"Total annual [general government](#dod:general-government) spending on {level_term} {spending_term}."
 
 
 def edit_indicator_displays(view):
-    """Edit display names for the grouped views."""
+    """Edit display names and colors for the grouped views."""
     if view.indicators.y is None:
         return
 
-    # Display name mappings for education levels
-    LEVEL_DISPLAY_NAMES = {
-        "pre_primary": "Pre-primary",
-        "primary": "Primary",
-        "lower_secondary": "Lower secondary",
-        "upper_secondary": "Upper secondary",
-        "tertiary": "Tertiary",
-        "all": "All levels",
+    # Display name and color mappings for education levels
+    LEVEL_CONFIG = {
+        "pre_primary": {"name": "Pre-primary", "color": COLOR_PREPRIMARY},
+        "primary": {"name": "Primary", "color": COLOR_PRIMARY},
+        "lower_secondary": {"name": "Lower secondary", "color": COLOR_LOWER_SECONDARY},
+        "upper_secondary": {"name": "Upper secondary", "color": COLOR_UPPER_SECONDARY},
+        "tertiary": {"name": "Tertiary", "color": COLOR_TERTIARY},
     }
 
-    for indicator in view.indicators.y:
-        display_name = None
-
-        # Check for level-based display names
-        if view.d.level == "level_side_by_side":
-            for level_key, display_name in LEVEL_DISPLAY_NAMES.items():
+    # Check for level-based display names
+    if view.matches(level="level_side_by_side"):
+        for indicator in view.indicators.y:
+            for level_key, config in LEVEL_CONFIG.items():
                 if level_key in indicator.catalogPath:
-                    indicator.display = {"name": display_name}
+                    indicator.display = {"name": config["name"], "color": config["color"]}
                     break

@@ -79,13 +79,17 @@ load_env()
 
 pd.set_option("future.no_silent_downcasting", True)
 
-# When DEBUG is on
-# - run steps in the same process (speeding up ETL)
-DEBUG = env.get("DEBUG") in ("True", "true", "1")
-
 # Environment, e.g. production, staging, dev
 ENV = env.get("ENV", "dev")
 ENV_IS_REMOTE = ENV in ("production", "staging")
+
+# When DEBUG is on
+# - run steps in the same process (speeding up ETL)
+# If DEBUG is not explicitly set, default to ENV == "dev"
+if "DEBUG" not in env:
+    DEBUG = ENV == "dev"
+else:
+    DEBUG = env.get("DEBUG") in ("True", "true", "1")
 
 # Prefer downloading datasets from catalog instead of building them
 PREFER_DOWNLOAD = env.get("PREFER_DOWNLOAD") in ("True", "true", "1")
