@@ -5,7 +5,12 @@ from owid.catalog import Table
 from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
-REGIONS = [reg for reg in geo.REGIONS.keys() if reg != "European Union (27)"] + ["World"]
+REGIONS = ['Africa',
+ 'Asia',
+ 'Europe',
+ 'North America',
+ 'Oceania',
+ 'South America']
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -35,7 +40,6 @@ def run() -> None:
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("maternal_mortality")
     ds_regions = paths.load_dataset("regions")
-    ds_income = paths.load_dataset("income_groups")
 
     # Read table from meadow dataset.
     tb = ds_meadow["maternal_mortality"].reset_index()
