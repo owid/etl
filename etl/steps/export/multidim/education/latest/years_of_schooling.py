@@ -219,7 +219,6 @@ def run() -> None:
                 "dimension": "metric_type",
                 "choice_new_slug": "metric_type_side_by_side",
                 "choices": ["expected_years_schooling", "average_years_schooling", "learning_adjusted_years_schooling"],
-                "drop_Dimensions_if_single_choice": True,
                 "view_config": {
                     "originUrl": "ourworldindata.org/education",
                     "hideAnnotationFieldsInTitle": {"time": True},
@@ -229,7 +228,15 @@ def run() -> None:
                     "selectedFacetStrategy": "entity",
                 },
             },
-        ]
+        ],
+    )
+
+    # Drop views that are not relevant: For `level`="metric_type_side_by_side", there is only one valid `level` choice (`level`="all"). All the other level choices should be dropped.
+    c.drop_views(
+        {
+            "metric_type": "metric_type_side_by_side",
+            "level": [d for d in c.dimension_choices["level"] if d != "all"],
+        }
     )
 
     for view in c.views:
