@@ -35,12 +35,6 @@ COLUMNS_AND_CATEGORIES = {
         "wealth_quintile": "Total",
         "unit_of_measure": "Deaths per 100 live births",
     },
-    "mortality": {
-        "sex": "Both sexes",
-        "age_group": "all ages",
-        "cause": "Maternal conditions",
-        "icd10_codes": "O00-O99",
-    },
     "wash": {"residence": "Total"},
     "harmonized_scores": {"sex": "all students"},
     "gho": {"sex": "both sexes"},
@@ -62,7 +56,7 @@ def run() -> None:
     ds_wdi = paths.load_dataset("wdi")
     ds_un_wpp = paths.load_dataset("un_wpp")
     ds_igme = paths.load_dataset("igme")
-    ds_mortality = paths.load_dataset("mortality_database")
+    ds_maternal_mortality = paths.load_dataset("maternal_mortality")
     ds_wash = paths.load_dataset("who")
     ds_unwto = paths.load_dataset("unwto")
     ds_pwt = paths.load_dataset("penn_world_table")
@@ -79,7 +73,7 @@ def run() -> None:
     tb_wdi = ds_wdi.read("wdi")
     tb_un_wpp = ds_un_wpp.read("life_expectancy")
     tb_igme = ds_igme.read("igme")
-    tb_mortality = ds_mortality.read("mortality_database")
+    tb_maternal_mortality = ds_maternal_mortality.read("maternal_mortality")
     tb_wash = ds_wash.read("who")
     tb_unwto = ds_unwto.read("unwto")
     tb_pwt = ds_pwt.read("penn_world_table")
@@ -118,13 +112,9 @@ def run() -> None:
         columns={"observation_value": "child_mortality_rate"}, errors="raise"
     )
 
-    # Mortality Database
-    check_columns_and_categories(tb=tb_mortality, table_name="mortality")
-    tb_mortality = filter_table(tb=tb_mortality, table_name="mortality")
-    tb_mortality = tb_mortality[
-        ["country", "year", "age_standardized_death_rate_per_100_000_standard_population"]
-    ].rename(
-        columns={"age_standardized_death_rate_per_100_000_standard_population": "maternal_death_rate"}, errors="raise"
+    # Maternal mortality
+    tb_maternal_mortality = tb_maternal_mortality[["country", "year", "mmr"]].rename(
+        columns={"mmr": "maternal_death_rate"}, errors="raise"
     )
 
     # WHO WASH
@@ -188,6 +178,10 @@ def run() -> None:
     # World Bank PIP
     check_columns_and_categories(tb=tb_pip, table_name="pip")
     tb_pip = filter_table(tb=tb_pip, table_name="pip")
+
+    # Also keep only the decile columns that are empty
+    tb_pip = tb_pip[tb_pip["decile"].isna()].reset_index(drop=True)
+
     tb_pip = tb_pip[["country", "year", "mean", "median"]].rename(
         columns={"mean": "mean_income", "median": "median_income"},
         errors="raise",
@@ -199,7 +193,7 @@ def run() -> None:
             tb_wdi,
             tb_un_wpp,
             tb_igme,
-            tb_mortality,
+            tb_maternal_mortality,
             tb_wash,
             tb_unwto,
             tb_pwt,
@@ -244,6 +238,10 @@ def select_most_recent_data(tb: Table) -> Table:
     # Define the columns that are indicators (the columns that are not country or year)
     indicators = tb.columns.difference(["country", "year"]).tolist()
 
+    # Move "gdp_per_capita" to the beginning of the list
+    indicators.remove("gdp_per_capita")
+    indicators.insert(0, "gdp_per_capita")
+
     tb_list = []
 
     for indicator in indicators:
@@ -266,19 +264,30 @@ def select_most_recent_data(tb: Table) -> Table:
         # For each country, select the row with the latest year
         tb_indicator = tb_indicator.groupby("country").first().reset_index()
 
-        # Calculate latest year again and earliest year
-        latest_year = tb_indicator["year"].max()
-        earliest_year = tb_indicator["year"].min()
-
-        if ENABLE_INDICATOR_YEARS_RANGE:
-            log.info(f"The indicator {indicator} ranges between {earliest_year} and {latest_year}.")
-
-        # Drop year column
-        tb_indicator = tb_indicator.drop(columns=["year"])
+        if indicator != "region":
+            # Rename year column
+            tb_indicator = tb_indicator.rename(columns={"year": f"{indicator}_year"}, errors="raise")
+        else:
+            # Drop year column
+            tb_indicator = tb_indicator.drop(columns=["year"], errors="raise")
 
         tb_list.append(tb_indicator)
 
-    tb = pr.multi_merge(tb_list, on=["country"], how="outer")
+    # It's a left merge to keep only data available in GDP pc
+    tb = pr.multi_merge(tb_list, on=["country"], how="left")
+
+    for indicator in [i for i in indicators if i != "region"]:
+        # Calculate latest year again and earliest year
+        latest_year = tb[f"{indicator}_year"].max()
+        earliest_year = tb[f"{indicator}_year"].min()
+
+        # Count unique values for each indicator
+        n_countries = tb[indicator].notna().sum()
+
+        if ENABLE_INDICATOR_YEARS_RANGE:
+            log.info(
+                f"The indicator {indicator} ranges between {earliest_year} and {latest_year}. It has data for {n_countries} countries."
+            )
 
     return tb
 
