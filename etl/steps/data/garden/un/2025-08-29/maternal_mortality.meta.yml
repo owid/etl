@@ -6,7 +6,7 @@ definitions:
         - Maternal Mortality
         - Causes of Death
     description_processing: |-
-      - The data shown is the UN MMEIG point estimate - this means there is a 50% chance that the true measure lies above this point,
+      - The data shown is the point estimate - this means there is a 50% chance that the true measure lies above this point,
         and a 50% chance that the true value lies below this point.
   description_hiv: |-
     For countries with generalized HIV epidemics and high HIV prevalence, HIV/AIDS is a leading cause of death during pregnancy and after delivery.
@@ -147,5 +147,23 @@ tables:
         display:
           numDecimalPlaces: 0
           entityAnnotationsMap: "United States: Values from 2003–2017 affected by measurement change"
+        description_from_producer: |-
+          {definitions.description_methodology}
+      coviddeaths:
+        title: Maternal deaths attributed to the COVID-19 pandemic
+        description_short: Estimated number of COVID-19 related maternal deaths. These are deaths that would not have occurred in the absence of the COVID-19 pandemic.
+        unit: deaths
+        short_unit: ""
+        display:
+          numDecimalPlaces: 0
+        description_from_producer: |-
+          {definitions.description_methodology}
+      covidmmr:
+        title: Maternal mortality ratio attributed to the COVID-19 pandemic
+        description_short: Estimated maternal mortality ratio (MMR) related to COVID-19. These are deaths that would not have occurred in the absence of the COVID-19 pandemic.
+        unit: deaths per 100,000 live births
+        short_unit: ""
+        display:
+          numDecimalPlaces: 1
         description_from_producer: |-
           {definitions.description_methodology}
