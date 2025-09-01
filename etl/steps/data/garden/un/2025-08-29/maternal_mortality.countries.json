@@ -193,5 +193,10 @@
   "SMR": "San Marino",
   "AND": "Andorra",
   "MHL": "Marshall Islands",
-  "COK": "Cook Islands"
+  "COK": "Cook Islands",
+  "WORLD": "World",
+  "High income": "High-income countries",
+  "Lower middle income": "Lower-middle-income countries",
+  "Upper middle income": "Upper-middle-income countries",
+  "Low income": "Low-income countries"
 }
