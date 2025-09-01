@@ -66,7 +66,7 @@ def run() -> None:
         ds_regions=ds_regions,
         ds_income_groups=ds_income,
         aggregations=aggr,
-        num_allowed_nans_per_year=0,
+        frac_allowed_nans_per_year=0.3,
     )
 
     tb = tb.format(["country", "year"])
