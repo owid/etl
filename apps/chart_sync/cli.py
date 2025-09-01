@@ -191,7 +191,7 @@ def cli(
 
                 # Get user who edited the chart
                 user_id = diff.source_chart.lastEditedByUserId
-                
+
                 # Get source chart tags (needed for both new and existing charts)
                 source_tags = diff.source_chart.tags(source_session)
 
@@ -201,7 +201,7 @@ def cli(
                     target_tags = diff.target_chart.tags(target_session)
                     configs_equal = configs_are_equal(migrated_config, diff.target_chart.config)
                     tags_equal = tags_are_equal(source_tags, target_tags)
-                    
+
                     # Skip if both configs and tags are equal
                     if configs_equal and tags_equal:
                         log.info(

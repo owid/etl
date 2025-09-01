@@ -490,9 +490,9 @@ class ChartDiffShow:
                     st.markdown(self._header_production_chart, help=CONFLICT_HELP_MESSAGE)
                 else:
                     st.markdown(self._header_production_chart)
-                
+
                 self._show_tags_if_changed(self.diff.target_chart, self.target_session)
-                
+
                 assert self.diff.target_chart is not None
                 grapher_chart(chart_config=self.diff.target_chart.config, owid_env=TARGET)
 
@@ -505,9 +505,9 @@ class ChartDiffShow:
             else:
                 with st.container(height=40, border=False):
                     st.markdown(self._header_staging_chart)
-            
+
             self._show_tags_if_changed(self.diff.source_chart, self.source_session)
-            
+
             grapher_chart(chart_config=self.diff.source_chart.config, owid_env=SOURCE)
 
         def _show_charts_comparison_v() -> Tuple[Any, bool]:
@@ -618,7 +618,6 @@ class ChartDiffShow:
 
         if "metadata" in self.diff.change_types:
             self._show_metadata_diff()
-
 
         # Get approval history
         # df_approvals = self.diff.get_all_approvals_df()

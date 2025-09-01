@@ -193,8 +193,8 @@ def filter_chart_diffs():
             # keep chart diffs with at least one change type (could be data, metadata or config)
             change_types = st.query_params.get_all("change_type")
         else:
-            # filter to changed config by default
-            change_types = ["new", "config"]
+            # filter to changed config or tags by default
+            change_types = ["new", "config", "tags"]
 
         st.session_state.chart_diffs_filtered = {
             k: v
@@ -401,7 +401,7 @@ def _show_options_filters():
     with st.form("chart-diff-filters"):
         default = [change for change in st.query_params.get_all("change_type")]
         if not default:
-            default = ["new", "config"]
+            default = ["new", "config", "tags"]
         st.multiselect(
             label="Chart change types",
             options=["new", "data", "metadata", "config", "tags"],  # type: ignore
