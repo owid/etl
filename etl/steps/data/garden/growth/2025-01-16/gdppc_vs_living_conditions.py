@@ -24,7 +24,7 @@ log = get_logger()
 MOST_RECENT_YEAR = 2023
 
 # Enable indicator years range or not
-ENABLE_INDICATOR_YEARS_RANGE = True
+ENABLE_INDICATOR_YEARS_RANGE = False
 
 # Define columns to filter and categories I want to select
 COLUMNS_AND_CATEGORIES = {
