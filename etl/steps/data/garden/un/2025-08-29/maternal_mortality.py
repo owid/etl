@@ -13,6 +13,7 @@ paths = PathFinder(__file__)
 
 DATA_COLS = [
     "births",
+    "matcoviddeaths",
     "coviddeaths",
     "covidmmr",
     "hiv_related_indirect_maternal_deaths",
