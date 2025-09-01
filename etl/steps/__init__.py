@@ -648,7 +648,7 @@ class DataStep(Step):
 
         # Run the command and show only the actual error output, not subprocess wrapper
         try:
-            subprocess.run(args, env=env, capture_output=False, text=True, check=True)
+            subprocess.run(args, env=env, capture_output=True, text=True, check=True)
         except subprocess.CalledProcessError as e:
             # Print the actual error instead of subprocess wrapper
             if e.stdout:
