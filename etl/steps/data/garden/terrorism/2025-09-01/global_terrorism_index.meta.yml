@@ -17,33 +17,41 @@ tables:
   global_terrorism_index:
     variables:
       incidents:
-        title: Terrorist attacks
+        title: Number of terrorist attacks
         description_short: The total number of terrorist attacks recorded in a given year.
         unit: attacks
+        presentation:
+          title_public: Terrorist attacks
         display:
           name: Attacks
           numDecimalPlaces: 0
 
       fatalities:
-        title: Terrorism deaths
+        title: Number of deaths from terrorism
         description_short: The total number of fatalities resulting from terrorist attacks in a given year.
         unit: deaths
+        presentation:
+          title_public: Terrorism fatalities
         display:
           name: Fatalities
           numDecimalPlaces: 0
 
       hostages:
-        title: Hostages
+        title: Number of hostages taken during terrorist attacks
         description_short: The total number of hostages taken during terrorist attacks in a given year.
         unit: hostages
+        presentation:
+          title_public: Terrorism hostages
         display:
           name: Hostages
           numDecimalPlaces: 0
 
       injuries:
-        title: Injuries
+        title: Number of injuries from terrorism
         description_short: The total number of injuries resulting from terrorist attacks in a given year.
         unit: injuries
+        presentation:
+          title_public: Terrorism injuries
         display:
           name: Injuries
           numDecimalPlaces: 0
@@ -52,6 +60,8 @@ tables:
         title: Share of deaths from terrorism
         description_short: The percentage of deaths resulting from terrorist attacks compared to total deaths in a given year.
         unit: percentage
+        presentation:
+          title_public: Share of deaths from terrorism
         display:
           name: Share of deaths from terrorism
           numDecimalPlaces: 2
@@ -60,6 +70,8 @@ tables:
         title: Terrorism deaths per 100,000 people
         description_short: The number of deaths resulting from terrorist attacks per 100,000 people in a given year.
         unit: deaths per 100,000 people
+        presentation:
+          title_public: Terrorism deaths per 100,000 people
         display:
           name: Terrorism deaths per 100,000 people
           numDecimalPlaces: 2
