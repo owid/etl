@@ -113,25 +113,12 @@ def run(dest_dir: str) -> None:
 
         prepare_and_save_outputs(tb, codebook=codebook, temp_dir_path=temp_dir_path)
 
-        # Initialise S3 client.
-        client = s3_utils.connect_r2()
-
         for file_name in tqdm(["owid-co2-data.csv", "owid-co2-data.xlsx", "owid-co2-data.json"]):
             # Path to local file.
             local_file = temp_dir_path / file_name
             # Path (within bucket) to S3 file.
-            s3_file = Path("data/co2") / file_name
+            s3_file = S3_DATA_DIR / file_name
             tqdm.write(f"Uploading file {local_file} to S3 bucket {S3_BUCKET_NAME} as {s3_file}.")
 
-            # Read file content and determine content type
-            with open(local_file, "rb") as f:
-                content_type = "text/csv" if file_name.endswith(".csv") else "application/json"
-
-                # Upload and make public each of the files.
-                client.put_object(
-                    Bucket=S3_BUCKET_NAME,
-                    Body=f,
-                    Key=str(s3_file),
-                    ContentType=content_type,
-                    ACL="public-read",  # Make file publicly accessible
-                )
+            # Upload file to S3
+            s3_utils.upload(f"s3://{S3_BUCKET_NAME}/{str(s3_file)}", local_file, public=True)

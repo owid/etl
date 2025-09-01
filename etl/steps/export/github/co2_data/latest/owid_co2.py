@@ -240,12 +240,12 @@ def run(dest_dir: str) -> None:
 
         repo = GithubApiRepo(repo_name="co2-data")
 
-        repo.create_branch_if_not_exists(branch=branch, dry_run=dry_run)
+        repo.create_branch_if_not_exists(branch_name=branch, dry_run=dry_run)
 
         # Commit csv files to the repos.
         for file_name in ["owid-co2-data.csv", "owid-co2-codebook.csv", "README.md"]:
             with (temp_dir_path / file_name).open("r") as file_content:
-                repo.commit_file_to_github(
+                repo.commit_file(
                     file_content.read(),
                     file_path=file_name,
                     commit_message=":bar_chart: Automated update",
