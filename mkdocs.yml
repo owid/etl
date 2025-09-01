@@ -138,6 +138,11 @@ markdown_extensions:
 plugins:
   - mkdocs-jupyter:
       ignore_h1_titles: True
+      include_source: True
+      execute: False
+      allow_errors: False
+      show_input: True
+      include_requirejs: True
   # The built-in search plugin integrates seamlessly with Material for MkDocs, adding multilingual client-side search with lunr and lunr-languages. ref: https://squidfunk.github.io/mkdocs-material/setup/setting-up-site-search/#built-in-search-plugin
   - search
   - exclude:
@@ -275,3 +280,7 @@ nav:
       - Querying data via Datasette: "api/datasette.md"
       - Maintenance: "api/maintenance.md"
       - COVID-19: "api/covid.md"
+  - Analyses:
+      - "analyses/index.md"
+      - Example Analysis:
+          - Data pipeline: "analyses/example-analysis/example_analysis.ipynb"
