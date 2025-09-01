@@ -233,7 +233,13 @@ def run() -> None:
             }
 
         edit_indicator_displays(view)
-
+    # Drop views that are not relevant: For `level`="metric_type_side_by_side", there is only one valid `level` choice (`level`="all"). All the other level choices should be dropped.
+    c.drop_views(
+        {
+            "metric_type": "enrolment_type_side_by_side",
+            "level": [d for d in c.dimension_choices["level"] if d == "tertiary"],
+        }
+    )
     #
     # Save garden dataset.
     #
