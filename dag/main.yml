@@ -705,6 +705,20 @@ steps:
   data://grapher/trade/2025-09-22/wto_trade_growth:
     - data://garden/trade/2025-09-22/wto_trade_growth
   #
+
+  #
+  # Global Terrorism Index
+  #
+  data://meadow/terrorism/2025-09-01/global_terrorism_index:
+    - snapshot://terrorism/2025-09-01/global_terrorism_index.xlsx
+  data://garden/terrorism/2025-09-01/global_terrorism_index:
+    - data://meadow/terrorism/2025-09-01/global_terrorism_index
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2024-07-15/population
+    - data://garden/un/2024-07-12/un_wpp
+  data://grapher/terrorism/2025-09-01/global_terrorism_index:
+    - data://garden/terrorism/2025-09-01/global_terrorism_index
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml

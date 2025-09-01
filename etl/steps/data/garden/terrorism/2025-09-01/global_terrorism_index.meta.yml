@@ -1,0 +1,65 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Terrorism
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  global_terrorism_index:
+    variables:
+      incidents:
+        title: Terrorist attacks
+        description_short: The total number of terrorist attacks recorded in a given year.
+        unit: attacks
+        display:
+          name: Attacks
+          numDecimalPlaces: 0
+
+      fatalities:
+        title: Terrorism deaths
+        description_short: The total number of fatalities resulting from terrorist attacks in a given year.
+        unit: deaths
+        display:
+          name: Fatalities
+          numDecimalPlaces: 0
+
+      hostages:
+        title: Hostages
+        description_short: The total number of hostages taken during terrorist attacks in a given year.
+        unit: hostages
+        display:
+          name: Hostages
+          numDecimalPlaces: 0
+
+      injuries:
+        title: Injuries
+        description_short: The total number of injuries resulting from terrorist attacks in a given year.
+        unit: injuries
+        display:
+          name: Injuries
+          numDecimalPlaces: 0
+
+      share_of_deaths_from_terrorism:
+        title: Share of deaths from terrorism
+        description_short: The percentage of deaths resulting from terrorist attacks compared to total deaths in a given year.
+        unit: percentage
+        display:
+          name: Share of deaths from terrorism
+          numDecimalPlaces: 2
+
+      terrorism_deaths_per_100k:
+        title: Terrorism deaths per 100,000 people
+        description_short: The number of deaths resulting from terrorist attacks per 100,000 people in a given year.
+        unit: deaths per 100,000 people
+        display:
+          name: Terrorism deaths per 100,000 people
+          numDecimalPlaces: 2

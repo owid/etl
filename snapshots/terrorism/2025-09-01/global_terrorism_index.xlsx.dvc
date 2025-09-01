@@ -1,0 +1,19 @@
+meta:
+  origin:
+    producer: Institute for Economics and Peace
+    title: Global Terrorism Index
+    description: |-
+      The GTI uses Dragonfly’s TerrorismTracker database, which contains detailed and structured event records of every terrorist incident reported in open sources since January 2007. Dragonfly is a leading risk intelligence and data company that specialises in global security, geopolitics, crises and instability.
+
+      TerrorismTracker is the most comprehensive, current and methodologically robust dedicated open-source terrorism incidents database available. It is widely used for professional applications in countering terrorism, by law enforcement, government, military, in the private sector, in academia, and among insurers.
+    citation_full: "Institute for Economics & Peace. Global Terrorism Index 2025: Measuring The Impact of Terrorism, Sydney, March 2025. Available from: http://visionofhumanity.org/resources (accessed 01 September 2025)."
+    url_main: https://www.visionofhumanity.org/maps/global-terrorism-index/#/
+    date_accessed: '2025-09-01'
+    date_published: '2025'
+    license:
+      name: "You may not, without the prior written permission of Institute for Economics and Peace and the permission of any other relevant rights owners: broadcast, republish, up-load to a third party, transmit, post, distribute, show or play in public, adapt or change in any way the Services or third party Services for any purpose, unless otherwise provided by these Terms. This prohibition does not extend to materials on the Website, which are freely available for re-use or are in the public domain."
+      url: https://www.visionofhumanity.org/terms/
+outs:
+  - md5: 94f6d8852c76855a1af4597187aeeed9
+    size: 315414
+    path: global_terrorism_index.xlsx
