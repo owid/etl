@@ -219,7 +219,7 @@ def run() -> None:
                 "dimension": "metric_type",
                 "choice_new_slug": "metric_type_side_by_side",
                 "choices": ["expected_years_schooling", "average_years_schooling", "learning_adjusted_years_schooling"],
-                "exclude": {"level": ["preprimary", "primary", "secondary", "tertiary"]},
+                "drop_Dimensions_if_single_choice": True,
                 "view_config": {
                     "originUrl": "ourworldindata.org/education",
                     "hideAnnotationFieldsInTitle": {"time": True},
