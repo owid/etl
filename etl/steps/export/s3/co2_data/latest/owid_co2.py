@@ -11,9 +11,9 @@ GDP are included.
 
 Outputs:
 * The data in three different formats will also be uploaded to S3, and will be made publicly available, in:
-  * https://nyc3.digitaloceanspaces.com/owid-public/data/co2/owid-co2-data.csv
-  * https://nyc3.digitaloceanspaces.com/owid-public/data/co2/owid-co2-data.xlsx
-  * https://nyc3.digitaloceanspaces.com/owid-public/data/co2/owid-co2-data.json
+  * https://owid-public.owid.io/data/co2/owid-co2-data.csv
+  * https://owid-public.owid.io/data/co2/owid-co2-data.xlsx
+  * https://owid-public.owid.io/data/co2/owid-co2-data.json
 
 """
 
