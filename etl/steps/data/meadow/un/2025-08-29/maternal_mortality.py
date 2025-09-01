@@ -21,13 +21,16 @@ def run() -> None:
     # Load data from snapshot.
     zf = ZipFile(snap.path)
     folder_name = zf.namelist()[0]
-    tb = pr.read_csv(zf.open(f"{folder_name}Estimates/estimates.csv"), metadata=snap_meta, origin=snap.metadata.origin)
+    tb = pr.read_csv(zf.open(f"{folder_name}Estimates/estimates.csv"), metadata=snap_meta, origin=snap.metadata.origin).rename(columns = {'iso_alpha_3_code': 'country', "year_mid": "year"})
+    tb_income = pr.read_csv(zf.open(f"{folder_name}Estimates/aggregates/aggregate_estimates_rt_World_Bank_Income.csv"), metadata=snap_meta, origin=snap.metadata.origin).drop(columns = 'Unnamed: 0').rename(columns = {'group': 'country', "year_mid": "year"})
+    tb_world = pr.read_csv(zf.open(f"{folder_name}Estimates/aggregates/aggregate_estimates_rt_WORLD.csv"), metadata=snap_meta, origin=snap.metadata.origin).drop(columns = 'Unnamed: 0').rename(columns = {'group': 'country', "year_mid": "year"})
 
+
+    tb = pr.concat([tb, tb_income, tb_world], ignore_index=True)
     # drop unneeded column
     tb = tb.drop(columns=["estimate_version"])
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb = tb.rename(columns={"iso_alpha_3_code": "country", "year_mid": "year"})
     tb = tb.format(["country", "year", "parameter"])
 
     #
