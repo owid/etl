@@ -999,6 +999,7 @@ tables:
         description_key: *desc_key_govt_expenditure_gdp_share
         presentation:
           title_public: Government spending on education as share of GDP
+          grapher_config: *grapher_config_expenditure_gdp
         display:
           numDecimalPlaces: 1
           name: Total across all levels of education
