@@ -67,6 +67,7 @@ Persistence:
    - Save summary to `workbench/<short_name>/snapshot-updater.md`.
    - Do not modify the old snapshot. Use collapsible sections for detail.
    - This step is part of the approval checkpoint below.
+   - CHECKPOINT
 
 3) Meadow step repair/verify — use step-fixer subagent
    - Invoke with `channel=meadow namespace=<ns> version=<ver> dataset=<name> short_name=<short_name>` (or the data:// form).
@@ -74,24 +75,28 @@ Persistence:
    - Diff against REMOTE for a representative country and save to:
      - `workbench/<short_name>/meadow_diff_raw.txt`
      - Summarize to `workbench/<short_name>/meadow_diff.md`
+   - CHECKPOINT
 
 4) Garden step repair/verify — use step-fixer subagent
    - Same as Meadow, but `channel=garden`.
    - Save to `workbench/<short_name>/garden_diff_raw.txt` and `garden_diff.md`.
+   - CHECKPOINT
 
 5) Grapher step run/verify — use step-fixer subagent
    - Invoke with `channel=grapher` and add `--grapher` flag inside the agent’s run command.
    - Skip the diff step (as per agent’s notes) but verify variables/metadata integrity.
+   - CHECKPOINT
 
 6) Indicator upgrade (optional, staging only) — use indicator-upgrader subagent
    - Inputs: `<short_name> <branch>`.
    - Resolve NEW and OLD dataset ids, map perfect variable matches, emit manual mapping TODOs.
    - Dry-run, then apply upgrade, verify no charts reference OLD dataset.
    - Persist `workbench/<short_name>/indicator_upgrade.json`.
+   - CHECKPOINT
 
 ## CHECKPOINT (mandatory user approval)
 
-- Present a consolidated summary of key changes across snapshot, meadow, garden, and grapher.
+- Present a consolidated summary of key changes from the step.
 - Ask explicitly: “Proceed? reply: yes/no”.
 - Only proceed to commit/push if the user replies “yes”.
 - After approval:
