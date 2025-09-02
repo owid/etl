@@ -415,7 +415,8 @@ def reset_mysql_database(server_name: str) -> Tuple[bool, str]:
     """
     try:
         # SSH into the server and run make refresh in owid-grapher directory
-        cmd = f"ssh owid@{server_name} 'cd owid-grapher && make refresh'"
+        # Disable host key checking for staging servers since they're ephemeral
+        cmd = f"ssh -o StrictHostKeyChecking=no owid@{server_name} 'cd owid-grapher && make refresh'"
         log.info("Resetting MySQL database via make refresh", command=cmd, server=server_name)
 
         result = subprocess.run(
