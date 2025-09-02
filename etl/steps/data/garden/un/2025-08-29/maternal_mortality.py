@@ -45,7 +45,7 @@ def run() -> None:
     tb = ds_meadow["maternal_mortality"].reset_index()
 
     # drop rows where parameter is mmr_mean or pm_mean
-    tb = tb[~tb["parameter"].str.contains("mean")]
+    tb = tb[~tb["parameter"].str.contains("mean", na=False)]
     # include only point estimate (estimation midpoint), drop uncertainty intervals (thresholds 10% and 90%)
     tb = tb.drop(columns=["_0_1", "_0_9"])
 
