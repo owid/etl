@@ -271,9 +271,9 @@ def run() -> None:
             view.metadata = {
                 "description_from_producer": "",
                 "description_short": view.config["subtitle"],
+                "description_key": METRIC_TYPE_DESCRIPTION_KEY,
                 "presentation": {
                     "title_public": view.config["title"],
-                    "description_key": METRIC_TYPE_DESCRIPTION_KEY,
                 },
             }
         else:
