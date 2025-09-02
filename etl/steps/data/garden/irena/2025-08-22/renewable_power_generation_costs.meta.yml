@@ -3,7 +3,7 @@ definitions:
     processing_level: major
     description_processing: |-
       - The resulting costs are compiled from two IRENA reports: Renewable Power Generation Costs in 2024 (primarily for data from 2010 onwards) and Renewable Power Generation Costs in 2023 (for earlier data not included in the latest report).
-      - Data from the Renewable Power Generation Costs in 2023 report (expressed in constant 2023 US dollars) was converted to constant 2024 US dollars using the US GDP deflator, to account for the effects of inflation. The deflator data is available from the [World Bank World Development Indicators](https://data.worldbank.org/indicator/NY.GDP.DEFL.ZS?locations=US).
+      - Data from the Renewable Power Generation Costs in 2023 report (expressed in constant 2023 US dollars) was converted to constant 2024 US dollars using the GDP deflator, to account for the effects of inflation in each country. The deflator data is available from the [World Bank World Development Indicators](https://data.worldbank.org/indicator/NY.GDP.DEFL.ZS.AD).
     presentation:
       topic_tags:
         - Energy
