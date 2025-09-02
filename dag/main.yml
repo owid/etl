@@ -660,6 +660,20 @@ steps:
   data://grapher/homicide/2025-08-06/who_mort_db:
     - data://garden/homicide/2025-08-06/who_mort_db
 
+  # World Development Indicators - WDI
+  data://meadow/worldbank_wdi/2025-09-01/wdi:
+    - snapshot://worldbank_wdi/2025-09-01/wdi.zip
+
+  data://garden/worldbank_wdi/2025-09-01/wdi:
+    - data://garden/wb/2025-07-01/income_groups
+    - data://garden/regions/2023-01-01/regions
+    - data://meadow/worldbank_wdi/2025-09-01/wdi
+    - snapshot://worldbank_wdi/2025-09-01/wdi.zip
+    - data://garden/demography/2024-07-15/population
+
+  data://grapher/worldbank_wdi/2025-09-01/wdi:
+    - data://garden/worldbank_wdi/2025-09-01/wdi
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
