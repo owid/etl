@@ -7,7 +7,7 @@ function create_full_queries() - This function creates the full queries for all 
 
 function create_single_keyword_queries() - This function creates queries that take all articles with even a single mention into account for all causes of death. The output is a dictionary of the form {cause_of_death: single_keyword_query_string}
 
-The full queries can also be found in the methodology document here: [TODO: link to methodology document]
+The full queries can also be found in the methodology document here: https://docs.owid.io/projects/etl/analyses/media_deaths/methodology/#queries-for-each-cause-of-death
 """
 
 

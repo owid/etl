@@ -143,6 +143,7 @@ plugins:
       allow_errors: False
       show_input: True
       include_requirejs: True
+      included: ["*.py", "*.ipynb"]
   # The built-in search plugin integrates seamlessly with Material for MkDocs, adding multilingual client-side search with lunr and lunr-languages. ref: https://squidfunk.github.io/mkdocs-material/setup/setting-up-site-search/#built-in-search-plugin
   - search
   - exclude:
