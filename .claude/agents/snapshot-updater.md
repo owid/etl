@@ -37,8 +37,10 @@ When tasked with updating a snapshot, you will follow this precise workflow:
 
 6. **Mandatory User Confirmation**:
    - Show the user the saved summary
-   - Ask: "Proceed? reply: yes/no".
-   - If user replies "yes", commit changes and update the PR with a collapsible "Snapshot Differences" section containing the comparison summary
+   - Ask: "Proceed? reply: yes/no" and **STOP HERE** - wait for explicit user response
+   - **DO NOT** proceed with any further actions until user confirms
+   - Only if user replies "yes", then commit changes and update the PR with a collapsible "Snapshot Differences" section containing the comparison summary
+   - If user replies "no", stop the process and explain what would need to be addressed
 
 
 Critical Guidelines:

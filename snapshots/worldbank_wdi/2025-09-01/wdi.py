@@ -73,6 +73,8 @@ def update_snapshot_metadata(snap: Snapshot) -> None:
     snap.metadata.origin.url_download = [r for r in meta_orig["resources"] if r["name"] == "CSV"][0]["distribution"][
         "url"
     ]
+    # Strip versionId from the URL, that returns 404 for some reason
+    snap.metadata.origin.url_download = snap.metadata.origin.url_download.split("?")[0]
     # Update the description (in case it changed).
     snap.metadata.origin.description = BeautifulSoup(
         meta_orig.get("identification").get("description"), features="html.parser"
