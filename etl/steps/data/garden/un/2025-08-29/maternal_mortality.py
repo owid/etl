@@ -13,9 +13,9 @@ paths = PathFinder(__file__)
 
 DATA_COLS = [
     "births",
-    #"matcoviddeaths",
-    #"coviddeaths",
-    #"covidmmr",
+    # "matcoviddeaths",
+    # "coviddeaths",
+    # "covidmmr",
     "hiv_related_indirect_maternal_deaths",
     "hiv_related_indirect_mmr",
     "hiv_related_indirect_percentage",
