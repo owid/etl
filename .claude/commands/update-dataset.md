@@ -54,6 +54,15 @@ Assumptions:
 Persistence:
 - After ticking each item, update `workbench/<short_name>/progress.md` with the current checklist state and a timestamp.
 
+## CHECKPOINT (mandatory user approval)
+
+- Present a consolidated summary of key changes from the step.
+- Ask explicitly: “Proceed? reply: yes/no”.
+- Only proceed to commit/push if the user replies “yes”.
+- After approval:
+  - Commit changes and push.
+  - **Update PR description** with a collapsed section containing a summary of the step and using step as the title (e.g. "Snapshot Update" or "Meadow Update")
+
 ## Workflow orchestration
 
 1) PR and branch setup — use dataset-update-pr subagent
@@ -93,15 +102,6 @@ Persistence:
    - Dry-run, then apply upgrade, verify no charts reference OLD dataset.
    - Persist `workbench/<short_name>/indicator_upgrade.json`.
    - CHECKPOINT
-
-## CHECKPOINT (mandatory user approval)
-
-- Present a consolidated summary of key changes from the step.
-- Ask explicitly: “Proceed? reply: yes/no”.
-- Only proceed to commit/push if the user replies “yes”.
-- After approval:
-  - Commit changes and push.
-  - Update PR description with a collapsed section containing the snapshot diff and a link to incremental changes.
 
 ## Guardrails and tips
 
