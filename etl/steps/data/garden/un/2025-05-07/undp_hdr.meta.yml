@@ -412,7 +412,6 @@ tables:
       eys:
         title: Expected years of schooling<% if sex == "female" %> among girls<% elif sex == "male" %> among boys<% endif %>
         unit: years
-        short_unit: years
         description_short: |-
           Number of years a<% if sex == "female" %> girl<% elif sex == "male" %> boy<% else %> child<% endif %> of school-entrance-age can expect to receive if the current age-specific enrollment rates persist throughout the child's life.
         description_key:
@@ -442,7 +441,6 @@ tables:
       mys:
         title: Average years of schooling<% if sex == "female" %> among women<% elif sex == "male" %> among men<% endif %>
         unit: years
-        short_unit: years
         description_short: |-
           Average number of years (excluding years spent repeating individual grades)<% if sex == "female" %> women<% elif sex == "male" %> men<% else %> adults<% endif %> over 25 years participated in formal education.
         description_key:
