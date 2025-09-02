@@ -32,18 +32,24 @@ def adjust_old_data_for_inflation(tb_old, tb_deflator, tb):
         "World",
         "South Korea",
     }
-    # Calculate the adjustment factor (and fill with 1 for countries for which we can't do the adjustment).
-    tb_deflator["adjustment"] = (tb_deflator[2024] / tb_deflator[2023]).fillna(1)
+    # Calculate the adjustment factor.
+    tb_deflator["adjustment"] = tb_deflator[2024] / tb_deflator[2023]
 
     # Add adjustment column to old table.
     tb_old = tb_old.merge(tb_deflator[["country", "adjustment"]], on=["country"], how="left")
+
+    # Assign US adjustment to the World (for which we don't have an alternative).
+    tb_old.loc[tb_old["country"] == "World", "adjustment"] = tb_deflator[(tb_deflator["country"] == "United States")][
+        "adjustment"
+    ].item()
 
     # Column by column in the old table, convert to constant USD of the latest year.
     for column in tb_old.drop(columns=["country", "year", "adjustment"]).columns:
         # Sanity check.
         error = f"Unexpected units for column {column}."
         assert tb[column].metadata.unit == f"constant {LATEST_YEAR} US$ per kilowatt-hour", error
-        tb_old[column] *= tb_old["adjustment"]
+        # Fill adjustment factor with 1 for countries for which we can't do the adjustment (namely South Korea).
+        tb_old[column] *= tb_old["adjustment"].fillna(1)
         tb_old[column].metadata.unit = tb[column].metadata.unit
 
     tb_old = tb_old.drop(columns=["adjustment"], errors="raise")
