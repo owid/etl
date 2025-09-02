@@ -82,8 +82,8 @@ def run() -> None:
     # Load data sets from Gapminder and UN
     ds_gm = paths.load_dataset("maternal_mortality", namespace="gapminder")
     ds_un = paths.load_dataset("maternal_mortality", namespace="un")
-    ds_regions = paths.load_dataset("regions")
-    ds_income = paths.load_dataset("income_groups")
+    #ds_regions = paths.load_dataset("regions")
+    #ds_income = paths.load_dataset("income_groups")
     ds_who_mortality = paths.load_dataset("mortality_database")
     ds_wpp = paths.load_dataset("un_wpp")
     ds_pop = paths.load_dataset("population")
