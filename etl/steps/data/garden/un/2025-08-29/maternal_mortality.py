@@ -5,12 +5,7 @@ from owid.catalog import Table
 from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
-REGIONS = ['Africa',
- 'Asia',
- 'Europe',
- 'North America',
- 'Oceania',
- 'South America']
+REGIONS = ["Africa", "Asia", "Europe", "North America", "Oceania", "South America"]
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
