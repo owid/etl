@@ -77,7 +77,7 @@ definitions:
       <<: *common_grapher_map_config
       colorScale:
         binningStrategy: manual
-        customNumericValues: *completion_rate_bins
+        customNumericValues: *enrolment_rate_bins
         baseColorScheme: Greens
   # ============================================================================
   # EXPENDITURE CONFIGURATIONS
