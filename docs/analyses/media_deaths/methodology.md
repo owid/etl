@@ -1,6 +1,6 @@
 This folder contains the methodology, code and data used to create the data used in our article "Does the news reflect what we die from?" [#TODO link article]
 
-You can find the methodology in this document below and the [code in the notebook](./media_deaths_analysis.ipynb). You can download a stand-alone package including methodology, code and both the raw and the final data files here [#TODO link download folder here].
+You can find the methodology in this document below and the [code in the notebook](./media_deaths_analysis.ipynb). You can download a stand-alone package including methodology, code and intermediate and final data files [here](../media_deaths/){:download} or just the file [here](../media_deaths/media_deaths_analysis.ipynb){:download}.
 
 In case of questions, you can reach out to tuna.acisu@ourworldindata.org.
 
