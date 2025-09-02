@@ -25,8 +25,8 @@ def run() -> None:
     tb_income = pr.read_csv(zf.open(f"{folder_name}Estimates/aggregates/aggregate_estimates_rt_World_Bank_Income.csv"), metadata=snap_meta, origin=snap.metadata.origin).drop(columns = 'Unnamed: 0').rename(columns = {'group': 'country', "year_mid": "year"})
     tb_world = pr.read_csv(zf.open(f"{folder_name}Estimates/aggregates/aggregate_estimates_rt_WORLD.csv"), metadata=snap_meta, origin=snap.metadata.origin).drop(columns = 'Unnamed: 0').rename(columns = {'group': 'country', "year_mid": "year"})
 
-
     tb = pr.concat([tb, tb_income, tb_world], ignore_index=True)
+    tb = fix_data_issues(tb)
     # drop unneeded column
     tb = tb.drop(columns=["estimate_version"])
 
@@ -41,3 +41,10 @@ def run() -> None:
 
     # Save changes in the new meadow dataset.
     ds_meadow.save()
+
+
+
+def fix_data_issues(tb):
+    # Fix specific data issues in the table
+    tb = tb.replace({"parameter": {"coviddeaths1549": "coviddeaths"}})
+    return tb

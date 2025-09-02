@@ -68,7 +68,6 @@ def run() -> None:
         tb=tb,
         regions=REGIONS,
         ds_regions=ds_regions,
-        ds_income_groups=ds_income,
         aggregations=aggr,
         frac_allowed_nans_per_year=0.3,
     )
