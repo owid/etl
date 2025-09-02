@@ -324,8 +324,8 @@ tables:
         title: Tangerines yield
       taro_yield:
         title: Taro yield
-      tea_yield:
-        title: Tea yield
+      # tea_yield:
+      #   title: Tea yield
       tobacco_yield:
         title: Tobacco yield
       tomatoes_yield:
