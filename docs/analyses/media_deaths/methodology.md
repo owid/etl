@@ -1,4 +1,4 @@
-This folder contains the methodology, code and data used to create the data used in our article "Does the news reflect what we die from?" [#TODO link article]
+This folder contains the methodology, code and data used to create the data used in our article "Does the news reflect what we die from?" [#TODO delete this section
 
 You can find the methodology in this document below and the [code in the notebook](./media_deaths_analysis.ipynb). You can download a stand-alone package including methodology, code and intermediate and final data files [here](../){: download } or just the file <a href="../media_deaths_analysis.ipynb" download=media_deaths_analysis.ipynb>here</a>
 
@@ -6,7 +6,9 @@ In case of questions, you can reach out to tuna.acisu@ourworldindata.org.
 
 # Methodology: Does the news reflect what we die from?
 
-At Our World in Data, we ran an analysis, and published an article (“Does the news reflect what we die from?”) comparing what Americans die from, and the relative coverage that these causes of death get in media coverage. We wanted to understand how “representative” what people read in the news is of reality. To be clear: our expectation was not that these should exactly match, but we wanted to understand the media bias towards more exceptional — rather than common — events, and to then make readers aware that this disconnect exists.
+At Our World in Data, we ran an analysis, and published an article (“Does the news reflect what we die from?”) comparing what Americans die from, and the relative coverage that these causes of death get in media coverage.
+
+We wanted to understand how “representative” what people read in the news is of reality. To be clear: our expectation was not that these should exactly match, but we wanted to understand the media bias towards more exceptional — rather than common — events, and to then make readers aware that this disconnect exists.
 
 In this document, we detail the methodology we used to do this analysis — and highlight some additional checks that we ran to understand how sensitive the results were to the choices of media outlets and mentions that we chose.
 
@@ -214,7 +216,7 @@ The first run of our analysis included all articles which mention any keyword at
 
 Below you can see the comparison of results between single and multiple mentions for the New York Times in absolute and relative terms.
 
-<img src="./output/media_deaths_nyt_single_vs_multiple_absolute.png" alt="NYT: Comparison between single and multiple mention approaches, absolute terms" height="450" /> <img src="./output/media_deaths_nyt_single_vs_multiple_relative.png" alt="Comparison between single and multiple mention approaches for the New York Times, relative shares" height="450"/>
+<img src="../output/media_deaths_nyt_single_vs_multiple_absolute.png" alt="NYT: Comparison between single and multiple mention approaches, absolute terms" height="450" /> <img src="../output/media_deaths_nyt_single_vs_multiple_relative.png" alt="Comparison between single and multiple mention approaches for the New York Times, relative shares" height="450"/>
 
 
 Overall using multiple mentions decrease the amount of relevant articles by a lot, often by 50% or more.
@@ -232,7 +234,7 @@ To check, we reran our queries on a larger dataset of different news outlets. Fo
 
 The results are similar to the results for the news outlets we used in the article. While the coverage for cancer and COVID-19 is higher in the collection and coverage for terrorism is slightly lower, the overall shares are very comparable. The column for the US Collection looks more similar to the columns for the other news sources than it looks like the column for actual deaths.
 
-<img src="./output/media_deaths_by_source.png" alt="Comparison of news coverage between NYT, WaPo, Fox and a larger set of media outlets (US collection)" height="450"/>
+<img src="../output/media_deaths_by_source.png" alt="Comparison of news coverage between NYT, WaPo, Fox and a larger set of media outlets (US collection)" height="450"/>
 
 ### Comparison to global causes of death
 
