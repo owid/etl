@@ -1,15 +1,10 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from structlog import get_logger
-
 from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
-
-# Initialize logger.
-log = get_logger()
 
 
 def run() -> None:

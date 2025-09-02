@@ -19,19 +19,19 @@ tables:
 
           ID: FP.CPI.TOTL
 
-          # Development Relevance:
+          # Development relevance
           A general and continuing increase in an economy's price level is called inflation. The increase in the average prices of goods and services in the economy should be distinguished from a change in the relative prices of individual goods and services. Generally accompanying an overall increase in the price level is a change in the structure of relative prices, but it is only the average increase, not the relative price changes, that constitutes inflation. A commonly used measure of inflation is the consumer price index, which measures the prices of a representative basket of goods and services purchased by a typical household. The consumer price index is usually calculated on the basis of periodic surveys of consumer prices. Other price indices are derived implicitly from indexes of current and constant price series.
 
-          # Limitations and Exceptions:
+          # Limitations and exceptions
           Consumer price indexes should be interpreted with caution. The definition of a household, the basket of goods, and the geographic (urban or rural) and income group coverage of consumer price surveys can vary widely by country. In addition, weights are derived from household expenditure surveys, which, for budgetary reasons, tend to be conducted infrequently in developing countries, impairing comparability over time. Although useful for measuring consumer price inflation within a country, consumer price indexes are of less value in comparing countries.
 
-          # Long Definition:
+          # Long definition
           Index of the prices of consumption goods and services, as compared to a certain reference period (2010=100).
 
-          # Statistical Concept and Methodology:
+          # Statistical concept and methodology
           Consumer Prices Indices are compiled in accordance with international standards: Consumer Price Index Manual, 2020 or 2004 version. Specific information on how countries compile their CPI statistics can be found on the IMF website: dsbb.imf.org Statistical concept(s): The conceptual basis of a consumer price index series is to measure the rate at which prices of consumption goods and services are changing from one period to another.
 
-      gdp:
+      gdp_deflator:
         title: GDP deflator
         unit: ""
         short_unit: ""
@@ -42,11 +42,31 @@ tables:
 
           ID: NY.GDP.DEFL.ZS
 
-          # Development relevance:
+          # Development relevance
           This indicator is related to the national accounts, which are critical for understanding and managing a country's economy. They provide a framework for the analysis of economic performance. National accounts are the basis for estimating the Gross Domestic Product (GDP) and Gross National Income (GNI), which are the most widely used indicator of economic performance. They are essential for government policymakers, providing the data needed to design and assess fiscal and monetary policies; and are also used by businesses and investors to assess the economic climate and make investment decisions. NAS enable comparison between economies, which is crucial for international trade, investment decisions, and economic competitiveness. More specifically, this indicator is related to national accounts aggregates. Gross Domestic Product (GDP), Gross National Income (GNI), and other aggregates provide a snapshot of the size and health of an economy by measuring the total economic activity within a country. They can thus be used by policymakers to design and implement economic policies, as they reflect the overall economic performance and can indicate the need for intervention in certain areas. Aggregates also allow for comparisons between different economies, which can be useful for trade negotiations, investment decisions, and economic benchmarking. By examining aggregates over time, economists and analysts can identify trends, cycles, and potential areas of concern within an economy, and investors can use national accounts aggregates to assess the potential risks and returns of investing in a particular country. Overall, national accounts aggregates are fundamental tools for economic analysis, policy formulation, and decision-making at both the national and international levels.
 
-          # Long Definition:
+          # Long definition
           The GDP implicit deflator is the ratio of GDP in current local currency to GDP in constant local currency. The base year varies by country. This indicator is expressed as a ratio (a÷b).
 
-          # Statistical Concept and Methodology:
+          # Statistical concept and methodology
           National accounts are compiled in accordance with international standards: System of National Accounts, 2008 or 1993 versions. Specific information on how countries compile their national accounts can be found on the IMF website: dsbb.imf.org Statistical concept(s): The conceptual elements of the SNA (System of National Accounts) measure what takes place in the economy, between which agents, and for what purpose. At the heart of the SNA is the production of goods and services. These may be used for consumption in the period to which the accounts relate or may be accumulated for use in a later period. In simple terms, the amount of value added generated by production represents GDP. The income corresponding to GDP is distributed to the various agents or groups of agents as income and it is the process of distributing and redistributing income that allows one agent to consume the goods and services produced by another agent or to acquire goods and services for later consumption. The way in which the SNA captures this pattern of economic flows is to identify the activities concerned by recognizing the institutional units in the economy and by specifying the structure of accounts capturing the transactions relevant to one stage or another of the process by which goods and services are produced and ultimately consumed.
+
+      gdp_deflator_linked:
+        title: GDP deflator (linked series)
+        unit: ""
+        short_unit: ""
+        description_short: |-
+          Ratio of GDP in current local currency to GDP in constant local currency. The base year varies by country. This series has been linked to produce a consistent time series to counteract breaks in series over time due to changes in base years, source data and methodologies.
+        description_from_producer: |-
+          The GDP implicit deflator is the ratio of GDP in current local currency to GDP in constant local currency. The base year varies by country. This series has been linked to produce a consistent time series to counteract breaks in series over time due to changes in base years, source data and methodologies. Thus, it may not be comparable with other national accounts series in the database for historical years. This indicator is expressed as a ratio (a÷b).
+
+          ID: NY.GDP.DEFL.ZS.AD
+
+          # Development relevance
+          This indicator is related to the national accounts, which are critical for understanding and managing a country's economy. They provide a framework for the analysis of economic performance. National accounts are the basis for estimating the Gross Domestic Product (GDP) and Gross National Income (GNI), which are the most widely used indicator of economic performance. They are essential for government policymakers, providing the data needed to design and assess fiscal and monetary policies; and are also used by businesses and investors to assess the economic climate and make investment decisions. NAS enable comparison between economies, which is crucial for international trade, investment decisions, and economic competitiveness. More specifically, this indicator is related to national accounts aggregates. Gross Domestic Product (GDP), Gross National Income (GNI), and other aggregates provide a snapshot of the size and health of an economy by measuring the total economic activity within a country. They can thus be used by policymakers to design and implement economic policies, as they reflect the overall economic performance and can indicate the need for intervention in certain areas. Aggregates also allow for comparisons between different economies, which can be useful for trade negotiations, investment decisions, and economic benchmarking. By examining aggregates over time, economists and analysts can identify trends, cycles, and potential areas of concern within an economy, and investors can use national accounts aggregates to assess the potential risks and returns of investing in a particular country. Overall, national accounts aggregates are fundamental tools for economic analysis, policy formulation, and decision-making at both the national and international levels.
+
+          # Long definition
+          The GDP implicit deflator is the ratio of GDP in current local currency to GDP in constant local currency. The base year varies by country. This series has been linked to produce a consistent time series to counteract breaks in series over time due to changes in base years, source data and methodologies. Thus, it may not be comparable with other national accounts series in the database for historical years. This indicator is expressed as a ratio (a÷b).
+
+          # Statistical concept and methodology
+          National accounts are compiled in accordance with international standards: System of National Accounts, 2008 or 1993 versions. Specific information on how countries compile their national accounts can be found on the IMF website: dsbb.imf.org Linked series have been smoothed to remove breaks resulting from changes in base years, data sources or compilation methods. The linking is performed using historical nominal growth rates from archived WDI databases. Statistical concept(s): The conceptual elements of the SNA (System of National Accounts) measure what takes place in the economy, between which agents, and for what purpose. At the heart of the SNA is the production of goods and services. These may be used for consumption in the period to which the accounts relate or may be accumulated for use in a later period. In simple terms, the amount of value added generated by production represents GDP. The income corresponding to GDP is distributed to the various agents or groups of agents as income and it is the process of distributing and redistributing income that allows one agent to consume the goods and services produced by another agent or to acquire goods and services for later consumption. The way in which the SNA captures this pattern of economic flows is to identify the activities concerned by recognizing the institutional units in the economy and by specifying the structure of accounts capturing the transactions relevant to one stage or another of the process by which goods and services are produced and ultimately consumed.
