@@ -46,5 +46,10 @@ def run() -> None:
 
 def fix_data_issues(tb):
     # Fix specific data issues in the table
-    tb = tb.replace({"parameter": {"coviddeaths1549": "coviddeaths"}})
+    # For regions the maternal deaths is provided in two forms : "maternal_deaths_aggregated_samples" and "maternal_deaths_summation_of_country_estimates"
+    # The WHO reports the aggregated samples in their report so we'll go forward using that one. I can't find an explanation of what the differences are.
+    tb = tb.replace({"parameter": {"coviddeaths1549": "coviddeaths", "maternal_deaths_aggregated_samples": "maternal_deaths"}})
+    # Drop the country estimates maternal deaths rows
+    tb = tb[tb["parameter"] != "maternal_deaths_summation_of_country_estimates"]
+
     return tb

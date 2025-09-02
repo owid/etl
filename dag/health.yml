@@ -1346,7 +1346,6 @@ steps:
     - snapshot://un/2025-08-29/maternal_mortality.zip
   data://garden/un/2025-08-29/maternal_mortality:
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2025-07-01/income_groups
     - data://meadow/un/2025-08-29/maternal_mortality
   data://grapher/un/2025-08-29/maternal_mortality:
     - data://garden/un/2025-08-29/maternal_mortality
