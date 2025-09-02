@@ -89,7 +89,7 @@ def run() -> None:
     ds_pop = paths.load_dataset("population")
 
     # save origins for later:
-    #who_origins = sources_to_origins_who(ds_who_mortality)
+    # who_origins = sources_to_origins_who(ds_who_mortality)
 
     # Read table from meadow dataset.
     tb_gm = ds_gm.read("maternal_mortality", reset_metadata="keep_origins")
@@ -168,21 +168,21 @@ def run() -> None:
 
     aggr = {"maternal_deaths": "sum", "live_births": "sum", "female_population": "sum", "population": "sum"}
 
-    #tb = geo.add_regions_to_table(
+    # tb = geo.add_regions_to_table(
     #    tb=tb,
     #    regions=REGIONS,
     #    ds_regions=ds_regions,
     #    ds_income_groups=ds_income,
     #    aggregations=aggr,
     #    num_allowed_nans_per_year=0,
-    #)
+    # )
 
     # remove all regions that are less than 90% covered by our data
-    #tb = check_region_share_population(tb, REGIONS, ds_pop, 0.9)
+    # tb = check_region_share_population(tb, REGIONS, ds_pop, 0.9)
 
     # calculate aggregated maternal mortality ratio and rate for regions
-    #tb["mmr"] = tb.apply(lambda x: calc_mmr(x), axis=1)
-    #tb["mm_rate"] = tb.apply(lambda x: calc_mmrate(x), axis=1)
+    # tb["mmr"] = tb.apply(lambda x: calc_mmr(x), axis=1)
+    # tb["mm_rate"] = tb.apply(lambda x: calc_mmrate(x), axis=1)
 
     # drop all columns that are not 1) long run or 2) not related to maternal mortality
     cols_to_keep = ["country", "year", "maternal_deaths", "mmr", "live_births", "mmr_rate"]
@@ -205,10 +205,10 @@ def run() -> None:
     tb["mmr_rate"] = pd.to_numeric(tb["mmr_rate"], errors="coerce").copy_metadata(tb["mmr_rate"])
 
     # index and format columns
-    tb = tb.format(["country", "year"], short_name = "maternal_mortality")
+    tb = tb.format(["country", "year"], short_name="maternal_mortality")
 
     # add who origins to the table
-    #tb = add_origins(tb, who_origins, ["maternal_deaths", "mmr", "mm_rate"])
+    # tb = add_origins(tb, who_origins, ["maternal_deaths", "mmr", "mm_rate"])
 
     #
     # Save outputs.
