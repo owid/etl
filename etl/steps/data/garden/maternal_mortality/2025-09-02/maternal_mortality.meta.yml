@@ -37,11 +37,11 @@ tables:
         short_unit: ""
         display:
           numDecimalPlaces: 1
-          entityAnnotationsMap: 'United States: Values from 2003–2017 affected by measurement change'
+          entityAnnotationsMap: "United States: Values from 2003–2017 affected by measurement change"
         description_key:
           - "{definitions.description_maternal_mortality}"
 
-      mm_rate:
+      mmr_rate:
         title: Maternal mortality rate
         description_short: |-
           The estimated number of women who die from [maternal conditions](#dod:maternal-mortality) per 100,000 women of reproductive age (15-49), based on data from death certificates, large-scale surveys, and statistical modeling.

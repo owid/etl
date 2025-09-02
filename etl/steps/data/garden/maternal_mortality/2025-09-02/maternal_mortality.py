@@ -89,12 +89,12 @@ def run() -> None:
     ds_pop = paths.load_dataset("population")
 
     # save origins for later:
-    who_origins = sources_to_origins_who(ds_who_mortality)
+    #who_origins = sources_to_origins_who(ds_who_mortality)
 
     # Read table from meadow dataset.
-    tb_gm = ds_gm["maternal_mortality"].reset_index()
-    tb_un = ds_un["maternal_mortality"].reset_index()
-    tb_who_mortality = ds_who_mortality["mortality_database"].reset_index()
+    tb_gm = ds_gm.read("maternal_mortality", reset_metadata="keep_origins")
+    tb_un = ds_un.read("maternal_mortality", reset_metadata="keep_origins")
+    tb_who_mortality = ds_who_mortality.read("mortality_database", reset_metadata="keep_origins")
     # Filtering out the data we need from WHO mortality database
     tb_who_mortality = tb_who_mortality[
         (tb_who_mortality["cause"] == "Maternal conditions")
@@ -102,8 +102,8 @@ def run() -> None:
         & (tb_who_mortality["sex"] == "Both sexes")
     ]
     assert tb_who_mortality.shape[0] > 0
-    tb_wpp_pop = ds_wpp["population"].reset_index()
-    tb_wpp_births = ds_wpp["births"].reset_index()
+    tb_wpp_pop = ds_wpp.read("population", reset_metadata="keep_origins")
+    tb_wpp_births = ds_wpp.read("births", reset_metadata="keep_origins")
 
     # calculate maternal mortality ratio/ rate out of WHO mortality database and UN WPP
     tb_who_mortality = tb_who_mortality.rename(columns={"number": "maternal_deaths"})[
@@ -141,7 +141,7 @@ def run() -> None:
     # combine with who mortality and calculate maternal mortality ratio and rate
     tb_calc_mm = pr.merge(tb_wpp, tb_who_mortality, on=["country", "year"], how="outer")
     tb_calc_mm["mmr"] = (tb_calc_mm["maternal_deaths"] / tb_calc_mm["live_births"]) * 100_000
-    tb_calc_mm["mm_rate"] = (tb_calc_mm["maternal_deaths"] / tb_calc_mm["female_population"]) * 100_000
+    tb_calc_mm["mmr_rate"] = (tb_calc_mm["maternal_deaths"] / tb_calc_mm["female_population"]) * 100_000
 
     # combine with Gapminder data - using WHO/ UN WPP data where available
     tb_gm["maternal_deaths"] = tb_gm["maternal_deaths"].round().astype("UInt32")
@@ -149,7 +149,7 @@ def run() -> None:
 
     # calculate mmr and mm rate if NA from Gapminder deaths with UN WPP data
     tb_who_gm["mmr"] = tb_who_gm["mmr"].combine_first(tb_who_gm["maternal_deaths"] / tb_who_gm["live_births"] * 100_000)
-    tb_who_gm["mm_rate"] = tb_who_gm["mm_rate"].combine_first(
+    tb_who_gm["mmr_rate"] = tb_who_gm["mmr_rate"].combine_first(
         tb_who_gm["maternal_deaths"] / tb_who_gm["female_population"] * 100_000
     )
 
@@ -161,35 +161,35 @@ def run() -> None:
     tb = combine_two_overlapping_dataframes(tb_un, tb_who_gm, index_columns=["country", "year"])
 
     # remove all rows that don't have any data on maternal deaths, mmr or mm rate
-    tb = tb.dropna(subset=["maternal_deaths", "mmr", "mm_rate"], how="all")
+    tb = tb.dropna(subset=["maternal_deaths", "mmr", "mmr_rate"], how="all")
 
     # calculate regional aggregates - population is needed for filtering out all regions that are not sufficiently covered by our data
     tb = geo.add_population_to_table(tb, ds_pop)
 
     aggr = {"maternal_deaths": "sum", "live_births": "sum", "female_population": "sum", "population": "sum"}
 
-    tb = geo.add_regions_to_table(
-        tb=tb,
-        regions=REGIONS,
-        ds_regions=ds_regions,
-        ds_income_groups=ds_income,
-        aggregations=aggr,
-        num_allowed_nans_per_year=0,
-    )
+    #tb = geo.add_regions_to_table(
+    #    tb=tb,
+    #    regions=REGIONS,
+    #    ds_regions=ds_regions,
+    #    ds_income_groups=ds_income,
+    #    aggregations=aggr,
+    #    num_allowed_nans_per_year=0,
+    #)
 
     # remove all regions that are less than 90% covered by our data
-    tb = check_region_share_population(tb, REGIONS, ds_pop, 0.9)
+    #tb = check_region_share_population(tb, REGIONS, ds_pop, 0.9)
 
     # calculate aggregated maternal mortality ratio and rate for regions
-    tb["mmr"] = tb.apply(lambda x: calc_mmr(x), axis=1)
-    tb["mm_rate"] = tb.apply(lambda x: calc_mmrate(x), axis=1)
+    #tb["mmr"] = tb.apply(lambda x: calc_mmr(x), axis=1)
+    #tb["mm_rate"] = tb.apply(lambda x: calc_mmrate(x), axis=1)
 
     # drop all columns that are not 1) long run or 2) not related to maternal mortality
-    cols_to_keep = ["country", "year", "maternal_deaths", "mmr", "live_births", "mm_rate"]
+    cols_to_keep = ["country", "year", "maternal_deaths", "mmr", "live_births", "mmr_rate"]
     tb = tb[cols_to_keep]
 
     # drop rows where there is no data for maternal mortality indicators (introduced by aggregating regions)
-    tb = tb.dropna(subset=["maternal_deaths", "mmr", "mm_rate"], how="all")
+    tb = tb.dropna(subset=["maternal_deaths", "mmr", "mmr_rate"], how="all")
 
     # fix dtypes (coerce errors since NAs are not accepted otherwise)
     tb["maternal_deaths"] = (
@@ -202,13 +202,13 @@ def run() -> None:
         pd.to_numeric(tb["live_births"], errors="coerce").round().astype("Int64").copy_metadata(tb["live_births"])
     )
     tb["mmr"] = pd.to_numeric(tb["mmr"], errors="coerce").copy_metadata(tb["mmr"])
-    tb["mm_rate"] = pd.to_numeric(tb["mm_rate"], errors="coerce").copy_metadata(tb["mm_rate"])
+    tb["mmr_rate"] = pd.to_numeric(tb["mmr_rate"], errors="coerce").copy_metadata(tb["mmr_rate"])
 
     # index and format columns
-    tb = tb.format(["country", "year"])
+    tb = tb.format(["country", "year"], short_name = "maternal_mortality")
 
     # add who origins to the table
-    tb = add_origins(tb, who_origins, ["maternal_deaths", "mmr", "mm_rate"])
+    #tb = add_origins(tb, who_origins, ["maternal_deaths", "mmr", "mm_rate"])
 
     #
     # Save outputs.
@@ -231,7 +231,7 @@ def calc_mmrate(tb_row):
     """If country is a region, calculate the maternal mortality rate, else return MM rate"""
     if tb_row["country"] in REGIONS:
         return (tb_row["maternal_deaths"] / tb_row["female_population"]) * 100_000
-    return tb_row["mm_rate"]
+    return tb_row["mmr_rate"]
 
 
 def check_region_share_population(tb: Table, regions: list, ds_population: Dataset, threshold: float) -> Table:
