@@ -37,7 +37,7 @@ def run() -> None:
     ds_regions = paths.load_dataset("regions")
 
     # Read table from meadow dataset.
-    tb = ds_meadow["maternal_mortality"].reset_index()
+    tb = ds_meadow.read("maternal_mortality")
 
     # drop rows where parameter is mmr_mean or pm_mean
     tb = tb[~tb["parameter"].str.contains("mean", na=False)]
