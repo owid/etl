@@ -45,7 +45,7 @@ def run() -> None:
     tb = tb.drop(columns=["_0_1", "_0_9"])
 
     tb = tb.pivot_table(index=["country", "year"], columns=["parameter"], values="_0_5").reset_index()
-
+    tb = tb.drop(columns=["matcoviddeaths", "coviddeaths", "covidmmr"])
     #
     # Process data.
     #
