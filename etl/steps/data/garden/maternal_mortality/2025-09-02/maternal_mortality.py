@@ -144,14 +144,14 @@ def run() -> None:
 
     # calculate mmr and mm rate if NA from Gapminder deaths with UN WPP data
     valid_births = ~(tb_who_gm["live_births"].isna() | (tb_who_gm["live_births"] == 0))
-    mmr_calculated = pd.Series(index=tb_who_gm.index, dtype='Float64')
+    mmr_calculated = pd.Series(index=tb_who_gm.index, dtype="Float64")
     mmr_calculated[valid_births] = (
         tb_who_gm.loc[valid_births, "maternal_deaths"] / tb_who_gm.loc[valid_births, "live_births"] * 100_000
     )
     tb_who_gm["mmr"] = tb_who_gm["mmr"].combine_first(mmr_calculated)
     # Calculate MMR rate with validation for zero/NaN denominators
     valid_pop = ~(tb_who_gm["female_population"].isna() | (tb_who_gm["female_population"] == 0))
-    mmr_rate_calculated = pd.Series(index=tb_who_gm.index, dtype='Float64')
+    mmr_rate_calculated = pd.Series(index=tb_who_gm.index, dtype="Float64")
     mmr_rate_calculated[valid_pop] = (
         tb_who_gm.loc[valid_pop, "maternal_deaths"] / tb_who_gm.loc[valid_pop, "female_population"] * 100_000
     )
