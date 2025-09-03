@@ -22,7 +22,7 @@ To run this code from scratch,
 The entire script, with extraction and file generation takes about 20 minutes.
 
 When the code finishes, you will have the following files in this folder:
-    - ilostat_data.parquet
+    - ilostat.parquet
     - ilostat_dictionary_classif1.parquet
     - ilostat_dictionary_classif2.parquet
     - ilostat_dictionary_indicator.parquet
@@ -96,32 +96,36 @@ PARENT_DIR = Path(__file__).parent.absolute()
 MAX_REPEATS = 15
 TIMEOUT = 500
 
-# Define expected datasets
-EXPECTED_DATASETS = [
-    "ILOEST",
-    "LFS",
-    "ILOSDG",
-    "GEND",
-    "DLMI",
-    "YouthSTATS",
-    "CHILD",
-    "EMI",
-    "PROFILES",
-    "RURBAN",
-    "COND",
-    "ILMS",
-    "WORK",
-    "OSH",
-    "PRICES",
-    "IRdata",
-]
+# Define indicators to extract
 
-# Define datasets to drop
-DATASETS_TO_DROP = [
-    "WORK",
-    "OSH",
-    "PRICES",
-    "IRdata",
+INDICATORS = [
+    "SDG_0111_SEX_AGE_RT",
+    "SDG_0131_SEX_SOC_RT",
+    "SDG_0552_NOC_RT",
+    "SDG_T552_NOC_RT",
+    "SDG_0821_NOC_RT",
+    "SDG_0831_SEX_ECO_RT",
+    "SDG_0851_SEX_OCU_NB",
+    "SDG_0852_SEX_AGE_RT",
+    "SDG_0852_SEX_DSB_RT",
+    "SDG_0861_SEX_RT",
+    "SDG_B871_SEX_AGE_RT",
+    "SDG_A871_SEX_AGE_RT",
+    "SDG_N881_SEX_MIG_RT",
+    "SDG_F881_SEX_MIG_RT",
+    "SDG_0882_NOC_RT",
+    "SDG_08B1_NOC_NB",
+    "SDG_0922_NOC_RT",
+    "SDG_1041_NOC_RT",
+    "EAR_4HRL_SEX_CUR_NB",
+    "EAR_XFLS_NOC_RT",
+    "EAR_GGAP_OCU_RT",
+    "EAP_2EAP_SEX_AGE_NB",
+    "EAP_2WAP_SEX_AGE_RT",
+    "EMP_2EMP_SEX_STE_NB",
+    "EMP_2IFL_SEX_RT",
+    "UNE_2EAP_SEX_AGE_RT",
+    "CLD_XCHL_SEX_AGE_RT",
 ]
 
 # Define dictionaries to extract
@@ -144,7 +148,7 @@ def run() -> None:
 
     df = extract_all_files_and_concatenate()
 
-    df = exclude_datasets(df)
+    df = select_indicators(df)
 
 
 @retry(wait=wait_random_exponential(multiplier=1), stop=stop_after_attempt(MAX_REPEATS))
@@ -328,55 +332,33 @@ def extract_all_files_and_concatenate() -> pd.DataFrame:
     return df
 
 
-def exclude_datasets(df: pd.DataFrame) -> pd.DataFrame:
+def select_indicators(df: pd.DataFrame) -> pd.DataFrame:
     """
     Exclude unwanted datasets from the DataFrame.
     """
 
-    # Extract table of contents for indicators
-    df_toc_indicator = ilostat_table_of_contents(type="indicator")
-
-    # Keep only indicators where freq=A
-    df_toc_indicator = df_toc_indicator[df_toc_indicator["freq"] == "A"].reset_index(drop=True)
-
-    # Keep only datasets with non-missing database
-    df_toc_indicator = df_toc_indicator[
-        (df_toc_indicator["database"] != "NA") & (df_toc_indicator["database"].notna())
-    ].reset_index(drop=True)
-
-    # Assert that all expected databases are present, and there is no new dataset
-    assert set(EXPECTED_DATASETS).issubset(set(df_toc_indicator["database"].unique())), log.error(
-        "Missing expected datasets in the DataFrame",
-        missing_datasets=set(EXPECTED_DATASETS).difference(set(df_toc_indicator["database"].unique())),
-    )
-    assert not set(df_toc_indicator["database"].unique()).difference(set(EXPECTED_DATASETS)), log.error(
-        "Unexpected datasets found in the DataFrame",
-        unexpected_datasets=set(df_toc_indicator["database"].unique()).difference(set(EXPECTED_DATASETS)),
-    )
-
-    # Keep only datasets to drop
-    df_toc_indicator = df_toc_indicator[df_toc_indicator["database"].isin(DATASETS_TO_DROP)].reset_index(drop=True)
-
-    # Create a list of the indicators to drop
-    indicators_to_drop = list(df_toc_indicator["indicator"].unique())
-
     # Calculate length of the DataFrame
     length_before = len(df)
 
-    # Drop indicators
-    df = df[~df["indicator"].isin(indicators_to_drop)].reset_index(drop=True)
+    # Assert that all indicators are available in the dataset
+    assert set(INDICATORS).issubset(set(df["indicator"].unique())), log.error(
+        "Missing expected indicators in the DataFrame",
+        missing_indicators=set(INDICATORS).difference(set(df["indicator"].unique())),
+    )
+
+    # Keep only the indicators we want
+    df = df[df["indicator"].isin(INDICATORS)].reset_index(drop=True)
 
     # Calculate length after
     length_after = len(df)
 
-    log.info(f"Excluded datasets: {DATASETS_TO_DROP}")
     log.info(
         f"Removed {(length_before - length_after):,} rows from the DataFrame. Now there are {length_after:,} rows."
     )
 
     df.to_parquet(f"{PARENT_DIR}/ilostat.parquet", index=False)
 
-    log.info("DataFrame with excluded datasets saved to ilostat.parquet")
+    log.info("DataFrame with excluded selected indicators saved to ilostat.parquet")
 
     return df
 
