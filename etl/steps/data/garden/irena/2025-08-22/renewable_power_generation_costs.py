@@ -36,7 +36,7 @@ def adjust_old_data_for_inflation(tb_old, tb_deflator, tb):
     tb_old = tb_old[tb_old["country"] != "South Korea"].reset_index(drop=True)
 
     # Calculate the adjustment factor.
-    tb_deflator["adjustment"] = tb_deflator[2024] / tb_deflator[2023]
+    tb_deflator["adjustment"] = tb_deflator[LATEST_YEAR] / tb_deflator[PREVIOUS_YEAR]
 
     # Add adjustment column to old table.
     tb_old = tb_old.merge(tb_deflator[["country", "adjustment"]], on=["country"], how="left")
