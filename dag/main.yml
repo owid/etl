@@ -663,11 +663,9 @@ steps:
   # Ethnologue
   data-private://meadow/language/2025-09-03/ethnologue:
     - snapshot-private://language/2025-09-03/ethnologue.zip
-
   data-private://garden/language/2025-09-03/ethnologue:
     - data://garden/regions/2023-01-01/regions
     - data-private://meadow/language/2025-09-03/ethnologue
-
   data-private://grapher/language/2025-09-03/ethnologue:
     - data-private://garden/language/2025-09-03/ethnologue
 
