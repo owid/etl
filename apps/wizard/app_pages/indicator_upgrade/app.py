@@ -38,6 +38,7 @@ from apps.wizard.app_pages.indicator_upgrade.dataset_selection import build_data
 from apps.wizard.app_pages.indicator_upgrade.indicator_mapping import render_indicator_mapping
 from apps.wizard.app_pages.indicator_upgrade.utils import get_datasets
 from apps.wizard.utils.components import st_title_with_expert
+from apps.wizard.utils.db import WizardDB
 
 # logger
 log = get_logger()
@@ -61,8 +62,6 @@ st.set_page_config(
 )
 st_title_with_expert("Indicator Upgrader", icon=":material/upgrade:")
 st.markdown("Update indicators to their new versions.")  # Get datasets (might take some time)
-
-from apps.wizard.utils.db import WizardDB
 
 WizardDB.get_pr()
 

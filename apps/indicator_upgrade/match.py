@@ -386,7 +386,13 @@ def save_mappings_to_database(mapping: pd.DataFrame, old_dataset_id: int, new_da
         return
 
     # Create the mapping dictionary expected by WizardDB.add_variable_mapping
-    mapping_dict = {int(k): int(v) for k, v in mapping.set_index("id_old")["id_new"].to_dict().items()}
+    raw_dict = mapping.set_index("id_old")["id_new"].to_dict()
+    mapping_dict: Dict[int, int] = {}
+    for k, v in raw_dict.items():
+        # Explicit type conversion to satisfy type checker
+        key_int = int(cast(Union[int, float, str], k))
+        value_int = int(cast(Union[int, float, str], v))
+        mapping_dict[key_int] = value_int
 
     # Save to database
     WizardDB.add_variable_mapping(
