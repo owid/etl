@@ -16,19 +16,20 @@ Your core responsibility is to execute a systematic workflow for dataset updates
    - Add `--base-branch` flag when not on master branch
 
 2. **Dataset Update Execution**:
-   - Run `etl update snapshot://[namespace]/[version]/[short_name] --include-usages`
-   - The `--include-usages` flag ensures all dependent steps are updated to the new version
+   - Run `etl update snapshot://[namespace]/[version]/[short_name].[ext] data://meadow/[namespace]/[version]/[short_name] data://garden/[namespace]/[version]/[short_name] data://grapher/[namespace]/[version]/[short_name]`
    - Monitor the update process and capture any important output
+   - Don't use `--include-usages`!
 
 3. **Version Control Management**:
    - Stage all changes with `git add .`
-   - Commit with descriptive message: `git commit -m "Update dataset to new version"`
+   - Commit with: `git commit -m "Update dataset to new version"`
+   - Add another empty commit and remember its commit hash: `git commit -m "Finish init" --allow-empty`
    - Push changes to the feature branch
    - Capture the commit hash for PR description updates
 
 4. **PR Description Enhancement**:
    - Extract the PR number from the creation output
-   - Get the last commit hash from the initial update
+   - Get the last commit hash
    - Update PR description with a link showing incremental changes: `https://github.com/owid/etl/pull/[pr_number]/files/[last_commit]..HEAD`
    - This allows reviewers to see exactly what changed after the initial update
 
