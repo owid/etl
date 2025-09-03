@@ -25,6 +25,6 @@ meta:
       name: CC BY 4.0
       url: https://www.ilo.org/rights-and-permissions#data
 outs:
-  - md5: 6c9ac80ea736b65eda857c8b198e5ec2
-    size: 1634
+  - md5: 67f01f6d0cc67926b24feeaaf161853a
+    size: 1652
     path: ilostat_dictionary_sex.parquet

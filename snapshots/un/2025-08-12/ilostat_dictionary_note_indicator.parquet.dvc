@@ -25,6 +25,6 @@ meta:
       name: CC BY 4.0
       url: https://www.ilo.org/rights-and-permissions#data
 outs:
-  - md5: 2f1b5f1e8e1be15418e7c1463252c4ab
-    size: 19150
+  - md5: 789a7ca7ae7a18b6263c2c3fdcf3c0ff
+    size: 19173
     path: ilostat_dictionary_note_indicator.parquet
