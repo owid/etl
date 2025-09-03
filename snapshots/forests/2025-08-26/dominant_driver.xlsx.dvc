@@ -1,6 +1,6 @@
 # Learn more at:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
-# This data was sent by David Gibbs from Global Forest Watch - World Resources Institute over email to Fiona on 2024-08-06.
+# This data was sent by David Gibbs from Global Forest Watch - World Resources Institute over email to Fiona on
 meta:
   origin:
     # Data product / Snapshot
