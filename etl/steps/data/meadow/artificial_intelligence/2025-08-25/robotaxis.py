@@ -1,5 +1,6 @@
 """Load a snapshot and create a meadow dataset."""
 
+import numpy as np
 import pandas as pd
 
 from etl.helpers import PathFinder
@@ -31,7 +32,8 @@ def run() -> None:
         for col in numeric_cols:
             if col in tb.columns:
                 # Remove commas and convert to numeric
-                tb[col] = tb[col].astype(str).str.replace(",", "").replace("", None)
+                tb[col] = tb[col].astype(str).str.replace(",", "")
+                tb[col] = tb[col].replace("", np.nan)
                 tb[col] = pd.to_numeric(tb[col], errors="coerce")
                 tb[col].metadata.origins = tb["Year"].metadata.origins
         # Drop rows that are *completely identical* across all columns
