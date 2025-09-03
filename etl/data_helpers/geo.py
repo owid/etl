@@ -1855,10 +1855,45 @@ class RegionAggregator:
             # regions is already a dict
             self.regions = regions
 
+        # Create a dictionary of regions and members.
+        self.regions_members = self._parse_regions_dict()
+
         if index_columns is None:
             self.index_columns = [self.country_col, self.year_col]
         else:
             self.index_columns = index_columns
+
+    def _parse_regions_dict(self):
+        regions_members = {}
+        for region in self.regions:
+            # Check that the content of the region dictionary is as expected.
+            # TODO: We could add an option "custom_members" to give an explicit list of members.
+            expected_items = {"additional_regions", "excluded_regions", "additional_members", "excluded_members"}
+            unknown_items = set(self.regions[region]) - expected_items
+            if len(unknown_items) > 0:
+                log.warning(
+                    f"Unknown items in dictionary of regions {region}: {unknown_items}. Expected: {expected_items}."
+                )
+
+            # List members of the region.
+            members = list_members_of_region(
+                region=region,
+                ds_regions=self.ds_regions,
+                # TODO: Is the following if clause still needed?
+                # If any of the regions is an income group, load income groups dataset (and raise an error if it is not among dependencies); otherwise, set ds_income_groups as None, to ignore the income groups dataset.
+                ds_income_groups=self.ds_income_groups
+                if (self.regions is not None) and any(set(self.regions).intersection(set(INCOME_GROUPS)))
+                else None,
+                additional_regions=self.regions[region].get("additional_regions"),
+                excluded_regions=self.regions[region].get("excluded_regions"),
+                additional_members=self.regions[region].get("additional_members"),
+                excluded_members=self.regions[region].get("excluded_members"),
+                # By default, include historical regions in income groups.
+                include_historical_regions_in_income_groups=True,
+            )
+            regions_members[region] = members
+
+        return regions_members
 
     @property
     def ds_regions(self) -> Dataset:
@@ -1899,6 +1934,47 @@ class RegionAggregator:
         # If aggregations are not defined, assume all non-index columns have a sum aggregate.
         if self.aggregations is None:
             self.aggregations = {column: "sum" for column in tb.columns if column not in self.index_columns}
+
+    def inspect_region_overlaps(
+        self,
+        tb,
+        accepted_overlaps: list[dict[int, set[str]]] | None = None,
+        ignore_overlaps_of_zeros: bool = False,
+        subregion_type: str = "successors",
+    ):
+        if accepted_overlaps is None:
+            accepted_overlaps = []
+
+        # Create a dictionary of regions and its members.
+        df_regions_and_members = create_table_of_regions_and_subregions(
+            ds_regions=self.ds_regions, subregion_type=subregion_type
+        )
+        regions_and_members = df_regions_and_members[subregion_type].to_dict()
+
+        # Assume incoming table has a dummy index (the whole function may not work otherwise).
+        # Example of region_and_members:
+        # {"Czechoslovakia": ["Czechia", "Slovakia"]}
+        all_overlaps = detect_overlapping_regions(
+            df=tb,
+            regions_and_members=regions_and_members,
+            country_col=self.country_col,
+            year_col=self.year_col,
+            index_columns=self.index_columns,
+            ignore_overlaps_of_zeros=ignore_overlaps_of_zeros,
+        )
+        # Example of accepted_overlaps:
+        # [{1991: {"Georgia", "USSR"}}, {2000: {"Some region", "Some overlapping region"}}]
+        # Check whether all accepted overlaps are found in the data, and that there are no new unknown overlaps.
+        accepted_not_found = [overlap for overlap in accepted_overlaps if overlap not in all_overlaps]
+        found_not_accepted = [overlap for overlap in all_overlaps if overlap not in accepted_overlaps]
+        if len(accepted_not_found):
+            log.warning(
+                f"Known overlaps not found in the data: {accepted_not_found}. Consider removing them from 'accepted_overlaps'."
+            )
+        if len(found_not_accepted):
+            log.warning(
+                f"Unknown overlaps found in the data: {found_not_accepted}. Consider adding them to 'accepted_overlaps'."
+            )
 
     # TODO: The idea is to split the original add_regions_to_table function into smaller pieces, e.g. (1) checks on region overlaps and data coverage, (2) create aggregates for regions (without adding them to the original table yet), (3) making nan aggregates that don't fulfil certain conditions, and (4) assembling the region aggregates with the original table.
     def add_aggregates(
@@ -2003,71 +2079,19 @@ class RegionAggregator:
 
         if check_for_region_overlaps:
             # Find overlaps between regions and its members.
-
-            if accepted_overlaps is None:
-                accepted_overlaps = []
-
-            # Create a dictionary of regions and its members.
-            df_regions_and_members = create_table_of_regions_and_subregions(
-                ds_regions=self.ds_regions, subregion_type=subregion_type
-            )
-            regions_and_members = df_regions_and_members[subregion_type].to_dict()
-
-            # Assume incoming table has a dummy index (the whole function may not work otherwise).
-            # Example of region_and_members:
-            # {"Czechoslovakia": ["Czechia", "Slovakia"]}
-            all_overlaps = detect_overlapping_regions(
-                df=df_with_regions,
-                regions_and_members=regions_and_members,
-                country_col=self.country_col,
-                year_col=self.year_col,
-                index_columns=self.index_columns,
+            # TODO: Should we also check for subregion_type "related" or "members"?
+            self.inspect_region_overlaps(
+                tb=df_with_regions,
+                accepted_overlaps=accepted_overlaps,
                 ignore_overlaps_of_zeros=ignore_overlaps_of_zeros,
+                subregion_type=subregion_type,
             )
-            # Example of accepted_overlaps:
-            # [{1991: {"Georgia", "USSR"}}, {2000: {"Some region", "Some overlapping region"}}]
-            # Check whether all accepted overlaps are found in the data, and that there are no new unknown overlaps.
-            accepted_not_found = [overlap for overlap in accepted_overlaps if overlap not in all_overlaps]
-            found_not_accepted = [overlap for overlap in all_overlaps if overlap not in accepted_overlaps]
-            if len(accepted_not_found):
-                log.warning(
-                    f"Known overlaps not found in the data: {accepted_not_found}. Consider removing them from 'accepted_overlaps'."
-                )
-            if len(found_not_accepted):
-                log.warning(
-                    f"Unknown overlaps found in the data: {found_not_accepted}. Consider adding them to 'accepted_overlaps'."
-                )
 
         # Add region aggregates.
         for region in self.regions:
-            # Check that the content of the region dictionary is as expected.
-            expected_items = {"additional_regions", "excluded_regions", "additional_members", "excluded_members"}
-            unknown_items = set(self.regions[region]) - expected_items
-            if len(unknown_items) > 0:
-                log.warning(
-                    f"Unknown items in dictionary of regions {region}: {unknown_items}. Expected: {expected_items}."
-                )
-
-            # List members of the region.
-            members = list_members_of_region(
-                region=region,
-                ds_regions=self.ds_regions,
-                # TODO: Is the following if clause still needed?
-                # If any of the regions is an income group, load income groups dataset (and raise an error if it is not among dependencies); otherwise, set ds_income_groups as None, to ignore the income groups dataset.
-                ds_income_groups=self.ds_income_groups
-                if (self.regions is not None) and any(set(self.regions).intersection(set(INCOME_GROUPS)))
-                else None,
-                additional_regions=self.regions[region].get("additional_regions"),
-                excluded_regions=self.regions[region].get("excluded_regions"),
-                additional_members=self.regions[region].get("additional_members"),
-                excluded_members=self.regions[region].get("excluded_members"),
-                # By default, include historical regions in income groups.
-                include_historical_regions_in_income_groups=True,
-            )
-
             df_region = groupby_agg(
                 # Select data for countries in the region.
-                df=df_with_regions[df_with_regions[self.country_col].isin(members)],
+                df=df_with_regions[df_with_regions[self.country_col].isin(self.regions_members[region])],
                 groupby_columns=[column for column in self.index_columns if column != self.country_col],
                 aggregations=dict(**self.aggregations),  # type: ignore
                 num_allowed_nans=num_allowed_nans_per_year,
