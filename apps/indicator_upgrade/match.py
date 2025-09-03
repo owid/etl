@@ -146,6 +146,29 @@ def main(
         # Get all variables from new dataset.
         new_indicators = get_variables_in_dataset(db_conn=db_conn, dataset_id=new_dataset_id, only_used_in_charts=False)
 
+    # Get existing variable mappings from database to exclude already mapped variables
+    existing_mappings = WizardDB.get_variable_mapping()
+
+    if existing_mappings:
+        # Filter out variables that already have mappings
+        mapped_old_ids = set(existing_mappings.keys())
+        mapped_new_ids = set(existing_mappings.values())
+
+        old_indicators = old_indicators[~old_indicators["id"].isin(mapped_old_ids)].reset_index(drop=True)
+        new_indicators = new_indicators[~new_indicators["id"].isin(mapped_new_ids)].reset_index(drop=True)
+
+        print(
+            f"Excluded {len(mapped_old_ids)} old variables and {len(mapped_new_ids)} new variables that already have mappings."
+        )
+
+    if len(old_indicators) == 0:
+        print("No old variables left to map after excluding already mapped variables.")
+        return
+
+    if len(new_indicators) == 0:
+        print("No new variables left to map after excluding already mapped variables.")
+        return
+
     # Map old variable names to new variable names.
     if no_interactive:
         mapping = map_old_and_new_indicators_auto(
