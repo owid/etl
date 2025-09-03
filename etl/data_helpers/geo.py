@@ -1842,6 +1842,9 @@ class RegionAggregator:
         self.year_col = year_col
         self.population_col = population_col
 
+        # Coverage table.
+        self.tb_coverage = None
+
         # Fill missing arguments with default values and ensure regions is always a dict.
         if regions is None:
             self.regions: dict[str, Any] = REGIONS
@@ -1884,24 +1887,13 @@ class RegionAggregator:
             )
         return self._ds_population
 
-    def _create_coverage_table(
-        self, tb: Table, columns: list[str] | None = None, reference_column: str | None = None
-    ) -> Table:
+    def _create_coverage_table(self, tb: Table) -> None:
         """Create data coverage table with the same shape as the original table."""
-
-        if columns is None:
-            columns = [column for column in tb.columns if column not in self.index_columns]
-
         # Create a data coverage table, which is 0 if a given cell in the original table was nan, and 1 otherwise.
-        tb_coverage = Table(tb[self.index_columns + columns].notnull())
+        self.tb_coverage = Table(tb.notnull())
 
         # Replace index columns by their original values.
-        tb_coverage[self.index_columns] = tb[self.index_columns].copy()
-
-        if reference_column:
-            tb_coverage[columns] = tb_coverage[columns].multiply(tb[reference_column], axis=0)
-
-        return tb_coverage
+        self.tb_coverage[self.index_columns] = tb[self.index_columns].copy()
 
     def _ensure_aggregations_are_defined(self, tb: TableOrDataFrame) -> None:
         # If aggregations are not defined, assume all non-index columns have a sum aggregate.
@@ -2217,11 +2209,16 @@ class RegionAggregator:
             # regions = sorted(set(tb["country"]) & set(self.regions_all))
             # Create an auxiliary table of informed population.
             # For a given column, each row contains the population of the corresponding region on the corresponding year, or a zero, if that column-row was originally nan.
-            tb_coverage = self._create_coverage_table(tb=tb_result, reference_column=self.population_col)
+            if self.tb_coverage is None:
+                self._create_coverage_table(tb=tb_result)
+            tb_population_informed = self.tb_coverage[self.index_columns + columns].copy()  # type: ignore
+            tb_population_informed[columns] = tb_population_informed[columns].multiply(
+                tb_result[self.population_col], axis=0
+            )
 
             # TODO: This is convoluted, we should rethink this approach. Here we just need a small part of the logic of the aggregates. Use that part after refactoring.
             # TODO: Note that now we assume that regions with per capita are the same as regions with aggregates; that's why regions and aggregations defined right above here were not used.
-            tb_population_informed = self.add_aggregates(tb=tb_coverage.drop(columns=[self.population_col]))
+            tb_population_informed = self.add_aggregates(tb=tb_population_informed)
 
             tb_result = tb_result.merge(
                 tb_population_informed, on=self.index_columns, how="left", suffixes=("", "_informed_population")
