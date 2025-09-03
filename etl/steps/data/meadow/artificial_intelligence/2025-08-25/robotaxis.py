@@ -18,8 +18,6 @@ def run() -> None:
 
     # Load data from snapshot.
     tb = snap.read(low_memory=False)
-    #'utf-8', 'latin1', 'cp1252', 'iso-8859-1']:
-
     #
     # Process data.
     #
