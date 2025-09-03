@@ -37,8 +37,6 @@ def run() -> None:
         errors="raise",
     )
 
-    tb[tb["indicator"].isna()].to_csv("ilostat.csv", index=False)
-
     tb = add_ilo_regions(tb=tb, tb_regions=tb_regions)
 
     # Harmonize country names.
