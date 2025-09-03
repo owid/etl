@@ -143,10 +143,15 @@ def run() -> None:
     tb_who_gm = combine_two_overlapping_dataframes(df1=tb_calc_mm, df2=tb_gm, index_columns=["country", "year"])
 
     # calculate mmr and mm rate if NA from Gapminder deaths with UN WPP data
-    tb_who_gm["mmr"] = tb_who_gm["mmr"].combine_first(tb_who_gm["maternal_deaths"] / tb_who_gm["live_births"] * 100_000)
-    tb_who_gm["mmr_rate"] = tb_who_gm["mmr_rate"].combine_first(
-        tb_who_gm["maternal_deaths"] / tb_who_gm["female_population"] * 100_000
-    )
+    valid_births = ~(tb_who_gm["live_births"].isna() | (tb_who_gm["live_births"] == 0))
+    mmr_calculated = pd.Series(index=tb_who_gm.index, dtype=float)
+    mmr_calculated[valid_births] = tb_who_gm.loc[valid_births, "maternal_deaths"] / tb_who_gm.loc[valid_births, "live_births"] * 100_000
+    tb_who_gm["mmr"] = tb_who_gm["mmr"].combine_first(mmr_calculated)
+    # Calculate MMR rate with validation for zero/NaN denominators
+    valid_pop = ~(tb_who_gm["female_population"].isna() | (tb_who_gm["female_population"] == 0))
+    mmr_rate_calculated = pd.Series(index=tb_who_gm.index, dtype=float)
+    mmr_rate_calculated[valid_pop] = tb_who_gm.loc[valid_pop, "maternal_deaths"] / tb_who_gm.loc[valid_pop, "female_population"] * 100_000
+    tb_who_gm["mmr_rate"] = tb_who_gm["mmr_rate"].combine_first(mmr_rate_calculated)
 
     # join the two tables
     # first - rename columns so they have the same names
@@ -165,9 +170,6 @@ def run() -> None:
     # drop all columns that are not 1) long run or 2) not related to maternal mortality
     cols_to_keep = ["country", "year", "maternal_deaths", "mmr", "live_births", "mmr_rate"]
     tb = tb[cols_to_keep]
-
-    # drop rows where there is no data for maternal mortality indicators (introduced by aggregating regions)
-    tb = tb.dropna(subset=["maternal_deaths", "mmr", "mmr_rate"], how="all")
 
     # fix dtypes (coerce errors since NAs are not accepted otherwise)
     tb["maternal_deaths"] = (
