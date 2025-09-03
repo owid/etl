@@ -363,15 +363,6 @@ steps:
   data://grapher/homicide/2024-07-30/homicide_long_run_omm:
     - data://garden/homicide/2024-07-30/homicide_long_run_omm
 
-  # Ethnologue
-  data-private://meadow/language/2024-07-17/ethnologue:
-    - snapshot-private://language/2024-07-17/ethnologue.zip
-  data-private://garden/language/2024-07-17/ethnologue:
-    - data-private://meadow/language/2024-07-17/ethnologue
-    - data://garden/regions/2023-01-01/regions
-  data-private://grapher/language/2024-07-17/ethnologue:
-    - data-private://garden/language/2024-07-17/ethnologue
-
   # Child Mortality Estimates - UN IGME
   data://meadow/un/2025-03-25/igme:
     - snapshot://un/2025-03-25/igme.zip
