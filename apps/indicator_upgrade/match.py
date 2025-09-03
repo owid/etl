@@ -8,9 +8,9 @@ import rich_click as click
 from rapidfuzz import fuzz
 from structlog import get_logger
 
+from apps.wizard.utils.db import WizardDB
 from etl.db import get_connection
 from etl.grapher.io import get_variables_in_dataset
-from apps.wizard.utils.db import WizardDB
 
 # If True, identical variables will be matched automatically (by string comparison).
 # If False, variables with identical names will appear in comparison.
@@ -356,10 +356,10 @@ def print_mapping_dataframe(mapping: pd.DataFrame, old_dataset_id: int, new_data
     if len(mapping) == 0:
         print("\nNo mappings to save to database.")
         return
-    
+
     # Create the mapping dictionary that would be saved
-    mapping_dict = mapping.set_index('id_old')['id_new'].to_dict()
-    
+    mapping_dict = mapping.set_index("id_old")["id_new"].to_dict()
+
     print("\nDataFrame that would be saved to database:")
     print("=" * 80)
     print(f"Dataset mapping: {old_dataset_id} -> {new_dataset_id}")
@@ -384,18 +384,18 @@ def save_mappings_to_database(mapping: pd.DataFrame, old_dataset_id: int, new_da
     if len(mapping) == 0:
         print("No mappings to save to database.")
         return
-    
+
     # Create the mapping dictionary expected by WizardDB.add_variable_mapping
-    mapping_dict = {int(k): int(v) for k, v in mapping.set_index('id_old')['id_new'].to_dict().items()}
-    
+    mapping_dict = {int(k): int(v) for k, v in mapping.set_index("id_old")["id_new"].to_dict().items()}
+
     # Save to database
     WizardDB.add_variable_mapping(
         mapping=mapping_dict,
         dataset_id_old=old_dataset_id,
         dataset_id_new=new_dataset_id,
-        comments=f"Variable mapping from dataset {old_dataset_id} to {new_dataset_id}"
+        comments=f"Variable mapping from dataset {old_dataset_id} to {new_dataset_id}",
     )
-    
+
     print(f"Successfully saved {len(mapping_dict)} variable mappings to database.")
     print(f"Dataset mapping: {old_dataset_id} -> {new_dataset_id}")
 

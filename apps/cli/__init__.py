@@ -210,8 +210,7 @@ GROUPS = (
         {
             "name": "Others",
             "commands": {
-                # TODO: should we move it elsewhere outside of app_pages?
-                "variable-match": "apps.wizard.app_pages.indicator_upgrade.match_variables.main_cli",
+                "indicator-upgrade": "apps.indicator_upgrade.cli.cli",
             },
         },
     ]

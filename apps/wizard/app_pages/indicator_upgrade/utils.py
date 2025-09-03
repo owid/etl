@@ -8,7 +8,7 @@ from pymysql import OperationalError
 from rapidfuzz import fuzz
 from structlog import get_logger
 
-from apps.wizard.app_pages.indicator_upgrade.match_variables import find_mapping_suggestions, preliminary_mapping
+from apps.indicator_upgrade.match import find_mapping_suggestions, preliminary_mapping
 from apps.wizard.utils.io import get_steps_df
 from etl.db import get_connection
 from etl.grapher.io import get_all_datasets, get_dataset_charts, get_variables_in_dataset
