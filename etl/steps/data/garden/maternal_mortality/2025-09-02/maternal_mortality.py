@@ -194,7 +194,7 @@ def run() -> None:
     ds_garden.save()
 
 
-def align_dtypes(tb1:Table, tb2: Table) -> tuple[Table, Table]:
+def align_dtypes(tb1: Table, tb2: Table) -> tuple[Table, Table]:
     shared_cols = tb1.columns.intersection(tb2.columns)
 
     for col in shared_cols:
