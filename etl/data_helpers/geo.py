@@ -1836,7 +1836,7 @@ class RegionAggregator:
         self._ds_regions = ds_regions
         self._ds_income_groups = ds_income_groups
         self._ds_population = ds_population
-        self.aggregations = aggregations
+        self.aggregations = aggregations  # type: ignore
         self.regions_all = regions_all
         self.country_col = country_col
         self.year_col = year_col
@@ -1933,7 +1933,9 @@ class RegionAggregator:
     def _ensure_aggregations_are_defined(self, tb: TableOrDataFrame) -> None:
         # If aggregations are not defined, assume all non-index columns have a sum aggregate.
         if self.aggregations is None:
-            self.aggregations = {column: "sum" for column in tb.columns if column not in self.index_columns}
+            self.aggregations: dict[str, Any] = {
+                column: "sum" for column in tb.columns if column not in self.index_columns
+            }
 
     def inspect_region_overlaps(
         self,
@@ -2013,7 +2015,6 @@ class RegionAggregator:
         num_allowed_nans_per_year: int | None = None,
         frac_allowed_nans_per_year: float | None = None,
         min_num_values_per_year: int | None = None,
-        keep_original_region_with_suffix: str | None = None,
         check_for_region_overlaps: bool = True,
         accepted_overlaps: list[dict[int, set[str]]] | None = None,
         ignore_overlaps_of_zeros: bool = False,
@@ -2029,10 +2030,7 @@ class RegionAggregator:
         This should be the default function to use when adding data for regions to a table (or dataframe).
         This function respects the metadata of the incoming data.
 
-        If the original data for a region already exists:
-        * If keep_original_region_with_suffix is None, the original data for the region will be replaced by a new aggregate.
-        * If keep_original_region_with_suffix is not None, the original data for the region will be kept, and the value of
-        keep_original_region_with_suffix will be appended to the name of the region.
+        NOTE: We used to have the argument keep_original_region_with_suffix, but it was barely used. If you want to keep the original regions with a suffix, or exclude them, you can still do that before creating aggregates, when harmonizing country names.
 
         Parameters
         ----------
@@ -2056,12 +2054,6 @@ class RegionAggregator:
             Name of country column.
         year_col : Optional[str], default: "year"
             Name of year column.
-        keep_original_region_with_suffix : Optional[str], default: None
-            * If not None, the original data for a region will be kept, with the same name, but having suffix
-            keep_original_region_with_suffix appended to its name.
-            Example: If keep_original_region_with_suffix is " (WB)", then there will be rows for, e.g. "Europe (WB)", with
-            the original data, and rows for "Europe", with the new aggregate data.
-            * If None, the original data for a region will be replaced by new aggregate data constructed by this function.
         check_for_region_overlaps : bool, default: True
             * If True, a warning is raised if a historical region has data on the same year as any of its successors.
             TODO: For now, this function simply warns about overlaps, but does nothing else about them.
@@ -2101,8 +2093,13 @@ class RegionAggregator:
             Original table (or dataframe) after adding (or replacing) aggregate data for regions.
 
         """
-
+        # Ensure aggregations are well defined.
         self._ensure_aggregations_are_defined(tb=tb)
+
+        # Define the list of (non-index) columns for which aggregates will be created.
+        columns = list(self.aggregations)
+        # Define the list of other non-index columns (if any) for which no aggregates need to be created.
+        other_columns = [column for column in tb.columns if column not in (self.index_columns + columns)]
 
         if check_for_region_overlaps:
             # Find overlaps between regions and its members.
@@ -2114,9 +2111,6 @@ class RegionAggregator:
                 subregion_type=subregion_type,
             )
 
-        # TODO: For now I'll simply copy here the content of the old add_regions_to_table and adapt inputs. But refactor it piece by piece to avoid redundant code.
-        df_with_regions = pd.DataFrame(tb).copy()
-
         # Create a table of region aggregates (just the regions, not individual countries).
         df_only_regions = self._create_table_of_only_region_aggregates(
             tb=tb,
@@ -2127,23 +2121,23 @@ class RegionAggregator:
 
         # TODO: Here is where we should impose a list of countries that need to be informed (and possibly other conditions) on the small table with only regions.
 
-        # Select rows in the original data that already contained regions.
-        select_old_regions = df_with_regions[self.country_col].isin(list(self.regions))
-        if isinstance(keep_original_region_with_suffix, str):
-            # Rename regions given in the original data, by adding a suffix.
-            df_with_regions.loc[select_old_regions, self.country_col] = (
-                df_with_regions.loc[select_old_regions, self.country_col] + keep_original_region_with_suffix
+        # Create a mask that selects rows of regions in the original data, if any.
+        _select_regions = tb[self.country_col].isin(list(self.regions))
+
+        # If there were regions in other columns (not used for aggregates) include them in the subtable of only regions.
+        if any(other_columns) and any(_select_regions):
+            df_only_regions = df_only_regions.merge(
+                tb[_select_regions][self.index_columns + other_columns], how="outer", on=self.index_columns
             )
-        else:
-            # Remove regions given in the original data.
-            df_with_regions = df_with_regions[~select_old_regions]
 
-        # Append the new regions.
-        # TODO: Handle the situation where you create aggregate of only a subset of columns (this is a known issue that raises a warning in the original add_regions_to_table function).
-        df_with_regions = pd.concat([df_with_regions, df_only_regions], ignore_index=True)
+        # Create a table of all other rows that are not regions.
+        df_no_regions = tb[~_select_regions]
 
-        # Sort conveniently.
-        df_with_regions = df_with_regions.sort_values(self.index_columns).reset_index(drop=True)  # type: ignore
+        # Combine the table with only regions and the table with no regions.
+        df_with_regions = pd.concat([df_only_regions, df_no_regions], ignore_index=True)
+
+        # Sort rows and columns conveniently.
+        df_with_regions = df_with_regions.sort_values(self.index_columns).reset_index(drop=True)[tb.columns]
 
         # Convert country to categorical if the original was
         if tb[self.country_col].dtype.name == "category":
@@ -2151,7 +2145,7 @@ class RegionAggregator:
 
         # If the original object was a Table, copy metadata
         if isinstance(tb, Table):
-            return Table(df_with_regions).copy_metadata(tb)  # type: ignore
+            return Table(df_with_regions).copy_metadata(tb)
         else:
             return df_with_regions  # type: ignore
 
