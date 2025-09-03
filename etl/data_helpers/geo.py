@@ -1920,8 +1920,9 @@ class RegionAggregator:
         accepted_overlaps: list[dict[int, set[str]]] | None = None,
         ignore_overlaps_of_zeros: bool = False,
         subregion_type: str = "successors",
-        countries_that_must_have_data: dict[str, list[str]] | None = None,
-        frac_countries_that_must_have_data: dict[str, float] | None = None,
+        # TODO: Implement logic for the following arguments, using the coverage table (which needs to be stored).
+        # countries_that_must_have_data: dict[str, list[str]] | None = None,
+        # frac_countries_that_must_have_data: dict[str, float] | None = None,
     ) -> Table:
         """Add one or more region aggregates to a table (or dataframe).
 
@@ -2045,28 +2046,6 @@ class RegionAggregator:
                     f"Unknown overlaps found in the data: {found_not_accepted}. Consider adding them to 'accepted_overlaps'."
                 )
 
-        if countries_that_must_have_data:
-            # If countries_that_must_have_data is neither None or [], it must be a dictionary with regions as keys.
-            # Check that the dictionary has the right format.
-            error = "Argument countries_that_must_have_data must be a dictionary with regions as keys."
-            assert set(countries_that_must_have_data) <= set(self.regions), error  # type: ignore
-            # Fill missing regions with an empty list.
-            countries_that_must_have_data = {
-                region: countries_that_must_have_data.get(region, []) for region in list(self.regions)
-            }
-        else:
-            countries_that_must_have_data = {region: [] for region in list(self.regions)}
-
-        if frac_countries_that_must_have_data:
-            error = "Argument frac_countries_that_must_have_data must be a dictionary with regions as keys."
-            assert set(frac_countries_that_must_have_data) <= set(self.regions), error
-            # Fill missing regions with an empty list.
-            # frac_countries_that_must_have_data = {
-            #     region: frac_countries_that_must_have_data.get(region, 1) for region in list(regions)
-            # }
-        else:
-            frac_countries_that_must_have_data = {}  # {region: 1 for region in list(regions)}
-
         # Add region aggregates.
         for region in self.regions:
             # Check that the content of the region dictionary is as expected.
@@ -2093,31 +2072,65 @@ class RegionAggregator:
                 # By default, include historical regions in income groups.
                 include_historical_regions_in_income_groups=True,
             )
-            # TODO: Here we could optionally define _df_with_regions, which is passed to add_region_aggregates, and is
-            #   identical to df_with_regions, but overlaps in accepted_overlaps are solved (e.g. the data for the historical
-            #   or parent region is made nan).
 
-            # Add aggregate data for current region.
-            df_with_regions = add_region_aggregates(
-                df=df_with_regions,
-                region=region,
-                aggregations=self.aggregations,
-                index_columns=self.index_columns,
-                countries_in_region=members,
-                countries_that_must_have_data=countries_that_must_have_data[region],
-                frac_countries_that_must_have_data=frac_countries_that_must_have_data.get(region),
-                num_allowed_nans_per_year=num_allowed_nans_per_year,
-                frac_allowed_nans_per_year=frac_allowed_nans_per_year,
-                min_num_values_per_year=min_num_values_per_year,
-                country_col=self.country_col,
-                year_col=self.year_col,
-                keep_original_region_with_suffix=keep_original_region_with_suffix,
-            )
+            df_region = groupby_agg(
+                # Select data for countries in the region.
+                df=df_with_regions[df_with_regions[self.country_col].isin(members)],
+                groupby_columns=[column for column in self.index_columns if column != self.country_col],
+                aggregations=dict(**self.aggregations),  # type: ignore
+                num_allowed_nans=num_allowed_nans_per_year,
+                frac_allowed_nans=frac_allowed_nans_per_year,
+                min_num_values=min_num_values_per_year,
+            ).reset_index()
+
+            # Add a column for region name.
+            df_region[self.country_col] = region
+
+            if isinstance(keep_original_region_with_suffix, str):
+                # Keep rows in the original dataframe containing rows for region (adding a suffix to the region name), and then
+                # append new rows for region.
+                rows_original_region = df_with_regions[self.country_col] == region
+                df_original_region = df_with_regions[rows_original_region].reset_index(drop=True)
+                # Append suffix at the end of the name of the original region.
+                df_original_region[self.country_col] = region + cast(str, keep_original_region_with_suffix)
+                df_updated = pd.concat(
+                    [df_with_regions[~rows_original_region], df_original_region, df_region],
+                    ignore_index=True,
+                )
+            else:
+                # Remove rows in the original table containing rows for region, and append new rows for region.
+                dfs_to_concat = [df_with_regions[~(df_with_regions[self.country_col] == region)], df_region]
+                df_updated = pd.concat([df for df in dfs_to_concat if not df.empty], ignore_index=True)
+                # WARNING: When an aggregate is added (e.g. "Europe") just for one of the columns (and no aggregation is
+                # specified for the rest of columns) and there was already data for that region, the data for the rest of
+                # columns is deleted for that particular region (in the following line).
+                # This is an unusual scenario, because you would normally want to replace all data for a certain region, not
+                # just certain columns. However, the expected behavior would be to just replace the region data for the
+                # specified column.
+                # For now, simply warn that the original data for the region for those columns was deleted.
+                columns_without_aggregate = set(df_with_regions.drop(columns=self.index_columns).columns) - set(
+                    self.aggregations  # type: ignore
+                )
+                if (len(columns_without_aggregate) > 0) and (
+                    len(df_with_regions[df_with_regions[self.country_col] == region]) > 0
+                ):
+                    log.warning(
+                        f"Region {region} already has data for columns that do not have a defined aggregation method: "
+                        f"({columns_without_aggregate}). That data will become nan."
+                    )
+
+            df_with_regions = df_updated
+
+        # Sort conveniently.
+        df_with_regions = df_with_regions.sort_values(self.index_columns).reset_index(drop=True)  # type: ignore
+
+        # Convert country to categorical if the original was
+        if tb[self.country_col].dtype.name == "category":
+            df_with_regions = df_with_regions.astype({self.country_col: "category"})
 
         # If the original object was a Table, copy metadata
         if isinstance(tb, Table):
-            # TODO: Add entry to processing log.
-            return Table(df_with_regions).copy_metadata(tb)
+            return Table(df_with_regions).copy_metadata(tb)  # type: ignore
         else:
             return df_with_regions  # type: ignore
 
