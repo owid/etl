@@ -14,7 +14,7 @@ def run() -> None:
     ds_garden = paths.load_dataset("maternal_mortality")
 
     # Read table from garden dataset.
-    tb = ds_garden.read("maternal_mortality")
+    tb = ds_garden.read("maternal_mortality", reset_index=False)
     #
     # Save outputs.
     #
