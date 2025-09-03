@@ -8,7 +8,6 @@ Available at: https://www.ethnologue.com/codes/
 from pathlib import Path
 
 import click
-from fastapi import requests
 
 from etl.snapshot import Snapshot
 
