@@ -15,7 +15,7 @@ def run() -> None:
 
     # Read table from garden dataset.
     tb = ds_garden.read("maternal_mortality")
-    tb = tb.format(['country', 'year'])
+    tb = tb.format(["country", "year"])
 
     # Save outputs.
     #
