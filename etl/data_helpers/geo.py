@@ -1976,6 +1976,36 @@ class RegionAggregator:
                 f"Unknown overlaps found in the data: {found_not_accepted}. Consider adding them to 'accepted_overlaps'."
             )
 
+    def _create_table_of_only_region_aggregates(
+        self,
+        tb: TableOrDataFrame,
+        num_allowed_nans_per_year: int | None = None,
+        frac_allowed_nans_per_year: float | None = None,
+        min_num_values_per_year: int | None = None,
+    ):
+        # Create region aggregates.
+        dfs_with_regions = []
+        for region in self.regions:
+            df_region = groupby_agg(
+                # Select data for countries in the region.
+                df=tb[tb[self.country_col].isin(self.regions_members[region])],
+                groupby_columns=[column for column in self.index_columns if column != self.country_col],
+                aggregations=dict(**self.aggregations),  # type: ignore
+                num_allowed_nans=num_allowed_nans_per_year,
+                frac_allowed_nans=frac_allowed_nans_per_year,
+                min_num_values=min_num_values_per_year,
+            ).reset_index()
+
+            # Add a column for region name.
+            df_region[self.country_col] = region
+
+            dfs_with_regions.append(df_region)
+
+        # Concatenate aggregates of all regions.
+        df_with_regions = pr.concat([df for df in dfs_with_regions if not df.empty], ignore_index=True)
+
+        return df_with_regions
+
     # TODO: The idea is to split the original add_regions_to_table function into smaller pieces, e.g. (1) checks on region overlaps and data coverage, (2) create aggregates for regions (without adding them to the original table yet), (3) making nan aggregates that don't fulfil certain conditions, and (4) assembling the region aggregates with the original table.
     def add_aggregates(
         self,
@@ -2074,68 +2104,43 @@ class RegionAggregator:
 
         self._ensure_aggregations_are_defined(tb=tb)
 
-        # TODO: For now I'll simply copy here the content of the old add_regions_to_table and adapt inputs. But refactor it piece by piece to avoid redundant code.
-        df_with_regions = pd.DataFrame(tb).copy()
-
         if check_for_region_overlaps:
             # Find overlaps between regions and its members.
             # TODO: Should we also check for subregion_type "related" or "members"?
             self.inspect_region_overlaps(
-                tb=df_with_regions,
+                tb=tb,
                 accepted_overlaps=accepted_overlaps,
                 ignore_overlaps_of_zeros=ignore_overlaps_of_zeros,
                 subregion_type=subregion_type,
             )
 
-        # Add region aggregates.
-        for region in self.regions:
-            df_region = groupby_agg(
-                # Select data for countries in the region.
-                df=df_with_regions[df_with_regions[self.country_col].isin(self.regions_members[region])],
-                groupby_columns=[column for column in self.index_columns if column != self.country_col],
-                aggregations=dict(**self.aggregations),  # type: ignore
-                num_allowed_nans=num_allowed_nans_per_year,
-                frac_allowed_nans=frac_allowed_nans_per_year,
-                min_num_values=min_num_values_per_year,
-            ).reset_index()
+        # TODO: For now I'll simply copy here the content of the old add_regions_to_table and adapt inputs. But refactor it piece by piece to avoid redundant code.
+        df_with_regions = pd.DataFrame(tb).copy()
 
-            # Add a column for region name.
-            df_region[self.country_col] = region
+        # Create a table of region aggregates (just the regions, not individual countries).
+        df_only_regions = self._create_table_of_only_region_aggregates(
+            tb=tb,
+            num_allowed_nans_per_year=num_allowed_nans_per_year,
+            frac_allowed_nans_per_year=frac_allowed_nans_per_year,
+            min_num_values_per_year=min_num_values_per_year,
+        )
 
-            if isinstance(keep_original_region_with_suffix, str):
-                # Keep rows in the original dataframe containing rows for region (adding a suffix to the region name), and then
-                # append new rows for region.
-                rows_original_region = df_with_regions[self.country_col] == region
-                df_original_region = df_with_regions[rows_original_region].reset_index(drop=True)
-                # Append suffix at the end of the name of the original region.
-                df_original_region[self.country_col] = region + cast(str, keep_original_region_with_suffix)
-                df_updated = pd.concat(
-                    [df_with_regions[~rows_original_region], df_original_region, df_region],
-                    ignore_index=True,
-                )
-            else:
-                # Remove rows in the original table containing rows for region, and append new rows for region.
-                dfs_to_concat = [df_with_regions[~(df_with_regions[self.country_col] == region)], df_region]
-                df_updated = pd.concat([df for df in dfs_to_concat if not df.empty], ignore_index=True)
-                # WARNING: When an aggregate is added (e.g. "Europe") just for one of the columns (and no aggregation is
-                # specified for the rest of columns) and there was already data for that region, the data for the rest of
-                # columns is deleted for that particular region (in the following line).
-                # This is an unusual scenario, because you would normally want to replace all data for a certain region, not
-                # just certain columns. However, the expected behavior would be to just replace the region data for the
-                # specified column.
-                # For now, simply warn that the original data for the region for those columns was deleted.
-                columns_without_aggregate = set(df_with_regions.drop(columns=self.index_columns).columns) - set(
-                    self.aggregations  # type: ignore
-                )
-                if (len(columns_without_aggregate) > 0) and (
-                    len(df_with_regions[df_with_regions[self.country_col] == region]) > 0
-                ):
-                    log.warning(
-                        f"Region {region} already has data for columns that do not have a defined aggregation method: "
-                        f"({columns_without_aggregate}). That data will become nan."
-                    )
+        # TODO: Here is where we should impose a list of countries that need to be informed (and possibly other conditions) on the small table with only regions.
 
-            df_with_regions = df_updated
+        # Select rows in the original data that already contained regions.
+        select_old_regions = df_with_regions[self.country_col].isin(list(self.regions))
+        if isinstance(keep_original_region_with_suffix, str):
+            # Rename regions given in the original data, by adding a suffix.
+            df_with_regions.loc[select_old_regions, self.country_col] = (
+                df_with_regions.loc[select_old_regions, self.country_col] + keep_original_region_with_suffix
+            )
+        else:
+            # Remove regions given in the original data.
+            df_with_regions = df_with_regions[~select_old_regions]
+
+        # Append the new regions.
+        # TODO: Handle the situation where you create aggregate of only a subset of columns (this is a known issue that raises a warning in the original add_regions_to_table function).
+        df_with_regions = pd.concat([df_with_regions, df_only_regions], ignore_index=True)
 
         # Sort conveniently.
         df_with_regions = df_with_regions.sort_values(self.index_columns).reset_index(drop=True)  # type: ignore
