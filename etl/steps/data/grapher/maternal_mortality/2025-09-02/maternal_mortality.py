@@ -14,8 +14,9 @@ def run() -> None:
     ds_garden = paths.load_dataset("maternal_mortality")
 
     # Read table from garden dataset.
-    tb = ds_garden.read("maternal_mortality", reset_index=False)
-    #
+    tb = ds_garden.read("maternal_mortality")
+    tb = tb.format(['country', 'year'])
+
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
