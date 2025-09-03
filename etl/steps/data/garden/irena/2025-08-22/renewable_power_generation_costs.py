@@ -36,7 +36,7 @@ def adjust_old_data_for_inflation(tb_old, tb_deflator, tb):
     tb_old = tb_old[tb_old["country"] != "South Korea"].reset_index(drop=True)
 
     # Calculate the adjustment factor.
-    tb_deflator["adjustment"] = tb_deflator[2024] / tb_deflator[2023]
+    tb_deflator["adjustment"] = tb_deflator[LATEST_YEAR] / tb_deflator[PREVIOUS_YEAR]
 
     ################################################################################################################
     # Remove metadata from WDI (which is used as an auxiliary dataset) to avoid it leaking into the new indicators.
