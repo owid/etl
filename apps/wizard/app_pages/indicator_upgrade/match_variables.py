@@ -1,6 +1,5 @@
 import json
 import os
-from pathlib import Path
 from typing import Any, Dict, List, Tuple, Union, cast
 
 import numpy as np
@@ -10,7 +9,8 @@ from rapidfuzz import fuzz
 from structlog import get_logger
 
 from etl.db import get_connection
-from etl.grapher.io import get_dataset_id, get_variables_in_dataset
+from etl.grapher.io import get_variables_in_dataset
+from apps.wizard.utils.db import WizardDB
 
 # If True, identical variables will be matched automatically (by string comparison).
 # If False, variables with identical names will appear in comparison.
@@ -35,24 +35,23 @@ log = get_logger()
 
 @click.command(name="variable-match", help=__doc__)
 @click.option(
-    "-f",
-    "--output-file",
-    type=str,
-    help="Path to output JSON file.",
-    required=True,
+    "--dry-run",
+    is_flag=True,
+    default=False,
+    help="Print the mappings without applying them.",
 )
 @click.option(
     "-old",
-    "--old-dataset-name",
-    type=str,
-    help="Old dataset name (as defined in grapher).",
+    "--old-dataset-id",
+    type=int,
+    help="Old dataset ID (as defined in grapher).",
     required=True,
 )
 @click.option(
     "-new",
-    "--new-dataset-name",
-    type=str,
-    help="New dataset name (as defined in grapher).",
+    "--new-dataset-id",
+    type=int,
+    help="New dataset ID (as defined in grapher).",
     required=True,
 )
 @click.option(
@@ -103,9 +102,9 @@ log = get_logger()
     help="Similarity threshold (0-100) for automatic mapping when --no-interactive is used. Default: 80.0",
 )
 def main_cli(
-    old_dataset_name: str,
-    new_dataset_name: str,
-    output_file: str,
+    old_dataset_id: int,
+    new_dataset_id: int,
+    dry_run: bool,
     add_identical_pairs: bool,
     similarity_name: str,
     max_suggestions: int,
@@ -120,11 +119,11 @@ def main_cli(
     If the variable names are identical, the task is trivial: find indexes of old variables and map them to the indexes of the identical variables in the new dataset. However, if variable names have changed (or the number of variables have changed) the pairing may need to be done manually. This CLI helps in either scenario.
     """
     main(
-        old_dataset_name=old_dataset_name,
-        new_dataset_name=new_dataset_name,
+        old_dataset_id=old_dataset_id,
+        new_dataset_id=new_dataset_id,
+        dry_run=dry_run,
         match_identical=not add_identical_pairs,
         similarity_name=similarity_name,
-        output_file=output_file,
         max_suggestions=int(max_suggestions),
         no_interactive=no_interactive,
         auto_threshold=auto_threshold,
@@ -132,25 +131,16 @@ def main_cli(
 
 
 def main(
-    old_dataset_name: str,
-    new_dataset_name: str,
-    output_file: str,
+    old_dataset_id: int,
+    new_dataset_id: int,
+    dry_run: bool,
     match_identical: bool = MATCH_IDENTICAL,
     similarity_name: str = SIMILARITY_NAME,
     max_suggestions: int = N_MAX_SUGGESTIONS,
     no_interactive: bool = False,
     auto_threshold: float = 80.0,
 ) -> None:
-    if os.path.isdir(output_file):
-        raise ValueError(f"`output_file` ({output_file}) should point to a JSON file ('*.json') and not a directory!")
-    if Path(output_file).suffix != ".json":
-        raise ValueError(f"`output_file` ({output_file}) should point to a JSON file ('*.json')!")
-
     with get_connection() as db_conn:
-        # Get old and new dataset ids.
-        old_dataset_id = get_dataset_id(db_conn=db_conn, dataset_name=old_dataset_name)
-        new_dataset_id = get_dataset_id(db_conn=db_conn, dataset_name=new_dataset_name)
-
         # Get variables from old dataset that have been used in at least one chart.
         old_indicators = get_variables_in_dataset(db_conn=db_conn, dataset_id=old_dataset_id, only_used_in_charts=True)
         # Get all variables from new dataset.
@@ -177,8 +167,13 @@ def main(
     # Display summary.
     display_summary(old_indicators=old_indicators, new_indicators=new_indicators, mapping=mapping)
 
-    # Save mapping to json file.
-    save_variable_replacements_file(mapping, output_file)
+    if dry_run:
+        # Print the mappings and dataframe
+        print_mappings(mapping)
+        print_mapping_dataframe(mapping, old_dataset_id, new_dataset_id)
+    else:
+        # Save to MySQL database
+        save_mappings_to_database(mapping, old_dataset_id, new_dataset_id)
 
 
 def map_old_and_new_indicators(
@@ -326,23 +321,83 @@ def display_summary(old_indicators: pd.DataFrame, new_indicators: pd.DataFrame, 
         print("\nAll variables in the new dataset have been matched.")
 
 
-def save_variable_replacements_file(mapping: pd.DataFrame, output_file: str) -> None:
-    """Save a json file with the mapping from old to new variable ids.
+def print_mappings(mapping: pd.DataFrame) -> None:
+    """Print the variable mappings in a readable format.
 
     Parameters
     ----------
     mapping : pd.DataFrame
         Mapping table from old variable name and id to new variable name and id.
-    output_file : str
-        Path to output file.
-
     """
-    # Create a dictionary mapping from old variable id to new variable id.
-    mapping_indexes = mapping[["id_old", "id_new"]].set_index("id_old").to_dict()["id_new"]
-    mapping_indexes = {str(key): str(mapping_indexes[key]) for key in mapping_indexes}
+    if len(mapping) == 0:
+        print("No variable mappings found.")
+        return
 
-    print(f"Saving index mapping to json file: {output_file}")
-    save_data_to_json_file(data=mapping_indexes, json_file=output_file, **{"indent": 4, "sort_keys": True})
+    print("Variable Mappings:")
+    print("=" * 60)
+    for _, row in mapping.iterrows():
+        print(f"Old: {row['name_old']} (ID: {row['id_old']})")
+        print(f"New: {row['name_new']} (ID: {row['id_new']})")
+        print("-" * 40)
+
+
+def print_mapping_dataframe(mapping: pd.DataFrame, old_dataset_id: int, new_dataset_id: int) -> None:
+    """Print the dataframe that would be saved to the database.
+
+    Parameters
+    ----------
+    mapping : pd.DataFrame
+        Mapping table from old variable name and id to new variable name and id.
+    old_dataset_id : int
+        ID of the old dataset.
+    new_dataset_id : int
+        ID of the new dataset.
+    """
+    if len(mapping) == 0:
+        print("\nNo mappings to save to database.")
+        return
+    
+    # Create the mapping dictionary that would be saved
+    mapping_dict = mapping.set_index('id_old')['id_new'].to_dict()
+    
+    print("\nDataFrame that would be saved to database:")
+    print("=" * 80)
+    print(f"Dataset mapping: {old_dataset_id} -> {new_dataset_id}")
+    print(f"Number of variable mappings: {len(mapping_dict)}")
+    print("\nMapping dictionary:")
+    for old_id, new_id in mapping_dict.items():
+        print(f"  {old_id} -> {new_id}")
+
+
+def save_mappings_to_database(mapping: pd.DataFrame, old_dataset_id: int, new_dataset_id: int) -> None:
+    """Save variable mappings to the MySQL database.
+
+    Parameters
+    ----------
+    mapping : pd.DataFrame
+        Mapping table from old variable name and id to new variable name and id.
+    old_dataset_id : int
+        ID of the old dataset.
+    new_dataset_id : int
+        ID of the new dataset.
+    """
+    if len(mapping) == 0:
+        print("No mappings to save to database.")
+        return
+    
+    # Create the mapping dictionary expected by WizardDB.add_variable_mapping
+    mapping_dict = {int(k): int(v) for k, v in mapping.set_index('id_old')['id_new'].to_dict().items()}
+    
+    # Save to database
+    WizardDB.add_variable_mapping(
+        mapping=mapping_dict,
+        dataset_id_old=old_dataset_id,
+        dataset_id_new=new_dataset_id,
+        comments=f"Variable mapping from dataset {old_dataset_id} to {new_dataset_id}"
+    )
+    
+    print(f"Successfully saved {len(mapping_dict)} variable mappings to database.")
+    print(f"Dataset mapping: {old_dataset_id} -> {new_dataset_id}")
 
 
 def preliminary_mapping(
@@ -677,3 +732,7 @@ def _input_manual_decision(new_indexes: list[Any]) -> Any:
         print(f"Invalid option: It should be one in {new_indexes}.")
 
     return chosen_index
+
+
+if __name__ == "__main__":
+    main_cli()

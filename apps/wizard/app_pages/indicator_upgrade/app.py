@@ -35,9 +35,9 @@ from apps.wizard.app_pages.indicator_upgrade.charts_update import (
 )
 from apps.wizard.app_pages.indicator_upgrade.dataset_selection import build_dataset_form
 from apps.wizard.app_pages.indicator_upgrade.indicator_mapping import render_indicator_mapping
+from apps.wizard.app_pages.indicator_upgrade.match_variables import SIMILARITY_NAMES
 from apps.wizard.app_pages.indicator_upgrade.utils import get_datasets
 from apps.wizard.utils.components import st_title_with_expert
-from etl.match_variables import SIMILARITY_NAMES
 
 # logger
 log = get_logger()

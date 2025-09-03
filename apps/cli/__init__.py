@@ -182,7 +182,6 @@ GROUPS = (
             "name": "Charts",
             "commands": {
                 "chart-sync": "apps.chart_sync.cli.cli",
-                "indicator-upgrade": "etl.indicator_upgrade_cli.cli",
             },
         },
         {
@@ -211,8 +210,8 @@ GROUPS = (
         {
             "name": "Others",
             "commands": {
-                "variable-match": "etl.match_variables.main_cli",
-                "variable-mapping-translate": "etl.variable_mapping_translate.main_cli",
+                # TODO: should we move it elsewhere outside of app_pages?
+                "variable-match": "apps.wizard.app_pages.indicator_upgrade.match_variables.main_cli",
             },
         },
     ]
