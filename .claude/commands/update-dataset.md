@@ -56,7 +56,7 @@ Persistence:
 
 ## CHECKPOINT (mandatory user approval)
 
-- Present a consolidated summary of key changes from the step.
+- Present a consolidated summary of key changes and what step is next.
 - Ask explicitly: “Proceed? reply: yes/no”.
 - Only proceed to commit/push if the user replies “yes”.
 - After approval:
