@@ -1922,7 +1922,7 @@ class RegionAggregator:
             )
         return self._ds_population
 
-    def _create_coverage_table(self, tb: Table) -> None:
+    def _create_coverage_table(self, tb: TableOrDataFrame) -> None:
         """Create data coverage table with the same shape as the original table."""
         # Create a data coverage table, which is 0 if a given cell in the original table was nan, and 1 otherwise.
         self.tb_coverage = Table(tb.notnull())
@@ -2008,7 +2008,25 @@ class RegionAggregator:
 
         return df_with_regions
 
-    # TODO: The idea is to split the original add_regions_to_table function into smaller pieces, e.g. (1) checks on region overlaps and data coverage, (2) create aggregates for regions (without adding them to the original table yet), (3) making nan aggregates that don't fulfil certain conditions, and (4) assembling the region aggregates with the original table.
+    def _impose_countries_that_must_have_data(self, df_only_regions, columns, countries_that_must_have_data):
+        # List all index columns except the country column.
+        other_index_columns = [column for column in self.index_columns if column != self.country_col]
+        for column in columns:
+            for region, countries in countries_that_must_have_data.items():
+                if df_only_regions[df_only_regions[self.country_col] == region].empty:
+                    continue
+                # Create a temporary dataframe of groupings where all required countries are informed.
+                df_covered = (
+                    self.tb_coverage[self.tb_coverage[column]][self.index_columns]  # type: ignore
+                    .groupby(other_index_columns, as_index=False)
+                    .agg({self.country_col: lambda x: set(countries) <= set(x)})
+                )
+                # Detect indexes where not all required countries are informed.
+                _make_nan = df_covered[~df_covered[self.country_col]].assign(**{self.country_col: region})
+                # Make those rows nan in the dataframe with only regions.
+                merged = df_only_regions.merge(_make_nan, on=self.index_columns, how="left", indicator=True)
+                df_only_regions.loc[merged["_merge"] == "both", column] = np.nan
+
     def add_aggregates(
         self,
         tb: TableOrDataFrame,
@@ -2019,8 +2037,8 @@ class RegionAggregator:
         accepted_overlaps: list[dict[int, set[str]]] | None = None,
         ignore_overlaps_of_zeros: bool = False,
         subregion_type: str = "successors",
-        # TODO: Implement logic for the following arguments, using the coverage table (which needs to be stored).
-        # countries_that_must_have_data: dict[str, list[str]] | None = None,
+        countries_that_must_have_data: dict[str, list[str]] | None = None,
+        # TODO: Consider implementing logic for the following argument (used only once).
         # frac_countries_that_must_have_data: dict[str, float] | None = None,
     ) -> Table:
         """Add one or more region aggregates to a table (or dataframe).
@@ -2119,7 +2137,15 @@ class RegionAggregator:
             min_num_values_per_year=min_num_values_per_year,
         )
 
-        # TODO: Here is where we should impose a list of countries that need to be informed (and possibly other conditions) on the small table with only regions.
+        # If a list of countries that must be informed was given, remove (make nan) aggregations where any of those countries was missing in the data.
+        if countries_that_must_have_data is not None:
+            if self.tb_coverage is None:
+                self._create_coverage_table(tb=tb)
+            self._impose_countries_that_must_have_data(
+                df_only_regions=df_only_regions,
+                columns=columns,
+                countries_that_must_have_data=countries_that_must_have_data,
+            )
 
         # Create a mask that selects rows of regions in the original data, if any.
         _select_regions = tb[self.country_col].isin(list(self.regions))
