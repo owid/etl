@@ -145,7 +145,7 @@ def run() -> None:
 
     # combine with Gapminder data - using WHO/ UN WPP data where available
     tb_gm["maternal_deaths"] = tb_gm["maternal_deaths"].round().astype("UInt32")
-    tb_who_gm = combine_two_overlapping_dataframes(df1 = tb_calc_mm, df2 = tb_gm, index_columns=["country", "year"])
+    tb_who_gm = combine_two_overlapping_dataframes(df1=tb_calc_mm, df2=tb_gm, index_columns=["country", "year"])
 
     # calculate mmr and mm rate if NA from Gapminder deaths with UN WPP data
     tb_who_gm["mmr"] = tb_who_gm["mmr"].combine_first(tb_who_gm["maternal_deaths"] / tb_who_gm["live_births"] * 100_000)
@@ -158,7 +158,7 @@ def run() -> None:
     tb_un = tb_un.rename(columns={"births": "live_births"})
 
     # combine UN MMEIG with WHO/UN/GM using UN MMEIG preferentially
-    tb = combine_two_overlapping_dataframes(df1 = tb_un, df2 = tb_who_gm, index_columns=["country", "year"])
+    tb = combine_two_overlapping_dataframes(df1=tb_un, df2=tb_who_gm, index_columns=["country", "year"])
 
     # remove all rows that don't have any data on maternal deaths, mmr or mm rate
     tb = tb.dropna(subset=["maternal_deaths", "mmr", "mmr_rate"], how="all")
