@@ -354,7 +354,7 @@ class EggYieldLesothoAnomaly(DataAnomaly):
 
 
 class TeaProductionAnomaly(DataAnomaly):
-    description = "* Tea production in FAO data increased dramatically from 1990 to 1991 for many different countries (including some of the main producers, like China and India). However, data from 1991 was flagged as 'Estimated value' (while data prior to 1991 is flagged as 'Official figure'). Therefore, we removed tea production data (as well as per-capita production and yield) from 1991 onwards.\n"
+    description = "* Tea production data in FAOSTAT increases abruptly from 1990 to 1991 for many different countries (including some of the main producers, like China and India). However, data from 1991 is flagged as 'Estimated value' (while data prior to 1991 is flagged as 'Official figure'). Therefore, we decided to remove all tea production data (as well as per-capita production and yield).\n"
 
     affected_item_codes = [
         "00000667",
@@ -443,11 +443,7 @@ class TeaProductionAnomaly(DataAnomaly):
 
     def fix(self, tb):
         indexes_to_drop = tb[
-            (
-                (tb["item_code"].isin(self.affected_item_codes))
-                & (tb["element_code"].isin(self.affected_element_codes))
-                & (tb["year"] > 1990)
-            )
+            ((tb["item_code"].isin(self.affected_item_codes)) & (tb["element_code"].isin(self.affected_element_codes)))
         ].index
         tb_fixed = tb.drop(indexes_to_drop).reset_index(drop=True)
 

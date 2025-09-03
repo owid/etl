@@ -1,3 +1,4 @@
+!.claude/
 .coverage
 **/__pycache__
 .virtual_documents
@@ -61,3 +62,5 @@ dist/
 
 .claude/settings.local.json
 CLAUDE.local.md
+
+workbench/

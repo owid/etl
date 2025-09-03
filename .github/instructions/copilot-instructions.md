@@ -6,6 +6,9 @@ applyTo: "**"
 
 This repository contains the ETL (Extract, Transform, Load) system for Our World in Data. It processes, versions, and maintains datasets from various sources.
 
+## Custom instructions
+- NEVER query MCP servers with custom python code, just ask the MCP server directly. If it is not running, let me know.
+
 ## Architecture
 - We use a DAG-based workflow with YAML configuration files in the `dag/` directory
 - Processing happens in channels: Snapshot → Meadow → Garden → Grapher

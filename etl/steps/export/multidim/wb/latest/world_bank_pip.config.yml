@@ -1,6 +1,8 @@
 title:
   title: Poverty indicators
   title_variant: World Bank
+topic_tags:
+  - Poverty
 default_selection:
   - Mozambique
   - Zambia
@@ -136,10 +138,10 @@ dimensions:
     choices:
       - slug: No spells
         name: Don't show
-        description: Better for understanding trends within individual countries
+        description: Better for making broad comparisons across several countries
       - slug: Spells
         name: Show
-        description: Better for making broad comparisons across several countries
+        description: Better for understanding trends within individual countries
 
 views:
   # MULTIPLE LINES SIMPLE

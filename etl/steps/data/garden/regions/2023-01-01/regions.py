@@ -5,6 +5,7 @@ Find more details in the README in `docs/data/regions.md`.
 """
 
 import json
+from graphlib import TopologicalSorter
 
 import pandas as pd
 import yaml
@@ -93,6 +94,33 @@ def run_sanity_checks(df: pd.DataFrame) -> None:
     assert len(aliases_duplicated) == 0, error
 
 
+def replace_aggregate_members(df: pd.DataFrame):
+    """Programmatically replace members that are aggregates with their members.
+
+    It uses TopologicalSorter to ensure that the order of replacements is correct. This allows for recursive replacements, and checks that there are no cycles in the graph of regions. E.g. that region A doesn't contain region B, which contains region A.
+    """
+    REGIONS_DO_NOT_REPLACE = [
+        "OWID_WRL",
+    ]
+
+    dag = df.dropna(subset="members").set_index("code")["members"].to_dict()
+    ts = TopologicalSorter(dag)
+    regions_ordered = tuple(ts.static_order())
+    for region in regions_ordered:
+        members = dag.get(region, None)
+        if members:
+            new_members = []
+            for member in members:
+                m = dag.get(member, [member])
+                new_members.extend(m)
+
+            dag[region] = new_members
+
+    mask = ~df["code"].isin(REGIONS_DO_NOT_REPLACE)
+    df.loc[mask, "members"] = df.loc[mask, "code"].map(dag).fillna(df.loc[mask, "members"])
+    return df
+
+
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
@@ -114,6 +142,9 @@ def run(dest_dir: str) -> None:
     # Run sanity checks on input data.
     run_sanity_checks(df=df)
 
+    # Replace members that are aggregates
+    df = replace_aggregate_members(df)
+
     # Create a table of legacy codes (ensuring all numeric codes are integer).
     df_codes = df_codes.astype(
         {code: pd.Int64Dtype() for code in ["cow_code", "imf_code", "legacy_country_id", "legacy_entity_id"]}
@@ -132,7 +163,7 @@ def run(dest_dir: str) -> None:
     tb_regions = tb_regions.astype({"is_historical": bool})
 
     # Set an appropriate index and sort conveniently.
-    tb_regions = tb_regions.set_index("code", verify_integrity=True).sort_index()
+    tb_regions = tb_regions.format("code")
 
     #
     # Save outputs.

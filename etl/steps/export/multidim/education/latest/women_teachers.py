@@ -10,6 +10,10 @@ paths = PathFinder(__file__)
 # --------------------- #
 #   Constants & Config  #
 # --------------------- #
+# Color constants for education levels
+COLOR_PRIMARY = "#4C6A9C"
+COLOR_SECONDARY = "#578145"
+COLOR_TERTIARY = "#B16214"
 
 ID_COLUMNS = ["country", "year"]
 
@@ -31,7 +35,7 @@ GROUPED_VIEW_CONFIG = MULTIDIM_CONFIG | {
     "tab": "chart",
     "yAxis": {"min": 0, "max": 100, "facetDomain": "independent"},
     "selectedFacetStrategy": "entity",
-    "addCountryMode": "change-country",
+    "addCountryMode": "add-country",
 }
 
 # --------------------- #
@@ -77,6 +81,16 @@ def run() -> None:
     create_grouped_views(collection)
 
     for view in collection.views:
+        level = view.dimensions["level"]
+        if level == "level_side_by_side":
+            view.metadata = {
+                "description_from_producer": "",
+                "description_short": view.config["subtitle"],
+                "presentation": {
+                    "title_public": view.config["title"],
+                },
+            }
+
         edit_indicator_displays(view)
 
     collection.save()
@@ -162,17 +176,17 @@ def generate_subtitle_by_dimensions(view):
 
 
 def edit_indicator_displays(view):
-    """Clean up indicator display names for grouped views."""
+    """Clean up indicator display names and colors for grouped views."""
 
     level_display = {
-        "primary": "Primary",
-        "secondary": "Secondary",
-        "tertiary": "Tertiary",
+        "primary": {"name": "Primary", "color": COLOR_PRIMARY},
+        "secondary": {"name": "Secondary", "color": COLOR_SECONDARY},
+        "tertiary": {"name": "Tertiary", "color": COLOR_TERTIARY},
     }
 
     for ind in view.indicators.y:
         if view.matches(level="level_side_by_side"):
-            for k, v in level_display.items():
+            for k, config in level_display.items():
                 if k in ind.catalogPath:
-                    ind.display = {"name": v}
+                    ind.display = {"name": config["name"], "color": config["color"]}
                     break

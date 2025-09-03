@@ -30,6 +30,7 @@ import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
 from owid.catalog import processing as pr
+from pyproj import CRS
 from shapely import wkt
 from shapely.strtree import STRtree
 from shared import (
@@ -38,6 +39,7 @@ from shared import (
     get_number_of_countries_in_conflict_by_region,
 )
 from structlog import get_logger
+from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_none
 
 from etl.data_helpers import geo
 from etl.data_helpers.misc import expand_time_column
@@ -1056,10 +1058,20 @@ def _add_missing_values(
     ids_missing = set(gdf["relid"]) - set(gdf_match["relid"])
     gdf_missing = gdf.loc[gdf["relid"].isin(ids_missing)]
 
+    # NOTE: the following sometimes ends with a non-determinstic error that fixes itself in the next run. The try-except
+    #   block is a workaround
+    # ValueError: Invalid value supplied 'WktVersion.WKT2_2019'. Only ('WKT2_2015', 'WKT2_2015_SIMPLIFIED', 'WKT2_2018', 'WKT2_2018_SIMPLIFIED', 'WKT2_2019', 'WKT2_2019_SIMPLIFIED', 'WKT1_GDAL', 'WKT1_ESRI') are supported.
+
     # Reprojecting the points and the world into the World Equidistant Cylindrical Sphere projection.
-    wec_crs = "+proj=eqc +lat_ts=0 +lat_0=0 +lon_0=0 +x_0=0 +y_0=0 +a=6371007 +b=6371007 +units=m +no_defs"
-    gdf_missing_wec = gdf_missing.to_crs(wec_crs)
-    gdf_maps_wec = gdf_maps.to_crs(wec_crs)
+    @retry(retry=retry_if_exception_type(ValueError), stop=stop_after_attempt(3), wait=wait_none())
+    def _reproject_geometries():
+        wec_crs = "+proj=eqc +lat_ts=0 +lat_0=0 +lon_0=0 +x_0=0 +y_0=0 +a=6371007 +b=6371007 +units=m +no_defs"
+        wec_crs_obj = CRS.from_proj4(wec_crs)
+        gdf_missing_wec = gdf_missing.to_crs(wec_crs_obj)
+        gdf_maps_wec = gdf_maps.to_crs(wec_crs_obj)
+        return gdf_missing_wec, gdf_maps_wec
+
+    gdf_missing_wec, gdf_maps_wec = _reproject_geometries()
 
     # Create spatial index for polygons
     tree = STRtree(gdf_maps_wec.geometry)
@@ -1128,7 +1140,8 @@ def _sanity_check_prio_conflict_types(tb_prio: Table):
     conflict_type_transitions = tb_prio.groupby("conflict_id")["type_of_conflict"].apply(set)
     transitions = conflict_type_transitions[conflict_type_transitions.apply(len) > 1].drop_duplicates()
     # Extract unique combinations of conflict_types for a conflict
-    transitions = set(transitions.astype(str))
+    # Convert numpy integers to regular Python integers before string conversion
+    transitions = set(str({int(x) for x in transition}) for transition in transitions)
     transitions_unk = transitions - TRANSITIONS_EXPECTED
 
     # Check if different regions categorise the conflict differently in the same year

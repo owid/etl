@@ -478,12 +478,14 @@ def cleanup_ghost_variables(engine: Engine, dataset_id: int, upserted_variable_i
         if rows:
             rows = pd.DataFrame(rows, columns=["chartId", "variableId"])
 
+            message = "Variables used in charts will not be deleted automatically. Ignore this if your PR doesn't affect the problematic variables."
+
             if _raise_error_for_deleted_variables(rows):
-                raise ValueError(f"Variables used in charts will not be deleted automatically:\n{rows}")
+                raise ValueError(f"{message}:\n{rows}")
             else:
                 # otherwise show a warning
                 log.warning(
-                    "Variables used in charts will not be deleted automatically",
+                    message,
                     rows=rows,
                     variables=variable_ids_to_delete,
                 )

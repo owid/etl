@@ -19,7 +19,14 @@ paths = PathFinder(__file__)
 # --------------------- #
 #   Constants & Config  #
 # --------------------- #
+# Color constants for education levels and gender
+COLOR_PREPRIMARY = "#D73C50"
+COLOR_PRIMARY = "#4C6A9C"
+COLOR_LOWER_SECONDARY = "#883039"
+COLOR_UPPER_SECONDARY = "#578145"
 
+COLOR_QUALIFIED = "#00847E"
+COLOR_TRAINED = "#E56E5A"
 # Standard columns present in all datasets
 ID_COLUMNS = ["country", "year"]
 
@@ -45,7 +52,7 @@ GROUPED_VIEW_CONFIG = MULTIDIM_CONFIG | {
     "tab": "chart",  # Default to chart view
     "yAxis": {"min": 0, "max": 100, "facetDomain": "independent"},  # Percentage scale
     "selectedFacetStrategy": "entity",  # Allow entity selection
-    "addCountryMode": "change-country",  # Change country instead of adding
+    "addCountryMode": "add-country",  # Allow adding countries for easier comparison
 }
 
 # --------------------- #
@@ -89,11 +96,13 @@ TEACHER_TYPES = {
     "qualified": {
         "title": "Qualified teachers",  # Display title
         "description": "academic qualifications",  # Short description for subtitles
+        "full_description": "who meet the minimum academic qualifications required in the subject they teach at that level in a given country",
         "catalog_key": "qualified",  # Key to match in catalog paths
     },
     "trained": {
         "title": "Trained teachers",
         "description": "pedagogical training",
+        "full_description": "who have received at least the minimum organized pedagogical training required for teaching at that level",
         "catalog_key": "tcaq",  # WDI uses "tcaq" in column names
     },
 }
@@ -139,8 +148,19 @@ def run() -> None:
     # Add grouped views for side-by-side comparisons
     create_grouped_views(collection)
 
-    # Clean up indicator display names for better chart labels
+    # Clean up indicator display names for better chart labels and set view metadata
     for view in collection.views:
+        level = view.dimensions["level"]
+        teacher_type = view.dimensions["teacher_type"]
+        if level == "level_side_by_side" or teacher_type == "teacher_type_side_by_side":
+            view.metadata = {
+                "description_from_producer": "",
+                "description_short": view.config["subtitle"],
+                "presentation": {
+                    "title_public": view.config["title"],
+                },
+            }
+
         edit_indicator_displays(view)
 
     collection.save()
@@ -308,41 +328,70 @@ def generate_subtitle_by_dimensions(view):
     Creates subtitles that:
     1. Use proper DOD links for education levels
     2. Explain what qualified vs trained means for grouped views
-    3. Include "shown as a percentage of all teachers" for clarity
+    3. Include "shown as a percentage of all teachers teaching at this level" for clarity
+    4. Adjust text based on whether it's qualified or trained teachers
     """
 
     if view.matches(level="level_side_by_side"):
-        # Education level comparison: build comma-separated list with "and" at the end
+        # Education level comparison: get the specific teacher type
+        teacher_type = view.dimensions["teacher_type"]
+        teacher_cfg = TEACHER_TYPES.get(teacher_type, {})
+        teacher_full_description = teacher_cfg.get("full_description", "qualifications")
+
+        # Build comma-separated list with "and" at the end
         education_levels = ", ".join([config["subtitle_link"] for config in EDUCATION_LEVELS.values()])
         education_levels = education_levels.rsplit(", ", 1)  # Split on last comma to add "and"
         education_levels = " and ".join(education_levels)  # Join with "and"
-        return f"Share of teachers with academic qualifications (qualified) and pedagogical training (trained) across {education_levels}, shown as a percentage of all teachers."
+
+        return f"Share of teachers {teacher_full_description} across {education_levels} education, shown as a percentage of all teachers teaching at each level."
 
     elif view.matches(teacher_type="teacher_type_side_by_side"):
         # Teacher type comparison: get specific education level link
         level = view.dimensions.get("level", "primary")
         education_level = EDUCATION_LEVELS.get(level, EDUCATION_LEVELS["primary"])["subtitle_link"]
-        return f"Share of teachers with academic qualifications (qualified) and pedagogical training (trained) in {education_level}, shown as a percentage of all teachers."
+
+        # Get full descriptions for both teacher types
+        qualified_desc = TEACHER_TYPES["qualified"]["full_description"]
+        trained_desc = TEACHER_TYPES["trained"]["full_description"]
+
+        return f"Share of teachers {qualified_desc} (qualified) and teachers {trained_desc} (trained) in {education_level} education, shown as a percentage of all teachers teaching at this level."
 
 
 def edit_indicator_displays(view):
-    """Clean up indicator display names for better chart labels in grouped views.
+    """Clean up indicator display names and colors for better chart labels in grouped views.
 
-    Sets concise, readable names for indicators in grouped views:
-    - Level comparisons: "Primary", "Secondary", etc.
-    - Teacher type comparisons: "Qualified teachers", "Trained teachers"
+    Sets concise, readable names and appropriate colors for indicators in grouped views:
+    - Level comparisons: "Primary", "Secondary", etc. with level-specific colors
+    - Teacher type comparisons: "Qualified teachers", "Trained teachers" with type-specific colors
     """
+
+    # Color mappings for education levels
+    level_colors = {
+        "pre_primary": COLOR_PREPRIMARY,
+        "primary": COLOR_PRIMARY,
+        "lower_secondary": COLOR_LOWER_SECONDARY,
+        "upper_secondary": COLOR_UPPER_SECONDARY,
+    }
+
+    # Color mappings for teacher types
+    teacher_type_colors = {
+        "qualified": COLOR_QUALIFIED,
+        "trained": COLOR_TRAINED,
+    }
 
     for ind in view.indicators.y:
         if view.matches(level="level_side_by_side"):
-            # Education level comparison: use short education level names
+            # Education level comparison: use short education level names and colors
             for level, config in EDUCATION_LEVELS.items():
                 if level in ind.catalogPath:
-                    ind.display = {"name": config["display_name"]}
+                    ind.display = {"name": config["display_name"], "color": level_colors.get(level, COLOR_PRIMARY)}
                     break
         elif view.matches(teacher_type="teacher_type_side_by_side"):
-            # Teacher type comparison: use teacher type titles
-            for config in TEACHER_TYPES.values():  # Don't need the key, just configs
+            # Teacher type comparison: use teacher type titles and colors
+            for teacher_type, config in TEACHER_TYPES.items():
                 if config["catalog_key"] in ind.catalogPath:
-                    ind.display = {"name": config["title"]}
+                    ind.display = {
+                        "name": config["title"],
+                        "color": teacher_type_colors.get(teacher_type, COLOR_QUALIFIED),
+                    }
                     break

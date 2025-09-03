@@ -21,7 +21,13 @@ from apps.wizard.app_pages.chart_diff.chart_diff import get_chart_diffs_from_gra
 from apps.wizard.app_pages.chart_diff.chart_diff_show import st_show
 from apps.wizard.app_pages.chart_diff.utils import WARN_MSG, get_engines, indicators_in_charts
 from apps.wizard.utils import set_states
-from apps.wizard.utils.components import Pagination, st_horizontal, st_wizard_page_link, url_persist
+from apps.wizard.utils.components import (
+    Pagination,
+    st_horizontal,
+    st_title_with_expert,
+    st_wizard_page_link,
+    url_persist,
+)
 from etl.config import FORCE_DATASETTE, OWID_ENV
 from etl.grapher import model as gm
 
@@ -187,8 +193,8 @@ def filter_chart_diffs():
             # keep chart diffs with at least one change type (could be data, metadata or config)
             change_types = st.query_params.get_all("change_type")
         else:
-            # filter to changed config by default
-            change_types = ["new", "config"]
+            # filter to changed config or tags by default
+            change_types = ["new", "config", "tags"]
 
         st.session_state.chart_diffs_filtered = {
             k: v
@@ -395,15 +401,15 @@ def _show_options_filters():
     with st.form("chart-diff-filters"):
         default = [change for change in st.query_params.get_all("change_type")]
         if not default:
-            default = ["new", "config"]
+            default = ["new", "config", "tags"]
         st.multiselect(
             label="Chart change types",
-            options=["new", "data", "metadata", "config"],  # type: ignore
+            options=["new", "data", "metadata", "config", "tags"],  # type: ignore
             format_func=lambda x: x if x == "new" else f"{x} modified",
             default=default,  # type: ignore
             key="chart-diff-change-type",
-            help="Show new charts or modified ones with changes in data, metadata, or config.",
-            placeholder="config, data, metadata",
+            help="Show new charts or modified ones with changes in data, metadata, config, or tags.",
+            placeholder="config, data, metadata, tags",
         )
         st.multiselect(
             label="Chart IDs",
@@ -638,7 +644,7 @@ def st_docs():
         **What gets synced for each chart:**
         - **Chart configuration** (title, subtitle, axis labels, chart type, etc.)
         - **Variable mappings** (automatically migrated from staging to production IDs)
-        - **Tags** (only for new charts; existing chart tags are not modified)
+        - **Tags** (tags for charts that are not in chart-diff won't be synced)
         - **Chart metadata** (description, notes, etc.)
 
         **Additional items synced:**
@@ -657,8 +663,9 @@ def st_docs():
 ########################################
 def main():
     # Title and links
-    st.title(
-        ":material/difference: Chart Diff",
+    st_title_with_expert(
+        title="Chart Diff",
+        icon=":material/difference:",
         help=f"""
 **Chart diff** is a living page that compares all ongoing charts between [`production`](http://owid.cloud) and your [`{OWID_ENV.name}`]({OWID_ENV.admin_site}) environment.
 
@@ -667,6 +674,7 @@ It lists all those charts that have been modified in the `{OWID_ENV.name}` envir
 If you want any of the modified charts in `{OWID_ENV.name}` to be migrated to `production`, you can approve them by clicking on the toggle button.
 """,
     )
+
     with st_horizontal(vertical_alignment="center"):
         st.markdown("Other links: ")
         st_wizard_page_link("mdim-diff")
