@@ -32,6 +32,9 @@ def adjust_old_data_for_inflation(tb_old, tb_deflator, tb):
         "World",
         "South Korea",
     }
+    # Remove South Korea from the old data, since it's the only country for which we can't adjust prices to 2024 USD.
+    tb_old = tb_old[tb_old["country"] != "South Korea"].reset_index(drop=True)
+
     # Calculate the adjustment factor.
     tb_deflator["adjustment"] = tb_deflator[2024] / tb_deflator[2023]
 
@@ -48,8 +51,7 @@ def adjust_old_data_for_inflation(tb_old, tb_deflator, tb):
         # Sanity check.
         error = f"Unexpected units for column {column}."
         assert tb[column].metadata.unit == f"constant {LATEST_YEAR} US$ per kilowatt-hour", error
-        # Fill adjustment factor with 1 for countries for which we can't do the adjustment (namely South Korea).
-        tb_old[column] *= tb_old["adjustment"].fillna(1)
+        tb_old[column] *= tb_old["adjustment"]
         tb_old[column].metadata.unit = tb[column].metadata.unit
 
     tb_old = tb_old.drop(columns=["adjustment"], errors="raise")
