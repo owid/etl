@@ -38,6 +38,13 @@ def adjust_old_data_for_inflation(tb_old, tb_deflator, tb):
     # Calculate the adjustment factor.
     tb_deflator["adjustment"] = tb_deflator[2024] / tb_deflator[2023]
 
+    ################################################################################################################
+    # Remove metadata from WDI (which is used as an auxiliary dataset) to avoid it leaking into the new indicators.
+    # NOTE: This problem of metadata propagation of auxiliary dataset needs to be fixed. For now, this is a patch.
+    tb_deflator["adjustment"].metadata.origins = []
+    tb_deflator["adjustment"].metadata.description_from_producer = None
+    ################################################################################################################
+
     # Add adjustment column to old table.
     tb_old = tb_old.merge(tb_deflator[["country", "adjustment"]], on=["country"], how="left")
 
