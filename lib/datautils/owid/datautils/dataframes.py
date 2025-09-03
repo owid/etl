@@ -649,7 +649,9 @@ def combine_two_overlapping_dataframes(
             pass
 
     # Fill missing values in df1 with values from df2.
-    combined = combined.fillna(df2)
+    # Changed from combined = combined.fillna(df2) to avoid TypeError: cannot safely cast non-equivalent float64 to int64
+    for col in combined.columns:
+        combined[col] = combined[col].fillna(df2[col].astype(combined[col].dtype))
 
     if index_columns is not None:
         combined = combined.reset_index()
