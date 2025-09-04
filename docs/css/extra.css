@@ -73,27 +73,3 @@ div.highlight pre span.gp {
 /* .md-typeset p {
     font-size: 1em;
 } */
-
-/* Wider content for Jupyter notebooks */
-.jupyter-wrapper .md-grid,
-.jupyter-content .md-grid {
-    max-width: 98% !important;
-}
-
-.jupyter-wrapper .md-main__inner,
-.jupyter-content .md-main__inner {
-    margin-left: 0;
-    margin-right: 0;
-}
-
-/* Hide table of contents for notebook pages */
-.jupyter-wrapper .md-sidebar--secondary,
-.jupyter-content .md-sidebar--secondary {
-    display: none !important;
-}
-
-/* Adjust main content when TOC is hidden */
-.jupyter-wrapper .md-content,
-.jupyter-content .md-content {
-    margin-right: 0 !important;
-}
