@@ -57,3 +57,11 @@ steps:
     - data://garden/biodiversity/2021-01-01/habitat_loss
   export://explorers/biodiversity/latest/habitat_loss:
     - data://grapher/biodiversity/2021-01-01/habitat_loss
+  # Cherry blossom
+  data://meadow/biodiversity/2025-09-04/cherry_blossom:
+    - snapshot://biodiversity/2024-01-25/cherry_blossom.xls
+    - snapshot://biodiversity/2025-09-04/cherry_blossom.csv
+  data://garden/biodiversity/2025-09-04/cherry_blossom:
+    - data://meadow/biodiversity/2025-09-04/cherry_blossom
+  data://grapher/biodiversity/2025-09-04/cherry_blossom:
+    - data://garden/biodiversity/2025-09-04/cherry_blossom

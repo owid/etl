@@ -1,5 +1,5 @@
 ---
-argument-hint: <namespace>/<old-version>/<name> [branch]
+argument-hint: <namespace>/<old_version>/<name> [branch]
 description: End-to-end dataset update workflow using project subagents with progress tracking and a mandatory checkpoint. New version is set to today's date automatically.
 ---
 
@@ -13,24 +13,10 @@ Use this command to run a complete dataset update with Claude Code subagents, ke
 
 ## Inputs
 
-Primary syntax (preferred):
+- `<namespace>/<old_version>/<name>`
+- Get `<new_version>` as today's date by running `date -u +"%Y-%m-%d"`
 
-- `<namespace>/<old-version>/<name>`
-   - The new version will be computed as today's date (YYYY-MM-DD).
-   - Example: `irena/2023-11-15/renewable_power_generation_costs`
 
-Also supported (for flexibility):
-
-1) Catalog URI
-   - `data://<channel>/<namespace>/<yyyy-mm-dd>/<name>`
-   - Example: `data://snapshot/irena/2024-11-15/renewable_power_generation_costs`
-
-2) Key-value form
-   - channel=<snapshot|meadow|garden|grapher> namespace=<ns> version=<yyyy-mm-dd> short_name=<name> [dataset=<name>]
-
-3) Minimal
-   - short_name=<short_name> channel=<meadow|garden|grapher>
-   - Infer namespace/version/name from repo context when possible
 
 Optional trailing args:
 - branch: The working branch name (defaults to current branch)
@@ -41,7 +27,7 @@ Assumptions:
 
 ## Progress checklist (maintain, tick live, and persist to progress.md)
 
-- [ ] Parse inputs and resolve: channel, namespace, version, short_name, old-version, branch
+- [ ] Parse inputs and resolve: channel, namespace, version, short_name, old_version, branch
 - [ ] Create or reuse draft PR and work branch
 - [ ] Update snapshot and compare to previous version; capture summary
 - [ ] Meadow step: run + fix + diff + summarize
@@ -65,14 +51,12 @@ Persistence:
 
 ## Workflow orchestration
 
-1) PR and branch setup — use dataset-update-pr subagent
-   - Create or reuse a draft PR and work branch.
-   - Compute `new_version = TODAY (YYYY-MM-DD)`.
-   - Run subagent `dataset-update-pr` with `<namespace>/<new_version>/<short_name>`
-   - Ensure branch length < 28 chars if interacting with DB-backed systems.
+1) Create PR and run step updater via subagent
+   — Use **dataset-update-pr subagent** with `<namespace>/<old_version>/<short_name>`
+   - Subagent will create a draft PR and update steps to the new version
 
 2) Snapshot update & compare — use snapshot-updater subagent
-   - Inputs: `<namespace>/<new_version>/<short_name>` and `<old-version>`.
+   - Inputs: `<namespace>/<new_version>/<short_name>` and `<old_version>`.
    - Save summary to `workbench/<short_name>/snapshot-updater.md`.
    - Do not modify the old snapshot. Use collapsible sections for detail.
    - This step is part of the approval checkpoint below.
