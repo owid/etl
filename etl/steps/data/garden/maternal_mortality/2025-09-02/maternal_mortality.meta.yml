@@ -16,8 +16,7 @@ definitions:
         note: |-
           Prior to 1985, only reported data are available, which are likely to underestimate the true maternal mortality rate. From 1985, estimates are shown, which aim to adjust for underreporting and misclassification.
   description_maternal_mortality: |-
-    Maternal deaths are defined as a death of a woman while pregnant or within 42 days of termination of pregnancy, irrespective of the duration and site of pregnancy,
-    from any cause related or aggravated by the pregnancy or its management, but not from accidental or incidental causes.
+    Maternal deaths are defined as a death of a woman while pregnant or within 42 days of termination of pregnancy, irrespective of the duration and site of pregnancy, from any cause related or aggravated by the pregnancy or its management, but not from accidental or incidental causes. The WHO Mortality Database also includes late maternal deaths, which occur between 42 days and 1 year after the termination of the pregnancy.
 
 dataset:
   title: Maternal mortality (OWID based on UN MMEIG & other sources) (1751-2023)
@@ -40,7 +39,8 @@ tables:
           entityAnnotationsMap: "United States: Values from 2003–2017 affected by measurement change"
         description_key:
           - "{definitions.description_maternal_mortality}"
-
+          - "This dataset is a combination of multiple sources which cover different time-periods. We use sources in this order of preference: UN MMEIG (1985 onwards), WHO Mortality Database (1950-1985), Gapminder (before 1985)."
+          - Detailed information on which source was used for each country and year can be found in [this spreadsheet](https://docs.google.com/spreadsheets/d/1AL-nZEhmEEcYLm7BxS1CMIhkRd-rBVedhnr7awoDxOQ/edit).
       mmr_rate:
         title: Maternal mortality rate
         description_short: |-
