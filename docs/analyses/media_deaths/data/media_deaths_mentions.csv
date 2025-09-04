@@ -1,0 +1,61 @@
+year,source,cause,mentions,single_mentions
+2023,The New York Times,heart disease,436,1028
+2023,The New York Times,cancer,625,2163
+2023,The New York Times,accidents,1489,5242
+2023,The New York Times,stroke,119,789
+2023,The New York Times,respiratory,212,392
+2023,The New York Times,alzheimers,131,473
+2023,The New York Times,diabetes,220,653
+2023,The New York Times,kidney,63,274
+2023,The New York Times,liver,49,133
+2023,The New York Times,covid,822,3886
+2023,The New York Times,suicide,580,1466
+2023,The New York Times,influenza,241,592
+2023,The New York Times,drug overdose,1152,2191
+2023,The New York Times,homicide,6469,12907
+2023,The New York Times,terrorism,2813,4954
+2023,The Washington Post,heart disease,337,820
+2023,The Washington Post,cancer,554,1663
+2023,The Washington Post,accidents,697,3534
+2023,The Washington Post,stroke,119,810
+2023,The Washington Post,respiratory,148,297
+2023,The Washington Post,alzheimers,161,531
+2023,The Washington Post,diabetes,158,504
+2023,The Washington Post,kidney,51,135
+2023,The Washington Post,liver,38,98
+2023,The Washington Post,covid,932,3573
+2023,The Washington Post,suicide,394,956
+2023,The Washington Post,influenza,235,487
+2023,The Washington Post,drug overdose,1119,1841
+2023,The Washington Post,homicide,5418,11373
+2023,The Washington Post,terrorism,1451,3015
+2023,Fox News,heart disease,446,912
+2023,Fox News,cancer,735,1808
+2023,Fox News,accidents,1189,3820
+2023,Fox News,stroke,153,628
+2023,Fox News,respiratory,115,239
+2023,Fox News,alzheimers,185,426
+2023,Fox News,diabetes,112,375
+2023,Fox News,kidney,32,90
+2023,Fox News,liver,41,97
+2023,Fox News,covid,1160,3378
+2023,Fox News,suicide,801,1666
+2023,Fox News,influenza,232,465
+2023,Fox News,drug overdose,1896,3175
+2023,Fox News,homicide,10170,16959
+2023,Fox News,terrorism,2140,3840
+2023,US Collection,heart disease,14845,32196
+2023,US Collection,cancer,29785,73971
+2023,US Collection,accidents,25656,129877
+2023,US Collection,stroke,4065,23700
+2023,US Collection,respiratory,5501,10232
+2023,US Collection,alzheimers,5723,13994
+2023,US Collection,diabetes,6735,18718
+2023,US Collection,kidney,1922,5142
+2023,US Collection,liver,2441,4931
+2023,US Collection,covid,42957,149504
+2023,US Collection,suicide,16425,36060
+2023,US Collection,influenza,7270,16126
+2023,US Collection,drug overdose,36557,63415
+2023,US Collection,homicide,187274,392661
+2023,US Collection,terrorism,37731,76975
