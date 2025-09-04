@@ -94,21 +94,23 @@ function findPreviousVersion(workspaceDir: string, currentFilePath: string): str
             return null; // Current version is the first/only one, or not found
         }
         
-        // Get the previous version (one index lower)
-        const previousVersion = validVersions[currentVersionIndex - 1];
-        
-        // Construct the path to the previous version file
-        const previousVersionParts = [...versionParentParts, previousVersion, ...pathParts.slice(versionIndex + 1)];
-        const previousVersionPath = path.join(workspaceDir, ...previousVersionParts);
-        
-        // Check if the file actually exists
-        if (fs.existsSync(previousVersionPath)) {
-            return previousVersionPath;
+        // Look backwards through versions to find one that contains the same file
+        for (let i = currentVersionIndex - 1; i >= 0; i--) {
+            const candidateVersion = validVersions[i];
+            
+            // Construct the path to the candidate version file
+            const candidateVersionParts = [...versionParentParts, candidateVersion, ...pathParts.slice(versionIndex + 1)];
+            const candidateVersionPath = path.join(workspaceDir, ...candidateVersionParts);
+            
+            // Check if the file actually exists in this version
+            if (fs.existsSync(candidateVersionPath)) {
+                return candidateVersionPath;
+            }
         }
         
-        return null;
+        return null; // No previous version contains this file
     } catch (error) {
-        console.warn(`Error searching for previous version:`, error);
+        // Log error but don't break the extension
         return null;
     }
 }
