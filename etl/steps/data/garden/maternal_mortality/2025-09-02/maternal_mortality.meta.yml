@@ -4,7 +4,7 @@ definitions:
     description_processing: |-
       - The dataset combines three sources: WHO Mortality Database (before 1985), Gapminder (before 1985, if WHO Mortality Database data are unavailable), United Nations Maternal Mortality Estimation Inter-Agency Group (UNMMEIG; 1985 onwards). UN MMEIG is made up of WHO, UNICEF, UNFPA, World Bank Group and UNDESA/Population Division.
         The WHO Mortality Database and Gapminder contain reported figures from countries, and are likely to underestimate the true maternal mortality figures. The UN MMEIG aims to estimates the true rate, by adjusting for underreporting and misclassification. Sudden jumps in mortality rate in 1985 are a consequence of switching data sources (from reported to estimated figures).
-      - For the years between 1950 - 1985 we calculated the maternal mortality ratio and maternal mortality rate based
+      - For the years between 1950-1985 we calculated the maternal mortality ratio and maternal mortality rate based
         on the number of maternal deaths from the WHO mortality database and live births and female population of reproductive age from the UN WPP.
       - Where the reported maternal deaths in the WHO Mortality Database differed significantly from the estimated figures in the UN MMEIG data, we opted not to include them.
       - Where a data point is attached to a range of years in the Gapminder data set, we used the midpoint of the range.
@@ -67,3 +67,7 @@ tables:
         short_unit: ""
         display:
           numDecimalPlaces: 0
+      source:
+        title: Source
+        description_short: Source of the data
+        unit: ""
