@@ -440,28 +440,6 @@ steps:
   data://garden/gapminder/2024-07-08/maternal_mortality:
     - data://meadow/gapminder/2024-07-08/maternal_mortality
 
-  # UN MMEIG Maternal Mortality (1985-2020)
-  data://meadow/un/2024-07-08/maternal_mortality:
-    - snapshot://un/2024-07-08/maternal_mortality.zip
-  data://garden/un/2024-07-08/maternal_mortality:
-    - data://meadow/un/2024-07-08/maternal_mortality
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2025-07-01/income_groups
-  data://grapher/un/2024-07-08/maternal_mortality:
-    - data://garden/un/2024-07-08/maternal_mortality
-
-  # Maternal Mortality long run data set (OWID OMM)
-  data://garden/maternal_mortality/2024-07-08/maternal_mortality:
-    - data://garden/gapminder/2024-07-08/maternal_mortality
-    - data://garden/un/2024-07-08/maternal_mortality
-    - data://garden/who/2025-04-17/mortality_database
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2025-07-01/income_groups
-    - data://garden/un/2024-07-12/un_wpp
-    - data://garden/demography/2024-07-15/population
-  data://grapher/maternal_mortality/2024-07-08/maternal_mortality:
-    - data://garden/maternal_mortality/2024-07-08/maternal_mortality
-
   # WHO Mortality Database - update
   data://meadow/who/2025-04-17/mortality_database:
     - snapshot://who/2025-04-17/mortality_database.feather
@@ -1340,3 +1318,24 @@ steps:
     - data://meadow/neglected_tropical_diseases/2025-08-20/funding
   data://grapher/neglected_tropical_diseases/2025-08-20/funding:
     - data://garden/neglected_tropical_diseases/2025-08-20/funding
+
+  # UN MMEIG Maternal Mortality (1985-2023)
+  data://meadow/un/2025-08-29/maternal_mortality:
+    - snapshot://un/2025-08-29/maternal_mortality.zip
+  data://garden/un/2025-08-29/maternal_mortality:
+    - data://garden/regions/2023-01-01/regions
+    - data://meadow/un/2025-08-29/maternal_mortality
+  data://grapher/un/2025-08-29/maternal_mortality:
+    - data://garden/un/2025-08-29/maternal_mortality
+
+  # Maternal Mortality long run data set (OWID OMM)
+  data://garden/maternal_mortality/2025-09-02/maternal_mortality:
+    - data://garden/gapminder/2024-07-08/maternal_mortality
+    - data://garden/demography/2024-07-15/population
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/un/2025-08-29/maternal_mortality
+    - data://garden/who/2025-04-17/mortality_database
+    - data://garden/un/2024-07-12/un_wpp
+    - data://garden/wb/2025-07-01/income_groups
+  data://grapher/maternal_mortality/2025-09-02/maternal_mortality:
+    - data://garden/maternal_mortality/2025-09-02/maternal_mortality
