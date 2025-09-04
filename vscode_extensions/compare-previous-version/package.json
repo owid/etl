@@ -22,8 +22,11 @@
     "keybindings": [
       {
         "command": "extension.comparePreviousVersion",
-        "key": "ctrl+shift+d",
-        "mac": "cmd+shift+d"
+        "key": "ctrl+shift+d"
+      },
+      {
+        "command": "extension.comparePreviousVersion",
+        "key": "cmd+shift+d"
       }
     ]
   },
