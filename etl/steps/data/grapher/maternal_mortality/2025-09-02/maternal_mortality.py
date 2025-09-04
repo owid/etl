@@ -22,6 +22,7 @@ def run(dest_dir: str) -> None:
     # Export the table to a Google Sheet
     # Can only be run locally, not in prod or staging
     tb_sel = tb[["country", "year", "mmr", "source"]].copy()
+    tb_sel["mmr"] = tb_sel["mmr"].astype(float).round(2)
     team_folder_id = get_team_folder_id()
     sheet_url, sheet_id = export_table_to_gsheet(
         table=tb_sel,
