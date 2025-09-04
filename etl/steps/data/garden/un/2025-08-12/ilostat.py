@@ -9,8 +9,142 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+
 # Define release year as the year in the version
 RELEASE_YEAR = int(paths.version.split("-")[0])
+
+# Define columns to keep
+COLUMNS_TO_KEEP = [
+    "ref_area",
+    "time",
+    "indicator",
+    "sex",
+    "classif1",
+    "classif2",
+    "obs_value",
+    "obs_status",
+]
+
+# Redefine column categories from the original dataset
+COLUMN_CATEGORIES = {
+    "indicator": {
+        "SDG indicator 1.1.1 - Working poverty rate (percentage of employed living below US$2.15 PPP) (%)": "sdg_1_1_1_working_poverty_rate",
+        "SDG indicator 1.3.1 - Proportion of population covered by social protection floors/systems (%)": "sdg_1_3_1_population_covered_by_social_protection",
+        "SDG indicator 5.5.2 - Proportion of women in senior and middle management positions (%)": "sdg_5_5_2_women_in_senior_middle_management",
+        "SDG indicator 5.5.2 - Proportion of women in managerial positions (%)": "sdg_5_5_2_women_in_management",
+        "SDG indicator 8.2.1 - Annual growth rate of output per worker (GDP constant 2021 international $ at PPP) (%)": "sdg_8_2_1_growth_rate_output_per_worker",
+        "SDG indicator 8.3.1 - Proportion of informal employment in total employment by sex and sector (%)": "sdg_8_3_1_informal_employment",
+        "SDG indicator 8.5.1 - Average hourly earnings of employees by sex (Local currency)": "sdg_8_5_1_average_hourly_earnings",
+        "SDG indicator 8.5.2 - Unemployment rate (%)": "sdg_8_5_2_unemployment_rate",
+        "SDG indicator 8.5.2 - Unemployment rate by disability status (%)": "sdg_8_5_2_unemployment_rate_by_disability_status",
+        "SDG indicator 8.6.1 - Proportion of youth (aged 15-24 years) not in education, employment or training": "sdg_8_6_1_youth_neet",
+        "SDG indicator 8.7.1 - Proportion of children engaged in economic activity (%)": "sdg_8_7_1_children_engaged_in_economic_activity",
+        "SDG indicator 8.7.1 - Proportion of children engaged in economic activity and household chores": "sdg_8_7_1_children_engaged_in_economic_activity_and_household_chores",
+        "SDG indicator 8.8.1 - Fatal occupational injuries per 100'000 workers": "sdg_8_8_1_fatal_occupational_injuries",
+        "SDG indicator 8.8.1 - Non-fatal occupational injuries per 100'000 workers": "sdg_8_8_1_non_fatal_occupational_injuries",
+        "SDG indicator 8.8.2 - Level of national compliance with labour rights (freedom of association and collective bargaining)": "sdg_8_8_2_national_compliance_labour_rights",
+        "SDG indicator 8.b.1: Existence of a developed and operationalized national strategy for youth employment, as\r\na distinct strategy or as part of a national employment strategy": "sdg_8_b_1_national_strategy_youth_employment",
+        "SDG indicator 9.2.2 - Manufacturing employment as a proportion of total employment (%)": "sdg_9_2_2_manufacturing_employment",
+        "SDG indicator 10.4.1 - Labour income share as a percent of GDP (%)": "sdg_10_4_1_labour_income_share",
+        "Average hourly earnings of employees by sex": "average_hourly_earnings_employees_by_sex",
+        "Gender wage gap by occupation (%)": "gender_wage_gap_by_occupation",
+        "Share of children in child labour by sex and age (%)": "share_of_children_in_child_labour_by_sex_and_age",
+        "Female share of low pay earners (%)": "female_share_of_low_pay_earners",
+        "Labour force by sex and age -- ILO modelled estimates, Nov. 2024 (thousands)": "labour_force_by_sex_and_age",
+        "Labour force participation rate by sex and age -- ILO modelled estimates, Nov. 2024 (%)": "labour_force_participation_rate_by_sex_and_age",
+        "Employment by sex and status in employment -- ILO modelled estimates, Nov. 2024 (thousands)": "employment_by_sex_and_status_in_employment",
+        "Unemployment rate by sex and age -- ILO modelled estimates, Nov. 2024 (%)": "unemployment_rate_by_sex_and_age",
+        "Informal employment rate by sex -- ILO modelled estimates, Nov. 2024 (%)": "informal_employment_rate_by_sex",
+    },
+    "sex": {
+        "Total": "Total",
+        "Male": "Male",
+        "Female": "Female",
+        # "Other": "Other",
+    },
+    "classif1": {
+        "Age (Aggregate bands): 15-24": "Age: 15-24",
+        "Age (Aggregate bands): 25-54": "Age: 25-54",
+        "Age (Aggregate bands): 55-64": "Age: 55-64",
+        "Age (Aggregate bands): 65+": "Age: 65+",
+        "Age (Aggregate bands): Total": "Age: Total",
+        "Age (Child labour bands): '5-11": "Age: 5-11",
+        "Age (Child labour bands): '5-17": "Age: 5-17",
+        "Age (Child labour bands): 12-14": "Age: 12-14",
+        "Age (Child labour bands): 15-17": "Age: 15-17",
+        "Age (Youth, adults): 15+": "Age: 15+",
+        "Age (Youth, adults): 15-24": "Age: 15-24",
+        "Age (Youth, adults): 15-64": "Age: 15-64",
+        "Age (Youth, adults): 25+": "Age: 25+",
+        "Contingency: Children/households receiving child/family cash benefits": "Contingency: Households receiving child/family cash benefits",
+        "Contingency: Employed covered in the event of work injury": "Contingency: Employed covered in the event of work injury",
+        "Contingency: Mothers with newborns receiving maternity benefits": "Contingency: Mothers with newborns receiving maternity benefits",
+        "Contingency: Persons above retirement age receiving a pension": "Contingency: Persons above retirement age receiving a pension",
+        "Contingency: Poor persons covered by social protection systems": "Contingency: Poor persons covered by social protection systems",
+        "Contingency: Population covered by at least one social protection benefit": "Contingency: Population covered by at least one social protection benefit",
+        "Contingency: Unemployed receiving unemployment benefits": "Contingency: Unemployed receiving unemployment benefits",
+        "Contingency: Vulnerable persons covered by social assistance": "Contingency: Vulnerable persons covered by social assistance",
+        "Contingency: Persons with severe disabilities collecting disability social protection benefits": "Contingency: Persons with severe disabilities collecting disability social protection benefits",
+        "Currency: 2021 PPP $": "Currency: 2021 PPP $",
+        # "Currency: Local currency": "Currency: Local currency",
+        # "Currency: U.S. dollars": "Currency: U.S. dollars",
+        "Disability status (Aggregate): Persons with disability": "Disability status: Persons with disability",
+        "Disability status (Aggregate): Persons without disability": "Disability status: Persons without disability",
+        "Disability status (Aggregate): Not elsewhere classified": "Disability status: Not elsewhere classified",
+        "Economic activity (Aggregate): Total": "Economic activity: Total",
+        "Economic activity (Aggregate): Agriculture": "Economic activity: Agriculture",
+        "Economic activity (Aggregate): Construction": "Economic activity: Construction",
+        "Economic activity (Aggregate): Manufacturing": "Economic activity: Manufacturing",
+        "Economic activity (Aggregate): Not classified": "Economic activity: Not classified",
+        "Economic activity (Aggregate): Trade, Transportation, Accommodation and Food, and Business and Administrative Services": "Economic activity: Trade, Transportation, Accommodation and Food, and Business and Administrative Services",
+        "Economic activity (Agriculture, Non-Agriculture): Agriculture": "Economic activity (Agriculture, Non-Agriculture): Agriculture",
+        "Economic activity (Agriculture, Non-Agriculture): Non-agriculture": "Economic activity (Agriculture, Non-Agriculture): Non-agriculture",
+        "Economic activity (Broad sector): Agriculture": "Economic activity (Broad sector): Agriculture",
+        "Economic activity (Broad sector): Industry": "Economic activity (Broad sector): Industry",
+        "Economic activity (Broad sector): Services": "Economic activity (Broad sector): Services",
+        "Employment by sex and status in employment -- ILO modelled estimates, Nov. 2024 (thousands)": "Employment by sex and status in employment -- ILO modelled estimates, Nov. 2024 (thousands)",
+        "Migrant status: Migrants": "Migrant status: Migrants",
+        "Migrant status: Non migrants": "Migrant status: Non migrants",
+        "Migrant status: Total": "Migrant status: Total",
+        "Occupation (ISCO-08): 0. Armed forces occupations": "Occupation (ISCO-08): 0. Armed forces occupations",
+        "Occupation (ISCO-08): 1. Managers": "Occupation (ISCO-08): 1. Managers",
+        "Occupation (ISCO-08): 2. Professionals": "Occupation (ISCO-08): 2. Professionals",
+        "Occupation (ISCO-08): 3. Technicians and associate professionals": "Occupation (ISCO-08): 3. Technicians and associate professionals",
+        "Occupation (ISCO-08): 4. Clerical support workers": "Occupation (ISCO-08): 4. Clerical support workers",
+        "Occupation (ISCO-08): 5. Service and sales workers": "Occupation (ISCO-08): 5. Service and sales workers",
+        "Occupation (ISCO-08): 6. Skilled agricultural, forestry and fishery workers": "Occupation (ISCO-08): 6. Skilled agricultural, forestry and fishery workers",
+        "Occupation (ISCO-08): 7. Craft and related trades workers": "Occupation (ISCO-08): 7. Craft and related trades workers",
+        "Occupation (ISCO-08): 8. Plant and machine operators, and assemblers": "Occupation (ISCO-08): 8. Plant and machine operators, and assemblers",
+        "Occupation (ISCO-08): 9. Elementary occupations": "Occupation (ISCO-08): 9. Elementary occupations",
+        "Occupation (ISCO-08): Total": "Occupation (ISCO-08): Total",
+        "Occupation (ISCO-08): X. Not elsewhere classified": "Occupation (ISCO-08): X. Not elsewhere classified",
+        "Occupation (ISCO-88): 0. Armed forces": "Occupation (ISCO-88): 0. Armed forces",
+        "Occupation (ISCO-88): 1. Legislators, senior officials and managers": "Occupation (ISCO-88): 1. Legislators, senior officials and managers",
+        "Occupation (ISCO-88): 2. Professionals": "Occupation (ISCO-88): 2. Professionals",
+        "Occupation (ISCO-88): 3. Technicians and associate professionals": "Occupation (ISCO-88): 3. Technicians and associate professionals",
+        "Occupation (ISCO-88): 4. Clerks": "Occupation (ISCO-88): 4. Clerks",
+        "Occupation (ISCO-88): 5. Service workers and shop and market sales workers": "Occupation (ISCO-88): 5. Service workers and shop and market sales workers",
+        "Occupation (ISCO-88): 6. Skilled agricultural and fishery workers": "Occupation (ISCO-88): 6. Skilled agricultural and fishery workers",
+        "Occupation (ISCO-88): 7. Craft and related trades workers": "Occupation (ISCO-88): 7. Craft and related trades workers",
+        "Occupation (ISCO-88): 8. Plant and machine operators and assemblers": "Occupation (ISCO-88): 8. Plant and machine operators and assemblers",
+        "Occupation (ISCO-88): 9. Elementary occupations": "Occupation (ISCO-88): 9. Elementary occupations",
+        "Occupation (ISCO-88): Total": "Occupation (ISCO-88): Total",
+        "Occupation (ISCO-88): X. Not elsewhere classified": "Occupation (ISCO-88): X. Not elsewhere classified",
+        "Occupation (Skill level): Not elsewhere classified": "Occupation (Skill level): Not elsewhere classified",
+        "Occupation (Skill level): Skill level 1 ~ low": "Occupation (Skill level): Skill level 1 ~ low",
+        "Occupation (Skill level): Skill level 2 ~ medium": "Occupation (Skill level): Skill level 2 ~ medium",
+        "Occupation (Skill level): Skill levels 3 and 4 ~ high": "Occupation (Skill level): Skill levels 3 and 4 ~ high",
+        "Occupation (Skill level): Total": "Occupation (Skill level): Total",
+        "Share of children in child labour by sex and age (%)": "Share of children in child labour by sex and age (%)",
+        "Status in employment (Aggregate): Self-employed": "Status in employment (Aggregate): Self-employed",
+        "Status in employment (Aggregate): Total": "Status in employment (Aggregate): Total",
+        "Status in employment (ICSE-93): 1. Employees": "Status in employment (ICSE-93): 1. Employees",
+        "Status in employment (ICSE-93): 2. Employers": "Status in employment (ICSE-93): 2. Employers",
+        "Status in employment (ICSE-93): 3. Own-account workers": "Status in employment (ICSE-93): 3. Own-account workers",
+        "Status in employment (ICSE-93): 5. Contributing family workers": "Status in employment (ICSE-93): 5. Contributing family workers",
+        "Status in employment (ICSE-93): Total": "Status in employment (ICSE-93): Total",
+    },
+}
 
 
 def run() -> None:
@@ -24,18 +158,25 @@ def run() -> None:
     tb = ds_ilostat.read("ilostat", safe_types=False)
     tb_regions = ds_ilostat.read("table_of_contents_country")
     tb_indicator = ds_ilostat.read("dictionary_indicator")
+    tb_sex = ds_ilostat.read("dictionary_sex")
+    tb_classif1 = ds_ilostat.read("dictionary_classif1")
+    tb_classif2 = ds_ilostat.read("dictionary_classif2")
+    tb_obs_status = ds_ilostat.read("dictionary_obs_status")
 
     #
     # Process data.
     #
-    # Rename columns
-    tb = tb.rename(
-        columns={
-            "ref_area": "country",
-            "time": "year",
-        },
-        errors="raise",
-    )
+
+    # Keep relevant columns
+    tb = tb[COLUMNS_TO_KEEP]
+
+    tb = add_indicator_metadata(tb=tb, tb_metadata=tb_indicator, column="indicator")
+    tb = add_indicator_metadata(tb=tb, tb_metadata=tb_sex, column="sex")
+    tb = add_indicator_metadata(tb=tb, tb_metadata=tb_classif1, column="classif1")
+    tb = add_indicator_metadata(tb=tb, tb_metadata=tb_classif2, column="classif2")
+    tb = add_indicator_metadata(tb=tb, tb_metadata=tb_obs_status, column="obs_status")
+
+    print(tb)
 
     tb = add_ilo_regions(tb=tb, tb_regions=tb_regions)
 
@@ -43,10 +184,6 @@ def run() -> None:
     tb = geo.harmonize_countries(
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
-
-    tb = add_indicator_metadata(tb=tb, tb_indicator=tb_indicator)
-
-    print(tb)
 
     # Improve table format.
     tb = tb.format(["country", "year"])
@@ -68,6 +205,15 @@ def add_ilo_regions(tb: Table, tb_regions: Table) -> Table:
 
     tb = tb.copy()
     tb_regions = tb_regions.copy()
+
+    # Rename columns
+    tb = tb.rename(
+        columns={
+            "ref_area": "country",
+            "time": "year",
+        },
+        errors="raise",
+    )
 
     # Filter freq
     tb_regions = tb_regions[tb_regions["freq"] == "A"].reset_index(drop=True)
@@ -94,22 +240,39 @@ def add_ilo_regions(tb: Table, tb_regions: Table) -> Table:
     return tb
 
 
-def add_indicator_metadata(tb: Table, tb_indicator: Table) -> Table:
+def add_indicator_metadata(tb: Table, tb_metadata: Table, column: str) -> Table:
     """
-    Add indicator metadata to the table.
+    Add column metadata to the table.
     """
 
     tb = tb.copy()
 
-    print(list(tb.indicator.unique()))
-
-    # Assert that there is info for every indicator
+    # Assert that there is info for every column
     assert set(
-        tb["indicator"].unique()
+        tb[column].dropna().unique()
     ).issubset(
-        set(tb_indicator["indicator"].unique())
-    ), f"Some indicators are missing in the indicator metadata table: {set(tb['indicator'].unique()) - set(tb_indicator['indicator'].unique())}"
+        set(tb_metadata[column].unique())
+    ), f"Some values are missing in the {column} metadata table: {set(tb[column].dropna().unique()) - set(tb_metadata[column].dropna().unique())}"
 
-    tb = pr.merge(tb, tb_indicator, on="indicator", how="left")
+    tb = pr.merge(tb, tb_metadata, on=column, how="left")
+
+    # Drop column column
+    tb = tb.drop(columns=[column], errors="raise")
+
+    # Rename column_label to column
+    tb = tb.rename(columns={f"{column}_label": column}, errors="raise")
+
+    print(set(tb[column].unique()))
+
+    # Filter tb by the values in COLUMN_CATEGORIES[column].keys()
+    tb = tb[tb[column].isin(COLUMN_CATEGORIES[column].keys())].reset_index(drop=True)
+
+    # Assert that all renamed columns are the same as COLUMN_CATEGORIES[column].keys()
+    assert (
+        set(tb[column].unique()) == set(COLUMN_CATEGORIES[column].keys())
+    ), f"Some {column} are missing in the column categories mapping: {set(tb[column].unique()) - set(COLUMN_CATEGORIES[column].keys())}"
+
+    # Rename categories in column
+    tb[column] = tb[column].replace(COLUMN_CATEGORIES[column])
 
     return tb
