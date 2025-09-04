@@ -1981,6 +1981,7 @@ class RegionAggregator:
     def _create_table_of_only_region_aggregates(
         self,
         tb: TableOrDataFrame,
+        aggregations: dict[str, Any],
         num_allowed_nans_per_year: int | None = None,
         frac_allowed_nans_per_year: float | None = None,
         min_num_values_per_year: int | None = None,
@@ -1992,7 +1993,7 @@ class RegionAggregator:
                 # Select data for countries in the region.
                 df=tb[tb[self.country_col].isin(self.regions_members[region])],
                 groupby_columns=[column for column in self.index_columns if column != self.country_col],
-                aggregations=dict(**self.aggregations),  # type: ignore
+                aggregations=aggregations,
                 num_allowed_nans=num_allowed_nans_per_year,
                 frac_allowed_nans=frac_allowed_nans_per_year,
                 min_num_values=min_num_values_per_year,
@@ -2132,6 +2133,7 @@ class RegionAggregator:
         # Create a table of region aggregates (just the regions, not individual countries).
         df_only_regions = self._create_table_of_only_region_aggregates(
             tb=tb,
+            aggregations=self.aggregations,
             num_allowed_nans_per_year=num_allowed_nans_per_year,
             frac_allowed_nans_per_year=frac_allowed_nans_per_year,
             min_num_values_per_year=min_num_values_per_year,
@@ -2182,7 +2184,7 @@ class RegionAggregator:
         columns: list[str] | None = None,
         prefix: str = "",
         suffix: str = "_per_capita",
-        suffix_informed_population: str = "_informed_population",
+        suffix_informed_population: str = "_region_population",
         drop_population: bool | None = None,
         warn_on_missing_countries: bool = True,
         show_full_warning: bool = True,
@@ -2264,20 +2266,25 @@ class RegionAggregator:
             tb_population_informed[columns] = tb_population_informed[columns].multiply(
                 tb_result[self.population_col], axis=0
             )
-
-            # TODO: This is convoluted, we should rethink this approach. Here we just need a small part of the logic of the aggregates. Use that part after refactoring.
-            # TODO: Note that now we assume that regions with per capita are the same as regions with aggregates; that's why regions and aggregations defined right above here were not used.
-            tb_population_informed = self.add_aggregates(tb=tb_population_informed)
-
+            # For each region, calculate the population of countries informed for each year and each indicator.
+            # NOTE: Here we do this calculation for all per capita columns. We could do this just for the intersection of per capita columns and aggregation columns. However, the current implementation is more informative.
+            tb_population_informed = self._create_table_of_only_region_aggregates(
+                tb=tb_population_informed, aggregations={column: "sum" for column in columns}
+            )
+            # For each per capita column, add an auxiliary columns of informed population.
+            # These columns will only have data for rows corresponding to region aggregates (and be nan for individual countries).
             tb_result = tb_result.merge(
-                tb_population_informed, on=self.index_columns, how="left", suffixes=("", "_informed_population")
+                tb_population_informed, on=self.index_columns, how="left", suffixes=("", suffix_informed_population)
             )
 
         for col in columns:
             new_col_name = f"{prefix}{col}{suffix}"
             if only_informed_countries_in_regions:
                 # Divide the original column by the population of informed countries in the region each year.
-                tb_result[new_col_name] = tb_result[col] / tb_result[f"{col}{suffix_informed_population}"]
+                # NOTE: The auxiliary columns of informed population have only data for regions. For individual countries, we fill missing values with the full population.
+                tb_result[new_col_name] = tb_result[col] / tb_result[f"{col}{suffix_informed_population}"].fillna(
+                    tb_result[self.population_col]
+                )
             else:
                 # Divide the original column by the population of the region, regardless of the coverage.
                 tb_result[new_col_name] = tb_result[col] / tb_result[self.population_col]
