@@ -38,9 +38,7 @@ def run() -> None:
     #
     # Process data.
     #
-    tb = geo.harmonize_countries(
-        df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
-    )
+    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
     tb_total = tb.groupby(["country", "year"])["tree_cover_loss_ha"].sum(numeric_only=True).reset_index()
     tb_total["category"] = "Total"
 
