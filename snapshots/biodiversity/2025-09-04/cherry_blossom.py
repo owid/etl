@@ -9,22 +9,18 @@ Recent years data are available from the Twitter account of the dataset author:
 import tempfile
 from pathlib import Path
 
-import click
 import pandas as pd
 
-from etl.snapshot import Snapshot
+from etl.helpers import PathFinder
 
-# Version for current snapshot dataset.
-SNAPSHOT_VERSION = Path(__file__).parent.name
+paths = PathFinder(__file__)
 
 
-@click.command()
-@click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
-def main(upload: bool) -> None:
+def run(upload: bool) -> None:
     # Create a new snapshot.
 
     df = create_table_for_recent_years()
-    snap = Snapshot(f"biodiversity/{SNAPSHOT_VERSION}/cherry_blossom.csv")
+    snap = paths.init_snapshot()
 
     with tempfile.TemporaryDirectory() as temp_dir:
         output_file = Path(temp_dir) / "cherry_blossom.csv"
@@ -54,7 +50,3 @@ def create_table_for_recent_years() -> pd.DataFrame:
     df = df.set_index(["country", "year"])
 
     return df
-
-
-if __name__ == "__main__":
-    main()

@@ -4,7 +4,7 @@ tables:
   cherry_blossom:
     variables:
       full_flowering_date:
-        title: Day of the year with peak cherry blossom
+        title: Peak cherry blossom day of year
         description_short: The day of the year with the peak cherry blossom of the Prunus jamasakura species of cherry tree in Kyoto, Japan.
         unit: day of the year
         short_unit: ""
