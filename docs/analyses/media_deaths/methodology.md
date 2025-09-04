@@ -1,6 +1,6 @@
 This is the methodology for the data analysis used in our article "Does the news reflect what we die from?".
 
-You can also browse the [code for the analysis](./media_deaths_analysis.ipynb) or download a stand-alone package including methodology, code and intermediate and final data files [here](#TODO: add link)
+You can also browse the [code for the analysis](./media_deaths_analysis.ipynb) or download a stand-alone package including methodology, code and intermediate and final data files [here](https://catalog.owid.io/analyses/media-deaths-analysis.zip') (direct download).
 
 In case of questions, you can reach out to [tuna.acisu@ourworldindata.org](mailto:tuna.acisu@ourworldindata.org?subject=Media%20Mentions%20of%20Causes%20of%20Death).
 
@@ -227,7 +227,7 @@ The first run of our analysis included all articles which mention any keyword at
 
 Below you can see the comparison of results between single and multiple mentions for the New York Times in absolute and relative terms.
 
-![NYT: Comparison between single and multiple mention approaches, absolute terms](../data/media_deaths_nyt_single_vs_multiple_absolute.png){: style="width:600px"} ![NYT: Comparison between single and multiple mention approaches, relative shares](../data/assets/media_deaths_nyt_single_vs_multiple_relative.png){: style="width:600px"}
+![NYT: Comparison between single and multiple mention approaches, absolute terms](data/media_deaths_nyt_single_vs_multiple_absolute.png){: style="width:600px"} ![NYT: Comparison between single and multiple mention approaches, relative shares](data/assets/media_deaths_nyt_single_vs_multiple_relative.png){: style="width:600px"}
 
 
 Overall using multiple mentions decrease the amount of relevant articles by a lot, often by 50% or more.
@@ -245,7 +245,7 @@ To check, we reran our queries on a larger dataset of different news outlets. Fo
 
 The results are similar to the results for the news outlets we used in the article. While the coverage for cancer and COVID-19 is higher in the collection and coverage for terrorism is slightly lower, the overall shares are very comparable. The column for the US Collection looks more similar to the columns for the other news sources than it looks like the column for actual deaths.
 
-![Comparison of news coverage between NYT, WaPo, Fox and a larger set of media outlets (US collection)](../data/media_deaths_by_source.png){: style="width:600px"}
+![Comparison of news coverage between NYT, WaPo, Fox and a larger set of media outlets (US collection)](data/media_deaths_by_source.png){: style="width:600px"}
 
 ### Comparison to global causes of death
 
