@@ -49,74 +49,86 @@
       "additionalProperties": false
     },
     "colorScheme": {
-      "type": "string",
-      "description": "One of the predefined base color schemes.\nIf not provided, a default is automatically chosen based on the chart type.\n",
-      "enum": [
-        "YlGn",
-        "YlGnBu",
-        "GnBu",
-        "BuGn",
-        "PuBuGn",
-        "BuPu",
-        "RdPu",
-        "PuRd",
-        "OrRd",
-        "YlOrRd",
-        "YlOrBr",
-        "Purples",
-        "Blues",
-        "Greens",
-        "Oranges",
-        "Reds",
-        "Greys",
-        "PuOr",
-        "BrBG",
-        "PRGn",
-        "PiYG",
-        "RdBu",
-        "RdGy",
-        "RdYlBu",
-        "Spectral",
-        "RdYlGn",
-        "Accent",
-        "Dark2",
-        "Paired",
-        "Pastel1",
-        "Pastel2",
-        "Set1",
-        "Set2",
-        "Set3",
-        "PuBu",
-        "Magma",
-        "Inferno",
-        "Plasma",
-        "Viridis",
-        "continents",
-        "stackedAreaDefault",
-        "owid-distinct",
-        "SingleColorDenim",
-        "SingleColorTeal",
-        "SingleColorPurple",
-        "SingleColorDustyCoral",
-        "SingleColorDarkCopper",
-        "OwidCategoricalA",
-        "OwidCategoricalB",
-        "OwidCategoricalC",
-        "OwidCategoricalD",
-        "OwidCategoricalE",
-        "OwidEnergy",
-        "OwidEnergyLines",
-        "OwidDistinctLines",
-        "BinaryMapPaletteA",
-        "BinaryMapPaletteB",
-        "BinaryMapPaletteC",
-        "BinaryMapPaletteD",
-        "BinaryMapPaletteE",
-        "SingleColorGradientDenim",
-        "SingleColorGradientTeal",
-        "SingleColorGradientPurple",
-        "SingleColorGradientDustyCoral",
-        "SingleColorGradientDarkCopper"
+      "oneOf": [
+        {
+          "type": "string",
+          "pattern": "<%"
+        },
+        {
+          "type": "string",
+          "pattern": "{definitions"
+        },
+        {
+          "type": "string",
+          "description": "One of the predefined base color schemes.\nIf not provided, a default is automatically chosen based on the chart type.\n",
+          "enum": [
+            "YlGn",
+            "YlGnBu",
+            "GnBu",
+            "BuGn",
+            "PuBuGn",
+            "BuPu",
+            "RdPu",
+            "PuRd",
+            "OrRd",
+            "YlOrRd",
+            "YlOrBr",
+            "Purples",
+            "Blues",
+            "Greens",
+            "Oranges",
+            "Reds",
+            "Greys",
+            "PuOr",
+            "BrBG",
+            "PRGn",
+            "PiYG",
+            "RdBu",
+            "RdGy",
+            "RdYlBu",
+            "Spectral",
+            "RdYlGn",
+            "Accent",
+            "Dark2",
+            "Paired",
+            "Pastel1",
+            "Pastel2",
+            "Set1",
+            "Set2",
+            "Set3",
+            "PuBu",
+            "Magma",
+            "Inferno",
+            "Plasma",
+            "Viridis",
+            "continents",
+            "stackedAreaDefault",
+            "owid-distinct",
+            "SingleColorDenim",
+            "SingleColorTeal",
+            "SingleColorPurple",
+            "SingleColorDustyCoral",
+            "SingleColorDarkCopper",
+            "OwidCategoricalA",
+            "OwidCategoricalB",
+            "OwidCategoricalC",
+            "OwidCategoricalD",
+            "OwidCategoricalE",
+            "OwidEnergy",
+            "OwidEnergyLines",
+            "OwidDistinctLines",
+            "BinaryMapPaletteA",
+            "BinaryMapPaletteB",
+            "BinaryMapPaletteC",
+            "BinaryMapPaletteD",
+            "BinaryMapPaletteE",
+            "SingleColorGradientDenim",
+            "SingleColorGradientTeal",
+            "SingleColorGradientPurple",
+            "SingleColorGradientDustyCoral",
+            "SingleColorGradientDarkCopper"
+          ]
+        }
       ]
     },
     "colorScale": {
@@ -214,11 +226,19 @@
           }
         },
         "customNumericValues": {
-          "type": "array",
-          "description": "Custom maximum brackets for each numeric bin. Only applied when strategy is `manual`",
-          "items": {
-            "type": "number"
-          }
+          "oneOf": [
+            {
+              "type": "array",
+              "description": "Custom maximum brackets for each numeric bin. Only applied when strategy is `manual`",
+              "items": {
+                "type": "number"
+              }
+            },
+            {
+              "type": "string",
+              "pattern": "<%"
+            }
+          ]
         },
         "customNumericColorsActive": {
           "type": "boolean",
@@ -1260,10 +1280,10 @@
                           }
                         },
                         "baseColorScheme": {
-                          "type": "string",
-                          "default": "default",
-                          "description": "The default color scheme if no color overrides are specified"
-                        },
+                                                        "type": "string",
+                              "default": "default",
+                              "description": "The default color scheme if no color overrides are specified"
+                                                    },
                         "yAxis": {
                           "$ref": "#/$defs/axis"
                         },
