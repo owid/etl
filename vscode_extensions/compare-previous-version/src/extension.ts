@@ -2,6 +2,10 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 
+// Track the current diff view state
+let isDiffViewOpen = false;
+let originalFilePath: string | undefined = undefined;
+
 export function activate(context: vscode.ExtensionContext) {
     let disposable = vscode.commands.registerCommand('extension.comparePreviousVersion', async () => {
         const editor = vscode.window.activeTextEditor;
@@ -11,6 +15,25 @@ export function activate(context: vscode.ExtensionContext) {
         }
 
         const currentFilePath = editor.document.uri.fsPath;
+
+        // Check if we should toggle back to original view
+        if (isDiffViewOpen && originalFilePath) {
+            // Close the current diff view
+            await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
+            
+            // Open the original file
+            const originalUri = vscode.Uri.file(originalFilePath);
+            await vscode.window.showTextDocument(originalUri);
+            
+            // Reset state
+            isDiffViewOpen = false;
+            originalFilePath = undefined;
+            return;
+        }
+
+        // Store the current file path as the original
+        originalFilePath = currentFilePath;
+        
         const workspaceFolder = vscode.workspace.workspaceFolders?.[0].uri.fsPath;
         if (!workspaceFolder) {
             vscode.window.showErrorMessage('No workspace folder found!');
@@ -37,6 +60,7 @@ export function activate(context: vscode.ExtensionContext) {
 
         // Open diff view with previous version
         await openDiffView(previousVersionPath, currentFilePath);
+        isDiffViewOpen = true;
     });
 
     context.subscriptions.push(disposable);
@@ -115,7 +139,7 @@ function findPreviousVersion(workspaceDir: string, currentFilePath: string): str
     }
 }
 
-async function openDiffView(previousPath: string, currentPath: string) {
+async function openDiffView(previousPath: string, currentPath: string): Promise<void> {
     try {
         const previousUri = vscode.Uri.file(previousPath);
         const currentUri = vscode.Uri.file(currentPath);
