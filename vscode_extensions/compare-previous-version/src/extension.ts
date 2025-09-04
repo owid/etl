@@ -2,9 +2,8 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 
-// Track the current diff view state
-let isDiffViewOpen = false;
-let originalFilePath: string | undefined = undefined;
+// Track diff state per file path
+const diffStateMap = new Map<string, { originalUri: vscode.Uri, diffTitle: string }>();
 
 export function activate(context: vscode.ExtensionContext) {
     let disposable = vscode.commands.registerCommand('extension.comparePreviousVersion', async () => {
@@ -14,26 +13,26 @@ export function activate(context: vscode.ExtensionContext) {
             return;
         }
 
-        const currentFilePath = editor.document.uri.fsPath;
+        const currentUri = editor.document.uri;
+        const currentFilePath = currentUri.fsPath;
 
-        // Check if we should toggle back to original view
-        if (isDiffViewOpen && originalFilePath) {
-            // Close the current diff view
-            await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
-            
-            // Open the original file
-            const originalUri = vscode.Uri.file(originalFilePath);
-            await vscode.window.showTextDocument(originalUri);
-            
-            // Reset state
-            isDiffViewOpen = false;
-            originalFilePath = undefined;
-            return;
+        // Check if this is a diff view we created - if so, toggle back
+        if (isDiffViewForOurFile(editor)) {
+            // Find the original file from our state map
+            const originalData = findOriginalFromDiff(editor);
+            if (originalData) {
+                // Close current diff and open original file in the same editor group
+                const viewColumn = editor.viewColumn;
+                await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
+                await vscode.window.showTextDocument(originalData.originalUri, { viewColumn });
+                
+                // Clean up state
+                diffStateMap.delete(originalData.originalUri.fsPath);
+                return;
+            }
         }
 
-        // Store the current file path as the original
-        originalFilePath = currentFilePath;
-        
+        // Not in a diff view, so open diff for current file
         const workspaceFolder = vscode.workspace.workspaceFolders?.[0].uri.fsPath;
         if (!workspaceFolder) {
             vscode.window.showErrorMessage('No workspace folder found!');
@@ -58,9 +57,11 @@ export function activate(context: vscode.ExtensionContext) {
             return;
         }
 
-        // Open diff view with previous version
-        await openDiffView(previousVersionPath, currentFilePath);
-        isDiffViewOpen = true;
+        // Open diff view with previous version in current editor group
+        const diffTitle = await openDiffView(previousVersionPath, currentFilePath, editor.viewColumn);
+        
+        // Store state for toggle functionality
+        diffStateMap.set(currentFilePath, { originalUri: currentUri, diffTitle });
     });
 
     context.subscriptions.push(disposable);
@@ -139,7 +140,32 @@ function findPreviousVersion(workspaceDir: string, currentFilePath: string): str
     }
 }
 
-async function openDiffView(previousPath: string, currentPath: string): Promise<void> {
+function isDiffViewForOurFile(editor: vscode.TextEditor): boolean {
+    // Check if this editor's document title matches any of our tracked diff titles
+    const tabTitle = vscode.window.tabGroups.activeTabGroup.activeTab?.label || '';
+    
+    for (const [_, state] of diffStateMap) {
+        if (tabTitle === state.diffTitle) {
+            return true;
+        }
+    }
+    
+    return false;
+}
+
+function findOriginalFromDiff(editor: vscode.TextEditor): { originalUri: vscode.Uri } | null {
+    const tabTitle = vscode.window.tabGroups.activeTabGroup.activeTab?.label || '';
+    
+    for (const [filePath, state] of diffStateMap) {
+        if (tabTitle === state.diffTitle) {
+            return { originalUri: state.originalUri };
+        }
+    }
+    
+    return null;
+}
+
+async function openDiffView(previousPath: string, currentPath: string, viewColumn?: vscode.ViewColumn): Promise<string> {
     try {
         const previousUri = vscode.Uri.file(previousPath);
         const currentUri = vscode.Uri.file(currentPath);
@@ -160,10 +186,14 @@ async function openDiffView(previousPath: string, currentPath: string): Promise<
             'vscode.diff',
             previousUri,
             currentUri,
-            title
+            title,
+            { viewColumn } // Force to open in specified column
         );
+        
+        return title;
     } catch (error) {
         vscode.window.showErrorMessage(`Failed to open diff view: ${error}`);
+        return '';
     }
 }
 
