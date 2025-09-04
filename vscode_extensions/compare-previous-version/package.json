@@ -1,0 +1,58 @@
+{
+  "name": "compare-previous-version",
+  "displayName": "Compare Previous Version",
+  "description": "Compare current file with its previous version by finding the highest date version that's lower than current",
+  "version": "0.0.1",
+  "publisher": "owid",
+  "engines": {
+    "vscode": "^1.93.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "extension.comparePreviousVersion",
+        "title": "Compare Previous Version"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "extension.comparePreviousVersion",
+        "key": "ctrl+shift+d"
+      },
+      {
+        "command": "extension.comparePreviousVersion",
+        "key": "cmd+shift+d"
+      }
+    ]
+  },
+  "scripts": {
+    "esbuild": "node esbuild.config.js",
+    "esbuild-watch": "node esbuild.config.js --watch",
+    "compile": "npm run check-types && npm run lint && npm run esbuild",
+    "watch": "npm run esbuild-watch",
+    "check-types": "tsc --noEmit",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.8",
+    "@types/node": "20.x",
+    "@types/vscode": "^1.93.0",
+    "@typescript-eslint/eslint-plugin": "^8.7.0",
+    "@typescript-eslint/parser": "^8.7.0",
+    "@vscode/test-cli": "^0.0.10",
+    "@vscode/test-electron": "^2.4.1",
+    "esbuild": "^0.24.0",
+    "eslint": "^9.11.1",
+    "npm-run-all": "^4.1.5",
+    "typescript": "^5.6.2"
+  },
+  "dependencies": {
+    "ignore": "^6.0.2"
+  }
+}
