@@ -70,9 +70,7 @@ def run() -> None:
 
     For the timeframe ~1950-1984 we calculate maternal mortality ratio and rate out of WHO mortality database and UN WPP by using:
     - death from maternal conditions (all sexes, all ages) from WHO mortality database
-    - births and female population aged 14-49 from UN WPP
-
-    We also create regional aggregates if a region is more than 90% covered by our data for a given year"""
+    - births and female population aged 14-49 from UN WPP"""
 
     #
     # Load inputs.
@@ -88,7 +86,9 @@ def run() -> None:
 
     # Read table from meadow dataset.
     tb_gm = ds_gm.read("maternal_mortality", reset_metadata="keep_origins")
+    tb_gm["source"] = "Gapminder"
     tb_un = ds_un.read("maternal_mortality", reset_metadata="keep_origins")
+    tb_un["source"] = "UN MMEIG"
     tb_who_mortality = ds_who_mortality.read("mortality_database", reset_metadata="keep_origins")
     # Filtering out the data we need from WHO mortality database
     tb_who_mortality = tb_who_mortality[
@@ -137,6 +137,7 @@ def run() -> None:
     tb_calc_mm = pr.merge(tb_wpp, tb_who_mortality, on=["country", "year"], how="outer")
     tb_calc_mm["mmr"] = (tb_calc_mm["maternal_deaths"] / tb_calc_mm["live_births"]) * 100_000
     tb_calc_mm["mmr_rate"] = (tb_calc_mm["maternal_deaths"] / tb_calc_mm["female_population"]) * 100_000
+    tb_calc_mm["source"] = "UN WPP and WHO Mortality Database"
 
     # combine with Gapminder data - using WHO/ UN WPP data where available
     tb_gm["maternal_deaths"] = tb_gm["maternal_deaths"].round().astype("UInt32")
@@ -172,7 +173,7 @@ def run() -> None:
     tb = geo.add_population_to_table(tb, ds_pop)
 
     # drop all columns that are not 1) long run or 2) not related to maternal mortality
-    cols_to_keep = ["country", "year", "maternal_deaths", "mmr", "live_births", "mmr_rate"]
+    cols_to_keep = ["country", "year", "maternal_deaths", "mmr", "live_births", "mmr_rate", "source"]
     tb = tb[cols_to_keep]
 
     # fix dtypes (coerce errors since NAs are not accepted otherwise)

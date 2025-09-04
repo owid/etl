@@ -2,9 +2,9 @@ definitions:
   common:
     processing_level: major
     description_processing: |-
-      - The dataset combines three sources: WHO Mortality Database (before 1985), Gapminder (before 1985, if WHO Mortality Database data are unavailable), UN MMEIG (1985 onwards).
+      - The dataset combines three sources: WHO Mortality Database (before 1985), Gapminder (before 1985, if WHO Mortality Database data are unavailable), United Nations Maternal Mortality Estimation Inter-Agency Group (UNMMEIG; 1985 onwards). UN MMEIG is made up of WHO, UNICEF, UNFPA, World Bank Group and UNDESA/Population Division.
         The WHO Mortality Database and Gapminder contain reported figures from countries, and are likely to underestimate the true maternal mortality figures. The UN MMEIG aims to estimates the true rate, by adjusting for underreporting and misclassification. Sudden jumps in mortality rate in 1985 are a consequence of switching data sources (from reported to estimated figures).
-      - For the years between 1950 - 1985 we calculated the maternal mortality ratio and maternal mortality rate based
+      - For the years between 1950-1985 we calculated the maternal mortality ratio and maternal mortality rate based
         on the number of maternal deaths from the WHO mortality database and live births and female population of reproductive age from the UN WPP.
       - Where the reported maternal deaths in the WHO Mortality Database differed significantly from the estimated figures in the UN MMEIG data, we opted not to include them.
       - Where a data point is attached to a range of years in the Gapminder data set, we used the midpoint of the range.
@@ -16,11 +16,10 @@ definitions:
         note: |-
           Prior to 1985, only reported data are available, which are likely to underestimate the true maternal mortality rate. From 1985, estimates are shown, which aim to adjust for underreporting and misclassification.
   description_maternal_mortality: |-
-    Maternal deaths are defined as a death of a woman while pregnant or within 42 days of termination of pregnancy, irrespective of the duration and site of pregnancy,
-    from any cause related or aggravated by the pregnancy or its management, but not from accidental or incidental causes.
+    Maternal deaths are defined as a death of a woman while pregnant or within 42 days of termination of pregnancy, irrespective of the duration and site of pregnancy, from any cause related or aggravated by the pregnancy or its management, but not from accidental or incidental causes. The WHO Mortality Database also includes late maternal deaths, which occur between 42 days and 1 year after the termination of the pregnancy.
 
 dataset:
-  title: Maternal mortality (OWID based on UN MMEIG & other sources) (1751-2020)
+  title: Maternal mortality (OWID based on UN MMEIG & other sources) (1751-2023)
   description: |-
     Long run data set constructured from Gapminder, the WHO mortality database, the UN WPP and UN MMEIG data. The years between 1950 - 1985 are based on the WHO mortality data set (recorded deaths) and the UN WPP, where available,
     and the Gapminder data set (recorded data) otherwise. All data points before 1950 are based on the Gapminder data set. The years after 1985 are based on the estimations of the UN MMEIG.
@@ -40,7 +39,8 @@ tables:
           entityAnnotationsMap: "United States: Values from 2003–2017 affected by measurement change"
         description_key:
           - "{definitions.description_maternal_mortality}"
-
+          - "This dataset is a combination of multiple sources which cover different time-periods. We use sources in this order of preference: UN MMEIG (1985 onwards), WHO Mortality Database (1950-1985), Gapminder (before 1985)."
+          - Detailed information on which source was used for each country and year can be found in [this spreadsheet](https://docs.google.com/spreadsheets/d/1AL-nZEhmEEcYLm7BxS1CMIhkRd-rBVedhnr7awoDxOQ/edit).
       mmr_rate:
         title: Maternal mortality rate
         description_short: |-
@@ -67,3 +67,7 @@ tables:
         short_unit: ""
         display:
           numDecimalPlaces: 0
+      source:
+        title: Source
+        description_short: Source of the data
+        unit: ""
