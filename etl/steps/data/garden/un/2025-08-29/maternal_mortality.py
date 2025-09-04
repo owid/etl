@@ -1,6 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
 from owid.catalog import Table
+from owid.catalog import processing as pr
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder
@@ -66,7 +67,13 @@ def run() -> None:
         aggregations=aggr,
         frac_allowed_nans_per_year=0.3,
     )
+    # Calculate the MMR for the regions
+    msk = tb["country"].isin(REGIONS)
+    tb_regions = tb[msk].copy()
+    tb_no_regions = tb[~msk].copy()
+    tb_regions["mmr"] = (tb_regions["maternal_deaths"] / tb_regions["births"]) * 100_000
 
+    tb = pr.concat([tb_regions, tb_no_regions], ignore_index=True)
     tb = tb.format(["country", "year"])
 
     #
