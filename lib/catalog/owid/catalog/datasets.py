@@ -121,16 +121,11 @@ class Dataset:
             utils.validate_underscore(col, "Variable's name")
 
         if not table.primary_key:
-            if environ.get("OWID_STRICT"):
-                raise PrimaryKeyMissing(
-                    f"Table `{table.metadata.short_name}` does not have a primary_key -- please use t.set_index([col, ...], verify_integrity=True) to indicate dimensions before saving"
-                )
-            else:
-                warnings.warn(
-                    f"Table `{table.metadata.short_name}` does not have a primary_key -- please use t.set_index([col, ...], verify_integrity=True) to indicate dimensions before saving"
-                )
+            raise PrimaryKeyMissing(
+                f"Table `{table.metadata.short_name}` does not have a primary_key -- please use t.set_index([col, ...], verify_integrity=True) to indicate dimensions before saving"
+            )
 
-        if not table.index.is_unique and environ.get("OWID_STRICT"):
+        if not table.index.is_unique:
             [(k, dups)] = table.index.value_counts().head(1).to_dict().items()
             raise NonUniqueIndex(
                 f"Table `{table.metadata.short_name}` has duplicate values in the index -- could you have made a mistake?\n\n"
