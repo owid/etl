@@ -848,7 +848,9 @@ def add_gdp_to_table(
     return tb_with_gdp
 
 
-def create_table_of_regions_and_subregions(ds_regions: Dataset, subregion_type: str = "members") -> Table:
+def create_table_of_regions_and_subregions(
+    ds_regions: Dataset, subregion_type: str = "members", unpack_subregions: bool = False
+) -> Table:
     # Subregion type can be "members" or "successors" (or in principle also "related").
     # Get the main table from the regions dataset.
     tb_regions = ds_regions["regions"]
@@ -869,6 +871,25 @@ def create_table_of_regions_and_subregions(ds_regions: Dataset, subregion_type: 
     tb_regions[subregion_type] = map_series(
         series=tb_regions[subregion_type], mapping=mapping, warn_on_missing_mappings=True
     )
+
+    if unpack_subregions:
+        # Replace subregions by their countries.
+        # For example, "World" includes "Africa"; replace that by all African countries.
+        tb_regions = tb_regions.reset_index()
+        # Currently, the only case of composite subregions is World, but we make this process recursive, in case we add more in the future.
+        while not (composed := tb_regions[tb_regions[subregion_type].isin(tb_regions["name"])]).empty:
+            for _, row in composed.iterrows():
+                # Create a temporary table without the composite subregion.
+                tb_without_composite_region = tb_regions[
+                    ~((tb_regions["name"] == row["name"]) & (tb_regions[subregion_type] == row[subregion_type]))
+                ].reset_index(drop=True)
+                # Create a temporary table with only that composite subregion.
+                tb_composite_region = tb_regions[tb_regions["name"] == row[subregion_type]].assign(
+                    **{"code": row.name, "name": row["name"]}
+                )
+                # Replace the original table by the combination of the two temporary tables.
+                tb_regions = pr.concat([tb_without_composite_region, tb_composite_region], ignore_index=True)
+        tb_regions = tb_regions.set_index("code")
 
     # Create a column with the list of members in each region
     tb_countries_in_region = (
@@ -891,6 +912,8 @@ def list_members_of_region(
     custom_members: list[str] | None = None,
     include_historical_regions_in_income_groups: bool = False,
     exclude_historical_countries: bool = False,
+    # TODO: Should this be True by default?
+    unpack_subregions: bool = False,
 ) -> list[str]:
     """Get countries in a region, both for known regions (e.g. "Africa") and custom ones (e.g. "Europe (excl. EU-27)").
 
@@ -915,6 +938,8 @@ def list_members_of_region(
         True to include historical regions in income groups.
     exclude_historical_countries : bool
         True to include historical countries.
+    unpack_subregions : bool
+        True to replace subregions by their countries. For example, for "World", instead of showing "Africa" as a member, it will show all African countries.
 
     Returns
     -------
@@ -934,7 +959,9 @@ def list_members_of_region(
         custom_members = []
 
     # Get the main table from the regions dataset and create a new table that has regions and members.
-    tb_countries_in_region = create_table_of_regions_and_subregions(ds_regions=ds_regions, subregion_type="members")
+    tb_countries_in_region = create_table_of_regions_and_subregions(
+        ds_regions=ds_regions, subregion_type="members", unpack_subregions=unpack_subregions
+    )
 
     if ds_income_groups is not None:
         if "wb_income_group" in ds_income_groups.table_names:
@@ -1672,6 +1699,7 @@ class Regions:
                 # Load income groups only if necessary (and raise an error if not among dependencies).
                 ds_income_groups=self.ds_income_groups if name in INCOME_GROUPS else None,
                 include_historical_regions_in_income_groups=True,
+                unpack_subregions=True,
             )
 
             self._region_cache[name] = region_dict
@@ -1863,11 +1891,11 @@ class RegionAggregator:
             # regions is already a dict
             self.regions = regions
 
-        # Create a dictionary of regions and members.
-        self.regions_members = self._parse_regions_dict()
-
         # Create a list of all possible regions, which includes any possible custom region.
-        self.regions_all = sorted(set(regions_all) | set(self.regions_members))
+        self.regions_all = sorted(set(regions_all) | set(self.regions))
+
+        # Create a dictionary of all regions and members.
+        self.regions_members = self._parse_regions_dict()
 
         if index_columns is None:
             self.index_columns = [self.country_col, self.year_col]
@@ -1876,39 +1904,51 @@ class RegionAggregator:
 
     def _parse_regions_dict(self):
         regions_members = {}
-        for region in self.regions:
-            # Check that the content of the region dictionary is as expected.
-            expected_items = {
-                "additional_regions",
-                "excluded_regions",
-                "additional_members",
-                "excluded_members",
-                "custom_members",
-            }
-            unknown_items = set(self.regions[region]) - expected_items
-            if len(unknown_items) > 0:
-                log.warning(
-                    f"Unknown items in dictionary of regions {region}: {unknown_items}. Expected: {expected_items}."
+        # TODO: Is this necessary, or should we pass self.ds_income_groups directly?
+        _ds_income_groups = (
+            self.ds_income_groups
+            if (self.regions is not None) and any(set(self.regions).intersection(set(INCOME_GROUPS)))
+            else None
+        )
+        for region in self.regions_all:
+            if region in self.regions:
+                # Check that the content of the region dictionary is as expected.
+                expected_items = {
+                    "additional_regions",
+                    "excluded_regions",
+                    "additional_members",
+                    "excluded_members",
+                    "custom_members",
+                }
+                unknown_items = set(self.regions[region]) - expected_items
+                if len(unknown_items) > 0:
+                    log.warning(
+                        f"Unknown items in dictionary of regions {region}: {unknown_items}. Expected: {expected_items}."
+                    )
+                # List members of the region, with possible modifications.
+                members = list_members_of_region(
+                    region=region,
+                    ds_regions=self.ds_regions,
+                    ds_income_groups=_ds_income_groups,
+                    additional_regions=self.regions[region].get("additional_regions"),
+                    excluded_regions=self.regions[region].get("excluded_regions"),
+                    additional_members=self.regions[region].get("additional_members"),
+                    excluded_members=self.regions[region].get("excluded_members"),
+                    custom_members=self.regions[region].get("custom_members"),
+                    include_historical_regions_in_income_groups=True,
+                    unpack_subregions=True,
                 )
-
-            # List members of the region.
-            members = list_members_of_region(
-                region=region,
-                ds_regions=self.ds_regions,
-                # TODO: Is the following if clause still needed?
-                # If any of the regions is an income group, load income groups dataset (and raise an error if it is not among dependencies); otherwise, set ds_income_groups as None, to ignore the income groups dataset.
-                ds_income_groups=self.ds_income_groups
-                if (self.regions is not None) and any(set(self.regions).intersection(set(INCOME_GROUPS)))
-                else None,
-                additional_regions=self.regions[region].get("additional_regions"),
-                excluded_regions=self.regions[region].get("excluded_regions"),
-                additional_members=self.regions[region].get("additional_members"),
-                excluded_members=self.regions[region].get("excluded_members"),
-                custom_members=self.regions[region].get("custom_members"),
-                # By default, include historical regions in income groups.
-                include_historical_regions_in_income_groups=True,
-            )
-            regions_members[region] = members
+                regions_members[region] = members
+            else:
+                # List default members of the region.
+                members = list_members_of_region(
+                    region=region,
+                    ds_regions=self.ds_regions,
+                    ds_income_groups=_ds_income_groups,
+                    include_historical_regions_in_income_groups=True,
+                    unpack_subregions=True,
+                )
+                regions_members[region] = members
 
         return regions_members
 
@@ -2291,7 +2331,6 @@ class RegionAggregator:
                 tb_result[self.population_col], axis=0
             )
             # NOTE: Here we do this calculation for all per capita columns. We could do this just for the intersection of per capita columns and aggregation columns. However, the current implementation is more informative.
-            # TODO: It would be good to show "members" as individual countries, not regions. This could affect both functions like paths.get_region() but also list_members_of_region.
             tb_population_informed = self._create_table_of_only_region_aggregates(
                 tb=tb_population_informed,
                 regions=regions,
