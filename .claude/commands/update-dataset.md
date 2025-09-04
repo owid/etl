@@ -1,11 +1,11 @@
 ---
-argument-hint: <namespace>/<old-version>/<name> [branch]
-description: End-to-end dataset update workflow using project subagents with progress tracking and a mandatory checkpoint. New version is set to today's date automatically.
+argument-hint: <namespace>/<old_version>/<name> [branch]
+description: End-to-end dataset update workflow using project subagents with progress tracking and a mandatory checkpoint after every step. New version is set to today's date automatically.
 ---
 
 # Update dataset (PR → snapshot → steps → grapher)
 
-Use this command to run a complete dataset update with Claude Code subagents, keep a live progress checklist, and pause for approval at the checkpoint before committing changes.
+Use this command to run a complete dataset update with Claude Code subagents, keep a live progress checklist, and pause for approval at a checkpoint **after every numbered workflow step** before continuing.
 
 ## Context probes
 
@@ -13,24 +13,10 @@ Use this command to run a complete dataset update with Claude Code subagents, ke
 
 ## Inputs
 
-Primary syntax (preferred):
+- `<namespace>/<old_version>/<name>`
+- Get `<new_version>` as today's date by running `date -u +"%Y-%m-%d"`
 
-- `<namespace>/<old-version>/<name>`
-   - The new version will be computed as today's date (YYYY-MM-DD).
-   - Example: `irena/2023-11-15/renewable_power_generation_costs`
 
-Also supported (for flexibility):
-
-1) Catalog URI
-   - `data://<channel>/<namespace>/<yyyy-mm-dd>/<name>`
-   - Example: `data://snapshot/irena/2024-11-15/renewable_power_generation_costs`
-
-2) Key-value form
-   - channel=<snapshot|meadow|garden|grapher> namespace=<ns> version=<yyyy-mm-dd> short_name=<name> [dataset=<name>]
-
-3) Minimal
-   - short_name=<short_name> channel=<meadow|garden|grapher>
-   - Infer namespace/version/name from repo context when possible
 
 Optional trailing args:
 - branch: The working branch name (defaults to current branch)
@@ -41,7 +27,8 @@ Assumptions:
 
 ## Progress checklist (maintain, tick live, and persist to progress.md)
 
-- [ ] Parse inputs and resolve: channel, namespace, version, short_name, old-version, branch
+(Checkpoint rule: After you finish each item below that represents a workflow step, immediately run the CHECKPOINT procedure. Do not batch multiple steps before a checkpoint.)
+- [ ] Parse inputs and resolve: channel, namespace, version, short_name, old_version, branch
 - [ ] Create or reuse draft PR and work branch
 - [ ] Update snapshot and compare to previous version; capture summary
 - [ ] Meadow step: run + fix + diff + summarize
@@ -54,49 +41,49 @@ Assumptions:
 Persistence:
 - After ticking each item, update `workbench/<short_name>/progress.md` with the current checklist state and a timestamp.
 
-## Workflow orchestration
-
-1) PR and branch setup — use dataset-update-pr subagent
-   - Create or reuse a draft PR and work branch.
-   - Compute `new_version = TODAY (YYYY-MM-DD)`.
-   - Run `etl update snapshot://<namespace>/<new_version>/<short_name> --include-usages` under this subagent’s rules.
-   - Ensure branch length < 28 chars if interacting with DB-backed systems.
-
-2) Snapshot update & compare — use snapshot-updater subagent
-   - Inputs: `<namespace>/<new_version>/<short_name>` and `<old-version>`.
-   - Save summary to `workbench/<short_name>/snapshot-updater.md`.
-   - Do not modify the old snapshot. Use collapsible sections for detail.
-   - This step is part of the approval checkpoint below.
-
-3) Meadow step repair/verify — use step-fixer subagent
-   - Invoke with `channel=meadow namespace=<ns> version=<ver> dataset=<name> short_name=<short_name>` (or the data:// form).
-   - Run the step, read tracebacks if any, minimally fix code/metadata, and re-run.
-   - Diff against REMOTE for a representative country and save to:
-     - `workbench/<short_name>/meadow_diff_raw.txt`
-     - Summarize to `workbench/<short_name>/meadow_diff.md`
-
-4) Garden step repair/verify — use step-fixer subagent
-   - Same as Meadow, but `channel=garden`.
-   - Save to `workbench/<short_name>/garden_diff_raw.txt` and `garden_diff.md`.
-
-5) Grapher step run/verify — use step-fixer subagent
-   - Invoke with `channel=grapher` and add `--grapher` flag inside the agent’s run command.
-   - Skip the diff step (as per agent’s notes) but verify variables/metadata integrity.
-
-6) Indicator upgrade (optional, staging only) — use indicator-upgrader subagent
-   - Inputs: `<short_name> <branch>`.
-   - Resolve NEW and OLD dataset ids, map perfect variable matches, emit manual mapping TODOs.
-   - Dry-run, then apply upgrade, verify no charts reference OLD dataset.
-   - Persist `workbench/<short_name>/indicator_upgrade.json`.
-
 ## CHECKPOINT (mandatory user approval)
 
-- Present a consolidated summary of key changes across snapshot, meadow, garden, and grapher.
-- Ask explicitly: “Proceed? reply: yes/no”.
-- Only proceed to commit/push if the user replies “yes”.
-- After approval:
-  - Commit changes and push.
-  - Update PR description with a collapsed section containing the snapshot diff and a link to incremental changes.
+Always performed **immediately after completing each numbered workflow step** (1–6). Never start the next step until approval is granted.
+
+Procedure (each time):
+1. Present a concise summary of what just changed, key diffs/issues resolved, and what the next step will do.
+2. Ask exactly: Proceed? reply: yes/no
+3. Only continue if the user replies exactly yes (case-insensitive). Any other reply = no; stop and wait.
+4. On approval:
+   - Update progress checklist (tick the completed item) and write `workbench/<short_name>/progress.md` with timestamp.
+   - Commit related changes (if any), push.
+   - Update (or append to) the PR description: add a collapsed section titled with the step name (e.g., "Snapshot Update", "Meadow Update") containing the summary.
+
+## Mandatory per-step checkpoints (rule)
+
+You MUST:
+- Stop after each workflow step (1–6) and run CHECKPOINT before starting the next.
+- Never chain multiple steps inside a single approval.
+- Treat missing or ambiguous replies as no.
+
+## Workflow orchestration
+
+1) Create PR and run step updater via subagent (dataset-update-pr)
+   - Inputs: `<namespace>/<old_version>/<short_name>`
+   - Creates draft PR and updates steps to new version
+   - CHECKPOINT (stop → summarize → ask → require yes)
+2) Snapshot update & compare (snapshot-updater subagent)
+   - Inputs: `<namespace>/<new_version>/<short_name>` and `<old_version>`
+   - Save summary to `workbench/<short_name>/snapshot-updater.md`
+   - CHECKPOINT
+3) Meadow step repair/verify (step-fixer subagent, channel=meadow)
+   - Run, fix, re-run; produce diffs
+   - Save diffs and summaries
+   - CHECKPOINT
+4) Garden step repair/verify (step-fixer subagent, channel=garden)
+   - Same pattern as Meadow
+   - CHECKPOINT
+5) Grapher step run/verify (step-fixer subagent, channel=grapher, add --grapher)
+   - Skip diff; verify variables/metadata
+   - CHECKPOINT
+6) Indicator upgrade (optional, staging only)
+   - Use indicator-upgrader subagent with `<short_name> <branch>`
+   - CHECKPOINT (if executed)
 
 ## Guardrails and tips
 
