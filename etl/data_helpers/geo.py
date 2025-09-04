@@ -1904,12 +1904,8 @@ class RegionAggregator:
 
     def _parse_regions_dict(self):
         regions_members = {}
-        # TODO: Is this necessary, or should we pass self.ds_income_groups directly?
-        _ds_income_groups = (
-            self.ds_income_groups
-            if (self.regions is not None) and any(set(self.regions).intersection(set(INCOME_GROUPS)))
-            else None
-        )
+        # Try to load income groups dataset only if required.
+        _ds_income_groups = self.ds_income_groups if any(set(self.regions).intersection(set(INCOME_GROUPS))) else None
         for region in self.regions_all:
             if region in self.regions:
                 # Check that the content of the region dictionary is as expected.
