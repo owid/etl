@@ -2,16 +2,16 @@
 This file generates the queries used in the media_deaths_analysis notebook. It includes the following functions:
 
 function create_queries()
-    This function includes all the keywords for each cause of death and creates a dictionary
-    with keywords, combinations, and terms to exclude.
+    This function includes all the keywords for each cause of death and creates
+    a dictionary with keywords, combinations, and terms to exclude.
 
 function create_query_str(query_dict, proximity=1000)
-    This function takes the query dictionary for each cause of death (created in create_queries)
+    This function takes the query dictionary for each cause of death (from create_queries)
     and creates a query string, including both the keywords and combinations of keywords.
 
 function create_queries_by_cause(dict_queries)
-    This function takes the dictionary of all causes of death and
-    all query terms and creates a string query (by calling create_query_str) for each cause of death.
+    This function takes the dictionary of all causes of death and all query terms
+    and creates a string query (by calling create_query_str) for each cause of death.
 
 function create_full_queries()
     This function creates the full queries for all causes of death.
@@ -22,7 +22,8 @@ function create_single_keyword_queries()
     a single mention into account for all causes of death.
     The output is a dictionary of the form {cause_of_death: single_keyword_query_string}
 
-The full queries can also be found in the methodology document here: https://docs.owid.io/projects/etl/analyses/media_deaths/methodology/#queries-for-each-cause-of-death
+The full queries can also be found in the methodology document here:
+    https://docs.owid.io/projects/etl/analyses/media_deaths/methodology/#queries-for-each-cause-of-death
 """
 
 

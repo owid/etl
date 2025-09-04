@@ -139,12 +139,7 @@ def upload_folder_as_zip(
 
         # Upload the zip file
         log.info("Uploading zip to R2", r2_path=full_r2_path)
-        upload(
-            s3_url=full_r2_path,
-            filename=temp_zip_path,
-            public=public,
-            quiet=False,
-        )
+        upload(s3_url=full_r2_path, filename=temp_zip_path, public=public, quiet=False)
 
         log.info("Successfully uploaded zip file to R2", r2_path=full_r2_path)
         return full_r2_path
@@ -154,7 +149,6 @@ def upload_folder_as_zip(
         if os.path.exists(temp_zip_path):
             os.unlink(temp_zip_path)
             log.debug("Cleaned up temporary zip file", temp_path=temp_zip_path)
-
 
 
 def upload_analysis_as_zip(
@@ -195,6 +189,7 @@ def upload_analysis_as_zip(
         local_folder_path=analysis_folder,
         r2_zip_path=r2_zip_path,
         public=True,  # Make publicly accessible
+        exclude_files=[".DS_Store", ".ipynb_checkpoints"],
         exclude_folders=["__pycache__"],
         dry_run=dry_run,
     )
