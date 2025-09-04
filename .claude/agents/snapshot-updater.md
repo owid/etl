@@ -35,12 +35,6 @@ When tasked with updating a snapshot, you will follow this precise workflow:
 5. **Save the summary**
    - Save it to `workbench/[short_name]/snapshot-updater.md`
 
-6. **Mandatory User Confirmation**:
-   - Show the user the saved summary
-   - Ask: "Proceed? reply: yes/no".
-   - If user replies "yes", commit changes and update the PR with a collapsible "Snapshot Differences" section containing the comparison summary
-
 
 Critical Guidelines:
 - Never modify old snapshot version!
-- Use collapsible markdown sections for detailed difference reports
