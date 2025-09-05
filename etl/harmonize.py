@@ -7,7 +7,7 @@ import json
 import re
 from collections import defaultdict
 from pathlib import Path
-from typing import DefaultDict, Dict, List, Literal, Optional, Set, cast
+from typing import DefaultDict, Dict, List, Literal, Set, cast
 
 import click
 import ipywidgets as widgets
@@ -62,7 +62,7 @@ COLUMN_HARMONIZE = "country"
     help=f"Number of suggestions to show per entity. Default is {DEFAULT_NUM_SUGGESTIONS}",
 )
 def harmonize(
-    data_file: str, column: str, output_file: str, num_suggestions: int, institution: Optional[str] = None
+    data_file: str, column: str, output_file: str, num_suggestions: int, institution: str | None = None
 ) -> None:
     """Generate a dictionary with the mapping of country names to OWID's canonical names.
 
@@ -103,11 +103,11 @@ def harmonize(
 
 def harmonize_ipython(
     tb: Table,
-    column: Optional[str] = None,
-    output_file: Optional[str] = None,
-    paths: Optional[PathFinder] = None,
+    column: str | None = None,
+    output_file: Path | str | None = None,
+    paths: PathFinder | None = None,
     num_suggestions: int = 100,
-    institution: Optional[str] = None,
+    institution: str | None = None,
 ):
     # Create Harmonizer
     harmonizer = Harmonizer(
@@ -189,7 +189,7 @@ class CountryRegionMapper:
     def __getitem__(self, key: str) -> str:
         return self.aliases[key.lower()]
 
-    def suggestions(self, region: str, institution: Optional[str] = None, num_suggestions: int = 5) -> List[str]:
+    def suggestions(self, region: str, institution: str | None = None, num_suggestions: int = 5) -> List[str]:
         if institution is None:
             # get the aliases which score highest on fuzzy matching
             results = process.extract(region.lower(), self.aliases.keys(), limit=1000)
@@ -273,11 +273,11 @@ def _add_alias_to_regions(yaml_content, target_name, new_alias):
 class Harmonizer:
     def __init__(
         self,
-        tb: Optional[Table | pd.DataFrame] = None,
-        colname: Optional[str] = None,
-        indicator: Optional[Variable | pd.Series] = None,
-        output_file: Optional[str] = None,
-        paths: Optional[PathFinder] = None,
+        tb: Table | pd.DataFrame | None = None,
+        colname: str | None = None,
+        indicator: Variable | pd.Series | None = None,
+        output_file: Path | str | None = None,
+        paths: PathFinder | None = None,
     ):
         """Constructor
 
@@ -309,7 +309,7 @@ class Harmonizer:
 
         return sorted(set(indicator.dropna().astype("string").unique()))
 
-    def _get_output_file(self, output_file: Optional[str], paths: Optional[PathFinder]):
+    def _get_output_file(self, output_file: Path | str | None, paths: PathFinder | None):
         """Get set of country names to map."""
         if (output_file is None) and (paths is None):
             raise ValueError("Either `output_file` or `paths` must be provided")
@@ -332,7 +332,7 @@ class Harmonizer:
 
     def run_automatic(
         self,
-        logging: Optional[Literal["shell", "ipython"]] = None,
+        logging: Literal["shell", "ipython"] | None = None,
     ):
         """Build country mappings that can be done automatically.
 
@@ -380,13 +380,13 @@ class Harmonizer:
 
         self.ambiguous = ambiguous
 
-    def get_suggestions(self, region: str, institution: Optional[str], num_suggestions: int):
+    def get_suggestions(self, region: str, institution: str | None, num_suggestions: int):
         """Get suggestions for region."""
         return self.mapper.suggestions(region, institution=institution, num_suggestions=num_suggestions)
 
     def run_interactive_terminal(
         self,
-        institution: Optional[str] = None,
+        institution: str | None = None,
         num_suggestions: int = DEFAULT_NUM_SUGGESTIONS,
     ) -> None:
         """Ask user to map countries."""
@@ -444,7 +444,7 @@ class Harmonizer:
 
     def run_interactive_ipython(
         self,
-        institution: Optional[str] = None,
+        institution: str | None = None,
         num_suggestions: int = DEFAULT_NUM_SUGGESTIONS,
     ):
         if self.ambiguous is None:
