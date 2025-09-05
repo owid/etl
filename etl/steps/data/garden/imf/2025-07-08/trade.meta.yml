@@ -136,7 +136,7 @@ tables:
         title: << counterpart_country >>'s import ranking
         unit: "rank"
         short_unit: ""
-        description_short: The rank of << counterpart_country >> among a country’s import partners, based on import values that include the cost of goods, freight, and insurance.
+        description_short: The rank of << counterpart_country >> among a country’s import partners, based on import values that include the cost of goods, freight, and insurance.  A rank of 1 indicates that the << counterpart_country >> is the country’s largest import partner.
         description_key:
           - This indicator shows the rank of << counterpart_country >> among a country’s import partners.
           - Import values were measured on a CIF (Cost, Insurance, and Freight) basis in current US dollars. This means the figures included the cost of goods plus transport and insurance to the importer’s border.
