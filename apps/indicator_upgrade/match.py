@@ -138,7 +138,7 @@ def main(
     similarity_name: str = SIMILARITY_NAME,
     max_suggestions: int = N_MAX_SUGGESTIONS,
     no_interactive: bool = False,
-    auto_threshold: float = 80.0,
+    auto_threshold: float = 100.0,
 ) -> None:
     with get_connection() as db_conn:
         # Get variables from old dataset that have been used in at least one chart.
@@ -217,7 +217,7 @@ def map_old_and_new_indicators_auto(
     new_indicators: pd.DataFrame,
     match_identical: bool = True,
     similarity_name: str = "partial_ratio",
-    auto_threshold: float = 80.0,
+    auto_threshold: float = 100.0,
 ) -> pd.DataFrame:
     """Map old variables to new variables automatically based on similarity threshold.
 
