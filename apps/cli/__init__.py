@@ -210,8 +210,7 @@ GROUPS = (
         {
             "name": "Others",
             "commands": {
-                "variable-match": "etl.match_variables.main_cli",
-                "variable-mapping-translate": "etl.variable_mapping_translate.main_cli",
+                "indicator-upgrade": "apps.indicator_upgrade.cli.cli",
             },
         },
     ]
