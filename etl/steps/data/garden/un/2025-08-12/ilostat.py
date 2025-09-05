@@ -295,6 +295,10 @@ def add_indicator_metadata(tb: Table, tb_metadata: Table, column: str) -> Table:
         set(tb[column].unique()) == set(COLUMN_CATEGORIES[column].keys())
     ), f"Some {column} are missing in the column categories mapping: {set(tb[column].unique()) - set(COLUMN_CATEGORIES[column].keys())}"
 
+    # Multiply observations by 1000 when the indicator is in thousands
+    if column == "indicator":
+        tb.loc[tb[column].str.contains("(thousands)", case=False, na=False, regex=False), "obs_value"] *= 1000
+
     # Rename categories in column
     tb[column] = tb[column].replace(COLUMN_CATEGORIES[column])
 
