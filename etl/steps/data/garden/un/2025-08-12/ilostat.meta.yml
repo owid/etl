@@ -33,7 +33,7 @@ tables:
           <<: *common_display
 
       employment_by_sex_and_status_in_employment:
-        title: Employment - <<sex>>, <<classif1>>
+        title: Employment - <<sex>> - <<classif1>>
         unit: "people"
         short_unit: ""
         # description_short: Short description of testing variable.
@@ -41,7 +41,7 @@ tables:
         # presentation:
           # title_variant:
         display:
-          name: Employment - <<sex>>, <<classif1>>
+          name: Employment - <<sex>> - <<classif1>>
           numDecimalPlaces: 0
           <<: *common_display
 
@@ -85,7 +85,7 @@ tables:
           <<: *common_display
 
       labour_force_by_sex_and_age:
-        title: Labour force - <<sex>>, <<classif1>>
+        title: Labour force - <<sex>> - <<classif1>>
         unit: "people"
         short_unit: ""
         # description_short: Short description of testing variable.
@@ -93,12 +93,12 @@ tables:
         # presentation:
           # title_variant:
         display:
-          name: Labour force - <<sex>>, <<classif1>>
+          name: Labour force - <<sex>> - <<classif1>>
           numDecimalPlaces: 0
           <<: *common_display
 
       labour_force_participation_rate_by_sex_and_age:
-        title: Labour force participation rate - <<sex>>, <<classif1>>
+        title: Labour force participation rate - <<sex>> - <<classif1>>
         unit: "%"
         short_unit: "%"
         # description_short: Short description of testing variable.
@@ -106,12 +106,12 @@ tables:
         # presentation:
           # title_variant:
         display:
-          name: Labour force participation rate - <<sex>>, <<classif1>>
+          name: Labour force participation rate - <<sex>> - <<classif1>>
           numDecimalPlaces: 1
           <<: *common_display
 
       share_of_children_in_child_labour_by_sex_and_age:
-        title: Share of children in child labor - <<sex>>, <<classif1>>
+        title: Share of children in child labor - <<sex>> - <<classif1>>
         unit: "%"
         short_unit: "%"
         # description_short: Short description of testing variable.
@@ -119,12 +119,12 @@ tables:
         # presentation:
           # title_variant:
         display:
-          name: Share of children in child labor - <<sex>>, <<classif1>>
+          name: Share of children in child labor - <<sex>> - <<classif1>>
           numDecimalPlaces: 1
           <<: *common_display
 
       unemployment_rate_by_sex_and_age:
-        title: Unemployment rate - <<sex>>, <<classif1>>
+        title: Unemployment rate - <<sex>> - <<classif1>>
         unit: "%"
         short_unit: "%"
         # description_short: Short description of testing variable.
@@ -132,12 +132,12 @@ tables:
         # presentation:
           # title_variant:
         display:
-          name: Unemployment rate - <<sex>>, <<classif1>>
+          name: Unemployment rate - <<sex>> - <<classif1>>
           numDecimalPlaces: 1
           <<: *common_display
 
       sdg_1_1_1_working_poverty_rate:
-        title: SDG 1.1.1 Working poverty rate - <<sex>>, <<classif1>>
+        title: SDG 1.1.1 Working poverty rate - <<sex>> - <<classif1>>
         unit: "%"
         short_unit: "%"
         # description_short: Short description of testing variable.
@@ -145,12 +145,12 @@ tables:
         # presentation:
           # title_variant:
         display:
-          name: Working poverty rate - <<sex>>, <<classif1>>
+          name: Working poverty rate - <<sex>> - <<classif1>>
           numDecimalPlaces: 1
           <<: *common_display
 
       sdg_1_3_1_population_covered_by_social_protection:
-        title: SDG 1.3.1 Proportion of population covered by social protection - <<sex>>, <<classif1>>
+        title: SDG 1.3.1 Proportion of population covered by social protection - <<sex>> - <<classif1>>
         unit: "%"
         short_unit: "%"
         # description_short: Short description of testing variable.
@@ -158,7 +158,7 @@ tables:
         # presentation:
           # title_variant:
         display:
-          name: Proportion of population covered by social protection - <<sex>>, <<classif1>>
+          name: Proportion of population covered by social protection - <<sex>> - <<classif1>>
           numDecimalPlaces: 1
           <<: *common_display
 
@@ -202,7 +202,7 @@ tables:
           <<: *common_display
 
       sdg_8_3_1_informal_employment:
-        title: SDG 8.3.1 Proportion of informal employment in total employment - <<sex>>, <<classif1>>
+        title: SDG 8.3.1 Proportion of informal employment in total employment - <<sex>> - <<classif1>>
         unit: "%"
         short_unit: "%"
         # description_short: Short description of testing variable.
@@ -210,12 +210,12 @@ tables:
         # presentation:
           # title_variant:
         display:
-          name: Proportion of informal employment in total employment - <<sex>>, <<classif1>>
+          name: Proportion of informal employment in total employment - <<sex>> - <<classif1>>
           numDecimalPlaces: 1
           <<: *common_display
 
       sdg_8_5_1_average_hourly_earnings:
-        title: SDG 8.5.1 Average hourly earnings of employees - <<sex>>, <<classif1>>
+        title: SDG 8.5.1 Average hourly earnings of employees - <<sex>> - <<classif1>>
         unit: "current local currency unit"
         short_unit: "LCU"
         # description_short: Short description of testing variable.
@@ -223,12 +223,12 @@ tables:
         # presentation:
           # title_variant:
         display:
-          name: Average hourly earnings of employees - <<sex>>, <<classif1>>
+          name: Average hourly earnings of employees - <<sex>> - <<classif1>>
           numDecimalPlaces: 1
           <<: *common_display
 
       sdg_8_5_2_unemployment_rate:
-        title: SDG 8.5.2 Unemployment rate - <<sex>>, <<classif1>>
+        title: SDG 8.5.2 Unemployment rate - <<sex>> - <<classif1>>
         unit: "%"
         short_unit: "%"
         # description_short: Short description of testing variable.
@@ -236,12 +236,12 @@ tables:
         # presentation:
           # title_variant:
         display:
-          name: Unemployment rate (<<sex>>, <<classif1>>)
+          name: Unemployment rate (<<sex>> - <<classif1>>)
           numDecimalPlaces: 1
           <<: *common_display
 
       sdg_8_5_2_unemployment_rate_by_disability_status:
-        title: SDG 8.5.2 Unemployment rate by disability status - <<sex>>, <<classif1>>
+        title: SDG 8.5.2 Unemployment rate by disability status - <<sex>> - <<classif1>>
         unit: "%"
         short_unit: "%"
         # description_short: Short description of testing variable.
@@ -249,7 +249,7 @@ tables:
         # presentation:
           # title_variant:
         display:
-          name: Unemployment rate by disability status (<<sex>>, <<classif1>>)
+          name: Unemployment rate by disability status (<<sex>> - <<classif1>>)
           numDecimalPlaces: 1
           <<: *common_display
 
@@ -267,7 +267,7 @@ tables:
           <<: *common_display
 
       sdg_8_7_1_children_engaged_in_economic_activity:
-        title: SDG 8.7.1 Proportion of children engaged in economic activity - <<sex>>, <<classif1>>
+        title: SDG 8.7.1 Proportion of children engaged in economic activity - <<sex>> - <<classif1>>
         unit: "%"
         short_unit: "%"
         # description_short: Short description of testing variable.
@@ -275,12 +275,12 @@ tables:
         # presentation:
           # title_variant:
         display:
-          name: Proportion of children engaged in economic activity - <<sex>>, <<classif1>>
+          name: Proportion of children engaged in economic activity - <<sex>> - <<classif1>>
           numDecimalPlaces: 1
           <<: *common_display
 
       sdg_8_7_1_children_engaged_in_economic_activity_and_household_chores:
-        title: SDG 8.7.1 Proportion of children engaged in economic activity and household chores - <<sex>>, <<classif1>>
+        title: SDG 8.7.1 Proportion of children engaged in economic activity and household chores - <<sex>> - <<classif1>>
         unit: "%"
         short_unit: "%"
         # description_short: Short description of testing variable.
@@ -288,12 +288,12 @@ tables:
         # presentation:
           # title_variant:
         display:
-          name: Proportion of children engaged in economic activity and household chores - <<sex>>, <<classif1>>
+          name: Proportion of children engaged in economic activity and household chores - <<sex>> - <<classif1>>
           numDecimalPlaces: 1
           <<: *common_display
 
       sdg_8_8_1_fatal_occupational_injuries:
-        title: SDG 8.8.1 Fatal occupational injuries per 100,000 workers - <<sex>>, <<classif1>>
+        title: SDG 8.8.1 Fatal occupational injuries per 100,000 workers - <<sex>> - <<classif1>>
         unit: "fatal injuries per 100,000 workers"
         short_unit: ""
         # description_short: Short description of testing variable.
@@ -301,12 +301,12 @@ tables:
         # presentation:
           # title_variant:
         display:
-          name: Fatal occupational injuries per 100,000 workers - <<sex>>, <<classif1>>
+          name: Fatal occupational injuries per 100,000 workers - <<sex>> - <<classif1>>
           numDecimalPlaces: 1
           <<: *common_display
 
       sdg_8_8_1_non_fatal_occupational_injuries:
-        title: SDG 8.8.1 Non-fatal occupational injuries per 100,000 workers - <<sex>>, <<classif1>>
+        title: SDG 8.8.1 Non-fatal occupational injuries per 100,000 workers - <<sex>> - <<classif1>>
         unit: "non-fatal injuries per 100,000 workers"
         short_unit: ""
         # description_short: Short description of testing variable.
@@ -314,7 +314,7 @@ tables:
         # presentation:
           # title_variant:
         display:
-          name: Non-fatal occupational injuries per 100,000 workers - <<sex>>, <<classif1>>
+          name: Non-fatal occupational injuries per 100,000 workers - <<sex>> - <<classif1>>
           numDecimalPlaces: 1
           <<: *common_display
 
