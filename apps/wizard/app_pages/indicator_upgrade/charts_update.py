@@ -9,14 +9,12 @@ import streamlit as st
 from structlog import get_logger
 
 import etl.grapher.model as gm
-from apps.chart_sync.admin_api import AdminAPI
+from apps.indicator_upgrade.upgrade import push_new_charts_cli
 from apps.wizard.utils import set_states
-from apps.wizard.utils.cached import get_grapher_user
 from apps.wizard.utils.components import st_toast_error, st_wizard_page_link
 from apps.wizard.utils.db import WizardDB
 from etl.config import OWID_ENV
-from etl.files import get_schema_from_url
-from etl.indicator_upgrade.indicator_update import find_charts_from_variable_ids, update_chart_config
+from etl.indicator_upgrade.indicator_update import find_charts_from_variable_ids
 
 # Logger
 log = get_logger()
@@ -94,46 +92,23 @@ def get_affected_charts_and_preview(indicator_mapping: Dict[int, int]) -> List[g
 
 
 def push_new_charts(charts: List[gm.Chart]) -> None:
-    """Updating charts in the database."""
-    # Use Tailscale user if it is available, otherwise use GRAPHER_USER_ID from env
-    grapher_user_id = get_grapher_user().id
-
-    # API to interact with the admin tool
-    api = AdminAPI(OWID_ENV, grapher_user_id=grapher_user_id)
-    # Update charts
-    progress_text = "Updating charts..."
-    bar = st.progress(0, progress_text)
-    try:
-        for i, chart in enumerate(charts):
-            log.info(f"creating comparison for chart {chart.id}")
-            # Update chart config
-            config_new = update_chart_config(
-                chart.config,
-                st.session_state.indicator_mapping,
-                get_schema_from_url(chart.config["$schema"]),
+    """Updating charts in the database using parallelized processing."""
+    with st.spinner("Updating charts in parallel..."):
+        try:
+            # Use the parallelized CLI function
+            indicator_mapping = st.session_state.indicator_mapping
+            push_new_charts_cli(charts, indicator_mapping, dry_run=False)
+        except Exception as e:
+            st.error(
+                "Something went wrong! Maybe the server was not properly launched? Check the job on the GitHub pull request."
             )
-            # Push new chart to DB
-            if chart.id:
-                chart_id = chart.id
-            elif "id" in chart.config:
-                chart_id = chart.config["id"]
-            else:
-                raise ValueError(f"Chart {chart} does not have an ID in config.")
-            api.update_chart(chart_id=chart_id, chart_config=config_new)
-            # Show progress bar
-            percent_complete = int(100 * (i + 1) / len(charts))
-            bar.progress(percent_complete, text=f"{progress_text} {percent_complete}%")
-    except Exception as e:
-        st.error(
-            "Something went wrong! Maybe the server was not properly launched? Check the job on the GitHub pull request."
-        )
-        st.exception(e)
-    else:
-        st.success(
-            "The charts were successfully updated! If indicators from other datasets also need to be upgraded, simply refresh this page, otherwise move on to `chart diff` to review all changes."
-        )
-        st_wizard_page_link("anomalist")
-        st_wizard_page_link("chart-diff")
+            st.exception(e)
+        else:
+            st.success(
+                "The charts were successfully updated! If indicators from other datasets also need to be upgraded, simply refresh this page, otherwise move on to `chart diff` to review all changes."
+            )
+            st_wizard_page_link("anomalist")
+            st_wizard_page_link("chart-diff")
 
 
 def save_variable_mapping(

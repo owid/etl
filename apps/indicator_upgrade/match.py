@@ -371,7 +371,7 @@ def print_mapping_dataframe(mapping: pd.DataFrame, old_dataset_id: int, new_data
 
 def _clear_dataset_mappings(old_dataset_id: int, new_dataset_id: int) -> None:
     """Clear existing variable mappings for a specific dataset pair.
-    
+
     Parameters
     ----------
     old_dataset_id : int
@@ -381,26 +381,26 @@ def _clear_dataset_mappings(old_dataset_id: int, new_dataset_id: int) -> None:
     """
     from sqlalchemy import text
     from sqlalchemy.orm import Session
-    
+
     # Check if table exists
     if not WizardDB.table_exists("wiz__variable_mapping"):
         return
-    
+
     # Delete mappings for this specific dataset pair
     query = """
-    DELETE FROM wiz__variable_mapping 
+    DELETE FROM wiz__variable_mapping
     WHERE dataset_id_old = :old_id AND dataset_id_new = :new_id
     """
-    
+
     engine = get_engine()
     with Session(engine) as s:
         result = s.execute(text(query), {"old_id": old_dataset_id, "new_id": new_dataset_id})
         try:
-            rows_deleted = getattr(result, 'rowcount', 0) or 0
+            rows_deleted = getattr(result, "rowcount", 0) or 0
         except AttributeError:
             rows_deleted = 0
         s.commit()
-        
+
         if rows_deleted > 0:
             print(f"Cleared {rows_deleted} existing mappings for dataset pair {old_dataset_id} -> {new_dataset_id}")
 
