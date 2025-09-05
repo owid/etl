@@ -448,7 +448,6 @@ class ChartDiffShow:
                 stream = api.chat.completions.create(
                     model=MODEL_DEFAULT,
                     messages=messages,  # type: ignore
-                    temperature=0.15,
                     max_completion_tokens=1000,
                     stream=True,
                 )
