@@ -2024,6 +2024,130 @@ class TestRegionAggregator(unittest.TestCase):
         self.assertTrue(pd.isna(europe_data["population"].iloc[0]))
         self.assertTrue(pd.isna(europe_data["gdp"].iloc[0]))
 
+    def test_countries_must_have_data_2(self):
+        """Test the specific bug from GitHub issue #3071 where countries_that_must_have_data
+        was not checked per column but globally."""
+        # Create test data where France has data in col_a but NaN in col_b for 2011
+        # Using countries that are actually in the mock Europe: Belarus, France, Italy, Russia, Spain
+        tb_test = Table(
+            {
+                "country": ["Belarus", "France", "Belarus", "France"],
+                "year": [2010, 2010, 2011, 2011],
+                "col_a": [1, 2, 3, 4],  # France has data in both years
+                "col_b": [1, 2, 5, None],  # France has NaN in 2011
+            }
+        )
+
+        aggregator = geo.RegionAggregator(
+            ds_regions=self.ds_regions,
+            regions_all=self.regions_all,
+            regions=["Europe"],
+            aggregations={"col_a": "sum", "col_b": "sum"},
+            ds_income_groups=self.ds_income_groups,
+        )
+
+        result = aggregator.add_aggregates(
+            tb_test,
+            countries_that_must_have_data={"Europe": ["France"]},
+            check_for_region_overlaps=False,
+        )
+
+        # Get Europe rows
+        europe_data = result[result["country"] == "Europe"].set_index("year").sort_index()
+
+        # For 2010: France has data in both columns, so Europe should have aggregates
+        self.assertFalse(pd.isna(europe_data.loc[2010, "col_a"]))  # Should be 3 (1+2)
+        self.assertFalse(pd.isna(europe_data.loc[2010, "col_b"]))  # Should be 3 (1+2)
+        self.assertEqual(europe_data.loc[2010, "col_a"], 3)
+        self.assertEqual(europe_data.loc[2010, "col_b"], 3)
+
+        # For 2011: France has data in col_a but NaN in col_b
+        # col_a should have aggregate (3+4=7), but col_b should be NaN
+        self.assertFalse(pd.isna(europe_data.loc[2011, "col_a"]))  # Should be 7 (3+4)
+        self.assertTrue(pd.isna(europe_data.loc[2011, "col_b"]))  # Should be NaN because France is NaN
+        self.assertEqual(europe_data.loc[2011, "col_a"], 7)
+
+    def test_countries_must_have_data_3(self):
+        """Test the hierarchical regions bug from GitHub issue #3071 where
+        World could have data even when Asia has no data due to China missing."""
+        # Create test data where China has no data, so Asia should have no data,
+        # and therefore World should have no data
+        tb_test = Table(
+            {
+                "country": ["Belarus", "France", "Italy"],  # Russia missing (which is in Europe)
+                "year": [2020, 2020, 2020],
+                "gdp": [100, 200, 300],
+            }
+        )
+
+        aggregator = geo.RegionAggregator(
+            ds_regions=self.ds_regions,
+            regions_all=self.regions_all,
+            regions=["Europe"],  # Just test Europe for simplicity
+            aggregations={"gdp": "sum"},
+            ds_income_groups=self.ds_income_groups,
+        )
+
+        result = aggregator.add_aggregates(
+            tb_test,
+            countries_that_must_have_data={
+                "Europe": ["Russia"],  # Europe requires Russia, but Russia is missing
+            },
+            check_for_region_overlaps=False,
+        )
+
+        # Get Europe row
+        europe_data = result[result["country"] == "Europe"]
+
+        # Europe should have NaN because Russia is missing
+        if not europe_data.empty:
+            self.assertTrue(pd.isna(europe_data.iloc[0]["gdp"]), "Europe should have NaN GDP because Russia is missing")
+
+    def test_countries_must_have_data_4(self):
+        """Test that countries_that_must_have_data correctly handles both
+        missing rows and NaN values for required countries."""
+        # Test case 1: Required country has no row at all
+        tb_no_row = Table(
+            {
+                "country": ["Belarus"],  # France completely missing
+                "year": [2020],
+                "gdp": [100],
+            }
+        )
+
+        # Test case 2: Required country has row but NaN value
+        tb_nan_value = Table(
+            {
+                "country": ["Belarus", "France"],
+                "year": [2020, 2020],
+                "gdp": [100, None],  # France has NaN
+            }
+        )
+
+        aggregator = geo.RegionAggregator(
+            ds_regions=self.ds_regions,
+            regions_all=self.regions_all,
+            regions=["Europe"],
+            aggregations={"gdp": "sum"},
+            ds_income_groups=self.ds_income_groups,
+        )
+
+        # Both cases should result in Europe having NaN
+        for tb_test, case_name in [(tb_no_row, "no_row"), (tb_nan_value, "nan_value")]:
+            with self.subTest(case=case_name):
+                result = aggregator.add_aggregates(
+                    tb_test,
+                    countries_that_must_have_data={"Europe": ["France"]},
+                    check_for_region_overlaps=False,
+                )
+
+                europe_data = result[result["country"] == "Europe"]
+                if not europe_data.empty:
+                    self.assertTrue(
+                        pd.isna(europe_data.iloc[0]["gdp"]),
+                        f"Europe should have NaN GDP in {case_name} case because France is required but missing/NaN",
+                    )
+
     def test_add_per_capita_basic(self):
         """Test basic add_per_capita functionality."""
         aggregator = geo.RegionAggregator(
