@@ -1567,9 +1567,26 @@ class Regions:
 
     It can also be used in the context of an ETL data step, e.g. to generate the country name harmonization file, or to apply that harmonization to a table.
 
-    ####################################################################################################################
-    # WARNING: This tool is under development, don't start using it just yet!
-    ####################################################################################################################
+    Simply create a regions object:
+    > regions = Regions()
+    and then:
+    - Access the members of a region:
+    > regions.get_region("Europe")["members"]
+    more generally, paths.regions.get_region("Europe") gives a dictionary with all info of the region given in the regions dataset.
+
+    - Access a list of regions:
+    > regions.get_regions(["Africa", "High-income countries"])
+    More conveniently
+    > regions.get_regions(["Africa", "High-income countries"], only_members=True)
+    returns a dictionary {"Africa": ["Algeria", "Angola", ...], "High-income countries": [...], ...}
+
+    The Regions object is instantiated with PathFinder, so, within an ETL step, one can e.g.:
+    - Create a countries harmonization file for the current dataset:
+    > paths.regions.harmonizer()
+    This will start the interactive harmonizer on the interactive window.
+
+    - Apply the country name harmonization to a table, without having to specify the path to the countries file or the excluded countries file.
+    > tb = paths.regions.harmonize_names(tb)
 
     """
 
@@ -1801,20 +1818,37 @@ class Regions:
 class RegionAggregator:
     """Manages operations on tables that have, or need to have, region aggregates.
 
-    ####################################################################################################################
-    # WARNING: This tool is under development, don't start using it just yet!
-    ####################################################################################################################
+    The aggregator is typically created through the `paths.region_aggregator()` method (using PathFinder), which pre-configures it with the necessary inputs.
 
-    TODO: Update docstring after refactor.
+    Examples
+    --------
+    * If you just want to add region aggregates to a table, you can, e.g.:
+    > tb = paths.region_aggregator().add_aggregates(tb)
 
-    The aggregator is typically created through the `Regions.create_region_aggregator()` method, which pre-configures it with the necessary inputs.
+    * You can add per capita indicators in a similar way (regardless of whether you have created region aggregates):
+    > tb = paths.region_aggregator().add_per_capita(tb)
+
+    * A more efficient way to achieve these calculations would be:
+    > tb_agg = paths.region_aggregator()
+    > tb = tb_agg.add_aggregates(tb)
+    > tb = tb_agg.add_per_capita(tb)
+    This avoids repeating certain calculations twice. However, if your table changes index after creating aggregates (e.g. if you pivot or melt), then you need to define tb_agg again and pass the new index_columns argument.
 
     Parameters
     ----------
     ds_regions : Dataset
         Regions dataset.
-    ds_income_groups : Optional[Dataset], default: None
-        World Bank income groups dataset.
+    regions_all : list[str]
+        Complete list of all regions (continents, aggregates, income groups, and the World) defined in the regions dataset.
+    aggregations : Optional[dict[str, Any]], default: None
+        Aggregation to implement for each variable.
+        * If a dictionary is given, the keys must be columns of the input data, and the values must be valid operations.
+        Only the variables indicated in the dictionary will be affected. All remaining variables will have an
+        aggregate value for the new regions of nan.
+        Example: {"column_1": "sum", "column_2": "mean", "column_3": lambda x: some_function(x)}
+        If there is a "column_4" in the data, for which no aggregation is defined, then the e.g. "Europe" will have
+        only nans for "column_4".
+        * If None, "sum" will be assumed to all variables.
     regions : Optional[Union[list[str], dict[str, Any]]], default: None
         Regions to be added.
         * If it is a list, it must contain region names of default regions or income groups.
@@ -1833,21 +1867,14 @@ class RegionAggregator:
                 },
             }
         * If None, the default regions will be added (defined as REGIONS in etl.data_helpers.geo).
-    aggregations : Optional[dict[str, str]], default: None
-        Aggregation to implement for each variable.
-        * If a dictionary is given, the keys must be columns of the input data, and the values must be valid operations.
-        Only the variables indicated in the dictionary will be affected. All remaining variables will have an
-        aggregate value for the new regions of nan.
-        Example: {"column_1": "sum", "column_2": "mean", "column_3": lambda x: some_function(x)}
-        If there is a "column_4" in the data, for which no aggregation is defined, then the e.g. "Europe" will have
-        only nans for "column_4".
-        * If None, "sum" will be assumed to all variables.
     index_columns : Optional[list[str]], default: None
         Names of index columns (usually ["country", "year"]). Aggregations will be done on groups defined by these
         columns (excluding the country column). A country and a year column should always be included.
         But more dimensions are also allowed, e.g. index_columns=["country", "year", "type"].
-    regions_all : list of str
-        Complete list of all regions (continents, aggregates, income groups, and the World) defined in the regions dataset.
+    ds_income_groups : Optional[Dataset], default: None
+        World Bank income groups dataset.
+    ds_population : Optional[Dataset], default: None
+        Population dataset.
     country_col : str, default 'country'
         Name of the country column in the data.
     year_col : str, default 'year'
@@ -2007,7 +2034,6 @@ class RegionAggregator:
         This function does not check if a region (e.g. Africa) overlaps with any of its members (e.g. Algeria). That is common and should not be cause of warning. Therefore, we don't need to account for custom definitions of regions (which is about region memberships, rather than successors).
 
         TODO: Consider adding the option to remove those overlaps.
-        TODO: Consider if successor_type should be a list, to be able to include both "successors" and "related".
         """
         if accepted_overlaps is None:
             accepted_overlaps = []
@@ -2111,12 +2137,8 @@ class RegionAggregator:
         ignore_overlaps_of_zeros: bool = False,
         subregion_type: str = "successors",
         countries_that_must_have_data: dict[str, list[str]] | None = None,
-        # TODO: Consider implementing logic for the following argument (used only once).
-        # frac_countries_that_must_have_data: dict[str, float] | None = None,
     ) -> Table:
-        """Add one or more region aggregates to a table (or dataframe).
-
-        TODO: Update this docstring.
+        """Add region aggregates to a table (or dataframe).
 
         This should be the default function to use when adding data for regions to a table (or dataframe).
         This function respects the metadata of the incoming data.
@@ -2141,10 +2163,6 @@ class RegionAggregator:
             However, if all values in the group are valid, the aggregate will also be valid, even if the number of values
             in the group is smaller than min_num_values_per_year.
             * If None, an aggregate is constructed regardless of the number of non-nan values.
-        country_col : Optional[str], default: "country"
-            Name of country column.
-        year_col : Optional[str], default: "year"
-            Name of year column.
         check_for_region_overlaps : bool, default: True
             * If True, a warning is raised if a historical region has data on the same year as any of its successors.
             * If False, any possible overlap is ignored.
@@ -2170,10 +2188,6 @@ class RegionAggregator:
             must have data for that region. If any of those countries is not informed on a particular variable and year,
             that region will have nan for that particular variable and year.
             * If None, an aggregate is constructed regardless of the countries missing.
-        frac_countries_that_must_have_data: dict[str, float] | None, default: None
-            * If a dictionary is passed, each key must be a valid region, and the value should be a float between 0 and 1,
-            indicating the fraction of countries that must have data for that region. NOTE: Only works if `countries_that_must_have_data` is passed.
-            * If None, an aggregate is constructed regardless of the fraction of countries missing. I.e. it assumes that fraction should be 1 (i.e. 100%).
 
         Returns
         -------
