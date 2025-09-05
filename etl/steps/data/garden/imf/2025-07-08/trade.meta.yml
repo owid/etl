@@ -1,83 +1,161 @@
-# NOTE: To learn more about the fields, hover over their names.
 definitions:
   common:
     processing_level: major
-    display:
-     numDecimalPlaces: 1
     presentation:
       topic_tags:
         - Trade & Globalization
 
-  decimals: &decimals 1
-
-# Learn more about the available fields:
-# http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 365
-
 
 tables:
   trade:
     variables:
       imports_of_goods__cost_insurance_freight__cif__us_dollar:
-        title: "Imports of goods (CIF): << counterpart_country >>"
+        title: Imports of goods from << counterpart_country >> (CIF, current US$)
         unit: "current US$"
         short_unit: "US$"
+        description_short: Total value of goods a country imports from << counterpart_country >>, including freight and insurance costs.
+        description_key:
+          - This indicator shows the total value of merchandise imports that a country brings in from a partner country.
+          - Imports are valued on a CIF basis (Cost, Insurance, and Freight). This means the values include the cost of the goods, as well as the transport and insurance costs to deliver them to the importing country’s border.
+          - The measure covers **goods only**, not services such as software, tourism, or financial services.
+          - Values are expressed in **current US dollars**. They are not adjusted for inflation, so part of the increase over time may reflect rising prices rather than larger trade volumes.
+          - This indicator is useful for understanding the scale of trade relations and economic dependence on specific partner countries.
+          - The numbers reflect official trade statistics and may vary depending on reporting methods used by each country.
+        presentation:
+          title_public: Imports of goods from << counterpart_country >>
         display:
+          name: << counterpart_country >>
           numDecimalPlaces: 0
 
       exports_of_goods__free_on_board__fob__us_dollar:
-        title: "Exports of goods (FOB): << counterpart_country >>"
+        title: Exports of goods to << counterpart_country >> (FOB, current US$)
         unit: "current US$"
         short_unit: "US$"
+        description_short: Total value of goods a country exports to << counterpart_country >>, excluding freight and insurance costs.
+        description_key:
+          - This indicator shows the total value of merchandise exports sent from a country to a partner country.
+          - Exports are valued on an FOB basis (Free on Board). This means the values include the cost of the goods up to the exporter’s border, but exclude transport and insurance costs after that point.
+          - The measure covers **goods only**, not services such as software, tourism, or financial services.
+          - Values are expressed in **current US dollars**. They are not adjusted for inflation, so part of the increase over time may reflect rising prices rather than larger trade volumes.
+          - This indicator highlights the scale and direction of a country’s exports to major partners.
+          - The numbers reflect official trade statistics and may vary depending on reporting methods used by each country.
+        presentation:
+          title_public: Exports of goods to << counterpart_country >>
         display:
+          name: << counterpart_country >>
           numDecimalPlaces: 0
 
       exports_of_goods__free_on_board__fob__share:
-        title: "Share of total exports of goods (FOB): << counterpart_country >>"
+        title: Exports to << counterpart_country >> as a share of total exports
         unit: "%"
         short_unit: "%"
+        description_short: The percentage of a country’s total goods exports that go to << counterpart_country >>.
+        description_key:
+          - This indicator shows how much of a country’s merchandise exports are sent to << counterpart_country >>, expressed as a percentage of country's total exports.
+          - Exports are valued on an FOB basis (Free on Board). This means the values include the cost of the goods up to the exporter’s border, but exclude transport and insurance costs after that point.
+          - It highlights how central << counterpart_country >> is as a market for a country’s goods.
+          - A higher percentage means the country depends more heavily on that partner for its export earnings.
+          - This is particularly useful for spotting whether a country’s exports are diversified or concentrated.
+        description_processing: Shares were calculated by dividing the value of FOB exports to << counterpart_country >> by the total FOB exports to the World, and multiplying the result by 100.
+        presentation:
+          title_public: Exports to << counterpart_country >> as a share of total exports
         display:
-          numDecimalPlaces: *decimals
+          name: << counterpart_country >>
+          numDecimalPlaces: 1
 
       imports_of_goods__cost_insurance_freight__cif__share:
-        title: "Share of total imports of goods (CIF): << counterpart_country >>"
+        title: Imports from << counterpart_country >> as a share of total imports
         unit: "%"
         short_unit: "%"
+        description_short: The percentage of a country’s total goods imports that come from << counterpart_country >>.
+        description_key:
+          - This indicator shows how much of a country’s merchandise imports are sourced from << counterpart_country >>, expressed as a percentage of country's total imports.
+          - Import values are measured on a CIF (Cost, Insurance, and Freight) basis. This means they include the cost of the goods, plus transport and insurance up to the border of the importing country.
+          - It highlights how central << counterpart_country >> is as a supplier of goods to the country.
+          - A higher percentage means stronger dependence on that partner for imports.
+          - This measure is useful for assessing the diversification of import sources and for spotting vulnerabilities in supply chains if reliance on a single partner is high.
+        description_processing: Shares were calculated by dividing the value of CIF imports from << counterpart_country >> by the total CIF imports from the World, and multiplying the result by 100. Calculations were performed for each country and year. Values were omitted when the counterpart was World, since numerator and denominator would otherwise be the same.
+        presentation:
+          title_public: Imports from << counterpart_country >> as a share of total imports
         display:
-          numDecimalPlaces: *decimals
+          name: << counterpart_country >>
+          numDecimalPlaces: 1
 
       share_of_total_trade:
-        title: "Share of total trade volume with << counterpart_country >>"
+        title: Trade with << counterpart_country >> as a share of total trade
         unit: "%"
         short_unit: "%"
+        description_short: The percentage of a country’s total goods trade (exports + imports) that takes place with << counterpart_country >>.
+        description_key:
+          - This indicator shows the share of a country’s total trade in goods that is conducted with << counterpart_country >>.
+          - Bilateral trade with << counterpart_country >> was defined as the sum of exports to and imports from that partner.
+          - Total trade was defined as the sum of all exports and imports with the World (all partners combined).
+          - Export values were measured on an FOB (Free on Board) basis, which includes the value of goods up to the exporter’s border but excludes shipping and insurance.
+          - Import values were measured on a CIF (Cost, Insurance, and Freight) basis, which includes the value of goods plus shipping and insurance to the importer’s border.
+          - A higher percentage indicates that trade is more concentrated with << counterpart_country >>, reflecting greater reliance on that single partner for both imports and exports.
+          - A lower percentage indicates that the country’s trade was spread more broadly across many partners, suggesting greater diversification.
+          - This indicator is useful for assessing overall trade dependence and identifying whether a country’s international trade links are concentrated or distributed across multiple partners.
+        presentation:
+          title_public: Trade with << counterpart_country >> as a share of total trade
         display:
-          numDecimalPlaces: *decimals
+          name: << counterpart_country >>
+          numDecimalPlaces: 1
 
       china_imports_share_of_gdp:
-        title: China imports as share of GDP
+        title: Imports from China as a share of GDP
         unit: "%"
         short_unit: "%"
+        description_short: The value of goods imported from China as a percentage of a country’s [gross domestic product (GDP)](#dod:gdp)
+        description_key:
+          - This indicator shows how much of a country’s economic output is equivalent to the value of goods it imports from China.
+          - Import values are measured on a CIF (Cost, Insurance, and Freight) basis. This means they include the price of the goods, plus transport and insurance costs to bring them to the importer’s border.
+          - GDP figures were taken from the World Bank and calculated as GDP per capita multiplied by population, both expressed in current US dollars.
+          - Expressing imports as a share of GDP highlights the scale of economic dependence on Chinese goods relative to the overall size of the economy.
+          - A higher percentage indicates that Chinese imports play a larger role in the economy, while a lower percentage suggests less reliance on China as a supplier.
+        description_processing: Shares were calculated by dividing the value of CIF imports from China by GDP, and multiplying the result by 100. Import data were sourced directly from official trade statistics and valued in current US dollars. GDP was computed from World Bank indicators as (GDP per capita × population), both measured in current US dollars. This approach ensured consistency across countries and years. Calculations were performed for each country–year, but values were only displayed on rows where the counterpart was World, to prevent duplication.
         display:
-          numDecimalPlaces: *decimals
+          numDecimalPlaces: 1
 
       total_imports_share_of_gdp:
-        title: "Total imports as share of GDP"
+        title: Total imports as a share of GDP
         unit: "%"
         short_unit: "%"
+        description_short: The value of a country’s total goods imports as a percentage of its gross domestic product (GDP)[gross domestic product (GDP)](#dod:gdp).
+        description_key:
+          - This indicator measures how large a country’s total imports are compared with the size of its economy.
+          - Import values include the cost of the goods, plus shipping and insurance up to the importer’s border (CIF basis).
+          - GDP figures come from the World Bank and were calculated by multiplying GDP per capita by population, expressed in current US dollars.
+          - A high percentage means the country relies heavily on imports; a low percentage means it is less dependent on them.
+        description_processing: The share was calculated by comparing the value of total CIF imports with the size of the economy (GDP). Total imports were divided by GDP and multiplied by 100. GDP was based on World Bank data and computed as GDP per capita × population, with all values in current US dollars.
         display:
-          numDecimalPlaces: *decimals
+          numDecimalPlaces: 1
 
       import_rank:
-        title: "<< counterpart_country >> rank in imports of goods (CIF)"
-        unit: rank
-        short_unit: ''
+        title: << counterpart_country >>'s import ranking
+        unit: "rank"
+        short_unit: ""
+        description_short: The rank of << counterpart_country >> among a country’s import partners, based on import values that include the cost of goods, freight, and insurance.
+        description_key:
+          - This indicator shows the rank of << counterpart_country >> among a country’s import partners.
+          - Import values were measured on a CIF (Cost, Insurance, and Freight) basis in current US dollars. This means the figures included the cost of goods plus transport and insurance to the importer’s border.
+          - Rank 1 indicates that << counterpart_country >> was the largest import partner for that country in a given year; rank 2 indicates the second largest, and higher numbers represent lower positions.
+          - This ranking highlights whether << counterpart_country >> was a dominant supplier or played a smaller role in a country’s imports.
+        description_processing: "For each country and year, all import partners were ordered from largest to smallest by their CIF import values in current US dollars. The position of << counterpart_country >> in this ranking was then recorded: 1 if it was the top supplier, 2 if the second largest, and so on. Rankings were produced separately for each year."
         display:
           numDecimalPlaces: 0
 
       top_partner_category:
-        title: Top partner category
-        unit: category
-        short_unit: ''
+        title: Top import partner category
+        unit: ""
+        short_unit: ""
+        description_short: The classification of a country’s largest import partner into one of the globally most frequent top suppliers or “Other”.
+        description_key:
+          - This indicator shows which country was the largest source of imports for each country–year, based on CIF (Cost, Insurance, and Freight) import values in current US dollars.
+          - CIF means the value includes not only the price of the goods themselves, but also the costs of shipping and insuring them up to the importing country’s border.
+          - The top supplier for each country–year was identified, and then a global count was made of how often each country appeared in this role. Here, the top ten countries with the highest counts are shown as separate categories, while the rest were grouped as ‘Other.
+        presentation:
+          title_public: Top import partner category
         display:
           numDecimalPlaces: 0
