@@ -107,7 +107,7 @@ tables:
         title: Imports from China as a share of GDP
         unit: "%"
         short_unit: "%"
-        description_short: The value of goods imported from China as a percentage of a country’s [gross domestic product (GDP)](#dod:gdp)
+        description_short: The value of goods imported from China, including freight and insurance costs, as a percentage of a country’s [gross domestic product (GDP)](#dod:gdp).
         description_key:
           - This indicator shows how much of a country’s economic output is equivalent to the value of goods it imports from China.
           - Import values are measured on a CIF (Cost, Insurance, and Freight) basis. This means they include the price of the goods, plus transport and insurance costs to bring them to the importer’s border.
@@ -122,7 +122,7 @@ tables:
         title: Total imports as a share of GDP
         unit: "%"
         short_unit: "%"
-        description_short: The value of a country’s total goods imports as a percentage of its gross domestic product (GDP)[gross domestic product (GDP)](#dod:gdp).
+        description_short: The value of a country’s total goods imports, including freight and insurance costs, as a percentage of a country’s [gross domestic product (GDP)](#dod:gdp).
         description_key:
           - This indicator measures how large a country’s total imports are compared with the size of its economy.
           - Import values include the cost of the goods, plus shipping and insurance up to the importer’s border (CIF basis).
