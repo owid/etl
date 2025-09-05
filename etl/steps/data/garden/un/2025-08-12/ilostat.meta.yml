@@ -85,7 +85,7 @@ tables:
           <<: *common_display
 
       labour_force_by_sex_and_age:
-        title: Labour force - <<sex>> - <<classif1>>
+        title: Labor force - <<sex>> - <<classif1>>
         unit: "people"
         short_unit: ""
         # description_short: Short description of testing variable.
@@ -93,12 +93,12 @@ tables:
         # presentation:
           # title_variant:
         display:
-          name: Labour force - <<sex>> - <<classif1>>
+          name: Labor force - <<sex>> - <<classif1>>
           numDecimalPlaces: 0
           <<: *common_display
 
       labour_force_participation_rate_by_sex_and_age:
-        title: Labour force participation rate - <<sex>> - <<classif1>>
+        title: Labor force participation rate - <<sex>> - <<classif1>>
         unit: "%"
         short_unit: "%"
         # description_short: Short description of testing variable.
@@ -106,7 +106,7 @@ tables:
         # presentation:
           # title_variant:
         display:
-          name: Labour force participation rate - <<sex>> - <<classif1>>
+          name: Labor force participation rate - <<sex>> - <<classif1>>
           numDecimalPlaces: 1
           <<: *common_display
 
@@ -358,7 +358,7 @@ tables:
           <<: *common_display
 
       sdg_10_4_1_labour_income_share:
-        title: SDG 10.4.1 Labour income share as a percent of GDP
+        title: SDG 10.4.1 Labor income share as a percent of GDP
         unit: "%"
         short_unit: "%"
         # description_short: Short description of testing variable.
@@ -366,7 +366,7 @@ tables:
         # presentation:
           # title_variant:
         display:
-          name: Labour income share as a percent of GDP
+          name: Labor income share as a percent of GDP
           numDecimalPlaces: 1
           <<: *common_display
 
