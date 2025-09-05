@@ -150,7 +150,7 @@ tables:
         title: Top import partner category
         unit: ""
         short_unit: ""
-        description_short: The classification of a country’s largest import partner into one of the globally most frequent top suppliers or “Other”.
+        description_short: The country that was the largest source of imports in a given year, based on merchandise import values that include the cost of goods plus freight and insurance.
         description_key:
           - This indicator shows which country was the largest source of imports for each country–year, based on CIF (Cost, Insurance, and Freight) import values in current US dollars.
           - CIF means the value includes not only the price of the goods themselves, but also the costs of shipping and insuring them up to the importing country’s border.
