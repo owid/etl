@@ -449,7 +449,7 @@ class ChartDiffShow:
                     model=MODEL_DEFAULT,
                     messages=messages,  # type: ignore
                     temperature=0.15,
-                    max_tokens=1000,
+                    max_completion_tokens=1000,
                     stream=True,
                 )
                 response = cast(str, st.write_stream(stream))
