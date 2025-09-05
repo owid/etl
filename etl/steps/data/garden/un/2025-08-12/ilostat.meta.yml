@@ -21,8 +21,8 @@ tables:
     variables:
       average_hourly_earnings_employees_by_sex:
         title: Average hourly earnings of employees (<<sex>>)
-        unit: $
-        short_unit: international-$ in 2021 prices
+        unit: international-$ in 2021 prices
+        short_unit: $
         # description_short: Short description of testing variable.
         # description_key: List of key points about the indicator.
         # presentation:
