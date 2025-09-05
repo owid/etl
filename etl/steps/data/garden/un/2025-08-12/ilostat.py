@@ -1,7 +1,9 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import owid.catalog.processing as pr
+import pandas as pd
 from owid.catalog import Table
+from structlog import get_logger
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder
@@ -9,9 +11,14 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Initialize logger.
+log = get_logger()
 
 # Define release year as the year in the version
 RELEASE_YEAR = int(paths.version.split("-")[0])
+
+# Define threshold for percentage of unreliable data
+UNRELIABLE_THRESHOLD = 1
 
 # Define columns to keep
 COLUMNS_TO_KEEP = [
@@ -61,21 +68,22 @@ COLUMN_CATEGORIES = {
         "Male": "Male",
         "Female": "Female",
         # "Other": "Other",
+        pd.NA: pd.NA,
     },
     "classif1": {
-        "Age (Aggregate bands): 15-24": "Age: 15-24",
-        "Age (Aggregate bands): 25-54": "Age: 25-54",
-        "Age (Aggregate bands): 55-64": "Age: 55-64",
-        "Age (Aggregate bands): 65+": "Age: 65+",
-        "Age (Aggregate bands): Total": "Age: Total",
-        "Age (Child labour bands): '5-11": "Age: 5-11",
-        "Age (Child labour bands): '5-17": "Age: 5-17",
-        "Age (Child labour bands): 12-14": "Age: 12-14",
-        "Age (Child labour bands): 15-17": "Age: 15-17",
-        "Age (Youth, adults): 15+": "Age: 15+",
-        "Age (Youth, adults): 15-24": "Age: 15-24",
-        "Age (Youth, adults): 15-64": "Age: 15-64",
-        "Age (Youth, adults): 25+": "Age: 25+",
+        "Age (Aggregate bands): 15-24": "Age (aggregate): 15-24",
+        "Age (Aggregate bands): 25-54": "Age (aggregate): 25-54",
+        "Age (Aggregate bands): 55-64": "Age (aggregate): 55-64",
+        "Age (Aggregate bands): 65+": "Age (aggregate): 65+",
+        "Age (Aggregate bands): Total": "Age (aggregate): Total",
+        "Age (Child labour bands): '5-11": "Age (child labour): 5-11",
+        "Age (Child labour bands): '5-17": "Age (child labour): 5-17",
+        "Age (Child labour bands): 12-14": "Age (child labour): 12-14",
+        "Age (Child labour bands): 15-17": "Age (child labour): 15-17",
+        "Age (Youth, adults): 15+": "Age (youth, adults): 15+",
+        "Age (Youth, adults): 15-24": "Age (youth, adults): 15-24",
+        "Age (Youth, adults): 15-64": "Age (youth, adults): 15-64",
+        "Age (Youth, adults): 25+": "Age (youth, adults): 25+",
         "Contingency: Children/households receiving child/family cash benefits": "Contingency: Households receiving child/family cash benefits",
         "Contingency: Employed covered in the event of work injury": "Contingency: Employed covered in the event of work injury",
         "Contingency: Mothers with newborns receiving maternity benefits": "Contingency: Mothers with newborns receiving maternity benefits",
@@ -92,17 +100,16 @@ COLUMN_CATEGORIES = {
         "Disability status (Aggregate): Persons without disability": "Disability status: Persons without disability",
         "Disability status (Aggregate): Not elsewhere classified": "Disability status: Not elsewhere classified",
         "Economic activity (Aggregate): Total": "Economic activity: Total",
-        "Economic activity (Aggregate): Agriculture": "Economic activity: Agriculture",
-        "Economic activity (Aggregate): Construction": "Economic activity: Construction",
-        "Economic activity (Aggregate): Manufacturing": "Economic activity: Manufacturing",
-        "Economic activity (Aggregate): Not classified": "Economic activity: Not classified",
-        "Economic activity (Aggregate): Trade, Transportation, Accommodation and Food, and Business and Administrative Services": "Economic activity: Trade, Transportation, Accommodation and Food, and Business and Administrative Services",
-        "Economic activity (Agriculture, Non-Agriculture): Agriculture": "Economic activity (Agriculture, Non-Agriculture): Agriculture",
-        "Economic activity (Agriculture, Non-Agriculture): Non-agriculture": "Economic activity (Agriculture, Non-Agriculture): Non-agriculture",
-        "Economic activity (Broad sector): Agriculture": "Economic activity (Broad sector): Agriculture",
-        "Economic activity (Broad sector): Industry": "Economic activity (Broad sector): Industry",
-        "Economic activity (Broad sector): Services": "Economic activity (Broad sector): Services",
-        "Employment by sex and status in employment -- ILO modelled estimates, Nov. 2024 (thousands)": "Employment by sex and status in employment -- ILO modelled estimates, Nov. 2024 (thousands)",
+        "Economic activity (Aggregate): Agriculture": "Economic activity (aggregate): Agriculture",
+        "Economic activity (Aggregate): Construction": "Economic activity (aggregate): Construction",
+        "Economic activity (Aggregate): Manufacturing": "Economic activity (aggregate): Manufacturing",
+        "Economic activity (Aggregate): Not classified": "Economic activity (aggregate): Not classified",
+        "Economic activity (Aggregate): Trade, Transportation, Accommodation and Food, and Business and Administrative Services": "Economic activity (aggregate): Trade, Transportation, Accommodation and Food, and Business and Administrative Services",
+        "Economic activity (Agriculture, Non-Agriculture): Agriculture": "Economic activity (agriculture vs. non-agriculture): Agriculture",
+        "Economic activity (Agriculture, Non-Agriculture): Non-agriculture": "Economic activity (agriculture vs. non-agriculture): Non-agriculture",
+        "Economic activity (Broad sector): Agriculture": "Economic activity (broad): Agriculture",
+        "Economic activity (Broad sector): Industry": "Economic activity (broad): Industry",
+        "Economic activity (Broad sector): Services": "Economic activity (broad): Services",
         "Migrant status: Migrants": "Migrant status: Migrants",
         "Migrant status: Non migrants": "Migrant status: Non migrants",
         "Migrant status: Total": "Migrant status: Total",
@@ -116,8 +123,8 @@ COLUMN_CATEGORIES = {
         "Occupation (ISCO-08): 7. Craft and related trades workers": "Occupation (ISCO-08): 7. Craft and related trades workers",
         "Occupation (ISCO-08): 8. Plant and machine operators, and assemblers": "Occupation (ISCO-08): 8. Plant and machine operators, and assemblers",
         "Occupation (ISCO-08): 9. Elementary occupations": "Occupation (ISCO-08): 9. Elementary occupations",
-        "Occupation (ISCO-08): Total": "Occupation (ISCO-08): Total",
         "Occupation (ISCO-08): X. Not elsewhere classified": "Occupation (ISCO-08): X. Not elsewhere classified",
+        "Occupation (ISCO-08): Total": "Occupation (ISCO-08): Total",
         "Occupation (ISCO-88): 0. Armed forces": "Occupation (ISCO-88): 0. Armed forces",
         "Occupation (ISCO-88): 1. Legislators, senior officials and managers": "Occupation (ISCO-88): 1. Legislators, senior officials and managers",
         "Occupation (ISCO-88): 2. Professionals": "Occupation (ISCO-88): 2. Professionals",
@@ -128,21 +135,29 @@ COLUMN_CATEGORIES = {
         "Occupation (ISCO-88): 7. Craft and related trades workers": "Occupation (ISCO-88): 7. Craft and related trades workers",
         "Occupation (ISCO-88): 8. Plant and machine operators and assemblers": "Occupation (ISCO-88): 8. Plant and machine operators and assemblers",
         "Occupation (ISCO-88): 9. Elementary occupations": "Occupation (ISCO-88): 9. Elementary occupations",
-        "Occupation (ISCO-88): Total": "Occupation (ISCO-88): Total",
         "Occupation (ISCO-88): X. Not elsewhere classified": "Occupation (ISCO-88): X. Not elsewhere classified",
+        "Occupation (ISCO-88): Total": "Occupation (ISCO-88): Total",
+        "Occupation (Skill level): Skill level 1 ~ low": "Occupation (Skill level): Low",
+        "Occupation (Skill level): Skill level 2 ~ medium": "Occupation (Skill level): Medium",
+        "Occupation (Skill level): Skill levels 3 and 4 ~ high": "Occupation (Skill level): High",
         "Occupation (Skill level): Not elsewhere classified": "Occupation (Skill level): Not elsewhere classified",
-        "Occupation (Skill level): Skill level 1 ~ low": "Occupation (Skill level): Skill level 1 ~ low",
-        "Occupation (Skill level): Skill level 2 ~ medium": "Occupation (Skill level): Skill level 2 ~ medium",
-        "Occupation (Skill level): Skill levels 3 and 4 ~ high": "Occupation (Skill level): Skill levels 3 and 4 ~ high",
         "Occupation (Skill level): Total": "Occupation (Skill level): Total",
-        "Share of children in child labour by sex and age (%)": "Share of children in child labour by sex and age (%)",
-        "Status in employment (Aggregate): Self-employed": "Status in employment (Aggregate): Self-employed",
-        "Status in employment (Aggregate): Total": "Status in employment (Aggregate): Total",
+        "Status in employment (Aggregate): Self-employed": "Status in employment (aggregate): Self-employed",
+        "Status in employment (Aggregate): Total": "Status in employment (aggregate): Total",
         "Status in employment (ICSE-93): 1. Employees": "Status in employment (ICSE-93): 1. Employees",
         "Status in employment (ICSE-93): 2. Employers": "Status in employment (ICSE-93): 2. Employers",
         "Status in employment (ICSE-93): 3. Own-account workers": "Status in employment (ICSE-93): 3. Own-account workers",
         "Status in employment (ICSE-93): 5. Contributing family workers": "Status in employment (ICSE-93): 5. Contributing family workers",
         "Status in employment (ICSE-93): Total": "Status in employment (ICSE-93): Total",
+        pd.NA: pd.NA,
+    },
+    "obs_status": {
+        "Real value": "Real value",
+        "Adjusted": "Adjusted",
+        "Imputation": "Imputation",
+        "Break in series": "Break in series",
+        "Unreliable": "Unreliable",
+        pd.NA: pd.NA,
     },
 }
 
@@ -176,44 +191,38 @@ def run() -> None:
     tb = add_indicator_metadata(tb=tb, tb_metadata=tb_classif2, column="classif2")
     tb = add_indicator_metadata(tb=tb, tb_metadata=tb_obs_status, column="obs_status")
 
-    print(tb)
+    tb = make_table_wide(tb=tb)
 
-    tb = add_ilo_regions(tb=tb, tb_regions=tb_regions)
+    tb_regions = format_ilo_regions(tb_regions=tb_regions)
 
     # Harmonize country names.
     tb = geo.harmonize_countries(
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
+    tb_regions = geo.harmonize_countries(
+        df=tb_regions, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
+    )
 
     # Improve table format.
-    tb = tb.format(["country", "year"])
+    tb = tb.format(["country", "year", "sex", "classif1"])
+    tb_regions = tb_regions.format(["country", "year"], short_name="regions")
 
     #
     # Save outputs.
     #
     # Initialize a new garden dataset.
-    ds_garden = paths.create_dataset(tables=[tb], default_metadata=ds_ilostat.metadata)
+    ds_garden = paths.create_dataset(tables=[tb, tb_regions], default_metadata=ds_ilostat.metadata)
 
     # Save garden dataset.
     ds_garden.save()
 
 
-def add_ilo_regions(tb: Table, tb_regions: Table) -> Table:
+def format_ilo_regions(tb_regions: Table) -> Table:
     """
-    Add ILO regions and subregions to the table.
+    Format the ILO regions table.
     """
 
-    tb = tb.copy()
     tb_regions = tb_regions.copy()
-
-    # Rename columns
-    tb = tb.rename(
-        columns={
-            "ref_area": "country",
-            "time": "year",
-        },
-        errors="raise",
-    )
 
     # Filter freq
     tb_regions = tb_regions[tb_regions["freq"] == "A"].reset_index(drop=True)
@@ -234,10 +243,7 @@ def add_ilo_regions(tb: Table, tb_regions: Table) -> Table:
     # Add year column as RELEASE_YEAR
     tb_regions["year"] = RELEASE_YEAR
 
-    # Merge with the main table
-    tb = pr.merge(tb, tb_regions, on=["country", "year"], how="outer")
-
-    return tb
+    return tb_regions
 
 
 def add_indicator_metadata(tb: Table, tb_metadata: Table, column: str) -> Table:
@@ -246,6 +252,21 @@ def add_indicator_metadata(tb: Table, tb_metadata: Table, column: str) -> Table:
     """
 
     tb = tb.copy()
+
+    # Skip and drop if there are no values in column
+    if tb[column].isnull().all():
+        tb = tb.drop(columns=[column], errors="raise")
+        return tb
+
+    if column == "obs_status":
+        # Count the % of obs_status that are U, from the total (including nulls)
+        pct_u = (tb[column] == "U").sum() / len(tb[column]) * 100
+        message = f"{pct_u:.2f}% of the observations are 'U', unreliable"
+        if pct_u > UNRELIABLE_THRESHOLD:
+            if "Unreliable" in COLUMN_CATEGORIES[column].keys():
+                log.warning(f"{message}, but we are keeping them")
+            else:
+                log.warning(f"{message}, and we are dropping them")
 
     # Assert that there is info for every column
     assert set(
@@ -262,8 +283,6 @@ def add_indicator_metadata(tb: Table, tb_metadata: Table, column: str) -> Table:
     # Rename column_label to column
     tb = tb.rename(columns={f"{column}_label": column}, errors="raise")
 
-    print(set(tb[column].unique()))
-
     # Filter tb by the values in COLUMN_CATEGORIES[column].keys()
     tb = tb[tb[column].isin(COLUMN_CATEGORIES[column].keys())].reset_index(drop=True)
 
@@ -274,5 +293,52 @@ def add_indicator_metadata(tb: Table, tb_metadata: Table, column: str) -> Table:
 
     # Rename categories in column
     tb[column] = tb[column].replace(COLUMN_CATEGORIES[column])
+
+    return tb
+
+
+def make_table_wide(tb: Table) -> Table:
+    """
+    Make the table wide by pivoting the indicators.
+    """
+
+    tb = tb.copy()
+
+    # Rename columns
+    tb = tb.rename(
+        columns={
+            "ref_area": "country",
+            "time": "year",
+        },
+        errors="raise",
+    )
+
+    # Build mapping from indicator to its description
+    indicator_dict = (
+        tb[["indicator", "indicator_description"]]
+        .drop_duplicates()
+        .set_index("indicator")["indicator_description"]
+        .to_dict()
+    )
+
+    # Pivot the table
+    tb = tb.pivot(
+        index=[
+            "country",
+            "year",
+            "sex",
+            "classif1",
+        ],
+        columns=["indicator"],
+        values=["obs_value"],
+        join_column_levels_with="_",
+    )
+
+    # Remove "obs_value_" from the column names
+    tb.columns = [col.replace("obs_value_", "") for col in tb.columns]
+
+    # For each indicator column, add description_from_producer metadata
+    for indicator in indicator_dict.keys():
+        tb[indicator].metadata.description_from_producer = indicator_dict[indicator]
 
     return tb

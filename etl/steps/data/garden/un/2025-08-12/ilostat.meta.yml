@@ -1,9 +1,13 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
   common:
+    description_processing: ""
     presentation:
+      attribution_short: ILO
       topic_tags:
-        - Uncategorized
+        - Labor & Employment
+    display: &common_display
+      tolerance: 5
 
 
 # Learn more about the available fields:
@@ -15,44 +19,371 @@ dataset:
 tables:
   ilostat:
     variables:
-      # testing_variable:
-      #   title: Testing variable title
-      #   unit: arbitrary units
-      #   short_unit: au
-      #   description_short: Short description of testing variable.
-      #   description_key: List of key points about the indicator.
-      #   processing_level: minor
-      #   description_processing: Description of processing of testing variable.
-      #   description_from_producer: Description of testing variable from producer.
-      #   type:
-      #   sort:
-      #   presentation:
-      #     attribution:
-      #     attribution_short:
-      #     faqs:
-      #     grapher_config:
-      #     title_public:
-      #     title_variant:
-      #     topic_tags:
-      #   display:
-      #     name: Testing variable
-      #     numDecimalPlaces: 0
-      #     tolerance: 0
-      #     color:
-      #     conversionFactor: 1
-      #     description:
-      #     entityAnnotationsMap: Test annotation
-      #     includeInTable:
-      #     isProjection: false
-      #     unit: arbitrary units
-      #     shortUnit: au
-      #     tableDisplay:
-      #       hideAbsoluteChange:
-      #       hideRelativeChange:
-      #     yearIsDay: false
-      #     zeroDay:
-      #     roundingMode:
-      #     numSignificantFigures:
-      #
-      {}
+      average_hourly_earnings_employees_by_sex:
+        title: Average hourly earnings of employees (<<sex>>)
+        unit: $
+        short_unit: international-$ in 2021 prices
+        # description_short: Short description of testing variable.
+        # description_key: List of key points about the indicator.
+        # presentation:
+          # title_variant:
+        display:
+          name: Average hourly earnings of employees (<<sex>>)
+          numDecimalPlaces: 1
+          <<: *common_display
 
+      employment_by_sex_and_status_in_employment:
+        title: Employment (<<sex>>, <<classif1>>)
+        unit: "people"
+        short_unit: ""
+        # description_short: Short description of testing variable.
+        # description_key: List of key points about the indicator.
+        # presentation:
+          # title_variant:
+        display:
+          name: Employment (<<sex>>, <<classif1>>)
+          numDecimalPlaces: 0
+          <<: *common_display
+
+      female_share_of_low_pay_earners:
+        title: Female share of low pay earners
+        unit: "%"
+        short_unit: "%"
+        # description_short: Short description of testing variable.
+        # description_key: List of key points about the indicator.
+        # presentation:
+          # title_variant:
+        display:
+          name: Female share of low pay earners
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      gender_wage_gap_by_occupation:
+        title: Gender wage gap (<<classif1>>)
+        unit: "%"
+        short_unit: "%"
+        # description_short: Short description of testing variable.
+        # description_key: List of key points about the indicator.
+        # presentation:
+          # title_variant:
+        display:
+          name: Gender wage gap (<<classif1>>)
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      informal_employment_rate_by_sex:
+        title: Informal employment rate (<<sex>>)
+        unit: "%"
+        short_unit: "%"
+        # description_short: Short description of testing variable.
+        # description_key: List of key points about the indicator.
+        # presentation:
+          # title_variant:
+        display:
+          name: Informal employment rate (<<sex>>)
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      labour_force_by_sex_and_age:
+        title: Labour force (<<sex>>, <<classif1>>)
+        unit: "people"
+        short_unit: ""
+        # description_short: Short description of testing variable.
+        # description_key: List of key points about the indicator.
+        # presentation:
+          # title_variant:
+        display:
+          name: Labour force (<<sex>>, <<classif1>>)
+          numDecimalPlaces: 0
+          <<: *common_display
+
+      labour_force_participation_rate_by_sex_and_age:
+        title: Labour force participation rate (<<sex>>, <<classif1>>)
+        unit: "%"
+        short_unit: "%"
+        # description_short: Short description of testing variable.
+        # description_key: List of key points about the indicator.
+        # presentation:
+          # title_variant:
+        display:
+          name: Labour force participation rate (<<sex>>, <<classif1>>)
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      share_of_children_in_child_labour_by_sex_and_age:
+        title: Share of children in child labor (<<sex>>, <<classif1>>)
+        unit: "%"
+        short_unit: "%"
+        # description_short: Short description of testing variable.
+        # description_key: List of key points about the indicator.
+        # presentation:
+          # title_variant:
+        display:
+          name: Share of children in child labor (<<sex>>, <<classif1>>)
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      unemployment_rate_by_sex_and_age:
+        title: Unemployment rate (<<sex>>, <<classif1>>)
+        unit: "%"
+        short_unit: "%"
+        # description_short: Short description of testing variable.
+        # description_key: List of key points about the indicator.
+        # presentation:
+          # title_variant:
+        display:
+          name: Unemployment rate (<<sex>>, <<classif1>>)
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      sdg_1_1_1_working_poverty_rate:
+        title: SDG 1.1.1 Working poverty rate (<<sex>>, <<classif1>>)
+        unit: "%"
+        short_unit: "%"
+        # description_short: Short description of testing variable.
+        # description_key: List of key points about the indicator.
+        # presentation:
+          # title_variant:
+        display:
+          name: Working poverty rate (<<sex>>, <<classif1>>)
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      sdg_1_3_1_population_covered_by_social_protection:
+        title: SDG 1.3.1 Proportion of population covered by social protection (<<sex>>, <<classif1>>)
+        unit: "%"
+        short_unit: "%"
+        # description_short: Short description of testing variable.
+        # description_key: List of key points about the indicator.
+        # presentation:
+          # title_variant:
+        display:
+          name: Proportion of population covered by social protection (<<sex>>, <<classif1>>)
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      sdg_5_5_2_women_in_management:
+        title: SDG 5.5.2 Proportion of women in managerial positions
+        unit: "%"
+        short_unit: "%"
+        # description_short: Short description of testing variable.
+        # description_key: List of key points about the indicator.
+        # presentation:
+          # title_variant:
+        display:
+          name: Proportion of women in managerial positions
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      sdg_5_5_2_women_in_senior_middle_management:
+        title: SDG 5.5.2 Proportion of women in senior and middle management positions
+        unit: "%"
+        short_unit: "%"
+        # description_short: Short description of testing variable.
+        # description_key: List of key points about the indicator.
+        # presentation:
+          # title_variant:
+        display:
+          name: Proportion of women in senior and middle management positions
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      sdg_8_2_1_growth_rate_output_per_worker:
+        title: SDG 8.2.1 Growth rate of output per worker
+        unit: "%"
+        short_unit: "%"
+        # description_short: Short description of testing variable.
+        # description_key: List of key points about the indicator.
+        # presentation:
+          # title_variant:
+        display:
+          name: Growth rate of output per worker
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      sdg_8_3_1_informal_employment:
+        title: SDG 8.3.1 Proportion of informal employment in total employment (<<sex>>, <<classif1>>)
+        unit: "%"
+        short_unit: "%"
+        # description_short: Short description of testing variable.
+        # description_key: List of key points about the indicator.
+        # presentation:
+          # title_variant:
+        display:
+          name: Proportion of informal employment in total employment (<<sex>>, <<classif1>>)
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      sdg_8_5_1_average_hourly_earnings:
+        title: SDG 8.5.1 Average hourly earnings of employees (<<sex>>, <<classif1>>)
+        unit: "current local currency unit"
+        short_unit: "LCU"
+        # description_short: Short description of testing variable.
+        # description_key: List of key points about the indicator.
+        # presentation:
+          # title_variant:
+        display:
+          name: Average hourly earnings of employees (<<sex>>, <<classif1>>)
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      sdg_8_5_2_unemployment_rate:
+        title: SDG 8.5.2 Unemployment rate (<<sex>>, <<classif1>>)
+        unit: "%"
+        short_unit: "%"
+        # description_short: Short description of testing variable.
+        # description_key: List of key points about the indicator.
+        # presentation:
+          # title_variant:
+        display:
+          name: Unemployment rate (<<sex>>, <<classif1>>)
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      sdg_8_5_2_unemployment_rate_by_disability_status:
+        title: SDG 8.5.2 Unemployment rate by disability status (<<sex>>, <<classif1>>)
+        unit: "%"
+        short_unit: "%"
+        # description_short: Short description of testing variable.
+        # description_key: List of key points about the indicator.
+        # presentation:
+          # title_variant:
+        display:
+          name: Unemployment rate by disability status (<<sex>>, <<classif1>>)
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      sdg_8_6_1_youth_neet:
+        title: SDG 8.6.1 Proportion of youth (aged 15-24) not in education, employment or training (NEET) (<<sex>>)
+        unit: "%"
+        short_unit: "%"
+        # description_short: Short description of testing variable.
+        # description_key: List of key points about the indicator.
+        # presentation:
+          # title_variant:
+        display:
+          name: Proportion of youth (aged 15-24) not in education, employment or training (NEET) (<<sex>>)
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      sdg_8_7_1_children_engaged_in_economic_activity:
+        title: SDG 8.7.1 Proportion of children engaged in economic activity (<<sex>>, <<classif1>>)
+        unit: "%"
+        short_unit: "%"
+        # description_short: Short description of testing variable.
+        # description_key: List of key points about the indicator.
+        # presentation:
+          # title_variant:
+        display:
+          name: Proportion of children engaged in economic activity (<<sex>>, <<classif1>>)
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      sdg_8_7_1_children_engaged_in_economic_activity_and_household_chores:
+        title: SDG 8.7.1 Proportion of children engaged in economic activity and household chores (<<sex>>, <<classif1>>)
+        unit: "%"
+        short_unit: "%"
+        # description_short: Short description of testing variable.
+        # description_key: List of key points about the indicator.
+        # presentation:
+          # title_variant:
+        display:
+          name: Proportion of children engaged in economic activity and household chores (<<sex>>, <<classif1>>)
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      sdg_8_8_1_fatal_occupational_injuries:
+        title: SDG 8.8.1 Fatal occupational injuries per 100,000 workers (<<sex>>, <<classif1>>)
+        unit: "fatal injuries per 100,000 workers"
+        short_unit: ""
+        # description_short: Short description of testing variable.
+        # description_key: List of key points about the indicator.
+        # presentation:
+          # title_variant:
+        display:
+          name: Fatal occupational injuries per 100,000 workers (<<sex>>, <<classif1>>)
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      sdg_8_8_1_non_fatal_occupational_injuries:
+        title: SDG 8.8.1 Non-fatal occupational injuries per 100,000 workers (<<sex>>, <<classif1>>)
+        unit: "non-fatal injuries per 100,000 workers"
+        short_unit: ""
+        # description_short: Short description of testing variable.
+        # description_key: List of key points about the indicator.
+        # presentation:
+          # title_variant:
+        display:
+          name: Non-fatal occupational injuries per 100,000 workers (<<sex>>, <<classif1>>)
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      sdg_8_8_2_national_compliance_labour_rights:
+        title: SDG 8.8.2 Level of national compliance with labor rights
+        unit: ""
+        short_unit: ""
+        # description_short: Short description of testing variable.
+        # description_key: List of key points about the indicator.
+        # presentation:
+          # title_variant:
+        display:
+          name: Level of national compliance with labor rights
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      sdg_8_b_1_national_strategy_youth_employment:
+        title: SDG 8.b.1 Existence of a developed and operationalized national strategy for youth employment
+        unit: ""
+        short_unit: ""
+        # description_short: Short description of testing variable.
+        # description_key: List of key points about the indicator.
+        # presentation:
+          # title_variant:
+        display:
+          name: Existence of a developed and operationalized national strategy for youth employment
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      sdg_9_2_2_manufacturing_employment:
+        title: SDG 9.2.2 Manufacturing employment as a proportion of total employment
+        unit: "%"
+        short_unit: "%"
+        # description_short: Short description of testing variable.
+        # description_key: List of key points about the indicator.
+        # presentation:
+          # title_variant:
+        display:
+          name: Manufacturing employment as a proportion of total employment
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      sdg_10_4_1_labour_income_share:
+        title: SDG 10.4.1 Labour income share as a percent of GDP
+        unit: "%"
+        short_unit: "%"
+        # description_short: Short description of testing variable.
+        # description_key: List of key points about the indicator.
+        # presentation:
+          # title_variant:
+        display:
+          name: Labour income share as a percent of GDP
+          numDecimalPlaces: 1
+          <<: *common_display
+
+  regions:
+    variables:
+      ilo_region:
+        title: ILO region
+        unit: ""
+        short_unit: ""
+        description_short: World regions as defined by the International Labour Organization (ILO).
+        display:
+          name: ILO region
+
+      ilo_subregion:
+        title: ILO subregion
+        unit: ""
+        short_unit: ""
+        description_short: World subregions as defined by the International Labour Organization (ILO).
+        display:
+          name: ILO subregion
