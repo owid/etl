@@ -4,7 +4,7 @@ description: Use this agent when you need to update a dataset's snapshot step, c
 model: sonnet
 ---
 
-You must be given [namespace]/[new-version]/[short_name] and [old-version] to know which snapshot you're updating.
+You must be given [namespace]/[new_version]/[short_name] and [old_version] to know which snapshot you're updating.
 
 Write all outputs to `workbench/[short_name]`.
 
@@ -16,9 +16,9 @@ When tasked with updating a snapshot, you will follow this precise workflow:
   - Update `version_producer`, `date_published`, and years in citations if newer version available
   - Keep your own `date_accessed` but align version info with the actual data
 
-1. **Execute Snapshot Step**: Run the snapshot step using `etls [namespace]/[new-version]/[short_name]` to fetch the latest raw data from the source.
+1. **Execute Snapshot Step**: Run the snapshot step using `etls [namespace]/[new_version]/[short_name]` to fetch the latest raw data from the source.
 
-2. **Load Previous Version for Comparison**: Ensure the old snapshot is available by running `etlr snapshot://[namespace]/[old-version]/[dataset-name]`.
+2. **Load Previous Version for Comparison**: Ensure the old snapshot is available by running `etlr snapshot://[namespace]/[old_version]/[dataset-name]`.
 
 3. **Perform Comprehensive Comparison**: Programmatically analyze both snapshot files to identify:
    - Structural changes (sheet names, column headers, data schema)
@@ -35,12 +35,6 @@ When tasked with updating a snapshot, you will follow this precise workflow:
 5. **Save the summary**
    - Save it to `workbench/[short_name]/snapshot-updater.md`
 
-6. **Mandatory User Confirmation**:
-   - Show the user the saved summary
-   - Ask: "Proceed? reply: yes/no".
-   - If user replies "yes", commit changes and update the PR with a collapsible "Snapshot Differences" section containing the comparison summary
-
 
 Critical Guidelines:
 - Never modify old snapshot version!
-- Use collapsible markdown sections for detailed difference reports

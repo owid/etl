@@ -716,7 +716,7 @@ MAP_BRACKETS = {
     },
     "immigrant_share_of_dest_population_all": {
         "colorScaleScheme": "YlGnBu",
-        "colorScaleNumericBins": [1.0, 2.0, 5.0, 10.0, 10.0, 20.0, 0],
+        "colorScaleNumericBins": [1.0, 2.0, 5.0, 10.0, 20.0, 0],
     },
     "emigrants_all": {
         "colorScaleScheme": "YlGnBu",
@@ -724,7 +724,7 @@ MAP_BRACKETS = {
     },
     "emigrants_share_of_total_population": {
         "colorScaleScheme": "YlGnBu",
-        "colorScaleNumericBins": [2.0, 5.0, 10.0, 15.0, 0],
+        "colorScaleNumericBins": [1.0, 2.0, 5.0, 10.0, 20.0, 0],
     },
     "net_migration": {
         "colorScaleScheme": "RdYlBu",

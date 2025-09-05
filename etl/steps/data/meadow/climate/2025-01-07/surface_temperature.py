@@ -12,6 +12,7 @@ from owid.catalog import Table
 from rioxarray.exceptions import NoDataInBounds, OneDimensionalRaster
 from shapely.geometry import mapping
 from structlog import get_logger
+from tenacity import Retrying, retry_if_exception_type, stop_after_attempt, wait_fixed
 from tqdm import tqdm
 
 from etl.helpers import PathFinder
@@ -42,7 +43,10 @@ def _load_data_array(snap: Snapshot) -> xr.DataArray:
     da = da["t2m"] - 273.15
 
     # Set the coordinate reference system for the temperature data to EPSG 4326.
-    da = da.rio.write_crs("epsg:4326")
+    # NOTE: we're getting random ValueError from pyproj
+    for attempt in Retrying(retry=retry_if_exception_type(ValueError), stop=stop_after_attempt(3), wait=wait_fixed(2)):
+        with attempt:
+            da = da.rio.write_crs("epsg:4326")
 
     return da
 
@@ -185,5 +189,7 @@ def run() -> None:
     # Create a new meadow dataset with the same metadata as the snapshot.
     ds_meadow = paths.create_dataset(tables=[tb], check_variables_metadata=True, default_metadata=snap.metadata)
 
+    # Save changes in the new garden dataset.
+    ds_meadow.save()
     # Save changes in the new garden dataset.
     ds_meadow.save()
