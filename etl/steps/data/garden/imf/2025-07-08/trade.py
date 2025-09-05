@@ -1,4 +1,4 @@
-"""Load a meadow dataset and create a garden dataset for IMF trade data focusing on Asia and China."""
+"""Load a meadow dataset and create a garden dataset for IMF trade data."""
 
 from __future__ import annotations
 
@@ -28,13 +28,12 @@ REGIONS_OF_INTEREST = [
 ]
 REGIONS_OWID = ["North America", "South America", "Europe", "Africa", "Asia", "Oceania"]
 
-# Column name constants (as they appear in the IMF/Meadow table)
+# Column name constants for imports and exports
 EXPORT_COL = "Exports of goods, Free on board (FOB), US dollar"
 IMPORT_COL = "Imports of goods, Cost insurance freight (CIF), US dollar"
 
 
 def run() -> None:
-    """Main ETL function to process IMF trade data for Asia and China analysis."""
     # Load inputs
     ds_meadow = paths.load_dataset("trade")
     ds_regions = paths.load_dataset("regions")
@@ -53,12 +52,11 @@ def run() -> None:
     tb_long = clean_historical_overlaps(tb_long, country_col="country")
     tb_long = clean_historical_overlaps(tb_long, country_col="counterpart_country")
 
-    # --- Member countries (for “all-countries” analyses) ------------------------
+    # --- Member countries (for “all-countries” analyses) which exclude regional aggregates ------------------------
     members: set[str] = set()
     for region in REGIONS_OWID:
         members.update(geo.list_members_of_region(region=region, ds_regions=ds_regions))
 
-    # This snapshot of country-to-country flows (no regions) is used later
     tb_all_countries = tb_long[
         (tb_long["country"].isin(members)) & (tb_long["counterpart_country"].isin(members))
     ].copy()
@@ -73,10 +71,10 @@ def run() -> None:
         & (tb_long["counterpart_country"].isin(REGIONS_OF_INTEREST + ["World"]))
     ].copy()
 
-    # --- Convert to WIDE & compute shares vs. each country's world totals -------
+    # --- Compute shares vs. each country's world totals -------
     tb = calculate_trade_shares_as_share_world(tb_long)
 
-    # Relabel self-trade as “Intraregional” *only* for regions (and never for World).
+    # Relabel self-trade as “Intraregional” *only* for regions.
     _regions_for_intraregional = set(REGIONS_OWID + ["European Union (IMF)", "Asia (excl. China)"])
     mask_intraregional = (
         tb["country"].isin(_regions_for_intraregional)
@@ -84,20 +82,6 @@ def run() -> None:
         & (tb["country"] != "World")
     )
     tb.loc[mask_intraregional, "counterpart_country"] = "Intraregional"
-
-    # Select/Order columns used downstream
-    tb = tb[
-        [
-            "country",
-            "year",
-            "counterpart_country",
-            "exports_of_goods__free_on_board__fob__share",
-            "imports_of_goods__cost_insurance_freight__cif__share",
-            "share_of_total_trade",
-            EXPORT_COL,
-            IMPORT_COL,
-        ]
-    ].copy()
 
     # --- GDP --------------------------------------------------------------
     gdp_data = _load_gdp_data(ds_wdi, ds_population)
@@ -113,8 +97,7 @@ def run() -> None:
         tb,
         total_imports,
         on=["country", "year", "counterpart_country"],
-        how="left",  # left keeps structure of tb and avoids accidental cartesian products
-        # validate="m:1",  # uncomment if pr.merge supports pandas' validate
+        how="left",
     )
 
     # --- Top partner classification (based on imports) --------------------
@@ -124,7 +107,6 @@ def run() -> None:
         tb_top_partners,
         on=["country", "year", "counterpart_country"],
         how="left",
-        # validate="m:1",
     )
 
     # --- Importer ranking for China & US ---------------------------------
@@ -137,10 +119,9 @@ def run() -> None:
         tb_china_us,
         on=["country", "year", "counterpart_country"],
         how="left",
-        # validate="m:1",
     )
 
-    # --- Format & save ----------------------------------------------------
+    # --- Format, add origins & save ----------------------------------------------------
     tb = tb.format(["country", "year", "counterpart_country"])
     for col in tb.columns:
         tb[col] = tb[col].copy_metadata(tb_long["value"])
@@ -207,7 +188,6 @@ def calculate_trade_shares_as_share_world(tb_long: Table) -> Table:
     Calculate trade shares for a given (LONG) table, using each country's
     counterpart='World' row as the total.
     """
-    # Robust pivot in case there are rare duplicate rows (sum them).
     wide = (
         tb_long.pivot_table(
             index=["country", "year", "counterpart_country"],
@@ -286,7 +266,6 @@ def add_china_imports_share_of_gdp(tb: Table, gdp_data: Table) -> Table:
         china_gdp,
         on=["country", "year", "counterpart_country"],
         how="left",
-        # validate="m:1",
     )
     return tb
 
@@ -301,40 +280,6 @@ def add_total_imports_share_of_gdp(tb_world: Table, gdp_data: Table) -> Table:
     out = total_imports[["country", "year", "total_imports_share_of_gdp"]].copy()
     out["counterpart_country"] = "World"
     return out
-
-
-def calculate_trade_relationship_shares(tb: Table) -> Table:
-    """(Unused in final output) Example of classifying bilateral/unilateral/non-trading shares."""
-    THRESHOLD = 0.01  # million USD
-    df = tb[tb.indicator.isin([EXPORT_COL, IMPORT_COL])].assign(has_trade=lambda d: d.value.fillna(0) > THRESHOLD)
-
-    c1 = df[["country", "counterpart_country"]]
-    df["pair"] = pd.Series(
-        np.where(
-            c1.country.values < c1.counterpart_country.values,
-            c1.country.values + "--" + c1.counterpart_country.values,
-            c1.counterpart_country.values + "--" + c1.country.values,
-        ),
-        index=df.index,
-    )
-
-    active = df[df.has_trade]
-    dir_counts = active.groupby(["year", "pair"])["country"].nunique().reset_index(name="n_dirs")
-
-    all_pairs = df[["year", "pair"]].drop_duplicates()
-    status = all_pairs.merge(dir_counts, on=["year", "pair"], how="left").fillna({"n_dirs": 0})
-
-    status["relationship"] = pd.cut(
-        status.n_dirs, bins=[-0.1, 0.1, 1.1, 2.1], labels=["non_trading", "unilateral", "bilateral"]
-    )
-
-    counts = status.groupby(["year", "relationship"]).size().unstack(fill_value=0)
-    total = counts.sum(axis=1)
-    shares = counts.divide(total, axis=0).multiply(100)
-    shares = shares.rename(
-        columns={"bilateral": "share_bilateral", "unilateral": "share_unilateral", "non_trading": "share_non_trading"}
-    ).reset_index()
-    return shares
 
 
 def get_top_partner(tb: Table) -> Table:
@@ -406,3 +351,37 @@ def clean_historical_overlaps(tb: Table, country_col: str = "country") -> Table:
     for country, year in exclude_members_of_historical_regions.items():
         tb_cleaned = tb_cleaned[~((tb_cleaned[country_col] == country) & (tb_cleaned["year"] < year))]
     return tb_cleaned
+
+
+def calculate_trade_relationship_shares(tb: Table) -> Table:
+    """(Currently unused but might need it later) Example of classifying bilateral/unilateral/non-trading shares."""
+    THRESHOLD = 0.01
+    df = tb[tb.indicator.isin([EXPORT_COL, IMPORT_COL])].assign(has_trade=lambda d: d.value.fillna(0) > THRESHOLD)
+
+    c1 = df[["country", "counterpart_country"]]
+    df["pair"] = pd.Series(
+        np.where(
+            c1.country.values < c1.counterpart_country.values,
+            c1.country.values + "--" + c1.counterpart_country.values,
+            c1.counterpart_country.values + "--" + c1.country.values,
+        ),
+        index=df.index,
+    )
+
+    active = df[df.has_trade]
+    dir_counts = active.groupby(["year", "pair"])["country"].nunique().reset_index(name="n_dirs")
+
+    all_pairs = df[["year", "pair"]].drop_duplicates()
+    status = all_pairs.merge(dir_counts, on=["year", "pair"], how="left").fillna({"n_dirs": 0})
+
+    status["relationship"] = pd.cut(
+        status.n_dirs, bins=[-0.1, 0.1, 1.1, 2.1], labels=["non_trading", "unilateral", "bilateral"]
+    )
+
+    counts = status.groupby(["year", "relationship"]).size().unstack(fill_value=0)
+    total = counts.sum(axis=1)
+    shares = counts.divide(total, axis=0).multiply(100)
+    shares = shares.rename(
+        columns={"bilateral": "share_bilateral", "unilateral": "share_unilateral", "non_trading": "share_non_trading"}
+    ).reset_index()
+    return shares
