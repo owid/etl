@@ -197,7 +197,11 @@ def run() -> None:
 
     # Harmonize country names.
     tb = geo.harmonize_countries(
-        df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
+        df=tb,
+        countries_file=paths.country_mapping_path,
+        excluded_countries_file=paths.excluded_countries_path,
+        warn_on_unused_countries=False,
+        warn_on_unknown_excluded_countries=False,
     )
     tb_regions = geo.harmonize_countries(
         df=tb_regions, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
