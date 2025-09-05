@@ -226,10 +226,10 @@
           }
         },
         "customNumericValues": {
+          "description": "Custom maximum brackets for each numeric bin. Only applied when strategy is `manual` or when using a string matching pattern like `<%`.",
           "oneOf": [
             {
               "type": "array",
-              "description": "Custom maximum brackets for each numeric bin. Only applied when strategy is `manual`",
               "items": {
                 "type": "number"
               }
