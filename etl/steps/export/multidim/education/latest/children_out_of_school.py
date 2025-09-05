@@ -232,10 +232,21 @@ def create_grouped_views(collection):
     }
 
     def get_view_config(view):
-        return GROUPED_VIEW_CONFIG | {
+        config = GROUPED_VIEW_CONFIG | {
             "title": "{title}",
             "subtitle": "{subtitle}",
         }
+
+        # Add stacked area chart configuration for number metrics
+        metric_type = view.dimensions.get("metric_type", "rate")
+        if metric_type == "number":
+            config.update(
+                {
+                    "chartTypes": ["StackedArea"],
+                }
+            )
+
+        return config
 
     collection.group_views(
         groups=[
