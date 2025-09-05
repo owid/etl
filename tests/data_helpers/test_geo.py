@@ -2363,3 +2363,198 @@ class TestRegionAggregator(unittest.TestCase):
         self.assertEqual(len(result), 2)
         self.assertListEqual(result["country"].tolist(), ["France", "Italy"])
         self.assertNotIn("NonexistentRegion", result["country"].tolist())
+
+    def test_partial_aggregation_preserves_existing_data(self):
+        """Test that when adding aggregates for only some columns, existing data
+        for non-aggregated columns is preserved (not deleted)."""
+        # Create test data where Europe already exists with data for multiple columns
+        tb_with_existing_europe = Table(
+            {
+                "country": ["France", "Italy", "Europe", "Europe"],
+                "year": [2020, 2020, 2020, 2021],
+                "gdp": [100, 200, 999, 888],  # Europe already has GDP data that should be replaced
+                "population": [67, 60, 777, 666],  # Europe already has population data that should be preserved
+                "area": [551, 301, 555, 444],  # Europe already has area data that should be preserved
+            }
+        )
+
+        # Create aggregator that only aggregates GDP (not population or area)
+        aggregator = geo.RegionAggregator(
+            ds_regions=self.ds_regions,
+            regions_all=self.regions_all,
+            regions=["Europe"],
+            aggregations={"gdp": "sum"},  # Only aggregating GDP, not population or area
+            ds_income_groups=self.ds_income_groups,
+        )
+
+        result = aggregator.add_aggregates(
+            tb_with_existing_europe,
+            check_for_region_overlaps=False,
+        )
+
+        # Get Europe data
+        europe_data = result[result["country"] == "Europe"].set_index("year").sort_index()
+
+        # GDP should be replaced with new aggregates (France + Italy)
+        self.assertEqual(europe_data.loc[2020, "gdp"], 300)  # 100 + 200 (aggregated)
+
+        # Population and area should be preserved from original Europe data
+        self.assertEqual(europe_data.loc[2020, "population"], 777)  # Original preserved
+        self.assertEqual(europe_data.loc[2020, "area"], 555)  # Original preserved
+        self.assertEqual(europe_data.loc[2021, "population"], 666)  # Original preserved
+        self.assertEqual(europe_data.loc[2021, "area"], 444)  # Original preserved
+
+    def test_partial_aggregation_new_region_gets_nan_for_non_aggregated(self):
+        """Test that when adding aggregates for only some columns, new regions
+        get NaN for non-aggregated columns."""
+        # Create test data without any existing Europe data
+        tb_without_europe = Table(
+            {
+                "country": ["France", "Italy"],
+                "year": [2020, 2020],
+                "gdp": [100, 200],
+                "population": [67, 60],
+                "area": [551, 301],
+            }
+        )
+
+        # Create aggregator that only aggregates GDP
+        aggregator = geo.RegionAggregator(
+            ds_regions=self.ds_regions,
+            regions_all=self.regions_all,
+            regions=["Europe"],
+            aggregations={"gdp": "sum"},  # Only aggregating GDP
+            ds_income_groups=self.ds_income_groups,
+        )
+
+        result = aggregator.add_aggregates(
+            tb_without_europe,
+            check_for_region_overlaps=False,
+        )
+
+        # Get Europe data
+        europe_data = result[result["country"] == "Europe"]
+
+        # GDP should be aggregated (France + Italy)
+        self.assertEqual(europe_data.iloc[0]["gdp"], 300)  # 100 + 200
+
+        # Population and area should be NaN since no aggregation was defined and no original data existed
+        self.assertTrue(pd.isna(europe_data.iloc[0]["population"]))
+        self.assertTrue(pd.isna(europe_data.iloc[0]["area"]))
+
+    def test_partial_aggregation_mixed_scenarios(self):
+        """Test partial aggregation with mixed scenarios: some years have existing data, others don't."""
+        # Create test data where Europe exists for some years but not others
+        tb_mixed = Table(
+            {
+                "country": ["France", "Italy", "France", "Italy", "Europe"],
+                "year": [2020, 2020, 2021, 2021, 2021],  # Europe only exists in 2021
+                "gdp": [100, 200, 110, 210, 999],  # Europe has GDP in 2021 that should be replaced
+                "population": [67, 60, 68, 61, 777],  # Europe has population in 2021 that should be preserved
+            }
+        )
+
+        aggregator = geo.RegionAggregator(
+            ds_regions=self.ds_regions,
+            regions_all=self.regions_all,
+            regions=["Europe"],
+            aggregations={"gdp": "sum"},  # Only aggregating GDP
+            ds_income_groups=self.ds_income_groups,
+        )
+
+        result = aggregator.add_aggregates(
+            tb_mixed,
+            check_for_region_overlaps=False,
+        )
+
+        europe_data = result[result["country"] == "Europe"].set_index("year").sort_index()
+
+        # Both years should have aggregated GDP
+        self.assertEqual(europe_data.loc[2020, "gdp"], 300)  # 100 + 200 (new aggregate)
+        self.assertEqual(europe_data.loc[2021, "gdp"], 320)  # 110 + 210 (replaces 999)
+
+        # 2020 should have NaN population (no original data)
+        self.assertTrue(pd.isna(europe_data.loc[2020, "population"]))
+
+        # 2021 should preserve original population
+        self.assertEqual(europe_data.loc[2021, "population"], 777)
+
+    def test_full_aggregation_replaces_all_data(self):
+        """Test that when aggregating all columns, all existing region data is replaced."""
+        tb_with_existing_europe = Table(
+            {
+                "country": ["France", "Italy", "Europe"],
+                "year": [2020, 2020, 2020],
+                "gdp": [100, 200, 999],  # Should be replaced
+                "population": [67, 60, 777],  # Should be replaced
+            }
+        )
+
+        # Aggregate both columns
+        aggregator = geo.RegionAggregator(
+            ds_regions=self.ds_regions,
+            regions_all=self.regions_all,
+            regions=["Europe"],
+            aggregations={"gdp": "sum", "population": "sum"},  # Aggregating both columns
+            ds_income_groups=self.ds_income_groups,
+        )
+
+        result = aggregator.add_aggregates(
+            tb_with_existing_europe,
+            check_for_region_overlaps=False,
+        )
+
+        europe_data = result[result["country"] == "Europe"]
+
+        # Both columns should be replaced with aggregates
+        self.assertEqual(europe_data.iloc[0]["gdp"], 300)  # 100 + 200 (replaces 999)
+        self.assertEqual(europe_data.iloc[0]["population"], 127)  # 67 + 60 (replaces 777)
+
+    def test_partial_aggregation_improvement_over_old_behavior(self):
+        """Test that demonstrates the improvement over the old add_region_aggregates behavior.
+
+        Old behavior: When aggregating only some columns, existing data for non-aggregated
+        columns would be DELETED (causing data loss).
+
+        New behavior: Existing data for non-aggregated columns is PRESERVED.
+        """
+        # Scenario: Europe already exists with multiple types of data
+        tb_with_europe = Table(
+            {
+                "country": ["France", "Italy", "Europe"],
+                "year": [2020, 2020, 2020],
+                "gdp": [100, 200, 999],  # Will be replaced with aggregate
+                "population": [67, 60, 777],  # Should be preserved (old behavior: would be deleted!)
+                "area": [551, 301, 555],  # Should be preserved (old behavior: would be deleted!)
+                "life_expectancy": [82, 83, 88],  # Should be preserved (old behavior: would be deleted!)
+            }
+        )
+
+        # Only aggregate GDP, leave other columns as-is
+        aggregator = geo.RegionAggregator(
+            ds_regions=self.ds_regions,
+            regions_all=self.regions_all,
+            regions=["Europe"],
+            aggregations={"gdp": "sum"},  # Only GDP gets aggregated
+            ds_income_groups=self.ds_income_groups,
+        )
+
+        result = aggregator.add_aggregates(
+            tb_with_europe,
+            check_for_region_overlaps=False,
+        )
+
+        europe_data = result[result["country"] == "Europe"]
+
+        # GDP should be replaced with aggregated value
+        self.assertEqual(europe_data.iloc[0]["gdp"], 300)  # 100 + 200 (NEW aggregate)
+
+        # Other columns should preserve original Europe data (IMPROVEMENT!)
+        # In the old behavior, these would all become NaN, causing data loss
+        self.assertEqual(europe_data.iloc[0]["population"], 777)  # PRESERVED
+        self.assertEqual(europe_data.iloc[0]["area"], 555)  # PRESERVED
+        self.assertEqual(europe_data.iloc[0]["life_expectancy"], 88)  # PRESERVED
+
+        # Verify that individual country data is still present
+        individual_countries = result[result["country"].isin(["France", "Italy"])]
+        self.assertEqual(len(individual_countries), 2)  # Both countries still there
