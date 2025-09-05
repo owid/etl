@@ -2071,7 +2071,13 @@ class RegionAggregator:
             dfs_with_regions.append(df_region)
 
         # Concatenate aggregates of all regions.
-        df_with_regions = pr.concat([df for df in dfs_with_regions if not df.empty], ignore_index=True)
+        # If no region aggregates were created, return an empty Table with the same columns as the original.
+        dfs_with_regions_non_empty = [df for df in dfs_with_regions if not df.empty]
+        df_with_regions = (
+            pd.concat(dfs_with_regions_non_empty, ignore_index=True)
+            if dfs_with_regions_non_empty
+            else pd.DataFrame(columns=tb.columns)
+        )
 
         return df_with_regions
 
@@ -2225,7 +2231,7 @@ class RegionAggregator:
         df_no_regions = tb[~_select_regions]
 
         # Combine the table with only regions and the table with no regions.
-        df_with_regions = pd.concat([df_only_regions, df_no_regions], ignore_index=True)
+        df_with_regions = pd.concat([df_only_regions, df_no_regions], ignore_index=True)  # type: ignore
 
         # Sort rows and columns conveniently.
         df_with_regions = df_with_regions.sort_values(self.index_columns).reset_index(drop=True)[tb.columns]
