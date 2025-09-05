@@ -98,8 +98,8 @@ log = get_logger()
 @click.option(
     "--auto-threshold",
     type=float,
-    default=80.0,
-    help="Similarity threshold (0-100) for automatic mapping when --no-interactive is used. Default: 80.0",
+    default=100.0,
+    help="Similarity threshold (0-100) for automatic mapping when --no-interactive is used. Default: 100.0",
 )
 def main_cli(
     old_dataset_id: int,

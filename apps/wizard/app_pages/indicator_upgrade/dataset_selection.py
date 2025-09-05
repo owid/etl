@@ -7,10 +7,13 @@ import streamlit as st
 from pydantic import BaseModel
 from structlog import get_logger
 
+from apps.indicator_upgrade.match import main as match_main
+from apps.indicator_upgrade.upgrade import cli_upgrade_indicators
 from apps.wizard.app_pages.indicator_upgrade.indicator_mapping import reset_indicator_form
 from apps.wizard.utils import set_states
 
 log = get_logger()
+
 
 # Set to True to select good initial default dataset selections
 DEBUG = False
@@ -194,6 +197,44 @@ def build_dataset_form(df: pd.DataFrame, similarity_names: Dict[str, Any]) -> "S
                 help="Select the preferred function for matching indicators. Find more details at https://www.analyticsvidhya.com/blog/2021/07/fuzzy-string-matching-a-hands-on-guide/",
                 on_change=set_states_if_form_is_modified,
             )
+
+    # Auto-upgrade button for perfectly matching indicators
+    if st.button(
+        "🚀 Upgrade perfectly matching indicators",
+        type="primary",
+        width="stretch",
+        help="Automatically match and upgrade indicators with identical names first",
+    ):
+        with st.spinner("Running automatic indicator upgrade..."):
+            # Get the selected dataset IDs using the display name to ID mapping
+            old_dataset_name = st.session_state.get("old_dataset_selectbox")
+            new_dataset_name = st.session_state.get("new_dataset_selectbox")
+
+            old_dataset_id = display_name_to_id_mapping.get(old_dataset_name) if old_dataset_name else None
+            new_dataset_id = display_name_to_id_mapping.get(new_dataset_name) if new_dataset_name else None
+
+            if old_dataset_id and new_dataset_id:
+                # Run indicator matching
+                st.info(f"Matching indicators between datasets {old_dataset_id} and {new_dataset_id}...")
+                match_main(
+                    old_dataset_id=old_dataset_id,
+                    new_dataset_id=new_dataset_id,
+                    dry_run=False,
+                    match_identical=True,
+                    similarity_name="partial_ratio",
+                    max_suggestions=10,
+                    no_interactive=True,
+                    auto_threshold=80.0,
+                )
+
+                # Run indicator upgrade
+                st.info("Upgrading matched indicators...")
+                cli_upgrade_indicators(dry_run=False)
+
+                st.success("✅ Automatic indicator upgrade completed successfully!")
+
+            else:
+                st.error("Please select both old and new datasets first")
 
     # Submit button
     submitted_datasets = st.button(
