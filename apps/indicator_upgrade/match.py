@@ -9,7 +9,7 @@ from rapidfuzz import fuzz
 from structlog import get_logger
 
 from apps.wizard.utils.db import WizardDB
-from etl.db import get_connection
+from etl.db import get_connection, get_engine
 from etl.grapher.io import get_variables_in_dataset
 
 # If True, identical variables will be matched automatically (by string comparison).
@@ -145,29 +145,6 @@ def main(
         old_indicators = get_variables_in_dataset(db_conn=db_conn, dataset_id=old_dataset_id, only_used_in_charts=True)
         # Get all variables from new dataset.
         new_indicators = get_variables_in_dataset(db_conn=db_conn, dataset_id=new_dataset_id, only_used_in_charts=False)
-
-    # Get existing variable mappings from database to exclude already mapped variables
-    existing_mappings = WizardDB.get_variable_mapping()
-
-    if existing_mappings:
-        # Filter out variables that already have mappings
-        mapped_old_ids = set(existing_mappings.keys())
-        mapped_new_ids = set(existing_mappings.values())
-
-        old_indicators = old_indicators[~old_indicators["id"].isin(mapped_old_ids)].reset_index(drop=True)
-        new_indicators = new_indicators[~new_indicators["id"].isin(mapped_new_ids)].reset_index(drop=True)
-
-        print(
-            f"Excluded {len(mapped_old_ids)} old variables and {len(mapped_new_ids)} new variables that already have mappings."
-        )
-
-    if len(old_indicators) == 0:
-        print("No old variables left to map after excluding already mapped variables.")
-        return
-
-    if len(new_indicators) == 0:
-        print("No new variables left to map after excluding already mapped variables.")
-        return
 
     # Map old variable names to new variable names.
     if no_interactive:
@@ -392,8 +369,46 @@ def print_mapping_dataframe(mapping: pd.DataFrame, old_dataset_id: int, new_data
         print(f"  {old_id} -> {new_id}")
 
 
+def _clear_dataset_mappings(old_dataset_id: int, new_dataset_id: int) -> None:
+    """Clear existing variable mappings for a specific dataset pair.
+    
+    Parameters
+    ----------
+    old_dataset_id : int
+        ID of the old dataset.
+    new_dataset_id : int
+        ID of the new dataset.
+    """
+    from sqlalchemy import text
+    from sqlalchemy.orm import Session
+    
+    # Check if table exists
+    if not WizardDB.table_exists("wiz__variable_mapping"):
+        return
+    
+    # Delete mappings for this specific dataset pair
+    query = """
+    DELETE FROM wiz__variable_mapping 
+    WHERE dataset_id_old = :old_id AND dataset_id_new = :new_id
+    """
+    
+    engine = get_engine()
+    with Session(engine) as s:
+        result = s.execute(text(query), {"old_id": old_dataset_id, "new_id": new_dataset_id})
+        try:
+            rows_deleted = getattr(result, 'rowcount', 0) or 0
+        except AttributeError:
+            rows_deleted = 0
+        s.commit()
+        
+        if rows_deleted > 0:
+            print(f"Cleared {rows_deleted} existing mappings for dataset pair {old_dataset_id} -> {new_dataset_id}")
+
+
 def save_mappings_to_database(mapping: pd.DataFrame, old_dataset_id: int, new_dataset_id: int) -> None:
     """Save variable mappings to the MySQL database.
+
+    This function will clear any existing mappings for the same dataset pair before saving new ones.
 
     Parameters
     ----------
@@ -407,6 +422,9 @@ def save_mappings_to_database(mapping: pd.DataFrame, old_dataset_id: int, new_da
     if len(mapping) == 0:
         print("No mappings to save to database.")
         return
+
+    # First, clear any existing mappings for this dataset pair to avoid duplicates
+    _clear_dataset_mappings(old_dataset_id, new_dataset_id)
 
     # Create the mapping dictionary expected by WizardDB.add_variable_mapping
     raw_dict = mapping.set_index("id_old")["id_new"].to_dict()
