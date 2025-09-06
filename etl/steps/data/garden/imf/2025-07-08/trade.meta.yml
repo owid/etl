@@ -15,7 +15,7 @@ tables:
         title: Imports of goods from << counterpart_country >> (CIF, current US$)
         unit: "current US$"
         short_unit: "US$"
-        description_short: Total value of goods a country imports from << counterpart_country >>, including freight and insurance costs.
+        description_short: Total value of goods a country imports from << counterpart_country >> in US dollars, including freight and insurance costs. This data is not adjusted for inflation.
         description_key:
           - This indicator shows the total value of merchandise imports that a country brings in from a partner country.
           - Imports are valued on a CIF basis (Cost, Insurance, and Freight). This means the values include the cost of the goods, as well as the transport and insurance costs to deliver them to the importing country’s border.
@@ -33,7 +33,7 @@ tables:
         title: Exports of goods to << counterpart_country >> (FOB, current US$)
         unit: "current US$"
         short_unit: "US$"
-        description_short: Total value of goods a country exports to << counterpart_country >>, excluding freight and insurance costs.
+        description_short: Total value of goods a country exports to << counterpart_country >> in US dollars, excluding freight and insurance costs. This data is not adjusted for inflation.
         description_key:
           - This indicator shows the total value of merchandise exports sent from a country to a partner country.
           - Exports are valued on an FOB basis (Free on Board). This means the values include the cost of the goods up to the exporter’s border, but exclude transport and insurance costs after that point.
