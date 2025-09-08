@@ -4,6 +4,7 @@ import functools
 import json
 import warnings
 from datetime import datetime
+from functools import cache
 from pathlib import Path
 from typing import Any, Hashable, Literal, TypeVar, cast
 
@@ -848,6 +849,7 @@ def add_gdp_to_table(
     return tb_with_gdp
 
 
+@cache
 def create_table_of_regions_and_subregions(
     ds_regions: Dataset, subregion_type: str = "members", unpack_subregions: bool = False
 ) -> Table:
