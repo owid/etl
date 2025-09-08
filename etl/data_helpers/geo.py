@@ -2272,7 +2272,7 @@ class RegionAggregator:
     def add_per_capita(
         self,
         tb: Table,
-        only_informed_countries_in_regions: bool = True,
+        only_informed_countries_in_regions: bool = False,
         columns: list[str] | None = None,
         prefix: str = "",
         suffix: str = "_per_capita",
