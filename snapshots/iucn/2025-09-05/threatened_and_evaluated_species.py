@@ -3,21 +3,26 @@
 The data for this snapshot was taken from the IUCN Red List Summary Statistics Table 1a, available at: https://www.iucnredlist.org/resources/summary-statistics
 """
 
+from pathlib import Path
+
+import click
 import pandas as pd
 
-from etl.helpers import PathFinder
+from etl.snapshot import Snapshot
 
-paths = PathFinder(__file__)
+SNAPSHOT_VERSION = Path(__file__).parent.name
 
 
-def run(upload: bool = True) -> None:
+@click.command()
+@click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
+def main(upload: bool = True) -> None:
     """Create a new snapshot.
 
     Args:
         upload: Whether to upload the snapshot to S3.
     """
     # Init Snapshot object
-    snap = paths.init_snapshot()
+    snap = Snapshot(f"iucn/{SNAPSHOT_VERSION}/threatened_and_evaluated_species.csv")
     df = pd.DataFrame(
         {
             "taxonomic_group": [
@@ -165,3 +170,7 @@ def run(upload: bool = True) -> None:
 
     # Save snapshot.
     snap.create_snapshot(upload=upload, data=df)
+
+
+if __name__ == "__main__":
+    main()
