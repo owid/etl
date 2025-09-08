@@ -1,7 +1,5 @@
 """Load snapshot and create a garden dataset."""
 
-from owid.catalog import processing as pr
-
 from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
