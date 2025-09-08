@@ -1,0 +1,17 @@
+meta:
+  origin:
+    producer: UK Office for National Statistics (ONS) and Action on Smoking and Health (ASH)
+    title: smokers_vapers_great_britain
+    citation_full: UK Office for National Statistics (ONS) and Action on Smoking and Health (ASH)
+    url_main: |-
+      https://www.ons.gov.uk/peoplepopulationandcommunity/healthandsocialcare/healthandlifeexpectancies/bulletins/adultsmokinghabitsingreatbritain/2023; https://ash.org.uk/resources/view/use-of-e-cigarettes-among-adults-in-great-britain
+    url_download: |-
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vRMUP7a42l60SG0f0TOwZrbZpD3YR_dil-uMJ8zEAUyGegeZ7Ar8gQlpenGCjz7NMyHYF60esJARVFZ/pub?output=csv
+    date_accessed: '2025-09-08'
+  name: Share and number of smokers and vapers in Great Britain (ONS and ASH)
+  description: ''
+  license: {}
+outs:
+  - md5: ae18be21475a5bf8d03e845c5335731f
+    size: 1430
+    path: smokers_vapers_great_britain.csv
