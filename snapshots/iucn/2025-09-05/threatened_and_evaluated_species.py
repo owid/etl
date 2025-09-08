@@ -1,0 +1,167 @@
+"""Script to create a snapshot of dataset.
+
+The data for this snapshot was taken from the IUCN Red List Summary Statistics Table 1a, available at: https://www.iucnredlist.org/resources/summary-statistics
+"""
+
+import pandas as pd
+
+from etl.helpers import PathFinder
+
+paths = PathFinder(__file__)
+
+
+def run(upload: bool = True) -> None:
+    """Create a new snapshot.
+
+    Args:
+        upload: Whether to upload the snapshot to S3.
+    """
+    # Init Snapshot object
+    snap = paths.init_snapshot()
+    df = pd.DataFrame(
+        {
+            "taxonomic_group": [
+                "Mammals",
+                "Birds",
+                "Reptiles",
+                "Amphibians",
+                "Fishes",
+                "All vertebrates",
+                "Insects",
+                "Molluscs",
+                "Crustaceans",
+                "Corals",
+                "Arachnids",
+                "Velvet worms",
+                "Horsehoe crabs",
+                "Other invertebrates",
+                "All invertebrates",
+                "Mosses",
+                "Ferns and allies",
+                "Gymnosperms",
+                "Flowering plants",
+                "Green algae",
+                "Red algae",
+                "All plants",
+                "Mushrooms",
+                "Brown algae",
+                "All fungi",
+                "All groups",
+            ],
+            "described_species": [
+                6736,
+                11195,
+                12386,
+                8863,
+                37109,
+                76289,
+                1003612,
+                87626,
+                91342,
+                5665,
+                96998,
+                220,
+                4,
+                189100,
+                1474567,
+                21325,
+                11800,
+                1113,
+                369000,
+                14350,
+                7677,
+                425865,
+                157648,
+                4873,
+                162521,
+                2139242,
+            ],
+            "evaluated_species": [
+                6025,
+                11195,
+                10316,
+                8009,
+                28866,
+                64411,
+                13442,
+                9144,
+                3310,
+                916,
+                994,
+                11,
+                4,
+                1119,
+                28940,
+                327,
+                828,
+                1061,
+                72439,
+                18,
+                78,
+                74751,
+                1300,
+                18,
+                1318,
+                169420,
+            ],
+            "threatened_species": [
+                1363,
+                1311,
+                1846,
+                2873,
+                4046,
+                11439,
+                2565,
+                2473,
+                759,
+                333,
+                347,
+                9,
+                2,
+                182,
+                6670,
+                181,
+                325,
+                450,
+                7696,
+                0,
+                9,
+                28661,
+                411,
+                6,
+                417,
+                47187,
+            ],
+            "best_share_threatened": [
+                27,
+                12,
+                21,
+                41,
+                pd.NA,
+                21,
+                pd.NA,
+                pd.NA,
+                pd.NA,
+                pd.NA,
+                pd.NA,
+                pd.NA,
+                100,
+                pd.NA,
+                pd.NA,
+                pd.NA,
+                pd.NA,
+                43,
+                pd.NA,
+                pd.NA,
+                pd.NA,
+                pd.NA,
+                pd.NA,
+                pd.NA,
+                pd.NA,
+                pd.NA,
+            ],
+        }
+    )
+
+    # Save snapshot.
+    snap.create_snapshot(upload=upload, data=df)
