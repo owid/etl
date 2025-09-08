@@ -281,3 +281,6 @@ nav:
       - Querying data via Datasette: "api/datasette.md"
       - Maintenance: "api/maintenance.md"
       - COVID-19: "api/covid.md"
+  - Public analyses:
+      - "analyses/index.md"
+      - Media mentions of deaths: "analyses/media_deaths/methodology.md"
