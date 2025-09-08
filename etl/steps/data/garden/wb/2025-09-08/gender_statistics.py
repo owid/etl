@@ -110,11 +110,11 @@ def add_metadata(tb: Table, tb_meta: pd.DataFrame) -> Table:
 
     for column in tb.columns:
         if column not in ["country", "year"]:
+            # Get the column metadata object
+            meta = tb[column].metadata
+            
             if column in metadata_dict:
                 meta_info = metadata_dict[column]
-
-                # Get the column metadata object
-                meta = tb[column].metadata
 
                 # Set title from Indicator Name
                 indicator_name = meta_info.get("Indicator Name", column)
@@ -127,14 +127,18 @@ def add_metadata(tb: Table, tb_meta: pd.DataFrame) -> Table:
 
                 # Handle units
                 unit_of_measure = meta_info.get("Unit of measure", "")
-                if pd.notna(unit_of_measure) and unit_of_measure:
+                if pd.notna(unit_of_measure) and str(unit_of_measure).strip():
                     unit_lower = str(unit_of_measure).lower()
                     if "percent" in unit_lower or "%" in unit_lower:
                         meta.unit = "%"
                         meta.short_unit = "%"
                     else:
                         meta.unit = unit_of_measure
-                        meta.short_unit = unit_of_measure
+                        meta.short_unit = ""
+                else:
+                    # Set default unit if missing or NaN
+                    meta.unit = ""
+                    meta.short_unit = ""
 
                 # Build description from producer
                 description_parts = []
@@ -169,5 +173,11 @@ def add_metadata(tb: Table, tb_meta: pd.DataFrame) -> Table:
                     meta.description_from_producer = "\n\n".join(description_parts)
                 else:
                     meta.description_from_producer = f"World Bank indicator: {column}"
+            else:
+                # Column not found in metadata - set defaults
+                meta.title = column
+                meta.unit = ""
+                meta.short_unit = ""
+                meta.description_from_producer = f"World Bank indicator: {column}"
 
     return tb
