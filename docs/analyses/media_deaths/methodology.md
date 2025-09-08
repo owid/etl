@@ -220,7 +220,7 @@ Below you can find the actual keywords we used for each cause of death and the f
 </details>
 
 
-## Additional Analysis
+## Additional analyses
 
 ### Differences between single and multiple mentions
 The first run of our analysis included all articles which mention any keyword at all, even if it was only mentioned once. One issue is that many articles will mention a cause of death in passing, without it being a central part of the coverage or covered in any detail. To reduce these false positives, we switched to the “multiple mentions” approach (s. above).
