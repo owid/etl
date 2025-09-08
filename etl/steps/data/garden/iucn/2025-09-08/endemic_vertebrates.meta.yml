@@ -50,15 +50,15 @@ tables:
         title: Endemic amphibian species that are extinct or extinct in the wild
         description_short: |-
           [Endemic species](#dod:endemic_species) are those known to occur naturally within one country only.
-      fw_fish__total_endemics:
+      fw_fishes__total_endemics:
         title: Endemic freshwater fish species
         description_short: |-
           [Endemic species](#dod:endemic_species) are those known to occur naturally within one country only.
-      fw_fish__threatened_endemics:
+      fw_fishes__threatened_endemics:
         title: Threatened endemic freshwater fish species
         description_short: |-
           [Endemic species](#dod:endemic_species) are those known to occur naturally within one country only. Threatened species are those whose [extinction risk](#dod:extinction_risk) is classified as 'Critically Endangered', 'Endangered', or 'Vulnerable'. They are at a high or greater risk of extinction in the wild.
-      fw_fish__ex__and__ew_endemics:
+      fw_fishes__ex__and__ew_endemics:
         title: Endemic freshwater fish species that are extinct or extinct in the wild
       groupers__total_endemics:
         title: Endemic grouper species
@@ -80,15 +80,15 @@ tables:
           [Endemic species](#dod:endemic_species) are those known to occur naturally within one country only. Threatened species are those whose [extinction risk](#dod:extinction_risk) is classified as 'Critically Endangered', 'Endangered', or 'Vulnerable'. They are at a high or greater risk of extinction in the wild.
       herrings__anchovies__etc__ex__and__ew_endemics:
         title: Endemic herring and anchovy species that are extinct or extinct in the wild
-      seahorses__and__pipefish__total_endemics:
+      seahorses__and__pipefishes__total_endemics:
         title: Endemic seahorse and pipefish species
         description_short: |-
           [Endemic species](#dod:endemic_species) are those known to occur naturally within one country only.
-      seahorses__and__pipefish__threatened_endemics:
+      seahorses__and__pipefishes__threatened_endemics:
         title: Threatened endemic seahorse and pipefish species
         description_short: |-
           [Endemic species](#dod:endemic_species) are those known to occur naturally within one country only. Threatened species are those whose [extinction risk](#dod:extinction_risk) is classified as 'Critically Endangered', 'Endangered', or 'Vulnerable'. They are at a high or greater risk of extinction in the wild.
-      seahorses__and__pipefish__ex__and__ew_endemics:
+      seahorses__and__pipefishes__ex__and__ew_endemics:
         title: Endemic seahorse and pipefish species that are extinct or extinct in the wild
       sturgeons__total_endemics:
         title: Endemic sturgeon species
