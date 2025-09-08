@@ -894,7 +894,7 @@ def create_table_of_regions_and_subregions(
                 ].reset_index(drop=True)
                 # Create a temporary table with only that composite subregion.
                 tb_composite_region = tb_regions[tb_regions["name"] == row[subregion_type]].assign(
-                    **{"code": row.name, "name": row["name"]}
+                    **{"code": row["code"], "name": row["name"]}
                 )
                 # Replace the original table by the combination of the two temporary tables.
                 tb_regions = pr.concat([tb_without_composite_region, tb_composite_region], ignore_index=True)
@@ -904,7 +904,7 @@ def create_table_of_regions_and_subregions(
     tb_countries_in_region = (
         tb_regions.rename(columns={"name": "region"})
         .groupby("region", as_index=True, observed=True)
-        .agg({subregion_type: list})
+        .agg({subregion_type: lambda x: sorted(set(x))})
     )
 
     return tb_countries_in_region
