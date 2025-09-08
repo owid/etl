@@ -227,7 +227,7 @@ The first run of our analysis included all articles which mention any keyword at
 
 Below you can see the comparison of results between single and multiple mentions for the New York Times in absolute and relative terms.
 
-![NYT: Comparison between single and multiple mention approaches, absolute terms](data/media_deaths_nyt_single_vs_multiple_absolute.png){: style="width:600px"} ![NYT: Comparison between single and multiple mention approaches, relative shares](data/assets/media_deaths_nyt_single_vs_multiple_relative.png){: style="width:600px"}
+![NYT: Comparison between single and multiple mention approaches, absolute terms](data/media_deaths_nyt_single_vs_multiple_absolute.png){: style="width:600px"} ![NYT: Comparison between single and multiple mention approaches, relative shares](data/media_deaths_nyt_single_vs_multiple_relative.png){: style="width:600px"}
 
 
 Overall using multiple mentions decrease the amount of relevant articles by a lot, often by 50% or more.
