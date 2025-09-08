@@ -34,8 +34,12 @@ add `--grapher` flag if the channel is grapher
 2. Diff processed data with a representative country
 
 ```bash
-etl diff REMOTE data/ --include "<channel>/<ns>/.*/<name>" --verbose --country <country> > workbench/<short_name>/<channel>_diff_raw.txt
+etl diff REMOTE data/ --include "<channel>/<ns>/.*/<name>" --verbose --country "<country>" > workbench/<short_name>/<channel>_diff_raw.txt
 ```
+
+**IMPORTANT**: Use regex pattern format `"<channel>/<ns>/.*/<name>"` NOT `--channel` parameter. For example:
+- ✅ CORRECT: `etl diff REMOTE data/ --include "meadow/worldbank_wdi/.*/wdi" --verbose --country "United States"`
+- ❌ WRONG: `etl diff REMOTE data/ --include "worldbank_wdi/2025-09-08/wdi" --verbose --country "United States" --channel meadow`
 
 3. Read the generated diff txt file and check the output. If there's a lot of removed data, double-check the step logic and fix it if necessary. Then try again from step 1.
 

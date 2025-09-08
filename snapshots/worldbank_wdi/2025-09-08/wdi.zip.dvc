@@ -7,9 +7,13 @@ meta:
     citation_full: World Development Indicators (WDI), The World Bank (2025).
     url_main: https://datacatalog.worldbank.org/search/dataset/0037712/World-Development-Indicators
     url_download: |-
-      https://datacatalogfiles.worldbank.org/ddh-published/0037712/DR0045575/WDI_CSV_2024_12_16.zip?versionId=2025-01-15T18:08:41.7545645Z
+      https://datacatalogfiles.worldbank.org/ddh-published/0037712/DR0095335/WDI_CSV_2025_07_02.zip
     date_accessed: '2025-09-08'
-    date_published: '2025-01-15'
+    date_published: '2025-01-28'
     license:
       name: CC BY 4.0
       url: https://datacatalog.worldbank.org/search/dataset/0037712/World-Development-Indicators
+outs:
+  - md5: ecc79cc69d55f38c1b11401027a96422
+    size: 282306239
+    path: wdi.zip

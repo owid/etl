@@ -512,10 +512,11 @@ def load_variable_metadata(df_vars: Table, indicator_codes: list[str]) -> pd.Dat
     # NOTE: this should be ideally in the snapshot, but there are only a few indicators like this so it's
     #   not worth it
     log.info("wdi.missing_metadata", n_indicators=len(indicators_without_meta))
-    df_missing = pd.DataFrame([_fetch_metadata_for_indicator(code) for code in indicators_without_meta])
-
-    # Merge missing metadata
-    df_vars = pd.concat([df_vars[~df_vars.indicator_code.isin(df_missing.indicator_code)], df_missing])
+    if indicators_without_meta:
+        df_missing = pd.DataFrame([_fetch_metadata_for_indicator(code) for code in indicators_without_meta])
+        # Merge missing metadata
+        df_vars = pd.concat([df_vars[~df_vars.indicator_code.isin(df_missing.indicator_code)], df_missing])
+    # If no missing indicators, no need to merge anything
 
     # Final checks
     missing_indicator_codes = set(indicator_codes) - set(df_vars["indicator_code"])

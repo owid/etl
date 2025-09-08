@@ -33,6 +33,10 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 # URL to the World Bank metadata API.
 URL_METADATA = "https://datacatalogapi.worldbank.org/ddhxext/DatasetDownload?dataset_unique_id=0037712"
 
+# We used to get the URL from the metadata API, but it points to an old version. You can get this
+# URL from https://datacatalog.worldbank.org/search/dataset/0037712/World-Development-Indicators
+URL_DATA = "https://datacatalogfiles.worldbank.org/ddh-published/0037712/DR0095335/WDI_CSV_2025_07_02.zip"
+
 
 @click.command()
 @click.option(
@@ -70,9 +74,11 @@ def update_snapshot_metadata(snap: Snapshot) -> None:
         meta_orig.get("last_updated_date"), "%Y-%m-%dT%H:%M:%S"
     ).strftime("%Y-%m-%d")  # type: ignore
     # Update the download URL to the latest version.
-    snap.metadata.origin.url_download = [r for r in meta_orig["resources"] if r["name"] == "CSV"][0]["distribution"][
-        "url"
-    ]
+    snap.metadata.origin.url_download = URL_DATA
+    # NOTE: URL in metadata API points to an old version of the data. Remove the hardcoded URL if they fix it.
+    # snap.metadata.origin.url_download = [r for r in meta_orig["resources"] if r["name"] == "CSV"][0]["distribution"][
+    #     "url"
+    # ]
     # Update the description (in case it changed).
     snap.metadata.origin.description = BeautifulSoup(
         meta_orig.get("identification").get("description"), features="html.parser"
