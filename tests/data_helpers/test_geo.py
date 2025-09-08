@@ -1584,6 +1584,87 @@ class TestAddRegionsToTable(unittest.TestCase):
         assert tb_out.equals(tb_expected)
 
 
+class MockComplexRegionsDataset:
+    """Mock dataset for testing complex region scenarios including circular dependencies."""
+
+    def __init__(self, with_circular_dependency=False, with_deep_nesting=False):
+        self.with_circular_dependency = with_circular_dependency
+        self.with_deep_nesting = with_deep_nesting
+
+    def __getitem__(self, name: str) -> Table:
+        if self.with_circular_dependency:
+            # Create a scenario with circular dependency: A includes B, B includes A
+            mock_tb_regions = Table(
+                {
+                    "code": ["FRA", "DEU", "REG_A", "REG_B", "WORLD"],
+                    "name": ["France", "Germany", "Region A", "Region B", "World"],
+                    "region_type": ["country", "country", "region", "region", "region"],
+                    "is_historical": [False, False, False, False, False],
+                    "members": [
+                        "[]",
+                        "[]",
+                        '["FRA", "REG_B"]',  # Region A includes France and Region B
+                        '["DEU", "REG_A"]',  # Region B includes Germany and Region A (circular!)
+                        '["REG_A", "REG_B"]',
+                    ],
+                    "successors": ["[]", "[]", "[]", "[]", "[]"],
+                }
+            ).set_index("code")
+        elif self.with_deep_nesting:
+            # Create a scenario with multiple levels of nesting
+            mock_tb_regions = Table(
+                {
+                    "code": ["FRA", "DEU", "ITA", "ESP", "EU_WEST", "EU_SOUTH", "EUROPE", "WORLD"],
+                    "name": [
+                        "France",
+                        "Germany",
+                        "Italy",
+                        "Spain",
+                        "Western Europe",
+                        "Southern Europe",
+                        "Europe",
+                        "World",
+                    ],
+                    "region_type": ["country", "country", "country", "country", "region", "region", "region", "region"],
+                    "is_historical": [False, False, False, False, False, False, False, False],
+                    "members": [
+                        "[]",
+                        "[]",
+                        "[]",
+                        "[]",
+                        '["FRA", "DEU"]',  # Western Europe
+                        '["ITA", "ESP"]',  # Southern Europe
+                        '["EU_WEST", "EU_SOUTH"]',  # Europe includes Western and Southern Europe
+                        '["EUROPE"]',  # World includes Europe
+                    ],
+                    "successors": ["[]", "[]", "[]", "[]", "[]", "[]", "[]", "[]"],
+                }
+            ).set_index("code")
+        else:
+            # Standard test scenario without issues
+            mock_tb_regions = Table(
+                {
+                    "code": ["FRA", "DEU", "ITA", "ESP", "EUROPE", "WORLD"],
+                    "name": ["France", "Germany", "Italy", "Spain", "Europe", "World"],
+                    "region_type": ["country", "country", "country", "country", "region", "region"],
+                    "is_historical": [False, False, False, False, False, False],
+                    "members": [
+                        "[]",
+                        "[]",
+                        "[]",
+                        "[]",
+                        '["FRA", "DEU", "ITA", "ESP"]',  # Europe includes countries
+                        '["EUROPE"]',  # World includes Europe
+                    ],
+                    "successors": ["[]", "[]", "[]", "[]", "[]", "[]"],
+                }
+            ).set_index("code")
+        return mock_tb_regions
+
+    def read(self, name: str) -> Table:
+        return self.__getitem__(name)
+
+
 class TestCreateTableOfRegionsAndSubregions(unittest.TestCase):
     @pytest.mark.integration
     def test_regions_table_has_unique_members(self):
@@ -1617,6 +1698,412 @@ class TestCreateTableOfRegionsAndSubregions(unittest.TestCase):
 
         # If we get here, the test passed
         self.assertTrue(True, "All members are unique within each region")
+
+    def test_basic_unpack_subregions_false(self):
+        """Test create_table_of_regions_and_subregions with unpack_subregions=False (default behavior)."""
+        ds_regions = cast(Dataset, MockComplexRegionsDataset())
+
+        tb_result = geo.create_table_of_regions_and_subregions(ds_regions=ds_regions, unpack_subregions=False)
+
+        # Check that World includes Europe as a subregion (not unpacked)
+        world_members = tb_result.loc["World", "members"]
+        self.assertIn("Europe", world_members)
+        self.assertEqual(len(world_members), 1)  # Should only contain Europe
+
+        # Check that Europe includes countries
+        europe_members = tb_result.loc["Europe", "members"]
+        expected_countries = {"France", "Germany", "Italy", "Spain"}
+        self.assertEqual(set(europe_members), expected_countries)
+
+    def test_basic_unpack_subregions_true(self):
+        """Test create_table_of_regions_and_subregions with unpack_subregions=True."""
+        ds_regions = cast(Dataset, MockComplexRegionsDataset())
+
+        tb_result = geo.create_table_of_regions_and_subregions(ds_regions=ds_regions, unpack_subregions=True)
+
+        # Check that World now includes all European countries (Europe is unpacked)
+        world_members = tb_result.loc["World", "members"]
+        expected_countries = {"France", "Germany", "Italy", "Spain"}
+        self.assertEqual(set(world_members), expected_countries)
+
+        # Europe should still include the same countries
+        europe_members = tb_result.loc["Europe", "members"]
+        self.assertEqual(set(europe_members), expected_countries)
+
+    def test_deep_nesting_unpack_subregions(self):
+        """Test unpacking with multiple levels of nested subregions."""
+        ds_regions = cast(Dataset, MockComplexRegionsDataset(with_deep_nesting=True))
+
+        tb_result = geo.create_table_of_regions_and_subregions(ds_regions=ds_regions, unpack_subregions=True)
+
+        # Check that World ultimately includes all countries
+        world_members = tb_result.loc["World", "members"]
+        expected_countries = {"France", "Germany", "Italy", "Spain"}
+        self.assertEqual(set(world_members), expected_countries)
+
+        # Check that Europe includes all countries from its subregions
+        europe_members = tb_result.loc["Europe", "members"]
+        self.assertEqual(set(europe_members), expected_countries)
+
+        # Check that Western Europe includes its specific countries
+        western_europe_members = tb_result.loc["Western Europe", "members"]
+        expected_western = {"France", "Germany"}
+        self.assertEqual(set(western_europe_members), expected_western)
+
+        # Check that Southern Europe includes its specific countries
+        southern_europe_members = tb_result.loc["Southern Europe", "members"]
+        expected_southern = {"Italy", "Spain"}
+        self.assertEqual(set(southern_europe_members), expected_southern)
+
+    def test_circular_dependency_raises_error(self):
+        """Test that circular dependencies raise an error when unpacking subregions."""
+        ds_regions = cast(Dataset, MockComplexRegionsDataset(with_circular_dependency=True))
+
+        # Should raise ValueError due to circular dependency
+        with self.assertRaises(ValueError) as context:
+            geo.create_table_of_regions_and_subregions(ds_regions=ds_regions, unpack_subregions=True)
+
+        # Check that the error message mentions circular dependencies
+        self.assertIn("circular dependencies", str(context.exception))
+
+    def test_circular_dependency_works_without_unpacking(self):
+        """Test that circular dependencies don't cause issues when unpack_subregions=False."""
+        ds_regions = cast(Dataset, MockComplexRegionsDataset(with_circular_dependency=True))
+
+        # Should not raise an error when not unpacking
+        tb_result = geo.create_table_of_regions_and_subregions(ds_regions=ds_regions, unpack_subregions=False)
+
+        # Should have entries for all regions
+        expected_regions = {"Region A", "Region B", "World"}
+        actual_regions = set(tb_result.index)
+        self.assertTrue(expected_regions.issubset(actual_regions))
+
+        # Region A should include France and Region B (not unpacked)
+        region_a_members = tb_result.loc["Region A", "members"]
+        self.assertIn("France", region_a_members)
+        self.assertIn("Region B", region_a_members)
+
+        # Region B should include Germany and Region A (not unpacked)
+        region_b_members = tb_result.loc["Region B", "members"]
+        self.assertIn("Germany", region_b_members)
+        self.assertIn("Region A", region_b_members)
+
+    def test_successors_subregion_type(self):
+        """Test create_table_of_regions_and_subregions with subregion_type='successors'."""
+        ds_regions = cast(Dataset, MockRegionsDataset())
+
+        tb_result = geo.create_table_of_regions_and_subregions(
+            ds_regions=ds_regions, subregion_type="successors", unpack_subregions=False
+        )
+
+        # USSR should have successors Belarus and Russia
+        ussr_successors = tb_result.loc["USSR", "successors"]
+        expected_successors = {"Belarus", "Russia"}
+        self.assertEqual(set(ussr_successors), expected_successors)
+
+    def test_successors_with_unpack_subregions(self):
+        """Test successors with unpack_subregions=True."""
+        ds_regions = cast(Dataset, MockRegionsDataset())
+
+        tb_result = geo.create_table_of_regions_and_subregions(
+            ds_regions=ds_regions, subregion_type="successors", unpack_subregions=True
+        )
+
+        # USSR successors should still be Belarus and Russia (no further unpacking in our mock data)
+        ussr_successors = tb_result.loc["USSR", "successors"]
+        expected_successors = {"Belarus", "Russia"}
+        self.assertEqual(set(ussr_successors), expected_successors)
+
+    def test_empty_members_handling(self):
+        """Test that regions with empty members are handled correctly."""
+        ds_regions = cast(Dataset, MockComplexRegionsDataset())
+
+        tb_result = geo.create_table_of_regions_and_subregions(ds_regions=ds_regions, unpack_subregions=True)
+
+        # Countries should not appear in the result since they have empty members
+        country_names = {"France", "Germany", "Italy", "Spain"}
+        result_regions = set(tb_result.index)
+
+        # Countries with empty members should not be in the result
+        for country in country_names:
+            self.assertNotIn(country, result_regions)
+
+    def test_partial_nested_regions(self):
+        """Test scenario where some regions are nested and others are not."""
+
+        # Create a custom mock with mixed nesting
+        class MixedNestingDataset:
+            def __getitem__(self, name: str) -> Table:
+                mock_tb_regions = Table(
+                    {
+                        "code": ["USA", "CAN", "MEX", "FRA", "DEU", "NA", "EU", "WORLD"],
+                        "name": [
+                            "United States",
+                            "Canada",
+                            "Mexico",
+                            "France",
+                            "Germany",
+                            "North America",
+                            "Europe",
+                            "World",
+                        ],
+                        "region_type": [
+                            "country",
+                            "country",
+                            "country",
+                            "country",
+                            "country",
+                            "region",
+                            "region",
+                            "region",
+                        ],
+                        "is_historical": [False, False, False, False, False, False, False, False],
+                        "members": [
+                            "[]",
+                            "[]",
+                            "[]",
+                            "[]",
+                            "[]",
+                            '["USA", "CAN", "MEX"]',  # North America: only countries
+                            '["FRA", "DEU"]',  # Europe: only countries
+                            '["NA", "EU"]',  # World: includes regions
+                        ],
+                        "successors": ["[]", "[]", "[]", "[]", "[]", "[]", "[]", "[]"],
+                    }
+                ).set_index("code")
+                return mock_tb_regions
+
+            def read(self, name: str) -> Table:
+                return self.__getitem__(name)
+
+        ds_regions = cast(Dataset, MixedNestingDataset())
+
+        tb_result = geo.create_table_of_regions_and_subregions(ds_regions=ds_regions, unpack_subregions=True)
+
+        # World should include all countries from both North America and Europe
+        world_members = tb_result.loc["World", "members"]
+        expected_countries = {"United States", "Canada", "Mexico", "France", "Germany"}
+        self.assertEqual(set(world_members), expected_countries)
+
+        # Individual regions should maintain their original members
+        na_members = tb_result.loc["North America", "members"]
+        expected_na = {"United States", "Canada", "Mexico"}
+        self.assertEqual(set(na_members), expected_na)
+
+        eu_members = tb_result.loc["Europe", "members"]
+        expected_eu = {"France", "Germany"}
+        self.assertEqual(set(eu_members), expected_eu)
+
+    def test_self_referencing_region_error(self):
+        """Test that a region that includes itself raises an error."""
+
+        class SelfReferencingDataset:
+            def __getitem__(self, name: str) -> Table:
+                mock_tb_regions = Table(
+                    {
+                        "code": ["FRA", "WEIRD_REGION"],
+                        "name": ["France", "Weird Region"],
+                        "region_type": ["country", "region"],
+                        "is_historical": [False, False],
+                        "members": [
+                            "[]",
+                            '["FRA", "WEIRD_REGION"]',  # Region includes itself!
+                        ],
+                        "successors": ["[]", "[]"],
+                    }
+                ).set_index("code")
+                return mock_tb_regions
+
+            def read(self, name: str) -> Table:
+                return self.__getitem__(name)
+
+        ds_regions = cast(Dataset, SelfReferencingDataset())
+
+        # Should raise ValueError due to circular dependency
+        with self.assertRaises(ValueError) as context:
+            geo.create_table_of_regions_and_subregions(ds_regions=ds_regions, unpack_subregions=True)
+
+        self.assertIn("circular dependencies", str(context.exception))
+
+    def test_empty_region_members_with_unpacking(self):
+        """Test that entities with empty members are treated as terminal entities during unpacking."""
+
+        class EmptyRegionDataset:
+            def __getitem__(self, name: str) -> Table:
+                mock_tb_regions = Table(
+                    {
+                        "code": ["FRA", "EMPTY_REG", "WORLD"],
+                        "name": ["France", "Empty Region", "World"],
+                        "region_type": ["country", "region", "region"],
+                        "is_historical": [False, False, False],
+                        "members": [
+                            "[]",
+                            "[]",  # Empty region with no members (behaves like a country)
+                            '["FRA", "EMPTY_REG"]',
+                        ],
+                        "successors": ["[]", "[]", "[]"],
+                    }
+                ).set_index("code")
+                return mock_tb_regions
+
+            def read(self, name: str) -> Table:
+                return self.__getitem__(name)
+
+        ds_regions = cast(Dataset, EmptyRegionDataset())
+
+        tb_result = geo.create_table_of_regions_and_subregions(ds_regions=ds_regions, unpack_subregions=True)
+
+        # World should contain both France and Empty Region (both are terminal entities)
+        world_members = tb_result.loc["World", "members"]
+        expected_members = {"Empty Region", "France"}
+        self.assertEqual(set(world_members), expected_members)
+
+    def test_region_with_only_subregions_no_countries(self):
+        """Test a region that contains only other regions, no countries."""
+
+        class RegionOnlyDataset:
+            def __getitem__(self, name: str) -> Table:
+                mock_tb_regions = Table(
+                    {
+                        "code": ["FRA", "DEU", "EU", "MEGA_REG", "WORLD"],
+                        "name": ["France", "Germany", "Europe", "Mega Region", "World"],
+                        "region_type": ["country", "country", "region", "region", "region"],
+                        "is_historical": [False, False, False, False, False],
+                        "members": [
+                            "[]",
+                            "[]",
+                            '["FRA", "DEU"]',
+                            '["EU"]',  # Mega Region contains only Europe (no countries)
+                            '["MEGA_REG"]',
+                        ],
+                        "successors": ["[]", "[]", "[]", "[]", "[]"],
+                    }
+                ).set_index("code")
+                return mock_tb_regions
+
+            def read(self, name: str) -> Table:
+                return self.__getitem__(name)
+
+        ds_regions = cast(Dataset, RegionOnlyDataset())
+
+        tb_result = geo.create_table_of_regions_and_subregions(ds_regions=ds_regions, unpack_subregions=True)
+
+        # Mega Region should contain France and Germany (unpacked from Europe)
+        mega_reg_members = tb_result.loc["Mega Region", "members"]
+        expected_countries = {"France", "Germany"}
+        self.assertEqual(set(mega_reg_members), expected_countries)
+
+        # World should also contain France and Germany (unpacked from Mega Region -> Europe)
+        world_members = tb_result.loc["World", "members"]
+        self.assertEqual(set(world_members), expected_countries)
+
+    def test_no_regions_to_unpack(self):
+        """Test scenario where no regions need unpacking (all members are countries)."""
+
+        class CountriesOnlyDataset:
+            def __getitem__(self, name: str) -> Table:
+                mock_tb_regions = Table(
+                    {
+                        "code": ["FRA", "DEU", "EU"],
+                        "name": ["France", "Germany", "Europe"],
+                        "region_type": ["country", "country", "region"],
+                        "is_historical": [False, False, False],
+                        "members": [
+                            "[]",
+                            "[]",
+                            '["FRA", "DEU"]',  # Only countries, no subregions
+                        ],
+                        "successors": ["[]", "[]", "[]"],
+                    }
+                ).set_index("code")
+                return mock_tb_regions
+
+            def read(self, name: str) -> Table:
+                return self.__getitem__(name)
+
+        ds_regions = cast(Dataset, CountriesOnlyDataset())
+
+        # Both should work the same way since no unpacking is needed
+        tb_result_false = geo.create_table_of_regions_and_subregions(ds_regions=ds_regions, unpack_subregions=False)
+
+        tb_result_true = geo.create_table_of_regions_and_subregions(ds_regions=ds_regions, unpack_subregions=True)
+
+        # Both results should be identical
+        self.assertEqual(tb_result_false.loc["Europe", "members"], tb_result_true.loc["Europe", "members"])
+        expected_countries = {"France", "Germany"}
+        self.assertEqual(set(tb_result_true.loc["Europe", "members"]), expected_countries)
+
+    def test_complex_iteration_limit(self):
+        """Test that the iteration limit (10) is respected in complex scenarios."""
+
+        class DeepNestingDataset:
+            def __getitem__(self, name: str) -> Table:
+                # Create 12 levels of nesting to trigger the iteration limit
+                codes = ["BASE"]
+                names = ["Base"]
+                members_list = ["[]"]
+
+                for i in range(1, 12):  # Create 11 levels
+                    code = f"LEVEL_{i}"
+                    name = f"Level {i}"
+                    prev_code = codes[-1]
+
+                    codes.append(code)
+                    names.append(name)
+                    members_list.append(f'["{prev_code}"]')
+
+                mock_tb_regions = Table(
+                    {
+                        "code": codes,
+                        "name": names,
+                        "region_type": ["country"] + ["region"] * 11,
+                        "is_historical": [False] * 12,
+                        "members": members_list,
+                        "successors": ["[]"] * 12,
+                    }
+                ).set_index("code")
+                return mock_tb_regions
+
+            def read(self, name: str) -> Table:
+                return self.__getitem__(name)
+
+        ds_regions = cast(Dataset, DeepNestingDataset())
+
+        # Should complete successfully without hitting iteration limit
+        tb_result = geo.create_table_of_regions_and_subregions(ds_regions=ds_regions, unpack_subregions=True)
+
+        # The top level should contain the base country
+        top_level_members = tb_result.loc["Level 11", "members"]
+        self.assertEqual(top_level_members, ["Base"])
+
+    def test_invalid_json_in_members(self):
+        """Test handling of invalid JSON in the members field."""
+
+        class InvalidJSONDataset:
+            def __getitem__(self, name: str) -> Table:
+                mock_tb_regions = Table(
+                    {
+                        "code": ["FRA", "BAD_REG"],
+                        "name": ["France", "Bad Region"],
+                        "region_type": ["country", "region"],
+                        "is_historical": [False, False],
+                        "members": [
+                            "[]",
+                            "invalid json string",  # This will cause json.loads to fail
+                        ],
+                        "successors": ["[]", "[]"],
+                    }
+                ).set_index("code")
+                return mock_tb_regions
+
+            def read(self, name: str) -> Table:
+                return self.__getitem__(name)
+
+        ds_regions = cast(Dataset, InvalidJSONDataset())
+
+        # Should raise an error due to invalid JSON
+        with self.assertRaises(json.JSONDecodeError):
+            geo.create_table_of_regions_and_subregions(ds_regions=ds_regions, unpack_subregions=False)
 
 
 class MockPopulationDataset:
