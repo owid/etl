@@ -660,6 +660,20 @@ steps:
   data-private://grapher/language/2025-09-03/ethnologue:
     - data-private://garden/language/2025-09-03/ethnologue
 
+  # World Development Indicators - WDI
+  data://meadow/worldbank_wdi/2025-09-08/wdi:
+    - snapshot://worldbank_wdi/2025-09-08/wdi.zip
+
+  data://garden/worldbank_wdi/2025-09-08/wdi:
+    - data://garden/regions/2023-01-01/regions
+    - data://meadow/worldbank_wdi/2025-09-08/wdi
+    - data://garden/wb/2025-07-01/income_groups
+    - data://garden/demography/2024-07-15/population
+    - snapshot://worldbank_wdi/2025-09-08/wdi.zip
+
+  data://grapher/worldbank_wdi/2025-09-08/wdi:
+    - data://garden/worldbank_wdi/2025-09-08/wdi
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
