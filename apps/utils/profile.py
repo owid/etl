@@ -129,7 +129,7 @@ def cli(step: str, cpu: bool, mem: bool, functions: tuple[str]) -> None:
 
     if cpu:
         if additional_funcs:
-            lp.disable()  # Disable after execution
+            lp.disable()  # Disable after execution  # type: ignore
         lp.print_stats()  # type: ignore
 
 
