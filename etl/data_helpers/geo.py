@@ -878,8 +878,15 @@ def create_table_of_regions_and_subregions(
         # Replace subregions by their countries.
         # For example, "World" includes "Africa"; replace that by all African countries.
         tb_regions = tb_regions.reset_index()
+        # For safety (to avoid an infinite loop, track the number of iterations).
+        iterations = 0
         # Currently, the only case of composite subregions is World, but we make this process recursive, in case we add more in the future.
         while not (composed := tb_regions[tb_regions[subregion_type].isin(tb_regions["name"])]).empty:
+            # Break this clause if there is a circular loop.
+            iterations += 1
+            if iterations > 10:
+                raise ValueError("There may be circular dependencies among regions, so subregions cannot be unpacked.")
+
             for _, row in composed.iterrows():
                 # Create a temporary table without the composite subregion.
                 tb_without_composite_region = tb_regions[
