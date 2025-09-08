@@ -65,3 +65,16 @@ steps:
     - data://meadow/iucn/2025-09-05/threatened_and_evaluated_species
   data://grapher/iucn/2025-09-05/threatened_and_evaluated_species:
     - data://garden/iucn/2025-09-05/threatened_and_evaluated_species
+
+  # IUCN Endemic vertebrate species
+
+  data://meadow/iucn/2025-09-08/endemic_vertebrates:
+    - snapshot://iucn/2025-09-08/endemic_vertebrates.csv
+  data://garden/iucn/2025-09-08/endemic_vertebrates:
+    - data://meadow/iucn/2025-09-08/endemic_vertebrates
+    - data://meadow/iucn/2025-09-08/endemic_fish
+  data://grapher/iucn/2025-09-08/endemic_vertebrates:
+    - data://garden/iucn/2025-09-08/endemic_vertebrates
+
+  data://meadow/iucn/2025-09-08/endemic_fish:
+    - snapshot://iucn/2025-09-08/endemic_fish.csv
