@@ -1337,15 +1337,6 @@ tables:
       hd_hci_ovrl_ub_ma:
         title: Human capital index (HCI), male, upper bound (scale 0-1)
         unit: ''
-      ic_bus_dfrn_xq:
-        title: Ease of doing business score (0 = lowest performance to 100 = best performance)
-        unit: 0=lowest performance to 100=frontier
-      ic_bus_disc_xq:
-        title: Business extent of disclosure index (0=less disclosure to 10=more disclosure)
-        unit: 0=less disclosure to 10=more disclosure
-      ic_bus_ease_xq:
-        title: Ease of doing business rank (1=most business-friendly regulations)
-        unit: 1=most business-friendly regulations
       ic_bus_ndns_zs:
         title: New business density (new registrations per 1,000 people ages 15-64)
         short_unit: new registrations
@@ -1354,17 +1345,6 @@ tables:
         title: New businesses registered (number)
         short_unit: number
         unit: number
-      ic_crd_info_xq:
-        title: Depth of credit information index (0=low to 8=high)
-        unit: 0=low to 8=high
-      ic_crd_prvt_zs:
-        title: Private credit bureau coverage (% of adults)
-        short_unit: '%'
-        unit: '% of adults'
-      ic_crd_publ_zs:
-        title: Public credit registry coverage (% of adults)
-        short_unit: '%'
-        unit: '% of adults'
       ic_cus_durs_ex:
         title: Average time to clear exports through customs (days)
         short_unit: days
@@ -1373,34 +1353,10 @@ tables:
         title: Time to obtain an electrical connection (days)
         short_unit: days
         unit: days
-      ic_elc_outg:
-        title: Power outages in firms in a typical month (number)
-        short_unit: number
-        unit: number
       ic_elc_outg_zs:
         title: Firms experiencing electrical outages (% of firms)
         short_unit: '%'
         unit: '% of firms'
-      ic_elc_time:
-        title: Time required to get electricity (days)
-        short_unit: days
-        unit: days
-      ic_exp_csbc_cd:
-        title: Cost to export, border compliance (US$)
-        short_unit: $
-        unit: US$
-      ic_exp_csdc_cd:
-        title: Cost to export, documentary compliance (US$)
-        short_unit: $
-        unit: US$
-      ic_exp_tmbc:
-        title: Time to export, border compliance (hours)
-        short_unit: hours
-        unit: hours
-      ic_exp_tmdc:
-        title: Time to export, documentary compliance (hours)
-        short_unit: hours
-        unit: hours
       ic_frm_bkwc_zs:
         title: Firms using banks to finance working capital (% of firms)
         short_unit: '%'
@@ -1421,10 +1377,6 @@ tables:
         title: Informal payments to public officials (% of firms)
         short_unit: '%'
         unit: '% of firms'
-      ic_frm_crim_zs:
-        title: Losses due to theft and vandalism (% of annual sales of affected firms)
-        short_unit: '%'
-        unit: '% of annual sales for affected firms'
       ic_frm_durs:
         title: Time required to obtain an operating license (days)
         short_unit: days
@@ -1453,14 +1405,6 @@ tables:
         title: Value lost due to electrical outages (% of sales for affected firms)
         short_unit: '%'
         unit: '% of sales for affected firms'
-      ic_frm_rsdv_zs:
-        title: Firms that spend on R&D (% of firms)
-        short_unit: '%'
-        unit: '% of firms'
-      ic_frm_thev_zs:
-        title: Firms experiencing losses due to theft and vandalism (% of firms)
-        short_unit: '%'
-        unit: '% of firms'
       ic_frm_trng_zs:
         title: Firms offering formal training (% of firms)
         short_unit: '%'
@@ -1469,116 +1413,13 @@ tables:
         title: Time spent dealing with the requirements of government regulations (% of senior management time)
         short_unit: '%'
         unit: '% of senior management time'
-      ic_imp_csbc_cd:
-        title: Cost to import, border compliance (US$)
-        short_unit: $
-        unit: US$
-      ic_imp_csdc_cd:
-        title: Cost to import, documentary compliance (US$)
-        short_unit: $
-        unit: US$
-      ic_imp_tmbc:
-        title: Time to import, border compliance (hours)
-        short_unit: hours
-        unit: hours
-      ic_imp_tmdc:
-        title: Time to import, documentary compliance (hours)
-        short_unit: hours
-        unit: hours
-      ic_isv_durs:
-        title: Time to resolve insolvency (years)
-        short_unit: years
-        unit: years
-      ic_lgl_cred_xq:
-        title: Strength of legal rights index (0=weak to 12=strong)
-        unit: 0=weak to 12=strong
-      ic_lgl_durs:
-        title: Time required to enforce a contract (days)
-        short_unit: days
-        unit: days
-      ic_prp_durs:
-        title: Time required to register property (days)
-        short_unit: days
-        unit: days
-      ic_prp_proc:
-        title: Procedures to register property (number)
-        short_unit: number
-        unit: number
-      ic_reg_cost_pc_fe_zs:
-        title: Cost of business start-up procedures, female (% of GNI per capita)
-        short_unit: '%'
-        unit: '% of GNI per capita'
-      ic_reg_cost_pc_ma_zs:
-        title: Cost of business start-up procedures, male (% of GNI per capita)
-        short_unit: '%'
-        unit: '% of GNI per capita'
-      ic_reg_cost_pc_zs:
-        title: Cost of business start-up procedures (% of GNI per capita)
-        short_unit: '%'
-        unit: '% of GNI per capita'
-      ic_reg_durs:
-        title: Time required to start a business (days)
-        short_unit: days
-        unit: days
-      ic_reg_durs_fe:
-        title: Time required to start a business, female (days)
-        short_unit: days
-        unit: days
-      ic_reg_durs_ma:
-        title: Time required to start a business, male (days)
-        short_unit: days
-        unit: days
-      ic_reg_proc:
-        title: Start-up procedures to register a business (number)
-        short_unit: number
-        unit: number
-      ic_reg_proc_fe:
-        title: Start-up procedures to register a business, female (number)
-        short_unit: number
-        unit: number
-      ic_reg_proc_ma:
-        title: Start-up procedures to register a business, male (number)
-        short_unit: number
-        unit: number
-      ic_tax_durs:
-        title: Time to prepare and pay taxes (hours)
-        short_unit: hours
-        unit: hours
       ic_tax_gift_zs:
         title: Firms expected to give gifts in meetings with tax officials (% of firms)
         short_unit: '%'
         unit: '% of firms'
-      ic_tax_labr_cp_zs:
-        title: Labor tax and contributions (% of commercial profits)
-        short_unit: '%'
-        unit: '% of commercial profits'
       ic_tax_metg:
         title: Number of visits or required meetings with tax officials (average for affected firms)
         unit: average for affected firms
-      ic_tax_othr_cp_zs:
-        title: Other taxes payable by businesses (% of commercial profits)
-        short_unit: '%'
-        unit: '% of commercial profits'
-      ic_tax_paym:
-        title: Tax payments (number)
-        short_unit: number
-        unit: number
-      ic_tax_prft_cp_zs:
-        title: Profit tax (% of commercial profits)
-        short_unit: '%'
-        unit: '% of commercial profits'
-      ic_tax_totl_cp_zs:
-        title: Total tax and contribution rate (% of profit)
-        short_unit: '%'
-        unit: '% of commercial profits'
-      ic_wrh_durs:
-        title: Time required to build a warehouse (days)
-        short_unit: days
-        unit: days
-      ic_wrh_proc:
-        title: Procedures to build a warehouse (number)
-        short_unit: number
-        unit: number
       ie_ppi_engy_cd:
         title: Investment in energy with private participation (current US$)
         short_unit: $
@@ -4294,10 +4135,6 @@ tables:
         unit: '% of children in employment, ages 7-14'
       sm_pop_netm:
         title: Net migration
-      sm_pop_refg:
-        title: Refugee population by country or territory of asylum
-      sm_pop_refg_or:
-        title: Refugee population by country or territory of origin
       sm_pop_totl:
         title: International migrant stock, total
       sm_pop_totl_zs:
@@ -4734,20 +4571,12 @@ tables:
         title: Bound rate, simple mean, manufactured products (%)
         short_unit: '%'
         unit: '%'
-      tm_tax_manf_ip_zs:
-        title: Share of tariff lines with international peaks, manufactured products (%)
-        short_unit: '%'
-        unit: '%'
       tm_tax_manf_sm_ar_zs:
         title: Tariff rate, applied, simple mean, manufactured products (%)
         short_unit: '%'
         unit: '%'
       tm_tax_manf_sm_fn_zs:
         title: Tariff rate, most favored nation, simple mean, manufactured products (%)
-        short_unit: '%'
-        unit: '%'
-      tm_tax_manf_sr_zs:
-        title: Share of tariff lines with specific rates, manufactured products (%)
         short_unit: '%'
         unit: '%'
       tm_tax_manf_wm_ar_zs:
@@ -4766,20 +4595,12 @@ tables:
         title: Bound rate, simple mean, all products (%)
         short_unit: '%'
         unit: '%'
-      tm_tax_mrch_ip_zs:
-        title: Share of tariff lines with international peaks, all products (%)
-        short_unit: '%'
-        unit: '%'
       tm_tax_mrch_sm_ar_zs:
         title: Tariff rate, applied, simple mean, all products (%)
         short_unit: '%'
         unit: '%'
       tm_tax_mrch_sm_fn_zs:
         title: Tariff rate, most favored nation, simple mean, all products (%)
-        short_unit: '%'
-        unit: '%'
-      tm_tax_mrch_sr_zs:
-        title: Share of tariff lines with specific rates, all products (%)
         short_unit: '%'
         unit: '%'
       tm_tax_mrch_wm_ar_zs:
@@ -4798,20 +4619,12 @@ tables:
         title: Bound rate, simple mean, primary products (%)
         short_unit: '%'
         unit: '%'
-      tm_tax_tcom_ip_zs:
-        title: Share of tariff lines with international peaks, primary products (%)
-        short_unit: '%'
-        unit: '%'
       tm_tax_tcom_sm_ar_zs:
         title: Tariff rate, applied, simple mean, primary products (%)
         short_unit: '%'
         unit: '%'
       tm_tax_tcom_sm_fn_zs:
         title: Tariff rate, most favored nation, simple mean, primary products (%)
-        short_unit: '%'
-        unit: '%'
-      tm_tax_tcom_sr_zs:
-        title: Share of tariff lines with specific rates, primary products (%)
         short_unit: '%'
         unit: '%'
       tm_tax_tcom_wm_ar_zs:
@@ -5053,9 +4866,6 @@ tables:
       vc_idp_nwds:
         title: Internally displaced persons, new displacement associated with disasters (number of cases)
         unit: number of cases
-      vc_idp_tocv:
-        title: Internally displaced persons, total displaced by conflict and violence (number of people)
-        unit: number of people
       vc_ihr_psrc_fe_p5:
         title: Intentional homicides, female (per 100,000 female)
         unit: per 100,000 female
@@ -5303,17 +5113,17 @@ tables:
       en_ghg_fgas_ip_mt_ce_ar5:
         title: Fluorinated greenhouse gases (F-gases) emissions from Industrial Processes (Mt CO2e)
       eg_elc_accs_zs_without:
-       title:  Access to electricity (% of population with no access)
+        title: Access to electricity (% of population with no access)
       eg_cft_accs_zs_without:
         title: Access to clean fuels and technologies for cooking (% of population with no access)
       eg_elc_accs_zs_number:
-       title: Access to electricity (number of people with access)
+        title: Access to electricity (number of people with access)
       eg_elc_accs_zs_without_number:
-       title: Access to electricity (number of people with no access)
+        title: Access to electricity (number of people with no access)
       eg_cft_accs_zs_number:
-       title: Access to clean fuels and technologies for cooking (number with access)
+        title: Access to clean fuels and technologies for cooking (number with access)
       eg_cft_accs_zs_without_number:
-       title: Access to clean fuels and technologies for cooking (number with no access)
+        title: Access to clean fuels and technologies for cooking (number with no access)
       patents_per_million_people:
         title: Patents granted per million people
         unit: patents per million people
