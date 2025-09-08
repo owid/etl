@@ -1,0 +1,61 @@
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Biodiversity
+tables:
+  endemic_vertebrates:
+    variables:
+      mammals__total_endemics:
+        title: Endemic mammal species
+        description_short: |-
+          [Endemic species](#dod:endemic_species) are those known to occur naturally within one country only.
+        unit: endemic species
+      mammals__threatened_endemics:
+        title: Threatened endemic mammal species
+        description_short: |-
+          [Endemic species](#dod:endemic_species) are those known to occur naturally within one country only. Threatened species are those whose [extinction risk](#dod:extinction_risk) is classified as 'Critically Endangered', 'Endangered', or 'Vulnerable'. They are at a high or greater risk of extinction in the wild.
+        unit: endemic species
+      mammals__ex__and__ew_endemics:
+        title: Endemic mammal species that are extinct or extinct in the wild
+        unit: endemic species
+      birds__total_endemics:
+        title: Endemic bird species
+        description_short: |-
+          [Endemic species](#dod:endemic_species) are those known to occur naturally within one country only.
+        unit: endemic species
+      birds__threatened_endemics:
+        title: Threatened endemic bird species
+        description_short: |-
+          [Endemic species](#dod:endemic_species) are those known to occur naturally within one country only. Threatened species are those whose [extinction risk](#dod:extinction_risk) is classified as 'Critically Endangered', 'Endangered', or 'Vulnerable'. They are at a high or greater risk of extinction in the wild.
+        unit: endemic species
+      birds__ex__and__ew_endemics:
+        title: Endemic bird species that are extinct or extinct in the wild
+        unit: endemic species
+      reptiles__total_endemics:
+        title: Endemic reptile species
+        description_short: |-
+          [Endemic species](#dod:endemic_species) are those known to occur naturally within one country only.
+        unit: endemic species
+      reptiles__threatened_endemics:
+        title: Threatened endemic reptile species
+        description_short: |-
+          [Endemic species](#dod:endemic_species) are those known to occur naturally within one country only. Threatened species are those whose [extinction risk](#dod:extinction_risk) is classified as 'Critically Endangered', 'Endangered', or 'Vulnerable'. They are at a high or greater risk of extinction in the wild.
+        unit: endemic species
+      reptiles__ex__and__ew_endemics:
+        title: Endemic reptile species that are extinct or extinct in the wild
+        unit: endemic species
+      amphibians__total_endemics:
+        title: Endemic amphibian species
+        description_short: |-
+          [Endemic species](#dod:endemic_species) are those known to occur naturally within one country only.
+        unit: endemic species
+      amphibians__threatened_endemics:
+        title: Threatened endemic amphibian species
+        description_short: |-
+          [Endemic species](#dod:endemic_species) are those known to occur naturally within one country only. Threatened species are those whose [extinction risk](#dod:extinction_risk) is classified as 'Critically Endangered', 'Endangered', or 'Vulnerable'. They are at a high or greater risk of extinction in the wild.
+        unit: endemic species
+      amphibians__ex__and__ew_endemics:
+        title: Endemic amphibian species that are extinct or extinct in the wild
+        unit: endemic species
