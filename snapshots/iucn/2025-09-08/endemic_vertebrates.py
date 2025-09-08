@@ -1,6 +1,6 @@
 """Script to create a snapshot of dataset.
 
-The data for this snapshot was taken from the IUCN Red List Summary Statistics Table 1a, available at: https://www.iucnredlist.org/resources/summary-statistics
+The data for this snapshot was taken from the IUCN Red List Summary Statistics Table 8a, available at: https://www.iucnredlist.org/resources/summary-statistics
 """
 
 import io

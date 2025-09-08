@@ -4,6 +4,7 @@ definitions:
     presentation:
       topic_tags:
         - Biodiversity
+    unit: endemic species
 tables:
   endemic_vertebrates:
     variables:
@@ -11,51 +12,111 @@ tables:
         title: Endemic mammal species
         description_short: |-
           [Endemic species](#dod:endemic_species) are those known to occur naturally within one country only.
-        unit: endemic species
       mammals__threatened_endemics:
         title: Threatened endemic mammal species
         description_short: |-
           [Endemic species](#dod:endemic_species) are those known to occur naturally within one country only. Threatened species are those whose [extinction risk](#dod:extinction_risk) is classified as 'Critically Endangered', 'Endangered', or 'Vulnerable'. They are at a high or greater risk of extinction in the wild.
-        unit: endemic species
       mammals__ex__and__ew_endemics:
         title: Endemic mammal species that are extinct or extinct in the wild
-        unit: endemic species
       birds__total_endemics:
         title: Endemic bird species
         description_short: |-
           [Endemic species](#dod:endemic_species) are those known to occur naturally within one country only.
-        unit: endemic species
       birds__threatened_endemics:
         title: Threatened endemic bird species
         description_short: |-
           [Endemic species](#dod:endemic_species) are those known to occur naturally within one country only. Threatened species are those whose [extinction risk](#dod:extinction_risk) is classified as 'Critically Endangered', 'Endangered', or 'Vulnerable'. They are at a high or greater risk of extinction in the wild.
-        unit: endemic species
       birds__ex__and__ew_endemics:
         title: Endemic bird species that are extinct or extinct in the wild
-        unit: endemic species
       reptiles__total_endemics:
         title: Endemic reptile species
         description_short: |-
           [Endemic species](#dod:endemic_species) are those known to occur naturally within one country only.
-        unit: endemic species
       reptiles__threatened_endemics:
         title: Threatened endemic reptile species
         description_short: |-
           [Endemic species](#dod:endemic_species) are those known to occur naturally within one country only. Threatened species are those whose [extinction risk](#dod:extinction_risk) is classified as 'Critically Endangered', 'Endangered', or 'Vulnerable'. They are at a high or greater risk of extinction in the wild.
-        unit: endemic species
       reptiles__ex__and__ew_endemics:
         title: Endemic reptile species that are extinct or extinct in the wild
-        unit: endemic species
       amphibians__total_endemics:
         title: Endemic amphibian species
         description_short: |-
           [Endemic species](#dod:endemic_species) are those known to occur naturally within one country only.
-        unit: endemic species
       amphibians__threatened_endemics:
         title: Threatened endemic amphibian species
         description_short: |-
           [Endemic species](#dod:endemic_species) are those known to occur naturally within one country only. Threatened species are those whose [extinction risk](#dod:extinction_risk) is classified as 'Critically Endangered', 'Endangered', or 'Vulnerable'. They are at a high or greater risk of extinction in the wild.
-        unit: endemic species
       amphibians__ex__and__ew_endemics:
         title: Endemic amphibian species that are extinct or extinct in the wild
-        unit: endemic species
+        description_short: |-
+          [Endemic species](#dod:endemic_species) are those known to occur naturally within one country only.
+      fw_fish__total_endemics:
+        title: Endemic freshwater fish species
+        description_short: |-
+          [Endemic species](#dod:endemic_species) are those known to occur naturally within one country only.
+      fw_fish__threatened_endemics:
+        title: Threatened endemic freshwater fish species
+        description_short: |-
+          [Endemic species](#dod:endemic_species) are those known to occur naturally within one country only. Threatened species are those whose [extinction risk](#dod:extinction_risk) is classified as 'Critically Endangered', 'Endangered', or 'Vulnerable'. They are at a high or greater risk of extinction in the wild.
+      fw_fish__ex__and__ew_endemics:
+        title: Endemic freshwater fish species that are extinct or extinct in the wild
+      groupers__total_endemics:
+        title: Endemic grouper species
+        description_short: |-
+          [Endemic species](#dod:endemic_species) are those known to occur naturally within one country only.
+      groupers__threatened_endemics:
+        title: Threatened endemic grouper species
+        description_short: |-
+          [Endemic species](#dod:endemic_species) are those known to occur naturally within one country only. Threatened species are those whose [extinction risk](#dod:extinction_risk) is classified as 'Critically Endangered', 'Endangered', or 'Vulnerable'. They are at a high or greater risk of extinction in the wild.
+      groupers__ex__and__ew_endemics:
+        title: Endemic grouper species that are extinct or extinct in the wild
+      herrings__anchovies__etc__total_endemics:
+        title: Endemic herring and anchovy species
+        description_short: |-
+          [Endemic species](#dod:endemic_species) are those known to occur naturally within one country only.
+      herrings__anchovies__etc__threatened_endemics:
+        title: Threatened endemic herring and anchovy species
+        description_short: |-
+          [Endemic species](#dod:endemic_species) are those known to occur naturally within one country only. Threatened species are those whose [extinction risk](#dod:extinction_risk) is classified as 'Critically Endangered', 'Endangered', or 'Vulnerable'. They are at a high or greater risk of extinction in the wild.
+      herrings__anchovies__etc__ex__and__ew_endemics:
+        title: Endemic herring and anchovy species that are extinct or extinct in the wild
+      seahorses__and__pipefish__total_endemics:
+        title: Endemic seahorse and pipefish species
+        description_short: |-
+          [Endemic species](#dod:endemic_species) are those known to occur naturally within one country only.
+      seahorses__and__pipefish__threatened_endemics:
+        title: Threatened endemic seahorse and pipefish species
+        description_short: |-
+          [Endemic species](#dod:endemic_species) are those known to occur naturally within one country only. Threatened species are those whose [extinction risk](#dod:extinction_risk) is classified as 'Critically Endangered', 'Endangered', or 'Vulnerable'. They are at a high or greater risk of extinction in the wild.
+      seahorses__and__pipefish__ex__and__ew_endemics:
+        title: Endemic seahorse and pipefish species that are extinct or extinct in the wild
+      sturgeons__total_endemics:
+        title: Endemic sturgeon species
+        description_short: |-
+          [Endemic species](#dod:endemic_species) are those known to occur naturally within one country only.
+      sturgeons__threatened_endemics:
+        title: Threatened endemic sturgeon species
+        description_short: |-
+          [Endemic species](#dod:endemic_species) are those known to occur naturally within one country only. Threatened species are those whose [extinction risk](#dod:extinction_risk) is classified as 'Critically Endangered', 'Endangered', or 'Vulnerable'. They are at a high or greater risk of extinction in the wild.
+      sturgeons__ex__and__ew_endemics:
+        title: Endemic sturgeon species that are extinct or extinct in the wild
+      wrasses__and__parrotfishes__total_endemics:
+        title: Endemic wrasse and parrotfish species
+        description_short: |-
+          [Endemic species](#dod:endemic_species) are those known to occur naturally within one country only.
+      wrasses__and__parrotfishes__threatened_endemics:
+        title: Threatened endemic wrasse and parrotfish species
+        description_short: |-
+          [Endemic species](#dod:endemic_species) are those known to occur naturally within one country only. Threatened species are those whose [extinction risk](#dod:extinction_risk) is classified as 'Critically Endangered', 'Endangered', or 'Vulnerable'. They are at a high or greater risk of extinction in the wild.
+      wrasses__and__parrotfishes__ex__and__ew_endemics:
+        title: Endemic wrasse and parrotfish species that are extinct or extinct in the wild
+      sharks__and__rays__total_endemics:
+        title: Endemic shark and ray species
+        description_short: |-
+          [Endemic species](#dod:endemic_species) are those known to occur naturally within one country only.
+      sharks__and__rays__threatened_endemics:
+        title: Threatened endemic shark and ray species
+        description_short: |-
+          [Endemic species](#dod:endemic_species) are those known to occur naturally within one country only. Threatened species are those whose [extinction risk](#dod:extinction_risk) is classified as 'Critically Endangered', 'Endangered', or 'Vulnerable'. They are at a high or greater risk of extinction in the wild.
+      sharks__and__rays__ex__and__ew_endemics:
+        title: Endemic shark and ray species that are extinct or extinct in the wild
