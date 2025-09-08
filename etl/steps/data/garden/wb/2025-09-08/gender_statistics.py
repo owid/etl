@@ -112,7 +112,7 @@ def add_metadata(tb: Table, tb_meta: pd.DataFrame) -> Table:
         if column not in ["country", "year"]:
             # Get the column metadata object
             meta = tb[column].metadata
-            
+
             if column in metadata_dict:
                 meta_info = metadata_dict[column]
 
