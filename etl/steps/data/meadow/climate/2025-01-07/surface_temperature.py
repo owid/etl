@@ -7,12 +7,12 @@ import geopandas as gpd
 import numpy as np
 import pandas as pd
 import pyproj
+import rioxarray as rxr
 import xarray as xr
 from owid.catalog import Table
 from rioxarray.exceptions import NoDataInBounds, OneDimensionalRaster
 from shapely.geometry import mapping
 from structlog import get_logger
-from tenacity import Retrying, retry_if_exception_type, stop_after_attempt, wait_fixed
 from tqdm import tqdm
 
 from etl.helpers import PathFinder
@@ -43,10 +43,10 @@ def _load_data_array(snap: Snapshot) -> xr.DataArray:
     da = da["t2m"] - 273.15
 
     # Set the coordinate reference system for the temperature data to EPSG 4326.
-    # NOTE: we're getting random ValueError from pyproj
-    for attempt in Retrying(retry=retry_if_exception_type(ValueError), stop=stop_after_attempt(3), wait=wait_fixed(2)):
-        with attempt:
-            da = da.rio.write_crs("epsg:4326")
+    # NOTE: export_grid_mapping is set to False to avoid error
+    # ValueError: Invalid value supplied 'WktVersion.WKT2_2019'. Only ('WKT2_2015', 'WKT2_2015_SIMPLIFIED', 'WKT2_2018', 'WKT2_2018_SIMPLIFIED', 'WKT2_2019', 'WKT2_2019_SIMPLIFIED', 'WKT1_GDAL', 'WKT1_ESRI') are supported.
+    with rxr.set_options(export_grid_mapping=False):
+        da = da.rio.write_crs("EPSG:4326")
 
     return da
 
