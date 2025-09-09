@@ -38,14 +38,6 @@ steps:
     - data://garden/biodiversity/2024-09-30/living_planet_index_completeness
 
   #
-  # IUCN Number of species in each extinction risk category
-  #
-  data://meadow/biodiversity/2024-12-23/iucn_number_each_status:
-    - snapshot://biodiversity/2024-12-23/iucn_number_each_status.csv
-  data://garden/biodiversity/2024-12-23/iucn_number_each_status:
-    - data://meadow/biodiversity/2024-12-23/iucn_number_each_status
-  data://grapher/biodiversity/2024-12-23/iucn_number_each_status:
-    - data://garden/biodiversity/2024-12-23/iucn_number_each_status
 
   #
   # Habitat loss
