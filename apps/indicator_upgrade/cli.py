@@ -160,11 +160,24 @@ def undo_command(dry_run: bool) -> None:
 
     log.info(f"Found {len(indicator_mapping)} variable mappings to undo")
 
-    # 2. Invert the mapping (swap old and new IDs to reverse the upgrade)
+    # 2. Check for duplicate new indicator IDs (many-to-one mappings)
+    new_ids = list(indicator_mapping.values())
+    duplicate_new_ids = [id for id in set(new_ids) if new_ids.count(id) > 1]
+
+    if duplicate_new_ids:
+        log.error("Cannot undo upgrade: Multiple old indicators were mapped to the same new indicator(s)")
+        log.error(f"Duplicate new indicator IDs: {duplicate_new_ids}")
+        log.error("This creates ambiguity - we cannot determine which old indicator to restore")
+        log.error("Original mapping:")
+        for old_id, new_id in indicator_mapping.items():
+            log.error(f"  {old_id} -> {new_id}")
+        return
+
+    # 3. Invert the mapping (swap old and new IDs to reverse the upgrade)
     mapping_inverted = {v: k for k, v in indicator_mapping.items()}
     log.info(f"Inverted mapping: {mapping_inverted}")
 
-    # 3. Get affected charts
+    # 4. Get affected charts
     charts = get_affected_charts_cli(mapping_inverted)
 
     if not charts:
@@ -177,10 +190,10 @@ def undo_command(dry_run: bool) -> None:
             chart_url = OWID_ENV.chart_site(chart.slug) if chart.slug else f"Chart {chart.id}"
             log.info(f"  - Chart {chart.id}: {chart_url}")
 
-        # 4. Update charts with inverted mapping (revert the changes)
+        # 5. Update charts with inverted mapping (revert the changes)
         push_new_charts_cli(charts, mapping_inverted, dry_run=dry_run)
 
-    # 5. Delete variable mapping from database (only if not dry run)
+    # 6. Delete variable mapping from database (only if not dry run)
     if not dry_run:
         WizardDB.delete_variable_mapping()
         log.info("Deleted variable mapping from database")

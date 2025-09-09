@@ -205,6 +205,22 @@ def map_old_and_new_indicators(
     """
     # get initial mapping
     mapping, missing_old, missing_new = preliminary_mapping(old_indicators, new_indicators, match_identical)
+
+    # Display preliminary mapping results
+    if match_identical:
+        if len(mapping) > 0:
+            print(f"\n✅ Found {len(mapping)} perfect matches (identical names):")
+            for _, row in mapping.iterrows():
+                print(f"  • {row['name_old']} (ID: {row['id_old']} → {row['id_new']})")
+        else:
+            print("\n❌ No perfect matches found (no variables with identical names)")
+
+        if len(missing_old) > 0:
+            print(f"\n🔍 {len(missing_old)} variables need manual matching...")
+        else:
+            print("\n🎉 All variables have been automatically matched!")
+            return mapping
+
     # get suggestions for mapping
     suggestions = find_mapping_suggestions(missing_old, missing_new, similarity_name)
     # iterate over suggestions and get user feedback
@@ -241,6 +257,21 @@ def map_old_and_new_indicators_auto(
     """
     # Get initial mapping (identical matches)
     mapping, missing_old, missing_new = preliminary_mapping(old_indicators, new_indicators, match_identical)
+
+    # Display preliminary mapping results
+    if match_identical:
+        if len(mapping) > 0:
+            log.info(f"Found {len(mapping)} perfect matches (identical names)")
+            for _, row in mapping.iterrows():
+                log.info(f"  • {row['name_old']} (ID: {row['id_old']} → {row['id_new']})")
+        else:
+            log.info("No perfect matches found (no variables with identical names)")
+
+        if len(missing_old) > 0:
+            log.info(f"{len(missing_old)} variables need automatic matching (similarity >= {auto_threshold}%)")
+        else:
+            log.info("All variables have been automatically matched with perfect matches!")
+            return mapping
 
     # Get suggestions for mapping
     suggestions = find_mapping_suggestions(missing_old, missing_new, similarity_name)
@@ -645,13 +676,14 @@ def consolidate_mapping_suggestions_with_user(
 
     Given an initial mapping and a list of suggestions, this function prompts the user with options and consolidates the mapping
     based on their input."""
-    count = 0
     ids_new_ignore = mapping["id_new"].tolist()
     mappings = [mapping]
+    total_suggestions = len(suggestions)
+
     while len(suggestions) > 0:
         # always access last suggestion
         suggestion = suggestions[-1]
-        count += 1
+        current_position = total_suggestions - len(suggestions) + 1
 
         # get relevant variables
         name_old = suggestion["old"]["name_old"]
@@ -661,7 +693,7 @@ def consolidate_mapping_suggestions_with_user(
         new_indexes = missing_new.index.tolist()
 
         # display comparison to user
-        click.secho(f"\nVARIABLE {count}/{len(suggestions)}", bold=True, bg="white", fg="black")
+        click.secho(f"\nVARIABLE {current_position}/{total_suggestions}", bold=True, bg="white", fg="black")
         _display_compared_variables(
             old_name=cast(str, name_old),
             missing_new=missing_new,
@@ -692,6 +724,7 @@ def consolidate_mapping_suggestions_with_user(
 
             # forget suggestion once mapped or if user chose to ignore (chosen_id=-1)
             _ = suggestions.pop()
+        # If chosen_id is None (invalid input), don't remove suggestion - stay on same variable
 
         mapping = pd.concat(mappings, ignore_index=True)
 
@@ -746,16 +779,25 @@ def _display_compared_variables(
     n_max_suggestions: int = N_MAX_SUGGESTIONS,
 ) -> None:
     """Display final variable mapping summary in terminal."""
-    new_name = missing_new.iloc[0]["name_new"]
     click.secho(f"\nOld variable: {old_name}", fg="red", bold=True, blink=True)
-    click.secho(f"New variable: {new_name}", fg="green", bold=True)
-    click.secho("\n\tOther options:", italic=True)
-    for i, row in missing_new.iloc[1 : 1 + n_max_suggestions].iterrows():
-        click.secho(
-            f"\t{i:5} - {row['name_new']} (id={row['id_new']}, similarity={row['similarity']:.0f})",
-            fg="bright_green",
-        )
-    click.echo("\n")
+    click.secho("\nOptions:", italic=True)
+
+    # Show all options (including the best match) with their index numbers
+    max_to_show = min(len(missing_new), n_max_suggestions + 1)  # +1 to include the best match
+    for idx, (i, row) in enumerate(missing_new.iloc[:max_to_show].iterrows()):
+        if idx == 0:
+            # Highlight the best match
+            click.secho(
+                f"{i:5} - {row['name_new']} (id={row['id_new']}, similarity={row['similarity']:.0f}) [BEST MATCH]",
+                fg="green",
+                bold=True,
+            )
+        else:
+            click.secho(
+                f"{i:5} - {row['name_new']} (id={row['id_new']}, similarity={row['similarity']:.0f})",
+                fg="bright_green",
+            )
+    click.echo("")
 
 
 def _input_manual_decision(new_indexes: list[Any]) -> Any:
