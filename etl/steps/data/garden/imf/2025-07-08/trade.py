@@ -32,13 +32,35 @@ REGIONS_OWID = ["North America", "South America", "Europe", "Africa", "Asia", "O
 EXPORT_COL = "Exports of goods, Free on board (FOB), US dollar"
 IMPORT_COL = "Imports of goods, Cost insurance freight (CIF), US dollar"
 
+# Historical region dissolution dates
+HISTORICAL_DISSOLUTIONS = {
+    "East Germany": 1990,
+    "USSR": 1991,
+    "Yugoslavia": 1992,
+    "Czechoslovakia": 1993,
+    "Serbia and Montenegro": 2006,
+    "Netherlands Antilles": 2010,
+}
+
+# Countries to exclude before their independence from historical regions
+EXCLUDE_MEMBERS_OF_HISTORICAL_REGIONS = {
+    "Germany": 1990,
+    "Latvia": 1991,
+    "Aruba": 2010,
+    "Serbia": 2006,
+    "Montenegro": 2006,
+    "Curacao": 2010,  # dataset spelling varies; harmonization usually fixes diacritics
+    "Sint Maarten (Dutch part)": 2010,
+    "Czechia": 1993,
+    "Slovakia": 1993,
+}
+
 
 def run() -> None:
     # Load inputs
     ds_meadow = paths.load_dataset("trade")
     ds_regions = paths.load_dataset("regions")
     ds_wdi = paths.load_dataset("wdi")
-    ds_population = paths.load_dataset("population")
 
     # Read table from meadow dataset (LONG format with 'indicator' & 'value')
     tb_long = ds_meadow.read("trade")
@@ -69,7 +91,7 @@ def run() -> None:
     tb_long = tb_long[
         (tb_long["country"].isin(list(members) + REGIONS_OF_INTEREST))
         & (tb_long["counterpart_country"].isin(REGIONS_OF_INTEREST + ["World"]))
-    ].copy()
+    ]
 
     # --- Compute shares vs. each country's world totals -------
     tb = calculate_trade_shares_as_share_world(tb_long)
@@ -84,7 +106,7 @@ def run() -> None:
     tb.loc[mask_intraregional, "counterpart_country"] = "Intraregional"
 
     # --- GDP --------------------------------------------------------------
-    gdp_data = _load_gdp_data(ds_wdi, ds_population)
+    gdp_data = ds_wdi.read("wdi")[["country", "year", "ny_gdp_mktp_cd"]].copy()
 
     # China imports as share of GDP (attached to counterpart=World rows)
     tb = add_china_imports_share_of_gdp(tb, gdp_data)
@@ -133,13 +155,17 @@ def run() -> None:
 def _harmonize_countries(tb: Table) -> Table:
     """Harmonize country names for both country and counterpart_country columns."""
     tb = geo.harmonize_countries(
-        df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
+        df=tb,
+        countries_file=paths.country_mapping_path,
+        excluded_countries_file=paths.excluded_countries_path,
+        warn_on_unknown_excluded_countries=False,
     )
     tb = geo.harmonize_countries(
         df=tb,
         country_col="counterpart_country",
         countries_file=paths.country_mapping_path,
         excluded_countries_file=paths.excluded_countries_path,
+        warn_on_unknown_excluded_countries=False,
     )
     return tb
 
@@ -231,33 +257,20 @@ def calculate_trade_shares_as_share_world(tb_long: Table) -> Table:
     combined = pr.concat([non_world, world], ignore_index=True)
     # Drop helper columns
     combined = combined.drop(
-        columns=[
-            c
-            for c in ["total_exports", "total_imports", "total_trade_volume", "bilateral_trade_volume"]
-            if c in combined
-        ],
+        columns=[c for c in ["total_exports", "total_imports", "total_trade_volume"] if c in combined],
         errors="ignore",
     )
     return combined
 
 
-def _load_gdp_data(ds_wdi: Dataset, ds_population: Dataset) -> Table:
-    """Load and calculate total GDP data from WDI and population datasets."""
-    tb_gdp_pc = ds_wdi.read("wdi")[["country", "year", "ny_gdp_pcap_cd"]].copy()
-    tb_population = ds_population.read("population")[["country", "year", "population"]].copy()
-
-    gdp = pr.merge(tb_gdp_pc, tb_population, on=["country", "year"], how="inner")
-    gdp["gdp_total"] = gdp["ny_gdp_pcap_cd"] * gdp["population"]
-    return gdp[["country", "year", "gdp_total"]].copy()
-
-
 def add_china_imports_share_of_gdp(tb: Table, gdp_data: Table) -> Table:
     """Add China imports as share of GDP (as %) for each country-year; attach to counterpart=World rows."""
+
     china_imports = tb[(tb["counterpart_country"] == "China")][["country", "year", IMPORT_COL]].copy()
     china_imports = china_imports.rename(columns={IMPORT_COL: "china_imports_value"})
 
     china_gdp = pr.merge(gdp_data, china_imports, on=["country", "year"], how="inner")
-    china_gdp["china_imports_share_of_gdp"] = china_gdp["china_imports_value"] / china_gdp["gdp_total"] * 100
+    china_gdp["china_imports_share_of_gdp"] = china_gdp["china_imports_value"] / china_gdp["ny_gdp_mktp_cd"] * 100
     china_gdp = china_gdp[["country", "year", "china_imports_share_of_gdp"]].copy()
     china_gdp["counterpart_country"] = "World"
 
@@ -275,7 +288,7 @@ def add_total_imports_share_of_gdp(tb_world: Table, gdp_data: Table) -> Table:
     total_imports = tb_world[["country", "year", IMPORT_COL]].rename(columns={IMPORT_COL: "total_imports_value"})
     total_imports = pr.merge(gdp_data, total_imports, on=["country", "year"], how="inner")
     total_imports["total_imports_share_of_gdp"] = (
-        total_imports["total_imports_value"] / total_imports["gdp_total"] * 100
+        total_imports["total_imports_value"] / total_imports["ny_gdp_mktp_cd"] * 100
     )
     out = total_imports[["country", "year", "total_imports_share_of_gdp"]].copy()
     out["counterpart_country"] = "World"
@@ -309,14 +322,15 @@ def get_country_import_ranking(tb: Table, target_country: str) -> Table:
     """
     import_data = tb[tb["indicator"] == IMPORT_COL].copy()
 
-    results = []
-    for (country, year), group in import_data.groupby(["country", "year"], sort=False):
-        ranked = group.sort_values("value", ascending=False).reset_index(drop=True)
-        pos = ranked.index[ranked["counterpart_country"] == target_country]
-        if len(pos) == 1:
-            results.append({"country": country, "year": year, "import_rank": int(pos[0]) + 1})
+    # Calculate rank using pandas ranking (1-based, descending by value)
+    import_data["import_rank"] = (
+        import_data.groupby(["country", "year"])["value"].rank(method="min", ascending=False).astype(int)
+    )
 
-    out = Table(results).copy_metadata(tb)
+    # Filter for target country only
+    out = import_data[import_data["counterpart_country"] == target_country][["country", "year", "import_rank"]].copy()
+
+    out = Table(out).copy_metadata(tb)
     out["counterpart_country"] = target_country
     return out
 
@@ -325,30 +339,10 @@ def clean_historical_overlaps(tb: Table, country_col: str = "country") -> Table:
     """
     Remove historical regions from Table after their dissolution dates and exclude members of historical regions before their dissolution dates.
     """
-    historical_dissolutions = {
-        "East Germany": 1990,
-        "USSR": 1991,
-        "Yugoslavia": 1992,
-        "Czechoslovakia": 1993,
-        "Serbia and Montenegro": 2006,
-        "Netherlands Antilles": 2010,
-    }
-    exclude_members_of_historical_regions = {
-        "Germany": 1990,
-        "Latvia": 1991,
-        "Aruba": 2010,
-        "Serbia": 2006,
-        "Montenegro": 2006,
-        "Curacao": 2010,  # dataset spelling varies; harmonization usually fixes diacritics
-        "Sint Maarten (Dutch part)": 2010,
-        "Czechia": 1993,
-        "Slovakia": 1993,
-    }
-
     tb_cleaned = tb.copy()
-    for region, diss_year in historical_dissolutions.items():
+    for region, diss_year in HISTORICAL_DISSOLUTIONS.items():
         tb_cleaned = tb_cleaned[~((tb_cleaned[country_col] == region) & (tb_cleaned["year"] >= diss_year))]
-    for country, year in exclude_members_of_historical_regions.items():
+    for country, year in EXCLUDE_MEMBERS_OF_HISTORICAL_REGIONS.items():
         tb_cleaned = tb_cleaned[~((tb_cleaned[country_col] == country) & (tb_cleaned["year"] < year))]
     return tb_cleaned
 

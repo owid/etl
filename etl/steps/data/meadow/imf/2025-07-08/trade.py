@@ -22,8 +22,9 @@ def run() -> None:
     # Drop unnecessary columns.
     tb = tb.drop(columns=["DATASET", "SERIES_CODE", "OBS_MEASURE", "FREQUENCY", "SCALE"])
 
-    # Melt year columns (1948-2024) into rows
-    year_columns = [str(year) for year in range(1948, 2025)]
+    # Melt year columns into rows
+    # Extract year columns (assuming they are 4-digit numeric strings)
+    year_columns = [col for col in tb.columns if col.isdigit() and len(col) == 4]
     tb = tb.melt(
         id_vars=["COUNTRY", "INDICATOR", "COUNTERPART_COUNTRY"],
         value_vars=year_columns,
