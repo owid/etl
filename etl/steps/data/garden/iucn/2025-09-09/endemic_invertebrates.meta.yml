@@ -6,7 +6,7 @@ definitions:
         - Biodiversity
     unit: endemic species
 tables:
-  endemic_vertebrates:
+  endemic_invertebrates:
     variables:
       fw_crab__total_endemics:
         title: Endemic freshwater crab species
