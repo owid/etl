@@ -109,7 +109,6 @@ def group_classes(tb: Table) -> Table:
     # Check if any expected class names are missing from the data
     unique_classes = set(tb["country"].unique())
     expected_classes = set(all_groups.keys())
-    classes_in_data = expected_classes.intersection(unique_classes)
     missing_classes = expected_classes - unique_classes
 
     if missing_classes:
