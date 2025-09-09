@@ -5,7 +5,7 @@ definitions:
     presentation:
       attribution_short: ILO
       topic_tags:
-        - Labor & Employment
+        - Work & Employment
     display: &common_display
       tolerance: 5
 
