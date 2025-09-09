@@ -7,10 +7,35 @@ import streamlit as st
 from pydantic import BaseModel
 from structlog import get_logger
 
+from apps.indicator_upgrade.match import main as match_main
+from apps.indicator_upgrade.upgrade import cli_upgrade_indicators
 from apps.wizard.app_pages.indicator_upgrade.indicator_mapping import reset_indicator_form
 from apps.wizard.utils import set_states
+from etl.db import get_connection
+from etl.grapher.io import get_variables_in_dataset
 
 log = get_logger()
+
+
+def get_mapping_status(old_dataset_id: int, new_dataset_id: int) -> tuple[int, int, int]:
+    """Get the current mapping status for the dataset pair.
+
+    Returns:
+        tuple: (total_old_indicators, mapped_indicators, unmapped_indicators)
+    """
+    with get_connection() as db_conn:
+        # Get variables from old dataset that have been used in at least one chart
+        old_indicators = get_variables_in_dataset(db_conn=db_conn, dataset_id=old_dataset_id, only_used_in_charts=True)
+        # Get variables from new dataset that have been used in at least one chart
+        new_indicators = get_variables_in_dataset(db_conn=db_conn, dataset_id=new_dataset_id, only_used_in_charts=True)
+
+    mapped_indicators = len(new_indicators)
+    unmapped_indicators = len(old_indicators)
+
+    total_indicators = mapped_indicators + unmapped_indicators
+
+    return total_indicators, mapped_indicators, unmapped_indicators
+
 
 # Set to True to select good initial default dataset selections
 DEBUG = False
@@ -194,6 +219,69 @@ def build_dataset_form(df: pd.DataFrame, similarity_names: Dict[str, Any]) -> "S
                 help="Select the preferred function for matching indicators. Find more details at https://www.analyticsvidhya.com/blog/2021/07/fuzzy-string-matching-a-hands-on-guide/",
                 on_change=set_states_if_form_is_modified,
             )
+
+    # Auto-upgrade button for perfectly matching indicators
+    if st.button(
+        "🚀 Upgrade perfectly matching indicators",
+        type="primary",
+        width="stretch",
+        help="Automatically match and upgrade indicators with identical names first",
+    ):
+        with st.spinner("Running automatic indicator upgrade..."):
+            # Get the selected dataset IDs using the display name to ID mapping
+            old_dataset_name = st.session_state.get("old_dataset_selectbox")
+            new_dataset_name = st.session_state.get("new_dataset_selectbox")
+
+            old_dataset_id = display_name_to_id_mapping.get(old_dataset_name) if old_dataset_name else None
+            new_dataset_id = display_name_to_id_mapping.get(new_dataset_name) if new_dataset_name else None
+
+            if old_dataset_id and new_dataset_id:
+                # Run indicator matching
+                st.info(f"Matching indicators between datasets {old_dataset_id} and {new_dataset_id}...")
+                match_main(
+                    old_dataset_id=old_dataset_id,
+                    new_dataset_id=new_dataset_id,
+                    dry_run=False,
+                    match_identical=True,
+                    similarity_name="partial_ratio",
+                    max_suggestions=10,
+                    no_interactive=True,
+                    auto_threshold=80.0,
+                )
+
+                # Run indicator upgrade
+                st.info("Upgrading matched indicators...")
+                cli_upgrade_indicators(dry_run=False)
+
+                # Check mapping status after upgrade
+                total_indicators, mapped_indicators, unmapped_indicators = get_mapping_status(
+                    old_dataset_id, new_dataset_id
+                )
+
+                st.success("✅ Automatic indicator upgrade completed successfully!")
+
+                # Show detailed status
+                col1, col2, col3 = st.columns(3)
+                with col1:
+                    st.metric("Total indicators", total_indicators)
+                with col2:
+                    st.metric("Mapped", mapped_indicators, delta=f"+{mapped_indicators}")
+                with col3:
+                    st.metric("Unmapped", unmapped_indicators)
+
+                if unmapped_indicators > 0:
+                    st.warning(
+                        f"⚠️ {unmapped_indicators} indicators still need manual mapping. "
+                        f"Click **Next (1/3)** below to proceed with manual mapping."
+                    )
+                else:
+                    st.success(
+                        "🎉 All indicators have been automatically mapped! "
+                        "You can proceed directly to the final step."
+                    )
+
+            else:
+                st.error("Please select both old and new datasets first")
 
     # Submit button
     submitted_datasets = st.button(
