@@ -37,7 +37,6 @@ def run() -> None:
             "Source",
         ]
     ]
-
     tb_meta = tb_meta.rename(columns={"Series Code": "indicator_code"})
 
     #
@@ -123,7 +122,9 @@ def add_metadata(tb: Table, tb_meta: pd.DataFrame) -> Table:
                 # Set source attribution
                 source = meta_info.get("Source", "")
                 if source and pd.notna(source):
-                    meta.presentation = {"attribution": source}
+                    cleaned_source = clean_source_field(source)
+                    if cleaned_source:
+                        meta.presentation = {"attribution": cleaned_source}
 
                 # Handle units
                 unit_of_measure = meta_info.get("Unit of measure", "")
@@ -181,3 +182,131 @@ def add_metadata(tb: Table, tb_meta: pd.DataFrame) -> Table:
                 meta.description_from_producer = f"World Bank indicator: {column}"
 
     return tb
+
+
+def clean_source_field(source: str) -> str:
+    """Clean up source field by simplifying to key organization names."""
+    if not source or pd.isna(source):
+        return ""
+
+    import re
+
+    # Create a simple lookup table for common sources to clean names
+    source_mappings = {
+        # World Bank variants
+        "world bank": "World Bank",
+        "wb": "World Bank",
+        "world bank group": "World Bank",
+        "wbg": "World Bank",
+        "doing business": "World Bank",
+        "enterprise surveys": "World Bank - Women, Business and the Law",
+        "women, business and the law": "World Bank",
+        "entrepreneurship survey": "World Bank",
+        "global findex": "World Bank",
+        # UN variants
+        "united nations population division": "UN Population Division",
+        "world population prospects": "UN Population Division",
+        "world urbanization prospects": "UN Population Division",
+        "world marriage data": "UN Population Division",
+        "trends in international migrant stock": "UN Population Division",
+        "united nations": "UN",
+        # UNESCO variants
+        "unesco institute for statistics": "UNESCO",
+        "uis": "UNESCO",
+        "stat bulk data download service": "UNESCO",
+        # WHO variants
+        "world health organization": "WHO",
+        "global health observatory": "WHO",
+        "global health estimates": "WHO",
+        "maternal mortality": "WHO",
+        "trends in maternal mortality": "WHO",
+        # UNICEF variants
+        "un children's fund": "UNICEF",
+        "unicef data": "UNICEF",
+        "state of the world's children": "UNICEF",
+        "childinfo": "UNICEF",
+        # ILO variants
+        "international labour organization": "ILO",
+        "ilostat": "ILO",
+        "labour force statistics": "ILO",
+        "ilo modelled estimates": "ILO",
+        # Other UN agencies
+        "international monetary fund": "IMF",
+        "unaids": "UNAIDS",
+        "joint united nations programme on hiv/aids": "UNAIDS",
+        "international telecommunication union": "ITU",
+        "inter-parliamentary union": "IPU",
+        "un women": "UN Women",
+        "unfpa": "UNFPA",
+        "unodc": "UNODC",
+        # Survey programs
+        "demographic and health surveys": "DHS",
+        "dhs program": "DHS",
+        "multiple indicator cluster surveys": "MICS",
+        # Other organizations
+        "organisation for economic co-operation and development": "OECD",
+        "organization for economic co-operation and development": "OECD",
+        "eurostat": "Eurostat",
+        "human mortality database": "Human Mortality Database",
+        "luxembourg income study": "Luxembourg Income Study",
+    }
+
+    # Convert to lowercase for matching
+    source_lower = source.lower()
+
+    # Special handling for World Bank methodology citations
+    if "world bank" in source_lower and ("methodology" in source_lower or "based on" in source_lower):
+        # Extract author and year from citations like "Filmer et al. (2018)"
+        author_year_match = re.search(r"([A-Za-z]+(?:\s+et\s+al\.)?)\s+\((\d{4})\)", source)
+        if author_year_match:
+            author = author_year_match.group(1)
+            year = author_year_match.group(2)
+            return f"World Bank based on methodology in {author} ({year})"
+
+    # Find matching organizations
+    found_orgs = set()
+    for key, org_name in source_mappings.items():
+        if key in source_lower:
+            found_orgs.add(org_name)
+
+    # Handle joint initiatives specifically
+    if "joint" in source_lower and ("unicef" in source_lower or "who" in source_lower or "world bank" in source_lower):
+        if "malnutrition" in source_lower or "jme" in source_lower:
+            found_orgs = {"UNICEF-WHO-World Bank JME"}
+        elif "child mortality" in source_lower:
+            found_orgs = {"UN IGME"}
+        elif "water" in source_lower and "sanitation" in source_lower:
+            found_orgs = {"WHO-UNICEF JMP"}
+
+    # Special cases for household surveys
+    if "household surveys" in source_lower:
+        found_orgs.add("Household surveys")
+
+    if "national statistical offices" in source_lower or "country official statistics" in source_lower:
+        found_orgs.add("National statistical offices")
+
+    # If no specific organizations found, try to extract the first meaningful part
+    if not found_orgs:
+        # Remove all URLs and technical metadata first
+        clean_text = re.sub(r"https?://[^\s,;)\]]+", "", source)
+        clean_text = re.sub(r"\([^)]*\)", "", clean_text)
+        clean_text = re.sub(r"uri:.*?(?=[,;]|$)", "", clean_text, flags=re.IGNORECASE)
+        clean_text = re.sub(r"note:.*?(?=[,;]|$)", "", clean_text, flags=re.IGNORECASE)
+        clean_text = re.sub(r"publisher:.*?(?=[,;]|$)", "", clean_text, flags=re.IGNORECASE)
+        clean_text = re.sub(r"type:.*?(?=[,;]|$)", "", clean_text, flags=re.IGNORECASE)
+        clean_text = re.sub(r"data accessed:.*?(?=[,;]|$)", "", clean_text, flags=re.IGNORECASE)
+
+        # Take the first substantial part
+        parts = re.split(r"[;,\n]", clean_text)
+        for part in parts:
+            part = part.strip()
+            if len(part) > 10 and not re.match(r"^\s*(staff|estimates|based|data|compiled)", part, re.IGNORECASE):
+                found_orgs.add(part[:50])  # Truncate if too long
+                break
+
+    if not found_orgs:
+        return ""
+
+    # Return up to 2 organizations, sorted for consistency
+    result_orgs = sorted(list(found_orgs))[:2]
+    return "; ".join(result_orgs)
