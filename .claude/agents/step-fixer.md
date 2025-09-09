@@ -31,7 +31,7 @@ add `--grapher` flag if the channel is grapher
 
 2. If the channel is grapher, skip the following steps
 
-2. Diff processed data with a representative country
+2. Run `etl diff` with a representative country
 
 ```bash
 etl diff REMOTE data/ --include "<channel>/<ns>/.*/<name>" --verbose --country "<country>" > workbench/<short_name>/<channel>_diff_raw.txt

@@ -130,6 +130,22 @@ tb = tb.format(short_name="table_name")  # Sets table metadata
 tb["column"] = tb["column"].replace_metadata(unit="percent", short_unit="%")
 ```
 
+### YAML File Editing
+Always use `ruamel_load` and `ruamel_dump` from `etl.files` to preserve comments and formatting when editing YAML files:
+```python
+from etl.files import ruamel_load, ruamel_dump
+
+# Load YAML while preserving comments and formatting
+data = ruamel_load(file_path)
+
+# Modify data as needed
+data['some_key'] = new_value
+
+# Save back to file with original formatting preserved
+with open(file_path, 'w') as f:
+    f.write(ruamel_dump(data))
+```
+
 ### Creating New Steps
 1. Use Wizard UI (`make wizard`) for guided creation
 2. Or follow existing patterns in `etl/steps/data/[stage]/[namespace]/`
