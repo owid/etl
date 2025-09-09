@@ -90,9 +90,9 @@ steps:
   #
   # IUCN Number of species in each extinction risk category
   #
-  data://meadow/biodiversity/2025-09-09/iucn_number_each_status:
-    - snapshot://biodiversity/2025-09-09/iucn_number_each_status.csv
-  data://garden/biodiversity/2025-09-09/iucn_number_each_status:
-    - data://meadow/biodiversity/2025-09-09/iucn_number_each_status
-  data://grapher/biodiversity/2025-09-09/iucn_number_each_status:
-    - data://garden/biodiversity/2025-09-09/iucn_number_each_status
+  data://meadow/iucn/2025-09-09/iucn_number_each_status:
+    - snapshot://iucn/2025-09-09/iucn_number_each_status.csv
+  data://garden/iucn/2025-09-09/iucn_number_each_status:
+    - data://meadow/iucn/2025-09-09/iucn_number_each_status
+  data://grapher/iucn/2025-09-09/iucn_number_each_status:
+    - data://garden/iucn/2025-09-09/iucn_number_each_status

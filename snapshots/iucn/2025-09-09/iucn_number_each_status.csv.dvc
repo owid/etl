@@ -3,10 +3,15 @@ meta:
     producer: IUCN Red List of Threatened Species
     title: Number of species in each IUCN Red List Category by kingdom and class.
     citation_full: |-
-      IUCN. 2024. The IUCN Red List of Threatened Species. Version 2024-2. https://www.iucnredlist.org. Accessed on 23rd December 2024.
+      IUCN. 2025. The IUCN Red List of Threatened Species. Version 2025-1. https://www.iucnredlist.org. Accessed on 9th September 2025.
     url_main: https://www.iucnredlist.org/statistics
-    date_accessed: '2025-09-09'
-    date_published: '2024-10-28'
+    date_accessed: "2025-09-09"
+    date_published: "2025-03-27"
+    attribution_short: IUCN
     license:
       name: © International Union for Conservation of Nature and Natural Resources
       url: https://www.iucnredlist.org/terms/terms-of-use
+outs:
+  - md5: 6b6f4fbbe0cb6ae6a4bcf56e662e69ab
+    size: 6393
+    path: iucn_number_each_status.csv
