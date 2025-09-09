@@ -80,20 +80,20 @@ def add_country_counts_and_population_by_status(tb: Table, ds_regions: Dataset, 
     columns_pop_dict = {columns[i]: [] for i in range(len(columns))}
     # Process each column and create all new columns at once to avoid fragmentation
     new_columns = {}
-    
+
     for col in columns:
         if col not in ["country", "year"]:
             column_title = tb[col].metadata.title
             description_from_producer = tb[col].metadata.description_from_producer
-            
+
             # Convert column to string and map values
             col_str = tb_regions[col].astype(str)
             value_map = {"nan": "missing", "<NA>": "missing", "0": "no", "1": "yes"}
             col_mapped = col_str.map(value_map)
-            
+
             # Update the original column in place
             tb_regions[col] = col_mapped
-            
+
             # Get the unique values in the column
             status_list = list(col_mapped.unique())
 
@@ -101,42 +101,42 @@ def add_country_counts_and_population_by_status(tb: Table, ds_regions: Dataset, 
                 # Calculate count and population for each status in the column
                 count_col_name = f"{col}_{status}_count"
                 pop_col_name = f"{col}_{status}_pop"
-                
+
                 count_data = col_mapped.apply(lambda x: 1 if x == status else 0)
                 pop_data = count_data * tb_regions["population"]
-                
+
                 # Store new columns temporarily
                 new_columns[count_col_name] = {
-                    'data': count_data,
-                    'metadata': add_metadata_for_aggregated_columns(
+                    "data": count_data,
+                    "metadata": add_metadata_for_aggregated_columns(
                         column_title=column_title,
                         description_from_producer=description_from_producer,
                         status=status,
                         count_or_pop="count",
                         origins=count_data.m.origins,
-                    )
+                    ),
                 }
-                
+
                 new_columns[pop_col_name] = {
-                    'data': pop_data,
-                    'metadata': add_metadata_for_aggregated_columns(
+                    "data": pop_data,
+                    "metadata": add_metadata_for_aggregated_columns(
                         column_title=column_title,
                         description_from_producer=description_from_producer,
                         status=status,
                         count_or_pop="pop",
                         origins=pop_data.m.origins,
-                    )
+                    ),
                 }
-                
+
                 # Add the new column names to the tracking lists
                 columns_count_dict[col].append(count_col_name)
                 columns_pop_dict[col].append(pop_col_name)
-    
+
     # Add all new columns at once to avoid fragmentation
     for col_name, col_info in new_columns.items():
-        tb_regions[col_name] = col_info['data']
-        tb_regions[col_name].metadata = col_info['metadata']
-    
+        tb_regions[col_name] = col_info["data"]
+        tb_regions[col_name].metadata = col_info["metadata"]
+
     # Copy to defragment the DataFrame
     tb_regions = tb_regions.copy()
 
