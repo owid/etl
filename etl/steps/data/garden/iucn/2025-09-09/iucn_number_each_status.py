@@ -19,7 +19,9 @@ def run() -> None:
     # Read table from meadow dataset.
     tb = ds_meadow.read("iucn_number_each_status")
     tb = group_classes(tb)
-    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+    tb = geo.harmonize_countries(
+        df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
+    )
     tb = tb.format(["country", "year"])
 
     #
@@ -42,9 +44,8 @@ def group_classes(tb: Table) -> Table:
         "Actinopterygii": "Fishes",
         "Chondrichthyes": "Fishes",
         "Sarcopterygii": "Fishes",
-        "Cephalaspidomorphi": "Fishes",
         "Myxini": "Fishes",
-        "Petromyzontida": "Fishes",
+        "Petromyzonti": "Fishes",
     }
 
     molluscs_groups = {
@@ -53,7 +54,7 @@ def group_classes(tb: Table) -> Table:
         "Gastropoda": "Molluscs",
         "Monoplacophora": "Molluscs",
         "Polyplacophora": "Molluscs",
-        "Solengastres": "Molluscs",
+        "Solenogastres": "Molluscs",
     }
 
     plant_groups = {
@@ -61,7 +62,6 @@ def group_classes(tb: Table) -> Table:
         "Anthocerotopsida": "Plants",
         "Bryopsida": "Plants",
         "Bryopsidophyceae": "Plants",
-        "Charophyceae": "Plants",
         "Chlorophyceae": "Plants",
         "Cycadopsida": "Plants",
         "Florideophyceae": "Plants",
@@ -77,23 +77,46 @@ def group_classes(tb: Table) -> Table:
         "Sphagnopsida": "Plants",
         "Takakiopsida": "Plants",
         "Ulvophyceae": "Plants",
+        "Charophyaceae": "Plants",
+        "Marchantiopsida": "Plants",
     }
     crustaceans_groups = {
         "Malacostraca": "Crustaceans",
         "Ostracoda": "Crustaceans",
         "Hexanauplia": "Crustaceans",
         "Maxillopoda": "Crustaceans",
-        "Brachiopoda": "Crustaceans",
     }
 
-    # Replace the class names with the broader fish categories
-    tb["country"] = tb["country"].replace(fish_groups)
-    # Replace the class names with the broader molluscs categories
-    tb["country"] = tb["country"].replace(molluscs_groups)
-    # Replace the class names with the broader plant categories
-    tb["country"] = tb["country"].replace(plant_groups)
-    # Replace the class names with the broader crustaceans categories
-    tb["country"] = tb["country"].replace(crustaceans_groups)
+    fungi_groups = {
+        "Exobasidiomycetes": "Fungi",
+        "Geoglossomycetes": "Fungi",
+        "Arthoniomycetes": "Fungi",
+        "Pezizomycetes": "Fungi",
+        "Eurotiomycetes": "Fungi",
+        "Leotiomycetes": "Fungi",
+        "Dacrymycetes": "Fungi",
+        "Ustilaginomycetes": "Fungi",
+        "Dothideomycetes": "Fungi",
+        "Agaricomycetes": "Fungi",
+        "Sordariomycetes": "Fungi",
+        "Wallemiomycetes": "Fungi",
+        "Lecanoromycetes": "Fungi",
+    }
+
+    # Combine all group mappings for validation
+    all_groups = {**fish_groups, **molluscs_groups, **plant_groups, **crustaceans_groups, **fungi_groups}
+
+    # Check if any expected class names are missing from the data
+    unique_classes = set(tb["country"].unique())
+    expected_classes = set(all_groups.keys())
+    classes_in_data = expected_classes.intersection(unique_classes)
+    missing_classes = expected_classes - unique_classes
+
+    if missing_classes:
+        print(f"Warning: Expected classes not found in data: {missing_classes}")
+
+    # Replace the class names with broader categories
+    tb["country"] = tb["country"].replace(all_groups)
 
     tb = tb.groupby(["country", "year"]).sum().reset_index()
 
