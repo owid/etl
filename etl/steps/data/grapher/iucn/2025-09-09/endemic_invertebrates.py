@@ -11,10 +11,10 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = paths.load_dataset("endemic_vertebrates")
+    ds_garden = paths.load_dataset("endemic_invertebrates")
 
     # Read tables from garden dataset.
-    tb = ds_garden.read("endemic_vertebrates", reset_index=False)
+    tb = ds_garden.read("endemic_invertebrates", reset_index=False)
     #
     # Save outputs.
     #
