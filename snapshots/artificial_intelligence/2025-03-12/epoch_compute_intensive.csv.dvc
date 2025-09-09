@@ -20,13 +20,13 @@ meta:
     # Files
     url_main: https://epoch.ai/blog/tracking-compute-intensive-ai-models
     url_download: https://epoch.ai/data/epochdb/large_scale_ai_models.csv
-    date_accessed: '2025-09-06'
+    date_accessed: '2025-09-09'
 
     # License
     license:
       name: CC BY 4.0
       url: https://epoch.ai/blog/how-much-does-it-cost-to-train-frontier-ai-models
 outs:
-  - md5: fb1245aaa222932fea4e5d712a84b518
-    size: 910060
+  - md5: fe6504a8e4d599de57c38d70109ad714
+    size: 910066
     path: epoch_compute_intensive.csv
