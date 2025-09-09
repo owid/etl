@@ -3,9 +3,9 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: IUCN Red List Summary Statistics - Total, threatened and extinct fish species in each country
+    title: IUCN Red List Summary Statistics Table 8c - Total, threatened and extinct invertebrate species in each country
     description: |-
-      Total number of endemic, threatened endemic and extinct fish species recorded for each country for comprehensively assessed groups only.
+      Total number of endemic, threatened endemic and extinct invertebrate species recorded for each country for comprehensively assessed groups only.
     date_published: "2025-03-27"
     # Citation
     producer: International Union for Conservation of Nature Red List of Threatened Species
@@ -13,7 +13,7 @@ meta:
       International Union for Conservation of Nature. 2025. The IUCN Red List of Threatened Species. Version 2025-1. https://www.iucnredlist.org. Accessed on [27 March 2025]
     attribution_short: IUCN
     # Files
-    url_main: https://nc.iucnredlist.org/redlist/content/attachment_files/2025-1_RL_Table_8b_v2.pdf
+    url_main: https://nc.iucnredlist.org/redlist/content/attachment_files/2025-1_RL_Table_8c.pdf
     date_accessed: "2025-09-09"
 
     # License
@@ -21,6 +21,6 @@ meta:
       name: © International Union for Conservation of Nature and Natural Resources
       url: https://www.iucnredlist.org/terms/terms-of-use
 outs:
-  - md5: 6cfaf467b7ccb5d5b3fdcd238baa44ae
-    size: 8813
-    path: endemic_fish.csv
+  - md5: 4d2b7b7f105f30939c2087ca828f31e5
+    size: 11807
+    path: endemic_invertebrates.csv
