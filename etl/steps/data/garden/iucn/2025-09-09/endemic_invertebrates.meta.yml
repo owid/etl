@@ -1,0 +1,70 @@
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Biodiversity
+    unit: endemic species
+tables:
+  endemic_vertebrates:
+    variables:
+      fw_crab__total_endemics:
+        title: Endemic freshwater crab species
+        description_short: |-
+          [Endemic species](#dod:endemic_species) are those known to occur naturally within one country only.
+      fw_crab__threatened_endemics:
+        title: Threatened endemic freshwater crab species
+        description_short: |-
+          [Endemic species](#dod:endemic_species) are those known to occur naturally within one country only. Threatened species are those whose [extinction risk](#dod:extinction_risk) is classified as 'Critically Endangered', 'Endangered', or 'Vulnerable'. They are at a high or greater risk of extinction in the wild.
+      fw_crab__ex__and__ew_endemics:
+        title: Endemic freshwater crab species that are extinct or extinct in the wild
+      fw_crayfish__total_endemics:
+        title: Endemic freshwater crayfish species
+        description_short: |-
+          [Endemic species](#dod:endemic_species) are those known to occur naturally within one country only.
+      fw_crayfish__threatened_endemics:
+        title: Threatened endemic freshwater crayfish species
+        description_short: |-
+          [Endemic species](#dod:endemic_species) are those known to occur naturally within one country only. Threatened species are those whose [extinction risk](#dod:extinction_risk) is classified as 'Critically Endangered', 'Endangered', or 'Vulnerable'. They are at a high or greater risk of extinction in the wild.
+      fw_crayfish__ex__and__ew_endemics:
+        title: Endemic freshwater crayfish species that are extinct or extinct in the wild
+      lobsters__total_endemics:
+        title: Endemic lobster species
+        description_short: |-
+          [Endemic species](#dod:endemic_species) are those known to occur naturally within one country only.
+      lobsters__threatened_endemics:
+        title: Threatened endemic lobster species
+        description_short: |-
+          [Endemic species](#dod:endemic_species) are those known to occur naturally within one country only. Threatened species are those whose [extinction risk](#dod:extinction_risk) is classified as 'Critically Endangered', 'Endangered', or 'Vulnerable'. They are at a high or greater risk of extinction in the wild.
+      lobsters__ex__and__ew_endemics:
+        title: Endemic lobster species that are extinct or extinct in the wild
+      dragonflies__and__damselflies__total_endemics:
+        title: Endemic dragonfly and damselfly species
+        description_short: |-
+          [Endemic species](#dod:endemic_species) are those known to occur naturally within one country only.
+      dragonflies__and__damselflies__threatened_endemics:
+        title: Threatened endemic dragonfly and damselfly species
+        description_short: |-
+          [Endemic species](#dod:endemic_species) are those known to occur naturally within one country only. Threatened species are those whose [extinction risk](#dod:extinction_risk) is classified as 'Critically Endangered', 'Endangered', or 'Vulnerable'. They are at a high or greater risk of extinction in the wild.
+      dragonflies__and__damselflies__ex__and__ew_endemics:
+        title: Endemic dragonfly and damselfly species that are extinct or extinct in the wild
+      abalone__total_endemics:
+        title: Endemic abalone species
+        description_short: |-
+          [Endemic species](#dod:endemic_species) are those known to occur naturally within one country only.
+      abalone__threatened_endemics:
+        title: Threatened endemic abalone species
+        description_short: |-
+          [Endemic species](#dod:endemic_species) are those known to occur naturally within one country only. Threatened species are those whose [extinction risk](#dod:extinction_risk) is classified as 'Critically Endangered', 'Endangered', or 'Vulnerable'. They are at a high or greater risk of extinction in the wild.
+      abalone__ex__and__ew_endemics:
+        title: Endemic abalone species that are extinct or extinct in the wild
+      reef_forming_corals__total_endemics:
+        title: Endemic reef-forming coral species
+        description_short: |-
+          [Endemic species](#dod:endemic_species) are those known to occur naturally within one country only.
+      reef_forming_corals__threatened_endemics:
+        title: Threatened endemic reef-forming coral species
+        description_short: |-
+          [Endemic species](#dod:endemic_species) are those known to occur naturally within one country only. Threatened species are those whose [extinction risk](#dod:extinction_risk) is classified as 'Critically Endangered', 'Endangered', or 'Vulnerable'. They are at a high or greater risk of extinction in the wild.
+      reef_forming_corals__ex__and__ew_endemics:
+        title: Endemic reef-forming coral species that are extinct or extinct in the wild

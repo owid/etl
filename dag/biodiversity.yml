@@ -75,6 +75,15 @@ steps:
     - data://meadow/iucn/2025-09-08/endemic_fish
   data://grapher/iucn/2025-09-08/endemic_vertebrates:
     - data://garden/iucn/2025-09-08/endemic_vertebrates
-
+  # Endemic fish species
   data://meadow/iucn/2025-09-08/endemic_fish:
     - snapshot://iucn/2025-09-08/endemic_fish.csv
+
+  # IUCN Endemic invertebrate species
+
+  data://meadow/iucn/2025-09-09/endemic_invertebrates:
+    - snapshot://iucn/2025-09-09/endemic_invertebrates.csv
+  data://garden/iucn/2025-09-09/endemic_invertebrates:
+    - data://meadow/iucn/2025-09-09/endemic_invertebrates
+  data://grapher/iucn/2025-09-09/endemic_invertebrates:
+    - data://garden/iucn/2025-09-09/endemic_invertebrates
