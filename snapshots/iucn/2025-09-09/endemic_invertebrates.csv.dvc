@@ -3,7 +3,7 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: IUCN Red List Summary Statistics Table 8c - Total, threatened and extinct invertebrate species in each country
+    title: IUCN Red List Summary Statistics - Total, threatened and extinct invertebrate species in each country
     description: |-
       Total number of endemic, threatened endemic and extinct invertebrate species recorded for each country for comprehensively assessed groups only.
     date_published: "2025-03-27"

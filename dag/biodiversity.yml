@@ -87,3 +87,12 @@ steps:
     - data://meadow/iucn/2025-09-09/endemic_invertebrates
   data://grapher/iucn/2025-09-09/endemic_invertebrates:
     - data://garden/iucn/2025-09-09/endemic_invertebrates
+  #
+  # IUCN Number of species in each extinction risk category
+  #
+  data://meadow/iucn/2025-09-09/iucn_number_each_status:
+    - snapshot://iucn/2025-09-09/iucn_number_each_status.csv
+  data://garden/iucn/2025-09-09/iucn_number_each_status:
+    - data://meadow/iucn/2025-09-09/iucn_number_each_status
+  data://grapher/iucn/2025-09-09/iucn_number_each_status:
+    - data://garden/iucn/2025-09-09/iucn_number_each_status
