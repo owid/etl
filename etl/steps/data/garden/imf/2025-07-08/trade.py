@@ -213,6 +213,18 @@ def calculate_trade_shares_as_share_world(tb_long: Table) -> Table:
     """
     Calculate trade shares for a given (LONG) table, using each country's
     counterpart='World' row as the total.
+    
+    This function:
+    1. Pivots long format data to wide format (exports/imports as columns)
+    2. Converts values from millions USD to USD  
+    3. Calculates shares by dividing bilateral trade by total trade with World
+    4. Adds bilateral trade volume metrics
+    
+    Args:
+        tb_long: Table in long format with 'indicator' and 'value' columns
+        
+    Returns:
+        Table with share columns added and absolute values in USD (not millions)
     """
     wide = (
         tb_long.pivot_table(
@@ -298,7 +310,18 @@ def add_total_imports_share_of_gdp(tb_world: Table, gdp_data: Table) -> Table:
 def get_top_partner(tb: Table) -> Table:
     """
     Get the top trading partner (by imports) for each country-year and classify based on global frequency.
-    Returns a table attached to counterpart_country='World' so it merges cleanly.
+    
+    This function:
+    1. Finds the largest import partner for each country-year
+    2. Counts how frequently each partner appears as #1 globally  
+    3. Keeps the top 10 most frequent partners, groups others as 'Other'
+    4. Returns with counterpart_country='World' for easy merging
+    
+    Args:
+        tb: Trade data table
+        
+    Returns:
+        Table with top_partner_category column, attached to counterpart='World' rows
     """
     import_data = tb[tb["indicator"] == IMPORT_COL].dropna(subset=["value"]).copy()
     idx = import_data.groupby(["country", "year"])["value"].idxmax()
@@ -318,7 +341,17 @@ def get_top_partner(tb: Table) -> Table:
 def get_country_import_ranking(tb: Table, target_country: str) -> Table:
     """
     Analyze a target country's ranking as an importer for each country.
-    Returns counterpart_country=<target_country> with an 'import_rank' column.
+    
+    This function calculates where a target country (e.g., China) ranks among 
+    each country's import partners. Rank 1 = largest import partner.
+    Uses vectorized pandas ranking instead of manual groupby loops for efficiency.
+    
+    Args:
+        tb: Trade data table
+        target_country: Country to analyze ranking for (e.g., "China", "United States")
+        
+    Returns:
+        Table with import_rank column, filtered to target_country rows only
     """
     import_data = tb[tb["indicator"] == IMPORT_COL].copy()
 
@@ -338,12 +371,30 @@ def get_country_import_ranking(tb: Table, target_country: str) -> Table:
 def clean_historical_overlaps(tb: Table, country_col: str = "country") -> Table:
     """
     Remove historical regions from Table after their dissolution dates and exclude members of historical regions before their dissolution dates.
+    
+    This prevents double-counting by ensuring we don't have overlapping data from:
+    1. Historical regions (like USSR) after they dissolved
+    2. Their member countries (like Latvia) before they became independent
+    
+    Args:
+        tb: Input table with trade data
+        country_col: Column name to apply the cleaning to (usually 'country' or 'counterpart_country')
+    
+    Returns:
+        Cleaned table with historical overlaps removed
     """
     tb_cleaned = tb.copy()
+    
+    # Remove historical regions after their dissolution year
+    # E.g., remove USSR data from 1991 onwards
     for region, diss_year in HISTORICAL_DISSOLUTIONS.items():
         tb_cleaned = tb_cleaned[~((tb_cleaned[country_col] == region) & (tb_cleaned["year"] >= diss_year))]
+    
+    # Remove member countries before they became independent
+    # E.g., remove Latvia data before 1991 (when it was part of USSR)
     for country, year in EXCLUDE_MEMBERS_OF_HISTORICAL_REGIONS.items():
         tb_cleaned = tb_cleaned[~((tb_cleaned[country_col] == country) & (tb_cleaned["year"] < year))]
+        
     return tb_cleaned
 
 
