@@ -78,41 +78,67 @@ def add_country_counts_and_population_by_status(tb: Table, ds_regions: Dataset, 
     # Define empty dictionaries for each of the columns
     columns_count_dict = {columns[i]: [] for i in range(len(columns))}
     columns_pop_dict = {columns[i]: [] for i in range(len(columns))}
+    # Process each column and create all new columns at once to avoid fragmentation
+    new_columns = {}
+    
     for col in columns:
         if col not in ["country", "year"]:
             column_title = tb[col].metadata.title
             description_from_producer = tb[col].metadata.description_from_producer
-            tb_regions[col] = tb_regions[col].astype(str)
-
-            # Define the mapping dictionary
+            
+            # Convert column to string and map values
+            col_str = tb_regions[col].astype(str)
             value_map = {"nan": "missing", "<NA>": "missing", "0": "no", "1": "yes"}
-            tb_regions[col] = tb_regions[col].map(value_map)
+            col_mapped = col_str.map(value_map)
+            
+            # Update the original column in place
+            tb_regions[col] = col_mapped
+            
             # Get the unique values in the column
-            status_list = list(tb_regions[col].unique())
+            status_list = list(col_mapped.unique())
 
             for status in status_list:
                 # Calculate count and population for each status in the column
-                tb_regions[f"{col}_{status}_count"] = tb_regions[col].apply(lambda x: 1 if x == status else 0)
-                tb_regions[f"{col}_{status}_pop"] = tb_regions[f"{col}_{status}_count"] * tb_regions["population"]
-
-                # Add metadata for the new columns
-                tb_regions[f"{col}_{status}_count"].metadata = add_metadata_for_aggregated_columns(
-                    column_title=column_title,
-                    description_from_producer=description_from_producer,
-                    status=status,
-                    count_or_pop="count",
-                    origins=tb_regions[f"{col}_{status}_count"].m.origins,
-                )
-                tb_regions[f"{col}_{status}_pop"].metadata = add_metadata_for_aggregated_columns(
-                    column_title=column_title,
-                    description_from_producer=description_from_producer,
-                    status=status,
-                    count_or_pop="pop",
-                    origins=tb_regions[f"{col}_{status}_pop"].m.origins,
-                )
-                # Add the new columns to the list
-                columns_count_dict[col].append(f"{col}_{status}_count")
-                columns_pop_dict[col].append(f"{col}_{status}_pop")
+                count_col_name = f"{col}_{status}_count"
+                pop_col_name = f"{col}_{status}_pop"
+                
+                count_data = col_mapped.apply(lambda x: 1 if x == status else 0)
+                pop_data = count_data * tb_regions["population"]
+                
+                # Store new columns temporarily
+                new_columns[count_col_name] = {
+                    'data': count_data,
+                    'metadata': add_metadata_for_aggregated_columns(
+                        column_title=column_title,
+                        description_from_producer=description_from_producer,
+                        status=status,
+                        count_or_pop="count",
+                        origins=count_data.m.origins,
+                    )
+                }
+                
+                new_columns[pop_col_name] = {
+                    'data': pop_data,
+                    'metadata': add_metadata_for_aggregated_columns(
+                        column_title=column_title,
+                        description_from_producer=description_from_producer,
+                        status=status,
+                        count_or_pop="pop",
+                        origins=pop_data.m.origins,
+                    )
+                }
+                
+                # Add the new column names to the tracking lists
+                columns_count_dict[col].append(count_col_name)
+                columns_pop_dict[col].append(pop_col_name)
+    
+    # Add all new columns at once to avoid fragmentation
+    for col_name, col_info in new_columns.items():
+        tb_regions[col_name] = col_info['data']
+        tb_regions[col_name].metadata = col_info['metadata']
+    
+    # Copy to defragment the DataFrame
+    tb_regions = tb_regions.copy()
 
     # Create a new list with all the count columns and population columns
     columns_count = [item for sublist in columns_count_dict.values() for item in sublist]
