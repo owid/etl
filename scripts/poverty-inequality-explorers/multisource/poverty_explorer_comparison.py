@@ -83,7 +83,7 @@ header_dict = {
         "China",
     ],
     "explorerSubtitle": "Compare World Bank and Luxembourg Income Study data on poverty.",
-    "isPublished": "true",
+    "isPublished": "false",
     "googleSheet": "",
     "wpBlockId": "57728",
     "entityType": "country or region",
