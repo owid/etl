@@ -1,6 +1,7 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
   common:
+    processing_level: minor
     description_processing: ""
     presentation:
       attribution_short: ILO
@@ -8,6 +9,9 @@ definitions:
         - Work & Employment
     display: &common_display
       tolerance: 5
+
+  unreliable_data: |-
+    We removed data points flagged as "unreliable" by the source (i.e. `obs_status = "U"` in the original data). These data points are likely to be inaccurate and misleading for analysis.
 
 
 # Learn more about the available fields:
@@ -27,6 +31,8 @@ tables:
         # description_key: List of key points about the indicator.
         # presentation:
           # title_variant:
+        processing_level: major
+        description_processing: "{definitions.unreliable_data}"
         display:
           name: Average hourly earnings of employees - <<sex>>
           numDecimalPlaces: 1
@@ -66,6 +72,8 @@ tables:
         # description_key: List of key points about the indicator.
         # presentation:
           # title_variant:
+        processing_level: major
+        description_processing: "{definitions.unreliable_data}"
         display:
           name: Gender wage gap - <<classif1>>
           numDecimalPlaces: 1
@@ -118,6 +126,8 @@ tables:
         # description_key: List of key points about the indicator.
         # presentation:
           # title_variant:
+        processing_level: major
+        description_processing: "{definitions.unreliable_data}"
         display:
           name: Share of children in child labor - <<sex>> - <<classif1>>
           numDecimalPlaces: 1
@@ -170,6 +180,8 @@ tables:
         # description_key: List of key points about the indicator.
         # presentation:
           # title_variant:
+        processing_level: major
+        description_processing: "{definitions.unreliable_data}"
         display:
           name: Proportion of women in managerial positions
           numDecimalPlaces: 1
@@ -183,6 +195,8 @@ tables:
         # description_key: List of key points about the indicator.
         # presentation:
           # title_variant:
+        processing_level: major
+        description_processing: "{definitions.unreliable_data}"
         display:
           name: Proportion of women in senior and middle management positions
           numDecimalPlaces: 1
@@ -209,6 +223,8 @@ tables:
         # description_key: List of key points about the indicator.
         # presentation:
           # title_variant:
+        processing_level: major
+        description_processing: "{definitions.unreliable_data}"
         display:
           name: Proportion of informal employment in total employment - <<sex>> - <<classif1>>
           numDecimalPlaces: 1
@@ -222,6 +238,8 @@ tables:
         # description_key: List of key points about the indicator.
         # presentation:
           # title_variant:
+        processing_level: major
+        description_processing: "{definitions.unreliable_data}"
         display:
           name: Average hourly earnings of employees - <<sex>> - <<classif1>>
           numDecimalPlaces: 1
@@ -235,6 +253,8 @@ tables:
         # description_key: List of key points about the indicator.
         # presentation:
           # title_variant:
+        processing_level: major
+        description_processing: "{definitions.unreliable_data}"
         display:
           name: Unemployment rate (<<sex>> - <<classif1>>)
           numDecimalPlaces: 1
@@ -248,6 +268,8 @@ tables:
         # description_key: List of key points about the indicator.
         # presentation:
           # title_variant:
+        processing_level: major
+        description_processing: "{definitions.unreliable_data}"
         display:
           name: Unemployment rate by disability status (<<sex>> - <<classif1>>)
           numDecimalPlaces: 1
@@ -261,6 +283,8 @@ tables:
         # description_key: List of key points about the indicator.
         # presentation:
           # title_variant:
+        processing_level: major
+        description_processing: "{definitions.unreliable_data}"
         display:
           name: Proportion of youth (aged 15-24) not in education, employment or training (NEET) - <<sex>>
           numDecimalPlaces: 1
@@ -274,6 +298,8 @@ tables:
         # description_key: List of key points about the indicator.
         # presentation:
           # title_variant:
+        processing_level: major
+        description_processing: "{definitions.unreliable_data}"
         display:
           name: Proportion of children engaged in economic activity - <<sex>> - <<classif1>>
           numDecimalPlaces: 1
@@ -287,6 +313,8 @@ tables:
         # description_key: List of key points about the indicator.
         # presentation:
           # title_variant:
+        processing_level: major
+        description_processing: "{definitions.unreliable_data}"
         display:
           name: Proportion of children engaged in economic activity and household chores - <<sex>> - <<classif1>>
           numDecimalPlaces: 1
@@ -300,6 +328,8 @@ tables:
         # description_key: List of key points about the indicator.
         # presentation:
           # title_variant:
+        processing_level: major
+        description_processing: "{definitions.unreliable_data}"
         display:
           name: Fatal occupational injuries per 100,000 workers - <<sex>> - <<classif1>>
           numDecimalPlaces: 1
@@ -352,6 +382,8 @@ tables:
         # description_key: List of key points about the indicator.
         # presentation:
           # title_variant:
+        processing_level: major
+        description_processing: "{definitions.unreliable_data}"
         display:
           name: Manufacturing employment as a proportion of total employment
           numDecimalPlaces: 1

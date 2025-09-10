@@ -156,7 +156,7 @@ COLUMN_CATEGORIES = {
         "Adjusted": "Adjusted",
         "Imputation": "Imputation",
         "Break in series": "Break in series",
-        "Unreliable": "Unreliable",
+        # "Unreliable": "Unreliable",
         pd.NA: pd.NA,
     },
 }
