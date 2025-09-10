@@ -320,7 +320,7 @@ print(f"Garden null values: {tb.date.isnull().sum()}")
 ### MySQL Connection
 Can execute SQL queries directly using the staging database:
 ```bash
-mysql -h staging-site-branch -u owid --port 3306 -D owid -e "SELECT query"
+mysql -h staging-site-[branch] -u owid --port 3306 -D owid -e "SELECT query"
 ```
 
 Example queries:

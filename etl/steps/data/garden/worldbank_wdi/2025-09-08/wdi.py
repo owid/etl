@@ -109,6 +109,14 @@ def run() -> None:
 
     tb_garden = add_patents_articles_per_million_people(tb_garden)
 
+    # Add population-weighted regional aggregations for internet users
+    tb_garden = add_population_weighted_aggregations(
+        tb=tb_garden,
+        indicator="it_net_user_zs",
+        ds_regions=ds_regions,
+        ds_population=ds_population,
+    )
+
     ####################################################################################################################
 
     #
