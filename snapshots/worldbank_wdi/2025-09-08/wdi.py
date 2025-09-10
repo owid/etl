@@ -105,19 +105,21 @@ def add_json_metadata_to_zip(zip_path: Path) -> None:
     for indicator in all_indicators:
         # Find the series code in fields
         series_code = None
-        for field in indicator.get('fields', []):
-            if field.get('name') == 'Series Code':
-                series_code = field.get('description')
+        for field in indicator.get("fields", []):
+            if field.get("name") == "Series Code":
+                series_code = field.get("description")
                 break
-            elif field.get('name') == 'Code':
-                series_code = field.get('description')
+            elif field.get("name") == "Code":
+                series_code = field.get("description")
                 break
-        
+
         if series_code:
             unique_indicators[series_code] = indicator
 
     deduped_indicators = list(unique_indicators.values())
-    print(f"After deduplication: {len(deduped_indicators)} unique indicators (removed {len(all_indicators) - len(deduped_indicators)} duplicates)")
+    print(
+        f"After deduplication: {len(deduped_indicators)} unique indicators (removed {len(all_indicators) - len(deduped_indicators)} duplicates)"
+    )
 
     # Create the complete metadata JSON with deduplicated indicators
     metadata_json = {"data": deduped_indicators, "count": len(deduped_indicators)}
