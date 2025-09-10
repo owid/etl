@@ -1,6 +1,5 @@
 import json
 import os
-from pathlib import Path
 from typing import Any, Dict, List, Tuple, Union, cast
 
 import numpy as np
@@ -9,8 +8,9 @@ import rich_click as click
 from rapidfuzz import fuzz
 from structlog import get_logger
 
-from etl.db import get_connection
-from etl.grapher.io import get_dataset_id, get_variables_in_dataset
+from apps.wizard.utils.db import WizardDB
+from etl.db import get_connection, get_engine
+from etl.grapher.io import get_variables_in_dataset
 
 # If True, identical variables will be matched automatically (by string comparison).
 # If False, variables with identical names will appear in comparison.
@@ -35,24 +35,23 @@ log = get_logger()
 
 @click.command(name="variable-match", help=__doc__)
 @click.option(
-    "-f",
-    "--output-file",
-    type=str,
-    help="Path to output JSON file.",
-    required=True,
+    "--dry-run",
+    is_flag=True,
+    default=False,
+    help="Print the mappings without applying them.",
 )
 @click.option(
     "-old",
-    "--old-dataset-name",
-    type=str,
-    help="Old dataset name (as defined in grapher).",
+    "--old-dataset-id",
+    type=int,
+    help="Old dataset ID (as defined in grapher).",
     required=True,
 )
 @click.option(
     "-new",
-    "--new-dataset-name",
-    type=str,
-    help="New dataset name (as defined in grapher).",
+    "--new-dataset-id",
+    type=int,
+    help="New dataset ID (as defined in grapher).",
     required=True,
 )
 @click.option(
@@ -87,13 +86,30 @@ log = get_logger()
         " variable at most [--max-suggestions] suggestions will be listed."
     ),
 )
+@click.option(
+    "--no-interactive",
+    is_flag=True,
+    default=False,
+    help=(
+        "Skip interactive prompts and automatically map variables based on similarity threshold."
+        " Best matches above the threshold will be selected automatically."
+    ),
+)
+@click.option(
+    "--auto-threshold",
+    type=float,
+    default=100.0,
+    help="Similarity threshold (0-100) for automatic mapping when --no-interactive is used. Default: 100.0",
+)
 def main_cli(
-    old_dataset_name: str,
-    new_dataset_name: str,
-    output_file: str,
+    old_dataset_id: int,
+    new_dataset_id: int,
+    dry_run: bool,
     add_identical_pairs: bool,
     similarity_name: str,
     max_suggestions: int,
+    no_interactive: bool,
+    auto_threshold: float,
 ) -> None:
     """Match variable IDs from an old dataset to a new dataset's.
 
@@ -103,52 +119,61 @@ def main_cli(
     If the variable names are identical, the task is trivial: find indexes of old variables and map them to the indexes of the identical variables in the new dataset. However, if variable names have changed (or the number of variables have changed) the pairing may need to be done manually. This CLI helps in either scenario.
     """
     main(
-        old_dataset_name=old_dataset_name,
-        new_dataset_name=new_dataset_name,
+        old_dataset_id=old_dataset_id,
+        new_dataset_id=new_dataset_id,
+        dry_run=dry_run,
         match_identical=not add_identical_pairs,
         similarity_name=similarity_name,
-        output_file=output_file,
         max_suggestions=int(max_suggestions),
+        no_interactive=no_interactive,
+        auto_threshold=auto_threshold,
     )
 
 
 def main(
-    old_dataset_name: str,
-    new_dataset_name: str,
-    output_file: str,
+    old_dataset_id: int,
+    new_dataset_id: int,
+    dry_run: bool,
     match_identical: bool = MATCH_IDENTICAL,
     similarity_name: str = SIMILARITY_NAME,
     max_suggestions: int = N_MAX_SUGGESTIONS,
+    no_interactive: bool = False,
+    auto_threshold: float = 100.0,
 ) -> None:
-    if os.path.isdir(output_file):
-        raise ValueError(f"`output_file` ({output_file}) should point to a JSON file ('*.json') and not a directory!")
-    if Path(output_file).suffix != ".json":
-        raise ValueError(f"`output_file` ({output_file}) should point to a JSON file ('*.json')!")
-
     with get_connection() as db_conn:
-        # Get old and new dataset ids.
-        old_dataset_id = get_dataset_id(db_conn=db_conn, dataset_name=old_dataset_name)
-        new_dataset_id = get_dataset_id(db_conn=db_conn, dataset_name=new_dataset_name)
-
         # Get variables from old dataset that have been used in at least one chart.
         old_indicators = get_variables_in_dataset(db_conn=db_conn, dataset_id=old_dataset_id, only_used_in_charts=True)
         # Get all variables from new dataset.
         new_indicators = get_variables_in_dataset(db_conn=db_conn, dataset_id=new_dataset_id, only_used_in_charts=False)
 
-    # Manually map old variable names to new variable names.
-    mapping = map_old_and_new_indicators(
-        old_indicators=old_indicators,
-        new_indicators=new_indicators,
-        match_identical=match_identical,
-        similarity_name=similarity_name,
-        max_suggestions=max_suggestions,
-    )
+    # Map old variable names to new variable names.
+    if no_interactive:
+        mapping = map_old_and_new_indicators_auto(
+            old_indicators=old_indicators,
+            new_indicators=new_indicators,
+            match_identical=match_identical,
+            similarity_name=similarity_name,
+            auto_threshold=auto_threshold,
+        )
+    else:
+        mapping = map_old_and_new_indicators(
+            old_indicators=old_indicators,
+            new_indicators=new_indicators,
+            match_identical=match_identical,
+            similarity_name=similarity_name,
+            max_suggestions=max_suggestions,
+        )
 
     # Display summary.
     display_summary(old_indicators=old_indicators, new_indicators=new_indicators, mapping=mapping)
 
-    # Save mapping to json file.
-    save_variable_replacements_file(mapping, output_file)
+    if dry_run:
+        # Print the mappings and dataframe
+        print_mappings(mapping)
+        print_mapping_dataframe(mapping, old_dataset_id, new_dataset_id)
+    else:
+        # Save to MySQL database
+        save_mappings_to_database(mapping, old_dataset_id, new_dataset_id)
 
 
 def map_old_and_new_indicators(
@@ -180,11 +205,117 @@ def map_old_and_new_indicators(
     """
     # get initial mapping
     mapping, missing_old, missing_new = preliminary_mapping(old_indicators, new_indicators, match_identical)
+
+    # Display preliminary mapping results
+    if match_identical:
+        if len(mapping) > 0:
+            print(f"\n✅ Found {len(mapping)} perfect matches (identical names):")
+            for _, row in mapping.iterrows():
+                print(f"  • {row['name_old']} (ID: {row['id_old']} → {row['id_new']})")
+        else:
+            print("\n❌ No perfect matches found (no variables with identical names)")
+
+        if len(missing_old) > 0:
+            print(f"\n🔍 {len(missing_old)} variables need manual matching...")
+        else:
+            print("\n🎉 All variables have been automatically matched!")
+            return mapping
+
     # get suggestions for mapping
     suggestions = find_mapping_suggestions(missing_old, missing_new, similarity_name)
     # iterate over suggestions and get user feedback
     mapping = consolidate_mapping_suggestions_with_user(mapping, suggestions, max_suggestions)
     return mapping
+
+
+def map_old_and_new_indicators_auto(
+    old_indicators: pd.DataFrame,
+    new_indicators: pd.DataFrame,
+    match_identical: bool = True,
+    similarity_name: str = "partial_ratio",
+    auto_threshold: float = 100.0,
+) -> pd.DataFrame:
+    """Map old variables to new variables automatically based on similarity threshold.
+
+    Parameters
+    ----------
+    old_indicators : pd.DataFrame
+        Table of old variable names (column 'name') and ids (column 'id').
+    new_indicators : pd.DataFrame
+        Table of new variable names (column 'name') and ids (column 'id').
+    match_identical : bool
+        True to automatically match variables that have identical names in both datasets.
+    similarity_name: str
+        Similarity function name. Must be in `SIMILARITY_NAMES`.
+    auto_threshold: float
+        Minimum similarity score (0-100) to automatically create a mapping.
+
+    Returns
+    -------
+    mapping : pd.DataFrame
+        Mapping table from old variable name and id to new variable name and id.
+    """
+    # Get initial mapping (identical matches)
+    mapping, missing_old, missing_new = preliminary_mapping(old_indicators, new_indicators, match_identical)
+
+    # Display preliminary mapping results
+    if match_identical:
+        if len(mapping) > 0:
+            log.info(f"Found {len(mapping)} perfect matches (identical names)")
+            for _, row in mapping.iterrows():
+                log.info(f"  • {row['name_old']} (ID: {row['id_old']} → {row['id_new']})")
+        else:
+            log.info("No perfect matches found (no variables with identical names)")
+
+        if len(missing_old) > 0:
+            log.info(f"{len(missing_old)} variables need automatic matching (similarity >= {auto_threshold}%)")
+        else:
+            log.info("All variables have been automatically matched with perfect matches!")
+            return mapping
+
+    # Get suggestions for mapping
+    suggestions = find_mapping_suggestions(missing_old, missing_new, similarity_name)
+
+    # Automatically map based on threshold
+    mappings = [mapping]
+    used_new_ids = set(mapping["id_new"].tolist())
+
+    for suggestion in suggestions:
+        name_old = suggestion["old"]["name_old"]
+        id_old = suggestion["old"]["id_old"]
+        candidates = suggestion["new"]
+
+        # Filter out already used new indicators
+        candidates = candidates[~candidates["id_new"].isin(used_new_ids)]
+
+        if len(candidates) > 0:
+            best_match = candidates.iloc[0]  # Already sorted by similarity
+            similarity_score = best_match["similarity"]
+
+            if similarity_score >= auto_threshold:
+                # Add this mapping
+                new_mapping = pd.DataFrame(
+                    {
+                        "id_old": [id_old],
+                        "name_old": [name_old],
+                        "id_new": [best_match["id_new"]],
+                        "name_new": [best_match["name_new"]],
+                    }
+                )
+                mappings.append(new_mapping)
+                used_new_ids.add(best_match["id_new"])
+
+                log.info(
+                    f"Auto-mapped '{name_old}' -> '{best_match['name_new']}' (similarity: {similarity_score:.1f}%)"
+                )
+
+    # Combine all mappings
+    if mappings:
+        final_mapping = pd.concat(mappings, ignore_index=True)
+    else:
+        final_mapping = pd.DataFrame()
+
+    return final_mapping
 
 
 def display_summary(old_indicators: pd.DataFrame, new_indicators: pd.DataFrame, mapping: pd.DataFrame) -> None:
@@ -201,7 +332,7 @@ def display_summary(old_indicators: pd.DataFrame, new_indicators: pd.DataFrame, 
 
     """
     print("Matched pairs:")
-    for i, row in mapping.iterrows():
+    for _, row in mapping.iterrows():
         print(f"\n  {row['name_old']} ({row['id_old']})")
         print(f"  {row['name_new']} ({row['id_new']})")
 
@@ -209,35 +340,142 @@ def display_summary(old_indicators: pd.DataFrame, new_indicators: pd.DataFrame, 
     unmatched_new = new_indicators[~new_indicators["name"].isin(mapping["name_new"])].reset_index(drop=True)
     if len(unmatched_old) > 0:
         print("\nUnmatched variables in the old dataset:")
-        for i, row in unmatched_old.iterrows():
+        for _, row in unmatched_old.iterrows():
             print(f"  {row['name']} ({row['id']})")
     else:
         print("\nAll variables in the old dataset have been matched.")
     if len(unmatched_new) > 0:
         print("\nUnmatched variables in the new dataset:")
-        for i, row in unmatched_new.iterrows():
+        for _, row in unmatched_new.iterrows():
             print(f"  {row['name']} ({row['id']})")
     else:
         print("\nAll variables in the new dataset have been matched.")
 
 
-def save_variable_replacements_file(mapping: pd.DataFrame, output_file: str) -> None:
-    """Save a json file with the mapping from old to new variable ids.
+def print_mappings(mapping: pd.DataFrame) -> None:
+    """Print the variable mappings in a readable format.
 
     Parameters
     ----------
     mapping : pd.DataFrame
         Mapping table from old variable name and id to new variable name and id.
-    output_file : str
-        Path to output file.
-
     """
-    # Create a dictionary mapping from old variable id to new variable id.
-    mapping_indexes = mapping[["id_old", "id_new"]].set_index("id_old").to_dict()["id_new"]
-    mapping_indexes = {str(key): str(mapping_indexes[key]) for key in mapping_indexes}
+    if len(mapping) == 0:
+        print("No variable mappings found.")
+        return
 
-    print(f"Saving index mapping to json file: {output_file}")
-    save_data_to_json_file(data=mapping_indexes, json_file=output_file, **{"indent": 4, "sort_keys": True})
+    print("Variable Mappings:")
+    print("=" * 60)
+    for _, row in mapping.iterrows():
+        print(f"Old: {row['name_old']} (ID: {row['id_old']})")
+        print(f"New: {row['name_new']} (ID: {row['id_new']})")
+        print("-" * 40)
+
+
+def print_mapping_dataframe(mapping: pd.DataFrame, old_dataset_id: int, new_dataset_id: int) -> None:
+    """Print the dataframe that would be saved to the database.
+
+    Parameters
+    ----------
+    mapping : pd.DataFrame
+        Mapping table from old variable name and id to new variable name and id.
+    old_dataset_id : int
+        ID of the old dataset.
+    new_dataset_id : int
+        ID of the new dataset.
+    """
+    if len(mapping) == 0:
+        print("\nNo mappings to save to database.")
+        return
+
+    # Create the mapping dictionary that would be saved
+    mapping_dict = mapping.set_index("id_old")["id_new"].to_dict()
+
+    print("\nDataFrame that would be saved to database:")
+    print("=" * 80)
+    print(f"Dataset mapping: {old_dataset_id} -> {new_dataset_id}")
+    print(f"Number of variable mappings: {len(mapping_dict)}")
+    print("\nMapping dictionary:")
+    for old_id, new_id in mapping_dict.items():
+        print(f"  {old_id} -> {new_id}")
+
+
+def _clear_dataset_mappings(old_dataset_id: int, new_dataset_id: int) -> None:
+    """Clear existing variable mappings for a specific dataset pair.
+
+    Parameters
+    ----------
+    old_dataset_id : int
+        ID of the old dataset.
+    new_dataset_id : int
+        ID of the new dataset.
+    """
+    from sqlalchemy import text
+    from sqlalchemy.orm import Session
+
+    # Check if table exists
+    if not WizardDB.table_exists("wiz__variable_mapping"):
+        return
+
+    # Delete mappings for this specific dataset pair
+    query = """
+    DELETE FROM wiz__variable_mapping
+    WHERE dataset_id_old = :old_id AND dataset_id_new = :new_id
+    """
+
+    engine = get_engine()
+    with Session(engine) as s:
+        result = s.execute(text(query), {"old_id": old_dataset_id, "new_id": new_dataset_id})
+        try:
+            rows_deleted = getattr(result, "rowcount", 0) or 0
+        except AttributeError:
+            rows_deleted = 0
+        s.commit()
+
+        if rows_deleted > 0:
+            print(f"Cleared {rows_deleted} existing mappings for dataset pair {old_dataset_id} -> {new_dataset_id}")
+
+
+def save_mappings_to_database(mapping: pd.DataFrame, old_dataset_id: int, new_dataset_id: int) -> None:
+    """Save variable mappings to the MySQL database.
+
+    This function will clear any existing mappings for the same dataset pair before saving new ones.
+
+    Parameters
+    ----------
+    mapping : pd.DataFrame
+        Mapping table from old variable name and id to new variable name and id.
+    old_dataset_id : int
+        ID of the old dataset.
+    new_dataset_id : int
+        ID of the new dataset.
+    """
+    if len(mapping) == 0:
+        print("No mappings to save to database.")
+        return
+
+    # First, clear any existing mappings for this dataset pair to avoid duplicates
+    _clear_dataset_mappings(old_dataset_id, new_dataset_id)
+
+    # Create the mapping dictionary expected by WizardDB.add_variable_mapping
+    raw_dict = mapping.set_index("id_old")["id_new"].to_dict()
+    mapping_dict: Dict[int, int] = {}
+    for k, v in raw_dict.items():
+        # Explicit type conversion to satisfy type checker
+        key_int = int(cast(Union[int, float, str], k))
+        value_int = int(cast(Union[int, float, str], v))
+        mapping_dict[key_int] = value_int
+
+    # Save to database
+    WizardDB.add_variable_mapping(
+        mapping=mapping_dict,
+        dataset_id_old=old_dataset_id,
+        dataset_id_new=new_dataset_id,
+        comments=f"Variable mapping from dataset {old_dataset_id} to {new_dataset_id}",
+    )
+
+    print(f"Successfully saved {len(mapping_dict)} variable mappings to database.")
+    print(f"Dataset mapping: {old_dataset_id} -> {new_dataset_id}")
 
 
 def preliminary_mapping(
@@ -438,13 +676,14 @@ def consolidate_mapping_suggestions_with_user(
 
     Given an initial mapping and a list of suggestions, this function prompts the user with options and consolidates the mapping
     based on their input."""
-    count = 0
     ids_new_ignore = mapping["id_new"].tolist()
     mappings = [mapping]
+    total_suggestions = len(suggestions)
+
     while len(suggestions) > 0:
         # always access last suggestion
         suggestion = suggestions[-1]
-        count += 1
+        current_position = total_suggestions - len(suggestions) + 1
 
         # get relevant variables
         name_old = suggestion["old"]["name_old"]
@@ -454,7 +693,7 @@ def consolidate_mapping_suggestions_with_user(
         new_indexes = missing_new.index.tolist()
 
         # display comparison to user
-        click.secho(f"\nVARIABLE {count}/{len(suggestions)}", bold=True, bg="white", fg="black")
+        click.secho(f"\nVARIABLE {current_position}/{total_suggestions}", bold=True, bg="white", fg="black")
         _display_compared_variables(
             old_name=cast(str, name_old),
             missing_new=missing_new,
@@ -485,6 +724,7 @@ def consolidate_mapping_suggestions_with_user(
 
             # forget suggestion once mapped or if user chose to ignore (chosen_id=-1)
             _ = suggestions.pop()
+        # If chosen_id is None (invalid input), don't remove suggestion - stay on same variable
 
         mapping = pd.concat(mappings, ignore_index=True)
 
@@ -539,16 +779,25 @@ def _display_compared_variables(
     n_max_suggestions: int = N_MAX_SUGGESTIONS,
 ) -> None:
     """Display final variable mapping summary in terminal."""
-    new_name = missing_new.iloc[0]["name_new"]
     click.secho(f"\nOld variable: {old_name}", fg="red", bold=True, blink=True)
-    click.secho(f"New variable: {new_name}", fg="green", bold=True)
-    click.secho("\n\tOther options:", italic=True)
-    for i, row in missing_new.iloc[1 : 1 + n_max_suggestions].iterrows():
-        click.secho(
-            f"\t{i:5} - {row['name_new']} (id={row['id_new']}, similarity={row['similarity']:.0f})",
-            fg="bright_green",
-        )
-    click.echo("\n")
+    click.secho("\nOptions:", italic=True)
+
+    # Show all options (including the best match) with their index numbers
+    max_to_show = min(len(missing_new), n_max_suggestions + 1)  # +1 to include the best match
+    for idx, (i, row) in enumerate(missing_new.iloc[:max_to_show].iterrows()):
+        if idx == 0:
+            # Highlight the best match
+            click.secho(
+                f"{i:5} - {row['name_new']} (id={row['id_new']}, similarity={row['similarity']:.0f}) [BEST MATCH]",
+                fg="green",
+                bold=True,
+            )
+        else:
+            click.secho(
+                f"{i:5} - {row['name_new']} (id={row['id_new']}, similarity={row['similarity']:.0f})",
+                fg="bright_green",
+            )
+    click.echo("")
 
 
 def _input_manual_decision(new_indexes: list[Any]) -> Any:
@@ -572,3 +821,7 @@ def _input_manual_decision(new_indexes: list[Any]) -> Any:
         print(f"Invalid option: It should be one in {new_indexes}.")
 
     return chosen_index
+
+
+if __name__ == "__main__":
+    main_cli()

@@ -156,8 +156,6 @@ steps:
     - snapshot://fasttrack/2023-06-19/world_population_comparison.csv
   data://grapher/fasttrack/latest/antimicrobial_usage_livestock:
     - snapshot://fasttrack/latest/antimicrobial_usage_livestock.csv
-  data://grapher/fasttrack/latest/iucn_number_evaluated:
-    - snapshot://fasttrack/latest/iucn_number_evaluated.csv
   data://grapher/fasttrack/latest/try_fast_track_in_donor_costs:
     - snapshot://fasttrack/latest/try_fast_track_in_donor_costs.csv
   data://grapher/fasttrack/latest/_1__2018_2023_in_donor_costs_dac_countries__sheet1:
@@ -249,4 +247,4 @@ steps:
   data://grapher/fasttrack/latest/wolbachia_dengue_indonesia_rct: !!set
     ? snapshot://fasttrack/latest/wolbachia_dengue_indonesia_rct.csv
   data://grapher/fasttrack/latest/smokers_vapers_great_britain: !!set
-    snapshot://fasttrack/latest/smokers_vapers_great_britain.csv:
+    ? snapshot://fasttrack/latest/smokers_vapers_great_britain.csv
