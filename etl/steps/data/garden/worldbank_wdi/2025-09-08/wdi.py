@@ -496,7 +496,10 @@ def _fetch_metadata_for_indicator(indicator_code: str) -> Dict[str, str]:
 
 
 def load_variable_metadata(df_vars: Table, indicator_codes: list[str]) -> pd.DataFrame:
-    df_vars = df_vars.copy()
+    # Exclude metadata not in indicator_codes
+    df_vars = df_vars[df_vars["series_code"].isin(indicator_codes)].copy()
+
+    # Drop columns that are completely empty
     df_vars.dropna(how="all", axis=1, inplace=True)
 
     # Check that series_code is unique
@@ -572,7 +575,7 @@ def add_variable_metadata(tb: Table, tb_metadata: Table) -> Table:
 
         # load metadata created from raw source name
         clean_source = clean_source_mapping.get(source_raw_name)
-        assert clean_source, f'`rawName` "{source_raw_name}" not found in wdi.sources.json. Run update_metadata.ipynb or check non-breaking spaces.'
+        assert clean_source, f'{var_code}: `rawName` "{source_raw_name}" not found in wdi.sources.json. Run update_metadata.ipynb or check non-breaking spaces.'
 
         # create an origin with WDI
         assert len(tb[var_code].m.origins) == 1

@@ -5130,12 +5130,6 @@ tables:
       articles_per_million_people:
         title: Scientific and technical journal articles per million people
         unit: articles per million people
-
-
-      is_rod_psgr_k6:
-        title: Roads, passengers carried (million passenger-km)
-      sg_law_eqrm_wk:
-        title: Law mandates equal remuneration for females and males for work of equal value (1=yes; 0=no)
       ic_bre_tx_p1:
         title: 'B-READY: Taxation Pillar 1: Quality of Regulations on Taxation'
       dt_dod_pvlx_gn_zs:
@@ -5154,8 +5148,6 @@ tables:
         title: 'B-READY: Pillar 2: Public Services'
       sh_sta_owgh_me_fe_zs:
         title: Prevalence of overweight, female (modeled estimate, % of children under 5)
-      is_veh_nveh_p3:
-        title: Motor vehicles (per 1,000 people)
       ic_bre_bl_os:
         title: 'B-READY: Business Location: Overall Score'
       ic_bre_be_p2:
@@ -5166,54 +5158,28 @@ tables:
         title: Refugees under the mandate of the UNRWA by country or territory of origin
       sm_pop_asys_eo:
         title: Asylum-seekers by country or territory of origin
-      se_sec_rept_fe_zs:
-        title: Repeaters, secondary, female (% of female enrollment)
-      er_bdv_totl_xq:
-        title: GEF benefits index for biodiversity (0 = no biodiversity potential to 100 = maximum)
       ic_bre_mc_p2:
         title: 'B-READY: Market Competition Pillar 2: Public Services that Promote Market Competition'
       ic_bre_dr_p3:
         title: 'B-READY: Dispute Resolution Pillar 3: Ease of Resolving a Commercial Dispute'
       sm_pop_rhcr_eo:
         title: Refugees under the mandate of the UNHCR by country or territory of origin
-      is_rod_dnst_k2:
-        title: Road density (km of road per 100 sq. km of land area)
-      iq_sci_ovrl:
-        title: Overall level of statistical capacity (scale 0 - 100)
-      sh_dth_0514:
-        title: Number of deaths ages 5-14 years
       ic_bre_lb_p3:
         title: 'B-READY: Labor Pillar 3: Operational Efficiency of Labor Regulations and Public Services in Practice'
       ic_bre_mc_os:
         title: 'B-READY: Market Competition: Overall Score'
-      sg_law_nodc_hr:
-        title: Law mandates nondiscrimination based on gender in hiring (1=yes; 0=no)
       ic_bre_p1_rf:
         title: 'B-READY: Pillar 1: Regulatory Framework'
       ic_bre_bi_os:
         title: 'B-READY: Business Insolvency: Overall Score'
       ic_bre_fs_p3:
         title: 'B-READY: Financial Services Pillar 3: Operational Efficiency of Receiving Financial Services'
-      dt_nfl_unid_cd:
-        title: Net official flows from UN agencies, UNIDIR (current US$)
       ic_bre_lb_p1:
         title: 'B-READY: Labor Pillar 1: Quality of Labor Regulations'
       ic_bre_tx_os:
         title: 'B-READY: Taxation: Overall Score'
       ic_bre_be_p1:
         title: 'B-READY: Business Entry Pillar 1: Quality of Regulations for Business Entry'
-      bm_klt_dinv_gd_zs:
-        title: Foreign direct investment, net outflows (% of GDP)
-      sg_gen_lsom_zs:
-        title: Female legislators, senior officials and managers (% of total)
-      sg_job_nopn_eq:
-        title: Nonpregnant and nonnursing women can do the same jobs as men (1=yes; 0=no)
-      sg_law_chmr:
-        title: Law prohibits or invalidates child or early marriage (1=yes; 0=no)
-      si_pov_mdim_it:
-        title: Multidimensional poverty intensity (average share of deprivations experienced by the poor)
-      sg_nod_cons:
-        title: Nondiscrimination clause mentions gender in the constitution (1=yes; 0=no)
       ic_bre_it_p2:
         title: 'B-READY: International Trade Pillar 2: Quality of Public Services for the Facilitation of International Trade'
       ic_bre_it_os:
@@ -5230,10 +5196,6 @@ tables:
         title: Other people in need of international protection by country or territory of origin
       sh_sta_owgh_me_ma_zs:
         title: Prevalence of overweight, male (modeled estimate, % of children under 5)
-      ny_gds_totl_kn:
-        title: Gross domestic savings (constant LCU)
-      sg_law_leve_pu:
-        title: Law mandates paid or unpaid maternity leave (1=yes; 0=no)
       ic_bre_us_p1:
         title: 'B-READY: Utility Services Pillar 1: Quality of Regulations on Utility Services'
       ic_bre_it_p1:
@@ -5244,10 +5206,6 @@ tables:
         title: 'B-READY: Pillar 3: Operational Efficiency'
       sm_pop_rhcr_ea:
         title: Refugees under the mandate of the UNHCR by country or territory of asylum
-      en_atm_noxe_ei_zs:
-        title: Nitrous oxide emissions in industrial and energy processes (% of total nitrous oxide emissions)
-      dt_dod_mdri_cd:
-        title: Debt forgiveness grants (current US$)
       ic_bre_bl_p3:
         title: 'B-READY: Business Location Pillar 3: Operational Efficiency of Establishing a Business Location'
       ic_bre_bi_p1:
@@ -5256,20 +5214,6 @@ tables:
         title: 'B-READY: Business Insolvency Pillar 2: Quality of Institutional and Operational Infrastructure for Judicial Insolvency Proceedings'
       ic_bre_fs_p1:
         title: 'B-READY: Financial Services Pillar 1: Quality of Regulations for Financial Services'
-      is_veh_road_k1:
-        title: Vehicles (per km of road)
-      en_atm_noxe_in_kt_ce:
-        title: Industrial nitrous oxide emissions (thousand metric tons of CO2 equivalent)
-      ic_tax_totl_cp_zs:
-        title: Total tax rate (% of commercial profits)
-      sg_mmr_leve_ep:
-        title: Mothers are guaranteed an equivalent position after maternity leave (1=yes; 0=no)
-      si_pov_urhc:
-        title: Urban poverty headcount ratio at national poverty lines (% of urban population)
-      si_pov_ruhc:
-        title: Rural poverty headcount ratio at national poverty lines (% of rural population)
-      sh_dyn_0514:
-        title: Probability of dying at age 5-14 years (per 1,000 children age 5)
       ic_bre_bl_p1:
         title: 'B-READY: Business Location Pillar 1: Quality of Regulations for Business Location'
       ic_bre_us_p2:
@@ -5278,12 +5222,6 @@ tables:
         title: Refugees under the mandate of the UNRWA by country or territory of asylum
       sh_sta_stnt_me_fe_zs:
         title: Prevalence of stunting, height for age, female (modeled estimate, % of children under 5)
-      se_sec_rept_zs:
-        title: Repeaters, secondary, total (% of total enrollment)
-      pa_nus_ppp_05:
-        title: 2005 PPP conversion factor, GDP (LCU per international $)
-      sg_leg_dvaw:
-        title: Legislation exists on domestic violence (1=yes; 0=no)
       ic_bre_fs_os:
         title: 'B-READY: Financial Services: Overall Score'
       ic_bre_fs_p2:
@@ -5298,10 +5236,6 @@ tables:
         title: Internally displaced people (IDP) by country or territory of asylum / origin
       sh_sta_stnt_me_ma_zs:
         title: Prevalence of stunting, height for age, male (modeled estimate, % of children under 5)
-      is_veh_pcar_p3:
-        title: Passenger cars (per 1,000 people)
-      se_sec_rept_ma_zs:
-        title: Repeaters, secondary, male (% of male enrollment)
       ic_bre_dr_p1:
         title: 'B-READY: Dispute Resolution Pillar 1: Quality of Regulations for Dispute Resolution'
       ic_bre_mc_p1:
@@ -5312,213 +5246,29 @@ tables:
         title: Forcibly displaced people
       sm_pop_opip_ea:
         title: Other people in need of international protection by country or territory of asylum
-      ic_prp_proc:
-        title: Procedures to register property (number)
-      it_mlt_main_p3:
-        title: Telephone mainlines (per 1,000 people)
-      bg_klt_dinv_gd_zs:
-        title: Gross foreign direct investment (% of GDP)
-      sl_tlf_chld_zs:
-        title: Labor force, children 10-14 (% of age group)
       ic_frm_fo_zs:
         title: Firms with at least 10% foreign ownership
-      ic_frm_crdc_pt_zs:
-        title: Firms that are partially credit constrained (% of firms)
-      dt_oda_alld_gi_zs:
-        title: Net official development assistance received (% of gross capital formation)
-      ic_mng_ind:
-        title: Management practices index
       ic_frm_nprd_zs:
         title: Firms that introduced a new product/service and process, and spent on R&D
-      it_int_traf_mn_ps:
-        title: International telecom, outgoing traffic (minutes per subscriber)
-      ic_frm_taxe_zs:
-        title: Firms filling taxes electronically (% of firms)
-      ic_lgl_cred_xq:
-        title: Strength of legal rights index (0=weak to 12=strong)
-      it_mlt_3min_cd_us:
-        title: Telephone average cost of call to US (US$ per three minutes)
-      ic_frm_crdc_fl_zs:
-        title: Firms that are fully credit constrained (% of firms)
-      it_mlt_lcty_p3:
-        title: Telephone mainlines in largest city (per 1,000 people)
-      sh_sta_arif_zs:
-        title: ARI prevalence (% of children under 5)
-      sm_pop_refg_or:
-        title: Refugee population by country or territory of origin
-      ic_lgl_empl_xq:
-        title: Rigidity of employment index (0=less rigid to 100=more rigid)
-      it_net_usec_zs:
-        title: Internet total monthly price (% of monthly GNI per capita)
-      it_mlt_clcl_cd:
-        title: Telephone average cost of local call (US$ per three minutes)
-      ic_cns_taxr_zs:
-        title: Tax rates (% of managers surveyed ranking this as a major constraint)
-      ag_lnd_irig_zs:
-        title: Irrigated land (% of cropland)
-      is_rrs_good_km:
-        title: Railways, good hauled (ton-km)
-      ic_reg_durs:
-        title: Time required to start a business (days)
-      tg_val_totl_gg_zs:
-        title: Trade in goods (% of goods GDP)
-      ag_trc_empl_zs:
-        title: Agricultural machinery, tractors per agricultural worker
-      gb_tax_imar_zs:
-        title: Highest marginal tax rate, individual rate (%)
-      tx_val_serv_mt_zs:
-        title: Ratio of commercial service exports to merchandise exports (%)
-      ic_cns_corr_zs:
-        title: Corruption (% of managers surveyed ranking this as a major constraint)
-      it_net_user_p3:
-        title: Internet users (per 1,000 people)
-      gb_tax_cmar_zs:
-        title: Highest marginal tax rate, corporate rate (%)
-      ny_gns_ictr_kn:
-        title: Gross national savings, including net current transfers (constant LCU)
-      sh_adm_inpt:
-        title: Inpatient admission rate (% of population )
-      eg_gdp_puse_ko_kd:
-        title: GDP per unit of energy use (2000 US$ per kg of oil equivalent)
-      ag_lnd_ppas_zs:
-        title: Permanent pasture (% of land area)
-      ic_crd_prvt_p3:
-        title: Private credit bureau coverage (borrowers per 1,000 adults)
-      en_rur_dnst:
-        title: Rural population density (rural population per sq. km of arable land)
-      sl_agr_empl_fe_to_zs:
-        title: Employees, agriculture, female (% of total agricultural employment)
-      sh_sta_dirh_zs:
-        title: Diarrhea prevalence (% of children under 5)
-      it_rad_sets_p3:
-        title: Radio sets (per 1,000 people)
-      ag_lnd_irig_ha:
-        title: Land use, irrigated land (hectares)
-      ic_bus_disc_xq:
-        title: Business extent of disclosure index (0=less disclosure to 10=more disclosure)
-      it_mlt_falt_m2:
-        title: Telephone faults (per 100 mainlines)
-      it_mlt_revn_cd:
-        title: Revenue from fixed telephone service (current US$)
-      bx_pef_totl_cd_dt:
-        title: Portfolio investment, equity (DRS, current US$)
-      ic_cns_crim_zs:
-        title: Crime (% of managers surveyed ranking this as a major constraint)
-      ic_cns_legl_zs:
-        title: Courts (% of managers surveyed ranking this as a major constraint)
-      ic_crd_publ_p3:
-        title: Public credit registry coverage (borrowers per 1,000 adults)
-      it_cel_sets_p3:
-        title: Mobile phone subscribers (per 1,000 people)
-      bg_kac_fnei_gd_zs:
-        title: Gross private capital flows (% of GDP)
-      ic_cns_lbsk_zs:
-        title: Labor skills (% of managers surveyed ranking this as a major constraint)
-      ic_cns_polc_zs:
-        title: Policy uncertainty (% of managers surveyed ranking this as a major constraint)
-      it_prt_news_p3:
-        title: Daily newspapers (per 1,000 people)
-      it_mlt_empl:
-        title: Telephone mainlines per employee
-      ag_lnd_trac_zs:
-        title: Agricultural machinery, tractors per 100 sq. km of arable land
-      gb_tax_imar_cd:
-        title: Highest marginal tax rate, individual (on income exceeding, US$)
-      ie_ict_pcap_cd:
-        title: Information and communication technology expenditure per capita (current US$)
-      ic_cns_elec_zs:
-        title: Electricity (% of managers surveyed ranking this as a major constraint)
-      sp_pop_1564_in_zs:
-        title: Population ages 15-64 (% of total)
-      it_net_usec_cd:
-        title: Price basket for Internet (US$ per month)
-      ic_isv_durs:
-        title: Time to resolve insolvency (years)
-      ic_prp_durs:
-        title: Time required to register property (days)
-      it_mlt_wait:
-        title: Telephone mainlines, waiting list
-      ic_frm_lotm_zs:
-        title: Firms where largest owner is also the top manager (% of firms)
-      bx_klt_dinv_dt_gi_zs:
-        title: Foreign direct investment, net inflows (% of gross capital formation)
-      dt_oda_alld_xp_zs:
-        title: Net ODA received (% of central government expenditure)
-      ic_reg_proc:
-        title: Start-up procedures to register a business (number)
-      sl_tlf_prim_ma_zs:
-        title: Labor force with primary education, male (% of male labor force)
-      ic_lgl_lack_zs:
-        title: Courts (% of managers surveyed lacking confidence in courts to uphold property rights)
-      it_tvs_sets_p3:
-        title: Television sets (per 1,000 people)
-      ip_tmk_nres:
-        title: Trademark applications, direct nonresident
-      fm_lbl_mqmy_ir_zs:
-        title: Money and quasi money (M2) to total reserves ratio
-      sl_tlf_seco_fe_zs:
-        title: Labor force with secondary education, female (% of female labor force)
-      fp_fpi_totl_zg:
-        title: Inflation, food prices (annual %)
-      ic_frm_exs_zs:
-        title: Firms exporting directly at least 10% of sales (% of firms)
-      ic_frm_engm_zs:
-        title: Firms adopting energy management measures to reduce emissions (% of firms)
-      ip_tmk_resd:
-        title: Trademark applications, direct resident
-      ic_cns_lbrg_zs:
-        title: Labor regulations (% of managers surveyed ranking this as a major constraint)
-      ag_lnd_totl_ha:
-        title: Land area (hectares)
-      sm_pop_refg:
-        title: Refugee population by country or territory of asylum
-      dt_oda_alld_mp_zs:
-        title: Net ODA received (% exports and imports)
-      it_tel_totl_p3:
-        title: Telephone (mainlines and mobile phone) subscribers (per 1,000 people)
-      ie_ict_totl_gd_zs:
-        title: Information and communication technology expenditure (% of GDP)
-      ag_lnd_othr_zs:
-        title: Land use, other (% of land area)
-      fs_lbl_liqu_gd_zs:
-        title: Liquid liabilities (M3) as % of GDP
       ic_cus_durs_im:
         title: Average time to clear imports through customs (days)
-      dt_oda_alld_gn_zs:
-        title: Net ODA received (% of GNP)
-      bn_klt_prvt_cd_dt:
-        title: Private capital flows, net total (DRS, current US$)
-      sl_tlf_tert_fe_zs:
-        title: Labor force with tertiary education, female (% of female labor force)
-      it_tvs_cabl_p3:
-        title: Cable television subscribers (per 1,000 people)
-      ic_frm_bnkl_zs:
-        title: Firms with a bank loan/line of credit (% of firms)
-      fs_lbl_qliq_gd_zs:
-        title: Quasi-liquid liabilities (% of GDP)
+      ic_frm_crdc_pt_zs:
+        title: Firms that are partially credit constrained (% of firms)
+      ic_mng_ind:
+        title: Management practices index
+      ic_frm_exs_zs:
+        title: Firms exporting directly at least 10% of sales (% of firms)
       ic_frm_cdp_zs:
         title: Firms that use a third party to resolve commercial disputes (% of firms)
+      ic_frm_bnkl_zs:
+        title: Firms with a bank loan/line of credit (% of firms)
+      ic_frm_engm_zs:
+        title: Firms adopting energy management measures to reduce emissions (% of firms)
+      ic_frm_crdc_fl_zs:
+        title: Firms that are fully credit constrained (% of firms)
+      ic_frm_lotm_zs:
+        title: Firms where largest owner is also the top manager (% of firms)
       ic_frm_co2_zs:
         title: Firms monitoring own CO2 emissions (% of firms)
-      ie_ppi_tele_cd:
-        title: Investment in telecoms with private participation (current US$)
-      it_cmp_pcmp_p3:
-        title: Personal computers (per 1,000 people)
-      bx_klt_dinv_dt_gd_zs:
-        title: Foreign direct investment, net inflows (% of GDP)
-      eg_elc_prod_kh:
-        title: Electricity production (kWh)
-      sl_tlf_prim_fe_zs:
-        title: Labor force with primary education, female (% of female labor force)
-      ic_cns_fina_zs:
-        title: Finance (% of managers surveyed ranking this as a major constraint)
-      sl_tlf_tert_ma_zs:
-        title: Labor force with tertiary education, male (% of male labor force)
-      sl_tlf_seco_ma_zs:
-        title: Labor force with secondary education, male (% of male labor force)
-      dt_dod_dpng_zs:
-        title: Private nonguaranteed debt (% of external debt)
-      ic_lgl_durs:
-        title: Time required to enforce a contract (days)
-      dt_oda_alld_pc_zs:
-        title: Net official development assistance received per capita (current US$)
+      ic_frm_taxe_zs:
+        title: Firms filling taxes electronically (% of firms)

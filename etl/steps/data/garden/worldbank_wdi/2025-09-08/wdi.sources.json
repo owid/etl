@@ -2448,5 +2448,25 @@
     "rawName": "International Labour Organization. “ILO Modelled Estimates and Projections database (ILOEST)” ILOSTAT. Accessed January 07, 2025. https://ilostat.ilo.org/data/.",
     "name": "ILO Modelled Estimates and Projections database (ILOEST) – ILOSTAT, via World Bank",
     "dataPublisherSource": ""
+  },
+  {
+    "rawName": "World Bank staff calculations based on the methodology described in Kraay (2018).  http://documents.worldbank.org/curated/en/300071537907028892/Methodology-for-a-World-Bank-Human-Capital-Index",
+    "name": "World Bank staff calculations based on Kraay (2018) methodology, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "Development Assistance Committee of the Organisation for Economic Co-operation and Development, and World Bank GNI estimates.",
+    "name": "Development Assistance Committee (OECD) and World Bank GNI estimates, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "International Telecommunication Union, World Telecommunication Development Report and database, and World Bank estimates.",
+    "name": "International Telecommunication Union, World Telecommunication Development Report and database, and World Bank estimates, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "\"International Telecommunication Union, World Telecommunication Development Report and database, and World Bank estimates.\\r\"",
+    "name": "International Telecommunication Union, World Telecommunication Development Report and database, and World Bank estimates, via World Bank",
+    "dataPublisherSource": ""
   }
 ]
