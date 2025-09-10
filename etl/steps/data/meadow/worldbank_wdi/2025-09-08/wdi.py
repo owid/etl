@@ -1,3 +1,4 @@
+import json
 import zipfile
 
 import pandas as pd
@@ -13,6 +14,99 @@ log = get_logger()
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
+
+def create_metadata_table_from_json(json_data: dict) -> Table:
+    """Parse JSON metadata from World Bank API and create a metadata table."""
+    indicators_data = []
+
+    # Extract indicators from the 'data' field in JSON
+    for indicator in json_data["data"]:
+        # Extract field information from the indicator
+        fields = indicator.get("fields", [])
+
+        # Create a dictionary with indicator metadata
+        indicator_info = {
+            "id": indicator.get("id"),
+            "title": indicator.get("title"),
+            "description": indicator.get("description", ""),
+            "url": indicator.get("url", ""),
+            "dataset": indicator.get("dataset", {}).get("title", ""),
+        }
+
+        # Add fields as key:name, value:description pairs
+        for field in fields:
+            field_name = field.get("name", "")
+            # We already have description in the main dict
+            if field_name == "Description":
+                continue
+
+            field_description = field.get("description", "")
+            if field_name:
+                indicator_info[field_name] = field_description
+
+        indicators_data.append(indicator_info)
+
+    # Create DataFrame
+    df_meta_new = pd.DataFrame(indicators_data)
+
+    # Certain indicators have Code, but not Series Code
+    df_meta_new["Series Code"] = df_meta_new["Series Code"].fillna(df_meta_new["Code"])
+    df_meta_new.drop(columns=["Code"], inplace=True)
+
+    # !!! There are DUPLICATES. It looks like they're keeping old versions of indicators and there's no way to distinguish them.
+    # Strategy: If duplicates all have non-null "Base Period", keep the one with highest Base Period (most recent)
+    # Otherwise, keep the first occurrence
+
+    """
+    gf = df_meta_new[df_meta_new["Series Code"].str.lower().str.replace(".", "_") == "dt_oda_oatl_kd"]
+
+    def deduplicate_by_base_period(group):
+        if len(group) == 1:
+            return group
+
+        # Check if all duplicates have non-null Base Period
+        base_periods = group["Base Period"].dropna()
+        if len(base_periods) == len(group) and len(base_periods) > 1:
+            # All have non-null base periods, convert to numeric and keep the highest
+            try:
+                # Convert Base Period to numeric (handle cases like "2021", "2017", etc.)
+                numeric_periods = pd.to_numeric(base_periods, errors="coerce")
+                if not numeric_periods.isna().all():
+                    # Keep the row with the highest base period
+                    max_idx = numeric_periods.idxmax()
+                    # log.info(
+                    #     f"Duplicate series {group['Series Code'].iloc[0]}: keeping base period {group.loc[max_idx, 'Base Period']} over others"
+                    # )
+                    return group.loc[[max_idx]]
+            except:
+                pass
+
+        # Fallback: keep first occurrence
+        # log.info(
+        #     f"Duplicate series {group['Series Code'].iloc[0]}: keeping first occurrence (no clear base period distinction)"
+        # )
+        return group.iloc[[0]]
+
+    # Group by Series Code and apply deduplication logic
+    df_meta_new = (
+        df_meta_new.groupby("Series Code", as_index=False, group_keys=False)
+        .apply(deduplicate_by_base_period)
+        .reset_index(drop=True)
+    )
+    """
+
+    # Drop duplicate indicators
+    vc = df_meta_new["Series Code"].value_counts()
+    vc = vc[vc > 1]
+    if not vc.empty:
+        log.warning(f"Dropping {len(vc)} duplicate indicators: {vc.index.tolist()[:5]}...")
+        df_meta_new = df_meta_new[~df_meta_new["Series Code"].isin(vc.index)]
+
+    # Create Table with proper naming
+    tb_meta_new = Table(df_meta_new, short_name="wdi_metadata", underscore=True)
+
+    return tb_meta_new
 
 
 def run() -> None:
@@ -86,6 +180,12 @@ def run() -> None:
 
     # Load metadata from snapshot.
     tb_meta = Table(pd.read_csv(zf.open("WDISeries.csv")), short_name="wdi_metadata", underscore=True)
+
+    # Load and parse JSON metadata from API
+    json_data = json.load(zf.open("WDIMetadata.json"))
+    tb_meta_new = create_metadata_table_from_json(json_data)
+
+    tb_meta = tb_meta_new
 
     #
     # Save outputs.

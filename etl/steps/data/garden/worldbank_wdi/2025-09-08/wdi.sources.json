@@ -2183,5 +2183,270 @@
     "rawName": "World Population Prospects, United Nations (UN), note: Derived from total population, publisher: UN Population Division;\nStatistical databases and publications from national statistical offices, National statistical offices, note: Derived from total population;\nDemographic Statistics, Eurostat (ESTAT), note: Derived from total population;\nPopulation and Vital Statistics Report (various years), United Nations (UN), note: Derived from total population, publisher: UN Statistical Division",
     "name": "United Nations Population Division, national statistical offices, Eurostat, and United Nations Statistical Division, via World Bank",
     "dataPublisherSource": ""
+  },
+  {
+    "rawName": "",
+    "name": "World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "World Bank, Business Ready (B-READY) project: https://www.worldbank.org/en/businessready",
+    "name": "Business Ready (B-READY) project, World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "(1) United Nations Population Division. World Population Prospects: 2024 Revision. (2) HMD. Human Mortality Database. Max Planck Institute for Demographic Research (Germany), University of California, Berkeley (USA), and French Institute for Demographic Studies (France). Available at www.mortality.org.",
+    "name": "World Population Prospects: 2024 Revision and Human Mortality Database, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "International Telecommunication Union, World Telecommunication/ICT Development Report and database, and World Bank estimates.",
+    "name": "World Telecommunication Development Report and database, and World Bank estimates, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "International Labour Organization. “Labour Market-related SDG Indicators database (ILOSDG)” ILOSTAT. Accessed January 07, 2025. https://ilostat.ilo.org/data/.",
+    "name": "Labour Market-related SDG Indicators database (ILOSDG), ILOSTAT, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "IEA Statistics © OECD/IEA 2014 (http://www.iea.org/stats/index.asp), subject to https://www.iea.org/t&c/termsandconditions/",
+    "name": "IEA Statistics (OECD/IEA 2014), via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "World Health Organization Global Health Expenditure database (http://apps.who.int/nha/database). The data was retrieved on April 4, 2025.",
+    "name": "World Health Organization Global Health Expenditure Database, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "World Intellectual Property Organization (WIPO), WIPO Patent Report: Statistics on Worldwide Patent Activity. The International Bureau of WIPO assumes no responsibility with respect to the transformation of these data. Data last retrieved January 2021.",
+    "name": "WIPO Patent Report: Statistics on Worldwide Patent Activity, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "\"World Bank country economists.\\r\"",
+    "name": "World Bank country economists, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "United Nations Children's Fund, Demographic and Health Surveys, and Multiple Indicator Cluster Surveys.",
+    "name": "Demographic and Health Surveys (DHS) and UNICEF, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "(1) United Nations Population Division. World Population Prospects: 2024 Revision; (2) Statistical databases and publications from national statistical offices; (3) Eurostat: Demographic Statistics; (4) United Nations Statistics Division. Population and Vital Statistics Reprot (various years).",
+    "name": "World Population Prospects: 2024 Revision; Eurostat Demographic Statistics; Population and Vital Statistics (UN), via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "World Bank, Bulletin Board on Statistical Capacity (http://bbsc.worldbank.org).",
+    "name": "Bulletin Board on Statistical Capacity, World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "Office of the United Nations High Commissioner for Refugees (UNHCR), UNHCR Refugee Population Statistics Database.",
+    "name": "UNHCR Refugee Population Statistics Database, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "International Telecommunication Union, World Telecommunication/ICT Development Report and database.",
+    "name": "World Telecommunication/ICT Development Report and database, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "United Nations Educational, Scientific, and Cultural Organization (UNESCO) Institute for Statistics.",
+    "name": "UNESCO Institute for Statistics, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "Development Assistance Committee of the Organisation for Economic Co-operation and Development, and IMF central government expense estimates.",
+    "name": "Development Assistance Committee - OECD and IMF central government expense estimates, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "The overall topic score is generated by averaging the scores assigned to each of the three pillars (regulatory framework, public services, and efficiency) for that topic.",
+    "name": "Topic score averaged over regulatory framework, public services, and efficiency, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "Development Assistance Committee of the Organisation for Economic Co-operation and Development, and World Bank GCF estimates.",
+    "name": "Development Assistance Committee - OECD, and World Bank GCF estimates, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "Office of the United Nations High Commissioner for Refugees (UNHCR), UNHCR Refugee Population Statistics Database; Internal Displacement Monitoring Centre (IDMC), Global Internal Displacement Database.",
+    "name": "UNHCR Refugee Population Statistics Database and IDMC Global Internal Displacement Database, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "International Road Federation, World Road Statistics and electronic files, except where noted.",
+    "name": "World Road Statistics and electronic files, International Road Federation, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "World Bank, Global Poverty Working Group. Data are compiled from official government sources or are computed by World Bank staff using national (i.e. country–specific) poverty lines.",
+    "name": "Global Poverty Working Group, World Bank, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "Development Assistance Committee of the Organisation for Economic Co-operation and Development.",
+    "name": "Development Assistance Committee - OECD, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "ILO Key Indicators of the Labour Market (KILM).",
+    "name": "Key Indicators of the Labour Market (KILM), ILO, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "World Bank staff calculations based on the methodology described in World Bank (2018). https://openknowledge.worldbank.org/handle/10986/30498.",
+    "name": "World Bank staff calculations based on methodology (World Bank 2018), via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "Household surveys, including Demographic and Health Surveys and Multiple Indicator Cluster Surveys. Largely compiled by United Nations Population Division (World Contraceptive Use 2024).",
+    "name": "Household surveys (DHS, MICS), compiled by UN Population Division, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "Development Administration Committee of the Organisation for Economic Co-operation and Development, and World Bank GNI estimates.",
+    "name": "Development Assistance Committee - OECD, and World Bank GNI estimates, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "International Labour Organization, Key Indicators of the Labour Market database.",
+    "name": "Key Indicators of the Labour Market (KILM), International Labour Organization, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "International Labour Organization. “ILO modelled estimates database” ILOSTAT. Accessed January 07, 2025. https://ilostat.ilo.org/data/.",
+    "name": "ILO Modelled Estimates Database (ILOEST), ILOSTAT, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "KPMG's Corporate and Indirect Tax Rate Survey 2009 (www.kpmg.com), and PricewaterhouseCoopers's Worldwide Tax Summaries Online (www.pwc.com).",
+    "name": "KPMG Corporate and Indirect Tax Rate Survey 2009 and PwC Worldwide Tax Summaries Online, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "\"International Telecommunication Union, World Telecommunication Development Report and database, and World Bank estimates.\"",
+    "name": "International Telecommunication Union, World Telecommunication Development Report and database, and World Bank estimates",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "(1) United Nations Population Division. World Population Prospects: 2024 Revision; (2) Statistical databases and publications from national statistical offices; (3) Eurostat: Demographic Statistics.",
+    "name": "World Population Prospects 2024 (UN Population Division) and Eurostat Demographic Statistics, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "International Labour Organization. “Wages and Working Time Statistics database (COND)” ILOSTAT. Accessed January 07, 2025. https://ilostat.ilo.org/data/.",
+    "name": "Wages and Working Time Statistics (COND) – ILOSTAT, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "WHO, OECD and supplemented by country data.",
+    "name": "WHO, OECD, and country data, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "UNESCO Institute for Statistics (UIS). UIS.Stat Bulk Data Download Service. Accessed April 5, 2025. https://apiportal.uis.unesco.org/bdds.",
+    "name": "UIS.Stat Bulk Data Download Service (UNESCO UIS), via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "World Bank: Women, Business and the Law.",
+    "name": "World Bank: Women, Business and the Law",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "Development Assistance Committee of the Organisation for Economic Co-operation and Development, and World Bank imports of goods and services estimates.",
+    "name": "Geographical Distribution of Financial Flows to Developing Countries (OECD DAC) and World Bank imports of goods and services, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "International Monetary Fund, Balance of Payments Statistics Yearbook. Data starting from 2005 are based the sixth edition of the IMF's Balance of Payments Manual (BPM6).",
+    "name": "Balance of Payments Statistics Yearbook (IMF BPM6), via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "Office of the United Nations High Commissioner for Refugees (UNHCR), UNHCR Refugee Population Statistics Database; United Nations Relief and Works Agency for Palestine Refugees in the Near East (UNRWA), UNRWA Statistics Bulletin.",
+    "name": "Refugee Population Statistics Database (UNHCR) and UNRWA Statistics Bulletin, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "Government statistical agencies. Data for EU countires are from the EUROSTAT",
+    "name": "Eurostat data for EU countries, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "Development Assistance Committee of the Organisation for Economic Co-operation and Development, and World Bank population estimates.",
+    "name": "Population estimates (OECD DAC) and World Bank population estimates, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "World Information Technology and Services Alliance, Digital Planet: The Global Information Economy, and Global Insight, Inc.",
+    "name": "Digital Planet: The Global Information Economy (WITSA), and Global Insight, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "European Commission, Joint Research Centre (JRC)/Netherlands Environmental Assessment Agency (PBL). Emission Database for Global Atmospheric Research (EDGAR): http://edgar.jrc.ec.europa.eu/",
+    "name": "EDGAR Emission Database for Global Atmospheric Research (JRC/PBL), via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "Calculated by The World Bank Group, based on data from the Office of the United Nations High Commissioner for Refugees (UNHCR), UNHCR Refugee Population Statistics Database, United Nations Relief and Works Agency for Palestine Refugees in the Near East (UNRWA), and Internal Displacement Monitoring Centre (IDMC), Global Internal Displacement Database.",
+    "name": "World Bank calculations based on UNHCR, UNRWA, and IDMC data (Global Internal Displacement Database), via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "World Bank, International Comparison Program database.",
+    "name": "ICP (International Comparison Program) database, World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "World Bank, Doing Business project (http://www.doingbusiness.org/).",
+    "name": "Doing Business project, World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "International Road Federation, World Road Statistics and data files.",
+    "name": "World Road Statistics (International Road Federation), via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "World Bank staff calculations based on Kraay (2018).  http://documents.worldbank.org/curated/en/300071537907028892/Methodology-for-a-World-Bank-Human-Capital-Index",
+    "name": "World Bank Human Capital Index methodology (Kraay 2018), via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "IEA Energy Statistics Data Browser, https://www.iea.org/data-and-statistics/data-tools/energy-statistics-data-browser",
+    "name": "IEA Energy Statistics Data Browser, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "(1) United Nations Population Division. World Population Prospects: 2024 Revision; or derived from male and female life expectancy at birth from sources such as: (2) Statistical databases and publications from national statistical offices; (3) Eurostat: Demographic Statistics.",
+    "name": "World Population Prospects 2024 (UN Population Division) and Eurostat Demographic Statistics, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "International Labour Organization. “Labour Force Statistics database (LFS)” ILOSTAT. Accessed January 07, 2025. https://ilostat.ilo.org/data/.",
+    "name": "Labour Force Statistics (LFS) – ILOSTAT, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "Kiran Dev Pandey, Piet Buys, Ken Chomitz, and David Wheeler's, \"Biodiversity Conservation Indicators: New Tools for Priority Setting at the Global Environment Facility\" (2006).",
+    "name": "Biodiversity Conservation Indicators (Pandey et al. 2006), via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "International Labour Organization. “Education and Mismatch Indicators database (EMI)” ILOSTAT. Accessed January 07, 2025. https://ilostat.ilo.org/data/.",
+    "name": "Education and Mismatch Indicators (EMI) – ILOSTAT, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "International Labour Organization. “ILO Modelled Estimates and Projections database (ILOEST)” ILOSTAT. Accessed January 07, 2025. https://ilostat.ilo.org/data/.",
+    "name": "ILO Modelled Estimates and Projections database (ILOEST) – ILOSTAT, via World Bank",
+    "dataPublisherSource": ""
   }
 ]

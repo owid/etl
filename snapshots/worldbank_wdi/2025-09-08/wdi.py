@@ -19,6 +19,8 @@ WDI also keeps large WDI archive at https://datatopics.worldbank.org/world-devel
 
 import datetime as dt
 import json
+import tempfile
+import zipfile
 from pathlib import Path
 
 import click
@@ -32,10 +34,17 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 
 # URL to the World Bank metadata API.
 URL_METADATA = "https://datacatalogapi.worldbank.org/ddhxext/DatasetDownload?dataset_unique_id=0037712"
+# use this one
+# "https://ddh-openapi.worldbank.org/dataset/download?dataset_unique_id=0037712"
 
 # We used to get the URL from the metadata API, but it points to an old version. You can get this
 # URL from https://datacatalog.worldbank.org/search/dataset/0037712/World-Development-Indicators
 URL_DATA = "https://datacatalogfiles.worldbank.org/ddh-published/0037712/DR0095335/WDI_CSV_2025_07_02.zip"
+
+# Check out their API docs at https://ddh-openapi.worldbank.org/docs/index.html,
+# use dataset id 0037712
+API_BASE_URL = "https://ddh-openapi.worldbank.org/indicators"
+DATASET_ID = "0037712"
 
 
 @click.command()
@@ -59,8 +68,72 @@ def main(upload: bool) -> None:
     # Download the ~270MB zip data file.
     snap.download_from_source()
 
+    # Add JSON metadata from API to the zip file
+    add_json_metadata_to_zip(snap.path)
+
     # Create the snapshot and upload the data.
     snap.dvc_add(upload=upload)
+
+
+def add_json_metadata_to_zip(zip_path: Path) -> None:
+    """Fetch JSON metadata from API and add it to the existing zip file."""
+    all_indicators = []
+    skip = 0
+    batch_size = 1000
+
+    # Fetch all indicators using pagination
+    while True:
+        url = f"{API_BASE_URL}?dataset_unique_id={DATASET_ID}&top={batch_size}&skip={skip}"
+        response = requests.get(url)
+        response.raise_for_status()
+        batch_data = response.json()
+
+        # Check if we got any data
+        if not batch_data.get("data") or len(batch_data["data"]) == 0:
+            break
+
+        all_indicators.extend(batch_data["data"])
+
+        # If we got less than the batch size, we're done
+        if len(batch_data["data"]) < batch_size:
+            break
+
+        skip += batch_size
+
+    # Deduplicate by series code - keep the last occurrence (likely most recent)
+    unique_indicators = {}
+    for indicator in all_indicators:
+        # Find the series code in fields
+        series_code = None
+        for field in indicator.get('fields', []):
+            if field.get('name') == 'Series Code':
+                series_code = field.get('description')
+                break
+            elif field.get('name') == 'Code':
+                series_code = field.get('description')
+                break
+        
+        if series_code:
+            unique_indicators[series_code] = indicator
+
+    deduped_indicators = list(unique_indicators.values())
+    print(f"After deduplication: {len(deduped_indicators)} unique indicators (removed {len(all_indicators) - len(deduped_indicators)} duplicates)")
+
+    # Create the complete metadata JSON with deduplicated indicators
+    metadata_json = {"data": deduped_indicators, "count": len(deduped_indicators)}
+
+    # Create a temporary file for the JSON metadata
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as temp_file:
+        json.dump(metadata_json, temp_file, indent=2)
+        temp_json_path = temp_file.name
+
+    try:
+        # Add the JSON file to the existing zip
+        with zipfile.ZipFile(zip_path, "a") as zf:
+            zf.write(temp_json_path, "WDIMetadata.json")
+    finally:
+        # Clean up temporary file
+        Path(temp_json_path).unlink()
 
 
 def update_snapshot_metadata(snap: Snapshot) -> None:
