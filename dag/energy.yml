@@ -329,6 +329,7 @@ steps:
   data://garden/irena/2025-08-22/renewable_power_generation_costs:
     - data://meadow/irena/2025-08-22/renewable_power_generation_costs
     - data://meadow/irena/2024-11-15/renewable_power_generation_costs
+    - data://garden/economics/2025-08-29/owid_deflator
   #
   # IRENA - Renewable power generation costs.
   #

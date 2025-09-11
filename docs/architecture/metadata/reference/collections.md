@@ -114,7 +114,7 @@ URL pointing to the JSON schema that validates the grapher configuration.
 
 	| :material-check: DO      | :material-close: DON'T  |
 	| ----------- | --------- |
-	| «`https://files.ourworldindata.org/schemas/grapher-schema.008.json`» | «`http://invalid-url.com/schema.json`», «`grapher-schema.008.json`» |
+	| «`https://files.ourworldindata.org/schemas/grapher-schema.009.json`» | «`http://invalid-url.com/schema.json`», «`grapher-schema.009.json`» |
 
 
 
@@ -3598,7 +3598,7 @@ Whether to zoom to the selected data points
 
 
 
-For the complete list of available configuration options, see the [Grapher schema](https://files.ourworldindata.org/schemas/grapher-schema.008.json).
+For the complete list of available configuration options, see the [Grapher schema](https://files.ourworldindata.org/schemas/grapher-schema.009.json).
 
 
 ## `view.metadata`

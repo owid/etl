@@ -186,7 +186,7 @@ ITEM_CODES_QCL = [
     "00001723",  # From faostat_qcl - 'Sugar crops' (previously 'Sugar crops').
     "00001726",  # From faostat_qcl - 'Pulses' (previously 'Pulses').
     "00000162",  # From faostat_qcl - 'Sugar (raw)' (previously 'Sugar (raw)').
-    "00000667",  # From faostat_qcl - 'Tea leaves' (previously 'Tea').
+    # "00000667",  # From faostat_qcl - 'Tea leaves' (previously 'Tea').
     "00000056",  # From faostat_qcl - 'Maize (corn)' (previously 'Maize').
     "00000257",  # From faostat_qcl - 'Palm oil' (previously 'Palm oil').
     "00000393",  # From faostat_qcl - 'Cauliflowers and broccoli' (previously 'Cauliflowers and broccoli').

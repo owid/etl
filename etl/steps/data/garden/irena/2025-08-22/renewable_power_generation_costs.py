@@ -8,7 +8,6 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-# Conversion factors.
 # In the latest IRENA renewable power generation costs, IRENA included new data for 2024, in constant 2024$.
 # Unfortunately, they also dropped data for years prior to 2010, for various indicators, that were given in the previous release (in constant 2023$).
 # Therefore, in this step, I combine the old data with the latest release (prioritizing the latest release, where there is overlap).
@@ -16,11 +15,55 @@ paths = PathFinder(__file__)
 # IRENA costs are given in the latest year's USD, so we convert other costs to the same currency.
 LATEST_YEAR = 2024
 PREVIOUS_YEAR = LATEST_YEAR - 1
-# Convert costs to constant {LATEST_YEAR} USD, using the World Bank's GDP deflator:
-# https://data.worldbank.org/indicator/NY.GDP.DEFL.ZS.AD?end=2024&locations=US&start=1990&view=chart&year=2024
-# I downloaded the CSV file, and took the values for the last two years for the US, namely 122.27 (for 2023), and 125.23 (for 2024).
-# The resulting factor is the result of dividing the value for 2024 by the value for 2023:
-USDPREVIOUS_TO_USDLATEST = 1.024
+
+
+def adjust_old_data_for_inflation(tb_old, tb_deflator, tb):
+    # Use the GDP deflator (linked series) to convert from constant USD of PREVIOUS_YEAR to constant USD of LATEST_YEAR.
+    tb_deflator = (
+        tb_deflator[tb_deflator["year"].isin([PREVIOUS_YEAR, LATEST_YEAR])][["country", "year", "gdp_deflator_linked"]]
+        .pivot(index=["country"], columns=["year"], values="gdp_deflator_linked")
+        .reset_index()
+    )
+    tb_deflator = tb_deflator.dropna(how="all", subset=[PREVIOUS_YEAR, LATEST_YEAR]).reset_index(drop=True)
+    # Check that we have deflator data for PREVIOUS_YEAR for all countries.
+    assert set(tb_old["country"]) - set(tb_deflator[(tb_deflator[PREVIOUS_YEAR].notnull())]["country"]) == {"World"}
+    # Only one country will not be able to be adjusted, namely South Korea.
+    assert set(tb_old["country"]) - set(tb_deflator[(tb_deflator[LATEST_YEAR].notnull())]["country"]) == {
+        "World",
+        "South Korea",
+    }
+    # Remove South Korea from the old data, since it's the only country for which we can't adjust prices to 2024 USD.
+    tb_old = tb_old[tb_old["country"] != "South Korea"].reset_index(drop=True)
+
+    # Calculate the adjustment factor.
+    tb_deflator["adjustment"] = tb_deflator[LATEST_YEAR] / tb_deflator[PREVIOUS_YEAR]
+
+    ################################################################################################################
+    # Remove metadata from WDI (which is used as an auxiliary dataset) to avoid it leaking into the new indicators.
+    # NOTE: This problem of metadata propagation of auxiliary dataset needs to be fixed. For now, this is a patch.
+    tb_deflator["adjustment"].metadata.origins = []
+    tb_deflator["adjustment"].metadata.description_from_producer = None
+    ################################################################################################################
+
+    # Add adjustment column to old table.
+    tb_old = tb_old.merge(tb_deflator[["country", "adjustment"]], on=["country"], how="left")
+
+    # Assign US adjustment to the World (for which we don't have an alternative).
+    tb_old.loc[tb_old["country"] == "World", "adjustment"] = tb_deflator[(tb_deflator["country"] == "United States")][
+        "adjustment"
+    ].item()
+
+    # Column by column in the old table, convert to constant USD of the latest year.
+    for column in tb_old.drop(columns=["country", "year", "adjustment"]).columns:
+        # Sanity check.
+        error = f"Unexpected units for column {column}."
+        assert tb[column].metadata.unit == f"constant {LATEST_YEAR} US$ per kilowatt-hour", error
+        tb_old[column] *= tb_old["adjustment"]
+        tb_old[column].metadata.unit = tb[column].metadata.unit
+
+    tb_old = tb_old.drop(columns=["adjustment"], errors="raise")
+
+    return tb_old
 
 
 def run() -> None:
@@ -42,21 +85,24 @@ def run() -> None:
     tb_old = ds_meadow_old.read("renewable_power_generation_costs", safe_types=False)
     # NOTE: Solar pv prices in the new release are not missing data with respect to the previous release.
 
+    # Load OWID deflator dataset, and read its main table.
+    ds_deflator = paths.load_dataset("owid_deflator")
+    tb_deflator = ds_deflator.read("owid_deflator")
+
     #
     # Process data.
     #
-    # Column by column in the old table, convert to constant USD$ of the latest year.
-    for column in tb_old.drop(columns=["country", "year"]).columns:
-        # Sanity check, given that this step requires a manual input, (the conversion above).
-        assert tb[column].metadata.unit == f"constant {LATEST_YEAR} US$ per kilowatt-hour"
-        tb_old[column] *= USDPREVIOUS_TO_USDLATEST
-        tb_old[column].metadata.unit = tb[column].metadata.unit
+    # Harmonize country names of the old table.
+    tb_old = geo.harmonize_countries(df=tb_old, countries_file=paths.country_mapping_path)
+
+    # Harmonize country names of the new table.
+    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path, warn_on_unused_countries=False)
+
+    # Adjust prices in the old table to be in constant USD of LATEST_YEAR.
+    tb_old = adjust_old_data_for_inflation(tb_old=tb_old, tb_deflator=tb_deflator, tb=tb)
 
     # Combine old and new tables, prioritizing the new where there is overlap.
     tb = combine_two_overlapping_dataframes(df1=tb, df2=tb_old, index_columns=["country", "year"])
-
-    # Harmonize country names.
-    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
     # Improve table formatting.
     tb = tb.format()

@@ -363,15 +363,6 @@ steps:
   data://grapher/homicide/2024-07-30/homicide_long_run_omm:
     - data://garden/homicide/2024-07-30/homicide_long_run_omm
 
-  # Ethnologue
-  data-private://meadow/language/2024-07-17/ethnologue:
-    - snapshot-private://language/2024-07-17/ethnologue.zip
-  data-private://garden/language/2024-07-17/ethnologue:
-    - data-private://meadow/language/2024-07-17/ethnologue
-    - data://garden/regions/2023-01-01/regions
-  data-private://grapher/language/2024-07-17/ethnologue:
-    - data-private://garden/language/2024-07-17/ethnologue
-
   # Child Mortality Estimates - UN IGME
   data://meadow/un/2025-03-25/igme:
     - snapshot://un/2025-03-25/igme.zip
@@ -660,6 +651,27 @@ steps:
   data://grapher/homicide/2025-08-06/who_mort_db:
     - data://garden/homicide/2025-08-06/who_mort_db
 
+  # Ethnologue
+  data-private://meadow/language/2025-09-03/ethnologue:
+    - snapshot-private://language/2025-09-03/ethnologue.zip
+  data-private://garden/language/2025-09-03/ethnologue:
+    - data://garden/regions/2023-01-01/regions
+    - data-private://meadow/language/2025-09-03/ethnologue
+  data-private://grapher/language/2025-09-03/ethnologue:
+    - data-private://garden/language/2025-09-03/ethnologue
+
+  #
+  # IMF Trade Data - Regional
+  #
+  data://meadow/imf/2025-07-08/trade:
+    - snapshot://imf/2025-07-08/trade.csv
+  data://garden/imf/2025-07-08/trade:
+    - data://meadow/imf/2025-07-08/trade
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/worldbank_wdi/2025-01-24/wdi
+  data://grapher/imf/2025-07-08/trade:
+    - data://garden/imf/2025-07-08/trade
+ #
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
@@ -702,3 +714,4 @@ include:
   - dag/corruption.yml
   - dag/geography.yml
   - dag/growth.yml
+  - dag/economics.yml

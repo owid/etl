@@ -152,7 +152,6 @@ def run() -> None:
                 "dimension": "enrolment_type",
                 "choice_new_slug": "enrolment_type_side_by_side",
                 "choices": ["net_enrolment", "gross_enrolment"],
-                "exclude": {"level": ["tertiary"]},
                 "view_config": {
                     "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.005.json",
                     "originUrl": "ourworldindata.org/education",
@@ -218,9 +217,9 @@ def run() -> None:
             view.metadata = {
                 "description_from_producer": "",
                 "description_short": view.config["subtitle"],
+                "description_key": ENROLLMENT_TYPE_DESCRIPTION_KEY,
                 "presentation": {
                     "title_public": view.config["title"],
-                    "description_key": ENROLLMENT_TYPE_DESCRIPTION_KEY,
                 },
             }
         else:
@@ -233,7 +232,13 @@ def run() -> None:
             }
 
         edit_indicator_displays(view)
-
+    # Drop views that are not relevant: For `level`="metric_type_side_by_side", there is only one valid `level` choice (`level`="all"). All the other level choices should be dropped.
+    c.drop_views(
+        {
+            "metric_type": "enrolment_type_side_by_side",
+            "level": [d for d in c.dimension_choices["level"] if d == "tertiary"],
+        }
+    )
     #
     # Save garden dataset.
     #

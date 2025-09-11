@@ -145,6 +145,7 @@ tables:
             - fragment_id: poverty-international-dollars
               gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
           grapher_config:
+            $schema: https://files.ourworldindata.org/schemas/grapher-schema.008.json
             title: GDP per capita
             subtitle: >-
               {definitions.description_key_ppp_adjustment}
