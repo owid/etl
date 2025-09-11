@@ -10,6 +10,9 @@ definitions:
     display: &common_display
       tolerance: 5
 
+  iloest_modelled_data: |-
+    This data is part of the ILO modelled estimates series. This series combines nationally reported observations with imputed data to have a internationally comparable dataset and produce regional and global aggregates. For more information, please refer to the [ILO Modelled Estimates documentation](https://ilostat.ilo.org/methods/concepts-and-definitions/ilo-modelled-estimates/).
+
   unreliable_data: |-
     We removed data points flagged as "unreliable" by the source (i.e. `obs_status = "U"` in the original data). These data points are likely to be inaccurate and misleading for analysis.
 
@@ -23,10 +26,88 @@ dataset:
 tables:
   ilostat:
     variables:
-      average_hourly_earnings_employees_by_sex:
-        title: Average hourly earnings of employees - <<sex>>
-        unit: international-$ in 2021 prices
-        short_unit: $
+    #############################################################
+    # ILO Modelled Estimates (ILOEST)
+    #############################################################
+
+      employment_by_sex_and_status_in_employment:
+        title: Employment - <<sex>> - <<classif1>>
+        unit: "people"
+        short_unit: ""
+        # description_short: Short description of testing variable.
+        description_key:
+          - "{definitions.iloest_modelled_data}"
+        # presentation:
+          # title_variant:
+        display:
+          name: Employment - <<sex>> - <<classif1>>
+          numDecimalPlaces: 0
+          <<: *common_display
+
+      informal_employment_rate_by_sex:
+        title: Informal employment rate - <<sex>>
+        unit: "%"
+        short_unit: "%"
+        # description_short: Short description of testing variable.
+        description_key:
+          - "{definitions.iloest_modelled_data}"
+        # presentation:
+          # title_variant:
+        display:
+          name: Informal employment rate - <<sex>>
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      labour_force_by_sex_and_age:
+        title: Labor force - <<sex>> - <<classif1>>
+        unit: "people"
+        short_unit: ""
+        # description_short: Short description of testing variable.
+        description_key:
+          - "{definitions.iloest_modelled_data}"
+        # presentation:
+          # title_variant:
+        display:
+          name: Labor force - <<sex>> - <<classif1>>
+          numDecimalPlaces: 0
+          <<: *common_display
+
+      labour_force_participation_rate_by_sex_and_age:
+        title: Labor force participation rate - <<sex>> - <<classif1>>
+        unit: "%"
+        short_unit: "%"
+        # description_short: Short description of testing variable.
+        description_key:
+          - "{definitions.iloest_modelled_data}"
+        # presentation:
+          # title_variant:
+        display:
+          name: Labor force participation rate - <<sex>> - <<classif1>>
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      unemployment_rate_by_sex_and_age:
+        title: Unemployment rate - <<sex>> - <<classif1>>
+        unit: "%"
+        short_unit: "%"
+        # description_short: Short description of testing variable.
+        description_key:
+          - "{definitions.iloest_modelled_data}"
+        # presentation:
+          # title_variant:
+        display:
+          name: Unemployment rate - <<sex>> - <<classif1>>
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      #############################################################
+      # Child Labour Statistics (CHILD)
+      #############################################################
+
+      share_of_children_in_child_labour_by_sex_and_age:
+        title: Share of children in child labor - <<sex>> - <<classif1>>
+        unit: "%"
+        short_unit: "%"
         # description_short: Short description of testing variable.
         # description_key: List of key points about the indicator.
         # presentation:
@@ -34,22 +115,13 @@ tables:
         processing_level: major
         description_processing: "{definitions.unreliable_data}"
         display:
-          name: Average hourly earnings of employees - <<sex>>
+          name: Share of children in child labor - <<sex>> - <<classif1>>
           numDecimalPlaces: 1
           <<: *common_display
 
-      employment_by_sex_and_status_in_employment:
-        title: Employment - <<sex>> - <<classif1>>
-        unit: "people"
-        short_unit: ""
-        # description_short: Short description of testing variable.
-        # description_key: List of key points about the indicator.
-        # presentation:
-          # title_variant:
-        display:
-          name: Employment - <<sex>> - <<classif1>>
-          numDecimalPlaces: 0
-          <<: *common_display
+      #############################################################
+      # Gender Equality and Non-Discrimination Indicators (GEND)
+      #############################################################
 
       female_share_of_low_pay_earners:
         title: Female share of low pay earners
@@ -79,49 +151,14 @@ tables:
           numDecimalPlaces: 1
           <<: *common_display
 
-      informal_employment_rate_by_sex:
-        title: Informal employment rate - <<sex>>
-        unit: "%"
-        short_unit: "%"
-        # description_short: Short description of testing variable.
-        # description_key: List of key points about the indicator.
-        # presentation:
-          # title_variant:
-        display:
-          name: Informal employment rate - <<sex>>
-          numDecimalPlaces: 1
-          <<: *common_display
+      #############################################################
+      # Wages and Working Time Statistics (COND)
+      #############################################################
 
-      labour_force_by_sex_and_age:
-        title: Labor force - <<sex>> - <<classif1>>
-        unit: "people"
-        short_unit: ""
-        # description_short: Short description of testing variable.
-        # description_key: List of key points about the indicator.
-        # presentation:
-          # title_variant:
-        display:
-          name: Labor force - <<sex>> - <<classif1>>
-          numDecimalPlaces: 0
-          <<: *common_display
-
-      labour_force_participation_rate_by_sex_and_age:
-        title: Labor force participation rate - <<sex>> - <<classif1>>
-        unit: "%"
-        short_unit: "%"
-        # description_short: Short description of testing variable.
-        # description_key: List of key points about the indicator.
-        # presentation:
-          # title_variant:
-        display:
-          name: Labor force participation rate - <<sex>> - <<classif1>>
-          numDecimalPlaces: 1
-          <<: *common_display
-
-      share_of_children_in_child_labour_by_sex_and_age:
-        title: Share of children in child labor - <<sex>> - <<classif1>>
-        unit: "%"
-        short_unit: "%"
+      average_hourly_earnings_employees_by_sex:
+        title: Average hourly earnings of employees - <<sex>>
+        unit: international-$ in 2021 prices
+        short_unit: $
         # description_short: Short description of testing variable.
         # description_key: List of key points about the indicator.
         # presentation:
@@ -129,22 +166,13 @@ tables:
         processing_level: major
         description_processing: "{definitions.unreliable_data}"
         display:
-          name: Share of children in child labor - <<sex>> - <<classif1>>
+          name: Average hourly earnings of employees - <<sex>>
           numDecimalPlaces: 1
           <<: *common_display
 
-      unemployment_rate_by_sex_and_age:
-        title: Unemployment rate - <<sex>> - <<classif1>>
-        unit: "%"
-        short_unit: "%"
-        # description_short: Short description of testing variable.
-        # description_key: List of key points about the indicator.
-        # presentation:
-          # title_variant:
-        display:
-          name: Unemployment rate - <<sex>> - <<classif1>>
-          numDecimalPlaces: 1
-          <<: *common_display
+      #############################################################
+      # SDG Labour Market Indicators (ILOSDG)
+      #############################################################
 
       sdg_1_1_1_working_poverty_rate:
         title: SDG 1.1.1 Working poverty rate - <<sex>> - <<classif1>>
