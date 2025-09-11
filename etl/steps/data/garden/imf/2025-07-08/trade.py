@@ -145,8 +145,14 @@ def run() -> None:
 
     # --- Format, add origins & save ----------------------------------------------------
     tb = tb.format(["country", "year", "counterpart_country"])
-    for col in tb.columns:
-        tb[col] = tb[col].copy_metadata(tb_long["value"])
+    for column in tb.columns:
+        if column in ["total_imports_share_of_gdp", "china_imports_share_of_gdp"]:
+            tb[column].metadata.origins = [
+                tb_long["value"].metadata.origins[0],
+                gdp_data["ny_gdp_mktp_cd"].metadata.origins[0],
+            ]
+        else:
+            tb[column].metadata.origins = tb_long["value"].metadata.origins
 
     ds_garden = paths.create_dataset(tables=[tb], default_metadata=ds_meadow.metadata)
     ds_garden.save()

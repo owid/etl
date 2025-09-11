@@ -244,9 +244,11 @@ tables:
           - This indicator shows which country was the largest source of imports for each country–year, based on import values in current US dollars.
           - *cif_basis
           - *goods_only
-          - The top supplier for each country–year was identified, and then a global count was made of how often each country appeared in this role. Here, the top ten countries with the highest counts are shown as separate categories, while the rest were grouped as ‘Other.
+          - The top supplier for each country–year was identified, and then a global count was made of how often each country appeared in this role. Here, the top ten countries with the highest counts are shown as separate categories, while the rest were grouped as "other".
         presentation:
           title_public: Top import partner category
+          grapher_config:
+            note: Only the 10 partners most often ranked as the top import source across countries are shown; the rest are grouped as "other".
         display:
           numDecimalPlaces: 0
 
