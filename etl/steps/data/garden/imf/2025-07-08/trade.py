@@ -5,6 +5,7 @@ from __future__ import annotations
 import numpy as np
 import owid.catalog.processing as pr
 import pandas as pd
+from narwhals import col
 from owid.catalog import Dataset, Table
 
 from etl.data_helpers import geo
@@ -146,7 +147,13 @@ def run() -> None:
     # --- Format, add origins & save ----------------------------------------------------
     tb = tb.format(["country", "year", "counterpart_country"])
     for col in tb.columns:
-        tb[col] = tb[col].copy_metadata(tb_long["value"])
+        if col in ["total_imports_share_of_gdp", "china_imports_share_of_gdp"]:
+            tb[col].metadata.origins = [
+                tb_long["value"].metadata.origins[0],
+                gdp_data["ny_gdp_mktp_cd"].metadata.origins[0],
+            ]
+        else:
+            tb[col].metadata.origins = tb_long["value"].metadata.origins
 
     ds_garden = paths.create_dataset(tables=[tb], default_metadata=ds_meadow.metadata)
     ds_garden.save()
