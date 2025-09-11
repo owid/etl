@@ -200,8 +200,8 @@ def clean_source_field(source: str) -> str:
         "wbg": "World Bank",
         "doing business": "World Bank",
         "enterprise surveys": "World Bank",
-        "women, business and the law": "World Bank",
-        "entrepreneurship survey": "World Bank - Women, Business and the Law",
+        "women, business and the law": "World Bank - Women, Business and the Law",
+        "entrepreneurship survey": "World Bank",
         "global findex": "World Bank",
         # UN variants
         "united nations population division": "UN Population Division via World Bank",
