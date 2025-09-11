@@ -110,7 +110,7 @@ def run() -> None:
     tb_garden = add_patents_articles_per_million_people(tb_garden)
 
     # Add population-weighted regional aggregations for internet users
-    tb_garden = add_population_weighted_aggregations(
+    tb_garden = add_population_weighted_aggregations_for_percentage_indicators(
         tb=tb_garden,
         indicator="it_net_user_zs",
         ds_regions=ds_regions,
@@ -813,6 +813,75 @@ def add_population_weighted_aggregations(
     tb = pr.concat([tb, tb_regions], ignore_index=True)
 
     return tb
+
+
+def add_population_weighted_aggregations_for_percentage_indicators(
+    tb: Table, indicator: str, ds_regions: Dataset, ds_population: Dataset
+) -> Table:
+    """
+    Add population weighted aggregations for percentage indicators.
+
+    For percentage indicators, we need to:
+    1. Convert the percentage to absolute numbers using population
+    2. Sum these numbers across regions
+    3. Convert back to percentage using regional population
+    """
+    # Only proceed if the indicator exists in the table
+    if indicator not in tb.columns:
+        return tb
+
+    # Reset index to work with country and year as columns
+    tb_reset = tb.reset_index()
+
+    # Extract just the indicator data we need to work with
+    tb_indicator = tb_reset[["country", "year", indicator]].copy()
+
+    # Remove regions from the indicator table
+    tb_no_regions = tb_indicator[~tb_indicator["country"].isin(REGIONS)].reset_index(drop=True)
+
+    # Add population to the table
+    tb_no_regions = geo.add_population_to_table(
+        tb=tb_no_regions, ds_population=ds_population, warn_on_missing_countries=False
+    )
+
+    # Convert percentage to absolute numbers (percentage/100 * population)
+    tb_no_regions[f"{indicator}_absolute"] = (tb_no_regions[indicator] / 100) * tb_no_regions["population"]
+
+    # Add regional aggregates
+    tb_regions = geo.add_regions_to_table(
+        tb=tb_no_regions,
+        aggregations={
+            f"{indicator}_absolute": "sum",
+            "population": "sum",
+        },
+        regions=REGIONS,
+        ds_regions=ds_regions,
+        frac_allowed_nans_per_year=FRAC_ALLOWED_NANS_PER_YEAR,
+    )
+
+    # Filter only by regions
+    tb_regions = tb_regions[tb_regions["country"].isin(REGIONS)].reset_index(drop=True)
+
+    # Convert back to percentage: (absolute_users / total_population) * 100
+    tb_regions[indicator] = (tb_regions[f"{indicator}_absolute"] / tb_regions["population"]) * 100
+
+    # Keep only the columns we need for merging back
+    tb_regions = tb_regions[["country", "year", indicator]]
+
+    # Merge the regional data back to the original table (which was reset)
+    tb_merged = pr.merge(tb_reset, tb_regions, on=["country", "year"], how="outer", suffixes=("", "_regional"))
+
+    # Update the original indicator with regional values where they exist
+    tb_merged[indicator] = tb_merged[indicator].fillna(tb_merged[f"{indicator}_regional"])
+
+    # Drop the temporary regional column
+    if f"{indicator}_regional" in tb_merged.columns:
+        tb_merged = tb_merged.drop(columns=[f"{indicator}_regional"])
+
+    # Set the index back to match the original table format
+    tb_merged = tb_merged.format(["country", "year"])
+
+    return tb_merged
 
 
 def add_energy_access_variables(tb: Table) -> Table:
