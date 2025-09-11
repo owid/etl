@@ -21,8 +21,6 @@
   "Latin America & Caribbean (excluding high income)",
   "Latin America & the Caribbean (IDA & IBRD countries)",
   "Least developed countries: UN classification",
-  "Middle East & North Africa (excluding high income)",
-  "Middle East & North Africa (IDA & IBRD countries)",
   "OECD members",
   "Other small states",
   "Pacific island small states",
@@ -33,5 +31,9 @@
   "Sub-Saharan Africa (excluding high income)",
   "Sub-Saharan Africa (IDA & IBRD countries)",
   "Low & middle income",
-  "Middle income"
+  "Middle income",
+  "Middle East, North Africa, Afghanistan & Pakistan (IDA & IBRD)",
+  "Puerto Rico (US)",
+  "Middle East, North Africa, Afghanistan & Pakistan (excluding high income)",
+  "Middle East, North Africa, Afghanistan & Pakistan"
 ]

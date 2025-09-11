@@ -125,7 +125,6 @@ def run() -> None:
         paths.region_aggregator(regions=REGIONS_AGG, aggregations={"it_net_user_zs": "weighted_by_population"})
         .add_aggregates(
             tb_garden.reset_index(),
-            frac_allowed_nans_per_year=FRAC_ALLOWED_NANS_PER_YEAR,
         )
         .format(["country", "year"])
     )
