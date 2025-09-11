@@ -129,6 +129,18 @@ def run() -> None:
         .format(["country", "year"])
     )
 
+    # Add population-weighted regional aggregations for sh_h2o_basw_zs and sh_sta_bass_zs
+    tb_garden = (
+        paths.region_aggregator(
+            regions=["World"],
+            aggregations={"sh_h2o_basw_zs": "weighted_by_population", "sh_sta_bass_zs": "weighted_by_population"},
+        )
+        .add_aggregates(
+            tb_garden.reset_index(),
+        )
+        .format(["country", "year"])
+    )
+
     ####################################################################################################################
 
     #
