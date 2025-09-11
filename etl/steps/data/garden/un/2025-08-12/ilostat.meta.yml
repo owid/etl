@@ -11,7 +11,7 @@ definitions:
       tolerance: 5
 
   iloest_modelled_data: |-
-    This data is part of the ILO modelled estimates series. This series combines nationally reported observations with imputed data to have a internationally comparable dataset and produce regional and global aggregates. For more information, please refer to the [ILO Modelled Estimates documentation](https://ilostat.ilo.org/methods/concepts-and-definitions/ilo-modelled-estimates/).
+    This data is part of the ILO Modelled Estimates series. This series combines nationally reported observations with imputed data to have a internationally comparable dataset and produce regional and global aggregates. For more information, please refer to the [ILO Modelled Estimates documentation](https://ilostat.ilo.org/methods/concepts-and-definitions/ilo-modelled-estimates/).
 
   unreliable_data: |-
     We removed data points flagged as "unreliable" by the source (i.e. `obs_status = "U"` in the original data). These data points are likely to be inaccurate and misleading for analysis.
