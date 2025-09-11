@@ -181,7 +181,7 @@ tables:
           numDecimalPlaces: 1
           tolerance: 10
 
-      sg_leg_dvaw_zs:
+      sg_leg_dvaw:
         title: There is legislation specifically addressing domestic violence
         description_short: The law on domestic violence may punish offenders, provide protection orders for victims, or address harassment that causes physical or mental harm.
         unit: "(1=yes; 0=no)"
@@ -384,6 +384,28 @@ tables:
       sg_law_asst_ar:
         title: Spouses have equal rights to manage their own and joint assets
         description_short: In marriage, women and men keep control over the property they bring in or acquire, and both have equal rights to manage joint assets, with consent required only for major transactions like selling or pledging property.
+        unit: "(1=yes; 0=no)"
+        display:
+          numDecimalPlaces: 0
+          tolerance: 5
+
+      sg_dmk_hlth_wf_zs:
+        title: Share of married women making their own health care decisions
+        description_short: Share of married women (15–49) reporting that they themselves are the main decision-makers for their health care.
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+          tolerance: 10
+
+      sg_law_eqrm_wk:
+        title: Law mandates equal pay for work of equal value for women and men
+        description_short: '"Work of equal value" means not just the same job, but also different jobs that are similar in skills, responsibilities, and working conditions.'
+        description_key:
+          - Equal pay for work of equal value" means that employees should be paid the same by their employer if their jobs require similar skills, effort, responsibility, and working conditions, even if the jobs themselves are different. This is also called "pay equity.
+          - Pay equity" goes further than "equal pay for equal work," which only ensures that employees in the same job get the same pay.
+          - The value of different jobs can be measured by looking at factors like skills, effort, responsibility, and working conditions. However, proving that jobs are of equal value can be difficult because different roles may require different expertise, take place in different environments, or have historically been valued unequally.
+          - For example, in the UK legal case of Julie Hayward v. Cammell Laird Shipbuilders (1988), a female cook argued that her job was just as valuable as those of male painters and joiners working in the shipyard, who were paid more. She won her case, but only after an independent expert carefully assessed the demands of each role.
         unit: "(1=yes; 0=no)"
         display:
           numDecimalPlaces: 0

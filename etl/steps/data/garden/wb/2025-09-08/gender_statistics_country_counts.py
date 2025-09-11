@@ -31,20 +31,23 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
 
-    # Get the columns that have (1=yes; 0=no) in the title which can be used for calculating the country counts
+    # Get the columns that have only values 0, 1, and NaN (binary indicators)
     indicators_for_sums = []
     for col in tb.columns:
         if col not in ["country", "year"]:
-            if "(1=yes; 0=no)" in tb[col].metadata.title:
+            # Get unique non-NaN values for this column
+            unique_vals = set(tb[col].dropna().unique())
+            # Check if unique values are only 0, 1 (and potentially NaN which we excluded)
+            if unique_vals.issubset({0, 1, 0.0, 1.0}):
                 indicators_for_sums.append(col)
 
     # Select only the columns of interest
     tb = tb[indicators_for_sums + ["country", "year"]]
 
     tb = add_country_counts_and_population_by_status(tb, ds_regions, ds_population)
-
     # Remove columns that are not needed and are in the original dataset
     columns_to_keep = [col for col in tb.columns if col not in indicators_for_sums]
+
     tb = tb[columns_to_keep]
     # Filter the Table to include rows from the minimum year in the original dataset onwards
     tb = tb[tb["year"] >= MIN_YEAR]
@@ -71,16 +74,13 @@ def add_country_counts_and_population_by_status(tb: Table, ds_regions: Dataset, 
     tb_regions = geo.add_population_to_table(
         tb=tb_regions, ds_population=ds_population, warn_on_missing_countries=False
     )
-    columns = [
-        col for col in tb.columns if col not in ["country", "year"] and "(1=yes; 0=no)" in tb[col].metadata.title
-    ]
+    columns = [col for col in tb.columns if col not in ["country", "year"]]
 
     # Remove years where all indicator columns are NaN (no data to aggregate)
     for year in tb_regions["year"].unique():
         year_data = tb_regions[tb_regions["year"] == year]
         # Check if all indicator columns are NaN for this year
         if year_data[columns].isna().all().all():
-            print(year)
             tb_regions = tb_regions[tb_regions["year"] != year]
 
     # Define empty dictionaries for each of the columns
