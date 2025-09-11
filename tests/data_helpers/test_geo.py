@@ -3116,10 +3116,11 @@ class TestRegionAggregator(unittest.TestCase):
         )
 
         # Use regions that don't exist in our mock dataset or don't contain these countries
+        # Use dict format to allow custom regions
         aggregator = geo.RegionAggregator(
             ds_regions=self.ds_regions,
             regions_all=self.regions_all,
-            regions=["NonexistentRegion"],  # This region doesn't exist
+            regions={"NonexistentRegion": {}},  # Custom region with no members
             aggregations={"population": "sum", "gdp": "sum"},
             ds_income_groups=self.ds_income_groups,
         )
@@ -3329,3 +3330,36 @@ class TestRegionAggregator(unittest.TestCase):
         # Verify that individual country data is still present
         individual_countries = result[result["country"].isin(["France", "Italy"])]
         self.assertEqual(len(individual_countries), 2)  # Both countries still there
+
+    def test_non_existent_region_raises_error(self):
+        """Test that using a non-existent region raises a clear error."""
+        # Test list with unknown region (strict validation)
+        with self.assertRaises(ValueError) as context:
+            geo.RegionAggregator(
+                ds_regions=self.ds_regions,
+                regions_all=self.regions_all,
+                regions=["Sub-Saharan Africa"],  # List - must be known regions
+                aggregations={"gdp": "sum"},
+                ds_income_groups=self.ds_income_groups,
+                ds_population=self.ds_population,
+            )
+
+        # Check that the error message is helpful for list case
+        error_message = str(context.exception)
+        self.assertIn("Sub-Saharan Africa", error_message)
+        self.assertIn("unknown regions in list", error_message.lower())
+
+        # Test dict with any region (should work - no validation)
+        try:
+            # Even "Sub-Saharan Africa" should work in dict format (no validation)
+            aggregator = geo.RegionAggregator(
+                ds_regions=self.ds_regions,
+                regions_all=self.regions_all,
+                regions={"Sub-Saharan Africa": {}},  # Dict allows anything
+                aggregations={"gdp": "sum"},
+                ds_income_groups=self.ds_income_groups,
+                ds_population=self.ds_population,
+            )
+            self.assertIsNotNone(aggregator)
+        except ValueError:
+            self.fail("Dict format should allow any region names without validation")

@@ -1927,6 +1927,25 @@ class RegionAggregator:
             # regions is already a dict
             self.regions = regions
 
+        # Validate regions based on input type (list vs dict)
+        # Documentation states: list must contain "default regions", dict allows "default or custom regions"
+        if isinstance(regions, list):
+            # List case: ALL regions must be known (strict validation)
+            unknown_regions = [region for region in regions if region not in regions_all]
+            if unknown_regions:
+                suggestions = []
+                for region in unknown_regions:
+                    similar = [r for r in regions_all if region.lower() in r.lower() or r.lower() in region.lower()]
+                    if similar:
+                        suggestions.append(f"{region} (did you mean: {', '.join(similar)}?)")
+                    else:
+                        suggestions.append(region)
+                raise ValueError(
+                    f"Unknown regions in list: {'; '.join(suggestions)}. Available regions: {', '.join(sorted(regions_all))}"
+                )
+
+        # Dict case: Allow complete flexibility - no validation
+
         # Create a list of all possible regions, which includes any possible custom region.
         self.regions_all = sorted(set(regions_all) | set(self.regions))
 
@@ -2044,6 +2063,17 @@ class RegionAggregator:
 
         return modified_tb
 
+    def _get_needed_columns(self, tb: TableOrDataFrame, columns: list[str]) -> list[str]:
+        """Extract the minimal set of columns needed for aggregation performance optimization."""
+        weight_columns = []
+        for agg_func in self.aggregations.values():
+            if isinstance(agg_func, str) and agg_func.startswith("weighted_by_"):
+                weight_col = agg_func.replace("weighted_by_", "")
+                if weight_col not in weight_columns and weight_col in tb.columns:
+                    weight_columns.append(weight_col)
+
+        return self.index_columns + columns + weight_columns
+
     def _add_population_to_table_if_needed(self, tb: TableOrDataFrame) -> TableOrDataFrame:
         """Add population column to table if it's needed for weighted aggregations."""
         # Common parameters for both functions
@@ -2051,7 +2081,7 @@ class RegionAggregator:
             "country_col": self.country_col,
             "year_col": self.year_col,
             "population_col": self.population_col,
-            "warn_on_missing_countries": True,
+            "warn_on_missing_countries": False,
             "show_full_warning": True,
             "interpolate_missing_population": False,
             "expected_countries_without_population": None,
@@ -2427,21 +2457,24 @@ class RegionAggregator:
 
         # Define the list of (non-index) columns for which aggregates will be created.
         columns = list(self.aggregations)
-        # Define the list of other non-index columns (if any) for which no aggregates need to be created.
-        other_columns = [column for column in tb.columns if column not in (self.index_columns + columns)]
 
+        # Extract only the columns we actually need to improve performance.
+        needed_columns = self._get_needed_columns(tb, columns)
+        tb_fast = tb[needed_columns]
+        other_columns = [col for col in tb.columns if col not in needed_columns]
+
+        # Run everything on the fast subset instead of full DataFrame
         if check_for_region_overlaps:
-            # Find overlaps between historical regions and successors.
             self.inspect_overlaps_with_historical_regions(
-                tb=tb,
+                tb=tb_fast,
                 accepted_overlaps=accepted_overlaps,
                 ignore_overlaps_of_zeros=ignore_overlaps_of_zeros,
                 subregion_type=subregion_type,
             )
 
-        # Create a table of region aggregates (just the regions, not individual countries).
+        # Create region aggregates on fast subset
         df_only_regions = self._create_table_of_only_region_aggregates(
-            tb=tb,
+            tb=tb_fast,
             regions=list(self.regions),
             aggregations=self.aggregations,
             num_allowed_nans_per_year=num_allowed_nans_per_year,
@@ -2449,32 +2482,27 @@ class RegionAggregator:
             min_num_values_per_year=min_num_values_per_year,
         )
 
-        # If a list of countries that must be informed was given, remove (make nan) aggregations where any of those countries was missing in the data.
         if countries_that_must_have_data is not None:
             if self.tb_coverage is None:
-                self._create_coverage_table(tb=tb)
+                self._create_coverage_table(tb=tb_fast)
             self._impose_countries_that_must_have_data(
                 df_only_regions=df_only_regions,
                 columns=columns,
                 countries_that_must_have_data=countries_that_must_have_data,
             )
 
-        # Create a mask that selects rows of regions in the original data, if any.
-        _select_regions = tb[self.country_col].isin(list(self.regions))
-
-        # If there were regions in other columns (not used for aggregates) include them in the subtable of only regions.
-        if any(other_columns) and any(_select_regions):
-            df_only_regions = df_only_regions.merge(
-                tb[_select_regions][self.index_columns + other_columns], how="outer", on=self.index_columns
-            )
-
-        # Create a table of all other rows that are not regions.
-        df_no_regions = tb[~_select_regions]
-
-        # Combine the table with only regions and the table with no regions.
+        # Fast region processing on subset
+        _select_regions = tb_fast[self.country_col].isin(list(self.regions))
+        df_no_regions = tb_fast[~_select_regions]
         df_with_regions = pd.concat([df_only_regions, df_no_regions], ignore_index=True)  # type: ignore
 
-        # Sort rows and columns conveniently.
+        # Add back other columns if needed
+        if other_columns:
+            # Simple: just get all the other column data and merge it back
+            other_data = tb[self.index_columns + other_columns]
+            df_with_regions = df_with_regions.merge(other_data, on=self.index_columns, how="left")
+
+        # Final sort and column ordering
         df_with_regions = df_with_regions.sort_values(self.index_columns).reset_index(drop=True)[tb.columns]
 
         # Convert country to categorical if the original was

@@ -39,6 +39,17 @@ REGIONS = [
     "World",
 ]
 
+REGIONS_AGG = [
+    "South Asia (WB)",
+    "North America (WB)",
+    "Sub-Saharan Africa (WB)",
+    "East Asia and Pacific (WB)",
+    "Middle East and North Africa (WB)",
+    "Europe and Central Asia (WB)",
+    "Latin America and Caribbean (WB)",
+    "World",
+]
+
 # Define the fraction of allowed NaNs per year for the population weighted aggregations
 FRAC_ALLOWED_NANS_PER_YEAR = 0.2
 
@@ -110,24 +121,14 @@ def run() -> None:
     tb_garden = add_patents_articles_per_million_people(tb_garden)
 
     # Add population-weighted regional aggregations for internet users
-    # Reset index to use the RegionAggregator
-    tb_reset = tb_garden.reset_index()
-
-    # Create region aggregator with population-weighted mean for internet users
-    region_aggregator = geo.RegionAggregator(
-        ds_regions=ds_regions,
-        ds_population=ds_population,
-        regions_all=REGIONS + ["World"],
-        aggregations={"it_net_user_zs": "weighted_by_population"},
-        regions=REGIONS,
-        frac_allowed_nans_per_year=FRAC_ALLOWED_NANS_PER_YEAR,
+    tb_garden = (
+        paths.region_aggregator(regions=REGIONS_AGG, aggregations={"it_net_user_zs": "weighted_by_population"})
+        .add_aggregates(
+            tb_garden.reset_index(),
+            frac_allowed_nans_per_year=FRAC_ALLOWED_NANS_PER_YEAR,
+        )
+        .format(["country", "year"])
     )
-
-    # Add the weighted aggregations
-    tb_with_regions = region_aggregator.add_aggregates(tb_reset)
-
-    # Set index back and update tb_garden
-    tb_garden = tb_with_regions.format(["country", "year"])
 
     ####################################################################################################################
 
