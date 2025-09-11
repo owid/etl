@@ -60,6 +60,8 @@ def run(dest_dir: str) -> None:
     tb_deaths = add_infectious_diseases(tb_deaths)
     # Aggregate all cancers which cause less than 200,000 deaths a year - for Deaths only
     tb_deaths = add_cancer_other_aggregates(tb_deaths)
+
+    get_data_for_max(tb_deaths)
     # Format the tables
     tb_deaths = tb_deaths.format(["country", "year", "metric", "age", "cause"], short_name="gbd_cause_deaths")
     tb_dalys = tb_dalys.format(["country", "year", "metric", "age", "cause"], short_name="gbd_cause_dalys")
@@ -79,6 +81,32 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def get_data_for_max(tb_deaths: Table):
+    """
+    Get data for Max's book as requested by Bastian.
+
+    Total deaths for:
+    - All causes
+    - Homicides
+    - Conflict and Terrorism
+
+    For all ages, World + OWID regions, all years
+    """
+
+    tb_max = tb_deaths[
+        (tb_deaths["age"] == "All ages")
+        & (
+            tb_deaths["country"].isin(
+                ["Africa", "Asia", "Europe", "Oceania", "North America", "South America", "World"]
+            )
+        )
+        & (tb_deaths["metric"] == "Number")
+        & (tb_deaths["cause"].isin(["All causes", "Interpersonal violence", "Conflict and terrorism"]))
+    ]
+    tb_max.to_csv("/Users/fionaspooner/Desktop/death_data_for_bastian.csv", index=False)
+    return
 
 
 def add_cancer_other_aggregates(tb: Table) -> Table:
