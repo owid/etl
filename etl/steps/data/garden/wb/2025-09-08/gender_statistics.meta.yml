@@ -373,7 +373,7 @@ tables:
 
       sg_dmk_hlth_wf_zs:
         title: Share of married women making their own health care decisions
-        description_short: Share of married women (15–49) reporting that they themselves are the main decision-makers for their health care.
+        description_short: Share of married women aged 15–49 reporting that they themselves are the main decision-makers for their health care.
         unit: "%"
         short_unit: "%"
         display:
