@@ -75,6 +75,14 @@ def add_country_counts_and_population_by_status(tb: Table, ds_regions: Dataset, 
         col for col in tb.columns if col not in ["country", "year"] and "(1=yes; 0=no)" in tb[col].metadata.title
     ]
 
+    # Remove years where all indicator columns are NaN (no data to aggregate)
+    for year in tb_regions["year"].unique():
+        year_data = tb_regions[tb_regions["year"] == year]
+        # Check if all indicator columns are NaN for this year
+        if year_data[columns].isna().all().all():
+            print(year)
+            tb_regions = tb_regions[tb_regions["year"] != year]
+
     # Define empty dictionaries for each of the columns
     columns_count_dict = {columns[i]: [] for i in range(len(columns))}
     columns_pop_dict = {columns[i]: [] for i in range(len(columns))}
