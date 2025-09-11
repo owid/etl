@@ -306,24 +306,6 @@ tables:
           numDecimalPlaces: 0
           tolerance: 5
 
-      fin22e_2:
-        title: Share of men who borrowed to start or expand a business
-        description_short: Share of men (aged 15 and older) who report having borrowed money—individually or jointly—in the past 12 months to start, operate, or expand a farm or business.
-        unit: "%"
-        short_unit: "%"
-        display:
-          numDecimalPlaces: 1
-          tolerance: 10
-
-      fin22e_1:
-        title: Share of women who borrowed to start or expand a business
-        description_short: Share of women (aged 15 and older) who report having borrowed money—individually or jointly—in the past 12 months to start, operate, or expand a farm or business.
-        unit: "%"
-        short_unit: "%"
-        display:
-          numDecimalPlaces: 1
-          tolerance: 10
-
       sg_law_crdd_gr:
         title: Equal access to financial services for women and men
         description_short: The law prohibits gender discrimination by banks or other financial institutions, and requires equal treatment of women and men in financial transactions, business activities, financial assistance, and access to goods and services.
