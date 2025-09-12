@@ -1,3 +1,17 @@
+"""
+
+NEXT UPDATE:
+- Indicator `it_net_user_zs` (chart 755) still uses old version because the new one doesn't have regional aggregates.
+  Is it still the case? If we calculate them ourselves, do they look ok?
+- Write a script to auto-approve charts with no changes.
+- We have a function for cleaning up source names https://github.com/owid/etl/pull/4980/files#diff-634c1b07a87794d87af9fbf6c92cae09a5a78caa83dd3a2a27505274802e45c5R187
+  Should we replace update_metadata.ipynb with it?
+- "dataPublisherSource" is no longer returned by WDI. Remove it if that's the case.
+- Indicator metadata from downloaded ZIP file is outdated and we have to fetch metadata from API. Have they solved
+    this problem? If yes, we can go back to ZIP file only.
+- Check old WDI version and try to switch their charts to new indicators and archive them.
+"""
+
 import json
 import re
 from pathlib import Path
@@ -120,14 +134,19 @@ def run() -> None:
 
     tb_garden = add_patents_articles_per_million_people(tb_garden)
 
+    # NOTE: This version of WDI doesn't have regional aggregates for internet users (it_net_user_zs).
+    #  I tried to calculate them myself, but some large countries such as India have missing values and
+    #  the time-series looks jagged. It's better to wait for the next WDI release and hope
+    #  they'll bring back aggregations.
+    #
     # Add population-weighted regional aggregations for internet users
-    tb_garden = (
-        paths.region_aggregator(regions=REGIONS_AGG, aggregations={"it_net_user_zs": "weighted_by_population"})
-        .add_aggregates(
-            tb_garden.reset_index(),
-        )
-        .format(["country", "year"])
-    )
+    # tb_garden = (
+    #     paths.region_aggregator(regions=REGIONS_AGG, aggregations={"it_net_user_zs": "weighted_by_population"})
+    #     .add_aggregates(
+    #         tb_garden.reset_index(),
+    #     )
+    #     .format(["country", "year"])
+    # )
 
     # Add population-weighted regional aggregations for sh_h2o_basw_zs and sh_sta_bass_zs
     tb_garden = (

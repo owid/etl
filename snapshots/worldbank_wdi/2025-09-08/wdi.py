@@ -33,13 +33,7 @@ from etl.snapshot import Snapshot
 SNAPSHOT_VERSION = Path(__file__).parent.name
 
 # URL to the World Bank metadata API.
-URL_METADATA = "https://datacatalogapi.worldbank.org/ddhxext/DatasetDownload?dataset_unique_id=0037712"
-# use this one
-# "https://ddh-openapi.worldbank.org/dataset/download?dataset_unique_id=0037712"
-
-# We used to get the URL from the metadata API, but it points to an old version. You can get this
-# URL from https://datacatalog.worldbank.org/search/dataset/0037712/World-Development-Indicators
-URL_DATA = "https://datacatalogfiles.worldbank.org/ddh-published/0037712/DR0095335/WDI_CSV_2025_07_02.zip"
+URL_METADATA = "https://ddh-openapi.worldbank.org/dataset/download?dataset_unique_id=0037712"
 
 # Check out their API docs at https://ddh-openapi.worldbank.org/docs/index.html,
 # use dataset id 0037712
@@ -69,6 +63,7 @@ def main(upload: bool) -> None:
     snap.download_from_source()
 
     # Add JSON metadata from API to the zip file
+    # NOTE: Ideally, we'd get all metadata from wdi.zip, but it contains outdated metadata.
     add_json_metadata_to_zip(snap.path)
 
     # Create the snapshot and upload the data.
@@ -145,15 +140,15 @@ def update_snapshot_metadata(snap: Snapshot) -> None:
     assert snap.metadata.origin
 
     # Update the publication date to be the date of their latest update.
-    snap.metadata.origin.date_published = dt.datetime.strptime(
-        meta_orig.get("last_updated_date"), "%Y-%m-%dT%H:%M:%S"
-    ).strftime("%Y-%m-%d")  # type: ignore
+    last_updated = meta_orig.get("last_updated_date")
+    # Handle timezone info by removing it before parsing
+    if last_updated and "+00:00" in last_updated:
+        last_updated = last_updated.replace("+00:00", "")
+    snap.metadata.origin.date_published = dt.datetime.strptime(last_updated, "%Y-%m-%dT%H:%M:%S").strftime("%Y-%m-%d")  # type: ignore
+
     # Update the download URL to the latest version.
-    snap.metadata.origin.url_download = URL_DATA
-    # NOTE: URL in metadata API points to an old version of the data. Remove the hardcoded URL if they fix it.
-    # snap.metadata.origin.url_download = [r for r in meta_orig["resources"] if r["name"] == "CSV"][0]["distribution"][
-    #     "url"
-    # ]
+    snap.metadata.origin.url_download = [r for r in meta_orig["Resources"] if r["name"] == "CSV file"][0]["url"]
+
     # Update the description (in case it changed).
     snap.metadata.origin.description = BeautifulSoup(
         meta_orig.get("identification").get("description"), features="html.parser"
