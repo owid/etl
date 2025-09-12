@@ -1,32 +1,3 @@
-"""
-
-UPDATE INSTRUCTIONS:
-
-It's easier to do it in two steps:
-
-1. Run indicator upgrader for:
-    - GDP per capita, PPP (constant 2021 international $)
-    - Current health expenditure per capita, PPP (current international $)
-
-   There are tons of charts using these indicators, if a couple of them look good, it's safe to approve them all.
-
-2. Run indicator upgrader for the rest
-    - Auto-approve all charts with no changes
-    - Manually review the rest
-
-
-NEXT UPDATE:
-- Indicator `it_net_user_zs` (chart 755) still uses old version because the new one doesn't have regional aggregates.
-  Is it still the case? If we calculate them ourselves, do they look ok?
-- Write a script to auto-approve charts with no changes.
-- We have a function for cleaning up source names https://github.com/owid/etl/pull/4980/files#diff-634c1b07a87794d87af9fbf6c92cae09a5a78caa83dd3a2a27505274802e45c5R187
-  Should we replace update_metadata.ipynb with it?
-- "dataPublisherSource" is no longer returned by WDI. Remove it if that's the case.
-- Indicator metadata from downloaded ZIP file is outdated and we have to fetch metadata from API. Have they solved
-    this problem? If yes, we can go back to ZIP file only.
-- Check old WDI version and try to switch their charts to new indicators and archive them.
-"""
-
 import json
 import re
 from pathlib import Path
