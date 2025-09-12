@@ -1,0 +1,45 @@
+dataset:
+  title: Share and number of smokers and vapers in Great Britain (ONS and ASH)
+  description: ''
+  licenses:
+    - {}
+tables:
+  smokers_vapers_great_britain:
+    variables:
+      share_smoking_cigarettes:
+        title: Share of adults who smoke cigarettes
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Cigarette smokers
+        description: The share of adults aged 16 years and older who smoke cigarettes.
+      share_vaping:
+        title: Share of adults who vape
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Vapers
+        description: The share of adults aged 16 years and older who use vapes/e-cigarettes.
+      number_vapers_exsmokers:
+        title: Number of ex-smokers who use vapes
+        unit: ''
+        display:
+          name: Ex-smokers
+        description: The number of people who used to smoke cigarettes who now use vapes.
+      number_vapes_current_smoker:
+        title: Number of current smokers who use vapes
+        unit: ''
+        display:
+          name: Current smokers
+        description: The number of people who still currently smoke cigarettes who now use vapes.
+      number_vapes_never_smokers:
+        title: Number of "never smokers" who use vapes
+        unit: ''
+        display:
+          name: Never smokers
+        description: The number of people who had never been cigarette smokers who now use vapes.
+    dimensions:
+      - name: country
+        slug: country
+      - name: year
+        slug: year

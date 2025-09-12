@@ -7,6 +7,7 @@ import geopandas as gpd
 import numpy as np
 import pandas as pd
 import pyproj
+import rioxarray as rxr
 import xarray as xr
 from owid.catalog import Table
 from rioxarray.exceptions import NoDataInBounds, OneDimensionalRaster
@@ -40,7 +41,8 @@ def _load_data_array(snap: Snapshot) -> xr.DataArray:
                     da = xr.open_dataset(tmp_file.name, engine="cfgrib").load()
     da = da["tp"]
     # Set the coordinate reference system for the precipitation data to EPSG 4326.
-    da = da.rio.write_crs("epsg:4326")
+    with rxr.set_options(export_grid_mapping=False):
+        da = da.rio.write_crs("epsg:4326")
 
     return da
 
@@ -101,17 +103,18 @@ def run() -> None:
         country_name = shapefile.iloc[i]["WB_NAME"]
 
         try:
-            # Clip to the bounding box for the country's shape to significantly improve performance.
-            xmin, ymin, xmax, ymax = geometry.bounds
-            clip = da.rio.clip_box(minx=xmin, miny=ymin, maxx=xmax, maxy=ymax)
+            with rxr.set_options(export_grid_mapping=False):
+                # Clip to the bounding box for the country's shape to significantly improve performance.
+                xmin, ymin, xmax, ymax = geometry.bounds
+                clip = da.rio.clip_box(minx=xmin, miny=ymin, maxx=xmax, maxy=ymax)
 
-            # Clip data to the country's shape.
-            # NOTE: if memory is an issue, we could use `from_disk=True` arg
-            clip = clip.rio.clip([mapping(geometry)], shapefile.crs)
+                # Clip data to the country's shape.
+                # NOTE: if memory is an issue, we could use `from_disk=True` arg
+                clip = clip.rio.clip([mapping(geometry)], shapefile.crs)
 
-            # Calculate weights based on latitude to account for area distortion in latitude-longitude grids.
-            weights = np.cos(np.deg2rad(clip.latitude))
-            weights.name = "weights"
+                # Calculate weights based on latitude to account for area distortion in latitude-longitude grids.
+                weights = np.cos(np.deg2rad(clip.latitude))
+                weights.name = "weights"
 
             # Apply the weights to the clipped precipitation data.
             clim_month_weighted = clip.weighted(weights)

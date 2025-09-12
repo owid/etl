@@ -30,3 +30,12 @@ steps:
     - data://meadow/biodiversity/2023-08-14/iucn_animal
   data://grapher/biodiversity/2023-08-14/iucn_animal:
     - data://garden/biodiversity/2023-08-14/iucn_animal
+
+  # IUCN Number of species in each extinction risk category
+  #
+  data://meadow/biodiversity/2024-12-23/iucn_number_each_status:
+    - snapshot://biodiversity/2024-12-23/iucn_number_each_status.csv
+  data://garden/biodiversity/2024-12-23/iucn_number_each_status:
+    - data://meadow/biodiversity/2024-12-23/iucn_number_each_status
+  data://grapher/biodiversity/2024-12-23/iucn_number_each_status:
+    - data://garden/biodiversity/2024-12-23/iucn_number_each_status
