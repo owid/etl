@@ -36,4 +36,10 @@ Learn more about our architecture in the following sections: -->
 
     A bit of history. Learn how we got here.
 
+-  **[:material-chart-line: &nbsp; Public analyses](../analyses/)**
+
+    ***
+
+    Browse the methodology and code for our public data analyses.
+
 </div>
