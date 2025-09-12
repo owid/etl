@@ -1,5 +1,20 @@
 """
 
+UPDATE INSTRUCTIONS:
+
+It's easier to do it in two steps:
+
+1. Run indicator upgrader for:
+    - GDP per capita, PPP (constant 2021 international $)
+    - Current health expenditure per capita, PPP (current international $)
+
+   There are tons of charts using these indicators, if a couple of them look good, it's safe to approve them all.
+
+2. Run indicator upgrader for the rest
+    - Auto-approve all charts with no changes
+    - Manually review the rest
+
+
 NEXT UPDATE:
 - Indicator `it_net_user_zs` (chart 755) still uses old version because the new one doesn't have regional aggregates.
   Is it still the case? If we calculate them ourselves, do they look ok?
