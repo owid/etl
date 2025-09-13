@@ -141,7 +141,7 @@ def run() -> None:
         tb,
         tb_china_us,
         on=["country", "year", "counterpart_country"],
-        how="outer",
+        how="left",
     )
 
     tb = pr.concat([tb, tb_partnerships], ignore_index=True)
