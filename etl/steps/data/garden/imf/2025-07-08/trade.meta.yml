@@ -297,7 +297,7 @@ tables:
           name: << counterpart_country >>
 
       share_bilateral:
-        title: Share of bilateral trade trade partnerships
+        title: Share of bilateral trade partnerships
         unit: "%"
         short_unit: "%"
         description_short: The share of world's trade partnerships that are bilateral, meaning both countries report trade with each other.
