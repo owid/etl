@@ -68,7 +68,6 @@ def run() -> None:
     # --- Harmonize & keep only the two indicators we actually use ----------------
     tb_long = _harmonize_countries(tb_long)
     tb_long = tb_long[tb_long["indicator"].isin([EXPORT_COL, IMPORT_COL])].copy()
-    tb_long = tb_long.dropna(subset=["value"])
 
     # --- Historical overlaps: remove both on exporter side and partner side -----
     tb_long = clean_historical_overlaps(tb_long, country_col="country")
@@ -82,7 +81,12 @@ def run() -> None:
     tb_all_countries = tb_long[
         (tb_long["country"].isin(members)) & (tb_long["counterpart_country"].isin(members))
     ].copy()
+
     tb_partnerships = calculate_trade_relationship_shares(tb_all_countries)
+
+    # Drop nans in value column to avoid issues when doing certain calculations later
+    tb_long = tb_long.dropna(subset=["value"])
+    tb_all_countries = tb_all_countries.dropna(subset=["value"])
 
     # --- Add regional aggregates on both axes (plus Asia excl. China) -----------
     tb_long = _add_regional_aggregates(tb_long, ds_regions)
