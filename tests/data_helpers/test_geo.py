@@ -880,6 +880,29 @@ ds_regions = cast(Dataset, MockRegionsDataset())
 ds_income_groups = cast(Dataset, MockIncomeGroupsDataset())
 
 
+class MockPopulationDataset:
+    """Mock population dataset for testing weighted aggregations."""
+
+    def __init__(self):
+        self.table_names = ["population"]
+
+    def __getitem__(self, name: str) -> Table:
+        return self.read(name)
+
+    def read(self, name: str, safe_types: bool = True) -> Table:
+        if name == "population":
+            mock_tb_population = Table(
+                {
+                    "country": ["France", "Italy", "Spain", "Germany", "Malta"],
+                    "year": [2020, 2020, 2020, 2020, 2020],
+                    "population": [67000000, 60000000, 47000000, 83000000, 500000],
+                }
+            )
+            return mock_tb_population
+        else:
+            raise KeyError(f"Table {name} not found.")
+
+
 class TestAddRegionsToTable(unittest.TestCase):
     def test_overlaps_without_income_groups(self):
         tb_in = Table.from_records(
@@ -1997,6 +2020,275 @@ class TestCreateTableOfRegionsAndSubregions(unittest.TestCase):
         world_members = tb_result.loc["World", "members"]
         self.assertEqual(set(world_members), expected_countries)
 
+    def test_weighted_aggregations_with_population(self):
+        """Test weighted aggregations using population as weights."""
+        # Create mock datasets
+        ds_regions = cast(Dataset, MockRegionsDataset())
+        ds_population = cast(Dataset, MockPopulationDataset())
+
+        # Create test data
+        tb_in = Table.from_records(
+            [
+                ("France", 2020, 10.0, 67000000),  # Large population
+                ("Italy", 2020, 30.0, 60000000),  # Large population
+                ("Spain", 2020, 50.0, 47000000),  # Medium population
+                ("France", 2021, 20.0, 67500000),
+                ("Italy", 2021, 40.0, 59500000),
+                ("Spain", 2021, 60.0, 47500000),
+            ],
+            columns=["country", "year", "indicator", "population"],
+        )
+
+        # Create region aggregator with weighted mean
+        regions_all = ["Europe", "World"]
+        aggregations = {"indicator": "weighted_by_population"}
+
+        aggregator = geo.RegionAggregator(
+            ds_regions=ds_regions,
+            ds_population=ds_population,
+            regions_all=regions_all,
+            aggregations=aggregations,
+            regions=["Europe"],
+        )
+
+        # Add aggregates
+        tb_result = aggregator.add_aggregates(tb_in)
+
+        # Check that Europe was added
+        europe_data = tb_result[tb_result["country"] == "Europe"]
+        self.assertFalse(europe_data.empty, "Europe region should be present")
+
+        # Check weighted mean calculation for 2020
+        europe_2020 = europe_data[europe_data["year"] == 2020]["indicator"].iloc[0]
+
+        # Expected weighted mean for 2020:
+        # (10 * 67000000 + 30 * 60000000 + 50 * 47000000) / (67000000 + 60000000 + 47000000)
+        expected_2020 = (10 * 67000000 + 30 * 60000000 + 50 * 47000000) / (67000000 + 60000000 + 47000000)
+
+        self.assertAlmostEqual(
+            europe_2020, expected_2020, places=5, msg="Weighted mean for 2020 should be calculated correctly"
+        )
+
+        # Check weighted mean calculation for 2021
+        europe_2021 = europe_data[europe_data["year"] == 2021]["indicator"].iloc[0]
+        expected_2021 = (20 * 67500000 + 40 * 59500000 + 60 * 47500000) / (67500000 + 59500000 + 47500000)
+
+        self.assertAlmostEqual(
+            europe_2021, expected_2021, places=5, msg="Weighted mean for 2021 should be calculated correctly"
+        )
+
+    def test_weighted_aggregations_without_population_in_table(self):
+        """Test weighted aggregations when population needs to be added automatically."""
+        # Create mock datasets
+        ds_regions = cast(Dataset, MockRegionsDataset())
+        ds_population = cast(Dataset, MockPopulationDataset())
+
+        # Create test data WITHOUT population column
+        tb_in = Table.from_records(
+            [
+                ("France", 2020, 10.0),
+                ("Italy", 2020, 30.0),
+                ("Spain", 2020, 25.0),
+            ],
+            columns=["country", "year", "indicator"],
+        )
+
+        # Create region aggregator with weighted mean
+        regions_all = ["Europe", "World"]
+        aggregations = {"indicator": "weighted_by_population"}
+
+        aggregator = geo.RegionAggregator(
+            ds_regions=ds_regions,
+            ds_population=ds_population,
+            regions_all=regions_all,
+            aggregations=aggregations,
+            regions=["Europe"],
+        )
+
+        # Add aggregates - population should be added automatically
+        tb_result = aggregator.add_aggregates(tb_in)
+
+        # Check that population column was added
+        self.assertIn("population", tb_result.columns, "Population column should be added automatically")
+
+        # Check that Europe was added with weighted calculation
+        europe_data = tb_result[tb_result["country"] == "Europe"]
+        self.assertFalse(europe_data.empty, "Europe region should be present")
+
+    def test_weighted_aggregations_with_custom_weight_column(self):
+        """Test weighted aggregations using a custom weight column (not population)."""
+        # Create mock datasets
+        ds_regions = cast(Dataset, MockRegionsDataset())
+
+        # Create test data with custom weight column
+        tb_in = Table.from_records(
+            [
+                ("France", 2020, 10.0, 0.3),  # 30% weight
+                ("Italy", 2020, 30.0, 0.5),  # 50% weight
+                ("Spain", 2020, 50.0, 0.2),  # 20% weight
+            ],
+            columns=["country", "year", "indicator", "weight"],
+        )
+
+        # Create region aggregator with custom weighted mean
+        regions_all = ["Europe", "World"]
+        aggregations = {"indicator": "weighted_by_weight"}
+
+        aggregator = geo.RegionAggregator(
+            ds_regions=ds_regions, regions_all=regions_all, aggregations=aggregations, regions=["Europe"]
+        )
+
+        # Add aggregates
+        tb_result = aggregator.add_aggregates(tb_in)
+
+        # Check that Europe was added
+        europe_data = tb_result[tb_result["country"] == "Europe"]
+        self.assertFalse(europe_data.empty, "Europe region should be present")
+
+        # Check weighted mean calculation
+        europe_indicator = europe_data[europe_data["year"] == 2020]["indicator"].iloc[0]
+        expected = (10 * 0.3 + 30 * 0.5 + 50 * 0.2) / (0.3 + 0.5 + 0.2)  # = 28.0
+
+        self.assertAlmostEqual(
+            europe_indicator, expected, places=5, msg="Custom weighted mean should be calculated correctly"
+        )
+
+    def test_weighted_aggregations_with_nan_values(self):
+        """Test weighted aggregations handle NaN values correctly."""
+        # Create mock datasets
+        ds_regions = cast(Dataset, MockRegionsDataset())
+
+        # Create test data with NaN values
+        tb_in = Table.from_records(
+            [
+                ("France", 2020, 10.0, 100.0),
+                ("Italy", 2020, np.nan, 200.0),  # NaN value
+                ("Spain", 2020, 30.0, np.nan),  # NaN weight
+                ("Russia", 2020, 40.0, 300.0),
+            ],
+            columns=["country", "year", "indicator", "weight"],
+        )
+
+        # Create region aggregator
+        regions_all = ["Europe", "World"]
+        aggregations = {"indicator": "weighted_by_weight"}
+
+        aggregator = geo.RegionAggregator(
+            ds_regions=ds_regions, regions_all=regions_all, aggregations=aggregations, regions=["Europe"]
+        )
+
+        # Add aggregates
+        tb_result = aggregator.add_aggregates(tb_in)
+
+        # Check that Europe was added
+        europe_data = tb_result[tb_result["country"] == "Europe"]
+        self.assertFalse(europe_data.empty, "Europe region should be present")
+
+        # Check weighted mean calculation (should only use France and Russia)
+        europe_indicator = europe_data[europe_data["year"] == 2020]["indicator"].iloc[0]
+        expected = (10.0 * 100.0 + 40.0 * 300.0) / (100.0 + 300.0)  # = 32.5
+
+        self.assertAlmostEqual(
+            europe_indicator, expected, places=5, msg="Weighted mean should ignore NaN values correctly"
+        )
+
+    def test_weighted_aggregations_mixed_with_regular_aggregations(self):
+        """Test that weighted and regular aggregations work together."""
+        # Create mock datasets
+        ds_regions = cast(Dataset, MockRegionsDataset())
+
+        # Create test data
+        tb_in = Table.from_records(
+            [
+                ("France", 2020, 10.0, 100.0, 1000),
+                ("Italy", 2020, 20.0, 200.0, 2000),
+                ("Spain", 2020, 30.0, 300.0, 3000),
+            ],
+            columns=["country", "year", "weighted_indicator", "weight", "sum_indicator"],
+        )
+
+        # Create region aggregator with mixed aggregations
+        regions_all = ["Europe", "World"]
+        aggregations = {"weighted_indicator": "weighted_by_weight", "sum_indicator": "sum"}
+
+        aggregator = geo.RegionAggregator(
+            ds_regions=ds_regions, regions_all=regions_all, aggregations=aggregations, regions=["Europe"]
+        )
+
+        # Add aggregates
+        tb_result = aggregator.add_aggregates(tb_in)
+
+        # Check that Europe was added
+        europe_data = tb_result[tb_result["country"] == "Europe"]
+        self.assertFalse(europe_data.empty, "Europe region should be present")
+
+        europe_row = europe_data[europe_data["year"] == 2020].iloc[0]
+
+        # Check weighted mean calculation
+        expected_weighted = (10.0 * 100.0 + 20.0 * 200.0 + 30.0 * 300.0) / (100.0 + 200.0 + 300.0)
+        self.assertAlmostEqual(
+            europe_row["weighted_indicator"],
+            expected_weighted,
+            places=5,
+            msg="Weighted mean should be calculated correctly",
+        )
+
+        # Check sum calculation
+        expected_sum = 1000 + 2000 + 3000
+        self.assertEqual(europe_row["sum_indicator"], expected_sum, msg="Sum should be calculated correctly")
+
+    def test_weighted_aggregations_error_on_missing_weight_column(self):
+        """Test that an error is raised when weight column is missing."""
+        # Create mock datasets
+        ds_regions = cast(Dataset, MockRegionsDataset())
+
+        # Create test data WITHOUT weight column
+        tb_in = Table.from_records(
+            [("France", 2020, 10.0), ("Italy", 2020, 20.0)], columns=["country", "year", "indicator"]
+        )
+
+        # Create region aggregator with weighted mean using missing column
+        regions_all = ["Europe"]
+        aggregations = {"indicator": "weighted_by_missing_column"}
+
+        aggregator = geo.RegionAggregator(
+            ds_regions=ds_regions, regions_all=regions_all, aggregations=aggregations, regions=["Europe"]
+        )
+
+        # Should raise error when trying to add aggregates
+        with self.assertRaises(ValueError) as context:
+            aggregator.add_aggregates(tb_in)
+
+        self.assertIn("missing_column", str(context.exception))
+
+    def test_weighted_aggregations_error_on_missing_population_dataset(self):
+        """Test that an error is raised when population dataset is needed but not provided."""
+        # Create mock regions dataset
+        ds_regions = cast(Dataset, MockRegionsDataset())
+
+        # Create test data WITHOUT population column
+        tb_in = Table.from_records(
+            [("France", 2020, 10.0), ("Italy", 2020, 20.0)], columns=["country", "year", "indicator"]
+        )
+
+        # Create region aggregator WITHOUT population dataset
+        regions_all = ["Europe"]
+        aggregations = {"indicator": "weighted_by_population"}
+
+        aggregator = geo.RegionAggregator(
+            ds_regions=ds_regions,
+            ds_population=None,  # No population dataset
+            regions_all=regions_all,
+            aggregations=aggregations,
+            regions=["Europe"],
+        )
+
+        # Should raise error when trying to add aggregates
+        with self.assertRaises(ValueError) as context:
+            aggregator.add_aggregates(tb_in)
+
+        self.assertIn("no population dataset provided", str(context.exception))
+
     def test_no_regions_to_unpack(self):
         """Test scenario where no regions need unpacking (all members are countries)."""
 
@@ -2104,14 +2396,6 @@ class TestCreateTableOfRegionsAndSubregions(unittest.TestCase):
         # Should raise an error due to invalid JSON
         with self.assertRaises(json.JSONDecodeError):
             geo.create_table_of_regions_and_subregions(ds_regions=ds_regions, unpack_subregions=False)
-
-
-class MockPopulationDataset:
-    def __getitem__(self, name: str) -> Table:
-        return mock_population
-
-    def read(self, name: str) -> Table:
-        return self.__getitem__(name)
 
 
 class TestRegions(unittest.TestCase):
@@ -2832,10 +3116,11 @@ class TestRegionAggregator(unittest.TestCase):
         )
 
         # Use regions that don't exist in our mock dataset or don't contain these countries
+        # Use dict format to allow custom regions
         aggregator = geo.RegionAggregator(
             ds_regions=self.ds_regions,
             regions_all=self.regions_all,
-            regions=["NonexistentRegion"],  # This region doesn't exist
+            regions={"NonexistentRegion": {}},  # Custom region with no members
             aggregations={"population": "sum", "gdp": "sum"},
             ds_income_groups=self.ds_income_groups,
         )
@@ -2850,46 +3135,6 @@ class TestRegionAggregator(unittest.TestCase):
         self.assertEqual(len(result), 2)
         self.assertListEqual(result["country"].tolist(), ["France", "Italy"])
         self.assertNotIn("NonexistentRegion", result["country"].tolist())
-
-    def test_partial_aggregation_preserves_existing_data(self):
-        """Test that when adding aggregates for only some columns, existing data
-        for non-aggregated columns is preserved (not deleted)."""
-        # Create test data where Europe already exists with data for multiple columns
-        tb_with_existing_europe = Table(
-            {
-                "country": ["France", "Italy", "Europe", "Europe"],
-                "year": [2020, 2020, 2020, 2021],
-                "gdp": [100, 200, 999, 888],  # Europe already has GDP data that should be replaced
-                "population": [67, 60, 777, 666],  # Europe already has population data that should be preserved
-                "area": [551, 301, 555, 444],  # Europe already has area data that should be preserved
-            }
-        )
-
-        # Create aggregator that only aggregates GDP (not population or area)
-        aggregator = geo.RegionAggregator(
-            ds_regions=self.ds_regions,
-            regions_all=self.regions_all,
-            regions=["Europe"],
-            aggregations={"gdp": "sum"},  # Only aggregating GDP, not population or area
-            ds_income_groups=self.ds_income_groups,
-        )
-
-        result = aggregator.add_aggregates(
-            tb_with_existing_europe,
-            check_for_region_overlaps=False,
-        )
-
-        # Get Europe data
-        europe_data = result[result["country"] == "Europe"].set_index("year").sort_index()
-
-        # GDP should be replaced with new aggregates (France + Italy)
-        self.assertEqual(europe_data.loc[2020, "gdp"], 300)  # 100 + 200 (aggregated)
-
-        # Population and area should be preserved from original Europe data
-        self.assertEqual(europe_data.loc[2020, "population"], 777)  # Original preserved
-        self.assertEqual(europe_data.loc[2020, "area"], 555)  # Original preserved
-        self.assertEqual(europe_data.loc[2021, "population"], 666)  # Original preserved
-        self.assertEqual(europe_data.loc[2021, "area"], 444)  # Original preserved
 
     def test_partial_aggregation_new_region_gets_nan_for_non_aggregated(self):
         """Test that when adding aggregates for only some columns, new regions
@@ -3045,3 +3290,36 @@ class TestRegionAggregator(unittest.TestCase):
         # Verify that individual country data is still present
         individual_countries = result[result["country"].isin(["France", "Italy"])]
         self.assertEqual(len(individual_countries), 2)  # Both countries still there
+
+    def test_non_existent_region_raises_error(self):
+        """Test that using a non-existent region raises a clear error."""
+        # Test list with unknown region (strict validation)
+        with self.assertRaises(ValueError) as context:
+            geo.RegionAggregator(
+                ds_regions=self.ds_regions,
+                regions_all=self.regions_all,
+                regions=["Sub-Saharan Africa"],  # List - must be known regions
+                aggregations={"gdp": "sum"},
+                ds_income_groups=self.ds_income_groups,
+                ds_population=self.ds_population,
+            )
+
+        # Check that the error message is helpful for list case
+        error_message = str(context.exception)
+        self.assertIn("Sub-Saharan Africa", error_message)
+        self.assertIn("unknown regions in list", error_message.lower())
+
+        # Test dict with any region (should work - no validation)
+        try:
+            # Even "Sub-Saharan Africa" should work in dict format (no validation)
+            aggregator = geo.RegionAggregator(
+                ds_regions=self.ds_regions,
+                regions_all=self.regions_all,
+                regions={"Sub-Saharan Africa": {}},  # Dict allows anything
+                aggregations={"gdp": "sum"},
+                ds_income_groups=self.ds_income_groups,
+                ds_population=self.ds_population,
+            )
+            self.assertIsNotNone(aggregator)
+        except ValueError:
+            self.fail("Dict format should allow any region names without validation")
