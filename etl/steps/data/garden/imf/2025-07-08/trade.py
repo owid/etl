@@ -423,11 +423,7 @@ def calculate_trade_relationship_shares(tb: Table) -> Table:
 
     # Count how many directions have trade per (year, pair)
     active = df[df.has_trade]
-    dir_counts = (
-        active.groupby(["year", "pair"])["country"]
-        .nunique()  # how many unique “origins” per pair-year (1 or 2)
-        .reset_index(name="n_dirs")
-    )
+    dir_counts = active.groupby(["year", "pair"])["country"].nunique().reset_index(name="n_dirs")
 
     # Build full set of pairs for every year (so we include non‑trading)
     all_pairs = df[["year", "pair"]].drop_duplicates()
@@ -451,8 +447,6 @@ def calculate_trade_relationship_shares(tb: Table) -> Table:
             "non_trading": "share_non_trading",
         }
     ).reset_index()
-    for col in ["share_bilateral", "share_unilateral", "share_non_trading"]:
-        shares[col] = shares[col].copy_metadata(tb["value"])
 
     shares["country"] = "World"
     return shares
