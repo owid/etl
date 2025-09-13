@@ -143,6 +143,14 @@ def run() -> None:
         how="left",
     )
 
+    tb_partnerships = calculate_trade_relationship_shares(tb_long)  # (currently unused but might need it later)
+
+    tb = pr.merge(
+        tb,
+        tb_partnerships,
+        on=["country", "year", "counterpart_country"],
+        how="left",
+    )
     # --- Format, add origins & save ----------------------------------------------------
     tb = tb.format(["country", "year", "counterpart_country"])
     for column in tb.columns:
@@ -435,4 +443,7 @@ def calculate_trade_relationship_shares(tb: Table) -> Table:
     shares = shares.rename(
         columns={"bilateral": "share_bilateral", "unilateral": "share_unilateral", "non_trading": "share_non_trading"}
     ).reset_index()
+
+    shares["country"] = "World"
+    shares["counterpart_country"] = "World"
     return shares

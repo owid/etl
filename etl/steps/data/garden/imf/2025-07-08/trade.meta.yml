@@ -284,3 +284,21 @@ tables:
         display:
           numDecimalPlaces: 0
           name: << counterpart_country >>
+
+      share_bilateral:
+        title: Share of bilateral trade trade partnerships
+        unit: "%"
+        short_unit: "%"
+        description_short: The share of world's trade partnerships that are bilateral, meaning both countries report trade with each other.
+
+      share_unilateral:
+        title: Share of unilateral trade partnerships
+        unit: "%"
+        short_unit: "%"
+        description_short: The share of world's trade partnerships that are unilateral, meaning only one country reports trade with the other.
+
+      share_non_trading:
+        title: Share of non-trading partnerships
+        unit: "%"
+        short_unit: "%"
+        description_short: The share of world's trade partnerships where no trade is reported by either country.
