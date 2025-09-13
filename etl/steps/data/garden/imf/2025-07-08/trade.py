@@ -68,6 +68,9 @@ def run() -> None:
     # --- Harmonize & keep only the two indicators we actually use ----------------
     tb_long = _harmonize_countries(tb_long)
     tb_long = tb_long[tb_long["indicator"].isin([EXPORT_COL, IMPORT_COL])].copy()
+
+    tb_partnerships = calculate_trade_relationship_shares(tb_all_countries)
+
     tb_long = tb_long.dropna(subset=["value"])
 
     # --- Historical overlaps: remove both on exporter side and partner side -----
@@ -143,14 +146,7 @@ def run() -> None:
         how="outer",
     )
 
-    tb_partnerships = calculate_trade_relationship_shares(tb_long)
-
-    tb = pr.merge(
-        tb,
-        tb_partnerships,
-        on=["country", "year", "counterpart_country"],
-        how="left",
-    )
+    tb = pr.concat([tb, tb_partnerships], ignore_index=True)
     # --- Format, add origins & save ----------------------------------------------------
     tb = tb.format(["country", "year", "counterpart_country"])
     for column in tb.columns:
@@ -427,23 +423,38 @@ def calculate_trade_relationship_shares(tb: Table) -> Table:
         index=df.index,
     )
 
+    # Count how many directions have trade per (year, pair)
     active = df[df.has_trade]
-    dir_counts = active.groupby(["year", "pair"])["country"].nunique().reset_index(name="n_dirs")
+    dir_counts = (
+        active.groupby(["year", "pair"])["country"]
+        .nunique()  # how many unique “origins” per pair-year (1 or 2)
+        .reset_index(name="n_dirs")
+    )
 
+    # Build full set of pairs for every year (so we include non‑trading)
     all_pairs = df[["year", "pair"]].drop_duplicates()
+
     status = all_pairs.merge(dir_counts, on=["year", "pair"], how="left").fillna({"n_dirs": 0})
 
+    # Classify and aggregate
     status["relationship"] = pd.cut(
         status.n_dirs, bins=[-0.1, 0.1, 1.1, 2.1], labels=["non_trading", "unilateral", "bilateral"]
     )
 
     counts = status.groupby(["year", "relationship"]).size().unstack(fill_value=0)
+
+    # Compute shares
     total = counts.sum(axis=1)
     shares = counts.divide(total, axis=0).multiply(100)
     shares = shares.rename(
-        columns={"bilateral": "share_bilateral", "unilateral": "share_unilateral", "non_trading": "share_non_trading"}
+        columns={
+            "bilateral": "share_bilateral",
+            "unilateral": "share_unilateral",
+            "non_trading": "share_non_trading",
+        }
     ).reset_index()
+    for col in ["share_bilateral", "share_unilateral", "share_non_trading"]:
+        shares[col] = shares[col].copy_metadata(tb["value"])
 
     shares["country"] = "World"
-    shares["counterpart_country"] = "World"
     return shares
