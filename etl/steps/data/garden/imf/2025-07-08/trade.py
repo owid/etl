@@ -407,10 +407,11 @@ def clean_historical_overlaps(tb: Table, country_col: str = "country") -> Table:
 
 
 def calculate_trade_relationship_shares(tb: Table) -> Table:
-    """(Currently unused but might need it later) Example of classifying bilateral/unilateral/non-trading shares."""
-    THRESHOLD = 0.01
+    THRESHOLD = 0.01  # million USD
+
     df = tb[tb.indicator.isin([EXPORT_COL, IMPORT_COL])].assign(has_trade=lambda d: d.value.fillna(0) > THRESHOLD)
 
+    #    This uses vectorized minimum/maximum on object‑dtypes:
     c1 = df[["country", "counterpart_country"]]
     df["pair"] = pd.Series(
         np.where(
@@ -421,23 +422,23 @@ def calculate_trade_relationship_shares(tb: Table) -> Table:
         index=df.index,
     )
 
-    # Count how many directions have trade per (year, pair)
     active = df[df.has_trade]
-    dir_counts = active.groupby(["year", "pair"])["country"].nunique().reset_index(name="n_dirs")
+    dir_counts = (
+        active.groupby(["year", "pair"])["country"]
+        .nunique()  # how many unique “origins” per pair-year (1 or 2)
+        .reset_index(name="n_dirs")
+    )
 
-    # Build full set of pairs for every year (so we include non‑trading)
     all_pairs = df[["year", "pair"]].drop_duplicates()
 
     status = all_pairs.merge(dir_counts, on=["year", "pair"], how="left").fillna({"n_dirs": 0})
 
-    # Classify and aggregate
     status["relationship"] = pd.cut(
         status.n_dirs, bins=[-0.1, 0.1, 1.1, 2.1], labels=["non_trading", "unilateral", "bilateral"]
     )
 
     counts = status.groupby(["year", "relationship"]).size().unstack(fill_value=0)
 
-    # Compute shares
     total = counts.sum(axis=1)
     shares = counts.divide(total, axis=0).multiply(100)
     shares = shares.rename(
@@ -449,4 +450,5 @@ def calculate_trade_relationship_shares(tb: Table) -> Table:
     ).reset_index()
 
     shares["country"] = "World"
-    return shares
+
+    return shares[["country", "year", "share_bilateral", "share_unilateral", "share_non_trading"]]
