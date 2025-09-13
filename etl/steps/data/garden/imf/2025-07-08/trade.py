@@ -140,10 +140,10 @@ def run() -> None:
         tb,
         tb_china_us,
         on=["country", "year", "counterpart_country"],
-        how="left",
+        how="outer",
     )
 
-    tb_partnerships = calculate_trade_relationship_shares(tb_long)  # (currently unused but might need it later)
+    tb_partnerships = calculate_trade_relationship_shares(tb_long)
 
     tb = pr.merge(
         tb,
