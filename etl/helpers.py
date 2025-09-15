@@ -922,3 +922,65 @@ class PathFinder:
 def _match_dependencies(pattern: str, dependencies: set[str]) -> set[str]:
     regex = re.compile(pattern)
     return {dependency for dependency in dependencies if regex.match(dependency)}
+
+
+def sanitize_crs(crs):
+    """
+    Normalize a CRS for rioxarray/rasterio by returning either an EPSG string (preferred)
+    or a plain WKT string with a supported version name.
+
+    Why:
+    - With some rioxarray/rasterio/pyproj combos, passing a pyproj.CRS directly into
+      rioxarray.rio.clip(..., crs=...) can cause rasterio to invoke pyproj.CRS.to_wkt
+      with a stringified foreign enum like 'WktVersion.WKT2_2019' instead of a bare
+      name ('WKT2_2019') or a pyproj.enums.WktVersion value.
+    - pyproj rejects that stringified enum and raises:
+        ValueError: Invalid value supplied 'WktVersion.WKT2_2019'. Only ('WKT2_2015',
+        'WKT2_2015_SIMPLIFIED', 'WKT2_2018', 'WKT2_2018_SIMPLIFIED', 'WKT2_2019',
+        'WKT2_2019_SIMPLIFIED', 'WKT1_GDAL', 'WKT1_ESRI') are supported.
+
+    What this does:
+    - Prefer an 'EPSG:XXXX' string when resolvable, which avoids WKT altogether.
+    - Otherwise return a plain WKT string using a supported version name, trying WKT2_2019
+      first and falling back to WKT1_GDAL. This prevents foreign enum objects from leaking
+      across library boundaries and triggering the error above.
+
+    Safe to pass into:
+      xarray/rioxarray/rasterio functions that accept CRS inputs.
+    """
+    if crs is None:
+        return None
+
+    # Try EPSG first
+    try:
+        to_epsg = getattr(crs, "to_epsg", None)
+        if callable(to_epsg):
+            epsg = to_epsg()
+            if epsg is not None:
+                return f"EPSG:{epsg}"
+    except Exception:
+        pass
+
+    # Rasterio CRS sometimes offers to_string -> 'EPSG:XXXX' or PROJ string
+    try:
+        to_string = getattr(crs, "to_string", None)
+        if callable(to_string):
+            s = to_string()
+            if s:
+                return s
+    except Exception:
+        pass
+
+    # Fall back to a bare WKT string with a supported version name
+    try:
+        to_wkt = getattr(crs, "to_wkt", None)
+        if callable(to_wkt):
+            try:
+                return to_wkt("WKT2_2019")
+            except Exception:
+                return to_wkt("WKT1_GDAL")
+    except Exception:
+        pass
+
+    # If it is already a string or int or unknown type, return as is
+    return crs
