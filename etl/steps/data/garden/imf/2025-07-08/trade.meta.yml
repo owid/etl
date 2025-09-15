@@ -13,14 +13,6 @@ definitions:
   cif_basis: &cif_basis Imports are valued on a CIF basis (Cost, Insurance, and Freight). This means the values include the cost of the goods, as well as the transport and insurance costs to deliver them to the importing country's border.
 
   description_processing_partnerships: &description_processing_partnerships We calculated the share of bilateral, unilateral, and non-trading partnerships by examining all possible country pairs for each year. For each pair, we checked whether both countries reported trade with each other (bilateral), only one country reported trade (unilateral), or neither country reported trade (non-trading). We then counted the total number of partnerships in each category and calculated their shares as a percentage of all partnerships.
-  description_key_trade_relationships: &description_key_trade_relationships
-    - This indicator shows the share of all country pairs that are classified as bilateral, unilateral, or non-trading.
-    - A bilateral pair means both countries report trade with each other; a unilateral pair means only one country reports trade with the other; and a non-trading pair means neither country reports trade with the other.
-    - Both exports and imports are considered on a goods-only basis, using FOB for exports and CIF for imports.
-    - *fob_basis
-    - *cif_basis
-    - *goods_only
-    - A higher share of bilateral pairs indicates more mutual trade, while a higher share of unilateral or non-trading pairs suggests more one-sided or absent trade links.
 
 dataset:
   update_period_days: 365
@@ -299,36 +291,52 @@ tables:
         title: Share of country pairs with bilateral trade
         unit: "%"
         short_unit: "%"
-        description_short: Trade relationships are bilateral when countries both [import](#dod:merchandise-imports) from and [export](#dod:merchandise-exports) to each other.
-        description_key: *description_key_trade_relationships
+        description_short: Trade relationships are bilateral when countries both [import](#dod:merchandise-imports) from and [export](#dod:merchandise-exports) goods to each other.
+        description_key:
+          - This indicator shows the share of country pairs that trade goods with each other in both directions.
+          - A pair is bilateral when both countries report importing from and exporting to the other.
+          - *fob_basis
+          - *cif_basis
+          - *goods_only
         description_processing: *description_processing_partnerships
         presentation:
           title_public: Share of country pairs with bilateral trade
         display:
-          numDecimalPlaces: 1
-          name: Bilateral
+            numDecimalPlaces: 1
+            name: Bilateral
 
       share_unilateral:
         title: Share of country pairs with unilateral trade
         unit: "%"
         short_unit: "%"
-        description_short: Trade relationships are unilateral when only one country in the pair [imports](#dod:merchandise-imports) from or [exports](#dod:merchandise-exports) to the other country.
-        description_key: *description_key_trade_relationships
+        description_short: Trade relationships are unilateral when only one country in the pair [imports](#dod:merchandise-imports) from or [exports](#dod:merchandise-exports) goods to the other country.
+        description_key:
+          - This indicator shows the share of country pairs that trade goods with each other in only one direction.
+          - A pair is unilateral when only one country reports importing from or exporting to the other.
+          - *fob_basis
+          - *cif_basis
+          - *goods_only
         description_processing: *description_processing_partnerships
         presentation:
           title_public: Share of country pairs with unilateral trade
         display:
-          numDecimalPlaces: 1
-          name: Unilateral
+            numDecimalPlaces: 1
+            name: Unilateral
 
       share_non_trading:
         title: Share of non-trading partnerships
         unit: "%"
         short_unit: "%"
-        description_short: Trade relationships are non-trading when neither country in the pair [imports](#dod:merchandise-imports) from or [exports](#dod:merchandise-exports) to the other country.
+        description_short: Trade relationships are non-trading when neither country in the pair [imports](#dod:merchandise-imports) from or [exports](#dod:merchandise-exports) goods to the other country.
+        description_key:
+          - This indicator shows the share of country pairs that do not trade goods with each other.
+          - A pair is non-trading when neither country reports importing from or exporting to the other.
+          - *fob_basis
+          - *cif_basis
+          - *goods_only
         description_processing: *description_processing_partnerships
         presentation:
           title_public: Share of non-trading partnerships
         display:
-          numDecimalPlaces: 1
-          name: Non-trading
+            numDecimalPlaces: 1
+            name: Non-trading
