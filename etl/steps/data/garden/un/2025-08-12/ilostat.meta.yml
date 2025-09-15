@@ -10,13 +10,48 @@ definitions:
     display: &common_display
       tolerance: 5
 
-  iloest_modelled_data: |-
-    This data is part of the ILO Modelled Estimates series. This series combines nationally reported observations with imputed data to have a internationally comparable dataset and produce regional and global aggregates. For more information, please refer to the [ILO Modelled Estimates documentation](https://ilostat.ilo.org/methods/concepts-and-definitions/ilo-modelled-estimates/).
+  employment: Employment refers to all persons of working age who, during a specified brief period, were in paid employment or self-employment.
 
-  13th_icls: |-
+  icse_93: This status in employment is provided according to the latest version of the International Standard Classification of Status in Employment (ICSE-93).
+
+  isco_08: This is based on the International Standard Classification of Occupations 2008 (ISCO-08). More information can be found in the [ISCO documentation](https://ilostat.ilo.org/methods/concepts-and-definitions/classification-occupation/).
+
+  description_key_status_in_employment: |-
+    <% if classif1 == "Status in employment (ICSE-93): 1. Employees" %>
+      _Employees_ are defined as workers on paid employment jobs. Paid employment refers to all jobs where people hold an employment contract which give them a remuneration not dependent upon the revenue of the organization for which they work. {definitions.icse_93}
+    <%- elif classif1 == "Status in employment (ICSE-93): 2. Employers" %>
+      _Employers_ are defined as workers working on self-employment jobs who, and that have engaged one or more persons to work for them as employees. {definitions.icse_93}
+    <%- elif classif1 == "Status in employment (ICSE-93): 3. Own-account workers" %>
+      _Own-account workers_ are defined as workers working on self-employment jobs who do not engage any employees to work with them. {definitions.icse_93}
+    <%- elif classif1 == "Status in employment (ICSE-93): 5. Contributing family workers" %>
+      _Contributing family workers_ are defined as workers working on self-employment jobs who work in an enterprise operated by a related person living in the same household. {definitions.icse_93}
+    <%- endif %>
+  description_key_informal_employment: |-
+    Informal employment encompasses all jobs that lack basic social or legal protection and employment benefits, regardless of the type of organization in which they are performed. It includes own-account workers, employers, and members of producers’ cooperatives operating in the informal sector; own-account workers engaged in producing goods exclusively for their household’s final use (such as subsistence farming); and contributing family workers, whether in formal or informal sector enterprises. It also covers employees in informal jobs, whether they are working in formal enterprises, informal enterprises, or employed as paid domestic workers by households.
+  description_key_child_labor: |-
+    <% if classif1 == "Age (child labour): 5-11" %>
+      Child labor for children aged 5-11 is defined as those who did at least one hour of economic activity and/or more than 21 hours of unpaid household services during the reference week.
+    <%- elif classif1 == "Age (child labour): 12-14" %>
+      Child labor for children aged 12-14 is defined as those who did at least 14 hours of economic activity and/or more than 21 hours of unpaid household services during the reference week.
+    <%- elif classif1 == "Age (child labour): 15-17" %>
+      Child labor for children aged 15-17 is defined as those who did at least 43 hours of economic activity during the reference week.
+    <%- elif classif1 == "Age (child labour): 5-17" %>
+      Child labor is defined differently depending on the age group: for children aged 5-11, it includes those who did at least one hour of economic activity and/or more than 21 hours of unpaid household services; for children aged 12-14, it includes those who did at least 14 hours of economic activity and/or more than 21 hours of unpaid household services; and for children aged 15-17, it includes those who did at least 43 hours of economic activity during the reference week.
+    <%- endif %>
+  description_key_low_pay_earners: |-
+    Workers are considered _low pay_ if their hourly earnings at all jobs are less than two-thirds of median hourly earnings.
+  # description_key_occupation: |-
+  #   <% if classif1.startswith("Occupation (ISCO-08):") %>
+  #       "Occupation (Skill level): Skill level 1 ~ low": "Occupation (Skill level): Low",
+  #       "Occupation (Skill level): Skill level 2 ~ medium": "Occupation (Skill level): Medium",
+  #       "Occupation (Skill level): Skill levels 3 and 4 ~ high": "Occupation (Skill level): High",
+  #       "Occupation (Skill level): Not elsewhere classified": "Occupation (Skill level): Not elsewhere classified",
+  description_key_iloest_modelled_data: |-
+    This data is part of the ILO Modelled Estimates series. This series combines nationally reported observations with imputed data to have a harmonized, internationally comparable dataset and produce regional and global aggregates. For more information, please refer to the [ILO Modelled Estimates documentation](https://ilostat.ilo.org/methods/concepts-and-definitions/ilo-modelled-estimates/).
+  description_key_13th_icls: |-
     This data is classified according to the 13th International Classification of Labour Statistics (ICLS), where employment includes anyone engaged for at least one hour per day in production of goods and services, even for own use by the household or family, volunteering, or other forms of unpaid work. For more information, please refer to the [this explainer by the International Labour Organization](https://www.ilo.org/publications/quick-guide-understanding-impact-new-statistical-standards-ilostat).
 
-  unreliable_data: |-
+  description_processing_unreliable_data: |-
     We removed data points flagged as "unreliable" by the source (i.e. `obs_status = "U"` in the original data). These data points are likely to be inaccurate and misleading for analysis.
 
 
@@ -37,12 +72,11 @@ tables:
         title: Employment - <<sex>> - <<classif1>>
         unit: "people"
         short_unit: ""
-        # description_short: Short description of testing variable.
+        description_short: "{definitions.employment}"
         description_key:
-          - "{definitions.iloest_modelled_data}"
-          - "{definitions.13th_icls}"
-        # presentation:
-          # title_variant:
+          - "{definitions.description_key_status_in_employment}"
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
         display:
           name: Employment - <<sex>> - <<classif1>>
           numDecimalPlaces: 0
@@ -52,12 +86,12 @@ tables:
         title: Informal employment rate - <<sex>>
         unit: "%"
         short_unit: "%"
-        # description_short: Short description of testing variable.
+        description_short: Informal employment relates to jobs that lack basic social or legal protection and employment benefits.
         description_key:
-          - "{definitions.iloest_modelled_data}"
-          - "{definitions.13th_icls}"
-        # presentation:
-          # title_variant:
+          - "{definitions.employment}"
+          - "{definitions.description_key_informal_employment}"
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
         display:
           name: Informal employment rate - <<sex>>
           numDecimalPlaces: 1
@@ -67,12 +101,10 @@ tables:
         title: Labor force - <<sex>> - <<classif1>>
         unit: "people"
         short_unit: ""
-        # description_short: Short description of testing variable.
+        description_short: Sum of all persons of working age who are employed and those who are unemployed.
         description_key:
-          - "{definitions.iloest_modelled_data}"
-          - "{definitions.13th_icls}"
-        # presentation:
-          # title_variant:
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
         display:
           name: Labor force - <<sex>> - <<classif1>>
           numDecimalPlaces: 0
@@ -82,12 +114,10 @@ tables:
         title: Labor force participation rate - <<sex>> - <<classif1>>
         unit: "%"
         short_unit: "%"
-        # description_short: Short description of testing variable.
+        description_short: The labour force participation rate is the labour force (all working-age persons employed and unemployed) divided the working-age population.
         description_key:
-          - "{definitions.iloest_modelled_data}"
-          - "{definitions.13th_icls}"
-        # presentation:
-          # title_variant:
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
         display:
           name: Labor force participation rate - <<sex>> - <<classif1>>
           numDecimalPlaces: 1
@@ -99,10 +129,8 @@ tables:
         short_unit: "%"
         description_short: Share of the labor force without work, but available for and seeking employment.
         description_key:
-          - "{definitions.iloest_modelled_data}"
-          - "{definitions.13th_icls}"
-        # presentation:
-          # title_variant:
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
         display:
           name: Unemployment rate - <<sex>> - <<classif1>>
           numDecimalPlaces: 1
@@ -116,12 +144,11 @@ tables:
         title: Share of children in child labor - <<sex>> - <<classif1>>
         unit: "%"
         short_unit: "%"
-        # description_short: Short description of testing variable.
-        # description_key: List of key points about the indicator.
-        # presentation:
-          # title_variant:
+        description_short: Proportion of children who are either working at an age that is too young for them to be employed, or doing work that —by its nature or conditions— is likely to harm their health, safety, or morals.
+        description_key:
+          - "{definitions.description_key_child_labor}"
         processing_level: major
-        description_processing: "{definitions.unreliable_data}"
+        description_processing: "{definitions.description_processing_unreliable_data}"
         display:
           name: Share of children in child labor - <<sex>> - <<classif1>>
           numDecimalPlaces: 1
@@ -135,10 +162,9 @@ tables:
         title: Female share of low pay earners
         unit: "%"
         short_unit: "%"
-        # description_short: Short description of testing variable.
-        # description_key: List of key points about the indicator.
-        # presentation:
-          # title_variant:
+        description_short: Percentage of low pay workers, among all low pay workers, who are female.
+        description_key:
+          - "{definitions.description_key_low_pay_earners}"
         display:
           name: Female share of low pay earners
           numDecimalPlaces: 1
@@ -148,12 +174,10 @@ tables:
         title: Gender wage gap - <<classif1>>
         unit: "%"
         short_unit: "%"
-        # description_short: Short description of testing variable.
+        description_short: Difference between average earnings of men and average earnings of women expressed as a percentage of average earnings of men.
         # description_key: List of key points about the indicator.
-        # presentation:
-          # title_variant:
         processing_level: major
-        description_processing: "{definitions.unreliable_data}"
+        description_processing: "{definitions.description_processing_unreliable_data}"
         display:
           name: Gender wage gap - <<classif1>>
           numDecimalPlaces: 1
@@ -169,10 +193,8 @@ tables:
         short_unit: $
         # description_short: Short description of testing variable.
         # description_key: List of key points about the indicator.
-        # presentation:
-          # title_variant:
         processing_level: major
-        description_processing: "{definitions.unreliable_data}"
+        description_processing: "{definitions.description_processing_unreliable_data}"
         display:
           name: Average hourly earnings of employees - <<sex>>
           numDecimalPlaces: 1
@@ -188,8 +210,6 @@ tables:
         short_unit: "%"
         # description_short: Short description of testing variable.
         # description_key: List of key points about the indicator.
-        # presentation:
-          # title_variant:
         display:
           name: Working poverty rate - <<sex>> - <<classif1>>
           numDecimalPlaces: 1
@@ -201,8 +221,6 @@ tables:
         short_unit: "%"
         # description_short: Short description of testing variable.
         # description_key: List of key points about the indicator.
-        # presentation:
-          # title_variant:
         display:
           name: Proportion of population covered by social protection - <<sex>> - <<classif1>>
           numDecimalPlaces: 1
@@ -214,10 +232,8 @@ tables:
         short_unit: "%"
         # description_short: Short description of testing variable.
         # description_key: List of key points about the indicator.
-        # presentation:
-          # title_variant:
         processing_level: major
-        description_processing: "{definitions.unreliable_data}"
+        description_processing: "{definitions.description_processing_unreliable_data}"
         display:
           name: Proportion of women in managerial positions
           numDecimalPlaces: 1
@@ -229,10 +245,8 @@ tables:
         short_unit: "%"
         # description_short: Short description of testing variable.
         # description_key: List of key points about the indicator.
-        # presentation:
-          # title_variant:
         processing_level: major
-        description_processing: "{definitions.unreliable_data}"
+        description_processing: "{definitions.description_processing_unreliable_data}"
         display:
           name: Proportion of women in senior and middle management positions
           numDecimalPlaces: 1
@@ -244,8 +258,6 @@ tables:
         short_unit: "%"
         # description_short: Short description of testing variable.
         # description_key: List of key points about the indicator.
-        # presentation:
-          # title_variant:
         display:
           name: Growth rate of output per worker
           numDecimalPlaces: 1
@@ -257,10 +269,8 @@ tables:
         short_unit: "%"
         # description_short: Short description of testing variable.
         # description_key: List of key points about the indicator.
-        # presentation:
-          # title_variant:
         processing_level: major
-        description_processing: "{definitions.unreliable_data}"
+        description_processing: "{definitions.description_processing_unreliable_data}"
         display:
           name: Proportion of informal employment in total employment - <<sex>> - <<classif1>>
           numDecimalPlaces: 1
@@ -272,10 +282,8 @@ tables:
         short_unit: "LCU"
         # description_short: Short description of testing variable.
         # description_key: List of key points about the indicator.
-        # presentation:
-          # title_variant:
         processing_level: major
-        description_processing: "{definitions.unreliable_data}"
+        description_processing: "{definitions.description_processing_unreliable_data}"
         display:
           name: Average hourly earnings of employees - <<sex>> - <<classif1>>
           numDecimalPlaces: 1
@@ -287,10 +295,8 @@ tables:
         short_unit: "%"
         # description_short: Short description of testing variable.
         # description_key: List of key points about the indicator.
-        # presentation:
-          # title_variant:
         processing_level: major
-        description_processing: "{definitions.unreliable_data}"
+        description_processing: "{definitions.description_processing_unreliable_data}"
         display:
           name: Unemployment rate (<<sex>> - <<classif1>>)
           numDecimalPlaces: 1
@@ -302,10 +308,8 @@ tables:
         short_unit: "%"
         # description_short: Short description of testing variable.
         # description_key: List of key points about the indicator.
-        # presentation:
-          # title_variant:
         processing_level: major
-        description_processing: "{definitions.unreliable_data}"
+        description_processing: "{definitions.description_processing_unreliable_data}"
         display:
           name: Unemployment rate by disability status (<<sex>> - <<classif1>>)
           numDecimalPlaces: 1
@@ -317,10 +321,8 @@ tables:
         short_unit: "%"
         # description_short: Short description of testing variable.
         # description_key: List of key points about the indicator.
-        # presentation:
-          # title_variant:
         processing_level: major
-        description_processing: "{definitions.unreliable_data}"
+        description_processing: "{definitions.description_processing_unreliable_data}"
         display:
           name: Proportion of youth (aged 15-24) not in education, employment or training (NEET) - <<sex>>
           numDecimalPlaces: 1
@@ -332,10 +334,8 @@ tables:
         short_unit: "%"
         # description_short: Short description of testing variable.
         # description_key: List of key points about the indicator.
-        # presentation:
-          # title_variant:
         processing_level: major
-        description_processing: "{definitions.unreliable_data}"
+        description_processing: "{definitions.description_processing_unreliable_data}"
         display:
           name: Proportion of children engaged in economic activity - <<sex>> - <<classif1>>
           numDecimalPlaces: 1
@@ -347,10 +347,8 @@ tables:
         short_unit: "%"
         # description_short: Short description of testing variable.
         # description_key: List of key points about the indicator.
-        # presentation:
-          # title_variant:
         processing_level: major
-        description_processing: "{definitions.unreliable_data}"
+        description_processing: "{definitions.description_processing_unreliable_data}"
         display:
           name: Proportion of children engaged in economic activity and household chores - <<sex>> - <<classif1>>
           numDecimalPlaces: 1
@@ -362,10 +360,8 @@ tables:
         short_unit: ""
         # description_short: Short description of testing variable.
         # description_key: List of key points about the indicator.
-        # presentation:
-          # title_variant:
         processing_level: major
-        description_processing: "{definitions.unreliable_data}"
+        description_processing: "{definitions.description_processing_unreliable_data}"
         display:
           name: Fatal occupational injuries per 100,000 workers - <<sex>> - <<classif1>>
           numDecimalPlaces: 1
@@ -377,8 +373,6 @@ tables:
         short_unit: ""
         # description_short: Short description of testing variable.
         # description_key: List of key points about the indicator.
-        # presentation:
-          # title_variant:
         display:
           name: Non-fatal occupational injuries per 100,000 workers - <<sex>> - <<classif1>>
           numDecimalPlaces: 1
@@ -390,8 +384,6 @@ tables:
         short_unit: ""
         # description_short: Short description of testing variable.
         # description_key: List of key points about the indicator.
-        # presentation:
-          # title_variant:
         display:
           name: Level of national compliance with labor rights
           numDecimalPlaces: 1
@@ -403,8 +395,6 @@ tables:
         short_unit: ""
         # description_short: Short description of testing variable.
         # description_key: List of key points about the indicator.
-        # presentation:
-          # title_variant:
         display:
           name: Existence of a developed and operationalized national strategy for youth employment
           numDecimalPlaces: 1
@@ -416,10 +406,8 @@ tables:
         short_unit: "%"
         # description_short: Short description of testing variable.
         # description_key: List of key points about the indicator.
-        # presentation:
-          # title_variant:
         processing_level: major
-        description_processing: "{definitions.unreliable_data}"
+        description_processing: "{definitions.description_processing_unreliable_data}"
         display:
           name: Manufacturing employment as a proportion of total employment
           numDecimalPlaces: 1
@@ -431,8 +419,6 @@ tables:
         short_unit: "%"
         # description_short: Short description of testing variable.
         # description_key: List of key points about the indicator.
-        # presentation:
-          # title_variant:
         display:
           name: Labor income share as a percent of GDP
           numDecimalPlaces: 1
