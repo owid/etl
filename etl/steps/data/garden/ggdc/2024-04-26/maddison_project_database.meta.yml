@@ -5,7 +5,7 @@ definitions:
     display: &common-display
       numDecimalPlaces: 0
       tolerance: 5
-      entityAnnotationsMap: "Western offshoots (MPD): United States, Canada, Australia and New Zealand"
+      entityAnnotationsMap: "Western offshoots (Maddison): United States, Canada, Australia and New Zealand"
     presentation:
       attribution_short: Maddison Project Database
       topic_tags:
@@ -22,10 +22,21 @@ definitions:
   description_key_long_run: This indicator provides information on economic growth and income levels in the _very long run_. Some country estimates are available as far back as 1 CE, and regional estimates as far back as 1820 CE.
   description_key_ppp_adjustment: This data is adjusted for inflation and differences in living costs between countries.
   description_key_ppp_prices: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at {definitions.ppp_year} prices, using a combination of {definitions.ppp_year} and 1990 PPPs for historical data.
-  description_key_former: Time series for former countries and territories are calculated forward in time by estimating values based on their last official borders.
+  description_key_former: Time series for former countries and territories are calculated forward by estimating values based on their last official borders.
+
+  description_key_gdp_per_capita_introduction: GDP per capita is a comprehensive measure of people's average income. It helps compare income levels across countries and track how they change over time. It is especially useful for understanding trends in economic growth and living standards.
+  description_key_gdp_per_capita_definition: GDP per capita is calculated as the value of all final goods and services produced each year in a country (the [gross domestic product](#dod:gdp)), divided by the population. It represents the average economic output per person.
+  description_key_gdp_per_capita_inequality: This indicator shows the large inequality between people in different countries. In the poorest countries, average incomes are below $1,000 per year; in rich countries, they are more than 50 times higher.
+  description_key_gdp_per_capita_mpd: This data comes from the [Maddison Project Database](https://www.rug.nl/ggdc/historicaldevelopment/maddison/releases/maddison-project-database-2023), which provides GDP per capita estimates for the _very long run_. Some country series extend as far back as 1 CE, and regional estimates start in 1820.
+  description_key_gdp_per_capita_researchers: This work builds on the efforts of many researchers who have carefully reconstructed historical data on economic growth and population for individual countries. You can find the full list of sources in [the original dataset](https://dataverse.nl/api/access/datafile/421302).
+  description_key_gdp_international_dollars: This data is expressed in constant international dollars at {definitions.ppp_year} prices to adjust for inflation and differences in living costs between countries. Read more in our article, [What are international dollars?](https://ourworldindata.org/international-dollars)
+  description_key_gdp_per_capita_ppp_method: This dataset combines multiple [purchasing power parity](#dod:purchasing-power-parity) (PPP) benchmarks to ensure historical consistency and comparability over time. 1990 PPPs are used up to 1990, and 2011 PPPs are used from 2011 onward. For the years in between, they adjust the series to smoothly connect the two benchmarks. This approach preserves consistency with the original long-run estimates calculated by Angus Maddison.
+  description_key_gdp_per_capita_world_bank: For more frequently updated estimates since 1990, explore our chart of GDP per capita from the [World Bank](https://ourworldindata.org/grapher/gdp-per-capita-worldbank).
 
   description_short_gdp: Total economic output of a country or region per year.
   description_short_gdp_per_capita: Average economic output per person in a country or region per year.
+
+  subtitle_gdp_per_capita: GDP per capita is a country's [gross domestic product](#dod:gdp) divided by its population.
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -55,20 +66,20 @@ tables:
           <<: *common-display
         presentation:
           title_public: Gross domestic product (GDP)
-          title_variant: In constant international-$. Historical data
+          title_variant: Long-run data in constant international-$
           faqs:
             - fragment_id: poverty-international-dollars
               gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
           grapher_config:
             title: Gross domestic product (GDP)
-            subtitle: >-
+            subtitle: |-
               {definitions.description_key_ppp_adjustment}
-            note: >-
+            note: |-
               {definitions.note_ppp_adjustment}
             hideRelativeToggle: false
             hasMapTab: true
             tab: map
-            variantName: In constant international-$. Historical data - Maddison Project Database
+            variantName: Long-run data in constant international-$ - Maddison Project Database
             originUrl: https://ourworldindata.org/economic-growth
             yAxis:
               min: 0
@@ -105,14 +116,15 @@ tables:
         short_unit: $
         description_short: "{definitions.description_short_gdp_per_capita} {definitions.description_key_ppp_adjustment}"
         description_key:
-          - "{definitions.description_key_attribution}"
-          - "{definitions.description_key_gdp} {definitions.description_key_gdp_per_capita}"
-          - "{definitions.description_key_long_run}"
-          - "{definitions.description_key_ppp_adjustment}"
-          - "{definitions.description_key_ppp_prices}"
+          - "{definitions.description_key_gdp_per_capita_introduction}"
+          - "{definitions.description_key_gdp_per_capita_definition}"
+          - "{definitions.description_key_gdp_per_capita_inequality}"
+          - "{definitions.description_key_gdp_per_capita_mpd}"
+          - "{definitions.description_key_gdp_per_capita_researchers}"
+          - "{definitions.description_key_gdp_international_dollars}"
+          - "{definitions.description_key_gdp_per_capita_ppp_method}"
           - "{definitions.description_key_former}"
-          - For more regularly updated estimates of GDP per capita since 1990, see the [World Bank's indicator](https://ourworldindata.org/grapher/gdp-per-capita-worldbank).
-
+          - "{definitions.description_key_gdp_per_capita_world_bank}"
         description_from_producer: |-
           Real GDP per capita in 2011$
 
@@ -140,21 +152,21 @@ tables:
           <<: *common-display
         presentation:
           title_public: GDP per capita
-          title_variant: In constant international-$. Historical data
+          title_variant: Long-run data in constant international-$
           faqs:
             - fragment_id: poverty-international-dollars
               gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
           grapher_config:
             $schema: https://files.ourworldindata.org/schemas/grapher-schema.008.json
             title: GDP per capita
-            subtitle: >-
-              {definitions.description_key_ppp_adjustment}
-            note: >-
+            subtitle: |-
+              {definitions.subtitle_gdp_per_capita} {definitions.description_key_ppp_adjustment}
+            note: |-
               {definitions.note_ppp_adjustment}
             hideRelativeToggle: false
             hasMapTab: true
             tab: map
-            variantName: Maddison Project Database, constant international-$
+            variantName: Long-run data in constant international-$ - Maddison Project Database
             originUrl: https://ourworldindata.org/economic-growth
             yAxis:
               min: 0
@@ -164,7 +176,6 @@ tables:
               colorScale:
                 baseColorScheme: GnBu
                 binningStrategy: manual
-                binningStrategyBinCount: 9
                 customNumericValues:
                   - 0
                   - 1000
@@ -176,14 +187,14 @@ tables:
                   - 1
             selectedEntityNames:
               - World
-              - Western Europe (MPD)
-              - Eastern Europe (MPD)
-              - Latin America (MPD)
-              - East Asia (MPD)
-              - Western offshoots (MPD)
-              - Sub Saharan Africa (MPD)
-              - South and South East Asia (MPD)
-              - Middle East and North Africa (MPD)
+              - Western Europe (Maddison)
+              - Eastern Europe (Maddison)
+              - Latin America (Maddison)
+              - East Asia (Maddison)
+              - Western offshoots (Maddison)
+              - Sub Saharan Africa (Maddison)
+              - South and South East Asia (Maddison)
+              - Middle East and North Africa (Maddison)
 
       population:
         title: Population
