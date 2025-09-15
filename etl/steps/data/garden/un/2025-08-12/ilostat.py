@@ -1,5 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import bleach
+import html2text
 import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Table
@@ -185,6 +187,9 @@ def run() -> None:
     # Keep relevant columns
     tb = tb[COLUMNS_TO_KEEP]
 
+    # Make indicator_description in Markdown format instead of HTML
+    tb_indicator["indicator_description"] = tb_indicator["indicator_description"].apply(html_to_markdown)
+
     tb = add_indicator_metadata(tb=tb, tb_metadata=tb_indicator, column="indicator")
     tb = add_indicator_metadata(tb=tb, tb_metadata=tb_sex, column="sex")
     tb = add_indicator_metadata(tb=tb, tb_metadata=tb_classif1, column="classif1")
@@ -295,8 +300,8 @@ def add_indicator_metadata(tb: Table, tb_metadata: Table, column: str) -> Table:
         set(tb[column].unique()) == set(COLUMN_CATEGORIES[column].keys())
     ), f"Some {column} are missing in the column categories mapping: {set(tb[column].unique()) - set(COLUMN_CATEGORIES[column].keys())}"
 
-    # Multiply observations by 1000 when the indicator is in thousands
     if column == "indicator":
+        # Multiply observations by 1000 when the indicator is in thousands
         tb.loc[tb[column].str.contains("(thousands)", case=False, na=False, regex=False), "obs_value"] *= 1000
 
     # Rename categories in column
@@ -350,3 +355,19 @@ def make_table_wide(tb: Table) -> Table:
         tb[indicator].metadata.description_from_producer = indicator_dict[indicator]
 
     return tb
+
+
+def html_to_markdown(text: str) -> str:
+    """Convert HTML text to Markdown using html2text."""
+    if pd.isna(text):
+        return pd.NA
+
+    # Configure html2text
+    h = html2text.HTML2Text()
+    h.body_width = 0  # don't wrap lines
+    h.ignore_images = True
+    h.ignore_links = False
+    h.single_line_break = False
+    md = h.handle(text).strip()
+
+    return md or pd.NA
