@@ -20,7 +20,12 @@ from pydantic_ai.models.openai import OpenAIResponsesModelSettings
 from pydantic_ai.tools import RunContext
 
 from apps.wizard.app_pages.expert_agent.utils import CURRENT_DIR
-from etl.analytics import ANALYTICS_URL, clean_sql_query, read_datasette
+from etl.analytics import (
+    ANALYTICS_URL,
+    DatasetteSQLError,
+    clean_sql_query,
+    read_datasette,
+)
 from etl.config import GOOGLE_API_KEY, LOGFIRE_TOKEN_EXPERT, OWID_MCP_SERVER_URL
 from etl.docs import (
     render_collection,
@@ -428,19 +433,19 @@ async def get_api_reference_metadata(
             return "Invalid object name: " + object_name
 
 
-@agent.tool_plain(docstring_format="google")
-async def generate_url_to_datasette(query: str) -> str:
-    """Generate a URL to the Datasette instance with the given query.
+# @agent.tool_plain(docstring_format="google")
+# async def generate_url_to_datasette(query: str) -> str:
+#     """Generate a URL to the Datasette instance with the given query.
 
-    Args:
-        query: Query to Datasette instance.
-    Returns:
-        str: URL to the Datasette instance with the query. The URL links to a datasette preview with the SQL query and its results.
-    """
-    st.markdown(
-        "**:material/construction: Tool use**: Generating Datasette query URL, via `generate_url_to_datasette`"
-    )  # , icon=":material/calculate:")
-    return _generate_url_to_datasette(query)
+#     Args:
+#         query: Query to Datasette instance.
+#     Returns:
+#         str: URL to the Datasette instance with the query. The URL links to a datasette preview with the SQL query and its results.
+#     """
+#     st.markdown(
+#         "**:material/construction: Tool use**: Generating Datasette query URL, via `generate_url_to_datasette`"
+#     )  # , icon=":material/calculate:")
+#     return _generate_url_to_datasette(query)
 
 
 def _generate_url_to_datasette(query: str) -> str:
@@ -448,53 +453,62 @@ def _generate_url_to_datasette(query: str) -> str:
     return f"{ANALYTICS_URL}?" + urllib.parse.urlencode({"sql": query, "_size": "max"})
 
 
-@agent.tool_plain(docstring_format="google")
-async def validate_datasette_query(query: str) -> str:
-    """Validate an SQL query.
+# @agent.tool_plain(docstring_format="google")
+# async def validate_datasette_query(query: str) -> str:
+#     """Validate an SQL query.
 
-    Args:
-        query: Query to Datasette instance.
-    Returns:
-        str: Validation result message. If the query is not valid, it will return an error message. Use it to improve the query!
-    """
-    st.markdown(
-        "**:material/construction: Tool use**: Validating Datasette query, via `validate_datasette_query`"
-    )  # , icon=":material/calculate:")
-    url = _generate_url_to_datasette(f"{query}")
-    url = url.replace(ANALYTICS_URL, ANALYTICS_URL + ".json")
-    response = requests.get(url).json()
-    if response["ok"]:
-        if ("rows" not in response) or not isinstance(response["rows"], list):
-            text = "Query is invalid! Check for correctness, it must be DuckDB compatible! Seems like no rows were returned."
-        elif len(response["rows"]) == 0:
-            text = "Query is valid, but it returned no results."
-        else:
-            text = "Query is valid!"
-    else:
-        text = f"Query is invalid! Check for correctness, it must be DuckDB compatible! `\nError: {response['error']}"
-    return text
+#     Args:
+#         query: Query to Datasette instance.
+#     Returns:
+#         str: Validation result message. If the query is not valid, it will return an error message. Use it to improve the query!
+#     """
+#     st.markdown(
+#         "**:material/construction: Tool use**: Validating Datasette query, via `validate_datasette_query`"
+#     )  # , icon=":material/calculate:")
+#     url = _generate_url_to_datasette(f"{query}")
+#     url = url.replace(ANALYTICS_URL, ANALYTICS_URL + ".json")
+#     response = requests.get(url).json()
+#     if response["ok"]:
+#         if ("rows" not in response) or not isinstance(response["rows"], list):
+#             text = "Query is invalid! Check for correctness, it must be DuckDB compatible! Seems like no rows were returned."
+#         elif len(response["rows"]) == 0:
+#             text = "Query is valid, but it returned no results."
+#         else:
+#             text = "Query is valid!"
+#     else:
+#         text = f"Query is invalid! Check for correctness, it must be DuckDB compatible! `\nError: {response['error']}"
+#     return text
 
 
 @agent.tool_plain(docstring_format="google")
 async def get_data_from_datasette(query: str, num_rows: int = 10) -> str:
     """Execute a query in the semantic layer in Datasette and get the actual data results.
 
-    This only shows the first 10 rows of the result, as a markdown table.
+    This shows the first N rows of the result as a markdown table. If the query is invalid,
+    it returns an error message that can be used to improve the query.
 
     Args:
         query: Query to Datasette instance.
         num_rows: Number of rows to return. Defaults to 10. Too many rows may increase the tokens. Be mindful when increasing this number.
     Returns:
-        pd.DataFrame: DataFrame with the results of the query.
+        str: Either a markdown table with the results or an error message if the query is invalid. Also includes a clickable Datasette link.
     """
     st.markdown(
         f"**:material/construction: Tool use**: Getting data ({num_rows} rows) from Datasette, via `get_data_from_datasette`"
     )  # , icon=":material/calculate:")
-    df = read_datasette(query, use_https=False)
-    if df.empty:
-        return ""
 
-    result = df.head(num_rows).to_markdown(index=False)
-    if result is None:
-        return ""
-    return result
+    try:
+        df = read_datasette(query, use_https=False)
+        datasette_url = _generate_url_to_datasette(query)
+
+        if df.empty:
+            return f"Query returned no results.\n\n[Run this query in Datasette]({datasette_url})"
+
+        result = df.head(num_rows).to_markdown(index=False)
+        if result is None:
+            return f"Query returned no results.\n\n[Run this query in Datasette]({datasette_url})"
+
+        return f"{result}\n\n[Run this query in Datasette]({datasette_url})"
+    except (DatasetteSQLError,) as e:
+        # Handle specific Datasette-related errors
+        return f"Query is invalid! Check for correctness, it must be DuckDB compatible!\nError: {e}"

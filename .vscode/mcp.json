@@ -2,11 +2,11 @@
 	"servers": {
 		"owid": {
 			"type": "http",
-			"url": "https://mcp.owid.io/mcp/"
+			"url": "https://mcp.owid.io/mcp"
 		},
 		"owid-dev": {
-			"url": "http://0.0.0.0:8080/mcp/",
-			"type": "http"
+			"type": "http",
+			"url": "http://0.0.0.0:8080/mcp"
 		}
 	},
 	"inputs": []
