@@ -202,7 +202,7 @@ def _call_snapshot_function(
 
         try:
             func(**kwargs)
-        except TypeError as e:
+        except TypeError:
             if path_to_file is not None and "path_to_file" not in sig.parameters:
                 raise click.ClickException(
                     f"Script {script_path} {func_name}() function doesn't accept --path-to-file argument"

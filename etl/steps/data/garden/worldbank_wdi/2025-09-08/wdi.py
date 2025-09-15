@@ -44,7 +44,7 @@ REGIONS_AGG = [
     "North America (WB)",
     "Sub-Saharan Africa (WB)",
     "East Asia and Pacific (WB)",
-    "Middle East and North Africa (WB)",
+    "Middle East, North Africa, Afghanistan and Pakistan (WB)",
     "Europe and Central Asia (WB)",
     "Latin America and Caribbean (WB)",
     "World",

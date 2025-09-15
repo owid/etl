@@ -14,7 +14,7 @@ def run() -> None:
     ds_garden = paths.load_dataset("wdi")
 
     # Read table from garden dataset.
-    tb = ds_garden["wdi"]
+    tb = ds_garden.read("wdi", reset_index=False)
 
     #
     # Save outputs.
