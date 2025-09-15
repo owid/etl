@@ -68,7 +68,6 @@ def run() -> None:
     # --- Harmonize & keep only the two indicators we actually use ----------------
     tb_long = _harmonize_countries(tb_long)
     tb_long = tb_long[tb_long["indicator"].isin([EXPORT_COL, IMPORT_COL])].copy()
-    tb_long = tb_long.dropna(subset=["value"])
 
     # --- Historical overlaps: remove both on exporter side and partner side -----
     tb_long = clean_historical_overlaps(tb_long, country_col="country")
@@ -82,6 +81,13 @@ def run() -> None:
     tb_all_countries = tb_long[
         (tb_long["country"].isin(members)) & (tb_long["counterpart_country"].isin(members))
     ].copy()
+
+    # --- Trade relationships (bilateral, unilateral, non-trading) - needs to be calculated before NaNs are excluded   --------------
+    tb_partnerships = calculate_trade_relationship_shares(tb_all_countries)
+
+    # Drop nans in value column to avoid issues when doing certain calculations later
+    tb_long = tb_long.dropna(subset=["value"])
+    tb_all_countries = tb_all_countries.dropna(subset=["value"])
 
     # --- Add regional aggregates on both axes (plus Asia excl. China) -----------
     tb_long = _add_regional_aggregates(tb_long, ds_regions)
@@ -143,6 +149,7 @@ def run() -> None:
         how="left",
     )
 
+    tb = pr.concat([tb, tb_partnerships], ignore_index=True)
     # --- Format, add origins & save ----------------------------------------------------
     tb = tb.format(["country", "year", "counterpart_country"])
     for column in tb.columns:
@@ -405,10 +412,11 @@ def clean_historical_overlaps(tb: Table, country_col: str = "country") -> Table:
 
 
 def calculate_trade_relationship_shares(tb: Table) -> Table:
-    """(Currently unused but might need it later) Example of classifying bilateral/unilateral/non-trading shares."""
-    THRESHOLD = 0.01
+    THRESHOLD = 0.01  # million USD
+
     df = tb[tb.indicator.isin([EXPORT_COL, IMPORT_COL])].assign(has_trade=lambda d: d.value.fillna(0) > THRESHOLD)
 
+    #    This uses vectorized minimum/maximum on object‑dtypes:
     c1 = df[["country", "counterpart_country"]]
     df["pair"] = pd.Series(
         np.where(
@@ -420,9 +428,14 @@ def calculate_trade_relationship_shares(tb: Table) -> Table:
     )
 
     active = df[df.has_trade]
-    dir_counts = active.groupby(["year", "pair"])["country"].nunique().reset_index(name="n_dirs")
+    dir_counts = (
+        active.groupby(["year", "pair"])["country"]
+        .nunique()  # how many unique “origins” per pair-year (1 or 2)
+        .reset_index(name="n_dirs")
+    )
 
     all_pairs = df[["year", "pair"]].drop_duplicates()
+
     status = all_pairs.merge(dir_counts, on=["year", "pair"], how="left").fillna({"n_dirs": 0})
 
     status["relationship"] = pd.cut(
@@ -430,9 +443,17 @@ def calculate_trade_relationship_shares(tb: Table) -> Table:
     )
 
     counts = status.groupby(["year", "relationship"]).size().unstack(fill_value=0)
+
     total = counts.sum(axis=1)
     shares = counts.divide(total, axis=0).multiply(100)
     shares = shares.rename(
-        columns={"bilateral": "share_bilateral", "unilateral": "share_unilateral", "non_trading": "share_non_trading"}
+        columns={
+            "bilateral": "share_bilateral",
+            "unilateral": "share_unilateral",
+            "non_trading": "share_non_trading",
+        }
     ).reset_index()
-    return shares
+
+    shares["country"] = "World"
+
+    return shares[["country", "year", "share_bilateral", "share_unilateral", "share_non_trading"]]
