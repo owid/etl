@@ -21,7 +21,7 @@ from pydantic_ai.tools import RunContext
 
 from apps.wizard.app_pages.expert_agent.utils import CURRENT_DIR
 from etl.analytics import ANALYTICS_URL, clean_sql_query, read_datasette
-from etl.config import GOOGLE_API_KEY, LOGFIRE_TOKEN_EXPERT
+from etl.config import GOOGLE_API_KEY, LOGFIRE_TOKEN_EXPERT, OWID_MCP_SERVER_URL
 from etl.docs import (
     render_collection,
     render_dataset,
@@ -93,7 +93,7 @@ async def process_tool_call(
 
 # OWID Prod MCP server
 mcp_server_prod = MCPServerStreamableHTTP(
-    url="https://mcp.owid.io/mcp",
+    url=OWID_MCP_SERVER_URL,
     process_tool_call=process_tool_call,
     tool_prefix="owid_data_",
 )

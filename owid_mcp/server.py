@@ -117,13 +117,10 @@ async def setup_server():
     await mcp.import_server(deep_research.mcp)
 
 
-# Create an event loop and setup the server
-if __name__ != "__main__":
-    asyncio.run(setup_server())
-
-
 # ---------------------------------------------------------------------------
 # Entrypoint
 # ---------------------------------------------------------------------------
 if __name__ == "__main__":
-    mcp.run(stateless_http=True)
+    # Setup the server before running
+    asyncio.run(setup_server())
+    mcp.run(transport="http", host="0.0.0.0", port=8080, stateless_http=True)
