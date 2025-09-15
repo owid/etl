@@ -221,6 +221,7 @@
   "East Asia & Pacific": "East Asia and Pacific (WB)",
   "Europe & Central Asia": "Europe and Central Asia (WB)",
   "Latin America & Caribbean": "Latin America and Caribbean (WB)",
+  "Middle East, North Africa, Afghanistan & Pakistan": "Middle East, North Africa, Afghanistan and Pakistan (WB)",
   "North America": "North America (WB)",
   "South Asia": "South Asia (WB)",
   "Sub-Saharan Africa": "Sub-Saharan Africa (WB)",
@@ -230,6 +231,5 @@
   "Upper middle income": "Upper-middle-income countries",
   "High income": "High-income countries",
 
-  "European Union": "European Union (27)",
-  "Middle East, North Africa, Afghanistan & Pakistan": "Middle East, North Africa, Afghanistan and Pakistan (WB)"
+  "European Union": "European Union (27)"
 }
