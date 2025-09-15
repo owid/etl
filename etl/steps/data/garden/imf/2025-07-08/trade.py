@@ -82,6 +82,7 @@ def run() -> None:
         (tb_long["country"].isin(members)) & (tb_long["counterpart_country"].isin(members))
     ].copy()
 
+    # --- Trade relationships (bilateral, unilateral, non-trading) - needs to be calculated before NaNs are excluded   --------------
     tb_partnerships = calculate_trade_relationship_shares(tb_all_countries)
 
     # Drop nans in value column to avoid issues when doing certain calculations later
