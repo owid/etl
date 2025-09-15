@@ -714,3 +714,36 @@ steps:
     - snapshot://artificial_intelligence/2024-06-28/ai_phds.csv
   data://grapher/artificial_intelligence/2024-06-28/ai_phds:
     - data://garden/artificial_intelligence/2024-06-28/ai_phds
+
+
+#
+# Papers with code
+#
+# Artificial Intelligence Papers with Code (benchmarks) - 2025
+  data://meadow/artificial_intelligence/2025-02-17/papers_with_code_coding:
+    - snapshot://artificial_intelligence/2025-02-17/papers_with_code_coding.html
+  data://garden/artificial_intelligence/2025-02-17/papers_with_code_coding:
+    - data://meadow/artificial_intelligence/2025-02-17/papers_with_code_coding
+  data://grapher/artificial_intelligence/2025-02-17/papers_with_code_coding:
+    - data://garden/artificial_intelligence/2025-02-17/papers_with_code_coding
+
+  data://meadow/artificial_intelligence/2025-02-17/papers_with_code_language:
+    - snapshot://artificial_intelligence/2025-02-17/papers_with_code_language.html
+  data://garden/artificial_intelligence/2025-02-17/papers_with_code_language:
+    - data://meadow/artificial_intelligence/2025-02-17/papers_with_code_language
+  data://grapher/artificial_intelligence/2025-02-17/papers_with_code_language:
+    - data://garden/artificial_intelligence/2025-02-17/papers_with_code_language
+
+  data://meadow/artificial_intelligence/2025-02-17/papers_with_code_math:
+    - snapshot://artificial_intelligence/2025-02-17/papers_with_code_math.html
+  data://garden/artificial_intelligence/2025-02-17/papers_with_code_math:
+    - data://meadow/artificial_intelligence/2025-02-17/papers_with_code_math
+  data://grapher/artificial_intelligence/2025-02-17/papers_with_code_math:
+    - data://garden/artificial_intelligence/2025-02-17/papers_with_code_math
+
+  data://meadow/artificial_intelligence/2025-02-17/papers_with_code_imagenet:
+    - snapshot://artificial_intelligence/2025-02-17/papers_with_code_imagenet.html
+  data://garden/artificial_intelligence/2025-02-17/papers_with_code_imagenet:
+    - data://meadow/artificial_intelligence/2025-02-17/papers_with_code_imagenet
+  data://grapher/artificial_intelligence/2025-02-17/papers_with_code_imagenet:
+    - data://garden/artificial_intelligence/2025-02-17/papers_with_code_imagenet
