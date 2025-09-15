@@ -149,7 +149,7 @@
   "Philippines": "Philippines",
   "Poland": "Poland",
   "Portugal": "Portugal",
-  "Puerto Rico": "Puerto Rico",
+  "Puerto Rico (US)": "Puerto Rico",
   "Qatar": "Qatar",
   "Romania": "Romania",
   "Russian Federation": "Russia",
@@ -231,5 +231,6 @@
   "Upper middle income": "Upper-middle-income countries",
   "High income": "High-income countries",
 
-  "European Union": "European Union (27)"
+  "European Union": "European Union (27)",
+  "Middle East, North Africa, Afghanistan & Pakistan": "Middle East, North Africa, Afghanistan and Pakistan (WB)"
 }
