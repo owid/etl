@@ -299,7 +299,7 @@ tables:
         title: Share of country pairs with bilateral trade
         unit: "%"
         short_unit: "%"
-        description_short: Country pairs are grouped as bilateral if both countries in the pair reported merchandise [imports](#dod:merchandise-imports) and [exports](#dod:merchandise-exports) with each other.
+        description_short: Trade relationships are bilateral when countries both [import](#dod:merchandise-imports) from and [export](#dod:merchandise-exports) to each other.
         description_key: *description_key_trade_relationships
         description_processing: *description_processing_partnerships
         presentation:
@@ -312,7 +312,7 @@ tables:
         title: Share of country pairs with unilateral trade
         unit: "%"
         short_unit: "%"
-        description_short: Country pairs are grouped as unilateral if only one country in the pair reported merchandise [imports](#dod:merchandise-imports) or [exports](#dod:merchandise-exports).
+        description_short: Trade relationships are unilateral when only one country in the pair [imports](#dod:merchandise-imports) from or [exports](#dod:merchandise-exports) to the other country.
         description_key: *description_key_trade_relationships
         description_processing: *description_processing_partnerships
         presentation:
@@ -325,8 +325,7 @@ tables:
         title: Share of non-trading partnerships
         unit: "%"
         short_unit: "%"
-        description_short: Country pairs are grouped as non-trading if neither reported merchandise [imports](#dod:merchandise-imports) nor [exports](#dod:merchandise-exports).
-        description_key: *description_key_trade_relationships
+        description_short: Trade relationships are non-trading when neither country in the pair [imports](#dod:merchandise-imports) from or [exports](#dod:merchandise-exports) to the other country.
         description_processing: *description_processing_partnerships
         presentation:
           title_public: Share of non-trading partnerships
