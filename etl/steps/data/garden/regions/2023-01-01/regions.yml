@@ -2185,6 +2185,34 @@
     - "VUT"
     - "WLF"
     - "WSM"
+- code: WB_MENAP
+  name: "Middle East, North Africa, Afghanistan and Pakistan (WB)"
+  region_type: "aggregate"
+  defined_by: wb
+  members:
+    - "AFG"
+    - "ARE"
+    - "BHR"
+    - "DJI"
+    - "DZA"
+    - "EGY"
+    - "IRN"
+    - "IRQ"
+    - "ISR"
+    - "JOR"
+    - "KWT"
+    - "LBN"
+    - "LBY"
+    - "MAR"
+    - "MLT"
+    - "OMN"
+    - "PAK"
+    - "PSE"
+    - "QAT"
+    - "SAU"
+    - "SYR"
+    - "TUN"
+    - "YEM"
 
 ##########
 # UN M49
