@@ -21,3 +21,7 @@ meta:
     license:
       name: CC BY 4.0
       url: https://creativecommons.org/licenses/by/4.0/
+outs:
+  - md5: 92a4923dc15e29707f33f8eb589d236d
+    size: 183
+    path: cherry_blossom.csv
