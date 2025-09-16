@@ -1936,6 +1936,7 @@
     - "VEN"
     - "VGB"
     - "VIR"
+# WB_MENA was replaced by WB_MENAP in newer versions of the WB regions
 - code: WB_MENA
   name: "Middle East and North Africa (WB)"
   region_type: "aggregate"
