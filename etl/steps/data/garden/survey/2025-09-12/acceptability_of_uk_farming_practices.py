@@ -78,8 +78,6 @@ def run() -> None:
     # For some reason, indicators' metadata is not propagated, copy it from the original table.
     for column in tb_counts.columns:
         tb_counts[column] = tb_counts[column].copy_metadata(tb["answer"])
-        tb_counts[column].metadata.unit = ""
-        tb_counts[column].metadata.short_unit = ""
 
     #
     # Save outputs.
