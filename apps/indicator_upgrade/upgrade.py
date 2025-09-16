@@ -16,7 +16,7 @@ from etl.files import get_schema_from_url
 from etl.indicator_upgrade.indicator_update import find_charts_from_variable_ids, update_chart_config
 
 # Default number of parallel workers
-DEFAULT_MAX_WORKERS = 3
+DEFAULT_MAX_WORKERS = 5
 
 log = get_logger()
 
