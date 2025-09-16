@@ -1936,18 +1936,17 @@
     - "VEN"
     - "VGB"
     - "VIR"
-# WB_MENA was replaced by WB_MENAP in newer versions of the WB regions
-- code: WB_MENA
-  name: "Middle East and North Africa (WB)"
+- code: WB_MENAP
+  name: "Middle East, North Africa, Afghanistan and Pakistan (WB)"
   region_type: "aggregate"
   defined_by: wb
   members:
+    - "AFG"
     - "ARE"
     - "BHR"
     - "DJI"
     - "DZA"
     - "EGY"
-    - "ESH"
     - "IRN"
     - "IRQ"
     - "ISR"
@@ -1958,8 +1957,7 @@
     - "MAR"
     - "MLT"
     - "OMN"
-    - "OWID_YAR"
-    - "OWID_YPR"
+    - "PAK"
     - "PSE"
     - "QAT"
     - "SAU"
@@ -2186,34 +2184,6 @@
     - "VUT"
     - "WLF"
     - "WSM"
-- code: WB_MENAP
-  name: "Middle East, North Africa, Afghanistan and Pakistan (WB)"
-  region_type: "aggregate"
-  defined_by: wb
-  members:
-    - "AFG"
-    - "ARE"
-    - "BHR"
-    - "DJI"
-    - "DZA"
-    - "EGY"
-    - "IRN"
-    - "IRQ"
-    - "ISR"
-    - "JOR"
-    - "KWT"
-    - "LBN"
-    - "LBY"
-    - "MAR"
-    - "MLT"
-    - "OMN"
-    - "PAK"
-    - "PSE"
-    - "QAT"
-    - "SAU"
-    - "SYR"
-    - "TUN"
-    - "YEM"
 
 ##########
 # UN M49
