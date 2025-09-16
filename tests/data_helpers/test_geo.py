@@ -3136,6 +3136,46 @@ class TestRegionAggregator(unittest.TestCase):
         self.assertListEqual(result["country"].tolist(), ["France", "Italy"])
         self.assertNotIn("NonexistentRegion", result["country"].tolist())
 
+    def test_partial_aggregation_preserves_existing_data(self):
+        """Test that when adding aggregates for only some columns, existing data
+        for non-aggregated columns is preserved (not deleted)."""
+        # Create test data where Europe already exists with data for multiple columns
+        tb_with_existing_europe = Table(
+            {
+                "country": ["France", "Italy", "Europe", "Europe"],
+                "year": [2020, 2020, 2020, 2021],
+                "gdp": [100, 200, 999, 888],  # Europe already has GDP data that should be replaced
+                "population": [67, 60, 777, 666],  # Europe already has population data that should be preserved
+                "area": [551, 301, 555, 444],  # Europe already has area data that should be preserved
+            }
+        )
+
+        # Create aggregator that only aggregates GDP (not population or area)
+        aggregator = geo.RegionAggregator(
+            ds_regions=self.ds_regions,
+            regions_all=self.regions_all,
+            regions=["Europe"],
+            aggregations={"gdp": "sum"},  # Only aggregating GDP, not population or area
+            ds_income_groups=self.ds_income_groups,
+        )
+
+        result = aggregator.add_aggregates(
+            tb_with_existing_europe,
+            check_for_region_overlaps=False,
+        )
+
+        # Get Europe data
+        europe_data = result[result["country"] == "Europe"].set_index("year").sort_index()
+
+        # GDP should be replaced with new aggregates (France + Italy)
+        self.assertEqual(europe_data.loc[2020, "gdp"], 300)  # 100 + 200 (aggregated)
+
+        # Population and area should be preserved from original Europe data
+        self.assertEqual(europe_data.loc[2020, "population"], 777)  # Original preserved
+        self.assertEqual(europe_data.loc[2020, "area"], 555)  # Original preserved
+        self.assertEqual(europe_data.loc[2021, "population"], 666)  # Original preserved
+        self.assertEqual(europe_data.loc[2021, "area"], 444)  # Original preserved
+
     def test_partial_aggregation_new_region_gets_nan_for_non_aggregated(self):
         """Test that when adding aggregates for only some columns, new regions
         get NaN for non-aggregated columns."""
