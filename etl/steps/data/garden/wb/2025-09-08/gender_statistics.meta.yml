@@ -201,10 +201,10 @@ tables:
         title: There is legislation specifically addressing domestic violence
         description_short: The law on domestic violence may punish offenders, provide protection orders for victims, or address harassment that causes physical or mental harm.
         description_key:
-          - Domestic violence includes physical, sexual, or psychological abuse in families or intimate relationships.
+          - Domestic violence includes physical, sexual, psychological, and economic abuse in families or intimate relationships.
           - The indicator measures whether legislation specifically addresses domestic violence.
-          - The answer is “yes” if the law includes criminal sanctions or provides protection orders for victims.
-          - The answer is “no” if there is no such legislation, if the law does not provide sanctions or protection orders, if it protects only certain women or family members, or if it only increases penalties for general crimes when committed within families.
+          - The answer is "yes" if the law explicitly covers all forms of domestic violence, includes criminal sanctions or protection orders, and criminalizes marital rape or allows a wife to file a complaint.
+          - The answer is "no" if there is no such legislation, if the law omits one or more forms of domestic violence, lacks sanctions or protection orders, protects only certain women or family members, does not criminalize marital rape, or only increases penalties for general crimes when committed within families.
           - In the absence of such laws, survivors usually have only limited protection under general criminal law.
           - Having a law does not mean it is enforced or effective in practice.
           - *desc_standardized_assumptions
