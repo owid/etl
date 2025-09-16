@@ -254,7 +254,6 @@ tables:
           - It includes deputy prime ministers and prime ministers if they also hold a ministerial role.
           - It excludes vice-presidents and leaders of public agencies that are not part of the cabinet.
           - A higher share indicates greater representation of women in senior government positions.
-          - Tracking this helps monitor progress toward gender equality in politics and leadership.
         unit: "%"
         short_unit: "%"
         display:
