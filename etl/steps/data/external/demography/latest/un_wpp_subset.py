@@ -25,7 +25,6 @@ def run() -> None:
         ds_garden["deaths"],
         ds_garden["births"],
         ds_garden["life_expectancy"],
-        ds_garden["mortality_rate"],
     ]
     # Reset the index for all tables to prepare for merging
     tables = [tb.reset_index() for tb in tables]
