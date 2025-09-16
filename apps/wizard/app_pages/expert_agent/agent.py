@@ -96,13 +96,6 @@ async def process_tool_call(
     return await call_tool(name, tool_args, {"deps": ctx.deps})
 
 
-# OWID Prod MCP server
-mcp_server_prod = MCPServerStreamableHTTP(
-    url=OWID_MCP_SERVER_URL,
-    process_tool_call=process_tool_call,
-    tool_prefix="owid_data_",
-)
-
 ## Trying to tweak the settings for OpenAI responses
 settings = OpenAIResponsesModelSettings(
     # openai_reasoning_effort="low",
@@ -114,7 +107,12 @@ settings = OpenAIResponsesModelSettings(
 ## Use MCPs or not based on user input
 def get_toolsets():
     if ("expert_use_mcp" in st.session_state) and st.session_state["expert_use_mcp"]:
-        # Use MCP server for the agent
+        # Create MCP server instance inside function to avoid event loop binding issues
+        mcp_server_prod = MCPServerStreamableHTTP(
+            url=OWID_MCP_SERVER_URL,
+            process_tool_call=process_tool_call,
+            tool_prefix="owid_data_",
+        )
         return [mcp_server_prod]
     return []
 
@@ -433,6 +431,7 @@ async def get_api_reference_metadata(
             return "Invalid object name: " + object_name
 
 
+# NOTE: commented out because Datasette URL is now returned in every result
 # @agent.tool_plain(docstring_format="google")
 # async def generate_url_to_datasette(query: str) -> str:
 #     """Generate a URL to the Datasette instance with the given query.
@@ -453,6 +452,7 @@ def _generate_url_to_datasette(query: str) -> str:
     return f"{ANALYTICS_URL}?" + urllib.parse.urlencode({"sql": query, "_size": "max"})
 
 
+# NOTE: commented out because Agent was doing unnecessary calls. If the query is invalid, it'll return `error` in response
 # @agent.tool_plain(docstring_format="google")
 # async def validate_datasette_query(query: str) -> str:
 #     """Validate an SQL query.
