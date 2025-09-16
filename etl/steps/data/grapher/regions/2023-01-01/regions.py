@@ -33,6 +33,10 @@ def run() -> None:
     ds_garden = paths.load_dataset("regions")
     tb_garden = ds_garden["regions"].reset_index()
 
+    # Exclude WB_MENA that has been replaced by WB_MENAP by the World Bank. Once we update all datasets, we can remove WB_MENA
+    # from regions and this line.
+    tb_garden = tb_garden[tb_garden.code == "WB_MENA"]
+
     #
     # Process data.
     #
