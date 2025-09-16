@@ -3,7 +3,7 @@ definitions:
   common:
     unit: ""
     short_unit: ""
-    processing_level: major
+    processing_level: minor
     presentation:
       topic_tags:
         - Animal Welfare
