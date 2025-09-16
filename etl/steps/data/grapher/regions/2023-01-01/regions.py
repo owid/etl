@@ -35,7 +35,7 @@ def run() -> None:
 
     # Exclude WB_MENA that has been replaced by WB_MENAP by the World Bank. Once we update all datasets, we can remove WB_MENA
     # from regions and this line.
-    tb_garden = tb_garden[tb_garden.code == "WB_MENA"]
+    tb_garden = tb_garden[tb_garden.code != "WB_MENA"]
 
     #
     # Process data.
