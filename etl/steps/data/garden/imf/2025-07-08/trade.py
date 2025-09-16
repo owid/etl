@@ -137,6 +137,15 @@ def run() -> None:
         how="left",
     )
 
+    # --- Top export partner classification (based on exports) -------------
+    tb_top_export_partners = get_top_export_partner(tb_all_countries)
+    tb = pr.merge(
+        tb,
+        tb_top_export_partners,
+        on=["country", "year", "counterpart_country"],
+        how="left",
+    )
+
     # --- Importer ranking for China & US ---------------------------------
     tb_china = get_country_import_ranking(tb_all_countries, "China")
     tb_us = get_country_import_ranking(tb_all_countries, "United States")
@@ -345,6 +354,37 @@ def get_top_partner(tb: Table) -> Table:
 
     top_df["top_partner_category"] = top_df["counterpart_country"].apply(lambda x: x if x in top_10 else "Other")
     out = Table(top_df[["country", "year", "top_partner_category"]]).copy_metadata(tb)
+    out = out.drop_duplicates(subset=["country", "year"])  # safety
+
+    out["counterpart_country"] = "World"
+    return out
+
+
+def get_top_export_partner(tb: Table) -> Table:
+    """
+    Get the top export destination (by exports) for each country-year and classify based on global frequency.
+
+    This function:
+    1. Finds the largest export destination for each country-year
+    2. Counts how frequently each destination appears as #1 globally
+    3. Keeps the top 10 most frequent destinations, groups others as 'Other'
+    4. Returns with counterpart_country='World' for easy merging
+
+    Args:
+        tb: Trade data table
+
+    Returns:
+        Table with top_export_partner_category column, attached to counterpart='World' rows
+    """
+    export_data = tb[tb["indicator"] == EXPORT_COL].dropna(subset=["value"]).copy()
+    idx = export_data.groupby(["country", "year"])["value"].idxmax()
+    top_df = export_data.loc[idx, ["country", "year", "counterpart_country"]].reset_index(drop=True)
+
+    partner_counts = top_df.groupby("counterpart_country")["country"].nunique().sort_values(ascending=False)
+    top_10 = set(partner_counts.head(10).index.tolist())
+
+    top_df["top_export_partner_category"] = top_df["counterpart_country"].apply(lambda x: x if x in top_10 else "Other")
+    out = Table(top_df[["country", "year", "top_export_partner_category"]]).copy_metadata(tb)
     out = out.drop_duplicates(subset=["country", "year"])  # safety
 
     out["counterpart_country"] = "World"

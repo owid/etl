@@ -254,6 +254,26 @@ tables:
         display:
           numDecimalPlaces: 0
 
+      top_export_partner_category:
+        title: |-
+          <% if counterpart_country == 'World' %>
+          Top export partner category
+          <%- endif -%>
+        unit: ""
+        short_unit: ""
+        description_short: The country that was the largest destination for exports in a given year, based on merchandise export values that exclude freight and insurance costs.
+        description_key:
+          - This indicator shows which country was the largest destination for exports from each country–year, based on export values in current US dollars.
+          - *fob_basis
+          - *goods_only
+          - The top destination for each country–year was identified, and then a global count was made of how often each country appeared in this role. Here, the top ten countries with the highest counts are shown as separate categories, while the rest were grouped as "other".
+        presentation:
+          title_public: Top export partner category
+          grapher_config:
+            note: Only the 10 partners most often ranked as the top export destination across countries are shown; the rest are grouped as "other".
+        display:
+          numDecimalPlaces: 0
+
       bilateral_trade_volume:
         title: |-
           <% if counterpart_country == 'Intraregional' %>
