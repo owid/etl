@@ -41,12 +41,19 @@ definitions:
   description_key_low_pay_earners: |-
     Workers are considered _low pay_ if their hourly earnings at all jobs are less than two-thirds of median hourly earnings.
   description_key_occupation: |-
-    <% if classif1 == "Occupation (Skill level): Low") %>
-      The skill level of occupations classified as _Low_ (level 1) typically includes the category "elementary occupations". Examples include cleaners and helpers, agricultural
-        "Occupation (Skill level): Skill level 1 ~ low": "Occupation (Skill level): Low",
-        "Occupation (Skill level): Skill level 2 ~ medium": "Occupation (Skill level): Medium",
-        "Occupation (Skill level): Skill levels 3 and 4 ~ high": "Occupation (Skill level): High",
-        "Occupation (Skill level): Not elsewhere classified": "Occupation (Skill level): Not elsewhere classified",
+    <% if classif1 == "Occupation (Skill level): Low" %>
+      The skill level of occupations classified as _Low_ (level 1) refers to the performance of simple and routine tasks which may require the use of hand-held tools and considerable physical effort. Examples typically include cleaners and helpers, industry laborers, and other similar roles. {definitions.isco_08}
+    <%- elif classif1 == "Occupation (Skill level): Medium" %>
+      The skill level of occupations classified as _Medium_ (level 2) includes workers on clerical support, service and sales, skilled agricultural, forestry and fishing jobs, craft and related trades, and plant and machine operators and assemblers. {definitions.isco_08}
+    <%- elif classif1 == "Occupation (Skill level): High" %>
+      The skill level of occupations classified as _High_ (levels 3 and 4) includes managers, professionals, and technicians and associate professionals. {definitions.isco_08}
+    <%- elif classif1 == "Occupation (Skill level): Not elsewhere classified" %>
+      The skill level of occupations classified as _Not elsewhere classified_ includes armed forces occupations and occupations not classified in any of the skill levels 1 to 4. {definitions.isco_08}
+    <%- endif %>
+  description_key_earnings: |-
+    This data includes remuneration in cash and as benefits in kind paid to employees at regular intervals. It excludes employers' contributions paid to social security and pensions schemes, the benefits received by employees under these schemes, as well as severance and termination pay.
+  description_key_international_dollars: |-
+    This data is expressed in constant international dollars to adjust for inflation and differences in living costs between countries. Read more in our article, [What are international dollars?](https://ourworldindata.org/international-dollars)
   description_key_iloest_modelled_data: |-
     This data is part of the ILO Modelled Estimates series. This series combines nationally reported observations with imputed data to have a harmonized, internationally comparable dataset and produce regional and global aggregates. For more information, please refer to the [ILO Modelled Estimates documentation](https://ilostat.ilo.org/methods/concepts-and-definitions/ilo-modelled-estimates/).
   description_key_13th_icls: |-
@@ -54,6 +61,9 @@ definitions:
 
   description_processing_unreliable_data: |-
     We removed data points flagged as "unreliable" by the source (i.e. `obs_status = "U"` in the original data). These data points are likely to be inaccurate and misleading for analysis.
+
+  # This is the ID of the Google Doc that contains the FAQs
+  gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
 
 
 # Learn more about the available fields:
@@ -176,7 +186,8 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: Difference between average earnings of men and average earnings of women expressed as a percentage of average earnings of men.
-        # description_key: List of key points about the indicator.
+        description_key:
+          - "{definitions.description_key_occupation}"
         processing_level: major
         description_processing: "{definitions.description_processing_unreliable_data}"
         display:
@@ -192,10 +203,16 @@ tables:
         title: Average hourly earnings of employees - <<sex>>
         unit: international-$ in 2021 prices
         short_unit: $
-        # description_short: Short description of testing variable.
-        # description_key: List of key points about the indicator.
+        description_short: Gross remuneration for time worked or work done, vacation, and other types of paid leave.
+        description_key:
+          - "{definitions.description_key_earnings}"
+          - "{definitions.description_key_international_dollars}"
         processing_level: major
         description_processing: "{definitions.description_processing_unreliable_data}"
+        presentation:
+          faqs:
+          - fragment_id: poverty-international-dollars
+            gdoc_id: "{definitions.gdoc_id}"
         display:
           name: Average hourly earnings of employees - <<sex>>
           numDecimalPlaces: 1
