@@ -250,7 +250,7 @@ tables:
         presentation:
           title_public: Top import partner category
           grapher_config:
-            note: Only the 10 partners most often ranked as the top import source across countries are shown; the rest are grouped as "other".
+            note: Only the 10 partners most often ranked as the top import source across countries are shown; the rest are grouped as "Other".
         display:
           numDecimalPlaces: 0
 
@@ -270,7 +270,7 @@ tables:
         presentation:
           title_public: Top export partner category
           grapher_config:
-            note: Only the 10 partners most often ranked as the top export destination across countries are shown; the rest are grouped as "other".
+            note: Only the 10 partners most often ranked as the top export destination across countries are shown; the rest are grouped as "Other".
         display:
           numDecimalPlaces: 0
 
