@@ -7,7 +7,9 @@ definitions:
         - Global Education
 
   desc_standardized_assumptions: &desc_standardized_assumptions
-    - The indicator relies on standardized assumptions. The reference woman is a lawful citizen, old enough to be legally independent, healthy, with no criminal record, and living in the main business city. She is cisgender and heterosexual, in her first registered marriage under the default property regime, works as a cashier in a supermarket with 60 employees, and is not in a union unless membership is required.
+    - This indicator uses standardized assumptions, like the woman having one child and residing in the largest business city, to ensure comparability, though this approach may not capture variations in laws affecting women in different states, rural areas, or minority groups.
+  desc_law_enforcement: &desc_law_enforcement
+    - Having a law does not mean it is enforced or effective in practice.
   desc_key_lays: &desc_key_lays
    - This indicator combines the quantity and quality of education into a single measure.
    - It shows how many years of schooling in a high-performing system are equivalent to the education a student receives in their country.
@@ -104,7 +106,7 @@ tables:
           - The first component, the length of paid maternity leave, focuses on the leave specifically designated for mothers around the time of childbirth. This includes the days taken just before, during, and immediately after giving birth. The primary focus of this leave is on the mother's recovery and the essential bonding time with the newborn. It's a critical period that supports the mother's health and wellbeing, as well as the initial development of the child.
           - The second component, the length of paid parental leave for mother, includes days of parental leave that are specifically reserved for mothers. These are often defined by "use-it-or-lose-it" policies or mothers’ quotas. This part of the indicator represents additional support provided to mothers, extending beyond the traditional maternity leave period. It ensures that mothers have dedicated time for child-rearing and recovery, which cannot be transferred to fathers. This acknowledges the unique needs of mothers in the postnatal period and supports their role in early childcare.
           - The sum of these components reflects the total days of leave available specifically for the mother, emphasizing the support for maternal health and well-being.
-          - This indicator uses standardized assumptions, like the woman having one child and residing in the largest business city, to ensure comparability, though this approach may not capture variations in laws affecting women in different states, rural areas, or minority groups
+          - *desc_standardized_assumptions
         processing_level: major
         display:
           numDecimalPlaces: 0
@@ -119,7 +121,7 @@ tables:
           - The first component, the length of paid paternity leave, focuses on the leave specifically designated for fathers at the time of childbirth. This includes the days available exclusively to fathers to support them in bonding with the newborn and assisting in early childcare. This leave plays a crucial role in supporting the father's engagement during the early stages of a child's life.
           - The second component, the length of paid parental leave for father, includes days of parental leave that are specifically reserved for fathers. These are often defined by "use-it-or-lose-it" policies or fathers’ quotas. This part of the indicator represents additional support provided to fathers, extending beyond the traditional paternity leave period. It ensures that fathers have dedicated time for child-rearing, promoting their active involvement in early childcare and supporting gender equality in parental responsibilities.
           - The sum of these components reflects the total days of leave available specifically for the father, highlighting the support for paternal involvement and gender equality in parenting.
-          - This indicator uses standardized assumptions, like the woman having one child and residing in the largest business city, to ensure comparability, though this approach may not capture variations in laws affecting women in different states, rural areas, or minority groups
+          - *desc_standardized_assumptions
         processing_level: major
         display:
           numDecimalPlaces: 0
@@ -135,7 +137,7 @@ tables:
           - The second component, the length of paid parental leave for mother, includes days of parental leave that are specifically reserved for mothers. These are often defined by policies that support gender equality in parental responsibilities. This part of the indicator represents additional support provided to mothers, extending beyond the traditional maternity leave period.
           - The third component, the length of shared parental leave, represents the portion of leave that can be shared between parents. This flexibility allows for a more equitable distribution of childcare responsibilities and supports gender equality.
           - By integrating these components, the indicator provides a total count of the calendar days of leave available to mothers.
-          - This indicator uses standardized assumptions, like the woman having one child and residing in the largest business city, to ensure comparability, though this approach may not capture variations in laws affecting women in different states, rural areas, or minority groups
+          - *desc_standardized_assumptions
         processing_level: major
         display:
           numDecimalPlaces: 0
@@ -151,7 +153,7 @@ tables:
           - The second component, the length of paid parental leave for father, includes days of parental leave that are specifically reserved for fathers. These are often defined by "use-it-or-lose-it" policies or fathers’ quotas.
           - The third component, the length of shared parental leave, represents the portion of leave that can be shared between parents. This flexibility allows for a more equitable distribution of childcare responsibilities and supports gender equality.
           - By integrating these components, the indicator provides a total count of the calendar days of leave available for fathers.
-          - This indicator uses standardized assumptions, like the woman having one child and residing in the largest business city, to ensure comparability, though this approach may not capture variations in laws affecting women in different states, rural areas, or minority groups
+          - *desc_standardized_assumptions
         processing_level: major
         display:
           numDecimalPlaces: 0
@@ -206,7 +208,7 @@ tables:
           - The answer is "yes" if the law explicitly covers all forms of domestic violence, includes criminal sanctions or protection orders, and criminalizes marital rape or allows a wife to file a complaint.
           - The answer is "no" if there is no such legislation, if the law omits one or more forms of domestic violence, lacks sanctions or protection orders, protects only certain women or family members, does not criminalize marital rape, or only increases penalties for general crimes when committed within families.
           - In the absence of such laws, survivors usually have only limited protection under general criminal law.
-          - Having a law does not mean it is enforced or effective in practice.
+          - *desc_law_enforcement
           - *desc_standardized_assumptions
         unit: "(1=yes; 0=no)"
         display:
@@ -230,9 +232,14 @@ tables:
         title: Married women are not required by law to obey their husbands
         description_short: This indicator captures whether family law includes any provision requiring a married woman to obey her husband or penalizing her for disobedience, such as loss of maintenance rights.
         description_key:
-          - The indicator measures whether family law obliges married women to obey their husbands.
+          - Family law in some countries includes provisions requiring married women to obey their husbands, often rooted in traditional or religious legal frameworks.
+          - This indicator measures whether national family law includes any legal obligation for married women to obey their husbands.
+          - The answer is "yes" (women are not required to obey) if family law treats spouses as equals without requiring obedience from either party.
+          - The answer is "no" (women are required to obey) if family law explicitly requires wives to obey husbands or imposes legal penalties for disobedience, such as loss of maintenance rights or other consequences.
+          - Such provisions restrict women's autonomy, reinforce unequal treatment within marriage, and can limit women's ability to make independent decisions.
           - If such provisions exist, they restrict women’s autonomy and reinforce unequal treatment within marriage.
           - Disobedience can carry legal consequences, such as loss of the right to maintenance.
+          - *desc_law_enforcement
           - *desc_standardized_assumptions
         unit: "(1=yes; 0=no)"
         display:
@@ -262,7 +269,8 @@ tables:
           - Such laws may cover hiring, pay, promotion, and conditions of work.
           - A “yes” means the law requires equal treatment of women and men at work.
           - Without such protections, women and men may face unequal opportunities in the labor market.
-          - Having laws is an important first step but enforcement is essential for impact.
+          - *desc_law_enforcement
+          - *desc_standardized_assumptions
         unit: "(1=yes; 0=no)"
         display:
           numDecimalPlaces: 0
@@ -276,7 +284,8 @@ tables:
           - In some countries, women need permission from a husband or guardian to work.
           - A “yes” means women can take a job without needing more approvals or documents than men.
           - Equal rights to employment allow women to participate more fully in the labor market.
-          - Restrictions can reduce women’s independence and limit economic growth.
+          - *desc_law_enforcement
+          - *desc_standardized_assumptions
         unit: "(1=yes; 0=no)"
         display:
           numDecimalPlaces: 0
@@ -291,6 +300,8 @@ tables:
           - Laws may define harassment and set penalties or remedies for victims.
           - A “yes” means that workers are legally protected, though enforcement may vary.
           - The absence of such laws leaves employees without legal protection from harassment.
+          - *desc_law_enforcement
+          - *desc_standardized_assumptions
         unit: "(1=yes; 0=no)"
         display:
           numDecimalPlaces: 0
@@ -319,7 +330,8 @@ tables:
           - Equal rights mean both spouses can own, buy, or sell property in their own name.
           - Husbands do not have special control over marital property if equality is guaranteed.
           - Property rights are a foundation of economic independence and security.
-          - Without equal rights, women’s ability to build wealth and make financial decisions is limited.
+          - *desc_law_enforcement
+          - *desc_standardized_assumptions
         unit: "(1=yes; 0=no)"
         display:
           numDecimalPlaces: 0
@@ -364,6 +376,8 @@ tables:
           - Victims may also have the right to compensation or civil remedies.
           - A “yes” means legal systems recognize harassment as a punishable offense.
           - Strong sanctions can deter harassment and support safer workplaces.
+          - *desc_law_enforcement
+          - *desc_standardized_assumptions
         unit: "(1=yes; 0=no)"
         display:
           numDecimalPlaces: 0
@@ -377,7 +391,8 @@ tables:
           - Equal inheritance means children are treated the same regardless of gender.
           - A “no” indicates daughters receive less or different inheritance rights than sons.
           - Inheritance laws shape the distribution of wealth and economic opportunities.
-          - Equal rights in inheritance are essential for reducing gender gaps in asset ownership.
+          - *desc_law_enforcement
+          - *desc_standardized_assumptions
         unit: "(1=yes; 0=no)"
         display:
           numDecimalPlaces: 0
@@ -391,7 +406,8 @@ tables:
           - A “yes” means women can open accounts independently, without extra approvals.
           - Equal access to banking is crucial for financial independence and participation in the economy.
           - Restrictions can limit women’s ability to save, borrow, or build credit.
-          - Financial inclusion for women supports broader economic development.
+          - *desc_law_enforcement
+          - *desc_standardized_assumptions
         unit: "(1=yes; 0=no)"
         display:
           numDecimalPlaces: 0
@@ -405,7 +421,8 @@ tables:
           - A “yes” means women do not need a husband’s or guardian’s approval to obtain a passport.
           - Equal rights to passports are essential for freedom of movement and travel.
           - Restrictions can prevent women from working, studying, or traveling abroad.
-          - Removing these barriers supports independence and equal citizenship.
+          - *desc_law_enforcement
+          - *desc_standardized_assumptions
         unit: "(1=yes; 0=no)"
         display:
           numDecimalPlaces: 0
@@ -420,6 +437,8 @@ tables:
           - It covers services like loans, credit, business financing, and other transactions.
           - A “yes” shows the law supports fairness in financial opportunities.
           - Equal financial rights allow women to invest, grow businesses, and build assets.
+          - *desc_law_enforcement
+          - *desc_standardized_assumptions
         unit: "(1=yes; 0=no)"
         display:
           numDecimalPlaces: 0
@@ -434,6 +453,8 @@ tables:
           - Equal rights to register a business support women’s participation in entrepreneurship and the economy.
           - Restrictions can discourage women from starting companies and reduce economic opportunities.
           - Legal equality in business registration is an important step toward gender equality in economic life.
+          - *desc_law_enforcement
+          - *desc_standardized_assumptions
         unit: "(1=yes; 0=no)"
         display:
           numDecimalPlaces: 0
@@ -448,6 +469,8 @@ tables:
           - A “no” means women face additional barriers, such as requiring a husband’s consent or being prohibited from divorcing.
           - Equal rights to divorce are central to women’s autonomy and freedom of choice in marriage.
           - Safeguards for women, such as during pregnancy, do not make the law unequal if men and women otherwise have the same rights.
+          - *desc_law_enforcement
+          - *desc_standardized_assumptions
         unit: "(1=yes; 0=no)"
         display:
           numDecimalPlaces: 0
@@ -462,6 +485,8 @@ tables:
           - A “no” means women face restrictions, such as longer waiting periods or bans after divorce or widowhood.
           - Equal rights to remarry reflect fairness in family law and personal freedom.
           - Restrictions on remarriage often reflect discriminatory cultural or legal norms.
+          - *desc_law_enforcement
+          - *desc_standardized_assumptions
         unit: "(1=yes; 0=no)"
         display:
           numDecimalPlaces: 0
@@ -491,6 +516,8 @@ tables:
           - Restrictions may require the approval of a husband, guardian, or relative.
           - Equal rights to sign contracts are key to economic independence.
           - Without this right, women may be excluded from business, property, or employment opportunities.
+          - *desc_law_enforcement
+          - *desc_standardized_assumptions
         unit: "(1=yes; 0=no)"
         display:
           numDecimalPlaces: 0
@@ -505,6 +532,8 @@ tables:
           - A “no” means the law gives husbands greater authority over the family’s place of residence.
           - Equal rights to residence reflect personal freedom and equality within marriage.
           - Restrictions reduce women’s independence and control over their lives.
+          - *desc_law_enforcement
+          - *desc_standardized_assumptions
         unit: "(1=yes; 0=no)"
         display:
           numDecimalPlaces: 0
@@ -519,6 +548,8 @@ tables:
           - Major transactions, like selling or pledging property, may require the consent of both spouses.
           - A “no” means the law gives husbands greater control over family property.
           - Equal management of assets supports fairness and independence within marriage.
+          - *desc_law_enforcement
+          - *desc_standardized_assumptions
         unit: "(1=yes; 0=no)"
         display:
           numDecimalPlaces: 0
@@ -550,6 +581,8 @@ tables:
           - The value of jobs is assessed by comparing skills, responsibilities, effort, and working conditions.
           - Proving jobs are of equal value can be difficult, as different roles may be valued unequally in practice.
           - Equal pay laws are designed to reduce gender wage gaps and ensure fairness in the labor market.
+          - *desc_law_enforcement
+          - *desc_standardized_assumptions
         unit: "(1=yes; 0=no)"
         display:
           numDecimalPlaces: 0
