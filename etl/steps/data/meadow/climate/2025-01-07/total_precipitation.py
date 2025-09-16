@@ -105,7 +105,7 @@ def run() -> None:
         try:
             # Clip to the bounding box for the country's shape to significantly improve performance.
             xmin, ymin, xmax, ymax = geometry.bounds
-            clip = da.rio.clip_box(minx=xmin, miny=ymin, maxx=xmax, maxy=ymax)
+            clip = da.rio.clip_box(minx=xmin, miny=ymin, maxx=xmax, maxy=ymax, crs=sanitize_crs(shapefile.crs))
 
             # Clip data to the country's shape.
             # NOTE: if memory is an issue, we could use `from_disk=True` arg
