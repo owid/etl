@@ -6,6 +6,8 @@ definitions:
         - Women's Rights
         - Global Education
 
+  desc_standardized_assumptions: &desc_standardized_assumptions
+    - The indicator relies on standardized assumptions. The reference woman is a lawful citizen, old enough to be legally independent, healthy, with no criminal record, and living in the main business city. She is cisgender and heterosexual, in her first registered marriage under the default property regime, works as a cashier in a supermarket with 60 employees, and is not in a union unless membership is required.
   desc_key_lays: &desc_key_lays
    - This indicator combines the quantity and quality of education into a single measure.
    - It shows how many years of schooling in a high-performing system are equivalent to the education a student receives in their country.
@@ -157,6 +159,10 @@ tables:
       sl_agr_empl_zs:
         title: Share of people employed in agricultural sector
         description_short: The share of people employed in agriculture includes working-age people with a job in farming, forestry, fishing, and related activities, including those temporarily absent.
+        description_key:
+          - This measures the percentage of all workers who are employed in agriculture.
+          - Agriculture includes farming, forestry, fishing, and related activities.
+          - People are counted even if they are temporarily absent from work due to sickness, leave, or seasonal factors.
         unit: "%"
         short_unit: "%"
         display:
@@ -166,6 +172,11 @@ tables:
       sg_own_ldal_ma_zs:
         title: Share of men who own land alone
         description_short: The share of men aged 15–49 with land registered in their name or requiring their signature to sell.
+        description_key:
+          - This measures the proportion of men aged 15–49 who are the sole owners of land.
+          - Sole ownership means the land is legally registered in their name or cannot be sold without their approval.
+          - Land ownership gives men economic security and influence within households and communities.
+          - The indicator does not include land held jointly with others.
         unit: "%"
         short_unit: "%"
         display:
@@ -175,6 +186,11 @@ tables:
       sg_own_ldal_fe_zs:
         title: Share of women who own land alone
         description_short: The share of women aged 15–49 with land registered in their name or requiring their signature to sell.
+        description_key:
+          - This measures the proportion of women aged 15–49 who are the sole owners of land.
+          - Sole ownership means the land is legally registered in their name or cannot be sold without their approval.
+          - Land ownership gives women economic security and a stronger role in decision-making.
+          - Women often face barriers to ownership due to inheritance laws, marital rules, or social customs.
         unit: "%"
         short_unit: "%"
         display:
@@ -184,6 +200,18 @@ tables:
       sg_leg_dvaw:
         title: There is legislation specifically addressing domestic violence
         description_short: The law on domestic violence may punish offenders, provide protection orders for victims, or address harassment that causes physical or mental harm.
+        description_key:
+          - Domestic violence includes physical, sexual, or psychological abuse in families or intimate relationships.
+          - The indicator measures whether legislation specifically addresses domestic violence.
+          - The answer is “Yes” (1) if the law includes criminal sanctions or provides protection orders for victims.
+          - "The answer is “No” (0) if:
+              • there is no such legislation,
+              • the law does not provide sanctions or protection orders,
+              • the law protects only certain women or family members, or
+              • it only increases penalties for general crimes when committed within families."
+          - In the absence of such laws, survivors usually have only limited protection under general criminal law.
+          - Having a law does not mean it is enforced or effective in practice.
+          - *desc_standardized_assumptions
         unit: "(1=yes; 0=no)"
         display:
           numDecimalPlaces: 0
@@ -192,6 +220,10 @@ tables:
       ic_frm_femm_zs:
         title: Share of firms with a female top manager
         description_short: Top manager refers to the highest ranking manager or CEO of the establishment. This may be the owner if she works as the manager of the firm.
+        description_key:
+          - This measures the percentage of firms where the top manager is a woman.
+          - The top manager is usually the CEO or highest-ranking executive, but may also be the owner if she manages the firm.
+          - Female leadership is important for gender equality in business and decision-making.
         unit: "% of firms"
         short_unit: "%"
         display:
@@ -201,6 +233,12 @@ tables:
       sg_law_obhb_mr_no:
         title: Married women are required by law to obey their husbands
         description_short: Any legal provision stating that a married woman must obey her husband or that disobeying her husband has legal ramifications for her, such as loss of their right to maintenance.
+        description_key:
+          - This indicator records whether the law requires married women to obey their husbands.
+          - Such provisions may restrict women’s autonomy in marriage and household decision-making.
+          - These laws may create legal consequences for women if they are considered disobedient.
+          - Requirements to obey are a sign of unequal treatment of women in family law.
+          - The absence of such laws indicates greater legal equality between spouses.
         unit: "(1=yes; 0=no)"
         display:
           numDecimalPlaces: 0
@@ -209,6 +247,12 @@ tables:
       sg_gen_mnst_zs:
         title: Share of women in ministerial positions
         description_short: Deputy prime ministers and prime ministers or heads of government that hold ministerial portfolios are included, vice-presidents and heads of governmental or public agencies are excluded.
+        description_key:
+          - This measures the percentage of ministerial positions held by women.
+          - It includes deputy prime ministers and prime ministers if they also hold a ministerial role.
+          - It excludes vice-presidents and leaders of public agencies that are not part of the cabinet.
+          - A higher share indicates greater representation of women in senior government positions.
+          - Tracking this helps monitor progress toward gender equality in politics and leadership.
         unit: "%"
         short_unit: "%"
         display:
@@ -218,6 +262,12 @@ tables:
       sg_law_nodc_hr:
         title: Employment discrimination based on gender prohibited
         description_short: The law prohibits employers from discriminating based on sex or gender, or mandates equal treatment of women and men in employment.
+        description_key:
+          - This indicator records whether national laws prohibit gender-based discrimination in employment.
+          - Such laws may cover hiring, pay, promotion, and conditions of work.
+          - A “yes” means the law requires equal treatment of women and men at work.
+          - Without such protections, women and men may face unequal opportunities in the labor market.
+          - Having laws is an important first step but enforcement is essential for impact.
         unit: "(1=yes; 0=no)"
         display:
           numDecimalPlaces: 0
@@ -226,6 +276,12 @@ tables:
       sg_get_jobs_eq:
         title: Women can get a job in the same way as men
         description_short: Husbands cannot prevent their wives from working, women don't need more permissions or additional documentation to work relative to men, and their work is not considered a form of disobedience with legal consequences.
+        description_key:
+          - This indicator records whether women face legal barriers to entering employment.
+          - In some countries, women need permission from a husband or guardian to work.
+          - A “yes” means women can take a job without needing more approvals or documents than men.
+          - Equal rights to employment allow women to participate more fully in the labor market.
+          - Restrictions can reduce women’s independence and limit economic growth.
         unit: "(1=yes; 0=no)"
         display:
           numDecimalPlaces: 0
@@ -234,23 +290,41 @@ tables:
       sg_leg_sxhr_em:
         title: Legislation on sexual harassment in employment
         description_short: Legal provisions specifically protect against sexual harassment in employment, including unwelcome verbal or physical conduct of a sexual nature.
+        description_key:
+          - This indicator records whether a country has laws against sexual harassment in employment.
+          - Sexual harassment includes unwelcome physical, verbal, or non-verbal conduct of a sexual nature at work.
+          - Laws may define harassment and set penalties or remedies for victims.
+          - A “yes” means that workers are legally protected, though enforcement may vary.
+          - The absence of such laws leaves employees without legal protection from harassment.
         unit: "(1=yes; 0=no)"
         display:
           numDecimalPlaces: 0
           tolerance: 5
 
       sl_tlf_cact_fm_zs:
-          title: Female-to-male labor force participation ratio
-          description_short: The female-to-male labor force participation ratio compares the share of women and men aged 15+ who are working or actively looking for work.
-          unit: "%"
-          short_unit: "%"
-          display:
-            numDecimalPlaces: 1
-            tolerance: 5
+        title: Female-to-male labor force participation ratio
+        description_short: The female-to-male labor force participation ratio compares the share of women and men aged 15+ who are working or actively looking for work.
+        description_key:
+          - This measures the ratio of women’s to men’s labor force participation rates.
+          - Labor force participation includes people who are working or actively seeking work.
+          - A value of 100% means equal participation between women and men.
+          - A lower value means fewer women are in the labor force relative to men.
+          - This indicator highlights gender gaps in access to and participation in employment.
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
 
       sg_own_prrt_im:
         title: Women and men have the same rights to own property
         description_short: The law gives women and men the same rights to own and manage property, without granting husbands special control over marital property.
+        description_key:
+          - This indicator records whether women and men have equal legal rights to own property.
+          - Equal rights mean both spouses can own, buy, or sell property in their own name.
+          - Husbands do not have special control over marital property if equality is guaranteed.
+          - Property rights are a foundation of economic independence and security.
+          - Without equal rights, women’s ability to build wealth and make financial decisions is limited.
         unit: "(1=yes; 0=no)"
         display:
           numDecimalPlaces: 0
@@ -259,6 +333,12 @@ tables:
       sl_uem_neet_fe_zs:
         title: Share of young women not in education, employment or training
         description_short: The share of women aged 15–24 who are not in education, employment, or vocational training.
+        description_key:
+          - This measures the percentage of young women aged 15–24 who are not studying, working, or in training.
+          - It shows how many are outside both the education system and the labor market.
+          - High rates can reflect limited opportunities, social barriers, or economic challenges.
+          - Being out of education or work can affect future earnings and independence.
+          - Reducing NEET rates is important for supporting youth development and gender equality.
         unit: "%"
         short_unit: "%"
         display:
@@ -268,6 +348,12 @@ tables:
       sl_uem_neet_ma_zs:
         title: Share of young men not in education, employment or training
         description_short: The share of men aged 15–24 who are not in education, employment, or vocational training.
+        description_key:
+          - This measures the percentage of young men aged 15–24 who are not studying, working, or in training.
+          - It captures how many are excluded from both education and the labor market.
+          - High NEET rates suggest barriers to learning or employment that affect young men.
+          - Being outside education and work can lead to long-term disadvantages.
+          - Monitoring NEET rates helps track youth inclusion and economic opportunities.
         unit: "%"
         short_unit: "%"
         display:
@@ -277,6 +363,12 @@ tables:
       sg_pen_sxhr_em:
         title: Criminal sanctions or compensation for sexual harassment in employment
         description_short: The law punishes sexual harassment at work with fines or prison, requires offenders to compensate victims, or allows victims to seek civil remedies even after losing their job.
+        description_key:
+          - This indicator records whether laws provide penalties or remedies for workplace sexual harassment.
+          - Penalties may include fines, prison sentences, or disciplinary measures.
+          - Victims may also have the right to compensation or civil remedies.
+          - A “yes” means legal systems recognize harassment as a punishable offense.
+          - Strong sanctions can deter harassment and support safer workplaces.
         unit: "(1=yes; 0=no)"
         display:
           numDecimalPlaces: 0
@@ -285,6 +377,12 @@ tables:
       sg_iht_asst_pt_eq:
         title: Equal rights of inheritance for sons and daughters when no will is left
         description_short: When parents die without a will, sons and daughters have the same rights to inherit.
+        description_key:
+          - This indicator records whether sons and daughters inherit equally when parents die without a will.
+          - Equal inheritance means children are treated the same regardless of gender.
+          - A “no” indicates daughters receive less or different inheritance rights than sons.
+          - Inheritance laws shape the distribution of wealth and economic opportunities.
+          - Equal rights in inheritance are essential for reducing gender gaps in asset ownership.
         unit: "(1=yes; 0=no)"
         display:
           numDecimalPlaces: 0
@@ -293,6 +391,12 @@ tables:
       sg_opn_bank_eq:
         title: Women can open a bank account on the same terms as men
         description_short: The law does not limit women’s ability to open a bank account, whether they are married or unmarried, and they do not need approval beyond what is required of men.
+        description_key:
+          - This indicator records whether women face restrictions on opening a bank account.
+          - A “yes” means women can open accounts independently, without extra approvals.
+          - Equal access to banking is crucial for financial independence and participation in the economy.
+          - Restrictions can limit women’s ability to save, borrow, or build credit.
+          - Financial inclusion for women supports broader economic development.
         unit: "(1=yes; 0=no)"
         display:
           numDecimalPlaces: 0
@@ -301,6 +405,12 @@ tables:
       sg_apl_pspt_eq:
         title: Women can apply for a passport in the same way as men
         description_short: Women can apply for a passport without needing permission, a signature, or details from their husband, father, or another relative.
+        description_key:
+          - This indicator records whether women can apply for a passport on the same terms as men.
+          - A “yes” means women do not need a husband’s or guardian’s approval to obtain a passport.
+          - Equal rights to passports are essential for freedom of movement and travel.
+          - Restrictions can prevent women from working, studying, or traveling abroad.
+          - Removing these barriers supports independence and equal citizenship.
         unit: "(1=yes; 0=no)"
         display:
           numDecimalPlaces: 0
@@ -309,6 +419,12 @@ tables:
       sg_law_crdd_gr:
         title: Equal access to financial services for women and men
         description_short: The law prohibits gender discrimination by banks or other financial institutions, and requires equal treatment of women and men in financial transactions, business activities, financial assistance, and access to goods and services.
+        description_key:
+          - This indicator records whether women and men have equal legal access to financial services.
+          - Equal access means banks and lenders cannot discriminate by gender.
+          - It covers services like loans, credit, business financing, and other transactions.
+          - A “yes” shows the law supports fairness in financial opportunities.
+          - Equal financial rights allow women to invest, grow businesses, and build assets.
         unit: "(1=yes; 0=no)"
         display:
           numDecimalPlaces: 0
@@ -317,6 +433,12 @@ tables:
       sg_bus_regt_eq:
         title: Women can register a business on the same terms as men
         description_short: Women face no legal restrictions when registering a business, such as needing a husband’s consent or providing extra documents not required of men.
+        description_key:
+          - This indicator records whether women can legally register a business without extra restrictions.
+          - A “yes” means women follow the same process as men, with no need for consent from a husband or guardian.
+          - Equal rights to register a business support women’s participation in entrepreneurship and the economy.
+          - Restrictions can discourage women from starting companies and reduce economic opportunities.
+          - Legal equality in business registration is an important step toward gender equality in economic life.
         unit: "(1=yes; 0=no)"
         display:
           numDecimalPlaces: 0
@@ -325,6 +447,12 @@ tables:
       sg_obt_dvrc_eq:
         title: Women can get a divorce on the same terms as men
         description_short: The divorce process is equal for women and men, unless the law provides women with added safeguards, such as during pregnancy. It is unequal if women face extra barriers, only men can initiate, or divorce is prohibited.
+        description_key:
+          - This indicator records whether women and men have equal legal rights to divorce.
+          - A “yes” means either spouse can start divorce proceedings under the same conditions.
+          - A “no” means women face additional barriers, such as requiring a husband’s consent or being prohibited from divorcing.
+          - Equal rights to divorce are central to women’s autonomy and freedom of choice in marriage.
+          - Safeguards for women, such as during pregnancy, do not make the law unequal if men and women otherwise have the same rights.
         unit: "(1=yes; 0=no)"
         display:
           numDecimalPlaces: 0
@@ -333,6 +461,12 @@ tables:
       sg_rem_rigt_eq:
         title: Women have the same rights to remarry as men
         description_short: Women and men have the same right to remarry. Unequal rights exist if women face restrictions—such as waiting periods not applied to men—or if divorce is not legally allowed.
+        description_key:
+          - This indicator records whether women and men have equal rights to remarry.
+          - A “yes” means both men and women can remarry under the same conditions.
+          - A “no” means women face restrictions, such as longer waiting periods or bans after divorce or widowhood.
+          - Equal rights to remarry reflect fairness in family law and personal freedom.
+          - Restrictions on remarriage often reflect discriminatory cultural or legal norms.
         unit: "(1=yes; 0=no)"
         display:
           numDecimalPlaces: 0
@@ -341,6 +475,12 @@ tables:
       sg_dmk_prch_fn_zs:
         title: Share of women involved in major household purchases
         description_short: The share of currently married women aged 15-49 who say that they alone or jointly have a say in major household purchase decisions.
+        description_key:
+          - This measures the percentage of married women aged 15–49 involved in making major household purchases.
+          - Women are counted if they decide alone or together with their spouse.
+          - Participation in spending decisions reflects women’s influence within the household.
+          - Greater involvement suggests stronger bargaining power and autonomy.
+          - Low involvement highlights gender gaps in family decision-making.
         unit: "%"
         short_unit: "%"
         display:
@@ -350,22 +490,40 @@ tables:
       sg_cnt_sign_eq:
         title: Women can sign a contract on the same terms as men
         description_short: Women can sign contracts on their own, without permission or signatures from a husband or guardian.
+        description_key:
+          - This indicator records whether women can legally sign contracts without extra conditions.
+          - A “yes” means women can enter agreements independently, just like men.
+          - Restrictions may require the approval of a husband, guardian, or relative.
+          - Equal rights to sign contracts are key to economic independence.
+          - Without this right, women may be excluded from business, property, or employment opportunities.
         unit: "(1=yes; 0=no)"
         display:
           numDecimalPlaces: 0
           tolerance: 5
 
       sg_loc_live_eq:
-       title: Women have full legal rights to decide where to live
-       description_short: The law does not restrict women’s choice of residence or give husbands more power in deciding where the family lives.
-       unit: "(1=yes; 0=no)"
-       display:
-         numDecimalPlaces: 0
-         tolerance: 5
+        title: Women have full legal rights to decide where to live
+        description_short: The law does not restrict women’s choice of residence or give husbands more power in deciding where the family lives.
+        description_key:
+          - This indicator records whether women have the same legal rights as men to decide where to live.
+          - A “yes” means women can freely choose their residence, either alone or with their family.
+          - A “no” means the law gives husbands greater authority over the family’s place of residence.
+          - Equal rights to residence reflect personal freedom and equality within marriage.
+          - Restrictions reduce women’s independence and control over their lives.
+        unit: "(1=yes; 0=no)"
+        display:
+          numDecimalPlaces: 0
+          tolerance: 5
 
       sg_law_asst_ar:
         title: Spouses have equal rights to manage their own and joint assets
         description_short: In marriage, women and men keep control over the property they bring in or acquire, and both have equal rights to manage joint assets, with consent required only for major transactions like selling or pledging property.
+        description_key:
+          - This indicator records whether women and men have equal legal rights to manage assets in marriage.
+          - Equal rights mean both spouses control their own property and share equal authority over joint assets.
+          - Major transactions, like selling or pledging property, may require the consent of both spouses.
+          - A “no” means the law gives husbands greater control over family property.
+          - Equal management of assets supports fairness and independence within marriage.
         unit: "(1=yes; 0=no)"
         display:
           numDecimalPlaces: 0
@@ -374,6 +532,12 @@ tables:
       sg_dmk_hlth_wf_zs:
         title: Share of married women making their own health care decisions
         description_short: Share of married women aged 15–49 reporting that they themselves are the main decision-makers for their health care.
+        description_key:
+          - This measures the percentage of married women aged 15–49 who decide on their own health care.
+          - Women are counted if they report being the main decision-maker.
+          - Health care autonomy is important for women’s well-being and reproductive rights.
+          - Greater decision-making power suggests stronger independence and bargaining power.
+          - Limited autonomy may reflect cultural or household barriers to women’s control over health.
         unit: "%"
         short_unit: "%"
         display:
@@ -384,10 +548,13 @@ tables:
         title: Law mandates equal pay for work of equal value for women and men
         description_short: '"Work of equal value" means not just the same job, but also different jobs that are similar in skills, responsibilities, and working conditions.'
         description_key:
-          - Equal pay for work of equal value" means that employees should be paid the same by their employer if their jobs require similar skills, effort, responsibility, and working conditions, even if the jobs themselves are different. This is also called "pay equity.
-          - Pay equity" goes further than "equal pay for equal work," which only ensures that employees in the same job get the same pay.
-          - The value of different jobs can be measured by looking at factors like skills, effort, responsibility, and working conditions. However, proving that jobs are of equal value can be difficult because different roles may require different expertise, take place in different environments, or have historically been valued unequally.
-          - For example, in the UK legal case of Julie Hayward v. Cammell Laird Shipbuilders (1988), a female cook argued that her job was just as valuable as those of male painters and joiners working in the shipyard, who were paid more. She won her case, but only after an independent expert carefully assessed the demands of each role.
+          - Equal pay for work of equal value means men and women should receive the same pay for jobs that require similar skills, effort, and responsibility.
+          - This is also known as pay equity, which goes further than equal pay for equal work.
+          - Equal pay for equal work ensures men and women in the same job receive the same wage.
+          - Pay equity covers different jobs if they are judged to have the same overall value.
+          - The value of jobs is assessed by comparing skills, responsibilities, effort, and working conditions.
+          - Proving jobs are of equal value can be difficult, as different roles may be valued unequally in practice.
+          - Equal pay laws are designed to reduce gender wage gaps and ensure fairness in the labor market.
         unit: "(1=yes; 0=no)"
         display:
           numDecimalPlaces: 0
