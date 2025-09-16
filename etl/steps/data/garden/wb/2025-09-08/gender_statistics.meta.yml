@@ -587,3 +587,20 @@ tables:
         display:
           numDecimalPlaces: 0
           tolerance: 5
+
+
+      sg_law_indx:
+        title: Women, Business and the Law Index
+        description_short: "The index measures how laws and regulations affect women’s economic opportunity on a scale from 0 to 100, where 100 means equal legal rights for men and women. It is the average score of eight categories: mobility, workplace, pay, marriage, parenthood, entrepreneurship, assets, and pension."
+        description_key:
+          - The Women, Business and the Law Index measures legal gender equality in the areas that shape women’s economic participation.
+          - "It scores economies on eight categories: mobility, workplace, pay, marriage, parenthood, entrepreneurship, assets, and pension."
+          - Each category score is based on legal provisions that affect women’s rights and opportunities in that domain.
+          - The index ranges from 0 to 100, where 100 indicates equal legal rights for men and women.
+          - The overall score is calculated as the simple average of the eight category scores.
+          - The index captures laws and regulations as written (de jure), not how effectively they are implemented (de facto).
+          - *desc_standardized_assumptions
+        unit: "index (0–100)"
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
