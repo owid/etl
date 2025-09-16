@@ -1,17 +1,4 @@
 steps:
-  # World Bank GenderStats
-  data://meadow/wb/2024-06-10/gender_statistics:
-    - snapshot://wb/2024-06-10/gender_statistics.feather
-  data://garden/wb/2024-06-10/gender_statistics:
-    - data://meadow/wb/2024-06-10/gender_statistics
-  data://garden/wb/2024-06-10/gender_statistics_country_counts:
-    - data://garden/wb/2024-06-10/gender_statistics
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/demography/2024-07-15/population
-  data://grapher/wb/2024-06-10/gender_statistics:
-    - data://garden/wb/2024-06-10/gender_statistics
-  data://grapher/wb/2024-06-10/gender_statistics_country_counts:
-    - data://garden/wb/2024-06-10/gender_statistics_country_counts
 
   # LGBTI Policy Index (Velasco, 2020)
   data://meadow/lgbt_rights/2023-04-27/lgbti_policy_index:
@@ -45,3 +32,21 @@ steps:
     - data://meadow/lgbt_rights/2025-07-09/criminalization_mignot
   data://grapher/lgbt_rights/2025-07-09/criminalization_mignot:
     - data://garden/lgbt_rights/2025-07-09/criminalization_mignot
+
+  #
+  # World Bank - Gender Statistics
+  #
+  data://meadow/wb/2025-09-08/gender_statistics:
+    - snapshot://wb/2025-09-08/gender_statistics.zip
+  data://garden/wb/2025-09-08/gender_statistics:
+    - data://meadow/wb/2025-09-08/gender_statistics
+    - snapshot://wb/2025-09-08/gender_statistics.zip
+  data://grapher/wb/2025-09-08/gender_statistics:
+    - data://garden/wb/2025-09-08/gender_statistics
+
+  data://garden/wb/2025-09-08/gender_statistics_country_counts:
+    - data://garden/wb/2025-09-08/gender_statistics
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2024-07-15/population
+  data://grapher/wb/2025-09-08/gender_statistics_country_counts:
+    - data://garden/wb/2025-09-08/gender_statistics_country_counts

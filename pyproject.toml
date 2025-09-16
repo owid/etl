@@ -72,9 +72,9 @@ dependencies = [
     "mediacloud>=4.4.0",
     # NOTE: higher versions cause errors when running this on staging server (maybe even locally)
     # fastmcp run owid_mcp/server.py --transport=http  --host=0.0.0.0 --port=8080
-    "fastmcp<=2.10.6",
+    "fastmcp>=2.12.3",
     "pyproj>=3.7.1",
-    "pydantic-ai>=0.7.3",
+    "pydantic-ai>=1.0.6",
     "logfire[fastapi,httpx]>=4.3.3",
     "cfgrib>=0.9.15.0",
 ]

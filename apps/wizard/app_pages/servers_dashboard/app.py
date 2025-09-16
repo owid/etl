@@ -292,6 +292,7 @@ else:
 
                     st.markdown("---")
                     st.markdown("**This will:**")
+                    st.markdown("- Purge R2 files for this server from owid-api-staging")
                     st.markdown("- Run `make refresh` in the owid-grapher directory")
                     st.markdown("- Drop and recreate the MySQL database")
                     st.markdown("- Import the latest data from staging")

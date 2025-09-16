@@ -1,0 +1,29 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "World Bank Gender Statistics"
+    description: |-
+      The World Bank Gender Statistics dataset provides a comprehensive range of gender-related indicators grouped by various topics. These indicators are categorized under different themes such as education, employment and time use, entrepreneurship, environment, health, leadership, norms and decision-making, technology, violence, and contextual information. Each category contains numerous specific indicators, covering a wide range of issues such as literacy rates, employment by sector, legal rights, health statistics, and more. This dataset offers detailed information and insights into various aspects of gender disparity and equality across different regions and countries.
+    date_published: "2025"
+
+    # Citation
+    producer: World Bank Gender Statistics
+    citation_full: |-
+      World Bank Gender Statistics, World Bank, 2025. Licence: CC BY 4.0.
+    attribution_short: World Bank
+
+    # Files
+    url_main: https://genderdata.worldbank.org/en/home
+    url_download: https://databank.worldbank.org/data/download/Gender_Stats_CSV.zip
+    date_accessed: '2025-09-08'
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://datacatalog.worldbank.org/public-licenses#cc-by
+outs:
+  - md5: 45e58dfc64fe49128e1e06bc4e5ab23c
+    size: 162035690
+    path: gender_statistics.zip

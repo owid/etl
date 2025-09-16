@@ -48,9 +48,10 @@ INSTRUCTIONS = (
 
 INSTRUCTIONS_ENTITIES = "• Entity names must match exactly as they appear in OWID:\n" f"{COMMON_ENTITIES}\n\n"
 
+
 # NOTE:
-# Because the ChatGPT connector doesn’t perform a session‑ID handshake (it just fires off JSON‑RPC POSTs),
-# you must run your FastMCP server in stateless mode. Otherwise FastMCP won’t recognize the incoming
+# Because the ChatGPT connector doesn't perform a session‑ID handshake (it just fires off JSON‑RPC POSTs),
+# you must run your FastMCP server in stateless mode. Otherwise FastMCP won't recognize the incoming
 # paths and will return 404.
 # NOTE:
 # I don't fully trust the note above, though I couldn't make it work without stateless_http=True. Whenever
@@ -117,13 +118,14 @@ async def setup_server():
     await mcp.import_server(deep_research.mcp)
 
 
-# Create an event loop and setup the server
-if __name__ != "__main__":
-    asyncio.run(setup_server())
+# Create the setup task - this will be awaited when needed
+_server_setup_task = setup_server()
 
 
 # ---------------------------------------------------------------------------
 # Entrypoint
 # ---------------------------------------------------------------------------
 if __name__ == "__main__":
-    mcp.run(stateless_http=True)
+    # Setup the server before running
+    asyncio.run(_server_setup_task)
+    mcp.run(transport="http", host="0.0.0.0", port=8080, stateless_http=True)
