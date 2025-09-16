@@ -40,12 +40,13 @@ definitions:
     <%- endif %>
   description_key_low_pay_earners: |-
     Workers are considered _low pay_ if their hourly earnings at all jobs are less than two-thirds of median hourly earnings.
-  # description_key_occupation: |-
-  #   <% if classif1.startswith("Occupation (ISCO-08):") %>
-  #       "Occupation (Skill level): Skill level 1 ~ low": "Occupation (Skill level): Low",
-  #       "Occupation (Skill level): Skill level 2 ~ medium": "Occupation (Skill level): Medium",
-  #       "Occupation (Skill level): Skill levels 3 and 4 ~ high": "Occupation (Skill level): High",
-  #       "Occupation (Skill level): Not elsewhere classified": "Occupation (Skill level): Not elsewhere classified",
+  description_key_occupation: |-
+    <% if classif1 == "Occupation (Skill level): Low") %>
+      The skill level of occupations classified as _Low_ (level 1) typically includes the category "elementary occupations". Examples include cleaners and helpers, agricultural
+        "Occupation (Skill level): Skill level 1 ~ low": "Occupation (Skill level): Low",
+        "Occupation (Skill level): Skill level 2 ~ medium": "Occupation (Skill level): Medium",
+        "Occupation (Skill level): Skill levels 3 and 4 ~ high": "Occupation (Skill level): High",
+        "Occupation (Skill level): Not elsewhere classified": "Occupation (Skill level): Not elsewhere classified",
   description_key_iloest_modelled_data: |-
     This data is part of the ILO Modelled Estimates series. This series combines nationally reported observations with imputed data to have a harmonized, internationally comparable dataset and produce regional and global aggregates. For more information, please refer to the [ILO Modelled Estimates documentation](https://ilostat.ilo.org/methods/concepts-and-definitions/ilo-modelled-estimates/).
   description_key_13th_icls: |-
