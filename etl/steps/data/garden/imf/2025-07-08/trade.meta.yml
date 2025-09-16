@@ -241,7 +241,7 @@ tables:
           <%- endif -%>
         unit: ""
         short_unit: ""
-        description_short: The country that was the largest source of imports in a given year, based on merchandise import values that include the cost of goods plus freight and insurance.
+        description_short: For every country, the main trading partner supplying the largest share of its [merchandise imports](#dod:merchandise-imports).
         description_key:
           - This indicator shows which country was the largest source of imports for each country–year, based on import values in current US dollars.
           - *cif_basis
@@ -261,7 +261,7 @@ tables:
           <%- endif -%>
         unit: ""
         short_unit: ""
-        description_short: The country that was the largest destination for exports in a given year, based on merchandise export values that exclude freight and insurance costs.
+        description_short: For every country, the main trading partner receiving the largest share of its total [merchandise exports](#dod:merchandise-exports).
         description_key:
           - This indicator shows which country was the largest destination for exports from each country–year, based on export values in current US dollars.
           - *fob_basis
