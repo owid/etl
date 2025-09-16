@@ -229,16 +229,14 @@ tables:
         display:
           numDecimalPlaces: 1
           tolerance: 5
-
       sg_law_obhb_mr_no:
-        title: Married women are required by law to obey their husbands
-        description_short: Any legal provision stating that a married woman must obey her husband or that disobeying her husband has legal ramifications for her, such as loss of their right to maintenance.
+        title: Married women are not required by law to obey their husbands
+        description_short: This indicator captures whether family law includes any provision requiring a married woman to obey her husband or penalizing her for disobedience, such as loss of maintenance rights.
         description_key:
-          - This indicator records whether the law requires married women to obey their husbands.
-          - Such provisions may restrict women’s autonomy in marriage and household decision-making.
-          - These laws may create legal consequences for women if they are considered disobedient.
-          - Requirements to obey are a sign of unequal treatment of women in family law.
-          - The absence of such laws indicates greater legal equality between spouses.
+          - The indicator measures whether family law obliges married women to obey their husbands.
+          - If such provisions exist, they restrict women’s autonomy and reinforce unequal treatment within marriage.
+          - Disobedience can carry legal consequences, such as loss of the right to maintenance.
+          - *desc_standardized_assumptions
         unit: "(1=yes; 0=no)"
         display:
           numDecimalPlaces: 0
