@@ -122,6 +122,9 @@ def add_country_counts_and_population_by_status(
         tb=tb_regions, ds_population=ds_population, warn_on_missing_countries=False
     )
 
+    # Remove attribution to avoid issues in propagation
+    tb_regions["population"].m.presentation.attribution = None
+
     # Define empty dictionaries for each of the columns
     columns_count_dict = {columns[i]: [] for i in range(len(columns))}
     columns_pop_dict = {columns[i]: [] for i in range(len(columns))}
@@ -164,6 +167,9 @@ def add_country_counts_and_population_by_status(
     tb_regions = geo.add_population_to_table(
         tb=tb_regions, ds_population=ds_population, warn_on_missing_countries=False
     )
+
+    # Remove attribution to avoid issues in propagation
+    tb_regions["population"].m.presentation.attribution = None
 
     # Calculate the missing population for each region
     for col in columns:
