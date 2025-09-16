@@ -203,12 +203,8 @@ tables:
         description_key:
           - Domestic violence includes physical, sexual, or psychological abuse in families or intimate relationships.
           - The indicator measures whether legislation specifically addresses domestic violence.
-          - The answer is “Yes” (1) if the law includes criminal sanctions or provides protection orders for victims.
-          - "The answer is “No” (0) if:
-              • there is no such legislation,
-              • the law does not provide sanctions or protection orders,
-              • the law protects only certain women or family members, or
-              • it only increases penalties for general crimes when committed within families."
+          - The answer is “yes” if the law includes criminal sanctions or provides protection orders for victims.
+          - The answer is “no” if there is no such legislation, if the law does not provide sanctions or protection orders, if it protects only certain women or family members, or if it only increases penalties for general crimes when committed within families.
           - In the absence of such laws, survivors usually have only limited protection under general criminal law.
           - Having a law does not mean it is enforced or effective in practice.
           - *desc_standardized_assumptions
@@ -229,6 +225,7 @@ tables:
         display:
           numDecimalPlaces: 1
           tolerance: 5
+
       sg_law_obhb_mr_no:
         title: Married women are not required by law to obey their husbands
         description_short: This indicator captures whether family law includes any provision requiring a married woman to obey her husband or penalizing her for disobedience, such as loss of maintenance rights.
