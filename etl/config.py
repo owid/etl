@@ -115,7 +115,10 @@ ENV_GRAPHER_USER_ID = GRAPHER_USER_ID
 DB_IS_PRODUCTION = DB_NAME == "live_grapher"
 
 # Special ENV file with access to production DB (read-only), used by chart-diff
-ENV_FILE_PROD = os.environ.get("ENV_FILE_PROD")
+if "ENV_FILE_PROD" in env:
+    ENV_FILE_PROD = BASE_DIR / os.environ.get("ENV_FILE_PROD")  # type: ignore
+else:
+    ENV_FILE_PROD = None
 
 if "DATA_API_ENV" in env:
     DATA_API_ENV = env["DATA_API_ENV"]
@@ -666,3 +669,6 @@ DATA_PRODUCER_REPORT_STATUS_SHEET_ID = os.environ.get("DATA_PRODUCER_REPORT_STAT
 LOGFIRE_TOKEN_EXPERT = env.get("LOGFIRE_TOKEN_EXPERT")
 LOGFIRE_TOKEN_MCP = env.get("LOGFIRE_TOKEN_MCP")
 LOGFIRE_TOKEN_ETL_API = env.get("LOGFIRE_TOKEN_ETL_API")
+
+# MCP server
+OWID_MCP_SERVER_URL = env.get("OWID_MCP_SERVER_URL", "https://mcp.owid.io/mcp")

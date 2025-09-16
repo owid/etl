@@ -25,12 +25,16 @@ def run() -> None:
         ds_garden["deaths"],
         ds_garden["births"],
         ds_garden["life_expectancy"],
+        ds_garden["mortality_rate"],
     ]
     # Reset the index for all tables to prepare for merging
     tables = [tb.reset_index() for tb in tables]
 
     tb = pr.multi_merge(tables, on=["country", "year", "sex", "age", "variant"], how="outer")
     tb = tb.drop(columns=["population_density"])
+    # This should be the same as population_change
+    tb["check_pop_change"] = tb["births"] - tb["deaths"] + tb["net_migration"]
+    tb["change_diff"] = tb["population_change"] - tb["check_pop_change"]
 
     simple_tb = get_simple_data(tb)
     age_sex_tb = get_age_sex_data(tb)
@@ -52,9 +56,6 @@ def get_simple_data(tb: Table) -> Table:
     """
 
     tb = tb[(tb["age"] == "all") & (tb["sex"] == "all")]
-    # This should be the same as population_change
-    tb["check_pop_change"] = tb["births"] - tb["deaths"] + tb["net_migration"]
-    tb["change_diff"] = tb["population_change"] - tb["check_pop_change"]
     tb = tb[tb["variant"].isin(["estimates", "medium"])]
     tb = tb.format(["country", "year", "sex", "age", "variant"], short_name="total_populations_medium")
     return tb

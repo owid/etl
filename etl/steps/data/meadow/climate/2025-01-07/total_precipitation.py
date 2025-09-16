@@ -15,7 +15,7 @@ from shapely.geometry import mapping
 from structlog import get_logger
 from tqdm import tqdm
 
-from etl.helpers import PathFinder
+from etl.helpers import PathFinder, sanitize_crs
 from etl.snapshot import Snapshot
 
 # Get paths and naming conventions for current step.
@@ -105,11 +105,11 @@ def run() -> None:
         try:
             # Clip to the bounding box for the country's shape to significantly improve performance.
             xmin, ymin, xmax, ymax = geometry.bounds
-            clip = da.rio.clip_box(minx=xmin, miny=ymin, maxx=xmax, maxy=ymax)
+            clip = da.rio.clip_box(minx=xmin, miny=ymin, maxx=xmax, maxy=ymax, crs=sanitize_crs(shapefile.crs))
 
             # Clip data to the country's shape.
             # NOTE: if memory is an issue, we could use `from_disk=True` arg
-            clip = clip.rio.clip([mapping(geometry)], shapefile.crs)
+            clip = clip.rio.clip([mapping(geometry)], sanitize_crs(shapefile.crs))
 
             # Calculate weights based on latitude to account for area distortion in latitude-longitude grids.
             weights = np.cos(np.deg2rad(clip.latitude))
