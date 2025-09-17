@@ -114,9 +114,6 @@ async def setup_server():
     await mcp.import_server(indicators.mcp)
     await mcp.import_server(posts.mcp)
     await mcp.import_server(charts.mcp)
-    # NOTE: disabled because it wasn't working well and was confusing LLM. Feel
-    #  free to remove the whole module.
-    # await mcp.import_server(deep_research.mcp)
 
 
 # Create the setup task - this will be awaited when needed
