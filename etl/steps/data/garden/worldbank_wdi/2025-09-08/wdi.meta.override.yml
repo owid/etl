@@ -1017,3 +1017,79 @@ tables:
           numDecimalPlaces: 1
           tolerance: 5
           name: Upper secondary
+
+    #####################################################################################################
+    # ILOSTAT indicators
+    #####################################################################################################
+
+    sl_tlf_cact_zs:
+      title: Labor force participation rate, total (% of total population ages 15+) (modeled ILO estimate)
+    sl_tlf_cact_ma_zs:
+      title: Labor force participation rate, male (% of male population ages 15+) (modeled ILO estimate)
+    sl_tlf_cact_fe_zs:
+      title: Labor force participation rate, female (% of female population ages 15+) (modeled ILO estimate)
+
+    sl_tlf_cact_fe_ne_zs:
+      title: Labor force participation rate, female (% of female population ages 15+) (national estimate)
+
+    sl_tlf_acti_1524_fe_ne_zs:
+      title: Labor force participation rate for ages 15-24, female (%) (national estimate)
+
+    sl_uem_totl_zs:
+      title: Unemployment, total (% of total labor force) (modeled ILO estimate)
+    sl_uem_totl_ma_zs:
+      title: Unemployment, male (% of male labor force) (modeled ILO estimate)
+    sl_uem_totl_fe_zs:
+      title: Unemployment, female (% of female labor force) (modeled ILO estimate)
+    sl_uem_1524_zs:
+      title: Unemployment, youth total (% of total labor force ages 15-24) (modeled ILO estimate)
+
+    sl_emp_totl_sp_zs:
+      title: Employment to population ratio, 15+, total (%) (modeled ILO estimate)
+
+    sl_emp_totl_sp_fe_zs:
+      title: Employment to population ratio, 15+, female (%) (modeled ILO estimate)
+
+    sl_emp_totl_sp_fe_ne_zs:
+      title: Employment to population ratio, 15+, female (%) (national estimate)
+
+    sl_emp_vuln_zs:
+      title: Vulnerable employment, total (% of total employment) (modeled ILO estimate)
+
+    sl_tlf_totl_fe_zs:
+      title: Labor force, female (% of total labor force)
+    sl_tlf_0714_zs:
+      title: Children in employment, total (% of children ages 7-14)
+    sl_tlf_0714_ma_zs:
+      title: Children in employment, male (% of male children ages 7-14)
+    sl_tlf_0714_fe_zs:
+      title: Children in employment, female (% of female children ages 7-14)
+
+    sl_tlf_0714_wk_zs:
+      title: Children in employment, work only (% of children in employment, ages 7-14)
+
+    sl_tlf_0714_sw_tm:
+      title: Average working hours of children, study and work, ages 7-14 (hours per week)
+
+    sl_ind_empl_zs:
+      title: Employment in industry (% of total employment) (modeled ILO estimate)
+    sl_agr_empl_zs:
+      title: Employment in agriculture (% of total employment) (modeled ILO estimate)
+    sl_srv_empl_zs:
+      title: Employment in services (% of total employment) (modeled ILO estimate)
+
+    sl_agr_empl_ma_zs:
+      title: Employment in agriculture, male (% of male employment) (modeled ILO estimate)
+    sl_ind_empl_ma_zs:
+      title: Employment in industry, male (% of male employment) (modeled ILO estimate)
+    sl_srv_empl_ma_zs:
+      title: Employment in services, male (% of male employment) (modeled ILO estimate)
+    sl_agr_empl_fe_zs:
+      title: Employment in agriculture, female (% of female employment) (modeled ILO estimate)
+    sl_ind_empl_fe_zs:
+      title: Employment in industry, female (% of female employment) (modeled ILO estimate)
+    sl_srv_empl_fe_zs:
+      title: Employment in services, female (% of female employment) (modeled ILO estimate)
+
+    sl_tlf_cact_fm_zs:
+      title: Ratio of female to male labor force participation rate (%) (modeled ILO estimate)
