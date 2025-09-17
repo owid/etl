@@ -72,6 +72,7 @@ def run() -> None:
     # --- Historical overlaps: remove both on exporter side and partner side -----
     tb_long = clean_historical_overlaps(tb_long, country_col="country")
     tb_long = clean_historical_overlaps(tb_long, country_col="counterpart_country")
+    tb_long = tb_long.dropna(subset=["value"])
 
     # --- Member countries (for “all-countries” analyses) which exclude regional aggregates ------------------------
     members: set[str] = set()
@@ -84,10 +85,6 @@ def run() -> None:
 
     # --- Trade relationships (bilateral, unilateral, non-trading) - needs to be calculated before NaNs are excluded   --------------
     tb_partnerships = calculate_trade_relationship_shares(tb_all_countries)
-
-    # Drop nans in value column to avoid issues when doing certain calculations later
-    tb_long = tb_long.dropna(subset=["value"])
-    tb_all_countries = tb_all_countries.dropna(subset=["value"])
 
     # --- Add regional aggregates on both axes (plus Asia excl. China) -----------
     tb_long = _add_regional_aggregates(tb_long, ds_regions)
