@@ -10,7 +10,7 @@ from sentry_sdk import logger as sentry_logger
 from etl.config import LOGFIRE_TOKEN_MCP, enable_sentry
 
 # Import the modular servers
-from owid_mcp import charts, deep_research, indicators, posts
+from owid_mcp import charts, indicators, posts
 from owid_mcp.config import COMMON_ENTITIES
 
 enable_sentry(enable_logs=True)
@@ -64,7 +64,6 @@ mcp = FastMCP(
     instructions="\n\n".join(
         [
             INSTRUCTIONS,
-            deep_research.INSTRUCTIONS,
             indicators.INSTRUCTIONS,
             charts.INSTRUCTIONS,
             posts.INSTRUCTIONS,
