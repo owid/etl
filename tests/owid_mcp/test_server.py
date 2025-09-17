@@ -330,12 +330,33 @@ async def test_search_and_fetch_workflow():
             # Different datasets have different numbers of columns, just check it has multiple columns
             assert len(parts) >= 3
 
-            # Just check we have data in a reasonable format - don't assume specific quoting
-            # Year should be numeric or empty (some datasets have empty values)
-            if parts[1].strip():
-                assert parts[1].strip().lstrip("-").isdigit()  # year (could be negative)
-            # Value might be float, so just check it's not empty
-            assert parts[2].strip()  # value
+            # CSV format can be either:
+            # - Entity,Code,Year,[Metric columns] (when Code column has empty values)
+            # - Code,Year,[Metric columns] (when Entity column is removed)
+            # Check if header has Entity column to determine format
+            has_entity_column = "Entity" in header
+
+            if has_entity_column:
+                # Format: Entity,Code,Year,[Metric columns]
+                # Entity should be non-empty
+                assert parts[0].strip()  # entity
+                # Code might be empty (that's why Entity wasn't removed)
+                # Year should be numeric or empty (could be int or float like 1990.0)
+                if parts[2].strip():
+                    try:
+                        float(parts[2].strip())  # year (could be negative, int or float)
+                    except ValueError:
+                        assert False, f"Year should be numeric but got: {parts[2].strip()}"
+            else:
+                # Format: Code,Year,[Metric columns]
+                # Code should be non-empty (country/region code)
+                assert parts[0].strip()  # code
+                # Year should be numeric or empty (could be int or float like 1990.0)
+                if parts[1].strip():
+                    try:
+                        float(parts[1].strip())  # year (could be negative, int or float)
+                    except ValueError:
+                        assert False, f"Year should be numeric but got: {parts[1].strip()}"
 
 
 @pytest.mark.asyncio

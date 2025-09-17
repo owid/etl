@@ -241,16 +241,36 @@ tables:
           <%- endif -%>
         unit: ""
         short_unit: ""
-        description_short: The country that was the largest source of imports in a given year, based on merchandise import values that include the cost of goods plus freight and insurance.
+        description_short: For every country, the main trading partner supplying the largest share of its [merchandise imports](#dod:merchandise-imports).
         description_key:
           - This indicator shows which country was the largest source of imports for each country–year, based on import values in current US dollars.
           - *cif_basis
           - *goods_only
-          - The top supplier for each country–year was identified, and then a global count was made of how often each country appeared in this role. Here, the top ten countries with the highest counts are shown as separate categories, while the rest were grouped as "other".
+          - The top supplier for each country–year was identified, and then a global count was made of how often each country appeared in this role. Here, the top ten countries with the highest counts are shown as separate categories, while the rest were grouped as "Other".
         presentation:
           title_public: Top import partner category
           grapher_config:
-            note: Only the 10 partners most often ranked as the top import source across countries are shown; the rest are grouped as "other".
+            note: Only the 10 partners most often ranked as the top import source across countries are shown; the rest are grouped as "Other".
+        display:
+          numDecimalPlaces: 0
+
+      top_export_partner_category:
+        title: |-
+          <% if counterpart_country == 'World' %>
+          Top export partner category
+          <%- endif -%>
+        unit: ""
+        short_unit: ""
+        description_short: For every country, the main trading partner receiving the largest share of its total [merchandise exports](#dod:merchandise-exports).
+        description_key:
+          - This indicator shows which country was the largest destination for exports from each country–year, based on export values in current US dollars.
+          - *fob_basis
+          - *goods_only
+          - The top destination for each country–year was identified, and then a global count was made of how often each country appeared in this role. Here, the top ten countries with the highest counts are shown as separate categories, while the rest were grouped as "Other".
+        presentation:
+          title_public: Top export partner category
+          grapher_config:
+            note: Only the 10 partners most often ranked as the top export destination across countries are shown; the rest are grouped as "Other".
         display:
           numDecimalPlaces: 0
 

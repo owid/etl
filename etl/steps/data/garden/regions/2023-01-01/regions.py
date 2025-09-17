@@ -94,6 +94,30 @@ def run_sanity_checks(df: pd.DataFrame) -> None:
     assert len(aliases_duplicated) == 0, error
 
 
+def check_unique_members_within_regions(df: pd.DataFrame) -> None:
+    """Check that each region has unique members (no duplicates within each region's members list)."""
+    duplicate_info = []
+    for _, row in df.iterrows():
+        region = row["code"]
+        members = row["members"]
+
+        if members is not None and isinstance(members, list):
+            # Check for duplicates within this row's members list
+            seen = set()
+            duplicates = []
+            for member in members:
+                if member in seen:
+                    duplicates.append(member)
+                seen.add(member)
+
+            if duplicates:
+                duplicate_info.append(f"Region '{region}' has duplicate members: {duplicates}")
+
+    if duplicate_info:
+        error_msg = "Found duplicate members within region rows:\n" + "\n".join(duplicate_info)
+        raise AssertionError(error_msg)
+
+
 def replace_aggregate_members(df: pd.DataFrame):
     """Programmatically replace members that are aggregates with their members.
 
@@ -144,6 +168,9 @@ def run(dest_dir: str) -> None:
 
     # Replace members that are aggregates
     df = replace_aggregate_members(df)
+
+    # Check that there are no duplicate members within each region
+    check_unique_members_within_regions(df)
 
     # Create a table of legacy codes (ensuring all numeric codes are integer).
     df_codes = df_codes.astype(

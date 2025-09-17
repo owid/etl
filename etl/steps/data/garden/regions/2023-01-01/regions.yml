@@ -1936,17 +1936,17 @@
     - "VEN"
     - "VGB"
     - "VIR"
-- code: WB_MENA
-  name: "Middle East and North Africa (WB)"
+- code: WB_MENAP
+  name: "Middle East, North Africa, Afghanistan and Pakistan (WB)"
   region_type: "aggregate"
   defined_by: wb
   members:
+    - "AFG"
     - "ARE"
     - "BHR"
     - "DJI"
     - "DZA"
     - "EGY"
-    - "ESH"
     - "IRN"
     - "IRQ"
     - "ISR"
@@ -1957,8 +1957,7 @@
     - "MAR"
     - "MLT"
     - "OMN"
-    - "OWID_YAR"
-    - "OWID_YPR"
+    - "PAK"
     - "PSE"
     - "QAT"
     - "SAU"
