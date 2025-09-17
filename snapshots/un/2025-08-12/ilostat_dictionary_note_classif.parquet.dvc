@@ -9,7 +9,7 @@ meta:
     title_snapshot: ILOSTAT - note_classif dictionary
     description_snapshot: |-
       This file the ILOSTAT dictionary that provides additional details for the `note_classif` column.
-    date_published: "2025-08-11"
+    date_published: "2025-09-16"
 
     producer: International Labour Organization
     citation_full: |-
@@ -18,7 +18,7 @@ meta:
 
     # Files
     url_main: https://ilostat.ilo.org/
-    date_accessed: '2025-08-12'
+    date_accessed: '2025-09-17'
 
     # License
     license:

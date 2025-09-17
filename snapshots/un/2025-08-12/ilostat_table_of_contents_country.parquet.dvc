@@ -9,7 +9,7 @@ meta:
     title_snapshot: ILOSTAT - Table of contents for country
     description_snapshot: |-
       This file the ILOSTAT table of contents that contains additional information for countries, including ILO regions and subregions.
-    date_published: "2025-08-11"
+    date_published: "2025-09-16"
 
     producer: International Labour Organization
     citation_full: |-
@@ -18,13 +18,13 @@ meta:
 
     # Files
     url_main: https://ilostat.ilo.org/
-    date_accessed: '2025-08-12'
+    date_accessed: '2025-09-17'
 
     # License
     license:
       name: CC BY 4.0
       url: https://www.ilo.org/rights-and-permissions#data
 outs:
-  - md5: ce705aa095b9e81b3f86a4115087ebac
-    size: 32900
+  - md5: 45d8c8c018c3b22a7df87d7dc428f4f7
+    size: 32632
     path: ilostat_table_of_contents_country.parquet

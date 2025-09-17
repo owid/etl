@@ -6,7 +6,7 @@ meta:
     title: "ILOSTAT"
     description: |-
       The ILO’s main online database, ILOSTAT, maintained by the Department of Statistics, is the world’s largest repository of labour market statistics. It covers all countries and regions and a wide range of labour-related topics, including employment, unemployment, wages, working time and labour productivity, to name a few. It includes time series going back as far as 1938; annual, quarterly and monthly labour statistics; country-level, regional and global estimates; and even projections of the main labour market indicators.
-    date_published: "2025-08-11"
+    date_published: "2025-09-16"
 
     # Citation
     producer: International Labour Organization
@@ -16,13 +16,13 @@ meta:
 
     # Files
     url_main: https://ilostat.ilo.org/
-    date_accessed: '2025-08-12'
+    date_accessed: '2025-09-17'
 
     # License
     license:
       name: CC BY 4.0
       url: https://www.ilo.org/rights-and-permissions#data
 outs:
-  - md5: 5e47151f1301c44f416d420171880367
-    size: 5034891
+  - md5: 07f0bb4c17f4625392c06867906c9de5
+    size: 5026992
     path: ilostat.parquet

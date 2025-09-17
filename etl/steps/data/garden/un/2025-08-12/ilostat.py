@@ -51,7 +51,7 @@ COLUMN_CATEGORIES = {
         "SDG indicator 8.8.1 - Fatal occupational injuries per 100'000 workers": "sdg_8_8_1_fatal_occupational_injuries",
         "SDG indicator 8.8.1 - Non-fatal occupational injuries per 100'000 workers": "sdg_8_8_1_non_fatal_occupational_injuries",
         "SDG indicator 8.8.2 - Level of national compliance with labour rights (freedom of association and collective bargaining)": "sdg_8_8_2_national_compliance_labour_rights",
-        "SDG indicator 8.b.1: Existence of a developed and operationalized national strategy for youth employment, as\r\na distinct strategy or as part of a national employment strategy": "sdg_8_b_1_national_strategy_youth_employment",
+        "SDG indicator 8.b.1: Existence of a developed and operationalized national strategy for youth employment": "sdg_8_b_1_national_strategy_youth_employment",
         "SDG indicator 9.2.2 - Manufacturing employment as a proportion of total employment (%)": "sdg_9_2_2_manufacturing_employment",
         "SDG indicator 10.4.1 - Labour income share as a percent of GDP (%)": "sdg_10_4_1_labour_income_share",
         "Average hourly earnings of employees by sex": "average_hourly_earnings_employees_by_sex",
@@ -281,7 +281,7 @@ def add_indicator_metadata(tb: Table, tb_metadata: Table, column: str) -> Table:
         tb[column].dropna().unique()
     ).issubset(
         set(tb_metadata[column].unique())
-    ), f"Some values are missing in the {column} metadata table: {set(tb[column].dropna().unique()) - set(tb_metadata[column].dropna().unique())}"
+    ), f"Some values are missing in the {column} metadata table: {set(tb[column].dropna().unique()) ^ set(tb_metadata[column].dropna().unique())}"
 
     tb = pr.merge(tb, tb_metadata, on=column, how="left")
 
@@ -297,7 +297,7 @@ def add_indicator_metadata(tb: Table, tb_metadata: Table, column: str) -> Table:
     # Assert that all renamed columns are the same as COLUMN_CATEGORIES[column].keys()
     assert (
         set(tb[column].unique()) == set(COLUMN_CATEGORIES[column].keys())
-    ), f"Some {column} are missing in the column categories mapping: {set(tb[column].unique()) - set(COLUMN_CATEGORIES[column].keys())}"
+    ), f"Some {column} are missing in the column categories mapping: {set(tb[column].unique()) ^ set(COLUMN_CATEGORIES[column].keys())}"
 
     if column == "indicator":
         # Multiply observations by 1000 when the indicator is in thousands
