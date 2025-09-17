@@ -15,13 +15,11 @@ BASE_DOLLAR_YEAR = 2024
 # We manually add the missing value here.
 # To get this value, go to:
 # https://fred.stlouisfed.org/series/GDPDEF
-# click on "Edit Graph",
-# set "Modify frequency" to "Annual" if possible, otherwise "Semiannual" (if there's no annual data yet for the last year),
-# aggregation method "Average",
-# then below, in "Units", select from the dropdown "Index (Scale value to 100 for chosen date)",
-# in the "or" field below, add the base year of the original WDI deflator (which, in the last update, was 2017).
-# NOTE: I used 2017-07-01, unsure if it should be some other day in the year, but the retrieved numbers for previous years coincided well with the given WDI values.
-DEFLATOR_MISSING_VALUES = {2025: 127.1}
+# click on "Edit Graph", and set:
+# * Modify frequency: "Annual" if possible, otherwise "Semiannual" (if there's no annual data yet for the last year),
+# * Aggregation method: "Average",
+# * Everything else by default, e.g. in "Units", leave it on "Select".
+DEFLATOR_MISSING_VALUES = {2025: 127.742}
 
 
 def deflate_prices(tb: Table, tb_deflator: Table) -> Table:
@@ -91,6 +89,9 @@ def run() -> None:
     # Combine tables.
     tb = tb.merge(tb_deflated, on=["year", "technology"])
 
+    # Calculate the range of years (used in the metadata).
+    year_lapse = int(tb["year"].max() - tb["year"].min())
+
     # Improve tables format.
     tb = tb.format(["year", "technology"])
 
@@ -101,7 +102,11 @@ def run() -> None:
     ds_garden = paths.create_dataset(
         tables=[tb],
         default_metadata=ds_meadow.metadata,
-        yaml_params={"BASE_DOLLAR_YEAR": BASE_DOLLAR_YEAR, "BASE_DOLLAR_YEAR_ORIGINAL": BASE_DOLLAR_YEAR_ORIGINAL},
+        yaml_params={
+            "BASE_DOLLAR_YEAR": BASE_DOLLAR_YEAR,
+            "BASE_DOLLAR_YEAR_ORIGINAL": BASE_DOLLAR_YEAR_ORIGINAL,
+            "YEAR_LAPSE": year_lapse,
+        },
     )
 
     # Save changes in the new garden dataset.
