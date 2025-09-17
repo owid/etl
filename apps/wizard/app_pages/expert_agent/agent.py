@@ -3,7 +3,6 @@ from pathlib import Path
 from typing import Any, AsyncGenerator, List, Literal
 
 import logfire
-import requests
 import streamlit as st
 import yaml
 from pydantic_ai import Agent
