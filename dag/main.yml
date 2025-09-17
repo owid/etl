@@ -731,4 +731,5 @@ include:
   - dag/corruption.yml
   - dag/geography.yml
   - dag/growth.yml
+  - dag/labor.yml
   - dag/economics.yml
