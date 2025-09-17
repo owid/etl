@@ -11,6 +11,17 @@ paths = PathFinder(__file__)
 BASE_DOLLAR_YEAR_ORIGINAL = 2017
 # Define the base year for the deflator.
 BASE_DOLLAR_YEAR = 2024
+# We use the WDI GDP deflator: linked series, but this is usually missing the latest year.
+# We manually add the missing value here.
+# To get this value, go to:
+# https://fred.stlouisfed.org/series/GDPDEF
+# click on "Edit Graph",
+# set "Modify frequency" to "Annual" if possible, otherwise "Semiannual" (if there's no annual data yet for the last year),
+# aggregation method "Average",
+# then below, in "Units", select from the dropdown "Index (Scale value to 100 for chosen date)",
+# in the "or" field below, add the base year of the original WDI deflator (which, in the last update, was 2017).
+# NOTE: I used 2017-07-01, unsure if it should be some other day in the year, but the retrieved numbers for previous years coincided well with the given WDI values.
+DEFLATOR_MISSING_VALUES = {2025: 127.1}
 
 
 def deflate_prices(tb: Table, tb_deflator: Table) -> Table:
@@ -24,6 +35,12 @@ def deflate_prices(tb: Table, tb_deflator: Table) -> Table:
 
     error = "Deflator base year has changed. Simply redefine BASE_DOLLAR_ORIGINAL."
     assert tb[tb["year"] == BASE_DOLLAR_YEAR_ORIGINAL]["deflator"].item() == 100, error
+
+    # Fill missing rows (caused by the deflator not having data for the latest year).
+    error = f"Expected missing data in deflator for the years {set(DEFLATOR_MISSING_VALUES)}."
+    for year in DEFLATOR_MISSING_VALUES:
+        assert tb.loc[tb["year"] == year, "deflator"].isnull().item(), error
+        tb.loc[tb["year"] == year, "deflator"] = DEFLATOR_MISSING_VALUES[year]
 
     # Deflate the prices for all technologies.
     deflator_on_base_year = tb[tb["year"] == BASE_DOLLAR_YEAR]["deflator"].item()
