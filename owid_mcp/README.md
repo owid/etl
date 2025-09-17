@@ -1,15 +1,8 @@
 # OWID MCP Server
 
-This is Our World in Data's MCP (Model Context Protocol) server providing access to charts, indicators, and data from Our World in Data. It's built using fastMCP and provides both Deep Research functionality and direct indicator access.
+This is Our World in Data's MCP (Model Context Protocol) server providing access to charts, indicators, and data from Our World in Data. It's built using fastMCP and provides direct indicator access.
 
 ## Features
-
-### Deep Research Module (`deep_research.py`)
-
-**Tools:**
-- `search(query)` - Search OWID charts via Algolia, returns CSV URLs filtered by country mentions
-- `fetch(id, time?)` - Download and process CSV data from chart URLs with optional time filtering
-- `fetch_image(id)` - Download PNG chart images by converting CSV URLs to PNG format
 
 ### Indicators Module (`indicators.py`)
 
@@ -51,18 +44,6 @@ python -m mcp.server.stdio owid_mcp.server:mcp
 
 ## Usage Examples
 
-### Chart Search and Data Retrieval
-```python
-# Search for population density charts
-search_results = await search("population density france")
-
-# Fetch CSV data from the first result
-csv_data = await fetch(search_results[0].id)
-
-# Get chart image
-chart_image = await fetch_image(search_results[0].id)
-```
-
 ### Indicator Search and Access
 ```python
 # Search for GDP indicators
@@ -95,15 +76,15 @@ search_results = await search_posts("climate change", limit=5)
 The server uses a modular architecture:
 
 - **`server.py`** - Main FastMCP server that imports and combines modules
-- **`deep_research.py`** - Algolia-based chart search and CSV/image fetching
 - **`indicators.py`** - Direct indicator search and data access
+- **`charts.py`** - Chart search and data retrieval functionality
 - **`posts.py`** - Post markdown content retrieval and search
 - **`data_utils.py`** - Shared utilities for data processing and API requests
 - **`config.py`** - Configuration constants and settings
 
 ## Search Optimization Tips
 
-### For Charts (Deep Research)
+### For Charts
 - Include country names in queries: "population density france", "co2 emissions china"
 - Use simple, generic terms: "coal production", "gdp per capita"
 - Avoid OWID-specific terms or overly complex queries
