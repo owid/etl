@@ -89,6 +89,9 @@ def run() -> None:
     # Combine tables.
     tb = tb.merge(tb_deflated, on=["year", "technology"])
 
+    # Calculate the range of years (used in the metadata).
+    year_lapse = int(tb["year"].max() - tb["year"].min())
+
     # Improve tables format.
     tb = tb.format(["year", "technology"])
 
@@ -99,7 +102,11 @@ def run() -> None:
     ds_garden = paths.create_dataset(
         tables=[tb],
         default_metadata=ds_meadow.metadata,
-        yaml_params={"BASE_DOLLAR_YEAR": BASE_DOLLAR_YEAR, "BASE_DOLLAR_YEAR_ORIGINAL": BASE_DOLLAR_YEAR_ORIGINAL},
+        yaml_params={
+            "BASE_DOLLAR_YEAR": BASE_DOLLAR_YEAR,
+            "BASE_DOLLAR_YEAR_ORIGINAL": BASE_DOLLAR_YEAR_ORIGINAL,
+            "YEAR_LAPSE": year_lapse,
+        },
     )
 
     # Save changes in the new garden dataset.
