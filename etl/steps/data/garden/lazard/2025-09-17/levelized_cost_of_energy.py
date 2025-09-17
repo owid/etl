@@ -15,13 +15,11 @@ BASE_DOLLAR_YEAR = 2024
 # We manually add the missing value here.
 # To get this value, go to:
 # https://fred.stlouisfed.org/series/GDPDEF
-# click on "Edit Graph",
-# set "Modify frequency" to "Annual" if possible, otherwise "Semiannual" (if there's no annual data yet for the last year),
-# aggregation method "Average",
-# then below, in "Units", select from the dropdown "Index (Scale value to 100 for chosen date)",
-# in the "or" field below, add the base year of the original WDI deflator (which, in the last update, was 2017).
-# NOTE: I used 2017-07-01, unsure if it should be some other day in the year, but the retrieved numbers for previous years coincided well with the given WDI values.
-DEFLATOR_MISSING_VALUES = {2025: 127.1}
+# click on "Edit Graph", and set:
+# * Modify frequency: "Annual" if possible, otherwise "Semiannual" (if there's no annual data yet for the last year),
+# * Aggregation method: "Average",
+# * Everything else by default, e.g. in "Units", leave it on "Select".
+DEFLATOR_MISSING_VALUES = {2025: 127.742}
 
 
 def deflate_prices(tb: Table, tb_deflator: Table) -> Table:
