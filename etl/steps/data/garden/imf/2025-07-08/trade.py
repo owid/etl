@@ -451,7 +451,7 @@ def clean_historical_overlaps(tb: Table, country_col: str = "country") -> Table:
 def calculate_trade_relationship_shares(tb: Table) -> Table:
     THRESHOLD = 0.01  # million USD
 
-    df = tb[tb.indicator.isin([EXPORT_COL, IMPORT_COL])].assign(has_trade=lambda d: d.value.fillna(0) > THRESHOLD)
+    df = tb[tb.indicator.isin([EXPORT_COL, IMPORT_COL])].dropna(subset=["value"]).assign(has_trade=lambda d: d.value > THRESHOLD)
 
     #    This uses vectorized minimum/maximum on object‑dtypes:
     c1 = df[["country", "counterpart_country"]]
