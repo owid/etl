@@ -12,6 +12,8 @@ definitions:
   fob_basis: &fob_basis Exports are valued on an FOB basis (Free on Board). This means the values include the cost of the goods up to the exporter's border, but exclude transport and insurance costs after that point.
   cif_basis: &cif_basis Imports are valued on a CIF basis (Cost, Insurance, and Freight). This means the values include the cost of the goods, as well as the transport and insurance costs to deliver them to the importing country's border.
 
+  description_processing_partnerships: &description_processing_partnerships We calculated the share of bilateral, unilateral, and non-trading partnerships by examining all possible country pairs for each year. For each pair, we checked whether both countries reported trade with each other (bilateral), only one country reported trade (unilateral), or neither country reported trade (non-trading). We then counted the total number of partnerships in each category and calculated their shares as a percentage of all partnerships.
+
 dataset:
   update_period_days: 365
 
@@ -239,16 +241,36 @@ tables:
           <%- endif -%>
         unit: ""
         short_unit: ""
-        description_short: The country that was the largest source of imports in a given year, based on merchandise import values that include the cost of goods plus freight and insurance.
+        description_short: For every country, the main trading partner supplying the largest share of its [merchandise imports](#dod:merchandise-imports).
         description_key:
           - This indicator shows which country was the largest source of imports for each country–year, based on import values in current US dollars.
           - *cif_basis
           - *goods_only
-          - The top supplier for each country–year was identified, and then a global count was made of how often each country appeared in this role. Here, the top ten countries with the highest counts are shown as separate categories, while the rest were grouped as "other".
+          - The top supplier for each country–year was identified, and then a global count was made of how often each country appeared in this role. Here, the top ten countries with the highest counts are shown as separate categories, while the rest were grouped as "Other".
         presentation:
           title_public: Top import partner category
           grapher_config:
-            note: Only the 10 partners most often ranked as the top import source across countries are shown; the rest are grouped as "other".
+            note: Only the 10 partners most often ranked as the top import source across countries are shown; the rest are grouped as "Other".
+        display:
+          numDecimalPlaces: 0
+
+      top_export_partner_category:
+        title: |-
+          <% if counterpart_country == 'World' %>
+          Top export partner category
+          <%- endif -%>
+        unit: ""
+        short_unit: ""
+        description_short: For every country, the main trading partner receiving the largest share of its total [merchandise exports](#dod:merchandise-exports).
+        description_key:
+          - This indicator shows which country was the largest destination for exports from each country–year, based on export values in current US dollars.
+          - *fob_basis
+          - *goods_only
+          - The top destination for each country–year was identified, and then a global count was made of how often each country appeared in this role. Here, the top ten countries with the highest counts are shown as separate categories, while the rest were grouped as "Other".
+        presentation:
+          title_public: Top export partner category
+          grapher_config:
+            note: Only the 10 partners most often ranked as the top export destination across countries are shown; the rest are grouped as "Other".
         display:
           numDecimalPlaces: 0
 
@@ -284,3 +306,57 @@ tables:
         display:
           numDecimalPlaces: 0
           name: << counterpart_country >>
+
+      share_bilateral:
+        title: Share of country pairs with bilateral trade
+        unit: "%"
+        short_unit: "%"
+        description_short: Trade relationships are bilateral when countries both [import](#dod:merchandise-imports) from and [export](#dod:merchandise-exports) goods to each other.
+        description_key:
+          - This indicator shows the share of country pairs that trade goods with each other in both directions.
+          - A pair is bilateral when both countries report importing from and exporting to the other.
+          - *fob_basis
+          - *cif_basis
+          - *goods_only
+        description_processing: *description_processing_partnerships
+        presentation:
+          title_public: Share of country pairs with bilateral trade
+        display:
+            numDecimalPlaces: 1
+            name: Bilateral
+
+      share_unilateral:
+        title: Share of country pairs with unilateral trade
+        unit: "%"
+        short_unit: "%"
+        description_short: Trade relationships are unilateral when only one country in the pair [imports](#dod:merchandise-imports) from or [exports](#dod:merchandise-exports) goods to the other country.
+        description_key:
+          - This indicator shows the share of country pairs that trade goods with each other in only one direction.
+          - A pair is unilateral when only one country reports importing from or exporting to the other.
+          - *fob_basis
+          - *cif_basis
+          - *goods_only
+        description_processing: *description_processing_partnerships
+        presentation:
+          title_public: Share of country pairs with unilateral trade
+        display:
+            numDecimalPlaces: 1
+            name: Unilateral
+
+      share_non_trading:
+        title: Share of non-trading partnerships
+        unit: "%"
+        short_unit: "%"
+        description_short: Trade relationships are non-trading when neither country in the pair [imports](#dod:merchandise-imports) from or [exports](#dod:merchandise-exports) goods to the other country.
+        description_key:
+          - This indicator shows the share of country pairs that do not trade goods with each other.
+          - A pair is non-trading when neither country reports importing from or exporting to the other.
+          - *fob_basis
+          - *cif_basis
+          - *goods_only
+        description_processing: *description_processing_partnerships
+        presentation:
+          title_public: Share of non-trading partnerships
+        display:
+            numDecimalPlaces: 1
+            name: Non-trading

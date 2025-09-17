@@ -405,7 +405,8 @@ def prepare_display_dataframe(df: pd.DataFrame) -> pd.DataFrame:
 
 def reset_mysql_database(server_name: str) -> Tuple[bool, str]:
     """
-    Reset the MySQL database for a staging server by running 'make refresh' in owid-grapher.
+    Reset the MySQL database for a staging server by running 'make refresh' in owid-grapher
+    and pruning associated R2 files.
 
     Args:
         server_name: Full server name (e.g., staging-site-branch-name)
@@ -414,6 +415,30 @@ def reset_mysql_database(server_name: str) -> Tuple[bool, str]:
         Tuple of (success, message)
     """
     try:
+        # First, prune R2 files for this server
+        log.info("Pruning R2 files", server=server_name)
+        r2_cmd = f"rclone purge r2:owid-api-staging/{server_name} --fast-list --transfers 64 --checkers 64"
+        log.info("Executing R2 purge command", command=r2_cmd, server=server_name)
+
+        r2_result = subprocess.run(
+            r2_cmd,
+            shell=True,
+            capture_output=True,
+            text=True,
+            timeout=300,  # 5 minute timeout for R2 purge
+        )
+
+        if r2_result.returncode != 0:
+            # Log warning but continue with MySQL reset - R2 purge failure shouldn't block DB reset
+            log.warning(
+                "R2 purge failed but continuing with MySQL reset",
+                error=r2_result.stderr,
+                server=server_name,
+                stdout=r2_result.stdout,
+            )
+        else:
+            log.info("R2 files successfully purged", server=server_name)
+
         # SSH into the server and run make refresh in owid-grapher directory
         # Disable host key checking for staging servers since they're ephemeral
         cmd = f"ssh -o StrictHostKeyChecking=no owid@{server_name} 'cd owid-grapher && make refresh'"
