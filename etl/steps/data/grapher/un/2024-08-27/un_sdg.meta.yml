@@ -243,3 +243,58 @@ tables:
           Most of the ministries, departments, agencies, boards, commissions, judicial authorities, legislative bodies, and other entities that make up the budgetary central government are not separate institutional units. This is because they generally do not have the authority to own assets, incur liabilities, or engage in transactions in their own right, including references to standards and classifications, preferably relying on international agreed definitions.
 
           Further information available at: https://unstats.un.org/sdgs/metadata/files/Metadata-17-01-02.pdf
+
+  _9_2_2__sl_tlf_manf:
+    variables:
+      _9_2_2__sl_tlf_manf:
+        title: 9.2.2 - Manufacturing employment as a proportion of total employment - 13th ICLS (%) - SL_TLF_MANF
+
+  _8_7_1__sl_tlf_chldea__5_to_17_years_old__female:
+    variables:
+      _8_7_1__sl_tlf_chldea__5_to_17_years_old__female:
+        title: 8.7.1 - Proportion of children engaged in economic activity, by sex and age  (%) - SL_TLF_CHLDEA - 5 to 17 years old - Female
+
+  _8_7_1__sl_tlf_chldea__5_to_17_years_old__male:
+    variables:
+      _8_7_1__sl_tlf_chldea__5_to_17_years_old__male:
+        title: 8.7.1 - Proportion of children engaged in economic activity, by sex and age  (%) - SL_TLF_CHLDEA - 5 to 17 years old - Male
+
+  _8_b_1__sl_cpa_yemp:
+    variables:
+      _8_b_1__sl_cpa_yemp:
+        title: 8.b.1 - Existence of a developed and operationalized national strategy for youth employment, as a distinct strategy or as part of a national employment strategy - SL_CPA_YEMP
+
+  _8_8_2__sl_lbr_ntlcpl:
+    variables:
+      _8_8_2__sl_lbr_ntlcpl:
+        title: 8.8.2 - Level of national compliance with labour rights (freedom of association and collective bargaining) based on International Labour Organization (ILO) textual sources and national legislation - SL_LBR_NTLCPL
+
+  _8_7_1__sl_tlf_chldea__5_to_17_years_old__both_sexes:
+    variables:
+      _8_7_1__sl_tlf_chldea__5_to_17_years_old__both_sexes:
+        title: 8.7.1 - Proportion of children engaged in economic activity, by sex and age  (%) - SL_TLF_CHLDEA - 5 to 17 years old - Both sexes
+
+  _8_3_1__sl_isv_ifem_19icls__non_agriculture__female:
+    variables:
+      _8_3_1__sl_isv_ifem_19icls__non_agriculture__female:
+        title: 8.3.1 - Proportion of informal employment, by sector and sex - 19th ICLS (%) - SL_ISV_IFEM_19ICLS - Non-agriculture - Female
+
+  _8_3_1__sl_isv_ifem__non_agriculture__male:
+    variables:
+      _8_3_1__sl_isv_ifem__non_agriculture__male:
+        title: 8.3.1 - Proportion of informal employment, by sector and sex - 13th ICLS (%) - SL_ISV_IFEM - Non-agriculture - Male
+
+  _8_3_1__sl_isv_ifem__non_agriculture__both_sexes:
+    variables:
+      _8_3_1__sl_isv_ifem__non_agriculture__both_sexes:
+        title: 8.3.1 - Proportion of informal employment, by sector and sex - 13th ICLS (%) - SL_ISV_IFEM - Non-agriculture - Both sexes
+
+  _8_5_2__sl_tlf_uemdis__persons_without_disability__both_sexes:
+    variables:
+      _8_5_2__sl_tlf_uemdis__persons_without_disability__both_sexes:
+        title: 8.5.2 - Unemployment rate, by sex and disability - 13th ICLS (%) - SL_TLF_UEMDIS - Persons without disability - Both sexes
+
+  _8_5_2__sl_tlf_uemdis__persons_with_disability__both_sexes:
+    variables:
+      _8_5_2__sl_tlf_uemdis__persons_with_disability__both_sexes:
+        title: 8.5.2 - Unemployment rate, by sex and disability - 13th ICLS (%) - SL_TLF_UEMDIS - Persons with disability - Both sexes
