@@ -1199,7 +1199,7 @@ def _uses_old_schema(e: KeyError) -> bool:
 @contextmanager
 def isolated_env(
     working_dir: Path,
-    keep_modules: str = r"openpyxl|pyarrow|lxml|PIL|pydantic|sqlalchemy|sqlmodel|pandas|frictionless|numpy",
+    keep_modules: str = r"openpyxl|pyarrow|lxml|PIL|pydantic|sqlalchemy|sqlmodel|pandas|frictionless|numpy|pyproj|geopandas|google|plotly|shapely",
 ) -> Generator[None, None, None]:
     """Add given directory to pythonpath, run code in context, and
     then remove from pythonpath and unimport modules imported in context.

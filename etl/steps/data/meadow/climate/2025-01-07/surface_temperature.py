@@ -7,7 +7,6 @@ import geopandas as gpd
 import numpy as np
 import pandas as pd
 import pyproj
-import rioxarray as rxr
 import xarray as xr
 from owid.catalog import Table
 from rioxarray.exceptions import NoDataInBounds, OneDimensionalRaster
@@ -43,10 +42,7 @@ def _load_data_array(snap: Snapshot) -> xr.DataArray:
     da = da["t2m"] - 273.15
 
     # Set the coordinate reference system for the temperature data to EPSG 4326.
-    # NOTE: export_grid_mapping is set to False to avoid error
-    # ValueError: Invalid value supplied 'WktVersion.WKT2_2019'. Only ('WKT2_2015', 'WKT2_2015_SIMPLIFIED', 'WKT2_2018', 'WKT2_2018_SIMPLIFIED', 'WKT2_2019', 'WKT2_2019_SIMPLIFIED', 'WKT1_GDAL', 'WKT1_ESRI') are supported.
-    with rxr.set_options(export_grid_mapping=False):
-        da = da.rio.write_crs("EPSG:4326")
+    da = da.rio.write_crs("EPSG:4326")
 
     return da
 
@@ -122,27 +118,26 @@ def run() -> None:
         log.info(f"Processing data for {country_name}")
 
         try:
-            with rxr.set_options(export_grid_mapping=False):
-                # Clip to the bounding box for the country's shape to significantly improve performance.
-                xmin, ymin, xmax, ymax = geometry.bounds
-                clip = da.rio.clip_box(minx=xmin, miny=ymin, maxx=xmax, maxy=ymax)
+            # Clip to the bounding box for the country's shape to significantly improve performance.
+            xmin, ymin, xmax, ymax = geometry.bounds
+            clip = da.rio.clip_box(minx=xmin, miny=ymin, maxx=xmax, maxy=ymax)
 
-                # Clip data to the country's shape.
-                # NOTE: if memory is an issue, we could use `from_disk=True` arg
-                clip = clip.rio.clip([mapping(geometry)], shapefile.crs)
+            # Clip data to the country's shape.
+            # NOTE: if memory is an issue, we could use `from_disk=True` arg
+            clip = clip.rio.clip([mapping(geometry)], shapefile.crs)
 
-                # Calculate weights based on latitude to account for area distortion in latitude-longitude grids.
-                weights = np.cos(np.deg2rad(clip.latitude))
-                weights.name = "weights"
+            # Calculate weights based on latitude to account for area distortion in latitude-longitude grids.
+            weights = np.cos(np.deg2rad(clip.latitude))
+            weights.name = "weights"
 
-                # Apply the weights to the clipped temperature data.
-                clim_month_weighted = clip.weighted(weights)
+            # Apply the weights to the clipped temperature data.
+            clim_month_weighted = clip.weighted(weights)
 
-                # Calculate the weighted mean temperature for the country.
-                country_weighted_mean = clim_month_weighted.mean(dim=["longitude", "latitude"]).values
+            # Calculate the weighted mean temperature for the country.
+            country_weighted_mean = clim_month_weighted.mean(dim=["longitude", "latitude"]).values
 
-                # Store the calculated mean temperature in the dictionary with the country's name as the key.
-                temp_country[country_name] = country_weighted_mean
+            # Store the calculated mean temperature in the dictionary with the country's name as the key.
+            temp_country[country_name] = country_weighted_mean
 
             # Clean up the memory
             del clip
