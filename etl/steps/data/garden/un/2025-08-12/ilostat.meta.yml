@@ -12,7 +12,7 @@ definitions:
 
   employment: Employment refers to all persons of working age who, during a specified brief period, were in paid employment or self-employment.
 
-  icse_93: This status in employment is provided according to the latest version of the International Standard Classification of Status in Employment (ICSE-93).
+  icse_93: This status in employment is provided according to the [International Standard Classification of Status in Employment](https://ilostat.ilo.org/methods/concepts-and-definitions/classification-status-at-work/) (ICSE-93).
 
   isco_08: This is based on the International Standard Classification of Occupations 2008 (ISCO-08). More information can be found in the [ISCO documentation](https://ilostat.ilo.org/methods/concepts-and-definitions/classification-occupation/).
 
