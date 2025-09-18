@@ -1,0 +1,16 @@
+meta:
+  origin:
+    producer: Unknown
+    title: Unknown
+    citation_full: Unknown
+    version_producer: Local CSV
+    url_main: https://unknown.com
+    url_download: majorpowerdeaths.csv
+    date_accessed: '2025-09-18'
+    date_published: '2025-09-18'
+  name: DRAFT majorpowerdeaths
+  description: ''
+outs:
+  - md5: 16eeb25aef5424e63d9284c1d18d3173
+    size: 4710
+    path: majorpowerdeaths.csv

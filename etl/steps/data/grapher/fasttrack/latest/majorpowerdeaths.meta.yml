@@ -1,0 +1,17 @@
+dataset:
+  title: DRAFT majorpowerdeaths
+  description: ''
+tables:
+  majorpowerdeaths:
+    variables:
+      deaths_mpw:
+        title: deaths_mpw
+        unit: ''
+      deaths_mpw_pop:
+        title: deaths_mpw_pop
+        unit: ''
+    dimensions:
+      - name: country
+        slug: country
+      - name: year
+        slug: year
