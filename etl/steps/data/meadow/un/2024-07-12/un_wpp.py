@@ -43,6 +43,14 @@ COLUMNS_INDEX_FORMAT = [
     "sex",
     "age",
 ]
+COLUMNS_INDEX_FORMAT_MONTH = [
+    "country",
+    "year",
+    "variant",
+    "sex",
+    "age",
+    "month",
+]
 SCENARIOS = ["Medium", "Low", "High", "Constant fertility", "Estimates"]
 LOCATION_TYPES_CSV = [
     "Country/Area",
@@ -69,10 +77,15 @@ def run(dest_dir: str) -> None:
     # Main file: Demography indicators
     paths.log.info("reading main file: demography indicators...")
     tb_main = read_from_xlsx("un_wpp_demographic_indicators.xlsx")
-
+    # Process data.
+    # Population density add month column
     tb_population_density = clean_table_standard_xlsx(
         tb_main, "Population Density, as of 1 July (persons per square km)", "population_density"
     )
+    tb_population_density = tb_population_density.reset_index()
+    tb_population_density["month"] = "July"
+    tb_population_density = tb_population_density.format(COLUMNS_INDEX_FORMAT_MONTH)
+
     tb_growth_rate = clean_table_standard_xlsx(tb_main, "Population Growth Rate (percentage)", "growth_rate")
     tb_nat_change = clean_table_standard_xlsx(
         tb_main, "Rate of Natural Change (per 1,000 population)", "natural_change_rate"
@@ -122,7 +135,7 @@ def run(dest_dir: str) -> None:
         # tb_population_doubling,
     ]
     # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = create_dataset(dest_dir, tables=tables, check_variables_metadata=True)
+    ds_meadow = create_dataset(dest_dir, tables=tables, check_variables_metadata=True, repack=False)
 
     # Save changes in the new meadow dataset.
     ds_meadow.save()
@@ -153,7 +166,7 @@ def make_tb_population() -> Table:
         ]
     )
     del tb_population_l, tb_population_m, tb_population_h, tb_population_c, tb_population_jan
-    tb_population = tb_population.format(COLUMNS_INDEX_FORMAT, short_name="population")
+    tb_population = tb_population.format(COLUMNS_INDEX_FORMAT_MONTH, short_name="population")
     return tb_population
 
 
@@ -424,7 +437,10 @@ def clean_table_standard_csv(
     tb = tb.dropna(subset=["LocTypeName"])
     tb = tb.loc[tb["LocTypeName"].isin(LOCATION_TYPES_CSV)]
     # Keep relevant columns
-    tb = tb.loc[:, COLUMNS_INDEX_CSV + metrics]
+    if "month" in tb.columns:
+        tb = tb.loc[:, COLUMNS_INDEX_CSV + ["month"] + metrics]
+    else:
+        tb = tb.loc[:, COLUMNS_INDEX_CSV + metrics]
     return tb
 
 
@@ -434,7 +450,7 @@ def combine_population(tbs: List[Table]) -> Table:
         # Clean table
         tb = clean_table_standard_csv(tb, ["PopTotal", "PopMale", "PopFemale"])
         # Unpivot
-        tb = tb.melt(id_vars=COLUMNS_INDEX_CSV, var_name="sex", value_name="population")
+        tb = tb.melt(id_vars=COLUMNS_INDEX_CSV + ["month"], var_name="sex", value_name="population")
         # Ensure correct format of column `sex`
         tb["sex"] = (
             tb["sex"]
