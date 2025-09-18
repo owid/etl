@@ -11,6 +11,6 @@ meta:
   name: DRAFT majorpowerdeaths
   description: ''
 outs:
-  - md5: 16eeb25aef5424e63d9284c1d18d3173
-    size: 4710
+  - md5: f8dbcf58fbace8e4987ec7e4c58d5c5d
+    size: 4749
     path: majorpowerdeaths.csv
