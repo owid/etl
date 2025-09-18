@@ -364,3 +364,18 @@ steps:
   #
   data://grapher/lazard/2025-09-17/levelized_cost_of_energy:
     - data://garden/lazard/2025-09-17/levelized_cost_of_energy
+  #
+  # Rupert Way - Historical energy costs (private dataset for internal research).
+  #
+  data-private://meadow/energy/2025-09-18/historical_energy_costs:
+    - snapshot-private://energy/2025-09-18/historical_energy_costs.xlsx
+  #
+  # Rupert Way - Historical energy costs (private dataset for internal research).
+  #
+  data-private://garden/energy/2025-09-18/historical_energy_costs:
+    - data-private://meadow/energy/2025-09-18/historical_energy_costs
+  #
+  # Rupert Way - Historical energy costs (private dataset for internal research).
+  #
+  data-private://grapher/energy/2025-09-18/historical_energy_costs:
+    - data-private://garden/energy/2025-09-18/historical_energy_costs
