@@ -131,20 +131,28 @@ def run(dest_dir: str) -> None:
 def make_tb_population() -> Table:
     """Make population table."""
     tb_population = read_from_csv("un_wpp_population_estimates.csv")
+    tb_population["month"] = "July"
+    tb_population_jan = read_from_csv("un_wpp_population_jan_estimates.csv")
+    tb_population_jan["month"] = "January"
     tb_population_l = read_from_csv("un_wpp_population_low.csv")
+    tb_population_l["month"] = "July"
     tb_population_m = read_from_csv("un_wpp_population_medium.csv")
+    tb_population_m["month"] = "July"
     tb_population_h = read_from_csv("un_wpp_population_high.csv")
+    tb_population_h["month"] = "July"
     tb_population_c = read_from_csv("un_wpp_population_constant_fertility.csv")
+    tb_population_c["month"] = "July"
     tb_population = combine_population(
         [
             tb_population,
+            tb_population_jan,
             tb_population_l,
             tb_population_m,
             tb_population_h,
             tb_population_c,
         ]
     )
-    del tb_population_l, tb_population_m, tb_population_h, tb_population_c
+    del tb_population_l, tb_population_m, tb_population_h, tb_population_c, tb_population_jan
     tb_population = tb_population.format(COLUMNS_INDEX_FORMAT, short_name="population")
     return tb_population
 
