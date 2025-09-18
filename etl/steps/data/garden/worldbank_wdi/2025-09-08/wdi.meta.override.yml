@@ -1,4 +1,4 @@
-# WARNING: Use this file to manually curate WDI indicators. Do NOT use the wdi.meta.yml file (which is generated automatically)
+# WARNING: Use this file to manually curate WDI indicators. Do NOT use the wdi.meta.yml file (which is generated automatically).
 definitions:
 
   ####################################################################################
