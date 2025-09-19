@@ -3,17 +3,17 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current data step.
 paths = PathFinder(__file__)
 
-# Columns to use, and how to rename them.
+# Columns to use, and how to rename them (they will become entities).
 COLUMNS = {
     "year": "year",
-    "crude_oil_price__2024dollar_mwh__useful": "crude_oil_price",
-    "coal_price__average_usa__2024dollar_mwh__useful": "coal_price",
-    "gas_price__us__2024dollar_mwh__useful": "gas_price",
-    "coal_lcoe__us_global__2024dollar_mwh__useful": "coal_electricity_lcoe",
-    "gas_lcoe__us_global__2024dollar_mwh__useful": "gas_electricity_lcoe",
-    "nuclear_lcoe__us__2024dollar_mwh__useful": "nuclear_electricity_lcoe",
-    "wind_onshore_lcoe__global__2024dollar_mwh__useful": "wind_onshore_electricity_lcoe",
-    "solar_pv_lcoe__global__2024dollar_mwh__useful": "solar_pv_electricity_lcoe",
+    "crude_oil_price__2024dollar_mwh__useful": "Crude oil",
+    "coal_price__average_usa__2024dollar_mwh__useful": "Coal",
+    "gas_price__us__2024dollar_mwh__useful": "Gas",
+    "coal_lcoe__us_global__2024dollar_mwh__useful": "Coal electricity",
+    "gas_lcoe__us_global__2024dollar_mwh__useful": "Gas electricity",
+    "nuclear_lcoe__us__2024dollar_mwh__useful": "Nuclear electricity",
+    "wind_onshore_lcoe__global__2024dollar_mwh__useful": "Wind onshore electricity",
+    "solar_pv_lcoe__global__2024dollar_mwh__useful": "Solar PV electricity",
 }
 
 
@@ -31,8 +31,14 @@ def run() -> None:
     # Select and rename columns.
     tb = tb[list(COLUMNS)].rename(columns=COLUMNS, errors="raise")
 
+    # Transpose table.
+    tb = tb.melt(id_vars=["year"], value_name="price", var_name="technology")
+
+    # Drop empty rows.
+    tb = tb.dropna(subset="price").reset_index(drop=True)
+
     # Improve tables format.
-    tb = tb.format(["year"])
+    tb = tb.format(["technology", "year"])
 
     #
     # Save outputs.

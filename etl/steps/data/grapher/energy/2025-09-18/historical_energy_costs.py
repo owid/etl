@@ -16,7 +16,7 @@ def run() -> None:
     # Process data.
     #
     # Adapt data to grapher format.
-    tb["country"] = "World"
+    tb = tb.rename(columns={"technology": "country"}, errors="raise")
 
     # Improve table format.
     tb = tb.format()
