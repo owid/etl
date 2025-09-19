@@ -366,7 +366,7 @@ tables:
         description_processing: "{definitions.description_processing_unreliable_data}"
         display:
           name: Average hourly earnings of employees - <<sex>> - <<classif1>>
-          numDecimalPlaces: 1
+          numDecimalPlaces: 2
           <<: *common_display
 
       sdg_8_5_2_unemployment_rate:
@@ -485,7 +485,7 @@ tables:
           - "{definitions.description_key_national_strategy_youth_employment}"
         display:
           name: Existence of a developed and operationalized national strategy for youth employment
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
           <<: *common_display
 
       sdg_9_2_2_manufacturing_employment:
