@@ -1,6 +1,5 @@
 """Data from UCDP.
 
-
 Notes:
     - Conflict types for state-based violence is sourced from UCDP/PRIO dataset. non-state and one-sided violence is sourced from GED dataset.
     - There can be some mismatches with latest official reported data (UCDP's live dashboard). This is because UCDP uses latest data for their dashboard, which might not be available yet as bulk download.
@@ -1129,7 +1128,8 @@ def _sanity_check_prio_conflict_types(tb_prio: Table):
     conflict_type_transitions = tb_prio.groupby("conflict_id")["type_of_conflict"].apply(set)
     transitions = conflict_type_transitions[conflict_type_transitions.apply(len) > 1].drop_duplicates()
     # Extract unique combinations of conflict_types for a conflict
-    transitions = set(transitions.astype(str))
+    # Convert numpy integers to regular Python integers before string conversion
+    transitions = set(str({int(x) for x in transition}) for transition in transitions)
     transitions_unk = transitions - TRANSITIONS_EXPECTED
 
     # Check if different regions categorise the conflict differently in the same year

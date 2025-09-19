@@ -4,6 +4,7 @@ import pandas as pd
 import streamlit as st
 
 from apps.utils.gpt import OpenAIWrapper
+from apps.wizard.utils.components import st_title_with_expert
 from apps.wizard.utils.insights import (
     fetch_chart_data,
     get_grapher_thumbnail,
@@ -17,14 +18,17 @@ class DataError(Exception):
     pass
 
 
-MODEL = "gpt-4.1"
+MODEL_DEFAULT = "gpt-5"
 
 # CONFIG
 st.set_page_config(
     page_title="Data insight robot",
     page_icon="🪄",
 )
-st.title(":material/lightbulb: Data insighter")
+st_title_with_expert(
+    "Data insighter",
+    icon=":material/lightbulb:",
+)
 
 
 def get_trajectory_prompt(conn, base_prompt: str, slug: str, codes: bool = False) -> Tuple[str, pd.DataFrame]:
@@ -63,7 +67,7 @@ section_tab = dict(zip(sections, tabs))
 
 with section_tab["Insight from chart"]:
     st.markdown(
-        f"Generate data insights from a chart view, using the `{MODEL}` model. Choose what to describe by selecting the chart and the countries and years you care about, then paste the link in here."
+        f"Generate data insights from a chart view, using the `{MODEL_DEFAULT}` model. Choose what to describe by selecting the chart and the countries and years you care about, then paste the link in here."
     )
     # PROMPT
     default_prompt = """This is a chart from Our World In Data.
@@ -151,16 +155,16 @@ Please write a data insight for the given chart. Use simple language and short p
         with st.chat_message("assistant"):
             # Ask GPT (stream)
             stream = api.chat.completions.create(
-                model=MODEL,
+                model=MODEL_DEFAULT,
                 messages=messages,  # type: ignore
-                max_tokens=3000,
+                max_completion_tokens=3000,
                 stream=True,
             )
             response = cast(str, st.write_stream(stream))
 
 with section_tab["Explain raw data"]:
     st.markdown(
-        f"Generate insights from the raw data underlying a chart, using the `{MODEL}` model. In this case, ChatGPT is looking at all countries and all time periods at once."
+        f"Generate insights from the raw data underlying a chart, using the `{MODEL_DEFAULT}` model. In this case, ChatGPT is looking at all countries and all time periods at once."
     )
     conn = get_connection()
     default_prompt = """This is an indicator published by Our World In Data.
@@ -211,9 +215,9 @@ Explain the core insights present in this data, in plain, educational language.
         with st.chat_message("assistant"):
             # Ask GPT (stream)
             stream = api.chat.completions.create(
-                model=MODEL,
+                model=MODEL_DEFAULT,
                 messages=messages,  # type: ignore
-                max_tokens=3000,
+                max_completion_tokens=3000,
                 stream=True,
             )
             response = cast(str, st.write_stream(stream))
@@ -285,9 +289,9 @@ If making a point about a country, include its peers, region, income group or "W
         with st.chat_message("assistant"):
             # Ask GPT (stream)
             stream = api.chat.completions.create(
-                model=MODEL,
+                model=MODEL_DEFAULT,
                 messages=messages,  # type: ignore
-                max_tokens=3000,
+                max_completion_tokens=3000,
                 stream=True,
             )
             response = cast(str, st.write_stream(stream))

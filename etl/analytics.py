@@ -31,7 +31,10 @@ DATE_MIN = "2024-11-01"
 # Current date.
 DATE_MAX = str(datetime.today().date())
 # Base url for Datasette csv queries.
-ANALYTICS_CSV_URL = "http://analytics.owid.io/analytics.csv"
+DATASETTE_URL = "http://analytics.owid.io"
+ANALYTICS_URL = f"{DATASETTE_URL}/analytics"
+ANALYTICS_CSV_URL = f"{ANALYTICS_URL}.csv"
+ANALYTICS_JSON_URL = f"{ANALYTICS_URL}.json"
 
 # Maximum number of rows that a single Datasette csv call can return.
 MAX_DATASETTE_N_ROWS = 10000
@@ -132,6 +135,29 @@ POST_LINK_TYPES_TO_URL = {
 }
 
 
+class DatasetteSQLError(Exception):
+    """Exception raised when a Datasette SQL query fails with a clear error message."""
+
+    pass
+
+
+def _get_datasette_error_from_json(sql_url: str) -> str:
+    """Get error message from Datasette JSON endpoint."""
+    # Convert CSV URL to JSON URL
+    json_url = sql_url.replace(".csv?", ".json?")
+    response = requests.get(json_url, timeout=10)
+
+    # Try to parse JSON response regardless of status code
+    try:
+        data = response.json()
+        if not data.get("ok", True):
+            return data.get("error", "Unknown error")
+    except (ValueError, KeyError):
+        pass
+
+    return f"HTTP {response.status_code}: {response.reason}"
+
+
 def _try_to_execute_datasette_query(sql_url: str, warn: bool = False) -> pd.DataFrame:
     try:
         df = pd.read_csv(sql_url)
@@ -140,7 +166,13 @@ def _try_to_execute_datasette_query(sql_url: str, warn: bool = False) -> pd.Data
         if e.code == 414:
             raise ValueError("HTTP 414: Query too long. Consider simplifying or batching the request.")
         else:
-            raise
+            # Get better error message from JSON endpoint
+            error_msg = _get_datasette_error_from_json(sql_url)
+            raise DatasetteSQLError(f"Datasette SQL Error: {error_msg}")
+    except pd.errors.EmptyDataError:
+        # Get better error message from JSON endpoint
+        error_msg = _get_datasette_error_from_json(sql_url)
+        raise DatasetteSQLError(f"Datasette SQL Error: {error_msg}")
 
 
 def clean_sql_query(sql: str) -> str:
@@ -161,7 +193,10 @@ def clean_sql_query(sql: str) -> str:
 
 
 def read_datasette(
-    sql: str, datasette_csv_url: str = ANALYTICS_CSV_URL, chunk_size: int = MAX_DATASETTE_N_ROWS
+    sql: str,
+    datasette_csv_url: str = ANALYTICS_CSV_URL,
+    chunk_size: int = MAX_DATASETTE_N_ROWS,
+    use_https: bool = True,
 ) -> pd.DataFrame:
     """
     Execute a query in the Datasette semantic layer.
@@ -184,6 +219,16 @@ def read_datasette(
         DataFrame containing the results of the query.
 
     """
+    if use_https:
+        datasette_csv_url = datasette_csv_url.replace("http://", "https://")
+
+    # Check if the query uses SQLite DATE() function instead of ISO date literals.
+    if re.search(r"\bDATE\s*\(", sql, re.IGNORECASE):
+        raise DatasetteSQLError(
+            "SQLite DATE() function is not supported in Datasette queries. "
+            "Use ISO date literals instead. Example: DATE '2025-01-01' - INTERVAL '1 year'"
+        )
+
     # Check if the query contains a LIMIT clause.
     limit_match = re.search(r"\bLIMIT\s+(\d+)(?:\s+OFFSET\s+(\d+))?\b", sql, re.IGNORECASE)
 
@@ -194,7 +239,7 @@ def read_datasette(
         # If a LIMIT clause already exists, check if it's larger than the limit.
         limit_value = int(limit_match.group(1))
         if limit_value > MAX_DATASETTE_N_ROWS:
-            raise ValueError(
+            raise DatasetteSQLError(
                 f"Query LIMIT ({limit_value}) exceeds Datasette's maximum row limit ({MAX_DATASETTE_N_ROWS}). Either use a lower value for the limit, or set no limit (and pagination will be used)."
             )
         else:

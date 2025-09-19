@@ -578,6 +578,7 @@ def exec_graph_parallel(
         # Dictionary to keep track of future tasks
         future_to_task: Dict[Future, str] = {}
         failed_tasks = set()
+        skipped_tasks = set()
         exceptions = []
 
         ready_tasks = []
@@ -586,14 +587,15 @@ def exec_graph_parallel(
             # add new tasks
             ready_tasks += topological_sorter.get_ready()
 
-            # Submit tasks that are ready to the executor, but skip those dependent on failed tasks
+            # Submit tasks that are ready to the executor, but skip those dependent on failed or skipped tasks
             tasks_to_submit = []
             for task in ready_tasks[:workers]:
                 if config.CONTINUE_ON_FAILURE:
-                    # Check if any dependency of this task has failed
+                    # Check if any dependency of this task has failed or been skipped
                     task_deps = exec_graph.get(task, set())
-                    if task_deps & failed_tasks:
+                    if task_deps & (failed_tasks | skipped_tasks):
                         print(f"--- Skipping {task} (depends on failed task)")
+                        skipped_tasks.add(task)
                         topological_sorter.done(task)  # Mark as done so execution can continue
                         continue
 
@@ -619,6 +621,9 @@ def exec_graph_parallel(
                     except Exception as e:
                         if config.CONTINUE_ON_FAILURE:
                             failed_tasks.add(task)
+                            skipped_tasks.add(
+                                task
+                            )  # Failed tasks should also be considered skipped for dependency checking
                             exceptions.append(e)
                             topological_sorter.done(task)  # Mark as done so execution can continue
                             print(f"--- Failed {task} - {click.style('FAILED', fg='red')}")

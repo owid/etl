@@ -68,7 +68,7 @@ def run(dest_dir: str) -> None:
             "Oceania",
             "North America (WB)",
             "Latin America and Caribbean (WB)",
-            "Middle East and North Africa (WB)",
+            "Middle East, North Africa, Afghanistan and Pakistan (WB)",
             "Sub-Saharan Africa (WB)",
             "Europe and Central Asia (WB)",
             "South Asia (WB)",

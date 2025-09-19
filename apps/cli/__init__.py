@@ -160,6 +160,7 @@ GROUPS = (
         {
             "name": "Data",
             "commands": {
+                "snapshot": "etl.snapshot_command.snapshot_cli",
                 "harmonize": "etl.harmonize.harmonize",
                 "diff": "etl.datadiff.cli",
                 "graphviz": "etl.to_graphviz.to_graphviz",
@@ -209,8 +210,7 @@ GROUPS = (
         {
             "name": "Others",
             "commands": {
-                "variable-match": "etl.match_variables.main_cli",
-                "variable-mapping-translate": "etl.variable_mapping_translate.main_cli",
+                "indicator-upgrade": "apps.indicator_upgrade.cli.cli",
             },
         },
     ]

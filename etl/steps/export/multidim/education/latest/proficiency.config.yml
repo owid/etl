@@ -1,39 +1,15 @@
 title:
   title: Learning outcomes in reading and mathematics
   title_variant: by education level, subject, and gender
+topic_tags:
+  - Global Education
 default_selection:
   - United States
-  - Germany
-  - Iran
+  - Chile
+  - Morocco
   - Turkey
 
 dimensions:
-  - slug: level
-    name: Education level
-    choices:
-      - slug: primary
-        name: End of primary education
-        description: Typically for children aged 11 to 12 years old.
-      - slug: lower_secondary
-        name: End of lower secondary education
-        description: Typically for children aged 14 to 15 years old.
-      - slug: level_side_by_side
-        name: All education levels
-        description: Compare proficiency rates across all education levels.
-
-  - slug: population
-    name: Who is included
-    choices:
-      - slug: students
-        name: Students
-        description: Includes only students enrolled in school.
-      - slug: all_children
-        name: All children
-        description: Includes all children in the relevant age group, not just those enrolled in school.
-      - slug: population_side_by_side
-        name: Children and students
-        description: Compare learning outcomes between all children and just those students who are enrolled.
-
   - slug: subject
     name: Subject
     choices:
@@ -42,8 +18,34 @@ dimensions:
       - slug: reading
         name: Reading
       - slug: subject_side_by_side
-        name: All subjects
-        description: Compare learning outcomes across subjects.
+        name: Mathematics vs. reading
+        description: Compare learning outcomes across subjects
+
+  - slug: level
+    name: Education level
+    choices:
+      - slug: primary
+        name: End of primary education
+        description: Typically for children aged 11 to 12 years old
+      - slug: lower_secondary
+        name: End of lower secondary education
+        description: Typically for children aged 14 to 15 years old
+      - slug: level_side_by_side
+        name: End of primary vs. lower secondary education
+        description: Compare proficiency rates across all education levels
+
+  - slug: population
+    name: Who is included
+    choices:
+      - slug: students
+        name: Students
+        description: Includes only students enrolled in school
+      - slug: all_children
+        name: All children
+        description: Includes all children in the relevant age group, not just those enrolled in school
+      - slug: population_side_by_side
+        name: Children vs. students
+        description: Compare learning outcomes between all children and just those students who are enrolled
 
   - slug: sex
     name: Gender
@@ -55,8 +57,8 @@ dimensions:
       - slug: male
         name: Boys
       - slug: sex_side_by_side
-        name: Boys and girls
-        description: Compare proficiency between boys and girls.
+        name: Girls vs. boys
+        description: Compare learning outcomes between boys and girls
 
 
 views: []

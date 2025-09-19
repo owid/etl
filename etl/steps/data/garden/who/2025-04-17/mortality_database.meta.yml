@@ -1,0 +1,137 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Causes of Death
+    processing_level: minor
+  description_disease_producer: |-
+    <% if cause == "All Causes" %>
+    <% elif cause == "Cardiovascular diseases" %>
+    More deaths are caused by cardiovascular diseases than any other category. Cardiovascular deaths increase sharply with age, and most cardiovascular deaths occur in older adults. The two most common causes of cardiovascular deaths are ischemic heart disease and stroke. These, in turn, are caused by behavioral and metabolic risk factors such as tobacco use, physical inactivity, high blood pressure, and high blood glucose.
+    <% elif cause == "Congenital anomalies" %>
+    Congenital anomalies, including spina bifida, congenital heart anomalies, and down syndrome are included in this category. Although these deaths can occur at any age, the majority of congenital deaths occur in newborns.
+    <% elif cause == "Diabetes mellitus and endocrine disorders" %>
+    Direct diabetes deaths, for example associated with a diabetic coma, are included in this category. Diabetes also raises the risk of other causes of death, including ischemic heart disease and kidney failure; many of these deaths are included in other categories. Endocrine disorders include anemia and sickle-cell disorders.
+    <% elif cause == "Digestive diseases" %>
+    The leading cause of death in this category is liver cirrhosis. Other disease in this category include peptic ulcer diseases, pancreatitis and appendicitis.
+    <% elif cause == "Genitourinary diseases" %>
+    Genitourinary diseases include kidney failure, which may be caused by diabetes or high blood pressure.
+    <% elif cause == "Ill-defined injuries" %>
+    Ill-defined injuries/accidents comprise events of undetermined intent. The proportion of deaths assigned to this category is an cause of data quality.
+    <% elif cause == "Infectious and parasitic diseases" %>
+    This category includes a wide range of communicable diseases, including sexually transmitted diseases including HIV/AIDS, tuberculosis, diarrheal diseases, some vaccine-preventable diseases such as measles, and diseases caused by tropical parasites such as malaria and hookworm.
+    <% elif cause == "Intentional injuries" %>
+    Intentional injury deaths comprise suicide, homicide, conflicts, and legal executions. Countries may include conflict deaths occuring abroad.
+    <% elif cause == "Malignant neoplasms" %>
+    Cancers are a diverse group of causes of death. Risk factors vary from one cancer to another, and because of diverse and changing risk exposures, trends in cancer mortality varies by cancer type, sex, and country. For example, in many European countries, lung cancer death rates are declining in men and increasing in women, due to gender differences in trends in tobacco smoking.
+    <% elif cause == "Maternal conditions" %>
+    Maternal deaths comprise deaths of women who are pregnant or within 42 days of the termination of the pregnancy, from any cause related to or aggravated by the pregnancy or its management (other than unintentional injuries or incidental causes). Thus, under ICD rules, a death caused by an existing cardiac disease that was aggravated by a pregnancy is be included here. In practice, maternal deaths are often undercounted in death certificate data. Late maternal deaths, which occur between 42 days and 1 year after the termination of the pregnancy, are included here as well.
+    <% elif cause == "Musculoskeletal diseases" %>
+    Musculoskeletal diseases, including arthritis, gout and back pain, are not common causes of death.
+    <% elif cause == "Neuropsychiatric conditions" %>
+    For the most part, neuropsychiatric conditions rarely lead to death. However, many deaths are caused by the use of psychoactive substances, namely drugs or alcohol. Deaths from drug/alcohol dependence are currently included in this category. Starting in 2006, following an ICD-10 update, acute drug and/or alcohol intoxication is classified as an unintentional poisoning. This change in classification may lead to odd trends in death rates.
+    <% elif cause == "Nutritional deficiencies" %>
+    Insufficient intake of macronutrients or micronutrients may lead to death. Such deaths would be included in this category. More commonly, nutritional deficiencies increase the risk of other diseases such as pneumonia, and most deaths associated with undernutrition appear in those other disease categories.
+    <% elif cause == "Oral conditions" %>
+    Oral conditions, such as dental caries and periodontal disease, are not common causes of death.
+    <% elif cause == "Other neoplasms" %>
+    Other neoplasms include in-situ tumors, tumors that are benign, and tumors for which there is uncertainty whether they are malignant or benign.
+    <% elif cause == "Perinatal conditions" %>
+    Perinatal conditions arise during the perinatal period, which spans from 22 completed weeks of gestation and ends 7 completed days after birth. Leading perinatal conditions include birth trauma and consequences of preterm birth. Although most deaths in this category occur during the perinatal period, a few deaths that are caused by perinatal conditions occur later in life.
+    <% elif cause == "Respiratory diseases" %>
+    Chronic obstructive pulmonary disease and asthma are the two leading causes of death in this category. Deaths from respiratory diseases occur mainly in older adults.
+    <% elif cause == "Respiratory infections" %>
+    The great majority of deaths from respiratory infections are caused by lower respiratory infections -- predominantly pneumonia. When they occur, upper respiratory infection and otitis media deaths are included in this category as well.
+    <% elif cause == "Sense organ diseases" %>
+    These diseases, which rarely cause death, include diseases that cause vision and hearing loss.
+    <% elif cause == "Skin diseases" %>
+    Skin diseases include dermatitis and eczema. Many deaths in this category are deaths of older, bed-ridden adults. These deaths are assigned to decubitus ulcer, also known as pressure ulcer or bedsores.
+    <% elif cause == "Sudden infant death syndrome" %>
+    Unexplained deaths of seemingly healthy infants, usually during sleep, are included in this category. Most sudden infant death syndrome deaths occur in infants younger than 6 months.
+    <% elif cause == "Unintentional injuries" %>
+    Leading unintentional injury causes of death include road traffic collisions, falls and drownings. Deaths from natural disasters are also included in this category.
+    <% elif cause == "Ill-defined diseases" %>
+    Ill-defined diseases include symptoms, signs, abnormal results of clinical or other investigative procedures, and ill-defined conditions regarding which no diagnosis classifiable elsewhere is recorded. The proportion of deaths assigned to this category is an cause of data quality.
+    <%- endif -%>
+
+  annotation: |-
+    <% if cause == 'Maternal conditions' %>United States: Values from 2003–2017 affected by measurement change<%- endif -%>
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+tables:
+  mortality_database:
+    variables:
+      number:
+        title: Deaths from << cause.lower() >> in << sex.lower() >> aged << age_group.lower() >>
+        description_short: Reported total deaths from << cause.lower() >> in << sex.lower() >> aged << age_group.lower() >>.
+        description_key:
+          [
+            "The International Classification of Diseases (Version 10) codes that define << cause.lower() >> are << icd10_codes  >>.",
+          ]
+        description_from_producer: |-
+          {definitions.description_disease_producer}
+        unit: deaths
+        display:
+          numDecimalPlaces: 0
+          entityAnnotationsMap: |-
+            {definitions.annotation}
+        presentation:
+          grapher_config:
+            note: |-
+              All deaths in a country may not have been registered with a [cause of death](#dod:underlying-cause-of-death).
+      percentage_of_cause_specific_deaths_out_of_total_deaths:
+        title: Share of total deaths in << sex.lower() >> in those aged << age_group.lower() >> that are from << cause.lower() >>
+        description_short: Share of total reported deaths in << sex.lower() >> in those aged << age_group.lower() >> that are from << cause.lower() >>.
+        description_key:
+          [
+            "The International Classification of Diseases (Version 10) codes that define << cause.lower() >> are << icd10_codes  >>.",
+          ]
+        description_from_producer: |-
+          {definitions.description_disease_producer}
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+        presentation:
+          grapher_config:
+            note: |-
+              All deaths in a country may not have been registered with a [cause of death](#dod:underlying-cause-of-death).
+      age_standardized_death_rate_per_100_000_standard_population:
+        title: Age-standardized deaths from << cause.lower() >> in << sex.lower() >> in those aged << age_group.lower() >> per 100,000 people
+        description_short: Reported deaths from << cause.lower() >> in << sex.lower() >> in those aged << age_group.lower() >> per 100,000 people.
+        description_key:
+          [
+            "The International Classification of Diseases (Version 10) codes that define << cause.lower() >> are << icd10_codes  >>.",
+          ]
+        description_from_producer: |-
+          {definitions.description_disease_producer}
+        unit: deaths per 100,000 people
+        display:
+          numDecimalPlaces: 1
+          entityAnnotationsMap: |-
+            {definitions.annotation}
+        presentation:
+          grapher_config:
+            note: |-
+              To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized). All deaths in a country may not have been registered with a [cause of death](#dod:underlying-cause-of-death).
+      death_rate_per_100_000_population:
+        title: Deaths from << cause.lower() >> per 100,000 people in << sex.lower() >> aged << age_group.lower() >>
+        description_short: Reported deaths from << cause.lower() >> per 100,000 people in << sex.lower() >> aged << age_group.lower() >>.
+        description_key:
+          [
+            "The International Classification of Diseases (Version 10) codes that define << cause.lower() >> are << icd10_codes  >>.",
+          ]
+        description_from_producer: |-
+          {definitions.description_disease_producer}
+        unit: deaths per 100,000 people
+        display:
+          numDecimalPlaces: 1
+          entityAnnotationsMap: |-
+            {definitions.annotation}
+        presentation:
+          grapher_config:
+            note: |-
+              All deaths in a country may not have been registered with a [cause of death](#dod:underlying-cause-of-death).

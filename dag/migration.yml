@@ -42,13 +42,6 @@ steps:
   data://grapher/wb/2024-12-17/bilateral_remittance:
     - data://garden/wb/2024-12-17/bilateral_remittance
 
-  # Migration distances
-  data://garden/migration/2024-11-19/migration_distance:
-    - data://garden/un/2025-03-12/migrant_stock
-    - data://garden/geography/2023-11-28/nat_earth_110
-  data://grapher/migration/2024-11-19/migration_distance:
-    - data://garden/migration/2024-11-19/migration_distance
-
   # Migration between regions, based on UN DESA flows
   data://garden/migration/2024-11-18/migration_between_regions:
     - data://garden/un/2025-03-12/migrant_stock
@@ -92,3 +85,12 @@ steps:
     - data://grapher/un/2025-03-18/migration_stock_flows
   export://explorers/migration/latest/migration_flows:
     - data://grapher/un/2025-03-18/migration_stock_flows
+
+  # UNHCR refugee data (2025)
+  data://meadow/un/2025-07-03/refugee_data:
+    - snapshot://un/2025-07-03/refugee_data.zip
+  data://garden/un/2025-07-03/refugee_data:
+    - data://meadow/un/2025-07-03/refugee_data
+    - data://garden/demography/2024-07-15/population
+  data://grapher/un/2025-07-03/refugee_data:
+    - data://garden/un/2025-07-03/refugee_data

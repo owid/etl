@@ -6,7 +6,7 @@
 
 include default.mk
 
-SRC = etl snapshots apps api tests docs
+SRC = etl snapshots apps api tests docs owid_mcp
 PYTHON_PLATFORM = $(shell python -c "import sys; print(sys.platform)")
 LIBS = lib/*
 
@@ -155,7 +155,7 @@ install-vscode-extensions:
 	@echo '==> Checking and installing required VS Code extensions'
 	@if command -v code > /dev/null; then \
 		EXTENSIONS="ms-toolsai.jupyter"; \
-		CUSTOM_EXTENSIONS="run-until-cursor find-latest-etl-step clickable-dag-steps dod-syntax"; \
+		CUSTOM_EXTENSIONS="run-until-cursor find-latest-etl-step clickable-dag-steps dod-syntax compare-previous-version"; \
 		EXTENSIONS_PATH="vscode_extensions"; \
 		for EXT in $$EXTENSIONS; do \
 			if ! code --list-extensions | grep -q "$$EXT"; then \

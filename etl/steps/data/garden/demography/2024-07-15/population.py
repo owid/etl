@@ -488,7 +488,10 @@ def add_regions(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Ta
     tb_agg.loc[
         (tb_agg["year"] >= YEAR_START_GAPMINDER) & (tb_agg["year"] < YEAR_START_WPP) & tb_agg["source"].isna(), "source"
     ] = SOURCES_NAMES["gapminder"]
-    tb_agg.loc[(tb_agg["year"] > YEAR_START_WPP) & tb_agg["source"].isna(), "source"] = SOURCES_NAMES["unwpp"]
+    tb_agg.loc[(tb_agg["year"] >= YEAR_START_WPP) & tb_agg["source"].isna(), "source"] = SOURCES_NAMES["unwpp"]
+    assert (
+        tb_agg.notna().all().all()
+    ), f"Some rows still have missing values! Columns without NaN? {tb_agg.notna().all()}"
     # re-estimate region aggregates
     tb_agg = _aggregate(
         tb=tb_agg,

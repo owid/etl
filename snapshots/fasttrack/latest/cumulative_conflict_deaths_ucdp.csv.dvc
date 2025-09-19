@@ -5,21 +5,22 @@ meta:
     description: |-
       This dataset is UCDP's most disaggregated dataset, covering individual events of organized violence (phenomena of lethal violence occurring at a given time and place). These events are sufficiently fine-grained to be geo-coded down to the level of individual villages, with temporal durations disaggregated to single, individual days.
 
-      You can find more notes at https://web.archive.org/web/20230618115833/https://ucdp.uu.se/downloads/ged/ged241.pdf
+      You can find more notes at https://ucdp.uu.se/downloads/ged/ged251.pdf
     citation_full: |-
-      Davies, Shawn, Garoun Engström, Therese Pettersson & Magnus Öberg (2024). Organized violence 1989-2023, and the prevalence of organized crime groups. Journal of Peace Research 61(4).
-    url_main: https://ucdp.uu.se/downloads/index.html
+      Davies, S., Pettersson, T., Sollenberg, M., & Öberg, M. (2025). Organized violence 1989–2024, and the challenges of identifying civilian victims. Journal of Peace Research, 62(4).
+      Sundberg, Ralph and Erik Melander (2013) Introducing the UCDP Georeferenced Event Dataset. Journal of Peace Research 50(4).
+    url_main: https://ucdp.uu.se/downloads/index.html#ged_global
     url_download: |-
       https://docs.google.com/spreadsheets/d/e/2PACX-1vRBIt1ZOTRCPxTRXXeQ4vPrO2SOvfLDO-brn4Vh87uxRzShrdkkflrouX7JIb4D3Grgh7E0BJjdt1Cz/pub?output=csv
-    date_accessed: '2024-10-11'
-    date_published: '2024'
-  name: Cumulative deaths in armed conflicts (UCDP, 2024)
+    date_accessed: '2025-07-24'
+    date_published: '2025'
+  name: Cumulative deaths in armed conflicts (UCDP, 2025)
   description: |-
     This dataset is UCDP's most disaggregated dataset, covering individual events of organized violence (phenomena of lethal violence occurring at a given time and place). These events are sufficiently fine-grained to be geo-coded down to the level of individual villages, with temporal durations disaggregated to single, individual days.
 
-    You can find more notes at https://web.archive.org/web/20230618115833/https://ucdp.uu.se/downloads/ged/ged231.pdf
+    You can find more notes at https://ucdp.uu.se/downloads/ged/ged251.pdf
   license: {}
 outs:
-  - md5: 90d2f68bae7a7561379ef9332058cc00
-    size: 14332
+  - md5: b7080f1e6b8e88615d915d5d42111542
+    size: 14265
     path: cumulative_conflict_deaths_ucdp.csv

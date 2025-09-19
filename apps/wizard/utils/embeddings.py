@@ -67,7 +67,8 @@ class EmbeddingsModel(Generic[TDoc]):
         # Get model name
         if model_name is None:
             # NOTE: this is a bit of a hack, it's better to pass it explicitly
-            model_name = model.tokenizer.name_or_path.split("/")[-1]
+            # TODO: fix it when we update to the latest version
+            model_name = model.tokenizer.name_or_path.split("/")[-1]  # type: ignore
 
         self.model = model
         self.model_name = model_name
@@ -200,7 +201,7 @@ class EmbeddingsModel(Generic[TDoc]):
                 score = (score + 1) / 2
             elif typ == "euclidean":
                 # distance = torch.cdist(embeddings, input_embedding)
-                score = util.euclidean_sim(embeddings, input_embedding)
+                score = util.euclidean_sim(embeddings, input_embedding)  # type: ignore
                 score = 1 / (1 - score)  # Normalize to [0, 1]
             else:
                 raise ValueError(f"Invalid similarity type: {typ}")

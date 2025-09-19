@@ -1,6 +1,8 @@
 title:
   title: Poverty indicators
   title_variant: World Bank
+topic_tags:
+  - Poverty
 default_selection:
   - Mozambique
   - Zambia
@@ -136,10 +138,10 @@ dimensions:
     choices:
       - slug: No spells
         name: Don't show
-        description: Better for understanding trends within individual countries
+        description: Better for making broad comparisons across several countries
       - slug: Spells
         name: Show
-        description: Better for making broad comparisons across several countries
+        description: Better for understanding trends within individual countries
 
 views:
   # MULTIPLE LINES SIMPLE
@@ -180,6 +182,7 @@ views:
         - "{definitions.description_key_welfare_type}"
         - "{definitions.description_key_not_market_income}"
         - "{definitions.description_key_nowcasts}"
+      description_short: "{definitions.ppp_adjustment_subtitle}"
 
   # AREA CHART
   - dimensions:
@@ -230,6 +233,7 @@ views:
         - "{definitions.description_key_welfare_type}"
         - "{definitions.description_key_not_market_income}"
         - "{definitions.description_key_nowcasts}"
+      description_short: "{definitions.ppp_adjustment_subtitle}"
 
   # BAR CHART
   - dimensions:
@@ -276,6 +280,7 @@ views:
         - "{definitions.description_key_welfare_type}"
         - "{definitions.description_key_not_market_income}"
         - "{definitions.description_key_nowcasts}"
+      description_short: "{definitions.ppp_adjustment_subtitle}"
 
   # MULTIPLE LINES MORE LINES
   - dimensions:
@@ -327,6 +332,7 @@ views:
         - "{definitions.description_key_welfare_type}"
         - "{definitions.description_key_not_market_income}"
         - "{definitions.description_key_nowcasts}"
+      description_short: "{definitions.ppp_adjustment_subtitle}"
 
   # AREA CHART MORE LINES
   - dimensions:
@@ -370,7 +376,7 @@ views:
             color: *color_100_to_300
         - catalogPath: world_bank_pip#headcount_ratio__ppp_version_2021__poverty_line_100__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
-            name: "$Below $1 a day"
+            name: "Below $1 a day"
             color: *color_0_to_100
     config:
       title: Distribution of the population between different poverty lines
@@ -393,6 +399,7 @@ views:
         - "{definitions.description_key_welfare_type}"
         - "{definitions.description_key_not_market_income}"
         - "{definitions.description_key_nowcasts}"
+      description_short: "{definitions.ppp_adjustment_subtitle}"
 
   # BAR CHART MORE LINES
   - dimensions:
@@ -452,6 +459,7 @@ views:
         - "{definitions.description_key_welfare_type}"
         - "{definitions.description_key_not_market_income}"
         - "{definitions.description_key_nowcasts}"
+      description_short: "{definitions.ppp_adjustment_subtitle}"
 
 
   # FOR HEADCOUNT
@@ -491,6 +499,7 @@ views:
         - "{definitions.description_key_welfare_type}"
         - "{definitions.description_key_not_market_income}"
         - "{definitions.description_key_nowcasts}"
+      description_short: "{definitions.ppp_adjustment_subtitle}"
 
   # AREA CHART
   - dimensions:
@@ -541,6 +550,7 @@ views:
         - "{definitions.description_key_welfare_type}"
         - "{definitions.description_key_not_market_income}"
         - "{definitions.description_key_nowcasts}"
+      description_short: "{definitions.ppp_adjustment_subtitle}"
 
   # BAR CHART
   - dimensions:
@@ -586,6 +596,7 @@ views:
         - "{definitions.description_key_welfare_type}"
         - "{definitions.description_key_not_market_income}"
         - "{definitions.description_key_nowcasts}"
+      description_short: "{definitions.ppp_adjustment_subtitle}"
 
   # MULTIPLE LINES MORE LINES
   - dimensions:
@@ -635,6 +646,7 @@ views:
         - "{definitions.description_key_welfare_type}"
         - "{definitions.description_key_not_market_income}"
         - "{definitions.description_key_nowcasts}"
+      description_short: "{definitions.ppp_adjustment_subtitle}"
 
   # AREA CHART MORE LINES
   - dimensions:
@@ -678,7 +690,7 @@ views:
             color: *color_100_to_300
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_100__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
-            name: "$Below $1 a day"
+            name: "Below $1 a day"
             color: *color_0_to_100
     config:
       title: Distribution of the population between different poverty lines
@@ -701,6 +713,7 @@ views:
         - "{definitions.description_key_welfare_type}"
         - "{definitions.description_key_not_market_income}"
         - "{definitions.description_key_nowcasts}"
+      description_short: "{definitions.ppp_adjustment_subtitle}"
 
   # BAR CHART MORE LINES
   - dimensions:
@@ -758,6 +771,7 @@ views:
         - "{definitions.description_key_welfare_type}"
         - "{definitions.description_key_not_market_income}"
         - "{definitions.description_key_nowcasts}"
+      description_short: "{definitions.ppp_adjustment_subtitle}"
 
     ####################################################
     # SPELL VIEWS

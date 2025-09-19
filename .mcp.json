@@ -1,12 +1,12 @@
 {
   "mcpServers": {
-    "etl": {
-      "type": "stdio",
-      "command": ".venv/bin/fastmcp",
-      "args": [
-        "run",
-        "etl_mcp/server.py"
-      ],
+    "owid": {
+      "type": "http",
+      "url": "https://mcp.owid.io/mcp"
+    },
+    "owid-dev": {
+      "url": "http://0.0.0.0:8080/mcp/",
+			"type": "http",
       "env": {}
     }
   }

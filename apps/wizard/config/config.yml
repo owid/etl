@@ -29,16 +29,23 @@ main:
     maintainer: "@lucas"
     entrypoint: home.py
     icon: ":material/home:"
+  # expert:
+  #   title: "Expert"
+  #   description: "Ask the expert ETL questions!"
+  #   maintainer:
+  #     - "@lucas"
+  #     - "@daniel"
+  #   entrypoint: app_pages/expert/app.py
+  #   icon: ":material/lightbulb_2:"
   expert:
     title: "Expert"
     description: "Ask the expert ETL questions!"
     maintainer:
       - "@lucas"
-      - "@daniel"
-    entrypoint: app_pages/expert/app.py
-    icon: ":material/lightbulb_2:"
+    entrypoint: app_pages/expert_agent/app.py
+    icon: ":material/smart_toy:"
   analytics:
-    title: "Analytics (external)"
+    title: "Metabase"
     description: "Learn more about OWID in Data!"
     maintainer:
       - "@bobbie"
@@ -188,13 +195,6 @@ sections:
         entrypoint: app_pages/indicator_search/app.py
         icon: ":material/search:"
         image_url: "https://www.shutterstock.com/image-vector/standard-ph-chart-aqueous-solution-600nw-2007387788.jpg"
-      - title: "Similar charts (deprecated)"
-        alias: similar_charts
-        description: "Find similar charts"
-        maintainer: "@mojmir"
-        entrypoint: app_pages/similar_charts/app.py
-        icon: ":material/bar_chart:"
-        image_url: "https://media.istockphoto.com/id/1296381479/vector/set-of-simple-infographic-graphs-and-charts-data-visualization-statistics-and-business.jpg?s=612x612&w=0&k=20&c=JpEoP-6w16OwVC49Sq2PEI8-dHF1CZnm7rHyL5DoxqA="
       - title: "Related charts"
         alias: related_charts
         description: "Find related charts"
@@ -259,6 +259,15 @@ sections:
         entrypoint: app_pages/owidle.py
         icon: ":material/videogame_asset:"
         image_url: "https://t3.ftcdn.net/jpg/06/26/23/36/360_F_626233679_tesiSRP9Jinq5wS0ZgbdJ6k5adupmgKl.jpg"
+      - title: "Servers Dashboard"
+        alias: servers-dashboard
+        entrypoint: app_pages/servers_dashboard/app.py
+        description: Real-time monitoring of our LXC staging servers
+        maintainer: "@mojmir"
+        icon: ":material/computer:"
+        image_url: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
+        disable:
+          staging: true
 
   # - title: "Metadata"
   #   description: |-
@@ -284,14 +293,14 @@ sections:
   #       disable:
   #         "production": True
   #         "staging": True
-# legacy:
-#   description: |-
-#     The pages below are legacy now. They are kept in case the new pages are not working properly.
-#   apps:
-#     - title:
-#       alias:
-#       entrypoint:
-#       description:
-#       maintainer:
-#       icon:
-#       image_url:
+legacy:
+  description: |-
+    The pages below are legacy now. They are kept in case the new pages are not working properly.
+  apps:
+    - title: "Similar charts (deprecated)"
+      alias: similar_charts
+      description: "Find similar charts"
+      maintainer: "@mojmir"
+      entrypoint: app_pages/similar_charts/app.py
+      icon: ":material/bar_chart:"
+      image_url: "https://media.istockphoto.com/id/1296381479/vector/set-of-simple-infographic-graphs-and-charts-data-visualization-statistics-and-business.jpg?s=612x612&w=0&k=20&c=JpEoP-6w16OwVC49Sq2PEI8-dHF1CZnm7rHyL5DoxqA="

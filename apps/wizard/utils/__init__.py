@@ -17,6 +17,7 @@ import json
 import re
 import sys
 from datetime import date
+from functools import cache
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Union, cast
 
@@ -403,7 +404,7 @@ def preview_dag_additions(dag_content: str, dag_path: str | Path, prefix: str = 
             st.code(dag_content, "yaml")
 
 
-@st.cache_data
+@cache
 def load_instructions() -> str:
     """Load snapshot step instruction text."""
     with open(CURRENT_DIR / f"{st.session_state['step_name']}.md", "r") as f:
