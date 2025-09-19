@@ -248,3 +248,5 @@ steps:
     ? snapshot://fasttrack/latest/wolbachia_dengue_indonesia_rct.csv
   data://grapher/fasttrack/latest/smokers_vapers_great_britain: !!set
     ? snapshot://fasttrack/latest/smokers_vapers_great_britain.csv
+  data://grapher/fasttrack/latest/majorpowerdeaths: !!set
+    snapshot://fasttrack/latest/majorpowerdeaths.csv:
