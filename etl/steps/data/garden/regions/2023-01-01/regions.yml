@@ -1964,6 +1964,7 @@
     - "SYR"
     - "TUN"
     - "YEM"
+    - "OWID_FPK"
 - code: WB_SSA
   name: "Sub-Saharan Africa (WB)"
   region_type: "aggregate"
@@ -2119,7 +2120,6 @@
   region_type: "aggregate"
   defined_by: wb
   members:
-    - "AFG"
     - "BGD"
     - "BTN"
     - "IND"
@@ -2127,8 +2127,6 @@
     - "LKA"
     - "MDV"
     - "NPL"
-    - "OWID_FPK"
-    - "PAK"
 - code: WB_EAP
   name: "East Asia and Pacific (WB)"
   region_type: "aggregate"
