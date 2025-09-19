@@ -180,7 +180,7 @@ tables:
         title: Labor force participation rate - <<sex>> - <<classif1>>
         unit: "%"
         short_unit: "%"
-        description_short: The labour force participation rate is the labour force (all working-age persons employed and unemployed) divided the working-age population.
+        description_short: The labour force participation rate is the labour force (all working-age persons employed and unemployed) divided by the working-age population.
         description_key:
           - "{definitions.description_key_iloest_modelled_data}"
           - "{definitions.description_key_13th_icls}"
