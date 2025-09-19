@@ -376,7 +376,7 @@ views:
             color: *color_100_to_300
         - catalogPath: world_bank_pip#headcount_ratio__ppp_version_2021__poverty_line_100__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
-            name: "$Below $1 a day"
+            name: "Below $1 a day"
             color: *color_0_to_100
     config:
       title: Distribution of the population between different poverty lines
@@ -690,7 +690,7 @@ views:
             color: *color_100_to_300
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_100__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
-            name: "$Below $1 a day"
+            name: "Below $1 a day"
             color: *color_0_to_100
     config:
       title: Distribution of the population between different poverty lines
