@@ -1074,452 +1074,452 @@ tables:
           tolerance: 5
           name: Upper secondary
 
-    #####################################################################################################
-    # ILOSTAT indicators
-    #####################################################################################################
+      #####################################################################################################
+      # ILOSTAT indicators
+      #####################################################################################################
 
-    sl_tlf_cact_zs:
-      title: Labor force participation rate, total (% of total population ages 15+) (modeled ILO estimate)
-      unit: "%"
-      short_unit: "%"
-      description_short: "{definitions.description_short_labor_force_participation_rate}"
-      description_key:
-        - "{definitions.description_key_iloest_modelled_data}"
-        - "{definitions.description_key_13th_icls}"
-      presentation:
-        attribution_short: ILO
-        topic_tags:
-          - Work & Employment
-      display:
-        name: Labor force participation rate
-        numDecimalPlaces: 1
-        tolerance: 5
+      sl_tlf_cact_zs:
+        title: Labor force participation rate, total (% of total population ages 15+) (modeled ILO estimate)
+        unit: "%"
+        short_unit: "%"
+        description_short: "{definitions.description_short_labor_force_participation_rate}"
+        description_key:
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+        display:
+          name: Labor force participation rate
+          numDecimalPlaces: 1
+          tolerance: 5
 
-    sl_tlf_cact_ma_zs:
-      title: Labor force participation rate, male (% of male population ages 15+) (modeled ILO estimate)
-      unit: "%"
-      short_unit: "%"
-      description_short: "{definitions.description_short_labor_force_participation_rate}"
-      description_key:
-        - "{definitions.description_key_iloest_modelled_data}"
-        - "{definitions.description_key_13th_icls}"
-      presentation:
-        attribution_short: ILO
-        topic_tags:
-          - Work & Employment
-      display:
-        name: Labor force participation rate, male
-        numDecimalPlaces: 1
-        tolerance: 5
+      sl_tlf_cact_ma_zs:
+        title: Labor force participation rate, male (% of male population ages 15+) (modeled ILO estimate)
+        unit: "%"
+        short_unit: "%"
+        description_short: "{definitions.description_short_labor_force_participation_rate}"
+        description_key:
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+        display:
+          name: Labor force participation rate, male
+          numDecimalPlaces: 1
+          tolerance: 5
 
-    sl_tlf_cact_fe_zs:
-      title: Labor force participation rate, female (% of female population ages 15+) (modeled ILO estimate)
-      unit: "%"
-      short_unit: "%"
-      description_short: "{definitions.description_short_labor_force_participation_rate}"
-      description_key:
-        - "{definitions.description_key_iloest_modelled_data}"
-        - "{definitions.description_key_13th_icls}"
-      presentation:
-        attribution_short: ILO
-        topic_tags:
-          - Work & Employment
-      display:
-        name: Labor force participation, female
-        numDecimalPlaces: 1
-        tolerance: 5
+      sl_tlf_cact_fe_zs:
+        title: Labor force participation rate, female (% of female population ages 15+) (modeled ILO estimate)
+        unit: "%"
+        short_unit: "%"
+        description_short: "{definitions.description_short_labor_force_participation_rate}"
+        description_key:
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+        display:
+          name: Labor force participation, female
+          numDecimalPlaces: 1
+          tolerance: 5
 
-    sl_tlf_cact_fe_ne_zs:
-      title: Labor force participation rate, female (% of female population ages 15+) (national estimate)
-      unit: "%"
-      short_unit: "%"
-      description_short: "{definitions.description_short_labor_force_participation_rate}"
-      description_key:
-        - "{definitions.description_key_national_estimates}"
-        - "{definitions.description_key_13th_icls}"
-      presentation:
-        attribution_short: ILO
-        topic_tags:
-          - Work & Employment
-      display:
-        name: Labor force participation rate, female
-        numDecimalPlaces: 1
-        tolerance: 5
+      sl_tlf_cact_fe_ne_zs:
+        title: Labor force participation rate, female (% of female population ages 15+) (national estimate)
+        unit: "%"
+        short_unit: "%"
+        description_short: "{definitions.description_short_labor_force_participation_rate}"
+        description_key:
+          - "{definitions.description_key_national_estimates}"
+          - "{definitions.description_key_13th_icls}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+        display:
+          name: Labor force participation rate, female
+          numDecimalPlaces: 1
+          tolerance: 5
 
-    sl_tlf_acti_1524_fe_ne_zs:
-      title: Labor force participation rate for ages 15-24, female (%) (national estimate)
-      unit: "%"
-      short_unit: "%"
-      description_short: "{definitions.description_short_labor_force_participation_rate}"
-      description_key:
-        - "{definitions.description_key_national_estimates}"
-        - "{definitions.description_key_13th_icls}"
-      presentation:
-        attribution_short: ILO
-        topic_tags:
-          - Work & Employment
-      display:
-        name: Labor force participation rate, female, ages 15-24
-        numDecimalPlaces: 1
-        tolerance: 5
+      sl_tlf_acti_1524_fe_ne_zs:
+        title: Labor force participation rate for ages 15-24, female (%) (national estimate)
+        unit: "%"
+        short_unit: "%"
+        description_short: "{definitions.description_short_labor_force_participation_rate}"
+        description_key:
+          - "{definitions.description_key_national_estimates}"
+          - "{definitions.description_key_13th_icls}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+        display:
+          name: Labor force participation rate, female, ages 15-24
+          numDecimalPlaces: 1
+          tolerance: 5
 
-    sl_uem_totl_zs:
-      title: Unemployment, total (% of total labor force) (modeled ILO estimate)
-      unit: "%"
-      short_unit: "%"
-      description_short: "{definitions.description_short_unemployment_rate}"
-      description_key:
-        - "{definitions.description_key_iloest_modelled_data}"
-        - "{definitions.description_key_13th_icls}"
-      presentation:
-        attribution_short: ILO
-        topic_tags:
-          - Work & Employment
-      display:
-        name: Unemployment rate
-        numDecimalPlaces: 1
-        tolerance: 5
+      sl_uem_totl_zs:
+        title: Unemployment, total (% of total labor force) (modeled ILO estimate)
+        unit: "%"
+        short_unit: "%"
+        description_short: "{definitions.description_short_unemployment_rate}"
+        description_key:
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+        display:
+          name: Unemployment rate
+          numDecimalPlaces: 1
+          tolerance: 5
 
-    sl_uem_totl_ma_zs:
-      title: Unemployment, male (% of male labor force) (modeled ILO estimate)
-      unit: "%"
-      short_unit: "%"
-      description_short: "{definitions.description_short_unemployment_rate}"
-      description_key:
-        - "{definitions.description_key_iloest_modelled_data}"
-        - "{definitions.description_key_13th_icls}"
-      presentation:
-        attribution_short: ILO
-        topic_tags:
-          - Work & Employment
-      display:
-        name: Unemployment rate, male
-        numDecimalPlaces: 1
-        tolerance: 5
+      sl_uem_totl_ma_zs:
+        title: Unemployment, male (% of male labor force) (modeled ILO estimate)
+        unit: "%"
+        short_unit: "%"
+        description_short: "{definitions.description_short_unemployment_rate}"
+        description_key:
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+        display:
+          name: Unemployment rate, male
+          numDecimalPlaces: 1
+          tolerance: 5
 
-    sl_uem_totl_fe_zs:
-      title: Unemployment, female (% of female labor force) (modeled ILO estimate)
-      unit: "%"
-      short_unit: "%"
-      description_short: "{definitions.description_short_unemployment_rate}"
-      description_key:
-        - "{definitions.description_key_iloest_modelled_data}"
-        - "{definitions.description_key_13th_icls}"
-      presentation:
-        attribution_short: ILO
-        topic_tags:
-          - Work & Employment
-      display:
-        name: Unemployment rate, female
-        numDecimalPlaces: 1
-        tolerance: 5
+      sl_uem_totl_fe_zs:
+        title: Unemployment, female (% of female labor force) (modeled ILO estimate)
+        unit: "%"
+        short_unit: "%"
+        description_short: "{definitions.description_short_unemployment_rate}"
+        description_key:
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+        display:
+          name: Unemployment rate, female
+          numDecimalPlaces: 1
+          tolerance: 5
 
-    sl_uem_1524_zs:
-      title: Unemployment, youth total (% of total labor force ages 15-24) (modeled ILO estimate)
-      unit: "%"
-      short_unit: "%"
-      description_short: "{definitions.description_short_unemployment_rate}"
-      description_key:
-        - "{definitions.description_key_iloest_modelled_data}"
-        - "{definitions.description_key_13th_icls}"
-      presentation:
-        attribution_short: ILO
-        topic_tags:
-          - Work & Employment
-      display:
-        name: Unemployment rate, ages 15-24
-        numDecimalPlaces: 1
-        tolerance: 5
+      sl_uem_1524_zs:
+        title: Unemployment, youth total (% of total labor force ages 15-24) (modeled ILO estimate)
+        unit: "%"
+        short_unit: "%"
+        description_short: "{definitions.description_short_unemployment_rate}"
+        description_key:
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+        display:
+          name: Unemployment rate, ages 15-24
+          numDecimalPlaces: 1
+          tolerance: 5
 
-    sl_emp_totl_sp_zs:
-      title: Employment to population ratio, 15+, total (%) (modeled ILO estimate)
-      unit: "%"
-      short_unit: "%"
-      description_short: "{definitions.description_short_employment_to_population_ratio}"
-      description_key:
-        - "{definitions.employment}"
-        - "{definitions.description_key_iloest_modelled_data}"
-        - "{definitions.description_key_13th_icls}"
-      presentation:
-        attribution_short: ILO
-        topic_tags:
-          - Work & Employment
-      display:
-        name: Employment-to-population ratio
-        numDecimalPlaces: 1
-        tolerance: 5
+      sl_emp_totl_sp_zs:
+        title: Employment to population ratio, 15+, total (%) (modeled ILO estimate)
+        unit: "%"
+        short_unit: "%"
+        description_short: "{definitions.description_short_employment_to_population_ratio}"
+        description_key:
+          - "{definitions.employment}"
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+        display:
+          name: Employment-to-population ratio
+          numDecimalPlaces: 1
+          tolerance: 5
 
-    sl_emp_totl_sp_fe_zs:
-      title: Employment to population ratio, 15+, female (%) (modeled ILO estimate)
-      unit: "%"
-      short_unit: "%"
-      description_short: "{definitions.description_short_employment_to_population_ratio}"
-      description_key:
-        - "{definitions.employment}"
-        - "{definitions.description_key_iloest_modelled_data}"
-        - "{definitions.description_key_13th_icls}"
-      presentation:
-        attribution_short: ILO
-        topic_tags:
-          - Work & Employment
-      display:
-        name: Employment-to-population ratio, female
-        numDecimalPlaces: 1
-        tolerance: 5
+      sl_emp_totl_sp_fe_zs:
+        title: Employment to population ratio, 15+, female (%) (modeled ILO estimate)
+        unit: "%"
+        short_unit: "%"
+        description_short: "{definitions.description_short_employment_to_population_ratio}"
+        description_key:
+          - "{definitions.employment}"
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+        display:
+          name: Employment-to-population ratio, female
+          numDecimalPlaces: 1
+          tolerance: 5
 
-    sl_emp_totl_sp_fe_ne_zs:
-      title: Employment to population ratio, 15+, female (%) (national estimate)
-      unit: "%"
-      short_unit: "%"
-      description_short: "{definitions.description_short_employment_to_population_ratio}"
-      description_key:
-        - "{definitions.employment}"
-        - "{definitions.description_key_national_estimates}"
-        - "{definitions.description_key_13th_icls}"
-      presentation:
-        attribution_short: ILO
-        topic_tags:
-          - Work & Employment
-      display:
-        name: Employment-to-population ratio, female
-        numDecimalPlaces: 1
-        tolerance: 5
+      sl_emp_totl_sp_fe_ne_zs:
+        title: Employment to population ratio, 15+, female (%) (national estimate)
+        unit: "%"
+        short_unit: "%"
+        description_short: "{definitions.description_short_employment_to_population_ratio}"
+        description_key:
+          - "{definitions.employment}"
+          - "{definitions.description_key_national_estimates}"
+          - "{definitions.description_key_13th_icls}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+        display:
+          name: Employment-to-population ratio, female
+          numDecimalPlaces: 1
+          tolerance: 5
 
-    sl_emp_vuln_zs:
-      title: Vulnerable employment, total (% of total employment) (modeled ILO estimate)
-      unit: "%"
-      short_unit: "%"
-      description_short: "{definitions.description_short_vulnerable_employment}"
-      description_key:
-        - "{definitions.employment}"
-        - "{definitions.description_key_own_account_workers}"
-        - "{definitions.description_key_contributing_family_workers}"
-        - "{definitions.icse_93}"
-        - "{definitions.description_key_iloest_modelled_data}"
-        - "{definitions.description_key_13th_icls}"
-      presentation:
-        attribution_short: ILO
-        topic_tags:
-          - Work & Employment
-      display:
-        name: Share in vulnerable employment
-        numDecimalPlaces: 1
-        tolerance: 5
+      sl_emp_vuln_zs:
+        title: Vulnerable employment, total (% of total employment) (modeled ILO estimate)
+        unit: "%"
+        short_unit: "%"
+        description_short: "{definitions.description_short_vulnerable_employment}"
+        description_key:
+          - "{definitions.employment}"
+          - "{definitions.description_key_own_account_workers}"
+          - "{definitions.description_key_contributing_family_workers}"
+          - "{definitions.icse_93}"
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+        display:
+          name: Share in vulnerable employment
+          numDecimalPlaces: 1
+          tolerance: 5
 
-    sl_tlf_totl_fe_zs:
-      title: Labor force, female (% of total labor force)
-      unit: "%"
-      short_unit: "%"
-      description_short: "{definitions.description_short_labor_force_female}"
-      description_key:
-        - "{definitions.description_key_iloest_modelled_data}"
-        - "{definitions.description_key_13th_icls}"
-      presentation:
-        attribution_short: ILO
-        topic_tags:
-          - Work & Employment
-      display:
-        name: Share of the labor force that is female
-        numDecimalPlaces: 1
-        tolerance: 5
+      sl_tlf_totl_fe_zs:
+        title: Labor force, female (% of total labor force)
+        unit: "%"
+        short_unit: "%"
+        description_short: "{definitions.description_short_labor_force_female}"
+        description_key:
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+        display:
+          name: Share of the labor force that is female
+          numDecimalPlaces: 1
+          tolerance: 5
 
-    # sl_tlf_0714_zs:
-    #   title: Children in employment, total (% of children ages 7-14)
-    # sl_tlf_0714_ma_zs:
-    #   title: Children in employment, male (% of male children ages 7-14)
-    # sl_tlf_0714_fe_zs:
-    #   title: Children in employment, female (% of female children ages 7-14)
+      # sl_tlf_0714_zs:
+      #   title: Children in employment, total (% of children ages 7-14)
+      # sl_tlf_0714_ma_zs:
+      #   title: Children in employment, male (% of male children ages 7-14)
+      # sl_tlf_0714_fe_zs:
+      #   title: Children in employment, female (% of female children ages 7-14)
 
-    # sl_tlf_0714_wk_zs:
-    #   title: Children in employment, work only (% of children in employment, ages 7-14)
+      # sl_tlf_0714_wk_zs:
+      #   title: Children in employment, work only (% of children in employment, ages 7-14)
 
-    # sl_tlf_0714_sw_tm:
-    #   title: Average working hours of children, study and work, ages 7-14 (hours per week)
+      # sl_tlf_0714_sw_tm:
+      #   title: Average working hours of children, study and work, ages 7-14 (hours per week)
 
-    sl_agr_empl_zs:
-      title: Employment in agriculture (% of total employment) (modeled ILO estimate)
-      unit: "%"
-      short_unit: "%"
-      description_short: "{definitions.description_short_employment_agriculture}"
-      description_key:
-        - "{definitions.employment}"
-        - "{definitions.description_key_employment_agriculture}"
-        - "{definitions.description_key_iloest_modelled_data}"
-        - "{definitions.description_key_13th_icls}"
-      presentation:
-        attribution_short: ILO
-        topic_tags:
-          - Work & Employment
-      display:
-        name: Employment in agriculture
-        numDecimalPlaces: 1
-        tolerance: 5
+      sl_agr_empl_zs:
+        title: Employment in agriculture (% of total employment) (modeled ILO estimate)
+        unit: "%"
+        short_unit: "%"
+        description_short: "{definitions.description_short_employment_agriculture}"
+        description_key:
+          - "{definitions.employment}"
+          - "{definitions.description_key_employment_agriculture}"
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+        display:
+          name: Employment in agriculture
+          numDecimalPlaces: 1
+          tolerance: 5
 
-    sl_ind_empl_zs:
-      title: Employment in industry (% of total employment) (modeled ILO estimate)
-      unit: "%"
-      short_unit: "%"
-      description_short: "{definitions.description_short_employment_industry}"
-      description_key:
-        - "{definitions.employment}"
-        - "{definitions.description_key_employment_industry}"
-        - "{definitions.description_key_iloest_modelled_data}"
-        - "{definitions.description_key_13th_icls}"
-      presentation:
-        attribution_short: ILO
-        topic_tags:
-          - Work & Employment
-      display:
-        name: Employment in industry
-        numDecimalPlaces: 1
-        tolerance: 5
+      sl_ind_empl_zs:
+        title: Employment in industry (% of total employment) (modeled ILO estimate)
+        unit: "%"
+        short_unit: "%"
+        description_short: "{definitions.description_short_employment_industry}"
+        description_key:
+          - "{definitions.employment}"
+          - "{definitions.description_key_employment_industry}"
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+        display:
+          name: Employment in industry
+          numDecimalPlaces: 1
+          tolerance: 5
 
-    sl_srv_empl_zs:
-      title: Employment in services (% of total employment) (modeled ILO estimate)
-      unit: "%"
-      short_unit: "%"
-      description_short: "{definitions.description_short_employment_services}"
-      description_key:
-        - "{definitions.employment}"
-        - "{definitions.description_key_employment_services}"
-        - "{definitions.description_key_iloest_modelled_data}"
-        - "{definitions.description_key_13th_icls}"
-      presentation:
-        attribution_short: ILO
-        topic_tags:
-          - Work & Employment
-      display:
-        name: Employment in services
-        numDecimalPlaces: 1
-        tolerance: 5
+      sl_srv_empl_zs:
+        title: Employment in services (% of total employment) (modeled ILO estimate)
+        unit: "%"
+        short_unit: "%"
+        description_short: "{definitions.description_short_employment_services}"
+        description_key:
+          - "{definitions.employment}"
+          - "{definitions.description_key_employment_services}"
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+        display:
+          name: Employment in services
+          numDecimalPlaces: 1
+          tolerance: 5
 
-    sl_agr_empl_ma_zs:
-      title: Employment in agriculture, male (% of male employment) (modeled ILO estimate)
-      unit: "%"
-      short_unit: "%"
-      description_short: "{definitions.description_short_employment_agriculture}"
-      description_key:
-        - "{definitions.employment}"
-        - "{definitions.description_key_employment_agriculture}"
-        - "{definitions.description_key_iloest_modelled_data}"
-        - "{definitions.description_key_13th_icls}"
-      presentation:
-        attribution_short: ILO
-        topic_tags:
-          - Work & Employment
-      display:
-        name: Employment in agriculture, male
-        numDecimalPlaces: 1
-        tolerance: 5
+      sl_agr_empl_ma_zs:
+        title: Employment in agriculture, male (% of male employment) (modeled ILO estimate)
+        unit: "%"
+        short_unit: "%"
+        description_short: "{definitions.description_short_employment_agriculture}"
+        description_key:
+          - "{definitions.employment}"
+          - "{definitions.description_key_employment_agriculture}"
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+        display:
+          name: Employment in agriculture, male
+          numDecimalPlaces: 1
+          tolerance: 5
 
-    sl_ind_empl_ma_zs:
-      title: Employment in industry, male (% of male employment) (modeled ILO estimate)
-      unit: "%"
-      short_unit: "%"
-      description_short: "{definitions.description_short_employment_industry}"
-      description_key:
-        - "{definitions.employment}"
-        - "{definitions.description_key_employment_industry}"
-        - "{definitions.description_key_iloest_modelled_data}"
-        - "{definitions.description_key_13th_icls}"
-      presentation:
-        attribution_short: ILO
-        topic_tags:
-          - Work & Employment
-      display:
-        name: Employment in industry, male
-        numDecimalPlaces: 1
-        tolerance: 5
+      sl_ind_empl_ma_zs:
+        title: Employment in industry, male (% of male employment) (modeled ILO estimate)
+        unit: "%"
+        short_unit: "%"
+        description_short: "{definitions.description_short_employment_industry}"
+        description_key:
+          - "{definitions.employment}"
+          - "{definitions.description_key_employment_industry}"
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+        display:
+          name: Employment in industry, male
+          numDecimalPlaces: 1
+          tolerance: 5
 
-    sl_srv_empl_ma_zs:
-      title: Employment in services, male (% of male employment) (modeled ILO estimate)
-      unit: "%"
-      short_unit: "%"
-      description_short: "{definitions.description_short_employment_services}"
-      description_key:
-        - "{definitions.employment}"
-        - "{definitions.description_key_employment_services}"
-        - "{definitions.description_key_iloest_modelled_data}"
-        - "{definitions.description_key_13th_icls}"
-      presentation:
-        attribution_short: ILO
-        topic_tags:
-          - Work & Employment
-      display:
-        name: Employment in services, male
-        numDecimalPlaces: 1
-        tolerance: 5
+      sl_srv_empl_ma_zs:
+        title: Employment in services, male (% of male employment) (modeled ILO estimate)
+        unit: "%"
+        short_unit: "%"
+        description_short: "{definitions.description_short_employment_services}"
+        description_key:
+          - "{definitions.employment}"
+          - "{definitions.description_key_employment_services}"
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+        display:
+          name: Employment in services, male
+          numDecimalPlaces: 1
+          tolerance: 5
 
-    sl_agr_empl_fe_zs:
-      title: Employment in agriculture, female (% of female employment) (modeled ILO estimate)
-      unit: "%"
-      short_unit: "%"
-      description_short: "{definitions.description_short_employment_agriculture}"
-      description_key:
-        - "{definitions.employment}"
-        - "{definitions.description_key_employment_agriculture}"
-        - "{definitions.description_key_iloest_modelled_data}"
-        - "{definitions.description_key_13th_icls}"
-      presentation:
-        attribution_short: ILO
-        topic_tags:
-          - Work & Employment
-      display:
-        name: Employment in agriculture, female
-        numDecimalPlaces: 1
-        tolerance: 5
+      sl_agr_empl_fe_zs:
+        title: Employment in agriculture, female (% of female employment) (modeled ILO estimate)
+        unit: "%"
+        short_unit: "%"
+        description_short: "{definitions.description_short_employment_agriculture}"
+        description_key:
+          - "{definitions.employment}"
+          - "{definitions.description_key_employment_agriculture}"
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+        display:
+          name: Employment in agriculture, female
+          numDecimalPlaces: 1
+          tolerance: 5
 
-    sl_ind_empl_fe_zs:
-      title: Employment in industry, female (% of female employment) (modeled ILO estimate)
-      unit: "%"
-      short_unit: "%"
-      description_short: "{definitions.description_short_employment_industry}"
-      description_key:
-        - "{definitions.employment}"
-        - "{definitions.description_key_employment_industry}"
-        - "{definitions.description_key_iloest_modelled_data}"
-        - "{definitions.description_key_13th_icls}"
-      presentation:
-        attribution_short: ILO
-        topic_tags:
-          - Work & Employment
-      display:
-        name: Employment in industry, female
-        numDecimalPlaces: 1
-        tolerance: 5
+      sl_ind_empl_fe_zs:
+        title: Employment in industry, female (% of female employment) (modeled ILO estimate)
+        unit: "%"
+        short_unit: "%"
+        description_short: "{definitions.description_short_employment_industry}"
+        description_key:
+          - "{definitions.employment}"
+          - "{definitions.description_key_employment_industry}"
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+        display:
+          name: Employment in industry, female
+          numDecimalPlaces: 1
+          tolerance: 5
 
-    sl_srv_empl_fe_zs:
-      title: Employment in services, female (% of female employment) (modeled ILO estimate)
-      unit: "%"
-      short_unit: "%"
-      description_short: "{definitions.description_short_employment_services}"
-      description_key:
-        - "{definitions.employment}"
-        - "{definitions.description_key_employment_services}"
-        - "{definitions.description_key_iloest_modelled_data}"
-        - "{definitions.description_key_13th_icls}"
-      presentation:
-        attribution_short: ILO
-        topic_tags:
-          - Work & Employment
-      display:
-        name: Employment in services, female
-        numDecimalPlaces: 1
-        tolerance: 5
+      sl_srv_empl_fe_zs:
+        title: Employment in services, female (% of female employment) (modeled ILO estimate)
+        unit: "%"
+        short_unit: "%"
+        description_short: "{definitions.description_short_employment_services}"
+        description_key:
+          - "{definitions.employment}"
+          - "{definitions.description_key_employment_services}"
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+        display:
+          name: Employment in services, female
+          numDecimalPlaces: 1
+          tolerance: 5
 
-    sl_tlf_cact_fm_zs:
-      title: Ratio of female to male labor force participation rate (%) (modeled ILO estimate)
-      unit: "%"
-      short_unit: "%"
-      description_short: "{definitions.description_short_ratio_female_male_labor_force_participation_rate}"
-      description_key:
-        - "{definitions.description_key_iloest_modelled_data}"
-        - "{definitions.description_key_13th_icls}"
-      presentation:
-        attribution_short: ILO
-        topic_tags:
-          - Work & Employment
-      display:
-        name: Ratio of female to male labor force participation rate
-        numDecimalPlaces: 1
-        tolerance: 5
+      sl_tlf_cact_fm_zs:
+        title: Ratio of female to male labor force participation rate (%) (modeled ILO estimate)
+        unit: "%"
+        short_unit: "%"
+        description_short: "{definitions.description_short_ratio_female_male_labor_force_participation_rate}"
+        description_key:
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+        display:
+          name: Ratio of female to male labor force participation rate
+          numDecimalPlaces: 1
+          tolerance: 5
