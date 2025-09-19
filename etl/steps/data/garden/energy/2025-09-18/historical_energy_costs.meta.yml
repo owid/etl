@@ -4,9 +4,14 @@ definitions:
     presentation:
       topic_tags:
         - Energy
-    # TODO: Improve units to follow guidelines.
-    unit: '2024$/MWh'
-    short_unit: '2024$/MWh'
+    unit: 'constant 2024 US$ per megawatt-hour'
+    short_unit: '$/MWh'
+    presentation:
+      grapher_config:
+        note: |-
+          This data is expressed in constant 2024 US$ per megawatt-hour.
+    description_short: |-
+      This data is expressed in US dollars, adjusted for inflation, per unit useful energy, in [megawatt-hours](#dod:watt-hours). The prices of electricity are given in terms of the levelized cost of electricity (LCOE). Crude oil, coal, and gas prices represent the cost of fuel.
 
 dataset:
   update_period_days: 365
@@ -15,28 +20,66 @@ tables:
   historical_energy_costs:
     variables:
       crude_oil_price:
-        title: Crude oil price per unit of useful energy
-        description_short: ''
+        title: Crude oil fuel price per unit of useful energy
+        display:
+          name: Crude oil
+          shortUnit: $
+        presentation:
+          title_public: |-
+            {tables.historical_energy_costs.variables.crude_oil_price.title}
       coal_price:
-        title: Coal price (average USA)
-        description_short: ''
+        title: Coal fuel price per unit of useful energy
+        display:
+          name: Coal
+          shortUnit: $
+        presentation:
+          title_public: |-
+            {tables.historical_energy_costs.variables.coal_price.title}
       gas_price:
-        title: Gas price (US)
-        description_short: ''
+        title: Gas fuel price per unit of useful energy
+        display:
+          name: Gas
+          shortUnit: $
+        presentation:
+          title_public: |-
+            {tables.historical_energy_costs.variables.gas_price.title}
       coal_electricity_lcoe:
-        title: Coal LCOE (US/global)
-        description_short: ''
+        title: Levelized cost of electricity from coal power plants, measured in useful energy
+        display:
+          name: Coal electricity
+          shortUnit: $
+        presentation:
+          title_public: |-
+            {tables.historical_energy_costs.variables.coal_electricity_lcoe.title}
       gas_electricity_lcoe:
-        title: Gas LCOE (US/global)
-        description_short: ''
+        title: Levelized cost of electricity from gas power plants, measured in useful energy
+        display:
+          name: Gas electricity
+          shortUnit: $
+        presentation:
+          title_public: |-
+            {tables.historical_energy_costs.variables.gas_electricity_lcoe.title}
       nuclear_electricity_lcoe:
-        title: Nuclear LCOE (US)
-        description_short: ''
+        title: Levelized cost of electricity from nuclear power plants, measured in useful energy
+        display:
+          name: Nuclear
+          shortUnit: $
+        presentation:
+          title_public: |-
+            {tables.historical_energy_costs.variables.nuclear_electricity_lcoe.title}
       wind_onshore_electricity_lcoe:
-        title: Wind onshore LCOE (global)
-        description_short: ''
+        title: Levelized cost of electricity from onshore wind, measured in useful energy
+        display:
+          name: Onshore wind
+          shortUnit: $
+        presentation:
+          title_public: |-
+            {tables.historical_energy_costs.variables.wind_onshore_electricity_lcoe.title}
       solar_pv_electricity_lcoe:
-        title: Solar PV LCOE (global)
-        description_short: ''
-
-
+        title: Levelized cost of electricity from solar photovoltaic, measured in useful energy
+        display:
+          name: Solar PV
+          shortUnit: $
+        presentation:
+          title_public: |-
+            {tables.historical_energy_costs.variables.solar_pv_electricity_lcoe.title}

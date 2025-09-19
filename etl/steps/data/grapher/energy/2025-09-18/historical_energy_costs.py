@@ -10,17 +10,20 @@ def run() -> None:
     #
     # Load table from garden dataset.
     ds_garden = paths.load_dataset("historical_energy_costs")
-    tb_garden = ds_garden.read("historical_energy_costs", reset_index=False)
+    tb = ds_garden.read("historical_energy_costs")
 
     #
     # Process data.
     #
     # Adapt data to grapher format.
-    tb_garden["country"] = "World"
+    tb["country"] = "World"
+
+    # Improve table format.
+    tb = tb.format()
 
     #
     # Save outputs.
     #
     # Create a new grapher dataset.
-    dataset = paths.create_dataset(tables=[tb_garden])
+    dataset = paths.create_dataset(tables=[tb])
     dataset.save()
