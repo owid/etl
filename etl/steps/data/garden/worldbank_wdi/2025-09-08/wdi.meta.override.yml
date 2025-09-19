@@ -1129,6 +1129,23 @@ tables:
           numDecimalPlaces: 1
           tolerance: 5
 
+      sl_tlf_cact_ne_zs:
+        title: Labor force participation rate, total (% of total population ages 15+) (national estimate)
+        unit: "%"
+        short_unit: "%"
+        description_short: "{definitions.description_short_labor_force_participation_rate}"
+        description_key:
+          - "{definitions.description_key_national_estimates}"
+          - "{definitions.description_key_13th_icls}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+        display:
+          name: Labor force participation rate
+          numDecimalPlaces: 1
+          tolerance: 5
+
       sl_tlf_cact_fe_ne_zs:
         title: Labor force participation rate, female (% of female population ages 15+) (national estimate)
         unit: "%"
@@ -1231,6 +1248,23 @@ tables:
           numDecimalPlaces: 1
           tolerance: 5
 
+      sl_uem_totl_ne_zs:
+        title: Unemployment, total (% of total labor force) (national estimate)
+        unit: "%"
+        short_unit: "%"
+        description_short: "{definitions.description_short_unemployment_rate}"
+        description_key:
+          - "{definitions.description_key_national_estimates}"
+          - "{definitions.description_key_13th_icls}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+        display:
+          name: Unemployment rate
+          numDecimalPlaces: 1
+          tolerance: 5
+
       sl_emp_totl_sp_zs:
         title: Employment to population ratio, 15+, total (%) (modeled ILO estimate)
         unit: "%"
@@ -1264,6 +1298,24 @@ tables:
             - Work & Employment
         display:
           name: Employment-to-population ratio, female
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      sl_emp_totl_sp_ne_zs:
+        title: Employment to population ratio, 15+, total (%) (national estimate)
+        unit: "%"
+        short_unit: "%"
+        description_short: "{definitions.description_short_employment_to_population_ratio}"
+        description_key:
+          - "{definitions.employment}"
+          - "{definitions.description_key_national_estimates}"
+          - "{definitions.description_key_13th_icls}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+        display:
+          name: Employment-to-population ratio
           numDecimalPlaces: 1
           tolerance: 5
 
