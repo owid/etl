@@ -182,6 +182,7 @@ views:
         - "{definitions.description_key_welfare_type}"
         - "{definitions.description_key_not_market_income}"
         - "{definitions.description_key_nowcasts}"
+      description_short: "{definitions.ppp_adjustment_subtitle}"
 
   # AREA CHART
   - dimensions:
@@ -232,6 +233,7 @@ views:
         - "{definitions.description_key_welfare_type}"
         - "{definitions.description_key_not_market_income}"
         - "{definitions.description_key_nowcasts}"
+      description_short: "{definitions.ppp_adjustment_subtitle}"
 
   # BAR CHART
   - dimensions:
@@ -278,6 +280,7 @@ views:
         - "{definitions.description_key_welfare_type}"
         - "{definitions.description_key_not_market_income}"
         - "{definitions.description_key_nowcasts}"
+      description_short: "{definitions.ppp_adjustment_subtitle}"
 
   # MULTIPLE LINES MORE LINES
   - dimensions:
@@ -329,6 +332,7 @@ views:
         - "{definitions.description_key_welfare_type}"
         - "{definitions.description_key_not_market_income}"
         - "{definitions.description_key_nowcasts}"
+      description_short: "{definitions.ppp_adjustment_subtitle}"
 
   # AREA CHART MORE LINES
   - dimensions:
@@ -395,6 +399,7 @@ views:
         - "{definitions.description_key_welfare_type}"
         - "{definitions.description_key_not_market_income}"
         - "{definitions.description_key_nowcasts}"
+      description_short: "{definitions.ppp_adjustment_subtitle}"
 
   # BAR CHART MORE LINES
   - dimensions:
@@ -454,6 +459,7 @@ views:
         - "{definitions.description_key_welfare_type}"
         - "{definitions.description_key_not_market_income}"
         - "{definitions.description_key_nowcasts}"
+      description_short: "{definitions.ppp_adjustment_subtitle}"
 
 
   # FOR HEADCOUNT
@@ -493,6 +499,7 @@ views:
         - "{definitions.description_key_welfare_type}"
         - "{definitions.description_key_not_market_income}"
         - "{definitions.description_key_nowcasts}"
+      description_short: "{definitions.ppp_adjustment_subtitle}"
 
   # AREA CHART
   - dimensions:
@@ -543,6 +550,7 @@ views:
         - "{definitions.description_key_welfare_type}"
         - "{definitions.description_key_not_market_income}"
         - "{definitions.description_key_nowcasts}"
+      description_short: "{definitions.ppp_adjustment_subtitle}"
 
   # BAR CHART
   - dimensions:
@@ -588,6 +596,7 @@ views:
         - "{definitions.description_key_welfare_type}"
         - "{definitions.description_key_not_market_income}"
         - "{definitions.description_key_nowcasts}"
+      description_short: "{definitions.ppp_adjustment_subtitle}"
 
   # MULTIPLE LINES MORE LINES
   - dimensions:
@@ -637,6 +646,7 @@ views:
         - "{definitions.description_key_welfare_type}"
         - "{definitions.description_key_not_market_income}"
         - "{definitions.description_key_nowcasts}"
+      description_short: "{definitions.ppp_adjustment_subtitle}"
 
   # AREA CHART MORE LINES
   - dimensions:
@@ -703,6 +713,7 @@ views:
         - "{definitions.description_key_welfare_type}"
         - "{definitions.description_key_not_market_income}"
         - "{definitions.description_key_nowcasts}"
+      description_short: "{definitions.ppp_adjustment_subtitle}"
 
   # BAR CHART MORE LINES
   - dimensions:
@@ -760,6 +771,7 @@ views:
         - "{definitions.description_key_welfare_type}"
         - "{definitions.description_key_not_market_income}"
         - "{definitions.description_key_nowcasts}"
+      description_short: "{definitions.ppp_adjustment_subtitle}"
 
     ####################################################
     # SPELL VIEWS
