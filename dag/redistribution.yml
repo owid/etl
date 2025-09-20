@@ -115,7 +115,7 @@ steps:
     - snapshot://sipri/2025-04-28/military_expenditure.xlsx
   data://garden/sipri/2025-04-28/military_expenditure:
     - data://meadow/sipri/2025-04-28/military_expenditure
-    - data://garden/worldbank_wdi/2025-01-24/wdi
+    - data://garden/worldbank_wdi/2025-09-08/wdi
   data://grapher/sipri/2025-04-28/military_expenditure:
     - data://garden/sipri/2025-04-28/military_expenditure
 
