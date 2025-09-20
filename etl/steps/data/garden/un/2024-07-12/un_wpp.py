@@ -17,6 +17,7 @@ paths = PathFinder(__file__)
 
 YEAR_SPLIT = 2024
 COLUMNS_INDEX = ["country", "year", "sex", "age", "variant"]
+COLUMNS_INDEX_MONTH = COLUMNS_INDEX + ["month"]
 
 
 def run(dest_dir: str) -> None:
@@ -50,7 +51,7 @@ def run(dest_dir: str) -> None:
 
     ## Population, Sex ratio
     tb_population, tb_sex_ratio = process_population_sex_ratio(tb_population, tb_population_density)
-    tb_population = tb_population.format(COLUMNS_INDEX)
+    tb_population = tb_population.format(COLUMNS_INDEX_MONTH)
 
     ## Sex ratio
     tb_sex_ratio = set_variant_to_estimates(tb_sex_ratio)
@@ -583,7 +584,9 @@ def estimate_sex_ratio(tb: Table, age_groups: Optional[List[str]] = None):
 
     tb_sex = tb.loc[(tb["age"].isin(age_groups)) & (tb["sex"] != "Total")].copy()
     # Pivot
-    tb_sex = tb_sex.pivot(columns="sex", index=[col for col in COLUMNS_INDEX if col != "sex"], values="population")
+    tb_sex = tb_sex.pivot(
+        columns="sex", index=[col for col in COLUMNS_INDEX_MONTH if col != "sex"], values="population"
+    )
     # Estimate ratio
     tb_sex["sex_ratio"] = tb_sex["male"] / tb_sex["female"]
     # Reset index
@@ -591,7 +594,7 @@ def estimate_sex_ratio(tb: Table, age_groups: Optional[List[str]] = None):
     # Add missing sex column
     tb_sex["sex"] = "all"
     # Keep relevant columns
-    tb_sex = tb_sex[COLUMNS_INDEX + ["sex_ratio"]]
+    tb_sex = tb_sex[COLUMNS_INDEX_MONTH + ["sex_ratio"]]
 
     return tb_sex
 
