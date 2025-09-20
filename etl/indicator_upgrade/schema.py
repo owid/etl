@@ -67,6 +67,11 @@ def validate_chart_config_and_set_defaults(
     # Remove isInheritanceEnabled if present as it's not part of the schema
     if "isInheritanceEnabled" in config_new:
         del config_new["isInheritanceEnabled"]
+    # Remove adminBaseUrl and bakedGrapherURL if present
+    if "adminBaseUrl" in config_new:
+        del config_new["adminBaseUrl"]
+    if "bakedGrapherURL" in config_new:
+        del config_new["bakedGrapherURL"]
 
     try:
         DefaultSetterValidatingValidator(schema).validate(config_new)
