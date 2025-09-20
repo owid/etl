@@ -88,3 +88,11 @@ steps:
     - data://meadow/iucn/2025-09-09/iucn_number_each_status
   data://grapher/iucn/2025-09-09/iucn_number_each_status:
     - data://garden/iucn/2025-09-09/iucn_number_each_status
+  # Cherry blossom
+  data://meadow/biodiversity/2025-09-15/cherry_blossom:
+    - snapshot://biodiversity/2025-09-15/cherry_blossom.csv
+    - snapshot://biodiversity/2024-01-25/cherry_blossom.xls
+  data://garden/biodiversity/2025-09-15/cherry_blossom:
+    - data://meadow/biodiversity/2025-09-15/cherry_blossom
+  data://grapher/biodiversity/2025-09-15/cherry_blossom:
+    - data://garden/biodiversity/2025-09-15/cherry_blossom
