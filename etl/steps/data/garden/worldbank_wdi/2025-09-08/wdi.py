@@ -138,8 +138,7 @@ def run() -> None:
     tb_garden = (
         paths.region_aggregator(
             regions=["World"],
-            # TODO: these should be weighted_by_population, not mean
-            aggregations={"sh_h2o_basw_zs": "mean", "sh_sta_bass_zs": "mean"},
+            aggregations={"sh_h2o_basw_zs": "weighted_by_population", "sh_sta_bass_zs": "weighted_by_population"},
         )
         .add_aggregates(
             tb_garden.reset_index(),

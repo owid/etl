@@ -1927,6 +1927,25 @@ class RegionAggregator:
             # regions is already a dict
             self.regions = regions
 
+        # Validate regions based on input type (list vs dict)
+        # Documentation states: list must contain "default regions", dict allows "default or custom regions"
+        if isinstance(regions, list):
+            # List case: ALL regions must be known (strict validation)
+            unknown_regions = [region for region in regions if region not in regions_all]
+            if unknown_regions:
+                suggestions = []
+                for region in unknown_regions:
+                    similar = [r for r in regions_all if region.lower() in r.lower() or r.lower() in region.lower()]
+                    if similar:
+                        suggestions.append(f"{region} (did you mean: {', '.join(similar)}?)")
+                    else:
+                        suggestions.append(region)
+                raise ValueError(
+                    f"Unknown regions in list: {'; '.join(suggestions)}. Available regions: {', '.join(sorted(regions_all))}"
+                )
+
+        # Dict case: Allow complete flexibility - no validation
+
         # Create a list of all possible regions, which includes any possible custom region.
         self.regions_all = sorted(set(regions_all) | set(self.regions))
 
@@ -2026,6 +2045,63 @@ class RegionAggregator:
                 column: "sum" for column in tb.columns if column not in self.index_columns
             }
 
+    def _preprocess_table_for_weighted_aggregations(self, tb: TableOrDataFrame) -> TableOrDataFrame:
+        """Add population or other weight columns if needed for weighted aggregations."""
+        modified_tb = tb
+
+        # Check if any aggregation uses population weighting and population column is missing
+        for _, agg_func in self.aggregations.items():
+            if isinstance(agg_func, str) and agg_func == f"weighted_by_{self.population_col}":
+                if self.population_col not in tb.columns:
+                    if self._ds_population is None:
+                        raise ValueError(
+                            f"Population column '{self.population_col}' not found in table, and no population dataset provided. "
+                            f"Add population dataset as a dependency or include population column in your table."
+                        )
+                    modified_tb = self._add_population_to_table_if_needed(modified_tb)
+                    break  # Only need to add population once
+
+        return modified_tb
+
+    def _get_needed_columns(self, tb: TableOrDataFrame, columns: list[str]) -> list[str]:
+        """Extract the minimal set of columns needed for aggregation performance optimization."""
+        weight_columns = []
+        for agg_func in self.aggregations.values():
+            if isinstance(agg_func, str) and agg_func.startswith("weighted_by_"):
+                weight_col = agg_func.replace("weighted_by_", "")
+                if weight_col not in weight_columns and weight_col in tb.columns:
+                    weight_columns.append(weight_col)
+
+        return self.index_columns + columns + weight_columns
+
+    def _add_population_to_table_if_needed(self, tb: TableOrDataFrame) -> TableOrDataFrame:
+        """Add population column to table if it's needed for weighted aggregations."""
+        # Common parameters for both functions
+        common_params = {
+            "country_col": self.country_col,
+            "year_col": self.year_col,
+            "population_col": self.population_col,
+            "warn_on_missing_countries": False,
+            "show_full_warning": True,
+            "interpolate_missing_population": False,
+            "expected_countries_without_population": None,
+        }
+
+        if isinstance(tb, Table):
+            return add_population_to_table(
+                tb=tb,
+                ds_population=self.ds_population,  # type: ignore
+                **common_params,
+            )
+        else:
+            # For pandas DataFrame, use the internal function
+            return _add_population_to_dataframe(
+                df=tb,
+                tb_population=self.ds_population.read("population", safe_types=False),  # type: ignore
+                _warn_deprecated=False,
+                **common_params,
+            )
+
     def inspect_overlaps_with_historical_regions(
         self,
         tb,
@@ -2087,18 +2163,59 @@ class RegionAggregator:
         frac_allowed_nans_per_year: float | None = None,
         min_num_values_per_year: int | None = None,
     ):
+        # Check if we have any weighted aggregations that need special handling
+        weighted_columns = {
+            col: agg_func
+            for col, agg_func in aggregations.items()
+            if isinstance(agg_func, str) and agg_func.startswith("weighted_by_")
+        }
+        non_weighted_aggregations = {
+            col: agg_func
+            for col, agg_func in aggregations.items()
+            if not (isinstance(agg_func, str) and agg_func.startswith("weighted_by_"))
+        }
+
         # Create region aggregates.
         dfs_with_regions = []
         for region in regions:
-            df_region = groupby_agg(
-                # Select data for countries in the region.
-                df=tb[tb[self.country_col].isin(self.regions_members[region])],
-                groupby_columns=[column for column in self.index_columns if column != self.country_col],
-                aggregations=aggregations,
-                num_allowed_nans=num_allowed_nans_per_year,
-                frac_allowed_nans=frac_allowed_nans_per_year,
-                min_num_values=min_num_values_per_year,
-            ).reset_index()
+            # Select data for countries in the region.
+            df_region_data = tb[tb[self.country_col].isin(self.regions_members[region])]
+
+            if df_region_data.empty:
+                # Create empty result with proper columns
+                empty_result = pd.DataFrame(columns=tb.columns)
+                if not empty_result.empty:
+                    dfs_with_regions.append(empty_result)
+                continue
+
+            # Handle non-weighted aggregations using the existing groupby_agg function
+            if non_weighted_aggregations:
+                df_region = groupby_agg(
+                    df=df_region_data,
+                    groupby_columns=[column for column in self.index_columns if column != self.country_col],
+                    aggregations=non_weighted_aggregations,
+                    num_allowed_nans=num_allowed_nans_per_year,
+                    frac_allowed_nans=frac_allowed_nans_per_year,
+                    min_num_values=min_num_values_per_year,
+                ).reset_index()
+            else:
+                # Create a basic dataframe with index columns if we only have weighted aggregations
+                groupby_columns = [column for column in self.index_columns if column != self.country_col]
+                if groupby_columns:
+                    df_region = df_region_data[groupby_columns].drop_duplicates().reset_index(drop=True)
+                else:
+                    df_region = pd.DataFrame([{}])  # Single row for aggregation
+
+            # Handle weighted aggregations separately
+            if weighted_columns:
+                df_region = self._add_weighted_aggregations(
+                    df_region=df_region,
+                    df_region_data=df_region_data,
+                    weighted_columns=weighted_columns,
+                    num_allowed_nans_per_year=num_allowed_nans_per_year,
+                    frac_allowed_nans_per_year=frac_allowed_nans_per_year,
+                    min_num_values_per_year=min_num_values_per_year,
+                )
 
             # Add a column for region name.
             df_region[self.country_col] = region
@@ -2115,6 +2232,134 @@ class RegionAggregator:
         )
 
         return df_with_regions
+
+    def _add_weighted_aggregations(
+        self,
+        df_region: pd.DataFrame,
+        df_region_data: pd.DataFrame,
+        weighted_columns: dict[str, Any],
+        num_allowed_nans_per_year: int | None = None,
+        frac_allowed_nans_per_year: float | None = None,
+        min_num_values_per_year: int | None = None,
+    ) -> pd.DataFrame:
+        """Add weighted aggregation columns to the region dataframe."""
+        groupby_columns = [column for column in self.index_columns if column != self.country_col]
+
+        if not groupby_columns:
+            # No grouping columns, aggregate all data
+            for col, agg_func in weighted_columns.items():
+                weight_column = agg_func.replace("weighted_by_", "")  # Extract weight column from string
+                weighted_mean = self._calculate_weighted_mean(
+                    df_region_data,
+                    col,
+                    weight_column,
+                    num_allowed_nans_per_year,
+                    frac_allowed_nans_per_year,
+                    min_num_values_per_year,
+                )
+                df_region[col] = weighted_mean
+        else:
+            # Group by the specified columns and calculate weighted means
+            for col, agg_func in weighted_columns.items():
+                weight_column = agg_func.replace("weighted_by_", "")  # Extract weight column from string
+
+                # Only select the columns we need for grouping and calculation (performance optimization)
+                # Check if all needed columns exist first
+                needed_columns = groupby_columns + [col, weight_column]
+                missing_columns = [c for c in needed_columns if c not in df_region_data.columns]
+                if missing_columns:
+                    if weight_column in missing_columns:
+                        raise ValueError(f"Weight column '{weight_column}' not found in data")
+                    elif col in missing_columns:
+                        raise ValueError(f"Value column '{col}' not found in data")
+                    else:
+                        raise ValueError(f"Required columns not found in data: {missing_columns}")
+
+                df_subset = df_region_data[needed_columns]
+
+                # Calculate weighted mean for each group
+                grouped_results = []
+                for group_values, group_data in df_subset.groupby(groupby_columns):
+                    weighted_mean = self._calculate_weighted_mean(
+                        group_data,
+                        col,
+                        weight_column,
+                        num_allowed_nans_per_year,
+                        frac_allowed_nans_per_year,
+                        min_num_values_per_year,
+                    )
+
+                    # Create a row with the group values and weighted mean
+                    if isinstance(group_values, tuple):
+                        result_row = dict(zip(groupby_columns, group_values))
+                    else:
+                        result_row = {groupby_columns[0]: group_values}
+                    result_row[col] = weighted_mean
+                    grouped_results.append(result_row)
+
+                # Merge the results back to df_region
+                if grouped_results:
+                    weighted_results = pd.DataFrame(grouped_results)
+                    if df_region.empty:
+                        df_region = weighted_results
+                    else:
+                        # Convert both to regular pandas DataFrames for merging to avoid catalog/pandas conflicts
+                        df_region_pd = pd.DataFrame(df_region) if not isinstance(df_region, pd.DataFrame) else df_region
+                        # Use pandas merge directly to avoid catalog merge complications
+                        merged = pd.merge(df_region_pd, weighted_results, on=groupby_columns, how="left")
+                        df_region = merged
+
+        return df_region
+
+    def _calculate_weighted_mean(
+        self,
+        data: pd.DataFrame,
+        value_col: str,
+        weight_col: str,
+        num_allowed_nans: int | None = None,
+        frac_allowed_nans: float | None = None,
+        min_num_values: int | None = None,
+    ) -> float:
+        """Calculate weighted mean for the given data, handling NaN values according to the specified rules."""
+        if value_col not in data.columns:
+            raise ValueError(f"Value column '{value_col}' not found in data")
+        if weight_col not in data.columns:
+            raise ValueError(f"Weight column '{weight_col}' not found in data")
+
+        values = data[value_col]
+        weights = data[weight_col]
+
+        # Remove rows where either value or weight is NaN or weight is zero
+        mask = ~(pd.isna(values) | pd.isna(weights) | (weights == 0))
+        valid_values = values[mask]
+        valid_weights = weights[mask]
+
+        # Apply NaN handling rules similar to groupby_agg
+        total_count = len(values)
+        valid_count = len(valid_values)
+        nan_count = total_count - valid_count
+
+        # Check num_allowed_nans condition
+        if num_allowed_nans is not None and nan_count > num_allowed_nans:
+            return np.nan
+
+        # Check frac_allowed_nans condition
+        if frac_allowed_nans is not None and total_count > 0:
+            nan_fraction = nan_count / total_count
+            if nan_fraction > frac_allowed_nans:
+                return np.nan
+
+        # Check min_num_values condition
+        if min_num_values is not None and valid_count < min_num_values:
+            # Exception: if all values in the group are valid, accept it even if count < min_num_values
+            if nan_count > 0:
+                return np.nan
+
+        # Calculate weighted mean if we have valid data
+        if len(valid_values) == 0:
+            return np.nan
+
+        return np.average(valid_values, weights=valid_weights)
 
     def _impose_countries_that_must_have_data(self, df_only_regions, columns, countries_that_must_have_data):
         # List all index columns except the country column.
@@ -2207,23 +2452,29 @@ class RegionAggregator:
         # Ensure aggregations are well defined.
         self._ensure_aggregations_are_defined(tb=tb)
 
+        # Preprocess table to add weight columns if needed for weighted aggregations
+        tb = self._preprocess_table_for_weighted_aggregations(tb)
+
         # Define the list of (non-index) columns for which aggregates will be created.
         columns = list(self.aggregations)
-        # Define the list of other non-index columns (if any) for which no aggregates need to be created.
-        other_columns = [column for column in tb.columns if column not in (self.index_columns + columns)]
 
+        # Extract only the columns we actually need to improve performance.
+        needed_columns = self._get_needed_columns(tb, columns)
+        tb_fast = tb[needed_columns]
+        other_columns = [col for col in tb.columns if col not in needed_columns]
+
+        # Run everything on the fast subset instead of full DataFrame
         if check_for_region_overlaps:
-            # Find overlaps between historical regions and successors.
             self.inspect_overlaps_with_historical_regions(
-                tb=tb,
+                tb=tb_fast,
                 accepted_overlaps=accepted_overlaps,
                 ignore_overlaps_of_zeros=ignore_overlaps_of_zeros,
                 subregion_type=subregion_type,
             )
 
-        # Create a table of region aggregates (just the regions, not individual countries).
+        # Create region aggregates on fast subset
         df_only_regions = self._create_table_of_only_region_aggregates(
-            tb=tb,
+            tb=tb_fast,
             regions=list(self.regions),
             aggregations=self.aggregations,
             num_allowed_nans_per_year=num_allowed_nans_per_year,
@@ -2231,32 +2482,27 @@ class RegionAggregator:
             min_num_values_per_year=min_num_values_per_year,
         )
 
-        # If a list of countries that must be informed was given, remove (make nan) aggregations where any of those countries was missing in the data.
         if countries_that_must_have_data is not None:
             if self.tb_coverage is None:
-                self._create_coverage_table(tb=tb)
+                self._create_coverage_table(tb=tb_fast)
             self._impose_countries_that_must_have_data(
                 df_only_regions=df_only_regions,
                 columns=columns,
                 countries_that_must_have_data=countries_that_must_have_data,
             )
 
-        # Create a mask that selects rows of regions in the original data, if any.
-        _select_regions = tb[self.country_col].isin(list(self.regions))
-
-        # If there were regions in other columns (not used for aggregates) include them in the subtable of only regions.
-        if any(other_columns) and any(_select_regions):
-            df_only_regions = df_only_regions.merge(
-                tb[_select_regions][self.index_columns + other_columns], how="outer", on=self.index_columns
-            )
-
-        # Create a table of all other rows that are not regions.
-        df_no_regions = tb[~_select_regions]
-
-        # Combine the table with only regions and the table with no regions.
+        # Fast region processing on subset
+        _select_regions = tb_fast[self.country_col].isin(list(self.regions))
+        df_no_regions = tb_fast[~_select_regions]
         df_with_regions = pd.concat([df_only_regions, df_no_regions], ignore_index=True)  # type: ignore
 
-        # Sort rows and columns conveniently.
+        # Add back other columns if needed
+        if other_columns:
+            # Simple: just get all the other column data and merge it back
+            other_data = tb[self.index_columns + other_columns]
+            df_with_regions = df_with_regions.merge(other_data, on=self.index_columns, how="left")
+
+        # Final sort and column ordering
         df_with_regions = df_with_regions.sort_values(self.index_columns).reset_index(drop=True)[tb.columns]
 
         # Convert country to categorical if the original was
