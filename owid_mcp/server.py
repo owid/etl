@@ -95,6 +95,9 @@ class RequestLoggingMiddleware(Middleware):
             # handle request
             try:
                 result = await call_next(context)
+            except (asyncio.CancelledError, KeyboardInterrupt):
+                # Don't send these to Sentry - they're normal shutdown signals
+                raise
             except Exception as e:
                 capture_exception(e)
                 logfire.exception("request failed", **attrs)
