@@ -19,7 +19,7 @@ def run() -> None:
     #
     # Process data.
     #
-    tb = tb[["Unnamed: 0", "Trade (1913=100)", "Extrapolation 1815-1913"]]
+    tb = tb[["Unnamed: 0", "Extrapolation 1815-1913"]]
     tb["country"] = "World"
 
     tb = tb.rename(

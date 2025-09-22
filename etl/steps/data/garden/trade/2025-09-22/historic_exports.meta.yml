@@ -15,9 +15,9 @@ tables:
   historic_exports:
     variables:
       historic_trade:
-        title: Trade volume index (constant 1913 US$)
+        title: Trade volume (constant 1913 US$)
         unit: constant 1913 US$
-        description_short: An index of world exports and imports, reconstructed from historical sources and standardized to modern definitions, expressed in constant 1913 prices (1913 = 100).
+        description_short: Total global exports and imports, reconstructed from historical sources and standardized to modern definitions, expressed in constant 1913 prices (1913 = 100).
         description_key:
           - International trade has long been central to economic development.
             To trace its evolution, researchers compiled historical trade statistics
