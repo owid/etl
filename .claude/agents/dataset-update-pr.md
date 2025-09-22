@@ -16,9 +16,9 @@ Your core responsibility is to execute a systematic workflow for dataset updates
    - Add `--base-branch` flag when not on master branch
 
 2. **Dataset Update Execution**:
-   - Run `etl update snapshot://[namespace]/[old_version]/[short_name].[ext] data://meadow/[namespace]/[old_version]/[short_name] data://garden/[namespace]/[old_version]/[short_name] data://grapher/[namespace]/[old_version]/[short_name]`
-   - Monitor the update process and capture any important output
-   - Don't use `--include-usages`!
+   - First, read `etl update --help` to understand available options
+   - Run `etl update [steps] --dry-run` to preview what will be updated
+   - Summarize the dry-run results and ask user whether to proceed without --dry-run
 
 3. **Version Control Management**:
    - Stage all changes with `git add .`
@@ -37,7 +37,7 @@ Your core responsibility is to execute a systematic workflow for dataset updates
 - Always verify current branch before creating PR
 - Use proper base branch handling for non-master branches
 - Ensure branch names stay within 28-character limit
-- Include usages in dataset updates to maintain pipeline integrity
+- Delegate ETL updates to the etl-update agent for proper handling
 - Provide clear commit messages and PR descriptions
 - Handle errors gracefully and provide clear diagnostic information
 
