@@ -1,16 +1,38 @@
 definitions:
   others:
-    regional_aggregates_processing: |-
-      ### Regional aggregates
+    different_sources_processing: |-
+      ### Combination of different sources
+      We construct our long-run population data by combining multiple sources:
 
-      **Continents and other region aggregates**:
+      - 10,000 BCE–1799: historical estimates by HYDE (v3.3).
+
+      - 1800–1949: historical estimates by Gapminder (v7).
+
+      - 1950–2023: population records from the United Nations World Population Prospects (2024 revision).
+
+    different_sources_gr_processing: |-
+      ### Combination of different sources
+      We construct our long-run data by combining multiple sources:
+
+      - 10,000 BCE–1799: historical estimates by HYDE (v3.3). Growth rate estimated over 50-year periods.
+
+      - 1800–1949: historical estimates by Gapminder (v7). Growth rate estimated over 50-year periods until 1900, then 10-year periods.
+
+      - 1950–2023: population records from the United Nations World Population Prospects (2024 revision). Growth rate estimated over 1-year periods.
+
+    regional_aggregates_processing: |-
+      **Geographical aggregates**
+
+      - For most years, we calculate aggregates by summing the population of member countries.
+      - We do this based on [our definition of continents](https://ourworldindata.org/world-region-map-definitions#our-world-in-data) and the [World Bank’s income groups](https://ourworldindata.org/grapher/world-bank-income-groups).
+      - The only exception is before 1800, where we use HYDE's estimates for continents (but not income groups).
 
       For most of the years, we've estimated regional aggregates by summing the population of countries in each region. We've relied on [our continents](https://ourworldindata.org/world-region-map-definitions#our-world-in-data) and [World Bank income group definitions](https://ourworldindata.org/grapher/world-bank-income-groups). The only exception is before 1800, where we've used HYDE's estimates on continents (but not income groups).
 
-      **World**:
-      - Before 1800: We've used HYDE's estimates.
-      - 1800-1950: We've estimated the World population by summing all available countries in the dataset, ensuring that we do not double-count any country.
-      - After 1950: We've relied on UN WPP's estimates.
+      **World**
+      - Before 1800: we use data from HYDE.
+      - 1800-1950: we estimate the global population by summing all available countries in the dataset.
+      - After 1950, we rely on estimates from the United Nations World Population Prospects.
 
   common:
     presentation:
@@ -19,14 +41,7 @@ definitions:
       attribution: HYDE (2023); Gapminder (2022); UN WPP (2024)
     processing_level: major
     description_processing: |-
-      ### Combination of different sources
-      The population data is constructed by combining data from multiple sources:
-
-      - 10,000 BCE - 1799: Historical estimates by HYDE (v3.3).
-
-      - 1800 - 1949: Historical estimates by Gapminder (v7).
-
-      - 1950-2023: Population records by the UN World Population Prospects (2024 revision).
+      {definitions.others.different_sources_processing}
 
       - 2024-2100: Projections based on Medium variant by the UN World Population Prospects (2024 revision).
 
@@ -46,16 +61,16 @@ tables:
         display:
           numDecimalPlaces: 0
         description_key: &population-key
-          - Population is the most commonly used metric throughout Our World in Data. It is used directly to understand population growth over time or indirectly to calculate per-capita adjustments, making it easier to compare countries of different sizes.
+          - Population is the most commonly used metric throughout Our World in Data. It is used directly to understand population growth over time, and indirectly to calculate per-capita indicators, making it easier to compare countries of different sizes.
           - |-
-            This indicator has been constructed by combining data from multiple sources covering different periods.
-              - HYDE v3.3 (2023): Historical estimates from 10,000 BCE to 1799.
+            We construct this indicator by combining multiple sources covering different periods.
+              - HYDE v3.3 (2023): historical estimates from 10,000 BCE to 1799.
               - Gapminder v7 (2022): for 1800-1949.
               - UN World Population Prospects (2024): for 1950 onwards, including 2100 projections.
-              - Gapminder Systema Globalis (2023): Additional source for data on former countries (Yugoslavia, USSR, etc.)
-          - Breaks in the data may occur at the boundaries between data sources due to methodological differences in how the data was collected and estimated.
-          - You can read more about the sources and methodology in our [Population Sources article](https://ourworldindata.org/population-sources). We also provide a [table of sources](https://ourworldindata.org/grapher/sources-population-dataset) that shows the source for each country-year in the dataset.
-          - Our regional aggregates (continents, income groups, etc.) are calculated by summing individual country populations. For years before 1800, we relied on HYDE's original data for continents to ensure historical consistency.
+              - Gapminder Systema Globalis (2023): additional source for former countries (Yugoslavia, USSR, etc.)
+          - Breaks in the data may occur at the boundaries between sources due to their methodological differences.
+          - You can read more about the sources and methodology in our [dedicated article](https://ourworldindata.org/population-sources). We also provide a table of sources showing the source we use for each country-year.
+          - We calculate geographical aggregates (continents, income groups, etc.) by summing individual country populations. For years before 1800, we rely directly on HYDE's values for continents to ensure historical consistency.
 
       world_pop_share:
         title: Share of world population
@@ -118,14 +133,7 @@ tables:
         unit: "%"
         short_unit: "%"
         description_processing: |-
-          ### Combination of different sources
-          The data is constructed by combining data from multiple sources:
-
-          - 1700 BCE - 1799: Historical estimates by HYDE (v3.3). Growth rate estimated over 50-year periods.
-
-          - 1800 - 1949: Historical estimates by Gapminder (v7). Growth rate estimated over 50-year periods until 1900, then 10-year periods.
-
-          - 1950-2023: Population records by the UN World Population Prospects (2024 revision). Growth rate estimated over 1-year periods.
+          {definitions.others.different_sources_gr_processing}
 
           - 2024-2100: Projections based on Medium variant by the UN World Population Prospects (2024 revision). Growth rate estimated over 1-year periods.
 
@@ -137,14 +145,7 @@ tables:
       presentation:
         attribution: HYDE (2023); Gapminder (2022); UN WPP (2024)
       description_processing: |-
-        ### Combination of different sources
-        The population data is constructed by combining data from multiple sources:
-
-        - 10,000 BCE - 1799: Historical estimates by HYDE (v3.3).
-
-        - 1800 - 1949: Historical estimates by Gapminder (v7).
-
-        - 1950-2023: Population records by the UN World Population Prospects (2024 revision).
+        {definitions.others.different_sources_processing}
 
         {definitions.others.regional_aggregates_processing}
 
@@ -160,8 +161,8 @@ tables:
           numDecimalPlaces: 0
         description_key: *population-key
         presentation:
-          title_variant: Historical data
-          attribution_short: "HYDE, Gapminder, UN WPP"
+          title_variant: Long-run data
+          attribution_short: "HYDE, Gapminder, UN"
 
       world_pop_share_historical:
         title: |-
@@ -184,14 +185,7 @@ tables:
         description_short: |-
           Average exponential rate of growth of the population over a given period. It is calculated as ln(P2/P1) where P1 and P2 are the populations on subsequent years. Available from 1700 to 2023, based on data and estimates from different sources.
         description_processing: |-
-          ### Combination of different sources
-          The data is constructed by combining data from multiple sources:
-
-          - 1700 BCE - 1799: Historical estimates by HYDE (v3.3). Growth rate estimated over 50-year periods.
-
-          - 1800 - 1949: Historical estimates by Gapminder (v7). Growth rate estimated over 50-year periods until 1900, then 10-year periods.
-
-          - 1950-2023: Population records by the UN World Population Prospects (2024 revision). Growth rate estimated over 1-year periods.
+          {definitions.others.different_sources_gr_processing}
 
           {definitions.others.regional_aggregates_processing}
         unit: "{tables.population_growth_rate.variables.growth_rate.unit}"
