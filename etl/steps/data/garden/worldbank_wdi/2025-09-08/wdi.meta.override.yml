@@ -74,6 +74,12 @@ definitions:
     Share of total employment working in the services sector.
   description_short_ratio_female_male_labor_force_participation_rate: |-
     The labour force participation rate is the labour force (all working-age persons employed and unemployed) divided the working-age population. This ratio is the division of the female and male rates, expressed as a percentage.
+  description_short_children_in_employment: |-
+    Share of children aged 7-14 years involved in economic activity for at least one hour in the reference week of the survey.
+  description_short_children_in_employment_work_only: |-
+    Share of children aged 7-14 years involved in economic activity for at least one hour in the reference week of the survey and not attending school.
+  description_short_average_working_hours_of_children: |-
+    Average weekly hours worked by children aged 7-14 years involved in economic activity and attending school.
 
   description_key_iloest_modelled_data: |-
     This data is part of the ILO Modelled Estimates series. This series combines nationally reported observations with imputed data to have a harmonized, internationally comparable dataset and produce regional and global aggregates. For more information, please refer to the [ILO Modelled Estimates documentation](https://ilostat.ilo.org/methods/concepts-and-definitions/ilo-modelled-estimates/).
@@ -1375,18 +1381,73 @@ tables:
           numDecimalPlaces: 1
           tolerance: 5
 
-      # sl_tlf_0714_zs:
-      #   title: Children in employment, total (% of children ages 7-14)
-      # sl_tlf_0714_ma_zs:
-      #   title: Children in employment, male (% of male children ages 7-14)
-      # sl_tlf_0714_fe_zs:
-      #   title: Children in employment, female (% of female children ages 7-14)
+      sl_tlf_0714_zs:
+        title: Children in employment, total (% of children ages 7-14)
+        unit: "%"
+        short_unit: "%"
+        description_short: "{definitions.description_short_children_in_employment}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+        display:
+          name: Children in employment
+          numDecimalPlaces: 1
+          tolerance: 5
+      sl_tlf_0714_ma_zs:
+        title: Children in employment, male (% of male children ages 7-14)
+        unit: "%"
+        short_unit: "%"
+        description_short: "{definitions.description_short_children_in_employment}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+        display:
+          name: Male children in employment
+          numDecimalPlaces: 1
+          tolerance: 5
+      sl_tlf_0714_fe_zs:
+        title: Children in employment, female (% of female children ages 7-14)
+        unit: "%"
+        short_unit: "%"
+        description_short: "{definitions.description_short_children_in_employment}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+        display:
+          name: Female children in employment
+          numDecimalPlaces: 1
+          tolerance: 5
 
-      # sl_tlf_0714_wk_zs:
-      #   title: Children in employment, work only (% of children in employment, ages 7-14)
+      sl_tlf_0714_wk_zs:
+        title: Children in employment, work only (% of children in employment, ages 7-14)
+        unit: "%"
+        short_unit: "%"
+        description_short: "{definitions.description_short_children_in_employment_work_only}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+        display:
+          name: Children in employment, work only
+          numDecimalPlaces: 1
+          tolerance: 5
 
-      # sl_tlf_0714_sw_tm:
-      #   title: Average working hours of children, study and work, ages 7-14 (hours per week)
+      sl_tlf_0714_sw_tm:
+        title: Average working hours of children, study and work, ages 7-14 (hours per week)
+        unit: "hours per week"
+        short_unit: ""
+        description_short: "{definitions.description_short_average_working_hours_of_children}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+        display:
+          name: Average working hours of children, study and work
+          numDecimalPlaces: 1
+          tolerance: 5
 
       sl_agr_empl_zs:
         title: Employment in agriculture (% of total employment) (modeled ILO estimate)
