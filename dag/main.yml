@@ -686,8 +686,16 @@ steps:
   data://grapher/imf/2025-07-08/trade:
     - data://garden/imf/2025-07-08/trade
 
- #
 
+  #
+  # Trade Data - Historic exports and imports from Absell-Federico-Tena World Trade post Second World War
+  #
+  data://meadow/trade/2025-09-22/historic_exports:
+    - snapshot://trade/2025-09-22/historic_exports.xlsx
+  data://garden/trade/2025-09-22/historic_exports:
+    - data://meadow/trade/2025-09-22/historic_exports
+  data://grapher/trade/2025-09-22/historic_exports:
+    - data://garden/trade/2025-09-22/historic_exports
 
 include:
   - dag/open_numbers.yml
