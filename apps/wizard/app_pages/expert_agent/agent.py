@@ -3,11 +3,11 @@ from pathlib import Path
 from typing import Any, AsyncGenerator, List, Literal
 
 import logfire
-import requests
 import streamlit as st
 import yaml
 from pydantic_ai import Agent
-from pydantic_ai.agent import CallToolsNode
+
+# from pydantic_ai.agent import CallToolsNode
 from pydantic_ai.mcp import CallToolFunc, MCPServerStreamableHTTP, ToolResult
 from pydantic_ai.messages import (
     PartDeltaEvent,
@@ -19,8 +19,13 @@ from pydantic_ai.models.openai import OpenAIResponsesModelSettings
 from pydantic_ai.tools import RunContext
 
 from apps.wizard.app_pages.expert_agent.utils import CURRENT_DIR
-from etl.analytics import ANALYTICS_URL, clean_sql_query, read_datasette
-from etl.config import GOOGLE_API_KEY, LOGFIRE_TOKEN_EXPERT
+from etl.analytics import (
+    ANALYTICS_URL,
+    DatasetteSQLError,
+    clean_sql_query,
+    read_datasette,
+)
+from etl.config import GOOGLE_API_KEY, LOGFIRE_TOKEN_EXPERT, OWID_MCP_SERVER_URL
 from etl.docs import (
     render_collection,
     render_dataset,
@@ -84,15 +89,11 @@ async def process_tool_call(
     tool_args: dict[str, Any],
 ) -> ToolResult:
     """A tool call processor that passes along the deps."""
-    st.toast(f"**MCP**: `owid_mcp(name={name})`", icon=":material/compare_arrows:")
+    st.markdown(
+        f"**:material/compare_arrows: MCP**: Querying OWID MCP, method `{name}`"
+    )  # , icon=":material/compare_arrows:")
     return await call_tool(name, tool_args, {"deps": ctx.deps})
 
-
-# OWID Prod MCP server
-mcp_server_prod = MCPServerStreamableHTTP(
-    url="https://mcp.owid.io/mcp",
-    process_tool_call=process_tool_call,
-)
 
 ## Trying to tweak the settings for OpenAI responses
 settings = OpenAIResponsesModelSettings(
@@ -105,7 +106,12 @@ settings = OpenAIResponsesModelSettings(
 ## Use MCPs or not based on user input
 def get_toolsets():
     if ("expert_use_mcp" in st.session_state) and st.session_state["expert_use_mcp"]:
-        # Use MCP server for the agent
+        # Create MCP server instance inside function to avoid event loop binding issues
+        mcp_server_prod = MCPServerStreamableHTTP(
+            url=OWID_MCP_SERVER_URL,
+            process_tool_call=process_tool_call,
+            tool_prefix="owid_data_",
+        )
         return [mcp_server_prod]
     return []
 
@@ -208,23 +214,26 @@ async def _collect_agent_stream2(prompt: str, model_name: str, message_history) 
     ) as run:
         nodes = []
         async for node in run:
+            # print(f"--------------------------")
+            # print(node)
             nodes.append(node)
             if Agent.is_model_request_node(node):
-                is_final_synthesis_node = any(isinstance(prev_node, CallToolsNode) for prev_node in nodes)
-                print(f"--- ModelRequestNode (Is Final Synthesis? {is_final_synthesis_node}) ---")
+                # is_final_synthesis_node = any(isinstance(prev_node, CallToolsNode) for prev_node in nodes)
+                # print(f"--- ModelRequestNode (Is Final Synthesis? {is_final_synthesis_node}) ---")
                 async with node.stream(run.ctx) as request_stream:
                     async for event in request_stream:
-                        print(f"Request Event: Data: {event!r}")
+                        # print(f"Request Event: Data: {event!r}")
                         if isinstance(event, PartDeltaEvent) and isinstance(event.delta, TextPartDelta):
                             chunks.append(event.delta.content_delta)
                         elif isinstance(event, PartStartEvent) and isinstance(event.part, TextPart):
                             chunks.append(event.part.content)
 
             elif Agent.is_call_tools_node(node):
-                print("--- CallToolsNode ---")
+                # print("--- CallToolsNode ---")
                 async with node.stream(run.ctx) as handle_stream:
                     async for event in handle_stream:
-                        print(f"Call Event Data: {event!r}")
+                        pass
+                        # print(f"Call Event Data: {event!r}")
 
         # Capture usage and result info
         if hasattr(run, "usage"):
@@ -248,7 +257,17 @@ async def agent_stream2(prompt: str, model_name: str, message_history) -> AsyncG
         str: Text chunks from the agent response
     """
     # Collect all chunks first to avoid async context issues with Streamlit
-    chunks = await _collect_agent_stream2(prompt, model_name, message_history)
+    # with st.spinner("Asking LLM...", show_time=True):
+    with st.status("Talking with the expert...", expanded=False) as status:
+        st.markdown(
+            f"**:material/smart_toy: Agent working**: `{st.session_state['expert_config']['model_name']}`",
+        )
+        chunks = await _collect_agent_stream2(
+            prompt,
+            model_name,
+            message_history,
+        )
+        status.update(label="Got the answer!", state="complete", expanded=False)
 
     # Yield chunks one by one
     for chunk in chunks:
@@ -272,7 +291,9 @@ async def get_context(category_name: Literal["analytics", "metadata", "docs"]) -
     Returns:
         str: The context for the specified category.
     """
-    st.toast(f"**Tool use**: `get_context(category_name={category_name})`", icon=":material/calculate:")
+    st.markdown(
+        f"**:material/construction: Tool use**: Getting context on category '{category_name}', using `get_context`"
+    )  # , icon=":material/calculate:")
     return CONTEXT["context"][category_name]
 
 
@@ -296,7 +317,9 @@ async def get_docs_index() -> str:
     Returns:
         str: The documentation index. List of available section and pages.
     """
-    st.toast("**Tool use**: `get_docs_index`", icon=":material/calculate:")
+    st.markdown(
+        "**:material/construction: Tool use**: Getting the table of contents of ETL documentation, via `get_docs_index`"
+    )  # , icon=":material/calculate:")
     docs = ruamel_dump(DOCS_INDEX["nav"])
     return docs
 
@@ -319,7 +342,9 @@ async def get_docs_page(file_path: str) -> str:
     Returns:
         str: The documentation for the specified file_path.
     """
-    st.toast(f"**Tool use**: `get_docs_page (file_path='{file_path}')`", icon=":material/calculate:")
+    st.markdown(
+        f"**:material/construction: Tool use**: Getting ETL docs page '{file_path}', via `get_docs_page`"
+    )  # , icon=":material/calculate:")
     if (DOCS_DIR / file_path).exists():
         docs = read_page_md(DOCS_DIR / file_path)
     else:
@@ -337,7 +362,9 @@ async def get_db_tables() -> str:
     Returns:
         str: Table short descriptions in format "table1: ...\ntable2: ...".
     """
-    st.toast("**Tool use**: `get_db_tables`", icon=":material/calculate:")
+    st.markdown(
+        "**:material/construction: Tool use**: Getting the database details of our semantic layer, via `get_db_tables`"
+    )  # , icon=":material/calculate:")
     return ANALYTICS_DB_OVERVIEW
 
 
@@ -353,7 +380,9 @@ async def get_db_table_fields(tb_name: str) -> str:
     Returns:
         str: Table documentation as string, mapping column names to their descriptions. E.g. "column1: description1\ncolumn2: description2".
     """
-    st.toast(f"**Tool use**: `get_db_table_fields(table='{tb_name}')`", icon=":material/calculate:")
+    st.markdown(
+        f"**:material/construction: Tool use**: Getting documentation of table `{tb_name}` from the semantic layer, via `get_db_table_fields`"
+    )  # , icon=":material/calculate:")
     if tb_name not in ANALYTICS_DB_TABLE_DETAILS:
         print("Table not found:", tb_name)
         print("Available tables:", sorted(ANALYTICS_DB_TABLE_DETAILS.keys()))
@@ -374,7 +403,9 @@ async def get_api_reference_metadata(
     Returns:
         str: Metadata for the specified object type.
     """
-    st.toast(f"**Tool use**: `get_api_reference_metadata(object_name='{object_name}')`", icon=":material/calculate:")
+    st.markdown(
+        f"**:material/construction: Tool use**: Getting metadata documentation for object '{object_name}', via `get_api_reference_metadata')`"
+    )  # , icon=":material/calculate:")
     match object_name:
         case "dataset":
             return render_dataset()
@@ -399,17 +430,20 @@ async def get_api_reference_metadata(
             return "Invalid object name: " + object_name
 
 
-@agent.tool_plain(docstring_format="google")
-async def generate_url_to_datasette(query: str) -> str:
-    """Generate a URL to the Datasette instance with the given query.
+# NOTE: commented out because Datasette URL is now returned in every result
+# @agent.tool_plain(docstring_format="google")
+# async def generate_url_to_datasette(query: str) -> str:
+#     """Generate a URL to the Datasette instance with the given query.
 
-    Args:
-        query: Query to Datasette instance.
-    Returns:
-        str: URL to the Datasette instance with the query. The URL links to a datasette preview with the SQL query and its results.
-    """
-    st.toast("**Tool use**: `generate_url_to_datasette`", icon=":material/calculate:")
-    return _generate_url_to_datasette(query)
+#     Args:
+#         query: Query to Datasette instance.
+#     Returns:
+#         str: URL to the Datasette instance with the query. The URL links to a datasette preview with the SQL query and its results.
+#     """
+#     st.markdown(
+#         "**:material/construction: Tool use**: Generating Datasette query URL, via `generate_url_to_datasette`"
+#     )  # , icon=":material/calculate:")
+#     return _generate_url_to_datasette(query)
 
 
 def _generate_url_to_datasette(query: str) -> str:
@@ -417,49 +451,63 @@ def _generate_url_to_datasette(query: str) -> str:
     return f"{ANALYTICS_URL}?" + urllib.parse.urlencode({"sql": query, "_size": "max"})
 
 
-@agent.tool_plain(docstring_format="google")
-async def validate_datasette_query(query: str) -> str:
-    """Validate an SQL query.
+# NOTE: commented out because Agent was doing unnecessary calls. If the query is invalid, it'll return `error` in response
+# @agent.tool_plain(docstring_format="google")
+# async def validate_datasette_query(query: str) -> str:
+#     """Validate an SQL query.
 
-    Args:
-        query: Query to Datasette instance.
-    Returns:
-        str: Validation result message. If the query is not valid, it will return an error message. Use it to improve the query!
-    """
-    st.toast("**Tool use**: `validate_datasette_query`", icon=":material/calculate:")
-    url = _generate_url_to_datasette(f"{query}")
-    url = url.replace(ANALYTICS_URL, ANALYTICS_URL + ".json")
-    response = requests.get(url).json()
-    if response["ok"]:
-        if ("rows" not in response) or not isinstance(response["rows"], list):
-            text = "Query is invalid! Check for correctness, it must be DuckDB compatible! Seems like no rows were returned."
-        elif len(response["rows"]) == 0:
-            text = "Query is valid, but it returned no results."
-        else:
-            text = "Query is valid!"
-    else:
-        text = f"Query is invalid! Check for correctness, it must be DuckDB compatible! `\nError: {response['error']}"
-    return text
+#     Args:
+#         query: Query to Datasette instance.
+#     Returns:
+#         str: Validation result message. If the query is not valid, it will return an error message. Use it to improve the query!
+#     """
+#     st.markdown(
+#         "**:material/construction: Tool use**: Validating Datasette query, via `validate_datasette_query`"
+#     )  # , icon=":material/calculate:")
+#     url = _generate_url_to_datasette(f"{query}")
+#     url = url.replace(ANALYTICS_URL, ANALYTICS_URL + ".json")
+#     response = requests.get(url).json()
+#     if response["ok"]:
+#         if ("rows" not in response) or not isinstance(response["rows"], list):
+#             text = "Query is invalid! Check for correctness, it must be DuckDB compatible! Seems like no rows were returned."
+#         elif len(response["rows"]) == 0:
+#             text = "Query is valid, but it returned no results."
+#         else:
+#             text = "Query is valid!"
+#     else:
+#         text = f"Query is invalid! Check for correctness, it must be DuckDB compatible! `\nError: {response['error']}"
+#     return text
 
 
 @agent.tool_plain(docstring_format="google")
 async def get_data_from_datasette(query: str, num_rows: int = 10) -> str:
     """Execute a query in the semantic layer in Datasette and get the actual data results.
 
-    This only shows the first 10 rows of the result, as a markdown table.
+    This shows the first N rows of the result as a markdown table. If the query is invalid,
+    it returns an error message that can be used to improve the query.
 
     Args:
         query: Query to Datasette instance.
         num_rows: Number of rows to return. Defaults to 10. Too many rows may increase the tokens. Be mindful when increasing this number.
     Returns:
-        pd.DataFrame: DataFrame with the results of the query.
+        str: Either a markdown table with the results or an error message if the query is invalid. Also includes a clickable Datasette link.
     """
-    st.toast("**Tool use**: `get_data_from_datasette`", icon=":material/calculate:")
-    df = read_datasette(query, use_https=False)
-    if df.empty:
-        return ""
+    st.markdown(
+        f"**:material/construction: Tool use**: Getting data ({num_rows} rows) from Datasette, via `get_data_from_datasette`"
+    )  # , icon=":material/calculate:")
 
-    result = df.head(num_rows).to_markdown(index=False)
-    if result is None:
-        return ""
-    return result
+    try:
+        df = read_datasette(query, use_https=False)
+        datasette_url = _generate_url_to_datasette(query)
+
+        if df.empty:
+            return f"Query returned no results.\n\n[Run this query in Datasette]({datasette_url})"
+
+        result = df.head(num_rows).to_markdown(index=False)
+        if result is None:
+            return f"Query returned no results.\n\n[Run this query in Datasette]({datasette_url})"
+
+        return f"{result}\n\n[Run this query in Datasette]({datasette_url})"
+    except (DatasetteSQLError,) as e:
+        # Handle specific Datasette-related errors
+        return f"Query is invalid! Check for correctness, it must be DuckDB compatible!\nError: {e}"

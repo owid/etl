@@ -15,6 +15,8 @@ definitions:
     Direct diabetes deaths, for example associated with a diabetic coma, are included in this category. Diabetes also raises the risk of other causes of death, including ischemic heart disease and kidney failure; many of these deaths are included in other categories. Endocrine disorders include anemia and sickle-cell disorders.
     <% elif cause == "Digestive diseases" %>
     The leading cause of death in this category is liver cirrhosis. Other disease in this category include peptic ulcer diseases, pancreatitis and appendicitis.
+    <% elif cause == "Genitourinary diseases" %>
+    Genitourinary diseases include kidney failure, which may be caused by diabetes or high blood pressure.
     <% elif cause == "Ill-defined injuries" %>
     Ill-defined injuries/accidents comprise events of undetermined intent. The proportion of deaths assigned to this category is an cause of data quality.
     <% elif cause == "Infectious and parasitic diseases" %>

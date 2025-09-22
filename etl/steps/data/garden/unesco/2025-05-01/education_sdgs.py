@@ -88,6 +88,10 @@ def run() -> None:
 
     tb_pivoted = tb_pivoted.reset_index()
 
+    # Remove Turkey 1998 value for Government expenditure on education as a percentage of GDP (%), XGDP.FSGOV (likely an error)
+    mask = (tb_pivoted["country"] == "Turkey") & (tb_pivoted["year"] == 1998)
+    tb_pivoted.loc[mask, "Government expenditure on education as a percentage of GDP (%), XGDP.FSGOV"] = None
+
     tb_pivoted = tb_pivoted.format(["country", "year"])
     # Combine recent literacy estimates and expenditure data with historical estimates from a migrated dataset
     tb_pivoted = combine_historical_expenditure(tb_pivoted, tb_expenditure)

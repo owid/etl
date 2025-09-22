@@ -150,7 +150,7 @@ steps:
   export://multidim/education/latest/years_of_schooling:
     - data://grapher/un/2025-05-07/undp_hdr
     - data://grapher/unesco/2025-05-01/education_opri
-    - data://grapher/wb/2024-06-10/gender_statistics
+    - data://grapher/wb/2025-09-08/gender_statistics
 
   #
   # Literacy OMM
@@ -196,7 +196,6 @@ steps:
   export://multidim/education/latest/proficiency:
     - data://grapher/unesco/2025-05-01/education_sdgs
 
-
   #
   # Mdim for PISA scores
   #
@@ -215,3 +214,13 @@ steps:
   #
   export://multidim/education/latest/women_teachers:
     - data://grapher/unesco/2025-05-01/education_opri
+
+  #
+  # Harmonized test scores
+  #
+  data://meadow/education/2025-08-20/harmonized_scores:
+    - snapshot://education/2025-08-20/harmonized_scores.csv
+  data://garden/education/2025-08-20/harmonized_scores:
+    - data://meadow/education/2025-08-20/harmonized_scores
+  data://grapher/education/2025-08-20/harmonized_scores:
+    - data://garden/education/2025-08-20/harmonized_scores

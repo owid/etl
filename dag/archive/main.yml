@@ -611,6 +611,23 @@ steps:
   data://grapher/un/2023-10-30/un_members:
     - data://garden/un/2023-10-30/un_members
 
+    # UN Regions
+  data://meadow/un/2024-06-24/sdg_regions:
+    - snapshot://un/2024-06-24/sdg_regions.csv
+  data://garden/un/2024-06-24/sdg_regions:
+    - data://meadow/un/2024-06-24/sdg_regions
+  data://grapher/un/2024-06-24/sdg_regions:
+    - data://garden/un/2024-06-24/sdg_regions
+
+  # Ethnologue
+  data-private://meadow/language/2024-07-17/ethnologue:
+    - snapshot-private://language/2024-07-17/ethnologue.zip
+  data-private://garden/language/2024-07-17/ethnologue:
+    - data-private://meadow/language/2024-07-17/ethnologue
+    - data://garden/regions/2023-01-01/regions
+  data-private://grapher/language/2024-07-17/ethnologue:
+    - data-private://garden/language/2024-07-17/ethnologue
+
 include:
   # Include all active steps plus all archive steps.
   - dag/main.yml
@@ -638,3 +655,5 @@ include:
   - dag/archive/redistribution.yml
   - dag/archive/wizard.yml
   - dag/archive/growth.yml
+  - dag/archive/labor.yml
+  - dag/archive/forests.yml

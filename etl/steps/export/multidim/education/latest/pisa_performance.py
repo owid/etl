@@ -5,6 +5,15 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+
+# Color constants gender and age group visualizations
+COLOR_MAT = "#D73C50"
+COLOR_SCIENCE = "#4C6A9C"
+COLOR_READING = "#578145"
+
+COLOR_BOYS = "#00847E"
+COLOR_GIRLS = "#E56E5A"
+
 # Common configuration for all charts
 MULTIDIM_CONFIG = {
     "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.008.json",
@@ -22,7 +31,6 @@ GROUPED_VIEW_CONFIG = MULTIDIM_CONFIG | {
     "tab": "chart",
     "selectedFacetStrategy": "entity",
     "chartTypes": ["LineChart"],
-    "hideFacetControl": False,
 }
 
 # Subject configurations
@@ -98,10 +106,25 @@ def run() -> None:
 
     # Edit display names
     for view in c.views:
-        # Set view metadata for all views
-        view.metadata = {
-            "description_short": view.config["subtitle"],
-        }
+        # Update title and subtitle based on view dimensions
+        sex = view.dimensions["sex"]
+        subject = view.dimensions["subject"]
+        if sex == "sex_side_by_side" or subject == "subject_side_by_side":
+            view.metadata = {
+                "description_from_producer": "",
+                "description_short": view.config["subtitle"],
+                "presentation": {
+                    "title_public": view.config["title"],
+                },
+            }
+        else:
+            # Only updated description_short for other views
+            view.metadata = {
+                "presentation": {
+                    "title_public": view.config["title"],
+                },
+            }
+
         edit_indicator_displays(view)
 
     # Save collection
@@ -237,17 +260,38 @@ def generate_subtitle_by_subject_and_gender(view):
 
 
 def edit_indicator_displays(view):
-    """Edit display names for the grouped views."""
-    if view.d.sex != "sex_side_by_side" or view.indicators.y is None:
-        return
+    """Edit display names and colors for the grouped views."""
 
-    DISPLAY_NAMES = {
-        "average_girls": "Girls",
-        "average_boys": "Boys",
-    }
+    sex = view.dimensions.get("sex")
+    subject = view.dimensions.get("subject")
 
-    for indicator in view.indicators.y:
-        for gender_key, display_name in DISPLAY_NAMES.items():
-            if gender_key in indicator.catalogPath:
-                indicator.display = {"name": display_name}
-                break
+    # Handle gender side-by-side views
+    if sex == "sex_side_by_side":
+        GENDER_CONFIG = {
+            "average_girls": {"name": "Girls", "color": COLOR_GIRLS},
+            "average_boys": {"name": "Boys", "color": COLOR_BOYS},
+        }
+
+        for indicator in view.indicators.y:
+            for gender_key, config in GENDER_CONFIG.items():
+                if gender_key in indicator.catalogPath:
+                    indicator.display = {"name": config["name"], "color": config["color"]}
+                    break
+
+    # Handle subject side-by-side views
+    elif subject == "subject_side_by_side":
+        SUBJECT_CONFIG = {
+            "mathematics": {
+                "name": "Mathematics",
+                "color": COLOR_MAT,
+                "patterns": ["pisa_math_all", "pisa_math_average"],
+            },
+            "science": {"name": "Science", "color": COLOR_SCIENCE, "patterns": ["pisa_science_"]},
+            "reading": {"name": "Reading", "color": COLOR_READING, "patterns": ["pisa_reading_"]},
+        }
+
+        for indicator in view.indicators.y:
+            for subject_key, config in SUBJECT_CONFIG.items():
+                if any(pattern in indicator.catalogPath for pattern in config["patterns"]):
+                    indicator.display = {"name": config["name"], "color": config["color"]}
+                    break

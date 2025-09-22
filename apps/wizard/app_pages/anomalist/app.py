@@ -289,7 +289,7 @@ def ask_llm_for_summary(df: pd.DataFrame):
         stream = client.chat.completions.create(
             model=MODEL_DEFAULT,
             messages=messages,  # type: ignore
-            max_tokens=3000,
+            max_completion_tokens=3000,
             stream=True,
         )
         response = cast(str, st.write_stream(stream))

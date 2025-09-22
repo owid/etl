@@ -10,7 +10,7 @@ definitions:
         maxTime: 2024
         map:
           time: 2024
-          timeTolerance: 5
+          timeTolerance: 10
 
   display_tolerance: &display_tolerance 10
 
@@ -25,19 +25,21 @@ definitions:
 
   common_grapher_map_config: &common_grapher_map_config
     time: 2024
-    timeTolerance: 5
+    timeTolerance: 10
 
   # ============================================================================
   # VALUE RANGES (BINS) FOR DIFFERENT INDICATOR TYPES
   # ============================================================================
 
-  enrolment_rate_bins: &enrolment_rate_bins [10,20,30,40,50,60,70,80,90,100]
-  tertiary_enrollment_bins: &tertiary_enrollment_bins [5,10,20,30,40,50,60,80]
-  expenditure_bins: &expenditure_bins [1,2,3,4,5,6,7,8]
-  expenditure_total_bins: &expenditure_total_bins [0,4,8,12,16,20,24]
-  per_student_spending_bins: &per_student_spending_bins [500, 1000, 5000, 10000,15000,20000,25000]
-  literacy_rate_bins: &literacy_rate_bins [10,20,30,40,50,60,70,80,90,100]
-
+  enrolment_rate_bins: &enrolment_rate_bins [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+  enrolment_rate_bins_gross: &enrolment_rate_bins_gross [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 1]
+  expenditure_bins: &expenditure_bins [0, 1, 2, 3, 4, 5, 6, 7, 8, 1]
+  expenditure_total_bins: &expenditure_total_bins [0, 4, 8, 12, 16, 20, 24, 1]
+  per_student_spending_bins: &per_student_spending_bins [0, 500, 1000, 5000, 10000, 15000, 20000, 25000, 1]
+  literacy_rate_bins: &literacy_rate_bins [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+  qualified_teachers_bins: &qualified_teachers_bins [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+  proficiency_rate_bins: &proficiency_rate_bins [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+  out_of_school_bins: &out_of_school_bins [0, 10, 20, 30, 40, 50, 60, 1]
   # ============================================================================
   # ENROLLMENT CONFIGURATIONS (Primary, Secondary, Pre-primary)
   # ============================================================================
@@ -58,7 +60,7 @@ definitions:
       <<: *common_grapher_map_config
       colorScale:
         binningStrategy: manual
-        customNumericValues: *enrolment_rate_bins
+        customNumericValues: *enrolment_rate_bins_gross
         baseColorScheme: PuBuGn
 
   grapher_out_of_school_reds: &grapher_out_of_school_reds
@@ -67,7 +69,7 @@ definitions:
       <<: *common_grapher_map_config
       colorScale:
         binningStrategy: manual
-        customNumericValues: [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50]
+        customNumericValues: *out_of_school_bins
         baseColorScheme: Reds
 
   grapher_completion: &grapher_completion
@@ -76,20 +78,20 @@ definitions:
       <<: *common_grapher_map_config
       colorScale:
         binningStrategy: manual
-        customNumericValues: [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+        customNumericValues: *enrolment_rate_bins
         baseColorScheme: Greens
   # ============================================================================
   # EXPENDITURE CONFIGURATIONS
   # ============================================================================
 
-  grapher_config_expenditure: &grapher_config_expenditure
+  grapher_config_expenditure_gdp: &grapher_config_expenditure_gdp
     <<: *common_grapher_config
     map:
       <<: *common_grapher_map_config
       colorScale:
         binningStrategy: manual
         customNumericValues: *expenditure_bins
-        baseColorScheme: YlOrBr
+        baseColorScheme: Blues
 
   grapher_config_expenditure_total: &grapher_config_expenditure_total
     <<: *common_grapher_config
@@ -98,50 +100,22 @@ definitions:
       colorScale:
         binningStrategy: manual
         customNumericValues: *expenditure_total_bins
-        baseColorScheme: YlOrBr
+        baseColorScheme: BuGn
 
   # Per-student spending configurations (using per-student bins)
-  grapher_config_per_student_spending_preprimary: &grapher_config_per_student_spending_preprimary
+  grapher_config_per_student_spending: &grapher_config_per_student_spending
     <<: *common_grapher_config
     map:
       <<: *common_grapher_map_config
       colorScale:
         binningStrategy: manual
         customNumericValues: *per_student_spending_bins
-        baseColorScheme: Oranges
+        baseColorScheme: Purples
 
-  grapher_config_per_student_spending_primary: &grapher_config_per_student_spending_primary
-    <<: *common_grapher_config
-    map:
-      <<: *common_grapher_map_config
-      colorScale:
-        binningStrategy: manual
-        customNumericValues: *per_student_spending_bins
-        baseColorScheme: Blues
-
-  grapher_config_per_student_spending_secondary: &grapher_config_per_student_spending_secondary
-    <<: *common_grapher_config
-    map:
-      <<: *common_grapher_map_config
-      colorScale:
-        binningStrategy: manual
-        customNumericValues: *per_student_spending_bins
-        baseColorScheme: Greens
-
-  grapher_config_per_student_spending_tertiary: &grapher_config_per_student_spending_tertiary
-    <<: *common_grapher_config
-    map:
-      <<: *common_grapher_map_config
-      colorScale:
-        binningStrategy: manual
-        customNumericValues: *per_student_spending_bins
-        baseColorScheme: Reds
 
   # ============================================================================
   # PROFICIENCY RATE CONFIGURATIONS
   # ============================================================================
-
-  proficiency_rate_bins: &proficiency_rate_bins [10,20,30,40,50,60,70,80,90,100]
 
   grapher_config_proficiency_reading: &grapher_config_proficiency_reading
     <<: *common_grapher_config
@@ -197,7 +171,6 @@ definitions:
   # QUALIFIED TEACHERS CONFIGURATIONS
   # ============================================================================
 
-  qualified_teachers_bins: &qualified_teachers_bins [10,20,30,40,50,60,70,80,90,100]
 
   grapher_config_qualified_teachers: &grapher_config_qualified_teachers
     <<: *common_grapher_config
@@ -212,31 +185,35 @@ definitions:
   # DESCRIPTION TEMPLATES
   # ============================================================================
   desc_key_govt_expenditure_constant_ppp_per_student: &desc_key_govt_expenditure_constant_ppp_per_student
-   - This indicator shows how much a government spends per student at a particular level of education, expressed in constant international dollars.
-   - It’s calculated by dividing total government spending by the number of enrolled students, and adjusted for inflation and differences in purchasing power between countries. This makes it possible to compare investment levels across education systems and over time.
-   - It includes all forms of public education spending — from teacher salaries and textbooks to school maintenance, capital projects like building classrooms, and external funding from international donors that flows through government budgets.
-   - Figures are initially reported in local currency, then converted using purchasing power parity (PPP) exchange rates and adjusted to a constant base year. This ensures the numbers reflect real resource commitments rather than changes in local prices or currency fluctuations. For example, data released in 2017 would typically be expressed in 2014 dollars.
-   - Higher values suggest that more resources are available per student — which could support better infrastructure, teaching quality, and learning environments. But it doesn’t tell us how effectively the money is used, or whether outcomes are improving.
-   - This is one of the most useful measures for understanding how governments fund education relative to the size of their student population. It’s especially helpful when comparing countries with different overall budgets or economic conditions.
+    - This indicator shows how much a government spends per student per year at a particular level of education, expressed in constant [international-$](#dod:int_dollar_abbreviation).
+    - It is calculated by dividing total annual government spending by the number of students currently enrolled, and then adjusted for inflation and differences in purchasing power between countries. This makes it possible to compare annual investment levels across education systems and over time.
+    - It includes all forms of public education spending — from teacher salaries and textbooks to school maintenance, capital projects like building classrooms, and external funding from international donors that flows through government budgets.
+    - Figures are initially reported in local currency, then converted using purchasing power parity (PPP) exchange rates and adjusted to a constant base year. This ensures the numbers reflect real resource commitments rather than changes in local prices or currency fluctuations.
+    - Higher values suggest that more resources are available per student in a given year — which could support better infrastructure, teaching quality, and learning environments. But it doesn’t tell us how effectively the money is used, or whether outcomes are improving.
+    - This is one of the most useful measures for understanding how governments fund education relative to the size of their student population. It’s especially helpful when comparing countries with different overall budgets or economic conditions.
+    - This indicator represents *annual spending per student*, not the total cost of completing an entire cycle of education (e.g. all years of primary or secondary).
 
   desc_key_govt_expenditure_gdp_share: &desc_key_govt_expenditure_gdp_share
-   - This indicator shows the share of a country’s economic output (GDP) that is spent on education. It reflects how much of the national budget is directed toward education relative to the size of the economy.
-   - It includes all government spending at the relevant education level — from central, regional, and local authorities — and covers both current and capital expenditures.
-   - A higher percentage means a larger share of national resources is allocated to education, which may indicate political commitment or policy prioritization. But it doesn’t necessarily mean higher spending per student or better outcomes. Countries with lower GDPs might have high percentages but limited resources in absolute terms.
-   - This indicator is useful for understanding how education fits within the broader picture of government spending and national development. It should be interpreted alongside measures like per-student spending and enrolment rates.
+    - This indicator shows the share of a country’s total economic output (GDP) that is spent on education annually. It reflects the scale of education spending relative to the size of the economy.
+    - It includes all government spending at the relevant education level — from central, regional, and local authorities — and covers both current and capital expenditures.
+    - It covers all types of public education spending — including teacher salaries, textbooks, school maintenance, capital projects such as building classrooms, and even external funding from international donors that is channeled through government budgets.
+    - A higher percentage means a larger share of national resources is allocated to education, which may indicate political commitment or policy prioritization. But it doesn’t necessarily mean higher spending per student or better outcomes. Countries with lower GDPs might have high percentages but limited resources in absolute terms.
+    - This indicator is useful for understanding how education fits within the broader picture of government spending and national development. It should be interpreted alongside measures like per-student spending and enrolment rates.
 
+  # Enrollment and attendance descriptions
   desc_key_ger: &desc_key_ger
-    - Not all students enrol in school at the same age. The gross enrolment ratio includes students enrolled in a certain level of education, regardless of whether they are within the expected age range for that level. It includes students who are younger or older than expected due to late entry, early entry, or grade repetition.
-    - It captures the total number of students enrolled at a specific education level, expressed as a percentage of the population in the official age group for that level. For example, if the official age group for upper secondary school is 15 to 17-year olds, the gross enrolment ratio compares total enrolment at that level (of any age) to the population of 15- to 17-year-olds.
-    - Values can be greater than 100% if students repeat grades or start a particular level of schooling late. For example, if the official age group for upper secondary school is 15 to 17-year olds, some 18- or 19 year olds might be included in the total if they started upper secondary school late.
-    - Similarly, a value of 100% does not necessarily mean all children within a particular age group are enrolled in school; some children could be out-of-school, but gross enrolment rates are boosted by older students being included.
-    - The data comes from administrative records, such as school enrolment reports, and from population estimates, usually provided by the United Nations or national sources.
+    - The gross enrolment ratio counts all students enrolled at a specific education level, regardless of their age. This includes students who are younger or older than the official age range because they started school early, started late, or repeated grades.
+    - It measures enrolment at a given level by dividing the total number of students—of any age—by the size of the age group officially assigned to that level. For instance, primary enrolment counts everyone enrolled, even outside ages 6–11, but compares it only to the 6–11 population.
+    - Values can exceed 100% when students repeat grades or start late. For instance, primary school enrolment might include 12- or 13-year-olds who started late or repeated grades, pushing the ratio above 100%.
+    - A value of 100% does not guarantee that all children in the official age group are enrolled in school; some may be out of school entirely, but the ratio appears high due to older students being counted in the total.
+    - Values much lower than 100% indicate that many children of the official age are not enrolled at the expected education level - they may be out of school entirely, enrolled at a different level, or have never started school.
+    - Values much higher than 100% can indicate educational challenges such as high grade repetition rates, late school entry, or inefficient progression through the system.
+    - The data comes from administrative records such as school enrolment reports, combined with population estimates typically sourced from the United Nations or national statistical offices.
 
   desc_key_net_enr: &desc_key_net_enr
-    - The net enrolment rate shows what percentage of children are enrolled at the education level intended for their age. Unlike gross enrolment, it only counts students who are within the official age range for that level.
-    - It compares children enrolled at the correct level for their age to the total population in that same age group. For example, if primary education is for ages 6 to 11, it measures how many 6- to 11-year-olds are actually enrolled in primary school.
+    - The net enrolment rate shows what percentage of children are enrolled at the education level intended for their age.
+    - It compares children enrolled at the correct level for their age to the total population in that same age group. For example, a primary school net enrolment of 90% means 90% of children between the ages of 6 and 11 years are enrolled in primary school. Children who are not enrolled in school or are enrolled at another education level are not counted here.
     - The highest possible value is 100%, which would mean all children of the right age are enrolled where they should be. High rates indicate that most children are progressing through school at the expected pace.
-    - Values cannot exceed 100% because it excludes over-age and under-age students. However, small discrepancies between enrolment records and population data can occasionally push rates slightly above 100%.
     - A rate of 90% doesn't necessarily mean 10% of children are out of school entirely — some may be enrolled at different levels (either higher or lower) than expected for their age, but these students aren't counted in the net rate.
     - The data comes from school administrative records that track enrolment by individual age, combined with population estimates from national statistics offices or UN sources.
 
@@ -256,9 +233,9 @@ definitions:
 
   description_key_out_school: &description_key_out_school
     - Many children and adolescents around the world are not in school, even though they are old enough to be. This indicator shows how many are missing out on education at each stage of the system.
-    - It measures the share of individuals in the official age range for a given level of education who are not enrolled at that level or in any higher level.
+    - It measures the share of individuals in the official age range for a given level of education who are not enrolled at that level of education.
     - These children or adolescents may have never entered school, may have dropped out, or may be starting later than expected.
-    - The indicator is calculated by subtracting the number of enrolled individuals in a specific age group from the total population of that group, and expressing the result as a percentage.
+    - A share of 10% for children out of primary school means that 90% of all 6- to 11-year-olds are enrolled in primary education.
     - High out-of-school rates signal barriers to access — such as poverty, gender inequality, location, or limited availability of schools — and highlight where more targeted support is needed.
     - The data comes from administrative school enrolment records and household surveys, which provide age-specific insights when compared to population estimates.
     - As with all education data, results should be interpreted carefully. Differences in how enrolment is defined, inconsistencies in age reporting, and timing of data collection (such as during holidays or late in the school year) can affect accuracy.
@@ -277,7 +254,7 @@ definitions:
     - Not all teachers have the same level of academic preparation in the subjects they teach. This indicator measures the percentage of teachers at each education level who have at least the minimum academic qualifications required for teaching their subjects at that level in their country.
     - It captures the share of teachers who are academically qualified, expressed as a percentage of all teachers at that level. For example, if there are 1,000 secondary teachers and 900 have the required academic qualifications, the indicator shows 90%.
     - The "minimum academic qualifications" refers to whatever subject-matter credentials each country requires - university degrees in relevant fields, subject-specific certifications, or other requirements that demonstrate mastery of the content being taught. This focuses on subject knowledge rather than pedagogical training (how to teach).
-    - Values below 100% suggest some teachers are teaching subjects without the academic qualifications their own country deems necessary. However, cross-country comparisons can be misleading since requirements vary significantly between nations.
+    - Values below 100% suggest some teachers are teaching subjects without the academic qualifications their own country deems necessary. However, cross-country comparisons should be made with caution since requirements vary significantly between nations.
     - The data comes from administrative records collected at schools and other organized learning centers, typically including information on teacher academic credentials and employment status.
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -551,6 +528,7 @@ tables:
         display:
           name: Primary school age
           numDecimalPlaces: 1
+          tolerance: *display_tolerance
 
       out_of_school_rate_for_adolescents_of_lower_secondary_school_age__both_sexes__pct__rofst_2_cp:
         title: Out-of-school rate for adolescents of lower secondary school age
@@ -564,6 +542,7 @@ tables:
         display:
           name: Lower secondary school age
           numDecimalPlaces: 1
+          tolerance: *display_tolerance
 
       out_of_school_rate_for_children_of_primary_school_age__female__pct__rofst_1_f_cp:
         title: Out-of-school rate for girls of primary school age
@@ -577,6 +556,7 @@ tables:
         display:
           name: Girls
           numDecimalPlaces: 1
+          tolerance: *display_tolerance
 
       out_of_school_rate_for_children_of_primary_school_age__male__pct__rofst_1_m_cp:
         title: Out-of-school rate for boys of primary school age
@@ -590,6 +570,7 @@ tables:
         display:
           name: Boys
           numDecimalPlaces: 1
+          tolerance: *display_tolerance
 
       out_of_school_rate_for_adolescents_of_lower_secondary_school_age__female__pct__rofst_2_f_cp:
         title: Out-of-school rate for girls of lower secondary school age
@@ -603,6 +584,7 @@ tables:
         display:
           name: Girls
           numDecimalPlaces: 1
+          tolerance: *display_tolerance
 
       out_of_school_rate_for_adolescents_of_lower_secondary_school_age__male__pct__rofst_2_m_cp:
         title: Out-of-school rate for boys of lower secondary school age
@@ -616,6 +598,7 @@ tables:
         display:
           name: Boys
           numDecimalPlaces: 1
+          tolerance: *display_tolerance
 
       out_of_school_rate_for_youth_of_upper_secondary_school_age__both_sexes__pct__rofst_3_cp:
         title: Out-of-school rate for youth of upper secondary school age
@@ -629,6 +612,7 @@ tables:
         display:
           name: Upper secondary school age
           numDecimalPlaces: 1
+          tolerance: *display_tolerance
 
       out_of_school_rate_for_youth_of_upper_secondary_school_age__female__pct__rofst_3_f_cp:
         title: Out-of-school rate for girls of upper secondary school age
@@ -642,6 +626,7 @@ tables:
         display:
           name: Girls
           numDecimalPlaces: 1
+          tolerance: *display_tolerance
 
       out_of_school_rate_for_youth_of_upper_secondary_school_age__male__pct__rofst_3_m_cp:
         title: Out-of-school rate for boys of upper secondary school age
@@ -655,6 +640,7 @@ tables:
         display:
           name: Boys
           numDecimalPlaces: 1
+          tolerance: *display_tolerance
 
       out_of_school_rate_for_children_one_year_before_the_official_primary_entry_age__both_sexes__pct__rofst_agm1_cp:
         title: Out-of-school rate for children one year before official primary entry age
@@ -668,6 +654,7 @@ tables:
         display:
           name: Pre-primary age
           numDecimalPlaces: 1
+          tolerance: *display_tolerance
 
       out_of_school_rate_for_children_one_year_before_the_official_primary_entry_age__female__pct__rofst_agm1_f_cp:
         title: Out-of-school rate for girls one year before official primary entry age
@@ -681,6 +668,7 @@ tables:
         display:
           name: Girls
           numDecimalPlaces: 1
+          tolerance: *display_tolerance
 
       out_of_school_rate_for_children_one_year_before_the_official_primary_entry_age__male__pct__rofst_agm1_m_cp:
         title: Out-of-school rate for boys one year before official primary entry age
@@ -694,6 +682,7 @@ tables:
         display:
           name: Boys
           numDecimalPlaces: 1
+          tolerance: *display_tolerance
 
       # ========================================================================
       # BASIC SERVICES IN SCHOOLS
@@ -983,9 +972,12 @@ tables:
         display:
           numDecimalPlaces: 1
 
+      # ========================================================================
+      # Expenditure on education
+      # ========================================================================
       expenditure_on_education_as_a_percentage_of_total_government_expenditure__pct__xgovexp_imf:
         title: Expenditure on education as share of government spending
-        description_short: Percentage of total [general government](#dod:general-government) spending (across all sectors) that is allocated to education, across all levels.
+        description_short: Percentage of total [general government](#dod:general-government) spending (across all sectors) that is allocated to education.
         unit: "%"
         short_unit: "%"
         description_key:
@@ -998,28 +990,27 @@ tables:
           grapher_config: *grapher_config_expenditure_total
         display:
           numDecimalPlaces: 1
-
-      # ========================================================================
-      # Expenditure on education
-      # ========================================================================
+          name: Total across all levels of education
 
       government_expenditure_on_education_as_a_percentage_of_gdp__pct__xgdp_fsgov:
         title: Government spending on education as share of GDP
         unit: "% of GDP"
         short_unit: "%"
-        description_short: Total [general government](#dod:general-government) spending on all levels of education, given as a share of [gross domestic product](#dod:gdp).
+        description_short: Total annual [general government](#dod:general-government) spending on all levels of education, expressed as a percentage of [GDP](#dod:gdp).
         description_key: *desc_key_govt_expenditure_gdp_share
         presentation:
           title_public: Government spending on education as share of GDP
+          grapher_config: *grapher_config_expenditure_gdp
         display:
           numDecimalPlaces: 1
           name: Total across all levels of education
+          tolerance: *display_tolerance
 
       combined_expenditure_share_gdp:
         title: Public spending on education as a share of GDP (historical and recent)
         unit: "% of GDP"
         short_unit: "%"
-        description_short: Total [general government](#dod:general-government) spending on all levels of education, given as a share of [gross domestic product](#dod:gdp).
+        description_short: Total annual [general government](#dod:general-government) spending on all levels of education, expressed as a percentage of [GDP](#dod:gdp).
         description_key: *desc_key_govt_expenditure_gdp_share
         description_processing: |-
           **Historical expenditure data:**
@@ -1031,78 +1022,85 @@ tables:
           General government expenditure on education (current, capital, and transfers) is expressed as a percentage of GDP. It includes expenditure funded by transfers from international sources to government. General government usually refers to local, regional and central governments.
         presentation:
           title_public: Public spending on education as a share of GDP
-          grapher_config: *grapher_config_expenditure
+          grapher_config: *grapher_config_expenditure_gdp
         display:
           numDecimalPlaces: 1
           name: Total across all levels of education
+          tolerance: *display_tolerance
+
       # ========================================================================
       # GOVERNMENT EXPENDITURE IN CONSTANT PPP DOLLARS PER STUDENT (by education level)
       # ========================================================================
 
       initial_government_funding_per_pre_primary_student__constant_pppdollar__xunit_pppconst_02_fsgov_ffntr:
         title: Government spending on pre-primary education per student
-        description_short: Total [general government](#dod:general-government) spending on [pre-primary education](#dod:pre-primary-education) per student, expressed in constant [international-$](#dod:int_dollar_abbreviation).
+        description_short: Total annual [general government](#dod:general-government) spending on [pre-primary education](#dod:pre-primary-education) per student, expressed in constant [international-$](#dod:int_dollar_abbreviation).
         unit: "international-$"
         short_unit: "$"
         description_key: *desc_key_govt_expenditure_constant_ppp_per_student
         presentation:
           title_public: Government spending on pre-primary education per student (international-$)
-          grapher_config: *grapher_config_per_student_spending_preprimary
+          grapher_config: *grapher_config_per_student_spending
         display:
           numDecimalPlaces: 0
           name: Pre-primary
+          tolerance: *display_tolerance
 
       initial_government_funding_per_primary_student__constant_pppdollar__xunit_pppconst_1_fsgov_ffntr:
         title: Government spending on primary education per student
-        description_short: Total [general government](#dod:general-government) spending on [primary education](#dod:primary-education) per student, expressed in constant [international-$](#dod:int_dollar_abbreviation).
+        description_short: Total annual [general government](#dod:general-government) spending on [primary education](#dod:primary-education) per student, expressed in constant [international-$](#dod:int_dollar_abbreviation).
         unit: "international-$"
         short_unit: "$"
         description_key: *desc_key_govt_expenditure_constant_ppp_per_student
         presentation:
           title_public: Government spending on primary education per student (international-$)
-          grapher_config: *grapher_config_per_student_spending_primary
+          grapher_config: *grapher_config_per_student_spending
         display:
           numDecimalPlaces: 0
           name: Primary
+          tolerance: *display_tolerance
 
       initial_government_funding_per_lower_secondary_student__constant_pppdollar__xunit_pppconst_2_fsgov_ffntr:
         title: Government spending on lower secondary education per student
-        description_short: Total [general government](#dod:general-government) spending on [lower secondary education](#dod:lower-secondary-education) per student, expressed in constant [international-$](#dod:int_dollar_abbreviation).
+        description_short: Total annual [general government](#dod:general-government) spending on [lower secondary education](#dod:lower-secondary-education) per student, expressed in constant [international-$](#dod:int_dollar_abbreviation).
         unit: "international-$"
         short_unit: "$"
         description_key: *desc_key_govt_expenditure_constant_ppp_per_student
         presentation:
           title_public: Government spending on lower secondary education per student (international-$)
-          grapher_config: *grapher_config_per_student_spending_secondary
+          grapher_config: *grapher_config_per_student_spending
         display:
           numDecimalPlaces: 0
           name: Lower secondary
+          tolerance: *display_tolerance
 
       initial_government_funding_per_upper_secondary_student__constant_pppdollar__xunit_pppconst_3_fsgov_ffntr:
         title: Government spending on upper secondary education per student
-        description_short: Total [general government](#dod:general-government) spending on [upper secondary education](#dod:upper-secondary-education) per student, expressed in constant [international-$](#dod:int_dollar_abbreviation).
+        description_short: Total annual [general government](#dod:general-government) spending on [upper secondary education](#dod:upper-secondary-education) per student, expressed in constant [international-$](#dod:int_dollar_abbreviation).
         unit: "international-$"
         short_unit: "$"
         description_key: *desc_key_govt_expenditure_constant_ppp_per_student
         presentation:
           title_public: Government spending on upper secondary education per student (international-$)
-          grapher_config: *grapher_config_per_student_spending_secondary
+          grapher_config: *grapher_config_per_student_spending
         display:
           numDecimalPlaces: 0
           name: Upper secondary
+          tolerance: *display_tolerance
 
       initial_government_funding_per_tertiary_student__constant_pppdollar__xunit_pppconst_5t8_fsgov_ffntr:
         title: Government spending on tertiary education per student
-        description_short: Total [general government](#dod:general-government) spending on [tertiary education](#dod:tertiary-education) per student, expressed in constant [international-$](#dod:int_dollar_abbreviation).
+        description_short: Total annual [general government](#dod:general-government) spending on [tertiary education](#dod:tertiary-education) per student, expressed in constant [international-$](#dod:int_dollar_abbreviation).
         unit: "international-$"
         short_unit: "$"
         description_key: *desc_key_govt_expenditure_constant_ppp_per_student
         presentation:
           title_public: Government spending on tertiary education per student (international-$)
-          grapher_config: *grapher_config_per_student_spending_tertiary
+          grapher_config: *grapher_config_per_student_spending
         display:
           numDecimalPlaces: 0
           name: Tertiary
+          tolerance: *display_tolerance
 
       # ========================================================================
       # MINIMUM PROFICIENCY RATES - PREPARED FOR THE FUTURE (All Children)
@@ -1454,7 +1452,7 @@ tables:
 
       percentage_of_qualified_teachers_in_lower_secondary_education__both_sexes__pct__qutp_2:
         title: Percentage of qualified teachers in lower secondary education
-        description_short: Share of qualified teachers in [lower secondary education](#dod:lower-secondary-education) who have the minimum academic qualifications required to teach at that level in a given country.
+        description_short: Share of qualified teachers in [lower secondary education](#dod:lower-secondary-education) who meet the minimum academic qualifications required in the subject they teach at that level in a given country.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_qualified_teachers
@@ -1468,8 +1466,7 @@ tables:
 
       percentage_of_qualified_teachers_in_pre_primary_education__both_sexes__pct__qutp_02:
         title: Percentage of qualified teachers in pre-primary education
-        description_short: Share of qualified teachers in [pre-primary education](#dod:pre-primary-education) who have the minimum academic qualifications required to teach at that level in a given country.
-        unit: "%"
+        description_short: Share of qualified teachers in [pre-primary education](#dod:pre-primary-education) who meet the minimum academic qualifications required in the subject they teach at that level in a given country.
         short_unit: "%"
         description_key: *desc_key_qualified_teachers
         presentation:
@@ -1482,7 +1479,7 @@ tables:
 
       percentage_of_qualified_teachers_in_primary_education__both_sexes__pct__qutp_1:
         title: Percentage of qualified teachers in primary education
-        description_short: Share of qualified teachers in [primary education](#dod:primary-education) who have the minimum academic qualifications required to teach at that level in a given country.
+        description_short: Share of qualified teachers in [primary education](#dod:primary-education) who meet the minimum academic qualifications required in the subject they teach at that level in a given country.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_qualified_teachers
@@ -1496,7 +1493,7 @@ tables:
 
       percentage_of_qualified_teachers_in_upper_secondary_education__both_sexes__pct__qutp_3:
         title: Percentage of qualified teachers in upper secondary education
-        description_short: Share of qualified teachers in [upper secondary education](#dod:upper-secondary-education) who have the minimum academic qualifications required to teach at that level in a given country.
+        description_short: Share of qualified teachers in [upper secondary education](#dod:upper-secondary-education) who meet the minimum academic qualifications required in the subject they teach at that level in a given country.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_qualified_teachers

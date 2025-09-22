@@ -356,29 +356,12 @@ steps:
   data://grapher/aviation_safety_network/2024-06-05/aviation_statistics:
     - data://garden/aviation_safety_network/2024-06-05/aviation_statistics
 
-  # UN Regions
-  data://meadow/un/2024-06-24/sdg_regions:
-    - snapshot://un/2024-06-24/sdg_regions.csv
-  data://garden/un/2024-06-24/sdg_regions:
-    - data://meadow/un/2024-06-24/sdg_regions
-  data://grapher/un/2024-06-24/sdg_regions:
-    - data://garden/un/2024-06-24/sdg_regions
-
   # Homicide - OMM
   data://garden/homicide/2024-07-30/homicide_long_run_omm:
     - snapshot://fasttrack/2023-01-03/long_term_homicide_rates_in_europe.csv
     - data://garden/homicide/2025-08-06/who_mort_db
   data://grapher/homicide/2024-07-30/homicide_long_run_omm:
     - data://garden/homicide/2024-07-30/homicide_long_run_omm
-
-  # Ethnologue
-  data-private://meadow/language/2024-07-17/ethnologue:
-    - snapshot-private://language/2024-07-17/ethnologue.zip
-  data-private://garden/language/2024-07-17/ethnologue:
-    - data-private://meadow/language/2024-07-17/ethnologue
-    - data://garden/regions/2023-01-01/regions
-  data-private://grapher/language/2024-07-17/ethnologue:
-    - data-private://garden/language/2024-07-17/ethnologue
 
   # Child Mortality Estimates - UN IGME
   data://meadow/un/2025-03-25/igme:
@@ -663,10 +646,48 @@ steps:
   data://meadow/homicide/2025-08-06/who_mort_db:
     - snapshot://homicide/2025-08-06/who_mort_db.csv
   data://garden/homicide/2025-08-06/who_mort_db:
-    - data://garden/un/2024-07-12/un_wpp
+    - data://garden/un/2022-07-11/un_wpp
     - data://meadow/homicide/2025-08-06/who_mort_db
   data://grapher/homicide/2025-08-06/who_mort_db:
     - data://garden/homicide/2025-08-06/who_mort_db
+
+  # Ethnologue
+  data-private://meadow/language/2025-09-03/ethnologue:
+    - snapshot-private://language/2025-09-03/ethnologue.zip
+  data-private://garden/language/2025-09-03/ethnologue:
+    - data://garden/regions/2023-01-01/regions
+    - data-private://meadow/language/2025-09-03/ethnologue
+  data-private://grapher/language/2025-09-03/ethnologue:
+    - data-private://garden/language/2025-09-03/ethnologue
+
+  # World Development Indicators - WDI
+  data://meadow/worldbank_wdi/2025-09-08/wdi:
+    - snapshot://worldbank_wdi/2025-09-08/wdi.zip
+
+  data://garden/worldbank_wdi/2025-09-08/wdi:
+    - data://garden/regions/2023-01-01/regions
+    - data://meadow/worldbank_wdi/2025-09-08/wdi
+    - data://garden/wb/2025-07-01/income_groups
+    - data://garden/demography/2024-07-15/population
+    - snapshot://worldbank_wdi/2025-09-08/wdi.zip
+
+  data://grapher/worldbank_wdi/2025-09-08/wdi:
+    - data://garden/worldbank_wdi/2025-09-08/wdi
+
+  #
+  # IMF Trade Data - Regional
+  #
+  data://meadow/imf/2025-07-08/trade:
+    - snapshot://imf/2025-07-08/trade.csv
+  data://garden/imf/2025-07-08/trade:
+    - data://meadow/imf/2025-07-08/trade
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/worldbank_wdi/2025-01-24/wdi
+  data://grapher/imf/2025-07-08/trade:
+    - data://garden/imf/2025-07-08/trade
+
+ #
+
 
 include:
   - dag/open_numbers.yml
@@ -710,3 +731,5 @@ include:
   - dag/corruption.yml
   - dag/geography.yml
   - dag/growth.yml
+  - dag/labor.yml
+  - dag/economics.yml

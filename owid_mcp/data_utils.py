@@ -248,13 +248,22 @@ async def run_sql(query: str, max_rows: int = MAX_ROWS_DEFAULT) -> Dict[str, Any
                 # Extract column name from string like "['\"abc\"']"
                 column_name = error_msg[2:-2].strip("\"'")  # Remove ['"] and quotes
                 if column_name:
-                    raise ValueError(
+                    error_msg = (
                         f"SQL Error: Column '{column_name}' does not exist in the table. "
                         f"You can check columns with: SELECT column_name FROM information_schema.columns WHERE table_name = 'table_name';"
                     )
-
+                else:
+                    error_msg = f"SQL Query Error: {error_msg}"
             # For all other errors, just pass through the original message
-            raise ValueError(f"SQL Query Error: {error_msg}")
+            else:
+                error_msg = f"SQL Query Error: {error_msg}"
+
+            # Return error information in a structured way that LLM can understand
+            return {
+                "csv": "",
+                "source": datasette_json_url,
+                "error": error_msg,
+            }
 
         # Success - convert JSON to CSV format
         rows = json_data["rows"]
@@ -361,6 +370,51 @@ def build_rows(data_json: Dict[str, Any], entities_meta: Dict[int, Dict[str, str
     return rows
 
 
+def build_efficient_rows(data_json: Dict[str, Any], entities_meta: Dict[int, Dict[str, str]]) -> List[Dict[str, Any]]:
+    """Convert the compact OWID arrays into an efficient grouped format.
+
+    Returns a list of entities, each with years and values arrays:
+    [
+        {
+            "entity": "Africa (FAO)",
+            "years": [1961, 1962, 1963],
+            "values": [4191055, 4718410, 4248436]
+        },
+        ...
+    ]
+    """
+    values = data_json["values"]
+    years = data_json["years"]
+    entity_ids = data_json["entities"]
+
+    # Guard against length mismatch
+    if not (len(values) == len(years) == len(entity_ids)):
+        raise ValueError("Mismatched lengths in OWID data arrays")
+
+    # Group data by entity
+    entity_data: Dict[str, Dict[str, list]] = {}
+
+    for v, y, eid in zip(values, years, entity_ids):
+        meta = entities_meta.get(eid)
+        if meta is None:
+            # Skip unknown entity id (should not normally happen)
+            continue
+
+        entity_name = meta["name"]
+        if entity_name not in entity_data:
+            entity_data[entity_name] = {"years": [], "values": []}
+
+        entity_data[entity_name]["years"].append(y)
+        entity_data[entity_name]["values"].append(smart_round(v))
+
+    # Convert to list format
+    result = []
+    for entity_name, data in entity_data.items():
+        result.append({"entity": entity_name, "years": data["years"], "values": data["values"]})
+
+    return result
+
+
 async def fetch_json(url: str) -> Dict[str, Any]:
     """Fetch JSON data from a URL."""
     async with httpx.AsyncClient(timeout=HTTP_TIMEOUT) as client:
@@ -412,6 +466,6 @@ def build_catalog_info(catalog_path: str) -> Dict[str, str]:
     )
     return {
         "parquet_url": parquet_url,
-        "sql_template": sql_tpl,
+        "run_sql_template": sql_tpl,
         "column": column,
     }

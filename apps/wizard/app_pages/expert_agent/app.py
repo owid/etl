@@ -6,8 +6,10 @@ references:
 
 import json
 import time
+from datetime import datetime
 from typing import cast
 
+import pytz
 import streamlit as st
 from pydantic_core import to_json
 from structlog import get_logger
@@ -60,14 +62,14 @@ def show_usage(response_time: float):
         # st.markdown(st.session_state.last_usage)
         cost = estimate_llm_cost(
             model_name=st.session_state["expert_config"]["model_name"],
-            input_tokens=st.session_state.last_usage.request_tokens,
-            output_tokens=st.session_state.last_usage.response_tokens,
+            input_tokens=st.session_state.last_usage.input_tokens,
+            output_tokens=st.session_state.last_usage.output_tokens,
         )
 
         # Build message
         time_msg = f"{response_time:.2f}s"
-        num_tokens_in = st.session_state.last_usage.request_tokens
-        num_tokens_out = st.session_state.last_usage.response_tokens
+        num_tokens_in = st.session_state.last_usage.input_tokens
+        num_tokens_out = st.session_state.last_usage.output_tokens
         num_tokens = st.session_state.last_usage.total_tokens
         model_name = st.session_state["expert_config"]["model_name"]
         cost_msg = f"~{cost:.4f} USD"
@@ -109,18 +111,10 @@ def _load_history_messages():
     return messages
 
 
-# @st.fragment
-def show_reasoning_details():
-    with st.expander("**Reasoning details**", expanded=False, icon=":material/auto_awesome:"):
-        show_reasoning_details_dialog()
-    # btn = st.button("**Reasoning details**", icon=":material/auto_awesome:")
-    # if btn:
-    #     show_reasoning_details_dialog()
-
-
 # @st.dialog(title="**:material/auto_awesome: Reasoning details**", width="large",)
 def show_reasoning_details_dialog():
     messages = _load_history_messages()
+    # st.write(messages)
     num_parts = sum(len(message["parts"]) for message in messages)
     counter_parts = 0
     counter_questions = 0
@@ -138,6 +132,35 @@ def show_reasoning_details_dialog():
                 st.badge(f"Question {counter_questions}")
             with st.expander(title):
                 st.write(part)
+
+
+@st.fragment
+def show_debugging_details():
+    messages = _load_history_messages()
+    config = st.session_state.get("expert_config", {})
+    mcp_use = st.session_state.get("expert_use_mcp", None)
+    usage = st.session_state.get("last_usage", {})
+    if usage != {}:
+        usage = to_json(usage)
+        usage = json.loads(usage)
+
+    data = {
+        "model_config": config,
+        "mcp_use": mcp_use,
+        "num_messages": len(messages),
+        "messages": messages,
+        "usage": usage,
+    }
+    json_string = json.dumps(data)
+
+    st.download_button(
+        label="Download session (JSON)",
+        data=json_string,
+        file_name=f"session-expert-{datetime.now(pytz.utc).strftime('%Y%m%d_%H%M_%s')}.json",
+        mime="application/json",
+        icon=":material/download:",
+        help="Download the session data as a JSON file for debugging purposes.\n\n**:material/warning: This file contains your session chat history, model configuration, and usage statistics. Don't share this file with the public, as it may contain sensitive information.**",
+    )
 
 
 def register_message_history():
@@ -207,7 +230,7 @@ def show_settings_menu():
         st.session_state["expert_config"]["model_name"] = model_name
     st.toggle(
         label="Use OWID mcp",
-        value=False,
+        value=True,
         key="expert_use_mcp",
         help="Use MCPs to access and interact with OWID's data. :material/warning: Note: This feature is new, disable it if you are experiencing any issues.",
     )
@@ -246,20 +269,23 @@ def show_suggestions():
 ##################################################################
 # Title
 container = st.container(
-    horizontal=True, horizontal_alignment="left", vertical_alignment="center", width="stretch", border=False
+    horizontal=True, horizontal_alignment="left", vertical_alignment="bottom", width="stretch", border=False
 )
 with container:
     ## Title/subtitle
-    st.title(":rainbow[:material/smart_toy:] Expert")
+    with st.container():
+        st.title(":rainbow[:material/smart_toy:] Expert")
+        # st.caption("Expert can make mistakes")
     # st.badge("agent mode", color="primary")
     # Settings
+    st.badge("**beta** preview", color="orange")
     model_name = MODELS_DISPLAY.get(st.session_state.get("expert_model_name", MODEL_DEFAULT))
     with st.popover(f"{model_name}", icon=":material/settings:", help="Model settings"):
         show_settings_menu()
 
 # Arrange chat input
 prompt = st.chat_input(
-    placeholder="Ask anything",
+    placeholder="Ask anything. Expert can make mistakes.",
 )
 
 if st.session_state["recommended_question"]:
@@ -278,10 +304,10 @@ if prompt:
     # Display assistant response in chat message container
     with st.chat_message("assistant"):
         # Notify user that agent is working
-        st.toast(
-            f"Agent working, model {st.session_state['expert_config']['model_name']}...",
-            icon=":material/smart_toy:",
-        )
+        # st.toast(
+        #     f"**Agent working**: `{st.session_state['expert_config']['model_name']}`...",
+        #     icon=":material/smart_toy:",
+        # )
         start_time = time.time()
 
         # Agent to work, and stream its output
@@ -307,7 +333,17 @@ if prompt:
         if "agent_result" in st.session_state:
             ## Agent execution details
             with container_summary:
-                show_reasoning_details()
+                container_buttons = st.container(
+                    horizontal=True, vertical_alignment="bottom", horizontal_alignment="distribute"
+                )
+                with container_buttons:
+                    with st.popover(
+                        "**Reasoning details**",
+                        icon=":material/auto_awesome:",
+                        width="stretch",
+                    ):
+                        show_reasoning_details_dialog()
+                    show_debugging_details()
             ## Add messages to history
             register_message_history()
 

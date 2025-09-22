@@ -8,12 +8,14 @@ from unittest.mock import mock_open, patch
 
 import numpy as np
 import pandas as pd
+import pytest
 from owid.catalog import Dataset, Table
 from owid.datautils import dataframes
 from pytest import warns
 from structlog.testing import capture_logs
 
 from etl.data_helpers import geo
+from etl.paths import LATEST_REGIONS_DATASET_PATH
 
 mock_countries = {
     "country_02": "Country 2",
@@ -813,11 +815,24 @@ class MockRegionsDataset:
             {
                 "code": ["OWID_EUR", "BLR", "FRA", "ITA", "RUS", "ESP", "OWID_USS"],
                 "name": ["Europe", "Belarus", "France", "Italy", "Russia", "Spain", "USSR"],
+                "region_type": [
+                    "continent",
+                    "country",
+                    "country",
+                    "country",
+                    "country",
+                    "country",
+                    "country",
+                ],
+                "is_historical": [False, False, False, False, False, False, True],
                 "members": ['["BLR", "FRA", "ITA", "RUS", "ESP", "OWID_USS"]', "[]", "[]", "[]", "[]", "[]", "[]"],
                 "successors": ["[]", "[]", "[]", "[]", "[]", "[]", '["BLR", "RUS"]'],
             }
         ).set_index("code")
         return mock_tb_regions
+
+    def read(self, name: str) -> Table:
+        return self.__getitem__(name)
 
 
 class MockIncomeGroupsDataset:
@@ -856,6 +871,9 @@ class MockIncomeGroupsDataset:
             return mock_tb_income_groups_latest
         else:
             raise KeyError(f"Table {name} not found.")
+
+    def read(self, name: str) -> Table:
+        return self.__getitem__(name)
 
 
 ds_regions = cast(Dataset, MockRegionsDataset())
@@ -1564,3 +1582,1466 @@ class TestAddRegionsToTable(unittest.TestCase):
             .reset_index(drop=True)
         )
         assert tb_out.equals(tb_expected)
+
+
+class MockComplexRegionsDataset:
+    """Mock dataset for testing complex region scenarios including circular dependencies."""
+
+    def __init__(self, with_circular_dependency=False, with_deep_nesting=False):
+        self.with_circular_dependency = with_circular_dependency
+        self.with_deep_nesting = with_deep_nesting
+
+    def __getitem__(self, name: str) -> Table:
+        if self.with_circular_dependency:
+            # Create a scenario with circular dependency: A includes B, B includes A
+            mock_tb_regions = Table(
+                {
+                    "code": ["FRA", "DEU", "REG_A", "REG_B", "WORLD"],
+                    "name": ["France", "Germany", "Region A", "Region B", "World"],
+                    "region_type": ["country", "country", "region", "region", "region"],
+                    "is_historical": [False, False, False, False, False],
+                    "members": [
+                        "[]",
+                        "[]",
+                        '["FRA", "REG_B"]',  # Region A includes France and Region B
+                        '["DEU", "REG_A"]',  # Region B includes Germany and Region A (circular!)
+                        '["REG_A", "REG_B"]',
+                    ],
+                    "successors": ["[]", "[]", "[]", "[]", "[]"],
+                }
+            ).set_index("code")
+        elif self.with_deep_nesting:
+            # Create a scenario with multiple levels of nesting
+            mock_tb_regions = Table(
+                {
+                    "code": ["FRA", "DEU", "ITA", "ESP", "EU_WEST", "EU_SOUTH", "EUROPE", "WORLD"],
+                    "name": [
+                        "France",
+                        "Germany",
+                        "Italy",
+                        "Spain",
+                        "Western Europe",
+                        "Southern Europe",
+                        "Europe",
+                        "World",
+                    ],
+                    "region_type": ["country", "country", "country", "country", "region", "region", "region", "region"],
+                    "is_historical": [False, False, False, False, False, False, False, False],
+                    "members": [
+                        "[]",
+                        "[]",
+                        "[]",
+                        "[]",
+                        '["FRA", "DEU"]',  # Western Europe
+                        '["ITA", "ESP"]',  # Southern Europe
+                        '["EU_WEST", "EU_SOUTH"]',  # Europe includes Western and Southern Europe
+                        '["EUROPE"]',  # World includes Europe
+                    ],
+                    "successors": ["[]", "[]", "[]", "[]", "[]", "[]", "[]", "[]"],
+                }
+            ).set_index("code")
+        else:
+            # Standard test scenario without issues
+            mock_tb_regions = Table(
+                {
+                    "code": ["FRA", "DEU", "ITA", "ESP", "EUROPE", "WORLD"],
+                    "name": ["France", "Germany", "Italy", "Spain", "Europe", "World"],
+                    "region_type": ["country", "country", "country", "country", "region", "region"],
+                    "is_historical": [False, False, False, False, False, False],
+                    "members": [
+                        "[]",
+                        "[]",
+                        "[]",
+                        "[]",
+                        '["FRA", "DEU", "ITA", "ESP"]',  # Europe includes countries
+                        '["EUROPE"]',  # World includes Europe
+                    ],
+                    "successors": ["[]", "[]", "[]", "[]", "[]", "[]"],
+                }
+            ).set_index("code")
+        return mock_tb_regions
+
+    def read(self, name: str) -> Table:
+        return self.__getitem__(name)
+
+
+class TestCreateTableOfRegionsAndSubregions(unittest.TestCase):
+    @pytest.mark.integration
+    def test_regions_table_has_unique_members(self):
+        """Test that create_table_of_regions_and_subregions produces a table with unique members in each row."""
+        # Load the regions dataset
+        ds_regions = Dataset(LATEST_REGIONS_DATASET_PATH)
+
+        # Create the regions table
+        tb_regions = geo.create_table_of_regions_and_subregions(ds_regions=ds_regions)
+
+        # Check each row for duplicate members
+        duplicate_info = []
+        for idx, row in tb_regions.iterrows():
+            region = row.name if hasattr(row, "name") else idx
+            members = row["members"]
+
+            if members is not None and isinstance(members, list):
+                # Check for duplicates within this row's members list
+                seen = set()
+                duplicates = []
+                for member in members:
+                    if member in seen:
+                        duplicates.append(member)
+                    seen.add(member)
+
+                if duplicates:
+                    duplicate_info.append(f"Region '{region}' has duplicate members: {duplicates}")
+
+        if duplicate_info:
+            self.fail("Found duplicate members within region rows:\n" + "\n".join(duplicate_info))
+
+        # If we get here, the test passed
+        self.assertTrue(True, "All members are unique within each region")
+
+    def test_basic_unpack_subregions_false(self):
+        """Test create_table_of_regions_and_subregions with unpack_subregions=False (default behavior)."""
+        ds_regions = cast(Dataset, MockComplexRegionsDataset())
+
+        tb_result = geo.create_table_of_regions_and_subregions(ds_regions=ds_regions, unpack_subregions=False)
+
+        # Check that World includes Europe as a subregion (not unpacked)
+        world_members = tb_result.loc["World", "members"]
+        self.assertIn("Europe", world_members)
+        self.assertEqual(len(world_members), 1)  # Should only contain Europe
+
+        # Check that Europe includes countries
+        europe_members = tb_result.loc["Europe", "members"]
+        expected_countries = {"France", "Germany", "Italy", "Spain"}
+        self.assertEqual(set(europe_members), expected_countries)
+
+    def test_basic_unpack_subregions_true(self):
+        """Test create_table_of_regions_and_subregions with unpack_subregions=True."""
+        ds_regions = cast(Dataset, MockComplexRegionsDataset())
+
+        tb_result = geo.create_table_of_regions_and_subregions(ds_regions=ds_regions, unpack_subregions=True)
+
+        # Check that World now includes all European countries (Europe is unpacked)
+        world_members = tb_result.loc["World", "members"]
+        expected_countries = {"France", "Germany", "Italy", "Spain"}
+        self.assertEqual(set(world_members), expected_countries)
+
+        # Europe should still include the same countries
+        europe_members = tb_result.loc["Europe", "members"]
+        self.assertEqual(set(europe_members), expected_countries)
+
+    def test_deep_nesting_unpack_subregions(self):
+        """Test unpacking with multiple levels of nested subregions."""
+        ds_regions = cast(Dataset, MockComplexRegionsDataset(with_deep_nesting=True))
+
+        tb_result = geo.create_table_of_regions_and_subregions(ds_regions=ds_regions, unpack_subregions=True)
+
+        # Check that World ultimately includes all countries
+        world_members = tb_result.loc["World", "members"]
+        expected_countries = {"France", "Germany", "Italy", "Spain"}
+        self.assertEqual(set(world_members), expected_countries)
+
+        # Check that Europe includes all countries from its subregions
+        europe_members = tb_result.loc["Europe", "members"]
+        self.assertEqual(set(europe_members), expected_countries)
+
+        # Check that Western Europe includes its specific countries
+        western_europe_members = tb_result.loc["Western Europe", "members"]
+        expected_western = {"France", "Germany"}
+        self.assertEqual(set(western_europe_members), expected_western)
+
+        # Check that Southern Europe includes its specific countries
+        southern_europe_members = tb_result.loc["Southern Europe", "members"]
+        expected_southern = {"Italy", "Spain"}
+        self.assertEqual(set(southern_europe_members), expected_southern)
+
+    def test_circular_dependency_raises_error(self):
+        """Test that circular dependencies raise an error when unpacking subregions."""
+        ds_regions = cast(Dataset, MockComplexRegionsDataset(with_circular_dependency=True))
+
+        # Should raise ValueError due to circular dependency
+        with self.assertRaises(ValueError) as context:
+            geo.create_table_of_regions_and_subregions(ds_regions=ds_regions, unpack_subregions=True)
+
+        # Check that the error message mentions circular dependencies
+        self.assertIn("circular dependencies", str(context.exception))
+
+    def test_circular_dependency_works_without_unpacking(self):
+        """Test that circular dependencies don't cause issues when unpack_subregions=False."""
+        ds_regions = cast(Dataset, MockComplexRegionsDataset(with_circular_dependency=True))
+
+        # Should not raise an error when not unpacking
+        tb_result = geo.create_table_of_regions_and_subregions(ds_regions=ds_regions, unpack_subregions=False)
+
+        # Should have entries for all regions
+        expected_regions = {"Region A", "Region B", "World"}
+        actual_regions = set(tb_result.index)
+        self.assertTrue(expected_regions.issubset(actual_regions))
+
+        # Region A should include France and Region B (not unpacked)
+        region_a_members = tb_result.loc["Region A", "members"]
+        self.assertIn("France", region_a_members)
+        self.assertIn("Region B", region_a_members)
+
+        # Region B should include Germany and Region A (not unpacked)
+        region_b_members = tb_result.loc["Region B", "members"]
+        self.assertIn("Germany", region_b_members)
+        self.assertIn("Region A", region_b_members)
+
+    def test_successors_subregion_type(self):
+        """Test create_table_of_regions_and_subregions with subregion_type='successors'."""
+        ds_regions = cast(Dataset, MockRegionsDataset())
+
+        tb_result = geo.create_table_of_regions_and_subregions(
+            ds_regions=ds_regions, subregion_type="successors", unpack_subregions=False
+        )
+
+        # USSR should have successors Belarus and Russia
+        ussr_successors = tb_result.loc["USSR", "successors"]
+        expected_successors = {"Belarus", "Russia"}
+        self.assertEqual(set(ussr_successors), expected_successors)
+
+    def test_successors_with_unpack_subregions(self):
+        """Test successors with unpack_subregions=True."""
+        ds_regions = cast(Dataset, MockRegionsDataset())
+
+        tb_result = geo.create_table_of_regions_and_subregions(
+            ds_regions=ds_regions, subregion_type="successors", unpack_subregions=True
+        )
+
+        # USSR successors should still be Belarus and Russia (no further unpacking in our mock data)
+        ussr_successors = tb_result.loc["USSR", "successors"]
+        expected_successors = {"Belarus", "Russia"}
+        self.assertEqual(set(ussr_successors), expected_successors)
+
+    def test_empty_members_handling(self):
+        """Test that regions with empty members are handled correctly."""
+        ds_regions = cast(Dataset, MockComplexRegionsDataset())
+
+        tb_result = geo.create_table_of_regions_and_subregions(ds_regions=ds_regions, unpack_subregions=True)
+
+        # Countries should not appear in the result since they have empty members
+        country_names = {"France", "Germany", "Italy", "Spain"}
+        result_regions = set(tb_result.index)
+
+        # Countries with empty members should not be in the result
+        for country in country_names:
+            self.assertNotIn(country, result_regions)
+
+    def test_partial_nested_regions(self):
+        """Test scenario where some regions are nested and others are not."""
+
+        # Create a custom mock with mixed nesting
+        class MixedNestingDataset:
+            def __getitem__(self, name: str) -> Table:
+                mock_tb_regions = Table(
+                    {
+                        "code": ["USA", "CAN", "MEX", "FRA", "DEU", "NA", "EU", "WORLD"],
+                        "name": [
+                            "United States",
+                            "Canada",
+                            "Mexico",
+                            "France",
+                            "Germany",
+                            "North America",
+                            "Europe",
+                            "World",
+                        ],
+                        "region_type": [
+                            "country",
+                            "country",
+                            "country",
+                            "country",
+                            "country",
+                            "region",
+                            "region",
+                            "region",
+                        ],
+                        "is_historical": [False, False, False, False, False, False, False, False],
+                        "members": [
+                            "[]",
+                            "[]",
+                            "[]",
+                            "[]",
+                            "[]",
+                            '["USA", "CAN", "MEX"]',  # North America: only countries
+                            '["FRA", "DEU"]',  # Europe: only countries
+                            '["NA", "EU"]',  # World: includes regions
+                        ],
+                        "successors": ["[]", "[]", "[]", "[]", "[]", "[]", "[]", "[]"],
+                    }
+                ).set_index("code")
+                return mock_tb_regions
+
+            def read(self, name: str) -> Table:
+                return self.__getitem__(name)
+
+        ds_regions = cast(Dataset, MixedNestingDataset())
+
+        tb_result = geo.create_table_of_regions_and_subregions(ds_regions=ds_regions, unpack_subregions=True)
+
+        # World should include all countries from both North America and Europe
+        world_members = tb_result.loc["World", "members"]
+        expected_countries = {"United States", "Canada", "Mexico", "France", "Germany"}
+        self.assertEqual(set(world_members), expected_countries)
+
+        # Individual regions should maintain their original members
+        na_members = tb_result.loc["North America", "members"]
+        expected_na = {"United States", "Canada", "Mexico"}
+        self.assertEqual(set(na_members), expected_na)
+
+        eu_members = tb_result.loc["Europe", "members"]
+        expected_eu = {"France", "Germany"}
+        self.assertEqual(set(eu_members), expected_eu)
+
+    def test_self_referencing_region_error(self):
+        """Test that a region that includes itself raises an error."""
+
+        class SelfReferencingDataset:
+            def __getitem__(self, name: str) -> Table:
+                mock_tb_regions = Table(
+                    {
+                        "code": ["FRA", "WEIRD_REGION"],
+                        "name": ["France", "Weird Region"],
+                        "region_type": ["country", "region"],
+                        "is_historical": [False, False],
+                        "members": [
+                            "[]",
+                            '["FRA", "WEIRD_REGION"]',  # Region includes itself!
+                        ],
+                        "successors": ["[]", "[]"],
+                    }
+                ).set_index("code")
+                return mock_tb_regions
+
+            def read(self, name: str) -> Table:
+                return self.__getitem__(name)
+
+        ds_regions = cast(Dataset, SelfReferencingDataset())
+
+        # Should raise ValueError due to circular dependency
+        with self.assertRaises(ValueError) as context:
+            geo.create_table_of_regions_and_subregions(ds_regions=ds_regions, unpack_subregions=True)
+
+        self.assertIn("circular dependencies", str(context.exception))
+
+    def test_empty_region_members_with_unpacking(self):
+        """Test that entities with empty members are treated as terminal entities during unpacking."""
+
+        class EmptyRegionDataset:
+            def __getitem__(self, name: str) -> Table:
+                mock_tb_regions = Table(
+                    {
+                        "code": ["FRA", "EMPTY_REG", "WORLD"],
+                        "name": ["France", "Empty Region", "World"],
+                        "region_type": ["country", "region", "region"],
+                        "is_historical": [False, False, False],
+                        "members": [
+                            "[]",
+                            "[]",  # Empty region with no members (behaves like a country)
+                            '["FRA", "EMPTY_REG"]',
+                        ],
+                        "successors": ["[]", "[]", "[]"],
+                    }
+                ).set_index("code")
+                return mock_tb_regions
+
+            def read(self, name: str) -> Table:
+                return self.__getitem__(name)
+
+        ds_regions = cast(Dataset, EmptyRegionDataset())
+
+        tb_result = geo.create_table_of_regions_and_subregions(ds_regions=ds_regions, unpack_subregions=True)
+
+        # World should contain both France and Empty Region (both are terminal entities)
+        world_members = tb_result.loc["World", "members"]
+        expected_members = {"Empty Region", "France"}
+        self.assertEqual(set(world_members), expected_members)
+
+    def test_region_with_only_subregions_no_countries(self):
+        """Test a region that contains only other regions, no countries."""
+
+        class RegionOnlyDataset:
+            def __getitem__(self, name: str) -> Table:
+                mock_tb_regions = Table(
+                    {
+                        "code": ["FRA", "DEU", "EU", "MEGA_REG", "WORLD"],
+                        "name": ["France", "Germany", "Europe", "Mega Region", "World"],
+                        "region_type": ["country", "country", "region", "region", "region"],
+                        "is_historical": [False, False, False, False, False],
+                        "members": [
+                            "[]",
+                            "[]",
+                            '["FRA", "DEU"]',
+                            '["EU"]',  # Mega Region contains only Europe (no countries)
+                            '["MEGA_REG"]',
+                        ],
+                        "successors": ["[]", "[]", "[]", "[]", "[]"],
+                    }
+                ).set_index("code")
+                return mock_tb_regions
+
+            def read(self, name: str) -> Table:
+                return self.__getitem__(name)
+
+        ds_regions = cast(Dataset, RegionOnlyDataset())
+
+        tb_result = geo.create_table_of_regions_and_subregions(ds_regions=ds_regions, unpack_subregions=True)
+
+        # Mega Region should contain France and Germany (unpacked from Europe)
+        mega_reg_members = tb_result.loc["Mega Region", "members"]
+        expected_countries = {"France", "Germany"}
+        self.assertEqual(set(mega_reg_members), expected_countries)
+
+        # World should also contain France and Germany (unpacked from Mega Region -> Europe)
+        world_members = tb_result.loc["World", "members"]
+        self.assertEqual(set(world_members), expected_countries)
+
+    def test_no_regions_to_unpack(self):
+        """Test scenario where no regions need unpacking (all members are countries)."""
+
+        class CountriesOnlyDataset:
+            def __getitem__(self, name: str) -> Table:
+                mock_tb_regions = Table(
+                    {
+                        "code": ["FRA", "DEU", "EU"],
+                        "name": ["France", "Germany", "Europe"],
+                        "region_type": ["country", "country", "region"],
+                        "is_historical": [False, False, False],
+                        "members": [
+                            "[]",
+                            "[]",
+                            '["FRA", "DEU"]',  # Only countries, no subregions
+                        ],
+                        "successors": ["[]", "[]", "[]"],
+                    }
+                ).set_index("code")
+                return mock_tb_regions
+
+            def read(self, name: str) -> Table:
+                return self.__getitem__(name)
+
+        ds_regions = cast(Dataset, CountriesOnlyDataset())
+
+        # Both should work the same way since no unpacking is needed
+        tb_result_false = geo.create_table_of_regions_and_subregions(ds_regions=ds_regions, unpack_subregions=False)
+
+        tb_result_true = geo.create_table_of_regions_and_subregions(ds_regions=ds_regions, unpack_subregions=True)
+
+        # Both results should be identical
+        self.assertEqual(tb_result_false.loc["Europe", "members"], tb_result_true.loc["Europe", "members"])
+        expected_countries = {"France", "Germany"}
+        self.assertEqual(set(tb_result_true.loc["Europe", "members"]), expected_countries)
+
+    def test_complex_iteration_limit(self):
+        """Test that the iteration limit (10) is respected in complex scenarios."""
+
+        class DeepNestingDataset:
+            def __getitem__(self, name: str) -> Table:
+                # Create 12 levels of nesting to trigger the iteration limit
+                codes = ["BASE"]
+                names = ["Base"]
+                members_list = ["[]"]
+
+                for i in range(1, 12):  # Create 11 levels
+                    code = f"LEVEL_{i}"
+                    name = f"Level {i}"
+                    prev_code = codes[-1]
+
+                    codes.append(code)
+                    names.append(name)
+                    members_list.append(f'["{prev_code}"]')
+
+                mock_tb_regions = Table(
+                    {
+                        "code": codes,
+                        "name": names,
+                        "region_type": ["country"] + ["region"] * 11,
+                        "is_historical": [False] * 12,
+                        "members": members_list,
+                        "successors": ["[]"] * 12,
+                    }
+                ).set_index("code")
+                return mock_tb_regions
+
+            def read(self, name: str) -> Table:
+                return self.__getitem__(name)
+
+        ds_regions = cast(Dataset, DeepNestingDataset())
+
+        # Should complete successfully without hitting iteration limit
+        tb_result = geo.create_table_of_regions_and_subregions(ds_regions=ds_regions, unpack_subregions=True)
+
+        # The top level should contain the base country
+        top_level_members = tb_result.loc["Level 11", "members"]
+        self.assertEqual(top_level_members, ["Base"])
+
+    def test_invalid_json_in_members(self):
+        """Test handling of invalid JSON in the members field."""
+
+        class InvalidJSONDataset:
+            def __getitem__(self, name: str) -> Table:
+                mock_tb_regions = Table(
+                    {
+                        "code": ["FRA", "BAD_REG"],
+                        "name": ["France", "Bad Region"],
+                        "region_type": ["country", "region"],
+                        "is_historical": [False, False],
+                        "members": [
+                            "[]",
+                            "invalid json string",  # This will cause json.loads to fail
+                        ],
+                        "successors": ["[]", "[]"],
+                    }
+                ).set_index("code")
+                return mock_tb_regions
+
+            def read(self, name: str) -> Table:
+                return self.__getitem__(name)
+
+        ds_regions = cast(Dataset, InvalidJSONDataset())
+
+        # Should raise an error due to invalid JSON
+        with self.assertRaises(json.JSONDecodeError):
+            geo.create_table_of_regions_and_subregions(ds_regions=ds_regions, unpack_subregions=False)
+
+
+class MockPopulationDataset:
+    def __getitem__(self, name: str) -> Table:
+        return mock_population
+
+    def read(self, name: str) -> Table:
+        return self.__getitem__(name)
+
+
+class TestRegions(unittest.TestCase):
+    """Test the Regions class functionality."""
+
+    def setUp(self):
+        """Set up test fixtures for Regions tests."""
+        self.ds_regions = cast(Dataset, MockRegionsDataset())
+        self.ds_income_groups = cast(Dataset, MockIncomeGroupsDataset())
+        self.ds_population = cast(Dataset, MockPopulationDataset())
+
+    def test_regions_initialization_with_datasets(self):
+        """Test Regions initialization with provided datasets."""
+        regions = geo.Regions(
+            ds_regions=self.ds_regions,
+            ds_income_groups=self.ds_income_groups,
+            ds_population=self.ds_population,
+            auto_load_datasets=False,
+        )
+
+        # Test that datasets are properly stored
+        self.assertEqual(regions.ds_regions, self.ds_regions)
+        self.assertEqual(regions.ds_income_groups, self.ds_income_groups)
+        self.assertEqual(regions.ds_population, self.ds_population)
+
+    def test_regions_initialization_auto_load_false(self):
+        """Test Regions initialization without datasets when auto_load is False."""
+        # This should work but raise errors when trying to access datasets
+        regions = geo.Regions(auto_load_datasets=False)
+
+        # Accessing ds_regions should raise an error since no dataset was provided
+        with self.assertRaises(ValueError):
+            _ = regions.ds_regions
+
+    def test_get_region_continent(self):
+        """Test getting information about a continent region."""
+        regions = geo.Regions(
+            ds_regions=self.ds_regions,
+            ds_income_groups=self.ds_income_groups,
+            auto_load_datasets=False,
+        )
+
+        europe_info = regions.get_region("Europe")
+
+        # Check that it returns a dictionary with members
+        self.assertIsInstance(europe_info, dict)
+        self.assertIn("members", europe_info)
+        self.assertIsInstance(europe_info["members"], list)
+
+        # Europe should include Russia, France, Italy, Spain, Belarus
+        expected_members = {"Russia", "France", "Italy", "Spain", "Belarus"}
+        actual_members = set(europe_info["members"])
+        self.assertTrue(expected_members.issubset(actual_members))
+
+    def test_get_region_income_group(self):
+        """Test getting information about an income group region."""
+        regions = geo.Regions(
+            ds_regions=self.ds_regions,
+            ds_income_groups=self.ds_income_groups,
+            auto_load_datasets=False,
+        )
+
+        high_income_info = regions.get_region("High-income countries")
+
+        # Check that it returns a dictionary with members
+        self.assertIsInstance(high_income_info, dict)
+        self.assertIn("members", high_income_info)
+        self.assertIsInstance(high_income_info["members"], list)
+
+        # High-income countries should include France, Italy, Spain
+        expected_members = {"France", "Italy", "Spain"}
+        actual_members = set(high_income_info["members"])
+        self.assertTrue(expected_members.issubset(actual_members))
+
+    def test_get_regions_all(self):
+        """Test getting all regions."""
+        regions = geo.Regions(
+            ds_regions=self.ds_regions,
+            ds_income_groups=self.ds_income_groups,
+            auto_load_datasets=False,
+        )
+
+        all_regions = regions.get_regions()
+
+        # Should be a dictionary
+        self.assertIsInstance(all_regions, dict)
+
+        # Should contain both continents and income groups
+        self.assertIn("Europe", all_regions)
+        self.assertIn("High-income countries", all_regions)
+
+    def test_get_regions_only_members(self):
+        """Test getting regions with only_members=True."""
+        regions = geo.Regions(
+            ds_regions=self.ds_regions,
+            ds_income_groups=self.ds_income_groups,
+            auto_load_datasets=False,
+        )
+
+        regions_members = regions.get_regions(only_members=True)
+
+        # Should be a dictionary of lists
+        self.assertIsInstance(regions_members, dict)
+        for region_name, members in regions_members.items():
+            self.assertIsInstance(members, list)
+
+    def test_get_regions_specific_names(self):
+        """Test getting specific regions by name."""
+        regions = geo.Regions(
+            ds_regions=self.ds_regions,
+            ds_income_groups=self.ds_income_groups,
+            auto_load_datasets=False,
+        )
+
+        specific_regions = regions.get_regions(names=["Europe", "High-income countries"])
+
+        # Should contain only the requested regions
+        self.assertEqual(set(specific_regions.keys()), {"Europe", "High-income countries"})
+
+    def test_harmonize_names_file_not_exists(self):
+        """Test harmonize_names when countries file doesn't exist."""
+        regions = geo.Regions(
+            ds_regions=self.ds_regions,
+            countries_file="nonexistent_file.json",
+            auto_load_datasets=False,
+        )
+
+        tb = Table({"country": ["France", "Spain"], "year": [2020, 2020], "value": [1, 2]})
+
+        # Should raise ValueError when file doesn't exist
+        with self.assertRaises(ValueError):
+            regions.harmonize_names(tb)
+
+    @patch("builtins.open", new=mock_opens)
+    @patch("pathlib.Path.exists")
+    def test_harmonize_names_with_file(self, mock_exists):
+        """Test harmonize_names with existing countries file."""
+        mock_exists.return_value = True  # Mock file exists
+
+        regions = geo.Regions(
+            ds_regions=self.ds_regions,
+            countries_file="MOCK_COUNTRIES_FILE",
+            auto_load_datasets=False,
+        )
+
+        tb = Table({"country": ["country_02", "Country 1"], "year": [2020, 2020], "value": [1, 2]})
+
+        result = regions.harmonize_names(tb, warn_on_missing_countries=False, warn_on_unused_countries=False)
+
+        # country_02 should be harmonized to Country 2
+        expected_countries = ["Country 2", "Country 1"]
+        self.assertEqual(result["country"].tolist(), expected_countries)
+
+
+class TestRegionAggregator(unittest.TestCase):
+    """Test the RegionAggregator class functionality."""
+
+    def setUp(self):
+        """Set up test fixtures for RegionAggregator tests."""
+        self.ds_regions = cast(Dataset, MockRegionsDataset())
+        self.ds_income_groups = cast(Dataset, MockIncomeGroupsDataset())
+        self.ds_population = cast(Dataset, MockPopulationDataset())
+
+        # Sample data for testing
+        self.tb_sample = Table(
+            {
+                "country": ["France", "Italy", "Spain", "Russia", "Belarus"],
+                "year": [2020, 2020, 2020, 2020, 2020],
+                "population": [67, 60, 47, 146, 9],
+                "gdp": [2600, 2000, 1400, 1700, 60],
+            }
+        )
+
+        # Create regions all list (similar to what would be in the real implementation)
+        self.regions_all = [
+            "Europe",
+            "Asia",
+            "Africa",
+            "North America",
+            "South America",
+            "Oceania",
+            "World",
+            "High-income countries",
+            "Upper-middle-income countries",
+            "Lower-middle-income countries",
+            "Low-income countries",
+        ]
+
+    def test_aggregator_initialization(self):
+        """Test RegionAggregator initialization."""
+        aggregator = geo.RegionAggregator(
+            ds_regions=self.ds_regions,
+            regions_all=self.regions_all,
+            ds_income_groups=self.ds_income_groups,
+            ds_population=self.ds_population,
+        )
+
+        # Test basic properties
+        self.assertEqual(aggregator.ds_regions, self.ds_regions)
+        self.assertEqual(aggregator.ds_income_groups, self.ds_income_groups)
+        self.assertEqual(aggregator.ds_population, self.ds_population)
+        self.assertEqual(aggregator.country_col, "country")
+        self.assertEqual(aggregator.year_col, "year")
+        self.assertEqual(aggregator.index_columns, ["country", "year"])
+
+    def test_aggregator_initialization_with_custom_columns(self):
+        """Test RegionAggregator initialization with custom column names."""
+        aggregator = geo.RegionAggregator(
+            ds_regions=self.ds_regions,
+            regions_all=self.regions_all,
+            ds_income_groups=self.ds_income_groups,  # Add income groups to prevent auto-loading
+            country_col="location",
+            year_col="time",
+            index_columns=["location", "time", "category"],
+        )
+
+        self.assertEqual(aggregator.country_col, "location")
+        self.assertEqual(aggregator.year_col, "time")
+        self.assertEqual(aggregator.index_columns, ["location", "time", "category"])
+
+    def test_aggregator_with_regions_list(self):
+        """Test RegionAggregator with regions as a list."""
+        aggregator = geo.RegionAggregator(
+            ds_regions=self.ds_regions,
+            regions_all=self.regions_all,
+            regions=["Europe", "High-income countries"],
+            ds_income_groups=self.ds_income_groups,
+        )
+
+        # Should convert list to dict
+        expected_regions = {"Europe": {}, "High-income countries": {}}
+        self.assertEqual(aggregator.regions, expected_regions)
+
+    def test_aggregator_with_regions_dict(self):
+        """Test RegionAggregator with regions as a dictionary."""
+        custom_regions = {
+            "Europe": {"excluded_members": ["Russia"]},
+            "Custom Region": {"custom_members": ["France", "Spain"]},
+        }
+
+        aggregator = geo.RegionAggregator(
+            ds_regions=self.ds_regions,
+            regions_all=self.regions_all,
+            regions=custom_regions,
+            ds_income_groups=self.ds_income_groups,
+        )
+
+        self.assertEqual(aggregator.regions, custom_regions)
+
+    def test_add_aggregates_basic(self):
+        """Test basic add_aggregates functionality."""
+        aggregator = geo.RegionAggregator(
+            ds_regions=self.ds_regions,
+            regions_all=self.regions_all,
+            regions=["Europe"],
+            aggregations={"population": "sum", "gdp": "sum"},
+            ds_income_groups=self.ds_income_groups,
+        )
+
+        result = aggregator.add_aggregates(
+            self.tb_sample,
+            check_for_region_overlaps=False,
+        )
+
+        # Check that Europe aggregate was added
+        europe_data = result[result["country"] == "Europe"]
+        self.assertEqual(len(europe_data), 1)
+
+        # Europe should include France, Italy, Spain, Russia, Belarus
+        expected_population = 67 + 60 + 47 + 146 + 9  # 329
+        expected_gdp = 2600 + 2000 + 1400 + 1700 + 60  # 7760
+
+        self.assertEqual(europe_data["population"].iloc[0], expected_population)
+        self.assertEqual(europe_data["gdp"].iloc[0], expected_gdp)
+
+    def test_add_aggregates_with_income_groups(self):
+        """Test add_aggregates with income groups."""
+        aggregator = geo.RegionAggregator(
+            ds_regions=self.ds_regions,
+            regions_all=self.regions_all,
+            regions=["High-income countries"],
+            aggregations={"population": "sum", "gdp": "sum"},
+            ds_income_groups=self.ds_income_groups,
+        )
+
+        result = aggregator.add_aggregates(
+            self.tb_sample,
+            check_for_region_overlaps=False,
+        )
+
+        # Check that High-income countries aggregate was added
+        high_income_data = result[result["country"] == "High-income countries"]
+        self.assertEqual(len(high_income_data), 1)
+
+        # High-income countries should include France, Italy, Spain
+        expected_population = 67 + 60 + 47  # 174
+        expected_gdp = 2600 + 2000 + 1400  # 6000
+
+        self.assertEqual(high_income_data["population"].iloc[0], expected_population)
+        self.assertEqual(high_income_data["gdp"].iloc[0], expected_gdp)
+
+    def test_add_aggregates_with_nans(self):
+        """Test add_aggregates behavior with NaN values."""
+        # Create data with some NaN values
+        tb_with_nans = Table(
+            {
+                "country": ["France", "Italy", "Spain", "Russia"],
+                "year": [2020, 2020, 2020, 2020],
+                "population": [67, 60, np.nan, 146],
+                "gdp": [2600, np.nan, 1400, 1700],
+            }
+        )
+
+        aggregator = geo.RegionAggregator(
+            ds_regions=self.ds_regions,
+            regions_all=self.regions_all,
+            regions=["Europe"],
+            aggregations={"population": "sum", "gdp": "sum"},
+            ds_income_groups=self.ds_income_groups,
+        )
+
+        result = aggregator.add_aggregates(
+            tb_with_nans,
+            check_for_region_overlaps=False,
+        )
+
+        # Check that Europe aggregate handles NaNs correctly
+        europe_data = result[result["country"] == "Europe"]
+
+        # population should be 67 + 60 + 146 = 273 (Spain's NaN ignored)
+        # gdp should be 2600 + 1400 + 1700 = 5700 (Italy's NaN ignored)
+        self.assertEqual(europe_data["population"].iloc[0], 273)
+        self.assertEqual(europe_data["gdp"].iloc[0], 5700)
+
+    def test_add_aggregates_with_max_nans_constraint(self):
+        """Test add_aggregates with num_allowed_nans_per_year constraint."""
+        # Create data with many NaN values
+        tb_with_many_nans = Table(
+            {
+                "country": ["France", "Italy", "Spain", "Russia"],
+                "year": [2020, 2020, 2020, 2020],
+                "population": [67, np.nan, np.nan, np.nan],
+                "gdp": [2600, 2000, 1400, 1700],
+            }
+        )
+
+        aggregator = geo.RegionAggregator(
+            ds_regions=self.ds_regions,
+            regions_all=self.regions_all,
+            regions=["Europe"],
+            aggregations={"population": "sum", "gdp": "sum"},
+            ds_income_groups=self.ds_income_groups,
+        )
+
+        result = aggregator.add_aggregates(
+            tb_with_many_nans,
+            num_allowed_nans_per_year=1,  # Allow only 1 NaN
+            check_for_region_overlaps=False,
+        )
+
+        europe_data = result[result["country"] == "Europe"]
+
+        # population should be NaN (3 NaNs > 1 allowed)
+        # gdp should be the sum (0 NaNs <= 1 allowed)
+        self.assertTrue(pd.isna(europe_data["population"].iloc[0]))
+        self.assertEqual(europe_data["gdp"].iloc[0], 7700)
+
+    def test_add_aggregates_with_countries_that_must_have_data(self):
+        """Test add_aggregates with countries_that_must_have_data constraint."""
+        # Create data missing some key countries
+        tb_missing_countries = Table(
+            {
+                "country": ["France", "Italy"],  # Missing Spain
+                "year": [2020, 2020],
+                "population": [67, 60],
+                "gdp": [2600, 2000],
+            }
+        )
+
+        aggregator = geo.RegionAggregator(
+            ds_regions=self.ds_regions,
+            regions_all=self.regions_all,
+            regions=["Europe"],
+            aggregations={"population": "sum", "gdp": "sum"},
+            ds_income_groups=self.ds_income_groups,
+        )
+
+        result = aggregator.add_aggregates(
+            tb_missing_countries,
+            countries_that_must_have_data={"Europe": ["France", "Italy", "Spain"]},
+            check_for_region_overlaps=False,
+        )
+
+        europe_data = result[result["country"] == "Europe"]
+
+        # Should be NaN because Spain is missing
+        self.assertTrue(pd.isna(europe_data["population"].iloc[0]))
+        self.assertTrue(pd.isna(europe_data["gdp"].iloc[0]))
+
+    def test_countries_must_have_data_2(self):
+        """Test the specific bug from GitHub issue #3071 where countries_that_must_have_data
+        was not checked per column but globally."""
+        # Create test data where France has data in col_a but NaN in col_b for 2011
+        # Using countries that are actually in the mock Europe: Belarus, France, Italy, Russia, Spain
+        tb_test = Table(
+            {
+                "country": ["Belarus", "France", "Belarus", "France"],
+                "year": [2010, 2010, 2011, 2011],
+                "col_a": [1, 2, 3, 4],  # France has data in both years
+                "col_b": [1, 2, 5, None],  # France has NaN in 2011
+            }
+        )
+
+        aggregator = geo.RegionAggregator(
+            ds_regions=self.ds_regions,
+            regions_all=self.regions_all,
+            regions=["Europe"],
+            aggregations={"col_a": "sum", "col_b": "sum"},
+            ds_income_groups=self.ds_income_groups,
+        )
+
+        result = aggregator.add_aggregates(
+            tb_test,
+            countries_that_must_have_data={"Europe": ["France"]},
+            check_for_region_overlaps=False,
+        )
+
+        # Get Europe rows
+        europe_data = result[result["country"] == "Europe"].set_index("year").sort_index()
+
+        # For 2010: France has data in both columns, so Europe should have aggregates
+        self.assertFalse(pd.isna(europe_data.loc[2010, "col_a"]))  # Should be 3 (1+2)
+        self.assertFalse(pd.isna(europe_data.loc[2010, "col_b"]))  # Should be 3 (1+2)
+        self.assertEqual(europe_data.loc[2010, "col_a"], 3)
+        self.assertEqual(europe_data.loc[2010, "col_b"], 3)
+
+        # For 2011: France has data in col_a but NaN in col_b
+        # col_a should have aggregate (3+4=7), but col_b should be NaN
+        self.assertFalse(pd.isna(europe_data.loc[2011, "col_a"]))  # Should be 7 (3+4)
+        self.assertTrue(pd.isna(europe_data.loc[2011, "col_b"]))  # Should be NaN because France is NaN
+        self.assertEqual(europe_data.loc[2011, "col_a"], 7)
+
+    def test_countries_must_have_data_3(self):
+        """Test the hierarchical regions bug from GitHub issue #3071 where
+        World could have data even when Asia has no data due to China missing."""
+        # Create test data where China has no data, so Asia should have no data,
+        # and therefore World should have no data
+        tb_test = Table(
+            {
+                "country": ["Belarus", "France", "Italy"],  # Russia missing (which is in Europe)
+                "year": [2020, 2020, 2020],
+                "gdp": [100, 200, 300],
+            }
+        )
+
+        aggregator = geo.RegionAggregator(
+            ds_regions=self.ds_regions,
+            regions_all=self.regions_all,
+            regions=["Europe"],  # Just test Europe for simplicity
+            aggregations={"gdp": "sum"},
+            ds_income_groups=self.ds_income_groups,
+        )
+
+        result = aggregator.add_aggregates(
+            tb_test,
+            countries_that_must_have_data={
+                "Europe": ["Russia"],  # Europe requires Russia, but Russia is missing
+            },
+            check_for_region_overlaps=False,
+        )
+
+        # Get Europe row
+        europe_data = result[result["country"] == "Europe"]
+
+        # Europe should have NaN because Russia is missing
+        if not europe_data.empty:
+            self.assertTrue(pd.isna(europe_data.iloc[0]["gdp"]), "Europe should have NaN GDP because Russia is missing")
+
+    def test_countries_must_have_data_4(self):
+        """Test that countries_that_must_have_data correctly handles both
+        missing rows and NaN values for required countries."""
+        # Test case 1: Required country has no row at all
+        tb_no_row = Table(
+            {
+                "country": ["Belarus"],  # France completely missing
+                "year": [2020],
+                "gdp": [100],
+            }
+        )
+
+        # Test case 2: Required country has row but NaN value
+        tb_nan_value = Table(
+            {
+                "country": ["Belarus", "France"],
+                "year": [2020, 2020],
+                "gdp": [100, None],  # France has NaN
+            }
+        )
+
+        aggregator = geo.RegionAggregator(
+            ds_regions=self.ds_regions,
+            regions_all=self.regions_all,
+            regions=["Europe"],
+            aggregations={"gdp": "sum"},
+            ds_income_groups=self.ds_income_groups,
+        )
+
+        # Both cases should result in Europe having NaN
+        for tb_test, case_name in [(tb_no_row, "no_row"), (tb_nan_value, "nan_value")]:
+            with self.subTest(case=case_name):
+                result = aggregator.add_aggregates(
+                    tb_test,
+                    countries_that_must_have_data={"Europe": ["France"]},
+                    check_for_region_overlaps=False,
+                )
+
+                europe_data = result[result["country"] == "Europe"]
+                if not europe_data.empty:
+                    self.assertTrue(
+                        pd.isna(europe_data.iloc[0]["gdp"]),
+                        f"Europe should have NaN GDP in {case_name} case because France is required but missing/NaN",
+                    )
+
+    def test_add_per_capita_basic(self):
+        """Test basic add_per_capita functionality."""
+        aggregator = geo.RegionAggregator(
+            ds_regions=self.ds_regions,
+            regions_all=self.regions_all,
+            regions=["Europe"],
+            aggregations={"gdp": "sum"},
+            ds_income_groups=self.ds_income_groups,
+            ds_population=self.ds_population,
+        )
+
+        # Add aggregates first
+        tb_with_aggregates = aggregator.add_aggregates(
+            self.tb_sample,
+            check_for_region_overlaps=False,
+        )
+
+        # Then add per capita
+        result = aggregator.add_per_capita(
+            tb_with_aggregates,
+            columns=["gdp"],
+            warn_on_missing_countries=False,
+        )
+
+        # Check that per capita columns were added
+        self.assertIn("gdp_per_capita", result.columns)
+
+        # Check individual country per capita values
+        france_data = result[result["country"] == "France"]
+        expected_france_per_capita = 2600 / 67  # gdp / population
+        self.assertAlmostEqual(france_data["gdp_per_capita"].iloc[0], expected_france_per_capita, places=2)
+
+    def test_add_per_capita_with_informed_countries_only(self):
+        """Test add_per_capita with only_informed_countries_in_regions=True."""
+        # Create data where not all countries have data
+        tb_partial = Table(
+            {
+                "country": ["France", "Italy"],  # Missing Spain, Russia, Belarus
+                "year": [2020, 2020],
+                "population": [67, 60],
+                "gdp": [2600, 2000],
+            }
+        )
+
+        aggregator = geo.RegionAggregator(
+            ds_regions=self.ds_regions,
+            regions_all=self.regions_all,
+            regions=["Europe"],
+            aggregations={"gdp": "sum"},
+            ds_income_groups=self.ds_income_groups,
+            ds_population=self.ds_population,
+        )
+
+        # Add aggregates first
+        tb_with_aggregates = aggregator.add_aggregates(
+            tb_partial,
+            check_for_region_overlaps=False,
+        )
+
+        # Add per capita with informed countries only
+        result = aggregator.add_per_capita(
+            tb_with_aggregates,
+            columns=["gdp"],
+            only_informed_countries_in_regions=True,
+            warn_on_missing_countries=False,
+        )
+
+        # Europe per capita should be based only on France + Italy population
+        europe_data = result[result["country"] == "Europe"]
+        expected_per_capita = (2600 + 2000) / (67 + 60)  # Only informed countries
+        self.assertAlmostEqual(europe_data["gdp_per_capita"].iloc[0], expected_per_capita, places=2)
+
+    def test_add_per_capita_custom_suffix(self):
+        """Test add_per_capita with custom prefix and suffix."""
+        aggregator = geo.RegionAggregator(
+            ds_regions=self.ds_regions,
+            regions_all=self.regions_all,
+            regions=["Europe"],
+            ds_income_groups=self.ds_income_groups,
+            ds_population=self.ds_population,
+        )
+
+        result = aggregator.add_per_capita(
+            self.tb_sample,
+            columns=["gdp"],
+            prefix="avg_",
+            suffix="_per_person",
+            only_informed_countries_in_regions=False,  # Disable to avoid empty dataframe issue
+            warn_on_missing_countries=False,
+        )
+
+        # Check that custom column name was created
+        self.assertIn("avg_gdp_per_person", result.columns)
+        self.assertNotIn("gdp_per_capita", result.columns)
+
+    def test_inspect_overlaps_with_historical_regions(self):
+        """Test inspect_overlaps_with_historical_regions functionality."""
+        # Create data with overlapping historical region (USSR) and successor (Russia)
+        tb_with_overlap = Table(
+            {
+                "country": ["USSR", "Russia", "France"],
+                "year": [1990, 1990, 1990],  # Same year - should trigger overlap warning
+                "population": [290, 148, 56],
+                "gdp": [1000, 500, 1200],
+            }
+        )
+
+        aggregator = geo.RegionAggregator(
+            ds_regions=self.ds_regions,
+            regions_all=self.regions_all,
+            regions=["Europe"],
+            ds_income_groups=self.ds_income_groups,
+        )
+
+        # This should log a warning about the overlap
+        with capture_logs() as captured_logs:
+            aggregator.inspect_overlaps_with_historical_regions(tb_with_overlap)
+
+        # Should have a warning about overlap
+        self.assertTrue(any("overlap" in log.get("event", "").lower() for log in captured_logs))
+
+    def test_inspect_overlaps_with_accepted_overlaps(self):
+        """Test inspect_overlaps_with_historical_regions with accepted overlaps."""
+        # Create data with overlapping historical region (USSR) and successor (Russia)
+        tb_with_overlap = Table(
+            {
+                "country": ["USSR", "Russia", "France"],
+                "year": [1990, 1990, 1990],
+                "population": [290, 148, 56],
+                "gdp": [1000, 500, 1200],
+            }
+        )
+
+        aggregator = geo.RegionAggregator(
+            ds_regions=self.ds_regions,
+            regions_all=self.regions_all,
+            regions=["Europe"],
+            ds_income_groups=self.ds_income_groups,
+        )
+
+        # Define accepted overlaps
+        accepted_overlaps = [{1990: {"USSR", "Russia"}}]
+
+        # This should not log a warning since the overlap is accepted
+        with capture_logs() as captured_logs:
+            aggregator.inspect_overlaps_with_historical_regions(tb_with_overlap, accepted_overlaps=accepted_overlaps)
+
+        # Should not have warning about this specific overlap
+        overlap_warnings = [log for log in captured_logs if "unknown overlap" in log.get("event", "").lower()]
+        self.assertEqual(len(overlap_warnings), 0)
+
+    def test_add_aggregates_empty_dataframe_handling(self):
+        """Test add_aggregates handles empty DataFrames correctly (Bug #1 fix)."""
+        # Create data that has no countries matching any region
+        tb_no_matching_countries = Table(
+            {
+                "country": ["NonexistentCountry1", "NonexistentCountry2"],
+                "year": [2020, 2020],
+                "population": [100, 200],
+                "gdp": [1000, 2000],
+            }
+        )
+
+        aggregator = geo.RegionAggregator(
+            ds_regions=self.ds_regions,
+            regions_all=self.regions_all,
+            regions=["Europe"],  # Europe won't have any matching countries
+            aggregations={"population": "sum", "gdp": "sum"},
+            ds_income_groups=self.ds_income_groups,
+        )
+
+        # This should not crash even though no countries match the region
+        result = aggregator.add_aggregates(
+            tb_no_matching_countries,
+            check_for_region_overlaps=False,
+        )
+
+        # Result should contain the original data (no regions added)
+        self.assertEqual(len(result), 2)  # Original 2 rows
+        self.assertListEqual(result["country"].tolist(), ["NonexistentCountry1", "NonexistentCountry2"])
+
+        # No Europe should be in the result since no countries matched
+        self.assertNotIn("Europe", result["country"].tolist())
+
+    def test_add_aggregates_all_empty_regions(self):
+        """Test add_aggregates when all regions result in empty DataFrames."""
+        # Create data with countries but request regions that don't contain those countries
+        tb_mismatched = Table(
+            {
+                "country": ["France", "Italy"],
+                "year": [2020, 2020],
+                "population": [67, 60],
+                "gdp": [2600, 2000],
+            }
+        )
+
+        # Use regions that don't exist in our mock dataset or don't contain these countries
+        aggregator = geo.RegionAggregator(
+            ds_regions=self.ds_regions,
+            regions_all=self.regions_all,
+            regions=["NonexistentRegion"],  # This region doesn't exist
+            aggregations={"population": "sum", "gdp": "sum"},
+            ds_income_groups=self.ds_income_groups,
+        )
+
+        # This should not crash and should return the original data
+        result = aggregator.add_aggregates(
+            tb_mismatched,
+            check_for_region_overlaps=False,
+        )
+
+        # Should contain original data
+        self.assertEqual(len(result), 2)
+        self.assertListEqual(result["country"].tolist(), ["France", "Italy"])
+        self.assertNotIn("NonexistentRegion", result["country"].tolist())
+
+    def test_partial_aggregation_preserves_existing_data(self):
+        """Test that when adding aggregates for only some columns, existing data
+        for non-aggregated columns is preserved (not deleted)."""
+        # Create test data where Europe already exists with data for multiple columns
+        tb_with_existing_europe = Table(
+            {
+                "country": ["France", "Italy", "Europe", "Europe"],
+                "year": [2020, 2020, 2020, 2021],
+                "gdp": [100, 200, 999, 888],  # Europe already has GDP data that should be replaced
+                "population": [67, 60, 777, 666],  # Europe already has population data that should be preserved
+                "area": [551, 301, 555, 444],  # Europe already has area data that should be preserved
+            }
+        )
+
+        # Create aggregator that only aggregates GDP (not population or area)
+        aggregator = geo.RegionAggregator(
+            ds_regions=self.ds_regions,
+            regions_all=self.regions_all,
+            regions=["Europe"],
+            aggregations={"gdp": "sum"},  # Only aggregating GDP, not population or area
+            ds_income_groups=self.ds_income_groups,
+        )
+
+        result = aggregator.add_aggregates(
+            tb_with_existing_europe,
+            check_for_region_overlaps=False,
+        )
+
+        # Get Europe data
+        europe_data = result[result["country"] == "Europe"].set_index("year").sort_index()
+
+        # GDP should be replaced with new aggregates (France + Italy)
+        self.assertEqual(europe_data.loc[2020, "gdp"], 300)  # 100 + 200 (aggregated)
+
+        # Population and area should be preserved from original Europe data
+        self.assertEqual(europe_data.loc[2020, "population"], 777)  # Original preserved
+        self.assertEqual(europe_data.loc[2020, "area"], 555)  # Original preserved
+        self.assertEqual(europe_data.loc[2021, "population"], 666)  # Original preserved
+        self.assertEqual(europe_data.loc[2021, "area"], 444)  # Original preserved
+
+    def test_partial_aggregation_new_region_gets_nan_for_non_aggregated(self):
+        """Test that when adding aggregates for only some columns, new regions
+        get NaN for non-aggregated columns."""
+        # Create test data without any existing Europe data
+        tb_without_europe = Table(
+            {
+                "country": ["France", "Italy"],
+                "year": [2020, 2020],
+                "gdp": [100, 200],
+                "population": [67, 60],
+                "area": [551, 301],
+            }
+        )
+
+        # Create aggregator that only aggregates GDP
+        aggregator = geo.RegionAggregator(
+            ds_regions=self.ds_regions,
+            regions_all=self.regions_all,
+            regions=["Europe"],
+            aggregations={"gdp": "sum"},  # Only aggregating GDP
+            ds_income_groups=self.ds_income_groups,
+        )
+
+        result = aggregator.add_aggregates(
+            tb_without_europe,
+            check_for_region_overlaps=False,
+        )
+
+        # Get Europe data
+        europe_data = result[result["country"] == "Europe"]
+
+        # GDP should be aggregated (France + Italy)
+        self.assertEqual(europe_data.iloc[0]["gdp"], 300)  # 100 + 200
+
+        # Population and area should be NaN since no aggregation was defined and no original data existed
+        self.assertTrue(pd.isna(europe_data.iloc[0]["population"]))
+        self.assertTrue(pd.isna(europe_data.iloc[0]["area"]))
+
+    def test_partial_aggregation_mixed_scenarios(self):
+        """Test partial aggregation with mixed scenarios: some years have existing data, others don't."""
+        # Create test data where Europe exists for some years but not others
+        tb_mixed = Table(
+            {
+                "country": ["France", "Italy", "France", "Italy", "Europe"],
+                "year": [2020, 2020, 2021, 2021, 2021],  # Europe only exists in 2021
+                "gdp": [100, 200, 110, 210, 999],  # Europe has GDP in 2021 that should be replaced
+                "population": [67, 60, 68, 61, 777],  # Europe has population in 2021 that should be preserved
+            }
+        )
+
+        aggregator = geo.RegionAggregator(
+            ds_regions=self.ds_regions,
+            regions_all=self.regions_all,
+            regions=["Europe"],
+            aggregations={"gdp": "sum"},  # Only aggregating GDP
+            ds_income_groups=self.ds_income_groups,
+        )
+
+        result = aggregator.add_aggregates(
+            tb_mixed,
+            check_for_region_overlaps=False,
+        )
+
+        europe_data = result[result["country"] == "Europe"].set_index("year").sort_index()
+
+        # Both years should have aggregated GDP
+        self.assertEqual(europe_data.loc[2020, "gdp"], 300)  # 100 + 200 (new aggregate)
+        self.assertEqual(europe_data.loc[2021, "gdp"], 320)  # 110 + 210 (replaces 999)
+
+        # 2020 should have NaN population (no original data)
+        self.assertTrue(pd.isna(europe_data.loc[2020, "population"]))
+
+        # 2021 should preserve original population
+        self.assertEqual(europe_data.loc[2021, "population"], 777)
+
+    def test_full_aggregation_replaces_all_data(self):
+        """Test that when aggregating all columns, all existing region data is replaced."""
+        tb_with_existing_europe = Table(
+            {
+                "country": ["France", "Italy", "Europe"],
+                "year": [2020, 2020, 2020],
+                "gdp": [100, 200, 999],  # Should be replaced
+                "population": [67, 60, 777],  # Should be replaced
+            }
+        )
+
+        # Aggregate both columns
+        aggregator = geo.RegionAggregator(
+            ds_regions=self.ds_regions,
+            regions_all=self.regions_all,
+            regions=["Europe"],
+            aggregations={"gdp": "sum", "population": "sum"},  # Aggregating both columns
+            ds_income_groups=self.ds_income_groups,
+        )
+
+        result = aggregator.add_aggregates(
+            tb_with_existing_europe,
+            check_for_region_overlaps=False,
+        )
+
+        europe_data = result[result["country"] == "Europe"]
+
+        # Both columns should be replaced with aggregates
+        self.assertEqual(europe_data.iloc[0]["gdp"], 300)  # 100 + 200 (replaces 999)
+        self.assertEqual(europe_data.iloc[0]["population"], 127)  # 67 + 60 (replaces 777)
+
+    def test_partial_aggregation_improvement_over_old_behavior(self):
+        """Test that demonstrates the improvement over the old add_region_aggregates behavior.
+
+        Old behavior: When aggregating only some columns, existing data for non-aggregated
+        columns would be DELETED (causing data loss).
+
+        New behavior: Existing data for non-aggregated columns is PRESERVED.
+        """
+        # Scenario: Europe already exists with multiple types of data
+        tb_with_europe = Table(
+            {
+                "country": ["France", "Italy", "Europe"],
+                "year": [2020, 2020, 2020],
+                "gdp": [100, 200, 999],  # Will be replaced with aggregate
+                "population": [67, 60, 777],  # Should be preserved (old behavior: would be deleted!)
+                "area": [551, 301, 555],  # Should be preserved (old behavior: would be deleted!)
+                "life_expectancy": [82, 83, 88],  # Should be preserved (old behavior: would be deleted!)
+            }
+        )
+
+        # Only aggregate GDP, leave other columns as-is
+        aggregator = geo.RegionAggregator(
+            ds_regions=self.ds_regions,
+            regions_all=self.regions_all,
+            regions=["Europe"],
+            aggregations={"gdp": "sum"},  # Only GDP gets aggregated
+            ds_income_groups=self.ds_income_groups,
+        )
+
+        result = aggregator.add_aggregates(
+            tb_with_europe,
+            check_for_region_overlaps=False,
+        )
+
+        europe_data = result[result["country"] == "Europe"]
+
+        # GDP should be replaced with aggregated value
+        self.assertEqual(europe_data.iloc[0]["gdp"], 300)  # 100 + 200 (NEW aggregate)
+
+        # Other columns should preserve original Europe data (IMPROVEMENT!)
+        # In the old behavior, these would all become NaN, causing data loss
+        self.assertEqual(europe_data.iloc[0]["population"], 777)  # PRESERVED
+        self.assertEqual(europe_data.iloc[0]["area"], 555)  # PRESERVED
+        self.assertEqual(europe_data.iloc[0]["life_expectancy"], 88)  # PRESERVED
+
+        # Verify that individual country data is still present
+        individual_countries = result[result["country"].isin(["France", "Italy"])]
+        self.assertEqual(len(individual_countries), 2)  # Both countries still there
