@@ -26,12 +26,13 @@ You are the indicator-upgrader agent. Migrate chart indicators from an old datas
 ## High-level plan
 
 1. Resolve dataset IDs for the given `short_name` and branch.
-2. Check for unmapped variables used in charts.
-3. If unmapped variables found, stop and direct user to resolve via wizard.
-4. When user confirms mappings are done, run dry run of the upgrader.
-5. Apply the upgrade.
-6. Verify no charts still reference the old dataset and summarize results.
-7. Persist a JSON result to `workbench/<short_name>/indicator_upgrade.json` and print a final JSON block.
+2. Run automatic perfect matching between old and new dataset variables.
+3. Check for any remaining unmapped variables used in charts.
+4. If unmapped variables found, stop and direct user to resolve via wizard.
+5. When user confirms mappings are done, run dry run of the upgrader.
+6. Apply the upgrade.
+7. Verify no charts still reference the old dataset and summarize results.
+8. Persist a JSON result to `workbench/<short_name>/indicator_upgrade.json` and print a final JSON block.
 
 ## Step 1 - Resolve dataset IDs
 
@@ -53,9 +54,23 @@ Resolution rules
 * If fewer than 2 rows are returned, fail with a clear message.
 * Double check `catalogPath` looks like the expected new release path. If suspicious, print a warning but proceed.
 
-## Step 2 - Check for unmapped variables
+## Step 2 - Run automatic perfect matching
 
-Check if there are any old variables used in charts that lack a mapping entry:
+Run the CLI command to automatically create perfect matches between old and new dataset variables.
+
+```bash
+etl indicator-upgrade match --old-dataset-id [OLD_DATASET_ID] --new-dataset-id [NEW_DATASET_ID] --dry-run
+```
+
+Review the output and then run without --dry-run to apply the matches:
+
+```bash
+etl indicator-upgrade match --old-dataset-id [OLD_DATASET_ID] --new-dataset-id [NEW_DATASET_ID]
+```
+
+## Step 3 - Check for remaining unmapped variables
+
+Check if there are any old variables used in charts that still lack a mapping entry after perfect matching:
 
 ```sql
 mysql -h staging-site-[branch] -u owid --port 3306 -D owid -e "
@@ -70,7 +85,7 @@ LEFT JOIN wiz__variable_mapping vm ON v_old.id = vm.id_old
 WHERE vm.id_old IS NULL;"
 ```
 
-## Step 3 - Handle unmapped variables (conditional)
+## Step 4 - Handle remaining unmapped variables (conditional)
 
 **If unmapped_count > 0**:
 
@@ -99,7 +114,7 @@ ORDER BY v_old.name;"
 
 **If unmapped_count = 0**: Continue to next step.
 
-## Step 4 - Dry run
+## Step 5 - Dry run
 
 Preview changes using the CLI.
 
@@ -109,13 +124,13 @@ etl indicator-upgrade upgrade --dry-run
 
 Summarize planned chart updates in the agent output.
 
-## Step 5 - Apply upgrade
+## Step 6 - Apply upgrade
 
 ```bash
 etl indicator-upgrade upgrade
 ```
 
-## Step 6 - Verification
+## Step 7 - Verification
 
 Ensure no charts still reference the old dataset.
 
@@ -140,7 +155,7 @@ JOIN chart_dimensions cd ON v.id = cd.variableId
 WHERE v.datasetId = [NEW_DATASET_ID];
 ```
 
-## Step 7 - Output and persistence
+## Step 8 - Output and persistence
 
 At the end, write `workbench/<short_name>/indicator_upgrade.json` and print a fenced JSON block:
 
