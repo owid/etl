@@ -21,19 +21,17 @@ You are the indicator-upgrader agent. Migrate chart indicators from an old datas
 
 * Operate on staging, not production. Host must match `staging-site-<branch>`.
 * The new and old datasets share the same `shortName` and are not archived.
-* Python environment has access to `apps/wizard/app_pages/indicator_upgrade/charts_update.py`.
 * Never silently ignore errors. If something is missing, print a short diagnostic and exit.
 
 ## High-level plan
 
 1. Resolve dataset IDs for the given `short_name` and branch.
-2. Analyze indicator mappings: perfect matches, unmapped new, and unused old.
-3. Create or reuse `wiz__variable_mapping` and insert perfect matches.
-4. Emit a TODO list for manual mapping candidates.
-5. Run dry run of the upgrader and summarize impact.
-6. Apply the upgrade.
-7. Verify no charts still reference the old dataset and summarize results.
-8. Persist a JSON result to `workbench/<short_name>/indicator_upgrade.json` and print a final JSON block.
+2. Check for unmapped variables used in charts.
+3. If unmapped variables found, stop and direct user to resolve via wizard.
+4. When user confirms mappings are done, run dry run of the upgrader.
+5. Apply the upgrade.
+6. Verify no charts still reference the old dataset and summarize results.
+7. Persist a JSON result to `workbench/<short_name>/indicator_upgrade.json` and print a final JSON block.
 
 ## Step 1 - Resolve dataset IDs
 
@@ -55,131 +53,28 @@ Resolution rules
 * If fewer than 2 rows are returned, fail with a clear message.
 * Double check `catalogPath` looks like the expected new release path. If suspicious, print a warning but proceed.
 
-## Step 2 - Analyze indicator mappings
+## Step 2 - Check for unmapped variables
 
-Generate a mapping report that classifies variables into three buckets. Use case-insensitive name matching to increase perfect matches.
-
-```sql
-mysql -h staging-site-[branch] -u owid --port 3306 -D owid -e "
-SELECT
-  v_new.id AS new_id,
-  v_old.id AS old_id,
-  COALESCE(v_new.name, v_old.name) AS title
-FROM (
-  SELECT DISTINCT v.id, v.name
-  FROM variables v
-  INNER JOIN chart_dimensions cd ON v.id = cd.variableId
-  WHERE v.datasetId = [OLD_DATASET_ID]
-) v_old
-LEFT JOIN (
-  SELECT v.id, v.name
-  FROM variables v
-  WHERE v.datasetId = [NEW_DATASET_ID]
-) v_new ON LOWER(v_old.name) = LOWER(v_new.name)
-
-UNION
-
-SELECT
-  v_new.id AS new_id,
-  v_old.id AS old_id,
-  COALESCE(v_new.name, v_old.name) AS title
-FROM (
-  SELECT v.id, v.name
-  FROM variables v
-  WHERE v.datasetId = [NEW_DATASET_ID]
-) v_new
-LEFT JOIN (
-  SELECT DISTINCT v.id, v.name
-  FROM variables v
-  INNER JOIN chart_dimensions cd ON v.id = cd.variableId
-  WHERE v.datasetId = [OLD_DATASET_ID]
-) v_old ON LOWER(v_new.name) = LOWER(v_old.name)
-WHERE v_old.id IS NULL
-
-ORDER BY title;"
-```
-
-Interpretation
-
-* Perfect matches: `new_id` and `old_id` both not null.
-* Unmapped new: `old_id` is null.
-* Unused old: `new_id` is null.
-
-Also compute quick counts:
-
-```sql
--- number of old variables used in charts
-SELECT COUNT(DISTINCT v.id) AS old_used
-FROM variables v
-JOIN chart_dimensions cd ON v.id = cd.variableId
-WHERE v.datasetId = [OLD_DATASET_ID];
-
--- number of perfect name matches (case-insensitive)
-SELECT COUNT(*) AS perfect_matches FROM (
-  SELECT 1
-  FROM (
-    SELECT DISTINCT v.id, v.name
-    FROM variables v
-    JOIN chart_dimensions cd ON v.id = cd.variableId
-    WHERE v.datasetId = [OLD_DATASET_ID]
-  ) v_old
-  JOIN (
-    SELECT v.id, v.name
-    FROM variables v
-    WHERE v.datasetId = [NEW_DATASET_ID]
-  ) v_new ON LOWER(v_old.name) = LOWER(v_new.name)
-) t;
-```
-
-## Step 3 - Create mapping table if needed
-
-The table keeps history by timestamp so re-runs are safe.
+Check if there are any old variables used in charts that lack a mapping entry:
 
 ```sql
 mysql -h staging-site-[branch] -u owid --port 3306 -D owid -e "
-CREATE TABLE IF NOT EXISTS wiz__variable_mapping (
-  id_old INT NOT NULL,
-  id_new INT NOT NULL,
-  timestamp DATETIME NOT NULL,
-  dataset_id_old INT NOT NULL,
-  dataset_id_new INT NOT NULL,
-  comments TEXT,
-  PRIMARY KEY (id_old, timestamp),
-  INDEX idx_dataset_old (dataset_id_old),
-  INDEX idx_dataset_new (dataset_id_new)
-);"
-```
-
-## Step 4 - Insert perfect matches
-
-Use case-insensitive joins and mark comment accordingly.
-
-```sql
-mysql -h staging-site-[branch] -u owid --port 3306 -D owid -e "
-INSERT INTO wiz__variable_mapping (id_old, id_new, timestamp, dataset_id_old, dataset_id_new, comments)
-SELECT v_old.id AS id_old,
-       v_new.id AS id_new,
-       NOW() AS timestamp,
-       [OLD_DATASET_ID] AS dataset_id_old,
-       [NEW_DATASET_ID] AS dataset_id_new,
-       'Perfect name match (case-insensitive) - automated' AS comments
+SELECT COUNT(*) AS unmapped_count
 FROM (
-  SELECT DISTINCT v.id, v.name
+  SELECT DISTINCT v.id
   FROM variables v
   JOIN chart_dimensions cd ON v.id = cd.variableId
   WHERE v.datasetId = [OLD_DATASET_ID]
 ) v_old
-JOIN (
-  SELECT v.id, v.name
-  FROM variables v
-  WHERE v.datasetId = [NEW_DATASET_ID]
-) v_new ON LOWER(v_old.name) = LOWER(v_new.name);
-"
+LEFT JOIN wiz__variable_mapping vm ON v_old.id = vm.id_old
+WHERE vm.id_old IS NULL;"
 ```
 
-## Step 5 - Emit manual mapping candidates
+## Step 3 - Handle unmapped variables (conditional)
 
-List remaining old variables that still lack a mapping entry, sorted for easy review.
+**If unmapped_count > 0**:
+
+1. List the unmapped variables:
 
 ```sql
 mysql -h staging-site-[branch] -u owid --port 3306 -D owid -e "
@@ -195,23 +90,32 @@ WHERE vm.id_old IS NULL
 ORDER BY v_old.name;"
 ```
 
-## Step 6 - Dry run
+2. **STOP** and tell the user:
+   - "Found [N] unmapped variables that are used in charts"
+   - "Please run `make wizard` and use the Indicator Upgrade page to create variable mappings"
+   - "Reply 'done' when you have finished creating the mappings"
 
-Preview changes.
+3. **Wait for user confirmation**. Only proceed when user replies exactly "done" (case-insensitive).
+
+**If unmapped_count = 0**: Continue to next step.
+
+## Step 4 - Dry run
+
+Preview changes using the CLI.
 
 ```bash
-python apps/wizard/app_pages/indicator_upgrade/charts_update.py --dry-run
+etl indicator-upgrade upgrade --dry-run
 ```
 
 Summarize planned chart updates in the agent output.
 
-## Step 7 - Apply upgrade
+## Step 5 - Apply upgrade
 
 ```bash
-python apps/wizard/app_pages/indicator_upgrade/charts_update.py
+etl indicator-upgrade upgrade
 ```
 
-## Step 8 - Verification
+## Step 6 - Verification
 
 Ensure no charts still reference the old dataset.
 
@@ -236,7 +140,7 @@ JOIN chart_dimensions cd ON v.id = cd.variableId
 WHERE v.datasetId = [NEW_DATASET_ID];
 ```
 
-## Output and persistence
+## Step 7 - Output and persistence
 
 At the end, write `workbench/<short_name>/indicator_upgrade.json` and print a fenced JSON block:
 
@@ -246,7 +150,6 @@ At the end, write `workbench/<short_name>/indicator_upgrade.json` and print a fe
   "branch": "[branch]",
   "old_dataset_id": [OLD_DATASET_ID],
   "new_dataset_id": [NEW_DATASET_ID],
-  "perfect_matches_inserted": [N],
   "charts_updated": [K],
   "old_charts_remaining": 0,
   "status": "success"
@@ -257,12 +160,10 @@ Write a brief human summary above the JSON with:
 
 * Dataset short name, branch
 * Old id -> new id
-* Counts for perfect matches, total charts updated
+* Total charts updated
 * Followups if any
 
 ## Rules
 
-* No user prompts. Proceed automatically.
 * Be explicit about failures and how to fix them.
-* Never return empty tables as a workaround. If something cannot be mapped, surface it in the manual mapping list and stop after verification shows any remaining charts on the old dataset.
 * Keep messages concise and actionable.
