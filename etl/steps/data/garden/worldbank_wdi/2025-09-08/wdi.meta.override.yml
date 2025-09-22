@@ -1289,6 +1289,24 @@ tables:
           numDecimalPlaces: 1
           tolerance: 5
 
+      sl_emp_totl_sp_ma_zs:
+        title: Employment to population ratio, 15+, male (%) (modeled ILO estimate)
+        unit: "%"
+        short_unit: "%"
+        description_short: "{definitions.description_short_employment_to_population_ratio}"
+        description_key:
+          - "{definitions.employment}"
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+        display:
+          name: Male employment-to-population ratio
+          numDecimalPlaces: 1
+          tolerance: 5
+
       sl_emp_totl_sp_fe_zs:
         title: Employment to population ratio, 15+, female (%) (modeled ILO estimate)
         unit: "%"
