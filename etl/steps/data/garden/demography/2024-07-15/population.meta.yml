@@ -154,7 +154,7 @@ tables:
         title: |-
           {tables.population.variables.population.title} (historical)
         description_short: |-
-          Population by country, available from 10,000 BCE to 2023, based on data and estimates from different sources.
+          LOLOLOLO Population by country, available from 10,000 BCE to 2023, based on data and estimates from different sources.
         unit: "{tables.population.variables.population.unit}"
         display:
           name: Population
@@ -202,7 +202,7 @@ tables:
         title: |-
           {tables.population.variables.population.title} (projections)
         description_short: |-
-          Population by country, available from 10,000 BCE to 2023, based on data and estimates from different sources.
+          LOLALALA Population by country, available from 10,000 BCE to 2023, based on data and estimates from different sources.
         unit: "{tables.population.variables.population.unit}"
         display:
           numDecimalPlaces: 0
