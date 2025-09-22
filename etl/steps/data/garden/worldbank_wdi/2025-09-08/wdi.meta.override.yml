@@ -1108,7 +1108,7 @@ tables:
           topic_tags:
             - Work & Employment
         display:
-          name: Labor force participation rate, male
+          name: Male labor force participation rate
           numDecimalPlaces: 1
           tolerance: 5
 
@@ -1125,7 +1125,7 @@ tables:
           topic_tags:
             - Work & Employment
         display:
-          name: Labor force participation, female
+          name: Female labor force participation rate
           numDecimalPlaces: 1
           tolerance: 5
 
@@ -1159,7 +1159,7 @@ tables:
           topic_tags:
             - Work & Employment
         display:
-          name: Labor force participation rate, female
+          name: Female labor force participation rate
           numDecimalPlaces: 1
           tolerance: 5
 
@@ -1176,7 +1176,7 @@ tables:
           topic_tags:
             - Work & Employment
         display:
-          name: Labor force participation rate, female, ages 15-24
+          name: Female labor force participation rate, ages 15-24
           numDecimalPlaces: 1
           tolerance: 5
 
@@ -1210,7 +1210,7 @@ tables:
           topic_tags:
             - Work & Employment
         display:
-          name: Unemployment rate, male
+          name: Male unemployment rate
           numDecimalPlaces: 1
           tolerance: 5
 
@@ -1227,7 +1227,7 @@ tables:
           topic_tags:
             - Work & Employment
         display:
-          name: Unemployment rate, female
+          name: Female unemployment rate
           numDecimalPlaces: 1
           tolerance: 5
 
@@ -1297,7 +1297,7 @@ tables:
           topic_tags:
             - Work & Employment
         display:
-          name: Employment-to-population ratio, female
+          name: Female employment-to-population ratio
           numDecimalPlaces: 1
           tolerance: 5
 
@@ -1333,7 +1333,7 @@ tables:
           topic_tags:
             - Work & Employment
         display:
-          name: Employment-to-population ratio, female
+          name: Female employment-to-population ratio
           numDecimalPlaces: 1
           tolerance: 5
 
@@ -1460,7 +1460,7 @@ tables:
           topic_tags:
             - Work & Employment
         display:
-          name: Employment in agriculture, male
+          name: Male employment in agriculture
           numDecimalPlaces: 1
           tolerance: 5
 
@@ -1479,7 +1479,7 @@ tables:
           topic_tags:
             - Work & Employment
         display:
-          name: Employment in industry, male
+          name: Male employment in industry
           numDecimalPlaces: 1
           tolerance: 5
 
@@ -1498,7 +1498,7 @@ tables:
           topic_tags:
             - Work & Employment
         display:
-          name: Employment in services, male
+          name: Male employment in services
           numDecimalPlaces: 1
           tolerance: 5
 
@@ -1517,7 +1517,7 @@ tables:
           topic_tags:
             - Work & Employment
         display:
-          name: Employment in agriculture, female
+          name: Female employment in agriculture
           numDecimalPlaces: 1
           tolerance: 5
 
@@ -1536,7 +1536,7 @@ tables:
           topic_tags:
             - Work & Employment
         display:
-          name: Employment in industry, female
+          name: Female employment in industry
           numDecimalPlaces: 1
           tolerance: 5
 
@@ -1555,7 +1555,7 @@ tables:
           topic_tags:
             - Work & Employment
         display:
-          name: Employment in services, female
+          name: Female employment in services
           numDecimalPlaces: 1
           tolerance: 5
 
