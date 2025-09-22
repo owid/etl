@@ -470,6 +470,13 @@ tables:
           numDecimalPlaces: 1
           tolerance: 5
 
+  _8_3_1__sl_isv_ifem__non_agriculture__male:
+    variables:
+      _8_3_1__sl_isv_ifem__non_agriculture__male:
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+
   _8_3_1__sl_isv_ifem__agriculture__forestry_and_fishing__both_sexes:
     variables:
       _8_3_1__sl_isv_ifem__agriculture__forestry_and_fishing__both_sexes:
