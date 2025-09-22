@@ -1404,7 +1404,7 @@ tables:
           topic_tags:
             - Work & Employment
         display:
-          name: Male children in employment
+          name: Boys in employment
           numDecimalPlaces: 1
           tolerance: 5
       sl_tlf_0714_fe_zs:
@@ -1417,7 +1417,7 @@ tables:
           topic_tags:
             - Work & Employment
         display:
-          name: Female children in employment
+          name: Girls in employment
           numDecimalPlaces: 1
           tolerance: 5
 
