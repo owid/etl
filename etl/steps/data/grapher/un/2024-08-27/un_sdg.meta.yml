@@ -19,7 +19,7 @@ definitions:
   description_key_social_protection_children: |-
     This indicator is calculated as the ratio of children/households receiving child or family cash benefits to the total number of children/households with children.
   description_key_social_protection_employed_injury: |-
-    This indicator is calculated as the ratio of workers protected by injury insurance to total employment or the labour force.
+    This indicator is calculated as the ratio of workers protected by injury insurance to total employment or the labor force.
   description_key_social_protection_mothers: |-
     This indicator is calculated as the ratio of women receiving cash maternity benefits to women giving birth in the same year.
   description_key_social_protection_retired: |-

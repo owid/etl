@@ -57,7 +57,7 @@ definitions:
   icse_93: These statuses in employment are provided according to the [International Standard Classification of Status in Employment](https://ilostat.ilo.org/methods/concepts-and-definitions/classification-status-at-work/) (ICSE-93).
 
   description_short_labor_force_participation_rate: |-
-    The labour force participation rate is the labour force (all working-age persons employed and unemployed) divided by the working-age population.
+    The labor force participation rate is the labor force (all working-age persons employed and unemployed) divided by the working-age population.
   description_short_unemployment_rate: |-
     Share of the labor force without work, but available for and seeking employment.
   description_short_employment_to_population_ratio: |-
@@ -73,7 +73,7 @@ definitions:
   description_short_employment_services: |-
     Share of total employment working in the services sector.
   description_short_ratio_female_male_labor_force_participation_rate: |-
-    The labour force participation rate is the labour force (all working-age persons employed and unemployed) divided the working-age population. This ratio is the division of the female and male rates, expressed as a percentage.
+    The labor force participation rate is the labor force (all working-age persons employed and unemployed) divided the working-age population. This ratio is the division of the female and male rates, expressed as a percentage.
   description_short_children_in_employment: |-
     Share of children aged 7-14 years involved in economic activity for at least one hour in the reference week of the survey.
   description_short_children_in_employment_work_only: |-

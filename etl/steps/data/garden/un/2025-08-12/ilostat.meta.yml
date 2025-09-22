@@ -79,7 +79,7 @@ definitions:
     <%- elif classif1 == "Contingency: Children/households receiving child/family cash benefits" %>
       This indicator is calculated as the ratio of children/households receiving child or family cash benefits to the total number of children/households with children.
     <%- elif classif1 == "Contingency: Employed covered in the event of work injury" %>
-      This indicator is calculated as the ratio of workers protected by injury insurance to total employment or the labour force.
+      This indicator is calculated as the ratio of workers protected by injury insurance to total employment or the labor force.
     <%- elif classif1 == "Contingency: Mothers with newborns receiving maternity benefits" %>
       This indicator is calculated as the ratio of women receiving cash maternity benefits to women giving birth in the same year.
     <%- elif classif1 == "Contingency: Persons above retirement age receiving a pension" %>
@@ -180,7 +180,7 @@ tables:
         title: Labor force participation rate - <<sex>> - <<classif1>>
         unit: "%"
         short_unit: "%"
-        description_short: The labour force participation rate is the labour force (all working-age persons employed and unemployed) divided by the working-age population.
+        description_short: The labor force participation rate is the labor force (all working-age persons employed and unemployed) divided by the working-age population.
         description_key:
           - "{definitions.description_key_iloest_modelled_data}"
           - "{definitions.description_key_13th_icls}"
