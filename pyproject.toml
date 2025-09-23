@@ -77,6 +77,7 @@ dependencies = [
     "pydantic-ai>=1.0.6",
     "logfire[fastapi,httpx]>=4.3.3",
     "cfgrib>=0.9.15.0",
+    "metabase-api>=3.5.2",
 ]
 
 [tool.uv.sources]
