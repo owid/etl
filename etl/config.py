@@ -662,6 +662,9 @@ for env_var in env_vars:
 METABASE_API_KEY = os.environ.get("METABASE_API_KEY")
 METABASE_URL = os.environ.get("METABASE_URL")
 METABASE_SEMANTIC_LAYER_DATABASE_ID = 2
+METABASE_URL_LOCAL = "http://localhost:3000"
+METABASE_URL = "http://metabase.owid.io"
+
 ########################################################################################################################
 # While users don't have Metadata credentials, default to Datassette.
 FORCE_DATASETTE = (not METABASE_API_KEY) or (not METABASE_URL)
