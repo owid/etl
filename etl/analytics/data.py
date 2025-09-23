@@ -1,344 +1,32 @@
-"""Module for helper functions related to analytics (e.g. chart views).
+"""Functions to get analytics data, including specific answers."""
 
-TODO: We currently have many functions reading analytics (from MySQL and GBQ) in different places. We should gather those functions in this module. For example, Anomalist should read from this module.
-"""
-
-import json
-import re
-import urllib.error
-import urllib.parse
 from datetime import datetime
-from io import BytesIO
 from typing import List, Optional, Union
 
 import pandas as pd
-import requests
-from structlog import get_logger
 
-from etl.config import (
-    FORCE_DATASETTE,
-    METABASE_API_KEY,
-    METABASE_SEMANTIC_LAYER_DATABASE_ID,
-    METABASE_URL,
-    OWID_ENV,
+from etl.analytics.config import (
+    COMPONENT_TYPES_TO_LINK_GDOCS_WITH_VIEWS,
+    DATE_MAX,
+    DATE_MIN,
+    GRAPHERS_BASE_URL,
+    OWID_BASE_URL,
+    POST_LINK_TYPES_TO_URL,
+    POST_TYPE_TO_URL,
 )
-
-# Initialize logger.
-log = get_logger()
-
-# First day when we started collecting chart render views.
-DATE_MIN = "2024-11-01"
-# Current date.
-DATE_MAX = str(datetime.today().date())
-# Base url for Datasette csv queries.
-DATASETTE_URL = "http://analytics.owid.io"
-ANALYTICS_URL = f"{DATASETTE_URL}/analytics"
-ANALYTICS_CSV_URL = f"{ANALYTICS_URL}.csv"
-ANALYTICS_JSON_URL = f"{ANALYTICS_URL}.json"
-
-# Maximum number of rows that a single Datasette csv call can return.
-MAX_DATASETTE_N_ROWS = 10000
-
-# Base OWID URL, used to find views in articles and topic pages.
-OWID_BASE_URL = "https://ourworldindata.org/"
-
-# Base URL for grapher charts.
-GRAPHERS_BASE_URL = OWID_BASE_URL + "grapher/"
-
-# Complete list of component types in the posts_gdocs_links.
-# Each component type corresponds to a way in which a gdoc can be linked to another piece of content (e.g. a grapher chart, or an explorer).
-COMPONENT_TYPES_ALL = [
-    # Gdoc (usually of a topic page, but also possibly articles, e.g. https://ourworldindata.org/human-development-index ) cites a grapher chart as part of the all-charts block.
-    # NOTE: Only charts that are specifically cited as top charts will be included.
-    # To link gdocs of topic pages with charts that appear in the all-charts block, we need to use tags.
-    "all-charts",
-    # Gdoc (usually of an article) embeds a grapher chart.
-    "chart",
-    # Gdoc (only the SDG tracker) embeds grapher charts in a special story style.
-    "chart-story",
-    # Gdoc of homepage links to a few explorers (showing a thumbnail, no data).
-    "explorer-tiles",
-    # Gdoc of data insights cites the grapher-url in the metadata.
-    # We can use this field to connect data insights to the original grapher chart.
-    # NOTE: Not all data insights can be linked to a grapher chart (either because grapher-url is not defined, or because it uses a custom static visualization).
-    "front-matter",
-    # Gdoc of homepage cites other content (usually other gdocs).
-    "homepage-intro",
-    # Gdoc of homepage cites key indicators (usually grapher charts).
-    "key-indicator",
-    # Gdoc of a topic page cites key insights (usually grapher charts).
-    "key-insights",
-    # Gdoc (usually of an article) cites a narrative chart.
-    "narrative-chart",
-    # Gdoc of team page cites a person.
-    "person",
-    # Gdoc of homepage or author page cites topics to be shown in a "row of pills".
-    "pill-row",
-    # Gdoc (usually of articles) cites content (usually URLs, but also grapher charts) that appear in a special box.
-    # NOTE: When it's linked to a chart, the box displays a small thumbnail of the grapher chart.
-    "prominent-link",
-    # Gdoc (usually topic pages) cite other content (usually articles).
-    "research-and-writing",
-    # Gdoc (of any kind of content) cites a URL (usually an external URL, a grapher chart, or an explorer).
-    "span-link",
-    # Gdoc of a topic page cites other content (usually related topics).
-    "topic-page-intro",
-    # Gdoc (articles about our site, or data insights) cite a video.
-    "video",
-]
-# Component types to consider when linking gdocs with views (of charts, explorers, or narrative charts).
-COMPONENT_TYPES_TO_LINK_GDOCS_WITH_VIEWS = [
-    # NOTE: 'all-charts' only includes top charts in the all-charts block. To link charts with topic pages, we need to use tags.
-    # 'all-charts',
-    "chart",
-    "chart-story",
-    # 'explorer-tiles',
-    "front-matter",
-    # 'homepage-intro',
-    "key-indicator",
-    "key-insights",
-    "narrative-chart",
-    # 'person',
-    # 'pill-row',
-    # 'prominent-link',
-    # 'research-and-writing',
-    # NOTE: Grapher charts are often cited as URLs. It's unclear whether we want to count these references. But I'd say that in most cases, we'd prefer to ignore these. For example, when counting views of articles that use charts, we should count articles that display the chart, but not articles that simply cite the URL of the chart. Therefore, for now, ignore 'span-link'.
-    # 'span-link',
-    # 'topic-page-intro',
-    # 'video',
-]
-# Dictionary that maps the type of a gdoc post (as defined in the posts_gdocs DB table) to its base URL; adding the post's slug to this base URL gives the complete URL to the corresponding post.
-POST_TYPE_TO_URL = {
-    "about-page": OWID_BASE_URL,
-    "article": OWID_BASE_URL,
-    "author": f"{OWID_BASE_URL}team/",
-    "data-insight": f"{OWID_BASE_URL}data-insights/",
-    # Fragments are used just a handful of times, and seems to be used for data pages FAQ.
-    # It's not clear to me how to link them to specific posts, so, ignore them for now.
-    "fragment": None,
-    # Gdocs of type 'homepage' have an arbitrary slug "owid-homepage". They will be manually fixed later on.
-    "homepage": None,
-    "linear-topic-page": OWID_BASE_URL,
-    "topic-page": OWID_BASE_URL,
-}
-# Dictionary that maps a link type (as defined in the posts_gdocs_links DB table) to the base url; adding the target to this base url gives a full URL to the linked content (e.g. a grapher chart).
-POST_LINK_TYPES_TO_URL = {
-    "grapher": OWID_BASE_URL + "grapher/",
-    # Narrative charts, which don't have a public URL.
-    # They are handled separately.
-    "narrative-charts": OWID_BASE_URL + "grapher/",
-    "explorer": OWID_BASE_URL + "explorers/",
-    "gdoc": "https://docs.google.com/document/d/",
-    # A "url" link type links to an arbitrary URL.
-    # NOTE: In a handful of cases, there are links of type "url" and component type "chart". It's not clear to me why they are not of link types "grapher" with type "chart". But what's clear is that, when the link type is "grapher" the target corresponds to a slug, and when the link type is "url" the target is a full URL to a grapher chart. So, simply map these urls to their targets without modification.
-    "url": "",
-}
+from etl.analytics.datasette import read_datasette
+from etl.analytics.metabase import read_metabase
+from etl.analytics.utils import _safe_concat, log
+from etl.config import FORCE_DATASETTE, OWID_ENV
 
 
-class DatasetteSQLError(Exception):
-    """Exception raised when a Datasette SQL query fails with a clear error message."""
-
-    pass
-
-
-def _get_datasette_error_from_json(sql_url: str) -> str:
-    """Get error message from Datasette JSON endpoint."""
-    # Convert CSV URL to JSON URL
-    json_url = sql_url.replace(".csv?", ".json?")
-    response = requests.get(json_url, timeout=10)
-
-    # Try to parse JSON response regardless of status code
-    try:
-        data = response.json()
-        if not data.get("ok", True):
-            return data.get("error", "Unknown error")
-    except (ValueError, KeyError):
-        pass
-
-    return f"HTTP {response.status_code}: {response.reason}"
-
-
-def _try_to_execute_datasette_query(sql_url: str, warn: bool = False) -> pd.DataFrame:
-    try:
-        df = pd.read_csv(sql_url)
-        return df
-    except urllib.error.HTTPError as e:
-        if e.code == 414:
-            raise ValueError("HTTP 414: Query too long. Consider simplifying or batching the request.")
-        else:
-            # Get better error message from JSON endpoint
-            error_msg = _get_datasette_error_from_json(sql_url)
-            raise DatasetteSQLError(f"Datasette SQL Error: {error_msg}")
-    except pd.errors.EmptyDataError:
-        # Get better error message from JSON endpoint
-        error_msg = _get_datasette_error_from_json(sql_url)
-        raise DatasetteSQLError(f"Datasette SQL Error: {error_msg}")
-
-
-def clean_sql_query(sql: str) -> str:
-    """
-    Normalize an SQL string for use in Datasette URL queries.
-
-    Parameters
-    ----------
-    sql : str
-        SQL query to clean.
-    Returns
-    -------
-    str
-        Cleaned SQL query.
-
-    """
-    return " ".join(sql.strip().rstrip(";").split())
-
-
-def read_datasette(
-    sql: str,
-    datasette_csv_url: str = ANALYTICS_CSV_URL,
-    chunk_size: int = MAX_DATASETTE_N_ROWS,
-    use_https: bool = True,
-) -> pd.DataFrame:
-    """
-    Execute a query in the Datasette semantic layer.
-
-    Parameters
-    ----------
-    sql : str
-        SQL query to execute.
-    datasette_csv_url : str
-        URL of the Datasette CSV endpoint.
-    chunk_size : int
-        Number of rows to fetch in each chunk.
-        The default is 10,000 (which is the maximum number of rows that Datasette can return in a single request).
-        If the query contains a LIMIT clause, it should be smaller than chunk_size (otherwise, an error is raised).
-        If the query does not contain a LIMIT clause, the query is paginated using LIMIT and OFFSET.
-
-    Returns
-    -------
-    pd.DataFrame
-        DataFrame containing the results of the query.
-
-    """
-    if use_https:
-        datasette_csv_url = datasette_csv_url.replace("http://", "https://")
-
-    # Check if the query uses SQLite DATE() function instead of ISO date literals.
-    if re.search(r"\bDATE\s*\(", sql, re.IGNORECASE):
-        raise DatasetteSQLError(
-            "SQLite DATE() function is not supported in Datasette queries. "
-            "Use ISO date literals instead. Example: DATE '2025-01-01' - INTERVAL '1 year'"
-        )
-
-    # Check if the query contains a LIMIT clause.
-    limit_match = re.search(r"\bLIMIT\s+(\d+)(?:\s+OFFSET\s+(\d+))?\b", sql, re.IGNORECASE)
-
-    # Clean the query.
-    sql_clean = clean_sql_query(sql)
-
-    if limit_match:
-        # If a LIMIT clause already exists, check if it's larger than the limit.
-        limit_value = int(limit_match.group(1))
-        if limit_value > MAX_DATASETTE_N_ROWS:
-            raise DatasetteSQLError(
-                f"Query LIMIT ({limit_value}) exceeds Datasette's maximum row limit ({MAX_DATASETTE_N_ROWS}). Either use a lower value for the limit, or set no limit (and pagination will be used)."
-            )
-        else:
-            # Given that there is a LIMIT clause, and the value is small, execute the query as-is.
-            full_url = f"{datasette_csv_url}?" + urllib.parse.urlencode({"sql": sql_clean, "_size": "max"})
-            # Fetch data as a dataframe, or raise an error (e.g. if query is too long).
-            df = _try_to_execute_datasette_query(sql_url=full_url, warn=True)
-    else:
-        # If there is no LIMIT clause, paginate using LIMIT/OFFSET.
-        offset = 0
-        dfs = []
-        while True:
-            # Prepare query for this chunk.
-            full_url = f"{datasette_csv_url}?" + urllib.parse.urlencode(
-                {"sql": f"{sql_clean} LIMIT {chunk_size} OFFSET {offset}", "_size": "max"}
-            )
-            # Fetch data for current chunk.
-            df_chunk = _try_to_execute_datasette_query(sql_url=full_url)
-            if len(df_chunk) == chunk_size:
-                # Add data for current chunk to the list.
-                dfs.append(df_chunk)
-                # Update offset.
-                offset += chunk_size
-            else:
-                # If fewer rows than the maximum (or even zero rows) are fetched, this must be the last chunk.
-                dfs.append(df_chunk)
-                break
-
-        # Concatenate all chunks of data.
-        df = _safe_concat(dfs)
-
-    return df
-
-
-def read_metabase(sql: str, force_datasette: bool = FORCE_DATASETTE) -> pd.DataFrame:
-    """Retrieve data from the Metabase API using an arbitrary sql query.
-
-    NOTE: This function has been adapted from this example in the analytics repo:
-    https://github.com/owid/analytics/blob/main/tutorials/metabase_data_download.py
-
-    Parameters
-    ----------
-    sql : str
-        SQL query to execute.
-    force_datasette : bool, optional
-        If True, use Datasette instead of Metabase. This is a fallback if Metabase API credentials are not available.
-
-    Returns
-    -------
-    pd.DataFrame
-        DataFrame containing the results of the query.
-
-    """
-    # Prepare the header and body of the request to send to the Metabase API.
-    headers = {
-        "x-api-key": METABASE_API_KEY,
-        "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
-        "Accept": "application/json",
-    }
-    body = {
-        "query": {
-            # Database corresponding to the Semantic Layer (DuckDB).
-            "database": METABASE_SEMANTIC_LAYER_DATABASE_ID,
-            "type": "native",
-            "native": {"query": re.sub(r"\s+", " ", sql.strip())},
-        }
-    }
-
-    # Note (copied from Bobbie in the analytics repo):
-    # Despite the documentation (https://www.metabase.com/docs/latest/api#tag/apidataset/POST/api/dataset/{export-format}),
-    # I cannot get the /api/dataset/csv endpoint to work when sending a dict (or json.dumps(dict)) to the POST body,
-    # so I instead urlencode the body. The url encoding is a little awkward – we cannot simply use urllib.parse.urlencode(body)
-    # b/c python dict single quotes need to be changed to double quotes. But we can't naively change all single quotes to
-    # double quotes b/c the sql query might include single quotes (and DuckDB doesn't allow double quotes). So the line below
-    # executes the url encoding without replacing any quotes within the sql query.
-    urlencoded = "&".join([f"{k}={urllib.parse.quote_plus(json.dumps(v))}" for k, v in body.items()])
-
-    ####################################################################################################################
+def read_analytics(sql: str, force_datasette: bool = FORCE_DATASETTE):
     if force_datasette:
         log.warning(
             "Missing Metabase credentials. Add them to your .env file to avoid this warning. For now, Datasette will be used."
         )
         return read_datasette(sql=sql)
-    ####################################################################################################################
-
-    # Send request.
-    response = requests.post(
-        f"{METABASE_URL}/api/dataset/csv",
-        headers=headers,
-        data=urlencoded,
-        timeout=30,
-    )
-    if not response.ok:
-        raise RuntimeError(f"Metabase API request failed with status code {response.status_code}: {response.text}")
-
-    # Create a dataframe with the returned data.
-    df = pd.read_csv(BytesIO(response.content))
-
-    return df
+    return read_metabase(sql=sql)
 
 
 def get_number_of_days(
@@ -388,7 +76,7 @@ def get_number_of_days(
 
     # There is always a lag in analytics, so we need to find out the maximum date informed in the analytics data.
     query = f"SELECT MAX({day_column_name}) AS date_max FROM {table_name}"
-    date_max_informed = read_metabase(sql=query)["date_max"].item()
+    date_max_informed = read_analytics(sql=query)["date_max"].item()
     date_end = min(pd.to_datetime(date_max_informed), pd.to_datetime(date_max))
 
     if isinstance(date_start, pd.Series) or isinstance(date_end, pd.Series):
@@ -451,7 +139,7 @@ def get_chart_views_per_day_by_chart_id(
     GROUP BY c.chart_id, c.url, v.day
     ORDER BY c.chart_id, v.day ASC;
     """
-    df = read_metabase(sql=query)
+    df = read_analytics(sql=query)
 
     return df
 
@@ -502,7 +190,7 @@ def get_chart_views_by_chart_id(
     GROUP BY c.chart_id, c.url, c.published_at
     ORDER BY views DESC
     """
-    df_views = read_metabase(sql=query)
+    df_views = read_analytics(sql=query)
 
     # To calculate the average daily views, we need to figure out the number of days for which we are counting views.
     df_views["n_days"] = get_number_of_days(
@@ -620,7 +308,7 @@ def get_post_views_by_url(
     GROUP BY url
     ORDER BY views DESC
     """
-    df_views = read_metabase(sql=query)
+    df_views = read_analytics(sql=query)
 
     # To calculate the average daily views, we need to figure out the number of days for which we are counting views.
     df_views["n_days"] = get_number_of_days(
@@ -803,21 +491,6 @@ def get_topic_tags_for_chart_ids(
 
     # Execute query and construct a dataframe.
     df = OWID_ENV.read_sql(query)
-
-    return df
-
-
-def _safe_concat(dfs: List[pd.DataFrame]) -> pd.DataFrame:
-    """Concatenate DataFrames, ignoring empty ones."""
-    # Filter out empty DataFrames.
-    dfs_to_concat = [df_ for df_ in dfs if not df_.empty]
-    columns = list(dict.fromkeys(col for df_ in dfs for col in df_.columns))
-
-    # Concatenate only if there are non-empty DataFrames
-    if dfs_to_concat:
-        df = pd.concat(dfs_to_concat, ignore_index=True)
-    else:
-        df = pd.DataFrame(columns=columns)
 
     return df
 
