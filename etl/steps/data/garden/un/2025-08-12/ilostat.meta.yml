@@ -12,11 +12,13 @@ definitions:
 
   employment: Employment refers to all persons of working age who, during a specified brief period, were in paid employment or self-employment.
 
-  icse_93: This status in employment is provided according to the latest version of the International Standard Classification of Status in Employment (ICSE-93).
+  icse_93: This status in employment is provided according to the [International Standard Classification of Status in Employment](https://ilostat.ilo.org/methods/concepts-and-definitions/classification-status-at-work/) (ICSE-93).
 
   isco_08: This is based on the International Standard Classification of Occupations 2008 (ISCO-08). More information can be found in the [ISCO documentation](https://ilostat.ilo.org/methods/concepts-and-definitions/classification-occupation/).
 
   poverty_line_per_day: $2.15 per day
+
+  ppp_year: 2021
 
   description_key_status_in_employment: |-
     <% if classif1 == "Status in employment (ICSE-93): 1. Employees" %>
@@ -79,7 +81,7 @@ definitions:
     <%- elif classif1 == "Contingency: Children/households receiving child/family cash benefits" %>
       This indicator is calculated as the ratio of children/households receiving child or family cash benefits to the total number of children/households with children.
     <%- elif classif1 == "Contingency: Employed covered in the event of work injury" %>
-      This indicator is calculated as the ratio of workers protected by injury insurance to total employment or the labour force.
+      This indicator is calculated as the ratio of workers protected by injury insurance to total employment or the labor force.
     <%- elif classif1 == "Contingency: Mothers with newborns receiving maternity benefits" %>
       This indicator is calculated as the ratio of women receiving cash maternity benefits to women giving birth in the same year.
     <%- elif classif1 == "Contingency: Persons above retirement age receiving a pension" %>
@@ -116,6 +118,9 @@ definitions:
 
   description_processing_unreliable_data: |-
     We removed data points flagged as "unreliable" by the source (i.e. `obs_status = "U"` in the original data). These data points are likely to be inaccurate and misleading for analysis.
+
+  description_processing_avg_earnings_outliers: |-
+    We excluded observations where average hourly earnings were below 0.2 or above 100 international-$ in {definitions.ppp_year} prices. Such values are highly unlikely as national averages and are therefore probably the result of miscalculation.
 
   # This is the ID of the Google Doc that contains the FAQs
   gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
@@ -180,7 +185,7 @@ tables:
         title: Labor force participation rate - <<sex>> - <<classif1>>
         unit: "%"
         short_unit: "%"
-        description_short: The labour force participation rate is the labour force (all working-age persons employed and unemployed) divided the working-age population.
+        description_short: The labor force participation rate is the labor force (all working-age persons employed and unemployed) divided by the working-age population.
         description_key:
           - "{definitions.description_key_iloest_modelled_data}"
           - "{definitions.description_key_13th_icls}"
@@ -256,14 +261,17 @@ tables:
 
       average_hourly_earnings_employees_by_sex:
         title: Average hourly earnings of employees - <<sex>>
-        unit: international-$ in 2021 prices
+        unit: international-$ in {definitions.ppp_year} prices
         short_unit: $
         description_short: Gross remuneration for time worked or work done, vacation, and other types of paid leave.
         description_key:
           - "{definitions.description_key_earnings}"
           - "{definitions.description_key_international_dollars}"
         processing_level: major
-        description_processing: "{definitions.description_processing_unreliable_data}"
+        description_processing: |-
+          {definitions.description_processing_unreliable_data}
+
+          {definitions.description_processing_avg_earnings_outliers}
         presentation:
           faqs:
           - fragment_id: poverty-international-dollars
@@ -366,7 +374,7 @@ tables:
         description_processing: "{definitions.description_processing_unreliable_data}"
         display:
           name: Average hourly earnings of employees - <<sex>> - <<classif1>>
-          numDecimalPlaces: 1
+          numDecimalPlaces: 2
           <<: *common_display
 
       sdg_8_5_2_unemployment_rate:
@@ -485,7 +493,7 @@ tables:
           - "{definitions.description_key_national_strategy_youth_employment}"
         display:
           name: Existence of a developed and operationalized national strategy for youth employment
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
           <<: *common_display
 
       sdg_9_2_2_manufacturing_employment:

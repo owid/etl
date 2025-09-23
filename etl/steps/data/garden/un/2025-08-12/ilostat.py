@@ -21,6 +21,11 @@ RELEASE_YEAR = int(paths.version.split("-")[0])
 # Define threshold for percentage of unreliable data
 UNRELIABLE_THRESHOLD = 1
 
+# Define thresholds for outlier removal in specific indicators
+INDICATOR_THRESHOLDS = {
+    "average_hourly_earnings_employees_by_sex": [0.2, 100],
+}
+
 # Define columns to keep
 COLUMNS_TO_KEEP = [
     "ref_area",
@@ -211,6 +216,9 @@ def run() -> None:
         df=tb_regions, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
 
+    # Remove outliers in specific indicators
+    tb = remove_outliers_in_data(tb=tb)
+
     # Improve table format.
     tb = tb.format(["country", "year", "sex", "classif1"])
     tb_regions = tb_regions.format(["country", "year"], short_name="regions")
@@ -370,3 +378,21 @@ def html_to_markdown(text: str) -> str:
     md = h.handle(text).strip()
 
     return md or pd.NA
+
+
+def remove_outliers_in_data(tb: Table) -> Table:
+    """
+    Remove outliers in the data for a specific indicator based on a threshold.
+    """
+    tb = tb.copy()
+
+    for indicator, thresholds in INDICATOR_THRESHOLDS.items():
+        if indicator not in tb.columns:
+            log.warning(f"Indicator {indicator} not found in the table columns.")
+            continue
+
+        # Replace out-of-range values with missing (pd.NA)
+        mask = (tb[indicator] < thresholds[0]) | (tb[indicator] > thresholds[1])
+        tb.loc[mask, indicator] = pd.NA
+
+    return tb
