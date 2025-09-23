@@ -65,10 +65,10 @@ dimensions:
     choices:
       - slug: headcount_ratio
         name: Share in poverty
-        description: The share of the population living below the selected poverty line.
+        description: The share of the population living below the selected poverty line
       - slug: headcount
         name: Number in poverty
-        description: The number of people living below the selected poverty line.
+        description: The number of people living below the selected poverty line
       # - slug: total_shortfall
       #   name: Total shortfall from poverty line
       # - slug: avg_shortfall
@@ -110,7 +110,7 @@ dimensions:
         group: Individual poverty lines
       - slug: line_chart
         name: Line chart
-        description: See how poverty has changed over time using 4 different poverty lines
+        description: See how poverty has changed over time using four different poverty lines
         group: Visualize multiple poverty lines
       - slug: area_chart
         name: Area chart
@@ -122,7 +122,7 @@ dimensions:
         group: Visualize multiple poverty lines
       - slug: line_chart_more_lines
         name: Line chart (more lines)
-        description: See how poverty has changed over time using 8 different poverty lines
+        description: See how poverty has changed over time using eight different poverty lines
         group: Visualize multiple poverty lines (more lines)
       - slug: area_chart_more_lines
         name: Area chart (more lines)
@@ -169,7 +169,7 @@ views:
       subtitle: "{definitions.ppp_adjustment_subtitle}"
       note: "{definitions.ppp_adjustment_welfare_type_note}"
       hasMapTab: false
-      chartTypes: ["LineChart", "DiscreteBar"]
+      chartTypes: ["LineChart"]
       selectedFacetStrategy: entity
       yAxis:
         max: 100
@@ -319,7 +319,7 @@ views:
       subtitle: "{definitions.ppp_adjustment_subtitle}"
       note: "{definitions.ppp_adjustment_welfare_type_note}"
       hasMapTab: false
-      chartTypes: ["LineChart", "DiscreteBar"]
+      chartTypes: ["LineChart"]
       selectedFacetStrategy: entity
       yAxis:
         max: 100
@@ -445,8 +445,7 @@ views:
       selectedFacetStrategy: entity
       baseColorScheme: RdYlBu
       sortBy: column
-      sortOrder: asc
-      sortColumnSlug: world_bank_pip#headcount_ratio_above__ppp_version_2021__poverty_line_4000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+      sortColumnSlug: world_bank_pip#headcount_ratio__ppp_version_2021__poverty_line_100__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
       hideRelativeToggle: false
       stackMode: absolute
       hideTotalValueLabel: true
@@ -473,22 +472,22 @@ views:
       y:
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_300__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
-            name: "Share below $3 a day"
+            name: "Number below $3 a day"
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_420__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
-            name: "Share below $4.20 a day"
+            name: "Number below $4.20 a day"
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_830__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
-            name: "Share below $8.30 a day"
+            name: "Number below $8.30 a day"
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_3000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
-            name: "Share below $30 a day"
+            name: "Number below $30 a day"
     config:
       title: Number of people living below a range of poverty lines
       subtitle: "{definitions.ppp_adjustment_subtitle}"
       note: "{definitions.ppp_adjustment_welfare_type_note}"
       hasMapTab: false
-      chartTypes: ["LineChart", "DiscreteBar"]
+      chartTypes: ["LineChart"]
       selectedFacetStrategy: entity
     metadata:
       description_key:
@@ -608,34 +607,34 @@ views:
       y:
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_100__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
-            name: "Share below $1 a day"
+            name: "Number below $1 a day"
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_300__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
-            name: "Share below $3 a day"
+            name: "Number below $3 a day"
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_420__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
-            name: "Share below $4.20 a day"
+            name: "Number below $4.20 a day"
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_830__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
-            name: "Share below $8.30 a day"
+            name: "Number below $8.30 a day"
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_1000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
-            name: "Share below $10 a day"
+            name: "Number below $10 a day"
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_2000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
-            name: "Share below $20 a day"
+            name: "Number below $20 a day"
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_3000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
-            name: "Share below $30 a day"
+            name: "Number below $30 a day"
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_4000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
-            name: "Share below $40 a day"
+            name: "Number below $40 a day"
     config:
       title: Number of people living below a range of poverty lines
       subtitle: "{definitions.ppp_adjustment_subtitle}"
       note: "{definitions.ppp_adjustment_welfare_type_note}"
       hasMapTab: false
-      chartTypes: ["LineChart", "DiscreteBar"]
+      chartTypes: ["LineChart"]
       selectedFacetStrategy: entity
     metadata:
       description_key:
