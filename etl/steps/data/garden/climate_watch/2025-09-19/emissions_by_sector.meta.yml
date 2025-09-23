@@ -13,7 +13,7 @@ definitions:
     display:
       numSignificantFigures: 3
   # Short description for per capita indicators, except on CO2 emissions.
-  description_short_per_capita: &description-short-per-capita Emissions are measured in tonnes of [carbon dioxide-equivalents](#dod:carbondioxideequivalents) per person.
+  description_short_per_capita: &description-short-per-capita Emissions are measured in kilograms of [carbon dioxide-equivalents](#dod:carbondioxideequivalents) per person.
   # Short description for indicators of CO2 emissions, except per capita indicators.
   description_short_co2: &description-short-co2 Emissions are measured in tonnes.
   # Short description for per capita indicators of CO2 emissions.
@@ -97,9 +97,9 @@ tables:
         short_unit: *short-unit-per-capita
         display: *display-per-capita
       land_use_change_and_forestry_ghg_emissions:
-        title: Greenhouse gas emissions from land use change and forestry
+        title: Greenhouse gas emissions from land-use change and forestry
       land_use_change_and_forestry_ghg_emissions_per_capita:
-        title: Per capita greenhouse gas emissions from land use change and forestry
+        title: Per capita greenhouse gas emissions from land-use change and forestry
         description_short: *description-short-per-capita
         unit: *unit-per-capita
         short_unit: *short-unit-per-capita
@@ -210,10 +210,10 @@ tables:
         short_unit: *short-unit-per-capita
         display: *display-per-capita
       land_use_change_and_forestry_co2_emissions:
-        title: Carbon dioxide emissions from land use change and forestry
+        title: Carbon dioxide emissions from land-use change and forestry
         description_short: *description-short-co2
       land_use_change_and_forestry_co2_emissions_per_capita:
-        title: Per capita carbon dioxide emissions from land use change and forestry
+        title: Per capita carbon dioxide emissions from land-use change and forestry
         description_short: *description-short-co2-per-capita
         unit: *unit-per-capita
         short_unit: *short-unit-per-capita
@@ -323,9 +323,9 @@ tables:
         short_unit: *short-unit-per-capita
         display: *display-per-capita
       land_use_change_and_forestry_ch4_emissions:
-        title: Methane emissions from land use change and forestry
+        title: Methane emissions from land-use change and forestry
       land_use_change_and_forestry_ch4_emissions_per_capita:
-        title: Per capita methane emissions from land use change and forestry
+        title: Per capita methane emissions from land-use change and forestry
         description_short: *description-short-per-capita
         unit: *unit-per-capita
         short_unit: *short-unit-per-capita
@@ -440,9 +440,9 @@ tables:
         short_unit: *short-unit-per-capita
         display: *display-per-capita
       land_use_change_and_forestry_n2o_emissions:
-        title: Nitrous oxide emissions from land use change and forestry
+        title: Nitrous oxide emissions from land-use change and forestry
       land_use_change_and_forestry_n2o_emissions_per_capita:
-        title: Per capita nitrous oxide emissions from land use change and forestry
+        title: Per capita nitrous oxide emissions from land-use change and forestry
         description_short: *description-short-per-capita
         unit: *unit-per-capita
         short_unit: *short-unit-per-capita
