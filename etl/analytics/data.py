@@ -21,6 +21,15 @@ from etl.config import FORCE_DATASETTE, OWID_ENV
 
 
 def read_analytics(sql: str, force_datasette: bool = FORCE_DATASETTE):
+    """Retrieve data from the Metabase API using an arbitrary sql query. If Metabase credentials are not available, use Datasette as a fallback.
+
+    Parameters
+    ----------
+    sql : str
+        SQL query to execute.
+    force_datasette : bool, optional
+        If True, use Datasette instead of Metabase. This is a fallback if Metabase API credentials are not available.
+    """
     if force_datasette:
         log.warning(
             "Missing Metabase credentials. Add them to your .env file to avoid this warning. For now, Datasette will be used."

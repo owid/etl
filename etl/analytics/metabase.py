@@ -25,8 +25,6 @@ def read_metabase(sql: str) -> pd.DataFrame:
     ----------
     sql : str
         SQL query to execute.
-    force_datasette : bool, optional
-        If True, use Datasette instead of Metabase. This is a fallback if Metabase API credentials are not available.
 
     Returns
     -------
