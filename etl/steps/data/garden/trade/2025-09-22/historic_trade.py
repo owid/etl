@@ -11,10 +11,10 @@ def run() -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = paths.load_dataset("historic_exports")
+    ds_meadow = paths.load_dataset("historic_trade")
 
     # Read table from meadow dataset.
-    tb = ds_meadow.read("historic_exports")
+    tb = ds_meadow.read("historic_trade")
 
     #
     # Process data.

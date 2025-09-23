@@ -11,23 +11,26 @@ def run() -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap = paths.load_snapshot("historic_exports.xlsx")
+    snap = paths.load_snapshot("wto_trade_growth.xlsx")
 
     # Load data from snapshot.
-    tb = snap.read(sheet_name="volume")
+    tb = snap.read(sheet_name="Chart Volume")
 
     #
     # Process data.
     #
-    tb = tb[["Unnamed: 0", "Extrapolation 1815-1913"]]
+    tb = tb[["Unnamed: 0", "Volume (Total)"]]
     tb["country"] = "World"
 
     tb = tb.rename(
         columns={
             "Unnamed: 0": "year",
-            "Extrapolation 1815-1913": "historic_trade",
+            "Volume (Total)": "volume_index",
         }
     )
+
+    # Remove rows where year or volume_index is NaN
+    tb = tb.dropna(subset=["year", "volume_index"])
 
     # Improve tables format.
     tables = [tb.format(["country", "year"])]

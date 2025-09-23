@@ -1,0 +1,29 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Evolution of trade under the WTO: handy statistics"
+    description: |-
+      The World Trade Organization (WTO) deals with the global rules of trade between nations. Its main function is to ensure that trade flows as smoothly, predictably and freely as possible.
+
+    date_published: "2024"
+
+    # Citation
+    producer: World Trade Organization
+    citation_full: |-
+      World Trade Organization. Evolution of Trade. WTO Statistics. Retrieved from https://www.wto.org/english/res_e/statis_e/trade_evolution_e/evolution_trade_wto_e.htm (Accessed: 23 Sept 2025).
+
+    # Files
+    url_main: https://www.wto.org/english/res_e/statis_e/trade_evolution_e/evolution_trade_wto_e.htm#fnt-1
+    url_download: https://www.wto.org/english/res_e/statis_e/trade_evolution_e/world_trade_growth.xlsx
+    date_accessed: '2025-09-23'
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://ttd.wto.org/docs/Terms_of_Use_WTO_Tariff_and_Trade_Data.pdf?utm_source=chatgpt.com
+outs:
+  - md5: 2ee74df08cec8f42881dc2412f56ef88
+    size: 43560
+    path: wto_trade_growth.xlsx

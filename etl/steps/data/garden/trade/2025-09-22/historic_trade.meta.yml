@@ -1,0 +1,26 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Trade & Globalization
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 709
+
+tables:
+  historic_trade:
+    variables:
+      volume_index:
+        title: Trade volume index
+        unit: index (1913 = 100)
+        description_short: The average of export and import volumes, reconstructed from historical sources and standardized to modern definitions, expressed as an index with 1913 = 100.
+        description_key:
+          - International trade has long been central to economic development. To trace its evolution, researchers compiled historical trade statistics from hundreds of sources, covering nearly all countries and colonies from 1800 onward. While the UK began reporting as early as 1696, most systematic records only appeared in the 19th century, and each country used different methods.
+          - To make figures comparable, the data were standardized to modern UN definitions. This meant excluding smuggling, re-exports, transit trade, and bullion; converting fiscal years to calendar years; and valuing imports including freight and exports excluding it. For regions without records, trade was estimated using partners’ data, nearby economies, or population-based proxies. All values were expressed relative to 1913, using detailed price indexes to adjust for inflation and shipping costs.
+          - Because political borders shifted frequently as states unified or dissolved, the series is adjusted to 1913 boundaries to ensure consistency across time. Measuring trade over such a long period is inherently difficult, and differences in sources, definitions, and assumptions mean comparisons across centuries should be made with caution. Still, this reconstruction provides the most comprehensive long-term picture of world trade available.
+        display:
+          numDecimalPlaces: 1

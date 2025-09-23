@@ -1,0 +1,28 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Trade & Globalization
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 709
+
+tables:
+  wto_trade_growth:
+    variables:
+      volume_index:
+        title: Trade volume index
+        unit: index (1913 = 100)
+        description_short: The average of export and import volumes, reconstructed from historical sources and standardized to modern definitions, expressed as an index with 1913 = 100.
+        description_key:
+          - Trade has always been central to economic growth. This index measures it as the average of exports and imports, showing how the overall volume of trade has changed over time.
+          - "Researchers compiled statistics from hundreds of sources, covering almost all countries and colonies since 1800. Because methods differed, the data were standardized to modern UN definitions: smuggling, re-exports, transit trade, and bullion were excluded; fiscal years were converted to calendar years; imports were valued including freight and exports excluding it. Where records were missing, researchers used partner data, nearby economies, or population-based proxies."
+          - "All figures are shown relative to 1913 = 100 and adjusted to the borders of that year. Detailed price indexes were used to correct for inflation and shipping costs. Reconstructing trade over such a long period is never perfect: definitions, assumptions, and sources differ. Comparisons across centuries should be made with caution, but this remains the most complete long-term picture of world trade available."
+          - We extended the historical series (to 2000) with World Trade Organization data from 2001 onward. WTO figures were originally indexed to 1950 = 100. We rescaled them to a 1913 = 100 baseline, using the most recent overlapping year between the two datasets to ensure a smooth continuation of the series.
+        description_processing: We combined historical trade data (through 2000) with World Trade Organization data (from 2001 onwards). The WTO data, originally indexed to 1950 = 100, was rescaled to match the historical series with a 1913 = 100 base. We calculated a scaling factor using the most recent overlapping year between the two datasets to ensure continuity in the time series while maintaining the 1913 baseline throughout.
+        display:
+          numDecimalPlaces: 1

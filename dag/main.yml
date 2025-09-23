@@ -690,13 +690,20 @@ steps:
   #
   # Trade Data - Historic exports and imports from Absell-Federico-Tena World Trade post Second World War
   #
-  data://meadow/trade/2025-09-22/historic_exports:
-    - snapshot://trade/2025-09-22/historic_exports.xlsx
-  data://garden/trade/2025-09-22/historic_exports:
-    - data://meadow/trade/2025-09-22/historic_exports
-  data://grapher/trade/2025-09-22/historic_exports:
-    - data://garden/trade/2025-09-22/historic_exports
-
+  data://meadow/trade/2025-09-22/historic_trade:
+    - snapshot://trade/2025-09-22/historic_trade.xlsx
+  data://garden/trade/2025-09-22/historic_trade:
+    - data://meadow/trade/2025-09-22/historic_trade
+#
+  # Trade Data - WTO Trade Growth
+  data://meadow/trade/2025-09-22/wto_trade_growth:
+    - snapshot://trade/2025-09-22/wto_trade_growth.xlsx
+  data://garden/trade/2025-09-22/wto_trade_growth:
+    - data://meadow/trade/2025-09-22/wto_trade_growth
+    - data://garden/trade/2025-09-22/historic_trade
+  data://grapher/trade/2025-09-22/wto_trade_growth:
+    - data://garden/trade/2025-09-22/wto_trade_growth
+  #
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml

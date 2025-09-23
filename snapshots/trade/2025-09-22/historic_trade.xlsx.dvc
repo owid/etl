@@ -23,4 +23,4 @@ meta:
 outs:
   - md5: fab3b87e99bcc717c48dcf052d459bf9
     size: 194543
-    path: historic_exports.xlsx
+    path: historic_trade.xlsx
