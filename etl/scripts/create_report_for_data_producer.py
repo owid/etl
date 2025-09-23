@@ -10,7 +10,7 @@ import requests
 from rich_click.rich_command import RichCommand
 from structlog import get_logger
 
-from etl.analytics import (
+from etl.analytics.data import (
     get_chart_views_by_chart_id,
     get_post_views_by_chart_id,
     get_visualizations_using_data_by_producer,
