@@ -57,8 +57,11 @@ REGIONS = {
     "High-income countries": {},
 }
 
-# Convert million tonnes to tonnes.
+# Convert million tonnes to tonnes (for non per capita indicators).
 MT_TO_T = 1e6
+
+# Convert million tonnes to kilograms (for per capita indicators).
+MT_TO_KG = 1e9
 
 
 def create_table_for_gas(
@@ -108,9 +111,11 @@ def create_table_for_gas(
     # List columns with emissions data.
     emissions_columns = [column for column in tb_gas.columns if column not in ["country", "year", "population"]]
 
-    # Add per capita variables.
     for variable in emissions_columns:
-        tb_gas[variable + PER_CAPITA_SUFFIX] = MT_TO_T * tb_gas[variable] / tb_gas["population"]
+        # Create per capita indicators (in kilograms).
+        tb_gas[variable + PER_CAPITA_SUFFIX] = MT_TO_KG * tb_gas[variable] / tb_gas["population"]
+        # Convert non per capita indicators from million tonnes to tonnes.
+        tb_gas[variable] *= MT_TO_T
 
     # Remove rows and columns that only have nans.
     tb_gas = tb_gas.dropna(how="all", axis=1)

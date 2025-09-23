@@ -5,9 +5,6 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-# Convert million tonnes to tonnes.
-MT_TO_T = 1e6
-
 
 def run() -> None:
     #
@@ -19,27 +16,10 @@ def run() -> None:
     #
     # Process data.
     #
-    # Process each table in the dataset.
-    tables = []
-    for table_name in ds_garden.table_names:
-        tb = ds_garden[table_name].copy()
-
-        # Drop unnecessary columns.
-        tb = tb.drop(columns=["population"], errors="raise")
-
-        # For convenience, change units from "million tonnes" to "tonnes" and multiply all variables by a million.
-        # Doing this, grapher will know when to use the word "million" and when to use "billion".
-        for column in tb.columns:
-            if tb[column].metadata.unit == "million tonnes":
-                tb[column].metadata.unit = "tonnes"
-                tb[column].metadata.short_unit = "t"
-                tb[column] *= MT_TO_T
-                tb[column].metadata.description_short = tb[column].metadata.description_short.replace(
-                    "million tonnes", "tonnes"
-                )
-
-        # Add current table to the list.
-        tables.append(tb)
+    # Remove unnecessary population column in each table.
+    tables = [
+        ds_garden[table_name].drop(columns=["population"], errors="raise") for table_name in ds_garden.table_names
+    ]
 
     #
     # Save outputs.
