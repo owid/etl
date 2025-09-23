@@ -1,5 +1,6 @@
 """Metabase utils"""
 
+import datetime
 import json
 import re
 import urllib.parse
@@ -7,12 +8,18 @@ from io import BytesIO
 
 import pandas as pd
 import requests
+from metabase_api import Metabase_API
 
 from etl.config import (
     METABASE_API_KEY,
     METABASE_SEMANTIC_LAYER_DATABASE_ID,
     METABASE_URL,
+    METABASE_URL_LOCAL,
 )
+
+# Config
+COLLECTION_EXPERT_ID = 61  # Expert collection
+DATABASE_ID = 2  # Semantic Layer database
 
 
 def read_metabase(sql: str) -> pd.DataFrame:
@@ -70,3 +77,50 @@ def read_metabase(sql: str) -> pd.DataFrame:
     df = pd.read_csv(BytesIO(response.content))
 
     return df
+
+
+def bake_question_url(card: dict) -> str:
+    assert "id" in card, "Card must have an 'id' field"
+    card_id = card["id"]
+    assert "name" in card, "Card must have an 'name' field"
+    card_name = card["name"]
+
+    url = f"{METABASE_URL_LOCAL}/question/{card_id}-{card_name.replace(' ', '-').lower()}"
+    return url
+
+
+def create_question(
+    title: str,
+    query: str,
+    description: str | None = None,
+    database_id: int = DATABASE_ID,
+    **kwargs,
+):
+    # Define title
+    QUESTION_TIMESTAMP = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    q_title = f"🤖 {title} ({QUESTION_TIMESTAMP})"
+
+    # Init API client
+    mb = Metabase_API(METABASE_URL_LOCAL, api_key=METABASE_API_KEY)
+
+    # Create question
+    question = mb.create_card(
+        # card_name=f"{QUESTION_TITLE} (1)",
+        collection_id=COLLECTION_EXPERT_ID,
+        # If you are providing only this argument, the keys 'name', 'dataset_query' and 'display' are required (https://github.com/metabase/metabase/blob/master/docs/api-documentation.md#post-apicard).
+        custom_json={
+            "name": q_title,
+            "description": description,
+            "type": "question",
+            "dataset_query": {
+                "type": "native",
+                "database": database_id,
+                "native": {"query": query},
+            },
+            "display": "table",
+        },
+        return_card=True,
+        **kwargs,
+    )
+
+    return question
