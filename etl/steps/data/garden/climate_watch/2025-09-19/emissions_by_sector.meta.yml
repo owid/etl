@@ -23,6 +23,9 @@ definitions:
   display_per_capita: &display-per-capita
     unit: tonnes
     shortUnit: t
+    numSignificantFigures: 3
+  display_total: &display-total
+    numSignificantFigures: 3
   # To avoid the previous common definitions to affect population, explicitly define population's metadata.
   metadata_population: &metadata-population
     title: Population
@@ -39,6 +42,7 @@ tables:
     variables:
       agriculture_ghg_emissions:
         title: Greenhouse gas emissions from agriculture
+        display: *display-total
       agriculture_ghg_emissions_per_capita:
         title: Per capita greenhouse gas emissions from agriculture
         description_short: *description-short-per-capita
@@ -47,6 +51,7 @@ tables:
         display: *display-per-capita
       aviation_and_shipping_ghg_emissions:
         title: Greenhouse gas emissions from bunker fuels
+        display: *display-total
       aviation_and_shipping_ghg_emissions_per_capita:
         title: Per capita greenhouse gas emissions from bunker fuels
         description_short: *description-short-per-capita
@@ -55,6 +60,7 @@ tables:
         display: *display-per-capita
       buildings_ghg_emissions:
         title: Greenhouse gas emissions from buildings
+        display: *display-total
       buildings_ghg_emissions_per_capita:
         title: Per capita greenhouse gas emissions from buildings
         description_short: *description-short-per-capita
@@ -63,6 +69,7 @@ tables:
         display: *display-per-capita
       electricity_and_heat_ghg_emissions:
         title: Greenhouse gas emissions from electricity and heat
+        display: *display-total
       electricity_and_heat_ghg_emissions_per_capita:
         title: Per capita greenhouse gas emissions from electricity and heat
         description_short: *description-short-per-capita
@@ -71,6 +78,7 @@ tables:
         display: *display-per-capita
       energy_ghg_emissions:
         title: Greenhouse gas emissions from energy
+        display: *display-total
       energy_ghg_emissions_per_capita:
         title: Per capita greenhouse gas emissions from energy
         description_short: *description-short-per-capita
@@ -79,6 +87,7 @@ tables:
         display: *display-per-capita
       fugitive_ghg_emissions:
         title: Fugitive emissions of greenhouse gases from energy production
+        display: *display-total
       fugitive_ghg_emissions_per_capita:
         title: Per capita fugitive emissions of greenhouse gases from energy production
         description_short: *description-short-per-capita
@@ -87,6 +96,7 @@ tables:
         display: *display-per-capita
       industry_ghg_emissions:
         title: Greenhouse gas emissions from industry
+        display: *display-total
       industry_ghg_emissions_per_capita:
         title: Per capita greenhouse gas emissions from industry
         description_short: *description-short-per-capita
@@ -95,6 +105,7 @@ tables:
         display: *display-per-capita
       land_use_change_and_forestry_ghg_emissions:
         title: Greenhouse gas emissions from land use change and forestry
+        display: *display-total
       land_use_change_and_forestry_ghg_emissions_per_capita:
         title: Per capita greenhouse gas emissions from land use change and forestry
         description_short: *description-short-per-capita
@@ -103,6 +114,7 @@ tables:
         display: *display-per-capita
       manufacturing_and_construction_ghg_emissions:
         title: Greenhouse gas emissions from manufacturing and construction
+        display: *display-total
       manufacturing_and_construction_ghg_emissions_per_capita:
         title: Per capita greenhouse gas emissions from manufacturing and construction
         description_short: *description-short-per-capita
@@ -111,6 +123,7 @@ tables:
         display: *display-per-capita
       other_fuel_combustion_ghg_emissions:
         title: Greenhouse gas emissions from other fuel combustion
+        display: *display-total
       other_fuel_combustion_ghg_emissions_per_capita:
         title: Per capita greenhouse gas emissions from other fuel combustion
         description_short: *description-short-per-capita
@@ -119,6 +132,7 @@ tables:
         display: *display-per-capita
       total_ghg_emissions_excluding_lucf:
         title: Total greenhouse gas emissions excluding land-use change and forestry
+        display: *display-total
       total_ghg_emissions_excluding_lucf_per_capita:
         title: Total greenhouse gas emissions per capita excluding land-use change and forestry
         description_short: *description-short-per-capita
@@ -127,6 +141,7 @@ tables:
         display: *display-per-capita
       total_ghg_emissions_including_lucf:
         title: Total greenhouse gas emissions including land-use change and forestry
+        display: *display-total
       total_ghg_emissions_including_lucf_per_capita:
         title: Total greenhouse gas emissions per capita including land-use change and forestry
         description_short: *description-short-per-capita
@@ -135,6 +150,7 @@ tables:
         display: *display-per-capita
       transport_ghg_emissions:
         title: Greenhouse gas emissions from transport
+        display: *display-total
       transport_ghg_emissions_per_capita:
         title: Per capita greenhouse gas emissions from transport
         description_short: *description-short-per-capita
@@ -143,6 +159,7 @@ tables:
         display: *display-per-capita
       waste_ghg_emissions:
         title: Greenhouse gas emissions from waste
+        display: *display-total
       waste_ghg_emissions_per_capita:
         title: Per capita greenhouse gas emissions from waste
         description_short: *description-short-per-capita
@@ -155,6 +172,7 @@ tables:
       aviation_and_shipping_co2_emissions:
         title: Carbon dioxide emissions from bunker fuels
         description_short: *description-short-co2
+        display: *display-total
       aviation_and_shipping_co2_emissions_per_capita:
         title: Per capita carbon dioxide emissions from bunker fuels
         description_short: *description-short-co2-per-capita
@@ -164,6 +182,7 @@ tables:
       buildings_co2_emissions:
         title: Carbon dioxide emissions from buildings
         description_short: *description-short-co2
+        display: *display-total
       buildings_co2_emissions_per_capita:
         title: Per capita carbon dioxide emissions from buildings
         description_short: *description-short-co2-per-capita
@@ -173,6 +192,7 @@ tables:
       electricity_and_heat_co2_emissions:
         title: Carbon dioxide emissions from electricity and heat
         description_short: *description-short-co2
+        display: *display-total
       electricity_and_heat_co2_emissions_per_capita:
         title: Per capita carbon dioxide emissions from electricity and heat
         description_short: *description-short-co2-per-capita
@@ -182,6 +202,7 @@ tables:
       energy_co2_emissions:
         title: Carbon dioxide emissions from energy
         description_short: *description-short-co2
+        display: *display-total
       energy_co2_emissions_per_capita:
         title: Per capita carbon dioxide emissions from energy
         description_short: *description-short-co2-per-capita
@@ -191,6 +212,7 @@ tables:
       fugitive_co2_emissions:
         title: Fugitive emissions of carbon dioxide from energy production
         description_short: *description-short-co2
+        display: *display-total
       fugitive_co2_emissions_per_capita:
         title: Per capita fugitive emissions of carbon dioxide from energy production
         description_short: *description-short-co2-per-capita
@@ -200,6 +222,7 @@ tables:
       industry_co2_emissions:
         title: Carbon dioxide emissions from industry
         description_short: *description-short-co2
+        display: *display-total
       industry_co2_emissions_per_capita:
         title: Per capita carbon dioxide emissions from industry
         description_short: *description-short-co2-per-capita
@@ -209,6 +232,7 @@ tables:
       land_use_change_and_forestry_co2_emissions:
         title: Carbon dioxide emissions from land use change and forestry
         description_short: *description-short-co2
+        display: *display-total
       land_use_change_and_forestry_co2_emissions_per_capita:
         title: Per capita carbon dioxide emissions from land use change and forestry
         description_short: *description-short-co2-per-capita
@@ -218,6 +242,7 @@ tables:
       manufacturing_and_construction_co2_emissions:
         title: Carbon dioxide emissions from manufacturing and construction
         description_short: *description-short-co2
+        display: *display-total
       manufacturing_and_construction_co2_emissions_per_capita:
         title: Per capita carbon dioxide emissions from manufacturing and construction
         description_short: *description-short-co2-per-capita
@@ -227,6 +252,7 @@ tables:
       other_fuel_combustion_co2_emissions:
         title: Carbon dioxide emissions from other fuel combustion
         description_short: *description-short-co2
+        display: *display-total
       other_fuel_combustion_co2_emissions_per_capita:
         title: Per capita carbon dioxide emissions from other fuel combustion
         description_short: *description-short-co2-per-capita
@@ -236,6 +262,7 @@ tables:
       total_co2_emissions_excluding_lucf:
         title: Total carbon dioxide emissions excluding land-use change and forestry
         description_short: *description-short-co2
+        display: *display-total
       total_co2_emissions_excluding_lucf_per_capita:
         title: Total carbon dioxide emissions per capita excluding land-use change and forestry
         description_short: *description-short-co2-per-capita
@@ -245,6 +272,7 @@ tables:
       total_co2_emissions_including_lucf:
         title: Total carbon dioxide emissions including land-use change and forestry
         description_short: *description-short-co2
+        display: *display-total
       total_co2_emissions_including_lucf_per_capita:
         title: Total carbon dioxide emissions per capita including land-use change and forestry
         description_short: *description-short-co2-per-capita
@@ -254,6 +282,7 @@ tables:
       transport_co2_emissions:
         title: Carbon dioxide emissions from transport
         description_short: *description-short-co2
+        display: *display-total
       transport_co2_emissions_per_capita:
         title: Per capita carbon dioxide emissions from transport
         description_short: *description-short-co2-per-capita
@@ -265,6 +294,7 @@ tables:
     variables:
       agriculture_ch4_emissions:
         title: Methane emissions from agriculture
+        display: *display-total
       agriculture_ch4_emissions_per_capita:
         title: Per capita methane emissions from agriculture
         description_short: *description-short-per-capita
@@ -273,6 +303,7 @@ tables:
         display: *display-per-capita
       aviation_and_shipping_ch4_emissions:
         title: Methane emissions from bunker fuels
+        display: *display-total
       aviation_and_shipping_ch4_emissions_per_capita:
         title: Per capita methane emissions from bunker fuels
         description_short: *description-short-per-capita
@@ -281,6 +312,7 @@ tables:
         display: *display-per-capita
       buildings_ch4_emissions:
         title: Methane emissions from buildings
+        display: *display-total
       buildings_ch4_emissions_per_capita:
         title: Per capita methane emissions from buildings
         description_short: *description-short-per-capita
@@ -289,6 +321,7 @@ tables:
         display: *display-per-capita
       electricity_and_heat_ch4_emissions:
         title: Methane emissions from electricity and heat
+        display: *display-total
       electricity_and_heat_ch4_emissions_per_capita:
         title: Per capita methane emissions from electricity and heat
         description_short: *description-short-per-capita
@@ -297,6 +330,7 @@ tables:
         display: *display-per-capita
       energy_ch4_emissions:
         title: Methane emissions from energy
+        display: *display-total
       energy_ch4_emissions_per_capita:
         title: Per capita methane emissions from energy
         description_short: *description-short-per-capita
@@ -305,6 +339,7 @@ tables:
         display: *display-per-capita
       fugitive_ch4_emissions:
         title: Fugitive emissions of methane from energy production
+        display: *display-total
       fugitive_ch4_emissions_per_capita:
         title: Per capita fugitive emissions of methane from energy production
         description_short: *description-short-per-capita
@@ -313,6 +348,7 @@ tables:
         display: *display-per-capita
       industry_ch4_emissions:
         title: Methane emissions from industry
+        display: *display-total
       industry_ch4_emissions_per_capita:
         title: Per capita methane emissions from industry
         description_short: *description-short-per-capita
@@ -321,6 +357,7 @@ tables:
         display: *display-per-capita
       land_use_change_and_forestry_ch4_emissions:
         title: Methane emissions from land use change and forestry
+        display: *display-total
       land_use_change_and_forestry_ch4_emissions_per_capita:
         title: Per capita methane emissions from land use change and forestry
         description_short: *description-short-per-capita
@@ -329,6 +366,7 @@ tables:
         display: *display-per-capita
       manufacturing_and_construction_ch4_emissions:
         title: Methane emissions from manufacturing and construction
+        display: *display-total
       manufacturing_and_construction_ch4_emissions_per_capita:
         title: Per capita methane emissions from manufacturing and construction
         description_short: *description-short-per-capita
@@ -337,6 +375,7 @@ tables:
         display: *display-per-capita
       other_fuel_combustion_ch4_emissions:
         title: Methane emissions from other fuel combustion
+        display: *display-total
       other_fuel_combustion_ch4_emissions_per_capita:
         title: Per capita methane emissions from other fuel combustion
         description_short: *description-short-per-capita
@@ -345,6 +384,7 @@ tables:
         display: *display-per-capita
       total_ch4_emissions_excluding_lucf:
         title: Total methane emissions excluding land-use change and forestry
+        display: *display-total
       total_ch4_emissions_excluding_lucf_per_capita:
         title: Total methane emissions per capita excluding land-use change and forestry
         description_short: *description-short-per-capita
@@ -353,6 +393,7 @@ tables:
         display: *display-per-capita
       total_ch4_emissions_including_lucf:
         title: Total methane emissions including land-use change and forestry
+        display: *display-total
       total_ch4_emissions_including_lucf_per_capita:
         title: Total methane emissions per capita including land-use change and forestry
         description_short: *description-short-per-capita
@@ -361,6 +402,7 @@ tables:
         display: *display-per-capita
       transport_ch4_emissions:
         title: Methane emissions from transport
+        display: *display-total
       transport_ch4_emissions_per_capita:
         title: Per capita methane emissions from transport
         description_short: *description-short-per-capita
@@ -369,6 +411,7 @@ tables:
         display: *display-per-capita
       waste_ch4_emissions:
         title: Methane emissions from waste
+        display: *display-total
       waste_ch4_emissions_per_capita:
         title: Per capita methane emissions from waste
         description_short: *description-short-per-capita
@@ -380,19 +423,18 @@ tables:
     variables:
       agriculture_n2o_emissions:
         title: Nitrous oxide emissions from agriculture
+        display: *display-total
       agriculture_n2o_emissions_per_capita:
         title: Per capita nitrous oxide emissions from agriculture
         description_short: *description-short-per-capita
         unit: *unit-per-capita
         short_unit: *short-unit-per-capita
-        display:
-          unit: tonnes
-          shortUnit: t
-          name: Agriculture
+        display: *display-per-capita
         presentation:
           title_public: Per capita nitrous oxide emissions from agriculture
       aviation_and_shipping_n2o_emissions:
         title: Nitrous oxide emissions from bunker fuels
+        display: *display-total
       aviation_and_shipping_n2o_emissions_per_capita:
         title: Per capita nitrous oxide emissions from bunker fuels
         description_short: *description-short-per-capita
@@ -401,6 +443,7 @@ tables:
         display: *display-per-capita
       buildings_n2o_emissions:
         title: Nitrous oxide emissions from buildings
+        display: *display-total
       buildings_n2o_emissions_per_capita:
         title: Per capita nitrous oxide emissions from buildings
         description_short: *description-short-per-capita
@@ -409,6 +452,7 @@ tables:
         display: *display-per-capita
       electricity_and_heat_n2o_emissions:
         title: Nitrous oxide emissions from electricity and heat
+        display: *display-total
       electricity_and_heat_n2o_emissions_per_capita:
         title: Per capita nitrous oxide emissions from electricity and heat
         description_short: *description-short-per-capita
@@ -417,6 +461,7 @@ tables:
         display: *display-per-capita
       energy_n2o_emissions:
         title: Nitrous oxide emissions from energy
+        display: *display-total
       energy_n2o_emissions_per_capita:
         title: Per capita nitrous oxide emissions from energy
         description_short: *description-short-per-capita
@@ -425,6 +470,7 @@ tables:
         display: *display-per-capita
       fugitive_n2o_emissions:
         title: Fugitive emissions of nitrous oxide from energy production
+        display: *display-total
       fugitive_n2o_emissions_per_capita:
         title: Per capita fugitive emissions of nitrous oxide from energy production
         description_short: *description-short-per-capita
@@ -433,6 +479,7 @@ tables:
         display: *display-per-capita
       industry_n2o_emissions:
         title: Nitrous oxide emissions from industry
+        display: *display-total
       industry_n2o_emissions_per_capita:
         title: Per capita nitrous oxide emissions from industry
         description_short: *description-short-per-capita
@@ -441,6 +488,7 @@ tables:
         display: *display-per-capita
       land_use_change_and_forestry_n2o_emissions:
         title: Nitrous oxide emissions from land use change and forestry
+        display: *display-total
       land_use_change_and_forestry_n2o_emissions_per_capita:
         title: Per capita nitrous oxide emissions from land use change and forestry
         description_short: *description-short-per-capita
@@ -449,6 +497,7 @@ tables:
         display: *display-per-capita
       manufacturing_and_construction_n2o_emissions:
         title: Nitrous oxide emissions from manufacturing and construction
+        display: *display-total
       manufacturing_and_construction_n2o_emissions_per_capita:
         title: Per capita nitrous oxide emissions from manufacturing and construction
         description_short: *description-short-per-capita
@@ -457,6 +506,7 @@ tables:
         display: *display-per-capita
       other_fuel_combustion_n2o_emissions:
         title: Nitrous oxide emissions from other fuel combustion
+        display: *display-total
       other_fuel_combustion_n2o_emissions_per_capita:
         title: Per capita nitrous oxide emissions from other fuel combustion
         description_short: *description-short-per-capita
@@ -465,6 +515,7 @@ tables:
         display: *display-per-capita
       total_n2o_emissions_excluding_lucf:
         title: Total nitrous oxide emissions excluding land-use change and forestry
+        display: *display-total
       total_n2o_emissions_excluding_lucf_per_capita:
         title: Total nitrous oxide emissions per capita excluding land-use change and forestry
         description_short: *description-short-per-capita
@@ -473,6 +524,7 @@ tables:
         display: *display-per-capita
       total_n2o_emissions_including_lucf:
         title: Total nitrous oxide emissions including land-use change and forestry
+        display: *display-total
       total_n2o_emissions_including_lucf_per_capita:
         title: Total nitrous oxide emissions per capita including land-use change and forestry
         description_short: *description-short-per-capita
@@ -481,6 +533,7 @@ tables:
         display: *display-per-capita
       transport_n2o_emissions:
         title: Nitrous oxide emissions from transport
+        display: *display-total
       transport_n2o_emissions_per_capita:
         title: Per capita nitrous oxide emissions from transport
         description_short: *description-short-per-capita
@@ -489,6 +542,7 @@ tables:
         display: *display-per-capita
       waste_n2o_emissions:
         title: Nitrous oxide emissions from waste
+        display: *display-total
       waste_n2o_emissions_per_capita:
         title: Per capita nitrous oxide emissions from waste
         description_short: *description-short-per-capita
@@ -500,6 +554,7 @@ tables:
     variables:
       industry_fgas_emissions:
         title: Fluorinated gas emissions from industry
+        display: *display-total
       industry_fgas_emissions_per_capita:
         title: Per capita fluorinated gas emissions from industry
         description_short: *description-short-per-capita
@@ -508,6 +563,7 @@ tables:
         display: *display-per-capita
       total_fgas_emissions_excluding_lucf:
         title: Total fluorinated gas emissions excluding land-use change and forestry
+        display: *display-total
       total_fgas_emissions_excluding_lucf_per_capita:
         title: Total fluorinated gas emissions per capita excluding land-use change and forestry
         description_short: *description-short-per-capita
@@ -516,6 +572,7 @@ tables:
         display: *display-per-capita
       total_fgas_emissions_including_lucf:
         title: Total fluorinated gas emissions including land-use change and forestry
+        display: *display-total
       total_fgas_emissions_including_lucf_per_capita:
         title: Total fluorinated gas emissions per capita including land-use change and forestry
         description_short: *description-short-per-capita
