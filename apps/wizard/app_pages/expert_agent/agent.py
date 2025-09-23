@@ -511,3 +511,7 @@ async def get_data_from_datasette(query: str, num_rows: int = 10) -> str:
     except (DatasetteSQLError,) as e:
         # Handle specific Datasette-related errors
         return f"Query is invalid! Check for correctness, it must be DuckDB compatible!\nError: {e}"
+
+
+def create_question_in_metabase():
+    pass
