@@ -1,7 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import Dict, List
-
 import html2text
 import owid.catalog.processing as pr
 import pandas as pd
