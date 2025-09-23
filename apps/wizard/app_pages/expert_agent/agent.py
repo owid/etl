@@ -480,17 +480,17 @@ def _generate_url_to_datasette(query: str) -> str:
 
 
 @agent.tool_plain(docstring_format="google")
-async def get_data_from_datasette(query: str, num_rows: int = 10) -> str:
+async def get_data_from_datasette(query: str, title: str, num_rows: int = 10) -> str:
     """Execute a query in the semantic layer in Datasette and get the actual data results.
 
-    This shows the first N rows of the result as a markdown table. If the query is invalid,
-    it returns an error message that can be used to improve the query.
+    This shows the first N rows of the result as a markdown table. If the query is invalid, it returns an error message that can be used to improve the query.
 
     Args:
         query: Query to Datasette instance.
+        title: Title that describes what the query does. Should be short, but concise.
         num_rows: Number of rows to return. Defaults to 10. Too many rows may increase the tokens. Be mindful when increasing this number.
     Returns:
-        str: Either a markdown table with the results or an error message if the query is invalid. Also includes a clickable Datasette link.
+        str: Either a markdown table with the results or an error message if the query is invalid. Also includes a clickable link.
     """
     st.markdown(
         f"**:material/construction: Tool use**: Getting data ({num_rows} rows) from Datasette, via `get_data_from_datasette`"
@@ -507,11 +507,42 @@ async def get_data_from_datasette(query: str, num_rows: int = 10) -> str:
         if result is None:
             return f"Query returned no results.\n\n[Run this query in Datasette]({datasette_url})"
 
-        return f"{result}\n\n[Run this query in Datasette]({datasette_url})"
+        # try:
+        # Save query in text.txt file
+        url = create_question_in_metabase(query=query, title=title)
+        url_text = f"[Run this query in Metabase]({url})"
+        # except:
+        #     url_text = f"[Run this query in Datasette]({datasette_url})"
+        return f"{result}\n\n{url_text}"
     except (DatasetteSQLError,) as e:
         # Handle specific Datasette-related errors
         return f"Query is invalid! Check for correctness, it must be DuckDB compatible!\nError: {e}"
 
 
-def create_question_in_metabase():
-    pass
+# Create question in Metabase
+# @agent.tool_plain(docstring_format="google")
+def create_question_in_metabase(query: str, title: str) -> str:
+    """Create a question in Metabase with the given SQL query and title.
+
+    This tool should be used once we are sure that the query is valid in Datasette.
+
+    Args:
+        query: Query user for Datasette/Metabase.
+        title: Title that describes what the query does. Should be short, but concise.
+    Returns:
+        str: Link to the created question in Metabase. This link can be shared with others to access the question directly.
+    """
+    st.markdown("**:material/add_circle: Creating metabase question**")  # , icon=":material/calculate:")
+
+    from etl.analytics.metabase import bake_question_url, create_question
+
+    # Create question in Metabase
+    question = create_question(
+        query=query,
+        title=title,
+    )
+    print(question)
+    # Obtain URL to the question
+    url = bake_question_url(question)
+
+    return url

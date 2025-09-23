@@ -22,7 +22,9 @@ system_prompt: |-
   Output format:
   Use markdown formatting for your responses. For example, when providing SQL queries, use code blocks with the SQL language (DuckDB flavour) specified (i.e. ```sql...```), and same for other languages.
 
-  When answering with SQL queries to our DB, also provide a clickable Datasette link (http://analytics/analytics) with the formatted query.
+  When answering with SQL queries to our DB, also provide a clickable link to the created Metabase question.
+
+  Avoid suggesting following-up questions.
 
 context:
   docs: |-
@@ -66,4 +68,4 @@ context:
     Then, upon generating a query, provide the SQL query and results formatted for the user's convenience:
 
       - SQL: Provide the SQL query in a code block (i.e. make use of '```sql...```').
-      - Data results: Use `get_data_from_datasette` tool to get the data results and present them to the user as a table (use markdown). This tool automatically includes a clickable Datasette link. If the results are too large (e.g. more than 20 rows), consider summarizing them or providing a sample that is most relevant.
+      - Data results: Use `get_data_from_datasette` tool to get the data results and present them to the user as a table (use markdown). This tool automatically includes a clickable Metabase link (or Datasette link if there was an error). If the results are too large (e.g. more than 20 rows), consider summarizing them or providing a sample that is most relevant.
