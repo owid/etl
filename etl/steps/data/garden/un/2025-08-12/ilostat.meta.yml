@@ -18,6 +18,8 @@ definitions:
 
   poverty_line_per_day: $2.15 per day
 
+  ppp_year: 2021
+
   description_key_status_in_employment: |-
     <% if classif1 == "Status in employment (ICSE-93): 1. Employees" %>
       _Employees_ are defined as workers on paid employment jobs. Paid employment refers to all jobs where people hold an employment contract which give them a remuneration not dependent upon the revenue of the organization for which they work. {definitions.icse_93}
@@ -116,6 +118,9 @@ definitions:
 
   description_processing_unreliable_data: |-
     We removed data points flagged as "unreliable" by the source (i.e. `obs_status = "U"` in the original data). These data points are likely to be inaccurate and misleading for analysis.
+
+  description_processing_avg_earnings_outliers: |-
+    We excluded observations where average hourly earnings were below 0.2 or above 100 international-$ in {definitions.ppp_year} prices. Such values are highly unlikely as national averages and are therefore probably the result of miscalculation.
 
   # This is the ID of the Google Doc that contains the FAQs
   gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
@@ -256,14 +261,17 @@ tables:
 
       average_hourly_earnings_employees_by_sex:
         title: Average hourly earnings of employees - <<sex>>
-        unit: international-$ in 2021 prices
+        unit: international-$ in {definitions.ppp_year} prices
         short_unit: $
         description_short: Gross remuneration for time worked or work done, vacation, and other types of paid leave.
         description_key:
           - "{definitions.description_key_earnings}"
           - "{definitions.description_key_international_dollars}"
         processing_level: major
-        description_processing: "{definitions.description_processing_unreliable_data}"
+        description_processing: |-
+          {definitions.description_processing_unreliable_data}
+
+          {definitions.description_processing_avg_earnings_outliers}
         presentation:
           faqs:
           - fragment_id: poverty-international-dollars
