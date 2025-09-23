@@ -15,7 +15,7 @@ from apps.anomalist.anomalist_api import get_anomalies_for_chart_ids
 from apps.wizard.app_pages.chart_diff.utils import ANALYTICS_NUM_DAYS
 from apps.wizard.utils import get_staging_creation_time
 from apps.wizard.utils.components import st_cache_data
-from etl.analytics import get_chart_views_last_n_days, get_post_views_last_n_days
+from etl.analytics.data import get_chart_views_last_n_days, get_post_views_last_n_days
 from etl.config import OWID_ENV
 from etl.db import read_sql
 from etl.git_helpers import get_changed_files, log_time

@@ -19,8 +19,8 @@ from pydantic_ai.models.openai import OpenAIResponsesModelSettings
 from pydantic_ai.tools import RunContext
 
 from apps.wizard.app_pages.expert_agent.utils import CURRENT_DIR
-from etl.analytics import (
-    ANALYTICS_URL,
+from etl.analytics.config import ANALYTICS_URL
+from etl.analytics.datasette import (
     DatasetteSQLError,
     clean_sql_query,
     read_datasette,
