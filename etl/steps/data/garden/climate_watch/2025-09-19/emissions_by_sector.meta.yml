@@ -389,8 +389,6 @@ tables:
         unit: *unit-per-capita
         short_unit: *short-unit-per-capita
         display: *display-per-capita
-        presentation:
-          title_public: Per capita nitrous oxide emissions from agriculture
       aviation_and_shipping_n2o_emissions:
         title: Nitrous oxide emissions from bunker fuels
       aviation_and_shipping_n2o_emissions_per_capita:
