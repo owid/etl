@@ -130,285 +130,372 @@ SUBSECTORS = {
 # Custom remapping of Climate Watch subsectors into our custom categories.
 CUSTOM_MAPPING = {
     "Growing food": [
-        (
-            "Agriculture",
-            "Livestock and manure",
-            "Methane from enteric fermentation in animals and CH4/N2O from manure management.",
-        ),
+        # 5.9% — Enteric fermentation and manure management are core farm sources of CH4 (and some N2O).
+        ("Agriculture", "Livestock and manure", "Methane from enteric fermentation and CH4/N2O from manure handling."),
+        # 4.1% — Directly tied to fertilizing and managing cropland/grassland soils.
         (
             "Agriculture",
             "Agriculture soils",
-            "Nitrous oxide from synthetic and organic fertilizers, manure applied to soils, crop residues, and soil processes.",
+            "N2O from synthetic/organic fertilizers, manure applied to soils, crop residues, and soil processes.",
         ),
+        # 1.2% — A classic agricultural source (anaerobic decomposition in flooded fields).
         ("Agriculture", "Rice cultivation", "Methane released from flooded rice paddies (anaerobic decomposition)."),
+        # 0.5% — Open burning of agricultural residues.
         ("Agriculture", "Burning", "Open burning of agricultural residues (emits CH4 and N2O)."),
+        # 0.9% — Tractor/irrigation/vessel fuel is farm (and fishing) activity.
         (
             "Other fuel combustion",
             "Agriculture and fishing energy use",
             "On-farm and fishing fuel use for tractors, pumps, irrigation, and vessels (non-electric).",
         ),
+        # 1.7% — Peat/organic soil drainage/cultivation is strongly linked to agricultural expansion and use.
         (
             "Land-use change and forestry",
             "Drained organic soils",
-            "CO2 and some N2O from drainage and cultivation of organic soils (e.g., peatlands) in cropland/grassland/forest.",
+            "CO2 (and some N2O) from drained/cultivated organic soils (e.g., peatlands).",
         ),
-        (
-            "Land-use change and forestry",
-            "Forest land",
-            "Net CO2 from forest land use change and management (deforestation/degradation net of regrowth).",
-        ),
-        (
-            "Land-use change and forestry",
-            "Forest fires",
-            "Emissions from fires on forest land (primarily CO2, CH4, N2O).",
-        ),
+        # 0.0% — Peat/organic soil fires are typically tied to land clearance/use.
         (
             "Land-use change and forestry",
             "Fires in organic soils",
             "Emissions from peat/organic soil fires (often large CH4 and CO2 pulses).",
         ),
+        # 1.0% — Electricity for pumps, cold chains, hatcheries, etc. is part of primary food production demand (counted here by purpose).
+        (
+            "Electricity and heat",
+            "Agriculture and fishing energy use",
+            "Power/steam used by agriculture and fisheries (allocated by end-use rather than by the power sector).",
+        ),
+        # Cross-category, related but not exclusively food-driven:
+        # 0.6% — Mostly driven by agricultural expansion (pasture/cropland), but also logging/settlements.
+        (
+            "Land-use change and forestry",
+            "Forest land",
+            "Net CO2 from forest-land change/management. Note: this subsector is largely driven by agriculture, but not exclusively.",
+        ),
+        # 0.4% — Many fires are linked to clearing for agriculture, but not all.
+        (
+            "Land-use change and forestry",
+            "Forest fires",
+            "Fires on forest land. Note: this subsector is often linked to land clearing for agriculture, but not exclusively.",
+        ),
+        # 2.0% — Landfill CH4 largely from organics/food waste, but includes paper/wood and non-food streams.
+        (
+            "Waste",
+            "Landfills",
+            "Methane from landfills. Note: this subsector is largely driven by food/organic waste, but it also includes non-food waste.",
+        ),
+        # 1.3% — Wastewater CH4/N2O from domestic + industrial sources; substantial share is food-related organics.
+        (
+            "Waste",
+            "Wastewater",
+            "Wastewater emissions (domestic/industrial). Note: this subsector is largely related to food/organic load, but not exclusively.",
+        ),
+    ],
+    "Getting around": [
+        # 12.1% — Road fuels.
+        (
+            "Transportation",
+            "Road",
+            "Road vehicles using liquid/gaseous fuels (tailpipe emissions; EV electricity counted under power unless reallocated).",
+        ),
+        # 0.7% — Domestic aviation fuels.
+        ("Transportation", "Air", "Domestic aviation fuel combustion within national inventories."),
+        # 0.3% — Domestic navigation.
+        ("Transportation", "Ship", "Domestic navigation (inland/coastal) fuel combustion within national inventories."),
+        # 0.3% — Fuels for pipeline compressors/pumps.
+        ("Transportation", "Pipeline", "Fuel used to power pipeline transport (e.g., compressor stations and pumps)."),
+        # 0.2% — Diesel rail traction.
+        (
+            "Transportation",
+            "Rail",
+            "Rail traction fuel use (diesel rail; electric rail demand reallocated here by purpose).",
+        ),
+        # 0.1% — Miscellaneous transport fuels.
+        ("Transportation", "Other transportation", "Miscellaneous smaller transport categories not listed elsewhere."),
+        # 1.3% — International shipping.
+        ("International bunker", "Ship", "International marine bunkers (fuel for international shipping)."),
+        # 0.7% — International aviation.
+        ("International bunker", "Air", "International aviation bunkers (fuel for international flights)."),
+        # 0.3% — Electricity used by rail systems (reallocated from power to transport by purpose).
+        ("Electricity and heat", "Rail", "Electricity used to power rail systems (allocated by transport end-use)."),
+        # 0.1% — Electricity used in road transport (EV charging, small share).
+        (
+            "Electricity and heat",
+            "Road",
+            "Electricity used in road transport (EV charging and related; allocated by transport end-use).",
+        ),
+        # 0.0% — Electricity for pipeline compressors/pumps.
+        (
+            "Electricity and heat",
+            "Pipeline",
+            "Electricity used to power pipeline compressors/pumps (allocated by transport end-use).",
+        ),
+        # 0.0% — Other electric transport uses.
+        (
+            "Electricity and heat",
+            "Other transportation",
+            "Miscellaneous electricity used by transport (allocated by transport end-use).",
+        ),
     ],
     "Keeping warm and cool": [
+        # 5.0% — Onsite fuels in homes (space/water heating, cooking when not electric).
         (
             "Buildings",
             "Residential buildings",
             "Direct onsite fuel use in homes (space/water heating, cooking when not electric).",
         ),
+        # 1.6% — Onsite fuels in commercial buildings (space/water heating, cooking).
         (
             "Buildings",
             "Commercial buildings",
             "Direct onsite fuel use in commercial buildings (space/water heating, cooking).",
         ),
+        # 3.5% — Generic stationary fuel use not allocated elsewhere; mostly heat/boilers.
         (
             "Other fuel combustion",
             "Unallocated fuel combustion",
             "Stationary fuel use not allocated elsewhere (generic boilers/heating and similar uses).",
         ),
     ],
-    "Getting around": [
-        (
-            "Transportation",
-            "Road",
-            "Road vehicles using liquid/gaseous fuels (tailpipe emissions; electricity use counted under electricity).",
-        ),
-        ("Transportation", "Air", "Domestic aviation fuel combustion within national inventories."),
-        ("Transportation", "Ship", "Domestic navigation (inland/coastal) fuel combustion within national inventories."),
-        ("Transportation", "Pipeline", "Fuel used to power pipeline transport (e.g., compressor stations and pumps)."),
-        (
-            "Transportation",
-            "Rail",
-            "Rail traction fuel use (diesel rail; electric rail demand is counted under electricity).",
-        ),
-        ("Transportation", "Other transportation", "Miscellaneous smaller transport categories not listed elsewhere."),
-        ("International bunker", "Ship", "International marine bunkers (fuel for international shipping)."),
-        ("International bunker", "Air", "International aviation bunkers (fuel for international flights)."),
-    ],
     "Electricity": [
+        # 7.5% — Household electricity/heat demand (kept in electricity to reflect production-based accounting).
         (
             "Electricity and heat",
             "Residential buildings",
-            "Emissions from electricity/heat generation used by households.",
+            "Power/steam generation to meet household electricity/heat demand. Note: this subsector is largely for non-thermal end-use, but it is also related to keeping warm and cool.",
         ),
+        # 4.8% — Commercial electricity/heat demand.
         (
             "Electricity and heat",
             "Commercial buildings",
-            "Emissions from electricity/heat generation used by commercial buildings.",
+            "Power/steam generation to meet commercial electricity/heat demand. Note: this subsector is largely for non-thermal end-use, but it is also related to keeping warm and cool.",
         ),
+        # 4.4% — Upstream venting in oil/gas/coal supply (supports power and other fuel uses).
         (
-            "Electricity and heat",
-            "Chemical and petrochemical",
-            "Emissions from electricity/heat generation used by the chemicals sector.",
+            "Fugitive emissions",
+            "Vented",
+            "Intentional venting (mostly CH4) from fossil supply chains; kept with electricity as part of the energy system.",
         ),
-        (
-            "Electricity and heat",
-            "Other industry",
-            "Emissions from electricity/heat generation used by other industries.",
-        ),
-        (
-            "Electricity and heat",
-            "Iron and steel",
-            "Emissions from electricity/heat generation used by iron and steel.",
-        ),
-        (
-            "Electricity and heat",
-            "Non-ferrous metals",
-            "Emissions from electricity/heat generation used by non-ferrous metals.",
-        ),
-        (
-            "Electricity and heat",
-            "Machinery",
-            "Emissions from electricity/heat generation used by machinery manufacturing.",
-        ),
-        (
-            "Electricity and heat",
-            "Agriculture and fishing energy use",
-            "Emissions from electricity/heat generation used by agriculture and fishing.",
-        ),
-        (
-            "Electricity and heat",
-            "Non-metallic minerals",
-            "Emissions from electricity/heat generation used by non-metallic minerals (e.g., cement works' power/steam).",
-        ),
-        (
-            "Electricity and heat",
-            "Food and tobacco",
-            "Emissions from electricity/heat generation used by food and tobacco manufacturing.",
-        ),
-        (
-            "Electricity and heat",
-            "Textile and leather",
-            "Emissions from electricity/heat generation used by textiles and leather.",
-        ),
-        (
-            "Electricity and heat",
-            "Mining and quarrying",
-            "Emissions from electricity/heat generation used by mining and quarrying.",
-        ),
-        (
-            "Electricity and heat",
-            "Paper, pulp and printing",
-            "Emissions from electricity/heat generation used by paper, pulp and printing.",
-        ),
-        (
-            "Electricity and heat",
-            "Transport equipment",
-            "Emissions from electricity/heat generation used by transport equipment manufacturing.",
-        ),
-        ("Electricity and heat", "Rail", "Emissions from electricity used to power rail systems."),
-        ("Electricity and heat", "Construction", "Emissions from electricity used by construction activities."),
-        (
-            "Electricity and heat",
-            "Wood and wood products",
-            "Emissions from electricity/heat generation used by wood product manufacturing.",
-        ),
-        (
-            "Electricity and heat",
-            "Road",
-            "Emissions from electricity used in road transport (EV charging and related).",
-        ),
-        ("Electricity and heat", "Pipeline", "Emissions from electricity used to power pipeline compressors/pumps."),
-        ("Electricity and heat", "Other transportation", "Emissions from electricity used by other transport modes."),
-        ("Fugitive emissions", "Vented", "Intentional venting of gas (mostly CH4) from oil, gas, and coal operations."),
+        # 1.0% — Upstream flaring in oil/gas production.
         (
             "Fugitive emissions",
             "Flared",
-            "Flaring of associated gas (CO2 and residual CH4/BC) in oil and gas operations.",
+            "Flaring of associated gas in fossil supply; kept with electricity as part of the energy system.",
         ),
-        (
-            "Fugitive emissions",
-            "Production",
-            "Fugitive releases from fossil fuel production and processing (coal mining, oil and gas extraction/processing).",
-        ),
+        # 0.7% — Upstream production leaks.
+        ("Fugitive emissions", "Production", "Fugitive releases from fossil fuel production/processing."),
+        # 0.4% — Gas leakage in transmission and distribution.
         (
             "Fugitive emissions",
             "Transmission and distribution",
-            "Fossil gas leakage during transmission and distribution (pipelines, city gas networks).",
+            "Fossil gas leakage during transmission and distribution.",
         ),
-        (
-            "Fugitive emissions",
-            "Unallocated fuel combustion",
-            "Small unallocated slice within fossil energy supply operations.",
-        ),
+        # 0.1% — Small unallocated stationary fuel slice in energy operations.
+        ("Fugitive emissions", "Unallocated fuel combustion", "Small residual in fossil energy operations."),
+        # 2.8% — Power/heat generation not allocated to an end-use in the source split.
         (
             "Electricity and heat",
             "Unallocated fuel combustion",
-            "Unallocated electricity/heat generation emissions (minor residual).",
+            "Unallocated power/steam generation (residual category in the electricity/heat sector).",
+        ),
+        # Cross-category:
+        # 0.1% — SF6 and related F-gases from grid equipment. Even though IPCC places it under Industrial processes, in practice these emissions occur because we run an electricity system.
+        (
+            "Industrial processes",
+            "Electric power systems",
+            "F-gas (mainly SF6) emissions from T&D equipment (switchgear/insulation). Note: this subsector is also related to 'Making things'.",
         ),
     ],
     "Making things": [
+        # Direct onsite fuel use in industry/construction (not purchased electricity/heat):
+        # 4.3%
         (
             "Manufacturing and construction",
             "Iron and steel",
-            "Direct onsite fuel combustion in industry and construction (excludes purchased electricity/heat).",
+            "Direct onsite fuel combustion in industry/construction (excludes purchased electricity/heat).",
         ),
+        # 2.4%
         (
             "Manufacturing and construction",
             "Other industry",
-            "Direct onsite fuel combustion in industry and construction (excludes purchased electricity/heat).",
+            "Direct onsite fuel combustion in industry/construction (excludes purchased electricity/heat).",
         ),
+        # 2.3%
         (
             "Manufacturing and construction",
             "Non-metallic minerals",
-            "Direct onsite fuel combustion in industry and construction (excludes purchased electricity/heat).",
+            "Direct onsite fuel combustion in industry/construction (excludes purchased electricity/heat).",
         ),
+        # 1.5%
         (
             "Manufacturing and construction",
             "Chemical and petrochemical",
-            "Direct onsite fuel combustion in industry and construction (excludes purchased electricity/heat).",
+            "Direct onsite fuel combustion in industry/construction (excludes purchased electricity/heat).",
         ),
-        (
-            "Manufacturing and construction",
-            "Food and tobacco",
-            "Direct onsite fuel combustion in industry and construction (excludes purchased electricity/heat).",
-        ),
+        # 0.4%
         (
             "Manufacturing and construction",
             "Non-ferrous metals",
-            "Direct onsite fuel combustion in industry and construction (excludes purchased electricity/heat).",
+            "Direct onsite fuel combustion in industry/construction (excludes purchased electricity/heat).",
         ),
+        # 0.3%
         (
             "Manufacturing and construction",
             "Construction",
-            "Direct onsite fuel combustion in industry and construction (excludes purchased electricity/heat).",
+            "Direct onsite fuel combustion in industry/construction (excludes purchased electricity/heat).",
         ),
+        # 0.3%
         (
             "Manufacturing and construction",
             "Mining and quarrying",
-            "Direct onsite fuel combustion in industry and construction (excludes purchased electricity/heat).",
+            "Direct onsite fuel combustion in industry/construction (excludes purchased electricity/heat).",
         ),
+        # 0.3%
         (
             "Manufacturing and construction",
             "Paper, pulp and printing",
-            "Direct onsite fuel combustion in industry and construction (excludes purchased electricity/heat).",
+            "Direct onsite fuel combustion in industry/construction (excludes purchased electricity/heat).",
         ),
+        # 0.2%
         (
             "Manufacturing and construction",
             "Machinery",
-            "Direct onsite fuel combustion in industry and construction (excludes purchased electricity/heat).",
+            "Direct onsite fuel combustion in industry/construction (excludes purchased electricity/heat).",
         ),
+        # 0.1%
         (
             "Manufacturing and construction",
             "Textile and leather",
-            "Direct onsite fuel combustion in industry and construction (excludes purchased electricity/heat).",
+            "Direct onsite fuel combustion in industry/construction (excludes purchased electricity/heat).",
         ),
+        # 0.1%
         (
             "Manufacturing and construction",
             "Transport equipment",
-            "Direct onsite fuel combustion in industry and construction (excludes purchased electricity/heat).",
+            "Direct onsite fuel combustion in industry/construction (excludes purchased electricity/heat).",
         ),
+        # 0.0%
         (
             "Manufacturing and construction",
             "Wood and wood products",
-            "Direct onsite fuel combustion in industry and construction (excludes purchased electricity/heat).",
+            "Direct onsite fuel combustion in industry/construction (excludes purchased electricity/heat).",
         ),
+        # Process (non-energy) industrial emissions:
+        # 3.4%
         (
             "Industrial processes",
             "Cement",
             "Process CO2 from clinker production (calcination), independent of fuel use.",
         ),
+        # 2.6%
         (
             "Industrial processes",
             "Chemical and petrochemical (ip)",
             "Non-energy process emissions from chemical/petrochemical production.",
         ),
+        # 0.1%
         ("Industrial processes", "Other industry (ip)", "Other non-energy industrial process emissions."),
+        # 0.1%
         ("Industrial processes", "Electronics (ip)", "Process and F-gas emissions from electronics manufacturing."),
-        (
-            "Industrial processes",
-            "Electric power systems",
-            "F-gas (mainly SF6) emissions from T&D equipment (switchgear/insulation).",
-        ),
+        # 0.1%
         (
             "Industrial processes",
             "Non-ferrous metals (ip)",
             "Process emissions in non-ferrous metals (e.g., PFCs from aluminum).",
         ),
-        ("Waste", "Landfills", "Methane from anaerobic decomposition of solid waste in landfills."),
-        ("Waste", "Wastewater", "CH4 and N2O from domestic and industrial wastewater treatment and discharge."),
+        # Electricity/heat used by industry (allocated here by purpose: making products):
+        # 2.3%
+        (
+            "Electricity and heat",
+            "Chemical and petrochemical",
+            "Power/steam used by chemicals manufacturing (allocated by industrial end-use).",
+        ),
+        # 2.2%
+        (
+            "Electricity and heat",
+            "Other industry",
+            "Power/steam used by other industries (allocated by industrial end-use).",
+        ),
+        # 1.8%
+        (
+            "Electricity and heat",
+            "Iron and steel",
+            "Power/steam used by iron and steel (allocated by industrial end-use).",
+        ),
+        # 1.4%
+        (
+            "Electricity and heat",
+            "Non-ferrous metals",
+            "Power/steam used by non-ferrous metals (allocated by industrial end-use).",
+        ),
+        # 1.4%
+        (
+            "Electricity and heat",
+            "Machinery",
+            "Power/steam used by machinery manufacturing (allocated by industrial end-use).",
+        ),
+        # 0.8%
+        (
+            "Electricity and heat",
+            "Non-metallic minerals",
+            "Power/steam used by non-metallic minerals (allocated by industrial end-use).",
+        ),
+        # 0.5%
+        (
+            "Electricity and heat",
+            "Textile and leather",
+            "Power/steam used by textiles & leather (allocated by industrial end-use).",
+        ),
+        # 0.5%
+        (
+            "Electricity and heat",
+            "Mining and quarrying",
+            "Power/steam used by mining & quarrying (allocated by industrial end-use).",
+        ),
+        # 0.5%
+        (
+            "Electricity and heat",
+            "Paper, pulp and printing",
+            "Power/steam used by paper, pulp & printing (allocated by industrial end-use).",
+        ),
+        # 0.4%
+        (
+            "Electricity and heat",
+            "Transport equipment",
+            "Power/steam used by transport equipment manufacturing (allocated by industrial end-use).",
+        ),
+        # 0.3%
+        (
+            "Electricity and heat",
+            "Construction",
+            "Electricity used by construction activities (allocated by industrial end-use).",
+        ),
+        # 0.1%
+        (
+            "Electricity and heat",
+            "Wood and wood products",
+            "Power/steam used by wood products (allocated by industrial end-use).",
+        ),
+        # --- Waste not clearly food-dominant (kept with industry/system management) ---
+        # 0.1%
         (
             "Waste",
             "Other waste",
-            "Other waste emissions (e.g., open burning of waste, composting, incineration without energy recovery).",
+            "Other waste emissions (e.g., open burning, composting, incineration without energy recovery).",
+        ),
+        # Cross-category, related to Growing food.
+        # 0.8%
+        (
+            "Electricity and heat",
+            "Food and tobacco",
+            "Power/steam used by food & tobacco manufacturing (allocated by industrial end-use). Note: this subsector is also partially related to growing food.",
+        ),
+        # 0.4%
+        (
+            "Manufacturing and construction",
+            "Food and tobacco",
+            "Direct onsite fuel combustion in industry/construction (excludes purchased electricity/heat). Note: this subsector is also partially related to growing food.",
         ),
     ],
 }
