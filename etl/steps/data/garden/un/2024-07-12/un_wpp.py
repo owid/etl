@@ -212,6 +212,14 @@ def process_population_sex_ratio(tb: Table, tb_density: Table) -> Tuple[Table, T
             "all": "all",
         },
     )
+    tb = harmonize_dimension(
+        tb,
+        "month",
+        {
+            "July": "july",
+            "January": "january",
+        },
+    )
 
     # Multiply sex_ratio x 100
     tb_sex["sex_ratio"] *= 100
@@ -223,7 +231,7 @@ def process_population_sex_ratio(tb: Table, tb_density: Table) -> Tuple[Table, T
 
     # Add population density
     tb_density = process_standard(tb_density)
-    tb = tb.merge(tb_density, on=COLUMNS_INDEX, how="left")
+    tb = tb.merge(tb_density, on=COLUMNS_INDEX_MONTH, how="left")
     del tb_density
 
     # Age as sting
