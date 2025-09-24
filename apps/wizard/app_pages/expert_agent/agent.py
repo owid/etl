@@ -465,7 +465,7 @@ async def execute_query(query: str, title: str, description: str, num_rows: int 
         # Serialize dataframe
         data = serialize_df(df, num_rows=num_rows)
 
-        if data.data != []:
+        if data.data == []:
             return QueryResult(
                 message="Query returned no results. Try it on Datasette",
                 valid=False,
