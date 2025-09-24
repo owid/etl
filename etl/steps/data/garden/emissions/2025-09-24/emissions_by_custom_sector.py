@@ -533,7 +533,7 @@ def run() -> None:
     tb_custom = tb_custom.assign(**{"country": "World", "year": YEAR})
 
     # Add an explanation to the metadata of which subsectors are included in each category.
-    description_processing = "Each category contains each of the following subsectors, as defined by Climate Watch:\n"
+    description_processing = "Each category is made up of the following subsectors, based on IPCC definitions (as reported by World Resources Institute):\n"
     for group, choices in CUSTOM_MAPPING.items():
         description_processing += f"\n{group}:\n"
         description_processing += "".join(
