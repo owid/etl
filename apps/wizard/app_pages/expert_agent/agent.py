@@ -18,7 +18,7 @@ from pydantic_ai.messages import (
 from pydantic_ai.models.openai import OpenAIResponsesModelSettings
 from pydantic_ai.tools import RunContext
 
-from apps.wizard.app_pages.expert_agent.utils import CURRENT_DIR, log
+from apps.wizard.app_pages.expert_agent.utils import CURRENT_DIR, DataFrameModel, QueryResult, log, serialize_df
 from etl.analytics.datasette import (
     DatasetteSQLError,
     _generate_url_to_datasette,
@@ -427,14 +427,6 @@ async def get_api_reference_metadata(
             return "Invalid object name: " + object_name
 
 
-class QueryResult(BaseModel):
-    message: str
-    valid: bool
-    result: dict | None = None
-    url_metabase: str | None = None
-    url_datasette: str | None = None
-
-
 @agent.tool_plain(docstring_format="google")
 async def execute_query(query: str, title: str, description: str, num_rows: int = 10) -> QueryResult:
     """Execute a query in the semantic layer and get the data results.
@@ -472,14 +464,9 @@ async def execute_query(query: str, title: str, description: str, num_rows: int 
             )
 
         # Serialize dataframe
-        data = {
-            "columns": df.columns.tolist(),
-            "dtypes": {c: str(t) for c, t in df.dtypes.items()},
-            "data": df.head(num_rows).to_numpy().tolist(),  # small slice
-            "total_rows": len(df),
-        }
+        data = serialize_df(df, num_rows=num_rows)
 
-        if data["data"] is None:
+        if data.data != []:
             return QueryResult(
                 message="Query returned no results. Try it on Datasette",
                 valid=False,
@@ -531,3 +518,82 @@ def create_question_in_metabase(query: str, title: str, description: str) -> str
     url = _generate_question_url(question)
 
     return url
+
+
+@agent.tool_plain(docstring_format="google")
+async def list_available_questions_metabase() -> List[dict]:
+    """List available questions in Metabase in the "Expert" collection.
+
+    Returns a list of questions with their metadata. Use the question names (and descriptions if available) to decide which question to use.
+
+    Returns:
+        List[dict]: List of questions with their metadata. Each item has the following fields:
+            - name (str): Name of the question.
+            - id (int): ID of the question.
+            - description (str, optional): Description of the question, if available.
+    """
+    from etl.analytics.metabase import list_questions
+
+    st.markdown(
+        "**:material/construction: Tool use**: Listing available questions in Metabase, via `list_available_questions_metabase`"
+    )
+
+    # Get questions
+    questions = list_questions()
+
+    # Create question summary
+    summary = []
+    for q in questions:
+        summary_ = {
+            "name": q["name"],
+            "id": q["id"],
+        }
+        if (q["description"] is not None) and (q["description"].strip() != ""):
+            summary_["description"] = q["description"]
+        summary.append(summary_)
+    return summary
+
+
+@agent.tool_plain(docstring_format="google")
+async def get_question_data(card_id: int, num_rows: int = 20) -> QueryResult:
+    """Get the data from a Metabase question by its card ID.
+
+    After choosing a question from the list of available questions, use this tool to get the data from that question.
+
+    Args:
+        card_id: The ID of the question card in Metabase.
+        num_rows: Number of rows to return. Defaults to 20.
+    Returns:
+        DataFrameModel: Serializable object with the following fields:
+            columns (list[str]): List of column names in the dataframe.
+            dtypes (dict[str, str]): Dictionary mapping column names to their data types.
+            data (list[list]): Small slice of the data (first `num_rows` rows).
+            total_rows (int): Total number of rows in the dataframe.
+    """
+    from etl.analytics.metabase import get_question_data, get_question_info
+
+    # Getting data
+    data = get_question_data(card_id)
+
+    # Get question
+    question = get_question_info(card_id)
+
+    q_name = question.get("name", "Unknown")
+    st.markdown(
+        f"**:material/construction: Tool use**: Getting data from a Metabase question, via `get_question_data`, using id `{card_id}` for questio nnamed '{q_name}'"
+    )
+
+    # GEnerate URL
+    url = _generate_question_url(question)
+
+    # Serialize
+    data = serialize_df(data, num_rows=num_rows)
+
+    # Build result
+    result = QueryResult(
+        message="SUCCESS",
+        valid=True,
+        result=data,
+        url_metabase=url,
+    )
+    return result
