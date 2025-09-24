@@ -50,16 +50,17 @@ def run(dest_dir: str) -> None:
     #
 
     ## Population, Sex ratio
-    tb_population, tb_sex_ratio = process_population_sex_ratio(tb_population, tb_population_density)
-    tb_population = tb_population.format(COLUMNS_INDEX_MONTH)
+    tb_population_jan, tb_population, tb_sex_ratio = process_population_sex_ratio(tb_population, tb_population_density)
+    tb_population = tb_population.format(COLUMNS_INDEX)
+    tb_population_jan = tb_population_jan.format(COLUMNS_INDEX, short_name="population_january")  # January data
 
     ## Sex ratio
     tb_sex_ratio = set_variant_to_estimates(tb_sex_ratio)
-    tb_sex_ratio = tb_sex_ratio.format(COLUMNS_INDEX_MONTH, short_name="sex_ratio")
+    tb_sex_ratio = tb_sex_ratio.format(COLUMNS_INDEX, short_name="sex_ratio")
 
     ## Dependency ratio
     tb_dependency = process_dependency(tb_population)
-    tb_dependency = tb_dependency.format(COLUMNS_INDEX_MONTH, short_name="dependency_ratio")
+    tb_dependency = tb_dependency.format(COLUMNS_INDEX, short_name="dependency_ratio")
 
     ## Growth rate
     tb_growth_rate = process_standard(tb_growth_rate)
@@ -119,6 +120,7 @@ def run(dest_dir: str) -> None:
 
     # Build tables list for dataset
     tables = [
+        tb_population_jan,
         tb_population,
         tb_growth_rate,
         tb_nat_change,
@@ -150,7 +152,7 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def process_population_sex_ratio(tb: Table, tb_density: Table) -> Tuple[Table, Table]:
+def process_population_sex_ratio(tb: Table, tb_density: Table) -> Tuple[Table, Table, Table]:
     """Process the population table.
 
     Also estimate sex ratio.
@@ -237,8 +239,18 @@ def process_population_sex_ratio(tb: Table, tb_density: Table) -> Tuple[Table, T
     # Age as sting
     tb["age"] = tb["age"].astype("string")
     tb_sex["age"] = tb_sex["age"].astype("string")
+    # Separate january and july data
+    msk_jan = tb["month"] == "january"
+    tb_jan = tb[msk_jan]
+    tb = tb[~msk_jan]
+    tb = tb.drop(columns=["month"])
+    tb_jan = tb_jan.drop(columns=["month"])
+    # Remove january data for sex ratio
+    tb_sex_msk = tb_sex["month"] == "January"
+    tb_sex = tb_sex[~tb_sex_msk]
+    tb_sex = tb_sex.drop(columns=["month"])
 
-    return tb, tb_sex
+    return tb_jan, tb, tb_sex
 
 
 def process_dependency(tb: Table) -> Table:
