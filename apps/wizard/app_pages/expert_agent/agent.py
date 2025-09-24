@@ -1,10 +1,10 @@
-import urllib.parse
 from pathlib import Path
 from typing import Any, AsyncGenerator, List, Literal
 
 import logfire
 import streamlit as st
 import yaml
+from pydantic import BaseModel
 from pydantic_ai import Agent
 
 # from pydantic_ai.agent import CallToolsNode
@@ -18,11 +18,10 @@ from pydantic_ai.messages import (
 from pydantic_ai.models.openai import OpenAIResponsesModelSettings
 from pydantic_ai.tools import RunContext
 
-from apps.wizard.app_pages.expert_agent.utils import CURRENT_DIR
-from etl.analytics.config import ANALYTICS_URL
+from apps.wizard.app_pages.expert_agent.utils import CURRENT_DIR, log
 from etl.analytics.datasette import (
     DatasetteSQLError,
-    clean_sql_query,
+    _generate_url_to_datasette,
     read_datasette,
 )
 from etl.config import GOOGLE_API_KEY, LOGFIRE_TOKEN_EXPERT, OWID_MCP_SERVER_URL
@@ -154,10 +153,10 @@ summarize_agent = Agent(
 
 def _get_model_from_name(model_name: str):
     if model_name == "llama3.2":
-        from pydantic_ai.models.openai import OpenAIModel
+        from pydantic_ai.models.openai import OpenAIChatModel
         from pydantic_ai.providers.ollama import OllamaProvider
 
-        model = OpenAIModel(
+        model = OpenAIChatModel(
             model_name="llama3.2",
             provider=OllamaProvider(base_url="http://localhost:11434/v1"),
         )
@@ -357,8 +356,6 @@ async def get_docs_page(file_path: str) -> str:
 async def get_db_tables() -> str:
     """Get an overview of the database tables. Retrieve the names of the tables in the database, along with their short descriptions.
 
-    Some table tables have description "TODO". That's because we haven't documented them yet.
-
     Returns:
         str: Table short descriptions in format "table1: ...\ntable2: ...".
     """
@@ -372,7 +369,6 @@ async def get_db_tables() -> str:
 async def get_db_table_fields(tb_name: str) -> str:
     """Retrieve the documentation of the columns of database table "tb_name".
 
-    Some table columns have description "TODO". That's because we haven't documented them yet.
 
     Args:
         tb_name: Name of the table
@@ -430,54 +426,80 @@ async def get_api_reference_metadata(
             return "Invalid object name: " + object_name
 
 
-def _generate_url_to_datasette(query: str) -> str:
-    query = clean_sql_query(query)
-    return f"{ANALYTICS_URL}?" + urllib.parse.urlencode({"sql": query, "_size": "max"})
+class QueryResult(BaseModel):
+    message: str
+    valid: bool
+    result: str | None = None
+    url_metabase: str | None = None
+    url_datasette: str | None = None
 
 
 @agent.tool_plain(docstring_format="google")
-async def get_data_from_datasette(query: str, title: str, num_rows: int = 10) -> str:
-    """Execute a query in the semantic layer in Datasette and get the actual data results.
+async def execute_query(query: str, title: str, description: str, num_rows: int = 10) -> QueryResult:
+    """Execute a query in the semantic layer and get the data results.
 
-    This shows the first N rows of the result as a markdown table. If the query is invalid, it returns an error message that can be used to improve the query.
+    The query is ran on Datasette, and if valid, it obtains the results from Datasette and creates a "question" in Metabase with the same query. Note that Metabase and Datasette use the same underlying database, so the query should work in both places.
+
+    If the query is invalid, it returns an error message that can be used to improve the query until valid.
 
     Args:
         query: Query to Datasette instance.
-        title: Title that describes what the query does. Should be short, but concise.
+        title: Title that describes what the query does. Should be short and concise.
+        description: Description of what the query does. Should be 1-3 sentence long.
         num_rows: Number of rows to return. Defaults to 10. Too many rows may increase the tokens. Be mindful when increasing this number.
     Returns:
-        str: Either a markdown table with the results or an error message if the query is invalid. Also includes a clickable link.
+        QueryResult: Serializable object with the following fields:
+            message (str): Message about the query execution. "SUCCCESS" if the query was valid, or an error message if not.
+            valid (bool): Whether the query was valid or not.
+            result (str): The data results in markdown format (first `num_rows` rows).
+            url_metabase (str): Link to the created question in Metabase, if the query was valid and the question was created successfully.
+            url_datasette (str): Link to the query in Datasette.
     """
     st.markdown(
-        f"**:material/construction: Tool use**: Getting data ({num_rows} rows) from Datasette, via `get_data_from_datasette`"
+        f"**:material/construction: Tool use**: Getting data ({num_rows} rows) from Datasette, via `execute_query`"
     )  # , icon=":material/calculate:")
 
     try:
         df = read_datasette(query, use_https=False)
-        datasette_url = _generate_url_to_datasette(query)
+        url_datasette = _generate_url_to_datasette(query)
 
         if df.empty:
-            return f"Query returned no results.\n\n[Run this query in Datasette]({datasette_url})"
+            return QueryResult(
+                message="Query returned no results. Try it on Datasette",
+                valid=False,
+                url_datasette=url_datasette,
+            )
 
-        result = df.head(num_rows).to_markdown(index=False)
-        if result is None:
-            return f"Query returned no results.\n\n[Run this query in Datasette]({datasette_url})"
+        data_str = df.head(num_rows).to_markdown(index=False)
+        if data_str is None:
+            return QueryResult(
+                message="Query returned no results. Try it on Datasette",
+                valid=False,
+                url_datasette=url_datasette,
+            )
 
-        # try:
-        # Save query in text.txt file
-        url = create_question_in_metabase(query=query, title=title)
-        url_text = f"[Run this query in Metabase]({url})"
-        # except:
-        #     url_text = f"[Run this query in Datasette]({datasette_url})"
-        return f"{result}\n\n{url_text}"
+        try:
+            url_metabase = create_question_in_metabase(query=query, title=title, description=description)
+        except Exception as _:
+            url_datasette = url_datasette
+            url_metabase = None
+        return QueryResult(
+            message="SUCCESS",
+            valid=True,
+            result=data_str,
+            url_metabase=url_metabase,
+            url_datasette=url_datasette,
+        )
     except (DatasetteSQLError,) as e:
         # Handle specific Datasette-related errors
-        return f"Query is invalid! Check for correctness, it must be DuckDB compatible!\nError: {e}"
+        return QueryResult(
+            message=f"ERROR. Query is invalid! Check for correctness, it must be DuckDB compatible!\nError: {e}",
+            valid=False,
+        )
 
 
 # Create question in Metabase
-# @agent.tool_plain(docstring_format="google")
-def create_question_in_metabase(query: str, title: str) -> str:
+def create_question_in_metabase(query: str, title: str, description: str) -> str:
     """Create a question in Metabase with the given SQL query and title.
 
     This tool should be used once we are sure that the query is valid in Datasette.
@@ -488,17 +510,17 @@ def create_question_in_metabase(query: str, title: str) -> str:
     Returns:
         str: Link to the created question in Metabase. This link can be shared with others to access the question directly.
     """
+    log.info(f"Creating Metabase question for query '{title}'")
     st.markdown("**:material/add_circle: Creating metabase question**")  # , icon=":material/calculate:")
-
-    from etl.analytics.metabase import bake_question_url, create_question
+    from etl.analytics.metabase import _generate_question_url, create_question
 
     # Create question in Metabase
     question = create_question(
         query=query,
         title=title,
+        description=description,
     )
-    print(question)
     # Obtain URL to the question
-    url = bake_question_url(question)
+    url = _generate_question_url(question)
 
     return url

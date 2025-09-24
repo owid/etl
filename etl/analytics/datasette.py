@@ -5,7 +5,7 @@ import urllib.parse
 import pandas as pd
 import requests
 
-from etl.analytics.config import ANALYTICS_CSV_URL, MAX_DATASETTE_N_ROWS
+from etl.analytics.config import ANALYTICS_CSV_URL, ANALYTICS_URL, MAX_DATASETTE_N_ROWS
 from etl.analytics.utils import _safe_concat, clean_sql_query
 
 
@@ -129,3 +129,8 @@ def read_datasette(
         df = _safe_concat(dfs)
 
     return df
+
+
+def _generate_url_to_datasette(query: str) -> str:
+    query = clean_sql_query(query)
+    return f"{ANALYTICS_URL}?" + urllib.parse.urlencode({"sql": query, "_size": "max"})

@@ -79,7 +79,7 @@ def read_metabase(sql: str) -> pd.DataFrame:
     return df
 
 
-def bake_question_url(card: dict) -> str:
+def _generate_question_url(card: dict) -> str:
     assert "id" in card, "Card must have an 'id' field"
     card_id = card["id"]
     assert "name" in card, "Card must have an 'name' field"
