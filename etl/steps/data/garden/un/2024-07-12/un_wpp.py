@@ -55,11 +55,11 @@ def run(dest_dir: str) -> None:
 
     ## Sex ratio
     tb_sex_ratio = set_variant_to_estimates(tb_sex_ratio)
-    tb_sex_ratio = tb_sex_ratio.format(COLUMNS_INDEX, short_name="sex_ratio")
+    tb_sex_ratio = tb_sex_ratio.format(COLUMNS_INDEX_MONTH, short_name="sex_ratio")
 
     ## Dependency ratio
     tb_dependency = process_dependency(tb_population)
-    tb_dependency = tb_dependency.format(COLUMNS_INDEX, short_name="dependency_ratio")
+    tb_dependency = tb_dependency.format(COLUMNS_INDEX_MONTH, short_name="dependency_ratio")
 
     ## Growth rate
     tb_growth_rate = process_standard(tb_growth_rate)
@@ -255,7 +255,7 @@ def process_dependency(tb: Table) -> Table:
 
     # Pivot table
     tb_dependency = tb_dependency.pivot(
-        columns="age", index=[col for col in COLUMNS_INDEX if col != "age"], values="population"
+        columns="age", index=[col for col in COLUMNS_INDEX_MONTH if col != "age"], values="population"
     ).reset_index()
 
     # Estimate ratios
