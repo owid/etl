@@ -2,7 +2,6 @@
 
 import numpy as np
 from owid.catalog import processing as pr
-from scipy.optimize import curve_fit
 
 from etl.helpers import PathFinder
 
