@@ -16,5 +16,7 @@ tables:
     variables:
       share_of_global_ghg_emissions:
         title: Share of global greenhouse-gas emissions
+        description_short: |-
+          Global greenhouse gas emissions broken down by five major categories of human activity.
         display:
           numDecimalPlaces: 1
