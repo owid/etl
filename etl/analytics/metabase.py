@@ -15,6 +15,7 @@ from etl.config import (
     METABASE_SEMANTIC_LAYER_DATABASE_ID,
     METABASE_URL,
     METABASE_URL_LOCAL,
+    OWID_ENV,
 )
 
 # Config
@@ -88,8 +89,12 @@ def _generate_question_url(card: dict) -> str:
     # Preliminary cleaning
     slug = card_name.lower().replace(" ", "-").replace("/", "-")
     # Use urllib.parse.quote to handle special characters properly
-    slug = urllib.parse.quote(card_name.lower().replace(" ", "-"), safe="")
-    url = f"{METABASE_URL_LOCAL}/question/{card_id}-{slug}"
+    slug = urllib.parse.quote(slug, safe="")
+
+    if OWID_ENV.env_local == "production":
+        url = f"{METABASE_URL}/question/{card_id}-{slug}"
+    else:
+        url = f"{METABASE_URL_LOCAL}/question/{card_id}-{slug}"
 
     return url
 
