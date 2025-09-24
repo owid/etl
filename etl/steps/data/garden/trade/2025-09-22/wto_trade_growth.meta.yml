@@ -9,18 +9,18 @@ definitions:
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
-  update_period_days: 709
+  update_period_days: 365
 
 tables:
   wto_trade_growth:
     variables:
       volume_index:
         title: Trade volume index
-        unit: index (1913 = 100)
+        unit: index 1913=100
         description_short: World trade volume index, based on the average of exports and imports, adjusted for inflation and expressed relative to 1913 = 100.
         description_key:
           - Trade has always been central to economic growth. This index tracks it by averaging exports and imports, with 1913 set as the reference point (100), to show how global trade has changed over time.
-          - Researchers assembled statistics from hundreds of sources, covering almost every country and colony since 1800.
+          - "[Federico & Tena-Junguito (2016)](https://e-archivo.uc3m.es/rest/api/core/bitstreams/32371da7-eb07-4588-967d-a37ba009b19b/content) assembled statistics from hundreds of sources, covering almost every country and colony since 1800."
           - "Because definitions varied, they standardized the data to modern UN conventions: smuggling, re-exports, transit trade, and bullion were excluded; fiscal years were aligned with calendar years; imports were valued including freight, and exports excluding it."
           - All figures are shown relative to 1913 = 100 and adjusted to that year’s borders. Researchers used detailed price indexes to correct for inflation and shipping costs.
           - We extend the historical series beyond 1950 using data from the World Trade Organization. Because the WTO index was originally set to 1950 = 100, we rescaled it to 1913 = 100 using the 1950 overlap, so the historical and modern series are expressed on the same scale.

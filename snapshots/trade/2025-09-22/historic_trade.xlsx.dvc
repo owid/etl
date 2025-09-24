@@ -9,12 +9,12 @@ meta:
     date_published: "2016"
 
     # Citation
-    producer: Federico & Tena
+    producer: Federico and Tena-Junguito
     citation_full: |-
-      Federico, Giovanni, and Antonio Tena-Junguito. "A tale of two globalizations: gains from trade and openness 1800–2010." Review of World economics 153.3 (2017): 601-626.
+      Federico, G., & Tena-Junguito, A. (2016). A tale of two globalizations: Gains from trade and openness 1800–2010 (Working Papers in Economic History No. 16-02).
 
     # Files
-    url_main: https://www.uc3m.es/ss/Satellite/UC3MInstitucional/en/TextoDosColumnas/1371375522267/Methodology_and_sources
+    url_main: https://e-archivo.uc3m.es/rest/api/core/bitstreams/32371da7-eb07-4588-967d-a37ba009b19b/content
     date_accessed: '2025-09-22'
 
     # License
