@@ -9,6 +9,7 @@ import yaml
 
 from etl.git_api_helpers import GithubApiRepo
 
+
 def get_metabase_db_docs():
     """Get documentation of all databases in Metabase.
 
@@ -18,6 +19,7 @@ def get_metabase_db_docs():
         List of dictionaries, where each dictionary is the parsed content of a YAML file
     """
     from github import ContentFile
+
     repo = GithubApiRepo(org="owid", repo_name="analytics")
     docs_file = "docs/db/db_docs.yml"
     branch = "main"
@@ -44,7 +46,9 @@ def get_metabase_db_docs():
 
     # Extract semantic layer
     assert "metabase" in yaml_data, "YAML data must contain 'metabase' key"
-    semantic_db = next((item for item in yaml_data["metabase"] if "semantic" in item.get("database_name", "").lower()), None)
+    semantic_db = next(
+        (item for item in yaml_data["metabase"] if "semantic" in item.get("database_name", "").lower()), None
+    )
     if semantic_db is None:
         raise ValueError("No semantic database found in metabase data")
     assert "tables" in semantic_db, "Semantic database must contain 'tables' key"
