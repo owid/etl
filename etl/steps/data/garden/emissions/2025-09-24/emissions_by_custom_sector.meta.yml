@@ -1,0 +1,46 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - CO2 & Greenhouse Gas Emissions
+    processing_level: major
+    unit: ''
+    short_unit: ''
+
+dataset:
+  update_period_days: 365
+  title: Greenhouse gas emissions by custom sector
+
+tables:
+  emissions_by_custom_sector:
+    variables:
+      food:
+        title: Share of greenhouse-gas emissions from food production
+        display:
+          name: Growing food
+        presentation:
+          title_public: {tables.emissions_by_custom_sector.variables.food.title}
+      heating_and_cooling:
+        title: Share of greenhouse-gas emissions from heating and cooling
+        display:
+          name: Keeping warm and cool
+        presentation:
+          title_public: {tables.emissions_by_custom_sector.variables.heating_and_cooling.title}
+      transport:
+        title: Share of greenhouse-gas emissions from transport
+        display:
+          name: Getting around
+        presentation:
+          title_public: {tables.emissions_by_custom_sector.variables.transport.title}
+      electricity:
+        title: Share of greenhouse-gas emissions from electricity
+        display:
+          name: Electricity
+        presentation:
+          title_public: {tables.emissions_by_custom_sector.variables.electricity.title}
+      making_stuff:
+        title: Share of greenhouse-gas emissions from making stuff
+        display:
+          name: Making things
+        presentation:
+          title_public: {tables.emissions_by_custom_sector.variables.making_stuff.title}
