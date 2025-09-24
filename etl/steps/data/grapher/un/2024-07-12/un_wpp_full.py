@@ -8,7 +8,9 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 # Exclude the last three as we want to treat them differently and remove the january rows from them
-TABLES_EXCLUDE = ["fertility_single", "population", "sex_ratio", "dependency_ratio"]
+TABLES_EXCLUDE = [
+    "fertility_single",
+]
 
 
 def run(dest_dir: str) -> None:
@@ -22,13 +24,6 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     tables = [reshape_table(ds_garden[tb_name]) for tb_name in ds_garden.table_names if tb_name not in TABLES_EXCLUDE]
-    # Fiona: Removing the January data for now, we want it for Cologne but no need to change the live data for now.
-    tb_pop = remove_jan_data(ds_garden["population"])
-    tb_sex_ratio = remove_jan_data(ds_garden["sex_ratio"])
-    tb_dependency = remove_jan_data(ds_garden["dependency_ratio"])
-    tables.append(tb_pop)
-    tables.append(tb_sex_ratio)
-    tables.append(tb_dependency)
     # Edit title
     ds_garden.metadata.title = cast(str, ds_garden.metadata.title) + " (projections full timeseries)"
 
@@ -45,14 +40,6 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new grapher dataset.
     ds_grapher.save()
-
-
-def remove_jan_data(tb: Table) -> Table:
-    tb = reshape_table(tb)
-    tb = tb.reset_index()
-    tb = tb[tb["month"].isin(["july", "July"])].drop(columns=["month"]).copy()
-    tb = tb.format(["country", "year", "sex", "age", "variant"])
-    return tb
 
 
 def reshape_table(tb: Table) -> Table:
