@@ -3,13 +3,13 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: Federico Tena Macrohistory Database
+    title: "A tale of two globalizations: gains from trade and openness 1800–2010"
     description: |-
-      This dataset provides annual series of world exports and imports from 1800 to 2020. Data before 1948 comes from *A Tale of Two Globalizations: Gains from Trade and Openness, 1800–2010*. From 1948 onward, values are drawn mainly from UNCTADstat and Comtrade, with constant-price estimates constructed using trade deflators based on international prices and trade composition.
-    date_published: "2024"
+      This paper compares the waves of globalization before the outbreak of the Great Recession in 2007 with its alleged historical antecedent before the outbreak of World War One. We describe trends in trade and openness, investigate the proximate causes of changes in openness and estimate the gains from trade from the early nineteenth century onwards. Our results suggest that the conventional wisdom has to be revised. The first wave of globalization started around 1820 and culminated around 1870. In the next century, trade continued to grow, with the exception of the Great Depression, but openness and gains fluctuated widely. They resumed a clear upward trend from the early 1970s. By 2007, the world was more open than a century earlier and its inhabitants gained from trade substantially more than their ancestors did.
+    date_published: "2016"
 
     # Citation
-    producer: Federico & Tena (2016); WTO; UNCTAD via Federico Tena Macrohistory Database
+    producer: Federico & Tena
     citation_full: |-
       Federico, Giovanni, and Antonio Tena-Junguito. "A tale of two globalizations: gains from trade and openness 1800–2010." Review of World economics 153.3 (2017): 601-626.
 

@@ -1,6 +1,8 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import numpy as np
 from owid.catalog import processing as pr
+from scipy.optimize import curve_fit
 
 from etl.helpers import PathFinder
 
@@ -24,36 +26,22 @@ def run() -> None:
     # Process data.
     #
 
-    # Filter historic_trade data up to 2000
-    tb_historic_filtered = tb_historic[tb_historic["year"] <= 2000].copy()
+    # Build overlap
 
-    # Filter wto_trade_growth data from 2001 onwards
-    tb_wto_filtered = tb_wto[tb_wto["year"] >= 2001].copy()
+    # Get the 1950 baseline value from historic data
+    baseline_1950 = tb_historic[tb_historic["year"] == 1950]["volume_index"].iloc[0]
 
-    # Find the best scaling factor to align WTO data with historic data
-    # Find overlapping years between the two datasets
-    historic_years = set(tb_historic["year"])
-    wto_years = set(tb_wto["year"])
-    overlapping_years = list(historic_years.intersection(wto_years))
+    # Calculate WTO adjusted values for years after 1950
+    tb_wto_adj = tb_wto.copy()
+    tb_wto_adj["volume_index"] = baseline_1950 * tb_wto_adj["volume_index"] / 100
 
-    # Use the most recent overlapping year for the best alignment
-    if overlapping_years:
-        most_recent_year = max(overlapping_years)
-        historic_value = tb_historic[tb_historic["year"] == most_recent_year]["volume_index"].iloc[0]
-        wto_value = tb_wto[tb_wto["year"] == most_recent_year]["volume_index"].iloc[0]
-        scaling_factor = historic_value / wto_value
-    else:
-        # Fallback: use 2000 from historic and earliest WTO year
-        historic_value = tb_historic[tb_historic["year"] == 2000]["volume_index"].iloc[0]
-        wto_value = tb_wto[tb_wto["year"] == tb_wto["year"].min()]["volume_index"].iloc[0]
-        scaling_factor = historic_value / wto_value
-
-    # Apply scaling factor to all WTO data
-    tb_wto_filtered["volume_index"] = tb_wto_filtered["volume_index"] * scaling_factor
+    # Combine historic data (up to 1950) with adjusted WTO data (after 1950)
+    tb_combined = pr.concat(
+        [tb_wto_adj[tb_wto_adj["year"] > 1950], tb_historic[tb_historic["year"] <= 1950]],
+        ignore_index=True,
+    ).sort_values("year")
 
     # Combine the datasets
-    tb_combined = pr.concat([tb_wto_filtered, tb_historic_filtered], ignore_index=True)
-    # Improve table format.
     tb_combined = tb_combined.format(["country", "year"])
 
     #
@@ -64,3 +52,11 @@ def run() -> None:
 
     # Save garden dataset.
     ds_garden.save()
+
+
+def power(x, a, b):
+    return a * (x**b)
+
+
+def expo(x, a, b):
+    return a * np.exp(b * x)

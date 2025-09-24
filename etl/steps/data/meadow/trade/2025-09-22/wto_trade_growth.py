@@ -19,13 +19,13 @@ def run() -> None:
     #
     # Process data.
     #
-    tb = tb[["Unnamed: 0", "Volume (Total)"]]
+    tb = tb[["Unnamed: 0", "Volume (Total).1"]]
     tb["country"] = "World"
 
     tb = tb.rename(
         columns={
             "Unnamed: 0": "year",
-            "Volume (Total)": "volume_index",
+            "Volume (Total).1": "volume_index",
         }
     )
 
