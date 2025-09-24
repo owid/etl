@@ -24,6 +24,7 @@ from etl.analytics.datasette import (
     _generate_url_to_datasette,
     read_datasette,
 )
+from etl.analytics.metabase import _generate_question_url, create_question
 from etl.config import GOOGLE_API_KEY, LOGFIRE_TOKEN_EXPERT, OWID_MCP_SERVER_URL
 from etl.docs import (
     render_collection,
@@ -519,7 +520,6 @@ def create_question_in_metabase(query: str, title: str, description: str) -> str
     """
     log.info(f"Creating Metabase question for query '{title}'")
     st.markdown("**:material/add_circle: Creating metabase question**")  # , icon=":material/calculate:")
-    from etl.analytics.metabase import _generate_question_url, create_question
 
     # Create question in Metabase
     question = create_question(
