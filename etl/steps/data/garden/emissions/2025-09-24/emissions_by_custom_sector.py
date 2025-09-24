@@ -171,7 +171,7 @@ CUSTOM_MAPPING = {
         (
             "Land-use change and forestry",
             "Forest land",
-            "Net CO2 from forest-land change/management. Note: this subsector is largely driven by agriculture, but not exclusively.",
+            "Net CO2 from forest-land change/management. Note: this subsector is largely driven by agricultural expansion (cropland/pasture), but also logging and settlement expansion.",
         ),
         # 0.4% — Many fires are linked to clearing for agriculture, but not all.
         (
@@ -183,13 +183,13 @@ CUSTOM_MAPPING = {
         (
             "Waste",
             "Landfills",
-            "Methane from landfills. Note: this subsector is largely driven by food/organic waste, but it also includes non-food waste.",
+            "Methane from the decomposition of solid waste in landfills. Note: much of this comes from food and other organic waste, but it also includes paper, wood, and non-food materials.",
         ),
         # 1.3% — Wastewater CH4/N2O from domestic + industrial sources; substantial share is food-related organics.
         (
             "Waste",
             "Wastewater",
-            "Wastewater emissions (domestic/industrial). Note: this subsector is largely related to food/organic load, but not exclusively.",
+            "Methane and nitrous oxide from the treatment and discharge of domestic and industrial wastewater. Note: a significant share is linked to food-related organic matter, but not exclusively.",
         ),
     ],
     "Getting around": [
@@ -263,13 +263,13 @@ CUSTOM_MAPPING = {
         (
             "Electricity and heat",
             "Residential buildings",
-            "Power/steam generation to meet household electricity/heat demand. Note: this subsector is largely for non-thermal end-use, but it is also related to keeping warm and cool.",
+            "Emissions from generating electricity and central heat for residential buildings. Note: while much of this power is used for appliances, lighting, and other non-heating needs, part also supports heating and cooling, which overlaps with 'Keeping warm and cool'.",
         ),
         # 4.8% — Commercial electricity/heat demand.
         (
             "Electricity and heat",
             "Commercial buildings",
-            "Power/steam generation to meet commercial electricity/heat demand. Note: this subsector is largely for non-thermal end-use, but it is also related to keeping warm and cool.",
+            "Emissions from generating electricity and central heat for commercial buildings. Note: while much of this power is used for appliances, lighting, and other non-heating needs, part also supports heating and cooling, which overlaps with 'Keeping warm and cool'.",
         ),
         # 4.4% — Upstream venting in oil/gas/coal supply (supports power and other fuel uses).
         (
@@ -293,18 +293,18 @@ CUSTOM_MAPPING = {
         ),
         # 0.1% — Small unallocated stationary fuel slice in energy operations.
         ("Fugitive emissions", "Unallocated fuel combustion", "Small residual in fossil energy operations."),
+        # Cross-category:
         # 2.8% — Power/heat generation not allocated to an end-use in the source split.
         (
             "Electricity and heat",
             "Unallocated fuel combustion",
-            "Unallocated power/steam generation (residual category in the electricity/heat sector).",
+            "Emissions from electricity and heat generation that could not be assigned to a specific end-use sector in the original dataset. Note: this is a residual category, not a distinct activity.",
         ),
-        # Cross-category:
         # 0.1% — SF6 and related F-gases from grid equipment. Even though IPCC places it under Industrial processes, in practice these emissions occur because we run an electricity system.
         (
             "Industrial processes",
             "Electric power systems",
-            "F-gas (mainly SF6) emissions from T&D equipment (switchgear/insulation). Note: this subsector is also related to 'Making things'.",
+            "Emissions of fluorinated gases (mainly SF₆) from transmission and distribution equipment such as switchgear and circuit breakers. Note: although IPCC classifies this under industrial processes, we include it here because it arises from running the electricity grid.",
         ),
     ],
     "Making things": [
@@ -489,13 +489,13 @@ CUSTOM_MAPPING = {
         (
             "Electricity and heat",
             "Food and tobacco",
-            "Power/steam used by food & tobacco manufacturing (allocated by industrial end-use). Note: this subsector is also partially related to growing food.",
+            "Emissions from energy use in food and tobacco processing industries. Note: although related to food, these emissions come from manufacturing and processing rather than primary food production.",
         ),
         # 0.4%
         (
             "Manufacturing and construction",
             "Food and tobacco",
-            "Direct onsite fuel combustion in industry/construction (excludes purchased electricity/heat). Note: this subsector is also partially related to growing food.",
+            "Direct onsite fuel combustion in industry/construction (excludes purchased electricity/heat). Note: although related to food, these emissions come from manufacturing and processing rather than primary food production.",
         ),
     ],
 }
@@ -567,6 +567,7 @@ def run() -> None:
         description_processing += "".join(
             f"* {sector} - {subsector}: {explanation}\n" for sector, subsector, explanation in choices
         )
+    description_processing += "\nNote that direct fuel use in buildings is shown under 'Keeping warm and cool'. Electricity and district heat for buildings are included under 'Electricity', reflecting production-based reporting."
     tb_custom["share_of_global_ghg_emissions"].metadata.description_processing = description_processing
 
     # Improve table format.
