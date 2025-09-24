@@ -14,7 +14,16 @@ def run() -> None:
     ds_garden = paths.load_dataset("emissions_by_custom_sector")
 
     # Read table from garden dataset.
-    tb = ds_garden.read("emissions_by_custom_sector", reset_index=False)
+    tb = ds_garden.read("emissions_by_custom_sector")
+
+    #
+    # Prepare data.
+    #
+    # Adapt to grapher format.
+    tb = tb.drop(columns=["country"], errors="raise").rename(columns={"sector": "country"}, errors="raise")
+
+    # Improve format.
+    tb = tb.format()
 
     #
     # Save outputs.

@@ -1,12 +1,5 @@
 """
-We need to have the share of emissions for the following custom list of broad sectors:
-- Food
-- Heating and cooling
-- Transport
-- Electricity
-- Making stuff
-
-Unfortunately, I haven't found a perfect mapping onto those categories from publicly available data.
+We need to have the share of emissions for the following custom list of broad sectors. Unfortunately, I haven't found a perfect mapping onto those categories from publicly available data.
 
 Climate Watch (where we get our data for emissions by sector) has the following sectors:
 Agriculture
@@ -137,7 +130,7 @@ SUBSECTORS = {
 
 # Custom remapping of Climate Watch subsectors into our custom categories.
 CUSTOM_MAPPING = {
-    "Food": [
+    "Growing food": [
         # Methane from animal digestion and manure handling.
         SUBSECTORS["Agriculture"]["Livestock & Manure"],
         # Nitrous oxide from fertilizer use and other soil management.
@@ -157,7 +150,7 @@ CUSTOM_MAPPING = {
         # Fires in organic soils/peat (listed as 0 here but keep for completeness).
         SUBSECTORS["Land-use change and forestry"]["Fires in organic soils"],
     ],
-    "Heating and cooling": [
+    "Keeping warm and cool": [
         # Direct onsite combustion in homes (space/water heating, cooking when not electric).
         SUBSECTORS["Energy"]["Buildings"]["Residential Buildings"],
         # Direct onsite combustion in commercial buildings (space/water heating, cooking).
@@ -165,7 +158,7 @@ CUSTOM_MAPPING = {
         # Stationary fuel use not allocated elsewhere; largely generic heating/boilers.
         SUBSECTORS["Energy"]["Other Fuel Combustion"]["Unallocated Fuel Combustion"],
     ],
-    "Transport": [
+    "Getting around": [
         # Road vehicles (gasoline/diesel, not counting electricity use).
         SUBSECTORS["Energy"]["Transportation"]["Road"],
         # Aviation within national inventories (domestic).
@@ -234,7 +227,7 @@ CUSTOM_MAPPING = {
         # Another small slice of unallocated fuel combustion.
         SUBSECTORS["Energy"]["Electricity and Heat"]["Unallocated Fuel Combustion"],
     ],
-    "Making stuff": [
+    "Making things": [
         # Direct onsite combustion in industry & construction (not electricity).
         SUBSECTORS["Energy"]["Manufacturing and Construction"]["Iron and steel"],
         SUBSECTORS["Energy"]["Manufacturing and Construction"]["Other Industry"],
@@ -308,26 +301,33 @@ def run() -> None:
     # Sanity checks.
     sanity_check_inputs()
 
-    # TODO: Create table with the original subsectors, and another with the custom mapping.
-    # TODO: In the grapher step, create a simple visualization with the custom mapping numbers.
     # TODO: Consider comparing with the original data.
-    # TODO: Add metadata describing what each category includes.
+    # TODO: Add metadata describing the subsectors that each category includes.
     # data = tb[(tb["country"]=="World") & (tb["year"]==YEAR)].drop(columns=["country", "year"]).iloc[0].to_dict()
     # data = {tb[field].metadata.title: 100 * value / data["total_ghg_emissions_including_lucf"] for field, value in data.items() if "capita" not in field if not "total" in field if "population" not in field}
     # data = {field.replace("Greenhouse gas emissions from ", "").replace(" of greenhouse gas from", "").capitalize(): value for field, value in data.items()}
 
     # Final shares in the custom mapping.
-    tb_custom = Table({sector: [sum(subsectors)] for sector, subsectors in CUSTOM_MAPPING.items()})
+    # tb_custom = Table({sector: [sum(subsectors)] for sector, subsectors in CUSTOM_MAPPING.items()})
+    tb_custom = Table(
+        {
+            "sector": CUSTOM_MAPPING.keys(),
+            "share_of_global_ghg_emissions": [sum(values) for values in CUSTOM_MAPPING.values()],
+        }
+    )
+
     # Add Climate Watch origin to all new columns.
     origin = tb[tb.columns[-1]].metadata.origins[0]
     assert origin.producer == "Climate Watch"
-    for column in tb_custom.columns:
-        tb_custom[column].origins = [origin]
+    # for column in tb_custom.columns:
+    #     tb_custom[column].origins = [origin]
+    tb_custom["share_of_global_ghg_emissions"].metadata.origins = [origin]
+
     # Add country and year columns.
     tb_custom = tb_custom.assign(**{"country": "World", "year": YEAR})
 
     # Improve table format.
-    tb_custom = tb_custom.format(short_name=paths.short_name)
+    tb_custom = tb_custom.format(keys=["country", "sector", "year"], short_name=paths.short_name)
 
     #
     # Save outputs.
