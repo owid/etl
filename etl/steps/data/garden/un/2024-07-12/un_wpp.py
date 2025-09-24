@@ -268,7 +268,7 @@ def process_dependency(tb: Table) -> Table:
 
     # Unpivot
     tb_dependency = tb_dependency.melt(
-        id_vars=[col for col in COLUMNS_INDEX if col != "age"],
+        id_vars=[col for col in COLUMNS_INDEX_MONTH if col != "age"],
         var_name="age",
         value_name="dependency_ratio",
     )
