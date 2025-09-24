@@ -531,7 +531,7 @@ async def list_available_questions_metabase() -> List[dict]:
             - id (int): ID of the question.
             - description (str, optional): Description of the question, if available.
     """
-    from etl.analytics.metabase import list_questions
+    from etl.analytics.metabase import COLLECTION_EXPERT_ID, list_questions
 
     st.markdown(
         "**:material/construction: Tool use**: Listing available questions in Metabase, via `list_available_questions_metabase`"
@@ -539,6 +539,9 @@ async def list_available_questions_metabase() -> List[dict]:
 
     # Get questions
     questions = list_questions()
+
+    # Skip those under collection expert
+    questions = [q for q in questions if q.get("collection_id") != COLLECTION_EXPERT_ID]
 
     # Create question summary
     summary = []
