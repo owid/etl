@@ -1,0 +1,26 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "A tale of two globalizations: gains from trade and openness 1800–2010"
+    description: |-
+      This paper compares the waves of globalization before the outbreak of the Great Recession in 2007 with its alleged historical antecedent before the outbreak of World War One. We describe trends in trade and openness, investigate the proximate causes of changes in openness and estimate the gains from trade from the early nineteenth century onwards. Our results suggest that the conventional wisdom has to be revised. The first wave of globalization started around 1820 and culminated around 1870. In the next century, trade continued to grow, with the exception of the Great Depression, but openness and gains fluctuated widely. They resumed a clear upward trend from the early 1970s. By 2007, the world was more open than a century earlier and its inhabitants gained from trade substantially more than their ancestors did.
+    date_published: "2016"
+
+    # Citation
+    producer: Federico and Tena-Junguito
+    citation_full: |-
+      Federico, G., & Tena-Junguito, A. (2016). A tale of two globalizations: Gains from trade and openness 1800–2010 (Working Papers in Economic History No. 16-02).
+
+    # Files
+    url_main: https://e-archivo.uc3m.es/rest/api/core/bitstreams/32371da7-eb07-4588-967d-a37ba009b19b/content
+    date_accessed: '2025-09-22'
+
+    # License
+    license:
+      name: CC BY 4.0
+outs:
+  - md5: fab3b87e99bcc717c48dcf052d459bf9
+    size: 194543
+    path: historic_trade.xlsx
