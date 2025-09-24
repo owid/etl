@@ -267,7 +267,7 @@ def process_dependency(tb: Table) -> Table:
 
     # Pivot table
     tb_dependency = tb_dependency.pivot(
-        columns="age", index=[col for col in COLUMNS_INDEX_MONTH if col != "age"], values="population"
+        columns="age", index=[col for col in COLUMNS_INDEX if col != "age"], values="population"
     ).reset_index()
 
     # Estimate ratios

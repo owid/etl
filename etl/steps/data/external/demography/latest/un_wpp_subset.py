@@ -16,7 +16,7 @@ def run() -> None:
     #
     # Process data.
     #
-    tb_pop = ds_garden["population"]
+    tb_pop = ds_garden["population_january"]
     tb_pop = tb_pop.reset_index()
     tb_pop = tb_pop[tb_pop["month"].isin(["january"])].drop(columns=["month"]).copy()
     tb_pop = tb_pop.format(["country", "year", "sex", "age", "variant"])
