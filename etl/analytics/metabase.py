@@ -85,6 +85,8 @@ def _generate_question_url(card: dict) -> str:
     assert "name" in card, "Card must have an 'name' field"
     card_name = card["name"]
 
+    # Preliminary cleaning
+    slug = card_name.lower().replace(" ", "-").replace("/", "-")
     # Use urllib.parse.quote to handle special characters properly
     slug = urllib.parse.quote(card_name.lower().replace(" ", "-"), safe="")
     url = f"{METABASE_URL_LOCAL}/question/{card_id}-{slug}"
