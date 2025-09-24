@@ -655,4 +655,5 @@ include:
   - dag/archive/redistribution.yml
   - dag/archive/wizard.yml
   - dag/archive/growth.yml
+  - dag/archive/labor.yml
   - dag/archive/forests.yml

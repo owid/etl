@@ -89,24 +89,6 @@ steps:
   export://s3/co2_data/latest/owid_co2:
     - data://garden/emissions/2024-11-21/owid_co2
   #
-  # Climate Watch - Greenhouse gas emissions by sector.
-  #
-  data://meadow/climate_watch/2024-11-21/emissions_by_sector:
-    - snapshot://climate_watch/2024-11-21/emissions_by_sector.gz
-  #
-  # Climate Watch - Greenhouse gas emissions by sector.
-  #
-  data://garden/climate_watch/2024-11-21/emissions_by_sector:
-    - data://meadow/climate_watch/2024-11-21/emissions_by_sector
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2025-07-01/income_groups
-    - data://garden/demography/2024-07-15/population
-  #
-  # Climate Watch - Greenhouse gas emissions by sector.
-  #
-  data://grapher/climate_watch/2024-11-21/emissions_by_sector:
-    - data://garden/climate_watch/2024-11-21/emissions_by_sector
-  #
   # Jones et al. - National contributions to climate change.
   #
   data://meadow/emissions/2024-11-21/national_contributions:
@@ -184,3 +166,21 @@ steps:
   #
   data://grapher/rff/2025-06-02/world_carbon_pricing:
     - data://garden/rff/2025-06-02/world_carbon_pricing
+  #
+  # Climate Watch - Greenhouse gas emissions by sector.
+  #
+  data://meadow/climate_watch/2025-09-19/emissions_by_sector:
+    - snapshot://climate_watch/2025-09-19/emissions_by_sector.gz
+  #
+  # Climate Watch - Greenhouse gas emissions by sector.
+  #
+  data://garden/climate_watch/2025-09-19/emissions_by_sector:
+    - data://meadow/climate_watch/2025-09-19/emissions_by_sector
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2025-07-01/income_groups
+    - data://garden/demography/2024-07-15/population
+  #
+  # Climate Watch - Greenhouse gas emissions by sector.
+  #
+  data://grapher/climate_watch/2025-09-19/emissions_by_sector:
+    - data://garden/climate_watch/2025-09-19/emissions_by_sector

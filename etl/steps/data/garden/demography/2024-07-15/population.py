@@ -84,6 +84,17 @@ def run() -> None:
     tb_un = format_wpp(tb_un)
     tb_gapminder_sg, tb_gapminder_sg_former = format_gapminder_sg(tb_gapminder_sg)
 
+    # Edit data on Ireland
+    # Remove from HYDE, replace label in Gapminder "Ireland" -> "Ireland (whole island)".
+    # We do this bc Gapminder is counting N. Ireland + Rep. Ireland all together, and we are unsure about HYDE.
+    # More details: https://github.com/owid/owid-issues/issues/2104
+    #
+    # Remove Ireland from HYDE
+    tb_hyde = tb_hyde.loc[tb_hyde["country"] != "Ireland"]
+    # Remove Ireland in Gapminder when year>1920
+    tb_gapminder = tb_gapminder.loc[~((tb_gapminder["country"] == "Ireland") & (tb_gapminder["year"] > 1920))]
+    tb_gapminder = tb_gapminder.replace({"country": {"Ireland": "Ireland (whole island)"}})
+
     # Concat tables
     tb = pr.concat(
         [tb_hyde, tb_gapminder, tb_un, tb_gapminder_sg],

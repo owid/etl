@@ -732,6 +732,8 @@ tables:
             <<welfare_type.capitalize()>> surveys
             <%- endif %>
           numDecimalPlaces: 0
+          numSignificantFigures: 3
+          roundingMode: significantFigures
           <<: *common_display
         presentation:
           topic_tags:
@@ -768,6 +770,8 @@ tables:
         display:
           name: Number of people not in poverty (above {definitions.poverty_line_a_day})
           numDecimalPlaces: 0
+          numSignificantFigures: 3
+          roundingMode: significantFigures
           <<: *common_display
 
       headcount_between:
@@ -787,6 +791,8 @@ tables:
         display:
           name: Number of people in poverty (between {definitions.poverty_line_a_day})
           numDecimalPlaces: 0
+          numSignificantFigures: 3
+          roundingMode: significantFigures
           <<: *common_display
 
       total_shortfall:
