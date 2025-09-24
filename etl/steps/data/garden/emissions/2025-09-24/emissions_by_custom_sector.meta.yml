@@ -14,36 +14,6 @@ dataset:
 tables:
   emissions_by_custom_sector:
     variables:
-      # growing_food:
-      #   title: Share of greenhouse-gas emissions from food production
-      #   display:
-      #     name: Growing food
-      #   presentation:
-      #     title_public: {tables.emissions_by_custom_sector.variables.growing_food.title}
-      # keeping_warm_and_cool:
-      #   title: Share of greenhouse-gas emissions from heating and cooling
-      #   display:
-      #     name: Keeping warm and cool
-      #   presentation:
-      #     title_public: {tables.emissions_by_custom_sector.variables.keeping_warm_and_cool.title}
-      # getting_around:
-      #   title: Share of greenhouse-gas emissions from transport
-      #   display:
-      #     name: Getting around
-      #   presentation:
-      #     title_public: {tables.emissions_by_custom_sector.variables.getting_around.title}
-      # electricity:
-      #   title: Share of greenhouse-gas emissions from electricity
-      #   display:
-      #     name: Electricity
-      #   presentation:
-      #     title_public: {tables.emissions_by_custom_sector.variables.electricity.title}
-      # making_things:
-      #   title: Share of greenhouse-gas emissions from construction and manufacturing
-      #   display:
-      #     name: Making things
-      #   presentation:
-      #     title_public: {tables.emissions_by_custom_sector.variables.making_things.title}
       share_of_global_ghg_emissions:
         title: Share of global greenhouse-gas emissions
         display:

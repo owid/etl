@@ -24,6 +24,7 @@ Then, figure out a reasonable mapping of subsectors onto my custom categories.
 """
 
 from owid.catalog import Table
+from owid.datautils.io import load_json
 
 from etl.helpers import PathFinder
 
@@ -32,99 +33,6 @@ paths = PathFinder(__file__)
 
 # Year that Climate Watch data refers to.
 YEAR = 2021
-
-SUBSECTORS = {
-    "Electricity and heat": {
-        "Residential buildings": 7.5,
-        "Commercial buildings": 4.8,
-        "Unallocated fuel combustion": 2.8,
-        "Chemical and petrochemical": 2.3,
-        "Other industry": 2.2,
-        "Iron and steel": 1.8,
-        "Non-ferrous metals": 1.4,
-        "Machinery": 1.4,
-        "Agriculture and fishing energy use": 1,
-        "Non-metallic minerals": 0.8,
-        "Food and tobacco": 0.8,
-        "Textile and leather": 0.5,
-        "Mining and quarrying": 0.5,
-        "Paper, pulp and printing": 0.5,
-        "Transport equipment": 0.4,
-        "Rail": 0.3,
-        "Construction": 0.3,
-        "Wood and wood products": 0.1,
-        "Road": 0.1,
-        "Pipeline": 0,
-        "Other transportation": 0,
-    },
-    "Transportation": {
-        "Road": 12.1,
-        "Air": 0.7,
-        "Ship": 0.3,
-        "Pipeline": 0.3,
-        "Rail": 0.2,
-        "Other transportation": 0.1,
-    },
-    "Manufacturing and construction": {
-        "Iron and steel": 4.3,
-        "Other industry": 2.4,
-        "Non-metallic minerals": 2.3,
-        "Chemical and petrochemical": 1.5,
-        "Food and tobacco": 0.4,
-        "Non-ferrous metals": 0.4,
-        "Construction": 0.3,
-        "Mining and quarrying": 0.3,
-        "Paper, pulp and printing": 0.3,
-        "Machinery": 0.2,
-        "Textile and leather": 0.1,
-        "Transport equipment": 0.1,
-        "Wood and wood products": 0,
-    },
-    "Buildings": {
-        "Residential buildings": 5,
-        "Commercial buildings": 1.6,
-    },
-    "Fugitive emissions": {
-        "Vented": 4.4,
-        "Flared": 1,
-        "Production": 0.7,
-        "Transmission and distribution": 0.4,
-        "Unallocated fuel combustion": 0.1,
-    },
-    "Other fuel combustion": {
-        "Unallocated fuel combustion": 3.5,
-        "Agriculture and fishing energy use": 0.9,
-    },
-    "International bunker": {
-        "Ship": 1.3,
-        "Air": 0.7,
-    },
-    "Agriculture": {
-        "Livestock and manure": 5.9,
-        "Agriculture soils": 4.1,
-        "Rice cultivation": 1.2,
-        "Burning": 0.5,
-    },
-    "Industrial processes": {
-        "Cement": 3.4,
-        "Chemical and petrochemical (ip)": 2.6,
-        "Other industry (ip)": 0.1,
-        "Electronics (ip)": 0.1,
-        "Electric power systems": 0.1,
-        "Non-ferrous metals (ip)": 0.1,
-    },
-    "Waste": {
-        "Landfills": 2,
-        "Wastewater": 1.3,
-        "Other waste": 0.1,
-    },
-    "Land-use change and forestry": {
-        "Drained organic soils": 1.7,
-        "Forest land": 0.6,
-        "Forest fires": 0.4,
-        "Fires in organic soils": 0,
-    },
-}
 
 
 # Custom remapping of Climate Watch subsectors into our custom categories.
@@ -502,17 +410,17 @@ CUSTOM_MAPPING = {
 
 
 # Sanity checks.
-def sanity_check_inputs():
+def sanity_check_inputs(subsectors):
     # Check that shares add up to ~100%.
     def deep_sum(d):
         return sum(deep_sum(v) if isinstance(v, dict) else v for v in d.values())
 
     error = "Share of GHG emissions from all subsectors don't add up to >99%"
-    assert deep_sum(SUBSECTORS) > 99, error
+    assert deep_sum(subsectors) > 99, error
 
     error = "Share of GHG emissions in custom mapping don't add up to >99%"
     assert (
-        sum(sum(SUBSECTORS[toplevel][leaf] for toplevel, leaf, _ in items) for items in CUSTOM_MAPPING.values()) > 99
+        sum(sum(subsectors[toplevel][leaf] for toplevel, leaf, _ in items) for items in CUSTOM_MAPPING.values()) > 99
     ), error
 
     # Check that all subsectors are included in the custom mapping by comparing unique values.
@@ -523,8 +431,8 @@ def sanity_check_inputs():
             else:
                 yield v
 
-    all_vals = set(leaves_values(SUBSECTORS))
-    mapped_vals = {SUBSECTORS[toplevel][leaf] for items in CUSTOM_MAPPING.values() for (toplevel, leaf, _desc) in items}
+    all_vals = set(leaves_values(subsectors))
+    mapped_vals = {subsectors[toplevel][leaf] for items in CUSTOM_MAPPING.values() for (toplevel, leaf, _desc) in items}
     assert all_vals == mapped_vals, f"Missing: {all_vals - mapped_vals}, Extra: {mapped_vals - all_vals}"
 
 
@@ -545,26 +453,72 @@ def fix_rounding_issues(tb_custom: Table) -> Table:
     return tb_custom
 
 
+# Just to be able to compare the Climate Watch data with the numbers reported on the WRI website.
+DATA_TO_SECTOR_NAMING = {
+    "agriculture_ghg_emissions": "Agriculture",
+    "aviation_and_shipping_ghg_emissions": "International bunker",
+    "buildings_ghg_emissions": "Buildings",
+    "electricity_and_heat_ghg_emissions": "Electricity and heat",
+    "fugitive_ghg_emissions": "Fugitive emissions",
+    "industry_ghg_emissions": "Industrial processes",
+    "land_use_change_and_forestry_ghg_emissions": "Land-use change and forestry",
+    "manufacturing_and_construction_ghg_emissions": "Manufacturing and construction",
+    "other_fuel_combustion_ghg_emissions": "Other fuel combustion",
+    "transport_ghg_emissions": "Transportation",
+    "waste_ghg_emissions": "Waste",
+}
+
+
 def run() -> None:
     #
     # Load inputs.
     #
+    # Load emissions by detailed sector and read its main table.
+    snap = paths.load_snapshot("emissions_by_detailed_sector.json")
+    subsectors = load_json(snap.path)
+
     # Load emissions by sector and read its main table.
-    ds_emissions = paths.load_dataset("emissions_by_sector")
-    tb = ds_emissions.read("greenhouse_gas_emissions_by_sector")
+    # NOTE: This data is only used for some sanity checking (which is commented out below).
+    # All data was extracted manually from the WRI site.
+    # ds_emissions = paths.load_dataset("emissions_by_sector")
+    # tb = ds_emissions.read("greenhouse_gas_emissions_by_sector")
 
     #
     # Process data.
     #
     # Sanity checks.
-    sanity_check_inputs()
+    sanity_check_inputs(subsectors=subsectors)
+
+    # # Select relevant columns from the table.
+    # tb = tb[(tb["country"] == "World") & (tb["year"] == YEAR)].drop(columns=["country", "year"], errors="raise")
+    # total_emissions = tb["total_ghg_emissions_including_lucf"].item()
+    # tb = tb[list(DATA_TO_SECTOR_NAMING)].rename(columns=DATA_TO_SECTOR_NAMING, errors="raise")
+    # data_shares = {column: (100 * tb[column].item() / total_emissions).round(1) for column in tb.columns}
+    # wri_shares = {sector: round(sum(SUBSECTORS[sector].values()), 1) for sector in SUBSECTORS}
+    # # NOTE: I expected that the total shares of each category in the Climate Watch data would be similar to the ones extracted from the WRI data. However, they differ up to 15% for some sectors, and 73% for "Other fuel combustion":
+    # for category in list(data_shares):
+    #     print(category, 100 * abs(data_shares[category] - wri_shares[category]) / wri_shares[category])
+    # Result:
+    # Agriculture 3.418803418803422
+    # International bunker 0.0
+    # Buildings 0.0
+    # Electricity and heat 10.847457627118654
+    # Fugitive emissions 0.0
+    # Industrial processes 1.5625000000000082
+    # Land-use change and forestry 0.0
+    # Manufacturing and construction 0.0
+    # Other fuel combustion 72.72727272727272
+    # Transportation 13.868613138686134
+    # Waste 8.823529411764714
+
+    # It would be good to have access to the disaggregated data from WRI, but they do not publish it.
 
     # Final shares in the custom mapping.
     tb_custom = Table(
         {
             "sector": CUSTOM_MAPPING.keys(),
             "share_of_global_ghg_emissions": [
-                sum(SUBSECTORS[toplevel][leaf] for toplevel, leaf, _ in items) for items in CUSTOM_MAPPING.values()
+                sum(subsectors[toplevel][leaf] for toplevel, leaf, _ in items) for items in CUSTOM_MAPPING.values()
             ],
         }
     )
@@ -572,10 +526,8 @@ def run() -> None:
     # Fix rounding issues.
     tb_custom = fix_rounding_issues(tb_custom=tb_custom)
 
-    # Add Climate Watch origin to all new columns.
-    origin = tb[tb.columns[-1]].metadata.origins[0]
-    assert origin.producer == "Climate Watch"
-    tb_custom["share_of_global_ghg_emissions"].metadata.origins = [origin]
+    # Add Climate Watch origin to new column.
+    tb_custom["share_of_global_ghg_emissions"].metadata.origins = [snap.metadata.origin]
 
     # Add country and year columns.
     tb_custom = tb_custom.assign(**{"country": "World", "year": YEAR})
