@@ -429,7 +429,7 @@ async def get_api_reference_metadata(
 class QueryResult(BaseModel):
     message: str
     valid: bool
-    result: str | None = None
+    result: dict | None = None
     url_metabase: str | None = None
     url_datasette: str | None = None
 
@@ -470,8 +470,15 @@ async def execute_query(query: str, title: str, description: str, num_rows: int 
                 url_datasette=url_datasette,
             )
 
-        data_str = df.head(num_rows).to_markdown(index=False)
-        if data_str is None:
+        # Serialize dataframe
+        data = {
+            "columns": df.columns.tolist(),
+            "dtypes": {c: str(t) for c, t in df.dtypes.items()},
+            "data": df.head(num_rows).to_numpy().tolist(),  # small slice
+            "total_rows": len(df),
+        }
+
+        if data["data"] is None:
             return QueryResult(
                 message="Query returned no results. Try it on Datasette",
                 valid=False,
@@ -486,7 +493,7 @@ async def execute_query(query: str, title: str, description: str, num_rows: int 
         return QueryResult(
             message="SUCCESS",
             valid=True,
-            result=data_str,
+            result=data,
             url_metabase=url_metabase,
             url_datasette=url_datasette,
         )
