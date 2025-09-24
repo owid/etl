@@ -176,12 +176,19 @@ async def agent_stream(prompt: str, model_name: str, message_history) -> AsyncGe
     Yields:
         str: Text chunks from the agent response
     """
+    toolsets = get_toolsets()
     model = _get_model_from_name(model_name)
+
+    print("===========================================")
+    print("Toolsets available")
+    print(toolsets)
+    print("===========================================")
+
     async with agent.run_stream(
         prompt,
         model=model,  # type: ignore
         message_history=message_history,
-        toolsets=get_toolsets(),  # type: ignore
+        toolsets=toolsets,  # type: ignore
     ) as result:
         # Yield each message from the stream
         async for message in result.stream_text(delta=True):
@@ -197,13 +204,13 @@ async def agent_stream(prompt: str, model_name: str, message_history) -> AsyncGe
 async def _collect_agent_stream2(prompt: str, model_name: str, message_history) -> List[str]:
     """Collect all chunks from agent_stream2 in one async context to avoid task switching issues."""
     toolsets = get_toolsets()
+    chunks = []
+    model = _get_model_from_name(model_name)
+
     print("===========================================")
     print("Toolsets available")
     print(toolsets)
     print("===========================================")
-
-    chunks = []
-    model = _get_model_from_name(model_name)
 
     async with agent.iter(
         prompt,
