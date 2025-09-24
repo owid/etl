@@ -34,72 +34,70 @@ paths = PathFinder(__file__)
 YEAR = 2021
 
 SUBSECTORS = {
-    "Energy": {
-        "Electricity and heat": {
-            "Residential buildings": 7.5,
-            "Commercial buildings": 4.8,
-            "Unallocated fuel combustion": 2.8,
-            "Chemical and petrochemical": 2.3,
-            "Other industry": 2.2,
-            "Iron and steel": 1.8,
-            "Non-ferrous metals": 1.4,
-            "Machinery": 1.4,
-            "Agriculture and fishing energy use": 1,
-            "Non-metallic minerals": 0.8,
-            "Food and tobacco": 0.8,
-            "Textile and leather": 0.5,
-            "Mining and quarrying": 0.5,
-            "Paper, pulp and printing": 0.5,
-            "Transport equipment": 0.4,
-            "Rail": 0.3,
-            "Construction": 0.3,
-            "Wood and wood products": 0.1,
-            "Road": 0.1,
-            "Pipeline": 0,
-            "Other transportation": 0,
-        },
-        "Transportation": {
-            "Road": 12.1,
-            "Air": 0.7,
-            "Ship": 0.3,
-            "Pipeline": 0.3,
-            "Rail": 0.2,
-            "Other transportation": 0.1,
-        },
-        "Manufacturing and construction": {
-            "Iron and steel": 4.3,
-            "Other industry": 2.4,
-            "Non-metallic minerals": 2.3,
-            "Chemical and petrochemical": 1.5,
-            "Food and tobacco": 0.4,
-            "Non-ferrous metals": 0.4,
-            "Construction": 0.3,
-            "Mining and quarrying": 0.3,
-            "Paper, pulp and printing": 0.3,
-            "Machinery": 0.2,
-            "Textile and leather": 0.1,
-            "Transport equipment": 0.1,
-            "Wood and wood products": 0,
-        },
-        "Buildings": {
-            "Residential buildings": 5,
-            "Commercial buildings": 1.6,
-        },
-        "Fugitive emissions": {
-            "Vented": 4.4,
-            "Flared": 1,
-            "Production": 0.7,
-            "Transmission and distribution": 0.4,
-            "Unallocated fuel combustion": 0.1,
-        },
-        "Other fuel combustion": {
-            "Unallocated fuel combustion": 3.5,
-            "Agriculture and fishing energy use": 0.9,
-        },
-        "International bunker": {
-            "Ship": 1.3,
-            "Air": 0.7,
-        },
+    "Electricity and heat": {
+        "Residential buildings": 7.5,
+        "Commercial buildings": 4.8,
+        "Unallocated fuel combustion": 2.8,
+        "Chemical and petrochemical": 2.3,
+        "Other industry": 2.2,
+        "Iron and steel": 1.8,
+        "Non-ferrous metals": 1.4,
+        "Machinery": 1.4,
+        "Agriculture and fishing energy use": 1,
+        "Non-metallic minerals": 0.8,
+        "Food and tobacco": 0.8,
+        "Textile and leather": 0.5,
+        "Mining and quarrying": 0.5,
+        "Paper, pulp and printing": 0.5,
+        "Transport equipment": 0.4,
+        "Rail": 0.3,
+        "Construction": 0.3,
+        "Wood and wood products": 0.1,
+        "Road": 0.1,
+        "Pipeline": 0,
+        "Other transportation": 0,
+    },
+    "Transportation": {
+        "Road": 12.1,
+        "Air": 0.7,
+        "Ship": 0.3,
+        "Pipeline": 0.3,
+        "Rail": 0.2,
+        "Other transportation": 0.1,
+    },
+    "Manufacturing and construction": {
+        "Iron and steel": 4.3,
+        "Other industry": 2.4,
+        "Non-metallic minerals": 2.3,
+        "Chemical and petrochemical": 1.5,
+        "Food and tobacco": 0.4,
+        "Non-ferrous metals": 0.4,
+        "Construction": 0.3,
+        "Mining and quarrying": 0.3,
+        "Paper, pulp and printing": 0.3,
+        "Machinery": 0.2,
+        "Textile and leather": 0.1,
+        "Transport equipment": 0.1,
+        "Wood and wood products": 0,
+    },
+    "Buildings": {
+        "Residential buildings": 5,
+        "Commercial buildings": 1.6,
+    },
+    "Fugitive emissions": {
+        "Vented": 4.4,
+        "Flared": 1,
+        "Production": 0.7,
+        "Transmission and distribution": 0.4,
+        "Unallocated fuel combustion": 0.1,
+    },
+    "Other fuel combustion": {
+        "Unallocated fuel combustion": 3.5,
+        "Agriculture and fishing energy use": 0.9,
+    },
+    "International bunker": {
+        "Ship": 1.3,
+        "Air": 0.7,
     },
     "Agriculture": {
         "Livestock and manure": 5.9,
@@ -140,7 +138,7 @@ CUSTOM_MAPPING = {
         # Field burning of crop residues and savannas.
         SUBSECTORS["Agriculture"]["Burning"],
         # On-farm fuel use for tractors, pumps, and fishing vessels (non-electric).
-        SUBSECTORS["Energy"]["Other fuel combustion"]["Agriculture and fishing energy use"],
+        SUBSECTORS["Other fuel combustion"]["Agriculture and fishing energy use"],
         # Land emissions tied to agriculture/forestry expansion and drainage (LUCF).
         SUBSECTORS["Land-use change and forestry"]["Drained organic soils"],
         # Net forest land sources (deforestation/degradation net of regrowth, per WRI slice).
@@ -152,96 +150,96 @@ CUSTOM_MAPPING = {
     ],
     "Keeping warm and cool": [
         # Direct onsite combustion in homes (space/water heating, cooking when not electric).
-        SUBSECTORS["Energy"]["Buildings"]["Residential buildings"],
+        SUBSECTORS["Buildings"]["Residential buildings"],
         # Direct onsite combustion in commercial buildings (space/water heating, cooking).
-        SUBSECTORS["Energy"]["Buildings"]["Commercial buildings"],
+        SUBSECTORS["Buildings"]["Commercial buildings"],
         # Stationary fuel use not allocated elsewhere; largely generic heating/boilers.
-        SUBSECTORS["Energy"]["Other fuel combustion"]["Unallocated fuel combustion"],
+        SUBSECTORS["Other fuel combustion"]["Unallocated fuel combustion"],
     ],
     "Getting around": [
         # Road vehicles (gasoline/diesel, not counting electricity use).
-        SUBSECTORS["Energy"]["Transportation"]["Road"],
+        SUBSECTORS["Transportation"]["Road"],
         # Aviation within national inventories (domestic).
-        SUBSECTORS["Energy"]["Transportation"]["Air"],
+        SUBSECTORS["Transportation"]["Air"],
         # Shipping within national inventories (domestic).
-        SUBSECTORS["Energy"]["Transportation"]["Ship"],
+        SUBSECTORS["Transportation"]["Ship"],
         # Fuels used for pipeline transport (e.g., compressors).
-        SUBSECTORS["Energy"]["Transportation"]["Pipeline"],
+        SUBSECTORS["Transportation"]["Pipeline"],
         # Rail transport fuels (diesel rail—electric rail is in electricity bucket).
-        SUBSECTORS["Energy"]["Transportation"]["Rail"],
+        SUBSECTORS["Transportation"]["Rail"],
         # Miscellaneous smaller transport categories.
-        SUBSECTORS["Energy"]["Transportation"]["Other transportation"],
+        SUBSECTORS["Transportation"]["Other transportation"],
         # International shipping fuel (bunker).
-        SUBSECTORS["Energy"]["International bunker"]["Ship"],
+        SUBSECTORS["International bunker"]["Ship"],
         # International aviation fuel (bunker).
-        SUBSECTORS["Energy"]["International bunker"]["Air"],
+        SUBSECTORS["International bunker"]["Air"],
     ],
     "Electricity": [
         # Electricity and heat generation for households.
-        SUBSECTORS["Energy"]["Electricity and heat"]["Residential buildings"],
+        SUBSECTORS["Electricity and heat"]["Residential buildings"],
         # Electricity and heat generation for commercial buildings.
-        SUBSECTORS["Energy"]["Electricity and heat"]["Commercial buildings"],
+        SUBSECTORS["Electricity and heat"]["Commercial buildings"],
         # Electricity and heat generation used by industry (chemicals).
-        SUBSECTORS["Energy"]["Electricity and heat"]["Chemical and petrochemical"],
+        SUBSECTORS["Electricity and heat"]["Chemical and petrochemical"],
         # Electricity and heat generation used by industry (other).
-        SUBSECTORS["Energy"]["Electricity and heat"]["Other industry"],
+        SUBSECTORS["Electricity and heat"]["Other industry"],
         # Electricity and heat generation used by iron and steel.
-        SUBSECTORS["Energy"]["Electricity and heat"]["Iron and steel"],
+        SUBSECTORS["Electricity and heat"]["Iron and steel"],
         # Electricity and heat generation used by non-ferrous metals.
-        SUBSECTORS["Energy"]["Electricity and heat"]["Non-ferrous metals"],
+        SUBSECTORS["Electricity and heat"]["Non-ferrous metals"],
         # Electricity and heat generation used by machinery.
-        SUBSECTORS["Energy"]["Electricity and heat"]["Machinery"],
+        SUBSECTORS["Electricity and heat"]["Machinery"],
         # Electricity and heat generation used by agriculture and fishing.
-        SUBSECTORS["Energy"]["Electricity and heat"]["Agriculture and fishing energy use"],
+        SUBSECTORS["Electricity and heat"]["Agriculture and fishing energy use"],
         # Electricity and heat generation used by non-metallic minerals.
-        SUBSECTORS["Energy"]["Electricity and heat"]["Non-metallic minerals"],
+        SUBSECTORS["Electricity and heat"]["Non-metallic minerals"],
         # Electricity and heat generation used by food and tobacco manufacturing.
-        SUBSECTORS["Energy"]["Electricity and heat"]["Food and tobacco"],
+        SUBSECTORS["Electricity and heat"]["Food and tobacco"],
         # Electricity and heat generation used by textiles and leather.
-        SUBSECTORS["Energy"]["Electricity and heat"]["Textile and leather"],
+        SUBSECTORS["Electricity and heat"]["Textile and leather"],
         # Electricity and heat generation used by mining and quarrying.
-        SUBSECTORS["Energy"]["Electricity and heat"]["Mining and quarrying"],
+        SUBSECTORS["Electricity and heat"]["Mining and quarrying"],
         # Electricity and heat generation used by paper, pulp and printing.
-        SUBSECTORS["Energy"]["Electricity and heat"]["Paper, pulp and printing"],
+        SUBSECTORS["Electricity and heat"]["Paper, pulp and printing"],
         # Electricity and heat generation used by transport equipment manufacturing.
-        SUBSECTORS["Energy"]["Electricity and heat"]["Transport equipment"],
+        SUBSECTORS["Electricity and heat"]["Transport equipment"],
         # Electricity used by rail systems.
-        SUBSECTORS["Energy"]["Electricity and heat"]["Rail"],
+        SUBSECTORS["Electricity and heat"]["Rail"],
         # Electricity used by construction activities.
-        SUBSECTORS["Energy"]["Electricity and heat"]["Construction"],
+        SUBSECTORS["Electricity and heat"]["Construction"],
         # Electricity and heat generation used by wood products.
-        SUBSECTORS["Energy"]["Electricity and heat"]["Wood and wood products"],
+        SUBSECTORS["Electricity and heat"]["Wood and wood products"],
         # Electricity used in road transport (EVs, small share here).
-        SUBSECTORS["Energy"]["Electricity and heat"]["Road"],
+        SUBSECTORS["Electricity and heat"]["Road"],
         # Electricity for pipelines (e.g., electric compressors/pumps).
-        SUBSECTORS["Energy"]["Electricity and heat"]["Pipeline"],
+        SUBSECTORS["Electricity and heat"]["Pipeline"],
         # Misc. electricity uses in transport.
-        SUBSECTORS["Energy"]["Electricity and heat"]["Other transportation"],
+        SUBSECTORS["Electricity and heat"]["Other transportation"],
         # Upstream leaks/venting/flaring in fossil energy supply feeding power/heat.
-        SUBSECTORS["Energy"]["Fugitive emissions"]["Vented"],
-        SUBSECTORS["Energy"]["Fugitive emissions"]["Flared"],
-        SUBSECTORS["Energy"]["Fugitive emissions"]["Production"],
-        SUBSECTORS["Energy"]["Fugitive emissions"]["Transmission and distribution"],
+        SUBSECTORS["Fugitive emissions"]["Vented"],
+        SUBSECTORS["Fugitive emissions"]["Flared"],
+        SUBSECTORS["Fugitive emissions"]["Production"],
+        SUBSECTORS["Fugitive emissions"]["Transmission and distribution"],
         # Small unallocated stationary fuel slice tied to energy system operations.
-        SUBSECTORS["Energy"]["Fugitive emissions"]["Unallocated fuel combustion"],
+        SUBSECTORS["Fugitive emissions"]["Unallocated fuel combustion"],
         # Another small slice of unallocated fuel combustion.
-        SUBSECTORS["Energy"]["Electricity and heat"]["Unallocated fuel combustion"],
+        SUBSECTORS["Electricity and heat"]["Unallocated fuel combustion"],
     ],
     "Making things": [
         # Direct onsite combustion in industry and construction (not electricity).
-        SUBSECTORS["Energy"]["Manufacturing and construction"]["Iron and steel"],
-        SUBSECTORS["Energy"]["Manufacturing and construction"]["Other industry"],
-        SUBSECTORS["Energy"]["Manufacturing and construction"]["Non-metallic minerals"],
-        SUBSECTORS["Energy"]["Manufacturing and construction"]["Chemical and petrochemical"],
-        SUBSECTORS["Energy"]["Manufacturing and construction"]["Food and tobacco"],
-        SUBSECTORS["Energy"]["Manufacturing and construction"]["Non-ferrous metals"],
-        SUBSECTORS["Energy"]["Manufacturing and construction"]["Construction"],
-        SUBSECTORS["Energy"]["Manufacturing and construction"]["Mining and quarrying"],
-        SUBSECTORS["Energy"]["Manufacturing and construction"]["Paper, pulp and printing"],
-        SUBSECTORS["Energy"]["Manufacturing and construction"]["Machinery"],
-        SUBSECTORS["Energy"]["Manufacturing and construction"]["Textile and leather"],
-        SUBSECTORS["Energy"]["Manufacturing and construction"]["Transport equipment"],
-        SUBSECTORS["Energy"]["Manufacturing and construction"]["Wood and wood products"],
+        SUBSECTORS["Manufacturing and construction"]["Iron and steel"],
+        SUBSECTORS["Manufacturing and construction"]["Other industry"],
+        SUBSECTORS["Manufacturing and construction"]["Non-metallic minerals"],
+        SUBSECTORS["Manufacturing and construction"]["Chemical and petrochemical"],
+        SUBSECTORS["Manufacturing and construction"]["Food and tobacco"],
+        SUBSECTORS["Manufacturing and construction"]["Non-ferrous metals"],
+        SUBSECTORS["Manufacturing and construction"]["Construction"],
+        SUBSECTORS["Manufacturing and construction"]["Mining and quarrying"],
+        SUBSECTORS["Manufacturing and construction"]["Paper, pulp and printing"],
+        SUBSECTORS["Manufacturing and construction"]["Machinery"],
+        SUBSECTORS["Manufacturing and construction"]["Textile and leather"],
+        SUBSECTORS["Manufacturing and construction"]["Transport equipment"],
+        SUBSECTORS["Manufacturing and construction"]["Wood and wood products"],
         # Process CO2 from cement clinker production.
         SUBSECTORS["Industrial processes"]["Cement"],
         # Process emissions from chemical and petrochemical production (non-energy).
