@@ -528,6 +528,23 @@ def sanity_check_inputs():
     assert all_vals == mapped_vals, f"Missing: {all_vals - mapped_vals}, Extra: {mapped_vals - all_vals}"
 
 
+def fix_rounding_issues(tb_custom: Table) -> Table:
+    # Round numbers to 1 decimal (this may actually not be needed, as all numbers are already rounded this way).
+    tb_custom["share_of_global_ghg_emissions"] = tb_custom["share_of_global_ghg_emissions"].round(1)
+    # Due to rounding, numbers won't add up to 100%. Find the residual, ensure it's small, and add it to the largest category (where it's contribution will be smallest).
+    residual = 100 - tb_custom["share_of_global_ghg_emissions"].sum()
+    error = "Expected residual error to be smaller."
+    assert residual < 0.5, error
+    tb_custom.loc[
+        tb_custom.sort_values("share_of_global_ghg_emissions", ascending=False).head(1).index,
+        "share_of_global_ghg_emissions",
+    ] += residual
+    error = "Unsuccessful correction for rounding error."
+    assert tb_custom["share_of_global_ghg_emissions"].sum() == 100, error
+
+    return tb_custom
+
+
 def run() -> None:
     #
     # Load inputs.
@@ -551,6 +568,9 @@ def run() -> None:
             ],
         }
     )
+
+    # Fix rounding issues.
+    tb_custom = fix_rounding_issues(tb_custom=tb_custom)
 
     # Add Climate Watch origin to all new columns.
     origin = tb[tb.columns[-1]].metadata.origins[0]

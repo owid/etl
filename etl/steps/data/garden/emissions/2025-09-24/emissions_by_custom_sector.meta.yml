@@ -46,3 +46,5 @@ tables:
       #     title_public: {tables.emissions_by_custom_sector.variables.making_things.title}
       share_of_global_ghg_emissions:
         title: Share of global greenhouse-gas emissions
+        display:
+          numDecimalPlaces: 1
