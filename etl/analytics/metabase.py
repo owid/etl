@@ -85,7 +85,10 @@ def _generate_question_url(card: dict) -> str:
     assert "name" in card, "Card must have an 'name' field"
     card_name = card["name"]
 
-    url = f"{METABASE_URL_LOCAL}/question/{card_id}-{card_name.replace(' ', '-').lower()}"
+    # Use urllib.parse.quote to handle special characters properly
+    slug = urllib.parse.quote(card_name.lower().replace(" ", "-"), safe="")
+    url = f"{METABASE_URL_LOCAL}/question/{card_id}-{slug}"
+
     return url
 
 
@@ -124,3 +127,49 @@ def create_question(
     )
 
     return question
+
+
+def list_questions():
+    # Init API client
+    mb = Metabase_API(METABASE_URL_LOCAL, api_key=METABASE_API_KEY)
+
+    # Get cards
+    cards = mb.get("/api/card/")
+
+    # Ensure cards is a list
+    if not isinstance(cards, list):
+        cards = []
+
+    # Filter from list only those with type="question"
+    questions = [card for card in cards if card.get("type") == "question"]
+
+    return questions
+
+
+def get_question_info(question_id: int) -> dict:
+    # Init API client
+    mb = Metabase_API(METABASE_URL_LOCAL, api_key=METABASE_API_KEY)
+
+    # Get question
+    question = mb.get_item_info(item_id=question_id, item_type="card")
+    assert question is not None, f"No card found with id {question_id}"
+    assert question.get("type") == "question", f"Card with id {question_id} is not a question"
+
+    return question
+
+
+def get_question_data(card_id: int, data_format: str = "csv") -> pd.DataFrame:
+    # Init API client
+    mb = Metabase_API(METABASE_URL_LOCAL, api_key=METABASE_API_KEY)
+
+    # Get card data
+    data_str = mb.get_card_data(
+        card_id=card_id,
+        data_format=data_format,
+    )
+    assert data_str is not None, "No data returned from Metabase API"
+
+    # Parse raw data as dataframe
+    df = pd.read_csv(BytesIO(initial_bytes=data_str.encode()), encoding="utf-8")  # add encoding if needed
+
+    return df
