@@ -4,7 +4,6 @@ from typing import Any, AsyncGenerator, List, Literal
 import logfire
 import streamlit as st
 import yaml
-from pydantic import BaseModel
 from pydantic_ai import Agent
 
 # from pydantic_ai.agent import CallToolsNode
@@ -18,7 +17,7 @@ from pydantic_ai.messages import (
 from pydantic_ai.models.openai import OpenAIResponsesModelSettings
 from pydantic_ai.tools import RunContext
 
-from apps.wizard.app_pages.expert_agent.utils import CURRENT_DIR, DataFrameModel, QueryResult, log, serialize_df
+from apps.wizard.app_pages.expert_agent.utils import CURRENT_DIR, QueryResult, log, serialize_df
 from etl.analytics.datasette import (
     DatasetteSQLError,
     _generate_url_to_datasette,
