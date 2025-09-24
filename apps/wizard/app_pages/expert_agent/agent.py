@@ -430,53 +430,9 @@ async def get_api_reference_metadata(
             return "Invalid object name: " + object_name
 
 
-# NOTE: commented out because Datasette URL is now returned in every result
-# @agent.tool_plain(docstring_format="google")
-# async def generate_url_to_datasette(query: str) -> str:
-#     """Generate a URL to the Datasette instance with the given query.
-
-#     Args:
-#         query: Query to Datasette instance.
-#     Returns:
-#         str: URL to the Datasette instance with the query. The URL links to a datasette preview with the SQL query and its results.
-#     """
-#     st.markdown(
-#         "**:material/construction: Tool use**: Generating Datasette query URL, via `generate_url_to_datasette`"
-#     )  # , icon=":material/calculate:")
-#     return _generate_url_to_datasette(query)
-
-
 def _generate_url_to_datasette(query: str) -> str:
     query = clean_sql_query(query)
     return f"{ANALYTICS_URL}?" + urllib.parse.urlencode({"sql": query, "_size": "max"})
-
-
-# NOTE: commented out because Agent was doing unnecessary calls. If the query is invalid, it'll return `error` in response
-# @agent.tool_plain(docstring_format="google")
-# async def validate_datasette_query(query: str) -> str:
-#     """Validate an SQL query.
-
-#     Args:
-#         query: Query to Datasette instance.
-#     Returns:
-#         str: Validation result message. If the query is not valid, it will return an error message. Use it to improve the query!
-#     """
-#     st.markdown(
-#         "**:material/construction: Tool use**: Validating Datasette query, via `validate_datasette_query`"
-#     )  # , icon=":material/calculate:")
-#     url = _generate_url_to_datasette(f"{query}")
-#     url = url.replace(ANALYTICS_URL, ANALYTICS_URL + ".json")
-#     response = requests.get(url).json()
-#     if response["ok"]:
-#         if ("rows" not in response) or not isinstance(response["rows"], list):
-#             text = "Query is invalid! Check for correctness, it must be DuckDB compatible! Seems like no rows were returned."
-#         elif len(response["rows"]) == 0:
-#             text = "Query is valid, but it returned no results."
-#         else:
-#             text = "Query is valid!"
-#     else:
-#         text = f"Query is invalid! Check for correctness, it must be DuckDB compatible! `\nError: {response['error']}"
-#     return text
 
 
 @agent.tool_plain(docstring_format="google")
