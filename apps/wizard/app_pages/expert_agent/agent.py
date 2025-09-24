@@ -53,18 +53,18 @@ SYSTEM_PROMPT = CONTEXT["system_prompt"]
 @st.cache_data(show_spinner="Loading analytics documentation...", show_time=True)
 def cached_analytics_docs():
     """Cache the analytics documentation (5 minutes)."""
-    from apps.wizard.app_pages.expert_agent.read_analytics import get_analytics_db_docs
+    from apps.wizard.app_pages.expert_agent.read_analytics import get_metabase_db_docs
 
-    docs = get_analytics_db_docs(max_workers=10)
+    docs = get_metabase_db_docs()
 
     summary = {}
     tables_summary = {}
     for doc in docs:
         # Main summary
-        summary[doc["name"]] = doc["description"]
+        summary[doc["table"]] = doc["description"]
         # Per-table summary
         table_summary = {col["name"]: col["description"] for col in doc["columns"]}
-        tables_summary[doc["name"]] = ruamel_dump(table_summary)
+        tables_summary[doc["table"]] = ruamel_dump(table_summary)
     summary = ruamel_dump(summary)
 
     return summary, tables_summary
