@@ -57,7 +57,7 @@ definitions:
   icse_93: These statuses in employment are provided according to the [International Standard Classification of Status in Employment](https://ilostat.ilo.org/methods/concepts-and-definitions/classification-status-at-work/) (ICSE-93).
 
   description_short_labor_force_participation_rate: |-
-    The labor force participation rate is the labor force (all working-age persons employed and unemployed) divided by the working-age population.
+    Share of the << sex >> working-age population << age >> who are employed or unemployed.
   description_short_unemployment_rate: |-
     Share of the labor force without work, but available for and seeking employment.
   description_short_employment_to_population_ratio: |-
@@ -1088,7 +1088,10 @@ tables:
         title: Labor force participation rate, total (% of total population ages 15+) (modeled ILO estimate)
         unit: "%"
         short_unit: "%"
-        description_short: "{definitions.description_short_labor_force_participation_rate}"
+        description_short: |-
+          <%- set sex = "" %>
+          <%- set age = "(15+)" %>
+          {definitions.description_short_labor_force_participation_rate}
         description_key:
           - "{definitions.description_key_iloest_modelled_data}"
           - "{definitions.description_key_13th_icls}"
@@ -1105,7 +1108,10 @@ tables:
         title: Labor force participation rate, male (% of male population ages 15+) (modeled ILO estimate)
         unit: "%"
         short_unit: "%"
-        description_short: "{definitions.description_short_labor_force_participation_rate}"
+        description_short: |-
+          <%- set sex = "male" %>
+          <%- set age = "(15+)" %>
+          {definitions.description_short_labor_force_participation_rate}
         description_key:
           - "{definitions.description_key_iloest_modelled_data}"
           - "{definitions.description_key_13th_icls}"
@@ -1122,7 +1128,10 @@ tables:
         title: Labor force participation rate, female (% of female population ages 15+) (modeled ILO estimate)
         unit: "%"
         short_unit: "%"
-        description_short: "{definitions.description_short_labor_force_participation_rate}"
+        description_short: |-
+          <%- set sex = "female" %>
+          <%- set age = "(15+)" %>
+          {definitions.description_short_labor_force_participation_rate}
         description_key:
           - "{definitions.description_key_iloest_modelled_data}"
           - "{definitions.description_key_13th_icls}"
@@ -1139,7 +1148,10 @@ tables:
         title: Labor force participation rate, total (% of total population ages 15+) (national estimate)
         unit: "%"
         short_unit: "%"
-        description_short: "{definitions.description_short_labor_force_participation_rate}"
+        description_short: |-
+          <%- set sex = "" %>
+          <%- set age = "" %>
+          {definitions.description_short_labor_force_participation_rate}
         description_key:
           - "{definitions.description_key_national_estimates}"
           - "{definitions.description_key_13th_icls}"
@@ -1152,11 +1164,34 @@ tables:
           numDecimalPlaces: 1
           tolerance: 5
 
+      sl_tlf_cact_ma_ne_zs:
+        title: Labor force participation rate, male (% of male population ages 15+) (national estimate)
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          <%- set sex = "male" %>
+          <%- set age = "" %>
+          {definitions.description_short_labor_force_participation_rate}
+        description_key:
+          - "{definitions.description_key_national_estimates}"
+          - "{definitions.description_key_13th_icls}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+        display:
+          name: Male labor force participation rate
+          numDecimalPlaces: 1
+          tolerance: 5
+
       sl_tlf_cact_fe_ne_zs:
         title: Labor force participation rate, female (% of female population ages 15+) (national estimate)
         unit: "%"
         short_unit: "%"
-        description_short: "{definitions.description_short_labor_force_participation_rate}"
+        description_short: |-
+          <%- set sex = "female" %>
+          <%- set age = "" %>
+          {definitions.description_short_labor_force_participation_rate}
         description_key:
           - "{definitions.description_key_national_estimates}"
           - "{definitions.description_key_13th_icls}"
@@ -1173,7 +1208,10 @@ tables:
         title: Labor force participation rate for ages 15-24, female (%) (national estimate)
         unit: "%"
         short_unit: "%"
-        description_short: "{definitions.description_short_labor_force_participation_rate}"
+        description_short: |-
+          <%- set sex = "female" %>
+          <%- set age = "aged 15-24" %>
+          {definitions.description_short_labor_force_participation_rate}
         description_key:
           - "{definitions.description_key_national_estimates}"
           - "{definitions.description_key_13th_icls}"
