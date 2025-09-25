@@ -8,9 +8,7 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 # Exclude the last three as we want to treat them differently and remove the january rows from them
-TABLES_EXCLUDE = [
-    "fertility_single",
-]
+TABLES_EXCLUDE = ["fertility_single", "population_january"]
 
 
 def run(dest_dir: str) -> None:
