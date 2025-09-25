@@ -39,21 +39,23 @@ def run() -> None:
     tb = geo.add_regions_to_table(
         tb,
         ds_regions,
-        regions=REGIONS,
+        regions=REGIONS + ["World"],
     )
     tb["net_export"] = tb["Export_TOTAL MOT"] - tb["Import_TOTAL MOT"]
-    tb["net_export"].metadata.origins = tb["Import_TOTAL MOT"].metadata.origins
 
     tb = add_per_capita_variables(tb)
 
     tb = add_share_from_total(tb)
 
+    tb = add_share_transported_by_air(tb)
+
+    # Improve table format.
+    tb = tb.format(["country", "year"])
     # Convert columns that are not per capita/ share of to tonnes
     for col in tb.columns:
         if "per_capita" not in col and "share" not in col:
             tb[col] = tb[col] / 1000
-    # Improve table format.
-    tb = tb.format(["country", "year"])
+
     tb = tb.reset_index()
 
     tb_up_to_2023 = tb_up_to_2023[tb.columns]
@@ -93,12 +95,9 @@ def add_per_capita_variables(tb: Table) -> Table:
     tb_with_per_capita = geo.add_population_to_table(
         tb_with_per_capita,
         ds_population,
-        expected_countries_without_population=[],
     )
     ## Calculate per capita indicators
     for col in tb_with_per_capita.columns:
-        if col not in ["year", "country", "population"]:
-            tb_with_per_capita[col].metadata.origins = tb[col].metadata.origins
         if col in ["Import_TOTAL MOT", "Export_TOTAL MOT", "net_export"]:
             tb_with_per_capita[f"{col}_per_capita"] = tb_with_per_capita[col] / tb_with_per_capita["population"]
             # Add origins to per capital variable
@@ -141,7 +140,6 @@ def add_share_from_total(tb: Table) -> Table:
 
     # Extract the World totals for each year
     world_totals = tb[tb["country"] == "World"][["year", "Import_TOTAL MOT", "Export_TOTAL MOT"]]
-
     # Merge these totals with the main dataframe on the year column
     merged_df = pr.merge(tb, world_totals, on="year", suffixes=("", "_World"))
 
@@ -152,3 +150,34 @@ def add_share_from_total(tb: Table) -> Table:
     merged_df = merged_df.drop(columns=["Import_TOTAL MOT_World", "Export_TOTAL MOT_World"])
 
     return merged_df
+
+
+def add_share_transported_by_air(tb: Table) -> Table:
+    """
+    Calculate the share of plastic waste transported by air for exports and imports.
+
+    Parameters
+    ----------
+    tb : Table
+        The input table with transport mode columns
+
+    Returns
+    -------
+    tb : Table
+        Table with added air transport share columns
+    """
+    tb_with_air_share = tb.copy()
+
+    # Calculate share transported by air for exports
+    tb_with_air_share["export_share_transported_by_air"] = (
+        tb_with_air_share["Export_Air"] / tb_with_air_share["Export_TOTAL MOT"]
+    ) * 100
+    tb_with_air_share["export_share_transported_by_air"].metadata.origins = tb["Export_Air"].metadata.origins
+
+    # Calculate share transported by air for imports
+    tb_with_air_share["import_share_transported_by_air"] = (
+        tb_with_air_share["Import_Air"] / tb_with_air_share["Import_TOTAL MOT"]
+    ) * 100
+    tb_with_air_share["import_share_transported_by_air"].metadata.origins = tb["Import_Air"].metadata.origins
+
+    return tb_with_air_share

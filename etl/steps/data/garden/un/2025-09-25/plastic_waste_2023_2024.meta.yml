@@ -100,3 +100,19 @@ tables:
         description_short: Plastic waste net exports encompassing all transport methods per capita. Net exports are calculated as exports minus imports. These are calculated by dividing by each country's population.
         display:
           numDecimalPlaces: 1
+
+      export_share_transported_by_air:
+        title: Share of plastic waste exports transported by air
+        unit: '%'
+        short_unit: '%'
+        description_short: Share of plastic waste exports transported by air from total plastic waste exports. These are calculated by determining the proportion of plastic waste exports transported by air from the total plastic waste exports.
+        display:
+          numDecimalPlaces: 1
+
+      import_share_transported_by_air:
+        title: Share of plastic waste imports transported by air
+        unit: '%'
+        short_unit: '%'
+        description_short: Share of plastic waste imports transported by air from total plastic waste imports. These are calculated by determining the proportion of plastic waste imports transported by air from the total plastic waste imports.
+        display:
+          numDecimalPlaces: 1
