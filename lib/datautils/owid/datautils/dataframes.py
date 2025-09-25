@@ -369,7 +369,12 @@ def groupby_agg(
             grouped = df.groupby(groupby_columns, **groupby_kwargs).agg(regular_aggregations)  # type: ignore
         else:
             # Create empty DataFrame with proper groupby index for weighted-only case
-            grouped = df.groupby(groupby_columns, **groupby_kwargs).size().to_frame("_temp").drop(columns=["_temp"])
+            grouped = (
+                df.groupby(groupby_columns, dropna=False, observed=True)
+                .size()
+                .to_frame("_temp")
+                .drop(columns=["_temp"])
+            )
 
         # Add weighted mean columns
         for col, agg_func in weighted_aggregations.items():
@@ -377,13 +382,13 @@ def groupby_agg(
             if weight_col not in df.columns:
                 raise ValueError(f"Weight column '{weight_col}' not found in data")
 
-            weighted_results = df.groupby(groupby_columns, **groupby_kwargs).apply(
+            weighted_results = df.groupby(groupby_columns, dropna=False, observed=True).apply(
                 lambda group: _calculate_weighted_mean(
                     group, col, weight_col, num_allowed_nans, frac_allowed_nans, min_num_values
                 ),
                 include_groups=False,
             )
-            grouped[col] = weighted_results
+            grouped[col] = weighted_results  # type: ignore
     else:
         # No weighted aggregations; use standard grouping logic
         grouped = df.groupby(groupby_columns, **groupby_kwargs).agg(aggregations)  # type: ignore
