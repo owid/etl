@@ -2058,7 +2058,32 @@ class RegionAggregator:
                             f"Population column '{self.population_col}' not found in table, and no population dataset provided. "
                             f"Add population dataset as a dependency or include population column in your table."
                         )
-                    modified_tb = self._add_population_to_table_if_needed(modified_tb)
+                    # Add population column using appropriate function
+                    if isinstance(modified_tb, Table):
+                        modified_tb = add_population_to_table(
+                            tb=modified_tb,
+                            ds_population=self.ds_population,  # type: ignore
+                            country_col=self.country_col,
+                            year_col=self.year_col,
+                            population_col=self.population_col,
+                            warn_on_missing_countries=False,
+                            show_full_warning=True,
+                            interpolate_missing_population=False,
+                            expected_countries_without_population=None,
+                        )
+                    else:
+                        modified_tb = _add_population_to_dataframe(
+                            df=modified_tb,
+                            tb_population=self.ds_population.read("population", safe_types=False),  # type: ignore
+                            country_col=self.country_col,
+                            year_col=self.year_col,
+                            population_col=self.population_col,
+                            warn_on_missing_countries=False,
+                            show_full_warning=True,
+                            interpolate_missing_population=False,
+                            expected_countries_without_population=None,
+                            _warn_deprecated=False,
+                        )
                     break  # Only need to add population once
 
         return modified_tb
@@ -2074,33 +2099,6 @@ class RegionAggregator:
 
         return self.index_columns + columns + weight_columns
 
-    def _add_population_to_table_if_needed(self, tb: TableOrDataFrame) -> TableOrDataFrame:
-        """Add population column to table if it's needed for weighted aggregations."""
-        # Common parameters for both functions
-        common_params = {
-            "country_col": self.country_col,
-            "year_col": self.year_col,
-            "population_col": self.population_col,
-            "warn_on_missing_countries": False,
-            "show_full_warning": True,
-            "interpolate_missing_population": False,
-            "expected_countries_without_population": None,
-        }
-
-        if isinstance(tb, Table):
-            return add_population_to_table(
-                tb=tb,
-                ds_population=self.ds_population,  # type: ignore
-                **common_params,
-            )
-        else:
-            # For pandas DataFrame, use the internal function
-            return _add_population_to_dataframe(
-                df=tb,
-                tb_population=self.ds_population.read("population", safe_types=False),  # type: ignore
-                _warn_deprecated=False,
-                **common_params,
-            )
 
     def inspect_overlaps_with_historical_regions(
         self,
