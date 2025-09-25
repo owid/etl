@@ -1927,24 +1927,12 @@ class RegionAggregator:
             # regions is already a dict
             self.regions = regions
 
-        # Validate regions based on input type (list vs dict)
-        # Documentation states: list must contain "default regions", dict allows "default or custom regions"
+        # If "regions" is passed as a list, it can only contain regions that are known to the regions dataset.
+        # On the other hand, if it is a dictionary, it can have custom regions.
         if isinstance(regions, list):
-            # List case: ALL regions must be known (strict validation)
             unknown_regions = [region for region in regions if region not in regions_all]
             if unknown_regions:
-                suggestions = []
-                for region in unknown_regions:
-                    similar = [r for r in regions_all if region.lower() in r.lower() or r.lower() in region.lower()]
-                    if similar:
-                        suggestions.append(f"{region} (did you mean: {', '.join(similar)}?)")
-                    else:
-                        suggestions.append(region)
-                raise ValueError(
-                    f"Unknown regions in list: {'; '.join(suggestions)}. Available regions: {', '.join(sorted(regions_all))}"
-                )
-
-        # Dict case: Allow complete flexibility - no validation
+                raise ValueError(f"Unknown regions in list: {unknown_regions}")
 
         # Create a list of all possible regions, which includes any possible custom region.
         self.regions_all = sorted(set(regions_all) | set(self.regions))
@@ -2045,10 +2033,8 @@ class RegionAggregator:
                 column: "sum" for column in tb.columns if column not in self.index_columns
             }
 
-    def _preprocess_table_for_weighted_aggregations(self, tb: TableOrDataFrame) -> TableOrDataFrame:
+    def _preprocess_table_for_weighted_aggregations(self, tb: Table) -> Table:
         """Add population or other weight columns if needed for weighted aggregations."""
-        modified_tb = tb
-
         # Check if any aggregation uses population weighting and population column is missing
         for _, agg_func in self.aggregations.items():
             if isinstance(agg_func, str) and agg_func == f"weighted_by_{self.population_col}":
@@ -2058,35 +2044,20 @@ class RegionAggregator:
                             f"Population column '{self.population_col}' not found in table, and no population dataset provided. "
                             f"Add population dataset as a dependency or include population column in your table."
                         )
-                    # Add population column using appropriate function
-                    if isinstance(modified_tb, Table):
-                        modified_tb = add_population_to_table(
-                            tb=modified_tb,
-                            ds_population=self.ds_population,  # type: ignore
-                            country_col=self.country_col,
-                            year_col=self.year_col,
-                            population_col=self.population_col,
-                            warn_on_missing_countries=False,
-                            show_full_warning=True,
-                            interpolate_missing_population=False,
-                            expected_countries_without_population=None,
-                        )
-                    else:
-                        modified_tb = _add_population_to_dataframe(
-                            df=modified_tb,
-                            tb_population=self.ds_population.read("population", safe_types=False),  # type: ignore
-                            country_col=self.country_col,
-                            year_col=self.year_col,
-                            population_col=self.population_col,
-                            warn_on_missing_countries=False,
-                            show_full_warning=True,
-                            interpolate_missing_population=False,
-                            expected_countries_without_population=None,
-                            _warn_deprecated=False,
-                        )
+                    tb = add_population_to_table(
+                        tb=tb,
+                        ds_population=self.ds_population,  # type: ignore
+                        country_col=self.country_col,
+                        year_col=self.year_col,
+                        population_col=self.population_col,
+                        warn_on_missing_countries=False,
+                        show_full_warning=True,
+                        interpolate_missing_population=False,
+                        expected_countries_without_population=None,
+                    )
                     break  # Only need to add population once
 
-        return modified_tb
+        return tb
 
     def _get_needed_columns(self, tb: TableOrDataFrame, columns: list[str]) -> list[str]:
         """Extract the minimal set of columns needed for aggregation performance optimization."""
@@ -2098,7 +2069,6 @@ class RegionAggregator:
                     weight_columns.append(weight_col)
 
         return self.index_columns + columns + weight_columns
-
 
     def inspect_overlaps_with_historical_regions(
         self,
@@ -2380,7 +2350,7 @@ class RegionAggregator:
 
     def add_aggregates(
         self,
-        tb: TableOrDataFrame,
+        tb: Table,
         num_allowed_nans_per_year: int | None = None,
         frac_allowed_nans_per_year: float | None = None,
         min_num_values_per_year: int | None = None,
