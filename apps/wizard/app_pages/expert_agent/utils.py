@@ -10,11 +10,13 @@ CURRENT_DIR = Path(__file__).parent
 
 
 # Load available models
+## See all of them in https://github.com/pydantic/pydantic-ai/blob/master/pydantic_ai_slim/pydantic_ai/models/__init__.py
 with open(CURRENT_DIR / "models.yml", "r") as f:
     MODELS = yaml.safe_load(f)
 MODELS_DISPLAY = {m["name"]: m["display_name"] for m in MODELS["models"]}
 MODELS_COST = {m["name"]: m["cost"] for m in MODELS["models"]}
 MODELS_AVAILABLE_LIST = list(MODELS_DISPLAY.keys())
+MODEL_DEFAULT = "openai:gpt-5-mini"
 
 
 def estimate_llm_cost(model_name: str, input_tokens: int, output_tokens: int) -> float:
