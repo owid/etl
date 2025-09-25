@@ -16,18 +16,18 @@ EXPECTED_CLASSIFICATIONS = ["FPN 4.0"]
 # Classification to adopt (by default, the latest one).
 CLASSIFICATION = EXPECTED_CLASSIFICATIONS[-1]
 
-# All costs are given in constant 2021 PPP$ per person per day, except for the cost of a healthy diet,
-# which is reported in current PPP$ per person per day for each year.
-# To express the healthy diet costs in constant 2021 PPP$, we need to adjust for inflation.
-# This is done by multiplying the cost in a given YEAR by the ratio CPI(BASE_YEAR) / CPI(YEAR).
-# Base year for CPI corrections.
-CPI_BASE_YEAR = 2021
+# Since the 2025 update, all prices are given in both local currency unit and "ppp dollars".
+# It's not specified whether the latter mean constant 2021 PPP$, or current PPP$.
+# Previous updates were reported in current PPP$, but we confirmed that they are now constant PPP$.
+# This clarification is relevant specifically for the cost of a healthy diet (since all other diets are informed for just a single year).
+# Year assumed for constant PPP$.
+PPP_YEAR = 2021
 
 # Alternative attribution for share and number who cannot afford a healthy diet.
 ATTRIBUTION_CANNOT_AFFORD = "FAO and World Bank (2025), using data and methods from Bai et al. (2024)"
 
 
-def adapt_units(tb: Table, tb_wdi: Table) -> Table:
+def adapt_units(tb: Table) -> Table:
     # Change units from million people to people.
     for column in [column for column in tb.columns if column.startswith("millions_of_people")]:
         tb[column] *= 1e6
@@ -41,21 +41,40 @@ def adapt_units(tb: Table, tb_wdi: Table) -> Table:
     ]:
         tb[column] *= 100
 
-    # Get CPI from WDI.
-    tb_cpi = tb_wdi[tb_wdi["country"] == "United States"][["year", "fp_cpi_totl"]].reset_index(drop=True)
-    # Get the value of CPI for the base year.
-    cpi_base_value = tb_cpi[tb_cpi["year"] == CPI_BASE_YEAR]["fp_cpi_totl"].item()
-    # Create an adjustment factor.
-    tb_cpi["cpi_adjustment_factor"] = cpi_base_value / tb_cpi["fp_cpi_totl"]
-    # Add CPI column to main table.
-    tb = tb.merge(tb_cpi[["year", "cpi_adjustment_factor"]], on=["year"], how="left")
-    # Multiply the cost of a healthy diet (given in current PPP$) by the adjustment factor, to correct for inflation
-    # and express the values in constant 2021 PPP$.
-    tb["cost_of_a_healthy_diet_in_ppp_dollars"] *= tb["cpi_adjustment_factor"]
-    # Drop unnecessary column.
-    tb = tb.drop(columns=["cpi_adjustment_factor"], errors="raise")
-
     return tb
+
+
+def sanity_check_outputs(tb: Table) -> None:
+    # Check data coverage is as expected.
+    # All cost columns are given for just a single year, except the cost of a healthy diet, which is given for multiple years.
+    for column in tb.columns:
+        if ("cost_of_a" in column) and ("relative" not in column):
+            if "healthy" not in column:
+                assert set(tb.dropna(subset=column)["year"]) == {PPP_YEAR}
+            else:
+                assert len(set(tb.dropna(subset=column)["year"])) > 1
+
+    # Other sanity checks.
+    for column in tb.columns:
+        if column.startswith("cost_of_"):
+            assert (tb[column] > 0).all(), f"{column} has non-positive values"
+
+    error = "The cost of a healthy diet was expected to be larger than the cost of a nutrient-adequate diet."
+    assert (
+        tb["cost_of_a_healthy_diet_in_ppp_dollars"] >= tb["cost_of_a_nutrient_adequate_diet_in_ppp_dollars"]
+    ).all(), error
+
+    error = "The cost of a nutrient-adequate diet was expected to be larger than the cost of an energy-sufficient diet."
+    assert (
+        tb["cost_of_a_nutrient_adequate_diet_in_ppp_dollars"] >= tb["cost_of_an_energy_sufficient_diet_in_ppp_dollars"]
+    ).all()
+
+    column = "cost_of_a_healthy_diet_in_ppp_dollars"
+    check = tb.dropna(subset=column).sort_values(["country", "year"]).reset_index(drop=True)
+    check["pct_change"] = abs(check.groupby("country")[column].pct_change())
+    abrupt_changes = check[check["pct_change"].abs() > 0.3]
+    error = "Abrupt variation in the cost of a healthy diet in unexpected countries."
+    assert set(abrupt_changes["country"]) == {"Lebanon", "South Sudan", "Syria"}, error
 
 
 def change_attribution(tb: Table, columns: List[str], attribution_text: str) -> Table:
@@ -75,11 +94,6 @@ def run() -> None:
     # Load meadow dataset and read its main table.
     ds_meadow = paths.load_dataset("food_prices_for_nutrition")
     tb = ds_meadow.read("food_prices_for_nutrition")
-
-    # Load the World Development Indicators (WDI) dataset to get the U.S. Consumer Price Index (CPI),
-    # which will be used to correct for inflation and express costs in constant 2021 PPP$.
-    ds_wdi = paths.load_dataset("wdi")
-    tb_wdi = ds_wdi.read("wdi")
 
     #
     # Process data.
@@ -101,8 +115,8 @@ def run() -> None:
     # Harmonize country names.
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
-    # Adapt units and correct for inflation.
-    tb = adapt_units(tb=tb, tb_wdi=tb_wdi)
+    # Adapt units.
+    tb = adapt_units(tb=tb)
 
     # Change attributions for share and number of people who cannot afford a healthy diet.
     tb = change_attribution(
@@ -114,22 +128,29 @@ def run() -> None:
         attribution_text=ATTRIBUTION_CANNOT_AFFORD,
     )
 
-    # Remove attributions for cost_of_an_energy_sufficient_diet and cost_of_a_nutrient_adequate_diet
-    tb = change_attribution(
-        tb=tb,
-        columns=[
-            "cost_of_an_energy_sufficient_diet_in_ppp_dollars",
-            "cost_of_a_nutrient_adequate_diet_in_ppp_dollars",
-        ],
-        attribution_text=None,
-    )
+    # Remove attributions for cost_of_an_energy_sufficient_diet and cost_of_a_nutrient_adequate_diet.
+    for diet in ["an_energy_sufficient", "a_nutrient_adequate"]:
+        for currency in ["in_ppp_dollars", "in_local_currency_unit"]:
+            tb = change_attribution(
+                tb=tb,
+                columns=[f"cost_of_{diet}_diet_{currency}"],
+                attribution_text=None,
+            )
+
+    # Sanity check outputs.
+    sanity_check_outputs(tb=tb)
 
     # Set an appropriate index and sort conveniently.
     tb = tb.format()
 
-    # Since the 2025 update, the dataset includes costs in local currency units.
-    # For now, since they are not used, remove them.
-    tb = tb[[column for column in tb.columns if "in_local_currency_unit" not in column]]
+    # The costs in the original data (since the 2025 update) was given in local currency unit, and in constant PPP$.
+    # For simplicity, since we are only using costs in constant PPP$, remove local currency unit.
+    columns_to_drop = [
+        column
+        for column in tb.columns
+        if (("in_local_currency_unit" in column) or ("in_current_ppp_dollars" in column))
+    ]
+    tb = tb.drop(columns=columns_to_drop, errors="raise")
 
     #
     # Save outputs.
