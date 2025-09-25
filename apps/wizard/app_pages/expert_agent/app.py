@@ -14,8 +14,9 @@ import streamlit as st
 from pydantic_core import to_json
 from structlog import get_logger
 
-from apps.wizard.app_pages.expert_agent.agent import agent_stream2, recommender_agent
+from apps.wizard.app_pages.expert_agent.agent import recommender_agent, run_agent_stream
 from apps.wizard.app_pages.expert_agent.utils import (
+    MODEL_DEFAULT,
     MODELS_AVAILABLE_LIST,
     MODELS_DISPLAY,
     estimate_llm_cost,
@@ -43,9 +44,6 @@ st.session_state.setdefault("expert_config", {})
 st.session_state.setdefault("agent_messages", [])
 st.session_state.setdefault("recommended_question", None)
 # st.session_state.setdefault("expert_use_mcp", True)
-# Models
-## See all of them in https://github.com/pydantic/pydantic-ai/blob/master/pydantic_ai_slim/pydantic_ai/models/__init__.py
-MODEL_DEFAULT = "openai:gpt-5-mini"
 
 
 ##################################################################
@@ -310,12 +308,10 @@ if prompt:
         # )
         start_time = time.time()
 
-        # Agent to work, and stream its output
-        stream = agent_stream2(
-            prompt,
-            model_name=st.session_state["expert_config"]["model_name"],
-            message_history=st.session_state["agent_messages"],
-        )
+        # Get stream
+        stream = run_agent_stream(prompt)
+
+        # Present stream
         st.session_state.response = cast(
             str,
             st.write_stream(stream),
