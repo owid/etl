@@ -75,7 +75,7 @@ tables:
         description_processing: We calculated per capita imports by dividing total plastic waste imports by population data and converting from tonnes to kilograms per person.
         display:
           tolerance: 5
-          numDecimalPlaces: 1
+          numDecimalPlaces: 2
 
       export_total_mot_per_capita:
         title: Per capita exports of plastic waste via all modes of transport
@@ -88,7 +88,7 @@ tables:
         description_processing: We calculated per capita exports by dividing total plastic waste exports by population data and converting from tonnes to kilograms per person.
         display:
           tolerance: 5
-          numDecimalPlaces: 1
+          numDecimalPlaces: 2
 
       net_export:
         title: Net exports of plastic waste via all modes of transport
@@ -115,7 +115,7 @@ tables:
         description_processing: We calculated import shares by dividing each country's plastic waste imports by the world total imports for each year and multiplying by 100.
         display:
           tolerance: 5
-          numDecimalPlaces: 1
+          numDecimalPlaces: 2
 
       export_share:
         title: Share of plastic waste exports via all modes of transport
@@ -128,7 +128,7 @@ tables:
         description_processing: We calculated export shares by dividing each country's plastic waste exports by the world total exports for each year and multiplying by 100.
         display:
           tolerance: 5
-          numDecimalPlaces: 1
+          numDecimalPlaces: 2
 
       net_export_per_capita:
         title: Per capita net exports of plastic waste via all modes of transport
@@ -141,7 +141,7 @@ tables:
         description_processing: We calculated per capita net exports by dividing net exports (total exports minus total imports) by population data and converting from tonnes to kilograms per person.
         display:
           tolerance: 5
-          numDecimalPlaces: 1
+          numDecimalPlaces: 2
 
       export_share_transported_by_air:
         title: Share of plastic waste exports transported by air
@@ -155,7 +155,7 @@ tables:
         description_processing: We calculated the air transport share for exports by dividing plastic waste exports via air by total plastic waste exports for each country and year, then multiplying by 100.
         display:
           tolerance: 5
-          numDecimalPlaces: 1
+          numDecimalPlaces: 2
 
       import_share_transported_by_air:
         title: Share of plastic waste imports transported by air
@@ -169,4 +169,4 @@ tables:
         description_processing: We calculated the air transport share for imports by dividing plastic waste imports via air by total plastic waste imports for each country and year, then multiplying by 100.
         display:
           tolerance: 5
-          numDecimalPlaces: 1
+          numDecimalPlaces: 2
