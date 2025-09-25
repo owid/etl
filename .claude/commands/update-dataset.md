@@ -78,9 +78,9 @@ You MUST:
    - Inputs: `<namespace>/<old_version>/<short_name>`
    - Create or reuse draft PR, set up work branch, and incorporate the ETL update outputs
    - CHECKPOINT
-3) Snapshot update & compare (snapshot-updater subagent)
+3) Snapshot run & compare (snapshot-runner subagent)
    - Inputs: `<namespace>/<new_version>/<short_name>` and `<old_version>`
-   - Save summary to `workbench/<short_name>/snapshot-updater.md`
+   - Save summary to `workbench/<short_name>/snapshot-runner.md`
    - CHECKPOINT
 4) Meadow step repair/verify (step-fixer subagent, channel=meadow)
    - Run, fix, re-run; produce diffs
@@ -105,7 +105,7 @@ You MUST:
 
 ## Artifacts (expected)
 
-- `workbench/<short_name>/snapshot-updater.md`
+- `workbench/<short_name>/snapshot-runner.md`
 - `workbench/<short_name>/progress.md`
 - `workbench/<short_name>/meadow_diff_raw.txt` and `meadow_diff.md`
 - `workbench/<short_name>/garden_diff_raw.txt` and `garden_diff.md`
