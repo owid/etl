@@ -2033,8 +2033,8 @@ class RegionAggregator:
                 column: "sum" for column in tb.columns if column not in self.index_columns
             }
 
-    def _preprocess_table_for_weighted_aggregations(self, tb: Table) -> Table:
-        """Add population or other weight columns if needed for weighted aggregations."""
+    def _preprocess_table_for_weighted_means(self, tb: Table) -> Table:
+        """Add population or other weight columns if needed for weighted means."""
         # Check if any aggregation uses population weighting and population column is missing
         for _, agg_func in self.aggregations.items():
             if isinstance(agg_func, str) and agg_func == f"mean_weighted_by_{self.population_col}":
@@ -2059,7 +2059,7 @@ class RegionAggregator:
 
         return tb
 
-    def _get_needed_columns(self, tb: TableOrDataFrame, columns: list[str]) -> list[str]:
+    def _get_needed_columns(self, tb: Table, columns: list[str]) -> list[str]:
         """Extract the minimal set of columns needed for aggregation performance optimization."""
         weight_columns = []
         for agg_func in self.aggregations.values():
@@ -2131,8 +2131,8 @@ class RegionAggregator:
         frac_allowed_nans_per_year: float | None = None,
         min_num_values_per_year: int | None = None,
     ):
-        # Check if we have any weighted aggregations that need special handling
-        weighted_columns = {
+        # Check if we have any weighted means that need special handling
+        weighted_mean_columns = {
             col: agg_func
             for col, agg_func in aggregations.items()
             if isinstance(agg_func, str) and agg_func.startswith("mean_weighted_by_")
@@ -2174,12 +2174,12 @@ class RegionAggregator:
                 else:
                     df_region = pd.DataFrame([{}])  # Single row for aggregation
 
-            # Handle weighted aggregations separately
-            if weighted_columns:
-                df_region = self._add_weighted_aggregations(
+            # Handle weighted means separately
+            if weighted_mean_columns:
+                df_region = self._add_weighted_means(
                     df_region=df_region,
                     df_region_data=df_region_data,
-                    weighted_columns=weighted_columns,
+                    weighted_mean_columns=weighted_mean_columns,
                     num_allowed_nans_per_year=num_allowed_nans_per_year,
                     frac_allowed_nans_per_year=frac_allowed_nans_per_year,
                     min_num_values_per_year=min_num_values_per_year,
@@ -2201,21 +2201,21 @@ class RegionAggregator:
 
         return df_with_regions
 
-    def _add_weighted_aggregations(
+    def _add_weighted_means(
         self,
         df_region: pd.DataFrame,
         df_region_data: pd.DataFrame,
-        weighted_columns: dict[str, Any],
+        weighted_mean_columns: dict[str, Any],
         num_allowed_nans_per_year: int | None = None,
         frac_allowed_nans_per_year: float | None = None,
         min_num_values_per_year: int | None = None,
     ) -> pd.DataFrame:
-        """Add weighted aggregation columns to the region dataframe."""
+        """Add weighted mean columns to the region dataframe."""
         groupby_columns = [column for column in self.index_columns if column != self.country_col]
 
         if not groupby_columns:
             # No grouping columns, aggregate all data
-            for col, agg_func in weighted_columns.items():
+            for col, agg_func in weighted_mean_columns.items():
                 weight_column = agg_func.replace("mean_weighted_by_", "")  # Extract weight column from string
                 weighted_mean = self._calculate_weighted_mean(
                     df_region_data,
@@ -2228,7 +2228,7 @@ class RegionAggregator:
                 df_region[col] = weighted_mean
         else:
             # Group by the specified columns and calculate weighted means
-            for col, agg_func in weighted_columns.items():
+            for col, agg_func in weighted_mean_columns.items():
                 weight_column = agg_func.replace("mean_weighted_by_", "")  # Extract weight column from string
 
                 # Only select the columns we need for grouping and calculation (performance optimization)
@@ -2420,8 +2420,8 @@ class RegionAggregator:
         # Ensure aggregations are well defined.
         self._ensure_aggregations_are_defined(tb=tb)
 
-        # Preprocess table to add weight columns if needed for weighted aggregations
-        tb = self._preprocess_table_for_weighted_aggregations(tb)
+        # Preprocess table to add weight columns if needed for weighted means
+        tb = self._preprocess_table_for_weighted_means(tb)
 
         # Define the list of (non-index) columns for which aggregates will be created.
         columns = list(self.aggregations)
