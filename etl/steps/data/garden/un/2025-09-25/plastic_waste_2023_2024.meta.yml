@@ -1,0 +1,102 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Plastic Pollution
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  plastic_waste_2023_2024:
+    variables:
+      import_total_mot:
+        title: Imports of plastic waste via all modes of transport
+        unit: tonnes
+        short_unit: t
+        description_short: Aggregate data of plastic waste imports, encompassing all transport methods.
+        display:
+          numDecimalPlaces: 0
+
+      export_total_mot:
+        title: Exports of plastic waste via all modes of transport
+        unit: tonnes
+        short_unit: t
+        description_short: Aggregate data of plastic waste exports, encompassing all transport methods.
+        display:
+          numDecimalPlaces: 0
+
+      import_air:
+        title: Imports of plastic waste via air
+        unit: tonnes
+        short_unit: t
+        description_short: Plastic waste imported through air transport.
+        display:
+          numDecimalPlaces: 0
+
+      export_air:
+        title: Exports of plastic waste via air
+        unit: tonnes
+        short_unit: t
+        description_short: Plastic waste exported through air transport.
+        display:
+          numDecimalPlaces: 0
+
+      import_total_mot_per_capita:
+        title: Per capita imports of plastic waste via all modes of transport
+        unit: kilograms
+        short_unit: kg
+        processing_level: minor
+        description_short: Plastic waste imports encompassing all transport methods per capita. These are calculated by dividing by each country's population.
+        display:
+          numDecimalPlaces: 1
+
+      export_total_mot_per_capita:
+        title: Per capita exports of plastic waste via all modes of transport
+        unit: kilograms
+        short_unit: kg
+        processing_level: minor
+        description_short: Plastic waste exports encompassing all transport methods per capita. These are calculated by dividing by each country's population.
+        display:
+          numDecimalPlaces: 1
+
+      net_export:
+        title: Net exports of plastic waste via all modes of transport
+        unit: tonnes
+        short_unit: t
+        processing_level: minor
+        description_short: Plastic waste net exports encompassing all transport methods. Net exports are calculated as exports minus imports.
+        display:
+          numDecimalPlaces: 0
+
+      import_share:
+        title: Share of plastic waste imports via all modes of transport
+        unit: '%'
+        short_unit: '%'
+        processing_level: minor
+        description_short: Share of plastic waste imports encompassing all transport methods from total global. These are calculated by determining the proportion of plastic waste imports from the total plastic waste imports worldwide.
+        display:
+          numDecimalPlaces: 1
+
+      export_share:
+        title: Share of plastic waste exports via all modes of transport
+        unit: '%'
+        short_unit: '%'
+        processing_level: minor
+        description_short: Share of plastic waste exports encompassing all transport methods from total global. These are calculated by determining the proportion of plastic waste exports from the total plastic waste exports worldwide.
+        display:
+          numDecimalPlaces: 1
+
+      net_export_per_capita:
+        title: Per capita net exports of plastic waste via all modes of transport
+        unit: kilograms
+        short_unit: kg
+        processing_level: minor
+        description_short: Plastic waste net exports encompassing all transport methods per capita. Net exports are calculated as exports minus imports. These are calculated by dividing by each country's population.
+        display:
+          numDecimalPlaces: 1
