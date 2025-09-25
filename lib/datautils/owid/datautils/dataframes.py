@@ -278,7 +278,7 @@ def _calculate_weighted_mean(
 
     if len(valid_values) == 0:
         return np.nan
-    return np.average(valid_values, weights=valid_weights)
+    return float(np.average(valid_values, weights=valid_weights))
 
 
 def groupby_agg(
@@ -354,20 +354,22 @@ def groupby_agg(
     }
 
     # Handle weighted aggregations separately if any are present
-    weighted_aggregations = {k: v for k, v in aggregations.items()
-                           if isinstance(v, str) and v.startswith("mean_weighted_by_")}
+    weighted_aggregations = {
+        k: v for k, v in aggregations.items() if isinstance(v, str) and v.startswith("mean_weighted_by_")
+    }
 
     if weighted_aggregations:
         # Split out regular aggregations to handle them normally
-        regular_aggregations = {k: v for k, v in aggregations.items()
-                              if not (isinstance(v, str) and v.startswith("mean_weighted_by_"))}
+        regular_aggregations = {
+            k: v for k, v in aggregations.items() if not (isinstance(v, str) and v.startswith("mean_weighted_by_"))
+        }
 
         # Handle regular aggregations first (if any)
         if regular_aggregations:
             grouped = df.groupby(groupby_columns, **groupby_kwargs).agg(regular_aggregations)  # type: ignore
         else:
             # Create empty DataFrame with proper groupby index for weighted-only case
-            grouped = df.groupby(groupby_columns, **groupby_kwargs).size().to_frame('_temp').drop(columns=['_temp'])
+            grouped = df.groupby(groupby_columns, **groupby_kwargs).size().to_frame("_temp").drop(columns=["_temp"])
 
         # Add weighted mean columns
         for col, agg_func in weighted_aggregations.items():
@@ -378,7 +380,8 @@ def groupby_agg(
             weighted_results = df.groupby(groupby_columns, **groupby_kwargs).apply(
                 lambda group: _calculate_weighted_mean(
                     group, col, weight_col, num_allowed_nans, frac_allowed_nans, min_num_values
-                )
+                ),
+                include_groups=False,
             )
             grouped[col] = weighted_results
     else:
