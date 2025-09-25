@@ -15,8 +15,8 @@ paths = PathFinder(__file__)
 # Initialize logger.
 log = get_logger()
 
-# Define release year as the year in the version
-RELEASE_YEAR = int(paths.version.split("-")[0])
+# Define release year as the year in the version minus 1
+RELEASE_YEAR = int(paths.version.split("-")[0]) - 1
 
 # Define threshold for percentage of unreliable data
 UNRELIABLE_THRESHOLD = 1
