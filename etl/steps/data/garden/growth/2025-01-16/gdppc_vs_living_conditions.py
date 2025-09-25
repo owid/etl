@@ -21,7 +21,7 @@ paths = PathFinder(__file__)
 log = get_logger()
 
 # Define most recent year, so we don't process projections
-MOST_RECENT_YEAR = 2023
+MOST_RECENT_YEAR = 2024
 
 # Enable indicator years range or not
 ENABLE_INDICATOR_YEARS_RANGE = False

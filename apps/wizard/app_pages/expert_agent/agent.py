@@ -1,9 +1,7 @@
-import urllib.parse
 from pathlib import Path
 from typing import Any, AsyncGenerator, List, Literal
 
 import logfire
-import requests
 import streamlit as st
 import yaml
 from pydantic_ai import Agent
@@ -19,8 +17,13 @@ from pydantic_ai.messages import (
 from pydantic_ai.models.openai import OpenAIResponsesModelSettings
 from pydantic_ai.tools import RunContext
 
-from apps.wizard.app_pages.expert_agent.utils import CURRENT_DIR
-from etl.analytics import ANALYTICS_URL, clean_sql_query, read_datasette
+from apps.wizard.app_pages.expert_agent.utils import CURRENT_DIR, QueryResult, log, serialize_df
+from etl.analytics.datasette import (
+    DatasetteSQLError,
+    _generate_url_to_datasette,
+    read_datasette,
+)
+from etl.analytics.metabase import _generate_question_url, create_question
 from etl.config import GOOGLE_API_KEY, LOGFIRE_TOKEN_EXPERT, OWID_MCP_SERVER_URL
 from etl.docs import (
     render_collection,
@@ -49,18 +52,18 @@ SYSTEM_PROMPT = CONTEXT["system_prompt"]
 @st.cache_data(show_spinner="Loading analytics documentation...", show_time=True)
 def cached_analytics_docs():
     """Cache the analytics documentation (5 minutes)."""
-    from apps.wizard.app_pages.expert_agent.read_analytics import get_analytics_db_docs
+    from apps.wizard.app_pages.expert_agent.read_analytics import get_metabase_db_docs
 
-    docs = get_analytics_db_docs(max_workers=10)
+    docs = get_metabase_db_docs()
 
     summary = {}
     tables_summary = {}
     for doc in docs:
         # Main summary
-        summary[doc["name"]] = doc["description"]
+        summary[doc["table"]] = doc["description"]
         # Per-table summary
         table_summary = {col["name"]: col["description"] for col in doc["columns"]}
-        tables_summary[doc["name"]] = ruamel_dump(table_summary)
+        tables_summary[doc["table"]] = ruamel_dump(table_summary)
     summary = ruamel_dump(summary)
 
     return summary, tables_summary
@@ -91,13 +94,6 @@ async def process_tool_call(
     return await call_tool(name, tool_args, {"deps": ctx.deps})
 
 
-# OWID Prod MCP server
-mcp_server_prod = MCPServerStreamableHTTP(
-    url=OWID_MCP_SERVER_URL,
-    process_tool_call=process_tool_call,
-    tool_prefix="owid_data_",
-)
-
 ## Trying to tweak the settings for OpenAI responses
 settings = OpenAIResponsesModelSettings(
     # openai_reasoning_effort="low",
@@ -109,7 +105,12 @@ settings = OpenAIResponsesModelSettings(
 ## Use MCPs or not based on user input
 def get_toolsets():
     if ("expert_use_mcp" in st.session_state) and st.session_state["expert_use_mcp"]:
-        # Use MCP server for the agent
+        # Create MCP server instance inside function to avoid event loop binding issues
+        mcp_server_prod = MCPServerStreamableHTTP(
+            url=OWID_MCP_SERVER_URL,
+            process_tool_call=process_tool_call,
+            tool_prefix="owid_data_",
+        )
         return [mcp_server_prod]
     return []
 
@@ -152,10 +153,10 @@ summarize_agent = Agent(
 
 def _get_model_from_name(model_name: str):
     if model_name == "llama3.2":
-        from pydantic_ai.models.openai import OpenAIModel
+        from pydantic_ai.models.openai import OpenAIChatModel
         from pydantic_ai.providers.ollama import OllamaProvider
 
-        model = OpenAIModel(
+        model = OpenAIChatModel(
             model_name="llama3.2",
             provider=OllamaProvider(base_url="http://localhost:11434/v1"),
         )
@@ -175,12 +176,19 @@ async def agent_stream(prompt: str, model_name: str, message_history) -> AsyncGe
     Yields:
         str: Text chunks from the agent response
     """
+    toolsets = get_toolsets()
     model = _get_model_from_name(model_name)
+
+    print("===========================================")
+    print("Toolsets available")
+    print(toolsets)
+    print("===========================================")
+
     async with agent.run_stream(
         prompt,
         model=model,  # type: ignore
         message_history=message_history,
-        toolsets=get_toolsets(),  # type: ignore
+        toolsets=toolsets,  # type: ignore
     ) as result:
         # Yield each message from the stream
         async for message in result.stream_text(delta=True):
@@ -196,13 +204,13 @@ async def agent_stream(prompt: str, model_name: str, message_history) -> AsyncGe
 async def _collect_agent_stream2(prompt: str, model_name: str, message_history) -> List[str]:
     """Collect all chunks from agent_stream2 in one async context to avoid task switching issues."""
     toolsets = get_toolsets()
+    chunks = []
+    model = _get_model_from_name(model_name)
+
     print("===========================================")
     print("Toolsets available")
     print(toolsets)
     print("===========================================")
-
-    chunks = []
-    model = _get_model_from_name(model_name)
 
     async with agent.iter(
         prompt,
@@ -355,8 +363,6 @@ async def get_docs_page(file_path: str) -> str:
 async def get_db_tables() -> str:
     """Get an overview of the database tables. Retrieve the names of the tables in the database, along with their short descriptions.
 
-    Some table tables have description "TODO". That's because we haven't documented them yet.
-
     Returns:
         str: Table short descriptions in format "table1: ...\ntable2: ...".
     """
@@ -370,7 +376,6 @@ async def get_db_tables() -> str:
 async def get_db_table_fields(tb_name: str) -> str:
     """Retrieve the documentation of the columns of database table "tb_name".
 
-    Some table columns have description "TODO". That's because we haven't documented them yet.
 
     Args:
         tb_name: Name of the table
@@ -429,72 +434,174 @@ async def get_api_reference_metadata(
 
 
 @agent.tool_plain(docstring_format="google")
-async def generate_url_to_datasette(query: str) -> str:
-    """Generate a URL to the Datasette instance with the given query.
+async def execute_query(query: str, title: str, description: str, num_rows: int = 10) -> QueryResult:
+    """Execute a query in the semantic layer and get the data results.
+
+    The query is ran on Datasette, and if valid, it obtains the results from Datasette and creates a "question" in Metabase with the same query. Note that Metabase and Datasette use the same underlying database, so the query should work in both places.
+
+    If the query is invalid, it returns an error message that can be used to improve the query until valid.
 
     Args:
         query: Query to Datasette instance.
-    Returns:
-        str: URL to the Datasette instance with the query. The URL links to a datasette preview with the SQL query and its results.
-    """
-    st.markdown(
-        "**:material/construction: Tool use**: Generating Datasette query URL, via `generate_url_to_datasette`"
-    )  # , icon=":material/calculate:")
-    return _generate_url_to_datasette(query)
-
-
-def _generate_url_to_datasette(query: str) -> str:
-    query = clean_sql_query(query)
-    return f"{ANALYTICS_URL}?" + urllib.parse.urlencode({"sql": query, "_size": "max"})
-
-
-@agent.tool_plain(docstring_format="google")
-async def validate_datasette_query(query: str) -> str:
-    """Validate an SQL query.
-
-    Args:
-        query: Query to Datasette instance.
-    Returns:
-        str: Validation result message. If the query is not valid, it will return an error message. Use it to improve the query!
-    """
-    st.markdown(
-        "**:material/construction: Tool use**: Validating Datasette query, via `validate_datasette_query`"
-    )  # , icon=":material/calculate:")
-    url = _generate_url_to_datasette(f"{query}")
-    url = url.replace(ANALYTICS_URL, ANALYTICS_URL + ".json")
-    response = requests.get(url).json()
-    if response["ok"]:
-        if ("rows" not in response) or not isinstance(response["rows"], list):
-            text = "Query is invalid! Check for correctness, it must be DuckDB compatible! Seems like no rows were returned."
-        elif len(response["rows"]) == 0:
-            text = "Query is valid, but it returned no results."
-        else:
-            text = "Query is valid!"
-    else:
-        text = f"Query is invalid! Check for correctness, it must be DuckDB compatible! `\nError: {response['error']}"
-    return text
-
-
-@agent.tool_plain(docstring_format="google")
-async def get_data_from_datasette(query: str, num_rows: int = 10) -> str:
-    """Execute a query in the semantic layer in Datasette and get the actual data results.
-
-    This only shows the first 10 rows of the result, as a markdown table.
-
-    Args:
-        query: Query to Datasette instance.
+        title: Title that describes what the query does. Should be short and concise.
+        description: Description of what the query does. Should be 1-3 sentence long.
         num_rows: Number of rows to return. Defaults to 10. Too many rows may increase the tokens. Be mindful when increasing this number.
     Returns:
-        pd.DataFrame: DataFrame with the results of the query.
+        QueryResult: Serializable object with the following fields:
+            message (str): Message about the query execution. "SUCCCESS" if the query was valid, or an error message if not.
+            valid (bool): Whether the query was valid or not.
+            result (str): The data results in markdown format (first `num_rows` rows).
+            url_metabase (str): Link to the created question in Metabase, if the query was valid and the question was created successfully.
+            url_datasette (str): Link to the query in Datasette.
     """
     st.markdown(
-        f"**:material/construction: Tool use**: Getting data ({num_rows} rows) from Datasette, via `get_data_from_datasette`"
+        f"**:material/construction: Tool use**: Getting data ({num_rows} rows) from Datasette, via `execute_query`"
     )  # , icon=":material/calculate:")
-    df = read_datasette(query, use_https=False)
-    if df.empty:
-        return ""
 
-    result = df.head(num_rows).to_markdown(index=False)
-    if result is None:
-        return ""
+    try:
+        df = read_datasette(query, use_https=False)
+        url_datasette = _generate_url_to_datasette(query)
+
+        if df.empty:
+            return QueryResult(
+                message="Query returned no results. Try it on Datasette",
+                valid=False,
+                url_datasette=url_datasette,
+            )
+
+        # Serialize dataframe
+        data = serialize_df(df, num_rows=num_rows)
+
+        if data.data == []:
+            return QueryResult(
+                message="Query returned no results. Try it on Datasette",
+                valid=False,
+                url_datasette=url_datasette,
+            )
+
+        try:
+            url_metabase = create_question_in_metabase(query=query, title=title, description=description)
+        except Exception as _:
+            url_metabase = None
+        return QueryResult(
+            message="SUCCESS",
+            valid=True,
+            result=data,
+            url_metabase=url_metabase,
+            url_datasette=url_datasette,
+        )
+    except (DatasetteSQLError,) as e:
+        # Handle specific Datasette-related errors
+        return QueryResult(
+            message=f"ERROR. Query is invalid! Check for correctness, it must be DuckDB compatible!\nError: {e}",
+            valid=False,
+        )
+
+
+# Create question in Metabase
+def create_question_in_metabase(query: str, title: str, description: str) -> str:
+    """Create a question in Metabase with the given SQL query and title.
+
+    This tool should be used once we are sure that the query is valid in Datasette.
+
+    Args:
+        query: Query user for Datasette/Metabase.
+        title: Title that describes what the query does. Should be short, but concise.
+    Returns:
+        str: Link to the created question in Metabase. This link can be shared with others to access the question directly.
+    """
+    log.info(f"Creating Metabase question for query '{title}'")
+    st.markdown("**:material/add_circle: Creating metabase question**")  # , icon=":material/calculate:")
+
+    # Create question in Metabase
+    question = create_question(
+        query=query,
+        title=title,
+        description=description,
+    )
+    # Obtain URL to the question
+    url = _generate_question_url(question)
+
+    return url
+
+
+@agent.tool_plain(docstring_format="google")
+async def list_available_questions_metabase() -> List[dict]:
+    """List available questions in Metabase in the "Expert" collection.
+
+    Returns a list of questions with their metadata. Use the question names (and descriptions if available) to decide which question to use.
+
+    Returns:
+        List[dict]: List of questions with their metadata. Each item has the following fields:
+            - name (str): Name of the question.
+            - id (int): ID of the question.
+            - description (str, optional): Description of the question, if available.
+    """
+    from etl.analytics.metabase import COLLECTION_EXPERT_ID, list_questions
+
+    st.markdown(
+        "**:material/construction: Tool use**: Listing available questions in Metabase, via `list_available_questions_metabase`"
+    )
+
+    # Get questions
+    questions = list_questions()
+
+    # Skip those under collection expert
+    questions = [q for q in questions if q.get("collection_id") != COLLECTION_EXPERT_ID]
+
+    # Create question summary
+    summary = []
+    for q in questions:
+        summary_ = {
+            "name": q["name"],
+            "id": q["id"],
+        }
+        if (q["description"] is not None) and (q["description"].strip() != ""):
+            summary_["description"] = q["description"]
+        summary.append(summary_)
+    return summary
+
+
+@agent.tool_plain(docstring_format="google")
+async def get_question_data(card_id: int, num_rows: int = 20) -> QueryResult:
+    """Get the data from a Metabase question by its card ID.
+
+    After choosing a question from the list of available questions, use this tool to get the data from that question.
+
+    Args:
+        card_id: The ID of the question card in Metabase.
+        num_rows: Number of rows to return. Defaults to 20.
+    Returns:
+        DataFrameModel: Serializable object with the following fields:
+            columns (list[str]): List of column names in the dataframe.
+            dtypes (dict[str, str]): Dictionary mapping column names to their data types.
+            data (list[list]): Small slice of the data (first `num_rows` rows).
+            total_rows (int): Total number of rows in the dataframe.
+    """
+    from etl.analytics.metabase import get_question_data, get_question_info
+
+    # Getting data
+    data = get_question_data(card_id)
+
+    # Get question
+    question = get_question_info(card_id)
+
+    q_name = question.get("name", "Unknown")
+    st.markdown(
+        f"**:material/construction: Tool use**: Getting data from a Metabase question, via `get_question_data`, using id `{card_id}` for question named '{q_name}'"
+    )
+
+    # GEnerate URL
+    url = _generate_question_url(question)
+
+    # Serialize
+    data = serialize_df(data, num_rows=num_rows)
+
+    # Build result
+    result = QueryResult(
+        message="SUCCESS",
+        valid=True,
+        result=data,
+        url_metabase=url,
+    )
     return result

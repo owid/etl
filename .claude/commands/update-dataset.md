@@ -29,6 +29,7 @@ Assumptions:
 
 (Checkpoint rule: After you finish each item below that represents a workflow step, immediately run the CHECKPOINT procedure. Do not batch multiple steps before a checkpoint.)
 - [ ] Parse inputs and resolve: channel, namespace, version, short_name, old_version, branch
+- [ ] Clean workbench directory: delete `workbench/<short_name>` unless continuing existing update
 - [ ] Create or reuse draft PR and work branch
 - [ ] Update snapshot and compare to previous version; capture summary
 - [ ] Meadow step: run + fix + diff + summarize
@@ -62,6 +63,11 @@ You MUST:
 - Treat missing or ambiguous replies as no.
 
 ## Workflow orchestration
+
+0) Initial setup
+   - Check if `workbench/<short_name>/progress.md` exists to determine if continuing existing update
+   - If starting fresh: delete `workbench/<short_name>` directory if it exists
+   - Create fresh `workbench/<short_name>` directory for artifacts
 
 1) Create PR and run step updater via subagent (dataset-update-pr)
    - Inputs: `<namespace>/<old_version>/<short_name>`

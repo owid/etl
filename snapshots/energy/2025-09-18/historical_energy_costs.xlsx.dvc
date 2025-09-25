@@ -1,0 +1,28 @@
+meta:
+  origin:
+    ####################################################################################################################
+    # TODO: This dataset was created for internal investigation purposes.
+    #  If we decide to publish it, and the data provider agrees, rephrase this metadata appropriately.
+    ####################################################################################################################
+    title: "Historical energy costs"
+    description: |-
+      This dataset is a compilation of historical and recent data on the levelized cost of energy of different technologies.
+    date_published: "2025-09-18"
+
+    # Citation
+    producer: Rupert Way
+    citation_full: |-
+      Rupert Way - Costs of energy technologies (2025). The original data was sent to us in a private communication.
+
+    url_main: https://www.smithschool.ox.ac.uk/person/rupert-way
+    date_accessed: '2025-09-19'
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://www.smithschool.ox.ac.uk/person/rupert-way
+  is_public: false
+outs:
+  - md5: 5612577126e65bc43bd5b3c9da36975e
+    size: 116349
+    path: historical_energy_costs.xlsx
