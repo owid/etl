@@ -4,7 +4,6 @@ This file provides guidance to automation agents working with code in this repos
 
 # Individual Preferences
 - @~/.claude/instructions/etl.md
-- Refer to local maintainer overrides at `~/.agent/instructions/etl.md` when present.
 
 ## Architecture Overview
 
