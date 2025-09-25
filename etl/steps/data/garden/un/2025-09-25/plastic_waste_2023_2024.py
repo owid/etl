@@ -30,10 +30,12 @@ def run() -> None:
     #
     # Harmonize country names.
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+
     # Pivot to get exports and imports by each mode of transport
     tb = tb.pivot(
         index=["year", "country"], columns=["export_vs_import", "mode_of_transport"], values="qty"
     ).reset_index()
+
     tb.columns = [f"{col[0]}_{col[1]}" if col[0] not in ["year", "country"] else col[0] for col in tb.columns]
 
     tb = geo.add_regions_to_table(
@@ -41,6 +43,7 @@ def run() -> None:
         ds_regions,
         regions=REGIONS + ["World"],
     )
+
     tb["net_export"] = tb["Export_TOTAL MOT"] - tb["Import_TOTAL MOT"]
 
     tb = add_per_capita_variables(tb)
@@ -51,6 +54,7 @@ def run() -> None:
 
     # Improve table format.
     tb = tb.format(["country", "year"])
+
     # Convert columns that are not per capita/ share of to tonnes
     for col in tb.columns:
         if "per_capita" not in col and "share" not in col:
@@ -58,6 +62,7 @@ def run() -> None:
 
     tb = tb.reset_index()
 
+    # Combine with data up to 2023
     tb_up_to_2023 = tb_up_to_2023[tb.columns]
     tb = pr.concat([tb, tb_up_to_2023], ignore_index=True)
     tb = tb.format(["country", "year"])
@@ -75,17 +80,6 @@ def run() -> None:
 def add_per_capita_variables(tb: Table) -> Table:
     """
     Add per-capita variables for total exports and imports of plastic waste.
-
-    Parameters
-    ----------
-    tb : Table
-        Primary data.
-    ds_population : Dataset
-        Population dataset.
-    Returns
-    -------
-    tb : Table
-        Data after adding per-capita variables.
     """
     tb_with_per_capita = tb.copy()
 
@@ -113,29 +107,6 @@ def add_share_from_total(tb: Table) -> Table:
     """
     Calculate the share of imports and exports for each country relative to
     the world total and add these as new columns to the input dataframe.
-
-    The function performs the following steps:
-    - Extracts world totals for each year for the columns 'Import_TOTAL MOT' and 'Export_TOTAL MOT'.
-    - Merges the world totals with the main dataframe on the 'year' column.
-    - Calculates the import and export share for each country as a percentage of the world total.
-    - Drops the columns used for intermediate calculations.
-
-    Parameters
-    ----------
-    tb : pandas.DataFrame
-        The input data frame, which must contain at least the following columns:
-        - 'country': The name of the country.
-        - 'year': The year of the data.
-        - 'Import_TOTAL MOT': The total import value for the country in the given year.
-        - 'Export_TOTAL MOT': The total export value for the country in the given year.
-
-    Returns
-    -------
-    merged_df : pandas.DataFrame
-        A dataframe with the same columns as `tb`, plus two additional columns:
-        - 'import_share': The share of the country's imports relative to the world total, expressed as a percentage.
-        - 'export_share': The share of the country's exports relative to the world total, expressed as a percentage.
-
     """
 
     # Extract the World totals for each year
@@ -155,16 +126,6 @@ def add_share_from_total(tb: Table) -> Table:
 def add_share_transported_by_air(tb: Table) -> Table:
     """
     Calculate the share of plastic waste transported by air for exports and imports.
-
-    Parameters
-    ----------
-    tb : Table
-        The input table with transport mode columns
-
-    Returns
-    -------
-    tb : Table
-        Table with added air transport share columns
     """
     tb_with_air_share = tb.copy()
 

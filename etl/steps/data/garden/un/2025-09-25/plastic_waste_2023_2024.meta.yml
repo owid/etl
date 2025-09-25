@@ -1,16 +1,15 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
   common:
+    processing_level: minor
     presentation:
       topic_tags:
         - Plastic Pollution
-
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 365
-
 
 tables:
   plastic_waste_2023_2024:
@@ -19,100 +18,147 @@ tables:
         title: Imports of plastic waste via all modes of transport
         unit: tonnes
         short_unit: t
-        description_short: Aggregate data of plastic waste imports, encompassing all transport methods.
+        description_short: Total quantity of plastic waste imported by a country via all transportation methods.
+        description_key:
+          - This indicator shows the total weight of plastic waste imports using all modes of transport combined.
+          - Data comes from UN Comtrade database covering commodity code 3915 (waste, parings and scrap, of plastics).
+          - Quantities are measured in tonnes and represent the physical weight of plastic waste traded.
         display:
+          tolerance: 5
           numDecimalPlaces: 0
 
       export_total_mot:
         title: Exports of plastic waste via all modes of transport
         unit: tonnes
         short_unit: t
-        description_short: Aggregate data of plastic waste exports, encompassing all transport methods.
+        description_short: Total quantity of plastic waste exported by a country via all transportation methods.
+        description_key:
+          - This indicator shows the total weight of plastic waste exports using all modes of transport combined.
+          - Data comes from UN Comtrade database covering commodity code 3915 (waste, parings and scrap, of plastics).
+          - Quantities are measured in tonnes and represent the physical weight of plastic waste traded.
         display:
-          numDecimalPlaces: 0
+          tolerance: 5
+          numDecimalPlaces: 1
 
       import_air:
         title: Imports of plastic waste via air
         unit: tonnes
         short_unit: t
-        description_short: Plastic waste imported through air transport.
+        description_short: Quantity of plastic waste imported by a country specifically via air transport.
+        description_key:
+          - This indicator shows the weight of plastic waste imports transported by air.
+          - Air transport typically represents a small fraction of total plastic waste trade due to high costs.
         display:
-          numDecimalPlaces: 0
+          tolerance: 5
+          numDecimalPlaces: 1
 
       export_air:
         title: Exports of plastic waste via air
         unit: tonnes
         short_unit: t
-        description_short: Plastic waste exported through air transport.
+        description_short: Quantity of plastic waste exported by a country specifically via air transport.
+        description_key:
+          - This indicator shows the weight of plastic waste exports transported by air.
+          - Air transport typically represents a small fraction of total plastic waste trade due to high costs.
         display:
-          numDecimalPlaces: 0
+          tolerance: 5
+          numDecimalPlaces: 1
 
       import_total_mot_per_capita:
         title: Per capita imports of plastic waste via all modes of transport
         unit: kilograms
         short_unit: kg
-        processing_level: minor
-        description_short: Plastic waste imports encompassing all transport methods per capita. These are calculated by dividing by each country's population.
+        description_short: Total plastic waste imports per person, calculated by dividing total imports by population.
+        description_key:
+          - This indicator normalizes plastic waste imports by population size, allowing for comparison across countries of different sizes.
+          - Calculated by dividing total plastic waste imports (in tonnes) by population and converting to kilograms per person.
         display:
+          tolerance: 5
           numDecimalPlaces: 1
 
       export_total_mot_per_capita:
         title: Per capita exports of plastic waste via all modes of transport
         unit: kilograms
         short_unit: kg
-        processing_level: minor
-        description_short: Plastic waste exports encompassing all transport methods per capita. These are calculated by dividing by each country's population.
+        description_short: Total plastic waste exports per person, calculated by dividing total exports by population.
+        description_key:
+          - This indicator normalizes plastic waste exports by population size, allowing for comparison across countries of different sizes.
+          - Calculated by dividing total plastic waste exports (in tonnes) by population and converting to kilograms per person.
         display:
+          tolerance: 5
           numDecimalPlaces: 1
 
       net_export:
         title: Net exports of plastic waste via all modes of transport
         unit: tonnes
         short_unit: t
-        processing_level: minor
-        description_short: Plastic waste net exports encompassing all transport methods. Net exports are calculated as exports minus imports.
+        description_short: The difference between plastic waste exports and imports, where positive values indicate net exports and negative values indicate net imports.
+        description_key:
+          - Calculated as total exports minus total imports of plastic waste.
+          - Positive values indicate the country exported more plastic waste than it imported (net exporter).
+          - Negative values indicate the country imported more plastic waste than it exported (net importer).
         display:
-          numDecimalPlaces: 0
+          tolerance: 5
+          numDecimalPlaces: 1
 
       import_share:
         title: Share of plastic waste imports via all modes of transport
         unit: '%'
         short_unit: '%'
-        processing_level: minor
-        description_short: Share of plastic waste imports encompassing all transport methods from total global. These are calculated by determining the proportion of plastic waste imports from the total plastic waste imports worldwide.
+        description_short: A country's plastic waste imports as a percentage of global plastic waste imports.
+        description_key:
+          - Shows what proportion of global plastic waste imports each country accounts for.
+          - Calculated by dividing a country's plastic waste imports by world total imports and multiplying by 100.
         display:
+          tolerance: 5
           numDecimalPlaces: 1
 
       export_share:
         title: Share of plastic waste exports via all modes of transport
         unit: '%'
         short_unit: '%'
-        processing_level: minor
-        description_short: Share of plastic waste exports encompassing all transport methods from total global. These are calculated by determining the proportion of plastic waste exports from the total plastic waste exports worldwide.
+        description_short: A country's plastic waste exports as a percentage of global plastic waste exports.
+        description_key:
+          - Shows what proportion of global plastic waste exports each country accounts for.
+          - Calculated by dividing a country's plastic waste exports by world total exports and multiplying by 100.
         display:
+          tolerance: 5
           numDecimalPlaces: 1
 
       net_export_per_capita:
         title: Per capita net exports of plastic waste via all modes of transport
         unit: kilograms
         short_unit: kg
-        processing_level: minor
-        description_short: Plastic waste net exports encompassing all transport methods per capita. Net exports are calculated as exports minus imports. These are calculated by dividing by each country's population.
+        description_short: Net plastic waste trade per person, where positive values indicate net exports and negative values indicate net imports per capita.
+        description_key:
+          - Calculated by dividing net exports (exports minus imports) by population and converting to kilograms per person.
+          - Allows comparison of plastic waste trade balance across countries of different population sizes.
         display:
+          tolerance: 5
           numDecimalPlaces: 1
 
       export_share_transported_by_air:
         title: Share of plastic waste exports transported by air
         unit: '%'
         short_unit: '%'
-        description_short: Share of plastic waste exports transported by air from total plastic waste exports. These are calculated by determining the proportion of plastic waste exports transported by air from the total plastic waste exports.
+        description_short: The percentage of a country's plastic waste exports that are transported by air.
+        description_key:
+          - Calculated by dividing air exports by total exports and multiplying by 100.
+          - Shows the relative importance of air transport in a country's plastic waste export profile.
+          - Air transport is typically a small share due to high costs relative to sea and land transport.
         display:
+          tolerance: 5
           numDecimalPlaces: 1
 
       import_share_transported_by_air:
         title: Share of plastic waste imports transported by air
         unit: '%'
         short_unit: '%'
-        description_short: Share of plastic waste imports transported by air from total plastic waste imports. These are calculated by determining the proportion of plastic waste imports transported by air from the total plastic waste imports.
+        description_short: The percentage of a country's plastic waste imports that are transported by air.
+        description_key:
+          - Calculated by dividing air imports by total imports and multiplying by 100.
+          - Shows the relative importance of air transport in a country's plastic waste import profile.
+          - Air transport is typically a small share due to high costs relative to sea and land transport.
         display:
+          tolerance: 5
           numDecimalPlaces: 1
