@@ -2491,16 +2491,20 @@ class RegionAggregator:
                 countries_that_must_have_data=countries_that_must_have_data,
             )
 
-        # Fast region processing on subset
-        _select_regions = tb_fast[self.country_col].isin(list(self.regions))
-        df_no_regions = tb_fast[~_select_regions]
-        df_with_regions = pd.concat([df_only_regions, df_no_regions], ignore_index=True)  # type: ignore
+        # Create a mask that selects rows of regions in the original data, if any.
+        _select_regions = tb[self.country_col].isin(list(self.regions))
 
-        # Add back other columns if needed
-        if other_columns:
-            # Simple: just get all the other column data and merge it back
-            other_data = tb[self.index_columns + other_columns]
-            df_with_regions = df_with_regions.merge(other_data, on=self.index_columns, how="left")
+        # If there were regions in other columns (not used for aggregates) include them in the subtable of only regions.
+        if any(other_columns) and any(_select_regions):
+            df_only_regions = df_only_regions.merge(
+                tb[_select_regions][self.index_columns + other_columns], how="outer", on=self.index_columns
+            )
+
+        # Create a table of all other rows that are not regions.
+        df_no_regions = tb[~_select_regions]
+
+        # Combine the table with only regions and the table with no regions.
+        df_with_regions = pd.concat([df_only_regions, df_no_regions], ignore_index=True)  # type: ignore
 
         # Final sort and column ordering
         df_with_regions = df_with_regions.sort_values(self.index_columns).reset_index(drop=True)[tb.columns]
