@@ -72,6 +72,7 @@ tables:
         description_key:
           - This indicator normalizes plastic waste imports by population size, allowing for comparison across countries of different sizes.
           - Calculated by dividing total plastic waste imports (in tonnes) by population and converting to kilograms per person.
+        description_processing: We calculated per capita imports by dividing total plastic waste imports by population data and converting from tonnes to kilograms per person.
         display:
           tolerance: 5
           numDecimalPlaces: 1
@@ -84,6 +85,7 @@ tables:
         description_key:
           - This indicator normalizes plastic waste exports by population size, allowing for comparison across countries of different sizes.
           - Calculated by dividing total plastic waste exports (in tonnes) by population and converting to kilograms per person.
+        description_processing: We calculated per capita exports by dividing total plastic waste exports by population data and converting from tonnes to kilograms per person.
         display:
           tolerance: 5
           numDecimalPlaces: 1
@@ -97,6 +99,7 @@ tables:
           - Calculated as total exports minus total imports of plastic waste.
           - Positive values indicate the country exported more plastic waste than it imported (net exporter).
           - Negative values indicate the country imported more plastic waste than it exported (net importer).
+        description_processing: We calculated net exports by subtracting total plastic waste imports from total plastic waste exports for each country and year.
         display:
           tolerance: 5
           numDecimalPlaces: 1
@@ -109,6 +112,7 @@ tables:
         description_key:
           - Shows what proportion of global plastic waste imports each country accounts for.
           - Calculated by dividing a country's plastic waste imports by world total imports and multiplying by 100.
+        description_processing: We calculated import shares by dividing each country's plastic waste imports by the world total imports for each year and multiplying by 100.
         display:
           tolerance: 5
           numDecimalPlaces: 1
@@ -121,6 +125,7 @@ tables:
         description_key:
           - Shows what proportion of global plastic waste exports each country accounts for.
           - Calculated by dividing a country's plastic waste exports by world total exports and multiplying by 100.
+        description_processing: We calculated export shares by dividing each country's plastic waste exports by the world total exports for each year and multiplying by 100.
         display:
           tolerance: 5
           numDecimalPlaces: 1
@@ -133,6 +138,7 @@ tables:
         description_key:
           - Calculated by dividing net exports (exports minus imports) by population and converting to kilograms per person.
           - Allows comparison of plastic waste trade balance across countries of different population sizes.
+        description_processing: We calculated per capita net exports by dividing net exports (total exports minus total imports) by population data and converting from tonnes to kilograms per person.
         display:
           tolerance: 5
           numDecimalPlaces: 1
@@ -146,6 +152,7 @@ tables:
           - Calculated by dividing air exports by total exports and multiplying by 100.
           - Shows the relative importance of air transport in a country's plastic waste export profile.
           - Air transport is typically a small share due to high costs relative to sea and land transport.
+        description_processing: We calculated the air transport share for exports by dividing plastic waste exports via air by total plastic waste exports for each country and year, then multiplying by 100.
         display:
           tolerance: 5
           numDecimalPlaces: 1
@@ -159,6 +166,7 @@ tables:
           - Calculated by dividing air imports by total imports and multiplying by 100.
           - Shows the relative importance of air transport in a country's plastic waste import profile.
           - Air transport is typically a small share due to high costs relative to sea and land transport.
+        description_processing: We calculated the air transport share for imports by dividing plastic waste imports via air by total plastic waste imports for each country and year, then multiplying by 100.
         display:
           tolerance: 5
           numDecimalPlaces: 1
