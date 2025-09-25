@@ -3363,3 +3363,192 @@ class TestRegionAggregator(unittest.TestCase):
             self.assertIsNotNone(aggregator)
         except ValueError:
             self.fail("Dict format should allow any region names without validation")
+
+    def test_weighted_aggregations_with_num_allowed_nans(self):
+        """Test weighted aggregations with num_allowed_nans constraint."""
+        # Simple test data: only 3 European countries
+        tb_test = Table(
+            {
+                "country": ["France", "Italy", "Spain"],
+                "year": [2020, 2020, 2020],
+                "indicator": [10.0, np.nan, 20.0],  # Italy has NaN - that's 1 NaN
+                "weight": [1.0, 2.0, 3.0],  # No NaNs in weight column
+            }
+        )
+
+        aggregator = geo.RegionAggregator(
+            ds_regions=self.ds_regions,
+            regions_all=self.regions_all,
+            regions=["Europe"],
+            aggregations={"indicator": "mean_weighted_by_weight"},
+            ds_income_groups=self.ds_income_groups,
+        )
+
+        # Test with num_allowed_nans=0: should be NaN because indicator column has 1 NaN
+        result_strict = aggregator.add_aggregates(tb_test, num_allowed_nans_per_year=0, check_for_region_overlaps=False)
+        europe_strict = result_strict[result_strict["country"] == "Europe"]
+        self.assertTrue(
+            pd.isna(europe_strict["indicator"].iloc[0]), "Should be NaN - indicator has 1 NaN but 0 allowed"
+        )
+
+        # Test with num_allowed_nans=1: should calculate using France(10.0*1.0) + Spain(20.0*3.0)
+        result_lenient = aggregator.add_aggregates(
+            tb_test, num_allowed_nans_per_year=1, check_for_region_overlaps=False
+        )
+        europe_lenient = result_lenient[result_lenient["country"] == "Europe"]
+
+        # Manual calculation: (10*1 + 20*3) / (1 + 3) = 70 / 4 = 17.5
+        expected_weighted = 17.5
+        self.assertAlmostEqual(europe_lenient["indicator"].iloc[0], expected_weighted, places=5)
+
+    def test_weighted_aggregations_with_frac_allowed_nans(self):
+        """Test weighted aggregations with frac_allowed_nans constraint."""
+        # Simple test: 4 countries, 1 has NaN = 25% NaN rate
+        tb_test = Table(
+            {
+                "country": ["France", "Italy", "Spain", "Russia"],
+                "year": [2020, 2020, 2020, 2020],
+                "indicator": [10.0, np.nan, 20.0, 30.0],  # Italy has NaN - that's 1/4 = 25%
+                "weight": [1.0, 1.0, 1.0, 1.0],  # All weights equal for simplicity
+            }
+        )
+
+        aggregator = geo.RegionAggregator(
+            ds_regions=self.ds_regions,
+            regions_all=self.regions_all,
+            regions=["Europe"],
+            aggregations={"indicator": "mean_weighted_by_weight"},
+            ds_income_groups=self.ds_income_groups,
+        )
+
+        # Test with frac_allowed_nans=0.2 (20%): should be NaN because we have 25% NaNs
+        result_strict = aggregator.add_aggregates(
+            tb_test, frac_allowed_nans_per_year=0.2, check_for_region_overlaps=False
+        )
+        europe_strict = result_strict[result_strict["country"] == "Europe"]
+        self.assertTrue(pd.isna(europe_strict["indicator"].iloc[0]), "Should be NaN - 25% NaNs > 20% allowed")
+
+        # Test with frac_allowed_nans=0.3 (30%): should work because 25% < 30%
+        result_lenient = aggregator.add_aggregates(
+            tb_test, frac_allowed_nans_per_year=0.3, check_for_region_overlaps=False
+        )
+        europe_lenient = result_lenient[result_lenient["country"] == "Europe"]
+
+        # Manual calculation: (10*1 + 20*1 + 30*1) / (1 + 1 + 1) = 60 / 3 = 20.0
+        expected_weighted = 20.0
+        self.assertAlmostEqual(europe_lenient["indicator"].iloc[0], expected_weighted, places=5)
+
+    def test_weighted_aggregations_with_min_num_values(self):
+        """Test weighted aggregations with min_num_values constraint."""
+        # Simple test: 3 countries, 1 has NaN pair = only 2 valid pairs
+        tb_test = Table(
+            {
+                "country": ["France", "Italy", "Spain"],
+                "year": [2020, 2020, 2020],
+                "indicator": [10.0, np.nan, 30.0],  # Italy has NaN
+                "weight": [1.0, 2.0, 3.0],  # All weights valid
+            }
+        )
+
+        aggregator = geo.RegionAggregator(
+            ds_regions=self.ds_regions,
+            regions_all=self.regions_all,
+            regions=["Europe"],
+            aggregations={"indicator": "mean_weighted_by_weight"},
+            ds_income_groups=self.ds_income_groups,
+        )
+
+        # Test with min_num_values=3: should be NaN because only 2 valid pairs (France, Spain)
+        result_strict = aggregator.add_aggregates(tb_test, min_num_values_per_year=3, check_for_region_overlaps=False)
+        europe_strict = result_strict[result_strict["country"] == "Europe"]
+        self.assertTrue(pd.isna(europe_strict["indicator"].iloc[0]), "Should be NaN - need 3 values but only 2 valid")
+
+        # Test with min_num_values=2: should work with 2 valid pairs
+        result_lenient = aggregator.add_aggregates(tb_test, min_num_values_per_year=2, check_for_region_overlaps=False)
+        europe_lenient = result_lenient[result_lenient["country"] == "Europe"]
+
+        # Manual calculation: (10*1 + 30*3) / (1 + 3) = 100 / 4 = 25.0
+        expected_weighted = 25.0
+        self.assertAlmostEqual(europe_lenient["indicator"].iloc[0], expected_weighted, places=5)
+
+    def test_weighted_aggregations_with_missing_countries(self):
+        """Test weighted aggregations when key countries are missing from region."""
+        # Simple test: only have France, missing other European countries
+        tb_test = Table(
+            {
+                "country": ["France"],  # Only France, missing Italy which we'll require
+                "year": [2020],
+                "indicator": [10.0],
+                "weight": [1.0],
+            }
+        )
+
+        aggregator = geo.RegionAggregator(
+            ds_regions=self.ds_regions,
+            regions_all=self.regions_all,
+            regions=["Europe"],
+            aggregations={"indicator": "mean_weighted_by_weight"},
+            ds_income_groups=self.ds_income_groups,
+        )
+
+        # Test with countries_that_must_have_data requiring Italy (which is missing)
+        result = aggregator.add_aggregates(
+            tb_test,
+            countries_that_must_have_data={"Europe": ["France", "Italy"]},
+            check_for_region_overlaps=False,
+        )
+        europe_data = result[result["country"] == "Europe"]
+        self.assertTrue(
+            pd.isna(europe_data["indicator"].iloc[0]), "Should be NaN when required country Italy is missing"
+        )
+
+        # Test without required countries - should calculate with just France
+        result_normal = aggregator.add_aggregates(tb_test, check_for_region_overlaps=False)
+        europe_normal = result_normal[result_normal["country"] == "Europe"]
+
+        # Only France: 10.0 * 1.0 / 1.0 = 10.0
+        self.assertEqual(europe_normal["indicator"].iloc[0], 10.0)
+
+    def test_weighted_aggregations_combined_constraints(self):
+        """Test weighted aggregations with multiple NaN constraints combined."""
+        # Simple test: 3 countries, 1 has NaN = 33% NaN rate, 2 valid pairs
+        tb_test = Table(
+            {
+                "country": ["France", "Italy", "Spain"],
+                "year": [2020, 2020, 2020],
+                "indicator": [10.0, np.nan, 30.0],  # Italy NaN = 1/3 = 33% NaN
+                "weight": [1.0, 2.0, 3.0],  # No NaNs in weight
+            }
+        )
+
+        aggregator = geo.RegionAggregator(
+            ds_regions=self.ds_regions,
+            regions_all=self.regions_all,
+            regions=["Europe"],
+            aggregations={"indicator": "mean_weighted_by_weight"},
+            ds_income_groups=self.ds_income_groups,
+        )
+
+        # Test with strict constraints: 0 NaNs allowed + max 20% NaN + need 3 values
+        result = aggregator.add_aggregates(
+            tb_test,
+            num_allowed_nans_per_year=0,  # 0 NaNs allowed, but indicator has 1
+            frac_allowed_nans_per_year=0.2,  # 20% allowed, but have 33%
+            min_num_values_per_year=3,  # Need 3 values, but only 2 valid pairs
+            check_for_region_overlaps=False,
+        )
+        europe_strict = result[result["country"] == "Europe"]
+        self.assertTrue(pd.isna(europe_strict["indicator"].iloc[0]), "Should be NaN - violates all constraints")
+
+        # Test with lenient constraints: allow calculations
+        result_lenient = aggregator.add_aggregates(
+            tb_test,
+            num_allowed_nans_per_year=1,  # Allow 1 NaN
+            frac_allowed_nans_per_year=0.5,  # Allow 50% NaNs
+            min_num_values_per_year=2,  # Need only 2 values
+            check_for_region_overlaps=False,
+        )
+        europe_lenient = result_lenient[result_lenient["country"] == "Europe"]
+
+        # Manual calculation: France(10*1) + Spain(30*3) / (1+3) = 100/4 = 25.0
+        self.assertEqual(europe_lenient["indicator"].iloc[0], 25.0)
