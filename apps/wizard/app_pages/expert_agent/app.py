@@ -15,6 +15,7 @@ from pydantic_core import to_json
 from structlog import get_logger
 
 from apps.wizard.app_pages.expert_agent.agent import recommender_agent, run_agent_stream
+from apps.wizard.app_pages.expert_agent.stream import set_status_container
 from apps.wizard.app_pages.expert_agent.utils import (
     MODEL_DEFAULT,
     MODELS_AVAILABLE_LIST,
@@ -308,8 +309,14 @@ if prompt:
         # )
         start_time = time.time()
 
-        # Get stream
-        stream = run_agent_stream(prompt)
+        # Create status container for tool activity
+        status_container = st.status("Agent is working...", expanded=False)
+
+        # Set up the status container for tool messages
+        set_status_container(status_container)
+
+        # Get stream (with structured output enabled)
+        stream = run_agent_stream(prompt, structured=False)
 
         # Present stream
         st.session_state.response = cast(
@@ -317,8 +324,14 @@ if prompt:
             st.write_stream(stream),
         )
 
+        # Update status to complete
+        status_container.update(label="Agent completed", state="complete")
+
         response_time = time.time() - start_time
         print("finished asking LLM...")
+
+        # Clear the status container reference
+        set_status_container(None)
 
         # Show usage and reasoning details
         container_summary = st.container(border=True)
@@ -339,7 +352,7 @@ if prompt:
                         width="stretch",
                     ):
                         show_reasoning_details_dialog()
-                    show_debugging_details()
+                    # show_debugging_details()
             ## Add messages to history
             register_message_history()
 

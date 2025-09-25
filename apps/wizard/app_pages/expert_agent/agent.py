@@ -17,7 +17,7 @@ from etl.analytics.datasette import (
     _generate_url_to_datasette,
     read_datasette,
 )
-from etl.analytics.metabase import _generate_question_url, create_question
+from etl.analytics.metabase import _generate_question_url, create_question, get_question_info
 from etl.config import GOOGLE_API_KEY, LOGFIRE_TOKEN_EXPERT, OWID_MCP_SERVER_URL
 from etl.docs import (
     render_collection,
@@ -82,9 +82,10 @@ async def process_tool_call(
     tool_args: dict[str, Any],
 ) -> ToolResult:
     """A tool call processor that passes along the deps."""
-    st.markdown(
-        f"**:material/compare_arrows: MCP**: Querying OWID MCP, method `{name}`"
-    )  # , icon=":material/compare_arrows:")
+    # tool_ui_message(
+    #     message_type="markdown",
+    #     text=f"**:material/compare_arrows: MCP**: Querying OWID MCP, method `{name}`",
+    # )
     return await call_tool(name, tool_args, {"deps": ctx.deps})
 
 
@@ -145,8 +146,15 @@ summarize_agent = Agent(
 #######################################################
 # STREAMING
 #######################################################
-def run_agent_stream(prompt: str):
-    from apps.wizard.app_pages.expert_agent.stream import agent_stream_sync
+def run_agent_stream(prompt: str, structured: bool = False):
+    if structured:
+        from apps.wizard.app_pages.expert_agent.stream import agent_stream_sync_structured
+
+        stream_func = agent_stream_sync_structured
+    else:
+        from apps.wizard.app_pages.expert_agent.stream import agent_stream_sync
+
+        stream_func = agent_stream_sync
 
     def handle_session_updates(updates):
         for key, value in updates.items():
@@ -154,7 +162,7 @@ def run_agent_stream(prompt: str):
 
     # Agent to work, and stream its output
     model_name = st.session_state["expert_config"].get("model_name", MODEL_DEFAULT)
-    stream = agent_stream_sync(
+    stream = stream_func(
         agent=agent,
         prompt=prompt,
         model_name=model_name,
@@ -181,9 +189,10 @@ async def get_context(category_name: Literal["analytics", "metadata", "docs"]) -
     Returns:
         str: The context for the specified category.
     """
-    st.markdown(
-        f"**:material/construction: Tool use**: Getting context on category '{category_name}', using `get_context`"
-    )  # , icon=":material/calculate:")
+    # tool_ui_message(
+    #     message_type="markdown",
+    #     text=f"**:material/construction: Tool use**: Getting context on category '{category_name}', using `get_context`",
+    # )
     return CONTEXT["context"][category_name]
 
 
@@ -207,9 +216,10 @@ async def get_docs_index() -> str:
     Returns:
         str: The documentation index. List of available section and pages.
     """
-    st.markdown(
-        "**:material/construction: Tool use**: Getting the table of contents of ETL documentation, via `get_docs_index`"
-    )  # , icon=":material/calculate:")
+    # tool_ui_message(
+    #     message_type="markdown",
+    #     text="**:material/construction: Tool use**: Getting the table of contents of ETL documentation, via `get_docs_index`",
+    # )
     docs = ruamel_dump(DOCS_INDEX["nav"])
     return docs
 
@@ -232,9 +242,10 @@ async def get_docs_page(file_path: str) -> str:
     Returns:
         str: The documentation for the specified file_path.
     """
-    st.markdown(
-        f"**:material/construction: Tool use**: Getting ETL docs page '{file_path}', via `get_docs_page`"
-    )  # , icon=":material/calculate:")
+    # tool_ui_message(
+    #     message_type="markdown",
+    #     text=f"**:material/construction: Tool use**: Getting ETL docs page '{file_path}', via `get_docs_page`",
+    # )
     if (DOCS_DIR / file_path).exists():
         docs = read_page_md(DOCS_DIR / file_path)
     else:
@@ -250,9 +261,10 @@ async def get_db_tables() -> str:
     Returns:
         str: Table short descriptions in format "table1: ...\ntable2: ...".
     """
-    st.markdown(
-        "**:material/construction: Tool use**: Getting the database details of our semantic layer, via `get_db_tables`"
-    )  # , icon=":material/calculate:")
+    # tool_ui_message(
+    #     message_type="markdown",
+    #     text="**:material/construction: Tool use**: Getting the database details of our semantic layer, via `get_db_tables`",
+    # )
     return ANALYTICS_DB_OVERVIEW
 
 
@@ -267,9 +279,10 @@ async def get_db_table_fields(tb_name: str) -> str:
     Returns:
         str: Table documentation as string, mapping column names to their descriptions. E.g. "column1: description1\ncolumn2: description2".
     """
-    st.markdown(
-        f"**:material/construction: Tool use**: Getting documentation of table `{tb_name}` from the semantic layer, via `get_db_table_fields`"
-    )  # , icon=":material/calculate:")
+    # tool_ui_message(
+    #     message_type="markdown",
+    #     text=f"**:material/construction: Tool use**: Getting documentation of table `{tb_name}` from the semantic layer, via `get_db_table_fields`",
+    # )
     if tb_name not in ANALYTICS_DB_TABLE_DETAILS:
         print("Table not found:", tb_name)
         print("Available tables:", sorted(ANALYTICS_DB_TABLE_DETAILS.keys()))
@@ -290,9 +303,10 @@ async def get_api_reference_metadata(
     Returns:
         str: Metadata for the specified object type.
     """
-    st.markdown(
-        f"**:material/construction: Tool use**: Getting metadata documentation for object '{object_name}', via `get_api_reference_metadata')`"
-    )  # , icon=":material/calculate:")
+    # tool_ui_message(
+    #     message_type="markdown",
+    #     text=f"**:material/construction: Tool use**: Getting metadata documentation for object '{object_name}', via `get_api_reference_metadata')`",
+    # )
     match object_name:
         case "dataset":
             return render_dataset()
@@ -338,9 +352,10 @@ async def execute_query(query: str, title: str, description: str, num_rows: int 
             url_metabase (str): Link to the created question in Metabase, if the query was valid and the question was created successfully.
             url_datasette (str): Link to the query in Datasette.
     """
-    st.markdown(
-        f"**:material/construction: Tool use**: Getting data ({num_rows} rows) from Datasette, via `execute_query`"
-    )  # , icon=":material/calculate:")
+    # tool_ui_message(
+    #     message_type="markdown",
+    #     text=f"**:material/construction: Tool use**: Getting data ({num_rows} rows) from Datasette, via `execute_query`",
+    # )
 
     try:
         df = read_datasette(query, use_https=False)
@@ -395,7 +410,10 @@ def create_question_in_metabase(query: str, title: str, description: str) -> str
         str: Link to the created question in Metabase. This link can be shared with others to access the question directly.
     """
     log.info(f"Creating Metabase question for query '{title}'")
-    st.markdown("**:material/add_circle: Creating metabase question**")  # , icon=":material/calculate:")
+    # tool_ui_message(
+    #     message_type="markdown",
+    #     text="**:material/add_circle: Creating metabase question**",
+    # )
 
     # Create question in Metabase
     question = create_question(
@@ -423,9 +441,10 @@ async def list_available_questions_metabase() -> List[dict]:
     """
     from etl.analytics.metabase import COLLECTION_EXPERT_ID, list_questions
 
-    st.markdown(
-        "**:material/construction: Tool use**: Listing available questions in Metabase, via `list_available_questions_metabase`"
-    )
+    # tool_ui_message(
+    #     message_type="markdown",
+    #     text="**:material/construction: Tool use**: Listing available questions in Metabase, via `list_available_questions_metabase`",
+    # )
 
     # Get questions
     questions = list_questions()
@@ -447,6 +466,23 @@ async def list_available_questions_metabase() -> List[dict]:
 
 
 @agent.tool_plain(docstring_format="google")
+async def get_question_url(card_id: int) -> str:
+    """Get the URL to a Metabase question by its card ID.
+    After choosing a question from the list of available questions, use this tool to get the URL to that question.
+
+    Args:
+        card_id: The ID of the question card in Metabase.
+    Returns:
+        str: The URL to the Metabase question.
+    """
+    # Get question
+    question = get_question_info(card_id)
+    # Generate URL
+    url = _generate_question_url(question)
+    return url
+
+
+@agent.tool_plain(docstring_format="google")
 async def get_question_data(card_id: int, num_rows: int = 20) -> QueryResult:
     """Get the data from a Metabase question by its card ID.
 
@@ -462,20 +498,21 @@ async def get_question_data(card_id: int, num_rows: int = 20) -> QueryResult:
             data (list[list]): Small slice of the data (first `num_rows` rows).
             total_rows (int): Total number of rows in the dataframe.
     """
-    from etl.analytics.metabase import get_question_data, get_question_info
+    from etl.analytics.metabase import get_question_data as _get_question_data
 
     # Getting data
-    data = get_question_data(card_id)
+    data = _get_question_data(card_id)
 
     # Get question
     question = get_question_info(card_id)
 
-    q_name = question.get("name", "Unknown")
-    st.markdown(
-        f"**:material/construction: Tool use**: Getting data from a Metabase question, via `get_question_data`, using id `{card_id}` for question named '{q_name}'"
-    )
+    # q_name = question.get("name", "Unknown")
+    # tool_ui_message(
+    #     message_type="markdown",
+    #     text=f"**:material/construction: Tool use**: Getting data from a Metabase question, via `get_question_data`, using id `{card_id}` for question named '{q_name}'",
+    # )
 
-    # GEnerate URL
+    # Generate URL
     url = _generate_question_url(question)
 
     # Serialize
