@@ -2033,32 +2033,6 @@ class RegionAggregator:
                 column: "sum" for column in tb.columns if column not in self.index_columns
             }
 
-    def _preprocess_table_for_weighted_means(self, tb: Table) -> Table:
-        """Add population or other weight columns if needed for weighted means."""
-        # Check if any aggregation uses population weighting and population column is missing
-        for _, agg_func in self.aggregations.items():
-            if isinstance(agg_func, str) and agg_func == f"mean_weighted_by_{self.population_col}":
-                if self.population_col not in tb.columns:
-                    if self._ds_population is None:
-                        raise ValueError(
-                            f"Population column '{self.population_col}' not found in table, and no population dataset provided. "
-                            f"Add population dataset as a dependency or include population column in your table."
-                        )
-                    tb = add_population_to_table(
-                        tb=tb,
-                        ds_population=self.ds_population,  # type: ignore
-                        country_col=self.country_col,
-                        year_col=self.year_col,
-                        population_col=self.population_col,
-                        warn_on_missing_countries=False,
-                        show_full_warning=True,
-                        interpolate_missing_population=False,
-                        expected_countries_without_population=None,
-                    )
-                    break  # Only need to add population once
-
-        return tb
-
     def inspect_overlaps_with_historical_regions(
         self,
         tb,
@@ -2245,9 +2219,6 @@ class RegionAggregator:
         # Ensure aggregations are well defined.
         self._ensure_aggregations_are_defined(tb=tb)
 
-        # Preprocess table to add weight columns if needed for weighted means
-        tb = self._preprocess_table_for_weighted_means(tb)
-
         # Define the list of (non-index) columns for which aggregates will be created.
         columns = list(self.aggregations)
 
@@ -2257,6 +2228,24 @@ class RegionAggregator:
         for agg_func in self.aggregations.values():
             if isinstance(agg_func, str) and agg_func.startswith("mean_weighted_by_"):
                 weight_col = agg_func.replace("mean_weighted_by_", "")
+                # Add population column if needed for population weighting
+                if weight_col == self.population_col and weight_col not in tb.columns:
+                    if self._ds_population is None:
+                        raise ValueError(
+                            f"Population column '{self.population_col}' not found in table, and no population dataset provided. "
+                            f"Add population dataset as a dependency or include population column in your table."
+                        )
+                    tb = add_population_to_table(
+                        tb=tb,
+                        ds_population=self.ds_population,  # type: ignore
+                        country_col=self.country_col,
+                        year_col=self.year_col,
+                        population_col=self.population_col,
+                        warn_on_missing_countries=False,
+                        show_full_warning=True,
+                        interpolate_missing_population=False,
+                        expected_countries_without_population=None,
+                    )
                 if weight_col not in weight_columns and weight_col in tb.columns:
                     weight_columns.append(weight_col)
 
