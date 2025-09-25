@@ -37,7 +37,7 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 # Names of data files.
 FILES = [
     # National Snow and Ice Data Center - Sea Ice Index.
-    # "sea_ice_index.xlsx",  # Commented out due to 404 error - using 2025-07-18 version in DAG
+    "sea_ice_index.xlsx",
     # Met Office Hadley Centre - HadSST.
     "sea_surface_temperature_world.csv",
     "sea_surface_temperature_northern_hemisphere.csv",

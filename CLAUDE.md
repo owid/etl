@@ -5,6 +5,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 # Individual Preferences
 - @~/.claude/instructions/etl.md
 
+## Critical Rules
+
+⚠️ **NEVER mask problems - fix them systematically:**
+- **NEVER** return empty tables, comment out failing code, or create workarounds
+- **NEVER** catch and ignore exceptions without fixing the root cause
+- **ALWAYS** trace issues upstream through the pipeline: snapshot → meadow → garden → grapher
+- **ALWAYS** provide full error tracebacks - don't truncate diagnostic information
+- **If unsure, ASK THE USER** - don't guess or mask issues
+
 ## Architecture Overview
 
 This is Our World in Data's ETL system - a content-addressable data pipeline with DAG-based execution. The system processes global development data through a multi-stage pipeline with rich metadata and automatic dependency resolution.
@@ -98,6 +107,14 @@ etl d prune             # Remove orphaned datasets
 # Specific step types
 pytest tests/test_etl_step_code.py::test_step_name  # Test single step
 ```
+
+## Additional Tools
+
+Get `--help` for details on any command.
+
+### etl archive
+
+Archive old datasets.
 
 ## Key Development Patterns
 
