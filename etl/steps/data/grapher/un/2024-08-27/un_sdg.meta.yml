@@ -498,6 +498,13 @@ tables:
           numDecimalPlaces: 1
           tolerance: 5
 
+  _8_3_1__sl_isv_ifem__non_agriculture__both_sexes:
+    variables:
+      _8_3_1__sl_isv_ifem__non_agriculture__both_sexes:
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+
   _8_5_2__sl_tlf_uem__15_years_old_and_over__both_sexes:
     variables:
       _8_5_2__sl_tlf_uem__15_years_old_and_over__both_sexes:
