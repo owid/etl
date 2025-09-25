@@ -2037,7 +2037,7 @@ class RegionAggregator:
         """Add population or other weight columns if needed for weighted aggregations."""
         # Check if any aggregation uses population weighting and population column is missing
         for _, agg_func in self.aggregations.items():
-            if isinstance(agg_func, str) and agg_func == f"weighted_by_{self.population_col}":
+            if isinstance(agg_func, str) and agg_func == f"mean_weighted_by_{self.population_col}":
                 if self.population_col not in tb.columns:
                     if self._ds_population is None:
                         raise ValueError(
@@ -2063,8 +2063,8 @@ class RegionAggregator:
         """Extract the minimal set of columns needed for aggregation performance optimization."""
         weight_columns = []
         for agg_func in self.aggregations.values():
-            if isinstance(agg_func, str) and agg_func.startswith("weighted_by_"):
-                weight_col = agg_func.replace("weighted_by_", "")
+            if isinstance(agg_func, str) and agg_func.startswith("mean_weighted_by_"):
+                weight_col = agg_func.replace("mean_weighted_by_", "")
                 if weight_col not in weight_columns and weight_col in tb.columns:
                     weight_columns.append(weight_col)
 
@@ -2135,12 +2135,12 @@ class RegionAggregator:
         weighted_columns = {
             col: agg_func
             for col, agg_func in aggregations.items()
-            if isinstance(agg_func, str) and agg_func.startswith("weighted_by_")
+            if isinstance(agg_func, str) and agg_func.startswith("mean_weighted_by_")
         }
         non_weighted_aggregations = {
             col: agg_func
             for col, agg_func in aggregations.items()
-            if not (isinstance(agg_func, str) and agg_func.startswith("weighted_by_"))
+            if not (isinstance(agg_func, str) and agg_func.startswith("mean_weighted_by_"))
         }
 
         # Create region aggregates.
@@ -2216,7 +2216,7 @@ class RegionAggregator:
         if not groupby_columns:
             # No grouping columns, aggregate all data
             for col, agg_func in weighted_columns.items():
-                weight_column = agg_func.replace("weighted_by_", "")  # Extract weight column from string
+                weight_column = agg_func.replace("mean_weighted_by_", "")  # Extract weight column from string
                 weighted_mean = self._calculate_weighted_mean(
                     df_region_data,
                     col,
@@ -2229,7 +2229,7 @@ class RegionAggregator:
         else:
             # Group by the specified columns and calculate weighted means
             for col, agg_func in weighted_columns.items():
-                weight_column = agg_func.replace("weighted_by_", "")  # Extract weight column from string
+                weight_column = agg_func.replace("mean_weighted_by_", "")  # Extract weight column from string
 
                 # Only select the columns we need for grouping and calculation (performance optimization)
                 # Check if all needed columns exist first

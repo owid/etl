@@ -2041,7 +2041,7 @@ class TestCreateTableOfRegionsAndSubregions(unittest.TestCase):
 
         # Create region aggregator with weighted mean
         regions_all = ["Europe", "World"]
-        aggregations = {"indicator": "weighted_by_population"}
+        aggregations = {"indicator": "mean_weighted_by_population"}
 
         aggregator = geo.RegionAggregator(
             ds_regions=ds_regions,
@@ -2095,7 +2095,7 @@ class TestCreateTableOfRegionsAndSubregions(unittest.TestCase):
 
         # Create region aggregator with weighted mean
         regions_all = ["Europe", "World"]
-        aggregations = {"indicator": "weighted_by_population"}
+        aggregations = {"indicator": "mean_weighted_by_population"}
 
         aggregator = geo.RegionAggregator(
             ds_regions=ds_regions,
@@ -2132,7 +2132,7 @@ class TestCreateTableOfRegionsAndSubregions(unittest.TestCase):
 
         # Create region aggregator with custom weighted mean
         regions_all = ["Europe", "World"]
-        aggregations = {"indicator": "weighted_by_weight"}
+        aggregations = {"indicator": "mean_weighted_by_weight"}
 
         aggregator = geo.RegionAggregator(
             ds_regions=ds_regions, regions_all=regions_all, aggregations=aggregations, regions=["Europe"]
@@ -2171,7 +2171,7 @@ class TestCreateTableOfRegionsAndSubregions(unittest.TestCase):
 
         # Create region aggregator
         regions_all = ["Europe", "World"]
-        aggregations = {"indicator": "weighted_by_weight"}
+        aggregations = {"indicator": "mean_weighted_by_weight"}
 
         aggregator = geo.RegionAggregator(
             ds_regions=ds_regions, regions_all=regions_all, aggregations=aggregations, regions=["Europe"]
@@ -2209,7 +2209,7 @@ class TestCreateTableOfRegionsAndSubregions(unittest.TestCase):
 
         # Create region aggregator with mixed aggregations
         regions_all = ["Europe", "World"]
-        aggregations = {"weighted_indicator": "weighted_by_weight", "sum_indicator": "sum"}
+        aggregations = {"weighted_indicator": "mean_weighted_by_weight", "sum_indicator": "sum"}
 
         aggregator = geo.RegionAggregator(
             ds_regions=ds_regions, regions_all=regions_all, aggregations=aggregations, regions=["Europe"]
@@ -2249,7 +2249,7 @@ class TestCreateTableOfRegionsAndSubregions(unittest.TestCase):
 
         # Create region aggregator with weighted mean using missing column
         regions_all = ["Europe"]
-        aggregations = {"indicator": "weighted_by_missing_column"}
+        aggregations = {"indicator": "mean_weighted_by_missing_column"}
 
         aggregator = geo.RegionAggregator(
             ds_regions=ds_regions, regions_all=regions_all, aggregations=aggregations, regions=["Europe"]
@@ -2273,7 +2273,7 @@ class TestCreateTableOfRegionsAndSubregions(unittest.TestCase):
 
         # Create region aggregator WITHOUT population dataset
         regions_all = ["Europe"]
-        aggregations = {"indicator": "weighted_by_population"}
+        aggregations = {"indicator": "mean_weighted_by_population"}
 
         aggregator = geo.RegionAggregator(
             ds_regions=ds_regions,
