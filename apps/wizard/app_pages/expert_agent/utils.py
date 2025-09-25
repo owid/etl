@@ -1,6 +1,10 @@
 from pathlib import Path
 
 import yaml
+from pydantic import BaseModel
+from structlog import get_logger
+
+log = get_logger()
 
 CURRENT_DIR = Path(__file__).parent
 
@@ -174,3 +178,33 @@ def _calculate_tiered_cost(cost_config, tokens: int) -> float:
         return total_cost
 
     raise ValueError(f"Invalid cost configuration: {cost_config}")
+
+
+class DataFrameModel(BaseModel):
+    columns: list[str]
+    dtypes: dict[str, str]
+    data: list[list]  # small slice of data
+    total_rows: int
+
+
+class QueryResult(BaseModel):
+    message: str
+    valid: bool
+    result: DataFrameModel | None = None
+    url_metabase: str | None = None
+    url_datasette: str | None = None
+
+
+def serialize_df(df, num_rows: int | None = None) -> DataFrameModel:
+    if num_rows is None:
+        df_head = df
+    else:
+        df_head = df.head(num_rows)
+
+    data = DataFrameModel(
+        columns=df.columns.tolist(),
+        dtypes={c: str(t) for c, t in df.dtypes.items()},
+        data=df_head.to_numpy().tolist(),  # small slice
+        total_rows=len(df),
+    )
+    return data
