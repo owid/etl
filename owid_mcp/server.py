@@ -10,7 +10,7 @@ from sentry_sdk import logger as sentry_logger
 from etl.config import LOGFIRE_TOKEN_MCP, enable_sentry
 
 # Import the modular servers
-from owid_mcp import charts, deep_research, indicators, posts
+from owid_mcp import charts, indicators, posts
 from owid_mcp.config import COMMON_ENTITIES
 
 enable_sentry(enable_logs=True)
@@ -48,9 +48,10 @@ INSTRUCTIONS = (
 
 INSTRUCTIONS_ENTITIES = "• Entity names must match exactly as they appear in OWID:\n" f"{COMMON_ENTITIES}\n\n"
 
+
 # NOTE:
-# Because the ChatGPT connector doesn’t perform a session‑ID handshake (it just fires off JSON‑RPC POSTs),
-# you must run your FastMCP server in stateless mode. Otherwise FastMCP won’t recognize the incoming
+# Because the ChatGPT connector doesn't perform a session‑ID handshake (it just fires off JSON‑RPC POSTs),
+# you must run your FastMCP server in stateless mode. Otherwise FastMCP won't recognize the incoming
 # paths and will return 404.
 # NOTE:
 # I don't fully trust the note above, though I couldn't make it work without stateless_http=True. Whenever
@@ -63,7 +64,6 @@ mcp = FastMCP(
     instructions="\n\n".join(
         [
             INSTRUCTIONS,
-            deep_research.INSTRUCTIONS,
             indicators.INSTRUCTIONS,
             charts.INSTRUCTIONS,
             posts.INSTRUCTIONS,
@@ -95,6 +95,9 @@ class RequestLoggingMiddleware(Middleware):
             # handle request
             try:
                 result = await call_next(context)
+            except (asyncio.CancelledError, KeyboardInterrupt):
+                # Don't send these to Sentry - they're normal shutdown signals
+                raise
             except Exception as e:
                 capture_exception(e)
                 logfire.exception("request failed", **attrs)
@@ -114,16 +117,16 @@ async def setup_server():
     await mcp.import_server(indicators.mcp)
     await mcp.import_server(posts.mcp)
     await mcp.import_server(charts.mcp)
-    await mcp.import_server(deep_research.mcp)
 
 
-# Create an event loop and setup the server
-if __name__ != "__main__":
-    asyncio.run(setup_server())
+# Create the setup task - this will be awaited when needed
+_server_setup_task = setup_server()
 
 
 # ---------------------------------------------------------------------------
 # Entrypoint
 # ---------------------------------------------------------------------------
 if __name__ == "__main__":
-    mcp.run(stateless_http=True)
+    # Setup the server before running
+    asyncio.run(_server_setup_task)
+    mcp.run(transport="http", host="0.0.0.0", port=8080, stateless_http=True)

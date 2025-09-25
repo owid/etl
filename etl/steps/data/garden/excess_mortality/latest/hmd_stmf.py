@@ -130,10 +130,10 @@ def reshape_df(df: pd.DataFrame) -> pd.DataFrame:
 def add_uk(df: pd.DataFrame):
     """Add UK to main dataframe.
 
-    By default, the dataset only contains data for England & Wales, Scotland and Northern Ireland.
+    By default, the dataset only contains data for England and Wales, Scotland and Northern Ireland.
     """
     # Get UK Nations
-    df_uk = df[df["entity"].isin(["England & Wales", "Scotland", "Northern Ireland"])].copy()
+    df_uk = df[df["entity"].isin(["England and Wales", "Scotland", "Northern Ireland"])].copy()
     # Years to consider (starting from 2015)
     column_years = list(filter(lambda x: x >= 2015, df_uk.filter(regex=r"20\d\d").columns))
     # Sanity check

@@ -11,7 +11,7 @@ steps:
   data://garden/growth/2024-05-16/gdp_historical:
     - data://garden/ggdc/2024-04-26/maddison_project_database
     - data://garden/ggdc/2022-12-23/maddison_database
-    - data://grapher/worldbank_wdi/2025-01-24/wdi
+    - data://grapher/worldbank_wdi/2025-09-08/wdi
   data://grapher/growth/2024-05-16/gdp_historical:
     - data://garden/growth/2024-05-16/gdp_historical
 
@@ -62,18 +62,20 @@ steps:
   data://grapher/working_hours/2025-08-05/working_hours_omm:
     - data://garden/working_hours/2025-08-05/working_hours_omm
 
-
     # GDP per capita vs. living conditions indicators
   data://garden/growth/2025-01-16/gdppc_vs_living_conditions:
-    - data://garden/worldbank_wdi/2025-01-24/wdi
+    - data://garden/worldbank_wdi/2025-09-08/wdi
     - data://garden/un/2024-07-12/un_wpp
-    - data://garden/un/2024-09-11/igme
-    - data://garden/who/2025-04-17/mortality_database
+    - data://garden/un/2025-03-25/igme
+    - data://garden/maternal_mortality/2025-09-02/maternal_mortality
     - data://garden/wash/2024-01-06/who
     - data://garden/tourism/2024-08-17/unwto
     - data://garden/ggdc/2025-07-31/penn_world_table
-    - data://garden/wb/2024-11-04/edstats
+    - data://garden/education/2025-08-20/harmonized_scores
+    - data://grapher/wb/2025-09-08/gender_statistics
     - data://garden/unesco/2025-05-01/education_sdgs
     - data://garden/happiness/2025-03-28/happiness
-    - data://garden/demography/2023-03-31/population
+    - data://garden/who/2025-05-19/gho
+    - data://garden/wb/2025-08-07/world_bank_pip
+    - data://garden/demography/2024-07-15/population
     - data://garden/regions/2023-01-01/regions

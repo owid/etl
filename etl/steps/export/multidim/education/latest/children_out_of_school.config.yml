@@ -15,10 +15,10 @@ dimensions:
     choices:
       - slug: rate
         name: Share (%)
-        description: Percentage of children out of school in the relevant age group
+        description: Percentage of children who are not in school
       - slug: number
         name: Number
-        description: Total number of children out of school
+        description: Total number of children who are not in school
 
   - name: Education level
     slug: level
@@ -37,7 +37,7 @@ dimensions:
         description: Children of upper secondary school age (typically 15-17 years) who are not enrolled in school
       - slug: level_side_by_side
         name: All education levels
-        description: Compare how girls and boys differ in school participation
+        description: Compare school participation across different levels of education
 
   - name: Gender
     slug: sex

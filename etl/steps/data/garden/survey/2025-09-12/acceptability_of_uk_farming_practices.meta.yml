@@ -1,0 +1,41 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    unit: ""
+    short_unit: ""
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Animal Welfare
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+  non_redistributable: true
+
+
+tables:
+  acceptability_of_uk_farming_practices:
+    variables:
+      acceptable:
+        title: Respondents who consider a farming practice acceptable
+        display:
+          name: Acceptable
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Respondents who consider a farming practice acceptable
+      not_acceptable:
+        title: Respondents who consider a farming practice not acceptable
+        display:
+          name: Not acceptable
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Respondents who consider a farming practice not acceptable
+      dont_know_no_opinion:
+        title: Respondents who don't know or have no opinion about a farming practice
+        display:
+          name: Don't know / no opinion
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Respondents who don't know or have no opinion about a farming practice

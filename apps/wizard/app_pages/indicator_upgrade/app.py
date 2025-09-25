@@ -26,6 +26,7 @@ We use various session state indicators to control the flow of the app:
 import streamlit as st
 from structlog import get_logger
 
+from apps.indicator_upgrade.match import SIMILARITY_NAMES
 from apps.wizard import utils
 from apps.wizard.app_pages.indicator_upgrade.charts_update import (
     get_affected_charts_and_preview,
@@ -37,7 +38,6 @@ from apps.wizard.app_pages.indicator_upgrade.dataset_selection import build_data
 from apps.wizard.app_pages.indicator_upgrade.indicator_mapping import render_indicator_mapping
 from apps.wizard.app_pages.indicator_upgrade.utils import get_datasets
 from apps.wizard.utils.components import st_title_with_expert
-from etl.match_variables import SIMILARITY_NAMES
 
 # logger
 log = get_logger()

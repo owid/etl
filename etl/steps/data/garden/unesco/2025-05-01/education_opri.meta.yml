@@ -10,7 +10,8 @@ definitions:
         maxTime: 2024
         map:
           time: 2024
-          timeTolerance: 5
+          timeTolerance: 10
+  display_tolerance: &display_tolerance 10
 
   # ============================================================================
   # COMMON CONFIGURATION TEMPLATES
@@ -22,20 +23,22 @@ definitions:
     hasMapTab: true
   common_grapher_map_config: &common_grapher_map_config
     time: 2024
-    timeTolerance: 5
+    timeTolerance: 10
 
   # Value ranges for different indicator types
-  enrolment_rate_bins: &enrolment_rate_bins [10,20,30,40,50,60,70,80,90,100]
-  gdp_share_bins: &gdp_share_bins [0,0.2,0.4,0.6,0.8,1,1.2,1.4,1.4]
-  school_life_expectancy_preprimary_bins: &school_life_expectancy_preprimary_bins [0.5,1,1.5,2,2.5,3,3.5,4]
-  school_life_expectancy_primary_bins: &school_life_expectancy_primary_bins [2,3,4,5,6,7,8,9]
-  school_life_expectancy_secondary_bins: &school_life_expectancy_secondary_bins [1,2,3,4,5,6,7,8]
-  school_life_expectancy_tertiary_bins: &school_life_expectancy_tertiary_bins [0.5,1,1.5,2,2.5,3,4,5]
-  expenditure_bins_total: &expenditure_bins_total   [500000000, 1000000000, 5000000000, 10000000000, 50000000000, 100000000000, 500000000000, 1000000000000]
-  expenditure_bins_by_level: &expenditure_bins_by_level   [500000000, 1000000000, 5000000000, 10000000000, 50000000000, 100000000000]
+  enrolment_rate_bins: &enrolment_rate_bins [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+  enrolment_rate_bins_gross: &enrolment_rate_bins_gross [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 1]
+  gdp_share_bins: &gdp_share_bins [0, 0.2, 0.4, 0.6, 0.8, 1, 1.2, 1.4, 1]
+  school_life_expectancy_preprimary_bins: &school_life_expectancy_preprimary_bins [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 1]
+  school_life_expectancy_primary_bins: &school_life_expectancy_primary_bins [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 1]
+  school_life_expectancy_secondary_bins: &school_life_expectancy_secondary_bins [0, 1, 2, 3, 4, 5, 6, 7, 8, 1]
+  school_life_expectancy_tertiary_bins: &school_life_expectancy_tertiary_bins [0, 0.5, 1, 1.5, 2, 2.5, 3, 4, 5, 1]
+  expenditure_bins_total: &expenditure_bins_total [0, 1000000000, 2000000000, 5000000000, 10000000000, 20000000000, 50000000000, 100000000000, 200000000000, 500000000000, 1000000000000, 1]
+  expenditure_bins_by_level: &expenditure_bins_by_level  [0, 1000000000, 2000000000, 5000000000, 10000000000, 20000000000, 50000000000, 1]
 
   # Per-student spending bins (in international dollars per student)
-  per_student_spending_bins: &per_student_spending_bins [500, 1000, 5000, 10000,15000,20000,25000]
+  per_student_spending_bins: &per_student_spending_bins [0, 500, 1000, 5000, 10000, 15000, 20000, 25000, 1]
+  out_of_school_children_bins: &out_of_school_children_bins [0, 30000, 100000, 300000, 1000000, 3000000, 1]
 
   # Female teachers grapher configuration
   female_teachers_grapher_config: &female_teachers_grapher_config
@@ -62,7 +65,7 @@ definitions:
       <<: *common_grapher_map_config
       colorScale:
         binningStrategy: manual
-        customNumericValues: *enrolment_rate_bins
+        customNumericValues: *enrolment_rate_bins_gross
         baseColorScheme: PuBuGn
 
   # School life expectancy configurations
@@ -106,8 +109,6 @@ definitions:
 
 
   # Out-of-school children configurations
-  out_of_school_children_bins: &out_of_school_children_bins [10000, 50000, 100000, 500000, 1000000, 5000000, 10000000, 50000000]
-
   grapher_config_out_of_school_children_reds: &grapher_config_out_of_school_children_reds
     <<: *common_grapher_config
     map:
@@ -191,57 +192,62 @@ definitions:
 
   description_processing_per_student: &description_processing_per_student
     This indicator was calculated by dividing the total government expenditure on education at a specific level by the number of students enrolled at that level.
+
   # Government expenditure descriptions
   desc_key_govt_expenditure_constant_ppp: &desc_key_govt_expenditure_constant_ppp
-   - This indicator tracks how much a government spends on education at a specific level, adjusted for inflation and differences in the cost of living. Spending is expressed in constant international dollars, which allows for comparisons across countries and over time.
-   - It includes all forms of public education spending — from teacher salaries and textbooks to school maintenance, capital projects like building classrooms, and external funding from international donors that flows through government budgets.
-   - Figures are initially reported in local currency, then converted using purchasing power parity (PPP) exchange rates and adjusted to a constant base year. This ensures the numbers reflect real resource commitments rather than changes in local prices or currency fluctuations. For example, data released in 2017 would typically be expressed in 2014 dollars.
-   - This measure provides a comparable view of how much governments invest in education in absolute terms. But it doesn’t show how spending is distributed or how effectively it’s used — it should be interpreted alongside indicators like enrolment and per-student spending.
+    - This indicator tracks how much a government spends on education at a specific level annually, adjusted for inflation and differences in the cost of living. Spending is expressed in constant [international-$](#dod:int_dollar_abbreviation), which allows for comparisons across countries and over time.
+    - It includes all forms of public education spending — from teacher salaries and textbooks to school maintenance, capital projects like building classrooms, and external funding from international donors that flows through government budgets.
+    - Figures are initially reported in local currency, then converted using purchasing power parity (PPP) exchange rates and adjusted to a constant base year. This ensures the numbers reflect real resource commitments rather than changes in local prices or currency fluctuations.
+    - This measure provides a comparable view of how much governments invest in education in absolute terms. But it doesn’t show how spending is distributed or how effectively it’s used — it should be interpreted alongside indicators like enrolment and per-student spending.
 
   desc_key_govt_expenditure_constant_ppp_per_student: &desc_key_govt_expenditure_constant_ppp_per_student
-   - This indicator shows how much a government spends per student at a particular level of education, expressed in constant international dollars.
-   - It’s calculated by dividing total government spending by the number of enrolled students, and adjusted for inflation and differences in purchasing power between countries. This makes it possible to compare investment levels across education systems and over time.
-   - It includes all forms of public education spending — from teacher salaries and textbooks to school maintenance, capital projects like building classrooms, and external funding from international donors that flows through government budgets.
-   - Figures are initially reported in local currency, then converted using purchasing power parity (PPP) exchange rates and adjusted to a constant base year. This ensures the numbers reflect real resource commitments rather than changes in local prices or currency fluctuations. For example, data released in 2017 would typically be expressed in 2014 dollars.
-   - Higher values suggest that more resources are available per student — which could support better infrastructure, teaching quality, and learning environments. But it doesn’t tell us how effectively the money is used, or whether outcomes are improving.
-   - This is one of the most useful measures for understanding how governments fund education relative to the size of their student population. It’s especially helpful when comparing countries with different overall budgets or economic conditions.
+    - This indicator shows how much a government spends per student per year at a particular level of education, expressed in constant [international-$](#dod:int_dollar_abbreviation).
+    - It is calculated by dividing total annual government spending by the number of students currently enrolled, and then adjusted for inflation and differences in purchasing power between countries. This makes it possible to compare annual investment levels across education systems and over time.
+    - It includes all forms of public education spending — from teacher salaries and textbooks to school maintenance, capital projects like building classrooms, and external funding from international donors that flows through government budgets.
+    - Figures are initially reported in local currency, then converted using purchasing power parity (PPP) exchange rates and adjusted to a constant base year. This ensures the numbers reflect real resource commitments rather than changes in local prices or currency fluctuations.
+    - Higher values suggest that more resources are available per student in a given year — which could support better infrastructure, teaching quality, and learning environments. But it doesn’t tell us how effectively the money is used, or whether outcomes are improving.
+    - This is one of the most useful measures for understanding how governments fund education relative to the size of their student population. It’s especially helpful when comparing countries with different overall budgets or economic conditions.
+    - This indicator represents *annual spending per student*, not the total cost of completing an entire cycle of education (e.g. all years of primary or secondary).
 
   desc_key_govt_expenditure_gdp_share: &desc_key_govt_expenditure_gdp_share
-   - This indicator shows the share of a country’s economic output (GDP) that is spent on education. It reflects how much of the national budget is directed toward education relative to the size of the economy.
-   - It includes all government spending at the relevant education level — from central, regional, and local authorities — and covers both current and capital expenditures.
-   - A higher percentage means a larger share of national resources is allocated to education, which may indicate political commitment or policy prioritization. But it doesn’t necessarily mean higher spending per student or better outcomes. Countries with lower GDPs might have high percentages but limited resources in absolute terms.
-   - This indicator is useful for understanding how education fits within the broader picture of government spending and national development. It should be interpreted alongside measures like per-student spending and enrolment rates.
+    - This indicator shows the share of a country’s total economic output (GDP) that is spent on education annually. It reflects the scale of education spending relative to the size of the economy.
+    - It includes all government spending at the relevant education level — from central, regional, and local authorities — and covers both current and capital expenditures.
+    - It covers all types of public education spending — including teacher salaries, textbooks, school maintenance, capital projects such as building classrooms, and even external funding from international donors that is channeled through government budgets.
+    - A higher percentage means a larger share of national resources is allocated to education, which may indicate political commitment or policy prioritization. But it doesn’t necessarily mean higher spending per student or better outcomes. Countries with lower GDPs might have high percentages but limited resources in absolute terms.
+    - This indicator is useful for understanding how education fits within the broader picture of government spending and national development. It should be interpreted alongside measures like per-student spending and enrolment rates.
 
   # Enrollment and attendance descriptions
   desc_key_net_enr: &desc_key_net_enr
-    - The net enrolment rate shows what percentage of children are enrolled at the education level intended for their age. Unlike gross enrolment, it only counts students who are within the official age range for that level.
-    - It compares children enrolled at the correct level for their age to the total population in that same age group. For example, if primary education is for ages 6 to 11, it measures how many 6- to 11-year-olds are actually enrolled in primary school.
+    - The net enrolment rate shows what percentage of children are enrolled at the education level intended for their age.
+    - It compares children enrolled at the correct level for their age to the total population in that same age group. For example, a primary school net enrolment of 90% means 90% of children between the ages of 6 and 11 years are enrolled in primary school. Children who are not enrolled in school or are enrolled at another education level are not counted here.
     - The highest possible value is 100%, which would mean all children of the right age are enrolled where they should be. High rates indicate that most children are progressing through school at the expected pace.
-    - Values cannot exceed 100% because it excludes over-age and under-age students. However, small discrepancies between enrolment records and population data can occasionally push rates slightly above 100%.
     - A rate of 90% doesn't necessarily mean 10% of children are out of school entirely — some may be enrolled at different levels (either higher or lower) than expected for their age, but these students aren't counted in the net rate.
     - The data comes from school administrative records that track enrolment by individual age, combined with population estimates from national statistics offices or UN sources.
 
   desc_key_ger: &desc_key_ger
-    - Not all students enrol in school at the same age. The gross enrolment ratio includes students enrolled in a certain level of education, regardless of whether they are within the expected age range for that level. It includes students who are younger or older than expected due to late entry, early entry, or grade repetition.
-    - It captures the total number of students enrolled at a specific education level, expressed as a percentage of the population in the official age group for that level. For example, if the official age group for upper secondary school is 15 to 17-year olds, the gross enrolment ratio compares total enrolment at that level (of any age) to the population of 15- to 17-year-olds.
-    - Values can be greater than 100% if students repeat grades or start a particular level of schooling late. For example, if the official age group for upper secondary school is 15 to 17-year olds, some 18- or 19 year olds might be included in the total if they started upper secondary school late.
-    - Similarly, a value of 100% does not necessarily mean all children within a particular age group are enrolled in school; some children could be out-of-school, but gross enrolment rates are boosted by older students being included.
-    - The data comes from administrative records, such as school enrolment reports, and from population estimates, usually provided by the United Nations or national sources.
+    - The gross enrolment ratio counts all students enrolled at a specific education level, regardless of their age. This includes students who are younger or older than the official age range because they started school early, started late, or repeated grades.
+    - It measures enrolment at a given level by dividing the total number of students—of any age—by the size of the age group officially assigned to that level. For instance, primary enrolment counts everyone enrolled, even outside ages 6–11, but compares it only to the 6–11 population.
+    - Values can exceed 100% when students repeat grades or start late. For instance, primary school enrolment might include 12- or 13-year-olds who started late or repeated grades, pushing the ratio above 100%.
+    - A value of 100% does not guarantee that all children in the official age group are enrolled in school; some may be out of school entirely, but the ratio appears high due to older students being counted in the total.
+    - Values much lower than 100% indicate that many children of the official age are not enrolled at the expected education level - they may be out of school entirely, enrolled at a different level, or have never started school.
+    - Values much higher than 100% can indicate educational challenges such as high grade repetition rates, late school entry, or inefficient progression through the system.
+    - The data comes from administrative records such as school enrolment reports, combined with population estimates typically sourced from the United Nations or national statistical offices.
 
   # Educational attainment descriptions
   desc_key_mye: &desc_key_mye
-    - Mean years of schooling shows the average number of years that adults in a country have spent in formal education, giving us a picture of how educated the population is overall.
-    - This number is calculated by asking adults about the highest level of school they completed, then figuring out how many years that typically takes. For example, someone who finished high school might have about 12 years of schooling.
-    - This indicator measures how much education adults have accumulated over their lifetimes, showing the results of past investments in schools and learning.
-    - The data comes from surveys and censuses where adults aged 25 and older report their educational background. Only formal schooling from primary school onwards is counted.
-    - Higher numbers mean adults in that country have generally stayed in school longer, showing stronger educational foundations. However, this doesn't tell us about the quality of education, learning outside of school, or whether younger people today are getting better education than the average suggests.
+    - This indicator shows the average number of years that adults in a country have spent in formal education.
+    - It reflects the overall educational attainment of the population based on what they have already completed
+    - The calculation converts each person's highest completed education level into years - for example, someone who finished high school counts as having roughly 12 years of schooling, while someone who never attended school counts as 0 years
+    - The data comes from censuses and surveys of adults aged 25 and older, including only formal education starting from primary school
+    - This indicator captures how much schooling adults have accumulated over their lifetimes, showing the results of past investments in education systems
+    - Higher values indicate a population with stronger educational foundations, but the measure does not account for education quality or informal learning
+    - The data may not reflect recent progress in countries with infrequent surveys or outdated census information
 
   desc_key_sle: &desc_key_sle
-    - Expected years of schooling estimates how long a child starting school today is likely to stay in education, assuming current enrollment patterns continue throughout their schooling years.
-    - It is calculated by combining enrollment rates at each level of education and age group, adjusted for the official age of attendance, resulting in the average number of years a child can expect to complete—including time spent repeating grades.
-    - The measure reflects access to education rather than completion or learning outcomes, and assumes current patterns remain stable over time.
-    - Expected years can be broken down into [pre-primary](#dod:pre-primary-education), [primary](#dod:primary-education), [secondary](#dod:secondary-education), and [tertiary](#dod:tertiary-education), showing the expected time spent at each stage.
-    - A higher value means students are expected to spend more time in school. For example, 2.5 years in pre-primary means most children will attend around 2.5 years of preschool; a country with 15 total expected years but only 0.5 in pre-primary likely has limited access to early childhood education.
+     - This indicator shows how many years a student starting school in that year is expected to spend in education.  It's based on the enrolment patterns observed in that country in that specific year.
+     - The calculation looks at how many students are enrolled at each age and education level, then estimates how long a new student would stay in school if those patterns continued. This includes time spent repeating grades, not just the official length of each school level.
+     - It measures participation in schooling - how long students are likely to stay in school - rather than whether they actually learn or graduate.
+     - Higher numbers mean students spend more years in school, either because the official school system is longer or because many students repeat grades.
 
   # Out-of-school descriptions
   desc_key_out_school: &desc_key_out_school
@@ -252,6 +258,7 @@ definitions:
     - High out-of-school rates signal barriers to access — such as poverty, gender inequality, location, or limited availability of schools — and highlight where more targeted support is needed.
     - The data comes from administrative school enrolment records and household surveys, which provide age-specific insights when compared to population estimates.
     - As with all education data, results should be interpreted carefully. Differences in how enrolment is defined, inconsistencies in age reporting, and timing of data collection (such as during holidays or late in the school year) can affect accuracy.
+
   # Education system descriptions
   desc_key_private_enrolment: &desc_key_private_enrolment
     - In many countries, education is provided not only by the government but also by private institutions — this indicator shows how much of total enrolment is taking place in privately run schools or educational programmes.
@@ -312,6 +319,7 @@ tables:
         display:
           name: Primary
           numDecimalPlaces: 0
+          tolerance: *display_tolerance
 
       out_of_school_children_of_primary_school_age__female__number:
         title: Out-of-school girls of primary school age
@@ -324,6 +332,7 @@ tables:
         display:
           name: Girls
           numDecimalPlaces: 0
+          tolerance: *display_tolerance
 
       out_of_school_children_of_primary_school_age__male__number:
         title: Out-of-school boys of primary school age
@@ -336,6 +345,7 @@ tables:
         display:
           name: Boys
           numDecimalPlaces: 0
+          tolerance: *display_tolerance
 
       out_of_school_adolescents_of_lower_secondary_school_age__both_sexes__number:
         title: Out-of-school children of lower secondary school age
@@ -348,6 +358,7 @@ tables:
         display:
           name: Lower secondary
           numDecimalPlaces: 0
+          tolerance: *display_tolerance
 
       out_of_school_adolescents_of_lower_secondary_school_age__female__number:
         title: Out-of-school girls of lower secondary school age
@@ -360,6 +371,7 @@ tables:
         display:
           name: Girls
           numDecimalPlaces: 0
+          tolerance: *display_tolerance
 
       out_of_school_adolescents_of_lower_secondary_school_age__male__number:
         title: Out-of-school boys of lower secondary school age
@@ -372,6 +384,7 @@ tables:
         display:
           name: Boys
           numDecimalPlaces: 0
+          tolerance: *display_tolerance
 
       out_of_school_children__one_year_before_the_official_primary_entry_age__both_sexes__number:
         title: Out-of-school children one year before official primary entry age
@@ -384,6 +397,7 @@ tables:
         display:
           name: Pre-primary
           numDecimalPlaces: 0
+          tolerance: *display_tolerance
 
       out_of_school_children__one_year_before_the_official_primary_entry_age__female__number:
         title: Out-of-school girls one year before official primary entry age
@@ -396,6 +410,7 @@ tables:
         display:
           name: Girls
           numDecimalPlaces: 0
+          tolerance: *display_tolerance
 
       out_of_school_children__one_year_before_the_official_primary_entry_age__male__number:
         title: Out-of-school boys one year before official primary entry age
@@ -408,6 +423,7 @@ tables:
         display:
           name: Boys
           numDecimalPlaces: 0
+          tolerance: *display_tolerance
 
       out_of_school_youth_of_upper_secondary_school_age__both_sexes__number:
         title: Out-of-school children of upper secondary school age
@@ -420,6 +436,7 @@ tables:
         display:
           name: Upper secondary
           numDecimalPlaces: 0
+          tolerance: *display_tolerance
 
       out_of_school_youth_of_upper_secondary_school_age__female__number:
         title: Out-of-school girls of upper secondary school age
@@ -432,6 +449,7 @@ tables:
         display:
           name: Girls
           numDecimalPlaces: 0
+          tolerance: *display_tolerance
 
       out_of_school_youth_of_upper_secondary_school_age__male__number:
         title: Out-of-school boys of upper secondary school age
@@ -444,6 +462,7 @@ tables:
         display:
           name: Boys
           numDecimalPlaces: 0
+          tolerance: *display_tolerance
 
       # ========================================================================
       # EDUCATIONAL ATTAINMENT (mean years of schooling and gender parity)
@@ -622,8 +641,8 @@ tables:
       # ========================================================================
 
       total_net_enrolment_rate__primary__adjusted_gender_parity_index__gpia:
-        title: Net enrollment rates in primary education, adjusted gender parity index
-        description_short: An [adjusted gender parity index](#dod:adjusted-gpi) of 1 indicates equal net enrollment rates in [primary](#dod:primary-education) school between boys and girls. Values below 1 favor boys, and above 1 favor girls.
+        title: Net enrolment rates in primary education, adjusted gender parity index
+        description_short: An [adjusted gender parity index](#dod:adjusted-gpi) of 1 indicates equal net enrolment rates in [primary](#dod:primary-education) school between boys and girls. Values below 1 favor boys, and above 1 favor girls.
         unit: "index"
         description_key:
           - Boys and girls don’t always have equal access to primary education — this indicator shows how close we are to gender parity in age-appropriate school enrolment.
@@ -640,7 +659,7 @@ tables:
 
       total_net_enrolment_rate__lower_secondary__adjusted_gender_parity_index__gpia:
         title: Net enrolment rates in lower secondary education, adjusted gender parity index
-        description_short: An [adjusted gender parity index](#dod:adjusted-gpi) of 1 indicates equal net enrollment rates in [lower secondary](#dod:lower-secondary-education) school between boys and girls. Values below 1 favor boys, and above 1 favor girls.
+        description_short: An [adjusted gender parity index](#dod:adjusted-gpi) of 1 indicates equal net enrolment rates in [lower secondary](#dod:lower-secondary-education) school between boys and girls. Values below 1 favor boys, and above 1 favor girls.
         unit: "index"
         description_key:
           - Boys and girls don’t always have equal access to lower secondary education — this indicator shows how close we are to gender parity in age-appropriate school enrolment at that level.
@@ -705,7 +724,7 @@ tables:
         description_key: *desc_key_female_teachers
         display:
           numDecimalPlaces: 1
-          tolerance: 10
+          tolerance: *display_tolerance
         presentation:
           grapher_config: *female_teachers_grapher_config
 
@@ -717,7 +736,7 @@ tables:
         description_key: *desc_key_female_teachers
         display:
           numDecimalPlaces: 1
-          tolerance: 10
+          tolerance: *display_tolerance
         presentation:
           grapher_config: *female_teachers_grapher_config
 
@@ -729,7 +748,7 @@ tables:
         description_key: *desc_key_female_teachers
         display:
           numDecimalPlaces: 1
-          tolerance: 10
+          tolerance: *display_tolerance
         presentation:
           grapher_config: *female_teachers_grapher_config
 
@@ -989,7 +1008,7 @@ tables:
 
       school_life_expectancy__pre_primary__both_sexes__years:
         title: School life expectancy in pre-primary education
-        description_short: Expected number of years a child of school entrance age is likely to spend in [pre-primary](#dod:pre-primary-education) education based on current enrollment patterns.
+        description_short: Expected number of years a child of school entrance age is likely to spend in [pre-primary](#dod:pre-primary-education) education based on current enrolment patterns.
         unit: "years"
         description_key: *desc_key_sle
         presentation:
@@ -1001,7 +1020,7 @@ tables:
 
       school_life_expectancy__pre_primary__female__years:
         title: School life expectancy in pre-primary education among girls
-        description_short: Expected number of years a girl of school entrance age is likely to spend in [pre-primary](#dod:pre-primary-education) education based on current enrollment patterns.
+        description_short: Expected number of years a girl of school entrance age is likely to spend in [pre-primary](#dod:pre-primary-education) education based on current enrolment patterns.
         unit: "years"
         description_key: *desc_key_sle
         presentation:
@@ -1013,7 +1032,7 @@ tables:
 
       school_life_expectancy__pre_primary__male__years:
         title: School life expectancy in pre-primary education among boys
-        description_short: Expected number of years a boy of school entrance age is likely to spend in [pre-primary](#dod:pre-primary-education) education based on current enrollment patterns.
+        description_short: Expected number of years a boy of school entrance age is likely to spend in [pre-primary](#dod:pre-primary-education) education based on current enrolment patterns.
         unit: "years"
         description_key: *desc_key_sle
         presentation:
@@ -1025,7 +1044,7 @@ tables:
 
       school_life_expectancy__primary__both_sexes__years:
         title: School life expectancy in primary education
-        description_short: Expected number of years a child of school entrance age is likely to spend in [primary](#dod:primary-education) education based on current enrollment patterns.
+        description_short: Expected number of years a child of school entrance age is likely to spend in [primary](#dod:primary-education) education based on current enrolment patterns.
         unit: "years"
         description_key: *desc_key_sle
         presentation:
@@ -1037,7 +1056,7 @@ tables:
 
       school_life_expectancy__primary__female__years:
         title: School life expectancy in primary education among girls
-        description_short: Expected number of years a girl of school entrance age is likely to spend in [primary](#dod:primary-education) education based on current enrollment patterns.
+        description_short: Expected number of years a girl of school entrance age is likely to spend in [primary](#dod:primary-education) education based on current enrolment patterns.
         unit: "years"
         description_key: *desc_key_sle
         presentation:
@@ -1049,7 +1068,7 @@ tables:
 
       school_life_expectancy__primary__male__years:
         title: School life expectancy in primary education among boys
-        description_short: Expected number of years a boy of school entrance age is likely to spend in [primary](#dod:primary-education) education based on current enrollment patterns.
+        description_short: Expected number of years a boy of school entrance age is likely to spend in [primary](#dod:primary-education) education based on current enrolment patterns.
         unit: "years"
         description_key: *desc_key_sle
         presentation:
@@ -1061,7 +1080,7 @@ tables:
 
       school_life_expectancy__secondary__both_sexes__years:
         title: School life expectancy in secondary education
-        description_short: Expected number of years a child of school entrance age is likely to spend in [secondary](#dod:secondary-education) education based on current enrollment patterns.
+        description_short: Expected number of years a child of school entrance age is likely to spend in [secondary](#dod:secondary-education) education based on current enrolment patterns.
         unit: "years"
         description_key: *desc_key_sle
         presentation:
@@ -1073,7 +1092,7 @@ tables:
 
       school_life_expectancy__secondary__female__years:
         title: School life expectancy in secondary education among girls
-        description_short: Expected number of years a girl of school entrance age is likely to spend in [secondary](#dod:secondary-education) education based on current enrollment patterns.
+        description_short: Expected number of years a girl of school entrance age is likely to spend in [secondary](#dod:secondary-education) education based on current enrolment patterns.
         unit: "years"
         description_key: *desc_key_sle
         presentation:
@@ -1085,7 +1104,7 @@ tables:
 
       school_life_expectancy__secondary__male__years:
         title: School life expectancy in secondary education among boys
-        description_short: Expected number of years a boy of school entrance age is likely to spend in [secondary](#dod:secondary-education) education based on current enrollment patterns.
+        description_short: Expected number of years a boy of school entrance age is likely to spend in [secondary](#dod:secondary-education) education based on current enrolment patterns.
         unit: "years"
         description_key: *desc_key_sle
         presentation:
@@ -1097,7 +1116,7 @@ tables:
 
       school_life_expectancy__tertiary__both_sexes__years:
         title: School life expectancy in tertiary education
-        description_short: Expected number of years a child of school entrance age is likely to spend in [tertiary](#dod:tertiary-education) education based on current enrollment patterns.
+        description_short: Expected number of years a child of school entrance age is likely to spend in [tertiary](#dod:tertiary-education) education based on current enrolment patterns.
         unit: "years"
         description_key: *desc_key_sle
         presentation:
@@ -1109,7 +1128,7 @@ tables:
 
       school_life_expectancy__tertiary__female__years:
         title: School life expectancy in tertiary education among girls
-        description_short: Expected number of years a girl of school entrance age is likely to spend in [tertiary](#dod:tertiary-education) education based on current enrollment patterns.
+        description_short: Expected number of years a girl of school entrance age is likely to spend in [tertiary](#dod:tertiary-education) education based on current enrolment patterns.
         unit: "years"
         description_key: *desc_key_sle
         presentation:
@@ -1121,7 +1140,7 @@ tables:
 
       school_life_expectancy__tertiary__male__years:
         title: School life expectancy in tertiary education among boys
-        description_short: Expected number of years a boy of school entrance age is likely to spend in [tertiary](#dod:tertiary-education) education based on current enrollment patterns.
+        description_short: Expected number of years a boy of school entrance age is likely to spend in [tertiary](#dod:tertiary-education) education based on current enrolment patterns.
         unit: "years"
         description_key: *desc_key_sle
         presentation:
@@ -1153,7 +1172,7 @@ tables:
 
       government_expenditure_on_pre_primary_education_as_a_percentage_of_gdp__pct:
         title: Government spending on pre-primary education as share of GDP
-        description_short: Total [general government](#dod:general-government) spending on [pre-primary education](#dod:pre-primary-education), expressed as a percentage of [GDP](#dod:gdp).
+        description_short: Total annual [general government](#dod:general-government) spending on [pre-primary education](#dod:pre-primary-education), expressed as a percentage of [GDP](#dod:gdp).
         unit: "% of GDP"
         short_unit: "%"
         description_key: *desc_key_govt_expenditure_gdp_share
@@ -1162,11 +1181,11 @@ tables:
           grapher_config: *grapher_config_gdp_share
         display:
           numDecimalPlaces: 1
-          tolerance: 10
+          tolerance: *display_tolerance
 
       government_expenditure_on_primary_education_as_a_percentage_of_gdp__pct:
         title: Government spending on primary education as share of GDP
-        description_short: Total [general government](#dod:general-government) spending on [primary education](#dod:primary-education), expressed as a percentage of [GDP](#dod:gdp).
+        description_short: Total annual [general government](#dod:general-government) spending on [primary education](#dod:primary-education), expressed as a percentage of [GDP](#dod:gdp).
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_govt_expenditure_gdp_share
@@ -1175,11 +1194,11 @@ tables:
           grapher_config: *grapher_config_gdp_share
         display:
           numDecimalPlaces: 1
-          tolerance: 10
+          tolerance: *display_tolerance
 
       government_expenditure_on_lower_secondary_education_as_a_percentage_of_gdp__pct:
         title: Government spending on lower secondary education as share of GDP
-        description_short: Total [general government](#dod:general-government) spending on [lower secondary education](#dod:lower-secondary-education), expressed as a percentage of [GDP](#dod:gdp).
+        description_short: Total annual [general government](#dod:general-government) spending on [lower secondary education](#dod:lower-secondary-education), expressed as a percentage of [GDP](#dod:gdp).
         unit: "% of GDP"
         short_unit: "%"
         description_key: *desc_key_govt_expenditure_gdp_share
@@ -1188,11 +1207,11 @@ tables:
           grapher_config: *grapher_config_gdp_share
         display:
           numDecimalPlaces: 1
-          tolerance: 10
+          tolerance: *display_tolerance
 
       government_expenditure_on_upper_secondary_education_as_a_percentage_of_gdp__pct:
         title: Government spending on upper secondary education as share of GDP
-        description_short: Total [general government](#dod:general-government) spending on [upper secondary education](#dod:upper-secondary-education), expressed as a percentage of [GDP](#dod:gdp).
+        description_short: Total annual [general government](#dod:general-government) spending on [upper secondary education](#dod:upper-secondary-education), expressed as a percentage of [GDP](#dod:gdp).
         unit: "% of GDP"
         short_unit: "%"
         description_key: *desc_key_govt_expenditure_gdp_share
@@ -1201,11 +1220,11 @@ tables:
           grapher_config: *grapher_config_gdp_share
         display:
           numDecimalPlaces: 1
-          tolerance: 10
+          tolerance: *display_tolerance
 
       government_expenditure_on_secondary_education_as_a_percentage_of_gdp__pct:
         title: Government spending on secondary education as share of GDP
-        description_short: Total [general government](#dod:general-government) spending on [lower secondary](#dod:lower-secondary-education) and [upper secondary](#dod:upper-secondary-education) education, expressed as a percentage of [GDP](#dod:gdp).
+        description_short: Total annual [general government](#dod:general-government) spending on [lower secondary](#dod:lower-secondary-education) and [upper secondary](#dod:upper-secondary-education) education, expressed as a percentage of [GDP](#dod:gdp).
         unit: "% of GDP"
         short_unit: "%"
         description_key: *desc_key_govt_expenditure_gdp_share
@@ -1214,11 +1233,11 @@ tables:
           grapher_config: *grapher_config_gdp_share
         display:
           numDecimalPlaces: 1
-          tolerance: 10
+          tolerance: *display_tolerance
 
       government_expenditure_on_tertiary_education_as_a_percentage_of_gdp__pct:
         title: Government spending on tertiary education as share of GDP
-        description_short: Total [general government](#dod:general-government) spending on [tertiary education](#dod:tertiary-education), expressed as a percentage of [GDP](#dod:gdp).
+        description_short: Total annual [general government](#dod:general-government) spending on [tertiary education](#dod:tertiary-education), expressed as a percentage of [GDP](#dod:gdp).
         unit: "% of GDP"
         short_unit: "%"
         description_key: *desc_key_govt_expenditure_gdp_share
@@ -1227,7 +1246,7 @@ tables:
           grapher_config: *grapher_config_gdp_share
         display:
           numDecimalPlaces: 1
-          tolerance: 10
+          tolerance: *display_tolerance
 
       # ========================================================================
       # GOVERNMENT EXPENDITURE IN CONSTANT PPP DOLLARS (by education level)
@@ -1235,7 +1254,7 @@ tables:
 
       government_expenditure_on_pre_primary_education__constant_pppdollar__millions:
         title: Government spending on pre-primary education
-        description_short:  Total [general government](#dod:general-government) spending on [pre-primary education](#dod:pre-primary-education), expressed in constant [international-$](#dod:int_dollar_abbreviation).
+        description_short:  Total annual [general government](#dod:general-government) spending on [pre-primary education](#dod:pre-primary-education), expressed in constant [international-$](#dod:int_dollar_abbreviation).
         unit: "international-$"
         short_unit: "$"
         description_key: *desc_key_govt_expenditure_constant_ppp
@@ -1245,11 +1264,11 @@ tables:
         display:
           numDecimalPlaces: 0
           name: Pre-primary
-          tolerance: 10
+          tolerance: *display_tolerance
 
       government_expenditure_on_primary_education__constant_pppdollar__millions:
         title: Government spending on primary education
-        description_short: Total [general government](#dod:general-government) spending on [primary education](#dod:primary-education), expressed in constant [international-$](#dod:int_dollar_abbreviation).
+        description_short: Total annual [general government](#dod:general-government) spending on [primary education](#dod:primary-education), expressed in constant [international-$](#dod:int_dollar_abbreviation).
         unit: "international-$"
         short_unit: "$"
         description_key: *desc_key_govt_expenditure_constant_ppp
@@ -1259,11 +1278,11 @@ tables:
         display:
           numDecimalPlaces: 0
           name: Primary
-          tolerance: 10
+          tolerance: *display_tolerance
 
       government_expenditure_on_lower_secondary_education__constant_pppdollar__millions:
         title: Government spending on lower secondary education
-        description_short: Total [general government](#dod:general-government) spending on [lower secondary education](#dod:lower-secondary-education), expressed in constant [international-$](#dod:int_dollar_abbreviation).
+        description_short: Total annual [general government](#dod:general-government) spending on [lower secondary education](#dod:lower-secondary-education), expressed in constant [international-$](#dod:int_dollar_abbreviation).
         unit: "international-$"
         short_unit: "$"
         description_key: *desc_key_govt_expenditure_constant_ppp
@@ -1273,11 +1292,11 @@ tables:
         display:
           numDecimalPlaces: 0
           name: Lower secondary
-          tolerance: 10
+          tolerance: *display_tolerance
 
       government_expenditure_on_upper_secondary_education__constant_pppdollar__millions:
         title: Government spending on upper secondary education
-        description_short: Total [general government](#dod:general-government) spending on [upper secondary education](#dod:upper-secondary-education), expressed in constant [international-$](#dod:int_dollar_abbreviation).
+        description_short: Total annual [general government](#dod:general-government) spending on [upper secondary education](#dod:upper-secondary-education), expressed in constant [international-$](#dod:int_dollar_abbreviation).
         unit: "international-$"
         short_unit: "$"
         description_key: *desc_key_govt_expenditure_constant_ppp
@@ -1287,11 +1306,11 @@ tables:
         display:
           numDecimalPlaces: 0
           name: Upper secondary
-          tolerance: 10
+          tolerance: *display_tolerance
 
       government_expenditure_on_tertiary_education__constant_pppdollar__millions:
         title: Government spending on tertiary education
-        description_short: Total [general government](#dod:general-government) spending on [tertiary education](#dod:tertiary-education), expressed in constant [international-$](#dod:int_dollar_abbreviation).
+        description_short: Total annual [general government](#dod:general-government) spending on [tertiary education](#dod:tertiary-education), expressed in constant [international-$](#dod:int_dollar_abbreviation).
         unit: "international-$"
         short_unit: "$"
         description_key: *desc_key_govt_expenditure_constant_ppp
@@ -1301,11 +1320,11 @@ tables:
         display:
           numDecimalPlaces: 0
           name: Tertiary
-          tolerance: 10
+          tolerance: *display_tolerance
 
       government_expenditure_on_education__constant_pppdollar__millions:
         title: Government spending on education
-        description_short: Total [general government](#dod:general-government) spending on education across all levels, expressed in constant [international-$](#dod:int_dollar_abbreviation).
+        description_short: Total annual [general government](#dod:general-government) spending on education across all levels, expressed in constant [international-$](#dod:int_dollar_abbreviation).
         unit: "international-$"
         short_unit: "$"
         description_key: *desc_key_govt_expenditure_constant_ppp
@@ -1315,17 +1334,19 @@ tables:
         display:
           numDecimalPlaces: 0
           name: Total across all levels
-          tolerance: 10
+          tolerance: *display_tolerance
+
 
       government_expenditure_on_education__pppdollar__millions:
         title: Government spending on education in purchasing power parity (PPP) dollars
-        description_short: Total [general government](#dod:general-government) spending on education across all levels, expressed in [international-$](#dod:int_dollar_abbreviation).
+        description_short: Total annual [general government](#dod:general-government) spending on education across all levels, expressed in [international-$](#dod:int_dollar_abbreviation).
         unit: "international-$"
         short_unit: "$"
         description_key: *desc_key_govt_expenditure_constant_ppp
         display:
           numDecimalPlaces: 0
-          tolerance: 10
+          tolerance: *display_tolerance
+
 
       # ========================================================================
       # GOVERNMENT EXPENDITURE IN CONSTANT PPP DOLLARS PER STUDENT (by education level)
@@ -1333,7 +1354,7 @@ tables:
 
       government_expenditure_on_education_per_student__total_across_all_levels__constant_pppdollar:
         title: Government spending on education per student across all levels
-        description_short: Total [general government](#dod:general-government) spending on education across all levels, per student, expressed in constant [international-$](#dod:int_dollar_abbreviation).
+        description_short: Total annual [general government](#dod:general-government) spending on education across all levels, per student, expressed in constant [international-$](#dod:int_dollar_abbreviation).
         unit: "international-$"
         short_unit: "$"
         description_key: *desc_key_govt_expenditure_constant_ppp_per_student
@@ -1344,4 +1365,5 @@ tables:
         display:
           numDecimalPlaces: 0
           name: Total across all levels
-          tolerance: 10
+          tolerance: *display_tolerance
+

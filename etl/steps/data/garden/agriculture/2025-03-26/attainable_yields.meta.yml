@@ -350,8 +350,9 @@ tables:
         title: Tangerines yield
       taro_yield:
         title: Taro yield
-      tea_yield:
-        title: Tea yield
+      # Tea production and yield data was removed; see faostat_qcl garden step for more details.
+      # tea_yield:
+      #   title: Tea yield
       tobacco_yield:
         title: Tobacco yield
       tomato_yield:

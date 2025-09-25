@@ -42,7 +42,7 @@ def _load_data_array(snap: Snapshot) -> xr.DataArray:
     da = da["t2m"] - 273.15
 
     # Set the coordinate reference system for the temperature data to EPSG 4326.
-    da = da.rio.write_crs("epsg:4326")
+    da = da.rio.write_crs("EPSG:4326")
 
     return da
 
@@ -185,5 +185,7 @@ def run() -> None:
     # Create a new meadow dataset with the same metadata as the snapshot.
     ds_meadow = paths.create_dataset(tables=[tb], check_variables_metadata=True, default_metadata=snap.metadata)
 
+    # Save changes in the new garden dataset.
+    ds_meadow.save()
     # Save changes in the new garden dataset.
     ds_meadow.save()

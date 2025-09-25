@@ -1,15 +1,16 @@
 """This script runs certain step of the ETL pipeline and profiles memory or CPU usage
-of its `run` function line by line. You can additionally specify other functions from
-the step module to profile.
+of its `run` function line by line. You can additionally specify other functions to profile.
 
 Usage:
 - Profile CPU usage of `run` function of the step:
     ```
-    etl d profile --cpu garden/biodiversity/2024-01-25/cherry_blossom`
+    etl d profile --cpu garden/biodiversity/2024-01-25/cherry_blossom
     ```
-- Profile memory usage of `run` and `calculate_multiple_year_average` functions of the step:
+- Profile specific functions (excludes `run` for cleaner output):
     ```
-    etl d profile --mem garden/biodiversity/2024-01-25/cherry_blossom -f calculate_multiple_year_average
+    etl d profile --cpu garden/biodiversity/2024-01-25/cherry_blossom -f calculate_multiple_year_average
+    etl d profile --cpu garden/biodiversity/2024-01-25/cherry_blossom -f etl.helpers.PathFinder.load_dataset
+    etl d profile --cpu garden/biodiversity/2024-01-25/cherry_blossom -f etl.data_helpers.geo.RegionAggregator.__init__
     ```
 
 To profile grapher upserts, it is better to use cProfile and run something like this:
@@ -18,7 +19,9 @@ ssh owid@staging-site-my-branch "cd etl && uv run python -m cProfile -s cumtime 
 ```
 """
 
+import importlib
 import importlib.util
+import inspect
 import sys
 from pathlib import Path
 from typing import Any
@@ -48,7 +51,7 @@ log = get_logger()
     "--functions",
     multiple=True,
     type=str,
-    help="Specify additional functions to profile. These must be located in the step function.",
+    help="Specify functions to profile (step functions or full paths like etl.helpers.PathFinder.load_dataset). Excludes 'run' for cleaner output.",
 )
 def cli(step: str, cpu: bool, mem: bool, functions: tuple[str]) -> None:
     if not cpu and not mem:
@@ -67,37 +70,106 @@ def cli(step: str, cpu: bool, mem: bool, functions: tuple[str]) -> None:
 
     module = _import_module(module_path)
 
+    # Collect additional functions first
+    additional_funcs = []
+    for f in functions:
+        try:
+            # Try to get function directly from module first
+            func = _nested_getattr(module, f)
+        except AttributeError:
+            # Handle cases with dot notation by importing the full path
+            if "." in f:
+                func = _import_from_path(f)
+            else:
+                raise ValueError(f"Cannot find function {f} in module")
+
+        additional_funcs.append((f, func))
+
+        if mem:
+            # For memory profiling of imported functions, we need to handle this differently
+            if "." in f and func != _nested_getattr(module, f, None):
+                log.warning(f"Memory profiling of {f} not supported yet - use CPU profiling instead")
+            else:
+                _nested_setattr(module, f, mem_profile(func))
+
     # Init CPU line profiler
     if cpu:
         lp = LineProfiler()
-        lp.add_function(module.run)
-        lp_wrapper = lp(module.run)
+        if additional_funcs:
+            # If -f functions are specified, only profile those (exclude run function)
+            for _, func in additional_funcs:
+                lp.add_function(func)  # type: ignore
+            # Enable profiler but don't profile run itself
+            lp.enable()
+            lp_wrapper = module.run
+        else:
+            # If no -f functions specified, profile the run function
+            lp.add_function(module.run)
+            lp_wrapper = lp(module.run)
     else:
         lp_wrapper = module.run
-
-    for f in functions:
-        func = _nested_getattr(module, f)
-        if cpu:
-            lp.add_function(func)  # type: ignore
-        if mem:
-            _nested_setattr(module, f, mem_profile(func))
 
     dest_dir = paths.DATA_DIR / step
 
     # Profile the run function
     if mem:
-        memory_usage((mem_profile(lp_wrapper), [dest_dir]))  # type: ignore[reportArgumentType]
+        # Check if run function takes arguments
+        sig = inspect.signature(module.run)
+        if len(sig.parameters) > 0:
+            memory_usage((mem_profile(lp_wrapper), [dest_dir]))  # type: ignore[reportArgumentType]
+        else:
+            memory_usage((mem_profile(lp_wrapper), []))  # type: ignore[reportArgumentType]
     else:
-        lp_wrapper(dest_dir)
+        # Check if run function takes arguments
+        sig = inspect.signature(module.run)
+        if len(sig.parameters) > 0:
+            lp_wrapper(dest_dir)
+        else:
+            lp_wrapper()
 
     if cpu:
+        if additional_funcs:
+            lp.disable()  # Disable after execution  # type: ignore
         lp.print_stats()  # type: ignore
 
 
-def _nested_getattr(o, name):
-    for n in name.split("."):
-        o = getattr(o, n)
-    return o
+def _import_from_path(path: str):
+    """Import a function or class from a full module path like 'etl.helpers.PathFinder.load_dataset'."""
+    parts = path.split(".")
+
+    # Try different splits to find the module vs attribute boundary
+    for i in range(1, len(parts)):
+        module_path = ".".join(parts[:i])
+        attr_path = parts[i:]
+
+        try:
+            module = importlib.import_module(module_path)
+            # Navigate through the attributes
+            obj = module
+            for attr in attr_path:
+                obj = getattr(obj, attr)
+            return obj
+        except (ImportError, AttributeError):
+            continue
+
+    raise ValueError(f"Cannot import {path}")
+
+
+def _nested_getattr(o, name, default=None):
+    """Get nested attribute, with optional default value."""
+    if default is None:
+        # Original behavior - raise AttributeError if not found
+        for n in name.split("."):
+            o = getattr(o, n)
+        return o
+    else:
+        # New behavior with default
+        try:
+            for n in name.split("."):
+                o = getattr(o, n)
+            return o
+        except AttributeError:
+            return default
 
 
 def _nested_setattr(o, name, value):
