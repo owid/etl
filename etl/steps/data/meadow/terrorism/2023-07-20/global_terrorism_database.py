@@ -45,6 +45,7 @@ def run(dest_dir: str) -> None:
     snap_2020 = cast(Snapshot, paths.load_dependency("global_terrorism_database.csv"))
     snap_2021 = cast(Snapshot, paths.load_dependency("global_terrorism_database_2021.csv"))
     # Select columns of interest
+
     COLUMNS_OF_INTEREST = [
         "iyear",
         "country_txt",
@@ -55,11 +56,16 @@ def run(dest_dir: str) -> None:
         "nkill",
         "nwound",
         "suicide",
+        "doubtterr",
     ]
 
     # Load data from snapshots.
     df_2020 = pd.read_csv(snap_2020.path, low_memory=False)
     df_2021 = pd.read_csv(snap_2021.path, low_memory=False)
+    # Exclude rows where doubtterr == 1 (uncertain terrorism classification)
+    df_2020 = df_2020[df_2020["doubtterr"] == 0]
+    df_2021 = df_2021[df_2021["doubtterr"] == 0]
+
     # Combine terrorism data up until 2020 and 2020-2021.
     df = pd.concat([df_2020[COLUMNS_OF_INTEREST], df_2021[COLUMNS_OF_INTEREST]])
     # Rename country and year columns
