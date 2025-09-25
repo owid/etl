@@ -116,31 +116,6 @@ Get `--help` for details on any command.
 
 Archive old datasets.
 
-### pr-summarizer
-
-Summarize what changed in ETL PRs after the duplication commit.
-1. Parse the PR URL to get owner, repo, and number.
-2. `gh api repos/{owner}/{repo}/pulls/{number}/commits` to list commits; pick the first true duplication commit (message "Duplicate old steps" or earliest large copy event).
-3. Compare that commit to the PR head with `gh api repos/{owner}/{repo}/compare/{start}...{end}` using 7–8 character hashes and the three-dot range.
-4. Report only the net changes: commit range string, review URL `https://github.com/owid/etl/pull/{number}/files/{start}..{end}`, every modified file with status, and key dataset/pipeline updates.
-5. Save markdown to `/tmp/pr-summary.md` using this format:
-
-```
-## PR Analysis: [PR Title]
-
-**Commit Range**: `[short_hash_start]..[short_hash_end]`
-
-**Review Changes**: https://github.com/owid/etl/pull/[pr_number]/files/[short_hash_start]...[short_hash_end]
-
-**Files Modified** ([count] total):
-- [file_path] (added/modified/deleted)
-- ...
-
-**Key Changes**:
-- [Concise bullets describing net updates]
-```
-
-Keep the summary concise, actionable, and free of duplication noise.
 
 ## Key Development Patterns
 
