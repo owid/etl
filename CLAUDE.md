@@ -130,6 +130,22 @@ tb = tb.format(short_name="table_name")  # Sets table metadata
 tb["column"] = tb["column"].replace_metadata(unit="percent", short_unit="%")
 ```
 
+### YAML File Editing
+Always use `ruamel_load` and `ruamel_dump` from `etl.files` to preserve comments and formatting when editing YAML files:
+```python
+from etl.files import ruamel_load, ruamel_dump
+
+# Load YAML while preserving comments and formatting
+data = ruamel_load(file_path)
+
+# Modify data as needed
+data['some_key'] = new_value
+
+# Save back to file with original formatting preserved
+with open(file_path, 'w') as f:
+    f.write(ruamel_dump(data))
+```
+
 ### Creating New Steps
 1. Use Wizard UI (`make wizard`) for guided creation
 2. Or follow existing patterns in `etl/steps/data/[stage]/[namespace]/`
@@ -236,6 +252,19 @@ Note: The `etl pr` creates a new branch but does NOT automatically commit files 
 - Only catch specific exceptions when you can meaningfully handle them
 - Avoid `except Exception` - it masks real problems
 
+### Never Mask Underlying Issues
+- **NEVER** return empty tables or default values to "fix" data parsing failures
+- **NEVER** silently skip errors or missing data without clear explanation
+- **NEVER** comment out code to temporarily bypass problems - fix the underlying issue instead
+- **BAD**: `return Table(pd.DataFrame({'col': []}))` - hides the real problem
+- **BAD**: `try: parse_data() except: return empty_table` - masks what's broken
+- **BAD**: `# return extract_data()  # Commented out due to format change` - commenting out code to avoid errors
+- **GOOD**: Let the error happen and provide clear diagnostic information
+- **GOOD**: `raise ValueError("Sheet 'Fig 3.2' format changed - skiprows needs updating from 7 to X")`
+- **GOOD**: Update the code to handle the new data format correctly
+- **If you don't know what to do - ASK THE USER instead of masking the issue**
+- Silent failures make debugging exponentially harder and create technical debt
+
 ## Debugging ETL Data Quality Issues
 
 When ETL steps fail due to data quality issues (NaT values, missing data, missing indicators), always trace the problem upstream through the pipeline stages rather than patching symptoms downstream:
@@ -291,7 +320,7 @@ print(f"Garden null values: {tb.date.isnull().sum()}")
 ### MySQL Connection
 Can execute SQL queries directly using the staging database:
 ```bash
-mysql -h staging-site-branch -u owid --port 3306 -D owid -e "SELECT query"
+mysql -h staging-site-[branch] -u owid --port 3306 -D owid -e "SELECT query"
 ```
 
 Example queries:
@@ -315,4 +344,4 @@ SELECT id, name FROM variables WHERE datasetId = 12345;
 - VS Code extensions available: `make install-vscode-extensions`
 - **ALWAYS run `make check` before committing** - formats code, fixes linting issues, and runs type checks
 - SQL queries enclose in triple quotes for readability
-- When running etlr, always use PREFER_DOWNLOAD=1 prefix
+- When running **etlr**, always use PREFER_DOWNLOAD=1 prefix (don't use it for **etls** command)

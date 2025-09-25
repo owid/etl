@@ -1,0 +1,12 @@
+steps:
+  # World Bank - WDI (specifically indicators used for inflation adjustments).
+  data://meadow/wb/2025-08-29/wdi_prices:
+    - snapshot://wb/2025-08-29/wdi_cpi.zip
+    - snapshot://wb/2025-08-29/wdi_gdp.zip
+    - snapshot://wb/2025-08-29/wdi_gdp_linked.zip
+  # World Bank - WDI (specifically indicators used for inflation adjustments).
+  data://garden/wb/2025-08-29/wdi_prices:
+    - data://meadow/wb/2025-08-29/wdi_prices
+  # OWID - OWID Deflator.
+  data://garden/economics/2025-08-29/owid_deflator:
+    - data://garden/wb/2025-08-29/wdi_prices

@@ -8,16 +8,6 @@ steps:
   data://grapher/forests/2024-05-08/ifl:
     - data://garden/forests/2024-05-08/ifl
 
-  # Dominant Driver of Forest Loss
-  data://meadow/forests/2024-07-10/tree_cover_loss_by_driver:
-    - snapshot://forests/2024-08-07/dominant_driver.xlsx
-  data://garden/forests/2024-07-10/tree_cover_loss_by_driver:
-    - data://meadow/forests/2024-07-10/tree_cover_loss_by_driver
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2025-07-01/income_groups
-  data://grapher/forests/2024-07-10/tree_cover_loss_by_driver:
-    - data://garden/forests/2024-07-10/tree_cover_loss_by_driver
-
   # Forest Share combined sources
   data://garden/forests/2025-05-08/forest_share:
     - snapshot://papers/2025-05-30/scottish_government.csv
@@ -59,3 +49,13 @@ steps:
   data://garden/fao/2025-05-09/fra_forest_extent:
     - data://meadow/fao/2025-05-09/fra_forest_extent
     - data://garden/faostat/2025-03-17/faostat_rl
+
+  # Dominant Driver of Forest Loss
+  data://meadow/forests/2025-08-26/tree_cover_loss_by_driver:
+    - snapshot://forests/2025-08-26/dominant_driver.xlsx
+  data://garden/forests/2025-08-26/tree_cover_loss_by_driver:
+    - data://meadow/forests/2025-08-26/tree_cover_loss_by_driver
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2025-07-01/income_groups
+  data://grapher/forests/2025-08-26/tree_cover_loss_by_driver:
+    - data://garden/forests/2025-08-26/tree_cover_loss_by_driver

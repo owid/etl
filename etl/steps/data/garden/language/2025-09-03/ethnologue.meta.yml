@@ -1,0 +1,40 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - State Capacity
+    processing_level: major
+    display:
+      numDecimalPlaces: 0
+    description_processing: Languages are aggregated to the continent level with each language being counted only once for each region it is spoken in.
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+  non_redistributable: true
+
+tables:
+  languages_by_status:
+    variables:
+      total:
+        title: Total number of languages
+        unit: languages
+        description_short: The total number of languages, indigenous and non-indigenous, that have been spoken.
+      living:
+        title: Number of living languages
+        unit: languages
+        description_short: The number of languages, indigenous and non-indigenous, that are still used by at least one person as their first language. For a non-indigenous language to be counted, it must be established, meaning it is being acquired by the next generation and its use is the norm within a language community.
+        description_key:
+          - A living language is one that is still in use, with at least one person using it as their first language.
+          - For a living language to be counted in each country, it must either be indigenous to that country or be non-indigenous and counted as established.
+          - To be considered established, a non-indigenous language must be both being acquired by the next generation, either in the home, or through mandatory schooling on in the work place. Additionally, its use must be the norm, either as a first or second language withing a language community or community of practice, for example students who learn it as a second language in a school system.
+          - Living languages can be classified as either institutional, stable or endangered, based on how likely they are to be transmitted to future generations. Institutional languages are those most likely to be passed on, while endangered languages are at the highest risk of falling out of use.
+
+      extinct:
+        title: Number of extinct languages
+        unit: languages
+        description_short: The number of extinct languages. Extinct languages are those that were formally used but are no longer in use in any country and no one retains a sense of ethnic identity associated with them.
+        description_key:
+          - Extinct languages are those that were once used but have ceased to exist in the last 200 years.

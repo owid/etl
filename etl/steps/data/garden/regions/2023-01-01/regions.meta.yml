@@ -8,43 +8,42 @@ tables:
     variables:
       name:
         title: "Region name"
-        description: |
-          Region name.
+        description_short: Region name.
       short_name:
         title: "Region short name"
-        description: |
+        description_short: |
           Region short name, to be used in certain visualizations that are short of space.
       region_type:
         title: "Region type"
-        description: |
+        description_short: |
           Type of region (e.g. country or continent). These types are not accurate, given that many regions have a complicated political status, and it is out of the scope of this dataset to adopt precise definitions.
       is_historical:
         title: "Is historical"
-        description: |
+        description_short: |
           True if the region does not currently exist, but existed in the past.
       defined_by:
         title: "Defined by"
-        description: |
+        description_short: |
           Institution that introduced a certain definition. For example, if a certain region was found in a dataset of a certain institution, this variable will contain the name of the institution (in a short, snake_case form, e.g. "owid").
       members:
         title: "Member"
-        description: |
+        description_short: |
           Member of a region.
       aliases:
         title: "Alias"
-        description: |
+        description_short: |
           Alternative name for a region. For example, "U.S" is a common alias of region "United States".
       related:
         title: "Possible member"
-        description: |
+        description_short: |
           Possible member of a region. Here, membership is defined rather vaguely: A member can be a sub-region of a country, an overseas territory, a country inside a continent, etc.
 
           The status of many regions is unclear or contested, and by defining these dependencies we are not making any political statement. We simply define possible overlaps between geographical regions that can be found in datasets, to ensure we never double-count the contribution from those regions when creating aggregate data.
       end_year:
         title: "Last year that a historical region existed"
-        description: |
+        description_short: |
           Last year when a historical region existed.
       successors:
         title: "Successors of a historical region"
-        description: |
+        description_short: |
           List of successors of a historical region.

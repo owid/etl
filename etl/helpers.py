@@ -29,6 +29,7 @@ from etl.collection import Collection, CollectionSet
 from etl.collection.core.create import Listable, create_collection
 from etl.collection.explorer import Explorer, ExplorerLegacy, create_explorer_legacy
 from etl.dag_helpers import load_dag
+from etl.data_helpers.geo import RegionAggregator, Regions
 from etl.grapher.helpers import grapher_checks
 from etl.snapshot import Snapshot, SnapshotMeta
 
@@ -346,6 +347,55 @@ class PathFinder:
     @property
     def garden_dataset(self) -> catalog.Dataset:
         return catalog.Dataset(paths.DATA_DIR / f"garden/{self.namespace}/{self.version}/{self.short_name}")
+
+    @property
+    def regions(self):
+        """Get Regions helper for the specific use of an ETL step."""
+        if not hasattr(self, "_regions"):
+            try:
+                ds_regions = self.load_dataset("regions")
+            except NoMatchingStepsAmongDependencies:
+                ds_regions = None
+            try:
+                ds_income_groups = self.load_dataset("income_groups")
+            except NoMatchingStepsAmongDependencies:
+                ds_income_groups = None
+            try:
+                ds_population = self.load_dataset("population")
+            except NoMatchingStepsAmongDependencies:
+                ds_population = None
+
+            self._regions = Regions(
+                ds_regions=ds_regions,
+                ds_income_groups=ds_income_groups,
+                ds_population=ds_population,
+                countries_file=self.country_mapping_path,
+                auto_load_datasets=False,
+            )
+        return self._regions
+
+    def region_aggregator(
+        self,
+        regions: list[str] | dict[str, Any] | None = None,
+        index_columns: list[str] | None = None,
+        aggregations: dict[str, Any] | None = None,
+        country_col: str = "country",
+        year_col: str = "year",
+        population_col: str = "population",
+    ) -> RegionAggregator:
+        """Create a RegionAggregator that will be used on a specific table."""
+        return RegionAggregator(
+            regions=regions,
+            ds_regions=self.regions.ds_regions,
+            ds_income_groups=self.regions._ds_income_groups,
+            ds_population=self.regions._ds_population,
+            regions_all=self.regions.regions_all,
+            index_columns=index_columns,
+            aggregations=aggregations,
+            country_col=country_col,
+            year_col=year_col,
+            population_col=population_col,
+        )
 
     @property
     def snapshot_dir(self) -> Path:

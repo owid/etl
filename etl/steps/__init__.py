@@ -646,8 +646,10 @@ class DataStep(Step):
         env = os.environ.copy()
         env["PATH"] = os.path.expanduser("~/.cargo/bin") + ":" + env["PATH"]
 
-        # This might raise subprocess.CalledProcessError
-        subprocess.check_call(args, env=env)
+        try:
+            subprocess.check_call(args, env=env)
+        except subprocess.CalledProcessError as e:
+            sys.exit(e.returncode)
 
     def _run_notebook(self) -> None:
         "Run a parameterised Jupyter notebook."
@@ -762,7 +764,7 @@ class SnapshotStep(Step):
 
     def run(self) -> None:
         snap = Snapshot(self.path)
-        snap.pull(force=True)
+        snap.pull(force=True, retries=3)
 
     def is_dirty(self) -> bool:
         snap = Snapshot(self.path)
@@ -1197,7 +1199,7 @@ def _uses_old_schema(e: KeyError) -> bool:
 @contextmanager
 def isolated_env(
     working_dir: Path,
-    keep_modules: str = r"openpyxl|pyarrow|lxml|PIL|pydantic|sqlalchemy|sqlmodel|pandas|frictionless|numpy",
+    keep_modules: str = r"openpyxl|pyarrow|lxml|PIL|pydantic|sqlalchemy|sqlmodel|pandas|frictionless|numpy|pyproj|geopandas|google|plotly|shapely",
 ) -> Generator[None, None, None]:
     """Add given directory to pythonpath, run code in context, and
     then remove from pythonpath and unimport modules imported in context.

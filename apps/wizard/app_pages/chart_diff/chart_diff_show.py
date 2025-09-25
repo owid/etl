@@ -369,6 +369,14 @@ class ChartDiffShow:
         ):
             self._show_metadata_diff_modal()
 
+    def _show_tags_if_changed(self, chart, session):
+        """Show tags as gray badges if there are tag changes."""
+        if "tags" in self.diff.change_types and chart:
+            tags = chart.tags(session)
+            if tags:
+                badges = " ".join([f":gray-badge[{tag['name']}]" for tag in tags])
+                st.markdown(badges)
+
     @st.dialog("Metadata differences", width="large")  # type: ignore
     def _show_metadata_diff_modal(self) -> None:
         """Show metadata diff in a modal page."""
@@ -440,8 +448,7 @@ class ChartDiffShow:
                 stream = api.chat.completions.create(
                     model=MODEL_DEFAULT,
                     messages=messages,  # type: ignore
-                    temperature=0.15,
-                    max_tokens=1000,
+                    max_completion_tokens=1000,
                     stream=True,
                 )
                 response = cast(str, st.write_stream(stream))
@@ -471,6 +478,7 @@ class ChartDiffShow:
                     )
 
                 if option == "prod":
+                    self._show_tags_if_changed(self.diff.target_chart, self.target_session)
                     assert self.diff.target_chart is not None
                     grapher_chart(chart_config=self.diff.target_chart.config, owid_env=TARGET)
                 elif option == "last":
@@ -481,6 +489,9 @@ class ChartDiffShow:
                     st.markdown(self._header_production_chart, help=CONFLICT_HELP_MESSAGE)
                 else:
                     st.markdown(self._header_production_chart)
+
+                self._show_tags_if_changed(self.diff.target_chart, self.target_session)
+
                 assert self.diff.target_chart is not None
                 grapher_chart(chart_config=self.diff.target_chart.config, owid_env=TARGET)
 
@@ -493,6 +504,9 @@ class ChartDiffShow:
             else:
                 with st.container(height=40, border=False):
                     st.markdown(self._header_staging_chart)
+
+            self._show_tags_if_changed(self.diff.source_chart, self.source_session)
+
             grapher_chart(chart_config=self.diff.source_chart.config, owid_env=SOURCE)
 
         def _show_charts_comparison_v() -> Tuple[Any, bool]:

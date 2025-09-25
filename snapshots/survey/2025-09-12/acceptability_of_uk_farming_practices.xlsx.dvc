@@ -1,0 +1,28 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Acceptability of UK Farming Practices"
+    description: |-
+      The survey was conducted by Bryant Research, with about 1,000 UK participants collected through an online platform commonly used in academic and policy research to provide diverse, paid respondents. The survey included demographic questions and a range of items on political views, diet, income, and attitudes toward animal welfare and activism. Although the sample was not intended to be fully nationally representative, it did not show strong imbalances across key demographic or attitudinal indicators.
+    date_published: "2022-08-18"
+
+    # Citation
+    producer: Bryant Research
+    citation_full: |-
+      Bryant Research - Acceptability of Common Farming Practices. Original survey data was collected by Bryant Research Ltd in July 2022. The anonymized data was shared with Our World in Data in a private communication.
+
+    # Files
+    url_main: https://bryantresearch.co.uk/insight-items/acceptability-of-farming/
+    date_accessed: '2025-09-12'
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://bryantresearch.co.uk/insight-items/acceptability-of-farming/
+  is_public: false
+outs:
+  - md5: 6f1e2d31fc91c1caaaef6a49a7bb65b2
+    size: 513542
+    path: acceptability_of_uk_farming_practices.xlsx

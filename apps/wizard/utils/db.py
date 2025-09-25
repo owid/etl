@@ -11,6 +11,7 @@ import hashlib
 import os
 import time
 from contextlib import contextmanager
+from functools import cache
 from typing import Any, Dict, Generator, List, Literal, Optional, Tuple
 
 import pandas as pd
@@ -106,7 +107,7 @@ class WizardDB:
                 s.commit()
 
     @classmethod
-    @st.cache_data()
+    @cache
     def get_pr(cls, num_days: int = 7) -> pd.DataFrame:
         """Get PR data from database."""
         data = []
@@ -142,7 +143,7 @@ class WizardDB:
                 s.commit()
 
     @classmethod
-    @st.cache_data()
+    @cache
     def get_news_summary(cls, window_type: WND_LITERAL) -> Tuple[str, str, str] | None:
         """Get nmews (latest) from DB."""
         data = []

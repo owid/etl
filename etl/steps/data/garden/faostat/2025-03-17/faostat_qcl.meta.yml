@@ -382,9 +382,9 @@ tables:
       swine__pigs__00001034__stocks__005111__animals:
         presentation:
           title_public: Number of pigs
-      tea__00000667__production__005510__tonnes:
-        presentation:
-          title_public: Tea production
+      # tea__00000667__production__005510__tonnes:
+      #   presentation:
+      #     title_public: Tea production
       tobacco__00000826__production__005510__tonnes:
         presentation:
           title_public: Tobacco production
@@ -658,9 +658,9 @@ tables:
       tangerines__00000495__yield__005412__tonnes_per_hectare:
         presentation:
           title_public: Tangerine yield
-      tea__00000667__yield__005412__tonnes_per_hectare:
-        presentation:
-          title_public: Tea yield
+      # tea__00000667__yield__005412__tonnes_per_hectare:
+      #   presentation:
+      #     title_public: Tea yield
       tobacco__00000826__yield__005412__tonnes_per_hectare:
         presentation:
           title_public: Tobacco yield
