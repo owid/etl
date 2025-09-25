@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Any, AsyncGenerator, List, Literal
+from typing import Any, List, Literal
 
 import logfire
 import streamlit as st
@@ -8,16 +8,10 @@ from pydantic_ai import Agent
 
 # from pydantic_ai.agent import CallToolsNode
 from pydantic_ai.mcp import CallToolFunc, MCPServerStreamableHTTP, ToolResult
-from pydantic_ai.messages import (
-    PartDeltaEvent,
-    PartStartEvent,
-    TextPart,
-    TextPartDelta,
-)
 from pydantic_ai.models.openai import OpenAIResponsesModelSettings
 from pydantic_ai.tools import RunContext
 
-from apps.wizard.app_pages.expert_agent.utils import CURRENT_DIR, QueryResult, log, serialize_df
+from apps.wizard.app_pages.expert_agent.utils import CURRENT_DIR, MODEL_DEFAULT, QueryResult, log, serialize_df
 from etl.analytics.datasette import (
     DatasetteSQLError,
     _generate_url_to_datasette,
@@ -124,6 +118,7 @@ agent = Agent(
     instructions=SYSTEM_PROMPT,
     retries=2,
     model_settings=settings,
+    toolsets=get_toolsets(),  # type: ignore
 )
 
 # Agent for recommending follow-up questions
@@ -146,139 +141,28 @@ summarize_agent = Agent(
     retries=2,
 )
 
+
 #######################################################
 # STREAMING
 #######################################################
+def run_agent_stream(prompt: str):
+    from apps.wizard.app_pages.expert_agent.stream import agent_stream_sync
 
+    def handle_session_updates(updates):
+        for key, value in updates.items():
+            st.session_state[key] = value
 
-def _get_model_from_name(model_name: str):
-    if model_name == "llama3.2":
-        from pydantic_ai.models.openai import OpenAIChatModel
-        from pydantic_ai.providers.ollama import OllamaProvider
+    # Agent to work, and stream its output
+    model_name = st.session_state["expert_config"].get("model_name", MODEL_DEFAULT)
+    stream = agent_stream_sync(
+        agent=agent,
+        prompt=prompt,
+        model_name=model_name,
+        message_history=st.session_state["agent_messages"],
+        session_updates_callback=handle_session_updates,
+    )
 
-        model = OpenAIChatModel(
-            model_name="llama3.2",
-            provider=OllamaProvider(base_url="http://localhost:11434/v1"),
-        )
-
-    else:
-        model = model_name
-    return model
-
-
-async def agent_stream(prompt: str, model_name: str, message_history) -> AsyncGenerator[str, None]:
-    """Stream agent response using run_stream.
-
-    Args:
-        prompt: The user prompt to process
-        model_name: The model to use.
-
-    Yields:
-        str: Text chunks from the agent response
-    """
-    toolsets = get_toolsets()
-    model = _get_model_from_name(model_name)
-
-    print("===========================================")
-    print("Toolsets available")
-    print(toolsets)
-    print("===========================================")
-
-    async with agent.run_stream(
-        prompt,
-        model=model,  # type: ignore
-        message_history=message_history,
-        toolsets=toolsets,  # type: ignore
-    ) as result:
-        # Yield each message from the stream
-        async for message in result.stream_text(delta=True):
-            if message is not None:
-                yield message
-
-    # At the very end, after the streaming is complete
-    # Capture the usage information in session state
-    if hasattr(result, "usage"):
-        st.session_state["last_usage"] = result.usage()
-
-
-async def _collect_agent_stream2(prompt: str, model_name: str, message_history) -> List[str]:
-    """Collect all chunks from agent_stream2 in one async context to avoid task switching issues."""
-    toolsets = get_toolsets()
-    chunks = []
-    model = _get_model_from_name(model_name)
-
-    print("===========================================")
-    print("Toolsets available")
-    print(toolsets)
-    print("===========================================")
-
-    async with agent.iter(
-        prompt,
-        model=model,
-        message_history=message_history,
-        toolsets=toolsets,  # type: ignore
-    ) as run:
-        nodes = []
-        async for node in run:
-            # print(f"--------------------------")
-            # print(node)
-            nodes.append(node)
-            if Agent.is_model_request_node(node):
-                # is_final_synthesis_node = any(isinstance(prev_node, CallToolsNode) for prev_node in nodes)
-                # print(f"--- ModelRequestNode (Is Final Synthesis? {is_final_synthesis_node}) ---")
-                async with node.stream(run.ctx) as request_stream:
-                    async for event in request_stream:
-                        # print(f"Request Event: Data: {event!r}")
-                        if isinstance(event, PartDeltaEvent) and isinstance(event.delta, TextPartDelta):
-                            chunks.append(event.delta.content_delta)
-                        elif isinstance(event, PartStartEvent) and isinstance(event.part, TextPart):
-                            chunks.append(event.part.content)
-
-            elif Agent.is_call_tools_node(node):
-                # print("--- CallToolsNode ---")
-                async with node.stream(run.ctx) as handle_stream:
-                    async for event in handle_stream:
-                        pass
-                        # print(f"Call Event Data: {event!r}")
-
-        # Capture usage and result info
-        if hasattr(run, "usage"):
-            st.session_state["last_usage"] = run.usage()
-        if hasattr(run, "result"):
-            st.session_state["agent_result"] = run.result
-
-    return chunks
-
-
-async def agent_stream2(prompt: str, model_name: str, message_history) -> AsyncGenerator[str, None]:
-    """Stream agent response using iter method with Streamlit-compatible wrapper.
-
-    This version collects all chunks in one async context first, then yields them
-    to avoid async context manager issues with Streamlit's task switching.
-
-    Args:
-        prompt: The user prompt to process
-        model_name: The model to use.
-    Yields:
-        str: Text chunks from the agent response
-    """
-    # Collect all chunks first to avoid async context issues with Streamlit
-    # with st.spinner("Asking LLM...", show_time=True):
-    with st.status("Talking with the expert...", expanded=False) as status:
-        st.markdown(
-            f"**:material/smart_toy: Agent working**: `{st.session_state['expert_config']['model_name']}`",
-        )
-        chunks = await _collect_agent_stream2(
-            prompt,
-            model_name,
-            message_history,
-        )
-        status.update(label="Got the answer!", state="complete", expanded=False)
-
-    # Yield chunks one by one
-    for chunk in chunks:
-        if chunk:  # Only yield non-empty chunks
-            yield chunk
+    return stream
 
 
 #######################################################
