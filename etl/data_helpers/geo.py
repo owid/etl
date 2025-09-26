@@ -2103,7 +2103,7 @@ class RegionAggregator:
             if df_region_data.empty:
                 continue
 
-            # Use groupby_agg to handle both regular and weighted aggregations
+            # Create region aggregates (both regular and possibly weighted aggregations).
             df_region = groupby_agg(
                 df=df_region_data,
                 groupby_columns=[column for column in self.index_columns if column != self.country_col],
@@ -2288,18 +2288,17 @@ class RegionAggregator:
         # Combine the table with only regions and the table with no regions.
         df_with_regions = pd.concat([df_only_regions, df_no_regions], ignore_index=True)  # type: ignore
 
-        # Final sort and column ordering
+        # Final sort and column ordering.
         df_with_regions = df_with_regions.sort_values(self.index_columns).reset_index(drop=True)[tb.columns]
 
-        # Convert country to categorical if the original was
+        # Convert country to categorical if the original was.
         if tb[self.country_col].dtype.name == "category":
             df_with_regions = df_with_regions.astype({self.country_col: "category"})
 
-        # If the original object was a Table, copy metadata
-        if isinstance(tb, Table):
-            return Table(df_with_regions).copy_metadata(tb)
-        else:
-            return df_with_regions  # type: ignore
+        # Create a table with the same metadata as the original one.
+        tb_with_regions = Table(df_with_regions).copy_metadata(tb)
+
+        return tb_with_regions
 
     def add_per_capita(
         self,
