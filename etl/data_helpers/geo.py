@@ -1823,6 +1823,209 @@ class Regions:
             show_full_warning=show_full_warning,
         )
 
+    def add_aggregates(
+        self,
+        tb: Table,
+        regions: list[str] | dict[str, Any] | None = None,
+        index_columns: list[str] | None = None,
+        aggregations: dict[str, Any] | None = None,
+        country_col: str = "country",
+        year_col: str = "year",
+        population_col: str = "population",
+        num_allowed_nans_per_year: int | None = None,
+        frac_allowed_nans_per_year: float | None = None,
+        min_num_values_per_year: int | None = None,
+        check_for_region_overlaps: bool = True,
+        accepted_overlaps: list[dict[int, set[str]]] | None = None,
+        ignore_overlaps_of_zeros: bool = False,
+        subregion_type: str = "successors",
+        countries_that_must_have_data: dict[str, list[str]] | None = None,
+    ) -> Table:
+        """Convenience method to add region aggregates without explicit RegionAggregator creation.
+
+        This is equivalent to calling paths.region_aggregator(**kwargs).add_aggregates(tb).
+        For advanced use cases requiring multiple operations (e.g., both aggregates and per capita),
+        consider using paths.region_aggregator() directly for better performance.
+
+        Parameters
+        ----------
+        tb : TableOrDataFrame
+            Input table to add aggregates to.
+        regions : list[str] | dict[str, Any] | None
+            Regions to aggregate. If None, uses all available regions.
+        index_columns : list[str] | None
+            Index columns for the table. If None, inferred from the table.
+        aggregations : dict[str, Any] | None
+            Aggregation methods for each column.
+        country_col : str
+            Name of the country column.
+        year_col : str
+            Name of the year column.
+        population_col : str
+            Name of the population column.
+
+        All other parameters are passed through to RegionAggregator.add_aggregates().
+
+        Returns
+        -------
+        Table
+            Table with region aggregates added.
+        """
+        region_aggregator = self.aggregator(
+            regions=regions,
+            index_columns=index_columns,
+            aggregations=aggregations,
+            country_col=country_col,
+            year_col=year_col,
+            population_col=population_col,
+        )
+
+        return region_aggregator.add_aggregates(
+            tb=tb,
+            num_allowed_nans_per_year=num_allowed_nans_per_year,
+            frac_allowed_nans_per_year=frac_allowed_nans_per_year,
+            min_num_values_per_year=min_num_values_per_year,
+            check_for_region_overlaps=check_for_region_overlaps,
+            accepted_overlaps=accepted_overlaps,
+            ignore_overlaps_of_zeros=ignore_overlaps_of_zeros,
+            subregion_type=subregion_type,
+            countries_that_must_have_data=countries_that_must_have_data,
+        )
+
+    def add_per_capita(
+        self,
+        tb: Table,
+        regions: list[str] | dict[str, Any] | None = None,
+        index_columns: list[str] | None = None,
+        aggregations: dict[str, Any] | None = None,
+        country_col: str = "country",
+        year_col: str = "year",
+        population_col: str = "population",
+        only_informed_countries_in_regions: bool = False,
+        columns: list[str] | None = None,
+        prefix: str = "",
+        suffix: str = "_per_capita",
+        suffix_informed_population: str = "_region_population",
+        drop_population: bool | None = None,
+        warn_on_missing_countries: bool = True,
+        show_full_warning: bool = True,
+        interpolate_missing_population: bool = False,
+        expected_countries_without_population: list[str] | None = None,
+    ) -> Table:
+        """Convenience method to add per capita indicators without explicit RegionAggregator creation.
+
+        This is equivalent to calling paths.region_aggregator(**kwargs).add_per_capita(tb).
+        For advanced use cases requiring multiple operations (e.g., both aggregates and per capita),
+        consider using paths.region_aggregator() directly for better performance.
+
+        Parameters
+        ----------
+        tb : Table
+            Input table to add per capita indicators to.
+        regions : list[str] | dict[str, Any] | None
+            Regions to use. If None, uses all available regions.
+        index_columns : list[str] | None
+            Index columns for the table. If None, inferred from the table.
+        aggregations : dict[str, Any] | None
+            Aggregation methods for each column.
+        country_col : str
+            Name of the country column.
+        year_col : str
+            Name of the year column.
+        population_col : str
+            Name of the population column.
+
+        All other parameters are passed through to RegionAggregator.add_per_capita().
+
+        Returns
+        -------
+        Table
+            Table with per capita indicators added.
+        """
+        region_aggregator = self.aggregator(
+            regions=regions,
+            index_columns=index_columns,
+            aggregations=aggregations,
+            country_col=country_col,
+            year_col=year_col,
+            population_col=population_col,
+        )
+
+        return region_aggregator.add_per_capita(
+            tb=tb,
+            only_informed_countries_in_regions=only_informed_countries_in_regions,
+            columns=columns,
+            prefix=prefix,
+            suffix=suffix,
+            suffix_informed_population=suffix_informed_population,
+            drop_population=drop_population,
+            warn_on_missing_countries=warn_on_missing_countries,
+            show_full_warning=show_full_warning,
+            interpolate_missing_population=interpolate_missing_population,
+            expected_countries_without_population=expected_countries_without_population,
+        )
+
+    def aggregator(
+        self,
+        regions: list[str] | dict[str, Any] | None = None,
+        index_columns: list[str] | None = None,
+        aggregations: dict[str, Any] | None = None,
+        country_col: str = "country",
+        year_col: str = "year",
+        population_col: str = "population",
+    ) -> "RegionAggregator":
+        """Create a RegionAggregator for efficient multi-operation workflows.
+
+        Use this method when you need to perform multiple operations (e.g., both add_aggregates
+        and add_per_capita) on the same table for better performance.
+
+        For simple single-operation cases, consider using the convenience methods:
+        - regions.add_aggregates(tb)
+        - regions.add_per_capita(tb)
+
+        Parameters
+        ----------
+        regions : list[str] | dict[str, Any] | None
+            Regions to aggregate. If None, uses all available regions.
+        index_columns : list[str] | None
+            Index columns for the table. If None, inferred from the table.
+        aggregations : dict[str, Any] | None
+            Aggregation methods for each column.
+        country_col : str
+            Name of the country column.
+        year_col : str
+            Name of the year column.
+        population_col : str
+            Name of the population column.
+
+        Returns
+        -------
+        RegionAggregator
+            Configured aggregator ready for multi-operation workflows.
+
+        Examples
+        --------
+        >>> # Multi-operation workflow (efficient)
+        >>> agg = paths.regions.aggregator(regions=["World"], aggregations={"gdp": "sum"})
+        >>> tb = agg.add_aggregates(tb)
+        >>> tb = agg.add_per_capita(tb, columns=["gdp"])
+
+        >>> # Single operations (convenient)
+        >>> tb = paths.regions.add_aggregates(tb, regions=["World"])
+        """
+        return RegionAggregator(
+            regions=regions,
+            ds_regions=self.ds_regions,
+            ds_income_groups=self._ds_income_groups,
+            ds_population=self._ds_population,
+            regions_all=self.regions_all,
+            index_columns=index_columns,
+            aggregations=aggregations,
+            country_col=country_col,
+            year_col=year_col,
+            population_col=population_col,
+        )
+
 
 class RegionAggregator:
     """Manages operations on tables that have, or need to have, region aggregates.
