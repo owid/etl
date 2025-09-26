@@ -22,20 +22,67 @@ definitions:
 
   sex: |-
     <% if sex == "Male" %>
-    male
+     male
     <%- elif sex == "Female" %>
-    female
+     female
+    <%- endif %>
+
+  sex_plural: |-
+    <% if sex == "Male" %>
+     males
+    <%- elif sex == "Female" %>
+     females
+    <%- else %>
+     people
     <%- endif %>
 
   age: |-
-    <% if age == "Age (youth, adults): 15+" %>
-    (15+)
-    <%- elif age == "15-24" %>
-    aged 15-24
-    <%- elif age == "25-64" %>
-    aged 25-64
-    <%- elif age == "65+" %>
-    aged 65 and older
+    <% if classif1 == "Age (youth, adults): 15+" %>
+     (15+)
+    <%- elif classif1 == "Age (youth, adults): 15-24" %>
+     aged 15-24
+    <%- elif classif1 == "Age (youth, adults): 15-64" %>
+     aged 15-64
+    <%- elif classif1 == "Age (youth, adults): 25+" %>
+     aged 25 and older
+    <%- elif classif1 == "Age (aggregate): 15-24" %>
+     aged 15-24
+    <%- elif classif1 == "Age (aggregate): 25-54" %>
+     aged 25-54
+    <%- elif classif1 == "Age (aggregate): 55-64" %>
+     aged 55-64
+    <%- elif classif1 == "Age (aggregate): 65+" %>
+     aged 65 and older
+    <%- elif classif1 == "Age (aggregate): Total" %>
+     (15+)
+    <%- endif %>
+
+  age_unemployment: |-
+    <% if classif1 == "Age (youth, adults): 15-24" %>
+     aged 15-24
+    <%- elif classif1 == "Age (youth, adults): 15-64" %>
+     aged 15-64
+    <%- elif classif1 == "Age (youth, adults): 25+" %>
+     aged 25 and older
+    <%- elif classif1 == "Age (aggregate): 15-24" %>
+     aged 15-24
+    <%- elif classif1 == "Age (aggregate): 25-54" %>
+     aged 25-54
+    <%- elif classif1 == "Age (aggregate): 55-64" %>
+     aged 55-64
+    <%- elif classif1 == "Age (aggregate): 65+" %>
+     aged 65 and older
+    <%- endif %>
+
+  description_short_status_in_employment: |-
+    <% if classif1 == "Status in employment (ICSE-93): 1. Employees" %>
+      employees
+    <%- elif classif1 == "Status in employment (ICSE-93): 2. Employers" %>
+      employers
+    <%- elif classif1 == "Status in employment (ICSE-93): 3. Own-account workers" %>
+      own-account workers
+    <%- elif classif1 == "Status in employment (ICSE-93): 5. Contributing family workers" %>
+      contributing family workers
     <%- endif %>
 
   description_key_status_in_employment: |-
@@ -161,8 +208,9 @@ tables:
         title: Employment - <<sex>> - <<classif1>>
         unit: "people"
         short_unit: ""
-        description_short: "{definitions.employment}"
+        description_short: Number of {definitions.sex_plural} in employment, working as {definitions.description_short_status_in_employment}.
         description_key:
+          - "{definitions.employment}"
           - "{definitions.description_key_status_in_employment}"
           - "{definitions.description_key_iloest_modelled_data}"
           - "{definitions.description_key_13th_icls}"
@@ -175,7 +223,7 @@ tables:
         title: Informal employment rate - <<sex>>
         unit: "%"
         short_unit: "%"
-        description_short: Informal employment relates to jobs that lack basic social or legal protection and employment benefits.
+        description_short: Share of{definitions.sex} employed population who are working in jobs that lack basic social or legal protection and employment benefits.
         description_key:
           - "{definitions.employment}"
           - "{definitions.description_key_informal_employment}"
@@ -203,7 +251,7 @@ tables:
         title: Labor force participation rate - <<sex>> - <<classif1>>
         unit: "%"
         short_unit: "%"
-        description_short: Share of the {definitions.sex} working-age population (15+) who are employed or unemployed.
+        description_short: Share of the{definitions.sex} working-age population{definitions.age} who are economically active (employed or unemployed).
         description_key:
           - "{definitions.description_key_iloest_modelled_data}"
           - "{definitions.description_key_13th_icls}"
@@ -216,7 +264,7 @@ tables:
         title: Unemployment rate - <<sex>> - <<classif1>>
         unit: "%"
         short_unit: "%"
-        description_short: Share of the labor force without work, but available for and seeking employment.
+        description_short: Share of the{definitions.sex} labor force{definitions.age_unemployment} without work, but actively looking for a job and available to start soon.
         description_key:
           - "{definitions.description_key_iloest_modelled_data}"
           - "{definitions.description_key_13th_icls}"
@@ -370,7 +418,7 @@ tables:
         title: SDG 8.3.1 Proportion of informal employment in total employment - <<sex>> - <<classif1>>
         unit: "%"
         short_unit: "%"
-        description_short: Informal employment relates to jobs that lack basic social or legal protection and employment benefits.
+        description_short: Share of{definitions.sex} employed population who are working in jobs that lack basic social or legal protection and employment benefits.
         description_key:
           - "{definitions.employment}"
           - "{definitions.description_key_informal_employment}"

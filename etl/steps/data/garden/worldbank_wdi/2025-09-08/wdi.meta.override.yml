@@ -57,13 +57,13 @@ definitions:
   icse_93: These statuses in employment are provided according to the [International Standard Classification of Status in Employment](https://ilostat.ilo.org/methods/concepts-and-definitions/classification-status-at-work/) (ICSE-93).
 
   description_short_labor_force_participation_rate: |-
-    Share of the << sex >> working-age population << age >> who are employed or unemployed.
+    Share of the << sex >>working-age population << age >>who are economically active (employed or unemployed).
   description_short_unemployment_rate: |-
-    Share of the labor force without work, but available for and seeking employment.
+    Share of the << sex >>labor force << age >>without work, but actively looking for a job and available to start soon.
   description_short_employment_to_population_ratio: |-
-    Share of the working-age population that is employed.
+    Share of the << sex >>working-age population << age >>who are employed.
   description_short_vulnerable_employment: |-
-    Share of total employment working as own-account workers or contributing family workers.
+    Share of employed population who are working as own-account workers (self-employed without staff), or contributing family workers (self-employed in a household business or farm).
   description_short_labor_force_female: |-
     Share of the labor force (all working-age persons employed and unemployed) that is female.
   description_short_employment_agriculture: |-
@@ -1090,7 +1090,7 @@ tables:
         short_unit: "%"
         description_short: |-
           <%- set sex = "" %>
-          <%- set age = "(15+)" %>
+          <%- set age = "(15+) " %>
           {definitions.description_short_labor_force_participation_rate}
         description_key:
           - "{definitions.description_key_iloest_modelled_data}"
@@ -1109,8 +1109,8 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-          <%- set sex = "male" %>
-          <%- set age = "(15+)" %>
+          <%- set sex = "male " %>
+          <%- set age = "(15+) " %>
           {definitions.description_short_labor_force_participation_rate}
         description_key:
           - "{definitions.description_key_iloest_modelled_data}"
@@ -1129,8 +1129,8 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-          <%- set sex = "female" %>
-          <%- set age = "(15+)" %>
+          <%- set sex = "female " %>
+          <%- set age = "(15+) " %>
           {definitions.description_short_labor_force_participation_rate}
         description_key:
           - "{definitions.description_key_iloest_modelled_data}"
@@ -1169,7 +1169,7 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-          <%- set sex = "male" %>
+          <%- set sex = "male " %>
           <%- set age = "" %>
           {definitions.description_short_labor_force_participation_rate}
         description_key:
@@ -1189,7 +1189,7 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-          <%- set sex = "female" %>
+          <%- set sex = "female " %>
           <%- set age = "" %>
           {definitions.description_short_labor_force_participation_rate}
         description_key:
@@ -1209,8 +1209,8 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-          <%- set sex = "female" %>
-          <%- set age = "aged 15-24" %>
+          <%- set sex = "female " %>
+          <%- set age = "aged 15-24 " %>
           {definitions.description_short_labor_force_participation_rate}
         description_key:
           - "{definitions.description_key_national_estimates}"
@@ -1228,7 +1228,10 @@ tables:
         title: Unemployment, total (% of total labor force) (modeled ILO estimate)
         unit: "%"
         short_unit: "%"
-        description_short: "{definitions.description_short_unemployment_rate}"
+        description_short: |-
+          <%- set sex = "" %>
+          <%- set age = "" %>
+          {definitions.description_short_unemployment_rate}
         description_key:
           - "{definitions.description_key_iloest_modelled_data}"
           - "{definitions.description_key_13th_icls}"
@@ -1245,7 +1248,10 @@ tables:
         title: Unemployment, male (% of male labor force) (modeled ILO estimate)
         unit: "%"
         short_unit: "%"
-        description_short: "{definitions.description_short_unemployment_rate}"
+        description_short: |-
+          <%- set sex = "male " %>
+          <%- set age = "" %>
+          {definitions.description_short_unemployment_rate}
         description_key:
           - "{definitions.description_key_iloest_modelled_data}"
           - "{definitions.description_key_13th_icls}"
@@ -1262,7 +1268,10 @@ tables:
         title: Unemployment, female (% of female labor force) (modeled ILO estimate)
         unit: "%"
         short_unit: "%"
-        description_short: "{definitions.description_short_unemployment_rate}"
+        description_short: |-
+          <%- set sex = "female " %>
+          <%- set age = "" %>
+          {definitions.description_short_unemployment_rate}
         description_key:
           - "{definitions.description_key_iloest_modelled_data}"
           - "{definitions.description_key_13th_icls}"
@@ -1279,7 +1288,10 @@ tables:
         title: Unemployment, youth total (% of total labor force ages 15-24) (modeled ILO estimate)
         unit: "%"
         short_unit: "%"
-        description_short: "{definitions.description_short_unemployment_rate}"
+        description_short: |-
+          <%- set sex = "" %>
+          <%- set age = "aged 15-24 " %>
+          {definitions.description_short_unemployment_rate}
         description_key:
           - "{definitions.description_key_iloest_modelled_data}"
           - "{definitions.description_key_13th_icls}"
@@ -1296,7 +1308,10 @@ tables:
         title: Unemployment, total (% of total labor force) (national estimate)
         unit: "%"
         short_unit: "%"
-        description_short: "{definitions.description_short_unemployment_rate}"
+        description_short: |-
+          <%- set sex = "" %>
+          <%- set age = "" %>
+          {definitions.description_short_unemployment_rate}
         description_key:
           - "{definitions.description_key_national_estimates}"
           - "{definitions.description_key_13th_icls}"
@@ -1313,7 +1328,10 @@ tables:
         title: Employment to population ratio, 15+, total (%) (modeled ILO estimate)
         unit: "%"
         short_unit: "%"
-        description_short: "{definitions.description_short_employment_to_population_ratio}"
+        description_short: |-
+          <%- set sex = "" %>
+          <%- set age = "(15+) " %>
+          {definitions.description_short_employment_to_population_ratio}
         description_key:
           - "{definitions.employment}"
           - "{definitions.description_key_iloest_modelled_data}"
@@ -1331,7 +1349,10 @@ tables:
         title: Employment to population ratio, 15+, male (%) (modeled ILO estimate)
         unit: "%"
         short_unit: "%"
-        description_short: "{definitions.description_short_employment_to_population_ratio}"
+        description_short: |-
+          <%- set sex = "male " %>
+          <%- set age = "(15+) " %>
+          {definitions.description_short_employment_to_population_ratio}
         description_key:
           - "{definitions.employment}"
           - "{definitions.description_key_iloest_modelled_data}"
@@ -1349,7 +1370,10 @@ tables:
         title: Employment to population ratio, 15+, female (%) (modeled ILO estimate)
         unit: "%"
         short_unit: "%"
-        description_short: "{definitions.description_short_employment_to_population_ratio}"
+        description_short: |-
+          <%- set sex = "female " %>
+          <%- set age = "(15+) " %>
+          {definitions.description_short_employment_to_population_ratio}
         description_key:
           - "{definitions.employment}"
           - "{definitions.description_key_iloest_modelled_data}"
@@ -1367,7 +1391,10 @@ tables:
         title: Employment to population ratio, 15+, total (%) (national estimate)
         unit: "%"
         short_unit: "%"
-        description_short: "{definitions.description_short_employment_to_population_ratio}"
+        description_short: |-
+          <%- set sex = "" %>
+          <%- set age = "" %>
+          {definitions.description_short_employment_to_population_ratio}
         description_key:
           - "{definitions.employment}"
           - "{definitions.description_key_national_estimates}"
@@ -1385,7 +1412,10 @@ tables:
         title: Employment to population ratio, 15+, female (%) (national estimate)
         unit: "%"
         short_unit: "%"
-        description_short: "{definitions.description_short_employment_to_population_ratio}"
+        description_short: |-
+          <%- set sex = "female " %>
+          <%- set age = "" %>
+          {definitions.description_short_employment_to_population_ratio}
         description_key:
           - "{definitions.employment}"
           - "{definitions.description_key_national_estimates}"
