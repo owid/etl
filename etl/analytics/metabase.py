@@ -81,6 +81,15 @@ def read_metabase(sql: str) -> pd.DataFrame:
 
 
 def _generate_question_url(card: dict) -> str:
+    """
+    Generate URL to access a Metabase question.
+
+    Args:
+        card (dict): Metabase card object as returned by the Metabase API.
+    Returns:
+        str: Link to the created question in Metabase. This link can be shared with others to access the question directly.
+
+    """
     assert "id" in card, "Card must have an 'id' field"
     card_id = card["id"]
     assert "name" in card, "Card must have an 'name' field"
@@ -106,6 +115,16 @@ def create_question(
     database_id: int = DATABASE_ID,
     **kwargs,
 ):
+    """Create a question in Metabase with the given SQL query and title.
+
+    This tool should be used once we are sure that the query is valid in Datasette.
+
+    Args:
+        query: Query user for Datasette/Metabase.
+        title: Title that describes what the query does. Should be short, but concise.
+    Returns:
+        Question object from Metabase API.
+    """
     # Define title
     QUESTION_TIMESTAMP = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     q_title = f"🤖 {title} ({QUESTION_TIMESTAMP})"
@@ -174,7 +193,8 @@ def get_question_data(card_id: int, data_format: str = "csv") -> pd.DataFrame:
         card_id=card_id,
         data_format=data_format,
     )
-    assert data_str is not None, "No data returned from Metabase API"
+    if data_str is None:
+        return pd.DataFrame()  # Return empty DataFrame if no data
 
     # Parse raw data as dataframe
     df = pd.read_csv(BytesIO(initial_bytes=data_str.encode()), encoding="utf-8")  # add encoding if needed
