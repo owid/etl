@@ -4,7 +4,7 @@ A crucial step in the ETL process is harmonizing country names. This is because 
 
     All our standardised country names are defined in our regions dataset (see [this YAML file](https://github.com/owid/etl/blob/master/etl/steps/data/garden/regions/2023-01-01/regions.yml)).
 
-Typically, harmonizing country names is done after the Meadow step and before (or during) the Garden step, and is is consolidated into a JSON dictionary, which maps the source's country names to our standard names:
+Typically, harmonizing country names is done while developing the Garden step, and is consolidated into a JSON dictionary, which maps the source's country names to our standard names:
 
 ```json
 // some_step.countries.json
@@ -28,6 +28,38 @@ We strive to harmonize country names in a way that is consistent with the [ISO 3
 Since we also present long-run datasets over multiple centuries, a time period in which national borders have changed, split and merged, we also make a best-effort attempt to harmonize the names of historical countries and regions that no longer exist and are not present in the ISO standard.
 
 Our harmonization tool relies on [rapidfuzz](https://github.com/rapidfuzz/RapidFuzz).
+
+## Using the interactive window
+
+If you are editing a step script in VS Code, it can be helpful to have access to the harmonizer tool from the interactive window (or interactive shell).
+
+You can simply invoke it with the following code:
+
+```python
+# Run interactive harmonizer to create mapping file
+paths.regions.harmonizer(tb)
+```
+
+This assumes that you have a `PathFinder` instance defined as `paths` and that `tb` has a column `"country"` to harmonize. If you want to use a different column, you can pass it as the `country_col` argument.
+
+```python
+# Harmonize a different column
+paths.regions.harmonizer(tb, country_col="region")
+```
+
+The harmonizer will present a form with a list of ambiguous country names and ask you to select the correct country name from a list of suggestions (ranked by similarity).
+
+<figure markdown="span">
+  ![Chart Upgrader](../assets/harmonize-ipython.gif)
+  <figcaption>Harmonizer interactive tool in VS Code.</figcaption>
+</figure>
+
+After running the harmonizer to create the mapping file, you can apply the harmonization to your table:
+
+```python
+# Apply harmonization using the created mapping file
+tb_harmonized = paths.regions.harmonize_names(tb)
+```
 
 ## Using Wizard
 
@@ -95,44 +127,3 @@ Beginning interactive harmonization...
 
 The output mapping is saved in `mapping.json`. If this file existed before, it will resume the session from where it left off.
 
-## Using the interactive shell
-
-If you are editing a step script in VS Code, it can be helpful to have access to the harmonizer tool from the interactive shell.
-
-You can simply invoke it with the following code:
-
-```python
-from etl.harmonize import harmonize_ipython
-harmonize_ipython(
-   tb,
-   paths=paths,
-)
-```
-
-This assumes that you have a `PathFinder` instance defined as `paths` and that `tb` has a column `"country"` to harmonize. If you want to use a different column, you can pass it as the `column` argument.
-
-```python
-from etl.harmonize import harmonize_ipython
-harmonize_ipython(
-   tb,
-   column="region",
-   paths=paths,
-)
-```
-
-If you want to export the mapping to a different file, you can pass the `output_file` argument.
-
-```python
-from etl.harmonize import harmonize_ipython
-harmonize_ipython(
-   tb,
-   output_file="output/file/path.json",
-)
-```
-
-The harmonizer will present a form with a list of ambiguous country names and ask you to select the correct country name from a list of suggestions (ranked by similarity). This is similar to the experience that you'd get from Wizard or the CLI.
-
-<figure markdown="span">
-  ![Chart Upgrader](../assets/harmonize-ipython.gif)
-  <figcaption>Harmonizer interactive tool in VS Code.</figcaption>
-</figure>
