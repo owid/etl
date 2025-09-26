@@ -172,8 +172,6 @@ def register_message_history(question_id: str):
             # Keep only response messages
             st.session_state["mapping_messages_question_id"][str(msg.provider_response_id)] = question_id
 
-    st.write("### Debug: register_message_history")
-    st.write(agent_messages)
     ## TEST: only keep user/system prompts and final responses
     # filtered_messages = []
     # for msg in agent_messages:
@@ -189,8 +187,6 @@ def register_message_history(question_id: str):
 def build_history_chat():
     # Load messages
     messages = st.session_state["agent_messages"]
-    st.write("### Debug: build_history_chat")
-    st.write(messages)
     messages = to_json(messages)
     messages = json.loads(messages)
     # Display messages
