@@ -23,70 +23,85 @@ from pydantic_ai.messages import (
 ########################
 # OTHERS               #
 ########################
-# Global UI message queue that tools can use
-_ui_message_queue = None
+class UIStateManager:
+    """Manages UI state for cross-thread communication in a thread-safe manner."""
+
+    def __init__(self):
+        self._ui_message_queue = None
+        self._status_container = None
+
+    def set_ui_message_queue(self, queue_obj):
+        """Set the UI message queue for tool messages."""
+        self._ui_message_queue = queue_obj
+
+    def set_status_container(self, status_obj):
+        """Set the status container for tool messages."""
+        self._status_container = status_obj
+
+    def send_ui_message(self, message_type: str, text: str, **kwargs):
+        """Send a UI message from a tool function to be displayed in the main thread.
+
+        Args:
+            message_type: Type of message ('markdown', 'info', 'warning', 'error', 'success')
+            text: The message text
+            **kwargs: Additional arguments to pass to the Streamlit function
+        """
+        if self._ui_message_queue is not None:
+            self._ui_message_queue.put({"type": message_type, "text": text, "args": (), "kwargs": kwargs})
+
+    def display_ui_message(self, ui_msg):
+        """Display a UI message captured from the worker thread."""
+        msg_type = ui_msg["type"]
+        text = ui_msg["text"]
+        args = ui_msg.get("args", ())
+        kwargs = ui_msg.get("kwargs", {})
+
+        # If we have a status container, display messages inside it
+        if self._status_container is not None:
+            # Write directly to the status container without using context manager
+            if msg_type == "markdown":
+                self._status_container.markdown(text, *args, **kwargs)
+            elif msg_type == "info":
+                self._status_container.info(text, *args, **kwargs)
+            elif msg_type == "warning":
+                self._status_container.warning(text, *args, **kwargs)
+            elif msg_type == "error":
+                self._status_container.error(text, *args, **kwargs)
+            elif msg_type == "success":
+                self._status_container.success(text, *args, **kwargs)
+        else:
+            # Fallback to regular display
+            if msg_type == "markdown":
+                st.markdown(text, *args, **kwargs)
+            elif msg_type == "info":
+                st.info(text, *args, **kwargs)
+            elif msg_type == "warning":
+                st.warning(text, *args, **kwargs)
+            elif msg_type == "error":
+                st.error(text, *args, **kwargs)
+            elif msg_type == "success":
+                st.success(text, *args, **kwargs)
 
 
+# Global instance for backward compatibility
+_ui_state_manager = UIStateManager()
+
+# Backward compatibility functions
 def tool_ui_message(message_type: str, text: str, **kwargs):
-    """Send a UI message from a tool function to be displayed in the main thread.
-
-    Args:
-        message_type: Type of message ('markdown', 'info', 'warning', 'error', 'success')
-        text: The message text
-        **kwargs: Additional arguments to pass to the Streamlit function
-    """
-    if _ui_message_queue is not None:
-        _ui_message_queue.put({"type": message_type, "text": text, "args": (), "kwargs": kwargs})
-
-
-# Global status container for tool messages
-_status_container = None
-
+    """Send a UI message from a tool function to be displayed in the main thread."""
+    _ui_state_manager.send_ui_message(message_type, text, **kwargs)
 
 def set_status_container(status_obj):
     """Set the global status container for tool messages."""
-    global _status_container
-    _status_container = status_obj
-
+    _ui_state_manager.set_status_container(status_obj)
 
 def display_ui_message(ui_msg):
     """Display a UI message captured from the worker thread."""
-    msg_type = ui_msg["type"]
-    text = ui_msg["text"]
-    args = ui_msg.get("args", ())
-    kwargs = ui_msg.get("kwargs", {})
-
-    # If we have a status container, display messages inside it
-    if _status_container is not None:
-        # Write directly to the status container without using context manager
-        if msg_type == "markdown":
-            _status_container.markdown(text, *args, **kwargs)
-        elif msg_type == "info":
-            _status_container.info(text, *args, **kwargs)
-        elif msg_type == "warning":
-            _status_container.warning(text, *args, **kwargs)
-        elif msg_type == "error":
-            _status_container.error(text, *args, **kwargs)
-        elif msg_type == "success":
-            _status_container.success(text, *args, **kwargs)
-    else:
-        # Fallback to regular display
-        if msg_type == "markdown":
-            st.markdown(text, *args, **kwargs)
-        elif msg_type == "info":
-            st.info(text, *args, **kwargs)
-        elif msg_type == "warning":
-            st.warning(text, *args, **kwargs)
-        elif msg_type == "error":
-            st.error(text, *args, **kwargs)
-        elif msg_type == "success":
-            st.success(text, *args, **kwargs)
-
+    _ui_state_manager.display_ui_message(ui_msg)
 
 def set_ui_message_queue(queue_obj):
     """Set the global UI message queue."""
-    global _ui_message_queue
-    _ui_message_queue = queue_obj
+    _ui_state_manager.set_ui_message_queue(queue_obj)
 
 
 def _get_model_from_name(model_name: str):
@@ -128,8 +143,8 @@ def _agent_stream_sync(
 
     async def async_worker():
         try:
-            # Set up the global UI message queue for tools to use
-            set_ui_message_queue(ui_messages_q)
+            # Set up the UI message queue for tools to use
+            _ui_state_manager.set_ui_message_queue(ui_messages_q)
 
             # Create a custom agent_stream that captures session updates
             async for chunk in func_stream(
