@@ -1,4 +1,3 @@
-import tempfile
 import uuid
 from pathlib import Path
 from typing import Any, List, Literal
@@ -16,6 +15,7 @@ from pydantic_ai.mcp import CallToolFunc, MCPServerStreamableHTTP, ToolResult
 from pydantic_ai.models.openai import OpenAIResponsesModelSettings
 from pydantic_ai.tools import RunContext
 
+from apps.wizard.app_pages.expert_agent.media import save_code_file, save_plot_file
 from apps.wizard.app_pages.expert_agent.utils import CURRENT_DIR, MODEL_DEFAULT, QueryResult, log, serialize_df
 from etl.analytics.datasette import (
     DatasetteSQLError,
@@ -191,7 +191,7 @@ Always include proper titles and axis labels to make the plot self-explanatory."
 #######################################################
 # STREAMING
 #######################################################
-def run_agent_stream(prompt: str, structured: bool = False):
+def run_agent_stream(prompt: str, structured: bool = False, question_id: str | None = None):
     if structured:
         from apps.wizard.app_pages.expert_agent.stream import agent_stream_sync_structured
 
@@ -214,6 +214,7 @@ def run_agent_stream(prompt: str, structured: bool = False):
         model_name=model_name,
         message_history=st.session_state["agent_messages"],
         session_updates_callback=handle_session_updates,
+        question_id=question_id,
     )
 
     return stream
@@ -299,43 +300,6 @@ async def get_docs_page(file_path: str) -> str:
     return docs
 
 
-# Analytics
-@agent.tool_plain(docstring_format="google")
-async def get_db_tables() -> str:
-    """Get an overview of the database tables. Retrieve the names of the tables in the database, along with their short descriptions.
-
-    Returns:
-        str: Table short descriptions in format "table1: ...\ntable2: ...".
-    """
-    # tool_ui_message(
-    #     message_type="markdown",
-    #     text="**:material/construction: Tool use**: Getting the database details of our semantic layer, via `get_db_tables`",
-    # )
-    return ANALYTICS_DB_OVERVIEW
-
-
-@agent.tool_plain(docstring_format="google")
-async def get_db_table_fields(tb_name: str) -> str:
-    """Retrieve the documentation of the columns of database table "tb_name".
-
-
-    Args:
-        tb_name: Name of the table
-
-    Returns:
-        str: Table documentation as string, mapping column names to their descriptions. E.g. "column1: description1\ncolumn2: description2".
-    """
-    # tool_ui_message(
-    #     message_type="markdown",
-    #     text=f"**:material/construction: Tool use**: Getting documentation of table `{tb_name}` from the semantic layer, via `get_db_table_fields`",
-    # )
-    if tb_name not in ANALYTICS_DB_TABLE_DETAILS:
-        print("Table not found:", tb_name)
-        print("Available tables:", sorted(ANALYTICS_DB_TABLE_DETAILS.keys()))
-        return "Table not found: " + tb_name
-    return ANALYTICS_DB_TABLE_DETAILS[tb_name]
-
-
 # API reference for Metadata
 @agent.tool_plain(docstring_format="google")
 async def get_api_reference_metadata(
@@ -377,6 +341,44 @@ async def get_api_reference_metadata(
             return "Invalid object name: " + object_name
 
 
+# Analytics
+@agent.tool_plain(docstring_format="google")
+async def get_db_tables() -> str:
+    """Get an overview of the database tables. Retrieve the names of the tables in the database, along with their short descriptions.
+
+    Returns:
+        str: Table short descriptions in format "table1: ...\ntable2: ...".
+    """
+    # tool_ui_message(
+    #     message_type="markdown",
+    #     text="**:material/construction: Tool use**: Getting the database details of our semantic layer, via `get_db_tables`",
+    # )
+    return ANALYTICS_DB_OVERVIEW
+
+
+@agent.tool_plain(docstring_format="google")
+async def get_db_table_fields(tb_name: str) -> str:
+    """Retrieve the documentation of the columns of database table "tb_name".
+
+
+    Args:
+        tb_name: Name of the table
+
+    Returns:
+        str: Table documentation as string, mapping column names to their descriptions. E.g. "column1: description1\ncolumn2: description2".
+    """
+    # tool_ui_message(
+    #     message_type="markdown",
+    #     text=f"**:material/construction: Tool use**: Getting documentation of table `{tb_name}` from the semantic layer, via `get_db_table_fields`",
+    # )
+    if tb_name not in ANALYTICS_DB_TABLE_DETAILS:
+        print("Table not found:", tb_name)
+        print("Available tables:", sorted(ANALYTICS_DB_TABLE_DETAILS.keys()))
+        return "Table not found: " + tb_name
+    return ANALYTICS_DB_TABLE_DETAILS[tb_name]
+
+
+# Metabase/Datasette
 @agent.tool_plain(docstring_format="google")
 async def execute_query(query: str, title: str, description: str, num_rows: int = 10) -> QueryResult:
     """Execute a query in the semantic layer and get the data results.
@@ -425,15 +427,24 @@ async def execute_query(query: str, title: str, description: str, num_rows: int 
             )
 
         try:
-            url_metabase = create_question_in_metabase(query=query, title=title, description=description)
+            question = create_question(
+                query=query,
+                title=title,
+                description=description,
+            )
+            # Obtain URL to the question
+            url_metabase = _generate_question_url(question)
+            card_id = question.get("id", None)
         except Exception as _:
             url_metabase = None
+            card_id = None
         return QueryResult(
             message="SUCCESS",
             valid=True,
             result=data,
             url_metabase=url_metabase,
             url_datasette=url_datasette,
+            card_id_metabase=card_id,
         )
     except (DatasetteSQLError,) as e:
         # Handle specific Datasette-related errors
@@ -441,36 +452,6 @@ async def execute_query(query: str, title: str, description: str, num_rows: int 
             message=f"ERROR. Query is invalid! Check for correctness, it must be DuckDB compatible!\nError: {e}",
             valid=False,
         )
-
-
-# Create question in Metabase
-def create_question_in_metabase(query: str, title: str, description: str) -> str:
-    """Create a question in Metabase with the given SQL query and title.
-
-    This tool should be used once we are sure that the query is valid in Datasette.
-
-    Args:
-        query: Query user for Datasette/Metabase.
-        title: Title that describes what the query does. Should be short, but concise.
-    Returns:
-        str: Link to the created question in Metabase. This link can be shared with others to access the question directly.
-    """
-    log.info(f"Creating Metabase question for query '{title}'")
-    # tool_ui_message(
-    #     message_type="markdown",
-    #     text="**:material/add_circle: Creating metabase question**",
-    # )
-
-    # Create question in Metabase
-    question = create_question(
-        query=query,
-        title=title,
-        description=description,
-    )
-    # Obtain URL to the question
-    url = _generate_question_url(question)
-
-    return url
 
 
 @agent.tool_plain(docstring_format="google")
@@ -553,9 +534,6 @@ async def get_question_data(card_id: int, num_rows: int = 20) -> QueryResult:
             valid=False,
         )
 
-    # Get question
-    question = get_question_info(card_id)
-
     # q_name = question.get("name", "Unknown")
     # tool_ui_message(
     #     message_type="markdown",
@@ -563,7 +541,7 @@ async def get_question_data(card_id: int, num_rows: int = 20) -> QueryResult:
     # )
 
     # Generate URL
-    url = _generate_question_url(question)
+    url = await get_question_url(card_id)
 
     # Serialize
     data = serialize_df(data, num_rows=num_rows)
@@ -578,11 +556,12 @@ async def get_question_data(card_id: int, num_rows: int = 20) -> QueryResult:
     return result
 
 
-@agent.tool_plain(docstring_format="google")
+@agent.tool(docstring_format="google")
 async def generate_plot(
+    ctx: RunContext[dict],
     card_id: int,
     plot_instructions: str,
-) -> str:
+) -> None:
     """Generate a plot from Metabase question data with custom plotting instructions.
 
     This tool creates visualizations by:
@@ -595,20 +574,20 @@ async def generate_plot(
         card_id: The ID of the Metabase question containing the data to plot. Typically a table, where only a subset of the columns are needed for plotting.
         plot_instructions: Natural language instructions for the plot (e.g., "create a line chart showing trend over time of num_users", "make a scatter plot with GDP vs population", "generate a bar chart grouped by country")
 
-    Returns:
-        str: Path to the generated plot image file
-
     Raises:
         ValueError: If data cannot be fetched or plot generation fails
     """
     try:
-        # 1. Get data from Metabase
+        # 1. Get question_id from context (fallback to generic if not available)
+        question_id = ctx.deps.get("question_id", f"plot_{card_id}")
+
+        # 2. Get data from Metabase
         df = _get_question_data(card_id)
 
         if df.empty:
             raise ValueError(f"DataFrame is empty for question with ID {card_id}")
 
-        # 2. Prepare context for plotting agent
+        # 3. Prepare context for plotting agent
         sample_data_str = df.head(3).to_string()
         context_info = (
             f"DataFrame info:\n"
@@ -619,17 +598,19 @@ async def generate_plot(
             f"User instructions: {plot_instructions}"
         )
 
-        # 3. Use plotting sub-agent to generate code
+        # 4. Use plotting sub-agent to generate code
+        log.info(f">>>>>> Generating plot for question {question_id} using Metabase card {card_id}")
         plotting_result = await plotting_agent.run(context_info)
         plotting_code = plotting_result.output
+        log.info(">>>>>> Finished generating plot")
 
-        # 4. Clean the code if it's wrapped in markdown
+        # 5. Clean the code if it's wrapped in markdown
         if plotting_code.startswith("```python"):
             plotting_code = plotting_code.split("```python")[1].split("```")[0].strip()
         elif plotting_code.startswith("```"):
             plotting_code = plotting_code.split("```")[1].split("```")[0].strip()
 
-        # 5. Execute the generated code safely
+        # 6. Execute the generated code safely
         local_vars = {
             "df": df,
             "px": px,
@@ -645,30 +626,18 @@ async def generate_plot(
 
         fig = local_vars["fig"]
 
-        # 6. Save to file
-        prefix = ""  # file_prefix or f"plot_{card_id}"
+        # 7. Save to files with question_id prefix
         unique_id = uuid.uuid4().hex[:8]
+        filename_base = f"{question_id}_plot_{unique_id}"
 
-        # Try to save as PNG first, fallback to HTML if kaleido not available
-        _safe_plot_file(fig, f"{prefix}_{unique_id}.png")
+        # Save the plot file (PNG or HTML)
+        filepath = save_plot_file(fig, filename_base)
+
+        # Save the plotting code with data fetching logic
+        save_code_file(plotting_code, filename_base, question_id, card_id)
+
+        log.info(f"Generated plot for question {question_id}: {filepath}")
 
     except Exception as e:
         log.error(f"Error generating plot: {e}")
         raise ValueError(f"Failed to generate plot: {e}")
-
-
-def _safe_plot_file(fig, filename: str):
-    try:
-        filename = f"{filename}.png"
-        filepath = Path(tempfile.gettempdir()) / filename
-        fig.write_image(str(filepath), width=1200, height=800)
-        log.info(f"Generated plot saved as PNG: {filepath}")
-        return str(filepath)
-    except Exception as png_error:
-        # Fallback to HTML format
-        log.warning(f"PNG export failed ({png_error}), saving as HTML instead")
-        filename = f"{filename}.html"
-        filepath = Path(tempfile.gettempdir()) / filename
-        fig.write_html(str(filepath))
-        log.info(f"Generated plot saved as HTML: {filepath}")
-        return str(filepath)
