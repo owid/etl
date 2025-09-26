@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 
 import pandas as pd
+from sqlalchemy import text
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import Session
@@ -1055,17 +1056,36 @@ def get_chart_id_slug_pairs(session: Session) -> set[tuple[int, str]]:
 def get_deleted_charts(source_session: Session, target_session: Session) -> list[dict]:
     """Get charts that exist in target but not in source (deleted charts).
 
-    This function matches on (id, slug) pairs to identify truly deleted charts,
-    using efficient set operations.
+    This function matches on chart IDs to identify truly deleted charts,
+    filtering out charts created in target after staging creation time.
     """
-    source_pairs = get_chart_id_slug_pairs(source_session)
-    target_pairs = get_chart_id_slug_pairs(target_session)
+    staging_creation_time = get_staging_creation_time(source_session)
 
-    # Find (id, slug) pairs that exist in target but not in source
-    deleted_pairs = target_pairs - source_pairs
+    # Get chart info from target that existed before staging was created
+    query = text("""
+    SELECT c.id, cc.slug
+    FROM charts c
+    JOIN chart_configs cc ON c.configId = cc.id
+    WHERE cc.slug IS NOT NULL AND c.createdAt < :staging_creation_time
+    """)
+    result = target_session.execute(query, {"staging_creation_time": staging_creation_time}).fetchall()
+    target_charts_pre_staging = {row[0]: row[1] for row in result}  # id -> slug mapping
+
+    # Get chart IDs from source
+    source_query = text("""
+    SELECT c.id
+    FROM charts c
+    JOIN chart_configs cc ON c.configId = cc.id
+    WHERE cc.slug IS NOT NULL
+    """)
+    source_result = source_session.execute(source_query).fetchall()
+    source_chart_ids = set(row[0] for row in source_result)
+
+    # Find chart IDs that exist in target (pre-staging) but not in source
+    deleted_chart_ids = set(target_charts_pre_staging.keys()) - source_chart_ids
 
     # Return list of deleted charts with their info
-    return [{"id": chart_id, "slug": slug} for chart_id, slug in deleted_pairs]
+    return [{"id": chart_id, "slug": target_charts_pre_staging[chart_id]} for chart_id in deleted_chart_ids]
 
 
 def modified_charts_on_staging(
