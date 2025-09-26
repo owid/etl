@@ -20,6 +20,7 @@ from pydantic_ai.messages import (
     # ToolCallPartDelta,
 )
 
+
 ########################
 # OTHERS               #
 ########################
@@ -86,18 +87,22 @@ class UIStateManager:
 # Global instance for backward compatibility
 _ui_state_manager = UIStateManager()
 
+
 # Backward compatibility functions
 def tool_ui_message(message_type: str, text: str, **kwargs):
     """Send a UI message from a tool function to be displayed in the main thread."""
     _ui_state_manager.send_ui_message(message_type, text, **kwargs)
 
+
 def set_status_container(status_obj):
     """Set the global status container for tool messages."""
     _ui_state_manager.set_status_container(status_obj)
 
+
 def display_ui_message(ui_msg):
     """Display a UI message captured from the worker thread."""
     _ui_state_manager.display_ui_message(ui_msg)
+
 
 def set_ui_message_queue(queue_obj):
     """Set the global UI message queue."""
