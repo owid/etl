@@ -359,7 +359,7 @@ def run() -> None:
     tb = remap_categories(tb=tb)
 
     # Add region aggregates.
-    tb = paths.region_aggregator(
+    tb = paths.regions.aggregator(
         regions=REGIONS, index_columns=["country", "year", "producer_type", "technology"]
     ).add_aggregates(tb, min_num_values_per_year=1)
 

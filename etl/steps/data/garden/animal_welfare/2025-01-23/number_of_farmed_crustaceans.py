@@ -64,15 +64,6 @@ def run() -> None:
     ds_meadow = paths.load_dataset("number_of_farmed_crustaceans")
     tb = ds_meadow.read("number_of_farmed_crustaceans")
 
-    # Load regions dataset.
-    ds_regions = paths.load_dataset("regions")
-
-    # Load income groups dataset.
-    ds_income_groups = paths.load_dataset("income_groups")
-
-    # Load population dataset.
-    ds_population = paths.load_dataset("population")
-
     #
     # Process data.
     #
@@ -80,7 +71,7 @@ def run() -> None:
     tb = tb[list(COLUMNS)].rename(columns=COLUMNS, errors="raise")
 
     # Harmonize country names.
-    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+    tb = paths.regions.harmonize_names(tb=tb)
 
     # There are cases of "<1" in the data. Replace those with the average value in that range, namely 0.5.
     # Convert to float and change from million to units.
@@ -88,16 +79,10 @@ def run() -> None:
         tb[column] = tb[column].replace("< 1", "0.5").astype("Float64") * 1e6
 
     # Add region aggregates.
-    tb = geo.add_regions_to_table(
-        tb=tb,
-        ds_regions=ds_regions,
-        ds_income_groups=ds_income_groups,
-        regions=REGIONS_TO_ADD,
-        min_num_values_per_year=1,
-    )
+    tb = paths.regions.add_aggregates(tb=tb, regions=REGIONS_TO_ADD, min_num_values_per_year=1)
 
     # Add per capita number of farmed decapod crustaceans.
-    tb = add_per_capita_variables(tb=tb, ds_population=ds_population)
+    tb = paths.regions.add_per_capita(tb=tb, warn_on_missing_countries=False)
 
     # Run sanity checks on outputs.
     sanity_check_outputs(tb=tb)
