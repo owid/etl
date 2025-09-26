@@ -1,7 +1,7 @@
 from pathlib import Path
 
 import yaml
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from structlog import get_logger
 
 log = get_logger()
@@ -183,18 +183,27 @@ def _calculate_tiered_cost(cost_config, tokens: int) -> float:
 
 
 class DataFrameModel(BaseModel):
-    columns: list[str]
-    dtypes: dict[str, str]
-    data: list[list]  # small slice of data
-    total_rows: int
+    columns: list[str] = Field(description="List of column names in the DataFrame.")
+    dtypes: dict[str, str] = Field(description="Dictionary mapping column names to their data types.")
+    data: list[list] = Field(description="Sample rows from the DataFrame (limited for performance).")
+    total_rows: int = Field(description="Total number of rows in the original DataFrame.")
 
 
 class QueryResult(BaseModel):
-    message: str
-    valid: bool
-    result: DataFrameModel | None = None
-    url_metabase: str | None = None
-    url_datasette: str | None = None
+    message: str = Field(
+        description="Status message about the query execution. 'SUCCESS' if valid, otherwise error details."
+    )
+    valid: bool = Field(description="Whether the query executed successfully and returned data.")
+    result: DataFrameModel | None = Field(
+        default=None, description="The query results as a serialized DataFrame with sample data."
+    )
+    url_metabase: str | None = Field(
+        default=None, description="URL to the created Metabase question for interactive exploration."
+    )
+    url_datasette: str | None = Field(default=None, description="URL to view the query results in Datasette.")
+    card_id_metabase: int | None = Field(
+        default=None, description="Metabase card ID that can be used with plotting tools."
+    )
 
 
 def serialize_df(df, num_rows: int | None = None) -> DataFrameModel:
