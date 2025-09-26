@@ -240,19 +240,6 @@ Use `etlr` to run ETL steps:
 - `--downstream/-d`: Include downstream dependencies
 - `--exact-match/-x`: Steps must exactly match arguments
 
-## Updating ETL Steps
-
-When asked to update a step or steps, use the `etl update` command:
-
-### Update Workflow
-1. **Check available options**: Run `etl update --help` first to understand available options
-2. **Create update command**: Build the command based on user input and requirements
-  - If user requests "direct", use `--direct-only` flag
-3. **Dry run first**: Always run with `--dry-run` flag initially to preview changes
-4. **CRITICAL: Get approval**: **ALWAYS** stop and ask user for approval before proceeding with actual update. **NEVER** execute `etl update` commands without explicit user approval.
-5. **Execute update**: If approved, run the update command and continue with any follow-up tasks
-
-
 ## Git Workflow
 Create PR first, then commit files:
 
