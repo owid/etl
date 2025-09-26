@@ -59,7 +59,7 @@ definitions:
   description_short_labor_force_participation_rate: |-
     Share of the << sex >>working-age population << age >>who are economically active (employed or unemployed).
   description_short_unemployment_rate: |-
-    Share of the << sex >>labor force << age >>without work, but actively looking for a job and available to start soon.
+    Share of the << sex >>[labor force](#dod:labor-force) << age >>without work, but actively looking for a job and available to start soon.
   description_short_employment_to_population_ratio: |-
     Share of the << sex >>working-age population << age >>who are employed.
   description_short_vulnerable_employment: |-

@@ -264,7 +264,7 @@ tables:
         title: Unemployment rate - <<sex>> - <<classif1>>
         unit: "%"
         short_unit: "%"
-        description_short: Share of the{definitions.sex} labor force{definitions.age_unemployment} without work, but actively looking for a job and available to start soon.
+        description_short: Share of the{definitions.sex} [labor force](#dod:labor-force){definitions.age_unemployment} without work, but actively looking for a job and available to start soon.
         description_key:
           - "{definitions.description_key_iloest_modelled_data}"
           - "{definitions.description_key_13th_icls}"
