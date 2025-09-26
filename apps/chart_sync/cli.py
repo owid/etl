@@ -368,7 +368,7 @@ The following {chart_word} exist(s) in production but not in staging and may hav
 
 {chart_list}
 
-Make sure to delete them from production if this was intentional.
+chart-sync doesn't delete charts. Make sure to delete them from production if this was intentional.
     """.strip()
 
     print(message)
