@@ -14,6 +14,7 @@ from pydantic_ai import Agent
 from pydantic_ai.mcp import CallToolFunc, MCPServerStreamableHTTP, ToolResult
 from pydantic_ai.models.openai import OpenAIResponsesModelSettings
 from pydantic_ai.tools import RunContext
+from RestrictedPython import compile_restricted, safe_globals
 
 from apps.wizard.app_pages.expert_agent.media import save_code_file, save_plot_file
 from apps.wizard.app_pages.expert_agent.utils import CURRENT_DIR, MODEL_DEFAULT, QueryResult, log, serialize_df
@@ -619,7 +620,8 @@ async def generate_plot(
         }
 
         # Execute in safe environment
-        exec(plotting_code, {}, local_vars)
+        byte_code = compile_restricted(plotting_code, "<inline>", "exec")
+        exec(byte_code, safe_globals, local_vars)
 
         if "fig" not in local_vars:
             raise ValueError("Generated code did not create a 'fig' variable")
