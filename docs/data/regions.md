@@ -3,8 +3,7 @@
 ## Description of the dataset
 This dataset contains useful information about the countries and regions of OWID datasets.
 
-There are no `snapshot` or `meadow` steps for this data, only a `garden` step.
-We could consider creating a `grapher` step to feed the charts on [the region definitions page](https://ourworldindata.org/world-region-map-definitions).
+There are no `snapshot` or `meadow` steps for this data, only a `garden` and a `grapher` step. The latter feeds the charts on [the region definitions page](https://ourworldindata.org/world-region-map-definitions).
 
 All tables in the dataset are indexed by `code`, which is defined as the ISO alpha-3 code, when it exists, and otherwise as a custom OWID code. For example, since Europe doesn't have an ISO code, it has the code `OWID_EUR`. There are no specific rules for how to define these custom codes, but as a guideline:
 
