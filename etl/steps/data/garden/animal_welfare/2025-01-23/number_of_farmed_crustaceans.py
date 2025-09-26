@@ -1,8 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -31,17 +30,6 @@ REGIONS_TO_ADD = [
     "Lower-middle-income countries",
     "High-income countries",
 ]
-
-
-def add_per_capita_variables(tb: Table, ds_population: Dataset) -> Table:
-    tb = geo.add_population_to_table(tb, ds_population=ds_population, warn_on_missing_countries=False)
-    tb["n_farmed_crustaceans_low_per_capita"] = tb["n_farmed_crustaceans_low"] / tb["population"]
-    tb["n_farmed_crustaceans_per_capita"] = tb["n_farmed_crustaceans"] / tb["population"]
-    tb["n_farmed_crustaceans_high_per_capita"] = tb["n_farmed_crustaceans_high"] / tb["population"]
-    # Drop population column.
-    tb = tb.drop(columns=["population"], errors="raise")
-
-    return tb
 
 
 def sanity_check_outputs(tb: Table) -> None:
