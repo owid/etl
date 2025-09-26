@@ -2287,7 +2287,7 @@ class TestCreateTableOfRegionsAndSubregions(unittest.TestCase):
         with self.assertRaises(ValueError) as context:
             aggregator.add_aggregates(tb_in)
 
-        self.assertIn("no population dataset provided", str(context.exception))
+        self.assertIn("Population dataset could not be loaded", str(context.exception))
 
     def test_no_regions_to_unpack(self):
         """Test scenario where no regions need unpacking (all members are countries)."""

@@ -2224,17 +2224,12 @@ class RegionAggregator:
 
         # Extract only the columns we actually need to improve performance.
         # Include index columns, aggregated columns, and any weight columns for weighted means
-        weight_columns = []
+        weight_columns = set()
         for agg_func in self.aggregations.values():
             if isinstance(agg_func, str) and agg_func.startswith("mean_weighted_by_"):
                 weight_col = agg_func.replace("mean_weighted_by_", "")
                 # Add population column if needed for population weighting
                 if weight_col == self.population_col and weight_col not in tb.columns:
-                    if self._ds_population is None:
-                        raise ValueError(
-                            f"Population column '{self.population_col}' not found in table, and no population dataset provided. "
-                            f"Add population dataset as a dependency or include population column in your table."
-                        )
                     tb = add_population_to_table(
                         tb=tb,
                         ds_population=self.ds_population,  # type: ignore
@@ -2242,14 +2237,11 @@ class RegionAggregator:
                         year_col=self.year_col,
                         population_col=self.population_col,
                         warn_on_missing_countries=False,
-                        show_full_warning=True,
-                        interpolate_missing_population=False,
-                        expected_countries_without_population=None,
                     )
-                if weight_col not in weight_columns and weight_col in tb.columns:
-                    weight_columns.append(weight_col)
+                if weight_col in tb.columns:
+                    weight_columns.add(weight_col)
 
-        needed_columns = self.index_columns + columns + weight_columns
+        needed_columns = self.index_columns + columns + list(weight_columns)
         tb_fast = tb[needed_columns]
         other_columns = [col for col in tb.columns if col not in needed_columns]
 
