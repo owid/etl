@@ -70,40 +70,17 @@ etl indicator-upgrade match --old-dataset-id [OLD_DATASET_ID] --new-dataset-id [
 
 ## Step 3 - Check for remaining unmapped variables
 
-Check if there are any old variables used in charts that still lack a mapping entry after perfect matching:
+Parse the output from the `etl indicator-upgrade match` command to identify any unmapped variables that are used in charts. The command output will show variables that could not be automatically matched.
 
-```sql
-mysql -h staging-site-[branch] -u owid --port 3306 -D owid -e "
-SELECT COUNT(*) AS unmapped_count
-FROM (
-  SELECT DISTINCT v.id
-  FROM variables v
-  JOIN chart_dimensions cd ON v.id = cd.variableId
-  WHERE v.datasetId = [OLD_DATASET_ID]
-) v_old
-LEFT JOIN wiz__variable_mapping vm ON v_old.id = vm.id_old
-WHERE vm.id_old IS NULL;"
-```
+Look for output indicating unmapped variables, such as:
+- "Found X unmapped variables used in charts"
+- Variable listings with IDs and names that need manual mapping
 
 ## Step 4 - Handle remaining unmapped variables (conditional)
 
-**If unmapped_count > 0**:
+**If unmapped variables are found in the match command output**:
 
-1. List the unmapped variables:
-
-```sql
-mysql -h staging-site-[branch] -u owid --port 3306 -D owid -e "
-SELECT v_old.id AS old_id, v_old.name AS old_name
-FROM (
-  SELECT DISTINCT v.id, v.name
-  FROM variables v
-  JOIN chart_dimensions cd ON v.id = cd.variableId
-  WHERE v.datasetId = [OLD_DATASET_ID]
-) v_old
-LEFT JOIN wiz__variable_mapping vm ON v_old.id = vm.id_old
-WHERE vm.id_old IS NULL
-ORDER BY v_old.name;"
-```
+1. Count the unmapped variables from the command output
 
 2. **STOP** and tell the user:
    - "Found [N] unmapped variables that are used in charts"
@@ -112,7 +89,7 @@ ORDER BY v_old.name;"
 
 3. **Wait for user confirmation**. Only proceed when user replies exactly "done" (case-insensitive).
 
-**If unmapped_count = 0**: Continue to next step.
+**If no unmapped variables are found**: Continue to next step.
 
 ## Step 5 - Dry run
 
