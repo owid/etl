@@ -360,7 +360,7 @@ async def agent_stream_iter_with_updates(
     updates_queue,
 ):
     """Stream output that can send session updates through a queue."""
-    with st.status("Talking with the expert...", expanded=False) as status:
+    with st.status("Talking with the expert...", expanded=False) as _:
         st.markdown(
             f"**:material/smart_toy: Agent working**: `{model_name}`",
         )
