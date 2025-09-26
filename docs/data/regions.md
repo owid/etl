@@ -49,11 +49,7 @@ Tables contained in the `regions` dataset:
 
 ## Working with regions data in ETL steps
 
-The regions dataset is commonly used in ETL steps through the `Regions` class, which provides convenient methods for working with regions data. In ETL steps, you can access this through `paths.regions`.
-
-!!! tip "Advanced usage"
-
-    For more advanced features like region overlap detection and custom region definitions, see the docstrings of the `Regions` class in `etl/data_helpers/geo.py`.
+The `Regions` class provides convenient methods for working with the regions dataset. In ETL steps, you can access this object through `paths.regions` (where `paths` is an instance of `PathFinder`).
 
 ### Accessing region information
 
@@ -65,13 +61,8 @@ regions = Regions()
 regions.get_region("Europe")["members"]
 
 # Get multiple regions with their members
-regions.get_regions(
-    ["Africa", "High-income countries"],
-    only_members=True
-)
+regions.get_regions(["Africa", "High-income countries"], only_members=True)
 ```
-
-If you are working from an ETL data step, note that you can directly call `paths.regions` (where `paths` is an instance of `PathFinder`).
 
 ### Country harmonization
 
@@ -93,25 +84,22 @@ Add region aggregates (continents, income groups, World) to your data:
 # Simple region aggregation
 tb = paths.regions.add_aggregates(tb)
 
-# Custom region aggregation with specific regions and aggregation methods
+# Custom regions with custom aggregation with specific regions and aggregation methods
 tb = paths.regions.add_aggregates(
     tb,
-    regions=["World", "Europe", "High-income countries"],
-    aggregations={"gdp": "sum", "population": "sum"}
+    regions={
+        "Asia": {},  # No need to define anything, since it is a default region.
+        "Asia excluding China": {  # Custom region that must be defined based on other known regions and countries.
+            "additional_regions": ["Asia"],
+            "excluded_members": ["China"],
+        },
+        "High-income countries": {},
+    },
+    aggregations={"population": "sum", "gdp": "mean_weighted_by_population"}
 )
 ```
 
-We have a custom aggregate method `mean_weighted_by_X` which will create a weighted mean, weighted by `X`, where `X` is a given column in the table. If `X` happens to be `population`, and it's not in the table, it will be added automatically (if so, the population dataset needs to be among the dependencies of the current data step).
-```python
-# Population-weighted aggregation (useful for rates, percentages, densities)
-tb = paths.regions.add_aggregates(
-    tb,
-    regions=["World"],
-    aggregations={
-        "gdp_per_capita": "mean_weighted_by_population",
-    }
-)
-```
+Note that we have a custom aggregate method `mean_weighted_by_X` which creates a mean weighted by `X`, where `X` is a given column in the table. If `X` is `population`, and it's not in the table, it will be added automatically (if so, the population dataset needs to be among the dependencies of the current data step).
 
 ### Per capita calculations
 
@@ -142,6 +130,11 @@ agg = paths.regions.aggregator(regions=["World"], aggregations={"gdp": "sum"})
 tb = agg.add_aggregates(tb)
 tb = agg.add_per_capita(tb, columns=["gdp"])
 ```
+
+!!! tip "Advanced usage"
+
+    For more advanced features of `Regions` and `RegionAggregator`, like region overlap detection and custom region definitions, see the docstrings of the `Regions` class in `etl/data_helpers/geo.py`.
+
 
 ## How to make changes to the dataset
 
