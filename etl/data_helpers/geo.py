@@ -1576,12 +1576,15 @@ class Regions:
 
     It can also be used in the context of an ETL data step, e.g. to generate the country name harmonization file, or to apply that harmonization to a table.
 
-    Simply create a regions object:
+    - Initialization:
+    If you are working from within an ETL step, PathFinder already has access Regions. So, typically, you can simply do:
+    > paths.regions
+    And there you have access to all operations mentioned below. Otherwise, if you don't have access to PathFinder, you can initialize a regions object as
     > regions = Regions()
-    and then:
+
     - Access the members of a region:
     > regions.get_region("Europe")["members"]
-    more generally, paths.regions.get_region("Europe") gives a dictionary with all info of the region given in the regions dataset.
+    More generally, paths.regions.get_region("Europe") gives a dictionary with all info of the region given in the regions dataset.
 
     - Access a list of regions:
     > regions.get_regions(["Africa", "High-income countries"])
@@ -1589,13 +1592,27 @@ class Regions:
     > regions.get_regions(["Africa", "High-income countries"], only_members=True)
     returns a dictionary {"Africa": ["Algeria", "Angola", ...], "High-income countries": [...], ...}
 
-    The Regions object is instantiated with PathFinder, so, within an ETL step, one can e.g.:
     - Create a countries harmonization file for the current dataset:
-    > paths.regions.harmonizer()
+    > regions.harmonizer()
     This will start the interactive harmonizer on the interactive window.
 
-    - Apply the country name harmonization to a table, without having to specify the path to the countries file or the excluded countries file.
-    > tb = paths.regions.harmonize_names(tb)
+    - Applying the country name harmonization to a table:
+    > regions.harmonize_names(tb)
+
+    - Creating region aggregates (simple use):
+    > regions.add_aggregates(tb)
+
+    - Creating per capita indicators (simple use):
+    > regions.add_per_capita(tb)
+
+    - Creating region aggregates and/or per capita indicators (advance use):
+    # NOTE: It's unclear if this use case will be common. If not, consider removing the additional complexity.
+    For better performance, especially when you are handling multiple tables, you may want to create an aggregator object per table, e.g.
+    > tb1_agg = regions.aggregator()
+    > tb1 = tb1_agg.add_aggregates(tb=tb1)
+    > tb1 = tb1_agg.add_per_capita(tb=tb1)
+    > tb2_agg = regions.aggregator()
+    > tb2 = tb2_agg.add_aggregates(tb=tb2)
 
     """
 
@@ -2030,21 +2047,9 @@ class Regions:
 class RegionAggregator:
     """Manages operations on tables that have, or need to have, region aggregates.
 
-    The aggregator is typically created through the `paths.region_aggregator()` method (using PathFinder), which pre-configures it with the necessary inputs.
+    The aggregator is typically created through the `paths.regions.aggregator()` method (using Regions via PathFinder), which pre-configures it with the necessary inputs.
 
-    Examples
-    --------
-    * If you just want to add region aggregates to a table, you can, e.g.:
-    > tb = paths.region_aggregator().add_aggregates(tb)
-
-    * You can add per capita indicators in a similar way (regardless of whether you have created region aggregates):
-    > tb = paths.region_aggregator().add_per_capita(tb)
-
-    * A more efficient way to achieve these calculations would be:
-    > tb_agg = paths.region_aggregator()
-    > tb = tb_agg.add_aggregates(tb)
-    > tb = tb_agg.add_per_capita(tb)
-    This avoids repeating certain calculations twice. However, if your table changes index after creating aggregates (e.g. if you pivot or melt), then you need to define tb_agg again and pass the new index_columns argument.
+    See more examples in the documentation of the Regions class.
 
     Parameters
     ----------
