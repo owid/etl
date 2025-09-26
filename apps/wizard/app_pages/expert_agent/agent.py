@@ -482,7 +482,6 @@ async def execute_query(query: str, title: str, description: str, num_rows: int 
         try:
             url_metabase = create_question_in_metabase(query=query, title=title, description=description)
         except Exception as _:
-            url_datasette = url_datasette
             url_metabase = None
         return QueryResult(
             message="SUCCESS",
@@ -589,7 +588,7 @@ async def get_question_data(card_id: int, num_rows: int = 20) -> QueryResult:
 
     q_name = question.get("name", "Unknown")
     st.markdown(
-        f"**:material/construction: Tool use**: Getting data from a Metabase question, via `get_question_data`, using id `{card_id}` for questio nnamed '{q_name}'"
+        f"**:material/construction: Tool use**: Getting data from a Metabase question, via `get_question_data`, using id `{card_id}` for question named '{q_name}'"
     )
 
     # GEnerate URL

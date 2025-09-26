@@ -30,6 +30,7 @@ Assumptions:
 (Checkpoint rule: After you finish each item below that represents a workflow step, immediately run the CHECKPOINT procedure. Do not batch multiple steps before a checkpoint.)
 - [ ] Parse inputs and resolve: channel, namespace, version, short_name, old_version, branch
 - [ ] Clean workbench directory: delete `workbench/<short_name>` unless continuing existing update
+- [ ] Run ETL update workflow via `etl-update` subagent (help → dry run → approval → real run)
 - [ ] Create or reuse draft PR and work branch
 - [ ] Update snapshot and compare to previous version; capture summary
 - [ ] Meadow step: run + fix + diff + summarize
@@ -58,7 +59,7 @@ Procedure (each time):
 ## Mandatory per-step checkpoints (rule)
 
 You MUST:
-- Stop after each workflow step (1–6) and run CHECKPOINT before starting the next.
+- Stop after each workflow step (1–6) and run CHECKPOINT before starting the next (step 7 is optional and still requires a checkpoint if executed).
 - Never chain multiple steps inside a single approval.
 - Treat missing or ambiguous replies as no.
 
@@ -69,25 +70,29 @@ You MUST:
    - If starting fresh: delete `workbench/<short_name>` directory if it exists
    - Create fresh `workbench/<short_name>` directory for artifacts
 
-1) Create PR and run step updater via subagent (dataset-update-pr)
-   - Inputs: `<namespace>/<old_version>/<short_name>`
-   - Creates draft PR and updates steps to new version
+1) Run ETL update command (etl-update subagent)
+   - Inputs: `<namespace>/<old_version>/<short_name>` plus any required flags
+   - Perform help check, dry run, approval, then real execution; capture summary for later PR notes
    - CHECKPOINT (stop → summarize → ask → require yes)
-2) Snapshot update & compare (snapshot-updater subagent)
-   - Inputs: `<namespace>/<new_version>/<short_name>` and `<old_version>`
-   - Save summary to `workbench/<short_name>/snapshot-updater.md`
+2) Create PR and integrate update via subagent (etl-pr)
+   - Inputs: `<namespace>/<old_version>/<short_name>`
+   - Create or reuse draft PR, set up work branch, and incorporate the ETL update outputs
    - CHECKPOINT
-3) Meadow step repair/verify (step-fixer subagent, channel=meadow)
+3) Snapshot run & compare (snapshot-runner subagent)
+   - Inputs: `<namespace>/<new_version>/<short_name>` and `<old_version>`
+   - Save summary to `workbench/<short_name>/snapshot-runner.md`
+   - CHECKPOINT
+4) Meadow step repair/verify (step-fixer subagent, channel=meadow)
    - Run, fix, re-run; produce diffs
    - Save diffs and summaries
    - CHECKPOINT
-4) Garden step repair/verify (step-fixer subagent, channel=garden)
+5) Garden step repair/verify (step-fixer subagent, channel=garden)
    - Same pattern as Meadow
    - CHECKPOINT
-5) Grapher step run/verify (step-fixer subagent, channel=grapher, add --grapher)
+6) Grapher step run/verify (step-fixer subagent, channel=grapher, add --grapher)
    - Skip diff; verify variables/metadata
    - CHECKPOINT
-6) Indicator upgrade (optional, staging only)
+7) Indicator upgrade (optional, staging only)
    - Use indicator-upgrader subagent with `<short_name> <branch>`
    - CHECKPOINT (if executed)
 
@@ -100,7 +105,7 @@ You MUST:
 
 ## Artifacts (expected)
 
-- `workbench/<short_name>/snapshot-updater.md`
+- `workbench/<short_name>/snapshot-runner.md`
 - `workbench/<short_name>/progress.md`
 - `workbench/<short_name>/meadow_diff_raw.txt` and `meadow_diff.md`
 - `workbench/<short_name>/garden_diff_raw.txt` and `garden_diff.md`

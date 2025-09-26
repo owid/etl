@@ -1,9 +1,18 @@
-# CLAUDE.md
+# Agent Guide
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to automation agents working with code in this repository.
 
 # Individual Preferences
 - @~/.claude/instructions/etl.md
+
+## Critical Rules
+
+⚠️ **NEVER mask problems - fix them systematically:**
+- **NEVER** return empty tables, comment out failing code, or create workarounds
+- **NEVER** catch and ignore exceptions without fixing the root cause
+- **ALWAYS** trace issues upstream through the pipeline: snapshot → meadow → garden → grapher
+- **ALWAYS** provide full error tracebacks - don't truncate diagnostic information
+- **If unsure, ASK THE USER** - don't guess or mask issues
 
 ## Architecture Overview
 
@@ -98,6 +107,15 @@ etl d prune             # Remove orphaned datasets
 # Specific step types
 pytest tests/test_etl_step_code.py::test_step_name  # Test single step
 ```
+
+## Additional Tools
+
+Get `--help` for details on any command.
+
+### etl archive
+
+Archive old datasets.
+
 
 ## Key Development Patterns
 
@@ -221,7 +239,6 @@ Use `etlr` to run ETL steps:
 - `--only/-o`: Run only selected step (no dependencies)
 - `--downstream/-d`: Include downstream dependencies
 - `--exact-match/-x`: Steps must exactly match arguments
-
 
 ## Git Workflow
 Create PR first, then commit files:
