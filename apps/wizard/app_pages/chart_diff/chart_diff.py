@@ -18,7 +18,7 @@ from apps.wizard.utils.components import st_cache_data
 from etl.analytics.data import get_chart_views_last_n_days, get_post_views_last_n_days
 from etl.config import OWID_ENV
 from etl.db import read_sql
-from etl.git_helpers import get_changed_files, log_time
+from etl.git_helpers import get_changed_files
 from etl.grapher import model as gm
 from etl.io import get_all_changed_catalog_paths
 
@@ -787,7 +787,7 @@ class ChartDiffsLoader:
         return pd.DataFrame(summary)
 
 
-@log_time
+# @log_time
 def _modified_data_metadata_on_staging(
     source_session: Session, target_session: Session, chart_ids: Optional[List[int]] = None
 ) -> pd.DataFrame:
@@ -894,7 +894,7 @@ def _modified_data_metadata_on_staging(
     return diff
 
 
-@log_time
+# @log_time
 def _modified_chart_configs_on_staging(
     source_session: Session, target_session: Session, chart_ids: Optional[List[int]] = None
 ) -> pd.DataFrame:
@@ -976,7 +976,7 @@ def _modified_chart_configs_on_staging(
     return diff[["configEdited", "chartEditedInStaging"]]
 
 
-@log_time
+# @log_time
 def _modified_tags_on_staging(
     source_session: Session, target_session: Session, chart_ids: Optional[List[int]] = None
 ) -> pd.DataFrame:
@@ -1036,6 +1036,36 @@ def _modified_tags_on_staging(
     diff["tagsEdited"] = diff["tagsEdited"] | (source_df["tagIds"].isnull() != target_df["tagIds"].isnull())
 
     return diff[["tagsEdited"]]
+
+
+def get_chart_id_slug_pairs(session: Session) -> set[tuple[int, str]]:
+    """Get all (chart_id, slug) pairs from a database as a set for efficient operations."""
+    from sqlalchemy import text
+
+    query = text("""
+    SELECT c.id, cc.slug
+    FROM charts c
+    JOIN chart_configs cc ON c.configId = cc.id
+    WHERE cc.slug IS NOT NULL
+    """)
+    result = session.execute(query).fetchall()
+    return set((row[0], row[1]) for row in result)
+
+
+def get_deleted_charts(source_session: Session, target_session: Session) -> list[dict]:
+    """Get charts that exist in target but not in source (deleted charts).
+
+    This function matches on (id, slug) pairs to identify truly deleted charts,
+    using efficient set operations.
+    """
+    source_pairs = get_chart_id_slug_pairs(source_session)
+    target_pairs = get_chart_id_slug_pairs(target_session)
+
+    # Find (id, slug) pairs that exist in target but not in source
+    deleted_pairs = target_pairs - source_pairs
+
+    # Return list of deleted charts with their info
+    return [{"id": chart_id, "slug": slug} for chart_id, slug in deleted_pairs]
 
 
 def modified_charts_on_staging(
