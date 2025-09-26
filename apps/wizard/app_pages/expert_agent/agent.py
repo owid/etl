@@ -151,6 +151,7 @@ def run_agent_stream(prompt: str, structured: bool = False):
         from apps.wizard.app_pages.expert_agent.stream import agent_stream_sync_structured
 
         stream_func = agent_stream_sync_structured
+
     else:
         from apps.wizard.app_pages.expert_agent.stream import agent_stream_sync
 
