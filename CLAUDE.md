@@ -1,6 +1,6 @@
-# CLAUDE.md
+# Agent Guide
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to automation agents working with code in this repository.
 
 # Individual Preferences
 - @~/.claude/instructions/etl.md
