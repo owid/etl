@@ -1927,6 +1927,13 @@ class RegionAggregator:
             # regions is already a dict
             self.regions = regions
 
+        # If "regions" is passed as a list, it can only contain regions that are known to the regions dataset.
+        # On the other hand, if it is a dictionary, it can have custom regions.
+        if isinstance(regions, list):
+            unknown_regions = [region for region in regions if region not in regions_all]
+            if unknown_regions:
+                raise ValueError(f"Unknown regions in list: {unknown_regions}")
+
         # Create a list of all possible regions, which includes any possible custom region.
         self.regions_all = sorted(set(regions_all) | set(self.regions))
 
@@ -2090,9 +2097,15 @@ class RegionAggregator:
         # Create region aggregates.
         dfs_with_regions = []
         for region in regions:
+            # Select data for countries in the region.
+            df_region_data = tb[tb[self.country_col].isin(self.regions_members[region])]
+
+            if df_region_data.empty:
+                continue
+
+            # Create region aggregates (both regular and possibly weighted aggregations).
             df_region = groupby_agg(
-                # Select data for countries in the region.
-                df=tb[tb[self.country_col].isin(self.regions_members[region])],
+                df=df_region_data,
                 groupby_columns=[column for column in self.index_columns if column != self.country_col],
                 aggregations=aggregations,
                 num_allowed_nans=num_allowed_nans_per_year,
@@ -2102,7 +2115,6 @@ class RegionAggregator:
 
             # Add a column for region name.
             df_region[self.country_col] = region
-
             dfs_with_regions.append(df_region)
 
         # Concatenate aggregates of all regions.
@@ -2137,7 +2149,7 @@ class RegionAggregator:
 
     def add_aggregates(
         self,
-        tb: TableOrDataFrame,
+        tb: Table,
         num_allowed_nans_per_year: int | None = None,
         frac_allowed_nans_per_year: float | None = None,
         min_num_values_per_year: int | None = None,
@@ -2209,21 +2221,42 @@ class RegionAggregator:
 
         # Define the list of (non-index) columns for which aggregates will be created.
         columns = list(self.aggregations)
-        # Define the list of other non-index columns (if any) for which no aggregates need to be created.
-        other_columns = [column for column in tb.columns if column not in (self.index_columns + columns)]
 
+        # Extract only the columns we actually need to improve performance.
+        # Include index columns, aggregated columns, and any weight columns for weighted means
+        weight_columns = set()
+        for agg_func in self.aggregations.values():
+            if isinstance(agg_func, str) and agg_func.startswith("mean_weighted_by_"):
+                weight_col = agg_func.replace("mean_weighted_by_", "")
+                # Add population column if needed for population weighting
+                if weight_col == self.population_col and weight_col not in tb.columns:
+                    tb = add_population_to_table(
+                        tb=tb,
+                        ds_population=self.ds_population,  # type: ignore
+                        country_col=self.country_col,
+                        year_col=self.year_col,
+                        population_col=self.population_col,
+                        warn_on_missing_countries=False,
+                    )
+                if weight_col in tb.columns:
+                    weight_columns.add(weight_col)
+
+        needed_columns = self.index_columns + columns + list(weight_columns)
+        tb_fast = tb[needed_columns]
+        other_columns = [col for col in tb.columns if col not in needed_columns]
+
+        # Run everything on the fast subset instead of full DataFrame
         if check_for_region_overlaps:
-            # Find overlaps between historical regions and successors.
             self.inspect_overlaps_with_historical_regions(
-                tb=tb,
+                tb=tb_fast,
                 accepted_overlaps=accepted_overlaps,
                 ignore_overlaps_of_zeros=ignore_overlaps_of_zeros,
                 subregion_type=subregion_type,
             )
 
-        # Create a table of region aggregates (just the regions, not individual countries).
+        # Create region aggregates on fast subset
         df_only_regions = self._create_table_of_only_region_aggregates(
-            tb=tb,
+            tb=tb_fast,
             regions=list(self.regions),
             aggregations=self.aggregations,
             num_allowed_nans_per_year=num_allowed_nans_per_year,
@@ -2231,10 +2264,9 @@ class RegionAggregator:
             min_num_values_per_year=min_num_values_per_year,
         )
 
-        # If a list of countries that must be informed was given, remove (make nan) aggregations where any of those countries was missing in the data.
         if countries_that_must_have_data is not None:
             if self.tb_coverage is None:
-                self._create_coverage_table(tb=tb)
+                self._create_coverage_table(tb=tb_fast)
             self._impose_countries_that_must_have_data(
                 df_only_regions=df_only_regions,
                 columns=columns,
@@ -2256,18 +2288,17 @@ class RegionAggregator:
         # Combine the table with only regions and the table with no regions.
         df_with_regions = pd.concat([df_only_regions, df_no_regions], ignore_index=True)  # type: ignore
 
-        # Sort rows and columns conveniently.
+        # Final sort and column ordering.
         df_with_regions = df_with_regions.sort_values(self.index_columns).reset_index(drop=True)[tb.columns]
 
-        # Convert country to categorical if the original was
+        # Convert country to categorical if the original was.
         if tb[self.country_col].dtype.name == "category":
             df_with_regions = df_with_regions.astype({self.country_col: "category"})
 
-        # If the original object was a Table, copy metadata
-        if isinstance(tb, Table):
-            return Table(df_with_regions).copy_metadata(tb)
-        else:
-            return df_with_regions  # type: ignore
+        # Create a table with the same metadata as the original one.
+        tb_with_regions = Table(df_with_regions).copy_metadata(tb)
+
+        return tb_with_regions
 
     def add_per_capita(
         self,
