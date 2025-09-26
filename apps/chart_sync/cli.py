@@ -11,7 +11,13 @@ from rich_click.rich_command import RichCommand
 from sqlalchemy.orm import Session
 
 from apps.chart_sync.admin_api import AdminAPI
-from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiff, ChartDiffsLoader, configs_are_equal, tags_are_equal
+from apps.wizard.app_pages.chart_diff.chart_diff import (
+    ChartDiff,
+    ChartDiffsLoader,
+    configs_are_equal,
+    get_deleted_charts,
+    tags_are_equal,
+)
 from apps.wizard.utils import get_staging_creation_time
 from etl import config
 from etl.config import OWIDEnv, get_container_name
@@ -273,6 +279,14 @@ def cli(
             # Sync DoDs
             dods_synced = _sync_dods(source_session, target_session, target_api, dry_run, SERVER_CREATION_TIME)
 
+            # Check for deleted charts and notify
+            deleted_charts = get_deleted_charts(source_session, target_session)
+            if deleted_charts:
+                log.info(
+                    "chart_sync.deleted_charts", count=len(deleted_charts), chart_ids=[c["id"] for c in deleted_charts]
+                )
+                _notify_slack_deleted_charts(deleted_charts, str(source), dry_run)
+
     if charts_synced > 0:
         print(f"\n[bold green]Charts synced: {charts_synced}[/bold green]")
     if dods_synced > 0:
@@ -326,6 +340,35 @@ DoD "{dod_name}" has been updated in production after staging server was created
 *Staging Updated*: {str(source_updated_at)} UTC
 *Production Updated*: {str(target_updated_at)} UTC
 *Staging Created*: {str(server_creation_time)} UTC
+    """.strip()
+
+    print(message)
+
+    if config.SLACK_API_TOKEN and not dry_run:
+        send_slack_message(channel="#data-architecture-github", message=message)
+
+
+def _notify_slack_deleted_charts(deleted_charts: list[dict], source: str, dry_run: bool) -> None:
+    """Notify about deleted charts via Slack."""
+    chart_count = len(deleted_charts)
+    chart_word = "chart" if chart_count == 1 else "charts"
+
+    # Build list of deleted charts for the message
+    chart_list = "\n".join(
+        [
+            f"• Chart {chart['id']}: `{chart['slug']}` - <https://admin.owid.io/admin/charts/{chart['id']}/edit|View on Production>"
+            for chart in deleted_charts
+        ]
+    )
+
+    message = f"""
+:warning: *ETL chart-sync: {chart_count} Deleted {chart_word.title()} Detected* from `{source}`
+
+The following {chart_word} exist(s) in production but not in staging and may have been deleted:
+
+{chart_list}
+
+Make sure to delete them from production if this was intentional.
     """.strip()
 
     print(message)
