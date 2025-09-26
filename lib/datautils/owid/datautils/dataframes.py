@@ -265,17 +265,13 @@ def _calculate_weighted_mean(
     valid_count = len(valid_values)
     nan_count = total_count - valid_count
 
-    # Apply NaN handling rules
-    if num_allowed_nans is not None and nan_count > num_allowed_nans:
+    # Apply NaN handling rules to follow the same logic as for the non-weighted aggregations (defined in groupby_agg).
+    if (num_allowed_nans is not None) and (nan_count > num_allowed_nans):
         return np.nan
-    if frac_allowed_nans is not None and total_count > 0:
-        nan_fraction = nan_count / total_count
-        if nan_fraction > frac_allowed_nans:
-            return np.nan
-    if min_num_values is not None and valid_count < min_num_values:
-        if nan_count > 0:  # Exception: accept if all values are valid
-            return np.nan
-
+    if (frac_allowed_nans is not None) and (total_count > 0) and (nan_count / total_count > frac_allowed_nans):
+        return np.nan
+    if (min_num_values is not None) and (valid_count < min_num_values) and (nan_count > 0):
+        return np.nan
     if len(valid_values) == 0:
         return np.nan
     return float(np.average(valid_values, weights=valid_weights))
