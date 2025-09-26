@@ -108,8 +108,19 @@ def _get_model_from_name(model_name: str):
     return model
 
 
+########################
+# CORE STREAMING       #
+########################
+
+
 def _agent_stream_sync(
-    agent, prompt: str, model_name: str, message_history, func_stream, session_updates_callback=None
+    agent,
+    prompt: str,
+    model_name: str,
+    message_history,
+    func_stream,
+    session_updates_callback=None,
+    question_id: str | None = None,
 ):
     text_q: "queue.Queue[AnswerChunk | str | None]" = queue.Queue()
     updates_q: "queue.Queue[dict | None]" = queue.Queue()
@@ -127,6 +138,7 @@ def _agent_stream_sync(
                 model_name,
                 message_history,
                 updates_q,
+                question_id,
             ):
                 text_q.put(chunk)
         except Exception as e:
@@ -173,6 +185,99 @@ def _agent_stream_sync(
         except queue.Empty:
             # No text chunk available yet, continue to check for UI messages
             continue
+
+
+########################
+# REGULAR STREAMING    #
+########################
+
+
+def agent_stream_sync(
+    agent, prompt: str, model_name: str, message_history, session_updates_callback=None, question_id: str | None = None
+):
+    """Synchronous wrapper for agent_stream that works with st.write_stream.
+
+    This bridges the async generator to a sync generator using a queue and thread,
+    allowing real-time streaming while maintaining compatibility with Streamlit.
+
+    It includes a function `session_updates_callback` that is called with session state updates originated in a separate thread.
+
+    Args:
+        prompt: User prompt
+        model_name: Model to use
+        message_history: Chat history
+        session_updates_callback: Function to call with session state updates
+        question_id: Unique identifier for this question/conversation turn
+    """
+
+    yield _agent_stream_sync(
+        agent=agent,
+        prompt=prompt,
+        model_name=model_name,
+        message_history=message_history,
+        func_stream=agent_stream_with_updates,
+        session_updates_callback=session_updates_callback,
+        question_id=question_id,
+    )
+
+
+async def agent_stream_with_updates(
+    agent,
+    prompt: str,
+    model_name: str,
+    message_history,
+    updates_queue,
+    question_id: str | None = None,
+):
+    """Stream output that can send session updates through a queue."""
+    model = _get_model_from_name(model_name)
+
+    # Prepare deps for tools
+    deps = {"question_id": question_id} if question_id else {}
+
+    # Run agent with text output (original behavior)
+    async with agent.run_stream(
+        prompt,
+        model=model,  # type: ignore
+        message_history=message_history,
+        deps=deps,
+        event_stream_handler=event_stream_handler,
+    ) as result:
+        # Send agent result info through updates queue
+        updates_queue.put({"agent_result": result})
+
+        # Yield text chunks
+        async for message in result.stream_text(delta=True):
+            if message is not None:
+                yield message
+
+        # Send final updates (usage info, etc.)
+        if hasattr(result, "usage"):
+            updates_queue.put({"last_usage": result.usage()})
+
+
+async def event_stream_handler(
+    ctx: RunContext,
+    event_stream: AsyncIterable[AgentStreamEvent],
+):
+    async for event in event_stream:
+        if isinstance(event, FunctionToolCallEvent):
+            # Show tool call in Streamlit UI
+            tool_ui_message(
+                "markdown",
+                f"**:material/construction: :green[:material/arrow_outward:] Tool call**: `{event.part.tool_name}`, with args {event.part.args}",
+            )
+
+        elif isinstance(event, FunctionToolResultEvent):
+            # Show tool result in Streamlit UI
+            tool_ui_message(
+                "markdown",
+                f"**:material/construction: :gray[:material/call_received:] Tool return**:  Tool `{event.result.tool_name}` completed",
+            )
+
+        elif isinstance(event, FinalResultEvent):
+            # Show final result start in Streamlit UI
+            tool_ui_message("markdown", "**:material/check: Final Result**: Starting to generate response")
 
 
 ########################
@@ -223,7 +328,9 @@ class AnswerChunk(BaseModel):
         return cls(type="metabase_question", content=url)
 
 
-def agent_stream_sync_structured(agent, prompt: str, model_name: str, message_history, session_updates_callback=None):
+def agent_stream_sync_structured(
+    agent, prompt: str, model_name: str, message_history, session_updates_callback=None, question_id: str | None = None
+):
     """Synchronous wrapper for structured output streaming with st.write_stream compatibility.
 
     Returns structured chunks (AnswerChunk objects) instead of plain text.
@@ -236,6 +343,7 @@ def agent_stream_sync_structured(agent, prompt: str, model_name: str, message_hi
         message_history=message_history,
         func_stream=agent_stream_with_updates_structured,
         session_updates_callback=session_updates_callback,
+        question_id=question_id,
     )
 
 
@@ -245,10 +353,14 @@ async def agent_stream_with_updates_structured(
     model_name: str,
     message_history,
     updates_queue,
+    question_id: str | None = None,
 ):
     """Stream output that can send session updates through a queue. Uses structured output."""
     # Get model
     model = _get_model_from_name(model_name)
+
+    # Prepare deps for tools
+    deps = {"question_id": question_id} if question_id else {}
 
     # Run agent with structured output
     async with agent.run_stream(
@@ -256,6 +368,7 @@ async def agent_stream_with_updates_structured(
         model=model,  # type: ignore
         message_history=message_history,
         output_type=list[AnswerChunk],
+        deps=deps,
         # toolsets=toolsets,
     ) as result:
         # Send agent result info through updates queue
@@ -272,86 +385,8 @@ async def agent_stream_with_updates_structured(
 
 
 ########################
-# REGULAR STREAMING    #
+# DEPRECATED STREAMING #
 ########################
-async def agent_stream_with_updates(
-    agent,
-    prompt: str,
-    model_name: str,
-    message_history,
-    updates_queue,
-):
-    """Stream output that can send session updates through a queue."""
-    model = _get_model_from_name(model_name)
-    # Run agent with text output (original behavior)
-    async with agent.run_stream(
-        prompt,
-        model=model,  # type: ignore
-        message_history=message_history,
-        event_stream_handler=event_stream_handler,
-    ) as result:
-        # Send agent result info through updates queue
-        updates_queue.put({"agent_result": result})
-
-        # Yield text chunks
-        async for message in result.stream_text(delta=True):
-            if message is not None:
-                yield message
-
-        # Send final updates (usage info, etc.)
-        if hasattr(result, "usage"):
-            updates_queue.put({"last_usage": result.usage()})
-
-
-def agent_stream_sync(agent, prompt: str, model_name: str, message_history, session_updates_callback=None):
-    """Synchronous wrapper for agent_stream that works with st.write_stream.
-
-    This bridges the async generator to a sync generator using a queue and thread,
-    allowing real-time streaming while maintaining compatibility with Streamlit.
-
-    It includes a function `session_updates_callback` that is called with session state updates originated in a separate thread.
-
-    Args:
-        prompt: User prompt
-        model_name: Model to use
-        message_history: Chat history
-        session_updates_callback: Function to call with session state updates
-    """
-
-    yield _agent_stream_sync(
-        agent=agent,
-        prompt=prompt,
-        model_name=model_name,
-        message_history=message_history,
-        func_stream=agent_stream_with_updates,
-        session_updates_callback=session_updates_callback,
-    )
-
-
-async def event_stream_handler(
-    ctx: RunContext,
-    event_stream: AsyncIterable[AgentStreamEvent],
-):
-    async for event in event_stream:
-        if isinstance(event, FunctionToolCallEvent):
-            # Show tool call in Streamlit UI
-            tool_ui_message(
-                "markdown",
-                f"**:material/construction: :green[:material/arrow_outward:] Tool call**: `{event.part.tool_name}`",
-            )
-
-        elif isinstance(event, FunctionToolResultEvent):
-            # Show tool result in Streamlit UI
-            tool_ui_message(
-                "markdown",
-                f"**:material/construction: :red[:material/call_received:] Tool return**:  Tool `{event.result.tool_name}` completed",
-            )
-
-        elif isinstance(event, FinalResultEvent):
-            # Show final result start in Streamlit UI
-            tool_ui_message("markdown", "**:material/check: Final Result**: Starting to generate response")
-
-
 async def agent_stream_iter_with_updates(
     agent,
     prompt: str,
@@ -403,9 +438,6 @@ async def agent_stream_iter_with_updates(
                 updates_queue.put({"last_usage": run.usage()})
 
 
-########################
-# DEPRECATED STREAMING #
-########################
 async def agent_stream(agent, prompt: str, model_name: str, message_history) -> AsyncGenerator[str, None]:
     """Stream agent response using run_stream.
 
