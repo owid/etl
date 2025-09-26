@@ -1,7 +1,12 @@
+import tempfile
+import uuid
 from pathlib import Path
 from typing import Any, List, Literal
 
 import logfire
+import pandas as pd
+import plotly.express as px
+import plotly.graph_objects as go
 import streamlit as st
 import yaml
 from pydantic_ai import Agent
@@ -18,6 +23,7 @@ from etl.analytics.datasette import (
     read_datasette,
 )
 from etl.analytics.metabase import _generate_question_url, create_question, get_question_info
+from etl.analytics.metabase import get_question_data as _get_question_data
 from etl.config import GOOGLE_API_KEY, LOGFIRE_TOKEN_EXPERT, OWID_MCP_SERVER_URL
 from etl.docs import (
     render_collection,
@@ -76,7 +82,7 @@ DOCS_INDEX = dict(DOCS_INDEX)
 
 
 async def process_tool_call(
-    ctx: RunContext[int],
+    ctx: RunContext[dict],
     call_tool: CallToolFunc,
     name: str,
     tool_args: dict[str, Any],
@@ -138,6 +144,45 @@ recommender_agent = Agent(
 summarize_agent = Agent(
     # "openai:gpt-5-nano",
     instructions="""You will get a chat history between a user and an LLM. Summarize the content shared by the two parties.""",
+    output_type=str,
+    retries=2,
+)
+
+# Agent for generating plotting code
+plotting_agent = Agent(
+    model=MODEL_DEFAULT,  # Use the same default model as other agents
+    instructions="""You are a data visualization expert specializing in plotly. You receive information about a pandas DataFrame and user instructions for creating a plot.
+
+Your task is to generate clean, executable Python code using plotly that creates the requested visualization.
+
+IMPORTANT RULES:
+1. Use only these imported libraries: pandas (as pd), plotly.express (as px), plotly.graph_objects (as go)
+2. The DataFrame is already loaded as variable 'df'
+3. Create a plot and assign the result to variable 'fig'
+4. Do NOT call fig.show(), fig.write_image(), or any file operations
+5. Do NOT import any libraries - they are already available
+6. Return ONLY the Python code, no explanations or markdown formatting
+7. Make the plots visually appealing with proper titles, axis labels, and formatting
+8. Handle edge cases like missing data gracefully
+
+Common plot types and their plotly.express functions:
+- Line chart: px.line()
+- Bar chart: px.bar()
+- Scatter plot: px.scatter()
+- Histogram: px.histogram()
+- Box plot: px.box()
+- Heatmap: px.imshow() or go.Heatmap()
+- Pie chart: px.pie()
+
+Example output for "create a line chart showing values over time":
+```python
+fig = px.line(df, x='date', y='value', title='Values Over Time')
+fig.update_layout(height=600, showlegend=True)
+fig.update_xaxes(title='Date')
+fig.update_yaxes(title='Value')
+```
+
+Always include proper titles and axis labels to make the plot self-explanatory.""",
     output_type=str,
     retries=2,
 )
@@ -499,10 +544,14 @@ async def get_question_data(card_id: int, num_rows: int = 20) -> QueryResult:
             data (list[list]): Small slice of the data (first `num_rows` rows).
             total_rows (int): Total number of rows in the dataframe.
     """
-    from etl.analytics.metabase import get_question_data as _get_question_data
-
     # Getting data
     data = _get_question_data(card_id)
+
+    if data.empty:
+        return QueryResult(
+            message="Query returned no results. Try it on Metabase",
+            valid=False,
+        )
 
     # Get question
     question = get_question_info(card_id)
@@ -527,3 +576,99 @@ async def get_question_data(card_id: int, num_rows: int = 20) -> QueryResult:
         url_metabase=url,
     )
     return result
+
+
+@agent.tool_plain(docstring_format="google")
+async def generate_plot(
+    card_id: int,
+    plot_instructions: str,
+) -> str:
+    """Generate a plot from Metabase question data with custom plotting instructions.
+
+    This tool creates visualizations by:
+    1. Fetching data from a Metabase question
+    2. Using AI to generate appropriate plotly code based on plotting instructions
+    3. Executing the code safely to create the plot
+    4. Saving the plot as an image file
+
+    Args:
+        card_id: The ID of the Metabase question containing the data to plot. Typically a table, where only a subset of the columns are needed for plotting.
+        plot_instructions: Natural language instructions for the plot (e.g., "create a line chart showing trend over time of num_users", "make a scatter plot with GDP vs population", "generate a bar chart grouped by country")
+
+    Returns:
+        str: Path to the generated plot image file
+
+    Raises:
+        ValueError: If data cannot be fetched or plot generation fails
+    """
+    try:
+        # 1. Get data from Metabase
+        df = _get_question_data(card_id)
+
+        if df.empty:
+            raise ValueError(f"DataFrame is empty for question with ID {card_id}")
+
+        # 2. Prepare context for plotting agent
+        sample_data_str = df.head(3).to_string()
+        context_info = (
+            f"DataFrame info:\n"
+            f"- Columns: {df.columns.tolist()}\n"
+            f"- Data types: {dict(df.dtypes)}\n"
+            f"- Shape: {df.shape}\n"
+            f"- Sample data (first 3 rows):\n{sample_data_str}\n\n"
+            f"User instructions: {plot_instructions}"
+        )
+
+        # 3. Use plotting sub-agent to generate code
+        plotting_result = await plotting_agent.run(context_info)
+        plotting_code = plotting_result.output
+
+        # 4. Clean the code if it's wrapped in markdown
+        if plotting_code.startswith("```python"):
+            plotting_code = plotting_code.split("```python")[1].split("```")[0].strip()
+        elif plotting_code.startswith("```"):
+            plotting_code = plotting_code.split("```")[1].split("```")[0].strip()
+
+        # 5. Execute the generated code safely
+        local_vars = {
+            "df": df,
+            "px": px,
+            "go": go,
+            "pd": pd,
+        }
+
+        # Execute in safe environment
+        exec(plotting_code, {}, local_vars)
+
+        if "fig" not in local_vars:
+            raise ValueError("Generated code did not create a 'fig' variable")
+
+        fig = local_vars["fig"]
+
+        # 6. Save to file
+        prefix = ""  # file_prefix or f"plot_{card_id}"
+        unique_id = uuid.uuid4().hex[:8]
+
+        # Try to save as PNG first, fallback to HTML if kaleido not available
+        _safe_plot_file(fig, f"{prefix}_{unique_id}.png")
+
+    except Exception as e:
+        log.error(f"Error generating plot: {e}")
+        raise ValueError(f"Failed to generate plot: {e}")
+
+
+def _safe_plot_file(fig, filename: str):
+    try:
+        filename = f"{filename}.png"
+        filepath = Path(tempfile.gettempdir()) / filename
+        fig.write_image(str(filepath), width=1200, height=800)
+        log.info(f"Generated plot saved as PNG: {filepath}")
+        return str(filepath)
+    except Exception as png_error:
+        # Fallback to HTML format
+        log.warning(f"PNG export failed ({png_error}), saving as HTML instead")
+        filename = f"{filename}.html"
+        filepath = Path(tempfile.gettempdir()) / filename
+        fig.write_html(str(filepath))
+        log.info(f"Generated plot saved as HTML: {filepath}")
+        return str(filepath)

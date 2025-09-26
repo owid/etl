@@ -174,7 +174,8 @@ def get_question_data(card_id: int, data_format: str = "csv") -> pd.DataFrame:
         card_id=card_id,
         data_format=data_format,
     )
-    assert data_str is not None, "No data returned from Metabase API"
+    if data_str is None:
+        return pd.DataFrame()  # Return empty DataFrame if no data
 
     # Parse raw data as dataframe
     df = pd.read_csv(BytesIO(initial_bytes=data_str.encode()), encoding="utf-8")  # add encoding if needed
