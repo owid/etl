@@ -6,15 +6,16 @@ references:
 
 import json
 import time
+import uuid
 from datetime import datetime
 from typing import cast
 
 import pytz
 import streamlit as st
 from pydantic_core import to_json
-from structlog import get_logger
 
 from apps.wizard.app_pages.expert_agent.agent import recommender_agent, run_agent_stream
+from apps.wizard.app_pages.expert_agent.media import display_generated_plots
 from apps.wizard.app_pages.expert_agent.stream import set_status_container
 from apps.wizard.app_pages.expert_agent.utils import (
     MODEL_DEFAULT,
@@ -31,8 +32,6 @@ st.set_page_config(
     layout="centered",
 )
 
-# LOG
-log = get_logger()
 
 # Config
 AVATAR_PERSON = ":material/person:"
@@ -44,6 +43,7 @@ load_env()
 st.session_state.setdefault("expert_config", {})
 st.session_state.setdefault("agent_messages", [])
 st.session_state.setdefault("recommended_question", None)
+st.session_state.setdefault("mapping_messages_question_id", {})
 # st.session_state.setdefault("expert_use_mcp", True)
 
 
@@ -162,8 +162,18 @@ def show_debugging_details():
     )
 
 
-def register_message_history():
+def register_message_history(question_id: str):
+    # Update message history
     agent_messages = [msg for msg in st.session_state["agent_result"].new_messages()]
+
+    # Update mapping of messages to question_id
+    for msg in agent_messages:
+        if hasattr(msg, "kind") and msg.kind == "response":
+            # Keep only response messages
+            st.session_state["mapping_messages_question_id"][str(msg.provider_response_id)] = question_id
+
+    st.write("### Debug: register_message_history")
+    st.write(agent_messages)
     ## TEST: only keep user/system prompts and final responses
     # filtered_messages = []
     # for msg in agent_messages:
@@ -179,6 +189,8 @@ def register_message_history():
 def build_history_chat():
     # Load messages
     messages = st.session_state["agent_messages"]
+    st.write("### Debug: build_history_chat")
+    st.write(messages)
     messages = to_json(messages)
     messages = json.loads(messages)
     # Display messages
@@ -194,6 +206,7 @@ def build_history_chat():
                         {
                             "kind": "user",
                             "content": part["content"],
+                            "provider_response_id": None,
                         }
                     )
             elif (kind == "response") and (part_kind == "text"):
@@ -202,6 +215,7 @@ def build_history_chat():
                         {
                             "kind": "assistant",
                             "content": part["content"],
+                            "provider_response_id": message.get("provider_response_id", None),
                         }
                     )
     return chat_history
@@ -209,10 +223,21 @@ def build_history_chat():
 
 def show_history_chat():
     chat_history = build_history_chat()
+    shown_plots = set()
     for message in chat_history:
         avatar = AVATAR_PERSON if message["kind"] == "user" else None
         with st.chat_message(message["kind"], avatar=avatar):
             st.markdown(message["content"])
+
+            # Show plots / code if applicable
+            response_id = message["provider_response_id"]
+            if (response_id in st.session_state["mapping_messages_question_id"]) and (response_id not in shown_plots):
+                # Get question ID
+                question_id = st.session_state["mapping_messages_question_id"][str(response_id)]
+                # Plot relevant files
+                display_generated_plots(question_id)
+                # Add to shown plots
+                shown_plots.add(response_id)
 
 
 def show_settings_menu():
@@ -309,20 +334,26 @@ if prompt:
         # )
         start_time = time.time()
 
+        # Generate unique question ID for this conversation turn
+        question_id = f"chat_q_{uuid.uuid4().hex[:8]}"
+
         # Create status container for tool activity
         status_container = st.status("Agent is working...", expanded=False)
 
         # Set up the status container for tool messages
         set_status_container(status_container)
 
-        # Get stream (with structured output enabled)
-        stream = run_agent_stream(prompt, structured=False)
+        # Get stream (with question_id for plot generation)
+        stream = run_agent_stream(prompt, structured=False, question_id=question_id)
 
         # Present stream
         st.session_state.response = cast(
             str,
             st.write_stream(stream),
         )
+
+        # Check for generated plots and display them
+        display_generated_plots(question_id)
 
         # Update status to complete
         status_container.update(label="Agent completed", state="complete")
@@ -354,7 +385,7 @@ if prompt:
                         show_reasoning_details_dialog()
                     # show_debugging_details()
             ## Add messages to history
-            register_message_history()
+            register_message_history(question_id)
 
     # Get recommendations
     try:
