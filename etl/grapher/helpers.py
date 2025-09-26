@@ -379,6 +379,9 @@ def country_to_entity_id(
             raise TypeError(
                 f"Country series contains unsupported data types. Expected strings or integers, got: {country.dtype}"
             )
+    elif country.dtype.name == "category":
+        # Convert categorical to string
+        country = country.astype(str)
     elif not country.dtype.name.startswith(("str", "string")):
         raise TypeError(f"Country series has unsupported data type: {country.dtype}. Expected strings or integers.")
 
