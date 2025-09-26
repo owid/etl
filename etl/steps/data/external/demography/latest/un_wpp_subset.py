@@ -17,7 +17,7 @@ def run() -> None:
     # Process data.
     #
     tables = [
-        ds_garden["population"],
+        ds_garden["population_january"],
         ds_garden["growth_rate"],
         ds_garden["natural_change_rate"],
         ds_garden["fertility_rate"],
