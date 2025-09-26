@@ -1,0 +1,62 @@
+dataset:
+  title: Historical employment and output by sector – OWID (2017)
+tables:
+  historical_employment_and_output_by_sector__owid__2017:
+    variables:
+      number_of_people_employed_in_agriculture__herrendorf_et_al__data:
+        title: Number of people employed in agriculture  (Herrendorf et al. data)
+        unit: People
+        display:
+          unit: Rate
+        description: Historical estimates of employment (number of people) by economic sector.
+      number_of_people_employed_in_industry__herrendorf_et_al__data:
+        title: Number of people employed in industry  (Herrendorf et al. data)
+        unit: People
+        display:
+          unit: Rate
+        description: Historical estimates of employment (number of people) by economic sector.
+      number_of_people_employed_in_services__herrendorf_et_al__data:
+        title: Number of people employed in services (Herrendorf et al. data)
+        unit: People
+        display:
+          unit: Rate
+        description: Historical estimates of employment (number of people) by economic sector.
+      share_of_agriculture_in_gdp_at_current_prices__herrendorf_et_al__data:
+        title: Share of agriculture in GDP at current prices (Herrendorf et al. data)
+        unit: '% GDP'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+          shortUnit: '%'
+          unit: '%'
+        description: |-
+          Historical estimates of value added by economic sector, at current prices (expressed as share of total value added at current prices)
+      share_of_industry_in_gdp_at_current_prices__herrendorf_et_al__data:
+        title: Share of industry in GDP at current prices (Herrendorf et al. data)
+        unit: '% GDP'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+          shortUnit: '%'
+          unit: '%'
+        description: |-
+          Historical estimates of value added by economic sector, at current prices (expressed as share of total value added at current prices)
+      share_of_services_in_gdp_at_current_prices__herrendorf_et_al__data:
+        title: Share of services in GDP at current prices (Herrendorf et al. data)
+        unit: '% GDP'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+          shortUnit: '%'
+          unit: '%'
+        description: |-
+          Historical estimates of value added by economic sector, at current prices (expressed as share of total value added at current prices)
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code
