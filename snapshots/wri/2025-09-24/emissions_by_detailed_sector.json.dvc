@@ -1,0 +1,18 @@
+meta:
+  origin:
+    title: "World Greenhouse Gas Emissions by Sector"
+    description: |-
+      Global greenhouse gas emissions by sector and end use, 2021.
+    date_published: "2024-12-06"
+    producer: World Resources Institute
+    citation_full: |-
+      World Resources Institute (WRI) - World Greenhouse Gas Emissions by Sector 2021 (Sunburst chart).
+    url_main: https://www.wri.org/data/world-greenhouse-gas-emissions-sector-2021-sunburst-chart
+    date_accessed: '2025-09-24'
+    license:
+      name: CC BY 4.0
+      url: https://www.climatewatchdata.org/about/permissions
+outs:
+  - md5: 772bd29633606161e4dda55d68c71a03
+    size: 1968
+    path: emissions_by_detailed_sector.json
