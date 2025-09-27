@@ -17,7 +17,8 @@ def run() -> None:
     # Process data.
     #
     tables = [
-        ds_garden["population_january"],
+        # ds_garden["population_january"],
+        # ds_garden["population"],
         ds_garden["growth_rate"],
         ds_garden["natural_change_rate"],
         ds_garden["fertility_rate"],
@@ -27,14 +28,23 @@ def run() -> None:
         ds_garden["life_expectancy"],
         ds_garden["mortality_rate"],
     ]
+    # Add population change - January
+    tb_pop_jan = ds_garden["population_january"].reset_index()
+    tb_pop_jan = add_population_change(tb_pop_jan, "population_change_january", "population_january")
+    tables = tables + [tb_pop_jan]
+    # Add population change - July
+    tb_pop_jul = ds_garden["population"].reset_index()
+    tb_pop_jul = add_population_change(tb_pop_jul, "population_change_july", "population_july")
+    tables = tables + [tb_pop_jul]
+
     # Reset the index for all tables to prepare for merging
     tables = [tb.reset_index() for tb in tables]
 
     tb = pr.multi_merge(tables, on=["country", "year", "sex", "age", "variant"], how="outer")
-    tb = tb.drop(columns=["population_density"])
     # This should be the same as population_change
     tb["check_pop_change"] = tb["births"] - tb["deaths"] + tb["net_migration"]
-    tb["change_diff"] = tb["population_change"] - tb["check_pop_change"]
+    tb["change_diff_january"] = tb["population_change_january"] - tb["check_pop_change"]
+    tb["change_diff_july"] = tb["population_change_july"] - tb["check_pop_change"]
 
     simple_tb = get_simple_data(tb)
     age_sex_tb = get_age_sex_data(tb)
@@ -48,6 +58,24 @@ def run() -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def add_population_change(tb: Table, column_pop_change: str, column_population: str) -> Table:
+    """Estimate anual population change."""
+
+    # Sort by year
+    tb = tb.sort_values(["country", "year", "sex"])
+
+    # Estimate population change # Fiona: I'm not sure this is done in the same way as WPP do for their population change variable. They have data for 1950 and it shows the difference between 1950 and 1951
+    tb[column_pop_change] = tb.groupby(["country", "sex", "age", "variant"])["population"].transform(
+        lambda x: x.diff().shift(-1)
+    )
+    tb = tb.drop(columns=["population_change", "population_density"])  # drop month as we don't need it anymore
+    # Rename population column to indicate the month
+    tb = tb.rename(columns={"population": column_population})
+    tb = tb.format(["country", "year", "sex", "age", "variant"])
+
+    return tb
 
 
 def get_simple_data(tb: Table) -> Table:

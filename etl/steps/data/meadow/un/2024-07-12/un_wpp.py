@@ -147,6 +147,8 @@ def make_tb_population() -> Table:
     tb_population["month"] = "July"
     tb_population_jan = read_from_csv("un_wpp_population_jan_estimates.csv")
     tb_population_jan["month"] = "January"
+    tb_population_jan_medium = read_from_csv("un_wpp_population_jan_medium.csv")
+    tb_population_jan_medium["month"] = "January"
     tb_population_l = read_from_csv("un_wpp_population_low.csv")
     tb_population_l["month"] = "July"
     tb_population_m = read_from_csv("un_wpp_population_medium.csv")
@@ -159,13 +161,14 @@ def make_tb_population() -> Table:
         [
             tb_population,
             tb_population_jan,
+            tb_population_jan_medium,
             tb_population_l,
             tb_population_m,
             tb_population_h,
             tb_population_c,
         ]
     )
-    del tb_population_l, tb_population_m, tb_population_h, tb_population_c, tb_population_jan
+    del tb_population_l, tb_population_m, tb_population_h, tb_population_c, tb_population_jan, tb_population_jan_medium
     tb_population = tb_population.format(COLUMNS_INDEX_FORMAT_MONTH, short_name="population")
     return tb_population
 
