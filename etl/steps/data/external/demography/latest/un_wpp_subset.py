@@ -67,7 +67,7 @@ def add_population_change(tb: Table, column_pop_change: str, column_population: 
     tb = tb.sort_values(["country", "year", "sex"])
 
     # Estimate population change # Fiona: I'm not sure this is done in the same way as WPP do for their population change variable. They have data for 1950 and it shows the difference between 1950 and 1951
-    tb[column_pop_change] = tb.groupby(["country", "sex", "age", "variant"])["population"].transform(
+    tb[column_pop_change] = tb.groupby(["country", "sex", "age", "variant"])[column_population].transform(
         lambda x: x.diff().shift(-1)
     )
     tb = tb.drop(columns=["population_change", "population_density"])  # drop month as we don't need it anymore
