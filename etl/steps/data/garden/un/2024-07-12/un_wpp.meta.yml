@@ -105,6 +105,42 @@ tables:
       #       Population doubling time, {definitions.global.dimensions.title}
       #     grapher_config:
       #       subtitle: *pop2_description_short
+  population_january:
+    variables:
+      population:
+        title: Population - January
+        unit: people
+        description_short: |-
+          De facto total population in a country, area or region as of 1 July of the year indicated. {definitions.global.dimensions.description_short}
+        presentation:
+          title_public: |-
+            Population, {definitions.global.dimensions.title}
+          grapher_config:
+            note: "Values as of 1 July of the indicated year."
+
+      population_change:
+        title: Population change - January
+        unit: people
+        description_short: |-
+          Population yearly increment, estimated as the difference between the population on 1st of July of the year indicated and the population a year before. {definitions.global.dimensions.description_short}
+        presentation:
+          title_public: |-
+            Population change, {definitions.global.dimensions.title}
+          grapher_config:
+            note: "Values as of 1 July of the indicated year."
+
+      population_density:
+        title: Population density - January
+        unit: people per square kilometer
+        short_unit: people/km²
+        description_short: |-
+          Population density in a country, area or region. {definitions.global.dimensions.description_short}
+        presentation:
+          title_public: |-
+            Population density, {definitions.global.dimensions.title}
+          grapher_config:
+            subtitle: |-
+              The number of people per km² of land area. {definitions.global.projections}
 
   growth_rate:
     variables:
