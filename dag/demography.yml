@@ -356,5 +356,5 @@ steps:
   # UN WPP data for Cologne
   data://external/demography/latest/un_wpp_subset:
     - data://garden/un/2024-07-12/un_wpp
-  data://grapher/demography/latest/un_wpp_subset:
-    - data://garden/demography/latest/un_wpp_subset
+data://grapher/un/2024-07-12/un_wpp_subset:
+  - data://garden/un/2024-07-12/un_wpp
