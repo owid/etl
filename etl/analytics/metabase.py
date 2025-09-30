@@ -248,5 +248,5 @@ def get_metabase_analytics():
     #########################
     # Anonymous stats
     #########################
-    stats = mb.get("/api/analytics/anonymous-stats")
+    # stats = mb.get("/api/analytics/anonymous-stats")
     return df
