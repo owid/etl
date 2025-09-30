@@ -26,6 +26,7 @@ paths = PathFinder(__file__)
 TWH_TO_KWH = 1e9
 # Megatonnes to grams.
 MT_TO_G = 1e12
+MT_TO_T = 1e6
 
 
 def process_statistical_review_data(tb_review: Table) -> Table:
@@ -193,7 +194,6 @@ def add_per_capita_variables(combined: Table, ds_population: Dataset) -> Table:
         "total_demand__twh",
         "wind_generation__twh",
         "solar_and_wind_generation__twh",
-        "total_emissions__mtco2",
     ]
     # Add a column for population (only for harmonized countries).
     combined = add_population_to_table(tb=combined, ds_population=ds_population, warn_on_missing_countries=False)
@@ -202,6 +202,42 @@ def add_per_capita_variables(combined: Table, ds_population: Dataset) -> Table:
         assert "twh" in variable, f"Variables are assumed to be in TWh, but {variable} is not."
         new_column = "per_capita_" + variable.replace("__twh", "__kwh")
         combined[new_column] = combined[variable] * TWH_TO_KWH / combined["population"]
+
+    return combined
+
+
+def add_per_capita_variables_emissions(combined: Table, ds_population: Dataset) -> Table:
+    """Add per capita variables (in tco2 per person) to the combined EI and Ember table.
+
+    The list of variables to make per capita are given in this function. The new variable names will be 'per_capita_'
+    followed by the original variable's name.
+
+    Parameters
+    ----------
+    combined : Table
+        Combination of EI's Statistical Review and Ember's Yearly Electricity Data.
+    ds_population: Dataset
+        Population dataset.
+
+    Returns
+    -------
+    combined : Table
+        Input table after adding per capita variables.
+
+    """
+    combined = combined.copy()
+
+    # Variables to make per capita.
+    per_capita_variables = [
+        "total_emissions__mtco2",
+    ]
+    # Add a column for population (only for harmonized countries).
+    combined = add_population_to_table(tb=combined, ds_population=ds_population, warn_on_missing_countries=False)
+
+    for variable in per_capita_variables:
+        assert "mtco2" in variable, f"Variables are assumed to be in MtCO2, but {variable} is not."
+        new_column = "per_capita_" + variable.replace("__mtco2", "__tco2")
+        combined[new_column] = combined[variable] * MT_TO_T / combined["population"]
 
     return combined
 
@@ -494,6 +530,7 @@ def run() -> None:
 
     # Add per capita variables.
     combined = add_per_capita_variables(combined=combined, ds_population=ds_population)
+    combined = add_per_capita_variables_emissions(combined=combined, ds_population=ds_population)
 
     # Add "share" variables.
     combined = add_share_variables(combined=combined)

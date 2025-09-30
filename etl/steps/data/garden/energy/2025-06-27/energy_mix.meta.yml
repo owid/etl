@@ -3,7 +3,7 @@ definitions:
     processing_level: major
     presentation:
       topic_tags:
-      - Energy
+        - Energy
   # Short description for fossil fuels.
   description_short_twh: &description_short_twh |-
     Measured in [terawatt-hours](#dod:watt-hours).
@@ -26,10 +26,12 @@ definitions:
   description_key_gross_generation: &description_key_gross_generation |-
     Figures are based on gross generation and do not account for cross-border electricity supply.
   # Key description item for non-fossil sources in terms of direct primary energy.
-  description_key_primary_energy_direct: &description_key_primary_energy_direct |-
+  description_key_primary_energy_direct:
+    &description_key_primary_energy_direct |-
     Direct [primary energy](#dod:primaryenergy) of non-fossil electricity sources corresponds to electricity generation.
   # Key description item for any sources in terms of primary energy using the substitution method.
-  description_key_primary_energy_equivalent: &description_key_primary_energy_equivalent |-
+  description_key_primary_energy_equivalent:
+    &description_key_primary_energy_equivalent |-
     Primary energy is measured using the "substitution method" (also called "input-equivalent" primary energy). This method is used for non-fossil sources of electricity (namely renewables and nuclear), and measures the amount of fossil fuels that would be required by thermal power stations to generate the same amount of non-fossil electricity.
     For example, if a country's nuclear power generated 100 TWh of electricity, and assuming that the efficiency of a standard thermal power plant is 38%, the input-equivalent primary energy for this country would be 100 TWh / 0.38 = 263 TWh = 0.95 EJ. This input-equivalent primary energy takes account of the inefficiencies in energy production from fossil fuels and provides a better approximation of each source's share of energy consumption. You can find more details in [the Statistical Review of World Energy's methodology document](https://www.energyinst.org/__data/assets/pdf_file/0003/1055541/Methodology.pdf).
   # Key description item for biofuels.
@@ -330,8 +332,8 @@ tables:
           - *description_key_primary_energy_equivalent
       coal__pct_direct_primary_energy:
         title: Coal (% direct primary energy)
-        unit: '%'
-        short_unit: '%'
+        unit: "%"
+        short_unit: "%"
         description_short: *description_short_pct_direct
         display:
           name: Coal
@@ -340,8 +342,8 @@ tables:
           title_variant: *title_variant_direct
       coal__pct_equivalent_primary_energy:
         title: Coal (% equivalent primary energy)
-        unit: '%'
-        short_unit: '%'
+        unit: "%"
+        short_unit: "%"
         description_short: *description_short_pct_equivalent
         display:
           name: Coal
@@ -350,8 +352,8 @@ tables:
           title_variant: *title_variant_equivalent
       fossil_fuels__pct_direct_primary_energy:
         title: Fossil fuels (% direct primary energy)
-        unit: '%'
-        short_unit: '%'
+        unit: "%"
+        short_unit: "%"
         description_short: *description_short_pct_direct
         display:
           name: Fossil fuels
@@ -360,8 +362,8 @@ tables:
           title_variant: *title_variant_direct
       fossil_fuels__pct_equivalent_primary_energy:
         title: Fossil fuels (% equivalent primary energy)
-        unit: '%'
-        short_unit: '%'
+        unit: "%"
+        short_unit: "%"
         description_short: *description_short_pct_equivalent
         display:
           name: Fossil fuels
@@ -370,8 +372,8 @@ tables:
           title_variant: *title_variant_equivalent
       gas__pct_direct_primary_energy:
         title: Gas (% direct primary energy)
-        unit: '%'
-        short_unit: '%'
+        unit: "%"
+        short_unit: "%"
         description_short: *description_short_pct_direct
         display:
           name: Gas
@@ -380,8 +382,8 @@ tables:
           title_variant: *title_variant_direct
       gas__pct_equivalent_primary_energy:
         title: Gas (% equivalent primary energy)
-        unit: '%'
-        short_unit: '%'
+        unit: "%"
+        short_unit: "%"
         description_short: *description_short_pct_equivalent
         display:
           name: Gas
@@ -390,8 +392,8 @@ tables:
           title_variant: *title_variant_equivalent
       oil__pct_direct_primary_energy:
         title: Oil (% direct primary energy)
-        unit: '%'
-        short_unit: '%'
+        unit: "%"
+        short_unit: "%"
         description_short: *description_short_pct_direct
         display:
           name: Oil
@@ -402,8 +404,8 @@ tables:
           - *description_key_primary_energy_direct
       oil__pct_equivalent_primary_energy:
         title: Oil (% equivalent primary energy)
-        unit: '%'
-        short_unit: '%'
+        unit: "%"
+        short_unit: "%"
         description_short: *description_short_pct_equivalent
         display:
           name: Oil
@@ -414,8 +416,8 @@ tables:
           - *description_key_primary_energy_equivalent
       biofuels__pct_direct_primary_energy:
         title: Biofuels (% direct primary energy)
-        unit: '%'
-        short_unit: '%'
+        unit: "%"
+        short_unit: "%"
         description_short: *description_short_pct_direct
         display:
           name: Biofuels
@@ -427,8 +429,8 @@ tables:
           - *description_key_primary_energy_direct
       biofuels__pct_equivalent_primary_energy:
         title: Biofuels (% equivalent primary energy)
-        unit: '%'
-        short_unit: '%'
+        unit: "%"
+        short_unit: "%"
         description_short: *description_short_pct_equivalent
         display:
           name: Biofuels
@@ -440,8 +442,8 @@ tables:
           - *description_key_primary_energy_equivalent
       hydro__pct_direct_primary_energy:
         title: Hydro (% direct primary energy)
-        unit: '%'
-        short_unit: '%'
+        unit: "%"
+        short_unit: "%"
         description_short: *description_short_pct_direct
         display:
           name: Hydro
@@ -453,8 +455,8 @@ tables:
           - *description_key_primary_energy_direct
       hydro__pct_equivalent_primary_energy:
         title: Hydro (% equivalent primary energy)
-        unit: '%'
-        short_unit: '%'
+        unit: "%"
+        short_unit: "%"
         description_short: *description_short_pct_equivalent
         display:
           name: Hydro
@@ -466,8 +468,8 @@ tables:
           - *description_key_primary_energy_equivalent
       low_carbon_energy__pct_direct_primary_energy:
         title: Low-carbon energy (% direct primary energy)
-        unit: '%'
-        short_unit: '%'
+        unit: "%"
+        short_unit: "%"
         description_short: *description_short_pct_direct
         display:
           name: Low-carbon energy
@@ -479,8 +481,8 @@ tables:
           - *description_key_primary_energy_direct
       low_carbon_energy__pct_equivalent_primary_energy:
         title: Low-carbon energy (% equivalent primary energy)
-        unit: '%'
-        short_unit: '%'
+        unit: "%"
+        short_unit: "%"
         description_short: *description_short_pct_equivalent
         display:
           name: Low-carbon energy
@@ -492,8 +494,8 @@ tables:
           - *description_key_primary_energy_equivalent
       nuclear__pct_direct_primary_energy:
         title: Nuclear (% direct primary energy)
-        unit: '%'
-        short_unit: '%'
+        unit: "%"
+        short_unit: "%"
         description_short: *description_short_pct_direct
         display:
           name: Nuclear
@@ -505,8 +507,8 @@ tables:
           - *description_key_primary_energy_direct
       nuclear__pct_equivalent_primary_energy:
         title: Nuclear (% equivalent primary energy)
-        unit: '%'
-        short_unit: '%'
+        unit: "%"
+        short_unit: "%"
         description_short: *description_short_pct_equivalent
         display:
           name: Nuclear
@@ -518,8 +520,8 @@ tables:
           - *description_key_primary_energy_equivalent
       other_renewables__pct_direct_primary_energy:
         title: Other renewables (% direct primary energy)
-        unit: '%'
-        short_unit: '%'
+        unit: "%"
+        short_unit: "%"
         description_short: *description_short_pct_direct
         display:
           name: Other renewables
@@ -531,8 +533,8 @@ tables:
           - *description_key_primary_energy_direct
       other_renewables__pct_equivalent_primary_energy:
         title: Other renewables (% equivalent primary energy)
-        unit: '%'
-        short_unit: '%'
+        unit: "%"
+        short_unit: "%"
         description_short: *description_short_pct_equivalent
         display:
           name: Other renewables
@@ -544,8 +546,8 @@ tables:
           - *description_key_primary_energy_equivalent
       renewables__pct_direct_primary_energy:
         title: Renewables (% direct primary energy)
-        unit: '%'
-        short_unit: '%'
+        unit: "%"
+        short_unit: "%"
         description_short: *description_short_pct_direct
         display:
           name: Renewables
@@ -557,8 +559,8 @@ tables:
           - *description_key_primary_energy_direct
       renewables__pct_equivalent_primary_energy:
         title: Renewables (% equivalent primary energy)
-        unit: '%'
-        short_unit: '%'
+        unit: "%"
+        short_unit: "%"
         description_short: *description_short_pct_equivalent
         display:
           name: Renewables
@@ -570,8 +572,8 @@ tables:
           - *description_key_primary_energy_equivalent
       solar__pct_direct_primary_energy:
         title: Solar (% direct primary energy)
-        unit: '%'
-        short_unit: '%'
+        unit: "%"
+        short_unit: "%"
         description_short: *description_short_pct_direct
         display:
           name: Solar
@@ -583,8 +585,8 @@ tables:
           - *description_key_primary_energy_direct
       solar__pct_equivalent_primary_energy:
         title: Solar (% equivalent primary energy)
-        unit: '%'
-        short_unit: '%'
+        unit: "%"
+        short_unit: "%"
         description_short: *description_short_pct_equivalent
         display:
           name: Solar
@@ -596,8 +598,8 @@ tables:
           - *description_key_primary_energy_equivalent
       wind__pct_direct_primary_energy:
         title: Wind (% direct primary energy)
-        unit: '%'
-        short_unit: '%'
+        unit: "%"
+        short_unit: "%"
         description_short: *description_short_pct_direct
         display:
           name: Wind
@@ -609,8 +611,8 @@ tables:
           - *description_key_primary_energy_direct
       wind__pct_equivalent_primary_energy:
         title: Wind (% equivalent primary energy)
-        unit: '%'
-        short_unit: '%'
+        unit: "%"
+        short_unit: "%"
         description_short: *description_short_pct_equivalent
         display:
           name: Wind
@@ -622,8 +624,8 @@ tables:
           - *description_key_primary_energy_equivalent
       solar_and_wind__pct_direct_primary_energy:
         title: Solar and wind (% direct primary energy)
-        unit: '%'
-        short_unit: '%'
+        unit: "%"
+        short_unit: "%"
         description_short: *description_short_pct_direct
         display:
           name: Solar and wind
@@ -635,8 +637,8 @@ tables:
           - *description_key_primary_energy_direct
       solar_and_wind__pct_equivalent_primary_energy:
         title: Solar and wind (% equivalent primary energy)
-        unit: '%'
-        short_unit: '%'
+        unit: "%"
+        short_unit: "%"
         description_short: *description_short_pct_equivalent
         display:
           name: Solar and wind
@@ -648,8 +650,8 @@ tables:
           - *description_key_primary_energy_equivalent
       coal__pct_growth:
         title: Coal (% growth)
-        unit: '%'
-        short_unit: '%'
+        unit: "%"
+        short_unit: "%"
         display:
           name: Coal
         presentation:
@@ -666,8 +668,8 @@ tables:
         description_processing: *description_processing_annual_change
       fossil_fuels__pct_growth:
         title: Fossil fuels (% growth)
-        unit: '%'
-        short_unit: '%'
+        unit: "%"
+        short_unit: "%"
         display:
           name: Fossil fuels
         presentation:
@@ -684,8 +686,8 @@ tables:
         description_processing: *description_processing_annual_change
       gas__pct_growth:
         title: Gas (% growth)
-        unit: '%'
-        short_unit: '%'
+        unit: "%"
+        short_unit: "%"
         display:
           name: Gas
         presentation:
@@ -702,8 +704,8 @@ tables:
         description_processing: *description_processing_annual_change
       oil__pct_growth:
         title: Oil (% growth)
-        unit: '%'
-        short_unit: '%'
+        unit: "%"
+        short_unit: "%"
         display:
           name: Oil
         presentation:
@@ -720,8 +722,8 @@ tables:
         description_processing: *description_processing_annual_change
       biofuels__pct_growth:
         title: Biofuels (% growth)
-        unit: '%'
-        short_unit: '%'
+        unit: "%"
+        short_unit: "%"
         display:
           name: Biofuels
         presentation:
@@ -742,8 +744,8 @@ tables:
         description_processing: *description_processing_annual_change
       hydro__pct_growth:
         title: Hydro (% growth)
-        unit: '%'
-        short_unit: '%'
+        unit: "%"
+        short_unit: "%"
         display:
           name: Hydro
         presentation:
@@ -775,8 +777,8 @@ tables:
         description_processing: *description_processing_annual_change
       low_carbon_energy__pct_growth:
         title: Low-carbon energy (% growth)
-        unit: '%'
-        short_unit: '%'
+        unit: "%"
+        short_unit: "%"
         display:
           name: Low-carbon energy
         presentation:
@@ -808,8 +810,8 @@ tables:
         description_processing: *description_processing_annual_change
       nuclear__pct_growth:
         title: Nuclear (% growth)
-        unit: '%'
-        short_unit: '%'
+        unit: "%"
+        short_unit: "%"
         display:
           name: Nuclear
         presentation:
@@ -841,8 +843,8 @@ tables:
         description_processing: *description_processing_annual_change
       other_renewables__pct_growth:
         title: Other renewables (% growth)
-        unit: '%'
-        short_unit: '%'
+        unit: "%"
+        short_unit: "%"
         display:
           name: Other renewables
         presentation:
@@ -874,8 +876,8 @@ tables:
         description_processing: *description_processing_annual_change
       renewables__pct_growth:
         title: Renewables (% growth)
-        unit: '%'
-        short_unit: '%'
+        unit: "%"
+        short_unit: "%"
         display:
           name: Renewables
         presentation:
@@ -907,8 +909,8 @@ tables:
         description_processing: *description_processing_annual_change
       solar__pct_growth:
         title: Solar (% growth)
-        unit: '%'
-        short_unit: '%'
+        unit: "%"
+        short_unit: "%"
         display:
           name: Solar
         presentation:
@@ -940,8 +942,8 @@ tables:
         description_processing: *description_processing_annual_change
       wind__pct_growth:
         title: Wind (% growth)
-        unit: '%'
-        short_unit: '%'
+        unit: "%"
+        short_unit: "%"
         display:
           name: Wind
         presentation:
@@ -973,8 +975,8 @@ tables:
         description_processing: *description_processing_annual_change
       solar_and_wind__pct_growth:
         title: Solar and wind (% growth)
-        unit: '%'
-        short_unit: '%'
+        unit: "%"
+        short_unit: "%"
         display:
           name: Solar and wind
         presentation:
