@@ -1,0 +1,50 @@
+title:
+  title: GDP and CO2 emissions decoupling
+  title_variant: by metric type and source
+
+topic_tags:
+  - Climate Change
+  - Economic Growth
+
+default_selection:
+  - United States
+  - China
+  - Germany
+  - India
+  - World
+
+dimensions:
+  - slug: metric_type
+    name: Scale
+    choices:
+      - slug: absolute
+        name: Total (absolute)
+        description: Total values for the country
+      - slug: per_capita
+        name: Per capita
+        description: Values per person
+
+  - slug: growth_metric
+    name: Economic indicator
+    choices:
+      - slug: gdp
+        name: GDP (PPP)
+        description: Gross Domestic Product, purchasing power parity adjusted
+      - slug: gni
+        name: GNI (PPP)
+        description: Gross National Income, purchasing power parity adjusted
+      - slug: income
+        name: Household income
+        description: Median household income from surveys
+
+  - slug: emissions_type
+    name: Emissions source
+    choices:
+      - slug: production
+        name: Production-based
+        description: CO2 emissions from domestic production
+      - slug: consumption
+        name: Consumption-based
+        description: CO2 emissions from domestic consumption
+
+views: []
