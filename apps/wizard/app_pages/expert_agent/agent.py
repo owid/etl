@@ -456,6 +456,25 @@ async def execute_query(query: str, title: str, description: str, num_rows: int 
 
 
 @agent.tool_plain(docstring_format="google")
+async def create_question_with_filters(query: str, title: str, description: str) -> None:
+    """Create a Metabase question that has filters."""
+    question = create_question(
+        query=query,
+        title=title,
+        description=description,
+    )
+
+
+@agent.tool_plain(docstring_format="google")
+async def get_question_query(card_id: int):
+    # Get question
+    question = get_question_info(card_id)
+    # Generate URL
+    # url = _generate_question_url(question)
+    # return url
+
+
+@agent.tool_plain(docstring_format="google")
 async def list_available_questions_metabase() -> List[dict]:
     """List available questions in Metabase in the "Expert" collection.
 
