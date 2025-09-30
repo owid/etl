@@ -581,7 +581,7 @@ async def generate_plot(
     Raises:
         ValueError: If data cannot be fetched or plot generation fails after retries
     """
-    max_retries: int = 3
+    max_retries = 3
     model_name = ctx.model.model_name
     question_id = ctx.deps.get("question_id", f"plot_{card_id}")
 
