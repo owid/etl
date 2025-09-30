@@ -193,6 +193,7 @@ def add_per_capita_variables(combined: Table, ds_population: Dataset) -> Table:
         "total_demand__twh",
         "wind_generation__twh",
         "solar_and_wind_generation__twh",
+        "total_emissions__mtco2",
     ]
     # Add a column for population (only for harmonized countries).
     combined = add_population_to_table(tb=combined, ds_population=ds_population, warn_on_missing_countries=False)
