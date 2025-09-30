@@ -232,7 +232,8 @@ def add_per_capita_variables_emissions(combined: Table, ds_population: Dataset) 
         "total_emissions__mtco2",
     ]
     # Add a column for population (only for harmonized countries).
-    combined = add_population_to_table(tb=combined, ds_population=ds_population, warn_on_missing_countries=False)
+    if "population" not in combined.columns:
+        combined = add_population_to_table(tb=combined, ds_population=ds_population, warn_on_missing_countries=False)
 
     for variable in per_capita_variables:
         assert "mtco2" in variable, f"Variables are assumed to be in MtCO2, but {variable} is not."
