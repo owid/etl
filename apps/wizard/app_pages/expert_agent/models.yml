@@ -30,8 +30,8 @@ models:
       out: 8.00
   # Anthropic models
   ## Cost: https://www.anthropic.com/pricing#api
-  - name: "anthropic:claude-sonnet-4-0"
-    display_name: "Claude Sonnet 4.0"
+  - name: "anthropic:claude-sonnet-4-5"
+    display_name: "Claude Sonnet 4.5"
     cost:
       in:
         value: [3, 6]
