@@ -364,3 +364,8 @@ steps:
 
   data://external/demography/latest/un_wpp_scenarios_single_age:
     - data://garden/un/2025-10-01/un_wpp
+
+  data://meadow/un/2025-10-01/un_wpp_scenarios:
+    - snapshot://un/2024-07-12/un_wpp_demographic_indicators_scenarios.csv
+
+  ########################################################################
