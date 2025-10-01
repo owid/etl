@@ -13,7 +13,7 @@ def run() -> None:
     #
     # Process data.
     #
-    tb = ds_garden["population"]
+    tb = ds_garden["un_wpp_demographic_indicators_scenarios"]
 
     ds_garden = paths.create_dataset(
         tables=[tb],

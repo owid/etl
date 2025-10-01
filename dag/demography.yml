@@ -370,6 +370,7 @@ steps:
 
   data://garden/un/2025-10-01/un_wpp_scenarios:
     - data://meadow/un/2025-10-01/un_wpp_scenarios
+    - data://garden/un/2024-07-12/un_wpp
 
   data://external/demography/latest/un_wpp_scenarios:
     - data://garden/un/2025-10-01/un_wpp_scenarios

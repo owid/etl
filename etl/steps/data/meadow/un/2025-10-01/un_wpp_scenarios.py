@@ -27,7 +27,6 @@ COLUMNS_RENAME_CSV = {
     "TPopulationFemale1July": "population_female_july",
     "TFR": "total_fertility_rate",
     "LEx": "life_expectancy",
-    "CDR": "crude_death_rate",
     "NetMigrations": "net_migration",
 }
 COLUMNS_INDEX_CSV = list(COLUMNS_RENAME_CSV.values())
@@ -57,7 +56,6 @@ COLS_TO_KEEP = [
     "TPopulationFemale1July",
     "TFR",
     "LEx",
-    "CDR",
     "NetMigrations",
 ]
 
