@@ -22,6 +22,10 @@ def run(dest_dir: str) -> None:
     ds_meadow_med = paths.load_dataset("un_wpp")
     # Load tables - population
     tb = ds_meadow.read("un_wpp_demographic_indicators_scenarios")
+    tb["population_july"] = tb["population_july"] * 1000
+    tb["population_male_july"] = tb["population_male_july"] * 1000
+    tb["population_female_july"] = tb["population_female_july"] * 1000
+    tb["net_migration"] = tb["net_migration"] * 1000
     tb = geo.harmonize_countries(
         tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
