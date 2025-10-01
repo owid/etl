@@ -5,6 +5,15 @@ definitions:
     presentation:
       topic_tags:
         - Plastic Pollution
+    display:
+      tolerance: 5
+  
+  # Reusable description components
+  hs_classification: &hs_classification "This covers plastic waste classified as HS 3915 in UN trade statistics."
+  all_transport_modes: &all_transport_modes "It includes all transport methods: air, sea, road, rail, inland waterways, and cases where the transport mode wasn't specified."
+  net_weight: &net_weight "Measured in tonnes (net weight)."
+  availability_note: &availability_note "Only available for countries and years where transport mode was reported."
+  per_capita_explanation: &per_capita_explanation "This allows fairer comparisons between countries of different sizes."
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -18,155 +27,156 @@ tables:
         title: Imports of plastic waste via all modes of transport
         unit: tonnes
         short_unit: t
-        description_short: Total quantity of plastic waste imported by a country via all transportation methods, in tonnes.
+        description_short: The amount of plastic waste a country imports from other countries, measured in tonnes.
         description_key:
-          - This indicator shows the total weight of plastic waste imports using all modes of transport combined.
-          - Data comes from UN Comtrade database covering commodity code 3915 (waste, parings and scrap, of plastics).
-          - Quantities are measured in tonnes and represent the physical weight of plastic waste traded.
+          - *hs_classification
+          - *all_transport_modes
+          - This shows the total weight of plastic waste a country brings in from other countries, across all transport methods.
         display:
-          tolerance: 5
           numDecimalPlaces: 0
 
       export_total_mot:
         title: Exports of plastic waste via all modes of transport
         unit: tonnes
         short_unit: t
-        description_short: Total quantity of plastic waste exported by a country via all transportation methods, in tonnes.
+        description_short: The amount of plastic waste that a country exports, measured in tonnes.
         description_key:
-          - This indicator shows the total weight of plastic waste exports using all modes of transport combined.
-          - Data comes from UN Comtrade database covering commodity code 3915 (waste, parings and scrap, of plastics).
-          - Quantities are measured in tonnes and represent the physical weight of plastic waste traded.
+          - *hs_classification
+          - *all_transport_modes
+          - *net_weight
+          - This includes re-exports (when a country imports plastic waste and then exports it again).
+          - Not all countries report transport mode details for every year.
         display:
-          tolerance: 5
           numDecimalPlaces: 1
 
       import_air:
         title: Imports of plastic waste via air
         unit: tonnes
         short_unit: t
-        description_short: Quantity of plastic waste imported by a country specifically via air transport, in tonnes.
+        description_short: The amount of plastic waste a country imports by air freight, measured in tonnes.
         description_key:
-          - This indicator shows the weight of plastic waste imports transported by air.
-          - Air transport typically represents a small fraction of total plastic waste trade due to high costs.
+          - This only includes plastic waste (HS 3915) transported by air.
+          - *net_weight
+          - Air transport typically accounts for a very small fraction of total plastic waste imports.
+          - *availability_note
         display:
-          tolerance: 5
           numDecimalPlaces: 1
 
       export_air:
         title: Exports of plastic waste via air
         unit: tonnes
         short_unit: t
-        description_short: Quantity of plastic waste exported by a country specifically via air transport, in tonnes.
+        description_short: The amount of plastic waste a country exports by air freight, measured in tonnes.
         description_key:
-          - This indicator shows the weight of plastic waste exports transported by air.
-          - Air transport typically represents a small fraction of total plastic waste trade due to high costs.
+          - This only includes plastic waste (HS 3915) transported by air.
+          - *net_weight
+          - Air transport typically accounts for a very small fraction of total plastic waste exports.
+          - *availability_note
         display:
-          tolerance: 5
           numDecimalPlaces: 1
 
       import_total_mot_per_capita:
         title: Per capita imports of plastic waste via all modes of transport
         unit: kilograms
         short_unit: kg
-        description_short: Total plastic waste imports per person, calculated by dividing total imports by population, in kilograms.
+        description_short: The amount of plastic waste imported per person, measured in kilograms.
         description_key:
-          - This indicator normalizes plastic waste imports by population size, allowing for comparison across countries of different sizes.
-          - Calculated by dividing total plastic waste imports (in tonnes) by population and converting to kilograms per person.
-        description_processing: We calculated per capita imports by dividing total plastic waste imports by population data and converting from tonnes to kilograms per person.
+          - This is calculated by dividing total plastic waste imports (HS 3915, all transport modes) by the country's population.
+          - *per_capita_explanation
+          - A country with 10 million people importing 1,000 tonnes will have the same per capita figure as a country with 100 million people importing 10,000 tonnes.
+        description_processing: Computed as (import_total_mot in tonnes × 1,000) ÷ population; reported in kg per person.
         display:
-          tolerance: 5
           numDecimalPlaces: 2
 
       export_total_mot_per_capita:
         title: Per capita exports of plastic waste via all modes of transport
         unit: kilograms
         short_unit: kg
-        description_short: Total plastic waste exports per person, calculated by dividing total exports by population, in kilograms.
+        description_short: The amount of plastic waste exported per person, measured in kilograms.
         description_key:
-          - This indicator normalizes plastic waste exports by population size, allowing for comparison across countries of different sizes.
-          - Calculated by dividing total plastic waste exports (in tonnes) by population and converting to kilograms per person.
-        description_processing: We calculated per capita exports by dividing total plastic waste exports by population data and converting from tonnes to kilograms per person.
+          - This is calculated by dividing total plastic waste exports (HS 3915, all transport modes) by the country's population.
+          - *per_capita_explanation
+          - A small country exporting 100 tonnes might have a higher per capita figure than a large country exporting 10,000 tonnes.
+        description_processing: Computed as (export_total_mot in tonnes × 1,000) ÷ population; reported in kg per person.
         display:
-          tolerance: 5
           numDecimalPlaces: 2
 
       net_export:
         title: Net exports of plastic waste via all modes of transport
         unit: tonnes
         short_unit: t
-        description_short: The difference between plastic waste exports and imports, in tonnes, where positive values indicate net exports and negative values indicate net imports.
+        description_short: Net plastic waste trade balance (exports minus imports), measured in tonnes.
         description_key:
-          - Calculated as total exports minus total imports of plastic waste.
-          - Positive values indicate the country exported more plastic waste than it imported (net exporter).
-          - Negative values indicate the country imported more plastic waste than it exported (net importer).
-        description_processing: We calculated net exports by subtracting total plastic waste imports from total plastic waste exports for each country and year.
+          - This is calculated as total exports minus total imports of plastic waste (HS 3915).
+          - A positive number means the country is a net exporter of plastic waste.
+          - A negative number means the country is a net importer of plastic waste.
+          - Differences in how countries report trade, and re-exports, can affect these figures.
+        description_processing: Computed as export_total_mot − import_total_mot for each country and year.
         display:
-          tolerance: 5
           numDecimalPlaces: 1
 
       import_share:
-        title: Share of plastic waste imports via all modes of transport
+        title: Share of global plastic waste imports
         unit: '%'
         short_unit: '%'
-        description_short: A country's plastic waste imports as a percentage of global plastic waste imports.
+        description_short: The percentage of global plastic waste imports that a country accounts for.
         description_key:
-          - Shows what proportion of global plastic waste imports each country accounts for.
-          - Calculated by dividing a country's plastic waste imports by world total imports and multiplying by 100.
-        description_processing: We calculated import shares by dividing each country's plastic waste imports by the world total imports for each year and multiplying by 100.
+          - This shows what share of the world's total plastic waste imports each country receives.
+          - It's calculated by dividing a country's imports by the sum of all countries' reported imports in that year.
+          - For example, if a country imported 100,000 tonnes and the world total was 10 million tonnes, their share would be 1%.
+        description_processing: Computed as 100 × (country import_total_mot) ÷ (sum of import_total_mot across all reporters in the same year).
         display:
-          tolerance: 5
           numDecimalPlaces: 2
 
       export_share:
-        title: Share of plastic waste exports via all modes of transport
+        title: Share of global plastic waste exports
         unit: '%'
         short_unit: '%'
-        description_short: A country's plastic waste exports as a percentage of global plastic waste exports.
+        description_short: The percentage of global plastic waste exports that a country accounts for.
         description_key:
-          - Shows what proportion of global plastic waste exports each country accounts for.
-          - Calculated by dividing a country's plastic waste exports by world total exports and multiplying by 100.
-        description_processing: We calculated export shares by dividing each country's plastic waste exports by the world total exports for each year and multiplying by 100.
+          - This shows what share of the world's total plastic waste exports each country sends.
+          - It's calculated by dividing a country's exports by the sum of all countries' reported exports in that year.
+          - For example, if a country exported 500,000 tonnes and the world total was 10 million tonnes, their share would be 5%.
+        description_processing: Computed as 100 × (country export_total_mot) ÷ (sum of export_total_mot across all reporters in the same year).
         display:
-          tolerance: 5
           numDecimalPlaces: 2
 
       net_export_per_capita:
-        title: Per capita net exports of plastic waste via all modes of transport
+        title: Per capita net exports of plastic waste
         unit: kilograms
         short_unit: kg
-        description_short: Net plastic waste trade per person, in kilograms, where positive values indicate net exports and negative values indicate net imports per capita.
+        description_short: Net plastic waste trade balance per person (exports minus imports), measured in kilograms.
         description_key:
-          - Calculated by dividing net exports (exports minus imports) by population and converting to kilograms per person.
-          - Allows comparison of plastic waste trade balance across countries of different population sizes.
-        description_processing: We calculated per capita net exports by dividing net exports (total exports minus total imports) by population data and converting from tonnes to kilograms per person.
+          - This is the net trade balance (exports minus imports) divided by population.
+          - A positive number means each person in the country is associated with net exports of that many kilograms.
+          - A negative number means each person in the country is associated with net imports of that many kilograms.
+          - *per_capita_explanation
+        description_processing: Computed as (net_export in tonnes × 1,000) ÷ population; reported in kg per person.
         display:
-          tolerance: 5
           numDecimalPlaces: 2
 
       export_share_transported_by_air:
         title: Share of plastic waste exports transported by air
         unit: '%'
         short_unit: '%'
-        description_short: The percentage of a country's plastic waste exports that are transported by air.
+        description_short: Percentage of a country's plastic waste exports shipped by air.
         description_key:
-          - Calculated by dividing air exports by total exports and multiplying by 100.
-          - Shows the relative importance of air transport in a country's plastic waste export profile.
-          - Air transport is typically a small share due to high costs relative to sea and land transport.
-        description_processing: We calculated the air transport share for exports by dividing plastic waste exports via air by total plastic waste exports for each country and year, then multiplying by 100.
+          - This shows how much of a country's plastic waste exports travel by air freight versus other transport methods.
+          - It's almost always a very small percentage—most plastic waste travels by sea or land.
+          - Only shown for countries and years where both air transport and total export data are available.
+        description_processing: Computed as 100 × export_air ÷ export_total_mot, per country and year.
         display:
-          tolerance: 5
           numDecimalPlaces: 2
 
       import_share_transported_by_air:
         title: Share of plastic waste imports transported by air
         unit: '%'
         short_unit: '%'
-        description_short: The percentage of a country's plastic waste imports that are transported by air.
+        description_short: Percentage of a country's plastic waste imports arriving by air.
         description_key:
-          - Calculated by dividing air imports by total imports and multiplying by 100.
-          - Shows the relative importance of air transport in a country's plastic waste import profile.
-          - Air transport is typically a small share due to high costs relative to sea and land transport.
-        description_processing: We calculated the air transport share for imports by dividing plastic waste imports via air by total plastic waste imports for each country and year, then multiplying by 100.
+          - This shows how much of a country's plastic waste imports travel by air freight versus other transport methods.
+          - It's almost always a very small percentage—most plastic waste travels by sea or land.
+          - Only shown for countries and years where both air transport and total import data are available.
+        description_processing: Computed as 100 × import_air ÷ import_total_mot, per country and year.
         display:
-          tolerance: 5
           numDecimalPlaces: 2
