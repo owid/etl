@@ -24,7 +24,7 @@ def run(dest_dir: str) -> None:
     # Load tables
     tb_population = ds_meadow.read("population")
 
-    tb_population = tb_population[(tb_population["month"] == "July") & (tb_population['age'] != 'all')]
+    tb_population = tb_population[(tb_population["month"] == "July") & (tb_population["age"] != "all")]
     tb_population = tb_population.drop(columns="month")
     tb_population.loc[(tb_population["year"] < 2024) & (tb_population["variant"] == "Medium"), "variant"] = "Estimates"
     #
@@ -39,7 +39,11 @@ def run(dest_dir: str) -> None:
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
-        dest_dir, tables=[tb_population], check_variables_metadata=True, default_metadata=ds_meadow.metadata, repack=False
+        dest_dir,
+        tables=[tb_population],
+        check_variables_metadata=True,
+        default_metadata=ds_meadow.metadata,
+        repack=False,
     )
 
     # Save changes in the new garden dataset.
