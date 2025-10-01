@@ -120,6 +120,7 @@ def create_question(
     query: str,
     description: str | None = None,
     database_id: int = DATABASE_ID,
+    collection_id: int = COLLECTION_EXPERT_ID,
     **kwargs,
 ):
     """Create a question in Metabase with the given SQL query and title.
@@ -142,7 +143,7 @@ def create_question(
     # Create question
     question = mb.create_card(
         # card_name=f"{QUESTION_TITLE} (1)",
-        collection_id=COLLECTION_EXPERT_ID,
+        collection_id=collection_id,
         # If you are providing only this argument, the keys 'name', 'dataset_query' and 'display' are required (https://github.com/metabase/metabase/blob/master/docs/api-documentation.md#post-apicard).
         custom_json={
             "name": q_title,
