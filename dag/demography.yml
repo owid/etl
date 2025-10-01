@@ -45,6 +45,8 @@ steps:
     - snapshot://un/2024-07-12/un_wpp_population_medium.csv
     - snapshot://un/2024-07-12/un_wpp_population_high.csv
     - snapshot://un/2024-07-12/un_wpp_population_constant_fertility.csv
+    - snapshot://un/2024-07-12/un_wpp_population_no_change.csv
+    - snapshot://un/2024-07-12/un_wpp_population_constant_mortality.csv
     # Fertility
     - snapshot://un/2024-07-12/un_wpp_fertility.csv
     - snapshot://un/2024-07-12/un_wpp_fertility_single_age.csv
@@ -60,6 +62,9 @@ steps:
   export://explorers/un/latest/un_wpp:
     - data://grapher/un/2024-07-12/un_wpp
     - data://grapher/un/2024-07-12/un_wpp_full
+
+  data://garden/un/2025-10-01/un_wpp:
+    - data://meadow/un/2024-07-12/un_wpp
 
   # UN WPP (2022)
   data://meadow/un/2022-07-11/un_wpp:
@@ -356,3 +361,6 @@ steps:
   # UN WPP data for Cologne
   data://external/demography/latest/un_wpp_subset:
     - data://garden/un/2024-07-12/un_wpp
+
+  data://external/demography/latest/un_wpp_scenarios_single_age:
+    - data://garden/un/2025-10-01/un_wpp

@@ -51,7 +51,7 @@ COLUMNS_INDEX_FORMAT_MONTH = [
     "age",
     "month",
 ]
-SCENARIOS = ["Medium", "Low", "High", "Constant fertility", "Estimates"]
+SCENARIOS = ["Medium", "Low", "High", "Constant fertility", "Estimates", "Constant mortality", "No change"]
 LOCATION_TYPES_CSV = [
     "Country/Area",
     "Geographic region",
@@ -157,6 +157,10 @@ def make_tb_population() -> Table:
     tb_population_h["month"] = "July"
     tb_population_c = read_from_csv("un_wpp_population_constant_fertility.csv")
     tb_population_c["month"] = "July"
+    tb_population_cm = read_from_csv("un_wpp_population_constant_mortality.csv")
+    tb_population_cm["month"] = "July"
+    tb_population_nc = read_from_csv("un_wpp_population_no_change.csv")
+    tb_population_nc["month"] = "July"
     tb_population = combine_population(
         [
             tb_population,
@@ -166,9 +170,20 @@ def make_tb_population() -> Table:
             tb_population_m,
             tb_population_h,
             tb_population_c,
+            tb_population_cm,
+            tb_population_nc,
         ]
     )
-    del tb_population_l, tb_population_m, tb_population_h, tb_population_c, tb_population_jan, tb_population_jan_medium
+    del (
+        tb_population_l,
+        tb_population_m,
+        tb_population_h,
+        tb_population_c,
+        tb_population_jan,
+        tb_population_jan_medium,
+        tb_population_cm,
+        tb_population_nc,
+    )
     tb_population = tb_population.format(COLUMNS_INDEX_FORMAT_MONTH, short_name="population")
     return tb_population
 

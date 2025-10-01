@@ -32,7 +32,9 @@ def main(upload: bool) -> None:
         # "un_wpp_population_high.csv",
         # "un_wpp_population_constant_fertility.csv",
         # "un_wpp_population_jan_estimates.csv",
-        "un_wpp_population_jan_medium.csv",
+        # "un_wpp_population_jan_medium.csv",
+        # "un_wpp_population_no_change.csv",
+        "un_wpp_population_constant_mortality.csv",
         # Fertility
         # "un_wpp_fertility_single_age.csv",
         # "un_wpp_fertility.csv",
