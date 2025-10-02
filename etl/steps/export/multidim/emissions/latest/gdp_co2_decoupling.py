@@ -8,6 +8,8 @@ def run() -> None:
     # Load configuration from adjacent yaml file.
     config = paths.load_collection_config()
 
+    
+
     c = paths.create_collection(
         config=config,
     )

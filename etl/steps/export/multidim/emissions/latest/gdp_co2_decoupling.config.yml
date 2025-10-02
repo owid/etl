@@ -8,9 +8,9 @@ definitions:
       chartTypes: [SlopeChart, LineChart]
       hasMapTab: false
       minTime: 2000
-      maxTime: 2023
+      maxTime: 2022
       timelineMinTime: 1950
-      timelineMaxTime: 2025
+      timelineMaxTime: 2022
       hideFacetControl: true
       hideRelativeToggle: true
       selectedFacetStrategy: entity
@@ -20,10 +20,6 @@ definitions:
     metadata:
       display:
         numDecimalPlaces: 0
-  - dimensions:
-      growth_metric: gdp
-    config:
-      note: "GDP (PPP) is given in constant 2021 international $."
 
 
 title:
