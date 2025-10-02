@@ -186,11 +186,25 @@ pytest tests/test_steps.py -m integration
 ## Configuration
 
 ### Python Environment
-- **Virtual Environment**: This project uses a Python virtual environment (`.venv/`)
-- **Activation**: Always activate the virtual environment before running commands:
-  ```bash
-  source .venv/bin/activate  # Activate virtual environment
-  ```
+
+⚠️ **CRITICAL: Virtual Environment Usage**
+
+This project uses a Python virtual environment (`.venv/`). **ALL Python commands must use the virtual environment binaries:**
+
+```bash
+# CORRECT - Use .venv binaries
+.venv/bin/python script.py
+.venv/bin/etl run step
+.venv/bin/pytest tests/
+
+# WRONG - Global commands will fail
+python script.py        # ❌ Don't use
+etl run step           # ❌ Don't use
+pytest tests/          # ❌ Don't use
+```
+
+**Throughout this document, when you see commands like `etl`, `python`, or `pytest`, always prefix them with `.venv/bin/`**
+
 - **Package Management**: Always use `uv` package manager instead of `pip`
   ```bash
   uv add package_name     # Add a new package
