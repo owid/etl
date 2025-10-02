@@ -1,6 +1,8 @@
 definitions:
   economic_color: &economic_color "#1f77b4"
-  emissions_color: &emissions_color "#ff7f0e"
+  emissions_color: &emissions_color "#d62728"
+
+
   gdp_pc_p: &gdp_pc_p grapher/worldbank_wdi/2025-09-08/wdi/wdi#ny_gdp_pcap_kn
   gdp_t_p: &gdp_t_p grapher/worldbank_wdi/2025-09-08/wdi/wdi#ny_gdp_mktp_kd
   gni_pc_p: &gni_pc_p grapher/worldbank_wdi/2025-09-08/wdi/wdi#ny_gnp_pcap_kn
@@ -10,26 +12,75 @@ definitions:
   emis_p_t_p: &emis_p_t_p grapher/gcp/2024-11-21/global_carbon_budget/global_carbon_budget#emissions_total
   emis_c_pc_p: &emis_c_pc_p grapher/gcp/2024-11-21/global_carbon_budget/global_carbon_budget#consumption_emissions_per_capita
   emis_c_t_p: &emis_c_t_p grapher/gcp/2024-11-21/global_carbon_budget/global_carbon_budget#consumption_emissions
+
+
   gdp_name: &gdp_name "GDP"
   gdp_pc_name: &gdp_pc_name "GDP per capita"
   gni_name: &gni_name "GNI"
   gni_pc_name: &gni_pc_name "GNI per capita"
   income_pc_name: &income_pc_name "Median income"
-  emis_p_name: &emis_p_name "CO2 emissions (production-based)"
-  emis_p_pc_name: &emis_p_pc_name "CO2 emissions per capita (production-based)"
-  emis_c_name: &emis_c_name "CO2 emissions (consumption-based)"
-  emis_c_pc_name: &emis_c_pc_name "CO2 emissions per capita (consumption-based)"
+  emis_p_name: &emis_p_name "CO₂ emissions (production-based)"
+  emis_p_pc_name: &emis_p_pc_name "CO₂ emissions per capita (production-based)"
+  emis_c_name: &emis_c_name "CO₂ emissions (consumption-based)"
+  emis_c_pc_name: &emis_c_pc_name "CO₂ emissions per capita (consumption-based)"
+
+  gdp_t_p_title: &gdp_t_p_title "GDP vs CO₂ emissions (production-based)"
+  gdp_t_p_subtitle: &gdp_t_p_subtitle "Comparing change in total GDP with the change in total CO₂ emissions from production"
+
+  gdp_pc_p_title: &gdp_pc_p_title "GDP vs CO₂ emissions per capita (production-based)"
+  gdp_pc_p_subtitle: &gdp_pc_p_subtitle "Comparing change in GDP per capita with the change in CO₂ emissions per capita. CO₂ emissions are based on production."
+
+  gni_t_p_title: &gni_t_p_title "GNI vs CO₂ emissions (production-based)"
+  gni_t_p_subtitle: &gni_t_p_subtitle "Comparing change in total GNI with the change in total CO₂ emissions from production."
+
+  gni_pc_p_title: &gni_pc_p_title "GNI vs CO₂ emissions per capita (production-based)"
+  gni_pc_p_subtitle: &gni_pc_p_subtitle "Comparing change in GNI per capita with the change in CO₂ emissions per capita. CO₂ emissions are based on production."
+
+  inc_pc_p_title: &inc_pc_p_title "Median income vs CO₂ emissions per capita (production-based)"
+  inc_pc_p_subtitle: &inc_pc_p_subtitle "Comparing change in median income or median consumption with the change in CO₂ emissions per capita. CO₂ emissions are based on production."
+
+  gdp_t_c_title: &gdp_t_c_title "GDP vs CO₂ emissions (consumption-based)"
+  gdp_t_c_subtitle: &gdp_t_c_subtitle "Comparing change in total GDP with the change in total CO₂ emissions from consumption."
+
+  gdp_pc_c_title: &gdp_pc_c_title "GDP vs CO₂ emissions per capita (consumption-based)"
+  gdp_pc_c_subtitle: &gdp_pc_c_subtitle "Comparing change in GDP per capita with the change in CO₂ emissions per capita. CO₂ emissions are based on consumption."
+
+  gni_t_c_title: &gni_t_c_title "GNI vs CO₂ emissions (consumption-based)"
+  gni_t_c_subtitle: &gni_t_c_subtitle "Comparing change in total GNI with the change in total CO₂ emissions from consumption."
+
+  gni_pc_c_title: &gni_pc_c_title "GNI vs CO₂ emissions per capita (consumption-based)"
+  gni_pc_c_subtitle: &gni_pc_c_subtitle "Comparing change in GNI per capita with the change in CO₂ emissions per capita. CO₂ emissions are based on consumption."
+
+  inc_pc_c_title: &inc_pc_c_title "Median income vs CO₂ emissions per capita (consumption-based)"
+  inc_pc_c_subtitle: &inc_pc_c_subtitle "Comparing change in median income or median consumption with the change in CO₂ emissions per capita. CO₂ emissions are based on consumption."
+
+
+  income_inf: &income_inf "Median income or median consumption comes from household surveys. The data is adjusted for inflation."
+  income_desc: &income_desc "Depending on data availability, the data relates to either income or consumption, per capita. Per capita means that the income of each household is attributed equally to each member of the household (including children)."
+
+  gdp_inf: &gdp_inf "Gross Domestic Product (GDP) is the total value of goods produced and services provided in a country during one year. The data is adjusted for inflation."
+
+  gni_inf: &gni_inf "Gross national income (GNI) is a measure of the total income earned by residents of a country or region each year. It is calculated as GDP plus net income received from abroad, plus taxes (minus subsidies) on production."
+
+  emis_prod: &emis_prod "The CO₂ emissions data is based on territorial emissions, meaning the emissions produced within a country's borders, but not those from imported goods. For example, emissions from imported steel are counted in the country where the steel is produced."
+
+  emis_shipping: &emis_shipping "Emissions from international aviation and shipping are not included in the data for any individual country or region. They are only counted in the global total."
+
+  emis_land_us: &emis_land_us "Emissions from land-use change (e.g., deforestation) are not included in the data."
+
+  emis_cons: &emis_cons "The C02 emissions data attributes the emissions generated in the production of goods and services according to where they were consumed, rather than where they were produced. The data is calculated by adjusting 'production-based' emissions (emissions produced domestically) for trade: Consumption-based emissions equals production-based emissions, minus emissions embedded in exports, plus emissions embedded in imports."
+
+
 
 
 
   common_views:
-  # Age structure
   - config:
       chartTypes: [SlopeChart, LineChart]
       hasMapTab: false
-      minTime: 2000
-      maxTime: 2022
-      timelineMinTime: 1950
+      minTime: 2005
+      maxTime: 2020
+      timelineMinTime: 1960
       timelineMaxTime: 2022
       hideFacetControl: true
       hideRelativeToggle: true
@@ -37,29 +88,112 @@ definitions:
       stackMode: relative
       yAxis:
         facetDomain: independent
+      title: Have these countries decoupled economic growth from CO₂ emissions?
     metadata:
       display:
         numDecimalPlaces: 0
+  - dimensions:
+      growth_metric: gdp
+      emissions_type: production
+    config:
+      note: The GDP is adjusted for inflation. The CO₂ emissions data is based on the location of production and does not account for trade.
+    metadata:
+        description_key:
+          - *gdp_inf
+          - *emis_prod
+          - *emis_shipping
+          - *emis_land_us
+  - dimensions:
+      growth_metric: gni
+      emissions_type: production
+    config:
+      note: The GNI is adjusted for inflation. The CO₂ emissions data is based on the location of production and does not account for trade.
+    metadata:
+        description_key:
+          - *gni_inf
+          - *emis_prod
+          - *emis_shipping
+          - *emis_land_us
+  - dimensions:
+      growth_metric: income
+      emissions_type: production
+    config:
+      note: The median income or median consumption is adjusted for inflation. The CO₂ emissions data is based on the location of production and does not account for trade.
+    metadata:
+        description_key:
+          - *income_inf
+          - *income_desc
+          - *emis_prod
+          - *emis_shipping
+          - *emis_land_us
+  - dimensions:
+      growth_metric: gdp
+      emissions_type: consumption
+    config:
+      note: The GDP is adjusted for inflation. The CO₂ emissions data is based on consumption and accounts for trade.
+    metadata:
+        description_key:
+          - *gdp_inf
+          - *emis_prod
+          - *emis_shipping
+          - *emis_land_us
+  - dimensions:
+      growth_metric: gni
+      emissions_type: consumption
+    config:
+      note: The GNI is adjusted for inflation. The CO₂ emissions data is based on consumption and accounts for trade.
+    metadata:
+        description_key:
+          - *gni_inf
+          - *emis_prod
+          - *emis_shipping
+          - *emis_land_us
+  - dimensions:
+      growth_metric: income
+      emissions_type: consumption
+    config:
+      note: The median income or median consumption is adjusted for inflation. The CO₂ emissions data is based on consumption and accounts for trade.
+    metadata:
+        description_key:
+          - *income_inf
+          - *income_desc
+          - *emis_prod
+          - *emis_shipping
+          - *emis_land_us
 
+
+metadata:
+  presentation:
+    grapher_config:
+      hideAnnotationFieldsInTitle:
+        changeInPrefix: false
 
 title:
-  title: GDP and CO2 emissions decoupling
+  title: Decoupling economic growth and CO₂ emissions
   title_variant: by metric type and source
 
 topic_tags:
   - Climate Change
   - Economic Growth
 
+default_dimensions:
+  metric: per_capita
+  growth_metric: gdp
+  emissions_type: consumption
+
 default_selection:
+  - Ireland
+  - Finland
+  - Sweden
+  - Denmark
   - United States
+  - Canada
   - Germany
-  - China
-  - India
-  - Nicaragua
-  - Costa Rica
-  - Azerbaijan
-  - United Kingdom
+  - Belgium
   - Japan
+  - Singapore
+  - Dominican Republic
+  - Hungary
 
 
 dimensions:
@@ -77,24 +211,24 @@ dimensions:
     name: Economic growth indicator
     choices:
       - slug: gdp
-        name: GDP
-        description: Gross Domestic Product
+        name: Gross Domestic Product
+        description: Gross Domestic Product (GDP) is the total value of goods produced in a country.
       - slug: gni
-        name: GNI
-        description: Gross National Income
+        name: Gross National Income
+        description: Gross National Income (GNI) is the total income earned by a country's residents and businesses, including any income earned abroad.
       - slug: income
-        name: Median income
-        description: Median income/consumption from surveys
+        name: Median income or consumption
+        description: Data from household surveys. Depending on data availability, the data relates to either income or consumption, per capita.
 
   - slug: emissions_type
     name: Emissions
     choices:
       - slug: production
         name: Production-based
-        description: CO2 emissions based on location of production
+        description: CO₂ emissions based on location of production
       - slug: consumption
         name: Consumption-based
-        description: CO2 emissions allocated based on location of consumption (adjusted for trade)
+        description: CO₂ emissions allocated based on location of consumption (adjusted for trade)
 
 views:
 - dimensions:
@@ -112,8 +246,7 @@ views:
             color: *emissions_color
             name: *emis_p_name
   config:
-      title: GDP vs CO2 emissions (production-based)
-      subtitle: Comparing change in total GDP with the change in total CO2 emissions from production
+      subtitle: Comparing change in total GDP with the change in total CO₂ emissions from production
 
 - dimensions:
       metric: per_capita
@@ -132,8 +265,7 @@ views:
             name: *emis_p_pc_name
             numDecimalPlaces: 0
   config:
-      title: GDP vs CO2 emissions per capita
-      subtitle: Comparing change in GDP per capita with the change in CO2 emissions per capita. CO2 emissions are based on production.
+      subtitle: Comparing change in GDP per capita with the change in CO₂ emissions per capita.
 
 - dimensions:
       metric: total
@@ -152,8 +284,7 @@ views:
           name: *emis_p_name
           numDecimalPlaces: 0
   config:
-      title: GNI vs CO2 emissions (production-based)
-      subtitle: Comparing change in total GNI with the change in total CO2 emissions from production.
+      subtitle: Comparing change in total GNI with the change in total CO₂ emissions from production.
 
 - dimensions:
       metric: per_capita
@@ -172,8 +303,7 @@ views:
           name: *emis_p_pc_name
           numDecimalPlaces: 0
   config:
-      title: GNI vs CO2 emissions per capita
-      subtitle: Comparing change in GNI per capita with the change in CO2 emissions per capita. CO2 emissions are based on production.
+      subtitle: Comparing change in GNI per capita with the change in CO₂ emissions per capita.
 
 - dimensions:
       metric: per_capita
@@ -190,8 +320,7 @@ views:
           color: *emissions_color
           name: *emis_p_pc_name
   config:
-      title: Median income vs CO2 emissions per capita
-      subtitle: Comparing change in median income or median consumption with the change in CO2 emissions per capita. CO2 emissions are based on production.
+      subtitle: Comparing change in median income or median consumption with the change in CO₂ emissions per capita.
 
 - dimensions:
       metric: total
@@ -208,8 +337,7 @@ views:
           color: *emissions_color
           name: *emis_c_name
   config:
-      title: GDP vs CO2 emissions (consumption-based)
-      subtitle: Comparing change in total GDP with the change in total CO2 emissions from consumption.
+      subtitle: Comparing change in total GDP with the change in total CO₂ emissions.
 
 - dimensions:
       metric: per_capita
@@ -226,8 +354,7 @@ views:
           color: *emissions_color
           name: *emis_c_pc_name
   config:
-      title: GDP vs CO2 emissions per capita
-      subtitle: Comparing change in GDP per capita with the change in CO2 emissions per capita. CO2 emissions are based on consumption.
+      subtitle: Comparing change in GDP per capita with the change in CO₂ emissions per capita.
 
 - dimensions:
       metric: total
@@ -244,8 +371,7 @@ views:
           color: *emissions_color
           name: *emis_c_name
   config:
-      title: GNI vs CO2 emissions (consumption-based)
-      subtitle: Comparing change in total GNI with the change in total CO2 emissions from consumption
+      subtitle: Comparing change in total GNI with the change in total CO₂ emissions.
 
 - dimensions:
       metric: per_capita
@@ -262,8 +388,7 @@ views:
           color: *emissions_color
           name: *emis_c_pc_name
   config:
-      title: GNI vs CO2 emissions per capita
-      subtitle: Comparing change in GNI per capita with the change in CO2 emissions per capita. CO2 emissions are based on consumption.
+      subtitle: Comparing change in GNI per capita with the change in CO₂ emissions per capita.
 
 - dimensions:
       metric: per_capita
@@ -280,5 +405,4 @@ views:
           color: *emissions_color
           name: *emis_c_pc_name
   config:
-      title: Median income vs CO2 emissions per capita
-      subtitle: Comparing change in median income or median consumption with the change in CO2 emissions per capita. CO2 emissions are based on consumption.
+      subtitle: Comparing change in median income or median consumption with the change in CO₂ emissions per capita.
