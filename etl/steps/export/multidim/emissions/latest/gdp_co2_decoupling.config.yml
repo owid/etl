@@ -70,9 +70,11 @@ definitions:
 
   emis_cons: &emis_cons "The C02 emissions data attributes the emissions generated in the production of goods and services according to where they were consumed, rather than where they were produced. The data is calculated by adjusting 'production-based' emissions (emissions produced domestically) for trade: Consumption-based emissions equals production-based emissions, minus emissions embedded in exports, plus emissions embedded in imports."
 
+  source_wdi_gcp: &source_wdi_gcp "World Bank World Development Indicators (2025); Global Carbon Budget (2024)"
+  source_pip_gcp: &source_pip_gcp "World Bank Poverty and Inequality Platform (2025); Global Carbon Budget (2024)"
 
 
-
+# common attributes for all views
 
   common_views:
   - config:
@@ -86,6 +88,8 @@ definitions:
       hideRelativeToggle: true
       selectedFacetStrategy: entity
       stackMode: relative
+      hideAnnotationFieldsInTitle:
+        changeInPrefix: true
       yAxis:
         facetDomain: independent
       title: Have these countries decoupled economic growth from CO₂ emissions?
@@ -103,6 +107,8 @@ definitions:
           - *emis_prod
           - *emis_shipping
           - *emis_land_us
+        presentation:
+          attribution: *source_wdi_gcp
   - dimensions:
       growth_metric: gni
       emissions_type: production
@@ -114,6 +120,8 @@ definitions:
           - *emis_prod
           - *emis_shipping
           - *emis_land_us
+        presentation:
+          attribution: *source_wdi_gcp
   - dimensions:
       growth_metric: income
       emissions_type: production
@@ -126,6 +134,8 @@ definitions:
           - *emis_prod
           - *emis_shipping
           - *emis_land_us
+        presentation:
+          attribution: *source_pip_gcp
   - dimensions:
       growth_metric: gdp
       emissions_type: consumption
@@ -134,9 +144,11 @@ definitions:
     metadata:
         description_key:
           - *gdp_inf
-          - *emis_prod
+          - *emis_cons
           - *emis_shipping
           - *emis_land_us
+        presentation:
+          attribution: *source_wdi_gcp
   - dimensions:
       growth_metric: gni
       emissions_type: consumption
@@ -145,9 +157,11 @@ definitions:
     metadata:
         description_key:
           - *gni_inf
-          - *emis_prod
+          - *emis_cons
           - *emis_shipping
           - *emis_land_us
+        presentation:
+          attribution: *source_wdi_gcp
   - dimensions:
       growth_metric: income
       emissions_type: consumption
@@ -157,17 +171,13 @@ definitions:
         description_key:
           - *income_inf
           - *income_desc
-          - *emis_prod
+          - *emis_cons
           - *emis_shipping
           - *emis_land_us
+        presentation:
+          attribution: *source_pip_gcp
 
-
-metadata:
-  presentation:
-    grapher_config:
-      hideAnnotationFieldsInTitle:
-        changeInPrefix: false
-
+# Overall chart configuration
 title:
   title: Decoupling economic growth and CO₂ emissions
   title_variant: by metric type and source
