@@ -1,3 +1,31 @@
+definitions:
+  economic_color: &economic_color "#1f77b4"
+  emissions_color: &emissions_color "#ff7f0e"
+
+  common_views:
+  # Age structure
+  - config:
+      chartTypes: [SlopeChart, LineChart]
+      hasMapTab: false
+      minTime: 2000
+      maxTime: 2023
+      timelineMinTime: 1950
+      timelineMaxTime: 2025
+      hideFacetControl: true
+      hideRelativeToggle: true
+      selectedFacetStrategy: entity
+      stackMode: relative
+      yAxis:
+        facetDomain: independent
+    metadata:
+      display:
+        numDecimalPlaces: 0
+  - dimensions:
+      growth_metric: gdp
+    config:
+      note: "GDP (PPP) is given in constant 2021 international $."
+
+
 title:
   title: GDP and CO2 emissions decoupling
   title_variant: by metric type and source
@@ -8,43 +36,224 @@ topic_tags:
 
 default_selection:
   - United States
-  - China
   - Germany
+  - China
   - India
-  - World
+  - Nicaragua
+  - Costa Rica
+  - Azerbaijan
+  - United Kingdom
+  - Japan
+
 
 dimensions:
-  - slug: metric_type
-    name: Scale
+  - slug: metric
+    name: Metric
     choices:
-      - slug: absolute
-        name: Total (absolute)
-        description: Total values for the country
+      - slug: total
+        name: Total
+        description: null
       - slug: per_capita
         name: Per capita
-        description: Values per person
+        description: null
 
   - slug: growth_metric
-    name: Economic indicator
+    name: Economic growth indicator
     choices:
       - slug: gdp
         name: GDP (PPP)
-        description: Gross Domestic Product, purchasing power parity adjusted
+        description: Gross Domestic Product
       - slug: gni
         name: GNI (PPP)
-        description: Gross National Income, purchasing power parity adjusted
+        description: Gross National Income
       - slug: income
-        name: Household income
-        description: Median household income from surveys
+        name: Median income
+        description: Median income/consumption from surveys
 
   - slug: emissions_type
-    name: Emissions source
+    name: Emissions
     choices:
       - slug: production
         name: Production-based
-        description: CO2 emissions from domestic production
+        description: CO2 emissions based on location of production
       - slug: consumption
         name: Consumption-based
-        description: CO2 emissions from domestic consumption
+        description: CO2 emissions allocated based on location of consumption (adjusted for trade)
 
-views: []
+views:
+- dimensions:
+      metric: total
+      growth_metric: gdp
+      emissions_type: production
+  indicators:
+      y:
+        - catalogPath: grapher/worldbank_wdi/2025-09-08/wdi/wdi#ny_gdp_mktp_pp_kd
+          display:
+            color: *economic_color
+            name: GDP (PPP)
+        - catalogPath: grapher/gcp/2024-11-21/global_carbon_budget/global_carbon_budget#emissions_total
+          display:
+            color: *emissions_color
+            name: CO2 emissions (production-based)
+  config:
+      title: GDP vs CO2 emissions (production-based)
+      subtitle: Comparing change in total GDP with the change in total CO2 emissions from production
+- dimensions:
+      metric: per_capita
+      growth_metric: gdp
+      emissions_type: production
+  indicators:
+      y:
+        - catalogPath: grapher/worldbank_wdi/2025-09-08/wdi/wdi#ny_gdp_pcap_pp_kd
+          display:
+            color: *economic_color
+            name: GDP (PPP) per capita
+            numDecimalPlaces: 0
+        - catalogPath: grapher/gcp/2024-11-21/global_carbon_budget/global_carbon_budget#emissions_total_per_capita
+          display:
+            color: *emissions_color
+            name: CO2 emissions per capita (production-based)
+            numDecimalPlaces: 0
+  config:
+      title: GDP vs CO2 emissions per capita
+      subtitle: Comparing change in GDP per capita with the change in CO2 emissions per capita. CO2 emissions are based on production.
+- dimensions:
+      metric: total
+      growth_metric: gni
+      emissions_type: production
+  indicators:
+      y:
+      - catalogPath: grapher/worldbank_wdi/2025-09-08/wdi/wdi#ny_gnp_mktp_pp_kd
+        display:
+          color: *economic_color
+          name: GNI (PPP)
+          numDecimalPlaces: 0
+      - catalogPath: grapher/gcp/2024-11-21/global_carbon_budget/global_carbon_budget#emissions_total
+        display:
+          color: *emissions_color
+          name: CO2 emissions (production-based)
+          numDecimalPlaces: 0
+  config:
+      title: GNI vs CO2 emissions (production-based)
+      subtitle: Comparing change in total GNI with the change in total CO2 emissions from production.
+- dimensions:
+      metric: per_capita
+      growth_metric: gni
+      emissions_type: production
+  indicators:
+      y:
+      - catalogPath: grapher/worldbank_wdi/2025-09-08/wdi/wdi#ny_gnp_pcap_pp_kd
+        display:
+          color: *economic_color
+          name: GNI (PPP) per capita
+          numDecimalPlaces: 0
+      - catalogPath: grapher/gcp/2024-11-21/global_carbon_budget/global_carbon_budget#emissions_total_per_capita
+        display:
+          color: *emissions_color
+          name: CO2 emissions per capita (production-based)
+          numDecimalPlaces: 0
+  config:
+      title: GNI vs CO2 emissions per capita
+      subtitle: Comparing change in GNI per capita with the change in CO2 emissions per capita. CO2 emissions are based on production.
+- dimensions:
+      metric: per_capita
+      growth_metric: income
+      emissions_type: production
+  indicators:
+      y:
+      - catalogPath: grapher/wb/2025-08-07/world_bank_pip/world_bank_pip#median__ppp_version_2021__poverty_line_no_poverty_line__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+        display:
+          color: *economic_color
+          name: Median income (PPP)
+      - catalogPath: grapher/gcp/2024-11-21/global_carbon_budget/global_carbon_budget#emissions_total_per_capita
+        display:
+          color: *emissions_color
+          name: CO2 emissions per capita (production-based)
+  config:
+      title: Median income vs CO2 emissions per capita
+      subtitle: Comparing change in median income or median consumption with the change in CO2 emissions per capita. CO2 emissions are based on production.
+- dimensions:
+      metric: total
+      growth_metric: gdp
+      emissions_type: consumption
+  indicators:
+      y:
+      - catalogPath: grapher/worldbank_wdi/2025-09-08/wdi/wdi#ny_gdp_mktp_pp_kd
+        display:
+          color: *economic_color
+          name: GDP (PPP)
+      - catalogPath: grapher/gcp/2024-11-21/global_carbon_budget/global_carbon_budget#consumption_emissions
+        display:
+          color: *emissions_color
+          name: CO2 emissions (consumption-based)
+  config:
+      title: GDP vs CO2 emissions (consumption-based)
+      subtitle: Comparing change in total GDP with the change in total CO2 emissions from consumption.
+- dimensions:
+      metric: per_capita
+      growth_metric: gdp
+      emissions_type: consumption
+  indicators:
+      y:
+      - catalogPath: grapher/worldbank_wdi/2025-09-08/wdi/wdi#ny_gdp_pcap_pp_kd
+        display:
+          color: *economic_color
+          name: GDP (PPP) per capita
+      - catalogPath: grapher/gcp/2024-11-21/global_carbon_budget/global_carbon_budget#consumption_emissions_per_capita
+        display:
+          color: *emissions_color
+          name: CO2 emissions per capita (consumption-based)
+  config:
+      title: GDP vs CO2 emissions per capita
+      subtitle: Comparing change in GDP per capita with the change in CO2 emissions per capita. CO2 emissions are based on consumption.
+- dimensions:
+      metric: total
+      growth_metric: gni
+      emissions_type: consumption
+  indicators:
+      y:
+      - catalogPath: grapher/worldbank_wdi/2025-09-08/wdi/wdi#ny_gnp_mktp_pp_kd
+        display:
+          color: *economic_color
+          name: GNI (PPP)
+      - catalogPath: grapher/gcp/2024-11-21/global_carbon_budget/global_carbon_budget#consumption_emissions
+        display:
+          color: *emissions_color
+          name: CO2 emissions (consumption-based)
+  config:
+      title: GNI vs CO2 emissions (consumption-based)
+      subtitle: Comparing change in total GNI with the change in total CO2 emissions from consumption
+- dimensions:
+      metric: per_capita
+      growth_metric: gni
+      emissions_type: consumption
+  indicators:
+      y:
+      - catalogPath: grapher/worldbank_wdi/2025-09-08/wdi/wdi#ny_gnp_pcap_pp_kd
+        display:
+          color: *economic_color
+          name: GNI (PPP) per capita
+      - catalogPath: grapher/gcp/2024-11-21/global_carbon_budget/global_carbon_budget#consumption_emissions_per_capita
+        display:
+          color: *emissions_color
+          name: CO2 emissions per capita (consumption-based)
+  config:
+      title: GNI vs CO2 emissions per capita
+      subtitle: Comparing change in GNI per capita with the change in CO2 emissions per capita. CO2 emissions are based on consumption.
+- dimensions:
+      metric: per_capita
+      growth_metric: income
+      emissions_type: consumption
+  indicators:
+      y:
+      - catalogPath: grapher/wb/2025-08-07/world_bank_pip/world_bank_pip#median__ppp_version_2021__poverty_line_no_poverty_line__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+        display:
+          color: *economic_color
+          name: Median income (PPP)
+      - catalogPath: grapher/gcp/2024-11-21/global_carbon_budget/global_carbon_budget#consumption_emissions_per_capita
+        display:
+          color: *emissions_color
+          name: CO2 emissions per capita (consumption-based)
+  config:
+      title: Median income vs CO2 emissions per capita
+      subtitle: Comparing change in median income or median consumption with the change in CO2 emissions per capita. CO2 emissions are based on consumption.

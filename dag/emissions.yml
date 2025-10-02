@@ -63,11 +63,17 @@ steps:
     - data://garden/worldbank_wdi/2024-05-20/wdi
     - data://garden/gcp/2024-11-21/global_carbon_budget
 
+  data://grapher/emissions/2025-09-30/gdp_co2_decoupling:
+    - data://grapher/worldbank_wdi/2025-09-08/wdi
+    - data://grapher/wb/2025-08-07/world_bank_pip
+    - data://grapher/gcp/2024-11-21/global_carbon_budget
+    - data://grapher/un/2024-07-12/un_wpp
+
   export://multidim/emissions/latest/gdp_co2_decoupling:
-    - data://garden/worldbank_wdi/2025-09-08/wdi
-    - data://garden/wb/2025-08-07/world_bank_pip
-    - data://garden/gcp/2024-11-21/global_carbon_budget
-    - data://garden/un/2024-07-12/un_wpp
+    - data://grapher/worldbank_wdi/2025-09-08/wdi
+    - data://grapher/wb/2025-08-07/world_bank_pip
+    - data://grapher/gcp/2024-11-21/global_carbon_budget
+    - data://grapher/un/2024-07-12/un_wpp
 
   #
   # GCP - Global Carbon Budget.
