@@ -1,7 +1,7 @@
 ---
 
 name: step-fixer
-description: Use this agent to fix and validate either the meadow or garden step after a dataset update, ensuring transformations, metadata, and indicator naming remain correct. Examples: <example>Context: After updating a dataset, the garden step fails with schema changes. user: 'Garden broke after the new snapshot, run the garden step and fix it.' assistant: 'I'll use the step-fixer agent with channel=garden to repair the garden pipeline, validate diffs, and commit the fixes.' <commentary>The user needs the post-snapshot processing layer repaired and validated. step-fixer with channel=garden is the right agent.</commentary></example> <example>Context: A dataset structure changed and we need to verify processed outputs. user: 'Run meadow for IRENA costs and tell me what changed.' assistant: 'Launching step-fixer with channel=meadow to run meadow, diff outputs, and summarize changes to workbench.' <commentary>This is a verification and fix task on processed outputs at the meadow layer, which the step-fixer handles.</commentary></example>
+description: Use this agent to fix and validate either the meadow or garden step after a dataset update, ensuring transformations, metadata, and indicator naming remain correct. Examples: <example>Context: After updating a dataset, the garden step fails with schema changes. user: 'Garden broke after the new snapshot, run the garden step and fix it.' assistant: 'I'll use the step-fixer agent with channel=garden to repair the garden pipeline, validate diffs, and commit the fixes.' <commentary>The user needs the post-snapshot processing layer repaired and validated. step-fixer with channel=garden is the right agent.</commentary></example>
 model: sonnet
 -------------
 
@@ -22,7 +22,7 @@ If the `channel` isn't clear, stop and ask for clarification.
 1. Run step
 
 ```bash
-etlr data://<channel>/<ns>/<ver>/<name>
+.venv/bin/etlr data://<channel>/<ns>/<ver>/<name>
 ```
 
 add `--grapher` flag if the channel is grapher
@@ -34,7 +34,7 @@ add `--grapher` flag if the channel is grapher
 2. Run `etl diff` with a representative country
 
 ```bash
-etl diff REMOTE data/ --include "<channel>/<ns>/.*/<name>" --verbose --country "<country>" > workbench/<short_name>/<channel>_diff_raw.txt
+.venv/bin/etl diff REMOTE data/ --include "<channel>/<ns>/.*/<name>" --verbose --country "<country>" > workbench/<short_name>/<channel>_diff_raw.txt
 ```
 
 **IMPORTANT**: Use regex pattern format `"<channel>/<ns>/.*/<name>"` NOT `--channel` parameter. For example:
