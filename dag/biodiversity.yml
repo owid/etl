@@ -88,3 +88,5 @@ steps:
     - data://meadow/iucn/2025-09-09/iucn_number_each_status
   data://grapher/iucn/2025-09-09/iucn_number_each_status:
     - data://garden/iucn/2025-09-09/iucn_number_each_status
+  data://garden/biodiversity/2025-10-02/cherry_blossom:
+    - data://meadow/biodiversity/2025-04-07/cherry_blossom
