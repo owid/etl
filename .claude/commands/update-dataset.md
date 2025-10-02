@@ -80,17 +80,17 @@ You MUST:
    - CHECKPOINT
 3) Snapshot run & compare (snapshot-runner subagent)
    - Inputs: `<namespace>/<new_version>/<short_name>` and `<old_version>`
-   - Save summary to `workbench/<short_name>/snapshot-runner.md`
    - CHECKPOINT
 4) Meadow step repair/verify (step-fixer subagent, channel=meadow)
    - Run, fix, re-run; produce diffs
    - Save diffs and summaries
    - CHECKPOINT
 5) Garden step repair/verify (step-fixer subagent, channel=garden)
-   - Same pattern as Meadow
+   - Run, fix, re-run; produce diffs
+   - Save diffs and summaries
    - CHECKPOINT
 6) Grapher step run/verify (step-fixer subagent, channel=grapher, add --grapher)
-   - Skip diff; verify variables/metadata
+   - Skip diff
    - CHECKPOINT
 7) Indicator upgrade (optional, staging only)
    - Use indicator-upgrader subagent with `<short_name> <branch>`
