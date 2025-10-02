@@ -1,6 +1,6 @@
 import uuid
 from pathlib import Path
-from typing import Any, List, Literal
+from typing import Any, Dict, List, Literal
 
 import logfire
 import pandas as pd
@@ -106,14 +106,14 @@ settings = OpenAIResponsesModelSettings(
 
 ## Use MCPs or not based on user input
 def get_toolsets():
-    if ("expert_use_mcp" in st.session_state) and st.session_state["expert_use_mcp"]:
-        # Create MCP server instance inside function to avoid event loop binding issues
-        mcp_server_prod = MCPServerStreamableHTTP(
-            url=OWID_MCP_SERVER_URL,
-            process_tool_call=process_tool_call,
-            tool_prefix="owid_data_",
-        )
-        return [mcp_server_prod]
+    # if ("expert_use_mcp" in st.session_state) and st.session_state["expert_use_mcp"]:
+    # Create MCP server instance inside function to avoid event loop binding issues
+    mcp_server_prod = MCPServerStreamableHTTP(
+        url=OWID_MCP_SERVER_URL,
+        process_tool_call=process_tool_call,
+        tool_prefix="owid_data_",
+    )
+    return [mcp_server_prod]
     return []
 
 
@@ -193,6 +193,12 @@ Always include proper titles and axis labels to make the plot self-explanatory."
 # STREAMING
 #######################################################
 def run_agent_stream(prompt: str, structured: bool = False, question_id: str | None = None):
+    print("============================================")
+    print("01---------------------------")
+    print(st.session_state)
+    print("---------------------------")
+    tools = agent._get_toolset()
+    print(tools)
     if structured:
         from apps.wizard.app_pages.expert_agent.stream import agent_stream_sync_structured
 
@@ -358,25 +364,28 @@ async def get_db_tables() -> str:
 
 
 @agent.tool_plain(docstring_format="google")
-async def get_db_table_fields(tb_name: str) -> str:
-    """Retrieve the documentation of the columns of database table "tb_name".
+async def get_db_table_fields(tb_names: List[str]) -> Dict[str, Any]:
+    """Retrieve the documentation of the columns of a subset of tables in the database table.
 
 
     Args:
-        tb_name: Name of the table
+        tb_names: Names of the tables of interest
 
     Returns:
-        str: Table documentation as string, mapping column names to their descriptions. E.g. "column1: description1\ncolumn2: description2".
+        Dict: Documentation of the tables of interest. Each key in the dictionary corresponds to a table. The values is the table documentation as string, mapping column names to their descriptions. E.g. "column1: description1\ncolumn2: description2".
     """
     # tool_ui_message(
     #     message_type="markdown",
     #     text=f"**:material/construction: Tool use**: Getting documentation of table `{tb_name}` from the semantic layer, via `get_db_table_fields`",
     # )
-    if tb_name not in ANALYTICS_DB_TABLE_DETAILS:
-        print("Table not found:", tb_name)
-        print("Available tables:", sorted(ANALYTICS_DB_TABLE_DETAILS.keys()))
-        return "Table not found: " + tb_name
-    return ANALYTICS_DB_TABLE_DETAILS[tb_name]
+    result = {}
+    for tb_name in tb_names:
+        if tb_name not in ANALYTICS_DB_TABLE_DETAILS:
+            text = f"Table not found: {tb_name}"
+        else:
+            text = ANALYTICS_DB_TABLE_DETAILS[tb_name]
+        result[tb_name] = text
+    return result
 
 
 # Metabase/Datasette
@@ -455,23 +464,23 @@ async def execute_query(query: str, title: str, description: str, num_rows: int 
         )
 
 
-@agent.tool_plain(docstring_format="google")
-async def create_question_with_filters(query: str, title: str, description: str) -> None:
-    """Create a Metabase question that has filters."""
-    _ = create_question(
-        query=query,
-        title=title,
-        description=description,
-    )
+# @agent.tool_plain(docstring_format="google")
+# async def create_question_with_filters(query: str, title: str, description: str) -> None:
+#     """Create a Metabase question that has filters."""
+#     _ = create_question(
+#         query=query,
+#         title=title,
+#         description=description,
+#     )
 
 
-@agent.tool_plain(docstring_format="google")
-async def get_question_query(card_id: int):
-    # Get question
-    _ = get_question_info(card_id)
-    # Generate URL
-    # url = _generate_question_url(question)
-    # return url
+# @agent.tool_plain(docstring_format="google")
+# async def get_question_query(card_id: int):
+#     # Get question
+#     _ = get_question_info(card_id)
+#     # Generate URL
+#     # url = _generate_question_url(question)
+#     # return url
 
 
 @agent.tool_plain(docstring_format="google")
