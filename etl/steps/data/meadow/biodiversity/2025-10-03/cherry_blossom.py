@@ -19,7 +19,7 @@ def run() -> None:
     snap = paths.load_snapshot("cherry_blossom.xls", version="2024-01-25")
     tb = snap.read(skiprows=25)
     # retrieve snapshot of more recent years
-    snap_recent = paths.load_snapshot("cherry_blossom.csv", version="2025-04-07")
+    snap_recent = paths.load_snapshot("cherry_blossom.csv", version="2025-10-03")
     tb_recent = snap_recent.read()
     # clean and transform data
     tb = clean_data(tb)
