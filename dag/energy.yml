@@ -210,6 +210,7 @@ steps:
     - data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy
     - data://garden/demography/2024-07-15/population
     - data://garden/ember/2025-05-12/yearly_electricity
+
   #
   # Energy - Electricity mix (EI & Ember).
   #
