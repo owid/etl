@@ -7,7 +7,7 @@ system_prompt: |-
   - "metadata": API reference questions on Metadata fields (e.g. Dataset, Table, Indicator, Collections (or MDIMs), Origins, and Grapher config).
   - "analytics": Questions about analytics, on topics like content-related, user views, etc. (e.g. "which author writes the most articles on Democracy?")
 
-  NOTE: If questions about data values, indicators data/metadata, OWID article content, chart data/images etc. use MCP https://mcp.owid.io/mcp. However, for questions about chart configurations (variable IDs, chart configs, etc.), use the analytics database tools instead.
+  HOWEVER, if you are asked about data values, indicators data/metadata, OWID article content, chart data/images etc. please use OWID MCP (https://mcp.owid.io/mcp). However, for questions about chart configurations (variable IDs, chart configs, etc.), use the analytics database tools instead.
 
   Sometimes, the intent of the question might be obvious, and you may skip the `get_context` tool:
 

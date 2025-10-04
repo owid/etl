@@ -137,7 +137,7 @@ def show_reasoning_details_dialog():
 def show_debugging_details():
     messages = _load_history_messages()
     config = st.session_state.get("expert_config", {})
-    mcp_use = st.session_state.get("expert_use_mcp", None)
+    # mcp_use = st.session_state.get("expert_use_mcp", None)
     usage = st.session_state.get("last_usage", {})
     if usage != {}:
         usage = to_json(usage)
@@ -145,7 +145,7 @@ def show_debugging_details():
 
     data = {
         "model_config": config,
-        "mcp_use": mcp_use,
+        # "mcp_use": mcp_use,
         "num_messages": len(messages),
         "messages": messages,
         "usage": usage,
@@ -248,12 +248,12 @@ def show_settings_menu():
             # on_change=lambda: st.session_state.setdefault("expert_config", {}).update({"model_name": st.session_state["expert_model_name"]}),
         )
         st.session_state["expert_config"]["model_name"] = model_name
-    st.toggle(
-        label="Use OWID mcp",
-        value=True,
-        key="expert_use_mcp",
-        help="Use MCPs to access and interact with OWID's data. :material/warning: Note: This feature is new, disable it if you are experiencing any issues.",
-    )
+    # st.toggle(
+    #     label="Use OWID mcp",
+    #     value=True,
+    #     key="expert_use_mcp",
+    #     help="Use MCPs to access and interact with OWID's data. :material/warning: Note: This feature is new, disable it if you are experiencing any issues.",
+    # )
     with st.container(horizontal=True, vertical_alignment="bottom"):
         st.button(
             label=":material/clear_all: Clear chat",

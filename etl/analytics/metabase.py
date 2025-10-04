@@ -12,6 +12,7 @@ from metabase_api import Metabase_API
 
 from etl.config import (
     METABASE_API_KEY,
+    METABASE_API_KEY_ADMIN,
     METABASE_SEMANTIC_LAYER_DATABASE_ID,
     METABASE_URL,
     METABASE_URL_LOCAL,
@@ -21,6 +22,12 @@ from etl.config import (
 # Config
 COLLECTION_EXPERT_ID = 61  # Expert collection
 DATABASE_ID = 2  # Semantic Layer database
+
+
+def mb_cli(key: str | None = None):
+    if key is None:
+        key = METABASE_API_KEY
+    return Metabase_API(METABASE_URL_LOCAL, api_key=key)
 
 
 def read_metabase(sql: str) -> pd.DataFrame:
@@ -113,6 +120,7 @@ def create_question(
     query: str,
     description: str | None = None,
     database_id: int = DATABASE_ID,
+    collection_id: int = COLLECTION_EXPERT_ID,
     **kwargs,
 ):
     """Create a question in Metabase with the given SQL query and title.
@@ -130,12 +138,12 @@ def create_question(
     q_title = f"🤖 {title} ({QUESTION_TIMESTAMP})"
 
     # Init API client
-    mb = Metabase_API(METABASE_URL_LOCAL, api_key=METABASE_API_KEY)
+    mb = mb_cli()
 
     # Create question
     question = mb.create_card(
         # card_name=f"{QUESTION_TITLE} (1)",
-        collection_id=COLLECTION_EXPERT_ID,
+        collection_id=collection_id,
         # If you are providing only this argument, the keys 'name', 'dataset_query' and 'display' are required (https://github.com/metabase/metabase/blob/master/docs/api-documentation.md#post-apicard).
         custom_json={
             "name": q_title,
@@ -157,7 +165,7 @@ def create_question(
 
 def list_questions():
     # Init API client
-    mb = Metabase_API(METABASE_URL_LOCAL, api_key=METABASE_API_KEY)
+    mb = mb_cli()
 
     # Get cards
     cards = mb.get("/api/card/")
@@ -174,7 +182,7 @@ def list_questions():
 
 def get_question_info(question_id: int) -> dict:
     # Init API client
-    mb = Metabase_API(METABASE_URL_LOCAL, api_key=METABASE_API_KEY)
+    mb = mb_cli()
 
     # Get question
     question = mb.get_item_info(item_id=question_id, item_type="card")
@@ -186,7 +194,7 @@ def get_question_info(question_id: int) -> dict:
 
 def get_question_data(card_id: int, data_format: str = "csv") -> pd.DataFrame:
     # Init API client
-    mb = Metabase_API(METABASE_URL_LOCAL, api_key=METABASE_API_KEY)
+    mb = mb_cli()
 
     # Get card data
     data_str = mb.get_card_data(
@@ -199,4 +207,47 @@ def get_question_data(card_id: int, data_format: str = "csv") -> pd.DataFrame:
     # Parse raw data as dataframe
     df = pd.read_csv(BytesIO(initial_bytes=data_str.encode()), encoding="utf-8")  # add encoding if needed
 
+    return df
+
+
+def get_metabase_analytics():
+    """Get views on Metabase questions."""
+    mb = mb_cli(key=METABASE_API_KEY_ADMIN)
+
+    #########################
+    # View counts
+    #########################
+    dfs = []
+    # Get cards
+    cards = mb.get("/api/card/")
+    # Ensure cards is a list
+    if not isinstance(cards, list):
+        cards = []
+
+    # Build cards dataframe
+    cards = [{"id": c["id"], "type": c["type"], "name": c["name"], "views": c["view_count"]} for c in cards]
+    df = pd.DataFrame(cards)
+    dfs.append(df)
+
+    # Get dashboards
+    dashboards = mb.get("/api/dashboard/")
+    # Ensure dashboards is a list
+    if not isinstance(dashboards, list):
+        dashboards = []
+
+    # Build cards dataframe
+    dashboards = [{"id": c["id"], "type": "dashboard", "name": c["name"], "views": c["view_count"]} for c in dashboards]
+    df = pd.DataFrame(dashboards)
+    dfs.append(df)
+
+    # Combine dataframes
+    df = pd.concat(dfs, ignore_index=True)
+
+    # Sort dataframe
+    df = df.sort_values(by="views", ascending=False).reset_index(drop=True)  # type: ignore
+
+    #########################
+    # Anonymous stats
+    #########################
+    # stats = mb.get("/api/analytics/anonymous-stats")
     return df
