@@ -1978,6 +1978,9 @@ class Explorer(Base):
     )
     # TODO: this field is set by the mirror_explorers.py in automation, it'll be soon moved elsewhere
     config: Mapped[dict] = mapped_column(JSON)
+    configMd5: Mapped[str] = mapped_column(
+        CHAR(24, "utf8mb4_0900_as_cs"), Computed("(to_base64(unhex(md5(`config`))))", persisted=True), nullable=False
+    )
 
     @classmethod
     def load_explorer(
