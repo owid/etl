@@ -682,7 +682,7 @@ steps:
   data://garden/imf/2025-07-08/trade:
     - data://meadow/imf/2025-07-08/trade
     - data://garden/regions/2023-01-01/regions
-    - data://garden/worldbank_wdi/2025-01-24/wdi
+    - data://garden/worldbank_wdi/2025-09-08/wdi
   data://grapher/imf/2025-07-08/trade:
     - data://garden/imf/2025-07-08/trade
 
