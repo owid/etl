@@ -19,6 +19,9 @@ Choose the material that most interests you:
 :material-download: I want to **access a public dataset** using an **API**<br>
 [Read more :octicons-arrow-right-24:](api/)
 
+:material-chart-line: I want to **explore public analyses** and research examples<br>
+[Read more :octicons-arrow-right-24:](analyses/)
+
 :material-upload: I am an **OWID staff** member, and want to **work with the ETL**<br>
 [Read more :octicons-arrow-right-24:](guides/index.md)
 
