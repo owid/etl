@@ -85,3 +85,16 @@ steps:
 
   data://grapher/un/2023-10-09/plastic_waste:
     - data://garden/un/2023-10-09/plastic_waste
+
+  #
+  # UN plastic trade dataset 2023-2024
+  #
+  data://meadow/un/2025-09-25/plastic_waste_2023_2024:
+    - snapshot://un/2025-09-25/plastic_waste_2023_2024.csv
+  data://garden/un/2025-09-25/plastic_waste_2023_2024:
+    - data://meadow/un/2025-09-25/plastic_waste_2023_2024
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2024-07-15/population
+    - data://garden/un/2023-10-09/plastic_waste
+  data://grapher/un/2025-09-25/plastic_waste_2023_2024:
+    - data://garden/un/2025-09-25/plastic_waste_2023_2024
