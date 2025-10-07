@@ -1,3 +1,10 @@
+"""
+Script to create snapshot for OECD Family Database - Marriage and Divorce Rates.
+
+Downloads and registers the Excel file containing data on crude marriage rates,
+crude divorce rates, and mean age at first marriage, across OECD countries.
+"""
+
 from pathlib import Path
 
 import click

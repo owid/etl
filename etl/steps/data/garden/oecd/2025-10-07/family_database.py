@@ -58,6 +58,10 @@ def run(dest_dir: str) -> None:
     ).reset_index()
     tb_marriage_new.columns.name = None
 
+    # Validate historical data has expected columns
+    assert "marriage_rate" in tb_garden_oecd_hist.columns, "Historical data missing marriage_rate column"
+    assert "divorce_rate" in tb_garden_oecd_hist.columns, "Historical data missing divorce_rate column"
+
     # Merge historical data with new data - new data takes precedence where it exists
     tb_marriage_combined = pr.merge(
         tb_garden_oecd_hist[["country", "year", "marriage_rate", "divorce_rate"]],
@@ -66,6 +70,12 @@ def run(dest_dir: str) -> None:
         how="outer",
         suffixes=("_hist", "_new"),
     )
+
+    # Validate merge created expected columns
+    required_cols = ["marriage_rate_hist", "marriage_rate_new", "divorce_rate_hist", "divorce_rate_new"]
+    missing_cols = [col for col in required_cols if col not in tb_marriage_combined.columns]
+    if missing_cols:
+        raise ValueError(f"Merge failed - missing columns: {missing_cols}")
 
     # Use new data where available, otherwise use historical data
     tb_marriage_combined["marriage_rate"] = tb_marriage_combined["marriage_rate_new"].fillna(
@@ -88,13 +98,18 @@ def run(dest_dir: str) -> None:
 
     # Process births outside marriage - merge with historical data
     tb_births_new = tb_births_outside_marriage[["country", "year", "births_outside_marriage"]].copy()
-    tb_births_new = tb_births_new.rename(
-        columns={"births_outside_marriage": "share_of_births_outside_of_marriage__pct_of_all_births"}
-    )
+
+    # Validate historical data has expected column
+    hist_col = "share_of_births_outside_of_marriage__pct_of_all_births"
+    assert hist_col in tb_garden_oecd_hist.columns, f"Historical data missing {hist_col} column"
+
+    # Rename columns to match for cleaner merge
+    tb_births_hist = tb_garden_oecd_hist[["country", "year", hist_col]].copy()
+    tb_births_hist = tb_births_hist.rename(columns={hist_col: "births_outside_marriage"})
 
     # Merge historical births data with new data
     tb_births_combined = pr.merge(
-        tb_garden_oecd_hist[["country", "year", "share_of_births_outside_of_marriage__pct_of_all_births"]],
+        tb_births_hist,
         tb_births_new,
         on=["country", "year"],
         how="outer",
@@ -102,9 +117,9 @@ def run(dest_dir: str) -> None:
     )
 
     # Use new data where available, otherwise use historical data
-    tb_births_combined["births_outside_marriage"] = tb_births_combined[
-        "share_of_births_outside_of_marriage__pct_of_all_births_new"
-    ].fillna(tb_births_combined["share_of_births_outside_of_marriage__pct_of_all_births_hist"])
+    tb_births_combined["births_outside_marriage"] = tb_births_combined["births_outside_marriage_new"].fillna(
+        tb_births_combined["births_outside_marriage_hist"]
+    )
     tb_births_combined = tb_births_combined[["country", "year", "births_outside_marriage"]]
 
     # Keep mean age data from new dataset only (no historical equivalent)

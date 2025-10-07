@@ -10,6 +10,18 @@ from etl.helpers import PathFinder, create_dataset
 paths = PathFinder(__file__)
 
 YEAR_NOW = datetime.now().year
+# Common placeholders used in OECD data to represent missing values
+PLACEHOLDERS = ["..", "—", "-", "…", "nan", ""]
+
+
+def get_year_columns(tb, start_year=2001):
+    """Extract year columns from table, filtering for valid years."""
+    year_cols = []
+    for col in tb.columns:
+        col_str = str(col)
+        if col_str.isdigit() and len(col_str) == 4 and start_year <= int(col_str) <= YEAR_NOW:
+            year_cols.append(col)
+    return year_cols
 
 
 def run(dest_dir: str) -> None:
@@ -35,11 +47,7 @@ def run(dest_dir: str) -> None:
     tb.loc[mask, "presence_and_marital_status_of_parents"] = tb.loc[mask, "Unnamed: 3"]
 
     # Get year columns that exist - check both string and integer formats
-    year_cols = []
-    for col in tb.columns:
-        col_str = str(col)
-        if col_str.isdigit() and len(col_str) == 4 and 2001 <= int(col_str) <= YEAR_NOW:
-            year_cols.append(col)
+    year_cols = get_year_columns(tb)
 
     # Select relevant columns
     cols_to_keep = ["Country", "presence_and_marital_status_of_parents"] + year_cols
@@ -64,7 +72,7 @@ def run(dest_dir: str) -> None:
     )
 
     # Clean the value column - replace placeholders with NaN and convert to numeric
-    tb["value"] = tb["value"].replace(["..", "—", "-", "…", "nan", ""], None)
+    tb["value"] = tb["value"].replace(PLACEHOLDERS, None)
     tb["value"] = pd.to_numeric(tb["value"], errors="coerce")
 
     # Remove rows with missing values

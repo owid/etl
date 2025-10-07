@@ -1,3 +1,10 @@
+"""
+Script to create snapshot for OECD Family Database - Children in Families.
+
+Downloads and registers the Excel file containing data on the distribution of
+children by household type and parental marital status, across OECD countries.
+"""
+
 from pathlib import Path
 
 import click

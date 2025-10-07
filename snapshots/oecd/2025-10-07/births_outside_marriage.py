@@ -1,3 +1,10 @@
+"""
+Script to create snapshot for OECD Family Database - Births Outside Marriage.
+
+Downloads and registers the Excel file containing data on the share of births
+to mothers who were not married at the time of birth, across OECD countries.
+"""
+
 from pathlib import Path
 
 import click
