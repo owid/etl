@@ -112,14 +112,13 @@ def run(dest_dir: str) -> None:
         ["country", "year", "gender", "indicator", "value"]
     ].copy()
 
-    # Combine marriage/divorce rates with mean age data
-    tb_marriage_divorce_final = pr.concat([tb_marriage_combined_long, tb_mean_age], ignore_index=True)
     #
     # Save outputs.
     #
     # Create a new garden dataset with multiple tables
     tables = [
-        tb_marriage_divorce_final.format(
+        tb_mean_age.format(["country", "year", "gender", "indicator"], short_name="mean_age_first_marriage"),
+        tb_marriage_combined_long.format(
             ["country", "year", "gender", "indicator"], short_name="marriage_divorce_rates"
         ),
         tb_births_combined.format(["country", "year"], short_name="births_outside_marriage"),

@@ -23,33 +23,41 @@ tables:
           Crude marriage rate
           <% elif indicator == "divorce_rate" and gender == "Both" %>
           Crude divorce rate
-          <% elif indicator == "mean_age_first_marriage" and gender == "Male" %>
-          Mean age of men at first marriage
-          <% elif indicator == "mean_age_first_marriage" and gender == "Female" %>
-          Mean age of women at first marriage
           <% endif %>
-        unit: |-
-          <% if indicator == "mean_age_first_marriage" %>
-          years
-          <% else %>
-          per 1,000 people
-          <% endif %>
+        unit: per 1,000 people
         description_short: |-
           <% if indicator == "marriage_rate" %>
           Number of marriages during a given year per 1,000 people.
           <% elif indicator == "divorce_rate" %>
           Number of divorces during a given year per 1,000 people.
-          <% elif indicator == "mean_age_first_marriage" and gender == "Female" %>
-          Average age of women who got married for the first time that year.
-          <% elif indicator == "mean_age_first_marriage" and gender == "Male" %>
-          Average age of men who got married for the first time that year.
           <% endif %>
         description_from_producer: |-
           <% if indicator == "marriage_rate" %>
           The crude marriage rate is defined as the number of marriages during a given year per 1,000 people.
           <% elif indicator == "divorce_rate" %>
           The crude divorce rate is defined as the number of divorces during a given year per 1,000 people.
-          <% elif indicator == "mean_age_first_marriage" %>
+          <% endif %>
+        description_processing: |-
+            <% if indicator == "marriage_rate" %>
+            Marriage rates in the United States between 1886 and 1945 are sourced from the US Census, for years 1945 to 1990 they are sourced from the CDC. Recent data comes from OECD.
+            <% endif %>
+
+  mean_age_first_marriage:
+    variables:
+      value:
+        title: |-
+          <% if indicator == "mean_age_first_marriage" and gender == "Male" %>
+          Mean age of men at first marriage
+          <% elif indicator == "mean_age_first_marriage" and gender == "Female" %>
+          Mean age of women at first marriage
+          <% endif %>
+        description_short:
+          <% if indicator == "mean_age_first_marriage" and gender == "Female" %>
+           Average age of women who got married for the first time that year.
+          <% elif indicator == "mean_age_first_marriage" and gender == "Male" %>
+          Average age of men who got married for the first time that year.
+          <% endif %>
+        description_from_producer: |-
           The mean age at first marriage, defined as the mean age in years of marrying persons at the time of marriage. This measure is disaggregated by sex with separate averages for men and women.
 
           For Australia, New Zealand and the United States, median age at first marriage. For Mexico, data refer to all marriages and not only first marriage. For Canada, data include the legal union of two persons of the same sex in some provinces and territories from 2003 onwards, and in all of Canada from 2005 onwards. Data for New Zealand include civil unions. From 2007 onwards, data include those who transferred their civil union to a marriage.
@@ -59,11 +67,6 @@ tables:
           Footnote for Turkey: the information in this document with reference to « Cyprus » relates to the southern part of the Island. There is no single authority representing both Turkish and Greek Cypriot people on the Island. Turkey recognizes the Turkish Republic of Northern Cyprus (TRNC). Until a lasting and equitable solution is found within the context of United Nations, Turkey shall preserve its position concerning the "Cyprus issue".
 
           Footnote for all the European Union Member States of the OECD and the European Commission: the Republic of Cyprus is recognized by all members of the United Nations with the exception of Turkey. The information in this document relates to the area under the effective control of the Government of the Republic of Cyprus.
-          <% endif %>
-        description_processing: |-
-            <% if indicator == "marriage_rate" and gender == "Both" %>
-            Marriage rates in the United States between 1886 and 1945 are sourced from the US Census, for years 1945 to 1990 they are sourced from the CDC. Recent data comes from OECD.
-            <% endif %>
 
   births_outside_marriage:
     variables:
