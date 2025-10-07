@@ -22,10 +22,17 @@ tables:
         description_short: |-
           The percentage of men or women born in a specific year who have ever married by a certain age.
         description_key:
-          - Ages are presented as "exact years", meaning "by age 30" includes marriages up to the day before the 30th birthday.
-          - Since 2014, data includes marriages with opposite- and same-sex partners. Civil partnerships converted into marriages are also counted as "ever married," assuming a prior status of "never married or civil partnered" when prior marital status is unknown.
-          - The table includes final figures for 2022. For instance, men born in 2002 were tracked for marriages up to their 21st birthday in 2022.
-          - Marital status estimates are derived from the Labour Force Survey (LFS).
+          - Data covers marriages legally registered in England and Wales, including marriages of residents that take place outside England and Wales.
+          - Marriages of same-sex couples first took place on 29 March 2014. Figures for 2014 represent a part-year only.
+          - Civil partnerships converted into marriages are included, and are counted as marriages that previously had "never married or civil partnered" status when prior marital status is unknown.
+        description_from_producer: |-
+          Marriage statistics are derived from information recorded when marriages are legally registered as part of civil registration.
+
+          Figures represent civil and religious marriages that take place in England and Wales only. Marriages to residents of England and Wales that take place outside of England and Wales are not included while marriages that take place in England and Wales to non-residents are included.
+
+          Marriages of same-sex couples first took place on 29 March 2014. Figures for 2014 represent a part-year only.
+
+          Same-sex couples in a civil partnership have been able to convert their existing civil partnership into a marriage since 10 December 2014. These conversions are included in the number of marriages taking place but are reported separately in Table 13.
         processing_level: minor
         presentation:
           title_public: Share of men or women ever been married for << birth_cohort >> birth cohort by a certain age
