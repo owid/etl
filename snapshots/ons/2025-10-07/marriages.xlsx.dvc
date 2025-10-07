@@ -7,7 +7,7 @@ meta:
     description: |-
       Number of marriages that took place in England and Wales by age, sex, previous partnership status and civil or religious ceremony.
 
-    date_published: "2024"
+    date_published: '2024-06-20'
 
     # Citation
     producer: UK Office for National Statistics
