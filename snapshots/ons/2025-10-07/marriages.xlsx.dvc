@@ -17,14 +17,13 @@ meta:
 
     # Files
     url_main: https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/marriagecohabitationandcivilpartnerships/datasets/marriagesinenglandandwales2013
-    url_download: PLACEHOLDER_ADD_URL_HERE
-    date_accessed: 2025-10-07
+    url_download: https://www.ons.gov.uk/file?uri=/peoplepopulationandcommunity/birthsdeathsandmarriages/marriagecohabitationandcivilpartnerships/datasets/marriagesinenglandandwales2013/2021and2022/correctionpub2025forchangestot13wholefile.xlsx
 
     # License
     license:
       name: Open Government Licence v3.0
       url: https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/marriagecohabitationandcivilpartnerships/datasets/marriagesinenglandandwales2013
 outs:
-  - md5:
-    size:
+  - md5: 5dc87143fd15768fce12b93e787e4669
+    size: 700638
     path: marriages.xlsx

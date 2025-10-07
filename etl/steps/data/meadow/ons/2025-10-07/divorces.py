@@ -32,8 +32,8 @@ def run() -> None:
     tb = tb.melt(id_vars=["Year of marriage"], var_name="anniversary_year", value_name="cumulative_percentage")
     # Keep only numbers in the anniversary_year column
     tb["anniversary_year"] = tb["anniversary_year"].str.extract(r"(\d+)").astype(int)
-    # Remove [note 4] and [note 22] from the year columns
-    tb["Year of marriage"] = tb["Year of marriage"].str.replace(r"\[note 4\]|\[note 22\]", "", regex=True).astype(int)
+    # Remove all [note X] patterns from the year column
+    tb["Year of marriage"] = tb["Year of marriage"].str.replace(r"\s*\[note \d+\]", "", regex=True).astype(int)
 
     tb = tb.rename(columns={"Year of marriage": "year"})
     tb["country"] = "England and Wales"

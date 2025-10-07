@@ -17,15 +17,14 @@ meta:
 
     # Files
     url_main: https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/divorce/datasets/divorcesinenglandandwales
-    url_download: PLACEHOLDER_ADD_URL_HERE
-    date_accessed: 2025-10-07
+    url_download: https://www.ons.gov.uk/file?uri=/peoplepopulationandcommunity/birthsdeathsandmarriages/divorce/datasets/divorcesinenglandandwales/2023/divorcesworkbook2023final.xlsx
+    date_accessed: '2025-10-07'
 
     # License
     license:
       name: Open Government Licence v3.0
       url: https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/
-
 outs:
-  - md5:
-    size:
+  - md5: a2ef49a8e0c002831d2e35be67ab9e39
+    size: 159230
     path: divorces.xlsx
