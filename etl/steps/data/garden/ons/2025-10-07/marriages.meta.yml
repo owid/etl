@@ -1,0 +1,35 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Marriages & Divorces
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  marriages:
+    variables:
+      cumulative_percentage_per_100:
+        title: Proportions of men or women who had ever married by a certain age for << birth_cohort >> birth cohort
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          The percentage of men or women born in a specific year who have ever married by a certain age.
+        description_key:
+          - Ages are presented as "exact years", meaning "by age 30" includes marriages up to the day before the 30th birthday.
+          - Since 2014, data includes marriages with opposite- and same-sex partners. Civil partnerships converted into marriages are also counted as "ever married," assuming a prior status of "never married or civil partnered" when prior marital status is unknown.
+          - The table includes final figures for 2022. For instance, men born in 2002 were tracked for marriages up to their 21st birthday in 2022.
+          - Marital status estimates are derived from the Labour Force Survey (LFS).
+        processing_level: minor
+        presentation:
+          title_public: Share of men or women ever been married for << birth_cohort >> birth cohort by a certain age
+        display:
+          numDecimalPlaces: 1
+          name: << birth_cohort >>
+
