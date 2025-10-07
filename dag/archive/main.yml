@@ -657,3 +657,4 @@ include:
   - dag/archive/growth.yml
   - dag/archive/labor.yml
   - dag/archive/forests.yml
+  - dag/archive/families.yml

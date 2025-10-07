@@ -1,0 +1,10 @@
+steps:
+  #
+  # OECD Family Database - Mean age at first marriage
+  #
+  data://meadow/oecd/2025-01-11/mean_age_at_marriage:
+    - snapshot://oecd/2025-01-11/mean_age_at_marriage.xls
+  data://garden/oecd/2025-01-11/mean_age_at_marriage:
+    - data://meadow/oecd/2025-01-11/mean_age_at_marriage
+  data://grapher/oecd/2025-01-11/mean_age_at_marriage:
+    - data://garden/oecd/2025-01-11/mean_age_at_marriage
