@@ -16,7 +16,7 @@ tables:
   divorces:
     variables:
       cumulative_percentage:
-        title: Cumulative share of divorces by anniversary year of marriage
+        title: Cumulative share of divorces of couples married in << year_of_marriage >> by anniversary year of marriage
         unit: "%"
         short_unit: "%"
         description_short: |-
@@ -28,7 +28,5 @@ tables:
         processing_level: minor
         display:
           numDecimalPlaces: 1
-          name: << anniversary_year >> years
-        presentation:
-          title_public: << anniversary_year >> years
+          name: << year_of_marriage >>
 
