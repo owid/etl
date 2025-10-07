@@ -34,12 +34,12 @@ def run() -> None:
     tb = tb.rename(columns={"anniversary_year": "country"})
 
     tb = tb.format(["country", "year"])
+    print(tb)
 
     #
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
-    ds_grapher = paths.create_dataset(tables=[tb], check_variables_metadata=True, default_metadata=ds_garden.metadata)
-
+    ds_grapher = paths.create_dataset(tables=[tb], check_variables_metadata=True)
     # Save changes in the new grapher dataset.
     ds_grapher.save()
