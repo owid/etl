@@ -23,7 +23,7 @@ meta:
     # License
     license:
       name: Open Government Licence v3.0
-      url: https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/marriagecohabitationandcivilpartnerships/datasets/marriagesinenglandandwales2013
+      url: https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/
 outs:
   - md5: 5dc87143fd15768fce12b93e787e4669
     size: 700638
