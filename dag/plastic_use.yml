@@ -82,10 +82,6 @@ steps:
     - data://garden/regions/2023-01-01/regions
     - data://garden/wb/2025-07-01/income_groups
     - data://garden/demography/2023-03-31/population
-
-  data://grapher/un/2023-10-09/plastic_waste:
-    - data://garden/un/2023-10-09/plastic_waste
-
   #
   # UN plastic trade dataset 2023-2024
   #
