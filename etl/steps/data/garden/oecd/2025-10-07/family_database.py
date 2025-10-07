@@ -1,5 +1,7 @@
 """Garden step that combines OECD family database sources into a single dataset."""
 
+import owid.catalog.processing as pr
+
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
@@ -15,11 +17,18 @@ def run(dest_dir: str) -> None:
     ds_marriage_divorce = paths.load_dataset("marriage_divorce_rates")
     ds_births_outside_marriage = paths.load_dataset("births_outside_marriage")
     ds_children_in_families = paths.load_dataset("children_in_families")
+    ds_garden_oecd_hist = paths.load_dataset("family_database")
 
     # Get tables from each dataset
     tb_marriage_divorce = ds_marriage_divorce.read("marriage_divorce_rates")
     tb_births_outside_marriage = ds_births_outside_marriage.read("births_outside_marriage")
     tb_children_in_families = ds_children_in_families.read("children_in_families")
+    tb_garden_oecd_hist = ds_garden_oecd_hist.read("family_database")
+
+    # Extract historical data columns
+    tb_garden_oecd_hist = tb_garden_oecd_hist[
+        ["country", "year", "marriage_rate", "divorce_rate", "share_of_births_outside_of_marriage__pct_of_all_births"]
+    ]
 
     #
     # Process data.
@@ -36,13 +45,84 @@ def run(dest_dir: str) -> None:
         tb_children_in_families, countries_file=paths.country_mapping_path, warn_on_unused_countries=False
     )
 
+    # Process marriage/divorce rates - merge historical data with new data
+    # Filter for marriage and divorce rates only from new data
+    tb_marriage_new = tb_marriage_divorce[
+        (tb_marriage_divorce["indicator"].isin(["marriage_rate", "divorce_rate"]))
+        & (tb_marriage_divorce["gender"] == "Both")
+    ][["country", "year", "indicator", "value"]].copy()
+
+    # Pivot to get marriage_rate and divorce_rate as columns
+    tb_marriage_new = tb_marriage_new.pivot(
+        index=["country", "year"], columns="indicator", values="value"
+    ).reset_index()
+    tb_marriage_new.columns.name = None
+
+    # Merge historical data with new data - new data takes precedence where it exists
+    tb_marriage_combined = pr.merge(
+        tb_garden_oecd_hist[["country", "year", "marriage_rate", "divorce_rate"]],
+        tb_marriage_new,
+        on=["country", "year"],
+        how="outer",
+        suffixes=("_hist", "_new"),
+    )
+
+    # Use new data where available, otherwise use historical data
+    tb_marriage_combined["marriage_rate"] = tb_marriage_combined["marriage_rate_new"].fillna(
+        tb_marriage_combined["marriage_rate_hist"]
+    )
+    tb_marriage_combined["divorce_rate"] = tb_marriage_combined["divorce_rate_new"].fillna(
+        tb_marriage_combined["divorce_rate_hist"]
+    )
+    tb_marriage_combined = tb_marriage_combined[["country", "year", "marriage_rate", "divorce_rate"]]
+
+    # Convert back to long format for consistency with the rest of the data
+    tb_marriage_combined_long = tb_marriage_combined.melt(
+        id_vars=["country", "year"],
+        value_vars=["marriage_rate", "divorce_rate"],
+        var_name="indicator",
+        value_name="value",
+    )
+    # Add gender column
+    tb_marriage_combined_long["gender"] = "Both"
+
+    # Process births outside marriage - merge with historical data
+    tb_births_new = tb_births_outside_marriage[["country", "year", "births_outside_marriage"]].copy()
+    tb_births_new = tb_births_new.rename(
+        columns={"births_outside_marriage": "share_of_births_outside_of_marriage__pct_of_all_births"}
+    )
+
+    # Merge historical births data with new data
+    tb_births_combined = pr.merge(
+        tb_garden_oecd_hist[["country", "year", "share_of_births_outside_of_marriage__pct_of_all_births"]],
+        tb_births_new,
+        on=["country", "year"],
+        how="outer",
+        suffixes=("_hist", "_new"),
+    )
+
+    # Use new data where available, otherwise use historical data
+    tb_births_combined["births_outside_marriage"] = tb_births_combined[
+        "share_of_births_outside_of_marriage__pct_of_all_births_new"
+    ].fillna(tb_births_combined["share_of_births_outside_of_marriage__pct_of_all_births_hist"])
+    tb_births_combined = tb_births_combined[["country", "year", "births_outside_marriage"]]
+
+    # Keep mean age data from new dataset only (no historical equivalent)
+    tb_mean_age = tb_marriage_divorce[tb_marriage_divorce["indicator"] == "mean_age_first_marriage"][
+        ["country", "year", "gender", "indicator", "value"]
+    ].copy()
+
+    # Combine marriage/divorce rates with mean age data
+    tb_marriage_divorce_final = pr.concat([tb_marriage_combined_long, tb_mean_age], ignore_index=True)
     #
     # Save outputs.
     #
     # Create a new garden dataset with multiple tables
     tables = [
-        tb_marriage_divorce.format(["country", "year", "gender", "indicator"]),
-        tb_births_outside_marriage.format(["country", "year"]),
+        tb_marriage_divorce_final.format(
+            ["country", "year", "gender", "indicator"], short_name="marriage_divorce_rates"
+        ),
+        tb_births_combined.format(["country", "year"], short_name="births_outside_marriage"),
         tb_children_in_families.format(["country", "year", "indicator"]),
     ]
     ds_garden = create_dataset(dest_dir, tables=tables, check_variables_metadata=True)
