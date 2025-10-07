@@ -17,6 +17,7 @@ def run(dest_dir: str) -> None:
     marriage_divorce_rates = ds_garden.read("marriage_divorce_rates", reset_index=False)
     births_outside_marriage = ds_garden.read("births_outside_marriage", reset_index=False)
     children_in_families = ds_garden.read("children_in_families", reset_index=False)
+    mean_age_first_marriage = ds_garden.read("mean_age_first_marriage", reset_index=False)
 
     #
     # Save outputs.
@@ -24,7 +25,7 @@ def run(dest_dir: str) -> None:
     # Create a new grapher dataset
     ds_grapher = create_dataset(
         dest_dir,
-        tables=[marriage_divorce_rates, births_outside_marriage, children_in_families],
+        tables=[marriage_divorce_rates, mean_age_first_marriage, births_outside_marriage, children_in_families],
         check_variables_metadata=True,
         default_metadata=ds_garden.metadata,
     )

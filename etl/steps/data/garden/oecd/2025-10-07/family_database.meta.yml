@@ -51,6 +51,7 @@ tables:
           <% elif indicator == "mean_age_first_marriage" and gender == "Female" %>
           Mean age of women at first marriage
           <% endif %>
+        unit: years
         description_short:
           <% if indicator == "mean_age_first_marriage" and gender == "Female" %>
            Average age of women who got married for the first time that year.
