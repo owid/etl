@@ -7,7 +7,7 @@ definitions:
         - Plastic Pollution
     display:
       tolerance: 5
-  
+
   # Reusable description components
   hs_classification: &hs_classification "This covers plastic waste classified as HS 3915 in UN trade statistics."
   all_transport_modes: &all_transport_modes "It includes all transport methods: air, sea, road, rail, inland waterways, and cases where the transport mode wasn't specified."
@@ -47,7 +47,8 @@ tables:
           - This includes re-exports (when a country imports plastic waste and then exports it again).
           - Not all countries report transport mode details for every year.
         display:
-          numDecimalPlaces: 1
+          numSignificantFigures: 1
+
 
       import_air:
         title: Imports of plastic waste via air
@@ -60,7 +61,7 @@ tables:
           - Air transport typically accounts for a very small fraction of total plastic waste imports.
           - *availability_note
         display:
-          numDecimalPlaces: 1
+          numSignificantFigures: 1
 
       export_air:
         title: Exports of plastic waste via air
@@ -73,7 +74,7 @@ tables:
           - Air transport typically accounts for a very small fraction of total plastic waste exports.
           - *availability_note
         display:
-          numDecimalPlaces: 1
+          numSignificantFigures: 1
 
       import_total_mot_per_capita:
         title: Per capita imports of plastic waste via all modes of transport
@@ -86,7 +87,7 @@ tables:
           - A country with 10 million people importing 1,000 tonnes will have the same per capita figure as a country with 100 million people importing 10,000 tonnes.
         description_processing: Computed as (import_total_mot in tonnes × 1,000) ÷ population; reported in kg per person.
         display:
-          numDecimalPlaces: 2
+          numSignificantFigures: 2
 
       export_total_mot_per_capita:
         title: Per capita exports of plastic waste via all modes of transport
@@ -99,7 +100,7 @@ tables:
           - A small country exporting 100 tonnes might have a higher per capita figure than a large country exporting 10,000 tonnes.
         description_processing: Computed as (export_total_mot in tonnes × 1,000) ÷ population; reported in kg per person.
         display:
-          numDecimalPlaces: 2
+          numSignificantFigures: 2
 
       net_export:
         title: Net exports of plastic waste via all modes of transport
@@ -113,7 +114,7 @@ tables:
           - Differences in how countries report trade, and re-exports, can affect these figures.
         description_processing: Computed as export_total_mot − import_total_mot for each country and year.
         display:
-          numDecimalPlaces: 1
+          numSignificantFigures: 2
 
       import_share:
         title: Share of global plastic waste imports
@@ -126,7 +127,7 @@ tables:
           - For example, if a country imported 100,000 tonnes and the world total was 10 million tonnes, their share would be 1%.
         description_processing: Computed as 100 × (country import_total_mot) ÷ (sum of import_total_mot across all reporters in the same year).
         display:
-          numDecimalPlaces: 2
+          numSignificantFigures: 2
 
       export_share:
         title: Share of global plastic waste exports
@@ -139,7 +140,7 @@ tables:
           - For example, if a country exported 500,000 tonnes and the world total was 10 million tonnes, their share would be 5%.
         description_processing: Computed as 100 × (country export_total_mot) ÷ (sum of export_total_mot across all reporters in the same year).
         display:
-          numDecimalPlaces: 2
+          numSignificantFigures: 2
 
       net_export_per_capita:
         title: Per capita net exports of plastic waste
@@ -153,7 +154,7 @@ tables:
           - *per_capita_explanation
         description_processing: Computed as (net_export in tonnes × 1,000) ÷ population; reported in kg per person.
         display:
-          numDecimalPlaces: 2
+          numSignificantFigures: 2
 
       export_share_transported_by_air:
         title: Share of plastic waste exports transported by air
@@ -166,7 +167,7 @@ tables:
           - Only shown for countries and years where both air transport and total export data are available.
         description_processing: Computed as 100 × export_air ÷ export_total_mot, per country and year.
         display:
-          numDecimalPlaces: 2
+          numSignificantFigures: 2
 
       import_share_transported_by_air:
         title: Share of plastic waste imports transported by air
@@ -179,4 +180,4 @@ tables:
           - Only shown for countries and years where both air transport and total import data are available.
         description_processing: Computed as 100 × import_air ÷ import_total_mot, per country and year.
         display:
-          numDecimalPlaces: 2
+          numSignificantFigures: 2
