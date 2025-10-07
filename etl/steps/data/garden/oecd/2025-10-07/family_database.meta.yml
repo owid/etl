@@ -60,6 +60,10 @@ tables:
 
           Footnote for all the European Union Member States of the OECD and the European Commission: the Republic of Cyprus is recognized by all members of the United Nations with the exception of Turkey. The information in this document relates to the area under the effective control of the Government of the Republic of Cyprus.
           <% endif %>
+        description_processing: |-
+            <% if indicator == "marriage_rate" and gender == "Both" %>
+            Marriage rates in the United States between 1886 and 1945 are sourced from the US Census, for years 1945 to 1990 they are sourced from the CDC. Recent data comes from OECD.
+            <% endif %>
 
   births_outside_marriage:
     variables:
