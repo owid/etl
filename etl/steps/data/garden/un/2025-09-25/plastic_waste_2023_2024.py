@@ -9,7 +9,20 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-REGIONS = [reg for reg in geo.REGIONS.keys() if reg != "European Union (27)"]
+REGIONS = [
+    "Europe",
+    "Asia",
+    "North America",
+    "South America",
+    "Africa",
+    "Oceania",
+    "High-income countries",
+    "Low-income countries",
+    "Lower-middle-income countries",
+    "Upper-middle-income countries",
+    "European Union (27)",
+    "World",
+]
 
 
 def run() -> None:
@@ -20,6 +33,7 @@ def run() -> None:
     ds_meadow = paths.load_dataset("plastic_waste_2023_2024")
     ds_garden_up_to_2023 = paths.load_dataset("plastic_waste")
     ds_regions = paths.load_dataset("regions")
+    ds_income_groups = paths.load_dataset("income_groups")
 
     # Read table from meadow dataset.
     tb = ds_meadow.read("plastic_waste_2023_2024")
@@ -40,8 +54,9 @@ def run() -> None:
 
     tb = geo.add_regions_to_table(
         tb,
-        ds_regions,
-        regions=REGIONS + ["World"],
+        ds_regions=ds_regions,
+        ds_income_groups=ds_income_groups,
+        regions=REGIONS,
     )
 
     tb["net_export"] = tb["Export_TOTAL MOT"] - tb["Import_TOTAL MOT"]
@@ -65,6 +80,10 @@ def run() -> None:
     # Combine with data up to 2023
     tb_up_to_2023 = tb_up_to_2023[tb.columns]
     tb = pr.concat([tb, tb_up_to_2023], ignore_index=True)
+
+    # Remove share values for World
+    tb.loc[tb["country"] == "World", ["import_share", "export_share"]] = None
+
     tb = tb.format(["country", "year"])
 
     #
@@ -117,6 +136,7 @@ def add_share_from_total(tb: Table) -> Table:
     # Calculate the shares for each country
     merged_df["import_share"] = (merged_df["Import_TOTAL MOT"] / merged_df["Import_TOTAL MOT_World"]) * 100
     merged_df["export_share"] = (merged_df["Export_TOTAL MOT"] / merged_df["Export_TOTAL MOT_World"]) * 100
+
     # Drop the intermediate columns used for calculations
     merged_df = merged_df.drop(columns=["Import_TOTAL MOT_World", "Export_TOTAL MOT_World"])
 
