@@ -78,6 +78,10 @@ def run() -> None:
     # Combine with data up to 2023
     tb_up_to_2023 = tb_up_to_2023[tb.columns]
     tb = pr.concat([tb, tb_up_to_2023], ignore_index=True)
+
+    # Remove share values for World
+    tb.loc[tb["country"] == "World", ["import_share", "export_share"]] = None
+
     tb = tb.format(["country", "year"])
 
     #
@@ -130,9 +134,6 @@ def add_share_from_total(tb: Table) -> Table:
     # Calculate the shares for each country (excluding World)
     merged_df["import_share"] = (merged_df["Import_TOTAL MOT"] / merged_df["Import_TOTAL MOT_World"]) * 100
     merged_df["export_share"] = (merged_df["Export_TOTAL MOT"] / merged_df["Export_TOTAL MOT_World"]) * 100
-
-    # Remove share values for World
-    merged_df.loc[merged_df["country"] == "World", ["import_share", "export_share"]] = None
 
     # Drop the intermediate columns used for calculations
     merged_df = merged_df.drop(columns=["Import_TOTAL MOT_World", "Export_TOTAL MOT_World"])
