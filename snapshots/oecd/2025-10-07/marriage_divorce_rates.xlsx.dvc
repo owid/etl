@@ -1,0 +1,28 @@
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: OECD Family Database - Marriage and Divorce Rates
+    description: |-
+      Marriage and divorce rates data from the OECD Family Database, including mean age at marriage. The OECD Family Database provides cross-national indicators on family outcomes and family policies across the OECD countries, its enhanced engagement partners and EU member states.
+
+    date_published: '2025-09-03'
+
+    # Citation
+    producer: OECD
+    citation_full: |-
+      OECD (2025). OECD Family Database.
+
+    # Files
+    url_main: https://data-explorer.oecd.org/vis?tenant=archive&df[ds]=DisseminateArchiveDMZ&df[id]=DF_FAMILY&df[ag]=OECD
+    url_download: https://webfs.oecd.org/Els-com/Family_Database/SF_3_1_Marriage_divorce_rates.xlsx
+    date_accessed: '2025-10-07'
+
+    # License
+    license:
+      name: OECD Terms of Conditions
+      url: https://www.oecd.org/en/about/terms-conditions.html
+outs:
+  - md5: 551176512c54d2ff31600481446b17a0
+    size: 969655
+    path: marriage_divorce_rates.xlsx
