@@ -33,7 +33,6 @@ def run() -> None:
     ds_meadow = paths.load_dataset("plastic_waste_2023_2024")
     ds_garden_up_to_2023 = paths.load_dataset("plastic_waste")
     ds_regions = paths.load_dataset("regions")
-    print(REGIONS)
 
     # Read table from meadow dataset.
     tb = ds_meadow.read("plastic_waste_2023_2024")
