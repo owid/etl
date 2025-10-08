@@ -133,7 +133,7 @@ def add_share_from_total(tb: Table) -> Table:
     # Merge these totals with the main dataframe on the year column
     merged_df = pr.merge(tb, world_totals, on="year", suffixes=("", "_World"))
 
-    # Calculate the shares for each country (excluding World)
+    # Calculate the shares for each country
     merged_df["import_share"] = (merged_df["Import_TOTAL MOT"] / merged_df["Import_TOTAL MOT_World"]) * 100
     merged_df["export_share"] = (merged_df["Export_TOTAL MOT"] / merged_df["Export_TOTAL MOT_World"]) * 100
 
