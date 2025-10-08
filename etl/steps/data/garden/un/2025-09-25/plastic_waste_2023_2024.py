@@ -9,7 +9,20 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-REGIONS = [reg for reg in geo.REGIONS.keys() if reg != "European Union (27)"]
+REGIONS = [
+    "Europe",
+    "Asia",
+    "North America",
+    "South America",
+    "Africa",
+    "Oceania",
+    "High-income countries",
+    "Low-income countries",
+    "Lower-middle-income countries",
+    "Upper-middle-income countries",
+    "European Union (27)",
+    "World",
+]
 
 
 def run() -> None:
@@ -20,6 +33,7 @@ def run() -> None:
     ds_meadow = paths.load_dataset("plastic_waste_2023_2024")
     ds_garden_up_to_2023 = paths.load_dataset("plastic_waste")
     ds_regions = paths.load_dataset("regions")
+    print(REGIONS)
 
     # Read table from meadow dataset.
     tb = ds_meadow.read("plastic_waste_2023_2024")
@@ -114,9 +128,13 @@ def add_share_from_total(tb: Table) -> Table:
     # Merge these totals with the main dataframe on the year column
     merged_df = pr.merge(tb, world_totals, on="year", suffixes=("", "_World"))
 
-    # Calculate the shares for each country
+    # Calculate the shares for each country (excluding World)
     merged_df["import_share"] = (merged_df["Import_TOTAL MOT"] / merged_df["Import_TOTAL MOT_World"]) * 100
     merged_df["export_share"] = (merged_df["Export_TOTAL MOT"] / merged_df["Export_TOTAL MOT_World"]) * 100
+
+    # Remove share values for World
+    merged_df.loc[merged_df["country"] == "World", ["import_share", "export_share"]] = None
+
     # Drop the intermediate columns used for calculations
     merged_df = merged_df.drop(columns=["Import_TOTAL MOT_World", "Export_TOTAL MOT_World"])
 
