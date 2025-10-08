@@ -33,6 +33,7 @@ def run() -> None:
     ds_meadow = paths.load_dataset("plastic_waste_2023_2024")
     ds_garden_up_to_2023 = paths.load_dataset("plastic_waste")
     ds_regions = paths.load_dataset("regions")
+    ds_income_groups = paths.load_dataset("income_groups")
 
     # Read table from meadow dataset.
     tb = ds_meadow.read("plastic_waste_2023_2024")
@@ -53,8 +54,9 @@ def run() -> None:
 
     tb = geo.add_regions_to_table(
         tb,
-        ds_regions,
-        regions=REGIONS + ["World"],
+        ds_regions=ds_regions,
+        ds_income_groups=ds_income_groups,
+        regions=REGIONS,
     )
 
     tb["net_export"] = tb["Export_TOTAL MOT"] - tb["Import_TOTAL MOT"]
