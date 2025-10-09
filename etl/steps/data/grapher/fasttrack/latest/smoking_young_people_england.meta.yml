@@ -7,7 +7,7 @@ tables:
   smoking_young_people_england:
     variables:
       _15yo_regular_smokers:
-        title: Share of adults who smoke cigarettes
+        title: Share of 15 year olds who smoke regularly
         unit: '%'
         short_unit: '%'
         display:
@@ -15,7 +15,7 @@ tables:
         description: |-
           The share of 15-year-olds who are regular smokers of cigarettes. Regular smokers  are defined as usually smoking at least one cigarette per week.
       pupils_ever_smoked:
-        title: Share of adults who vape
+        title: Share of pupils who have ever smoked
         unit: '%'
         short_unit: '%'
         display:

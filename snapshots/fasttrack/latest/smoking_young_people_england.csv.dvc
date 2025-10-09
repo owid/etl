@@ -2,7 +2,7 @@ meta:
   origin:
     producer: NHS England (2024)
     title: smoking_young_people_england
-    citation_full: NHS England. Smoking, Drinking and Drug Use among Young People in England.
+    citation_full: 'NHS England. Smoking, Drinking and Drug Use among Young People in England. '
     url_main: |-
       https://digital.nhs.uk/data-and-information/publications/statistical/smoking-drinking-and-drug-use-among-young-people-in-england/2023
     url_download: |-
