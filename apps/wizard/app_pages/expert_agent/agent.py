@@ -197,7 +197,7 @@ def run_agent_stream(prompt: str, structured: bool = False, question_id: str | N
     # print("01---------------------------")
     # print(st.session_state)
     # print("---------------------------")
-    tools = agent._get_toolset()
+    # tools = agent._get_toolset()
     # print(tools)
     if structured:
         from apps.wizard.app_pages.expert_agent.stream import agent_stream_sync_structured
