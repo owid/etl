@@ -305,7 +305,7 @@ with container:
 
 # Arrange chat input
 prompt = st.chat_input(
-    placeholder="Ask anything. Expert can make mistakes.",
+    placeholder="Ask anything. ⚠ Expert can make mistakes. Sessions are logged for quality purposes.",
 )
 
 if st.session_state["recommended_question"]:
