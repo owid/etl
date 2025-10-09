@@ -73,7 +73,8 @@ def cached_analytics_docs():
 ANALYTICS_DB_OVERVIEW, ANALYTICS_DB_TABLE_DETAILS = cached_analytics_docs()
 
 # ETL docs
-with open(BASE_DIR / "mkdocs.yml", "r") as f:
+p = BASE_DIR / "mkdocs.yml"
+with p.open("r") as f:
     DOCS_INDEX = ruamel_load(f)
 DOCS_INDEX = dict(DOCS_INDEX)
 
@@ -114,7 +115,6 @@ def get_toolsets():
         tool_prefix="owid_data_",
     )
     return [mcp_server_prod]
-    return []
 
 
 #######################################################
