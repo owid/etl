@@ -8,15 +8,7 @@ steps:
     - data://meadow/oecd/2024-12-30/family_database
     - data://meadow/us_census_bureau/2025-01-22/marriages_divorces
     - data://meadow/cdc/2025-01-22/marriages
-  data://grapher/oecd/2024-12-30/family_database:
-    - data://garden/oecd/2024-12-30/family_database
 
-  data://meadow/oecd/2025-01-11/mean_age_at_marriage:
-    - snapshot://oecd/2025-01-11/mean_age_at_marriage.xls
-  data://garden/oecd/2025-01-11/mean_age_at_marriage:
-    - data://meadow/oecd/2025-01-11/mean_age_at_marriage
-  data://grapher/oecd/2025-01-11/mean_age_at_marriage:
-    - data://garden/oecd/2025-01-11/mean_age_at_marriage
 
   #
   # US Census Bureau data on marriages and divorces between 1886-1945
@@ -72,3 +64,19 @@ steps:
   data://grapher/un/2024-12-31/households:
     - data://garden/un/2024-12-31/households
 
+  #
+  # OECD Family Database
+  #
+  data://meadow/oecd/2025-10-07/marriage_divorce_rates:
+    - snapshot://oecd/2025-10-07/marriage_divorce_rates.xlsx
+  data://meadow/oecd/2025-10-07/births_outside_marriage:
+    - snapshot://oecd/2025-10-07/births_outside_marriage.xlsx
+  data://meadow/oecd/2025-10-07/children_in_families:
+    - snapshot://oecd/2025-10-07/children_in_families.xlsx
+  data://garden/oecd/2025-10-07/family_database:
+    - data://meadow/oecd/2025-10-07/marriage_divorce_rates
+    - data://meadow/oecd/2025-10-07/births_outside_marriage
+    - data://meadow/oecd/2025-10-07/children_in_families
+    - data://garden/oecd/2024-12-30/family_database
+  data://grapher/oecd/2025-10-07/family_database:
+    - data://garden/oecd/2025-10-07/family_database

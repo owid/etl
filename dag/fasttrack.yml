@@ -249,4 +249,6 @@ steps:
   data://grapher/fasttrack/latest/smokers_vapers_great_britain: !!set
     ? snapshot://fasttrack/latest/smokers_vapers_great_britain.csv
   data://grapher/fasttrack/latest/majorpowerdeaths: !!set
-    snapshot://fasttrack/latest/majorpowerdeaths.csv:
+    ? snapshot://fasttrack/latest/majorpowerdeaths.csv
+  data://grapher/fasttrack/latest/smoking_young_people_england: !!set
+    snapshot://fasttrack/latest/smoking_young_people_england.csv:
