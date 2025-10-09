@@ -59,7 +59,6 @@ DATA_INFO_VARS = [
     "i_xr",
     "i_irr",
     "cor_exp",
-    "statcap",
 ]
 
 
