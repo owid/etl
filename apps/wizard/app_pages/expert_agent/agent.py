@@ -1,6 +1,6 @@
 import uuid
 from pathlib import Path
-from typing import Any, List, Literal
+from typing import Any, Dict, List, Literal
 
 import logfire
 import pandas as pd
@@ -73,7 +73,8 @@ def cached_analytics_docs():
 ANALYTICS_DB_OVERVIEW, ANALYTICS_DB_TABLE_DETAILS = cached_analytics_docs()
 
 # ETL docs
-with open(BASE_DIR / "mkdocs.yml", "r") as f:
+p = BASE_DIR / "mkdocs.yml"
+with p.open("r") as f:
     DOCS_INDEX = ruamel_load(f)
 DOCS_INDEX = dict(DOCS_INDEX)
 
@@ -106,15 +107,14 @@ settings = OpenAIResponsesModelSettings(
 
 ## Use MCPs or not based on user input
 def get_toolsets():
-    if ("expert_use_mcp" in st.session_state) and st.session_state["expert_use_mcp"]:
-        # Create MCP server instance inside function to avoid event loop binding issues
-        mcp_server_prod = MCPServerStreamableHTTP(
-            url=OWID_MCP_SERVER_URL,
-            process_tool_call=process_tool_call,
-            tool_prefix="owid_data_",
-        )
-        return [mcp_server_prod]
-    return []
+    # if ("expert_use_mcp" in st.session_state) and st.session_state["expert_use_mcp"]:
+    # Create MCP server instance inside function to avoid event loop binding issues
+    mcp_server_prod = MCPServerStreamableHTTP(
+        url=OWID_MCP_SERVER_URL,
+        process_tool_call=process_tool_call,
+        tool_prefix="owid_data_",
+    )
+    return [mcp_server_prod]
 
 
 #######################################################
@@ -193,6 +193,12 @@ Always include proper titles and axis labels to make the plot self-explanatory."
 # STREAMING
 #######################################################
 def run_agent_stream(prompt: str, structured: bool = False, question_id: str | None = None):
+    # print("============================================")
+    # print("01---------------------------")
+    # print(st.session_state)
+    # print("---------------------------")
+    # tools = agent._get_toolset()
+    # print(tools)
     if structured:
         from apps.wizard.app_pages.expert_agent.stream import agent_stream_sync_structured
 
@@ -358,25 +364,28 @@ async def get_db_tables() -> str:
 
 
 @agent.tool_plain(docstring_format="google")
-async def get_db_table_fields(tb_name: str) -> str:
-    """Retrieve the documentation of the columns of database table "tb_name".
+async def get_db_table_fields(tb_names: List[str]) -> Dict[str, Any]:
+    """Retrieve the documentation of the columns of a subset of tables in the database table.
 
 
     Args:
-        tb_name: Name of the table
+        tb_names: Names of the tables of interest
 
     Returns:
-        str: Table documentation as string, mapping column names to their descriptions. E.g. "column1: description1\ncolumn2: description2".
+        Dict: Documentation of the tables of interest. Each key in the dictionary corresponds to a table. The values is the table documentation as string, mapping column names to their descriptions. E.g. "column1: description1\ncolumn2: description2".
     """
     # tool_ui_message(
     #     message_type="markdown",
     #     text=f"**:material/construction: Tool use**: Getting documentation of table `{tb_name}` from the semantic layer, via `get_db_table_fields`",
     # )
-    if tb_name not in ANALYTICS_DB_TABLE_DETAILS:
-        print("Table not found:", tb_name)
-        print("Available tables:", sorted(ANALYTICS_DB_TABLE_DETAILS.keys()))
-        return "Table not found: " + tb_name
-    return ANALYTICS_DB_TABLE_DETAILS[tb_name]
+    result = {}
+    for tb_name in tb_names:
+        if tb_name not in ANALYTICS_DB_TABLE_DETAILS:
+            text = f"Table not found: {tb_name}"
+        else:
+            text = ANALYTICS_DB_TABLE_DETAILS[tb_name]
+        result[tb_name] = text
+    return result
 
 
 # Metabase/Datasette
@@ -453,6 +462,25 @@ async def execute_query(query: str, title: str, description: str, num_rows: int 
             message=f"ERROR. Query is invalid! Check for correctness, it must be DuckDB compatible!\nError: {e}",
             valid=False,
         )
+
+
+# @agent.tool_plain(docstring_format="google")
+# async def create_question_with_filters(query: str, title: str, description: str) -> None:
+#     """Create a Metabase question that has filters."""
+#     _ = create_question(
+#         query=query,
+#         title=title,
+#         description=description,
+#     )
+
+
+# @agent.tool_plain(docstring_format="google")
+# async def get_question_query(card_id: int):
+#     # Get question
+#     _ = get_question_info(card_id)
+#     # Generate URL
+#     # url = _generate_question_url(question)
+#     # return url
 
 
 @agent.tool_plain(docstring_format="google")
@@ -562,84 +590,108 @@ async def generate_plot(
     ctx: RunContext[dict],
     card_id: int,
     plot_instructions: str,
-) -> None:
+) -> str:
     """Generate a plot from Metabase question data with custom plotting instructions.
 
     This tool creates visualizations by:
     1. Fetching data from a Metabase question
     2. Using AI to generate appropriate plotly code based on plotting instructions
-    3. Executing the code safely to create the plot
+    3. Executing the code safely to create the plot with automatic retry on errors
     4. Saving the plot as an image file
 
     Args:
         card_id: The ID of the Metabase question containing the data to plot. Typically a table, where only a subset of the columns are needed for plotting.
         plot_instructions: Natural language instructions for the plot (e.g., "create a line chart showing trend over time of num_users", "make a scatter plot with GDP vs population", "generate a bar chart grouped by country")
 
+    Returns:
+        str: Success message with file path or error details after all retries exhausted.
+
     Raises:
-        ValueError: If data cannot be fetched or plot generation fails
+        ValueError: If data cannot be fetched or plot generation fails after retries
     """
-    try:
-        # 1. Get question_id from context (fallback to generic if not available)
-        question_id = ctx.deps.get("question_id", f"plot_{card_id}")
+    max_retries = 3
+    model_name = ctx.model.model_name
+    question_id = ctx.deps.get("question_id", f"plot_{card_id}")
 
-        # 2. Get data from Metabase
-        df = _get_question_data(card_id)
+    # Get data from Metabase
+    df = _get_question_data(card_id)
+    if df.empty:
+        raise ValueError(f"DataFrame is empty for question with ID {card_id}")
 
-        if df.empty:
-            raise ValueError(f"DataFrame is empty for question with ID {card_id}")
+    # Prepare context for plotting agent
+    sample_data_str = df.head(3).to_string()
+    context_info = (
+        f"DataFrame info:\n"
+        f"- Columns: {df.columns.tolist()}\n"
+        f"- Data types: {dict(df.dtypes)}\n"
+        f"- Shape: {df.shape}\n"
+        f"- Sample data (first 3 rows):\n{sample_data_str}\n\n"
+        f"User instructions: {plot_instructions}"
+    )
 
-        # 3. Prepare context for plotting agent
-        sample_data_str = df.head(3).to_string()
-        context_info = (
-            f"DataFrame info:\n"
-            f"- Columns: {df.columns.tolist()}\n"
-            f"- Data types: {dict(df.dtypes)}\n"
-            f"- Shape: {df.shape}\n"
-            f"- Sample data (first 3 rows):\n{sample_data_str}\n\n"
-            f"User instructions: {plot_instructions}"
-        )
+    # Retry loop for code generation and execution
+    error_history = []
+    for attempt in range(max_retries):
+        try:
+            log.info(f">>>>>> Generating plot attempt {attempt + 1}/{max_retries} for question {question_id}")
 
-        # 4. Use plotting sub-agent to generate code
-        log.info(f">>>>>> Generating plot for question {question_id} using Metabase card {card_id}")
-        plotting_result = await plotting_agent.run(context_info)
-        plotting_code = plotting_result.output
-        log.info(">>>>>> Finished generating plot")
+            # Build prompt with error feedback from previous attempts
+            if error_history:
+                error_feedback = "\n\nPREVIOUS ATTEMPT ERRORS:\n" + "\n".join(
+                    f"Attempt {i+1} error: {err}" for i, err in enumerate(error_history)
+                )
+                prompt = context_info + error_feedback + "\n\nPlease fix the code to avoid these errors."
+            else:
+                prompt = context_info
 
-        # 5. Clean the code if it's wrapped in markdown
-        if plotting_code.startswith("```python"):
-            plotting_code = plotting_code.split("```python")[1].split("```")[0].strip()
-        elif plotting_code.startswith("```"):
-            plotting_code = plotting_code.split("```")[1].split("```")[0].strip()
+            # Generate code using sub-agent
+            plotting_result = await plotting_agent.run(
+                prompt,
+                model=model_name,
+                usage=ctx.usage,
+            )
+            plotting_code = plotting_result.output
 
-        # 6. Execute the generated code safely
-        local_vars = {
-            "df": df,
-            "px": px,
-            "go": go,
-            "pd": pd,
-        }
+            # Clean markdown formatting
+            if plotting_code.startswith("```python"):
+                plotting_code = plotting_code.split("```python")[1].split("```")[0].strip()
+            elif plotting_code.startswith("```"):
+                plotting_code = plotting_code.split("```")[1].split("```")[0].strip()
 
-        # Execute in safe environment
-        # byte_code = compile_restricted(plotting_code, "<inline>", "exec")
-        exec(plotting_code, {}, local_vars)
+            # Execute the generated code safely
+            local_vars = {
+                "df": df,
+                "px": px,
+                "go": go,
+                "pd": pd,
+            }
 
-        if "fig" not in local_vars:
-            raise ValueError("Generated code did not create a 'fig' variable")
+            exec(plotting_code, {}, local_vars)
 
-        fig = local_vars["fig"]
+            if "fig" not in local_vars:
+                raise ValueError("Generated code did not create a 'fig' variable")
 
-        # 7. Save to files with question_id prefix
-        unique_id = uuid.uuid4().hex[:8]
-        filename_base = f"{question_id}_plot_{unique_id}"
+            fig = local_vars["fig"]
 
-        # Save the plot file (PNG or HTML)
-        filepath = save_plot_file(fig, filename_base)
+            # Save to files
+            unique_id = uuid.uuid4().hex[:8]
+            filename_base = f"{question_id}_plot_{unique_id}"
+            filepath = save_plot_file(fig, filename_base)
+            save_code_file(plotting_code, filename_base, question_id, card_id)
 
-        # Save the plotting code with data fetching logic
-        save_code_file(plotting_code, filename_base, question_id, card_id)
+            log.info(f"Successfully generated plot for question {question_id}: {filepath}")
+            return f"Successfully generated plot: {filepath}"
 
-        log.info(f"Generated plot for question {question_id}: {filepath}")
+        except Exception as e:
+            error_msg = f"{type(e).__name__}: {str(e)}"
+            error_history.append(error_msg)
+            log.warning(f"Plot generation attempt {attempt + 1} failed: {error_msg}")
 
-    except Exception as e:
-        log.error(f"Error generating plot: {e}")
-        raise ValueError(f"Failed to generate plot: {e}")
+            # If this was the last retry, raise the error
+            if attempt == max_retries - 1:
+                full_error = "\n".join(f"Attempt {i+1}: {err}" for i, err in enumerate(error_history))
+                log.error(f"All {max_retries} attempts failed for question {question_id}:\n{full_error}")
+                raise ValueError(f"Failed to generate plot after {max_retries} attempts. Errors:\n{full_error}")
+
+    # This line should never be reached due to the raise in the last retry
+    raise ValueError("Unexpected code path: all retries exhausted without success or error")
