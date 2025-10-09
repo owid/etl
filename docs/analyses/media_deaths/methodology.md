@@ -29,7 +29,7 @@ The first step was to compile data on what Americans die from.
 | ---------------------------------------------------------------------- | -------------------------- | ---------------------------------- |
 | Diseases of heart                                                      | I00-I09, I11, I13, I20-I51 | Heart disease                      |
 | Malignant neoplasms                                                    | C00-C97                    | Cancer                             |
-| Accidents (unintentional injuries)                                     | V01-X59, Y85-Y86           | Accidents                          |
+| Accidents (unintentional injuries) (\*excluding drug overdoses)        | V01-X59 (excl. X42), Y85-Y86| Accidents                          |
 | Cerebrovascular diseases                                               | I60-I69                    | Stroke                             |
 | Chronic lower respiratory diseases                                     | J40-J47                    | Chronic lower respiratory diseases |
 | Alzheimer's disease                                                    | G30                        | Alzheimer’s                        |
