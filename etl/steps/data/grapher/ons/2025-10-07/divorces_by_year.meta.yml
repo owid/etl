@@ -9,7 +9,7 @@ definitions:
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
-  title: Share of marriages in England and Wales that ended in divorce by 5,10,20, and 30 years after marriage
+  title: Share of marriages in England and Wales that ended in divorce by 5, 10, 20, and 30 years after marriage
   update_period_days: 365
 
 

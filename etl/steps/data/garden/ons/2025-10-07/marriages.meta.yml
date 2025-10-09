@@ -22,9 +22,9 @@ tables:
         description_short: |-
           The percentage of men or women born in a specific year who have ever married by a certain age.
         description_key:
-          - Data covers marriages legally registered in England and Wales, including marriages of residents that take place outside England and Wales.
-          - Marriages of same-sex couples first took place on 29 March 2014. Figures for 2014 represent a part-year only.
-          - Civil partnerships converted into marriages are included, and are counted as marriages that previously had "never married or civil partnered" status when prior marital status is unknown.
+         - Data covers marriages legally registered in England and Wales, including marriages of residents that take place outside England and Wales.
+         - Marriages between same-sex couples became legal on 29 March 2014, so the 2014 figures include only same-sex marriages that took place from that date onward.
+         - Civil partnerships converted into marriages are included, and are counted as marriages that previously had "never married or civil partnered" status when prior marital status is unknown.
         description_from_producer: |-
           Marriage statistics are derived from information recorded when marriages are legally registered as part of civil registration.
 
