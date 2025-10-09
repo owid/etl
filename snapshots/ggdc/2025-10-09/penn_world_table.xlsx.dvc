@@ -3,16 +3,20 @@ meta:
     producer: Feenstra et al.
     title: Penn World Table
     description: |-
-      PWT version 10.01 is a database with information on relative levels of income, output, input and productivity, covering 183 countries between 1950 and 2019.
+      PWT version 11.0 is a database with information on relative levels of income, output, input and productivity, covering 185 countries between 1950 and 2023.
     citation_full: |-
       Feenstra, Robert C., Robert Inklaar and Marcel P. Timmer (2015), "The Next Generation of the Penn World Table" American Economic Review, 105(10), 3150-3182, available for download at www.ggdc.net/pwt
-    attribution: Feenstra et al. - Penn World Table (2023)
+    attribution: Feenstra et al. - Penn World Table (2025)
     attribution_short: Penn World Table
-    version_producer: '10.01'
+    version_producer: '11.0'
     url_main: https://www.rug.nl/ggdc/productivity/pwt/
-    url_download: https://dataverse.nl/api/access/datafile/354095
+    url_download: https://dataverse.nl/api/access/datafile/554027
     date_accessed: '2025-10-09'
-    date_published: '2023-01-23'
+    date_published: '2025-10-07'
     license:
       name: CC BY 4.0
       url: https://www.rug.nl/ggdc/productivity/pwt/
+outs:
+  - md5: 4a482e9957de32ee66577781eda4ad05
+    size: 5841216
+    path: penn_world_table.xlsx
