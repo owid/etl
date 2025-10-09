@@ -1,0 +1,17 @@
+meta:
+  origin:
+    producer: NHS England (2024)
+    title: smoking_young_people_england
+    citation_full: NHS England. Smoking, Drinking and Drug Use among Young People in England.
+    url_main: |-
+      https://digital.nhs.uk/data-and-information/publications/statistical/smoking-drinking-and-drug-use-among-young-people-in-england/2023
+    url_download: |-
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vQsl8XmxeCG8Nhx2q3gb_OFvJRATxf6hJ9Eo2CvxcCY0oPK6goD04p5n2bC2YWk6J63nwAi6AVfr7Fr/pub?output=csv
+    date_accessed: '2025-10-09'
+  name: Smoking rates among young people in England  (NHS England)
+  description: ''
+  license: {}
+outs:
+  - md5: 788dee23871fc0accf3d6d753d473372
+    size: 618
+    path: smoking_young_people_england.csv
