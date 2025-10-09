@@ -10,7 +10,7 @@ definitions:
         - Economic Growth
 
   # NOTE: Update in case PWT changes the PPP benchmark year.
-  ppp_year: 2017
+  ppp_year: 2021
 
   # This is the ID of the Google Doc that contains the FAQs
   gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
@@ -694,7 +694,7 @@ tables:
         description_key:
           - "{definitions.description_key_ppp_adjustment}"
           - "{definitions.description_key_ppp_prices_single_benchmark}"
-        description_from_producer: Price level of CCON (PPP/XR), price level of USA GDPo in 2017=1
+        description_from_producer: Price level of CCON (PPP/XR), price level of USA GDPo in {definitions.ppp_year}=1
         description_processing: |-
           {definitions.description_processing_outliers}
         display:
@@ -710,7 +710,7 @@ tables:
         description_key:
           - "{definitions.description_key_ppp_adjustment}"
           - "{definitions.description_key_ppp_prices_single_benchmark}"
-        description_from_producer: Price level of CDA (PPP/XR), price level of USA GDPo in 2017=1
+        description_from_producer: Price level of CDA (PPP/XR), price level of USA GDPo in {definitions.ppp_year}=1
         description_processing: |-
           {definitions.description_processing_outliers}
         display:
@@ -726,7 +726,7 @@ tables:
         description_key:
           - "{definitions.description_key_ppp_adjustment}"
           - "{definitions.description_key_ppp_prices_single_benchmark}"
-        description_from_producer: Price level of CGDPo (PPP/XR), price level of USA GDPo in 2017=1
+        description_from_producer: Price level of CGDPo (PPP/XR), price level of USA GDPo in {definitions.ppp_year}=1
         description_processing: |-
           {definitions.description_processing_outliers}
         display:
@@ -838,7 +838,7 @@ tables:
         description_key:
           - "{definitions.description_key_ppp_adjustment}"
           - "{definitions.description_key_ppp_prices_single_benchmark}"
-        description_from_producer: Price level of household consumption,  price level of USA GDPo in 2017=1
+        description_from_producer: Price level of household consumption,  price level of USA GDPo in {definitions.ppp_year}=1
         description_processing: |-
           {definitions.description_processing_outliers}
         display:
@@ -854,7 +854,7 @@ tables:
         description_key:
           - "{definitions.description_key_ppp_adjustment}"
           - "{definitions.description_key_ppp_prices_single_benchmark}"
-        description_from_producer: Price level of capital formation,  price level of USA GDPo in 2017=1
+        description_from_producer: Price level of capital formation,  price level of USA GDPo in {definitions.ppp_year}=1
         description_processing: |-
           {definitions.description_processing_outliers}
         display:
@@ -870,7 +870,7 @@ tables:
         description_key:
           - "{definitions.description_key_ppp_adjustment}"
           - "{definitions.description_key_ppp_prices_single_benchmark}"
-        description_from_producer: Price level of government consumption,  price level of USA GDPo in 2017=1
+        description_from_producer: Price level of government consumption,  price level of USA GDPo in {definitions.ppp_year}=1
         description_processing: |-
           {definitions.description_processing_outliers}
         display:
@@ -886,7 +886,7 @@ tables:
         description_key:
           - "{definitions.description_key_ppp_adjustment}"
           - "{definitions.description_key_ppp_prices_single_benchmark}"
-        description_from_producer: Price level of exports, price level of USA GDPo in 2017=1
+        description_from_producer: Price level of exports, price level of USA GDPo in {definitions.ppp_year}=1
         description_processing: |-
           {definitions.description_processing_outliers}
         display:
@@ -902,7 +902,7 @@ tables:
         description_key:
           - "{definitions.description_key_ppp_adjustment}"
           - "{definitions.description_key_ppp_prices_single_benchmark}"
-        description_from_producer: Price level of imports, price level of USA GDPo in 2017=1
+        description_from_producer: Price level of imports, price level of USA GDPo in {definitions.ppp_year}=1
         description_processing: |-
           {definitions.description_processing_outliers}
         display:
@@ -918,7 +918,7 @@ tables:
         description_key:
           - "{definitions.description_key_ppp_adjustment}"
           - "{definitions.description_key_ppp_prices_single_benchmark}"
-        description_from_producer: Price level of the capital stock, price level of USA in 2017=1
+        description_from_producer: Price level of the capital stock, price level of USA in {definitions.ppp_year}=1
         description_processing: |-
           {definitions.description_processing_outliers}
         display:
