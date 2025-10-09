@@ -193,12 +193,12 @@ Always include proper titles and axis labels to make the plot self-explanatory."
 # STREAMING
 #######################################################
 def run_agent_stream(prompt: str, structured: bool = False, question_id: str | None = None):
-    print("============================================")
-    print("01---------------------------")
-    print(st.session_state)
-    print("---------------------------")
+    # print("============================================")
+    # print("01---------------------------")
+    # print(st.session_state)
+    # print("---------------------------")
     tools = agent._get_toolset()
-    print(tools)
+    # print(tools)
     if structured:
         from apps.wizard.app_pages.expert_agent.stream import agent_stream_sync_structured
 
