@@ -62,6 +62,15 @@ steps:
   data://grapher/artificial_intelligence/2024-07-11/epoch_gpus:
     - data://garden/artificial_intelligence/2024-07-11/epoch_gpus
 
+  # EPOCH dataset on Machine Learning Hardware (updated 2025-10-10)
+  data://meadow/artificial_intelligence/2025-10-10/epoch_gpus:
+    - snapshot://artificial_intelligence/2025-10-10/epoch_gpus.csv
+  data://garden/artificial_intelligence/2025-10-10/epoch_gpus:
+    - data://meadow/artificial_intelligence/2025-10-10/epoch_gpus
+    - data://garden/bls/2025-04-12/us_consumer_prices
+  data://grapher/artificial_intelligence/2025-10-10/epoch_gpus:
+    - data://garden/artificial_intelligence/2025-10-10/epoch_gpus
+
   # Dataset on AI performance across different benchmarks from Dynabench
   data://meadow/artificial_intelligence/2024-04-02/dynabench:
     - snapshot://artificial_intelligence/2024-04-02/dynabench.xlsx

@@ -1,0 +1,87 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: major
+    presentation:
+      topic_tags:
+        - Artificial Intelligence
+    display:
+      zeroDay: '2000-01-01'
+      yearIsDay: true
+      numDecimalPlaces: 0
+    description_processing: |-
+      - Reporting a time series of AI investments in nominal prices (i.e., without adjusting for inflation) means it makes little sense to compare observations across time; it is therefore not very useful. To make comparisons across time possible, one has to take into account that prices change (e.g., there is inflation).
+      - It is not obvious how to adjust this time series for inflation, and we debated it at some length within our team.
+      - It would be straightforward to adjust the time series for price changes if we knew the prices of the specific goods and services that these investments purchased. This would make it possible to calculate a volume measure of AI investments, and it would tell us how much these investments bought. But such a metric is not available. While a comprehensive price index is not available, we know that the cost for some crucial AI technology has fallen rapidly in price.
+      - In the absence of a comprehensive price index that captures the price of AI-specific goods and services, one has to rely on one of the available metrics for the price of a bundle of goods and services. In the end we decided to use the US Consumer Price Index (CPI).
+      - The US CPI does not provide us with a volume measure of AI goods and services, but it does capture the opportunity costs of these investments. The inflation adjustment of this time series of AI investments therefore lets us understand the size of these investments relative to whatever else these sums of money could have purchased.
+
+dataset:
+  update_period_days: 365
+
+tables:
+  epoch_gpus:
+    variables:
+
+      manufacturer:
+        title: Manufacturer
+        unit: ''
+        short_unit: ''
+        description_short: The company that produced the hardware.
+
+      type:
+        title: Hardware type
+        unit: ''
+        short_unit: ''
+        description_short: The type of hardware (GPU, NPU, etc.).
+
+      fp32__single_precision__performance__flop_s:
+        title: FP32 performance
+        unit: FLOP/s
+        description_short: The number of floating-point operations per second that can be performed by the hardware. FLOP/s values refer to 32-bit (full) precision.
+
+      fp16__half_precision__performance__flop_s:
+        title: FP16 performance
+        unit: FLOP/s
+        description_short: The number of floating-point operations per second that can be performed by the hardware. FLOP/s values refer to 16-bit (half) precision.
+
+      int8_performance__op_s:
+        title: INT8 performance
+        unit: OP/s
+        description_short: The number of integer operations per second that can be performed by the hardware using 8-bit integers.
+
+      memory_size_per_board__byte:
+        title: Memory size per board
+        unit: bytes
+        description_short: The amount of memory available on each board.
+
+      memory_bandwidth__byte_s:
+        title: Memory bandwidth
+        unit: byte/s
+        description_short: The rate at which data can be read from or written to memory.
+
+      tdp__w:
+        title: TDP
+        unit: watts
+        short_unit: W
+        description_short: Thermal Design Power - the maximum amount of heat the hardware is designed to dissipate under load.
+
+      process_size__nm:
+        title: Process size
+        unit: nanometers
+        short_unit: nm
+        description_short: The manufacturing process technology node size.
+
+      release_price__usd:
+        title: Release price
+        unit: US$
+        short_unit: $
+        description_short: The price of the hardware at the time of its release. Data is expressed in constant 2023 US$. Inflation adjustment is based on the US Consumer Price Index (CPI).
+
+      comp_performance_per_dollar:
+        title: Computational performance per dollar
+        unit: FLOP/s/$
+        description_short: Hardware computational performance shown in [floating-point operations](#dod:flop) per second (FLOP/s) per US dollar, adjusted for inflation.
+        presentation:
+          grapher_config:
+            note: FLOP/s values refer to 32-bit (full) precision. Data is expressed in constant 2023 US$. Inflation adjustment is based on the US Consumer Price Index (CPI).
