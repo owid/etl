@@ -6,6 +6,10 @@ tags:
 
 Adding and updating datasets in ETL is part of our routinary work. To this end, we strive to keep this process as simple as possible. Find below the list of the steps involved in the workflow. Click on each step to learn more about it.
 
+!!! tip "New: AI-Powered Workflow"
+
+    Want to use AI assistance for your ETL work? Check out our [**AI-Powered Workflow guide**](ai-workflow.md) to learn how Claude Code can help with development, debugging, and data operations.
+
 ```mermaid
 graph LR
     A["<a href='#create-environment'><b>Create environment</b></a><br>Create PR, staging server"]
