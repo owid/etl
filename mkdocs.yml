@@ -119,7 +119,6 @@ markdown_extensions:
 
       - pymdownx.details
       - pymdownx.keys
-      - pymdownx.details
       - pymdownx.snippets
       - pymdownx.superfences:
               custom_fences:
