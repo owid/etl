@@ -1,11 +1,11 @@
 """Script to create a snapshot of dataset."""
 
-from pathlib import Path
-
-import click
 import tempfile
 import zipfile
+from pathlib import Path
 from urllib.request import urlretrieve
+
+import click
 
 from etl.snapshot import Snapshot
 
