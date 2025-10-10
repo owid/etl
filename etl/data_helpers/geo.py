@@ -2362,20 +2362,30 @@ class RegionAggregator:
         # List all index columns except the country column.
         other_index_columns = [column for column in self.index_columns if column != self.country_col]
         for column in columns:
-            for region, countries in countries_that_must_have_data.items():
+            for region, required_countries in countries_that_must_have_data.items():
                 if df_only_regions[df_only_regions[self.country_col] == region].empty:
                     continue
-                # Create a temporary dataframe of groupings where all required countries are informed.
+                # Within each group check if all required countries have data for this column.
+                # This ensures all groupings appear in the result, even if no country has data.
                 df_covered = (
-                    self.tb_coverage[self.tb_coverage[column]][self.index_columns]  # type: ignore
+                    self.tb_coverage[self.index_columns]  # type: ignore
                     .groupby(other_index_columns, as_index=False)
-                    .agg({self.country_col: lambda x: set(countries) <= set(x)})
+                    .agg(
+                        {
+                            self.country_col: lambda x: set(required_countries)
+                            <= set(x[self.tb_coverage.loc[x.index, column]])  # type: ignore
+                        }
+                    )  # type: ignore
                 )
-                # Detect indexes where not all required countries are informed.
-                _make_nan = df_covered[~df_covered[self.country_col]].assign(**{self.country_col: region})
-                # Make those rows nan in the dataframe with only regions.
-                merged = df_only_regions.merge(_make_nan, on=self.index_columns, how="left", indicator=True)
-                df_only_regions.loc[merged["_merge"] == "both", column] = np.nan
+                groupings_to_nan = df_covered[~df_covered[self.country_col]][other_index_columns]
+                # Set region aggregate to NaN for those groupings
+                df_only_regions.loc[
+                    (df_only_regions[self.country_col] == region)
+                    & df_only_regions[other_index_columns]
+                    .apply(tuple, axis=1)
+                    .isin(groupings_to_nan.apply(tuple, axis=1)),
+                    column,
+                ] = np.nan
 
     def add_aggregates(
         self,
@@ -2438,6 +2448,7 @@ class RegionAggregator:
             * If a dictionary is passed, each key must be a valid region, and the value should be a list of countries that
             must have data for that region. If any of those countries is not informed on a particular variable and year,
             that region will have nan for that particular variable and year.
+            NOTE: It is safer to list **countries** that must have data (e.g. "China"), not aggregate regions (e.g. "Asia").
             * If None, an aggregate is constructed regardless of the countries missing.
 
         Returns
