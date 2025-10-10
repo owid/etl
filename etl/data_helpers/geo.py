@@ -83,7 +83,9 @@ TNAME_WB_INCOME = "wb_income_group"
 @functools.lru_cache
 def _load_countries_regions() -> pd.DataFrame:
     ####################################################################################################################
-    # WARNING: This function is deprecated. All datasets should be loaded using PathFinder.
+    # WARNING: This function is deprecated. You can simply call tb_regions from the Regions class.
+    # If working from an ETL step, you can simply do: `paths.regions.tb_regions`
+    # (This will work as long as the regions dataset is among the dependencies of the step).
     ####################################################################################################################
     log.warning(f"Dataset {LATEST_REGIONS_DATASET_PATH} is silently being loaded.")
     countries_regions = Dataset(LATEST_REGIONS_DATASET_PATH)["regions"]
@@ -93,7 +95,9 @@ def _load_countries_regions() -> pd.DataFrame:
 @functools.lru_cache
 def _load_income_groups() -> pd.DataFrame:
     ####################################################################################################################
-    # WARNING: This function is deprecated. All datasets should be loaded using PathFinder.
+    # WARNING: This function is deprecated. You can simply call tb_income_groups (or tb_income_groups_latest) from the Regions class.
+    # If working from an ETL step, you can simply do: `paths.regions.tb_income_groups`
+    # (This will work as long as the income groups dataset is among the dependencies of the step).
     ####################################################################################################################
     log.warning(f"Dataset {DATASET_WB_INCOME} is silently being loaded.")
     income_groups = Dataset(DATASET_WB_INCOME)[TNAME_WB_INCOME]
@@ -112,7 +116,7 @@ def list_countries_in_region(
     """List countries that are members of a region.
 
     ####################################################################################################################
-    WARNING: This function is deprecated, use list_members_of_region instead.
+    WARNING: This function is deprecated. Instead, use the get_region() method of the Regions class.
     ####################################################################################################################
 
     Parameters
@@ -277,8 +281,8 @@ def add_region_aggregates(
     """Add aggregate data for a specific region (e.g. a continent or an income group) to a table.
 
     ####################################################################################################################
-    WARNING: Consider using add_regions_to_table instead.
-    This function is not deprecated, as it is used by add_regions_to_table, but it should not be used directly.
+    WARNING: This function is deprecated. Instead, use the add_aggregates() method of the Regions class.
+    If working from an ETL step, you can simply do: `paths.regions.add_aggregates(tb)`
     ####################################################################################################################
 
     If data for a region already exists:
@@ -472,6 +476,9 @@ def harmonize_countries(
     show_full_warning: bool = True,
 ) -> TableOrDataFrame:
     """Harmonize country names in dataframe, following the mapping given in a file.
+
+    NOTE: Instead of using this function directly, use the harmonize_names() method of the Regions class.
+    If you are working from within an ETL step, you can simply do: `paths.regions.harmonize_names(tb)`
 
     Countries in dataframe that are not in mapping will left unchanged (or converted to nan, if
     make_missing_countries_nan is True). If excluded_countries_file is given, countries in that list will be removed
@@ -736,6 +743,10 @@ def add_population_to_table(
 ) -> Table:
     """Add column of population to a table with metadata.
 
+    NOTE: If you are using this function in order to create per capita indicators, consider using the add_per_capita method of the Regions class.
+    You can simply do: `paths.regions.add_per_capita(tb)`
+    (This will work as long as the population dataset is among the dependencies of the step).
+
     Parameters
     ----------
     tb : Table
@@ -926,6 +937,9 @@ def list_members_of_region(
 ) -> list[str]:
     """Get countries in a region, both for known regions (e.g. "Africa") and custom ones (e.g. "Europe (excl. EU-27)").
 
+    NOTE: Instead of using this function directly, consider using the get_region() method of the Regions class.
+    If working from an ETL step, you can simply do: `paths.regions.get_region("Europe")["members"]`
+
     Parameters
     ----------
     region : str
@@ -1065,6 +1079,9 @@ def detect_overlapping_regions(
 ):
     """Detect years on which the data for two regions overlap, e.g. a historical region and one of its successors.
 
+    NOTE: Instead of calling this function directly, consider using the inspect_overlaps_with_historical_regions method of the Regions class.
+    Normally, you don't need to call this function explicitly; instead, when creating aggregates, you can use: `paths.regions.add_aggregates(check_for_region_overlaps=True)`
+
     Parameters
     ----------
     df : TableOrDataFrame
@@ -1163,6 +1180,11 @@ def add_regions_to_table(
     frac_countries_that_must_have_data: dict[str, float] | None = None,
 ) -> Table:
     """Add one or more region aggregates to a table (or dataframe).
+
+    ####################################################################################################################
+    WARNING: This function is deprecated. Instead, use the add_aggregates() method of the Regions class.
+    If working from an ETL step, you can simply do: `paths.regions.add_aggregates(tb)`
+    ####################################################################################################################
 
     This should be the default function to use when adding data for regions to a table (or dataframe).
     This function respects the metadata of the incoming data.
@@ -1821,7 +1843,7 @@ class Regions:
     ) -> Table:
         """Harmonize country names in a table using the countries mapping file."""
         if self.countries_file is None:
-            raise ValueError("countries_file must be provided to use harmonize_countries")
+            raise ValueError("The countries_file argument must be defined to use harmonize_countries")
 
         if not Path(self.countries_file).exists():
             raise ValueError(
