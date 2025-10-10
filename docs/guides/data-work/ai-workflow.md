@@ -24,6 +24,16 @@ status: new
 
 At the moment it is mostly useful for updating datasets.
 
+!!! warning "Work in Progress"
+
+    This AI workflow is actively evolving! Updating a dataset was a proof of concept, and we're continuously improving Claude's capabilities and documentation based on real-world usage.
+
+    **Have ideas or feedback?** Your input is highly appreciated! If you discover new useful patterns or encounter issues, please:
+
+    - Share your experience in #data-scientists on Slack
+    - Suggest improvements to CLAUDE.md or this documentation
+    - Help us document new use cases as we discover them
+
 ## Try it!
 If you are wondering what Claude is capable of doing, just ask it. Claude can explain its own capabilities and help you understand how to use it effectively:
 
@@ -45,7 +55,9 @@ A typical, and well supported, task include updating an existing dataset. Claude
 
 ### Other examples
 
+
 > Explain how the PathFinder pattern works in our ETL steps
+
 
 > What does the geo.harmonize_countries() function do?
 
@@ -73,7 +85,6 @@ A typical, and well supported, task include updating an existing dataset. Claude
 
 </div>
 
-### Verification
 
 !!! warning "Always double-check AI-generated code"
 
@@ -95,13 +106,3 @@ It has access to your workspace, along with various documentation files in the r
 - etc.
 
 Have a look at these files to better understand its references.
-
-
-## Reporting Issues
-
-If Claude suggests something that doesn't align with OWID practices:
-
-* **Correct it in the conversation** - Claude learns from your feedback
-* **Check CLAUDE.md** - Verify if the guidance needs updating
-* **Report in Slack** - Share feedback in #data-scientists
-
