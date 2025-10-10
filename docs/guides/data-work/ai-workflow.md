@@ -13,7 +13,7 @@ status: new
     claude
     ```
 
-    Ask it to explain you what it can assist you with:
+    Ask it to explain to you what it can assist you with:
 
     ```
     > What ETL tasks can you help me with?
