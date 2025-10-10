@@ -2359,6 +2359,24 @@ class RegionAggregator:
         return df_with_regions
 
     def _impose_countries_that_must_have_data(self, df_only_regions, columns, countries_that_must_have_data):
+        # Convert list to dict by mapping countries to their regions.
+        if isinstance(countries_that_must_have_data, list):
+            requested = set(countries_that_must_have_data)
+            countries_that_must_have_data = {
+                region: [c for c in requested if c in members]
+                for region, members in self.regions_members.items()
+                if region in self.regions
+            }
+            # Check for unknown countries in list format.
+            if unknown := requested - {c for countries in countries_that_must_have_data.values() for c in countries}:
+                raise ValueError(
+                    f"Countries {unknown} are not members of any of the specified regions {list(self.regions)}"
+                )
+        # Validate all countries in dict format belong to their specified regions.
+        else:
+            for region, countries in countries_that_must_have_data.items():
+                if unknown := set(countries) - set(self.regions_members.get(region, [])):
+                    raise ValueError(f"Countries {unknown} are not members of region {region}")
         # List all index columns except the country column.
         other_index_columns = [column for column in self.index_columns if column != self.country_col]
         for column in columns:
@@ -2397,7 +2415,7 @@ class RegionAggregator:
         accepted_overlaps: list[dict[int, set[str]]] | None = None,
         ignore_overlaps_of_zeros: bool = False,
         subregion_type: str = "successors",
-        countries_that_must_have_data: dict[str, list[str]] | None = None,
+        countries_that_must_have_data: dict[str, list[str]] | list[str] | None = None,
     ) -> Table:
         """Add region aggregates to a table (or dataframe).
 
@@ -2444,12 +2462,13 @@ class RegionAggregator:
             * If "successors", the function will look for overlaps between historical regions and their successors.
             * If "related", the function will look for overlaps between regions and their possibly related members (e.g.
             overseas territories).
-        countries_that_must_have_data : Optional[dict[str, list[str]]], default: None
+        countries_that_must_have_data : Optional[dict[str, list[str]] | list[str]], default: None
             * If a dictionary is passed, each key must be a valid region, and the value should be a list of countries that
             must have data for that region. If any of those countries is not informed on a particular variable and year,
             that region will have nan for that particular variable and year.
-            NOTE: It is safer to list **countries** that must have data (e.g. "China"), not aggregate regions (e.g. "Asia").
+            * If a list of countries is passed, it will be automatically converted to a dictionary by mapping each of those countries to the regions that contain it.
             * If None, an aggregate is constructed regardless of the countries missing.
+            NOTE: It is safer to list **countries** that must have data (e.g. {"World": ["China"]}), instead of aggregate regions (e.g. {"World": ["Asia"}). The condition will only work as expected if those countries/regions that must have data existed already in the original data.
 
         Returns
         -------
