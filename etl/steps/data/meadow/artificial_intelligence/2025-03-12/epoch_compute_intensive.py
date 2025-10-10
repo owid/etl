@@ -24,6 +24,7 @@ def run() -> None:
     # Process data.
     #
     # Define columns of interest.
+    print(tb.columns)
     cols = [
         "Model",
         "Domain",
@@ -33,7 +34,6 @@ def run() -> None:
         "Publication date",
         "Parameters",
         "Training compute (FLOP)",
-        "Training dataset size (datapoints)",
     ]
 
     # Check that the columns of interest are present
