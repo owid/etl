@@ -29,7 +29,7 @@ def main(upload: bool) -> None:
         urlretrieve(snap.metadata.origin.url_download, zip_path)
 
         # Extract ml_hardware.csv from the zip
-        with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+        with zipfile.ZipFile(zip_path, "r") as zip_ref:
             zip_ref.extract("ml_hardware.csv", tmp_path)
 
         csv_path = tmp_path / "ml_hardware.csv"
