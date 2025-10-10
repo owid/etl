@@ -40,28 +40,30 @@ def run(dest_dir: str) -> None:
 
     assert not tb[["hardware_name", "days_since_2000"]].isnull().any().any(), "Index columns should not have NaN values"
 
+    # Keep only GPU rows
+    tb = tb[tb["type"] == "GPU"]
     # Clean release price - remove $ and commas, convert to float
     # Handle NaN values by replacing <NA> string with actual NaN
     tb["release_price__usd"] = tb["release_price__usd"].astype(str)
     tb["release_price__usd"] = tb["release_price__usd"].replace(
-        {"<NA>": None, "nan": None, "\$": "", ",": ""}, regex=True
+        {"<NA>": None, "nan": None, "$": "", ",": ""}, regex=True
     )
     tb["release_price__usd"] = pd.to_numeric(tb["release_price__usd"], errors="coerce")
 
     # Extract year from 'release_date' and create a new 'year' column
     tb["year"] = tb["release_date"].dt.year
 
-    # Adjust CPI values so that 2023 is the reference year (2023 = 100)
-    cpi_2023 = tb_us_cpi.loc[tb_us_cpi["year"] == 2023, "all_items"].values[0]
+    # Adjust CPI values so that 2024 is the reference year (2024 = 100)
+    cpi_2024 = tb_us_cpi.loc[tb_us_cpi["year"] == 2024, "all_items"].values[0]
 
-    # Adjust 'all_items' column by the 2023 CPI
-    tb_us_cpi["cpi_adj_2023"] = tb_us_cpi["all_items"] / cpi_2023
-    tb_us_cpi_2023 = tb_us_cpi[["cpi_adj_2023", "year"]].copy()
-    tb_cpi = pr.merge(tb, tb_us_cpi_2023, on="year", how="left")
+    # Adjust 'all_items' column by the 2024 CPI
+    tb_us_cpi["cpi_adj_2024"] = tb_us_cpi["all_items"] / cpi_2024
+    tb_us_cpi_2024 = tb_us_cpi[["cpi_adj_2024", "year"]].copy()
+    tb_cpi = pr.merge(tb, tb_us_cpi_2024, on="year", how="left")
 
-    # Adjust prices to 2023 dollars
-    tb_cpi["release_price__usd"] = round(tb_cpi["release_price__usd"] / tb_cpi["cpi_adj_2023"])
-    tb_cpi = tb_cpi.drop("cpi_adj_2023", axis=1)
+    # Adjust prices to 2024 dollars
+    tb_cpi["release_price__usd"] = round(tb_cpi["release_price__usd"] / tb_cpi["cpi_adj_2024"])
+    tb_cpi = tb_cpi.drop("cpi_adj_2024", axis=1)
 
     # Calculate computational performance per dollar
     tb_cpi["comp_performance_per_dollar"] = (
@@ -69,6 +71,7 @@ def run(dest_dir: str) -> None:
     )
     tb_cpi = tb_cpi.drop(columns=["release_date", "year"])
 
+    tb_cpi = tb_cpi[["days_since_2000", "hardware_name", "manufacturer", "comp_performance_per_dollar"]]
     tb_cpi = tb_cpi.format(["days_since_2000", "hardware_name"])
 
     #
