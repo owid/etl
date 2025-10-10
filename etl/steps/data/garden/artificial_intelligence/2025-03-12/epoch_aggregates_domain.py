@@ -40,7 +40,7 @@ def run() -> None:
         "organization_categorization",
         "parameters",
         "training_compute__flop",
-        "training_dataset_size__datapoints",
+        "training_dataset_size__gradients",
         "notability_criteria",
     ]
     # Drop the unused columns
