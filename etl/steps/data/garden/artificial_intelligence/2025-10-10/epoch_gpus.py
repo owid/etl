@@ -38,14 +38,14 @@ def run(dest_dir: str) -> None:
 
     tb = tb.reset_index(drop=True)
 
-    assert (
-        not tb[["hardware_name", "days_since_2000"]].isnull().any().any()
-    ), "Index columns should not have NaN values"
+    assert not tb[["hardware_name", "days_since_2000"]].isnull().any().any(), "Index columns should not have NaN values"
 
     # Clean release price - remove $ and commas, convert to float
     # Handle NaN values by replacing <NA> string with actual NaN
     tb["release_price__usd"] = tb["release_price__usd"].astype(str)
-    tb["release_price__usd"] = tb["release_price__usd"].replace({"<NA>": None, "nan": None, "\$": "", ",": ""}, regex=True)
+    tb["release_price__usd"] = tb["release_price__usd"].replace(
+        {"<NA>": None, "nan": None, "\$": "", ",": ""}, regex=True
+    )
     tb["release_price__usd"] = pd.to_numeric(tb["release_price__usd"], errors="coerce")
 
     # Extract year from 'release_date' and create a new 'year' column
