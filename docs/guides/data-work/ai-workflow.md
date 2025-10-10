@@ -47,7 +47,7 @@ Or, in general, you can ask Claude for help on how to use it:
 ```
 
 ### Updating a dataset
-A typical, and well supported, task include updating an existing dataset. Claude is able to create a pull request, create snapshot and data step templates, run and fix them, update indicators, etc.
+A typical, and well supported, task includes updating an existing dataset. Claude is able to create a pull request, create snapshot and data step templates, run and fix them, update indicators, etc.
 
 ```
 > Help me create a new garden step for WHO tuberculosis data. It is under namespace 'who', short name 'tuberculosis'.
