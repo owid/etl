@@ -2919,6 +2919,61 @@ class TestRegionAggregator(unittest.TestCase):
                         f"Europe should have NaN GDP in {case_name} case because France is required but missing/NaN",
                     )
 
+    def test_countries_must_have_data_5_no_country_has_data_in_year(self):
+        """Test the edge case where NO country has data for a column in a specific year.
+
+        This is the exact bug reported: when the required country exists in a year but has NaN,
+        AND no other country has data for that column in that year, the year-group doesn't appear
+        in the coverage check, causing the aggregate to incorrectly show 0 instead of NaN.
+
+        Example: France (2010) and Spain (2011) where Spain has NaN for colb in 2011,
+        and no other country has colb data in 2011.
+        """
+        # Spain missing in 2010, France missing in 2011
+        # In 2011: Spain exists but has NaN for colb, and no other country has colb data
+        tb_test = Table(
+            {
+                "country": ["France", "Spain"],
+                "year": [2010, 2011],
+                "cola": [1, 2],
+                "colb": [1, None],  # Spain has NaN in colb for 2011
+            }
+        )
+
+        aggregator = geo.RegionAggregator(
+            ds_regions=self.ds_regions,
+            regions_all=self.regions_all,
+            regions=["Europe"],
+            aggregations={"cola": "sum", "colb": "sum"},
+            ds_income_groups=self.ds_income_groups,
+        )
+
+        result = aggregator.add_aggregates(
+            tb_test,
+            countries_that_must_have_data={"Europe": ["Spain"]},
+            check_for_region_overlaps=False,
+        )
+
+        europe_data = result[result["country"] == "Europe"]
+
+        # Should have 2 rows (one for each year)
+        self.assertEqual(len(europe_data), 2, "Should have Europe data for both years")
+
+        europe_2010 = europe_data[europe_data["year"] == 2010].iloc[0]
+        europe_2011 = europe_data[europe_data["year"] == 2011].iloc[0]
+
+        # 2010: Spain missing entirely, so both columns should be NaN
+        self.assertTrue(pd.isna(europe_2010["cola"]), "2010 cola should be NaN (Spain missing)")
+        self.assertTrue(pd.isna(europe_2010["colb"]), "2010 colb should be NaN (Spain missing)")
+
+        # 2011: Spain has cola=2 but colb=NaN
+        # cola should have value (Spain has data), colb should be NaN (Spain has NaN)
+        self.assertEqual(europe_2011["cola"], 2, "2011 cola should be 2 (Spain has data)")
+        self.assertTrue(
+            pd.isna(europe_2011["colb"]),
+            "2011 colb should be NaN (Spain has NaN, no other country has colb data in 2011)",
+        )
+
     def test_add_per_capita_basic(self):
         """Test basic add_per_capita functionality."""
         aggregator = geo.RegionAggregator(
