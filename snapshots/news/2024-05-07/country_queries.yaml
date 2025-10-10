@@ -219,7 +219,7 @@ queries:
   - country: Italy
     query: ("Italy")
   - country: Ivory Coast
-    query: ("CÃ´te D'Ivoire" "C<U+00F4>te d<U+2019>Ivoire" "Côte d’Ivoire" "Ivory Coast" "Côte d'Ivoire" "Cote d'Ivoire")
+    query: ("Ivory Coast" "Cote d\'Ivoire" "Côte d’Ivoire" "Côte d\'Ivoire" "C<U+00F4>te d<U+2019>Ivoire" "CÃ´te D\'Ivoire")
   - country: Jamaica
     query: ("Jamaica")
   - country: Japan
