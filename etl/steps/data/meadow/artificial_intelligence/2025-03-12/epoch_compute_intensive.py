@@ -33,7 +33,6 @@ def run() -> None:
         "Publication date",
         "Parameters",
         "Training compute (FLOP)",
-        "Training dataset size (datapoints)",
     ]
 
     # Check that the columns of interest are present
