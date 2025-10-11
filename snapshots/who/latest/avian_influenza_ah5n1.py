@@ -4,6 +4,8 @@ CDC provides this same data but in a machine-readable format. To download it:
 
 - Go to https://www.cdc.gov/bird-flu/php/avian-flu-summary/chart-epi-curve-ah5n1.html
 - Under the main chart, click on "Download data (CSV)".
+- Update `date_published` field in the DVC file
+- Run snapshot `etls latest/avian_influenza_ah5n1` and then `etlr latest/avian_influenza_ah5n1`
 
 To get the publication date, look at the top right part of the site.
 
