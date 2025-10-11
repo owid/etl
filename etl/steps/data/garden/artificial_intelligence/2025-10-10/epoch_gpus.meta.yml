@@ -27,25 +27,12 @@ tables:
         title: Manufacturer
         unit: ''
         short_unit: ''
-        description_short: The company that produced the GPU.
-
-      fp32__single_precision__performance__flop_s:
-        title: FP32 performance
-        unit: FLOP/s
-        description_short: The number of floating-point operations per second that can be performed by the GPU. FLOP/s values refer to 32-bit (full) precision.
-
-      release_price__usd:
-        title: Release price
-        unit: US$
-        short_unit: $
-        description_short: The price of the GPU at the time of its release. Data is expressed in constant 2023 US$. Inflation adjustment is based on the US Consumer Price Index (CPI).
+        description_short: The company that produced the hardware.
 
       comp_performance_per_dollar:
-        title: GPU computational performance per dollar
+        title: Computational performance per dollar
         unit: FLOP/s/$
-        description_short: Graphics processing units (GPUs) are the dominant computing hardware for artificial intelligence systems. GPU performance is shown in [floating-point operations](#dod:flop) operations/second (FLOP/s) per US dollar, adjusted for inflation.
+        description_short: Hardware computational performance shown in [floating-point operations](#dod:flop) per second (FLOP/s) per US dollar, adjusted for inflation.
         presentation:
           grapher_config:
-            note: FLOP/s values refer to 32-bit (full) precision. Data is expressed in constant 2023 US$. Inflation adjustment is based on the US Consumer Price Index (CPI).
-
-
+            note: FLOP/s values refer to 32-bit (full) precision. Data is expressed in constant 2024 US$. Inflation adjustment is based on the US Consumer Price Index (CPI).
