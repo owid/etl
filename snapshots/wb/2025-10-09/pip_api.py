@@ -24,7 +24,7 @@ To run this code from scratch,
         - Check the list of countries without percentile data. It will show up as a list in the output (_These countries are available in a common query but not in the percentile file:_)
         - Open
             https://api.worldbank.org/pip/v1/pip?country=LCA&year=all&povline=150&fill_gaps=false&welfare_type=all&reporting_level=all&additional_ind=false&ppp_version=2021&identity=PROD&format=csv
-            https://api.worldbank.org/pip/v1/pip-grp?country=OHI&year=all&povline=320&group_by=wb&welfare_type=all&reporting_level=all&additional_ind=false&ppp_version=2021&format=csv
+            https://api.worldbank.org/pip/v1/pip-grp?country=NAC&year=all&povline=425&group_by=wb&welfare_type=all&reporting_level=all&additional_ind=false&ppp_version=2021&format=csv
         - And see if any of the `headcount` values is lower than 0.99. If so, you need to add more poverty lines to the functions.
     - Run the code. You have two options to see the output, in the terminal or in the background:
         python snapshots/wb/{version}/pip_api.py
@@ -138,6 +138,7 @@ def poverty_lines_regions():
     between_175_and_250_dollars = list(range(17500, 25000, 20))
     between_250_and_300_dollars = list(range(25000, 30000, 50))
     between_300_and_320_dollars = list(range(30000, 32000, 100))
+    between_320_and_425_dollars = list(range(32000, 42500, 100))
 
     # povlines is all these lists together
     povlines = (
@@ -154,6 +155,7 @@ def poverty_lines_regions():
         + between_175_and_250_dollars
         + between_250_and_300_dollars
         + between_300_and_320_dollars
+        + between_320_and_425_dollars
     )
 
     return povlines
