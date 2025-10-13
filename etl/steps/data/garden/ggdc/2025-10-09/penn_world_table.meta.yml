@@ -19,6 +19,8 @@ definitions:
 
   note_ppp_production: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at {definitions.ppp_year} prices per hour, using multiple benchmark years to adjust for differences in living costs between countries over time.
 
+  subtitle_gdp_per_capita: GDP per capita is a country’s [gross domestic product](#dod:gdp) divided by its population.
+
   description_short_gdp: Total economic output of a country or region per year.
   description_short_gdp_per_capita: Average economic output per person in a country or region per year.
 
@@ -72,11 +74,9 @@ definitions:
     [0, 20, 40, 60, 80, 100, 120, 1]
 
   selected_entity_names_gdp: &selected_entity_names_gdp
-    [China, United States, India, Japan, Germany, Russia, Brazil, United Kingdom, France, Mexico]
+    [United States, Germany, United Kingdom, Brazil, South Korea, Japan, China, India, Ethiopia, Russia]
   selected_entity_names_gdp_per_capita: &selected_entity_names_gdp_per_capita
-    [Germany, United States, China, United Kingdom, Japan, India, France, South Korea]
-
-
+    [United States, Germany, United Kingdom, Brazil, South Korea, Japan, China, India, Ethiopia, Russia]
 
 
 # Learn more about the available fields:
@@ -284,7 +284,7 @@ tables:
               gdoc_id: "{definitions.gdoc_id}"
           grapher_config:
             title: GDP per capita
-            subtitle: "{definitions.description_key_ppp_adjustment}"
+            subtitle: "{definitions.subtitle_gdp_per_capita} {definitions.description_key_ppp_adjustment}"
             note: "{definitions.note_ppp_adjustment}"
             variantName: Penn World Table, constant international-$
             originUrl: https://ourworldindata.org/economic-growth
