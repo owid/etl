@@ -17,8 +17,6 @@ def run() -> None:
     #
     # Process data.
     #
-    # Remove duplicates
-    tb = tb.drop_duplicates(subset=["country", "year"], keep="first")
 
     # Improve tables format.
     tables = [tb.format(["country", "year"])]
