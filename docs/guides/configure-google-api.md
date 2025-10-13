@@ -1,7 +1,6 @@
 ---
 tags:
   - 👷 Staff
-status: new
 ---
 
 In order to use the Google API for ETL tasks, you need to configure your Google Cloud Project and set up OAuth credentials. Follow these steps:

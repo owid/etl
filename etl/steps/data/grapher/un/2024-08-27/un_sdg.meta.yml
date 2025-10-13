@@ -6,7 +6,8 @@ definitions:
 
   employment: Employment refers to all persons of working age who, during a specified brief period, were in paid employment or self-employment.
 
-  description_short_informal_employment: Informal employment relates to jobs that lack basic social or legal protection and employment benefits.
+  description_short_informal_employment: |-
+    Share of << sex >>employed population who are working in jobs that lack basic social or legal protection and employment benefits.
 
   description_key_international_dollars: |-
     This data is expressed in constant international dollars to adjust for inflation and differences in living costs between countries. Read more in our article, [What are international dollars?](https://ourworldindata.org/international-dollars)
@@ -433,7 +434,9 @@ tables:
   _8_3_1__sl_isv_ifem__no_breakdown__both_sexes:
     variables:
       _8_3_1__sl_isv_ifem__no_breakdown__both_sexes:
-        description_short: "{definitions.description_short_informal_employment}"
+        description_short: |-
+          <%- set sex = "" %>
+          {definitions.description_short_informal_employment}
         description_key:
           - "{definitions.employment}"
           - "{definitions.description_key_informal_employment}"
@@ -444,7 +447,9 @@ tables:
   _8_3_1__sl_isv_ifem__no_breakdown__female:
     variables:
       _8_3_1__sl_isv_ifem__no_breakdown__female:
-        description_short: "{definitions.description_short_informal_employment}"
+        description_short: |-
+          <%- set sex = "female " %>
+          {definitions.description_short_informal_employment}
         description_key:
           - "{definitions.employment}"
           - "{definitions.description_key_informal_employment}"
@@ -455,7 +460,9 @@ tables:
   _8_3_1__sl_isv_ifem__no_breakdown__male:
     variables:
       _8_3_1__sl_isv_ifem__no_breakdown__male:
-        description_short: "{definitions.description_short_informal_employment}"
+        description_short: |-
+          <%- set sex = "male " %>
+          {definitions.description_short_informal_employment}
         description_key:
           - "{definitions.employment}"
           - "{definitions.description_key_informal_employment}"
@@ -494,6 +501,13 @@ tables:
   _8_3_1__sl_isv_ifem__agriculture__forestry_and_fishing__both_sexes:
     variables:
       _8_3_1__sl_isv_ifem__agriculture__forestry_and_fishing__both_sexes:
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+
+  _8_3_1__sl_isv_ifem__non_agriculture__both_sexes:
+    variables:
+      _8_3_1__sl_isv_ifem__non_agriculture__both_sexes:
         display:
           numDecimalPlaces: 1
           tolerance: 5

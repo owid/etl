@@ -83,7 +83,9 @@ TNAME_WB_INCOME = "wb_income_group"
 @functools.lru_cache
 def _load_countries_regions() -> pd.DataFrame:
     ####################################################################################################################
-    # WARNING: This function is deprecated. All datasets should be loaded using PathFinder.
+    # WARNING: This function is deprecated. You can simply call tb_regions from the Regions class.
+    # If working from an ETL step, you can simply do: `paths.regions.tb_regions`
+    # (This will work as long as the regions dataset is among the dependencies of the step).
     ####################################################################################################################
     log.warning(f"Dataset {LATEST_REGIONS_DATASET_PATH} is silently being loaded.")
     countries_regions = Dataset(LATEST_REGIONS_DATASET_PATH)["regions"]
@@ -93,7 +95,9 @@ def _load_countries_regions() -> pd.DataFrame:
 @functools.lru_cache
 def _load_income_groups() -> pd.DataFrame:
     ####################################################################################################################
-    # WARNING: This function is deprecated. All datasets should be loaded using PathFinder.
+    # WARNING: This function is deprecated. You can simply call tb_income_groups (or tb_income_groups_latest) from the Regions class.
+    # If working from an ETL step, you can simply do: `paths.regions.tb_income_groups`
+    # (This will work as long as the income groups dataset is among the dependencies of the step).
     ####################################################################################################################
     log.warning(f"Dataset {DATASET_WB_INCOME} is silently being loaded.")
     income_groups = Dataset(DATASET_WB_INCOME)[TNAME_WB_INCOME]
@@ -112,7 +116,7 @@ def list_countries_in_region(
     """List countries that are members of a region.
 
     ####################################################################################################################
-    WARNING: This function is deprecated, use list_members_of_region instead.
+    WARNING: This function is deprecated. Instead, use the get_region() method of the Regions class.
     ####################################################################################################################
 
     Parameters
@@ -277,8 +281,8 @@ def add_region_aggregates(
     """Add aggregate data for a specific region (e.g. a continent or an income group) to a table.
 
     ####################################################################################################################
-    WARNING: Consider using add_regions_to_table instead.
-    This function is not deprecated, as it is used by add_regions_to_table, but it should not be used directly.
+    WARNING: This function is deprecated. Instead, use the add_aggregates() method of the Regions class.
+    If working from an ETL step, you can simply do: `paths.regions.add_aggregates(tb)`
     ####################################################################################################################
 
     If data for a region already exists:
@@ -472,6 +476,9 @@ def harmonize_countries(
     show_full_warning: bool = True,
 ) -> TableOrDataFrame:
     """Harmonize country names in dataframe, following the mapping given in a file.
+
+    NOTE: Instead of using this function directly, use the harmonize_names() method of the Regions class.
+    If you are working from within an ETL step, you can simply do: `paths.regions.harmonize_names(tb)`
 
     Countries in dataframe that are not in mapping will left unchanged (or converted to nan, if
     make_missing_countries_nan is True). If excluded_countries_file is given, countries in that list will be removed
@@ -736,6 +743,10 @@ def add_population_to_table(
 ) -> Table:
     """Add column of population to a table with metadata.
 
+    NOTE: If you are using this function in order to create per capita indicators, consider using the add_per_capita method of the Regions class.
+    You can simply do: `paths.regions.add_per_capita(tb)`
+    (This will work as long as the population dataset is among the dependencies of the step).
+
     Parameters
     ----------
     tb : Table
@@ -926,6 +937,9 @@ def list_members_of_region(
 ) -> list[str]:
     """Get countries in a region, both for known regions (e.g. "Africa") and custom ones (e.g. "Europe (excl. EU-27)").
 
+    NOTE: Instead of using this function directly, consider using the get_region() method of the Regions class.
+    If working from an ETL step, you can simply do: `paths.regions.get_region("Europe")["members"]`
+
     Parameters
     ----------
     region : str
@@ -1065,6 +1079,9 @@ def detect_overlapping_regions(
 ):
     """Detect years on which the data for two regions overlap, e.g. a historical region and one of its successors.
 
+    NOTE: Instead of calling this function directly, consider using the inspect_overlaps_with_historical_regions method of the Regions class.
+    Normally, you don't need to call this function explicitly; instead, when creating aggregates, you can use: `paths.regions.add_aggregates(check_for_region_overlaps=True)`
+
     Parameters
     ----------
     df : TableOrDataFrame
@@ -1163,6 +1180,11 @@ def add_regions_to_table(
     frac_countries_that_must_have_data: dict[str, float] | None = None,
 ) -> Table:
     """Add one or more region aggregates to a table (or dataframe).
+
+    ####################################################################################################################
+    WARNING: This function is deprecated. Instead, use the add_aggregates() method of the Regions class.
+    If working from an ETL step, you can simply do: `paths.regions.add_aggregates(tb)`
+    ####################################################################################################################
 
     This should be the default function to use when adding data for regions to a table (or dataframe).
     This function respects the metadata of the incoming data.
@@ -1576,12 +1598,15 @@ class Regions:
 
     It can also be used in the context of an ETL data step, e.g. to generate the country name harmonization file, or to apply that harmonization to a table.
 
-    Simply create a regions object:
+    - Initialization:
+    If you are working from within an ETL step, PathFinder already has access Regions. So, typically, you can simply do:
+    > paths.regions
+    And there you have access to all operations mentioned below. Otherwise, if you don't have access to PathFinder, you can initialize a regions object as
     > regions = Regions()
-    and then:
+
     - Access the members of a region:
     > regions.get_region("Europe")["members"]
-    more generally, paths.regions.get_region("Europe") gives a dictionary with all info of the region given in the regions dataset.
+    More generally, paths.regions.get_region("Europe") gives a dictionary with all info of the region given in the regions dataset.
 
     - Access a list of regions:
     > regions.get_regions(["Africa", "High-income countries"])
@@ -1589,13 +1614,27 @@ class Regions:
     > regions.get_regions(["Africa", "High-income countries"], only_members=True)
     returns a dictionary {"Africa": ["Algeria", "Angola", ...], "High-income countries": [...], ...}
 
-    The Regions object is instantiated with PathFinder, so, within an ETL step, one can e.g.:
     - Create a countries harmonization file for the current dataset:
-    > paths.regions.harmonizer()
+    > regions.harmonizer()
     This will start the interactive harmonizer on the interactive window.
 
-    - Apply the country name harmonization to a table, without having to specify the path to the countries file or the excluded countries file.
-    > tb = paths.regions.harmonize_names(tb)
+    - Applying the country name harmonization to a table:
+    > regions.harmonize_names(tb)
+
+    - Creating region aggregates (simple use):
+    > regions.add_aggregates(tb)
+
+    - Creating per capita indicators (simple use):
+    > regions.add_per_capita(tb)
+
+    - Creating region aggregates and/or per capita indicators (advance use):
+    # NOTE: It's unclear if this use case will be common. If not, consider removing the additional complexity.
+    For better performance, especially when you are handling multiple tables, you may want to create an aggregator object per table, e.g.
+    > tb1_agg = regions.aggregator()
+    > tb1 = tb1_agg.add_aggregates(tb=tb1)
+    > tb1 = tb1_agg.add_per_capita(tb=tb1)
+    > tb2_agg = regions.aggregator()
+    > tb2 = tb2_agg.add_aggregates(tb=tb2)
 
     """
 
@@ -1804,7 +1843,7 @@ class Regions:
     ) -> Table:
         """Harmonize country names in a table using the countries mapping file."""
         if self.countries_file is None:
-            raise ValueError("countries_file must be provided to use harmonize_countries")
+            raise ValueError("The countries_file argument must be defined to use harmonize_countries")
 
         if not Path(self.countries_file).exists():
             raise ValueError(
@@ -1823,25 +1862,216 @@ class Regions:
             show_full_warning=show_full_warning,
         )
 
+    def add_aggregates(
+        self,
+        tb: Table,
+        regions: list[str] | dict[str, Any] | None = None,
+        index_columns: list[str] | None = None,
+        aggregations: dict[str, Any] | None = None,
+        country_col: str = "country",
+        year_col: str = "year",
+        population_col: str = "population",
+        num_allowed_nans_per_year: int | None = None,
+        frac_allowed_nans_per_year: float | None = None,
+        min_num_values_per_year: int | None = None,
+        check_for_region_overlaps: bool = True,
+        accepted_overlaps: list[dict[int, set[str]]] | None = None,
+        ignore_overlaps_of_zeros: bool = False,
+        subregion_type: str = "successors",
+        countries_that_must_have_data: dict[str, list[str]] | None = None,
+    ) -> Table:
+        """Convenience method to add region aggregates without explicit RegionAggregator creation.
+
+        This is equivalent to calling paths.region_aggregator(**kwargs).add_aggregates(tb).
+        For advanced use cases requiring multiple operations (e.g., both aggregates and per capita),
+        consider using paths.region_aggregator() directly for better performance.
+
+        Parameters
+        ----------
+        tb : TableOrDataFrame
+            Input table to add aggregates to.
+        regions : list[str] | dict[str, Any] | None
+            Regions to aggregate. If None, uses all available regions.
+        index_columns : list[str] | None
+            Index columns for the table. If None, inferred from the table.
+        aggregations : dict[str, Any] | None
+            Aggregation methods for each column.
+        country_col : str
+            Name of the country column.
+        year_col : str
+            Name of the year column.
+        population_col : str
+            Name of the population column.
+
+        All other parameters are passed through to RegionAggregator.add_aggregates().
+
+        Returns
+        -------
+        Table
+            Table with region aggregates added.
+        """
+        region_aggregator = self.aggregator(
+            regions=regions,
+            index_columns=index_columns,
+            aggregations=aggregations,
+            country_col=country_col,
+            year_col=year_col,
+            population_col=population_col,
+        )
+
+        return region_aggregator.add_aggregates(
+            tb=tb,
+            num_allowed_nans_per_year=num_allowed_nans_per_year,
+            frac_allowed_nans_per_year=frac_allowed_nans_per_year,
+            min_num_values_per_year=min_num_values_per_year,
+            check_for_region_overlaps=check_for_region_overlaps,
+            accepted_overlaps=accepted_overlaps,
+            ignore_overlaps_of_zeros=ignore_overlaps_of_zeros,
+            subregion_type=subregion_type,
+            countries_that_must_have_data=countries_that_must_have_data,
+        )
+
+    def add_per_capita(
+        self,
+        tb: Table,
+        regions: list[str] | dict[str, Any] | None = None,
+        index_columns: list[str] | None = None,
+        aggregations: dict[str, Any] | None = None,
+        country_col: str = "country",
+        year_col: str = "year",
+        population_col: str = "population",
+        only_informed_countries_in_regions: bool = False,
+        columns: list[str] | None = None,
+        prefix: str = "",
+        suffix: str = "_per_capita",
+        suffix_informed_population: str = "_region_population",
+        drop_population: bool | None = None,
+        warn_on_missing_countries: bool = True,
+        show_full_warning: bool = True,
+        interpolate_missing_population: bool = False,
+        expected_countries_without_population: list[str] | None = None,
+    ) -> Table:
+        """Convenience method to add per capita indicators without explicit RegionAggregator creation.
+
+        This is equivalent to calling paths.region_aggregator(**kwargs).add_per_capita(tb).
+        For advanced use cases requiring multiple operations (e.g., both aggregates and per capita),
+        consider using paths.region_aggregator() directly for better performance.
+
+        Parameters
+        ----------
+        tb : Table
+            Input table to add per capita indicators to.
+        regions : list[str] | dict[str, Any] | None
+            Regions to use. If None, uses all available regions.
+        index_columns : list[str] | None
+            Index columns for the table. If None, inferred from the table.
+        aggregations : dict[str, Any] | None
+            Aggregation methods for each column.
+        country_col : str
+            Name of the country column.
+        year_col : str
+            Name of the year column.
+        population_col : str
+            Name of the population column.
+
+        All other parameters are passed through to RegionAggregator.add_per_capita().
+
+        Returns
+        -------
+        Table
+            Table with per capita indicators added.
+        """
+        region_aggregator = self.aggregator(
+            regions=regions,
+            index_columns=index_columns,
+            aggregations=aggregations,
+            country_col=country_col,
+            year_col=year_col,
+            population_col=population_col,
+        )
+
+        return region_aggregator.add_per_capita(
+            tb=tb,
+            only_informed_countries_in_regions=only_informed_countries_in_regions,
+            columns=columns,
+            prefix=prefix,
+            suffix=suffix,
+            suffix_informed_population=suffix_informed_population,
+            drop_population=drop_population,
+            warn_on_missing_countries=warn_on_missing_countries,
+            show_full_warning=show_full_warning,
+            interpolate_missing_population=interpolate_missing_population,
+            expected_countries_without_population=expected_countries_without_population,
+        )
+
+    def aggregator(
+        self,
+        regions: list[str] | dict[str, Any] | None = None,
+        index_columns: list[str] | None = None,
+        aggregations: dict[str, Any] | None = None,
+        country_col: str = "country",
+        year_col: str = "year",
+        population_col: str = "population",
+    ) -> "RegionAggregator":
+        """Create a RegionAggregator for efficient multi-operation workflows.
+
+        Use this method when you need to perform multiple operations (e.g., both add_aggregates
+        and add_per_capita) on the same table for better performance.
+
+        For simple single-operation cases, consider using the convenience methods:
+        - regions.add_aggregates(tb)
+        - regions.add_per_capita(tb)
+
+        Parameters
+        ----------
+        regions : list[str] | dict[str, Any] | None
+            Regions to aggregate. If None, uses all available regions.
+        index_columns : list[str] | None
+            Index columns for the table. If None, inferred from the table.
+        aggregations : dict[str, Any] | None
+            Aggregation methods for each column.
+        country_col : str
+            Name of the country column.
+        year_col : str
+            Name of the year column.
+        population_col : str
+            Name of the population column.
+
+        Returns
+        -------
+        RegionAggregator
+            Configured aggregator ready for multi-operation workflows.
+
+        Examples
+        --------
+        >>> # Multi-operation workflow (efficient)
+        >>> agg = paths.regions.aggregator(regions=["World"], aggregations={"gdp": "sum"})
+        >>> tb = agg.add_aggregates(tb)
+        >>> tb = agg.add_per_capita(tb, columns=["gdp"])
+
+        >>> # Single operations (convenient)
+        >>> tb = paths.regions.add_aggregates(tb, regions=["World"])
+        """
+        return RegionAggregator(
+            regions=regions,
+            ds_regions=self.ds_regions,
+            ds_income_groups=self._ds_income_groups,
+            ds_population=self._ds_population,
+            regions_all=self.regions_all,
+            index_columns=index_columns,
+            aggregations=aggregations,
+            country_col=country_col,
+            year_col=year_col,
+            population_col=population_col,
+        )
+
 
 class RegionAggregator:
     """Manages operations on tables that have, or need to have, region aggregates.
 
-    The aggregator is typically created through the `paths.region_aggregator()` method (using PathFinder), which pre-configures it with the necessary inputs.
+    The aggregator is typically created through the `paths.regions.aggregator()` method (using Regions via PathFinder), which pre-configures it with the necessary inputs.
 
-    Examples
-    --------
-    * If you just want to add region aggregates to a table, you can, e.g.:
-    > tb = paths.region_aggregator().add_aggregates(tb)
-
-    * You can add per capita indicators in a similar way (regardless of whether you have created region aggregates):
-    > tb = paths.region_aggregator().add_per_capita(tb)
-
-    * A more efficient way to achieve these calculations would be:
-    > tb_agg = paths.region_aggregator()
-    > tb = tb_agg.add_aggregates(tb)
-    > tb = tb_agg.add_per_capita(tb)
-    This avoids repeating certain calculations twice. However, if your table changes index after creating aggregates (e.g. if you pivot or melt), then you need to define tb_agg again and pass the new index_columns argument.
+    See more examples in the documentation of the Regions class.
 
     Parameters
     ----------
@@ -1926,6 +2156,13 @@ class RegionAggregator:
         else:
             # regions is already a dict
             self.regions = regions
+
+        # If "regions" is passed as a list, it can only contain regions that are known to the regions dataset.
+        # On the other hand, if it is a dictionary, it can have custom regions.
+        if isinstance(regions, list):
+            unknown_regions = [region for region in regions if region not in regions_all]
+            if unknown_regions:
+                raise ValueError(f"Unknown regions in list: {unknown_regions}")
 
         # Create a list of all possible regions, which includes any possible custom region.
         self.regions_all = sorted(set(regions_all) | set(self.regions))
@@ -2090,9 +2327,15 @@ class RegionAggregator:
         # Create region aggregates.
         dfs_with_regions = []
         for region in regions:
+            # Select data for countries in the region.
+            df_region_data = tb[tb[self.country_col].isin(self.regions_members[region])]
+
+            if df_region_data.empty:
+                continue
+
+            # Create region aggregates (both regular and possibly weighted aggregations).
             df_region = groupby_agg(
-                # Select data for countries in the region.
-                df=tb[tb[self.country_col].isin(self.regions_members[region])],
+                df=df_region_data,
                 groupby_columns=[column for column in self.index_columns if column != self.country_col],
                 aggregations=aggregations,
                 num_allowed_nans=num_allowed_nans_per_year,
@@ -2102,7 +2345,6 @@ class RegionAggregator:
 
             # Add a column for region name.
             df_region[self.country_col] = region
-
             dfs_with_regions.append(df_region)
 
         # Concatenate aggregates of all regions.
@@ -2117,27 +2359,55 @@ class RegionAggregator:
         return df_with_regions
 
     def _impose_countries_that_must_have_data(self, df_only_regions, columns, countries_that_must_have_data):
+        # Convert list to dict by mapping countries to their regions.
+        if isinstance(countries_that_must_have_data, list):
+            requested = set(countries_that_must_have_data)
+            countries_that_must_have_data = {
+                region: [c for c in requested if c in members]
+                for region, members in self.regions_members.items()
+                if region in self.regions
+            }
+            # Check for unknown countries in list format.
+            if unknown := requested - {c for countries in countries_that_must_have_data.values() for c in countries}:
+                raise ValueError(
+                    f"Countries {unknown} are not members of any of the specified regions {list(self.regions)}"
+                )
+        # Validate all countries in dict format belong to their specified regions.
+        else:
+            for region, countries in countries_that_must_have_data.items():
+                if unknown := set(countries) - set(self.regions_members.get(region, [])):
+                    raise ValueError(f"Countries {unknown} are not members of region {region}")
         # List all index columns except the country column.
         other_index_columns = [column for column in self.index_columns if column != self.country_col]
         for column in columns:
-            for region, countries in countries_that_must_have_data.items():
+            for region, required_countries in countries_that_must_have_data.items():
                 if df_only_regions[df_only_regions[self.country_col] == region].empty:
                     continue
-                # Create a temporary dataframe of groupings where all required countries are informed.
+                # Within each group check if all required countries have data for this column.
+                # This ensures all groupings appear in the result, even if no country has data.
                 df_covered = (
-                    self.tb_coverage[self.tb_coverage[column]][self.index_columns]  # type: ignore
+                    self.tb_coverage[self.index_columns]  # type: ignore
                     .groupby(other_index_columns, as_index=False)
-                    .agg({self.country_col: lambda x: set(countries) <= set(x)})
+                    .agg(
+                        {
+                            self.country_col: lambda x: set(required_countries)
+                            <= set(x[self.tb_coverage.loc[x.index, column]])  # type: ignore
+                        }
+                    )  # type: ignore
                 )
-                # Detect indexes where not all required countries are informed.
-                _make_nan = df_covered[~df_covered[self.country_col]].assign(**{self.country_col: region})
-                # Make those rows nan in the dataframe with only regions.
-                merged = df_only_regions.merge(_make_nan, on=self.index_columns, how="left", indicator=True)
-                df_only_regions.loc[merged["_merge"] == "both", column] = np.nan
+                groupings_to_nan = df_covered[~df_covered[self.country_col]][other_index_columns]
+                # Set region aggregate to NaN for those groupings
+                df_only_regions.loc[
+                    (df_only_regions[self.country_col] == region)
+                    & df_only_regions[other_index_columns]
+                    .apply(tuple, axis=1)
+                    .isin(groupings_to_nan.apply(tuple, axis=1)),
+                    column,
+                ] = np.nan
 
     def add_aggregates(
         self,
-        tb: TableOrDataFrame,
+        tb: Table,
         num_allowed_nans_per_year: int | None = None,
         frac_allowed_nans_per_year: float | None = None,
         min_num_values_per_year: int | None = None,
@@ -2145,7 +2415,7 @@ class RegionAggregator:
         accepted_overlaps: list[dict[int, set[str]]] | None = None,
         ignore_overlaps_of_zeros: bool = False,
         subregion_type: str = "successors",
-        countries_that_must_have_data: dict[str, list[str]] | None = None,
+        countries_that_must_have_data: dict[str, list[str]] | list[str] | None = None,
     ) -> Table:
         """Add region aggregates to a table (or dataframe).
 
@@ -2192,11 +2462,13 @@ class RegionAggregator:
             * If "successors", the function will look for overlaps between historical regions and their successors.
             * If "related", the function will look for overlaps between regions and their possibly related members (e.g.
             overseas territories).
-        countries_that_must_have_data : Optional[dict[str, list[str]]], default: None
+        countries_that_must_have_data : Optional[dict[str, list[str]] | list[str]], default: None
             * If a dictionary is passed, each key must be a valid region, and the value should be a list of countries that
             must have data for that region. If any of those countries is not informed on a particular variable and year,
             that region will have nan for that particular variable and year.
+            * If a list of countries is passed, it will be automatically converted to a dictionary by mapping each of those countries to the regions that contain it.
             * If None, an aggregate is constructed regardless of the countries missing.
+            NOTE: It is safer to list **countries** that must have data (e.g. {"World": ["China"]}), instead of aggregate regions (e.g. {"World": ["Asia"}). The condition will only work as expected if those countries/regions that must have data existed already in the original data.
 
         Returns
         -------
@@ -2209,21 +2481,42 @@ class RegionAggregator:
 
         # Define the list of (non-index) columns for which aggregates will be created.
         columns = list(self.aggregations)
-        # Define the list of other non-index columns (if any) for which no aggregates need to be created.
-        other_columns = [column for column in tb.columns if column not in (self.index_columns + columns)]
 
+        # Extract only the columns we actually need to improve performance.
+        # Include index columns, aggregated columns, and any weight columns for weighted means
+        weight_columns = set()
+        for agg_func in self.aggregations.values():
+            if isinstance(agg_func, str) and agg_func.startswith("mean_weighted_by_"):
+                weight_col = agg_func.replace("mean_weighted_by_", "")
+                # Add population column if needed for population weighting
+                if weight_col == self.population_col and weight_col not in tb.columns:
+                    tb = add_population_to_table(
+                        tb=tb,
+                        ds_population=self.ds_population,  # type: ignore
+                        country_col=self.country_col,
+                        year_col=self.year_col,
+                        population_col=self.population_col,
+                        warn_on_missing_countries=False,
+                    )
+                if weight_col in tb.columns:
+                    weight_columns.add(weight_col)
+
+        needed_columns = self.index_columns + columns + list(weight_columns)
+        tb_fast = tb[needed_columns]
+        other_columns = [col for col in tb.columns if col not in needed_columns]
+
+        # Run everything on the fast subset instead of full DataFrame
         if check_for_region_overlaps:
-            # Find overlaps between historical regions and successors.
             self.inspect_overlaps_with_historical_regions(
-                tb=tb,
+                tb=tb_fast,
                 accepted_overlaps=accepted_overlaps,
                 ignore_overlaps_of_zeros=ignore_overlaps_of_zeros,
                 subregion_type=subregion_type,
             )
 
-        # Create a table of region aggregates (just the regions, not individual countries).
+        # Create region aggregates on fast subset
         df_only_regions = self._create_table_of_only_region_aggregates(
-            tb=tb,
+            tb=tb_fast,
             regions=list(self.regions),
             aggregations=self.aggregations,
             num_allowed_nans_per_year=num_allowed_nans_per_year,
@@ -2231,10 +2524,9 @@ class RegionAggregator:
             min_num_values_per_year=min_num_values_per_year,
         )
 
-        # If a list of countries that must be informed was given, remove (make nan) aggregations where any of those countries was missing in the data.
         if countries_that_must_have_data is not None:
             if self.tb_coverage is None:
-                self._create_coverage_table(tb=tb)
+                self._create_coverage_table(tb=tb_fast)
             self._impose_countries_that_must_have_data(
                 df_only_regions=df_only_regions,
                 columns=columns,
@@ -2256,18 +2548,17 @@ class RegionAggregator:
         # Combine the table with only regions and the table with no regions.
         df_with_regions = pd.concat([df_only_regions, df_no_regions], ignore_index=True)  # type: ignore
 
-        # Sort rows and columns conveniently.
+        # Final sort and column ordering.
         df_with_regions = df_with_regions.sort_values(self.index_columns).reset_index(drop=True)[tb.columns]
 
-        # Convert country to categorical if the original was
+        # Convert country to categorical if the original was.
         if tb[self.country_col].dtype.name == "category":
             df_with_regions = df_with_regions.astype({self.country_col: "category"})
 
-        # If the original object was a Table, copy metadata
-        if isinstance(tb, Table):
-            return Table(df_with_regions).copy_metadata(tb)
-        else:
-            return df_with_regions  # type: ignore
+        # Create a table with the same metadata as the original one.
+        tb_with_regions = Table(df_with_regions).copy_metadata(tb)
+
+        return tb_with_regions
 
     def add_per_capita(
         self,

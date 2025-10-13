@@ -12,7 +12,7 @@ meta:
       This data is specifically from Figure 1 of the paper.
 
     # Citation
-    producer: Epoch
+    producer: Epoch AI
     citation_full: |-
       Ben Cottier, Robi Rahman, Loredana Fattorini, Nestor Maslej, and David Owen. ‘The rising costs of training frontier AI models’. ArXiv [cs.CY], 2024. arXiv. https://arxiv.org/abs/2405.21015.
 

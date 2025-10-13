@@ -74,9 +74,10 @@ dependencies = [
     # fastmcp run owid_mcp/server.py --transport=http  --host=0.0.0.0 --port=8080
     "fastmcp>=2.12.3",
     "pyproj>=3.7.1",
-    "pydantic-ai>=1.0.6",
+    "pydantic-ai>=1.0.10",
     "logfire[fastapi,httpx]>=4.3.3",
     "cfgrib>=0.9.15.0",
+    "metabase-api>=3.5.2",
 ]
 
 [tool.uv.sources]
@@ -127,7 +128,7 @@ api = [
     "joblib>=1.3.2",
 ]
 wizard = [
-    "streamlit>=1.49.0",
+    "streamlit>=1.50.0",
     "streamlit-aggrid>=0.3.4.post3",
     "streamlit-ace>=0.1.1",
     "streamlit-extras>=0.3.6",

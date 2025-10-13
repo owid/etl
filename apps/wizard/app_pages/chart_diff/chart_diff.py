@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 
 import pandas as pd
+from sqlalchemy import text
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import Session
@@ -18,7 +19,7 @@ from apps.wizard.utils.components import st_cache_data
 from etl.analytics.data import get_chart_views_last_n_days, get_post_views_last_n_days
 from etl.config import OWID_ENV
 from etl.db import read_sql
-from etl.git_helpers import get_changed_files, log_time
+from etl.git_helpers import get_changed_files
 from etl.grapher import model as gm
 from etl.io import get_all_changed_catalog_paths
 
@@ -787,7 +788,7 @@ class ChartDiffsLoader:
         return pd.DataFrame(summary)
 
 
-@log_time
+# @log_time
 def _modified_data_metadata_on_staging(
     source_session: Session, target_session: Session, chart_ids: Optional[List[int]] = None
 ) -> pd.DataFrame:
@@ -894,7 +895,7 @@ def _modified_data_metadata_on_staging(
     return diff
 
 
-@log_time
+# @log_time
 def _modified_chart_configs_on_staging(
     source_session: Session, target_session: Session, chart_ids: Optional[List[int]] = None
 ) -> pd.DataFrame:
@@ -976,7 +977,7 @@ def _modified_chart_configs_on_staging(
     return diff[["configEdited", "chartEditedInStaging"]]
 
 
-@log_time
+# @log_time
 def _modified_tags_on_staging(
     source_session: Session, target_session: Session, chart_ids: Optional[List[int]] = None
 ) -> pd.DataFrame:
@@ -1036,6 +1037,55 @@ def _modified_tags_on_staging(
     diff["tagsEdited"] = diff["tagsEdited"] | (source_df["tagIds"].isnull() != target_df["tagIds"].isnull())
 
     return diff[["tagsEdited"]]
+
+
+def get_chart_id_slug_pairs(session: Session) -> set[tuple[int, str]]:
+    """Get all (chart_id, slug) pairs from a database as a set for efficient operations."""
+    from sqlalchemy import text
+
+    query = text("""
+    SELECT c.id, cc.slug
+    FROM charts c
+    JOIN chart_configs cc ON c.configId = cc.id
+    WHERE cc.slug IS NOT NULL
+    """)
+    result = session.execute(query).fetchall()
+    return set((row[0], row[1]) for row in result)
+
+
+def get_deleted_charts(source_session: Session, target_session: Session) -> list[dict]:
+    """Get charts that exist in target but not in source (deleted charts).
+
+    This function matches on chart IDs to identify truly deleted charts,
+    filtering out charts created in target after staging creation time.
+    """
+    staging_creation_time = get_staging_creation_time(source_session)
+
+    # Get chart info from target that existed before staging was created
+    query = text("""
+    SELECT c.id, cc.slug
+    FROM charts c
+    JOIN chart_configs cc ON c.configId = cc.id
+    WHERE cc.slug IS NOT NULL AND c.createdAt < :staging_creation_time
+    """)
+    result = target_session.execute(query, {"staging_creation_time": staging_creation_time}).fetchall()
+    target_charts_pre_staging = {row[0]: row[1] for row in result}  # id -> slug mapping
+
+    # Get chart IDs from source
+    source_query = text("""
+    SELECT c.id
+    FROM charts c
+    JOIN chart_configs cc ON c.configId = cc.id
+    WHERE cc.slug IS NOT NULL
+    """)
+    source_result = source_session.execute(source_query).fetchall()
+    source_chart_ids = set(row[0] for row in source_result)
+
+    # Find chart IDs that exist in target (pre-staging) but not in source
+    deleted_chart_ids = set(target_charts_pre_staging.keys()) - source_chart_ids
+
+    # Return list of deleted charts with their info
+    return [{"id": chart_id, "slug": target_charts_pre_staging[chart_id]} for chart_id in deleted_chart_ids]
 
 
 def modified_charts_on_staging(

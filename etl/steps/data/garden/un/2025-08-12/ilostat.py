@@ -15,8 +15,8 @@ paths = PathFinder(__file__)
 # Initialize logger.
 log = get_logger()
 
-# Define release year as the year in the version
-RELEASE_YEAR = int(paths.version.split("-")[0])
+# Define release year as the year in the version minus 1
+RELEASE_YEAR = int(paths.version.split("-")[0]) - 1
 
 # Define threshold for percentage of unreliable data
 UNRELIABLE_THRESHOLD = 1
@@ -219,6 +219,9 @@ def run() -> None:
     # Remove outliers in specific indicators
     tb = remove_outliers_in_data(tb=tb)
 
+    # Show data only until the release year
+    tb = show_data_until_release_year(tb=tb)
+
     # Improve table format.
     tb = tb.format(["country", "year", "sex", "classif1"])
     tb_regions = tb_regions.format(["country", "year"], short_name="regions")
@@ -394,5 +397,17 @@ def remove_outliers_in_data(tb: Table) -> Table:
         # Replace out-of-range values with missing (pd.NA)
         mask = (tb[indicator] < thresholds[0]) | (tb[indicator] > thresholds[1])
         tb.loc[mask, indicator] = pd.NA
+
+    return tb
+
+
+def show_data_until_release_year(tb: Table) -> Table:
+    """
+    Show data only until the release year.
+    """
+    tb = tb.copy()
+
+    # Filter data until RELEASE_YEAR
+    tb = tb[tb["year"] <= RELEASE_YEAR].reset_index(drop=True)
 
     return tb

@@ -6,6 +6,16 @@ a:hover {
     text-align: center;
  }
 
+/* Hide Jupyter notebook execution numbers */
+.jp-InputPrompt,
+.jp-OutputPrompt {
+    display: none !important;
+}
+
+/* Hide In/Out prompts in code cells */
+div.highlight pre span.gp {
+    display: none !important;
+}
 
 /* fix some horrible jupyter cell margins */
 .jp-Cell h1 {

@@ -127,7 +127,7 @@ def run() -> None:
     #
     # Add population-weighted regional aggregations for internet users
     # tb_garden = (
-    #     paths.region_aggregator(regions=REGIONS_AGG, aggregations={"it_net_user_zs": "weighted_by_population"})
+    #     paths.regions.aggregator(regions=REGIONS_AGG, aggregations={"it_net_user_zs": "mean_weighted_by_population"})
     #     .add_aggregates(
     #         tb_garden.reset_index(),
     #     )
@@ -136,10 +136,12 @@ def run() -> None:
 
     # Add population-weighted regional aggregations for sh_h2o_basw_zs and sh_sta_bass_zs
     tb_garden = (
-        paths.region_aggregator(
+        paths.regions.aggregator(
             regions=["World"],
-            # TODO: these should be weighted_by_population, not mean
-            aggregations={"sh_h2o_basw_zs": "mean", "sh_sta_bass_zs": "mean"},
+            aggregations={
+                "sh_h2o_basw_zs": "mean_weighted_by_population",
+                "sh_sta_bass_zs": "mean_weighted_by_population",
+            },
         )
         .add_aggregates(
             tb_garden.reset_index(),
