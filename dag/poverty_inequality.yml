@@ -71,7 +71,6 @@ steps:
     - data://garden/wb/2025-08-07/world_bank_pip_legacy
     - data://garden/wid/2025-03-14/world_inequality_database
     - data://garden/lis/2025-07-23/luxembourg_income_study
-    - data://garden/wb/2025-10-13/thousand_bins_distribution
     - data://garden/worldbank_wdi/2025-09-08/wdi
 
   # Inequality comparison data
