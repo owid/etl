@@ -187,11 +187,10 @@ steps:
   #
   # Emissions - Greenhouse gas emissions by custom sector.
   #
-  data://garden/emissions/2025-09-24/emissions_by_custom_sector:
-    - snapshot://wri/2025-09-24/emissions_by_detailed_sector.json
-    # - data://garden/climate_watch/2025-09-19/emissions_by_sector
+  data-private://garden/emissions/2025-09-24/emissions_by_custom_sector:
+    - snapshot-private://wri/2025-09-24/emissions_by_detailed_sector.json
   #
   # Emissions - Greenhouse gas emissions by custom sector.
   #
-  data://grapher/emissions/2025-09-24/emissions_by_custom_sector:
-    - data://garden/emissions/2025-09-24/emissions_by_custom_sector
+  data-private://grapher/emissions/2025-09-24/emissions_by_custom_sector:
+    - data-private://garden/emissions/2025-09-24/emissions_by_custom_sector

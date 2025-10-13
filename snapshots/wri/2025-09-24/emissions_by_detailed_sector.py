@@ -2,6 +2,10 @@
 
 The data was manually extracted from
 https://www.wri.org/data/world-greenhouse-gas-emissions-sector-2021-sunburst-chart
+
+Note that this snapshot is private; WRI does not make this data public, for some reason.
+So, for now, we will keep it private and not downloadable, and will contact them to see if we can make it public (and also update it to use more recent data, which seems to be available on the Climate Watch explorer).
+
 """
 
 import json

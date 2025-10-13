@@ -12,6 +12,7 @@ meta:
     license:
       name: CC BY 4.0
       url: https://www.climatewatchdata.org/about/permissions
+  is_public: false
 outs:
   - md5: 772bd29633606161e4dda55d68c71a03
     size: 1968

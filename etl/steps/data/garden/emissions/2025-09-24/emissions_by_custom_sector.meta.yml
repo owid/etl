@@ -10,6 +10,7 @@ definitions:
 dataset:
   update_period_days: 365
   title: Greenhouse gas emissions by custom sector
+  non_redistributable: true
 
 tables:
   emissions_by_custom_sector:
