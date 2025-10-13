@@ -15,19 +15,19 @@ steps:
   data://grapher/growth/2024-05-16/gdp_historical:
     - data://garden/growth/2024-05-16/gdp_historical
 
-    # Penn World Table
-  data://meadow/ggdc/2025-07-31/penn_world_table:
-    - snapshot://ggdc/2025-07-31/penn_world_table.xlsx
-  data://meadow/ggdc/2025-07-31/penn_world_table_national_accounts:
+  # Penn World Table
+  data://meadow/ggdc/2025-10-09/penn_world_table:
+    - snapshot://ggdc/2025-10-09/penn_world_table.xlsx
+  data://meadow/ggdc/2025-10-09/penn_world_table_national_accounts:
+    - snapshot://ggdc/2025-10-09/penn_world_table_national_accounts.xlsx
     - data://garden/regions/2023-01-01/regions
-    - snapshot://ggdc/2025-07-31/penn_world_table_national_accounts.xlsx
-  data://garden/ggdc/2025-07-31/penn_world_table_national_accounts:
-    - data://meadow/ggdc/2025-07-31/penn_world_table_national_accounts
-  data://garden/ggdc/2025-07-31/penn_world_table:
-    - data://garden/ggdc/2025-07-31/penn_world_table_national_accounts
-    - data://meadow/ggdc/2025-07-31/penn_world_table
-  data://grapher/ggdc/2025-07-31/penn_world_table:
-    - data://garden/ggdc/2025-07-31/penn_world_table
+  data://garden/ggdc/2025-10-09/penn_world_table_national_accounts:
+    - data://meadow/ggdc/2025-10-09/penn_world_table_national_accounts
+  data://garden/ggdc/2025-10-09/penn_world_table:
+    - data://meadow/ggdc/2025-10-09/penn_world_table
+    - data://garden/ggdc/2025-10-09/penn_world_table_national_accounts
+  data://grapher/ggdc/2025-10-09/penn_world_table:
+    - data://garden/ggdc/2025-10-09/penn_world_table
 
     # Maddison Database 2010
   data://meadow/ggdc/2022-12-23/maddison_database:
@@ -57,7 +57,7 @@ steps:
   # Working hours OMM
   #
   data://garden/working_hours/2025-08-05/working_hours_omm:
-    - data://garden/ggdc/2025-07-31/penn_world_table
+    - data://garden/ggdc/2025-10-09/penn_world_table
     - data://garden/working_hours/2025-08-05/huberman_minns
   data://grapher/working_hours/2025-08-05/working_hours_omm:
     - data://garden/working_hours/2025-08-05/working_hours_omm
@@ -70,7 +70,7 @@ steps:
     - data://garden/maternal_mortality/2025-09-02/maternal_mortality
     - data://garden/wash/2024-01-06/who
     - data://garden/tourism/2024-08-17/unwto
-    - data://garden/ggdc/2025-07-31/penn_world_table
+    - data://garden/ggdc/2025-10-09/penn_world_table
     - data://garden/education/2025-08-20/harmonized_scores
     - data://grapher/wb/2025-09-08/gender_statistics
     - data://garden/unesco/2025-05-01/education_sdgs
