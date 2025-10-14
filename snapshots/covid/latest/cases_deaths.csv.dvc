@@ -29,6 +29,6 @@ meta:
       name: CC BY 4.0
       url: https://data.who.int/dashboards/covid19/
 outs:
-  - md5: 3fa05f834277c8376ca4caa58187b4bd
-    size: 22829390
+  - md5: 85c61aa0029ca7efb36b648e69c17bf5
+    size: 22905380
     path: cases_deaths.csv
