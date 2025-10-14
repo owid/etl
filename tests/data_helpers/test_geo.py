@@ -2919,6 +2919,202 @@ class TestRegionAggregator(unittest.TestCase):
                         f"Europe should have NaN GDP in {case_name} case because France is required but missing/NaN",
                     )
 
+    def test_countries_must_have_data_5_no_country_has_data_in_year(self):
+        """Test the edge case where NO country has data for a column in a specific year.
+
+        This is the exact bug reported: when the required country exists in a year but has NaN,
+        AND no other country has data for that column in that year, the year-group doesn't appear
+        in the coverage check, causing the aggregate to incorrectly show 0 instead of NaN.
+
+        Example: France (2010) and Spain (2011) where Spain has NaN for colb in 2011,
+        and no other country has colb data in 2011.
+        """
+        # Spain missing in 2010, France missing in 2011
+        # In 2011: Spain exists but has NaN for colb, and no other country has colb data
+        tb_test = Table(
+            {
+                "country": ["France", "Spain"],
+                "year": [2010, 2011],
+                "cola": [1, 2],
+                "colb": [1, None],  # Spain has NaN in colb for 2011
+            }
+        )
+
+        aggregator = geo.RegionAggregator(
+            ds_regions=self.ds_regions,
+            regions_all=self.regions_all,
+            regions=["Europe"],
+            aggregations={"cola": "sum", "colb": "sum"},
+            ds_income_groups=self.ds_income_groups,
+        )
+
+        result = aggregator.add_aggregates(
+            tb_test,
+            countries_that_must_have_data={"Europe": ["Spain"]},
+            check_for_region_overlaps=False,
+        )
+
+        europe_data = result[result["country"] == "Europe"]
+
+        # Should have 2 rows (one for each year)
+        self.assertEqual(len(europe_data), 2, "Should have Europe data for both years")
+
+        europe_2010 = europe_data[europe_data["year"] == 2010].iloc[0]
+        europe_2011 = europe_data[europe_data["year"] == 2011].iloc[0]
+
+        # 2010: Spain missing entirely, so both columns should be NaN
+        self.assertTrue(pd.isna(europe_2010["cola"]), "2010 cola should be NaN (Spain missing)")
+        self.assertTrue(pd.isna(europe_2010["colb"]), "2010 colb should be NaN (Spain missing)")
+
+        # 2011: Spain has cola=2 but colb=NaN
+        # cola should have value (Spain has data), colb should be NaN (Spain has NaN)
+        self.assertEqual(europe_2011["cola"], 2, "2011 cola should be 2 (Spain has data)")
+        self.assertTrue(
+            pd.isna(europe_2011["colb"]),
+            "2011 colb should be NaN (Spain has NaN, no other country has colb data in 2011)",
+        )
+
+    def test_countries_must_have_data_with_list(self):
+        """Test that countries_that_must_have_data accepts a list and maps countries to regions automatically."""
+        tb_test = Table(
+            {
+                "country": ["France", "Spain"],
+                "year": [2010, 2011],
+                "cola": [1, 2],
+                "colb": [1, None],
+            }
+        )
+
+        aggregator = geo.RegionAggregator(
+            ds_regions=self.ds_regions,
+            regions_all=self.regions_all,
+            regions=["Europe"],
+            aggregations={"cola": "sum", "colb": "sum"},
+            ds_income_groups=self.ds_income_groups,
+        )
+
+        # Test with list - should be converted to dict automatically
+        result_list = aggregator.add_aggregates(
+            tb_test,
+            countries_that_must_have_data=["Spain"],  # List
+            check_for_region_overlaps=False,
+        )
+
+        # Test with dict - should give same result
+        result_dict = aggregator.add_aggregates(
+            tb_test,
+            countries_that_must_have_data={"Europe": ["Spain"]},  # Dict
+            check_for_region_overlaps=False,
+        )
+
+        # Results should be identical
+        self.assertTrue(result_list.equals(result_dict), "List and dict should produce identical results")
+
+        # Verify the actual values are correct
+        europe_list = result_list[result_list["country"] == "Europe"]
+        self.assertEqual(len(europe_list), 2)
+        self.assertTrue(pd.isna(europe_list[europe_list["year"] == 2010]["cola"].iloc[0]))
+        self.assertTrue(pd.isna(europe_list[europe_list["year"] == 2011]["colb"].iloc[0]))
+
+    def test_countries_must_have_data_with_list_unknown_country(self):
+        """Test that passing an unknown country in list format raises ValueError."""
+        tb_test = Table(
+            {
+                "country": ["France", "Spain"],
+                "year": [2010, 2011],
+                "cola": [1, 2],
+            }
+        )
+
+        aggregator = geo.RegionAggregator(
+            ds_regions=self.ds_regions,
+            regions_all=self.regions_all,
+            regions=["Europe"],
+            aggregations={"cola": "sum"},
+            ds_income_groups=self.ds_income_groups,
+        )
+
+        # Should raise ValueError for unknown country
+        with self.assertRaises(ValueError) as context:
+            aggregator.add_aggregates(
+                tb_test,
+                countries_that_must_have_data=["Atlantis"],
+                check_for_region_overlaps=False,
+            )
+
+        self.assertIn("Atlantis", str(context.exception))
+        self.assertIn("not members of any of the specified regions", str(context.exception))
+
+    def test_countries_must_have_data_with_dict_unknown_country(self):
+        """Test that passing an unknown country in dict format raises ValueError."""
+        tb_test = Table(
+            {
+                "country": ["France", "Spain"],
+                "year": [2010, 2011],
+                "cola": [1, 2],
+            }
+        )
+
+        aggregator = geo.RegionAggregator(
+            ds_regions=self.ds_regions,
+            regions_all=self.regions_all,
+            regions=["Europe"],
+            aggregations={"cola": "sum"},
+            ds_income_groups=self.ds_income_groups,
+        )
+
+        # Should raise ValueError for unknown country in dict
+        with self.assertRaises(ValueError) as context:
+            aggregator.add_aggregates(
+                tb_test,
+                countries_that_must_have_data={"Europe": ["Atlantis"]},
+                check_for_region_overlaps=False,
+            )
+
+        self.assertIn("Atlantis", str(context.exception))
+        self.assertIn("not members of region Europe", str(context.exception))
+
+    def test_countries_must_have_data_with_custom_region(self):
+        """Test countries_that_must_have_data with custom regions that have additional_members."""
+        tb_test = Table(
+            {
+                "country": ["France", "Spain", "United States"],
+                "year": [2010, 2010, 2010],
+                "cola": [1, 2, 3],
+            }
+        )
+
+        # Define custom region with additional members
+        aggregator = geo.RegionAggregator(
+            ds_regions=self.ds_regions,
+            regions_all=self.regions_all,
+            regions={"Europe Plus": {"additional_regions": ["Europe"], "additional_members": ["United States"]}},
+            aggregations={"cola": "sum"},
+            ds_income_groups=self.ds_income_groups,
+        )
+
+        # List format should map United States to Europe Plus
+        result_list = aggregator.add_aggregates(
+            tb_test,
+            countries_that_must_have_data=["United States"],
+            check_for_region_overlaps=False,
+        )
+
+        # Dict format should also work
+        result_dict = aggregator.add_aggregates(
+            tb_test,
+            countries_that_must_have_data={"Europe Plus": ["United States"]},
+            check_for_region_overlaps=False,
+        )
+
+        # Both should produce the same result
+        self.assertTrue(result_list.equals(result_dict))
+
+        # Europe Plus should have data since United States has data
+        europe_plus = result_list[result_list["country"] == "Europe Plus"]
+        self.assertEqual(len(europe_plus), 1)
+        self.assertEqual(europe_plus["cola"].iloc[0], 6)
+
     def test_add_per_capita_basic(self):
         """Test basic add_per_capita functionality."""
         aggregator = geo.RegionAggregator(

@@ -1,0 +1,34 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Comtrade Database"
+    description: |-
+      The United Nations Comtrade database aggregates detailed global annual and monthly trade statistics by product and trading partner for use by governments, academia, research institutes, and enterprises. Data compiled by the United Nations Statistics.
+
+       Division covers approximately 200 countries and represents more than 99% of the world's merchandise trade. Information can be extracted in a variety of formats, including API developer tools for integration into enterprise applications and workflows.
+    date_published: "2025"
+    title_snapshot: Comtrade Database - 3915 (waste, parings and scarp, of plastics)
+    description_snapshot: |-
+      Subset of Comtrade database only concerning indicators related to plastic waste. The data is sourced from the commodity category '3915 – Waste, parings and scrap, of plastics' from the UN's Comtrade Database. This snapshot only includes data for 2023 and 2024.
+
+
+    # Citation
+    producer: United Nations Comtrade Database
+    citation_full: |-
+      United Nations Comtrade Database (2025). comtrade@un.org. Accessed on: 09 Sep 2025.
+    attribution_short: UN Comtrade
+
+    # Files
+    url_main: https://comtradeplus.un.org/
+    date_accessed: '2025-09-25'
+
+    # License
+    license:
+      name: United Nations COMTRADE
+      url: https://comtrade.un.org/licenseagreement.html
+outs:
+  - md5: c87616f24512ef26c85637b2a414d763
+    size: 3330806
+    path: plastic_waste_2023_2024.csv

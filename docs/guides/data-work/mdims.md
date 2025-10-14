@@ -1,6 +1,3 @@
----
-status: new
----
 
 !!! warning "MDIMs and Explorer steps are a work in progress"
     We are currently working to align MDIMs and Explorers as much as possible. While they are presented in different ways on our site, the underlying data structure should be as similar as possible (if not identical). Track the progress of this work in [this issue](https://github.com/owid/etl/issues/3992).
