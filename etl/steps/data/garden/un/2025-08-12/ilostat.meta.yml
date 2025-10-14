@@ -89,7 +89,7 @@ definitions:
     <% if classif1 == "Status in employment (ICSE-93): 1. Employees" %>
       _Employees_ are defined as workers on paid employment jobs. Paid employment refers to all jobs where people hold an employment contract which give them a remuneration not dependent upon the revenue of the organization for which they work. {definitions.icse_93}
     <%- elif classif1 == "Status in employment (ICSE-93): 2. Employers" %>
-      _Employers_ are defined as workers working on self-employment jobs who, and that have engaged one or more persons to work for them as employees. {definitions.icse_93}
+      _Employers_ are defined as workers working on self-employment jobs who have engaged one or more persons to work for them as employees. {definitions.icse_93}
     <%- elif classif1 == "Status in employment (ICSE-93): 3. Own-account workers" %>
       _Own-account workers_ are defined as workers working on self-employment jobs who do not engage any employees to work with them. {definitions.icse_93}
     <%- elif classif1 == "Status in employment (ICSE-93): 5. Contributing family workers" %>
@@ -123,9 +123,9 @@ definitions:
     <% if classif1 == "Occupation (Skill level): Low" %>
       The skill level of occupations classified as _Low_ (level 1) refers to the performance of simple and routine tasks which may require the use of hand-held tools and considerable physical effort. Examples typically include cleaners and helpers, industry laborers, and other similar roles. {definitions.isco_08}
     <%- elif classif1 == "Occupation (Skill level): Medium" %>
-      The skill level of occupations classified as _Medium_ (level 2) includes workers on clerical support, service and sales, skilled agricultural, forestry and fishing jobs, craft and related trades, and plant and machine operators and assemblers. {definitions.isco_08}
+      The skill level of occupations classified as _Medium_ (level 2) includes workers in clerical support, service and sales, skilled agricultural, forestry and fishing jobs, craft and related trades, and plant and machine operators and assemblers. {definitions.isco_08}
     <%- elif classif1 == "Occupation (Skill level): High" %>
-      The skill level of occupations classified as _High_ (levels 3 and 4) includes managers, professionals, and technicians and associate professionals. {definitions.isco_08}
+      The skill level of occupations classified as _High_ (levels 3 and 4) includes managers, professionals, technicians, and associate professionals. {definitions.isco_08}
     <%- elif classif1 == "Occupation (Skill level): Not elsewhere classified" %>
       The skill level of occupations classified as _Not elsewhere classified_ includes armed forces occupations and occupations not classified in any of the skill levels 1 to 4. {definitions.isco_08}
     <%- endif %>
@@ -136,7 +136,7 @@ definitions:
   description_key_iloest_modelled_data: |-
     This data is part of the ILO Modelled Estimates series. This series combines nationally reported observations with imputed data to have a harmonized, internationally comparable dataset and produce regional and global aggregates. For more information, please refer to the [ILO Modelled Estimates documentation](https://ilostat.ilo.org/methods/concepts-and-definitions/ilo-modelled-estimates/).
   description_key_13th_icls: |-
-    This data is classified according to the 13th International Classification of Labour Statistics (ICLS), where employment includes anyone engaged for at least one hour per day in production of goods and services, even for own use by the household or family, volunteering, or other forms of unpaid work. For more information, please refer to the [this explainer by the International Labour Organization](https://www.ilo.org/publications/quick-guide-understanding-impact-new-statistical-standards-ilostat).
+    This data is classified according to the 13th International Classification of Labour Statistics (ICLS), where employment includes anyone engaged for at least one hour per day in the production of goods and services, even for own use by the household or family, volunteering, or other forms of unpaid work. For more information, please refer to [this explainer by the International Labour Organization](https://www.ilo.org/publications/quick-guide-understanding-impact-new-statistical-standards-ilostat).
 
   description_key_extreme_poverty: |-
     Extreme poverty here is defined as living below the International Poverty Line of {definitions.poverty_line_per_day}.
