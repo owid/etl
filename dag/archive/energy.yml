@@ -611,3 +611,19 @@ steps:
   #
   data://grapher/irena/2024-11-01/renewable_capacity_statistics:
     - data://garden/irena/2024-11-01/renewable_capacity_statistics
+  #
+  # Lazard - Levelized Cost of Energy
+  #
+  data://meadow/lazard/2025-02-25/levelized_cost_of_energy:
+    - snapshot://lazard/2025-02-25/levelized_cost_of_energy.csv
+  #
+  # Lazard - Levelized Cost of Energy+
+  #
+  data://garden/lazard/2025-02-25/levelized_cost_of_energy:
+    - data://meadow/lazard/2025-02-25/levelized_cost_of_energy
+    - data://garden/worldbank_wdi/2025-01-24/wdi
+  #
+  # Lazard - Levelized Cost of Energy+
+  #
+  data://grapher/lazard/2025-02-25/levelized_cost_of_energy:
+    - data://garden/lazard/2025-02-25/levelized_cost_of_energy
