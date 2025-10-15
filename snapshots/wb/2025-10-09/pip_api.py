@@ -777,7 +777,12 @@ def generate_percentiles_raw(wb_api: WB_API):
 
     # I check if the set of regions is the same in the df and in the aux table (list of regions)
     aux_dict = pip_aux_tables(wb_api, table="regions")
-    assert set(df_region["country"].unique()) == set(aux_dict["regions"]["region"].unique()), log.fatal(
+
+    # Select the dataframe and specific values in grouping_type
+    df_region_aux = aux_dict["regions"]
+    df_region_aux = df_region_aux[df_region_aux["grouping_type"].isin(["africa_split", "region", "regionpcn", "world"])]
+
+    assert set(df_region["country"].unique()) == set(df_region_aux["region"].unique()), log.fatal(
         "List of regions is not the same as the one defined in PIP!"
     )
 
