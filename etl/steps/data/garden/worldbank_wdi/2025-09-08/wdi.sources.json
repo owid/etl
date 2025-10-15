@@ -2588,5 +2588,10 @@
     "rawName": "The OECD PPP Programme, Organisation for Economic Co-operation and Development (OECD), uri: https://data-https://data-explorer.oecd.org/, publisher: OECD",
     "name": "The OECD PPP Programme, OECD, via World Bank",
     "dataPublisherSource": ""
+  },
+  {
+    "rawName": "International Comparison Program (ICP), World Bank (WB), uri: https://www.worldbank.org/en/programs/icp/data, publisher: International Comparison Program, type: International statistical program, date accessed: May 30, 2024, date published: May 30, 2024;\nThe Eurostat PPP Programme, Eurostat (ESTAT), uri: https://ec.europa.eu/eurostat/databrowser/explore/all/all_themes, publisher: Eurostat, type: International statistical program;\nThe OECD PPP Programme, Organisation for Economic Co-operation and Development (OECD), uri: https://data-https://data-explorer.oecd.org/, publisher: OECD",
+    "name": "ICP, Eurostat PPP Programme, and OECD PPP Programme, via World Bank",
+    "dataPublisherSource": ""
   }
 ]
