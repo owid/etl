@@ -202,6 +202,31 @@ def run(live_api: bool) -> None:
     else:
         wb_api = WB_API("https://apiv2qa.worldbank.org/pip/v1")
 
+    ##########################################################################################
+    # Run a regional query for the World to check if the headcount ratio coincides with the newly published data
+
+    versions = pip_versions(wb_api)
+
+    df_world = pip_query_region(
+        wb_api=wb_api,
+        popshare_or_povline="povline",
+        value=INTERNATIONAL_POVERTY_LINE_CURRENT,
+        versions=versions,
+        country_code="all",
+        year="all",
+        welfare_type="all",
+        reporting_level="all",
+        ppp_version=PPP_VERSIONS[1],
+        download="true",
+    )
+
+    log.warning(
+        "This is the headcount ratio series for `World`. Please check if it coincides with the newly published data."
+    )
+    print(df_world[df_world["country"] == "World"][["year", "headcount"]])
+
+    ##########################################################################################
+
     # Generate percentiles by extracting the raw files and processing them afterward
     df_percentiles = generate_consolidated_percentiles(generate_percentiles_raw(wb_api), wb_api)
 
