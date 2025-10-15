@@ -442,22 +442,70 @@ def reset_mysql_database(server_name: str) -> Tuple[bool, str]:
         # SSH into the server and run make refresh in owid-grapher directory
         # Disable host key checking for staging servers since they're ephemeral
         cmd = f"ssh -o StrictHostKeyChecking=no owid@{server_name} 'cd owid-grapher && make refresh'"
-        log.info("Resetting MySQL database via make refresh", command=cmd, server=server_name)
+        log.info("Executing MySQL reset and rsync in parallel", server=server_name)
 
-        result = subprocess.run(
+        # Start MySQL refresh
+        mysql_process = subprocess.Popen(
             cmd,
             shell=True,
-            capture_output=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
             text=True,
-            timeout=1800,  # 30 minute timeout for make refresh (can take very long)
         )
 
-        if result.returncode != 0:
-            error_msg = f"MySQL reset failed with return code {result.returncode}: {result.stderr}"
-            log.error("MySQL reset failed", error=error_msg, server=server_name, stdout=result.stdout)
+        # Start rsync in parallel
+        rsync_cmd = f"ssh -o StrictHostKeyChecking=no owid@{server_name} 'rsync -vr --progress owid@staging-site-master:/home/owid/etl/data/ /home/owid/etl/data/'"
+        log.info("Starting rsync in parallel", command=rsync_cmd, server=server_name)
+        rsync_process = subprocess.Popen(
+            rsync_cmd,
+            shell=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+        )
+
+        # Wait for both processes to complete with timeout
+        try:
+            mysql_stdout, mysql_stderr = mysql_process.communicate(timeout=1800)
+            mysql_returncode = mysql_process.returncode
+        except subprocess.TimeoutExpired:
+            mysql_process.kill()
+            mysql_stdout, mysql_stderr = mysql_process.communicate()
+            error_msg = "MySQL reset timed out after 30 minutes"
+            log.error("MySQL reset timeout", server=server_name)
+            # Try to clean up rsync process
+            rsync_process.kill()
             return False, error_msg
 
-        success_msg = f"MySQL database successfully refreshed for {server_name}"
+        try:
+            rsync_stdout, rsync_stderr = rsync_process.communicate(timeout=1800)
+            rsync_returncode = rsync_process.returncode
+        except subprocess.TimeoutExpired:
+            rsync_process.kill()
+            rsync_stdout, rsync_stderr = rsync_process.communicate()
+            log.warning("rsync timed out after 30 minutes", server=server_name)
+            rsync_returncode = -1
+            rsync_stderr = "rsync timed out"
+
+        # Check MySQL result
+        if mysql_returncode != 0:
+            error_msg = f"MySQL reset failed with return code {mysql_returncode}: {mysql_stderr}"
+            log.error("MySQL reset failed", error=error_msg, server=server_name, stdout=mysql_stdout)
+            return False, error_msg
+
+        # Check rsync result (non-blocking)
+        if rsync_returncode != 0:
+            log.warning(
+                "rsync failed but MySQL refresh completed successfully",
+                error=rsync_stderr,
+                server=server_name,
+                stdout=rsync_stdout,
+            )
+            success_msg = f"MySQL database successfully refreshed for {server_name} (but rsync from master failed)"
+        else:
+            log.info("ETL data successfully synced from master", server=server_name)
+            success_msg = f"MySQL database successfully refreshed and ETL data synced for {server_name}"
+
         log.info("MySQL reset completed", server=server_name)
         return True, success_msg
 
