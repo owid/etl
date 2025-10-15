@@ -2563,5 +2563,30 @@
     "rawName": "International Migrant Stock, United Nations (UN), publisher: UN Population Division",
     "name": "International Migrant Stock, United Nations, via World Bank",
     "dataPublisherSource": ""
+  },
+  {
+    "rawName": "Data API, UN Educational, Scientific and Cultural Organization (UNESCO), uri: https://databrowser.uis.unesco.org/resources, note: The data are obtained through the UIS API.  Detailed documentation is available at: https://api.uis.unesco.org/api/public/documentation/, publisher: UNESCO Institute for Statistics (UIS), type: Bulk file (csv), date accessed: 2025-09-22, date published: 2025-09",
+    "name": "UNESCO Institute for Statistics (UIS) Data API, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "International Comparison Program ( ICP ), World Bank (WB), uri: https://www.worldbank.org/en/programs/icp/data, publisher: International Comparison Program, type: International statistical program, date accessed: May 30, 2024, date published: May 30, 2024;\\nThe Eurostat PPP Programme, Eurostat (ESTAT), uri: https://ec.europa.eu/eurostat/databrowser/explore/all/all_themes, publisher: Eurostat, type: International statistical program;\\nThe OECD PPP Programme, Organisation for Economic Co-operation and Development (OECD), uri: https://data-https://data-explorer.oecd.org/, publisher: OECD",
+    "name": "ICP, Eurostat PPP Programme, OECD PPP Programme, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "International Comparison Program (ICP), World Bank (WB), uri: https://www.worldbank.org/en/programs/icp/data, publisher: International Comparison Program, type: International statistical program, date accessed: May 30, 2024, date published: May 30, 2024;",
+    "name": "International Comparison Program (ICP), World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "The Eurostat PPP Programme, Eurostat (ESTAT), uri: https://ec.europa.eu/eurostat/databrowser/explore/all/all_themes, publisher: Eurostat, type: International statistical program;",
+    "name": "The Eurostat PPP Programme, Eurostat, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "The OECD PPP Programme, Organisation for Economic Co-operation and Development (OECD), uri: https://data-https://data-explorer.oecd.org/, publisher: OECD",
+    "name": "The OECD PPP Programme, OECD, via World Bank",
+    "dataPublisherSource": ""
   }
 ]
