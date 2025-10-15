@@ -371,6 +371,20 @@ def country_to_entity_id(
     :param errors: how to handle missing countries
     :param by: use `name` if you use country names, `code` if you use ISO codes
     """
+    if country.dtype in ("int32", "int64"):
+        country = country.astype(str)
+    elif country.dtype == "object":
+        # Check if all values are strings or can be converted to strings
+        if not all(isinstance(x, (str, type(None))) for x in country.dropna()):
+            raise TypeError(
+                f"Country series contains unsupported data types. Expected strings or integers, got: {country.dtype}"
+            )
+    elif country.dtype.name == "category":
+        # Convert categorical to string
+        country = country.astype(str)
+    elif not country.dtype.name.startswith(("str", "string")):
+        raise TypeError(f"Country series has unsupported data type: {country.dtype}. Expected strings or integers.")
+
     # fill entities from DB
     db_entities = _get_entities_from_db(set(country.unique()), by=by, engine=engine)
     entity_id = country.map(db_entities).astype(float)

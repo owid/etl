@@ -686,9 +686,25 @@ steps:
   data://grapher/imf/2025-07-08/trade:
     - data://garden/imf/2025-07-08/trade
 
- #
 
+  #
+  # Trade Volume Index - "A tale of two globalizations: gains from trade and openness 1800–2010"
+  #
+  data://meadow/trade/2025-09-22/historic_trade:
+    - snapshot://trade/2025-09-22/historic_trade.xlsx
+  data://garden/trade/2025-09-22/historic_trade:
+    - data://meadow/trade/2025-09-22/historic_trade
 
+#
+  # Trade Volume Index - WTO Trade Growth
+  data://meadow/trade/2025-09-22/wto_trade_growth:
+    - snapshot://trade/2025-09-22/wto_trade_growth.xlsx
+  data://garden/trade/2025-09-22/wto_trade_growth:
+    - data://meadow/trade/2025-09-22/wto_trade_growth
+    - data://garden/trade/2025-09-22/historic_trade
+  data://grapher/trade/2025-09-22/wto_trade_growth:
+    - data://garden/trade/2025-09-22/wto_trade_growth
+  #
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
@@ -731,4 +747,5 @@ include:
   - dag/corruption.yml
   - dag/geography.yml
   - dag/growth.yml
+  - dag/labor.yml
   - dag/economics.yml

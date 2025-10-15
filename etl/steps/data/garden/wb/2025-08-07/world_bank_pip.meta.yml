@@ -219,14 +219,14 @@ definitions:
     <%- endif %>
 
   description_processing_main: |-
-    <% if welfare_type in ["income", "consumption"] %>
-    To construct a global dataset, the World Bank combines estimates based on income data and estimates based on consumption data. Here we only include the estimates based on <<welfare_type>> data.
-    <%- elif welfare_type == "income or consumption" %>
+    <% if survey_comparability != "No spells" or welfare_type == "income or consumption" %>
     For most countries in the PIP dataset, estimates relate to _either_ disposable income or consumption, for all available years. A number of countries, however, have a mix of income and consumption data points, with both data types sometimes available for particular years.
 
     In most of our charts, we present the data with some data points dropped in order to present single series for each country. This allows us to make readable visualizations that combine multiple countries and metrics. In choosing which data points to drop, we try to strike a balance between maintaining comparability over time and showing as long a time series as possible. As such, the exact approach varies somewhat across countries.
 
     If you would like to see the original data with _all_ available income and consumption data points shown separately, you can do so in our [Poverty Data Explorer](https://ourworldindata.org/explorers/poverty-explorer?Indicator=Share+in+poverty&Poverty+line=%2410+per+day&Household+survey+data+type=Show+data+from+both+income+and+consumption+surveys&Show+breaks+between+less+comparable+surveys=true&country=ROU~CHN~BLR~PER).
+    <%- elif welfare_type in ["income", "consumption"] %>
+    To construct a global dataset, the World Bank combines estimates based on income data and estimates based on consumption data. Here we only include the estimates based on <<welfare_type>> data.
     <%- endif %>
 
   description_processing_surveys_past_decade: |-
@@ -685,7 +685,12 @@ tables:
         title: Share of population in poverty ({definitions.poverty_line_a_day}, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: "%"
         short_unit: "%"
-        description_short: Percentage of population living in households with {definitions.description_short_welfare_type} below {definitions.poverty_line_per_day}.
+        description_short: |-
+          <% if survey_comparability == "No spells" %>
+          Percentage of population living in households with {definitions.description_short_welfare_type} below {definitions.poverty_line_per_day}.
+          <%- else %>
+          Percentage of population living in households with an income or consumption below {definitions.poverty_line_per_day}.
+          <%- endif %>
         description_key:
           - "{definitions.description_key_poverty_line}"
           - "{definitions.description_key_ppp}"
@@ -707,6 +712,10 @@ tables:
           numDecimalPlaces: 1
           <<: *common_display
         presentation:
+          title_public: |-
+            <% if survey_comparability != "No spells" %>
+            Share of population in poverty ({definitions.poverty_line_a_day})
+            <%- endif %>
           topic_tags:
             - Poverty
           grapher_config:
@@ -768,7 +777,12 @@ tables:
         title: Number of people in poverty ({definitions.poverty_line_a_day}, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: "people"
         short_unit: ""
-        description_short: Number of people living in households with {definitions.description_short_welfare_type} below {definitions.poverty_line_per_day}.
+        description_short: |-
+          <% if survey_comparability == "No spells" %>
+          Number of people living in households with {definitions.description_short_welfare_type} below {definitions.poverty_line_per_day}.
+          <%- else %>
+          Number of people living in households with an income or consumption below {definitions.poverty_line_per_day}.
+          <%- endif %>
         description_key:
           - "{definitions.description_key_poverty_line}"
           - "{definitions.description_key_ppp}"
@@ -786,8 +800,14 @@ tables:
             <<welfare_type.capitalize()>> surveys
             <%- endif %>
           numDecimalPlaces: 0
+          numSignificantFigures: 3
+          roundingMode: significantFigures
           <<: *common_display
         presentation:
+          title_public: |-
+            <% if survey_comparability != "No spells" %>
+            Number of people in poverty ({definitions.poverty_line_a_day})
+            <%- endif %>
           topic_tags:
             - Poverty
           grapher_config:
@@ -822,6 +842,8 @@ tables:
         display:
           name: Number of people not in poverty (above {definitions.poverty_line_a_day})
           numDecimalPlaces: 0
+          numSignificantFigures: 3
+          roundingMode: significantFigures
           <<: *common_display
 
       headcount_between:
@@ -841,13 +863,20 @@ tables:
         display:
           name: Number of people in poverty (between {definitions.poverty_line_a_day})
           numDecimalPlaces: 0
+          numSignificantFigures: 3
+          roundingMode: significantFigures
           <<: *common_display
 
       total_shortfall:
         title: Total shortfall ({definitions.poverty_line_a_day}, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: international-$ in <<ppp_version>> prices
         short_unit: $
-        description_short: This is the amount of money that would be theoretically needed to lift the <<welfare_type>> of all people in poverty up to {definitions.poverty_line_per_day}. However, this is not a measure of the actual cost of eliminating poverty, since it does not take into account the costs involved in making the necessary transfers nor any changes in behavior they would bring about.
+        description_short: |-
+          <% if survey_comparability == "No spells" %>
+          This is the amount of money that would be theoretically needed to lift the <<welfare_type>> of all people in poverty up to {definitions.poverty_line_per_day}. However, this is not a measure of the actual cost of eliminating poverty, since it does not take into account the costs involved in making the necessary transfers nor any changes in behavior they would bring about.
+          <%- else %>
+          This is the amount of money that would be theoretically needed to lift the income or consumption of all people in poverty up to {definitions.poverty_line_per_day}. However, this is not a measure of the actual cost of eliminating poverty, since it does not take into account the costs involved in making the necessary transfers nor any changes in behavior they would bring about.
+          <%- endif %>
         description_key:
           - "{definitions.description_key_poverty_line}"
           - "{definitions.description_key_ppp}"
@@ -867,6 +896,10 @@ tables:
           numDecimalPlaces: 2
           <<: *common_display
         presentation:
+          title_public: |-
+            <% if survey_comparability != "No spells" %>
+            Total shortfall ({definitions.poverty_line_a_day})
+            <%- endif %>
           topic_tags:
             - Poverty
           grapher_config:
@@ -890,7 +923,12 @@ tables:
         title: Average shortfall ($) ({definitions.poverty_line_a_day}, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: international-$ in <<ppp_version>> prices
         short_unit: $
-        description_short: This is the amount of money that would be theoretically needed to lift the <<welfare_type>> of all people in poverty up to {definitions.poverty_line_per_day}, averaged across the population in poverty.
+        description_short: |-
+          <% if survey_comparability == "No spells" %>
+          This is the amount of money that would be theoretically needed to lift the <<welfare_type>> of all people in poverty up to {definitions.poverty_line_per_day}, averaged across the population in poverty.
+          <%- else %>
+          This is the amount of money that would be theoretically needed to lift the income or consumption of all people in poverty up to {definitions.poverty_line_per_day}, averaged across the population in poverty.
+          <%- endif %>
         description_key:
           - "{definitions.description_key_poverty_line}"
           - "{definitions.description_key_ppp}"
@@ -910,6 +948,10 @@ tables:
           numDecimalPlaces: 2
           <<: *common_display
         presentation:
+          title_public: |-
+            <% if survey_comparability != "No spells" %>
+            Average shortfall ($) ({definitions.poverty_line_a_day})
+            <%- endif %>
           topic_tags:
             - Poverty
           grapher_config:
@@ -931,7 +973,8 @@ tables:
         title: Average shortfall (%) ({definitions.poverty_line_a_day}, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: "%"
         short_unit: "%"
-        description_short: This is the average shortfall expressed as a share of the poverty line, sometimes called the _income gap ratio_. It captures the depth of poverty of those living on less than {definitions.poverty_line_per_day}.
+        description_short: |-
+          This is the average shortfall expressed as a share of the poverty line, sometimes called the _income gap ratio_. It captures the depth of poverty of those living on less than {definitions.poverty_line_per_day}.
         description_key:
           - "{definitions.description_key_poverty_line}"
           - "{definitions.description_key_ppp}"
@@ -951,6 +994,10 @@ tables:
           numDecimalPlaces: 1
           <<: *common_display
         presentation:
+          title_public: |-
+            <% if survey_comparability != "No spells" %>
+            Average shortfall (%) ({definitions.poverty_line_a_day})
+            <%- endif %>
           topic_tags:
             - Poverty
           grapher_config:
@@ -994,6 +1041,10 @@ tables:
           numDecimalPlaces: 1
           <<: *common_display
         presentation:
+          title_public: |-
+            <% if survey_comparability != "No spells" %>
+            Poverty gap index ({definitions.poverty_line_a_day})
+            <%- endif %>
           topic_tags:
             - Poverty
           grapher_config:
@@ -1037,6 +1088,10 @@ tables:
           numDecimalPlaces: 1
           <<: *common_display
         presentation:
+          title_public: |-
+            <% if survey_comparability != "No spells" %>
+            Watts index ({definitions.poverty_line_a_day})
+            <%- endif %>
           topic_tags:
             - Poverty
 
@@ -1065,6 +1120,11 @@ tables:
             <% endif %>
           numDecimalPlaces: 1
           <<: *common_display
+        presentation:
+          title_public: |-
+            <% if survey_comparability != "No spells" %>
+            Poverty severity ({definitions.poverty_line_a_day})
+            <%- endif %>
 
       spl:
         title: Societal poverty line (<<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
@@ -1088,6 +1148,10 @@ tables:
           numDecimalPlaces: 2
           <<: *common_display
         presentation:
+          title_public: |-
+            <% if survey_comparability != "No spells" %>
+            Societal poverty line
+            <%- endif %>
           topic_tags:
             - Poverty
 
@@ -1095,7 +1159,12 @@ tables:
         title: Share of population in societal poverty (<<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: "%"
         short_unit: "%"
-        description_short: Percentage of population living in households with {definitions.description_short_welfare_type} below the Societal Poverty Line.
+        description_short: |-
+          <% if survey_comparability == "No spells" %>
+          Percentage of population living in households with {definitions.description_short_welfare_type} below the Societal Poverty Line.
+          <%- else %>
+          Percentage of population living in households with an income or consumption below the Societal Poverty Line.
+          <%- endif %>
         description_key:
           - "{definitions.description_key_ppp}"
           - "{definitions.description_key_welfare_type}"
@@ -1114,6 +1183,11 @@ tables:
             <% endif %>
           numDecimalPlaces: 1
           <<: *common_display
+        presentation:
+          title_public: |-
+            <% if survey_comparability != "No spells" %>
+            Share of population in societal poverty
+            <%- endif %>
 
       pg:
         title: Prosperity gap (<<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
@@ -1140,6 +1214,10 @@ tables:
           numDecimalPlaces: 1
           <<: *common_display
         presentation:
+          title_public: |-
+            <% if survey_comparability != "No spells" %>
+            Prosperity gap
+            <%- endif %>
           grapher_config:
             title: "Prosperity gap"
             subtitle: Average factor by which incomes need to be multiplied to bring everyone to the prosperity standard of {definitions.prosperity_gap_threshold} per person per day. {definitions.ppp_adjustment_subtitle}
@@ -1178,6 +1256,10 @@ tables:
           numDecimalPlaces: 2
           <<: *common_display
         presentation:
+          title_public: |-
+            <% if survey_comparability != "No spells" %>
+            Gini coefficient
+            <%- endif %>
           topic_tags:
             - Economic Inequality
           grapher_config:
@@ -1215,6 +1297,10 @@ tables:
           numDecimalPlaces: 1
           <<: *common_display
         presentation:
+          title_public: |-
+            <% if survey_comparability != "No spells" %>
+            Palma ratio
+            <%- endif %>
           topic_tags:
             - Economic Inequality
           grapher_config:
@@ -1253,6 +1339,10 @@ tables:
           numDecimalPlaces: 1
           <<: *common_display
         presentation:
+          title_public: |-
+            <% if survey_comparability != "No spells" %>
+            S80/S20 ratio
+            <%- endif %>
           topic_tags:
             - Economic Inequality
 
@@ -1260,7 +1350,12 @@ tables:
         title: P90/P10 ratio (<<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: ""
         short_unit: ""
-        description_short: P90 and P10 are the levels of <<welfare_type>> below which 90% and 10% of the population live, respectively. This variable gives the ratio of the two. It is a measure of inequality that indicates the gap between the richest and poorest tenth of the population.
+        description_short: |-
+          <% if survey_comparability == "No spells" %>
+          P90 and P10 are the levels of <<welfare_type>> below which 90% and 10% of the population live, respectively. This variable gives the ratio of the two. It is a measure of inequality that indicates the gap between the richest and poorest tenth of the population.
+          <%- else %>
+          P90 and P10 are the levels of income or consumption below which 90% and 10% of the population live, respectively. This variable gives the ratio of the two. It is a measure of inequality that indicates the gap between the richest and poorest tenth of the population.
+          <%- endif %>
         description_key:
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_not_market_income}"
@@ -1275,12 +1370,22 @@ tables:
             <% endif %>
           numDecimalPlaces: 1
           <<: *common_display
+        presentation:
+          title_public: |-
+            <% if survey_comparability != "No spells" %>
+            P90/P10 ratio
+            <%- endif %>
 
       p90_p50_ratio:
         title: P90/P50 ratio (<<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: ""
         short_unit: ""
-        description_short: The P90/P50 ratio measures the degree of inequality within the richest half of the population. A ratio of 2 means that someone just falling in the richest tenth of the population has twice the median <<welfare_type>>.
+        description_short: |-
+          <% if survey_comparability == "No spells" %>
+          The P90/P50 ratio measures the degree of inequality within the richest half of the population. A ratio of 2 means that someone just falling in the richest tenth of the population has twice the median <<welfare_type>>.
+          <%- else %>
+          The P90/P50 ratio measures the degree of inequality within the richest half of the population. A ratio of 2 means that someone just falling in the richest tenth of the population has twice the median income or consumption.
+          <%- endif %>
         description_key:
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_not_market_income}"
@@ -1296,6 +1401,10 @@ tables:
           numDecimalPlaces: 1
           <<: *common_display
         presentation:
+          title_public: |-
+            <% if survey_comparability != "No spells" %>
+            P90/P50 ratio
+            <%- endif %>
           topic_tags:
             - Economic Inequality
 
@@ -1303,7 +1412,12 @@ tables:
         title: P50/P10 ratio (<<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: ""
         short_unit: ""
-        description_short: The P50/P10 ratio measures the degree of inequality within the poorest half of the population. A ratio of 2 means that the median <<welfare_type>> is two times higher than that of someone just falling in the poorest tenth of the population.
+        description_short: |-
+          <% if survey_comparability == "No spells" %>
+          The P50/P10 ratio measures the degree of inequality within the poorest half of the population. A ratio of 2 means that the median <<welfare_type>> is two times higher than that of someone just falling in the poorest tenth of the population.
+          <%- else %>
+          The P50/P10 ratio measures the degree of inequality within the poorest half of the population. A ratio of 2 means that the median income or consumption is two times higher than that of someone just falling in the poorest tenth of the population.
+          <%- endif %>
         description_key:
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_not_market_income}"
@@ -1319,6 +1433,10 @@ tables:
           numDecimalPlaces: 1
           <<: *common_display
         presentation:
+          title_public: |-
+            <% if survey_comparability != "No spells" %>
+            P50/P10 ratio
+            <%- endif %>
           topic_tags:
             - Economic Inequality
 
@@ -1344,6 +1462,10 @@ tables:
           numDecimalPlaces: 2
           <<: *common_display
         presentation:
+          title_public: |-
+            <% if survey_comparability != "No spells" %>
+            Mean log deviation
+            <%- endif %>
           topic_tags:
             - Economic Inequality
           grapher_config:
@@ -1382,6 +1504,10 @@ tables:
           numDecimalPlaces: 2
           <<: *common_display
         presentation:
+          title_public: |-
+            <% if survey_comparability != "No spells" %>
+            Polarization
+            <%- endif %>
           topic_tags:
             - Economic Inequality
 
@@ -1390,7 +1516,12 @@ tables:
         title: Mean (<<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: international-$ in <<ppp_version>> prices
         short_unit: $
-        description_short: The mean is the average <<welfare_type>> of the population.
+        description_short: |-
+          <% if survey_comparability == "No spells" %>
+          Average <<welfare_type>> of the population.
+          <%- else %>
+          Average income or consumption of the population.
+          <%- endif %>
         description_key:
           - "{definitions.description_key_ppp}"
           - "{definitions.description_key_welfare_type}"
@@ -1409,6 +1540,10 @@ tables:
           numDecimalPlaces: 2
           <<: *common_display
         presentation:
+          title_public: |-
+            <% if survey_comparability != "No spells" %>
+            Mean
+            <%- endif %>
           grapher_config:
             title: Mean <<welfare_type>> per day
             subtitle: "{definitions.ppp_adjustment_subtitle}"
@@ -1430,7 +1565,12 @@ tables:
         title: Median (<<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: international-$ in <<ppp_version>> prices
         short_unit: $
-        description_short: The median is the value of <<welfare_type>> below which 50% of the population live.
+        description_short: |-
+          <% if survey_comparability == "No spells" %>
+          Value of <<welfare_type>> below which 50% of the population live.
+          <%- else %>
+          Value of income or consumption below which 50% of the population live.
+          <%- endif %>
         description_key:
           - "{definitions.description_key_ppp}"
           - "{definitions.description_key_welfare_type}"
@@ -1449,6 +1589,10 @@ tables:
           numDecimalPlaces: 2
           <<: *common_display
         presentation:
+          title_public: |-
+            <% if survey_comparability != "No spells" %>
+            Median
+            <%- endif %>
           grapher_config:
             title: Median <<welfare_type>> per day
             subtitle: "{definitions.ppp_adjustment_subtitle}"
@@ -1474,7 +1618,11 @@ tables:
         short_unit: $
         description_short: |-
           {macros}
+          <% if survey_comparability == "No spells" %>
           The mean <<welfare_type>> per day within the <<percentiles_avg_share(decile)>> (tenth of the population).
+          <% else %>
+          The mean income or consumption per day within the <<percentiles_avg_share(decile)>> (tenth of the population).
+          <% endif %>
         description_key:
           - "{definitions.description_key_ppp}"
           - "{definitions.description_key_welfare_type}"
@@ -1493,6 +1641,11 @@ tables:
           numDecimalPlaces: 2
           <<: *common_display
         presentation:
+          title_public: |-
+            {macros}
+            <% if survey_comparability != "No spells" %>
+            Average (<<percentiles_avg_share(decile)>>)
+            <%- endif %>
           grapher_config:
             title: |-
               {macros}
@@ -1522,7 +1675,11 @@ tables:
         short_unit: "%"
         description_short: |-
           {macros}
-          The share of <<welfare_type>> {definitions.welfare_type_verb} by the <<percentiles_avg_share(decile)>> (tenth of the population)
+          <% if survey_comparability == "No spells" %>
+          The share of <<welfare_type>> {definitions.welfare_type_verb} by the <<percentiles_avg_share(decile)>> (tenth of the population).
+          <% else %>
+          The share of income or consumption by the <<percentiles_avg_share(decile)>> (tenth of the population).
+          <% endif %>
         description_key:
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_not_market_income}"
@@ -1541,6 +1698,11 @@ tables:
           numDecimalPlaces: 1
           <<: *common_display
         presentation:
+          title_public: |-
+            {macros}
+            <% if survey_comparability != "No spells" %>
+            Share (<<percentiles_avg_share(decile)>>)
+            <%- endif %>
           grapher_config:
             title: |-
               {macros}
@@ -1566,7 +1728,12 @@ tables:
           Threshold (<<percentiles_thr(decile)>>, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: international-$ in <<ppp_version>> prices
         short_unit: $
-        description_short: The level of <<welfare_type>> per day below which <<decile>>0% of the population falls.
+        description_short: |-
+          <% if survey_comparability == "No spells" %>
+          The level of <<welfare_type>> per day below which <<decile>>0% of the population falls.
+          <% else %>
+          The level of income or consumption per day below which <<decile>>0% of the population falls.
+          <% endif %>
         description_key:
           - "{definitions.description_key_ppp}"
           - "{definitions.description_key_welfare_type}"
@@ -1585,6 +1752,11 @@ tables:
           numDecimalPlaces: 2
           <<: *common_display
         presentation:
+          title_public: |-
+            {macros}
+            <% if survey_comparability != "No spells" %>
+            Threshold (<<percentiles_thr(decile)>>)
+            <%- endif %>
           grapher_config:
             title: "{definitions.threshold_title}"
             subtitle: The level of <<welfare_type>> per person per day below which <<decile>>0% of the population falls. {definitions.ppp_adjustment_subtitle}
@@ -1606,7 +1778,12 @@ tables:
         title: Share (bottom 50%, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: "%"
         short_unit: "%"
-        description_short: The share of <<welfare_type>> {definitions.welfare_type_verb} by the poorest 50% of the population.
+        description_short: |-
+          <% if survey_comparability == "No spells" %>
+          The share of <<welfare_type>> {definitions.welfare_type_verb} by the poorest 50% of the population.
+          <% else %>
+          The share of income or consumption by the poorest 50% of the population.
+          <% endif %>
         description_key:
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_not_market_income}"
@@ -1621,12 +1798,22 @@ tables:
             <% endif %>
           numDecimalPlaces: 1
           <<: *common_display
+        presentation:
+          title_public: |-
+            <% if survey_comparability != "No spells" %>
+            Share (bottom 50%)
+            <%- endif %>
 
       middle40_share:
         title: Share (middle 40%, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: "%"
         short_unit: "%"
-        description_short: The share of <<welfare_type>> {definitions.welfare_type_verb} by the middle 40% of the population. The middle 40% is the share of the population whose <<welfare_type>> lies between the poorest 50% and the richest 10%.
+        description_short: |-
+          <% if survey_comparability == "No spells" %>
+          The share of <<welfare_type>> {definitions.welfare_type_verb} by the middle 40% of the population. The middle 40% is the share of the population whose <<welfare_type>> lies between the poorest 50% and the richest 10%.
+          <% else %>
+          The share of income or consumption by the middle 40% of the population. The middle 40% is the share of the population whose income or consumption lies between the poorest 50% and the richest 10%.
+          <% endif %>
         description_key:
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_not_market_income}"
@@ -1641,12 +1828,22 @@ tables:
             <% endif %>
           numDecimalPlaces: 1
           <<: *common_display
+        presentation:
+          title_public: |-
+            <% if survey_comparability != "No spells" %>
+            Share (middle 40%)
+            <%- endif %>
 
       top1_share:
         title: Share (top 1%, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: "%"
         short_unit: "%"
-        description_short: The share of <<welfare_type>> {definitions.welfare_type_verb} by the richest 1% of the population.
+        description_short: |-
+          <% if survey_comparability == "No spells" %>
+          The share of <<welfare_type>> {definitions.welfare_type_verb} by the richest 1% of the population.
+          <% else %>
+          The share of income or consumption by the richest 1% of the population.
+          <% endif %>
         description_key:
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_not_market_income}"
@@ -1661,12 +1858,22 @@ tables:
             <% endif %>
           numDecimalPlaces: 1
           <<: *common_display
+        presentation:
+          title_public: |-
+            <% if survey_comparability != "No spells" %>
+            Share (top 1%)
+            <%- endif %>
 
       top90_99_share:
         title: Share (between 90th and 99th percentiles, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: "%"
         short_unit: "%"
-        description_short: The share of <<welfare_type>> {definitions.welfare_type_verb} by the population between the 90th and 99th percentiles.
+        description_short: |-
+          <% if survey_comparability == "No spells" %>
+          The share of <<welfare_type>> {definitions.welfare_type_verb} by the population between the 90th and 99th percentiles.
+          <% else %>
+          The share of income or consumption by the population between the 90th and 99th percentiles.
+          <% endif %>
         description_key:
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_not_market_income}"
@@ -1682,12 +1889,22 @@ tables:
             <% endif %>
           numDecimalPlaces: 1
           <<: *common_display
+        presentation:
+          title_public: |-
+            <% if survey_comparability != "No spells" %>
+            Share (top 90-99%)
+            <%- endif %>
 
       top1_thr:
         title: Threshold (top 1%, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: international-$ in <<ppp_version>> prices
         short_unit: $
-        description_short: The level of <<welfare_type>> per day below which 99% of the population falls.
+        description_short: |-
+          <% if survey_comparability == "No spells" %>
+          The level of <<welfare_type>> per day below which 99% of the population falls.
+          <% else %>
+          The level of income or consumption per day below which 99% of the population falls.
+          <% endif %>
         description_key:
           - "{definitions.description_key_ppp}"
           - "{definitions.description_key_welfare_type}"
@@ -1704,12 +1921,22 @@ tables:
             <% endif %>
           numDecimalPlaces: 2
           <<: *common_display
+        presentation:
+          title_public: |-
+            <% if survey_comparability != "No spells" %>
+            Threshold (top 1%)
+            <%- endif %>
 
       top1_avg:
         title: Average (top 1%, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: international-$ in <<ppp_version>> prices
         short_unit: $
-        description_short: The mean <<welfare_type>> per day within the richest 1% of the population.
+        description_short: |-
+          <% if survey_comparability == "No spells" %>
+          The mean <<welfare_type>> per day within the richest 1% of the population.
+          <% else %>
+          The mean income or consumption per day within the richest 1% of the population.
+          <% endif %>
         description_key:
           - "{definitions.description_key_ppp}"
           - "{definitions.description_key_welfare_type}"
@@ -1726,6 +1953,11 @@ tables:
             <% endif %>
           numDecimalPlaces: 2
           <<: *common_display
+        presentation:
+          title_public: |-
+            <% if survey_comparability != "No spells" %>
+            Average (top 1%)
+            <%- endif %>
 
       cpi:
         title: Consumer Price Index (CPI) - {definitions.table}{definitions.survey_comparability}
@@ -1741,6 +1973,11 @@ tables:
             <% endif %>
           numDecimalPlaces: 1
           <<: *common_display
+        presentation:
+          title_public: |-
+            <% if survey_comparability != "No spells" %>
+            Consumer Price Index (CPI)
+            <%- endif %>
 
       ppp:
         title: Purchasing Power Parity (PPP) rates (<<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
@@ -1756,6 +1993,11 @@ tables:
             <% endif %>
           numDecimalPlaces: 1
           <<: *common_display
+        presentation:
+          title_public: |-
+            <% if survey_comparability != "No spells" %>
+            Purchasing Power Parity (PPP) rates
+            <%- endif %>
 
       # ADDITIONAL VARIABLES
       surveys_past_decade:

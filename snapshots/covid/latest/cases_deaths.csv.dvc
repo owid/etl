@@ -23,12 +23,12 @@ meta:
     version_producer: WHO COVID-19 Dashboard - Daily cases and deaths
     url_main: https://covid19.who.int/
     url_download: https://srhdpeuwpubsa.blob.core.windows.net/whdh/COVID/WHO-COVID-19-global-daily-data.csv
-    date_accessed: 2025-09-17
+    date_accessed: 2025-10-15
     date_published: '2025'
     license:
       name: CC BY 4.0
       url: https://data.who.int/dashboards/covid19/
 outs:
-  - md5: 942fcca83035b885f34bad870f728f6e
-    size: 22525172
+  - md5: 85c61aa0029ca7efb36b648e69c17bf5
+    size: 22905380
     path: cases_deaths.csv

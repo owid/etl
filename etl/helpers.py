@@ -29,7 +29,7 @@ from etl.collection import Collection, CollectionSet
 from etl.collection.core.create import Listable, create_collection
 from etl.collection.explorer import Explorer, ExplorerLegacy, create_explorer_legacy
 from etl.dag_helpers import load_dag
-from etl.data_helpers.geo import RegionAggregator, Regions
+from etl.data_helpers.geo import Regions
 from etl.grapher.helpers import grapher_checks
 from etl.snapshot import Snapshot, SnapshotMeta
 
@@ -373,29 +373,6 @@ class PathFinder:
                 auto_load_datasets=False,
             )
         return self._regions
-
-    def region_aggregator(
-        self,
-        regions: list[str] | dict[str, Any] | None = None,
-        index_columns: list[str] | None = None,
-        aggregations: dict[str, Any] | None = None,
-        country_col: str = "country",
-        year_col: str = "year",
-        population_col: str = "population",
-    ) -> RegionAggregator:
-        """Create a RegionAggregator that will be used on a specific table."""
-        return RegionAggregator(
-            regions=regions,
-            ds_regions=self.regions.ds_regions,
-            ds_income_groups=self.regions._ds_income_groups,
-            ds_population=self.regions._ds_population,
-            regions_all=self.regions.regions_all,
-            index_columns=index_columns,
-            aggregations=aggregations,
-            country_col=country_col,
-            year_col=year_col,
-            population_col=population_col,
-        )
 
     @property
     def snapshot_dir(self) -> Path:
@@ -922,65 +899,3 @@ class PathFinder:
 def _match_dependencies(pattern: str, dependencies: set[str]) -> set[str]:
     regex = re.compile(pattern)
     return {dependency for dependency in dependencies if regex.match(dependency)}
-
-
-def sanitize_crs(crs):
-    """
-    Normalize a CRS for rioxarray/rasterio by returning either an EPSG string (preferred)
-    or a plain WKT string with a supported version name.
-
-    Why:
-    - With some rioxarray/rasterio/pyproj combos, passing a pyproj.CRS directly into
-      rioxarray.rio.clip(..., crs=...) can cause rasterio to invoke pyproj.CRS.to_wkt
-      with a stringified foreign enum like 'WktVersion.WKT2_2019' instead of a bare
-      name ('WKT2_2019') or a pyproj.enums.WktVersion value.
-    - pyproj rejects that stringified enum and raises:
-        ValueError: Invalid value supplied 'WktVersion.WKT2_2019'. Only ('WKT2_2015',
-        'WKT2_2015_SIMPLIFIED', 'WKT2_2018', 'WKT2_2018_SIMPLIFIED', 'WKT2_2019',
-        'WKT2_2019_SIMPLIFIED', 'WKT1_GDAL', 'WKT1_ESRI') are supported.
-
-    What this does:
-    - Prefer an 'EPSG:XXXX' string when resolvable, which avoids WKT altogether.
-    - Otherwise return a plain WKT string using a supported version name, trying WKT2_2019
-      first and falling back to WKT1_GDAL. This prevents foreign enum objects from leaking
-      across library boundaries and triggering the error above.
-
-    Safe to pass into:
-      xarray/rioxarray/rasterio functions that accept CRS inputs.
-    """
-    if crs is None:
-        return None
-
-    # Try EPSG first
-    try:
-        to_epsg = getattr(crs, "to_epsg", None)
-        if callable(to_epsg):
-            epsg = to_epsg()
-            if epsg is not None:
-                return f"EPSG:{epsg}"
-    except Exception:
-        pass
-
-    # Rasterio CRS sometimes offers to_string -> 'EPSG:XXXX' or PROJ string
-    try:
-        to_string = getattr(crs, "to_string", None)
-        if callable(to_string):
-            s = to_string()
-            if s:
-                return s
-    except Exception:
-        pass
-
-    # Fall back to a bare WKT string with a supported version name
-    try:
-        to_wkt = getattr(crs, "to_wkt", None)
-        if callable(to_wkt):
-            try:
-                return to_wkt("WKT2_2019")
-            except Exception:
-                return to_wkt("WKT1_GDAL")
-    except Exception:
-        pass
-
-    # If it is already a string or int or unknown type, return as is
-    return crs

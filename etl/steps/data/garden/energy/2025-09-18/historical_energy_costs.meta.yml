@@ -1,0 +1,26 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Energy
+    processing_level: minor
+
+dataset:
+  update_period_days: 365
+  non_redistributable: true
+
+tables:
+  historical_energy_costs:
+    variables:
+      price:
+        title: Prices of different technologies in terms of useful energy
+        unit: 'constant 2024 US$ per megawatt-hour'
+        short_unit: '$/MWh'
+        display:
+          shortUnit: $
+        presentation:
+          grapher_config:
+            note: |-
+              This data is expressed in constant 2024 US$ per megawatt-hour.
+        description_short: |-
+          This data is expressed in US dollars, adjusted for inflation, per unit useful energy, in [megawatt-hours](#dod:watt-hours). The prices of electricity are given in terms of the levelized cost of electricity (LCOE). Crude oil, coal, and gas prices represent the cost of fuel.

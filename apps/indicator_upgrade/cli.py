@@ -97,6 +97,12 @@ def cli() -> None:
     default=100.0,
     help="Similarity threshold (0-100) for automatic mapping when --no-interactive is used. Default: 100.0",
 )
+@click.option(
+    "--quiet",
+    is_flag=True,
+    default=False,
+    help="Minimal output - only show essential results",
+)
 def match_command(
     old_dataset_id: int,
     new_dataset_id: int,
@@ -106,6 +112,7 @@ def match_command(
     max_suggestions: int,
     no_interactive: bool,
     auto_threshold: float,
+    quiet: bool,
 ) -> None:
     """Match variable IDs from an old dataset to a new dataset.
 
@@ -123,6 +130,7 @@ def match_command(
         max_suggestions=max_suggestions,
         no_interactive=no_interactive,
         auto_threshold=auto_threshold,
+        quiet=quiet,
     )
 
 

@@ -44,9 +44,14 @@ def create_tb_death(tb_leading_causes, tb_ext_causes):
         {"cause": "terrorism", "year": 2023, "deaths": terrorism_deaths},
     ]
 
-    tb_death = pr.concat([tb_leading_causes, Table(deaths)])
+    tb_deaths = pr.concat([tb_leading_causes, Table(deaths)])
 
-    return tb_death
+    # subtract drug overdose deaths from accidents
+    acc_deaths = tb_deaths[tb_deaths["cause"] == "accidents"]["deaths"].iloc[0]
+    drug_od_deaths = tb_deaths[tb_deaths["cause"] == "drug overdose"]["deaths"].iloc[0]
+    tb_deaths.loc[tb_deaths["cause"] == "accidents", "deaths"] = acc_deaths - drug_od_deaths
+
+    return tb_deaths
 
 
 def add_shares(tb, columns=None):

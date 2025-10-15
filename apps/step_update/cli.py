@@ -1,4 +1,5 @@
 import difflib
+import fnmatch
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -280,8 +281,12 @@ class StepUpdater:
         include_dependencies: bool = False,
         include_usages: bool = False,
         step_headers: Optional[Dict[str, str]] = None,
+        direct_only: bool = False,
     ) -> None:
         """Update one or more steps to their new version, if possible."""
+        # Store original steps for direct_only filtering
+        original_steps = steps.copy()
+
         # Gather all steps to be updated.
         for step in steps:
             # Check that step to be updated exists in the active dag.
@@ -296,6 +301,10 @@ class StepUpdater:
                 # Add direct usages of current step to the list of steps to update (if not already in the list).
                 usages = self.steps_df[self.steps_df["step"] == step]["direct_usages"].item()
                 steps += [usage for usage in usages if usage not in steps]
+
+        # Apply direct_only filtering if requested
+        if direct_only and (include_dependencies or include_usages):
+            steps = _filter_direct_only_steps(original_steps, steps)
 
         # Remove steps that cannot be updated because their version is already equal to the new version.
         # NOTE: One could think that steps with version "latest" should also be skipped. But their dependencies may need
@@ -468,6 +477,88 @@ def _update_temporary_dag(dag_active, dag_all_reverse) -> None:
     )
 
 
+def _extract_step_pattern(step: str) -> tuple[str, str, str]:
+    """Extract namespace, version, and short_name from a step URI."""
+    # Remove channel prefix if present
+    path = step.split("://", 1)[1] if "://" in step else step
+    parts = path.split("/")
+
+    # snapshot://namespace/version/short_name (3 parts)
+    # data://stage/namespace/version/short_name (4 parts)
+    if len(parts) == 3:
+        return parts[0], parts[1], parts[2]
+    elif len(parts) >= 4:
+        return parts[1], parts[2], parts[3]
+    else:
+        raise ValueError(f"Could not parse step URI: {step}")
+
+
+def _filter_direct_only_steps(original_steps: List[str], all_steps: List[str]) -> List[str]:
+    """Filter steps to only include those with the same namespace/version/short_name pattern as original steps.
+
+    Args:
+        original_steps: The initial steps provided by the user
+        all_steps: All steps including dependencies/usages
+
+    Returns:
+        Filtered list containing only direct steps matching the original pattern
+    """
+    # Extract patterns from original steps
+    original_patterns = set()
+    for step in original_steps:
+        namespace, version, short_name = _extract_step_pattern(step)
+        # Remove file extension from short_name for matching
+        short_name_base = short_name.split(".")[0] if "." in short_name else short_name
+        original_patterns.add((namespace, version, short_name_base))
+
+    # Filter all steps to only include those matching original patterns
+    filtered_steps = []
+    for step in all_steps:
+        namespace, version, short_name = _extract_step_pattern(step)
+        short_name_base = short_name.split(".")[0] if "." in short_name else short_name
+
+        if (namespace, version, short_name_base) in original_patterns:
+            filtered_steps.append(step)
+
+    return filtered_steps
+
+
+def _expand_wildcard_patterns(patterns: List[str], active_steps: List[str]) -> List[str]:
+    """Expand wildcard patterns to match actual step names.
+
+    Args:
+        patterns: List of step patterns, potentially containing wildcards (*, ?, [abc])
+        active_steps: List of all available active steps
+
+    Returns:
+        List of expanded step names matching the patterns
+    """
+    expanded_steps = []
+
+    for pattern in patterns:
+        if "*" in pattern or "?" in pattern or "[" in pattern:
+            # This is a wildcard pattern
+            matches = fnmatch.filter(active_steps, pattern)
+            if not matches:
+                log.error(f"No steps found matching pattern: {pattern}")
+                continue
+            log.info(f"Pattern '{pattern}' expanded to {len(matches)} step(s).")
+            expanded_steps.extend(matches)
+        else:
+            # This is a regular step name
+            expanded_steps.append(pattern)
+
+    # Remove duplicates while preserving order
+    seen = set()
+    result = []
+    for step in expanded_steps:
+        if step not in seen:
+            seen.add(step)
+            result.append(step)
+
+    return result
+
+
 def _confirm_choice(multiple_files: List[Any]) -> int:
     choice_default = 0
     for i, file_name in enumerate(multiple_files):
@@ -518,6 +609,13 @@ def _confirm_choice(multiple_files: List[Any]) -> int:
     type=bool,
     help="Skip user interactions (for confirmation and when there is ambiguity). Default: False.",
 )
+@click.option(
+    "--direct-only",
+    is_flag=True,
+    default=False,
+    type=bool,
+    help="When used with --include-usages, only include steps with the same namespace/version/short_name pattern. Default: False.",
+)
 def cli(
     steps: Union[str, List[str]],
     step_version_new: Optional[str] = STEP_VERSION_NEW,
@@ -525,6 +623,7 @@ def cli(
     include_usages: bool = False,
     dry_run: bool = False,
     interactive: bool = True,
+    direct_only: bool = False,
 ) -> None:
     """Update one or more steps to their new version, if possible.
 
@@ -541,6 +640,7 @@ def cli(
     * If new snapshots are created that are not used by any steps, they are added to a temporary dag (temp.yml). These steps are then removed from the temporary dag as soon as they are used by an active step.
     * All dependencies of new steps will be assumed to use their latest version possible.
     * Steps whose version is already equal to the new version will be skipped.
+    * Wildcard patterns (*, ?, [abc]) are supported in step names for batch operations.
 
     **Examples:**
 
@@ -564,6 +664,13 @@ def cli(
         ```
 
         Note that the code of the explorers step itself will not be updated (since it has version "latest"), but its dependencies will be updated in the dag.
+
+    * To update all snapshots in a namespace/version directory using wildcards:
+        ```
+        $ etl update "snapshot://climate/2025-07-18/*" --dry-run
+        ```
+
+        This will update all snapshot files matching the pattern in the climate/2025-07-18 directory.
     """
     # If a single step is given, convert it to a list.
     if isinstance(steps, str):
@@ -571,12 +678,26 @@ def cli(
     elif isinstance(steps, tuple):
         steps = list(steps)
 
-    # Initialize step updater and run update.
-    StepUpdater(dry_run=dry_run, interactive=interactive).update_steps(
-        steps=steps,
+    # Initialize step updater to get access to active steps for wildcard expansion.
+    step_updater = StepUpdater(dry_run=dry_run, interactive=interactive)
+
+    # Get the list of active steps for wildcard expansion.
+    active_steps = sorted(set(step_updater.steps_df["step"]))
+
+    # Expand wildcard patterns in step names.
+    expanded_steps = _expand_wildcard_patterns(steps, active_steps)
+
+    if not expanded_steps:
+        log.error("No valid steps found after expanding patterns.")
+        sys.exit(1)
+
+    # Run update with expanded step list.
+    step_updater.update_steps(
+        steps=expanded_steps,
         step_version_new=step_version_new,
         include_dependencies=include_dependencies,
         include_usages=include_usages,
+        direct_only=direct_only,
     )
 
 

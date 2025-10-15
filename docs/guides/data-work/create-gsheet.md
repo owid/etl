@@ -1,7 +1,6 @@
 ---
 tags:
   - 👷 Staff
-status: new
 ---
 
 For some metrics we compile multiple sources in order to create a single variable, AKA an OWID Maintained Metric (OMM). In these cases we should create a publicly available Google Sheet that contains for each data point the sources used, the values, and any notes that are relevant to the data point.
