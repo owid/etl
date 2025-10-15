@@ -19,7 +19,7 @@ To run this code from scratch,
     - Delete the files in the local cache folder:
         rm -rf .cache/*
     - (If needed) Delete the files in R2:
-        rclone delete r2:owid-private/cache/ --fast-list --transfers 32 --checkers 32 --verbose
+        rclone delete r2:owid-private/cache/pip_api --fast-list --transfers 32 --checkers 32 --verbose
     - Check if you need to update the poverty lines in the functions `poverty_lines_countries` and `poverty_lines_regions`.
         - Check the list of countries without percentile data. It will show up as a list in the output (_These countries are available in a common query but not in the percentile file:_)
         - Open
