@@ -357,6 +357,17 @@ class Snapshot:
             self.path, *args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs
         )
 
+    def read_custom(self, read_function: Callable, *args, **kwargs) -> Table:
+        """Read data file using a custom reader function, and return a Table with metadata."""
+        return pr.read_custom(
+            filepath_or_buffer=self.path,
+            read_function=read_function,
+            *args,
+            metadata=self.to_table_metadata(),
+            origin=self.metadata.origin,
+            **kwargs,
+        )
+
     # Methods to deal with archived files
     @deprecated("This function will be deprecated. Use `open_archive` context manager instead.")
     def extract(self, output_dir: Path | str):
