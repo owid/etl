@@ -48,17 +48,32 @@ def run() -> None:
     tb_sif = tb_sif[list(COLUMNS_SIF)].rename(columns=COLUMNS_SIF, errors="raise")
     tb_fao = tb_fao[list(COLUMNS_FAO)].rename(columns=COLUMNS_FAO, errors="raise")
 
-    # Prepare FAO data.
     # Sanity check.
     assert set(tb_fao["unit"]) == {"100 g/ha"}, "Unexpected units"
+    assert set(tb_fao["flag"]) == {"Official figure", "Estimated value"}, "Unexpected flags"
+    # Prepare FAO data.
+    # TODO: There are two items in FAO data, namely "Maize (corn)" and "Green corn (maize)". For now, use one of them.
+    tb_fao = tb_fao[(tb_fao["item"] == "Maize (corn)")][["country", "year", "yield"]].reset_index(drop=True)
+    # Convert FAOSTAT yield units from 100 g/ha to tonnes/ha.
+    tb_fao["yield"] /= 10000
 
-    # TODO: There are two items in FAO data, namely "Maize (corn)" and "Green corn (maize)". Decide how to combine with other tables.
-    # TODO: Continue here: combine tables, harmonize country names, and improve format.
-    # For now, pick just one of them to avoid an error.
-    tb = tb_sif.copy()
+    # Concatenate tables.
+    import owid.catalog.processing as pr
+
+    tb = pr.concat(
+        [
+            tb_modis.assign(**{"source": "yield_modis"}),
+            tb_sif.assign(**{"source": "yield_sif"}),
+            tb_fao.assign(**{"source": "yield_fao"}),
+        ],
+        ignore_index=True,
+    )
 
     # Harmonize country names.
-    # tb = paths.regions.harmonize_names(tb=tb)
+    tb = paths.regions.harmonize_names(tb=tb)
+
+    # Create one column per source.
+    tb = tb.pivot(index=["country", "year"], columns=["source"], values="yield", join_column_levels_with="_")
 
     # Improve table format.
     tb = tb.format(["country", "year"], short_name=paths.short_name)
@@ -67,7 +82,7 @@ def run() -> None:
     # Save outputs.
     #
     # Initialize a new garden dataset.
-    ds_garden = paths.create_dataset(tables=[tb], default_metadata=ds_meadow.metadata)
+    ds_garden = paths.create_dataset(tables=[tb])
 
     # Save garden dataset.
     ds_garden.save()
