@@ -392,3 +392,16 @@ def edit_indicator_displays(view):
                         "color": gender_color_mapping.get(gender_key, COLOR_BOYS),
                     }
                     break
+
+    # Sort indicators for age_side_by_side: youth → adult → elderly (young to older)
+    if view.matches(age_group="age_side_by_side"):
+        def get_age_index(ind):
+            if "15_24_years" in ind.catalogPath:  # youth
+                return 0
+            elif "15plus_years" in ind.catalogPath:  # adult
+                return 1
+            elif "65plus_years" in ind.catalogPath:  # elderly
+                return 2
+            return 3
+
+        view.indicators.y = sorted(view.indicators.y, key=get_age_index)

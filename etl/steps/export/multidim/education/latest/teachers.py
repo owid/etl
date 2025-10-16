@@ -395,3 +395,18 @@ def edit_indicator_displays(view):
                         "color": teacher_type_colors.get(teacher_type, COLOR_QUALIFIED),
                     }
                     break
+
+    # Sort indicators for level_side_by_side: pre-primary → primary → lower secondary → upper secondary
+    if view.matches(level="level_side_by_side"):
+        def get_level_index(ind):
+            if "pre_primary" in ind.catalogPath:
+                return 0
+            elif "primary" in ind.catalogPath and "pre" not in ind.catalogPath:
+                return 1
+            elif "lower_secondary" in ind.catalogPath:
+                return 2
+            elif "upper_secondary" in ind.catalogPath:
+                return 3
+            return 4
+
+        view.indicators.y = sorted(view.indicators.y, key=get_level_index)

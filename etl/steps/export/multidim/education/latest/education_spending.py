@@ -328,3 +328,20 @@ def edit_indicator_displays(view):
                 if level_key in indicator.catalogPath:
                     indicator.display = {"name": config["name"], "color": config["color"]}
                     break
+
+        # Sort indicators: pre-primary → primary → lower secondary → upper secondary → tertiary
+        # Reverse for stacked charts
+        def get_level_index(ind):
+            if "pre_primary" in ind.catalogPath or "preprimary" in ind.catalogPath:
+                return 4
+            elif "primary" in ind.catalogPath and "pre" not in ind.catalogPath:
+                return 3
+            elif "lower_secondary" in ind.catalogPath:
+                return 2
+            elif "upper_secondary" in ind.catalogPath:
+                return 1
+            elif "tertiary" in ind.catalogPath:
+                return 0
+            return 5
+
+        view.indicators.y = sorted(view.indicators.y, key=get_level_index)
