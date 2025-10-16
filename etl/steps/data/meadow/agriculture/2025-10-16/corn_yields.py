@@ -17,6 +17,9 @@ def run() -> None:
 
     # Load data from snapshot.
     # Note that, despite USDA/FAS generating files with ".xls" extension, they are HTML files.
+    # Also, note that the online tool fills empty data points with zeros when more than one country is fetched.
+    # For example, if one downloads only corn yields for Romania, the data ends in 1999; however, if one downloads corn yields for Romania and Russia, the resulting table contains zeros for Romania from 2000 onwards.
+    # I couldn't find any straightforward option to avoid these spurious zeros; they will be handled in the garden step.
     tb = snap.read_custom(read_function=lambda x: pd.read_html(x)[0])
 
     #

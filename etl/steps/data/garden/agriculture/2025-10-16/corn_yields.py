@@ -38,7 +38,15 @@ def run() -> None:
     # Harmonize country names.
     tb = paths.regions.harmonize_names(tb=tb)
 
-    # TODO: It seems there are spurious zeros in the data (e.g. Malawi, Zambia and Mozambique in 1960 are exactly zero).
+    # As mentioned in the meadow step, the download tool creates spurious zeros when downloading data for multiple countries. For example, if you go to:
+    # https://apps.fas.usda.gov/psdonline/app/index.html#/app/advQuery
+    # And select corn yields for Croatia, it only has data between 1992 and 1998. But if you fetch data from both Croatia and any other country with more years of data informed, e.g. Egypt, the resulting series for Croatia is filled with zeros from 1960 onwards.
+    # DEBUG: Uncomment to inspect all countries that have at least one zero.
+    # for country in sorted(set(tb["country"])):
+    #     if not tb[(tb["country"]==country) & (tb["yield"] == 0)].empty:
+    #         px.line(tb[tb["country"]==country], x="year", y="yield", title=country).show()
+    # It seems safe to assume that most zeros in the data are spurious, and should therefore be removed.
+    tb = tb[(tb["yield"] > 0)].reset_index(drop=True)
 
     # Improve table format.
     tb = tb.format(["country", "year"])
