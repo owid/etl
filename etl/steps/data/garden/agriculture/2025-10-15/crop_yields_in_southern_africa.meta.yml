@@ -40,15 +40,21 @@ tables:
           name: FAO
         presentation:
           title_public: "{tables.crop_yields_in_southern_africa.variables.yield_fao_adapted.title}"
+        description_processing: |-
+          - The data has been shifted one year earlier to align harvest-year data with satellite observations. Although not explicitly mentioned in the paper, this seems to be the approach followed to produce the series of Fig. 1.
       yield_modis_adapted:
         title: Crop productivity (MODIS), rescaled for comparison with FAO data
         display:
           name: MODIS
         presentation:
           title_public: "{tables.crop_yields_in_southern_africa.variables.yield_modis_adapted.title}"
+        description_processing: |-
+          - The series was rescaled so that its lowest and highest values match those of the FAO yield data for each country, enabling direct comparison of trends.
       yield_sif_adapted:
         title: Crop productivity (SIF), rescaled for comparison with FAO data
         display:
           name: SIF
         presentation:
           title_public: "{tables.crop_yields_in_southern_africa.variables.yield_sif_adapted.title}"
+        description_processing: |-
+          - The series was rescaled so that its lowest and highest values match those of the FAO yield data for each country, enabling direct comparison of trends.
