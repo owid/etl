@@ -381,11 +381,20 @@ def edit_indicator_displays(view):
         if view.matches(level="level_side_by_side"):
             # Check for education level - be specific to avoid substring matching
             if "one_year_before_the_official_primary_entry_age" in ind.catalogPath:
-                ind.display = {"name": level_display["pre_primary"]["name"], "color": level_display["pre_primary"]["color"]}
+                ind.display = {
+                    "name": level_display["pre_primary"]["name"],
+                    "color": level_display["pre_primary"]["color"],
+                }
             elif "lower_secondary" in ind.catalogPath:
-                ind.display = {"name": level_display["lower_secondary"]["name"], "color": level_display["lower_secondary"]["color"]}
+                ind.display = {
+                    "name": level_display["lower_secondary"]["name"],
+                    "color": level_display["lower_secondary"]["color"],
+                }
             elif "upper_secondary" in ind.catalogPath:
-                ind.display = {"name": level_display["upper_secondary"]["name"], "color": level_display["upper_secondary"]["color"]}
+                ind.display = {
+                    "name": level_display["upper_secondary"]["name"],
+                    "color": level_display["upper_secondary"]["color"],
+                }
             elif "primary" in ind.catalogPath:
                 ind.display = {"name": level_display["primary"]["name"], "color": level_display["primary"]["color"]}
         elif view.matches(sex="sex_side_by_side"):
@@ -396,6 +405,7 @@ def edit_indicator_displays(view):
 
     # Sort indicators according to desired order
     if view.matches(level="level_side_by_side"):
+
         def get_level_index(ind):
             # Use specific patterns to avoid substring matching issues
             if "one_year_before_the_official_primary_entry_age" in ind.catalogPath:

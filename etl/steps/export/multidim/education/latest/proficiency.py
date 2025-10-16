@@ -463,6 +463,7 @@ def edit_indicator_displays(view):
 
     # Sort indicators for level_side_by_side: primary → lower secondary
     if view.matches(level="level_side_by_side"):
+
         def get_level_index(ind):
             if "primary" in ind.catalogPath and "lower" not in ind.catalogPath:
                 return 0

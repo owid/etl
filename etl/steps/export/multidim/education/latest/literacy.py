@@ -395,6 +395,7 @@ def edit_indicator_displays(view):
 
     # Sort indicators for age_side_by_side: youth → adult → elderly (young to older)
     if view.matches(age_group="age_side_by_side"):
+
         def get_age_index(ind):
             if "15_24_years" in ind.catalogPath:  # youth
                 return 0
