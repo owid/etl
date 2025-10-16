@@ -217,12 +217,6 @@ def adjust_dimensions(tb):
             {
                 "name": "Education level",
                 "slug": "level",
-                "choices": [
-                    {"slug": "pre_primary"},
-                    {"slug": "primary"},
-                    {"slug": "lower_secondary"},
-                    {"slug": "upper_secondary"},
-                ],
             },
             {"name": "Gender", "slug": "sex"},
             {"name": "Metric type", "slug": "metric_type"},
