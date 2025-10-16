@@ -214,7 +214,16 @@ def adjust_dimensions(tb):
 
     tb.metadata.dimensions.extend(
         [
-            {"name": "Education level", "slug": "level"},
+            {
+                "name": "Education level",
+                "slug": "level",
+                "choices": [
+                    {"slug": "pre_primary"},
+                    {"slug": "primary"},
+                    {"slug": "lower_secondary"},
+                    {"slug": "upper_secondary"},
+                ],
+            },
             {"name": "Gender", "slug": "sex"},
             {"name": "Metric type", "slug": "metric_type"},
         ]
@@ -260,7 +269,7 @@ def create_grouped_views(collection):
             {
                 "dimension": "level",
                 "choice_new_slug": "level_side_by_side",
-                "choices": ["primary", "lower_secondary", "upper_secondary"],
+                "choices": ["pre_primary", "primary", "lower_secondary", "upper_secondary"],
                 "view_config": get_view_config,
                 "view_metadata": view_metadata,
             },
