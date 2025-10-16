@@ -505,13 +505,13 @@ def edit_indicator_displays(view):
         # Sort indicators: pre-primary → primary → secondary → tertiary
         def get_level_index(ind):
             if "pre_primary" in ind.catalogPath:
-                return 0
-            elif "primary" in ind.catalogPath and "pre" not in ind.catalogPath:
-                return 1
-            elif "secondary" in ind.catalogPath:
-                return 2
-            elif "tertiary" in ind.catalogPath:
                 return 3
+            elif "primary" in ind.catalogPath and "pre" not in ind.catalogPath:
+                return 2
+            elif "secondary" in ind.catalogPath:
+                return 1
+            elif "tertiary" in ind.catalogPath:
+                return 0
             return 4
 
         view.indicators.y = sorted(view.indicators.y, key=get_level_index)
