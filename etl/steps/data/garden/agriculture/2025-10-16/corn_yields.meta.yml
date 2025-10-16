@@ -1,0 +1,17 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Crop Yields
+        - Agricultural Production
+    unit: tonnes per hectare
+    short_unit: t/ha
+
+dataset:
+  update_period_days: 365
+
+tables:
+  corn_yields:
+    variables:
+      yield:
+        title: Corn yields

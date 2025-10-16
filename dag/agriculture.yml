@@ -211,3 +211,18 @@ steps:
   #
   data://grapher/agriculture/2025-10-15/crop_yields_in_southern_africa:
     - data://garden/agriculture/2025-10-15/crop_yields_in_southern_africa
+  #
+  # USDA/FAS - Corn yields
+  #
+  data://meadow/agriculture/2025-10-16/corn_yields:
+    - snapshot://agriculture/2025-10-16/corn_yields.xls
+  #
+  # USDA/FAS - Corn yields
+  #
+  data://garden/agriculture/2025-10-16/corn_yields:
+    - data://meadow/agriculture/2025-10-16/corn_yields
+  #
+  # USDA/FAS - Corn yields
+  #
+  data://grapher/agriculture/2025-10-16/corn_yields:
+    - data://garden/agriculture/2025-10-16/corn_yields
