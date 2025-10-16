@@ -38,7 +38,6 @@ def run() -> None:
     # Harmonize country names.
     tb = paths.regions.harmonize_names(tb=tb)
 
-    # TODO: It seems that harmonize_names ignore the excluded_countries.json file.
     # TODO: It seems there are spurious zeros in the data (e.g. Malawi, Zambia and Mozambique in 1960 are exactly zero).
 
     # Improve table format.
