@@ -11,19 +11,44 @@ definitions:
 
 dataset:
   update_period_days: 365
+  title: Crop productivity and reported corn yields in Southern Africa
 
 tables:
   crop_yields_in_southern_africa:
     variables:
       yield_fao:
-        title: Crop yields according to FAO
+        title: Corn yields (FAO)
+        display:
+          name: FAO
+        presentation:
+          title_public: "{tables.crop_yields_in_southern_africa.variables.yield_fao.title}"
       yield_modis:
-        title: Crop yields according to MODIS
+        title: Crop productivity (MODIS satellite)
+        display:
+          name: MODIS
+        presentation:
+          title_public: "{tables.crop_yields_in_southern_africa.variables.yield_modis.title}"
       yield_sif:
-        title: Crop yields according to SIF
+        title: Crop productivity (SIF satellite)
+        display:
+          name: SIF
+        presentation:
+          title_public: "{tables.crop_yields_in_southern_africa.variables.yield_sif.title}"
       yield_fao_adapted:
-        title: Crop yields according to FAO, adapted for comparison with MODIS and SIF
+        title: Corn yields (FAO), aligned for comparison with satellite data
+        display:
+          name: FAO
+        presentation:
+          title_public: "{tables.crop_yields_in_southern_africa.variables.yield_fao_adapted.title}"
       yield_modis_adapted:
-        title: Crop yields according to MODIS, adapted for comparison with FAO and SIF
+        title: Crop productivity (MODIS), rescaled for comparison with FAO data
+        display:
+          name: MODIS
+        presentation:
+          title_public: "{tables.crop_yields_in_southern_africa.variables.yield_modis_adapted.title}"
       yield_sif_adapted:
-        title: Crop yields according to SIF, adapted for comparison with FAO and MODIS
+        title: Crop productivity (SIF), rescaled for comparison with FAO data
+        display:
+          name: SIF
+        presentation:
+          title_public: "{tables.crop_yields_in_southern_africa.variables.yield_sif_adapted.title}"
