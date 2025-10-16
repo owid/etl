@@ -439,30 +439,69 @@ def reset_mysql_database(server_name: str) -> Tuple[bool, str]:
         else:
             log.info("R2 files successfully purged", server=server_name)
 
-        # SSH into the server and run make refresh in owid-grapher directory
+        # SSH into the server and run commands in parallel
         # Disable host key checking for staging servers since they're ephemeral
-        cmd = f"ssh -o StrictHostKeyChecking=no owid@{server_name} 'cd owid-grapher && make refresh'"
-        log.info("Resetting MySQL database via make refresh", command=cmd, server=server_name)
+        mysql_cmd = f"ssh -o StrictHostKeyChecking=no owid@{server_name} 'cd owid-grapher && make refresh'"
+        rsync_cmd = f"ssh -o StrictHostKeyChecking=no owid@{server_name} 'rsync -az --stats owid@staging-site-master:/home/owid/etl/data/ /home/owid/etl/data/'"
 
-        result = subprocess.run(
-            cmd,
-            shell=True,
-            capture_output=True,
-            text=True,
-            timeout=1800,  # 30 minute timeout for make refresh (can take very long)
-        )
+        log.info("Executing MySQL reset and rsync in parallel", server=server_name)
 
-        if result.returncode != 0:
-            error_msg = f"MySQL reset failed with return code {result.returncode}: {result.stderr}"
-            log.error("MySQL reset failed", error=error_msg, server=server_name, stdout=result.stdout)
+        # Start both processes in parallel
+        processes = {
+            "mysql": subprocess.Popen(mysql_cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True),
+            "rsync": subprocess.Popen(rsync_cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True),
+        }
+
+        # Wait for both processes with timeout handling
+        results = {}
+        timeout_seconds = 1800  # 30 minutes
+
+        for name, process in processes.items():
+            try:
+                stdout, stderr = process.communicate(timeout=timeout_seconds)
+                results[name] = {"returncode": process.returncode, "stdout": stdout, "stderr": stderr}
+            except subprocess.TimeoutExpired:
+                process.kill()
+                stdout, stderr = process.communicate()
+                log.warning(f"{name} timed out", server=server_name)
+                results[name] = {
+                    "returncode": -1,
+                    "stdout": stdout,
+                    "stderr": f"{name} timed out after {timeout_seconds // 60} minutes",
+                }
+                # If MySQL times out, kill other processes and fail
+                if name == "mysql":
+                    for other_name, other_process in processes.items():
+                        if other_name != name:
+                            other_process.kill()
+                    return False, f"MySQL reset timed out after {timeout_seconds // 60} minutes"
+
+        # Check MySQL result (critical)
+        mysql_result = results["mysql"]
+        if mysql_result["returncode"] != 0:
+            error_msg = f"MySQL reset failed with return code {mysql_result['returncode']}: {mysql_result['stderr']}"
+            log.error("MySQL reset failed", error=error_msg, server=server_name, stdout=mysql_result["stdout"])
             return False, error_msg
 
-        success_msg = f"MySQL database successfully refreshed for {server_name}"
+        # Check rsync result (non-critical)
+        rsync_result = results["rsync"]
+        if rsync_result["returncode"] != 0:
+            log.warning(
+                "rsync failed but MySQL refresh completed successfully",
+                error=rsync_result["stderr"],
+                server=server_name,
+                stdout=rsync_result["stdout"],
+            )
+            success_msg = f"MySQL database successfully refreshed for {server_name} (rsync from master failed)"
+        else:
+            log.info("ETL data successfully synced from master", server=server_name)
+            success_msg = f"MySQL database successfully refreshed and ETL data synced for {server_name}"
+
         log.info("MySQL reset completed", server=server_name)
         return True, success_msg
 
     except subprocess.TimeoutExpired:
-        error_msg = "MySQL reset timed out after 30 minutes"
+        error_msg = "Unexpected timeout in MySQL reset"
         log.error("MySQL reset timeout", server=server_name)
         return False, error_msg
     except Exception as e:

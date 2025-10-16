@@ -84,9 +84,9 @@ definitions:
   description_key_iloest_modelled_data: |-
     This data is part of the ILO Modelled Estimates series. This series combines nationally reported observations with imputed data to have a harmonized, internationally comparable dataset and produce regional and global aggregates. For more information, please refer to the [ILO Modelled Estimates documentation](https://ilostat.ilo.org/methods/concepts-and-definitions/ilo-modelled-estimates/).
   description_key_national_estimates: |-
-    This data includes only nationally reported observations from surveys and censuses. Given different methodologies and definitions used by countries, this data is not internationally comparable.
+    This data includes only nationally reported observations from surveys and censuses. Due to the varying methodologies and definitions employed by countries, this data is not internationally comparable.
   description_key_13th_icls: |-
-    This data is classified according to the 13th International Classification of Labour Statistics (ICLS), where employment includes anyone engaged for at least one hour per day in production of goods and services, even for own use by the household or family, volunteering, or other forms of unpaid work. For more information, please refer to the [this explainer by the International Labour Organization](https://www.ilo.org/publications/quick-guide-understanding-impact-new-statistical-standards-ilostat).
+    This data is classified according to the 13th International Classification of Labour Statistics (ICLS), where employment includes anyone engaged for at least one hour per day in the production of goods and services, even for own use by the household or family, volunteering, or other forms of unpaid work. For more information, please refer to [this explainer by the International Labour Organization](https://www.ilo.org/publications/quick-guide-understanding-impact-new-statistical-standards-ilostat).
   description_key_own_account_workers: |-
     _Own-account workers_ are defined as workers working on self-employment jobs who do not engage any employees to work with them.
   description_key_contributing_family_workers: |-

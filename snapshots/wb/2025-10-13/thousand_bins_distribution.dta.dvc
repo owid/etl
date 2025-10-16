@@ -1,0 +1,25 @@
+meta:
+  origin:
+    producer: Mahler, Yonzan and Lakner
+    title: 1000 Binned Global Distribution
+    description: |-
+      This dataset contains a distribution of global welfare for the years 1990 to 2025. For each year, the dataset contains 1000 welfare (income or consumption) bins per country. The dataset reports the following variables: code—ISO 3-letter country code, World Bank regions, regionpcn—[regional classification](https://datanalytics.worldbank.org/PIP-Methodology/lineupestimates.html#regionsandcountries) previously used in PIP, quantile—rank of the bin with 1 being the lowest welfare bin and 1000 the highest welfare bin, welf—average daily household per capita welfare values of each bin in 2021 PPP USD, and pop—population of the bin in millions. The welfare values are based on [lineup methodology](https://datanalytics.worldbank.org/PIP-Methodology/lineupestimates.html) in PIP.
+
+      Disclaimer:
+
+      The data should not be used in lieu of the full survey data, or in lieu of the poverty and inequality statistics that are estimated directly from the survey data. For these purposes, users should use the estimates available in the Poverty and Inequality Platform (PIP). The poverty and inequality statistics published in PIP are estimated directly from the survey data. For example, the binned database would result in a lower level of within-country inequality, since it does not account for the inequality within each bin.
+    citation_full: |-
+      Mahler, Daniel Gerszon; Yonzan, Nishant; Lakner, Christoph (2022). The Impact of COVID-19 on Global Inequality and Poverty. Policy Research Working Papers; 10198. © World Bank, Washington, DC. https://openknowledge.worldbank.org/entities/publication/54fae299-8800-585f-9f18-a42514f8d83b updated with Poverty and Inequality Platform (September 2025).
+    version_producer: Version 5
+    url_main: https://datacatalog.worldbank.org/search/dataset/0064304
+    url_download: |-
+      https://datacatalogfiles.worldbank.org/ddh-published/0064304/DR0094424/GlobalDist1000bins_1990_20250930_2021_01_02_PROD.dta
+    date_accessed: '2025-10-13'
+    date_published: '2024-06-06'
+    license:
+      name: CC BY 3.0 IGO DEED
+      url: https://datacatalog.worldbank.org/search/dataset/0064304/1000-Binned-Global-Distribution
+outs:
+  - md5: 1655b2ca19d0daac1d3a270a5dc53bde
+    size: 1059487545
+    path: thousand_bins_distribution.dta

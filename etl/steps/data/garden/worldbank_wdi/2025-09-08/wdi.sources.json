@@ -2468,5 +2468,130 @@
     "rawName": "\"International Telecommunication Union, World Telecommunication Development Report and database, and World Bank estimates.\\r\"",
     "name": "International Telecommunication Union, World Telecommunication Development Report and database, and World Bank estimates, via World Bank",
     "dataPublisherSource": ""
+  },
+  {
+    "rawName": "Data API, UN Educational, Scientific and Cultural Organization (UNESCO), uri: https://databrowser.uis.unesco.org/resources, note: The data are obtained through the UIS API.  Detailed documentation is available at: https://api.uis.unesco.org/api/public/documentation/, publisher: UNESCO Institute for Statistics (UIS), type: Bulk file, date accessed: 2025-09-22, date published: 2025-09",
+    "name": "UNESCO UIS Data API, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "Protected Planet: The World Database on Protected Areas (WDPA) and World Database on Other Effective Area-based Conservation Measures (WD-OECM), UN Environment Programme World Conservation Monitoring Centre (UNEP-WCMC), uri: https://www.protectedplanet.net/en, note: Only the latest data can be retrieved from the Protected Planet website. The time series are provided directly to WDI by Protected Planet., publisher: Protected Planet, date accessed: 20240516, date published: 202405;\nInternational Union for Conservation of Nature (IUCN), uri: https://www.protectedplanet.net/en, publisher: Protected Planet, date accessed: 20240516",
+    "name": "Protected Planet WDPA and WD-OECM data, UNEP-WCMC and IUCN, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "UNAIDS estimates, Joint United Nations Programme on HIV/AIDS (UNAIDS), uri: https://aidsinfo.unaids.org/, publisher: UNAIDS, date accessed: 2025-08-27, date published: 2025-07",
+    "name": "UNAIDS estimates, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "AQUASTAT - FAO's Global Information System on Water and Agriculture, Food and Agriculture Organization of the United Nations (FAO), uri: https://data.apps.fao.org/aquastat/, publisher: Food and Agriculture Organization of the United Nations (FAO), date accessed: 20240529",
+    "name": "AQUASTAT - FAO's Global Information System on Water and Agriculture, FAO, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "Data API, UN Educational, Scientific and Cultural Organization (UNESCO), uri: https://databrowser.uis.unesco.org/resources, note: The data are obtained through the UIS API.  Detailed documentation is available at: https://api.uis.unesco.org/api/public/documentation/, publisher: UNESCO Institute for Statistics (UIS), date accessed: 2025-09-22, date published: 2025-09",
+    "name": "UNESCO UIS Data API, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "Protected Planet: The World Database on Protected Areas (WDPA) and World Database on Other Effective Area-based Conservation Measures (WD-OECM), UN Environment Programme World Conservation Monitoring Centre (UNEP-WCMC), uri: https://www.protectedplanet.net/en, publisher: Protected Planet, date accessed: 20240516, date published: 202405;\nInternational Union for Conservation of Nature (IUCN), uri: https://www.protectedplanet.net/en, publisher: Protected Planet, date accessed: 20240516",
+    "name": "Protected Planet WDPA and WD-OECM data, UNEP-WCMC and IUCN, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "IEA Energy Statistics Data Browser, International Energy Agency (IEA), uri: https://www.iea.org/data-and-statistics/data-tools/energy-statistics-data-browser, publisher: International Energy Agency (IEA), date accessed: 2025-03-25",
+    "name": "IEA Energy Statistics Data Browser, IEA, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "International Comparison Program (ICP), World Bank (WB), uri: https://www.worldbank.org/en/programs/icp/data, note: This information is for ICP’s PPPs utilized in WDI, publisher: International Comparison Program (ICP), date accessed: May 30, 2024, date published: May 30, 2024;\nThe Eurostat PPP Programme, Eurostat (ESTAT), uri: https://ec.europa.eu/eurostat/databrowser/explore/all/all_themes, publisher: Eurostat;\nThe OECD PPP Programme, Organisation for Economic Co-operation and Development (OECD), uri: https://data-explorer.oecd.org/, publisher: OECD;\nStaff estimates, World Bank (WB);\nNational Accounts data files, Organisation for Economic Co-operation and Development (OECD);\nWorld Economic Outlook database, International Monetary Fund (IMF)",
+    "name": "ICP data and PPP data (World Bank, Eurostat, OECD, IMF), via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "Women, Business and the Law, World Bank (WB), uri: https://wbl.worldbank.org/en/wbl-data, type: Excel, date accessed: 2024-03-04, date published: 2024-03-04",
+    "name": "Women, Business and the Law, World Bank (WB), via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "UNAIDS estimates, Joint United Nations Programme on HIV/AIDS (UNAIDS), uri: https://aidsinfo.unaids.org/, date accessed: 2025-08-27, date published: 2025-07",
+    "name": "UNAIDS estimates, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "Monthly ranking of women in national parliaments, Inter-Parliamentary Union (IPU), uri: https://data.ipu.org/women-ranking/, note: For the year of 1998, the data is as of August 10, 1998., type: Excel, date accessed: 2024-03-21",
+    "name": "Inter-Parliamentary Union (IPU) monthly ranking of women in national parliaments, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "Stat Bulk Data Download Service, UN Educational, Scientific and Cultural Organization (UNESCO), uri: https://databrowser.uis.unesco.org/resources/bulk, publisher: UNESCO Institute for Statistics (UIS), date accessed: 2025-03-26, date published: 2025-02",
+    "name": "UNESCO UIS Stat Bulk Data Download Service, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "WHO/UNICEF Joint Monitoring Programme (JMP) for Water Supply, Sanitation and Hygiene, World Health Organization (WHO), uri: washdata.org, date accessed: 2023-07-25, date published: 2023-07-06;\nUN Children's Fund (UNICEF), uri: washdata.org, note: WHO/UNICEF Joint Monitoring Programme (JMP) for Water Supply, Sanitation and Hygiene",
+    "name": "WHO/UNICEF JMP for Water, Sanitation and Hygiene, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "Data API, UN Educational, Scientific and Cultural Organization (UNESCO), uri: https://databrowser.uis.unesco.org/resources, note: The data are obtained through the UIS API.  Detailed documentation is available at: https://api.uis.unesco.org/api/public/documentation/, publisher: UNESCO Institute for Statistics (UIS), type: Excel (bulk file), date accessed: 2025-09-22, date published: 2025-09",
+    "name": "UNESCO UIS Data API, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "Low Elevation Coastal Zone (LECZ) Urban-Rural Population and Land Area Estimates, Version 3, Center For International Earth Science Information Network (CIESIN) - Columbia University, uri: https://doi.org/10.7927/d1x1-d702, publisher: NASA Earthdata GIS, date accessed: 202112, date published: 202112;\nCUNY Institute for Demographic Research (CIDR) - City University of New York, uri: https://doi.org/10.7927/d1x1-d702, publisher: NASA Earthdata GIS, date accessed: 202112",
+    "name": "Low Elevation Coastal Zone (LECZ) Urban-Rural Population and Land Area Estimates, NASA Earthdata GIS, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "Global Burden of Disease Study 2021 (GBD 2021) Air Pollution Exposure Estimates 1990-2021, Institute for Health Metrics and Evaluation (IHME), uri: https://ghdx.healthdata.org/record/ihme-data/gbd-2021-air-pollution-exposure-estimates-1990-2021, note: Need to create account to retrieve data., publisher: Institute for Health Metrics and Evaluation (IHME), date accessed: 2024-09-26, date published: 2024-06-06",
+    "name": "Global Burden of Disease Study 2021 (GBD 2021) Air Pollution Exposure Estimates, IHME, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "International Comparison Program (ICP), World Bank (WB), uri: https://www.worldbank.org/en/programs/icp/data, note: This information is for ICP’s PPPs utilized in WDI, publisher: International Comparison Program, date accessed: May 30, 2024, date published: May 30, 2024;\nThe Eurostat PPP Programme, Eurostat (ESTAT), uri: https://ec.europa.eu/eurostat/databrowser/explore/all/all_themes, publisher: Eurostat;\nThe OECD PPP Programme, Organisation for Economic Co-operation and Development (OECD), uri: https://data-https://data-explorer.oecd.org/, publisher: OECD",
+    "name": "ICP data and PPP programs (World Bank, Eurostat, OECD), via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "SDG 7.1.1 Electrification Dataset, World Bank (WB), uri: https://trackingsdg7.esmap.org/downloads, note: Data is downloaded from ESMAP website. Data is released when a new Tracking SDG7 report is released., publisher: World Bank (WB), date accessed: 2024-05-16, date published: 2023",
+    "name": "SDG 7.1.1 Electrification Dataset, World Bank, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "International Migrant Stock, United Nations (UN), publisher: UN Population Division",
+    "name": "International Migrant Stock, United Nations, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "Data API, UN Educational, Scientific and Cultural Organization (UNESCO), uri: https://databrowser.uis.unesco.org/resources, note: The data are obtained through the UIS API.  Detailed documentation is available at: https://api.uis.unesco.org/api/public/documentation/, publisher: UNESCO Institute for Statistics (UIS), type: Bulk file (csv), date accessed: 2025-09-22, date published: 2025-09",
+    "name": "UNESCO Institute for Statistics (UIS) Data API, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "International Comparison Program ( ICP ), World Bank (WB), uri: https://www.worldbank.org/en/programs/icp/data, publisher: International Comparison Program, type: International statistical program, date accessed: May 30, 2024, date published: May 30, 2024;\\nThe Eurostat PPP Programme, Eurostat (ESTAT), uri: https://ec.europa.eu/eurostat/databrowser/explore/all/all_themes, publisher: Eurostat, type: International statistical program;\\nThe OECD PPP Programme, Organisation for Economic Co-operation and Development (OECD), uri: https://data-https://data-explorer.oecd.org/, publisher: OECD",
+    "name": "ICP, Eurostat PPP Programme, OECD PPP Programme, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "International Comparison Program (ICP), World Bank (WB), uri: https://www.worldbank.org/en/programs/icp/data, publisher: International Comparison Program, type: International statistical program, date accessed: May 30, 2024, date published: May 30, 2024;",
+    "name": "International Comparison Program (ICP), World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "The Eurostat PPP Programme, Eurostat (ESTAT), uri: https://ec.europa.eu/eurostat/databrowser/explore/all/all_themes, publisher: Eurostat, type: International statistical program;",
+    "name": "The Eurostat PPP Programme, Eurostat, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "The OECD PPP Programme, Organisation for Economic Co-operation and Development (OECD), uri: https://data-https://data-explorer.oecd.org/, publisher: OECD",
+    "name": "The OECD PPP Programme, OECD, via World Bank",
+    "dataPublisherSource": ""
+  },
+  {
+    "rawName": "International Comparison Program (ICP), World Bank (WB), uri: https://www.worldbank.org/en/programs/icp/data, publisher: International Comparison Program, type: International statistical program, date accessed: May 30, 2024, date published: May 30, 2024;\nThe Eurostat PPP Programme, Eurostat (ESTAT), uri: https://ec.europa.eu/eurostat/databrowser/explore/all/all_themes, publisher: Eurostat, type: International statistical program;\nThe OECD PPP Programme, Organisation for Economic Co-operation and Development (OECD), uri: https://data-https://data-explorer.oecd.org/, publisher: OECD",
+    "name": "ICP, Eurostat PPP Programme, and OECD PPP Programme, via World Bank",
+    "dataPublisherSource": ""
   }
 ]
