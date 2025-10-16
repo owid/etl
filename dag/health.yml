@@ -1283,6 +1283,7 @@ steps:
   #
   data://meadow/health/2025-07-16/drug_approvals:
     - snapshot://fda/2025-07-15/drugs_at_fda_json.zip
+
   data://garden/health/2025-07-16/drug_approvals:
   #  - data://meadow/health/2025-07-16/drug_approvals
     - data://meadow/health/2025-07-16/cder_approvals
@@ -1297,3 +1298,7 @@ steps:
     - snapshot://fda/2025-07-16/purple_book.csv
   data://meadow/health/2025-07-16/orange_book:
     - snapshot://fda/2025-07-16/orange_book.zip
+
+    #anxiety drugs:
+  data://meadow/health/2025-07-16/anxiety_drugs:
+    - snapshot://fda/2025-07-15/drugs_at_fda_json.zip
