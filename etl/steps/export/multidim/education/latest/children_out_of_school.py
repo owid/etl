@@ -373,6 +373,10 @@ def edit_indicator_displays(view):
         "_female": {"name": "Girls", "color": COLOR_GIRLS},
     }
 
+    # Define sort order
+    level_order = ["pre_primary", "primary", "lower_secondary", "upper_secondary"]
+    sex_order = ["_male", "_female"]
+
     for ind in view.indicators.y:
         if view.matches(level="level_side_by_side"):
             for k, config in level_display.items():
@@ -384,3 +388,21 @@ def edit_indicator_displays(view):
                 if k in ind.catalogPath:
                     ind.display = {"name": config["name"], "color": config["color"]}
                     break
+
+    # Sort indicators according to desired order
+    if view.matches(level="level_side_by_side"):
+        view.indicators.y = sorted(
+            view.indicators.y,
+            key=lambda ind: next(
+                (i for i, k in enumerate(level_order) if k in ind.catalogPath),
+                len(level_order),
+            ),
+        )
+    elif view.matches(sex="sex_side_by_side"):
+        view.indicators.y = sorted(
+            view.indicators.y,
+            key=lambda ind: next(
+                (i for i, k in enumerate(sex_order) if k in ind.catalogPath),
+                len(sex_order),
+            ),
+        )
