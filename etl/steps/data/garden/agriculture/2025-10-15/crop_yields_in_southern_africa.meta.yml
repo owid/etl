@@ -6,6 +6,8 @@ definitions:
         - Agricultural Production
     unit: tonnes per hectare
     short_unit: t/ha
+    # NOTE: One could say that the "_adapted" curves have major processing, but we follow the same processing as the authors do in the paper to reproduce the curves in Fig 1.
+    processing_level: minor
 
 dataset:
   update_period_days: 365
@@ -19,3 +21,9 @@ tables:
         title: Crop yields according to MODIS
       yield_sif:
         title: Crop yields according to SIF
+      yield_fao_adapted:
+        title: Crop yields according to FAO, adapted for comparison with MODIS and SIF
+      yield_modis_adapted:
+        title: Crop yields according to MODIS, adapted for comparison with FAO and SIF
+      yield_sif_adapted:
+        title: Crop yields according to SIF, adapted for comparison with FAO and MODIS
