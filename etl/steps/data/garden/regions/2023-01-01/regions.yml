@@ -182,6 +182,7 @@
     - "Congo, Rep."
     - "Congo-Brazzaville"
     - "Republic of Congo"
+    - "Congo (Brazzaville)"
     - "Congo Brazzaville"
 - code: "COK"
   name: "Cook Islands"
@@ -563,6 +564,7 @@
     - "Democratic People's Republic of Korea"
     - "Korea (the Democratic People's Republic of)"
     - "Korea, Dem. People's Rep."
+    - "Korea, North"
     - "Korea, Dem. P.R. of"
 - code: "MKD"
   name: "North Macedonia"
@@ -725,6 +727,7 @@
     - "Korea, Rep."
     - "Korea, Republic Of"
     - "Republic of Korea"
+    - "Korea, South"
     - "Korea (Rep. of)"
 - code: "SSD"
   name: "South Sudan"
@@ -1186,6 +1189,7 @@
     - "Former U.S.S.R."
     - "Former USSR"
     - "Soviet Union"
+    - "Union of Soviet Socialist Repu"
   end_year: 1991
   successors:
     - "ARM"
@@ -1595,6 +1599,7 @@
     - "EU"
     - "EU-27"
     - "EU27"
+    - "European Union"
   members:
     - "AUT"
     - "BEL"
