@@ -223,7 +223,7 @@ def run(live_api: bool) -> None:
     log.warning(
         "This is the headcount ratio series for `World`. Please check if it coincides with the newly published data."
     )
-    print(df_world[df_world["country"] == "World"][["year", "headcount"]])
+    print(df_world[(df_world["country"] == "World") & (df_world["year"] >= 2020)][["year", "headcount"]])
 
     ##########################################################################################
 
