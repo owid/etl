@@ -284,6 +284,18 @@ def edit_indicator_displays(view):
                     indicator.display = {"name": config["name"], "color": config["color"]}
                     break
 
+        # Sort indicators: primary → lower secondary → upper secondary
+        def get_level_index(ind):
+            if "primary" in ind.catalogPath and "lower" not in ind.catalogPath and "upper" not in ind.catalogPath:
+                return 0
+            elif "lower_secondary" in ind.catalogPath:
+                return 1
+            elif "upper_secondary" in ind.catalogPath:
+                return 2
+            return 3
+
+        view.indicators.y = sorted(view.indicators.y, key=get_level_index)
+
     # Handle sex side-by-side views (gender)
     elif view.matches(sex="sex_side_by_side"):
         # Display name and color mappings for gender
