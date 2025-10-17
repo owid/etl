@@ -93,6 +93,17 @@ def run_sanity_checks(df: pd.DataFrame) -> None:
     )
     assert len(aliases_duplicated) == 0, error
 
+    # Sanity check the definitions of Northern and Southern Hemispheres.
+    nh = df[df["name"] == "Northern Hemisphere"]["members"].item()
+    sh = df[df["name"] == "Southern Hemisphere"]["members"].item()
+    countries = df[(df["region_type"] == "country") & (df["defined_by"] == "owid")]["code"].unique().tolist()
+    error = "Overlap between countries in the Northern and Southern Hemispheres."
+    assert set(nh) & set(sh) == set(), error
+    error = "Unexpected countries in the aggregates of the Northern and Southern Hemispheres."
+    assert (set(nh) | set(sh)) - set(countries) == set(), error
+    error = "Northern and Southern Hemispheres do not contain all countries."
+    assert set(countries) - (set(nh) | set(sh)) == set(), error
+
 
 def check_unique_members_within_regions(df: pd.DataFrame) -> None:
     """Check that each region has unique members (no duplicates within each region's members list)."""
