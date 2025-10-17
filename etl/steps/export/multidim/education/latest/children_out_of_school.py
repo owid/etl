@@ -214,7 +214,10 @@ def adjust_dimensions(tb):
 
     tb.metadata.dimensions.extend(
         [
-            {"name": "Education level", "slug": "level"},
+            {
+                "name": "Education level",
+                "slug": "level",
+            },
             {"name": "Gender", "slug": "sex"},
             {"name": "Metric type", "slug": "metric_type"},
         ]
@@ -260,7 +263,7 @@ def create_grouped_views(collection):
             {
                 "dimension": "level",
                 "choice_new_slug": "level_side_by_side",
-                "choices": ["primary", "lower_secondary", "upper_secondary"],
+                "choices": ["pre_primary", "primary", "lower_secondary", "upper_secondary"],
                 "view_config": get_view_config,
                 "view_metadata": view_metadata,
             },
@@ -370,14 +373,60 @@ def edit_indicator_displays(view):
         "_female": {"name": "Girls", "color": COLOR_GIRLS},
     }
 
+    # Define sort order
+    level_order = ["pre_primary", "primary", "lower_secondary", "upper_secondary"]
+    sex_order = ["_male", "_female"]
+
     for ind in view.indicators.y:
         if view.matches(level="level_side_by_side"):
-            for k, config in level_display.items():
-                if k in ind.catalogPath:
-                    ind.display = {"name": config["name"], "color": config["color"]}
-                    break
+            # Check for education level - be specific to avoid substring matching
+            if "one_year_before_the_official_primary_entry_age" in ind.catalogPath:
+                ind.display = {
+                    "name": level_display["pre_primary"]["name"],
+                    "color": level_display["pre_primary"]["color"],
+                }
+            elif "lower_secondary" in ind.catalogPath:
+                ind.display = {
+                    "name": level_display["lower_secondary"]["name"],
+                    "color": level_display["lower_secondary"]["color"],
+                }
+            elif "upper_secondary" in ind.catalogPath:
+                ind.display = {
+                    "name": level_display["upper_secondary"]["name"],
+                    "color": level_display["upper_secondary"]["color"],
+                }
+            elif "primary" in ind.catalogPath:
+                ind.display = {"name": level_display["primary"]["name"], "color": level_display["primary"]["color"]}
         elif view.matches(sex="sex_side_by_side"):
             for k, config in sex_display.items():
                 if k in ind.catalogPath:
                     ind.display = {"name": config["name"], "color": config["color"]}
                     break
+
+    # Sort indicators according to desired order
+    if view.matches(level="level_side_by_side"):
+
+        def get_level_index(ind):
+            # Use specific patterns to avoid substring matching issues
+            if "one_year_before_the_official_primary_entry_age" in ind.catalogPath:
+                return 0  # pre-primary
+            elif "lower_secondary" in ind.catalogPath:
+                return 2
+            elif "upper_secondary" in ind.catalogPath:
+                return 3
+            elif "primary" in ind.catalogPath:
+                return 1
+            return len(level_order)
+
+        # For stacked area charts (number metric), reverse the order
+        metric_type = view.dimensions.get("metric_type", "rate")
+        reverse_order = metric_type == "number"
+        view.indicators.y = sorted(view.indicators.y, key=get_level_index, reverse=reverse_order)
+    elif view.matches(sex="sex_side_by_side"):
+        view.indicators.y = sorted(
+            view.indicators.y,
+            key=lambda ind: next(
+                (i for i, k in enumerate(sex_order) if k in ind.catalogPath),
+                len(sex_order),
+            ),
+        )
