@@ -358,7 +358,35 @@ class Snapshot:
         )
 
     def read_custom(self, read_function: Callable, *args, **kwargs) -> Table:
-        """Read data file using a custom reader function, and return a Table with metadata."""
+        """Read data file using a custom reader function, and return a Table with metadata.
+
+        Use this method when standard read methods (read_csv, read_excel, etc.) don't meet
+        your needs. The custom function receives the snapshot file path and should return
+        a pandas DataFrame or compatible data structure.
+
+        Parameters
+        ----------
+        read_function : Callable
+            Custom function to read the data. Must accept a file path as first argument
+            and return a DataFrame or Table.
+        *args
+            Additional positional arguments to pass to read_function.
+        **kwargs
+            Additional keyword arguments to pass to read_function.
+
+        Returns
+        -------
+        Table
+            Data read by the custom function as a Table with snapshot metadata.
+
+        Examples
+        --------
+        Read a table from an HTML file:
+
+        ```python
+        tb = snap.read_custom(read_function=lambda x: pd.read_html(x))
+        ```
+        """
         return pr.read_custom(
             filepath_or_buffer=self.path,
             read_function=read_function,
