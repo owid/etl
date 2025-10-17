@@ -3,14 +3,14 @@
 from structlog import get_logger
 
 from etl.data_helpers.misc import export_table_to_gsheet, get_team_folder_id
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 log = get_logger()
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -21,7 +21,7 @@ def run(dest_dir: str) -> None:
     tb = ds_garden.read("maternal_mortality", reset_index=True)
     # Export the table to a Google Sheet
     # Can only be run locally, not in prod or staging
-    tb_sel = tb[["country", "year", "mmr", "source"]].copy()
+    tb_sel = tb.loc[:, ["country", "year", "mmr", "source"]].copy()
     tb_sel["mmr"] = tb_sel["mmr"].astype(float).round(2)
     team_folder_id = get_team_folder_id()
     sheet_url, sheet_id = export_table_to_gsheet(
@@ -41,9 +41,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
-    ds_grapher = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_garden.metadata
-    )
+    ds_grapher = paths.create_dataset(tables=[tb], check_variables_metadata=True, default_metadata=ds_garden.metadata)
 
     # Save changes in the new grapher dataset.
     ds_grapher.save()
