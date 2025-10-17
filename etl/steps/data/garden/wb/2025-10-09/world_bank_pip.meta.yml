@@ -163,7 +163,7 @@ definitions:
   description_key_poverty_line: |-
     {macros}
     <% if poverty_line in poverty_line_ipl %>
-    Extreme poverty here is defined as living below the International Poverty Line of {definitions.poverty_line_per_day}.
+    The World Bank defines extreme poverty as living on less than {definitions.poverty_line_per_day}. This threshold, known as the ["International Poverty Line"](#dod:international-poverty-line), is set so that poverty can be compared across countries. This indicator plays an important and successful role in focusing the world's attention on the very poorest people. The UN uses this indicator to track progress towards [ending extreme poverty by 2030](https://ourworldindata.org/sdgs/no-poverty).
     <%- elif poverty_line in poverty_line_lmic %>
     A poverty line of {definitions.poverty_line_per_day} represents definitions of national poverty lines in lower-middle-income countries.
     <%- elif poverty_line in poverty_line_umic %>
@@ -174,10 +174,14 @@ definitions:
     This is a measure of _relative_ poverty – it captures the share of people whose income is low by the standards typical in their own country.
     <%- endif %>
 
-  description_key_ppp: |-
-    The data is measured in international-$ at <<ppp_version>> prices – this adjusts for inflation and for differences in living costs between countries.
+  description_key_extreme_poverty_additional: |-
+    {macros}
+    <% if poverty_line in poverty_line_ipl %>
+    Two centuries ago, most of the world's population was extremely poor. Many believed that widespread poverty was inevitable. But this turned out to be wrong. Economic growth is possible, and poverty can decline. With this poverty line, we can track whether countries are leaving the worst poverty behind.
+    <%- endif %>
 
-  description_key_per_capita: _Per capita_ means that the income of each household is attributed equally to each member of the household (including children).
+  description_key_ppp: |-
+    This data is expressed in constant international dollars to adjust for inflation and differences in living costs between countries. Read more in our article, [What are international dollars?](https://ourworldindata.org/international-dollars)
 
   description_key_welfare_type: |-
     <% if welfare_type == "income" %>
@@ -185,10 +189,10 @@ definitions:
     <%- elif welfare_type == "consumption" %>
     The data relates to consumption per capita. {definitions.description_key_per_capita}
     <%- else %>
-    Depending on the country and year, the data relates to income (measured after taxes and benefits) or to consumption, per capita. {definitions.description_key_per_capita}
+    Depending on the country and year, the data refers either to income (after taxes and benefits) or to consumption, [per capita](#dod:per-capita). We process the data to keep one observation per country and year. Our [Poverty Data Explorer](https://ourworldindata.org/explorers/poverty-explorer?Indicator=Share+in+poverty&Poverty+line=%243+per+day%3A+International+Poverty+Line&Household+survey+data+type=Show+data+from+both+income+and+consumption+surveys&Show+breaks+between+less+comparable+surveys=true&country=ROU~CHN~BLR~PER) shows the original data with *all* available income and consumption measures separately.
     <%- endif %>
 
-  description_key_not_market_income: Non-market sources of income, including food grown by subsistence farmers for their own consumption, are taken into account.
+  description_key_not_market_income: Many people, today and in the past, have no monetary income. This data accounts for this by including the estimated value of non-market income, such as food grown by subsistence farmers for their own use.
 
   description_key_nowcasts: |-
     <% if survey_comparability == "No spells" %>
@@ -197,11 +201,6 @@ definitions:
     <%- else %>
     Country estimates are interpolated and extrapolated up until the year of the data release using GDP growth estimates and forecasts. This data is then used to produce regional and global aggregates available for each year. For more details about the methodology, please refer to the [World Bank PIP documentation](https://datanalytics.worldbank.org/PIP-Methodology/lineupestimates.html).
     <%- endif %>
-    <%- endif %>
-
-  description_key_filled: |-
-    <% if table == "Income or consumption intra/extrapolated" %>
-    Country estimates are interpolated between available surveys and extrapolated until the year of the data release using GDP growth estimates and forecasts. For more details about the methodology, please refer to the [World Bank PIP documentation](https://datanalytics.worldbank.org/PIP-Methodology/lineupestimates.html#nowcasts).
     <%- endif %>
 
   prosperity_gap_threshold: |-
@@ -220,11 +219,11 @@ definitions:
 
   description_processing_main: |-
     <% if survey_comparability != "No spells" or welfare_type == "income or consumption" %>
-    For most countries in the PIP dataset, estimates relate to _either_ disposable income or consumption, for all available years. A number of countries, however, have a mix of income and consumption data points, with both data types sometimes available for particular years.
+    For most countries in the dataset, estimates relate to disposable income or consumption, for all available years. Several countries, however, have a mix of income and consumption data points, with both data types sometimes available for particular years.
 
-    In most of our charts, we present the data with some data points dropped in order to present single series for each country. This allows us to make readable visualizations that combine multiple countries and metrics. In choosing which data points to drop, we try to strike a balance between maintaining comparability over time and showing as long a time series as possible. As such, the exact approach varies somewhat across countries.
+    In most of our charts, we present the data with some data points dropped to present a single series for each country. This allows us to make readable visualizations that combine multiple countries. In choosing which data points to keep, we strike a balance between maintaining comparability over time and showing as long a time series as possible. As such, the exact approach varies across countries.
 
-    If you would like to see the original data with _all_ available income and consumption data points shown separately, you can do so in our [Poverty Data Explorer](https://ourworldindata.org/explorers/poverty-explorer?Indicator=Share+in+poverty&Poverty+line=%2410+per+day&Household+survey+data+type=Show+data+from+both+income+and+consumption+surveys&Show+breaks+between+less+comparable+surveys=true&country=ROU~CHN~BLR~PER).
+    The original data with *all* available income and consumption measures is shown separately in our [Poverty Data Explorer.](https://ourworldindata.org/explorers/poverty-explorer?Indicator=Share+in+poverty&Poverty+line=%243+per+day%3A+International+Poverty+Line&Household+survey+data+type=Show+data+from+both+income+and+consumption+surveys&Show+breaks+between+less+comparable+surveys=true&country=ROU~CHN~BLR~PER)
     <%- elif welfare_type in ["income", "consumption"] %>
     To construct a global dataset, the World Bank combines estimates based on income data and estimates based on consumption data. Here we only include the estimates based on <<welfare_type>> data.
     <%- endif %>
@@ -242,7 +241,7 @@ definitions:
 
   # NOTE: Modify depending on the final data structure
   description_processing_share_90_99: |-
-    The income share of the population between the 90th and 99th percentiles is not directly available in the World Bank PIP API. We calculate the metric by subtracting the share of the population in the 99th percentile (available in the percentile files [provided by the World Bank](https://datacatalog.worldbank.org/search/dataset/0063646/_poverty_and_inequality_platform_pip_percentiles)) from the share of the population in the 90th percentile (available in the API).
+    The income share of the population between the 90th and 99th percentiles is not directly available in the World Bank PIP API. We calculate the metric by subtracting the income share of the richest 1% (available in the percentile files [provided by the World Bank](https://datacatalog.worldbank.org/search/dataset/0063646/_poverty_and_inequality_platform_pip_percentiles)) from the income share of the richest 10% (available in the API).
 
   description_processing_avg: |-
     Income and consumption averages by decile are not directly available in the World Bank PIP API. We calculate the metric by multiplying the share of each decile by the mean income or consumption of the distribution and dividing by the population share of the decile (10%).
@@ -259,7 +258,7 @@ definitions:
     received
     <%- endif %>
 
-  ppp_adjustment_subtitle: This data is adjusted for inflation and for differences in living costs between countries.
+  ppp_adjustment_subtitle: This data is adjusted for inflation and differences in living costs between countries.
 
   ppp_adjustment_note: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at <<ppp_version>> prices.
 
@@ -344,7 +343,7 @@ definitions:
   poverty_line_subtitle: |-
     {macros}
     <% if poverty_line in poverty_line_ipl %>
-    Extreme poverty is defined as living below the International Poverty Line of {definitions.poverty_line_per_day}. {definitions.ppp_adjustment_subtitle}
+    Extreme poverty is defined as living below the [International Poverty Line](#dod:international-poverty-line) of {definitions.poverty_line_per_day}. {definitions.ppp_adjustment_subtitle}
     <%- elif poverty_line in poverty_line_lmic %>
     The poverty line of {definitions.poverty_line_per_day} is set by the World Bank to be representative of the definitions of poverty adopted in lower-middle-income countries. {definitions.ppp_adjustment_subtitle}
     <%- elif poverty_line in poverty_line_umic %>
@@ -358,7 +357,7 @@ definitions:
   total_shortfall_subtitle: |-
     {macros}
     <% if poverty_line in poverty_line_ipl %>
-    This is the amount of money that would be theoretically needed to lift the incomes of all people in extreme poverty up to the International Poverty Line of {definitions.poverty_line_per_day}. {definitions.ppp_adjustment_subtitle}
+    This is the amount of money that would be theoretically needed to lift the incomes of all people in extreme poverty up to the [International Poverty Line](#dod:international-poverty-line) of {definitions.poverty_line_per_day}. {definitions.ppp_adjustment_subtitle}
     <%- elif poverty_line in poverty_line_lmic %>
     This is the amount of money that would be theoretically needed to lift the incomes of all people in poverty up to the lower-middle income poverty line of {definitions.poverty_line_per_day}. {definitions.ppp_adjustment_subtitle}
     <%- elif poverty_line in poverty_line_umic %>
@@ -372,7 +371,7 @@ definitions:
   avg_shortfall_subtitle: |-
     {macros}
     <% if poverty_line in poverty_line_ipl %>
-    This is the amount of money that would be theoretically needed to lift the incomes of all people in extreme poverty up to the International Poverty Line of {definitions.poverty_line_per_day}, averaged across the population in poverty.
+    This is the amount of money that would be theoretically needed to lift the incomes of all people in extreme poverty up to the [International Poverty Line](#dod:international-poverty-line) of {definitions.poverty_line_per_day}, averaged across the population in poverty.
     <%- elif poverty_line in poverty_line_lmic %>
     This is the amount of money that would be theoretically needed to lift the incomes of all people in poverty up to the lower-middle income poverty line of {definitions.poverty_line_per_day}, averaged across the population in poverty.
     <%- elif poverty_line in poverty_line_umic %>
@@ -389,7 +388,7 @@ definitions:
   income_gap_ratio_subtitle: |-
     {macros}
     <% if poverty_line in poverty_line_ipl %>
-    {definitions.income_gap_ratio_subtitle_base} It captures the depth of poverty of those living on less than the International Poverty Line ({definitions.poverty_line_per_day}).
+    {definitions.income_gap_ratio_subtitle_base} It captures the depth of poverty of those living on less than the [International Poverty Line](#dod:international-poverty-line) ({definitions.poverty_line_per_day}).
     <%- elif poverty_line in poverty_line_lmic %>
     {definitions.income_gap_ratio_subtitle_base} It captures the depth of poverty of those living on less than the lower-middle income poverty line ({definitions.poverty_line_per_day}).
     <%- elif poverty_line in poverty_line_umic %>
@@ -628,6 +627,8 @@ definitions:
     - Nigeria
     - Bangladesh
     - Bolivia
+    - Romania
+    - Indonesia
 
   entity_names_inequality: &entity_names_inequality
     - Chile
@@ -693,10 +694,11 @@ tables:
           <%- endif %>
         description_key:
           - "{definitions.description_key_poverty_line}"
+          - "{definitions.description_key_extreme_poverty_additional}"
           - "{definitions.description_key_ppp}"
-          - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_not_market_income}"
           - "{definitions.description_key_nowcasts}"
+          - "{definitions.description_key_welfare_type}"
         description_processing: |-
           {definitions.description_processing_relative_poverty}
           {definitions.description_processing_main}
@@ -740,10 +742,11 @@ tables:
         description_short: Percentage of population living in households with {definitions.description_short_welfare_type} above {definitions.poverty_line_per_day}.
         description_key:
           - "{definitions.description_key_poverty_line}"
+          - "{definitions.description_key_extreme_poverty_additional}"
           - "{definitions.description_key_ppp}"
-          - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_not_market_income}"
           - "{definitions.description_key_nowcasts}"
+          - "{definitions.description_key_welfare_type}"
         description_processing: |-
           {definitions.description_processing_relative_poverty}
           {definitions.description_processing_main}
@@ -761,10 +764,11 @@ tables:
         description_short: Percentage of population living in households with {definitions.description_short_welfare_type} between {definitions.poverty_line_per_day}.
         description_key:
           - "{definitions.description_key_poverty_line}"
+          - "{definitions.description_key_extreme_poverty_additional}"
           - "{definitions.description_key_ppp}"
-          - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_not_market_income}"
           - "{definitions.description_key_nowcasts}"
+          - "{definitions.description_key_welfare_type}"
         description_processing: |-
           {definitions.description_processing_relative_poverty}
           {definitions.description_processing_main}
@@ -785,10 +789,11 @@ tables:
           <%- endif %>
         description_key:
           - "{definitions.description_key_poverty_line}"
+          - "{definitions.description_key_extreme_poverty_additional}"
           - "{definitions.description_key_ppp}"
-          - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_not_market_income}"
           - "{definitions.description_key_nowcasts}"
+          - "{definitions.description_key_welfare_type}"
         description_processing: |-
           {definitions.description_processing_relative_poverty}
           {definitions.description_processing_main}
@@ -832,10 +837,11 @@ tables:
         description_short: Number of people living in households with {definitions.description_short_welfare_type} above {definitions.poverty_line_per_day}.
         description_key:
           - "{definitions.description_key_poverty_line}"
+          - "{definitions.description_key_extreme_poverty_additional}"
           - "{definitions.description_key_ppp}"
-          - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_not_market_income}"
           - "{definitions.description_key_nowcasts}"
+          - "{definitions.description_key_welfare_type}"
         description_processing: |-
           {definitions.description_processing_relative_poverty}
           {definitions.description_processing_main}
@@ -853,10 +859,11 @@ tables:
         description_short: Number of people living in households with {definitions.description_short_welfare_type} between {definitions.poverty_line_per_day}.
         description_key:
           - "{definitions.description_key_poverty_line}"
+          - "{definitions.description_key_extreme_poverty_additional}"
           - "{definitions.description_key_ppp}"
-          - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_not_market_income}"
           - "{definitions.description_key_nowcasts}"
+          - "{definitions.description_key_welfare_type}"
         description_processing: |-
           {definitions.description_processing_relative_poverty}
           {definitions.description_processing_main}
@@ -879,10 +886,11 @@ tables:
           <%- endif %>
         description_key:
           - "{definitions.description_key_poverty_line}"
+          - "{definitions.description_key_extreme_poverty_additional}"
           - "{definitions.description_key_ppp}"
-          - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_not_market_income}"
           - "{definitions.description_key_nowcasts}"
+          - "{definitions.description_key_welfare_type}"
         description_processing: |-
           {definitions.description_processing_relative_poverty}
           {definitions.description_processing_main}
@@ -931,10 +939,11 @@ tables:
           <%- endif %>
         description_key:
           - "{definitions.description_key_poverty_line}"
+          - "{definitions.description_key_extreme_poverty_additional}"
           - "{definitions.description_key_ppp}"
-          - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_not_market_income}"
           - "{definitions.description_key_nowcasts}"
+          - "{definitions.description_key_welfare_type}"
         description_processing: |-
           {definitions.description_processing_relative_poverty}
           {definitions.description_processing_main}
@@ -977,10 +986,11 @@ tables:
           This is the average shortfall expressed as a share of the poverty line, sometimes called the _income gap ratio_. It captures the depth of poverty of those living on less than {definitions.poverty_line_per_day}.
         description_key:
           - "{definitions.description_key_poverty_line}"
+          - "{definitions.description_key_extreme_poverty_additional}"
           - "{definitions.description_key_ppp}"
-          - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_not_market_income}"
           - "{definitions.description_key_nowcasts}"
+          - "{definitions.description_key_welfare_type}"
         description_processing: |-
           {definitions.description_processing_relative_poverty}
           {definitions.description_processing_main}
@@ -1022,10 +1032,11 @@ tables:
         description_short: The poverty gap index is a poverty measure that reflects both the prevalence and the depth of poverty. It is calculated as the share of population in poverty multiplied by the average shortfall from the poverty line (expressed as a % of the poverty line).
         description_key:
           - "{definitions.description_key_poverty_line}"
+          - "{definitions.description_key_extreme_poverty_additional}"
           - "{definitions.description_key_ppp}"
-          - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_not_market_income}"
           - "{definitions.description_key_nowcasts}"
+          - "{definitions.description_key_welfare_type}"
         description_processing: |-
           {definitions.description_processing_relative_poverty}
           {definitions.description_processing_main}
@@ -1069,10 +1080,11 @@ tables:
         description_short: This is the mean across the population of the proportionate poverty gaps, as measured by the log of the ratio of the poverty line to income, where the mean is formed over the whole population, counting the nonpoor as having a zero poverty gap.
         description_key:
           - "{definitions.description_key_poverty_line}"
+          - "{definitions.description_key_extreme_poverty_additional}"
           - "{definitions.description_key_ppp}"
-          - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_not_market_income}"
           - "{definitions.description_key_nowcasts}"
+          - "{definitions.description_key_welfare_type}"
         description_processing: |-
           {definitions.description_processing_relative_poverty}
           {definitions.description_processing_main}
@@ -1102,10 +1114,11 @@ tables:
         description_short: This is calculated as the square of the income gap ratio, the average shortfall expressed as a share of the poverty line.
         description_key:
           - "{definitions.description_key_poverty_line}"
+          - "{definitions.description_key_extreme_poverty_additional}"
           - "{definitions.description_key_ppp}"
-          - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_not_market_income}"
           - "{definitions.description_key_nowcasts}"
+          - "{definitions.description_key_welfare_type}"
         description_processing: |-
           {definitions.description_processing_relative_poverty}
           {definitions.description_processing_main}
@@ -1130,12 +1143,12 @@ tables:
         title: Societal poverty line (<<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: international-$ in <<ppp_version>> prices
         short_unit: $
-        description_short: The Societal Poverty Line (SPL) is defined to account for national definitions of poverty around the world. The SPL is the International Poverty Line when the national median is sufficiently low and it grows as the median income or consumption grows.
+        description_short: The Societal Poverty Line (SPL) is defined to account for national definitions of poverty around the world. The SPL is the [International Poverty Line](#dod:international-poverty-line) when the national median is sufficiently low and it grows as the median income or consumption grows.
         description_key:
           - "{definitions.description_key_ppp}"
-          - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_not_market_income}"
           - "{definitions.description_key_nowcasts}"
+          - "{definitions.description_key_welfare_type}"
         description_processing: |-
           {definitions.description_processing_main}
         display:
@@ -1167,9 +1180,9 @@ tables:
           <%- endif %>
         description_key:
           - "{definitions.description_key_ppp}"
-          - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_not_market_income}"
           - "{definitions.description_key_nowcasts}"
+          - "{definitions.description_key_welfare_type}"
         description_processing: |-
           {definitions.description_processing_main}
         description_from_producer: |-
@@ -1197,9 +1210,9 @@ tables:
         description_key:
           - "{definitions.description_key_prosperity_gap}"
           - "{definitions.description_key_ppp}"
-          - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_not_market_income}"
           - "{definitions.description_key_nowcasts}"
+          - "{definitions.description_key_welfare_type}"
         description_processing: |-
           {definitions.description_processing_main}
         description_from_producer: |-
