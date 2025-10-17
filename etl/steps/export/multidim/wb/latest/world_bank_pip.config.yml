@@ -39,17 +39,17 @@ definitions:
   color_1000_to_inf_simplified: &color_1000_to_inf_simplified "#2C7BB6"
 
   extreme_poverty_subtitle: Extreme poverty is defined as living below the [International Poverty Line](#dod:international-poverty-line) of $3 per day.
-  lmic_poverty_line_subtitle: The poverty line of $4.20 a day is set by the World Bank to be representative of the definitions of poverty adopted in lower-middle-income countries.
-  umic_poverty_line_subtitle: The poverty line of $8.30 a day is set by the World Bank to be representative of the definitions of poverty adopted in upper-middle-income countries.
+  lmic_poverty_line_subtitle: The poverty line of $4.20 per day is set by the World Bank to be representative of the definitions of poverty adopted in lower-middle-income countries.
+  umic_poverty_line_subtitle: The poverty line of $8.30 per day is set by the World Bank to be representative of the definitions of poverty adopted in upper-middle-income countries.
 
   spells_subtitle: The chart shows breaks in the comparability of the underlying household survey data over time within each country individually.
 
   ppp_adjustment_subtitle: This data is adjusted for inflation and differences in living costs between countries.
   ppp_adjustment_welfare_type_note: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2021 prices. Depending on the country and year, it relates to income (measured after taxes and benefits) or to consumption, [per capita](#dod:per-capita).
 
-  description_key_extreme_poverty: The World Bank defines extreme poverty as living on less than {definitions.poverty_line_per_day}. This threshold, known as the ["International Poverty Line"](#dod:international-poverty-line), is set so that poverty can be compared across countries. This indicator plays an important and successful role in focusing the world's attention on the very poorest people. The UN uses this indicator to track progress towards [ending extreme poverty by 2030](https://ourworldindata.org/sdgs/no-poverty).
-  description_key_lmic_poverty_line: A poverty line of $4.20 a day represents definitions of national poverty lines in lower-middle-income countries.
-  description_key_umic_poverty_line: A poverty line of $8.30 a day represents definitions of national poverty lines in upper-middle-income countries.
+  description_key_extreme_poverty: The World Bank defines extreme poverty as living on less than $3 per day. This threshold, known as the ["International Poverty Line"](#dod:international-poverty-line), is set so that poverty can be compared across countries. This indicator plays an important and successful role in focusing the world's attention on the very poorest people. The UN uses this indicator to track progress towards [ending extreme poverty by 2030](https://ourworldindata.org/sdgs/no-poverty).
+  description_key_lmic_poverty_line: A poverty line of $4.20 per day represents definitions of national poverty lines in lower-middle-income countries.
+  description_key_umic_poverty_line: A poverty line of $8.30 per day represents definitions of national poverty lines in upper-middle-income countries.
 
   description_key_extreme_poverty_additional: |-
     Two centuries ago, most of the world's population was extremely poor. Many believed that widespread poverty was inevitable. But this turned out to be wrong. Economic growth is possible, and poverty can decline. With this poverty line, we can track whether countries are leaving the worst poverty behind.
