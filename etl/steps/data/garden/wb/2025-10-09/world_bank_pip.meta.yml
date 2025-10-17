@@ -185,9 +185,9 @@ definitions:
 
   description_key_welfare_type: |-
     <% if welfare_type == "income" %>
-    The data relates to income measured after taxes and benefits per capita. {definitions.description_key_per_capita}
+    The data relates to income measured after taxes and benefits [per capita](#dod:per-capita).
     <%- elif welfare_type == "consumption" %>
-    The data relates to consumption per capita. {definitions.description_key_per_capita}
+    The data relates to consumption [per capita](#dod:per-capita).
     <%- else %>
     Depending on the country and year, the data refers either to income (after taxes and benefits) or to consumption, [per capita](#dod:per-capita). We process the data to keep one observation per country and year. Our [Poverty Data Explorer](https://ourworldindata.org/explorers/poverty-explorer?Indicator=Share+in+poverty&Poverty+line=%243+per+day%3A+International+Poverty+Line&Household+survey+data+type=Show+data+from+both+income+and+consumption+surveys&Show+breaks+between+less+comparable+surveys=true&country=ROU~CHN~BLR~PER) shows the original data with *all* available income and consumption measures separately.
     <%- endif %>
