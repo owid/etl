@@ -384,7 +384,7 @@ class Snapshot:
         Read a table from an HTML file:
 
         ```python
-        tb = snap.read_custom(read_function=lambda x: pd.read_html(x))
+        tb = snap.read_custom(read_function=lambda x: pd.read_html(x)[0])
         ```
         """
         return pr.read_custom(
