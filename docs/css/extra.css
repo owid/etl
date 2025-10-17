@@ -73,3 +73,70 @@ div.highlight pre span.gp {
 /* .md-typeset p {
     font-size: 1em;
 } */
+
+/* --- OWID: code to allow expanding and collapsing code blocks --- */
+
+.md-typeset .jp-Cell-inputWrapper {
+  display: block !important;        /* drop the grid that reserves a left column */
+}
+
+.md-typeset .jp-Collapser,
+.md-typeset .jp-InputPrompt {
+  display: none !important;         /* hide collapser + prompt elements */
+}
+
+.md-typeset .jp-InputArea {
+  margin-left: 0 !important;        /* ensure code starts flush with content */
+}
+
+/* (nbsphinx/legacy structure fallback, harmless if unused) */
+.md-typeset .nbinput .prompt { display: none !important; }
+.md-typeset .nbinput .input_area { margin-left: 0 !important; }
+
+/* --- OWID: tidy notebook code toggles ------------------------ */
+.md-typeset .owid-toggle-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: .25rem 0 .5rem;
+  color: var(--md-default-fg-color--light);
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  font-size: 0.8em;
+}
+
+.md-typeset .owid-toggle-btn::before {
+  content: "▸";
+  display: inline-block;
+  font-size: 1.15em;
+  line-height: 1;
+  transform: rotate(0deg);
+  transition: transform .15s ease-in-out;
+}
+
+.md-typeset .owid-toggle-btn[aria-expanded="true"]::before {
+  transform: rotate(90deg);
+}
+
+.md-typeset .owid-collapsed {
+  display: none !important;
+}
+
+.md-typeset .celltoolbar {
+  display: none !important;
+}
+
+.cell-tag,
+.jp-Tag {
+  display: none !important;
+}
+
+/* Optional: accessibility nicety */
+@media (prefers-reduced-motion: reduce) {
+  .md-typeset .owid-toggle-btn::before {
+    transition: none;
+  }
+}
