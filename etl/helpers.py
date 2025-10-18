@@ -370,6 +370,7 @@ class PathFinder:
                 ds_income_groups=ds_income_groups,
                 ds_population=ds_population,
                 countries_file=self.country_mapping_path,
+                excluded_countries_file=self.excluded_countries_path if self.excluded_countries_path.exists() else None,
                 auto_load_datasets=False,
             )
         return self._regions
