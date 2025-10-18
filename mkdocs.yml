@@ -135,12 +135,12 @@ markdown_extensions:
 # Plugins
 plugins:
       - mkdocs-jupyter:
-              ignore_h1_titles: True
-              include_source: True
-              execute: False
-              allow_errors: False
-              show_input: True
-              include_requirejs: True
+              ignore_h1_titles: true
+              include_source: true
+              execute: false
+              allow_errors: false
+              show_input: true
+              include_requirejs: true
               included: ["*.py", "*.ipynb"]
       # The built-in search plugin integrates seamlessly with Material for MkDocs, adding multilingual client-side search with lunr and lunr-languages. ref: https://squidfunk.github.io/mkdocs-material/setup/setting-up-site-search/#built-in-search-plugin
       - search
@@ -176,6 +176,7 @@ extra_css:
 extra_javascript:
       - https://unpkg.com/tablesort@5.3.0/dist/tablesort.min.js
       - javascripts/tablesort.js
+      - javascripts/cell-toggles.js
 
 # Custom home page
 home:
