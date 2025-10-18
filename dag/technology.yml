@@ -1,4 +1,10 @@
 steps:
+  # Epoch AI - Biological sequence database growth
+  data://meadow/biotech/2025-09-09/epoch_database_growth:
+  - snapshot://biotech/2025-09-09/epoch_database_growth.xlsx
+  data://garden/biotech/2025-09-09/epoch_database_growth:
+    - data://meadow/biotech/2025-09-09/epoch_database_growth
+
   # Global mobile money dataset (GSMA)
   data://meadow/technology/2024-05-30/mobile_money:
     - snapshot://technology/2024-05-30/mobile_money.xlsx
