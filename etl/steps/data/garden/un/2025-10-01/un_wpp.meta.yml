@@ -1,0 +1,68 @@
+definitions:
+  global:
+    projections: |-
+      <% if (variant is defined) and (variant != 'estimates') -%>
+      Projections from 2024 onwards are based on the UN's << variant >> scenario.
+      <%- endif -%>
+    dimensions:
+      title: |-
+        <% if sex == 'all' and age == 'all' and variant == 'estimates' %>
+        total
+        <%- else %>
+        <%- if sex != 'all' %>
+         << sex >>s<% if age != 'all' or variant != 'estimates' %>, <%endif %>
+        <%- endif %>
+        <%- if age == '0' %>
+        at birth<% if variant != 'estimates' %>, <%endif %>
+        <%- elif '-' in age|string or '+' in age|string %>
+        ages << age >><%- if variant != 'estimates' %>, <%endif %>
+        <%- elif age != 'all' %>
+        age << age >><%- if variant != 'estimates' %>, <%endif %>
+        <%- endif %>
+        <%- if variant != 'estimates' %>
+        << variant >> projection
+        <%- endif %>
+        <%- endif %>
+      description_short: |-
+        <% if not (sex == 'all' and age == 'all') %>
+        This only includes
+        <%- if sex == 'all' %>
+         individuals<%- else %> << sex >>s<%- endif %>
+        <%- if age == '0' %> at birth<%- elif age != 'all' %> aged << age >><%- endif %>.
+        <%- endif %> {definitions.global.projections}
+
+      description_short_births: |-
+        <% if sex is defined %>
+        <% if not (sex == 'all' and age == 'all') %>
+        This only includes
+        <%- if sex != 'all' %>
+         << sex >> babies<% if age != 'all' %>, and<% endif %>
+        <%- endif %>
+        <%- if age != 'all' %>
+         mothers aged << age >>
+        <%- endif %>.
+        <%- endif %>
+        <%- endif %> {definitions.global.projections}
+
+  common:
+    presentation:
+      attribution_short: UN WPP
+      # title_variant: "{definitions.global.dimensions}"
+      grapher_config:
+        subtitle: "{definitions.global.projections}"
+        originUrl: "https://ourworldindata.org/population-growth"
+
+# this metadata file is not used in garden step, but in grapher step
+tables:
+  population:
+    variables:
+      population:
+        title: Population
+        unit: people
+        description_short: |-
+          De facto total population in a country, area or region as of 1 July of the year indicated. {definitions.global.dimensions.description_short}
+        presentation:
+          title_public: |-
+            Population, {definitions.global.dimensions.title}
+          grapher_config:
+            note: "Values as of 1 July of the indicated year."
