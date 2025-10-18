@@ -1,6 +1,6 @@
 This is the methodology for the data analysis used in our article "[Does the news reflect what we die from?](https://ourworldindata.org/does-the-news-reflect-what-we-die-from)".
 
-You can also browse the [code for the analysis](media_deaths_analysis.ipynb) or download a stand-alone package including methodology, code and intermediate and final data files [here](https://catalog.owid.io/analyses/media-deaths-analysis.zip) (direct download).
+You can also browse the [code for the analysis](media_deaths_analysis.ipynb) or download a stand-alone package including methodology, code and intermediate and final data files [here](https://catalog.owid.io/analyses/media-deaths-analysis-data.zip) (direct download).
 
 In case of questions, you can reach out to [tuna.acisu@ourworldindata.org](mailto:tuna.acisu@ourworldindata.org?subject=Media%20Mentions%20of%20Causes%20of%20Death).
 

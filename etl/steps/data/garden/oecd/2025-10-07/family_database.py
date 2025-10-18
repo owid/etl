@@ -3,13 +3,13 @@
 import owid.catalog.processing as pr
 
 from etl.data_helpers import geo
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -139,7 +139,7 @@ def run(dest_dir: str) -> None:
         tb_births_combined.format(["country", "year"], short_name="births_outside_marriage"),
         tb_children_in_families.format(["country", "year", "indicator"]),
     ]
-    ds_garden = create_dataset(dest_dir, tables=tables, check_variables_metadata=True)
+    ds_garden = paths.create_dataset(tables=tables, check_variables_metadata=True)
 
     # Save the dataset
     ds_garden.save()

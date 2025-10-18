@@ -4,7 +4,7 @@ from datetime import datetime
 
 import pandas as pd
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -24,7 +24,7 @@ def get_year_columns(tb, start_year=2001):
     return year_cols
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -89,7 +89,7 @@ def run(dest_dir: str) -> None:
     tb = tb.format(["country", "year", "indicator"])
 
     # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=snap.metadata)
+    ds_meadow = paths.create_dataset(tables=[tb], check_variables_metadata=True, default_metadata=snap.metadata)
 
     # Save changes in the new meadow dataset.
     ds_meadow.save()

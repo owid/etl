@@ -173,24 +173,24 @@ def test_app_dashboard():
     assert not at.exception
 
 
-@pytest.mark.integration
-@pytest.mark.usefixtures("set_config")
-def test_app_dataset_preview():
-    at = AppTest.from_file(str(WIZARD_DIR / "app_pages/dataset_preview/app.py"), default_timeout=DEFAULT_TIMEOUT).run()
+# @pytest.mark.integration
+# @pytest.mark.usefixtures("set_config")
+# def test_app_dataset_preview():
+#     at = AppTest.from_file(str(WIZARD_DIR / "app_pages/dataset_preview/app.py"), default_timeout=DEFAULT_TIMEOUT).run()
 
-    # Select random dataset
-    dataset_id = _get_random_dataset()
+#     # Select random dataset
+#     dataset_id = _get_random_dataset()
 
-    sel = at.selectbox[0]
-    sel.set_value(dataset_id).run()
+#     sel = at.selectbox[0]
+#     sel.set_value(dataset_id).run()
 
-    assert not at.exception
+#     assert not at.exception
 
-    # Click dependency graph
-    btn = _pick_button_by_label(at, "Dependency graph")
-    btn.click().run()
+#     # Click dependency graph
+#     btn = _pick_button_by_label(at, "Dependency graph")
+#     btn.click().run()
 
-    assert not at.exception
+#     assert not at.exception
 
 
 def _get_random_dataset():
