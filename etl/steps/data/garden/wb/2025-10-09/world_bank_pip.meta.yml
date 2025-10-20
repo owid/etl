@@ -149,10 +149,10 @@ definitions:
     <%- endif %>
 
   table: |-
-    <% if table == "Income or consumption" %>
-    <<table>> (<<welfare_type>>)
-    <%- else %>
+    <% if table not in ["Income or consumption consolidated", "Income or consumption intra/extrapolated"] %>
     <<table>>
+    <%- elif table == "Income or consumption intra/extrapolated" %>
+    Inter/extrapolated
     <%- endif %>
 
   survey_comparability: |-

@@ -191,7 +191,7 @@ def run() -> None:
     tb = make_cpi_not_depending_on_ppp(tb=tb)
 
     # Separate out consumption-only, income-only. Also, create a table with both income and consumption
-    tb, tb_inc_or_cons_smooth = inc_or_cons_data(tb=tb)
+    tb, tb_inc_or_cons_complete, tb_inc_or_cons_smooth = inc_or_cons_data(tb=tb)
 
     # Create survey count dataset, by counting the number of surveys available for each country in the past decade
     tb_inc_or_cons_smooth = survey_count(tb=tb_inc_or_cons_smooth)
@@ -206,6 +206,7 @@ def run() -> None:
 
     # Drop columns not needed
     tb = drop_columns(tb)
+    tb_inc_or_cons_complete = drop_columns(tb_inc_or_cons_complete)
 
     # Make empty values of survey_comparability to "No spells"
     tb["survey_comparability"] = tb["survey_comparability"].astype(str)
@@ -218,6 +219,10 @@ def run() -> None:
     tb = tb.format(
         ["country", "year", "ppp_version", "poverty_line", "welfare_type", "decile", "table", "survey_comparability"],
     )
+    tb_inc_or_cons_complete = tb_inc_or_cons_complete.format(
+        ["country", "year", "ppp_version", "poverty_line", "welfare_type", "decile"],
+        short_name="full_dataset_without_smoothing",
+    )
     tb_percentiles = tb_percentiles.format(
         ["country", "year", "ppp_version", "welfare_type", "reporting_level", "percentile"],
     )
@@ -227,7 +232,7 @@ def run() -> None:
     #
     # Initialize a new garden dataset.
     ds_garden = paths.create_dataset(
-        tables=[tb, tb_percentiles],
+        tables=[tb, tb_inc_or_cons_complete, tb_percentiles],
         default_metadata=ds_meadow.metadata,
     )
 
@@ -961,7 +966,6 @@ def inc_or_cons_data(tb: Table) -> Tuple[Table, Table]:
     # Add the column table, identifying the type of table to use in Grapher
     tb_inc_spells["table"] = "Income with spells"
     tb_cons_spells["table"] = "Consumption with spells"
-    tb_no_spells["table"] = "Income or consumption"
     tb_inc_no_spells["table"] = "Income"
     tb_cons_no_spells["table"] = "Consumption"
     tb_no_spells_smooth["table"] = "Income or consumption consolidated"
@@ -979,7 +983,6 @@ def inc_or_cons_data(tb: Table) -> Tuple[Table, Table]:
         [
             tb_inc_spells,
             tb_cons_spells,
-            tb_no_spells,
             tb_inc_no_spells,
             tb_cons_no_spells,
             tb_filled,
@@ -989,9 +992,10 @@ def inc_or_cons_data(tb: Table) -> Tuple[Table, Table]:
 
     # Remove filled column
     tb = tb.drop(columns=["filled"], errors="raise")
+    tb_no_spells = tb_no_spells.drop(columns=["filled"], errors="raise")
     tb_no_spells_smooth = tb_no_spells_smooth.drop(columns=["filled"], errors="raise")
 
-    return tb, tb_no_spells_smooth
+    return tb, tb_no_spells, tb_no_spells_smooth
 
 
 def create_smooth_inc_cons_series(tb: Table) -> Table:
