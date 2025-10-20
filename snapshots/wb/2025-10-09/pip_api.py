@@ -40,7 +40,7 @@ When the code finishes, you will have the following files in the cache folder:
 Copy these files to this folder and run in the terminal:
     python snapshots/wb/{version}/world_bank_pip.py --path-to-file snapshots/wb/{version}/world_bank_pip.csv
     python snapshots/wb/{version}/world_bank_pip_percentiles.py --path-to-file snapshots/wb/{version}/world_bank_pip_percentiles.csv
-    python snapshots/wb/{version}/world_bank_pip_regions.py --path-to-file snapshots/wb/{version}/world_bank_pip_percentiles.csv
+    python snapshots/wb/{version}/world_bank_pip_regions.py --path-to-file snapshots/wb/{version}/world_bank_pip_regions.csv
 
 You can delete the files after this.
 

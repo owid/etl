@@ -14,6 +14,6 @@ meta:
       name: CC0
       url: https://datacatalog.worldbank.org/search/dataset/0063646
 outs:
-  - md5: f2ce4607b05065a6e2dd9192882a31ff
-    size: 8532
+  - md5: 6a21231cbf5d4d71611847c5ee0e27ca
+    size: 8835
     path: world_bank_pip_regions.csv
