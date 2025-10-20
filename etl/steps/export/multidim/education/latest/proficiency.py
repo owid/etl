@@ -449,6 +449,7 @@ def edit_indicator_displays(view):
                 if level_key in indicator.catalogPath:
                     indicator.display = {"name": config["name"], "color": config["color"]}
                     break
+
         elif view.matches(subject="subject_side_by_side"):
             for subject_key, config in display_config["subject"].items():
                 if subject_key in indicator.catalogPath:
@@ -459,3 +460,15 @@ def edit_indicator_displays(view):
                 if gender_key in indicator.catalogPath:
                     indicator.display = {"name": config["name"], "color": config["color"]}
                     break
+
+    # Sort indicators for level_side_by_side: primary → lower secondary
+    if view.matches(level="level_side_by_side"):
+
+        def get_level_index(ind):
+            if "primary" in ind.catalogPath and "lower" not in ind.catalogPath:
+                return 0
+            elif "lower_secondary" in ind.catalogPath:
+                return 1
+            return 2
+
+        view.indicators.y = sorted(view.indicators.y, key=get_level_index)
