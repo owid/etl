@@ -1779,7 +1779,7 @@ def add_relative_poverty_and_decile_thresholds(df, df_relative, df_percentiles, 
 
     # Make tb_percentile wide, with percentile as columns
     df_percentiles = df_percentiles.pivot(
-        index=["ppp_version", "country", "year", "reporting_level", "welfare_type"],
+        index=["ppp_version", "country", "country_code", "year", "reporting_level", "welfare_type"],
         columns="percentile",
         values="thr",
     )
@@ -1794,7 +1794,7 @@ def add_relative_poverty_and_decile_thresholds(df, df_relative, df_percentiles, 
     df = pd.merge(
         df,
         df_percentiles,
-        on=["ppp_version", "country", "year", "reporting_level", "welfare_type"],
+        on=["ppp_version", "country", "country_code", "year", "reporting_level", "welfare_type"],
         how="left",
     )
 

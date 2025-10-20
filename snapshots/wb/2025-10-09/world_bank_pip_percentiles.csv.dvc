@@ -17,6 +17,6 @@ meta:
       name: CC0
       url: https://datacatalog.worldbank.org/search/dataset/0063646/_poverty_and_inequality_platform_pip_percentiles
 outs:
-  - md5: 1894df88068c095ab7062d9449a12aa8
-    size: 61242480
+  - md5: 6600c67009c9dd34af79b035e1aac63e
+    size: 65778688
     path: world_bank_pip_percentiles.csv
