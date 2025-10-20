@@ -4,17 +4,18 @@ This server exposes a tool to search for charts based on keywords and returns
 them as interactive iframes. Uses OWID's real chart data via the existing
 owid_mcp charts module. Uses low-level MCP protocol for ChatGPT App widget support.
 """
+# pyright: reportMissingImports=false
 
 from __future__ import annotations
 
 from functools import lru_cache
 from typing import Any, Dict, List
 
-import mcp.types as types  # type: ignore
-import uvicorn  # type: ignore
-from mcp.server.fastmcp import FastMCP  # type: ignore
-from pydantic import BaseModel, ConfigDict, Field, ValidationError  # type: ignore
-from starlette.middleware.cors import CORSMiddleware  # type: ignore
+import mcp.types as types
+import uvicorn
+from mcp.server.fastmcp import FastMCP
+from pydantic import BaseModel, ConfigDict, Field, ValidationError
+from starlette.middleware.cors import CORSMiddleware
 
 from owid_mcp.data_utils import make_algolia_request
 
