@@ -16,7 +16,7 @@ from mcp.server.fastmcp import FastMCP
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 from starlette.middleware.cors import CORSMiddleware
 
-from owid_mcp.charts import search_chart
+from owid_mcp.data_utils import make_algolia_request
 
 MIME_TYPE = "text/html+skybridge"
 
@@ -272,10 +272,10 @@ async def _call_tool_request(req: types.CallToolRequest) -> types.ServerResult:
             )
         )
 
-    # Search for charts using OWID's search_chart function
-    results = await search_chart(payload.query)
+    # Search for charts using OWID's Algolia API
+    hits = await make_algolia_request(payload.query, limit=10)
 
-    if not results:
+    if not hits:
         return types.ServerResult(
             types.CallToolResult(
                 content=[
@@ -289,10 +289,10 @@ async def _call_tool_request(req: types.CallToolRequest) -> types.ServerResult:
         )
 
     # Get the first result and extract chart info
-    first_result = results[0]
-    chart_url = first_result["url"]
-    chart_title = first_result["title"]
-    chart_slug = first_result["slug"]
+    first_hit = hits[0]
+    chart_slug = first_hit["slug"]
+    chart_title = first_hit.get("title") or chart_slug.replace("-", " ").title()
+    chart_url = f"https://ourworldindata.org/grapher/{chart_slug}"
 
     # Remove .csv extension to get interactive chart URL
     if chart_url.endswith(".csv"):
@@ -301,17 +301,17 @@ async def _call_tool_request(req: types.CallToolRequest) -> types.ServerResult:
     widget_resource = _embedded_widget_resource(chart_slug, chart_title, chart_url)
 
     # Build response text with all results
-    response_text = f"Found {len(results)} chart(s) from Our World in Data:\n\n"
+    response_text = f"Found {len(hits)} chart(s) from Our World in Data:\n\n"
     response_text += f"**{chart_title}**\n"
     response_text += f"[View interactive chart]({chart_url})\n\n"
 
-    if len(results) > 1:
+    if len(hits) > 1:
         response_text += "Other relevant charts:\n"
-        for other_chart in results[1:6]:  # Show up to 5 more
-            other_url = other_chart["url"]
-            if other_url.endswith(".csv"):
-                other_url = other_url[:-4]
-            response_text += f"- [{other_chart['title']}]({other_url})\n"
+        for other_hit in hits[1:6]:  # Show up to 5 more
+            other_slug = other_hit["slug"]
+            other_title = other_hit.get("title") or other_slug.replace("-", " ").title()
+            other_url = f"https://ourworldindata.org/grapher/{other_slug}"
+            response_text += f"- [{other_title}]({other_url})\n"
 
     meta: Dict[str, Any] = {
         "openai.com/widget": widget_resource.model_dump(mode="json"),
