@@ -3,6 +3,11 @@
 This server exposes a tool to search for charts based on keywords and returns
 them as interactive iframes. Uses OWID's real chart data via the existing
 owid_mcp charts module. Uses low-level MCP protocol for ChatGPT App widget support.
+
+NOTE: The code is way more low level that it would typically be. That's because OpenAI
+needs custom _meta fields. Normally we'd use FastMCP's @mcp.tool decorators. Watch out
+for updates to https://github.com/openai/openai-apps-sdk-examples, it's likely this
+code can be simplified in the future.
 """
 
 from functools import lru_cache
