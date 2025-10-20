@@ -6,8 +6,11 @@ definitions:
         - Agricultural Production
     unit: tonnes per hectare
     short_unit: t/ha
-    # NOTE: One could say that the "_adapted" curves have major processing, but we follow the same processing as the authors do in the paper to reproduce the curves in Fig 1.
-    processing_level: minor
+    processing_level: major
+  description_processing_shifting: |-
+    In Southern Hemisphere countries, corn planting and harvesting occur in different calendar years. Satellite data reflects the growing season, while data from official statistics (like FAO) is reported by harvest year. To make satellite data refer to the same crop as FAO data, satellite data is shifted one year forward.
+  description_processing_rescaling: |-
+    The series was rescaled so that its lowest and highest values match those of the FAO yield data for each country, enabling direct comparison of trends.
 
 dataset:
   update_period_days: 365
@@ -22,39 +25,39 @@ tables:
           name: FAO
         presentation:
           title_public: "{tables.crop_yields_in_southern_africa.variables.yield_fao.title}"
+        # FAO data from the paper is neither shifted nor rescaled.
+        processing_level: minor
       yield_modis:
         title: Crop productivity (MODIS satellite)
         display:
           name: MODIS
         presentation:
           title_public: "{tables.crop_yields_in_southern_africa.variables.yield_modis.title}"
+        description_processing: |-
+          {definitions.description_processing_shifting}
       yield_sif:
         title: Crop productivity (SIF satellite)
         display:
           name: SIF
         presentation:
           title_public: "{tables.crop_yields_in_southern_africa.variables.yield_sif.title}"
-      yield_fao_adapted:
-        title: Corn yields (FAO), aligned for comparison with satellite data
-        display:
-          name: FAO
-        presentation:
-          title_public: "{tables.crop_yields_in_southern_africa.variables.yield_fao_adapted.title}"
         description_processing: |-
-          The data has been shifted one year earlier to align harvest-year data with satellite observations. Although not explicitly mentioned in the paper, this seems to be the approach followed to produce the series of Fig. 1.
-      yield_modis_adapted:
+          {definitions.description_processing_shifting}
+      yield_modis_rescaled:
         title: Crop productivity (MODIS), rescaled for comparison with FAO data
         display:
           name: MODIS
         presentation:
-          title_public: "{tables.crop_yields_in_southern_africa.variables.yield_modis_adapted.title}"
+          title_public: "{tables.crop_yields_in_southern_africa.variables.yield_modis_rescaled.title}"
         description_processing: |-
-          The series was rescaled so that its lowest and highest values match those of the FAO yield data for each country, enabling direct comparison of trends.
-      yield_sif_adapted:
+          - {definitions.description_processing_shifting}
+          - {definitions.description_processing_rescaling}
+      yield_sif_rescaled:
         title: Crop productivity (SIF), rescaled for comparison with FAO data
         display:
           name: SIF
         presentation:
-          title_public: "{tables.crop_yields_in_southern_africa.variables.yield_sif_adapted.title}"
+          title_public: "{tables.crop_yields_in_southern_africa.variables.yield_sif_rescaled.title}"
         description_processing: |-
-          The series was rescaled so that its lowest and highest values match those of the FAO yield data for each country, enabling direct comparison of trends.
+          - {definitions.description_processing_shifting}
+          - {definitions.description_processing_rescaling}

@@ -35,7 +35,8 @@ def adapt_and_combine_tables(tb_fao, tb_modis, tb_sif):
     assert set(tb_fao["unit"]) == {"100 g/ha"}, "Unexpected units"
     assert set(tb_fao["flag"]) == {"Official figure", "Estimated value"}, "Unexpected flags"
     # Prepare FAO data.
-    # There are two items in FAO data, namely "Maize (corn)" and "Green corn (maize)". For now, use one of them.
+    # There are two items in FAO data, namely "Maize (corn)" and "Green corn (maize)".
+    # For now, use one of them (namely "Maize (corn)", which seems to be the one reported in Fig 1).
     tb_fao = tb_fao[(tb_fao["item"] == "Maize (corn)")][["country", "year", "yield"]].reset_index(drop=True)
     # Convert FAOSTAT yield units from 100 g/ha to tonnes/ha.
     tb_fao["yield"] /= 10000
@@ -53,35 +54,10 @@ def adapt_and_combine_tables(tb_fao, tb_modis, tb_sif):
     return tb
 
 
-def add_columns_for_rescaled_yield(tb):
-    # In the paper, the MODIS and SIF time series for each country are rescaled using a linear transformation so that their minimum and maximum values matched those of the corresponding FAO maize yields, enabling direct visual comparison of trends across datasets.
-    # Additionally, the FAO yield data is shifted one year earlier; I suppose they do this to align harvest-year statistics with the satellite observations from the preceding growing season.
-    tb_fao_shifted = tb[["country", "year", "yield_fao"]].rename(columns={"yield_fao": "yield_fao_adapted"}).copy()
-    tb_fao_shifted["year"] -= 1
-    tb = tb.merge(tb_fao_shifted, on=["country", "year"], how="outer")
-    for country, group in tb.groupby("country"):
-        # Find absolute minimum and maximum of each source, for the current country.
-        fao_min, fao_max = group["yield_fao"].min(), group["yield_fao"].max()
-        modis_min, modis_max = group["yield_modis"].min(), group["yield_modis"].max()
-        sif_min, sif_max = group["yield_sif"].min(), group["yield_sif"].max()
-        # Rescale MODIS and SIF so that their minimum and maxima coincide with those of FAO.
-        tb.loc[tb["country"] == country, "yield_modis_adapted"] = fao_min + (group["yield_modis"] - modis_min) * (
-            fao_max - fao_min
-        ) / (modis_max - modis_min)
-        tb.loc[tb["country"] == country, "yield_sif_adapted"] = fao_min + (group["yield_sif"] - sif_min) * (
-            fao_max - fao_min
-        ) / (sif_max - sif_min)
-    # Add metadata to the newly created columns.
-    tb["yield_modis_adapted"] = tb["yield_modis_adapted"].copy_metadata(tb["yield_modis"])
-    tb["yield_sif_adapted"] = tb["yield_sif_adapted"].copy_metadata(tb["yield_sif"])
-
-    return tb
-
-
 def plot_curves(tb):
     import plotly.express as px
 
-    plot = tb[["country", "year", "yield_fao_adapted", "yield_modis_adapted", "yield_sif_adapted"]].melt(
+    plot = tb[["country", "year", "yield_fao", "yield_modis_rescaled", "yield_sif_rescaled"]].melt(
         id_vars=["country", "year"]
     )
     for country in sorted(set(plot["country"])):
@@ -92,11 +68,47 @@ def plot_curves(tb):
             color="variable",
             title=country,
             color_discrete_map={
-                "yield_fao_adapted": "red",
-                "yield_sif_adapted": "green",
-                "yield_modis_adapted": "blue",
+                "yield_fao": "red",
+                "yield_sif_rescaled": "green",
+                "yield_modis_rescaled": "blue",
             },
         ).show()
+
+
+def shift_satellite_data(tb):
+    """Shift satellite data one year forward, to align with FAO's way of reporting data by harvesting year.
+
+    Corn grows in spring and is harvested in autumn. For countries in the Northern Hemisphere, both events happen during the same calendar year. However, for countries in the Souther Hemisphere, harvesting happens the following year. Given that FAOSTAT reports by harvesting year, we shift satellite data for countries in the Southern Hemisphere one year forward. This way, satellite and FAOSTAT data refer to the same crop season.
+
+    NOTE: This seems to be the approach followed by the authors of the paper to compare satellite with FAO data, as shown in Fig 1.
+    """
+    tb_satellite = tb[["country", "year", "yield_modis", "yield_sif"]].copy()
+    tb_satellite["year"] += 1
+    tb = tb.drop(columns=["yield_modis", "yield_sif"]).merge(tb_satellite, on=["country", "year"], how="outer")
+
+    return tb
+
+
+def add_rescaled_columns(tb):
+    # In the paper, the MODIS and SIF time series for each country are rescaled using a linear transformation so that their minimum and maximum values matched those of the corresponding FAO maize yields, enabling direct visual comparison of trends across datasets.
+    # Add columns of yield rescaled to be able to compare them (as done for Fig 1 of the paper).
+    for country, group in tb.groupby("country"):
+        # Find absolute minimum and maximum of each source, for the current country.
+        fao_min, fao_max = group["yield_fao"].min(), group["yield_fao"].max()
+        modis_min, modis_max = group["yield_modis"].min(), group["yield_modis"].max()
+        sif_min, sif_max = group["yield_sif"].min(), group["yield_sif"].max()
+        # Rescale MODIS and SIF so that their minimum and maxima coincide with those of FAO.
+        tb.loc[tb["country"] == country, "yield_modis_rescaled"] = fao_min + (group["yield_modis"] - modis_min) * (
+            fao_max - fao_min
+        ) / (modis_max - modis_min)
+        tb.loc[tb["country"] == country, "yield_sif_rescaled"] = fao_min + (group["yield_sif"] - sif_min) * (
+            fao_max - fao_min
+        ) / (sif_max - sif_min)
+    # Add metadata to the newly created columns.
+    tb["yield_modis_rescaled"] = tb["yield_modis_rescaled"].copy_metadata(tb["yield_modis"])
+    tb["yield_sif_rescaled"] = tb["yield_sif_rescaled"].copy_metadata(tb["yield_sif"])
+
+    return tb
 
 
 def run() -> None:
@@ -128,8 +140,11 @@ def run() -> None:
     # Create one column per source.
     tb = tb.pivot(index=["country", "year"], columns=["source"], values="yield", join_column_levels_with="_")
 
-    # Add columns of yield rescaled to be able to compare them (as done for Fig 1 of the paper).
-    tb = add_columns_for_rescaled_yield(tb=tb)
+    # Shift satellite data one year forward, to align with FAO's way of reporting data by harvesting year.
+    tb = shift_satellite_data(tb=tb)
+
+    # To be able to reproduce the curves in Fig 1 of the paper, we need to add rescaled columns of satellite data.
+    tb = add_rescaled_columns(tb=tb)
 
     # DEBUG: Uncomment to plot curves similar to those in Fig 1 of the paper.
     # plot_curves(tb=tb)
