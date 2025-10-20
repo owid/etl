@@ -4,9 +4,6 @@ This server exposes a tool to search for charts based on keywords and returns
 them as interactive iframes. Uses OWID's real chart data via the existing
 owid_mcp charts module. Uses low-level MCP protocol for ChatGPT App widget support.
 """
-# pyright: reportMissingImports=false
-
-from __future__ import annotations
 
 from functools import lru_cache
 from typing import Any, Dict, List
@@ -168,7 +165,7 @@ def _embedded_widget_resource(chart_slug: str, chart_title: str, chart_url: str)
             uri=WIDGET_TEMPLATE_URI,
             mimeType=MIME_TYPE,
             text=_generate_chart_widget_html(chart_slug, chart_title, chart_url),
-            title=WIDGET_TITLE,
+            title=WIDGET_TITLE,  # type: ignore
         ),
     )
 
@@ -185,7 +182,7 @@ async def _list_tools() -> List[types.Tool]:
             annotations={
                 "destructiveHint": False,
                 "openWorldHint": False,
-                "readOnlyHint": True,
+                "readOnlyHint": True,  # type: ignore
             },
         )
     ]
@@ -197,7 +194,7 @@ async def _list_resources() -> List[types.Resource]:
         types.Resource(
             name=WIDGET_TITLE,
             title=WIDGET_TITLE,
-            uri=WIDGET_TEMPLATE_URI,
+            uri=WIDGET_TEMPLATE_URI,  # type: ignore
             description="OWID chart viewer widget for displaying data visualizations",
             mimeType=MIME_TYPE,
             _meta=_tool_meta(),
@@ -233,14 +230,14 @@ async def _handle_read_resource(req: types.ReadResourceRequest) -> types.ServerR
     default_title = "GDP per capita"
     contents = [
         types.TextResourceContents(
-            uri=WIDGET_TEMPLATE_URI,
+            uri=WIDGET_TEMPLATE_URI,  # type: ignore
             mimeType=MIME_TYPE,
             text=_generate_chart_widget_html("gdp-per-capita-worldbank", default_title, default_url),
             _meta=_tool_meta(),
         )
     ]
 
-    return types.ServerResult(types.ReadResourceResult(contents=contents))
+    return types.ServerResult(types.ReadResourceResult(contents=contents))  # type: ignore
 
 
 async def _call_tool_request(req: types.CallToolRequest) -> types.ServerResult:

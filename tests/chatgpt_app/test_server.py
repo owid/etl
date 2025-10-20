@@ -1,5 +1,5 @@
 """Tests for the ChatGPT App MCP server."""
-# pyright: reportMissingImports=false
+# pyright: reportAttributeAccessIssue=false
 
 import mcp.types as types
 import pytest
@@ -10,7 +10,7 @@ from chatgpt_app.server import _call_tool_request, _list_tools
 @pytest.mark.asyncio
 async def test_list_tools():
     """Test that the server lists the search-charts tool."""
-    tools = await _list_tools()
+    tools = await _list_tools()  # type: ignore
     assert len(tools) == 1
     assert tools[0].name == "search-charts"
     assert tools[0].inputSchema["required"] == ["query"]
