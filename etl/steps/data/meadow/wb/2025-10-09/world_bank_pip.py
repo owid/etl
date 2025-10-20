@@ -5,6 +5,17 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Define old PIP regions, which will be phased out in future versions of the API
+OLD_REGIONS = [
+    "EAP",
+    "ECA",
+    "LAC",
+    "MNA",
+    "OHI",
+    "SAR",
+    "SSA",
+]
+
 
 def run() -> None:
     #
@@ -32,6 +43,9 @@ def run() -> None:
     tb["welfare_type"] = tb["welfare_type"].astype("string")
     tb_percentiles["reporting_level"] = tb_percentiles["reporting_level"].astype("string")
     tb_percentiles["welfare_type"] = tb_percentiles["welfare_type"].astype("string")
+
+    # Drop old regions in tb
+    tb = tb[~tb["country"].isin(OLD_REGIONS)].reset_index(drop=True)
 
     # Set index and sort
     tb = tb.format(["ppp_version", "filled", "poverty_line", "country", "year", "reporting_level", "welfare_type"])
