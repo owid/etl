@@ -182,6 +182,17 @@ INTERNATIONAL_POVERTY_LINE_CURRENT = INTERNATIONAL_POVERTY_LINES[PPP_VERSIONS[1]
 POV_LINES_COUNTRIES = poverty_lines_countries()
 POV_LINES_REGIONS = poverty_lines_regions()
 
+# Define old PIP regions, which will be phased out in future versions of the API
+OLD_REGIONS = [
+    "EAP",
+    "ECA",
+    "LAC",
+    "MNA",
+    "OHI",
+    "SAR",
+    "SSA",
+]
+
 # # DEBUGGING
 # PPP_VERSIONS = [2021]
 # POV_LINES_COUNTRIES = [1, 1000, 25000, 50000]
@@ -1317,7 +1328,7 @@ def generate_relative_poverty(wb_api: WB_API):
             pov_severity_list = []
             watts_list = []
             for i in range(len(df)):
-                if ~np.isnan(df["median"].iloc[i]):
+                if ~np.isnan(df["median"].iloc[i]) and df.iloc[i]["country_code"] not in OLD_REGIONS:
                     if country_or_region == "country":
                         # Here I check if the file exists even after the original extraction. If it does, I read it. If not, I start the queries again.
                         file_path = f"{CACHE_DIR}/pip_country_data/pip_country_{df.iloc[i]['country_code']}_year_{df.iloc[i]['year']}_povline_{int(round(df.iloc[i]['median'] * pct))}_welfare_{df.iloc[i]['welfare_type']}_rep_{df.iloc[i]['reporting_level']}_fillgaps_{FILL_GAPS}_ppp_{PPP_VERSIONS[1]}.csv"
