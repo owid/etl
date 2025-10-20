@@ -1,7 +1,7 @@
 """Tests for the ChatGPT App MCP server."""
 
-import mcp.types as types
-import pytest
+import mcp.types as types  # type: ignore
+import pytest  # type: ignore
 
 from chatgpt_app.server import _call_tool_request, _list_tools
 

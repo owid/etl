@@ -10,11 +10,11 @@ from __future__ import annotations
 from functools import lru_cache
 from typing import Any, Dict, List
 
-import mcp.types as types
-import uvicorn
-from mcp.server.fastmcp import FastMCP
-from pydantic import BaseModel, ConfigDict, Field, ValidationError
-from starlette.middleware.cors import CORSMiddleware
+import mcp.types as types  # type: ignore
+import uvicorn  # type: ignore
+from mcp.server.fastmcp import FastMCP  # type: ignore
+from pydantic import BaseModel, ConfigDict, Field, ValidationError  # type: ignore
+from starlette.middleware.cors import CORSMiddleware  # type: ignore
 
 from owid_mcp.data_utils import make_algolia_request
 
