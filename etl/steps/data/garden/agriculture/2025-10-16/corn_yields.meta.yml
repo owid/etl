@@ -6,7 +6,7 @@ definitions:
         - Agricultural Production
     unit: tonnes per hectare
     short_unit: t/ha
-    processing_level: minor
+    processing_level: major
 
 dataset:
   update_period_days: 365
@@ -17,3 +17,5 @@ tables:
       yield:
         title: Corn yields
         description_short: Measured in tonnes per hectare.
+        description_processing: |-
+          USDA data are reported in year pairs (e.g. 2020/2021, 2021/2022), representing the marketing year. For countries in the Northern Hemisphere, we use the first year in the pair, since planting, harvesting, and marketing all occur within the same calendar year. For countries in the Southern Hemisphere, we use the second year, since harvesting takes place in the following calendar year. This approach aligns the data with FAO's reporting, which is based on the harvest year.

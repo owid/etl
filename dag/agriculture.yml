@@ -221,6 +221,7 @@ steps:
   #
   data://garden/agriculture/2025-10-16/corn_yields:
     - data://meadow/agriculture/2025-10-16/corn_yields
+    - data://garden/regions/2023-01-01/regions
   #
   # USDA/FAS - Corn yields
   #
