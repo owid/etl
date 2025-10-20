@@ -1733,6 +1733,7 @@ def add_relative_poverty_and_decile_thresholds(df, df_relative, df_percentiles, 
         df_relative[
             [
                 "country",
+                "country_code",
                 "year",
                 "reporting_level",
                 "welfare_type",
@@ -1750,7 +1751,7 @@ def add_relative_poverty_and_decile_thresholds(df, df_relative, df_percentiles, 
                 "watts_60_median",
             ]
         ],
-        on=["country", "year", "reporting_level", "welfare_type"],
+        on=["country", "country_code", "year", "reporting_level", "welfare_type"],
         how="left",
     )
 
