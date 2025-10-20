@@ -8,7 +8,7 @@ from owid.catalog import Table
 from structlog import get_logger
 
 from etl.data_helpers import geo
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 log = get_logger()
 
@@ -18,7 +18,7 @@ paths = PathFinder(__file__)
 CURRENT_YEAR = 2024
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     snap = paths.load_snapshot("guinea_worm_cases.csv")
@@ -75,9 +75,7 @@ def run(dest_dir: str) -> None:
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
     # Do not check variables metadata, as this is added in grapher step
-    ds_garden = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=False, default_metadata=ds_garden.metadata
-    )
+    ds_garden = paths.create_dataset(tables=[tb], check_variables_metadata=False, default_metadata=ds_garden.metadata)
 
     # Save changes in the new garden dataset
     ds_garden.save()
