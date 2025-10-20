@@ -45,7 +45,7 @@ def run() -> None:
     tb_percentiles["welfare_type"] = tb_percentiles["welfare_type"].astype("string")
 
     # Drop old regions in tb
-    tb = tb[~tb["country"].isin(OLD_REGIONS)].reset_index(drop=True)
+    tb = tb[~tb["country_code"].isin(OLD_REGIONS)].reset_index(drop=True)
 
     # Set index and sort
     tb = tb.format(["ppp_version", "filled", "poverty_line", "country", "year", "reporting_level", "welfare_type"])
