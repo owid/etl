@@ -854,7 +854,7 @@ def calculate_percentile(p, df):
     df_closest = (
         df.sort_values("distance_to_p")
         .groupby(
-            ["ppp_version", "country", "year", "reporting_level", "welfare_type"],
+            ["ppp_version", "country", "country_code", "year", "reporting_level", "welfare_type"],
             as_index=False,
             sort=False,
             dropna=False,  # This is to avoid dropping rows with NaNs (reporting_level and welfare_type for regions)
@@ -866,6 +866,7 @@ def calculate_percentile(p, df):
         [
             "ppp_version",
             "country",
+            "country_code",
             "year",
             "reporting_level",
             "welfare_type",
@@ -961,13 +962,29 @@ def generate_consolidated_percentiles(df, wb_api: WB_API):
 
         # Drop duplicates. Keep the second one (the official one)
         df_percentiles = df_percentiles.drop_duplicates(
-            subset=["ppp_version", "country", "year", "reporting_level", "welfare_type", "target_percentile"],
+            subset=[
+                "ppp_version",
+                "country",
+                "country_code",
+                "year",
+                "reporting_level",
+                "welfare_type",
+                "target_percentile",
+            ],
             keep="last",
         )
 
         # Sort by ppp_version, country, year, reporting_level, welfare_type and target_percentile
         df_percentiles = df_percentiles.sort_values(
-            by=["ppp_version", "country", "year", "reporting_level", "welfare_type", "target_percentile"]
+            by=[
+                "ppp_version",
+                "country",
+                "country_code",
+                "year",
+                "reporting_level",
+                "welfare_type",
+                "target_percentile",
+            ]
         )
 
         # Save to csv
@@ -976,8 +993,8 @@ def generate_consolidated_percentiles(df, wb_api: WB_API):
     # SANITY CHECKS
     df_percentiles = sanity_checks(df_percentiles)
 
-    # Drop distance_to_p, estimated_percentile, country_code
-    df_percentiles = df_percentiles.drop(columns=["distance_to_p", "estimated_percentile", "country_code"])
+    # Drop distance_to_p, estimated_percentile
+    df_percentiles = df_percentiles.drop(columns=["distance_to_p", "estimated_percentile"])
 
     # Rename target_percentile to percentile
     df_percentiles = df_percentiles.rename(columns={"target_percentile": "percentile"})
