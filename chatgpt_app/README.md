@@ -2,6 +2,8 @@
 
 This is a specialized MCP server for ChatGPT Apps that provides access to Our World in Data charts with widget support. It uses the OpenAI Apps SDK MCP protocol to display interactive chart visualizations directly in ChatGPT.
 
+Inspired by https://github.com/openai/openai-apps-sdk-examples
+
 ## Features
 
 - **Chart Search**: Search for OWID charts by keywords (e.g., "population density", "CO2 emissions")

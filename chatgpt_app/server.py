@@ -11,8 +11,10 @@ from functools import lru_cache
 from typing import Any, Dict, List
 
 import mcp.types as types
+import uvicorn
 from mcp.server.fastmcp import FastMCP
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
+from starlette.middleware.cors import CORSMiddleware
 
 from owid_mcp.charts import search_chart
 
@@ -344,21 +346,14 @@ mcp._mcp_server.request_handlers[types.ReadResourceRequest] = _handle_read_resou
 
 app = mcp.streamable_http_app()
 
-try:
-    from starlette.middleware.cors import CORSMiddleware
-
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=["*"],
-        allow_methods=["*"],
-        allow_headers=["*"],
-        allow_credentials=False,
-    )
-except Exception:
-    pass
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+    allow_credentials=False,
+)
 
 
 if __name__ == "__main__":
-    import uvicorn
-
     uvicorn.run("chatgpt_app.server:app", host="0.0.0.0", port=8001)
