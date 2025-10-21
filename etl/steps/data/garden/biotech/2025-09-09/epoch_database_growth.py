@@ -40,12 +40,24 @@ def run() -> None:
 
     tb_uni_prot["date"] = pd.to_datetime(tb_uni_prot["date"])
 
-    tb_mgnify["date"] = pd.to_datetime(tb_mgnify["date"])
+    tb_mgnify["date"] = pd.to_datetime(tb_mgnify["release"])
 
     tb_alpha_fold["date"] = pd.to_datetime(tb_alpha_fold["release_time"])
 
-    tb_esm_atlas["date"] = pd.to_datetime(tb_esm_atlas["release_date"])
+    tb_esm_atlas["date"] = pd.to_datetime(tb_esm_atlas["release"])
 
+    tables = [
+        tb_uni_prot,
+        tb_mgnify,
+        tb_pdb,
+        tb_alpha_fold,
+        tb_esm_atlas,
+        tb_ena,
+        tb_gb_all,
+        tb_gb_traditional,
+        tb_ddbj,
+        tb_refseq,
+    ]
     #
     # Save outputs.
     #
