@@ -30,10 +30,6 @@ def run() -> None:
     snap_percentiles = paths.load_snapshot("world_bank_pip_percentiles.csv")
     tb_percentiles = snap_percentiles.read(safe_types=False)
 
-    # For regional definitions
-    snap_regions = paths.load_snapshot("world_bank_pip_regions.csv")
-    tb_regions = snap_regions.read(safe_types=False)
-
     #
     # Process data.
     #
@@ -53,14 +49,13 @@ def run() -> None:
     tb_percentiles = tb_percentiles.format(
         ["ppp_version", "country", "year", "reporting_level", "welfare_type", "percentile"]
     )
-    tb_regions = tb_regions.format(["country", "year"])
 
     #
     # Save outputs.
     #
     # Create a new meadow dataset with the same metadata as the snapshot.
     ds_meadow = paths.create_dataset(
-        tables=[tb, tb_percentiles, tb_regions], check_variables_metadata=True, default_metadata=snap.metadata
+        tables=[tb, tb_percentiles], check_variables_metadata=True, default_metadata=snap.metadata
     )
 
     # Save changes in the new garden dataset.

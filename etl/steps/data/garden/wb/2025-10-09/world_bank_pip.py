@@ -41,15 +41,15 @@ PRECISION_PERCENTAGE = 0.1
 
 # Define regions in the dataset
 REGIONS_LIST = [
-    "East Asia and Pacific (PIP)",
-    "Eastern and Southern Africa (PIP)",
-    "Europe and Central Asia (PIP)",
-    "Latin America and the Caribbean (PIP)",
-    "Middle East and North Africa (PIP)",
-    "Other high income countries (PIP)",
-    "South Asia (PIP)",
-    "Sub-Saharan Africa (PIP)",
-    "Western and Central Africa (PIP)",
+    "East Asia and Pacific (WB)",
+    "Eastern and Southern Africa (WB)",
+    "Europe and Central Asia (WB)",
+    "Latin America and Caribbean (WB)",
+    "Middle East, North Africa, Afghanistan and Pakistan (WB)",
+    "North America (WB)",
+    "South Asia (WB)",
+    "Sub-Saharan Africa (WB)",
+    "Western and Central Africa (WB)",
     "World",
     "World (excluding China)",
     "World (excluding India)",
@@ -145,9 +145,6 @@ def run() -> None:
     # Percentiles
     tb_percentiles = ds_meadow.read("world_bank_pip_percentiles")
 
-    # Region definitions
-    tb_region_definitions = ds_meadow.read("world_bank_pip_regions")
-
     #
     # Process data.
     #
@@ -159,7 +156,6 @@ def run() -> None:
     tb_percentiles = geo.harmonize_countries(
         df=tb_percentiles, countries_file=paths.country_mapping_path, warn_on_unused_countries=False
     )
-    tb_region_definitions = harmonize_region_name(tb=tb_region_definitions)
 
     # Make share a percentage in tb_percentiles
     tb_percentiles["share"] *= 100
@@ -196,11 +192,6 @@ def run() -> None:
     # Create survey count dataset, by counting the number of surveys available for each country in the past decade
     tb_inc_or_cons_smooth = survey_count(tb=tb_inc_or_cons_smooth)
 
-    # Add region definitions
-    tb_inc_or_cons_smooth = add_region_definitions(
-        tb=tb_inc_or_cons_smooth, tb_region_definitions=tb_region_definitions
-    )
-
     # Concatenate the final table
     tb = pr.concat([tb, tb_inc_or_cons_smooth], ignore_index=True)
 
@@ -221,7 +212,7 @@ def run() -> None:
     )
     tb_inc_or_cons_complete = tb_inc_or_cons_complete.format(
         ["country", "year", "ppp_version", "poverty_line", "welfare_type", "decile"],
-        short_name="full_dataset_without_smoothing",
+        short_name="world_bank_pip_complete_series",
     )
     tb_percentiles = tb_percentiles.format(
         ["country", "year", "ppp_version", "welfare_type", "reporting_level", "percentile"],
@@ -368,24 +359,6 @@ def calculate_inequality_indicators(tb: Table) -> Table:
 
     # Replace infinite values with nulls
     tb = tb.replace([np.inf, -np.inf], pd.NA)
-
-    return tb
-
-
-def harmonize_region_name(tb: Table) -> Table:
-    """
-    Harmonize country and region_name in tb_region_definitions, using the harmonizing tool, but removing the (PIP) suffix
-    """
-
-    tb = tb.copy()
-
-    for country_col in ["country", "region_name"]:
-        tb = geo.harmonize_countries(
-            df=tb, country_col=country_col, countries_file=paths.country_mapping_path, warn_on_unused_countries=False
-        )
-
-    # Remove (PIP) from region_name
-    tb["region_name"] = tb["region_name"].str.replace(r" \(PIP\)", "", regex=True)
 
     return tb
 
@@ -1332,45 +1305,6 @@ def drop_columns(tb: Table) -> Table:
             "pop_in_poverty",
         ],
         errors="raise",
-    )
-
-    return tb
-
-
-def add_region_definitions(tb: Table, tb_region_definitions: Table) -> Table:
-    """
-    Add region definitions to the main table
-    """
-
-    tb_base = tb.copy()
-
-    ipl_current = INTERNATIONAL_POVERTY_LINES[list(INTERNATIONAL_POVERTY_LINES.keys())[1]]
-
-    # Filter for the current value
-    tb_base = tb_base[tb_base["poverty_line"] == ipl_current].reset_index(drop=True)
-
-    # Define ppp_version and poverty_line columns, empty
-    tb_base["ppp_version"] = pd.NA
-    tb_base["poverty_line"] = pd.NA
-
-    # Do the same with tb_region_definitions
-    tb_region_definitions["welfare_type"] = "income or consumption"
-    tb_region_definitions["table"] = "Income or consumption consolidated"
-
-    # Merge with original table
-    tb_base = pr.merge(
-        tb_base,
-        tb_region_definitions,
-        on=["country", "year", "welfare_type", "table"],
-        how="outer",
-    )
-
-    # Now merge with tb
-    tb = pr.merge(
-        tb,
-        tb_base[["country", "year", "welfare_type", "ppp_version", "poverty_line", "table", "region_name"]],
-        on=["country", "year", "welfare_type", "ppp_version", "poverty_line", "table"],
-        how="outer",
     )
 
     return tb

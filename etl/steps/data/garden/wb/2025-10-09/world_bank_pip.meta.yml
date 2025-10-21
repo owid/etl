@@ -2028,30 +2028,6 @@ tables:
           numDecimalPlaces: 0
           <<: *common_display
 
-      region_name:
-        title: World Bank PIP region{definitions.short_title}
-        unit: ""
-        short_unit: ""
-        description_short: Regions of the world as defined by the World Bank Poverty and Inequality Platform (PIP).
-        description_key:
-          - The regions employed by the World Bank PIP differ from the regional groupings used by the World Bank in other contexts.
-          - Some economies, mostly high-income economies, are excluded from the geographical regions and are included as a separate group referred to as _other high income_ (or _industrialized economies_ or _rest of the world_ in earlier publications).
-        description_processing: |-
-          {definitions.description_processing_main}
-        type: ordinal
-        sort:
-          - Latin America and the Caribbean
-          - Sub-Saharan Africa
-          - Middle East and North Africa
-          - Europe and Central Asia
-          - South Asia
-          - East Asia and Pacific
-          - Other high income countries
-        display:
-          name: World Bank PIP region
-          numDecimalPlaces: 0
-          <<: *common_display
-
   world_bank_pip_percentiles:
     variables:
       avg:

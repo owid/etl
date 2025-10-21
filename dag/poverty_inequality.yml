@@ -7,7 +7,6 @@ steps:
 
   # World Bank Poverty and Inequality Platform
   data://meadow/wb/2025-10-09/world_bank_pip:
-    - snapshot://wb/2025-10-09/world_bank_pip_regions.csv
     - snapshot://wb/2025-10-09/world_bank_pip.csv
     - snapshot://wb/2025-10-09/world_bank_pip_percentiles.csv
   # Dimensional PIP pipeline

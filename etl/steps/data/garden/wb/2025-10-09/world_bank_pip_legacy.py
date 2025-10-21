@@ -122,9 +122,6 @@ def run() -> None:
     # Percentiles
     tb_percentiles = ds_meadow.read("world_bank_pip_percentiles")
 
-    # Region definitions
-    tb_region_definitions = ds_meadow.read("world_bank_pip_regions")
-
     # Process data
     # Make table wide and change column names
     tb = process_data(tb)
@@ -137,7 +134,6 @@ def run() -> None:
     tb_percentiles = geo.harmonize_countries(
         df=tb_percentiles, countries_file=paths.country_mapping_path, warn_on_unused_countries=False
     )
-    tb_region_definitions = harmonize_region_name(tb=tb_region_definitions)
 
     # Make share a percentage in tb_percentiles
     tb_percentiles["share"] *= 100
@@ -193,11 +189,6 @@ def run() -> None:
 
     # Create survey count dataset, by counting the number of surveys available for each country in the past decade
     tb_inc_or_cons_ppp_current = survey_count(tb_inc_or_cons_ppp_current)
-
-    # Add region definitions
-    tb_inc_or_cons_ppp_current = add_region_definitions(
-        tb=tb_inc_or_cons_ppp_current, tb_region_definitions=tb_region_definitions
-    )
 
     # Add metadata by code
     tb_inc_ppp_old = add_metadata_vars(tb_garden=tb_inc_ppp_old, ppp_version=PPP_YEAR_OLD, welfare_type="income")
@@ -1421,24 +1412,6 @@ def regional_data_from_1990(tb: Table, regions_list: list) -> Table:
 
     # Concatenate both tables
     tb = pr.concat([tb, tb_regions], ignore_index=True)
-    return tb
-
-
-def harmonize_region_name(tb: Table) -> Table:
-    """
-    Harmonize country and region_name in tb_region_definitions, using the harmonizing tool, but removing the (PIP) suffix
-    """
-
-    tb = tb.copy()
-
-    for country_col in ["country", "region_name"]:
-        tb = geo.harmonize_countries(
-            df=tb, country_col=country_col, countries_file=paths.country_mapping_path, warn_on_unused_countries=False
-        )
-
-    # Remove (PIP) from region_name
-    tb["region_name"] = tb["region_name"].str.replace(r" \(PIP\)", "", regex=True)
-
     return tb
 
 
