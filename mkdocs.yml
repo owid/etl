@@ -165,7 +165,7 @@ plugins:
       - tags:
               tags_file: tags.md
       # When the privacy plugin is activated, plotly charts don't show. So we'll deactivate it.
-      # - privacy:
+      # - privacy
       # ref: https://squidfunk.github.io/mkdocs-material/reference/images/
       - glightbox
 
