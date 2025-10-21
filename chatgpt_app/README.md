@@ -29,7 +29,7 @@ The ChatGPT App server differs from the regular MCP server (`owid_mcp/server.py`
 .venv/bin/python -m chatgpt_app.server
 ```
 
-The server will run on `http://localhost:8081`.
+The server will run on `http://localhost:8001`.
 
 ### Production Deployment
 
@@ -130,7 +130,7 @@ Test the server locally:
 .venv/bin/python -m chatgpt_app.server
 
 # In another terminal, test the endpoints
-curl -X POST http://localhost:8081/mcp \
+curl -X POST http://localhost:8001/mcp \
   -H "Content-Type: application/json" \
   -H "Accept: application/json, text/event-stream" \
   -d '{"jsonrpc": "2.0", "id": 1, "method": "tools/list", "params": {}}'
