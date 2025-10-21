@@ -1,7 +1,7 @@
 meta:
   origin:
     producer: IHME, Global Burden of Disease
-    title: Global Burden of Disease - Deaths and DALYs
+    title: Global Burden of Disease - Treemap data
     description: |-
       The Global Burden of Disease (GBD) study provides a comprehensive assessment of global health trends. This dataset contains the death and DALY counts and rates for 371 diseases and injuries.
     citation_full: |-
@@ -13,7 +13,6 @@ meta:
     license:
       name: Free-of-Charge Non-commercial User Agreement
       url: https://www.healthdata.org/Data-tools-practices/data-practices/ihme-free-charge-non-commercial-user-agreement
-  is_public: false
 outs:
   - md5: cf5b020e3c86cea9f3151010ecfc5bf5
     size: 175042

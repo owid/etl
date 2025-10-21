@@ -13,7 +13,6 @@ definitions:
 
 dataset:
   update_period_days: 1460
-  non_redistributable: true
 tables:
   gbd_treemap:
     dimensions:
