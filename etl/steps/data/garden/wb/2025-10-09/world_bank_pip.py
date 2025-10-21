@@ -477,6 +477,7 @@ def create_stacked_variables(tb: Table) -> Tuple[Table, list, list]:
             "filled",
             "ppp_version",
             "poverty_line",
+            "survey_comparability",
             "headcount_ratio",
             "headcount",
             "reporting_pop",
@@ -486,7 +487,7 @@ def create_stacked_variables(tb: Table) -> Tuple[Table, list, list]:
     # Pivot
     tb_pivot = pivot_table(
         tb=tb_pivot,
-        index=["country", "year", "welfare_type", "filled"],
+        index=["country", "year", "welfare_type", "survey_comparability", "filled"],
         columns=["ppp_version", "poverty_line"],
     )
 
@@ -565,7 +566,7 @@ def create_stacked_variables(tb: Table) -> Tuple[Table, list, list]:
     # Stack table
     tb_pivot = unpivot_table(
         tb=tb_pivot.reset_index(),
-        index=["country", "year", "welfare_type", "filled"],
+        index=["country", "year", "welfare_type", "survey_comparability", "filled"],
         level=["ppp_version", "poverty_line"],
     )
 
@@ -573,7 +574,7 @@ def create_stacked_variables(tb: Table) -> Tuple[Table, list, list]:
     tb = pr.merge(
         tb,
         tb_pivot,
-        on=["country", "year", "welfare_type", "filled", "poverty_line", "ppp_version"],
+        on=["country", "year", "welfare_type", "survey_comparability", "filled", "poverty_line", "ppp_version"],
         how="outer",
     )
 
@@ -1323,7 +1324,7 @@ def make_distributional_indicators_long(tb: Table) -> Table:
     tb_base = tb_base[tb_base["poverty_line"].isin(ipl_list)].reset_index(drop=True)
 
     # Define index columns
-    index_columns = ["country", "year", "welfare_type", "ppp_version", "filled"]
+    index_columns = ["country", "year", "welfare_type", "ppp_version", "survey_comparability", "filled"]
 
     # SHARE
     # Define share columns
@@ -1411,7 +1412,7 @@ def make_relative_poverty_long(tb: Table) -> Table:
     tb_relative = tb_relative[tb_relative["poverty_line"].isin(ipl_list)].reset_index(drop=True)
 
     # Define index columns
-    index_columns = ["country", "year", "welfare_type", "ppp_version", "filled"]
+    index_columns = ["country", "year", "welfare_type", "ppp_version", "survey_comparability", "filled"]
 
     # Define relative poverty columns. They are all the columns that contain "_median"
     rel_pov_columns = [col for col in tb.columns if "_median" in col]
@@ -1464,7 +1465,16 @@ def make_poverty_line_null_for_non_dimensional_indicators(tb: Table) -> Table:
     ].reset_index(drop=True)
 
     # Define index columns
-    index_columns = ["country", "year", "welfare_type", "ppp_version", "filled", "poverty_line", "decile"]
+    index_columns = [
+        "country",
+        "year",
+        "welfare_type",
+        "ppp_version",
+        "survey_comparability",
+        "filled",
+        "poverty_line",
+        "decile",
+    ]
 
     # Select the columns we want
     tb_non_dimensional = tb_non_dimensional[index_columns + INDICATORS_NOT_DEPENDENT_ON_POVLINES_NOR_DECILES]
