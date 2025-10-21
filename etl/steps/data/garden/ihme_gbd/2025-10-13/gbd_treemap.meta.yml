@@ -56,3 +56,4 @@ tables:
             <% if metric == 'Number' %>0<% else %>1<%- endif -%>
           entityAnnotationsMap: |-
             {definitions.annotation}
+          name: << cause >>
