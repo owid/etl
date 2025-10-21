@@ -61,7 +61,7 @@ definitions:
     Depending on the country and year, the data refers either to income (after taxes and benefits) or to consumption, [per capita](#dod:per-capita).
 
   description_key_welfare_type: |-
-    {definitions.description_key_welfare_type_beginning} We process the data to keep one observation per country and year.
+    {definitions.description_key_welfare_type_beginning} For most countries, we have only one option available. But when there is a mix of consumption and income data points, we process the data to keep one observation per country and year.
 
   description_key_not_market_income: Many people, today and in the past, have no monetary income. This data accounts for this by including the estimated value of non-market income, such as food grown by subsistence farmers for their own use.
 
