@@ -12,7 +12,7 @@ paths = PathFinder(__file__)
 REGIONS_MAPPING = {
     "EAS": "East Asia and Pacific",
     "ECS": "Europe and Central Asia",
-    "LCN": "Latin America and the Caribbean",
+    "LCN": "Latin America and Caribbean",
     "MEA": "Middle East, North Africa, Afghanistan and Pakistan",
     "NAC": "North America",
     "SAS": "South Asia",
@@ -22,7 +22,7 @@ REGIONS_MAPPING = {
 REGIONS_MAPPING_OLD = {
     "EAP": "East Asia and Pacific",
     "ECA": "Europe and Central Asia",
-    "LAC": "Latin America and the Caribbean",
+    "LAC": "Latin America and Caribbean",
     "MNA": "Middle East and North Africa",
     "OHI": "Other high income countries",
     "SAR": "South Asia",
