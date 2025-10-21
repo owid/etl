@@ -190,3 +190,17 @@ def edit_indicator_displays(view):
                 if k in ind.catalogPath:
                     ind.display = {"name": config["name"], "color": config["color"]}
                     break
+
+    # Sort indicators for level_side_by_side: primary → secondary → tertiary
+    if view.matches(level="level_side_by_side"):
+
+        def get_level_index(ind):
+            if "primary" in ind.catalogPath and "pre" not in ind.catalogPath:
+                return 0
+            elif "secondary" in ind.catalogPath:
+                return 1
+            elif "tertiary" in ind.catalogPath:
+                return 2
+            return 3
+
+        view.indicators.y = sorted(view.indicators.y, key=get_level_index)
