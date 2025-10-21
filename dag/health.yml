@@ -1339,3 +1339,12 @@ steps:
     - data://garden/wb/2025-07-01/income_groups
   data://grapher/maternal_mortality/2025-09-02/maternal_mortality:
     - data://garden/maternal_mortality/2025-09-02/maternal_mortality
+
+data-private://meadow/ihme_gbd/2025-10-13/gbd_treemap:
+    - snapshot-private://ihme_gbd/2025-10-13/gbd_treemap.feather
+  data-private://garden/ihme_gbd/2025-10-13/gbd_treemap:
+    - data://garden/un/2024-07-12/un_wpp
+    - data://garden/regions/2023-01-01/regions
+   - data-private://meadow/ihme_gbd/2025-10-13/gbd_treemap
+data-private://grapher/ihme_gbd/2025-10-13/gbd_treemap:
+    - data-private://garden/ihme_gbd/2025-10-13/gbd_treemap
