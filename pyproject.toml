@@ -100,6 +100,7 @@ dev-dependencies = [
     "hydra-core>=1.3.2",
     "gspread>=5.12.4",
     "jsonref>=1.1.0",
+    "kaleido==1.1.0",
     "mkdocs-material>=9.5.34",
     "mkdocs-jupyter>=0.24.8",
     "mkdocs-exclude>=1.0.2",
