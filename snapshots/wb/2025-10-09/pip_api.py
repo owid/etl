@@ -1707,8 +1707,10 @@ def median_patch(df, country_or_region):
         # Merge df and df_percentiles
         df = pd.merge(
             df,
-            df_percentiles[["ppp_version", "country", "year", "reporting_level", "welfare_type", "thr"]],
-            on=["ppp_version", "country", "year", "reporting_level", "welfare_type"],
+            df_percentiles[
+                ["ppp_version", "country", "country_code", "year", "reporting_level", "welfare_type", "thr"]
+            ],
+            on=["ppp_version", "country", "country_code", "year", "reporting_level", "welfare_type"],
             how="left",
         )
 
@@ -1722,8 +1724,8 @@ def median_patch(df, country_or_region):
         # Merge df and df_percentiles
         df = pd.merge(
             df,
-            df_percentiles[["ppp_version", "country", "year", "thr"]],
-            on=["ppp_version", "country", "year"],
+            df_percentiles[["ppp_version", "country", "country_code", "year", "thr"]],
+            on=["ppp_version", "country", "country_code", "year"],
             how="left",
         )
 
