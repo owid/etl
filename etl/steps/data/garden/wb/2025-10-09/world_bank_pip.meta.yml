@@ -55,8 +55,6 @@ definitions:
           gdoc_id: "{definitions.gdoc_id}"
     display: &common_display
       tolerance: 5
-      entityAnnotationsMap: |-
-        Other high income countries (PIP): e.g. US, Western Europe, Australia, Japan, South Korea and Saudi Arabia
 
   description_short_welfare_type: |-
     <% if welfare_type == "consumption" %>
