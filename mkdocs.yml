@@ -9,8 +9,8 @@ site_description: >-
 repo_name: owid/etl
 repo_url: https://github.com/owid/etl
 
-# Copyright
-copyright: Copyright &copy; 2024 Our World in Data
+# License
+copyright: '<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a> • <a href="/projects/etl/privacy/">Privacy</a> • <a href="https://ourworldindata.org/">Our World in Data</a>'
 
 # Configuration
 theme:
@@ -88,7 +88,7 @@ extra:
       social:
             # icons available listed: https://github.com/squidfunk/mkdocs-material/tree/master/material/.icons/fontawesome
             - icon: fontawesome/brands/github
-              link: https://github.com/ourworldindata
+              link: https://github.com/owid
             - icon: fontawesome/solid/globe
               link: https://ourworldindata.org
             - icon: fontawesome/brands/instagram
@@ -164,7 +164,8 @@ plugins:
       - git-revision-date-localized
       - tags:
               tags_file: tags.md
-      - privacy
+      # When the privacy plugin is activated, plotly charts don't show. So we'll deactivate it.
+      # - privacy:
       # ref: https://squidfunk.github.io/mkdocs-material/reference/images/
       - glightbox
 
@@ -181,29 +182,27 @@ extra_javascript:
 # Custom home page
 home:
       # Custom Homepage Elements
-      tagline: Our data workflow
+      tagline: Our World in Data - Technical documentation
       # cover_image: https://github.com/tylerdotrar/mkdocs-coverpage/blob/main/docs/attachments/wizard-posting.png?raw=true #attachments/wizard-posting.png # This path starts at your root mkdocs directory.
-      description: |
-            Find all the details about OWID's data management tool.
+      description: |-
+            This documentation explains our data workflow and tooling — both to help OWID team members work effectively and to give external readers insight into how we manage and publish our data.
+            You can also find selected public analyses related to our work.
       # Gradient Color
       # gradient_hsla: hsla(173, 100%, 24%, 1) # Default Green: hsla(160deg,47%,55%,1)
 
       buttons:
-            - name: Get started
+            - name: Data workflow
               url: getting-started
-              # icon: people
               theme: md-button md-button--primary
-              # blurb: This joker navigates to the shadow wizard armory located in "/Folder1/index.md"
-            - name: Learn more
-              url: architecture
-              # icon: gear
-              theme: md-button
-              # blurb: This goober navigates to some important thingies located in "/Folder2/index.md"
-            - name: Guides
+            # - name: Learn more
+            #   url: architecture
+            #   theme: md-button
+            - name: Internal guides
               url: guides
               theme: md-button
-              # blurb: This psycho navigates to an interesting table of stuff located in "/Folder3/index.md"
-              # icon: image
+            - name: Public analyses
+              url: analyses/
+              theme: md-button
 
 # Navigation
 nav:
