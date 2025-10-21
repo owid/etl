@@ -15,7 +15,7 @@ dataset:
   update_period_days: 1460
   non_redistributable: true
 tables:
-  gbd_cause_deaths:
+  gbd_treemap:
     dimensions:
       - name: Cause of death
         slug: cause
@@ -56,27 +56,3 @@ tables:
             <% if metric == 'Number' %>0<% else %>1<%- endif -%>
           entityAnnotationsMap: |-
             {definitions.annotation}
-  gbd_cause_dalys:
-    variables:
-      value:
-        title: |-
-          {macros}
-          << format_title(metric, age, format_cause(cause), 'DALYs') >>
-        unit: |-
-          {macros}
-          << format_unit(metric, 'DALYs') >>
-        short_unit: |-
-          {definitions.short_unit}
-        description_short: |-
-          {macros}
-          << format_description_short(metric, age, format_cause(cause), "[Disability Adjusted Life Years (DALYs)](#dod:dalys)") >>
-        description_key:
-          - |-
-            {definitions.description_key}
-        presentation:
-          grapher_config:
-            note: |-
-              {definitions.footnote}
-        display:
-          numDecimalPlaces: |-
-            <% if metric == 'Number' %>0<% else %>1<%- endif -%>

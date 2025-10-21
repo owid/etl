@@ -13,7 +13,7 @@ def run(dest_dir: str) -> None:
     # Load garden dataset.
     ds_garden = paths.load_dataset("gbd_treemap")
     # Read table from garden dataset.
-    tb_deaths = ds_garden["gbd_treemap"].reset_index()
+    tb_deaths = ds_garden["gbd_treemap"]
     #
     # Save outputs.
     #
