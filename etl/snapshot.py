@@ -111,7 +111,7 @@ class Snapshot:
         if retries > 1:
             for attempt in Retrying(
                 retry=retry_if_exception_type(
-                    (requests.exceptions.HTTPError, requests.exceptions.ChunkedEncodingError)
+                    (requests.exceptions.HTTPError, requests.exceptions.ChunkedEncodingError, DownloadCorrupted)
                 ),
                 stop=stop_after_attempt(retries),
                 wait=wait_exponential(multiplier=1, min=1, max=10),
