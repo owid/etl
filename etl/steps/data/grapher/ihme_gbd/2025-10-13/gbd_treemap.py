@@ -11,14 +11,9 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = paths.load_dataset("gbd_cause")
-    ds_garden.metadata.title = "Global Burden of Disease - Cause - Deaths"
+    ds_garden = paths.load_dataset("gbd_treemap")
     # Read table from garden dataset.
-    tb_deaths = ds_garden["gbd_cause_deaths"]
-    #
-    # Process data.
-    #
-
+    tb_deaths = ds_garden["gbd_treemap"].reset_index()
     #
     # Save outputs.
     #
