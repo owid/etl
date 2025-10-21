@@ -92,7 +92,7 @@ definitions:
   description_key_contributing_family_workers: |-
     _Contributing family workers_ are defined as workers working on self-employment jobs who work in an enterprise operated by a related person living in the same household.
   description_key_employment_agriculture: |-
-    The agriculture sector includes crop and animal, fishing and aquaculture, and forestry and logging activities, as defined by the [International Standard Industrial Classification of All Economic Activities (ISIC)](https://ilostat.ilo.org/methods/concepts-and-definitions/classification-economic-activities/) (category A in ISIC revision 4).
+    The agriculture sector includes crop and animal production, hunting, forestry, logging, and fishing and aquaculture activities, as defined by the [International Standard Industrial Classification of All Economic Activities (ISIC)](https://ilostat.ilo.org/methods/concepts-and-definitions/classification-economic-activities/) (category A in ISIC revision 4).
   description_key_employment_industry: |-
     The industry sector includes mining and quarrying, manufacturing, electricity, gas, steam and air conditioning supply, water supply, and construction activities, as defined by the [International Standard Industrial Classification of All Economic Activities (ISIC)](https://ilostat.ilo.org/methods/concepts-and-definitions/classification-economic-activities/) (categories B to F in ISIC revision 4).
   description_key_employment_services: |-
