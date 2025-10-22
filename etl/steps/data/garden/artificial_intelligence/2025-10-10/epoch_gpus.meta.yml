@@ -34,11 +34,13 @@ tables:
         unit: FLOP/s/$
         description_short: Hardware computational performance shown in [floating-point operations](#dod:flop) per second (FLOP/s) per US dollar, adjusted for inflation.
         description_key:
-          - This indicator measures how much computational performance GPUs provide for each dollar spent.
-          - A GPU (graphics processing unit) is a type of chip originally developed for rendering images, but now widely used to train and run machine learning models because it can process many calculations in parallel.
-          - Includes GPUs used in AI training or clearly designed for ML workloads, based on their specifications and numerical formats.
-          - Performance is based on benchmarks of AI-relevant operations divided by the GPU’s launch price.
-          - As GPUs have become more powerful and cheaper per unit of compute, the cost of training AI systems has declined.
+        - Measures how much computational performance GPUs deliver for each dollar spent.
+        - A GPU is a processor built for parallel computation; it now powers most AI training because it can run many calculations at once.
+        - Includes only GPUs used to train notable AI models or clearly designed for ML workloads; TPUs and CPUs are excluded.
+        - Performance comes from benchmarks of AI-relevant tasks and is compared with the GPU launch price.
+        - Reported as floating-point operations per second (FLOP/s) per US dollar, adjusted for inflation; amounts are in constant 2024 US$ using the U.S. Consumer Price Index (CPI).
+        - FLOP/s values use 32-bit full-precision math ("FP32"), which stores numbers to about 7 decimal places. Using FP32 keeps results comparable across hardware; faster, lower-precision formats (FP16, BF16, INT8) exist but are not used here.
+        - As GPUs have delivered more compute per dollar over time, the cost of training AI systems has fallen.
         presentation:
           grapher_config:
             note: FLOP/s values refer to 32-bit (full) precision. Data is expressed in constant 2024 US$. Inflation adjustment is based on the US Consumer Price Index (CPI).
