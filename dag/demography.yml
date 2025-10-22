@@ -150,12 +150,21 @@ steps:
     - data://meadow/demography/2023-10-10/riley_2005
 
   # Human Mortality Database
+  # Old version (2024-12-01) - keep for downstream dependencies
   data://meadow/hmd/2024-12-01/hmd:
     - snapshot://hmd/2024-11-27/hmd.zip
   data://garden/hmd/2024-12-01/hmd:
     - data://meadow/hmd/2024-12-01/hmd
   data://grapher/hmd/2024-12-01/hmd:
     - data://garden/hmd/2024-12-01/hmd
+
+  # New version (2025-10-22)
+  data://meadow/hmd/2025-10-22/hmd:
+    - snapshot://hmd/2025-10-22/hmd.zip
+  data://garden/hmd/2025-10-22/hmd:
+    - data://meadow/hmd/2025-10-22/hmd
+  data://grapher/hmd/2025-10-22/hmd:
+    - data://garden/hmd/2025-10-22/hmd
 
   # UN WPP Life Tables
   data://meadow/un/2024-12-02/un_wpp_lt:
