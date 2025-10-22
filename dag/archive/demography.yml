@@ -140,3 +140,13 @@ steps:
   # Fariss
   data://grapher/demography/2023-12-20/population_fariss:
     - data://garden/demography/2023-12-20/population_fariss
+
+  #
+  # Fertility
+  #
+  # OMM: Fertility Rate -- HFD + UN WPP
+  data://garden/demography/2024-12-03/fertility_rate:
+    - data://garden/hmd/2024-11-19/hfd
+    - data://garden/un/2024-07-12/un_wpp
+  data://grapher/demography/2024-12-03/fertility_rate:
+    - data://garden/demography/2024-12-03/fertility_rate

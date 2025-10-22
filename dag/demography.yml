@@ -275,11 +275,11 @@ steps:
     - data://garden/demography/2024-11-26/multiple_births
 
   # OMM: Fertility Rate -- HFD + UN WPP
-  data://garden/demography/2024-12-03/fertility_rate:
-    - data://garden/hmd/2024-11-19/hfd
+  data://garden/demography/2025-10-22/fertility_rate:
+    - data://garden/hmd/2025-10-22/hfd
     - data://garden/un/2024-07-12/un_wpp
-  data://grapher/demography/2024-12-03/fertility_rate:
-    - data://garden/demography/2024-12-03/fertility_rate
+  data://grapher/demography/2025-10-22/fertility_rate:
+    - data://garden/demography/2025-10-22/fertility_rate
 
   # OMM: Birth rate -- HFD + UN WPP
   data://garden/demography/2024-12-03/birth_rate:
