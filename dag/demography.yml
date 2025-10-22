@@ -259,6 +259,12 @@ steps:
     - data://meadow/hmd/2024-11-19/hfd
   data://grapher/hmd/2024-11-19/hfd:
     - data://garden/hmd/2024-11-19/hfd
+  data://meadow/hmd/2025-10-22/hfd:
+    - snapshot://hmd/2025-10-22/hfd.zip
+  data://garden/hmd/2025-10-22/hfd:
+    - data://meadow/hmd/2025-10-22/hfd
+  data://grapher/hmd/2025-10-22/hfd:
+    - data://garden/hmd/2025-10-22/hfd
 
   # Multiple births
   data://meadow/demography/2024-11-26/multiple_births:
