@@ -7,14 +7,14 @@ meta:
 
       The ESC Atlas of Cardiology is a key initiative, gathering data on healthcare systems from ESC member countries. It provides a range of information, from geographical and demographic data to specifics about healthcare organization and financing. Notably, it features a detailed section on cardiology, offering insights into cardiac care services, resources, and reimbursement methods where available.
     citation_full: 'Downloaded from the ESC Atlas of Cardiology website eatlas.escardio.org. Accessed on: 2023-10-10.'
-    url_main: |-
-      https://eatlas.escardio.org/Atlas/ESC-Atlas-of-Cardiology/Cardiovascular-healthcare-delivery/Cardiological-specialists/chr_card_1m_r-cardiologists-total-per-million-people
+    url_main: https://eatlas.escardio.org/
+
     date_accessed: '2025-10-21'
     date_published: '2023'
     license:
       name: ©producer year
       url: https://eatlas.escardio.org/About/terms-conditions
 outs:
-  - md5: 77cf28be407f353b56790dcf4fc7fa79
-    size: 204515
+  - md5: 34425f74d95db36adb5f9a1065cd0157
+    size: 151528
     path: esc.csv
