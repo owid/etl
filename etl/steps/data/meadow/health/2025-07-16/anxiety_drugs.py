@@ -144,6 +144,31 @@ def get_fda_label(query, limit=100):
     return df
 
 
+def get_all_anxiety_drugs(limit=100):
+    """
+    Fetch all FDA label entries related to anxiety drugs from openFDA.
+    Returns a pandas DataFrame containing key fields (indications, brand_name, etc.).
+    """
+
+    # not case sensitive search for all
+    keywords = ["anxiety", "panic", "GAD", "phobia", "mutism", "SAD"]
+
+    df = pd.DataFrame()
+
+    for keyword in keywords:
+        print(f"### {keyword} ###")
+        query = f'search=indications_and_usage:"{keyword}"'
+        df_kw = get_fda_label(query, limit)
+        df = pd.concat([df, df_kw], ignore_index=True)
+        print(f"Total records for keyword '{keyword}': {len(df_kw)}")
+        print(f"Cumulative total records: {len(df)}")
+
+    df = df.dropna(subset=["application_number"])
+    df = df.drop_duplicates(subset=["generic_name"])
+    df["dailymed"] = df["spl_id"].apply(lambda x: f"{DAILYMED_BASE_URL}{x}")
+    return df
+
+
 def get_fda_labels_by_characteristic(search_term, limit=100, characteristic="active ingredient"):
     """
     Fetch all FDA label entries for a given active ingredient from openFDA.
@@ -294,6 +319,26 @@ def print_urls_and_check(spl_set_id):
     print("\n")
 
 
+ADD_ANXIETY_DRUGS = ["Prochlorperazine", "Trifluoperazine", "Amoxapine"]
+
+
+def get_min_approval_year_for_added_drugs(submissions, drug_names):
+    min_approval_years = {}
+
+    for drug_name in drug_names:
+        mask = submissions.apply(lambda x: drug_name.lower() in str(x["active_ingredients"]).lower(), axis=1)
+        this_drug = submissions[mask]
+
+        if this_drug.empty:
+            min_approval_years[drug_name] = None
+        else:
+            min_approval_idx = this_drug["approval_year"].idxmin()
+            min_approval_year = this_drug.loc[min_approval_idx, "approval_year"]
+            min_approval_years[drug_name] = min_approval_year
+
+    return min_approval_years
+
+
 def run() -> None:
     #
     # Load inputs.
@@ -350,7 +395,7 @@ def run() -> None:
     df_anxiety_meds["notes"] = None
     df_anxiety_meds["daily_med_url"] = None
 
-    drug_names = ["Amitriptyline"]  # df_anxiety_meds["Drug_name"].unique()
+    drug_names = ["Prochlorperazine", "Trifluoperazine", "Amoxapine"]  # df_anxiety_meds["Drug_name"].unique()
 
     dict_fda_labels, dict_submissions = create_label_and_submissions_tables(drug_names, submissions)
 
