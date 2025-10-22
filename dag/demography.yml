@@ -155,8 +155,6 @@ steps:
     - snapshot://hmd/2024-11-27/hmd.zip
   data://garden/hmd/2024-12-01/hmd:
     - data://meadow/hmd/2024-12-01/hmd
-  data://grapher/hmd/2024-12-01/hmd:
-    - data://garden/hmd/2024-12-01/hmd
 
   # New version (2025-10-22)
   data://meadow/hmd/2025-10-22/hmd:
@@ -178,10 +176,11 @@ steps:
     - data://meadow/un/2024-12-02/un_wpp_lt
 
   # Survivorship ages (HMD-derived)
-  data://garden/demography/2024-12-02/survivor_percentiles:
-    - data://garden/hmd/2024-12-01/hmd
-  data://grapher/demography/2024-12-02/survivor_percentiles:
-    - data://garden/demography/2024-12-02/survivor_percentiles
+  # Old version (2024-12-02)
+  data://garden/demography/2025-10-22/survivor_percentiles:
+    - data://garden/hmd/2025-10-22/hmd
+  data://grapher/demography/2025-10-22/survivor_percentiles:
+    - data://garden/demography/2025-10-22/survivor_percentiles
 
   # UN WPP + HMD Life Tables
   data://garden/demography/2024-12-03/life_tables:
