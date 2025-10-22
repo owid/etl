@@ -34,13 +34,13 @@ tables:
         unit: FLOP/s/$
         description_short: Hardware computational performance shown in [floating-point operations](#dod:flop) per second (FLOP/s) per US dollar, adjusted for inflation.
         description_key:
-          - Measures how much computational performance GPUs deliver for each dollar spent.
-          - A GPU is a processor built for parallel computation; it now powers most AI training because it can run many calculations at once.
-          - Includes only GPUs used to train notable AI models or clearly designed for ML workloads; TPUs and CPUs are excluded.
-          - Performance comes from benchmarks of AI-relevant tasks and is compared with the GPU launch price.
-          - Reported as floating-point operations per second (FLOP/s) per US dollar, adjusted for inflation; amounts are in constant 2024 US$ using the U.S. Consumer Price Index (CPI).
-          - FLOP/s values use 32-bit full-precision math ("FP32"), which stores numbers to about 7 decimal places. Using FP32 keeps results comparable across hardware; faster, lower-precision formats (FP16, BF16, INT8) exist but are not used here.
-          - As GPUs have delivered more compute per dollar over time, the cost of training AI systems has fallen.
+          - Measures how much computing power you get per dollar when buying a GPU.
+          - GPUs (graphics processing units) are specialized computer chips that can perform many calculations simultaneously, making them ideal for training AI systems.
+          - Only includes GPUs actually used to train notable AI models or specifically designed for machine learning tasks. Excludes other processor types like TPUs and CPUs.
+          - Performance measured using AI-specific benchmark tests; prices are the launch prices when GPUs first became available.
+          - Values shown as FLOP/s per dollar—meaning how many floating-point operations per second the GPU can perform for each dollar of its price. All prices adjusted for inflation to 2024 US dollars using the Consumer Price Index.
+          - Performance measured using FP32 (32-bit floating-point), a standard precision level that represents numbers to about 7 decimal places. This ensures fair comparisons across different hardware, though newer GPUs often support faster but less precise formats.
+          - As this metric has improved over time, the cost of training AI systems has decreased dramatically.
         presentation:
           grapher_config:
             note: FLOP/s values refer to 32-bit (full) precision. Data is expressed in constant 2024 US$. Inflation adjustment is based on the US Consumer Price Index (CPI).
