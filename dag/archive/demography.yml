@@ -126,6 +126,9 @@ steps:
     - data://garden/hmd/2024-12-01/hmd
   data://grapher/hmd/2024-12-03/hmd_country:
     - data://garden/hmd/2024-12-03/hmd_country
+  # Life Tables (HMD)
+  data://grapher/demography/2024-12-03/life_tables:
+    - data://garden/demography/2024-12-03/life_tables
   # UN WPP Life Tables
   data://meadow/un/2023-10-02/un_wpp_lt:
     - snapshot://un/2023-10-02/un_wpp_lt_all.zip
@@ -160,6 +163,8 @@ steps:
     - data://garden/un/2022-07-11/un_wpp
   data://grapher/demography/2023-10-10/life_expectancy:
     - data://garden/demography/2023-10-09/life_expectancy
+  data://grapher/demography/2024-12-03/life_expectancy:
+    - data://garden/demography/2024-12-03/life_expectancy
 
   ## Population by education group (Wittgenstein centre)
   data://meadow/demography/2023-04-07/population_education_wittgenstein:

@@ -150,13 +150,6 @@ steps:
     - data://meadow/demography/2023-10-10/riley_2005
 
   # Human Mortality Database
-  # Old version (2024-12-01) - keep for downstream dependencies
-  data://meadow/hmd/2024-12-01/hmd:
-    - snapshot://hmd/2024-11-27/hmd.zip
-  data://garden/hmd/2024-12-01/hmd:
-    - data://meadow/hmd/2024-12-01/hmd
-
-  # New version (2025-10-22)
   data://meadow/hmd/2025-10-22/hmd:
     - snapshot://hmd/2025-10-22/hmd.zip
   data://garden/hmd/2025-10-22/hmd:
@@ -182,14 +175,6 @@ steps:
     - data://garden/demography/2025-10-22/survivor_percentiles
 
   # UN WPP + HMD Life Tables
-  # Old version (2024-12-03)
-  data://garden/demography/2024-12-03/life_tables:
-    - data://garden/hmd/2024-12-01/hmd
-    - data://garden/un/2024-12-02/un_wpp_lt
-  data://grapher/demography/2024-12-03/life_tables:
-    - data://garden/demography/2024-12-03/life_tables
-
-  # New version (2025-10-22)
   data://garden/demography/2025-10-22/life_tables:
     - data://garden/hmd/2025-10-22/hmd
     - data://garden/un/2024-12-02/un_wpp_lt
@@ -197,13 +182,13 @@ steps:
     - data://garden/demography/2025-10-22/life_tables
 
   # OMM: Life Expectancy
-  data://garden/demography/2024-12-03/life_expectancy:
+  data://garden/demography/2025-10-22/life_expectancy:
     - data://garden/demography/2023-10-10/riley_2005
     - data://garden/demography/2023-10-10/zijdeman_et_al_2015
-    - data://garden/demography/2024-12-03/life_tables
+    - data://garden/demography/2025-10-22/life_tables
     - data://garden/un/2024-07-12/un_wpp
-  data://grapher/demography/2024-12-03/life_expectancy:
-    - data://garden/demography/2024-12-03/life_expectancy
+  data://grapher/demography/2025-10-22/life_expectancy:
+    - data://garden/demography/2025-10-22/life_expectancy
 
   # Broken limits of Life Expectancy
   data://garden/demography/2025-10-22/broken_limits_le:
