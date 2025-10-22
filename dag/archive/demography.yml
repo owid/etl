@@ -123,6 +123,12 @@ steps:
     - data://garden/un/2023-10-02/un_wpp_lt
   data://grapher/demography/2023-10-04/life_tables:
     - data://garden/demography/2023-10-03/life_tables
+  # OMM: Birth rate -- HMD + UN WPP
+  data://garden/demography/2024-12-03/birth_rate:
+    - data://garden/hmd/2024-12-01/hmd
+    - data://garden/un/2024-07-12/un_wpp
+  data://grapher/demography/2024-12-03/birth_rate:
+    - data://garden/demography/2024-12-03/birth_rate
   # OMM: Life Expectancy
   data://garden/demography/2023-10-09/life_expectancy:
     - data://garden/demography/2023-10-03/life_tables

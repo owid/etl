@@ -281,12 +281,12 @@ steps:
   data://grapher/demography/2024-12-03/fertility_rate:
     - data://garden/demography/2024-12-03/fertility_rate
 
-  # OMM: Birth rate -- HFD + UN WPP
-  data://garden/demography/2024-12-03/birth_rate:
-    - data://garden/hmd/2024-12-01/hmd
+  # OMM: Birth rate -- HMD + UN WPP
+  data://garden/demography/2025-10-22/birth_rate:
+    - data://garden/hmd/2025-10-22/hmd
     - data://garden/un/2024-07-12/un_wpp
-  data://grapher/demography/2024-12-03/birth_rate:
-    - data://garden/demography/2024-12-03/birth_rate
+  data://grapher/demography/2025-10-22/birth_rate:
+    - data://garden/demography/2025-10-22/birth_rate
 
   # HMD country data
   data://meadow/hmd/2024-12-03/hmd_country:
