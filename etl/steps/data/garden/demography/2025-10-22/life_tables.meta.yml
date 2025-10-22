@@ -34,7 +34,7 @@ definitions:
         <%- endif %>
         <%- endif %>
     data_used: |-
-      Prior to 1950, we use HMD (2025) data. From 1950 onwards, we use UN WPP (2025) data.
+      Prior to 1950, we use HMD (2025) data. From 1950 onwards, we use UN WPP (2024) data.
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
