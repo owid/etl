@@ -23,10 +23,6 @@ def run(dest_dir: str) -> None:
     tb = geo.harmonize_countries(
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
-    # Convert ratio of female to male cardiologists to % as clarified by source
-    tb["cardiologists__females__percent_of_cardiologists__total"] = (
-        tb["cardiologists__females__percent_of_cardiologists__total"] * 100
-    )
     tb = tb.set_index(["country", "year"], verify_integrity=True)
     #
     # Save outputs.

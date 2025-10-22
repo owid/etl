@@ -4,7 +4,6 @@
   "Armenia": "Armenia",
   "Austria": "Austria",
   "Azerbaijan": "Azerbaijan",
-  "Belarus": "Belarus",
   "Belgium": "Belgium",
   "Bosnia and Herzegovina": "Bosnia and Herzegovina",
   "Bulgaria": "Bulgaria",
@@ -14,7 +13,6 @@
   "Denmark": "Denmark",
   "Egypt": "Egypt",
   "Estonia": "Estonia",
-  "Europe": "Europe",
   "Finland": "Finland",
   "France": "France",
   "Georgia": "Georgia",
@@ -42,7 +40,7 @@
   "Poland": "Poland",
   "Portugal": "Portugal",
   "Romania": "Romania",
-  "Russia": "Russia",
+  "San Marino": "San Marino",
   "Serbia": "Serbia",
   "Slovakia": "Slovakia",
   "Slovenia": "Slovenia",
@@ -54,6 +52,7 @@
   "Ukraine": "Ukraine",
   "United Kingdom": "United Kingdom",
   "Uzbekistan": "Uzbekistan",
-  "High income countries": "High income countries (Europe)",
-  "Middle income countries": "Middle income countries (Europe)"
+  "Europe": "Europe",
+  "High income countries": "High income countries",
+  "Middle income countries": "Middle income countries"
 }
