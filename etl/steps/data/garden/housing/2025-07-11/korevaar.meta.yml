@@ -106,8 +106,8 @@ tables:
         unit: "%"
         short_unit: "%"
       isolation_pct:
-        title: Percentage of households with isolation
-        description_short: Percentage of households that have isolation. {{ definitions.notes.historic_records }}
+        title: Percentage of households with insulation
+        description_short: Percentage of households that have insulation. {{ definitions.notes.historic_records }}
         unit: "%"
         short_unit: "%"
       gas_pct:
