@@ -33,6 +33,12 @@ tables:
         title: Computational performance per dollar
         unit: FLOP/s/$
         description_short: Hardware computational performance shown in [floating-point operations](#dod:flop) per second (FLOP/s) per US dollar, adjusted for inflation.
+        description_key:
+          - This indicator measures how much computational performance GPUs provide for each dollar spent.
+          - A GPU (graphics processing unit) is a type of chip originally developed for rendering images, but now widely used to train and run machine learning models because it can process many calculations in parallel.
+          - Includes GPUs used in AI training or clearly designed for ML workloads, based on their specifications and numerical formats.
+          - Performance is based on benchmarks of AI-relevant operations divided by the GPU’s launch price.
+          - As GPUs have become more powerful and cheaper per unit of compute, the cost of training AI systems has declined.
         presentation:
           grapher_config:
             note: FLOP/s values refer to 32-bit (full) precision. Data is expressed in constant 2024 US$. Inflation adjustment is based on the US Consumer Price Index (CPI).
