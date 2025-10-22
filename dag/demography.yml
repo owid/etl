@@ -308,12 +308,12 @@ steps:
   #
   # Effective Fertility Rate (Malani & Jacob)
   #
-  data://garden/demography/2024-12-17/efr_malani_jacob:
+  data://garden/demography/2025-10-22/efr_malani_jacob:
     - data://garden/un/2024-12-02/un_wpp_lt
     - data://garden/un/2024-07-12/un_wpp
-    - data://garden/hmd/2024-12-01/hmd
-  data://grapher/demography/2024-12-17/efr_malani_jacob:
-    - data://garden/demography/2024-12-17/efr_malani_jacob
+    - data://garden/hmd/2025-10-22/hmd
+  data://grapher/demography/2025-10-22/efr_malani_jacob:
+    - data://garden/demography/2025-10-22/efr_malani_jacob
 
   # Mean Age at childbirth (HFD + UN WPP)
   data://garden/demography/2024-12-18/mean_age_childbearing:

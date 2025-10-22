@@ -137,6 +137,13 @@ steps:
     - data://garden/un/2024-07-12/un_wpp
   data://grapher/demography/2024-12-03/birth_rate:
     - data://garden/demography/2024-12-03/birth_rate
+  # Effective Fertility Rate (Malani & Jacob)
+  data://garden/demography/2024-12-17/efr_malani_jacob:
+    - data://garden/un/2024-12-02/un_wpp_lt
+    - data://garden/un/2024-07-12/un_wpp
+    - data://garden/hmd/2024-12-01/hmd
+  data://grapher/demography/2024-12-17/efr_malani_jacob:
+    - data://garden/demography/2024-12-17/efr_malani_jacob
   # OMM: Life Expectancy
   data://garden/demography/2023-10-09/life_expectancy:
     - data://garden/demography/2023-10-03/life_tables
