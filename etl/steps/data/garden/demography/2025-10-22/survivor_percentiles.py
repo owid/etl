@@ -43,7 +43,7 @@ def run() -> None:
 
     # Keep format="1x1", and sex="both"
     paths.log.info("keep period & 1-year data.")
-    tb = tb.loc[tb["age"].str.match(r"^(\d{1,3}|d{3}\+)$") & (tb["type"] == "period")]
+    tb = tb.loc[tb["age"].str.match(r"^(\d{1,3}|\d{3}\+)$") & (tb["type"] == "period")]
 
     # Drop unused columns
     tb = tb.drop(columns=["type"])
