@@ -219,10 +219,10 @@ steps:
     - data://garden/demography/2024-12-03/phi_gender_le
 
   # Gini Life Expectancy Inequality
-  data://garden/demography/2024-12-03/gini_le:
-    - data://garden/demography/2024-12-03/life_tables
-  data://grapher/demography/2024-12-03/gini_le:
-    - data://garden/demography/2024-12-03/gini_le
+  data://garden/demography/2025-10-22/gini_le:
+    - data://garden/demography/2025-10-22/life_tables
+  data://grapher/demography/2025-10-22/gini_le:
+    - data://garden/demography/2025-10-22/gini_le
 
   # Life Expectancy OECD
   data://meadow/oecd/2023-10-11/life_expectancy_birth:

@@ -102,7 +102,10 @@ steps:
     - data://garden/demography/2023-10-03/life_tables
   data://grapher/demography/2023-10-04/gini_le:
     - data://garden/demography/2023-10-04/gini_le
-
+  data://garden/demography/2024-12-03/gini_le:
+    - data://garden/demography/2024-12-03/life_tables
+  data://grapher/demography/2024-12-03/gini_le:
+    - data://garden/demography/2024-12-03/gini_le
   # HMD
   data://meadow/hmd/2023-09-19/hmd:
     - snapshot://hmd/2023-09-18/hmd.zip
