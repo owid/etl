@@ -86,7 +86,7 @@ def read_and_clean_data(file_ids: List[str], temp_dir: str, field_name: str) -> 
 
         # Aggregate duplicates by summing numeric columns
         # Group by country, year, and field, then sum all numeric columns
-        numeric_cols = df_add.select_dtypes(include=['number']).columns.tolist()
+        numeric_cols = df_add.select_dtypes(include=["number"]).columns.tolist()
         if numeric_cols:
             df_add = df_add.groupby(["country", "year", "field"], as_index=False)[numeric_cols].sum()
 
