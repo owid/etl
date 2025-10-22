@@ -1,4 +1,4 @@
-# Public analyses
+# Technical publications
 
 On this page, we publish technical reports on data projects at Our World in Data. These reports include methodology, replication code, and supplementary data or figures. They often support live articles on our site. You can think of them as the “technical appendices” to our research articles.
 
