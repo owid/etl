@@ -308,7 +308,7 @@ def _clean_population_type(tb):
     # Create new column with the year.
     regex = r"\b\d{4}\b"
     tb["year"] = tb["Year"].astype("string").str.extract(f"({regex})", expand=False)
-    assert tb["year"].notna().all(), "Year extraction was successful!"
+    assert tb["year"].notna().all(), "Year extraction failed - found null values"
     tb["year"] = tb["year"].astype(int)
 
     # Ensure raw year is as expected
