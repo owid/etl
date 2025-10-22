@@ -36,7 +36,7 @@ def run() -> None:
 
     # UN: estimates + medium,
     tb_un = tb_un.loc[
-        (tb_un["sex"] == "all") & (tb_un["variant"].isin(["medium", "estimates"]) & (tb_un["age"] == "all")),
+        (tb_un["sex"] == "all") & (tb_un["variant"].isin(["medium", "estimates"])) & (tb_un["age"] == "all"),
         ["country", "year", COLUMN_NAME_WPP],
     ].rename(columns={COLUMN_NAME_WPP: COLUMN_NEW_NAME})
 
