@@ -10,7 +10,7 @@ repo_name: owid/etl
 repo_url: https://github.com/owid/etl
 
 # License
-copyright: '<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a> • <a href="/projects/etl/privacy/">Privacy</a> • <a href="https://ourworldindata.org/">Our World in Data</a>'
+copyright: '<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a> • <a href="privacy/">Privacy</a> • <a href="https://ourworldindata.org/">Our World in Data</a>'
 
 # Configuration
 theme:
@@ -191,7 +191,7 @@ home:
       # gradient_hsla: hsla(173, 100%, 24%, 1) # Default Green: hsla(160deg,47%,55%,1)
 
       buttons:
-            - name: Data workflow
+            - name: Get started
               url: getting-started
               theme: md-button md-button--primary
             # - name: Learn more
@@ -200,7 +200,7 @@ home:
             - name: Internal guides
               url: guides
               theme: md-button
-            - name: Public analyses
+            - name: Technical publications
               url: analyses/
               theme: md-button
 
