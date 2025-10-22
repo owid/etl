@@ -4,8 +4,6 @@ definitions:
       topic_tags:
         - Crop Yields
         - Agricultural Production
-    unit: tonnes per hectare
-    short_unit: t/ha
     processing_level: major
   description_processing_shifting: |-
     In Southern Hemisphere countries, corn planting and harvesting occur in different calendar years. Satellite data reflects the growing season, while data from official statistics (like FAO) is reported by harvest year. To make satellite data refer to the same crop as FAO data, satellite data is shifted one year forward.
@@ -21,6 +19,8 @@ tables:
     variables:
       yield_fao:
         title: Corn yields (FAO)
+        unit: tonnes per hectare
+        short_unit: t/ha
         display:
           name: FAO
         presentation:
@@ -29,6 +29,8 @@ tables:
         processing_level: minor
       yield_modis:
         title: Crop productivity (MODIS satellite)
+        unit: ""
+        short_unit: ""
         display:
           name: MODIS
         presentation:
@@ -37,6 +39,8 @@ tables:
           {definitions.description_processing_shifting}
       yield_sif:
         title: Crop productivity (SIF satellite)
+        unit: watts per square meter per micrometer per steradian
+        short_unit: W/m²/μm/sr
         display:
           name: SIF
         presentation:
@@ -45,6 +49,8 @@ tables:
           {definitions.description_processing_shifting}
       yield_modis_rescaled:
         title: Crop productivity (MODIS), rescaled for comparison with FAO data
+        unit: ""
+        short_unit: ""
         display:
           name: MODIS
         presentation:
@@ -54,6 +60,8 @@ tables:
           - {definitions.description_processing_rescaling}
       yield_sif_rescaled:
         title: Crop productivity (SIF), rescaled for comparison with FAO data
+        unit: ""
+        short_unit: ""
         display:
           name: SIF
         presentation:
