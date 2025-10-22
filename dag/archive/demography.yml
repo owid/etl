@@ -83,6 +83,10 @@ steps:
     - data://garden/demography/2023-10-03/life_tables
   data://grapher/demography/2023-10-03/phi_gender_le:
     - data://garden/demography/2023-10-03/phi_gender_le
+  data://garden/demography/2024-12-03/phi_gender_le:
+    - data://garden/demography/2024-12-03/life_tables
+  data://grapher/demography/2024-12-03/phi_gender_le:
+    - data://garden/demography/2024-12-03/phi_gender_le
 
   # Broken limits of Life Expectancy
   data://garden/demography/2023-10-20/broken_limits_le:
@@ -106,6 +110,7 @@ steps:
     - data://garden/demography/2024-12-03/life_tables
   data://grapher/demography/2024-12-03/gini_le:
     - data://garden/demography/2024-12-03/gini_le
+
   # HMD
   data://meadow/hmd/2023-09-19/hmd:
     - snapshot://hmd/2023-09-18/hmd.zip
