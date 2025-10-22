@@ -69,7 +69,7 @@ tables:
           - Does not account for potential changes in social, economic, or health conditions that could affect fertility rates.
         presentation:
           title_public: "Fertility rate: births per woman"
-          attribution: HFD
+          attribution_short: HFD
 
       tfr40:
         title: |-
