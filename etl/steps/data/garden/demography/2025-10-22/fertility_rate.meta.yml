@@ -4,7 +4,7 @@ definitions:
     presentation:
       topic_tags:
         - Fertility Rate
-      attribution: UN WPP (2024); HFD (2025)
+      # attribution: HFD (2025); UN WPP (2024)
     processing_level: major
 
 # Learn more about the available fields:
