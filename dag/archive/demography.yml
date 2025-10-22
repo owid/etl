@@ -144,9 +144,22 @@ steps:
   #
   # Fertility
   #
+  # HFD
+  data://meadow/hmd/2024-11-19/hfd:
+    - snapshot://hmd/2024-11-19/hfd.zip
+  data://garden/hmd/2024-11-19/hfd:
+    - data://meadow/hmd/2024-11-19/hfd
+  data://grapher/hmd/2024-11-19/hfd:
+    - data://garden/hmd/2024-11-19/hfd
   # OMM: Fertility Rate -- HFD + UN WPP
   data://garden/demography/2024-12-03/fertility_rate:
     - data://garden/hmd/2024-11-19/hfd
     - data://garden/un/2024-07-12/un_wpp
   data://grapher/demography/2024-12-03/fertility_rate:
     - data://garden/demography/2024-12-03/fertility_rate
+  # Mean Age at childbirth (HFD + UN WPP)
+  data://garden/demography/2024-12-18/mean_age_childbearing:
+    - data://garden/un/2024-07-12/un_wpp
+    - data://garden/hmd/2024-11-19/hfd
+  data://grapher/demography/2024-12-18/mean_age_childbearing:
+    - data://garden/demography/2024-12-18/mean_age_childbearing
