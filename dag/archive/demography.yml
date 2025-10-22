@@ -91,6 +91,12 @@ steps:
   data://grapher/demography/2023-10-20/broken_limits_le:
     - data://garden/demography/2023-10-20/broken_limits_le
 
+  data://garden/demography/2024-12-03/broken_limits_le:
+    - data://garden/hmd/2024-12-01/hmd
+    - data://garden/demography/2024-12-03/life_tables
+  data://grapher/demography/2024-12-03/broken_limits_le:
+    - data://garden/demography/2024-12-03/broken_limits_le
+
   # Gini Life Expectancy Inequality
   data://garden/demography/2023-10-04/gini_le:
     - data://garden/demography/2023-10-03/life_tables
