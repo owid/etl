@@ -3,6 +3,7 @@
 This file runs automatically before other modules (like etl.config),
 setting shared defaults that can be overridden by user or .env values.
 """
+
 import os
 
 # Default plotly renderer that works on VSCode's interactive window and jupyter notebooks, and lets MkDocs display interactive charts.
