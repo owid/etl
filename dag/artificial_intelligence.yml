@@ -69,12 +69,14 @@ steps:
     - data://meadow/artificial_intelligence/2024-04-02/dynabench
   data://grapher/artificial_intelligence/2024-04-02/dynabench:
     - data://garden/artificial_intelligence/2024-04-02/dynabench
-  data://meadow/artificial_intelligence/2024-06-06/epoch_compute_cost:
-    - snapshot://artificial_intelligence/2024-06-06/epoch_compute_cost.csv
-  data://garden/artificial_intelligence/2024-06-06/epoch_compute_cost:
-    - data://meadow/artificial_intelligence/2024-06-06/epoch_compute_cost
-  data://grapher/artificial_intelligence/2024-06-06/epoch_compute_cost:
-    - data://garden/artificial_intelligence/2024-06-06/epoch_compute_cost
+
+  # EPOCH dataset on AI training cost
+  data://meadow/artificial_intelligence/2025-10-22/epoch_compute_cost:
+    - snapshot://artificial_intelligence/2025-10-22/epoch_compute_cost.csv
+  data://garden/artificial_intelligence/2025-10-22/epoch_compute_cost:
+    - data://meadow/artificial_intelligence/2025-10-22/epoch_compute_cost
+  data://grapher/artificial_intelligence/2025-10-22/epoch_compute_cost:
+    - data://garden/artificial_intelligence/2025-10-22/epoch_compute_cost
 
   # Chess dataset (ELO ratings)
   data://garden/artificial_intelligence/2024-02-05/chess:
