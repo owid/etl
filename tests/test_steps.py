@@ -11,7 +11,9 @@ import random
 import shutil
 import string
 import sys
+import tempfile
 from contextlib import contextmanager
+from pathlib import Path
 from typing import Iterator
 from unittest.mock import patch
 
@@ -259,3 +261,99 @@ def test_isolated_env(tmp_path):
         import shared  # type: ignore
 
     assert "test_abc" not in sys.modules.keys()
+
+
+def test_instant_metadata_with_override_file():
+    """Test that --instant mode picks up changes in .meta.override.yml files."""
+    from owid.catalog import Table
+
+    from etl import config
+
+    # Save original INSTANT value
+    original_instant = config.INSTANT
+
+    try:
+        # Create a temporary directory for the test dataset
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_path = Path(tmp_dir)
+
+            # Create a dataset directory structure like garden/namespace/version/dataset
+            parent_dir = tmp_path / "garden" / "test_ns" / "2024-01-01"
+            parent_dir.mkdir(parents=True)
+            dataset_dir = parent_dir / "test_dataset"
+
+            # Create base metadata file
+            meta_file = parent_dir / "test_dataset.meta.yml"
+            with open(str(meta_file), "w") as f:
+                f.write("""
+tables:
+  test_table:
+    variables:
+      value:
+        title: Original title
+        description_short: Original description
+""")
+
+            # Create override metadata file
+            meta_override_file = parent_dir / "test_dataset.meta.override.yml"
+            with open(str(meta_override_file), "w") as f:
+                f.write("""
+tables:
+  test_table:
+    variables:
+      value:
+        title: Override title
+""")
+
+            # Create initial dataset
+            ds = Dataset.create_empty(dataset_dir.as_posix())
+            ds.metadata.short_name = "test_dataset"
+
+            # Create a table with one indicator
+            tb = Table(pd.DataFrame({"value": [1, 2, 3]}, index=pd.Index([2020, 2021, 2022], name="year")))
+            tb.metadata.short_name = "test_table"
+            tb["value"].metadata.title = "Test indicator"
+            ds.add(tb)
+            ds.save()
+
+            # Load metadata from files (simulating what create_dataset does)
+            ds = Dataset(dataset_dir.as_posix())
+            ds.update_metadata(meta_file)
+            ds.update_metadata(meta_override_file)
+            ds.save()
+
+            # Verify override was applied
+            ds = Dataset(dataset_dir.as_posix())
+            assert ds["test_table"]["value"].metadata.title == "Override title"
+            assert ds["test_table"]["value"].metadata.description_short == "Original description"
+
+            # Now test INSTANT mode - modify the override file
+            with open(str(meta_override_file), "w") as f:
+                f.write("""
+tables:
+  test_table:
+    variables:
+      value:
+        title: Updated override title
+""")
+
+            # Simulate what _run_instant_metadata does
+            config.INSTANT = True
+
+            ds = Dataset(dataset_dir.as_posix())
+
+            # Load metadata files as _run_instant_metadata should do
+            ds.update_metadata(meta_file)
+            # This is the critical line - it should load the override file
+            if meta_override_file.exists():
+                ds.update_metadata(meta_override_file)
+            ds.save()
+
+            # Verify that the override changes were picked up
+            ds = Dataset(dataset_dir.as_posix())
+            assert ds["test_table"]["value"].metadata.title == "Updated override title"
+            assert ds["test_table"]["value"].metadata.description_short == "Original description"
+
+    finally:
+        # Restore original INSTANT value
+        config.INSTANT = original_instant

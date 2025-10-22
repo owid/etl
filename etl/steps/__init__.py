@@ -586,6 +586,12 @@ class DataStep(Step):
         # Save dataset, but use _instant suffix in the checksum to make sure we
         # trigger fresh run when not using INSTANT
         ds.update_metadata(meta_path)
+
+        # Also load the override metadata file if it exists (similar to create_dataset in helpers.py)
+        meta_override_path = meta_path.with_suffix(".override.yml")
+        if meta_override_path.exists():
+            ds.update_metadata(meta_override_path)
+
         ds.metadata.source_checksum = self.checksum_input() + "_instant"
         ds.save()
 
