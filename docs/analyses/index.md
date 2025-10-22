@@ -18,7 +18,7 @@ On this page, we publish technical reports on data projects at Our World in Data
 !!! note ""
 
     ### COVID-19 work
-    Summary of our data work during COVID-19 Pandemic, with all the relevant links to data and research. For a less technical, but more narrative summary, refer to our [COVID-19 history article](https://ourworldindata.org/owid-covid-history).
+    Summary of our data work during COVID-19 pandemic, with all the relevant links to data and research. For a less technical, but more narrative summary, refer to our [COVID-19 history article](https://ourworldindata.org/owid-covid-history).
 
     [:material-book-open-variant: Methodology](../api/covid.md){ .md-button }
     [:material-download: Download compact dataset (CSV)](https://catalog.ourworldindata.org/garden/covid/latest/compact/compact.csv){ .md-button }
