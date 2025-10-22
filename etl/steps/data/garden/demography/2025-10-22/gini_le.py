@@ -1,4 +1,4 @@
-"""Estimate the gini index on life expectency"""
+"""Estimate the gini index on life expectancy"""
 
 from typing import Any, cast
 

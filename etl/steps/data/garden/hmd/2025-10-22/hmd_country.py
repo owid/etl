@@ -65,7 +65,7 @@ def make_main_table(tb, tb_pop):
     tb["date"] = tb["date"] + pd.to_timedelta(tb["days_in_month"] - 1, unit="D")
 
     # Sort rows
-    tb = tb.sort_values(["country", "date", "date"])
+    tb = tb.sort_values(["country", "date"])
 
     return tb
 

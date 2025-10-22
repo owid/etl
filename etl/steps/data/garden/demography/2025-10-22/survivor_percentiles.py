@@ -98,7 +98,7 @@ def obtain_survivorship_ages(tb_group: Table, start_age: int = 0, end_age: int =
 
     Output dataframe has a column for each percentile of survivorship age.
 
-    tb_group is expected to be a subset of the compelte table. It should only concern a particular (country, year, sex) triple.
+    tb_group is expected to be a subset of the complete table. It should only concern a particular (country, year, sex) triple.
     """
     # Step 1: Apply splines, get Mx for each (country, year, sex, age)
     ## Define splines
