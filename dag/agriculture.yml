@@ -196,3 +196,34 @@ steps:
     - data://garden/demography/2024-07-15/population
   data://grapher/agriculture/2025-08-06/decoupling_food_production_and_land_use:
     - data://garden/agriculture/2025-08-06/decoupling_food_production_and_land_use
+  #
+  # Lobell Lab: Crop productivity in southern Africa
+  #
+  data://meadow/agriculture/2025-10-15/crop_yields_in_southern_africa:
+    - snapshot://agriculture/2025-10-15/crop_yields_in_southern_africa.zip
+  #
+  # Lobell Lab: Crop productivity in southern Africa
+  #
+  data://garden/agriculture/2025-10-15/crop_yields_in_southern_africa:
+    - data://meadow/agriculture/2025-10-15/crop_yields_in_southern_africa
+  #
+  # Lobell Lab: Crop productivity in southern Africa
+  #
+  data://grapher/agriculture/2025-10-15/crop_yields_in_southern_africa:
+    - data://garden/agriculture/2025-10-15/crop_yields_in_southern_africa
+  #
+  # USDA/FAS - Corn yields
+  #
+  data://meadow/agriculture/2025-10-16/corn_yields:
+    - snapshot://agriculture/2025-10-16/corn_yields.xls
+  #
+  # USDA/FAS - Corn yields
+  #
+  data://garden/agriculture/2025-10-16/corn_yields:
+    - data://meadow/agriculture/2025-10-16/corn_yields
+    - data://garden/regions/2023-01-01/regions
+  #
+  # USDA/FAS - Corn yields
+  #
+  data://grapher/agriculture/2025-10-16/corn_yields:
+    - data://garden/agriculture/2025-10-16/corn_yields
