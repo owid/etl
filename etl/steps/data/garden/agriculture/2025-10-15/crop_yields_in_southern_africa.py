@@ -78,7 +78,7 @@ def plot_curves(tb):
 def shift_satellite_data(tb):
     """Shift satellite data one year forward, to align with FAO's way of reporting data by harvesting year.
 
-    Corn grows in spring and is harvested in autumn. For countries in the Northern Hemisphere, both events happen during the same calendar year. However, for countries in the Souther Hemisphere, harvesting happens the following year. Given that FAOSTAT reports by harvesting year, we shift satellite data for countries in the Southern Hemisphere one year forward. This way, satellite and FAOSTAT data refer to the same crop season.
+    Corn grows in spring and is harvested in autumn. For countries in the Northern Hemisphere, both events happen during the same calendar year. However, for countries in the Southern Hemisphere, harvesting happens the following year. Given that FAOSTAT reports by harvesting year, we shift satellite data for countries in the Southern Hemisphere one year forward. This way, satellite and FAOSTAT data refer to the same crop season.
 
     NOTE: This seems to be the approach followed by the authors of the paper to compare satellite with FAO data, as shown in Fig 1.
     """
