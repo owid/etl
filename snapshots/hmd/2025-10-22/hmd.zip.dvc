@@ -20,7 +20,7 @@ meta:
       Wilmoth, J. R., Andreev, K., Jdanov, D., Glei, D. A., Riffe, T., Boe, C., Bubenheim, M., Philipov, D., Shkolnikov, V., Vachon, P., Winant, C., & Barbieri, M. (2021). Methods protocol for the human mortality database (v6). [Available online](https://www.mortality.org/File/GetDocument/Public/Docs/MethodsProtocolV6.pdf) (needs log in to mortality.org).
     attribution_short: HMD
     # Files
-    url_main: https://www.mortality.org/Datale/ZippedDataFiles
+    url_main: https://www.mortality.org/Data/ZippedDataFiles
     date_accessed: "2025-10-22"
 
     # License

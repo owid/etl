@@ -305,7 +305,7 @@ def _clean_population_type(tb):
 
     To avoid confusion and duplicity, whenever there are multiple entries for a year, we keep YYYY+ definition for the year (e.g. country with new territorial changes).
     """
-    # Crete new column with the year.
+    # Create new column with the year.
     regex = r"\b\d{4}\b"
     tb["year"] = tb["Year"].astype("string").str.extract(f"({regex})", expand=False)
     assert tb["year"].notna().all(), "Year extraction was successful!"

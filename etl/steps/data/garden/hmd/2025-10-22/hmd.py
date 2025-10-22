@@ -143,7 +143,7 @@ def process_table(tb, col_index, sex_expected=None, callback_post=None):
         row_dups = summary.loc[summary["size"] != 1]
         assert row_dups.empty, "Found duplicated rows in life tables!"
 
-    # Final dropping o f columns
+    # Final dropping of columns
     tb = tb.drop(columns="format")
 
     # Country name standardization
