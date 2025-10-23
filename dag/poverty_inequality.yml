@@ -118,6 +118,14 @@ steps:
     - snapshot://wb/2025-10-13/thousand_bins_distribution.dta
   data://garden/wb/2025-10-13/thousand_bins_distribution:
     - data://meadow/wb/2025-10-13/thousand_bins_distribution
+
+  # Historical poverty estimates (combining thousand_bins with Maddison GDP growth)
+  data://garden/wb/2025-10-23/historical_poverty:
+    - data://garden/wb/2025-10-13/thousand_bins_distribution
+    - data://garden/ggdc/2024-04-26/maddison_project_database
+  data://grapher/wb/2025-10-23/historical_poverty:
+    - data://garden/wb/2025-10-23/historical_poverty
+
   # Socio-Economic Database for Latin America and the Caribbean (SEDLAC)
   data://meadow/cedlas/2025-04-01/sedlac:
     - snapshot://cedlas/2025-04-01/sedlac_poverty.xlsx
