@@ -1920,6 +1920,36 @@ def read_custom(
     *args,
     **kwargs,
 ) -> Table:
+    """Read data using a custom reader function and return a Table with metadata.
+
+    This function allows using any custom data reading function while automatically
+    attaching metadata and origin information to the resulting Table. Useful when
+    standard read functions (read_csv, read_excel, etc.) don't meet specific needs.
+
+    Parameters
+    ----------
+    read_function : Callable
+        Custom function to read the data. Must accept filepath_or_buffer as first argument
+        and return a DataFrame or Table.
+    filepath_or_buffer : str | Path | IO[AnyStr]
+        Path to the file or file-like object to read.
+    metadata : TableMeta
+        Table metadata.
+    origin : Origin | None, optional
+        Origin of the table data.
+    underscore : bool, optional
+        True to make all column names snake case.
+    *args
+        Additional positional arguments to pass to read_function.
+    **kwargs
+        Additional keyword arguments to pass to read_function.
+
+    Returns
+    -------
+    Table
+        Data read by the custom function as a Table with attached metadata and origin.
+
+    """
     table = Table(read_function(filepath_or_buffer, *args, **kwargs), underscore=underscore)
     table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
     return cast(Table, table)

@@ -76,8 +76,12 @@ tables:
           grapher_config:
               note: |-
                 {definitions.note_investment}
-          title_public:
-              Disclosed investment - <<field>>
+          title_public: |-
+              <% if field == "All" -%>
+              Annual private investment in artificial intelligence (disclosed)
+              <%- else -%>
+              Annual private investment in << field|lower >> (disclosed)
+              <%- endif %>
         display:
           name: << field >>
 
@@ -95,8 +99,12 @@ tables:
           grapher_config:
               note: |-
                 {definitions.note_investment}
-          title_public:
-              Estimated investment - <<field>>
+          title_public: |-
+              <% if field == "All" -%>
+              Annual private investment in artificial intelligence (estimated)
+              <%- else -%>
+              Annual private investment in << field|lower >> (estimated)
+              <%- endif %>
         display:
           name: << field >>
 
@@ -114,7 +122,11 @@ tables:
               note: |-
                 {definitions.note_patents}
           title_public: |-
-              Patent applications - <<field>>
+              <% if field == "All" -%>
+              Artificial intelligence patent applications
+              <%- else -%>
+              Patent applications in << field|lower >>
+              <%- endif %>
         display:
           name: << field >>
 
@@ -132,7 +144,11 @@ tables:
               note: |-
                 {definitions.note_patents}
           title_public: |-
-              Patent applications granted - <<field>>
+              <% if field == "All" -%>
+              Artificial intelligence patent applications granted
+              <%- else -%>
+              Patent applications granted in << field|lower >>
+              <%- endif %>
         display:
           name: << field >>
 
@@ -148,7 +164,11 @@ tables:
             note: |-
               {definitions.note_articles}
           title_public: |-
-              Number of articles - <<field>>
+              <% if field == "All" -%>
+              Scholarly publications in artificial intelligence
+              <%- else -%>
+              Scholarly publications in << field|lower >>
+              <%- endif %>
         display:
           name: << field >>
 
@@ -164,7 +184,11 @@ tables:
               note: |-
                 {definitions.note_citations}
           title_public: |-
-              Number of citations - <<field>>
+              <% if field == "All" -%>
+              Citations of artificial intelligence publications
+              <%- else -%>
+              Citations of << field|lower >> publications
+              <%- endif %>
         display:
           name: << field >>
 
@@ -181,7 +205,11 @@ tables:
               note: |-
                 {definitions.note_patents}
           title_public: |-
-              Patent applications per 1 million people - <<field>>
+              <% if field == "All" -%>
+              Artificial intelligence patent applications per million people
+              <%- else -%>
+              Patent applications in << field|lower >> per million people
+              <%- endif %>
         display:
           name: << field >>
 
@@ -198,7 +226,11 @@ tables:
               note: |-
                 {definitions.note_patents}
           title_public: |-
-              Patent applications granted per 1 million people - <<field>>
+              <% if field == "All" -%>
+              Artificial intelligence patent applications granted per million people
+              <%- else -%>
+              Patent applications granted in << field|lower >> per million people
+              <%- endif %>
         display:
           name: << field >>
 
@@ -213,6 +245,10 @@ tables:
               note: |-
                 {definitions.note_articles}
           title_public: |-
-              Number of articles per 1 million people - <<field>>
+              <% if field == "All" -%>
+              Scholarly publications in artificial intelligence per million people
+              <%- else -%>
+              Scholarly publications in << field|lower >> per million people
+              <%- endif %>
         display:
           name: << field >>
