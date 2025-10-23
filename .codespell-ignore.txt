@@ -1,0 +1,36 @@
+# Codespell ignore list for OWID ETL
+# Domain-specific terms that are NOT typos
+
+# Agriculture and crops
+tung
+fallow
+
+# Technical abbreviations
+fpr
+eto
+ags
+ons
+ned
+neet
+aer
+wil
+ahd
+mis
+
+# Chemical elements and minerals
+nd
+ore
+
+# Academic/technical terms
+theses
+demog
+ane
+ans
+oint
+mor
+sive
+fot
+belows
+
+# Proper names
+reste
