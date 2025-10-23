@@ -5,7 +5,7 @@ description: Check .meta.yml files for spelling typos using codespell
 Check `.meta.yml` files for spelling typos using comprehensive spell checking.
 
 **First, ask the user which scope they want to check:**
-1. **Current step only** - Check only the `.meta.yml` file(s) in the current working directory/step
+1. **Current step only** - Ask the user to specify the step path (e.g., `etl/steps/data/garden/energy/2025-06-27/electricity_mix`)
 2. **All ETL metadata** - Check all active `.meta.yml` files in `etl/steps/data/garden/` (automatically excludes ~1,979 archived steps)
 
 Once the user specifies the scope, proceed with the typo check using the codespell-based approach.
@@ -40,11 +40,20 @@ ARCHIVED=$(grep -h "data://garden/" dag/archive/*.yml 2>/dev/null |
 
 ### 3. Run codespell with ignore list and exclusions
 Use the existing `.codespell-ignore.txt` file to filter out domain-specific terms:
-```bash
-# For current directory (option 1)
-.venv/bin/codespell . \
-  --ignore-words=.codespell-ignore.txt
 
+**For option 1 (current step only):**
+1. Ask the user to provide the step path (e.g., `etl/steps/data/garden/energy/2025-06-27/electricity_mix`)
+2. Construct the full path to the metadata file: `<step_path>/*.meta.yml`
+3. Run codespell on that specific path:
+```bash
+# For specific step (option 1)
+STEP_PATH="<user_provided_path>"  # e.g., etl/steps/data/garden/energy/2025-06-27/electricity_mix
+.venv/bin/codespell "${STEP_PATH}"/*.meta.yml \
+  --ignore-words=.codespell-ignore.txt
+```
+
+**For option 2 (all garden metadata):**
+```bash
 # For all garden metadata (option 2)
 .venv/bin/codespell etl/steps/data/garden/**/*.meta.yml \
   --ignore-words=.codespell-ignore.txt \
