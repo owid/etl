@@ -32,8 +32,8 @@ def run(dest_dir: str) -> None:
     # Standardize domain names.
     tb["domain"] = tb["domain"].astype(str)
     replacements = {
-        "Multimodal": "Multimodal",
         "Vision,Image generation": "Vision and image generation",
+        "Language,Image generation": "Language and image generation",
     }
     for old_value, new_value in replacements.items():
         tb.loc[tb["domain"].str.contains(old_value, na=False), "domain"] = new_value
