@@ -4,7 +4,7 @@ definitions:
 
   poverty_line_per_day: $2.15 per day
 
-  employment: Employment refers to all persons of working age who, during a specified brief period, were in paid employment or self-employment.
+  employment: Employment refers to people of working age who worked for at least an hour during the reference period (typically a week), whether in paid employment or self-employment.
 
   description_short_informal_employment: |-
     Share of << sex >>employed population who are working in jobs that lack basic social or legal protection and employment benefits.
