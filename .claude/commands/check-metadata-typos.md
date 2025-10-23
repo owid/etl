@@ -6,9 +6,11 @@ Check `.meta.yml` files for spelling typos using comprehensive spell checking.
 
 **First, ask the user which scope they want to check:**
 1. **Current step only** - Check only the `.meta.yml` file(s) in the current working directory/step
-2. **All ETL metadata** - Check all `.meta.yml` files in `etl/steps/data/garden/` (approximately 1,262 files)
+2. **All ETL metadata** - Check all active `.meta.yml` files in `etl/steps/data/garden/` (automatically excludes ~1,979 archived steps)
 
 Once the user specifies the scope, proceed with the typo check using the codespell-based approach.
+
+**Note:** Archived steps (defined in `dag/archive/*.yml`) are automatically excluded from checking as they are no longer actively maintained.
 
 ---
 
@@ -20,17 +22,38 @@ Check if codespell is available in the virtual environment. If not, install it:
 .venv/bin/pip show codespell || uv add --dev codespell
 ```
 
-### 2. Run codespell with ignore list
-Use the existing `.codespell-ignore.txt` file to filter out domain-specific terms:
+### 2. Exclude archived steps
+**IMPORTANT:** Do not check archived steps as they are no longer in use.
+
+Archived steps are defined in `dag/archive/*.yml` files (~1,979 deprecated steps).
+
+To exclude them, extract their paths and pass to codespell's `--skip` flag:
 ```bash
-.venv/bin/codespell <path> --ignore-words=.codespell-ignore.txt
+# Extract archived garden step paths
+ARCHIVED=$(grep -h "data://garden/" dag/archive/*.yml 2>/dev/null |
+           grep -o "data://garden/[^:]*" |
+           sed 's|data://||' |
+           sed 's|$|.meta.yml|' |
+           tr '\n' ',' |
+           sed 's/,$//')
 ```
 
-Where `<path>` is either:
-- `.` for current directory (option 1)
-- `etl/steps/data/garden/**/*.meta.yml` for all garden files (option 2)
+### 3. Run codespell with ignore list and exclusions
+Use the existing `.codespell-ignore.txt` file to filter out domain-specific terms:
+```bash
+# For current directory (option 1)
+.venv/bin/codespell . \
+  --ignore-words=.codespell-ignore.txt
 
-### 3. Parse and present results
+# For all garden metadata (option 2)
+.venv/bin/codespell etl/steps/data/garden/**/*.meta.yml \
+  --ignore-words=.codespell-ignore.txt \
+  --skip="$ARCHIVED"
+```
+
+Note: Excluding archived steps reduces the scope by ~1,979 files and focuses on actively maintained metadata.
+
+### 4. Parse and present results
 Extract typos from codespell output and present them in a structured format:
 - Group by typo type (e.g., all instances of "seperate" → "separate")
 - Show file paths (as clickable links when possible)
@@ -52,13 +75,13 @@ Detailed list:
 ...
 ```
 
-### 4. Offer to fix typos
+### 5. Offer to fix typos
 After presenting results, ask the user:
 - **Fix all automatically?** - Apply all suggested fixes
 - **Review each typo?** - Go through typos one by one for confirmation
 - **Cancel** - Exit without making changes
 
-### 5. Apply fixes (if user confirms)
+### 6. Apply fixes (if user confirms)
 For automatic fixes:
 ```bash
 # Use sed or Python script to replace typos in files
@@ -67,7 +90,7 @@ For automatic fixes:
 
 For reviewed fixes, confirm each change before applying.
 
-### 6. Verify fixes
+### 7. Verify fixes
 After applying fixes, re-run codespell to verify all typos were corrected:
 ```bash
 .venv/bin/codespell <path> --ignore-words=.codespell-ignore.txt
@@ -75,7 +98,7 @@ After applying fixes, re-run codespell to verify all typos were corrected:
 
 Should return 0 results.
 
-### 7. Clean up
+### 8. Clean up
 **IMPORTANT:** Delete any temporary files created during the check:
 - Any `/tmp/` files created for analysis
 - Any temporary Python scripts
