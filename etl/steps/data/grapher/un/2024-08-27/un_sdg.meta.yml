@@ -2,6 +2,77 @@ definitions:
   common:
     processing_level: minor
 
+  poverty_line_per_day: $2.15 per day
+
+  employment: Employment refers to all persons of working age who, during a specified brief period, were in paid employment or self-employment.
+
+  description_short_informal_employment: |-
+    Share of << sex >>employed population who are working in jobs that lack basic social or legal protection and employment benefits.
+
+  description_key_international_dollars: |-
+    This data is expressed in constant international dollars to adjust for inflation and differences in living costs between countries. Read more in our article, [What are international dollars?](https://ourworldindata.org/international-dollars)
+
+  description_key_extreme_poverty: |-
+    Extreme poverty here is defined as living below the International Poverty Line of {definitions.poverty_line_per_day}.
+
+  description_key_social_protection_at_least_one_benefit: |-
+    This indicator is calculated as the ratio of the population receiving cash benefits under at least one of multiple contingencies/social protection functions or actively contributing to at least one social security scheme to the total population. The different benefits are aimed at children, unemployed persons, older persons, persons with disabilities, pregnant women, newborns, work-injury victims and the poor and the vulnerable.
+  description_key_social_protection_children: |-
+    This indicator is calculated as the ratio of children/households receiving child or family cash benefits to the total number of children/households with children.
+  description_key_social_protection_employed_injury: |-
+    This indicator is calculated as the ratio of workers protected by injury insurance to total employment or the labor force.
+  description_key_social_protection_mothers: |-
+    This indicator is calculated as the ratio of women receiving cash maternity benefits to women giving birth in the same year.
+  description_key_social_protection_retired: |-
+    This indicator is calculated as the ratio of persons above statutory retirement age receiving an old-age pension to persons above statutory retirement age (including contributory and non-contributory).
+  description_key_social_protection_poor: |-
+    This indicator is calculated as the ratio of social assistance recipients to the population living below the national poverty line.
+  description_key_social_protection_unemployed: |-
+    This indicator is calculated as the ratio of recipients of unemployment cash benefits to the number of unemployed persons.
+  description_key_social_protection_vulnerable: |-
+    This indicator is calculated as the ratio of social assistance recipients to the total number of vulnerable persons. The latter are calculated by subtracting from total population all people of working age who are contributing to a social insurance scheme or receiving contributory benefits, and all persons above retirement age receiving contributory benefits.
+  description_key_social_protection_disabled: |-
+    This indicator is calculated as the ratio of persons receiving disability cash benefits to persons with severe disabilities. The latter is calculated as the product of prevalence of disability ratios (published for each country group by the World Health Organization) and each country’s population.
+
+  description_key_women_in_management: |-
+    Employment in management is defined based on the [International Standard Classification of Occupations](https://ilostat.ilo.org/methods/concepts-and-definitions/classification-occupation/). This series refers to total management (category 1 of ISCO-08 or ISCO-88).
+  description_key_women_in_senior_middle_management: |-
+    Employment in senior and middle management is defined based on the [International Standard Classification of Occupations](https://ilostat.ilo.org/methods/concepts-and-definitions/classification-occupation/). This series refers to major group 1 of ISCO-08 or ISCO-88, excluding sub-major groups 14 in ISCO-08 and 13 in ISCO-88.
+
+  description_key_informal_employment: |-
+    Informal employment encompasses all jobs that lack basic social or legal protection and employment benefits, regardless of the type of organization in which they are performed. It includes own-account workers, employers, and members of producers’ cooperatives operating in the informal sector; own-account workers engaged in producing goods exclusively for their household’s final use (such as subsistence farming); and contributing family workers, whether in formal or informal sector enterprises. It also covers employees in informal jobs, whether they are working in formal enterprises, informal enterprises, or employed as paid domestic workers by households.
+
+  description_key_earnings: |-
+    This data includes remuneration in cash and as benefits in kind paid to employees at regular intervals. It excludes employers' contributions paid to social security and pensions schemes, the benefits received by employees under these schemes, as well as severance and termination pay.
+
+  description_key_disability_status: |-
+    Disability, as defined in the [International Classification of Functioning, Disability and Health (ICF)](https://www.who.int/standards/classifications/international-classification-of-functioning-disability-and-health), is used as an umbrella term, covering impairments, activity limitations, and participation restrictions. For measurement purposes, a person with disability is defined as a person who is limited in the kind or amount of activities that he or she can do because of ongoing difficulties due to a long-term physical condition, mental condition or health problem.
+
+  description_key_child_labor_5_17: |-
+    Child labor is defined differently depending on the age group: for children aged 5-11, it includes those who did at least one hour of economic activity and/or more than 21 hours of unpaid household services; for children aged 12-14, it includes those who did at least 14 hours of economic activity and/or more than 21 hours of unpaid household services; and for children aged 15-17, it includes those who did at least 43 hours of economic activity during the reference week.
+
+  description_key_child_labor_economic_activity_5_17: |-
+    Child labor is defined differently depending on the age group: for children aged 5-11, it includes those who did at least one hour of economic activity and/or more than 21 hours of unpaid household services; for children aged 12-14, it includes those who did at least 14 hours of economic activity and/or more than 21 hours of unpaid household services; and for children aged 15-17, it includes those who did at least 43 hours of economic activity during the reference week.
+
+  description_key_occupational_injury: |-
+    An occupational injury is defined as any personal injury, disease or death resulting from an occupational accident. An occupational accident is an unexpected and unplanned occurrence, including acts of violence, arising out of or in connection with work which results in one or more workers incurring a personal injury, disease or death.
+  description_key_fatal_occupational_injury: |-
+    An occupational injury is fatal when it results in the death of a worker within one year of the day of the accident.
+  description_key_occupational_injury_reference_group: |-
+    This indicator is calculated against a reference group, which is the average number of workers in the particular group under consideration and who are covered by the source of the statistics on occupational injuries.
+
+  description_key_facb: |-
+    The principles of freedom of association and collective bargaining (FACB) are fundamental rights at work. Freedom of association is the right of workers and employers to freely form or join organizations that promote and defend their interests at work, without interference from one another or the State. Collective bargaining is a voluntary process through which employers and trade unions discuss and negotiate their relations and interaction at the workplace, such as pay and other terms and conditions of work.
+
+  description_key_national_strategy_youth_employment: |-
+    The indicator is based on a four-level scale: (0) The country has not developed any national strategy or taken steps to develop or adopt one; (1) The country is in the process of developing a national strategy; (2) The country has developed and adopted a national strategy; (3) The country has operationalized a national strategy.
+
+  description_key_manufacturing_employment: |-
+    The manufacturing sector is defined according the [International Standard Industrial Classification of all Economic Activities (ISIC)](https://ilostat.ilo.org/methods/concepts-and-definitions/classification-economic-activities/). It refers to industries belonging to sector C in revision 4 or sector D in revision 3.
+
+  description_key_labor_income_share: |-
+    This indicator is calculated using compensation of employees (wages and salaries in cash and in kind benefits, and social contributions paid by employers) and labor income of the self-employed (the part of the remuneration attributable for work done by self-employed workers).
+
 dataset:
   update_period_days: 730
 tables:
@@ -243,3 +314,415 @@ tables:
           Most of the ministries, departments, agencies, boards, commissions, judicial authorities, legislative bodies, and other entities that make up the budgetary central government are not separate institutional units. This is because they generally do not have the authority to own assets, incur liabilities, or engage in transactions in their own right, including references to standards and classifications, preferably relying on international agreed definitions.
 
           Further information available at: https://unstats.un.org/sdgs/metadata/files/Metadata-17-01-02.pdf
+
+  _1_1_1__si_pov_emp1__15_years_old_and_over__both_sexes:
+    variables:
+      _1_1_1__si_pov_emp1__15_years_old_and_over__both_sexes:
+        description_key:
+          - "{definitions.description_key_extreme_poverty}"
+          - "{definitions.description_key_international_dollars}"
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+
+  _1_3_1__si_cov_benfts__both_sexes:
+    variables:
+      _1_3_1__si_cov_benfts__both_sexes:
+        description_key:
+          - "{definitions.description_key_social_protection_at_least_one_benefit}"
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+
+  _1_3_1__si_cov_chld__both_sexes:
+    variables:
+      _1_3_1__si_cov_chld__both_sexes:
+        description_key:
+          - "{definitions.description_key_social_protection_children}"
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+
+  _1_3_1__si_cov_disab__both_sexes:
+    variables:
+      _1_3_1__si_cov_disab__both_sexes:
+        description_key:
+          - "{definitions.description_key_social_protection_disabled}"
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+
+  _1_3_1__si_cov_matnl:
+    variables:
+      _1_3_1__si_cov_matnl:
+        description_key:
+          - "{definitions.description_key_social_protection_mothers}"
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+
+  _1_3_1__si_cov_pensn__both_sexes:
+    variables:
+      _1_3_1__si_cov_pensn__both_sexes:
+        description_key:
+          - "{definitions.description_key_social_protection_retired}"
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+
+  _1_3_1__si_cov_poor__both_sexes:
+    variables:
+      _1_3_1__si_cov_poor__both_sexes:
+        description_key:
+          - "{definitions.description_key_social_protection_poor}"
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+
+  _1_3_1__si_cov_uemp__both_sexes:
+    variables:
+      _1_3_1__si_cov_uemp__both_sexes:
+        description_key:
+          - "{definitions.description_key_social_protection_unemployed}"
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+
+  _1_3_1__si_cov_vuln__both_sexes:
+    variables:
+      _1_3_1__si_cov_vuln__both_sexes:
+        description_key:
+          - "{definitions.description_key_social_protection_vulnerable}"
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+
+  _1_3_1__si_cov_wkinjry__both_sexes:
+    variables:
+      _1_3_1__si_cov_wkinjry__both_sexes:
+        description_key:
+          - "{definitions.description_key_social_protection_employed_injury}"
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+
+  _5_5_2__ic_gen_mgtl:
+    variables:
+      _5_5_2__ic_gen_mgtl:
+        description_key:
+          - "{definitions.description_key_women_in_management}"
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+
+  _5_5_2__ic_gen_mgtn:
+    variables:
+      _5_5_2__ic_gen_mgtn:
+        description_key:
+          - "{definitions.description_key_women_in_senior_middle_management}"
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+
+  _8_2_1__sl_emp_pcap:
+    variables:
+      _8_2_1__sl_emp_pcap:
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+
+  _8_3_1__sl_isv_ifem__no_breakdown__both_sexes:
+    variables:
+      _8_3_1__sl_isv_ifem__no_breakdown__both_sexes:
+        description_short: |-
+          <%- set sex = "" %>
+          {definitions.description_short_informal_employment}
+        description_key:
+          - "{definitions.employment}"
+          - "{definitions.description_key_informal_employment}"
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+
+  _8_3_1__sl_isv_ifem__no_breakdown__female:
+    variables:
+      _8_3_1__sl_isv_ifem__no_breakdown__female:
+        description_short: |-
+          <%- set sex = "female " %>
+          {definitions.description_short_informal_employment}
+        description_key:
+          - "{definitions.employment}"
+          - "{definitions.description_key_informal_employment}"
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+
+  _8_3_1__sl_isv_ifem__no_breakdown__male:
+    variables:
+      _8_3_1__sl_isv_ifem__no_breakdown__male:
+        description_short: |-
+          <%- set sex = "male " %>
+          {definitions.description_short_informal_employment}
+        description_key:
+          - "{definitions.employment}"
+          - "{definitions.description_key_informal_employment}"
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+
+  _8_3_1__sl_isv_ifem__non_agriculture__female:
+    variables:
+      _8_3_1__sl_isv_ifem__non_agriculture__female:
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+
+  _8_3_1__sl_isv_ifem__non_agriculture__male:
+    variables:
+      _8_3_1__sl_isv_ifem__non_agriculture__male:
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+
+  _8_3_1__sl_isv_ifem__agriculture__forestry_and_fishing__female:
+    variables:
+      _8_3_1__sl_isv_ifem__agriculture__forestry_and_fishing__female:
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+
+  _8_3_1__sl_isv_ifem__agriculture__forestry_and_fishing__male:
+    variables:
+      _8_3_1__sl_isv_ifem__agriculture__forestry_and_fishing__male:
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+
+  _8_3_1__sl_isv_ifem__agriculture__forestry_and_fishing__both_sexes:
+    variables:
+      _8_3_1__sl_isv_ifem__agriculture__forestry_and_fishing__both_sexes:
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+
+  _8_3_1__sl_isv_ifem__non_agriculture__both_sexes:
+    variables:
+      _8_3_1__sl_isv_ifem__non_agriculture__both_sexes:
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+
+  _8_5_2__sl_tlf_uem__15_years_old_and_over__both_sexes:
+    variables:
+      _8_5_2__sl_tlf_uem__15_years_old_and_over__both_sexes:
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+
+  _8_5_2__sl_tlf_uem__15_years_old_and_over__female:
+    variables:
+      _8_5_2__sl_tlf_uem__15_years_old_and_over__female:
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+
+  _8_5_2__sl_tlf_uem__15_years_old_and_over__male:
+    variables:
+      _8_5_2__sl_tlf_uem__15_years_old_and_over__male:
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+
+  _8_5_2__sl_tlf_uemdis__persons_without_disability__both_sexes:
+    variables:
+      _8_5_2__sl_tlf_uemdis__persons_without_disability__both_sexes:
+        description_key:
+          - "{definitions.description_key_disability_status}"
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+
+  _8_5_2__sl_tlf_uemdis__persons_with_disability__both_sexes:
+    variables:
+      _8_5_2__sl_tlf_uemdis__persons_with_disability__both_sexes:
+        description_key:
+          - "{definitions.description_key_disability_status}"
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+
+  _8_6_1__sl_tlf_neet__both_sexes:
+    variables:
+      _8_6_1__sl_tlf_neet__both_sexes:
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+
+  _8_6_1__sl_tlf_neet__female:
+    variables:
+      _8_6_1__sl_tlf_neet__female:
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+
+  _8_6_1__sl_tlf_neet__male:
+    variables:
+      _8_6_1__sl_tlf_neet__male:
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+
+  _8_7_1__sl_tlf_chldea__5_to_17_years_old__both_sexes:
+    variables:
+      _8_7_1__sl_tlf_chldea__5_to_17_years_old__both_sexes:
+        description_key:
+          - "{definitions.description_key_child_labor_economic_activity_5_17}"
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+
+  _8_7_1__sl_tlf_chldea__5_to_17_years_old__female:
+    variables:
+      _8_7_1__sl_tlf_chldea__5_to_17_years_old__female:
+        description_key:
+          - "{definitions.description_key_child_labor_economic_activity_5_17}"
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+
+  _8_7_1__sl_tlf_chldea__5_to_17_years_old__male:
+    variables:
+      _8_7_1__sl_tlf_chldea__5_to_17_years_old__male:
+        description_key:
+          - "{definitions.description_key_child_labor_economic_activity_5_17}"
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+
+  _8_7_1__sl_tlf_chldec__5_to_17_years_old__both_sexes:
+    variables:
+      _8_7_1__sl_tlf_chldec__5_to_17_years_old__both_sexes:
+        description_key:
+          - "{definitions.description_key_child_labor_5_17}"
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+
+  _8_7_1__sl_tlf_chldec__5_to_17_years_old__female:
+    variables:
+      _8_7_1__sl_tlf_chldec__5_to_17_years_old__female:
+        description_key:
+          - "{definitions.description_key_child_labor_5_17}"
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+
+  _8_7_1__sl_tlf_chldec__5_to_17_years_old__male:
+    variables:
+      _8_7_1__sl_tlf_chldec__5_to_17_years_old__male:
+        description_key:
+          - "{definitions.description_key_child_labor_5_17}"
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+
+  _8_8_1__sl_emp_ftlinjur__no_breakdown__both_sexes:
+    variables:
+      _8_8_1__sl_emp_ftlinjur__no_breakdown__both_sexes:
+        description_key:
+          - "{definitions.description_key_occupational_injury}"
+          - "{definitions.description_key_fatal_occupational_injury}"
+          - "{definitions.description_key_occupational_injury_reference_group}"
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+
+  _8_8_1__sl_emp_ftlinjur__no_breakdown__female:
+    variables:
+      _8_8_1__sl_emp_ftlinjur__no_breakdown__female:
+        description_key:
+          - "{definitions.description_key_occupational_injury}"
+          - "{definitions.description_key_fatal_occupational_injury}"
+          - "{definitions.description_key_occupational_injury_reference_group}"
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+
+  _8_8_1__sl_emp_ftlinjur__no_breakdown__male:
+    variables:
+      _8_8_1__sl_emp_ftlinjur__no_breakdown__male:
+        description_key:
+          - "{definitions.description_key_occupational_injury}"
+          - "{definitions.description_key_fatal_occupational_injury}"
+          - "{definitions.description_key_occupational_injury_reference_group}"
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+
+  _8_8_1__sl_emp_injur__no_breakdown__both_sexes:
+    variables:
+      _8_8_1__sl_emp_injur__no_breakdown__both_sexes:
+        description_key:
+          - "{definitions.description_key_occupational_injury}"
+          - "{definitions.description_key_occupational_injury_reference_group}"
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+
+  _8_8_1__sl_emp_injur__no_breakdown__female:
+    variables:
+      _8_8_1__sl_emp_injur__no_breakdown__female:
+        description_key:
+          - "{definitions.description_key_occupational_injury}"
+          - "{definitions.description_key_occupational_injury_reference_group}"
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+
+  _8_8_1__sl_emp_injur__no_breakdown__male:
+    variables:
+      _8_8_1__sl_emp_injur__no_breakdown__male:
+        description_key:
+          - "{definitions.description_key_occupational_injury}"
+          - "{definitions.description_key_occupational_injury_reference_group}"
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+
+  _8_8_2__sl_lbr_ntlcpl:
+    variables:
+      _8_8_2__sl_lbr_ntlcpl:
+        description_short: Level of national compliance with fundamental rights at work (freedom of association and collective bargaining), in a scale from 0 to 10. Higher values indicate higher levels of compliance.
+        description_key:
+          - "{definitions.description_key_facb}"
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+
+  _8_b_1__sl_cpa_yemp:
+    variables:
+      _8_b_1__sl_cpa_yemp:
+        description_short: Level of development and implementation of a national strategy for youth employment, in a scale from 0 to 3. 0 means no strategy exists, and 3 means that the strategy is developed and operationalized.
+        description_key:
+          - "{definitions.description_key_national_strategy_youth_employment}"
+        display:
+          numDecimalPlaces: 0
+          tolerance: 5
+
+  _9_2_2__sl_tlf_manf:
+    variables:
+      _9_2_2__sl_tlf_manf:
+        description_key:
+          - "{definitions.description_key_manufacturing_employment}"
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+
+  _10_4_1__sl_emp_gtotl:
+    variables:
+      _10_4_1__sl_emp_gtotl:
+        description_key:
+          - "{definitions.description_key_labor_income_share}"
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5

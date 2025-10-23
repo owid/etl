@@ -7,6 +7,18 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+COLOR_PRIMARY = "#4C6A9C"
+COLOR_LOWER_SECONDARY = "#883039"
+
+COLOR_MAT = "#D73C50"
+COLOR_READING = "#578145"
+
+COLOR_BOYS = "#00847E"
+COLOR_GIRLS = "#E56E5A"
+
+COLOR_ALL_CHILDREN = "#B16214"
+COLOR_STUDENTS = "#4C6A9C"
+
 # Common configuration for all charts
 MULTIDIM_CONFIG = {
     "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.008.json",
@@ -15,7 +27,7 @@ MULTIDIM_CONFIG = {
     "yAxis": {"min": 0, "max": 100},
     "hasMapTab": True,
     "tab": "map",
-    "addCountryMode": "change-country",
+    "addCountryMode": "add-country",
 }
 
 # Common grouped view configuration
@@ -86,6 +98,18 @@ for level_key, config in EDUCATION_LEVELS.items():
 SUBJECT_KEYWORDS = {config["keywords"]: key for key, config in SUBJECTS.items()}
 SEX_KEYWORDS = {"both_sexes": "both", "male": "male", "female": "female"}
 
+# DOD link mappings for education levels
+LEVEL_DOD_LINKS = {
+    "primary": "primary-education",
+    "lower_secondary": "lower-secondary-education",
+}
+
+# Display name mappings for education levels
+LEVEL_DISPLAY_NAMES = {
+    "primary": "primary",
+    "lower_secondary": "lower secondary",
+}
+
 # Exclusion patterns for column filtering
 EXCLUSION_PATTERNS = [
     "urban",
@@ -138,8 +162,34 @@ def run() -> None:
         }
     )
 
-    # Edit display names
+    # Edit display names and set view metadata
     for view in c.views:
+        level = view.dimensions["level"]
+        sex = view.dimensions["sex"]
+        population = view.dimensions["population"]
+        subject = view.dimensions["subject"]
+
+        if (
+            level == "level_side_by_side"
+            or sex == "sex_side_by_side"
+            or population == "population_side_by_side"
+            or subject == "subject_side_by_side"
+        ):
+            view.metadata = {
+                "description_from_producer": "",
+                "description_short": view.config["subtitle"],
+                "presentation": {
+                    "title_public": view.config["title"],
+                },
+            }
+        else:
+            # Only updated description_short for other views
+            view.metadata = {
+                "description_short": view.config["subtitle"],
+                "presentation": {
+                    "title_public": view.config["title"],
+                },
+            }
         edit_indicator_displays(view)
 
     # Save collection
@@ -326,7 +376,7 @@ def generate_subtitle_by_dimensions(view):
         primary_reading = EDUCATION_LEVELS["primary"]["reading_desc"]
         secondary_reading = EDUCATION_LEVELS["lower_secondary"]["reading_desc"]
 
-        return f"The share of children who achieve the minimum [math](#dod:math-proficiency) and [reading](#dod:reading-proficiency) proficiency at different stages of education. For mathematics: at [primary](#dod:primary-education) level, students can {primary_math}; at [lower-secondary](#dod:lower-secondary-education) level, students {secondary_math}. For reading: at primary level, children can {primary_reading}; at lower-secondary level, children can {secondary_reading}."
+        return f"The share of children who achieve the minimum [math](#dod:math-proficiency) and [reading](#dod:reading-proficiency) proficiency at different stages of education. For mathematics: at [primary](#dod:primary-education) level, students can {primary_math}; at [lower secondary](#dod:lower-secondary-education) level, students {secondary_math}. For reading: at primary level, children can {primary_reading}; at lower-secondary level, children can {secondary_reading}."
 
     elif view.matches(level="level_side_by_side"):
         desc_key = "math_desc" if subject == "mathematics" else "reading_desc"
@@ -334,60 +384,91 @@ def generate_subtitle_by_dimensions(view):
         secondary_desc = EDUCATION_LEVELS["lower_secondary"][desc_key]
         subject_link = "math" if subject == "mathematics" else "reading"
 
-        return f"The share of children who achieve minimum [{subject_link}](#dod:{subject_link}-proficiency) proficiency at different education levels. At [primary](#dod:primary-education) level, {'students' if subject == 'mathematics' else 'children'} can {primary_desc}. At [lower-secondary](#dod:lower-secondary-education) level, {'students' if subject == 'mathematics' else 'children'} can {secondary_desc}."
+        return f"The share of children who achieve minimum [{subject_link}](#dod:{subject_link}-proficiency) proficiency at different education levels. At [primary](#dod:primary-education) level, {'students' if subject == 'mathematics' else 'children'} can {primary_desc}. At [lower secondary](#dod:lower-secondary-education) level, {'students' if subject == 'mathematics' else 'children'} can {secondary_desc}."
 
     elif view.matches(subject="subject_side_by_side"):
         math_desc = level_config.get("math_desc", "")
         reading_desc = level_config.get("reading_desc", "")
 
-        return f"The share of children who achieve minimum proficiency by the end of [{level}](#dod:{level}-education) education. For [math](#dod:math-proficiency), students can {math_desc}. For [reading](#dod:reading-proficiency), children can {reading_desc}."
+        level_dod = LEVEL_DOD_LINKS.get(level, f"{level}-education")
+        level_display = LEVEL_DISPLAY_NAMES.get(level, level)
+        return f"The share of children who achieve minimum proficiency by the end of [{level_display}](#dod:{level_dod}) education. For [math](#dod:math-proficiency), students can {math_desc}. For [reading](#dod:reading-proficiency), children can {reading_desc}."
 
     elif view.matches(population="population_side_by_side"):
         proficiency_desc = get_proficiency_desc(subject)
         subject_link = "math" if subject == "mathematics" else "reading"
 
-        return f"The share of children who achieve minimum [{subject_link}](#dod:{subject_link}-proficiency) proficiency by the end of [{level}](#dod:{level}-education) education, where {'students' if subject == 'mathematics' else 'children'} can {proficiency_desc}. Compares all children in the age group versus only those enrolled in school."
+        level_dod = LEVEL_DOD_LINKS.get(level, f"{level}-education")
+        level_display = LEVEL_DISPLAY_NAMES.get(level, level)
+        return f"The share of children who achieve minimum [{subject_link}](#dod:{subject_link}-proficiency) proficiency by the end of [{level_display}](#dod:{level_dod}) education, where {'students' if subject == 'mathematics' else 'children'} can {proficiency_desc}. Compares all children in the age group versus only those enrolled in school."
 
     else:
         proficiency_desc = get_proficiency_desc(subject)
         subject_link = "math" if subject == "mathematics" else "reading"
         population_context = population_config.get("context", "")
 
-        return f"The share of children who achieve minimum [{subject_link}](#dod:{subject_link}-proficiency) proficiency by the end of [{level}](#dod:{level}-education) education, where {'students' if subject == 'mathematics' else 'children'} can {proficiency_desc}. {population_context}"
+        level_dod = LEVEL_DOD_LINKS.get(level, f"{level}-education")
+        level_display = LEVEL_DISPLAY_NAMES.get(level, level)
+        return f"The share of children who achieve minimum [{subject_link}](#dod:{subject_link}-proficiency) proficiency by the end of [{level_display}](#dod:{level_dod}) education, where {'students' if subject == 'mathematics' else 'children'} can {proficiency_desc}. {population_context}"
 
 
 def edit_indicator_displays(view):
-    """Edit display names for the grouped views."""
+    """Edit display names and colors for the grouped views."""
     if view.indicators.y is None:
         return
 
-    display_names = {
-        "level": {"primary": "Primary education", "lower_secondary": "Lower secondary education"},
-        "subject": {"mathematics": "Mathematics", "reading": "Reading"},
-        "gender": {"both_sexes": "Both genders", "_male": "Boys", "_female": "Girls"},
-        "population": {"all_children": "All children", "students": "Students"},
+    display_config = {
+        "level": {
+            "primary": {"name": "Primary education", "color": COLOR_PRIMARY},
+            "lower_secondary": {"name": "Lower secondary education", "color": COLOR_LOWER_SECONDARY},
+        },
+        "subject": {
+            "mathematics": {"name": "Mathematics", "color": COLOR_MAT},
+            "reading": {"name": "Reading", "color": COLOR_READING},
+        },
+        "gender": {
+            "_male": {"name": "Boys", "color": COLOR_BOYS},
+            "_female": {"name": "Girls", "color": COLOR_GIRLS},
+        },
+        "population": {
+            "all_children": {"name": "All children", "color": COLOR_ALL_CHILDREN},
+            "students": {"name": "Students", "color": COLOR_STUDENTS},
+        },
     }
 
     for indicator in view.indicators.y:
         if view.matches(population="population_side_by_side"):
-            for pop_key, display_name in display_names["population"].items():
+            for pop_key, config in display_config["population"].items():
                 if (pop_key == "all_children" and "prepared_for_the_future" in indicator.catalogPath) or (
                     pop_key == "students" and "achieving_at_least_a_minimum_proficiency" in indicator.catalogPath
                 ):
-                    indicator.display = {"name": display_name}
+                    indicator.display = {"name": config["name"], "color": config["color"]}
                     break
         elif view.matches(level="level_side_by_side"):
-            for level_key, display_name in display_names["level"].items():
+            for level_key, config in display_config["level"].items():
                 if level_key in indicator.catalogPath:
-                    indicator.display = {"name": display_name}
+                    indicator.display = {"name": config["name"], "color": config["color"]}
                     break
+
         elif view.matches(subject="subject_side_by_side"):
-            for subject_key, display_name in display_names["subject"].items():
+            for subject_key, config in display_config["subject"].items():
                 if subject_key in indicator.catalogPath:
-                    indicator.display = {"name": display_name}
+                    indicator.display = {"name": config["name"], "color": config["color"]}
                     break
         elif view.matches(sex="sex_side_by_side"):
-            for gender_key, display_name in display_names["gender"].items():
+            for gender_key, config in display_config["gender"].items():
                 if gender_key in indicator.catalogPath:
-                    indicator.display = {"name": display_name}
+                    indicator.display = {"name": config["name"], "color": config["color"]}
                     break
+
+    # Sort indicators for level_side_by_side: primary → lower secondary
+    if view.matches(level="level_side_by_side"):
+
+        def get_level_index(ind):
+            if "primary" in ind.catalogPath and "lower" not in ind.catalogPath:
+                return 0
+            elif "lower_secondary" in ind.catalogPath:
+                return 1
+            return 2
+
+        view.indicators.y = sorted(view.indicators.y, key=get_level_index)

@@ -10,6 +10,15 @@ paths = PathFinder(__file__)
 # --------------------- #
 #   Constants & Config  #
 # --------------------- #
+# Color constants for education levels and gender
+COLOR_PREPRIMARY = "#D73C50"
+COLOR_PRIMARY = "#4C6A9C"
+COLOR_LOWER_SECONDARY = "#883039"
+COLOR_UPPER_SECONDARY = "#578145"
+COLOR_TERTIARY = "#B16214"
+
+COLOR_BOYS = "#00847E"
+COLOR_GIRLS = "#E56E5A"
 
 ID_COLUMNS = ["country", "year"]
 
@@ -52,37 +61,42 @@ GROUPED_VIEW_CONFIG = MULTIDIM_CONFIG | {
     "tab": "chart",
     "yAxis": {"min": 0, "facetDomain": "independent"},
     "selectedFacetStrategy": "entity",
-    "addCountryMode": "change-country",
+    "addCountryMode": "add-country",
 }
 
 # --------------------- #
 #      Dimensions       #
 # --------------------- #
 
+
 EDUCATION_LEVELS = {
     "primary": {
         "keywords": ["primary_school_age"],
         "display_name": "Primary education",
-        "title_term": "primary school age",
-        "age_range": "primary school age (typically 6–11 years)",
+        "title_term": "primary",
+        "age_range": "of primary school age (typically 6–11 years)",
+        "dod_term": "primary-education",
     },
     "lower_secondary": {
         "keywords": ["lower_secondary_school_age"],
         "display_name": "Lower secondary education",
-        "title_term": "lower secondary school age",
-        "age_range": "lower secondary school age (typically 12–14 years)",
+        "title_term": "lower secondary",
+        "age_range": "of lower secondary school age (typically 12–14 years)",
+        "dod_term": "lower-secondary-education",
     },
     "upper_secondary": {
         "keywords": ["upper_secondary_school_age"],
         "display_name": "Upper secondary education",
-        "title_term": "upper secondary school age",
-        "age_range": "upper secondary school age (typically 15–17 years)",
+        "title_term": "upper secondary",
+        "age_range": "of upper secondary school age (typically 15–17 years)",
+        "dod_term": "upper-secondary-education",
     },
     "pre_primary": {
         "keywords": ["one_year_before_the_official_primary_entry_age"],
         "display_name": "Pre-primary education",
-        "title_term": "pre-primary age",
+        "title_term": "pre-primary",
         "age_range": "one year before official primary entry age (typically age 5)",
+        "dod_term": "pre-primary-education",
     },
 }
 
@@ -99,21 +113,6 @@ GENDERS = {
     "male": "boys",
     "female": "girls",
     "sex_side_by_side": "boys and girls",
-}
-
-METRIC_TYPES = {
-    "rate": {
-        "title": "Share of children out of school",
-        "unit": "percent",
-        "y_axis": {"min": 0, "max": 100},
-        "description": "shown as a percentage of children in the relevant age group",
-    },
-    "number": {
-        "title": "Number of children out of school",
-        "unit": "children",
-        "y_axis": {"min": 0},
-        "description": "shown as the total number of children not enrolled in school",
-    },
 }
 
 
@@ -147,6 +146,26 @@ def run() -> None:
     )
 
     for view in collection.views:
+        # Update title and subtitle based on view dimensions
+        sex = view.dimensions["sex"]
+        level = view.dimensions["level"]
+        # Set view metadata for all views
+        if sex == "sex_side_by_side" or level == "level_side_by_side":
+            view.metadata = {
+                "description_from_producer": "",
+                "description_short": view.config["subtitle"],
+                "presentation": {
+                    "title_public": view.config["title"],
+                },
+            }
+        else:
+            # Only updated description_short for other views
+            view.metadata = {
+                "description_short": view.config["subtitle"],
+                "presentation": {
+                    "title_public": view.config["title"],
+                },
+            }
         edit_indicator_displays(view)
 
     collection.save()
@@ -195,7 +214,10 @@ def adjust_dimensions(tb):
 
     tb.metadata.dimensions.extend(
         [
-            {"name": "Education level", "slug": "level"},
+            {
+                "name": "Education level",
+                "slug": "level",
+            },
             {"name": "Gender", "slug": "sex"},
             {"name": "Metric type", "slug": "metric_type"},
         ]
@@ -213,10 +235,21 @@ def create_grouped_views(collection):
     }
 
     def get_view_config(view):
-        return GROUPED_VIEW_CONFIG | {
+        config = GROUPED_VIEW_CONFIG | {
             "title": "{title}",
             "subtitle": "{subtitle}",
         }
+
+        # Add stacked area chart configuration for number metrics
+        metric_type = view.dimensions.get("metric_type", "rate")
+        if metric_type == "number":
+            config.update(
+                {
+                    "chartTypes": ["StackedArea"],
+                }
+            )
+
+        return config
 
     collection.group_views(
         groups=[
@@ -230,7 +263,7 @@ def create_grouped_views(collection):
             {
                 "dimension": "level",
                 "choice_new_slug": "level_side_by_side",
-                "choices": ["primary", "lower_secondary", "upper_secondary"],
+                "choices": ["pre_primary", "primary", "lower_secondary", "upper_secondary"],
                 "view_config": get_view_config,
                 "view_metadata": view_metadata,
             },
@@ -249,74 +282,151 @@ def generate_title_by_dimensions(view):
     metric = view.dimensions.get("metric_type", "rate")
     gender_term = GENDERS.get(sex, "children")
     level_cfg = EDUCATION_LEVELS.get(level, {})
-    age_term = level_cfg.get("title_term", level)
+    title_term = level_cfg.get("title_term", "")
 
-    if view.matches(level="level_side_by_side"):
+    # ---- RATE ----
+    if metric == "rate":
+        if view.matches(level="level_side_by_side"):
+            return f"{gender_term.title()} of official age for each level of education who are not in school"
         if view.matches(sex="sex_side_by_side"):
-            return f"{METRIC_TYPES[metric]['title']}, by education level and gender"
+            return f"Share of girls and boys who are not in {title_term} school"
         else:
-            return f"{METRIC_TYPES[metric]['title']} for {gender_term}, by education level"
-    elif view.matches(sex="sex_side_by_side"):
-        return f"{METRIC_TYPES[metric]['title']} for children of {age_term}, by gender"
+            return f"Share of {gender_term} who are not in {title_term} school"
+
+    # ---- NUMBER ----
     else:
-        return f"{METRIC_TYPES[metric]['title']} for {gender_term} of {age_term}"
+        if view.matches(level="level_side_by_side"):
+            return f"Number of {gender_term} of official age for each level of education who are not in school"
+        else:
+            return f"Number of {gender_term} who are not in {title_term} school"
+
+
+def _dod_link(level_cfg):
+    """Return markdown link [title_term](#dod:slug) if dod_term exists."""
+    title = level_cfg.get("title_term", "")
+    dod_term = level_cfg.get("dod_term")
+    if dod_term:
+        # Use first occurrence of the key term (primary / secondary etc.)
+        short_label = title.split(" school age")[0] if "school age" in title else title
+        return f"[{short_label}](#dod:{dod_term})"
+    return title
 
 
 def generate_subtitle_by_dimensions(view):
-    """Generate chart subtitle based on dimensions."""
+    """Generate chart subtitle with DOD links included."""
     level = view.dimensions.get("level", "primary")
     sex = view.dimensions.get("sex", "both")
     metric = view.dimensions.get("metric_type", "rate")
 
     level_cfg = EDUCATION_LEVELS.get(level, {})
     gender_term = GENDERS.get(sex, "children")
-    age_range = level_cfg.get("age_range", "")
     title_term = level_cfg.get("title_term", "")
+    age_range = level_cfg.get("age_range", "")
+    dod_link = _dod_link(level_cfg)
 
+    # Determine scope
+    term_lower = title_term.lower()
+    if "upper secondary" in term_lower:
+        scope = f"{dod_link}"
+    elif "lower secondary" in term_lower:
+        scope = f"{dod_link}"
+    elif "primary" in term_lower and "before" not in term_lower:
+        scope = f"{dod_link}"
+    elif "pre-primary" in term_lower:
+        scope = f"{dod_link}"
+    else:
+        scope = dod_link or title_term
+
+    # ---- RATE ----
     if metric == "rate":
-        if sex == "both" or view.matches(sex="sex_side_by_side"):
-            desc = "expressed as a percentage of the total population of children in that age group"
+        if view.matches(level="level_side_by_side"):
+            return (
+                f"{gender_term.title()} of official age for each level of education not enrolled at that level of education, "
+                f"expressed as a percentage of the total population of {gender_term} in that age group."
+            )
         else:
-            desc = f"expressed as a percentage of the total population of {gender_term} in that age group"
-    else:
-        desc = (
-            f"shown as the total number of children not enrolled in {title_term} school"
-            if view.matches(sex="sex_side_by_side")
-            else ""
-        )
+            return (
+                f"{gender_term.title()} {age_range} not enrolled in {scope} education, "
+                f"expressed as a percentage of the total population of {gender_term} in that age group."
+            )
 
-    if view.matches(level="level_side_by_side"):
-        return f"{gender_term.title()} not enrolled in school across different education levels, {desc}."
-    elif view.matches(sex="sex_side_by_side"):
-        return f"Children of {age_range} not enrolled in school, {desc}."
+    # ---- NUMBER ----
     else:
-        return f"{gender_term.title()} of {age_range} not enrolled in school, {desc}."
+        if view.matches(level="level_side_by_side"):
+            return f"{gender_term.title()} of official age for each level of education not enrolled in that level of education or higher."
+        else:
+            return f"{gender_term.title()} {age_range} not enrolled in {scope} education or higher."
 
 
 def edit_indicator_displays(view):
-    """Clean up indicator display names for grouped views."""
+    """Clean up indicator display names and colors for grouped views."""
 
     level_display = {
-        "pre_primary": "Pre-primary",
-        "primary": "Primary",
-        "lower_secondary": "Lower secondary",
-        "upper_secondary": "Upper secondary",
+        "pre_primary": {"name": "Pre-primary", "color": COLOR_PREPRIMARY},
+        "primary": {"name": "Primary", "color": COLOR_PRIMARY},
+        "lower_secondary": {"name": "Lower secondary", "color": COLOR_LOWER_SECONDARY},
+        "upper_secondary": {"name": "Upper secondary", "color": COLOR_UPPER_SECONDARY},
     }
 
     sex_display = {
-        "_male": "Boys",
-        "_female": "Girls",
-        "both": "Both genders",
+        "_male": {"name": "Boys", "color": COLOR_BOYS},
+        "_female": {"name": "Girls", "color": COLOR_GIRLS},
     }
+
+    # Define sort order
+    level_order = ["pre_primary", "primary", "lower_secondary", "upper_secondary"]
+    sex_order = ["_male", "_female"]
 
     for ind in view.indicators.y:
         if view.matches(level="level_side_by_side"):
-            for k, v in level_display.items():
-                if k in ind.catalogPath:
-                    ind.display = {"name": v}
-                    break
+            # Check for education level - be specific to avoid substring matching
+            if "one_year_before_the_official_primary_entry_age" in ind.catalogPath:
+                ind.display = {
+                    "name": level_display["pre_primary"]["name"],
+                    "color": level_display["pre_primary"]["color"],
+                }
+            elif "lower_secondary" in ind.catalogPath:
+                ind.display = {
+                    "name": level_display["lower_secondary"]["name"],
+                    "color": level_display["lower_secondary"]["color"],
+                }
+            elif "upper_secondary" in ind.catalogPath:
+                ind.display = {
+                    "name": level_display["upper_secondary"]["name"],
+                    "color": level_display["upper_secondary"]["color"],
+                }
+            elif "primary" in ind.catalogPath:
+                ind.display = {"name": level_display["primary"]["name"], "color": level_display["primary"]["color"]}
         elif view.matches(sex="sex_side_by_side"):
-            for k, v in sex_display.items():
+            for k, config in sex_display.items():
                 if k in ind.catalogPath:
-                    ind.display = {"name": v}
+                    ind.display = {"name": config["name"], "color": config["color"]}
                     break
+
+    # Sort indicators according to desired order
+    if view.matches(level="level_side_by_side"):
+
+        def get_level_index(ind):
+            # Use specific patterns to avoid substring matching issues
+            if "one_year_before_the_official_primary_entry_age" in ind.catalogPath:
+                return 0  # pre-primary
+            elif "lower_secondary" in ind.catalogPath:
+                return 2
+            elif "upper_secondary" in ind.catalogPath:
+                return 3
+            elif "primary" in ind.catalogPath:
+                return 1
+            return len(level_order)
+
+        # For stacked area charts (number metric), reverse the order
+        metric_type = view.dimensions.get("metric_type", "rate")
+        reverse_order = metric_type == "number"
+        view.indicators.y = sorted(view.indicators.y, key=get_level_index, reverse=reverse_order)
+    elif view.matches(sex="sex_side_by_side"):
+        view.indicators.y = sorted(
+            view.indicators.y,
+            key=lambda ind: next(
+                (i for i, k in enumerate(sex_order) if k in ind.catalogPath),
+                len(sex_order),
+            ),
+        )

@@ -1128,7 +1128,8 @@ def _sanity_check_prio_conflict_types(tb_prio: Table):
     conflict_type_transitions = tb_prio.groupby("conflict_id")["type_of_conflict"].apply(set)
     transitions = conflict_type_transitions[conflict_type_transitions.apply(len) > 1].drop_duplicates()
     # Extract unique combinations of conflict_types for a conflict
-    transitions = set(transitions.astype(str))
+    # Convert numpy integers to regular Python integers before string conversion
+    transitions = set(str({int(x) for x in transition}) for transition in transitions)
     transitions_unk = transitions - TRANSITIONS_EXPECTED
 
     # Check if different regions categorise the conflict differently in the same year

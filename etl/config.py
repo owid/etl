@@ -7,9 +7,11 @@ The environment variables and settings here are for publishing options, they're
 only important for OWID staff.
 """
 
+import asyncio
 import os
 import pwd
 import re
+import sys
 import warnings
 from dataclasses import dataclass, fields
 from os import environ as env
@@ -78,13 +80,17 @@ load_env()
 
 pd.set_option("future.no_silent_downcasting", True)
 
-# When DEBUG is on
-# - run steps in the same process (speeding up ETL)
-DEBUG = env.get("DEBUG") in ("True", "true", "1")
-
 # Environment, e.g. production, staging, dev
 ENV = env.get("ENV", "dev")
 ENV_IS_REMOTE = ENV in ("production", "staging")
+
+# When DEBUG is on
+# - run steps in the same process (speeding up ETL)
+# If DEBUG is not explicitly set, default to ENV == "dev"
+if "DEBUG" not in env:
+    DEBUG = ENV == "dev"
+else:
+    DEBUG = env.get("DEBUG") in ("True", "true", "1")
 
 # Prefer downloading datasets from catalog instead of building them
 PREFER_DOWNLOAD = env.get("PREFER_DOWNLOAD") in ("True", "true", "1")
@@ -110,7 +116,10 @@ ENV_GRAPHER_USER_ID = GRAPHER_USER_ID
 DB_IS_PRODUCTION = DB_NAME == "live_grapher"
 
 # Special ENV file with access to production DB (read-only), used by chart-diff
-ENV_FILE_PROD = os.environ.get("ENV_FILE_PROD")
+if "ENV_FILE_PROD" in env:
+    ENV_FILE_PROD = BASE_DIR / os.environ.get("ENV_FILE_PROD")  # type: ignore
+else:
+    ENV_FILE_PROD = None
 
 if "DATA_API_ENV" in env:
     DATA_API_ENV = env["DATA_API_ENV"]
@@ -129,15 +138,20 @@ def load_STAGING() -> Optional[str]:
     # if STAGING is used, override ENV values
     STAGING = env.get("STAGING")
 
+    # Check if we're running via etl d run-python-step (suppress warnings)
+    is_run_python_step = len(sys.argv) >= 3 and sys.argv[1:3] == ["d", "run-python-step"]
+
     # ENV_FILE takes precedence over STAGING
     if STAGING and ENV_FILE != BASE_DIR / ".env":
-        log.warning("Both ENV_FILE and STAGING is set, STAGING will be ignored.")
+        if not is_run_python_step:
+            log.warning("Both ENV_FILE and STAGING is set, STAGING will be ignored.")
         return None
     # if STAGING=1, use branch name
     elif STAGING == "1":
         branch_name = git.Repo(BASE_DIR).active_branch.name
         if branch_name == "master":
-            log.warning("You're on master branch, using local env instead of STAGING=master")
+            if not is_run_python_step:
+                log.warning("You're on master branch, using local env instead of STAGING=master")
             return None
         else:
             return branch_name
@@ -227,7 +241,10 @@ FASTTRACK_COMMIT = env.get("FASTTRACK_COMMIT") in ("True", "true", "1")
 # if True, commit to monkeypox repository from export step
 MONKEYPOX_COMMIT = env.get("MONKEYPOX_COMMIT") in ("True", "true", "1")
 
-ADMIN_HOST = env.get("ADMIN_HOST", f"http://staging-site-{STAGING}" if STAGING else "http://localhost:3030")
+ADMIN_HOST = env.get(
+    "ADMIN_HOST",
+    f"http://staging-site-{STAGING}" if STAGING else "http://localhost:3030",
+)
 
 # Tailscale address of Admin, this cannot be just `http://owid-admin-prod`
 # because that would resolve to LXC container instead of the actual server
@@ -236,6 +253,8 @@ TAILSCALE_ADMIN_HOST = "http://owid-admin-prod.tail6e23.ts.net"
 SENTRY_DSN = env.get("SENTRY_DSN")
 
 OPENAI_API_KEY = env.get("OPENAI_API_KEY", None)
+ANTHROPIC_API_KEY = env.get("ANTHROPIC_API_KEY", None)
+GOOGLE_API_KEY = env.get("GOOGLE_API_KEY", None)
 
 OWIDBOT_ACCESS_TOKEN = env.get("OWIDBOT_ACCESS_TOKEN", None)
 
@@ -258,17 +277,29 @@ GITHUB_API_URL = f"{GITHUB_API_BASE}/pulls"
 TLS_VERIFY = bool(int(env.get("TLS_VERIFY", 1)))
 
 # Default schema for presentation.grapher_config in metadata. Try to keep it up to date with the latest schema.
-DEFAULT_GRAPHER_SCHEMA = "https://files.ourworldindata.org/schemas/grapher-schema.008.json"
+DEFAULT_GRAPHER_SCHEMA = "https://files.ourworldindata.org/schemas/grapher-schema.009.json"
 
 # Google Cloud service account path (used for BigQuery)
 GOOGLE_APPLICATION_CREDENTIALS = env.get("GOOGLE_APPLICATION_CREDENTIALS")
 
 
-def enable_sentry() -> None:
+def enable_sentry(enable_logs: bool = False) -> None:
     if SENTRY_DSN:
-        sentry_sdk.init(
-            dsn=SENTRY_DSN,
-        )
+
+        def before_send(event, hint):
+            # Ignore normal shutdown signals
+            if "exc_info" in hint:
+                exc_type, exc_value, tb = hint["exc_info"]
+                if exc_type in (KeyboardInterrupt, asyncio.CancelledError):
+                    return None
+            return event
+
+        kwargs = {"dsn": SENTRY_DSN, "before_send": before_send}
+
+        if enable_logs:
+            kwargs["_experiments"] = {"enable_logs": True}
+
+        sentry_sdk.init(**kwargs)
 
 
 # Wizard config
@@ -616,15 +647,25 @@ def no_trailing_slash(url: str | None) -> None:
         raise ValueError(f"Env {url} should not have a trailing slash.")
 
 
-env_vars = [ADMIN_HOST, TAILSCALE_ADMIN_HOST, DATA_API_URL, BAKED_VARIABLES_PATH, R2_SNAPSHOTS_PUBLIC_READ]
+env_vars = [
+    ADMIN_HOST,
+    TAILSCALE_ADMIN_HOST,
+    DATA_API_URL,
+    BAKED_VARIABLES_PATH,
+    R2_SNAPSHOTS_PUBLIC_READ,
+]
 for env_var in env_vars:
     no_trailing_slash(env_var)
 
 
 # Get Metabase credentials and parameters (for more information, visit the analytics repos).
 METABASE_API_KEY = os.environ.get("METABASE_API_KEY")
+METABASE_API_KEY_ADMIN = os.environ.get("METABASE_API_KEY_ADMIN")
 METABASE_URL = os.environ.get("METABASE_URL")
 METABASE_SEMANTIC_LAYER_DATABASE_ID = 2
+METABASE_URL_LOCAL = os.environ.get("METABASE_URL", "http://localhost:3000")
+METABASE_URL = os.environ.get("METABASE_URL", "http://metabase.owid.io")
+
 ########################################################################################################################
 # While users don't have Metadata credentials, default to Datassette.
 FORCE_DATASETTE = (not METABASE_API_KEY) or (not METABASE_URL)
@@ -639,3 +680,11 @@ NOTION_DATA_PROVIDERS_CONTACTS_TABLE_URL = os.environ.get("NOTION_DATA_PROVIDERS
 DATA_PRODUCER_REPORT_FOLDER_ID = os.environ.get("DATA_PRODUCER_REPORT_FOLDER_ID", "")
 DATA_PRODUCER_REPORT_TEMPLATE_DOC_ID = os.environ.get("DATA_PRODUCER_REPORT_TEMPLATE_DOC_ID", "")
 DATA_PRODUCER_REPORT_STATUS_SHEET_ID = os.environ.get("DATA_PRODUCER_REPORT_STATUS_SHEET_ID", "")
+
+# Logfire for LLM observability
+LOGFIRE_TOKEN_EXPERT = env.get("LOGFIRE_TOKEN_EXPERT")
+LOGFIRE_TOKEN_MCP = env.get("LOGFIRE_TOKEN_MCP")
+LOGFIRE_TOKEN_ETL_API = env.get("LOGFIRE_TOKEN_ETL_API")
+
+# MCP server
+OWID_MCP_SERVER_URL = env.get("OWID_MCP_SERVER_URL", "https://mcp.owid.io/mcp")

@@ -85,3 +85,12 @@ steps:
     - data://grapher/un/2025-03-18/migration_stock_flows
   export://explorers/migration/latest/migration_flows:
     - data://grapher/un/2025-03-18/migration_stock_flows
+
+  # UNHCR refugee data (2025)
+  data://meadow/un/2025-07-03/refugee_data:
+    - snapshot://un/2025-07-03/refugee_data.zip
+  data://garden/un/2025-07-03/refugee_data:
+    - data://meadow/un/2025-07-03/refugee_data
+    - data://garden/demography/2024-07-15/population
+  data://grapher/un/2025-07-03/refugee_data:
+    - data://garden/un/2025-07-03/refugee_data

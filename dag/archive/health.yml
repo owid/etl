@@ -467,3 +467,43 @@ steps:
     - data://meadow/who/2025-01-17/mortality_database_vaccine_preventable
   data://grapher/who/2025-01-17/mortality_database_vaccine_preventable:
     - data://garden/who/2025-01-17/mortality_database_vaccine_preventable
+
+  # WHO Preventive Chemotherapy - Neglected Tropical Diseases
+  # Lymphatic filariasis
+  data://meadow/neglected_tropical_diseases/2024-05-02/lymphatic_filariasis:
+    - snapshot://neglected_tropical_diseases/2024-05-02/lymphatic_filariasis.xlsx
+  data://garden/neglected_tropical_diseases/2024-05-02/lymphatic_filariasis:
+    - data://meadow/neglected_tropical_diseases/2024-05-02/lymphatic_filariasis
+    - data://garden/regions/2023-01-01/regions
+  data://grapher/neglected_tropical_diseases/2024-05-02/lymphatic_filariasis:
+    - data://garden/neglected_tropical_diseases/2024-05-02/lymphatic_filariasis
+    # Schistosomiasis
+  data://meadow/neglected_tropical_diseases/2024-05-02/schistosomiasis:
+    - snapshot://neglected_tropical_diseases/2024-05-02/schistosomiasis.xlsx
+  data://garden/neglected_tropical_diseases/2024-05-02/schistosomiasis:
+    - data://meadow/neglected_tropical_diseases/2024-05-02/schistosomiasis
+    - data://garden/regions/2023-01-01/regions
+  data://grapher/neglected_tropical_diseases/2024-05-02/schistosomiasis:
+    - data://garden/neglected_tropical_diseases/2024-05-02/schistosomiasis
+
+  # UN MMEIG Maternal Mortality (1985-2020)
+  data://meadow/un/2024-07-08/maternal_mortality:
+    - snapshot://un/2024-07-08/maternal_mortality.zip
+  data://garden/un/2024-07-08/maternal_mortality:
+    - data://meadow/un/2024-07-08/maternal_mortality
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2025-07-01/income_groups
+  data://grapher/un/2024-07-08/maternal_mortality:
+    - data://garden/un/2024-07-08/maternal_mortality
+
+  # Maternal Mortality long run data set (OWID OMM)
+  data://garden/maternal_mortality/2024-07-08/maternal_mortality:
+    - data://garden/gapminder/2024-07-08/maternal_mortality
+    - data://garden/un/2024-07-08/maternal_mortality
+    - data://garden/who/2025-04-17/mortality_database
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2025-07-01/income_groups
+    - data://garden/un/2024-07-12/un_wpp
+    - data://garden/demography/2024-07-15/population
+  data://grapher/maternal_mortality/2024-07-08/maternal_mortality:
+    - data://garden/maternal_mortality/2024-07-08/maternal_mortality

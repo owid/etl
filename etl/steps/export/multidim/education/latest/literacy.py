@@ -5,6 +5,16 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+
+# Color constants gender and age group visualizations
+COLOR_YOUTH = "#D73C50"
+COLOR_ADULTS = "#4C6A9C"
+COLOR_ELDERLY = "#578145"
+
+COLOR_BOYS = "#00847E"
+COLOR_GIRLS = "#E56E5A"
+
+
 # Common configuration for all charts
 MULTIDIM_CONFIG = {
     "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.008.json",
@@ -13,7 +23,7 @@ MULTIDIM_CONFIG = {
     "yAxis": {"min": 0, "max": 100},
     "hasMapTab": True,
     "tab": "map",
-    "addCountryMode": "change-country",
+    "addCountryMode": "add-country",
 }
 
 # Common grouped view configuration
@@ -105,8 +115,28 @@ def run() -> None:
         }
     )
 
-    # Edit display names
+    # Edit display names and set view metadata for all views
     for view in c.views:
+        # Update title and subtitle based on view dimensions
+        sex = view.dimensions["sex"]
+        age = view.dimensions["age_group"]
+
+        if sex == "sex_side_by_side" or age == "age_side_by_side":
+            view.metadata = {
+                "description_from_producer": "",
+                "description_short": view.config["subtitle"],
+                "presentation": {
+                    "title_public": view.config["title"],
+                },
+            }
+        else:
+            # Only updated description_short for other views
+            view.metadata = {
+                "description_short": view.config["subtitle"],
+                "presentation": {
+                    "title_public": view.config["title"],
+                },
+            }
         edit_indicator_displays(view)
 
     # Save collection
@@ -197,7 +227,6 @@ def create_grouped_views(collection):
     """Add grouped views for gender and age group comparisons."""
     view_metadata = {
         "presentation": {"title_public": "{title}"},
-        "description_short": "{subtitle}",
     }
     view_config = GROUPED_VIEW_CONFIG | {
         "title": "{title}",
@@ -270,7 +299,7 @@ def _get_gender_specific_subtitle(age_group, gender_term):
     prefix = age_config.get("gender_prefix", "")
     age_range = age_config.get("age_range", "")
 
-    return f"Share of {prefix}{gender_term} aged {age_range} who can read and write a short, simple sentence with understanding."
+    return f"Share of {prefix}{gender_term} aged {age_range} who can read and write a simple sentence about their daily life."
 
 
 def _get_sex_side_by_side_subtitle(age_group):
@@ -280,9 +309,11 @@ def _get_sex_side_by_side_subtitle(age_group):
     age_range = age_config.get("age_range", "")
 
     if prefix:
-        return f"Share of {prefix}women and men aged {age_range} who can read and write a short, simple sentence with understanding."
+        return f"Share of {prefix}women and men aged {age_range} who can read and write a simple sentence about their daily life."
     else:
-        return f"Share of women and men aged {age_range} who can read and write a short, simple sentence with understanding."
+        return (
+            f"Share of women and men aged {age_range} who can read and write a simple sentence about their daily life."
+        )
 
 
 def generate_subtitle_by_age_and_gender(view):
@@ -291,11 +322,7 @@ def generate_subtitle_by_age_and_gender(view):
 
     # Handle different combinations
     if age_group == "age_side_by_side":
-        age_descriptions = _get_age_descriptions_by_gender(sex)
-        if age_descriptions:
-            return f"Share of {age_descriptions} who can read and write a short, simple sentence with understanding."
-        else:
-            return "Share of adults, young people, and older adults who can read and write a short, simple sentence with understanding."
+        return "Comparison of basic literacy rates between young people (15 to 24 years old), older adults (65 years old and above) and all adults (15 years old and above). Basic literacy means that a person can read and write a simple sentence about their daily life."
 
     elif sex == "sex_side_by_side":
         return _get_sex_side_by_side_subtitle(age_group)
@@ -303,7 +330,7 @@ def generate_subtitle_by_age_and_gender(view):
     elif sex == "both":
         age_config = AGE_GROUPS.get(age_group, {})
         age_range = age_config.get("age_range", "")
-        return f"Share of {age_config.get('title_term', 'adults')} aged {age_range} who can read and write a short, simple sentence with understanding."
+        return f"Share of {age_config.get('title_term', 'adults')} aged {age_range} who can read and write a simple sentence about their daily life."
 
     else:
         # For specific genders
@@ -326,31 +353,56 @@ def _get_age_display_names(sex):
 
 
 def edit_indicator_displays(view):
-    """Edit display names for the grouped views."""
-    if view.indicators.y is None:
-        return
+    """Edit display names and colors for the grouped views."""
 
-    sex = view.d.sex
+    sex = view.dimensions["sex"]
+    age_group = view.dimensions["age_group"]
 
-    # Get appropriate display names
-    age_display_names = _get_age_display_names(sex)
-    gender_display_names = {
-        "years__male": "Men",
-        "years__female": "Women",
-        "both": "Both genders",
+    # Age group color mappings
+    age_color_mapping = {
+        "adult": COLOR_ADULTS,
+        "youth": COLOR_YOUTH,
+        "elderly": COLOR_ELDERLY,
     }
 
+    # Gender color mappings
+    gender_color_mapping = {
+        "years__male": COLOR_BOYS,
+        "years__female": COLOR_GIRLS,
+    }
     for indicator in view.indicators.y:
         # Check for age-based display names
-        if view.d.age_group == "age_side_by_side":
+        if age_group == "age_side_by_side":
+            age_display_names = _get_age_display_names(sex)
             for age_key, display_name in age_display_names.items():
                 if age_key in indicator.catalogPath:
-                    indicator.display = {"name": display_name}
+                    indicator.display = {"name": display_name, "color": age_color_mapping.get(age_key, COLOR_ADULTS)}
                     break
 
         # Check for gender-based display names
         elif sex == "sex_side_by_side":
+            gender_display_names = {
+                "years__male": "Men",
+                "years__female": "Women",
+            }
             for gender_key, display_name in gender_display_names.items():
                 if gender_key in indicator.catalogPath:
-                    indicator.display = {"name": display_name}
+                    indicator.display = {
+                        "name": display_name,
+                        "color": gender_color_mapping.get(gender_key, COLOR_BOYS),
+                    }
                     break
+
+    # Sort indicators for age_side_by_side: youth → adult → elderly (young to older)
+    if view.matches(age_group="age_side_by_side"):
+
+        def get_age_index(ind):
+            if "15_24_years" in ind.catalogPath:  # youth
+                return 0
+            elif "15plus_years" in ind.catalogPath:  # adult
+                return 1
+            elif "65plus_years" in ind.catalogPath:  # elderly
+                return 2
+            return 3
+
+        view.indicators.y = sorted(view.indicators.y, key=get_age_index)

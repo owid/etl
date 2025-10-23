@@ -1,5 +1,5 @@
 import pandas as pd
-from owid.catalog import Table
+from owid.catalog import Dataset, Table
 from owid.catalog import processing as pr
 from structlog import get_logger
 
@@ -43,10 +43,12 @@ def run() -> None:
     ds_meadow = paths.load_dataset("who_mort_db")
     tb = ds_meadow["who_mort_db"].reset_index()
 
+    ds_un_wpp = paths.load_dataset("un_wpp")
+
     log.info("who_mort_db.harmonize_countries")
     tb = geo.harmonize_countries(tb, countries_file=paths.country_mapping_path)
     tb = clean_up_dimensions(tb)
-    tb = add_age_groups(tb)
+    tb = add_age_groups(tb, ds_un_wpp=ds_un_wpp)
 
     tb = tb.format(["country", "year", "age_group", "sex"])
     ds_garden = paths.create_dataset(
@@ -69,7 +71,7 @@ def clean_up_dimensions(tb: Table) -> Table:
     return tb
 
 
-def add_age_groups(tb: Table) -> Table:
+def add_age_groups(tb: Table, ds_un_wpp: Dataset) -> Table:
     """
     Create custom age-group aggregations, there are a range of different ones that might be useful for this dataset.
     For example, we may want to compare to other causes of death imported via the IHME dataset, so we should include age-groups that match our chosen IHME groups.
@@ -127,16 +129,16 @@ def add_age_groups(tb: Table) -> Table:
         "Age15_19": "Age 0-19",
     }
 
-    tb_age_group_ihme = build_custom_age_groups(tb, age_groups=age_groups_ihme)
-    tb_age_group_decadal = build_custom_age_groups(tb, age_groups=age_groups_decadal)
-    tb_age_group_child = build_custom_age_groups(tb, age_groups=age_groups_child)
+    tb_age_group_ihme = build_custom_age_groups(tb, age_groups=age_groups_ihme, ds_un_wpp=ds_un_wpp)
+    tb_age_group_decadal = build_custom_age_groups(tb, age_groups=age_groups_decadal, ds_un_wpp=ds_un_wpp)
+    tb_age_group_child = build_custom_age_groups(tb, age_groups=age_groups_child, ds_un_wpp=ds_un_wpp)
     tb_orig = remove_granular_age_groups(tb)
     tb_combined = pr.concat([tb_orig, tb_age_group_ihme, tb_age_group_decadal, tb_age_group_child], axis=0)
     tb_combined = tb_combined.drop_duplicates()
     return tb_combined
 
 
-def build_custom_age_groups(tb: Table, age_groups: dict) -> Table:
+def build_custom_age_groups(tb: Table, age_groups: dict, ds_un_wpp: Dataset) -> Table:
     """
     Estimate metrics for broader age groups. In line with the age-groups we define in the age_groups dict:
     """
@@ -150,6 +152,7 @@ def build_custom_age_groups(tb: Table, age_groups: dict) -> Table:
 
     tb_age = add_population(
         df=tb_age,
+        ds_un_wpp=ds_un_wpp,
         country_col="country",
         year_col="year",
         sex_col="sex",

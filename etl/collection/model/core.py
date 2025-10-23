@@ -564,6 +564,10 @@ class Collection(MDIMBase):
     ):
         """Remove views that have any set of dimensions that can be generated from the given in `dimensions`.
 
+        The argument `dimension` can be either a dictionary or a list of dictionaries. Each dictionary represents a set of dimension filters to drop. The keys are the dimension slugs, and the values are either a list of choices or a single choice.
+
+        Depending on the structure of `dimensions`, you can define ANDs and ORs operations. Read the documentation below for examples.
+
         Args:
             dimensions (Dict[str, Union[List[str], str]]): Dictionary with the dimensions to drop. The keys are the dimension slugs, and the values are either a list of choices or a single choice.
                     - Example 1: `dimensions = {"sex": "female"}`.
@@ -632,8 +636,8 @@ class Collection(MDIMBase):
                         If True, the original choices will be removed and replaced with the new choice. If False, the original choices will be kept and the new choice will be added.
                     - overwrite_dimension_choice: Optional[bool], default=False
                         If True and `choice_new_slug` already exists as a `choice` in `dimension`, views created here will overwrite those already existing if there is any collision.
-            drop_Dimensions_if_single_choice (bool):
-                If True, drop dimensions that have only one choice in use. Default: True. To keep the dropdown, even if just with one option, set this to False.
+            drop_dimensions_if_single_choice (bool):
+                If True, drop dimensions that always have one choice in use. A dropdown (or dimension) that always is set to a constant value is not really useful, and hence we drop it by default. Default: True. To keep the dropdown, even if just with one option, set this to False.
             params (Dict[str, Any]):
                 Optional parameters to pass to the config and metadata. Keys of the dictionary are the parameter names, and values can either be strings or callables. NOTE: Callables must have one argument, which should be the grouped view. See Example 2 below for more details.
 

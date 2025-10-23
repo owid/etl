@@ -1,39 +1,47 @@
 title:
   title: School enrolment rates
   title_variant: by level of education and gender
+topic_tags:
+  - Global Education
 default_selection:
   - World
+  - Niger
+  - Indonesia
+  - Peru
 dimensions:
   - slug: enrolment_type
     name: Metric
     choices:
-      - slug: gross_enrolment
-        name: Gross enrolment
-        description: Includes children of any age entering that level of education.
       - slug: net_enrolment
         name: Net enrolment
-        description: Only includes children within the official age group.
+        description: Only includes children within the official age group of the corresponding education level
+      - slug: gross_enrolment
+        name: Gross enrolment
+        description: Includes children of any age entering that level of education
+      - slug: enrolment_type_side_by_side
+        name: Both metrics
+        description: Compare net and gross enrolment rates
   - slug: level
     name: Education level
     choices:
       - slug: preprimary
         name: Pre-primary
-        description: Often provided through kindergarten or nursery for children ages around 3 to 5.
+        description: Often provided through kindergarten or nursery for children ages around 3 to 5
       - slug: primary
         name: Primary
-        description: Marks the start of formal schooling, typically for children aged 5 to 7.
+        description: Marks the start of formal schooling, typically for children aged 5 to 7
       - slug: lower_secondary
         name: Lower secondary
-        description: For students generally aged 11 to 14.
+        description: For students generally aged 11 to 14
       - slug: upper_secondary
         name: Upper secondary
-        description: For students generally aged 15 to 18.
+        description: For students generally aged 15 to 18
       - slug: tertiary
         name: Tertiary
-        description: Formal post-secondary learning, ranging from short vocational programs to university degrees.
+        description: Formal post-secondary learning, ranging from short vocational programs to university degrees
       - slug: level_side_by_side
         name: All levels
-        description: Compare enrolment rates across all education levels.
+        description: Compare enrolment rates across all education levels
 
   - slug: sex
     name: Gender
@@ -45,7 +53,7 @@ dimensions:
       - slug: boys
         name: Boys
       - slug: "sex_side_by_side"
-        name: Girls and boys
-        description: Compare genders
+        name: Girls vs. boys
+        description: Compare enrolment rates between girls and boys
 
 views: []

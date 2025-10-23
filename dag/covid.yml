@@ -30,7 +30,7 @@ steps:
     - data://garden/demography/2024-12-03/life_expectancy
     - data://garden/un/2024-07-12/un_wpp
     # Econ
-    - data://garden/wb/2025-06-05/world_bank_pip_legacy
+    - data://garden/wb/2025-10-09/world_bank_pip_legacy
     - data://garden/un/2025-05-07/undp_hdr
     # Health
     - data://garden/wash/2024-01-06/who
@@ -311,6 +311,22 @@ steps:
     - data://meadow/covid/2024-11-05/github_stats
   data://grapher/covid/2024-11-05/github_stats:
     - data://garden/covid/2024-11-05/github_stats
+
+  #
+  # Auxiliary: Life expectancy (old versions)
+  #
+  data://garden/demography/2024-12-03/life_expectancy:
+    - data://garden/demography/2023-10-10/riley_2005
+    - data://garden/demography/2023-10-10/zijdeman_et_al_2015
+    - data://garden/demography/2024-12-03/life_tables
+    - data://garden/un/2024-07-12/un_wpp
+  data://garden/demography/2024-12-03/life_tables:
+    - data://garden/hmd/2024-12-01/hmd
+    - data://garden/un/2024-12-02/un_wpp_lt
+  data://garden/hmd/2024-12-01/hmd:
+    - data://meadow/hmd/2024-12-01/hmd
+  data://meadow/hmd/2024-12-01/hmd:
+    - snapshot://hmd/2024-11-27/hmd.zip
 
   ######################################
   # MULTIDIM

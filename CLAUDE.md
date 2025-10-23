@@ -1,10 +1,20 @@
-# CLAUDE.md
+# Agent Guide
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to automation agents working with code in this repository.
 
 # Individual Preferences
 
 - @~/.claude/instructions/etl.md
+
+## Critical Rules
+
+- When running `etl` command, **ALWAYS** use the `.venv/bin/etl` binary (same for `python`, `pytest`, etc.)
+  ⚠️ **NEVER mask problems - fix them systematically:**
+- **NEVER** return empty tables, comment out failing code, or create workarounds
+- **NEVER** catch and ignore exceptions without fixing the root cause
+- **ALWAYS** trace issues upstream through the pipeline: snapshot → meadow → garden → grapher
+- **ALWAYS** provide full error tracebacks - don't truncate diagnostic information
+- **If unsure, ASK THE USER** - don't guess or mask issues
 
 ## Architecture Overview
 
@@ -26,17 +36,17 @@ Steps are content-addressable with automatic dirty detection:
 
 ```python
 # Standard garden step pattern
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 from etl.data_helpers import geo
 
 paths = PathFinder(__file__)
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     ds_input = paths.load_dataset("input_dataset")
     tb = ds_input["table_name"].reset_index()
     tb = geo.harmonize_countries(tb, countries_file=paths.country_mapping_path)
     tb = tb.format(short_name=paths.short_name)
-    ds_garden = create_dataset(dest_dir, tables=[tb])
+    ds_garden = paths.create_dataset(tables=[tb])
     ds_garden.save()
 ```
 
@@ -105,7 +115,32 @@ etl d prune             # Remove orphaned datasets
 pytest tests/test_etl_step_code.py::test_step_name  # Test single step
 ```
 
+## Additional Tools
+
+Get `--help` for details on any command.
+
+### etl archive
+
+Archive old datasets.
+
 ## Key Development Patterns
+
+### CLI Tools
+
+Always use Click instead of ArgumentParser for CLI scripts:
+
+```python
+import click
+
+@click.command()
+@click.option("--dry-run", is_flag=True, help="Preview changes without applying them")
+def main(dry_run: bool, output: str):
+    """Brief description of what the CLI does."""
+    # Implementation here
+
+if __name__ == "__main__":
+    main()
+```
 
 ### Geographic Harmonization
 
@@ -123,6 +158,24 @@ Tables inherit and propagate metadata:
 ```python
 tb = tb.format(short_name="table_name")  # Sets table metadata
 tb["column"] = tb["column"].replace_metadata(unit="percent", short_unit="%")
+```
+
+### YAML File Editing
+
+Always use `ruamel_load` and `ruamel_dump` from `etl.files` to preserve comments and formatting when editing YAML files:
+
+```python
+from etl.files import ruamel_load, ruamel_dump
+
+# Load YAML while preserving comments and formatting
+data = ruamel_load(file_path)
+
+# Modify data as needed
+data['some_key'] = new_value
+
+# Save back to file with original formatting preserved
+with open(file_path, 'w') as f:
+    f.write(ruamel_dump(data))
 ```
 
 ### Creating New Steps
@@ -147,6 +200,34 @@ pytest tests/test_steps.py -m integration
 ```
 
 ## Configuration
+
+### Python Environment
+
+⚠️ **CRITICAL: Virtual Environment Usage**
+
+This project uses a Python virtual environment (`.venv/`). **ALL Python commands must use the virtual environment binaries:**
+
+```bash
+# CORRECT - Use .venv binaries
+.venv/bin/python script.py
+.venv/bin/etl run step
+.venv/bin/pytest tests/
+
+# WRONG - Global commands will fail
+python script.py        # ❌ Don't use
+etl run step           # ❌ Don't use
+pytest tests/          # ❌ Don't use
+```
+
+**Throughout this document, when you see commands like `etl`, `python`, or `pytest`, always prefix them with `.venv/bin/`**
+
+- **Package Management**: Always use `uv` package manager instead of `pip`
+  ```bash
+  uv add package_name     # Add a new package
+  uv remove package_name  # Remove a package
+  uv sync                 # Sync dependencies
+  ```
+- **IMPORTANT**: Never install packages with `pip install` - always ask first, then use `uv` if approved
 
 ### Environment Variables
 
@@ -176,6 +257,36 @@ These are installed as editable packages (`owid-catalog`, `owid-datautils`, `owi
 - **Core ETL** (`etl/`): Step execution engine, catalog management, DAG processing
 - **Apps** (`apps/`): Extended functionality - Wizard, chart sync, anomaly detection, maintenance tools
 
+## Running ETL Steps
+
+Use `.venv/bin/etlr` to run ETL steps:
+
+### Basic Usage
+
+- Run steps matching a pattern: `etlr biodiversity/2025-06-28/cherry_blossom`
+- Run with grapher upload: `etlr biodiversity/2025-06-28/cherry_blossom --grapher`
+- Dry run (preview): `etlr biodiversity/2025-06-28/cherry_blossom --dry-run`
+
+### Key Options
+
+- `--grapher/-g`: Upload datasets to grapher database (OWID staff only)
+- `--dry-run`: Preview steps without running them
+- `--force/-f`: Re-run steps even if up-to-date
+- `--only/-o`: Run only selected step (no dependencies)
+- `--downstream/-d`: Include downstream dependencies
+- `--exact-match/-x`: Steps must exactly match arguments
+
+## Git Workflow
+
+Create PR first, then commit files:
+
+1. **Create PR**: Use `etl pr` CLI (creates new branch)
+2. **Check status**: `git status` to see modified/untracked files
+3. **Add files**: `git add .` or `git add <specific-files>`
+4. **Commit**: `git commit -m "Description of changes"`
+
+Note: The `etl pr` creates a new branch but does NOT automatically commit files - you must commit manually after creating the PR.
+
 ## Important Development Notes
 
 - Always use `geo.harmonize_countries()` for geographic data
@@ -185,9 +296,32 @@ These are installed as editable packages (`owid-catalog`, `owid-datautils`, `owi
 - Use `make sync.catalog` to avoid rebuilding entire catalog locally
 - Check `etl d version-tracker` before major changes
 - VS Code extensions available: `make install-vscode-extensions`
-- Never run --force alone, if you want to force run a step, use --force --only together.
+- Never run --force alone, if you want to force run a step, use --force --only together
 - When running ETL steps, always use --private flag
 - When running grapher:// step in ETL, always add --grapher flag
+- **ALWAYS run `make check` before committing** - formats code, fixes linting issues, and runs type checks
+- SQL queries enclose in triple quotes for readability
+
+### Exception Handling
+
+- **NEVER** catch, log, and re-raise exceptions (`except Exception: log.error(e); raise`)
+- Let exceptions propagate naturally with their original stack traces
+- Only catch specific exceptions when you can meaningfully handle them
+- Avoid `except Exception` - it masks real problems
+
+### Never Mask Underlying Issues
+
+- **NEVER** return empty tables or default values to "fix" data parsing failures
+- **NEVER** silently skip errors or missing data without clear explanation
+- **NEVER** comment out code to temporarily bypass problems - fix the underlying issue instead
+- **BAD**: `return Table(pd.DataFrame({'col': []}))` - hides the real problem
+- **BAD**: `try: parse_data() except: return empty_table` - masks what's broken
+- **BAD**: `# return extract_data()  # Commented out due to format change` - commenting out code to avoid errors
+- **GOOD**: Let the error happen and provide clear diagnostic information
+- **GOOD**: `raise ValueError("Sheet 'Fig 3.2' format changed - skiprows needs updating from 7 to X")`
+- **GOOD**: Update the code to handle the new data format correctly
+- **If you don't know what to do - ASK THE USER instead of masking the issue**
+- Silent failures make debugging exponentially harder and create technical debt
 
 ## Debugging ETL Data Quality Issues
 
@@ -559,3 +693,23 @@ def run() -> None:
 - Time series consistency for monitoring data
 
 Always adapt these patterns to your specific dataset's domain and expected data characteristics.
+
+## Database Access
+
+### MySQL Connection
+
+Can execute SQL queries directly using the staging database:
+
+```bash
+mysql -h staging-site-[branch] -u owid --port 3306 -D owid -e "SELECT query"
+```
+
+Example queries:
+
+```sql
+-- Find datasets by shortName
+SELECT id, catalogPath, name FROM datasets WHERE shortName = 'dataset_name' AND NOT isArchived;
+
+-- Check variables in dataset
+SELECT id, name FROM variables WHERE datasetId = 12345;
+```

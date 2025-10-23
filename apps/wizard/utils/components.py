@@ -12,11 +12,15 @@ import numpy as np
 import streamlit as st
 import streamlit.components.v1 as components
 import streamlit.errors
+from structlog import get_logger
 
 from apps.wizard.config import PAGES_BY_ALIAS
+from apps.wizard.utils import cache_all, is_running_in_streamlit
 from apps.wizard.utils.chart_config import bake_chart_config
 from etl.config import OWID_ENV, OWIDEnv
 from etl.grapher.model import Variable
+
+log = get_logger()
 
 HORIZONTAL_STYLE = """<style class="hide-element">
     /* Hides the style container and removes the extra spacing */
@@ -143,7 +147,7 @@ def grapher_chart_from_url(chart_url: str, height=600):
             style="width: 100%; height: 600px; border: 0px none;"
             allow="web-share; clipboard-write"></iframe>
     """
-    return st.components.v1.html(chart_animation_iframe_html, height=height)  # type: ignore
+    return components.html(chart_animation_iframe_html, height=height, width=1.6 * height)  # type: ignore
 
 
 def explorer_chart(
@@ -173,7 +177,7 @@ def explorer_chart(
     """
 
     # Render the HTML
-    return st.components.v1.html(HTML, height=height)  # type: ignore
+    return st.components.v1.html(HTML, height=height, width=1.6 * height)  # type: ignore
 
 
 def mdim_chart(url: str, view: dict, height: int = 600, default_display: Optional[str] = None):
@@ -194,7 +198,7 @@ def mdim_chart(url: str, view: dict, height: int = 600, default_display: Optiona
     """
 
     # Render the HTML
-    return st.components.v1.html(HTML, height=height)  # type: ignore
+    return st.components.v1.html(HTML, height=height, width=1.6 * height)  # type: ignore
 
 
 def _chart_html(chart_config: Dict[str, Any], owid_env: OWIDEnv, height=600, **kwargs):
@@ -228,7 +232,7 @@ def _chart_html(chart_config: Dict[str, Any], owid_env: OWIDEnv, height=600, **k
     </div>
     """
 
-    components.html(HTML, height=height, **kwargs)
+    components.html(HTML, height=height, width=int(1.6 * height), **kwargs)
 
 
 def tag_in_md(tag_name: str, color: str, icon: Optional[str] = None):
@@ -467,6 +471,21 @@ def st_wizard_page_link(alias: str, border: bool = False, **kwargs) -> None:
         st.warning(f"App must be run via `make wizard` to display link to `{alias}`.")
 
 
+def st_title_with_expert(title: str, icon: str | None = None, **kwargs):
+    container = st.container(border=False, horizontal=True, vertical_alignment="bottom")
+    if icon is not None:
+        title = f"{icon} {title}"
+    with container:
+        st.title(title, **kwargs)
+        st_wizard_page_link(
+            alias="expert",
+            label=":rainbow[**Ask the Expert**]",
+            help="Ask the expert any documentation question!",
+            width="content",
+            border=False,
+        )
+
+
 def preview_file(
     file_path: str | Path, prefix: str = "File", language: str = "python", custom_header: Optional[str] = None
 ) -> None:
@@ -612,26 +631,38 @@ def st_cache_data(
     **cache_kwargs,
 ):
     """
-    A custom decorator that wraps `st.cache_data` and adds support for a `custom_text` argument.
+    A custom decorator that wraps `st.cache_data` when running in Streamlit,
+    or uses standard caching when not in Streamlit.
 
     Args:
         func: The function to be cached.
-        custom_text (str): The custom spinner text to display.
+        custom_text (str): The custom spinner text to display (Streamlit only).
         show_spinner (bool): Whether to show the default Streamlit spinner message. Defaults to False.
-        show_time (bool): Whether to show the elapsed time. Defaults to False.
+        show_time (bool): Whether to show the elapsed time (Streamlit only). Defaults to False.
         **cache_kwargs: Additional arguments passed to `st.cache_data`.
     """
 
     def decorator(f):
-        # Wrap the function with st.cache_data and force show_spinner=False
-        cached_func = st.cache_data(show_spinner=show_spinner, **cache_kwargs)(f)
+        if is_running_in_streamlit():
+            # Use Streamlit caching with spinner when in Streamlit context
+            cached_func = st.cache_data(show_spinner=show_spinner, **cache_kwargs)(f)
 
-        @wraps(f)
-        def wrapper(*args, **kwargs):
-            with st.spinner(custom_text, show_time=show_time):
+            @wraps(f)
+            def wrapper(*args, **kwargs):
+                with st.spinner(custom_text, show_time=show_time):
+                    return cached_func(*args, **kwargs)
+
+            return wrapper
+        else:
+            # Use standard Python caching when not in Streamlit
+            cached_func = cache_all(f)
+
+            @wraps(f)
+            def wrapper(*args, **kwargs):
+                log.info(custom_text)
                 return cached_func(*args, **kwargs)
 
-        return wrapper
+            return wrapper
 
     # If used as @custom_cache_data without parentheses
     if func is not None:

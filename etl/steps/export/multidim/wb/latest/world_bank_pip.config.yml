@@ -1,6 +1,8 @@
 title:
   title: Poverty indicators
   title_variant: World Bank
+topic_tags:
+  - Poverty
 default_selection:
   - Mozambique
   - Zambia
@@ -8,6 +10,8 @@ default_selection:
   - Nigeria
   - Bangladesh
   - Bolivia
+  - Romania
+  - Indonesia
 
 default_dimensions:
   indicator: headcount_ratio
@@ -34,25 +38,32 @@ definitions:
   color_830_to_1000_simplified: &color_830_to_1000_simplified "#ABD9E9"
   color_1000_to_inf_simplified: &color_1000_to_inf_simplified "#2C7BB6"
 
-  extreme_poverty_subtitle: Extreme poverty is defined as living below the International Poverty Line of $3 a day.
-  lmic_poverty_line_subtitle: The poverty line of $4.20 a day is set by the World Bank to be representative of the definitions of poverty adopted in lower-middle-income countries.
-  umic_poverty_line_subtitle: The poverty line of $8.30 a day is set by the World Bank to be representative of the definitions of poverty adopted in upper-middle-income countries.
+  extreme_poverty_subtitle: Extreme poverty is defined as living below the [International Poverty Line](#dod:international-poverty-line) of $3 per day.
+  lmic_poverty_line_subtitle: The poverty line of $4.20 per day is set by the World Bank to be representative of the definitions of poverty adopted in lower-middle-income countries.
+  umic_poverty_line_subtitle: The poverty line of $8.30 per day is set by the World Bank to be representative of the definitions of poverty adopted in upper-middle-income countries.
 
   spells_subtitle: The chart shows breaks in the comparability of the underlying household survey data over time within each country individually.
 
-  ppp_adjustment_subtitle: This data is adjusted for inflation and for differences in living costs between countries.
+  ppp_adjustment_subtitle: This data is adjusted for inflation and differences in living costs between countries.
   ppp_adjustment_welfare_type_note: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2021 prices. Depending on the country and year, it relates to income (measured after taxes and benefits) or to consumption, [per capita](#dod:per-capita).
 
-  description_key_extreme_poverty: Extreme poverty here is defined as living below the International Poverty Line of $3 a day.
-  description_key_lmic_poverty_line: A poverty line of $4.20 a day represents definitions of national poverty lines in lower-middle-income countries.
-  description_key_umic_poverty_line: A poverty line of $8.30 a day represents definitions of national poverty lines in upper-middle-income countries.
+  description_key_extreme_poverty: The World Bank defines extreme poverty as living on less than $3 per day. This threshold, known as the ["International Poverty Line"](#dod:international-poverty-line), is set so that poverty can be compared across countries. This indicator plays an important and successful role in focusing the world's attention on the very poorest people. The UN uses this indicator to track progress towards [ending extreme poverty by 2030](https://ourworldindata.org/sdgs/no-poverty).
+  description_key_lmic_poverty_line: A poverty line of $4.20 per day represents definitions of national poverty lines in lower-middle-income countries.
+  description_key_umic_poverty_line: A poverty line of $8.30 per day represents definitions of national poverty lines in upper-middle-income countries.
+
+  description_key_extreme_poverty_additional: |-
+    Two centuries ago, most of the world's population was extremely poor. Many believed that widespread poverty was inevitable. But this turned out to be wrong. Economic growth is possible, and poverty can decline. With this poverty line, we can track whether countries are leaving the worst poverty behind.
 
   description_key_ppp: |-
-    The data is measured in international-$ at 2021 prices – this adjusts for inflation and for differences in living costs between countries.
+    This data is expressed in constant international dollars to adjust for inflation and differences in living costs between countries. Read more in our article, [What are international dollars?](https://ourworldindata.org/international-dollars)
 
-  description_key_welfare_type: Depending on the country and year, the data relates to income (measured after taxes and benefits) or to consumption, per capita. _Per capita_ means that the income of each household is attributed equally to each member of the household (including children).
+  description_key_welfare_type_beginning: |-
+    Depending on the country and year, the data refers either to income (after taxes and benefits) or to consumption, [per capita](#dod:per-capita).
 
-  description_key_not_market_income: Non-market sources of income, including food grown by subsistence farmers for their own consumption, are taken into account.
+  description_key_welfare_type: |-
+    {definitions.description_key_welfare_type_beginning} For most countries, we have only one option available. But when there is a mix of consumption and income data points, we process the data to keep one observation per country and year.
+
+  description_key_not_market_income: Many people, today and in the past, have no monetary income. This data accounts for this by including the estimated value of non-market income, such as food grown by subsistence farmers for their own use.
 
   description_key_nowcasts: Regional and global estimates are extrapolated up until the year of the data release using GDP growth estimates and forecasts. For more details about the methodology, please refer to the [World Bank PIP documentation](https://datanalytics.worldbank.org/PIP-Methodology/lineupestimates.html#nowcasts).
 
@@ -63,10 +74,10 @@ dimensions:
     choices:
       - slug: headcount_ratio
         name: Share in poverty
-        description: The share of the population living below the selected poverty line.
+        description: The share of the population living below the selected poverty line
       - slug: headcount
         name: Number in poverty
-        description: The number of people living below the selected poverty line.
+        description: The number of people living below the selected poverty line
       # - slug: total_shortfall
       #   name: Total shortfall from poverty line
       # - slug: avg_shortfall
@@ -108,7 +119,7 @@ dimensions:
         group: Individual poverty lines
       - slug: line_chart
         name: Line chart
-        description: See how poverty has changed over time using 4 different poverty lines
+        description: See how poverty has changed over time using four different poverty lines
         group: Visualize multiple poverty lines
       - slug: area_chart
         name: Area chart
@@ -120,7 +131,7 @@ dimensions:
         group: Visualize multiple poverty lines
       - slug: line_chart_more_lines
         name: Line chart (more lines)
-        description: See how poverty has changed over time using 8 different poverty lines
+        description: See how poverty has changed over time using eight different poverty lines
         group: Visualize multiple poverty lines (more lines)
       - slug: area_chart_more_lines
         name: Area chart (more lines)
@@ -136,10 +147,10 @@ dimensions:
     choices:
       - slug: No spells
         name: Don't show
-        description: Better for understanding trends within individual countries
+        description: Better for making broad comparisons across several countries
       - slug: Spells
         name: Show
-        description: Better for making broad comparisons across several countries
+        description: Better for understanding trends within individual countries
 
 views:
   # MULTIPLE LINES SIMPLE
@@ -167,19 +178,21 @@ views:
       subtitle: "{definitions.ppp_adjustment_subtitle}"
       note: "{definitions.ppp_adjustment_welfare_type_note}"
       hasMapTab: false
-      chartTypes: ["LineChart", "DiscreteBar"]
+      chartTypes: ["LineChart"]
       selectedFacetStrategy: entity
       yAxis:
         max: 100
     metadata:
       description_key:
         - "{definitions.description_key_extreme_poverty}"
+        - "{definitions.description_key_extreme_poverty_additional}"
         - "{definitions.description_key_lmic_poverty_line}"
         - "{definitions.description_key_umic_poverty_line}"
         - "{definitions.description_key_ppp}"
-        - "{definitions.description_key_welfare_type}"
         - "{definitions.description_key_not_market_income}"
         - "{definitions.description_key_nowcasts}"
+        - "{definitions.description_key_welfare_type}"
+      description_short: "{definitions.ppp_adjustment_subtitle}"
 
   # AREA CHART
   - dimensions:
@@ -224,12 +237,14 @@ views:
     metadata:
       description_key:
         - "{definitions.description_key_extreme_poverty}"
+        - "{definitions.description_key_extreme_poverty_additional}"
         - "{definitions.description_key_lmic_poverty_line}"
         - "{definitions.description_key_umic_poverty_line}"
         - "{definitions.description_key_ppp}"
-        - "{definitions.description_key_welfare_type}"
         - "{definitions.description_key_not_market_income}"
         - "{definitions.description_key_nowcasts}"
+        - "{definitions.description_key_welfare_type}"
+      description_short: "{definitions.ppp_adjustment_subtitle}"
 
   # BAR CHART
   - dimensions:
@@ -270,12 +285,14 @@ views:
     metadata:
       description_key:
         - "{definitions.description_key_extreme_poverty}"
+        - "{definitions.description_key_extreme_poverty_additional}"
         - "{definitions.description_key_lmic_poverty_line}"
         - "{definitions.description_key_umic_poverty_line}"
         - "{definitions.description_key_ppp}"
-        - "{definitions.description_key_welfare_type}"
         - "{definitions.description_key_not_market_income}"
         - "{definitions.description_key_nowcasts}"
+        - "{definitions.description_key_welfare_type}"
+      description_short: "{definitions.ppp_adjustment_subtitle}"
 
   # MULTIPLE LINES MORE LINES
   - dimensions:
@@ -314,19 +331,21 @@ views:
       subtitle: "{definitions.ppp_adjustment_subtitle}"
       note: "{definitions.ppp_adjustment_welfare_type_note}"
       hasMapTab: false
-      chartTypes: ["LineChart", "DiscreteBar"]
+      chartTypes: ["LineChart"]
       selectedFacetStrategy: entity
       yAxis:
         max: 100
     metadata:
       description_key:
         - "{definitions.description_key_extreme_poverty}"
+        - "{definitions.description_key_extreme_poverty_additional}"
         - "{definitions.description_key_lmic_poverty_line}"
         - "{definitions.description_key_umic_poverty_line}"
         - "{definitions.description_key_ppp}"
-        - "{definitions.description_key_welfare_type}"
         - "{definitions.description_key_not_market_income}"
         - "{definitions.description_key_nowcasts}"
+        - "{definitions.description_key_welfare_type}"
+      description_short: "{definitions.ppp_adjustment_subtitle}"
 
   # AREA CHART MORE LINES
   - dimensions:
@@ -370,7 +389,7 @@ views:
             color: *color_100_to_300
         - catalogPath: world_bank_pip#headcount_ratio__ppp_version_2021__poverty_line_100__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
-            name: "$Below $1 a day"
+            name: "Below $1 a day"
             color: *color_0_to_100
     config:
       title: Distribution of the population between different poverty lines
@@ -387,12 +406,14 @@ views:
     metadata:
       description_key:
         - "{definitions.description_key_extreme_poverty}"
+        - "{definitions.description_key_extreme_poverty_additional}"
         - "{definitions.description_key_lmic_poverty_line}"
         - "{definitions.description_key_umic_poverty_line}"
         - "{definitions.description_key_ppp}"
-        - "{definitions.description_key_welfare_type}"
         - "{definitions.description_key_not_market_income}"
         - "{definitions.description_key_nowcasts}"
+        - "{definitions.description_key_welfare_type}"
+      description_short: "{definitions.ppp_adjustment_subtitle}"
 
   # BAR CHART MORE LINES
   - dimensions:
@@ -438,20 +459,21 @@ views:
       selectedFacetStrategy: entity
       baseColorScheme: RdYlBu
       sortBy: column
-      sortOrder: asc
-      sortColumnSlug: world_bank_pip#headcount_ratio_above__ppp_version_2021__poverty_line_4000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+      sortColumnSlug: world_bank_pip#headcount_ratio__ppp_version_2021__poverty_line_100__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
       hideRelativeToggle: false
       stackMode: absolute
       hideTotalValueLabel: true
     metadata:
       description_key:
         - "{definitions.description_key_extreme_poverty}"
+        - "{definitions.description_key_extreme_poverty_additional}"
         - "{definitions.description_key_lmic_poverty_line}"
         - "{definitions.description_key_umic_poverty_line}"
         - "{definitions.description_key_ppp}"
-        - "{definitions.description_key_welfare_type}"
         - "{definitions.description_key_not_market_income}"
         - "{definitions.description_key_nowcasts}"
+        - "{definitions.description_key_welfare_type}"
+      description_short: "{definitions.ppp_adjustment_subtitle}"
 
 
   # FOR HEADCOUNT
@@ -465,32 +487,34 @@ views:
       y:
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_300__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
-            name: "Share below $3 a day"
+            name: "Number below $3 a day"
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_420__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
-            name: "Share below $4.20 a day"
+            name: "Number below $4.20 a day"
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_830__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
-            name: "Share below $8.30 a day"
+            name: "Number below $8.30 a day"
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_3000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
-            name: "Share below $30 a day"
+            name: "Number below $30 a day"
     config:
       title: Number of people living below a range of poverty lines
       subtitle: "{definitions.ppp_adjustment_subtitle}"
       note: "{definitions.ppp_adjustment_welfare_type_note}"
       hasMapTab: false
-      chartTypes: ["LineChart", "DiscreteBar"]
+      chartTypes: ["LineChart"]
       selectedFacetStrategy: entity
     metadata:
       description_key:
         - "{definitions.description_key_extreme_poverty}"
+        - "{definitions.description_key_extreme_poverty_additional}"
         - "{definitions.description_key_lmic_poverty_line}"
         - "{definitions.description_key_umic_poverty_line}"
         - "{definitions.description_key_ppp}"
-        - "{definitions.description_key_welfare_type}"
         - "{definitions.description_key_not_market_income}"
         - "{definitions.description_key_nowcasts}"
+        - "{definitions.description_key_welfare_type}"
+      description_short: "{definitions.ppp_adjustment_subtitle}"
 
   # AREA CHART
   - dimensions:
@@ -535,12 +559,14 @@ views:
     metadata:
       description_key:
         - "{definitions.description_key_extreme_poverty}"
+        - "{definitions.description_key_extreme_poverty_additional}"
         - "{definitions.description_key_lmic_poverty_line}"
         - "{definitions.description_key_umic_poverty_line}"
         - "{definitions.description_key_ppp}"
-        - "{definitions.description_key_welfare_type}"
         - "{definitions.description_key_not_market_income}"
         - "{definitions.description_key_nowcasts}"
+        - "{definitions.description_key_welfare_type}"
+      description_short: "{definitions.ppp_adjustment_subtitle}"
 
   # BAR CHART
   - dimensions:
@@ -580,12 +606,14 @@ views:
     metadata:
       description_key:
         - "{definitions.description_key_extreme_poverty}"
+        - "{definitions.description_key_extreme_poverty_additional}"
         - "{definitions.description_key_lmic_poverty_line}"
         - "{definitions.description_key_umic_poverty_line}"
         - "{definitions.description_key_ppp}"
-        - "{definitions.description_key_welfare_type}"
         - "{definitions.description_key_not_market_income}"
         - "{definitions.description_key_nowcasts}"
+        - "{definitions.description_key_welfare_type}"
+      description_short: "{definitions.ppp_adjustment_subtitle}"
 
   # MULTIPLE LINES MORE LINES
   - dimensions:
@@ -597,44 +625,46 @@ views:
       y:
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_100__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
-            name: "Share below $1 a day"
+            name: "Number below $1 a day"
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_300__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
-            name: "Share below $3 a day"
+            name: "Number below $3 a day"
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_420__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
-            name: "Share below $4.20 a day"
+            name: "Number below $4.20 a day"
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_830__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
-            name: "Share below $8.30 a day"
+            name: "Number below $8.30 a day"
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_1000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
-            name: "Share below $10 a day"
+            name: "Number below $10 a day"
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_2000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
-            name: "Share below $20 a day"
+            name: "Number below $20 a day"
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_3000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
-            name: "Share below $30 a day"
+            name: "Number below $30 a day"
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_4000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
-            name: "Share below $40 a day"
+            name: "Number below $40 a day"
     config:
       title: Number of people living below a range of poverty lines
       subtitle: "{definitions.ppp_adjustment_subtitle}"
       note: "{definitions.ppp_adjustment_welfare_type_note}"
       hasMapTab: false
-      chartTypes: ["LineChart", "DiscreteBar"]
+      chartTypes: ["LineChart"]
       selectedFacetStrategy: entity
     metadata:
       description_key:
         - "{definitions.description_key_extreme_poverty}"
+        - "{definitions.description_key_extreme_poverty_additional}"
         - "{definitions.description_key_lmic_poverty_line}"
         - "{definitions.description_key_umic_poverty_line}"
         - "{definitions.description_key_ppp}"
-        - "{definitions.description_key_welfare_type}"
         - "{definitions.description_key_not_market_income}"
         - "{definitions.description_key_nowcasts}"
+        - "{definitions.description_key_welfare_type}"
+      description_short: "{definitions.ppp_adjustment_subtitle}"
 
   # AREA CHART MORE LINES
   - dimensions:
@@ -678,7 +708,7 @@ views:
             color: *color_100_to_300
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_100__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
-            name: "$Below $1 a day"
+            name: "Below $1 a day"
             color: *color_0_to_100
     config:
       title: Distribution of the population between different poverty lines
@@ -695,12 +725,14 @@ views:
     metadata:
       description_key:
         - "{definitions.description_key_extreme_poverty}"
+        - "{definitions.description_key_extreme_poverty_additional}"
         - "{definitions.description_key_lmic_poverty_line}"
         - "{definitions.description_key_umic_poverty_line}"
         - "{definitions.description_key_ppp}"
-        - "{definitions.description_key_welfare_type}"
         - "{definitions.description_key_not_market_income}"
         - "{definitions.description_key_nowcasts}"
+        - "{definitions.description_key_welfare_type}"
+      description_short: "{definitions.ppp_adjustment_subtitle}"
 
   # BAR CHART MORE LINES
   - dimensions:
@@ -752,12 +784,14 @@ views:
     metadata:
       description_key:
         - "{definitions.description_key_extreme_poverty}"
+        - "{definitions.description_key_extreme_poverty_additional}"
         - "{definitions.description_key_lmic_poverty_line}"
         - "{definitions.description_key_umic_poverty_line}"
         - "{definitions.description_key_ppp}"
-        - "{definitions.description_key_welfare_type}"
         - "{definitions.description_key_not_market_income}"
         - "{definitions.description_key_nowcasts}"
+        - "{definitions.description_key_welfare_type}"
+      description_short: "{definitions.ppp_adjustment_subtitle}"
 
     ####################################################
     # SPELL VIEWS
@@ -795,8 +829,8 @@ views:
     metadata:
       description_key:
         - "{definitions.description_key_ppp}"
-        - "{definitions.description_key_welfare_type}"
         - "{definitions.description_key_not_market_income}"
+        - "{definitions.description_key_welfare_type_beginning}"
 
   - dimensions:
       indicator: headcount_ratio
@@ -830,9 +864,10 @@ views:
     metadata:
       description_key:
         - "{definitions.description_key_extreme_poverty}"
+        - "{definitions.description_key_extreme_poverty_additional}"
         - "{definitions.description_key_ppp}"
-        - "{definitions.description_key_welfare_type}"
         - "{definitions.description_key_not_market_income}"
+        - "{definitions.description_key_welfare_type_beginning}"
 
   - dimensions:
       indicator: headcount_ratio
@@ -867,8 +902,8 @@ views:
       description_key:
         - "{definitions.description_key_lmic_poverty_line}"
         - "{definitions.description_key_ppp}"
-        - "{definitions.description_key_welfare_type}"
         - "{definitions.description_key_not_market_income}"
+        - "{definitions.description_key_welfare_type_beginning}"
 
   - dimensions:
       indicator: headcount_ratio
@@ -903,8 +938,8 @@ views:
       description_key:
         - "{definitions.description_key_umic_poverty_line}"
         - "{definitions.description_key_ppp}"
-        - "{definitions.description_key_welfare_type}"
         - "{definitions.description_key_not_market_income}"
+        - "{definitions.description_key_welfare_type_beginning}"
 
   - dimensions:
       indicator: headcount_ratio
@@ -939,8 +974,8 @@ views:
     metadata:
       description_key:
         - "{definitions.description_key_ppp}"
-        - "{definitions.description_key_welfare_type}"
         - "{definitions.description_key_not_market_income}"
+        - "{definitions.description_key_welfare_type_beginning}"
 
   - dimensions:
       indicator: headcount_ratio
@@ -976,8 +1011,8 @@ views:
     metadata:
       description_key:
         - "{definitions.description_key_ppp}"
-        - "{definitions.description_key_welfare_type}"
         - "{definitions.description_key_not_market_income}"
+        - "{definitions.description_key_welfare_type_beginning}"
 
   - dimensions:
       indicator: headcount_ratio
@@ -1013,8 +1048,8 @@ views:
     metadata:
       description_key:
         - "{definitions.description_key_ppp}"
-        - "{definitions.description_key_welfare_type}"
         - "{definitions.description_key_not_market_income}"
+        - "{definitions.description_key_welfare_type_beginning}"
 
   - dimensions:
       indicator: headcount_ratio
@@ -1050,8 +1085,8 @@ views:
     metadata:
       description_key:
         - "{definitions.description_key_ppp}"
-        - "{definitions.description_key_welfare_type}"
         - "{definitions.description_key_not_market_income}"
+        - "{definitions.description_key_welfare_type_beginning}"
 
   # HEADCOUNT
   - dimensions:
@@ -1086,8 +1121,8 @@ views:
     metadata:
       description_key:
         - "{definitions.description_key_ppp}"
-        - "{definitions.description_key_welfare_type}"
         - "{definitions.description_key_not_market_income}"
+        - "{definitions.description_key_welfare_type_beginning}"
 
   - dimensions:
       indicator: headcount
@@ -1121,9 +1156,10 @@ views:
     metadata:
       description_key:
         - "{definitions.description_key_extreme_poverty}"
+        - "{definitions.description_key_extreme_poverty_additional}"
         - "{definitions.description_key_ppp}"
-        - "{definitions.description_key_welfare_type}"
         - "{definitions.description_key_not_market_income}"
+        - "{definitions.description_key_welfare_type_beginning}"
 
   - dimensions:
       indicator: headcount
@@ -1158,8 +1194,8 @@ views:
       description_key:
         - "{definitions.description_key_lmic_poverty_line}"
         - "{definitions.description_key_ppp}"
-        - "{definitions.description_key_welfare_type}"
         - "{definitions.description_key_not_market_income}"
+        - "{definitions.description_key_welfare_type_beginning}"
 
   - dimensions:
       indicator: headcount
@@ -1194,8 +1230,8 @@ views:
       description_key:
         - "{definitions.description_key_umic_poverty_line}"
         - "{definitions.description_key_ppp}"
-        - "{definitions.description_key_welfare_type}"
         - "{definitions.description_key_not_market_income}"
+        - "{definitions.description_key_welfare_type_beginning}"
 
   - dimensions:
       indicator: headcount
@@ -1230,8 +1266,8 @@ views:
     metadata:
       description_key:
         - "{definitions.description_key_ppp}"
-        - "{definitions.description_key_welfare_type}"
         - "{definitions.description_key_not_market_income}"
+        - "{definitions.description_key_welfare_type_beginning}"
 
   - dimensions:
       indicator: headcount
@@ -1267,8 +1303,8 @@ views:
     metadata:
       description_key:
         - "{definitions.description_key_ppp}"
-        - "{definitions.description_key_welfare_type}"
         - "{definitions.description_key_not_market_income}"
+        - "{definitions.description_key_welfare_type_beginning}"
 
   - dimensions:
       indicator: headcount
@@ -1304,8 +1340,8 @@ views:
     metadata:
       description_key:
         - "{definitions.description_key_ppp}"
-        - "{definitions.description_key_welfare_type}"
         - "{definitions.description_key_not_market_income}"
+        - "{definitions.description_key_welfare_type_beginning}"
 
   - dimensions:
       indicator: headcount
@@ -1341,5 +1377,5 @@ views:
     metadata:
       description_key:
         - "{definitions.description_key_ppp}"
-        - "{definitions.description_key_welfare_type}"
         - "{definitions.description_key_not_market_income}"
+        - "{definitions.description_key_welfare_type_beginning}"
