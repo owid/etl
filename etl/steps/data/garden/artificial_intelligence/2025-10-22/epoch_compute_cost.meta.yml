@@ -29,10 +29,15 @@ tables:
         unit: 'constant 2023 US$'
         short_unit: '$'
         description_short: The cost of developing the AI system expressed in 2023 US dollars, adjusted for inflation.
+        description_key:
+          - Hardware costs account for depreciation. The cost reflects only the portion of hardware value used during training, not the full purchase price, since hardware loses value as newer chips become available.
+          - Training costs include both hardware expenses and electricity consumed during training, plus data center cooling and power distribution.
+          - These figures show only the final training run. Total development costs are typically higher because they include many experimental runs before the final model.
+          - Exact training times are often unknown, so costs are estimated using "chip-hours"—the number of chips multiplied by hours of training.
         description_from_producer: |-
           The cost of developing the AI system was adjusted for inflation using the Consumer Price Index (CPI) for the United States. The CPI was used to account for the changes in the price level of consumer goods and services over time. The inflation-adjusted cost is presented in 2023 US dollars.
         presentation:
-          title_public: Cost of AI system development (inflation-adjusted)
+          title_public: Hardware and energy cost to train notable AI systems
         display:
           numDecimalPlaces: 0
           name: Cost
