@@ -1,38 +1,54 @@
 ---
-description: Check .meta.yml files for spelling typos using codespell
+description: Check .meta.yml and snapshot .dvc files for spelling typos using codespell
 ---
 
-Check `.meta.yml` files for spelling typos using comprehensive spell checking.
+Check metadata files for spelling typos using comprehensive spell checking.
 
 **First, ask the user which scope they want to check:**
 
 1. **Current step only** - Ask the user to specify the step path (e.g., `etl/steps/data/garden/energy/2025-06-27/electricity_mix`)
 2. **All ETL metadata** - Check all active `.meta.yml` files in `etl/steps/data/garden/` (automatically excludes ~1,979 archived steps)
+3. **Snapshot metadata** - Check all snapshot `.dvc` files in `snapshots/` (~7,913 files)
+4. **All metadata** - Check both ETL and snapshot metadata files
 
 Once the user specifies the scope, proceed with the typo check using the codespell-based approach.
 
-**Note:** Archived steps (defined in `dag/archive/*.yml`) are automatically excluded from checking as they are no longer actively maintained.
+**Note:** Archived steps and snapshots (defined in `dag/archive/*.yml`) are automatically excluded from checking as they are no longer actively maintained.
 
 ---
 
 ## Implementation Strategy
 
-### 1. Exclude archived steps
+### 1. Exclude archived steps and snapshots
 
-**IMPORTANT:** Do not check archived steps as they are no longer in use.
+**IMPORTANT:** Do not check archived steps and snapshots as they are no longer in use.
 
-Archived steps are defined in `dag/archive/*.yml` files (~1,979 deprecated steps).
+Archived steps and snapshots are defined in `dag/archive/*.yml` files:
+- ~1,979 deprecated garden steps
+- ~736 deprecated snapshots
 
 To exclude them, extract their paths and pass to codespell's `--skip` flag:
 
 ```bash
 # Extract archived garden step paths
-ARCHIVED=$(grep -h "data://garden/" dag/archive/*.yml 2>/dev/null |
+ARCHIVED_STEPS=$(grep -h "data://garden/" dag/archive/*.yml 2>/dev/null |
            grep -o "data://garden/[^:]*" |
            sed 's|data://||' |
            sed 's|$|.meta.yml|' |
            tr '\n' ',' |
            sed 's/,$//')
+
+# Extract archived snapshot paths
+ARCHIVED_SNAPSHOTS=$(grep -rh "snapshot://" dag/archive/*.yml 2>/dev/null |
+           grep -o "snapshot://[^:]*" |
+           sed 's|snapshot://|snapshots/|' |
+           sed 's|$|.dvc|' |
+           sort -u |
+           tr '\n' ',' |
+           sed 's/,$//')
+
+# Combine both for use in --skip flag
+ARCHIVED="${ARCHIVED_STEPS},${ARCHIVED_SNAPSHOTS}"
 ```
 
 ### 2. Run codespell with ignore list and exclusions
@@ -61,7 +77,36 @@ STEP_PATH="<user_provided_path>"  # e.g., etl/steps/data/garden/energy/2025-06-2
   --skip="$ARCHIVED"
 ```
 
-Note: Excluding archived steps reduces the scope by ~1,979 files and focuses on actively maintained metadata.
+Note: Excluding archived steps reduces the scope by ~1,979 files and focuses on actively maintained metadata. Archived snapshots are also excluded when checking snapshot metadata.
+
+**For option 3 (snapshot metadata):**
+
+```bash
+# For all snapshot metadata (option 3)
+# Extract archived snapshots
+ARCHIVED_SNAPSHOTS=$(grep -rh "snapshot://" dag/archive/*.yml 2>/dev/null |
+           grep -o "snapshot://[^:]*" |
+           sed 's|snapshot://|snapshots/|' |
+           sed 's|$|.dvc|' |
+           sort -u |
+           tr '\n' ',' |
+           sed 's/,$//')
+
+.venv/bin/codespell snapshots/**/*.dvc \
+  --ignore-words=.codespell-ignore.txt \
+  --skip="$ARCHIVED_SNAPSHOTS"
+```
+
+Note: Snapshot `.dvc` files contain metadata in the `meta.source.description` and `meta.source.published_by` fields. ~736 archived snapshots are excluded.
+
+**For option 4 (all metadata):**
+
+```bash
+# For all metadata - ETL and snapshots (option 4)
+.venv/bin/codespell etl/steps/data/garden/**/*.meta.yml snapshots/**/*.dvc \
+  --ignore-words=.codespell-ignore.txt \
+  --skip="$ARCHIVED"
+```
 
 ### 3. Parse and present results
 
@@ -143,7 +188,7 @@ All analysis logic should be embedded in this command execution, not saved as se
 ## Error Handling
 
 - If codespell is not installed and installation fails, explain to the user how to install it manually
-- If no `.meta.yml` files are found in the specified scope, inform the user
+- If no `.meta.yml` or `.dvc` files are found in the specified scope, inform the user
 - If codespell finds no typos, congratulate the user on clean metadata!
 - If file modification fails, report which files couldn't be updated
 
@@ -153,5 +198,6 @@ All analysis logic should be embedded in this command execution, not saved as se
 
 - Always use American English spelling (e.g., "combating" not "combatting")
 - Technical field names (like variable names with underscores) are typically safe to ignore
-- Acronyms in ALL CAPS that are fewer than 6 characters are likely legitimate
+- **Acronyms in ALL CAPS should be ignored** - they are almost always legitimate acronyms (e.g., TE, INE, DIEA)
+- **URLs and domain names should be ignored** - codespell may flag parts of URLs (e.g., "ine.es", "corona.fo") but these are correct
 - When in doubt about a flagged word, ask the user before fixing

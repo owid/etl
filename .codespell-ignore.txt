@@ -32,5 +32,30 @@ sive
 fot
 belows
 
-# Proper names
+# Proper names and author names
 reste
+Winn
+Comin
+Suh
+Atack
+Joo
+Rin
+Fle
+Troup
+
+# Organization names and acronyms
+hsi
+DIEA
+Commun
+TE
+
+# URL components and domains
+fo
+whe
+ine
+vie
+
+# Valid words in other languages (Spanish, French, Portuguese)
+Comercial
+serie
+comunicate
