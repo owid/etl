@@ -32,7 +32,6 @@ def run(dest_dir: str) -> None:
     # Standardize domain names.
     tb["domain"] = tb["domain"].astype(str)
     replacements = {
-        "Vision,Image generation": "Vision and image generation",
         "Language,Image generation": "Language and image generation",
     }
     for old_value, new_value in replacements.items():
