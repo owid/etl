@@ -11,7 +11,7 @@ definitions:
     display:
       numDecimalPlaces: 0
   description_short_sector: There is a subset of new AI PhDs each year who become self-employed, unemployed, or report an “other” employment status in the CRA survey. These students are not included in the chart.
-  description_short_gender: PhDs who graduated in the given year from academic units of computer science, computer engineering, and information that esponded to the Computing Research Association's Taulbee Survey.
+  description_short_gender: PhDs who graduated in the given year from academic units of computer science, computer engineering, and information that responded to the Computing Research Association's Taulbee Survey.
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/

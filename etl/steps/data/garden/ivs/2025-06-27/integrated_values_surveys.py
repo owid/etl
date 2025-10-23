@@ -93,7 +93,7 @@ HAPPINESS_QUESTIONS = ["happy"]
 NEIGHBORS_QUESTIONS = [
     "neighbors_different_race",
     "neighbors_heavy_drinkers",
-    "neighbors_inmigrant_foreign_workers",
+    "neighbors_immigrant_foreign_workers",
     "neighbors_aids",
     "neighbors_drug_addicts",
     "neighbors_homosexuals",
