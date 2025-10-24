@@ -61,7 +61,7 @@ def run() -> None:
         decadal_averages["decade"] = decadal_averages["decade"].astype(str) + "s"
 
         # Pivot decades into columns
-        pivoted_decadal = decadal_averages.pivot_table(
+        pivoted_decadal = decadal_averages.pivot(
             index=["month", "country"], columns="decade", values="value"
         ).reset_index()
 
@@ -78,19 +78,12 @@ def run() -> None:
         # Set metadata for each column
         for column in tb_merged.columns:
             tb_merged[column].metadata.title = column
-            source_metadata = tb_original["sea_temperature_anomaly"].metadata
-            tb_merged[column].metadata.origins = source_metadata.origins
-            tb_merged[column].metadata.unit = source_metadata.unit
-            tb_merged[column].metadata.short_unit = source_metadata.short_unit
-            tb_merged[column].metadata.description_short = source_metadata.description_short
-            tb_merged[column].metadata.description_from_producer = source_metadata.description_from_producer
-            tb_merged[column].metadata.description_processing = source_metadata.description_processing
 
         tb_merged.metadata = tb_original.metadata
         tb_merged.metadata.short_name = "climate_change_impacts_monthly_sea_temperature"
 
         # Save both tables
-        ds_grapher = paths.create_dataset(tables=[tb, tb_merged])
+        ds_grapher = paths.create_dataset(tables=[tb, tb_merged], check_variables_metadata=True)
     else:
         # If the column doesn't exist, save only the original table
         ds_grapher = paths.create_dataset(tables=[tb])
