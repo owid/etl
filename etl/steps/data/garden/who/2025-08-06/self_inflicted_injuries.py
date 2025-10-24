@@ -151,7 +151,7 @@ def _validate_self_harm_mortality_values(tb: Table) -> None:
 
 def _validate_demographic_dimensions(tb: Table) -> None:
     """Validate sex and age group categories."""
-    expected_sex_categories = {"All", "Female", "Male", "Unknown"}
+    expected_sex_categories = {"Both sexes", "Female", "Male", "Unknown"}
     actual_sex = set(tb["sex"].unique())
     unexpected_sex = actual_sex - expected_sex_categories
     assert not unexpected_sex, f"Unexpected sex categories: {unexpected_sex}"
