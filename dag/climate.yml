@@ -38,6 +38,16 @@ steps:
   data://grapher/climate/2025-01-07/total_precipitation_annual:
     - data://garden/climate/2025-01-07/total_precipitation
   #
+  # Copernicus Climate Change Service - Snowfall.
+  #
+  data://meadow/climate/2025-10-24/total_snowfall:
+  - snapshot://climate/2025-10-24/total_snowfall.zip
+  - snapshot://countries/2023-12-27/world_bank.zip
+  data://garden/climate/2025-10-24/total_snowfall:
+    - data://meadow/climate/2025-10-24/total_snowfall
+  data://grapher/climate/2025-10-24/total_snowfall_annual:
+    - data://garden/climate/2025-10-24/total_snowfall
+  #
   # Global Wildfire Information System - Monthly burned area.
   #
   data://meadow/climate/2024-02-19/monthly_burned_area:
