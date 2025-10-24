@@ -137,9 +137,7 @@ def _validate_self_harm_mortality_values(tb: Table) -> None:
                 variable="death_rate_per_100_000_population",
                 threshold=100,
                 count=len(extreme_rates),
-                examples=extreme_records[
-                    ["country", "year", "sex", "age_group", "death_rate_per_100_000_population"]
-                ]
+                examples=extreme_records[["country", "year", "sex", "age_group", "death_rate_per_100_000_population"]]
                 .head()
                 .to_dict("records"),
             )
@@ -220,17 +218,14 @@ def _validate_demographic_dimensions(tb: Table) -> None:
 def _validate_self_harm_age_patterns(tb: Table) -> None:
     """Validate self-inflicted injury mortality age patterns."""
     # Self-harm mortality typically peaks in middle-age groups and has specific patterns
-    
+
     # Check for unexpectedly high rates in very young children (should be very rare)
     young_children_data = tb[
-        (tb["age_group"].isin(["less than 1 year", "1-4 years", "5-9 years"]))
-        & (tb["sex"] == "Both sexes")
+        (tb["age_group"].isin(["less than 1 year", "1-4 years", "5-9 years"])) & (tb["sex"] == "Both sexes")
     ]
-    
+
     if len(young_children_data) > 0 and "death_rate_per_100_000_population" in tb.columns:
-        high_child_rates = young_children_data[
-            young_children_data["death_rate_per_100_000_population"] > 5.0
-        ]
+        high_child_rates = young_children_data[young_children_data["death_rate_per_100_000_population"] > 5.0]
         if len(high_child_rates) > 0:
             log.warning(
                 "Unusually high self-harm rates in young children",
@@ -239,9 +234,7 @@ def _validate_self_harm_age_patterns(tb: Table) -> None:
                 age_groups=["less than 1 year", "1-4 years", "5-9 years"],
                 threshold=5.0,
                 count=len(high_child_rates),
-                examples=high_child_rates[
-                    ["country", "year", "sex", "age_group", "death_rate_per_100_000_population"]
-                ]
+                examples=high_child_rates[["country", "year", "sex", "age_group", "death_rate_per_100_000_population"]]
                 .head()
                 .to_dict("records"),
             )
@@ -249,7 +242,7 @@ def _validate_self_harm_age_patterns(tb: Table) -> None:
     # Check age patterns for major countries
     for country in ["World", "United States", "Germany", "Japan"]:
         country_data = tb[(tb["country"] == country) & (tb["sex"] == "Both sexes")]
-        
+
         if len(country_data) == 0:
             continue
 
@@ -292,9 +285,7 @@ def _validate_temporal_patterns(tb: Table) -> None:
     # Check for major jumps in self-harm death counts
     for country in ["United States", "United Kingdom", "Australia", "France"]:
         country_data = tb[
-            (tb["country"] == country)
-            & (tb["sex"] == "Both sexes")
-            & (tb["age_group"] == "all ages")
+            (tb["country"] == country) & (tb["sex"] == "Both sexes") & (tb["age_group"] == "all ages")
         ].sort_values("year")
 
         if len(country_data) < 3:
@@ -305,7 +296,7 @@ def _validate_temporal_patterns(tb: Table) -> None:
         deaths_nonzero = deaths[deaths > 0]
         if len(deaths_nonzero) < len(deaths) * 0.5:  # Skip if too many zeros
             continue
-            
+
         year_changes = np.diff(deaths_nonzero) / deaths_nonzero[:-1] * 100  # Percent change
 
         extreme_changes = np.abs(year_changes) > 50  # >50% change year-over-year
@@ -334,7 +325,7 @@ def _validate_country_coverage(tb: Table) -> None:
     # Check for major countries that often report self-harm data
     expected_countries = {
         "United States",
-        "United Kingdom", 
+        "United Kingdom",
         "Germany",
         "France",
         "Japan",
