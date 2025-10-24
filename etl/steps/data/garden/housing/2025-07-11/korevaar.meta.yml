@@ -1,119 +1,195 @@
-# NOTE: To learn more about the fields, hover over their names.
+dataset:
+  title: The Housing Affordability Revolution
+  update_period_days: 1825
+
 definitions:
   common:
+    processing_level: minor
     presentation:
       topic_tags:
-        - Housing
-      grapher_config:
-        note: The value for Belgium is constructed from the values of four major cities, namely Antwerp, Bruges, Brussels, and Ghent.
-  notes:
-    historic_records: This is based on archival sources and previous research.
-
-
-# Learn more about the available fields:
-# http://docs.owid.io/projects/etl/architecture/metadata/reference/
-dataset:
-  update_period_days: 365
-
+        - Economic Inequality
+      attribution_short: Eichholtz et al.
 
 tables:
   korevaar:
+    title: Historical housing affordability indices
+    description: |-
+      The paper documents the long-run evolution of urban housing affordability in seven major European cities from 1500 to 2024. Using nearly half a million rent observations, we construct annual indices of rents and wages and develop new estimates of housing quality, inequality, and expenditure shares. Over this period, real rents increased slowly-by just 0.17 percent annually on average-while housing quality improved substantially even before industrialization. From the 1910s to the 1970s, we document a "housing affordability revolution": real wages grew markedly faster than rents, housing quality rose sharply, and housing consumption inequality declined-coinciding with large-scale housing policy. Yet housing expenditure shares are higher today than a century ago, not because affordability declined, but because housing consumption increased and household size declined - challenging models with constant expenditure shares. Our findings establish new stylized facts on housing rents, quality, and inequality over five centuries, and highlight the long-run role of preferences, institutions, and policy in shaping affordability.
     variables:
       affordability:
-        title: Housing affordability
-        description_short: Housing affordability in the long run, given as the ratio of real rents to real wages and normalized to 1900=100.
-        unit: Index
+        title: Housing affordability index
+        unit: index
         short_unit: ""
-      real_wage:
-        title: Real wages
-        description_short: Real wages, normalized to 1900=100 and adjusted for inflation.
+        description_short: Ratio of real wages to real rents, indicating relative housing affordability over time.
         description_key:
-          - This data comes from the paper "The Housing Affordability Revolution" by Korevaar et al. (2023). It provides insights into the long-term trends in housing affordability across various countries, focusing on the ratio of real rents to real wages.
-          - Real wages are based on multiple sources, such as day wages and annual wages of various industries, collective labour agreements, tax documentation and existing wage indices.
-          - The researchers adjusted the raw values for inflation by constructing a long-term consumer price index for each country.
-        unit: Index
-        short_unit: ""
+          - Higher values indicate better housing affordability (wages growing faster than rents).
+          - Calculated as the ratio of the real wage index to the real rent index.
+          - Shows how many units of housing a worker can afford with their wages over time.
+        display:
+          name: Affordability
+          numDecimalPlaces: 1
       real_rent:
-        title: Real rents
-        description_short: Real rents, normalized to 1900=100. These values are adjusted for inflation and improvements in quality of the housing stock. Quality improvements take into account amenities such as the availability of indoor bathrooms and toilets, kitchens, electricity, and central heating.
-        description_key:
-          - This data comes from the paper "The Housing Affordability Revolution" by Korevaar et al. (2023). It provides insights into the long-term trends in housing affordability across various countries, focusing on the ratio of real rents to real wages.
-          - Real rents are based on multiple sources, such as historical records of rents from institutional accounts, rent control records, tax documentation and existing rent indices.
-          - The researchers adjusted the raw values for inflation by constructing a long-term consumer price index for each country. They also adjusted for improvements in the quality of the housing stock, which includes amenities such as the availability of indoor bathrooms and toilets, kitchens, electricity, and central heating.
-          - In Paris, strict rent controls kept real rents extremely low until 1948, boosting affordability but making it hard to find housing. A major reform that year ended the system, leading to a return to more typical rent levels.
-        unit: Index
+        title: Real rent index
+        unit: index
         short_unit: ""
+        description_short: Index of real rent prices adjusted for inflation.
+        description_key:
+          - Real rents increased slowly over five centuries, by just 0.17% annually on average.
+          - Index values are normalized to allow comparison across cities and time periods.
+          - Adjusted for inflation using consumer price indices.
+        display:
+          name: Real rent
+          numDecimalPlaces: 1
+      real_wage:
+        title: Real wage index
+        unit: index
+        short_unit: ""
+        description_short: Index of real wages adjusted for inflation.
+        description_key:
+          - From the 1910s to 1970s, real wages grew markedly faster than rents during the "housing affordability revolution".
+          - Index values are normalized to allow comparison across cities and time periods.
+          - Adjusted for inflation using consumer price indices.
+        display:
+          name: Real wage
+          numDecimalPlaces: 1
   korevaar_quality:
+    title: Historical housing quality indicators
+    description: |-
+      How do housing rents, quality and affordability evolve when cities grow over time? This paper studies urban housing markets for half a millennium (1500-2017) for Amsterdam, Antwerp, Bruges, Brussels, Ghent, London, and Paris. Based on a dataset of 436,000 rent observations, we build new indices of housing rents, quality and inequality, and relate these to changes in wages and population. Long-term growth in real rent prices has been limited. Before 1900, markets were unregulated and rent prices and wages rose in tandem when cities grew, while housing quality and inequality increased. After 1900, housing affordability started improving substantially, and we show that short-term improvements in this period were partially attributable to rent controls. Most of the surge in housing expenditure that did occur over time is due to increasing housing quality rather than rising rent.
     variables:
       rooms_per_occupant:
         title: Rooms per occupant
-        description_short: Average number of rooms per occupant of a dwelling. {{ definitions.notes.historic_records }}
-        unit: Rooms per occupant
-        short_unit: "rooms"
+        unit: rooms per person
+        short_unit: ""
+        description_short: Average number of rooms per occupant in a dwelling.
+        description_key:
+          - Measures housing space availability relative to household size.
+          - Higher values indicate less crowding and better living conditions.
+        display:
+          name: Rooms per occupant
+          numDecimalPlaces: 2
       surface_m2:
-        title: Surface area in square meters
-        description_short: Average surface area of the dwelling in square meters. {{ definitions.notes.historic_records }}
+        title: Average dwelling surface area
         unit: square meters
-        short_unit: "m²"
+        short_unit: m²
+        description_short: Average floor area of dwellings in square meters.
+        display:
+          name: Dwelling size
+          numDecimalPlaces: 1
       surface_per_occupant:
         title: Surface area per occupant
-        description_short: Average surface area per occupant in the household, in square meters. {{ definitions.notes.historic_records }}
-        unit: square meters
-        short_unit: "m²"
+        unit: square meters per person
+        short_unit: m²
+        description_short: Average floor area per occupant in square meters.
+        description_key:
+          - Measures personal living space.
+          - Higher values indicate more spacious living conditions.
+        display:
+          name: Space per occupant
+          numDecimalPlaces: 1
       occupants:
-        title: Number of occupants
-        description_short: Average number of occupants in the household. {{ definitions.notes.historic_records }}
-        unit: Occupants
+        title: Average occupants per dwelling
+        unit: people
         short_unit: ""
+        description_short: Average number of people living in a dwelling.
+        display:
+          name: Occupants
+          numDecimalPlaces: 2
       inside_toilet_pct:
-        title: Percentage of households with an inside toilet
-        description_short: Percentage of households that have an inside toilet. {{ definitions.notes.historic_records }}
+        title: Share of dwellings with inside toilet
         unit: "%"
         short_unit: "%"
+        description_short: Percentage of dwellings with an indoor toilet.
+        description_key:
+          - Key indicator of sanitation and housing quality improvements.
+          - Rose dramatically during the 20th century in European cities.
+        display:
+          name: Inside toilet
+          numDecimalPlaces: 1
       bathroom_pct:
-        title: Percentage of households with a bathroom
-        description_short: Percentage of households that have a bathroom. {{ definitions.notes.historic_records }}
+        title: Share of dwellings with bathroom
         unit: "%"
         short_unit: "%"
+        description_short: Percentage of dwellings with a bathroom.
+        display:
+          name: Bathroom
+          numDecimalPlaces: 1
       central_heating_pct:
-        title: Percentage of households with central heating
-        description_short: Percentage of households that have central heating. {{ definitions.notes.historic_records }}
+        title: Share of dwellings with central heating
         unit: "%"
         short_unit: "%"
+        description_short: Percentage of dwellings with central heating systems.
+        description_key:
+          - Major indicator of thermal comfort and housing modernization.
+          - Increased substantially after 1950 in European cities.
+        display:
+          name: Central heating
+          numDecimalPlaces: 1
       water_pct:
-        title: Percentage of households with running water
-        description_short: Percentage of households that have running water. {{ definitions.notes.historic_records }}
+        title: Share of dwellings with running water
         unit: "%"
         short_unit: "%"
+        description_short: Percentage of dwellings with running water.
+        description_key:
+          - Fundamental indicator of basic housing amenities.
+          - One of the first modern conveniences to become widespread.
+        display:
+          name: Running water
+          numDecimalPlaces: 1
       electricity_pct:
-        title: Percentage of households with electricity
-        description_short: Percentage of households that have electricity. {{ definitions.notes.historic_records }}
+        title: Share of dwellings with electricity
         unit: "%"
         short_unit: "%"
+        description_short: Percentage of dwellings with electricity.
+        display:
+          name: Electricity
+          numDecimalPlaces: 1
       rooms:
-        title: Number of rooms
-        description_short: Average number of rooms in the dwelling. {{ definitions.notes.historic_records }}
-        unit: Rooms
-        short_unit: "rooms"
+        title: Average number of rooms per dwelling
+        unit: rooms
+        short_unit: ""
+        description_short: Average number of rooms in a dwelling.
+        display:
+          name: Rooms
+          numDecimalPlaces: 1
       rooms_per_capita:
         title: Rooms per capita
-        description_short: Average number of rooms per capita in the region. This is calculated as the total number of rooms divided by the total number of people living in the city. {{ definitions.notes.historic_records }}
-        unit: Rooms
-        short_unit: "rooms"
+        unit: rooms per person
+        short_unit: ""
+        description_short: Average number of rooms per person in the population.
+        display:
+          name: Rooms per capita
+          numDecimalPlaces: 2
       kitchen_greater_than_4m2_pct:
-        title: Percentage of households with a kitchen larger than 4 square meters
-        description_short: Percentage of households that have a kitchen larger than 4 square meters. {{ definitions.notes.historic_records }}
+        title: Share of dwellings with kitchen larger than 4m²
         unit: "%"
         short_unit: "%"
+        description_short: Percentage of dwellings with a kitchen larger than 4 square meters.
+        description_key:
+          - Indicates quality of cooking facilities.
+          - Larger kitchens allow for modern appliances and better food preparation.
+        display:
+          name: Large kitchen
+          numDecimalPlaces: 1
       isolation_pct:
-        title: Percentage of households with isolation
-        description_short: Percentage of households that have isolation. {{ definitions.notes.historic_records }}
+        title: Share of dwellings with insulation
         unit: "%"
         short_unit: "%"
+        description_short: Percentage of dwellings with insulation.
+        description_key:
+          - Indicates energy efficiency and thermal comfort.
+          - Became more common with rising energy concerns from the 1970s onward.
+        display:
+          name: Insulation
+          numDecimalPlaces: 1
       gas_pct:
-        title: Percentage of households with gas
-        description_short: Percentage of households that are connected to the gas network. {{ definitions.notes.historic_records }}
+        title: Share of dwellings with gas connection
         unit: "%"
         short_unit: "%"
-
-
+        description_short: Percentage of dwellings with a gas connection.
+        description_key:
+          - Used for heating and cooking.
+          - Spread rapidly in the mid-20th century as cities built gas networks.
+        display:
+          name: Gas connection
+          numDecimalPlaces: 1

@@ -1,6 +1,13 @@
 ---
 name: owid-metadata-generation
-description: Use when creating or enriching metadata for OWID ETL datasets - generates comprehensive YAML metadata from dataset inspection, data exploration, and web research following OWID metadata standards
+description: |
+  **ALWAYS USE THIS SKILL when:**
+  - Creating or improving metadata files (*.meta.yml)
+  - Running `etl metadata-export` command
+  - Filling in titles, units, descriptions for indicators
+  - Working with dataset metadata, variable metadata, or YAML metadata files
+
+  This skill provides comprehensive guidelines for generating publication-ready OWID metadata following strict standards for titles, units, descriptions, processing levels, licenses, and more.
 ---
 
 # OWID Metadata Generation
@@ -205,7 +212,6 @@ presentation:
 ```
 
 **Rules:**
-- Must use existing topic tags (check Admin or datasette)
 - First tag = primary topic (used in citations)
 - 1-3 tags maximum
 - Most relevant first
@@ -214,12 +220,17 @@ presentation:
 
 ### Step 1: Load and Inspect Dataset
 
+**ALWAYS start by inspecting the actual data to understand what you're describing.**
+
 ```python
 from owid.catalog import Dataset
-from etl import paths
+from pathlib import Path
 
-# Load the dataset
-ds = Dataset(paths.DATA_DIR / "garden/namespace/version/dataset_name")
+# Find the dataset path - use either garden or grapher
+dataset_path = "data/garden/namespace/version/dataset_name"
+# or: dataset_path = "data/grapher/namespace/version/dataset_name"
+
+ds = Dataset(dataset_path)
 
 # Inspect structure
 print(f"Tables: {list(ds.table_names)}")
@@ -231,23 +242,36 @@ for table_name in ds.table_names:
     print(f"\nSample data:")
     print(tb.head())
 
-    # Check value ranges
+    # Check existing metadata
+    if hasattr(tb, 'metadata'):
+        print(f"Table title: {tb.metadata.title if hasattr(tb.metadata, 'title') else 'None'}")
+
+    # Check value ranges and identify data patterns
     for col in tb.select_dtypes(include=['number']).columns:
-        print(f"{col}: min={tb[col].min()}, max={tb[col].max()}")
+        print(f"\n{col}:")
+        print(f"  Range: {tb[col].min():.2f} to {tb[col].max():.2f}")
+        print(f"  Mean: {tb[col].mean():.2f}")
+        # Check if it's a percentage (0-100 or 0-1)
+        if tb[col].min() >= 0 and tb[col].max() <= 1.1:
+            print(f"  → Likely a proportion/percentage")
+        # Check if it's an index (around 100)
+        if 50 < tb[col].mean() < 150:
+            print(f"  → Possibly an index")
 ```
 
 **What to extract:**
 - Variable names (columns)
-- Data ranges and patterns
+- Data ranges and patterns (helps determine units and decimal precision)
+- Whether variables are percentages, indices, absolute values, or ratios
 - Countries/entities present
 - Time periods covered
-- Existing metadata from origins
+- Existing metadata from origins and upstream steps
 
 ### Step 2: Research Sources
 
-**Check dataset origins:**
+**First, check dataset origins:**
 ```python
-# Extract origin metadata
+# Extract origin metadata from the dataset
 for table_name in ds.table_names:
     tb = ds[table_name]
     if hasattr(tb, 'metadata') and hasattr(tb.metadata, 'origins'):
@@ -256,9 +280,21 @@ for table_name in ds.table_names:
             print(f"Title: {origin.title}")
             print(f"URL: {origin.url_main}")
             print(f"Description: {origin.description}")
+            print(f"License: {origin.license}")
 ```
 
-**Web research:**
+**Read the garden step code:**
+```python
+# ALWAYS read the garden step to understand transformations
+# Look for:
+# - Data filtering or subsetting
+# - Calculations (multiplying, dividing, aggregating)
+# - Country harmonization
+# - Unit conversions
+# This determines processing_level and description_processing
+```
+
+**Web research (if OWID sources insufficient):**
 - Visit origin URLs to understand methodology
 - Search for "<producer> <dataset> methodology"
 - Look for data dictionaries, codebooks, technical documentation
@@ -270,6 +306,7 @@ for table_name in ds.table_names:
 - Methodology details (`description_key`)
 - Acronym expansions
 - Appropriate topic tags
+- Data construction notes (for grapher_config.note)
 
 ### Step 3: Generate Metadata Structure
 
@@ -290,17 +327,32 @@ This creates a YAML file with all variable names pre-filled.
 
 ### Step 4: Fill Metadata Systematically
 
-**For each variable, determine in order:**
+**SYSTEMATIC APPROACH - Do each step for ALL variables before moving to the next:**
 
-1. **Title** - from column name or origin docs
-2. **Units** - inspect data and origin docs
-3. **Description short** - one-sentence summary
-4. **Description key** - research-backed bullet points
-5. **Description from producer** - extract from source if exists
-6. **Processing level** - analyze transformations in garden step
-7. **Description processing** - document major transformations
-8. **Display settings** - determine appropriate decimal places
-9. **Topic tags** - match to OWID topic pages
+**Round 1: Basic identification (title, unit, short_unit)**
+- Determine titles from column names + data inspection
+- Identify units from data ranges and origin docs
+- Set short_unit symbols
+
+**Round 2: Descriptions (description_short, description_key)**
+- Write one-sentence summaries for all variables
+- Add research-backed bullet points from OWID articles/sources
+- Expand all acronyms in description_key
+
+**Round 3: Technical fields (processing_level, license, description_processing)**
+- Read garden step code to classify processing level
+- Set license based on processing level and origin licenses
+- Document major transformations if processing_level is "major"
+
+**Round 4: Presentation (topic_tags, attribution_short, display settings)**
+- Assign 1-3 topic tags (check existing OWID content)
+- Set attribution_short from origin producer
+- Determine decimal places based on data ranges
+
+**Round 5: Polish (display.name, title_public, grapher notes)**
+- Create short display names for charts
+- Add title_public if needed for clarity
+- Include grapher_config.note for data construction methods
 
 **Use YAML features for efficiency:**
 
@@ -643,28 +695,50 @@ renewable_energy_share:
 
 ## Quality Checklist
 
-Before considering metadata complete:
+**Before considering metadata complete:**
 
+### Data-Driven Validation
+- [ ] **Inspected actual dataset** - Loaded and examined data before writing any metadata
+- [ ] **Units match data ranges** - Verified units by checking min/max values
+- [ ] **Decimal precision tested** - Checked numDecimalPlaces against actual data values
+- [ ] **Index identification** - Confirmed whether variables are indices, percentages, or absolute values
+
+### Research Validation
+- [ ] **Read garden step code** - Analyzed transformations to determine processing_level
+- [ ] **Checked origin metadata** - Extracted producer, title, URL, license from origins
+- [ ] **Found topic tags from existing content** - Checked datasette or similar datasets
+
+### Required Fields
 - [ ] Every variable has title, unit, short_unit, description_short
 - [ ] All descriptions start with capital letter, end with period
 - [ ] Units are lowercase, plural (except % and Index)
 - [ ] Short units follow SI conventions
-- [ ] No metadata fields mentioned in descriptions or titles
 - [ ] Processing level accurately reflects transformations
 - [ ] License matches processing level
-- [ ] Topic tags exist and spelled correctly (check datasette/Admin)
+
+### Content Quality
+- [ ] No metadata fields mentioned in descriptions or titles
+- [ ] Topic tags exist and spelled correctly (verified via datasette)
 - [ ] Description_key bullet points expand all acronyms
 - [ ] Description_key is public-friendly (layperson can understand)
 - [ ] Description_from_producer is exact producer text (if used)
 - [ ] Description_processing documents major transformations (if applicable)
-- [ ] Display.name is short enough for chart legends
+
+### Display Settings
+- [ ] Display.name is short enough for chart legends (< 40 chars)
 - [ ] Decimal places appropriate and consistent for related variables
+- [ ] Tested decimal precision against actual data ranges
+
+### Dataset-Level
 - [ ] Dataset.update_period_days set correctly
 - [ ] Table titles and descriptions provided (if multiple tables or complex dataset)
 - [ ] Dynamic YAML used for repeated text ({definitions.notes...})
 - [ ] Grapher notes included for data construction methods (if applicable)
+
+### Final Checks
 - [ ] No TODO or placeholder text remains
 - [ ] Metadata previewed in Admin/staging
+- [ ] **All metadata claims verified** - No guessing or assumptions
 
 ## Red Flags - Stop and Review
 

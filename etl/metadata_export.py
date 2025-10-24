@@ -196,6 +196,7 @@ def metadata_export(
         t.pop("short_name")
         t.pop("dataset")
         t.pop("primary_key", None)
+        t.pop("dimensions", None)
 
         # transform variables metadata
         t["variables"] = {}
