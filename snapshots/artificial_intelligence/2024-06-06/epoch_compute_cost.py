@@ -1,11 +1,4 @@
-"""Script to create a snapshot of the Epoch AI training cost dataset.
-
-The dataset was originally provided directly by the authors in a private communication.
-
-This update was sourced from the public GitHub repository: https://github.com/epoch-research/training-cost-trends
-
-It needs to be cloned manually and ran to get the latest data.
-"""
+"""Script to create a snapshot of dataset. The dataset was provided to us directly by the authors in a private communication."""
 
 from pathlib import Path
 
