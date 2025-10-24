@@ -51,39 +51,22 @@ def run() -> None:
             index=["country", "month"], columns="year", values="sea_temperature_anomaly", join_column_levels_with="_"
         )
 
-        # Calculate decadal averages
-        tb_long = tb_pivot.melt(id_vars=["month", "country"], var_name="year", value_name="value")
-        tb_long["year"] = tb_long["year"].astype(int)
-        tb_long["decade"] = (tb_long["year"] // 10) * 10
-
-        # Group by month, country, and decade
-        decadal_averages = tb_long.groupby(["month", "country", "decade"])["value"].mean().reset_index()
-        decadal_averages["decade"] = decadal_averages["decade"].astype(str) + "s"
-
-        # Pivot decades into columns
-        pivoted_decadal = decadal_averages.pivot(
-            index=["month", "country"], columns="decade", values="value"
-        ).reset_index()
-
-        # Merge decadal and yearly data
-        tb_merged = pr.merge(pivoted_decadal, tb_pivot, on=["month", "country"], how="outer")
-
         # Rename month to year for grapher compatibility
-        tb_merged = tb_merged.rename(columns={"month": "year"})
-        tb_merged = tb_merged.set_index(["country", "year"])
+        tb_pivot = tb_pivot.rename(columns={"month": "year"})
+        tb_pivot = tb_pivot.set_index(["country", "year"])
 
         # Convert all column names to strings
-        tb_merged.columns = [str(col) for col in tb_merged.columns]
+        tb_pivot.columns = [str(col) for col in tb_pivot.columns]
 
         # Set metadata for each column
-        for column in tb_merged.columns:
-            tb_merged[column].metadata.title = column
+        for column in tb_pivot.columns:
+            tb_pivot[column].metadata.title = column
 
-        tb_merged.metadata = tb_original.metadata
-        tb_merged.metadata.short_name = "climate_change_impacts_monthly_sea_temperature"
+        tb_pivot.metadata = tb_original.metadata
+        tb_pivot.metadata.short_name = "climate_change_impacts_monthly_sea_temperature"
 
         # Save both tables
-        ds_grapher = paths.create_dataset(tables=[tb, tb_merged], check_variables_metadata=True)
+        ds_grapher = paths.create_dataset(tables=[tb, tb_pivot], check_variables_metadata=True)
     else:
         # If the column doesn't exist, save only the original table
         ds_grapher = paths.create_dataset(tables=[tb])
