@@ -25,7 +25,6 @@ def run(dest_dir: str) -> None:
     tb = tb.format()
 
     #
-    #
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
