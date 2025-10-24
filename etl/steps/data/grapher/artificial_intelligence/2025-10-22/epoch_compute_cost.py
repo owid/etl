@@ -14,15 +14,14 @@ def run(dest_dir: str) -> None:
     ds_garden = paths.load_dataset("epoch_compute_cost")
 
     # Read table from garden dataset.
-    tb = ds_garden["epoch_compute_cost"]
+    tb = ds_garden.read("epoch_compute_cost")
 
     #
     # Process data.
     #
-    tb = tb.reset_index()
     # Rename for plotting model name as country in grapher
     tb = tb.rename(columns={"model": "country", "days_since_1949": "year"})
-    tb = tb.format()
+    tb = tb.format(["country", "year"])
 
     #
     # Save outputs.
