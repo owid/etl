@@ -14,11 +14,7 @@ def run(dest_dir: str) -> None:
     ds_garden = paths.load_dataset("esc")
 
     # Read table from garden dataset.
-    tb = ds_garden["esc"]
-
-    #
-    # Process data.
-    #
+    tb = ds_garden.read("esc", reset_index=False)
 
     #
     # Save outputs.
