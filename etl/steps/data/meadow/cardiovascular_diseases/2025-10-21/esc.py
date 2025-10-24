@@ -22,8 +22,7 @@ def run(dest_dir: str) -> None:
     #
     # Pivot to get a column for each indicator
     tb = pr.pivot(tb, index=["year", "country"], columns=["indicator"], values="value").reset_index()
-    # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb = tb.underscore().set_index(["country", "year"], verify_integrity=True).sort_index()
+    tb = tb.format(["country", "year"])
 
     #
     # Save outputs.
