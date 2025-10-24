@@ -26,11 +26,7 @@ def run(dest_dir: str) -> None:
     tb["year"] = tb["time"].astype(str).str[0:4]
 
     # Group by year and calculate the mean of the specified columns
-    tb = (
-        tb.groupby(["year", "country"])
-        .agg({"total_snowfall": "sum", "snowfall_anomaly": "sum"})
-        .reset_index()
-    )
+    tb = tb.groupby(["year", "country"]).agg({"total_snowfall": "sum", "snowfall_anomaly": "sum"}).reset_index()
 
     # Remove rows where the year is 2025 as it's incomplete
     tb["year"] = tb["year"].astype(int)
