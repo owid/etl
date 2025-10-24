@@ -5,7 +5,7 @@ meta:
     date_accessed: 2023-08-10 08:10:19.752820
     publication_date: latest
     published_by: Our World in Data catalog backport
-  name: Global Corruption Barometer - Transparancy International (2017)
+  name: Global Corruption Barometer - Transparency International (2017)
   description: The surveys are spread across years, and the metrics are not constant
     over time, which makes this a tricky dataset. It's necessary to allow tolerance
     when using it to make graphs.

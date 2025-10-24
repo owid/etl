@@ -2,7 +2,7 @@
 definitions:
   common:
     description_processing: |-
-        For each country the average across all cities avaialble was calculated.
+        For each country the average across all cities available was calculated.
     presentation:
       topic_tags:
         - Urbanization

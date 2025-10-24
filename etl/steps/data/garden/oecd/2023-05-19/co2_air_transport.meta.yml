@@ -47,7 +47,7 @@ tables:
           numDecimalPlaces: 0
       per_capita_ter_int_a:
         title: Per capita CO₂ emissions from international aviation.
-        descripton: >
+        description: >
           International aviation emissions are assigned to the country of departure. The term "per capita" indicates that the emissions are calculated on a per-person basis, taking into account the total population of the country. By using this measurement, we can understand the average amount of CO₂ emissions attributed to each individual as a result of domestic air travel.
 
 

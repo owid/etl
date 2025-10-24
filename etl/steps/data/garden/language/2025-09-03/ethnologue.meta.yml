@@ -29,7 +29,7 @@ tables:
         description_key:
           - A living language is one that is still in use, with at least one person using it as their first language.
           - For a living language to be counted in each country, it must either be indigenous to that country or be non-indigenous and counted as established.
-          - To be considered established, a non-indigenous language must be both being acquired by the next generation, either in the home, or through mandatory schooling on in the work place. Additionally, its use must be the norm, either as a first or second language withing a language community or community of practice, for example students who learn it as a second language in a school system.
+          - To be considered established, a non-indigenous language must be both being acquired by the next generation, either in the home, or through mandatory schooling on in the work place. Additionally, its use must be the norm, either as a first or second language within a language community or community of practice, for example students who learn it as a second language in a school system.
           - Living languages can be classified as either institutional, stable or endangered, based on how likely they are to be transmitted to future generations. Institutional languages are those most likely to be passed on, while endangered languages are at the highest risk of falling out of use.
 
       extinct:

@@ -122,7 +122,7 @@ tables:
         description_processing: |-
           0: non-electoral autocracy
           1: one-party autocracy
-          2: multi-party autocracy wihtout elected executive
+          2: multi-party autocracy without elected executive
           3: multi-party autocracy
           4: exclusive Democracy
           5: male democracy

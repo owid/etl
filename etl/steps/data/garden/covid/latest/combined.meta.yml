@@ -13,7 +13,7 @@ dataset:
   update_period_days: 0
   title: COVID-19, combined indicators
   description: |-
-    This dataset is built by combinining indicators of multiple COVID-19 indicators. It estimates various indicators based on relationships between others.
+    This dataset is built by combining indicators of multiple COVID-19 indicators. It estimates various indicators based on relationships between others.
 
 tables:
   combined:

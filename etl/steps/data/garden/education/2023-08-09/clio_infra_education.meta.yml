@@ -42,7 +42,7 @@ tables:
           The Gini coefficient measures the inequality in the spread of education in the total population aged 15 years and older.
 
 
-          A Gini coefficient here is an aggregate metric that takes into account the distribution of educational attainment in a population, weighted by the average years of schooling at each level. Higher numbers indicate higher inequality in educational attainment in the population (ie. small proportion of the population spending most years in education and receving the highest levels of educational attainment).
+          A Gini coefficient here is an aggregate metric that takes into account the distribution of educational attainment in a population, weighted by the average years of schooling at each level. Higher numbers indicate higher inequality in educational attainment in the population (ie. small proportion of the population spending most years in education and receiving the highest levels of educational attainment).
         unit: index
         short_unit: ''
         display:
@@ -74,7 +74,7 @@ tables:
           For example, individiauals might state their age as 30, 35, or 40 and avoid being precise with figures like 31, 36, or 39. This is believed to happen more often in populations that lack basic numeracy skills.
 
 
-          Age heaping can therefore be used to estimate histroic data on basic numeracy across different regions and timeframes.
+          Age heaping can therefore be used to estimate historic data on basic numeracy across different regions and timeframes.
 
 
           To estimate age heaping (also known as Whipple index) the authors of this dataset divide the number of people who report their ages to end in 0 or 5 by the expected real age distribution if ages were evenly distributed, meaning ages ending in 0 or 5 would appear about one-fifth of the time. They then perform a simple transformation of the Whipple index that can be interpreted as the share of individuals that correctly report their age.
@@ -90,15 +90,15 @@ tables:
             For example, individiauals might state their age as 30, 35, or 40 and avoid being precise with figures like 31, 36, or 39. This is believed to happen more often in populations that lack basic numeracy skills.
 
 
-            Age heaping can therefore be used to estimate histroic data on basic numeracy across different regions and timeframes.
+            Age heaping can therefore be used to estimate historic data on basic numeracy across different regions and timeframes.
 
 
             To estimate age heaping (also known as Whipple index) the authors of this dataset divide the number of people who report their ages to end in 0 or 5 by the expected real age distribution if ages were evenly distributed, meaning ages ending in 0 or 5 would appear about one-fifth of the time.
             If all individuals in a population report ages ending in 0 or 5, the score is 500. If half of individuals report such ages, the score is 250. If one fifth of the population which is approximate number of people whose age in fact ends on 0 or 5 report age-heaping, the score would be 100, indicating no age heaping.
 
 
-            To estimate gender inequality in numeracy the male age-heaping index is subtracted from the female one, divided by the male one and multipled by -100.
-            A higher score suggests fewer women are rounding their ages compared to men in a specific region. Positive indicies indicates women have an advantage in numeracy and negative indicates men have an advantage in numeracy.
+            To estimate gender inequality in numeracy the male age-heaping index is subtracted from the female one, divided by the male one and multiplied by -100.
+            A higher score suggests fewer women are rounding their ages compared to men in a specific region. Positive indices indicates women have an advantage in numeracy and negative indicates men have an advantage in numeracy.
             The index isn't proportional. E.g., a 50% heaping in women (score 250) against perfect reporting by men (score 100) gives a gender equality index of -150, but if roles are reversed, the index becomes 60.
         unit: '%'
         short_unit: '%'

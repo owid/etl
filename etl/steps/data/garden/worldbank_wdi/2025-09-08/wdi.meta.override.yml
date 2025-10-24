@@ -53,7 +53,8 @@ definitions:
   # ILOSTAT definitions
   ####################################################################################
 
-  employment: Employment refers to all persons of working age who, during a specified brief period, were in paid employment or self-employment.
+  employment: Employment refers to people of working age who worked for at least an hour during the reference period (typically a week), whether in paid employment or self-employment.
+
   icse_93: These statuses in employment are provided according to the [International Standard Classification of Status in Employment](https://ilostat.ilo.org/methods/concepts-and-definitions/classification-status-at-work/) (ICSE-93).
 
   description_short_labor_force_participation_rate: |-
@@ -81,12 +82,27 @@ definitions:
   description_short_average_working_hours_of_children: |-
     Average weekly hours worked by children aged 7-14 years involved in economic activity and attending school.
 
+  description_key_labor_force_participation_1: |-
+    The labor force participation rate shows the share of working-age people who are either employed (working for pay or profit) or unemployed (not working, but actively looking for work and available to start). This indicator shows the share of the population that is economically active.
+  description_key_labor_force_participation_2: |-
+    People who are not seeking work or are not available, such as students, retired people, or unpaid caregivers, are excluded as they are considered to be outside the labor force.
+  description_key_unemployment: |-
+    The unemployment rate measures the share of the labor force that is without a job but actively looking for work and available to start soon. It is one of the most widely used indicators of labor market conditions across countries and over time.
+
   description_key_iloest_modelled_data: |-
-    This data is part of the ILO Modelled Estimates series. This series combines nationally reported observations with imputed data to have a harmonized, internationally comparable dataset and produce regional and global aggregates. For more information, please refer to the [ILO Modelled Estimates documentation](https://ilostat.ilo.org/methods/concepts-and-definitions/ilo-modelled-estimates/).
+    This data comes from the ILO Modelled Estimates series. The ILO combines countries' own reported estimates with statistically modeled estimates when observations are missing. This ensures that the data follows harmonized definitions and is comparable across countries and over time. It also allows the ILO to calculate regional and global aggregates for every year. You can read more about how the ILO produces these estimates in the [Modelled Estimates documentation](https://ilostat.ilo.org/methods/concepts-and-definitions/ilo-modelled-estimates/).
   description_key_national_estimates: |-
-    This data includes only nationally reported observations from surveys and censuses. Due to the varying methodologies and definitions employed by countries, this data is not internationally comparable.
+    This data comes from national sources, typically labor force surveys, household surveys, or population censuses. Each country uses its own definitions and methods, so this data may not be directly comparable across countries and over time.
   description_key_13th_icls: |-
-    This data is classified according to the 13th International Classification of Labour Statistics (ICLS), where employment includes anyone engaged for at least one hour per day in the production of goods and services, even for own use by the household or family, volunteering, or other forms of unpaid work. For more information, please refer to [this explainer by the International Labour Organization](https://www.ilo.org/publications/quick-guide-understanding-impact-new-statistical-standards-ilostat).
+    This data follows the standards of the [13th International Classification of Labour Statisticians (ICLS)](#dod:13-icls). One important point is that employment encompasses work for pay or profit, including self-employment, and also the production of goods for own use (such as subsistence farming). Changes in the definition of employment imply changes in the identification of the unemployed and of those out of the labor force. Because definitions changed under the [19th ICLS](#dod:19-icls), data using those newer definitions are not fully comparable with data based on the 13th ICLS. You can read more about the definitions in [this explainer by the ILO](https://www.ilo.org/publications/quick-guide-understanding-impact-new-statistical-standards-ilostat).
+
+  description_key_working_age_ilo_modeled: |-
+    When defining the labor force, the definition of “working age” varies across countries, depending on national laws and practices. In the ILO modeled estimates shown here, this is harmonized to refer to people aged 15 and older.
+  description_key_working_age_ilo_modeled_employment: |-
+    When defining the working-age population, the definition of “working age” varies across countries, depending on national laws and practices. In the ILO modeled estimates shown here, this is harmonized to refer to people aged 15 and older.
+  description_key_working_age_ilo_national: |-
+    When defining the labor force, the working-age population includes all people above the legal working age for employment in each country. The ILO recommends defining it as people aged 15 and older, but national definitions vary, depending on local laws. Some countries also set an upper age limit.
+
   description_key_own_account_workers: |-
     _Own-account workers_ are defined as workers working on self-employment jobs who do not engage any employees to work with them.
   description_key_contributing_family_workers: |-
@@ -1093,6 +1109,9 @@ tables:
           <%- set age = "(15+) " %>
           {definitions.description_short_labor_force_participation_rate}
         description_key:
+          - "{definitions.description_key_labor_force_participation_1}"
+          - "{definitions.description_key_labor_force_participation_2}"
+          - "{definitions.description_key_working_age_ilo_modeled}"
           - "{definitions.description_key_iloest_modelled_data}"
           - "{definitions.description_key_13th_icls}"
         presentation:
@@ -1113,6 +1132,9 @@ tables:
           <%- set age = "(15+) " %>
           {definitions.description_short_labor_force_participation_rate}
         description_key:
+          - "{definitions.description_key_labor_force_participation_1}"
+          - "{definitions.description_key_labor_force_participation_2}"
+          - "{definitions.description_key_working_age_ilo_modeled}"
           - "{definitions.description_key_iloest_modelled_data}"
           - "{definitions.description_key_13th_icls}"
         presentation:
@@ -1133,6 +1155,9 @@ tables:
           <%- set age = "(15+) " %>
           {definitions.description_short_labor_force_participation_rate}
         description_key:
+          - "{definitions.description_key_labor_force_participation_1}"
+          - "{definitions.description_key_labor_force_participation_2}"
+          - "{definitions.description_key_working_age_ilo_modeled}"
           - "{definitions.description_key_iloest_modelled_data}"
           - "{definitions.description_key_13th_icls}"
         presentation:
@@ -1153,6 +1178,9 @@ tables:
           <%- set age = "" %>
           {definitions.description_short_labor_force_participation_rate}
         description_key:
+          - "{definitions.description_key_labor_force_participation_1}"
+          - "{definitions.description_key_labor_force_participation_2}"
+          - "{definitions.description_key_working_age_ilo_national}"
           - "{definitions.description_key_national_estimates}"
           - "{definitions.description_key_13th_icls}"
         presentation:
@@ -1173,6 +1201,9 @@ tables:
           <%- set age = "" %>
           {definitions.description_short_labor_force_participation_rate}
         description_key:
+          - "{definitions.description_key_labor_force_participation_1}"
+          - "{definitions.description_key_labor_force_participation_2}"
+          - "{definitions.description_key_working_age_ilo_national}"
           - "{definitions.description_key_national_estimates}"
           - "{definitions.description_key_13th_icls}"
         presentation:
@@ -1193,6 +1224,9 @@ tables:
           <%- set age = "" %>
           {definitions.description_short_labor_force_participation_rate}
         description_key:
+          - "{definitions.description_key_labor_force_participation_1}"
+          - "{definitions.description_key_labor_force_participation_2}"
+          - "{definitions.description_key_working_age_ilo_national}"
           - "{definitions.description_key_national_estimates}"
           - "{definitions.description_key_13th_icls}"
         presentation:
@@ -1213,6 +1247,8 @@ tables:
           <%- set age = "aged 15-24 " %>
           {definitions.description_short_labor_force_participation_rate}
         description_key:
+          - "{definitions.description_key_labor_force_participation_1}"
+          - "{definitions.description_key_labor_force_participation_2}"
           - "{definitions.description_key_national_estimates}"
           - "{definitions.description_key_13th_icls}"
         presentation:
@@ -1233,6 +1269,8 @@ tables:
           <%- set age = "" %>
           {definitions.description_short_unemployment_rate}
         description_key:
+          - "{definitions.description_key_unemployment}"
+          - "{definitions.description_key_working_age_ilo_modeled}"
           - "{definitions.description_key_iloest_modelled_data}"
           - "{definitions.description_key_13th_icls}"
         presentation:
@@ -1253,6 +1291,8 @@ tables:
           <%- set age = "" %>
           {definitions.description_short_unemployment_rate}
         description_key:
+          - "{definitions.description_key_unemployment}"
+          - "{definitions.description_key_working_age_ilo_modeled}"
           - "{definitions.description_key_iloest_modelled_data}"
           - "{definitions.description_key_13th_icls}"
         presentation:
@@ -1273,6 +1313,8 @@ tables:
           <%- set age = "" %>
           {definitions.description_short_unemployment_rate}
         description_key:
+          - "{definitions.description_key_unemployment}"
+          - "{definitions.description_key_working_age_ilo_modeled}"
           - "{definitions.description_key_iloest_modelled_data}"
           - "{definitions.description_key_13th_icls}"
         presentation:
@@ -1293,6 +1335,7 @@ tables:
           <%- set age = "aged 15-24 " %>
           {definitions.description_short_unemployment_rate}
         description_key:
+          - "{definitions.description_key_unemployment}"
           - "{definitions.description_key_iloest_modelled_data}"
           - "{definitions.description_key_13th_icls}"
         presentation:
@@ -1313,6 +1356,8 @@ tables:
           <%- set age = "" %>
           {definitions.description_short_unemployment_rate}
         description_key:
+          - "{definitions.description_key_unemployment}"
+          - "{definitions.description_key_working_age_ilo_national}"
           - "{definitions.description_key_national_estimates}"
           - "{definitions.description_key_13th_icls}"
         presentation:
@@ -1334,6 +1379,7 @@ tables:
           {definitions.description_short_employment_to_population_ratio}
         description_key:
           - "{definitions.employment}"
+          - "{definitions.description_key_working_age_ilo_modeled_employment}"
           - "{definitions.description_key_iloest_modelled_data}"
           - "{definitions.description_key_13th_icls}"
         presentation:
@@ -1355,6 +1401,7 @@ tables:
           {definitions.description_short_employment_to_population_ratio}
         description_key:
           - "{definitions.employment}"
+          - "{definitions.description_key_working_age_ilo_modeled_employment}"
           - "{definitions.description_key_iloest_modelled_data}"
           - "{definitions.description_key_13th_icls}"
         presentation:
@@ -1376,6 +1423,7 @@ tables:
           {definitions.description_short_employment_to_population_ratio}
         description_key:
           - "{definitions.employment}"
+          - "{definitions.description_key_working_age_ilo_modeled_employment}"
           - "{definitions.description_key_iloest_modelled_data}"
           - "{definitions.description_key_13th_icls}"
         presentation:
@@ -1397,6 +1445,7 @@ tables:
           {definitions.description_short_employment_to_population_ratio}
         description_key:
           - "{definitions.employment}"
+          - "{definitions.description_key_working_age_ilo_national}"
           - "{definitions.description_key_national_estimates}"
           - "{definitions.description_key_13th_icls}"
         presentation:
@@ -1418,6 +1467,7 @@ tables:
           {definitions.description_short_employment_to_population_ratio}
         description_key:
           - "{definitions.employment}"
+          - "{definitions.description_key_working_age_ilo_national}"
           - "{definitions.description_key_national_estimates}"
           - "{definitions.description_key_13th_icls}"
         presentation:

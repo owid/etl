@@ -126,7 +126,7 @@ tables:
           name: Census frequency
           <<: *common-display
       v2clrspct:
-        title: Rigourous and Impartial Public Administration
+        title: Rigorous and Impartial Public Administration
         unit: ""
         short_unit: ""
         description_short: Based on the expert assessments by V-Dem. It captures the extent to which public officials are expected to follow the law and are not biased in their administration of the law. It ranges from 0 to 4 (more rigorous and impartial public administration).
@@ -148,7 +148,7 @@ tables:
           We use data covering 177 countries from 1960-2015.
         processing_level: minor
         display:
-          name: Rigourous and Impartial Public Administration
+          name: Rigorous and Impartial Public Administration
           <<: *common-display
       v2stfisccap:
         title: Fiscal capacity

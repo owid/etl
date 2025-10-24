@@ -99,7 +99,7 @@ tables:
           numDecimalPlaces: 0
       confer_citizenship_to_non_national_spouse_married:
         title: Can a married woman legally confer her citizenship to a non-national spouse in the same way as a married man? (1=yes; 0=no)
-        description: Measures wheter a married woman can legally confer her citizenship to a non-national spouse in the same way as a married man.
+        description: Measures whether a married woman can legally confer her citizenship to a non-national spouse in the same way as a married man.
         short_unit: ''
         unit: ''
         display:

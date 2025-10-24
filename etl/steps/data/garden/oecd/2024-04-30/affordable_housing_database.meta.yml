@@ -150,21 +150,21 @@ definitions:
         - Poverty
 
   ethos_1: This data has been categorized within the European Typology of Homelessness and Housing Exclusion (ETHOS) typology as _ETHOS Light 1_. ETHOS Light 1 is defined as people living rough, living in the streets or public spaces without a shelter that can be defined as living quarters.
-  ethos_2_3: This data has been categorized within the European Typology of Homelessness and Housing Exclusion (ETHOS) typology as _ETHOS Light 2 and 3_. ETHOS Light 2 is defined as people living in emergency accomodation, people with no place of usual residence who move frequently between various types of accommodation. ETHOS Light 3 is defined as people living in accommodation for the homeless, including hostels, temporary and transitional accommodation, and women's shelters or refuge accomodation.
-  ethos_1_2_3: This data has been categorized within the European Typology of Homelessness and Housing Exclusion (ETHOS) typology as _ETHOS Light 1, 2 and 3_. It includes people living in the streets or public spaces, in emergency accomodation and in accommodation for the homeless, but it has not been dissagregated.
+  ethos_2_3: This data has been categorized within the European Typology of Homelessness and Housing Exclusion (ETHOS) typology as _ETHOS Light 2 and 3_. ETHOS Light 2 is defined as people living in emergency accommodation, people with no place of usual residence who move frequently between various types of accommodation. ETHOS Light 3 is defined as people living in accommodation for the homeless, including hostels, temporary and transitional accommodation, and women's shelters or refuge accommodation.
+  ethos_1_2_3: This data has been categorized within the European Typology of Homelessness and Housing Exclusion (ETHOS) typology as _ETHOS Light 1, 2 and 3_. It includes people living in the streets or public spaces, in emergency accommodation and in accommodation for the homeless, but it has not been dissagregated.
 
   point_in_time_count: This data is collected with a _point-in-time count_, in which data are collected at a single point in time, generally through a coordinated street count or an enumeration of people staying in shelters for people experiencing homelessness on a given night. Point-in-time counts thus present a “snapshot” of homelessness at a single time and place.
   flow_count: This data is collected with a _flow count_, in which data are collected over a given period of time, such as the enumeration of all people who have stayed in a shelter over the course of the year.
 
-  gender_breakdown: The gender breakdown refers to the headline estimate of homelessness in each country, along the statistical defintion of each country.
+  gender_breakdown: The gender breakdown refers to the headline estimate of homelessness in each country, along the statistical definition of each country.
 
   harmonization: Countries use different definitions and data collection methods and are harmonized to the extent possible.
   methodology_issues: More details about definitions, methodology and comparability issues can be found in the [OECD Population Experiencing Homelessness documentation](https://www.oecd.org/els/family/HC3-1-Population-experiencing-homelessness.pdf).
   country_notes: For more information on the statistical definitions for each country, please check the [OECD's Country Notes on Homelessness data](https://www.oecd.org/social/homelessness-country-notes.htm).
 
   description_short_ethos_1: Includes people living in the streets or public spaces without a shelter that can be defined as living quarters.
-  description_short_ethos_2_3: Includes people living in emergency accomodation, people with no place of usual residence who move frequently between various types of accommodation, and people living in accommodation for the homeless.
-  description_short_ethos_1_2_3: Includes people living in the streets or public spaces, in emergency accomodation, and in accommodation for the homeless.
+  description_short_ethos_2_3: Includes people living in emergency accommodation, people with no place of usual residence who move frequently between various types of accommodation, and people living in accommodation for the homeless.
+  description_short_ethos_1_2_3: Includes people living in the streets or public spaces, in emergency accommodation, and in accommodation for the homeless.
 
   description_short_point_in_time: This data is collected at a single point in time, generally through a coordinated street count.
   description_short_flow: This data is collected over a given period of time, such as the enumeration of all people who have stayed in a shelter over the course of the year.
@@ -646,7 +646,7 @@ tables:
         title: Type of strategy to address homelessness
         unit: ""
         short_unit: ""
-        description_short: Defines whether the country has a Housing First strategy or housing-led strategy to adress homelessness at the national administrative level, other strategy, or no strategy at the national level at all.
+        description_short: Defines whether the country has a Housing First strategy or housing-led strategy to address homelessness at the national administrative level, other strategy, or no strategy at the national level at all.
         description_key:
           - Housing First models aim to provide tailored, intensive support for homeless people with high and complex needs by providing them with long-term, immediate housing and enabling them to exercise control over their support services.
           - Housing-led solutions are based on access to immediate, long-term housing solutions for people experiencing homelessness.
@@ -654,7 +654,7 @@ tables:
         description_processing: |-
           The data is originally presented as two different classifications: whether countries have an active national strategy to combat homelessness, and whether Housing First or housing-led policies are in place. We combined these by considering that a Housing First or housing-led strategy exists when a national or regional strategy of that kind is in place. When there is no Housing First or housing-led strategy, but there is an active national or regional strategy, we consider that the country has another type of strategy in place (coded as "Other strategy"). When neither a national or regional strategy nor a Housing First or housing-led strategy is in place, we consider that the country has no strategy to address homelessness.
 
-          For more information about these two classifications, please refer to the OECD report [National strategies for combatting homelessness](https://www.oecd.org/els/family/HC3-2-Homeless-strategies.pdf).
+          For more information about these two classifications, please refer to the OECD report [National strategies for combating homelessness](https://www.oecd.org/els/family/HC3-2-Homeless-strategies.pdf).
         presentation:
           title_public: Type of strategy to address homelessness
         display:

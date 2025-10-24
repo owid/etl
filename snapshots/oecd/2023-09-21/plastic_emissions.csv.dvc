@@ -7,7 +7,7 @@ meta:
     description: |-
       Greenhouse gases emissions are aggregated using 100-year global warming potential (GWP) from AR2 (IPCC, 1995)
 
-      Emission coefficiens by stage and polymer or end-of-life fate are extrapolated from 2015 data using indexes. These indexes are built on scope-2 emissions intensity of primary and secondary plastics production (incl. upstream sectors) from the OECD ENV-Linkages model.
+      Emission coefficients by stage and polymer or end-of-life fate are extrapolated from 2015 data using indexes. These indexes are built on scope-2 emissions intensity of primary and secondary plastics production (incl. upstream sectors) from the OECD ENV-Linkages model.
     date_published: 2022-02-09
     description_snapshot: |-
       Greenhouse gas emissions are combined using a measurement called the 100-year Global Warming Potential (GWP), which comes from a 1995 report by the international climate science group, IPCC. Emissions are estimated at different stages, for different types of plastics, and when they are thrown away, based on data from 2015. These estimates are calculated using specific measures that consider the emissions created during the making of primary and secondary plastics, including those from related industries. These measures are taken from a model by the Organisation for Economic Co-operation and Development (OECD), ensuring a detailed and thorough analysis of emissions related to plastic production.
