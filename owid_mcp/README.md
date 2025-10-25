@@ -2,6 +2,8 @@
 
 This is Our World in Data's MCP (Model Context Protocol) server providing access to charts, indicators, and data from Our World in Data. It's built using fastMCP and provides direct indicator access.
 
+> **Note**: For ChatGPT App integration with widget support, see the separate [`chatgpt_app`](../chatgpt_app/) package.
+
 ## Features
 
 ### Indicators Module (`indicators.py`)
