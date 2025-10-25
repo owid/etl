@@ -19,6 +19,22 @@ Once the user specifies the scope, proceed with the typo check using the codespe
 
 ## Implementation Strategy
 
+### 0. Check codespell installation
+
+**IMPORTANT:** Check if codespell is installed before attempting to use it. Since codespell is now a dev dependency in the project, it should already be installed, but verify first to avoid reinstalling unnecessarily.
+
+```bash
+# Check if codespell is installed
+if ! .venv/bin/codespell --version &> /dev/null; then
+    echo "codespell not found, installing..."
+    uv add --dev codespell
+else
+    echo "codespell is already installed"
+fi
+```
+
+If codespell is not installed and `uv add --dev codespell` fails, explain to the user how to install it manually.
+
 ### 1. Exclude archived steps and snapshots
 
 **IMPORTANT:** Do not check archived steps and snapshots as they are no longer in use.
@@ -187,7 +203,7 @@ All analysis logic should be embedded in this command execution, not saved as se
 
 ## Error Handling
 
-- If codespell is not installed and installation fails, explain to the user how to install it manually
+- Check if codespell is installed first (see step 0). If not installed and `uv add --dev codespell` fails, explain to the user how to install it manually with `uv sync` or check their Python environment
 - If no `.meta.yml` or `.dvc` files are found in the specified scope, inform the user
 - If codespell finds no typos, congratulate the user on clean metadata!
 - If file modification fails, report which files couldn't be updated
