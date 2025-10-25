@@ -404,6 +404,13 @@ steps:
   data://grapher/artificial_intelligence/2025-02-04/epoch_compute_intensive_domain:
     - data://garden/artificial_intelligence/2025-02-04/epoch_compute_intensive_domain
 
+  # EPOCH dataset on the cost of training AI models
+  data://meadow/artificial_intelligence/2024-06-06/epoch_compute_cost:
+    - snapshot://artificial_intelligence/2024-06-06/epoch_compute_cost.csv
+  data://garden/artificial_intelligence/2024-06-06/epoch_compute_cost:
+    - data://meadow/artificial_intelligence/2024-06-06/epoch_compute_cost
+  data://grapher/artificial_intelligence/2024-06-06/epoch_compute_cost:
+    - data://garden/artificial_intelligence/2024-06-06/epoch_compute_cost
 ##############################################################################################################
 
   # CSET data on articles, patents and investment
