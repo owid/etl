@@ -660,6 +660,51 @@ steps:
   data-private://grapher/language/2025-09-03/ethnologue:
     - data-private://garden/language/2025-09-03/ethnologue
 
+  # World Development Indicators - WDI
+  data://meadow/worldbank_wdi/2025-09-08/wdi:
+    - snapshot://worldbank_wdi/2025-09-08/wdi.zip
+
+  data://garden/worldbank_wdi/2025-09-08/wdi:
+    - data://garden/regions/2023-01-01/regions
+    - data://meadow/worldbank_wdi/2025-09-08/wdi
+    - data://garden/wb/2025-07-01/income_groups
+    - data://garden/demography/2024-07-15/population
+    - snapshot://worldbank_wdi/2025-09-08/wdi.zip
+
+  data://grapher/worldbank_wdi/2025-09-08/wdi:
+    - data://garden/worldbank_wdi/2025-09-08/wdi
+
+  #
+  # IMF Trade Data - Regional
+  #
+  data://meadow/imf/2025-07-08/trade:
+    - snapshot://imf/2025-07-08/trade.csv
+  data://garden/imf/2025-07-08/trade:
+    - data://meadow/imf/2025-07-08/trade
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/worldbank_wdi/2025-09-08/wdi
+  data://grapher/imf/2025-07-08/trade:
+    - data://garden/imf/2025-07-08/trade
+
+
+  #
+  # Trade Volume Index - "A tale of two globalizations: gains from trade and openness 1800–2010"
+  #
+  data://meadow/trade/2025-09-22/historic_trade:
+    - snapshot://trade/2025-09-22/historic_trade.xlsx
+  data://garden/trade/2025-09-22/historic_trade:
+    - data://meadow/trade/2025-09-22/historic_trade
+
+#
+  # Trade Volume Index - WTO Trade Growth
+  data://meadow/trade/2025-09-22/wto_trade_growth:
+    - snapshot://trade/2025-09-22/wto_trade_growth.xlsx
+  data://garden/trade/2025-09-22/wto_trade_growth:
+    - data://meadow/trade/2025-09-22/wto_trade_growth
+    - data://garden/trade/2025-09-22/historic_trade
+  data://grapher/trade/2025-09-22/wto_trade_growth:
+    - data://garden/trade/2025-09-22/wto_trade_growth
+  #
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
@@ -702,4 +747,5 @@ include:
   - dag/corruption.yml
   - dag/geography.yml
   - dag/growth.yml
+  - dag/labor.yml
   - dag/economics.yml

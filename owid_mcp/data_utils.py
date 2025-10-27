@@ -248,13 +248,22 @@ async def run_sql(query: str, max_rows: int = MAX_ROWS_DEFAULT) -> Dict[str, Any
                 # Extract column name from string like "['\"abc\"']"
                 column_name = error_msg[2:-2].strip("\"'")  # Remove ['"] and quotes
                 if column_name:
-                    raise ValueError(
+                    error_msg = (
                         f"SQL Error: Column '{column_name}' does not exist in the table. "
                         f"You can check columns with: SELECT column_name FROM information_schema.columns WHERE table_name = 'table_name';"
                     )
-
+                else:
+                    error_msg = f"SQL Query Error: {error_msg}"
             # For all other errors, just pass through the original message
-            raise ValueError(f"SQL Query Error: {error_msg}")
+            else:
+                error_msg = f"SQL Query Error: {error_msg}"
+
+            # Return error information in a structured way that LLM can understand
+            return {
+                "csv": "",
+                "source": datasette_json_url,
+                "error": error_msg,
+            }
 
         # Success - convert JSON to CSV format
         rows = json_data["rows"]

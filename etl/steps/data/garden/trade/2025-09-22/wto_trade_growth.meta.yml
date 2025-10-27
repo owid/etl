@@ -1,0 +1,30 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Trade & Globalization
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+tables:
+  wto_trade_growth:
+    variables:
+      volume_index:
+        title: Trade volume index
+        unit: index 1913=100
+        description_short: World trade volume index, based on the average of exports and imports, adjusted for inflation and expressed relative to 1913 = 100.
+        description_key:
+        - The volume of world trade measures the goods that countries export and import across borders. To compare trade over time, researchers calculate an index that averages exports and imports and sets 1913 as the baseline year (equal to 100). This allows us to track how global trade has changed over time.
+        - One of the most important developments of the last century has been the integration of national economies into a global economic system. This indicator helps us see how trade has grown and how deeply connected the world’s economies have become since 1800.
+        - This data is expressed as a world trade volume index, with all figures relative to 1913 = 100.
+        - "[Federico & Tena-Junguito (2016)](https://link.springer.com/article/10.1007/s10290-017-0279-z) assembled trade statistics from hundreds of sources for the period up to 1938, covering almost every country and colony from 1800. These estimates are adjusted to 1913 country borders."
+        - "Because definitions varied, the researchers standardized the historical data to modern UN conventions: smuggling, re-exports, transit trade, and bullion were excluded; fiscal years were aligned with calendar years; imports were valued including freight, and exports excluding it. Researchers used detailed price indexes to correct for inflation and shipping costs."
+        - From 1950 onwards, we extend the series using data from the World Trade Organization (WTO). Because the WTO index was originally set to 1950 = 100, we rescaled it to 1913 = 100, so that the historical and current series are on the same scale.
+        description_processing: We combined historical trade data from Federico & Tena-Junguito (2016) (up to 1950) with World Trade Organization data (from 1951 onwards). The WTO index, originally set to 1950 = 100, was rescaled to 1913 = 100 using the 1950 overlap as the conversion factor. This allows the two series to be presented consistently on the same baseline.
+        display:
+          numDecimalPlaces: 1

@@ -758,7 +758,6 @@ class UnstableNumberOfPoultryBirdsInEurope(DataAnomaly):
     # Countries affected by the anomaly.
     affected_countries = [
         "Europe",
-        "European Union (27)",
         "High-income countries",
     ]
 
@@ -812,7 +811,7 @@ class UnstableNumberOfPoultryBirdsInEurope(DataAnomaly):
             "value",
         ] = None
 
-        for country in ["Europe", "European Union (27)"]:
+        for country in ["Europe"]:
             for item_code in self.affected_item_codes:
                 for element_code in ["005112"]:
                     for year in self.affected_years:

@@ -16,7 +16,9 @@ import datetime as dt
 import json
 import re
 import sys
+from collections.abc import Mapping
 from datetime import date
+from functools import cache, wraps
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Union, cast
 
@@ -25,6 +27,7 @@ import streamlit as st
 from owid.catalog import Dataset
 from sentry_sdk import capture_exception
 from sqlalchemy.orm import Session
+from streamlit.runtime.runtime import Runtime
 from structlog import get_logger
 from typing_extensions import Self
 from wfork_streamlit_profiler import Profiler
@@ -90,8 +93,8 @@ DUMMY_DATA = {
     "url_main": "https://www.url-dummy.com/",
     "license_name": "MIT dummy license",
 }
-# Session state to track staging creation time
-VARNAME_STAGING_CREATION_TIME = "staging_creation_time"
+# Cache for staging creation times (keyed by session bind string)
+_staging_creation_time_cache: dict[str, Any] = {}
 
 
 def start_profiler() -> Profiler:
@@ -403,7 +406,7 @@ def preview_dag_additions(dag_content: str, dag_path: str | Path, prefix: str = 
             st.code(dag_content, "yaml")
 
 
-@st.cache_data
+@cache
 def load_instructions() -> str:
     """Load snapshot step instruction text."""
     with open(CURRENT_DIR / f"{st.session_state['step_name']}.md", "r") as f:
@@ -566,10 +569,10 @@ def _get_staging_creation_time(session: Session):
 def get_staging_creation_time(session: Session):
     """Get staging server creation time."""
     # Create a unique key for a session to avoid conflicts when working with multiple staging servers.
-    key = f"{VARNAME_STAGING_CREATION_TIME}_{str(session.bind)}"
-    if key not in st.session_state:
-        st.session_state[key] = _get_staging_creation_time(session)
-    return st.session_state[key]
+    key = str(session.bind)
+    if key not in _staging_creation_time_cache:
+        _staging_creation_time_cache[key] = _get_staging_creation_time(session)
+    return _staging_creation_time_cache[key]
 
 
 def default_converter(o):
@@ -603,6 +606,54 @@ def as_list(s):
         except (ValueError, SyntaxError):
             return s
     return s
+
+
+@cache
+def is_running_in_streamlit():
+    """Check if running in Streamlit."""
+    return Runtime.exists()
+
+
+def _canon(x):
+    # Fast paths first
+    if x is None or isinstance(x, (int, float, str, bytes, bool)):
+        return x
+    if isinstance(x, tuple):
+        return tuple(_canon(v) for v in x)
+    if isinstance(x, list):
+        return tuple(_canon(v) for v in x)
+    if isinstance(x, set):
+        return frozenset(_canon(v) for v in x)
+    if isinstance(x, Mapping):
+        # sort by key for deterministic ordering
+        return tuple(sorted((k, _canon(v)) for k, v in x.items()))
+    if isinstance(x, np.ndarray):
+        # stable, hashable representation for numpy arrays
+        return ("__np__", x.dtype.str, x.shape, x.tobytes())
+    # Fallback: try dataclasses/objects with __dict__
+    if hasattr(x, "__dict__"):
+        return ("__obj__", x.__class__.__qualname__, _canon(vars(x)))
+    # Last resort: use repr (only if you accept collisions when repr changes)
+    return ("__repr__", repr(x))
+
+
+def cache_all(f):
+    """A caching decorator that works for unhashable types (lists, dicts)."""
+
+    @cache
+    def _cached(key):
+        args_c, kwargs_c = key
+        return f(*args_c, **dict(kwargs_c))
+
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        key = (
+            tuple(_canon(a) for a in args),
+            tuple(sorted((k, _canon(v)) for k, v in kwargs.items())),
+        )
+        return _cached(key)
+
+    return wrapper
 
 
 # Enable sentry when apps.wizard.utils is loaded

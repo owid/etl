@@ -5,12 +5,8 @@
       "url": "https://mcp.owid.io/mcp"
     },
     "owid-dev": {
-      "type": "stdio",
-      "command": ".venv/bin/fastmcp",
-      "args": [
-        "run",
-        "owid_mcp/server.py"
-      ],
+      "url": "http://0.0.0.0:8080/mcp/",
+			"type": "http",
       "env": {}
     }
   }

@@ -157,7 +157,7 @@ Please write a data insight for the given chart. Use simple language and short p
             stream = api.chat.completions.create(
                 model=MODEL_DEFAULT,
                 messages=messages,  # type: ignore
-                max_tokens=3000,
+                max_completion_tokens=3000,
                 stream=True,
             )
             response = cast(str, st.write_stream(stream))
@@ -217,7 +217,7 @@ Explain the core insights present in this data, in plain, educational language.
             stream = api.chat.completions.create(
                 model=MODEL_DEFAULT,
                 messages=messages,  # type: ignore
-                max_tokens=3000,
+                max_completion_tokens=3000,
                 stream=True,
             )
             response = cast(str, st.write_stream(stream))
@@ -291,7 +291,7 @@ If making a point about a country, include its peers, region, income group or "W
             stream = api.chat.completions.create(
                 model=MODEL_DEFAULT,
                 messages=messages,  # type: ignore
-                max_tokens=3000,
+                max_completion_tokens=3000,
                 stream=True,
             )
             response = cast(str, st.write_stream(stream))

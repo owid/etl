@@ -344,6 +344,9 @@ class Dataset:
         for name in self.table_names:
             yield self[name]
 
+    def __hash__(self) -> int:
+        return hash(self.path)
+
     @property
     def _data_files(self) -> list[str]:
         files = []
