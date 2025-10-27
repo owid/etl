@@ -24,7 +24,7 @@ from rich.progress import Progress, SpinnerColumn, TextColumn
 from rich_click.rich_command import RichCommand
 from structlog import get_logger
 
-from etl.config import OWID_ENV
+from etl import config
 from etl.db import read_sql
 from etl.paths import BASE_DIR
 
@@ -58,7 +58,7 @@ def build_explorer_url(explorer_slug: str, dimensions: dict[str, Any]) -> str:
     """
     from urllib.parse import urlencode
 
-    base_url = OWID_ENV.site or "https://ourworldindata.org"
+    base_url = config.OWID_ENV.site or "https://ourworldindata.org"
     url = f"{base_url}/explorers/{explorer_slug}"
 
     if dimensions:
@@ -794,11 +794,6 @@ def display_issues(issues: list[dict[str, Any]], output_format: str = "table") -
     help="Skip writing quality checking",
 )
 @click.option(
-    "--anthropic-api-key",
-    envvar="ANTHROPIC_API_KEY",
-    help="Anthropic API key for semantic and quality checks",
-)
-@click.option(
     "--output-format",
     type=click.Choice(["table", "json", "csv"]),
     default="table",
@@ -820,7 +815,6 @@ def main(
     skip_typos: bool,
     skip_semantic: bool,
     skip_quality: bool,
-    anthropic_api_key: str | None,
     output_format: str,
     output_file: str | None,
     batch_size: int,
@@ -829,22 +823,20 @@ def main(
 
     This script analyzes explorer views from the database and detects:
     - Typos using codespell (if available)
-    - Semantic inconsistencies using Claude API (if API key provided)
-    - Writing quality issues using Claude API (if API key provided)
+    - Semantic inconsistencies using Claude API (requires ANTHROPIC_API_KEY in .env)
+    - Writing quality issues using Claude API (requires ANTHROPIC_API_KEY in .env)
+
+    To use semantic/quality checks, add ANTHROPIC_API_KEY to your .env file.
 
     Examples:
         # Check all explorers for typos only
         python check_explorer_metadata.py --skip-semantic --skip-quality
 
-        # Check specific explorer with all checks
-        python check_explorer_metadata.py --explorer global-food --anthropic-api-key sk-...
+        # Check specific explorer with all checks (requires API key in .env)
+        python check_explorer_metadata.py --explorer global-food
 
         # Export issues to JSON
         python check_explorer_metadata.py --output-format json --output-file issues.json
-
-        # Use environment variable for API key
-        export ANTHROPIC_API_KEY=sk-...
-        python check_explorer_metadata.py
     """
     # Check codespell availability
     has_codespell = get_codespell_path() is not None
@@ -854,12 +846,12 @@ def main(
         skip_typos = True
 
     # Check API key for semantic/quality checks
+    anthropic_api_key = config.ANTHROPIC_API_KEY
     if not anthropic_api_key and (not skip_semantic or not skip_quality):
-        rprint("[yellow]Warning: No Anthropic API key provided.[/yellow]")
-        rprint("[yellow]Set ANTHROPIC_API_KEY environment variable or use --anthropic-api-key[/yellow]")
-        rprint("[yellow]Skipping semantic and quality checks...[/yellow]")
-        skip_semantic = True
-        skip_quality = True
+        rprint("[red]Error: ANTHROPIC_API_KEY not found in configuration.[/red]")
+        rprint("[yellow]Please add ANTHROPIC_API_KEY to your .env file to use semantic and quality checks.[/yellow]")
+        rprint("[yellow]Alternatively, use --skip-semantic and --skip-quality flags to skip these checks.[/yellow]")
+        raise click.ClickException("Missing ANTHROPIC_API_KEY in .env file")
 
     # Fetch data
     df = fetch_explorer_data(explorer_slug=explorer)
