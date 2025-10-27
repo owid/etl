@@ -7,20 +7,13 @@ definitions:
     display:
       numDecimalPlaces: 0
 
-  extraction_notes: &extraction_notes |-
-    ### Extraction notes from Epoch AI:
-    Data sources and extraction notes:
-    - MGnify: Data extracted from [MGnify release notes](https://ftp.ebi.ac.uk/pub/databases/metagenomics/peptide_database/).
-    - UniProt: Data extracted from UniProt release notes and supplementary data from [UniProt paper](https://academic.oup.com/nar/article/43/D1/D204/2439939#supplementary-data).
-    - PDB: Data extracted from RCSB PDB growth statistics webpage. (CSV downloadable from https://www.rcsb.org/stats/growth/growth-released-structureswebsite)
-    - ESMAtlas: Data extracted from [ESMAtlas database](https://esmatlas.com/about#download_dataset) information.
-    - AlphaFoldDB: Data extracted from AlphaFoldDB release notes and [associated paper](https://academic.oup.com/nar/advance-article/doi/10.1093/nar/gkad1011/7337620).
-    - ISDC (GenBank, DDBJ, ENA): Data extracted from release notes of respective databases. ENA growth rate figures available [here](https://www.ebi.ac.uk/ena/browser/about/statistics).
-
 
 dataset:
-  update_period_days: 9999 #never gets updated
+  update_period_days: 0 #never gets updated
 
+
+# These get overwritten in grapher metadata
+# Keeping them around in case we want to restructure metadata/ dataset at some point
 tables:
   epoch_database_growth:
     variables:

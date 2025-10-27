@@ -10,7 +10,7 @@ definitions:
 
 
 dataset:
-  update_period_days: 9999 #never gets updated
+  update_period_days: 0 #never gets updated
 
 tables:
   epoch_database_growth:
@@ -20,7 +20,7 @@ tables:
         unit: entries
         short_unit: ""
         description_short: |-
-          Biological sequence databases store data such as DNA, RNA, and amino acid sequences as well as predicted and experimentally determined protein structures. This data includes entries from [GenBank](#dod:genbank), [RefSeq](#dod:refseq), [PDB](#dod:protein-data-bank), [UniProtKB/SwissProt](#dod:uniprotkb), as well as predicted structures in [AlphaFoldDB](#dod:alphafolddb) and [ESMAtlas](#dod:esmatlas).
+          Biological sequence databases store data such as DNA, RNA, and amino acid sequences and 3D protein structures. This data includes entries from [GenBank](#dod:genbank), [RefSeq](#dod:refseq), [PDB](#dod:protein-data-bank), [UniProtKB/SwissProt](#dod:uniprotkb), as well as predicted protein structures in [AlphaFoldDB](#dod:alphafolddb) and [ESMAtlas](#dod:esmatlas).
         description_key:
           - Biological sequence data includes data such as DNA and RNA sequences, amino acid sequences of proteins, and three-dimensional structures of proteins and other molecules found in living organisms. These organisms can be bacteria, viruses, plants, animals and humans.
           - Researchers use this data to better understand the biology of organisms, including the functions of genes and proteins and how they interact. This knowledge can then be applied to e.g. develop new drugs and treatments for illnesses or use biotechnology to improve agriculture and environmental science.
@@ -72,7 +72,7 @@ tables:
           We show the maximum number of entries reported for each database in a given year.
 
 
-          #### Extraction notes from Epoch AI
+          **Extraction notes from Epoch AI**
           - GenBank: Data extracted from [release notes](https://www.ncbi.nlm.nih.gov/genbank/release/) of GenBank.
           - RefSeq: Data extracted from [RefSeq release notes](https://ftp.ncbi.nlm.nih.gov/refseq/release/release-notes/archive/).
           - UniProt: Data extracted from UniProt release notes and supplementary data from [UniProt paper](https://academic.oup.com/nar/article/43/D1/D204/2439939#supplementary-data).
@@ -82,7 +82,7 @@ tables:
 
         presentation:
           grapher_config:
-            note: Number of entries corresponds to number of DNA and RNA sequences in GenBank, number of records in RefSeq, number of structures in PDB and number of protein sequences UniProtKB, AlphaFoldDB and ESMAtlas.
+            note: Number of entries corresponds to number of DNA and RNA sequences in GenBank, number of records in RefSeq, number of protein sequences UniProtKB and number of molecule structures in PDB, AlphaFoldDB and ESMAtlas.
 
 
 
