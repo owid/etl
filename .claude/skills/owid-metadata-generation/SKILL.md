@@ -388,19 +388,11 @@ tables:
 
 **For datasets with dimensions (e.g., age groups, sexes):**
 
-```yaml
-# Use Jinja templates for dynamic text
-macros: |-
-  <% macro format_sex(sex) %>
-    <%- if sex == "Both" -%>
-    all individuals
-    <%- elif sex == "Male" -%>
-    males
-    <%- elif sex == "Female" -%>
-    females
-    <%- endif -%>
-  <% endmacro %>
+!!! important "Jinja Syntax"
+    We use **`<% %>` instead of `{% %}`** and **`<< >>` instead of `{{ }}`** for Jinja templates.
 
+```yaml
+# Use Jinja templates for dynamic text based on dimension values
 definitions:
   notes:
     common_note: |-
@@ -410,8 +402,15 @@ tables:
   my_table:
     variables:
       deaths:
+        # Dimension values (cause, sex) are automatically available as variables
+        title: Deaths from << cause >> in << sex >>
         description_short: |-
-          The number of deaths from << cause >> among << format_sex(sex) >>. {definitions.notes.common_note}
+          <% if sex == "Both" %>
+          The number of deaths from << cause >> among all individuals.
+          <%- else %>
+          The number of deaths from << cause >> among << sex.lower() >>s.
+          <%- endif %>
+          {definitions.notes.common_note}
 ```
 
 **For repeated grapher notes (e.g., data construction methods):**
@@ -594,6 +593,163 @@ tables:
           The number of deaths attributed to << cause >>.
         processing_level: minor
 ```
+
+## Advanced: Jinja Templates for Dimensions
+
+**When to use Jinja:**
+- Datasets in long format with multiple dimensions (age, sex, cause, country, etc.)
+- Hundreds or thousands of similar variables that differ only by dimension values
+- Need to generate dynamic titles, descriptions based on dimension combinations
+
+### Jinja Syntax Reference
+
+**CRITICAL:** We use a modified Jinja syntax:
+- Use `<% %>` instead of standard `{% %}`
+- Use `<< >>` instead of standard `{{ }}`
+
+### Pattern 1: Accessing Dimension Values
+
+**Most common pattern** - Dimension values are automatically available as variables:
+
+```yaml
+# If your dataset has dimensions: age_group, sex, cause
+# All are accessible in templates without declaration
+
+tables:
+  my_table:
+    variables:
+      rate:
+        title: << cause >> prevalence rate in << sex >>
+        description_short: |-
+          Cases of << cause >> per 100,000 << sex >> individuals in age group << age_group >>.
+```
+
+### Pattern 2: Conditional Text
+
+**Best for:** Changing text based on dimension values
+
+```yaml
+tables:
+  my_table:
+    variables:
+      deaths:
+        title: |-
+          <% if sex == "Both" %>Deaths in all individuals<%- elif sex == "Male" %>Deaths in males<%- else %>Deaths in females<%- endif %>
+        description_short: |-
+          <% if age_group == "ALLAges" %>
+          Deaths across all age groups.
+          <%- else %>
+          Deaths in age group << age_group >>.
+          <%- endif %>
+```
+
+### Pattern 3: Setting Variables
+
+**Best for:** Defining values used multiple times
+
+```yaml
+tables:
+  my_table:
+    variables:
+      deaths_high:
+        description_short: |-
+          <% set estimate = "high" %>
+          <% set estimate_desc = "upper bound" %>
+          The << estimate >> estimate (<<  estimate_desc >>) of deaths.
+```
+
+### Whitespace Control
+
+**Problem:** Jinja can create unwanted blank lines
+
+**Solution:** Use `<%-` and `-%>` to strip whitespace
+
+```yaml
+# BAD - creates blank lines between clauses
+age: |-
+  <% if age_group == "ALLAges" %>
+  All ages
+  <% elif age_group == "Age-standardized" %>
+  Age-standardized
+  <% endif %>
+
+# GOOD - clean output
+age: |-
+  <% if age_group == "ALLAges" %>
+  All ages
+  <%- elif age_group == "Age-standardized" %>
+  Age-standardized
+  <%- endif %>
+
+# ALTERNATIVE - single line (harder to read but works)
+age: |-
+  <% if age_group == "ALLAges" %>All ages<%- elif age_group == "Age-standardized" %>Age-standardized<%- endif %>
+```
+
+**Rule of thumb:** Use `<%-` (not `<%`) for `elif`, `else`, and `endif` clauses to avoid blank lines.
+
+### Testing Jinja Templates
+
+**Before running the full ETL step, test your YAML locally:**
+
+```python
+# In a notebook or Python script
+import etl.grapher.helpers as gh
+
+# Provide example dimension values
+dim_dict = {
+    "age_group": "YEARS0-4",
+    "sex": "Male",
+    "cause": "Drug use disorders"
+}
+
+# Render the YAML file
+d = gh.render_yaml_file("my_dataset.meta.yml", dim_dict=dim_dict)
+
+# Check a specific variable's metadata
+print(d["tables"]["my_table"]["variables"]["prevalence"])
+```
+
+### Combining Dynamic YAML and Jinja
+
+**CRITICAL DISTINCTION:**
+- Dynamic YAML uses **single braces**: `{definitions.notes.something}`
+- Jinja variables use **double angle brackets**: `<< variable_name >>`
+- Standard Jinja uses `{{ }}` but we DON'T use that syntax
+
+You can use both together:
+
+```yaml
+definitions:
+  notes:
+    data_source: Based on historical records.
+
+tables:
+  my_table:
+    variables:
+      deaths:
+        description_short: |-
+          <% if sex == "Both" %>
+          Deaths among all individuals.
+          <%- else %>
+          Deaths among << sex.lower() >>s.
+          <%- endif %>
+          {definitions.notes.data_source}
+```
+
+**Common mistakes:**
+- `{{definitions.notes.something}}` ✗ Wrong (standard Jinja)
+- `{definitions.notes.something}` ✓ Correct (dynamic YAML)
+- `{{ variable_name }}` ✗ Wrong (standard Jinja)
+- `<< variable_name >>` ✓ Correct (our Jinja)
+
+### Common Pitfalls
+
+1. **Using standard Jinja syntax** - Remember `<% %>` not `{% %}`, and `<< >>` not `{{ }}`
+2. **Confusing dynamic YAML and Jinja** - Use `{ }` for definitions, `<< >>` for variables
+3. **Extra whitespace** - Use `<%-` for elif/else/endif to avoid blank lines
+4. **Undefined dimensions** - Dimension values must exist in your data
+5. **Complex logic in templates** - Consider postprocessing in Python instead
 
 ## Using Existing Tools
 
