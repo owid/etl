@@ -32,3 +32,4 @@ This is just a sneak peek into some of our data work. But note that all our code
 
     [:material-notebook: View notebook](food_supply_of_world_regions/food_supply_of_world_regions.ipynb){ .md-button }
     [:material-play-circle: Run in Colab](https://colab.research.google.com/github/owid/etl/blob/docs-technical-publication-agriculturalindicators/docs/analyses/food_supply_of_world_regions/food_supply_of_world_regions.ipynb){ .md-button }
+    [:material-download: Download notebook](https://raw.githubusercontent.com/owid/etl/master/docs/analyses/food_supply_of_world_regions/food_supply_of_world_regions.ipynb){ .md-button }
