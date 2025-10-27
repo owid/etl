@@ -231,16 +231,19 @@ def run_codespell_batch(views: list[dict[str, Any]]) -> dict[int, list[dict[str,
                 continue
 
             field_name = parts[2]
-            # Remove numeric suffix for variable fields
-            if field_name.endswith(tuple(f"_{i}" for i in range(100))):
-                field_name = "_".join(field_name.split("_")[:-1])
 
-            # Find the original text
+            # Find the original text and get the correct field name
             text = ""
             for fname, fpath, ftext in view_files.get(view_id, []):
                 if fpath == Path(file_path):
                     text = ftext
-                    field_name = fname.split("_")[0] if "_" in fname and fname.split("_")[0] in ["variable"] else fname
+                    # Use the original field name from fname, removing numeric suffix if present
+                    # fname could be like "variable_description_from_producer_0"
+                    if fname.rsplit("_", 1)[-1].isdigit():
+                        # Has numeric suffix, remove it
+                        field_name = fname.rsplit("_", 1)[0]
+                    else:
+                        field_name = fname
                     break
 
             # Get context
