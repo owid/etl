@@ -7,9 +7,11 @@ The environment variables and settings here are for publishing options, they're
 only important for OWID staff.
 """
 
+import asyncio
 import os
 import pwd
 import re
+import sys
 import warnings
 from dataclasses import dataclass, fields
 from os import environ as env
@@ -78,13 +80,17 @@ load_env()
 
 pd.set_option("future.no_silent_downcasting", True)
 
-# When DEBUG is on
-# - run steps in the same process (speeding up ETL)
-DEBUG = env.get("DEBUG") in ("True", "true", "1")
-
 # Environment, e.g. production, staging, dev
 ENV = env.get("ENV", "dev")
 ENV_IS_REMOTE = ENV in ("production", "staging")
+
+# When DEBUG is on
+# - run steps in the same process (speeding up ETL)
+# If DEBUG is not explicitly set, default to ENV == "dev"
+if "DEBUG" not in env:
+    DEBUG = ENV == "dev"
+else:
+    DEBUG = env.get("DEBUG") in ("True", "true", "1")
 
 # Prefer downloading datasets from catalog instead of building them
 PREFER_DOWNLOAD = env.get("PREFER_DOWNLOAD") in ("True", "true", "1")
@@ -110,7 +116,10 @@ ENV_GRAPHER_USER_ID = GRAPHER_USER_ID
 DB_IS_PRODUCTION = DB_NAME == "live_grapher"
 
 # Special ENV file with access to production DB (read-only), used by chart-diff
-ENV_FILE_PROD = os.environ.get("ENV_FILE_PROD")
+if "ENV_FILE_PROD" in env:
+    ENV_FILE_PROD = BASE_DIR / os.environ.get("ENV_FILE_PROD")  # type: ignore
+else:
+    ENV_FILE_PROD = None
 
 if "DATA_API_ENV" in env:
     DATA_API_ENV = env["DATA_API_ENV"]
@@ -129,15 +138,20 @@ def load_STAGING() -> Optional[str]:
     # if STAGING is used, override ENV values
     STAGING = env.get("STAGING")
 
+    # Check if we're running via etl d run-python-step (suppress warnings)
+    is_run_python_step = len(sys.argv) >= 3 and sys.argv[1:3] == ["d", "run-python-step"]
+
     # ENV_FILE takes precedence over STAGING
     if STAGING and ENV_FILE != BASE_DIR / ".env":
-        log.warning("Both ENV_FILE and STAGING is set, STAGING will be ignored.")
+        if not is_run_python_step:
+            log.warning("Both ENV_FILE and STAGING is set, STAGING will be ignored.")
         return None
     # if STAGING=1, use branch name
     elif STAGING == "1":
         branch_name = git.Repo(BASE_DIR).active_branch.name
         if branch_name == "master":
-            log.warning("You're on master branch, using local env instead of STAGING=master")
+            if not is_run_python_step:
+                log.warning("You're on master branch, using local env instead of STAGING=master")
             return None
         else:
             return branch_name
@@ -263,7 +277,7 @@ GITHUB_API_URL = f"{GITHUB_API_BASE}/pulls"
 TLS_VERIFY = bool(int(env.get("TLS_VERIFY", 1)))
 
 # Default schema for presentation.grapher_config in metadata. Try to keep it up to date with the latest schema.
-DEFAULT_GRAPHER_SCHEMA = "https://files.ourworldindata.org/schemas/grapher-schema.008.json"
+DEFAULT_GRAPHER_SCHEMA = "https://files.ourworldindata.org/schemas/grapher-schema.009.json"
 
 # Google Cloud service account path (used for BigQuery)
 GOOGLE_APPLICATION_CREDENTIALS = env.get("GOOGLE_APPLICATION_CREDENTIALS")
@@ -271,10 +285,21 @@ GOOGLE_APPLICATION_CREDENTIALS = env.get("GOOGLE_APPLICATION_CREDENTIALS")
 
 def enable_sentry(enable_logs: bool = False) -> None:
     if SENTRY_DSN:
+
+        def before_send(event, hint):
+            # Ignore normal shutdown signals
+            if "exc_info" in hint:
+                exc_type, exc_value, tb = hint["exc_info"]
+                if exc_type in (KeyboardInterrupt, asyncio.CancelledError):
+                    return None
+            return event
+
+        kwargs = {"dsn": SENTRY_DSN, "before_send": before_send}
+
         if enable_logs:
-            sentry_sdk.init(dsn=SENTRY_DSN, _experiments={"enable_logs": True})
-        else:
-            sentry_sdk.init(dsn=SENTRY_DSN)
+            kwargs["_experiments"] = {"enable_logs": True}
+
+        sentry_sdk.init(**kwargs)
 
 
 # Wizard config
@@ -635,8 +660,12 @@ for env_var in env_vars:
 
 # Get Metabase credentials and parameters (for more information, visit the analytics repos).
 METABASE_API_KEY = os.environ.get("METABASE_API_KEY")
+METABASE_API_KEY_ADMIN = os.environ.get("METABASE_API_KEY_ADMIN")
 METABASE_URL = os.environ.get("METABASE_URL")
 METABASE_SEMANTIC_LAYER_DATABASE_ID = 2
+METABASE_URL_LOCAL = os.environ.get("METABASE_URL", "http://localhost:3000")
+METABASE_URL = os.environ.get("METABASE_URL", "http://metabase.owid.io")
+
 ########################################################################################################################
 # While users don't have Metadata credentials, default to Datassette.
 FORCE_DATASETTE = (not METABASE_API_KEY) or (not METABASE_URL)
@@ -656,3 +685,6 @@ DATA_PRODUCER_REPORT_STATUS_SHEET_ID = os.environ.get("DATA_PRODUCER_REPORT_STAT
 LOGFIRE_TOKEN_EXPERT = env.get("LOGFIRE_TOKEN_EXPERT")
 LOGFIRE_TOKEN_MCP = env.get("LOGFIRE_TOKEN_MCP")
 LOGFIRE_TOKEN_ETL_API = env.get("LOGFIRE_TOKEN_ETL_API")
+
+# MCP server
+OWID_MCP_SERVER_URL = env.get("OWID_MCP_SERVER_URL", "https://mcp.owid.io/mcp")

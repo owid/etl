@@ -1,27 +1,31 @@
-import urllib.parse
+import uuid
 from pathlib import Path
-from typing import Any, AsyncGenerator, List, Literal
+from typing import Any, Dict, List, Literal
 
 import logfire
-import requests
+import pandas as pd
+import plotly.express as px
+import plotly.graph_objects as go
 import streamlit as st
 import yaml
 from pydantic_ai import Agent
 
 # from pydantic_ai.agent import CallToolsNode
 from pydantic_ai.mcp import CallToolFunc, MCPServerStreamableHTTP, ToolResult
-from pydantic_ai.messages import (
-    PartDeltaEvent,
-    PartStartEvent,
-    TextPart,
-    TextPartDelta,
-)
 from pydantic_ai.models.openai import OpenAIResponsesModelSettings
 from pydantic_ai.tools import RunContext
 
-from apps.wizard.app_pages.expert_agent.utils import CURRENT_DIR
-from etl.analytics import ANALYTICS_URL, clean_sql_query, read_datasette
-from etl.config import GOOGLE_API_KEY, LOGFIRE_TOKEN_EXPERT
+# from RestrictedPython import compile_restricted, safe_globals
+from apps.wizard.app_pages.expert_agent.media import save_code_file, save_plot_file
+from apps.wizard.app_pages.expert_agent.utils import CURRENT_DIR, MODEL_DEFAULT, QueryResult, log, serialize_df
+from etl.analytics.datasette import (
+    DatasetteSQLError,
+    _generate_url_to_datasette,
+    read_datasette,
+)
+from etl.analytics.metabase import _generate_question_url, create_question, get_question_info
+from etl.analytics.metabase import get_question_data as _get_question_data
+from etl.config import GOOGLE_API_KEY, LOGFIRE_TOKEN_EXPERT, OWID_MCP_SERVER_URL
 from etl.docs import (
     render_collection,
     render_dataset,
@@ -49,18 +53,18 @@ SYSTEM_PROMPT = CONTEXT["system_prompt"]
 @st.cache_data(show_spinner="Loading analytics documentation...", show_time=True)
 def cached_analytics_docs():
     """Cache the analytics documentation (5 minutes)."""
-    from apps.wizard.app_pages.expert_agent.read_analytics import get_analytics_db_docs
+    from apps.wizard.app_pages.expert_agent.read_analytics import get_metabase_db_docs
 
-    docs = get_analytics_db_docs(max_workers=10)
+    docs = get_metabase_db_docs()
 
     summary = {}
     tables_summary = {}
     for doc in docs:
         # Main summary
-        summary[doc["name"]] = doc["description"]
+        summary[doc["table"]] = doc["description"]
         # Per-table summary
         table_summary = {col["name"]: col["description"] for col in doc["columns"]}
-        tables_summary[doc["name"]] = ruamel_dump(table_summary)
+        tables_summary[doc["table"]] = ruamel_dump(table_summary)
     summary = ruamel_dump(summary)
 
     return summary, tables_summary
@@ -69,7 +73,8 @@ def cached_analytics_docs():
 ANALYTICS_DB_OVERVIEW, ANALYTICS_DB_TABLE_DETAILS = cached_analytics_docs()
 
 # ETL docs
-with open(BASE_DIR / "mkdocs.yml", "r") as f:
+p = BASE_DIR / "mkdocs.yml"
+with p.open("r") as f:
     DOCS_INDEX = ruamel_load(f)
 DOCS_INDEX = dict(DOCS_INDEX)
 
@@ -79,23 +84,18 @@ DOCS_INDEX = dict(DOCS_INDEX)
 
 
 async def process_tool_call(
-    ctx: RunContext[int],
+    ctx: RunContext[dict],
     call_tool: CallToolFunc,
     name: str,
     tool_args: dict[str, Any],
 ) -> ToolResult:
     """A tool call processor that passes along the deps."""
-    st.markdown(
-        f"**:material/compare_arrows: MCP**: Querying OWID MCP, method `{name}`"
-    )  # , icon=":material/compare_arrows:")
+    # tool_ui_message(
+    #     message_type="markdown",
+    #     text=f"**:material/compare_arrows: MCP**: Querying OWID MCP, method `{name}`",
+    # )
     return await call_tool(name, tool_args, {"deps": ctx.deps})
 
-
-# OWID Prod MCP server
-mcp_server_prod = MCPServerStreamableHTTP(
-    url="https://mcp.owid.io/mcp",
-    process_tool_call=process_tool_call,
-)
 
 ## Trying to tweak the settings for OpenAI responses
 settings = OpenAIResponsesModelSettings(
@@ -107,10 +107,14 @@ settings = OpenAIResponsesModelSettings(
 
 ## Use MCPs or not based on user input
 def get_toolsets():
-    if ("expert_use_mcp" in st.session_state) and st.session_state["expert_use_mcp"]:
-        # Use MCP server for the agent
-        return [mcp_server_prod]
-    return []
+    # if ("expert_use_mcp" in st.session_state) and st.session_state["expert_use_mcp"]:
+    # Create MCP server instance inside function to avoid event loop binding issues
+    mcp_server_prod = MCPServerStreamableHTTP(
+        url=OWID_MCP_SERVER_URL,
+        process_tool_call=process_tool_call,
+        tool_prefix="owid_data_",
+    )
+    return [mcp_server_prod]
 
 
 #######################################################
@@ -122,6 +126,7 @@ agent = Agent(
     instructions=SYSTEM_PROMPT,
     retries=2,
     model_settings=settings,
+    toolsets=get_toolsets(),  # type: ignore
 )
 
 # Agent for recommending follow-up questions
@@ -144,132 +149,82 @@ summarize_agent = Agent(
     retries=2,
 )
 
+# Agent for generating plotting code
+plotting_agent = Agent(
+    model=MODEL_DEFAULT,  # Use the same default model as other agents
+    instructions="""You are a data visualization expert specializing in plotly. You receive information about a pandas DataFrame and user instructions for creating a plot.
+
+Your task is to generate clean, executable Python code using plotly that creates the requested visualization.
+
+IMPORTANT RULES:
+1. Use only these imported libraries: pandas (as pd), plotly.express (as px), plotly.graph_objects (as go)
+2. The DataFrame is already loaded as variable 'df'
+3. Create a plot and assign the result to variable 'fig'
+4. Do NOT call fig.show(), fig.write_image(), or any file operations
+5. Do NOT import any libraries - they are already available
+6. Return ONLY the Python code, no explanations or markdown formatting
+7. Make the plots visually appealing with proper titles, axis labels, and formatting
+8. Handle edge cases like missing data gracefully
+
+Common plot types and their plotly.express functions:
+- Line chart: px.line()
+- Bar chart: px.bar()
+- Scatter plot: px.scatter()
+- Histogram: px.histogram()
+- Box plot: px.box()
+- Heatmap: px.imshow() or go.Heatmap()
+- Pie chart: px.pie()
+
+Example output for "create a line chart showing values over time":
+```python
+fig = px.line(df, x='date', y='value', title='Values Over Time')
+fig.update_layout(height=600, showlegend=True)
+fig.update_xaxes(title='Date')
+fig.update_yaxes(title='Value')
+```
+
+Always include proper titles and axis labels to make the plot self-explanatory.""",
+    output_type=str,
+    retries=2,
+)
+
+
 #######################################################
 # STREAMING
 #######################################################
+def run_agent_stream(prompt: str, structured: bool = False, question_id: str | None = None):
+    # print("============================================")
+    # print("01---------------------------")
+    # print(st.session_state)
+    # print("---------------------------")
+    # tools = agent._get_toolset()
+    # print(tools)
+    if structured:
+        from apps.wizard.app_pages.expert_agent.stream import agent_stream_sync_structured
 
-
-def _get_model_from_name(model_name: str):
-    if model_name == "llama3.2":
-        from pydantic_ai.models.openai import OpenAIModel
-        from pydantic_ai.providers.ollama import OllamaProvider
-
-        model = OpenAIModel(
-            model_name="llama3.2",
-            provider=OllamaProvider(base_url="http://localhost:11434/v1"),
-        )
+        stream_func = agent_stream_sync_structured
 
     else:
-        model = model_name
-    return model
+        from apps.wizard.app_pages.expert_agent.stream import agent_stream_sync
 
+        stream_func = agent_stream_sync
 
-async def agent_stream(prompt: str, model_name: str, message_history) -> AsyncGenerator[str, None]:
-    """Stream agent response using run_stream.
+    def handle_session_updates(updates):
+        for key, value in updates.items():
+            st.session_state[key] = value
 
-    Args:
-        prompt: The user prompt to process
-        model_name: The model to use.
+    # Agent to work, and stream its output
+    model_name = st.session_state["expert_config"].get("model_name", MODEL_DEFAULT)
+    stream = stream_func(
+        agent=agent,
+        prompt=prompt,
+        model_name=model_name,
+        message_history=st.session_state["agent_messages"],
+        session_updates_callback=handle_session_updates,
+        question_id=question_id,
+    )
 
-    Yields:
-        str: Text chunks from the agent response
-    """
-    model = _get_model_from_name(model_name)
-    async with agent.run_stream(
-        prompt,
-        model=model,  # type: ignore
-        message_history=message_history,
-        toolsets=get_toolsets(),  # type: ignore
-    ) as result:
-        # Yield each message from the stream
-        async for message in result.stream_text(delta=True):
-            if message is not None:
-                yield message
-
-    # At the very end, after the streaming is complete
-    # Capture the usage information in session state
-    if hasattr(result, "usage"):
-        st.session_state["last_usage"] = result.usage()
-
-
-async def _collect_agent_stream2(prompt: str, model_name: str, message_history) -> List[str]:
-    """Collect all chunks from agent_stream2 in one async context to avoid task switching issues."""
-    toolsets = get_toolsets()
-    print("===========================================")
-    print("Toolsets available")
-    print(toolsets)
-    print("===========================================")
-
-    chunks = []
-    model = _get_model_from_name(model_name)
-
-    async with agent.iter(
-        prompt,
-        model=model,
-        message_history=message_history,
-        toolsets=toolsets,  # type: ignore
-    ) as run:
-        nodes = []
-        async for node in run:
-            # print(f"--------------------------")
-            # print(node)
-            nodes.append(node)
-            if Agent.is_model_request_node(node):
-                # is_final_synthesis_node = any(isinstance(prev_node, CallToolsNode) for prev_node in nodes)
-                # print(f"--- ModelRequestNode (Is Final Synthesis? {is_final_synthesis_node}) ---")
-                async with node.stream(run.ctx) as request_stream:
-                    async for event in request_stream:
-                        # print(f"Request Event: Data: {event!r}")
-                        if isinstance(event, PartDeltaEvent) and isinstance(event.delta, TextPartDelta):
-                            chunks.append(event.delta.content_delta)
-                        elif isinstance(event, PartStartEvent) and isinstance(event.part, TextPart):
-                            chunks.append(event.part.content)
-
-            elif Agent.is_call_tools_node(node):
-                # print("--- CallToolsNode ---")
-                async with node.stream(run.ctx) as handle_stream:
-                    async for event in handle_stream:
-                        pass
-                        # print(f"Call Event Data: {event!r}")
-
-        # Capture usage and result info
-        if hasattr(run, "usage"):
-            st.session_state["last_usage"] = run.usage()
-        if hasattr(run, "result"):
-            st.session_state["agent_result"] = run.result
-
-    return chunks
-
-
-async def agent_stream2(prompt: str, model_name: str, message_history) -> AsyncGenerator[str, None]:
-    """Stream agent response using iter method with Streamlit-compatible wrapper.
-
-    This version collects all chunks in one async context first, then yields them
-    to avoid async context manager issues with Streamlit's task switching.
-
-    Args:
-        prompt: The user prompt to process
-        model_name: The model to use.
-    Yields:
-        str: Text chunks from the agent response
-    """
-    # Collect all chunks first to avoid async context issues with Streamlit
-    # with st.spinner("Asking LLM...", show_time=True):
-    with st.status("Talking with the expert...", expanded=False) as status:
-        st.markdown(
-            f"**:material/smart_toy: Agent working**: `{st.session_state['expert_config']['model_name']}`",
-        )
-        chunks = await _collect_agent_stream2(
-            prompt,
-            model_name,
-            message_history,
-        )
-        status.update(label="Got the answer!", state="complete", expanded=False)
-
-    # Yield chunks one by one
-    for chunk in chunks:
-        if chunk:  # Only yield non-empty chunks
-            yield chunk
+    return stream
 
 
 #######################################################
@@ -288,9 +243,10 @@ async def get_context(category_name: Literal["analytics", "metadata", "docs"]) -
     Returns:
         str: The context for the specified category.
     """
-    st.markdown(
-        f"**:material/construction: Tool use**: Getting context on category '{category_name}', using `get_context`"
-    )  # , icon=":material/calculate:")
+    # tool_ui_message(
+    #     message_type="markdown",
+    #     text=f"**:material/construction: Tool use**: Getting context on category '{category_name}', using `get_context`",
+    # )
     return CONTEXT["context"][category_name]
 
 
@@ -314,9 +270,10 @@ async def get_docs_index() -> str:
     Returns:
         str: The documentation index. List of available section and pages.
     """
-    st.markdown(
-        "**:material/construction: Tool use**: Getting the table of contents of ETL documentation, via `get_docs_index`"
-    )  # , icon=":material/calculate:")
+    # tool_ui_message(
+    #     message_type="markdown",
+    #     text="**:material/construction: Tool use**: Getting the table of contents of ETL documentation, via `get_docs_index`",
+    # )
     docs = ruamel_dump(DOCS_INDEX["nav"])
     return docs
 
@@ -339,52 +296,15 @@ async def get_docs_page(file_path: str) -> str:
     Returns:
         str: The documentation for the specified file_path.
     """
-    st.markdown(
-        f"**:material/construction: Tool use**: Getting ETL docs page '{file_path}', via `get_docs_page`"
-    )  # , icon=":material/calculate:")
+    # tool_ui_message(
+    #     message_type="markdown",
+    #     text=f"**:material/construction: Tool use**: Getting ETL docs page '{file_path}', via `get_docs_page`",
+    # )
     if (DOCS_DIR / file_path).exists():
         docs = read_page_md(DOCS_DIR / file_path)
     else:
         return f"File not found: {file_path}"
     return docs
-
-
-# Analytics
-@agent.tool_plain(docstring_format="google")
-async def get_db_tables() -> str:
-    """Get an overview of the database tables. Retrieve the names of the tables in the database, along with their short descriptions.
-
-    Some table tables have description "TODO". That's because we haven't documented them yet.
-
-    Returns:
-        str: Table short descriptions in format "table1: ...\ntable2: ...".
-    """
-    st.markdown(
-        "**:material/construction: Tool use**: Getting the database details of our semantic layer, via `get_db_tables`"
-    )  # , icon=":material/calculate:")
-    return ANALYTICS_DB_OVERVIEW
-
-
-@agent.tool_plain(docstring_format="google")
-async def get_db_table_fields(tb_name: str) -> str:
-    """Retrieve the documentation of the columns of database table "tb_name".
-
-    Some table columns have description "TODO". That's because we haven't documented them yet.
-
-    Args:
-        tb_name: Name of the table
-
-    Returns:
-        str: Table documentation as string, mapping column names to their descriptions. E.g. "column1: description1\ncolumn2: description2".
-    """
-    st.markdown(
-        f"**:material/construction: Tool use**: Getting documentation of table `{tb_name}` from the semantic layer, via `get_db_table_fields`"
-    )  # , icon=":material/calculate:")
-    if tb_name not in ANALYTICS_DB_TABLE_DETAILS:
-        print("Table not found:", tb_name)
-        print("Available tables:", sorted(ANALYTICS_DB_TABLE_DETAILS.keys()))
-        return "Table not found: " + tb_name
-    return ANALYTICS_DB_TABLE_DETAILS[tb_name]
 
 
 # API reference for Metadata
@@ -400,9 +320,10 @@ async def get_api_reference_metadata(
     Returns:
         str: Metadata for the specified object type.
     """
-    st.markdown(
-        f"**:material/construction: Tool use**: Getting metadata documentation for object '{object_name}', via `get_api_reference_metadata')`"
-    )  # , icon=":material/calculate:")
+    # tool_ui_message(
+    #     message_type="markdown",
+    #     text=f"**:material/construction: Tool use**: Getting metadata documentation for object '{object_name}', via `get_api_reference_metadata')`",
+    # )
     match object_name:
         case "dataset":
             return render_dataset()
@@ -427,73 +348,350 @@ async def get_api_reference_metadata(
             return "Invalid object name: " + object_name
 
 
+# Analytics
 @agent.tool_plain(docstring_format="google")
-async def generate_url_to_datasette(query: str) -> str:
-    """Generate a URL to the Datasette instance with the given query.
+async def get_db_tables() -> str:
+    """Get an overview of the database tables. Retrieve the names of the tables in the database, along with their short descriptions.
 
-    Args:
-        query: Query to Datasette instance.
     Returns:
-        str: URL to the Datasette instance with the query. The URL links to a datasette preview with the SQL query and its results.
+        str: Table short descriptions in format "table1: ...\ntable2: ...".
     """
-    st.markdown(
-        "**:material/construction: Tool use**: Generating Datasette query URL, via `generate_url_to_datasette`"
-    )  # , icon=":material/calculate:")
-    return _generate_url_to_datasette(query)
-
-
-def _generate_url_to_datasette(query: str) -> str:
-    query = clean_sql_query(query)
-    return f"{ANALYTICS_URL}?" + urllib.parse.urlencode({"sql": query, "_size": "max"})
+    # tool_ui_message(
+    #     message_type="markdown",
+    #     text="**:material/construction: Tool use**: Getting the database details of our semantic layer, via `get_db_tables`",
+    # )
+    return ANALYTICS_DB_OVERVIEW
 
 
 @agent.tool_plain(docstring_format="google")
-async def validate_datasette_query(query: str) -> str:
-    """Validate an SQL query.
+async def get_db_table_fields(tb_names: List[str]) -> Dict[str, Any]:
+    """Retrieve the documentation of the columns of a subset of tables in the database table.
+
 
     Args:
-        query: Query to Datasette instance.
+        tb_names: Names of the tables of interest
+
     Returns:
-        str: Validation result message. If the query is not valid, it will return an error message. Use it to improve the query!
+        Dict: Documentation of the tables of interest. Each key in the dictionary corresponds to a table. The values is the table documentation as string, mapping column names to their descriptions. E.g. "column1: description1\ncolumn2: description2".
     """
-    st.markdown(
-        "**:material/construction: Tool use**: Validating Datasette query, via `validate_datasette_query`"
-    )  # , icon=":material/calculate:")
-    url = _generate_url_to_datasette(f"{query}")
-    url = url.replace(ANALYTICS_URL, ANALYTICS_URL + ".json")
-    response = requests.get(url).json()
-    if response["ok"]:
-        if ("rows" not in response) or not isinstance(response["rows"], list):
-            text = "Query is invalid! Check for correctness, it must be DuckDB compatible! Seems like no rows were returned."
-        elif len(response["rows"]) == 0:
-            text = "Query is valid, but it returned no results."
+    # tool_ui_message(
+    #     message_type="markdown",
+    #     text=f"**:material/construction: Tool use**: Getting documentation of table `{tb_name}` from the semantic layer, via `get_db_table_fields`",
+    # )
+    result = {}
+    for tb_name in tb_names:
+        if tb_name not in ANALYTICS_DB_TABLE_DETAILS:
+            text = f"Table not found: {tb_name}"
         else:
-            text = "Query is valid!"
-    else:
-        text = f"Query is invalid! Check for correctness, it must be DuckDB compatible! `\nError: {response['error']}"
-    return text
+            text = ANALYTICS_DB_TABLE_DETAILS[tb_name]
+        result[tb_name] = text
+    return result
 
 
+# Metabase/Datasette
 @agent.tool_plain(docstring_format="google")
-async def get_data_from_datasette(query: str, num_rows: int = 10) -> str:
-    """Execute a query in the semantic layer in Datasette and get the actual data results.
+async def execute_query(query: str, title: str, description: str, num_rows: int = 10) -> QueryResult:
+    """Execute a query in the semantic layer and get the data results.
 
-    This only shows the first 10 rows of the result, as a markdown table.
+    The query is ran on Datasette, and if valid, it obtains the results from Datasette and creates a "question" in Metabase with the same query. Note that Metabase and Datasette use the same underlying database, so the query should work in both places.
+
+    If the query is invalid, it returns an error message that can be used to improve the query until valid.
 
     Args:
         query: Query to Datasette instance.
+        title: Title that describes what the query does. Should be short and concise.
+        description: Description of what the query does. Should be 1-3 sentence long.
         num_rows: Number of rows to return. Defaults to 10. Too many rows may increase the tokens. Be mindful when increasing this number.
     Returns:
-        pd.DataFrame: DataFrame with the results of the query.
+        QueryResult: Serializable object with the following fields:
+            message (str): Message about the query execution. "SUCCCESS" if the query was valid, or an error message if not.
+            valid (bool): Whether the query was valid or not.
+            result (str): The data results in markdown format (first `num_rows` rows).
+            url_metabase (str): Link to the created question in Metabase, if the query was valid and the question was created successfully.
+            url_datasette (str): Link to the query in Datasette.
     """
-    st.markdown(
-        f"**:material/construction: Tool use**: Getting data ({num_rows} rows) from Datasette, via `get_data_from_datasette`"
-    )  # , icon=":material/calculate:")
-    df = read_datasette(query, use_https=False)
-    if df.empty:
-        return ""
+    # tool_ui_message(
+    #     message_type="markdown",
+    #     text=f"**:material/construction: Tool use**: Getting data ({num_rows} rows) from Datasette, via `execute_query`",
+    # )
 
-    result = df.head(num_rows).to_markdown(index=False)
-    if result is None:
-        return ""
+    try:
+        df = read_datasette(query, use_https=False)
+        url_datasette = _generate_url_to_datasette(query)
+
+        if df.empty:
+            return QueryResult(
+                message="Query returned no results. Try it on Datasette",
+                valid=False,
+                url_datasette=url_datasette,
+            )
+
+        # Serialize dataframe
+        data = serialize_df(df, num_rows=num_rows)
+
+        if data.data == []:
+            return QueryResult(
+                message="Query returned no results. Try it on Datasette",
+                valid=False,
+                url_datasette=url_datasette,
+            )
+
+        try:
+            question = create_question(
+                query=query,
+                title=title,
+                description=description,
+            )
+            # Obtain URL to the question
+            url_metabase = _generate_question_url(question)
+            card_id = question.get("id", None)
+        except Exception as _:
+            url_metabase = None
+            card_id = None
+        return QueryResult(
+            message="SUCCESS",
+            valid=True,
+            result=data,
+            url_metabase=url_metabase,
+            url_datasette=url_datasette,
+            card_id_metabase=card_id,
+        )
+    except (DatasetteSQLError,) as e:
+        # Handle specific Datasette-related errors
+        return QueryResult(
+            message=f"ERROR. Query is invalid! Check for correctness, it must be DuckDB compatible!\nError: {e}",
+            valid=False,
+        )
+
+
+# @agent.tool_plain(docstring_format="google")
+# async def create_question_with_filters(query: str, title: str, description: str) -> None:
+#     """Create a Metabase question that has filters."""
+#     _ = create_question(
+#         query=query,
+#         title=title,
+#         description=description,
+#     )
+
+
+# @agent.tool_plain(docstring_format="google")
+# async def get_question_query(card_id: int):
+#     # Get question
+#     _ = get_question_info(card_id)
+#     # Generate URL
+#     # url = _generate_question_url(question)
+#     # return url
+
+
+@agent.tool_plain(docstring_format="google")
+async def list_available_questions_metabase() -> List[dict]:
+    """List available questions in Metabase in the "Expert" collection.
+
+    Returns a list of questions with their metadata. Use the question names (and descriptions if available) to decide which question to use.
+
+    Returns:
+        List[dict]: List of questions with their metadata. Each item has the following fields:
+            - name (str): Name of the question.
+            - id (int): ID of the question.
+            - description (str, optional): Description of the question, if available.
+    """
+    from etl.analytics.metabase import COLLECTION_EXPERT_ID, list_questions
+
+    # tool_ui_message(
+    #     message_type="markdown",
+    #     text="**:material/construction: Tool use**: Listing available questions in Metabase, via `list_available_questions_metabase`",
+    # )
+
+    # Get questions
+    questions = list_questions()
+
+    # Skip those under collection expert
+    questions = [q for q in questions if q.get("collection_id") != COLLECTION_EXPERT_ID]
+
+    # Create question summary
+    summary = []
+    for q in questions:
+        summary_ = {
+            "name": q["name"],
+            "id": q["id"],
+        }
+        if (q["description"] is not None) and (q["description"].strip() != ""):
+            summary_["description"] = q["description"]
+        summary.append(summary_)
+    return summary
+
+
+@agent.tool_plain(docstring_format="google")
+async def get_question_url(card_id: int) -> str:
+    """Get the URL to a Metabase question by its card ID.
+    After choosing a question from the list of available questions, use this tool to get the URL to that question.
+
+    Args:
+        card_id: The ID of the question card in Metabase.
+    Returns:
+        str: The URL to the Metabase question.
+    """
+    # Get question
+    question = get_question_info(card_id)
+    # Generate URL
+    url = _generate_question_url(question)
+    return url
+
+
+@agent.tool_plain(docstring_format="google")
+async def get_question_data(card_id: int, num_rows: int = 20) -> QueryResult:
+    """Get the data from a Metabase question by its card ID.
+
+    After choosing a question from the list of available questions, use this tool to get the data from that question.
+
+    Args:
+        card_id: The ID of the question card in Metabase.
+        num_rows: Number of rows to return. Defaults to 20.
+    Returns:
+        DataFrameModel: Serializable object with the following fields:
+            columns (list[str]): List of column names in the dataframe.
+            dtypes (dict[str, str]): Dictionary mapping column names to their data types.
+            data (list[list]): Small slice of the data (first `num_rows` rows).
+            total_rows (int): Total number of rows in the dataframe.
+    """
+    # Getting data
+    data = _get_question_data(card_id)
+
+    if data.empty:
+        return QueryResult(
+            message="Query returned no results. Try it on Metabase",
+            valid=False,
+        )
+
+    # q_name = question.get("name", "Unknown")
+    # tool_ui_message(
+    #     message_type="markdown",
+    #     text=f"**:material/construction: Tool use**: Getting data from a Metabase question, via `get_question_data`, using id `{card_id}` for question named '{q_name}'",
+    # )
+
+    # Generate URL
+    url = await get_question_url(card_id)
+
+    # Serialize
+    data = serialize_df(data, num_rows=num_rows)
+
+    # Build result
+    result = QueryResult(
+        message="SUCCESS",
+        valid=True,
+        result=data,
+        url_metabase=url,
+    )
     return result
+
+
+@agent.tool(docstring_format="google")
+async def generate_plot(
+    ctx: RunContext[dict],
+    card_id: int,
+    plot_instructions: str,
+) -> str:
+    """Generate a plot from Metabase question data with custom plotting instructions.
+
+    This tool creates visualizations by:
+    1. Fetching data from a Metabase question
+    2. Using AI to generate appropriate plotly code based on plotting instructions
+    3. Executing the code safely to create the plot with automatic retry on errors
+    4. Saving the plot as an image file
+
+    Args:
+        card_id: The ID of the Metabase question containing the data to plot. Typically a table, where only a subset of the columns are needed for plotting.
+        plot_instructions: Natural language instructions for the plot (e.g., "create a line chart showing trend over time of num_users", "make a scatter plot with GDP vs population", "generate a bar chart grouped by country")
+
+    Returns:
+        str: Success message with file path or error details after all retries exhausted.
+
+    Raises:
+        ValueError: If data cannot be fetched or plot generation fails after retries
+    """
+    max_retries = 3
+    model_name = ctx.model.model_name
+    question_id = ctx.deps.get("question_id", f"plot_{card_id}")
+
+    # Get data from Metabase
+    df = _get_question_data(card_id)
+    if df.empty:
+        raise ValueError(f"DataFrame is empty for question with ID {card_id}")
+
+    # Prepare context for plotting agent
+    sample_data_str = df.head(3).to_string()
+    context_info = (
+        f"DataFrame info:\n"
+        f"- Columns: {df.columns.tolist()}\n"
+        f"- Data types: {dict(df.dtypes)}\n"
+        f"- Shape: {df.shape}\n"
+        f"- Sample data (first 3 rows):\n{sample_data_str}\n\n"
+        f"User instructions: {plot_instructions}"
+    )
+
+    # Retry loop for code generation and execution
+    error_history = []
+    for attempt in range(max_retries):
+        try:
+            log.info(f">>>>>> Generating plot attempt {attempt + 1}/{max_retries} for question {question_id}")
+
+            # Build prompt with error feedback from previous attempts
+            if error_history:
+                error_feedback = "\n\nPREVIOUS ATTEMPT ERRORS:\n" + "\n".join(
+                    f"Attempt {i+1} error: {err}" for i, err in enumerate(error_history)
+                )
+                prompt = context_info + error_feedback + "\n\nPlease fix the code to avoid these errors."
+            else:
+                prompt = context_info
+
+            # Generate code using sub-agent
+            plotting_result = await plotting_agent.run(
+                prompt,
+                model=model_name,
+                usage=ctx.usage,
+            )
+            plotting_code = plotting_result.output
+
+            # Clean markdown formatting
+            if plotting_code.startswith("```python"):
+                plotting_code = plotting_code.split("```python")[1].split("```")[0].strip()
+            elif plotting_code.startswith("```"):
+                plotting_code = plotting_code.split("```")[1].split("```")[0].strip()
+
+            # Execute the generated code safely
+            local_vars = {
+                "df": df,
+                "px": px,
+                "go": go,
+                "pd": pd,
+            }
+
+            exec(plotting_code, {}, local_vars)
+
+            if "fig" not in local_vars:
+                raise ValueError("Generated code did not create a 'fig' variable")
+
+            fig = local_vars["fig"]
+
+            # Save to files
+            unique_id = uuid.uuid4().hex[:8]
+            filename_base = f"{question_id}_plot_{unique_id}"
+            filepath = save_plot_file(fig, filename_base)
+            save_code_file(plotting_code, filename_base, question_id, card_id)
+
+            log.info(f"Successfully generated plot for question {question_id}: {filepath}")
+            return f"Successfully generated plot: {filepath}"
+
+        except Exception as e:
+            error_msg = f"{type(e).__name__}: {str(e)}"
+            error_history.append(error_msg)
+            log.warning(f"Plot generation attempt {attempt + 1} failed: {error_msg}")
+
+            # If this was the last retry, raise the error
+            if attempt == max_retries - 1:
+                full_error = "\n".join(f"Attempt {i+1}: {err}" for i, err in enumerate(error_history))
+                log.error(f"All {max_retries} attempts failed for question {question_id}:\n{full_error}")
+                raise ValueError(f"Failed to generate plot after {max_retries} attempts. Errors:\n{full_error}")
+
+    # This line should never be reached due to the raise in the last retry
+    raise ValueError("Unexpected code path: all retries exhausted without success or error")

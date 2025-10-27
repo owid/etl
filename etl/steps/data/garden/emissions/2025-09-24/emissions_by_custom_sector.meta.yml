@@ -1,0 +1,21 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - CO2 & Greenhouse Gas Emissions
+    processing_level: major
+    unit: ''
+    short_unit: ''
+
+dataset:
+  update_period_days: 365
+  title: Greenhouse gas emissions by custom sector
+  non_redistributable: true
+
+tables:
+  emissions_by_custom_sector:
+    variables:
+      share_of_global_ghg_emissions:
+        title: Share of global greenhouse-gas emissions by human activity
+        display:
+          numDecimalPlaces: 1

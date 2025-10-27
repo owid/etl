@@ -13,15 +13,18 @@ dimensions:
   - slug: metric_type
     name: Metric
     choices:
-      - slug: expected_years_schooling
-        name: Expected years of schooling
-        description: The number of years a person is expected to spend in school or university, including years spent on repetition
       - slug: average_years_schooling
         name: Average years of schooling
         description: The average number of completed years of education of a population
+      - slug: expected_years_schooling
+        name: Expected years of schooling
+        description: The number of years a person is expected to spend in school or university, including years spent on repetition
       - slug: learning_adjusted_years_schooling
         name: Learning-adjusted years of schooling
         description: Expected years of schooling adjusted for quality of learning
+      - slug: metric_type_side_by_side
+        name: All metrics
+        description: Compare all three metrics of years of schooling
   - slug: level
     name: Education level
     choices:

@@ -1,0 +1,629 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    description_processing: ""
+    presentation:
+      attribution_short: ILO
+      topic_tags:
+        - Work & Employment
+    display: &common_display
+      tolerance: 5
+
+  employment: Employment refers to people of working age who worked for at least an hour during the reference period (typically a week), whether in paid employment or self-employment.
+
+  icse_93: This status in employment is provided according to the [International Standard Classification of Status in Employment](https://ilostat.ilo.org/methods/concepts-and-definitions/classification-status-at-work/) (ICSE-93).
+
+  isco_08: This is based on the International Standard Classification of Occupations 2008 (ISCO-08). More information can be found in the [ISCO documentation](https://ilostat.ilo.org/methods/concepts-and-definitions/classification-occupation/).
+
+  poverty_line_per_day: $2.15 per day
+
+  ppp_year: 2021
+
+  sex: |-
+    <% if sex == "Male" %>
+     male
+    <%- elif sex == "Female" %>
+     female
+    <%- endif %>
+
+  sex_plural: |-
+    <% if sex == "Male" %>
+     males
+    <%- elif sex == "Female" %>
+     females
+    <%- else %>
+     people
+    <%- endif %>
+
+  age: |-
+    <% if classif1 == "Age (youth, adults): 15+" %>
+     (15+)
+    <%- elif classif1 == "Age (youth, adults): 15-24" %>
+     aged 15-24
+    <%- elif classif1 == "Age (youth, adults): 15-64" %>
+     aged 15-64
+    <%- elif classif1 == "Age (youth, adults): 25+" %>
+     aged 25 and older
+    <%- elif classif1 == "Age (aggregate): 15-24" %>
+     aged 15-24
+    <%- elif classif1 == "Age (aggregate): 25-54" %>
+     aged 25-54
+    <%- elif classif1 == "Age (aggregate): 55-64" %>
+     aged 55-64
+    <%- elif classif1 == "Age (aggregate): 65+" %>
+     aged 65 and older
+    <%- elif classif1 == "Age (aggregate): Total" %>
+     (15+)
+    <%- endif %>
+
+  age_unemployment: |-
+    <% if classif1 == "Age (youth, adults): 15-24" %>
+     aged 15-24
+    <%- elif classif1 == "Age (youth, adults): 15-64" %>
+     aged 15-64
+    <%- elif classif1 == "Age (youth, adults): 25+" %>
+     aged 25 and older
+    <%- elif classif1 == "Age (aggregate): 15-24" %>
+     aged 15-24
+    <%- elif classif1 == "Age (aggregate): 25-54" %>
+     aged 25-54
+    <%- elif classif1 == "Age (aggregate): 55-64" %>
+     aged 55-64
+    <%- elif classif1 == "Age (aggregate): 65+" %>
+     aged 65 and older
+    <%- endif %>
+
+  description_short_status_in_employment: |-
+    <% if classif1 == "Status in employment (ICSE-93): 1. Employees" %>
+      employees
+    <%- elif classif1 == "Status in employment (ICSE-93): 2. Employers" %>
+      employers
+    <%- elif classif1 == "Status in employment (ICSE-93): 3. Own-account workers" %>
+      own-account workers
+    <%- elif classif1 == "Status in employment (ICSE-93): 5. Contributing family workers" %>
+      contributing family workers
+    <%- endif %>
+
+  description_key_labor_force_participation_1: |-
+    The labor force participation rate shows the share of working-age people who are either employed (working for pay or profit) or unemployed (not working, but actively looking for work and available to start). This indicator shows the share of the population that is economically active.
+  description_key_labor_force_participation_2: |-
+    People who are not seeking work or are not available, such as students, retired people, or unpaid caregivers, are excluded as they are considered to be outside the labor force.
+
+  description_key_unemployment: |-
+    The unemployment rate measures the share of the labor force that is without a job but actively looking for work and available to start soon. It is one of the most widely used indicators of labor market conditions across countries and over time.
+
+  description_key_status_in_employment: |-
+    <% if classif1 == "Status in employment (ICSE-93): 1. Employees" %>
+      _Employees_ are defined as workers on paid employment jobs. Paid employment refers to all jobs where people hold an employment contract which give them a remuneration not dependent upon the revenue of the organization for which they work. {definitions.icse_93}
+    <%- elif classif1 == "Status in employment (ICSE-93): 2. Employers" %>
+      _Employers_ are defined as workers working on self-employment jobs who have engaged one or more persons to work for them as employees. {definitions.icse_93}
+    <%- elif classif1 == "Status in employment (ICSE-93): 3. Own-account workers" %>
+      _Own-account workers_ are defined as workers working on self-employment jobs who do not engage any employees to work with them. {definitions.icse_93}
+    <%- elif classif1 == "Status in employment (ICSE-93): 5. Contributing family workers" %>
+      _Contributing family workers_ are defined as workers working on self-employment jobs who work in an enterprise operated by a related person living in the same household. {definitions.icse_93}
+    <%- endif %>
+  description_key_informal_employment: |-
+    Informal employment encompasses all jobs that lack basic social or legal protection and employment benefits, regardless of the type of organization in which they are performed. It includes own-account workers, employers, and members of producers’ cooperatives operating in the informal sector; own-account workers engaged in producing goods exclusively for their household’s final use (such as subsistence farming); and contributing family workers, whether in formal or informal sector enterprises. It also covers employees in informal jobs, whether they are working in formal enterprises, informal enterprises, or employed as paid domestic workers by households.
+  description_key_child_labor: |-
+    <% if classif1 == "Age (child labour): 5-11" %>
+      Child labor for children aged 5-11 is defined as those who did at least one hour of economic activity and/or more than 21 hours of unpaid household services during the reference week.
+    <%- elif classif1 == "Age (child labour): 12-14" %>
+      Child labor for children aged 12-14 is defined as those who did at least 14 hours of economic activity and/or more than 21 hours of unpaid household services during the reference week.
+    <%- elif classif1 == "Age (child labour): 15-17" %>
+      Child labor for children aged 15-17 is defined as those who did at least 43 hours of economic activity during the reference week.
+    <%- elif classif1 == "Age (child labour): 5-17" %>
+      Child labor is defined differently depending on the age group: for children aged 5-11, it includes those who did at least one hour of economic activity and/or more than 21 hours of unpaid household services; for children aged 12-14, it includes those who did at least 14 hours of economic activity and/or more than 21 hours of unpaid household services; and for children aged 15-17, it includes those who did at least 43 hours of economic activity during the reference week.
+    <%- endif %>
+  description_key_child_labor_economic_activity: |-
+    <% if classif1 == "Age (child labour): 5-11" %>
+      Child labor for children aged 5-11 is defined as those who did at least one hour of economic activity during the reference week.
+    <%- elif classif1 == "Age (child labour): 12-14" %>
+      Child labor for children aged 12-14 is defined as those who did at least 14 hours of economic activity during the reference week.
+    <%- elif classif1 == "Age (child labour): 15-17" %>
+      Child labor for children aged 15-17 is defined as those who did at least 43 hours of economic activity during the reference week.
+    <%- elif classif1 == "Age (child labour): 5-17" %>
+      Child labor is defined differently depending on the age group: for children aged 5-11, it includes those who did at least one hour of economic activity and/or more than 21 hours of unpaid household services; for children aged 12-14, it includes those who did at least 14 hours of economic activity and/or more than 21 hours of unpaid household services; and for children aged 15-17, it includes those who did at least 43 hours of economic activity during the reference week.
+    <%- endif %>
+  description_key_low_pay_earners: |-
+    Workers are considered _low pay_ if their hourly earnings at all jobs are less than two-thirds of median hourly earnings.
+  description_key_occupation: |-
+    <% if classif1 == "Occupation (Skill level): Low" %>
+      The skill level of occupations classified as _Low_ (level 1) refers to the performance of simple and routine tasks which may require the use of hand-held tools and considerable physical effort. Examples typically include cleaners and helpers, industry laborers, and other similar roles. {definitions.isco_08}
+    <%- elif classif1 == "Occupation (Skill level): Medium" %>
+      The skill level of occupations classified as _Medium_ (level 2) includes workers in clerical support, service and sales, skilled agricultural, forestry and fishing jobs, craft and related trades, and plant and machine operators and assemblers. {definitions.isco_08}
+    <%- elif classif1 == "Occupation (Skill level): High" %>
+      The skill level of occupations classified as _High_ (levels 3 and 4) includes managers, professionals, technicians, and associate professionals. {definitions.isco_08}
+    <%- elif classif1 == "Occupation (Skill level): Not elsewhere classified" %>
+      The skill level of occupations classified as _Not elsewhere classified_ includes armed forces occupations and occupations not classified in any of the skill levels 1 to 4. {definitions.isco_08}
+    <%- endif %>
+  description_key_earnings: |-
+    This data includes remuneration in cash and as benefits in kind paid to employees at regular intervals. It excludes employers' contributions paid to social security and pensions schemes, the benefits received by employees under these schemes, as well as severance and termination pay.
+  description_key_international_dollars: |-
+    This data is expressed in constant international dollars to adjust for inflation and differences in living costs between countries. Read more in our article, [What are international dollars?](https://ourworldindata.org/international-dollars)
+  description_key_iloest_modelled_data: |-
+    This data comes from the ILO Modelled Estimates series. The ILO combines countries' own reported estimates with statistically modeled estimates when observations are missing. This ensures that the data follows harmonized definitions and is comparable across countries and over time. It also allows the ILO to calculate regional and global aggregates for every year. You can read more about how the ILO produces these estimates in the [Modelled Estimates documentation](https://ilostat.ilo.org/methods/concepts-and-definitions/ilo-modelled-estimates/).
+  description_key_ilo_national_estimates: |-
+    This data comes from national sources, typically labor force surveys, household surveys, or population censuses. Each country uses its own definitions and methods, so this data may not be directly comparable across countries and over time.
+  description_key_13th_icls: |-
+    This data follows the standards of the [13th International Classification of Labour Statisticians (ICLS)](#dod:13-icls). One important point is that employment encompasses work for pay or profit, including self-employment, and also the production of goods for own use (such as subsistence farming). Changes in the definition of employment imply changes in the identification of the unemployed and of those out of the labor force. Because definitions changed under the [19th ICLS](#dod:19-icls), data using those newer definitions are not fully comparable with data based on the 13th ICLS. You can read more about the definitions in [this explainer by the ILO](https://www.ilo.org/publications/quick-guide-understanding-impact-new-statistical-standards-ilostat).
+
+  description_key_working_age_ilo_modeled: |-
+    When defining the labor force, the definition of “working age” varies across countries, depending on national laws and practices. In the ILO modeled estimates shown here, this is harmonized to refer to people aged 15 and older.
+  description_key_working_age_ilo_modeled_employment: |-
+    When defining the working-age population, the definition of “working age” varies across countries, depending on national laws and practices. In the ILO modeled estimates shown here, this is harmonized to refer to people aged 15 and older.
+  description_key_working_age_ilo_national: |-
+    When defining the labor force, the working-age population includes all people above the legal working age for employment in each country. The ILO recommends defining it as people aged 15 and older, but national definitions vary, depending on local laws. Some countries also set an upper age limit.
+
+  description_key_extreme_poverty: |-
+    Extreme poverty here is defined as living below the International Poverty Line of {definitions.poverty_line_per_day}.
+  description_key_social_protection: |-
+    <% if classif1 == "Contingency: Population covered by at least one social protection benefit" %>
+      This indicator is calculated as the ratio of the population receiving cash benefits under at least one of multiple contingencies/social protection functions or actively contributing to at least one social security scheme to the total population. The different benefits are aimed at children, unemployed persons, older persons, persons with disabilities, pregnant women, newborns, work-injury victims and the poor and the vulnerable.
+    <%- elif classif1 == "Contingency: Children/households receiving child/family cash benefits" %>
+      This indicator is calculated as the ratio of children/households receiving child or family cash benefits to the total number of children/households with children.
+    <%- elif classif1 == "Contingency: Employed covered in the event of work injury" %>
+      This indicator is calculated as the ratio of workers protected by injury insurance to total employment or the labor force.
+    <%- elif classif1 == "Contingency: Mothers with newborns receiving maternity benefits" %>
+      This indicator is calculated as the ratio of women receiving cash maternity benefits to women giving birth in the same year.
+    <%- elif classif1 == "Contingency: Persons above retirement age receiving a pension" %>
+      This indicator is calculated as the ratio of persons above statutory retirement age receiving an old-age pension to persons above statutory retirement age (including contributory and non-contributory).
+    <%- elif classif1 == "Contingency: Poor persons covered by social protection systems" %>
+      This indicator is calculated as the ratio of social assistance recipients to the population living below the national poverty line.
+    <%- elif classif1 == "Contingency: Unemployed receiving unemployment benefits" %>
+      This indicator is calculated as the ratio of recipients of unemployment cash benefits to the number of unemployed persons.
+    <%- elif classif1 == "Contingency: Vulnerable persons covered by social assistance" %>
+      This indicator is calculated as the ratio of social assistance recipients to the total number of vulnerable persons. The latter are calculated by subtracting from total population all people of working age who are contributing to a social insurance scheme or receiving contributory benefits, and all persons above retirement age receiving contributory benefits.
+    <%- elif classif1 == "Contingency: Persons with severe disabilities collecting disability social protection benefits" %>
+      This indicator is calculated as the ratio of persons receiving disability cash benefits to persons with severe disabilities. The latter is calculated as the product of prevalence of disability ratios (published for each country group by the World Health Organization) and each country’s population.
+    <%- endif %>
+  description_key_women_in_management: |-
+    Employment in management is defined based on the [International Standard Classification of Occupations](https://ilostat.ilo.org/methods/concepts-and-definitions/classification-occupation/). This series refers to total management (category 1 of ISCO-08 or ISCO-88).
+  description_key_women_in_senior_middle_management: |-
+    Employment in senior and middle management is defined based on the [International Standard Classification of Occupations](https://ilostat.ilo.org/methods/concepts-and-definitions/classification-occupation/). This series refers to major group 1 of ISCO-08 or ISCO-88, excluding sub-major groups 14 in ISCO-08 and 13 in ISCO-88.
+  description_key_disability_status: |-
+    Disability, as defined in the [International Classification of Functioning, Disability and Health (ICF)](https://www.who.int/standards/classifications/international-classification-of-functioning-disability-and-health), is used as an umbrella term, covering impairments, activity limitations, and participation restrictions. For measurement purposes, a person with disability is defined as a person who is limited in the kind or amount of activities that he or she can do because of ongoing difficulties due to a long-term physical condition, mental condition or health problem.
+  description_key_occupational_injury: |-
+    An occupational injury is defined as any personal injury, disease or death resulting from an occupational accident. An occupational accident is an unexpected and unplanned occurrence, including acts of violence, arising out of or in connection with work which results in one or more workers incurring a personal injury, disease or death.
+  description_key_fatal_occupational_injury: |-
+    An occupational injury is fatal when it results in the death of a worker within one year of the day of the accident.
+  description_key_occupational_injury_reference_group: |-
+    This indicator is calculated against a reference group, which is the average number of workers in the particular group under consideration and who are covered by the source of the statistics on occupational injuries.
+  description_key_facb: |-
+    The principles of freedom of association and collective bargaining (FACB) are fundamental rights at work. Freedom of association is the right of workers and employers to freely form or join organizations that promote and defend their interests at work, without interference from one another or the State. Collective bargaining is a voluntary process through which employers and trade unions discuss and negotiate their relations and interaction at the workplace, such as pay and other terms and conditions of work.
+  description_key_national_strategy_youth_employment: |-
+    The indicator is based on a four-level scale: (0) The country has not developed any national strategy or taken steps to develop or adopt one; (1) The country is in the process of developing a national strategy; (2) The country has developed and adopted a national strategy; (3) The country has operationalized a national strategy.
+  description_key_manufacturing_employment: |-
+    The manufacturing sector is defined according the [International Standard Industrial Classification of all Economic Activities (ISIC)](https://ilostat.ilo.org/methods/concepts-and-definitions/classification-economic-activities/). It refers to industries belonging to sector C in revision 4 or sector D in revision 3.
+  description_key_labor_income_share: |-
+    This indicator is calculated using compensation of employees (wages and salaries in cash and in kind benefits, and social contributions paid by employers) and labor income of the self-employed (the part of the remuneration attributable for work done by self-employed workers).
+
+  description_processing_unreliable_data: |-
+    We removed data points flagged as "unreliable" by the source (i.e. `obs_status = "U"` in the original data). These data points are likely to be inaccurate and misleading for analysis.
+
+  description_processing_avg_earnings_outliers: |-
+    We excluded observations where average hourly earnings were below 0.2 or above 100 international-$ in {definitions.ppp_year} prices. Such values are highly unlikely as national averages and are therefore probably the result of miscalculation.
+
+  # This is the ID of the Google Doc that contains the FAQs
+  gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  ilostat:
+    variables:
+    #############################################################
+    # ILO Modelled Estimates (ILOEST)
+    #############################################################
+
+      employment_by_sex_and_status_in_employment:
+        title: Employment - <<sex>> - <<classif1>>
+        unit: "people"
+        short_unit: ""
+        description_short: Number of {definitions.sex_plural} in employment, working as {definitions.description_short_status_in_employment}.
+        description_key:
+          - "{definitions.employment}"
+          - "{definitions.description_key_status_in_employment}"
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
+        display:
+          name: Employment - <<sex>> - <<classif1>>
+          numDecimalPlaces: 0
+          <<: *common_display
+
+      informal_employment_rate_by_sex:
+        title: Informal employment rate - <<sex>>
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of{definitions.sex} employed population who are working in jobs that lack basic social or legal protection and employment benefits.
+        description_key:
+          - "{definitions.employment}"
+          - "{definitions.description_key_informal_employment}"
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
+        display:
+          name: Informal employment rate - <<sex>>
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      labour_force_by_sex_and_age:
+        title: Labor force - <<sex>> - <<classif1>>
+        unit: "people"
+        short_unit: ""
+        description_short: Sum of all persons of working age who are employed and those who are unemployed.
+        description_key:
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
+        display:
+          name: Labor force - <<sex>> - <<classif1>>
+          numDecimalPlaces: 0
+          <<: *common_display
+
+      labour_force_participation_rate_by_sex_and_age:
+        title: Labor force participation rate - <<sex>> - <<classif1>>
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of the{definitions.sex} working-age population{definitions.age} who are economically active (employed or unemployed).
+        description_key:
+          - "{definitions.description_key_labor_force_participation_1}"
+          - "{definitions.description_key_labor_force_participation_2}"
+          - "{definitions.description_key_working_age_ilo_modeled}"
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
+        display:
+          name: Labor force participation rate - <<sex>> - <<classif1>>
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      unemployment_rate_by_sex_and_age:
+        title: Unemployment rate - <<sex>> - <<classif1>>
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of the{definitions.sex} [labor force](#dod:labor-force){definitions.age_unemployment} without work, but actively looking for a job and available to start soon.
+        description_key:
+          - "{definitions.description_key_unemployment}"
+          - "{definitions.description_key_working_age_ilo_modeled}"
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
+        display:
+          name: Unemployment rate - <<sex>> - <<classif1>>
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      #############################################################
+      # Child Labour Statistics (CHILD)
+      #############################################################
+
+      share_of_children_in_child_labour_by_sex_and_age:
+        title: Share of children in child labor - <<sex>> - <<classif1>>
+        unit: "%"
+        short_unit: "%"
+        description_short: Proportion of children who are either working at an age that is too young for them to be employed, or doing work that —by its nature or conditions— is likely to harm their health, safety, or morals.
+        description_key:
+          - "{definitions.description_key_child_labor}"
+        processing_level: major
+        description_processing: "{definitions.description_processing_unreliable_data}"
+        display:
+          name: Share of children in child labor - <<sex>> - <<classif1>>
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      #############################################################
+      # Gender Equality and Non-Discrimination Indicators (GEND)
+      #############################################################
+
+      female_share_of_low_pay_earners:
+        title: Female share of low pay earners
+        unit: "%"
+        short_unit: "%"
+        description_short: Percentage of low pay workers, among all low pay workers, who are female.
+        description_key:
+          - "{definitions.description_key_low_pay_earners}"
+        display:
+          name: Female share of low pay earners
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      gender_wage_gap_by_occupation:
+        title: Gender wage gap - <<classif1>>
+        unit: "%"
+        short_unit: "%"
+        description_short: Difference between average earnings of men and average earnings of women expressed as a percentage of average earnings of men.
+        description_key:
+          - "{definitions.description_key_occupation}"
+        processing_level: major
+        description_processing: "{definitions.description_processing_unreliable_data}"
+        display:
+          name: Gender wage gap - <<classif1>>
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      #############################################################
+      # Wages and Working Time Statistics (COND)
+      #############################################################
+
+      average_hourly_earnings_employees_by_sex:
+        title: Average hourly earnings of employees - <<sex>>
+        unit: international-$ in {definitions.ppp_year} prices
+        short_unit: $
+        description_short: Gross remuneration for time worked or work done, vacation, and other types of paid leave.
+        description_key:
+          - "{definitions.description_key_earnings}"
+          - "{definitions.description_key_international_dollars}"
+        processing_level: major
+        description_processing: |-
+          {definitions.description_processing_unreliable_data}
+
+          {definitions.description_processing_avg_earnings_outliers}
+        presentation:
+          faqs:
+          - fragment_id: poverty-international-dollars
+            gdoc_id: "{definitions.gdoc_id}"
+        display:
+          name: Average hourly earnings of employees - <<sex>>
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      #############################################################
+      # SDG Labour Market Indicators (ILOSDG)
+      #############################################################
+
+      sdg_1_1_1_working_poverty_rate:
+        title: SDG 1.1.1 Working poverty rate - <<sex>> - <<classif1>>
+        unit: "%"
+        short_unit: "%"
+        description_short: Percentage of employed persons living in extreme poverty in spite of being employed.
+        description_key:
+          - "{definitions.description_key_extreme_poverty}"
+          - "{definitions.description_key_international_dollars}"
+        display:
+          name: Working poverty rate - <<sex>> - <<classif1>>
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      sdg_1_3_1_population_covered_by_social_protection:
+        title: SDG 1.3.1 Proportion of population covered by social protection - <<sex>> - <<classif1>>
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of the population effectively covered by a social protection system, including social protection floors.
+        description_key:
+          - "{definitions.description_key_social_protection}"
+        display:
+          name: Proportion of population covered by social protection - <<sex>> - <<classif1>>
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      sdg_5_5_2_women_in_management:
+        title: SDG 5.5.2 Proportion of women in managerial positions
+        unit: "%"
+        short_unit: "%"
+        description_short: Number of women in management as a percentage of employment in management.
+        description_key:
+          - "{definitions.description_key_women_in_management}"
+        processing_level: major
+        description_processing: "{definitions.description_processing_unreliable_data}"
+        display:
+          name: Proportion of women in managerial positions
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      sdg_5_5_2_women_in_senior_middle_management:
+        title: SDG 5.5.2 Proportion of women in senior and middle management positions
+        unit: "%"
+        short_unit: "%"
+        description_short: Number of women in senior and middle management as a percentage of employment in senior and middle management.
+        description_key:
+          - "{definitions.description_key_women_in_senior_middle_management}"
+        processing_level: major
+        description_processing: "{definitions.description_processing_unreliable_data}"
+        display:
+          name: Proportion of women in senior and middle management positions
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      sdg_8_2_1_growth_rate_output_per_worker:
+        title: SDG 8.2.1 Growth rate of output per worker
+        unit: "%"
+        short_unit: "%"
+        description_short: Growth rate of labor productivity, measured as gross domestic product (GDP) per person employed.
+        display:
+          name: Growth rate of output per worker
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      sdg_8_3_1_informal_employment:
+        title: SDG 8.3.1 Proportion of informal employment in total employment - <<sex>> - <<classif1>>
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of{definitions.sex} employed population who are working in jobs that lack basic social or legal protection and employment benefits.
+        description_key:
+          - "{definitions.employment}"
+          - "{definitions.description_key_informal_employment}"
+        processing_level: major
+        description_processing: "{definitions.description_processing_unreliable_data}"
+        display:
+          name: Proportion of informal employment in total employment - <<sex>> - <<classif1>>
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      sdg_8_5_1_average_hourly_earnings:
+        title: SDG 8.5.1 Average hourly earnings of employees - <<sex>> - <<classif1>>
+        unit: "current local currency unit"
+        short_unit: "LCU"
+        description_short: Gross remuneration for time worked or work done, vacation, and other types of paid leave.
+        description_key:
+          - "{definitions.description_key_earnings}"
+        processing_level: major
+        description_processing: "{definitions.description_processing_unreliable_data}"
+        display:
+          name: Average hourly earnings of employees - <<sex>> - <<classif1>>
+          numDecimalPlaces: 2
+          <<: *common_display
+
+      sdg_8_5_2_unemployment_rate:
+        title: SDG 8.5.2 Unemployment rate - <<sex>> - <<classif1>>
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of the labor force without work, but available for and seeking employment.
+        processing_level: major
+        description_processing: "{definitions.description_processing_unreliable_data}"
+        display:
+          name: Unemployment rate (<<sex>> - <<classif1>>)
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      sdg_8_5_2_unemployment_rate_by_disability_status:
+        title: SDG 8.5.2 Unemployment rate by disability status - <<sex>> - <<classif1>>
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of the labor force without work, but available for and seeking employment, among people with disabilities.
+        description_key:
+          - "{definitions.description_key_disability_status}"
+        processing_level: major
+        description_processing: "{definitions.description_processing_unreliable_data}"
+        display:
+          name: Unemployment rate by disability status (<<sex>> - <<classif1>>)
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      sdg_8_6_1_youth_neet:
+        title: SDG 8.6.1 Proportion of youth (aged 15-24) not in education, employment or training (NEET) - <<sex>>
+        unit: "%"
+        short_unit: "%"
+        description_short: Number of young persons not in education, employment or training as a percentage of the total youth population
+        processing_level: major
+        description_processing: "{definitions.description_processing_unreliable_data}"
+        display:
+          name: Proportion of youth (aged 15-24) not in education, employment or training (NEET) - <<sex>>
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      sdg_8_7_1_children_engaged_in_economic_activity:
+        title: SDG 8.7.1 Proportion of children engaged in economic activity - <<sex>> - <<classif1>>
+        unit: "%"
+        short_unit: "%"
+        description_short: Proportion of children who are either working at an age that is too young for them to be employed, or doing work that —by its nature or conditions— is likely to harm their health, safety, or morals.
+        description_key:
+          - "{definitions.description_key_child_labor_economic_activity}"
+        processing_level: major
+        description_processing: "{definitions.description_processing_unreliable_data}"
+        display:
+          name: Proportion of children engaged in economic activity - <<sex>> - <<classif1>>
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      sdg_8_7_1_children_engaged_in_economic_activity_and_household_chores:
+        title: SDG 8.7.1 Proportion of children engaged in economic activity and household chores - <<sex>> - <<classif1>>
+        unit: "%"
+        short_unit: "%"
+        description_short: Proportion of children who are either working at an age that is too young for them to be employed, or doing work that —by its nature or conditions— is likely to harm their health, safety, or morals.
+        description_key:
+          - "{definitions.description_key_child_labor}"
+        processing_level: major
+        description_processing: "{definitions.description_processing_unreliable_data}"
+        display:
+          name: Proportion of children engaged in economic activity and household chores - <<sex>> - <<classif1>>
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      sdg_8_8_1_fatal_occupational_injuries:
+        title: SDG 8.8.1 Fatal occupational injuries per 100,000 workers - <<sex>> - <<classif1>>
+        unit: "fatal injuries per 100,000 workers"
+        short_unit: ""
+        description_short: Rate of fatal occupational injuries per 100,000 workers in the reference group
+        description_key:
+          - "{definitions.description_key_occupational_injury}"
+          - "{definitions.description_key_fatal_occupational_injury}"
+          - "{definitions.description_key_occupational_injury_reference_group}"
+        processing_level: major
+        description_processing: "{definitions.description_processing_unreliable_data}"
+        display:
+          name: Fatal occupational injuries per 100,000 workers - <<sex>> - <<classif1>>
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      sdg_8_8_1_non_fatal_occupational_injuries:
+        title: SDG 8.8.1 Non-fatal occupational injuries per 100,000 workers - <<sex>> - <<classif1>>
+        unit: "non-fatal injuries per 100,000 workers"
+        short_unit: ""
+        description_short: Rate of non-fatal occupational injuries per 100,000 workers in the reference group
+        description_key:
+          - "{definitions.description_key_occupational_injury}"
+          - "{definitions.description_key_occupational_injury_reference_group}"
+        display:
+          name: Non-fatal occupational injuries per 100,000 workers - <<sex>> - <<classif1>>
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      sdg_8_8_2_national_compliance_labour_rights:
+        title: SDG 8.8.2 Level of national compliance with labor rights
+        unit: ""
+        short_unit: ""
+        description_short: Level of national compliance with fundamental rights at work (freedom of association and collective bargaining), in a scale from 0 to 10. Higher values indicate higher levels of compliance.
+        description_key:
+          - "{definitions.description_key_facb}"
+        display:
+          name: Level of national compliance with labor rights
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      sdg_8_b_1_national_strategy_youth_employment:
+        title: SDG 8.b.1 Existence of a developed and operationalized national strategy for youth employment
+        unit: ""
+        short_unit: ""
+        description_short: Level of development and implementation of a national strategy for youth employment, in a scale from 0 to 3. 0 means no strategy exists, and 3 means that the strategy is developed and operationalized.
+        description_key:
+          - "{definitions.description_key_national_strategy_youth_employment}"
+        display:
+          name: Existence of a developed and operationalized national strategy for youth employment
+          numDecimalPlaces: 0
+          <<: *common_display
+
+      sdg_9_2_2_manufacturing_employment:
+        title: SDG 9.2.2 Manufacturing employment as a proportion of total employment
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of the total employment in manufacturing activities.
+        description_key:
+          - "{definitions.description_key_manufacturing_employment}"
+        processing_level: major
+        description_processing: "{definitions.description_processing_unreliable_data}"
+        display:
+          name: Manufacturing employment as a proportion of total employment
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      sdg_10_4_1_labour_income_share:
+        title: SDG 10.4.1 Labor income share as a percent of GDP
+        unit: "%"
+        short_unit: "%"
+        description_short: Total compensation of employees and labor income of the self-employed as a percentage of GDP.
+        description_key:
+          - "{definitions.description_key_labor_income_share}"
+        display:
+          name: Labor income share as a percent of GDP
+          numDecimalPlaces: 1
+          <<: *common_display
+
+  regions:
+    variables:
+      ilo_region:
+        title: ILO region
+        unit: ""
+        short_unit: ""
+        description_short: World regions as defined by the International Labour Organization (ILO).
+        display:
+          name: ILO region
+
+      ilo_subregion:
+        title: ILO subregion
+        unit: ""
+        short_unit: ""
+        description_short: World subregions as defined by the International Labour Organization (ILO).
+        display:
+          name: ILO subregion

@@ -6,16 +6,19 @@ references:
 
 import json
 import time
+import uuid
 from datetime import datetime
 from typing import cast
 
 import pytz
 import streamlit as st
 from pydantic_core import to_json
-from structlog import get_logger
 
-from apps.wizard.app_pages.expert_agent.agent import agent_stream2, recommender_agent
+from apps.wizard.app_pages.expert_agent.agent import recommender_agent, run_agent_stream
+from apps.wizard.app_pages.expert_agent.media import display_generated_plots
+from apps.wizard.app_pages.expert_agent.stream import set_status_container
 from apps.wizard.app_pages.expert_agent.utils import (
+    MODEL_DEFAULT,
     MODELS_AVAILABLE_LIST,
     MODELS_DISPLAY,
     estimate_llm_cost,
@@ -29,8 +32,6 @@ st.set_page_config(
     layout="centered",
 )
 
-# LOG
-log = get_logger()
 
 # Config
 AVATAR_PERSON = ":material/person:"
@@ -42,10 +43,8 @@ load_env()
 st.session_state.setdefault("expert_config", {})
 st.session_state.setdefault("agent_messages", [])
 st.session_state.setdefault("recommended_question", None)
+st.session_state.setdefault("mapping_messages_question_id", {})
 # st.session_state.setdefault("expert_use_mcp", True)
-# Models
-## See all of them in https://github.com/pydantic/pydantic-ai/blob/master/pydantic_ai_slim/pydantic_ai/models/__init__.py
-MODEL_DEFAULT = "openai:gpt-5-mini"
 
 
 ##################################################################
@@ -138,7 +137,7 @@ def show_reasoning_details_dialog():
 def show_debugging_details():
     messages = _load_history_messages()
     config = st.session_state.get("expert_config", {})
-    mcp_use = st.session_state.get("expert_use_mcp", None)
+    # mcp_use = st.session_state.get("expert_use_mcp", None)
     usage = st.session_state.get("last_usage", {})
     if usage != {}:
         usage = to_json(usage)
@@ -146,7 +145,7 @@ def show_debugging_details():
 
     data = {
         "model_config": config,
-        "mcp_use": mcp_use,
+        # "mcp_use": mcp_use,
         "num_messages": len(messages),
         "messages": messages,
         "usage": usage,
@@ -163,8 +162,16 @@ def show_debugging_details():
     )
 
 
-def register_message_history():
+def register_message_history(question_id: str):
+    # Update message history
     agent_messages = [msg for msg in st.session_state["agent_result"].new_messages()]
+
+    # Update mapping of messages to question_id
+    for msg in agent_messages:
+        if hasattr(msg, "kind") and msg.kind == "response":
+            # Keep only response messages
+            st.session_state["mapping_messages_question_id"][str(msg.provider_response_id)] = question_id
+
     ## TEST: only keep user/system prompts and final responses
     # filtered_messages = []
     # for msg in agent_messages:
@@ -195,6 +202,7 @@ def build_history_chat():
                         {
                             "kind": "user",
                             "content": part["content"],
+                            "provider_response_id": None,
                         }
                     )
             elif (kind == "response") and (part_kind == "text"):
@@ -203,6 +211,7 @@ def build_history_chat():
                         {
                             "kind": "assistant",
                             "content": part["content"],
+                            "provider_response_id": message.get("provider_response_id", None),
                         }
                     )
     return chat_history
@@ -210,10 +219,21 @@ def build_history_chat():
 
 def show_history_chat():
     chat_history = build_history_chat()
+    shown_plots = set()
     for message in chat_history:
         avatar = AVATAR_PERSON if message["kind"] == "user" else None
         with st.chat_message(message["kind"], avatar=avatar):
             st.markdown(message["content"])
+
+            # Show plots / code if applicable
+            response_id = message["provider_response_id"]
+            if (response_id in st.session_state["mapping_messages_question_id"]) and (response_id not in shown_plots):
+                # Get question ID
+                question_id = st.session_state["mapping_messages_question_id"][str(response_id)]
+                # Plot relevant files
+                display_generated_plots(question_id)
+                # Add to shown plots
+                shown_plots.add(response_id)
 
 
 def show_settings_menu():
@@ -228,12 +248,12 @@ def show_settings_menu():
             # on_change=lambda: st.session_state.setdefault("expert_config", {}).update({"model_name": st.session_state["expert_model_name"]}),
         )
         st.session_state["expert_config"]["model_name"] = model_name
-    st.toggle(
-        label="Use OWID mcp",
-        value=True,
-        key="expert_use_mcp",
-        help="Use MCPs to access and interact with OWID's data. :material/warning: Note: This feature is new, disable it if you are experiencing any issues.",
-    )
+    # st.toggle(
+    #     label="Use OWID mcp",
+    #     value=True,
+    #     key="expert_use_mcp",
+    #     help="Use MCPs to access and interact with OWID's data. :material/warning: Note: This feature is new, disable it if you are experiencing any issues.",
+    # )
     with st.container(horizontal=True, vertical_alignment="bottom"):
         st.button(
             label=":material/clear_all: Clear chat",
@@ -269,20 +289,23 @@ def show_suggestions():
 ##################################################################
 # Title
 container = st.container(
-    horizontal=True, horizontal_alignment="left", vertical_alignment="center", width="stretch", border=False
+    horizontal=True, horizontal_alignment="left", vertical_alignment="bottom", width="stretch", border=False
 )
 with container:
     ## Title/subtitle
-    st.title(":rainbow[:material/smart_toy:] Expert")
+    with st.container():
+        st.title(":rainbow[:material/smart_toy:] Expert")
+        # st.caption("Expert can make mistakes")
     # st.badge("agent mode", color="primary")
     # Settings
+    st.badge("**beta** preview", color="orange")
     model_name = MODELS_DISPLAY.get(st.session_state.get("expert_model_name", MODEL_DEFAULT))
     with st.popover(f"{model_name}", icon=":material/settings:", help="Model settings"):
         show_settings_menu()
 
 # Arrange chat input
 prompt = st.chat_input(
-    placeholder="Ask anything",
+    placeholder="Ask anything. ⚠ Expert can make mistakes. Sessions are logged for quality purposes.",
 )
 
 if st.session_state["recommended_question"]:
@@ -307,19 +330,35 @@ if prompt:
         # )
         start_time = time.time()
 
-        # Agent to work, and stream its output
-        stream = agent_stream2(
-            prompt,
-            model_name=st.session_state["expert_config"]["model_name"],
-            message_history=st.session_state["agent_messages"],
-        )
+        # Generate unique question ID for this conversation turn
+        question_id = f"chat_q_{uuid.uuid4().hex[:8]}"
+
+        # Create status container for tool activity
+        status_container = st.status("Agent is working...", expanded=False)
+
+        # Set up the status container for tool messages
+        set_status_container(status_container)
+
+        # Get stream (with question_id for plot generation)
+        stream = run_agent_stream(prompt, structured=False, question_id=question_id)
+
+        # Present stream
         st.session_state.response = cast(
             str,
             st.write_stream(stream),
         )
 
+        # Check for generated plots and display them
+        display_generated_plots(question_id)
+
+        # Update status to complete
+        status_container.update(label="Agent completed", state="complete")
+
         response_time = time.time() - start_time
         print("finished asking LLM...")
+
+        # Clear the status container reference
+        set_status_container(None)
 
         # Show usage and reasoning details
         container_summary = st.container(border=True)
@@ -340,9 +379,9 @@ if prompt:
                         width="stretch",
                     ):
                         show_reasoning_details_dialog()
-                    show_debugging_details()
+                    # show_debugging_details()
             ## Add messages to history
-            register_message_history()
+            register_message_history(question_id)
 
     # Get recommendations
     try:

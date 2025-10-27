@@ -18,13 +18,13 @@ meta:
     # Files
     url_main: https://www.ncei.noaa.gov/access/monitoring/enso/sst
     url_download: https://www.cpc.ncep.noaa.gov/data/indices/sstoi.indices
-    date_accessed: '2025-08-07'
+    date_accessed: '2025-10-07'
 
     # License
     license:
       name: CC BY 4.0
       url: https://gml.noaa.gov/about/disclaimer.html
 outs:
-  - md5: a0021d8f1cc8d768f1b3214125bd2b06
-    size: 43766
+  - md5: bb9a4c3fd69a67979f8fbed2789fe504
+    size: 43896
     path: sst.csv

@@ -55,22 +55,6 @@ steps:
   data://meadow/usda_ers/2025-03-26/food_expenditure_in_us_archive:
     - snapshot://usda_ers/2025-03-26/food_expenditure_in_us_archive.xlsx
   #
-  # Food prices for nutrition - World Bank based on FAO.
-  #
-  data://meadow/wb/2024-09-09/food_prices_for_nutrition:
-    - snapshot://wb/2024-09-09/food_prices_for_nutrition.csv
-  #
-  # Food prices for nutrition - World Bank based on FAO.
-  #
-  data://garden/wb/2024-09-09/food_prices_for_nutrition:
-    - data://meadow/wb/2024-09-09/food_prices_for_nutrition
-    - data://garden/worldbank_wdi/2024-05-20/wdi
-  #
-  # Food prices for nutrition - World Bank based on FAO.
-  #
-  data://grapher/wb/2024-09-09/food_prices_for_nutrition:
-    - data://garden/wb/2024-09-09/food_prices_for_nutrition
-  #
   # Agriculture - Long-run daily calorie supply per person.
   #
   data://garden/agriculture/2025-03-26/daily_calories_per_person:
@@ -188,6 +172,21 @@ steps:
   data://grapher/agriculture/2025-07-30/long_term_food_and_agriculture_trends:
     - data://garden/agriculture/2025-07-30/long_term_food_and_agriculture_trends
   #
+  # Food prices for nutrition - World Bank based on FAO.
+  #
+  data://meadow/wb/2025-08-04/food_prices_for_nutrition:
+    - snapshot://wb/2025-08-04/food_prices_for_nutrition.csv
+  #
+  # Food prices for nutrition - World Bank based on FAO.
+  #
+  data://garden/wb/2025-08-04/food_prices_for_nutrition:
+    - data://meadow/wb/2025-08-04/food_prices_for_nutrition
+  #
+  # Food prices for nutrition - World Bank based on FAO.
+  #
+  data://grapher/wb/2025-08-04/food_prices_for_nutrition:
+    - data://garden/wb/2025-08-04/food_prices_for_nutrition
+  #
   # Decoupling of agricultural production and land use
   #
   data://garden/agriculture/2025-08-06/decoupling_food_production_and_land_use:
@@ -197,3 +196,34 @@ steps:
     - data://garden/demography/2024-07-15/population
   data://grapher/agriculture/2025-08-06/decoupling_food_production_and_land_use:
     - data://garden/agriculture/2025-08-06/decoupling_food_production_and_land_use
+  #
+  # Lobell Lab: Crop productivity in southern Africa
+  #
+  data://meadow/agriculture/2025-10-15/crop_yields_in_southern_africa:
+    - snapshot://agriculture/2025-10-15/crop_yields_in_southern_africa.zip
+  #
+  # Lobell Lab: Crop productivity in southern Africa
+  #
+  data://garden/agriculture/2025-10-15/crop_yields_in_southern_africa:
+    - data://meadow/agriculture/2025-10-15/crop_yields_in_southern_africa
+  #
+  # Lobell Lab: Crop productivity in southern Africa
+  #
+  data://grapher/agriculture/2025-10-15/crop_yields_in_southern_africa:
+    - data://garden/agriculture/2025-10-15/crop_yields_in_southern_africa
+  #
+  # USDA/FAS - Corn yields
+  #
+  data://meadow/agriculture/2025-10-16/corn_yields:
+    - snapshot://agriculture/2025-10-16/corn_yields.xls
+  #
+  # USDA/FAS - Corn yields
+  #
+  data://garden/agriculture/2025-10-16/corn_yields:
+    - data://meadow/agriculture/2025-10-16/corn_yields
+    - data://garden/regions/2023-01-01/regions
+  #
+  # USDA/FAS - Corn yields
+  #
+  data://grapher/agriculture/2025-10-16/corn_yields:
+    - data://garden/agriculture/2025-10-16/corn_yields

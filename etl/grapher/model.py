@@ -389,6 +389,7 @@ class ChartConfig(Base):
     updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime, onupdate=func.current_timestamp())
 
     chartss: Mapped[List["Chart"]] = relationship("Chart", back_populates="chart_config")
+    explorer_viewss: Mapped[list["ExplorerView"]] = relationship("ExplorerView", back_populates="chart_config")
 
 
 class Chart(Base):
@@ -1968,6 +1969,7 @@ class Explorer(Base):
     updatedAt: Mapped[Optional[datetime]] = mapped_column(
         DateTime, server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     )
+    explorer_viewss: Mapped[list["ExplorerView"]] = relationship("ExplorerView", back_populates="explorer")
 
     # isPublished is a virtual column and depends `isPublished\tTrue` string in TSV, it'll be soon treated
     #   as a real column
@@ -1976,6 +1978,9 @@ class Explorer(Base):
     )
     # TODO: this field is set by the mirror_explorers.py in automation, it'll be soon moved elsewhere
     config: Mapped[dict] = mapped_column(JSON)
+    configMd5: Mapped[str] = mapped_column(
+        CHAR(24, "utf8mb4_0900_as_cs"), Computed("(to_base64(unhex(md5(`config`))))", persisted=True), nullable=False
+    )
 
     @classmethod
     def load_explorer(
@@ -1991,6 +1996,33 @@ class Explorer(Base):
     def load_explorers(cls, session: Session, columns: Optional[List[str]] = None) -> List["Explorer"]:
         execute = session.execute if columns else session.scalars
         return execute(_select_columns(cls, columns)).all()  # type: ignore
+
+
+class ExplorerView(Base):
+    __tablename__ = "explorer_views"
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ["chartConfigId"], ["chart_configs.id"], ondelete="CASCADE", name="fk_explorer_views_chart_config_id"
+        ),
+        ForeignKeyConstraint(
+            ["explorerSlug"],
+            ["explorers.slug"],
+            ondelete="CASCADE",
+            onupdate="CASCADE",
+            name="fk_explorer_views_explorer_slug",
+        ),
+        Index("fk_explorer_views_chart_config_id", "chartConfigId"),
+        Index("fk_explorer_views_explorer_slug", "explorerSlug"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    explorerSlug: Mapped[str] = mapped_column(String(255, "utf8mb4_0900_as_cs"))
+    explorerView: Mapped[dict] = mapped_column(JSON)
+    chartConfigId: Mapped[Optional[str]] = mapped_column(CHAR(36, "utf8mb4_0900_as_cs"))
+    error: Mapped[Optional[str]] = mapped_column(TEXT(collation="utf8mb4_0900_as_cs"))
+
+    chart_config: Mapped[Optional["ChartConfig"]] = relationship("ChartConfig", back_populates="explorer_viewss")
+    explorer: Mapped["Explorer"] = relationship("Explorer", back_populates="explorer_viewss")
 
 
 def _json_is(json_field: Any, key: str, val: Any) -> Any:

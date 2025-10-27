@@ -12,7 +12,7 @@ import streamlit as st
 
 from apps.wizard.app_pages.producer_analytics.utils import GRAPHERS_BASE_URL, MIN_DATE, TODAY
 from apps.wizard.utils.components import st_cache_data
-from etl.analytics import get_visualizations_using_data_by_producer
+from etl.analytics.data import get_visualizations_using_data_by_producer
 from etl.google import read_gbq
 
 

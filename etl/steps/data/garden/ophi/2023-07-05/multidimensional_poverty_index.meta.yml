@@ -24,7 +24,7 @@ all_sources:
   - dissagregated: &source-dissagregated
       name: |
         {source_common.name}
-      published_by: Alkire, S., Kanagaratnam, U., and Suppa, N. (2023), 'The global Multidimensional Poverty Index (MPI) 2023. Dissagregation Results and Methodological Note', OPHI MPI Methodological Note 56, Oxford Poverty and Human Development Initiative, University of Oxford.
+      published_by: Alkire, S., Kanagaratnam, U., and Suppa, N. (2023), 'The global Multidimensional Poverty Index (MPI) 2023. Disaggregation Results and Methodological Note', OPHI MPI Methodological Note 56, Oxford Poverty and Human Development Initiative, University of Oxford.
       url: |
         {source_common.url}
       date_accessed: "{source_common.date_accessed}"

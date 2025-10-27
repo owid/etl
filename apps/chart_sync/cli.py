@@ -11,7 +11,13 @@ from rich_click.rich_command import RichCommand
 from sqlalchemy.orm import Session
 
 from apps.chart_sync.admin_api import AdminAPI
-from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiff, ChartDiffsLoader, configs_are_equal
+from apps.wizard.app_pages.chart_diff.chart_diff import (
+    ChartDiff,
+    ChartDiffsLoader,
+    configs_are_equal,
+    get_deleted_charts,
+    tags_are_equal,
+)
 from apps.wizard.utils import get_staging_creation_time
 from etl import config
 from etl.config import OWIDEnv, get_container_name
@@ -85,7 +91,7 @@ def cli(
 
     **Considerations on tags:**
 
-    - Tags are synced only for **_new charts_**, any edits to tags in existing charts are ignored.
+    - Tags are synced for both **_new and existing charts_**.
 
     **Example 1:** Run chart-sync in dry-run mode to see what charts will be updated
 
@@ -135,9 +141,10 @@ def cli(
         with Session(target_engine) as target_session:
             # Get all chart diffs between source and target
             # NOTE: We're creating two paris of sessions here, it'd be nicer to only create a single one
-            cd_loader = ChartDiffsLoader(source_engine, target_engine)
+            cd_loader = ChartDiffsLoader(source_engine, target_engine, chart_ids=[chart_id] if chart_id else None)
             chart_diffs = cd_loader.get_diffs(
                 config=True,
+                tags=True,
                 metadata=False,
                 data=False,
                 source_session=source_session,
@@ -191,10 +198,18 @@ def cli(
                 # Get user who edited the chart
                 user_id = diff.source_chart.lastEditedByUserId
 
+                # Get source chart tags (needed for both new and existing charts)
+                source_tags = diff.source_chart.tags(source_session)
+
                 # Chart in target exists, update it
                 if diff.target_chart:
-                    # Configs are equal, no need to update
-                    if configs_are_equal(migrated_config, diff.target_chart.config):
+                    # Check if configs and tags are equal
+                    target_tags = diff.target_chart.tags(target_session)
+                    configs_equal = configs_are_equal(migrated_config, diff.target_chart.config)
+                    tags_equal = tags_are_equal(source_tags, target_tags)
+
+                    # Skip if both configs and tags are equal
+                    if configs_equal and tags_equal:
                         log.info(
                             "chart_sync.skip",
                             slug=diff.target_chart.slug,
@@ -209,6 +224,7 @@ def cli(
                         charts_synced += 1
                         if not dry_run:
                             target_api.update_chart(chart_id, migrated_config, user_id=user_id)
+                            target_api.set_tags(chart_id, source_tags, user_id=user_id)
 
                     # Rejected chart diff
                     elif diff.is_rejected:
@@ -230,14 +246,12 @@ def cli(
 
                 # Chart is new, create it
                 else:
-                    chart_tags = diff.source_chart.tags(source_session)
-
                     # New chart has been approved
                     if diff.is_approved:
                         charts_synced += 1
                         if not dry_run:
                             resp = target_api.create_chart(migrated_config, user_id=user_id)
-                            target_api.set_tags(resp["chartId"], chart_tags, user_id=user_id)
+                            target_api.set_tags(resp["chartId"], source_tags, user_id=user_id)
                         else:
                             resp = {"chartId": None}
                         log.info(
@@ -264,6 +278,14 @@ def cli(
 
             # Sync DoDs
             dods_synced = _sync_dods(source_session, target_session, target_api, dry_run, SERVER_CREATION_TIME)
+
+            # Check for deleted charts and notify
+            deleted_charts = get_deleted_charts(source_session, target_session)
+            if deleted_charts:
+                log.info(
+                    "chart_sync.deleted_charts", count=len(deleted_charts), chart_ids=[c["id"] for c in deleted_charts]
+                )
+                _notify_slack_deleted_charts(deleted_charts, str(source), dry_run)
 
     if charts_synced > 0:
         print(f"\n[bold green]Charts synced: {charts_synced}[/bold green]")
@@ -318,6 +340,35 @@ DoD "{dod_name}" has been updated in production after staging server was created
 *Staging Updated*: {str(source_updated_at)} UTC
 *Production Updated*: {str(target_updated_at)} UTC
 *Staging Created*: {str(server_creation_time)} UTC
+    """.strip()
+
+    print(message)
+
+    if config.SLACK_API_TOKEN and not dry_run:
+        send_slack_message(channel="#data-architecture-github", message=message)
+
+
+def _notify_slack_deleted_charts(deleted_charts: list[dict], source: str, dry_run: bool) -> None:
+    """Notify about deleted charts via Slack."""
+    chart_count = len(deleted_charts)
+    chart_word = "chart" if chart_count == 1 else "charts"
+
+    # Build list of deleted charts for the message
+    chart_list = "\n".join(
+        [
+            f"• Chart {chart['id']}: `{chart['slug']}` - <https://admin.owid.io/admin/charts/{chart['id']}/edit|View on Production>"
+            for chart in deleted_charts
+        ]
+    )
+
+    message = f"""
+:warning: *ETL chart-sync: {chart_count} Deleted {chart_word.title()} Detected* from `{source}`
+
+The following {chart_word} exist(s) in production but not in staging and may have been deleted:
+
+{chart_list}
+
+chart-sync doesn't delete charts. Make sure to delete them from production if this was intentional.
     """.strip()
 
     print(message)

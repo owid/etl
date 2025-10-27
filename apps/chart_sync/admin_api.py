@@ -220,7 +220,7 @@ def create_session_id(owid_env: OWIDEnv, grapher_user_id: int) -> str:
 
 def requests_with_retry() -> requests.Session:
     s = requests.Session()
-    retries = Retry(total=5, backoff_factor=1, status_forcelist=[502])
+    retries = Retry(total=5, backoff_factor=1, status_forcelist=[502, 504])
     s.mount("http://", HTTPAdapter(max_retries=retries))
     s.mount("https://", HTTPAdapter(max_retries=retries))
     return s

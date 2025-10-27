@@ -160,13 +160,13 @@ sections:
         entrypoint: app_pages/harmonizer/app.py
         icon: ":material/music_note:"
         image_url: "https://www.shutterstock.com/image-vector/abstract-vector-musical-background-music-260nw-485443810.jpg"
-      - title: "Dataset preview"
-        alias: datasets
-        description: "Preview datasets and their indicators"
-        maintainer: "@lucas"
-        entrypoint: app_pages/dataset_preview/app.py
-        icon: ":material/search:"
-        image_url: "https://upload.wikimedia.org/wikipedia/commons/c/c3/NGC_4414_%28NASA-med%29.jpg"
+      # - title: "Dataset preview"
+      #   alias: datasets
+      #   description: "Preview datasets and their indicators"
+      #   maintainer: "@lucas"
+      #   entrypoint: app_pages/dataset_preview/app.py
+      #   icon: ":material/search:"
+      #   image_url: "https://upload.wikimedia.org/wikipedia/commons/c/c3/NGC_4414_%28NASA-med%29.jpg"
       - title: "Producer analytics"
         alias: producer-analytics
         description: "Share analytics with data producers"
@@ -259,6 +259,15 @@ sections:
         entrypoint: app_pages/owidle.py
         icon: ":material/videogame_asset:"
         image_url: "https://t3.ftcdn.net/jpg/06/26/23/36/360_F_626233679_tesiSRP9Jinq5wS0ZgbdJ6k5adupmgKl.jpg"
+      - title: "Servers Dashboard"
+        alias: servers-dashboard
+        entrypoint: app_pages/servers_dashboard/app.py
+        description: Real-time monitoring of our LXC staging servers
+        maintainer: "@mojmir"
+        icon: ":material/computer:"
+        image_url: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
+        disable:
+          staging: true
 
   # - title: "Metadata"
   #   description: |-

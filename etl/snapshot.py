@@ -10,6 +10,7 @@ from typing import Any, Callable, Dict, Iterator, Optional, Union, cast
 
 import owid.catalog.processing as pr
 import pandas as pd
+import requests
 import structlog
 import yaml
 from deprecated import deprecated
@@ -26,6 +27,7 @@ from owid.catalog.meta import (
 from owid.datautils import dataframes
 from owid.datautils.io import decompress_file
 from owid.repack import to_safe_types
+from tenacity import Retrying, retry_if_exception_type, stop_after_attempt, wait_exponential
 
 from etl import config, download_helpers, paths
 from etl.download_helpers import DownloadCorrupted
@@ -98,7 +100,7 @@ class Snapshot:
                 f"Checksum mismatch for {self.path}: expected {md5}, got {downloaded_md5}. It is possible that download got interrupted."
             )
 
-    def pull(self, force=True) -> None:
+    def pull(self, force=True, retries: int = 1) -> None:
         """Pull file from S3."""
         if not force and not self.is_dirty():
             return
@@ -106,7 +108,18 @@ class Snapshot:
         assert len(self.metadata.outs) == 1, ".dvc file is missing 'outs' field. Have you run the snapshot?"
         expected_md5 = self.metadata.outs[0]["md5"]
 
-        self._download_dvc_file(expected_md5)
+        if retries > 1:
+            for attempt in Retrying(
+                retry=retry_if_exception_type(
+                    (requests.exceptions.HTTPError, requests.exceptions.ChunkedEncodingError, DownloadCorrupted)
+                ),
+                stop=stop_after_attempt(retries),
+                wait=wait_exponential(multiplier=1, min=1, max=10),
+            ):
+                with attempt:
+                    self._download_dvc_file(expected_md5)
+        else:
+            self._download_dvc_file(expected_md5)
 
         expected_size = self.metadata.outs[0]["size"]
         downloaded_size = self.path.stat().st_size
@@ -344,6 +357,45 @@ class Snapshot:
         """Read parquet file into a Table and populate it with metadata."""
         return pr.read_parquet(
             self.path, *args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs
+        )
+
+    def read_custom(self, read_function: Callable, *args, **kwargs) -> Table:
+        """Read data file using a custom reader function, and return a Table with metadata.
+
+        Use this method when standard read methods (read_csv, read_excel, etc.) don't meet
+        your needs. The custom function receives the snapshot file path and should return
+        a pandas DataFrame or compatible data structure.
+
+        Parameters
+        ----------
+        read_function : Callable
+            Custom function to read the data. Must accept a file path as first argument
+            and return a DataFrame or Table.
+        *args
+            Additional positional arguments to pass to read_function.
+        **kwargs
+            Additional keyword arguments to pass to read_function.
+
+        Returns
+        -------
+        Table
+            Data read by the custom function as a Table with snapshot metadata.
+
+        Examples
+        --------
+        Read a table from an HTML file:
+
+        ```python
+        tb = snap.read_custom(read_function=lambda x: pd.read_html(x)[0])
+        ```
+        """
+        return pr.read_custom(
+            filepath_or_buffer=self.path,
+            read_function=read_function,
+            *args,
+            metadata=self.to_table_metadata(),
+            origin=self.metadata.origin,
+            **kwargs,
         )
 
     # Methods to deal with archived files
