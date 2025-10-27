@@ -8,7 +8,7 @@ from etl.helpers import PathFinder
 paths = PathFinder(__file__)
 
 # Define the original base year of the deflator.
-BASE_DOLLAR_YEAR_ORIGINAL = 2015
+BASE_DOLLAR_YEAR_ORIGINAL = 2017
 # Define the base year for the deflator.
 BASE_DOLLAR_YEAR = 2023
 # We use the WDI GDP deflator, but this is usually missing for the latest year.
@@ -20,7 +20,9 @@ BASE_DOLLAR_YEAR = 2023
 # then below, in "Units", select from the dropdown "Index (Scale value to 100 for chosen date)",
 # in the "or" field below, add the base year of the original WDI deflator (which, in the last update, was 2015).
 # NOTE: I used 2015-07-01, unsure if it should be some other day in the year, but the retrieved numbers for previous years coincided well with the given WDI values.
-DEFLATOR_MISSING_VALUES = {2024: 128.7}
+# DEFLATOR_MISSING_VALUES = {2024: 128.7}
+# NOTE: WDI has been updated with 2024 data, so no missing values now.
+DEFLATOR_MISSING_VALUES = {}
 
 
 def deflate_prices(tb: Table, tb_wdi: Table) -> Table:

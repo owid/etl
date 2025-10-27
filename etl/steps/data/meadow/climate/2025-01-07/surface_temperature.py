@@ -7,7 +7,6 @@ import geopandas as gpd
 import numpy as np
 import pandas as pd
 import pyproj
-import rioxarray as rxr
 import xarray as xr
 from owid.catalog import Table
 from rioxarray.exceptions import NoDataInBounds, OneDimensionalRaster
@@ -43,10 +42,7 @@ def _load_data_array(snap: Snapshot) -> xr.DataArray:
     da = da["t2m"] - 273.15
 
     # Set the coordinate reference system for the temperature data to EPSG 4326.
-    # NOTE: export_grid_mapping is set to False to avoid error
-    # ValueError: Invalid value supplied 'WktVersion.WKT2_2019'. Only ('WKT2_2015', 'WKT2_2015_SIMPLIFIED', 'WKT2_2018', 'WKT2_2018_SIMPLIFIED', 'WKT2_2019', 'WKT2_2019_SIMPLIFIED', 'WKT1_GDAL', 'WKT1_ESRI') are supported.
-    with rxr.set_options(export_grid_mapping=False):
-        da = da.rio.write_crs("EPSG:4326")
+    da = da.rio.write_crs("EPSG:4326")
 
     return da
 

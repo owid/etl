@@ -14,3 +14,18 @@ steps:
   #
   data://grapher/survey/2025-03-04/dietary_choices_uk:
     - data://garden/survey/2025-03-04/dietary_choices_uk
+  #
+  # Bryant Research - Acceptability of UK Farming Practices.
+  #
+  data-private://meadow/survey/2025-09-12/acceptability_of_uk_farming_practices:
+    - snapshot-private://survey/2025-09-12/acceptability_of_uk_farming_practices.xlsx
+  #
+  # Bryant Research - Acceptability of UK Farming Practices.
+  #
+  data-private://garden/survey/2025-09-12/acceptability_of_uk_farming_practices:
+    - data-private://meadow/survey/2025-09-12/acceptability_of_uk_farming_practices
+  #
+  # Bryant Research - Acceptability of UK Farming Practices.
+  #
+  data-private://grapher/survey/2025-09-12/acceptability_of_uk_farming_practices:
+    - data-private://garden/survey/2025-09-12/acceptability_of_uk_farming_practices

@@ -182,6 +182,7 @@ GROUPS = (
             "name": "Charts",
             "commands": {
                 "chart-sync": "apps.chart_sync.cli.cli",
+                "approve": "apps.chart_approval.cli.cli",
             },
         },
         {

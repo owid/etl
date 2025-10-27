@@ -405,7 +405,8 @@ def prepare_display_dataframe(df: pd.DataFrame) -> pd.DataFrame:
 
 def reset_mysql_database(server_name: str) -> Tuple[bool, str]:
     """
-    Reset the MySQL database for a staging server by running 'make refresh' in owid-grapher.
+    Reset the MySQL database for a staging server by running 'make refresh' in owid-grapher
+    and pruning associated R2 files.
 
     Args:
         server_name: Full server name (e.g., staging-site-branch-name)
@@ -414,30 +415,93 @@ def reset_mysql_database(server_name: str) -> Tuple[bool, str]:
         Tuple of (success, message)
     """
     try:
-        # SSH into the server and run make refresh in owid-grapher directory
-        # Disable host key checking for staging servers since they're ephemeral
-        cmd = f"ssh -o StrictHostKeyChecking=no owid@{server_name} 'cd owid-grapher && make refresh'"
-        log.info("Resetting MySQL database via make refresh", command=cmd, server=server_name)
+        # First, prune R2 files for this server
+        log.info("Pruning R2 files", server=server_name)
+        r2_cmd = f"rclone purge r2:owid-api-staging/{server_name} --fast-list --transfers 64 --checkers 64"
+        log.info("Executing R2 purge command", command=r2_cmd, server=server_name)
 
-        result = subprocess.run(
-            cmd,
+        r2_result = subprocess.run(
+            r2_cmd,
             shell=True,
             capture_output=True,
             text=True,
-            timeout=1800,  # 30 minute timeout for make refresh (can take very long)
+            timeout=300,  # 5 minute timeout for R2 purge
         )
 
-        if result.returncode != 0:
-            error_msg = f"MySQL reset failed with return code {result.returncode}: {result.stderr}"
-            log.error("MySQL reset failed", error=error_msg, server=server_name, stdout=result.stdout)
+        if r2_result.returncode != 0:
+            # Log warning but continue with MySQL reset - R2 purge failure shouldn't block DB reset
+            log.warning(
+                "R2 purge failed but continuing with MySQL reset",
+                error=r2_result.stderr,
+                server=server_name,
+                stdout=r2_result.stdout,
+            )
+        else:
+            log.info("R2 files successfully purged", server=server_name)
+
+        # SSH into the server and run commands in parallel
+        # Disable host key checking for staging servers since they're ephemeral
+        mysql_cmd = f"ssh -o StrictHostKeyChecking=no owid@{server_name} 'cd owid-grapher && make refresh'"
+        rsync_cmd = f"ssh -o StrictHostKeyChecking=no owid@{server_name} 'rsync -az --stats owid@staging-site-master:/home/owid/etl/data/ /home/owid/etl/data/'"
+
+        log.info("Executing MySQL reset and rsync in parallel", server=server_name)
+
+        # Start both processes in parallel
+        processes = {
+            "mysql": subprocess.Popen(mysql_cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True),
+            "rsync": subprocess.Popen(rsync_cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True),
+        }
+
+        # Wait for both processes with timeout handling
+        results = {}
+        timeout_seconds = 1800  # 30 minutes
+
+        for name, process in processes.items():
+            try:
+                stdout, stderr = process.communicate(timeout=timeout_seconds)
+                results[name] = {"returncode": process.returncode, "stdout": stdout, "stderr": stderr}
+            except subprocess.TimeoutExpired:
+                process.kill()
+                stdout, stderr = process.communicate()
+                log.warning(f"{name} timed out", server=server_name)
+                results[name] = {
+                    "returncode": -1,
+                    "stdout": stdout,
+                    "stderr": f"{name} timed out after {timeout_seconds // 60} minutes",
+                }
+                # If MySQL times out, kill other processes and fail
+                if name == "mysql":
+                    for other_name, other_process in processes.items():
+                        if other_name != name:
+                            other_process.kill()
+                    return False, f"MySQL reset timed out after {timeout_seconds // 60} minutes"
+
+        # Check MySQL result (critical)
+        mysql_result = results["mysql"]
+        if mysql_result["returncode"] != 0:
+            error_msg = f"MySQL reset failed with return code {mysql_result['returncode']}: {mysql_result['stderr']}"
+            log.error("MySQL reset failed", error=error_msg, server=server_name, stdout=mysql_result["stdout"])
             return False, error_msg
 
-        success_msg = f"MySQL database successfully refreshed for {server_name}"
+        # Check rsync result (non-critical)
+        rsync_result = results["rsync"]
+        if rsync_result["returncode"] != 0:
+            log.warning(
+                "rsync failed but MySQL refresh completed successfully",
+                error=rsync_result["stderr"],
+                server=server_name,
+                stdout=rsync_result["stdout"],
+            )
+            success_msg = f"MySQL database successfully refreshed for {server_name} (rsync from master failed)"
+        else:
+            log.info("ETL data successfully synced from master", server=server_name)
+            success_msg = f"MySQL database successfully refreshed and ETL data synced for {server_name}"
+
         log.info("MySQL reset completed", server=server_name)
         return True, success_msg
 
     except subprocess.TimeoutExpired:
-        error_msg = "MySQL reset timed out after 30 minutes"
+        error_msg = "Unexpected timeout in MySQL reset"
         log.error("MySQL reset timeout", server=server_name)
         return False, error_msg
     except Exception as e:

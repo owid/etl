@@ -50,17 +50,17 @@ tables:
       weekly_cases_rolling:
         title: Cases (7-day rolling)
         unit: 'cases'
-        description_short: Number of cases of COVID-19 in the preceeding 7 days.
+        description_short: Number of cases of COVID-19 in the preceding 7 days.
       weekly_cases_rolling_normalized:
         title: Cases (7-day rolling, normalized)
-        description_short: Number of cases of COVID-19 in the preceeding 7 days. Normalized by the maximum number of weekly cases.
+        description_short: Number of cases of COVID-19 in the preceding 7 days. Normalized by the maximum number of weekly cases.
         unit: 'cases'
         display:
           numDecimalPlaces: 2
           <<: *zero_day
       weekly_cases_rate:
         title: Case rate (7-day rolling)
-        description_short: Number of cases of COVID-19 in the preceeding 7 days, per 100,000 people.
+        description_short: Number of cases of COVID-19 in the preceding 7 days, per 100,000 people.
         unit: 'cases per 100,000 people'
         display:
           numDecimalPlaces: 1
@@ -100,18 +100,18 @@ tables:
 
       weekly_deaths_rolling:
         title: Deaths (weekly, 7-day average)
-        description_short: Number of deaths due to COVID-19 in the preceeding 7 days. Smoothed by averaging with a 7-day rolling-window.
+        description_short: Number of deaths due to COVID-19 in the preceding 7 days. Smoothed by averaging with a 7-day rolling-window.
         unit: 'deaths'
       weekly_deaths_rolling_normalized:
         title: Deaths (weekly, 7-day average, normalized)
-        description_short: Number of deaths due to COVID-19 in the preceeding 7 days. Smoothed by averaging with a 7-day rolling-window. Normalized by the maximum number of weekly deaths.
+        description_short: Number of deaths due to COVID-19 in the preceding 7 days. Smoothed by averaging with a 7-day rolling-window. Normalized by the maximum number of weekly deaths.
         unit: ''
         display:
           numDecimalPlaces: 2
           <<: *zero_day
       weekly_deaths_rate:
         title: Death rate (7-day rolling)
-        description_short: Number of deaths due to COVID-19 in the preceeding 7 days, per 100,000 people.
+        description_short: Number of deaths due to COVID-19 in the preceding 7 days, per 100,000 people.
         unit: ''
         display:
           numDecimalPlaces: 1

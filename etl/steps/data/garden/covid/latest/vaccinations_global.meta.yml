@@ -514,7 +514,7 @@ tables:
       # Cumnulative, absolute, interpolated
       total_vaccinations_no_boosters_interpolated:
         title: Initial doses (cumulative, interpolated)
-        description_short: Total number of inital doses. Total number of COVID-19 vaccination intial doses administered (doses administered as prescribed by the initial vaccination protocol).
+        description_short: Total number of initial doses. Total number of COVID-19 vaccination initial doses administered (doses administered as prescribed by the initial vaccination protocol).
         unit: doses
         display:
           name: Initial protocol doses
@@ -524,7 +524,7 @@ tables:
       # Cumulative, per-capita, interpolated
       total_vaccinations_no_boosters_per_hundred_interpolated:
         title: Initial doses (cumulative, interpolated, per hundred)
-        description_short: Total number of inital doses. Total number of COVID-19 vaccination intial doses administered (doses administered as prescribed by the initial vaccination protocol).
+        description_short: Total number of initial doses. Total number of COVID-19 vaccination initial doses administered (doses administered as prescribed by the initial vaccination protocol).
         unit: doses
         display:
           name: Initial protocol doses (per 100)

@@ -110,7 +110,9 @@ class Snapshot:
 
         if retries > 1:
             for attempt in Retrying(
-                retry=retry_if_exception_type(requests.exceptions.HTTPError),
+                retry=retry_if_exception_type(
+                    (requests.exceptions.HTTPError, requests.exceptions.ChunkedEncodingError, DownloadCorrupted)
+                ),
                 stop=stop_after_attempt(retries),
                 wait=wait_exponential(multiplier=1, min=1, max=10),
             ):
@@ -355,6 +357,45 @@ class Snapshot:
         """Read parquet file into a Table and populate it with metadata."""
         return pr.read_parquet(
             self.path, *args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs
+        )
+
+    def read_custom(self, read_function: Callable, *args, **kwargs) -> Table:
+        """Read data file using a custom reader function, and return a Table with metadata.
+
+        Use this method when standard read methods (read_csv, read_excel, etc.) don't meet
+        your needs. The custom function receives the snapshot file path and should return
+        a pandas DataFrame or compatible data structure.
+
+        Parameters
+        ----------
+        read_function : Callable
+            Custom function to read the data. Must accept a file path as first argument
+            and return a DataFrame or Table.
+        *args
+            Additional positional arguments to pass to read_function.
+        **kwargs
+            Additional keyword arguments to pass to read_function.
+
+        Returns
+        -------
+        Table
+            Data read by the custom function as a Table with snapshot metadata.
+
+        Examples
+        --------
+        Read a table from an HTML file:
+
+        ```python
+        tb = snap.read_custom(read_function=lambda x: pd.read_html(x)[0])
+        ```
+        """
+        return pr.read_custom(
+            filepath_or_buffer=self.path,
+            read_function=read_function,
+            *args,
+            metadata=self.to_table_metadata(),
+            origin=self.metadata.origin,
+            **kwargs,
         )
 
     # Methods to deal with archived files

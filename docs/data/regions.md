@@ -3,8 +3,7 @@
 ## Description of the dataset
 This dataset contains useful information about the countries and regions of OWID datasets.
 
-There are no `snapshot` or `meadow` steps for this data, only a `garden` step.
-We could consider creating a `grapher` step to feed the charts on [the region](https://ourworldindata.org/world-region-map-definitions) definitions page](https://ourworldindata.org/world-region-map-definitions).
+There are no `snapshot` or `meadow` steps for this data, only a `garden` and a `grapher` step. The latter feeds the charts on [the region definitions page](https://ourworldindata.org/world-region-map-definitions).
 
 All tables in the dataset are indexed by `code`, which is defined as the ISO alpha-3 code, when it exists, and otherwise as a custom OWID code. For example, since Europe doesn't have an ISO code, it has the code `OWID_EUR`. There are no specific rules for how to define these custom codes, but as a guideline:
 
@@ -48,10 +47,98 @@ Tables contained in the `regions` dataset:
     * `end_year`: Last year the historical region existed.
     * `successor`: Country that existed (from `end_year` on) in the same geographical space as the historical region.
 
+## Working with regions data in ETL steps
+
+The `Regions` class provides convenient methods for working with the regions dataset. In ETL steps, you can access this object through `paths.regions` (where `paths` is an instance of `PathFinder`).
+
+### Accessing region information
+
+Query region data programmatically:
+
+```python
+# Get region members
+regions = Regions()
+regions.get_region("Europe")["members"]
+
+# Get multiple regions with their members
+regions.get_regions(["Africa", "High-income countries"], only_members=True)
+```
+
+### Country harmonization
+
+Harmonize country names in your data to match OWID's standardized country names:
+
+```python
+# Run interactive harmonizer to create mapping file
+paths.regions.harmonizer(tb)
+
+# Apply harmonization using the created mapping file
+tb = paths.regions.harmonize_names(tb)
+```
+
+### Region aggregation
+
+Add region aggregates (continents, income groups, World) to your data:
+
+```python
+# Simple region aggregation
+tb = paths.regions.add_aggregates(tb)
+
+# Custom regions with custom aggregation with specific regions and aggregation methods
+tb = paths.regions.add_aggregates(
+    tb,
+    regions={
+        "Asia": {},  # No need to define anything, since it is a default region.
+        "Asia excluding China": {  # Custom region that must be defined based on other known regions and countries.
+            "additional_regions": ["Asia"],
+            "excluded_members": ["China"],
+        },
+        "High-income countries": {},
+    },
+    aggregations={"population": "sum", "gdp": "mean_weighted_by_population"}
+)
+```
+
+Note that we have a custom aggregate method `mean_weighted_by_X` which creates a mean weighted by `X`, where `X` is a given column in the table. If `X` is `population`, and it's not in the table, it will be added automatically (if so, the population dataset needs to be among the dependencies of the current data step).
+
+### Per capita calculations
+
+Create per capita indicators for your data:
+
+```python
+# Add per capita indicators for all numeric columns
+tb = paths.regions.add_per_capita(tb)
+
+# Add per capita indicators for specific columns
+tb = paths.regions.add_per_capita(tb, columns=["gdp", "co2_emissions"])
+
+# Only include countries that have data (useful for regional aggregates)
+tb = paths.regions.add_per_capita(
+    tb,
+    columns=["gdp"],
+    only_informed_countries_in_regions=True
+)
+```
+
+### Multi-operation workflows
+
+For better performance when doing both aggregation and per capita calculations:
+
+```python
+# Create aggregator for efficient multi-operation workflow
+agg = paths.regions.aggregator(regions=["World"], aggregations={"gdp": "sum"})
+tb = agg.add_aggregates(tb)
+tb = agg.add_per_capita(tb, columns=["gdp"])
+```
+
+!!! tip "Advanced usage"
+
+    For more advanced features of `Regions` and `RegionAggregator`, like region overlap detection and custom region definitions, see the docstrings of the `Regions` class in `etl/data_helpers/geo.py`.
+
+
 ## How to make changes to the dataset
 
 New aliases and short names can be added to the dataset without creating a new dataset version. For that, we can use the `harmonize` tool in `etl`.
-TODO: Close issue: https://github.com/owid/etl/issues/845
 
 For any other type of change to the dataset:
 

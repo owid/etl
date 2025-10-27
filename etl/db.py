@@ -1,7 +1,7 @@
 import functools
 import os
 import warnings
-from typing import Any, Dict, Optional
+from typing import Any, Dict, NoReturn, Optional
 from urllib.parse import quote
 
 import pandas as pd
@@ -10,12 +10,37 @@ import structlog
 from deprecated import deprecated
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
-from sqlalchemy.exc import PendingRollbackError
+from sqlalchemy.exc import OperationalError, PendingRollbackError
 from sqlalchemy.orm import Session
 
 from etl import config
+from etl.exceptions import StagingServerUnavailable
 
 log = structlog.get_logger()
+
+
+def _handle_connection_error(e: OperationalError) -> NoReturn:
+    """Handle database connection errors and raise more informative exceptions."""
+    error_msg = str(e)
+
+    # Check if it's a staging server connection issue
+    if "Can't connect to MySQL server" in error_msg or "Temporary failure in name resolution" in error_msg:
+        # Extract the host from config
+        host = config.DB_HOST
+
+        # Check if it's a staging server
+        if host and host.startswith("staging-site-"):
+            raise StagingServerUnavailable(
+                f"Cannot connect to staging server '{host}'.\n\n"
+                f"This usually happens when:\n"
+                f"  • The PR is old and the staging server has been stopped/removed\n"
+                f"  • The staging server hasn't been provisioned yet\n"
+                f"  • There are network connectivity issues\n\n"
+                f"Original error: {error_msg}"
+            ) from e
+
+    # Re-raise the original error if it's not a staging server issue
+    raise e
 
 
 def can_connect(conf: Optional[Dict[str, Any]] = None) -> bool:
@@ -73,25 +98,28 @@ def read_sql(sql: str, engine: Optional[Engine | Session] = None, *args, **kwarg
     engine = engine or get_engine()
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", UserWarning)
-        if isinstance(engine, Engine):
-            with engine.connect() as con:
+        try:
+            if isinstance(engine, Engine):
+                with engine.connect() as con:
+                    try:
+                        return pd.read_sql(sql, con, *args, **kwargs)
+                    except PendingRollbackError as e:
+                        # Rollback and retry
+                        log.error("PendingRollbackError occurred", error=str(e))
+                        con.rollback()
+                        return pd.read_sql(sql, con, *args, **kwargs)
+            elif isinstance(engine, Session):
                 try:
-                    return pd.read_sql(sql, con, *args, **kwargs)
+                    return pd.read_sql(sql, engine.bind, *args, **kwargs)
                 except PendingRollbackError as e:
                     # Rollback and retry
                     log.error("PendingRollbackError occurred", error=str(e))
-                    con.rollback()
-                    return pd.read_sql(sql, con, *args, **kwargs)
-        elif isinstance(engine, Session):
-            try:
-                return pd.read_sql(sql, engine.bind, *args, **kwargs)
-            except PendingRollbackError as e:
-                # Rollback and retry
-                log.error("PendingRollbackError occurred", error=str(e))
-                engine.rollback()
-                return pd.read_sql(sql, engine.bind, *args, **kwargs)
-        else:
-            raise ValueError(f"Unsupported engine type {type(engine)}")
+                    engine.rollback()
+                    return pd.read_sql(sql, engine.bind, *args, **kwargs)
+            else:
+                raise ValueError(f"Unsupported engine type {type(engine)}")
+        except OperationalError as e:
+            _handle_connection_error(e)
 
 
 def to_sql(df: pd.DataFrame, name: str, engine: Optional[Engine | Session] = None, *args, **kwargs):
@@ -101,13 +129,16 @@ def to_sql(df: pd.DataFrame, name: str, engine: Optional[Engine | Session] = Non
     engine = engine or get_engine()
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", UserWarning)
-        if isinstance(engine, Engine):
-            with engine.connect() as con:
-                return df.to_sql(name, con, *args, **kwargs)
-        elif isinstance(engine, Session):
-            return df.to_sql(name, engine.bind, *args, **kwargs)
-        else:
-            raise ValueError(f"Unsupported engine type {type(engine)}")
+        try:
+            if isinstance(engine, Engine):
+                with engine.connect() as con:
+                    return df.to_sql(name, con, *args, **kwargs)
+            elif isinstance(engine, Session):
+                return df.to_sql(name, engine.bind, *args, **kwargs)
+            else:
+                raise ValueError(f"Unsupported engine type {type(engine)}")
+        except OperationalError as e:
+            _handle_connection_error(e)
 
 
 def production_or_master_engine() -> Engine:
