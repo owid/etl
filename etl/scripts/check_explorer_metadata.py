@@ -20,11 +20,11 @@ import pandas as pd
 from anthropic.types import TextBlock
 from rich import print as rprint
 from rich.console import Console
-from rich.progress import Progress, SpinnerColumn, TextColumn
-from rich.table import Table
+from rich.progress import BarColumn, Progress, SpinnerColumn, TaskProgressColumn, TextColumn
 from rich_click.rich_command import RichCommand
 from structlog import get_logger
 
+from etl.config import OWID_ENV
 from etl.db import read_sql
 from etl.paths import BASE_DIR
 
@@ -44,6 +44,81 @@ def get_codespell_path() -> Path | None:
     if venv_codespell.exists():
         return venv_codespell
     return None
+
+
+def build_explorer_url(explorer_slug: str, dimensions: dict[str, Any]) -> str:
+    """Build URL for explorer view with dimensions.
+
+    Args:
+        explorer_slug: Explorer slug (e.g., 'air-pollution')
+        dimensions: Dictionary of dimension key-value pairs
+
+    Returns:
+        Full URL to the explorer view with properly encoded query parameters
+    """
+    from urllib.parse import urlencode
+
+    base_url = OWID_ENV.site or "https://ourworldindata.org"
+    url = f"{base_url}/explorers/{explorer_slug}"
+
+    if dimensions:
+        # Filter out empty values and build query string with proper encoding
+        params = {k: v for k, v in dimensions.items() if v}
+        if params:
+            url += "?" + urlencode(params)
+
+    return url
+
+
+def get_text_context(text: str, typo: str, context_words: int = 10) -> str:
+    """Extract context around a typo in text.
+
+    Args:
+        text: Full text containing the typo
+        typo: The typo to find
+        context_words: Number of words to show before and after
+
+    Returns:
+        Context string with typo highlighted
+    """
+    # Find the typo in text (case insensitive)
+    text_lower = text.lower()
+    typo_lower = typo.lower()
+    pos = text_lower.find(typo_lower)
+
+    if pos == -1:
+        # If not found, return first N chars
+        return text[:200] + ("..." if len(text) > 200 else "")
+
+    # Split into words
+    words = text.split()
+
+    # Find which word contains the typo
+    char_count = 0
+    typo_word_idx = -1
+    for i, word in enumerate(words):
+        if char_count <= pos < char_count + len(word) + 1:  # +1 for space
+            typo_word_idx = i
+            break
+        char_count += len(word) + 1
+
+    if typo_word_idx == -1:
+        return text[:200] + ("..." if len(text) > 200 else "")
+
+    # Get context words
+    start_idx = max(0, typo_word_idx - context_words)
+    end_idx = min(len(words), typo_word_idx + context_words + 1)
+
+    context_words_list = words[start_idx:end_idx]
+    context = " ".join(context_words_list)
+
+    # Add ellipsis if truncated
+    if start_idx > 0:
+        context = "..." + context
+    if end_idx < len(words):
+        context = context + "..."
+
+    return context
 
 
 def run_codespell_on_text(text: str) -> list[dict[str, str]]:
@@ -200,20 +275,29 @@ def check_typos_in_view(view: dict[str, Any]) -> list[dict[str, Any]]:
     """
     issues = []
     chart_config = json.loads(view["chart_config"]) if view["chart_config"] else {}
+    dimensions = json.loads(view["dimensions"]) if view["dimensions"] else {}
+
+    # Get view title and URL
+    view_title = chart_config.get("title", "")
+    view_url = build_explorer_url(view["explorerSlug"], dimensions)
 
     # Check title
     title = chart_config.get("title", "")
     if title:
         typos = run_codespell_on_text(title)
         for typo in typos:
+            context = get_text_context(title, typo["typo"])
             issues.append(
                 {
                     "view_id": view["id"],
                     "explorer_slug": view["explorerSlug"],
+                    "view_title": view_title,
+                    "view_url": view_url,
                     "issue_type": "typo",
                     "severity": "warning",
                     "field": "title",
                     "text": title,
+                    "context": context,
                     "typo": typo["typo"],
                     "correction": typo["correction"],
                     "explanation": f"Typo in title: '{typo['typo']}' should be '{typo['correction']}'",
@@ -225,14 +309,18 @@ def check_typos_in_view(view: dict[str, Any]) -> list[dict[str, Any]]:
     if subtitle:
         typos = run_codespell_on_text(subtitle)
         for typo in typos:
+            context = get_text_context(subtitle, typo["typo"])
             issues.append(
                 {
                     "view_id": view["id"],
                     "explorer_slug": view["explorerSlug"],
+                    "view_title": view_title,
+                    "view_url": view_url,
                     "issue_type": "typo",
                     "severity": "warning",
                     "field": "subtitle",
                     "text": subtitle,
+                    "context": context,
                     "typo": typo["typo"],
                     "correction": typo["correction"],
                     "explanation": f"Typo in subtitle: '{typo['typo']}' should be '{typo['correction']}'",
@@ -244,14 +332,18 @@ def check_typos_in_view(view: dict[str, Any]) -> list[dict[str, Any]]:
     if note:
         typos = run_codespell_on_text(note)
         for typo in typos:
+            context = get_text_context(note, typo["typo"])
             issues.append(
                 {
                     "view_id": view["id"],
                     "explorer_slug": view["explorerSlug"],
+                    "view_title": view_title,
+                    "view_url": view_url,
                     "issue_type": "typo",
                     "severity": "warning",
                     "field": "note",
                     "text": note,
+                    "context": context,
                     "typo": typo["typo"],
                     "correction": typo["correction"],
                     "explanation": f"Typo in note: '{typo['typo']}' should be '{typo['correction']}'",
@@ -274,14 +366,18 @@ def check_typos_in_view(view: dict[str, Any]) -> list[dict[str, Any]]:
             if var_text:
                 typos = run_codespell_on_text(str(var_text))
                 for typo in typos:
+                    context = get_text_context(str(var_text), typo["typo"])
                     issues.append(
                         {
                             "view_id": view["id"],
                             "explorer_slug": view["explorerSlug"],
+                            "view_title": view_title,
+                            "view_url": view_url,
                             "issue_type": "typo",
                             "severity": "warning",
                             "field": field_name,
                             "text": str(var_text)[:100],  # Truncate for display
+                            "context": context,
                             "typo": typo["typo"],
                             "correction": typo["correction"],
                             "explanation": f"Typo in {field_label.lower()}: '{typo['typo']}' → '{typo['correction']}'",
@@ -578,32 +674,36 @@ def display_issues(issues: list[dict[str, Any]], output_format: str = "table") -
 
         rprint(f"\n[bold {color}]{category}:[/bold {color}]")
 
-        table = Table(show_header=True, header_style=f"bold {color}")
-        table.add_column("View ID", style="cyan", width=8)
-        table.add_column("Explorer", style="cyan", width=20)
-        table.add_column("Type", style="magenta", width=15)
-        table.add_column("Issue", width=60)
-
-        for issue in issues_list:
+        # Print each issue with full details
+        for i, issue in enumerate(issues_list, 1):
             issue_type = issue.get("issue_type", "unknown")
-            explanation = issue.get("explanation", "")
+            view_title = issue.get("view_title", "Untitled")
+            view_url = issue.get("view_url", "")
+            field = issue.get("field", "unknown")
+            context = issue.get("context", issue.get("text", ""))
 
-            # Add field information if available
-            if "field" in issue:
-                explanation = f"[{issue['field']}] {explanation}"
+            # Print issue header with embedded clickable link
+            if view_url:
+                # Embed link in title for clickable terminal support
+                rprint(f"\n[bold]{i}. [link={view_url}]{view_title}[/link][/bold]")
+                # Also show the URL for copy-paste
+                # rprint(f"   [dim]{view_url}[/dim]")
+            else:
+                rprint(f"\n[bold]{i}. {view_title}[/bold]")
 
-            # Add typo details if available
+            # Print issue details
             if issue_type == "typo":
-                explanation = f"{issue.get('typo', '')} → {issue.get('correction', '')}"
-
-            table.add_row(
-                str(issue.get("view_id", "")),
-                issue.get("explorer_slug", "")[:20],
-                issue_type,
-                explanation[:60],
-            )
-
-        console.print(table)
+                typo = issue.get("typo", "")
+                correction = issue.get("correction", "")
+                rprint(f"   [yellow]Field:[/yellow] {field}")
+                rprint(f"   [yellow]Typo:[/yellow] '{typo}' → '{correction}'")
+                rprint(f"   [yellow]Context:[/yellow] {context}")
+            else:
+                explanation = issue.get("explanation", "")
+                rprint(f"   [yellow]Type:[/yellow] {issue_type}")
+                rprint(f"   [yellow]Issue:[/yellow] {explanation}")
+                if context:
+                    rprint(f"   [yellow]Context:[/yellow] {context}")
 
 
 @click.command(cls=RichCommand)
@@ -719,10 +819,18 @@ def main(
 
     # Check typos
     if not skip_typos:
-        rprint("[bold]Checking for typos...[/bold]")
-        for view in views:
-            issues = check_typos_in_view(view)
-            all_issues.extend(issues)
+        with Progress(
+            SpinnerColumn(),
+            TextColumn("[progress.description]{task.description}"),
+            BarColumn(),
+            TaskProgressColumn(),
+            console=console,
+        ) as progress:
+            task = progress.add_task("[cyan]Checking for typos...", total=len(views))
+            for view in views:
+                issues = check_typos_in_view(view)
+                all_issues.extend(issues)
+                progress.advance(task)
         rprint(f"[green]✓ Found {len([i for i in all_issues if i['issue_type'] == 'typo'])} typo issues[/green]\n")
 
     # Check semantic issues
