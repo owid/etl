@@ -81,14 +81,23 @@ def get_text_context(text: str, typo: str, context_words: int = 10) -> str:
     Returns:
         Context string with typo highlighted
     """
-    # Find the typo in text (case insensitive)
-    text_lower = text.lower()
-    typo_lower = typo.lower()
-    pos = text_lower.find(typo_lower)
+    # Find the typo in text as a whole word (case insensitive)
+    import re
 
-    if pos == -1:
-        # If not found, return first N chars
-        return text[:200] + ("..." if len(text) > 200 else "")
+    # Search for typo as a whole word using word boundaries
+    pattern = r"\b" + re.escape(typo) + r"\b"
+    match = re.search(pattern, text, re.IGNORECASE)
+
+    if not match:
+        # If not found as whole word, try substring match
+        text_lower = text.lower()
+        typo_lower = typo.lower()
+        pos = text_lower.find(typo_lower)
+        if pos == -1:
+            # If still not found, return first N chars
+            return text[:200] + ("..." if len(text) > 200 else "")
+    else:
+        pos = match.start()
 
     # Split into words
     words = text.split()
@@ -207,13 +216,20 @@ def run_codespell_batch(views: list[dict[str, Any]]) -> dict[int, list[dict[str,
             left = parts[0].strip()
             correction = parts[1].strip()
 
-            # Extract file path and typo
+            # Extract file path, line number, and typo
             file_parts = left.rsplit(":", 2)
             if len(file_parts) < 3:
                 continue
 
             file_path = file_parts[0]
+            line_num = file_parts[1]
             typo = file_parts[2].strip()
+
+            # Parse line number
+            try:
+                line_num_int = int(line_num)
+            except ValueError:
+                continue
 
             # Extract view_id and field from filename
             filename = Path(file_path).name
@@ -246,8 +262,14 @@ def run_codespell_batch(views: list[dict[str, Any]]) -> dict[int, list[dict[str,
                         field_name = fname
                     break
 
-            # Get context
-            context = get_text_context(text, typo)
+            # Get context from the specific line where the typo was found
+            text_lines = text.split("\n")
+            if 1 <= line_num_int <= len(text_lines):
+                typo_line = text_lines[line_num_int - 1]
+                context = get_text_context(typo_line, typo)
+            else:
+                # Fallback to searching entire text if line number is out of range
+                context = get_text_context(text, typo)
 
             # Get view details
             view = next((v for v in views if v["id"] == view_id), None)
