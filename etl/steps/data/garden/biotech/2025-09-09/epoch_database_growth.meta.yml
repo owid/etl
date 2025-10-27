@@ -84,6 +84,6 @@ tables:
         description_short: |-
           Total number of entries in the [UniProtKB/Swiss-Prot database](#dod:uniprotkb). UniProtKB/Swiss-Prot is a database that stores protein sequences and functional information, explaining both how a protein is built and what it does in a biological context. The Swiss-Prot database is manually curated and includes only experimentally verified information.
         description_key:
-          - The [UniProt Knowledgebase (UniProtKB)](https://www.uniprot.org/uniprotkb) is a high-quality database of protein sequence and functional information. The entries for each protein explain both is built and what it does in a biological context.
+          - The [UniProt Knowledgebase (UniProtKB)](https://www.uniprot.org/uniprotkb) is a high-quality database of protein sequence and functional information. The entries for each protein explain both how it is built and what it does in a biological context.
           - The Swiss-Prot section of UniProtKB is manually curated and contains only experimentally verified information. Each entry is reviewed and annotated by expert curators to ensure accuracy and consistency.
           - UniProtKB is freely accessible and widely used by researchers, educators, and students worldwide for various purposes, including scientific research, drug discovery, and education.
