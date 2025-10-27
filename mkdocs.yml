@@ -282,6 +282,10 @@ nav:
               - Example API usage: "api/example-usage.md"
               - Querying data via Datasette: "api/datasette.md"
               - Maintenance: "api/maintenance.md"
+      - Data documentation:
+              - "data/index.md"
+              - FAOSTAT: "data/faostat.md"
+              - Regions: "data/regions.md"
       - Technical publications:
               - "analyses/index.md"
               - Does the news reflect what we die from?: "analyses/media_deaths/methodology.md"
