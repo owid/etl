@@ -87,6 +87,8 @@ make watch
 
 ## Changelog
 
+- `v0.4.3`
+  - Fixed minor bugs
 - `v0.4.0`
   - **Highlights**
     - Support for Python 3.10-3.13 (was 3.11-3.13)

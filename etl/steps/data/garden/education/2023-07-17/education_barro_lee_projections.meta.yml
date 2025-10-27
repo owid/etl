@@ -99,7 +99,7 @@ tables:
           numDecimalPlaces: 1
 
       female_over_male_share_with_no_education:
-        title: Share of populaton with no education gender ratio, 15-64 year olds
+        title: Share of population with no education gender ratio, 15-64 year olds
         description_processing: *description_processing
         unit: ratio
         display:
@@ -107,7 +107,7 @@ tables:
           numDecimalPlaces: 1
 
       female_over_male_share_some_formal_education:
-        title: Share of populaton with some formal education gender ratio, 15-64 year olds
+        title: Share of population with some formal education gender ratio, 15-64 year olds
         description_processing: *description_processing
         unit: ratio
         display:

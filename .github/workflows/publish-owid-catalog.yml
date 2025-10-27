@@ -1,6 +1,11 @@
 name: Publish owid-catalog
 
 on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'lib/catalog/pyproject.toml'
   workflow_dispatch:
     inputs:
       reason:
@@ -13,6 +18,25 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
+      with:
+        fetch-depth: 2  # Need previous commit to detect version changes
+
+    - name: Check if version was bumped
+      run: |
+        # Get the version line from current and previous commit
+        CURRENT_VERSION=$(grep '^version = ' lib/catalog/pyproject.toml | head -1)
+        PREVIOUS_VERSION=$(git show HEAD~1:lib/catalog/pyproject.toml | grep '^version = ' | head -1)
+
+        echo "Current version: $CURRENT_VERSION"
+        echo "Previous version: $PREVIOUS_VERSION"
+
+        if [ "$CURRENT_VERSION" = "$PREVIOUS_VERSION" ]; then
+          echo "❌ Version was not bumped in lib/catalog/pyproject.toml"
+          echo "Please increment the version before publishing."
+          exit 1
+        fi
+
+        echo "✅ Version was bumped, proceeding with publish"
 
     - name: Set up Python
       uses: actions/setup-python@v2
