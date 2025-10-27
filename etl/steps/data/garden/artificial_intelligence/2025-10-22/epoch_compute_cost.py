@@ -31,13 +31,10 @@ def run(dest_dir: str) -> None:
 
     # Standardize domain names.
     tb["domain"] = tb["domain"].astype(str)
-    replacements = {
-        "Language,Image generation": "Language and image generation",
-    }
-    for old_value, new_value in replacements.items():
-        tb.loc[tb["domain"].str.contains(old_value, na=False), "domain"] = new_value
-
-    # Add metadata to publication_date column.
+    # Convert any domain containing "Multimodal" to just "Multimodal".
+    tb.loc[tb["domain"].str.contains("Multimodal", na=False), "domain"] = "Multimodal"
+    # Convert "Language,Image generation" to "Language and image generation".
+    tb.loc[tb["domain"] == "Language,Image generation", "domain"] = "Multimodal"
     tb["publication_date"].metadata.origins = tb["cost__inflation_adjusted"].metadata.origins
 
     # Format table with index columns.
