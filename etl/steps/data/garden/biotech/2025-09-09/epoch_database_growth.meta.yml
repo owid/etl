@@ -66,7 +66,7 @@ tables:
         description_short: |-
           Total number of sequences reported in [GenBank](#dod:genbank). A nucleotide sequence encodes the genetic information of an organism. Nucleotide sequences in GenBank include DNA and RNA sequences from various organisms, such as viruses, bacteria, plants, and animals.
         description_key:
-          - "[GenBank](https://www.ncbi.nlm.nih.gov/genbank/) is a comprehensive public database of RNA and DNA sequences (nucleotides) maintained by the National Center for Biotechnology Information (NCBI)."
+          - "[GenBank](https://www.ncbi.nlm.nih.gov/genbank/) is a comprehensive public database of RNA and DNA sequences maintained by the National Center for Biotechnology Information (NCBI)."
           - Nucleotide sequences in GenBank include DNA and RNA sequences from various organisms, such as viruses, bacteria, plants, and animals.
           - Sequences are submitted to GenBank by researchers worldwide. Submissions are reviewed and annotated by NCBI staff to ensure accuracy and consistency, but scientific accuracy is the responsibility of the submitter.
           - GenBank is part of the International Nucleotide Sequence Database Collaboration (INSDC), which also includes the DNA Data Bank of Japan (DDBJ) and the European Nucleotide Archive (ENA). These databases share data daily to ensure global access to nucleotide sequence information.
