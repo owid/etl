@@ -31,13 +31,13 @@ tables:
 
         coronary_angiography_and_diagnostic_cardiac_catheterization__per_million_people:
           title: Coronary angiography and diagnostic cardiac catheterization per million people
-          description_short: Number of coronary angiographies, a technique for visualizing heart vessels, and diagnostic cardiac catheterizations, a procedure for examining heart health, per million people in the population.
+          description_short: Number of [coronary angiographies](#dod:coronary-angiography), a technique for visualizing heart vessels, and [diagnostic cardiac catheterizations](#dod:cardiac-catheterization), a procedure for examining heart health, per million people in the population.
           display:
             numDecimalPlaces: 0
 
         coronary_stents__per_million_people:
           title: Coronary stents per million people
-          description_short: Number of coronary stent implantations, which are devices that open and support blocked arteries to improve heart blood flow, per million people in the population.
+          description_short: Number of [coronary stent](#dod:stent) implantations, which are devices that open and support blocked arteries to improve heart blood flow, per million people in the population.
           display:
             numDecimalPlaces: 0
 
@@ -60,8 +60,8 @@ tables:
             numDecimalPlaces: 0
 
         hospitals_with_dedicated_hf_centers__per_million_people:
-          title: Hospitals with dedicated heart failure (HF) centers per million people
-          description_short: Number of hospitals with dedicated heart failure (HF) centers, per million people in the population.
+          title: Hospitals with dedicated heart failure centers per million people
+          description_short: Number of hospitals with dedicated heart failure centers, per million people in the population.
           display:
             numDecimalPlaces: 1
 
@@ -91,6 +91,6 @@ tables:
 
         percutaneous_aortic_valve_implantation__tavi__per_million_people:
           title: Percutaneous aortic valve implantation (TAVI) per million people
-          description_short: Number of percutaneous aortic valve implantation (TAVI) procedures, per million people in the population.
+          description_short: Number of [percutaneous aortic valve implantation (TAVI)](#dod:percutaneous-aortic-valve-implantations) procedures, per million people in the population.
           display:
             numDecimalPlaces: 0
