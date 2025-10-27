@@ -180,8 +180,14 @@ def run_codespell_batch(views: list[dict[str, Any]]) -> dict[int, list[dict[str,
                     view_files[view_id].append((field_name, file_path, text))
 
         # Run codespell once on the entire directory
+        # Check if .codespell-ignore.txt exists
+        ignore_file = BASE_DIR / ".codespell-ignore.txt"
+        cmd = [str(codespell_path), temp_dir]
+        if ignore_file.exists():
+            cmd.extend(["--ignore-words", str(ignore_file)])
+
         result = subprocess.run(
-            [str(codespell_path), temp_dir],
+            cmd,
             capture_output=True,
             text=True,
         )
