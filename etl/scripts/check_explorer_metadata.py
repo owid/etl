@@ -617,6 +617,52 @@ Respond ONLY with a JSON array of issues, or an empty array [] if no issues foun
     return all_issues
 
 
+def group_similar_issues(issues: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Group similar issues together (same explorer, field, and context).
+
+    Args:
+        issues: List of issue dictionaries
+
+    Returns:
+        List of grouped issues with count information
+    """
+    from collections import defaultdict
+
+    # Group issues by (explorer_slug, field, typo, correction, context)
+    groups = defaultdict(list)
+    for issue in issues:
+        if issue.get("issue_type") == "typo":
+            # Group key for typos
+            key = (
+                issue.get("explorer_slug", ""),
+                issue.get("field", ""),
+                issue.get("typo", ""),
+                issue.get("correction", ""),
+                issue.get("context", "")[:200],  # First 200 chars of context
+            )
+        else:
+            # For non-typo issues, use explanation
+            key = (
+                issue.get("explorer_slug", ""),
+                issue.get("issue_type", ""),
+                issue.get("explanation", ""),
+            )
+
+        groups[key].append(issue)
+
+    # Create grouped issues with count
+    grouped_issues = []
+    for group in groups.values():
+        # Take the first issue as representative
+        representative = group[0].copy()
+        # Add count information
+        representative["group_count"] = len(group)
+        representative["group_views"] = [issue.get("view_title", "") for issue in group]
+        grouped_issues.append(representative)
+
+    return grouped_issues
+
+
 def display_issues(issues: list[dict[str, Any]], output_format: str = "table") -> None:
     """Display issues in specified format.
 
@@ -637,13 +683,18 @@ def display_issues(issues: list[dict[str, Any]], output_format: str = "table") -
         print(df.to_csv(index=False))
         return
 
+    # Group similar issues
+    grouped_issues = group_similar_issues(issues)
+
     # Group by severity and issue type
-    critical = [i for i in issues if i.get("severity") == "critical"]
-    warnings = [i for i in issues if i.get("severity") == "warning"]
-    info = [i for i in issues if i.get("severity") == "info"]
+    critical = [i for i in grouped_issues if i.get("severity") == "critical"]
+    warnings = [i for i in grouped_issues if i.get("severity") == "warning"]
+    info = [i for i in grouped_issues if i.get("severity") == "info"]
 
     # Display summary
-    rprint(f"\n[bold]Found {len(issues)} total issues:[/bold]")
+    total_original = len(issues)
+    total_grouped = len(grouped_issues)
+    rprint(f"\n[bold]Found {total_original} total issues ({total_grouped} unique):[/bold]")
     if critical:
         rprint(f"  [red]• {len(critical)} critical issues[/red]")
     if warnings:
@@ -669,6 +720,7 @@ def display_issues(issues: list[dict[str, Any]], output_format: str = "table") -
             view_url = issue.get("view_url", "")
             field = issue.get("field", "unknown")
             context = issue.get("context", issue.get("text", ""))
+            group_count = issue.get("group_count", 1)
 
             # Print issue header with embedded clickable link
             if view_url:
@@ -678,6 +730,10 @@ def display_issues(issues: list[dict[str, Any]], output_format: str = "table") -
                 # rprint(f"   [dim]{view_url}[/dim]")
             else:
                 rprint(f"\n[bold]{i}. {view_title}[/bold]")
+
+            # Show group count if more than 1
+            if group_count > 1:
+                rprint(f"   [dim]({group_count} similar occurrences in this explorer)[/dim]")
 
             # Print issue details
             if issue_type == "typo":
