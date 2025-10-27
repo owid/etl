@@ -14,19 +14,20 @@ def run() -> None:
     snap = paths.load_snapshot("patents.csv")
 
     # Load data from snapshot and adjust columns:
-    tb = snap.read(header=3, encoding="latin-1")
+    tb = snap.read(header=3)
+
+    temp_metadata = tb["Office"].metadata.copy()
     temp_cols = tb.columns.copy()
+
     tb = tb.drop(columns=["2023"]).reset_index()
     tb.columns = temp_cols
-
-    snap_historical = paths.load_snapshot("historical_patents.csv")
-    tb_historical = snap_historical.read(header=15, encoding="latin-1")
-
+    for col in tb.columns:
+        tb[col].metadata = temp_metadata    
     #
     # Process data.
     #
     # Improve tables format.
-    tables = [tb.format(["country", "year"])]
+    tables = [tb.format(["Office", "Field of technology"])]
 
     #
     # Save outputs.
