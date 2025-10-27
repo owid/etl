@@ -20,7 +20,7 @@ import pandas as pd
 from anthropic.types import TextBlock
 from rich import print as rprint
 from rich.console import Console
-from rich.progress import BarColumn, Progress, SpinnerColumn, TaskProgressColumn, TextColumn
+from rich.progress import Progress, SpinnerColumn, TextColumn
 from rich_click.rich_command import RichCommand
 from structlog import get_logger
 
@@ -121,60 +121,162 @@ def get_text_context(text: str, typo: str, context_words: int = 10) -> str:
     return context
 
 
-def run_codespell_on_text(text: str) -> list[dict[str, str]]:
-    """Run codespell on text and return detected typos.
+def run_codespell_batch(views: list[dict[str, Any]]) -> dict[int, list[dict[str, Any]]]:
+    """Run codespell on all views at once for performance.
 
     Args:
-        text: Text to check for typos
+        views: List of view dictionaries
 
     Returns:
-        List of dicts with keys: typo, correction, context
+        Dictionary mapping view_id to list of typo issues
     """
-    if not text:
-        return []
-
     codespell_path = get_codespell_path()
     if not codespell_path:
-        return []
+        return {}
 
-    # Create a temporary file with the text
-    with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False) as f:
-        f.write(text)
-        temp_file = f.name
+    # Create a temporary directory for all text files
+    temp_dir = tempfile.mkdtemp()
+    view_files = {}  # Map view_id to list of (field_name, file_path, text)
 
     try:
-        # Run codespell
+        # Write all texts to temporary files
+        for view in views:
+            chart_config = json.loads(view["chart_config"]) if view["chart_config"] else {}
+            dimensions = json.loads(view["dimensions"]) if view["dimensions"] else {}
+            view_id = view["id"]
+            view_files[view_id] = []
+
+            # Collect texts to check with field names
+            texts_to_check = [
+                ("title", chart_config.get("title", "")),
+                ("subtitle", chart_config.get("subtitle", "")),
+                ("note", chart_config.get("note", "")),
+            ]
+
+            # Add variable metadata fields
+            variable_fields = [
+                ("variable_name", view.get("variable_name", [])),
+                ("variable_description", view.get("variable_description", [])),
+                ("variable_title_public", view.get("variable_title_public", [])),
+                ("variable_description_short", view.get("variable_description_short", [])),
+                ("variable_description_from_producer", view.get("variable_description_from_producer", [])),
+                ("variable_description_key", view.get("variable_description_key", [])),
+                ("variable_description_processing", view.get("variable_description_processing", [])),
+            ]
+
+            for field_name, values in variable_fields:
+                if isinstance(values, list):
+                    for i, value in enumerate(values):
+                        if value:
+                            texts_to_check.append((f"{field_name}_{i}", str(value)))
+                elif values:
+                    texts_to_check.append((field_name, str(values)))
+
+            # Write each text to a separate file
+            for field_name, text in texts_to_check:
+                if text and text.strip():
+                    file_path = Path(temp_dir) / f"view_{view_id}_{field_name}.txt"
+                    file_path.write_text(text)
+                    view_files[view_id].append((field_name, file_path, text))
+
+        # Run codespell once on the entire directory
         result = subprocess.run(
-            [str(codespell_path), temp_file],
+            [str(codespell_path), temp_dir],
             capture_output=True,
             text=True,
         )
 
-        # Parse output (format: filename:line: typo ==> correction)
-        typos = []
-        for line in result.stdout.strip().split("\n"):
-            if not line:
-                continue
-            # Example: /tmp/tmpfile.txt:1: typo ==> correction
-            if "==>" in line:
-                parts = line.split("==>")
-                if len(parts) == 2:
-                    left = parts[0].strip()
-                    correction = parts[1].strip()
-                    # Extract typo from "filename:line: typo"
-                    typo_part = left.split(":")[-1].strip()
-                    typos.append(
-                        {
-                            "typo": typo_part,
-                            "correction": correction,
-                            "context": line,
-                        }
-                    )
+        # Parse results and map back to views
+        issues_by_view: dict[int, list[dict[str, Any]]] = {}
 
-        return typos
+        for line in result.stdout.strip().split("\n"):
+            if not line or "==>" not in line:
+                continue
+
+            # Parse: /tmp/dir/view_123_field.txt:1: typo ==> correction
+            parts = line.split("==>")
+            if len(parts) != 2:
+                continue
+
+            left = parts[0].strip()
+            correction = parts[1].strip()
+
+            # Extract file path and typo
+            file_parts = left.rsplit(":", 2)
+            if len(file_parts) < 3:
+                continue
+
+            file_path = file_parts[0]
+            typo = file_parts[2].strip()
+
+            # Extract view_id and field from filename
+            filename = Path(file_path).name
+            if not filename.startswith("view_"):
+                continue
+
+            # Parse filename: view_{view_id}_{field_name}.txt
+            parts = filename.replace(".txt", "").split("_", 2)
+            if len(parts) < 3:
+                continue
+
+            try:
+                view_id = int(parts[1])
+            except ValueError:
+                continue
+
+            field_name = parts[2]
+            # Remove numeric suffix for variable fields
+            if field_name.endswith(tuple(f"_{i}" for i in range(100))):
+                field_name = "_".join(field_name.split("_")[:-1])
+
+            # Find the original text
+            text = ""
+            for fname, fpath, ftext in view_files.get(view_id, []):
+                if fpath == Path(file_path):
+                    text = ftext
+                    field_name = fname.split("_")[0] if "_" in fname and fname.split("_")[0] in ["variable"] else fname
+                    break
+
+            # Get context
+            context = get_text_context(text, typo)
+
+            # Get view details
+            view = next((v for v in views if v["id"] == view_id), None)
+            if not view:
+                continue
+
+            chart_config = json.loads(view["chart_config"]) if view["chart_config"] else {}
+            dimensions = json.loads(view["dimensions"]) if view["dimensions"] else {}
+            view_title = chart_config.get("title", "")
+            view_url = build_explorer_url(view["explorerSlug"], dimensions)
+
+            # Create issue
+            issue = {
+                "view_id": view_id,
+                "explorer_slug": view["explorerSlug"],
+                "view_title": view_title,
+                "view_url": view_url,
+                "issue_type": "typo",
+                "severity": "warning",
+                "field": field_name,
+                "text": text[:100],
+                "context": context,
+                "typo": typo,
+                "correction": correction,
+                "explanation": f"Typo in {field_name}: '{typo}' → '{correction}'",
+            }
+
+            if view_id not in issues_by_view:
+                issues_by_view[view_id] = []
+            issues_by_view[view_id].append(issue)
+
+        return issues_by_view
+
     finally:
-        # Clean up temp file
-        Path(temp_file).unlink()
+        # Clean up temp directory
+        import shutil
+
+        shutil.rmtree(temp_dir, ignore_errors=True)
 
 
 def fetch_explorer_data(explorer_slug: str | None = None) -> pd.DataFrame:
@@ -262,129 +364,6 @@ def aggregate_explorer_views(df: pd.DataFrame) -> pd.DataFrame:
     )
 
     return agg_df
-
-
-def check_typos_in_view(view: dict[str, Any]) -> list[dict[str, Any]]:
-    """Check for typos in a single explorer view.
-
-    Args:
-        view: Dictionary containing view data
-
-    Returns:
-        List of typo issues found
-    """
-    issues = []
-    chart_config = json.loads(view["chart_config"]) if view["chart_config"] else {}
-    dimensions = json.loads(view["dimensions"]) if view["dimensions"] else {}
-
-    # Get view title and URL
-    view_title = chart_config.get("title", "")
-    view_url = build_explorer_url(view["explorerSlug"], dimensions)
-
-    # Check title
-    title = chart_config.get("title", "")
-    if title:
-        typos = run_codespell_on_text(title)
-        for typo in typos:
-            context = get_text_context(title, typo["typo"])
-            issues.append(
-                {
-                    "view_id": view["id"],
-                    "explorer_slug": view["explorerSlug"],
-                    "view_title": view_title,
-                    "view_url": view_url,
-                    "issue_type": "typo",
-                    "severity": "warning",
-                    "field": "title",
-                    "text": title,
-                    "context": context,
-                    "typo": typo["typo"],
-                    "correction": typo["correction"],
-                    "explanation": f"Typo in title: '{typo['typo']}' should be '{typo['correction']}'",
-                }
-            )
-
-    # Check subtitle
-    subtitle = chart_config.get("subtitle", "")
-    if subtitle:
-        typos = run_codespell_on_text(subtitle)
-        for typo in typos:
-            context = get_text_context(subtitle, typo["typo"])
-            issues.append(
-                {
-                    "view_id": view["id"],
-                    "explorer_slug": view["explorerSlug"],
-                    "view_title": view_title,
-                    "view_url": view_url,
-                    "issue_type": "typo",
-                    "severity": "warning",
-                    "field": "subtitle",
-                    "text": subtitle,
-                    "context": context,
-                    "typo": typo["typo"],
-                    "correction": typo["correction"],
-                    "explanation": f"Typo in subtitle: '{typo['typo']}' should be '{typo['correction']}'",
-                }
-            )
-
-    # Check note
-    note = chart_config.get("note", "")
-    if note:
-        typos = run_codespell_on_text(note)
-        for typo in typos:
-            context = get_text_context(note, typo["typo"])
-            issues.append(
-                {
-                    "view_id": view["id"],
-                    "explorer_slug": view["explorerSlug"],
-                    "view_title": view_title,
-                    "view_url": view_url,
-                    "issue_type": "typo",
-                    "severity": "warning",
-                    "field": "note",
-                    "text": note,
-                    "context": context,
-                    "typo": typo["typo"],
-                    "correction": typo["correction"],
-                    "explanation": f"Typo in note: '{typo['typo']}' should be '{typo['correction']}'",
-                }
-            )
-
-    # Check variable metadata fields
-    variable_fields = [
-        ("variable_name", "Variable name"),
-        ("variable_description", "Variable description"),
-        ("variable_title_public", "Variable public title"),
-        ("variable_description_short", "Variable short description"),
-        ("variable_description_from_producer", "Variable description from producer"),
-        ("variable_description_key", "Variable key description"),
-        ("variable_description_processing", "Variable processing description"),
-    ]
-
-    for field_name, field_label in variable_fields:
-        for var_text in view.get(field_name, []):
-            if var_text:
-                typos = run_codespell_on_text(str(var_text))
-                for typo in typos:
-                    context = get_text_context(str(var_text), typo["typo"])
-                    issues.append(
-                        {
-                            "view_id": view["id"],
-                            "explorer_slug": view["explorerSlug"],
-                            "view_title": view_title,
-                            "view_url": view_url,
-                            "issue_type": "typo",
-                            "severity": "warning",
-                            "field": field_name,
-                            "text": str(var_text)[:100],  # Truncate for display
-                            "context": context,
-                            "typo": typo["typo"],
-                            "correction": typo["correction"],
-                            "explanation": f"Typo in {field_label.lower()}: '{typo['typo']}' → '{typo['correction']}'",
-                        }
-                    )
-
-    return issues
 
 
 def check_semantic_issues_batch(
@@ -819,18 +798,11 @@ def main(
 
     # Check typos
     if not skip_typos:
-        with Progress(
-            SpinnerColumn(),
-            TextColumn("[progress.description]{task.description}"),
-            BarColumn(),
-            TaskProgressColumn(),
-            console=console,
-        ) as progress:
-            task = progress.add_task("[cyan]Checking for typos...", total=len(views))
-            for view in views:
-                issues = check_typos_in_view(view)
-                all_issues.extend(issues)
-                progress.advance(task)
+        rprint("[cyan]Checking for typos (running codespell)...[/cyan]")
+        issues_by_view = run_codespell_batch(views)
+        # Flatten the issues
+        for view_issues in issues_by_view.values():
+            all_issues.extend(view_issues)
         rprint(f"[green]✓ Found {len([i for i in all_issues if i['issue_type'] == 'typo'])} typo issues[/green]\n")
 
     # Check semantic issues
