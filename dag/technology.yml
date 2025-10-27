@@ -16,3 +16,14 @@ steps:
     - data://meadow/wb/2025-05-21/findex
   data://grapher/wb/2025-05-21/findex:
     - data://garden/wb/2025-05-21/findex
+
+  #
+  # WIPO patents data
+  #
+  data://meadow/research_development/2025-10-27/patents:
+    - snapshot://research_development/2025-10-27/patents.csv
+    - snapshot://research_development/2025-10-27/historical_patents.csv
+  data://garden/research_development/2025-10-27/patents:
+    - data://meadow/research_development/2025-10-27/patents
+  data://grapher/research_development/2025-10-27/patents:
+    - data://garden/research_development/2025-10-27/patents
