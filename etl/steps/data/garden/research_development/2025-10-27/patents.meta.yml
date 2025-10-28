@@ -1,11 +1,36 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
+  patents_general: &patents_general |-
+    Patents are a form of intellectual property that give their holders exclusive rights to an invention for a limited period, typically 20 years from the filing date.
+
+    It prevents others from making, using, selling, or distributing the patented invention without the patent holder's permission.
+  patents_data: &patents_data |-
+    The number of patents granted by a patent office is an indicator of innovation and research activity within a country or region. It is sometimes used as a proxy for technological advancement and economic development, as patents often lead to new products, services, and industries.
+  filing_office: &filing_office |-
+    This chart shows patents based on where the patent application was filed. This is typically the national or regional patent office of the region where the intellectual property protection is sought, but does not necessarily mean the inventor was born or lived there.
+  regional_filing_office: &regional_filing_office |-
+    Inventors can file patents in national or regional patent offices. Regional patent offices cover multiple countries and issue a single patent that is valid in all member countries (with some exceptions).
+
+    Patents granted by regional offices are not included in the national totals of the member countries.
   common:
     presentation:
       topic_tags:
         - Medicine & Biotechnology
-  notes: |-
-   Totals by geographical region are WIPO estimates using data covering 164 offices. Each region includes the following number of offices: Africa (34), Asia (46), Europe (44), Latin America and the Caribbean (31), Northern America (2) and Oceania (7).
+      grapher_config:
+        note: |-
+          Totals by geographical region are WIPO estimates. Each region includes the following number of offices: Africa (34), Asia (46), Europe (44), Latin America and the Caribbean (31), Northern America (2) and Oceania (7).
+        entityType: filing office
+        entityTypePlural: filing offices
+        tab: chart
+    display:
+      numDecimalPlaces: 0
+      entityAnnotationsMap: |-
+        Patent Office of the Cooperation Council for the Arab States of the Gulf: Stopped accepting applications in 2021
+    description_key: &common_description
+      - *patents_general
+      - *patents_data
+      - *filing_office
+      - *regional_filing_office
 
 
 # Learn more about the available fields:
@@ -17,44 +42,24 @@ dataset:
 tables:
   patents:
     variables:
-      # testing_variable:
-      #   title: Testing variable title
-      #   unit: arbitrary units
-      #   short_unit: au
-      #   description_short: Short description of testing variable.
-      #   description_key: List of key points about the indicator.
-      #   processing_level: minor
-      #   description_processing: Description of processing of testing variable.
-      #   description_from_producer: Description of testing variable from producer.
-      #   type:
-      #   sort:
-      #   presentation:
-      #     attribution:
-      #     attribution_short:
-      #     faqs:
-      #     grapher_config:
-      #     title_public:
-      #     title_variant:
-      #     topic_tags:
-      #   display:
-      #     name: Testing variable
-      #     numDecimalPlaces: 0
-      #     tolerance: 0
-      #     color:
-      #     conversionFactor: 1
-      #     description:
-      #     entityAnnotationsMap: Test annotation
-      #     includeInTable:
-      #     isProjection: false
-      #     unit: arbitrary units
-      #     shortUnit: au
-      #     tableDisplay:
-      #       hideAbsoluteChange:
-      #       hideRelativeChange:
-      #     yearIsDay: false
-      #     zeroDay:
-      #     roundingMode:
-      #     numSignificantFigures:
-      #
-      {}
+      all_patents:
+        title: Life science patents granted, by filing office
+        description_short: Patents granted within the fields of medical technology, biotechnology, and pharmaceuticals by filing office. These patents cover a wide range of innovations, including new drugs, medical devices, diagnostic methods, genetic engineering techniques, and biotechnological processes.
+        unit: patents
+        short_unit: ""
+      medical_technology_patents:
+        title: Medical technology patents granted by filing office
+        description_short: Number of medical technology patents granted by the filing office in a given year. Medical technology patents can include medical and surgical equipment, diagnostic tools and other devices, materials or processes used in medical treatment.
+        unit: patents
+        short_unit: ""
+      biotechnology_patents:
+        title: Biotechnology patents granted by filing office
+        description_short: Number of biotechnology patents granted by the filing office in a given year. Examples for biotechnology patents could be genetic engineering methods to improve agriculture or novel processes using microorganisms to produce bio-fuel.
+        unit: patents
+        short_unit: ""
+      pharmaceutical_patents:
+        title: Pharmaceutical patents granted by filing office
+        description_short: Number of pharmaceutical patents granted by the filing office in a given year. Pharmaceutical patents typically cover new drugs, biological treatments or vaccines.
+        unit: patents
+        short_unit: ""
 

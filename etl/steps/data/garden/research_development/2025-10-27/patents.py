@@ -34,9 +34,11 @@ def run() -> None:
         }
     )
 
-    # remove entries with no patents:
-    tb = tb.dropna(subset=["medical_technology_patents", "biotechnology_patents", "pharmaceutical_patents"], how="all")
-
+    tb["all_patents"] = (
+        tb["medical_technology_patents"].fillna(0)
+        + tb["biotechnology_patents"].fillna(0)
+        + tb["pharmaceutical_patents"].fillna(0)
+    )
 
     tb = tb.rename(columns={"office": "country"})
     #
