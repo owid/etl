@@ -35,8 +35,42 @@ POVERTY_LINES = [3, 10, 30]
 # Earliest year for extrapolation
 EARLIEST_YEAR = 1820
 
-# Historical entities file
-HISTORICAL_ENTITIES_FILE = Path(__file__).parent / "historical_entities.yml"
+# Historical entities mapping
+HISTORICAL_ENTITIES = {
+    "USSR": {
+        "successor_states": [
+            "Russia",
+            "Ukraine",
+            "Belarus",
+            "Uzbekistan",
+            "Kazakhstan",
+            "Georgia",
+            "Azerbaijan",
+            "Lithuania",
+            "Moldova",
+            "Latvia",
+            "Kyrgyzstan",
+            "Tajikistan",
+            "Armenia",
+            "Turkmenistan",
+            "Estonia",
+        ],
+        "end_year": 1991,
+    },
+    "Yugoslavia": {
+        "successor_states": [
+            "Serbia",
+            "Croatia",
+            "Slovenia",
+            "Bosnia and Herzegovina",
+            "North Macedonia",
+            "Montenegro",
+            "Kosovo",
+        ],
+        "end_year": 1992,
+    },
+    "Czechoslovakia": {"successor_states": ["Czechia", "Slovakia"], "end_year": 1992},
+}
 
 
 def run() -> None:
@@ -179,10 +213,58 @@ def prepare_gdp_data(tb_maddison: Table) -> Table:
         limit_direction="both",
     )
 
+    # Merge with tb_maddison to show original vs interpolated values
+    tb_gdp = pr.merge(
+        tb_gdp,
+        tb_maddison[["country", "year", "gdp_per_capita"]],
+        on=["country", "year"],
+        how="left",
+        suffixes=("", "_original"),
+    )
+
     # Restore region information
     tb_gdp["region"] = tb_gdp["country"].map(regions_map)
 
-    log.info(f"prepare_gdp_data: After interpolation: {len(tb_gdp)} rows")
+    # Remove (Maddison) from country column if present
+    tb_gdp["country"] = tb_gdp["country"].str.replace(" (Maddison)", "", regex=False)
+
+    # Create tb_gdp_regions table, selecting only regions, which are the countries including (Maddison) and World
+    tb_gdp_regions = tb_gdp[tb_gdp["country"].isin(list(regions_map.values()) + ["World"])].reset_index(drop=True)
+
+    # Create year-over-year growth factors for regions table
+    tb_gdp_regions = tb_gdp_regions.sort_values(["country", "year"])
+    tb_gdp_regions["growth_factor"] = tb_gdp_regions.groupby("country")["gdp_per_capita"].transform(
+        lambda x: x / x.shift(1)
+    )
+
+    # Assert that HISTORICAL_ENTITIES keys and successor states are in tb_gdp
+    all_countries = set(tb_gdp["country"].unique())
+    for entity_name, entity_data in HISTORICAL_ENTITIES.items():
+        if entity_name not in all_countries:
+            log.warning(f"prepare_gdp_data: Historical entity '{entity_name}' not found in GDP data")
+        for successor in entity_data["successor_states"]:
+            if successor not in all_countries:
+                log.warning(f"prepare_gdp_data: Successor state '{successor}' of '{entity_name}' not found in GDP data")
+
+    # Create a historical entities table
+    tb_historical_entities = []
+    for entity_name, entity_data in HISTORICAL_ENTITIES.items():
+        tb_entity = tb_gdp[
+            (tb_gdp["country"] == entity_name) & (tb_gdp["year"] <= entity_data["end_year"])
+        ].reset_index(drop=True)
+        tb_historical_entities.append(tb_entity)
+
+    # Concatenate all historical entities data
+    tb_historical_entities = pr.concat(tb_historical_entities, ignore_index=True)
+
+    # Calculate growth factors for historical entities table
+    tb_historical_entities = tb_historical_entities.sort_values(["country", "year"])
+    tb_historical_entities["growth_factor"] = tb_historical_entities.groupby("country")["gdp_per_capita"].transform(
+        lambda x: x / x.shift(1)
+    )
+
+    # Add historical_entity column to tb_gdp
+    tb_gdp["historical_entity"] = tb_gdp["country"].map({name: name for name, data in HISTORICAL_ENTITIES.items()})
 
     # Calculate year-over-year growth factors
     log.info("prepare_gdp_data: Calculating year-over-year growth factors")
