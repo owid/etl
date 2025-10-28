@@ -40,28 +40,18 @@ HISTORICAL_ENTITIES_FILE = Path(__file__).parent / "historical_entities.yml"
 
 
 def run() -> None:
-    """Main execution function."""
-    log.info("historical_poverty: Starting execution")
-
     #
     # Load inputs
     #
-    log.info("historical_poverty: Loading input datasets")
-    ds_bins = paths.load_dataset("thousand_bins_distribution")
+    ds_thousand_bins = paths.load_dataset("thousand_bins_distribution")
     ds_maddison = paths.load_dataset("maddison_project_database")
 
-    tb_bins = ds_bins["thousand_bins_distribution"].reset_index()
+    tb_bins = ds_thousand_bins["thousand_bins_distribution"].reset_index()
     tb_maddison = ds_maddison["maddison_project_database"].reset_index()
-
-    log.info(f"historical_poverty: Loaded {len(tb_bins)} rows from thousand_bins_distribution")
-    log.info(f"historical_poverty: thousand_bins date range: {tb_bins['year'].min()}-{tb_bins['year'].max()}")
-    log.info(f"historical_poverty: Loaded {len(tb_maddison)} rows from maddison_project_database")
-    log.info(f"historical_poverty: Maddison date range: {tb_maddison['year'].min()}-{tb_maddison['year'].max()}")
 
     #
     # Prepare GDP data
     #
-    log.info("historical_poverty: Preparing GDP data")
     tb_gdp = prepare_gdp_data(tb_maddison)
 
     #
@@ -173,15 +163,12 @@ def prepare_gdp_data(tb_maddison: Table) -> Table:
     # Remove rows with missing GDP per capita
     tb_gdp = tb_gdp.dropna(subset=["gdp_per_capita"])
 
-    log.info(f"prepare_gdp_data: Starting with {len(tb_gdp)} rows after removing NaN GDP values")
-
     # Store region information separately (categorical column can't be interpolated)
     regions_map = tb_gdp.groupby("country")["region"].first().to_dict()
 
     # Interpolate missing years using geometric mean growth rate
     # This fills gaps between available years
     # Drop region before interpolation (categorical columns can't be interpolated)
-    log.info("prepare_gdp_data: Interpolating missing years")
     tb_gdp = tb_gdp.drop(columns=["region"])
     tb_gdp = interpolate_table(
         tb_gdp,
