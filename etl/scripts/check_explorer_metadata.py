@@ -21,7 +21,7 @@ import pandas as pd
 from anthropic.types import TextBlock
 from rich import print as rprint
 from rich.console import Console
-from rich.progress import Progress, SpinnerColumn, TextColumn
+from rich.progress import BarColumn, MofNCompleteColumn, Progress, TextColumn, TimeRemainingColumn
 from rich_click.rich_command import RichCommand
 from structlog import get_logger
 
@@ -150,47 +150,58 @@ def run_codespell_batch(views: list[dict[str, Any]]) -> dict[int, list[dict[str,
 
     try:
         # Write all texts to temporary files
-        for view in views:
-            chart_config = json.loads(view["chart_config"]) if view["chart_config"] else {}
-            dimensions = json.loads(view["dimensions"]) if view["dimensions"] else {}
-            view_id = view["id"]
-            view_files[view_id] = []
+        with Progress(
+            TextColumn("[progress.description]{task.description}"),
+            BarColumn(),
+            MofNCompleteColumn(),
+            TimeRemainingColumn(),
+            console=console,
+        ) as progress:
+            task = progress.add_task("Preparing views for spell check", total=len(views))
 
-            # Collect texts to check with field names
-            texts_to_check = [
-                ("title", chart_config.get("title", "")),
-                ("subtitle", chart_config.get("subtitle", "")),
-                ("note", chart_config.get("note", "")),
-            ]
+            for view in views:
+                chart_config = json.loads(view["chart_config"]) if view["chart_config"] else {}
+                dimensions = json.loads(view["dimensions"]) if view["dimensions"] else {}
+                view_id = view["id"]
+                view_files[view_id] = []
 
-            # Add variable metadata fields
-            variable_fields = [
-                ("variable_name", view.get("variable_name", [])),
-                ("variable_description", view.get("variable_description", [])),
-                ("variable_title_public", view.get("variable_title_public", [])),
-                ("variable_description_short", view.get("variable_description_short", [])),
-                ("variable_description_from_producer", view.get("variable_description_from_producer", [])),
-                ("variable_description_key", view.get("variable_description_key", [])),
-                ("variable_description_processing", view.get("variable_description_processing", [])),
-            ]
+                # Collect texts to check with field names
+                texts_to_check = [
+                    ("title", chart_config.get("title", "")),
+                    ("subtitle", chart_config.get("subtitle", "")),
+                    ("note", chart_config.get("note", "")),
+                ]
 
-            for field_name, values in variable_fields:
-                if isinstance(values, list):
-                    for i, value in enumerate(values):
-                        if value:
-                            texts_to_check.append((f"{field_name}_{i}", str(value)))
-                elif values:
-                    texts_to_check.append((field_name, str(values)))
+                # Add variable metadata fields
+                variable_fields = [
+                    ("variable_name", view.get("variable_name", [])),
+                    ("variable_description", view.get("variable_description", [])),
+                    ("variable_title_public", view.get("variable_title_public", [])),
+                    ("variable_description_short", view.get("variable_description_short", [])),
+                    ("variable_description_from_producer", view.get("variable_description_from_producer", [])),
+                    ("variable_description_key", view.get("variable_description_key", [])),
+                    ("variable_description_processing", view.get("variable_description_processing", [])),
+                ]
 
-            # Write each text to a separate file
-            for field_name, text in texts_to_check:
-                if text and text.strip():
-                    file_path = Path(temp_dir) / f"view_{view_id}_{field_name}.txt"
-                    file_path.write_text(text)
-                    view_files[view_id].append((field_name, file_path, text))
+                for field_name, values in variable_fields:
+                    if isinstance(values, list):
+                        for i, value in enumerate(values):
+                            if value:
+                                texts_to_check.append((f"{field_name}_{i}", str(value)))
+                    elif values:
+                        texts_to_check.append((field_name, str(values)))
+
+                # Write each text to a separate file
+                for field_name, text in texts_to_check:
+                    if text and text.strip():
+                        file_path = Path(temp_dir) / f"view_{view_id}_{field_name}.txt"
+                        file_path.write_text(text)
+                        view_files[view_id].append((field_name, file_path, text))
+
+                progress.update(task, advance=1)
 
         # Run codespell once on the entire directory
-        # Check if .codespell-ignore.txt exists
+        rprint("  [cyan]Running spell checker...[/cyan]")
         ignore_file = BASE_DIR / ".codespell-ignore.txt"
         cmd = [str(codespell_path), temp_dir]
         if ignore_file.exists():
@@ -204,103 +215,120 @@ def run_codespell_batch(views: list[dict[str, Any]]) -> dict[int, list[dict[str,
 
         # Parse results and map back to views
         issues_by_view: dict[int, list[dict[str, Any]]] = {}
+        result_lines = [line for line in result.stdout.strip().split("\n") if line and "==>" in line]
 
-        for line in result.stdout.strip().split("\n"):
-            if not line or "==>" not in line:
-                continue
+        if result_lines:
+            with Progress(
+                TextColumn("[progress.description]{task.description}"),
+                BarColumn(),
+                MofNCompleteColumn(),
+                TimeRemainingColumn(),
+                console=console,
+            ) as progress:
+                task = progress.add_task("Processing typos found", total=len(result_lines))
 
-            # Parse: /tmp/dir/view_123_field.txt:1: typo ==> correction
-            parts = line.split("==>")
-            if len(parts) != 2:
-                continue
+                for line in result_lines:
+                    # Parse: /tmp/dir/view_123_field.txt:1: typo ==> correction
+                    parts = line.split("==>")
+                    if len(parts) != 2:
+                        progress.update(task, advance=1)
+                        continue
 
-            left = parts[0].strip()
-            correction = parts[1].strip()
+                    left = parts[0].strip()
+                    correction = parts[1].strip()
 
-            # Extract file path, line number, and typo
-            file_parts = left.rsplit(":", 2)
-            if len(file_parts) < 3:
-                continue
+                    # Extract file path, line number, and typo
+                    file_parts = left.rsplit(":", 2)
+                    if len(file_parts) < 3:
+                        progress.update(task, advance=1)
+                        continue
 
-            file_path = file_parts[0]
-            line_num = file_parts[1]
-            typo = file_parts[2].strip()
+                    file_path = file_parts[0]
+                    line_num = file_parts[1]
+                    typo = file_parts[2].strip()
 
-            # Parse line number
-            try:
-                line_num_int = int(line_num)
-            except ValueError:
-                continue
+                    # Parse line number
+                    try:
+                        line_num_int = int(line_num)
+                    except ValueError:
+                        progress.update(task, advance=1)
+                        continue
 
-            # Extract view_id and field from filename
-            filename = Path(file_path).name
-            if not filename.startswith("view_"):
-                continue
+                    # Extract view_id and field from filename
+                    filename = Path(file_path).name
+                    if not filename.startswith("view_"):
+                        progress.update(task, advance=1)
+                        continue
 
-            # Parse filename: view_{view_id}_{field_name}.txt
-            parts = filename.replace(".txt", "").split("_", 2)
-            if len(parts) < 3:
-                continue
+                    # Parse filename: view_{view_id}_{field_name}.txt
+                    parts = filename.replace(".txt", "").split("_", 2)
+                    if len(parts) < 3:
+                        progress.update(task, advance=1)
+                        continue
 
-            try:
-                view_id = int(parts[1])
-            except ValueError:
-                continue
+                    try:
+                        view_id = int(parts[1])
+                    except ValueError:
+                        progress.update(task, advance=1)
+                        continue
 
-            field_name = parts[2]
+                    field_name = parts[2]
 
-            # Find the original text and get the correct field name
-            text = ""
-            for fname, fpath, ftext in view_files.get(view_id, []):
-                if fpath == Path(file_path):
-                    text = ftext
-                    # Use the original field name from fname, removing numeric suffix if present
-                    # fname could be like "variable_description_from_producer_0"
-                    if fname.rsplit("_", 1)[-1].isdigit():
-                        # Has numeric suffix, remove it
-                        field_name = fname.rsplit("_", 1)[0]
+                    # Find the original text and get the correct field name
+                    text = ""
+                    for fname, fpath, ftext in view_files.get(view_id, []):
+                        if fpath == Path(file_path):
+                            text = ftext
+                            # Use the original field name from fname, removing numeric suffix if present
+                            # fname could be like "variable_description_from_producer_0"
+                            if fname.rsplit("_", 1)[-1].isdigit():
+                                # Has numeric suffix, remove it
+                                field_name = fname.rsplit("_", 1)[0]
+                            else:
+                                field_name = fname
+                            break
+
+                    # Get context from the specific line where the typo was found
+                    text_lines = text.split("\n")
+                    if 1 <= line_num_int <= len(text_lines):
+                        typo_line = text_lines[line_num_int - 1]
+                        context = get_text_context(typo_line, typo)
                     else:
-                        field_name = fname
-                    break
+                        # Fallback to searching entire text if line number is out of range
+                        context = get_text_context(text, typo)
 
-            # Get context from the specific line where the typo was found
-            text_lines = text.split("\n")
-            if 1 <= line_num_int <= len(text_lines):
-                typo_line = text_lines[line_num_int - 1]
-                context = get_text_context(typo_line, typo)
-            else:
-                # Fallback to searching entire text if line number is out of range
-                context = get_text_context(text, typo)
+                    # Get view details
+                    view = next((v for v in views if v["id"] == view_id), None)
+                    if not view:
+                        progress.update(task, advance=1)
+                        continue
 
-            # Get view details
-            view = next((v for v in views if v["id"] == view_id), None)
-            if not view:
-                continue
+                    chart_config = json.loads(view["chart_config"]) if view["chart_config"] else {}
+                    dimensions = json.loads(view["dimensions"]) if view["dimensions"] else {}
+                    view_title = chart_config.get("title", "")
+                    view_url = build_explorer_url(view["explorerSlug"], dimensions)
 
-            chart_config = json.loads(view["chart_config"]) if view["chart_config"] else {}
-            dimensions = json.loads(view["dimensions"]) if view["dimensions"] else {}
-            view_title = chart_config.get("title", "")
-            view_url = build_explorer_url(view["explorerSlug"], dimensions)
+                    # Create issue
+                    issue = {
+                        "view_id": view_id,
+                        "explorer_slug": view["explorerSlug"],
+                        "view_title": view_title,
+                        "view_url": view_url,
+                        "issue_type": "typo",
+                        "severity": "warning",
+                        "field": field_name,
+                        "text": text[:100],
+                        "context": context,
+                        "typo": typo,
+                        "correction": correction,
+                        "explanation": f"Typo in {field_name}: '{typo}' → '{correction}'",
+                    }
 
-            # Create issue
-            issue = {
-                "view_id": view_id,
-                "explorer_slug": view["explorerSlug"],
-                "view_title": view_title,
-                "view_url": view_url,
-                "issue_type": "typo",
-                "severity": "warning",
-                "field": field_name,
-                "text": text[:100],
-                "context": context,
-                "typo": typo,
-                "correction": correction,
-                "explanation": f"Typo in {field_name}: '{typo}' → '{correction}'",
-            }
+                    if view_id not in issues_by_view:
+                        issues_by_view[view_id] = []
+                    issues_by_view[view_id].append(issue)
 
-            if view_id not in issues_by_view:
-                issues_by_view[view_id] = []
-            issues_by_view[view_id].append(issue)
+                    progress.update(task, advance=1)
 
         return issues_by_view
 
@@ -479,15 +507,16 @@ def check_semantic_issues_batch(
     total_output_tokens = 0
 
     with Progress(
-        SpinnerColumn(),
         TextColumn("[progress.description]{task.description}"),
+        BarColumn(),
+        MofNCompleteColumn(),
+        TimeRemainingColumn(),
         console=console,
     ) as progress:
-        task = progress.add_task(f"Checking semantic issues (batches of {batch_size})...", total=len(views))
+        task = progress.add_task("Checking semantic issues", total=len(views))
 
         for i in range(0, len(views), batch_size):
             batch = views[i : i + batch_size]
-            progress.update(task, advance=len(batch))
 
             # Prepare batch context
             batch_context = []
@@ -621,6 +650,9 @@ Respond ONLY with a JSON array of issues, or an empty array [] if no issues foun
             except Exception as e:
                 log.error(f"Error calling Claude API for batch: {e}")
                 continue
+            finally:
+                # Update progress after processing batch
+                progress.update(task, advance=len(batch))
 
     usage_stats = {
         "input_tokens": total_input_tokens,
@@ -651,15 +683,16 @@ def check_writing_quality_batch(
     total_output_tokens = 0
 
     with Progress(
-        SpinnerColumn(),
         TextColumn("[progress.description]{task.description}"),
+        BarColumn(),
+        MofNCompleteColumn(),
+        TimeRemainingColumn(),
         console=console,
     ) as progress:
-        task = progress.add_task(f"Checking writing quality (batches of {batch_size})...", total=len(views))
+        task = progress.add_task("Checking writing quality", total=len(views))
 
         for i in range(0, len(views), batch_size):
             batch = views[i : i + batch_size]
-            progress.update(task, advance=len(batch))
 
             # Prepare batch context
             batch_context = []
@@ -791,6 +824,9 @@ Respond ONLY with a JSON array of issues, or an empty array [] if no issues foun
             except Exception as e:
                 log.error(f"Error calling Claude API for batch: {e}")
                 continue
+            finally:
+                # Update progress after processing batch
+                progress.update(task, advance=len(batch))
 
     usage_stats = {
         "input_tokens": total_input_tokens,
@@ -827,6 +863,8 @@ def group_issues_with_claude(
         return grouped_typos, 0
 
     # Use Claude to group semantic/quality issues
+    rprint("  [cyan]Grouping similar issues intelligently...[/cyan]")
+
     # Prepare simplified issue list for Claude
     simplified_issues = []
     for idx, issue in enumerate(other_issues):
