@@ -22,7 +22,7 @@ def run() -> None:
     tb = tb.drop(columns=["2023"]).reset_index()
     tb.columns = temp_cols
     for col in tb.columns:
-        tb[col].metadata = temp_metadata    
+        tb[col].metadata = temp_metadata
     #
     # Process data.
     #
