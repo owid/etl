@@ -1308,6 +1308,174 @@ def display_issues(
     return grouping_tokens
 
 
+def load_and_aggregate_views(slug_list: list[str] | None, limit: int | None) -> tuple[list[dict[str, Any]], int, int]:
+    """Load views from database and aggregate by view ID.
+
+    Returns:
+        Tuple of (views list, explorer_count, mdim_count)
+    """
+    # Fetch data from both explorers and multidimensional indicators
+    df_explorers = fetch_explorer_data(explorer_slugs=slug_list)
+    df_mdims = fetch_multidim_data(slug_filters=slug_list)
+
+    # Report what was found
+    explorer_count = len(df_explorers)
+    mdim_count = len(df_mdims)
+    if slug_list:
+        slugs_str = ", ".join(slug_list)
+        rprint(
+            f"[cyan]Filtering to slug(s): {slugs_str} ({explorer_count} explorer records, {mdim_count} multidim records)[/cyan]"
+        )
+    else:
+        rprint(f"[cyan]Fetched {explorer_count} explorer records and {mdim_count} multidim records[/cyan]")
+
+    # Check if we got any results
+    if df_explorers.empty and df_mdims.empty:
+        if slug_list:
+            slugs_str = ", ".join(slug_list)
+            rprint(f"[red]Error: No views found for slug(s) '{slugs_str}' (checked both explorers and multidims)[/red]")
+        else:
+            rprint("[red]Error: No explorer or multidim views found in database[/red]")
+        return [], 0, 0
+
+    # Aggregate views
+    agg_df_explorers = aggregate_explorer_views(df_explorers) if not df_explorers.empty else pd.DataFrame()
+    agg_df_mdims = aggregate_multidim_views(df_mdims) if not df_mdims.empty else pd.DataFrame()
+    agg_df = pd.concat([agg_df_explorers, agg_df_mdims], ignore_index=True)
+    views: list[dict[str, Any]] = agg_df.to_dict("records")  # type: ignore
+
+    # Apply limit if specified
+    if limit is not None and limit > 0:
+        views = views[:limit]
+        rprint(f"[yellow]Limiting to first {limit} views (for testing)[/yellow]")
+
+    explorer_view_count = len(agg_df_explorers)
+    mdim_view_count = len(agg_df_mdims)
+    rprint(
+        f"[cyan]Aggregated to {len(views)} unique views ({explorer_view_count} explorers + {mdim_view_count} multidims)...[/cyan]\n"
+    )
+
+    return views, explorer_view_count, mdim_view_count
+
+
+def run_checks(
+    views: list[dict[str, Any]],
+    skip_typos: bool,
+    skip_semantic: bool,
+    skip_quality: bool,
+    anthropic_api_key: str | None,
+    batch_size: int,
+    dry_run: bool,
+) -> tuple[list[dict[str, Any]], int, int]:
+    """Run all enabled checks and return issues and token usage.
+
+    Returns:
+        Tuple of (all_issues, total_input_tokens, total_output_tokens)
+    """
+    all_issues = []
+    total_input_tokens = 0
+    total_output_tokens = 0
+
+    # Check typos (skip in dry-run mode since codespell has no cost)
+    if not skip_typos and not dry_run:
+        rprint("[cyan]Checking for typos (running codespell)...[/cyan]")
+        issues_by_view = run_codespell_batch(views)
+        for view_issues in issues_by_view.values():
+            all_issues.extend(view_issues)
+        rprint(f"[green]✓ Found {len([i for i in all_issues if i['issue_type'] == 'typo'])} typo issues[/green]\n")
+
+    # Check semantic issues
+    if not skip_semantic:
+        msg = (
+            "[yellow]Estimating semantic check costs (dry run)...[/yellow]"
+            if dry_run
+            else "[bold]Checking for semantic inconsistencies...[/bold]"
+        )
+        rprint(msg)
+        semantic_issues, usage_stats = check_semantic_issues_batch(views, anthropic_api_key, batch_size, dry_run)
+        all_issues.extend(semantic_issues)
+        total_input_tokens += usage_stats.get("input_tokens", 0)
+        total_output_tokens += usage_stats.get("output_tokens", 0)
+        if not dry_run:
+            rprint(f"[green]✓ Found {len(semantic_issues)} semantic issues[/green]\n")
+
+    # Check writing quality
+    if not skip_quality:
+        msg = (
+            "[yellow]Estimating quality check costs (dry run)...[/yellow]"
+            if dry_run
+            else "[bold]Checking writing quality...[/bold]"
+        )
+        rprint(msg)
+        quality_issues, usage_stats = check_writing_quality_batch(views, anthropic_api_key, batch_size, dry_run)
+        all_issues.extend(quality_issues)
+        total_input_tokens += usage_stats.get("input_tokens", 0)
+        total_output_tokens += usage_stats.get("output_tokens", 0)
+        if not dry_run:
+            rprint(f"[green]✓ Found {len(quality_issues)} quality issues[/green]\n")
+
+    return all_issues, total_input_tokens, total_output_tokens
+
+
+def display_cost_estimate(
+    total_input_tokens: int, total_output_tokens: int, has_issues: bool, skip_semantic: bool, skip_quality: bool
+) -> None:
+    """Display cost estimate in dry-run mode."""
+    # Estimate grouping tokens if we have issues
+    grouping_tokens_estimate = 0
+    if has_issues and not skip_semantic and not skip_quality:
+        grouping_tokens_estimate = 500
+        total_input_tokens += grouping_tokens_estimate // 2
+        total_output_tokens += grouping_tokens_estimate // 2
+
+    rprint("\n[bold yellow]DRY RUN - Cost Estimate:[/bold yellow]")
+    if total_input_tokens > 0 or total_output_tokens > 0:
+        estimated_cost = calculate_cost(total_input_tokens, total_output_tokens)
+        lower_cost = estimated_cost * 0.9
+        upper_cost = estimated_cost * 1.5
+
+        rprint(f"  Estimated input tokens:  {total_input_tokens:,}")
+        rprint(f"  Estimated output tokens: {total_output_tokens:,}")
+        if grouping_tokens_estimate > 0:
+            rprint(f"  [dim](Includes ~{grouping_tokens_estimate} tokens for intelligent grouping)[/dim]")
+        rprint(f"  [bold]Estimated cost: ${lower_cost:.4f} - ${upper_cost:.4f}[/bold]")
+        rprint(f"  [dim](Most likely: ${estimated_cost:.4f})[/dim]")
+    else:
+        rprint("  No API calls needed for selected checks.")
+
+
+def display_results_and_cost(
+    all_issues: list[dict[str, Any]],
+    views: list[dict[str, Any]],
+    total_input_tokens: int,
+    total_output_tokens: int,
+    anthropic_api_key: str | None,
+    dry_run: bool,
+) -> None:
+    """Display issues and API usage cost."""
+    # Extract unique explorer slugs and identify mdims
+    all_explorers_analyzed = list(set(view["explorerSlug"] for view in views))
+    mdim_slugs = set(view["explorerSlug"] for view in views if str(view.get("id", "")).startswith("mdim_"))
+
+    # Display issues and get grouping tokens
+    grouping_tokens = display_issues(
+        all_issues, "table", anthropic_api_key, dry_run, all_explorers_analyzed, mdim_slugs
+    )
+
+    # Display API usage and cost
+    total_input_tokens += grouping_tokens // 2
+    total_output_tokens += grouping_tokens // 2
+
+    if total_input_tokens > 0 or total_output_tokens > 0:
+        total_cost = calculate_cost(total_input_tokens, total_output_tokens)
+        rprint("\n[bold cyan]API Usage:[/bold cyan]")
+        rprint(f"  Input tokens:  {total_input_tokens:,}")
+        rprint(f"  Output tokens: {total_output_tokens:,}")
+        if grouping_tokens > 0:
+            rprint(f"  [dim](Includes {grouping_tokens} tokens for intelligent grouping)[/dim]")
+        rprint(f"  [bold]Total cost: ${total_cost:.4f}[/bold]")
+
+
 @click.command(cls=RichCommand)
 @click.option(
     "--slug",
@@ -1330,15 +1498,9 @@ def display_issues(
     help="Skip writing quality checking",
 )
 @click.option(
-    "--output-format",
-    type=click.Choice(["table", "json", "csv"]),
-    default="table",
-    help="Output format",
-)
-@click.option(
     "--output-file",
     type=click.Path(),
-    help="Save issues to file (format inferred from extension or --output-format)",
+    help="Save issues to CSV file",
 )
 @click.option(
     "--batch-size",
@@ -1357,12 +1519,11 @@ def display_issues(
     is_flag=True,
     help="Estimate API costs without making actual API calls",
 )
-def main(
+def run(
     slug: tuple[str, ...],
     skip_typos: bool,
     skip_semantic: bool,
     skip_quality: bool,
-    output_format: str,
     output_file: str | None,
     batch_size: int,
     limit: int | None,
@@ -1370,217 +1531,45 @@ def main(
 ) -> None:
     """Check explorer and multidim views for typos, semantic inconsistencies, and quality issues.
 
-    This script analyzes explorer and multidimensional indicator (mdim) views from the database and detects:
-    - Typos using codespell (if available)
-    - Semantic inconsistencies using Claude API (requires ANTHROPIC_API_KEY in .env)
-    - Writing quality issues using Claude API (requires ANTHROPIC_API_KEY in .env)
-
-    To use semantic/quality checks, add ANTHROPIC_API_KEY to your .env file.
-
     Examples:
-        # Check all explorers and mdims for typos only
         python check_explorer_metadata.py --skip-semantic --skip-quality
-
-        # Check specific explorer with all checks (requires API key in .env)
         python check_explorer_metadata.py --slug global-food
-
-        # Check specific multidim
-        python check_explorer_metadata.py --slug covid-boosters
-
-        # Check multiple explorers/mdims
-        python check_explorer_metadata.py --slug global-food --slug covid-boosters --slug energy-prices
-
-        # Test with limited views to minimize API costs
+        python check_explorer_metadata.py --slug global-food --slug covid-boosters
         python check_explorer_metadata.py --slug animal-welfare --limit 5
-
-        # Export issues to JSON
-        python check_explorer_metadata.py --output-format json --output-file issues.json
+        python check_explorer_metadata.py --output-file issues.csv
     """
-    # Check codespell availability
-    has_codespell = get_codespell_path() is not None
-    if not skip_typos and not has_codespell:
+    # Validate prerequisites
+    if not skip_typos and not get_codespell_path():
         rprint("[yellow]Warning: codespell not found. Install with: uv add codespell[/yellow]")
-        rprint("[yellow]Skipping typo checks...[/yellow]")
         skip_typos = True
 
-    # Check API key for semantic/quality checks
     anthropic_api_key = config.ANTHROPIC_API_KEY
     if not anthropic_api_key and (not skip_semantic or not skip_quality):
-        rprint("[red]Error: ANTHROPIC_API_KEY not found in configuration.[/red]")
-        rprint("[yellow]Please add ANTHROPIC_API_KEY to your .env file to use semantic and quality checks.[/yellow]")
-        rprint("[yellow]Alternatively, use --skip-semantic and --skip-quality flags to skip these checks.[/yellow]")
-        raise click.ClickException("Missing ANTHROPIC_API_KEY in .env file")
+        rprint("[red]Error: ANTHROPIC_API_KEY not found. Add to .env file or use --skip-semantic --skip-quality[/red]")
+        raise click.ClickException("Missing ANTHROPIC_API_KEY")
 
-    # Convert tuple to list (or None if empty)
+    # Load and aggregate views
     slug_list = list(slug) if slug else None
-
-    # Fetch data from both explorers and multidimensional indicators
-    df_explorers = fetch_explorer_data(explorer_slugs=slug_list)
-    df_mdims = fetch_multidim_data(slug_filters=slug_list)
-
-    # Combine both datasets
-    df = pd.concat([df_explorers, df_mdims], ignore_index=True)
-
-    # Check if we got any results
-    if df.empty:
-        if slug_list:
-            slugs_str = ", ".join(slug_list)
-            rprint(f"[red]Error: No views found for slug(s) '{slugs_str}' (checked both explorers and multidims)[/red]")
-        else:
-            rprint("[red]Error: No explorer or multidim views found in database[/red]")
+    views, _, _ = load_and_aggregate_views(slug_list, limit)
+    if not views:
         return
 
-    # Report what was found
-    explorer_count = len(df_explorers)
-    mdim_count = len(df_mdims)
-    if slug_list:
-        slugs_str = ", ".join(slug_list)
-        rprint(
-            f"[cyan]Filtering to slug(s): {slugs_str} ({explorer_count} explorer records, {mdim_count} multidim records)[/cyan]"
-        )
-    else:
-        rprint(f"[cyan]Fetched {explorer_count} explorer records and {mdim_count} multidim records[/cyan]")
-
-    # Aggregate views (works for both explorers and mdims since structure is the same)
-    # Note: "records" count is higher than "views" count because:
-    # - Explorer records include multiple rows per view (one per variable in chart config)
-    # - After aggregation, variables are grouped into lists per view
-    agg_df_explorers = aggregate_explorer_views(df_explorers) if not df_explorers.empty else pd.DataFrame()
-    agg_df_mdims = aggregate_multidim_views(df_mdims) if not df_mdims.empty else pd.DataFrame()
-    agg_df = pd.concat([agg_df_explorers, agg_df_mdims], ignore_index=True)
-    views: list[dict[str, Any]] = agg_df.to_dict("records")  # type: ignore
-
-    # Apply limit if specified
-    if limit is not None and limit > 0:
-        views = views[:limit]
-        rprint(f"[yellow]Limiting to first {limit} views (for testing)[/yellow]")
-
-    explorer_view_count = len(agg_df_explorers)
-    mdim_view_count = len(agg_df_mdims)
-    rprint(
-        f"[cyan]Aggregated to {len(views)} unique views "
-        f"({explorer_view_count} explorers + {mdim_view_count} multidims)...[/cyan]\n"
+    # Run checks
+    all_issues, total_input_tokens, total_output_tokens = run_checks(
+        views, skip_typos, skip_semantic, skip_quality, anthropic_api_key, batch_size, dry_run
     )
 
-    all_issues = []
-
-    # Track API usage for cost calculation
-    total_input_tokens = 0
-    total_output_tokens = 0
-
-    # Check typos (skip in dry-run mode since codespell has no cost)
-    if not skip_typos and not dry_run:
-        rprint("[cyan]Checking for typos (running codespell)...[/cyan]")
-        issues_by_view = run_codespell_batch(views)
-        # Flatten the issues
-        for view_issues in issues_by_view.values():
-            all_issues.extend(view_issues)
-        rprint(f"[green]✓ Found {len([i for i in all_issues if i['issue_type'] == 'typo'])} typo issues[/green]\n")
-
-    # Check semantic issues
-    if not skip_semantic:
-        if dry_run:
-            rprint("[yellow]Estimating semantic check costs (dry run)...[/yellow]")
-        else:
-            rprint("[bold]Checking for semantic inconsistencies...[/bold]")
-        semantic_issues, usage_stats = check_semantic_issues_batch(views, anthropic_api_key, batch_size, dry_run)
-        all_issues.extend(semantic_issues)
-        total_input_tokens += usage_stats.get("input_tokens", 0)
-        total_output_tokens += usage_stats.get("output_tokens", 0)
-
-        if not dry_run:
-            rprint(f"[green]✓ Found {len(semantic_issues)} semantic issues[/green]\n")
-
-    # Check writing quality
-    if not skip_quality:
-        if dry_run:
-            rprint("[yellow]Estimating quality check costs (dry run)...[/yellow]")
-        else:
-            rprint("[bold]Checking writing quality...[/bold]")
-        quality_issues, usage_stats = check_writing_quality_batch(views, anthropic_api_key, batch_size, dry_run)
-        all_issues.extend(quality_issues)
-        total_input_tokens += usage_stats.get("input_tokens", 0)
-        total_output_tokens += usage_stats.get("output_tokens", 0)
-
-        if not dry_run:
-            rprint(f"[green]✓ Found {len(quality_issues)} quality issues[/green]\n")
-
-    # Display results
+    # Save to CSV if requested
     if output_file:
-        # Infer format from file extension if not explicitly set
-        if output_file.endswith(".json"):
-            file_format = "json"
-        elif output_file.endswith(".csv"):
-            file_format = "csv"
-        else:
-            file_format = output_format
-
-        # Save to file
-        with open(output_file, "w") as f:
-            if file_format == "json":
-                json.dump(all_issues, f, indent=2)
-            elif file_format == "csv":
-                df_issues = pd.DataFrame(all_issues)
-                df_issues.to_csv(f, index=False)
-
+        pd.DataFrame(all_issues).to_csv(output_file, index=False)
         rprint(f"[green]✓ Issues saved to {output_file}[/green]")
 
-    # Display results (skip in dry-run mode)
+    # Display results
     if dry_run:
-        # In dry run, estimate grouping tokens if we have issues
-        grouping_tokens_estimate = 0
-        if all_issues and not skip_semantic and not skip_quality:
-            # Estimate ~500 tokens for grouping call (input + output)
-            grouping_tokens_estimate = 500
-            total_input_tokens += grouping_tokens_estimate // 2
-            total_output_tokens += grouping_tokens_estimate // 2
-
-        # In dry run, show cost estimate instead of issues
-        rprint("\n[bold yellow]DRY RUN - Cost Estimate:[/bold yellow]")
-        if total_input_tokens > 0 or total_output_tokens > 0:
-            estimated_cost = calculate_cost(total_input_tokens, total_output_tokens)
-
-            # Calculate range: conservative lower bound (-10%) and higher upper bound (+50%)
-            # Upper bound is intentionally high to avoid unpleasant surprises
-            lower_cost = estimated_cost * 0.9
-            upper_cost = estimated_cost * 1.5
-
-            rprint(f"  Estimated input tokens:  {total_input_tokens:,}")
-            rprint(f"  Estimated output tokens: {total_output_tokens:,}")
-            if grouping_tokens_estimate > 0:
-                rprint(f"  [dim](Includes ~{grouping_tokens_estimate} tokens for intelligent grouping)[/dim]")
-            rprint(f"  [bold]Estimated cost: ${lower_cost:.4f} - ${upper_cost:.4f}[/bold]")
-            rprint(f"  [dim](Most likely: ${estimated_cost:.4f})[/dim]")
-        else:
-            rprint("  No API calls needed for selected checks.")
+        display_cost_estimate(total_input_tokens, total_output_tokens, bool(all_issues), skip_semantic, skip_quality)
     else:
-        # Extract unique explorer slugs from views for reporting
-        all_explorers_analyzed = list(set(view["explorerSlug"] for view in views))
-
-        # Identify which slugs are mdims vs explorers
-        # Mdim views have IDs starting with 'mdim_'
-        mdim_slugs = set(view["explorerSlug"] for view in views if str(view.get("id", "")).startswith("mdim_"))
-
-        # Normal mode - display issues and get grouping tokens
-        grouping_tokens = display_issues(
-            all_issues, "table", anthropic_api_key, dry_run, all_explorers_analyzed, mdim_slugs
-        )
-
-        # Add grouping tokens to total
-        total_input_tokens += grouping_tokens // 2  # Rough split
-        total_output_tokens += grouping_tokens // 2
-
-        # Display API usage and cost
-        if total_input_tokens > 0 or total_output_tokens > 0:
-            total_cost = calculate_cost(total_input_tokens, total_output_tokens)
-
-            rprint("\n[bold cyan]API Usage:[/bold cyan]")
-            rprint(f"  Input tokens:  {total_input_tokens:,}")
-            rprint(f"  Output tokens: {total_output_tokens:,}")
-            if grouping_tokens > 0:
-                rprint(f"  [dim](Includes {grouping_tokens} tokens for intelligent grouping)[/dim]")
-            rprint(f"  [bold]Total cost: ${total_cost:.4f}[/bold]")
+        display_results_and_cost(all_issues, views, total_input_tokens, total_output_tokens, anthropic_api_key, dry_run)
 
 
 if __name__ == "__main__":
-    main()
+    run()
