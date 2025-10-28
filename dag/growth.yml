@@ -77,5 +77,6 @@ steps:
     - data://garden/happiness/2025-03-28/happiness
     - data://garden/who/2025-05-19/gho
     - data://garden/wb/2025-10-09/world_bank_pip
+    - data://garden/un/2025-05-07/undp_hdr
     - data://garden/demography/2024-07-15/population
     - data://garden/regions/2023-01-01/regions

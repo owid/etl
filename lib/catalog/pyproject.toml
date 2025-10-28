@@ -1,6 +1,6 @@
 [project]
 name = "owid-catalog"
-version = "0.4.2"
+version = "0.4.3"
 description = "Core data types used by OWID for managing data."
 readme = "README.md"
 authors = [

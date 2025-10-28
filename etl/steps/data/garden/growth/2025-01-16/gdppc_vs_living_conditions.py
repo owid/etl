@@ -35,9 +35,14 @@ COLUMNS_AND_CATEGORIES = {
         "wealth_quintile": "Total",
         "unit_of_measure": "Deaths per 100 live births",
     },
+    "igme_under_fifteen_mortality": {
+        "indicator": "Under-fifteen mortality rate",
+        "unit_of_measure": "Deaths per 100 live births",
+    },
     "wash": {"residence": "Total"},
     "harmonized_scores": {"sex": "all students"},
     "gho": {"sex": "both sexes"},
+    "gho_clean_fuel_cooking": {"residence_area_type": "Total"},
     "pip": {
         "ppp_version": 2021,
         "poverty_line": "No poverty line",
@@ -45,6 +50,7 @@ COLUMNS_AND_CATEGORIES = {
         "table": "Income or consumption consolidated",
         "survey_comparability": "No spells",
     },
+    "undp_hdr": {"sex": "total"},
 }
 
 
@@ -66,6 +72,7 @@ def run() -> None:
     ds_happiness = paths.load_dataset("happiness")
     ds_gho = paths.load_dataset("gho")
     ds_pip = paths.load_dataset("world_bank_pip")
+    ds_undp_hdr = paths.load_dataset("undp_hdr")
     ds_population = paths.load_dataset("population")
     ds_regions = paths.load_dataset("regions")
 
@@ -73,6 +80,7 @@ def run() -> None:
     tb_wdi = ds_wdi.read("wdi")
     tb_un_wpp = ds_un_wpp.read("life_expectancy")
     tb_igme = ds_igme.read("igme")
+    tb_igme_youth_mortality = ds_igme.read("igme_under_fifteen_mortality")
     tb_maternal_mortality = ds_maternal_mortality.read("maternal_mortality")
     tb_wash = ds_wash.read("who")
     tb_unwto = ds_unwto.read("unwto")
@@ -84,7 +92,11 @@ def run() -> None:
     tb_gho = ds_gho.read(
         "stunting_prevalence_among_children_under_5_years_of_age__pct_height_for_age__lt__2_sd__model_based_estimates"
     )
+    tb_gho_clean_fuel_cooking = ds_gho.read(
+        "proportion_of_population_with_primary_reliance_on_clean_fuels_and_technologies_for_cooking__pct"
+    )
     tb_pip = ds_pip.read("world_bank_pip")
+    tb_undp_hdr = ds_undp_hdr.read("undp_hdr_sex")
 
     #
     # Process data.
@@ -110,6 +122,13 @@ def run() -> None:
     tb_igme = filter_table(tb=tb_igme, table_name="igme")
     tb_igme = tb_igme[["country", "year", "observation_value"]].rename(
         columns={"observation_value": "child_mortality_rate"}, errors="raise"
+    )
+
+    # IGME Under fifteen mortality
+    check_columns_and_categories(tb=tb_igme_youth_mortality, table_name="igme_under_fifteen_mortality")
+    tb_igme_youth_mortality = filter_table(tb=tb_igme_youth_mortality, table_name="igme_under_fifteen_mortality")
+    tb_igme_youth_mortality = tb_igme_youth_mortality[["country", "year", "observation_value"]].rename(
+        columns={"observation_value": "under_fifteen_mortality_rate"}, errors="raise"
     )
 
     # Maternal mortality
@@ -175,6 +194,22 @@ def run() -> None:
         errors="raise",
     )
 
+    # WHO GHO - Clean cooking fuels
+    check_columns_and_categories(tb=tb_gho_clean_fuel_cooking, table_name="gho_clean_fuel_cooking")
+    tb_gho_clean_fuel_cooking = filter_table(tb=tb_gho_clean_fuel_cooking, table_name="gho_clean_fuel_cooking")
+    tb_gho_clean_fuel_cooking = tb_gho_clean_fuel_cooking[
+        [
+            "country",
+            "year",
+            "proportion_of_population_with_primary_reliance_on_clean_fuels_and_technologies_for_cooking__pct",
+        ]
+    ].rename(
+        columns={
+            "proportion_of_population_with_primary_reliance_on_clean_fuels_and_technologies_for_cooking__pct": "share_population_using_clean_cooking_fuels"
+        },
+        errors="raise",
+    )
+
     # World Bank PIP
     check_columns_and_categories(tb=tb_pip, table_name="pip")
     tb_pip = filter_table(tb=tb_pip, table_name="pip")
@@ -187,12 +222,18 @@ def run() -> None:
         errors="raise",
     )
 
+    # UNDP HDR
+    check_columns_and_categories(tb=tb_undp_hdr, table_name="undp_hdr")
+    tb_undp_hdr = filter_table(tb=tb_undp_hdr, table_name="undp_hdr")
+    tb_undp_hdr = tb_undp_hdr[["country", "year", "mys"]].rename(columns={"mys": "years_of_schooling"}, errors="raise")
+
     # Merge all the tables
     tb = pr.multi_merge(
         [
             tb_wdi,
             tb_un_wpp,
             tb_igme,
+            tb_igme_youth_mortality,
             tb_maternal_mortality,
             tb_wash,
             tb_unwto,
@@ -202,7 +243,9 @@ def run() -> None:
             tb_unesco,
             tb_happiness,
             tb_gho,
+            tb_gho_clean_fuel_cooking,
             tb_pip,
+            tb_undp_hdr,
         ],
         on=["country", "year"],
         how="outer",
