@@ -188,7 +188,7 @@ def get_text_context(text: str, typo: str, context_words: int = 10) -> str:
     return context
 
 
-def run_codespell_batch(views: list[dict[str, Any]]) -> dict[int, list[dict[str, Any]]]:
+def check_typos(views: list[dict[str, Any]]) -> dict[int, list[dict[str, Any]]]:
     """Run codespell on all views at once for performance.
 
     Args:
@@ -614,7 +614,7 @@ def estimate_tokens(text: str) -> int:
     return len(text) // 4
 
 
-def call_claude_api_with_retry(
+def call_claude(
     client: anthropic.Anthropic, model: str, max_tokens: int, prompt: str, max_retries: int = 3
 ) -> anthropic.types.Message:
     """Call Claude API with exponential backoff retry logic.
@@ -657,7 +657,7 @@ def call_claude_api_with_retry(
     raise RuntimeError("All retry attempts failed")
 
 
-def check_semantic_issues_batch(
+def check_semantic_issues(
     views: list[dict[str, Any]], api_key: str | None, batch_size: int = 10, dry_run: bool = False
 ) -> tuple[list[dict[str, Any]], dict[str, int]]:
     """Check for semantic inconsistencies using Claude API in batches.
@@ -756,7 +756,7 @@ Respond ONLY with a JSON array of issues, or an empty array [] if no issues foun
 
             content = ""  # Initialize to avoid unbound variable
             try:
-                response = call_claude_api_with_retry(
+                response = call_claude(
                     client=client,
                     model=CLAUDE_MODEL,
                     max_tokens=4096,
@@ -834,7 +834,7 @@ Respond ONLY with a JSON array of issues, or an empty array [] if no issues foun
     return all_issues, usage_stats
 
 
-def check_writing_quality_batch(
+def check_quality(
     views: list[dict[str, Any]], api_key: str | None, batch_size: int = 10, dry_run: bool = False
 ) -> tuple[list[dict[str, Any]], dict[str, int]]:
     """Check for writing quality issues using Claude API in batches.
@@ -931,7 +931,7 @@ Respond ONLY with a JSON array of issues, or an empty array [] if no issues foun
 
             content = ""  # Initialize to avoid unbound variable
             try:
-                response = call_claude_api_with_retry(
+                response = call_claude(
                     client=client,
                     model=CLAUDE_MODEL,
                     max_tokens=4096,
@@ -1008,20 +1008,17 @@ Respond ONLY with a JSON array of issues, or an empty array [] if no issues foun
     return all_issues, usage_stats
 
 
-def group_issues_with_claude(
-    issues: list[dict[str, Any]], api_key: str | None, dry_run: bool = False
-) -> tuple[list[dict[str, Any]], int]:
+def group_issues(issues: list[dict[str, Any]], api_key: str | None) -> tuple[list[dict[str, Any]], int]:
     """Use Claude to intelligently group similar issues.
 
     Args:
         issues: List of issue dictionaries
         api_key: Anthropic API key
-        dry_run: If True, skip API call and return ungrouped issues
 
     Returns:
         Tuple of (grouped issues, tokens used for grouping)
     """
-    if not api_key or dry_run or not issues:
+    if not api_key or not issues:
         return issues, 0
 
     # Separate typos from semantic/quality issues
@@ -1029,14 +1026,13 @@ def group_issues_with_claude(
     other_issues = [i for i in issues if i.get("issue_type") != "typo"]
 
     # Group typos using simple string matching (fast and accurate)
-    grouped_typos = group_typos_simple(typo_issues)
+    grouped_typos = group_typos(typo_issues)
 
     # If no semantic/quality issues, return just the typos
     if not other_issues:
         return grouped_typos, 0
 
     # Use Claude to group semantic/quality issues
-    rprint("  [cyan]Grouping similar issues intelligently...[/cyan]")
 
     # Prepare simplified issue list for Claude
     simplified_issues = []
@@ -1068,7 +1064,7 @@ Issues in the same group will be displayed together with a count."""
 
     try:
         client = anthropic.Anthropic(api_key=api_key)
-        response = call_claude_api_with_retry(
+        response = call_claude(
             client=client,
             model=CLAUDE_MODEL,
             max_tokens=2048,
@@ -1104,7 +1100,7 @@ Issues in the same group will be displayed together with a count."""
                 continue
             # Take first issue as representative
             representative = other_issues[group_indices[0]].copy()
-            representative["group_count"] = len(group_indices)
+            representative["similar_count"] = len(group_indices)
             representative["group_views"] = [
                 other_issues[i].get("view_title", "") for i in group_indices if i < len(other_issues)
             ]
@@ -1117,19 +1113,42 @@ Issues in the same group will be displayed together with a count."""
         return grouped_typos + other_issues, 0
 
 
-def group_typos_simple(typo_issues: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    """Group typos using simple string matching.
+def is_spurious_typo(typo: str) -> bool:
+    """Determine if a typo flagged by codespell is likely spurious.
+
+    Common false positives from codespell:
+    - Technical abbreviations (e.g., 'GHGs' flagged as typo)
+    - Domain-specific terms
+    - Acronyms
+    """
+    # Add common false positives here as they're discovered
+    spurious_typos = [
+        # Example: "ghgs",  # GHGs is not a typo
+    ]
+
+    return typo.lower() in spurious_typos
+
+
+def group_typos(typo_issues: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Group typos using simple string matching and filter spurious ones.
 
     Args:
         typo_issues: List of typo issue dictionaries
 
     Returns:
-        List of grouped typo issues
+        List of grouped typo issues (with spurious ones removed)
     """
     from collections import defaultdict
 
-    groups = defaultdict(list)
+    # Filter out spurious typos
+    filtered_issues = []
     for issue in typo_issues:
+        typo = issue.get("typo", "")
+        if not is_spurious_typo(typo):
+            filtered_issues.append(issue)
+
+    groups = defaultdict(list)
+    for issue in filtered_issues:
         # Group key for typos
         key = (
             issue.get("explorer_slug", ""),
@@ -1144,7 +1163,7 @@ def group_typos_simple(typo_issues: list[dict[str, Any]]) -> list[dict[str, Any]
     grouped_issues = []
     for group in groups.values():
         representative = group[0].copy()
-        representative["group_count"] = len(group)
+        representative["similar_count"] = len(group)
         representative["group_views"] = [issue.get("view_title", "") for issue in group]
         grouped_issues.append(representative)
 
@@ -1153,61 +1172,41 @@ def group_typos_simple(typo_issues: list[dict[str, Any]]) -> list[dict[str, Any]
 
 def display_issues(
     issues: list[dict[str, Any]],
-    output_format: str = "table",
-    api_key: str | None = None,
-    dry_run: bool = False,
-    all_explorers: list[str] | None = None,
-    mdim_slugs: set[str] | None = None,
-) -> int:
-    """Display issues in specified format.
+    all_explorers: list[str],
+    mdim_slugs: set[str],
+) -> None:
+    """Display grouped issues.
 
     Args:
-        issues: List of issue dictionaries
-        output_format: Output format (table, json, or csv)
-        api_key: Anthropic API key for intelligent grouping
-        dry_run: If True, skip Claude API calls for grouping
-        all_explorers: List of all explorer slugs that were analyzed (for reporting clean explorers)
-        mdim_slugs: Set of slugs that are multidimensional indicators (not explorers)
-
-    Returns:
-        Number of tokens used for grouping (0 for non-table formats)
+        issues: List of already-grouped issue dictionaries
+        all_explorers: List of all explorer slugs that were analyzed
+        mdim_slugs: Set of slugs that are multidimensional indicators
     """
     if not issues:
         rprint("[green]✓ No issues found![/green]")
-        return 0
-
-    if output_format == "json":
-        print(json.dumps(issues, indent=2))
-        return 0
-
-    if output_format == "csv":
-        df = pd.DataFrame(issues)
-        print(df.to_csv(index=False))
-        return 0
-
-    # Group similar issues using Claude
-    grouped_issues, grouping_tokens = group_issues_with_claude(issues, api_key, dry_run)
+        return
 
     # Group issues by explorer
     from collections import defaultdict
 
     issues_by_explorer = defaultdict(list)
-    for issue in grouped_issues:
+    for issue in issues:
         explorer_slug = issue.get("explorer_slug", "unknown")
         issues_by_explorer[explorer_slug].append(issue)
 
     # Display summary
-    total_original = len(issues)
-    total_grouped = len(grouped_issues)
+    total_unique = len(issues)
+    # Calculate total original count from similar_count fields
+    total_original = sum(issue.get("similar_count", 1) for issue in issues)
     num_collections = len(issues_by_explorer)
     rprint(
-        f"\n[bold]Found {total_original} total issues ({total_grouped} unique) across {num_collections} collection(s):[/bold]"
+        f"\n[bold]Found {total_original} total issues ({total_unique} unique) across {num_collections} collection(s):[/bold]"
     )
 
     # Count by severity across all explorers
-    all_critical = [i for i in grouped_issues if i.get("severity") == "critical"]
-    all_warnings = [i for i in grouped_issues if i.get("severity") == "warning"]
-    all_info = [i for i in grouped_issues if i.get("severity") == "info"]
+    all_critical = [i for i in issues if i.get("severity") == "critical"]
+    all_warnings = [i for i in issues if i.get("severity") == "warning"]
+    all_info = [i for i in issues if i.get("severity") == "info"]
     if all_critical:
         rprint(f"  [red]• {len(all_critical)} critical issues[/red]")
     if all_warnings:
@@ -1251,7 +1250,7 @@ def display_issues(
                 view_url = issue.get("view_url", "")
                 field = issue.get("field", "unknown")
                 context = issue.get("context", issue.get("text", ""))
-                group_count = issue.get("group_count", 1)
+                similar_count = issue.get("similar_count", 1)
 
                 # Print issue header with embedded clickable link
                 if view_url:
@@ -1263,8 +1262,8 @@ def display_issues(
                     rprint(f"\n[bold]{i}. {view_title}[/bold]")
 
                 # Show group count if more than 1
-                if group_count > 1:
-                    rprint(f"   [dim]({group_count} similar occurrences in this explorer)[/dim]")
+                if similar_count > 1:
+                    rprint(f"   [dim]({similar_count} similar occurrences in this explorer)[/dim]")
 
                 # Print issue details
                 if issue_type == "typo":
@@ -1305,10 +1304,8 @@ def display_issues(
                 rprint(f"[bold magenta]✓ No issues found in {len(clean_mdims)} multidim(s):[/bold magenta]")
                 rprint(f"[magenta]{', '.join(clean_mdims)}[/magenta]")
 
-    return grouping_tokens
 
-
-def load_and_aggregate_views(slug_list: list[str] | None, limit: int | None) -> list[dict[str, Any]]:
+def load_views(slug_list: list[str] | None, limit: int | None) -> list[dict[str, Any]]:
     """Load views from database and aggregate by view ID."""
     # Fetch data from both explorers and multidimensional indicators
     df_explorers = fetch_explorer_data(explorer_slugs=slug_list)
@@ -1352,13 +1349,42 @@ def load_and_aggregate_views(slug_list: list[str] | None, limit: int | None) -> 
     return views
 
 
+def estimate_check_costs(
+    views: list[dict[str, Any]],
+    skip_typos: bool,
+    skip_semantic: bool,
+    skip_quality: bool,
+    batch_size: int,
+) -> tuple[int, int]:
+    """Estimate token costs for checks without running them.
+
+    Returns:
+        Tuple of (input_tokens, output_tokens)
+    """
+    total_input_tokens = 0
+    total_output_tokens = 0
+
+    if not skip_semantic:
+        rprint("[yellow]Estimating semantic check costs (dry run)...[/yellow]")
+        _, usage_stats = check_semantic_issues(views, config.ANTHROPIC_API_KEY, batch_size, dry_run=True)
+        total_input_tokens += usage_stats.get("input_tokens", 0)
+        total_output_tokens += usage_stats.get("output_tokens", 0)
+
+    if not skip_quality:
+        rprint("[yellow]Estimating quality check costs (dry run)...[/yellow]")
+        _, usage_stats = check_quality(views, config.ANTHROPIC_API_KEY, batch_size, dry_run=True)
+        total_input_tokens += usage_stats.get("input_tokens", 0)
+        total_output_tokens += usage_stats.get("output_tokens", 0)
+
+    return total_input_tokens, total_output_tokens
+
+
 def run_checks(
     views: list[dict[str, Any]],
     skip_typos: bool,
     skip_semantic: bool,
     skip_quality: bool,
     batch_size: int,
-    dry_run: bool,
 ) -> tuple[list[dict[str, Any]], int, int]:
     """Run all enabled checks and return issues and token usage.
 
@@ -1369,54 +1395,42 @@ def run_checks(
     total_input_tokens = 0
     total_output_tokens = 0
 
-    # Check typos (skip in dry-run mode since codespell has no cost)
-    if not skip_typos and not dry_run:
+    # Check typos
+    if not skip_typos:
         rprint("[cyan]Checking for typos (running codespell)...[/cyan]")
-        issues_by_view = run_codespell_batch(views)
+        issues_by_view = check_typos(views)
         for view_issues in issues_by_view.values():
             all_issues.extend(view_issues)
         rprint(f"[green]✓ Found {len([i for i in all_issues if i['issue_type'] == 'typo'])} typo issues[/green]\n")
 
     # Check semantic issues
     if not skip_semantic:
-        msg = (
-            "[yellow]Estimating semantic check costs (dry run)...[/yellow]"
-            if dry_run
-            else "[bold]Checking for semantic inconsistencies...[/bold]"
-        )
-        rprint(msg)
-        semantic_issues, usage_stats = check_semantic_issues_batch(views, config.ANTHROPIC_API_KEY, batch_size, dry_run)
+        rprint("[bold]Checking for semantic inconsistencies...[/bold]")
+        semantic_issues, usage_stats = check_semantic_issues(views, config.ANTHROPIC_API_KEY, batch_size, dry_run=False)
         all_issues.extend(semantic_issues)
         total_input_tokens += usage_stats.get("input_tokens", 0)
         total_output_tokens += usage_stats.get("output_tokens", 0)
-        if not dry_run:
-            rprint(f"[green]✓ Found {len(semantic_issues)} semantic issues[/green]\n")
+        rprint(f"[green]✓ Found {len(semantic_issues)} semantic issues[/green]\n")
 
     # Check writing quality
     if not skip_quality:
-        msg = (
-            "[yellow]Estimating quality check costs (dry run)...[/yellow]"
-            if dry_run
-            else "[bold]Checking writing quality...[/bold]"
-        )
-        rprint(msg)
-        quality_issues, usage_stats = check_writing_quality_batch(views, config.ANTHROPIC_API_KEY, batch_size, dry_run)
+        rprint("[bold]Checking writing quality...[/bold]")
+        quality_issues, usage_stats = check_quality(views, config.ANTHROPIC_API_KEY, batch_size, dry_run=False)
         all_issues.extend(quality_issues)
         total_input_tokens += usage_stats.get("input_tokens", 0)
         total_output_tokens += usage_stats.get("output_tokens", 0)
-        if not dry_run:
-            rprint(f"[green]✓ Found {len(quality_issues)} quality issues[/green]\n")
+        rprint(f"[green]✓ Found {len(quality_issues)} quality issues[/green]\n")
 
     return all_issues, total_input_tokens, total_output_tokens
 
 
 def display_cost_estimate(
-    total_input_tokens: int, total_output_tokens: int, has_issues: bool, skip_semantic: bool, skip_quality: bool
+    total_input_tokens: int, total_output_tokens: int, skip_semantic: bool, skip_quality: bool
 ) -> None:
     """Display cost estimate in dry-run mode."""
-    # Estimate grouping tokens if we have issues
+    # Estimate grouping tokens if semantic/quality checks are enabled
     grouping_tokens_estimate = 0
-    if has_issues and not skip_semantic and not skip_quality:
+    if not skip_semantic and not skip_quality:
         grouping_tokens_estimate = 500
         total_input_tokens += grouping_tokens_estimate // 2
         total_output_tokens += grouping_tokens_estimate // 2
@@ -1437,27 +1451,22 @@ def display_cost_estimate(
         rprint("  No API calls needed for selected checks.")
 
 
-def display_results_and_cost(
-    all_issues: list[dict[str, Any]],
+def display_results(
+    grouped_issues: list[dict[str, Any]],
     views: list[dict[str, Any]],
     total_input_tokens: int,
     total_output_tokens: int,
-    dry_run: bool,
+    grouping_tokens: int,
 ) -> None:
-    """Display issues and API usage cost."""
+    """Display grouped issues and cost."""
     # Extract unique explorer slugs and identify mdims
     all_explorers_analyzed = list(set(view["explorerSlug"] for view in views))
     mdim_slugs = set(view["explorerSlug"] for view in views if str(view.get("id", "")).startswith("mdim_"))
 
-    # Display issues and get grouping tokens
-    grouping_tokens = display_issues(
-        all_issues, "table", config.ANTHROPIC_API_KEY, dry_run, all_explorers_analyzed, mdim_slugs
-    )
+    # Display grouped issues
+    display_issues(grouped_issues, all_explorers_analyzed, mdim_slugs)
 
     # Display API usage and cost
-    total_input_tokens += grouping_tokens // 2
-    total_output_tokens += grouping_tokens // 2
-
     if total_input_tokens > 0 or total_output_tokens > 0:
         total_cost = calculate_cost(total_input_tokens, total_output_tokens)
         rprint("\n[bold cyan]API Usage:[/bold cyan]")
@@ -1539,27 +1548,42 @@ def run(
         rprint("[red]Error: ANTHROPIC_API_KEY not found. Add to .env file or use --skip-semantic --skip-quality[/red]")
         raise click.ClickException("Missing ANTHROPIC_API_KEY")
 
-    # Load and aggregate views
+    # Load views
     slug_list = list(slug) if slug else None
-    views = load_and_aggregate_views(slug_list, limit)
+    views = load_views(slug_list, limit)
     if not views:
+        return
+
+    # Dry-run: estimate costs and exit
+    if dry_run:
+        total_input_tokens, total_output_tokens = estimate_check_costs(
+            views, skip_typos, skip_semantic, skip_quality, batch_size
+        )
+        display_cost_estimate(total_input_tokens, total_output_tokens, skip_semantic, skip_quality)
         return
 
     # Run checks
     all_issues, total_input_tokens, total_output_tokens = run_checks(
-        views, skip_typos, skip_semantic, skip_quality, batch_size, dry_run
+        views, skip_typos, skip_semantic, skip_quality, batch_size
     )
+
+    # Group and prune issues
+    if all_issues:
+        rprint("  [cyan]Grouping similar issues intelligently...[/cyan]")
+        grouped_issues, grouping_tokens = group_issues(all_issues, config.ANTHROPIC_API_KEY)
+        total_input_tokens += grouping_tokens // 2
+        total_output_tokens += grouping_tokens // 2
+    else:
+        grouped_issues = all_issues
+        grouping_tokens = 0
 
     # Save to CSV if requested
     if output_file:
-        pd.DataFrame(all_issues).to_csv(output_file, index=False)
+        pd.DataFrame(grouped_issues).to_csv(output_file, index=False)
         rprint(f"[green]✓ Issues saved to {output_file}[/green]")
 
     # Display results
-    if dry_run:
-        display_cost_estimate(total_input_tokens, total_output_tokens, bool(all_issues), skip_semantic, skip_quality)
-    else:
-        display_results_and_cost(all_issues, views, total_input_tokens, total_output_tokens, dry_run)
+    display_results(grouped_issues, views, total_input_tokens, total_output_tokens, grouping_tokens)
 
 
 if __name__ == "__main__":
