@@ -79,10 +79,14 @@ tables:
           - PDB: Data extracted from [RCSB PDB growth statistics](https://www.rcsb.org/stats/growth/growth-released-structureswebsite) webpage.
           - AlphaFoldDB: Data extracted from AlphaFoldDB release notes and [associated paper](https://academic.oup.com/nar/advance-article/doi/10.1093/nar/gkad1011/7337620).
           - ESMAtlas: Data extracted from [ESMAtlas database](https://esmatlas.com/about#download_dataset) information.
-
-        presentation:
-          grapher_config:
-            note: Number of entries corresponds to number of DNA and RNA sequences in GenBank, number of records in RefSeq, number of protein sequences UniProtKB and number of molecule structures in PDB, AlphaFoldDB and ESMAtlas.
-
+        display:
+          numDecimalPlaces: 0
+          entityAnnotationsMap: |-
+            GenBank: DNA and RNA sequences
+            RefSeq: Gene records (incl. genomic DNA, transcripts, and proteins)
+            Protein Data Bank (PDB): 3D molecule structures (e.g. proteins)
+            UniProtKB (Swiss-Prot): Protein sequences
+            AlphaFoldDB: Predicted 3D protein structures
+            ESMAtlas: Predicted 3D protein structures
 
 
