@@ -187,10 +187,9 @@ Should return 0 results.
 
 ```bash
 rm -f /tmp/archived_files.txt /tmp/all_meta_files.txt /tmp/active_meta_files.txt \
-      /tmp/all_garden_files.txt /tmp/active_garden_files.txt \
+      /tmp/all_step_files.txt /tmp/active_step_files.txt \
       /tmp/all_snapshot_files.txt /tmp/active_snapshot_files.txt \
       /tmp/codespell_output.txt
-```
 
 The only persistent files should be:
 
