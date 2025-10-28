@@ -11,6 +11,7 @@ The script can use Claude API for semantic validation when an API key is provide
 import json
 import subprocess
 import tempfile
+import time
 from pathlib import Path
 from typing import Any
 
@@ -397,8 +398,66 @@ def aggregate_explorer_views(df: pd.DataFrame) -> pd.DataFrame:
     return agg_df
 
 
+def estimate_tokens(text: str) -> int:
+    """Estimate number of tokens in text.
+
+    Uses a simple heuristic: ~4 characters per token for English text.
+    This is reasonably accurate for cost estimation purposes.
+
+    Args:
+        text: Text to estimate tokens for
+
+    Returns:
+        Estimated number of tokens
+    """
+    return len(text) // 4
+
+
+def call_claude_api_with_retry(
+    client: anthropic.Anthropic, model: str, max_tokens: int, prompt: str, max_retries: int = 3
+) -> anthropic.types.Message:
+    """Call Claude API with exponential backoff retry logic.
+
+    Args:
+        client: Anthropic client instance
+        model: Model name to use
+        max_tokens: Maximum tokens in response
+        prompt: Prompt text to send
+        max_retries: Maximum number of retry attempts
+
+    Returns:
+        API response message
+
+    Raises:
+        Exception: If all retries fail
+    """
+    for attempt in range(max_retries):
+        try:
+            response = client.messages.create(
+                model=model,
+                max_tokens=max_tokens,
+                messages=[{"role": "user", "content": prompt}],
+            )
+            return response
+        except anthropic.APIError as e:
+            if attempt < max_retries - 1:
+                # Exponential backoff: 2^attempt seconds (2s, 4s, 8s)
+                wait_time = 2 ** (attempt + 1)
+                log.warning(f"API error (attempt {attempt + 1}/{max_retries}): {e}. Retrying in {wait_time}s...")
+                time.sleep(wait_time)
+            else:
+                log.error(f"API error after {max_retries} attempts: {e}")
+                raise
+        except Exception as e:
+            log.error(f"Unexpected error calling Claude API: {e}")
+            raise
+
+    # This should never be reached due to raise in the loop, but satisfies type checker
+    raise RuntimeError("All retry attempts failed")
+
+
 def check_semantic_issues_batch(
-    views: list[dict[str, Any]], api_key: str | None, batch_size: int = 10
+    views: list[dict[str, Any]], api_key: str | None, batch_size: int = 10, dry_run: bool = False
 ) -> tuple[list[dict[str, Any]], dict[str, int]]:
     """Check for semantic inconsistencies using Claude API in batches.
 
@@ -484,12 +543,22 @@ Views to analyze:
 
 Respond ONLY with a JSON array of issues, or an empty array [] if no issues found."""
 
+            # If dry run, estimate tokens and skip API call
+            if dry_run:
+                estimated_input = estimate_tokens(prompt)
+                # Estimate output: typically 30-60 tokens per issue, assume ~0.3 issues per view
+                estimated_output = len(batch) * 20
+                total_input_tokens += estimated_input
+                total_output_tokens += estimated_output
+                continue
+
             content = ""  # Initialize to avoid unbound variable
             try:
-                response = client.messages.create(
-                    model="claude-3-7-sonnet-20250219",  # Latest Sonnet model
+                response = call_claude_api_with_retry(
+                    client=client,
+                    model="claude-3-7-sonnet-20250219",
                     max_tokens=4096,
-                    messages=[{"role": "user", "content": prompt}],
+                    prompt=prompt,
                 )
 
                 # Parse response
@@ -561,7 +630,7 @@ Respond ONLY with a JSON array of issues, or an empty array [] if no issues foun
 
 
 def check_writing_quality_batch(
-    views: list[dict[str, Any]], api_key: str | None, batch_size: int = 10
+    views: list[dict[str, Any]], api_key: str | None, batch_size: int = 10, dry_run: bool = False
 ) -> tuple[list[dict[str, Any]], dict[str, int]]:
     """Check for writing quality issues using Claude API in batches.
 
@@ -645,12 +714,22 @@ Texts to review:
 
 Respond ONLY with a JSON array of issues, or an empty array [] if no issues found."""
 
+            # If dry run, estimate tokens and skip API call
+            if dry_run:
+                estimated_input = estimate_tokens(prompt)
+                # Estimate output: typically 40-80 tokens per issue, assume ~0.2 issues per view
+                estimated_output = len(batch) * 15
+                total_input_tokens += estimated_input
+                total_output_tokens += estimated_output
+                continue
+
             content = ""  # Initialize to avoid unbound variable
             try:
-                response = client.messages.create(
-                    model="claude-3-7-sonnet-20250219",  # Latest Sonnet model
+                response = call_claude_api_with_retry(
+                    client=client,
+                    model="claude-3-7-sonnet-20250219",
                     max_tokens=4096,
-                    messages=[{"role": "user", "content": prompt}],
+                    prompt=prompt,
                 )
 
                 # Parse response
@@ -720,60 +799,140 @@ Respond ONLY with a JSON array of issues, or an empty array [] if no issues foun
     return all_issues, usage_stats
 
 
-def group_similar_issues(issues: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    """Group similar issues together (same explorer, field, and context).
+def group_issues_with_claude(
+    issues: list[dict[str, Any]], api_key: str | None, dry_run: bool = False
+) -> tuple[list[dict[str, Any]], int]:
+    """Use Claude to intelligently group similar issues.
 
     Args:
         issues: List of issue dictionaries
+        api_key: Anthropic API key
+        dry_run: If True, skip API call and return ungrouped issues
 
     Returns:
-        List of grouped issues with count information
+        Tuple of (grouped issues, tokens used for grouping)
+    """
+    if not api_key or dry_run or not issues:
+        return issues, 0
+
+    # Separate typos from semantic/quality issues
+    typo_issues = [i for i in issues if i.get("issue_type") == "typo"]
+    other_issues = [i for i in issues if i.get("issue_type") != "typo"]
+
+    # Group typos using simple string matching (fast and accurate)
+    grouped_typos = group_typos_simple(typo_issues)
+
+    # If no semantic/quality issues, return just the typos
+    if not other_issues:
+        return grouped_typos, 0
+
+    # Use Claude to group semantic/quality issues
+    # Prepare simplified issue list for Claude
+    simplified_issues = []
+    for idx, issue in enumerate(other_issues):
+        simplified_issues.append(
+            {
+                "index": idx,
+                "type": issue.get("issue_type"),
+                "explanation": issue.get("explanation", "")[:200],  # Limit length
+            }
+        )
+
+    prompt = f"""Group these {len(simplified_issues)} issues by semantic similarity.
+Issues that describe essentially the same problem should be in the same group,
+even if wording differs or they apply to different cases.
+
+For example:
+- "Spelling of 'sulfur' vs 'sulphur'" issues should be grouped together
+- "Subtitle mentions X but title is about Y" issues with same pattern should be grouped
+- Issues about same inconsistency applying to different sectors should be grouped
+
+Issues:
+{json.dumps(simplified_issues, indent=2)}
+
+Respond ONLY with a JSON object mapping group IDs to lists of issue indices:
+{{"group_0": [0, 3, 7], "group_1": [1, 2], "group_2": [4, 5, 6], ...}}
+
+Issues in the same group will be displayed together with a count."""
+
+    try:
+        client = anthropic.Anthropic(api_key=api_key)
+        response = call_claude_api_with_retry(
+            client=client,
+            model="claude-3-7-sonnet-20250219",
+            max_tokens=2048,
+            prompt=prompt,
+        )
+
+        # Parse response
+        content_block = response.content[0]
+        if not isinstance(content_block, TextBlock):
+            log.warning("Unexpected content block type in grouping, using fallback")
+            return grouped_typos + other_issues, 0
+
+        content = content_block.text.strip()
+
+        # Extract JSON
+        if "```json" in content:
+            content = content.split("```json")[1].split("```")[0].strip()
+        elif "```" in content:
+            content = content.split("```")[1].split("```")[0].strip()
+        else:
+            start = content.find("{")
+            end = content.rfind("}")
+            if start != -1 and end != -1:
+                content = content[start : end + 1]
+
+        grouping = json.loads(content)
+        tokens_used = response.usage.input_tokens + response.usage.output_tokens
+
+        # Apply grouping
+        grouped_other = []
+        for group_indices in grouping.values():
+            if not group_indices:
+                continue
+            # Take first issue as representative
+            representative = other_issues[group_indices[0]].copy()
+            representative["group_count"] = len(group_indices)
+            representative["group_views"] = [
+                other_issues[i].get("view_title", "") for i in group_indices if i < len(other_issues)
+            ]
+            grouped_other.append(representative)
+
+        return grouped_typos + grouped_other, tokens_used
+
+    except Exception as e:
+        log.warning(f"Error grouping with Claude: {e}, using fallback grouping")
+        return grouped_typos + other_issues, 0
+
+
+def group_typos_simple(typo_issues: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Group typos using simple string matching.
+
+    Args:
+        typo_issues: List of typo issue dictionaries
+
+    Returns:
+        List of grouped typo issues
     """
     from collections import defaultdict
 
-    # Group issues by (explorer_slug, field, typo, correction, context)
     groups = defaultdict(list)
-    for issue in issues:
-        if issue.get("issue_type") == "typo":
-            # Group key for typos
-            key = (
-                issue.get("explorer_slug", ""),
-                issue.get("field", ""),
-                issue.get("typo", ""),
-                issue.get("correction", ""),
-                issue.get("context", "")[:200],  # First 200 chars of context
-            )
-        else:
-            # For non-typo issues (semantic, writing_quality), group by normalized explanation
-            # Remove quoted strings to create a fingerprint that groups similar issues
-            import re
-
-            explanation = issue.get("explanation", "")
-            field = issue.get("field", "")
-
-            # Create a fingerprint by removing quoted/dynamic parts
-            # Replace single-quoted strings like 'Farmed fishes killed for food' with placeholder
-            fingerprint = re.sub(r"'[^']*'", "'...'", explanation)
-            # Replace double-quoted strings
-            fingerprint = re.sub(r'"[^"]*"', '"..."', fingerprint)
-            # Take first 150 chars of fingerprint
-            fingerprint = fingerprint[:150]
-
-            key = (
-                issue.get("explorer_slug", ""),
-                issue.get("issue_type", ""),
-                field,
-                fingerprint,
-            )
-
+    for issue in typo_issues:
+        # Group key for typos
+        key = (
+            issue.get("explorer_slug", ""),
+            issue.get("field", ""),
+            issue.get("typo", ""),
+            issue.get("correction", ""),
+            issue.get("context", "")[:200],
+        )
         groups[key].append(issue)
 
     # Create grouped issues with count
     grouped_issues = []
     for group in groups.values():
-        # Take the first issue as representative
         representative = group[0].copy()
-        # Add count information
         representative["group_count"] = len(group)
         representative["group_views"] = [issue.get("view_title", "") for issue in group]
         grouped_issues.append(representative)
@@ -781,28 +940,38 @@ def group_similar_issues(issues: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return grouped_issues
 
 
-def display_issues(issues: list[dict[str, Any]], output_format: str = "table") -> None:
+def display_issues(
+    issues: list[dict[str, Any]],
+    output_format: str = "table",
+    api_key: str | None = None,
+    dry_run: bool = False,
+) -> int:
     """Display issues in specified format.
 
     Args:
         issues: List of issue dictionaries
         output_format: Output format (table, json, or csv)
+        api_key: Anthropic API key for intelligent grouping
+        dry_run: If True, skip Claude API calls for grouping
+
+    Returns:
+        Number of tokens used for grouping (0 for non-table formats)
     """
     if not issues:
         rprint("[green]✓ No issues found![/green]")
-        return
+        return 0
 
     if output_format == "json":
         print(json.dumps(issues, indent=2))
-        return
+        return 0
 
     if output_format == "csv":
         df = pd.DataFrame(issues)
         print(df.to_csv(index=False))
-        return
+        return 0
 
-    # Group similar issues
-    grouped_issues = group_similar_issues(issues)
+    # Group similar issues using Claude
+    grouped_issues, grouping_tokens = group_issues_with_claude(issues, api_key, dry_run)
 
     # Group by severity and issue type
     critical = [i for i in grouped_issues if i.get("severity") == "critical"]
@@ -867,6 +1036,8 @@ def display_issues(issues: list[dict[str, Any]], output_format: str = "table") -
                 if context:
                     rprint(f"   [yellow]Context:[/yellow] {context}")
 
+    return grouping_tokens
+
 
 @click.command(cls=RichCommand)
 @click.option(
@@ -912,6 +1083,11 @@ def display_issues(issues: list[dict[str, Any]], output_format: str = "table") -
     default=None,
     help="Limit number of views to analyze (useful for testing to reduce API costs)",
 )
+@click.option(
+    "--dry-run",
+    is_flag=True,
+    help="Estimate API costs without making actual API calls",
+)
 def main(
     explorer: str | None,
     skip_typos: bool,
@@ -921,6 +1097,7 @@ def main(
     output_file: str | None,
     batch_size: int,
     limit: int | None,
+    dry_run: bool,
 ) -> None:
     """Check explorer views for typos, semantic inconsistencies, and quality issues.
 
@@ -1001,21 +1178,29 @@ def main(
 
     # Check semantic issues
     if not skip_semantic:
-        rprint("[bold]Checking for semantic inconsistencies...[/bold]")
-        semantic_issues, usage_stats = check_semantic_issues_batch(views, anthropic_api_key, batch_size)
+        if dry_run:
+            rprint("[yellow]Estimating semantic check costs (dry run)...[/yellow]")
+        else:
+            rprint("[bold]Checking for semantic inconsistencies...[/bold]")
+        semantic_issues, usage_stats = check_semantic_issues_batch(views, anthropic_api_key, batch_size, dry_run)
         all_issues.extend(semantic_issues)
         total_input_tokens += usage_stats.get("input_tokens", 0)
         total_output_tokens += usage_stats.get("output_tokens", 0)
-        rprint(f"[green]✓ Found {len(semantic_issues)} semantic issues[/green]\n")
+        if not dry_run:
+            rprint(f"[green]✓ Found {len(semantic_issues)} semantic issues[/green]\n")
 
     # Check writing quality
     if not skip_quality:
-        rprint("[bold]Checking writing quality...[/bold]")
-        quality_issues, usage_stats = check_writing_quality_batch(views, anthropic_api_key, batch_size)
+        if dry_run:
+            rprint("[yellow]Estimating quality check costs (dry run)...[/yellow]")
+        else:
+            rprint("[bold]Checking writing quality...[/bold]")
+        quality_issues, usage_stats = check_writing_quality_batch(views, anthropic_api_key, batch_size, dry_run)
         all_issues.extend(quality_issues)
         total_input_tokens += usage_stats.get("input_tokens", 0)
         total_output_tokens += usage_stats.get("output_tokens", 0)
-        rprint(f"[green]✓ Found {len(quality_issues)} quality issues[/green]\n")
+        if not dry_run:
+            rprint(f"[green]✓ Found {len(quality_issues)} quality issues[/green]\n")
 
     # Display results
     if output_file:
@@ -1037,22 +1222,62 @@ def main(
 
         rprint(f"[green]✓ Issues saved to {output_file}[/green]")
 
-    # Always display to console
-    display_issues(all_issues, "table")
+    # Display results (skip in dry-run mode)
+    if dry_run:
+        # In dry run, estimate grouping tokens if we have issues
+        grouping_tokens_estimate = 0
+        if all_issues and not skip_semantic and not skip_quality:
+            # Estimate ~500 tokens for grouping call (input + output)
+            grouping_tokens_estimate = 500
+            total_input_tokens += grouping_tokens_estimate // 2
+            total_output_tokens += grouping_tokens_estimate // 2
 
-    # Display API usage and cost
-    if total_input_tokens > 0 or total_output_tokens > 0:
-        # Claude 3.7 Sonnet pricing (as of 2025-02-19)
-        # Input: $3 per million tokens
-        # Output: $15 per million tokens
-        input_cost = (total_input_tokens / 1_000_000) * 3.0
-        output_cost = (total_output_tokens / 1_000_000) * 15.0
-        total_cost = input_cost + output_cost
+        # In dry run, show cost estimate instead of issues
+        rprint("\n[bold yellow]DRY RUN - Cost Estimate:[/bold yellow]")
+        if total_input_tokens > 0 or total_output_tokens > 0:
+            # Claude 3.7 Sonnet pricing (as of 2025-02-19)
+            # Input: $3 per million tokens
+            # Output: $15 per million tokens
+            input_cost = (total_input_tokens / 1_000_000) * 3.0
+            output_cost = (total_output_tokens / 1_000_000) * 15.0
+            estimated_cost = input_cost + output_cost
 
-        rprint("\n[bold cyan]API Usage:[/bold cyan]")
-        rprint(f"  Input tokens:  {total_input_tokens:,}")
-        rprint(f"  Output tokens: {total_output_tokens:,}")
-        rprint(f"  [bold]Total cost: ${total_cost:.4f}[/bold]")
+            # Calculate range: conservative lower bound (-10%) and higher upper bound (+50%)
+            # Upper bound is intentionally high to avoid unpleasant surprises
+            lower_cost = estimated_cost * 0.9
+            upper_cost = estimated_cost * 1.5
+
+            rprint(f"  Estimated input tokens:  {total_input_tokens:,}")
+            rprint(f"  Estimated output tokens: {total_output_tokens:,}")
+            if grouping_tokens_estimate > 0:
+                rprint(f"  [dim](Includes ~{grouping_tokens_estimate} tokens for intelligent grouping)[/dim]")
+            rprint(f"  [bold]Estimated cost: ${lower_cost:.4f} - ${upper_cost:.4f}[/bold]")
+            rprint(f"  [dim](Most likely: ${estimated_cost:.4f})[/dim]")
+        else:
+            rprint("  No API calls needed for selected checks.")
+    else:
+        # Normal mode - display issues and get grouping tokens
+        grouping_tokens = display_issues(all_issues, "table", anthropic_api_key, dry_run)
+
+        # Add grouping tokens to total
+        total_input_tokens += grouping_tokens // 2  # Rough split
+        total_output_tokens += grouping_tokens // 2
+
+        # Display API usage and cost
+        if total_input_tokens > 0 or total_output_tokens > 0:
+            # Claude 3.7 Sonnet pricing (as of 2025-02-19)
+            # Input: $3 per million tokens
+            # Output: $15 per million tokens
+            input_cost = (total_input_tokens / 1_000_000) * 3.0
+            output_cost = (total_output_tokens / 1_000_000) * 15.0
+            total_cost = input_cost + output_cost
+
+            rprint("\n[bold cyan]API Usage:[/bold cyan]")
+            rprint(f"  Input tokens:  {total_input_tokens:,}")
+            rprint(f"  Output tokens: {total_output_tokens:,}")
+            if grouping_tokens > 0:
+                rprint(f"  [dim](Includes {grouping_tokens} tokens for intelligent grouping)[/dim]")
+            rprint(f"  [bold]Total cost: ${total_cost:.4f}[/bold]")
 
 
 if __name__ == "__main__":
