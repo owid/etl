@@ -1018,6 +1018,7 @@ def display_issues(
     output_format: str = "table",
     api_key: str | None = None,
     dry_run: bool = False,
+    all_explorers: list[str] | None = None,
 ) -> int:
     """Display issues in specified format.
 
@@ -1026,6 +1027,7 @@ def display_issues(
         output_format: Output format (table, json, or csv)
         api_key: Anthropic API key for intelligent grouping
         dry_run: If True, skip Claude API calls for grouping
+        all_explorers: List of all explorer slugs that were analyzed (for reporting clean explorers)
 
     Returns:
         Number of tokens used for grouping (0 for non-table formats)
@@ -1046,68 +1048,103 @@ def display_issues(
     # Group similar issues using Claude
     grouped_issues, grouping_tokens = group_issues_with_claude(issues, api_key, dry_run)
 
-    # Group by severity and issue type
-    critical = [i for i in grouped_issues if i.get("severity") == "critical"]
-    warnings = [i for i in grouped_issues if i.get("severity") == "warning"]
-    info = [i for i in grouped_issues if i.get("severity") == "info"]
+    # Group issues by explorer
+    from collections import defaultdict
+
+    issues_by_explorer = defaultdict(list)
+    for issue in grouped_issues:
+        explorer_slug = issue.get("explorer_slug", "unknown")
+        issues_by_explorer[explorer_slug].append(issue)
 
     # Display summary
     total_original = len(issues)
     total_grouped = len(grouped_issues)
-    rprint(f"\n[bold]Found {total_original} total issues ({total_grouped} unique):[/bold]")
-    if critical:
-        rprint(f"  [red]• {len(critical)} critical issues[/red]")
-    if warnings:
-        rprint(f"  [yellow]• {len(warnings)} warnings[/yellow]")
-    if info:
-        rprint(f"  [blue]• {len(info)} info[/blue]")
+    num_explorers = len(issues_by_explorer)
+    rprint(
+        f"\n[bold]Found {total_original} total issues ({total_grouped} unique) across {num_explorers} explorer(s):[/bold]"
+    )
 
-    # Display each category
-    for category, issues_list, color in [
-        ("CRITICAL ISSUES", critical, "red"),
-        ("WARNINGS", warnings, "yellow"),
-        ("INFO", info, "blue"),
-    ]:
-        if not issues_list:
-            continue
+    # Count by severity across all explorers
+    all_critical = [i for i in grouped_issues if i.get("severity") == "critical"]
+    all_warnings = [i for i in grouped_issues if i.get("severity") == "warning"]
+    all_info = [i for i in grouped_issues if i.get("severity") == "info"]
+    if all_critical:
+        rprint(f"  [red]• {len(all_critical)} critical issues[/red]")
+    if all_warnings:
+        rprint(f"  [yellow]• {len(all_warnings)} warnings[/yellow]")
+    if all_info:
+        rprint(f"  [blue]• {len(all_info)} info[/blue]")
 
-        rprint(f"\n[bold {color}]{category}:[/bold {color}]")
+    # Display issues grouped by explorer
+    for explorer_slug in sorted(issues_by_explorer.keys()):
+        explorer_issues = issues_by_explorer[explorer_slug]
 
-        # Print each issue with full details
-        for i, issue in enumerate(issues_list, 1):
-            issue_type = issue.get("issue_type", "unknown")
-            view_title = issue.get("view_title", "Untitled")
-            view_url = issue.get("view_url", "")
-            field = issue.get("field", "unknown")
-            context = issue.get("context", issue.get("text", ""))
-            group_count = issue.get("group_count", 1)
+        # Group by severity for this explorer
+        critical = [i for i in explorer_issues if i.get("severity") == "critical"]
+        warnings = [i for i in explorer_issues if i.get("severity") == "warning"]
+        info = [i for i in explorer_issues if i.get("severity") == "info"]
 
-            # Print issue header with embedded clickable link
-            if view_url:
-                # Embed link in title for clickable terminal support
-                rprint(f"\n[bold]{i}. [link={view_url}]{view_title}[/link][/bold]")
-                # Also show the URL for copy-paste
-                # rprint(f"   [dim]{view_url}[/dim]")
-            else:
-                rprint(f"\n[bold]{i}. {view_title}[/bold]")
+        # Display explorer header
+        rprint(f"\n[bold cyan]{'=' * 80}[/bold cyan]")
+        rprint(f"[bold cyan]Explorer: {explorer_slug}[/bold cyan]")
+        rprint(f"[bold cyan]{'=' * 80}[/bold cyan]")
 
-            # Show group count if more than 1
-            if group_count > 1:
-                rprint(f"   [dim]({group_count} similar occurrences in this explorer)[/dim]")
+        # Display each category for this explorer
+        for category, issues_list, color in [
+            ("CRITICAL ISSUES", critical, "red"),
+            ("WARNINGS", warnings, "yellow"),
+            ("INFO", info, "blue"),
+        ]:
+            if not issues_list:
+                continue
 
-            # Print issue details
-            if issue_type == "typo":
-                typo = issue.get("typo", "")
-                correction = issue.get("correction", "")
-                rprint(f"   [yellow]Field:[/yellow] {field}")
-                rprint(f"   [yellow]Typo:[/yellow] '{typo}' → '{correction}'")
-                rprint(f"   [yellow]Context:[/yellow] {context}")
-            else:
-                explanation = issue.get("explanation", "")
-                rprint(f"   [yellow]Type:[/yellow] {issue_type}")
-                rprint(f"   [yellow]Issue:[/yellow] {explanation}")
-                if context:
+            rprint(f"\n[bold {color}]{category}:[/bold {color}]")
+
+            # Print each issue with full details
+            for i, issue in enumerate(issues_list, 1):
+                issue_type = issue.get("issue_type", "unknown")
+                view_title = issue.get("view_title", "Untitled")
+                view_url = issue.get("view_url", "")
+                field = issue.get("field", "unknown")
+                context = issue.get("context", issue.get("text", ""))
+                group_count = issue.get("group_count", 1)
+
+                # Print issue header with embedded clickable link
+                if view_url:
+                    # Embed link in title for clickable terminal support
+                    rprint(f"\n[bold]{i}. [link={view_url}]{view_title}[/link][/bold]")
+                    # Also show the URL for copy-paste
+                    # rprint(f"   [dim]{view_url}[/dim]")
+                else:
+                    rprint(f"\n[bold]{i}. {view_title}[/bold]")
+
+                # Show group count if more than 1
+                if group_count > 1:
+                    rprint(f"   [dim]({group_count} similar occurrences in this explorer)[/dim]")
+
+                # Print issue details
+                if issue_type == "typo":
+                    typo = issue.get("typo", "")
+                    correction = issue.get("correction", "")
+                    rprint(f"   [yellow]Field:[/yellow] {field}")
+                    rprint(f"   [yellow]Typo:[/yellow] '{typo}' → '{correction}'")
                     rprint(f"   [yellow]Context:[/yellow] {context}")
+                else:
+                    explanation = issue.get("explanation", "")
+                    rprint(f"   [yellow]Type:[/yellow] {issue_type}")
+                    rprint(f"   [yellow]Issue:[/yellow] {explanation}")
+                    if context:
+                        rprint(f"   [yellow]Context:[/yellow] {context}")
+
+    # Show clean explorers if we have the full list
+    if all_explorers:
+        explorers_with_issues = set(issues_by_explorer.keys())
+        clean_explorers = sorted(set(all_explorers) - explorers_with_issues)
+
+        if clean_explorers:
+            rprint(f"\n[bold green]{'=' * 80}[/bold green]")
+            rprint(f"[bold green]✓ No issues found in {len(clean_explorers)} explorer(s):[/bold green]")
+            rprint(f"[green]{', '.join(clean_explorers)}[/green]")
 
     return grouping_tokens
 
@@ -1309,7 +1346,9 @@ def main(
         rprint("\n[bold yellow]DRY RUN - Cost Estimate:[/bold yellow]")
         if total_input_tokens > 0 or total_output_tokens > 0:
             # Get pricing for the selected model
-            pricing = MODEL_PRICING.get(CLAUDE_MODEL, {"input": 3.0, "output": 15.0})
+            if CLAUDE_MODEL not in MODEL_PRICING:
+                raise ValueError(f"Unknown model '{CLAUDE_MODEL}'. Please add pricing to MODEL_PRICING dictionary.")
+            pricing = MODEL_PRICING[CLAUDE_MODEL]
             input_cost = (total_input_tokens / 1_000_000) * pricing["input"]
             output_cost = (total_output_tokens / 1_000_000) * pricing["output"]
             estimated_cost = input_cost + output_cost
@@ -1328,8 +1367,11 @@ def main(
         else:
             rprint("  No API calls needed for selected checks.")
     else:
+        # Extract unique explorer slugs from views for reporting
+        all_explorers_analyzed = list(set(view["explorerSlug"] for view in views))
+
         # Normal mode - display issues and get grouping tokens
-        grouping_tokens = display_issues(all_issues, "table", anthropic_api_key, dry_run)
+        grouping_tokens = display_issues(all_issues, "table", anthropic_api_key, dry_run, all_explorers_analyzed)
 
         # Add grouping tokens to total
         total_input_tokens += grouping_tokens // 2  # Rough split
@@ -1338,7 +1380,9 @@ def main(
         # Display API usage and cost
         if total_input_tokens > 0 or total_output_tokens > 0:
             # Get pricing for the selected model
-            pricing = MODEL_PRICING.get(CLAUDE_MODEL, {"input": 3.0, "output": 15.0})
+            if CLAUDE_MODEL not in MODEL_PRICING:
+                raise ValueError(f"Unknown model '{CLAUDE_MODEL}'. Please add pricing to MODEL_PRICING dictionary.")
+            pricing = MODEL_PRICING[CLAUDE_MODEL]
             input_cost = (total_input_tokens / 1_000_000) * pricing["input"]
             output_cost = (total_output_tokens / 1_000_000) * pricing["output"]
             total_cost = input_cost + output_cost
