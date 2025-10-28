@@ -317,18 +317,30 @@ def run_codespell_batch(views: list[dict[str, Any]]) -> dict[int, list[dict[str,
                         continue
 
                     # Parse filename: view_{view_id}_{field_name}.txt
-                    parts = filename.replace(".txt", "").split("_", 2)
-                    if len(parts) < 3:
+                    # For mdim views, view_id contains underscores, so we need to find it in view_files
+                    # Extract everything between "view_" and "_{field_name}.txt"
+                    filename_without_ext = filename.replace(".txt", "")
+                    if not filename_without_ext.startswith("view_"):
                         progress.update(task, advance=1)
                         continue
 
-                    try:
-                        view_id = int(parts[1])
-                    except ValueError:
+                    # Remove "view_" prefix
+                    rest = filename_without_ext[5:]  # len("view_") = 5
+
+                    # The view_id is everything up to the last underscore (which separates field name)
+                    # But we need to find which view_id matches from our view_files dict
+                    view_id = None
+                    field_name = None
+                    for vid in view_files.keys():
+                        vid_str = str(vid)
+                        if rest.startswith(vid_str + "_"):
+                            view_id = vid
+                            field_name = rest[len(vid_str) + 1 :]  # Everything after view_id and underscore
+                            break
+
+                    if view_id is None:
                         progress.update(task, advance=1)
                         continue
-
-                    field_name = parts[2]
 
                     # Find the original text and get the correct field name
                     text = ""
@@ -1124,6 +1136,7 @@ def display_issues(
     api_key: str | None = None,
     dry_run: bool = False,
     all_explorers: list[str] | None = None,
+    mdim_slugs: set[str] | None = None,
 ) -> int:
     """Display issues in specified format.
 
@@ -1133,6 +1146,7 @@ def display_issues(
         api_key: Anthropic API key for intelligent grouping
         dry_run: If True, skip Claude API calls for grouping
         all_explorers: List of all explorer slugs that were analyzed (for reporting clean explorers)
+        mdim_slugs: Set of slugs that are multidimensional indicators (not explorers)
 
     Returns:
         Number of tokens used for grouping (0 for non-table formats)
@@ -1189,10 +1203,14 @@ def display_issues(
         warnings = [i for i in explorer_issues if i.get("severity") == "warning"]
         info = [i for i in explorer_issues if i.get("severity") == "info"]
 
-        # Display explorer header
-        rprint(f"\n[bold cyan]{'=' * 80}[/bold cyan]")
-        rprint(f"[bold cyan]Explorer: {explorer_slug}[/bold cyan]")
-        rprint(f"[bold cyan]{'=' * 80}[/bold cyan]")
+        # Display header with appropriate label and color
+        is_mdim = mdim_slugs and explorer_slug in mdim_slugs
+        label = "Multidim" if is_mdim else "Explorer"
+        color = "magenta" if is_mdim else "cyan"
+
+        rprint(f"\n[bold {color}]{'=' * 80}[/bold {color}]")
+        rprint(f"[bold {color}]{label}: {explorer_slug}[/bold {color}]")
+        rprint(f"[bold {color}]{'=' * 80}[/bold {color}]")
 
         # Display each category for this explorer
         for category, issues_list, color in [
@@ -1499,8 +1517,14 @@ def main(
         # Extract unique explorer slugs from views for reporting
         all_explorers_analyzed = list(set(view["explorerSlug"] for view in views))
 
+        # Identify which slugs are mdims vs explorers
+        # Mdim views have IDs starting with 'mdim_'
+        mdim_slugs = set(view["explorerSlug"] for view in views if str(view.get("id", "")).startswith("mdim_"))
+
         # Normal mode - display issues and get grouping tokens
-        grouping_tokens = display_issues(all_issues, "table", anthropic_api_key, dry_run, all_explorers_analyzed)
+        grouping_tokens = display_issues(
+            all_issues, "table", anthropic_api_key, dry_run, all_explorers_analyzed, mdim_slugs
+        )
 
         # Add grouping tokens to total
         total_input_tokens += grouping_tokens // 2  # Rough split
