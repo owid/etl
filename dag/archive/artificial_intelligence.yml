@@ -426,6 +426,18 @@ steps:
     - data://garden/bls/2025-04-12/us_consumer_prices
   data://grapher/artificial_intelligence/2024-07-16/cset:
     - data://garden/artificial_intelligence/2024-07-16/cset
+
+  # CSET data on articles, patents and investment (archived - replaced by 2025-10-22)
+  data://meadow/artificial_intelligence/2025-04-18/cset:
+    - snapshot://artificial_intelligence/2025-04-18/cset.zip
+  data://garden/artificial_intelligence/2025-04-18/cset:
+    - data://meadow/artificial_intelligence/2025-04-18/cset
+    - data://garden/demography/2024-07-15/population
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/bls/2025-04-12/us_consumer_prices
+  data://grapher/artificial_intelligence/2025-04-18/cset:
+    - data://garden/artificial_intelligence/2025-04-18/cset
+
   ########################
   # Papers with Code
   ########################
