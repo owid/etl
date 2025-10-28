@@ -484,6 +484,7 @@ Views to analyze:
 
 Respond ONLY with a JSON array of issues, or an empty array [] if no issues found."""
 
+            content = ""  # Initialize to avoid unbound variable
             try:
                 response = client.messages.create(
                     model="claude-3-7-sonnet-20250219",  # Latest Sonnet model
@@ -511,8 +512,15 @@ Respond ONLY with a JSON array of issues, or an empty array [] if no issues foun
                     if start != -1 and end != -1 and start < end:
                         content = content[start : end + 1]
 
-                # Try to parse JSON
-                batch_issues = json.loads(content)
+                # Try to parse JSON, with fallback for common issues
+                try:
+                    batch_issues = json.loads(content)
+                except json.JSONDecodeError:
+                    # Try to fix common JSON issues - replace literal newlines in strings
+                    import re
+
+                    content_fixed = re.sub(r'"\s*\n\s*', '" ', content)
+                    batch_issues = json.loads(content_fixed)
 
                 # Track token usage
                 total_input_tokens += response.usage.input_tokens
@@ -536,6 +544,11 @@ Respond ONLY with a JSON array of issues, or an empty array [] if no issues foun
                         issue["view_url"] = view_url
                         all_issues.append(issue)
 
+            except json.JSONDecodeError as e:
+                log.error(f"JSON parsing error for batch: {e}")
+                if content:
+                    log.error(f"Content that failed to parse: {content[:500]}...")
+                continue
             except Exception as e:
                 log.error(f"Error calling Claude API for batch: {e}")
                 continue
@@ -620,6 +633,11 @@ For each issue found, respond with a JSON object:
     "suggestion": "<optional: suggested improvement>"
 }}
 
+IMPORTANT: Ensure valid JSON formatting:
+- Use proper escaping for quotes within strings
+- Keep all content on single lines (no literal line breaks in strings)
+- Avoid using 'or' in suggestion fields - pick one option
+
 If no significant issues found, respond with an empty array.
 
 Texts to review:
@@ -627,6 +645,7 @@ Texts to review:
 
 Respond ONLY with a JSON array of issues, or an empty array [] if no issues found."""
 
+            content = ""  # Initialize to avoid unbound variable
             try:
                 response = client.messages.create(
                     model="claude-3-7-sonnet-20250219",  # Latest Sonnet model
@@ -654,8 +673,15 @@ Respond ONLY with a JSON array of issues, or an empty array [] if no issues foun
                     if start != -1 and end != -1 and start < end:
                         content = content[start : end + 1]
 
-                # Try to parse JSON
-                batch_issues = json.loads(content)
+                # Try to parse JSON, with fallback for common issues
+                try:
+                    batch_issues = json.loads(content)
+                except json.JSONDecodeError:
+                    # Try to fix common JSON issues - replace literal newlines in strings
+                    import re
+
+                    content_fixed = re.sub(r'"\s*\n\s*', '" ', content)
+                    batch_issues = json.loads(content_fixed)
 
                 # Track token usage
                 total_input_tokens += response.usage.input_tokens
@@ -678,6 +704,11 @@ Respond ONLY with a JSON array of issues, or an empty array [] if no issues foun
                         issue["view_url"] = view_url
                         all_issues.append(issue)
 
+            except json.JSONDecodeError as e:
+                log.error(f"JSON parsing error for batch: {e}")
+                if content:
+                    log.error(f"Content that failed to parse: {content[:500]}...")
+                continue
             except Exception as e:
                 log.error(f"Error calling Claude API for batch: {e}")
                 continue
@@ -713,11 +744,26 @@ def group_similar_issues(issues: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 issue.get("context", "")[:200],  # First 200 chars of context
             )
         else:
-            # For non-typo issues, use explanation
+            # For non-typo issues (semantic, writing_quality), group by normalized explanation
+            # Remove quoted strings to create a fingerprint that groups similar issues
+            import re
+
+            explanation = issue.get("explanation", "")
+            field = issue.get("field", "")
+
+            # Create a fingerprint by removing quoted/dynamic parts
+            # Replace single-quoted strings like 'Farmed fishes killed for food' with placeholder
+            fingerprint = re.sub(r"'[^']*'", "'...'", explanation)
+            # Replace double-quoted strings
+            fingerprint = re.sub(r'"[^"]*"', '"..."', fingerprint)
+            # Take first 150 chars of fingerprint
+            fingerprint = fingerprint[:150]
+
             key = (
                 issue.get("explorer_slug", ""),
                 issue.get("issue_type", ""),
-                issue.get("explanation", ""),
+                field,
+                fingerprint,
             )
 
         groups[key].append(issue)
