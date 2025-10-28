@@ -399,7 +399,7 @@ def aggregate_explorer_views(df: pd.DataFrame) -> pd.DataFrame:
 
 def check_semantic_issues_batch(
     views: list[dict[str, Any]], api_key: str | None, batch_size: int = 10
-) -> list[dict[str, Any]]:
+) -> tuple[list[dict[str, Any]], dict[str, int]]:
     """Check for semantic inconsistencies using Claude API in batches.
 
     Args:
@@ -408,14 +408,16 @@ def check_semantic_issues_batch(
         batch_size: Number of views to check in each API call
 
     Returns:
-        List of semantic issues found
+        Tuple of (list of semantic issues found, usage stats dict)
     """
     if not api_key:
         log.warning("No Claude API key provided, skipping semantic checks")
-        return []
+        return [], {}
 
     client = anthropic.Anthropic(api_key=api_key)
     all_issues = []
+    total_input_tokens = 0
+    total_output_tokens = 0
 
     with Progress(
         SpinnerColumn(),
@@ -484,7 +486,7 @@ Respond ONLY with a JSON array of issues, or an empty array [] if no issues foun
 
             try:
                 response = client.messages.create(
-                    model="claude-3-5-sonnet-20241022",
+                    model="claude-3-7-sonnet-20250219",  # Latest Sonnet model
                     max_tokens=4096,
                     messages=[{"role": "user", "content": prompt}],
                 )
@@ -494,14 +496,27 @@ Respond ONLY with a JSON array of issues, or an empty array [] if no issues foun
                 if not isinstance(content_block, TextBlock):
                     log.error(f"Unexpected content block type: {type(content_block)}")
                     continue
-                content = content_block.text
-                # Extract JSON from response (handle markdown code blocks)
+                content = content_block.text.strip()
+
+                # Extract JSON from response (handle markdown code blocks and extra text)
                 if "```json" in content:
                     content = content.split("```json")[1].split("```")[0].strip()
                 elif "```" in content:
                     content = content.split("```")[1].split("```")[0].strip()
+                else:
+                    # Try to find JSON array in the content
+                    # Look for the first '[' and last ']'
+                    start = content.find("[")
+                    end = content.rfind("]")
+                    if start != -1 and end != -1 and start < end:
+                        content = content[start : end + 1]
 
+                # Try to parse JSON
                 batch_issues = json.loads(content)
+
+                # Track token usage
+                total_input_tokens += response.usage.input_tokens
+                total_output_tokens += response.usage.output_tokens
 
                 # Enrich issues with view metadata
                 for issue in batch_issues:
@@ -514,18 +529,27 @@ Respond ONLY with a JSON array of issues, or an empty array [] if no issues foun
                         chart_config = json.loads(view["chart_config"]) if view["chart_config"] else {}
                         issue["dimensions"] = dimensions
                         issue["title"] = chart_config.get("title", "")
+                        # Add view title and URL for display
+                        view_title = chart_config.get("title", "")
+                        view_url = build_explorer_url(view["explorerSlug"], dimensions)
+                        issue["view_title"] = view_title
+                        issue["view_url"] = view_url
                         all_issues.append(issue)
 
             except Exception as e:
                 log.error(f"Error calling Claude API for batch: {e}")
                 continue
 
-    return all_issues
+    usage_stats = {
+        "input_tokens": total_input_tokens,
+        "output_tokens": total_output_tokens,
+    }
+    return all_issues, usage_stats
 
 
 def check_writing_quality_batch(
     views: list[dict[str, Any]], api_key: str | None, batch_size: int = 10
-) -> list[dict[str, Any]]:
+) -> tuple[list[dict[str, Any]], dict[str, int]]:
     """Check for writing quality issues using Claude API in batches.
 
     Args:
@@ -534,13 +558,15 @@ def check_writing_quality_batch(
         batch_size: Number of views to check in each API call
 
     Returns:
-        List of writing quality issues found
+        Tuple of (list of writing quality issues found, usage stats dict)
     """
     if not api_key:
-        return []
+        return [], {}
 
     client = anthropic.Anthropic(api_key=api_key)
     all_issues = []
+    total_input_tokens = 0
+    total_output_tokens = 0
 
     with Progress(
         SpinnerColumn(),
@@ -603,7 +629,7 @@ Respond ONLY with a JSON array of issues, or an empty array [] if no issues foun
 
             try:
                 response = client.messages.create(
-                    model="claude-3-5-sonnet-20241022",
+                    model="claude-3-7-sonnet-20250219",  # Latest Sonnet model
                     max_tokens=4096,
                     messages=[{"role": "user", "content": prompt}],
                 )
@@ -613,14 +639,27 @@ Respond ONLY with a JSON array of issues, or an empty array [] if no issues foun
                 if not isinstance(content_block, TextBlock):
                     log.error(f"Unexpected content block type: {type(content_block)}")
                     continue
-                content = content_block.text
-                # Extract JSON from response
+                content = content_block.text.strip()
+
+                # Extract JSON from response (handle markdown code blocks and extra text)
                 if "```json" in content:
                     content = content.split("```json")[1].split("```")[0].strip()
                 elif "```" in content:
                     content = content.split("```")[1].split("```")[0].strip()
+                else:
+                    # Try to find JSON array in the content
+                    # Look for the first '[' and last ']'
+                    start = content.find("[")
+                    end = content.rfind("]")
+                    if start != -1 and end != -1 and start < end:
+                        content = content[start : end + 1]
 
+                # Try to parse JSON
                 batch_issues = json.loads(content)
+
+                # Track token usage
+                total_input_tokens += response.usage.input_tokens
+                total_output_tokens += response.usage.output_tokens
 
                 # Enrich issues with view metadata
                 for issue in batch_issues:
@@ -630,13 +669,24 @@ Respond ONLY with a JSON array of issues, or an empty array [] if no issues foun
                         issue["issue_type"] = "writing_quality"
                         issue["severity"] = "info"
                         issue["explorer_slug"] = view["explorerSlug"]
+                        # Add view title and URL for display
+                        dimensions = json.loads(view["dimensions"]) if view["dimensions"] else {}
+                        chart_config = json.loads(view["chart_config"]) if view["chart_config"] else {}
+                        view_title = chart_config.get("title", "")
+                        view_url = build_explorer_url(view["explorerSlug"], dimensions)
+                        issue["view_title"] = view_title
+                        issue["view_url"] = view_url
                         all_issues.append(issue)
 
             except Exception as e:
                 log.error(f"Error calling Claude API for batch: {e}")
                 continue
 
-    return all_issues
+    usage_stats = {
+        "input_tokens": total_input_tokens,
+        "output_tokens": total_output_tokens,
+    }
+    return all_issues, usage_stats
 
 
 def group_similar_issues(issues: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -810,6 +860,12 @@ def display_issues(issues: list[dict[str, Any]], output_format: str = "table") -
     default=10,
     help="Number of views to check per API call",
 )
+@click.option(
+    "--limit",
+    type=int,
+    default=None,
+    help="Limit number of views to analyze (useful for testing to reduce API costs)",
+)
 def main(
     explorer: str | None,
     skip_typos: bool,
@@ -818,6 +874,7 @@ def main(
     output_format: str,
     output_file: str | None,
     batch_size: int,
+    limit: int | None,
 ) -> None:
     """Check explorer views for typos, semantic inconsistencies, and quality issues.
 
@@ -834,6 +891,9 @@ def main(
 
         # Check specific explorer with all checks (requires API key in .env)
         python check_explorer_metadata.py --explorer global-food
+
+        # Test with limited views to minimize API costs
+        python check_explorer_metadata.py --explorer animal-welfare --limit 5
 
         # Export issues to JSON
         python check_explorer_metadata.py --output-format json --output-file issues.json
@@ -871,9 +931,18 @@ def main(
     agg_df = aggregate_explorer_views(df)
     views: list[dict[str, Any]] = agg_df.to_dict("records")  # type: ignore
 
+    # Apply limit if specified
+    if limit is not None and limit > 0:
+        views = views[:limit]
+        rprint(f"[yellow]Limiting to first {limit} views (for testing)[/yellow]")
+
     rprint(f"[cyan]Analyzing {len(views)} explorer views...[/cyan]\n")
 
     all_issues = []
+
+    # Track API usage for cost calculation
+    total_input_tokens = 0
+    total_output_tokens = 0
 
     # Check typos
     if not skip_typos:
@@ -887,15 +956,19 @@ def main(
     # Check semantic issues
     if not skip_semantic:
         rprint("[bold]Checking for semantic inconsistencies...[/bold]")
-        semantic_issues = check_semantic_issues_batch(views, anthropic_api_key, batch_size)
+        semantic_issues, usage_stats = check_semantic_issues_batch(views, anthropic_api_key, batch_size)
         all_issues.extend(semantic_issues)
+        total_input_tokens += usage_stats.get("input_tokens", 0)
+        total_output_tokens += usage_stats.get("output_tokens", 0)
         rprint(f"[green]✓ Found {len(semantic_issues)} semantic issues[/green]\n")
 
     # Check writing quality
     if not skip_quality:
         rprint("[bold]Checking writing quality...[/bold]")
-        quality_issues = check_writing_quality_batch(views, anthropic_api_key, batch_size)
+        quality_issues, usage_stats = check_writing_quality_batch(views, anthropic_api_key, batch_size)
         all_issues.extend(quality_issues)
+        total_input_tokens += usage_stats.get("input_tokens", 0)
+        total_output_tokens += usage_stats.get("output_tokens", 0)
         rprint(f"[green]✓ Found {len(quality_issues)} quality issues[/green]\n")
 
     # Display results
@@ -920,6 +993,20 @@ def main(
 
     # Always display to console
     display_issues(all_issues, "table")
+
+    # Display API usage and cost
+    if total_input_tokens > 0 or total_output_tokens > 0:
+        # Claude 3.7 Sonnet pricing (as of 2025-02-19)
+        # Input: $3 per million tokens
+        # Output: $15 per million tokens
+        input_cost = (total_input_tokens / 1_000_000) * 3.0
+        output_cost = (total_output_tokens / 1_000_000) * 15.0
+        total_cost = input_cost + output_cost
+
+        rprint("\n[bold cyan]API Usage:[/bold cyan]")
+        rprint(f"  Input tokens:  {total_input_tokens:,}")
+        rprint(f"  Output tokens: {total_output_tokens:,}")
+        rprint(f"  [bold]Total cost: ${total_cost:.4f}[/bold]")
 
 
 if __name__ == "__main__":
