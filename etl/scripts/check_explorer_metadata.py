@@ -1259,18 +1259,30 @@ def display_issues(
                     if context:
                         rprint(f"   [yellow]Context:[/yellow] {context}")
 
-    # Show clean explorers if we have the full list
-    if all_explorers:
+    # Show clean explorers/mdims if we have the full list
+    if all_explorers and mdim_slugs is not None:
         explorers_with_issues = set(issues_by_explorer.keys())
         # Filter out NaN values (from NULL slugs) before sorting
         all_explorers_valid = {e for e in all_explorers if isinstance(e, str)}
         explorers_with_issues_valid = {e for e in explorers_with_issues if isinstance(e, str)}
-        clean_explorers = sorted(all_explorers_valid - explorers_with_issues_valid)
+        all_clean = sorted(all_explorers_valid - explorers_with_issues_valid)
 
-        if clean_explorers:
+        # Separate into explorers and mdims
+        clean_explorers = [e for e in all_clean if e not in mdim_slugs]
+        clean_mdims = [e for e in all_clean if e in mdim_slugs]
+
+        if clean_explorers or clean_mdims:
             rprint(f"\n[bold green]{'=' * 80}[/bold green]")
-            rprint(f"[bold green]✓ No issues found in {len(clean_explorers)} explorer(s):[/bold green]")
-            rprint(f"[green]{', '.join(clean_explorers)}[/green]")
+
+            if clean_explorers:
+                rprint(f"[bold cyan]✓ No issues found in {len(clean_explorers)} explorer(s):[/bold cyan]")
+                rprint(f"[cyan]{', '.join(clean_explorers)}[/cyan]")
+
+            if clean_mdims:
+                if clean_explorers:
+                    rprint()  # Add spacing between the two lists
+                rprint(f"[bold magenta]✓ No issues found in {len(clean_mdims)} multidim(s):[/bold magenta]")
+                rprint(f"[magenta]{', '.join(clean_mdims)}[/magenta]")
 
     return grouping_tokens
 
