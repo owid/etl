@@ -69,6 +69,27 @@ MODEL_PRICING = {
 }
 
 
+def parse_dimensions(dimensions_raw: Any) -> dict[str, Any]:
+    """Parse dimensions field which can be JSON (explorers) or just a viewId (mdims).
+
+    Args:
+        dimensions_raw: Raw dimensions value from database
+
+    Returns:
+        Parsed dimensions dict, or empty dict if not applicable
+    """
+    if not dimensions_raw:
+        return {}
+    if isinstance(dimensions_raw, dict):
+        # Already parsed
+        return dimensions_raw
+    if isinstance(dimensions_raw, str) and dimensions_raw.startswith("{"):
+        # Explorer: dimensions is a JSON string
+        return json.loads(dimensions_raw)
+    # Mdim: dimensions is just a viewId (string or number) - not relevant for our checks
+    return {}
+
+
 def get_codespell_path() -> Path | None:
     """Get path to codespell binary.
 
@@ -196,7 +217,7 @@ def run_codespell_batch(views: list[dict[str, Any]]) -> dict[int, list[dict[str,
 
             for view in views:
                 chart_config = json.loads(view["chart_config"]) if view["chart_config"] else {}
-                dimensions = json.loads(view["dimensions"]) if view["dimensions"] else {}
+                dimensions = parse_dimensions(view["dimensions"])
                 view_id = view["id"]
                 view_files[view_id] = []
 
@@ -339,7 +360,7 @@ def run_codespell_batch(views: list[dict[str, Any]]) -> dict[int, list[dict[str,
                         continue
 
                     chart_config = json.loads(view["chart_config"]) if view["chart_config"] else {}
-                    dimensions = json.loads(view["dimensions"]) if view["dimensions"] else {}
+                    dimensions = parse_dimensions(view["dimensions"])
                     view_title = chart_config.get("title", "")
                     view_url = build_explorer_url(view["explorerSlug"], dimensions)
 
@@ -437,8 +458,92 @@ def aggregate_explorer_views(df: pd.DataFrame) -> pd.DataFrame:
         Aggregated dataframe with one row per explorer view
     """
     # Group by explorer view and aggregate variable metadata
+    # Use dropna=False to preserve rows with NULL explorerSlug (if any)
     agg_df = (
-        df.groupby(["id", "explorerSlug", "dimensions", "chartConfigId", "chart_config"])
+        df.groupby(["id", "explorerSlug", "dimensions", "chartConfigId", "chart_config"], dropna=False)
+        .agg(
+            {
+                "variable_id": lambda x: list(x.dropna()),
+                "variable_name": lambda x: list(x.dropna()),
+                "variable_unit": lambda x: list(x.dropna()),
+                "variable_description": lambda x: list(x.dropna()),
+                "variable_short_unit": lambda x: list(x.dropna()),
+                "variable_short_name": lambda x: list(x.dropna()),
+                "variable_title_public": lambda x: list(x.dropna()),
+                "variable_title_variant": lambda x: list(x.dropna()),
+                "variable_description_short": lambda x: list(x.dropna()),
+                "variable_description_from_producer": lambda x: list(x.dropna()),
+                "variable_description_key": lambda x: list(x.dropna()),
+                "variable_description_processing": lambda x: list(x.dropna()),
+            }
+        )
+        .reset_index()
+    )
+
+    return agg_df
+
+
+def fetch_multidim_data(slug_filter: str | None = None) -> pd.DataFrame:
+    """Fetch multidimensional indicator data from the database.
+
+    Args:
+        slug_filter: Optional filter for specific multidim slug
+
+    Returns:
+        DataFrame with columns matching explorer structure: id, explorerSlug, dimensions,
+                                chartConfigId, chart_config, and variable_* columns
+    """
+    where_clause = ""
+    if slug_filter:
+        where_clause = f"WHERE md.slug = '{slug_filter}'"
+
+    query = f"""
+        SELECT
+            CONCAT('mdim_', md.id, '_', mx.viewId) as id,
+            md.slug as explorerSlug,
+            mx.viewId as dimensions,
+            mx.chartConfigId,
+            cc.full as chart_config,
+            v.id as variable_id,
+            v.name as variable_name,
+            v.unit as variable_unit,
+            v.description as variable_description,
+            v.shortUnit as variable_short_unit,
+            v.shortName as variable_short_name,
+            v.titlePublic as variable_title_public,
+            v.titleVariant as variable_title_variant,
+            v.descriptionShort as variable_description_short,
+            v.descriptionFromProducer as variable_description_from_producer,
+            v.descriptionKey as variable_description_key,
+            v.descriptionProcessing as variable_description_processing
+        FROM multi_dim_data_pages md
+        JOIN multi_dim_x_chart_configs mx ON md.id = mx.multiDimId
+        LEFT JOIN chart_configs cc ON mx.chartConfigId = cc.id
+        LEFT JOIN variables v ON mx.variableId = v.id
+        {where_clause}
+        ORDER BY md.slug, mx.viewId
+    """
+
+    log.info("Fetching multidimensional indicator data from database...")
+    df = read_sql(query)
+    log.info(f"Fetched {len(df)} multidim view records")
+
+    return df
+
+
+def aggregate_multidim_views(df: pd.DataFrame) -> pd.DataFrame:
+    """Aggregate multidim views by grouping variables for each view.
+
+    Args:
+        df: Raw dataframe from fetch_multidim_data
+
+    Returns:
+        Aggregated dataframe with one row per multidim view
+    """
+    # Group by multidim view and aggregate variable metadata (same as explorers)
+    # Use dropna=False to preserve rows with NULL explorerSlug
+    agg_df = (
+        df.groupby(["id", "explorerSlug", "dimensions", "chartConfigId", "chart_config"], dropna=False)
         .agg(
             {
                 "variable_id": lambda x: list(x.dropna()),
@@ -557,7 +662,7 @@ def check_semantic_issues_batch(
             batch_context = []
             for view in batch:
                 chart_config = json.loads(view["chart_config"]) if view["chart_config"] else {}
-                dimensions = json.loads(view["dimensions"]) if view["dimensions"] else {}
+                dimensions = parse_dimensions(view["dimensions"])
 
                 # Build comprehensive variable metadata
                 variables = []
@@ -666,7 +771,7 @@ Respond ONLY with a JSON array of issues, or an empty array [] if no issues foun
                     if view:
                         issue["issue_type"] = "semantic"
                         issue["explorer_slug"] = view["explorerSlug"]
-                        dimensions = json.loads(view["dimensions"]) if view["dimensions"] else {}
+                        dimensions = parse_dimensions(view["dimensions"])
                         chart_config = json.loads(view["chart_config"]) if view["chart_config"] else {}
                         issue["dimensions"] = dimensions
                         issue["title"] = chart_config.get("title", "")
@@ -843,7 +948,7 @@ Respond ONLY with a JSON array of issues, or an empty array [] if no issues foun
                         issue["severity"] = "info"
                         issue["explorer_slug"] = view["explorerSlug"]
                         # Add view title and URL for display
-                        dimensions = json.loads(view["dimensions"]) if view["dimensions"] else {}
+                        dimensions = parse_dimensions(view["dimensions"])
                         chart_config = json.loads(view["chart_config"]) if view["chart_config"] else {}
                         view_title = chart_config.get("title", "")
                         view_url = build_explorer_url(view["explorerSlug"], dimensions)
@@ -1139,7 +1244,10 @@ def display_issues(
     # Show clean explorers if we have the full list
     if all_explorers:
         explorers_with_issues = set(issues_by_explorer.keys())
-        clean_explorers = sorted(set(all_explorers) - explorers_with_issues)
+        # Filter out NaN values (from NULL slugs) before sorting
+        all_explorers_valid = {e for e in all_explorers if isinstance(e, str)}
+        explorers_with_issues_valid = {e for e in explorers_with_issues if isinstance(e, str)}
+        clean_explorers = sorted(all_explorers_valid - explorers_with_issues_valid)
 
         if clean_explorers:
             rprint(f"\n[bold green]{'=' * 80}[/bold green]")
@@ -1246,22 +1354,38 @@ def main(
         rprint("[yellow]Alternatively, use --skip-semantic and --skip-quality flags to skip these checks.[/yellow]")
         raise click.ClickException("Missing ANTHROPIC_API_KEY in .env file")
 
-    # Fetch data
-    df = fetch_explorer_data(explorer_slug=explorer)
+    # Fetch data from both explorers and multidimensional indicators
+    df_explorers = fetch_explorer_data(explorer_slug=explorer)
+    df_mdims = fetch_multidim_data(slug_filter=explorer)
+
+    # Combine both datasets
+    df = pd.concat([df_explorers, df_mdims], ignore_index=True)
 
     # Check if we got any results
     if df.empty:
         if explorer:
-            rprint(f"[red]Error: No views found for explorer '{explorer}'[/red]")
+            rprint(f"[red]Error: No views found for slug '{explorer}' (checked both explorers and multidims)[/red]")
         else:
-            rprint("[red]Error: No explorer views found in database[/red]")
+            rprint("[red]Error: No explorer or multidim views found in database[/red]")
         return
 
+    # Report what was found
+    explorer_count = len(df_explorers)
+    mdim_count = len(df_mdims)
     if explorer:
-        rprint(f"[cyan]Filtering to explorer: {explorer} ({len(df)} records)[/cyan]")
+        rprint(
+            f"[cyan]Filtering to slug: {explorer} ({explorer_count} explorer records, {mdim_count} multidim records)[/cyan]"
+        )
+    else:
+        rprint(f"[cyan]Fetched {explorer_count} explorer records and {mdim_count} multidim records[/cyan]")
 
-    # Aggregate views
-    agg_df = aggregate_explorer_views(df)
+    # Aggregate views (works for both explorers and mdims since structure is the same)
+    # Note: "records" count is higher than "views" count because:
+    # - Explorer records include multiple rows per view (one per variable in chart config)
+    # - After aggregation, variables are grouped into lists per view
+    agg_df_explorers = aggregate_explorer_views(df_explorers) if not df_explorers.empty else pd.DataFrame()
+    agg_df_mdims = aggregate_multidim_views(df_mdims) if not df_mdims.empty else pd.DataFrame()
+    agg_df = pd.concat([agg_df_explorers, agg_df_mdims], ignore_index=True)
     views: list[dict[str, Any]] = agg_df.to_dict("records")  # type: ignore
 
     # Apply limit if specified
@@ -1269,7 +1393,12 @@ def main(
         views = views[:limit]
         rprint(f"[yellow]Limiting to first {limit} views (for testing)[/yellow]")
 
-    rprint(f"[cyan]Analyzing {len(views)} explorer views...[/cyan]\n")
+    explorer_view_count = len(agg_df_explorers)
+    mdim_view_count = len(agg_df_mdims)
+    rprint(
+        f"[cyan]Aggregated to {len(views)} unique views "
+        f"({explorer_view_count} explorers + {mdim_view_count} multidims)...[/cyan]\n"
+    )
 
     all_issues = []
 
