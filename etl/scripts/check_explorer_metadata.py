@@ -1308,12 +1308,8 @@ def display_issues(
     return grouping_tokens
 
 
-def load_and_aggregate_views(slug_list: list[str] | None, limit: int | None) -> tuple[list[dict[str, Any]], int, int]:
-    """Load views from database and aggregate by view ID.
-
-    Returns:
-        Tuple of (views list, explorer_count, mdim_count)
-    """
+def load_and_aggregate_views(slug_list: list[str] | None, limit: int | None) -> list[dict[str, Any]]:
+    """Load views from database and aggregate by view ID."""
     # Fetch data from both explorers and multidimensional indicators
     df_explorers = fetch_explorer_data(explorer_slugs=slug_list)
     df_mdims = fetch_multidim_data(slug_filters=slug_list)
@@ -1336,7 +1332,7 @@ def load_and_aggregate_views(slug_list: list[str] | None, limit: int | None) -> 
             rprint(f"[red]Error: No views found for slug(s) '{slugs_str}' (checked both explorers and multidims)[/red]")
         else:
             rprint("[red]Error: No explorer or multidim views found in database[/red]")
-        return [], 0, 0
+        return []
 
     # Aggregate views
     agg_df_explorers = aggregate_explorer_views(df_explorers) if not df_explorers.empty else pd.DataFrame()
@@ -1349,13 +1345,11 @@ def load_and_aggregate_views(slug_list: list[str] | None, limit: int | None) -> 
         views = views[:limit]
         rprint(f"[yellow]Limiting to first {limit} views (for testing)[/yellow]")
 
-    explorer_view_count = len(agg_df_explorers)
-    mdim_view_count = len(agg_df_mdims)
     rprint(
-        f"[cyan]Aggregated to {len(views)} unique views ({explorer_view_count} explorers + {mdim_view_count} multidims)...[/cyan]\n"
+        f"[cyan]Aggregated to {len(views)} unique views ({len(agg_df_explorers)} explorers + {len(agg_df_mdims)} multidims)...[/cyan]\n"
     )
 
-    return views, explorer_view_count, mdim_view_count
+    return views
 
 
 def run_checks(
@@ -1363,7 +1357,6 @@ def run_checks(
     skip_typos: bool,
     skip_semantic: bool,
     skip_quality: bool,
-    anthropic_api_key: str | None,
     batch_size: int,
     dry_run: bool,
 ) -> tuple[list[dict[str, Any]], int, int]:
@@ -1392,7 +1385,7 @@ def run_checks(
             else "[bold]Checking for semantic inconsistencies...[/bold]"
         )
         rprint(msg)
-        semantic_issues, usage_stats = check_semantic_issues_batch(views, anthropic_api_key, batch_size, dry_run)
+        semantic_issues, usage_stats = check_semantic_issues_batch(views, config.ANTHROPIC_API_KEY, batch_size, dry_run)
         all_issues.extend(semantic_issues)
         total_input_tokens += usage_stats.get("input_tokens", 0)
         total_output_tokens += usage_stats.get("output_tokens", 0)
@@ -1407,7 +1400,7 @@ def run_checks(
             else "[bold]Checking writing quality...[/bold]"
         )
         rprint(msg)
-        quality_issues, usage_stats = check_writing_quality_batch(views, anthropic_api_key, batch_size, dry_run)
+        quality_issues, usage_stats = check_writing_quality_batch(views, config.ANTHROPIC_API_KEY, batch_size, dry_run)
         all_issues.extend(quality_issues)
         total_input_tokens += usage_stats.get("input_tokens", 0)
         total_output_tokens += usage_stats.get("output_tokens", 0)
@@ -1449,7 +1442,6 @@ def display_results_and_cost(
     views: list[dict[str, Any]],
     total_input_tokens: int,
     total_output_tokens: int,
-    anthropic_api_key: str | None,
     dry_run: bool,
 ) -> None:
     """Display issues and API usage cost."""
@@ -1459,7 +1451,7 @@ def display_results_and_cost(
 
     # Display issues and get grouping tokens
     grouping_tokens = display_issues(
-        all_issues, "table", anthropic_api_key, dry_run, all_explorers_analyzed, mdim_slugs
+        all_issues, "table", config.ANTHROPIC_API_KEY, dry_run, all_explorers_analyzed, mdim_slugs
     )
 
     # Display API usage and cost
@@ -1543,20 +1535,19 @@ def run(
         rprint("[yellow]Warning: codespell not found. Install with: uv add codespell[/yellow]")
         skip_typos = True
 
-    anthropic_api_key = config.ANTHROPIC_API_KEY
-    if not anthropic_api_key and (not skip_semantic or not skip_quality):
+    if not config.ANTHROPIC_API_KEY and (not skip_semantic or not skip_quality):
         rprint("[red]Error: ANTHROPIC_API_KEY not found. Add to .env file or use --skip-semantic --skip-quality[/red]")
         raise click.ClickException("Missing ANTHROPIC_API_KEY")
 
     # Load and aggregate views
     slug_list = list(slug) if slug else None
-    views, _, _ = load_and_aggregate_views(slug_list, limit)
+    views = load_and_aggregate_views(slug_list, limit)
     if not views:
         return
 
     # Run checks
     all_issues, total_input_tokens, total_output_tokens = run_checks(
-        views, skip_typos, skip_semantic, skip_quality, anthropic_api_key, batch_size, dry_run
+        views, skip_typos, skip_semantic, skip_quality, batch_size, dry_run
     )
 
     # Save to CSV if requested
@@ -1568,7 +1559,7 @@ def run(
     if dry_run:
         display_cost_estimate(total_input_tokens, total_output_tokens, bool(all_issues), skip_semantic, skip_quality)
     else:
-        display_results_and_cost(all_issues, views, total_input_tokens, total_output_tokens, anthropic_api_key, dry_run)
+        display_results_and_cost(all_issues, views, total_input_tokens, total_output_tokens, dry_run)
 
 
 if __name__ == "__main__":
