@@ -61,7 +61,8 @@ CLAUDE_MODEL = "claude-3-5-haiku-20241022"  # Fast: $1/M in, $5/M out (RECOMMEND
 DEFAULT_BATCH_SIZE = 50
 
 # Model pricing (USD per million tokens)
-# Source: https://www.anthropic.com/pricing (as of 2025-02-19)
+# Source: https://www.anthropic.com/api-pricing (verified 2025-10-28)
+# Note: We use the regular API, not Batch API (which offers 50% discount but is asynchronous)
 MODEL_PRICING = {
     "claude-3-5-haiku-20241022": {"input": 1.0, "output": 5.0},
     "claude-3-7-sonnet-20250219": {"input": 3.0, "output": 15.0},
@@ -578,6 +579,24 @@ def aggregate_multidim_views(df: pd.DataFrame) -> pd.DataFrame:
     )
 
     return agg_df
+
+
+def calculate_cost(input_tokens: int, output_tokens: int) -> float:
+    """Calculate cost in USD for given token counts.
+
+    Args:
+        input_tokens: Number of input tokens
+        output_tokens: Number of output tokens
+
+    Returns:
+        Cost in USD
+    """
+    if CLAUDE_MODEL not in MODEL_PRICING:
+        raise ValueError(f"Unknown model '{CLAUDE_MODEL}'. Please add pricing to MODEL_PRICING dictionary.")
+    pricing = MODEL_PRICING[CLAUDE_MODEL]
+    input_cost = (input_tokens / 1_000_000) * pricing["input"]
+    output_cost = (output_tokens / 1_000_000) * pricing["output"]
+    return input_cost + output_cost
 
 
 def estimate_tokens(text: str) -> int:
@@ -1468,6 +1487,7 @@ def main(
         all_issues.extend(semantic_issues)
         total_input_tokens += usage_stats.get("input_tokens", 0)
         total_output_tokens += usage_stats.get("output_tokens", 0)
+
         if not dry_run:
             rprint(f"[green]✓ Found {len(semantic_issues)} semantic issues[/green]\n")
 
@@ -1481,6 +1501,7 @@ def main(
         all_issues.extend(quality_issues)
         total_input_tokens += usage_stats.get("input_tokens", 0)
         total_output_tokens += usage_stats.get("output_tokens", 0)
+
         if not dry_run:
             rprint(f"[green]✓ Found {len(quality_issues)} quality issues[/green]\n")
 
@@ -1517,13 +1538,7 @@ def main(
         # In dry run, show cost estimate instead of issues
         rprint("\n[bold yellow]DRY RUN - Cost Estimate:[/bold yellow]")
         if total_input_tokens > 0 or total_output_tokens > 0:
-            # Get pricing for the selected model
-            if CLAUDE_MODEL not in MODEL_PRICING:
-                raise ValueError(f"Unknown model '{CLAUDE_MODEL}'. Please add pricing to MODEL_PRICING dictionary.")
-            pricing = MODEL_PRICING[CLAUDE_MODEL]
-            input_cost = (total_input_tokens / 1_000_000) * pricing["input"]
-            output_cost = (total_output_tokens / 1_000_000) * pricing["output"]
-            estimated_cost = input_cost + output_cost
+            estimated_cost = calculate_cost(total_input_tokens, total_output_tokens)
 
             # Calculate range: conservative lower bound (-10%) and higher upper bound (+50%)
             # Upper bound is intentionally high to avoid unpleasant surprises
@@ -1557,13 +1572,7 @@ def main(
 
         # Display API usage and cost
         if total_input_tokens > 0 or total_output_tokens > 0:
-            # Get pricing for the selected model
-            if CLAUDE_MODEL not in MODEL_PRICING:
-                raise ValueError(f"Unknown model '{CLAUDE_MODEL}'. Please add pricing to MODEL_PRICING dictionary.")
-            pricing = MODEL_PRICING[CLAUDE_MODEL]
-            input_cost = (total_input_tokens / 1_000_000) * pricing["input"]
-            output_cost = (total_output_tokens / 1_000_000) * pricing["output"]
-            total_cost = input_cost + output_cost
+            total_cost = calculate_cost(total_input_tokens, total_output_tokens)
 
             rprint("\n[bold cyan]API Usage:[/bold cyan]")
             rprint(f"  Input tokens:  {total_input_tokens:,}")
