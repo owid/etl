@@ -7,9 +7,9 @@ Check metadata files for spelling typos using comprehensive spell checking.
 **First, ask the user which scope they want to check:**
 
 1. **Current step only** - Ask the user to specify the step path (e.g., `etl/steps/data/garden/energy/2025-06-27/electricity_mix`)
-2. **All ETL metadata** - Check all active `.meta.yml` files in `etl/steps/data/garden/` (automatically excludes ~1,979 archived steps)
-3. **Snapshot metadata** - Check all snapshot `.dvc` files in `snapshots/` (~7,913 files)
-4. **All metadata** - Check both ETL and snapshot metadata files
+2. **All ETL metadata** - Check all active `.meta.yml` files in `etl/steps/data/{garden,meadow,grapher}/` (automatically excludes ~3,570 archived steps)
+3. **Snapshot metadata** - Check all snapshot `.dvc` files in `snapshots/` (~7,915 files)
+4. **All metadata** - Check both ETL steps and snapshot metadata files
 
 Once the user specifies the scope, proceed with the typo check using the codespell-based approach.
 
@@ -40,18 +40,21 @@ If codespell is not installed and `uv add --dev codespell` fails, explain to the
 **IMPORTANT:** Do not check archived steps and snapshots as they are no longer in use.
 
 Archived steps and snapshots are defined in `dag/archive/*.yml` files:
-- ~1,979 deprecated garden steps
+- ~3,570 deprecated steps (garden, meadow, grapher)
 - ~736 deprecated snapshots
 
 To exclude them, extract their paths and create a list of active files:
 
 ```bash
-# Extract archived paths to a file
-grep -h "data://garden/" dag/archive/*.yml 2>/dev/null | \
-  grep -o "data://garden/[^:]*" | \
-  sed 's|data://|etl/steps/data/|' | \
-  sed 's|$|.meta.yml|' > /tmp/archived_files.txt
+# Extract archived step paths to a file
+for step_type in garden meadow grapher; do
+  grep -h "data://${step_type}/" dag/archive/*.yml 2>/dev/null | \
+    grep -o "data://${step_type}/[^:]*" | \
+    sed 's|data://|etl/steps/data/|' | \
+    sed 's|$|.meta.yml|'
+done > /tmp/archived_files.txt
 
+# Extract archived snapshots
 grep -rh "snapshot://" dag/archive/*.yml 2>/dev/null | \
   grep -o "snapshot://[^:]*" | \
   sed 's|snapshot://|snapshots/|' | \
@@ -60,6 +63,8 @@ grep -rh "snapshot://" dag/archive/*.yml 2>/dev/null | \
 
 # Create list of all metadata files
 find etl/steps/data/garden -name "*.meta.yml" > /tmp/all_meta_files.txt
+find etl/steps/data/meadow -name "*.meta.yml" >> /tmp/all_meta_files.txt
+find etl/steps/data/grapher -name "*.meta.yml" >> /tmp/all_meta_files.txt
 find snapshots -name "*.dvc" >> /tmp/all_meta_files.txt
 
 # Filter out archived files
@@ -85,18 +90,20 @@ STEP_PATH="<user_provided_path>"  # e.g., etl/steps/data/garden/energy/2025-06-2
   --ignore-words=.codespell-ignore.txt
 ```
 
-**For option 2 (all garden metadata):**
+**For option 2 (all ETL metadata - garden, meadow, grapher):**
 
 ```bash
-# For all garden metadata (option 2)
-find etl/steps/data/garden -name "*.meta.yml" > /tmp/all_garden_files.txt
-grep -vFf /tmp/archived_files.txt /tmp/all_garden_files.txt > /tmp/active_garden_files.txt
+# For all ETL step metadata (option 2)
+find etl/steps/data/garden -name "*.meta.yml" > /tmp/all_step_files.txt
+find etl/steps/data/meadow -name "*.meta.yml" >> /tmp/all_step_files.txt
+find etl/steps/data/grapher -name "*.meta.yml" >> /tmp/all_step_files.txt
+grep -vFf /tmp/archived_files.txt /tmp/all_step_files.txt > /tmp/active_step_files.txt
 
-cat /tmp/active_garden_files.txt | xargs .venv/bin/codespell \
+cat /tmp/active_step_files.txt | xargs .venv/bin/codespell \
   --ignore-words=.codespell-ignore.txt
 ```
 
-Note: Excluding archived steps reduces the scope by ~1,979 files and focuses on actively maintained metadata.
+Note: Excluding archived steps reduces the scope by ~3,570 files and focuses on actively maintained metadata.
 
 **For option 3 (snapshot metadata):**
 

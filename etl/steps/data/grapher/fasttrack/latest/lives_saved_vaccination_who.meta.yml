@@ -6,7 +6,7 @@ dataset:
 tables:
   lives_saved_vaccination_who:
     variables:
-      diptheria:
+      diphtheria:
         title: Diphtheria
         unit: lives saved
         description: The number of lives saved from diphtheria over the last 50 years as a result of vaccination efforts.
