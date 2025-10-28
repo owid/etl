@@ -78,6 +78,7 @@ dependencies = [
     "logfire[fastapi,httpx]>=4.3.3",
     "cfgrib>=0.9.15.0",
     "metabase-api>=3.5.2",
+    "codespell>=2.4.1",
 ]
 
 [tool.uv.sources]
@@ -119,6 +120,7 @@ dev-dependencies = [
     "commentjson>=0.9.0",
     "pytest-asyncio>=1.0.0",
     "sqlacodegen>=3.1.0",
+    "codespell>=2.4.1",
 ]
 
 [project.optional-dependencies]

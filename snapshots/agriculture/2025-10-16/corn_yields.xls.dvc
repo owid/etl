@@ -14,7 +14,7 @@ meta:
     date_published: "2025-10-01"
     producer: USDA/FAS
     citation_full: |-
-      United States Department of Agriculture Foregin Agricultural Service (USDA/FAS) - International corn yields data, extracted from the Production, Supply and Distribution Database.
+      United States Department of Agriculture Foreign Agricultural Service (USDA/FAS) - International corn yields data, extracted from the Production, Supply and Distribution Database.
       USDA uses official country statistics, reports from agricultural attaches at U.S. embassies, data from international organizations, publications from individual countries, information from traders both inside and outside a country, and other available information.
     attribution_short: USDA/FAS
     url_main: https://apps.fas.usda.gov/psdonline/app/index.html#/app/advQuery

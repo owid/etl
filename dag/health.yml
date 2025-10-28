@@ -1339,3 +1339,10 @@ steps:
     - data://garden/wb/2025-07-01/income_groups
   data://grapher/maternal_mortality/2025-09-02/maternal_mortality:
     - data://garden/maternal_mortality/2025-09-02/maternal_mortality
+  # European Society for Cardiology datasets
+  data://meadow/cardiovascular_diseases/2025-10-21/esc:
+    - snapshot://cardiovascular_diseases/2025-10-21/esc.csv
+  data://garden/cardiovascular_diseases/2025-10-21/esc:
+    - data://meadow/cardiovascular_diseases/2025-10-21/esc
+  data://grapher/cardiovascular_diseases/2025-10-21/esc:
+    - data://garden/cardiovascular_diseases/2025-10-21/esc
