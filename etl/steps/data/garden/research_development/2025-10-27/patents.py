@@ -16,6 +16,29 @@ def run() -> None:
     # Read table from meadow dataset.
     tb = ds_meadow.read("patents")
 
+    tb = tb.drop(columns=["office__code", "origin"])
+
+    # remove leading _ from columns:
+    tb.columns = [col.lstrip("_") for col in tb.columns]
+
+    tb = tb.melt(id_vars=["office", "field_of_technology"], var_name="year", value_name="patent_count")
+
+    tb = tb.pivot(index=["office", "year"], columns="field_of_technology", values="patent_count").reset_index()
+
+    # rename patent columns:
+    tb = tb.rename(
+        columns={
+            "13 - Medical technology": "medical_technology_patents",
+            "15 - Biotechnology": "biotechnology_patents",
+            "16 - Pharmaceuticals": "pharmaceutical_patents",
+        }
+    )
+
+    # remove entries with no patents:
+    tb = tb.dropna(subset=["medical_technology_patents", "biotechnology_patents", "pharmaceutical_patents"], how="all")
+
+
+    tb = tb.rename(columns={"office": "country"})
     #
     # Process data.
     #
