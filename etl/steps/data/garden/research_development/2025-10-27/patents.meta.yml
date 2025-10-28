@@ -22,6 +22,8 @@ definitions:
         entityType: filing office
         entityTypePlural: filing offices
         tab: chart
+        xAxis:
+          label: Year granted
     display:
       numDecimalPlaces: 0
       entityAnnotationsMap: |-
@@ -44,7 +46,7 @@ tables:
     variables:
       all_patents:
         title: Life science patents granted, by filing office
-        description_short: Patents granted within the fields of medical technology, biotechnology, and pharmaceuticals by filing office. These patents cover a wide range of innovations, including new drugs, medical devices, diagnostic methods, genetic engineering techniques, and biotechnological processes.
+        description_short: Patents granted within the fields of medical technology, biotechnology, and pharmaceuticals by filing office. These patents cover a wide range of innovations, such as medical devices, diagnostic methods, genetic engineering techniques, biotechnological processes and new drugs.
         unit: patents
         short_unit: ""
       medical_technology_patents:
