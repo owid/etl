@@ -43,28 +43,29 @@ Archived steps and snapshots are defined in `dag/archive/*.yml` files:
 - ~1,979 deprecated garden steps
 - ~736 deprecated snapshots
 
-To exclude them, extract their paths and pass to codespell's `--skip` flag:
+To exclude them, extract their paths and create a list of active files:
 
 ```bash
-# Extract archived garden step paths
-ARCHIVED_STEPS=$(grep -h "data://garden/" dag/archive/*.yml 2>/dev/null |
-           grep -o "data://garden/[^:]*" |
-           sed 's|data://||' |
-           sed 's|$|.meta.yml|' |
-           tr '\n' ',' |
-           sed 's/,$//')
+# Extract archived paths to a file
+grep -h "data://garden/" dag/archive/*.yml 2>/dev/null | \
+  grep -o "data://garden/[^:]*" | \
+  sed 's|data://|etl/steps/data/|' | \
+  sed 's|$|.meta.yml|' > /tmp/archived_files.txt
 
-# Extract archived snapshot paths
-ARCHIVED_SNAPSHOTS=$(grep -rh "snapshot://" dag/archive/*.yml 2>/dev/null |
-           grep -o "snapshot://[^:]*" |
-           sed 's|snapshot://|snapshots/|' |
-           sed 's|$|.dvc|' |
-           sort -u |
-           tr '\n' ',' |
-           sed 's/,$//')
+grep -rh "snapshot://" dag/archive/*.yml 2>/dev/null | \
+  grep -o "snapshot://[^:]*" | \
+  sed 's|snapshot://|snapshots/|' | \
+  sed 's|$|.dvc|' | \
+  sort -u >> /tmp/archived_files.txt
 
-# Combine both for use in --skip flag
-ARCHIVED="${ARCHIVED_STEPS},${ARCHIVED_SNAPSHOTS}"
+# Create list of all metadata files
+find etl/steps/data/garden -name "*.meta.yml" > /tmp/all_meta_files.txt
+find snapshots -name "*.dvc" >> /tmp/all_meta_files.txt
+
+# Filter out archived files
+grep -vFf /tmp/archived_files.txt /tmp/all_meta_files.txt > /tmp/active_meta_files.txt
+
+echo "Total files to check: $(wc -l < /tmp/active_meta_files.txt)"
 ```
 
 ### 2. Run codespell with ignore list and exclusions
@@ -88,29 +89,24 @@ STEP_PATH="<user_provided_path>"  # e.g., etl/steps/data/garden/energy/2025-06-2
 
 ```bash
 # For all garden metadata (option 2)
-.venv/bin/codespell etl/steps/data/garden/**/*.meta.yml \
-  --ignore-words=.codespell-ignore.txt \
-  --skip="$ARCHIVED"
+find etl/steps/data/garden -name "*.meta.yml" > /tmp/all_garden_files.txt
+grep -vFf /tmp/archived_files.txt /tmp/all_garden_files.txt > /tmp/active_garden_files.txt
+
+cat /tmp/active_garden_files.txt | xargs .venv/bin/codespell \
+  --ignore-words=.codespell-ignore.txt
 ```
 
-Note: Excluding archived steps reduces the scope by ~1,979 files and focuses on actively maintained metadata. Archived snapshots are also excluded when checking snapshot metadata.
+Note: Excluding archived steps reduces the scope by ~1,979 files and focuses on actively maintained metadata.
 
 **For option 3 (snapshot metadata):**
 
 ```bash
 # For all snapshot metadata (option 3)
-# Extract archived snapshots
-ARCHIVED_SNAPSHOTS=$(grep -rh "snapshot://" dag/archive/*.yml 2>/dev/null |
-           grep -o "snapshot://[^:]*" |
-           sed 's|snapshot://|snapshots/|' |
-           sed 's|$|.dvc|' |
-           sort -u |
-           tr '\n' ',' |
-           sed 's/,$//')
+find snapshots -name "*.dvc" > /tmp/all_snapshot_files.txt
+grep -vFf /tmp/archived_files.txt /tmp/all_snapshot_files.txt > /tmp/active_snapshot_files.txt
 
-.venv/bin/codespell snapshots/**/*.dvc \
-  --ignore-words=.codespell-ignore.txt \
-  --skip="$ARCHIVED_SNAPSHOTS"
+cat /tmp/active_snapshot_files.txt | xargs .venv/bin/codespell \
+  --ignore-words=.codespell-ignore.txt
 ```
 
 Note: Snapshot `.dvc` files contain metadata in the `meta.source.description` and `meta.source.published_by` fields. ~736 archived snapshots are excluded.
@@ -119,9 +115,9 @@ Note: Snapshot `.dvc` files contain metadata in the `meta.source.description` an
 
 ```bash
 # For all metadata - ETL and snapshots (option 4)
-.venv/bin/codespell etl/steps/data/garden/**/*.meta.yml snapshots/**/*.dvc \
-  --ignore-words=.codespell-ignore.txt \
-  --skip="$ARCHIVED"
+# Use the active_meta_files.txt created in step 1
+cat /tmp/active_meta_files.txt | xargs .venv/bin/codespell \
+  --ignore-words=.codespell-ignore.txt
 ```
 
 ### 3. Parse and present results
@@ -182,9 +178,12 @@ Should return 0 results.
 
 **IMPORTANT:** Delete any temporary files created during the check:
 
-- Any `/tmp/` files created for analysis
-- Any temporary Python scripts
-- Any temporary report files
+```bash
+rm -f /tmp/archived_files.txt /tmp/all_meta_files.txt /tmp/active_meta_files.txt \
+      /tmp/all_garden_files.txt /tmp/active_garden_files.txt \
+      /tmp/all_snapshot_files.txt /tmp/active_snapshot_files.txt \
+      /tmp/codespell_output.txt
+```
 
 The only persistent files should be:
 
