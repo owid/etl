@@ -1449,8 +1449,8 @@ def main(
     total_input_tokens = 0
     total_output_tokens = 0
 
-    # Check typos
-    if not skip_typos:
+    # Check typos (skip in dry-run mode since codespell has no cost)
+    if not skip_typos and not dry_run:
         rprint("[cyan]Checking for typos (running codespell)...[/cyan]")
         issues_by_view = run_codespell_batch(views)
         # Flatten the issues
