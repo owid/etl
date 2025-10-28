@@ -407,19 +407,20 @@ def run_codespell_batch(views: list[dict[str, Any]]) -> dict[int, list[dict[str,
         shutil.rmtree(temp_dir, ignore_errors=True)
 
 
-def fetch_explorer_data(explorer_slug: str | None = None) -> pd.DataFrame:
+def fetch_explorer_data(explorer_slugs: list[str] | None = None) -> pd.DataFrame:
     """Fetch all explorer views with their metadata from the database.
 
     Args:
-        explorer_slug: Optional filter for specific explorer
+        explorer_slugs: Optional list of explorer slugs to filter by
 
     Returns:
         DataFrame with columns: id, explorerSlug, dimensions, chartConfigId,
                                 chart_config, and multiple variable_* columns
     """
     where_clause = "WHERE ev.error IS NULL"
-    if explorer_slug:
-        where_clause += f" AND ev.explorerSlug = '{explorer_slug}'"
+    if explorer_slugs:
+        slugs_str = "', '".join(explorer_slugs)
+        where_clause += f" AND ev.explorerSlug IN ('{slugs_str}')"
 
     query = f"""
         SELECT
@@ -495,19 +496,20 @@ def aggregate_explorer_views(df: pd.DataFrame) -> pd.DataFrame:
     return agg_df
 
 
-def fetch_multidim_data(slug_filter: str | None = None) -> pd.DataFrame:
+def fetch_multidim_data(slug_filters: list[str] | None = None) -> pd.DataFrame:
     """Fetch multidimensional indicator data from the database.
 
     Args:
-        slug_filter: Optional filter for specific multidim slug
+        slug_filters: Optional list of multidim slugs to filter by
 
     Returns:
         DataFrame with columns matching explorer structure: id, explorerSlug, dimensions,
                                 chartConfigId, chart_config, and variable_* columns
     """
     where_clause = ""
-    if slug_filter:
-        where_clause = f"WHERE md.slug = '{slug_filter}'"
+    if slug_filters:
+        slugs_str = "', '".join(slug_filters)
+        where_clause = f"WHERE md.slug IN ('{slugs_str}')"
 
     query = f"""
         SELECT
@@ -1178,9 +1180,9 @@ def display_issues(
     # Display summary
     total_original = len(issues)
     total_grouped = len(grouped_issues)
-    num_explorers = len(issues_by_explorer)
+    num_collections = len(issues_by_explorer)
     rprint(
-        f"\n[bold]Found {total_original} total issues ({total_grouped} unique) across {num_explorers} explorer(s):[/bold]"
+        f"\n[bold]Found {total_original} total issues ({total_grouped} unique) across {num_collections} collection(s):[/bold]"
     )
 
     # Count by severity across all explorers
@@ -1289,9 +1291,9 @@ def display_issues(
 
 @click.command(cls=RichCommand)
 @click.option(
-    "--explorer",
-    help="Filter by specific explorer slug (e.g., 'global-food')",
-    default=None,
+    "--slug",
+    multiple=True,
+    help="Filter by specific explorer or multidim slug. Can be specified multiple times (e.g., '--slug global-food --slug covid-boosters')",
 )
 @click.option(
     "--skip-typos",
@@ -1337,7 +1339,7 @@ def display_issues(
     help="Estimate API costs without making actual API calls",
 )
 def main(
-    explorer: str | None,
+    slug: tuple[str, ...],
     skip_typos: bool,
     skip_semantic: bool,
     skip_quality: bool,
@@ -1347,9 +1349,9 @@ def main(
     limit: int | None,
     dry_run: bool,
 ) -> None:
-    """Check explorer views for typos, semantic inconsistencies, and quality issues.
+    """Check explorer and multidim views for typos, semantic inconsistencies, and quality issues.
 
-    This script analyzes explorer views from the database and detects:
+    This script analyzes explorer and multidimensional indicator (mdim) views from the database and detects:
     - Typos using codespell (if available)
     - Semantic inconsistencies using Claude API (requires ANTHROPIC_API_KEY in .env)
     - Writing quality issues using Claude API (requires ANTHROPIC_API_KEY in .env)
@@ -1357,14 +1359,20 @@ def main(
     To use semantic/quality checks, add ANTHROPIC_API_KEY to your .env file.
 
     Examples:
-        # Check all explorers for typos only
+        # Check all explorers and mdims for typos only
         python check_explorer_metadata.py --skip-semantic --skip-quality
 
         # Check specific explorer with all checks (requires API key in .env)
-        python check_explorer_metadata.py --explorer global-food
+        python check_explorer_metadata.py --slug global-food
+
+        # Check specific multidim
+        python check_explorer_metadata.py --slug covid-boosters
+
+        # Check multiple explorers/mdims
+        python check_explorer_metadata.py --slug global-food --slug covid-boosters --slug energy-prices
 
         # Test with limited views to minimize API costs
-        python check_explorer_metadata.py --explorer animal-welfare --limit 5
+        python check_explorer_metadata.py --slug animal-welfare --limit 5
 
         # Export issues to JSON
         python check_explorer_metadata.py --output-format json --output-file issues.json
@@ -1384,17 +1392,21 @@ def main(
         rprint("[yellow]Alternatively, use --skip-semantic and --skip-quality flags to skip these checks.[/yellow]")
         raise click.ClickException("Missing ANTHROPIC_API_KEY in .env file")
 
+    # Convert tuple to list (or None if empty)
+    slug_list = list(slug) if slug else None
+
     # Fetch data from both explorers and multidimensional indicators
-    df_explorers = fetch_explorer_data(explorer_slug=explorer)
-    df_mdims = fetch_multidim_data(slug_filter=explorer)
+    df_explorers = fetch_explorer_data(explorer_slugs=slug_list)
+    df_mdims = fetch_multidim_data(slug_filters=slug_list)
 
     # Combine both datasets
     df = pd.concat([df_explorers, df_mdims], ignore_index=True)
 
     # Check if we got any results
     if df.empty:
-        if explorer:
-            rprint(f"[red]Error: No views found for slug '{explorer}' (checked both explorers and multidims)[/red]")
+        if slug_list:
+            slugs_str = ", ".join(slug_list)
+            rprint(f"[red]Error: No views found for slug(s) '{slugs_str}' (checked both explorers and multidims)[/red]")
         else:
             rprint("[red]Error: No explorer or multidim views found in database[/red]")
         return
@@ -1402,9 +1414,10 @@ def main(
     # Report what was found
     explorer_count = len(df_explorers)
     mdim_count = len(df_mdims)
-    if explorer:
+    if slug_list:
+        slugs_str = ", ".join(slug_list)
         rprint(
-            f"[cyan]Filtering to slug: {explorer} ({explorer_count} explorer records, {mdim_count} multidim records)[/cyan]"
+            f"[cyan]Filtering to slug(s): {slugs_str} ({explorer_count} explorer records, {mdim_count} multidim records)[/cyan]"
         )
     else:
         rprint(f"[cyan]Fetched {explorer_count} explorer records and {mdim_count} multidim records[/cyan]")
