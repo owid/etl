@@ -280,6 +280,19 @@ tables:
           numDecimalPlaces: 1
           <<: *common_display
 
+      obs_status_labour_force_participation_rate_by_sex_and_age:
+        title: Labor force participation rate status - <<sex>> - <<classif1>>
+        unit: ""
+        short_unit: ""
+        description_short: Observation status of the labor force participation rate data point.
+        description_key:
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
+        display:
+          name: Labor force participation rate status - <<sex>> - <<classif1>>
+          numDecimalPlaces: 0
+          <<: *common_display
+
       unemployment_rate_by_sex_and_age:
         title: Unemployment rate - <<sex>> - <<classif1>>
         unit: "%"
@@ -293,6 +306,19 @@ tables:
         display:
           name: Unemployment rate - <<sex>> - <<classif1>>
           numDecimalPlaces: 1
+          <<: *common_display
+
+      obs_status_unemployment_rate_by_sex_and_age:
+        title: Unemployment rate status - <<sex>> - <<classif1>>
+        unit: ""
+        short_unit: ""
+        description_short: Observation status of the unemployment rate data point.
+        description_key:
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
+        display:
+          name: Unemployment rate status - <<sex>> - <<classif1>>
+          numDecimalPlaces: 0
           <<: *common_display
 
       #############################################################

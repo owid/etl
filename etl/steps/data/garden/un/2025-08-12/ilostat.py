@@ -353,12 +353,25 @@ def make_table_wide(tb: Table) -> Table:
             "classif1",
         ],
         columns=["indicator"],
-        values=["obs_value"],
+        values=["obs_value", "obs_status"],
         join_column_levels_with="_",
     )
 
     # Remove "obs_value_" from the column names
     tb.columns = [col.replace("obs_value_", "") for col in tb.columns]
+
+    # Remove "obs_status_" columns, except for obs_status_unemployment_rate_by_sex_and_age
+    cols_to_drop = [
+        col
+        for col in tb.columns
+        if col.startswith("obs_status_")
+        and col
+        not in [
+            "obs_status_unemployment_rate_by_sex_and_age",
+            "obs_status_labour_force_participation_rate_by_sex_and_age",
+        ]
+    ]
+    tb = tb.drop(columns=cols_to_drop, errors="raise")
 
     # For each indicator column, add description_from_producer metadata
     for indicator in indicator_dict.keys():
