@@ -1,3 +1,13 @@
+# Ingest EM-DAT raw data on natural disasters.
+# Before running this script, the data needs to be downloaded:
+# * Register at https://public.emdat.be/ and verify email.
+# * Access https://public.emdat.be/data and select:
+#   * "Natural" in the list of "Classification".
+#   * All regions in "Countries".
+#   * All years.
+# * Activate "Include Historical events (pre-2000)".
+# * Then click on "Download".
+# * Run this script using the argument --path-to-file followed by the path to the downloaded file.
 meta:
   origin:
     producer: EM-DAT, CRED / UCLouvain
@@ -7,7 +17,8 @@ meta:
     citation_full: EM-DAT, CRED / UCLouvain, Brussels, Belgium - www.emdat.be
     url_main: https://emdat.be/
     date_accessed: '2025-10-29'
-    date_published: '2024-04-05'
+    # The date_published can be found in the excel file, sheet "EM-DAT Info", "Version".
+    date_published: '2025-10-24'
     license:
       name: UCLouvain 2023
       url: https://doc.emdat.be/docs/legal/terms-of-use/

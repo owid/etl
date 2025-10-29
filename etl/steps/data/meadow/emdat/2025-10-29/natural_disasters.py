@@ -1,6 +1,6 @@
 """Load snapshot of EM-DAT natural disasters data and prepare a table with basic metadata."""
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -35,7 +35,7 @@ COLUMNS = {
 }
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load and process inputs.
     #
@@ -61,5 +61,5 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new meadow dataset.
-    ds_meadow = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
+    ds_meadow = paths.create_dataset(tables=[tb])
     ds_meadow.save()
