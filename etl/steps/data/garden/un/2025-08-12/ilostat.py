@@ -461,7 +461,6 @@ def drop_iloest_projections(tb: Table) -> Table:
     # For each ILOEST indicator, define the maximum year where obs_status is not null and drop data beyond that year
     for indicator in ILOEST_INDICATORS:
         max_year = tb.loc[(tb["indicator"] == indicator) & (tb["obs_status"].notna()), "time"].max()
-        print(f"Dropping ILOEST projections for indicator {indicator} beyond year {max_year}")
         tb = tb[~((tb["time"] > max_year) & (tb["indicator"] == indicator))].reset_index(drop=True)
 
     return tb
