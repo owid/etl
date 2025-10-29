@@ -835,15 +835,15 @@ def check_issues(
 
                 # Build comprehensive variable metadata
                 variables = []
-                for i, var_name in enumerate(view.get("variable_name", [])):
+                for var_idx, var_name in enumerate(view.get("variable_name", [])):
                     var_info = {"name": var_name}
                     # Add other metadata if available at the same index
-                    if i < len(view.get("variable_title_public", [])):
-                        var_info["title_public"] = view["variable_title_public"][i]
-                    if i < len(view.get("variable_unit", [])):
-                        var_info["unit"] = view["variable_unit"][i]
-                    if i < len(view.get("variable_description_short", [])):
-                        var_info["description_short"] = view["variable_description_short"][i]
+                    if var_idx < len(view.get("variable_title_public", [])):
+                        var_info["title_public"] = view["variable_title_public"][var_idx]
+                    if var_idx < len(view.get("variable_unit", [])):
+                        var_info["unit"] = view["variable_unit"][var_idx]
+                    if var_idx < len(view.get("variable_description_short", [])):
+                        var_info["description_short"] = view["variable_description_short"][var_idx]
                     variables.append(var_info)
 
                 context = {
