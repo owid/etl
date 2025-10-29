@@ -25,7 +25,7 @@ steps:
     - data://garden/emdat/2024-04-11/natural_disasters
   # Natural disasters explorer.
   data://explorers/emdat/latest/natural_disasters:
-    - data://garden/emdat/2024-04-11/natural_disasters
+    - data://garden/emdat/2025-10-29/natural_disasters
   #
   # NOAA/NCEI Natural Hazards Data
   #
@@ -39,8 +39,27 @@ steps:
     - data://garden/wb/2025-07-01/income_groups
   data://grapher/noaa_ncei/2024-05-09/natural_hazards:
     - data://garden/noaa_ncei/2024-05-09/natural_hazards
-
-  ######################################################################################################################
-  # Older versions that should be archived once they are not used by any other steps.
-
-  ######################################################################################################################
+  #
+  # EM-DAT Natural disasters.
+  #
+  data://meadow/emdat/2025-10-29/natural_disasters:
+    - snapshot://emdat/2025-10-29/natural_disasters.xlsx
+  # The following dataset has a table for yearly data and another for decadal data.
+  data://garden/emdat/2025-10-29/natural_disasters:
+    - data://meadow/emdat/2025-10-29/natural_disasters
+    - data://garden/worldbank_wdi/2025-09-08/wdi
+    - data://garden/demography/2024-07-15/population
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2025-07-01/income_groups
+  # The following dataset has only global yearly data, and entity corresponds to the threshold of deaths.
+  data://grapher/emdat/2025-10-29/natural_disasters_global_by_deaths:
+    - data://garden/emdat/2025-10-29/natural_disasters
+  # The following dataset has all (yearly and decadal) variables together.
+  data://grapher/emdat/2025-10-29/natural_disasters:
+    - data://garden/emdat/2025-10-29/natural_disasters
+  # The following dataset has yearly and decadal count (and share) of events by impacts.
+  data://grapher/emdat/2025-10-29/natural_disasters_impact:
+    - data://garden/emdat/2025-10-29/natural_disasters
+  # The following dataset has only global yearly data, and entity corresponds to the type of disaster.
+  data://grapher/emdat/2025-10-29/natural_disasters_global_by_type:
+    - data://garden/emdat/2025-10-29/natural_disasters

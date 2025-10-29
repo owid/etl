@@ -1,6 +1,6 @@
 from owid.catalog import Table
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 paths = PathFinder(__file__)
 
@@ -27,7 +27,7 @@ def prepare_tables(table: Table, is_decade: bool) -> Table:
     return table_wide
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -47,12 +47,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create new grapher dataset.
-    ds_grapher = create_dataset(
-        dest_dir,
-        tables=[tb_yearly_wide, tb_decadal_wide],
-        default_metadata=ds_garden.metadata,
-        check_variables_metadata=True,
-    )
+    ds_grapher = paths.create_dataset(tables=[tb_yearly_wide, tb_decadal_wide], default_metadata=ds_garden.metadata)
 
     ds_grapher.metadata.title = "Natural disasters by impact"
     ds_grapher.save()

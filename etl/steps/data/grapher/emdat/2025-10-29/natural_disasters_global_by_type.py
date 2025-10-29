@@ -1,9 +1,9 @@
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 paths = PathFinder(__file__)
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -34,5 +34,5 @@ def run(dest_dir: str) -> None:
     tb_global.metadata.short_name = "natural_disasters_global_by_type"
 
     # Create new grapher dataset, update metadata, add table, and save dataset.
-    ds_grapher = create_dataset(dest_dir, tables=[tb_global], check_variables_metadata=True)
+    ds_grapher = paths.create_dataset(tables=[tb_global])
     ds_grapher.save()
