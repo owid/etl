@@ -593,7 +593,7 @@ def fetch_multidim_data(slug_filters: list[str] | None = None) -> pd.DataFrame:
 
     query = f"""
         SELECT
-            CONCAT('mdim_', md.id, '_', mx.viewId) as id,
+            mx.id as id,
             md.slug as explorerSlug,
             mx.viewId as dimensions,
             md.config as mdim_config,
@@ -885,6 +885,13 @@ Your response:"""
             return [], response.usage.input_tokens, response.usage.output_tokens
 
         view_issues = json.loads(content)
+
+        # Filter out non-issues (Claude sometimes says "no errors found")
+        view_issues = [
+            issue
+            for issue in view_issues
+            if issue.get("issue_type") in ["typo", "semantic"] and (issue.get("typo") or issue.get("explanation"))
+        ]
 
         # Enrich each issue with view metadata
         for issue in view_issues:
