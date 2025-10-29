@@ -1,0 +1,39 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Trends in Biological Sequence Data"
+    description: |-
+      Growth of key biological sequence databases between January 1976 and January 2024.
+
+      Biological sequence data used to train biological sequence models is provided by a vast array of public databases compiled by government, academic, and private institutions. Epoch delineates major sources into three primary categories:
+
+      - DNA sequence databases. These have the highest growth rate of analyzed databases, with GenBank seeing a 31% increase in the number of sequences stored between 2022 and 2023. Whole genome shotgun sequencing studies have been the driving force of growth of DNA data, as the increase in number of entries in all other GenBank divisions, referred to as traditional entries, is greatly attenuated in comparison.
+
+      - Protein sequence databases. The level of detail in protein sequence databases can vary. Databases with rich annotations such as UniProtKB have a much slower growth rate (6.7%), compared to metagenomic databases such as MGnify (20%), which provide protein sequences but lack detailed information about the protein’s structure, function, and origin.
+
+      - Protein structure databases. Gathering experimental data on protein structures is slow and painstaking. Thus, the Protein Data Bank grows by only 6.5% per year. Instead, databases publishing protein structures predicted by AI models can quickly generate large volumes of synthetic data. Databases of synthetic data such as AlphaFoldDB and ESMAtlas have dramatically boosted the supply of available data, though their growth could slow as opportunities for synthetic data are exhausted.
+
+      The majority of entries in large biological databases such as the International Nucleotide Sequence Database Collaboration (INSDC), MGnify, UniProtKB and PDB pertain to cellular organisms (humans, animals, plants, fungi, yeast, bacteria). For example, UniProtKB entries comprise 97% cellular and 2% viral protein sequences, a subset of which are known pathogens.
+    date_published: "2024-01-17"
+
+    # Citation
+    producer: Epoch AI
+    citation_full: |-
+      Nicole Maug, Aidan O'Gara and Tamay Besiroglu (2024), "Biological Sequence Models in the Context of the AI Directives". Published online at epoch.ai. Retrieved from: 'https://epoch.ai/blog/biological-sequence-models-in-the-context-of-the-ai-directives' [online resource]
+    attribution_short: Epoch AI
+
+    # Files
+    url_main: https://epoch.ai/blog/biological-sequence-models-in-the-context-of-the-ai-directives
+    url_download: https://docs.google.com/spreadsheets/d/10L0LF47eoWfYSdIfiDLEIDp3EqJt72WA_Wm2L1VjrqI/edit?gid=316233161#gid=316233161
+    date_accessed: '2025-09-09'
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://epoch.ai/data
+outs:
+  - md5: 235cd4e04a99ce9c896b7d8960cf844e
+    size: 318683
+    path: epoch_database_growth.xlsx
