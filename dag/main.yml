@@ -296,15 +296,15 @@ steps:
     - data://garden/missing_data/2024-03-26/who_md_suicides
 
   # Attention in Media: The Guardian
-  data://meadow/news/2024-05-08/guardian_mentions:
-    - snapshot://news/2024-05-07/guardian_mentions.csv
-    - snapshot://news/2024-05-07/guardian_mentions_raw.csv
-  data://garden/news/2024-05-08/guardian_mentions:
-    - data://meadow/news/2024-05-08/guardian_mentions
+  data://meadow/news/2025-10-29/guardian_mentions:
+    - snapshot://news/2025-10-29/guardian_mentions.csv
+    - snapshot://news/2025-10-29/guardian_mentions_raw.csv
+  data://garden/news/2025-10-29/guardian_mentions:
+    - data://meadow/news/2025-10-29/guardian_mentions
     - data://garden/demography/2023-03-31/population
     - data://garden/regions/2023-01-01/regions
-  data://grapher/news/2024-05-08/guardian_mentions:
-    - data://garden/news/2024-05-08/guardian_mentions
+  data://grapher/news/2025-10-29/guardian_mentions:
+    - data://garden/news/2025-10-29/guardian_mentions
 
   # News coverage by GDELT 2
   data://meadow/news/2024-05-23/gdelt_v2:
