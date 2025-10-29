@@ -470,6 +470,7 @@ def check_typos(views: list[dict[str, Any]]) -> dict[int, list[dict[str, Any]]]:
                         "typo": typo,
                         "correction": correction,
                         "explanation": f"Typo in {field_name}: '{typo}' → '{correction}'",
+                        "source": "codespell",
                     }
 
                     if view_id not in issues_by_view:
@@ -795,15 +796,143 @@ def call_claude(
     raise RuntimeError("All retry attempts failed")
 
 
+async def check_view_async(
+    client: anthropic.AsyncAnthropic,
+    view: dict[str, Any],
+) -> tuple[list[dict[str, Any]], int, int]:
+    """Check a single view for issues asynchronously.
+
+    Returns:
+        Tuple of (issues, input_tokens, output_tokens)
+    """
+    chart_config = json.loads(view["chart_config"]) if view["chart_config"] else {}
+
+    # Get title from chart_config or fall back to variable metadata
+    title = chart_config.get("title", "").strip()
+    if not title:
+        # Fallback order: titlePublic -> name (variable name is always present)
+        variable_title_public = view.get("variable_title_public", [])
+        variable_name = view.get("variable_name", [])
+
+        if variable_title_public and isinstance(variable_title_public, list) and variable_title_public:
+            title = variable_title_public[0]
+        elif variable_name and isinstance(variable_name, list) and variable_name:
+            title = variable_name[0]
+        elif variable_title_public:
+            title = str(variable_title_public)
+        elif variable_name:
+            title = str(variable_name)
+
+    # If still no title, skip (shouldn't happen for valid views)
+    if not title:
+        return [], 0, 0
+
+    subtitle = chart_config.get("subtitle", "")
+    note = chart_config.get("note", "")
+
+    # Build field list for prompt (only include non-empty fields)
+    fields_to_check = []
+    if title:
+        fields_to_check.append(f"Title: {title}")
+    if subtitle:
+        fields_to_check.append(f"Subtitle: {subtitle}")
+    if note:
+        fields_to_check.append(f"Note: {note}")
+
+    # If only title exists (or no fields), skip - nothing substantial to check
+    if len(fields_to_check) <= 1:
+        return [], 0, 0
+
+    fields_text = "\n".join(fields_to_check)
+
+    # Sanity check: ensure we have actual content to send
+    if not fields_text.strip():
+        return [], 0, 0
+
+    prompt = f"""Check these chart fields for spelling/semantic errors:
+
+{fields_text}
+
+Task: Find misspelled words (American English) or semantic contradictions between fields.
+
+Return format: JSON array only. Examples:
+- If issues found: [{{"issue_type": "typo", "field": "title", "typo": "nuber", "correction": "number", "explanation": "Spelling error"}}]
+- If no issues: []
+
+Your response:"""
+
+    raw_text = ""  # Initialize for type checker
+    try:
+        response = await client.messages.create(
+            model=CLAUDE_MODEL,
+            max_tokens=1024,
+            messages=[{"role": "user", "content": prompt}],
+        )
+
+        content_block = response.content[0]
+        if not isinstance(content_block, TextBlock):
+            return [], 0, 0
+
+        raw_text = content_block.text.strip()
+
+        # Handle cases where Claude returns just "[]" or empty responses
+        if not raw_text or raw_text == "[]":
+            return [], response.usage.input_tokens, response.usage.output_tokens
+
+        content = extract_json_array(raw_text)
+
+        # Validate we have actual JSON content
+        if not content or content == "[]":
+            return [], response.usage.input_tokens, response.usage.output_tokens
+
+        view_issues = json.loads(content)
+
+        # Enrich each issue with view metadata
+        for issue in view_issues:
+            issue["view_id"] = view["id"]
+            issue["explorer_slug"] = view["explorerSlug"]
+            issue["view_title"] = title  # Use the resolved title (chart_config or variable)
+            issue["source"] = "ai"  # Mark as AI-detected
+
+            mdim_config = view.get("mdim_config")
+            dimensions = parse_dimensions(view["dimensions"], mdim_config)
+            mdim_published = bool(view.get("mdim_published", True))
+            mdim_catalog_path = view.get("mdim_catalog_path")
+
+            issue["view_url"] = build_explorer_url(
+                view["explorerSlug"], dimensions, view["id"], mdim_published, mdim_catalog_path
+            )
+
+            # Add context from the actual field content
+            field = issue.get("field", "")
+            if field == "title":
+                issue["context"] = title[:200]
+            elif field == "subtitle":
+                issue["context"] = subtitle[:200]
+            elif field == "note":
+                issue["context"] = note[:200]
+
+        return view_issues, response.usage.input_tokens, response.usage.output_tokens
+
+    except json.JSONDecodeError:
+        # This shouldn't happen - log for debugging
+        log.warning(f"View {view['id']}: Claude returned invalid response (length: {len(raw_text)})")
+        return [], 0, 0
+    except Exception as e:
+        log.warning(f"Error processing view {view['id']}: {e}")
+        return [], 0, 0
+
+
 def check_issues(
     views: list[dict[str, Any]], api_key: str | None, batch_size: int = 10, dry_run: bool = False
 ) -> tuple[list[dict[str, Any]], dict[str, int]]:
-    """Check for semantic inconsistencies and absurdities using Claude API in batches.
+    """Check for semantic inconsistencies and absurdities using Claude API.
 
     Args:
         views: List of view dictionaries
         api_key: Anthropic API key
-        batch_size: Number of views to check in each API call
+        batch_size: Ignored (kept for compatibility)
+        dry_run: If True, estimate costs without making API calls
 
     Returns:
         Tuple of (list of semantic issues found, usage stats dict)
@@ -812,210 +941,45 @@ def check_issues(
         log.warning("No Claude API key provided, skipping issue checks")
         return [], {}
 
-    client = anthropic.Anthropic(api_key=api_key)
-    all_issues = []
-    total_input_tokens = 0
-    total_output_tokens = 0
+    if dry_run:
+        total_input_tokens = sum(
+            estimate_tokens(f"Title: {json.loads(v['chart_config']).get('title', '')}...")
+            for v in views
+            if v["chart_config"]
+        )
+        total_output_tokens = len(views) * 50
+        return [], {"input_tokens": total_input_tokens, "output_tokens": total_output_tokens}
 
-    with Progress(
-        TextColumn("[progress.description]{task.description}"),
-        BarColumn(),
-        MofNCompleteColumn(),
-        TimeRemainingColumn(),
-        console=console,
-    ) as progress:
-        task = progress.add_task("Checking for semantic issues", total=len(views))
+    # Run async checks in parallel
+    import asyncio
 
-        for i in range(0, len(views), batch_size):
-            batch = views[i : i + batch_size]
+    async def check_all_views():
+        client = anthropic.AsyncAnthropic(api_key=api_key)
+        tasks = [check_view_async(client, view) for view in views]
 
-            # Prepare batch context
-            batch_context = []
-            for idx, view in enumerate(batch):
-                chart_config = json.loads(view["chart_config"]) if view["chart_config"] else {}
-                dimensions = parse_dimensions(view["dimensions"])
+        all_issues = []
+        total_input_tokens = 0
+        total_output_tokens = 0
 
-                # Build comprehensive variable metadata
-                variables = []
-                for var_idx, var_name in enumerate(view.get("variable_name", [])):
-                    var_info = {"name": var_name}
-                    # Add other metadata if available at the same index
-                    if var_idx < len(view.get("variable_title_public", [])):
-                        var_info["title_public"] = view["variable_title_public"][var_idx]
-                    if var_idx < len(view.get("variable_unit", [])):
-                        var_info["unit"] = view["variable_unit"][var_idx]
-                    if var_idx < len(view.get("variable_description_short", [])):
-                        var_info["description_short"] = view["variable_description_short"][var_idx]
-                    variables.append(var_info)
+        with Progress(
+            TextColumn("[progress.description]{task.description}"),
+            BarColumn(),
+            MofNCompleteColumn(),
+            TimeRemainingColumn(),
+            console=console,
+        ) as progress:
+            task_id = progress.add_task("Checking for semantic issues", total=len(views))
 
-                context = {
-                    "chart_index": idx,  # Use simple 0-based index for Claude to reference
-                    "view_id": view["id"],  # Include view_id for reliable matching
-                    "explorer_slug": view["explorerSlug"],
-                    "dimensions": dimensions,
-                    "title": chart_config.get("title", ""),
-                    "subtitle": chart_config.get("subtitle", ""),
-                    "note": chart_config.get("note", ""),
-                    "variables": variables,
-                }
-                batch_context.append(context)
+            for coro in asyncio.as_completed(tasks):
+                issues, input_tokens, output_tokens = await coro
+                all_issues.extend(issues)
+                total_input_tokens += input_tokens
+                total_output_tokens += output_tokens
+                progress.update(task_id, advance=1)
 
-            # Call Claude API
-            prompt = f"""Check {len(batch_context)} charts for errors.
+        return all_issues, total_input_tokens, total_output_tokens
 
-Find:
-1. SPELLING - Misspelled words (use American English spelling)
-2. INCORRECT CAPITALIZATION - Titles with wrong capitalization
-3. SEMANTIC ABSURDITIES - Illogical information that doesn't make sense
-
-Examples of SEMANTIC ABSURDITIES (make up your own, don't just match these):
-- "Ocean temperature in landlocked countries"
-- "Wheat production in Antarctica"
-- "Population of tomato production"
-- Metric describing one thing but entity describing something completely different
-
-DO NOT flag:
-- Empty fields
-- Technical/scientific terminology
-- Formatting preferences
-
-Return ONLY a JSON array:
-[{{
-    "chart_index": <int - 0-based index from chart context>,
-    "issue_type": "typo" or "semantic",
-    "field": "title|subtitle|note|variable",
-    "explanation": "<brief>",
-    "typo": "<word>",
-    "correction": "<word>"
-}}]
-
-Charts:
-{json.dumps(batch_context, indent=2)}"""
-
-            # If dry run, estimate tokens and skip API call
-            if dry_run:
-                estimated_input = estimate_tokens(prompt)
-                # Estimate output: typically 30-60 tokens per issue, assume ~0.3 issues per view
-                estimated_output = len(batch) * 20
-                total_input_tokens += estimated_input
-                total_output_tokens += estimated_output
-                continue
-
-            content = ""  # Initialize to avoid unbound variable
-            try:
-                response = call_claude(
-                    client=client,
-                    model=CLAUDE_MODEL,
-                    max_tokens=4096,
-                    prompt=prompt,
-                )
-
-                # Parse response
-                content_block = response.content[0]
-                if not isinstance(content_block, TextBlock):
-                    log.error(f"Unexpected content block type: {type(content_block)}")
-                    continue
-                content = content_block.text.strip()
-
-                # Extract JSON from response
-                content = extract_json_array(content)
-
-                # Try to parse JSON, with fallback for common issues
-                try:
-                    batch_issues = json.loads(content)
-                except json.JSONDecodeError:
-                    # Try to fix common JSON issues - replace literal newlines in strings
-                    import re
-
-                    content_fixed = re.sub(r'"\s*\n\s*', '" ', content)
-                    batch_issues = json.loads(content_fixed)
-
-                # Track token usage
-                total_input_tokens += response.usage.input_tokens
-                total_output_tokens += response.usage.output_tokens
-
-                # Enrich issues with view metadata
-                # IMPORTANT: Don't trust chart_index from Claude - it's sometimes wrong
-                # Instead, match by finding which view's content actually matches the issue
-                for issue in batch_issues:
-                    field = issue.get("field", "")
-                    issue_type = issue.get("issue_type", "")
-
-                    # Find the correct view by matching content
-                    matched_view = None
-
-                    if issue_type == "typo":
-                        # For typos: find view where the typo exists in the specified field
-                        typo = issue.get("typo", "")
-                        for view in batch:
-                            chart_config = json.loads(view["chart_config"]) if view["chart_config"] else {}
-                            if field in chart_config:
-                                field_content = str(chart_config[field])
-                                if typo.lower() in field_content.lower():
-                                    matched_view = view
-                                    break
-                    else:
-                        # For semantic issues: match by title/subtitle content
-                        # Use chart_index as hint but verify the content matches
-                        chart_index = issue.get("chart_index")
-                        if chart_index is not None and 0 <= chart_index < len(batch):
-                            candidate_view = batch[chart_index]
-                            chart_config = json.loads(candidate_view["chart_config"]) if candidate_view["chart_config"] else {}
-
-                            # Verify this view has matching title/subtitle
-                            if field in chart_config:
-                                # For semantic issues, Claude should have analyzed the right view
-                                matched_view = candidate_view
-
-                        # If chart_index didn't work, try to find by matching title from batch_context
-                        if not matched_view:
-                            expected_title = batch_context[chart_index]["title"] if chart_index is not None and chart_index < len(batch_context) else ""
-                            if expected_title:
-                                for view in batch:
-                                    chart_config = json.loads(view["chart_config"]) if view["chart_config"] else {}
-                                    if chart_config.get("title", "") == expected_title:
-                                        matched_view = view
-                                        break
-
-                    if not matched_view:
-                        log.warning(f"Could not match issue to any view in batch: {issue}")
-                        continue
-
-                    # Now enrich with the CORRECT view's metadata
-                    chart_config = json.loads(matched_view["chart_config"]) if matched_view["chart_config"] else {}
-                    issue["view_id"] = matched_view["id"]
-                    issue["explorer_slug"] = matched_view["explorerSlug"]
-                    mdim_config = matched_view.get("mdim_config")
-                    dimensions = parse_dimensions(matched_view["dimensions"], mdim_config)
-                    issue["dimensions"] = dimensions
-                    issue["title"] = chart_config.get("title", "")
-
-                    view_title = chart_config.get("title", "")
-                    mdim_published = bool(matched_view.get("mdim_published", True))
-                    mdim_catalog_path = matched_view.get("mdim_catalog_path")
-                    view_url = build_explorer_url(
-                        matched_view["explorerSlug"], dimensions, matched_view["id"], mdim_published, mdim_catalog_path
-                    )
-                    issue["view_title"] = view_title
-                    issue["view_url"] = view_url
-
-                    # Add context from the field where the issue was found
-                    if field and field in chart_config and not issue.get("context"):
-                        issue["context"] = str(chart_config[field])[:200]
-
-                    all_issues.append(issue)
-
-            except json.JSONDecodeError as e:
-                log.error(f"JSON parsing error for batch: {e}")
-                if content:
-                    log.error(f"Content that failed to parse: {content[:500]}...")
-                continue
-            except Exception as e:
-                log.error(f"Error calling Claude API for batch: {e}")
-                continue
-            finally:
-                # Update progress after processing batch
-                progress.update(task, advance=len(batch))
+    all_issues, total_input_tokens, total_output_tokens = asyncio.run(check_all_views())
 
     usage_stats = {
         "input_tokens": total_input_tokens,
@@ -1279,14 +1243,16 @@ def display_issues(
         # Print each issue with full details
         for i, issue in enumerate(explorer_issues, 1):
             issue_type = issue.get("issue_type", "unknown")
-            view_title = issue.get("view_title", "Untitled")
+            view_title = issue.get("view_title", "")
             view_url = issue.get("view_url", "")
             field = issue.get("field", "unknown")
             context = issue.get("context", issue.get("text", ""))
             similar_count = issue.get("similar_count", 1)
+            source = issue.get("source", "unknown")
 
             # Print issue header with embedded clickable link
             view_id = issue.get("view_id", issue.get("id", "unknown"))
+
             if view_url:
                 # Embed link in title for clickable terminal support
                 rprint(f"\n[bold]{i}. [link={view_url}]{view_title}[/link][/bold] [dim](view_id: {view_id})[/dim]")
@@ -1301,12 +1267,15 @@ def display_issues(
             if issue_type == "typo":
                 typo = issue.get("typo", "")
                 correction = issue.get("correction", "")
-                rprint(f"   [yellow]Typo:[/yellow] '{typo}' → '{correction}'")
+                if source == "codespell":
+                    rprint(f"   [yellow]Typo (codespell):[/yellow] '{typo}' → '{correction}'")
+                else:
+                    rprint(f"   [yellow]Typo (AI):[/yellow] '{typo}' → '{correction}'")
                 rprint(f"   [yellow]Field:[/yellow] {field}")
                 rprint(f"   [yellow]Context:[/yellow] {context}")
             else:
                 explanation = issue.get("explanation", "")
-                rprint(f"   [yellow]Issue:[/yellow] {explanation}")
+                rprint(f"   [yellow]Issue (AI):[/yellow] {explanation}")
                 rprint(f"   [yellow]Field:[/yellow] {field}")
                 if context:
                     rprint(f"   [yellow]Context:[/yellow] {context}")
