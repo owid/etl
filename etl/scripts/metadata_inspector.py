@@ -1502,11 +1502,11 @@ def run(
     """Check explorer and multidim views for typos and semantic issues.
 
     Examples:
-        python check_explorer_metadata.py --skip-issues
-        python check_explorer_metadata.py --slug global-food
-        python check_explorer_metadata.py --slug global-food --slug covid-boosters
-        python check_explorer_metadata.py --slug animal-welfare --limit 5
-        python check_explorer_metadata.py --output-file issues.csv
+        python metadata_inspector.py --skip-issues
+        python metadata_inspector.py --slug global-food
+        python metadata_inspector.py --slug global-food --slug covid-boosters
+        python metadata_inspector.py --slug animal-welfare --limit 5
+        python metadata_inspector.py --output-file issues.csv
     """
     # Validate prerequisites
     if not skip_typos and not get_codespell_path():
