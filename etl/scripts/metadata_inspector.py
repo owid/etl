@@ -392,43 +392,45 @@ def check_typos(views: list[dict[str, Any]]) -> dict[int, list[dict[str, Any]]]:
 
                     # Parse filename: view_{view_id}_{field_name}.txt
                     # For mdim views, view_id contains underscores, so we need to find it in view_files
-                    # Extract everything between "view_" and "_{field_name}.txt"
+                    # CRITICAL: We must use the ACTUAL file path from codespell to find the right view_id
+                    # Rather than parsing the filename, search view_files for the matching file path
                     filename_without_ext = filename.replace(".txt", "")
                     if not filename_without_ext.startswith("view_"):
                         progress.update(task, advance=1)
                         continue
 
-                    # Remove "view_" prefix
-                    rest = filename_without_ext[5:]  # len("view_") = 5
-
-                    # The view_id is everything up to the last underscore (which separates field name)
-                    # But we need to find which view_id matches from our view_files dict
+                    # Search for the file path in view_files to find the correct view_id
                     view_id = None
                     field_name = None
-                    for vid in view_files.keys():
-                        vid_str = str(vid)
-                        if rest.startswith(vid_str + "_"):
-                            view_id = vid
-                            field_name = rest[len(vid_str) + 1 :]  # Everything after view_id and underscore
+                    text = ""
+                    file_path_obj = Path(file_path)
+
+                    for vid, file_list in view_files.items():
+                        for fname, fpath, ftext in file_list:
+                            if fpath == file_path_obj:
+                                view_id = vid
+                                text = ftext
+                                # Use the original field name from fname, removing numeric suffix if present
+                                if fname.rsplit("_", 1)[-1].isdigit():
+                                    field_name = fname.rsplit("_", 1)[0]
+                                else:
+                                    field_name = fname
+                                break
+                        if view_id is not None:
                             break
 
                     if view_id is None:
                         progress.update(task, advance=1)
                         continue
 
-                    # Find the original text and get the correct field name
-                    text = ""
-                    for fname, fpath, ftext in view_files.get(view_id, []):
-                        if fpath == Path(file_path):
-                            text = ftext
-                            # Use the original field name from fname, removing numeric suffix if present
-                            # fname could be like "variable_description_from_producer_0"
-                            if fname.rsplit("_", 1)[-1].isdigit():
-                                # Has numeric suffix, remove it
-                                field_name = fname.rsplit("_", 1)[0]
-                            else:
-                                field_name = fname
-                            break
+                    # Verify the typo actually exists in the text
+                    if typo.lower() not in text.lower():
+                        log.warning(
+                            f"Typo '{typo}' not found in text for view_id {view_id}, field {field_name}. "
+                            f"Codespell reported it in {file_path}. Skipping."
+                        )
+                        progress.update(task, advance=1)
+                        continue
 
                     # Get context from the specific line where the typo was found
                     text_lines = text.split("\n")
@@ -848,6 +850,7 @@ def check_issues(
 
                 context = {
                     "chart_index": idx,  # Use simple 0-based index for Claude to reference
+                    "view_id": view["id"],  # Include view_id for reliable matching
                     "explorer_slug": view["explorerSlug"],
                     "dimensions": dimensions,
                     "title": chart_config.get("title", ""),
@@ -932,38 +935,74 @@ Charts:
                 total_output_tokens += response.usage.output_tokens
 
                 # Enrich issues with view metadata
+                # IMPORTANT: Don't trust chart_index from Claude - it's sometimes wrong
+                # Instead, match by finding which view's content actually matches the issue
                 for issue in batch_issues:
-                    chart_index = issue.get("chart_index")
-                    if chart_index is None:
-                        log.warning(f"Issue missing chart_index: {issue}")
-                        continue
-                    if not isinstance(chart_index, int) or chart_index < 0 or chart_index >= len(batch):
-                        log.warning(f"Invalid chart_index {chart_index} for batch of size {len(batch)}")
+                    field = issue.get("field", "")
+                    issue_type = issue.get("issue_type", "")
+
+                    # Find the correct view by matching content
+                    matched_view = None
+
+                    if issue_type == "typo":
+                        # For typos: find view where the typo exists in the specified field
+                        typo = issue.get("typo", "")
+                        for view in batch:
+                            chart_config = json.loads(view["chart_config"]) if view["chart_config"] else {}
+                            if field in chart_config:
+                                field_content = str(chart_config[field])
+                                if typo.lower() in field_content.lower():
+                                    matched_view = view
+                                    break
+                    else:
+                        # For semantic issues: match by title/subtitle content
+                        # Use chart_index as hint but verify the content matches
+                        chart_index = issue.get("chart_index")
+                        if chart_index is not None and 0 <= chart_index < len(batch):
+                            candidate_view = batch[chart_index]
+                            chart_config = json.loads(candidate_view["chart_config"]) if candidate_view["chart_config"] else {}
+
+                            # Verify this view has matching title/subtitle
+                            if field in chart_config:
+                                # For semantic issues, Claude should have analyzed the right view
+                                matched_view = candidate_view
+
+                        # If chart_index didn't work, try to find by matching title from batch_context
+                        if not matched_view:
+                            expected_title = batch_context[chart_index]["title"] if chart_index is not None and chart_index < len(batch_context) else ""
+                            if expected_title:
+                                for view in batch:
+                                    chart_config = json.loads(view["chart_config"]) if view["chart_config"] else {}
+                                    if chart_config.get("title", "") == expected_title:
+                                        matched_view = view
+                                        break
+
+                    if not matched_view:
+                        log.warning(f"Could not match issue to any view in batch: {issue}")
                         continue
 
-                    view = batch[chart_index]
-
-                    # issue_type is already set by Claude (either "typo" or "semantic")
-                    issue["explorer_slug"] = view["explorerSlug"]
-                    mdim_config = view.get("mdim_config")
-                    dimensions = parse_dimensions(view["dimensions"], mdim_config)
-                    chart_config = json.loads(view["chart_config"]) if view["chart_config"] else {}
+                    # Now enrich with the CORRECT view's metadata
+                    chart_config = json.loads(matched_view["chart_config"]) if matched_view["chart_config"] else {}
+                    issue["view_id"] = matched_view["id"]
+                    issue["explorer_slug"] = matched_view["explorerSlug"]
+                    mdim_config = matched_view.get("mdim_config")
+                    dimensions = parse_dimensions(matched_view["dimensions"], mdim_config)
                     issue["dimensions"] = dimensions
                     issue["title"] = chart_config.get("title", "")
-                    # Add view title and URL for display
+
                     view_title = chart_config.get("title", "")
-                    mdim_published = bool(view.get("mdim_published", True))
-                    mdim_catalog_path = view.get("mdim_catalog_path")
+                    mdim_published = bool(matched_view.get("mdim_published", True))
+                    mdim_catalog_path = matched_view.get("mdim_catalog_path")
                     view_url = build_explorer_url(
-                        view["explorerSlug"], dimensions, view["id"], mdim_published, mdim_catalog_path
+                        matched_view["explorerSlug"], dimensions, matched_view["id"], mdim_published, mdim_catalog_path
                     )
                     issue["view_title"] = view_title
                     issue["view_url"] = view_url
-                    # Add context for typos
-                    if issue.get("issue_type") == "typo":
-                        field = issue.get("field", "")
-                        if field in chart_config:
-                            issue["context"] = str(chart_config[field])[:200]
+
+                    # Add context from the field where the issue was found
+                    if field and field in chart_config and not issue.get("context"):
+                        issue["context"] = str(chart_config[field])[:200]
+
                     all_issues.append(issue)
 
             except json.JSONDecodeError as e:
@@ -1247,11 +1286,12 @@ def display_issues(
             similar_count = issue.get("similar_count", 1)
 
             # Print issue header with embedded clickable link
+            view_id = issue.get("view_id", issue.get("id", "unknown"))
             if view_url:
                 # Embed link in title for clickable terminal support
-                rprint(f"\n[bold]{i}. [link={view_url}]{view_title}[/link][/bold]")
+                rprint(f"\n[bold]{i}. [link={view_url}]{view_title}[/link][/bold] [dim](view_id: {view_id})[/dim]")
             else:
-                rprint(f"\n[bold]{i}. {view_title}[/bold]")
+                rprint(f"\n[bold]{i}. {view_title}[/bold] [dim](view_id: {view_id})[/dim]")
 
             # Show group count if more than 1
             if similar_count > 1:
@@ -1261,13 +1301,13 @@ def display_issues(
             if issue_type == "typo":
                 typo = issue.get("typo", "")
                 correction = issue.get("correction", "")
-                rprint(f"   [yellow]Field:[/yellow] {field}")
                 rprint(f"   [yellow]Typo:[/yellow] '{typo}' → '{correction}'")
+                rprint(f"   [yellow]Field:[/yellow] {field}")
                 rprint(f"   [yellow]Context:[/yellow] {context}")
             else:
                 explanation = issue.get("explanation", "")
-                rprint(f"   [yellow]Type:[/yellow] {issue_type}")
                 rprint(f"   [yellow]Issue:[/yellow] {explanation}")
+                rprint(f"   [yellow]Field:[/yellow] {field}")
                 if context:
                     rprint(f"   [yellow]Context:[/yellow] {context}")
 
