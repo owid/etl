@@ -291,6 +291,7 @@ tables:
         display:
           name: Labor force participation rate status - <<sex>> - <<classif1>>
           numDecimalPlaces: 0
+          tolerance: 0
           <<: *common_display
 
       unemployment_rate_by_sex_and_age:
@@ -319,6 +320,7 @@ tables:
         display:
           name: Unemployment rate status - <<sex>> - <<classif1>>
           numDecimalPlaces: 0
+          tolerance: 0
           <<: *common_display
 
       #############################################################
