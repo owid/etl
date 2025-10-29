@@ -151,7 +151,7 @@ def get_codespell_path() -> Path | None:
 def build_explorer_url(
     explorer_slug: str,
     dimensions: dict[str, Any],
-    view_id: str = "",
+    view_type: str = "explorer",
     mdim_published: bool = True,
     mdim_catalog_path: str | None = None,
 ) -> str:
@@ -160,7 +160,7 @@ def build_explorer_url(
     Args:
         explorer_slug: Explorer slug (e.g., 'air-pollution')
         dimensions: Dictionary of dimension key-value pairs
-        view_id: View ID (used to detect if it's a multidim)
+        view_type: Type of view ('explorer' or 'multidim')
         mdim_published: Whether the multidim is published
         mdim_catalog_path: Catalog path for unpublished multidims
 
@@ -171,7 +171,7 @@ def build_explorer_url(
 
     base_url = config.OWID_ENV.site or "https://ourworldindata.org"
 
-    is_mdim = str(view_id).startswith("mdim_")
+    is_mdim = view_type == "multidim"
 
     if is_mdim:
         if mdim_published:
@@ -448,13 +448,16 @@ def check_typos(views: list[dict[str, Any]]) -> dict[int, list[dict[str, Any]]]:
                         continue
 
                     chart_config = json.loads(view["chart_config"]) if view["chart_config"] else {}
-                    mdim_config = view.get("mdim_config")
-                    dimensions = parse_dimensions(view["dimensions"], mdim_config)
+                    dimensions = parse_dimensions(view["dimensions"])
                     view_title = chart_config.get("title", "")
                     mdim_published = bool(view.get("mdim_published", True))
                     mdim_catalog_path = view.get("mdim_catalog_path")
                     view_url = build_explorer_url(
-                        view["explorerSlug"], dimensions, view_id, mdim_published, mdim_catalog_path
+                        view["explorerSlug"],
+                        dimensions,
+                        view.get("view_type", "explorer"),
+                        mdim_published,
+                        mdim_catalog_path,
                     )
 
                     # Create issue
@@ -505,6 +508,7 @@ def fetch_explorer_data(explorer_slugs: list[str] | None = None) -> pd.DataFrame
     query = f"""
         SELECT
             ev.id,
+            'explorer' as view_type,
             ev.explorerSlug,
             ev.dimensions,
             ev.chartConfigId,
@@ -553,7 +557,7 @@ def aggregate_explorer_views(df: pd.DataFrame) -> pd.DataFrame:
     # Group by explorer view and aggregate variable metadata
     # Use dropna=False to preserve rows with NULL explorerSlug (if any)
     agg_df = (
-        df.groupby(["id", "explorerSlug", "dimensions", "chartConfigId", "chart_config"], dropna=False)
+        df.groupby(["id", "view_type", "explorerSlug", "dimensions", "chartConfigId", "chart_config"], dropna=False)
         .agg(
             {
                 "variable_id": lambda x: list(x.dropna()),
@@ -594,9 +598,9 @@ def fetch_multidim_data(slug_filters: list[str] | None = None) -> pd.DataFrame:
     query = f"""
         SELECT
             mx.id as id,
+            'multidim' as view_type,
             md.slug as explorerSlug,
             mx.viewId as dimensions,
-            md.config as mdim_config,
             md.published as mdim_published,
             md.catalogPath as mdim_catalog_path,
             mx.chartConfigId,
@@ -643,9 +647,9 @@ def aggregate_multidim_views(df: pd.DataFrame) -> pd.DataFrame:
         df.groupby(
             [
                 "id",
+                "view_type",
                 "explorerSlug",
                 "dimensions",
-                "mdim_config",
                 "mdim_published",
                 "mdim_catalog_path",
                 "chartConfigId",
@@ -900,13 +904,16 @@ Your response:"""
             issue["view_title"] = title  # Use the resolved title (chart_config or variable)
             issue["source"] = "ai"  # Mark as AI-detected
 
-            mdim_config = view.get("mdim_config")
-            dimensions = parse_dimensions(view["dimensions"], mdim_config)
+            dimensions = parse_dimensions(view["dimensions"])
             mdim_published = bool(view.get("mdim_published", True))
             mdim_catalog_path = view.get("mdim_catalog_path")
 
             issue["view_url"] = build_explorer_url(
-                view["explorerSlug"], dimensions, view["id"], mdim_published, mdim_catalog_path
+                view["explorerSlug"],
+                dimensions,
+                view.get("view_type", "explorer"),
+                mdim_published,
+                mdim_catalog_path,
             )
 
             # Add context from the actual field content
@@ -1458,7 +1465,7 @@ def display_results(
     """Display grouped issues and cost."""
     # Extract unique explorer slugs and identify mdims
     all_explorers_analyzed = list(set(view["explorerSlug"] for view in views))
-    mdim_slugs = set(view["explorerSlug"] for view in views if str(view.get("id", "")).startswith("mdim_"))
+    mdim_slugs = set(view["explorerSlug"] for view in views if view.get("view_type") == "multidim")
 
     # Display grouped issues
     display_issues(grouped_issues, all_explorers_analyzed, mdim_slugs)
