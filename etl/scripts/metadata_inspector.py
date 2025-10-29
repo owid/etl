@@ -465,7 +465,6 @@ def check_typos(views: list[dict[str, Any]]) -> dict[int, list[dict[str, Any]]]:
                         "view_url": view_url,
                         "issue_type": "typo",
                         "field": field_name,
-                        "text": text[:100],
                         "context": context,
                         "typo": typo,
                         "correction": correction,
@@ -1246,7 +1245,7 @@ def display_issues(
             view_title = issue.get("view_title", "")
             view_url = issue.get("view_url", "")
             field = issue.get("field", "unknown")
-            context = issue.get("context", issue.get("text", ""))
+            context = issue.get("context", "")
             similar_count = issue.get("similar_count", 1)
             source = issue.get("source", "unknown")
 
