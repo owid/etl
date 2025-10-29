@@ -208,9 +208,10 @@ def prepare_gdp_data(tb_maddison: Table) -> Table:
         tb_gdp,
         entity_col="country",
         time_col="year",
-        time_mode="full_range_entity",  # Fill complete range for each country
+        time_mode="full_range",
         method="linear",
         limit_direction="both",
+        limit_area="inside",
     )
 
     # Merge with tb_maddison to show original vs interpolated values
@@ -224,6 +225,10 @@ def prepare_gdp_data(tb_maddison: Table) -> Table:
 
     # Restore region information
     tb_gdp["region"] = tb_gdp["country"].map(regions_map)
+
+    # Create year-over-year growth factors for countries
+    tb_gdp = tb_gdp.sort_values(["country", "year"])
+    tb_gdp["growth_factor"] = tb_gdp.groupby("country")["gdp_per_capita"].transform(lambda x: x / x.shift(1))
 
     # Remove (Maddison) from country column if present
     tb_gdp["country"] = tb_gdp["country"].str.replace(" (Maddison)", "", regex=False)
@@ -249,13 +254,22 @@ def prepare_gdp_data(tb_maddison: Table) -> Table:
     # Create a historical entities table
     tb_historical_entities = []
     for entity_name, entity_data in HISTORICAL_ENTITIES.items():
-        tb_entity = tb_gdp[
-            (tb_gdp["country"] == entity_name) & (tb_gdp["year"] <= entity_data["end_year"])
-        ].reset_index(drop=True)
+        tb_entity = tb_gdp[(tb_gdp["country"] == entity_name)].reset_index(drop=True)
+        tb_entity["successor_states"] = [list(entity_data["successor_states"]) for _ in range(len(tb_entity))]
         tb_historical_entities.append(tb_entity)
 
     # Concatenate all historical entities data
     tb_historical_entities = pr.concat(tb_historical_entities, ignore_index=True)
+
+    # Rename country to historical_entity
+    tb_historical_entities = tb_historical_entities.rename(columns={"country": "historical_entity"})
+    # Expand successor_states into multiple rows and rename columns
+    tb_historical_entities = tb_historical_entities.explode("successor_states").rename(
+        columns={"country": "historical_entity", "successor_states": "country"}
+    )
+
+    # Restore region information
+    tb_historical_entities["region"] = tb_historical_entities["country"].map(regions_map)
 
     # Calculate growth factors for historical entities table
     tb_historical_entities = tb_historical_entities.sort_values(["country", "year"])
@@ -263,26 +277,55 @@ def prepare_gdp_data(tb_maddison: Table) -> Table:
         lambda x: x / x.shift(1)
     )
 
-    # Add historical_entity column to tb_gdp
-    tb_gdp["historical_entity"] = tb_gdp["country"].map({name: name for name, data in HISTORICAL_ENTITIES.items()})
+    # Multimerge tb, tb_gdp_regions, and tb_historical_entities
+    tb_gdp = pr.merge(
+        tb_gdp,
+        tb_gdp_regions[["country", "year", "growth_factor"]],
+        left_on=["region", "year"],
+        right_on=["country", "year"],
+        how="outer",
+        suffixes=("", "_region"),
+    )
 
-    # Calculate year-over-year growth factors
-    log.info("prepare_gdp_data: Calculating year-over-year growth factors")
-    tb_gdp = tb_gdp.sort_values(["country", "year"])
+    # Drop extra country_region column
+    tb_gdp = tb_gdp.drop(columns=["country_region"])
 
-    # Growth factor = GDP(t) / GDP(t-1)
-    tb_gdp["growth_factor"] = tb_gdp.groupby("country")["gdp_per_capita"].transform(lambda x: x / x.shift(1))
+    tb_gdp = pr.merge(
+        tb_gdp,
+        tb_historical_entities[["country", "year", "region", "historical_entity", "growth_factor"]],
+        on=["country", "region", "year"],
+        how="outer",
+        suffixes=("", "_historical_entity"),
+    )
 
-    # Check for extreme growth rates
-    extreme_growth = tb_gdp[(tb_gdp["growth_factor"] > 2.0) | (tb_gdp["growth_factor"] < 0.5)]
-    if len(extreme_growth) > 0:
-        log.warning(
-            f"prepare_gdp_data: Found {len(extreme_growth)} instances of extreme growth "
-            f"(>100% or <-50% in a single year)"
-        )
-        # Show some examples
-        sample = extreme_growth.head(10)[["country", "year", "gdp_per_capita", "growth_factor"]]
-        log.warning(f"prepare_gdp_data: Examples:\n{sample}")
+    # Show data only from EARLIEST_YEAR onwards
+    tb_gdp = tb_gdp[tb_gdp["year"] >= EARLIEST_YEAR].reset_index(drop=True)
+
+    # Show country, year, region, and historical_entity columns first. Don't use and entire list to define this
+    tb_gdp = tb_gdp[
+        [
+            "country",
+            "year",
+            "region",
+            "historical_entity",
+            "gdp_per_capita_original",
+            "gdp_per_capita",
+            "growth_factor",
+            "growth_factor_region",
+            "growth_factor_historical",
+        ]
+    ]
+
+    # # Check for extreme growth rates
+    # extreme_growth = tb_gdp[(tb_gdp["growth_factor"] > 2.0) | (tb_gdp["growth_factor"] < 0.5)]
+    # if len(extreme_growth) > 0:
+    #     log.warning(
+    #         f"prepare_gdp_data: Found {len(extreme_growth)} instances of extreme growth "
+    #         f"(>100% or <-50% in a single year)"
+    #     )
+    #     # Show some examples
+    #     sample = extreme_growth.head(10)[["country", "year", "gdp_per_capita", "growth_factor"]]
+    #     log.warning(f"prepare_gdp_data: Examples:\n{sample}")
 
     return tb_gdp
 
