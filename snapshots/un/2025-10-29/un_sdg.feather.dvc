@@ -14,3 +14,7 @@ meta:
     license:
       name: © 2024 United Nations
       url: https://www.un.org/en/about-us/terms-of-use
+outs:
+  - md5: 24e7439a1d48cdcf79b7e76af237e114
+    size: 1056179354
+    path: un_sdg.feather

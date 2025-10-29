@@ -13,3 +13,7 @@ meta:
     license:
       name: © 2024 United Nations
       url: https://www.un.org/en/about-us/terms-of-use
+outs:
+  - md5: 69bb8043108ee3dfd8c01dde9c121966
+    size: 2772
+    path: un_sdg_unit.csv
