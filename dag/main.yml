@@ -704,6 +704,18 @@ steps:
   data://grapher/trade/2025-09-22/wto_trade_growth:
     - data://garden/trade/2025-09-22/wto_trade_growth
   #
+  # UN SDG (2024)
+  data://meadow/un/2025-10-29/un_sdg:
+    - snapshot://un/2025-10-29/un_sdg.feather
+
+  data://garden/un/2025-10-29/un_sdg:
+    - data://meadow/un/2025-10-29/un_sdg
+    - snapshot://un/2025-10-29/un_sdg_dimension.json
+    - snapshot://un/2025-10-29/un_sdg_unit.csv
+
+  data://grapher/un/2025-10-29/un_sdg:
+    - data://garden/un/2025-10-29/un_sdg
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml

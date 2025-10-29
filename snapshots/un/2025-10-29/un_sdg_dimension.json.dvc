@@ -1,0 +1,15 @@
+meta:
+  origin:
+    producer: United Nations Department of Economic and Social Affairs
+    title: United Nations Sustainable Development Goals - Dimensions
+    description_snapshot: |-
+      Dimensions of the data tables of the global indicator framework for the Sustainable Development Goals and targets of the 2030 Agenda for Sustainable Development.
+    citation_full: |-
+      SDG Indicators Database, United Nations, Department of Economic and Social Affairs, https://unstats.un.org/sdgs/dataportal (2024)
+    attribution_short: UN DESA
+    url_main: https://unstats.un.org/sdgs/dataportal
+    date_accessed: '2025-10-29'
+    date_published: '2024-06-28'
+    license:
+      name: © 2024 United Nations
+      url: https://www.un.org/en/about-us/terms-of-use
