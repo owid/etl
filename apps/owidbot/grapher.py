@@ -5,9 +5,8 @@ from etl.paths import BASE_DIR
 def run(branch: str) -> str:
     container_name = get_container_name(branch)
 
-    # NOTE: disabled to avoid waiting on SVG tester
-    # default_views = make_differences_line("verify-graphs_default-views.log", "commit_default-views.log")
-    # all_views = make_differences_line("verify-graphs_all-views.log", "commit_all-views.log")
+    default_views = make_differences_line("verify-graphs_default-views.log", "commit_default-views.log")
+    all_views = make_differences_line("verify-graphs_all-views.log", "commit_all-views.log")
 
     body = f"""
 - **Site-screenshots:** https://github.com/owid/site-screenshots/compare/{branch}
@@ -23,15 +22,15 @@ def run(branch: str) -> str:
 - [Archived multidimensional data page](http://{container_name}:8789/latest/grapher/vaccination-coverage-who-unicef.html)
 - [Data page with archive citation](http://{container_name}/grapher/life-expectancy)
 </details>
+
+<details open>
+<summary><b>SVG tester:</b> </summary>
+
+Number of differences (default views): {default_views}
+Number of differences (all views): {all_views}
+
+</details>
     """.strip()
-
-    # <details open>
-    # <summary><b>SVG tester:</b> </summary>
-
-    # Number of differences (default views): {default_views}
-    # Number of differences (all views): {all_views}
-
-    # </details>
 
     return body
 
