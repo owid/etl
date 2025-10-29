@@ -210,7 +210,8 @@ definitions:
   description_processing_obs_status: |-
     We modified the observation status (`obs_status`) variable to show the data is modeled whenever the original observation status was missing and there is a non-missing value for the corresponding ILO Modelled Estimates indicator.
 
-  sort_values: &sort_values
+  # Common sort values for ordinal obs_status variables
+  sort_obs_status: &sort_obs_status
     - Real value
     - Modeled value
 
@@ -307,7 +308,7 @@ tables:
         processing_level: major
         description_processing: "{definitions.description_processing_obs_status}"
         type: ordinal
-        sort: *sort_values
+        sort: *sort_obs_status
         display:
           name: Labor force participation rate status - <<sex>> - <<classif1>>
           numDecimalPlaces: 0
@@ -341,7 +342,7 @@ tables:
         processing_level: major
         description_processing: "{definitions.description_processing_obs_status}"
         type: ordinal
-        sort: *sort_values
+        sort: *sort_obs_status
         display:
           name: Unemployment rate status - <<sex>> - <<classif1>>
           numDecimalPlaces: 0
