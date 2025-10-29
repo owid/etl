@@ -83,12 +83,12 @@ CHART_FIELDS_TO_CHECK = [
 
 VARIABLE_FIELDS_TO_CHECK = [
     "variable_name",
-    # "variable_description",
-    # "variable_title_public",
-    # "variable_description_short",
-    # "variable_description_from_producer",
-    # "variable_description_key",
-    # "variable_description_processing",
+    "variable_description",
+    "variable_title_public",
+    "variable_description_short",
+    "variable_description_from_producer",
+    "variable_description_key",
+    "variable_description_processing",
 ]
 
 
@@ -854,17 +854,22 @@ async def check_view_async(
     # Build prompt text
     fields_text = "\n".join([f"{name.replace('_', ' ').title()}: {value}" for name, value in fields_to_check])
 
-    prompt = f"""Check these chart/variable fields for spelling/semantic errors:
+    prompt = f"""Proofread these fields. Find ONLY critical errors - actual mistakes, not style differences:
 
 {fields_text}
 
-Task: Find misspelled words (American English) or semantic contradictions between fields.
+Report ONLY:
+1. **Clearly misspelled words** - Words with wrong spelling (e.g., "recieve" → "receive", "environemnt" → "environment")
+2. **Obvious nonsense** - Random non-existing words (e.g., "zschool")
+3. **Absurd contradictions** - Title/content completely mismatched (e.g., title "dogs" but all content about "cats")
 
-Return format: JSON array only. Examples:
-- If issues found: [{{"issue_type": "typo", "field": "title", "typo": "nuber", "correction": "number", "explanation": "Spelling error"}}]
-- If no issues: []
+NEVER report minor style preferences, or minor wording issues, or minor inconsistencies in capitalization.
 
-Your response:"""
+Return JSON array (empty if no CRITICAL errors):
+- Typo format: [{{"issue_type": "typo", "field": "title", "typo": "recieve", "correction": "receive"}}]
+- Contradiction format: [{{"issue_type": "semantic", "field": "title", "explanation": "Title says dogs but content only mentions cats"}}]
+
+Response:"""
 
     raw_text = ""  # Initialize for type checker
     try:
