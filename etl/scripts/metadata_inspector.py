@@ -854,22 +854,22 @@ async def check_view_async(
     # Build prompt text
     fields_text = "\n".join([f"{name.replace('_', ' ').title()}: {value}" for name, value in fields_to_check])
 
-    prompt = f"""Find critical errors in these fields:
+    prompt = f"""You are checking metadata for an Our World in Data chart. Find ONLY mistakes that would damage OWID's reputation:
 
 {fields_text}
 
-IMPORTANT: Check if the Title subject matches what the other fields describe.
+Report ONLY critical errors:
+1. **Spelling errors** (e.g., "recieve" → "receive", "governemnt" → "government")
+2. **Obvious nonsensical mistakes** (e.g., title speaks about CO2 emissions but ALL other fields speak about vaccines)
 
-Report ONLY:
-1. **Misspellings** (e.g., "recieve" → "receive", "environemnt" → "environment")
-2. **Gibberish words** (e.g., "asdfgh", "zzzschool")
-3. **Subject mismatches** - Title subject doesn't match descriptions (e.g., title "dogs" but descriptions about "cats")
+DO NOT report:
+- Style suggestions or writing improvements
+- Minor inconsistencies or nitpicks
+- Issues that say "everything looks fine" - if there are NO errors, return []
 
-IGNORE capitalization, wording variations, style preferences.
-
-JSON response:
-[{{"issue_type": "typo", "field": "title", "typo": "recieve", "correction": "receive"}}]
-[{{"issue_type": "semantic", "field": "title", "explanation": "Title is about dogs but descriptions are about cats"}}]
+Return ONLY JSON array with format: issue_type (either "typo" or "semantic") field (where the issue occurs), context (phrase containing the issue), and explanation (why that's an issue):
+[{{"issue_type": "typo", "typo": "recieve", "correction": "receive", "field": "title", "context": "People recieve money"}}]
+[{{"issue_type": "semantic", "field": "title", "context": "CO2 emissions", "explanation": "Title is about CO2 emissions but descriptions are about vaccines"}}]
 []
 
 Response:"""
@@ -1321,7 +1321,6 @@ def display_issues(
 
         # Print each issue with full details
         for i, issue in enumerate(explorer_issues, 1):
-            issue_type = issue.get("issue_type", "unknown")
             view_title = issue.get("view_title", "")
             view_url = issue.get("view_url", "")
             field = issue.get("field", "unknown")
@@ -1343,21 +1342,32 @@ def display_issues(
                 rprint(f"   [dim]({similar_count} similar occurrences in this explorer)[/dim]")
 
             # Print issue details
+            issue_type = issue.get("issue_type", "semantic")
+
             if issue_type == "typo":
                 typo = issue.get("typo", "")
                 correction = issue.get("correction", "")
-                if source == "codespell":
-                    rprint(f"   [yellow]Typo (codespell):[/yellow] '{typo}' → '{correction}'")
+                explanation = issue.get("explanation", "")
+
+                # If typo/correction are properly filled, show them
+                if typo and correction:
+                    if source == "codespell":
+                        rprint(f"   [yellow]Typo (codespell):[/yellow] '{typo}' → '{correction}'")
+                    else:
+                        rprint(f"   [yellow]Typo (AI):[/yellow] '{typo}' → '{correction}'")
+                elif explanation:
+                    # If no typo/correction but explanation exists, show the explanation
+                    rprint(f"   [yellow]Typo (AI):[/yellow] {explanation}")
                 else:
-                    rprint(f"   [yellow]Typo (AI):[/yellow] '{typo}' → '{correction}'")
-                rprint(f"   [yellow]Field:[/yellow] {field}")
-                rprint(f"   [yellow]Context:[/yellow] {context}")
+                    # Last resort: show context
+                    rprint("   [yellow]Typo (AI):[/yellow] See context below")
             else:
                 explanation = issue.get("explanation", "")
                 rprint(f"   [yellow]Issue (AI):[/yellow] {explanation}")
-                rprint(f"   [yellow]Field:[/yellow] {field}")
-                if context:
-                    rprint(f"   [yellow]Context:[/yellow] {context}")
+
+            rprint(f"   [yellow]Field:[/yellow] {field}")
+            if context:
+                rprint(f"   [yellow]Context:[/yellow] {context}")
 
     # Show clean explorers/mdims if we have the full list
     if all_explorers and mdim_slugs is not None:
