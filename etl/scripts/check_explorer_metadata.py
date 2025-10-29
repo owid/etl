@@ -69,11 +69,56 @@ MODEL_PRICING = {
 }
 
 
-def parse_dimensions(dimensions_raw: Any) -> dict[str, Any]:
+def parse_multidim_view_id(view_id: str, mdim_config: str | None) -> dict[str, str]:
+    """Parse multidim viewId into dimension values.
+
+    ViewId format: choice values are ordered alphabetically by dimension slug.
+    E.g., for dimensions [metric, antigen], viewId "comparison__vaccinated" maps to
+    {antigen: comparison, metric: vaccinated} (alphabetical order: antigen, metric).
+
+    Args:
+        view_id: ViewId string like "level_side_by_side__number__both"
+        mdim_config: JSON config string with dimension definitions
+
+    Returns:
+        Dict mapping dimension slugs to choice slugs
+    """
+    if not view_id or not mdim_config:
+        return {}
+
+    try:
+        config = json.loads(mdim_config)
+        dimensions = config.get("dimensions", [])
+
+        if not dimensions:
+            return {}
+
+        # Split viewId by double underscore to get choice values
+        parts = view_id.split("__")
+
+        if len(parts) != len(dimensions):
+            return {}
+
+        # Sort dimension slugs alphabetically (this is the viewId ordering convention)
+        dim_slugs_sorted = sorted([dim.get("slug", "") for dim in dimensions])
+
+        # Map sorted dimension slugs to viewId parts
+        result = {}
+        for dim_slug, choice_slug in zip(dim_slugs_sorted, parts):
+            if dim_slug:
+                result[dim_slug] = choice_slug
+
+        return result
+    except (json.JSONDecodeError, AttributeError, KeyError):
+        return {}
+
+
+def parse_dimensions(dimensions_raw: Any, mdim_config: str | None = None) -> dict[str, Any]:
     """Parse dimensions field which can be JSON (explorers) or just a viewId (mdims).
 
     Args:
         dimensions_raw: Raw dimensions value from database
+        mdim_config: For multidims, the JSON config string
 
     Returns:
         Parsed dimensions dict, or empty dict if not applicable
@@ -86,8 +131,8 @@ def parse_dimensions(dimensions_raw: Any) -> dict[str, Any]:
     if isinstance(dimensions_raw, str) and dimensions_raw.startswith("{"):
         # Explorer: dimensions is a JSON string
         return json.loads(dimensions_raw)
-    # Mdim: dimensions is just a viewId (string or number) - not relevant for our checks
-    return {}
+    # Mdim: dimensions is a viewId - parse it with the config
+    return parse_multidim_view_id(str(dimensions_raw), mdim_config)
 
 
 def get_codespell_path() -> Path | None:
@@ -103,31 +148,55 @@ def get_codespell_path() -> Path | None:
     return None
 
 
-def build_explorer_url(explorer_slug: str, dimensions: dict[str, Any], view_id: str = "") -> str:
+def build_explorer_url(
+    explorer_slug: str,
+    dimensions: dict[str, Any],
+    view_id: str = "",
+    mdim_published: bool = True,
+    mdim_catalog_path: str | None = None,
+) -> str:
     """Build URL for explorer or multidim view with dimensions.
 
     Args:
         explorer_slug: Explorer slug (e.g., 'air-pollution')
         dimensions: Dictionary of dimension key-value pairs
         view_id: View ID (used to detect if it's a multidim)
+        mdim_published: Whether the multidim is published
+        mdim_catalog_path: Catalog path for unpublished multidims
 
     Returns:
         Full URL to the view with properly encoded query parameters
     """
-    from urllib.parse import urlencode
+    from urllib.parse import quote, urlencode
 
     base_url = config.OWID_ENV.site or "https://ourworldindata.org"
 
-    # Multidims use /grapher/, regular explorers use /explorers/
     is_mdim = str(view_id).startswith("mdim_")
-    path = "grapher" if is_mdim else "explorers"
-    url = f"{base_url}/{path}/{explorer_slug}"
 
-    if dimensions:
-        # Filter out empty values and build query string with proper encoding
-        params = {k: v for k, v in dimensions.items() if v}
-        if params:
-            url += "?" + urlencode(params)
+    if is_mdim:
+        if mdim_published:
+            # Published multidim: /grapher/{slug}?dimensions
+            url = f"{base_url}/grapher/{explorer_slug}"
+            if dimensions:
+                params = {k: v for k, v in dimensions.items() if v}
+                if params:
+                    url += "?" + urlencode(params)
+        else:
+            # Unpublished multidim: /admin/grapher/{catalogPath}?dimensions#{slug}
+            catalog_path = quote(mdim_catalog_path or "", safe="")
+            url = f"{base_url}/admin/grapher/{catalog_path}"
+            if dimensions:
+                params = {k: v for k, v in dimensions.items() if v}
+                if params:
+                    url += "?" + urlencode(params)
+            url += f"#{explorer_slug}"
+    else:
+        # Regular explorer: /explorers/{slug}?dimensions
+        url = f"{base_url}/explorers/{explorer_slug}"
+        if dimensions:
+            params = {k: v for k, v in dimensions.items() if v}
+            if params:
+                url += "?" + urlencode(params)
 
     return url
 
@@ -377,9 +446,14 @@ def check_typos(views: list[dict[str, Any]]) -> dict[int, list[dict[str, Any]]]:
                         continue
 
                     chart_config = json.loads(view["chart_config"]) if view["chart_config"] else {}
-                    dimensions = parse_dimensions(view["dimensions"])
+                    mdim_config = view.get("mdim_config")
+                    dimensions = parse_dimensions(view["dimensions"], mdim_config)
                     view_title = chart_config.get("title", "")
-                    view_url = build_explorer_url(view["explorerSlug"], dimensions, view_id)
+                    mdim_published = bool(view.get("mdim_published", True))
+                    mdim_catalog_path = view.get("mdim_catalog_path")
+                    view_url = build_explorer_url(
+                        view["explorerSlug"], dimensions, view_id, mdim_published, mdim_catalog_path
+                    )
 
                     # Create issue
                     issue = {
@@ -520,6 +594,9 @@ def fetch_multidim_data(slug_filters: list[str] | None = None) -> pd.DataFrame:
             CONCAT('mdim_', md.id, '_', mx.viewId) as id,
             md.slug as explorerSlug,
             mx.viewId as dimensions,
+            md.config as mdim_config,
+            md.published as mdim_published,
+            md.catalogPath as mdim_catalog_path,
             mx.chartConfigId,
             cc.full as chart_config,
             v.id as variable_id,
@@ -561,7 +638,19 @@ def aggregate_multidim_views(df: pd.DataFrame) -> pd.DataFrame:
     # Group by multidim view and aggregate variable metadata (same as explorers)
     # Use dropna=False to preserve rows with NULL explorerSlug
     agg_df = (
-        df.groupby(["id", "explorerSlug", "dimensions", "chartConfigId", "chart_config"], dropna=False)
+        df.groupby(
+            [
+                "id",
+                "explorerSlug",
+                "dimensions",
+                "mdim_config",
+                "mdim_published",
+                "mdim_catalog_path",
+                "chartConfigId",
+                "chart_config",
+            ],
+            dropna=False,
+        )
         .agg(
             {
                 "variable_id": lambda x: list(x.dropna()),
@@ -849,13 +938,18 @@ Charts:
                     if view:
                         # issue_type is already set by Claude (either "typo" or "semantic")
                         issue["explorer_slug"] = view["explorerSlug"]
-                        dimensions = parse_dimensions(view["dimensions"])
+                        mdim_config = view.get("mdim_config")
+                        dimensions = parse_dimensions(view["dimensions"], mdim_config)
                         chart_config = json.loads(view["chart_config"]) if view["chart_config"] else {}
                         issue["dimensions"] = dimensions
                         issue["title"] = chart_config.get("title", "")
                         # Add view title and URL for display
                         view_title = chart_config.get("title", "")
-                        view_url = build_explorer_url(view["explorerSlug"], dimensions, view["id"])
+                        mdim_published = bool(view.get("mdim_published", True))
+                        mdim_catalog_path = view.get("mdim_catalog_path")
+                        view_url = build_explorer_url(
+                            view["explorerSlug"], dimensions, view["id"], mdim_published, mdim_catalog_path
+                        )
                         issue["view_title"] = view_title
                         issue["view_url"] = view_url
                         # Add context for typos
