@@ -829,7 +829,7 @@ def check_issues(
 
             # Prepare batch context
             batch_context = []
-            for view in batch:
+            for idx, view in enumerate(batch):
                 chart_config = json.loads(view["chart_config"]) if view["chart_config"] else {}
                 dimensions = parse_dimensions(view["dimensions"])
 
@@ -847,7 +847,7 @@ def check_issues(
                     variables.append(var_info)
 
                 context = {
-                    "view_id": view["id"],
+                    "chart_index": idx,  # Use simple 0-based index for Claude to reference
                     "explorer_slug": view["explorerSlug"],
                     "dimensions": dimensions,
                     "title": chart_config.get("title", ""),
@@ -878,7 +878,7 @@ DO NOT flag:
 
 Return ONLY a JSON array:
 [{{
-    "view_id": <int>,
+    "chart_index": <int - 0-based index from chart context>,
     "issue_type": "typo" or "semantic",
     "field": "title|subtitle|note|variable",
     "explanation": "<brief>",
@@ -933,31 +933,38 @@ Charts:
 
                 # Enrich issues with view metadata
                 for issue in batch_issues:
-                    view_id = issue["view_id"]
-                    view = next((v for v in batch if v["id"] == view_id), None)
-                    if view:
-                        # issue_type is already set by Claude (either "typo" or "semantic")
-                        issue["explorer_slug"] = view["explorerSlug"]
-                        mdim_config = view.get("mdim_config")
-                        dimensions = parse_dimensions(view["dimensions"], mdim_config)
-                        chart_config = json.loads(view["chart_config"]) if view["chart_config"] else {}
-                        issue["dimensions"] = dimensions
-                        issue["title"] = chart_config.get("title", "")
-                        # Add view title and URL for display
-                        view_title = chart_config.get("title", "")
-                        mdim_published = bool(view.get("mdim_published", True))
-                        mdim_catalog_path = view.get("mdim_catalog_path")
-                        view_url = build_explorer_url(
-                            view["explorerSlug"], dimensions, view["id"], mdim_published, mdim_catalog_path
-                        )
-                        issue["view_title"] = view_title
-                        issue["view_url"] = view_url
-                        # Add context for typos
-                        if issue.get("issue_type") == "typo":
-                            field = issue.get("field", "")
-                            if field in chart_config:
-                                issue["context"] = str(chart_config[field])[:200]
-                        all_issues.append(issue)
+                    chart_index = issue.get("chart_index")
+                    if chart_index is None:
+                        log.warning(f"Issue missing chart_index: {issue}")
+                        continue
+                    if not isinstance(chart_index, int) or chart_index < 0 or chart_index >= len(batch):
+                        log.warning(f"Invalid chart_index {chart_index} for batch of size {len(batch)}")
+                        continue
+
+                    view = batch[chart_index]
+
+                    # issue_type is already set by Claude (either "typo" or "semantic")
+                    issue["explorer_slug"] = view["explorerSlug"]
+                    mdim_config = view.get("mdim_config")
+                    dimensions = parse_dimensions(view["dimensions"], mdim_config)
+                    chart_config = json.loads(view["chart_config"]) if view["chart_config"] else {}
+                    issue["dimensions"] = dimensions
+                    issue["title"] = chart_config.get("title", "")
+                    # Add view title and URL for display
+                    view_title = chart_config.get("title", "")
+                    mdim_published = bool(view.get("mdim_published", True))
+                    mdim_catalog_path = view.get("mdim_catalog_path")
+                    view_url = build_explorer_url(
+                        view["explorerSlug"], dimensions, view["id"], mdim_published, mdim_catalog_path
+                    )
+                    issue["view_title"] = view_title
+                    issue["view_url"] = view_url
+                    # Add context for typos
+                    if issue.get("issue_type") == "typo":
+                        field = issue.get("field", "")
+                        if field in chart_config:
+                            issue["context"] = str(chart_config[field])[:200]
+                    all_issues.append(issue)
 
             except json.JSONDecodeError as e:
                 log.error(f"JSON parsing error for batch: {e}")
@@ -1320,6 +1327,12 @@ def load_views(slug_list: list[str] | None, limit: int | None) -> list[dict[str,
     agg_df_explorers = aggregate_explorer_views(df_explorers) if not df_explorers.empty else pd.DataFrame()
     agg_df_mdims = aggregate_multidim_views(df_mdims) if not df_mdims.empty else pd.DataFrame()
     agg_df = pd.concat([agg_df_explorers, agg_df_mdims], ignore_index=True)
+
+    # Sort by explorerSlug to group views from same collection together
+    # This ensures batches don't mix different collections, which would confuse Claude
+    if not agg_df.empty:
+        agg_df = agg_df.sort_values("explorerSlug").reset_index(drop=True)
+
     views: list[dict[str, Any]] = agg_df.to_dict("records")  # type: ignore
 
     # Apply limit if specified
