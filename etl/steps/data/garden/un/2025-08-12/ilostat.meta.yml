@@ -204,6 +204,12 @@ definitions:
   description_processing_avg_earnings_outliers: |-
     We excluded observations where average hourly earnings were below 0.2 or above 100 international-$ in {definitions.ppp_year} prices. Such values are highly unlikely as national averages and are therefore probably the result of miscalculation.
 
+  description_processing_projections: |-
+    We excluded projections from the ILO Modelled Estimates (ILOEST) series. These projections are indicated by the absence of an observation status (`obs_status`) across all countries in a given year.
+
+  description_processing_obs_status: |-
+    We modified the observation status (`obs_status`) variable to show the data is modeled whenever the original observation status was missing and there is a non-missing value for the indicator.
+
   # This is the ID of the Google Doc that contains the FAQs
   gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
 
@@ -231,6 +237,8 @@ tables:
           - "{definitions.description_key_status_in_employment}"
           - "{definitions.description_key_iloest_modelled_data}"
           - "{definitions.description_key_13th_icls}"
+        processing_level: major
+        description_processing: "{definitions.description_processing_projections}"
         display:
           name: Employment - <<sex>> - <<classif1>>
           numDecimalPlaces: 0
@@ -259,6 +267,8 @@ tables:
         description_key:
           - "{definitions.description_key_iloest_modelled_data}"
           - "{definitions.description_key_13th_icls}"
+        processing_level: major
+        description_processing: "{definitions.description_processing_projections}"
         display:
           name: Labor force - <<sex>> - <<classif1>>
           numDecimalPlaces: 0
@@ -275,6 +285,8 @@ tables:
           - "{definitions.description_key_working_age_ilo_modeled}"
           - "{definitions.description_key_iloest_modelled_data}"
           - "{definitions.description_key_13th_icls}"
+        processing_level: major
+        description_processing: "{definitions.description_processing_projections}"
         display:
           name: Labor force participation rate - <<sex>> - <<classif1>>
           numDecimalPlaces: 1
@@ -288,6 +300,8 @@ tables:
         description_key:
           - "{definitions.description_key_iloest_modelled_data}"
           - "{definitions.description_key_13th_icls}"
+        processing_level: major
+        description_processing: "{definitions.description_processing_obs_status}"
         display:
           name: Labor force participation rate status - <<sex>> - <<classif1>>
           numDecimalPlaces: 0
@@ -304,6 +318,8 @@ tables:
           - "{definitions.description_key_working_age_ilo_modeled}"
           - "{definitions.description_key_iloest_modelled_data}"
           - "{definitions.description_key_13th_icls}"
+        processing_level: major
+        description_processing: "{definitions.description_processing_projections}"
         display:
           name: Unemployment rate - <<sex>> - <<classif1>>
           numDecimalPlaces: 1
@@ -316,7 +332,8 @@ tables:
         description_short: Observation status of the unemployment rate data point.
         description_key:
           - "{definitions.description_key_iloest_modelled_data}"
-          - "{definitions.description_key_13th_icls}"
+        processing_level: major
+        description_processing: "{definitions.description_processing_obs_status}"
         display:
           name: Unemployment rate status - <<sex>> - <<classif1>>
           numDecimalPlaces: 0
