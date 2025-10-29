@@ -10,7 +10,7 @@ from owid.catalog import Dataset, Table, Variable, utils
 from owid.datautils.dataframes import map_series
 
 from etl.data_helpers import geo
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -108,7 +108,7 @@ REGIONS = {
 # Overlaps found between historical regions and successor countries, that we accept in the data.
 # We accept them either because they happened close to the transition, or to avoid needing to introduce new
 # countries for which we do not have data (like the Russian Empire).
-ACCEPTED_OVERLAPS = [{1911: {"USSR", "Kazakhstan"}}, {1991: {"Georgia", "USSR"}}, {1991: {"West Germany", "Germany"}}]
+ACCEPTED_OVERLAPS = [{1911: {"USSR", "Kazakhstan"}}, {1991: {"Georgia", "USSR"}}]
 
 # List issues found in the data:
 # Each element is a tuple with a dictionary that fully identifies the wrong row,
@@ -322,7 +322,7 @@ def calculate_start_and_end_dates(tb: Table) -> Table:
     tb["end_date"] = pd.to_datetime(tb["end_date"])
 
     error = "Events can't have an end_date prior to start_date."
-    assert (tb["end_date"] >= tb["start_date"]).all(), error
+    assert tb[(tb["end_date"] < tb["start_date"])].empty, error
 
     return tb
 
@@ -900,7 +900,7 @@ def sanity_checks_on_outputs(tb: Table, is_decade: bool, ds_regions: Dataset) ->
             assert (tb[informed_rows][column] <= tb[informed_rows]["population"]).all(), error
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -927,13 +927,87 @@ def run(dest_dir: str) -> None:
     # Prepare input data (prepare time columns, convert cost variables to dollars, and fix some known issues).
     tb = prepare_input_data(tb=tb_meadow)
 
+    ####################################################################################################################
+    # TODO: Contact EM-DAT about these issues:
+    # * Even with end date prior to start date: China, Wet mass movement, 10 deaths, starting in 2025-06, ending in 2024-06-04.
+    # The most likely explanation is that the end year is wrong and should be 2025. Also, the day when it starts is missing. I'll assume it's this event:
+    #   https://eos.org/thelandslideblog/muta-1
+    assert tb.loc[(tb["start_year"] > tb["end_year"]) & (tb["country"] == "China"), "end_year"].item() == 2024
+    tb.loc[(tb["start_year"] > tb["end_year"]) & (tb["country"] == "China"), ("start_day", "end_year")] = 1, 2025
+    # * Event with end date prior to start date: Honduras, Extreme weather, starting in 2025-06-17, ending in 2024-06-20.
+    assert tb.loc[(tb["start_year"] > tb["end_year"]) & (tb["country"] == "Honduras"), "end_year"].item() == 2024
+    tb.loc[(tb["start_year"] > tb["end_year"]) & (tb["country"] == "Honduras"), "end_year"] = 2025
+    # * Event with end date prior to start date: Cuba, Extreme weather, starting in 1955-09-13, ending in 2025-09-20.
+    #  It could be this:
+    #  https://en.wikipedia.org/wiki/Hurricane_Hilda_%281955%29
+    assert tb.loc[(tb["start_year"] == 1955) & (tb["country"] == "Cuba"), "end_year"].item() == 2025
+    tb.loc[(tb["start_year"] == 1955) & (tb["country"] == "Cuba"), "end_year"] = 1955
+    # * Event with end date prior to start date: France, Flood, starting in 1994-06-27, ending in 1994-06-26.
+    assert (
+        tb.loc[
+            (tb["start_year"] == 1994)
+            & (tb["start_month"] == 6)
+            & (tb["start_day"] == 27)
+            & (tb["country"] == "France")
+            & (tb["end_year"] == 1994)
+            & (tb["end_month"] == 6),
+            "end_day",
+        ].item()
+        == 26
+    )
+    tb.loc[
+        (tb["start_year"] == 1994) & (tb["start_month"] == 6) & (tb["start_day"] == 27) & (tb["country"] == "France"),
+        "end_day",
+    ] = 27
+    # * Event with end date prior to start date: Japan, Extreme weather, starting in 1956-09-01, ending in 1956-08-11.
+    assert (
+        tb.loc[
+            (tb["country"] == "Japan")
+            & (tb["start_year"] == 1956)
+            & (tb["start_month"] == 9)
+            & (tb["start_day"] == 1)
+            & (tb["end_year"] == 1956),
+            "end_month",
+        ].item()
+        == 8
+    )
+    tb.loc[
+        (tb["country"] == "Japan")
+        & (tb["start_year"] == 1956)
+        & (tb["start_month"] == 9)
+        & (tb["start_day"] == 1)
+        & (tb["end_year"] == 1956),
+        "end_month",
+    ] = 9
+    # * Event with end date prior to start date: Thailand, Extreme weather, starting in 2025-07-21, ending in 2025-07-01.
+    assert (
+        tb.loc[
+            (tb["country"] == "Thailand")
+            & (tb["start_year"] == 2025)
+            & (tb["start_month"] == 7)
+            & (tb["start_day"] == 21)
+            & (tb["end_year"] == 2025)
+            & (tb["end_month"] == 7),
+            "end_day",
+        ].item()
+        == 1
+    )
+    tb.loc[
+        (tb["country"] == "Thailand")
+        & (tb["start_year"] == 2025)
+        & (tb["start_month"] == 7)
+        & (tb["start_day"] == 21)
+        & (tb["end_year"] == 2025)
+        & (tb["end_month"] == 7),
+        "end_day",
+    ] = 21
+    ####################################################################################################################
+
     # Sanity checks.
     sanity_checks_on_inputs(tb=tb)
 
     # Harmonize country names.
-    tb = geo.harmonize_countries(
-        df=tb, countries_file=paths.country_mapping_path, warn_on_missing_countries=True, warn_on_unused_countries=True
-    )
+    tb = paths.regions.harmonize_names(tb=tb)
 
     # Create a (yearly and decadal) table with the number and share of small, medium and large events.
     tb_yearly_sizes, tb_decadal_sizes = create_tables_of_event_sizes(
@@ -965,13 +1039,8 @@ def run(dest_dir: str) -> None:
     tb = create_a_new_type_for_all_disasters_combined(tb=tb)
 
     # Add region aggregates.
-    tb = geo.add_regions_to_table(
-        tb=tb,
-        regions=REGIONS,
-        index_columns=["country", "year", "type"],
-        ds_regions=ds_regions,
-        ds_income_groups=ds_income_groups,
-        accepted_overlaps=ACCEPTED_OVERLAPS,
+    tb = paths.regions.add_aggregates(
+        tb=tb, index_columns=["country", "year", "type"], regions=REGIONS, accepted_overlaps=ACCEPTED_OVERLAPS
     )
 
     # Add damages per GDP, and rates per 100,000 people.
@@ -1001,10 +1070,8 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create new garden dataset.
-    ds_garden = create_dataset(
-        dest_dir,
+    ds_garden = paths.create_dataset(
         tables=[tb, tb_decadal, tb_yearly_sizes, tb_decadal_sizes, tb_yearly_deaths, tb_decadal_deaths],
         default_metadata=ds_meadow.metadata,
-        check_variables_metadata=True,
     )
     ds_garden.save()
