@@ -329,7 +329,7 @@ queries:
     query: ("Dem.Rep.,Korea" "North Korea" "D.P.R. of Korea" "Democratic People's Republic of Korea" "Korea, Dem. P.R. of" "Korea, Dem. People's Rep." "DPRK") AND NOT ("South Korea" "Republic of Korea" "Korea, Rep.")
   - country: North Macedonia
     query: ("North Macedonia" "TFYR Macedonia" "TFYR of Macedonia" "Macedonia" "Macedonia, The Former Yugoslav Republic Of" "Macedonia, FYR")
-  - country: Northern Marianas Islands
+  - country: Northern Mariana Islands
     query: ("Northern Mariana Islands" "Northern Mariana")
   - country: Norway
     query: ("Norway" "Norge")
