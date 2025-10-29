@@ -301,6 +301,11 @@ def prepare_gdp_data(tb_maddison: Table) -> Table:
     # Show data only from EARLIEST_YEAR onwards
     tb_gdp = tb_gdp[tb_gdp["year"] >= EARLIEST_YEAR].reset_index(drop=True)
 
+    # Rename growth factor columns
+    tb_gdp = tb_gdp.rename(
+        columns={"growth_factor": "growth_factor_country"},
+    )
+
     # Show country, year, region, and historical_entity columns first. Don't use and entire list to define this
     tb_gdp = tb_gdp[
         [
@@ -310,11 +315,14 @@ def prepare_gdp_data(tb_maddison: Table) -> Table:
             "historical_entity",
             "gdp_per_capita_original",
             "gdp_per_capita",
-            "growth_factor",
+            "growth_factor_country",
             "growth_factor_region",
-            "growth_factor_historical",
+            "growth_factor_historical_entity",
         ]
     ]
+
+    # Generate growth_factor column using priority: country > historical_entity > region
+    tb_gdp["growth_factor"] = tb_gdp.apply(select_growth_factor, axis=1)
 
     # # Check for extreme growth rates
     # extreme_growth = tb_gdp[(tb_gdp["growth_factor"] > 2.0) | (tb_gdp["growth_factor"] < 0.5)]
@@ -901,3 +909,13 @@ def run_data_quality_checks(tb: Table) -> None:
             log.error(f"run_data_quality_checks: Found {len(invalid)} invalid ratios (not in [0,1]) in {ratio_col}")
 
     log.info("run_data_quality_checks: Data quality checks completed")
+
+
+def select_growth_factor(row):
+    """Select growth factor based on priority: country > historical_entity > region."""
+    if not pd.isna(row["growth_factor_country"]):
+        return row["growth_factor_country"]
+    elif not pd.isna(row["growth_factor_historical_entity"]):
+        return row["growth_factor_historical_entity"]
+    else:
+        return row["growth_factor_region"]
