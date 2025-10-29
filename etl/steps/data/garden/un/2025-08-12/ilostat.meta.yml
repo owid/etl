@@ -306,6 +306,7 @@ tables:
           - "{definitions.description_key_13th_icls}"
         processing_level: major
         description_processing: "{definitions.description_processing_obs_status}"
+        type: ordinal
         sort: *sort_values
         display:
           name: Labor force participation rate status - <<sex>> - <<classif1>>
@@ -339,6 +340,7 @@ tables:
           - "{definitions.description_key_iloest_modelled_data}"
         processing_level: major
         description_processing: "{definitions.description_processing_obs_status}"
+        type: ordinal
         sort: *sort_values
         display:
           name: Unemployment rate status - <<sex>> - <<classif1>>
