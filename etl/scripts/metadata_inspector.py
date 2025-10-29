@@ -59,6 +59,11 @@ CLAUDE_MODEL = "claude-3-5-haiku-20241022"  # Fast: $1/M in, $5/M out (RECOMMEND
 # Default of 50 provides best balance of speed, cost, and reliability.
 DEFAULT_BATCH_SIZE = 20
 
+# Concurrency limit for API requests
+# Anthropic rate limits: typically 5-50 concurrent requests depending on tier
+# Increase if you have higher tier access, decrease if you hit rate limits
+MAX_CONCURRENT_REQUESTS = 25
+
 # Model pricing (USD per million tokens)
 # Source: https://www.anthropic.com/api-pricing (verified 2025-10-28)
 # Note: We use the regular API, not Batch API (which offers 50% discount but is asynchronous)
@@ -67,6 +72,24 @@ MODEL_PRICING = {
     "claude-3-7-sonnet-20250219": {"input": 3.0, "output": 15.0},
     "claude-opus-4-20250514": {"input": 15.0, "output": 75.0},
 }
+
+# Fields to inspect for typos and semantic issues
+# Both codespell and Claude AI will check these fields
+CHART_FIELDS_TO_CHECK = [
+    "title",
+    "subtitle",
+    "note",
+]
+
+VARIABLE_FIELDS_TO_CHECK = [
+    "variable_name",
+    # "variable_description",
+    # "variable_title_public",
+    # "variable_description_short",
+    # "variable_description_from_producer",
+    # "variable_description_key",
+    # "variable_description_processing",
+]
 
 
 def parse_multidim_view_id(view_id: str, mdim_config: str | None) -> dict[str, str]:
@@ -296,24 +319,17 @@ def check_typos(views: list[dict[str, Any]]) -> dict[int, list[dict[str, Any]]]:
                 view_files[view_id] = []
 
                 # Collect texts to check with field names
-                texts_to_check = [
-                    ("title", chart_config.get("title", "")),
-                    ("subtitle", chart_config.get("subtitle", "")),
-                    ("note", chart_config.get("note", "")),
-                ]
+                texts_to_check = []
+
+                # Add chart fields
+                for field_name in CHART_FIELDS_TO_CHECK:
+                    value = chart_config.get(field_name, "")
+                    if value:
+                        texts_to_check.append((field_name, value))
 
                 # Add variable metadata fields
-                variable_fields = [
-                    ("variable_name", view.get("variable_name", [])),
-                    ("variable_description", view.get("variable_description", [])),
-                    ("variable_title_public", view.get("variable_title_public", [])),
-                    ("variable_description_short", view.get("variable_description_short", [])),
-                    ("variable_description_from_producer", view.get("variable_description_from_producer", [])),
-                    ("variable_description_key", view.get("variable_description_key", [])),
-                    ("variable_description_processing", view.get("variable_description_processing", [])),
-                ]
-
-                for field_name, values in variable_fields:
+                for field_name in VARIABLE_FIELDS_TO_CHECK:
+                    values = view.get(field_name, [])
                     if isinstance(values, list):
                         for i, value in enumerate(values):
                             if value:
@@ -810,49 +826,35 @@ async def check_view_async(
     """
     chart_config = json.loads(view["chart_config"]) if view["chart_config"] else {}
 
-    # Get title from chart_config or fall back to variable metadata
-    title = chart_config.get("title", "").strip()
-    if not title:
-        # Fallback order: titlePublic -> name (variable name is always present)
-        variable_title_public = view.get("variable_title_public", [])
-        variable_name = view.get("variable_name", [])
-
-        if variable_title_public and isinstance(variable_title_public, list) and variable_title_public:
-            title = variable_title_public[0]
-        elif variable_name and isinstance(variable_name, list) and variable_name:
-            title = variable_name[0]
-        elif variable_title_public:
-            title = str(variable_title_public)
-        elif variable_name:
-            title = str(variable_name)
-
-    # If still no title, skip (shouldn't happen for valid views)
-    if not title:
-        return [], 0, 0
-
-    subtitle = chart_config.get("subtitle", "")
-    note = chart_config.get("note", "")
-
     # Build field list for prompt (only include non-empty fields)
     fields_to_check = []
-    if title:
-        fields_to_check.append(f"Title: {title}")
-    if subtitle:
-        fields_to_check.append(f"Subtitle: {subtitle}")
-    if note:
-        fields_to_check.append(f"Note: {note}")
 
-    # If only title exists (or no fields), skip - nothing substantial to check
-    if len(fields_to_check) <= 1:
+    # Add chart fields
+    for field_name in CHART_FIELDS_TO_CHECK:
+        value = chart_config.get(field_name, "")
+        if value and str(value).strip():
+            fields_to_check.append((field_name, str(value)))
+
+    # Add variable metadata fields
+    for field_name in VARIABLE_FIELDS_TO_CHECK:
+        values = view.get(field_name, [])
+        if isinstance(values, list):
+            for i, value in enumerate(values):
+                if value and str(value).strip():
+                    # Include index in field name for multiple variables
+                    indexed_field_name = f"{field_name}_{i}" if len(values) > 1 else field_name
+                    fields_to_check.append((indexed_field_name, str(value)))
+        elif values and str(values).strip():
+            fields_to_check.append((field_name, str(values)))
+
+    # Skip if no substantial content (need at least 2 fields for meaningful semantic checking)
+    if len(fields_to_check) < 2:
         return [], 0, 0
 
-    fields_text = "\n".join(fields_to_check)
+    # Build prompt text
+    fields_text = "\n".join([f"{name.replace('_', ' ').title()}: {value}" for name, value in fields_to_check])
 
-    # Sanity check: ensure we have actual content to send
-    if not fields_text.strip():
-        return [], 0, 0
-
-    prompt = f"""Check these chart fields for spelling/semantic errors:
+    prompt = f"""Check these chart/variable fields for spelling/semantic errors:
 
 {fields_text}
 
@@ -897,11 +899,23 @@ Your response:"""
             if issue.get("issue_type") in ["typo", "semantic"] and (issue.get("typo") or issue.get("explanation"))
         ]
 
+        # Create a lookup dict for field values
+        fields_dict = dict(fields_to_check)
+
+        # Get view title for display (prefer title from chart, fall back to first variable title)
+        view_title = fields_dict.get("title", "")
+        if not view_title:
+            # Try variable_title_public or variable_name as fallback
+            for field_name, value in fields_to_check:
+                if field_name.startswith("variable_title_public") or field_name.startswith("variable_name"):
+                    view_title = value
+                    break
+
         # Enrich each issue with view metadata
         for issue in view_issues:
             issue["view_id"] = view["id"]
             issue["explorer_slug"] = view["explorerSlug"]
-            issue["view_title"] = title  # Use the resolved title (chart_config or variable)
+            issue["view_title"] = view_title
             issue["source"] = "ai"  # Mark as AI-detected
 
             dimensions = parse_dimensions(view["dimensions"])
@@ -918,18 +932,20 @@ Your response:"""
 
             # Add context from the actual field content
             field = issue.get("field", "")
-            if field == "title":
-                issue["context"] = title[:200]
-            elif field == "subtitle":
-                issue["context"] = subtitle[:200]
-            elif field == "note":
-                issue["context"] = note[:200]
+            # Look up the field value (handle both exact match and indexed fields like "variable_name_0")
+            for field_name, value in fields_to_check:
+                if field_name == field or field_name.startswith(field + "_"):
+                    issue["context"] = value[:200]
+                    break
 
         return view_issues, response.usage.input_tokens, response.usage.output_tokens
 
-    except json.JSONDecodeError:
-        # This shouldn't happen - log for debugging
-        log.warning(f"View {view['id']}: Claude returned invalid response (length: {len(raw_text)})")
+    except json.JSONDecodeError as e:
+        # Log the actual response to help debug the issue
+        log.warning(
+            f"View {view['id']}: Claude returned invalid JSON (length: {len(raw_text)}). "
+            f"Response preview: {raw_text[:200]}... Error: {e}"
+        )
         return [], 0, 0
     except Exception as e:
         log.warning(f"Error processing view {view['id']}: {e}")
@@ -955,20 +971,62 @@ def check_issues(
         return [], {}
 
     if dry_run:
-        total_input_tokens = sum(
-            estimate_tokens(f"Title: {json.loads(v['chart_config']).get('title', '')}...")
-            for v in views
-            if v["chart_config"]
-        )
-        total_output_tokens = len(views) * 50
+        # Estimate costs by simulating what would be checked
+        total_input_tokens = 0
+        total_output_tokens = 0
+        views_to_check = 0
+
+        for view in views:
+            chart_config = json.loads(view["chart_config"]) if view["chart_config"] else {}
+
+            # Build field list (same logic as check_view_async)
+            fields_to_check = []
+
+            # Add chart fields
+            for field_name in CHART_FIELDS_TO_CHECK:
+                value = chart_config.get(field_name, "")
+                if value and str(value).strip():
+                    fields_to_check.append((field_name, str(value)))
+
+            # Add variable metadata fields
+            for field_name in VARIABLE_FIELDS_TO_CHECK:
+                values = view.get(field_name, [])
+                if isinstance(values, list):
+                    for i, value in enumerate(values):
+                        if value and str(value).strip():
+                            indexed_field_name = f"{field_name}_{i}" if len(values) > 1 else field_name
+                            fields_to_check.append((indexed_field_name, str(value)))
+                elif values and str(values).strip():
+                    fields_to_check.append((field_name, str(values)))
+
+            # Skip if no substantial content (need at least 2 fields)
+            if len(fields_to_check) < 2:
+                continue
+
+            # Estimate prompt size (includes prompt template + field content)
+            prompt_text = "\n".join([f"{name}: {value}" for name, value in fields_to_check])
+
+            # Add ~250 tokens for the prompt template/instructions
+            total_input_tokens += estimate_tokens(prompt_text) + 250
+            # Average response is typically 50-150 tokens per view (more fields = potentially more issues)
+            total_output_tokens += 100
+            views_to_check += 1
+
+        rprint(f"[yellow]Would check {views_to_check}/{len(views)} views[/yellow]")
         return [], {"input_tokens": total_input_tokens, "output_tokens": total_output_tokens}
 
-    # Run async checks in parallel
+    # Run async checks in parallel with concurrency limiting
     import asyncio
 
     async def check_all_views():
         client = anthropic.AsyncAnthropic(api_key=api_key)
-        tasks = [check_view_async(client, view) for view in views]
+        semaphore = asyncio.Semaphore(MAX_CONCURRENT_REQUESTS)
+
+        async def check_with_semaphore(view):
+            async with semaphore:
+                return await check_view_async(client, view)
+
+        tasks = [check_with_semaphore(view) for view in views]
 
         all_issues = []
         total_input_tokens = 0
