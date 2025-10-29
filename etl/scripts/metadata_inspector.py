@@ -854,20 +854,23 @@ async def check_view_async(
     # Build prompt text
     fields_text = "\n".join([f"{name.replace('_', ' ').title()}: {value}" for name, value in fields_to_check])
 
-    prompt = f"""Proofread these fields. Find ONLY critical errors - actual mistakes, not style differences:
+    prompt = f"""Find critical errors in these fields:
 
 {fields_text}
 
+IMPORTANT: Check if the Title subject matches what the other fields describe.
+
 Report ONLY:
-1. **Clearly misspelled words** - Words with wrong spelling (e.g., "recieve" → "receive", "environemnt" → "environment")
-2. **Obvious nonsense** - Random non-existing words (e.g., "zschool")
-3. **Absurd contradictions** - Title/content completely mismatched (e.g., title "dogs" but all content about "cats")
+1. **Misspellings** (e.g., "recieve" → "receive", "environemnt" → "environment")
+2. **Gibberish words** (e.g., "asdfgh", "zzzschool")
+3. **Subject mismatches** - Title subject doesn't match descriptions (e.g., title "dogs" but descriptions about "cats")
 
-NEVER report minor style preferences, or minor wording issues, or minor inconsistencies in capitalization.
+IGNORE capitalization, wording variations, style preferences.
 
-Return JSON array (empty if no CRITICAL errors):
-- Typo format: [{{"issue_type": "typo", "field": "title", "typo": "recieve", "correction": "receive"}}]
-- Contradiction format: [{{"issue_type": "semantic", "field": "title", "explanation": "Title says dogs but content only mentions cats"}}]
+JSON response:
+[{{"issue_type": "typo", "field": "title", "typo": "recieve", "correction": "receive"}}]
+[{{"issue_type": "semantic", "field": "title", "explanation": "Title is about dogs but descriptions are about cats"}}]
+[]
 
 Response:"""
 
