@@ -1,0 +1,27 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Poverty
+        - Hunger & Undernourishment
+        - Global Health
+        - Global Education
+        - Economic Inequality by Gender
+        - Clean Water & Sanitation
+        - Access to Energy
+        - Economic Growth
+        - Economic Inequality
+        - Climate Change
+        - War & Peace
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  un_sdg:
+    variables:
+      {}
