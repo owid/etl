@@ -6,14 +6,15 @@ dataset:
 tables:
   lives_saved_vaccination_who:
     variables:
-      diphtheria:
+      diptheria:
         title: Diphtheria
         unit: lives saved
         description: The number of lives saved from diphtheria over the last 50 years as a result of vaccination efforts.
       influenza_b:
         title: Haemophilus influenzae type B
         unit: lives saved
-        description: The number of lives saved from Haemophilus influenzae type B over the last 50 years as a result of vaccination
+        description:
+          The number of lives saved from Haemophilus influenzae type B over the last 50 years as a result of vaccination
           efforts.
       hepatitus_b:
         title: Hepatitis B
@@ -22,7 +23,8 @@ tables:
       japanese_encephalitis:
         title: Japanese encephalitis
         unit: lives saved
-        description: The number of lives saved from Japanese encephalitis over the last 50 years as a result of vaccination
+        description:
+          The number of lives saved from Japanese encephalitis over the last 50 years as a result of vaccination
           efforts.
       measles:
         title: Measles
@@ -31,7 +33,8 @@ tables:
       meningitis_a:
         title: Neisseria meningitidis A
         unit: lives saved
-        description: The number of lives saved from Neisseria meningitidis A over the last 50 years as a result of vaccination
+        description:
+          The number of lives saved from Neisseria meningitidis A over the last 50 years as a result of vaccination
           efforts.
       pertussis:
         title: Whooping cough (Pertussis)
@@ -52,7 +55,8 @@ tables:
       streptococcus_pneumoniae:
         title: Streptococcus pneumoniae
         unit: lives saved
-        description: The number of lives saved from Streptococcus pneumoniae over the last 50 years as a result of vaccination
+        description:
+          The number of lives saved from Streptococcus pneumoniae over the last 50 years as a result of vaccination
           efforts.
       tetanus:
         title: Tetanus
