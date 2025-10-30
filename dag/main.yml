@@ -302,6 +302,7 @@ steps:
     - data://meadow/news/2025-10-29/guardian_mentions
     - data://garden/demography/2024-07-15/population
     - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2025-07-01/income_groups
   data://grapher/news/2025-10-29/guardian_mentions:
     - data://garden/news/2025-10-29/guardian_mentions
 
