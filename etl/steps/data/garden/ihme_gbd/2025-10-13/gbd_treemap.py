@@ -16,6 +16,29 @@ cause_renaming_dict = {
     "Self-harm": "Suicide",
 }
 
+broad_cause_dict = {
+    "Heart diseases": "Non-communicable diseases",
+    "Chronic respiratory diseases": "Non-communicable diseases",
+    "Diabetes and kidney diseases": "Non-communicable diseases",
+    "Diarrheal diseases": "Infectious diseases",
+    "Digestive diseases": "Non-communicable diseases",
+    "HIV/AIDS": "Infectious diseases",
+    "Interpersonal violence": "Injuries",
+    "Malaria": "Infectious diseases",
+    "Maternal disorders": "Maternal, neonatal and nutritional diseases",
+    "Neonatal disorders": "Maternal and neonatal diseases",
+    "Cancers": "Non-communicable diseases",
+    "Neurological disorders": "Non-communicable diseases",
+    "Nutritional deficiencies": "Maternal, neonatal and nutritional diseases",
+    "Suicide": "Injuries",
+    "Transport injuries": "Injuries",
+    "Tuberculosis": "Infectious diseases",
+    "Pneumonia": "Infectious diseases",
+    "Other non-communicable diseases": "Non-communicable diseases",
+    "Other infectious diseases": "Infectious diseases",
+    "Other injuries": "Injuries",
+}
+
 
 def run(dest_dir: str) -> None:
     #
@@ -37,7 +60,7 @@ def run(dest_dir: str) -> None:
     # Reaggregate causes
     tb = reaggregate_causes(tb)
     # Rename causes
-    tb = rename_causes(tb, cause_renaming_dict=cause_renaming_dict)
+    tb = rename_causes(tb=tb, cause_renaming_dict=cause_renaming_dict, broad_cause_dict=broad_cause_dict)
     # Check for duplicates
     # index_cols = ["country", "age", "cause", "metric", "year"]
     # duplicates = tb[tb.duplicated(subset=index_cols, keep=False)]
@@ -123,7 +146,7 @@ def reaggregate_causes(tb: Table) -> Table:
     return tb
 
 
-def rename_causes(tb: Table, cause_renaming_dict: dict[str, str]) -> Table:
+def rename_causes(tb: Table, cause_renaming_dict: dict[str, str], broad_cause_dict: dict[str, str]) -> Table:
     """
     Rename causes based on a provided mapping dictionary.
 
@@ -135,6 +158,7 @@ def rename_causes(tb: Table, cause_renaming_dict: dict[str, str]) -> Table:
         Table with renamed causes
     """
     tb["cause"] = tb["cause"].replace(cause_renaming_dict, regex=False)
+    tb["broad_cause"] = tb["cause"].map(broad_cause_dict)
     return tb
 
 
