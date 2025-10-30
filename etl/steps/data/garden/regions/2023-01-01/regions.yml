@@ -2227,6 +2227,7 @@
     - "VIR"
 - code: WB_MENAP
   name: "Middle East, North Africa, Afghanistan and Pakistan (WB)"
+  short_name: "MENA, Afghanistan and Pakistan (WB)"
   region_type: "aggregate"
   defined_by: wb
   members:

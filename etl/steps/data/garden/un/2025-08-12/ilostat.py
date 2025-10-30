@@ -167,6 +167,20 @@ COLUMN_CATEGORIES = {
     },
 }
 
+# Define columns with obs_status
+OBS_STATUS_COLUMNS = [
+    "unemployment_rate_by_sex_and_age",
+    "labour_force_participation_rate_by_sex_and_age",
+]
+
+# Define ILOEST estimates to drop projections
+ILOEST_INDICATORS = [
+    "labour_force_by_sex_and_age",
+    "labour_force_participation_rate_by_sex_and_age",
+    "employment_by_sex_and_status_in_employment",
+    "unemployment_rate_by_sex_and_age",
+]
+
 
 def run() -> None:
     #
@@ -200,6 +214,8 @@ def run() -> None:
     tb = add_indicator_metadata(tb=tb, tb_metadata=tb_classif2, column="classif2")
     tb = add_indicator_metadata(tb=tb, tb_metadata=tb_obs_status, column="obs_status")
 
+    tb = drop_iloest_projections(tb=tb)
+
     tb = make_table_wide(tb=tb)
 
     tb_regions = format_ilo_regions(tb_regions=tb_regions)
@@ -219,8 +235,8 @@ def run() -> None:
     # Remove outliers in specific indicators
     tb = remove_outliers_in_data(tb=tb)
 
-    # Show data only until the release year
-    tb = show_data_until_release_year(tb=tb)
+    # Add 'Modeled' category to obs_status based on the presence of data in the corresponding indicator
+    tb = add_modeled_category_to_obs_status(tb=tb)
 
     # Improve table format.
     tb = tb.format(["country", "year", "sex", "classif1"])
@@ -353,12 +369,20 @@ def make_table_wide(tb: Table) -> Table:
             "classif1",
         ],
         columns=["indicator"],
-        values=["obs_value"],
+        values=["obs_value", "obs_status"],
         join_column_levels_with="_",
     )
 
     # Remove "obs_value_" from the column names
     tb.columns = [col.replace("obs_value_", "") for col in tb.columns]
+
+    # Remove "obs_status_" columns, except for the columns in OBS_STATUS_COLUMNS, with obs_status_ prefix
+    cols_to_drop = [
+        col
+        for col in tb.columns
+        if col.startswith("obs_status_") and col not in [f"obs_status_{c}" for c in OBS_STATUS_COLUMNS]
+    ]
+    tb = tb.drop(columns=cols_to_drop, errors="raise")
 
     # For each indicator column, add description_from_producer metadata
     for indicator in indicator_dict.keys():
@@ -401,13 +425,42 @@ def remove_outliers_in_data(tb: Table) -> Table:
     return tb
 
 
-def show_data_until_release_year(tb: Table) -> Table:
+def add_modeled_category_to_obs_status(tb: Table) -> Table:
     """
-    Show data only until the release year.
+    Add 'Modeled' category to obs_status based on the presence of data in the corresponding indicator.
     """
     tb = tb.copy()
 
-    # Filter data until RELEASE_YEAR
-    tb = tb[tb["year"] <= RELEASE_YEAR].reset_index(drop=True)
+    for col in OBS_STATUS_COLUMNS:
+        obs_status_col = f"obs_status_{col}"
+
+        # Define maximum year where data is available for the indicator
+        max_year_with_data = tb.loc[tb[col].notna(), "year"].max()
+
+        # If the obs_status column exists, update it
+        if obs_status_col in tb.columns:
+            mask_modeled = tb[col].notna() & tb[obs_status_col].isna() & (tb["year"] <= max_year_with_data)
+            tb.loc[mask_modeled, obs_status_col] = "Modeled value"
+
+    return tb
+
+
+def drop_iloest_projections(tb: Table) -> Table:
+    """
+    Drop ILOEST projections from the table.
+    """
+    tb = tb.copy()
+
+    # Assert that all ILOEST indicators are in the indicator column
+    assert set(
+        ILOEST_INDICATORS
+    ).issubset(
+        set(tb["indicator"].unique())
+    ), f"Some ILOEST indicators are missing in the indicator column: {set(ILOEST_INDICATORS) - set(tb['indicator'].unique())}"
+
+    # For each ILOEST indicator, define the maximum year where obs_status is not null and drop data beyond that year
+    for indicator in ILOEST_INDICATORS:
+        max_year = tb.loc[(tb["indicator"] == indicator) & (tb["obs_status"].notna()), "time"].max()
+        tb = tb[~((tb["time"] > max_year) & (tb["indicator"] == indicator))].reset_index(drop=True)
 
     return tb
