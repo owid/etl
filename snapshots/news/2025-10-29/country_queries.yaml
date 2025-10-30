@@ -28,7 +28,7 @@ queries:
   - country: Australia
     query: ("Australia" "Autralia")
   - country: Austria
-    query: ("Austria" "Österreich" "Oesterreich") AND NOT ("Australia")
+    query: ("Austria" "Österreich" "Oesterreich" "vienna") AND NOT ("Australia")
   - country: Azerbaijan
     query: ("Azerbaijan")
   - country: Bahamas
@@ -80,7 +80,7 @@ queries:
   - country: Cameroon
     query: ("Cameroon")
   - country: Canada
-    query: ("Canada")
+    query: ("Canada" "Toronto" "Montreal" "Vancouver" "Ottawa")
   - country: Cape Verde
     query: ("Cabo Verde" "Cape Verde")
   - country: Cayman Islands
@@ -92,7 +92,7 @@ queries:
   - country: Chile
     query: ("Chile")
   - country: China
-    query: ("China, mainland" "China") AND NOT ("china plate" "bone china" "porcelain" "china shop")
+    query: ("China, mainland" "China" "Beijing" "Shanghai" "chinese") AND NOT ("china plate" "bone china" "porcelain" "china shop")
   - country: Christmas Island
     query: ("Christmas Isl." "Christmas Island")
   - country: Cocos Island
@@ -120,7 +120,7 @@ queries:
   - country: Democratic Republic of Congo
     query: ("Zaire/ Congo , Dem. Rep." "Congo, The Democratic Republic Of The" "Congo-Kinshasa" "Democratic Republic of the Congo" "D.R. of the Congo" "Congo, Democratic Republic" "Congo, Dem. Rep." "Democratic Republic of Congo")
   - country: Denmark
-    query: ("Denmark" "Danmark")
+    query: ("Denmark" "Danmark" "copenhagen")
   - country: Djibouti
     query: ("Djibouti" "French Somalia")
   - country: Dominica
@@ -172,7 +172,7 @@ queries:
   - country: Gibraltar
     query: ("Gibraltar")
   - country: Greece
-    query: ("Greece" "Hellas" "Ellada" "Hellenic Republic")
+    query: ("Greece" "athens" "Hellas" "Ellada" "Hellenic Republic")
   - country: Greenland
     query: ("Greenland")
   - country: Grenada
@@ -204,9 +204,9 @@ queries:
   - country: Iceland
     query: ("Iceland" "Reykjavík" "Reykjavik")
   - country: India
-    query: ("India") AND NOT ("Indiana" "Indianapolis" "Indiana Jones" "Indiana State" "Indiana University")
+    query: ("India" "Bharat" "New Delhi" "Taj Mahal" "Mumbai" "Kerala" "Kolkata") AND NOT ("Indiana" "Indianapolis" "Indiana Jones" "Indiana State" "Indiana University")
   - country: Indonesia
-    query: ("Indonesia")
+    query: ("Indonesia" "Bali" "Jakarta")
   - country: Iran
     query: ("Iran, Islamic Republic Of" "Iran, Isl.Rep.of" "Iran, Islamic Rep." "Iran" "Persia")
   - country: Iraq
@@ -224,7 +224,7 @@ queries:
   - country: Jamaica
     query: ("Jamaica")
   - country: Japan
-    query: ("Japan" "Nippon" "Nihon")
+    query: ("Japan" "Nippon" "Nihon" "Tokyo")
   - country: Jersey
     query: ("Jersey") AND NOT ("United States" "the US" "American" "Americans" "State" "America" "New Jersey" "Washington" "football" "player" "goal" "score" "director" "actor" "actress" "movie")
   - country: Jordan
@@ -310,7 +310,7 @@ queries:
   - country: Nepal
     query: ("Nepal")
   - country: Netherlands
-    query: ("Netherlands" "Holland" "Nederland")
+    query: ("Netherlands" "Holland" "Nederland" "amsterdam")
   - country: New Caledonia
     query: ("New Caledonia")
   - country: New Zealand
@@ -326,7 +326,7 @@ queries:
   - country: Norfolk Island
     query: ("Norfolk Island" "Norfolk Isl.")
   - country: North Korea
-    query: ("Dem.Rep.,Korea" "North Korea" "D.P.R. of Korea" "Democratic People's Republic of Korea" "Korea, Dem. P.R. of" "Korea, Dem. People's Rep." "DPRK") AND NOT ("South Korea" "Republic of Korea" "Korea, Rep.")
+    query: ("Dem.Rep.,Korea" "North Korea" "D.P.R. of Korea" "Democratic People's Republic of Korea" "Korea, Dem. P.R. of" "Korea, Dem. People's Rep." "DPRK" "pyongyang") AND NOT ("South Korea" "Republic of Korea" "Korea, Rep.")
   - country: North Macedonia
     query: ("North Macedonia" "TFYR Macedonia" "TFYR of Macedonia" "Macedonia" "Macedonia, The Former Yugoslav Republic Of" "Macedonia, FYR")
   - country: Northern Mariana Islands
@@ -360,13 +360,13 @@ queries:
   - country: Puerto Rico
     query: ("Puerto Rico")
   - country: Qatar
-    query: ("Qatar")
+    query: ("Qatar" "Doha")
   - country: Reunion
     query: ("Reunion" "Réunion")
   - country: Romania
     query: ("Romania" "ROM")
   - country: Russia
-    query: ("Russia" "Russian Federation" "Russian Fed." "Soviet Union" "USSR" "RSFSR")
+    query: ("Russia" "Russian Federation" "Russian Fed." "Soviet Union" "USSR" "RSFSR" "Moscow")
   - country: Rwanda
     query: ("Rwanda")
   - country: Saint Barthelemy
@@ -412,7 +412,7 @@ queries:
   - country: South Georgia and the South Sandwich Islands
     query: ("South Georgia and the South Sandwich Islands" "South Georgia & South Sandwich Islands" "South Georgia" "South Sandwich Islands")
   - country: South Korea
-    query: ("South Korea" "Korea, Rep." "Korea, Republic Of" "ROK" "S. Korea" "S Korea") AND NOT ("North Korea" "Democratic People's Republic of Korea" "DPRK" "D.P.R. of Korea")
+    query: ("South Korea" "Korea, Rep." "Korea, Republic Of" "ROK" "S. Korea" "S Korea" "seoul") AND NOT ("North Korea" "Democratic People's Republic of Korea" "DPRK" "D.P.R. of Korea")
   - country: South Sudan
     query: ("South Sudan" "Southern Sudan" "S. Sudan")
   - country: Spain
@@ -428,11 +428,11 @@ queries:
   - country: Suriname
     query: ("Suriname")
   - country: Sweden
-    query: ("Sweden" "Sverige")
+    query: ("Sweden" "Sverige" "stockholm")
   - country: Switzerland
     query: ("Switzerland" "Schweiz" "Suisse" "Svizzera" "Svizra" "Swiss Confederation")
   - country: Syria
-    query: ("Syria" "Syrian Arab Rep." "Syrian Arab Republic")
+    query: ("Syria" "Syrian Arab Rep." "Syrian Arab Republic" "damascus")
   - country: Taiwan
     query: ("China, Taiwan Province of" "Taiwan, Province Of China" "Taiwan" "Taiwan, China" "Chinese Taipei")
   - country: Tajikistan
@@ -454,7 +454,7 @@ queries:
   - country: Tunisia
     query: ("Tunisia")
   - country: Turkey
-    query: ("Turkiye" "Türkiye" "The Republic of Türkiye" "Turkey") AND NOT ("turkey dinner" "turkey bird" "cold turkey" "turkey shoot" "talk turkey")
+    query: ("istanbul" "ankara" "Turkiye" "Türkiye" "The Republic of Türkiye" "Turkey") AND NOT ("turkey dinner" "turkey bird" "cold turkey" "turkey shoot" "talk turkey")
   - country: Turkmenistan
     query: ("Turkmenistan")
   - country: Turks and Caicos Islands
@@ -462,15 +462,15 @@ queries:
   - country: Tuvalu
     query: ("Tuvalu")
   - country: United Kingdom
-    query: ("United Kingdom of Great Britain and Northern Ireland" "United Kingdom" "the UK") AND NOT ("Ukraine")
+    query: ("United Kingdom of Great Britain and Northern Ireland" "United Kingdom" "the UK" "London" "Scotland" "Whales" "Northern Ireland") AND NOT ("Ukraine")
   - country: United States
-    query: ("the US" "Washington" "United States of America" "United States" "USA")
+    query: ("the US" "Washington" "United States of America" "United States" "USA" "New York" "Texas" "California" "Florida" "los angeles" "hawaii"  "miami" "boston" "chicago" "seattle")
   - country: Uganda
     query: ("Uganda")
   - country: Ukraine
-    query: ("Ukraine")
+    query: ("Ukraine" "kyiv" "kiev")
   - country: United Arab Emirates
-    query: ("U.Arab Emirates" "United Arab Emirates" "UAE" "United Arab Em" "Trucial States" "Trucial Coast")
+    query: ("U.Arab Emirates" "United Arab Emirates" "UAE" "United Arab Em" "Trucial States" "Trucial Coast" "Dubai" "Abu Dhabi")
   - country: Uruguay
     query: ("Uruguay")
   - country: United States Virgin Islands
