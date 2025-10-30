@@ -55,6 +55,7 @@
     "Eritrea": "Eritrea",
     "Ethiopia": "Ethiopia",
     "FIJI": "Fiji",
+    "FINLAND": "Finland",
     "FRANCE": "France",
     "FRENCH GUIANA": "French Guiana",
     "FRENCH POLYNESIA": "French Polynesia",
@@ -124,6 +125,7 @@
     "New Zealand": "New Zealand",
     "Nicaragua": "Nicaragua",
     "North Korea": "North Korea",
+    "OMAN": "Oman",
     "PAKISTAN": "Pakistan",
     "PALAU": "Palau",
     "PANAMA": "Panama",
@@ -221,6 +223,7 @@
     "PACIFIC OCEAN": "Pacific Ocean (NOAA/NCEI)",
     "Pacific Ocean": "Pacific Ocean (NOAA/NCEI)",
     "SOLOMON SEA": "Solomon Sea (NOAA/NCEI)",
+    "TASMAN SEA": "Tasman Sea (NOAA/NCEI)",
     "UK TERRITORY": "United Kingdom Territory (NOAA/NCEI)",
     "USA TERRITORY": "United States Territory (NOAA/NCEI)"
   }

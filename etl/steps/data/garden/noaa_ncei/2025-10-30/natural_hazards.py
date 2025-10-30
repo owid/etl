@@ -6,8 +6,7 @@ import pandas as pd
 from owid.catalog import Table
 from owid.datautils import dataframes
 
-from etl.data_helpers import geo
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -242,7 +241,7 @@ def create_decadal_total(tb: Table) -> Table:
     return tb_decadal
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -254,21 +253,13 @@ def run(dest_dir: str) -> None:
         "volcanoes": ds_meadow["natural_hazards_volcanoes"].reset_index(),
     }
 
-    # Load regions and income groups datasets.
-    ds_regions = paths.load_dataset("regions")
-    ds_income_groups = paths.load_dataset("income_groups")
-
     #
     # Process data.
     #
     # Process each table.
     for table_name in tables:
         # Fix known data issues.
-        if table_name == "earthquakes":
-            error = "Data issue with earthquake event id 10737 (missing country) may have been fixed. Remove this code."
-            assert set(tables[table_name][tables[table_name]["country"].isnull()]["id"]) == {10583}, error
-            tables[table_name].loc[tables[table_name]["id"] == 10583, "country"] = "GREECE"
-        elif table_name == "tsunamis":
+        if table_name == "tsunamis":
             error = "Data issue with earthquake event id 3190 (missing country) may have been fixed. Remove this code."
             assert set(tables[table_name][tables[table_name]["country"].isnull()]["id"]) == {3190}, error
             tables[table_name]["country"] = tables[table_name]["country"].cat.add_categories(["MEDITERRANEAN SEA"])
@@ -298,9 +289,7 @@ def run(dest_dir: str) -> None:
         tables[table_name] = tables[table_name][list(COLUMNS)].rename(columns=COLUMNS, errors="raise")
 
         # Harmonize country names.
-        tables[table_name] = geo.harmonize_countries(
-            tables[table_name], countries_file=paths.country_mapping_path, warn_on_unused_countries=False
-        )
+        tables[table_name] = paths.regions.harmonize_names(tables[table_name], warn_on_unused_countries=False)
 
         # Column "deaths_total" is more often informed than "deaths", but there are also cases where there is "deaths"
         # but not "deaths_total". Since "deaths_total" includes all deaths (including secondary ones), it would make
@@ -354,12 +343,10 @@ def run(dest_dir: str) -> None:
         tb[column] *= 1e6
 
     # Add aggregate regions to table.
-    tb = geo.add_regions_to_table(
+    tb = paths.regions.add_aggregates(
         tb=tb,
         regions=REGIONS,
         index_columns=["country", "year", "type"],
-        ds_regions=ds_regions,
-        ds_income_groups=ds_income_groups,
         min_num_values_per_year=1,
     )
 
@@ -376,5 +363,5 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb_yearly], check_variables_metadata=True)
+    ds_garden = paths.create_dataset(tables=[tb_yearly])
     ds_garden.save()

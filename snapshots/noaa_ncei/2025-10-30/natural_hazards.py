@@ -17,7 +17,7 @@ API_BASE_URL = "https://www.ngdc.noaa.gov/hazel/hazard-service/api/v1/"
 
 @click.command()
 @click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
-def main(upload: bool) -> None:
+def run(upload: bool) -> None:
     for disaster in tqdm(["earthquakes", "tsunamis", "volcanoes"], desc="Disasters"):
         # Create a new snapshot.
         snap = Snapshot(f"noaa_ncei/{SNAPSHOT_VERSION}/natural_hazards_{disaster}.csv")
@@ -47,10 +47,9 @@ def main(upload: bool) -> None:
             # Add data for current page to the data.
             data.extend(response.json()["items"])
 
-        # The following sanity check fails because there are repeated "ids".
-        # This happens, at least, for earthquake with id 1926 (Chile 1961), which appears twice.
-        # error = f"There are repeated event ids for {disaster}."
-        # assert len(data) == len(set([event["id"] for event in data])), error
+        # The following sanity check used to fail because there were repeated "ids", e.g. for earthquake with id 1926 (Chile 1961), which appeared twice.
+        error = f"There are repeated event ids for {disaster}."
+        assert len(data) == len(set([event["id"] for event in data])), error
 
         # Sanity check.
         error = f"Expected empty response after the last page of {disaster}."
@@ -64,4 +63,4 @@ def main(upload: bool) -> None:
 
 
 if __name__ == "__main__":
-    main()
+    run()
