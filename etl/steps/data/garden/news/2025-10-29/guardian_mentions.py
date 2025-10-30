@@ -37,7 +37,6 @@ def run() -> None:
     ds_meadow = paths.load_dataset("guardian_mentions")
     ds_population = paths.load_dataset("population")
     ds_regions = paths.load_dataset("regions")
-    ds_income_groups = paths.load_dataset("income_groups")
 
     # Read table from meadow dataset.
     tb = ds_meadow.read("guardian_mentions")
@@ -87,6 +86,7 @@ def run() -> None:
     tb_10y_avg, tb_10y_avg_log = make_decadal_avg_table(tb)
 
     # DEV only: compare with old data
+    # ds_income_groups = paths.load_dataset("income_groups")
     # tb_max = format_maxroser(tb_10y_avg, ds_regions, ds_income_groups)
     # _compare_with_old(tb_max, drop_non_countries=True, num_countries=30)
 
