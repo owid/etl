@@ -5,7 +5,7 @@ meta:
     description: |-
       The Global Burden of Disease (GBD) study provides a comprehensive assessment of global health trends. This dataset contains the death and DALY counts and rates for 371 diseases and injuries.
     citation_full: |-
-      "Global Burden of Disease Collaborative Network. Global Burden of Disease Study 2021 (GBD 2021). Seattle, United States: Institute for Health Metrics and Evaluation (IHME), 2024. Available from https://vizhub.healthdata.org/gbd-results/."
+      "Global Burden of Disease Collaborative Network. Global Burden of Disease Study 2023 (GBD 2023). Seattle, United States: Institute for Health Metrics and Evaluation (IHME), 2024. Available from https://vizhub.healthdata.org/gbd-results/."
     attribution_short: IHME-GBD
     url_main: https://vizhub.healthdata.org/gbd-results/
     date_accessed: "2025-10-21"
