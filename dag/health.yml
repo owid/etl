@@ -1341,7 +1341,7 @@ steps:
     - data://garden/maternal_mortality/2025-09-02/maternal_mortality
 
   data-private://meadow/ihme_gbd/2025-10-13/gbd_treemap:
-    - snapshot-private://ihme_gbd/2025-10-13/gbd_treemap.feather
+    - snapshot://ihme_gbd/2025-10-13/gbd_treemap.feather
   data-private://garden/ihme_gbd/2025-10-13/gbd_treemap:
     - data-private://meadow/ihme_gbd/2025-10-13/gbd_treemap
   data-private://grapher/ihme_gbd/2025-10-13/gbd_treemap:
