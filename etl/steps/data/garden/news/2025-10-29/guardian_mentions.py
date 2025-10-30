@@ -86,8 +86,9 @@ def run() -> None:
     # Estimate 10-year average
     tb_10y_avg, tb_10y_avg_log = make_decadal_avg_table(tb)
 
-    tb_max = format_maxroser(tb_10y_avg, ds_regions, ds_income_groups)
-    _compare_with_old(tb_max, drop_non_countries=True, num_countries=30)
+    # DEV only: compare with old data
+    # tb_max = format_maxroser(tb_10y_avg, ds_regions, ds_income_groups)
+    # _compare_with_old(tb_max, drop_non_countries=True, num_countries=30)
 
     ## Format
     tb = tb.format(COLUMN_INDEX)
@@ -320,8 +321,9 @@ def load_old_data(path_num, path_relative) -> pd.DataFrame:
 
 
 def _compare_with_old(tb_max, drop_non_countries=False, num_countries=None, output=None):
-    path_num = "/home/lucas/repos/etl/compare_guardian_counts.csv"
-    path_relative = "/home/lucas/repos/etl/compare_guardian_relative.csv"
+    # Load old data
+    path_num = ""
+    path_relative = ""
     df = load_old_data(path_num, path_relative)
 
     # Drop year
