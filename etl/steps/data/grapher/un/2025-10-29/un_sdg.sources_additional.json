@@ -7,9 +7,11 @@
     "11.1.1": "United Nations Human Settlements Programme",
     "11.2.1": "United Nations Human Settlements Programme",
     "11.3.1": "United Nations Human Settlements Programme",
+    "11.3.2": "United Nations Human Settlements Programme",
     "11.6.1": "United Nations Human Settlements Programme and United Nations Statistics Division",
     "11.7.1": "United Nations Human Settlements Programme",
     "11.7.2": "United Nations Office on Drugs and Crime",
+    "11.a.1": "United Nations Human Settlements Programme",
     "12.1.1": "United Nations Environment Programme",
     "12.2.2": "United Nations Environment Programme",
     "12.3.1": "United Nations Environment Programme",
@@ -124,5 +126,10 @@
     "9.3.1": "United Nations Industrial Development Organization",
     "9.5.1": "UNESCO Institute for Statistics",
     "9.5.2": "UNESCO Institute for Statistics",
-    "9.c.1": "International Telecommunication Union"
+    "9.c.1": "International Telecommunication Union",
+    "12.4.1": "United Nations Environment Programme, United Nations Statistics Division and the United Nations Institute for Training and Research",
+    "15.4.2": "Food and Agriculture Organization of the United Nations",
+    "17.18.1": "Partnership in Statistics for Development in the 21st Century",
+    "2.2.4": "Food and Agriculture Organization of the United Nations",
+    "8.9.2": "World Tourism Organization"
 }

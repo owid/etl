@@ -86,6 +86,19 @@ def run(dest_dir: str) -> None:
                 all_tables.append(wide_table)
 
     #
+    # Make table short names unique by adding counter if duplicates exist
+    #
+    short_name_counts = {}
+    for table in all_tables:
+        short_name = table.metadata.short_name
+        if short_name in short_name_counts:
+            short_name_counts[short_name] += 1
+            # Add counter to make it unique, keeping under 255 char limit
+            table.metadata.short_name = f"{short_name[:240]}_{short_name_counts[short_name]}"
+        else:
+            short_name_counts[short_name] = 0
+
+    #
     # Save outputs.
     #
     ds_grapher = create_dataset(dest_dir, tables=all_tables, default_metadata=ds_garden.metadata)
@@ -197,11 +210,17 @@ def add_metadata_and_prepare_for_grapher(tb: Table, ds_garden: Dataset, source_d
     )
 
     # hotfix - for some reason underscore function does not work as expected
+    import re
     var_name = underscore(tb["variable_name"].iloc[0][0:254], validate=False)
-    special_chars = ["(", ")", "+", "!", ","]
+    # Replace special characters and HTML entities
+    special_chars = ["(", ")", "+", "!", ",", "/", "'", '"', "'", """, """]
     for char in special_chars:
         if char in var_name:
             var_name = var_name.replace(char, "_")
+    # Replace any remaining spaces and non-ASCII characters with underscores
+    var_name = re.sub(r"[^\w]", "_", var_name)
+    # Clean up multiple consecutive underscores
+    var_name = re.sub(r"_+", "_", var_name)
     tb["variable"] = var_name
 
     tb = Table(tb[["country", "year", "value", "variable", "meta"]])
