@@ -9,7 +9,7 @@ Important - You need and account to access the data.
 * In Measure select 'Deaths'
 * In Metric select 'Number' and 'Percent'
 * In Cause select 'Select all level 2 causes'
-* In Location select 'Global', 'China', 'United States', 'Central African Republic', 'Brazil', 'Germany'
+* In Location select 'Global', 'China', 'United States', 'Central African Republic', 'Brazil', 'France'
 * In Age select 'All ages',
 * In Sex select 'Both'
 * In Year select '2023'
