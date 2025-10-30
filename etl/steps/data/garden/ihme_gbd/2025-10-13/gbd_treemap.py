@@ -68,7 +68,7 @@ def run(dest_dir: str) -> None:
     #    print(f"\nFound {len(duplicates)} duplicate rows:")
     #    print(duplicates.sort_values(index_cols))
     # Format the tables
-    tb = tb.format(["country", "age", "cause", "metric", "year"], short_name="gbd_treemap")
+    tb = tb.format(["country", "age", "broad_cause", "cause", "metric", "year"], short_name="gbd_treemap")
 
     #
     # Save outputs.
