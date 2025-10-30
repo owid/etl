@@ -1,37 +1,34 @@
 """Media attention to countries.
 
-We have estimated various indicators.
+Indicators estimated:
 
-- num_pages_tags: Number of pages tagged with a country name.
-- relative_pages_tags: Share of pages tagged with a country name.
-- relative_pages_tags_excluded: Share of pages tagged with a country name. It excludes COUNTRIES_EXCLUDED from share-estimation.
-- num_pages_mentions: Number of pages mentioning a country name.
-- relative_pages_mentions: Share of pages mentioning a country name.
-- relative_pages_mentions_excluded: Share of pages tagged with a country name. It excludes COUNTRIES_EXCLUDED from share-estimation.
+- num_pages: Number of pages mentioning a country name.
+- relative_pages: Share of pages mentioning a country name.
+- relative_pages_excluded: Share of pages tagged with a country name. It excludes COUNTRIES_EXCLUDED from share-estimation.
 """
 
 import numpy as np
 from owid.catalog import Table
 
 from etl.data_helpers import geo
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 # Countries to exclude in some indicators
-COUNTRIES_EXCLUDED = [
+COUNTRIES_EXCLUDED = {
     "United States",
     "United Kingdom",
     "Australia",
-]
+}
 # Index columns
 COLUMN_INDEX = ["country", "year"]
 # Years: Minimum and maximum of the 10-year average period.
-YEAR_DEC_MIN = 2014
-YEAR_DEC_MAX = 2023
+YEAR_DEC_MAX = 2024
+YEAR_DEC_MIN = YEAR_DEC_MAX - 9
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -41,7 +38,7 @@ def run(dest_dir: str) -> None:
     ds_regions = paths.load_dataset("regions")
 
     # Read table from meadow dataset.
-    tb = ds_meadow["guardian_mentions"].reset_index()
+    tb = ds_meadow.read("guardian_mentions")
 
     #
     # Process data.
@@ -52,8 +49,11 @@ def run(dest_dir: str) -> None:
         countries_file=paths.country_mapping_path,
     )
 
+    # Remove expected NaNs
+    tb = check_and_filter_nans(tb)
+
     ## Get relative values
-    tb = add_relative_indicators(tb, ["num_pages_tags", "num_pages_mentions"])
+    tb = add_relative_indicators(tb, ["num_pages"])
 
     ## Add data for regions
     tb = geo.add_regions_to_table(
@@ -78,24 +78,11 @@ def run(dest_dir: str) -> None:
 
     ## Add per-capita indicators
     tb = geo.add_population_to_table(tb, ds_population)
-    for column in ["num_pages_tags", "num_pages_mentions"]:
-        tb[f"{column}_per_million"] = tb[column] / tb["population"] * 1_000_000
+    tb["num_pages_per_million"] = tb["num_pages"] / tb["population"] * 1_000_000
     tb = tb.drop(columns="population")
 
     # Estimate 10-year average
-    tb_10y_avg = tb[(tb["year"] >= YEAR_DEC_MIN) & (tb["year"] <= YEAR_DEC_MAX)].copy()
-    tb_10y_avg = tb_10y_avg.rename(
-        columns={col: f"{col}_10y_avg" for col in tb_10y_avg.columns if col not in COLUMN_INDEX}
-    )
-    columns_indicators = [col for col in tb_10y_avg.columns if col not in COLUMN_INDEX]
-    tb_10y_avg = tb_10y_avg.groupby("country", observed=False)[columns_indicators].mean().reset_index()
-    tb_10y_avg["year"] = YEAR_DEC_MAX
-
-    # Estimate log(10-year average)
-    tb_10y_avg_log = tb_10y_avg.copy()
-    tb_10y_avg_log[columns_indicators] = np.log(tb_10y_avg[columns_indicators] + 1)
-    tb_10y_avg_log = tb_10y_avg_log.rename(columns={col: f"{col}_10y_avg_log" for col in columns_indicators})
-    tb_10y_avg_log["year"] = YEAR_DEC_MAX
+    tb_10y_avg, tb_10y_avg_log = make_decadal_avg_table(tb)
 
     ## Format
     tb = tb.format(COLUMN_INDEX)
@@ -111,8 +98,10 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(
-        dest_dir, tables=tables, check_variables_metadata=True, default_metadata=ds_meadow.metadata
+    ds_garden = paths.create_dataset(
+        tables=tables,
+        check_variables_metadata=True,
+        default_metadata=ds_meadow.metadata,
     )
 
     # Save changes in the new garden dataset.
@@ -131,14 +120,25 @@ def add_relative_indicator(tb, colname):
 
     E.g. Global share of ? for a given year. Note that we use 'per 100,000' factor.
     """
-    tb_exc = tb[~tb["country"].isin(COUNTRIES_EXCLUDED)].copy()
+    # Add relative indicator
+    colname_new = f"{colname.replace('num_', 'relative_')}"
+    tb.loc[:, colname_new] = get_relative_indicator(tb, colname).tolist()
+    tb[colname_new] = tb[colname_new].copy_metadata(tb[colname])
 
-    tb[f"{colname.replace('num_', 'relative_')}"] = get_relative_indicator(tb, colname)
+    # Add relative indicator excluding some countries
+    tb_exc = tb.loc[~tb["country"].isin(COUNTRIES_EXCLUDED)].copy()
     colname_excluded = f"{colname.replace('num_', 'relative_')}_excluded"
-    tb_exc[colname_excluded] = get_relative_indicator(tb_exc, colname)
-
-    # Combine
+    tb_exc[colname_excluded] = get_relative_indicator(tb_exc, colname).tolist()
     tb = tb.merge(tb_exc[COLUMN_INDEX + [colname_excluded]], on=COLUMN_INDEX, how="left")
+    tb[colname_excluded] = tb[colname_excluded].copy_metadata(tb[colname])
+
+    # Ensure no NA in columns but excluded
+    cols = [col for col in tb.columns if col != colname_excluded]
+    assert not tb[cols].isna().any().any(), f"NA values found in unexpected columns {cols}"
+    countries_with_nas = set(tb.loc[tb[colname_excluded].isna(), "country"].unique())
+    assert (
+        countries_with_nas == COUNTRIES_EXCLUDED
+    ), f"Unexpected countries with NA in {colname_excluded}: {countries_with_nas}"
 
     return tb
 
@@ -158,3 +158,46 @@ def get_relative_indicator(tb, colname):
     # tb[f"{colname.replace('num_', 'relative_')}"] = tb[colname] / tb["total"] * 100_000
     # tb = tb.drop(columns=["total"])
     # return tb
+
+
+def check_and_filter_nans(tb):
+    nas_country = tb[tb["num_pages"].isna()].groupby("country").size().sort_values().to_dict()
+    nas_country_expected = {
+        "Aland Islands": 1,
+        "Cocos Islands": 1,
+        "Sao Tome and Principe": 1,
+        "Niue": 1,
+        "Tokelau": 2,
+        "Wallis and Futuna": 4,
+        "Heard Island and McDonald Islands": 6,
+        "Saint Pierre and Miquelon": 6,
+        "Bouvet Island": 12,
+        "French Southern Territories": 12,
+    }
+    assert nas_country == nas_country_expected, f"Unexpected NaNs in countries: {nas_country}"
+
+    return tb.dropna(subset=["num_pages"])
+
+
+def make_decadal_avg_table(tb: Table):
+    """Get table with 10-year average and log(10-year average) indicators."""
+    tb_10y_avg = tb[(tb["year"] >= YEAR_DEC_MIN) & (tb["year"] <= YEAR_DEC_MAX)].copy()
+    tb_10y_avg = tb_10y_avg.rename(
+        columns={col: f"{col}_10y_avg" for col in tb_10y_avg.columns if col not in COLUMN_INDEX}
+    )
+    columns_indicators = [col for col in tb_10y_avg.columns if col not in COLUMN_INDEX]
+    tb_10y_avg = tb_10y_avg.groupby("country", observed=False)[columns_indicators].mean().reset_index()
+    tb_10y_avg["year"] = YEAR_DEC_MAX
+
+    # Copy metadata
+    col_og = [col for col in tb.columns if col not in COLUMN_INDEX][0]
+    for col in [col for col in tb_10y_avg.columns if col not in COLUMN_INDEX]:
+        tb_10y_avg[col] = tb_10y_avg[col].copy_metadata(tb[col_og])
+
+    # Estimate log(10-year average)
+    tb_10y_avg_log = tb_10y_avg.copy()
+    tb_10y_avg_log[columns_indicators] = np.log(tb_10y_avg[columns_indicators] + 1)
+    tb_10y_avg_log = tb_10y_avg_log.rename(columns={col: f"{col}_10y_avg_log" for col in columns_indicators})
+    tb_10y_avg_log["year"] = YEAR_DEC_MAX
+
+    return tb_10y_avg, tb_10y_avg_log
