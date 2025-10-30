@@ -937,7 +937,7 @@ def run() -> None:
     # * Event with end date prior to start date: Honduras, Extreme weather, starting in 2025-06-17, ending in 2024-06-20.
     assert tb.loc[(tb["start_year"] > tb["end_year"]) & (tb["country"] == "Honduras"), "end_year"].item() == 2024
     tb.loc[(tb["start_year"] > tb["end_year"]) & (tb["country"] == "Honduras"), "end_year"] = 2025
-    # * Event with end date prior to start date: Cuba, Extreme weather, starting in 1955-09-13, ending in 2025-09-20.
+    # * Event with an unreasonably long duration: Cuba, Extreme weather, starting in 1955-09-13, ending in 2025-09-20.
     #  It could be this:
     #  https://en.wikipedia.org/wiki/Hurricane_Hilda_%281955%29
     assert tb.loc[(tb["start_year"] == 1955) & (tb["country"] == "Cuba"), "end_year"].item() == 2025
