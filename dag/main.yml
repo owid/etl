@@ -300,7 +300,7 @@ steps:
     - snapshot://news/2025-10-29/guardian_mentions.csv
   data://garden/news/2025-10-29/guardian_mentions:
     - data://meadow/news/2025-10-29/guardian_mentions
-    - data://garden/demography/2023-03-31/population
+    - data://garden/demography/2024-07-15/population
     - data://garden/regions/2023-01-01/regions
   data://grapher/news/2025-10-29/guardian_mentions:
     - data://garden/news/2025-10-29/guardian_mentions
