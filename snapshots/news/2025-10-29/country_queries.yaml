@@ -462,7 +462,7 @@ queries:
   - country: Tuvalu
     query: ("Tuvalu")
   - country: United Kingdom
-    query: ("United Kingdom of Great Britain and Northern Ireland" "United Kingdom" "the UK" "London" "Scotland" "Whales" "Northern Ireland") AND NOT ("Ukraine")
+    query: ("United Kingdom of Great Britain and Northern Ireland" "United Kingdom" "the UK" "London" "Scotland" "Wales" "Northern Ireland") AND NOT ("Ukraine")
   - country: United States
     query: ("the US" "Washington" "United States of America" "United States" "USA" "New York" "Texas" "California" "Florida" "los angeles" "hawaii"  "miami" "boston" "chicago" "seattle")
   - country: Uganda

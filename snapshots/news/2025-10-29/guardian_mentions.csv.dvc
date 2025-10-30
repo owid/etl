@@ -49,6 +49,6 @@ meta:
       name: The Guardian terms of service
       url: https://www.theguardian.com/help/terms-of-service
 outs:
-  - md5: 0770df7fb3d4c7376d18c9938f281624
-    size: 60752
+  - md5: dafae061601d1cfe77a98e2222b1c013
+    size: 60750
     path: guardian_mentions.csv
