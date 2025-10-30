@@ -12,7 +12,7 @@ paths = PathFinder(__file__)
 cause_renaming_dict = {
     "Cardiovascular diseases": "Heart diseases",
     "Neoplasms": "Cancers",
-    "Respiratory infections and tuberculosis excluding Tuberculosis": "Pneumonia",
+    "Respiratory infections and tuberculosis excluding Tuberculosis": "Respiratory infections",
     "Self-harm": "Suicide",
 }
 
