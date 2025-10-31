@@ -628,6 +628,17 @@ steps:
   data-private://grapher/language/2024-07-17/ethnologue:
     - data-private://garden/language/2024-07-17/ethnologue
 
+  # Guardian mentions (old version)
+  data://meadow/news/2024-05-08/guardian_mentions:
+    - snapshot://news/2024-05-07/guardian_mentions.csv
+    - snapshot://news/2024-05-07/guardian_mentions_raw.csv
+  data://garden/news/2024-05-08/guardian_mentions:
+    - data://meadow/news/2024-05-08/guardian_mentions
+    - data://garden/demography/2023-03-31/population
+    - data://garden/regions/2023-01-01/regions
+  data://grapher/news/2024-05-08/guardian_mentions:
+    - data://garden/news/2024-05-08/guardian_mentions
+
 include:
   # Include all active steps plus all archive steps.
   - dag/main.yml
@@ -658,3 +669,4 @@ include:
   - dag/archive/labor.yml
   - dag/archive/forests.yml
   - dag/archive/families.yml
+  - dag/archive/natural_disasters.yml
