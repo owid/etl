@@ -101,10 +101,38 @@ def run(dest_dir: str) -> None:
                 all_tables.append(wide_table)
 
     #
+    # Make table short names unique by adding counter if duplicates exist. This happens rarely for
+    # some duplicates like _11_7_1__en_acs_urb_opensp__tarabulus__tripoli.
+    #
+    short_name_counts = {}
+    warnings = []
+    for table in all_tables:
+        short_name = table.metadata.short_name
+        if short_name in short_name_counts:
+            short_name_counts[short_name] += 1
+            new_short_name = f"{short_name[:240]}_{short_name_counts[short_name]}"
+            warnings.append(
+                {
+                    "type": "duplicate_short_name",
+                    "original_short_name": short_name,
+                    "new_short_name": new_short_name,
+                    "duplicate_count": short_name_counts[short_name],
+                }
+            )
+            # Add counter to make it unique, keeping under 255 char limit
+            table.metadata.short_name = new_short_name
+        else:
+            short_name_counts[short_name] = 0
+
+    #
     # Save outputs.
     #
     ds_grapher = create_dataset(dest_dir, tables=all_tables, default_metadata=ds_garden.metadata)
     ds_grapher.save()
+
+    # Show warnings at the very end so they are not lost in the middle of the processing logs
+    for warning in warnings:
+        log.warning("un_sdg.warning", **warning)
 
 
 def clean_source_name(tb: Table, clean_source_map: Dict[str, str], additional_source_map: Dict[str, str]) -> str:
