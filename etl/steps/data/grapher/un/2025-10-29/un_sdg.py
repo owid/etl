@@ -93,8 +93,15 @@ def run(dest_dir: str) -> None:
         short_name = table.metadata.short_name
         if short_name in short_name_counts:
             short_name_counts[short_name] += 1
+            new_short_name = f"{short_name[:240]}_{short_name_counts[short_name]}"
+            log.warning(
+                "duplicate_short_name",
+                original_short_name=short_name,
+                new_short_name=new_short_name,
+                duplicate_count=short_name_counts[short_name],
+            )
             # Add counter to make it unique, keeping under 255 char limit
-            table.metadata.short_name = f"{short_name[:240]}_{short_name_counts[short_name]}"
+            table.metadata.short_name = new_short_name
         else:
             short_name_counts[short_name] = 0
 
