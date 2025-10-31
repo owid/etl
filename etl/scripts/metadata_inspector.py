@@ -1503,36 +1503,55 @@ def group_issues(issues: list[dict[str, Any]], api_key: str | None) -> tuple[lis
         )
 
     # Single combined prompt for grouping and pruning issues
-    prompt = f"""Two tasks:
+    prompt = f"""You are reviewing issues found in OWID (Our World in Data) content. Your goal: REMOVE low-value issues from the list, KEEP only issues that pose reputational risk.
 
-1. GROUP ISSUES BY SIMILARITY
+TASK 1: GROUP SIMILAR ISSUES
+- Typos: Group by identical misspelling + correction pair
+- Semantic issues: Group by identical problem description (across different views)
 
-For typos: Group by identical misspelling + correction pair
-For semantic issues: Group by identical problem description
+INPUT DATA:
 
-Typos:
+Typos ({len(typo_data)} issues):
 {json.dumps(typo_data, indent=2) if typo_data else "[]"}
 
-Semantic issues:
+Semantic issues ({len(semantic_data)} issues):
 {json.dumps(semantic_data, indent=2) if semantic_data else "[]"}
 
-2. FILTER SPURIOUS TYPO GROUPS
+TASK 2: DECIDE WHICH ISSUE GROUPS TO REMOVE
 
-Review each typo group's context. Mark groups as spurious ONLY if ALL instances are:
-- Scientific names (genus/species in biology)
-- Technical jargon that is standard in the field
-- Proper nouns
+Review each group's context. REMOVE groups from the list if they are FALSE POSITIVES or LOW-VALUE:
 
-When uncertain, KEEP the group (better false positives than miss real errors).
+TYPO GROUPS - REMOVE from list if:
+- NOT actually typos: The flagged "typo" is correct in context (scientific names like "Escherichia coli", technical terms like "eigenvalue", proper nouns like "McDonald")
+- Codespell false positives that are actually correct spellings
 
-Return ONLY valid JSON (no Python code, no functions, no comments):
+TYPO GROUPS - KEEP in list if:
+- Real typos: Actual misspellings like "teh" → "the", "recieve" → "receive"
+
+SEMANTIC ISSUE GROUPS - REMOVE from list if:
+- Minor style suggestions that don't affect meaning
+- Tiny inconsistencies (capitalization preferences, punctuation style)
+- Subjective writing preferences
+
+SEMANTIC ISSUE GROUPS - KEEP in list (reputational risk):
+- Inappropriate/offensive language (bad words, slurs, profanity) - CRITICAL: ALWAYS KEEP
+- Factual errors or contradictions
+- Major inconsistencies that confuse readers
+- Unclear or ambiguous statements
+- Anything that could damage OWID's reputation or credibility
+
+OUTPUT FORMAT:
+
+Return ONLY valid JSON:
 {{
-  "typo_groups": {{"group_name": [0, 1, 2, 3]}},
+  "typo_groups": {{"group_name": [0, 1, 2]}},
   "semantic_groups": {{"group_name": [0, 1, 2]}},
-  "spurious_typo_groups": ["group_name1"]
+  "spurious_typo_groups": ["group_name1"],
+  "spurious_semantic_groups": ["group_name2"]
 }}
 
-IMPORTANT: Write out array values explicitly [0, 1, 2, 3], NOT Python code like list(range(0, 190))."""
+CRITICAL: When unsure about severity, KEEP the issue in the list. Missing a reputational risk is worse than a false positive.
+Write arrays explicitly [0, 1, 2], NOT Python code."""
 
     try:
         client = anthropic.Anthropic(api_key=api_key)
@@ -1601,20 +1620,31 @@ IMPORTANT: Write out array values explicitly [0, 1, 2, 3], NOT Python code like 
 
         # Group semantic issues
         semantic_grouping = result.get("semantic_groups", {})
+        spurious_semantic_groups = set(result.get("spurious_semantic_groups", []))
         grouped_semantic = []
         grouped_semantic_indices = set()
+        semantic_pruned_count = 0
 
-        for group_indices in semantic_grouping.values():
+        for group_name, group_indices in semantic_grouping.items():
             if not group_indices:
                 continue
-            representative = other_issues[group_indices[0]].copy()
-            representative["similar_count"] = len(group_indices)
-            representative["group_views"] = [
-                other_issues[i].get("view_title", "") for i in group_indices if i < len(other_issues)
-            ]
+
+            # Skip entire group if marked as spurious (low-value)
+            if group_name in spurious_semantic_groups:
+                semantic_pruned_count += len(group_indices)
+                grouped_semantic_indices.update(group_indices)  # Mark as handled
+                continue
+
+            valid_indices = [i for i in group_indices if i < len(other_issues)]
+            if not valid_indices:
+                continue
+
+            representative = other_issues[valid_indices[0]].copy()
+            representative["similar_count"] = len(valid_indices)
+            representative["group_views"] = [other_issues[i].get("view_title", "") for i in valid_indices]
             grouped_semantic.append(representative)
             # Track which indices were grouped
-            grouped_semantic_indices.update(group_indices)
+            grouped_semantic_indices.update(valid_indices)
 
         # Add ungrouped semantic issues (ones that weren't grouped)
         for idx, issue in enumerate(other_issues):
@@ -1622,6 +1652,18 @@ IMPORTANT: Write out array values explicitly [0, 1, 2, 3], NOT Python code like 
                 ungrouped = issue.copy()
                 ungrouped["similar_count"] = 1
                 grouped_semantic.append(ungrouped)
+
+        if semantic_pruned_count > 0:
+            rprint(f"  [dim]Pruned {semantic_pruned_count} low-value semantic issue(s)[/dim]")
+
+        # Validation: Warn if unexpected issue loss (beyond intentional pruning)
+        expected_kept = len(other_issues) - semantic_pruned_count
+        if len(grouped_semantic) != expected_kept:
+            log.warning(
+                f"Semantic issue count mismatch after grouping: "
+                f"input={len(other_issues)}, pruned={semantic_pruned_count}, output={len(grouped_semantic)}, "
+                f"expected={expected_kept}"
+            )
 
         return grouped_typos + grouped_semantic, tokens_used
 
