@@ -1,0 +1,37 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Global Religious Composition Estimates for 2010 and 2020"
+    description: |-
+      This dataset provides estimates of the number of people of all ages in seven categories: Christians, Muslims, Hindus, Buddhists, Jews, people who belong to other religions, and those who are religiously unaffiliated.
+
+      The “other religions” category includes Baha’is, Daoists (also spelled Taoists), Jains, Shintoists, Sikhs, Wiccans, Zoroastrians and many small groups, some of which can be described as folk or traditional religions. The religiously unaffiliated category – sometimes called “nones” – consists of people who do not identify with any religion.
+
+      This analysis is based on more than 2,700 sources of data, including national censuses, large-scale demographic surveys, general population surveys and population registers. Our estimates cover 201 countries and territories that had populations of at least 100,000 people in 2010 or 2020. Collectively, these places are home to 99.98% of the world’s population. Data on country population totals and general demographic characteristics come from the 2024 revision of the United Nations’ World Population Prospects.
+
+      In most countries, it is not possible to precisely measure the number of people who identify with each religion. For reporting purposes, please use figures in the rounded counts worksheet. For example, since the rounded count worksheet has a value “<10,000” for values below 10,000, please report our estimates for these small populations as “less than 10,000.”
+
+      A worksheet of unrounded counts is also provided, which should be used with caution. For example, these figures may be appropriate for regression analyses.
+
+
+    date_published: "2025"
+
+    # Citation
+    producer: Pew Research Center
+    citation_full: |-
+      Hackett, Conrad, Marcin Stonawski, Yunping Tong, Stephanie Kramer and Anne Fengyan Shi. 2025. “Dataset of Global Religious Composition Estimates for 2010 and 2020.” Pew Research Center. doi: 10.58094/vhrw-k516.
+
+    # Files
+    url_main: https://www.pewresearch.org/dataset/dataset-of-global-religious-composition-estimates-for-2010-and-2020/
+    date_accessed: '2025-10-31'
+
+    # License
+    license:
+      name: © Pew Research Center
+      url: https://www.pewresearch.org/about/terms-and-conditions/
+outs:
+  - md5: 2b8080eb0e754888bdc751e5821cbe79
+    size: 206618
+    path: religious_composition.zip
