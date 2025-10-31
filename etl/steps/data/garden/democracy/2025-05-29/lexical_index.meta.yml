@@ -475,7 +475,7 @@ tables:
         unit: "people"
 
       #################
-      # PEOPLE LIVIN IN...
+      # PEOPLE LIVING IN...
       pop_democracy_lied:
         title: |-
           <%- if category == '-1' -%>
