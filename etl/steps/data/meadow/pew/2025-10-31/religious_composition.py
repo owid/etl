@@ -52,8 +52,16 @@ def run() -> None:
     #
     # Process data.
     #
+    assert tb_regions is not None
+    tb_regions = (
+        tb_regions.loc[tb_regions["Level"] == 1, ["Region", "Country"]].drop_duplicates().reset_index(drop=True)
+    )
+
     # Improve tables format.
-    tables = [tb.format(["country", "year", "religion"])]
+    tables = [
+        tb.format(["country", "year", "religion"]),
+        tb_regions.format(["country"], short_name="pew_regions"),
+    ]
 
     #
     # Save outputs.
