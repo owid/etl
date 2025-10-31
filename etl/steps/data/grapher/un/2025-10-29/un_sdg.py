@@ -9,11 +9,11 @@ from typing import Any, Dict, cast
 
 import pandas as pd
 import requests
-import yaml
 from owid.catalog import Dataset, License, Origin, Table, VariableMeta
 from owid.catalog.utils import underscore
 from structlog import getLogger
 
+from etl.files import yaml_load
 from etl.grapher import helpers as gh
 from etl.helpers import PathFinder, create_dataset
 
@@ -21,23 +21,28 @@ log = getLogger()
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-pd.options.mode.chained_assignment = None
+pd.options.mode.chained_assignment = "raise"
 
 # only include tables containing SUBSET string, this is useful for debugging
 SUBSET = os.environ.get("SUBSET")
 if SUBSET:
-    # Append additional table names from metadata file
+    # Append indicator prefixes from metadata file
+    # Extract indicator prefix by splitting on second double underscore
+    # e.g., "_6_2_1__sh_san_safe__all_areas" -> "_6_2_1__sh_san_safe"
     meta_path = Path(__file__).parent / "un_sdg.meta.yml"
     if meta_path.exists():
         with open(meta_path, "r") as f:
-            meta = yaml.safe_load(f)
+            meta = yaml_load(f)
         table_names = list(meta["tables"].keys())
-        if table_names:
-            SUBSET += "|" + "|".join(table_names)
-
-# for origins
-DATE_ACCESSED = "2024-08-27"
-CURRENT_YEAR = 2024
+        # Extract unique indicator prefixes (up to second __)
+        indicator_prefixes = set()
+        for table_name in table_names:
+            parts = table_name.split("__")
+            if len(parts) >= 2:
+                # Take first two parts: e.g., "_6_2_1" + "__" + "sh_san_safe"
+                indicator_prefixes.add(parts[0] + "_" + parts[1])
+        if indicator_prefixes:
+            SUBSET += "|" + "|".join(sorted(indicator_prefixes))
 
 
 def run(dest_dir: str) -> None:
@@ -46,6 +51,10 @@ def run(dest_dir: str) -> None:
     #
     # Load garden dataset.
     ds_garden = paths.load_dataset("un_sdg")
+
+    # Get date_accessed dynamically from the step version (which is the snapshot date)
+    DATE_ACCESSED = paths.version
+    CURRENT_YEAR = int(DATE_ACCESSED.split("-")[0])
 
     # Add table of processed data to the new dataset.
     # add tables to dataset
@@ -76,7 +85,7 @@ def run(dest_dir: str) -> None:
         source_desc = load_source_description()
 
         for var_name, tb_var in tb_var_gr:
-            tb_var = add_metadata_and_prepare_for_grapher(tb_var, ds_garden, source_desc)
+            tb_var = add_metadata_and_prepare_for_grapher(tb_var, source_desc, DATE_ACCESSED, CURRENT_YEAR)
 
             # NOTE: long format is quite inefficient, we're creating a table for every variable
             # converting it to wide format would be too sparse, but we could move dimensions from
@@ -179,7 +188,9 @@ def create_metadata_desc(indicator, series_code, source_desc, series_description
     return source_desc_out
 
 
-def add_metadata_and_prepare_for_grapher(tb: Table, ds_garden: Dataset, source_desc: dict) -> Table:
+def add_metadata_and_prepare_for_grapher(
+    tb: Table, source_desc: dict, date_accessed: str, current_year: int
+) -> Table:
     """
     Adding variable name specific metadata - there is an option to add more detailed metadata in the un_sdg.source_description.json
     but the default option is to link out to the metadata pdfs provided by the UN.
@@ -199,7 +210,7 @@ def add_metadata_and_prepare_for_grapher(tb: Table, ds_garden: Dataset, source_d
 
     # construct citation including link to metadata pdf
     metadata_link = get_metadata_link(indicator)
-    citation_for_indicator = f"{source_in_tb} via UN SDG Indicators Database (https://unstats.un.org/sdgs/dataportal), UN Department of Economic and Social Affairs (accessed {CURRENT_YEAR})."
+    citation_for_indicator = f"{source_in_tb} via UN SDG Indicators Database (https://unstats.un.org/sdgs/dataportal), UN Department of Economic and Social Affairs (accessed {current_year})."
     if metadata_link != "no metadata found":
         citation_for_indicator += f" More information available at: {metadata_link}."
 
@@ -208,11 +219,11 @@ def add_metadata_and_prepare_for_grapher(tb: Table, ds_garden: Dataset, source_d
         title=title_in_tb,
         description="The United Nations Sustainable Development Goal (SDG) dataset is the primary collection of data tracking progress towards the SDG indicators, compiled from officially-recognized international sources.",
         citation_full=citation_for_indicator,
-        date_accessed=DATE_ACCESSED,
+        date_accessed=date_accessed,
         url_main="https://unstats.un.org/sdgs/dataportal",
         url_download="https://unstats.un.org/sdgapi",
         attribution_short=tb["attribution_short"].iloc[0],
-        license=License(name=f"© {CURRENT_YEAR} United Nations", url="https://www.un.org/en/about-us/terms-of-use"),
+        license=License(name=f"© {current_year} United Nations", url="https://www.un.org/en/about-us/terms-of-use"),
     )
 
     tb["meta"] = VariableMeta(
@@ -229,7 +240,7 @@ def add_metadata_and_prepare_for_grapher(tb: Table, ds_garden: Dataset, source_d
     var_name = underscore(original_name, validate=False)
 
     # Validate that no problematic characters remain
-    problematic_chars = ["(", ")", "+", "!", ",", "/", "'", '"', "'", """, """]
+    problematic_chars = ["(", ")", "+", ",", "/", "'", '"', "'", """, """]
     for char in problematic_chars:
         assert (
             char not in var_name

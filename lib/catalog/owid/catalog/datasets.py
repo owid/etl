@@ -204,7 +204,7 @@ class Dataset:
                             t[col].metadata = VariableMeta()
                 return t
 
-        raise KeyError(f"Table `{name}` not found, available tables: {', '.join(self.table_names)}")
+        raise KeyError(f"Table `{name}` not found, available tables: {', '.join(self.table_names[:10])}")
 
     def __getitem__(self, name: str) -> tables.Table:
         return self.read(name, reset_index=False, safe_types=False)

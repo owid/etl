@@ -75,11 +75,26 @@ def test_underscore():
         == "poverty_rate__lt_50pct_of_median__lis_key_figures__2018"
     )
     assert underscore("10") == "_10"
+    # Test case from UN SDG data with parentheses and special characters in URLs
+    # The input has unicode characters that unidecode converts, potentially leaving parentheses
+    assert (
+        underscore(
+            "14.2.1 - EN_SCP_ECSYBA - Implementation (with parens) - Test https://example.com/#hash(test)"
+        )
+        == "_14_2_1__en_scp_ecsyba__implementation__with_parens__test_https__example_com_hash__test"
+    )
     assert (
         underscore(
             "Indicator 1.5.1: Death rate due to exposure to forces of nature (per 100,000 population) *Estimates reported here are based on a 10-year distributed lag for natural disaster mortality. - Past - Scaled"
         )
         == "indicator_1_5_1__death_rate_due_to_exposure_to_forces_of_nature__per_100_000_population__estimates_reported_here_are_based_on_a_10_year_distributed_lag_for_natural_disaster_mortality__past__scaled"
+    )
+    # Test case with exclamation mark from UN SDG data - double-encoded UTF-8 produces ! after unidecode
+    assert (
+        underscore(
+            "14.2.1 - EN_SCP_ECSYBA - Implementation and adaptive management - POMIUAC MALAGA-BUENAVENTURA : Plan de OrdenaciÃ³n y Manejo Integrado de la  Unidad Ambiental Costera del Complejo de MÃ¡laga - Buenaventura, https://www.cvc.gov.co"
+        )
+        == "_14_2_1__en_scp_ecsyba__implementation_and_adaptive_management__pomiuac_malaga_buenaventura__plan_de_ordenacia3n_y_manejo_integrado_de_la__unidad_ambiental_costera_del_complejo_de_ma_laga__buenaventura__https__www_cvc_gov_co"
     )
     assert underscore("a|b") == "a_b"
     assert underscore("$/£ exchange rate") == "dollar_ps_exchange_rate"
