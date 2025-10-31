@@ -364,3 +364,5 @@ steps:
     - data://meadow/pew/2025-10-31/religious_composition
   data://grapher/pew/2025-10-31/religious_composition:
     - data://garden/pew/2025-10-31/religious_composition
+  export://multidim/pew/latest/religious_composition:
+    - data://grapher/pew/2025-10-31/religious_composition
