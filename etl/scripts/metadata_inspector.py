@@ -892,6 +892,7 @@ def fetch_chart_configs(chart_slugs: list[str] | None = None) -> list[dict[str, 
     Returns:
         List of chart config dictionaries with flattened human-readable fields
     """
+    log.info("Fetching chart configs from database...")
     engine = get_engine()
     with Session(engine) as session:
         query = session.query(ChartConfig)
@@ -901,11 +902,13 @@ def fetch_chart_configs(chart_slugs: list[str] | None = None) -> list[dict[str, 
             query = query.filter(ChartConfig.slug.in_(chart_slugs))
         else:
             # By default, only get published charts with slugs
+            # Note: Explorer views use unpublished charts (without slugs), so there's no duplication
             query = query.filter(ChartConfig.slug.isnot(None))
 
         charts = query.all()
 
         if not charts:
+            log.info("Fetched 0 chart configs")
             return []
 
         # Convert to format similar to explorer views
@@ -919,6 +922,7 @@ def fetch_chart_configs(chart_slugs: list[str] | None = None) -> list[dict[str, 
             }
             result.append(chart_dict)
 
+        log.info(f"Fetched {len(result)} chart configs")
         return result
 
 
@@ -1868,17 +1872,22 @@ def load_views(
         List of view dictionaries (explorers, multidims, and charts)
     """
     # Fetch data from explorers, multidimensional indicators, and charts
-    # Only fetch explorer/multidim data if slug_list is provided OR if no filters at all
-    if slug_list or not chart_slug_list:
+    # Determine what to fetch based on provided filters
+    if slug_list is not None or chart_slug_list is None:
+        # Fetch explorers/multidims if: (1) slug_list provided, OR (2) no filters at all
         df_explorers = fetch_explorer_data(explorer_slugs=slug_list)
         df_mdims = fetch_multidim_data(slug_filters=slug_list)
     else:
-        # Only chart slugs provided - skip explorer/multidim data
+        # Only chart slugs provided - skip explorer/multidim data for performance
         df_explorers = pd.DataFrame()
         df_mdims = pd.DataFrame()
 
-    # Always fetch chart configs if chart slugs are provided
-    chart_configs = fetch_chart_configs(chart_slugs=chart_slug_list) if chart_slug_list else []
+    # Fetch charts if: (1) chart_slug_list provided, OR (2) no filters at all
+    if chart_slug_list is not None or slug_list is None:
+        chart_configs = fetch_chart_configs(chart_slugs=chart_slug_list)
+    else:
+        # Only explorer/multidim slugs provided - skip charts for performance
+        chart_configs = []
 
     # Check if we got any results
     if df_explorers.empty and df_mdims.empty and not chart_configs:
@@ -1950,9 +1959,17 @@ def load_views(
 
     config_count = len(configs_by_slug)
     view_count = len(views) - config_count
+
+    # Count charts separately (they have view_type="chart")
+    chart_count = len([v for v in views if v.get("view_type") == "chart"])
+
+    breakdown = f"{len(agg_df_explorers)} explorers + {len(agg_df_mdims)} multidims"
+    if chart_count > 0:
+        breakdown += f" + {chart_count} charts"
+
     rprint(
         f"[cyan]Aggregated to {view_count} unique views + {config_count} collection configs "
-        f"({len(agg_df_explorers)} explorers + {len(agg_df_mdims)} multidims)...[/cyan]\n"
+        f"({breakdown})...[/cyan]\n"
     )
 
     return views
