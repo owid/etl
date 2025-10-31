@@ -24,10 +24,12 @@ from rich import print as rprint
 from rich.console import Console
 from rich.progress import BarColumn, MofNCompleteColumn, Progress, TextColumn, TimeRemainingColumn
 from rich_click.rich_command import RichCommand
+from sqlalchemy.orm import Session
 from structlog import get_logger
 
 from etl import config
-from etl.db import read_sql
+from etl.db import get_engine, read_sql
+from etl.grapher.model import ChartConfig
 from etl.paths import BASE_DIR
 
 # Initialize logger
@@ -136,6 +138,25 @@ def parse_multidim_view_id(view_id: str, mdim_config: str | None) -> dict[str, s
         return result
     except (json.JSONDecodeError, AttributeError, KeyError):
         return {}
+
+
+def parse_chart_config(chart_config_raw: Any) -> dict[str, Any]:
+    """Parse chart_config field which can be a dict (chart views) or JSON string (explorer views).
+
+    Args:
+        chart_config_raw: Raw chart_config value - can be dict or JSON string
+
+    Returns:
+        Parsed chart config dict, or empty dict if not present
+    """
+    if isinstance(chart_config_raw, dict):
+        return chart_config_raw
+    elif chart_config_raw:
+        try:
+            return json.loads(chart_config_raw)
+        except (json.JSONDecodeError, TypeError):
+            return {}
+    return {}
 
 
 def parse_dimensions(dimensions_raw: Any, mdim_config: str | None = None) -> dict[str, Any]:
@@ -377,8 +398,14 @@ def check_typos(views: list[dict[str, Any]]) -> dict[int | str, list[dict[str, A
                     progress.update(task, advance=1)
                     continue
 
-                chart_config = json.loads(view["chart_config"]) if view["chart_config"] else {}
-                dimensions = parse_dimensions(view["dimensions"])
+                # Handle chart_config - it's already a dict for chart views, but a JSON string for explorer views
+                chart_config = parse_chart_config(view.get("chart_config"))
+
+                # For chart views, dimensions come from chart_config, not from view directly
+                if view.get("view_type") == "chart":
+                    dimensions = []  # Chart views don't have variable dimensions like explorers
+                else:
+                    dimensions = parse_dimensions(view["dimensions"])
                 view_id = view["id"]
                 view_files[view_id] = []
 
@@ -568,7 +595,7 @@ def check_typos(views: list[dict[str, Any]]) -> dict[int | str, list[dict[str, A
                             progress.update(task, advance=1)
                             continue
 
-                        chart_config = json.loads(view["chart_config"]) if view["chart_config"] else {}
+                        chart_config = parse_chart_config(view.get("chart_config"))
                         dimensions = parse_dimensions(view["dimensions"])
                         view_title = chart_config.get("title", "")
                         mdim_published = bool(view.get("mdim_published", True))
@@ -851,6 +878,74 @@ def aggregate_multidim_views(df: pd.DataFrame) -> pd.DataFrame:
     return agg_df
 
 
+def fetch_chart_configs(chart_slugs: list[str] | None = None) -> list[dict[str, Any]]:
+    """Fetch chart configs from database by slug.
+
+    Args:
+        chart_slugs: Optional list of chart slugs to filter by
+
+    Returns:
+        List of chart config dictionaries with flattened human-readable fields
+    """
+    engine = get_engine()
+    with Session(engine) as session:
+        query = session.query(ChartConfig)
+
+        # Filter by slugs if provided
+        if chart_slugs:
+            query = query.filter(ChartConfig.slug.in_(chart_slugs))
+        else:
+            # By default, only get published charts with slugs
+            query = query.filter(ChartConfig.slug.isnot(None))
+
+        charts = query.all()
+
+        if not charts:
+            return []
+
+        # Convert to format similar to explorer views
+        result = []
+        for chart in charts:
+            chart_dict = {
+                "id": str(chart.id),  # Chart config ID (UUID)
+                "slug": chart.slug,
+                "view_type": "chart",  # Mark as chart (not explorer view)
+                "chart_config": chart.full,
+            }
+            result.append(chart_dict)
+
+        return result
+
+
+def extract_chart_fields(chart_config: dict[str, Any]) -> list[tuple[str, Any]]:
+    """Extract human-readable fields from chart config JSON.
+
+    Args:
+        chart_config: Chart configuration dictionary from chart_configs.full
+
+    Returns:
+        List of (field_name, field_value) tuples for all text fields
+    """
+    fields = []
+
+    # Top-level text fields (excluding internalNotes as requested)
+    for field_name in ["title", "subtitle", "note", "sourceDesc"]:
+        if field_name in chart_config and chart_config[field_name]:
+            fields.append((field_name, chart_config[field_name]))
+
+    # Extract display names and other text from dimensions
+    if "dimensions" in chart_config and chart_config["dimensions"]:
+        for dim_idx, dimension in enumerate(chart_config["dimensions"]):
+            if "display" in dimension and dimension["display"]:
+                for display_key, display_value in dimension["display"].items():
+                    # Only include string fields (names, labels, tooltips, etc.)
+                    if isinstance(display_value, str) and display_value.strip():
+                        field_key = f"dimension_{dim_idx}_display_{display_key}"
+                        fields.append((field_key, display_value))
+
+    return fields
+
+
 def calculate_cost(
     input_tokens: int, output_tokens: int, cache_creation_tokens: int = 0, cache_read_tokens: int = 0
 ) -> float:
@@ -1004,9 +1099,17 @@ async def check_view_async(
 
         # For configs, check the extracted human-readable text
         fields_to_check = [("collection_config", config_text)]
+    elif view.get("view_type") == "chart":
+        # Chart config handling
+        chart_config = view.get("chart_config", {})
+        if not chart_config:
+            return [], 0, 0, 0, 0
+
+        # Extract fields from chart config using helper function
+        fields_to_check = extract_chart_fields(chart_config)
     else:
-        # Regular view handling
-        chart_config = json.loads(view["chart_config"]) if view["chart_config"] else {}
+        # Regular explorer view handling
+        chart_config = parse_chart_config(view.get("chart_config"))
 
         # Build field list for prompt (only include non-empty fields)
         fields_to_check = []
@@ -1162,12 +1265,17 @@ Here is the metadata to check:"""
         # Enrich each issue with view metadata
         for issue in view_issues:
             issue["view_id"] = view["id"]
-            issue["explorer_slug"] = view["explorerSlug"]
+            # For charts, use 'slug' instead of 'explorerSlug'
+            issue["explorer_slug"] = view.get("slug") if view.get("view_type") == "chart" else view.get("explorerSlug")
             issue["view_title"] = view_title
             issue["source"] = "ai"  # Mark as AI-detected
 
-            # Build URL (configs get collection base URL, regular views get specific view URL)
-            if view.get("is_config_view"):
+            # Build URL
+            if view.get("view_type") == "chart":
+                # Chart configs use direct chart URL
+                chart_slug = view.get("slug", "")
+                issue["view_url"] = f"https://ourworldindata.org/grapher/{chart_slug}" if chart_slug else ""
+            elif view.get("is_config_view"):
                 # For config pseudo-views, build base URL without dimension parameters
                 view_type = view.get("view_type", "explorer")
                 mdim_published = bool(view.get("mdim_published", True))
@@ -1181,6 +1289,7 @@ Here is the metadata to check:"""
                     mdim_catalog_path,
                 )
             else:
+                # Regular explorer views
                 dimensions = parse_dimensions(view.get("dimensions"))
                 mdim_published = bool(view.get("mdim_published", True))
                 mdim_catalog_path = view.get("mdim_catalog_path")
@@ -1250,7 +1359,7 @@ def check_issues(
                     fields_to_check.append(("collection_config", config_text))
             else:
                 # Regular view handling
-                chart_config = json.loads(view["chart_config"]) if view["chart_config"] else {}
+                chart_config = parse_chart_config(view.get("chart_config"))
 
                 # Add chart fields
                 for field_name in CHART_FIELDS_TO_CHECK:
@@ -1698,19 +1807,44 @@ def display_issues(
                 rprint(f"[magenta]{', '.join(clean_mdims)}[/magenta]")
 
 
-def load_views(slug_list: list[str] | None, limit: int | None) -> list[dict[str, Any]]:
-    """Load views from database and aggregate by view ID."""
-    # Fetch data from both explorers and multidimensional indicators
-    df_explorers = fetch_explorer_data(explorer_slugs=slug_list)
-    df_mdims = fetch_multidim_data(slug_filters=slug_list)
+def load_views(
+    slug_list: list[str] | None, chart_slug_list: list[str] | None, limit: int | None
+) -> list[dict[str, Any]]:
+    """Load views from database and aggregate by view ID.
+
+    Args:
+        slug_list: List of explorer/multidim slugs to filter by
+        chart_slug_list: List of chart slugs to filter by
+        limit: Maximum number of views to return
+
+    Returns:
+        List of view dictionaries (explorers, multidims, and charts)
+    """
+    # Fetch data from explorers, multidimensional indicators, and charts
+    # Only fetch explorer/multidim data if slug_list is provided OR if no filters at all
+    if slug_list or not chart_slug_list:
+        df_explorers = fetch_explorer_data(explorer_slugs=slug_list)
+        df_mdims = fetch_multidim_data(slug_filters=slug_list)
+    else:
+        # Only chart slugs provided - skip explorer/multidim data
+        df_explorers = pd.DataFrame()
+        df_mdims = pd.DataFrame()
+
+    # Always fetch chart configs if chart slugs are provided
+    chart_configs = fetch_chart_configs(chart_slugs=chart_slug_list) if chart_slug_list else []
 
     # Check if we got any results
-    if df_explorers.empty and df_mdims.empty:
-        if slug_list:
-            slugs_str = ", ".join(slug_list)
-            rprint(f"[red]Error: No views found for slug(s) '{slugs_str}' (checked both explorers and multidims)[/red]")
+    if df_explorers.empty and df_mdims.empty and not chart_configs:
+        if slug_list or chart_slug_list:
+            all_slugs = []
+            if slug_list:
+                all_slugs.extend(slug_list)
+            if chart_slug_list:
+                all_slugs.extend([f"chart:{s}" for s in chart_slug_list])
+            slugs_str = ", ".join(all_slugs)
+            rprint(f"[red]Error: No views found for slug(s) '{slugs_str}'[/red]")
         else:
-            rprint("[red]Error: No explorer or multidim views found in database[/red]")
+            rprint("[red]Error: No explorer, multidim, or chart views found in database[/red]")
         return []
 
     # Aggregate views
@@ -1724,6 +1858,9 @@ def load_views(slug_list: list[str] | None, limit: int | None) -> list[dict[str,
         agg_df = agg_df.sort_values("explorerSlug").reset_index(drop=True)
 
     views: list[dict[str, Any]] = agg_df.to_dict("records")  # type: ignore
+
+    # Add chart configs as views (charts are treated as single "views" without collections)
+    views.extend(chart_configs)
 
     # Apply limit if specified
     if limit is not None and limit > 0:
@@ -1919,8 +2056,19 @@ def display_results(
 ) -> None:
     """Display grouped issues and cost."""
     # Extract unique explorer slugs and identify mdims
-    all_explorers_analyzed = list(set(view["explorerSlug"] for view in views))
-    mdim_slugs = set(view["explorerSlug"] for view in views if view.get("view_type") == "multidim")
+    # Charts use 'slug', explorers use 'explorerSlug'
+    all_slugs = []
+    for view in views:
+        if view.get("view_type") == "chart":
+            slug = view.get("slug")
+        else:
+            slug = view.get("explorerSlug")
+        if slug:
+            all_slugs.append(slug)
+    all_explorers_analyzed = list(set(all_slugs))
+
+    mdim_slugs_list = [view.get("explorerSlug") for view in views if view.get("view_type") == "multidim"]
+    mdim_slugs = set(s for s in mdim_slugs_list if s is not None)
 
     # Display grouped issues
     display_issues(grouped_issues, all_explorers_analyzed, mdim_slugs)
@@ -1996,6 +2144,11 @@ def save_collection_results(output_file: str, issues: list[dict[str, Any]]) -> N
     help="Filter by specific explorer or multidim slug. Can be specified multiple times (e.g., '--slug global-food --slug covid-boosters')",
 )
 @click.option(
+    "--chart-slug",
+    multiple=True,
+    help="Filter by specific chart slug. Can be specified multiple times (e.g., '--chart-slug co2-emissions-per-capita')",
+)
+@click.option(
     "--skip-typos",
     is_flag=True,
     help="Skip typo checking (codespell)",
@@ -2034,6 +2187,7 @@ def save_collection_results(output_file: str, issues: list[dict[str, Any]]) -> N
 )
 def run(
     slug: tuple[str, ...],
+    chart_slug: tuple[str, ...],
     skip_typos: bool,
     skip_issues: bool,
     skip_grouping: bool,
@@ -2042,11 +2196,12 @@ def run(
     limit: int | None,
     dry_run: bool,
 ) -> None:
-    """Check explorer and multidim views for typos and semantic issues.
+    """Check explorer, multidim views, and chart configs for typos and semantic issues.
 
     Examples:
         python metadata_inspector.py --skip-issues
         python metadata_inspector.py --slug global-food
+        python metadata_inspector.py --chart-slug co2-emissions-per-capita
         python metadata_inspector.py --slug global-food --slug covid-boosters
         python metadata_inspector.py --slug animal-welfare --limit 5
         python metadata_inspector.py --output-file issues.csv
@@ -2060,9 +2215,12 @@ def run(
         rprint("[red]Error: ANTHROPIC_API_KEY not found. Add to .env file or use --skip-issues[/red]")
         raise click.ClickException("Missing ANTHROPIC_API_KEY")
 
-    # Load views
+    # Load views (explorers and multidims)
     slug_list = list(slug) if slug else None
-    views = load_views(slug_list, limit)
+    chart_slug_list = list(chart_slug) if chart_slug else None
+
+    # Load both explorer views and chart configs
+    views = load_views(slug_list, chart_slug_list, limit)
     if not views:
         return
 
@@ -2072,7 +2230,13 @@ def run(
         completed_collections = get_completed_collections(output_file)
         if completed_collections:
             original_count = len(views)
-            views = [v for v in views if v["explorerSlug"] not in completed_collections]
+            # Filter out completed collections - charts use 'slug', explorers use 'explorerSlug'
+            views = [
+                v
+                for v in views
+                if (v.get("slug") if v.get("view_type") == "chart" else v.get("explorerSlug"))
+                not in completed_collections
+            ]
             skipped_count = original_count - len(views)
             if skipped_count > 0:
                 rprint(
@@ -2089,13 +2253,15 @@ def run(
         display_cost_estimate(total_input_tokens, total_output_tokens, skip_issues, len(views))
         return
 
-    # Group views by collection (explorerSlug) for incremental processing
-    collections = {}
+    # Group views by collection (explorerSlug for explorers, slug for charts) for incremental processing
+    collections: dict[str, list[dict[str, Any]]] = {}
     for view in views:
-        slug = view["explorerSlug"]
-        if slug not in collections:
-            collections[slug] = []
-        collections[slug].append(view)
+        # Charts use 'slug', explorers use 'explorerSlug'
+        collection_slug = view.get("slug") if view.get("view_type") == "chart" else view.get("explorerSlug")
+        if collection_slug and collection_slug not in collections:
+            collections[collection_slug] = []
+        if collection_slug:
+            collections[collection_slug].append(view)
 
     # Process collections one by one, saving after each
     all_issues = []
