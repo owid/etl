@@ -661,6 +661,10 @@ def fetch_explorer_data(explorer_slugs: list[str] | None = None) -> pd.DataFrame
     log.info("Fetching explorer configs...")
     configs_df = read_sql(config_query)
 
+    # Deduplicate configs by slug (keep first occurrence)
+    # This prevents cartesian product issues with NULL slugs during merge
+    configs_df = configs_df.drop_duplicates(subset=["slug"], keep="first")
+
     # Merge configs with views
     df = df.merge(
         configs_df.rename(columns={"slug": "explorerSlug", "config": "explorer_config"}), on="explorerSlug", how="left"
@@ -770,6 +774,10 @@ def fetch_multidim_data(slug_filters: list[str] | None = None) -> pd.DataFrame:
     """
     log.info("Fetching multidim configs...")
     configs_df = read_sql(config_query)
+
+    # Deduplicate configs by slug (keep first occurrence)
+    # This prevents cartesian product issues with NULL slugs during merge
+    configs_df = configs_df.drop_duplicates(subset=["slug"], keep="first")
 
     # Merge configs with views
     df = df.merge(
@@ -1557,17 +1565,6 @@ def load_views(slug_list: list[str] | None, limit: int | None) -> list[dict[str,
     df_explorers = fetch_explorer_data(explorer_slugs=slug_list)
     df_mdims = fetch_multidim_data(slug_filters=slug_list)
 
-    # Report what was found
-    explorer_count = len(df_explorers)
-    mdim_count = len(df_mdims)
-    if slug_list:
-        slugs_str = ", ".join(slug_list)
-        rprint(
-            f"[cyan]Filtering to slug(s): {slugs_str} ({explorer_count} explorer records, {mdim_count} multidim records)[/cyan]"
-        )
-    else:
-        rprint(f"[cyan]Fetched {explorer_count} explorer records and {mdim_count} multidim records[/cyan]")
-
     # Check if we got any results
     if df_explorers.empty and df_mdims.empty:
         if slug_list:
@@ -1593,6 +1590,10 @@ def load_views(slug_list: list[str] | None, limit: int | None) -> list[dict[str,
     if limit is not None and limit > 0:
         views = views[:limit]
         rprint(f"[yellow]Limiting to first {limit} views (for testing)[/yellow]")
+
+    if slug_list:
+        slugs_str = ", ".join(slug_list)
+        rprint(f"[cyan]Filtering to slug(s): {slugs_str}[/cyan]")
 
     rprint(
         f"[cyan]Aggregated to {len(views)} unique views ({len(agg_df_explorers)} explorers + {len(agg_df_mdims)} multidims)...[/cyan]\n"
