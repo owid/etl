@@ -568,6 +568,7 @@ def fetch_explorer_data(explorer_slugs: list[str] | None = None) -> pd.DataFrame
         slugs_str = "', '".join(explorer_slugs)
         where_clause += f" AND ev.explorerSlug IN ('{slugs_str}')"
 
+    # Fetch views without configs first
     query = f"""
         SELECT
             ev.id,
@@ -576,7 +577,6 @@ def fetch_explorer_data(explorer_slugs: list[str] | None = None) -> pd.DataFrame
             ev.dimensions,
             ev.chartConfigId,
             cc.full as chart_config,
-            e.config as explorer_config,
             v.id as variable_id,
             v.name as variable_name,
             v.unit as variable_unit,
@@ -590,7 +590,6 @@ def fetch_explorer_data(explorer_slugs: list[str] | None = None) -> pd.DataFrame
             v.descriptionKey as variable_description_key,
             v.descriptionProcessing as variable_description_processing
         FROM explorer_views ev
-        LEFT JOIN explorers e ON ev.explorerSlug = e.slug
         LEFT JOIN chart_configs cc ON ev.chartConfigId = cc.id
         LEFT JOIN JSON_TABLE(
             cc.full,
@@ -606,6 +605,25 @@ def fetch_explorer_data(explorer_slugs: list[str] | None = None) -> pd.DataFrame
     log.info("Fetching explorer data from database...")
     df = read_sql(query)
     log.info(f"Fetched {len(df)} explorer view records")
+
+    # Fetch explorer configs separately (much more efficient)
+    config_where = ""
+    if explorer_slugs:
+        slugs_str = "', '".join(explorer_slugs)
+        config_where = f"WHERE slug IN ('{slugs_str}')"
+
+    config_query = f"""
+        SELECT slug, config
+        FROM explorers
+        {config_where}
+    """
+    log.info("Fetching explorer configs...")
+    configs_df = read_sql(config_query)
+
+    # Merge configs with views
+    df = df.merge(
+        configs_df.rename(columns={"slug": "explorerSlug", "config": "explorer_config"}), on="explorerSlug", how="left"
+    )
 
     return df
 
@@ -663,6 +681,7 @@ def fetch_multidim_data(slug_filters: list[str] | None = None) -> pd.DataFrame:
         slugs_str = "', '".join(slug_filters)
         where_clause = f"WHERE md.slug IN ('{slugs_str}')"
 
+    # Fetch views without configs first
     query = f"""
         SELECT
             mx.id as id,
@@ -673,7 +692,6 @@ def fetch_multidim_data(slug_filters: list[str] | None = None) -> pd.DataFrame:
             md.catalogPath as mdim_catalog_path,
             mx.chartConfigId,
             cc.full as chart_config,
-            md.config as explorer_config,
             v.id as variable_id,
             v.name as variable_name,
             v.unit as variable_unit,
@@ -697,6 +715,25 @@ def fetch_multidim_data(slug_filters: list[str] | None = None) -> pd.DataFrame:
     log.info("Fetching multidimensional indicator data from database...")
     df = read_sql(query)
     log.info(f"Fetched {len(df)} multidim view records")
+
+    # Fetch multidim configs separately (much more efficient)
+    config_where = ""
+    if slug_filters:
+        slugs_str = "', '".join(slug_filters)
+        config_where = f"WHERE slug IN ('{slugs_str}')"
+
+    config_query = f"""
+        SELECT slug, config
+        FROM multi_dim_data_pages
+        {config_where}
+    """
+    log.info("Fetching multidim configs...")
+    configs_df = read_sql(config_query)
+
+    # Merge configs with views
+    df = df.merge(
+        configs_df.rename(columns={"slug": "explorerSlug", "config": "explorer_config"}), on="explorerSlug", how="left"
+    )
 
     return df
 
