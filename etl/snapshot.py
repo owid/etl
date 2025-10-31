@@ -473,7 +473,7 @@ class Snapshot:
     def read_from_archive(self, filename: str, force_extension: Optional[str] = None, *args, **kwargs) -> Table:
         """Read a file in an archive.
 
-        Use this function within `open_archive()` context manager. Otherwise it'll raise a RuntimeError, since `_unarchived_dir` will be None.
+        Use this function within a 'with snap.open_archive():' context manager. Otherwise it'll raise a RuntimeError, since `_unarchived_dir` will be None.
 
         The read method is inferred based on the file extension of `filename`. Use `force_extension` if you want to override this.
 
