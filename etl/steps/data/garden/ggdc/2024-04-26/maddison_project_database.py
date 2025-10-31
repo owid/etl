@@ -49,6 +49,8 @@ def run(dest_dir: str) -> None:
 
     sanity_checks(tb)
 
+    tb = rename_region(tb)
+
     tb = tb.format(["country", "year"])
 
     #
@@ -134,3 +136,15 @@ def sanity_checks(tb: Table) -> None:
         )
 
     return None
+
+
+def rename_region(tb: Table) -> Table:
+    """In the column regions, rename Western Offshoots to Western offshoots."""
+    tb = tb.copy()
+
+    # Assert that the value Western Offshoots is in the region column
+    assert "Western Offshoots" in tb["region"].unique(), "`Western Offshoots` not found in region column."
+
+    tb["region"] = tb["region"].replace("Western Offshoots", "Western offshoots")
+
+    return tb
