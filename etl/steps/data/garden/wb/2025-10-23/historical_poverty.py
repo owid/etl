@@ -11,7 +11,6 @@ The approach:
 4. Generate estimates for individual countries and regional aggregates
 """
 
-from pathlib import Path
 from typing import Dict, Optional
 
 import owid.catalog.processing as pr
@@ -80,7 +79,7 @@ def run() -> None:
     ds_thousand_bins = paths.load_dataset("thousand_bins_distribution")
     ds_maddison = paths.load_dataset("maddison_project_database")
 
-    tb_bins = ds_thousand_bins["thousand_bins_distribution"].reset_index()
+    tb_thousand_bins = ds_thousand_bins["thousand_bins_distribution"].reset_index()
     tb_maddison = ds_maddison["maddison_project_database"].reset_index()
 
     #
@@ -89,16 +88,9 @@ def run() -> None:
     tb_gdp = prepare_gdp_data(tb_maddison)
 
     #
-    # Load historical entities mapping
-    #
-    log.info("historical_poverty: Loading historical entities mapping")
-    historical_entities = load_historical_entities()
-
-    #
     # Perform backward extrapolation
     #
-    log.info("historical_poverty: Starting backward extrapolation from 1990 to 1820")
-    tb_extended = extrapolate_backwards(tb_bins=tb_bins, tb_gdp=tb_gdp, historical_entities=historical_entities)
+    tb_extended = extrapolate_backwards(tb_bins=tb_thousand_bins, tb_gdp=tb_gdp)
 
     log.info(f"historical_poverty: Extended dataset has {len(tb_extended)} rows")
     log.info(f"historical_poverty: Extended date range: {tb_extended['year'].min()}-{tb_extended['year'].max()}")
