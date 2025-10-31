@@ -7,6 +7,7 @@ This script uses a three-layer approach to find issues:
 
 """
 
+import asyncio
 import json
 import re
 import subprocess
@@ -850,12 +851,16 @@ def aggregate_multidim_views(df: pd.DataFrame) -> pd.DataFrame:
     return agg_df
 
 
-def calculate_cost(input_tokens: int, output_tokens: int) -> float:
-    """Calculate cost in USD for given token counts.
+def calculate_cost(
+    input_tokens: int, output_tokens: int, cache_creation_tokens: int = 0, cache_read_tokens: int = 0
+) -> float:
+    """Calculate cost in USD for given token counts including cache costs.
 
     Args:
-        input_tokens: Number of input tokens
+        input_tokens: Number of regular input tokens (non-cached)
         output_tokens: Number of output tokens
+        cache_creation_tokens: Number of tokens written to cache
+        cache_read_tokens: Number of tokens read from cache
 
     Returns:
         Cost in USD
@@ -863,9 +868,21 @@ def calculate_cost(input_tokens: int, output_tokens: int) -> float:
     if CLAUDE_MODEL not in MODEL_PRICING:
         raise ValueError(f"Unknown model '{CLAUDE_MODEL}'. Please add pricing to MODEL_PRICING dictionary.")
     pricing = MODEL_PRICING[CLAUDE_MODEL]
-    input_cost = (input_tokens / 1_000_000) * pricing["input"]
+
+    # Regular input tokens
+    regular_input_tokens = input_tokens - cache_creation_tokens - cache_read_tokens
+    input_cost = (regular_input_tokens / 1_000_000) * pricing["input"]
+
+    # Cache creation cost (25% premium over regular input)
+    cache_write_cost = (cache_creation_tokens / 1_000_000) * pricing["input"] * 1.25
+
+    # Cache read cost (90% discount, so 10% of regular price)
+    cache_read_cost = (cache_read_tokens / 1_000_000) * pricing["input"] * 0.01
+
+    # Output cost
     output_cost = (output_tokens / 1_000_000) * pricing["output"]
-    return input_cost + output_cost
+
+    return input_cost + cache_write_cost + cache_read_cost + output_cost
 
 
 def estimate_tokens(text: str) -> int:
@@ -973,17 +990,17 @@ def call_claude(
 async def check_view_async(
     client: anthropic.AsyncAnthropic,
     view: dict[str, Any],
-) -> tuple[list[dict[str, Any]], int, int]:
+) -> tuple[list[dict[str, Any]], int, int, int, int]:
     """Check a single view for issues asynchronously.
 
     Returns:
-        Tuple of (issues, input_tokens, output_tokens)
+        Tuple of (issues, input_tokens, output_tokens, cache_creation_tokens, cache_read_tokens)
     """
     # Handle config pseudo-views differently
     if view.get("is_config_view"):
         config_text = view.get("config_text", "")
         if not config_text or not config_text.strip():
-            return [], 0, 0
+            return [], 0, 0, 0, 0
 
         # For configs, check the extracted human-readable text
         fields_to_check = [("collection_config", config_text)]
@@ -1014,7 +1031,7 @@ async def check_view_async(
 
     # Skip if no substantial content (need at least 1 non-empty field)
     if len(fields_to_check) < 1:
-        return [], 0, 0
+        return [], 0, 0, 0, 0
 
     # Build prompt text
     fields_text = "\n".join([f"{name.replace('_', ' ').title()}: {value}" for name, value in fields_to_check])
@@ -1040,43 +1057,81 @@ Return ONLY JSON array with format: issue_type (either "typo" or "semantic") fie
 Here is the metadata to check:"""
 
     raw_text = ""  # Initialize for type checker
-    try:
-        response = await client.messages.create(
-            model=CLAUDE_MODEL,
-            max_tokens=1024,
-            messages=[
-                {
-                    "role": "user",
-                    "content": [
-                        {
-                            "type": "text",
-                            "text": instructions,
-                            "cache_control": {"type": "ephemeral"},
-                        },
-                        {
-                            "type": "text",
-                            "text": fields_text,
-                        },
-                    ],
-                }
-            ],
-        )
+    response = None  # Initialize for type checker
 
+    # Retry logic for transient API errors (rate limits, overloaded, etc.)
+    max_retries = 3
+    for attempt in range(max_retries):
+        try:
+            response = await client.messages.create(
+                model=CLAUDE_MODEL,
+                max_tokens=1024,
+                messages=[
+                    {
+                        "role": "user",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": instructions,
+                                "cache_control": {"type": "ephemeral"},
+                            },
+                            {
+                                "type": "text",
+                                "text": fields_text,
+                            },
+                        ],
+                    }
+                ],
+            )
+            break  # Success, exit retry loop
+        except Exception as e:
+            # Check if this is a retryable error
+            error_msg = str(e)
+            is_retryable = any(
+                keyword in error_msg.lower()
+                for keyword in ["overloaded", "rate_limit", "rate limit", "529", "429", "timeout"]
+            )
+
+            if is_retryable and attempt < max_retries - 1:
+                # Exponential backoff: 2^attempt seconds
+                wait_time = 2**attempt
+                log.debug(
+                    f"View {view['id']}: Retryable error (attempt {attempt + 1}/{max_retries}), waiting {wait_time}s: {e}"
+                )
+                await asyncio.sleep(wait_time)
+            else:
+                # Non-retryable error or max retries exceeded
+                if is_retryable:
+                    log.warning(f"View {view['id']}: Max retries exceeded for API error: {e}")
+                raise  # Re-raise to be caught by outer exception handler
+
+    # Check if we have a response (should always be true if no exception was raised)
+    if response is None:
+        log.warning(f"View {view['id']}: No response received after retries")
+        return [], 0, 0, 0, 0
+
+    try:
         content_block = response.content[0]
         if not isinstance(content_block, TextBlock):
-            return [], 0, 0
+            return [], 0, 0, 0, 0
 
         raw_text = content_block.text.strip()
 
+        # Extract usage information including cache stats
+        input_tokens = response.usage.input_tokens
+        output_tokens = response.usage.output_tokens
+        cache_creation_tokens = getattr(response.usage, "cache_creation_input_tokens", 0)
+        cache_read_tokens = getattr(response.usage, "cache_read_input_tokens", 0)
+
         # Handle cases where Claude returns just "[]" or empty responses
         if not raw_text or raw_text == "[]":
-            return [], response.usage.input_tokens, response.usage.output_tokens
+            return [], input_tokens, output_tokens, cache_creation_tokens, cache_read_tokens
 
         content = extract_json_array(raw_text)
 
         # Validate we have actual JSON content
         if not content or content == "[]":
-            return [], response.usage.input_tokens, response.usage.output_tokens
+            return [], input_tokens, output_tokens, cache_creation_tokens, cache_read_tokens
 
         view_issues = json.loads(content)
 
@@ -1146,7 +1201,7 @@ Here is the metadata to check:"""
                     issue["context"] = value[:200]
                     break
 
-        return view_issues, response.usage.input_tokens, response.usage.output_tokens
+        return view_issues, input_tokens, output_tokens, cache_creation_tokens, cache_read_tokens
 
     except json.JSONDecodeError as e:
         # Log the actual response to help debug the issue
@@ -1154,10 +1209,10 @@ Here is the metadata to check:"""
             f"View {view['id']}: Claude returned invalid JSON (length: {len(raw_text)}). "
             f"Response preview: {raw_text[:200]}... Error: {e}"
         )
-        return [], 0, 0
+        return [], 0, 0, 0, 0
     except Exception as e:
         log.warning(f"Error processing view {view['id']}: {e}")
-        return [], 0, 0
+        return [], 0, 0, 0, 0
 
 
 def check_issues(
@@ -1231,45 +1286,60 @@ def check_issues(
         return [], {"input_tokens": total_input_tokens, "output_tokens": total_output_tokens}
 
     # Run async checks in parallel with concurrency limiting
-    import asyncio
-
     async def check_all_views():
         client = anthropic.AsyncAnthropic(api_key=api_key)
-        semaphore = asyncio.Semaphore(MAX_CONCURRENT_REQUESTS)
+        try:
+            semaphore = asyncio.Semaphore(MAX_CONCURRENT_REQUESTS)
 
-        async def check_with_semaphore(view):
-            async with semaphore:
-                return await check_view_async(client, view)
+            async def check_with_semaphore(view):
+                async with semaphore:
+                    return await check_view_async(client, view)
 
-        tasks = [check_with_semaphore(view) for view in views]
+            tasks = [check_with_semaphore(view) for view in views]
 
-        all_issues = []
-        total_input_tokens = 0
-        total_output_tokens = 0
+            all_issues = []
+            total_input_tokens = 0
+            total_output_tokens = 0
+            total_cache_creation_tokens = 0
+            total_cache_read_tokens = 0
 
-        with Progress(
-            TextColumn("[progress.description]{task.description}"),
-            BarColumn(),
-            MofNCompleteColumn(),
-            TimeRemainingColumn(),
-            console=console,
-        ) as progress:
-            task_id = progress.add_task("Checking for semantic issues", total=len(views))
+            with Progress(
+                TextColumn("[progress.description]{task.description}"),
+                BarColumn(),
+                MofNCompleteColumn(),
+                TimeRemainingColumn(),
+                console=console,
+            ) as progress:
+                task_id = progress.add_task("Checking for semantic issues", total=len(views))
 
-            for coro in asyncio.as_completed(tasks):
-                issues, input_tokens, output_tokens = await coro
-                all_issues.extend(issues)
-                total_input_tokens += input_tokens
-                total_output_tokens += output_tokens
-                progress.update(task_id, advance=1)
+                for coro in asyncio.as_completed(tasks):
+                    issues, input_tokens, output_tokens, cache_creation, cache_read = await coro
+                    all_issues.extend(issues)
+                    total_input_tokens += input_tokens
+                    total_output_tokens += output_tokens
+                    total_cache_creation_tokens += cache_creation
+                    total_cache_read_tokens += cache_read
+                    progress.update(task_id, advance=1)
 
-        return all_issues, total_input_tokens, total_output_tokens
+            return (
+                all_issues,
+                total_input_tokens,
+                total_output_tokens,
+                total_cache_creation_tokens,
+                total_cache_read_tokens,
+            )
+        finally:
+            await client.close()
 
-    all_issues, total_input_tokens, total_output_tokens = asyncio.run(check_all_views())
+    all_issues, total_input_tokens, total_output_tokens, cache_creation_tokens, cache_read_tokens = asyncio.run(
+        check_all_views()
+    )
 
     usage_stats = {
         "input_tokens": total_input_tokens,
         "output_tokens": total_output_tokens,
+        "cache_creation_tokens": cache_creation_tokens,
+        "cache_read_tokens": cache_read_tokens,
     }
     return all_issues, usage_stats
 
@@ -1732,15 +1802,17 @@ def run_checks(
     skip_typos: bool,
     skip_issues: bool,
     batch_size: int,
-) -> tuple[list[dict[str, Any]], int, int]:
+) -> tuple[list[dict[str, Any]], int, int, int, int]:
     """Run all enabled checks and return issues and token usage.
 
     Returns:
-        Tuple of (all_issues, total_input_tokens, total_output_tokens)
+        Tuple of (all_issues, total_input_tokens, total_output_tokens, cache_creation_tokens, cache_read_tokens)
     """
     all_issues = []
     total_input_tokens = 0
     total_output_tokens = 0
+    cache_creation_tokens = 0
+    cache_read_tokens = 0
 
     # Check typos with codespell
     if not skip_typos:
@@ -1758,11 +1830,13 @@ def run_checks(
         all_issues.extend(issues)
         total_input_tokens += usage_stats.get("input_tokens", 0)
         total_output_tokens += usage_stats.get("output_tokens", 0)
+        cache_creation_tokens += usage_stats.get("cache_creation_tokens", 0)
+        cache_read_tokens += usage_stats.get("cache_read_tokens", 0)
         claude_typos = len([i for i in issues if i.get("issue_type") == "typo"])
         semantic_issues = len([i for i in issues if i.get("issue_type") == "semantic"])
         rprint(f"[green]✓ Found {claude_typos} typos and {semantic_issues} semantic issues with Claude[/green]\n")
 
-    return all_issues, total_input_tokens, total_output_tokens
+    return all_issues, total_input_tokens, total_output_tokens, cache_creation_tokens, cache_read_tokens
 
 
 def display_cost_estimate(
@@ -2018,6 +2092,9 @@ def run(
     all_issues = []
     total_input_tokens = 0
     total_output_tokens = 0
+    total_cache_creation_tokens = 0
+    total_cache_read_tokens = 0
+    total_cost = 0.0
 
     rprint(f"\n[bold cyan]Processing {len(collections)} collection(s)...[/bold cyan]\n")
 
@@ -2025,12 +2102,18 @@ def run(
         rprint(f"[bold]Collection {collection_num}/{len(collections)}: {collection_slug}[/bold]")
 
         # Run checks for this collection
-        collection_issues, input_tokens, output_tokens = run_checks(
+        collection_issues, input_tokens, output_tokens, cache_creation, cache_read = run_checks(
             collection_views, skip_typos, skip_issues, batch_size
         )
 
+        # Calculate cost for this collection
+        collection_cost = calculate_cost(input_tokens, output_tokens, cache_creation, cache_read)
+        total_cost += collection_cost
+
         total_input_tokens += input_tokens
         total_output_tokens += output_tokens
+        total_cache_creation_tokens += cache_creation
+        total_cache_read_tokens += cache_read
 
         # Save this collection's results immediately (even if no issues, for checkpoint tracking)
         if output_file:
@@ -2051,6 +2134,9 @@ def run(
                 rprint("  [green]✓ Checkpoint saved (no issues found)[/green]")
 
         all_issues.extend(collection_issues)
+
+        # Display cost for this collection
+        rprint(f"  [dim]Cost: ${collection_cost:.4f} (running total: ${total_cost:.4f})[/dim]")
         rprint()
 
     # Group and prune issues (across all collections)
