@@ -209,18 +209,15 @@ def add_metadata_and_prepare_for_grapher(tb: Table, ds_garden: Dataset, source_d
         short_unit=tb["short_unit"].iloc[0],
     )
 
-    # hotfix - for some reason underscore function does not work as expected
-    import re
-    var_name = underscore(tb["variable_name"].iloc[0][0:254], validate=False)
-    # Replace special characters and HTML entities
-    special_chars = ["(", ")", "+", "!", ",", "/", "'", '"', "'", """, """]
-    for char in special_chars:
-        if char in var_name:
-            var_name = var_name.replace(char, "_")
-    # Replace any remaining spaces and non-ASCII characters with underscores
-    var_name = re.sub(r"[^\w]", "_", var_name)
-    # Clean up multiple consecutive underscores
-    var_name = re.sub(r"_+", "_", var_name)
+    # Use underscore to create valid variable names
+    original_name = tb["variable_name"].iloc[0][0:254]
+    var_name = underscore(original_name, validate=False)
+
+    # Validate that no problematic characters remain
+    problematic_chars = ["(", ")", "+", "!", ",", "/", "'", '"', "'", """, """]
+    for char in problematic_chars:
+        assert char not in var_name, f"Variable name '{var_name}' contains problematic character '{char}' after underscore() conversion. Original: '{original_name}'"
+
     tb["variable"] = var_name
 
     tb = Table(tb[["country", "year", "value", "variable", "meta"]])
