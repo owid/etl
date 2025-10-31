@@ -9,11 +9,11 @@ from typing import Any, Dict, cast
 
 import pandas as pd
 import requests
+import yaml
 from owid.catalog import Dataset, License, Origin, Table, VariableMeta
 from owid.catalog.utils import underscore
 from structlog import getLogger
 
-from etl.files import ruamel_load
 from etl.grapher import helpers as gh
 from etl.helpers import PathFinder, create_dataset
 
@@ -26,22 +26,14 @@ pd.options.mode.chained_assignment = None
 # only include tables containing SUBSET string, this is useful for debugging
 SUBSET = os.environ.get("SUBSET")
 if SUBSET:
-    # Append additional indicators from metadata file
+    # Append additional table names from metadata file
     meta_path = Path(__file__).parent / "un_sdg.meta.yml"
     if meta_path.exists():
-        meta = ruamel_load(meta_path)
-        if "tables" in meta and meta["tables"]:
-            # Get all table keys and extract unique indicator prefixes
-            table_keys = list(meta["tables"].keys())
-            # Extract indicator patterns (e.g., "_1_1_1", "_6_1_1", "_16", etc.)
-            indicators = set()
-            for key in table_keys:
-                # Match patterns like _X_X_X at the start
-                match = re.match(r"(_\d+(?:_\d+)*(?:_[a-z]+)?)", key)
-                if match:
-                    indicators.add(match.group(1))
-            if indicators:
-                SUBSET += "|" + "|".join(sorted(indicators))
+        with open(meta_path, "r") as f:
+            meta = yaml.safe_load(f)
+        table_names = list(meta["tables"].keys())
+        if table_names:
+            SUBSET += "|" + "|".join(table_names)
 
 # for origins
 DATE_ACCESSED = "2024-08-27"
