@@ -75,29 +75,25 @@ def underscore(name: str | None, validate: bool = True, camel_to_snake: bool = F
     if camel_to_snake:
         name = _camel_to_snake(name)
 
+    # convert special characters to ASCII first, then work with clean ASCII
+    name = unidecode(name).lower()
+
+    # replace basic whitespace and punctuation
     name = (
         name.replace(" ", "_")
         .replace("-", "_")
-        .replace("—", "_")
-        .replace("–", "_")
-        .replace("‑", "_")
         .replace(",", "_")
         .replace(".", "_")
         .replace("\t", "_")
         .replace("?", "_")
+        .replace("!", "_")
         .replace('"', "")
-        .replace("‘", "")
+        .replace("'", "")
         .replace("\xa0", "_")
-        .replace("’", "")
         .replace("`", "")
-        .replace("−", "_")
         .replace("*", "_")
-        .replace("“", "")
-        .replace("”", "")
         .replace("#", "")
         .replace("^", "")
-        .replace("ˆ", "")
-        .lower()
     )
 
     # replace special separators
@@ -121,17 +117,9 @@ def underscore(name: str | None, validate: bool = True, camel_to_snake: bool = F
     name = name.replace("&", "_and_")
     name = name.replace("<", "_lt_")
     name = name.replace(">", "_gt_")
-    name = name.replace("≥", "_gte_")
-    name = name.replace("≤", "_lte_")
-
-    # replace quotes
-    name = name.replace("'", "")
 
     # shrink triple underscore
     name = re.sub("__+", "__", name)
-
-    # convert special characters to ASCII
-    name = unidecode(name).lower()
 
     # strip leading and trailing underscores
     name = name.strip("_")
