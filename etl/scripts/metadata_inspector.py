@@ -309,7 +309,23 @@ def extract_human_readable_text(config_json: str) -> str:
         if isinstance(obj, dict):
             for key, value in obj.items():
                 # Extract common human-readable field names
-                if key in ["title", "subtitle", "note", "description", "label", "text", "tooltip"]:
+                if key in [
+                    "title",
+                    "subtitle",
+                    "note",
+                    "description",
+                    "label",
+                    "text",
+                    "tooltip",
+                    "name",  # Dimension/choice names
+                    "group",  # Choice groups
+                    "explorerTitle",
+                    "explorerSubtitle",
+                    "relatedQuestionText",  # From schema line 256
+                    "sourceName",  # Display metadata
+                    "additionalInfo",  # Display metadata
+                    "dataPublishedBy",  # Display metadata
+                ]:
                     if isinstance(value, str):
                         # Strip {template} patterns like {welfare['welfare_type'][wel]}
                         cleaned = re.sub(r"\{[^}]+\}", "", value)
@@ -353,6 +369,11 @@ def check_typos(views: list[dict[str, Any]]) -> dict[int | str, list[dict[str, A
             task = progress.add_task("Preparing views for spell check", total=len(views))
 
             for view in views:
+                # Skip config pseudo-views - they'll be added separately below
+                if view.get("is_config_view"):
+                    progress.update(task, advance=1)
+                    continue
+
                 chart_config = json.loads(view["chart_config"]) if view["chart_config"] else {}
                 dimensions = parse_dimensions(view["dimensions"])
                 view_id = view["id"]
@@ -386,27 +407,19 @@ def check_typos(views: list[dict[str, Any]]) -> dict[int | str, list[dict[str, A
 
                 progress.update(task, advance=1)
 
-        # Add collection configs as additional "pseudo-views" to check
-        # Group views by explorerSlug and process one config per collection
+        # Add collection configs as additional files to check
+        # Config pseudo-views were already created in load_views()
         rprint("  [cyan]Adding collection configs for spell check...[/cyan]")
-        configs_by_slug = {}
         for view in views:
-            slug = view.get("explorerSlug")
-            config = view.get("explorer_config")
-            if slug and config and slug not in configs_by_slug:
-                configs_by_slug[slug] = (view, config)
+            if view.get("is_config_view"):
+                config_view_id = view["id"]
+                config_text = view.get("config_text", "")
 
-        for slug, (view, config_json) in configs_by_slug.items():
-            # Use a special negative ID to mark config pseudo-views
-            config_view_id = f"config_{slug}"
-            view_files[config_view_id] = []
-
-            # Write config JSON as text (extract only human-readable fields and strip templates)
-            if config_json and config_json.strip():
-                file_path = Path(temp_dir) / f"view_{config_view_id}_collection_config.txt"
-                cleaned_text = extract_human_readable_text(config_json)
-                file_path.write_text(cleaned_text)
-                view_files[config_view_id].append(("collection_config", file_path, cleaned_text))
+                if config_text and config_text.strip():
+                    view_files[config_view_id] = []
+                    file_path = Path(temp_dir) / f"view_{config_view_id}_collection_config.txt"
+                    file_path.write_text(config_text)
+                    view_files[config_view_id].append(("collection_config", file_path, config_text))
 
         # Run codespell once on the entire directory
         rprint("  [cyan]Running spell checker...[/cyan]")
@@ -964,28 +977,38 @@ async def check_view_async(
     Returns:
         Tuple of (issues, input_tokens, output_tokens)
     """
-    chart_config = json.loads(view["chart_config"]) if view["chart_config"] else {}
+    # Handle config pseudo-views differently
+    if view.get("is_config_view"):
+        config_text = view.get("config_text", "")
+        if not config_text or not config_text.strip():
+            return [], 0, 0
 
-    # Build field list for prompt (only include non-empty fields)
-    fields_to_check = []
+        # For configs, check the extracted human-readable text
+        fields_to_check = [("collection_config", config_text)]
+    else:
+        # Regular view handling
+        chart_config = json.loads(view["chart_config"]) if view["chart_config"] else {}
 
-    # Add chart fields
-    for field_name in CHART_FIELDS_TO_CHECK:
-        value = chart_config.get(field_name, "")
-        if value and str(value).strip():
-            fields_to_check.append((field_name, str(value)))
+        # Build field list for prompt (only include non-empty fields)
+        fields_to_check = []
 
-    # Add variable metadata fields
-    for field_name in VARIABLE_FIELDS_TO_CHECK:
-        values = view.get(field_name, [])
-        if isinstance(values, list):
-            for i, value in enumerate(values):
-                if value and str(value).strip():
-                    # Include index in field name for multiple variables
-                    indexed_field_name = f"{field_name}_{i}" if len(values) > 1 else field_name
-                    fields_to_check.append((indexed_field_name, str(value)))
-        elif values and str(values).strip():
-            fields_to_check.append((field_name, str(values)))
+        # Add chart fields
+        for field_name in CHART_FIELDS_TO_CHECK:
+            value = chart_config.get(field_name, "")
+            if value and str(value).strip():
+                fields_to_check.append((field_name, str(value)))
+
+        # Add variable metadata fields
+        for field_name in VARIABLE_FIELDS_TO_CHECK:
+            values = view.get(field_name, [])
+            if isinstance(values, list):
+                for i, value in enumerate(values):
+                    if value and str(value).strip():
+                        # Include index in field name for multiple variables
+                        indexed_field_name = f"{field_name}_{i}" if len(values) > 1 else field_name
+                        fields_to_check.append((indexed_field_name, str(value)))
+            elif values and str(values).strip():
+                fields_to_check.append((field_name, str(values)))
 
     # Skip if no substantial content (need at least 2 fields for meaningful semantic checking)
     if len(fields_to_check) < 2:
@@ -1050,14 +1073,19 @@ Response:"""
         # Create a lookup dict for field values
         fields_dict = dict(fields_to_check)
 
-        # Get view title for display (prefer title from chart, fall back to first variable title)
-        view_title = fields_dict.get("title", "")
-        if not view_title:
-            # Try variable_title_public or variable_name as fallback
-            for field_name, value in fields_to_check:
-                if field_name.startswith("variable_title_public") or field_name.startswith("variable_name"):
-                    view_title = value
-                    break
+        # Get view title for display
+        if view.get("is_config_view"):
+            # For config pseudo-views, use a descriptive title
+            view_title = f"Collection Config ({view['explorerSlug']})"
+        else:
+            # For regular views, prefer title from chart, fall back to first variable title
+            view_title = fields_dict.get("title", "")
+            if not view_title:
+                # Try variable_title_public or variable_name as fallback
+                for field_name, value in fields_to_check:
+                    if field_name.startswith("variable_title_public") or field_name.startswith("variable_name"):
+                        view_title = value
+                        break
 
         # Enrich each issue with view metadata
         for issue in view_issues:
@@ -1066,17 +1094,21 @@ Response:"""
             issue["view_title"] = view_title
             issue["source"] = "ai"  # Mark as AI-detected
 
-            dimensions = parse_dimensions(view["dimensions"])
-            mdim_published = bool(view.get("mdim_published", True))
-            mdim_catalog_path = view.get("mdim_catalog_path")
+            # Build URL (configs get explorer URL, regular views get specific view URL)
+            if view.get("is_config_view"):
+                issue["view_url"] = f"https://ourworldindata.org/explorers/{view['explorerSlug']}"
+            else:
+                dimensions = parse_dimensions(view.get("dimensions"))
+                mdim_published = bool(view.get("mdim_published", True))
+                mdim_catalog_path = view.get("mdim_catalog_path")
 
-            issue["view_url"] = build_explorer_url(
-                view["explorerSlug"],
-                dimensions,
-                view.get("view_type", "explorer"),
-                mdim_published,
-                mdim_catalog_path,
-            )
+                issue["view_url"] = build_explorer_url(
+                    view["explorerSlug"],
+                    dimensions,
+                    view.get("view_type", "explorer"),
+                    mdim_published,
+                    mdim_catalog_path,
+                )
 
             # Add context from the actual field content
             field = issue.get("field", "")
@@ -1274,12 +1306,14 @@ Review each typo group's context. Mark groups as spurious ONLY if ALL instances 
 
 When uncertain, KEEP the group (better false positives than miss real errors).
 
-Return this JSON structure (NO explanation, ONLY JSON):
+Return ONLY valid JSON (no Python code, no functions, no comments):
 {{
-  "typo_groups": {{"group_name": [0, 1, ...]}},
-  "semantic_groups": {{"group_name": [0, 1, ...]}},
-  "spurious_typo_groups": ["group_name1", "group_name2"]
-}}"""
+  "typo_groups": {{"group_name": [0, 1, 2, 3]}},
+  "semantic_groups": {{"group_name": [0, 1, 2]}},
+  "spurious_typo_groups": ["group_name1"]
+}}
+
+IMPORTANT: Write out array values explicitly [0, 1, 2, 3], NOT Python code like list(range(0, 190))."""
 
     try:
         client = anthropic.Anthropic(api_key=api_key)
@@ -1591,12 +1625,42 @@ def load_views(slug_list: list[str] | None, limit: int | None) -> list[dict[str,
         views = views[:limit]
         rprint(f"[yellow]Limiting to first {limit} views (for testing)[/yellow]")
 
+    # Add collection config pseudo-views for AI semantic checking
+    # These will be checked alongside regular views
+    configs_by_slug = {}
+    for view in views:
+        slug = view.get("explorerSlug")
+        config = view.get("explorer_config")
+        view_type = view.get("view_type", "explorer")
+        if slug and config and slug not in configs_by_slug:
+            # Create a pseudo-view for this collection's config
+            config_view = {
+                "id": f"config_{slug}",
+                "view_type": view_type,
+                "explorerSlug": slug,
+                "config_text": extract_human_readable_text(config),
+                "is_config_view": True,
+                # Add empty lists for expected fields
+                "variable_name": [],
+                "variable_description": [],
+                "variable_title_public": [],
+                "variable_description_short": [],
+                "variable_description_from_producer": [],
+                "variable_description_key": [],
+                "variable_description_processing": [],
+            }
+            configs_by_slug[slug] = config_view
+            views.append(config_view)
+
     if slug_list:
         slugs_str = ", ".join(slug_list)
         rprint(f"[cyan]Filtering to slug(s): {slugs_str}[/cyan]")
 
+    config_count = len(configs_by_slug)
+    view_count = len(views) - config_count
     rprint(
-        f"[cyan]Aggregated to {len(views)} unique views ({len(agg_df_explorers)} explorers + {len(agg_df_mdims)} multidims)...[/cyan]\n"
+        f"[cyan]Aggregated to {view_count} unique views + {config_count} collection configs "
+        f"({len(agg_df_explorers)} explorers + {len(agg_df_mdims)} multidims)...[/cyan]\n"
     )
 
     return views
