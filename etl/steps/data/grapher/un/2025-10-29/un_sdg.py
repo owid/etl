@@ -9,7 +9,7 @@ from typing import Any, Dict, cast
 
 import pandas as pd
 import requests
-from owid.catalog import Dataset, License, Origin, Table, VariableMeta
+from owid.catalog import License, Origin, Table, VariableMeta
 from owid.catalog.utils import underscore
 from structlog import getLogger
 

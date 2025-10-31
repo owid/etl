@@ -78,9 +78,7 @@ def test_underscore():
     # Test case from UN SDG data with parentheses and special characters in URLs
     # The input has unicode characters that unidecode converts, potentially leaving parentheses
     assert (
-        underscore(
-            "14.2.1 - EN_SCP_ECSYBA - Implementation (with parens) - Test https://example.com/#hash(test)"
-        )
+        underscore("14.2.1 - EN_SCP_ECSYBA - Implementation (with parens) - Test https://example.com/#hash(test)")
         == "_14_2_1__en_scp_ecsyba__implementation__with_parens__test_https__example_com_hash__test"
     )
     assert (
