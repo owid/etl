@@ -1295,6 +1295,30 @@ def display_issues(
         explorer_slug = issue.get("explorer_slug", "unknown")
         issues_by_explorer[explorer_slug].append(issue)
 
+    # Deduplicate codespell typos within each explorer by (typo, correction) pair
+    # Keep track of how many duplicates were removed
+    for explorer_slug in issues_by_explorer:
+        seen_typos = {}  # Map (typo, correction) -> first issue
+        deduplicated = []
+
+        for issue in issues_by_explorer[explorer_slug]:
+            # Only deduplicate codespell typos (not AI issues)
+            if issue.get("source") == "codespell" and issue.get("issue_type") == "typo":
+                typo_key = (issue.get("typo", ""), issue.get("correction", ""))
+                if typo_key in seen_typos:
+                    # Increment the count on the first occurrence
+                    seen_typos[typo_key]["similar_count"] = seen_typos[typo_key].get("similar_count", 1) + 1
+                else:
+                    # First occurrence of this typo
+                    issue["similar_count"] = 1
+                    seen_typos[typo_key] = issue
+                    deduplicated.append(issue)
+            else:
+                # Keep all non-typo issues
+                deduplicated.append(issue)
+
+        issues_by_explorer[explorer_slug] = deduplicated
+
     # Display summary
     total_unique = len(issues)
     # Calculate total original count from similar_count fields
