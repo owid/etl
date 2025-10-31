@@ -18,15 +18,6 @@ definitions:
 
       The extrapolation assumes that relative income inequality within countries remained constant over time, which is a simplifying assumption necessary for long-run historical estimates.
 
-  poverty_line_3:
-    description_short: The share of population living on less than $3 per day, measured in 2021 prices adjusted for differences in living costs between countries.
-
-  poverty_line_10:
-    description_short: The share of population living on less than $10 per day, measured in 2021 prices adjusted for differences in living costs between countries.
-
-  poverty_line_30:
-    description_short: The share of population living on less than $30 per day, measured in 2021 prices adjusted for differences in living costs between countries.
-
   description_key_common: |-
     - Data is measured in international-$ at 2021 prices to adjust for inflation and differences in the cost of living between countries.
     - Historical estimates (before 1990) are extrapolated backwards using GDP per capita growth rates from the Maddison Project Database.
@@ -49,73 +40,21 @@ dataset:
 tables:
   historical_poverty:
     variables:
-      headcount_ratio_poverty_3_dollars:
-        title: Share in poverty (less than $3/day)
+      headcount_ratio:
+        title: Share below $<<poverty_line>> a day
         unit: "%"
         short_unit: "%"
-        description_short: "{definitions.poverty_line_3}"
-        description_key:
-          - "{definitions.description_key_common}"
-          - "This poverty line of $3 per day represents extreme poverty in lower-middle income countries."
         display:
           numDecimalPlaces: 1
-
-      headcount_poverty_3_dollars:
-        title: Number in poverty (less than $3/day)
+      headcount:
+        title: Number below $<<poverty_line>> a day
         unit: "people"
-        short_unit: ""
-        description_short: "The number of people living on less than $3 per day, measured in 2021 prices adjusted for differences in living costs between countries."
-        description_key:
-          - "{definitions.description_key_common}"
-          - "This poverty line of $3 per day represents extreme poverty in lower-middle income countries."
+        short_unit: "people"
         display:
           numDecimalPlaces: 0
-
-      headcount_ratio_poverty_10_dollars:
-        title: Share in poverty (less than $10/day)
-        unit: "%"
-        short_unit: "%"
-        description_short: "{definitions.poverty_line_10}"
-        description_key:
-          - "{definitions.description_key_common}"
-          - "This poverty line of $10 per day represents poverty in upper-middle income countries."
-        display:
-          numDecimalPlaces: 1
-
-      headcount_poverty_10_dollars:
-        title: Number in poverty (less than $10/day)
+      population:
+        title: Population
         unit: "people"
-        short_unit: ""
-        description_short: "The number of people living on less than $10 per day, measured in 2021 prices adjusted for differences in living costs between countries."
-        description_key:
-          - "{definitions.description_key_common}"
-          - "This poverty line of $10 per day represents poverty in upper-middle income countries."
+        short_unit: "people"
         display:
           numDecimalPlaces: 0
-
-      headcount_ratio_poverty_30_dollars:
-        title: Share in poverty (less than $30/day)
-        unit: "%"
-        short_unit: "%"
-        description_short: "{definitions.poverty_line_30}"
-        description_key:
-          - "{definitions.description_key_common}"
-          - "This poverty line of $30 per day is commonly used to measure poverty in high-income countries."
-        display:
-          numDecimalPlaces: 1
-
-      headcount_poverty_30_dollars:
-        title: Number in poverty (less than $30/day)
-        unit: "people"
-        short_unit: ""
-        description_short: "The number of people living on less than $30 per day, measured in 2021 prices adjusted for differences in living costs between countries."
-        description_key:
-          - "{definitions.description_key_common}"
-          - "This poverty line of $30 per day is commonly used to measure poverty in high-income countries."
-        display:
-          numDecimalPlaces: 0
-
-      extrapolation_method:
-        title: Extrapolation method
-        unit: ""
-        description_short: "The method used to generate the poverty estimate: 'original' for modern data from World Bank (1990+), 'direct' for country-level GDP extrapolation, 'historical_entity' for USSR/Yugoslavia/Czechoslovakia extrapolation, 'regional' for regional GDP extrapolation, or 'regional_aggregate' for regional totals."

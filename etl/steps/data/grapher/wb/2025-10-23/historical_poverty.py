@@ -17,12 +17,6 @@ def run() -> None:
     tb = ds_garden.read("historical_poverty", reset_index=False)
 
     #
-    # Process data.
-    #
-    # Drop extrapolation_method column (diagnostic field, not needed for grapher)
-    tb = tb.drop(columns=["extrapolation_method"])
-
-    #
     # Save outputs.
     #
     # Initialize a new grapher dataset.

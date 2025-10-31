@@ -15,10 +15,10 @@ from typing import Dict, Optional
 
 import owid.catalog.processing as pr
 import pandas as pd
-from owid.catalog import Table
-from ruamel.yaml import YAML
+from owid.catalog import Dataset, Table
 from structlog import get_logger
 
+from etl.data_helpers import geo
 from etl.data_helpers.misc import interpolate_table
 from etl.helpers import PathFinder
 
@@ -81,92 +81,32 @@ def run() -> None:
     #
     ds_thousand_bins = paths.load_dataset("thousand_bins_distribution")
     ds_maddison = paths.load_dataset("maddison_project_database")
+    ds_population = paths.load_dataset("population")
 
     tb_thousand_bins = ds_thousand_bins["thousand_bins_distribution"].reset_index()
     tb_maddison = ds_maddison["maddison_project_database"].reset_index()
 
-    #
     # Prepare GDP data
-    #
     tb_gdp = prepare_gdp_data(tb_maddison)
 
-    #
     # Perform backward extrapolation
-    #
-    tb_extended = extrapolate_backwards(tb_thousand_bins=tb_thousand_bins, tb_gdp=tb_gdp)
+    tb_extended = extrapolate_backwards(tb_thousand_bins=tb_thousand_bins, tb_gdp=tb_gdp, ds_population=ds_population)
 
-    log.info(f"historical_poverty: Extended dataset has {len(tb_extended)} rows")
-    log.info(f"historical_poverty: Extended date range: {tb_extended['year'].min()}-{tb_extended['year'].max()}")
-
-    #
     # Calculate poverty measures
-    #
-    log.info("historical_poverty: Calculating poverty measures")
-    tb_poverty = calculate_poverty_measures(tb_extended)
+    tb = calculate_poverty_measures(tb=tb_extended)
 
-    log.info(f"historical_poverty: Poverty table has {len(tb_poverty)} rows")
+    # # Data quality checks
+    # run_data_quality_checks(tb)
 
-    #
-    # Calculate regional aggregates
-    #
-    log.info("historical_poverty: Calculating regional aggregates")
-    tb_poverty_regional = calculate_regional_poverty(tb_extended, tb_bins)
-
-    log.info(f"historical_poverty: Regional poverty table has {len(tb_poverty_regional)} rows")
-
-    #
-    # Combine country and regional data
-    #
-    log.info("historical_poverty: Combining country and regional data")
-    tb_final = pr.concat([tb_poverty, tb_poverty_regional], ignore_index=True)
-
-    #
-    # Data quality checks
-    #
-    log.info("historical_poverty: Running data quality checks")
-    run_data_quality_checks(tb_final)
-
-    #
-    # Add origins to all poverty indicator columns
-    #
-    log.info("historical_poverty: Adding origins metadata")
-    # Get origins from source tables
-    bins_origins = []
-    for col in tb_bins.columns:
-        if hasattr(tb_bins[col].metadata, "origins") and tb_bins[col].metadata.origins:
-            bins_origins.extend(tb_bins[col].metadata.origins)
-            break  # Just need one column's origins
-
-    maddison_origins = []
-    for col in tb_maddison.columns:
-        if hasattr(tb_maddison[col].metadata, "origins") and tb_maddison[col].metadata.origins:
-            maddison_origins.extend(tb_maddison[col].metadata.origins)
-            break  # Just need one column's origins
-
-    # Combine origins from both source datasets
-    combined_origins = bins_origins + maddison_origins
-
-    # Add origins to all poverty indicator columns
-    for col in tb_final.columns:
-        if col not in ["country", "year", "extrapolation_method"]:
-            tb_final[col].metadata.origins = combined_origins
-
-    #
-    # Format and save
-    #
-    log.info(f"historical_poverty: Final table has {len(tb_final)} rows")
-    log.info(f"historical_poverty: Countries/regions: {tb_final['country'].nunique()}")
-
-    tb_final = tb_final.format(["country", "year"], short_name="historical_poverty")
+    tb = tb.format(["country", "year", "poverty_line"], short_name="historical_poverty")
 
     # Create dataset
     ds_garden = paths.create_dataset(
-        tables=[tb_final], check_variables_metadata=True, default_metadata=ds_bins.metadata
+        tables=[tb], check_variables_metadata=True, default_metadata=ds_thousand_bins.metadata
     )
 
     # Save dataset
     ds_garden.save()
-    log.info("historical_poverty: Execution completed successfully")
 
 
 def prepare_gdp_data(tb_maddison: Table) -> Table:
@@ -232,7 +172,6 @@ def prepare_gdp_data(tb_maddison: Table) -> Table:
 
     # Create tb_gdp_regions table, selecting only regions, which are the countries including (Maddison) and World
     region_entities = pd.Index(list(regions_map.values()) + ["World"]).dropna().unique().tolist()
-    print(region_entities)
     tb_gdp_regions = tb_gdp[tb_gdp["country"].isin(region_entities)].reset_index(drop=True)
 
     # Assert that HISTORICAL_ENTITIES keys and successor states are in tb_gdp
@@ -338,7 +277,7 @@ def prepare_gdp_data(tb_maddison: Table) -> Table:
     return tb_gdp
 
 
-def extrapolate_backwards(tb_thousand_bins: Table, tb_gdp: Table) -> Table:
+def extrapolate_backwards(tb_thousand_bins: Table, tb_gdp: Table, ds_population: Dataset) -> Table:
     """Extrapolate income distributions backwards from 1990 to 1820.
 
     Uses a 3-tier fallback strategy:
@@ -358,249 +297,68 @@ def extrapolate_backwards(tb_thousand_bins: Table, tb_gdp: Table) -> Table:
     Table
         Extended table with historical estimates (1820-present)
     """
-    # Calculate maximum available year per country in tb_thousand_bins
-    max_years = tb_thousand_bins["year"].max()
 
     # Create tb_thousand_bins_to_extrapolate
     tb_thousand_bins_to_extrapolate = tb_thousand_bins[tb_thousand_bins["year"] == LATEST_YEAR].reset_index(drop=True)
 
-    # # Define column year as empty
-    # tb_thousand_bins_to_extrapolate["year"] = pd.NA
+    # Assert that countries coincide in both tables
+    countries_bins = set(tb_thousand_bins_to_extrapolate["country"].unique())
+    countries_gdp = set(tb_gdp["country"].unique())
+    missing_countries = countries_bins - countries_gdp
+    if len(missing_countries) > 0:
+        log.warning(
+            f"extrapolate_backwards: The following countries are in thousand_bins but missing in GDP data: "
+            f"{missing_countries}"
+        )
 
-    # Add all the years between EARLIEST_YEAR and LATEST_YEAR to tb_thousand_bins_to_extrapolate
-    years_to_add = Table({"year": list(range(EARLIEST_YEAR, LATEST_YEAR + 1))})
+    # Filter tb_gdp to only countries present in tb_thousand_bins_to_extrapolate
+    tb_gdp = tb_gdp[tb_gdp["country"].isin(countries_bins)].reset_index(drop=True)
+
+    # For tb_thousand_bins_to_extrapolate, column year, assign a list of years from EARLIEST_YEAR to LATEST_YEAR - 1 and then explode
+    tb_thousand_bins_to_extrapolate = (
+        tb_thousand_bins_to_extrapolate.assign(year=lambda df: [list(range(EARLIEST_YEAR, LATEST_YEAR))] * len(df))
+        .explode("year")
+        .reset_index(drop=True)
+    )
+
+    # Drop pop column
+    tb_thousand_bins_to_extrapolate = tb_thousand_bins_to_extrapolate.drop(columns=["pop"])
+
+    # Merge with tb_gdp to get growth factors
     tb_thousand_bins_to_extrapolate = pr.merge(
         tb_thousand_bins_to_extrapolate,
-        years_to_add,
-        how="cross",
+        tb_gdp[["country", "year", "cumulative_growth_factor"]],
+        on=["country", "year"],
+        how="left",
     )
 
-    # Prepare baseline data (earliest year for each country)
-    baseline_data = get_baseline_data(tb_bins)
-
-    # Create list to store extended data
-    extended_tables = []
-
-    # Keep original data
-    tb_bins_copy = tb_bins.copy()
-    tb_bins_copy["extrapolation_method"] = "original"
-    extended_tables.append(tb_bins_copy)
-
-    # Track statistics for summary logging
-    stats = {"direct": 0, "historical_entity": 0, "regional": 0, "skipped": 0}
-
-    # Process each country
-    for country in countries_bins:
-        # Get baseline year and data for this country
-        baseline_year = baseline_data[country]["year"]
-        baseline_quantiles = baseline_data[country]["data"]
-
-        # Try tier 1: Direct country extrapolation
-        growth_data = get_country_growth_data(tb_gdp, country, baseline_year)
-
-        if growth_data is not None:
-            stats["direct"] += 1
-            tb_extended = apply_backward_extrapolation(
-                country=country,
-                baseline_year=baseline_year,
-                baseline_quantiles=baseline_quantiles,
-                growth_data=growth_data,
-                method="direct",
-            )
-            extended_tables.append(tb_extended)
-            continue
-
-        # Try tier 2: Historical entity
-        historical_entity = find_historical_entity(country, historical_entities)
-        if historical_entity:
-            growth_data = get_country_growth_data(tb_gdp, historical_entity, baseline_year)
-            if growth_data is not None:
-                stats["historical_entity"] += 1
-                tb_extended = apply_backward_extrapolation(
-                    country=country,
-                    baseline_year=baseline_year,
-                    baseline_quantiles=baseline_quantiles,
-                    growth_data=growth_data,
-                    method="historical_entity",
-                )
-                extended_tables.append(tb_extended)
-                continue
-
-        # Try tier 3: Regional growth
-        region = (
-            tb_bins[tb_bins["country"] == country]["region"].iloc[0]
-            if len(tb_bins[tb_bins["country"] == country]) > 0
-            else None
-        )
-        if region:
-            growth_data = get_regional_growth_data(tb_gdp, tb_bins, region, baseline_year)
-            if growth_data is not None:
-                stats["regional"] += 1
-                tb_extended = apply_backward_extrapolation(
-                    country=country,
-                    baseline_year=baseline_year,
-                    baseline_quantiles=baseline_quantiles,
-                    growth_data=growth_data,
-                    method="regional",
-                )
-                extended_tables.append(tb_extended)
-                continue
-
-        stats["skipped"] += 1
-        log.warning(f"extrapolate_backwards: {country} - No growth data available, skipping extrapolation")
-
-    # Log summary statistics
-    log.info(
-        f"extrapolate_backwards: Summary - Direct: {stats['direct']}, "
-        f"Historical entity: {stats['historical_entity']}, "
-        f"Regional: {stats['regional']}, "
-        f"Skipped: {stats['skipped']}"
+    # Divide avg income columns by cumulative_growth_factor to extrapolate backwards
+    tb_thousand_bins_to_extrapolate["avg"] = (
+        tb_thousand_bins_to_extrapolate["avg"] / tb_thousand_bins_to_extrapolate["cumulative_growth_factor"]
     )
 
-    # Combine all extended data
-    tb_final = pr.concat(extended_tables, ignore_index=True)
-
-    return tb_final
-
-
-def get_baseline_data(tb_bins: Table) -> Dict:
-    """Get baseline year and data for each country (earliest available year).
-
-    Parameters
-    ----------
-    tb_bins : Table
-        Thousand bins distribution data
-
-    Returns
-    -------
-    dict
-        Dictionary mapping country to baseline year and data
-    """
-    baseline = {}
-
-    for country in tb_bins["country"].unique():
-        country_data = tb_bins[tb_bins["country"] == country].sort_values("year")
-        baseline_year = country_data["year"].min()
-        baseline_quantiles = country_data[country_data["year"] == baseline_year]
-
-        baseline[country] = {"year": baseline_year, "data": baseline_quantiles}
-
-    return baseline
-
-
-def get_country_growth_data(tb_gdp: Table, country: str, baseline_year: int) -> Optional[Table]:
-    """Get GDP growth data for a specific country.
-
-    Parameters
-    ----------
-    tb_gdp : Table
-        GDP data with growth factors
-    country : str
-        Country name
-    baseline_year : int
-        Baseline year (starting point for backward extrapolation)
-
-    Returns
-    -------
-    Table or None
-        GDP growth data from EARLIEST_YEAR to baseline_year, or None if not available
-    """
-    country_gdp = tb_gdp[tb_gdp["country"] == country].copy()
-
-    if len(country_gdp) == 0:
-        return None
-
-    # Filter to years we need (EARLIEST_YEAR to baseline_year)
-    country_gdp = country_gdp[
-        (country_gdp["year"] >= EARLIEST_YEAR) & (country_gdp["year"] <= baseline_year)
-    ].sort_values("year")
-
-    # Check if we have reasonable coverage
-    if len(country_gdp) < (baseline_year - EARLIEST_YEAR) * 0.3:  # At least 30% coverage
-        return None
-
-    return country_gdp
-
-
-def get_regional_growth_data(tb_gdp: Table, tb_bins: Table, region: str, baseline_year: int) -> Optional[Table]:
-    """Calculate regional aggregate GDP growth.
-
-    Parameters
-    ----------
-    tb_gdp : Table
-        GDP data
-    tb_bins : Table
-        Bins data (for region mapping)
-    region : str
-        Region name
-    baseline_year : int
-        Baseline year
-
-    Returns
-    -------
-    Table or None
-        Regional GDP growth data
-    """
-    # Get countries in this region from bins data
-    countries_in_region = tb_bins[tb_bins["region"] == region]["country"].unique()
-
-    # Get GDP data for these countries
-    regional_gdp = tb_gdp[tb_gdp["country"].isin(countries_in_region)].copy()
-
-    if len(regional_gdp) == 0:
-        return None
-
-    # Calculate regional aggregate GDP per capita
-    # For each year: sum(GDP) / sum(Population)
-    # We need population from Maddison (it's in the dataset)
-    # For simplicity, we'll use weighted average of GDP per capita by population
-
-    # Group by year and calculate weighted average
-    regional_agg = (
-        regional_gdp.groupby("year")
-        .agg(
-            {
-                "gdp_per_capita": "mean"  # Simple average for now
-            }
-        )
-        .reset_index()
+    # Add population data for this table
+    tb_thousand_bins_to_extrapolate = geo.add_population_to_table(
+        tb=tb_thousand_bins_to_extrapolate,
+        ds_population=ds_population,
+        population_col="pop",
+        warn_on_missing_countries=True,
+        interpolate_missing_population=True,
     )
 
-    regional_agg["country"] = region
+    # Divide pop into quantiles (1000 quantiles)
+    tb_thousand_bins_to_extrapolate["pop"] /= 1000
 
-    # Calculate growth factors
-    regional_agg = regional_agg.sort_values("year")
-    regional_agg["growth_factor"] = regional_agg["gdp_per_capita"] / regional_agg["gdp_per_capita"].shift(1)
+    # Drop cumulative_growth_factor column
+    tb_thousand_bins_to_extrapolate = tb_thousand_bins_to_extrapolate.drop(columns=["cumulative_growth_factor"])
 
-    # Filter to years we need
-    regional_agg = regional_agg[(regional_agg["year"] >= EARLIEST_YEAR) & (regional_agg["year"] <= baseline_year)]
+    # Concatenate with original tb_thousand_bins
+    tb_thousand_bins = pr.concat([tb_thousand_bins, tb_thousand_bins_to_extrapolate], ignore_index=True)
 
-    if len(regional_agg) < (baseline_year - EARLIEST_YEAR) * 0.3:
-        return None
+    # Sort values
+    tb_thousand_bins = tb_thousand_bins.sort_values(["country", "year", "quantile"]).reset_index(drop=True)
 
-    return regional_agg
-
-
-def find_historical_entity(country: str, historical_entities: Dict) -> Optional[str]:
-    """Find if a country corresponds to a historical entity.
-
-    Parameters
-    ----------
-    country : str
-        Country name
-    historical_entities : dict
-        Mapping of historical entities
-
-    Returns
-    -------
-    str or None
-        Historical entity name if found, None otherwise
-    """
-    for entity_name, entity_data in historical_entities.items():
-        if country in entity_data.get("successor_states", []):
-            return entity_name
-
-    return None
+    return tb_thousand_bins
 
 
 def apply_backward_extrapolation(
@@ -678,7 +436,7 @@ def apply_backward_extrapolation(
     return Table(extended_rows)
 
 
-def calculate_poverty_measures(tb_extended: Table) -> Table:
+def calculate_poverty_measures(tb: Table) -> Table:
     """Calculate poverty headcount ratios and counts for all poverty lines.
 
     Parameters
@@ -691,169 +449,49 @@ def calculate_poverty_measures(tb_extended: Table) -> Table:
     Table
         Poverty measures by country and year
     """
-    poverty_rows = []
 
-    # Group by country and year
-    for (country, year), group in tb_extended.groupby(["country", "year"]):
-        # Sort by income (avg)
-        group = group.sort_values("avg")
+    # Sort table by year and avg
+    tb = tb.sort_values(["year", "avg"]).reset_index(drop=True)
 
-        # Get total population
-        total_pop = group["pop"].sum()
+    # Calculate the cumulative sum of the population by year
+    tb["cum_pop"] = tb.groupby("year")["pop"].cumsum()
 
-        # Get extrapolation method (should be same for all quantiles in a country-year)
-        method = group["extrapolation_method"].iloc[0]
+    # Calculate the global population as the last value of cum_pop by year
+    tb["global_population"] = tb.groupby("year")["cum_pop"].transform("max")
 
-        # Calculate for each poverty line
-        poverty_measures = {"country": country, "year": year, "extrapolation_method": method}
+    # Calculate the cumulative sum of the population as a percentage of the global population by year
+    tb["percentage_global_pop"] = tb["cum_pop"] / tb["global_population"] * 100
 
-        for poverty_line in POVERTY_LINES:
-            # Find quantile where income exceeds poverty line
-            above_line = group[group["avg"] >= poverty_line]
-
-            if len(above_line) == 0:
-                # Everyone is below poverty line
-                headcount_ratio = 1.0
-                headcount = total_pop
-            else:
-                # Get first quantile above line
-                first_above_quantile = above_line["quantile"].iloc[0]
-
-                # Share in poverty = (quantile_index - 1) / 1000
-                headcount_ratio = (first_above_quantile - 1) / 1000
-                headcount = headcount_ratio * total_pop
-
-                # For more precision, use linear interpolation if we have the previous quantile
-                # Reset index to use positional indexing
-                group_reset = group.reset_index(drop=True)
-                above_line_reset = group_reset[group_reset["avg"] >= poverty_line]
-
-                if len(above_line_reset) > 0:
-                    first_above_pos = above_line_reset.index[0]
-
-                    if first_above_pos > 0:
-                        prev_row = group_reset.iloc[first_above_pos - 1]
-                        curr_row = above_line_reset.iloc[0]
-
-                        # Linear interpolation between the two points
-                        if curr_row["avg"] != prev_row["avg"]:
-                            # Fraction = (poverty_line - prev_income) / (curr_income - prev_income)
-                            fraction = (poverty_line - prev_row["avg"]) / (curr_row["avg"] - prev_row["avg"])
-                            # Adjust headcount ratio
-                            prev_quantile = prev_row["quantile"]
-                            interpolated_quantile = prev_quantile + fraction * (first_above_quantile - prev_quantile)
-                            headcount_ratio = (interpolated_quantile - 1) / 1000
-                            headcount = headcount_ratio * total_pop
-
-            # Store results
-            poverty_measures[f"headcount_ratio_poverty_{poverty_line}_dollars"] = headcount_ratio
-            poverty_measures[f"headcount_poverty_{poverty_line}_dollars"] = headcount
-
-        poverty_rows.append(poverty_measures)
-
-    return Table(poverty_rows)
-
-
-def calculate_regional_poverty(tb_extended: Table, tb_bins: Table) -> Table:
-    """Calculate regional poverty aggregates including World.
-
-    Parameters
-    ----------
-    tb_extended : Table
-        Extended income distribution data
-    tb_bins : Table
-        Original bins data (for region mapping)
-
-    Returns
-    -------
-    Table
-        Regional poverty measures
-    """
-    regional_rows = []
-
-    # Get World Bank regions
-    wb_regions = tb_bins["region"].unique()
-
-    # Process World Bank regions
-    for region in wb_regions:
-        # Get countries in this region
-        countries_in_region = tb_bins[tb_bins["region"] == region]["country"].unique()
-
-        # Filter extended data to these countries
-        regional_data = tb_extended[tb_extended["country"].isin(countries_in_region)]
-
-        if len(regional_data) == 0:
-            continue
-
-        # Group by year
-        for year, year_group in regional_data.groupby("year"):
-            regional_measures = _calculate_poverty_for_pooled_data(year_group, region_name=region, year=year)
-            regional_rows.append(regional_measures)
-
-    # Calculate World aggregate (all countries)
-    log.info("calculate_regional_poverty: Calculating World aggregate")
-    all_countries = tb_bins["country"].unique()
-    world_data = tb_extended[tb_extended["country"].isin(all_countries)]
-
-    if len(world_data) > 0:
-        for year, year_group in world_data.groupby("year"):
-            world_measures = _calculate_poverty_for_pooled_data(year_group, region_name="World", year=year)
-            regional_rows.append(world_measures)
-
-    return Table(regional_rows)
-
-
-def _calculate_poverty_for_pooled_data(year_group: Table, region_name: str, year: int) -> dict:
-    """Calculate poverty measures for pooled country data.
-
-    Parameters
-    ----------
-    year_group : Table
-        Data for all countries in a region for a specific year
-    region_name : str
-        Name of the region or "World"
-    year : int
-        Year for this calculation
-
-    Returns
-    -------
-    dict
-        Dictionary with poverty measures
-    """
-    # Pool all quantiles from all countries
-    # Sort by income
-    pooled = year_group.sort_values("avg")
-
-    # Calculate cumulative population
-    pooled["cumul_pop"] = pooled["pop"].cumsum()
-    total_pop = pooled["pop"].sum()
-
-    # Calculate for each poverty line
-    regional_measures = {"country": region_name, "year": year, "extrapolation_method": "regional_aggregate"}
-
+    # Define empty list to store poverty rows
+    tb_poverty = []
     for poverty_line in POVERTY_LINES:
-        # Find where cumulative population crosses poverty line
-        above_line = pooled[pooled["avg"] >= poverty_line]
+        # Filter rows where avg is less than poverty line
+        tb_poverty_line = tb[tb["avg"] < poverty_line].reset_index(drop=True)
 
-        if len(above_line) == 0:
-            # Everyone is below poverty line
-            headcount = total_pop
-            headcount_ratio = 1.0
-        else:
-            # Population below line is cumulative population just before crossing
-            first_above_idx = above_line.index[0]
-            if first_above_idx == pooled.index[0]:
-                headcount = 0
-            else:
-                prev_idx = pooled.index[pooled.index.get_loc(first_above_idx) - 1]
-                headcount = pooled.loc[prev_idx, "cumul_pop"]
+        # Get the last row for each year (highest quantile below poverty line)
+        tb_poverty_line = tb_poverty_line.groupby("year").tail(1).reset_index(drop=True)
 
-            headcount_ratio = headcount / total_pop if total_pop > 0 else 0
+        # Add poverty_line column
+        tb_poverty_line["poverty_line"] = poverty_line
 
-        regional_measures[f"headcount_ratio_poverty_{poverty_line}_dollars"] = headcount_ratio
-        regional_measures[f"headcount_poverty_{poverty_line}_dollars"] = headcount
+        # Append to tb_poverty
+        tb_poverty.append(tb_poverty_line)
 
-    return regional_measures
+    # Concatenate all poverty lines
+    tb_poverty = pr.concat(tb_poverty, ignore_index=True)
+
+    # Keep relevant columns
+    tb_poverty = tb_poverty[["year", "poverty_line", "global_population", "cum_pop", "percentage_global_pop"]]
+
+    # Rename columns
+    tb_poverty = tb_poverty.rename(
+        columns={"cum_pop": "headcount", "percentage_global_pop": "headcount_ratio", "global_population": "population"}
+    )
+
+    # Add country column
+    tb_poverty["country"] = "World"
+
+    return tb_poverty
 
 
 def run_data_quality_checks(tb: Table) -> None:
