@@ -53,7 +53,7 @@ def run() -> None:
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
     # Set an appropriate index and sort conveniently.
-    tb = tb.format(["country", "year", "region", "quantile"])
+    tb = tb.format(["country", "year", "region", "region_old", "quantile"])
 
     #
     # Save outputs.
@@ -87,6 +87,9 @@ def rename_columns_regions_and_multiply_pop(tb: Table, regions_mapping: dict) ->
 
     # Multiply pop by 1,000,000
     tb["pop"] *= 1e6
+
+    # Drop region_name and regionpcn_name columns
+    tb = tb.drop(columns=["region_name", "regionpcn_name"])
 
     return tb
 
