@@ -1970,7 +1970,16 @@ def save_collection_results(output_file: str, issues: list[dict[str, Any]]) -> N
     if not issues:
         return
 
-    df = pd.DataFrame(issues)
+    # Define expected column order for CSV output
+    expected_columns = ["explorer_slug", "view_id", "issue_type", "field", "context", "explanation"]
+
+    # Filter issues to only include expected columns
+    filtered_issues = []
+    for issue in issues:
+        filtered_issue = {col: issue.get(col, "") for col in expected_columns}
+        filtered_issues.append(filtered_issue)
+
+    df = pd.DataFrame(filtered_issues, columns=expected_columns)
     output_path = Path(output_file)
 
     # Append to existing file or create new one
