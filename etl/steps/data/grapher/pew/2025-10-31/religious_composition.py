@@ -14,13 +14,16 @@ def run() -> None:
     ds_garden = paths.load_dataset("religious_composition")
 
     # Read table from garden dataset.
-    tb = ds_garden.read("religious_composition", reset_index=False)
+    tbs = [
+        ds_garden.read("religious_composition", reset_index=False),
+        ds_garden.read("most_popular_religion", reset_index=False),
+    ]
 
     #
     # Save outputs.
     #
     # Initialize a new grapher dataset.
-    ds_grapher = paths.create_dataset(tables=[tb], default_metadata=ds_garden.metadata)
+    ds_grapher = paths.create_dataset(tables=tbs, default_metadata=ds_garden.metadata)
 
     # Save grapher dataset.
     ds_grapher.save()
