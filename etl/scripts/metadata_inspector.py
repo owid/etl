@@ -1794,6 +1794,50 @@ def display_results(
         rprint(f"  [bold]Total cost: ${total_cost:.4f}[/bold]")
 
 
+def get_completed_collections(output_file: str) -> set[str]:
+    """Read CSV file and return set of collection slugs already processed.
+
+    Args:
+        output_file: Path to CSV file with results
+
+    Returns:
+        Set of explorer slugs that have been completed
+    """
+    output_path = Path(output_file)
+    if not output_path.exists():
+        return set()
+
+    try:
+        df = pd.read_csv(output_path)
+        if "explorer_slug" in df.columns:
+            completed = set(df["explorer_slug"].dropna().unique())
+            return completed
+        return set()
+    except Exception as e:
+        log.warning(f"Failed to read checkpoint from {output_file}: {e}")
+        return set()
+
+
+def save_collection_results(output_file: str, issues: list[dict[str, Any]]) -> None:
+    """Append collection results to CSV file.
+
+    Args:
+        output_file: Path to CSV file
+        issues: List of issues to append
+    """
+    if not issues:
+        return
+
+    df = pd.DataFrame(issues)
+    output_path = Path(output_file)
+
+    # Append to existing file or create new one
+    if output_path.exists():
+        df.to_csv(output_path, mode="a", header=False, index=False)
+    else:
+        df.to_csv(output_path, index=False)
+
+
 @click.command(cls=RichCommand)
 @click.option(
     "--slug",
@@ -1871,16 +1915,77 @@ def run(
     if not views:
         return
 
+    # Auto-resume: filter out completed collections if output file exists
+    completed_collections = set()
+    if output_file and Path(output_file).exists():
+        completed_collections = get_completed_collections(output_file)
+        if completed_collections:
+            original_count = len(views)
+            views = [v for v in views if v["explorerSlug"] not in completed_collections]
+            skipped_count = original_count - len(views)
+            if skipped_count > 0:
+                rprint(
+                    f"[yellow]Resuming from checkpoint: skipping {len(completed_collections)} "
+                    f"already-processed collection(s) ({skipped_count} views)[/yellow]"
+                )
+            if not views:
+                rprint("[green]✓ All collections already processed![/green]")
+                return
+
     # Dry-run: estimate costs and exit
     if dry_run:
         total_input_tokens, total_output_tokens = estimate_check_costs(views, skip_typos, skip_issues, batch_size)
         display_cost_estimate(total_input_tokens, total_output_tokens, skip_issues)
         return
 
-    # Run checks
-    all_issues, total_input_tokens, total_output_tokens = run_checks(views, skip_typos, skip_issues, batch_size)
+    # Group views by collection (explorerSlug) for incremental processing
+    collections = {}
+    for view in views:
+        slug = view["explorerSlug"]
+        if slug not in collections:
+            collections[slug] = []
+        collections[slug].append(view)
 
-    # Group and prune issues
+    # Process collections one by one, saving after each
+    all_issues = []
+    total_input_tokens = 0
+    total_output_tokens = 0
+
+    rprint(f"\n[bold cyan]Processing {len(collections)} collection(s)...[/bold cyan]\n")
+
+    for collection_num, (collection_slug, collection_views) in enumerate(collections.items(), 1):
+        rprint(f"[bold]Collection {collection_num}/{len(collections)}: {collection_slug}[/bold]")
+
+        # Run checks for this collection
+        collection_issues, input_tokens, output_tokens = run_checks(
+            collection_views, skip_typos, skip_issues, batch_size
+        )
+
+        total_input_tokens += input_tokens
+        total_output_tokens += output_tokens
+
+        # Save this collection's results immediately (even if no issues, for checkpoint tracking)
+        if output_file:
+            if collection_issues:
+                save_collection_results(output_file, collection_issues)
+                rprint(f"  [green]✓ Saved {len(collection_issues)} issue(s) to {output_file}[/green]")
+            else:
+                # Save a marker row to track that this collection was processed
+                marker = {
+                    "explorer_slug": collection_slug,
+                    "view_id": None,
+                    "issue_type": "checkpoint",
+                    "field": "completed",
+                    "context": "",
+                    "explanation": "Collection processed with no issues found",
+                }
+                save_collection_results(output_file, [marker])
+                rprint("  [green]✓ Checkpoint saved (no issues found)[/green]")
+
+        all_issues.extend(collection_issues)
+        rprint()
+
+    # Group and prune issues (across all collections)
     if all_issues and not skip_grouping:
         rprint("  [cyan]Grouping similar issues and pruning false positives...[/cyan]")
         grouped_issues, grouping_tokens = group_issues(all_issues, config.ANTHROPIC_API_KEY)
@@ -1889,11 +1994,6 @@ def run(
     else:
         grouped_issues = all_issues
         grouping_tokens = 0
-
-    # Save to CSV if requested
-    if output_file:
-        pd.DataFrame(grouped_issues).to_csv(output_file, index=False)
-        rprint(f"[green]✓ Issues saved to {output_file}[/green]")
 
     # Display results
     display_results(grouped_issues, views, total_input_tokens, total_output_tokens, grouping_tokens)
