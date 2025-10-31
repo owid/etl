@@ -1170,30 +1170,37 @@ def check_issues(
         views_to_check = 0
 
         for view in views:
-            chart_config = json.loads(view["chart_config"]) if view["chart_config"] else {}
-
             # Build field list (same logic as check_view_async)
             fields_to_check = []
 
-            # Add chart fields
-            for field_name in CHART_FIELDS_TO_CHECK:
-                value = chart_config.get(field_name, "")
-                if value and str(value).strip():
-                    fields_to_check.append((field_name, str(value)))
+            # Handle config pseudo-views differently
+            if view.get("is_config_view"):
+                config_text = view.get("config_text", "")
+                if config_text and config_text.strip():
+                    fields_to_check.append(("collection_config", config_text))
+            else:
+                # Regular view handling
+                chart_config = json.loads(view["chart_config"]) if view["chart_config"] else {}
 
-            # Add variable metadata fields
-            for field_name in VARIABLE_FIELDS_TO_CHECK:
-                values = view.get(field_name, [])
-                if isinstance(values, list):
-                    for i, value in enumerate(values):
-                        if value and str(value).strip():
-                            indexed_field_name = f"{field_name}_{i}" if len(values) > 1 else field_name
-                            fields_to_check.append((indexed_field_name, str(value)))
-                elif values and str(values).strip():
-                    fields_to_check.append((field_name, str(values)))
+                # Add chart fields
+                for field_name in CHART_FIELDS_TO_CHECK:
+                    value = chart_config.get(field_name, "")
+                    if value and str(value).strip():
+                        fields_to_check.append((field_name, str(value)))
 
-            # Skip if no substantial content (need at least 2 fields)
-            if len(fields_to_check) < 2:
+                # Add variable metadata fields
+                for field_name in VARIABLE_FIELDS_TO_CHECK:
+                    values = view.get(field_name, [])
+                    if isinstance(values, list):
+                        for i, value in enumerate(values):
+                            if value and str(value).strip():
+                                indexed_field_name = f"{field_name}_{i}" if len(values) > 1 else field_name
+                                fields_to_check.append((indexed_field_name, str(value)))
+                    elif values and str(values).strip():
+                        fields_to_check.append((field_name, str(values)))
+
+            # Skip if no substantial content (need at least 1 non-empty field)
+            if len(fields_to_check) < 1:
                 continue
 
             # Estimate prompt size (includes prompt template + field content)
