@@ -284,14 +284,14 @@ def get_text_context(text: str, typo: str, context_words: int = 10) -> str:
     return context
 
 
-def check_typos(views: list[dict[str, Any]]) -> dict[int, list[dict[str, Any]]]:
+def check_typos(views: list[dict[str, Any]]) -> dict[int | str, list[dict[str, Any]]]:
     """Run codespell on all views at once for performance.
 
     Args:
         views: List of view dictionaries
 
     Returns:
-        Dictionary mapping view_id to list of typo issues
+        Dictionary mapping view_id (int or str for config pseudo-views) to list of typo issues
     """
     codespell_path = get_codespell_path()
     if not codespell_path:
@@ -346,6 +346,27 @@ def check_typos(views: list[dict[str, Any]]) -> dict[int, list[dict[str, Any]]]:
 
                 progress.update(task, advance=1)
 
+        # Add collection configs as additional "pseudo-views" to check
+        # Group views by explorerSlug and process one config per collection
+        rprint("  [cyan]Adding collection configs for spell check...[/cyan]")
+        configs_by_slug = {}
+        for view in views:
+            slug = view.get("explorerSlug")
+            config = view.get("explorer_config")
+            if slug and config and slug not in configs_by_slug:
+                configs_by_slug[slug] = (view, config)
+
+        for slug, (view, config_json) in configs_by_slug.items():
+            # Use a special negative ID to mark config pseudo-views
+            config_view_id = f"config_{slug}"
+            view_files[config_view_id] = []
+
+            # Write config JSON as text
+            if config_json and config_json.strip():
+                file_path = Path(temp_dir) / f"view_{config_view_id}_collection_config.txt"
+                file_path.write_text(config_json)
+                view_files[config_view_id].append(("collection_config", file_path, config_json))
+
         # Run codespell once on the entire directory
         rprint("  [cyan]Running spell checker...[/cyan]")
         ignore_file = BASE_DIR / ".codespell-ignore.txt"
@@ -360,7 +381,7 @@ def check_typos(views: list[dict[str, Any]]) -> dict[int, list[dict[str, Any]]]:
         )
 
         # Parse results and map back to views
-        issues_by_view: dict[int, list[dict[str, Any]]] = {}
+        issues_by_view: dict[int | str, list[dict[str, Any]]] = {}
         result_lines = [line for line in result.stdout.strip().split("\n") if line and "==>" in line]
 
         if result_lines:
@@ -457,39 +478,65 @@ def check_typos(views: list[dict[str, Any]]) -> dict[int, list[dict[str, Any]]]:
                         # Fallback to searching entire text if line number is out of range
                         context = get_text_context(text, typo)
 
-                    # Get view details
-                    view = next((v for v in views if v["id"] == view_id), None)
-                    if not view:
-                        progress.update(task, advance=1)
-                        continue
+                    # Handle config pseudo-views differently from regular views
+                    if isinstance(view_id, str) and view_id.startswith("config_"):
+                        # This is a collection config pseudo-view
+                        explorer_slug = view_id.replace("config_", "")
+                        # Find any view from this explorer to get basic info
+                        sample_view = next((v for v in views if v.get("explorerSlug") == explorer_slug), None)
+                        if not sample_view:
+                            progress.update(task, advance=1)
+                            continue
 
-                    chart_config = json.loads(view["chart_config"]) if view["chart_config"] else {}
-                    dimensions = parse_dimensions(view["dimensions"])
-                    view_title = chart_config.get("title", "")
-                    mdim_published = bool(view.get("mdim_published", True))
-                    mdim_catalog_path = view.get("mdim_catalog_path")
-                    view_url = build_explorer_url(
-                        view["explorerSlug"],
-                        dimensions,
-                        view.get("view_type", "explorer"),
-                        mdim_published,
-                        mdim_catalog_path,
-                    )
+                        view_title = f"Collection Config ({explorer_slug})"
+                        view_url = f"https://ourworldindata.org/explorers/{explorer_slug}"
 
-                    # Create issue
-                    issue = {
-                        "view_id": view_id,
-                        "explorer_slug": view["explorerSlug"],
-                        "view_title": view_title,
-                        "view_url": view_url,
-                        "issue_type": "typo",
-                        "field": field_name,
-                        "context": context,
-                        "typo": typo,
-                        "correction": correction,
-                        "explanation": f"Typo in {field_name}: '{typo}' → '{correction}'",
-                        "source": "codespell",
-                    }
+                        issue = {
+                            "view_id": view_id,
+                            "explorer_slug": explorer_slug,
+                            "view_title": view_title,
+                            "view_url": view_url,
+                            "issue_type": "typo",
+                            "field": field_name,
+                            "context": context,
+                            "typo": typo,
+                            "correction": correction,
+                            "explanation": f"Typo in {field_name}: '{typo}' → '{correction}'",
+                            "source": "codespell",
+                        }
+                    else:
+                        # Regular view
+                        view = next((v for v in views if v["id"] == view_id), None)
+                        if not view:
+                            progress.update(task, advance=1)
+                            continue
+
+                        chart_config = json.loads(view["chart_config"]) if view["chart_config"] else {}
+                        dimensions = parse_dimensions(view["dimensions"])
+                        view_title = chart_config.get("title", "")
+                        mdim_published = bool(view.get("mdim_published", True))
+                        mdim_catalog_path = view.get("mdim_catalog_path")
+                        view_url = build_explorer_url(
+                            view["explorerSlug"],
+                            dimensions,
+                            view.get("view_type", "explorer"),
+                            mdim_published,
+                            mdim_catalog_path,
+                        )
+
+                        issue = {
+                            "view_id": view_id,
+                            "explorer_slug": view["explorerSlug"],
+                            "view_title": view_title,
+                            "view_url": view_url,
+                            "issue_type": "typo",
+                            "field": field_name,
+                            "context": context,
+                            "typo": typo,
+                            "correction": correction,
+                            "explanation": f"Typo in {field_name}: '{typo}' → '{correction}'",
+                            "source": "codespell",
+                        }
 
                     if view_id not in issues_by_view:
                         issues_by_view[view_id] = []
@@ -529,6 +576,7 @@ def fetch_explorer_data(explorer_slugs: list[str] | None = None) -> pd.DataFrame
             ev.dimensions,
             ev.chartConfigId,
             cc.full as chart_config,
+            e.config as explorer_config,
             v.id as variable_id,
             v.name as variable_name,
             v.unit as variable_unit,
@@ -542,6 +590,7 @@ def fetch_explorer_data(explorer_slugs: list[str] | None = None) -> pd.DataFrame
             v.descriptionKey as variable_description_key,
             v.descriptionProcessing as variable_description_processing
         FROM explorer_views ev
+        LEFT JOIN explorers e ON ev.explorerSlug = e.slug
         LEFT JOIN chart_configs cc ON ev.chartConfigId = cc.id
         LEFT JOIN JSON_TABLE(
             cc.full,
@@ -573,7 +622,10 @@ def aggregate_explorer_views(df: pd.DataFrame) -> pd.DataFrame:
     # Group by explorer view and aggregate variable metadata
     # Use dropna=False to preserve rows with NULL explorerSlug (if any)
     agg_df = (
-        df.groupby(["id", "view_type", "explorerSlug", "dimensions", "chartConfigId", "chart_config"], dropna=False)
+        df.groupby(
+            ["id", "view_type", "explorerSlug", "dimensions", "chartConfigId", "chart_config", "explorer_config"],
+            dropna=False,
+        )
         .agg(
             {
                 "variable_id": lambda x: list(x.dropna()),
@@ -621,6 +673,7 @@ def fetch_multidim_data(slug_filters: list[str] | None = None) -> pd.DataFrame:
             md.catalogPath as mdim_catalog_path,
             mx.chartConfigId,
             cc.full as chart_config,
+            md.config as explorer_config,
             v.id as variable_id,
             v.name as variable_name,
             v.unit as variable_unit,
@@ -670,6 +723,7 @@ def aggregate_multidim_views(df: pd.DataFrame) -> pd.DataFrame:
                 "mdim_catalog_path",
                 "chartConfigId",
                 "chart_config",
+                "explorer_config",
             ],
             dropna=False,
         )
