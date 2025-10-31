@@ -296,15 +296,15 @@ steps:
     - data://garden/missing_data/2024-03-26/who_md_suicides
 
   # Attention in Media: The Guardian
-  data://meadow/news/2024-05-08/guardian_mentions:
-    - snapshot://news/2024-05-07/guardian_mentions.csv
-    - snapshot://news/2024-05-07/guardian_mentions_raw.csv
-  data://garden/news/2024-05-08/guardian_mentions:
-    - data://meadow/news/2024-05-08/guardian_mentions
-    - data://garden/demography/2023-03-31/population
+  data://meadow/news/2025-10-29/guardian_mentions:
+    - snapshot://news/2025-10-29/guardian_mentions.csv
+  data://garden/news/2025-10-29/guardian_mentions:
+    - data://meadow/news/2025-10-29/guardian_mentions
+    - data://garden/demography/2024-07-15/population
     - data://garden/regions/2023-01-01/regions
-  data://grapher/news/2024-05-08/guardian_mentions:
-    - data://garden/news/2024-05-08/guardian_mentions
+    - data://garden/wb/2025-07-01/income_groups
+  data://grapher/news/2025-10-29/guardian_mentions:
+    - data://garden/news/2025-10-29/guardian_mentions
 
   # News coverage by GDELT 2
   data://meadow/news/2024-05-23/gdelt_v2:
@@ -686,7 +686,6 @@ steps:
   data://grapher/imf/2025-07-08/trade:
     - data://garden/imf/2025-07-08/trade
 
-
   #
   # Trade Volume Index - "A tale of two globalizations: gains from trade and openness 1800–2010"
   #
@@ -695,7 +694,7 @@ steps:
   data://garden/trade/2025-09-22/historic_trade:
     - data://meadow/trade/2025-09-22/historic_trade
 
-#
+  #
   # Trade Volume Index - WTO Trade Growth
   data://meadow/trade/2025-09-22/wto_trade_growth:
     - snapshot://trade/2025-09-22/wto_trade_growth.xlsx

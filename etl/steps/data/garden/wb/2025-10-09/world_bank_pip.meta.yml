@@ -181,13 +181,28 @@ definitions:
   description_key_ppp: |-
     This data is expressed in constant international dollars to adjust for inflation and differences in living costs between countries. Read more in our article, [What are international dollars?](https://ourworldindata.org/international-dollars)
 
+  description_key_welfare_type_base: |-
+    Depending on the country and year, the data refers either to income (after taxes and benefits) or to consumption, [per capita](#dod:per-capita). For most countries, we have only one option available. But when there is a mix of consumption and income data points, we process the data to keep one observation per country and year.
+
+  description_key_welfare_type_poverty_explorer: |-
+    Our [Poverty Data Explorer](https://ourworldindata.org/explorers/poverty-explorer?Indicator=Share+in+poverty&Poverty+line=%243+per+day%3A+International+Poverty+Line&Household+survey+data+type=Show+data+from+both+income+and+consumption+surveys&Show+breaks+between+less+comparable+surveys=true&country=ROU~CHN~BLR~PER) shows the original data with *all* available income and consumption measures separately.
+
+  description_key_welfare_type_poverty: |-
+    <% if welfare_type == "income" %>
+    The data relates to income measured after taxes and benefits [per capita](#dod:per-capita).
+    <%- elif welfare_type == "consumption" %>
+    The data relates to consumption [per capita](#dod:per-capita).
+    <%- else %>
+    {definitions.description_key_welfare_type_base} {definitions.description_key_welfare_type_poverty_explorer}
+    <%- endif %>
+
   description_key_welfare_type: |-
     <% if welfare_type == "income" %>
     The data relates to income measured after taxes and benefits [per capita](#dod:per-capita).
     <%- elif welfare_type == "consumption" %>
     The data relates to consumption [per capita](#dod:per-capita).
     <%- else %>
-    Depending on the country and year, the data refers either to income (after taxes and benefits) or to consumption, [per capita](#dod:per-capita). For most countries, we have only one option available. But when there is a mix of consumption and income data points, we process the data to keep one observation per country and year. Our [Poverty Data Explorer](https://ourworldindata.org/explorers/poverty-explorer?Indicator=Share+in+poverty&Poverty+line=%243+per+day%3A+International+Poverty+Line&Household+survey+data+type=Show+data+from+both+income+and+consumption+surveys&Show+breaks+between+less+comparable+surveys=true&country=ROU~CHN~BLR~PER) shows the original data with *all* available income and consumption measures separately.
+    {definitions.description_key_welfare_type_base}
     <%- endif %>
 
   description_key_not_market_income: Many people, today and in the past, have no monetary income. This data accounts for this by including the estimated value of non-market income, such as food grown by subsistence farmers for their own use.
@@ -215,13 +230,26 @@ definitions:
     1.30
     <%- endif %>
 
-  description_processing_main: |-
-    <% if survey_comparability != "No spells" or welfare_type == "income or consumption" %>
+  description_processing_main_base: |-
     For most countries in the dataset, estimates relate to disposable income or consumption, for all available years. Several countries, however, have a mix of income and consumption data points, with both data types sometimes available for particular years.
 
     In most of our charts, we present the data with some data points dropped to present a single series for each country. This allows us to make readable visualizations that combine multiple countries. In choosing which data points to keep, we strike a balance between maintaining comparability over time and showing as long a time series as possible. As such, the exact approach varies across countries.
 
-    The original data with *all* available income and consumption measures is shown separately in our [Poverty Data Explorer.](https://ourworldindata.org/explorers/poverty-explorer?Indicator=Share+in+poverty&Poverty+line=%243+per+day%3A+International+Poverty+Line&Household+survey+data+type=Show+data+from+both+income+and+consumption+surveys&Show+breaks+between+less+comparable+surveys=true&country=ROU~CHN~BLR~PER)
+  description_processing_main_poverty_explorer: |-
+    The original data with *all* available income and consumption measures is shown separately in our [Poverty Data Explorer](https://ourworldindata.org/explorers/poverty-explorer?Indicator=Share+in+poverty&Poverty+line=%243+per+day%3A+International+Poverty+Line&Household+survey+data+type=Show+data+from+both+income+and+consumption+surveys&Show+breaks+between+less+comparable+surveys=true&country=ROU~CHN~BLR~PER).
+
+  description_processing_main_poverty: |-
+    <% if survey_comparability != "No spells" or welfare_type == "income or consumption" %>
+    {definitions.description_processing_main_base}
+
+    {definitions.description_processing_main_poverty_explorer}
+    <%- elif welfare_type in ["income", "consumption"] %>
+    To construct a global dataset, the World Bank combines estimates based on income data and estimates based on consumption data. Here we only include the estimates based on <<welfare_type>> data.
+    <%- endif %>
+
+  description_processing_main: |-
+    <% if survey_comparability != "No spells" or welfare_type == "income or consumption" %>
+    {definitions.description_processing_main_base}
     <%- elif welfare_type in ["income", "consumption"] %>
     To construct a global dataset, the World Bank combines estimates based on income data and estimates based on consumption data. Here we only include the estimates based on <<welfare_type>> data.
     <%- endif %>
@@ -696,10 +724,10 @@ tables:
           - "{definitions.description_key_ppp}"
           - "{definitions.description_key_not_market_income}"
           - "{definitions.description_key_nowcasts}"
-          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_welfare_type_poverty}"
         description_processing: |-
           {definitions.description_processing_relative_poverty}
-          {definitions.description_processing_main}
+          {definitions.description_processing_main_poverty}
         description_from_producer: |-
           % of population living in households with consumption or income per person below the poverty line at <<ppp_version>> international prices. As a result of revisions in PPP exchange rates, poverty rates for individual countries cannot be compared with poverty rates reported in earlier editions.
         display:
@@ -744,10 +772,10 @@ tables:
           - "{definitions.description_key_ppp}"
           - "{definitions.description_key_not_market_income}"
           - "{definitions.description_key_nowcasts}"
-          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_welfare_type_poverty}"
         description_processing: |-
           {definitions.description_processing_relative_poverty}
-          {definitions.description_processing_main}
+          {definitions.description_processing_main_poverty}
         description_from_producer: |-
           Number of people living on less than a day at <<ppp_version>> PPP is calculated by multiplying the poverty rate and the population. As a result of revisions in PPP exchange rates, poverty rates for individual countries cannot be compared with poverty rates reported in earlier editions.
         display:
@@ -766,10 +794,10 @@ tables:
           - "{definitions.description_key_ppp}"
           - "{definitions.description_key_not_market_income}"
           - "{definitions.description_key_nowcasts}"
-          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_welfare_type_poverty}"
         description_processing: |-
           {definitions.description_processing_relative_poverty}
-          {definitions.description_processing_main}
+          {definitions.description_processing_main_poverty}
         display:
           name: Share of population in poverty (between {definitions.poverty_line_a_day})
           numDecimalPlaces: 1
@@ -791,10 +819,10 @@ tables:
           - "{definitions.description_key_ppp}"
           - "{definitions.description_key_not_market_income}"
           - "{definitions.description_key_nowcasts}"
-          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_welfare_type_poverty}"
         description_processing: |-
           {definitions.description_processing_relative_poverty}
-          {definitions.description_processing_main}
+          {definitions.description_processing_main_poverty}
         display:
           name: |-
             <% if survey_comparability == "No spells" %>
@@ -839,10 +867,10 @@ tables:
           - "{definitions.description_key_ppp}"
           - "{definitions.description_key_not_market_income}"
           - "{definitions.description_key_nowcasts}"
-          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_welfare_type_poverty}"
         description_processing: |-
           {definitions.description_processing_relative_poverty}
-          {definitions.description_processing_main}
+          {definitions.description_processing_main_poverty}
         display:
           name: Number of people not in poverty (above {definitions.poverty_line_a_day})
           numDecimalPlaces: 0
@@ -861,10 +889,10 @@ tables:
           - "{definitions.description_key_ppp}"
           - "{definitions.description_key_not_market_income}"
           - "{definitions.description_key_nowcasts}"
-          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_welfare_type_poverty}"
         description_processing: |-
           {definitions.description_processing_relative_poverty}
-          {definitions.description_processing_main}
+          {definitions.description_processing_main_poverty}
         display:
           name: Number of people in poverty (between {definitions.poverty_line_a_day})
           numDecimalPlaces: 0
@@ -1535,10 +1563,10 @@ tables:
           <%- endif %>
         description_key:
           - "{definitions.description_key_ppp}"
-          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_welfare_type_poverty}"
           - "{definitions.description_key_not_market_income}"
         description_processing: |-
-          {definitions.description_processing_main}
+          {definitions.description_processing_main_poverty}
         description_from_producer: |-
           The mean is the average monthly household per capita income or consumption expenditure from the survey in <<ppp_version>> PPP.
         display:
@@ -1584,10 +1612,10 @@ tables:
           <%- endif %>
         description_key:
           - "{definitions.description_key_ppp}"
-          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_welfare_type_poverty}"
           - "{definitions.description_key_not_market_income}"
         description_processing: |-
-          {definitions.description_processing_main}
+          {definitions.description_processing_main_poverty}
         description_from_producer: |-
           The median of monthly household per capita income or consumption expenditure from the survey in <<ppp_version>> PPP.
         display:
