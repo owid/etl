@@ -311,6 +311,7 @@ def extract_human_readable_text(config_json: str) -> str:
                 # Extract common human-readable field names
                 if key in [
                     "title",
+                    "title_variant",  # Multidim title variant
                     "subtitle",
                     "note",
                     "description",
@@ -321,8 +322,9 @@ def extract_human_readable_text(config_json: str) -> str:
                     "group",  # Choice groups
                     "explorerTitle",
                     "explorerSubtitle",
-                    "relatedQuestionText",  # From schema line 256
+                    "relatedQuestionText",  # Explorer schema
                     "sourceName",  # Display metadata
+                    "sourceDesc",  # Source description (grapher config)
                     "additionalInfo",  # Display metadata
                     "dataPublishedBy",  # Display metadata
                 ]:
@@ -1094,9 +1096,20 @@ Response:"""
             issue["view_title"] = view_title
             issue["source"] = "ai"  # Mark as AI-detected
 
-            # Build URL (configs get explorer URL, regular views get specific view URL)
+            # Build URL (configs get collection base URL, regular views get specific view URL)
             if view.get("is_config_view"):
-                issue["view_url"] = f"https://ourworldindata.org/explorers/{view['explorerSlug']}"
+                # For config pseudo-views, build base URL without dimension parameters
+                view_type = view.get("view_type", "explorer")
+                mdim_published = bool(view.get("mdim_published", True))
+                mdim_catalog_path = view.get("mdim_catalog_path")
+
+                issue["view_url"] = build_explorer_url(
+                    view["explorerSlug"],
+                    {},  # No dimensions for config view
+                    view_type,
+                    mdim_published,
+                    mdim_catalog_path,
+                )
             else:
                 dimensions = parse_dimensions(view.get("dimensions"))
                 mdim_published = bool(view.get("mdim_published", True))
@@ -1640,6 +1653,9 @@ def load_views(slug_list: list[str] | None, limit: int | None) -> list[dict[str,
                 "explorerSlug": slug,
                 "config_text": extract_human_readable_text(config),
                 "is_config_view": True,
+                # Copy multidim-specific fields for URL building
+                "mdim_published": view.get("mdim_published", True),
+                "mdim_catalog_path": view.get("mdim_catalog_path"),
                 # Add empty lists for expected fields
                 "variable_name": [],
                 "variable_description": [],
