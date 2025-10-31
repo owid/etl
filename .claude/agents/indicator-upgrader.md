@@ -59,13 +59,7 @@ Resolution rules
 Run the CLI command to automatically create perfect matches between old and new dataset variables.
 
 ```bash
-etl indicator-upgrade match --old-dataset-id [OLD_DATASET_ID] --new-dataset-id [NEW_DATASET_ID] --dry-run
-```
-
-Review the output and then run without --dry-run to apply the matches:
-
-```bash
-etl indicator-upgrade match --old-dataset-id [OLD_DATASET_ID] --new-dataset-id [NEW_DATASET_ID]
+etl indicator-upgrade match --old-dataset-id [OLD_DATASET_ID] --new-dataset-id [NEW_DATASET_ID] --perfect-match-only
 ```
 
 ## Step 3 - Check for remaining unmapped variables
