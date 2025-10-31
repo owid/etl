@@ -645,7 +645,7 @@ def fetch_explorer_data(explorer_slugs: list[str] | None = None) -> pd.DataFrame
 
     log.info("Fetching explorer data from database...")
     df = read_sql(query)
-    log.info(f"Fetched {len(df)} explorer view records")
+    log.info(f"Fetched {len(df)} explorer view records (views x variables, which will be aggregated)")
 
     # Fetch explorer configs separately (much more efficient)
     config_where = ""
