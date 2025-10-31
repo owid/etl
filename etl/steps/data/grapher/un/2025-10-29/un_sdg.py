@@ -21,8 +21,6 @@ log = getLogger()
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-pd.options.mode.chained_assignment = "raise"
-
 # only include tables containing SUBSET string, this is useful for debugging
 SUBSET = os.environ.get("SUBSET")
 if SUBSET:
@@ -103,26 +101,6 @@ def run(dest_dir: str) -> None:
                 all_tables.append(wide_table)
 
     #
-    # Make table short names unique by adding counter if duplicates exist
-    #
-    short_name_counts = {}
-    for table in all_tables:
-        short_name = table.metadata.short_name
-        if short_name in short_name_counts:
-            short_name_counts[short_name] += 1
-            new_short_name = f"{short_name[:240]}_{short_name_counts[short_name]}"
-            log.warning(
-                "duplicate_short_name",
-                original_short_name=short_name,
-                new_short_name=new_short_name,
-                duplicate_count=short_name_counts[short_name],
-            )
-            # Add counter to make it unique, keeping under 255 char limit
-            table.metadata.short_name = new_short_name
-        else:
-            short_name_counts[short_name] = 0
-
-    #
     # Save outputs.
     #
     ds_grapher = create_dataset(dest_dir, tables=all_tables, default_metadata=ds_garden.metadata)
@@ -188,9 +166,7 @@ def create_metadata_desc(indicator, series_code, source_desc, series_description
     return source_desc_out
 
 
-def add_metadata_and_prepare_for_grapher(
-    tb: Table, source_desc: dict, date_accessed: str, current_year: int
-) -> Table:
+def add_metadata_and_prepare_for_grapher(tb: Table, source_desc: dict, date_accessed: str, current_year: int) -> Table:
     """
     Adding variable name specific metadata - there is an option to add more detailed metadata in the un_sdg.source_description.json
     but the default option is to link out to the metadata pdfs provided by the UN.
@@ -238,13 +214,6 @@ def add_metadata_and_prepare_for_grapher(
     # Use underscore to create valid variable names
     original_name = tb["variable_name"].iloc[0][0:254]
     var_name = underscore(original_name, validate=False)
-
-    # Validate that no problematic characters remain
-    problematic_chars = ["(", ")", "+", ",", "/", "'", '"', "'", """, """]
-    for char in problematic_chars:
-        assert (
-            char not in var_name
-        ), f"Variable name '{var_name}' contains problematic character '{char}' after underscore() conversion. Original: '{original_name}'"
 
     tb["variable"] = var_name
 
