@@ -15,8 +15,7 @@ meta:
 
       A worksheet of unrounded counts is also provided, which should be used with caution. For example, these figures may be appropriate for regression analyses.
 
-
-    date_published: "2025"
+    date_published: "2025-06-09"
 
     # Citation
     producer: Pew Research Center
@@ -25,7 +24,7 @@ meta:
 
     # Files
     url_main: https://www.pewresearch.org/dataset/dataset-of-global-religious-composition-estimates-for-2010-and-2020/
-    date_accessed: '2025-10-31'
+    date_accessed: "2025-10-31"
 
     # License
     license:
