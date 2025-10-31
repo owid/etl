@@ -45,9 +45,14 @@ console = Console()
 # Testing showed Haiku finds same semantic issues as Sonnet with minimal quality difference,
 # making it the best choice for large-scale analysis.
 
+# Model for individual issue detection (used many times - cost matters)
 CLAUDE_MODEL = "claude-3-5-haiku-20241022"  # Fast: $1/M in, $5/M out (RECOMMENDED)
 # CLAUDE_MODEL = "claude-3-7-sonnet-20250219"  # Balanced: $3/M in, $15/M out
 # CLAUDE_MODEL = "claude-opus-4-20250514"  # Quality: $15/M in, $75/M out
+
+# Model for grouping/pruning (used once per collection - quality matters more than cost)
+GROUPING_MODEL = "claude-3-7-sonnet-20250219"  # Better reasoning for filtering false positives
+# GROUPING_MODEL = "claude-opus-4-20250514"  # Best quality if budget allows
 
 # Batch size configuration
 # Number of views to check per API call. Larger batches are faster and cheaper,
@@ -1533,7 +1538,7 @@ IMPORTANT: Write out array values explicitly [0, 1, 2, 3], NOT Python code like 
         client = anthropic.Anthropic(api_key=api_key)
         response = call_claude(
             client=client,
-            model=CLAUDE_MODEL,
+            model=GROUPING_MODEL,  # Use higher-quality model for grouping/pruning
             max_tokens=3072,
             prompt=prompt,
         )
@@ -2074,13 +2079,34 @@ def display_results(
     display_issues(grouped_issues, all_explorers_analyzed, mdim_slugs)
 
     # Display API usage and cost
-    if total_input_tokens > 0 or total_output_tokens > 0:
-        total_cost = calculate_cost(total_input_tokens, total_output_tokens)
-        rprint("\n[bold cyan]API Usage:[/bold cyan]")
-        rprint(f"  Input tokens:  {total_input_tokens:,}")
-        rprint(f"  Output tokens: {total_output_tokens:,}")
+    if total_input_tokens > 0 or total_output_tokens > 0 or grouping_tokens > 0:
+        # Calculate cost for issue detection (uses CLAUDE_MODEL)
+        detection_cost = calculate_cost(total_input_tokens, total_output_tokens)
+
+        # Calculate cost for grouping/pruning (uses GROUPING_MODEL)
+        grouping_cost = 0.0
         if grouping_tokens > 0:
-            rprint(f"  [dim](Includes {grouping_tokens} tokens for grouping and pruning)[/dim]")
+            # Assume roughly 50/50 split between input and output tokens
+            grouping_input = grouping_tokens // 2
+            grouping_output = grouping_tokens - grouping_input
+            grouping_pricing = MODEL_PRICING.get(GROUPING_MODEL, MODEL_PRICING[CLAUDE_MODEL])
+            grouping_cost = (grouping_input / 1_000_000) * grouping_pricing["input"] + (
+                grouping_output / 1_000_000
+            ) * grouping_pricing["output"]
+
+        total_cost = detection_cost + grouping_cost
+
+        rprint("\n[bold cyan]API Usage:[/bold cyan]")
+        rprint(f"  Detection ({CLAUDE_MODEL}):")
+        rprint(f"    Input tokens:  {total_input_tokens:,}")
+        rprint(f"    Output tokens: {total_output_tokens:,}")
+        rprint(f"    Cost: ${detection_cost:.4f}")
+
+        if grouping_tokens > 0:
+            rprint(f"  Grouping ({GROUPING_MODEL}):")
+            rprint(f"    Total tokens: {grouping_tokens:,}")
+            rprint(f"    Cost: ${grouping_cost:.4f}")
+
         rprint(f"  [bold]Total cost: ${total_cost:.4f}[/bold]")
 
 
@@ -2315,16 +2341,15 @@ def run(
         rprint()
 
     # Group and prune issues (across all collections)
+    grouping_tokens = 0
     if all_issues and not skip_grouping:
         rprint("  [cyan]Grouping similar issues and pruning false positives...[/cyan]")
         grouped_issues, grouping_tokens = group_issues(all_issues, config.ANTHROPIC_API_KEY)
-        total_input_tokens += grouping_tokens // 2
-        total_output_tokens += grouping_tokens // 2
+        # Note: grouping tokens are tracked separately since they use a different model
     else:
         grouped_issues = all_issues
-        grouping_tokens = 0
 
-    # Display results
+    # Display results (grouping tokens tracked separately for cost calculation)
     display_results(grouped_issues, views, total_input_tokens, total_output_tokens, grouping_tokens)
 
 
