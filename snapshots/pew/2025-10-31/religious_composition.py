@@ -1,4 +1,10 @@
-"""Script to create a snapshot of dataset."""
+"""Script to create a snapshot of dataset.
+
+Instructions to download data:
+- Register an account in Pew Research: https://www.pewresearch.org/.
+- Go to https://www.pewresearch.org/dataset/dataset-of-global-religious-composition-estimates-for-2010-and-2020/
+- Click on the left button "Download dataset"
+"""
 
 from etl.helpers import PathFinder
 
