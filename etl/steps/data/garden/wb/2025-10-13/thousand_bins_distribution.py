@@ -88,8 +88,8 @@ def rename_columns_regions_and_multiply_pop(tb: Table, regions_mapping: dict) ->
     # Multiply pop by 1,000,000
     tb["pop"] *= 1e6
 
-    # Drop region_name and regionpcn_name columns
-    tb = tb.drop(columns=["region_name", "regionpcn_name"])
+    # Drop region_name and regionpcn_name columns. Also drop pipvintage column as it is not needed
+    tb = tb.drop(columns=["region_name", "regionpcn_name", "pipvintage"])
 
     return tb
 
