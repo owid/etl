@@ -1012,8 +1012,8 @@ async def check_view_async(
             elif values and str(values).strip():
                 fields_to_check.append((field_name, str(values)))
 
-    # Skip if no substantial content (need at least 2 fields for meaningful semantic checking)
-    if len(fields_to_check) < 2:
+    # Skip if no substantial content (need at least 1 non-empty field)
+    if len(fields_to_check) < 1:
         return [], 0, 0
 
     # Build prompt text
