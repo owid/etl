@@ -161,7 +161,9 @@ def main(upload: bool) -> None:
                             "value": str(round(avg_value, 3)),
                         }
                     )
-                    log.info(f"Calculated annual average for {series_id} in {year} from semi-annual data: {avg_value:.3f}")
+                    log.info(
+                        f"Calculated annual average for {series_id} in {year} from semi-annual data: {avg_value:.3f}"
+                    )
 
     # Convert to DataFrame and save
     df = pd.DataFrame(flattened)
