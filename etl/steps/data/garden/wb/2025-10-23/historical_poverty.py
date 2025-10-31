@@ -330,27 +330,7 @@ def prepare_gdp_data(tb_maddison: Table) -> Table:
     return tb_gdp
 
 
-def load_historical_entities() -> Dict:
-    """Load historical entities mapping from YAML file.
-
-    Returns
-    -------
-    dict
-        Mapping of historical entities to their successor states
-    """
-    if not HISTORICAL_ENTITIES_FILE.exists():
-        log.warning(f"Historical entities file not found: {HISTORICAL_ENTITIES_FILE}")
-        return {}
-
-    yaml = YAML(typ="safe")
-    with open(HISTORICAL_ENTITIES_FILE, "r") as f:
-        entities = yaml.load(f)
-
-    log.info(f"load_historical_entities: Loaded {len(entities.get('historical_entities', {}))} historical entities")
-    return entities.get("historical_entities", {})
-
-
-def extrapolate_backwards(tb_bins: Table, tb_gdp: Table, historical_entities: Dict) -> Table:
+def extrapolate_backwards(tb_bins: Table, tb_gdp: Table) -> Table:
     """Extrapolate income distributions backwards from 1990 to 1820.
 
     Uses a 3-tier fallback strategy:
@@ -364,8 +344,6 @@ def extrapolate_backwards(tb_bins: Table, tb_gdp: Table, historical_entities: Di
         Thousand bins distribution data (1990+)
     tb_gdp : Table
         Prepared GDP data with growth factors
-    historical_entities : dict
-        Mapping of historical entities to successor states
 
     Returns
     -------
