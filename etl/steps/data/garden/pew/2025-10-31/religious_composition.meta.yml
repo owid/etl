@@ -1,0 +1,96 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Uncategorized
+  others:
+    methodology: |-
+      Estimates are based on more than 2,700 censuses and surveys. You can read complete methodology in [Pew's report](https://www.pewresearch.org/religion/2025/06/09/how-the-global-religious-landscape-changed-from-2010-to-2020/).
+    other_religions: |-
+      of people of all ages affiliated to other religions. Other religions include Baha’is, Daoists (also spelled Taoists), Jains, Shintoists, Sikhs, Wiccans, Zoroastrians and many small groups, some of which can be described as folk or traditional religions.
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+tables:
+  religious_composition:
+    variables:
+      share:
+        title: Share of population
+        unit: percentage
+        short_unit: "%"
+        description_short: |-
+          <% if religion == "religiously_unaffiliated" -%>
+          Estimates of the percentage of people of all ages that are religiously unaffiliated.
+          <% elif religion == "other_religions" -%>
+          Estimates of the percentage  {definitions.others.other_religions}
+          <% else -%>
+          Estimates of the percentage of people that are << religion >>.
+          <% endif -%>
+        description_key:
+          - "{definitions.others.methodology}"
+      count:
+        title: Population
+        unit: people
+        description_short: |-
+          <% if religion == "religiously_unaffiliated" -%>
+          Estimates of the number of people of all ages that are religiously unaffiliated.
+          <% elif religion == "other_religions" -%>
+          Estimates of the number {definitions.others.other_religions}
+          <% else -%>
+          Estimates of the number of people that are << religion >>.
+          <% endif -%>
+        description_key:
+          - "{definitions.others.methodology}"
+          - In most countries, it is not possible to precisely count the number of people who identify with each religion. Because our estimates are not precise, the tables in this report and accompanying data files show rounded population counts (often to the nearest 10,000) and show counts below 10,000 as “<10,000.”
+
+      count_unrounded:
+        title: Population (unrounded)
+        unit: people
+        description_short: |-
+          {tables.religious_composition.variables.count.description_short}
+           These estimates are unrounded counts, which should be used with caution.
+        description_key:
+          - "{definitions.others.methodology}"
+
+      # testing_variable:
+      #   title: Testing variable title
+      #   unit: arbitrary units
+      #   short_unit: au
+      #   description_short: Short description of testing variable.
+      #   description_key: List of key points about the indicator.
+      #   processing_level: minor
+      #   description_processing: Description of processing of testing variable.
+      #   description_from_producer: Description of testing variable from producer.
+      #   type:
+      #   sort:
+      #   presentation:
+      #     attribution:
+      #     attribution_short:
+      #     faqs:
+      #     grapher_config:
+      #     title_public:
+      #     title_variant:
+      #     topic_tags:
+      #   display:
+      #     name: Testing variable
+      #     numDecimalPlaces: 0
+      #     tolerance: 0
+      #     color:
+      #     conversionFactor: 1
+      #     description:
+      #     entityAnnotationsMap: Test annotation
+      #     includeInTable:
+      #     isProjection: false
+      #     unit: arbitrary units
+      #     shortUnit: au
+      #     tableDisplay:
+      #       hideAbsoluteChange:
+      #       hideRelativeChange:
+      #     yearIsDay: false
+      #     zeroDay:
+      #     roundingMode:
+      #     numSignificantFigures:
+      #
