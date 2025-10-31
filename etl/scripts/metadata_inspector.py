@@ -601,12 +601,18 @@ def check_typos(views: list[dict[str, Any]]) -> dict[int | str, list[dict[str, A
                             continue
 
                         chart_config = parse_chart_config(view.get("chart_config"))
-                        dimensions = parse_dimensions(view["dimensions"])
+
+                        # For chart views, dimensions come from chart_config, not from view directly
+                        if view.get("view_type") == "chart":
+                            dimensions = {}
+                        else:
+                            dimensions = parse_dimensions(view.get("dimensions"))
+
                         view_title = chart_config.get("title", "")
                         mdim_published = bool(view.get("mdim_published", True))
                         mdim_catalog_path = view.get("mdim_catalog_path")
                         view_url = build_explorer_url(
-                            view["explorerSlug"],
+                            view.get("explorerSlug", view.get("slug", "")),
                             dimensions,
                             view.get("view_type", "explorer"),
                             mdim_published,
@@ -615,7 +621,7 @@ def check_typos(views: list[dict[str, Any]]) -> dict[int | str, list[dict[str, A
 
                         issue = {
                             "view_id": view_id,
-                            "explorer_slug": view["explorerSlug"],
+                            "explorer_slug": view.get("explorerSlug", view.get("slug", "")),
                             "view_title": view_title,
                             "view_url": view_url,
                             "issue_type": "typo",
@@ -1291,7 +1297,7 @@ Here is the metadata to check:"""
                 mdim_catalog_path = view.get("mdim_catalog_path")
 
                 issue["view_url"] = build_explorer_url(
-                    view["explorerSlug"],
+                    view.get("explorerSlug", ""),
                     {},  # No dimensions for config view
                     view_type,
                     mdim_published,
@@ -1304,7 +1310,7 @@ Here is the metadata to check:"""
                 mdim_catalog_path = view.get("mdim_catalog_path")
 
                 issue["view_url"] = build_explorer_url(
-                    view["explorerSlug"],
+                    view.get("explorerSlug", ""),
                     dimensions,
                     view.get("view_type", "explorer"),
                     mdim_published,
