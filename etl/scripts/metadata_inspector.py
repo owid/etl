@@ -1019,9 +1019,9 @@ async def check_view_async(
     # Build prompt text
     fields_text = "\n".join([f"{name.replace('_', ' ').title()}: {value}" for name, value in fields_to_check])
 
-    prompt = f"""You are checking metadata for an Our World in Data chart. Find ONLY mistakes that would damage OWID's reputation:
-
-{fields_text}
+    # Split prompt into cacheable (instructions) and variable (data) parts
+    # The instructions are cached across all requests, saving ~62% on costs
+    instructions = """You are checking metadata for an Our World in Data chart. Find ONLY mistakes that would damage OWID's reputation.
 
 Report ONLY critical errors:
 1. **Spelling errors** (e.g., "recieve" → "receive", "governemnt" → "government")
@@ -1033,18 +1033,33 @@ DO NOT report:
 - Issues that say "everything looks fine" - if there are NO errors, return []
 
 Return ONLY JSON array with format: issue_type (either "typo" or "semantic") field (where the issue occurs), context (phrase containing the issue), and explanation (why that's an issue):
-[{{"issue_type": "typo", "typo": "recieve", "correction": "receive", "field": "title", "context": "People recieve money"}}]
-[{{"issue_type": "semantic", "field": "title", "context": "CO2 emissions", "explanation": "Title is about CO2 emissions but descriptions are about vaccines"}}]
+[{"issue_type": "typo", "typo": "recieve", "correction": "receive", "field": "title", "context": "People recieve money"}]
+[{"issue_type": "semantic", "field": "title", "context": "CO2 emissions", "explanation": "Title is about CO2 emissions but descriptions are about vaccines"}]
 []
 
-Response:"""
+Here is the metadata to check:"""
 
     raw_text = ""  # Initialize for type checker
     try:
         response = await client.messages.create(
             model=CLAUDE_MODEL,
             max_tokens=1024,
-            messages=[{"role": "user", "content": prompt}],
+            messages=[
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": instructions,
+                            "cache_control": {"type": "ephemeral"},
+                        },
+                        {
+                            "type": "text",
+                            "text": fields_text,
+                        },
+                    ],
+                }
+            ],
         )
 
         content_block = response.content[0]
@@ -1750,8 +1765,10 @@ def run_checks(
     return all_issues, total_input_tokens, total_output_tokens
 
 
-def display_cost_estimate(total_input_tokens: int, total_output_tokens: int, skip_issues: bool) -> None:
-    """Display cost estimate in dry-run mode."""
+def display_cost_estimate(
+    total_input_tokens: int, total_output_tokens: int, skip_issues: bool, num_views: int = 0
+) -> None:
+    """Display cost estimate in dry-run mode with prompt caching."""
     # Estimate grouping/pruning tokens if issue checks are enabled
     grouping_tokens_estimate = 0
     if not skip_issues:
@@ -1761,16 +1778,60 @@ def display_cost_estimate(total_input_tokens: int, total_output_tokens: int, ski
 
     rprint("\n[bold yellow]DRY RUN - Cost Estimate:[/bold yellow]")
     if total_input_tokens > 0 or total_output_tokens > 0:
-        estimated_cost = calculate_cost(total_input_tokens, total_output_tokens)
-        lower_cost = estimated_cost * 0.9
-        upper_cost = estimated_cost * 1.5
+        # Calculate cost WITHOUT caching (baseline)
+        estimated_cost_no_cache = calculate_cost(total_input_tokens, total_output_tokens)
 
+        # Calculate cost WITH prompt caching
+        # Instructions are ~250 tokens and are cached after first request
+        instruction_tokens = 250
+        if num_views > 0 and CLAUDE_MODEL in MODEL_PRICING:
+            # Get pricing for the current model
+            pricing = MODEL_PRICING[CLAUDE_MODEL]
+            input_price = pricing["input"]
+            output_price = pricing["output"]
+
+            # Calculate cache pricing (cache write = base + 25%, cache read = 10% of base)
+            cache_write_price = input_price * 1.25  # 25% premium over regular input
+            cache_read_price = input_price * 0.01  # 90% discount (10% of regular price)
+
+            # Calculate instruction token costs with caching
+            # First request: cache write
+            cache_write_cost = instruction_tokens * cache_write_price / 1_000_000
+
+            # Remaining requests: cache reads
+            cache_read_cost = instruction_tokens * (num_views - 1) * cache_read_price / 1_000_000
+
+            # Data tokens (non-instruction) still cost regular input price
+            # total_input_tokens includes instruction tokens, so subtract them to get data tokens
+            data_tokens = total_input_tokens - (instruction_tokens * num_views)
+            regular_input_cost = data_tokens * input_price / 1_000_000
+
+            # Output tokens always cost regular output price
+            output_cost = total_output_tokens * output_price / 1_000_000
+
+            estimated_cost_with_cache = cache_write_cost + cache_read_cost + regular_input_cost + output_cost
+        else:
+            estimated_cost_with_cache = estimated_cost_no_cache
+
+        # Add variance
+        lower_cost = estimated_cost_with_cache * 0.9
+        upper_cost = estimated_cost_with_cache * 1.5
+
+        rprint(f"  Total views to check: {num_views:,}")
         rprint(f"  Estimated input tokens:  {total_input_tokens:,}")
         rprint(f"  Estimated output tokens: {total_output_tokens:,}")
         if grouping_tokens_estimate > 0:
             rprint(f"  [dim](Includes ~{grouping_tokens_estimate} tokens for grouping and pruning)[/dim]")
-        rprint(f"  [bold]Estimated cost: ${lower_cost:.4f} - ${upper_cost:.4f}[/bold]")
-        rprint(f"  [dim](Most likely: ${estimated_cost:.4f})[/dim]")
+
+        rprint("\n  [bold]WITH prompt caching (69% of prompt is cached):[/bold]")
+        rprint(f"  [bold green]Estimated cost: ${lower_cost:.4f} - ${upper_cost:.4f}[/bold green]")
+        rprint(f"  [dim](Most likely: ${estimated_cost_with_cache:.4f})[/dim]")
+
+        savings = estimated_cost_no_cache - estimated_cost_with_cache
+        if savings > 0:
+            savings_percent = (savings / estimated_cost_no_cache * 100) if estimated_cost_no_cache > 0 else 0
+            rprint(f"\n  [dim]Savings vs no caching: ~${savings:.4f} ({savings_percent:.0f}% reduction)[/dim]")
+            rprint(f"  [dim](Without caching would cost: ${estimated_cost_no_cache:.4f})[/dim]")
     else:
         rprint("  No API calls needed for selected checks.")
 
@@ -1942,7 +2003,7 @@ def run(
     # Dry-run: estimate costs and exit
     if dry_run:
         total_input_tokens, total_output_tokens = estimate_check_costs(views, skip_typos, skip_issues, batch_size)
-        display_cost_estimate(total_input_tokens, total_output_tokens, skip_issues)
+        display_cost_estimate(total_input_tokens, total_output_tokens, skip_issues, len(views))
         return
 
     # Group views by collection (explorerSlug) for incremental processing
