@@ -237,7 +237,7 @@ def render_fields_init():
         APP_STATE.st_widget(
             st.toggle,
             label="Import dataset from local file",
-            help="Check if you want to import the snapshot from a local file.",
+            help="Check if you want to import the snapshot from a local file. You can use local imports without python script.",
             key="local_import",
             default_last=False,
         )
