@@ -8,6 +8,7 @@ This script uses a three-layer approach to find issues:
 """
 
 import json
+import re
 import subprocess
 import tempfile
 import time
@@ -284,6 +285,45 @@ def get_text_context(text: str, typo: str, context_words: int = 10) -> str:
     return context
 
 
+def extract_human_readable_text(config_json: str) -> str:
+    """Extract only human-readable fields from config JSON and strip template variables.
+
+    Args:
+        config_json: JSON string of explorer/multidim config
+
+    Returns:
+        Cleaned text with only human-readable content and templates removed
+    """
+    try:
+        config = json.loads(config_json)
+    except json.JSONDecodeError:
+        # Fallback to full text if parse fails
+        return config_json
+
+    texts = []
+
+    def extract(obj: Any, depth: int = 0) -> None:
+        if depth > 10:  # Prevent infinite recursion
+            return
+
+        if isinstance(obj, dict):
+            for key, value in obj.items():
+                # Extract common human-readable field names
+                if key in ["title", "subtitle", "note", "description", "label", "text", "tooltip"]:
+                    if isinstance(value, str):
+                        # Strip {template} patterns like {welfare['welfare_type'][wel]}
+                        cleaned = re.sub(r"\{[^}]+\}", "", value)
+                        if cleaned.strip():
+                            texts.append(cleaned)
+                extract(value, depth + 1)
+        elif isinstance(obj, list):
+            for item in obj:
+                extract(item, depth + 1)
+
+    extract(config)
+    return "\n".join(texts)
+
+
 def check_typos(views: list[dict[str, Any]]) -> dict[int | str, list[dict[str, Any]]]:
     """Run codespell on all views at once for performance.
 
@@ -361,11 +401,12 @@ def check_typos(views: list[dict[str, Any]]) -> dict[int | str, list[dict[str, A
             config_view_id = f"config_{slug}"
             view_files[config_view_id] = []
 
-            # Write config JSON as text
+            # Write config JSON as text (extract only human-readable fields and strip templates)
             if config_json and config_json.strip():
                 file_path = Path(temp_dir) / f"view_{config_view_id}_collection_config.txt"
-                file_path.write_text(config_json)
-                view_files[config_view_id].append(("collection_config", file_path, config_json))
+                cleaned_text = extract_human_readable_text(config_json)
+                file_path.write_text(cleaned_text)
+                view_files[config_view_id].append(("collection_config", file_path, cleaned_text))
 
         # Run codespell once on the entire directory
         rprint("  [cyan]Running spell checker...[/cyan]")
