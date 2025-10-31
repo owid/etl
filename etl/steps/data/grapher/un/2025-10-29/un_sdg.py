@@ -4,6 +4,7 @@ import json
 import os
 import re
 from functools import cache
+from pathlib import Path
 from typing import Any, Dict, cast
 
 import pandas as pd
@@ -12,6 +13,7 @@ from owid.catalog import Dataset, License, Origin, Table, VariableMeta
 from owid.catalog.utils import underscore
 from structlog import getLogger
 
+from etl.files import ruamel_load
 from etl.grapher import helpers as gh
 from etl.helpers import PathFinder, create_dataset
 
@@ -24,8 +26,22 @@ pd.options.mode.chained_assignment = None
 # only include tables containing SUBSET string, this is useful for debugging
 SUBSET = os.environ.get("SUBSET")
 if SUBSET:
-    # Append additional indicators we need in the step
-    SUBSET += "|_6_1_1|_6_2_1|_16|_2_4|_17"
+    # Append additional indicators from metadata file
+    meta_path = Path(__file__).parent / "un_sdg.meta.yml"
+    if meta_path.exists():
+        meta = ruamel_load(meta_path)
+        if "tables" in meta and meta["tables"]:
+            # Get all table keys and extract unique indicator prefixes
+            table_keys = list(meta["tables"].keys())
+            # Extract indicator patterns (e.g., "_1_1_1", "_6_1_1", "_16", etc.)
+            indicators = set()
+            for key in table_keys:
+                # Match patterns like _X_X_X at the start
+                match = re.match(r"(_\d+(?:_\d+)*(?:_[a-z]+)?)", key)
+                if match:
+                    indicators.add(match.group(1))
+            if indicators:
+                SUBSET += "|" + "|".join(sorted(indicators))
 
 # for origins
 DATE_ACCESSED = "2024-08-27"
@@ -223,7 +239,9 @@ def add_metadata_and_prepare_for_grapher(tb: Table, ds_garden: Dataset, source_d
     # Validate that no problematic characters remain
     problematic_chars = ["(", ")", "+", "!", ",", "/", "'", '"', "'", """, """]
     for char in problematic_chars:
-        assert char not in var_name, f"Variable name '{var_name}' contains problematic character '{char}' after underscore() conversion. Original: '{original_name}'"
+        assert (
+            char not in var_name
+        ), f"Variable name '{var_name}' contains problematic character '{char}' after underscore() conversion. Original: '{original_name}'"
 
     tb["variable"] = var_name
 
