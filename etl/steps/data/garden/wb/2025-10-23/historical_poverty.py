@@ -34,6 +34,9 @@ POVERTY_LINES = [3, 10, 30]
 # Earliest year for extrapolation
 EARLIEST_YEAR = 1820
 
+# Latest year for extrapolation
+LATEST_YEAR = 1990
+
 # Historical entities mapping
 HISTORICAL_ENTITIES = {
     "USSR": {
@@ -90,7 +93,7 @@ def run() -> None:
     #
     # Perform backward extrapolation
     #
-    tb_extended = extrapolate_backwards(tb_bins=tb_thousand_bins, tb_gdp=tb_gdp)
+    tb_extended = extrapolate_backwards(tb_thousand_bins=tb_thousand_bins, tb_gdp=tb_gdp)
 
     log.info(f"historical_poverty: Extended dataset has {len(tb_extended)} rows")
     log.info(f"historical_poverty: Extended date range: {tb_extended['year'].min()}-{tb_extended['year'].max()}")
@@ -186,6 +189,9 @@ def prepare_gdp_data(tb_maddison: Table) -> Table:
     # Select relevant columns
     tb_gdp = tb_maddison[["country", "year", "gdp_per_capita", "region"]].copy()
 
+    # Restrict data to years EARLIEST_YEAR to LATEST_YEAR
+    tb_gdp = tb_gdp[(tb_gdp["year"] >= EARLIEST_YEAR) & (tb_gdp["year"] <= LATEST_YEAR)].reset_index(drop=True)
+
     # Remove rows with missing GDP per capita
     tb_gdp = tb_gdp.dropna(subset=["gdp_per_capita"])
 
@@ -219,20 +225,15 @@ def prepare_gdp_data(tb_maddison: Table) -> Table:
     tb_gdp["region"] = tb_gdp["country"].map(regions_map)
 
     # Create year-over-year growth factors for countries
-    tb_gdp = tb_gdp.sort_values(["country", "year"])
-    tb_gdp["growth_factor"] = tb_gdp.groupby("country")["gdp_per_capita"].transform(lambda x: x / x.shift(1))
+    tb_gdp = create_growth_factor_column(tb=tb_gdp)
 
     # Remove (Maddison) from country column if present
     tb_gdp["country"] = tb_gdp["country"].str.replace(" (Maddison)", "", regex=False)
 
     # Create tb_gdp_regions table, selecting only regions, which are the countries including (Maddison) and World
-    tb_gdp_regions = tb_gdp[tb_gdp["country"].isin(list(regions_map.values()) + ["World"])].reset_index(drop=True)
-
-    # Create year-over-year growth factors for regions table
-    tb_gdp_regions = tb_gdp_regions.sort_values(["country", "year"])
-    tb_gdp_regions["growth_factor"] = tb_gdp_regions.groupby("country")["gdp_per_capita"].transform(
-        lambda x: x / x.shift(1)
-    )
+    region_entities = pd.Index(list(regions_map.values()) + ["World"]).dropna().unique().tolist()
+    print(region_entities)
+    tb_gdp_regions = tb_gdp[tb_gdp["country"].isin(region_entities)].reset_index(drop=True)
 
     # Assert that HISTORICAL_ENTITIES keys and successor states are in tb_gdp
     all_countries = set(tb_gdp["country"].unique())
@@ -263,16 +264,10 @@ def prepare_gdp_data(tb_maddison: Table) -> Table:
     # Restore region information
     tb_historical_entities["region"] = tb_historical_entities["country"].map(regions_map)
 
-    # Calculate growth factors for historical entities table
-    tb_historical_entities = tb_historical_entities.sort_values(["country", "year"])
-    tb_historical_entities["growth_factor"] = tb_historical_entities.groupby("country")["gdp_per_capita"].transform(
-        lambda x: x / x.shift(1)
-    )
-
-    # Multimerge tb, tb_gdp_regions, and tb_historical_entities
+    # Merge tb, tb_gdp_regions, and tb_historical_entities
     tb_gdp = pr.merge(
         tb_gdp,
-        tb_gdp_regions[["country", "year", "growth_factor"]],
+        tb_gdp_regions,
         left_on=["region", "year"],
         right_on=["country", "year"],
         how="outer",
@@ -284,37 +279,50 @@ def prepare_gdp_data(tb_maddison: Table) -> Table:
 
     tb_gdp = pr.merge(
         tb_gdp,
-        tb_historical_entities[["country", "year", "region", "historical_entity", "growth_factor"]],
+        tb_historical_entities,
         on=["country", "region", "year"],
         how="outer",
         suffixes=("", "_historical_entity"),
     )
-
-    # Show data only from EARLIEST_YEAR onwards
-    tb_gdp = tb_gdp[tb_gdp["year"] >= EARLIEST_YEAR].reset_index(drop=True)
 
     # Rename growth factor columns
     tb_gdp = tb_gdp.rename(
         columns={"growth_factor": "growth_factor_country"},
     )
 
-    # Show country, year, region, and historical_entity columns first. Don't use and entire list to define this
+    # Generate growth_factor column using priority: country > historical_entity > region
+    tb_gdp["growth_factor"] = tb_gdp.apply(select_growth_factor, axis=1)
+
+    # Shift growth_factor down by one year to align with the starting year of extrapolation
+    tb_gdp["growth_factor"] = tb_gdp.groupby("country")["growth_factor"].shift(-1)
+
+    # Calculate the the cumulative growth factor product from LATEST_YEAR to each year
+    tb_gdp = tb_gdp.sort_values(["country", "year"], ascending=[True, False]).reset_index(drop=True)
+
+    # Make growth_factor Float64 to avoid issues with cumprod
+    tb_gdp["growth_factor"] = tb_gdp["growth_factor"].astype("Float64")
+    tb_gdp["cumulative_growth_factor"] = tb_gdp.groupby("country")["growth_factor"].cumprod()
+
+    # Restore original order
+    tb_gdp = tb_gdp.sort_values(["country", "year"]).reset_index(drop=True)
+
+    # Drop region_entities in country column
+    tb_gdp = tb_gdp[~tb_gdp["country"].isin(region_entities)].reset_index(drop=True)
+
+    # Drop empty values for country
+    tb_gdp = tb_gdp.dropna(subset=["country"]).reset_index(drop=True)
+
+    # Show country, year, region, and historical_entity columns first.
     tb_gdp = tb_gdp[
         [
             "country",
             "year",
             "region",
             "historical_entity",
-            "gdp_per_capita_original",
-            "gdp_per_capita",
-            "growth_factor_country",
-            "growth_factor_region",
-            "growth_factor_historical_entity",
+            "growth_factor",
+            "cumulative_growth_factor",
         ]
     ]
-
-    # Generate growth_factor column using priority: country > historical_entity > region
-    tb_gdp["growth_factor"] = tb_gdp.apply(select_growth_factor, axis=1)
 
     # # Check for extreme growth rates
     # extreme_growth = tb_gdp[(tb_gdp["growth_factor"] > 2.0) | (tb_gdp["growth_factor"] < 0.5)]
@@ -330,7 +338,7 @@ def prepare_gdp_data(tb_maddison: Table) -> Table:
     return tb_gdp
 
 
-def extrapolate_backwards(tb_bins: Table, tb_gdp: Table) -> Table:
+def extrapolate_backwards(tb_thousand_bins: Table, tb_gdp: Table) -> Table:
     """Extrapolate income distributions backwards from 1990 to 1820.
 
     Uses a 3-tier fallback strategy:
@@ -350,9 +358,22 @@ def extrapolate_backwards(tb_bins: Table, tb_gdp: Table) -> Table:
     Table
         Extended table with historical estimates (1820-present)
     """
-    # Get list of unique countries in bins data
-    countries_bins = sorted(tb_bins["country"].unique())
-    log.info(f"extrapolate_backwards: Processing {len(countries_bins)} countries")
+    # Calculate maximum available year per country in tb_thousand_bins
+    max_years = tb_thousand_bins["year"].max()
+
+    # Create tb_thousand_bins_to_extrapolate
+    tb_thousand_bins_to_extrapolate = tb_thousand_bins[tb_thousand_bins["year"] == LATEST_YEAR].reset_index(drop=True)
+
+    # # Define column year as empty
+    # tb_thousand_bins_to_extrapolate["year"] = pd.NA
+
+    # Add all the years between EARLIEST_YEAR and LATEST_YEAR to tb_thousand_bins_to_extrapolate
+    years_to_add = Table({"year": list(range(EARLIEST_YEAR, LATEST_YEAR + 1))})
+    tb_thousand_bins_to_extrapolate = pr.merge(
+        tb_thousand_bins_to_extrapolate,
+        years_to_add,
+        how="cross",
+    )
 
     # Prepare baseline data (earliest year for each country)
     baseline_data = get_baseline_data(tb_bins)
@@ -889,3 +910,16 @@ def select_growth_factor(row):
         return row["growth_factor_historical_entity"]
     else:
         return row["growth_factor_region"]
+
+
+def create_growth_factor_column(tb: Table) -> Table:
+    """
+    Create growth_factor column, dividing GDP values by the value in LATEST_YEAR.
+    """
+
+    tb = tb.sort_values(["country", "year"])
+
+    # Calculate growth factor
+    tb["growth_factor"] = tb.groupby("country")["gdp_per_capita"].transform(lambda x: x / x.shift(1))
+
+    return tb
