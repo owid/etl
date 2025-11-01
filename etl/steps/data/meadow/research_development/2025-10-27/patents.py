@@ -16,13 +16,20 @@ def run() -> None:
     # Load data from snapshot and adjust columns:
     tb = snap.read(header=3)
 
+    # columns are off by one in original file - we correct this here
+    # save metadata to repopulate
     temp_metadata = tb["Office"].metadata.copy()
     temp_cols = tb.columns.copy()
-
+    #fix columns
     tb = tb.drop(columns=["2023"]).reset_index()
     tb.columns = temp_cols
+
+    # repopulate metadata
     for col in tb.columns:
         tb[col].metadata = temp_metadata
+
+
+
     #
     # Process data.
     #

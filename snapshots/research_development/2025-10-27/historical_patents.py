@@ -1,4 +1,4 @@
-"""Script to create a snapshot of dataset."""
+"""Script to create a snapshot of dataset. This data is not currently used but kept in preparation for a larger patent data update."""
 
 from etl.helpers import PathFinder
 
