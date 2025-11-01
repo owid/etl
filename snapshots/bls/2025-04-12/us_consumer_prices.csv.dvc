@@ -23,6 +23,6 @@ meta:
       url: https://www.bls.gov/opub/copyright-information.htm
 
 outs:
-  - md5: b32101a40ebd327030d3f15cdf49f70e
-    size: 330105
+  - md5: d42784b58857bed48e4bcbcb0fe3bd68
+    size: 28060
     path: us_consumer_prices.csv
