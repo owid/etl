@@ -399,10 +399,11 @@ class Snapshot:
         )
 
     # Methods to deal with archived files
-    @deprecated("This function will be deprecated. Use `open_archive` context manager instead.")
+    @deprecated("This function will be deprecated. Use `open_archive()` context manager instead.")
     def extract(self, output_dir: Path | str):
         decompress_file(self.path, output_dir)
 
+    @deprecated("This function will be deprecated. Use `open_archive()` context manager instead.")
     def extract_to_tempdir(self) -> Any:
         # Create temporary directory
         temp_dir = tempfile.TemporaryDirectory()
@@ -465,19 +466,29 @@ class Snapshot:
     @property
     def path_unarchived(self) -> Path:
         if not hasattr(self, "_unarchived_dir") or self._unarchived_dir is None:
-            raise RuntimeError("Archive is not unarchived. Use 'with snap.unarchived()' context manager.")
+            raise RuntimeError("Archive is not unarchived. Use 'with snap.open_archive():' context manager.")
 
         return self._unarchived_dir
 
     def read_from_archive(self, filename: str, force_extension: Optional[str] = None, *args, **kwargs) -> Table:
         """Read a file in an archive.
 
-        Use this function within a context manager. Otherwise it'll raise a RuntimeError, since `_unarchived_dir` will be None.
+        Use this function within a 'with snap.open_archive():' context manager. Otherwise it'll raise a RuntimeError, since `_unarchived_dir` will be None.
 
         The read method is inferred based on the file extension of `filename`. Use `force_extension` if you want to override this.
+
+        Example:
+
+        ```python
+        snap = Snapshot(...)
+
+        with snap.open_archive():
+            table1 = snap.read_from_archive("filename1.csv")
+            table2 = snap.read_from_archive("filename2.csv")
+        ```
         """
         if not hasattr(self, "_unarchived_dir") or self._unarchived_dir is None:
-            raise RuntimeError("Archive is not unarchived. Use 'with snap.unarchived()' context manager.")
+            raise RuntimeError("Archive is not unarchived. Use 'with snap.open_archive()' context manager.")
 
         if force_extension is None:
             new_extension = filename.split(".")[-1]

@@ -2,7 +2,7 @@ definitions:
   common_views:
     - config:
         hasMapTab: true
-        originUrl: ourworldindata.org/ucdp
+        originUrl: ourworldindata.org/war-and-peace
         relatedQuestions:
           text: "How do different approaches measure armed conflicts and their deaths?"
           url: "https://ourworldindata.org/conflict-data-how-do-researchers-measure-armed-conflicts-and-their-deaths"

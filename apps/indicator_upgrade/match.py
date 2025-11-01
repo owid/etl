@@ -140,6 +140,7 @@ def main(
     no_interactive: bool = False,
     auto_threshold: float = 100.0,
     quiet: bool = False,
+    perfect_match_only: bool = False,
 ) -> None:
     with get_connection() as db_conn:
         # Get variables from old dataset that have been used in at least one chart.
@@ -148,13 +149,14 @@ def main(
         new_indicators = get_variables_in_dataset(db_conn=db_conn, dataset_id=new_dataset_id, only_used_in_charts=False)
 
     # Map old variable names to new variable names.
-    if no_interactive:
+    if perfect_match_only or no_interactive:
         mapping = map_old_and_new_indicators_auto(
             old_indicators=old_indicators,
             new_indicators=new_indicators,
             match_identical=match_identical,
             similarity_name=similarity_name,
             auto_threshold=auto_threshold,
+            perfect_match_only=perfect_match_only,
         )
     else:
         mapping = map_old_and_new_indicators(
@@ -235,6 +237,7 @@ def map_old_and_new_indicators_auto(
     match_identical: bool = True,
     similarity_name: str = "partial_ratio",
     auto_threshold: float = 100.0,
+    perfect_match_only: bool = False,
 ) -> pd.DataFrame:
     """Map old variables to new variables automatically based on similarity threshold.
 
@@ -250,6 +253,9 @@ def map_old_and_new_indicators_auto(
         Similarity function name. Must be in `SIMILARITY_NAMES`.
     auto_threshold: float
         Minimum similarity score (0-100) to automatically create a mapping.
+    perfect_match_only: bool
+        If True, only match indicators with exact string equality (identical names).
+        Ignores auto_threshold and similarity_name.
 
     Returns
     -------
@@ -258,6 +264,22 @@ def map_old_and_new_indicators_auto(
     """
     # Get initial mapping (identical matches)
     mapping, missing_old, missing_new = preliminary_mapping(old_indicators, new_indicators, match_identical)
+
+    # If perfect_match_only is True, return only exact matches (no fuzzy matching)
+    if perfect_match_only:
+        if len(mapping) > 0:
+            log.info(f"Found {len(mapping)} perfect matches (identical names)")
+            for _, row in mapping.iterrows():
+                log.info(f"  • {row['name_old']} (ID: {row['id_old']} → {row['id_new']})")
+        else:
+            log.info("No perfect matches found (no variables with identical names)")
+
+        if len(missing_old) > 0:
+            log.warning(f"{len(missing_old)} variables have no perfect match and will be skipped")
+            for _, row in missing_old.iterrows():
+                log.warning(f"  • {row['name_old']} (ID: {row['id_old']})")
+
+        return mapping
 
     # Display preliminary mapping results
     if match_identical:
