@@ -61,6 +61,6 @@ tables:
         - The operational stock of robots refers to the number of robots currently in use.
         - In Japan, this is measured directly by the Japan Robot Association (JARA).
         - In other countries, the International Federation of Robotics (IFR) estimates the stock by summing robot installations over the past 12 years. This assumes robots are withdrawn after 12 years of service.
-        - This 12-year assumption may be conservative — a pilot study suggested the average service life could be closer to 15 years.
+        - This 12-year assumption may be conservative - a pilot study suggested the average service life could be closer to 15 years.
         - Tax guidelines in Germany and the US assume shorter lifespans of 5 to 6 years, though these may underestimate actual use due to refurbishment.
         - The actual service life likely depends on the industry, application, and type of robot. More research is needed to improve these estimates.
