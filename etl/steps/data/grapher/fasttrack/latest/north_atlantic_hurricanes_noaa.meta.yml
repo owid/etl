@@ -25,7 +25,7 @@ tables:
         description: |-
           The number of major hurricanes that make landfall in the US. Major hurricanes score 3 or higher on the Saffir–Simpson hurricane wind scale (SSHWS).
       accumulated_cyclone_energy:
-        title: Acumulated cyclone energy index
+        title: Accumulated cyclone energy index
         unit: ''
         description: |-
           An index that combines the numbers of systems, how long they existed and how intense they became. It is calculated by squaring the maximum sustained surface wind in the system every six hours that the cyclone is a Named Storm and summing it up for the season.
