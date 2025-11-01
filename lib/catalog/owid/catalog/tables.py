@@ -231,7 +231,7 @@ class Table(pd.DataFrame):
             columns.append(column)
             titles.append(getattr(md.presentation, "title_public", None) or md.title)
             # Use short description (after removing details on demand, if any).
-            descriptions.append(utils.remove_details_on_demand(md.description_short))
+            descriptions.append(utils.remove_details_on_demand(md.description_short or ""))
             sources.append(
                 "; ".join(
                     dict.fromkeys(
