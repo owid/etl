@@ -3,12 +3,13 @@
 This file provides guidance to automation agents working with code in this repository.
 
 # Individual Preferences
+
 - @~/.claude/instructions/etl.md
 
 ## Critical Rules
 
 - When running `etl` command, **ALWAYS** use the `.venv/bin/etl` binary (same for `python`, `pytest`, etc.)
-⚠️ **NEVER mask problems - fix them systematically:**
+  ⚠️ **NEVER mask problems - fix them systematically:**
 - **NEVER** return empty tables, comment out failing code, or create workarounds
 - **NEVER** catch and ignore exceptions without fixing the root cause
 - **ALWAYS** trace issues upstream through the pipeline: snapshot → meadow → garden → grapher
@@ -32,6 +33,7 @@ This is Our World in Data's ETL system - a content-addressable data pipeline wit
 ### Step Execution System
 
 Steps are content-addressable with automatic dirty detection:
+
 ```python
 # Standard garden step pattern
 from etl.helpers import PathFinder
@@ -51,6 +53,7 @@ def run() -> None:
 ### Catalog System
 
 Built on **owid.catalog** library:
+
 - **Dataset**: Container for multiple tables with shared metadata
 - **Table**: pandas.DataFrame subclass with rich metadata per column
 - **Variable**: pandas.Series subclass with variable-specific metadata
@@ -60,6 +63,7 @@ Built on **owid.catalog** library:
 ### DAG Dependencies
 
 YAML-based dependency graphs in `dag/` directory:
+
 - Content-based dirty detection skips unchanged steps
 - Topological sorting ensures proper execution order
 - Supports partial execution with `--only`, `--downstream` flags
@@ -67,6 +71,7 @@ YAML-based dependency graphs in `dag/` directory:
 ## Development Commands
 
 ### Essential Commands
+
 ```bash
 # Core ETL operations
 make etl                    # Run garden steps only
@@ -89,6 +94,7 @@ make lab                   # Start Jupyter Lab
 ```
 
 ### ETL CLI Commands
+
 ```bash
 # Main execution
 etl run [steps...]         # Run specific ETL steps
@@ -117,11 +123,12 @@ Get `--help` for details on any command.
 
 Archive old datasets.
 
-
 ## Key Development Patterns
 
 ### CLI Tools
+
 Always use Click instead of ArgumentParser for CLI scripts:
+
 ```python
 import click
 
@@ -136,21 +143,27 @@ if __name__ == "__main__":
 ```
 
 ### Geographic Harmonization
+
 Use `geo.harmonize_countries()` for standardization:
+
 ```python
 from etl.data_helpers import geo
 tb = geo.harmonize_countries(tb, countries_file=paths.country_mapping_path)
 ```
 
 ### Metadata Management
+
 Tables inherit and propagate metadata:
+
 ```python
 tb = tb.format(short_name="table_name")  # Sets table metadata
 tb["column"] = tb["column"].replace_metadata(unit="percent", short_unit="%")
 ```
 
 ### YAML File Editing
+
 Always use `ruamel_load` and `ruamel_dump` from `etl.files` to preserve comments and formatting when editing YAML files:
+
 ```python
 from etl.files import ruamel_load, ruamel_dump
 
@@ -166,12 +179,14 @@ with open(file_path, 'w') as f:
 ```
 
 ### Creating New Steps
+
 1. Use Wizard UI (`make wizard`) for guided creation
 2. Or follow existing patterns in `etl/steps/data/[stage]/[namespace]/`
 3. Add dependencies to appropriate DAG file in `dag/`
 4. Steps follow URI pattern: `data://[stage]/[namespace]/[version]/[name]`
 
 ### Testing Steps
+
 ```bash
 # Test specific step
 etl run --dry-run data://garden/namespace/version/dataset
@@ -215,11 +230,13 @@ pytest tests/          # ❌ Don't use
 - **IMPORTANT**: Never install packages with `pip install` - always ask first, then use `uv` if approved
 
 ### Environment Variables
+
 - `OWID_ENV`: dev/staging/production environment
 - `.env`: Local environment configuration
 - Database connections managed via `etl.config.OWID_ENV`
 
 ### Key Files
+
 - `dag/main.yml`: Main DAG dependencies
 - `dag/[topic].yml`: Topic-specific dependencies
 - `etl/config.py`: Runtime configuration
@@ -228,6 +245,7 @@ pytest tests/          # ❌ Don't use
 ## Libraries Structure
 
 ### Core Libraries (`lib/`)
+
 - **catalog**: Dataset/table/variable management with metadata
 - **datautils**: Data processing utilities and helpers
 - **repack**: Data packaging and compression tools
@@ -235,18 +253,22 @@ pytest tests/          # ❌ Don't use
 These are installed as editable packages (`owid-catalog`, `owid-datautils`, `owid-repack`).
 
 ### Apps vs Core ETL
+
 - **Core ETL** (`etl/`): Step execution engine, catalog management, DAG processing
 - **Apps** (`apps/`): Extended functionality - Wizard, chart sync, anomaly detection, maintenance tools
 
 ## Running ETL Steps
+
 Use `.venv/bin/etlr` to run ETL steps:
 
 ### Basic Usage
+
 - Run steps matching a pattern: `etlr biodiversity/2025-06-28/cherry_blossom`
 - Run with grapher upload: `etlr biodiversity/2025-06-28/cherry_blossom --grapher`
 - Dry run (preview): `etlr biodiversity/2025-06-28/cherry_blossom --dry-run`
 
 ### Key Options
+
 - `--grapher/-g`: Upload datasets to grapher database (OWID staff only)
 - `--dry-run`: Preview steps without running them
 - `--force/-f`: Re-run steps even if up-to-date
@@ -255,6 +277,7 @@ Use `.venv/bin/etlr` to run ETL steps:
 - `--exact-match/-x`: Steps must exactly match arguments
 
 ## Git Workflow
+
 Create PR first, then commit files:
 
 1. **Create PR**: Use `etl pr` CLI (creates new branch)
@@ -280,12 +303,14 @@ Note: The `etl pr` creates a new branch but does NOT automatically commit files 
 - SQL queries enclose in triple quotes for readability
 
 ### Exception Handling
+
 - **NEVER** catch, log, and re-raise exceptions (`except Exception: log.error(e); raise`)
 - Let exceptions propagate naturally with their original stack traces
 - Only catch specific exceptions when you can meaningfully handle them
 - Avoid `except Exception` - it masks real problems
 
 ### Never Mask Underlying Issues
+
 - **NEVER** return empty tables or default values to "fix" data parsing failures
 - **NEVER** silently skip errors or missing data without clear explanation
 - **NEVER** comment out code to temporarily bypass problems - fix the underlying issue instead
@@ -305,6 +330,7 @@ When ETL steps fail due to data quality issues (NaT values, missing data, missin
 ### Systematic Debugging Approach
 
 1. **Check the Snapshot First**: Root cause often lies at the data source level, not ETL logic
+
    - Compare snapshot file sizes and date ranges - external providers may truncate or discontinue data feeds
    - Examine snapshot history: `git log --oneline --follow snapshots/dataset.csv.dvc`
    - Verify the upstream data source is still providing complete data
@@ -347,15 +373,28 @@ print(f"Garden null values: {tb.date.isnull().sum()}")
 - **Document data issues**: Log warnings about data quality problems found during processing
 - **Fix meadow steps**: Most data cleaning should happen in meadow, not garden steps
 
+## Data Validation and Sanity Checks
+
+For comprehensive data validation patterns and best practices, see [.claude/docs/validation.md](.claude/docs/validation.md).
+
+Key validation principles:
+- Always validate **before** calling `.format()` on tables
+- Use metadata files to inform validation logic
+- Validate regional and income group aggregations for OWID datasets
+- Include domain-specific checks based on data type (health, economic, environmental, etc.)
+
 ## Database Access
 
 ### MySQL Connection
+
 Can execute SQL queries directly using the staging database:
+
 ```bash
 mysql -h staging-site-[branch] -u owid --port 3306 -D owid -e "SELECT query"
 ```
 
 Example queries:
+
 ```sql
 -- Find datasets by shortName
 SELECT id, catalogPath, name FROM datasets WHERE shortName = 'dataset_name' AND NOT isArchived;
