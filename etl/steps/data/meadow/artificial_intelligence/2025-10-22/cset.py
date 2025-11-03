@@ -105,14 +105,22 @@ def read_and_clean_data(file_ids: List[str], temp_dir: str, field_name: str) -> 
             df_projected.rename(columns=rename_dict, inplace=True)
 
             # Merge last actual values into all projected rows
-            df_projected_with_actual = pd.merge(df_projected, df_last_actual_for_projected, on=["country", "field"], how="left", suffixes=("", "_last_actual"))
+            df_projected_with_actual = pd.merge(
+                df_projected,
+                df_last_actual_for_projected,
+                on=["country", "field"],
+                how="left",
+                suffixes=("", "_last_actual"),
+            )
 
             # Fill projected values with last actual where projected is missing
             for col in value_cols:
                 proj_col = f"{col}_projected"
                 last_col = f"{col}_projected_last_actual"
                 if last_col in df_projected_with_actual.columns:
-                    df_projected_with_actual[proj_col] = df_projected_with_actual[proj_col].fillna(df_projected_with_actual[last_col])
+                    df_projected_with_actual[proj_col] = df_projected_with_actual[proj_col].fillna(
+                        df_projected_with_actual[last_col]
+                    )
                     df_projected_with_actual.drop(columns=[last_col], inplace=True)
 
             df_projected_combined = df_projected_with_actual
