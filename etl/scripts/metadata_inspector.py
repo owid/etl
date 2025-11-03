@@ -1720,6 +1720,7 @@ def display_issues(
     issues: list[dict[str, Any]],
     all_explorers: list[str],
     mdim_slugs: set[str],
+    chart_slugs: set[str],
 ) -> None:
     """Display grouped issues.
 
@@ -1727,14 +1728,11 @@ def display_issues(
         issues: List of already-grouped issue dictionaries
         all_explorers: List of all explorer slugs that were analyzed
         mdim_slugs: Set of slugs that are multidimensional indicators
+        chart_slugs: Set of slugs that are charts
     """
-    if not issues:
-        rprint("[green]✓ No issues found![/green]")
-        return
-
-    # Group issues by explorer
     from collections import defaultdict
 
+    # Group issues by explorer
     issues_by_explorer = defaultdict(list)
     for issue in issues:
         explorer_slug = issue.get("explorer_slug", "unknown")
@@ -1764,14 +1762,16 @@ def display_issues(
 
         issues_by_explorer[explorer_slug] = deduplicated
 
-    # Display summary
-    total_unique = len(issues)
-    # Calculate total original count from similar_count fields
-    total_original = sum(issue.get("similar_count", 1) for issue in issues)
-    num_collections = len(issues_by_explorer)
-    rprint(
-        f"\n[bold]Found {total_original} total issues ({total_unique} unique) across {num_collections} collection(s)[/bold]"
-    )
+    # Display issues section only if there are issues
+    if issues:
+        # Display summary
+        total_unique = len(issues)
+        # Calculate total original count from similar_count fields
+        total_original = sum(issue.get("similar_count", 1) for issue in issues)
+        num_collections = len(issues_by_explorer)
+        rprint(
+            f"\n[bold]Found {total_original} total issues ({total_unique} unique) across {num_collections} collection(s)[/bold]"
+        )
 
     # Display issues grouped by explorer
     for explorer_slug in sorted(issues_by_explorer.keys()):
@@ -1779,8 +1779,17 @@ def display_issues(
 
         # Display header with appropriate label and color
         is_mdim = mdim_slugs and explorer_slug in mdim_slugs
-        label = "Multidim" if is_mdim else "Explorer"
-        color = "magenta" if is_mdim else "cyan"
+        is_chart = chart_slugs and explorer_slug in chart_slugs
+
+        if is_chart:
+            label = "Chart"
+            color = "yellow"
+        elif is_mdim:
+            label = "Multidim"
+            color = "magenta"
+        else:
+            label = "Explorer"
+            color = "cyan"
 
         rprint(f"\n[bold {color}]{'=' * 80}[/bold {color}]")
         rprint(f"[bold {color}]{label}: {explorer_slug}[/bold {color}]")
@@ -1838,19 +1847,20 @@ def display_issues(
             if context:
                 rprint(f"   [yellow]Context:[/yellow] {context}")
 
-    # Show clean explorers/mdims if we have the full list
-    if all_explorers and mdim_slugs is not None:
+    # Show clean explorers/mdims/charts if we have the full list
+    if all_explorers and mdim_slugs is not None and chart_slugs is not None:
         explorers_with_issues = set(issues_by_explorer.keys())
         # Filter out NaN values (from NULL slugs) before sorting
         all_explorers_valid = {e for e in all_explorers if isinstance(e, str)}
         explorers_with_issues_valid = {e for e in explorers_with_issues if isinstance(e, str)}
         all_clean = sorted(all_explorers_valid - explorers_with_issues_valid)
 
-        # Separate into explorers and mdims
-        clean_explorers = [e for e in all_clean if e not in mdim_slugs]
+        # Separate into explorers, mdims, and charts
+        clean_explorers = [e for e in all_clean if e not in mdim_slugs and e not in chart_slugs]
         clean_mdims = [e for e in all_clean if e in mdim_slugs]
+        clean_charts = [e for e in all_clean if e in chart_slugs]
 
-        if clean_explorers or clean_mdims:
+        if clean_explorers or clean_mdims or clean_charts:
             rprint(f"\n[bold green]{'=' * 80}[/bold green]")
 
             if clean_explorers:
@@ -1859,51 +1869,37 @@ def display_issues(
 
             if clean_mdims:
                 if clean_explorers:
-                    rprint()  # Add spacing between the two lists
+                    rprint()  # Add spacing between the lists
                 rprint(f"[bold magenta]✓ No issues found in {len(clean_mdims)} multidim(s):[/bold magenta]")
                 rprint(f"[magenta]{', '.join(clean_mdims)}[/magenta]")
 
+            if clean_charts:
+                if clean_explorers or clean_mdims:
+                    rprint()  # Add spacing between the lists
+                rprint(f"[bold yellow]✓ No issues found in {len(clean_charts)} chart(s):[/bold yellow]")
+                rprint(f"[yellow]{', '.join(clean_charts)}[/yellow]")
 
-def load_views(
-    slug_list: list[str] | None, chart_slug_list: list[str] | None, limit: int | None
-) -> list[dict[str, Any]]:
+
+def load_views(slug_list: list[str] | None, limit: int | None) -> list[dict[str, Any]]:
     """Load views from database and aggregate by view ID.
 
     Args:
-        slug_list: List of explorer/multidim slugs to filter by
-        chart_slug_list: List of chart slugs to filter by
+        slug_list: List of slugs to filter by (works for explorers, multidims, and charts)
         limit: Maximum number of views to return
 
     Returns:
         List of view dictionaries (explorers, multidims, and charts)
     """
-    # Fetch data from explorers, multidimensional indicators, and charts
-    # Determine what to fetch based on provided filters
-    if slug_list is not None or chart_slug_list is None:
-        # Fetch explorers/multidims if: (1) slug_list provided, OR (2) no filters at all
-        df_explorers = fetch_explorer_data(explorer_slugs=slug_list)
-        df_mdims = fetch_multidim_data(slug_filters=slug_list)
-    else:
-        # Only chart slugs provided - skip explorer/multidim data for performance
-        df_explorers = pd.DataFrame()
-        df_mdims = pd.DataFrame()
-
-    # Fetch charts if: (1) chart_slug_list provided, OR (2) no filters at all
-    if chart_slug_list is not None or slug_list is None:
-        chart_configs = fetch_chart_configs(chart_slugs=chart_slug_list)
-    else:
-        # Only explorer/multidim slugs provided - skip charts for performance
-        chart_configs = []
+    # Fetch data from all sources (explorers, multidimensional indicators, and charts)
+    # When slug_list is provided, all queries filter by the same slugs
+    df_explorers = fetch_explorer_data(explorer_slugs=slug_list)
+    df_mdims = fetch_multidim_data(slug_filters=slug_list)
+    chart_configs = fetch_chart_configs(chart_slugs=slug_list)
 
     # Check if we got any results
     if df_explorers.empty and df_mdims.empty and not chart_configs:
-        if slug_list or chart_slug_list:
-            all_slugs = []
-            if slug_list:
-                all_slugs.extend(slug_list)
-            if chart_slug_list:
-                all_slugs.extend([f"chart:{s}" for s in chart_slug_list])
-            slugs_str = ", ".join(all_slugs)
+        if slug_list:
+            slugs_str = ", ".join(slug_list)
             rprint(f"[red]Error: No views found for slug(s) '{slugs_str}'[/red]")
         else:
             rprint("[red]Error: No explorer, multidim, or chart views found in database[/red]")
@@ -2125,8 +2121,8 @@ def display_results(
     grouping_tokens: int,
 ) -> None:
     """Display grouped issues and cost."""
-    # Extract unique explorer slugs and identify mdims
-    # Charts use 'slug', explorers use 'explorerSlug'
+    # Extract unique slugs and identify types
+    # Charts use 'slug', explorers/multidims use 'explorerSlug'
     all_slugs = []
     for view in views:
         if view.get("view_type") == "chart":
@@ -2140,8 +2136,11 @@ def display_results(
     mdim_slugs_list = [view.get("explorerSlug") for view in views if view.get("view_type") == "multidim"]
     mdim_slugs = set(s for s in mdim_slugs_list if s is not None)
 
+    chart_slugs_list = [view.get("slug") for view in views if view.get("view_type") == "chart"]
+    chart_slugs = set(s for s in chart_slugs_list if s is not None)
+
     # Display grouped issues
-    display_issues(grouped_issues, all_explorers_analyzed, mdim_slugs)
+    display_issues(grouped_issues, all_explorers_analyzed, mdim_slugs, chart_slugs)
 
     # Display API usage and cost
     if total_input_tokens > 0 or total_output_tokens > 0 or grouping_tokens > 0:
@@ -2232,12 +2231,7 @@ def save_collection_results(output_file: str, issues: list[dict[str, Any]]) -> N
 @click.option(
     "--slug",
     multiple=True,
-    help="Filter by specific explorer or multidim slug. Can be specified multiple times (e.g., '--slug global-food --slug covid-boosters')",
-)
-@click.option(
-    "--chart-slug",
-    multiple=True,
-    help="Filter by specific chart slug. Can be specified multiple times (e.g., '--chart-slug co2-emissions-per-capita')",
+    help="Filter by specific slug (explorer, multidim, or chart). Can be specified multiple times (e.g., '--slug global-food --slug covid-boosters')",
 )
 @click.option(
     "--skip-typos",
@@ -2278,7 +2272,6 @@ def save_collection_results(output_file: str, issues: list[dict[str, Any]]) -> N
 )
 def run(
     slug: tuple[str, ...],
-    chart_slug: tuple[str, ...],
     skip_typos: bool,
     skip_issues: bool,
     skip_grouping: bool,
@@ -2292,7 +2285,7 @@ def run(
     Examples:
         python metadata_inspector.py --skip-issues
         python metadata_inspector.py --slug global-food
-        python metadata_inspector.py --chart-slug co2-emissions-per-capita
+        python metadata_inspector.py --slug co2-emissions-per-capita
         python metadata_inspector.py --slug global-food --slug covid-boosters
         python metadata_inspector.py --slug animal-welfare --limit 5
         python metadata_inspector.py --output-file issues.csv
@@ -2306,12 +2299,11 @@ def run(
         rprint("[red]Error: ANTHROPIC_API_KEY not found. Add to .env file or use --skip-issues[/red]")
         raise click.ClickException("Missing ANTHROPIC_API_KEY")
 
-    # Load views (explorers and multidims)
+    # Load views (explorers, multidims, and charts)
     slug_list = list(slug) if slug else None
-    chart_slug_list = list(chart_slug) if chart_slug else None
 
     # Load both explorer views and chart configs
-    views = load_views(slug_list, chart_slug_list, limit)
+    views = load_views(slug_list, limit)
     if not views:
         return
 
