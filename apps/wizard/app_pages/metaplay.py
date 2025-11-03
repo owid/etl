@@ -153,7 +153,7 @@ with col_garden:
 ###################################################
 try:
     with col2:
-        clicked = st.button("Render data page", width="stretch", type="primary")
+        clicked = st.button("Render data page", width="content", type="primary")
 
         if clicked:
             # Update YAML files
