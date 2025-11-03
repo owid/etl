@@ -1,9 +1,15 @@
+from contextlib import contextmanager
 from typing import Any
 
 from rich import print as rprint
+from rich.console import Console
+from rich.progress import BarColumn, MofNCompleteColumn, Progress, TextColumn, TimeRemainingColumn
 
 from apps.inspector.config import CLAUDE_MODEL, GROUPING_MODEL, MODEL_PRICING
 from apps.inspector.detectors import calculate_cost
+from apps.inspector.utils import estimate_tokens
+
+console = Console()
 
 
 def display_issues(
@@ -301,3 +307,110 @@ def display_cost_estimate(
             rprint(f"  [dim](Without caching would cost: ${estimated_cost_no_cache:.4f})[/dim]")
     else:
         rprint("  No API calls needed for selected checks.")
+
+
+@contextmanager
+def create_progress_bar(description: str = "Processing", quiet: bool = False):
+    """Create a progress bar context manager.
+
+    Args:
+        description: Description to show in progress bar
+        quiet: If True, suppress progress bar entirely
+
+    Yields:
+        Progress object or None if quiet=True
+    """
+    if quiet:
+        # Return a no-op context manager
+
+        yield None
+    else:
+        with Progress(
+            TextColumn("[progress.description]{task.description}"),
+            BarColumn(),
+            MofNCompleteColumn(),
+            TimeRemainingColumn(),
+            console=console,
+        ) as progress:
+            yield progress
+
+
+def print_step(message: str, quiet: bool = False):
+    """Print a step message unless quiet mode is enabled.
+
+    Args:
+        message: Message to print
+        quiet: If True, suppress output
+    """
+    if not quiet:
+        rprint(message)
+
+
+def estimate_check_costs(
+    views: list[dict[str, Any]],
+    skip_typos: bool,
+    skip_issues: bool,
+) -> tuple[int, int]:
+    """Estimate token costs for checks without running them.
+
+    Returns:
+        Tuple of (input_tokens, output_tokens)
+    """
+    from apps.inspector.db import parse_chart_config
+
+    total_input_tokens = 0
+    total_output_tokens = 0
+
+    if not skip_issues:
+        rprint("[yellow]Estimating issue check costs (dry run)...[/yellow]")
+        # Estimate costs by simulating what would be checked
+        views_to_check = 0
+
+        for view in views:
+            # Build field list (same logic as check_view_async)
+            fields_to_check = []
+
+            # Handle config pseudo-views differently
+            if view.get("is_config_view"):
+                config_text = view.get("config_text", "")
+                if config_text and config_text.strip():
+                    fields_to_check.append(("collection_config", config_text))
+            else:
+                # Regular view handling
+                chart_config = parse_chart_config(view.get("chart_config"))
+
+                # Add chart fields
+                from apps.inspector.config import CHART_FIELDS_TO_CHECK, VARIABLE_FIELDS_TO_CHECK
+
+                for field_name in CHART_FIELDS_TO_CHECK:
+                    value = chart_config.get(field_name, "")
+                    if value and str(value).strip():
+                        fields_to_check.append((field_name, str(value)))
+
+                # Add variable metadata fields
+                for field_name in VARIABLE_FIELDS_TO_CHECK:
+                    values = view.get(field_name, [])
+                    if isinstance(values, list):
+                        for i, value in enumerate(values):
+                            if value and str(value).strip():
+                                indexed_field_name = f"{field_name}_{i}" if len(values) > 1 else field_name
+                                fields_to_check.append((indexed_field_name, str(value)))
+                    elif values and str(values).strip():
+                        fields_to_check.append((field_name, str(values)))
+
+            # Skip if no substantial content (need at least 1 non-empty field)
+            if len(fields_to_check) < 1:
+                continue
+
+            # Estimate prompt size (includes prompt template + field content)
+            prompt_text = "\n".join([f"{name}: {value}" for name, value in fields_to_check])
+
+            # Add ~250 tokens for the prompt template/instructions
+            total_input_tokens += estimate_tokens(prompt_text) + 250
+            # Average response is typically 50-150 tokens per view (more fields = potentially more issues)
+            total_output_tokens += 100
+            views_to_check += 1
+
+        rprint(f"[yellow]Would check {views_to_check}/{len(views)} views[/yellow]")
+
+    return total_input_tokens, total_output_tokens
