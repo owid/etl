@@ -46,12 +46,12 @@ console = Console()
 # making it the best choice for large-scale analysis.
 
 # Model for individual issue detection (used many times - cost matters)
-CLAUDE_MODEL = "claude-3-5-haiku-20241022"  # Fast: $1/M in, $5/M out (RECOMMENDED)
-# CLAUDE_MODEL = "claude-3-7-sonnet-20250219"  # Balanced: $3/M in, $15/M out
+CLAUDE_MODEL = "claude-haiku-4-5-20251001"  # Fast: $1/M in, $5/M out (RECOMMENDED)
+# CLAUDE_MODEL = "claude-sonnet-4-5-20250929"  # Balanced: $3/M in, $15/M out
 # CLAUDE_MODEL = "claude-opus-4-20250514"  # Quality: $15/M in, $75/M out
 
 # Model for grouping/pruning (used once per collection - quality matters more than cost)
-GROUPING_MODEL = "claude-3-7-sonnet-20250219"  # Better reasoning for filtering false positives
+GROUPING_MODEL = "claude-sonnet-4-5-20250929"  # Better reasoning for filtering false positives
 # GROUPING_MODEL = "claude-opus-4-20250514"  # Best quality if budget allows
 
 # Batch size configuration
@@ -74,11 +74,14 @@ DEFAULT_BATCH_SIZE = 20
 MAX_CONCURRENT_REQUESTS = 25
 
 # Model pricing (USD per million tokens)
-# Source: https://www.anthropic.com/api-pricing (verified 2025-10-28)
+# Source: https://claude.com/pricing (verified 2025-11-03)
 # Note: We use the regular API, not Batch API (which offers 50% discount but is asynchronous)
+# Sonnet 4.5 pricing: $3/M in, $15/M out for prompts ≤200K tokens (our use case)
 MODEL_PRICING = {
-    "claude-3-5-haiku-20241022": {"input": 1.0, "output": 5.0},
-    "claude-3-7-sonnet-20250219": {"input": 3.0, "output": 15.0},
+    "claude-haiku-4-5-20251001": {"input": 1.0, "output": 5.0},
+    "claude-3-5-haiku-20241022": {"input": 1.0, "output": 5.0},  # Legacy
+    "claude-sonnet-4-5-20250929": {"input": 3.0, "output": 15.0},
+    "claude-3-7-sonnet-20250219": {"input": 3.0, "output": 15.0},  # Legacy
     "claude-opus-4-20250514": {"input": 15.0, "output": 75.0},
 }
 
