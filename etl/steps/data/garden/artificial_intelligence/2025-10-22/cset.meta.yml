@@ -131,6 +131,8 @@ tables:
               <%- endif %>
         display:
           name: << field >> (projected)
+          isProjection: true
+
 
       num_patent_applications:
         title: Patent applications

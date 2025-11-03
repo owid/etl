@@ -68,7 +68,7 @@ def run() -> None:
     columns_to_nan = [col for col in tb.columns if col not in columns_to_exclude + ["country", "year", "field"]]
 
     # Set values to NaN for the specified regions and columns
-    tb.loc[tb["country"].isin(regional_aggregates), columns_to_nan] = np.nan
+    # tb.loc[tb["country"].isin(regional_aggregates), columns_to_nan] = np.nan
     tb = tb.format(["country", "year", "field"])
     #
     # Save outputs.
@@ -86,7 +86,7 @@ def add_regions(tb: Table, ds_regions: Dataset) -> Table:
         regions=REGIONS,
         index_columns=["country", "year", "field"],
         ds_regions=ds_regions,
-        min_num_values_per_year=1,
+        frac_allowed_nans_per_year=0.85,
     )
 
     return tb
