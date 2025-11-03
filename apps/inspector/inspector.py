@@ -26,8 +26,19 @@ from rich.progress import BarColumn, MofNCompleteColumn, Progress, TextColumn, T
 from rich_click.rich_command import RichCommand
 from structlog import get_logger
 
+from apps.inspector.config import (
+    CHART_FIELDS_TO_CHECK,
+    CLAUDE_MODEL,
+    DEFAULT_BATCH_SIZE,
+    GROUPING_MODEL,
+    MAX_CONCURRENT_REQUESTS,
+    VARIABLE_FIELDS_TO_CHECK,
+)
 from apps.inspector.db import (
+    build_explorer_url,
     load_views,
+    parse_chart_config,
+    parse_dimensions,
 )
 from apps.inspector.detectors import calculate_cost
 from apps.inspector.display import display_cost_estimate, display_results
@@ -37,226 +48,6 @@ from etl.paths import BASE_DIR
 # Initialize logger
 log = get_logger()
 console = Console()
-
-# Claude model configuration
-# Choose model based on speed vs quality tradeoff:
-# - Haiku: Fastest, cheapest (18% faster, 72% cheaper), excellent quality for this task
-# - Sonnet: Higher quality but slower and more expensive
-# - Opus: Highest quality but much slower and more expensive
-#
-# Testing showed Haiku finds same semantic issues as Sonnet with minimal quality difference,
-# making it the best choice for large-scale analysis.
-
-# Model for individual issue detection (used many times - cost matters)
-CLAUDE_MODEL = "claude-haiku-4-5-20251001"  # Fast: $1/M in, $5/M out (RECOMMENDED)
-# CLAUDE_MODEL = "claude-sonnet-4-5-20250929"  # Balanced: $3/M in, $15/M out
-# CLAUDE_MODEL = "claude-opus-4-20250514"  # Quality: $15/M in, $75/M out
-
-# Model for grouping/pruning (used once per collection - quality matters more than cost)
-GROUPING_MODEL = "claude-sonnet-4-5-20250929"  # Better reasoning for filtering false positives
-# GROUPING_MODEL = "claude-opus-4-20250514"  # Best quality if budget allows
-
-# Batch size configuration
-# Number of views to check per API call. Larger batches are faster and cheaper,
-# but batch sizes >100 cause quality degradation (model misses issues).
-#
-# Testing results (100 views):
-# - batch=10:  86s, $0.25 (baseline)
-# - batch=30:  31s, $0.17 (2.8x faster, 33% cheaper)
-# - batch=50:  18s, $0.15 (4.8x faster, 40% cheaper) ✓ OPTIMAL
-# - batch=100: 20s, $0.16 (4.3x faster, 36% cheaper, slight variance)
-# - batch=200: Quality degradation - misses semantic issues!
-#
-# Default of 50 provides best balance of speed, cost, and reliability.
-DEFAULT_BATCH_SIZE = 20
-
-# Concurrency limit for API requests
-# Anthropic rate limits: typically 5-50 concurrent requests depending on tier
-# Increase if you have higher tier access, decrease if you hit rate limits
-MAX_CONCURRENT_REQUESTS = 25
-
-# Model pricing (USD per million tokens)
-# Source: https://claude.com/pricing (verified 2025-11-03)
-# Note: We use the regular API, not Batch API (which offers 50% discount but is asynchronous)
-# Sonnet 4.5 pricing: $3/M in, $15/M out for prompts ≤200K tokens (our use case)
-MODEL_PRICING = {
-    "claude-haiku-4-5-20251001": {"input": 1.0, "output": 5.0},
-    "claude-3-5-haiku-20241022": {"input": 1.0, "output": 5.0},  # Legacy
-    "claude-sonnet-4-5-20250929": {"input": 3.0, "output": 15.0},
-    "claude-3-7-sonnet-20250219": {"input": 3.0, "output": 15.0},  # Legacy
-    "claude-opus-4-20250514": {"input": 15.0, "output": 75.0},
-}
-
-# Fields to inspect for typos and semantic issues
-# Both codespell and Claude AI will check these fields
-CHART_FIELDS_TO_CHECK = [
-    "title",
-    "subtitle",
-    "note",
-]
-
-VARIABLE_FIELDS_TO_CHECK = [
-    "variable_name",
-    "variable_description",
-    "variable_title_public",
-    "variable_description_short",
-    "variable_description_from_producer",
-    "variable_description_key",
-    "variable_description_processing",
-]
-
-
-def parse_multidim_view_id(view_id: str, mdim_config: str | None) -> dict[str, str]:
-    """Parse multidim viewId into dimension values.
-
-    ViewId format: choice values are ordered alphabetically by dimension slug.
-    E.g., for dimensions [metric, antigen], viewId "comparison__vaccinated" maps to
-    {antigen: comparison, metric: vaccinated} (alphabetical order: antigen, metric).
-
-    Args:
-        view_id: ViewId string like "level_side_by_side__number__both"
-        mdim_config: JSON config string with dimension definitions
-
-    Returns:
-        Dict mapping dimension slugs to choice slugs
-    """
-    if not view_id or not mdim_config:
-        return {}
-
-    try:
-        config = json.loads(mdim_config)
-        dimensions = config.get("dimensions", [])
-
-        if not dimensions:
-            return {}
-
-        # Split viewId by double underscore to get choice values
-        parts = view_id.split("__")
-
-        if len(parts) != len(dimensions):
-            return {}
-
-        # Sort dimension slugs alphabetically (this is the viewId ordering convention)
-        dim_slugs_sorted = sorted([dim.get("slug", "") for dim in dimensions])
-
-        # Map sorted dimension slugs to viewId parts
-        result = {}
-        for dim_slug, choice_slug in zip(dim_slugs_sorted, parts):
-            if dim_slug:
-                result[dim_slug] = choice_slug
-
-        return result
-    except (json.JSONDecodeError, AttributeError, KeyError):
-        return {}
-
-
-def parse_chart_config(chart_config_raw: Any) -> dict[str, Any]:
-    """Parse chart_config field which can be a dict (chart views) or JSON string (explorer views).
-
-    Args:
-        chart_config_raw: Raw chart_config value - can be dict or JSON string
-
-    Returns:
-        Parsed chart config dict, or empty dict if not present
-    """
-    if isinstance(chart_config_raw, dict):
-        return chart_config_raw
-    elif chart_config_raw:
-        try:
-            return json.loads(chart_config_raw)
-        except (json.JSONDecodeError, TypeError):
-            return {}
-    return {}
-
-
-def parse_dimensions(dimensions_raw: Any, mdim_config: str | None = None) -> dict[str, Any]:
-    """Parse dimensions field which can be JSON (explorers) or just a viewId (mdims).
-
-    Args:
-        dimensions_raw: Raw dimensions value from database
-        mdim_config: For multidims, the JSON config string
-
-    Returns:
-        Parsed dimensions dict, or empty dict if not applicable
-    """
-    if not dimensions_raw:
-        return {}
-    if isinstance(dimensions_raw, dict):
-        # Already parsed
-        return dimensions_raw
-    if isinstance(dimensions_raw, str) and dimensions_raw.startswith("{"):
-        # Explorer: dimensions is a JSON string
-        return json.loads(dimensions_raw)
-    # Mdim: dimensions is a viewId - parse it with the config
-    return parse_multidim_view_id(str(dimensions_raw), mdim_config)
-
-
-def get_codespell_path() -> Path | None:
-    """Get path to codespell binary.
-
-    Returns:
-        Path to codespell if available, None otherwise
-    """
-    # Check in venv first
-    venv_codespell = BASE_DIR / ".venv" / "bin" / "codespell"
-    if venv_codespell.exists():
-        return venv_codespell
-    return None
-
-
-def build_explorer_url(
-    explorer_slug: str,
-    dimensions: dict[str, Any],
-    view_type: str = "explorer",
-    mdim_published: bool = True,
-    mdim_catalog_path: str | None = None,
-) -> str:
-    """Build URL for explorer or multidim view with dimensions.
-
-    Args:
-        explorer_slug: Explorer slug (e.g., 'air-pollution')
-        dimensions: Dictionary of dimension key-value pairs
-        view_type: Type of view ('explorer' or 'multidim')
-        mdim_published: Whether the multidim is published
-        mdim_catalog_path: Catalog path for unpublished multidims
-
-    Returns:
-        Full URL to the view with properly encoded query parameters
-    """
-    from urllib.parse import quote, urlencode
-
-    base_url = config.OWID_ENV.site or "https://ourworldindata.org"
-
-    is_mdim = view_type == "multidim"
-
-    if is_mdim:
-        if mdim_published:
-            # Published multidim: /grapher/{slug}?dimensions
-            url = f"{base_url}/grapher/{explorer_slug}"
-            if dimensions:
-                params = {k: v for k, v in dimensions.items() if v}
-                if params:
-                    url += "?" + urlencode(params)
-        else:
-            # Unpublished multidim: /admin/grapher/{catalogPath}?dimensions#{slug}
-            # Ensure catalog_path is a string before quoting
-            catalog_path_str = str(mdim_catalog_path) if mdim_catalog_path is not None else ""
-            catalog_path = quote(catalog_path_str, safe="")
-            url = f"{base_url}/admin/grapher/{catalog_path}"
-            if dimensions:
-                params = {k: v for k, v in dimensions.items() if v}
-                if params:
-                    url += "?" + urlencode(params)
-            url += f"#{explorer_slug}"
-    else:
-        # Regular explorer: /explorers/{slug}?dimensions
-        url = f"{base_url}/explorers/{explorer_slug}"
-        if dimensions:
-            params = {k: v for k, v in dimensions.items() if v}
-            if params:
-                url += "?" + urlencode(params)
-
-    return url
 
 
 def get_text_context(text: str, typo: str, context_words: int = 10) -> str:
@@ -328,10 +119,6 @@ def check_typos(views: list[dict[str, Any]], quiet: bool = False) -> dict[int | 
     Returns:
         Dictionary mapping view_id (int or str for config pseudo-views) to list of typo issues
     """
-    codespell_path = get_codespell_path()
-    if not codespell_path:
-        return {}
-
     # Create a temporary directory for all text files
     temp_dir = tempfile.mkdtemp()
     view_files = {}  # Map view_id to list of (field_name, file_path, text)
@@ -424,7 +211,7 @@ def check_typos(views: list[dict[str, Any]], quiet: bool = False) -> dict[int | 
         if not quiet:
             rprint("  [cyan]Running spell checker...[/cyan]")
         ignore_file = BASE_DIR / ".codespell-ignore.txt"
-        cmd = [str(codespell_path), temp_dir]
+        cmd = [str(BASE_DIR / ".venv" / "bin" / "codespell"), temp_dir]
         if ignore_file.exists():
             cmd.extend(["--ignore-words", str(ignore_file)])
 
@@ -1686,11 +1473,6 @@ def run(
         python metadata_inspector.py --slug animal-welfare --limit 5
         python metadata_inspector.py --output-file issues.csv
     """
-    # Validate prerequisites
-    if not skip_typos and not get_codespell_path():
-        rprint("[yellow]Warning: codespell not found. Install with: uv add codespell[/yellow]")
-        skip_typos = True
-
     if not config.ANTHROPIC_API_KEY and not skip_issues:
         rprint("[red]Error: ANTHROPIC_API_KEY not found. Add to .env file or use --skip-issues[/red]")
         raise click.ClickException("Missing ANTHROPIC_API_KEY")
