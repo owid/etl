@@ -415,6 +415,7 @@ def extrapolate_backwards(tb_thousand_bins: Table, tb_gdp: Table, ds_population:
 
     if SHOW_WARNINGS:
         # Check empty values in pop column
+        # NOTE: I am checking this because it could be the case that some countries don't have population data for some years
         missing_pop = tb_thousand_bins_to_extrapolate[tb_thousand_bins_to_extrapolate["pop"].isna()]
 
         # Select only one quantile to review
