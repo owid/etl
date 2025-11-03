@@ -307,6 +307,9 @@ def prepare_gdp_data(tb_maddison: Table) -> Table:
     # Generate growth_factor column using priority: country > historical_entity > region
     tb_gdp["growth_factor"] = tb_gdp.apply(select_growth_factor, axis=1)
 
+    # Copy metadata from growth_factor_country to growth_factor
+    tb_gdp["growth_factor"] = tb_gdp["growth_factor"].copy_metadata(tb_gdp["growth_factor_country"])
+
     # Shift growth_factor down by one year to align with the starting year of extrapolation
     tb_gdp["growth_factor"] = tb_gdp.groupby("country")["growth_factor"].shift(-1)
 
@@ -563,6 +566,10 @@ def calculate_poverty_measures(tb: Table, ds_population: Dataset) -> Tuple[Table
     tb_poverty = tb_poverty.rename(
         columns={"cum_pop": "headcount", "percentage_global_pop": "headcount_ratio", "global_population": "population"}
     )
+
+    # Copy metadata from avg to headcount
+    tb_poverty["headcount"] = tb_poverty["headcount"].copy_metadata(tb["avg"])
+    tb_poverty["headcount_ratio"] = tb_poverty["headcount_ratio"].copy_metadata(tb["avg"])
 
     # Add country column
     tb_poverty["country"] = "World"
