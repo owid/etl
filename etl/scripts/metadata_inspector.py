@@ -719,6 +719,7 @@ def fetch_explorer_data(explorer_slugs: list[str] | None = None) -> pd.DataFrame
     """
     log.info("Fetching explorer configs...")
     configs_df = read_sql(config_query)
+    log.info(f"Fetched {len(configs_df)} explorer config(s)")
 
     # Deduplicate configs by slug (keep first occurrence)
     # This prevents cartesian product issues with NULL slugs during merge
@@ -833,6 +834,7 @@ def fetch_multidim_data(slug_filters: list[str] | None = None) -> pd.DataFrame:
     """
     log.info("Fetching multidim configs...")
     configs_df = read_sql(config_query)
+    log.info(f"Fetched {len(configs_df)} multidim config(s)")
 
     # Deduplicate configs by slug (keep first occurrence)
     # This prevents cartesian product issues with NULL slugs during merge
