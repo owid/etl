@@ -1,0 +1,50 @@
+title:
+  title: Religious composition
+  title_variant: ""
+default_selection:
+  - World
+
+definitions:
+  common_views:
+    - config:
+        chartTypes: ["SlopeChart"]
+        hasMapTab: true
+        originUrl: ourworldindata.org/war-and-peace
+
+dimensions:
+  - slug: religion
+    name: Religion
+    choices:
+      - slug: "religion_distrib"
+        name: "Religious composition"
+        group: "Aggregate"
+        description: Distribution of population by religion
+      - slug: "any_religion"
+        name: "Any religion"
+        group: "Aggregate"
+        description: People affiliated to any religion
+      - slug: "christians"
+        name: "Christianity"
+      - slug: "muslims"
+        name: "Islam"
+      - slug: "hindus"
+        name: "Hinduism"
+      - slug: "buddhists"
+        name: "Buddhism"
+      - slug: "jews"
+        name: "Judaism"
+      - slug: "other_religions"
+        name: "Other religions"
+      - slug: "religiously_unaffiliated"
+        name: "No religion"
+
+  - slug: indicator
+    name: Measure
+    choices:
+      - slug: "share"
+        name: "Share of population"
+        description: People affiliated to a religion as a percentage of the total population
+      - slug: "count_unrounded"
+        name: "Number of people"
+        description: Number of deaths divided by the total population
+views: []
