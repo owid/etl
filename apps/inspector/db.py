@@ -5,12 +5,10 @@ from typing import Any
 
 import pandas as pd
 from rich import print as rprint
-from sqlalchemy.orm import Session
 from structlog import get_logger
 
 from etl import config
-from etl.db import get_engine, read_sql
-from etl.grapher.model import Chart, ChartConfig
+from etl.db import read_sql
 
 log = get_logger()
 
@@ -259,48 +257,90 @@ def aggregate_multidim_views(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def fetch_chart_configs(chart_slugs: list[str] | None = None) -> list[dict[str, Any]]:
-    """Fetch chart configs from database by slug.
+    """Fetch chart configs from database by slug, including variable metadata.
 
     Args:
         chart_slugs: Optional list of chart slugs to filter by
 
     Returns:
-        List of chart config dictionaries with flattened human-readable fields
+        List of chart config dictionaries with variable metadata
     """
     log.info("Fetching chart configs from database...")
-    engine = get_engine()
-    with Session(engine) as session:
-        # Join with charts table to get numeric chart ID
-        query = session.query(ChartConfig, Chart).join(Chart, ChartConfig.id == Chart.configId)
 
-        # Filter by slugs if provided
-        if chart_slugs:
-            query = query.filter(ChartConfig.slug.in_(chart_slugs))
-        else:
-            # By default, only get published charts with slugs
-            # Note: Explorer views use unpublished charts (without slugs), so there's no duplication
-            query = query.filter(ChartConfig.slug.isnot(None))
+    # Build WHERE clause for SQL query
+    where_clause = ""
+    if chart_slugs:
+        slugs_str = "', '".join(chart_slugs)
+        where_clause = f"WHERE cc.slug IN ('{slugs_str}')"
+    else:
+        # By default, only get published charts with slugs
+        # Note: Explorer views use unpublished charts (without slugs), so there's no duplication
+        where_clause = "WHERE cc.slug IS NOT NULL"
 
-        results = query.all()
+    # Fetch charts with their variable metadata (similar to explorer views)
+    query = f"""
+        SELECT
+            c.id,
+            cc.id as config_id,
+            cc.slug,
+            'chart' as view_type,
+            cc.full as chart_config,
+            v.id as variable_id,
+            v.name as variable_name,
+            v.unit as variable_unit,
+            v.description as variable_description,
+            v.shortUnit as variable_short_unit,
+            v.shortName as variable_short_name,
+            v.titlePublic as variable_title_public,
+            v.titleVariant as variable_title_variant,
+            v.descriptionShort as variable_description_short,
+            v.descriptionFromProducer as variable_description_from_producer,
+            v.descriptionKey as variable_description_key,
+            v.descriptionProcessing as variable_description_processing
+        FROM charts c
+        JOIN chart_configs cc ON c.configId = cc.id
+        LEFT JOIN JSON_TABLE(
+            cc.full,
+            '$.dimensions[*]' COLUMNS(
+                variableId INT PATH '$.variableId'
+            )
+        ) jt ON TRUE
+        LEFT JOIN variables v ON jt.variableId = v.id
+        {where_clause}
+        ORDER BY cc.slug, c.id
+    """
 
-        if not results:
-            log.info("Fetched 0 chart configs")
-            return []
+    df = read_sql(query)
+    log.info(f"Fetched {len(df)} chart records (charts x variables, which will be aggregated)")
 
-        # Convert to format similar to explorer views
-        result = []
-        for chart_config, chart in results:
-            chart_dict = {
-                "id": chart.id,  # Numeric chart ID
-                "config_id": str(chart_config.id),  # Chart config ID (UUID) - keep for reference
-                "slug": chart_config.slug,
-                "view_type": "chart",  # Mark as chart (not explorer view)
-                "chart_config": chart_config.full,
+    if df.empty:
+        return []
+
+    # Aggregate by chart to group all variables together
+    agg_df = (
+        df.groupby(["id", "config_id", "slug", "view_type", "chart_config"], dropna=False)
+        .agg(
+            {
+                "variable_id": lambda x: list(x.dropna()),
+                "variable_name": lambda x: list(x.dropna()),
+                "variable_unit": lambda x: list(x.dropna()),
+                "variable_description": lambda x: list(x.dropna()),
+                "variable_short_unit": lambda x: list(x.dropna()),
+                "variable_short_name": lambda x: list(x.dropna()),
+                "variable_title_public": lambda x: list(x.dropna()),
+                "variable_title_variant": lambda x: list(x.dropna()),
+                "variable_description_short": lambda x: list(x.dropna()),
+                "variable_description_from_producer": lambda x: list(x.dropna()),
+                "variable_description_key": lambda x: list(x.dropna()),
+                "variable_description_processing": lambda x: list(x.dropna()),
             }
-            result.append(chart_dict)
+        )
+        .reset_index()
+    )
 
-        log.info(f"Fetched {len(result)} chart configs")
-        return result
+    result: list[dict[str, Any]] = agg_df.to_dict("records")  # type: ignore
+    log.info(f"Aggregated to {len(result)} chart configs")
+    return result
 
 
 def extract_chart_fields(chart_config: dict[str, Any]) -> list[tuple[str, Any]]:

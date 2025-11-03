@@ -362,13 +362,25 @@ async def check_view_async(
         # For configs, check the extracted human-readable text
         fields_to_check = [("collection_config", config_text)]
     elif view.get("view_type") == "chart":
-        # Chart config handling
-        chart_config = view.get("chart_config", {})
+        # Chart config handling - parse it first since it comes as JSON string from DB
+        chart_config = parse_chart_config(view.get("chart_config"))
         if not chart_config:
             return [], 0, 0, 0, 0
 
         # Extract fields from chart config using helper function
         fields_to_check = extract_chart_fields(chart_config)
+
+        # Add variable metadata fields (same as explorer views)
+        for field_name in VARIABLE_FIELDS_TO_CHECK:
+            values = view.get(field_name, [])
+            if isinstance(values, list):
+                for i, value in enumerate(values):
+                    if value and str(value).strip():
+                        # Include index in field name for multiple variables
+                        indexed_field_name = f"{field_name}_{i}" if len(values) > 1 else field_name
+                        fields_to_check.append((indexed_field_name, str(value)))
+            elif values and str(values).strip():
+                fields_to_check.append((field_name, str(values)))
     else:
         # Regular explorer view handling
         chart_config = parse_chart_config(view.get("chart_config"))
