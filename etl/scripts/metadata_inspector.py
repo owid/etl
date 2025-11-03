@@ -234,7 +234,9 @@ def build_explorer_url(
                     url += "?" + urlencode(params)
         else:
             # Unpublished multidim: /admin/grapher/{catalogPath}?dimensions#{slug}
-            catalog_path = quote(mdim_catalog_path or "", safe="")
+            # Ensure catalog_path is a string before quoting
+            catalog_path_str = str(mdim_catalog_path) if mdim_catalog_path is not None else ""
+            catalog_path = quote(catalog_path_str, safe="")
             url = f"{base_url}/admin/grapher/{catalog_path}"
             if dimensions:
                 params = {k: v for k, v in dimensions.items() if v}
@@ -369,11 +371,12 @@ def extract_human_readable_text(config_json: str) -> str:
     return "\n".join(texts)
 
 
-def check_typos(views: list[dict[str, Any]]) -> dict[int | str, list[dict[str, Any]]]:
+def check_typos(views: list[dict[str, Any]], quiet: bool = False) -> dict[int | str, list[dict[str, Any]]]:
     """Run codespell on all views at once for performance.
 
     Args:
         views: List of view dictionaries
+        quiet: Suppress progress bars
 
     Returns:
         Dictionary mapping view_id (int or str for config pseudo-views) to list of typo issues
@@ -388,19 +391,29 @@ def check_typos(views: list[dict[str, Any]]) -> dict[int | str, list[dict[str, A
 
     try:
         # Write all texts to temporary files
-        with Progress(
-            TextColumn("[progress.description]{task.description}"),
-            BarColumn(),
-            MofNCompleteColumn(),
-            TimeRemainingColumn(),
-            console=console,
-        ) as progress:
-            task = progress.add_task("Preparing views for spell check", total=len(views))
+        if not quiet:
+            progress_ctx = Progress(
+                TextColumn("[progress.description]{task.description}"),
+                BarColumn(),
+                MofNCompleteColumn(),
+                TimeRemainingColumn(),
+                console=console,
+            )
+        else:
+            # Use a dummy context manager that does nothing
+            from contextlib import nullcontext
+            progress_ctx = nullcontext()
+
+        with progress_ctx as progress:
+            if not quiet:
+                task = progress.add_task("Preparing views for spell check", total=len(views))
+            else:
+                task = None
 
             for view in views:
                 # Skip config pseudo-views - they'll be added separately below
                 if view.get("is_config_view"):
-                    progress.update(task, advance=1)
+                    if not quiet: progress.update(task, advance=1)
                     continue
 
                 # Handle chart_config - it's already a dict for chart views, but a JSON string for explorer views
@@ -440,11 +453,12 @@ def check_typos(views: list[dict[str, Any]]) -> dict[int | str, list[dict[str, A
                         file_path.write_text(text)
                         view_files[view_id].append((field_name, file_path, text))
 
-                progress.update(task, advance=1)
+                if not quiet: progress.update(task, advance=1)
 
         # Add collection configs as additional files to check
         # Config pseudo-views were already created in load_views()
-        rprint("  [cyan]Adding collection configs for spell check...[/cyan]")
+        if not quiet:
+            rprint("  [cyan]Adding collection configs for spell check...[/cyan]")
         for view in views:
             if view.get("is_config_view"):
                 config_view_id = view["id"]
@@ -457,7 +471,8 @@ def check_typos(views: list[dict[str, Any]]) -> dict[int | str, list[dict[str, A
                     view_files[config_view_id].append(("collection_config", file_path, config_text))
 
         # Run codespell once on the entire directory
-        rprint("  [cyan]Running spell checker...[/cyan]")
+        if not quiet:
+            rprint("  [cyan]Running spell checker...[/cyan]")
         ignore_file = BASE_DIR / ".codespell-ignore.txt"
         cmd = [str(codespell_path), temp_dir]
         if ignore_file.exists():
@@ -474,20 +489,29 @@ def check_typos(views: list[dict[str, Any]]) -> dict[int | str, list[dict[str, A
         result_lines = [line for line in result.stdout.strip().split("\n") if line and "==>" in line]
 
         if result_lines:
-            with Progress(
-                TextColumn("[progress.description]{task.description}"),
-                BarColumn(),
-                MofNCompleteColumn(),
-                TimeRemainingColumn(),
-                console=console,
-            ) as progress:
-                task = progress.add_task("Processing typos found", total=len(result_lines))
+            if not quiet:
+                progress_ctx2 = Progress(
+                    TextColumn("[progress.description]{task.description}"),
+                    BarColumn(),
+                    MofNCompleteColumn(),
+                    TimeRemainingColumn(),
+                    console=console,
+                )
+            else:
+                from contextlib import nullcontext
+                progress_ctx2 = nullcontext()
+
+            with progress_ctx2 as progress:
+                if not quiet:
+                    task = progress.add_task("Processing typos found", total=len(result_lines))
+                else:
+                    task = None
 
                 for line in result_lines:
                     # Parse: /tmp/dir/view_123_field.txt:1: typo ==> correction
                     parts = line.split("==>")
                     if len(parts) != 2:
-                        progress.update(task, advance=1)
+                        if not quiet: progress.update(task, advance=1)
                         continue
 
                     left = parts[0].strip()
@@ -496,7 +520,7 @@ def check_typos(views: list[dict[str, Any]]) -> dict[int | str, list[dict[str, A
                     # Extract file path, line number, and typo
                     file_parts = left.rsplit(":", 2)
                     if len(file_parts) < 3:
-                        progress.update(task, advance=1)
+                        if not quiet: progress.update(task, advance=1)
                         continue
 
                     file_path = file_parts[0]
@@ -507,13 +531,13 @@ def check_typos(views: list[dict[str, Any]]) -> dict[int | str, list[dict[str, A
                     try:
                         line_num_int = int(line_num)
                     except ValueError:
-                        progress.update(task, advance=1)
+                        if not quiet: progress.update(task, advance=1)
                         continue
 
                     # Extract view_id and field from filename
                     filename = Path(file_path).name
                     if not filename.startswith("view_"):
-                        progress.update(task, advance=1)
+                        if not quiet: progress.update(task, advance=1)
                         continue
 
                     # Parse filename: view_{view_id}_{field_name}.txt
@@ -522,7 +546,7 @@ def check_typos(views: list[dict[str, Any]]) -> dict[int | str, list[dict[str, A
                     # Rather than parsing the filename, search view_files for the matching file path
                     filename_without_ext = filename.replace(".txt", "")
                     if not filename_without_ext.startswith("view_"):
-                        progress.update(task, advance=1)
+                        if not quiet: progress.update(task, advance=1)
                         continue
 
                     # Search for the file path in view_files to find the correct view_id
@@ -546,7 +570,7 @@ def check_typos(views: list[dict[str, Any]]) -> dict[int | str, list[dict[str, A
                             break
 
                     if view_id is None:
-                        progress.update(task, advance=1)
+                        if not quiet: progress.update(task, advance=1)
                         continue
 
                     # Verify the typo actually exists in the text
@@ -555,7 +579,7 @@ def check_typos(views: list[dict[str, Any]]) -> dict[int | str, list[dict[str, A
                             f"Typo '{typo}' not found in text for view_id {view_id}, field {field_name}. "
                             f"Codespell reported it in {file_path}. Skipping."
                         )
-                        progress.update(task, advance=1)
+                        if not quiet: progress.update(task, advance=1)
                         continue
 
                     # Get context from the specific line where the typo was found
@@ -574,7 +598,7 @@ def check_typos(views: list[dict[str, Any]]) -> dict[int | str, list[dict[str, A
                         # Find any view from this explorer to get basic info
                         sample_view = next((v for v in views if v.get("explorerSlug") == explorer_slug), None)
                         if not sample_view:
-                            progress.update(task, advance=1)
+                            if not quiet: progress.update(task, advance=1)
                             continue
 
                         view_title = f"Collection Config ({explorer_slug})"
@@ -599,7 +623,7 @@ def check_typos(views: list[dict[str, Any]]) -> dict[int | str, list[dict[str, A
                         # Regular view
                         view = next((v for v in views if v["id"] == view_id), None)
                         if not view:
-                            progress.update(task, advance=1)
+                            if not quiet: progress.update(task, advance=1)
                             continue
 
                         chart_config = parse_chart_config(view.get("chart_config"))
@@ -642,7 +666,7 @@ def check_typos(views: list[dict[str, Any]]) -> dict[int | str, list[dict[str, A
                         issues_by_view[view_id] = []
                     issues_by_view[view_id].append(issue)
 
-                    progress.update(task, advance=1)
+                    if not quiet: progress.update(task, advance=1)
 
         return issues_by_view
 
@@ -2053,8 +2077,16 @@ def run_checks(
     skip_typos: bool,
     skip_issues: bool,
     batch_size: int,
+    quiet: bool = False,
 ) -> tuple[list[dict[str, Any]], int, int, int, int]:
     """Run all enabled checks and return issues and token usage.
+
+    Args:
+        views: List of view dictionaries to check
+        skip_typos: Skip codespell typo checking
+        skip_issues: Skip Claude API semantic checking
+        batch_size: Batch size for Claude API calls
+        quiet: Suppress progress messages (useful when processing many items with outer progress bar)
 
     Returns:
         Tuple of (all_issues, total_input_tokens, total_output_tokens, cache_creation_tokens, cache_read_tokens)
@@ -2067,8 +2099,9 @@ def run_checks(
 
     # Check typos with codespell
     if not skip_typos:
-        rprint("[cyan]Checking for typos with codespell...[/cyan]")
-        issues_by_view = check_typos(views)
+        if not quiet:
+            rprint("[cyan]Checking for typos with codespell...[/cyan]")
+        issues_by_view = check_typos(views, quiet=quiet)
         for view_issues in issues_by_view.values():
             all_issues.extend(view_issues)
 
@@ -2082,21 +2115,26 @@ def run_checks(
             ]
             all_issues.extend(grouped_codespell)
 
-        codespell_typos = len([i for i in all_issues if i["issue_type"] == "typo" and i.get("source") == "codespell"])
-        rprint(f"[green]✓ Found {codespell_typos} unique typos with codespell[/green]\n")
+        if not quiet:
+            codespell_typos = len(
+                [i for i in all_issues if i["issue_type"] == "typo" and i.get("source") == "codespell"]
+            )
+            rprint(f"[green]✓ Found {codespell_typos} unique typos with codespell[/green]\n")
 
     # Check for all issues with Claude (typos + semantic)
     if not skip_issues:
-        rprint("[bold]Checking for typos and semantic issues with Claude...[/bold]")
+        if not quiet:
+            rprint("[bold]Checking for typos and semantic issues with Claude...[/bold]")
         issues, usage_stats = check_issues(views, config.ANTHROPIC_API_KEY, batch_size, dry_run=False)
         all_issues.extend(issues)
         total_input_tokens += usage_stats.get("input_tokens", 0)
         total_output_tokens += usage_stats.get("output_tokens", 0)
         cache_creation_tokens += usage_stats.get("cache_creation_tokens", 0)
         cache_read_tokens += usage_stats.get("cache_read_tokens", 0)
-        claude_typos = len([i for i in issues if i.get("issue_type") == "typo"])
-        semantic_issues = len([i for i in issues if i.get("issue_type") == "semantic"])
-        rprint(f"[green]✓ Found {claude_typos} typos and {semantic_issues} semantic issues with Claude[/green]\n")
+        if not quiet:
+            claude_typos = len([i for i in issues if i.get("issue_type") == "typo"])
+            semantic_issues = len([i for i in issues if i.get("issue_type") == "semantic"])
+            rprint(f"[green]✓ Found {claude_typos} typos and {semantic_issues} semantic issues with Claude[/green]\n")
 
     return all_issues, total_input_tokens, total_output_tokens, cache_creation_tokens, cache_read_tokens
 
@@ -2405,14 +2443,20 @@ def run(
         return
 
     # Group views by collection (explorerSlug for explorers, slug for charts) for incremental processing
-    collections: dict[str, list[dict[str, Any]]] = {}
+    # Separate charts from explorer/multidim collections for better progress display
+    chart_collections: dict[str, list[dict[str, Any]]] = {}
+    other_collections: dict[str, list[dict[str, Any]]] = {}
+
     for view in views:
         # Charts use 'slug', explorers use 'explorerSlug'
-        collection_slug = view.get("slug") if view.get("view_type") == "chart" else view.get("explorerSlug")
-        if collection_slug and collection_slug not in collections:
-            collections[collection_slug] = []
+        is_chart = view.get("view_type") == "chart"
+        collection_slug = view.get("slug") if is_chart else view.get("explorerSlug")
+
         if collection_slug:
-            collections[collection_slug].append(view)
+            target_dict = chart_collections if is_chart else other_collections
+            if collection_slug not in target_dict:
+                target_dict[collection_slug] = []
+            target_dict[collection_slug].append(view)
 
     # Process collections one by one, saving after each
     all_issues = []
@@ -2422,10 +2466,15 @@ def run(
     total_cache_read_tokens = 0
     total_cost = 0.0
 
-    rprint(f"\n[bold cyan]Processing {len(collections)} collection(s)...[/bold cyan]\n")
+    total_collections = len(other_collections) + len(chart_collections)
+    rprint(
+        f"\n[bold cyan]Processing {total_collections} collection(s): {len(other_collections)} explorer/multidim(s) + {len(chart_collections)} chart(s)...[/bold cyan]\n"
+    )
 
-    for collection_num, (collection_slug, collection_views) in enumerate(collections.items(), 1):
-        rprint(f"[bold]Collection {collection_num}/{len(collections)}: {collection_slug}[/bold]")
+    # Process explorers/multidims first
+    for collection_num, (collection_slug, collection_views) in enumerate(other_collections.items(), 1):
+        rprint(f"[bold]Collection {collection_num}/{len(other_collections)}: {collection_slug}[/bold]")
+        collection_type = "Explorer/Multidim"
 
         # Run checks for this collection
         collection_issues, input_tokens, output_tokens, cache_creation, cache_read = run_checks(
@@ -2488,6 +2537,69 @@ def run(
         # Display cost for this collection
         rprint(f"  [dim]Cost: ${collection_cost:.4f} (running total: ${total_cost:.4f})[/dim]")
         rprint()
+
+    # Process charts separately with their own progress display
+    if chart_collections:
+        rprint(f"\n[bold cyan]Processing {len(chart_collections)} chart(s)...[/bold cyan]")
+
+        # Use a progress bar for charts
+        with Progress(
+            TextColumn("[progress.description]{task.description}"),
+            BarColumn(),
+            MofNCompleteColumn(),
+            TimeRemainingColumn(),
+            console=console,
+        ) as progress:
+            task = progress.add_task("[cyan]Checking charts...", total=len(chart_collections))
+
+            for chart_num, (chart_slug, chart_views) in enumerate(chart_collections.items(), 1):
+                # Update progress description with current chart
+                progress.update(task, description=f"[cyan]Chart {chart_num}/{len(chart_collections)}: {chart_slug}")
+
+                # Run checks for this chart (quiet mode to avoid cluttering progress bar)
+                collection_issues, input_tokens, output_tokens, cache_creation, cache_read = run_checks(
+                    chart_views, skip_typos, skip_issues, batch_size, quiet=True
+                )
+
+                # Calculate cost for this chart
+                collection_cost = calculate_cost(input_tokens, output_tokens, cache_creation, cache_read)
+                total_cost += collection_cost
+
+                total_input_tokens += input_tokens
+                total_output_tokens += output_tokens
+                total_cache_creation_tokens += cache_creation
+                total_cache_read_tokens += cache_read
+
+                # Save this chart's results immediately (even if no issues, for checkpoint tracking)
+                if output_file:
+                    if collection_issues:
+                        save_collection_results(output_file, collection_issues)
+                    else:
+                        # Save a marker row to track that this chart was processed
+                        if chart_views:
+                            chart_id = chart_views[0].get("id")
+                            base_url = config.OWID_ENV.site or "https://ourworldindata.org"
+                            chart_url = f"{base_url}/grapher/{chart_slug}"
+
+                            marker = {
+                                "slug": chart_slug,
+                                "id": chart_id,
+                                "type": "chart",
+                                "view_url": chart_url,
+                                "issue_type": "checkpoint",
+                                "field": "completed",
+                                "context": "",
+                                "explanation": "Collection processed with no issues found",
+                            }
+                            save_collection_results(output_file, [marker])
+
+                all_issues.extend(collection_issues)
+
+                # Advance progress
+                progress.update(task, advance=1)
+
+        rprint(f"[green]✓ Completed processing {len(chart_collections)} chart(s)[/green]")
+        rprint(f"[dim]Total charts cost: ${total_cost:.4f}[/dim]\n")
 
     # Group and prune issues (across all collections)
     grouping_tokens = 0
