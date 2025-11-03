@@ -402,18 +402,20 @@ def check_typos(views: list[dict[str, Any]], quiet: bool = False) -> dict[int | 
         else:
             # Use a dummy context manager that does nothing
             from contextlib import nullcontext
+
             progress_ctx = nullcontext()
 
         with progress_ctx as progress:
             if not quiet:
-                task = progress.add_task("Preparing views for spell check", total=len(views))
+                task = progress.add_task("Preparing views for spell check", total=len(views))  # type: ignore[union-attr]
             else:
                 task = None
 
             for view in views:
                 # Skip config pseudo-views - they'll be added separately below
                 if view.get("is_config_view"):
-                    if not quiet: progress.update(task, advance=1)
+                    if not quiet:
+                        progress.update(task, advance=1)  # type: ignore[union-attr,arg-type]
                     continue
 
                 # Handle chart_config - it's already a dict for chart views, but a JSON string for explorer views
@@ -453,7 +455,8 @@ def check_typos(views: list[dict[str, Any]], quiet: bool = False) -> dict[int | 
                         file_path.write_text(text)
                         view_files[view_id].append((field_name, file_path, text))
 
-                if not quiet: progress.update(task, advance=1)
+                if not quiet:
+                    progress.update(task, advance=1)  # type: ignore[union-attr,arg-type]
 
         # Add collection configs as additional files to check
         # Config pseudo-views were already created in load_views()
@@ -499,11 +502,12 @@ def check_typos(views: list[dict[str, Any]], quiet: bool = False) -> dict[int | 
                 )
             else:
                 from contextlib import nullcontext
+
                 progress_ctx2 = nullcontext()
 
             with progress_ctx2 as progress:
                 if not quiet:
-                    task = progress.add_task("Processing typos found", total=len(result_lines))
+                    task = progress.add_task("Processing typos found", total=len(result_lines))  # type: ignore[union-attr]
                 else:
                     task = None
 
@@ -511,7 +515,8 @@ def check_typos(views: list[dict[str, Any]], quiet: bool = False) -> dict[int | 
                     # Parse: /tmp/dir/view_123_field.txt:1: typo ==> correction
                     parts = line.split("==>")
                     if len(parts) != 2:
-                        if not quiet: progress.update(task, advance=1)
+                        if not quiet:
+                            progress.update(task, advance=1)  # type: ignore[union-attr,arg-type]
                         continue
 
                     left = parts[0].strip()
@@ -520,7 +525,8 @@ def check_typos(views: list[dict[str, Any]], quiet: bool = False) -> dict[int | 
                     # Extract file path, line number, and typo
                     file_parts = left.rsplit(":", 2)
                     if len(file_parts) < 3:
-                        if not quiet: progress.update(task, advance=1)
+                        if not quiet:
+                            progress.update(task, advance=1)  # type: ignore[union-attr,arg-type]
                         continue
 
                     file_path = file_parts[0]
@@ -531,13 +537,15 @@ def check_typos(views: list[dict[str, Any]], quiet: bool = False) -> dict[int | 
                     try:
                         line_num_int = int(line_num)
                     except ValueError:
-                        if not quiet: progress.update(task, advance=1)
+                        if not quiet:
+                            progress.update(task, advance=1)  # type: ignore[union-attr,arg-type]
                         continue
 
                     # Extract view_id and field from filename
                     filename = Path(file_path).name
                     if not filename.startswith("view_"):
-                        if not quiet: progress.update(task, advance=1)
+                        if not quiet:
+                            progress.update(task, advance=1)  # type: ignore[union-attr,arg-type]
                         continue
 
                     # Parse filename: view_{view_id}_{field_name}.txt
@@ -546,7 +554,8 @@ def check_typos(views: list[dict[str, Any]], quiet: bool = False) -> dict[int | 
                     # Rather than parsing the filename, search view_files for the matching file path
                     filename_without_ext = filename.replace(".txt", "")
                     if not filename_without_ext.startswith("view_"):
-                        if not quiet: progress.update(task, advance=1)
+                        if not quiet:
+                            progress.update(task, advance=1)  # type: ignore[union-attr,arg-type]
                         continue
 
                     # Search for the file path in view_files to find the correct view_id
@@ -570,7 +579,8 @@ def check_typos(views: list[dict[str, Any]], quiet: bool = False) -> dict[int | 
                             break
 
                     if view_id is None:
-                        if not quiet: progress.update(task, advance=1)
+                        if not quiet:
+                            progress.update(task, advance=1)  # type: ignore[union-attr,arg-type]
                         continue
 
                     # Verify the typo actually exists in the text
@@ -579,7 +589,8 @@ def check_typos(views: list[dict[str, Any]], quiet: bool = False) -> dict[int | 
                             f"Typo '{typo}' not found in text for view_id {view_id}, field {field_name}. "
                             f"Codespell reported it in {file_path}. Skipping."
                         )
-                        if not quiet: progress.update(task, advance=1)
+                        if not quiet:
+                            progress.update(task, advance=1)  # type: ignore[union-attr,arg-type]
                         continue
 
                     # Get context from the specific line where the typo was found
@@ -598,7 +609,8 @@ def check_typos(views: list[dict[str, Any]], quiet: bool = False) -> dict[int | 
                         # Find any view from this explorer to get basic info
                         sample_view = next((v for v in views if v.get("explorerSlug") == explorer_slug), None)
                         if not sample_view:
-                            if not quiet: progress.update(task, advance=1)
+                            if not quiet:
+                                progress.update(task, advance=1)  # type: ignore[union-attr,arg-type]
                             continue
 
                         view_title = f"Collection Config ({explorer_slug})"
@@ -623,7 +635,8 @@ def check_typos(views: list[dict[str, Any]], quiet: bool = False) -> dict[int | 
                         # Regular view
                         view = next((v for v in views if v["id"] == view_id), None)
                         if not view:
-                            if not quiet: progress.update(task, advance=1)
+                            if not quiet:
+                                progress.update(task, advance=1)  # type: ignore[union-attr,arg-type]
                             continue
 
                         chart_config = parse_chart_config(view.get("chart_config"))
@@ -666,7 +679,8 @@ def check_typos(views: list[dict[str, Any]], quiet: bool = False) -> dict[int | 
                         issues_by_view[view_id] = []
                     issues_by_view[view_id].append(issue)
 
-                    if not quiet: progress.update(task, advance=1)
+                    if not quiet:
+                        progress.update(task, advance=1)  # type: ignore[union-attr,arg-type]
 
         return issues_by_view
 
@@ -1088,7 +1102,12 @@ def extract_json_array(content: str) -> str:
 
 
 def call_claude(
-    client: anthropic.Anthropic, model: str, max_tokens: int, prompt: str, max_retries: int = 3
+    client: anthropic.Anthropic,
+    model: str,
+    max_tokens: int,
+    prompt: str,
+    max_retries: int = 3,
+    display_prompt: bool = False,
 ) -> anthropic.types.Message:
     """Call Claude API with exponential backoff retry logic.
 
@@ -1098,6 +1117,7 @@ def call_claude(
         max_tokens: Maximum tokens in response
         prompt: Prompt text to send
         max_retries: Maximum number of retry attempts
+        display_prompt: If True, print the prompt before sending
 
     Returns:
         API response message
@@ -1105,6 +1125,13 @@ def call_claude(
     Raises:
         Exception: If all retries fail
     """
+    if display_prompt:
+        rprint(f"\n[bold yellow]{'=' * 80}[/bold yellow]")
+        rprint(f"[bold yellow]Prompt to {model} (max_tokens={max_tokens}):[/bold yellow]")
+        rprint(f"[bold yellow]{'=' * 80}[/bold yellow]")
+        rprint(prompt)
+        rprint(f"[bold yellow]{'=' * 80}[/bold yellow]\n")
+
     for attempt in range(max_retries):
         try:
             response = client.messages.create(
@@ -1133,8 +1160,14 @@ def call_claude(
 async def check_view_async(
     client: anthropic.AsyncAnthropic,
     view: dict[str, Any],
+    display_prompt: bool = False,
 ) -> tuple[list[dict[str, Any]], int, int, int, int]:
     """Check a single view for issues asynchronously.
+
+    Args:
+        client: Async Anthropic client
+        view: View dictionary to check
+        display_prompt: If True, print prompt before sending
 
     Returns:
         Tuple of (issues, input_tokens, output_tokens, cache_creation_tokens, cache_read_tokens)
@@ -1209,6 +1242,14 @@ Here is the metadata to check:"""
 
     raw_text = ""  # Initialize for type checker
     response = None  # Initialize for type checker
+
+    if display_prompt:
+        full_prompt = f"{instructions}\n\n{fields_text}"
+        rprint(f"\n[bold yellow]{'=' * 80}[/bold yellow]")
+        rprint(f"[bold yellow]Prompt to {CLAUDE_MODEL} (max_tokens=1024) for view {view.get('id')}:[/bold yellow]")
+        rprint(f"[bold yellow]{'=' * 80}[/bold yellow]")
+        rprint(full_prompt)
+        rprint(f"[bold yellow]{'=' * 80}[/bold yellow]\n")
 
     # Retry logic for transient API errors (rate limits, overloaded, etc.)
     max_retries = 3
@@ -1375,7 +1416,11 @@ Here is the metadata to check:"""
 
 
 def check_issues(
-    views: list[dict[str, Any]], api_key: str | None, batch_size: int = 10, dry_run: bool = False
+    views: list[dict[str, Any]],
+    api_key: str | None,
+    batch_size: int = 10,
+    dry_run: bool = False,
+    display_prompt: bool = False,
 ) -> tuple[list[dict[str, Any]], dict[str, int]]:
     """Check for semantic inconsistencies and absurdities using Claude API.
 
@@ -1384,6 +1429,7 @@ def check_issues(
         api_key: Anthropic API key
         batch_size: Ignored (kept for compatibility)
         dry_run: If True, estimate costs without making API calls
+        display_prompt: If True, print prompts before sending to Claude
 
     Returns:
         Tuple of (list of semantic issues found, usage stats dict)
@@ -1452,7 +1498,7 @@ def check_issues(
 
             async def check_with_semaphore(view):
                 async with semaphore:
-                    return await check_view_async(client, view)
+                    return await check_view_async(client, view, display_prompt=display_prompt)
 
             tasks = [check_with_semaphore(view) for view in views]
 
@@ -1503,7 +1549,9 @@ def check_issues(
     return all_issues, usage_stats
 
 
-def group_issues(issues: list[dict[str, Any]], api_key: str | None) -> tuple[list[dict[str, Any]], int]:
+def group_issues(
+    issues: list[dict[str, Any]], api_key: str | None, display_prompt: bool = False
+) -> tuple[list[dict[str, Any]], int]:
     """Group similar issues and prune spurious typos using Claude in a single API call.
 
     Uses Claude to:
@@ -1514,6 +1562,7 @@ def group_issues(issues: list[dict[str, Any]], api_key: str | None) -> tuple[lis
     Args:
         issues: List of issue dictionaries
         api_key: Anthropic API key
+        display_prompt: If True, print prompt before sending to Claude
 
     Returns:
         Tuple of (grouped/pruned issues, tokens used)
@@ -1605,6 +1654,7 @@ Write arrays explicitly [0, 1, 2], NOT Python code."""
             model=GROUPING_MODEL,  # Use higher-quality model for grouping/pruning
             max_tokens=3072,
             prompt=prompt,
+            display_prompt=display_prompt,
         )
 
         # Parse response
@@ -2078,6 +2128,7 @@ def run_checks(
     skip_issues: bool,
     batch_size: int,
     quiet: bool = False,
+    display_prompt: bool = False,
 ) -> tuple[list[dict[str, Any]], int, int, int, int]:
     """Run all enabled checks and return issues and token usage.
 
@@ -2087,6 +2138,7 @@ def run_checks(
         skip_issues: Skip Claude API semantic checking
         batch_size: Batch size for Claude API calls
         quiet: Suppress progress messages (useful when processing many items with outer progress bar)
+        display_prompt: If True, print prompts before sending to Claude
 
     Returns:
         Tuple of (all_issues, total_input_tokens, total_output_tokens, cache_creation_tokens, cache_read_tokens)
@@ -2125,7 +2177,9 @@ def run_checks(
     if not skip_issues:
         if not quiet:
             rprint("[bold]Checking for typos and semantic issues with Claude...[/bold]")
-        issues, usage_stats = check_issues(views, config.ANTHROPIC_API_KEY, batch_size, dry_run=False)
+        issues, usage_stats = check_issues(
+            views, config.ANTHROPIC_API_KEY, batch_size, dry_run=False, display_prompt=display_prompt
+        )
         all_issues.extend(issues)
         total_input_tokens += usage_stats.get("input_tokens", 0)
         total_output_tokens += usage_stats.get("output_tokens", 0)
@@ -2376,6 +2430,11 @@ def save_collection_results(output_file: str, issues: list[dict[str, Any]]) -> N
     is_flag=True,
     help="Estimate API costs without making actual API calls",
 )
+@click.option(
+    "--display-prompt",
+    is_flag=True,
+    help="Print the exact prompts sent to Claude API",
+)
 def run(
     slug: tuple[str, ...],
     skip_typos: bool,
@@ -2385,6 +2444,7 @@ def run(
     batch_size: int,
     limit: int | None,
     dry_run: bool,
+    display_prompt: bool,
 ) -> None:
     """Check explorer, multidim views, and chart configs for typos and semantic issues.
 
@@ -2478,7 +2538,7 @@ def run(
 
         # Run checks for this collection
         collection_issues, input_tokens, output_tokens, cache_creation, cache_read = run_checks(
-            collection_views, skip_typos, skip_issues, batch_size
+            collection_views, skip_typos, skip_issues, batch_size, display_prompt=display_prompt
         )
 
         # Calculate cost for this collection
@@ -2558,7 +2618,7 @@ def run(
 
                 # Run checks for this chart (quiet mode to avoid cluttering progress bar)
                 collection_issues, input_tokens, output_tokens, cache_creation, cache_read = run_checks(
-                    chart_views, skip_typos, skip_issues, batch_size, quiet=True
+                    chart_views, skip_typos, skip_issues, batch_size, quiet=True, display_prompt=display_prompt
                 )
 
                 # Calculate cost for this chart
@@ -2605,7 +2665,9 @@ def run(
     grouping_tokens = 0
     if all_issues and not skip_grouping:
         rprint("  [cyan]Grouping similar issues and pruning false positives...[/cyan]")
-        grouped_issues, grouping_tokens = group_issues(all_issues, config.ANTHROPIC_API_KEY)
+        grouped_issues, grouping_tokens = group_issues(
+            all_issues, config.ANTHROPIC_API_KEY, display_prompt=display_prompt
+        )
         # Note: grouping tokens are tracked separately since they use a different model
     else:
         grouped_issues = all_issues
