@@ -133,13 +133,15 @@ def approve_identical_chart_diffs(dry_run: bool = True, chart_ids: list[int] | N
                 prod_json = json.dumps(config_prod, indent=2, sort_keys=True).splitlines(keepends=True)
                 staging_json = json.dumps(config_staging, indent=2, sort_keys=True).splitlines(keepends=True)
 
-                diff_lines = list(unified_diff(
-                    prod_json,
-                    staging_json,
-                    fromfile=f"production (chart {chart_id})",
-                    tofile=f"staging (chart {chart_id})",
-                    lineterm=""
-                ))
+                diff_lines = list(
+                    unified_diff(
+                        prod_json,
+                        staging_json,
+                        fromfile=f"production (chart {chart_id})",
+                        tofile=f"staging (chart {chart_id})",
+                        lineterm="",
+                    )
+                )
 
                 if diff_lines:
                     print(f"\n{'='*80}")
