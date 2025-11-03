@@ -77,10 +77,47 @@ def read_and_clean_data(file_ids: List[str], temp_dir: str, field_name: str) -> 
 
         # Read the CSV file
         df_add = pd.read_csv(file_path)
-        if "complete" in df_add.columns:
+
+        # Handle estimated investment data with projections
+        if file_name == "companies_yearly_estimated.csv" and "complete" in df_add.columns:
+            # Separate actual vs projected data based on boolean 'complete' column
+            df_actual = df_add[df_add["complete"] == True].copy()
+            df_projected = df_add[df_add["complete"] == False].copy()
+
+            # Drop the 'complete' column
+            df_actual = df_actual.drop(columns=["complete"])
+            df_projected_raw = df_projected.drop(columns=["complete"])
+
+            # For projected data, also include the actual value from 1 year before
+            # Create a shifted version of actual data (year - 1)
+            df_actual_shifted = df_actual.copy()
+            df_actual_shifted["year"] = df_actual_shifted["year"] + 1  # Shift year forward by 1
+
+            # Merge projected data with the previous year's actual data
+            df_projected = pd.merge(
+                df_projected_raw,
+                df_actual_shifted,
+                on=["country", "year", "field"],
+                how="left",
+                suffixes=("_projected", "_projected_prev_year"),
+            )
+
+            # Rename columns to distinguish projected from actual
+            value_cols = [col for col in df_projected_raw.columns if col not in ["country", "year", "field"]]
+            rename_dict = {
+                col: f"{col}_projected" for col in value_cols if f"{col}_projected" not in df_projected.columns
+            }
+            df_projected.rename(columns=rename_dict, inplace=True)
+            print(df_projected)
+            # Merge actual and projected data
+            df_add = pd.merge(df_actual, df_projected, on=["country", "year", "field"], how="outer")
+
+        # Filter by 'complete' column for other datasets
+        elif "complete" in df_add.columns:
             df_add["complete"] = df_add["complete"].astype(str)
             df_add = df_add[df_add["complete"] == "True"]
             df_add = df_add.drop(columns=["complete"])
+
         # Normalize 'field' capitalization
         df_add["field"] = df_add["field"].apply(lambda s: s[0] + s[1:].lower() if isinstance(s, str) else s)
 

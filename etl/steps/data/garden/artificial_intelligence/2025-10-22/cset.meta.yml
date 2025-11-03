@@ -108,6 +108,30 @@ tables:
         display:
           name: << field >>
 
+      estimated_investment_projected:
+        title: Estimated investment (projected)
+        unit: constant 2021 US$
+        short_unit: $
+        description_short: |-
+          Projected estimates of private investment in AI. {definitions.description_short_investment}
+        description_processing: |-
+          {definitions.description_processing_investment}
+        description_key:
+          - *description_key_investment
+          - Projected values represent forecasted investment amounts for future years.
+        presentation:
+          grapher_config:
+              note: |-
+                {definitions.note_investment} Projected values are estimates for future years.
+          title_public: |-
+              <% if field == "All" -%>
+              Annual private investment in artificial intelligence (estimated, projected)
+              <%- else -%>
+              Annual private investment in << field|lower >> (estimated, projected)
+              <%- endif %>
+        display:
+          name: << field >> (projected)
+
       num_patent_applications:
         title: Patent applications
         unit: applications
