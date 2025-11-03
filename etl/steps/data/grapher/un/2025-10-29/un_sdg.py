@@ -57,6 +57,13 @@ def run(dest_dir: str) -> None:
     # Add table of processed data to the new dataset.
     # add tables to dataset
     all_tables = []
+    assertion_errors = []
+
+    # Preload source mappings
+    clean_source_mapping = load_clean_source_mapping()
+    additional_source_mapping = load_additional_source_mapping()
+    source_desc = load_source_description()
+    short_source_mapping = load_short_source_mapping()
 
     for var in ds_garden.table_names:
         if SUBSET and not re.search(SUBSET, var):
@@ -70,17 +77,19 @@ def run(dest_dir: str) -> None:
         tb = create_table(tb)
 
         # clean source name - this uses source column and hardcoded mapping in un_sdg.sources.json/ un_sdg.sources_additional.json - check whether this mapping is still up to date here: https://unstats.un.org/sdgs/iaeg-sdgs/tier-classification/.
-        tb["source_producer"] = clean_source_name(tb, load_clean_source_mapping(), load_additional_source_mapping())
-
-        # add short attribution, this uses mapping in un_sdg.sources_short.json
-        tb["attribution_short"] = add_short_source_name(tb["source_producer"], load_short_source_mapping())
+        try:
+            tb["source_producer"] = clean_source_name(tb, clean_source_mapping, additional_source_mapping)
+            # add short attribution, this uses mapping in un_sdg.sources_short.json
+            tb["attribution_short"] = add_short_source_name(tb["source_producer"], short_source_mapping)
+        except AssertionError as e:
+            assertion_errors.append(e)
+            tb["source_producer"] = ""
+            tb["attribution_short"] = ""
 
         # add title of data product where applicable, otherwise this defaults to "multiple sources"
         tb["source_title"] = get_source(tb["source"])
 
         tb_var_gr = tb.groupby("variable_name")
-
-        source_desc = load_source_description()
 
         for var_name, tb_var in tb_var_gr:
             tb_var = add_metadata_and_prepare_for_grapher(tb_var, source_desc, DATE_ACCESSED, CURRENT_YEAR)
@@ -125,6 +134,13 @@ def run(dest_dir: str) -> None:
             short_name_counts[short_name] = 0
 
     #
+    # Check for assertion errors and fail if any found
+    #
+    if assertion_errors:
+        error_messages = "\n".join(str(e) for e in assertion_errors)
+        raise AssertionError(f"Found {len(assertion_errors)} missing source(s):\n\n{error_messages}")
+
+    #
     # Save outputs.
     #
     ds_grapher = create_dataset(dest_dir, tables=all_tables, default_metadata=ds_garden.metadata)
@@ -139,6 +155,7 @@ def clean_source_name(tb: Table, clean_source_map: Dict[str, str], additional_so
     unique_srcs = tb["source"].drop_duplicates()
     ind_code = tb["variable_name"].iloc[0].split("-")[0].strip()
     if len(unique_srcs) > 1:
+        assert ind_code in additional_source_map, f"{repr(ind_code)} not in un_sdg.sources_additional.json - please add"
         clean_source = additional_source_map[ind_code]
     else:
         source_name = unique_srcs.iloc[0].strip()
