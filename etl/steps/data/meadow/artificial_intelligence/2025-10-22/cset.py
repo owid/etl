@@ -80,9 +80,10 @@ def read_and_clean_data(file_ids: List[str], temp_dir: str, field_name: str) -> 
 
         # Handle estimated investment data with projections
         if file_name == "companies_yearly_estimated.csv" and "complete" in df_add.columns:
+            df_add["complete"] = df_add["complete"].astype(str)
             # Separate actual vs projected data based on boolean 'complete' column
-            df_actual = df_add[df_add["complete"] == True].copy()
-            df_projected = df_add[df_add["complete"] == False].copy()
+            df_actual = df_add[df_add["complete"] == "True"].copy()
+            df_projected = df_add[df_add["complete"] == "False"].copy()
 
             # Drop the 'complete' column
             df_actual = df_actual.drop(columns=["complete"])
@@ -108,7 +109,6 @@ def read_and_clean_data(file_ids: List[str], temp_dir: str, field_name: str) -> 
                 col: f"{col}_projected" for col in value_cols if f"{col}_projected" not in df_projected.columns
             }
             df_projected.rename(columns=rename_dict, inplace=True)
-            print(df_projected)
             # Merge actual and projected data
             df_add = pd.merge(df_actual, df_projected, on=["country", "year", "field"], how="outer")
 
