@@ -413,6 +413,18 @@ def extrapolate_backwards(tb_thousand_bins: Table, tb_gdp: Table, ds_population:
     # Divide pop into quantiles (1000 quantiles)
     tb_thousand_bins_to_extrapolate["pop"] /= 1000
 
+    if SHOW_WARNINGS:
+        # Check empty values in pop column
+        missing_pop = tb_thousand_bins_to_extrapolate[tb_thousand_bins_to_extrapolate["pop"].isna()]
+
+        # Select only one quantile to review
+        missing_pop = missing_pop[missing_pop["quantile"] == 1]
+
+        # Define countries with missing population values
+        missing_countries = missing_pop["country"].unique()
+        if not missing_pop.empty:
+            log.warning(f"extrapolate_backwards: Missing population values for countries:\n{missing_countries}")
+
     # Drop cumulative_growth_factor column, as it's no longer needed
     tb_thousand_bins_to_extrapolate = tb_thousand_bins_to_extrapolate.drop(columns=["cumulative_growth_factor"])
 
