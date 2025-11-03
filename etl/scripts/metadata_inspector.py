@@ -1691,8 +1691,44 @@ Write arrays explicitly [0, 1, 2], NOT Python code."""
         return group_typos(typo_issues) + other_issues, 0
 
 
+def group_identical_typos(typo_issues: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Group ABSOLUTELY identical typos within each collection.
+
+    Groups typos by: slug + field + typo + correction + context (first 200 chars).
+    Only typos that match ALL these criteria are grouped together.
+
+    Args:
+        typo_issues: List of typo issue dictionaries
+
+    Returns:
+        List of grouped typo issues with 'count' field indicating duplicates
+    """
+    from collections import defaultdict
+
+    groups = defaultdict(list)
+    for issue in typo_issues:
+        # Group key for typos - must match ALL fields to be considered identical
+        key = (
+            issue.get("slug", ""),
+            issue.get("field", ""),
+            issue.get("typo", ""),
+            issue.get("correction", ""),
+            issue.get("context", "")[:200],
+        )
+        groups[key].append(issue)
+
+    # Create grouped issues with count
+    grouped_issues = []
+    for group in groups.values():
+        representative = group[0].copy()
+        representative["count"] = len(group)  # Number of identical occurrences
+        grouped_issues.append(representative)
+
+    return grouped_issues
+
+
 def group_typos(typo_issues: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    """Group typos using simple string matching.
+    """Group typos using simple string matching (legacy function for display).
 
     Args:
         typo_issues: List of typo issue dictionaries
@@ -1775,8 +1811,8 @@ def display_issues(
     if issues:
         # Display summary
         total_unique = len(issues)
-        # Calculate total original count from similar_count fields
-        total_original = sum(issue.get("similar_count", 1) for issue in issues)
+        # Calculate total original count from count field (or similar_count for backwards compat)
+        total_original = sum(issue.get("count", issue.get("similar_count", 1)) for issue in issues)
         num_collections = len(issues_by_explorer)
         rprint(
             f"\n[bold]Found {total_original} total issues ({total_unique} unique) across {num_collections} collection(s)[/bold]"
@@ -1812,7 +1848,8 @@ def display_issues(
             view_url = issue.get("view_url", "")
             field = issue.get("field", "unknown")
             context = issue.get("context", "")
-            similar_count = issue.get("similar_count", 1)
+            # Use 'count' field from grouping (for CSV consistency), fallback to 'similar_count' for backwards compat
+            count = issue.get("count", issue.get("similar_count", 1))
             source = issue.get("source", "unknown")
 
             # Print issue header with embedded clickable link
@@ -1824,9 +1861,9 @@ def display_issues(
             else:
                 rprint(f"\n[bold]{i}. {view_title}[/bold] [dim](id: {view_id})[/dim]")
 
-            # Show group count if more than 1
-            if similar_count > 1:
-                rprint(f"   [dim]({similar_count} similar occurrences in this explorer)[/dim]")
+            # Show count if more than 1 occurrence
+            if count > 1:
+                rprint(f"   [dim]({count} identical occurrences in this collection)[/dim]")
 
             # Print issue details
             issue_type = issue.get("issue_type", "semantic")
@@ -2032,8 +2069,19 @@ def run_checks(
         issues_by_view = check_typos(views)
         for view_issues in issues_by_view.values():
             all_issues.extend(view_issues)
-        codespell_typos = len([i for i in all_issues if i["issue_type"] == "typo"])
-        rprint(f"[green]✓ Found {codespell_typos} typos with codespell[/green]\n")
+
+        # Group identical codespell typos immediately
+        codespell_issues = [i for i in all_issues if i.get("issue_type") == "typo" and i.get("source") == "codespell"]
+        if codespell_issues:
+            grouped_codespell = group_identical_typos(codespell_issues)
+            # Replace codespell issues in all_issues with grouped ones
+            all_issues = [
+                i for i in all_issues if not (i.get("issue_type") == "typo" and i.get("source") == "codespell")
+            ]
+            all_issues.extend(grouped_codespell)
+
+        codespell_typos = len([i for i in all_issues if i["issue_type"] == "typo" and i.get("source") == "codespell"])
+        rprint(f"[green]✓ Found {codespell_typos} unique typos with codespell[/green]\n")
 
     # Check for all issues with Claude (typos + semantic)
     if not skip_issues:
@@ -2218,7 +2266,7 @@ def save_collection_results(output_file: str, issues: list[dict[str, Any]]) -> N
         return
 
     # Define expected column order for CSV output
-    expected_columns = ["slug", "id", "type", "url", "issue_type", "field", "context", "explanation"]
+    expected_columns = ["slug", "id", "type", "url", "issue_type", "field", "context", "explanation", "count"]
 
     # Filter issues to only include expected columns
     filtered_issues = []
@@ -2228,6 +2276,9 @@ def save_collection_results(output_file: str, issues: list[dict[str, Any]]) -> N
         for col in expected_columns:
             if col == "url":
                 filtered_issue[col] = issue.get("view_url", "")
+            elif col == "count":
+                # Use count field if present (from grouping), otherwise default to 1
+                filtered_issue[col] = issue.get("count", 1)
             else:
                 filtered_issue[col] = issue.get(col, "")
         filtered_issues.append(filtered_issue)
