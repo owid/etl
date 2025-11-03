@@ -129,6 +129,66 @@ def estimate_tokens(text: str) -> int:
     return len(text) // 4
 
 
+def format_field_value(value: Any) -> str:
+    """Format a field value for display, handling lists and JSON arrays specially.
+
+    Args:
+        value: The field value (can be str, list, or other)
+
+    Returns:
+        Formatted string suitable for AI inspection
+    """
+    # Handle string values that might be JSON arrays
+    if isinstance(value, str):
+        value_stripped = value.strip()
+        # Check if it looks like a JSON array
+        if value_stripped.startswith("[") and value_stripped.endswith("]"):
+            try:
+                parsed = json.loads(value_stripped)
+                if isinstance(parsed, list):
+                    # Recursively format the parsed list
+                    return format_field_value(parsed)
+            except (json.JSONDecodeError, TypeError):
+                # If parsing fails, return as-is
+                pass
+        return value
+
+    if isinstance(value, list):
+        # For lists, join items with bullet points for readability
+        if not value:
+            return ""
+        # Filter out empty items
+        items = [str(item).strip() for item in value if item and str(item).strip()]
+        if not items:
+            return ""
+
+        # Try to parse each item as JSON in case it's a JSON-encoded array
+        parsed_items = []
+        for item in items:
+            try:
+                # Check if item looks like a JSON array
+                if item.startswith("[") and item.endswith("]"):
+                    parsed = json.loads(item)
+                    if isinstance(parsed, list):
+                        # Flatten the nested list
+                        parsed_items.extend(str(x).strip() for x in parsed if x and str(x).strip())
+                    else:
+                        parsed_items.append(item)
+                else:
+                    parsed_items.append(item)
+            except (json.JSONDecodeError, TypeError):
+                # If parsing fails, just use the original item
+                parsed_items.append(item)
+
+        if not parsed_items:
+            return ""
+        if len(parsed_items) == 1:
+            return parsed_items[0]
+        # Use bullet points for multiple items
+        return "\n".join(f"• {item}" for item in parsed_items)
+    return str(value)
+
+
 def extract_chart_fields(chart_config: dict[str, Any]) -> list[tuple[str, Any]]:
     """Extract human-readable fields from chart config JSON.
 

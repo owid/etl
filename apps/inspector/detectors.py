@@ -21,7 +21,13 @@ from apps.inspector.config import (
     VARIABLE_FIELDS_TO_CHECK,
 )
 from apps.inspector.db import build_explorer_url, parse_chart_config, parse_dimensions
-from apps.inspector.utils import call_claude, extract_chart_fields, extract_json_array, get_text_context
+from apps.inspector.utils import (
+    call_claude,
+    extract_chart_fields,
+    extract_json_array,
+    format_field_value,
+    get_text_context,
+)
 from etl import config
 from etl.paths import BASE_DIR
 
@@ -375,12 +381,17 @@ async def check_view_async(
             values = view.get(field_name, [])
             if isinstance(values, list):
                 for i, value in enumerate(values):
-                    if value and str(value).strip():
-                        # Include index in field name for multiple variables
-                        indexed_field_name = f"{field_name}_{i}" if len(values) > 1 else field_name
-                        fields_to_check.append((indexed_field_name, str(value)))
-            elif values and str(values).strip():
-                fields_to_check.append((field_name, str(values)))
+                    if value:
+                        # Format the value (handles JSON arrays and lists nicely)
+                        formatted = format_field_value(value)
+                        if formatted.strip():
+                            # Include index in field name for multiple variables
+                            indexed_field_name = f"{field_name}_{i}" if len(values) > 1 else field_name
+                            fields_to_check.append((indexed_field_name, formatted))
+            elif values:
+                formatted = format_field_value(values)
+                if formatted.strip():
+                    fields_to_check.append((field_name, formatted))
     else:
         # Regular explorer view handling
         chart_config = parse_chart_config(view.get("chart_config"))
@@ -399,19 +410,32 @@ async def check_view_async(
             values = view.get(field_name, [])
             if isinstance(values, list):
                 for i, value in enumerate(values):
-                    if value and str(value).strip():
-                        # Include index in field name for multiple variables
-                        indexed_field_name = f"{field_name}_{i}" if len(values) > 1 else field_name
-                        fields_to_check.append((indexed_field_name, str(value)))
-            elif values and str(values).strip():
-                fields_to_check.append((field_name, str(values)))
+                    if value:
+                        # Format the value (handles JSON arrays and lists nicely)
+                        formatted = format_field_value(value)
+                        if formatted.strip():
+                            # Include index in field name for multiple variables
+                            indexed_field_name = f"{field_name}_{i}" if len(values) > 1 else field_name
+                            fields_to_check.append((indexed_field_name, formatted))
+            elif values:
+                formatted = format_field_value(values)
+                if formatted.strip():
+                    fields_to_check.append((field_name, formatted))
 
     # Skip if no substantial content (need at least 1 non-empty field)
     if len(fields_to_check) < 1:
         return [], 0, 0, 0, 0
 
-    # Build prompt text
-    fields_text = "\n".join([f"{name.replace('_', ' ').title()}: {value}" for name, value in fields_to_check])
+    # Build prompt text - handle multi-line values (like bullet lists) properly
+    formatted_fields = []
+    for name, value in fields_to_check:
+        field_label = name.replace("_", " ").title()
+        # If value contains newlines (e.g., bullet points), add newline after label
+        if "\n" in value:
+            formatted_fields.append(f"{field_label}:\n{value}")
+        else:
+            formatted_fields.append(f"{field_label}: {value}")
+    fields_text = "\n\n".join(formatted_fields)
 
     # Split prompt into cacheable (instructions) and variable (data) parts
     # The instructions are cached across all requests, saving ~62% on costs
