@@ -11,8 +11,6 @@ The approach:
 4. Generate estimates for individual countries and regional aggregates
 """
 
-from typing import Dict, Optional
-
 import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Dataset, Table
