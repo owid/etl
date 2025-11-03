@@ -29,7 +29,7 @@ from structlog import get_logger
 
 from etl import config
 from etl.db import get_engine, read_sql
-from etl.grapher.model import ChartConfig
+from etl.grapher.model import Chart, ChartConfig
 from etl.paths import BASE_DIR
 
 # Initialize logger
@@ -579,10 +579,12 @@ def check_typos(views: list[dict[str, Any]]) -> dict[int | str, list[dict[str, A
 
                         view_title = f"Collection Config ({explorer_slug})"
                         view_url = f"https://ourworldindata.org/explorers/{explorer_slug}"
+                        view_type = sample_view.get("view_type", "explorer")
 
                         issue = {
-                            "view_id": view_id,
-                            "explorer_slug": explorer_slug,
+                            "id": view_id,
+                            "slug": explorer_slug,
+                            "type": view_type,
                             "view_title": view_title,
                             "view_url": view_url,
                             "issue_type": "typo",
@@ -620,8 +622,11 @@ def check_typos(views: list[dict[str, Any]]) -> dict[int | str, list[dict[str, A
                         )
 
                         issue = {
-                            "view_id": view_id,
-                            "explorer_slug": view.get("explorerSlug", view.get("slug", "")),
+                            "id": view_id,
+                            "slug": view.get("slug")
+                            if view.get("view_type") == "chart"
+                            else view.get("explorerSlug", ""),
+                            "type": view.get("view_type", "explorer"),
                             "view_title": view_title,
                             "view_url": view_url,
                             "issue_type": "typo",
@@ -901,7 +906,8 @@ def fetch_chart_configs(chart_slugs: list[str] | None = None) -> list[dict[str, 
     log.info("Fetching chart configs from database...")
     engine = get_engine()
     with Session(engine) as session:
-        query = session.query(ChartConfig)
+        # Join with charts table to get numeric chart ID
+        query = session.query(ChartConfig, Chart).join(Chart, ChartConfig.id == Chart.configId)
 
         # Filter by slugs if provided
         if chart_slugs:
@@ -911,20 +917,21 @@ def fetch_chart_configs(chart_slugs: list[str] | None = None) -> list[dict[str, 
             # Note: Explorer views use unpublished charts (without slugs), so there's no duplication
             query = query.filter(ChartConfig.slug.isnot(None))
 
-        charts = query.all()
+        results = query.all()
 
-        if not charts:
+        if not results:
             log.info("Fetched 0 chart configs")
             return []
 
         # Convert to format similar to explorer views
         result = []
-        for chart in charts:
+        for chart_config, chart in results:
             chart_dict = {
-                "id": str(chart.id),  # Chart config ID (UUID)
-                "slug": chart.slug,
+                "id": chart.id,  # Numeric chart ID
+                "config_id": str(chart_config.id),  # Chart config ID (UUID) - keep for reference
+                "slug": chart_config.slug,
                 "view_type": "chart",  # Mark as chart (not explorer view)
-                "chart_config": chart.full,
+                "chart_config": chart_config.full,
             }
             result.append(chart_dict)
 
@@ -1279,9 +1286,10 @@ Here is the metadata to check:"""
 
         # Enrich each issue with view metadata
         for issue in view_issues:
-            issue["view_id"] = view["id"]
+            issue["id"] = view["id"]
             # For charts, use 'slug' instead of 'explorerSlug'
-            issue["explorer_slug"] = view.get("slug") if view.get("view_type") == "chart" else view.get("explorerSlug")
+            issue["slug"] = view.get("slug") if view.get("view_type") == "chart" else view.get("explorerSlug")
+            issue["type"] = view.get("view_type", "explorer")
             issue["view_title"] = view_title
             issue["source"] = "ai"  # Mark as AI-detected
 
@@ -1289,7 +1297,8 @@ Here is the metadata to check:"""
             if view.get("view_type") == "chart":
                 # Chart configs use direct chart URL
                 chart_slug = view.get("slug", "")
-                issue["view_url"] = f"https://ourworldindata.org/grapher/{chart_slug}" if chart_slug else ""
+                base_url = config.OWID_ENV.site or "https://ourworldindata.org"
+                issue["view_url"] = f"{base_url}/grapher/{chart_slug}" if chart_slug else ""
             elif view.get("is_config_view"):
                 # For config pseudo-views, build base URL without dimension parameters
                 view_type = view.get("view_type", "explorer")
@@ -1697,7 +1706,7 @@ def group_typos(typo_issues: list[dict[str, Any]]) -> list[dict[str, Any]]:
     for issue in typo_issues:
         # Group key for typos
         key = (
-            issue.get("explorer_slug", ""),
+            issue.get("slug", ""),
             issue.get("field", ""),
             issue.get("typo", ""),
             issue.get("correction", ""),
@@ -1732,11 +1741,11 @@ def display_issues(
     """
     from collections import defaultdict
 
-    # Group issues by explorer
+    # Group issues by slug (explorer/multidim/chart)
     issues_by_explorer = defaultdict(list)
     for issue in issues:
-        explorer_slug = issue.get("explorer_slug", "unknown")
-        issues_by_explorer[explorer_slug].append(issue)
+        slug = issue.get("slug", "unknown")
+        issues_by_explorer[slug].append(issue)
 
     # Deduplicate codespell typos within each explorer by (typo, correction) pair
     # Keep track of how many duplicates were removed
@@ -1807,13 +1816,13 @@ def display_issues(
             source = issue.get("source", "unknown")
 
             # Print issue header with embedded clickable link
-            view_id = issue.get("view_id", issue.get("id", "unknown"))
+            view_id = issue.get("id", "unknown")
 
             if view_url:
                 # Embed link in title for clickable terminal support
-                rprint(f"\n[bold]{i}. [link={view_url}]{view_title}[/link][/bold] [dim](view_id: {view_id})[/dim]")
+                rprint(f"\n[bold]{i}. [link={view_url}]{view_title}[/link][/bold] [dim](id: {view_id})[/dim]")
             else:
-                rprint(f"\n[bold]{i}. {view_title}[/bold] [dim](view_id: {view_id})[/dim]")
+                rprint(f"\n[bold]{i}. {view_title}[/bold] [dim](id: {view_id})[/dim]")
 
             # Show group count if more than 1
             if similar_count > 1:
@@ -2189,8 +2198,8 @@ def get_completed_collections(output_file: str) -> set[str]:
 
     try:
         df = pd.read_csv(output_path)
-        if "explorer_slug" in df.columns:
-            completed = set(df["explorer_slug"].dropna().unique())
+        if "slug" in df.columns:
+            completed = set(df["slug"].dropna().unique())
             return completed
         return set()
     except Exception as e:
@@ -2209,12 +2218,18 @@ def save_collection_results(output_file: str, issues: list[dict[str, Any]]) -> N
         return
 
     # Define expected column order for CSV output
-    expected_columns = ["explorer_slug", "view_id", "issue_type", "field", "context", "explanation"]
+    expected_columns = ["slug", "id", "type", "url", "issue_type", "field", "context", "explanation"]
 
     # Filter issues to only include expected columns
     filtered_issues = []
     for issue in issues:
-        filtered_issue = {col: issue.get(col, "") for col in expected_columns}
+        # Map view_url to url for CSV output
+        filtered_issue = {}
+        for col in expected_columns:
+            if col == "url":
+                filtered_issue[col] = issue.get("view_url", "")
+            else:
+                filtered_issue[col] = issue.get(col, "")
         filtered_issues.append(filtered_issue)
 
     df = pd.DataFrame(filtered_issues, columns=expected_columns)
@@ -2380,9 +2395,33 @@ def run(
                 rprint(f"  [green]✓ Saved {len(collection_issues)} issue(s) to {output_file}[/green]")
             else:
                 # Save a marker row to track that this collection was processed
+                if collection_views:
+                    collection_type = collection_views[0].get("view_type", "explorer")
+                    collection_id = collection_views[0].get("id")
+
+                    # Build URL based on type
+                    base_url = config.OWID_ENV.site or "https://ourworldindata.org"
+                    if collection_type == "chart":
+                        collection_url = f"{base_url}/grapher/{collection_slug}"
+                    elif collection_type == "multidim":
+                        # For multidims, use the first view to get publish status and catalog path
+                        mdim_published = bool(collection_views[0].get("mdim_published", True))
+                        mdim_catalog_path = collection_views[0].get("mdim_catalog_path")
+                        collection_url = build_explorer_url(
+                            collection_slug, {}, "multidim", mdim_published, mdim_catalog_path
+                        )
+                    else:  # explorer
+                        collection_url = f"{base_url}/explorers/{collection_slug}"
+                else:
+                    collection_type = "explorer"
+                    collection_id = None
+                    collection_url = ""
+
                 marker = {
-                    "explorer_slug": collection_slug,
-                    "view_id": None,
+                    "slug": collection_slug,
+                    "id": collection_id,
+                    "type": collection_type,
+                    "view_url": collection_url,
                     "issue_type": "checkpoint",
                     "field": "completed",
                     "context": "",
