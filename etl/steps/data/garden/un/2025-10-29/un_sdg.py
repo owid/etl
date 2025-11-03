@@ -151,6 +151,41 @@ def manual_clean_data(df: pd.DataFrame) -> pd.DataFrame:
     df = df[~df["seriescode"].isin(["ER_OAW_MNACD"])]
     df = df.drop(["level_0", "index"], axis=1, errors="ignore")
 
+    # Fix data quality issues for indicator 12.2.2
+    df = fix_indicator_12_2_2(df)
+
+    return df
+
+
+def fix_indicator_12_2_2(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Fix data quality issues for indicator 12.2.2 (Domestic material consumption per unit of GDP).
+
+    Issue: In 2023, some countries (e.g., Canada) report zero values for the "Total or no breakdown"
+    category while missing data for individual product types. This appears to be incomplete data
+    submission rather than true zero consumption.
+
+    Solution:
+    1. Replace negative values with zero (negative consumption is not valid)
+    2. Replace zero values in 2023 with NaN to indicate missing data
+
+    This prevents misleading visualizations showing zero consumption when data is actually unavailable.
+
+    Args:
+        df: DataFrame containing UN SDG data
+
+    Returns:
+        DataFrame with fixed values for indicator 12.2.2
+    """
+    df = df.copy(deep=False)
+    mask_12_2_2 = df["indicator"] == "12.2.2"
+
+    # Replace negative values with zero (negative consumption is invalid)
+    df.loc[mask_12_2_2 & (df["value"] < 0), "value"] = 0
+
+    # Replace zeros in 2023 with NaN (likely incomplete data submission)
+    df.loc[mask_12_2_2 & (df["year"] == 2023) & (df["value"] == 0), "value"] = np.nan
+
     return df
 
 
