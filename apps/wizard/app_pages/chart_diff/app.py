@@ -479,7 +479,7 @@ def _show_options_display():
             ],
             key="charts-per-page",
             help="Select the number of charts to display per page.",
-            index=1,
+            index=2,  # Default to 20
         )
 
     with col3:
@@ -556,8 +556,7 @@ def _show_summary_top(chart_diffs):
     if num_charts_pending > 50:
         st.info(
             f"💡 **Tip:** You have {num_charts_pending} charts pending review. "
-            "You can use the CLI command `etl approve --dry-run` to automatically approve charts with identical configs between staging and production. "
-            "This can significantly speed up the review process for charts where only the underlying data changed."
+            "You can use the CLI command `etl approve --dry-run` to automatically approve charts with identical configs & data."
         )
 
     # Signal filtering (if any)
