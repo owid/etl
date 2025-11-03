@@ -87,30 +87,38 @@ def read_and_clean_data(file_ids: List[str], temp_dir: str, field_name: str) -> 
 
             # Drop the 'complete' column
             df_actual = df_actual.drop(columns=["complete"])
-            df_projected_raw = df_projected.drop(columns=["complete"])
+            df_projected = df_projected.drop(columns=["complete"])
 
-            # For projected data, also include the actual value from 1 year before
-            # Create a shifted version of actual data (year - 1)
-            df_actual_shifted = df_actual.copy()
-            df_actual_shifted["year"] = df_actual_shifted["year"] + 1  # Shift year forward by 1
+            # For projected years, include the last actual year's value
+            # Find the last actual year for each country/field combination
+            df_last_actual = df_actual.loc[df_actual.groupby(["country", "field"])["year"].idxmax()]
 
-            # Merge projected data with the previous year's actual data
-            df_projected = pd.merge(
-                df_projected_raw,
-                df_actual_shifted,
-                on=["country", "year", "field"],
-                how="left",
-                suffixes=("_projected", "_projected_prev_year"),
-            )
+            # Get value columns
+            value_cols = [col for col in df_projected.columns if col not in ["country", "year", "field"]]
 
-            # Rename columns to distinguish projected from actual
-            value_cols = [col for col in df_projected_raw.columns if col not in ["country", "year", "field"]]
-            rename_dict = {
-                col: f"{col}_projected" for col in value_cols if f"{col}_projected" not in df_projected.columns
-            }
+            # Create a version of last actual values to merge with projected data
+            df_last_actual_for_projected = df_last_actual[["country", "field"] + value_cols].copy()
+            rename_dict = {col: f"{col}_projected" for col in value_cols}
+            df_last_actual_for_projected.rename(columns=rename_dict, inplace=True)
+
+            # Rename projected columns
             df_projected.rename(columns=rename_dict, inplace=True)
+
+            # Merge last actual values into all projected rows
+            df_projected_with_actual = pd.merge(df_projected, df_last_actual_for_projected, on=["country", "field"], how="left", suffixes=("", "_last_actual"))
+
+            # Fill projected values with last actual where projected is missing
+            for col in value_cols:
+                proj_col = f"{col}_projected"
+                last_col = f"{col}_projected_last_actual"
+                if last_col in df_projected_with_actual.columns:
+                    df_projected_with_actual[proj_col] = df_projected_with_actual[proj_col].fillna(df_projected_with_actual[last_col])
+                    df_projected_with_actual.drop(columns=[last_col], inplace=True)
+
+            df_projected_combined = df_projected_with_actual
+
             # Merge actual and projected data
-            df_add = pd.merge(df_actual, df_projected, on=["country", "year", "field"], how="outer")
+            df_add = pd.merge(df_actual, df_projected_combined, on=["country", "year", "field"], how="outer")
 
         # Filter by 'complete' column for other datasets
         elif "complete" in df_add.columns:
