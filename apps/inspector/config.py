@@ -68,4 +68,8 @@ VARIABLE_FIELDS_TO_CHECK = [
     "variable_description_from_producer",
     "variable_description_key",
     "variable_description_processing",
+    "variable_unit",
+    "variable_title_variant",
+    "variable_attribution",
+    "variable_attribution_short",
 ]

@@ -392,6 +392,32 @@ async def check_view_async(
                 formatted = format_field_value(values)
                 if formatted.strip():
                     fields_to_check.append((field_name, formatted))
+
+        # Handle variable_display specially - extract display name from JSON
+        variable_display_values = view.get("variable_display", [])
+        if isinstance(variable_display_values, list):
+            for i, display_json in enumerate(variable_display_values):
+                if display_json:
+                    try:
+                        # Parse the JSON if it's a string
+                        if isinstance(display_json, str):
+                            display_obj = json.loads(display_json)
+                        else:
+                            display_obj = display_json
+
+                        # Extract the name field from the display object
+                        if isinstance(display_obj, dict) and "name" in display_obj:
+                            display_name = display_obj["name"]
+                            if display_name and str(display_name).strip():
+                                indexed_field_name = (
+                                    f"variable_display_name_{i}"
+                                    if len(variable_display_values) > 1
+                                    else "variable_display_name"
+                                )
+                                fields_to_check.append((indexed_field_name, str(display_name)))
+                    except (json.JSONDecodeError, TypeError):
+                        # If parsing fails, skip this display value
+                        pass
     else:
         # Regular explorer view handling
         chart_config = parse_chart_config(view.get("chart_config"))
@@ -421,6 +447,32 @@ async def check_view_async(
                 formatted = format_field_value(values)
                 if formatted.strip():
                     fields_to_check.append((field_name, formatted))
+
+        # Handle variable_display specially - extract display name from JSON
+        variable_display_values = view.get("variable_display", [])
+        if isinstance(variable_display_values, list):
+            for i, display_json in enumerate(variable_display_values):
+                if display_json:
+                    try:
+                        # Parse the JSON if it's a string
+                        if isinstance(display_json, str):
+                            display_obj = json.loads(display_json)
+                        else:
+                            display_obj = display_json
+
+                        # Extract the name field from the display object
+                        if isinstance(display_obj, dict) and "name" in display_obj:
+                            display_name = display_obj["name"]
+                            if display_name and str(display_name).strip():
+                                indexed_field_name = (
+                                    f"variable_display_name_{i}"
+                                    if len(variable_display_values) > 1
+                                    else "variable_display_name"
+                                )
+                                fields_to_check.append((indexed_field_name, str(display_name)))
+                    except (json.JSONDecodeError, TypeError):
+                        # If parsing fails, skip this display value
+                        pass
 
     # Skip if no substantial content (need at least 1 non-empty field)
     if len(fields_to_check) < 1:

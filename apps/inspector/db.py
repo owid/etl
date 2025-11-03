@@ -43,12 +43,15 @@ def fetch_explorer_data(explorer_slugs: list[str] | None = None) -> pd.DataFrame
             v.description as variable_description,
             v.shortUnit as variable_short_unit,
             v.shortName as variable_short_name,
+            v.display as variable_display,
             v.titlePublic as variable_title_public,
             v.titleVariant as variable_title_variant,
             v.descriptionShort as variable_description_short,
             v.descriptionFromProducer as variable_description_from_producer,
             v.descriptionKey as variable_description_key,
-            v.descriptionProcessing as variable_description_processing
+            v.descriptionProcessing as variable_description_processing,
+            v.attribution as variable_attribution,
+            v.attributionShort as variable_attribution_short
         FROM explorer_views ev
         LEFT JOIN chart_configs cc ON ev.chartConfigId = cc.id
         LEFT JOIN JSON_TABLE(
@@ -117,12 +120,15 @@ def aggregate_explorer_views(df: pd.DataFrame) -> pd.DataFrame:
                 "variable_description": lambda x: list(x.dropna()),
                 "variable_short_unit": lambda x: list(x.dropna()),
                 "variable_short_name": lambda x: list(x.dropna()),
+                "variable_display": lambda x: list(x.dropna()),
                 "variable_title_public": lambda x: list(x.dropna()),
                 "variable_title_variant": lambda x: list(x.dropna()),
                 "variable_description_short": lambda x: list(x.dropna()),
                 "variable_description_from_producer": lambda x: list(x.dropna()),
                 "variable_description_key": lambda x: list(x.dropna()),
                 "variable_description_processing": lambda x: list(x.dropna()),
+                "variable_attribution": lambda x: list(x.dropna()),
+                "variable_attribution_short": lambda x: list(x.dropna()),
             }
         )
         .reset_index()
@@ -163,12 +169,15 @@ def fetch_multidim_data(slug_filters: list[str] | None = None) -> pd.DataFrame:
             v.description as variable_description,
             v.shortUnit as variable_short_unit,
             v.shortName as variable_short_name,
+            v.display as variable_display,
             v.titlePublic as variable_title_public,
             v.titleVariant as variable_title_variant,
             v.descriptionShort as variable_description_short,
             v.descriptionFromProducer as variable_description_from_producer,
             v.descriptionKey as variable_description_key,
-            v.descriptionProcessing as variable_description_processing
+            v.descriptionProcessing as variable_description_processing,
+            v.attribution as variable_attribution,
+            v.attributionShort as variable_attribution_short
         FROM multi_dim_data_pages md
         JOIN multi_dim_x_chart_configs mx ON md.id = mx.multiDimId
         LEFT JOIN chart_configs cc ON mx.chartConfigId = cc.id
@@ -242,12 +251,15 @@ def aggregate_multidim_views(df: pd.DataFrame) -> pd.DataFrame:
                 "variable_description": lambda x: list(x.dropna()),
                 "variable_short_unit": lambda x: list(x.dropna()),
                 "variable_short_name": lambda x: list(x.dropna()),
+                "variable_display": lambda x: list(x.dropna()),
                 "variable_title_public": lambda x: list(x.dropna()),
                 "variable_title_variant": lambda x: list(x.dropna()),
                 "variable_description_short": lambda x: list(x.dropna()),
                 "variable_description_from_producer": lambda x: list(x.dropna()),
                 "variable_description_key": lambda x: list(x.dropna()),
                 "variable_description_processing": lambda x: list(x.dropna()),
+                "variable_attribution": lambda x: list(x.dropna()),
+                "variable_attribution_short": lambda x: list(x.dropna()),
             }
         )
         .reset_index()
@@ -291,12 +303,15 @@ def fetch_chart_configs(chart_slugs: list[str] | None = None) -> list[dict[str, 
             v.description as variable_description,
             v.shortUnit as variable_short_unit,
             v.shortName as variable_short_name,
+            v.display as variable_display,
             v.titlePublic as variable_title_public,
             v.titleVariant as variable_title_variant,
             v.descriptionShort as variable_description_short,
             v.descriptionFromProducer as variable_description_from_producer,
             v.descriptionKey as variable_description_key,
-            v.descriptionProcessing as variable_description_processing
+            v.descriptionProcessing as variable_description_processing,
+            v.attribution as variable_attribution,
+            v.attributionShort as variable_attribution_short
         FROM charts c
         JOIN chart_configs cc ON c.configId = cc.id
         LEFT JOIN JSON_TABLE(
@@ -327,12 +342,15 @@ def fetch_chart_configs(chart_slugs: list[str] | None = None) -> list[dict[str, 
                 "variable_description": lambda x: list(x.dropna()),
                 "variable_short_unit": lambda x: list(x.dropna()),
                 "variable_short_name": lambda x: list(x.dropna()),
+                "variable_display": lambda x: list(x.dropna()),
                 "variable_title_public": lambda x: list(x.dropna()),
                 "variable_title_variant": lambda x: list(x.dropna()),
                 "variable_description_short": lambda x: list(x.dropna()),
                 "variable_description_from_producer": lambda x: list(x.dropna()),
                 "variable_description_key": lambda x: list(x.dropna()),
                 "variable_description_processing": lambda x: list(x.dropna()),
+                "variable_attribution": lambda x: list(x.dropna()),
+                "variable_attribution_short": lambda x: list(x.dropna()),
             }
         )
         .reset_index()
