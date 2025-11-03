@@ -15,12 +15,13 @@ def run() -> None:
 
     # Read table from garden dataset.
     tb = ds_garden.read("historical_poverty", reset_index=False)
+    tb_population = ds_garden.read("population", reset_index=False)
 
     #
     # Save outputs.
     #
     # Initialize a new grapher dataset.
-    ds_grapher = paths.create_dataset(tables=[tb], default_metadata=ds_garden.metadata)
+    ds_grapher = paths.create_dataset(tables=[tb, tb_population], default_metadata=ds_garden.metadata)
 
     # Save grapher dataset.
     ds_grapher.save()

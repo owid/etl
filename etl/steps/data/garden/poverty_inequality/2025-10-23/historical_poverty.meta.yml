@@ -24,6 +24,13 @@ definitions:
     - Modern estimates (1990 onwards) are based on the World Bank's Poverty and Inequality Platform with 1000 income quantiles per country.
     - The methodology assumes constant relative inequality within countries over time.
 
+  poverty_line_between: |-
+    <% if poverty_line == "3 and 10" %>
+    $3 and $10
+    <%- elif poverty_line == "10 and 30" %>
+    $10 and $30
+    <%- endif %>
+
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
 dataset:
@@ -52,8 +59,50 @@ tables:
         short_unit: "people"
         display:
           numDecimalPlaces: 0
+
+      headcount_ratio_above:
+        title: Share above $<<poverty_line>> a day
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      headcount_above:
+        title: Number above $<<poverty_line>> a day
+        unit: "people"
+        short_unit: "people"
+        display:
+          numDecimalPlaces: 0
+
+      headcount_ratio_between:
+        title: Share between {definitions.poverty_line_between} a day
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      headcount_between:
+        title: Number between {definitions.poverty_line_between} a day
+        unit: "people"
+        short_unit: "people"
+        display:
+          numDecimalPlaces: 0
+
+      headcount_ratio_omm:
+        title: Share below $<<poverty_line>> a day (OMM)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+
+  population:
+    variables:
       population:
         title: Population
+        unit: "people"
+        short_unit: "people"
+        display:
+          numDecimalPlaces: 0
+      population_omm:
+        title: Population (OMM)
         unit: "people"
         short_unit: "people"
         display:
