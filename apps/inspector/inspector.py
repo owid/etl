@@ -15,7 +15,6 @@ import pandas as pd
 from rich import print as rprint
 from rich_click.rich_command import RichCommand
 
-from apps.inspector.config import DEFAULT_BATCH_SIZE
 from apps.inspector.db import build_explorer_url, load_views
 from apps.inspector.detectors import (
     calculate_cost,
@@ -199,7 +198,13 @@ def run_checks(
 @click.option(
     "--slug",
     multiple=True,
-    help="Filter by specific slug (explorer, multidim, or chart). Can be specified multiple times (e.g., '--slug global-food --slug covid-boosters')",
+    help="Filter by specific slug (explorer, multidim, chart, or post). Can be specified multiple times (e.g., '--slug global-food --slug covid-boosters')",
+)
+@click.option(
+    "--type",
+    "content_type",
+    type=click.Choice(["explorer", "multidim", "chart", "post"], case_sensitive=False),
+    help="Filter by content type. Useful when a slug exists in multiple types (e.g., both explorer and post with same slug)",
 )
 @click.option(
     "--skip-typos",
@@ -222,12 +227,6 @@ def run_checks(
     help="Save issues to CSV file",
 )
 @click.option(
-    "--batch-size",
-    type=int,
-    default=DEFAULT_BATCH_SIZE,
-    help=f"Number of views to check per API call (default: {DEFAULT_BATCH_SIZE}, safe range: 30-100)",
-)
-@click.option(
     "--limit",
     type=int,
     default=None,
@@ -245,21 +244,21 @@ def run_checks(
 )
 def run(
     slug: tuple[str, ...],
+    content_type: str | None,
     skip_typos: bool,
     skip_issues: bool,
     skip_grouping: bool,
     output_file: str | None,
-    batch_size: int,
     limit: int | None,
     dry_run: bool,
     display_prompt: bool,
 ) -> None:
-    """Check explorer, multidim views, and chart configs for typos and semantic issues.
+    """Check explorer, multidim views, chart configs, and posts for typos and semantic issues.
 
     Examples:
         python metadata_inspector.py --skip-issues
         python metadata_inspector.py --slug global-food
-        python metadata_inspector.py --slug co2-emissions-per-capita
+        python metadata_inspector.py --slug natural-disasters --type post
         python metadata_inspector.py --slug global-food --slug covid-boosters
         python metadata_inspector.py --slug animal-welfare --limit 5
         python metadata_inspector.py --output-file issues.csv
@@ -268,11 +267,11 @@ def run(
         rprint("[red]Error: ANTHROPIC_API_KEY not found. Add to .env file or use --skip-issues[/red]")
         raise click.ClickException("Missing ANTHROPIC_API_KEY")
 
-    # Load views (explorers, multidims, and charts)
+    # Load views (explorers, multidims, charts, and posts)
     slug_list = list(slug) if slug else None
 
-    # Load both explorer views and chart configs
-    views = load_views(slug_list, limit)
+    # Load all matching views, optionally filtered by type
+    views = load_views(slug_list, limit, content_type)
     if not views:
         return
 
@@ -305,18 +304,23 @@ def run(
         display_cost_estimate(total_input_tokens, total_output_tokens, skip_issues, len(views))
         return
 
-    # Group views by collection (explorerSlug for explorers, slug for charts) for incremental processing
-    # Separate charts from explorer/multidim collections for better progress display
+    # Group views by collection (explorerSlug for explorers, slug for charts/posts) for incremental processing
+    # Separate charts and posts from explorer/multidim collections for better progress display
     chart_collections: dict[str, list[dict[str, Any]]] = {}
+    post_collections: dict[str, list[dict[str, Any]]] = {}
     other_collections: dict[str, list[dict[str, Any]]] = {}
 
     for view in views:
-        # Charts use 'slug', explorers use 'explorerSlug'
-        is_chart = view.get("view_type") == "chart"
-        collection_slug = view.get("slug") if is_chart else view.get("explorerSlug")
+        # Charts and posts use 'slug', explorers/multidims use 'explorerSlug'
+        view_type = view.get("view_type")
+        if view_type in ["chart", "post"]:
+            collection_slug = view.get("slug")
+            target_dict = post_collections if view_type == "post" else chart_collections
+        else:
+            collection_slug = view.get("explorerSlug")
+            target_dict = other_collections
 
         if collection_slug:
-            target_dict = chart_collections if is_chart else other_collections
             if collection_slug not in target_dict:
                 target_dict[collection_slug] = []
             target_dict[collection_slug].append(view)
@@ -329,9 +333,9 @@ def run(
     total_cache_read_tokens = 0
     total_cost = 0.0
 
-    total_collections = len(other_collections) + len(chart_collections)
+    total_collections = len(other_collections) + len(chart_collections) + len(post_collections)
     rprint(
-        f"\n[bold cyan]Processing {total_collections} collection(s): {len(other_collections)} explorer/multidim(s) + {len(chart_collections)} chart(s)...[/bold cyan]\n"
+        f"\n[bold cyan]Processing {total_collections} collection(s): {len(other_collections)} explorer/multidim(s) + {len(chart_collections)} chart(s) + {len(post_collections)} post(s)...[/bold cyan]\n"
     )
 
     # Process explorers/multidims first
@@ -460,6 +464,67 @@ def run(
 
         rprint(f"[green]✓ Completed processing {len(chart_collections)} chart(s)[/green]")
         rprint(f"[dim]Total charts cost: ${total_cost:.4f}[/dim]\n")
+
+    # Process posts separately with their own progress display
+    if post_collections:
+        rprint(f"\n[bold cyan]Processing {len(post_collections)} post(s)...[/bold cyan]")
+
+        # Use a progress bar for posts
+        with create_progress_bar("") as progress:
+            task = None
+            if progress is not None:
+                task = progress.add_task("[green]Checking posts...", total=len(post_collections))
+
+            for post_num, (post_slug, post_views) in enumerate(post_collections.items(), 1):
+                # Update progress description with current post
+                if progress is not None and task is not None:
+                    progress.update(task, description=f"[green]Post {post_num}/{len(post_collections)}: {post_slug}")
+
+                # Run checks for this post (quiet mode to avoid cluttering progress bar)
+                collection_issues, input_tokens, output_tokens, cache_creation, cache_read = run_checks(
+                    post_views, skip_typos, skip_issues, quiet=True, display_prompt=display_prompt
+                )
+
+                # Calculate cost for this post
+                collection_cost = calculate_cost(input_tokens, output_tokens, cache_creation, cache_read)
+                total_cost += collection_cost
+
+                total_input_tokens += input_tokens
+                total_output_tokens += output_tokens
+                total_cache_creation_tokens += cache_creation
+                total_cache_read_tokens += cache_read
+
+                # Save this post's results immediately (even if no issues, for checkpoint tracking)
+                if output_file:
+                    if collection_issues:
+                        save_collection_results(output_file, collection_issues)
+                    else:
+                        # Save a marker row to track that this post was processed
+                        if post_views:
+                            post_id = post_views[0].get("id")
+                            base_url = config.OWID_ENV.site or "https://ourworldindata.org"
+                            post_url = f"{base_url}/{post_slug}"
+
+                            marker = {
+                                "slug": post_slug,
+                                "id": post_id,
+                                "type": "post",
+                                "view_url": post_url,
+                                "issue_type": "checkpoint",
+                                "field": "completed",
+                                "context": "",
+                                "explanation": "Collection processed with no issues found",
+                            }
+                            save_collection_results(output_file, [marker])
+
+                all_issues.extend(collection_issues)
+
+                # Advance progress
+                if progress is not None and task is not None:
+                    progress.advance(task, 1)
+
+        rprint(f"[green]✓ Completed processing {len(post_collections)} post(s)[/green]")
+        rprint(f"[dim]Total posts cost: ${total_cost:.4f}[/dim]\n")
 
     # Group and prune issues (across all collections)
     grouping_tokens = 0

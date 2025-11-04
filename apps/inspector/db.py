@@ -268,6 +268,46 @@ def aggregate_multidim_views(df: pd.DataFrame) -> pd.DataFrame:
     return agg_df
 
 
+def fetch_posts(post_slugs: list[str] | None = None) -> list[dict[str, Any]]:
+    """Fetch post markdown from posts_gdocs table.
+
+    Posts include articles, data insights, and topic pages.
+
+    Args:
+        post_slugs: Optional list of post slugs to filter by
+
+    Returns:
+        List of post dictionaries with markdown content
+    """
+    log.info("Fetching posts from database...")
+
+    # Build WHERE clause for SQL query
+    where_clause = ""
+    if post_slugs:
+        slugs_str = "', '".join(post_slugs)
+        where_clause = f"WHERE slug IN ('{slugs_str}')"
+
+    query = f"""
+        SELECT
+            id,
+            slug,
+            'post' as view_type,
+            markdown
+        FROM posts_gdocs
+        {where_clause}
+        ORDER BY slug
+    """
+
+    df = read_sql(query)
+    log.info(f"Fetched {len(df)} post(s)")
+
+    if df.empty:
+        return []
+
+    result: list[dict[str, Any]] = df.to_dict("records")  # type: ignore
+    return result
+
+
 def fetch_chart_configs(chart_slugs: list[str] | None = None) -> list[dict[str, Any]]:
     """Fetch chart configs from database by slug, including variable metadata.
 
@@ -447,29 +487,31 @@ def extract_human_readable_text(config_json: str) -> str:
     return "\n".join(texts)
 
 
-def load_views(slug_list: list[str] | None, limit: int | None) -> list[dict[str, Any]]:
+def load_views(slug_list: list[str] | None, limit: int | None, content_type: str | None = None) -> list[dict[str, Any]]:
     """Load views from database and aggregate by view ID.
 
     Args:
-        slug_list: List of slugs to filter by (works for explorers, multidims, and charts)
+        slug_list: List of slugs to filter by (works for explorers, multidims, charts, and posts)
         limit: Maximum number of views to return
+        content_type: Optional filter by content type ('explorer', 'multidim', 'chart', or 'post')
 
     Returns:
-        List of view dictionaries (explorers, multidims, and charts)
+        List of view dictionaries (explorers, multidims, charts, and posts)
     """
-    # Fetch data from all sources (explorers, multidimensional indicators, and charts)
+    # Fetch data from all sources (explorers, multidimensional indicators, charts, and posts)
     # When slug_list is provided, all queries filter by the same slugs
     df_explorers = fetch_explorer_data(explorer_slugs=slug_list)
     df_mdims = fetch_multidim_data(slug_filters=slug_list)
     chart_configs = fetch_chart_configs(chart_slugs=slug_list)
+    posts = fetch_posts(post_slugs=slug_list)
 
     # Check if we got any results
-    if df_explorers.empty and df_mdims.empty and not chart_configs:
+    if df_explorers.empty and df_mdims.empty and not chart_configs and not posts:
         if slug_list:
             slugs_str = ", ".join(slug_list)
             rprint(f"[red]Error: No views found for slug(s) '{slugs_str}'[/red]")
         else:
-            rprint("[red]Error: No explorer, multidim, or chart views found in database[/red]")
+            rprint("[red]Error: No explorer, multidim, chart, or post views found in database[/red]")
         return []
 
     # Aggregate views
@@ -486,6 +528,16 @@ def load_views(slug_list: list[str] | None, limit: int | None) -> list[dict[str,
 
     # Add chart configs as views (charts are treated as single "views" without collections)
     views.extend(chart_configs)
+
+    # Add posts as views (posts are individual items without collections)
+    views.extend(posts)
+
+    # Apply content type filter if specified
+    if content_type:
+        original_count = len(views)
+        views = [v for v in views if v.get("view_type") == content_type]
+        if original_count > len(views):
+            rprint(f"[yellow]Filtered to {len(views)} {content_type} view(s) from {original_count} total[/yellow]")
 
     # Apply limit if specified
     if limit is not None and limit > 0:
@@ -529,12 +581,15 @@ def load_views(slug_list: list[str] | None, limit: int | None) -> list[dict[str,
     config_count = len(configs_by_slug)
     view_count = len(views) - config_count
 
-    # Count charts separately (they have view_type="chart")
+    # Count charts and posts separately (they have view_type="chart" and "post")
     chart_count = len([v for v in views if v.get("view_type") == "chart"])
+    post_count = len([v for v in views if v.get("view_type") == "post"])
 
     breakdown = f"{len(agg_df_explorers)} explorers + {len(agg_df_mdims)} multidims"
     if chart_count > 0:
         breakdown += f" + {chart_count} charts"
+    if post_count > 0:
+        breakdown += f" + {post_count} posts"
 
     rprint(
         f"[cyan]Aggregated to {view_count} unique views + {config_count} collection configs "

@@ -94,35 +94,43 @@ def check_typos(views: list[dict[str, Any]], progress_callback: Any = None) -> d
                     progress_callback(advance=1)
                 continue
 
-            # Handle chart_config - it's already a dict for chart views, but a JSON string for explorer views
-            chart_config = parse_chart_config(view.get("chart_config"))
-
-            # For chart views, dimensions come from chart_config, not from view directly
-            if view.get("view_type") == "chart":
-                dimensions = []  # Chart views don't have variable dimensions like explorers
-            else:
-                dimensions = parse_dimensions(view["dimensions"])
             view_id = view["id"]
             view_files[view_id] = []
 
             # Collect texts to check with field names
             texts_to_check = []
 
-            # Add chart fields
-            for field_name in CHART_FIELDS_TO_CHECK:
-                value = chart_config.get(field_name, "")
-                if value:
-                    texts_to_check.append((field_name, value))
+            # Handle posts separately (articles, data insights, topic pages)
+            if view.get("view_type") == "post":
+                # For posts, check the markdown content
+                markdown = view.get("markdown", "")
+                if markdown:
+                    texts_to_check.append(("markdown", markdown))
+            else:
+                # Handle chart_config - it's already a dict for chart views, but a JSON string for explorer views
+                chart_config = parse_chart_config(view.get("chart_config"))
 
-            # Add variable metadata fields
-            for field_name in VARIABLE_FIELDS_TO_CHECK:
-                values = view.get(field_name, [])
-                if isinstance(values, list):
-                    for i, value in enumerate(values):
-                        if value:
-                            texts_to_check.append((f"{field_name}_{i}", str(value)))
-                elif values:
-                    texts_to_check.append((field_name, str(values)))
+                # For chart views, dimensions come from chart_config, not from view directly
+                if view.get("view_type") == "chart":
+                    dimensions = []  # Chart views don't have variable dimensions like explorers
+                else:
+                    dimensions = parse_dimensions(view["dimensions"])
+
+                # Add chart fields
+                for field_name in CHART_FIELDS_TO_CHECK:
+                    value = chart_config.get(field_name, "")
+                    if value:
+                        texts_to_check.append((field_name, value))
+
+                # Add variable metadata fields
+                for field_name in VARIABLE_FIELDS_TO_CHECK:
+                    values = view.get(field_name, [])
+                    if isinstance(values, list):
+                        for i, value in enumerate(values):
+                            if value:
+                                texts_to_check.append((f"{field_name}_{i}", str(value)))
+                    elif values:
+                        texts_to_check.append((field_name, str(values)))
 
             # Write each text to a separate file
             for field_name, text in texts_to_check:
@@ -294,28 +302,40 @@ def check_typos(views: list[dict[str, Any]], progress_callback: Any = None) -> d
                         progress_callback(advance=1)
                     continue
 
-                chart_config = parse_chart_config(view.get("chart_config"))
-
-                # For chart views, dimensions come from chart_config, not from view directly
-                if view.get("view_type") == "chart":
-                    dimensions = {}
+                # Build view_url and view_title based on view type
+                if view.get("view_type") == "post":
+                    # Post handling (articles, data insights, topic pages)
+                    post_slug = view.get("slug", "")
+                    base_url = config.OWID_ENV.site or "https://ourworldindata.org"
+                    view_url = f"{base_url}/{post_slug}" if post_slug else ""
+                    view_title = post_slug.replace("-", " ").title() if post_slug else "Post"
+                elif view.get("view_type") == "chart":
+                    # Chart handling
+                    chart_config = parse_chart_config(view.get("chart_config"))
+                    view_title = chart_config.get("title", "")
+                    chart_slug = view.get("slug", "")
+                    base_url = config.OWID_ENV.site or "https://ourworldindata.org"
+                    view_url = f"{base_url}/grapher/{chart_slug}" if chart_slug else ""
                 else:
+                    # Explorer/multidim handling
+                    chart_config = parse_chart_config(view.get("chart_config"))
                     dimensions = parse_dimensions(view.get("dimensions"))
-
-                view_title = chart_config.get("title", "")
-                mdim_published = bool(view.get("mdim_published", True))
-                mdim_catalog_path = view.get("mdim_catalog_path")
-                view_url = build_explorer_url(
-                    view.get("explorerSlug", view.get("slug", "")),
-                    dimensions,
-                    view.get("view_type", "explorer"),
-                    mdim_published,
-                    mdim_catalog_path,
-                )
+                    view_title = chart_config.get("title", "")
+                    mdim_published = bool(view.get("mdim_published", True))
+                    mdim_catalog_path = view.get("mdim_catalog_path")
+                    view_url = build_explorer_url(
+                        view.get("explorerSlug", view.get("slug", "")),
+                        dimensions,
+                        view.get("view_type", "explorer"),
+                        mdim_published,
+                        mdim_catalog_path,
+                    )
 
                 issue = {
                     "id": view_id,
-                    "slug": view.get("slug") if view.get("view_type") == "chart" else view.get("explorerSlug", ""),
+                    "slug": view.get("slug")
+                    if view.get("view_type") in ["chart", "post"]
+                    else view.get("explorerSlug", ""),
                     "type": view.get("view_type", "explorer"),
                     "view_title": view_title,
                     "view_url": view_url,
@@ -367,6 +387,14 @@ async def check_view_async(
 
         # For configs, check the extracted human-readable text
         fields_to_check = [("collection_config", config_text)]
+    elif view.get("view_type") == "post":
+        # Post handling (articles, data insights, topic pages) - check the markdown content
+        markdown = view.get("markdown", "")
+        if not markdown or not markdown.strip():
+            return [], 0, 0, 0, 0
+
+        # For posts, check the markdown content
+        fields_to_check = [("markdown", markdown)]
     elif view.get("view_type") == "chart":
         # Chart config handling - parse it first since it comes as JSON string from DB
         chart_config = parse_chart_config(view.get("chart_config"))
@@ -612,6 +640,10 @@ Here is the metadata to check:"""
         if view.get("is_config_view"):
             # For config pseudo-views, use a descriptive title
             view_title = f"Collection Config ({view['explorerSlug']})"
+        elif view.get("view_type") == "post":
+            # For posts (articles, data insights, topic pages), use the slug as title
+            post_slug = view.get("slug", "")
+            view_title = post_slug.replace("-", " ").title() if post_slug else "Post"
         else:
             # For regular views, prefer title from chart, fall back to first variable title
             view_title = fields_dict.get("title", "")
@@ -625,14 +657,22 @@ Here is the metadata to check:"""
         # Enrich each issue with view metadata
         for issue in view_issues:
             issue["id"] = view["id"]
-            # For charts, use 'slug' instead of 'explorerSlug'
-            issue["slug"] = view.get("slug") if view.get("view_type") == "chart" else view.get("explorerSlug")
+            # For charts and posts, use 'slug'; for explorers/multidims use 'explorerSlug'
+            if view.get("view_type") in ["chart", "post"]:
+                issue["slug"] = view.get("slug")
+            else:
+                issue["slug"] = view.get("explorerSlug")
             issue["type"] = view.get("view_type", "explorer")
             issue["view_title"] = view_title
             issue["source"] = "ai"  # Mark as AI-detected
 
             # Build URL
-            if view.get("view_type") == "chart":
+            if view.get("view_type") == "post":
+                # Post URL (articles, data insights, topic pages)
+                post_slug = view.get("slug", "")
+                base_url = config.OWID_ENV.site or "https://ourworldindata.org"
+                issue["view_url"] = f"{base_url}/{post_slug}" if post_slug else ""
+            elif view.get("view_type") == "chart":
                 # Chart configs use direct chart URL
                 chart_slug = view.get("slug", "")
                 base_url = config.OWID_ENV.site or "https://ourworldindata.org"

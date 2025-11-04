@@ -17,6 +17,7 @@ def display_issues(
     all_explorers: list[str],
     mdim_slugs: set[str],
     chart_slugs: set[str],
+    post_slugs: set[str],
 ) -> None:
     """Display grouped issues.
 
@@ -25,6 +26,7 @@ def display_issues(
         all_explorers: List of all explorer slugs that were analyzed
         mdim_slugs: Set of slugs that are multidimensional indicators
         chart_slugs: Set of slugs that are charts
+        post_slugs: Set of slugs that are posts (articles, data insights, topic pages)
     """
     from collections import defaultdict
 
@@ -74,13 +76,18 @@ def display_issues(
         explorer_issues = issues_by_explorer[explorer_slug]
 
         # Display header with appropriate label and color
-        is_mdim = mdim_slugs and explorer_slug in mdim_slugs
-        is_chart = chart_slugs and explorer_slug in chart_slugs
+        # Determine type from the actual issues, not just slug presence
+        # (since same slug can exist as both explorer and post)
+        issue_types = {issue.get("type") for issue in explorer_issues}
 
-        if is_chart:
+        # Pick the most common type, or the first one if tied
+        if "post" in issue_types:
+            label = "Post"
+            color = "green"
+        elif "chart" in issue_types:
             label = "Chart"
             color = "yellow"
-        elif is_mdim:
+        elif "multidim" in issue_types:
             label = "Multidim"
             color = "magenta"
         else:
@@ -144,20 +151,21 @@ def display_issues(
             if context:
                 rprint(f"   [yellow]Context:[/yellow] {context}")
 
-    # Show clean explorers/mdims/charts if we have the full list
-    if all_explorers and mdim_slugs is not None and chart_slugs is not None:
+    # Show clean explorers/mdims/charts/posts if we have the full list
+    if all_explorers and mdim_slugs is not None and chart_slugs is not None and post_slugs is not None:
         explorers_with_issues = set(issues_by_explorer.keys())
         # Filter out NaN values (from NULL slugs) before sorting
         all_explorers_valid = {e for e in all_explorers if isinstance(e, str)}
         explorers_with_issues_valid = {e for e in explorers_with_issues if isinstance(e, str)}
         all_clean = sorted(all_explorers_valid - explorers_with_issues_valid)
 
-        # Separate into explorers, mdims, and charts
-        clean_explorers = [e for e in all_clean if e not in mdim_slugs and e not in chart_slugs]
+        # Separate into explorers, mdims, charts, and posts
+        clean_explorers = [e for e in all_clean if e not in mdim_slugs and e not in chart_slugs and e not in post_slugs]
         clean_mdims = [e for e in all_clean if e in mdim_slugs]
         clean_charts = [e for e in all_clean if e in chart_slugs]
+        clean_posts = [e for e in all_clean if e in post_slugs]
 
-        if clean_explorers or clean_mdims or clean_charts:
+        if clean_explorers or clean_mdims or clean_charts or clean_posts:
             rprint(f"\n[bold green]{'=' * 80}[/bold green]")
 
             if clean_explorers:
@@ -176,6 +184,12 @@ def display_issues(
                 rprint(f"[bold yellow]✓ No issues found in {len(clean_charts)} chart(s):[/bold yellow]")
                 rprint(f"[yellow]{', '.join(clean_charts)}[/yellow]")
 
+            if clean_posts:
+                if clean_explorers or clean_mdims or clean_charts:
+                    rprint()  # Add spacing between the lists
+                rprint(f"[bold green]✓ No issues found in {len(clean_posts)} post(s):[/bold green]")
+                rprint(f"[green]{', '.join(clean_posts)}[/green]")
+
 
 def display_results(
     grouped_issues: list[dict[str, Any]],
@@ -186,10 +200,10 @@ def display_results(
 ) -> None:
     """Display grouped issues and cost."""
     # Extract unique slugs and identify types
-    # Charts use 'slug', explorers/multidims use 'explorerSlug'
+    # Charts and posts use 'slug', explorers/multidims use 'explorerSlug'
     all_slugs = []
     for view in views:
-        if view.get("view_type") == "chart":
+        if view.get("view_type") in ["chart", "post"]:
             slug = view.get("slug")
         else:
             slug = view.get("explorerSlug")
@@ -203,8 +217,11 @@ def display_results(
     chart_slugs_list = [view.get("slug") for view in views if view.get("view_type") == "chart"]
     chart_slugs = set(s for s in chart_slugs_list if s is not None)
 
+    post_slugs_list = [view.get("slug") for view in views if view.get("view_type") == "post"]
+    post_slugs = set(s for s in post_slugs_list if s is not None)
+
     # Display grouped issues
-    display_issues(grouped_issues, all_explorers_analyzed, mdim_slugs, chart_slugs)
+    display_issues(grouped_issues, all_explorers_analyzed, mdim_slugs, chart_slugs, post_slugs)
 
     # Display API usage and cost
     if total_input_tokens > 0 or total_output_tokens > 0 or grouping_tokens > 0:

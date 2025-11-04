@@ -18,20 +18,6 @@ CLAUDE_MODEL = "claude-haiku-4-5-20251001"  # Fast: $1/M in, $5/M out (RECOMMEND
 GROUPING_MODEL = "claude-sonnet-4-5-20250929"  # Better reasoning for filtering false positives
 # GROUPING_MODEL = "claude-opus-4-20250514"  # Best quality if budget allows
 
-# Batch size configuration
-# Number of views to check per API call. Larger batches are faster and cheaper,
-# but batch sizes >100 cause quality degradation (model misses issues).
-#
-# Testing results (100 views):
-# - batch=10:  86s, $0.25 (baseline)
-# - batch=30:  31s, $0.17 (2.8x faster, 33% cheaper)
-# - batch=50:  18s, $0.15 (4.8x faster, 40% cheaper) ✓ OPTIMAL
-# - batch=100: 20s, $0.16 (4.3x faster, 36% cheaper, slight variance)
-# - batch=200: Quality degradation - misses semantic issues!
-#
-# Default of 50 provides best balance of speed, cost, and reliability.
-DEFAULT_BATCH_SIZE = 20
-
 # Concurrency limit for API requests
 # Anthropic rate limits: typically 5-50 concurrent requests depending on tier
 # Increase if you have higher tier access, decrease if you hit rate limits
