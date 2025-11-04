@@ -428,6 +428,25 @@ def get_country_import_ranking(tb: Table, target_country: str) -> Table:
     mask = out["country"] != target_country
     out = pr.concat([out.loc[mask], target_country_template], ignore_index=True)
 
+    # Add color category based on ranking
+    def categorize_rank(rank):
+        if rank == -1:
+            return target_country
+        elif rank == 1:
+            return "1st - Top partner"
+        elif rank == 2:
+            return "2nd"
+        elif rank == 3:
+            return "3rd"
+        elif rank == 4:
+            return "4th"
+        elif rank == 5:
+            return "5th"
+        else:
+            return "Not in top 5"
+
+    out["import_rank_category"] = out["import_rank"].apply(categorize_rank)
+
     out = Table(out).copy_metadata(tb)
     out["counterpart_country"] = target_country
     return out
