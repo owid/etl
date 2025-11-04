@@ -221,7 +221,7 @@ tables:
           numDecimalPlaces: 1
 
       import_rank:
-        title:  << counterpart_country >>´s import ranking
+        title:  << counterpart_country >>´s rank among import partners
         unit: "rank"
         short_unit: ""
         description_short: The rank of << counterpart_country >> among a country’s import partners, based on import values that include the cost of goods, freight, and insurance.  A rank of 1 indicates that the << counterpart_country >> is the country’s largest import partner.
