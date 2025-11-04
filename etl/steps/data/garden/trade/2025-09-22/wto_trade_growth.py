@@ -24,8 +24,6 @@ def run() -> None:
     #
     # Process data.
     #
-    print(tb_historic)
-    print(tb_wto)
 
     # First, re-index historic data from 1913 = 100 to 1800 = 1
     baseline_1800_historic = tb_historic[tb_historic["year"] == 1800]["volume_index"].iloc[0]
