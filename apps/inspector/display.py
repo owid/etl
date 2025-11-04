@@ -34,6 +34,8 @@ def display_issues(
     issues_by_explorer = defaultdict(list)
     for issue in issues:
         slug = issue.get("slug", "unknown")
+        # Convert slug to string to avoid TypeError when sorting mixed types
+        slug = str(slug) if slug is not None else "unknown"
         issues_by_explorer[slug].append(issue)
 
     # Deduplicate codespell typos within each explorer by (typo, correction) pair
