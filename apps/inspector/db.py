@@ -291,6 +291,7 @@ def fetch_posts(post_slugs: list[str] | None = None) -> list[dict[str, Any]]:
         SELECT
             id,
             slug,
+            type,
             'post' as view_type,
             markdown
         FROM posts_gdocs

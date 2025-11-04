@@ -502,8 +502,13 @@ def run(
                         # Save a marker row to track that this post was processed
                         if post_views:
                             post_id = post_views[0].get("id")
+                            post_type = post_views[0].get("type", "")
                             base_url = config.OWID_ENV.site or "https://ourworldindata.org"
-                            post_url = f"{base_url}/{post_slug}"
+                            # Data insights need /data-insights/ prefix
+                            if post_type == "data-insight":
+                                post_url = f"{base_url}/data-insights/{post_slug}"
+                            else:
+                                post_url = f"{base_url}/{post_slug}"
 
                             marker = {
                                 "slug": post_slug,

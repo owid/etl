@@ -306,8 +306,13 @@ def check_typos(views: list[dict[str, Any]], progress_callback: Any = None) -> d
                 if view.get("view_type") == "post":
                     # Post handling (articles, data insights, topic pages)
                     post_slug = view.get("slug", "")
+                    post_type = view.get("type", "")
                     base_url = config.OWID_ENV.site or "https://ourworldindata.org"
-                    view_url = f"{base_url}/{post_slug}" if post_slug else ""
+                    # Data insights need /data-insights/ prefix
+                    if post_type == "data-insight":
+                        view_url = f"{base_url}/data-insights/{post_slug}" if post_slug else ""
+                    else:
+                        view_url = f"{base_url}/{post_slug}" if post_slug else ""
                     view_title = post_slug.replace("-", " ").title() if post_slug else "Post"
                 elif view.get("view_type") == "chart":
                     # Chart handling
@@ -670,8 +675,13 @@ Here is the metadata to check:"""
             if view.get("view_type") == "post":
                 # Post URL (articles, data insights, topic pages)
                 post_slug = view.get("slug", "")
+                post_type = view.get("type", "")
                 base_url = config.OWID_ENV.site or "https://ourworldindata.org"
-                issue["view_url"] = f"{base_url}/{post_slug}" if post_slug else ""
+                # Data insights need /data-insights/ prefix
+                if post_type == "data-insight":
+                    issue["view_url"] = f"{base_url}/data-insights/{post_slug}" if post_slug else ""
+                else:
+                    issue["view_url"] = f"{base_url}/{post_slug}" if post_slug else ""
             elif view.get("view_type") == "chart":
                 # Chart configs use direct chart URL
                 chart_slug = view.get("slug", "")
