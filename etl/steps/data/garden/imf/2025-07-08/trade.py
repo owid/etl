@@ -421,7 +421,7 @@ def get_country_import_ranking(tb: Table, target_country: str) -> Table:
     target_country_years = import_data[import_data["country"] == target_country]["year"].unique()
 
     target_country_template = Table(
-        pd.DataFrame({"country": target_country, "year": target_country_years, "import_rank": -1})
+        pd.DataFrame({"country": target_country, "year": target_country_years, "import_rank": 0})
     )
 
     # Combine: remove any existing self-referential rows and add our template
@@ -430,7 +430,7 @@ def get_country_import_ranking(tb: Table, target_country: str) -> Table:
 
     # Add color category based on ranking
     def categorize_rank(rank):
-        if rank == -1:
+        if rank == 0:
             return target_country
         elif rank == 1:
             return "1st - Top partner"
