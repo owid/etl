@@ -27,10 +27,11 @@ def run() -> None:
 
     # Build overlap
 
-    # Get the 1950 baseline value from historic data
+    # Get the 1950 baseline value from historic data (now indexed to 1800 = 1)
     baseline_1950 = tb_historic[tb_historic["year"] == 1950]["volume_index"].iloc[0]
 
     # Calculate WTO adjusted values for years after 1950
+    # WTO data is indexed to 100, so divide by 100 to get the multiplier
     tb_wto_adj = tb_wto.copy()
     tb_wto_adj["volume_index"] = baseline_1950 * tb_wto_adj["volume_index"] / 100
 
@@ -39,6 +40,11 @@ def run() -> None:
         [tb_wto_adj[tb_wto_adj["year"] > 1950], tb_historic[tb_historic["year"] <= 1950]],
         ignore_index=True,
     ).sort_values("year")
+
+    # Re-index to 1800 = 1 instead of 1913 = 100
+    # This makes values directly interpretable as "X times larger than 1800"
+    baseline_1800 = tb_combined[tb_combined["year"] == 1800]["volume_index"].iloc[0]
+    tb_combined["volume_index"] = tb_combined["volume_index"] / baseline_1800
 
     # Combine the datasets
     tb_combined = tb_combined.format(["country", "year"])
