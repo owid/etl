@@ -706,7 +706,7 @@ def build_explorer_url(
     """
     from urllib.parse import quote, urlencode
 
-    base_url = config.OWID_ENV.site or "https://ourworldindata.org"
+    base_url = config.OWID_ENV.site
 
     is_mdim = view_type == "multidim"
 

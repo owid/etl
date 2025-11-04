@@ -368,7 +368,7 @@ def run(
                     collection_id = collection_views[0].get("id")
 
                     # Build URL based on type
-                    base_url = config.OWID_ENV.site or "https://ourworldindata.org"
+                    base_url = config.OWID_ENV.site
                     if collection_type == "chart":
                         collection_url = f"{base_url}/grapher/{collection_slug}"
                     elif collection_type == "multidim":
@@ -441,7 +441,7 @@ def run(
                         # Save a marker row to track that this chart was processed
                         if chart_views:
                             chart_id = chart_views[0].get("id")
-                            base_url = config.OWID_ENV.site or "https://ourworldindata.org"
+                            base_url = config.OWID_ENV.site
                             chart_url = f"{base_url}/grapher/{chart_slug}"
 
                             marker = {
@@ -503,7 +503,7 @@ def run(
                         if post_views:
                             post_id = post_views[0].get("id")
                             post_type = post_views[0].get("type", "")
-                            base_url = config.OWID_ENV.site or "https://ourworldindata.org"
+                            base_url = config.OWID_ENV.site
                             # Data insights need /data-insights/ prefix
                             if post_type == "data-insight":
                                 post_url = f"{base_url}/data-insights/{post_slug}"

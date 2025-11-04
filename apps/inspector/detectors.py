@@ -277,7 +277,8 @@ def check_typos(views: list[dict[str, Any]], progress_callback: Any = None) -> d
                     continue
 
                 view_title = f"Collection Config ({explorer_slug})"
-                view_url = f"https://ourworldindata.org/explorers/{explorer_slug}"
+                base_url = config.OWID_ENV.site
+                view_url = f"{base_url}/explorers/{explorer_slug}"
                 view_type = sample_view.get("view_type", "explorer")
 
                 issue = {
@@ -307,7 +308,7 @@ def check_typos(views: list[dict[str, Any]], progress_callback: Any = None) -> d
                     # Post handling (articles, data insights, topic pages)
                     post_slug = view.get("slug", "")
                     post_type = view.get("type", "")
-                    base_url = config.OWID_ENV.site or "https://ourworldindata.org"
+                    base_url = config.OWID_ENV.site
                     # Data insights need /data-insights/ prefix
                     if post_type == "data-insight":
                         view_url = f"{base_url}/data-insights/{post_slug}" if post_slug else ""
@@ -319,7 +320,7 @@ def check_typos(views: list[dict[str, Any]], progress_callback: Any = None) -> d
                     chart_config = parse_chart_config(view.get("chart_config"))
                     view_title = chart_config.get("title", "")
                     chart_slug = view.get("slug", "")
-                    base_url = config.OWID_ENV.site or "https://ourworldindata.org"
+                    base_url = config.OWID_ENV.site
                     view_url = f"{base_url}/grapher/{chart_slug}" if chart_slug else ""
                 else:
                     # Explorer/multidim handling
@@ -705,7 +706,7 @@ Here is the metadata to check:"""
                 # Post URL (articles, data insights, topic pages)
                 post_slug = view.get("slug", "")
                 post_type = view.get("type", "")
-                base_url = config.OWID_ENV.site or "https://ourworldindata.org"
+                base_url = config.OWID_ENV.site
                 # Data insights need /data-insights/ prefix
                 if post_type == "data-insight":
                     issue["view_url"] = f"{base_url}/data-insights/{post_slug}" if post_slug else ""
@@ -714,7 +715,7 @@ Here is the metadata to check:"""
             elif view.get("view_type") == "chart":
                 # Chart configs use direct chart URL
                 chart_slug = view.get("slug", "")
-                base_url = config.OWID_ENV.site or "https://ourworldindata.org"
+                base_url = config.OWID_ENV.site
                 issue["view_url"] = f"{base_url}/grapher/{chart_slug}" if chart_slug else ""
             elif view.get("is_config_view"):
                 # For config pseudo-views, build base URL without dimension parameters
