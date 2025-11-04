@@ -49,7 +49,8 @@ def get_completed_collections(output_file: str) -> set[str]:
     try:
         df = pd.read_csv(output_path)
         if "slug" in df.columns:
-            completed = set(df["slug"].dropna().unique())
+            # Convert all slugs to strings to avoid type mismatch issues
+            completed = set(str(s) for s in df["slug"].dropna().unique())
             return completed
         return set()
     except Exception:
@@ -282,10 +283,11 @@ def run(
         if completed_collections:
             original_count = len(views)
             # Filter out completed collections - charts use 'slug', explorers use 'explorerSlug'
+            # Convert slugs to strings to match the completed_collections set
             views = [
                 v
                 for v in views
-                if (v.get("slug") if v.get("view_type") == "chart" else v.get("explorerSlug"))
+                if str(v.get("slug") if v.get("view_type") in ["chart", "post"] else v.get("explorerSlug"))
                 not in completed_collections
             ]
             skipped_count = original_count - len(views)
