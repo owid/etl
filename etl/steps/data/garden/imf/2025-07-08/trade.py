@@ -416,6 +416,10 @@ def get_country_import_ranking(tb: Table, target_country: str) -> Table:
     # Filter for target country only
     out = import_data[import_data["counterpart_country"] == target_country][["country", "year", "import_rank"]].copy()
 
+    # Set rank to 0 for China
+    if target_country == "China":
+        out["import_rank"] = 0
+
     out = Table(out).copy_metadata(tb)
     out["counterpart_country"] = target_country
     return out
