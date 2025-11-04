@@ -44,7 +44,6 @@ def run() -> None:
         [tb_wto_adj[tb_wto_adj["year"] > 1950], tb_historic_reindexed[tb_historic_reindexed["year"] <= 1950]],
         ignore_index=True,
     ).sort_values("year")
-    print(tb_combined)
 
     # Combine the datasets
     tb_combined = tb_combined.format(["country", "year"])
