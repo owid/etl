@@ -48,6 +48,8 @@ views:
       selectedFacetStrategy: entity
       yAxis:
         min: 0
+      hideAnnotationFieldsInTitle:
+        time: true
     # metadata:
     #   description_key:
     #     - "{definitions.description_key_extreme_poverty}"
@@ -80,6 +82,8 @@ views:
       selectedFacetStrategy: entity
       yAxis:
         min: 0
+      hideAnnotationFieldsInTitle:
+        time: true
     # metadata:
     #   description_key:
     #     - "{definitions.description_key_extreme_poverty}"
@@ -112,6 +116,8 @@ views:
       selectedFacetStrategy: entity
       yAxis:
         min: 0
+      hideAnnotationFieldsInTitle:
+        time: true
     # metadata:
     #   description_key:
     #     - "{definitions.description_key_extreme_poverty}"
