@@ -101,9 +101,24 @@ tables:
         short_unit: "people"
         display:
           numDecimalPlaces: 0
+
       population_omm:
         title: Population (OMM)
         unit: "people"
         short_unit: "people"
         display:
           numDecimalPlaces: 0
+
+      population_diff:
+        title: Population difference
+        unit: "people"
+        short_unit: "people"
+        display:
+          numDecimalPlaces: 0
+
+      population_diff_pct:
+        title: Population difference (%)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1

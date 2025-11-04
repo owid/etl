@@ -597,6 +597,10 @@ def calculate_poverty_measures(tb: Table, ds_population: Dataset) -> Tuple[Table
     # Drop poverty_line column
     tb_population = tb_population.drop(columns=["poverty_line"])
 
+    # Add population differences columns
+    tb_population["population_diff"] = tb_population["population_omm"] - tb_population["population"]
+    tb_population["population_diff_pct"] = tb_population["population_diff"] / tb_population["population_omm"] * 100
+
     # Drop population columns from tb_poverty
     tb_poverty = tb_poverty.drop(columns=["population", "population_omm"])
 
