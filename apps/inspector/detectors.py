@@ -522,6 +522,35 @@ async def check_view_async(
             formatted_fields.append(f"{field_label}: {value}")
     fields_text = "\n\n".join(formatted_fields)
 
+    # Estimate token count (rough approximation: 1 token ≈ 4 characters)
+    # Add some buffer for the instructions and formatting
+    estimated_tokens = len(fields_text) // 4 + 5000  # 5k buffer for instructions
+    MAX_TOKENS = 195000  # Leave some buffer below the 200k limit
+
+    if estimated_tokens > MAX_TOKENS:
+        view_id = view.get("id", "unknown")
+        view_title = view.get("view_title", "unknown")
+        view_slug = view.get("slug", "unknown")
+        view_type = view.get("view_type", "unknown")
+
+        log.warning(
+            f"Skipping view {view_id} ({view_title}): estimated {estimated_tokens} tokens exceeds {MAX_TOKENS} limit"
+        )
+
+        # Return an error issue instead of empty results
+        error_issue = {
+            "id": view_id,
+            "slug": view_slug,
+            "type": view_type,
+            "view_title": view_title,
+            "issue_type": "error",
+            "field": "content_size",
+            "context": f"Estimated {estimated_tokens:,} tokens",
+            "explanation": f"Content too large to check (exceeds {MAX_TOKENS:,} token limit). Consider splitting or reducing content.",
+        }
+
+        return [error_issue], 0, 0, 0, 0
+
     # Split prompt into cacheable (instructions) and variable (data) parts
     # The instructions are cached across all requests, saving ~62% on costs
     instructions = """You are checking metadata for an Our World in Data chart. Find ONLY mistakes that would damage OWID's reputation.
