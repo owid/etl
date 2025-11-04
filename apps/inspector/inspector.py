@@ -217,9 +217,9 @@ def run_checks(
     help="Skip semantic issue checking (Claude API)",
 )
 @click.option(
-    "--skip-grouping",
+    "--enable-grouping",
     is_flag=True,
-    help="Skip grouping and pruning of similar issues",
+    help="Enable grouping and pruning of similar issues (EXPERIMENTAL: may not work well with large numbers of collections)",
 )
 @click.option(
     "--output-file",
@@ -247,7 +247,7 @@ def run(
     content_type: str | None,
     skip_typos: bool,
     skip_issues: bool,
-    skip_grouping: bool,
+    enable_grouping: bool,
     output_file: str | None,
     limit: int | None,
     dry_run: bool,
@@ -533,7 +533,7 @@ def run(
 
     # Group and prune issues (across all collections)
     grouping_tokens = 0
-    if all_issues and not skip_grouping:
+    if all_issues and enable_grouping:
         rprint("  [cyan]Grouping similar issues and pruning false positives...[/cyan]")
         grouped_issues, grouping_tokens = group_issues(
             all_issues, config.ANTHROPIC_API_KEY, display_prompt=display_prompt
