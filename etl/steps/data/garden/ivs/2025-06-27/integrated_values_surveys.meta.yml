@@ -4522,49 +4522,49 @@ tables:
 
       not_democratic:
         title: "Democracy - Democraticness in own country: Not democratic"
-        description_short: '% of respondents replying 1 to 4 in a scale from 1 to 10 when asked "And how democratically is this country being governed today?. Again using a scale from 1 to 10, where 1 means that it is “not at all democratic” and 10 means that it is “completely democratic,” what position would you choose?"'
+        description_short: '% of respondents replying 1 to 4 in a scale from 1 to 10 when asked "And how democratically is this country being governed today? Again using a scale from 1 to 10, where 1 means that it is “not at all democratic” and 10 means that it is “completely democratic,” what position would you choose?"'
         display:
           name: "Democraticness in own country: Not democratic"
           <<: *common-display
       yes_democratic:
         title: "Democracy - Democraticness in own country: Democratic"
-        description_short: '% of respondents replying 7 to 10 in a scale from 1 to 10 when asked "And how democratically is this country being governed today?. Again using a scale from 1 to 10, where 1 means that it is “not at all democratic” and 10 means that it is “completely democratic,” what position would you choose?"'
+        description_short: '% of respondents replying 7 to 10 in a scale from 1 to 10 when asked "And how democratically is this country being governed today? Again using a scale from 1 to 10, where 1 means that it is “not at all democratic” and 10 means that it is “completely democratic,” what position would you choose?"'
         display:
           name: "Democraticness in own country: Democratic"
           <<: *common-display
       not_at_all_democratic:
         title: "Democracy - Democraticness in own country: Not at all democratic"
-        description_short: '% of respondents replying 1 in a scale from 1 to 10 when asked "And how democratically is this country being governed today?. Again using a scale from 1 to 10, where 1 means that it is “not at all democratic” and 10 means that it is “completely democratic,” what position would you choose?"'
+        description_short: '% of respondents replying 1 in a scale from 1 to 10 when asked "And how democratically is this country being governed today? Again using a scale from 1 to 10, where 1 means that it is “not at all democratic” and 10 means that it is “completely democratic,” what position would you choose?"'
         display:
           name: "Democraticness in own country: Not at all democratic"
           <<: *common-display
       completely_democratic:
         title: "Democracy - Democraticness in own country: Completely democratic"
-        description_short: '% of respondents replying 10 in a scale from 1 to 10 when asked "And how democratically is this country being governed today?. Again using a scale from 1 to 10, where 1 means that it is “not at all democratic” and 10 means that it is “completely democratic,” what position would you choose?"'
+        description_short: '% of respondents replying 10 in a scale from 1 to 10 when asked "And how democratically is this country being governed today? Again using a scale from 1 to 10, where 1 means that it is “not at all democratic” and 10 means that it is “completely democratic,” what position would you choose?"'
         display:
           name: "Democraticness in own country: Completely democratic"
           <<: *common-display
       neutral_democratic:
         title: "Democracy - Democraticness in own country: Neutral"
-        description_short: '% of respondents replying 5 or 6 in a scale from 1 to 10 when asked "And how democratically is this country being governed today?. Again using a scale from 1 to 10, where 1 means that it is “not at all democratic” and 10 means that it is “completely democratic,” what position would you choose?"'
+        description_short: '% of respondents replying 5 or 6 in a scale from 1 to 10 when asked "And how democratically is this country being governed today? Again using a scale from 1 to 10, where 1 means that it is “not at all democratic” and 10 means that it is “completely democratic,” what position would you choose?"'
         display:
           name: "Democraticness in own country: Neutral"
           <<: *common-display
       dont_know_democratic:
         title: "Democracy - Democraticness in own country: Don't know"
-        description_short: '% of respondents replying "don''t know" when asked "And how democratically is this country being governed today?. Again using a scale from 1 to 10, where 1 means that it is “not at all democratic” and 10 means that it is “completely democratic,” what position would you choose?"'
+        description_short: '% of respondents replying "don''t know" when asked "And how democratically is this country being governed today? Again using a scale from 1 to 10, where 1 means that it is “not at all democratic” and 10 means that it is “completely democratic,” what position would you choose?"'
         display:
           name: "Democraticness in own country: Don't know"
           <<: *common-display
       no_answer_democratic:
         title: "Democracy - Democraticness in own country: No answer"
-        description_short: '% of answers classified as "No answer" for the question "And how democratically is this country being governed today?. Again using a scale from 1 to 10, where 1 means that it is “not at all democratic” and 10 means that it is “completely democratic,” what position would you choose?"'
+        description_short: '% of answers classified as "No answer" for the question "And how democratically is this country being governed today? Again using a scale from 1 to 10, where 1 means that it is “not at all democratic” and 10 means that it is “completely democratic,” what position would you choose?"'
         display:
           name: "Democraticness in own country: No answer"
           <<: *common-display
       avg_score_democratic:
         title: "Democracy - Democraticness in own country: Average score"
-        description_short: 'Average score in a scale from 1 to 10 when asked "And how democratically is this country being governed today?. Again using a scale from 1 to 10, where 1 means that it is “not at all democratic” and 10 means that it is “completely democratic,” what position would you choose?"'
+        description_short: 'Average score in a scale from 1 to 10 when asked "And how democratically is this country being governed today? Again using a scale from 1 to 10, where 1 means that it is “not at all democratic” and 10 means that it is “completely democratic,” what position would you choose?"'
         display:
           name: "Democraticness in own country: Average score"
           <<: *common-display
@@ -4788,49 +4788,49 @@ tables:
 
       not_important_god:
         title: "Religion - Importance of God: Not important"
-        description_short: '% of respondents replying 1 to 4 in a scale from 1 to 10 when asked "How important is God in your life?. Please use this scale to indicate. 10 means "very important" and 1 means “not at all important."'
+        description_short: '% of respondents replying 1 to 4 in a scale from 1 to 10 when asked "How important is God in your life? Please use this scale to indicate. 10 means "very important" and 1 means “not at all important."'
         display:
           name: "Importance of God: Not important"
           <<: *common-display
       important_god:
         title: "Religion - Importance of God: Important"
-        description_short: '% of respondents replying 7 to 10 in a scale from 1 to 10 when asked "How important is God in your life?. Please use this scale to indicate. 10 means "very important" and 1 means “not at all important."'
+        description_short: '% of respondents replying 7 to 10 in a scale from 1 to 10 when asked "How important is God in your life? Please use this scale to indicate. 10 means "very important" and 1 means “not at all important."'
         display:
           name: "Importance of God: Important"
           <<: *common-display
       not_at_all_important_god:
         title: "Religion - Importance of God: Not at all important"
-        description_short: '% of respondents replying 1 in a scale from 1 to 10 when asked "How important is God in your life?. Please use this scale to indicate. 10 means "very important" and 1 means “not at all important."'
+        description_short: '% of respondents replying 1 in a scale from 1 to 10 when asked "How important is God in your life? Please use this scale to indicate. 10 means "very important" and 1 means “not at all important."'
         display:
           name: "Importance of God: Not at all important"
           <<: *common-display
       very_important_god:
         title: "Religion - Importance of God: Very important"
-        description_short: '% of respondents replying 10 in a scale from 1 to 10 when asked "How important is God in your life?. Please use this scale to indicate. 10 means "very important" and 1 means “not at all important."'
+        description_short: '% of respondents replying 10 in a scale from 1 to 10 when asked "How important is God in your life? Please use this scale to indicate. 10 means "very important" and 1 means “not at all important."'
         display:
           name: "Importance of God: Very important"
           <<: *common-display
       neutral_important_god:
         title: "Religion - Importance of God: Neutral"
-        description_short: '% of respondents replying 5 or 6 in a scale from 1 to 10 when asked "How important is God in your life?. Please use this scale to indicate. 10 means "very important" and 1 means “not at all important."'
+        description_short: '% of respondents replying 5 or 6 in a scale from 1 to 10 when asked "How important is God in your life? Please use this scale to indicate. 10 means "very important" and 1 means “not at all important."'
         display:
           name: "Importance of God: Neutral"
           <<: *common-display
       dont_know_important_god:
         title: "Religion - Importance of God: Don't know"
-        description_short: '% of respondents replying "don''t know" when asked "How important is God in your life?. Please use this scale to indicate. 10 means "very important" and 1 means “not at all important."'
+        description_short: '% of respondents replying "don''t know" when asked "How important is God in your life? Please use this scale to indicate. 10 means "very important" and 1 means “not at all important."'
         display:
           name: "Importance of God: Don't know"
           <<: *common-display
       no_answer_important_god:
         title: "Religion - Importance of God: No answer"
-        description_short: '% of answers classified as "No answer" for the question "How important is God in your life?. Please use this scale to indicate. 10 means "very important" and 1 means “not at all important."'
+        description_short: '% of answers classified as "No answer" for the question "How important is God in your life? Please use this scale to indicate. 10 means "very important" and 1 means “not at all important."'
         display:
           name: "Importance of God: No answer"
           <<: *common-display
       avg_score_important_god:
         title: "Religion - Importance of God: Average score"
-        description_short: 'Average score in a scale from 1 to 10 when asked "How important is God in your life?. Please use this scale to indicate. 10 means "very important" and 1 means “not at all important."'
+        description_short: 'Average score in a scale from 1 to 10 when asked "How important is God in your life? Please use this scale to indicate. 10 means "very important" and 1 means “not at all important."'
         display:
           name: "Importance of God: Average score"
           <<: *common-display
