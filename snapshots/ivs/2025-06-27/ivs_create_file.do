@@ -1331,11 +1331,11 @@ foreach var in $religion_how_often {
 	gen up_to_once_month_`var' = 0
 	replace up_to_once_month_`var' = 1 if `var' <= 3
 
-	gen special_holidays_`var' = 0
-	replace special_holidays_`var' = 1 if `var' >= 4 & `var' <= 5
+	gen special_holydays_`var' = 0
+	replace special_holydays_`var' = 1 if `var' >= 4 & `var' <= 5
 
-	gen less_than_once_year`var' = 0
-	replace less_than_once_year`var' = 1 if `var' >= 7 & `var' <= 8
+	gen less_than_once_year_`var' = 0
+	replace less_than_once_year_`var' = 1 if `var' >= 7 & `var' <= 8
 
 	gen more_once_week_`var' = 0
 	replace more_once_week_`var' = 1 if `var' == 1
@@ -1346,11 +1346,11 @@ foreach var in $religion_how_often {
 	gen once_month_`var' = 0
 	replace once_month_`var' = 1 if `var' == 3
 	
-	gen holidays_chr_`var' = 0
-	replace holidays_chr_`var' = 1 if `var' == 4
+	gen holydays_chr_`var' = 0
+	replace holydays_chr_`var' = 1 if `var' == 4
 	
-	gen holidays_oth_`var' = 0
-	replace holidays_oth_`var' = 1 if `var' == 5
+	gen holydays_oth_`var' = 0
+	replace holydays_oth_`var' = 1 if `var' == 5
 	
 	gen once_year_`var' = 0
 	replace once_year_`var' = 1 if `var' == 6
@@ -1367,7 +1367,7 @@ foreach var in $religion_how_often {
 	gen no_answer_`var' = 0
 	replace no_answer_`var' = 1 if `var' == .b
 
-	collapse (mean) up_to_once_month_`var' special_holidays_`var' less_than_once_year`var' more_once_week_`var' once_week_`var' once_month_`var' holidays_chr_`var' holidays_oth_`var' once_year_`var' less_often_`var' never_`var' dont_know_`var' no_answer_`var' [w=S017], by (year country)
+	collapse (mean) up_to_once_month_`var' special_holydays_`var' less_than_once_year_`var' more_once_week_`var' once_week_`var' once_month_`var' holydays_chr_`var' holydays_oth_`var' once_year_`var' less_often_`var' never_`var' dont_know_`var' no_answer_`var' [w=S017], by (year country)
 	tempfile religion_how_often_`var'_file
 	save "`religion_how_often_`var'_file'"
 
