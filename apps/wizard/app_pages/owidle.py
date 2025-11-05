@@ -709,7 +709,7 @@ def _plot_chart(
     st.plotly_chart(
         fig,
         theme="streamlit",
-        use_container_width=True,
+        width="stretch",
     )
 
 
@@ -794,7 +794,7 @@ def _plot_chart_hard(
     st.plotly_chart(
         fig,
         theme="streamlit",
-        use_container_width=True,
+        width="stretch",
     )
 
 
@@ -966,7 +966,7 @@ with st.form("form_guess", border=False, clear_on_submit=True):
     btn = st.form_submit_button(
         label=label,
         type="primary",
-        use_container_width=True,
+        width="stretch",
         on_click=lambda: guess(),
         disabled=disabled,
     )

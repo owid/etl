@@ -34,8 +34,11 @@ We started working on COVID-19 before our [ETL system](../../architecture). In m
 
 Our _compact COVID-19 dataset_ is a compilation of the most relevant COVID-19 indicators we have collected in the last few years. It consolidates indicators from various datasets into a single file. It comes with metadata, which explains all the indicators in detail. In the past, this dataset was generated and shared in our [GitHub](https://github.com/owid/covid-19-data/blob/master/public/data) repository.
 
-[:material-download: Download our compact dataset (CSV)](https://catalog.ourworldindata.org/garden/covid/latest/compact/compact.csv){ .md-button .md-button--primary }
+<a href="https://catalog.ourworldindata.org/garden/covid/latest/compact/compact.csv" download="owid-covid-compact.csv" class="md-button md-button--primary">:material-download: Download our compact dataset (CSV)</a>
 [:material-download: Download metadata](https://catalog.ourworldindata.org/garden/covid/latest/compact/compact.meta.json){ .md-button }
+
+!!! warning "Downloading files"
+      If clicking the button opens the CSV in your browser instead of downloading, right-click the button and select "Save Link As..." or "Download Linked File".
 
 In addition to our compact dataset, we provide individual datasets with all our COVID-19 indicators. These files are direct exports from our ETL.
 

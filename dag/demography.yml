@@ -354,3 +354,15 @@ steps:
   # UN WPP data for Cologne
   data://external/demography/latest/un_wpp_subset:
     - data://garden/un/2024-07-12/un_wpp
+
+  #
+  # PEW: Global Religious Composition
+  #
+  data://meadow/pew/2025-10-31/religious_composition:
+    - snapshot://pew/2025-10-31/religious_composition.zip
+  data://garden/pew/2025-10-31/religious_composition:
+    - data://meadow/pew/2025-10-31/religious_composition
+  data://grapher/pew/2025-10-31/religious_composition:
+    - data://garden/pew/2025-10-31/religious_composition
+  export://multidim/pew/latest/religious_composition:
+    - data://grapher/pew/2025-10-31/religious_composition

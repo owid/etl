@@ -47,7 +47,7 @@ def st_display_indicators(indicators: list[data.Indicator]):
     st.dataframe(
         styled_df,
         column_order=["name", "catalogPath", "n_charts", "similarity", "link"],
-        use_container_width=True,
+        width="stretch",
         hide_index=True,
         column_config=column_config,
     )
