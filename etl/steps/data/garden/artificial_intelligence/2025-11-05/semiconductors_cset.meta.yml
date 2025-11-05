@@ -1,0 +1,535 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Artificial Intelligence
+
+
+tables:
+  semiconductors_cset:
+    variables:
+      share_provided:
+        title: |-
+          Market share of << provided_name >>
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          <% if provided_name == "AI ASICs" %>
+          Application-specific integrated circuits for artificial intelligence (\"AI ASICs\"), a rapidly growing category of logic chips, often achieve greater speed and efficiency for artificial intelligence than GPUs and FPGAs, but are usable only for spe...
+          <% elif provided_name == "ATP materials" %>
+          ATP materials are the specialized materials required for the assembly, test, and packaging processes.
+          <% elif provided_name == "Advanced CPUs" %>
+          Central processing units (\"CPUs\") are the dominant general purpose logic chips.
+          <% elif provided_name == "ArF dry (DUV) lithography tools" %>
+          ArF dry lithography scanners are advanced deep ultraviolet (DUV) photolithography tools used in high-volume semiconductor manufacturing.
+          <% elif provided_name == "ArF immersion (DUV) lithography tools" %>
+          ArF immersion lithography scanners are advanced deep ultraviolet (DUV) photolithography tools used in high-volume semiconductor manufacturing.
+          <% elif provided_name == "Assembly and packaging" %>
+          At the end of the fabrication process, the finished wafer contains dozens of chips in a grid pattern.
+          <% elif provided_name == "Assembly inspection tools" %>
+          Assembly inspection tools inspect dies, bonding, packages, or wafers for defects throughout the packaging process.
+          <% elif provided_name == "Assembly tools" %>
+          Assembly tools are the specialized equipment that converts processed wafers into packaged semiconductor devices.
+          <% elif provided_name == "Atomic layer deposition tools" %>
+          Atomic layer deposition (ALD) tools are particularly advanced chemical vapor deposition tools capable of depositing layers a single atom in thickness, and are essential for leading-edge chip designs.
+          <% elif provided_name == "Auto ball bonders for IC" %>
+          Automatic ball bonders for integrated circuits (ICs) are high-speed thermosonic wire-bonding systems that create gold or copper ball interconnects between an IC's die pads and the package lead frame.
+          <% elif provided_name == "Auto ball bonders for non-IC" %>
+          Automatic ball bonders for non-integrated circuit (IC) devices are thermosonic wire-bonding systems engineered to create gold or copper ball interconnects between die pads and the package lead frame for power semiconductors, other discrete semicon...
+          <% elif provided_name == "Automatic wedge bonders" %>
+          Automatic wedge bonders are wire-bonding systems that form alumnium or copper wedge bonds to connect a device's die pads to a lead frame or substrate.
+          <% elif provided_name == "Bond wires" %>
+          A bond wire, typically made of aluminum, copper, silver, or gold, attaches the chip to a lead frame.
+          <% elif provided_name == "Bonding tools" %>
+          Bonding tools include die attach tools (to connect dies to lead frames or substrates), wire bonders (to make interconnects between lead frames and die pads), and advanced interconnect tools.
+          <% elif provided_name == "Burn-in test tools" %>
+          Burn-in tools heat devices to check if defects cause the devices to fail.
+          <% elif provided_name == "CMP materials" %>
+          Chemical mechanical planarization (CMP) is a process that makes layers produced during fabrication flat so lithography can successfully be performed on them.
+          <% elif provided_name == "CMP tools" %>
+          After other steps like etching and cleaning, chemical mechanical planarization (CMP) tools flatten the wafer surface.
+          <% elif provided_name == "CMP tools (adv. pkg.)" %>
+          After other steps like etching and cleaning, chemical mechanical planarization (CMP) tools flatten the wafer surface.
+          <% elif provided_name == "CVD tools (adv. pkg.)" %>
+          Chemical vapor deposition (CVD) tools for advanced packaging deposit thin films on wafers and substrates during an advanced packaging process.
+          <% elif provided_name == "Ceramic packages" %>
+          Protective ceramic packages, plastic substrates, or encapsulant resins may be bonded to a chip during the packaging process.
+          <% elif provided_name == "Chemical mechanical planarization" %>
+          After etching and cleaning, the wafer surface is flattened in a process called chemical mechanical planarization (CMP) to allow a new layer of features to be added.
+          <% elif provided_name == "Chemical vapor deposition tools" %>
+          Chemical vapor deposition (CVD) tools create a chemical vapor that deposits films on the wafer atom-by-atom or molecule-by-molecule.
+          <% elif provided_name == "Chip design" %>
+          Chip design involves specification, logic design, physical design, and validation and verification.
+          <% elif provided_name == "Conductor etching tools" %>
+          Conductor etching tools are used to carve the transistor electrodes and metal wiring into a chip.
+          <% elif provided_name == "Core intellectual property" %>
+          Core intellectual property (IP) consists of reusable, modular design blocks that chip design firms license for use in their designs.
+          <% elif provided_name == "Critical dimensions metrology tools" %>
+          Critical dimensions measuring tools (including optical tools and scanning electron microscopes) measure device dimensions and ensure alignment between a photomask and wafer during photolithography.
+          <% elif provided_name == "Crystal growing furnaces" %>
+          Crystal growing furnaces and machining tools are necessary to produce all wafers-thin, disc-shaped materials fabs used to produce chips.
+          <% elif provided_name == "Crystal machining tools" %>
+          Crystal growing furnaces and machining tools are necessary to produce all wafers-thin, disc-shaped materials fabs used to produce chips.
+          <% elif provided_name == "DAO chip design" %>
+          Discrete, Analog, and Other (DAO) semiconductors include discrete, analog, sensor, and optoelectronic devices.
+          <% elif provided_name == "Defect inspection tools" %>
+          Defect inspection tools include brightfield inspection tools (using light to scan the wafer), darkfield inspection tools (using lasers), e-beam inspection tools (using electrons), and optical and scanning electron microscopes.
+          <% elif provided_name == "Defect review stations" %>
+          Defect review stations are specialized semiconductor manufacturing systems used to identify and analyze microscopic defects on wafers during chip production.
+          <% elif provided_name == "Deposition" %>
+          In the deposition process, specialized tools are used to deposit thin films of materials on a silicon wafer.
+          <% elif provided_name == "Deposition materials" %>
+          Deposition materials include materials such as sputtering targets, which are used in physical vapor deposition.
+          <% elif provided_name == "Deposition tools" %>
+          Deposition tools are used to deposit thin films of materials on a silicon wafer.
+          <% elif provided_name == "Deposition tools (adv. pkg.)" %>
+          These tools are deposition tools designed and sold for advanced packaging, also referred to as wafer level packaging (WLP).
+          <% elif provided_name == "Dicing tools" %>
+          Dicing tools cut individual chips (dies) in the wafer into separated chips.
+          <% elif provided_name == "Die attach materials" %>
+          Die attach materials, including polymers and eutectic alloys, are used to attach chips to packages or substrates.
+          <% elif provided_name == "Die attaching tools" %>
+          Die attaching tools are bonding tools used to connect individual chips, or \"dies,\" to lead frames or substrates.
+          <% elif provided_name == "Die attaching tools for IC" %>
+          Die attaching tools for integrated circuits (IC) precisely place and bond each die onto its package or substrate.
+          <% elif provided_name == "Die attaching tools for non-IC" %>
+          Die attaching tools for non-integrated circuit (IC) devices affix devices, such as power semiconductors, other discrete semiconductors, LEDs, and CMOS image sensors to their substrates.
+          <% elif provided_name == "Direct write systems" %>
+          Direct write systems are lithography tools that pattern semiconductor features without using photomasks, enabling flexible and rapid prototyping in chip manufacturing.
+          <% elif provided_name == "Direct write systems (adv. pkg.)" %>
+          These tools are direct write systems designed and sold for advanced packaging, also referred to as wafer level packaging (WLP).
+          <% elif provided_name == "Discrete GPUs" %>
+          Discrete graphics processing units (\"GPUs\") have long been used for graphics processing (for example, in video game consoles) and in the last decade have become the most used chip for training artificial intelligence algorithms.
+          <% elif provided_name == "Dry clean tools" %>
+          Dry clean tools use plasma to remove films or particles from wafers.
+          <% elif provided_name == "Dry etch tools" %>
+          The main types of dry etching tools are used either for etching conductors or dielectrics.
+          <% elif provided_name == "Dry etching and cleaning tools" %>
+          Etching and cleaning tools have two main types: dry and wet.
+          <% elif provided_name == "Dry etching tools (adv. pkg.)" %>
+          Etching tools for advanced packaging are used to remove materials from wafers and substrates during an advanced packaging process.
+          <% elif provided_name == "Dry stripping tools" %>
+          Dry stripping tools use plasma to remove photoresist and other residues from wafers after processes like etching, ion implantation, or deposition.
+          <% elif provided_name == "E-beam metrology tools" %>
+          E-beam metrology tools use focused electron beams (e-beams) to detect defects—achieving better resolution than optical methods.
+          <% elif provided_name == "ECP tools (adv. pkg.)" %>
+          Electrochemical plating (ECP) tools for advanced packaging use electrolysis to deposit materials during an advanced packaging process.
+          <% elif provided_name == "EDA and Core IP" %>
+          Electronic design automation (EDA) software: Until the 1970s, when chips included few electric components, engineers drew designs manually.
+          <% elif provided_name == "EUV lithography tools" %>
+          EUV lithography tools are the most advanced photolithography equipment currently used in mass semiconductor production.
+          <% elif provided_name == "Electrochemical plating tools" %>
+          Electrochemical plating (ECP) tools use electrolysis to deposit materials.
+          <% elif provided_name == "Electronic design automation software" %>
+          Until the 1970s, when chips included few electric components, engineers drew designs manually.
+          <% elif provided_name == "Electronic gases" %>
+          Gases are widely used in semiconductor fabrication, including common gases like nitrogen, hydrogen, helium, argon helium, and carbon dioxide as well as speciality electronic gases like nitrogen trifluoride, tungsten hexafluoride, hydrogen chloride...
+          <% elif provided_name == "Encapsulation resins" %>
+          Protective ceramic packages, plastic substrates, or encapsulant resins may be bonded to a chip during the packaging process.
+          <% elif provided_name == "Etch and clean" %>
+          After photolithography creates a pattern in the photoresist coating a wafer, specialized tools etch the pattern into the permanent layer below the photoresist.
+          <% elif provided_name == "Etch and clean tools" %>
+          After photolithography creates a pattern in the photoresist coating a wafer, specialized tools etch the pattern into the permanent layer below the photoresist.
+          <% elif provided_name == "Etch and clean tools (adv. pkg.)" %>
+          These tools are etch and clean tools designed and sold for advanced packaging, also referred to as wafer level packaging (WLP).
+          <% elif provided_name == "FPGAs" %>
+          Field-programmable gate arrays (\"FPGAs\"), unlike other chips, can be reprogrammed after deployment to suit specific calculations, such as executing particular algorithms.
+          <% elif provided_name == "Fabrication materials" %>
+          Fabrication materials are a critical input in the fabrication of chips.
+          <% elif provided_name == "Fabrication tools (for advanced packaging)" %>
+          Advanced packaging tools are specialized semiconductor manufacturing systems used to integrate multiple chips into a single package, improving overall performance and power efficiency.
+          <% elif provided_name == "Film, stack, and shape metrology tools" %>
+          Film and wafer measuring tools include tools to measure film thickness, makeup, and stack (such as Fourier-transform infrared spectrometers, ellipsometers, opto-acoustic tools, and x-ray tools) and tools to measure wafer surfaces, taper, warpage, ...
+          <% elif provided_name == "Finished logic chip" %>
+          The production of a single logic chip often requires more than 1,000 steps, passing through international borders 70 or more times, before reaching an end customer.
+          <% elif provided_name == "Handlers and probers" %>
+          Handlers and probers link test tools and tested devices.
+          <% elif provided_name == "High-temperature CVD tools" %>
+          High-temperature chemical vapor deposition tools are used to deposit epitaxial layers (layers oriented in a particular way relative to underlying layers).
+          <% elif provided_name == "Imprint lithography" %>
+          Imprint lithography tools use physical templates to directly transfer nanoscale patterns onto wafers.
+          <% elif provided_name == "Inspection tools (adv. pkg.)" %>
+          These tools inspect parts of wafers during the advanced packaging process, before these wafers are \"diced‚\" (i.
+          <% elif provided_name == "Insulator etching tools" %>
+          Insulator (or dielectric) etching tools electrically isolate the metal wiring and transistors on a chip.
+          <% elif provided_name == "Integrated assembly tools" %>
+          Integrated assembly tools integrate different packaging systems.
+          <% elif provided_name == "Ion implantation" %>
+          Ion implanters embed dopant substances into silicon wafers to give different parts of the wafer different levels of semiconductivity to make functional transistors in chips.
+          <% elif provided_name == "Ion implanters" %>
+          Ion implanters embed dopant substances into silicon wafers to give different parts of the wafer different levels of semiconductivity to make functional transistors in chips.
+          <% elif provided_name == "Ion milling tools" %>
+          Ion milling tools are advanced semiconductor manufacturing equipment used for precise material removal and surface preparation in chip production.
+          <% elif provided_name == "KrF (DUV) lithography tools" %>
+          KrF lithography tools are deep ultraviolet (DUV) photolithography tools that use 248 nm wavelength light from krypton fluoride lasers to pattern semiconductor features for mature node semiconductors.
+          <% elif provided_name == "Lead frames" %>
+          A lead frame transfers data between a chip and external devices.
+          <% elif provided_name == "Linear and discrete testing tools" %>
+          Linear testing devices include, for example, operational amplifiers and voltage regulators.
+          <% elif provided_name == "Lithography tools" %>
+          The Netherlands, Japan, and a small number of other countries are the dominant producers of lithography equipment, critical for the production of chips and photomasks.
+          <% elif provided_name == "Lithography tools (adv. pkg.)" %>
+          These tools are lithography tools designed and sold for advanced packaging, also referred to as wafer level packaging (WLP).
+          <% elif provided_name == "Logic chip design" %>
+          Logic chip design is the design of integrated circuits that perform digital computation.
+          <% elif provided_name == "Low-pressure CVD tools" %>
+          Low-pressure chemical vapor deposition tools are commonly used to deposit polysilicon, tungsten, titanium, and titanium nitride.
+          <% elif provided_name == "Manual wire bonders" %>
+          Manual wire bonders are operator-controlled machines used to form wires between semiconductor die pads and a lead frame.
+          <% elif provided_name == "Mask aligners" %>
+          Mask aligners line up a patterned glass plate called a photomask with a silicon wafer that has been coated in light-sensitive phtoresist.
+          <% elif provided_name == "Mask exposure systems - e-beam" %>
+          Electron-beam (or \"e-beam\") lithography tools draw patterns in a substrate using electrons.
+          <% elif provided_name == "Mask exposure systems - laser beam" %>
+          Laser lithography tools draw patterns in a substrate using laser light.
+          <% elif provided_name == "Maskless lithography tools" %>
+          Maskless lithography equipment draws patterns in a substrate using laser light, electrons, or ions.
+          <% elif provided_name == "Memory chip design" %>
+          Memory chip design is the design of integrated circuits that store digital information, including both DRAM and NAND memory technologies.
+          <% elif provided_name == "Memory test tools" %>
+          Memory test tools for flash and DRAM are specialized semiconductor equipment used to validate performance, reliability, and functionality of memory chips during manufacturing.
+          <% elif provided_name == "Misc. dry etch tools" %>
+          Miscellaneous dry etch tools are specialized semiconductor manufacturing equipment used for various etching processes in chip production.
+          <% elif provided_name == "Other deposition tools (non-IC)" %>
+          Deposition tools for non-IC applications includes tools for compound semiconductors, MEMS, and \"other.
+          <% elif provided_name == "Other interconnect tools" %>
+          Other interconnect tools include various bonding tools other than die attach tools and wire bonders.
+          <% elif provided_name == "Overlay metrology tools" %>
+          Overlay metrology tools are used to measure and control the alignment accuracy between successive lithographic layers in chip production.
+          <% elif provided_name == "PVD tools (adv. pkg.)" %>
+          Physical vapor deposition (PVD) tools for advanced packaging deposit thin metal films on wafers and substrates during an advanced packaging process.
+          <% elif provided_name == "Packaging materials" %>
+          Semiconductor packaging involves several steps to bond a fabricated chip to an encasing package, each requiring different materials.
+          <% elif provided_name == "Packaging tools" %>
+          Packaging tools encase dies (individual chips) in packages.
+          <% elif provided_name == "Photolithography" %>
+          In photolithography, light is used to draw patterns into semiconductor wafers, creating the tiny circuits that comprise logic chips.
+          <% elif provided_name == "Photomask handlers" %>
+          Wafer and photomask handlers store and transport wafers and photomasks in a fab.
+          <% elif provided_name == "Photomask inspection and repair tools" %>
+          Photomask inspection and repair tools are similar to those used in wafer inspection, such as microscopes.
+          <% elif provided_name == "Photomasks" %>
+          Photomasks are transparent plates containing a circuit pattern to be fabricated in a chip.
+          <% elif provided_name == "Photoresists" %>
+          Photoresists are chemicals deposited on a wafer.
+          <% elif provided_name == "Physical vapor deposition tools" %>
+          Physical vapor deposition (PVD) tools vaporize a solid or liquid material, which then condenses onto a substrate.
+          <% elif provided_name == "Plasma CVD tools" %>
+          Plasma chemical vapor deposition tools are used to deposit for materials requiring low temperatures during the deposition process.
+          <% elif provided_name == "Plasma modification tools" %>
+          Plasma modification tools are used to alter material properties of a layer that is deposited or grown on the surface of a wafer.
+          <% elif provided_name == "Process control and handling" %>
+          Process control: In semiconductor fabrication, process control involves precisely monitoring wafers, photomasks, and the overall chip manufacturing process to ensure consistency and low manufacturing error rates.
+          <% elif provided_name == "Process control tools" %>
+          In semiconductor fabrication, process control involves precisely monitoring wafers, photomasks, and the overall chip manufacturing process to ensure consistency and low manufacturing error rates.
+          <% elif provided_name == "Process monitoring tools" %>
+          Process monitoring tools, such as curve tracers, are relatively low-value equipment used to measure performance of devices fabricated in wafers during chip manufacturing.
+          <% elif provided_name == "Process-specific fabrication materials" %>
+          Process-specific fabrication materials are highly engineered materials that enable each step in the semiconductor fabrication process, inlcuidng (1) CMP materials—slurries and pads that planarize wafer surfaces; (2) deposition materials—ultra-high...
+          <% elif provided_name == "Rapid thermal processing tools" %>
+          Rapid thermal processing (RTP) is critical to several steps in chip manufacturing.
+          <% elif provided_name == "Resist processing tools" %>
+          Resist processing tools, also called \"tracks,\" coat photoresists on wafers (typically by spin-coating, which spins the wafer to spread deposited photoresist), develop them (dissolve portions hit by light), and bake them (harden undissolved photo...
+          <% elif provided_name == "Resist processing tools (adv. pkg.)" %>
+          Resist processing tools, also called \"tracks,\" coat photoresists on wafers (typically by spin-coating, which spins the wafer to spread deposited photoresist), develop them (dissolve portions hit by light), and bake them (harden undissolved photo...
+          <% elif provided_name == "Single wafer spin & spray systems (adv. pkg.)" %>
+          These tools are single wafer spin & spray systems designed and sold for advanced packaging, also referred to as wafer level packaging (WLP).
+          <% elif provided_name == "SoC test tools" %>
+          SoC test tools can test logic, memory, mixed, and analog circuits.
+          <% elif provided_name == "Spin-on deposition tools (adv. pkg.)" %>
+          Spin-on deposition tools for advanced packaging apply a liquid coating onto wafers and substrates during an advanced packaging process.
+          <% elif provided_name == "Substrates" %>
+          Protective ceramic packages, plastic substrates, or encapsulant resins may be bonded to a chip during the packaging process.
+          <% elif provided_name == "Test tools" %>
+          Test tools are also known as automatic test equipment (ATE).
+          <% elif provided_name == "Testing" %>
+          Chips undergo tests requiring a range of specialized equipment, including system-on-a-chip test tools, linear and discrete devices, burn-in tools, and handlers and probers.
+          <% elif provided_name == "Tube-based diffusion and deposition tools" %>
+          Tube-based diffusion and deposition systems are called \"tube‚\"-based because substrates are loaded in cylindrical chambers for processing, either causing  diffusion of dopants into a wafer (tube diffusion systems) or depositing materials for par...
+          <% elif provided_name == "Wafer" %>
+          Silicon wafers are the basic building block for chip production.
+          <% elif provided_name == "Wafer and photomask handlers" %>
+          Storing and transporting wafers and photomasks in a fab requires specific equipment.
+          <% elif provided_name == "Wafer bonding and aligning tools" %>
+          Wafer bonders and aligners join silicon wafers.
+          <% elif provided_name == "Wafer handlers" %>
+          Wafer and photomask handlers store and transport wafers and photomasks in a fab.
+          <% elif provided_name == "Wafer inspection tools" %>
+          Even the tiniest imperfections can cause serious problems during chip production.
+          <% elif provided_name == "Wafer level stud bonders" %>
+          Wafer level stud bonders are automated thermosonic bonding systems that fabricate gold or copper \"stud\" bumps on a wafer's bond pads.
+          <% elif provided_name == "Wet chemicals" %>
+          Wet chemicals, such as sulfuric acid, isopropyl alcohol, ammonium hydroxide, phosphoric acid, nitric acid, hydrochloric acid, and acetic acid, are widely used in semiconductor manufacturing.
+          <% elif provided_name == "Wet etching and cleaning tools" %>
+          Etching and cleaning tools have two main types: dry and wet.
+          <% elif provided_name == "Wire bonding tools" %>
+          Wire bonders are bonding tools used to make interconnects between semiconductor die pads and a lead frame.
+          <% elif provided_name == "i-line lithography tools" %>
+          i-line lithography tools are ultraviolet (UV) photolithography systems used in semiconductor manufacturing for mature process nodes.
+          <% else %>
+          Market share of << provided_name.lower() >> in the semiconductor supply chain
+          <%- endif -%>
+        description_processing: |-
+          <% if provided_name == "AI ASICs" %>
+          Application-specific integrated circuits for artificial intelligence (\"AI ASICs\"), a rapidly growing category of logic chips, often achieve greater speed and efficiency for artificial intelligence than GPUs and FPGAs, but are usable only for specific algorithms. ASICs can be easier to design than CPUs, GPUs, and FPGAs, opening the field to a wide range of design startups, including in China. Still, few highly specialized ASICs have been widely commercialized, as their markets are often too small for recouping fixed development costs.
+          <% elif provided_name == "ATP materials" %>
+          ATP materials are the specialized materials required for the assembly, test, and packaging processes. These materials inlcude signal-routing carriers, including lead frames and substrates, as well as interconnect materials such as bond wires, solder balls, and conductive adhesives.
+          <% elif provided_name == "Advanced CPUs" %>
+          Central processing units (\"CPUs\") are the dominant general purpose logic chips. Two U.S. firms, Intel and AMD, have long held a duopoly over CPUs used for laptops, desktops, and servers. (China has several ventures, though none are competitive with U.S. firms.) CPUs are often classified into \"nodes,\" which represent technology generations: a chip at a new node (e.g., \"5 nm‚\" released in 2020) contains approximately double the transistor density as a previous node (e.g., \"7 nm‚\" released in 2018) and is also more cost-effective.
+          <% elif provided_name == "ArF dry (DUV) lithography tools" %>
+          ArF dry lithography scanners are advanced deep ultraviolet (DUV) photolithography tools used in high-volume semiconductor manufacturing. ArF dry lithography tools use 193 nm wavelength light from argon fluoride (ArF) lasers to pattern critical non-immersion layers in chip production. Only the Dutch firm ASML and the Japanese firm Nikon produce ArF lithography tools capable of mass production.
+          <% elif provided_name == "ArF immersion (DUV) lithography tools" %>
+          ArF immersion lithography scanners are advanced deep ultraviolet (DUV) photolithography tools used in high-volume semiconductor manufacturing. ArF dry lithography tools use 193 nm wavelength light and a liquid medium to achieve high-resolution patterning for advanced semiconductors. EUV and ArF immersion scanners are the only lithography tools capable of mass-producing chips at near-cutting edge scale (the absolute cutting edge requires EUV). Only the Dutch firm ASML and the Japanese firm Nikon produce ArF scanners or ArF immersion scanners capable of mass production.
+          <% elif provided_name == "Assembly and packaging" %>
+          At the end of the fabrication process, the finished wafer contains dozens of chips in a grid pattern. During assembly and packaging, the wafer is separated into individual chips, or \"dies\". Each chip is mounted on a frame with wires that connect the chip to external devices, and enclosed in a protective casing. This produces the familiar look of a dark gray rectangle with metal pins at the edges. This is part of the Assembly, testing, and packaging (ATP) stage.
+          <% elif provided_name == "Assembly inspection tools" %>
+          Assembly inspection tools inspect dies, bonding, packages, or wafers for defects throughout the packaging process.
+          <% elif provided_name == "Assembly tools" %>
+          Assembly tools are the specialized equipment that converts processed wafers into packaged semiconductor devices. This category includes (1) dicing tools, which precisely separate individual dies from the wafer; (2) bonding tools, including die attach tools, wire bonders, and advanced interconnect tools; (3) assembly inspection tools, which inspect dies, bonding, packages, or wafers for defects throughout the packaging process; and (4) integrated assembly tools, which integrate multiple packaging systems.
+          <% elif provided_name == "Atomic layer deposition tools" %>
+          Atomic layer deposition (ALD) tools are particularly advanced chemical vapor deposition tools capable of depositing layers a single atom in thickness, and are essential for leading-edge chip designs.
+          <% elif provided_name == "Auto ball bonders for IC" %>
+          Automatic ball bonders for integrated circuits (ICs) are high-speed thermosonic wire-bonding systems that create gold or copper ball interconnects between an IC's die pads and the package lead frame.
+          <% elif provided_name == "Auto ball bonders for non-IC" %>
+          Automatic ball bonders for non-integrated circuit (IC) devices are thermosonic wire-bonding systems engineered to create gold or copper ball interconnects between die pads and the package lead frame for power semiconductors, other discrete semiconductors, LEDs, and CMOS image sensors.
+          <% elif provided_name == "Automatic wedge bonders" %>
+          Automatic wedge bonders are wire-bonding systems that form alumnium or copper wedge bonds to connect a device's die pads to a lead frame or substrate. These data exclude automatic wedge bonders designed for batteries.
+          <% elif provided_name == "Bond wires" %>
+          A bond wire, typically made of aluminum, copper, silver, or gold, attaches the chip to a lead frame.
+          <% elif provided_name == "Bonding tools" %>
+          Bonding tools include die attach tools (to connect dies to lead frames or substrates), wire bonders (to make interconnects between lead frames and die pads), and advanced interconnect tools.
+          <% elif provided_name == "Burn-in test tools" %>
+          Burn-in tools heat devices to check if defects cause the devices to fail.
+          <% elif provided_name == "CMP materials" %>
+          Chemical mechanical planarization (CMP) is a process that makes layers produced during fabrication flat so lithography can successfully be performed on them. The highest-value materials used in chemical mechanical planarization are chemical slurries, which often include rare earth minerals, and polishing pads. During fabrication, a wafer is placed on the pad along with the slurry, and a polishing head presses against the wafer and rotates to planarize the wafer.
+          <% elif provided_name == "CMP tools" %>
+          After other steps like etching and cleaning, chemical mechanical planarization (CMP) tools flatten the wafer surface. CMP tools are critical for chip fabrication, but not as complex as other tools, such as lithography and deposition tools.
+          <% elif provided_name == "CMP tools (adv. pkg.)" %>
+          After other steps like etching and cleaning, chemical mechanical planarization (CMP) tools flatten the wafer surface. CMP tools are critical for chip fabrication, but they are not as complex as other tools, such as lithography and deposition tools.
+          <% elif provided_name == "CVD tools (adv. pkg.)" %>
+          Chemical vapor deposition (CVD) tools for advanced packaging deposit thin films on wafers and substrates during an advanced packaging process. These tools are used to deposit most dielectrics (a type of insulator) and some metals. US firm Applied Materials is the leading supplier of CVD tools for advanced packaging, followed by Chinese firm NAURA, US firm Lam Research, and Japanese firm Kokusai.
+          <% elif provided_name == "Ceramic packages" %>
+          Protective ceramic packages, plastic substrates, or encapsulant resins may be bonded to a chip during the packaging process.
+          <% elif provided_name == "Chemical mechanical planarization" %>
+          After etching and cleaning, the wafer surface is flattened in a process called chemical mechanical planarization (CMP) to allow a new layer of features to be added. CMP tools are critical for chip fabrication, but not as complex as other tools, such as lithography and deposition tools. This is part of the Fabrication stage.
+          <% elif provided_name == "Chemical vapor deposition tools" %>
+          Chemical vapor deposition (CVD) tools create a chemical vapor that deposits films on the wafer atom-by-atom or molecule-by-molecule. CVD is the most widely used deposition technique in chip fabrication. It is used to deposit most dielectrics (a type of insulator), silicon, and some metals.
+          <% elif provided_name == "Chip design" %>
+          Chip design involves specification, logic design, physical design, and validation and verification. Specification determines how the chip should operate in the system using it. Logic design creates a schematic model of interconnected electrical components. Physical design translates this model to a physical layout of electrical components and interconnects, the wires that connect components. Validation and verification ensure chips based on the design will operate as expected. This is part of the Design stage.
+          <% elif provided_name == "Conductor etching tools" %>
+          Conductor etching tools are used to carve the transistor electrodes and metal wiring into a chip. After a conductor such as copper, aluminum, tungsten, or silicon is deposited and coated with a layer of photoresist, the conductor etching tool removes the unwanted material, leaving the desired feature. U.S. firms are leading suppliers of conductor etching tools.
+          <% elif provided_name == "Core intellectual property" %>
+          Core intellectual property (IP) consists of reusable, modular design blocks that chip design firms license for use in their designs. U.S. and U.K. vendors dominate the core IP market; some firms specialize exclusively on core IP, while others combine their offerings with EDA tools. The company ARM is the top core IP vendor, providing an instruction set architecture (ISA) and associated core IP underpinning most of the world's smartphone processors.
+          <% elif provided_name == "Critical dimensions metrology tools" %>
+          Critical dimensions measuring tools (including optical tools and scanning electron microscopes) measure device dimensions and ensure alignment between a photomask and wafer during photolithography.
+          <% elif provided_name == "Crystal growing furnaces" %>
+          Crystal growing furnaces and machining tools are necessary to produce all wafers-thin, disc-shaped materials fabs used to produce chips. The furnace forms a cylindrical ingot of silicon from polycrystalline raw silicon; machining equipment then cuts the ingot into wafers used for chip fabrication. These tools have relatively low value and complexity relative to other semiconductor manufacturing equipment. Japan, Germany, and Switzerland are the main producers.
+          <% elif provided_name == "Crystal machining tools" %>
+          Crystal growing furnaces and machining tools are necessary to produce all wafers-thin, disc-shaped materials fabs used to produce chips. The furnace forms a cylindrical ingot of silicon from polycrystalline raw silicon; machining equipment then cuts the ingot into wafers used for chip fabrication. These tools have relatively low value and complexity relative to other semiconductor manufacturing equipment.
+          <% elif provided_name == "DAO chip design" %>
+          Discrete, Analog, and Other (DAO) semiconductors include discrete, analog, sensor, and optoelectronic devices. These designs typically utilize mature process nodes (28nm and above) and are essential for a wide range of applications including power management, signal processing, and sensor interfaces in automotive, industrial, and consumer electronics sectors.
+          <% elif provided_name == "Defect inspection tools" %>
+          Defect inspection tools include brightfield inspection tools (using light to scan the wafer), darkfield inspection tools (using lasers), e-beam inspection tools (using electrons), and optical and scanning electron microscopes.
+          <% elif provided_name == "Defect review stations" %>
+          Defect review stations are specialized semiconductor manufacturing systems used to identify and analyze microscopic defects on wafers during chip production. These tools combine high-resolution imaging to pinpoint irregularities in circuit patterns. Critical for maintaining yield in advanced semiconductor nodes, defect review stations typically utilize scanning electron microscopy (SEM) or optical imaging to detect defects that could impact device performance. US firm Applied Materials is the leading supplier of defect review stations; however US firm KLA and Japanese firm Hitachi High-Tech also have notable market shares.
+          <% elif provided_name == "Deposition" %>
+          In the deposition process, specialized tools are used to deposit thin films of materials on a silicon wafer. After lithography and etching, these films become different chip layers, including for transistors, interconnects (wires), and other elements. This is part of the Fabrication stage.
+          <% elif provided_name == "Deposition materials" %>
+          Deposition materials include materials such as sputtering targets, which are used in physical vapor deposition. In this process, argon ions are fired at the target, whose atoms are stripped off and deposited as a thin film on the wafer. Other deposition materials can be used to form interconnects, which are wires that connect devices within a chip, or for deposition of insulators that form layers within transistors and also between interconnects.  Many other materials used in deposition are simply purified versions of raw materials such as aluminum, copper, tantalum, and titanium.
+          <% elif provided_name == "Deposition tools" %>
+          Deposition tools are used to deposit thin films of materials on a silicon wafer. After lithography and etching, these films become different chip layers, including for transistors, interconnects (wires), and other elements. In addition to deposition tools for integrated circuit (IC) manufacturing, this section includes deposition tools for non-IC applications, specifically: compound semiconductors, MEMS, and \"other.\" Deposition tools for hard drive manufacturing are excluded.
+          <% elif provided_name == "Deposition tools (adv. pkg.)" %>
+          These tools are deposition tools designed and sold for advanced packaging, also referred to as wafer level packaging (WLP). In general, deposition tools are used to deposit thin films of materials on a silicon wafer.
+          <% elif provided_name == "Dicing tools" %>
+          Dicing tools cut individual chips (dies) in the wafer into separated chips. This process also involves thinning the wafer. Dicing tools include blade saws, laser saws, dicing accessories and backside grinding equipment.
+          <% elif provided_name == "Die attach materials" %>
+          Die attach materials, including polymers and eutectic alloys, are used to attach chips to packages or substrates.
+          <% elif provided_name == "Die attaching tools" %>
+          Die attaching tools are bonding tools used to connect individual chips, or \"dies,\" to lead frames or substrates.
+          <% elif provided_name == "Die attaching tools for IC" %>
+          Die attaching tools for integrated circuits (IC) precisely place and bond each die onto its package or substrate. High placement accuracy and uniform thermal conduction across the die are critical for yield and long-term reliability.
+          <% elif provided_name == "Die attaching tools for non-IC" %>
+          Die attaching tools for non-integrated circuit (IC) devices affix devices, such as power semiconductors, other discrete semiconductors, LEDs, and CMOS image sensors to their substrates.
+          <% elif provided_name == "Direct write systems" %>
+          Direct write systems are lithography tools that pattern semiconductor features without using photomasks, enabling flexible and rapid prototyping in chip manufacturing. These systems use focused electron beams (e-beam), ion beams, or laser beams to directly \"write\" circuit patterns onto wafers or photoresists. Japanese firm JEOL and German firm Vistec Semiconductor are the leading manufacturers of direct write systems.
+          <% elif provided_name == "Direct write systems (adv. pkg.)" %>
+          These tools are direct write systems designed and sold for advanced packaging, also referred to as wafer level packaging (WLP). In general, direct write systems are lithography tools that pattern semiconductor features without using photomasks, enabling flexible and rapid prototyping in chip manufacturing.
+          <% elif provided_name == "Discrete GPUs" %>
+          Discrete graphics processing units (\"GPUs\") have long been used for graphics processing (for example, in video game consoles) and in the last decade have become the most used chip for training artificial intelligence algorithms. The United States monopolizes the design market for GPUs, including standalone \"discrete GPUs,\" the most powerful GPUs.
+          <% elif provided_name == "Dry clean tools" %>
+          Dry clean tools use plasma to remove films or particles from wafers. These tools are used to create residue-free surfaces while minimizing wafer damage and material loss. US firm Lam Research and South Korean firm PSK are leading producers of dry clean tools.
+          <% elif provided_name == "Dry etch tools" %>
+          The main types of dry etching tools are used either for etching conductors or dielectrics. Major subtypes of conductor and dielectric dry etching tools include sputter etching and plasma etching; plasma etching is further divided into reactive ion etching and deep reactive ion etching (a form of reactive ion etching used to make deep wells). The most commonly used form is reactive ion etching.
+          <% elif provided_name == "Dry etching and cleaning tools" %>
+          Etching and cleaning tools have two main types: dry and wet. Dry etching tools-using gases to etch the substrate-are the most commonly used tool, and are especially necessary for circuit features in advanced chips. Dry etching tools have advantages over wet tools: they are fast and can etch differently depending on the direction of etch (\"anisotropic etching\"), which enables fine-grained features with complex shapes.  The most advanced dry etching tools are called atomic layer etching (ALE) tools. These tools are important for multiple etching applications in the most advanced chips, and are produced by leading U.S., Japanese, and British firms. Though it doesn't produce ALE tools, China’s AMEC produces dry etching tools that are perhaps the most advanced SME tools sold by any Chinese firm. They are used for leading Taiwanese chipmaker TSMC’s 7 and 5 nm nodes, though not for the finest features, such as in complex transistor structures. Recognizing China’s competitiveness in dry etching tools, the United States removed these tools from the Commerce Control List in 2016.
+          <% elif provided_name == "Dry etching tools (adv. pkg.)" %>
+          Etching tools for advanced packaging are used to remove materials from wafers and substrates during an advanced packaging process. US firm Lam Research is the leading supplier of etching tools for advanced packaging, followed by Chinese firm Advanced Micro-Fabrication Equipment Inc. (AMEC), US firms Applied Materials and KLA, and Chinese firm NAURA.
+          <% elif provided_name == "Dry stripping tools" %>
+          Dry stripping tools use plasma to remove photoresist and other residues from wafers after processes like etching, ion implantation, or deposition. These tools are used to create residue-free surfaces while minimizing wafer damage and material loss. US-based but Chinese-owned firm Mattson Technology, US-firm Lam Research, Japanese firm Kokusai Electric, and South Korean firm PSK are the leading producers of dry stripping tools.
+          <% elif provided_name == "E-beam metrology tools" %>
+          E-beam metrology tools use focused electron beams (e-beams) to detect defects—achieving better resolution than optical methods. These tools enable precise measurements of line widths, spaces between features, and complex three-dimensional structures in advanced semiconductor devices. US firms Applied Materials and KLA and Dutch firm ASML are the leading producers of e-beam metrology tools. Dongfang Jingyuan Electron is an emerging Chinese firm producing e-beam metrology tools.
+          <% elif provided_name == "ECP tools (adv. pkg.)" %>
+          Electrochemical plating (ECP) tools for advanced packaging use electrolysis to deposit materials during an advanced packaging process. A common application is to deposit copper (used for wiring in chips) on a wafer or substrate. US firms Lam Research and Applied Materials are the leading producers followed by Singaporean firm ASMPT, among others.
+          <% elif provided_name == "EDA and Core IP" %>
+          Electronic design automation (EDA) software: Until the 1970s, when chips included few electric components, engineers drew designs manually. Today, chips include billions of interconnected transistors and other electrical components. To manage this complexity, chip designers use sophisticated electronic design automation (EDA) software to produce chip designs.  Core intellectual property: Core IP consists of reusable, modular design blocks that chip design firms license for use in their designs. U.S. and U.K. vendors dominate the core IP market; some firms specialize exclusively on core IP, while others combine their offerings with EDA tools. The company ARM is the top core IP vendor, providing an instruction set architecture (ISA) and associated core IP underpinning most of the world's smartphone processors. This is part of the Design stage.
+          <% elif provided_name == "EUV lithography tools" %>
+          EUV lithography tools are the most advanced photolithography equipment currently used in mass semiconductor production. They are the only tools combining leading-edge precision (by producing light with small wavelengths) with high throughput (by using photomasks), and are necessary for mass-producing the most advanced logic chips. They are exclusively produced by the Dutch firm ASML. A single EUV scanner costs well over $150 million, ships in 40 freight containers and contains about 100,000 individual parts.
+          <% elif provided_name == "Electrochemical plating tools" %>
+          Electrochemical plating (ECP) tools use electrolysis to deposit materials. A common application is to deposit copper (used for wiring in chips) across a wafer. However, other techniques, such as chemical vapor deposition, can also deposit copper for some applications.
+          <% elif provided_name == "Electronic design automation software" %>
+          Until the 1970s, when chips included few electric components, engineers drew designs manually. Today, chips include billions of interconnected transistors and other electrical components. To manage this complexity, chip designers use sophisticated electronic design automation (EDA) software to produce logic chip designs.  Only U.S. firms can produce EDA software with the full-spectrum capabilities engineers need to design leading-edge chips. Although the industry is top-heavy, startups frequently enter the EDA space. However, they struggle to compete with top EDA firms that typically acquire them to incorporate the startups' niche functionality to their full-spectrum capabilities.
+          <% elif provided_name == "Electronic gases" %>
+          Gases are widely used in semiconductor fabrication, including common gases like nitrogen, hydrogen, helium, argon helium, and carbon dioxide as well as speciality electronic gases like nitrogen trifluoride, tungsten hexafluoride, hydrogen chloride, ammonia, disilane, germane, high-purity carbon dioxide, and nitrous oxide. In particular, the photolithography process uses various noble gases, such as neon, argon, and krypton, to create lasers to draw circuit patterns on wafers. (However, the most advanced photolithography equipment, EUV, uses a tin light source rather than a gas-based light source.)
+          <% elif provided_name == "Encapsulation resins" %>
+          Protective ceramic packages, plastic substrates, or encapsulant resins may be bonded to a chip during the packaging process.
+          <% elif provided_name == "Etch and clean" %>
+          After photolithography creates a pattern in the photoresist coating a wafer, specialized tools etch the pattern into the permanent layer below the photoresist. The photoresist is then removed and the etched material cleaned off of the layer.  The United States and Japan are the main producers of etch and clean equipment; South Korea and China are also significant suppliers. This is part of the Fabrication stage.
+          <% elif provided_name == "Etch and clean tools" %>
+          After photolithography creates a pattern in the photoresist coating a wafer, specialized tools etch the pattern into the permanent layer below the photoresist. The photoresist is then removed and the etched material cleaned off of the layer.
+          <% elif provided_name == "Etch and clean tools (adv. pkg.)" %>
+          These tools are etch and clean tools designed and sold for advanced packaging, also referred to as wafer level packaging (WLP). In general, etch tools carve the pattern into the permanent layer below the photoresist, and clean tools remove residues, preparing the wafer for the next processing step.
+          <% elif provided_name == "FPGAs" %>
+          Field-programmable gate arrays (\"FPGAs\"), unlike other chips, can be reprogrammed after deployment to suit specific calculations, such as executing particular algorithms. U.S. firms capture virtually the entire FPGA design market.
+          <% elif provided_name == "Fabrication materials" %>
+          Fabrication materials are a critical input in the fabrication of chips. Fabrication materials include high-purity silicon wafers, chemicals, and gases. This is part of the Fabrication stage.
+          <% elif provided_name == "Fabrication tools (for advanced packaging)" %>
+          Advanced packaging tools are specialized semiconductor manufacturing systems used to integrate multiple chips into a single package, improving overall performance and power efficiency.
+          <% elif provided_name == "Film, stack, and shape metrology tools" %>
+          Film and wafer measuring tools include tools to measure film thickness, makeup, and stack (such as Fourier-transform infrared spectrometers, ellipsometers, opto-acoustic tools, and x-ray tools) and tools to measure wafer surfaces, taper, warpage, and bow (such as wafer flatness mapping tools, surface profiling tools, optical instruments,\" and atomic force microscopes).
+          <% elif provided_name == "Finished logic chip" %>
+          The production of a single logic chip often requires more than 1,000 steps, passing through international borders 70 or more times, before reaching an end customer. The result of this complex, $500 billion supply chain is a resource fundamental to virtually every aspect of modern life.
+          <% elif provided_name == "Handlers and probers" %>
+          Handlers and probers link test tools and tested devices.
+          <% elif provided_name == "High-temperature CVD tools" %>
+          High-temperature chemical vapor deposition tools are used to deposit epitaxial layers (layers oriented in a particular way relative to underlying layers).
+          <% elif provided_name == "Imprint lithography" %>
+          Imprint lithography tools use physical templates to directly transfer nanoscale patterns onto wafers. Unlike traditional photolithography, imprint lithography does not rely on optical projection, enabling high-resolution patterning with minimal diffraction limits. Austrian firm EV Group and South Korean firm GigaLane are market leaders in imprint lithography.
+          <% elif provided_name == "Inspection tools (adv. pkg.)" %>
+          These tools inspect parts of wafers during the advanced packaging process, before these wafers are \"diced‚\" (i.e., cut) into multiple chips.
+          <% elif provided_name == "Insulator etching tools" %>
+          Insulator (or dielectric) etching tools electrically isolate the metal wiring and transistors on a chip. Japanese firm Tokyo Electron, U.S. firm Lam Research, and Chinese firm AMEC are the leading suppliers of insulator etching tools.
+          <% elif provided_name == "Integrated assembly tools" %>
+          Integrated assembly tools integrate different packaging systems.
+          <% elif provided_name == "Ion implantation" %>
+          Ion implanters embed dopant substances into silicon wafers to give different parts of the wafer different levels of semiconductivity to make functional transistors in chips. Different types of implanters are used for different purposes. Low-to-medium-current ion implanters and high-current ion implanters are most commonly used, with high-current ion implanters capable of greater throughput. Meanwhile, high-voltage ion implanters can implant ions deeply into silicon, and ultra-high-dose doping implanters can achieve greater dopant density than the other tools. The United States is the dominant producer of ion implanters, with Japan and Taiwan rounding out most of global market share. This is part of the Fabrication stage.
+          <% elif provided_name == "Ion implanters" %>
+          Ion implanters embed dopant substances into silicon wafers to give different parts of the wafer different levels of semiconductivity to make functional transistors in chips. Different types of implanters are used for different purposes. Low-to-medium-current ion implanters and high-current ion implanters are most commonly used, with high-current ion implanters capable of greater throughput. Meanwhile, high-voltage ion implanters can implant ions deeply into silicon, and ultra-high-dose doping implanters can achieve greater dopant density than the other tools. The United States is the dominant producer of ion implanters, with Japan and Taiwan rounding out most of global market share.
+          <% elif provided_name == "Ion milling tools" %>
+          Ion milling tools are advanced semiconductor manufacturing equipment used for precise material removal and surface preparation in chip production. These tools utilize focused beams of ionized gas, typically argon, to etch or polish semiconductor wafers. Ion milling enables the creation of high-quality cross-sections, smooth surfaces, and precise features crucial for advanced semiconductor devices and materials analysis.
+          <% elif provided_name == "KrF (DUV) lithography tools" %>
+          KrF lithography tools are deep ultraviolet (DUV) photolithography tools that use 248 nm wavelength light from krypton fluoride lasers to pattern semiconductor features for mature node semiconductors. Dutch firm ASML and Japanese firms Canon and Nikon dominate production.
+          <% elif provided_name == "Lead frames" %>
+          A lead frame transfers data between a chip and external devices.
+          <% elif provided_name == "Linear and discrete testing tools" %>
+          Linear testing devices include, for example, operational amplifiers and voltage regulators.
+          <% elif provided_name == "Lithography tools" %>
+          The Netherlands, Japan, and a small number of other countries are the dominant producers of lithography equipment, critical for the production of chips and photomasks. In particular, the Netherlands and Japan are exclusive providers of advanced photolithography scanners, necessary for mass-production of advanced chips.  Photolithography scanners use ultraviolet light to draw intricate, nanoscale patterns into semiconductor wafers, creating the billions of tiny circuits contained in a single advanced logic chip. An extreme ultraviolet (EUV) scanner refracts a beam of 13.5 nm ultraviolet light through a photomask, transferring that pattern to a photoresist chemical applied as a layer on the chip. The light dissolves parts of the photoresist in the circuit pattern. The newly created photoresist pattern is etched into a permanent chip substrate below the photoresist. Throughout this process, the scanner precisely moves the wafer and the photomask helps build the design.
+          <% elif provided_name == "Lithography tools (adv. pkg.)" %>
+          These tools are lithography tools designed and sold for advanced packaging, also referred to as wafer level packaging (WLP). In general, lithography tools use ultraviolet light to draw intricate, nanoscale patterns into semiconductor wafers, creating the billions of tiny circuits contained in a single advanced logic chip.
+          <% elif provided_name == "Logic chip design" %>
+          Logic chip design is the design of integrated circuits that perform digital computation. Based on World Semiconductor Trade Statistics (WSTS) and Semiconductor Industry Association (SIA) market segmentation, this category includes the following device categories: logic, microprocessor (MPU), microcontroller (MCU), digital signal processor (DSP).
+          <% elif provided_name == "Low-pressure CVD tools" %>
+          Low-pressure chemical vapor deposition tools are commonly used to deposit polysilicon, tungsten, titanium, and titanium nitride.
+          <% elif provided_name == "Manual wire bonders" %>
+          Manual wire bonders are operator-controlled machines used to form wires between semiconductor die pads and a lead frame.
+          <% elif provided_name == "Mask aligners" %>
+          Mask aligners line up a patterned glass plate called a photomask with a silicon wafer that has been coated in light-sensitive phtoresist. This category includes contact aligners (which press the mask directly against a wafer), proximity aligners (which leave a small gap between the mask and the wafer), and scanning projection aligners (which use high-quality optics to project the mask image onto the wafer without physical contact). German firm SUSS MicroTec is the leading supplier of mask aligners.
+          <% elif provided_name == "Mask exposure systems - e-beam" %>
+          Electron-beam (or \"e-beam\") lithography tools draw patterns in a substrate using electrons. They are the dominant tools for photomask production, and are also infrequently used for low-volume chip production. Like other maskless lithography tools, e-beam tools can quickly and cheaply make new patterns, but are slow at drawing patterns into wafers, making them ill-suited to mass chip production.
+          <% elif provided_name == "Mask exposure systems - laser beam" %>
+          Laser lithography tools draw patterns in a substrate using laser light. They are sometimes used to produce photomasks (though less often than e-beam tools). Like other maskless lithography tools, laser lithography tools can quickly and cheaply make new patterns, but are slow at drawing patterns into wafers, making them ill-suited to mass chip production.
+          <% elif provided_name == "Maskless lithography tools" %>
+          Maskless lithography equipment draws patterns in a substrate using laser light, electrons, or ions. Unlike photolithography equipment, maskless lithography tools work without masks. This allows them to quickly and cheaply make new patterns, but slows down the process of drawing patterns into the wafer. As a result, maskless lithography tools can cost-effectively produce low-volume items like photomasks, but are are ill-suited to mass chip production.
+          <% elif provided_name == "Memory chip design" %>
+          Memory chip design is the design of integrated circuits that store digital information, including both DRAM and NAND memory technologies. Memory designers also fabricate their designs, making them integrated device manufacturers (IDMs). Major memory design players include Micron, Samsung, and SK Hynix.
+          <% elif provided_name == "Memory test tools" %>
+          Memory test tools for flash and DRAM are specialized semiconductor equipment used to validate performance, reliability, and functionality of memory chips during manufacturing. These systems perform critical measurements such as access speed, endurance cycles, data retention, and error correction efficiency, ensuring compliance with industry standards for consumer electronics, data center, and automotive applications. Leading DRAM test tool providers include Japanese firm Advantest, South Korean firm YIKC, US firm Teradyne, among others. Leading flash test tool providers include US firm Teradyne and Japanese firm Advantest.
+          <% elif provided_name == "Misc. dry etch tools" %>
+          Miscellaneous dry etch tools are specialized semiconductor manufacturing equipment used for various etching processes in chip production. They include tools used to etch reticles as well as materials such as T follicular helper (TFH) cells and gallium arsenide (GaAs).
+          <% elif provided_name == "Other deposition tools (non-IC)" %>
+          Deposition tools for non-IC applications includes tools for compound semiconductors, MEMS, and \"other.\" Deposition tools for hard drive manufacturing are excluded.
+          <% elif provided_name == "Other interconnect tools" %>
+          Other interconnect tools include various bonding tools other than die attach tools and wire bonders.
+          <% elif provided_name == "Overlay metrology tools" %>
+          Overlay metrology tools are used to measure and control the alignment accuracy between successive lithographic layers in chip production. These tools use sophisticated imaging and scatterometry techniques to detect and quantify overlay errors with nanometer-scale precision, ensuring the precise registration of device features and interconnects. US firm KLA and Dutch firm ASML are leading producers of overlay metrology tools.
+          <% elif provided_name == "PVD tools (adv. pkg.)" %>
+          Physical vapor deposition (PVD) tools for advanced packaging deposit thin metal films on wafers and substrates during an advanced packaging process. The leading producer of PVD tools for advanced packaging is US firm Applied Materials, followed by Chinese firm NAURA and Japanese firm Ulvac, among others.
+          <% elif provided_name == "Packaging materials" %>
+          Semiconductor packaging involves several steps to bond a fabricated chip to an encasing package, each requiring different materials. For example, a bond wire, typically made of aluminum, copper, silver, or gold, attaches the chip to a lead frame. The lead frame transfers data between the chip and external devices. A protective ceramic package, plastic substrate, or encapsulant resin can also be bonded to the chip.  Die attach materials including polymers and eutectic alloys are used to attach the chip to packages or substrates.
+          <% elif provided_name == "Packaging tools" %>
+          Packaging tools encase dies (individual chips) in packages.
+          <% elif provided_name == "Photolithography" %>
+          In photolithography, light is used to draw patterns into semiconductor wafers, creating the tiny circuits that comprise logic chips. A photolithography tool passes light through a photomask-a transparent plate with a circuit pattern-to transfer that pattern to a wafer coated with photoresist chemical. (Photomasks are themselves made with lithography tools.) The light dissolves parts of the photoresist according to the circuit pattern.  Advanced photolithography is critical to mass production of cutting-edge semiconductors. It requires enormously complex, expensive equipment supplied by only a few vendors in Europe and Japan. The most sophisticated photolithography processes involve extreme ultraviolet (EUV) scanners, produced exclusively by the Dutch firm ASML. This is part of the Fabrication stage.
+          <% elif provided_name == "Photomask handlers" %>
+          Wafer and photomask handlers store and transport wafers and photomasks in a fab. Japan, South Korea, Taiwan, and France produce these relatively less complex tools.
+          <% elif provided_name == "Photomask inspection and repair tools" %>
+          Photomask inspection and repair tools are similar to those used in wafer inspection, such as microscopes.
+          <% elif provided_name == "Photomasks" %>
+          Photomasks are transparent plates containing a circuit pattern to be fabricated in a chip. Photolithography equipment produces light that passes through this pattern so that the photomask's pattern is transferred to the chip.  Each photomask is specific to one chip design. Photomasks are produced by captive mask shops (businesses within large semiconductor manufacturing firms) or merchant mask shops (which sell to semiconductor manufacturers). Japan, the United States, and Taiwan lead production of leading-edge photomasks.
+          <% elif provided_name == "Photoresists" %>
+          Photoresists are chemicals deposited on a wafer. When exposed to patterned light that has passed through a photomask, they selectively dissolve to form the circuit pattern. Etching is then performed in places where the photoresist has dissolved to transfer the circuit pattern permanently onto the wafer. Photoresists are specific to particular photolithography processes. Japanese firms are the leading producers.
+          <% elif provided_name == "Physical vapor deposition tools" %>
+          Physical vapor deposition (PVD) tools vaporize a solid or liquid material, which then condenses onto a substrate. The primary PVD method is called \"sputtering.\" The United States controls most of the PVD equipment market, followed by China and Japan.
+          <% elif provided_name == "Plasma CVD tools" %>
+          Plasma chemical vapor deposition tools are used to deposit for materials requiring low temperatures during the deposition process. They are mostly produced by American firms.
+          <% elif provided_name == "Plasma modification tools" %>
+          Plasma modification tools are used to alter material properties of a layer that is deposited or grown on the surface of a wafer. US firm Applied Materials is the leading provider of plasma modification tools, but Japanese firms Kokusai Electric and Tokyo Electron (TEL) also hold a portion of the market.
+          <% elif provided_name == "Process control and handling" %>
+          Process control: In semiconductor fabrication, process control involves precisely monitoring wafers, photomasks, and the overall chip manufacturing process to ensure consistency and low manufacturing error rates. Accordingly, process control tools are among the most essential and valuable semiconductor manufacturing equipment.  Handling: Storing and transporting wafers and photomasks in a fab requires specific equipment. Although specialized, this equipment is less complex than other tools used in semiconductor manufacturing. This is part of the Fabrication stage.
+          <% elif provided_name == "Process control tools" %>
+          In semiconductor fabrication, process control involves precisely monitoring wafers, photomasks, and the overall chip manufacturing process to ensure consistency and low manufacturing error rates. Accordingly, process control tools are among the most essential and valuable semiconductor manufacturing equipment.
+          <% elif provided_name == "Process monitoring tools" %>
+          Process monitoring tools, such as curve tracers, are relatively low-value equipment used to measure performance of devices fabricated in wafers during chip manufacturing.
+          <% elif provided_name == "Process-specific fabrication materials" %>
+          Process-specific fabrication materials are highly engineered materials that enable each step in the semiconductor fabrication process, inlcuidng (1) CMP materials—slurries and pads that planarize wafer surfaces; (2) deposition materials—ultra-high-purity gases, liquids, and targets; (3) photomasks—patterned plates that project circuit images during lithography; and (4) photoresists—light-sensitive polymers that define where material will be added or removed from the wafer.
+          <% elif provided_name == "Rapid thermal processing tools" %>
+          Rapid thermal processing (RTP) is critical to several steps in chip manufacturing. RTP tools include lamps, lasers, or other mechanisms to quickly increase the temperature of a wafer in order to change its properties. For instance, RTP tools are used to activate materials (such as dopants in transistors) to change their properties, modify materials, or make deposited films denser to improve their properties. Some RTP tools provide heat for as long as multiple seconds (solely produced by the United States and South Korea); others provide it only for milliseconds (solely produced by the United States and Japan).
+          <% elif provided_name == "Resist processing tools" %>
+          Resist processing tools, also called \"tracks,\" coat photoresists on wafers (typically by spin-coating, which spins the wafer to spread deposited photoresist), develop them (dissolve portions hit by light), and bake them (harden undissolved photoresist to prepare for etching). Japan is the sole producer of the most advanced tracks for EUV and ArF immersion photolithography; Germany, South Korea, the United States, and China produce less advanced equipment.
+          <% elif provided_name == "Resist processing tools (adv. pkg.)" %>
+          Resist processing tools, also called \"tracks,\" coat photoresists on wafers (typically by spin-coating, which spins the wafer to spread deposited photoresist), develop them (dissolve portions hit by light), and bake them (harden undissolved photoresist to prepare for etching). Japan is the sole producer of the most advanced tracks for EUV and ArF immersion photolithography; Germany, South Korea, the United States, and China produce less advanced equipment.
+          <% elif provided_name == "Single wafer spin & spray systems (adv. pkg.)" %>
+          These tools are single wafer spin & spray systems designed and sold for advanced packaging, also referred to as wafer level packaging (WLP). In general, single wafer spin and spray systems are a subcategory of etch and clean tools that rotate each wafer at high speeds while spraying chemicals to remove residues.
+          <% elif provided_name == "SoC test tools" %>
+          SoC test tools can test logic, memory, mixed, and analog circuits. As a result, they can test a wide variety of chips, including advanced logic chips like GPUs and other processors.
+          <% elif provided_name == "Spin-on deposition tools (adv. pkg.)" %>
+          Spin-on deposition tools for advanced packaging apply a liquid coating onto wafers and substrates during an advanced packaging process. Japanese firm SCREEN is the leading producer of spin-on tools for advanced packaging.
+          <% elif provided_name == "Substrates" %>
+          Protective ceramic packages, plastic substrates, or encapsulant resins may be bonded to a chip during the packaging process.
+          <% elif provided_name == "Test tools" %>
+          Test tools are also known as automatic test equipment (ATE). These tools confirms electrical functionality, performance, and reliability of semiconductors at both the wafer sort and final packaging stages. These tools include (1) burn-in test tools, which expose devices to high temperatures and stress to reduce failures; (2) linear and discrete test tools, which are optimized for analog ICs, power semiconductors, and other discrete transistors; (3) memory test tools, which are specialized semiconductor equipment used to validate performance, reliability, and functionality of memory chips; and (4) system-on-a-chip (SoC) test tools, which can test a wide variety of processors, including advanced logic chips like GPUs.
+          <% elif provided_name == "Testing" %>
+          Chips undergo tests requiring a range of specialized equipment, including system-on-a-chip test tools, linear and discrete devices, burn-in tools, and handlers and probers. This is part of the Assembly, testing, and packaging (ATP) stage.
+          <% elif provided_name == "Tube-based diffusion and deposition tools" %>
+          Tube-based diffusion and deposition systems are called \"tube‚\"-based because substrates are loaded in cylindrical chambers for processing, either causing  diffusion of dopants into a wafer (tube diffusion systems) or depositing materials for particular applications (tube deposition systems).
+          <% elif provided_name == "Wafer" %>
+          Silicon wafers are the basic building block for chip production. To produce them, a furnace forms a cylinder of silicon (or other semiconducting materials), which is then cut into disc-shaped wafers. These wafers are then processed, split and packaged into individual chips. Most wafers are made purely of silicon or another material, but others have more complex structures.  Dopants, such as boron, aluminum, phosphorous, platinum or other elements, may be added to alter the level of semiconductivity.  300 mm wafers, produced by Japanese, Taiwanese, German, and Korean firms, are used to produce nearly all advanced chips today. Manufacturing the smoothest, high-purity 300 mm wafers-which are necessary for supporting the smallest chip feature sizes-requires considerable tacit know-how. Older-technology wafer sizes include 150 and 200 mm, used for chips with larger feature sizes.
+          <% elif provided_name == "Wafer and photomask handlers" %>
+          Storing and transporting wafers and photomasks in a fab requires specific equipment. Although specialized, this equipment is less complex than other tools used in semiconductor manufacturing.
+          <% elif provided_name == "Wafer bonding and aligning tools" %>
+          Wafer bonders and aligners join silicon wafers. In this visualization, these fabrication tools are included as an input to advanced packaging, but they may also be used earlier in the production process. Austria, Japan, and Germany produce this equipment.
+          <% elif provided_name == "Wafer handlers" %>
+          Wafer and photomask handlers store and transport wafers and photomasks in a fab. Japan, the United States, South Korea, Taiwan, and France produce these relatively less complex tools.
+          <% elif provided_name == "Wafer inspection tools" %>
+          Even the tiniest imperfections can cause serious problems during chip production. Major types of wafer inspection tools include film and wafer measuring tools, critical dimensions measuring tools, defect inspection tools, general-purpose microscopes, and structural inspection tools.
+          <% elif provided_name == "Wafer level stud bonders" %>
+          Wafer level stud bonders are automated thermosonic bonding systems that fabricate gold or copper \"stud\" bumps on a wafer's bond pads.
+          <% elif provided_name == "Wet chemicals" %>
+          Wet chemicals, such as sulfuric acid, isopropyl alcohol, ammonium hydroxide, phosphoric acid, nitric acid, hydrochloric acid, and acetic acid, are widely used in semiconductor manufacturing.
+          <% elif provided_name == "Wet etching and cleaning tools" %>
+          Etching and cleaning tools have two main types: dry and wet. Wet etching tools, using liquids, are less commonly used, and largely for cleaning wafers. Wet etching has advantages compared to dry etching-it is cheaper, risks less damage to substrates, and is more selective, i.e., it can etch a particular material without unintentionally etching nearby materials. However, it is slower and typically cannot etch differently depending on the direction of etch, making it difficult to form complex structures. Therefore, wet etching is not typically used for etching the smallest features in advanced chips.
+          <% elif provided_name == "Wire bonding tools" %>
+          Wire bonders are bonding tools used to make interconnects between semiconductor die pads and a lead frame.
+          <% elif provided_name == "i-line lithography tools" %>
+          i-line lithography tools are ultraviolet (UV) photolithography systems used in semiconductor manufacturing for mature process nodes. These tools use 365 nm wavelength light from mercury vapor lamps to pattern features down to about 350 nm, making them suitable for producing chips with less stringent resolution requirements. Japanese firms Canon and Nikon and Dutch firm ASML are the primary manufacturers of i-line lithography tools, but Chinese firm SMEE and US firm Veeco also hold a small portion of the market.
+          <% else %>
+          << provided_name >> is a component in the semiconductor supply chain. Market share represents the percentage of global production or capacity controlled by different countries or companies.
+          <%- endif -%>
+        display:
+          numDecimalPlaces: 1
+
+      country_name:
+        title: Country manufacturing the component
+        unit: ""

@@ -177,6 +177,16 @@ steps:
   data://grapher/artificial_intelligence/2025-10-22/cset:
     - data://garden/artificial_intelligence/2025-10-22/cset
   # CSET data on semiconductor supply chain
+  # Semiconductor Supply Chain (CSET) - Updated version
+  data://meadow/artificial_intelligence/2025-11-05/semiconductors_cset:
+    - snapshot://artificial_intelligence/2025-11-05/semiconductors_cset.csv
+    - snapshot://artificial_intelligence/2025-11-05/semiconductors_cset_providers.csv
+  data://garden/artificial_intelligence/2025-11-05/semiconductors_cset:
+    - data://meadow/artificial_intelligence/2025-11-05/semiconductors_cset
+  data://grapher/artificial_intelligence/2025-11-05/semiconductors_cset:
+    - data://garden/artificial_intelligence/2025-11-05/semiconductors_cset
+
+  # Semiconductor Supply Chain (CSET) - Old version (archived)
   data://meadow/artificial_intelligence/2023-07-07/semiconductors_cset:
     - snapshot://artificial_intelligence/2023-07-07/semiconductors_cset.csv
   data://garden/artificial_intelligence/2023-07-07/semiconductors_cset:

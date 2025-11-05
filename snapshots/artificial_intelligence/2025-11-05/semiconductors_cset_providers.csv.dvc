@@ -1,0 +1,27 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Advanced Semiconductor Supply Chain Dataset
+    date_published: "2022"
+    description_snapshot: |
+      This dataset contains mappings between provider IDs and their corresponding countries and types (country or organization). It is used to enrich the semiconductor supply chain provision data with geographic and organizational information.
+    title_snapshot: Advanced Semiconductor Supply Chain Dataset - Provider Mappings
+    # Citation
+    producer: Center for Security and Emerging Technology (CSET)
+    citation_full: Emerging Technology Observatory (Advanced Semiconductor Supply Chain Dataset (2025 release))[https://eto.tech/dataset-docs/chipexplorer/]
+
+    # Files
+    url_main: https://chipexplorer.eto.tech/
+    url_download: https://raw.githubusercontent.com/georgetown-cset/eto-chip-explorer/main/data/providers.csv
+    date_accessed: '2025-11-05'
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://eto.tech/tou/
+outs:
+  - md5: 8e2844818d4fa6e152a6cb1859dc90e8
+    size: 14393
+    path: semiconductors_cset_providers.csv
