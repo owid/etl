@@ -75,10 +75,6 @@ def run() -> None:
         else row["country"],
         axis=1,
     )
-
-    # Convert share_provided to numeric
-    tb["share_provided"] = pd.to_numeric(tb["share_provided"], errors="coerce")
-
     # Drop rows with missing share_provided values
     tb = tb.dropna(subset=["share_provided"])
 
@@ -91,14 +87,6 @@ def run() -> None:
     # Rename columns for clarity
     tb = tb.rename(columns={"display_name": "provider", "country_col": "country"})
 
-    # Sort by year, provider, and provided name
-    tb = tb.sort_values(["year", "provider", "provided_name"])
-
-    # Reset index
-    tb = tb.reset_index(drop=True)
-
-    paths.log.info(f"Loaded {len(tb)} rows with {len(tb['provider'].unique())} unique providers")
-
     #
     # Create a new table.
     #
@@ -107,7 +95,7 @@ def run() -> None:
     # Add origins metadata to columns that don't have it
     for col in ["country", "share_provided"]:
         if col in tb.columns:
-            tb[col].metadata.origins = snap.metadata.origin
+            tb[col].metadata.origins = [snap.metadata.origin]
 
     #
     # Save outputs.
