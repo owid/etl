@@ -440,7 +440,11 @@ def add_modeled_category_to_obs_status(tb: Table) -> Table:
         # If the obs_status column exists, update it
         if obs_status_col in tb.columns:
             mask_modeled = tb[col].notna() & tb[obs_status_col].isna() & (tb["year"] <= max_year_with_data)
-            tb.loc[mask_modeled, obs_status_col] = "Modeled value"
+            tb.loc[mask_modeled, obs_status_col] = "Estimated by ILO models"
+
+        # Replace "Real value" with "Survey data (observed)"
+        mask_survey = tb[obs_status_col] == "Real value"
+        tb.loc[mask_survey, obs_status_col] = "Survey data (observed)"
 
     return tb
 

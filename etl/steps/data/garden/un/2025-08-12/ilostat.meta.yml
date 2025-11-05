@@ -212,8 +212,8 @@ definitions:
 
   # Common sort values for ordinal obs_status variables
   sort_obs_status: &sort_obs_status
-    - Real value
-    - Modeled value
+    - Survey data (observed)
+    - Estimated by ILO models
 
   # This is the ID of the Google Doc that contains the FAQs
   gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
