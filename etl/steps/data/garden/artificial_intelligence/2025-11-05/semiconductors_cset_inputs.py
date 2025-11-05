@@ -1,6 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -8,32 +7,23 @@ paths = PathFinder(__file__)
 
 
 def run() -> None:
-    paths.log.info("semiconductors_cset.start")
-
     #
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = paths.load_dataset("semiconductors_cset")
+    ds_meadow = paths.load_dataset("semiconductors_cset_inputs")
 
     # Read table from meadow dataset.
-    tb = ds_meadow.read("semiconductors_cset")
+    tb = ds_meadow.read("semiconductors_cset_inputs")
 
     #
     # Process data.
     #
-    # Harmonize country names using OWID standard
-    tb = geo.harmonize_countries(
-        df=tb,
-        countries_file=paths.country_mapping_path,
-    )
-
-    tb = tb.rename(columns={"country": "country_name"})
-
-    tb = tb.drop(columns=["country_name"])
+    tb["market_size_value"] = tb["market_size_value"] * 1e9  # Convert from billions to units
+    tb = tb.drop(columns=["description"])  # Drop description column
 
     # Set index
-    tb = tb.format(["provider", "provided_name", "year"])
+    tb = tb.format(["input_name", "year"])
 
     #
     # Save outputs.
@@ -43,5 +33,3 @@ def run() -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
-
-    paths.log.info("semiconductors_cset.end")

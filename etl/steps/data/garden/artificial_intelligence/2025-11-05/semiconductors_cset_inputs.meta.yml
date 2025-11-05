@@ -1,0 +1,16 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Artificial Intelligence
+
+tables:
+  semiconductors_cset_inputs:
+    variables:
+      market_size_value:
+        title: Global market size value of semiconductor inputs
+        unit: "US dollars"
+        short_unit: "$"
+        description_short: The estimated global market size value for a given semiconductor input in a given year.

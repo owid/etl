@@ -12,7 +12,7 @@ tables:
     variables:
       share_provided:
         title: |-
-          Market share of << provided_name >>
+          Market share of << provided_name.lower() >> in the semiconductor supply chain
         unit: "%"
         short_unit: "%"
         description_short: |-
@@ -530,6 +530,3 @@ tables:
         display:
           numDecimalPlaces: 1
 
-      country_name:
-        title: Country manufacturing the component
-        unit: ""

@@ -186,6 +186,14 @@ steps:
   data://grapher/artificial_intelligence/2025-11-05/semiconductors_cset:
     - data://garden/artificial_intelligence/2025-11-05/semiconductors_cset
 
+  # Semiconductor Supply Chain Inputs (CSET)
+  data://meadow/artificial_intelligence/2025-11-05/semiconductors_cset_inputs:
+    - snapshot://artificial_intelligence/2025-11-05/semiconductors_cset_inputs.csv
+  data://garden/artificial_intelligence/2025-11-05/semiconductors_cset_inputs:
+    - data://meadow/artificial_intelligence/2025-11-05/semiconductors_cset_inputs
+  data://grapher/artificial_intelligence/2025-11-05/semiconductors_cset_inputs:
+    - data://garden/artificial_intelligence/2025-11-05/semiconductors_cset_inputs
+
 
   #
   # Robotaxis dataset

@@ -7,24 +7,21 @@ paths = PathFinder(__file__)
 
 
 def run() -> None:
-    paths.log.info("semiconductors_cset.start")
-
     #
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = paths.load_dataset("semiconductors_cset")
+    ds_garden = paths.load_dataset("semiconductors_cset_inputs")
 
     # Read table from garden dataset.
-    tb = ds_garden.read("semiconductors_cset")
+    tb = ds_garden.read("semiconductors_cset_inputs")
 
     #
     # Process data.
     #
-    tb = tb.rename(columns={"provider": "country"})
+    tb = tb.rename(columns={"input_name": "country"})
     # Format the table
-    tb = tb.format(["country", "year", "provided_name"])
-
+    tb = tb.format(["country", "year"])
     #
     # Save outputs.
     #
@@ -33,5 +30,3 @@ def run() -> None:
 
     # Save changes in the new grapher dataset.
     ds_grapher.save()
-
-    paths.log.info("semiconductors_cset.end")
