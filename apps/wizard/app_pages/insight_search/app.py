@@ -50,7 +50,7 @@ def st_display_insight(insight: data.Insight):
 
             # Show multimedia content if available (image, video)
             if insight.url_img_desktop is not None:
-                st.image(insight.url_img_desktop, use_container_width=True)
+                st.image(insight.url_img_desktop, width="stretch")
             elif insight.url_vid is not None:
                 st.video(insight.url_vid)
         # Display only authors if not public

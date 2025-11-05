@@ -166,7 +166,7 @@ def st_related_charts_table(
 
     st.dataframe(
         df,
-        use_container_width=True,
+        width="stretch",
         hide_index=True,
         column_config=column_config,
     )

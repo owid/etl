@@ -239,7 +239,7 @@ else:
     # Display the table with custom column configuration
     st.dataframe(
         filtered_df,
-        use_container_width=True,
+        width="stretch",
         column_config={
             "Status": st.column_config.TextColumn("Status", help="Server running status", width="small"),
             "Origin": st.column_config.TextColumn("Origin", help="Server origin (etl, grapher, etc.)", width="small"),
@@ -283,7 +283,7 @@ else:
         col1, col2, col3 = st.columns(3)
 
         with col1:
-            if st.button("🗄️ Reset MySQL", use_container_width=True):
+            if st.button("🗄️ Reset MySQL", width="stretch"):
 
                 @st.dialog(f"Reset MySQL: {selected_server['Branch']}")
                 def show_mysql_reset_modal():
@@ -302,10 +302,10 @@ else:
 
                     col1, col2 = st.columns(2)
                     with col1:
-                        if st.button("❌ Cancel", use_container_width=True):
+                        if st.button("❌ Cancel", width="stretch"):
                             st.rerun()
                     with col2:
-                        if st.button("🗄️ Reset MySQL", type="primary", use_container_width=True):
+                        if st.button("🗄️ Reset MySQL", type="primary", width="stretch"):
                             with st.spinner("Resetting MySQL database... This may take 5 minutes", show_time=True):
                                 success, message = reset_mysql_database(server_name)
 
@@ -321,7 +321,7 @@ else:
                 show_mysql_reset_modal()
 
         with col2:
-            if st.button("💥 Destroy Server", type="secondary", use_container_width=True):
+            if st.button("💥 Destroy Server", type="secondary", width="stretch"):
 
                 @st.dialog(f"Destroy Server: {selected_server['Branch']}")
                 def show_destroy_modal():
@@ -335,10 +335,10 @@ else:
 
                     col1, col2 = st.columns(2)
                     with col1:
-                        if st.button("❌ Cancel", use_container_width=True):
+                        if st.button("❌ Cancel", width="stretch"):
                             st.rerun()
                     with col2:
-                        if st.button("💥 DESTROY SERVER", type="primary", use_container_width=True):
+                        if st.button("💥 DESTROY SERVER", type="primary", width="stretch"):
                             with st.spinner("Destroying server...", show_time=True):
                                 success, message = destroy_server(server_name)
 

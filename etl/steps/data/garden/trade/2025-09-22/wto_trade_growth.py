@@ -25,18 +25,21 @@ def run() -> None:
     # Process data.
     #
 
-    # Build overlap
+    # First, re-index historic data from 1913 = 100 to 1800 = 1
+    baseline_1800_historic = tb_historic[tb_historic["year"] == 1800]["volume_index"].iloc[0]
+    tb_historic_reindexed = tb_historic.copy()
+    tb_historic_reindexed["volume_index"] = tb_historic_reindexed["volume_index"] / baseline_1800_historic
 
-    # Get the 1950 baseline value from historic data
-    baseline_1950 = tb_historic[tb_historic["year"] == 1950]["volume_index"].iloc[0]
+    # Get the 1950 value from the re-indexed historic data (now 1800 = 1)
+    baseline_1950_reindexed = tb_historic_reindexed[tb_historic_reindexed["year"] == 1950]["volume_index"].iloc[0]
 
-    # Calculate WTO adjusted values for years after 1950
+    # Now scale WTO data (1950 = 100) to match the re-indexed scale (1800 = 1)
     tb_wto_adj = tb_wto.copy()
-    tb_wto_adj["volume_index"] = baseline_1950 * tb_wto_adj["volume_index"] / 100
+    tb_wto_adj["volume_index"] = tb_wto_adj["volume_index"] * baseline_1950_reindexed / 100
 
-    # Combine historic data (up to 1950) with adjusted WTO data (after 1950)
+    # Combine: both are now on the same 1800 = 1 scale
     tb_combined = pr.concat(
-        [tb_wto_adj[tb_wto_adj["year"] > 1950], tb_historic[tb_historic["year"] <= 1950]],
+        [tb_wto_adj[tb_wto_adj["year"] > 1950], tb_historic_reindexed[tb_historic_reindexed["year"] <= 1950]],
         ignore_index=True,
     ).sort_values("year")
 

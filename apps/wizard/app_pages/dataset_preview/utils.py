@@ -198,7 +198,7 @@ def show_table_charts(df_charts):
                     format="%.2f",
                 ),
             },
-            use_container_width=True,
+            width="stretch",
         )
 
 
@@ -206,7 +206,7 @@ def show_table_explorers(df):
     if (df is not None) and not df.empty:
         st.dataframe(
             df,
-            use_container_width=True,
+            width="stretch",
             column_config={
                 "views": st.column_config.ProgressColumn(
                     label="Daily views (year-average)",
