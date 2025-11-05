@@ -34,17 +34,19 @@ def run() -> None:
 
     # Fix provider name mismatches based on technical notes
     # "Various" in provision.csv should map to "Various countries" in providers.csv
-    tb["provider_name"] = tb["provider_name"].replace({
-        "Various": "Various countries",
-        # Add other known name changes from technical notes
-        "EMD Performance Materials": "EMD Electronics",
-        "Haute Gas": "Huate Gas",
-        "Showa Denka": "Showa Denko",
-        "Jinhong": "Jinhong Gas",
-        "Quik-Pak": "QP Technologies",
-        "Zhonghuan": "Zhonghuan Semiconductor",
-        "Fujifilm": "Fujifilm Electronic Materials",
-    })
+    tb["provider_name"] = tb["provider_name"].replace(
+        {
+            "Various": "Various countries",
+            # Add other known name changes from technical notes
+            "EMD Performance Materials": "EMD Electronics",
+            "Haute Gas": "Huate Gas",
+            "Showa Denka": "Showa Denko",
+            "Jinhong": "Jinhong Gas",
+            "Quik-Pak": "QP Technologies",
+            "Zhonghuan": "Zhonghuan Semiconductor",
+            "Fujifilm": "Fujifilm Electronic Materials",
+        }
+    )
 
     columns_to_keep_providers = ["provider_name", "alias", "provider_type", "country"]
     tb_providers = tb_providers[columns_to_keep_providers]
@@ -68,8 +70,10 @@ def run() -> None:
     # For countries (provider_type = 'country'), the country column should be the display_name
     # For organizations, use the country column from the mapping
     tb["country_col"] = tb.apply(
-        lambda row: row["display_name"] if pd.notna(row["provider_type"]) and row["provider_type"] == "country" else row["country"],
-        axis=1
+        lambda row: row["display_name"]
+        if pd.notna(row["provider_type"]) and row["provider_type"] == "country"
+        else row["country"],
+        axis=1,
     )
 
     # Convert share_provided to numeric
