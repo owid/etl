@@ -6,6 +6,15 @@ from etl.helpers import PathFinder
 paths = PathFinder(__file__)
 
 COMMON_CONFIG = {}
+COLORS_DISTRIB = {
+    "christians": "#4C6A9C",
+    "muslims": "#58AC8C",
+    "hindus": "#C05917",
+    "buddhists": "#BC8E5A",
+    "jews": "#7C4DA0",
+    "other_religions": "#9A5129",
+    "religiously_unaffiliated": "#81C0C9",
+}
 
 
 def run() -> None:
@@ -41,24 +50,32 @@ def run() -> None:
                 "dimension": "religion",
                 "choices": [
                     "christians",
+                    "jews",
                     "muslims",
                     "hindus",
                     "buddhists",
-                    "jews",
                     "other_religions",
                     "religiously_unaffiliated",
                 ],
                 "choice_new_slug": "religion_distrib",
                 "view_config": {
                     "hasMapTab": False,
-                    "addCountryMode": "change-country",
                     "tab": "chart",
-                    "chartTypes": ["DiscreteBar"],
-                    "selectedFacetStrategy": "entity",
-                    "title": "Religious composition",
+                    "chartTypes": ["StackedDiscreteBar"],
+                    "selectedFacetStrategy": "none",
+                    "title": "{indicator} by religious affiliation",
+                },
+                "view_metadata": {
+                    "presentation": {
+                        "title_public": "{indicator} by religious affiliation",
+                    },
+                    "description_short": "Distribution of the population by religious affiliation.",
                 },
             }
-        ]
+        ],
+        params={
+            "indicator": lambda view: "Share of population" if view.matches(indicator="share") else "Number of people",
+        },
     )
     #
     # (optional) Edit views
@@ -70,10 +87,15 @@ def run() -> None:
                 display = {}
                 if "other_religions" in y.catalogPath:
                     display["name"] = "Other religions"
+                    display["color"] = COLORS_DISTRIB["other_religions"]
                 elif "unaffiliated" in y.catalogPath:
-                    display["name"] = "Religiously unaffiliated"
+                    display["name"] = "No religion"
+                    display["color"] = COLORS_DISTRIB["religiously_unaffiliated"]
                 else:
                     display["name"] = y.catalogPath.split("_")[-1].title()
+                    for religion, color in COLORS_DISTRIB.items():
+                        if religion in y.catalogPath:
+                            display["color"] = color
                 y.display = display
 
     #

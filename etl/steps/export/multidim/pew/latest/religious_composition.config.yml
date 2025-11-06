@@ -2,8 +2,13 @@ title:
   title: Religious composition
   title_variant: ""
 default_selection:
+  - India
+  - Indonesia
+  - United Kingdom
+  - Egypt
   - World
-
+  - United States
+  - China
 definitions:
   common_views:
     - config:
@@ -17,26 +22,33 @@ dimensions:
     choices:
       - slug: "religion_distrib"
         name: "Religious composition"
-        group: "Aggregate"
+        group: "Aggregates"
         description: Distribution of population by religion
       - slug: "any_religion"
         name: "Any religion"
-        group: "Aggregate"
+        group: "Aggregates"
         description: People affiliated to any religion
       - slug: "christians"
         name: "Christianity"
+        group: "Major religions"
       - slug: "muslims"
         name: "Islam"
+        group: "Major religions"
       - slug: "hindus"
         name: "Hinduism"
+        group: "Major religions"
       - slug: "buddhists"
         name: "Buddhism"
+        group: "Major religions"
       - slug: "jews"
         name: "Judaism"
+        group: "Major religions"
       - slug: "other_religions"
         name: "Other religions"
+        group: "Major religions"
       - slug: "religiously_unaffiliated"
         name: "No religion"
+        group: "Major religions"
 
   - slug: indicator
     name: Measure
