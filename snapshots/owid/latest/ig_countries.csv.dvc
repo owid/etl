@@ -13,15 +13,13 @@ meta:
 
     # Files
     url_main: https://instagram.com/ourworldindata
-    date_accessed: 2024-11-07
+    date_accessed: '2024-11-07'
 
     # License
     license:
       name: CC BY 4.0
-
-
   is_public: false
 outs:
-  - md5: ec13666b8ad90755ca913d8ad90a943d
-    size: 5399
+  - md5: 0d75528d85d68f6979ba97f75593a6da
+    size: 9865
     path: ig_countries.csv
