@@ -16,14 +16,21 @@ MODELS_YAML_PATH = BASE_DIR / "apps" / "wizard" / "app_pages" / "expert_agent" /
 # Testing showed Haiku finds same semantic issues as Sonnet with minimal quality difference,
 # making it the best choice for large-scale analysis.
 
+# Mapping from YAML model names to Anthropic API model names
+MODEL_API_NAMES = {
+    "anthropic:claude-haiku-4-5": "claude-haiku-4-5-20251001",
+    "anthropic:claude-sonnet-4-5": "claude-sonnet-4-5-20250929",
+    "anthropic:claude-opus-4": "claude-opus-4-20250514",
+}
+
 # Model for individual issue detection (used many times - cost matters)
-CLAUDE_MODEL = "anthropic:claude-haiku-4-5"  # Fast: $1/M in, $5/M out (RECOMMENDED)
-# CLAUDE_MODEL = "anthropic:claude-sonnet-4-5"  # Balanced: $3/M in, $15/M out
-# CLAUDE_MODEL = "anthropic:claude-opus-4"  # Quality: $15/M in, $75/M out
+CLAUDE_MODEL = MODEL_API_NAMES["anthropic:claude-haiku-4-5"]  # Fast: $1/M in, $5/M out (RECOMMENDED)
+# CLAUDE_MODEL = MODEL_API_NAMES["anthropic:claude-sonnet-4-5"]  # Balanced: $3/M in, $15/M out
+# CLAUDE_MODEL = MODEL_API_NAMES["anthropic:claude-opus-4"]  # Quality: $15/M in, $75/M out
 
 # Model for grouping/pruning (used once per collection - quality matters more than cost)
-GROUPING_MODEL = "anthropic:claude-sonnet-4-5"  # Better reasoning for filtering false positives
-# GROUPING_MODEL = "anthropic:claude-opus-4"  # Best quality if budget allows
+GROUPING_MODEL = MODEL_API_NAMES["anthropic:claude-sonnet-4-5"]  # Better reasoning for filtering false positives
+# GROUPING_MODEL = MODEL_API_NAMES["anthropic:claude-opus-4"]  # Best quality if budget allows
 
 # Concurrency limit for API requests
 # Anthropic rate limits: typically 5-50 concurrent requests depending on tier
@@ -31,14 +38,22 @@ GROUPING_MODEL = "anthropic:claude-sonnet-4-5"  # Better reasoning for filtering
 MAX_CONCURRENT_REQUESTS = 25
 
 # Token limits
-GROUPING_MAX_TOKENS = 3_072  # Keep limited for quality
+DETECTION_MAX_TOKENS = 1_024  # Max tokens for individual issue detection
+GROUPING_MAX_TOKENS = 3_072  # Max tokens for grouping/pruning
+MAX_PROMPT_TOKENS = 195_000  # Leave buffer below 200k context limit
+INSTRUCTION_BUFFER_TOKENS = 5_000  # Buffer for prompt instructions
+
+# Context lengths for display/grouping
+CONTEXT_LENGTH_SHORT = 200  # Short context for issue display
+CONTEXT_LENGTH_MEDIUM = 300  # Medium context for grouping
+CONTEXT_LENGTH_LONG = 500  # Long context for debugging
 
 
 def _load_model_pricing() -> dict[str, dict[str, float]]:
     """Load model pricing from the wizard YAML configuration.
 
     Returns:
-        Dictionary mapping model names to pricing info with 'input' and 'output' keys.
+        Dictionary mapping API model names to pricing info with 'input' and 'output' keys.
         For models with tiered pricing, uses the first tier (lowest price).
     """
     with open(MODELS_YAML_PATH) as f:
@@ -47,7 +62,7 @@ def _load_model_pricing() -> dict[str, dict[str, float]]:
     pricing = {}
 
     for model in data.get("models", []):
-        model_name = model.get("name", "")
+        yaml_name = model.get("name", "")
         cost = model.get("cost", {})
 
         # Handle simple pricing (single value)
@@ -68,8 +83,9 @@ def _load_model_pricing() -> dict[str, dict[str, float]]:
         else:
             continue
 
-        # Store with the model name from YAML (e.g., "anthropic:claude-sonnet-4-5")
-        pricing[model_name] = {
+        # Store with API model name if we have a mapping, otherwise use YAML name
+        api_name = MODEL_API_NAMES.get(yaml_name, yaml_name)
+        pricing[api_name] = {
             "input": input_price,
             "output": output_price,
         }

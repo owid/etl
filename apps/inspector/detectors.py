@@ -15,8 +15,15 @@ from structlog import get_logger
 from apps.inspector.config import (
     CHART_FIELDS_TO_CHECK,
     CLAUDE_MODEL,
+    CONTEXT_LENGTH_LONG,
+    CONTEXT_LENGTH_MEDIUM,
+    CONTEXT_LENGTH_SHORT,
+    DETECTION_MAX_TOKENS,
+    GROUPING_MAX_TOKENS,
     GROUPING_MODEL,
+    INSTRUCTION_BUFFER_TOKENS,
     MAX_CONCURRENT_REQUESTS,
+    MAX_PROMPT_TOKENS,
     MODEL_PRICING,
     VARIABLE_FIELDS_TO_CHECK,
 )
@@ -525,17 +532,16 @@ async def check_view_async(
 
     # Estimate token count (rough approximation: 1 token ≈ 4 characters)
     # Add some buffer for the instructions and formatting
-    estimated_tokens = len(fields_text) // 4 + 5000  # 5k buffer for instructions
-    MAX_TOKENS = 195000  # Leave some buffer below the 200k limit
+    estimated_tokens = len(fields_text) // 4 + INSTRUCTION_BUFFER_TOKENS
 
-    if estimated_tokens > MAX_TOKENS:
+    if estimated_tokens > MAX_PROMPT_TOKENS:
         view_id = view.get("id", "unknown")
         view_title = view.get("view_title", "unknown")
         view_slug = view.get("slug", "unknown")
         view_type = view.get("view_type", "unknown")
 
         log.warning(
-            f"Skipping view {view_id} ({view_title}): estimated {estimated_tokens} tokens exceeds {MAX_TOKENS} limit"
+            f"Skipping view {view_id} ({view_title}): estimated {estimated_tokens} tokens exceeds {MAX_PROMPT_TOKENS} limit"
         )
 
         # Return an error issue instead of empty results
@@ -547,7 +553,7 @@ async def check_view_async(
             "issue_type": "error",
             "field": "content_size",
             "context": f"Estimated {estimated_tokens:,} tokens",
-            "explanation": f"Content too large to check (exceeds {MAX_TOKENS:,} token limit). Consider splitting or reducing content.",
+            "explanation": f"Content too large to check (exceeds {MAX_PROMPT_TOKENS:,} token limit). Consider splitting or reducing content.",
         }
 
         return [error_issue], 0, 0, 0, 0
@@ -580,7 +586,9 @@ Here is the metadata to check:"""
 
         full_prompt = f"{instructions}\n\n{fields_text}"
         rprint(f"\n[bold yellow]{'=' * 80}[/bold yellow]")
-        rprint(f"[bold yellow]Prompt to {CLAUDE_MODEL} (max_tokens=1024) for view {view.get('id')}:[/bold yellow]")
+        rprint(
+            f"[bold yellow]Prompt to {CLAUDE_MODEL} (max_tokens={DETECTION_MAX_TOKENS}) for view {view.get('id')}:[/bold yellow]"
+        )
         rprint(f"[bold yellow]{'=' * 80}[/bold yellow]")
         rprint(full_prompt)
         rprint(f"[bold yellow]{'=' * 80}[/bold yellow]\n")
@@ -591,7 +599,7 @@ Here is the metadata to check:"""
         try:
             response = await client.messages.create(
                 model=CLAUDE_MODEL,
-                max_tokens=1024,
+                max_tokens=DETECTION_MAX_TOKENS,
                 messages=[
                     {
                         "role": "user",
@@ -749,7 +757,7 @@ Here is the metadata to check:"""
             # Look up the field value (handle both exact match and indexed fields like "variable_name_0")
             for field_name, value in fields_to_check:
                 if field_name == field or field_name.startswith(field + "_"):
-                    issue["context"] = value[:200]
+                    issue["context"] = value[:CONTEXT_LENGTH_SHORT]
                     break
 
         return view_issues, input_tokens, output_tokens, cache_creation_tokens, cache_read_tokens
@@ -758,7 +766,7 @@ Here is the metadata to check:"""
         # Log the actual response to help debug the issue
         log.warning(
             f"View {view['id']}: Claude returned invalid JSON (length: {len(raw_text)}). "
-            f"Response preview: {raw_text[:200]}... Error: {e}"
+            f"Response preview: {raw_text[:CONTEXT_LENGTH_SHORT]}... Error: {e}"
         )
         return [], 0, 0, 0, 0
     except Exception as e:
@@ -874,7 +882,7 @@ def group_issues(
                 "index": idx,
                 "typo": issue.get("typo", ""),
                 "correction": issue.get("correction", ""),
-                "context": issue.get("context", "")[:300],
+                "context": issue.get("context", "")[:CONTEXT_LENGTH_MEDIUM],
             }
         )
 
@@ -884,7 +892,7 @@ def group_issues(
             {
                 "index": idx,
                 "type": issue.get("issue_type"),
-                "explanation": issue.get("explanation", "")[:200],
+                "explanation": issue.get("explanation", "")[:CONTEXT_LENGTH_SHORT],
             }
         )
 
@@ -944,7 +952,7 @@ Write arrays explicitly [0, 1, 2], NOT Python code."""
         response = call_claude(
             client=client,
             model=GROUPING_MODEL,  # Use higher-quality model for grouping/pruning
-            max_tokens=3072,
+            max_tokens=GROUPING_MAX_TOKENS,
             prompt=prompt,
             display_prompt=display_prompt,
         )
@@ -972,7 +980,7 @@ Write arrays explicitly [0, 1, 2], NOT Python code."""
             result = json.loads(content)
         except json.JSONDecodeError as e:
             log.warning(f"Failed to parse Claude response: {e}")
-            log.warning(f"Response content (first 500 chars): {content[:500]}")
+            log.warning(f"Response content (first {CONTEXT_LENGTH_LONG} chars): {content[:CONTEXT_LENGTH_LONG]}")
             raise
 
         tokens_used = response.usage.input_tokens + response.usage.output_tokens
@@ -1066,7 +1074,7 @@ Write arrays explicitly [0, 1, 2], NOT Python code."""
 def group_identical_typos(typo_issues: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """Group ABSOLUTELY identical typos within each collection.
 
-    Groups typos by: slug + field + typo + correction + context (first 200 chars).
+    Groups typos by: slug + field + typo + correction + context.
     Only typos that match ALL these criteria are grouped together.
 
     Args:
@@ -1083,7 +1091,7 @@ def group_identical_typos(typo_issues: list[dict[str, Any]]) -> list[dict[str, A
             issue.get("field", ""),
             issue.get("typo", ""),
             issue.get("correction", ""),
-            issue.get("context", "")[:200],
+            issue.get("context", "")[:CONTEXT_LENGTH_SHORT],
         )
         groups[key].append(issue)
 
@@ -1114,7 +1122,7 @@ def group_typos(typo_issues: list[dict[str, Any]]) -> list[dict[str, Any]]:
             issue.get("field", ""),
             issue.get("typo", ""),
             issue.get("correction", ""),
-            issue.get("context", "")[:200],
+            issue.get("context", "")[:CONTEXT_LENGTH_SHORT],
         )
         groups[key].append(issue)
 
