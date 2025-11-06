@@ -444,13 +444,16 @@ def extract_human_readable_text(config_json: str) -> str:
     return "\n".join(texts)
 
 
-def load_views(slug_list: list[str] | None, limit: int | None, content_type: str | None = None) -> list[dict[str, Any]]:
+def load_views(
+    slug_list: list[str] | None, limit: int | None, content_type: tuple[str, ...] | None = None
+) -> list[dict[str, Any]]:
     """Load views from database and aggregate by view ID.
 
     Args:
         slug_list: List of slugs to filter by (works for explorers, multidims, charts, and posts)
         limit: Maximum number of views to return
-        content_type: Optional filter by content type ('explorer', 'multidim', 'chart', or 'post')
+        content_type: Optional filter by content type(s) ('explorer', 'multidim', 'chart', or 'post').
+                     Can be a tuple of multiple types to include.
 
     Returns:
         List of view dictionaries (explorers, multidims, charts, and posts)
@@ -492,9 +495,12 @@ def load_views(slug_list: list[str] | None, limit: int | None, content_type: str
     # Apply content type filter if specified
     if content_type:
         original_count = len(views)
-        views = [v for v in views if v.get("view_type") == content_type]
+        views = [v for v in views if v.get("view_type") in content_type]
         if original_count > len(views):
-            rprint(f"[yellow]Filtered to {len(views)} {content_type} view(s) from {original_count} total[/yellow]")
+            types_str = ", ".join(content_type)
+            rprint(
+                f"[yellow]Filtered to {len(views)} view(s) of type(s) [{types_str}] from {original_count} total[/yellow]"
+            )
 
     # Apply limit if specified
     if limit is not None and limit > 0:

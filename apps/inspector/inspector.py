@@ -235,8 +235,9 @@ def run_checks(
     "--type",
     "-t",
     "content_type",
+    multiple=True,
     type=click.Choice(["explorer", "multidim", "chart", "post"], case_sensitive=False),
-    help="Filter by content type. Useful when a slug exists in multiple types (e.g., both explorer and post with same slug)",
+    help="Filter by content type. Can be specified multiple times (e.g., '-t post -t explorer'). Useful when a slug exists in multiple types.",
 )
 @click.option(
     "--model",
@@ -284,7 +285,7 @@ def run_checks(
 )
 def run(
     slug: tuple[str, ...],
-    content_type: str | None,
+    content_type: tuple[str, ...],
     model: str | None,
     skip_typos: bool,
     skip_issues: bool,
