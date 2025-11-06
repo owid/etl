@@ -294,16 +294,51 @@ def run(
     dry_run: bool,
     display_prompt: bool,
 ) -> None:
-    """Check explorer, multidim views, chart configs, and posts for typos and semantic issues.
+    """Check explorer, multidim views, chart configs, and posts (including articles, topic pages, and data insights) for typos and semantic issues.
 
     Examples:
-        python metadata_inspector.py --skip-issues
-        python metadata_inspector.py --slug global-food
-        python metadata_inspector.py --slug natural-disasters --type post
-        python metadata_inspector.py --slug global-food --slug covid-boosters
-        python metadata_inspector.py --slug animal-welfare --limit 5
-        python metadata_inspector.py --output-file issues.csv
-        python metadata_inspector.py --model sonnet
+        - Check specific slug (with --slug or -s)
+        > etl inspector -s natural-disasters
+
+        - For simplicity, the slug applies to all content types (explorers, mdims and posts); you can specify one (or more) content type (with --type or -t)
+        > etl inspector -s natural-disasters -t post
+
+        > etl inspector -s natural-disasters -t post -t explorer
+
+        - You can check multiple slugs
+        > etl inspector -s global-food -s natural-disasters
+
+        - Use different models (with --model or -m); currently available models are haiku=fast/cheap, sonnet=balanced, opus=best quality/more expensive
+        > etl inspector -s global-food -m sonnet
+
+        > etl inspector -s natural-disasters -m opus
+
+        - Save results to an output file (with --output-file or -o); it auto-resumes if interrupted, skipping already inspected content
+        > etl inspector -o issues.csv
+
+        > etl inspector -s global-food -o food_issues.csv
+
+        - Limit number of views (useful for testing/cost control)
+        > etl inspector -l 10
+
+        > etl inspector -s natural-disasters -l 5 -m haiku
+
+        - Skip specific checks
+        > etl inspector --skip-issues  # Only run typo checks with codespell (skipping AI inspection); this option has no cost
+
+        > etl inspector --skip-typos  # Only run semantic checks (skipping codespell inspection); this option has costs
+
+        - Estimate costs without running (dry run)
+        > etl inspector --dry-run
+
+        > etl inspector -s global-food -m opus --dry-run
+
+        - Enable experimental grouping/pruning (for large result sets)
+        > etl inspector --enable-grouping
+
+        - Debug: see exact prompts sent to Claude
+        > etl inspector -s energy -l 1 --display-prompt
+
     """
     # Get the model name to use
     model_name = get_model_name(model)
