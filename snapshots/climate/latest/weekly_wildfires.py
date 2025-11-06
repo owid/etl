@@ -56,6 +56,8 @@ COUNTRIES = {
     k: v for k, v in COUNTRIES.items() if not k.startswith(tuple(EXCLUDE_OWID)) and k not in EXCLUDE_ADDITIONAL
 }
 
+TIMEOUT = 300  # seconds
+
 
 def fetch_with_curl(url: str) -> dict:
     """Fallback method using curl with retry logic."""
@@ -75,7 +77,7 @@ def fetch_with_curl(url: str) -> dict:
             ],
             capture_output=True,
             text=True,
-            timeout=120,
+            timeout=TIMEOUT,
         )
 
         if result.returncode != 0:
@@ -83,12 +85,12 @@ def fetch_with_curl(url: str) -> dict:
 
         return json.loads(result.stdout)
     except subprocess.TimeoutExpired:
-        raise Exception("curl request timed out after 120 seconds")
+        raise Exception(f"curl request timed out after {TIMEOUT} seconds")
     except json.JSONDecodeError as e:
         raise Exception(f"Failed to parse JSON from curl response: {e}")
 
 
-def fetch_with_retry(url: str, max_retries: int = 3, timeout: int = 30) -> dict:
+def fetch_with_retry(url: str, max_retries: int = 3, timeout: int = TIMEOUT) -> dict:
     """Fetch data from API with retry logic and comprehensive error handling."""
     headers = {"User-Agent": "Mozilla/5.0"}
 
