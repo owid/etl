@@ -80,3 +80,10 @@ steps:
     - data://garden/un/2025-05-07/undp_hdr
     - data://garden/demography/2024-07-15/population
     - data://garden/regions/2023-01-01/regions
+  # IMF World Economic Outlook
+  data://meadow/imf/2025-11-06/world_economic_outlook:
+    - snapshot://imf/2025-11-06/world_economic_outlook.csv
+  data://garden/imf/2025-11-06/world_economic_outlook:
+    - data://meadow/imf/2025-11-06/world_economic_outlook
+  data://grapher/imf/2025-11-06/world_economic_outlook:
+    - data://garden/imf/2025-11-06/world_economic_outlook
