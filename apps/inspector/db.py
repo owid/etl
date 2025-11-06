@@ -105,6 +105,10 @@ def aggregate_explorer_views(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         Aggregated dataframe with one row per explorer view
     """
+    # Build aggregation dict for all variable columns
+    var_cols = [c for c in df.columns if c.startswith("variable_")]
+    agg_dict = {col: lambda x: list(x.dropna()) for col in var_cols}
+
     # Group by explorer view and aggregate variable metadata
     # Use dropna=False to preserve rows with NULL explorerSlug (if any)
     agg_df = (
@@ -112,25 +116,7 @@ def aggregate_explorer_views(df: pd.DataFrame) -> pd.DataFrame:
             ["id", "view_type", "explorerSlug", "dimensions", "chartConfigId", "chart_config", "explorer_config"],
             dropna=False,
         )
-        .agg(
-            {
-                "variable_id": lambda x: list(x.dropna()),
-                "variable_name": lambda x: list(x.dropna()),
-                "variable_unit": lambda x: list(x.dropna()),
-                "variable_description": lambda x: list(x.dropna()),
-                "variable_short_unit": lambda x: list(x.dropna()),
-                "variable_short_name": lambda x: list(x.dropna()),
-                "variable_display": lambda x: list(x.dropna()),
-                "variable_title_public": lambda x: list(x.dropna()),
-                "variable_title_variant": lambda x: list(x.dropna()),
-                "variable_description_short": lambda x: list(x.dropna()),
-                "variable_description_from_producer": lambda x: list(x.dropna()),
-                "variable_description_key": lambda x: list(x.dropna()),
-                "variable_description_processing": lambda x: list(x.dropna()),
-                "variable_attribution": lambda x: list(x.dropna()),
-                "variable_attribution_short": lambda x: list(x.dropna()),
-            }
-        )
+        .agg(agg_dict)
         .reset_index()
     )
 
@@ -226,6 +212,10 @@ def aggregate_multidim_views(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         Aggregated dataframe with one row per multidim view
     """
+    # Build aggregation dict for all variable columns
+    var_cols = [c for c in df.columns if c.startswith("variable_")]
+    agg_dict = {col: lambda x: list(x.dropna()) for col in var_cols}
+
     # Group by multidim view and aggregate variable metadata (same as explorers)
     # Use dropna=False to preserve rows with NULL explorerSlug
     agg_df = (
@@ -243,25 +233,7 @@ def aggregate_multidim_views(df: pd.DataFrame) -> pd.DataFrame:
             ],
             dropna=False,
         )
-        .agg(
-            {
-                "variable_id": lambda x: list(x.dropna()),
-                "variable_name": lambda x: list(x.dropna()),
-                "variable_unit": lambda x: list(x.dropna()),
-                "variable_description": lambda x: list(x.dropna()),
-                "variable_short_unit": lambda x: list(x.dropna()),
-                "variable_short_name": lambda x: list(x.dropna()),
-                "variable_display": lambda x: list(x.dropna()),
-                "variable_title_public": lambda x: list(x.dropna()),
-                "variable_title_variant": lambda x: list(x.dropna()),
-                "variable_description_short": lambda x: list(x.dropna()),
-                "variable_description_from_producer": lambda x: list(x.dropna()),
-                "variable_description_key": lambda x: list(x.dropna()),
-                "variable_description_processing": lambda x: list(x.dropna()),
-                "variable_attribution": lambda x: list(x.dropna()),
-                "variable_attribution_short": lambda x: list(x.dropna()),
-            }
-        )
+        .agg(agg_dict)
         .reset_index()
     )
 
@@ -372,29 +344,13 @@ def fetch_chart_configs(chart_slugs: list[str] | None = None) -> list[dict[str, 
     if df.empty:
         return []
 
+    # Build aggregation dict for all variable columns
+    var_cols = [c for c in df.columns if c.startswith("variable_")]
+    agg_dict = {col: lambda x: list(x.dropna()) for col in var_cols}
+
     # Aggregate by chart to group all variables together
     agg_df = (
-        df.groupby(["id", "config_id", "slug", "view_type", "chart_config"], dropna=False)
-        .agg(
-            {
-                "variable_id": lambda x: list(x.dropna()),
-                "variable_name": lambda x: list(x.dropna()),
-                "variable_unit": lambda x: list(x.dropna()),
-                "variable_description": lambda x: list(x.dropna()),
-                "variable_short_unit": lambda x: list(x.dropna()),
-                "variable_short_name": lambda x: list(x.dropna()),
-                "variable_display": lambda x: list(x.dropna()),
-                "variable_title_public": lambda x: list(x.dropna()),
-                "variable_title_variant": lambda x: list(x.dropna()),
-                "variable_description_short": lambda x: list(x.dropna()),
-                "variable_description_from_producer": lambda x: list(x.dropna()),
-                "variable_description_key": lambda x: list(x.dropna()),
-                "variable_description_processing": lambda x: list(x.dropna()),
-                "variable_attribution": lambda x: list(x.dropna()),
-                "variable_attribution_short": lambda x: list(x.dropna()),
-            }
-        )
-        .reset_index()
+        df.groupby(["id", "config_id", "slug", "view_type", "chart_config"], dropna=False).agg(agg_dict).reset_index()
     )
 
     result: list[dict[str, Any]] = agg_df.to_dict("records")  # type: ignore
