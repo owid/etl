@@ -40,15 +40,15 @@ tables:
         presentation:
           title_public: |-
             Share of people
-            <% if religion == "religiously_unaffiliated" -%>
+            <%- if religion == "religiously_unaffiliated" %>
              that are not religious
-            <% elif religion == "any_religion" -%>
+            <%- elif religion == "any_religion" %>
              that are religious
-            <% elif religion == "other_religions" -%>
+            <%- elif religion == "other_religions" %>
              affiliated to other religions
-            <% else -%>
+            <%- else %>
              that are <<religion>>
-            <% endif -%>
+            <% endif %>
         unit: percentage
         short_unit: "%"
         description_short: |-
@@ -69,26 +69,26 @@ tables:
       count:
         title: |-
           Number of people -
-          <% if religion == "religiously_unaffiliated" %>
+          <%- if religion == "religiously_unaffiliated" %>
            No religion
-          <% elif religion == "other_religions" %>
+          <%- elif religion == "other_religions" %>
            Other religions
-          <% elif religion == "any_religion" %>
+          <%- elif religion == "any_religion" %>
            Any religion
-          <% else %>
+          <%- else %>
            <<religion.title()>>
-          <% endif %>
+          <%- endif %>
         unit: people
         description_short: |-
-          <% if religion == "religiously_unaffiliated" -%>
+          <%- if religion == "religiously_unaffiliated" -%>
           Estimates of the number of people of all ages that are religiously unaffiliated.
-          <% elif religion == "other_religions" -%>
+          <%- elif religion == "other_religions" -%>
           Estimates of the number {definitions.others.other_religions}
-          <% elif religion == "any_religion" %>
+          <%- elif religion == "any_religion" -%>
           Estimates of the number of people affiliated to any religion.
-          <% else -%>
+          <%- else -%>
           Estimates of the number of people that are << religion >>.
-          <% endif -%>
+          <%- endif %>
         description_key:
           - "{definitions.others.methodology}"
           - In most countries, it is not possible to precisely count the number of people who identify with each religion. Because our estimates are not precise, the tables in this report and accompanying data files show rounded population counts (often to the nearest 10,000) and show counts below 10,000 as “<10,000.”
@@ -110,15 +110,15 @@ tables:
       count_unrounded:
         title: |-
           Number of people (unrounded) -
-          <% if religion == "religiously_unaffiliated" %>
+          <%- if religion == "religiously_unaffiliated" %>
            No religion
-          <% elif religion == "other_religions" %>
+          <%- elif religion == "other_religions" %>
            Other religions
-          <% elif religion == "any_religion" %>
+          <%- elif religion == "any_religion" %>
            Any religion
-          <% else %>
+          <%- else %>
            <<religion.title()>>
-          <% endif %>
+          <%- endif -%>
         unit: people
         description_short: |-
           {tables.religious_composition.variables.count.description_short} These estimates are unrounded counts, which should be used with caution.
@@ -129,12 +129,12 @@ tables:
         presentation:
           title_public: |-
             Number of people
-            <% if religion == "religiously_unaffiliated" -%>
+            <%- if religion == "religiously_unaffiliated" %>
              that are not religious
-            <% elif religion == "any_religion" -%>
+            <%- elif religion == "any_religion" %>
              that are religious
-            <% elif religion == "other_religions" -%>
+            <%- elif religion == "other_religions" %>
              affiliated to other religions
-            <% else -%>
+            <%- else %>
              that are <<religion>>
             <% endif -%>
