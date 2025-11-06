@@ -227,17 +227,20 @@ def run_checks(
 @click.command(cls=RichCommand)
 @click.option(
     "--slug",
+    "-s",
     multiple=True,
-    help="Filter by specific slug (explorer, multidim, chart, or post). Can be specified multiple times (e.g., '--slug global-food --slug covid-boosters')",
+    help="Filter by specific slug (explorer, multidim, chart, or post). Can be specified multiple times (e.g., '-s global-food -s covid-boosters')",
 )
 @click.option(
     "--type",
+    "-t",
     "content_type",
     type=click.Choice(["explorer", "multidim", "chart", "post"], case_sensitive=False),
     help="Filter by content type. Useful when a slug exists in multiple types (e.g., both explorer and post with same slug)",
 )
 @click.option(
     "--model",
+    "-m",
     type=click.Choice(["haiku", "sonnet", "opus"], case_sensitive=False),
     help="Claude model to use for issue detection (default: haiku). Haiku is fastest/cheapest, Sonnet is balanced, Opus is highest quality.",
 )
@@ -258,11 +261,13 @@ def run_checks(
 )
 @click.option(
     "--output-file",
+    "-o",
     type=click.Path(),
     help="Save issues to CSV file",
 )
 @click.option(
     "--limit",
+    "-l",
     type=int,
     default=None,
     help="Limit number of views to analyze (useful for testing to reduce API costs)",
