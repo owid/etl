@@ -44,7 +44,7 @@ from etl.snapshot import Snapshot
 SNAPSHOT_VERSION = Path(__file__).parent.name
 
 VERSIONS = [
-    "v25_01_25_06",
+    "v25_01_25_09",
 ]
 
 

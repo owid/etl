@@ -18,10 +18,10 @@ meta:
     url_main: https://ucdp.uu.se/downloads/index.html#candidate
     url_download: https://ucdp.uu.se/downloads/candidateged/GEDEvent_v25_01_25_09.csv
     date_published: "2025-10-20"
+    date_accessed: "2025-11-06"
     license:
       name: CC BY 4.0
       url: https://creativecommons.org/licenses/by/4.0/
-    date_accessed: "2023-11-06"
 outs:
   - md5: 12edd128599bbefc05c1e1dcbce69e84
     size: 15883361
