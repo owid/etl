@@ -101,9 +101,13 @@ global democracy_importance E235
 global democracy_democraticness E236
 global democracy_elections_makes_diff E266
 
+* Religion questions
+global religion_how_often F028 F028B
+global religion_god_important F063
+
 * List of questions to work with
 * NOTE: A168 is not available in IVS
-global questions A165 A168 G007_33_B G007_34_B $additional_questions $important_in_life_questions $politics_questions $environment_vs_econ_questions $income_equality_questions $schwartz_questions $work_leisure_questions $work_questions $most_serious_problem_questions $justifiable_questions $worries_questions $happiness_questions $neighbors_questions $homosexuals_parents_questions $democracy_satisfied $democracy_very_good_very_bad $democracy_essential_char $democracy_importance $democracy_democraticness $democracy_elections_makes_diff
+global questions A165 A168 G007_33_B G007_34_B $additional_questions $important_in_life_questions $politics_questions $environment_vs_econ_questions $income_equality_questions $schwartz_questions $work_leisure_questions $work_questions $most_serious_problem_questions $justifiable_questions $worries_questions $happiness_questions $neighbors_questions $homosexuals_parents_questions $democracy_satisfied $democracy_very_good_very_bad $democracy_essential_char $democracy_importance $democracy_democraticness $democracy_elections_makes_diff $religion_how_often $religion_god_important
 
  * Keep wave ID, country, weight and the list of questions
 keep S002VS S002EVS S003 S017 $questions
@@ -1300,6 +1304,133 @@ foreach var in $democracy_elections_makes_diff {
 }
 
 
+* Processing "how often" questions about religion
+/*
+           1 More than once a week
+           2 Once a week
+           3 Once a month
+           4 Only on special holy days/Christmas/Easter days
+           5 Other specific holy days
+           6 Once a year
+           7 Less often
+           8 Never practically never
+          .a Don't know
+          .b No answer
+          .c Not applicable
+          .d Not asked in survey
+          .e Missing: other
+
+*/
+
+foreach var in $religion_how_often {
+	keep if `var' >= 1
+	keep if `var' != .c
+	keep if `var' != .d
+	keep if `var' != .e
+
+	gen up_to_once_month_`var' = 0
+	replace up_to_once_month_`var' = 1 if `var' <= 3
+
+	gen special_holydays_`var' = 0
+	replace special_holydays_`var' = 1 if `var' >= 4 & `var' <= 5
+
+	gen less_than_once_year_`var' = 0
+	replace less_than_once_year_`var' = 1 if `var' >= 7 & `var' <= 8
+
+	gen more_once_week_`var' = 0
+	replace more_once_week_`var' = 1 if `var' == 1
+	
+	gen once_week_`var' = 0
+	replace once_week_`var' = 1 if `var' == 2
+	
+	gen once_month_`var' = 0
+	replace once_month_`var' = 1 if `var' == 3
+	
+	gen holydays_chr_`var' = 0
+	replace holydays_chr_`var' = 1 if `var' == 4
+	
+	gen holydays_oth_`var' = 0
+	replace holydays_oth_`var' = 1 if `var' == 5
+	
+	gen once_year_`var' = 0
+	replace once_year_`var' = 1 if `var' == 6
+	
+	gen less_often_`var' = 0
+	replace less_often_`var' = 1 if `var' == 7
+	
+	gen never_`var' = 0
+	replace never_`var' = 1 if `var' == 8
+
+	gen dont_know_`var' = 0
+	replace dont_know_`var' = 1 if `var' == .a
+
+	gen no_answer_`var' = 0
+	replace no_answer_`var' = 1 if `var' == .b
+
+	collapse (mean) up_to_once_month_`var' special_holydays_`var' less_than_once_year_`var' more_once_week_`var' once_week_`var' once_month_`var' holydays_chr_`var' holydays_oth_`var' once_year_`var' less_often_`var' never_`var' dont_know_`var' no_answer_`var' [w=S017], by (year country)
+	tempfile religion_how_often_`var'_file
+	save "`religion_how_often_`var'_file'"
+
+	restore
+	preserve
+}
+
+* Processing "how important god is in your life"
+/*
+           1 Not at all important
+           2 2
+           3 3
+           4 4
+           5 5
+           6 6
+           7 7
+           8 8
+           9 9
+          10 Very important
+          .a Don't know
+          .b No answer
+          .c Not applicable
+          .d Not asked in survey
+          .e Missing: other
+*/
+
+keep if $religion_god_important >= 1
+keep if $religion_god_important != .c
+keep if $religion_god_important != .d
+keep if $religion_god_important != .e
+
+
+gen not_important_god = 0
+replace not_important_god = 1 if $religion_god_important <= 4
+
+gen important_god = 0
+replace important_god = 1 if $religion_god_important >= 7 & $religion_god_important <= 10
+
+gen not_at_all_important_god = 0
+replace not_at_all_important_god = 1 if $religion_god_important == 1
+
+gen very_important_god = 0
+replace very_important_god = 1 if $religion_god_important == 10
+
+gen neutral_important_god = 0
+replace neutral_important_god = 1 if $religion_god_important == 5 | $religion_god_important == 6
+
+gen dont_know_important_god = 0
+replace dont_know_important_god = 1 if $religion_god_important == .a
+
+gen no_answer_important_god = 0
+replace no_answer_important_god = 1 if $religion_god_important == .b
+
+gen avg_score_important_god = $religion_god_important
+
+collapse (mean) not_important_god important_god not_at_all_important_god very_important_god neutral_important_god dont_know_important_god no_answer_important_god avg_score_important_god [w=S017], by (year country)
+tempfile god_important_file
+save "`god_important_file'"
+
+restore
+preserve
+
+
 * Combine all the saved datasets
 use "`trust_file'", clear
 
@@ -1368,6 +1499,12 @@ qui merge 1:1 year country using "`democratic_file'", nogenerate // keep(master 
 foreach var in $democracy_elections_makes_diff {
 	qui merge 1:1 year country using "`elections_difference_`var'_file'", nogenerate // keep(master match)
 }
+
+foreach var in $religion_how_often {
+	qui merge 1:1 year country using "`religion_how_often_`var'_file'", nogenerate // keep(master match)
+}
+
+qui merge 1:1 year country using "`god_important_file'", nogenerate // keep(master match)
 
 * Get a list of variables excluding country and year (and avg_score_eq_ineq to not multiply it by 100)
 ds country year avg_score*, not

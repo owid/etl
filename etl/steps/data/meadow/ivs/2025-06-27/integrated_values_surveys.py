@@ -151,6 +151,8 @@ VARS_DICT = {
     "E233A": "The state makes people's incomes equal",
     "E233B": "People obey their rulers",
     "E266": "Honest elections make a difference",
+    "F028": "Attend religious services",
+    "F028B": "Pray",
 }
 
 
