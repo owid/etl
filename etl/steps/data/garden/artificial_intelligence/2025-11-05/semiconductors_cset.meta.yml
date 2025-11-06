@@ -527,6 +527,10 @@ tables:
           <% else %>
           << provided_name >> is a component in the semiconductor supply chain. Market share represents the percentage of global production or capacity controlled by different countries or companies.
           <%- endif -%>
+        presentation:
+         title_public: |-
+           Market share of << provided_name.lower() >> in the semiconductor supply chain
         display:
           numDecimalPlaces: 1
+          name: <<provided_name>>
 
