@@ -916,10 +916,7 @@ class Collection(MDIMBase):
         for view_group in new_view_groups:
             # Sort view_group according to the order in choices list
             # This ensures indicators appear in the same order as specified in choices
-            view_group_sorted = sorted(
-                view_group,
-                key=lambda v: choices.index(v.dimensions[dimension])
-            )
+            view_group_sorted = sorted(view_group, key=lambda v: choices.index(v.dimensions[dimension]))
             # Create dimensions for new view
             new_dimensions = view_group_sorted[0].dimensions.copy()
             new_dimensions[dimension] = choice_new_slug
