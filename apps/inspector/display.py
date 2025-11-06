@@ -30,21 +30,23 @@ def display_issues(
     """
     from collections import defaultdict
 
-    # Group issues by slug (explorer/multidim/chart)
-    issues_by_explorer = defaultdict(list)
+    # Group issues by (slug, type) to handle cases where same slug exists as multiple content types
+    issues_by_collection = defaultdict(list)
     for issue in issues:
         slug = issue.get("slug", "unknown")
         # Convert slug to string to avoid TypeError when sorting mixed types
         slug = str(slug) if slug is not None else "unknown"
-        issues_by_explorer[slug].append(issue)
+        content_type = issue.get("type", "explorer")
+        # Group by (slug, type) tuple to separate e.g. explorer:foo from post:foo
+        issues_by_collection[(slug, content_type)].append(issue)
 
-    # Deduplicate codespell typos within each explorer by (typo, correction) pair
+    # Deduplicate codespell typos within each collection by (typo, correction) pair
     # Keep track of how many duplicates were removed
-    for explorer_slug in issues_by_explorer:
+    for collection_key in issues_by_collection:
         seen_typos = {}  # Map (typo, correction) -> first issue
         deduplicated = []
 
-        for issue in issues_by_explorer[explorer_slug]:
+        for issue in issues_by_collection[collection_key]:
             # Only deduplicate codespell typos (not AI issues)
             if issue.get("source") == "codespell" and issue.get("issue_type") == "typo":
                 typo_key = (issue.get("typo", ""), issue.get("correction", ""))
@@ -60,7 +62,7 @@ def display_issues(
                 # Keep all non-typo issues
                 deduplicated.append(issue)
 
-        issues_by_explorer[explorer_slug] = deduplicated
+        issues_by_collection[collection_key] = deduplicated
 
     # Display issues section only if there are issues
     if issues:
@@ -68,28 +70,31 @@ def display_issues(
         total_unique = len(issues)
         # Calculate total original count from count field (or similar_count for backwards compat)
         total_original = sum(issue.get("count", issue.get("similar_count", 1)) for issue in issues)
-        num_collections = len(issues_by_explorer)
+        num_collections = len(issues_by_collection)
         rprint(
             f"\n[bold]Found {total_original} total issues ({total_unique} unique) across {num_collections} collection(s)[/bold]"
         )
 
-    # Display issues grouped by explorer
-    for explorer_slug in sorted(issues_by_explorer.keys()):
-        explorer_issues = issues_by_explorer[explorer_slug]
+    # Sort collections by type first (explorer, multidim, chart, post), then by slug
+    # This ensures explorers appear before posts when same slug exists in both
+    type_order = {"explorer": 0, "multidim": 1, "chart": 2, "post": 3}
 
-        # Display header with appropriate label and color
-        # Determine type from the actual issues, not just slug presence
-        # (since same slug can exist as both explorer and post)
-        issue_types = {issue.get("type") for issue in explorer_issues}
+    def sort_key(collection_tuple):
+        slug, content_type = collection_tuple
+        return (type_order.get(content_type, 99), slug)
 
-        # Pick the most common type, or the first one if tied
-        if "post" in issue_types:
+    # Display issues grouped by collection
+    for slug, content_type in sorted(issues_by_collection.keys(), key=sort_key):
+        collection_issues = issues_by_collection[(slug, content_type)]
+
+        # Display header with appropriate label and color based on content type
+        if content_type == "post":
             label = "Post"
             color = "green"
-        elif "chart" in issue_types:
+        elif content_type == "chart":
             label = "Chart"
             color = "yellow"
-        elif "multidim" in issue_types:
+        elif content_type == "multidim":
             label = "Multidim"
             color = "magenta"
         else:
@@ -97,13 +102,13 @@ def display_issues(
             color = "cyan"
 
         rprint(f"\n[bold {color}]{'=' * 80}[/bold {color}]")
-        rprint(f"[bold {color}]{label}: {explorer_slug}[/bold {color}]")
+        rprint(f"[bold {color}]{label}: {slug}[/bold {color}]")
         rprint(f"[bold {color}]{'=' * 80}[/bold {color}]")
 
         rprint("\n[bold]Issues:[/bold]")
 
         # Print each issue with full details
-        for i, issue in enumerate(explorer_issues, 1):
+        for i, issue in enumerate(collection_issues, 1):
             view_title = issue.get("view_title", "")
             view_url = issue.get("view_url", "")
             field = issue.get("field", "unknown")
@@ -155,7 +160,8 @@ def display_issues(
 
     # Show clean explorers/mdims/charts/posts if we have the full list
     if all_explorers and mdim_slugs is not None and chart_slugs is not None and post_slugs is not None:
-        explorers_with_issues = set(issues_by_explorer.keys())
+        # Extract just the slugs from (slug, content_type) tuples
+        explorers_with_issues = {slug for slug, _ in issues_by_collection.keys()}
         # Filter out NaN values (from NULL slugs) before sorting
         all_explorers_valid = {e for e in all_explorers if isinstance(e, str)}
         explorers_with_issues_valid = {e for e in explorers_with_issues if isinstance(e, str)}
