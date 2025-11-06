@@ -87,9 +87,11 @@ def find_snapshot_script(dataset_name: str) -> Optional[Path]:
         else:
             return None
 
+    # Remove snapshots/ prefix if present (for paths like snapshots/namespace/version/name)
+    dataset_name = dataset_name.removeprefix("snapshots/")
+
     # Remove any file extension if present (e.g., .py, .csv, .xlsx)
-    if "." in dataset_name and not dataset_name.startswith("snapshots/"):
-        # Only strip extension if it's not a full path starting with snapshots/
+    if "." in dataset_name:
         # Find the last dot and check if it's likely a file extension
         dot_index = dataset_name.rfind(".")
         if dot_index > dataset_name.rfind("/"):  # Extension is after the last slash
