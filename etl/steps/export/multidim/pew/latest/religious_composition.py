@@ -27,6 +27,7 @@ def run() -> None:
     # Load grapher dataset.
     ds = paths.load_dataset("religious_composition")
     tb = ds.read("religious_composition", load_data=False)
+    tb_pct = ds.read("share_change", load_data=False)
 
     #
     # (optional) Adjust dimensions if needed
@@ -38,8 +39,14 @@ def run() -> None:
     c = paths.create_collection(
         config=config,
         short_name="religious_composition",
-        tb=tb,
-        indicator_names=["share", "count_unrounded"],
+        tb=[
+            tb,
+            tb_pct,
+        ],
+        indicator_names=[
+            ["share", "count_unrounded"],
+            ["share_change_2010_2020"],
+        ],
         # dimensions={},
     )
 
@@ -64,6 +71,7 @@ def run() -> None:
                     "chartTypes": ["StackedDiscreteBar"],
                     "selectedFacetStrategy": "none",
                     "title": "{indicator} by religious affiliation",
+                    "originUrl": "ourworldindata.org/religion",
                 },
                 "view_metadata": {
                     "presentation": {
@@ -75,6 +83,13 @@ def run() -> None:
         ],
         params={
             "indicator": lambda view: "Share of population" if view.matches(indicator="share") else "Number of people",
+        },
+    )
+
+    c.drop_views(
+        dimensions={
+            "religion": "religion_distrib",
+            "indicator": "share_change_2010_2020",
         },
     )
     #

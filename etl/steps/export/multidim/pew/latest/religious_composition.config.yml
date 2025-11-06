@@ -14,7 +14,12 @@ definitions:
     - config:
         chartTypes: ["SlopeChart", "DiscreteBar"]
         hasMapTab: true
-        originUrl: ourworldindata.org/war-and-peace
+        originUrl: ourworldindata.org/religion
+    - dimensions:
+        indicator: share_change_2010_2020
+      config:
+        chartTypes: []
+        hasMapTab: true
 
 dimensions:
   - slug: religion
@@ -59,4 +64,7 @@ dimensions:
       - slug: "count_unrounded"
         name: "Number of people"
         description: Number of deaths divided by the total population
+      - slug: "share_change_2010_2020"
+        name: "Percentage point change"
+        description: Percentage point change between 2010 and 2020
 views: []
