@@ -8,7 +8,7 @@ definitions:
     methodology: |-
       Estimates are based on more than 2,700 censuses and surveys. You can read complete methodology in [Pew's report](https://www.pewresearch.org/religion/2025/06/09/how-the-global-religious-landscape-changed-from-2010-to-2020/).
     other_religions: |-
-      of people of all ages affiliated to other religions. Other religions include Baha’is, Daoists (also spelled Taoists), Jains, Shintoists, Sikhs, Wiccans, Zoroastrians and many small groups, some of which can be described as folk or traditional religions.
+      Other religions include Baha’is, Daoists (also spelled Taoists), Jains, Shintoists, Sikhs, Wiccans, Zoroastrians and many small groups, some of which can be described as folk or traditional religions.
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
@@ -23,6 +23,36 @@ tables:
         unit: ""
         description_key:
           - "{definitions.others.methodology}"
+
+  share_change:
+    variables:
+      share_change_2010_2020:
+        title: |-
+          <% if religion == "religiously_unaffiliated" -%>
+          Percentage point change in share of people that are not religious (2010-2020)
+          <% elif religion == "other_religions" -%>
+          Percentage point change in share of people that are affiliated to other religions (2010-2020)
+          <% elif religion == "any_religion" %>
+          Percentage point change in share of people that is religious (2010-2020)
+          <% else -%>
+          Percentage point change in share of people that are <<religion.title()>> (2010-2020)
+          <% endif -%>
+        description_short: |-
+          The difference in the share of the population affiliated to << religion >> between 2010 and 2020.
+          <% if religion == "religiously_unaffiliated" -%>
+          The difference in the share of of people that are religiously unaffiliated between 2010 and 2020.
+          <% elif religion == "other_religions" -%>
+          The difference in the share of of people that are affiliated to other religions between 2010 and 2020. {{definitions.others.other_religions}}
+          <% elif religion == "any_religion" %>
+          The difference in the share of of people that are affiliated to any religion between 2010 and 2020.
+          <% else -%>
+          The difference in the share of of people that are <<religion>> between 2010 and 2020.
+          <% endif -%>
+        unit: "%"
+        short_unit: "%"
+        description_key:
+          - "{definitions.others.methodology}"
+
   religious_composition:
     variables:
       share:
@@ -55,7 +85,7 @@ tables:
           <% if religion == "religiously_unaffiliated" -%>
           Estimates of the percentage of people of all ages that are religiously unaffiliated.
           <% elif religion == "other_religions" -%>
-          Estimates of the percentage  {definitions.others.other_religions}
+          Estimates of the percentage of people of all ages affiliated to other religions. {definitions.others.other_religions}
           <% elif religion == "any_religion" %>
           Estimates of the percentage of people affiliated to any religion.
           <% else -%>
@@ -83,7 +113,7 @@ tables:
           <%- if religion == "religiously_unaffiliated" -%>
           Estimates of the number of people of all ages that are religiously unaffiliated.
           <%- elif religion == "other_religions" -%>
-          Estimates of the number {definitions.others.other_religions}
+          Estimates of the number of people of all ages affiliated to other religions. {definitions.others.other_religions}
           <%- elif religion == "any_religion" -%>
           Estimates of the number of people affiliated to any religion.
           <%- else -%>

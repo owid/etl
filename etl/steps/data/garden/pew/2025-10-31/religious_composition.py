@@ -39,10 +39,14 @@ def run() -> None:
     # Add "any religion"
     tb = add_any_religion(tb)
 
+    # Add percentage change
+    tb_pct = make_tb_pct_change(tb)
+
     # Improve table format.
     tables = [
         tb.format(["country", "year", "religion"]),
         tb_most_popular.format(["country", "year"], short_name="most_popular_religion"),
+        tb_pct.format(["country", "year", "religion"], short_name="share_change"),
     ]
 
     #
@@ -86,3 +90,19 @@ def make_tb_popular_religion(tb):
     tb_popular = tb_popular.reset_index(drop=True)
 
     return tb_popular
+
+
+def make_tb_pct_change(tb):
+    # Sanity check
+    assert set(tb["year"].unique()) == {2010, 2020}, "Unexpected years detected!"
+    # Separate 2010 and 2020 years
+    cols = ["country", "religion", "share"]
+    tb_10 = tb.loc[tb["year"] == 2010, cols]
+    tb_20 = tb.loc[tb["year"] == 2020, cols]
+    # Merge and calculate change
+    tb_pct = tb_10.merge(tb_20, on=["country", "religion"], suffixes=("_2010", "_2020"))
+    tb_pct["share_change_2010_2020"] = tb_pct["share_2020"] - tb_pct["share_2010"]
+    # Keep relevant columns
+    tb_pct["year"] = 2020
+    tb_pct = tb_pct[["country", "year", "religion", "share_change_2010_2020"]]
+    return tb_pct
