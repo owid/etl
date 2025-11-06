@@ -414,9 +414,8 @@ def run(
     total_cache_read_tokens = 0
     total_cost = 0.0
 
-    total_collections = len(other_collections) + len(chart_collections) + len(post_collections)
     rprint(
-        f"\n[bold cyan]Processing {total_collections} collection(s): {len(other_collections)} explorer/multidim(s) + {len(chart_collections)} chart(s) + {len(post_collections)} post(s)...[/bold cyan]\n"
+        f"\n[bold cyan]Processing {len(other_collections)} explorer/multidim(s) + {len(chart_collections)} chart(s) + {len(post_collections)} post(s)...[/bold cyan]\n"
     )
 
     # Process explorers/multidims first

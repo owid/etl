@@ -458,12 +458,27 @@ def load_views(
     Returns:
         List of view dictionaries (explorers, multidims, charts, and posts)
     """
-    # Fetch data from all sources (explorers, multidimensional indicators, charts, and posts)
+    # Fetch data from sources based on content_type filter (or all sources if no filter)
     # When slug_list is provided, all queries filter by the same slugs
-    df_explorers = fetch_explorer_data(explorer_slugs=slug_list)
-    df_mdims = fetch_multidim_data(slug_filters=slug_list)
-    chart_configs = fetch_chart_configs(chart_slugs=slug_list)
-    posts = fetch_posts(post_slugs=slug_list)
+    if not content_type or "explorer" in content_type:
+        df_explorers = fetch_explorer_data(explorer_slugs=slug_list)
+    else:
+        df_explorers = pd.DataFrame()
+
+    if not content_type or "multidim" in content_type:
+        df_mdims = fetch_multidim_data(slug_filters=slug_list)
+    else:
+        df_mdims = pd.DataFrame()
+
+    if not content_type or "chart" in content_type:
+        chart_configs = fetch_chart_configs(chart_slugs=slug_list)
+    else:
+        chart_configs = []
+
+    if not content_type or "post" in content_type:
+        posts = fetch_posts(post_slugs=slug_list)
+    else:
+        posts = []
 
     # Check if we got any results
     if df_explorers.empty and df_mdims.empty and not chart_configs and not posts:
@@ -542,22 +557,18 @@ def load_views(
         rprint(f"[cyan]Filtering to slug(s): {slugs_str}[/cyan]")
 
     config_count = len(configs_by_slug)
-    view_count = len(views) - config_count
 
     # Count charts and posts separately (they have view_type="chart" and "post")
     chart_count = len([v for v in views if v.get("view_type") == "chart"])
     post_count = len([v for v in views if v.get("view_type") == "post"])
 
-    breakdown = f"{len(agg_df_explorers)} explorers + {len(agg_df_mdims)} multidims"
+    breakdown = f"{len(agg_df_explorers)} explorer views + {config_count} configs + {len(agg_df_mdims)} multidims"
     if chart_count > 0:
         breakdown += f" + {chart_count} charts"
     if post_count > 0:
         breakdown += f" + {post_count} posts"
 
-    rprint(
-        f"[cyan]Aggregated to {view_count} unique views + {config_count} collection configs "
-        f"({breakdown})...[/cyan]\n"
-    )
+    rprint(f"[cyan]Aggregated to {len(views)} unique objects to inspect " f"({breakdown})...[/cyan]\n")
 
     return views
 
