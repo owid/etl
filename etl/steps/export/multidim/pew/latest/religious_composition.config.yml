@@ -12,7 +12,7 @@ default_selection:
 definitions:
   common_views:
     - config:
-        chartTypes: ["SlopeChart"]
+        chartTypes: ["SlopeChart", "DiscreteBar"]
         hasMapTab: true
         originUrl: ourworldindata.org/war-and-peace
 
