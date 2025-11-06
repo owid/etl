@@ -15,6 +15,7 @@ import pandas as pd
 from rich import print as rprint
 from rich_click.rich_command import RichCommand
 
+from apps.inspector.config import MODEL_API_NAMES
 from apps.inspector.db import build_explorer_url, load_views
 from apps.inspector.detectors import (
     calculate_cost,
@@ -31,6 +32,28 @@ from apps.inspector.display import (
     print_step,
 )
 from etl import config
+
+
+def get_model_name(model_choice: str | None) -> str:
+    """Get the API model name from user choice.
+
+    Args:
+        model_choice: User's model choice (haiku/sonnet/opus) or None for default
+
+    Returns:
+        Full API model name
+    """
+    if model_choice is None:
+        # Default to haiku
+        model_choice = "haiku"
+
+    model_map = {
+        "haiku": MODEL_API_NAMES["anthropic:claude-haiku-4-5"],
+        "sonnet": MODEL_API_NAMES["anthropic:claude-sonnet-4-5"],
+        "opus": MODEL_API_NAMES["anthropic:claude-opus-4"],
+    }
+
+    return model_map[model_choice.lower()]
 
 
 def get_completed_collections(output_file: str) -> set[str]:
@@ -99,6 +122,7 @@ def run_checks(
     views: list[dict[str, Any]],
     skip_typos: bool,
     skip_issues: bool,
+    model: str | None = None,
     quiet: bool = False,
     display_prompt: bool = False,
 ) -> tuple[list[dict[str, Any]], int, int, int, int]:
@@ -108,6 +132,7 @@ def run_checks(
         views: List of view dictionaries to check
         skip_typos: Skip codespell typo checking
         skip_issues: Skip Claude API semantic checking
+        model: Model name to use for issue detection
         quiet: Suppress progress messages (useful when processing many items with outer progress bar)
         display_prompt: If True, print prompts before sending to Claude
 
@@ -173,11 +198,15 @@ def run_checks(
                             progress.advance(task, advance)
 
                 issues, usage_stats = check_issues(
-                    views, config.ANTHROPIC_API_KEY, display_prompt=display_prompt, progress_callback=progress_callback
+                    views,
+                    config.ANTHROPIC_API_KEY,
+                    model=model,
+                    display_prompt=display_prompt,
+                    progress_callback=progress_callback,
                 )
             else:
                 issues, usage_stats = check_issues(
-                    views, config.ANTHROPIC_API_KEY, display_prompt=display_prompt, progress_callback=None
+                    views, config.ANTHROPIC_API_KEY, model=model, display_prompt=display_prompt, progress_callback=None
                 )
 
         all_issues.extend(issues)
@@ -206,6 +235,11 @@ def run_checks(
     "content_type",
     type=click.Choice(["explorer", "multidim", "chart", "post"], case_sensitive=False),
     help="Filter by content type. Useful when a slug exists in multiple types (e.g., both explorer and post with same slug)",
+)
+@click.option(
+    "--model",
+    type=click.Choice(["haiku", "sonnet", "opus"], case_sensitive=False),
+    help="Claude model to use for issue detection (default: haiku). Haiku is fastest/cheapest, Sonnet is balanced, Opus is highest quality.",
 )
 @click.option(
     "--skip-typos",
@@ -246,6 +280,7 @@ def run_checks(
 def run(
     slug: tuple[str, ...],
     content_type: str | None,
+    model: str | None,
     skip_typos: bool,
     skip_issues: bool,
     enable_grouping: bool,
@@ -263,7 +298,10 @@ def run(
         python metadata_inspector.py --slug global-food --slug covid-boosters
         python metadata_inspector.py --slug animal-welfare --limit 5
         python metadata_inspector.py --output-file issues.csv
+        python metadata_inspector.py --model sonnet
     """
+    # Get the model name to use
+    model_name = get_model_name(model)
     if not config.ANTHROPIC_API_KEY and not skip_issues:
         rprint("[red]Error: ANTHROPIC_API_KEY not found. Add to .env file or use --skip-issues[/red]")
         raise click.ClickException("Missing ANTHROPIC_API_KEY")
@@ -303,7 +341,7 @@ def run(
     # Dry-run: estimate costs and exit
     if dry_run:
         total_input_tokens, total_output_tokens = estimate_check_costs(views, skip_typos, skip_issues)
-        display_cost_estimate(total_input_tokens, total_output_tokens, skip_issues, len(views))
+        display_cost_estimate(total_input_tokens, total_output_tokens, skip_issues, len(views), model=model_name)
         return
 
     # Group views by collection (explorerSlug for explorers, slug for charts/posts) for incremental processing
@@ -346,11 +384,11 @@ def run(
 
         # Run checks for this collection
         collection_issues, input_tokens, output_tokens, cache_creation, cache_read = run_checks(
-            collection_views, skip_typos, skip_issues, display_prompt=display_prompt
+            collection_views, skip_typos, skip_issues, model=model_name, display_prompt=display_prompt
         )
 
         # Calculate cost for this collection
-        collection_cost = calculate_cost(input_tokens, output_tokens, cache_creation, cache_read)
+        collection_cost = calculate_cost(input_tokens, output_tokens, cache_creation, cache_read, model=model_name)
         total_cost += collection_cost
 
         total_input_tokens += input_tokens
@@ -423,11 +461,13 @@ def run(
 
                 # Run checks for this chart (quiet mode to avoid cluttering progress bar)
                 collection_issues, input_tokens, output_tokens, cache_creation, cache_read = run_checks(
-                    chart_views, skip_typos, skip_issues, quiet=True, display_prompt=display_prompt
+                    chart_views, skip_typos, skip_issues, model=model_name, quiet=True, display_prompt=display_prompt
                 )
 
                 # Calculate cost for this chart
-                collection_cost = calculate_cost(input_tokens, output_tokens, cache_creation, cache_read)
+                collection_cost = calculate_cost(
+                    input_tokens, output_tokens, cache_creation, cache_read, model=model_name
+                )
                 total_cost += collection_cost
 
                 total_input_tokens += input_tokens
@@ -484,11 +524,13 @@ def run(
 
                 # Run checks for this post (quiet mode to avoid cluttering progress bar)
                 collection_issues, input_tokens, output_tokens, cache_creation, cache_read = run_checks(
-                    post_views, skip_typos, skip_issues, quiet=True, display_prompt=display_prompt
+                    post_views, skip_typos, skip_issues, model=model_name, quiet=True, display_prompt=display_prompt
                 )
 
                 # Calculate cost for this post
-                collection_cost = calculate_cost(input_tokens, output_tokens, cache_creation, cache_read)
+                collection_cost = calculate_cost(
+                    input_tokens, output_tokens, cache_creation, cache_read, model=model_name
+                )
                 total_cost += collection_cost
 
                 total_input_tokens += input_tokens
@@ -545,4 +587,4 @@ def run(
         grouped_issues = all_issues
 
     # Display results (grouping tokens tracked separately for cost calculation)
-    display_results(grouped_issues, views, total_input_tokens, total_output_tokens, grouping_tokens)
+    display_results(grouped_issues, views, total_input_tokens, total_output_tokens, grouping_tokens, model=model_name)

@@ -42,7 +42,11 @@ log = get_logger()
 
 
 def calculate_cost(
-    input_tokens: int, output_tokens: int, cache_creation_tokens: int = 0, cache_read_tokens: int = 0
+    input_tokens: int,
+    output_tokens: int,
+    cache_creation_tokens: int = 0,
+    cache_read_tokens: int = 0,
+    model: str | None = None,
 ) -> float:
     """Calculate cost in USD for given token counts including cache costs.
 
@@ -51,13 +55,15 @@ def calculate_cost(
         output_tokens: Number of output tokens
         cache_creation_tokens: Number of tokens written to cache
         cache_read_tokens: Number of tokens read from cache
+        model: Optional model name to use for pricing (defaults to CLAUDE_MODEL)
 
     Returns:
         Cost in USD
     """
-    if CLAUDE_MODEL not in MODEL_PRICING:
-        raise ValueError(f"Unknown model '{CLAUDE_MODEL}'. Please add pricing to MODEL_PRICING dictionary.")
-    pricing = MODEL_PRICING[CLAUDE_MODEL]
+    model_name = model or CLAUDE_MODEL
+    if model_name not in MODEL_PRICING:
+        raise ValueError(f"Unknown model '{model_name}'. Please add pricing to MODEL_PRICING dictionary.")
+    pricing = MODEL_PRICING[model_name]
 
     # Regular input tokens
     regular_input_tokens = input_tokens - cache_creation_tokens - cache_read_tokens
@@ -380,6 +386,7 @@ def check_typos(views: list[dict[str, Any]], progress_callback: Any = None) -> d
 async def check_view_async(
     client: anthropic.AsyncAnthropic,
     view: dict[str, Any],
+    model: str | None = None,
     display_prompt: bool = False,
 ) -> tuple[list[dict[str, Any]], int, int, int, int]:
     """Check a single view for issues asynchronously.
@@ -387,11 +394,14 @@ async def check_view_async(
     Args:
         client: Async Anthropic client
         view: View dictionary to check
+        model: Optional model name to use (defaults to CLAUDE_MODEL from config)
         display_prompt: If True, print prompt before sending
 
     Returns:
         Tuple of (issues, input_tokens, output_tokens, cache_creation_tokens, cache_read_tokens)
     """
+    # Use provided model or default from config
+    detection_model = model or CLAUDE_MODEL
     # Handle config pseudo-views differently
     if view.get("is_config_view"):
         config_text = view.get("config_text", "")
@@ -587,7 +597,7 @@ Here is the metadata to check:"""
         full_prompt = f"{instructions}\n\n{fields_text}"
         rprint(f"\n[bold yellow]{'=' * 80}[/bold yellow]")
         rprint(
-            f"[bold yellow]Prompt to {CLAUDE_MODEL} (max_tokens={DETECTION_MAX_TOKENS}) for view {view.get('id')}:[/bold yellow]"
+            f"[bold yellow]Prompt to {detection_model} (max_tokens={DETECTION_MAX_TOKENS}) for view {view.get('id')}:[/bold yellow]"
         )
         rprint(f"[bold yellow]{'=' * 80}[/bold yellow]")
         rprint(full_prompt)
@@ -598,7 +608,7 @@ Here is the metadata to check:"""
     for attempt in range(max_retries):
         try:
             response = await client.messages.create(
-                model=CLAUDE_MODEL,
+                model=detection_model,
                 max_tokens=DETECTION_MAX_TOKENS,
                 messages=[
                     {
@@ -777,6 +787,7 @@ Here is the metadata to check:"""
 def check_issues(
     views: list[dict[str, Any]],
     api_key: str | None,
+    model: str | None = None,
     display_prompt: bool = False,
     progress_callback: Any = None,
 ) -> tuple[list[dict[str, Any]], dict[str, int]]:
@@ -785,12 +796,15 @@ def check_issues(
     Args:
         views: List of view dictionaries
         api_key: Anthropic API key
+        model: Optional model name to use (defaults to CLAUDE_MODEL from config)
         display_prompt: If True, print prompts before sending to Claude
         progress_callback: Optional callback for progress updates
 
     Returns:
         Tuple of (list of semantic issues found, usage stats dict)
     """
+    # Use provided model or default from config
+    detection_model = model or CLAUDE_MODEL
     if not api_key:
         log.warning("No Claude API key provided, skipping issue checks")
         return [], {}
@@ -803,7 +817,7 @@ def check_issues(
 
             async def check_with_semaphore(view):
                 async with semaphore:
-                    return await check_view_async(client, view, display_prompt=display_prompt)
+                    return await check_view_async(client, view, model=detection_model, display_prompt=display_prompt)
 
             tasks = [check_with_semaphore(view) for view in views]
 

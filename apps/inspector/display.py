@@ -199,8 +199,18 @@ def display_results(
     total_input_tokens: int,
     total_output_tokens: int,
     grouping_tokens: int,
+    model: str | None = None,
 ) -> None:
-    """Display grouped issues and cost."""
+    """Display grouped issues and cost.
+
+    Args:
+        grouped_issues: List of issue dictionaries
+        views: List of view dictionaries
+        total_input_tokens: Total input tokens used
+        total_output_tokens: Total output tokens used
+        grouping_tokens: Tokens used for grouping
+        model: Model name used for detection (defaults to CLAUDE_MODEL)
+    """
     # Extract unique slugs and identify types
     # Charts and posts use 'slug', explorers/multidims use 'explorerSlug'
     all_slugs = []
@@ -227,8 +237,8 @@ def display_results(
 
     # Display API usage and cost
     if total_input_tokens > 0 or total_output_tokens > 0 or grouping_tokens > 0:
-        # Calculate cost for issue detection (uses CLAUDE_MODEL)
-        detection_cost = calculate_cost(total_input_tokens, total_output_tokens)
+        # Calculate cost for issue detection
+        detection_cost = calculate_cost(total_input_tokens, total_output_tokens, model=model)
 
         # Calculate cost for grouping/pruning (uses GROUPING_MODEL)
         grouping_cost = 0.0
@@ -258,9 +268,18 @@ def display_results(
 
 
 def display_cost_estimate(
-    total_input_tokens: int, total_output_tokens: int, skip_issues: bool, num_views: int = 0
+    total_input_tokens: int, total_output_tokens: int, skip_issues: bool, num_views: int = 0, model: str | None = None
 ) -> None:
-    """Display cost estimate in dry-run mode with prompt caching."""
+    """Display cost estimate in dry-run mode with prompt caching.
+
+    Args:
+        total_input_tokens: Total input tokens
+        total_output_tokens: Total output tokens
+        skip_issues: Whether issue checking is skipped
+        num_views: Number of views to check
+        model: Model name to use for cost estimate (defaults to CLAUDE_MODEL)
+    """
+    detection_model = model or CLAUDE_MODEL
     # Estimate grouping/pruning tokens if issue checks are enabled
     grouping_tokens_estimate = 0
     if not skip_issues:
@@ -271,14 +290,14 @@ def display_cost_estimate(
     rprint("\n[bold yellow]DRY RUN - Cost Estimate:[/bold yellow]")
     if total_input_tokens > 0 or total_output_tokens > 0:
         # Calculate cost WITHOUT caching (baseline)
-        estimated_cost_no_cache = calculate_cost(total_input_tokens, total_output_tokens)
+        estimated_cost_no_cache = calculate_cost(total_input_tokens, total_output_tokens, model=detection_model)
 
         # Calculate cost WITH prompt caching
         # Instructions are ~250 tokens and are cached after first request
         instruction_tokens = 250
-        if num_views > 0 and CLAUDE_MODEL in MODEL_PRICING:
+        if num_views > 0 and detection_model in MODEL_PRICING:
             # Get pricing for the current model
-            pricing = MODEL_PRICING[CLAUDE_MODEL]
+            pricing = MODEL_PRICING[detection_model]
             input_price = pricing["input"]
             output_price = pricing["output"]
 
