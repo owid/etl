@@ -1,5 +1,12 @@
 """Configuration for the inspector app."""
 
+import yaml
+
+from etl.paths import BASE_DIR
+
+# Path to shared model pricing configuration
+MODELS_YAML_PATH = BASE_DIR / "apps" / "wizard" / "app_pages" / "expert_agent" / "models.yml"
+
 # Claude model configuration
 # Choose model based on speed vs quality tradeoff:
 # - Haiku: Fastest, cheapest (18% faster, 72% cheaper), excellent quality for this task
@@ -10,13 +17,13 @@
 # making it the best choice for large-scale analysis.
 
 # Model for individual issue detection (used many times - cost matters)
-CLAUDE_MODEL = "claude-haiku-4-5-20251001"  # Fast: $1/M in, $5/M out (RECOMMENDED)
-# CLAUDE_MODEL = "claude-sonnet-4-5-20250929"  # Balanced: $3/M in, $15/M out
-# CLAUDE_MODEL = "claude-opus-4-20250514"  # Quality: $15/M in, $75/M out
+CLAUDE_MODEL = "anthropic:claude-haiku-4-5"  # Fast: $1/M in, $5/M out (RECOMMENDED)
+# CLAUDE_MODEL = "anthropic:claude-sonnet-4-5"  # Balanced: $3/M in, $15/M out
+# CLAUDE_MODEL = "anthropic:claude-opus-4"  # Quality: $15/M in, $75/M out
 
 # Model for grouping/pruning (used once per collection - quality matters more than cost)
-GROUPING_MODEL = "claude-sonnet-4-5-20250929"  # Better reasoning for filtering false positives
-# GROUPING_MODEL = "claude-opus-4-20250514"  # Best quality if budget allows
+GROUPING_MODEL = "anthropic:claude-sonnet-4-5"  # Better reasoning for filtering false positives
+# GROUPING_MODEL = "anthropic:claude-opus-4"  # Best quality if budget allows
 
 # Concurrency limit for API requests
 # Anthropic rate limits: typically 5-50 concurrent requests depending on tier
@@ -26,17 +33,53 @@ MAX_CONCURRENT_REQUESTS = 25
 # Token limits
 GROUPING_MAX_TOKENS = 3_072  # Keep limited for quality
 
+
+def _load_model_pricing() -> dict[str, dict[str, float]]:
+    """Load model pricing from the wizard YAML configuration.
+
+    Returns:
+        Dictionary mapping model names to pricing info with 'input' and 'output' keys.
+        For models with tiered pricing, uses the first tier (lowest price).
+    """
+    with open(MODELS_YAML_PATH) as f:
+        data = yaml.safe_load(f)
+
+    pricing = {}
+
+    for model in data.get("models", []):
+        model_name = model.get("name", "")
+        cost = model.get("cost", {})
+
+        # Handle simple pricing (single value)
+        if isinstance(cost.get("in"), (int, float)):
+            input_price = float(cost["in"])
+        # Handle tiered pricing (use first tier/lowest price)
+        elif isinstance(cost.get("in"), dict):
+            values = cost["in"].get("value", [])
+            input_price = float(values[0]) if values else 0.0
+        else:
+            continue
+
+        if isinstance(cost.get("out"), (int, float)):
+            output_price = float(cost["out"])
+        elif isinstance(cost.get("out"), dict):
+            values = cost["out"].get("value", [])
+            output_price = float(values[0]) if values else 0.0
+        else:
+            continue
+
+        # Store with the model name from YAML (e.g., "anthropic:claude-sonnet-4-5")
+        pricing[model_name] = {
+            "input": input_price,
+            "output": output_price,
+        }
+
+    return pricing
+
+
 # Model pricing (USD per million tokens)
-# Source: https://claude.com/pricing (verified 2025-11-03)
-# Note: We use the regular API, not Batch API (which offers 50% discount but is asynchronous)
-# Sonnet 4.5 pricing: $3/M in, $15/M out for prompts ≤200K tokens (our use case)
-MODEL_PRICING = {
-    "claude-haiku-4-5-20251001": {"input": 1.0, "output": 5.0},
-    "claude-3-5-haiku-20241022": {"input": 1.0, "output": 5.0},  # Legacy
-    "claude-sonnet-4-5-20250929": {"input": 3.0, "output": 15.0},
-    "claude-3-7-sonnet-20250219": {"input": 3.0, "output": 15.0},  # Legacy
-    "claude-opus-4-20250514": {"input": 15.0, "output": 75.0},
-}
+# Loaded from apps/wizard/app_pages/expert_agent/models.yml
+MODEL_PRICING = _load_model_pricing()
 
 # Fields to inspect for typos and semantic issues
 # Both codespell and Claude AI will check these fields
