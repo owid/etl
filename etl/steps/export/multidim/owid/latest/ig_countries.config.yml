@@ -36,8 +36,7 @@ definitions:
         note: |-
           {definitions.note_share_denominator}
 
-
-          Suppose there are two posts, and the first one mentions **country A** and another country, and the second one mentions other countries. This equals to (50% + 0%)/2 = 25% average share of mentions for **country A**.
+          **What does "average mention mean"?** Suppose there are two posts, and the first one mentions country A and another country, and the second one mentions other countries. This equals to (50% + 0%)/2 = 25% average share of mentions for country A.
         map:
           colorScale:
             binningStrategy: manual
