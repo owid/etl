@@ -44,7 +44,7 @@ def run() -> None:
     # Sanity check
     assert tb[["country", "date"]].value_counts().max() == 1, "Duplicate country-date entries found!"
     # Get total number of posts
-    num_posts = tb["date"].nunique()
+    # num_posts = tb["date"].nunique()
 
     # Get share of posts with country X
     # tb_summary = make_tb_summary(tb, num_posts)
