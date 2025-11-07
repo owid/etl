@@ -16,10 +16,10 @@ tables:
     variables:
       value:
         title: |-
-            <% if scenario and category %>
-            << metric >> - << infrastructure_type >> << category.replace('_', ' ') >> (<< scenario.replace('_', ' ').title() >> scenario)
-            <% elif category %>
-            << metric >> - << infrastructure_type >> << category.replace('_', ' ') >>
+            <% if scenario and data_center_category %>
+            << metric >> - << infrastructure_type >> << data_center_category.replace('_', ' ') >> (<< scenario.replace('_', ' ').title() >> scenario)
+            <% elif data_center_category %>
+            << metric >> - << infrastructure_type >> << data_center_category.replace('_', ' ') >>
             <% else %>
             << metric >>
             <% endif %>
@@ -40,14 +40,14 @@ tables:
             %
             <%- endif -%>
         description_short: |-
-            <% if scenario and category %>
-            The estimated << metric.replace(' (GW)', '').replace(' (%)', '').replace(' (TWh)', '').lower() >> for << infrastructure_type >> infrastructure in the << category.replace('_', ' ') >> category under the << scenario.replace('_', ' ') >> scenario.
-            <% elif category and infrastructure_type == 'total' %>
-            The estimated << metric.replace(' (GW)', '').replace(' (%)', '').replace(' (TWh)', '').lower() >> for total data center infrastructure in the << category.replace('_', ' ') >> category.
-            <% elif category and infrastructure_type == 'it' %>
-            The estimated << metric.replace(' (GW)', '').replace(' (%)', '').replace(' (TWh)', '').lower() >> for IT equipment only in the << category.replace('_', ' ') >> category.
-            <% elif category %>
-            The estimated << metric.replace(' (GW)', '').replace(' (%)', '').replace(' (TWh)', '').lower() >> for << category.replace('_', ' ') >> data centers.
+            <% if scenario and data_center_category %>
+            The estimated << metric.replace(' (GW)', '').replace(' (%)', '').replace(' (TWh)', '').lower() >> for << infrastructure_type >> infrastructure in the << data_center_category.replace('_', ' ') >> data_center_category under the << scenario.replace('_', ' ') >> scenario.
+            <% elif data_center_category and infrastructure_type == 'total' %>
+            The estimated << metric.replace(' (GW)', '').replace(' (%)', '').replace(' (TWh)', '').lower() >> for total data center infrastructure in the << data_center_category.replace('_', ' ') >> data_center_category.
+            <% elif data_center_category and infrastructure_type == 'it' %>
+            The estimated << metric.replace(' (GW)', '').replace(' (%)', '').replace(' (TWh)', '').lower() >> for IT equipment only in the << data_center_category.replace('_', ' ') >> data_center_category.
+            <% elif data_center_category %>
+            The estimated << metric.replace(' (GW)', '').replace(' (%)', '').replace(' (TWh)', '').lower() >> for << data_center_category.replace('_', ' ') >> data centers.
             <% else %>
             The estimated << metric.replace(' (GW)', '').replace(' (%)', '').replace(' (TWh)', '').lower() >>.
             <% endif %>
