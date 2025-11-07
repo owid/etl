@@ -30,6 +30,11 @@ models:
   #     out: 8.00
   # Anthropic models
   ## Cost: https://www.anthropic.com/pricing#api
+  - name: "anthropic:claude-haiku-4-5"
+    display_name: "Haiku 4.5"
+    cost:
+      in: 1.0
+      out: 5.0
   - name: "anthropic:claude-sonnet-4-5"
     display_name: "Sonnet 4.5 (smarter)"
     cost:
@@ -39,11 +44,11 @@ models:
       out:
         value: [15, 22.50]
         brackets: [0, 200_000]
-  # - name: "anthropic:claude-3-5-haiku-latest"
-  #   display_name: "Claude 3.5 Haiku"
-  #   cost:
-  #     in: 0.8
-  #     out: 4
+  - name: "anthropic:claude-opus-4"
+    display_name: "Opus 4 (smartest)"
+    cost:
+      in: 15.0
+      out: 75.0
   # Google models
   ## Cost: https://ai.google.dev/pricing
   - name: "google-gla:gemini-2.5-pro"
