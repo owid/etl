@@ -47,7 +47,7 @@ def run() -> None:
     num_posts = tb["date"].nunique()
 
     # Get share of posts with country X
-    tb_summary = make_tb_summary(tb, num_posts)
+    # tb_summary = make_tb_summary(tb, num_posts)
 
     ##################
     # MAIN TABLE EDITS
@@ -88,8 +88,8 @@ def run() -> None:
     # Metadata
     tb_mentioned["is_mentioned"] = tb_mentioned["is_mentioned"].copy_metadata(tb["date"])
     tb_mentioned["is_mentioned_ever"] = tb_mentioned["is_mentioned_ever"].copy_metadata(tb["date"])
-    tb_summary["proportion"] = tb_summary["proportion"].copy_metadata(tb["date"])
-    tb_summary["proportion_weighed"] = tb_summary["proportion_weighed"].copy_metadata(tb["date"])
+    # tb_summary["proportion"] = tb_summary["proportion"].copy_metadata(tb["date"])
+    # tb_summary["proportion_weighed"] = tb_summary["proportion_weighed"].copy_metadata(tb["date"])
     tb_windows["share"] = tb_windows["share"].copy_metadata(tb["date"])
     tb_windows["share_weighted"] = tb_windows["share_weighted"].copy_metadata(tb["date"])
     tb_windows["count"] = tb_windows["count"].copy_metadata(tb["date"])
@@ -98,7 +98,7 @@ def run() -> None:
     tables = [
         tb_mentioned.format(index_cols, short_name="mentions"),
         tb_windows.format(index_cols + ["time_window"], short_name="ig_countries"),
-        tb_summary.format(["country"], short_name="summary"),
+        # tb_summary.format(["country"], short_name="summary"),
     ]
 
     #

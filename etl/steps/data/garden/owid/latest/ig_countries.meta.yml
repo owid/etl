@@ -80,14 +80,14 @@ tables:
         unit: ""
         description_short: Indicates whether the country has ever been mentioned in any post.
 
-  summary:
-    variables:
-      proportion:
-        title: Share of posts mentioning a country
-        unit: "%"
-        short_unit: "%"
-        description_short: Proportion of posts with country.
-      proportion_weighed:
-        title: Average mention of a country in a post
-        unit: ""
-        description_short: If there are two posts, and the first one mentions a country A and another country, this equals to (50% + 0%)/2 = 25%.
+  # summary:
+  #   variables:
+  #     proportion:
+  #       title: Share of posts mentioning a country
+  #       unit: "%"
+  #       short_unit: "%"
+  #       description_short: Proportion of posts with country.
+  #     proportion_weighed:
+  #       title: Average mention of a country in a post
+  #       unit: ""
+  #       description_short: If there are two posts, and the first one mentions a country A and another country, this equals to (50% + 0%)/2 = 25%.
