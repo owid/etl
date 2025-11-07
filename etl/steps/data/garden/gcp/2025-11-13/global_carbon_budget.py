@@ -722,8 +722,6 @@ def combine_data_and_add_variables(
     tb_energy: Table,
     ds_gdp: Dataset,
     ds_population: Table,
-    ds_regions: Dataset,
-    ds_income_groups: Dataset,
 ) -> Table:
     """Combine all relevant data into one table, add region aggregates, and add custom variables (e.g. emissions per
     capita).
@@ -746,10 +744,6 @@ def combine_data_and_add_variables(
         GDP dataset.
     ds_population : Dataset
         Population dataset.
-    ds_regions : Dataset
-        Regions dataset.
-    ds_income_groups : Dataset
-        Income groups dataset.
 
     Returns
     -------
@@ -822,26 +816,9 @@ def combine_data_and_add_variables(
     # Add region aggregates.
     # Aggregate not only emissions data, but also population, gdp and primary energy.
     # This way we ensure that custom regions (e.g. "North America (excl. USA)") will have all required data.
-    aggregations = {column: "sum" for column in tb_co2_with_regions.columns if column not in ["country", "year"]}
-    for region in REGIONS:
-        countries_in_region = geo.list_members_of_region(
-            region=region,
-            ds_regions=ds_regions,
-            ds_income_groups=ds_income_groups,
-            additional_regions=REGIONS[region].get("additional_regions", None),
-            excluded_regions=REGIONS[region].get("excluded_regions", None),
-            additional_members=REGIONS[region].get("additional_members", None),
-            excluded_members=REGIONS[region].get("excluded_members", None),
-            include_historical_regions_in_income_groups=True,
-        )
-        tb_co2_with_regions = geo.add_region_aggregates(
-            df=tb_co2_with_regions,
-            region=region,
-            countries_in_region=countries_in_region,
-            countries_that_must_have_data=[],
-            frac_allowed_nans_per_year=0.999,
-            aggregations=aggregations,
-        )
+    tb_co2_with_regions = paths.regions.add_aggregates(
+        tb=tb_co2_with_regions, regions=REGIONS, min_num_values_per_year=1
+    )
 
     # Fix consumption emissions for Africa.
     tb_co2_with_regions = fix_consumption_emissions_for_africa(tb_co2_with_regions=tb_co2_with_regions)
@@ -870,7 +847,7 @@ def combine_data_and_add_variables(
         "emissions_total_including_land_use_change",
     ]:
         # Add per-capita variables.
-        tb_co2_with_regions[f"{column}_per_capita"] = tb_co2_with_regions[column] / tb_co2_with_regions["population"]
+        tb_co2_with_regions = paths.regions.add_per_capita(tb=tb_co2_with_regions, columns=[column])
 
         # Add columns for cumulative emissions.
         # Rows that had nan emissions will have nan cumulative emissions.
@@ -1008,12 +985,6 @@ def run() -> None:
     # Load population dataset.
     ds_population = paths.load_dataset("population")
 
-    # Load regions dataset.
-    ds_regions = paths.load_dataset("regions")
-
-    # Load income groups dataset.
-    ds_income_groups = paths.load_dataset("income_groups")
-
     #
     # Process data.
     #
@@ -1072,8 +1043,6 @@ def run() -> None:
         tb_energy=tb_energy,
         ds_gdp=ds_gdp,
         ds_population=ds_population,
-        ds_regions=ds_regions,
-        ds_income_groups=ds_income_groups,
     )
 
     ####################################################################################################################
