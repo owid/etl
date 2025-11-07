@@ -16,9 +16,11 @@ def run() -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("ig_countries")
+    ds_regions = paths.load_dataset("regions")
 
     # Read table from meadow dataset.
-    tb = ds_meadow["ig_countries"].reset_index()
+    tb = ds_meadow.read("ig_countries")
+    tb_regions = ds_regions.read("regions")
 
     #
     # Process data.
@@ -55,6 +57,14 @@ def run() -> None:
             "share_post": "is_mentioned_weighted",
         }
     )
+
+    # Add missing countries
+    mask = tb_regions["region_type"] == "country"
+    countries = tb_regions.loc[mask, "name"].unique().tolist()
+    countries_missing = [c for c in countries if c not in tb["country"].unique()]
+    tb_missing = Table({"country": countries_missing, "date": tb["date"].min(), "count": 0})
+    tb = pr.concat([tb, tb_missing], ignore_index=True)
+
     # Expand time column
     tb = expand_time_column(tb, time_col="date", dimension_col="country", method="observed", fillna_method="zero")
 

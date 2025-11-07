@@ -6,21 +6,21 @@ definitions:
         - Uncategorized
   others:
     window_size: |-
-      <% if time_window == "30d" -%>
+      <% if time_window == "30d" %>
       30 days
-      <% elif time_window == "90d" -%>
+      <%- elif time_window == "90d" %>
       90 days
-      <% elif time_window == "365d" -%>
+      <%- elif time_window == "365d" %>
       365 days
-      <% else -%>
+      <%- else %>
       all time
-      <% endif -%>
+      <%- endif %>
     window_size_verbose: |-
-      <% if time_window == "all" -%>
+      <% if time_window == "all" %>
       of all time
-      <% else -%>
+      <%- else %>
       in the last {definitions.others.window_size}
-      <% endif -%>
+      <%- endif %>
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
@@ -34,18 +34,36 @@ tables:
         unit: "posts"
         description_short: |-
           Number of posts {definitions.others.window_size_verbose} that mention the country.
+        presentation:
+          title_public: |-
+            Number of posts mentioning a country
+            <%- if time_window != "all" %>
+            in the last {definitions.others.window_size}
+            <%- endif %>
       share:
         title: Share of posts mentioning country ({definitions.others.window_size})
         unit: "%"
         short_unit: "%"
         description_short: |-
           Share of posts {definitions.others.window_size_verbose} that mention the country.
+        presentation:
+          title_public: |-
+            Share of posts mentioning a country
+            <%- if time_window != "all" %>
+            in the last {definitions.others.window_size}
+            <%- endif %>
       share_weighted:
         title: Weighted share of posts mentioning country ({definitions.others.window_size})
         unit: "%"
         short_unit: "%"
         description_short: |-
           Weighted share {definitions.others.window_size_verbose}. If a post mentions 4 countries, each gets 25%.
+        presentation:
+          title_public: |-
+            Average mention of a country in a post
+            <%- if time_window != "all" %>
+            in the last {definitions.others.window_size}
+            <%- endif %>
 
   mentions:
     variables:
