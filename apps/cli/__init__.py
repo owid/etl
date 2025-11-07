@@ -179,6 +179,12 @@ GROUPS = (
             },
         },
         {
+            "name": "Inspector",
+            "commands": {
+                "inspector": "apps.inspector.inspector.run",
+            },
+        },
+        {
             "name": "Charts",
             "commands": {
                 "chart-sync": "apps.chart_sync.cli.cli",
