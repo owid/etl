@@ -5,27 +5,82 @@ definitions:
       topic_tags:
         - Uncategorized
 
-
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 365
 
-
 tables:
   ig_countries:
     variables:
-      count:
-        title: Country in post (flag)
+      is_mentioned:
+        title: Country is mentioned in post
         unit: ""
-      share_post:
-        title: Country in post (share of post)
+      is_mentioned_weighed:
+        title: Country is mentioned in post (share of post)
         unit: "%"
         short_unit: "%"
         description_short: If there are 4 countries in the post, each country will have a share of 25%
-      counts_cum:
-        title: Total count of posts with country
+      count_30d:
+        title: Number of posts mentioning country (30 days)
         unit: "posts"
+        description_short: Number of posts in the last 30 days that mention the country
+      share_30d:
+        title: Share of posts mentioning country (30 days)
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of posts in the last 30 days that mention the country
+      share_weighed_30d:
+        title: Weighted share of posts mentioning country (30 days)
+        unit: "%"
+        short_unit: "%"
+        description_short: Weighted share of posts in the last 30 days. If a post mentions 4 countries, each gets 25%
+      count_90d:
+        title: Number of posts mentioning country (90 days)
+        unit: "posts"
+        description_short: Number of posts in the last 90 days that mention the country
+      share_90d:
+        title: Share of posts mentioning country (90 days)
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of posts in the last 90 days that mention the country
+      share_weighed_90d:
+        title: Weighted share of posts mentioning country (90 days)
+        unit: "%"
+        short_unit: "%"
+        description_short: Weighted share of posts in the last 90 days. If a post mentions 4 countries, each gets 25%
+      count_365d:
+        title: Number of posts mentioning country (365 days)
+        unit: "posts"
+        description_short: Number of posts in the last 365 days that mention the country
+      share_365d:
+        title: Share of posts mentioning country (365 days)
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of posts in the last 365 days that mention the country
+      share_weighed_365d:
+        title: Weighted share of posts mentioning country (365 days)
+        unit: "%"
+        short_unit: "%"
+        description_short: Weighted share of posts in the last 365 days. If a post mentions 4 countries, each gets 25%
+      count_all:
+        title: Number of posts mentioning country (all time)
+        unit: "posts"
+        description_short: Total number of posts that mention the country
+      share_all:
+        title: Share of posts mentioning country (all time)
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of all posts that mention the country
+      share_weighed_all:
+        title: Weighted share of posts mentioning country (all time)
+        unit: "%"
+        short_unit: "%"
+        description_short: Weighted share of all posts. If a post mentions 4 countries, each gets 25%
+      is_mentioned_ever:
+        title: Country has ever been mentioned
+        unit: ""
+        description_short: Indicates whether the country has ever been mentioned in any post.
   summary:
     variables:
       proportion:
