@@ -174,7 +174,7 @@ Additionally, to construct indicators per capita, per GDP, and per unit energy, 
 - 2021-02-08: Updated this dataset with the latest annual release from the Global Carbon Project.
 - 2020-08-07: The first version of this dataset was made available.
 
-## Data alterations
+## Data processing
 
 - **We standardize names of countries and regions.** Since the names of countries and regions are different in different data sources, we standardize all names in order to minimize data loss during data merges.
 - **We recalculate carbon emissions to CO2.** The primary data sources on CO2 emissions—the Global Carbon Project, for example—typically report emissions in tonnes of carbon. We have recalculated these figures as tonnes of CO2 using a conversion factor of 3.664.
@@ -192,12 +192,11 @@ This data has been collected, aggregated, and documented by Hannah Ritchie, Max 
 
 The mission of *Our World in Data* is to make data and research on the world's largest problems understandable and accessible. [Read more about our mission](https://ourworldindata.org/about).
 
-
 ## How to cite this data?
 
 If you are using this dataset, please cite both [Our World in Data](https://ourworldindata.org/co2-and-greenhouse-gas-emissions#article-citation) and the underlying data source(s).
 
-Please follow [the guidelines in our FAQ](https://ourworldindata.org/faqs#citing-work-produced-by-third-parties-and-made-available-by-our-world-in-data) on how to cite our work.
+Please follow [the guidelines in our FAQ](https://ourworldindata.org/faqs#how-should-i-cite-your-data) on how to cite our work.
 
 """
 
