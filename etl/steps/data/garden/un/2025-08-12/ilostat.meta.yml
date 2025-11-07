@@ -38,7 +38,7 @@ definitions:
 
   age: |-
     <% if classif1 == "Age (youth, adults): 15+" %>
-     (15+)
+     (ages 15 and over)
     <%- elif classif1 == "Age (youth, adults): 15-24" %>
      aged 15-24
     <%- elif classif1 == "Age (youth, adults): 15-64" %>
@@ -54,7 +54,7 @@ definitions:
     <%- elif classif1 == "Age (aggregate): 65+" %>
      aged 65 and older
     <%- elif classif1 == "Age (aggregate): Total" %>
-     (15+)
+     (ages 15 and over)
     <%- endif %>
 
   age_unemployment: |-
@@ -212,8 +212,8 @@ definitions:
 
   # Common sort values for ordinal obs_status variables
   sort_obs_status: &sort_obs_status
-    - Survey data (observed)
-    - Estimated by ILO models
+    - Survey data (national)
+    - Estimated by ILO models (modeled)
 
   # This is the ID of the Google Doc that contains the FAQs
   gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
@@ -301,7 +301,7 @@ tables:
         title: Labor force participation rate status - <<sex>> - <<classif1>>
         unit: ""
         short_unit: ""
-        description_short: Observation status of the labor force participation rate data point.
+        description_short: Shows whether the International Labour Organization uses country-reported national survey data or fills gaps with modeled estimates for labor force participation rate.
         description_key:
           - "{definitions.description_key_iloest_modelled_data}"
           - "{definitions.description_key_13th_icls}"
@@ -336,7 +336,7 @@ tables:
         title: Unemployment rate status - <<sex>> - <<classif1>>
         unit: ""
         short_unit: ""
-        description_short: Observation status of the unemployment rate data point.
+        description_short: Shows whether the International Labour Organization uses country-reported national survey data or fills gaps with modeled estimates for unemployment rate.
         description_key:
           - "{definitions.description_key_iloest_modelled_data}"
         processing_level: major
