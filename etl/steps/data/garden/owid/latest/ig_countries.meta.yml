@@ -37,7 +37,7 @@ tables:
           Number of posts {definitions.others.window_size_verbose} that mention the country.
         presentation:
           title_public: |-
-            Number of posts mentioning a country
+            Number of Instagram posts mentioning a country
             <%- if time_window != "all" %>
             in the last {definitions.others.window_size}
             <%- endif %>
@@ -49,7 +49,7 @@ tables:
           Share of posts {definitions.others.window_size_verbose} that mention the country.
         presentation:
           title_public: |-
-            Share of posts mentioning a country
+            Share of Instagram posts mentioning a country
             <%- if time_window != "all" %>
             in the last {definitions.others.window_size}
             <%- endif %>
@@ -61,7 +61,7 @@ tables:
           Weighted share {definitions.others.window_size_verbose}. If a post mentions 4 countries, each gets 25%.
         presentation:
           title_public: |-
-            Average mention of a country in a post
+            Average mention of a country in an Instagram post
             <%- if time_window != "all" %>
             in the last {definitions.others.window_size}
             <%- endif %>
