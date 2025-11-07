@@ -1,0 +1,123 @@
+title:
+  title: Country coverage on Instagram
+  title_variant: "Tracking how we cover different countries on our Instagram posts"
+default_selection:
+  - United States
+  - India
+  - Brazil
+  - China
+  - South Africa
+
+definitions:
+  note_share_denominator: |-
+    The share is estimated only considering the posts that mention at least a country. This means we are excluding posts that do not mention any country from the denominator when calculating the share.
+  common_views:
+    - config:
+        chartTypes: ["LineChart"]
+        tab: "map"
+        hasMapTab: true
+        hideAnnotationFieldsInTitle:
+          time: true
+          entity: true
+          changeInPrefix: true
+        showNoDataArea: false
+        map:
+          colorScale:
+            baseColorScheme: RdBu
+            customNumericLabels:
+              - "No mentions"
+            # customNumericColorsActive: true
+            # customNumericColors:
+            #   - "#FFBE5C"
+
+    - dimensions:
+        indicator: share_weighted
+      config:
+        note: |-
+          {definitions.note_share_denominator}
+
+
+          Suppose there are two posts, and the first one mentions **country A** and another country, and the second one mentions other countries. This equals to (50% + 0%)/2 = 25% average share of mentions for **country A**.
+        map:
+          colorScale:
+            binningStrategy: manual
+            customNumericValues:
+              - 0
+              - 0
+              - 1
+              - 2
+              - 5
+              - 10
+              - 20
+              - -1
+
+    - dimensions:
+        indicator: share
+      config:
+        note: "{definitions.note_share_denominator}"
+        map:
+          colorScale:
+            binningStrategy: manual
+            customNumericValues:
+              - 0
+              - 0
+              - 2
+              - 5
+              - 10
+              - 20
+              - 50
+              - -1
+
+    - dimensions:
+        indicator: count
+      config:
+        map:
+          colorScale:
+            baseColorScheme: RdBu
+            binningStrategy: manual
+            customNumericValues:
+              - 0
+              - 0
+              - 1
+              - 2
+              - 5
+              - 10
+              - 20
+              - -1
+            customNumericLabels:
+              - "No mentions"
+              - "Only once"
+            customNumericColorsActive: false
+            # customNumericColors:
+            #   - "#FFBE5C"
+            #   - "#FFE2B8"
+
+dimensions:
+  - slug: indicator
+    name: Indicator
+    choices:
+      - slug: "share_weighted"
+        name: "Average post mention"
+        description: Average mention of a country in a post
+      - slug: "share"
+        name: "Share of posts"
+        description: Share of posts mentioning a country population
+      - slug: "count"
+        name: "Number of posts"
+        description: Number of posts mentioning a country
+  - slug: time_window
+    name: Period
+    choices:
+      - slug: "all"
+        name: All time
+        description: Cumulative data for all time
+      - slug: "365d"
+        name: Last 365 days
+        description: Data for the last 365 days
+      - slug: "90d"
+        name: Last 90 days
+        description: Data for the last 365 days
+      - slug: "30d"
+        name: Last 30 days
+        description: Data for the last 365 days
+views: []
