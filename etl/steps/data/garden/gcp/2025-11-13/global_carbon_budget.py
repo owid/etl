@@ -12,7 +12,7 @@ It harmonizes and further processes meadow data, and uses the following auxiliar
 import numpy as np
 import owid.catalog.processing as pr
 from owid.catalog import Dataset, Table
-from owid.datautils import dataframes
+from owid.datautils.dataframes import combine_two_overlapping_dataframes
 from structlog import get_logger
 
 from etl.data_helpers import geo
@@ -139,132 +139,6 @@ COLUMNS_THAT_MUST_HAVE_DATA = [
     "consumption_emissions",
     "emissions_from_land_use_change",
 ]
-
-
-def run() -> None:
-    #
-    # Load inputs.
-    #
-    # Load meadow dataset and read all its tables.
-    ds_meadow = paths.load_dataset("global_carbon_budget")
-    tb_co2 = ds_meadow.read("global_carbon_budget_fossil_co2_emissions", safe_types=False)
-    tb_historical = ds_meadow.read("global_carbon_budget_historical_budget", safe_types=False)
-    tb_consumption = ds_meadow.read("global_carbon_budget_consumption_emissions", safe_types=False)
-    tb_production = ds_meadow.read("global_carbon_budget_production_emissions", safe_types=False)
-    tb_land_use = ds_meadow.read("global_carbon_budget_land_use_change", safe_types=False)
-
-    # Load primary energy consumption dataset and read its main table.
-    ds_energy = paths.load_dataset("primary_energy_consumption")
-    tb_energy = ds_energy["primary_energy_consumption"].reset_index()
-
-    # Load GDP dataset.
-    ds_gdp = paths.load_dataset("maddison_project_database")
-
-    # Load population dataset.
-    ds_population = paths.load_dataset("population")
-
-    # Load regions dataset.
-    ds_regions = paths.load_dataset("regions")
-
-    # Load income groups dataset.
-    ds_income_groups = paths.load_dataset("income_groups")
-
-    #
-    # Process data.
-    #
-    # Prepare fossil CO2 emissions data.
-    tb_co2 = prepare_fossil_co2_emissions(tb_co2=tb_co2)
-
-    # Prepare consumption-based emission data.
-    tb_consumption = prepare_consumption_emissions(tb_consumption=tb_consumption)
-
-    # Prepare production-based emission data.
-    tb_production = prepare_production_emissions(tb_production=tb_production)
-
-    # Prepare land-use emission data.
-    tb_land_use = prepare_land_use_emissions(tb_land_use=tb_land_use)
-
-    # Select and rename columns from primary energy data.
-    tb_energy = tb_energy[list(PRIMARY_ENERGY_COLUMNS)].rename(columns=PRIMARY_ENERGY_COLUMNS, errors="raise")
-
-    # Prepare historical emissions data.
-    tb_historical = prepare_historical_emissions(tb_historical=tb_historical)
-
-    # Run sanity checks on input data.
-    sanity_checks_on_input_data(
-        tb_production=tb_production, tb_consumption=tb_consumption, tb_historical=tb_historical, tb_co2=tb_co2
-    )
-
-    # Extract global emissions, including bunker and land-use change emissions.
-    tb_global_emissions = extract_global_emissions(
-        tb_co2=tb_co2, tb_historical=tb_historical, ds_population=ds_population
-    )
-
-    # Harmonize country names.
-    tb_co2 = harmonize_country_names(tb=tb_co2)
-    tb_consumption = harmonize_country_names(tb=tb_consumption)
-    tb_production = harmonize_country_names(tb=tb_production)
-    tb_land_use = harmonize_country_names(tb=tb_land_use)
-
-    # Fix duplicated rows for Palau.
-    tb_co2 = fix_duplicated_palau_data(tb_co2=tb_co2)
-
-    # Add new variables to main table (consumption-based emissions, emission intensity, per-capita emissions, etc.).
-    tb_combined = combine_data_and_add_variables(
-        tb_co2=tb_co2,
-        tb_production=tb_production,
-        tb_consumption=tb_consumption,
-        tb_global_emissions=tb_global_emissions,
-        tb_land_use=tb_land_use,
-        tb_energy=tb_energy,
-        ds_gdp=ds_gdp,
-        ds_population=ds_population,
-        ds_regions=ds_regions,
-        ds_income_groups=ds_income_groups,
-    )
-
-    ####################################################################################################################
-    # The data for emissions from other industry is quite sparse.
-    # This causes the share of emissions to have spurious jumps (because during some years only a few countries are informed). You can easily see these jumps for China and US. From 1990 on, more countries are informed, and therefore the data is more reliable. So I will set the share of emissions from other industry to None for years before 1990.
-    error = "Expected emissions_from_other_industry to be informed for very few countries before 1990, and many after. Things have changed."
-    assert (
-        len(
-            set(
-                tb_combined.loc[
-                    (~tb_combined["country"].isin(REGIONS))
-                    & (tb_combined["year"] < 1990)
-                    & (tb_combined["emissions_from_other_industry"].notnull())
-                ]["country"]
-            )
-        )
-        < 10
-    ), error
-    assert (
-        len(
-            set(
-                tb_combined.loc[
-                    (tb_combined["year"] == 1990) & (tb_combined["emissions_from_other_industry"].notnull())
-                ]["country"]
-            )
-        )
-        > 50
-    ), error
-    tb_combined.loc[(tb_combined["year"] < 1990), "emissions_from_other_industry_as_share_of_global"] = None
-    tb_combined.loc[(tb_combined["year"] < 1990), "cumulative_emissions_from_other_industry_as_share_of_global"] = None
-    ####################################################################################################################
-
-    # Set an appropriate index, ensure there are no rows that only have nan, and sort conveniently.
-    tb_combined = tb_combined.format(sort_columns=True, short_name=paths.short_name)
-
-    # Run sanity checks on output data.
-    sanity_checks_on_output_data(tb_combined)
-
-    #
-    # Save outputs.
-    #
-    # Create a new garden dataset and use metadata from meadow dataset.
-    ds_garden = paths.create_dataset(tables=[tb_combined], default_metadata=ds_meadow.metadata)
-    ds_garden.save()
 
 
 def sanity_checks_on_input_data(
@@ -565,7 +439,7 @@ def prepare_fossil_co2_emissions(tb_co2: Table) -> Table:
         .assign(**{"country": "Global"})
     )
     # Combine the new table of aggregate data with the main table.
-    tb_co2 = dataframes.combine_two_overlapping_dataframes(
+    tb_co2 = combine_two_overlapping_dataframes(
         df1=tb_co2, df2=aggregated_missing_data, index_columns=["country", "year"], keep_column_order=True
     )
     # NOTE: The previous function currently does not properly propagate metadata, but keeps only the sources of the
@@ -748,41 +622,7 @@ def extract_global_emissions(tb_co2: Table, tb_historical: Table, ds_population:
     # Add a country column and add global population.
     global_emissions["country"] = "World"
 
-    # Add global population.
-    global_emissions = geo.add_population_to_table(
-        tb=global_emissions, ds_population=ds_population, population_col="global_population"
-    )
-
     return global_emissions
-
-
-def harmonize_country_names(tb: Table) -> Table:
-    """Harmonize country names, and fix known issues with certain regions.
-
-    Parameters
-    ----------
-    tb : Table
-        Emissions data (either from the fossil CO2, the production-based, consumption-based, or land-use emissions
-        datasets).
-
-    Returns
-    -------
-    tb : Table
-        Emissions data after harmonizing country names.
-
-    """
-    # Harmonize country names.
-    tb = geo.harmonize_countries(
-        df=tb,
-        countries_file=paths.country_mapping_path,
-        excluded_countries_file=paths.excluded_countries_path,
-        warn_on_missing_countries=True,
-        warn_on_unused_countries=False,
-        make_missing_countries_nan=False,
-        warn_on_unknown_excluded_countries=False,
-    )
-
-    return tb
 
 
 def fix_duplicated_palau_data(tb_co2: Table) -> Table:
@@ -942,6 +782,11 @@ def combine_data_and_add_variables(
     # Add population to original table.
     tb_co2_with_regions = geo.add_population_to_table(
         tb=tb_co2_with_regions, ds_population=ds_population, warn_on_missing_countries=False
+    )
+
+    # Add global population to global emissions table.
+    tb_global_emissions = geo.add_population_to_table(
+        tb=tb_global_emissions, ds_population=ds_population, population_col="global_population"
     )
 
     # Add GDP to main table.
@@ -1139,3 +984,137 @@ def combine_data_and_add_variables(
     )
 
     return tb_co2_with_regions
+
+
+def run() -> None:
+    #
+    # Load inputs.
+    #
+    # Load meadow dataset and read all its tables.
+    ds_meadow = paths.load_dataset("global_carbon_budget")
+    tb_co2 = ds_meadow.read("global_carbon_budget_fossil_co2_emissions", safe_types=False)
+    tb_historical = ds_meadow.read("global_carbon_budget_historical_budget", safe_types=False)
+    tb_consumption = ds_meadow.read("global_carbon_budget_consumption_emissions", safe_types=False)
+    tb_production = ds_meadow.read("global_carbon_budget_production_emissions", safe_types=False)
+    tb_land_use = ds_meadow.read("global_carbon_budget_land_use_change", safe_types=False)
+
+    # Load primary energy consumption dataset and read its main table.
+    ds_energy = paths.load_dataset("primary_energy_consumption")
+    tb_energy = ds_energy["primary_energy_consumption"].reset_index()
+
+    # Load GDP dataset.
+    ds_gdp = paths.load_dataset("maddison_project_database")
+
+    # Load population dataset.
+    ds_population = paths.load_dataset("population")
+
+    # Load regions dataset.
+    ds_regions = paths.load_dataset("regions")
+
+    # Load income groups dataset.
+    ds_income_groups = paths.load_dataset("income_groups")
+
+    #
+    # Process data.
+    #
+    # Prepare fossil CO2 emissions data.
+    tb_co2 = prepare_fossil_co2_emissions(tb_co2=tb_co2)
+
+    # Prepare consumption-based emission data.
+    tb_consumption = prepare_consumption_emissions(tb_consumption=tb_consumption)
+
+    # Prepare production-based emission data.
+    tb_production = prepare_production_emissions(tb_production=tb_production)
+
+    # Prepare land-use emission data.
+    tb_land_use = prepare_land_use_emissions(tb_land_use=tb_land_use)
+
+    # Select and rename columns from primary energy data.
+    tb_energy = tb_energy[list(PRIMARY_ENERGY_COLUMNS)].rename(columns=PRIMARY_ENERGY_COLUMNS, errors="raise")
+
+    # Prepare historical emissions data.
+    tb_historical = prepare_historical_emissions(tb_historical=tb_historical)
+
+    # Run sanity checks on input data.
+    sanity_checks_on_input_data(
+        tb_production=tb_production, tb_consumption=tb_consumption, tb_historical=tb_historical, tb_co2=tb_co2
+    )
+
+    # Extract global emissions, including bunker and land-use change emissions.
+    tb_global_emissions = extract_global_emissions(
+        tb_co2=tb_co2, tb_historical=tb_historical, ds_population=ds_population
+    )
+
+    # Harmonize country names.
+    tb_co2 = paths.regions.harmonize_names(
+        tb=tb_co2, warn_on_unused_countries=False, warn_on_unknown_excluded_countries=False
+    )
+    tb_consumption = paths.regions.harmonize_names(
+        tb=tb_consumption, warn_on_unused_countries=False, warn_on_unknown_excluded_countries=False
+    )
+    tb_production = paths.regions.harmonize_names(
+        tb=tb_production, warn_on_unused_countries=False, warn_on_unknown_excluded_countries=False
+    )
+    tb_land_use = paths.regions.harmonize_names(
+        tb=tb_land_use, warn_on_unused_countries=False, warn_on_unknown_excluded_countries=False
+    )
+
+    # Fix duplicated rows for Palau.
+    tb_co2 = fix_duplicated_palau_data(tb_co2=tb_co2)
+
+    # Add new variables to main table (consumption-based emissions, emission intensity, per-capita emissions, etc.).
+    tb_combined = combine_data_and_add_variables(
+        tb_co2=tb_co2,
+        tb_production=tb_production,
+        tb_consumption=tb_consumption,
+        tb_global_emissions=tb_global_emissions,
+        tb_land_use=tb_land_use,
+        tb_energy=tb_energy,
+        ds_gdp=ds_gdp,
+        ds_population=ds_population,
+        ds_regions=ds_regions,
+        ds_income_groups=ds_income_groups,
+    )
+
+    ####################################################################################################################
+    # The data for emissions from other industry is quite sparse.
+    # This causes the share of emissions to have spurious jumps (because during some years only a few countries are informed). You can easily see these jumps for China and US. From 1990 on, more countries are informed, and therefore the data is more reliable. So I will set the share of emissions from other industry to None for years before 1990.
+    error = "Expected emissions_from_other_industry to be informed for very few countries before 1990, and many after. Things have changed."
+    assert (
+        len(
+            set(
+                tb_combined.loc[
+                    (~tb_combined["country"].isin(REGIONS))
+                    & (tb_combined["year"] < 1990)
+                    & (tb_combined["emissions_from_other_industry"].notnull())
+                ]["country"]
+            )
+        )
+        < 10
+    ), error
+    assert (
+        len(
+            set(
+                tb_combined.loc[
+                    (tb_combined["year"] == 1990) & (tb_combined["emissions_from_other_industry"].notnull())
+                ]["country"]
+            )
+        )
+        > 50
+    ), error
+    tb_combined.loc[(tb_combined["year"] < 1990), "emissions_from_other_industry_as_share_of_global"] = None
+    tb_combined.loc[(tb_combined["year"] < 1990), "cumulative_emissions_from_other_industry_as_share_of_global"] = None
+    ####################################################################################################################
+
+    # Set an appropriate index, ensure there are no rows that only have nan, and sort conveniently.
+    tb_combined = tb_combined.format(sort_columns=True, short_name=paths.short_name)
+
+    # Run sanity checks on output data.
+    sanity_checks_on_output_data(tb_combined)
+
+    #
+    # Save outputs.
+    #
+    # Create a new garden dataset and use metadata from meadow dataset.
+    ds_garden = paths.create_dataset(tables=[tb_combined], default_metadata=ds_meadow.metadata)
+    ds_garden.save()
