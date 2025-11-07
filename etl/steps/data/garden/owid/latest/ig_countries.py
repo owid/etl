@@ -1,5 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import pandas as pd
 from owid.catalog import Table
 
 from etl.data_helpers.misc import expand_time_column
@@ -102,38 +103,44 @@ def run() -> None:
 def add_cum_values(tb, origins):
     windows = [30, 90, 365, None]  # None = all time
 
+    # Ensure date column is datetime and sort
+    tb = tb.sort_values(["country", "date"])
+
     for window in windows:
         suffix = f"_{window}d" if window else "_all"
-        # Group by country and calculate rolling/cumulative metrics
-        if window:
-            # Rolling window calculations
-            tb[f"count{suffix}"] = (
-                tb.groupby("country")["is_mentioned"]
-                .rolling(window=window, min_periods=1)
-                .sum()
-                .reset_index(level=0, drop=True)
-            )
-            tb[f"share_weighed{suffix}"] = (
-                tb.groupby("country")["is_mentioned_weighed"]
-                .rolling(window=window, min_periods=1)
-                .sum()
-                .reset_index(level=0, drop=True)
-            )
 
-            # Get total number of posts in the rolling window for share calculation
-            # Count rows in the rolling window
-            tb[f"total_posts{suffix}"] = (
-                tb.groupby("country")["is_mentioned"]
-                .rolling(window=window, min_periods=1)
-                .count()
-                .reset_index(level=0, drop=True)
-            )
+        if window:
+            # Time-based rolling window - use pandas built-in with date index
+            # We need to temporarily set date as index for time-based rolling
+            def apply_time_rolling(group):
+                # Set date as index for time-based rolling
+                g = group.set_index("date")
+
+                # Use pandas' time-based rolling with window specified as offset string
+                window_str = f"{window}D"
+
+                # Calculate rolling sums for mentions
+                g[f"count{suffix}"] = g["is_mentioned"].rolling(window_str, closed="both").sum()
+                g[f"share_weighed{suffix}"] = g["is_mentioned_weighed"].rolling(window_str, closed="both").sum()
+
+                # For total posts, we need to count unique dates in the window
+                # Use a trick: create a column of 1s and sum them in rolling window
+                g[f"total_posts{suffix}"] = g.index.to_series().rolling(window_str, closed="both").count()
+
+                return g.reset_index()
+
+            # Apply to each country group
+            result = tb.groupby("country", group_keys=False).apply(apply_time_rolling)
+
+            # Update the main dataframe with calculated columns
+            tb[f"count{suffix}"] = result[f"count{suffix}"].values
+            tb[f"share_weighed{suffix}"] = result[f"share_weighed{suffix}"].values
+            tb[f"total_posts{suffix}"] = result[f"total_posts{suffix}"].values
+
         else:
             # Cumulative calculations (all time)
             tb[f"count{suffix}"] = tb.groupby("country")["is_mentioned"].cumsum()
             tb[f"share_weighed{suffix}"] = tb.groupby("country")["is_mentioned_weighed"].cumsum()
-
-            # Total posts up to current date (cumulative row count per country)
             tb[f"total_posts{suffix}"] = tb.groupby("country").cumcount() + 1
 
         # Calculate share as percentage (normalize by total posts in window)
