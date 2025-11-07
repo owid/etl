@@ -20,6 +20,22 @@ definitions:
       config:
         chartTypes: []
         hasMapTab: true
+        map:
+          colorScale:
+            baseColorScheme: RdBu
+            binningStrategy: manual
+            customNumericValues:
+              - 1
+              - -10
+              - -5
+              - -2
+              - -1
+              # - 0
+              - 1
+              - 2
+              - 5
+              - 10
+              - -1
 
 dimensions:
   - slug: religion

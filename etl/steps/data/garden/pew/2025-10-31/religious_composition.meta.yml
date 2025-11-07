@@ -38,7 +38,6 @@ tables:
           Percentage point change in share of people that are <<religion.title()>> (2010-2020)
           <% endif -%>
         description_short: |-
-          The difference in the share of the population affiliated to << religion >> between 2010 and 2020.
           <% if religion == "religiously_unaffiliated" -%>
           The difference in the share of of people that are religiously unaffiliated between 2010 and 2020.
           <% elif religion == "other_religions" -%>
