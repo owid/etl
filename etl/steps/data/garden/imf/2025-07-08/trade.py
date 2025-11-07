@@ -117,13 +117,20 @@ def run() -> None:
     # China imports as share of GDP (attached to counterpart=World rows)
     tb = add_china_imports_share_of_gdp(tb, gdp_data)
 
-    # Total imports as share of GDP (only for counterpart=World rows)
+    # Total imports and exports as share of GDP (only for counterpart=World rows)
     tb_world = tb[(tb["country"].isin(members)) & (tb["counterpart_country"] == "World")].copy()
     total_imports = add_total_imports_share_of_gdp(tb_world, gdp_data)
+    total_exports = add_total_exports_share_of_gdp(tb_world, gdp_data)
 
     tb = pr.merge(
         tb,
         total_imports,
+        on=["country", "year", "counterpart_country"],
+        how="left",
+    )
+    tb = pr.merge(
+        tb,
+        total_exports,
         on=["country", "year", "counterpart_country"],
         how="left",
     )
@@ -162,7 +169,7 @@ def run() -> None:
     # --- Format, add origins & save ----------------------------------------------------
     tb = tb.format(["country", "year", "counterpart_country"])
     for column in tb.columns:
-        if column in ["total_imports_share_of_gdp", "china_imports_share_of_gdp"]:
+        if column in ["total_imports_share_of_gdp", "total_exports_share_of_gdp", "china_imports_share_of_gdp"]:
             tb[column].metadata.origins = [
                 tb_long["value"].metadata.origins[0],
                 gdp_data["ny_gdp_mktp_cd"].metadata.origins[0],
@@ -325,6 +332,18 @@ def add_total_imports_share_of_gdp(tb_world: Table, gdp_data: Table) -> Table:
         total_imports["total_imports_value"] / total_imports["ny_gdp_mktp_cd"] * 100
     )
     out = total_imports[["country", "year", "total_imports_share_of_gdp"]].copy()
+    out["counterpart_country"] = "World"
+    return out
+
+
+def add_total_exports_share_of_gdp(tb_world: Table, gdp_data: Table) -> Table:
+    """Add total exports as share of GDP (as %) for counterpart=World rows."""
+    total_exports = tb_world[["country", "year", EXPORT_COL]].rename(columns={EXPORT_COL: "total_exports_value"})
+    total_exports = pr.merge(gdp_data, total_exports, on=["country", "year"], how="inner")
+    total_exports["total_exports_share_of_gdp"] = (
+        total_exports["total_exports_value"] / total_exports["ny_gdp_mktp_cd"] * 100
+    )
+    out = total_exports[["country", "year", "total_exports_share_of_gdp"]].copy()
     out["counterpart_country"] = "World"
     return out
 

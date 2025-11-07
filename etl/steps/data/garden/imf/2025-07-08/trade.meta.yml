@@ -220,6 +220,22 @@ tables:
         display:
           numDecimalPlaces: 1
 
+      total_exports_share_of_gdp:
+        title: |-
+          <% if counterpart_country == 'World' %>
+          Total exports as a share of GDP
+          <%- endif -%>
+        unit: "%"
+        short_unit: "%"
+        description_short: The value of a country’s total goods exports, excluding freight and insurance costs, as a percentage of a country’s [gross domestic product (GDP)](#dod:gdp).
+        description_key:
+          - This indicator measures how large a country’s total exports are compared with the size of its economy.
+          - *fob_basis
+          - A high percentage means the country relies heavily on exports; a low percentage means it is less dependent on them.
+        description_processing: We calculated the share of exports by comparing the total value of FOB exports to the size of the economy (GDP). Specifically, total exports were divided by GDP and multiplied by 100. GDP was taken from World Bank data, both in current US dollars.
+        display:
+          numDecimalPlaces: 1
+
       import_rank:
         title:  << counterpart_country >>´s rank among import partners
         unit: "rank"
@@ -374,3 +390,4 @@ tables:
         display:
             numDecimalPlaces: 1
             name: Non-trading
+
