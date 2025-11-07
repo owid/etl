@@ -16,6 +16,7 @@ Outputs that will be committed to a branch in the co2-data repository:
 """
 
 import os
+import re
 import tempfile
 from pathlib import Path
 
@@ -27,6 +28,7 @@ from structlog import get_logger
 from etl.git_api_helpers import GithubApiRepo
 from etl.helpers import PathFinder
 from etl.paths import BASE_DIR
+from etl.version_tracker import VersionTracker
 
 # Initialize logger.
 log = get_logger()
@@ -35,10 +37,33 @@ log = get_logger()
 paths = PathFinder(__file__)
 
 
-def prepare_readme(tb: Table) -> str:
+def prepare_readme() -> str:
     # NOTE: In a future update, we could figure out a way to generate the main content of the README from the table's metadata (possibly with the help of VersionTracker).
     # origins = {origin.title_snapshot or origin.title: origin for origin in set(sum([tb[column].metadata.origins for column in tb.columns], []))}
-    readme = """\
+    df = VersionTracker().steps_df
+
+    # Get all dependencies of the current step.
+    dependencies = df[df["step"] == paths.step]["all_active_dependencies"].item()
+
+    # Get the versions of the main steps.
+    gcb_version = [step for step in dependencies if "global_carbon_budget" in step if "garden" in step][0].split("/")[
+        -2
+    ]
+    jones_version = [step for step in dependencies if "national_contributions" in step if "garden" in step][0].split(
+        "/"
+    )[-2]
+    owid_co2_version = [step for step in dependencies if "owid_co2" in step if "garden" in step][0].split("/")[-2]
+
+    # Get the versions of the auxiliary steps.
+    regions_version = [step for step in dependencies if "regions" in step][0].split("/")[-2]
+    population_version = [step for step in dependencies if "population" in step][0].split("/")[-2]
+    income_groups_version = [step for step in dependencies if "income_groups" in step][0].split("/")[-2]
+    gdp_version = [step for step in dependencies if "maddison" in step][0].split("/")[-2]
+    stat_review_version = [step for step in dependencies if "statistical_review" in step][0].split("/")[-2]
+    eia_version = [step for step in dependencies if "eia" in step][0].split("/")[-2]
+    primary_energy_version = [step for step in dependencies if "primary_energy" in step][0].split("/")[-2]
+
+    readme = f"""\
 # Data on CO2 and Greenhouse Gas Emissions by *Our World in Data*
 
 Our complete CO2 and Greenhouse Gas Emissions dataset is a collection of key metrics maintained by [*Our World in Data*](https://ourworldindata.org/co2-and-other-greenhouse-gas-emissions). It is updated regularly and includes data on CO2 emissions (annual, per capita, cumulative and consumption-based), other greenhouse gases, energy mix, and other relevant metrics.
@@ -59,58 +84,49 @@ A [full codebook](https://github.com/owid/co2-data/blob/master/owid-co2-codebook
 
 The dataset is built upon a number of datasets and processing steps:
 
-- Statistical review of world energy (Energy Institute, EI):
-  - [Source data](https://www.energyinst.org/statistical-review)
-  - [Ingestion code](https://github.com/owid/etl/blob/master/snapshots/energy_institute/2024-06-20/statistical_review_of_world_energy.py)
-  - [Basic processing code](https://github.com/owid/etl/blob/master/etl/steps/data/meadow/energy_institute/2024-06-20/statistical_review_of_world_energy.py)
-  - [Further processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/energy_institute/2024-06-20/statistical_review_of_world_energy.py)
-- International energy data (U.S. Energy Information Administration, EIA):
-  - [Source data](https://www.eia.gov/opendata/bulkfiles.php)
-  - [Ingestion code](https://github.com/owid/etl/blob/master/snapshots/eia/2023-12-12/international_energy_data.py)
-  - [Basic processing code](https://github.com/owid/etl/blob/master/etl/steps/data/meadow/eia/2023-12-12/energy_consumption.py)
-  - [Further processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/eia/2023-12-12/energy_consumption.py)
-- Primary energy consumption (Our World in Data based on EI's Statistical review of world energy & EIA's International energy data):
-  - [Processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/energy/2024-06-20/primary_energy_consumption.py)
-- Global carbon budget - Fossil CO2 emissions (Global Carbon Project):
-  - [Source data](https://zenodo.org/records/13981696/files/GCB2024v17_MtCO2_flat.csv)
-  - [Ingestion code](https://github.com/owid/etl/blob/master/snapshots/gcp/2024-11-13/global_carbon_budget.py)
-- Global carbon budget - Global carbon emissions (Global Carbon Project):
-  - [Source data](https://globalcarbonbudgetdata.org/downloads/jGJH0-data/Global_Carbon_Budget_2024_v1.0.xlsx)
-  - [Ingestion code](https://github.com/owid/etl/blob/master/snapshots/gcp/2024-11-13/global_carbon_budget.py)
-- Global carbon budget - National fossil carbon emissions (Global Carbon Project):
-  - [Source data](https://globalcarbonbudgetdata.org/downloads/jGJH0-data/National_Fossil_Carbon_Emissions_2024v1.0.xlsx)
-  - [Ingestion code](https://github.com/owid/etl/blob/master/snapshots/gcp/2024-11-13/global_carbon_budget.py)
-- Global carbon budget - National land-use change carbon emissions (Global Carbon Project):
-  - [Source data](https://globalcarbonbudgetdata.org/downloads/jGJH0-data/National_LandUseChange_Carbon_Emissions_2024v1.0.xlsx)
-  - [Ingestion code](https://github.com/owid/etl/blob/master/snapshots/gcp/2024-11-13/global_carbon_budget.py)
-- Global carbon budget (Our World in Data based on the Global Carbon Project's Fossil CO2 emissions, Global carbon emissions, National fossil carbon emissions, and National land-use change emissions):
-  - [Basic processing code](https://github.com/owid/etl/blob/master/etl/steps/data/meadow/gcp/2024-11-13/global_carbon_budget.py)
-  - [Further processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/gcp/2024-11-13/global_carbon_budget.py)
-- National contributions to climate change (Jones et al. (2024)):
+- Global carbon budget - Global Carbon Project:
+  - [Source data](https://globalcarbonbudgetdata.org/)
+  - [Ingestion code](https://github.com/owid/etl/blob/master/snapshots/gcp/{gcb_version}/global_carbon_budget.py)
+  - [Basic processing code](https://github.com/owid/etl/blob/master/etl/steps/data/meadow/gcp/{gcb_version}/global_carbon_budget.py)
+  - [Further processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/gcp/{gcb_version}/global_carbon_budget.py)
+- National contributions to climate change - Jones et al.:
   - [Source data](https://zenodo.org/records/7636699/latest)
-  - [Ingestion code](https://github.com/owid/etl/blob/master/snapshots/emissions/2024-11-21/national_contributions.py)
-  - [Basic processing code](https://github.com/owid/etl/blob/master/etl/steps/data/meadow/emissions/2024-11-21/national_contributions.py)
-  - [Further processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/emissions/2024-11-21/national_contributions.py)
-- CO2 dataset (Our World in Data based on all sources above):
-  - [Processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/emissions/2024-11-21/owid_co2.py)
+  - [Ingestion code](https://github.com/owid/etl/blob/master/snapshots/emissions/{jones_version}/national_contributions.py)
+  - [Basic processing code](https://github.com/owid/etl/blob/master/etl/steps/data/meadow/emissions/{jones_version}/national_contributions.py)
+  - [Further processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/emissions/{jones_version}/national_contributions.py)
+- Our World in data's CO2 dataset (based on all sources above):
+  - [Processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/emissions/{owid_co2_version}/owid_co2.py)
   - [Exporting code](https://github.com/owid/etl/blob/master/etl/steps/export/github/co2_data/latest/owid_co2.py)
   - [Uploading code](https://github.com/owid/etl/blob/master/etl/steps/export/s3/co2_data/latest/owid_co2.py)
 
-Additionally, to construct indicators per capita and per GDP, we use the following datasets and processing steps:
+Additionally, to construct indicators per capita, per GDP, and per unit energy, we use the following datasets and processing steps:
 - Regions (Our World in Data).
-  - [Processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/regions/2023-01-01/regions.py)
+  - [Processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/regions/{regions_version}/regions.py)
 - Population (Our World in Data based on [a number of different sources](https://ourworldindata.org/population-sources)).
-  - [Processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/demography/2024-07-15/population/__init__.py)
+  - [Processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/demography/{population_version}/population/__init__.py)
 - Income groups (World Bank).
-  - [Processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/wb/2024-07-29/income_groups.py)
-- GDP (University of Groningen GGDC's Maddison Project Database, Bolt and van Zanden, 2024).
-  - [Source data](https://www.rug.nl/ggdc/historicaldevelopment/maddison/releases/maddison-project-database-2023)
-  - [Ingestion code](https://github.com/owid/etl/blob/master/snapshots/ggdc/2024-04-26/maddison_project_database.py)
-  - [Basic processing code](https://github.com/owid/etl/blob/master/etl/steps/data/meadow/ggdc/2024-04-26/maddison_project_database.py)
-  - [Processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/ggdc/2024-04-26/maddison_project_database.py)
+  - [Processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/wb/{income_groups_version}/income_groups.py)
+- GDP (University of Groningen GGDC's Maddison Project Database, Bolt and van Zanden).
+  - [Ingestion code](https://github.com/owid/etl/blob/master/snapshots/ggdc/{gdp_version}/maddison_project_database.py)
+  - [Basic processing code](https://github.com/owid/etl/blob/master/etl/steps/data/meadow/ggdc/{gdp_version}/maddison_project_database.py)
+  - [Processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/ggdc/{gdp_version}/maddison_project_database.py)
+- Statistical review of world energy (Energy Institute, EI):
+  - [Source data](https://www.energyinst.org/statistical-review)
+  - [Ingestion code](https://github.com/owid/etl/blob/master/snapshots/energy_institute/{stat_review_version}/statistical_review_of_world_energy.py)
+  - [Basic processing code](https://github.com/owid/etl/blob/master/etl/steps/data/meadow/energy_institute/{stat_review_version}/statistical_review_of_world_energy.py)
+  - [Further processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/energy_institute/{stat_review_version}/statistical_review_of_world_energy.py)
+- International energy data (U.S. Energy Information Administration, EIA):
+  - [Source data](https://www.eia.gov/opendata/bulkfiles.php)
+  - [Ingestion code](https://github.com/owid/etl/blob/master/snapshots/eia/{eia_version}/international_energy_data.py)
+  - [Basic processing code](https://github.com/owid/etl/blob/master/etl/steps/data/meadow/eia/{eia_version}/energy_consumption.py)
+  - [Further processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/eia/{eia_version}/energy_consumption.py)
+- Primary energy consumption (EI's Statistical review of world energy & EIA's International energy data):
+  - [Processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/energy/{primary_energy_version}/primary_energy_consumption.py)
 
 ## Changelog
 
+- 2025-11-13:
+  - Updated dataset to use the latest version of the Global Carbon Budget (2025).
 - 2024-11-21:
   - Updated dataset (and codebook) to use the latest version of the Global Carbon Budget (2024), and Jones et al. (2024) (version 2024.2).
   - Now methane, nitrous oxide, and total greenhouse gas emissions data come from Jones et al. (2024), instead of Climate Watch, to provide a wider data coverage.
@@ -184,25 +200,29 @@ If you are using this dataset, please cite both [Our World in Data](https://ourw
 Please follow [the guidelines in our FAQ](https://ourworldindata.org/faqs#citing-work-produced-by-third-parties-and-made-available-by-our-world-in-data) on how to cite our work.
 
 """
+
+    log_dates = re.findall("\d{4}-\d{2}-\d{2}", readme.split("Changelog\n")[-1])
+    error = "Update the change log to add the latest update."
+    assert max(log_dates) >= max([gcb_version, jones_version, owid_co2_version]), error
+
     return readme
 
 
-def prepare_and_save_outputs(tb: Table, codebook: Table, temp_dir_path: Path) -> None:
+def prepare_and_save_outputs(tb: Table, codebook: Table, readme: str, temp_dir_path: Path) -> None:
     # Create codebook and save it as a csv file.
-    log.info("Creating codebook csv file.")
+    log.info("Saving codebook csv file.")
     pd.DataFrame(codebook).to_csv(temp_dir_path / "owid-co2-codebook.csv", index=False)
 
     # Create a csv file.
-    log.info("Creating csv file.")
+    log.info("Saving data csv file.")
     pd.DataFrame(tb).to_csv(temp_dir_path / "owid-co2-data.csv", index=False, float_format="%.3f")
 
     # Create a README file.
-    log.info("Creating README file.")
-    readme = prepare_readme(tb)
+    log.info("Saving README file.")
     (temp_dir_path / "README.md").write_text(readme)
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load data.
     #
@@ -210,6 +230,12 @@ def run(dest_dir: str) -> None:
     ds_gcp = paths.load_dataset("owid_co2")
     tb = ds_gcp.read("owid_co2")
     codebook = ds_gcp.read("owid_co2_codebook")
+
+    #
+    # Process data.
+    #
+    # Create a README file.
+    readme = prepare_readme()
 
     #
     # Save outputs.
@@ -220,23 +246,18 @@ def run(dest_dir: str) -> None:
         log.warning("You are on master branch, using dry mode.")
         dry_run = True
     else:
-        log.info(f"Committing files to branch {branch}")
         # Load DRY_RUN from env or use False as default.
         dry_run = bool(int(os.environ.get("DRY_RUN", 0)))
-
-    # Uncomment to inspect changes.
-    # from etl.data_helpers.misc import compare_tables
-    # branch = "update-ghg-emissions"
-    # old = pd.read_csv("https://raw.githubusercontent.com/owid/co2-data/refs/heads/master/owid-co2-data.csv")
-    # new = tb.copy()
-    # new = pd.read_csv(f"https://raw.githubusercontent.com/owid/co2-data/refs/heads/{branch}/owid-co2-data.csv")
-    # compare_tables(old, new, countries=["World"])
+        if dry_run:
+            log.info(f"Dry run mode: Would commit files to branch {branch}")
+        else:
+            log.info(f"Committing files to branch {branch}")
 
     # Create a temporary directory for all files to be committed.
     with tempfile.TemporaryDirectory() as temp_dir:
         temp_dir_path = Path(temp_dir)
 
-        prepare_and_save_outputs(tb, codebook=codebook, temp_dir_path=temp_dir_path)
+        prepare_and_save_outputs(tb, codebook=codebook, readme=readme, temp_dir_path=temp_dir_path)
 
         repo = GithubApiRepo(repo_name="co2-data")
 
@@ -257,3 +278,11 @@ def run(dest_dir: str) -> None:
         log.info(
             f"Files committed successfully to branch {branch}. Create a PR here https://github.com/owid/co2-data/compare/master...{branch}."
         )
+
+    # Uncomment to inspect changes (after the new branch has been created).
+    # from etl.data_helpers.misc import compare_tables
+    # branch = "update-ghg-emissions"
+    # old = pd.read_csv("https://raw.githubusercontent.com/owid/co2-data/refs/heads/master/owid-co2-data.csv")
+    # new = tb.copy()
+    # new = pd.read_csv(f"https://raw.githubusercontent.com/owid/co2-data/refs/heads/{branch}/owid-co2-data.csv")
+    # compare_tables(old, new, countries=["World"])

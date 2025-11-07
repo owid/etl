@@ -82,12 +82,12 @@ steps:
   # Emissions - CO2 dataset.
   #
   export://github/co2_data/latest/owid_co2:
-    - data://garden/emissions/2024-11-21/owid_co2
+    - data://garden/emissions/2025-11-13/owid_co2
   #
   # Emissions - CO2 dataset.
   #
   export://s3/co2_data/latest/owid_co2:
-    - data://garden/emissions/2024-11-21/owid_co2
+    - data://garden/emissions/2025-11-13/owid_co2
   #
   # Jones et al. - National contributions to climate change.
   #
