@@ -433,7 +433,7 @@ def get_country_import_ranking(tb: Table, target_country: str) -> Table:
         if rank == 0:
             return target_country
         elif rank == 1:
-            return "1st - Top partner"
+            return "1st - Top source"
         elif rank == 2:
             return "2nd"
         elif rank == 3:
