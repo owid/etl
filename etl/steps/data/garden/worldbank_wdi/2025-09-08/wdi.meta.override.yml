@@ -53,9 +53,10 @@ definitions:
   # ILOSTAT definitions
   ####################################################################################
 
-  employment: Employment refers to people of working age who worked for at least an hour during the reference period (typically a week), whether in paid employment or self-employment.
+  employment: Employment refers to people who worked for at least an hour during the reference period (typically a week), whether in paid employment or self-employment.
+  employment_for_employment_to_population_ratio: This indicator is defined as the proportion of a country’s working-age population that is employed. Employment refers to people who worked for at least an hour during the reference period (typically a week), whether in paid employment or self-employment. This indicator gives a broad sense of how many people in a country are working, regardless of the kind of job they have or how many hours they work.
 
-  icse_93: These statuses in employment are provided according to the [International Standard Classification of Status in Employment](https://ilostat.ilo.org/methods/concepts-and-definitions/classification-status-at-work/) (ICSE-93).
+  icse_93: The concept of status in employment refers to a person's relationship with their job — that is, who they work for or with. It does not refer to the sector, their skill level, or the quality of their work. This is based on the [International Standard Classification of Status in Employment (ICSE-93)](#dod:icse-93), which groups jobs according to the type of relationship between the worker and their job or employer.
 
   description_short_labor_force_participation_rate: |-
     Share of the << sex >>working-age population << age >>who are economically active (employed or unemployed).
@@ -87,32 +88,34 @@ definitions:
   description_key_labor_force_participation_2: |-
     People who are not seeking work or are not available, such as students, retired people, or unpaid caregivers, are excluded as they are considered to be outside the labor force.
   description_key_unemployment: |-
-    The unemployment rate measures the share of the labor force that is without a job but actively looking for work and available to start soon. It is one of the most widely used indicators of labor market conditions across countries and over time.
+    The unemployment rate measures the share of the [labor force](#dod:labor-force) that is without a job but actively looking for work and available to start soon. It is one of the most widely used indicators of labor market conditions across countries and over time.
 
   description_key_iloest_modelled_data: |-
-    This data comes from the ILO Modelled Estimates series. The ILO combines countries' own reported estimates with statistically modeled estimates when observations are missing. This ensures that the data follows harmonized definitions and is comparable across countries and over time. It also allows the ILO to calculate regional and global aggregates for every year. You can read more about how the ILO produces these estimates in the [Modelled Estimates documentation](https://ilostat.ilo.org/methods/concepts-and-definitions/ilo-modelled-estimates/).
+    This data comes from the ILO Modelled Estimates series. The ILO combines countries' own reported estimates with statistically modeled estimates when observations are missing. This improves comparability across countries and over time and allows the ILO to calculate regional and global aggregates for every year. You can read more about how the ILO produces these estimates in the [Modelled Estimates documentation](https://ilostat.ilo.org/methods/concepts-and-definitions/ilo-modelled-estimates/).
   description_key_national_estimates: |-
     This data comes from national sources, typically labor force surveys, household surveys, or population censuses. Each country uses its own definitions and methods, so this data may not be directly comparable across countries and over time.
   description_key_13th_icls: |-
-    This data follows the standards of the [13th International Classification of Labour Statisticians (ICLS)](#dod:13-icls). One important point is that employment encompasses work for pay or profit, including self-employment, and also the production of goods for own use (such as subsistence farming). Changes in the definition of employment imply changes in the identification of the unemployed and of those out of the labor force. Because definitions changed under the [19th ICLS](#dod:19-icls), data using those newer definitions are not fully comparable with data based on the 13th ICLS. You can read more about the definitions in [this explainer by the ILO](https://www.ilo.org/publications/quick-guide-understanding-impact-new-statistical-standards-ilostat).
+    This data follows the standards of the [13th International Classification of Labour Statisticians (ICLS)](#dod:13-icls). Under this framework, employment includes work for pay or profit, including self-employment, as well as the production of goods for own use (such as subsistence farming). Changes in the definition of employment also affect who is counted as unemployed or outside the labor force. Because definitions were updated under the [19th ICLS](#dod:19-icls), data using the newer definitions is not fully comparable with data based on the 13th ICLS. You can read more about the definitions in [this explainer by the ILO](https://www.ilo.org/publications/quick-guide-understanding-impact-new-statistical-standards-ilostat).
 
   description_key_working_age_ilo_modeled: |-
     When defining the labor force, the definition of “working age” varies across countries, depending on national laws and practices. In the ILO modeled estimates shown here, this is harmonized to refer to people aged 15 and older.
   description_key_working_age_ilo_modeled_employment: |-
     When defining the working-age population, the definition of “working age” varies across countries, depending on national laws and practices. In the ILO modeled estimates shown here, this is harmonized to refer to people aged 15 and older.
   description_key_working_age_ilo_national: |-
-    When defining the labor force, the working-age population includes all people above the legal working age for employment in each country. The ILO recommends defining it as people aged 15 and older, but national definitions vary, depending on local laws. Some countries also set an upper age limit.
+    When defining the labor force, the working-age population includes all people above the legal working age for employment in each country. The ILO’s guidelines define it as people aged 15 and older, but national definitions vary, depending on local laws. Some countries also set an upper age limit.
 
-  description_key_own_account_workers: |-
-    _Own-account workers_ are defined as workers working on self-employment jobs who do not engage any employees to work with them.
-  description_key_contributing_family_workers: |-
-    _Contributing family workers_ are defined as workers working on self-employment jobs who work in an enterprise operated by a related person living in the same household.
+  description_key_vulnerable_employment_1: |-
+    This indicator shows the share of employed people in vulnerable employment – those working as own-account workers or as contributing family members. These groups are more likely to lack formal arrangements and social protection, and to have variable income.
+  description_key_vulnerable_employment_2: |-
+    Own-account workers are defined as workers in self-employment jobs who do not engage any employees to work with them. Contributing family members are workers in self-employment jobs who work in an enterprise operated by a related person living in the same household. These groups are defined according to the [International Standard Classification of Status in Employment (ICSE-93)](#dod:icse-93).
+  description_key_vulnerable_employment_3: |-
+    A higher share indicates greater labor market vulnerability, which is more common in lower-income countries. Over time, the share tends to fall as countries get richer and more workers move into wage and salaried employment. It’s important to note that this is a broad measure: even within this category, people’s work circumstances can vary widely. For example, some own-account workers in rich countries are highly paid professionals or freelancers, and would not usually be considered “vulnerable”.
   description_key_employment_agriculture: |-
-    The agriculture sector includes crop and animal production, hunting, forestry, logging, and fishing and aquaculture activities, as defined by the [International Standard Industrial Classification of All Economic Activities (ISIC)](https://ilostat.ilo.org/methods/concepts-and-definitions/classification-economic-activities/) (category A in ISIC revision 4).
+    The agriculture sector includes crop and animal production, hunting, forestry, logging, and fishing and aquaculture activities, as defined by the [International Standard Industrial Classification of All Economic Activities (ISIC)](https://ilostat.ilo.org/methods/concepts-and-definitions/classification-economic-activities/).
   description_key_employment_industry: |-
-    The industry sector includes mining and quarrying, manufacturing, electricity, gas, steam and air conditioning supply, water supply, and construction activities, as defined by the [International Standard Industrial Classification of All Economic Activities (ISIC)](https://ilostat.ilo.org/methods/concepts-and-definitions/classification-economic-activities/) (categories B to F in ISIC revision 4).
+    The industry sector includes mining and quarrying, manufacturing, construction, and public utilities (electricity, gas, and water), as defined by the [International Standard Industrial Classification of All Economic Activities (ISIC)](https://ilostat.ilo.org/methods/concepts-and-definitions/classification-economic-activities/).
   description_key_employment_services: |-
-    The services sector includes market services (trade, transportation, accommodation and food, and business and administrative services), and non-market services (public administration, community, social, and other services and activities) as defined by the [International Standard Industrial Classification of All Economic Activities (ISIC)](https://ilostat.ilo.org/methods/concepts-and-definitions/classification-economic-activities/) (categories G to U in ISIC revision 4).
+    The services sector includes wholesale and retail trade; restaurants and hotels; transport, storage, and communications; financing, insurance, real estate, and business and administrative services; and public administration, community, social, and personal services, as defined by the International Standard Industrial Classification of All Economic Activities (ISIC).
 
   note_icls_13: |-
     Employment is defined in line with the [13th ICLS](#dod:13-icls) and includes the production of goods for own use, such as subsistence farming.
@@ -1452,7 +1455,7 @@ tables:
           <%- set age = "(ages 15 and older) " %>
           {definitions.description_short_employment_to_population_ratio}
         description_key:
-          - "{definitions.employment}"
+          - "{definitions.employment_for_employment_to_population_ratio}"
           - "{definitions.description_key_working_age_ilo_modeled_employment}"
           - "{definitions.description_key_iloest_modelled_data}"
           - "{definitions.description_key_13th_icls}"
@@ -1479,7 +1482,7 @@ tables:
           <%- set age = "(ages 15 and older) " %>
           {definitions.description_short_employment_to_population_ratio}
         description_key:
-          - "{definitions.employment}"
+          - "{definitions.employment_for_employment_to_population_ratio}"
           - "{definitions.description_key_working_age_ilo_modeled_employment}"
           - "{definitions.description_key_iloest_modelled_data}"
           - "{definitions.description_key_13th_icls}"
@@ -1506,7 +1509,7 @@ tables:
           <%- set age = "(ages 15 and older) " %>
           {definitions.description_short_employment_to_population_ratio}
         description_key:
-          - "{definitions.employment}"
+          - "{definitions.employment_for_employment_to_population_ratio}"
           - "{definitions.description_key_working_age_ilo_modeled_employment}"
           - "{definitions.description_key_iloest_modelled_data}"
           - "{definitions.description_key_13th_icls}"
@@ -1533,7 +1536,7 @@ tables:
           <%- set age = "" %>
           {definitions.description_short_employment_to_population_ratio} {definitions.note_national_estimates}
         description_key:
-          - "{definitions.employment}"
+          - "{definitions.employment_for_employment_to_population_ratio}"
           - "{definitions.description_key_working_age_ilo_national}"
           - "{definitions.description_key_national_estimates}"
           - "{definitions.description_key_13th_icls}"
@@ -1560,7 +1563,7 @@ tables:
           <%- set age = "" %>
           {definitions.description_short_employment_to_population_ratio} {definitions.note_national_estimates}
         description_key:
-          - "{definitions.employment}"
+          - "{definitions.employment_for_employment_to_population_ratio}"
           - "{definitions.description_key_working_age_ilo_national}"
           - "{definitions.description_key_national_estimates}"
           - "{definitions.description_key_13th_icls}"
@@ -1584,10 +1587,10 @@ tables:
         short_unit: "%"
         description_short: "{definitions.description_short_vulnerable_employment}"
         description_key:
-          - "{definitions.employment}"
-          - "{definitions.description_key_own_account_workers}"
-          - "{definitions.description_key_contributing_family_workers}"
-          - "{definitions.icse_93}"
+          - "{definitions.description_key_vulnerable_employment_1}"
+          - "{definitions.description_key_vulnerable_employment_2}"
+          - "{definitions.description_key_vulnerable_employment_3}"
+          - "{definitions.description_key_working_age_ilo_modeled_employment}"
           - "{definitions.description_key_iloest_modelled_data}"
           - "{definitions.description_key_13th_icls}"
         presentation:
