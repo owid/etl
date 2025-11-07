@@ -459,7 +459,7 @@ tables:
         description_key:
           - "{definitions.description_key_informal_employment_1}"
           - "{definitions.description_key_informal_employment_2}"
-          - "{definitions.description_key_employment}"
+          - "{definitions.employment}"
           - "{definitions.description_key_13th_icls}"
         presentation:
           grapher_config:
@@ -479,8 +479,10 @@ tables:
           <%- set sex = "females " %>
           {definitions.description_short_informal_employment} {definitions.note_national_estimates}
         description_key:
+          - "{definitions.description_key_informal_employment_1}"
+          - "{definitions.description_key_informal_employment_2}"
           - "{definitions.employment}"
-          - "{definitions.description_key_informal_employment}"
+          - "{definitions.description_key_13th_icls}"
         presentation:
           grapher_config:
             title: Share of female workers in informal employment
@@ -499,8 +501,10 @@ tables:
           <%- set sex = "males " %>
           {definitions.description_short_informal_employment} {definitions.note_national_estimates}
         description_key:
+          - "{definitions.description_key_informal_employment_1}"
+          - "{definitions.description_key_informal_employment_2}"
           - "{definitions.employment}"
-          - "{definitions.description_key_informal_employment}"
+          - "{definitions.description_key_13th_icls}"
         presentation:
           grapher_config:
             title: Share of male workers in informal employment
