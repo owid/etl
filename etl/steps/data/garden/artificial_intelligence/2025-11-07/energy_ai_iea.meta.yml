@@ -1,0 +1,71 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Artificial Intelligence
+        - Energy
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  energy_ai_iea:
+    variables:
+      value:
+        title: |-
+            <% if scenario and category %>
+            << metric >> - << infrastructure_type >> << category.replace('_', ' ') >> (<< scenario.replace('_', ' ').title() >> scenario)
+            <% elif category %>
+            << metric >> - << infrastructure_type >> << category.replace('_', ' ') >>
+            <% else %>
+            << metric >>
+            <% endif %>
+        unit: |-
+            <% if 'GW' in metric %>
+            gigawatts
+            <% elif 'TWh' in metric %>
+            terawatt-hours
+            <% elif '%' in metric %>
+            %
+            <%- endif -%>
+        short_unit: |-
+            <% if 'GW' in metric %>
+            GW
+            <% elif 'TWh' in metric %>
+            TWh
+            <% elif '%' in metric %>
+            %
+            <%- endif -%>
+        description_short: |-
+            <% if scenario and category %>
+            The estimated << metric.replace(' (GW)', '').replace(' (%)', '').replace(' (TWh)', '').lower() >> for << infrastructure_type >> infrastructure in the << category.replace('_', ' ') >> category under the << scenario.replace('_', ' ') >> scenario.
+            <% elif category and infrastructure_type == 'total' %>
+            The estimated << metric.replace(' (GW)', '').replace(' (%)', '').replace(' (TWh)', '').lower() >> for total data center infrastructure in the << category.replace('_', ' ') >> category.
+            <% elif category and infrastructure_type == 'it' %>
+            The estimated << metric.replace(' (GW)', '').replace(' (%)', '').replace(' (TWh)', '').lower() >> for IT equipment only in the << category.replace('_', ' ') >> category.
+            <% elif category %>
+            The estimated << metric.replace(' (GW)', '').replace(' (%)', '').replace(' (TWh)', '').lower() >> for << category.replace('_', ' ') >> data centers.
+            <% else %>
+            The estimated << metric.replace(' (GW)', '').replace(' (%)', '').replace(' (TWh)', '').lower() >>.
+            <% endif %>
+        description_key:
+          - |-
+            **Infrastructure types:**
+            - **Total**: Includes all data center infrastructure (IT equipment, cooling, power distribution, etc.)
+            - **IT**: IT equipment only (servers, storage, network equipment)
+          - |-
+            **Categories:**
+            - **Hyperscale**: Large-scale data centers operated by major cloud and internet companies
+            - **Colocation and service provider**: Third-party data centers that rent space to multiple clients
+            - **Enterprise**: Data centers owned and operated by individual organizations for their own use
+          - |-
+            **Scenarios (for 2030 and 2035 projections):**
+            - **Base**: Baseline projection based on current trends
+            - **Lift-Off**: Higher growth scenario with accelerated AI adoption
+            - **High Efficiency**: Scenario with significant efficiency improvements
+            - **Headwinds**: Lower growth scenario due to various constraints
+        display:
+          numDecimalPlaces: 0
