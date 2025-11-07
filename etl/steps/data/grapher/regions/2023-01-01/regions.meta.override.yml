@@ -26,6 +26,14 @@ definitions:
     title: Regional groupings used in Report and Statistical Annex
     url_main: https://unstats.un.org/sdgs/indicators/regional-groups/
     date_accessed: *date_accessed
+  origins_pew_regions: &origins_pew_regions
+    producer: Pew Research Center
+    title: Countries/areas by Pew region
+    url_main: https://www.pewresearch.org/religion/2024/08/19/religious-compositions-migrants-appendix-a-regions/#asia-pacific
+    date_accessed: 2025-11-07
+    date_published: 2024-08-19
+    citation_full: |-
+      Pew Research Center. (2024, August 19). Religious compositions of migrants: Appendix A: Regions. Pew Research Center. https://www.pewresearch.org/religion/2024/08/19/religious-compositions-migrants-appendix-a-regions/#asia-pacific. Appendix A: Regions.
 
 tables:
   regions:
@@ -107,9 +115,9 @@ tables:
         origins:
           - *origins_un_m49
       un_region:
-        title: "[DEPRECATED] World regions according to the UN"
+        title: "World regions according to the UN"
         description_short: |-
-          [Don't use this indicator, use UN M49 ones]. Regions defined by the United Nations, which are used across the UN including UN WPP.
+          Regions defined by the United Nations, which are used across the UN including UN WPP.
         origins:
           - *origins_un_m49
 
@@ -163,3 +171,19 @@ tables:
           - Western Pacific (WHO)
         origins:
           - *origins_who_regions
+
+      # Pew
+      pew_region:
+        title: World regions according to Pew
+        description_short: |-
+          Regions as defined by the Pew Research Center.
+        type: ordinal
+        sort:
+          - North America (Pew)
+          - Latin America-Caribbean (Pew)
+          - Sub-Saharan Africa (Pew)
+          - Middle East-North Africa (Pew)
+          - Europe (Pew)
+          - Asia-Pacific (Pew)
+        origins:
+          - *origins_pew_regions

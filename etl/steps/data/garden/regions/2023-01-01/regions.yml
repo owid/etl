@@ -2474,6 +2474,54 @@
     - "WSM"
 
 ##########
+# UN
+# Hybrid of M49, almost equivalent with L1 but replaces Americas with LATAM and North America
+# https://unstats.un.org/unsd/methodology/m49/
+##########
+- code: UN_AFR
+  name: "Africa (UN)"
+  region_type: "aggregate"
+  defined_by: un
+  members:
+    - UNM49_NAF
+    - UNM49_SSA
+
+- code: UN_NAM
+  name: "Northern America (UN)"
+  region_type: "aggregate"
+  defined_by: un
+  members:
+    - UNM49_NAM
+
+- code: UN_LAC
+  name: "Latin America and the Caribbean (UN)"
+  region_type: "aggregate"
+  defined_by: un
+  members:
+    - UNM49_LAC
+
+- code: UN_ASI
+  name: "Asia (UN)"
+  region_type: "aggregate"
+  defined_by: un
+  members:
+    - UNM49_ASI
+
+- code: UN_EUR
+  name: "Europe (UN)"
+  region_type: "aggregate"
+  defined_by: un
+  members:
+    - UNM49_EUR
+
+- code: UN_OCE
+  name: "Oceania (UN)"
+  region_type: "aggregate"
+  defined_by: un
+  members:
+    - UNM49_OCE
+
+##########
 # UN M49
 # https://unstats.un.org/unsd/methodology/m49/
 ##########
@@ -3203,3 +3251,268 @@
     - "UGA"
     - "ZMB"
     - "ZWE"
+##########
+# PEW
+##########
+- code: PEW_APA
+  name: "Asia-Pacific (Pew)"
+  region_type: "aggregate"
+  defined_by: pew
+  members:
+    - AFG
+    - ASM
+    - ARM
+    - AUS
+    - AZE
+    - BGD
+    - BTN
+    - BRN
+    - KHM
+    - CHN
+    - COK
+    - CYP
+    - FSM
+    - FJI
+    - PYF
+    - GUM
+    - HKG
+    - IND
+    - IDN
+    - IRN
+    - JPN
+    - KAZ
+    - KIR
+    - KGZ
+    - LAO
+    - MAC
+    - MYS
+    - MDV
+    - MHL
+    - MNG
+    - MMR
+    - NRU
+    - NPL
+    - NCL
+    - NZL
+    - NIU
+    - PRK
+    - MNP
+    - PAK
+    - PLW
+    - PNG
+    - PHL
+    - WSM
+    - SGP
+    - SLB
+    - KOR
+    - LKA
+    - TJK
+    - THA
+    - TLS
+    - TKL
+    - TON
+    - TUR
+    - TKM
+    - TUV
+    - UZB
+    - VUT
+    - VNM
+    - WLF
+- code: PEW_EUR
+  name: "Europe (Pew)"
+  region_type: "aggregate"
+  defined_by: pew
+  members:
+    - ALB
+    - AND
+    - AUT
+    - BLR
+    - BEL
+    - BIH
+    - BGR
+    - OWID_CIS
+    - HRV
+    - CZE
+    - DNK
+    - EST
+    - FRO
+    - FIN
+    - FRA
+    - GEO
+    - DEU
+    - GIB
+    - GRC
+    - HUN
+    - ISL
+    - IRL
+    - IMN
+    - ITA
+    - LVA
+    - LIE
+    - LTU
+    - LUX
+    - MLT
+    - MDA
+    - MCO
+    - MNE
+    - NLD
+    - MKD
+    - NOR
+    - POL
+    - PRT
+    - ROU
+    - RUS
+    - SMR
+    - SRB
+    - SVK
+    - SVN
+    - ESP
+    - SWE
+    - CHE
+    - UKR
+    - GBR
+    - VAT
+- code: PEW_LAC
+  name: "Latin America-Caribbean (Pew)"
+  region_type: "aggregate"
+  defined_by: pew
+  members:
+    - AIA
+    - ATG
+    - ARG
+    - ABW
+    - BHS
+    - BRB
+    - BLZ
+    - BOL
+    - BRA
+    - VGB
+    - BES
+    - CYM
+    - CHL
+    - COL
+    - CRI
+    - CUB
+    - CUW
+    - DMA
+    - DOM
+    - ECU
+    - SLV
+    - FLK
+    - GUF
+    - GRD
+    - GLP
+    - GTM
+    - GUY
+    - HTI
+    - HND
+    - JAM
+    - MTQ
+    - MEX
+    - MSR
+    - NIC
+    - PAN
+    - PRY
+    - PER
+    - PRI
+    - SXM
+    - KNA
+    - LCA
+    - VCT
+    - SUR
+    - TTO
+    - TCA
+    - VIR
+    - URY
+    - VEN
+- code: PEW_MENA
+  name: "Middle East-North Africa (Pew)"
+  region_type: "aggregate"
+  defined_by: pew
+  members:
+    - DZA
+    - BHR
+    - EGY
+    - IRQ
+    - ISR
+    - JOR
+    - KWT
+    - LBN
+    - LBY
+    - MAR
+    - OMN
+    - PSE
+    - QAT
+    - SAU
+    - SDN
+    - SYR
+    - TUN
+    - ARE
+    - ESH
+    - YEM
+- code: PEW_NAM
+  name: "North America (Pew)"
+  region_type: "aggregate"
+  defined_by: pew
+  members:
+    - BMU
+    - CAN
+    - GRL
+    - SPM
+    - USA
+- code: PEW_SSA
+  name: "Sub-Saharan Africa (Pew)"
+  region_type: "aggregate"
+  defined_by: pew
+  members:
+    - AGO
+    - BEN
+    - BWA
+    - BFA
+    - BDI
+    - CMR
+    - CPV
+    - CAF
+    - TCD
+    - COM
+    - COD
+    - DJI
+    - GNQ
+    - ERI
+    - SWZ
+    - ETH
+    - GAB
+    - GMB
+    - GHA
+    - GIN
+    - GNB
+    - CIV
+    - KEN
+    - LSO
+    - LBR
+    - MDG
+    - MWI
+    - MLI
+    - MRT
+    - MUS
+    - MYT
+    - MOZ
+    - NAM
+    - NER
+    - NGA
+    - COG
+    - REU
+    - RWA
+    - STP
+    - SEN
+    - SYC
+    - SLE
+    - SOM
+    - ZAF
+    - SSD
+    - SHN
+    - TZA
+    - TGO
+    - UGA
+    - ZMB
+    - ZWE
