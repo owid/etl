@@ -86,10 +86,86 @@ def process_world_data(snap) -> pd.DataFrame:
         # Determine infrastructure type based on category position
         if category == "Total":
             current_infrastructure = "total"
-            continue  # Skip Total row itself, we only want the breakdown
+            # Extract Total values as aggregate data
+            for i, year in enumerate(historical_years):
+                value = row[3 + i]
+                if pd.notna(value):
+                    data_rows.append(
+                        {
+                            "year": year,
+                            "metric": current_metric,
+                            "category": "total",
+                            "infrastructure_type": "None",
+                            "scenario": "historical",
+                            "value": value,
+                        }
+                    )
+
+            # Scenario projections for Total
+            scenario_columns = {
+                "Base": [(7, 2030), (8, 2035)],
+                "Lift-Off": [(10, 2030), (11, 2035)],
+                "High Efficiency": [(13, 2030), (14, 2035)],
+                "Headwinds": [(16, 2030), (17, 2035)],
+            }
+
+            for scenario_name, year_cols in scenario_columns.items():
+                for col_idx, year in year_cols:
+                    value = row[col_idx]
+                    if pd.notna(value):
+                        data_rows.append(
+                            {
+                                "year": year,
+                                "metric": current_metric,
+                                "category": "total",
+                                "infrastructure_type": "None",
+                                "scenario": scenario_name.lower().replace(" ", "_"),
+                                "value": value,
+                            }
+                        )
+            continue
+
         elif category == "IT":
             current_infrastructure = "it"
-            continue  # Skip IT row itself, it's just a label
+            # Extract IT values as aggregate data
+            for i, year in enumerate(historical_years):
+                value = row[3 + i]
+                if pd.notna(value):
+                    data_rows.append(
+                        {
+                            "year": year,
+                            "metric": current_metric,
+                            "category": "it",
+                            "infrastructure_type": "None",
+                            "scenario": "historical",
+                            "value": value,
+                        }
+                    )
+
+            # Scenario projections for IT
+            scenario_columns = {
+                "Base": [(7, 2030), (8, 2035)],
+                "Lift-Off": [(10, 2030), (11, 2035)],
+                "High Efficiency": [(13, 2030), (14, 2035)],
+                "Headwinds": [(16, 2030), (17, 2035)],
+            }
+
+            for scenario_name, year_cols in scenario_columns.items():
+                for col_idx, year in year_cols:
+                    value = row[col_idx]
+                    if pd.notna(value):
+                        data_rows.append(
+                            {
+                                "year": year,
+                                "metric": current_metric,
+                                "category": "it",
+                                "infrastructure_type": "None",
+                                "scenario": scenario_name.lower().replace(" ", "_"),
+                                "value": value,
+                            }
+                        )
+            continue
+
         elif category in ["Hyperscale", "Colocation and service provider", "Enterprise"]:
             # Historical years (2020, 2023, 2024)
             for i, year in enumerate(historical_years):
@@ -179,7 +255,10 @@ def process_regional_data(snap) -> pd.DataFrame:
 
         if not country or country == "nan" or not current_metric:
             continue
-
+        if current_metric == "Power usage effectiveness":
+            current_metric = "Total power usage effectiveness"
+        elif current_metric == "Load factor (%)":
+            current_metric = "Total load factor (%)"
         # Extract values for each year
         for i, year in enumerate(years):
             if year is not None:

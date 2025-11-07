@@ -28,7 +28,6 @@ def run() -> None:
 
     # Format with proper index
     tb = tb.format(["country", "year", "metric", "category", "infrastructure_type", "scenario"])
-    print(tb)
     #
     # Save outputs.
     #
