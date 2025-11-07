@@ -30,7 +30,7 @@ def run() -> None:
     tb = Table(pd.DataFrame(df), short_name="energy_ai_iea")
 
     # Set index - year, country, and metric form the primary key
-    tb = tb.format(["country", "year", "metric", "category", "infrastructure_type", "scenario"])
+    tb = tb.format(["country", "year", "metric", "data_center_category", "infrastructure_type", "scenario"])
     # Add metadata
     for col in tb.columns:
         tb[col].metadata.origins = [snap.metadata.origin]
@@ -85,7 +85,7 @@ def process_world_data(snap) -> pd.DataFrame:
 
         # Determine infrastructure type based on category position
         if category == "Total":
-            current_infrastructure = "total"
+            current_infrastructure = "Total"
             # Extract Total values as aggregate data
             for i, year in enumerate(historical_years):
                 value = row[3 + i]
@@ -94,8 +94,8 @@ def process_world_data(snap) -> pd.DataFrame:
                         {
                             "year": year,
                             "metric": current_metric,
-                            "category": "total",
-                            "infrastructure_type": "None",
+                            "data_center_category": "Total",
+                            "infrastructure_type": current_infrastructure,
                             "scenario": "historical",
                             "value": value,
                         }
@@ -117,8 +117,8 @@ def process_world_data(snap) -> pd.DataFrame:
                             {
                                 "year": year,
                                 "metric": current_metric,
-                                "category": "total",
-                                "infrastructure_type": "None",
+                                "data_center_category": "Total",
+                                "infrastructure_type": current_infrastructure,
                                 "scenario": scenario_name.lower().replace(" ", "_"),
                                 "value": value,
                             }
@@ -126,7 +126,7 @@ def process_world_data(snap) -> pd.DataFrame:
             continue
 
         elif category == "IT":
-            current_infrastructure = "it"
+            current_infrastructure = "IT"
             # Extract IT values as aggregate data
             for i, year in enumerate(historical_years):
                 value = row[3 + i]
@@ -135,8 +135,8 @@ def process_world_data(snap) -> pd.DataFrame:
                         {
                             "year": year,
                             "metric": current_metric,
-                            "category": "it",
-                            "infrastructure_type": "None",
+                            "data_center_category": "IT",
+                            "infrastructure_type": current_infrastructure,
                             "scenario": "historical",
                             "value": value,
                         }
@@ -158,8 +158,8 @@ def process_world_data(snap) -> pd.DataFrame:
                             {
                                 "year": year,
                                 "metric": current_metric,
-                                "category": "it",
-                                "infrastructure_type": "None",
+                                "data_center_category": "IT",
+                                "infrastructure_type": current_infrastructure,
                                 "scenario": scenario_name.lower().replace(" ", "_"),
                                 "value": value,
                             }
@@ -175,7 +175,7 @@ def process_world_data(snap) -> pd.DataFrame:
                         {
                             "year": year,
                             "metric": current_metric,
-                            "category": category.lower().replace(" and ", "_").replace(" ", "_"),
+                            "data_center_category": category.lower().replace(" and ", "_").replace(" ", "_"),
                             "infrastructure_type": current_infrastructure,
                             "scenario": "historical",
                             "value": value,
@@ -198,7 +198,7 @@ def process_world_data(snap) -> pd.DataFrame:
                             {
                                 "year": year,
                                 "metric": current_metric,
-                                "category": category.lower().replace(" and ", "_").replace(" ", "_"),
+                                "data_center_category": category.lower().replace(" and ", "_").replace(" ", "_"),
                                 "infrastructure_type": current_infrastructure,
                                 "scenario": scenario_name.lower().replace(" ", "_"),
                                 "value": value,
@@ -242,23 +242,23 @@ def process_regional_data(snap) -> pd.DataFrame:
             current_metric = metric_name
             continue
 
-        # Skip rows that are general section headers (not data rows)
-        if metric_name and metric_name in [
-            "Installed capacity (GW)",
-            "Power usage effectiveness and load factor (%)",
-            "Electricity consumption (TWh)",
-        ]:
-            continue
-
         # Extract country/region
         country = str(row[1]) if pd.notna(row[1]) else None
 
         if not country or country == "nan" or not current_metric:
             continue
+
+        # Rename metrics to distinguish from World Data sheet and remove "Total" prefix
+        metric_name = current_metric
         if current_metric == "Power usage effectiveness":
-            current_metric = "Total power usage effectiveness"
+            metric_name = "Regional power usage effectiveness"
         elif current_metric == "Load factor (%)":
-            current_metric = "Total load factor (%)"
+            metric_name = "Regional load factor (%)"
+        elif current_metric.startswith("Total "):
+            metric_name = current_metric.replace("Total ", "Regional total ", 1)
+        elif current_metric.startswith("IT "):
+            metric_name = current_metric.replace("IT ", "Regional IT ", 1)
+
         # Extract values for each year
         for i, year in enumerate(years):
             if year is not None:
@@ -266,19 +266,22 @@ def process_regional_data(snap) -> pd.DataFrame:
                 if pd.notna(value) and value != 0:
                     # Set scenario based on year: "base" for 2030, "historical" for others
                     scenario = "base" if year == 2030 else "historical"
+                    infrastructure_type = "IT" if "IT" in current_metric else "Total"
                     data_rows.append(
                         {
                             "year": year,
                             "country": country,
-                            "metric": current_metric,
+                            "metric": metric_name,
                             "value": value,
+                            "infrastructure_type": infrastructure_type,
                             "scenario": scenario,
                         }
                     )
 
     # Convert to DataFrame and then to Table
     df = pd.DataFrame(data_rows)
-    df["infrastructure_type"] = "None"
-    df["category"] = "total"
+    df["data_center_category"] = "Total"
+
+    print(df)
 
     return df
