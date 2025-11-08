@@ -331,7 +331,7 @@ def expand_time_column(
         elif method == "ffill":
             df[values_column] = df.groupby(dimension_col)[values_column].ffill()
         elif method == "zero":
-            df[values_column] = df.groupby(dimension_col)[values_column].fillna(0)
+            df[values_column] = df[values_column].fillna(0)
         return df
 
     DID_INTERPOLATE = False

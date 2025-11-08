@@ -155,7 +155,7 @@ def run() -> None:
         tb,
         tb_china_us,
         on=["country", "year", "counterpart_country"],
-        how="left",
+        how="outer",
     )
 
     tb = pr.concat([tb, tb_partnerships], ignore_index=True)
@@ -415,6 +415,37 @@ def get_country_import_ranking(tb: Table, target_country: str) -> Table:
 
     # Filter for target country only
     out = import_data[import_data["counterpart_country"] == target_country][["country", "year", "import_rank"]].copy()
+
+    # Add self-referential rows (e.g., China importing from China) with rank=-1
+    # This row likely doesn't exist in the data but is needed for visualization
+    target_country_years = import_data[import_data["country"] == target_country]["year"].unique()
+
+    target_country_template = Table(
+        pd.DataFrame({"country": target_country, "year": target_country_years, "import_rank": 0})
+    )
+
+    # Combine: remove any existing self-referential rows and add our template
+    mask = out["country"] != target_country
+    out = pr.concat([out.loc[mask], target_country_template], ignore_index=True)
+
+    # Add color category based on ranking
+    def categorize_rank(rank):
+        if rank == 0:
+            return target_country
+        elif rank == 1:
+            return "1st - Top source"
+        elif rank == 2:
+            return "2nd"
+        elif rank == 3:
+            return "3rd"
+        elif rank == 4:
+            return "4th"
+        elif rank == 5:
+            return "5th"
+        else:
+            return "Not in top 5"
+
+    out["import_rank_category"] = out["import_rank"].apply(categorize_rank)
 
     out = Table(out).copy_metadata(tb)
     out["counterpart_country"] = target_country
