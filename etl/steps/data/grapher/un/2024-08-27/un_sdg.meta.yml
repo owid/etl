@@ -7,7 +7,10 @@ definitions:
   employment: Employment refers to people of working age who worked for at least an hour during the reference period (typically a week), whether in paid employment or self-employment.
 
   description_short_informal_employment: |-
-    Share of << sex >>employed population who are working in jobs that lack basic social or legal protection and employment benefits.
+    Share of employed << sex >>working in jobs that lack basic social or legal protection and employment benefits. Does not include illegal and illicit activities.
+
+  description_key_13th_icls: |-
+    This data follows the standards of the [13th International Classification of Labour Statisticians (ICLS)](#dod:13-icls). Under this framework, employment includes work for pay or profit, including self-employment, as well as the production of goods for own use (such as subsistence farming). Changes in the definition of employment also affect who is counted as unemployed or outside the labor force. Because definitions were updated under the [19th ICLS](#dod:19-icls), data using the newer definitions is not fully comparable with data based on the 13th ICLS. You can read more about the definitions in [this explainer by the ILO](https://www.ilo.org/publications/quick-guide-understanding-impact-new-statistical-standards-ilostat).
 
   description_key_international_dollars: |-
     This data is expressed in constant international dollars to adjust for inflation and differences in living costs between countries. Read more in our article, [What are international dollars?](https://ourworldindata.org/international-dollars)
@@ -39,8 +42,10 @@ definitions:
   description_key_women_in_senior_middle_management: |-
     Employment in senior and middle management is defined based on the [International Standard Classification of Occupations](https://ilostat.ilo.org/methods/concepts-and-definitions/classification-occupation/). This series refers to major group 1 of ISCO-08 or ISCO-88, excluding sub-major groups 14 in ISCO-08 and 13 in ISCO-88.
 
-  description_key_informal_employment: |-
-    Informal employment encompasses all jobs that lack basic social or legal protection and employment benefits, regardless of the type of organization in which they are performed. It includes own-account workers, employers, and members of producers’ cooperatives operating in the informal sector; own-account workers engaged in producing goods exclusively for their household’s final use (such as subsistence farming); and contributing family workers, whether in formal or informal sector enterprises. It also covers employees in informal jobs, whether they are working in formal enterprises, informal enterprises, or employed as paid domestic workers by households.
+  description_key_informal_employment_1: |-
+    Informal employment encompasses all work activities done without formal arrangements (in law or in practice). Informality is a characteristic of the job, not the worker. These are often jobs without basic social or legal protection and employment benefits. It excludes illegal and illicit activities.
+  description_key_informal_employment_2: |-
+    This indicator is particularly important in low- and middle-income countries, where informal employment accounts for a large share of total work and provides a main source of income for many households.
 
   description_key_earnings: |-
     This data includes remuneration in cash and as benefits in kind paid to employees at regular intervals. It excludes employers' contributions paid to social security and pensions schemes, the benefits received by employees under these schemes, as well as severance and termination pay.
@@ -72,6 +77,20 @@ definitions:
 
   description_key_labor_income_share: |-
     This indicator is calculated using compensation of employees (wages and salaries in cash and in kind benefits, and social contributions paid by employers) and labor income of the self-employed (the part of the remuneration attributable for work done by self-employed workers).
+
+  note_icls_13: |-
+    Employment is defined in line with the [13th ICLS](#dod:13-icls) and includes the production of goods for own use, such as subsistence farming.
+
+  note_iloest_modelled_data: |-
+    All figures correspond to [modeled ILO estimates](#dod:ilo-modelled-estimates).
+  note_national_estimates: |-
+    Figures refer to [national estimates](#dod:ilo-national-estimates) and may not be fully comparable across countries.
+
+  note_icse_93: |-
+    Types of jobs are classified by status according to the [ICSE-93 standard](#dod:icse-93).
+
+  variant_name_iloest_modelled_data: Modeled estimates
+  variant_name_national_estimates: National estimates
 
 dataset:
   update_period_days: 730
@@ -435,12 +454,21 @@ tables:
     variables:
       _8_3_1__sl_isv_ifem__no_breakdown__both_sexes:
         description_short: |-
-          <%- set sex = "" %>
-          {definitions.description_short_informal_employment}
+          <%- set sex = "people " %>
+          {definitions.description_short_informal_employment} {definitions.note_national_estimates}
         description_key:
+          - "{definitions.description_key_informal_employment_1}"
+          - "{definitions.description_key_informal_employment_2}"
           - "{definitions.employment}"
-          - "{definitions.description_key_informal_employment}"
+          - "{definitions.description_key_13th_icls}"
+        presentation:
+          grapher_config:
+            title: Share of workers in informal employment
+            note: |-
+              {definitions.note_icls_13}
+            variantName: "{definitions.variant_name_national_estimates}"
         display:
+          name: Share of workers in informal employment
           numDecimalPlaces: 1
           tolerance: 5
 
@@ -448,12 +476,21 @@ tables:
     variables:
       _8_3_1__sl_isv_ifem__no_breakdown__female:
         description_short: |-
-          <%- set sex = "female " %>
-          {definitions.description_short_informal_employment}
+          <%- set sex = "females " %>
+          {definitions.description_short_informal_employment} {definitions.note_national_estimates}
         description_key:
+          - "{definitions.description_key_informal_employment_1}"
+          - "{definitions.description_key_informal_employment_2}"
           - "{definitions.employment}"
-          - "{definitions.description_key_informal_employment}"
+          - "{definitions.description_key_13th_icls}"
+        presentation:
+          grapher_config:
+            title: Share of female workers in informal employment
+            note: |-
+              {definitions.note_icls_13}
+            variantName: "{definitions.variant_name_national_estimates}"
         display:
+          name: Share of female workers in informal employment
           numDecimalPlaces: 1
           tolerance: 5
 
@@ -461,12 +498,21 @@ tables:
     variables:
       _8_3_1__sl_isv_ifem__no_breakdown__male:
         description_short: |-
-          <%- set sex = "male " %>
-          {definitions.description_short_informal_employment}
+          <%- set sex = "males " %>
+          {definitions.description_short_informal_employment} {definitions.note_national_estimates}
         description_key:
+          - "{definitions.description_key_informal_employment_1}"
+          - "{definitions.description_key_informal_employment_2}"
           - "{definitions.employment}"
-          - "{definitions.description_key_informal_employment}"
+          - "{definitions.description_key_13th_icls}"
+        presentation:
+          grapher_config:
+            title: Share of male workers in informal employment
+            note: |-
+              {definitions.note_icls_13}
+            variantName: "{definitions.variant_name_national_estimates}"
         display:
+          name: Share of male workers in informal employment
           numDecimalPlaces: 1
           tolerance: 5
 
