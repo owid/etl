@@ -195,6 +195,16 @@ steps:
   data://grapher/artificial_intelligence/2025-08-25/robotaxis:
     - data://garden/artificial_intelligence/2025-08-25/robotaxis
 
+  #
+  # Ireland Data Centres Metered Electricity Consumption
+  #
+  data://meadow/artificial_intelligence/2025-11-10/ireland_metered_consumption:
+    - snapshot://artificial_intelligence/2025-11-10/ireland_metered_consumption.csv
+  data://garden/artificial_intelligence/2025-11-10/ireland_metered_consumption:
+    - data://meadow/artificial_intelligence/2025-11-10/ireland_metered_consumption
+  data://grapher/artificial_intelligence/2025-11-10/ireland_metered_consumption:
+    - data://garden/artificial_intelligence/2025-11-10/ireland_metered_consumption
+
 
   # NVIDIA quarterly revenue dataset
   data://meadow/artificial_intelligence/2025-11-11/nvidia_revenue:
