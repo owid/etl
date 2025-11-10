@@ -49,7 +49,7 @@ def run() -> None:
     # Assert that there are no negative values for avg and that avg data is monotonically increasing by each quantile.
     tb = sanity_checks(tb=tb)
 
-    tb = paths.regions.harmonize_names(df=tb, countries_file=paths.country_mapping_path)
+    tb = paths.regions.harmonize_names(tb=tb)
 
     # Set an appropriate index and sort conveniently.
     tb = tb.format(["country", "year", "region", "region_old", "quantile"])

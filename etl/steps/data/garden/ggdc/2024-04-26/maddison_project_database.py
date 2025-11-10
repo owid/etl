@@ -56,7 +56,8 @@ def run() -> None:
     tb = paths.regions.harmonize_names(tb=tb)
 
     # Sanity checks.
-    sanity_checks(tb)
+    # DEBUG: Turn on the warning to inspect implausibly low per capita GDP levels below substinence level.
+    sanity_checks(tb, warn_on_subsistence_levels=False)
 
     # Rename Western Offshoots -> Western offshoots in the region column.
     tb["region"] = map_series(
@@ -78,7 +79,7 @@ def run() -> None:
     ds_garden.save()
 
 
-def sanity_checks(tb: Table) -> None:
+def sanity_checks(tb: Table, warn_on_subsistence_levels: bool = False) -> None:
     """
     Check if values are negative, zero or there are too many values under subsistence levels.
     """
@@ -116,7 +117,7 @@ def sanity_checks(tb: Table) -> None:
 
     list_of_countries = list(tb_error.country.unique())
 
-    if not tb_error.empty:
+    if not tb_error.empty and warn_on_subsistence_levels:
         log.warning(
             f"""There are {len(tb_error)} observations with values under subsistence levels (${EXTREME_POVERTY_LINE}) for GDP per capita. For these {len(list_of_countries)} countries: {list_of_countries}
             {tabulate(tb_error[['country', 'year', 'gdp_per_capita']].sort_values('gdp_per_capita').reset_index(drop=True), headers = 'keys', tablefmt = TABLEFMT)}"""

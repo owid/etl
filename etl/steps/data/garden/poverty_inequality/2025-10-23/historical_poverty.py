@@ -146,8 +146,8 @@ def run() -> None:
     ds_maddison = paths.load_dataset("maddison_project_database")
     ds_population = paths.load_dataset("population")
 
-    tb_thousand_bins = ds_thousand_bins["thousand_bins_distribution"].reset_index()
-    tb_maddison = ds_maddison["maddison_project_database"].reset_index()
+    tb_thousand_bins = ds_thousand_bins.read("thousand_bins_distribution")
+    tb_maddison = ds_maddison.read("maddison_project_database")
 
     # Prepare GDP data
     tb_gdp = prepare_gdp_data(tb_maddison)
