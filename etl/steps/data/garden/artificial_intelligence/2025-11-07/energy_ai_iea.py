@@ -69,7 +69,7 @@ def create_other_country(tb: Table) -> Table:
 
     # Keep only necessary columns
     other_data = merged[["year", "metric", "data_center_category", "infrastructure_type", "scenario", "value"]].copy()
-    other_data["country"] = "Other"
+    other_data["country"] = "Rest of the world"
 
     # Concatenate with original table
     tb = pr.concat([tb, Table(other_data)], ignore_index=True)
