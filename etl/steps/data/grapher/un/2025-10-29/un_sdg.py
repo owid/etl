@@ -9,7 +9,7 @@ from typing import Any, Dict, cast
 
 import pandas as pd
 import requests
-from owid.catalog import License, Origin, Table, VariableMeta
+from owid.catalog import License, Origin, Table, VariableMeta, VariablePresentationMeta
 from owid.catalog.utils import underscore
 from structlog import getLogger
 
@@ -254,6 +254,7 @@ def add_metadata_and_prepare_for_grapher(tb: Table, source_desc: dict, date_acce
         origins=[origin],
         unit=tb["long_unit"].iloc[0].lower(),
         short_unit=tb["short_unit"].iloc[0],
+        presentation=VariablePresentationMeta(title_public=tb["variable_name_public"].iloc[0]),
     )
 
     # Use underscore to create valid variable names
@@ -278,6 +279,7 @@ def create_table(tb: Table) -> Table:
         "seriesdescription",
         "variable_name",
         "variable_name_meta",
+        "variable_name_public",
         "value",
         "source",
         "long_unit",
@@ -286,6 +288,7 @@ def create_table(tb: Table) -> Table:
 
     cols_meta = ["indicator", "seriesdescription", "seriescode"]
     cols = ["indicator", "seriescode"]
+    cols_public = ["seriesdescription"]  # For title_public: exclude indicator and seriescode
     if tb.shape[1] > 11:
         col_list = sorted(tb.columns.to_list())
         drop_cols = [
@@ -305,13 +308,16 @@ def create_table(tb: Table) -> Table:
         dim_cols = [x for x in col_list if x not in drop_cols]
         cols_meta_dim = cols_meta + dim_cols
         cols_dim = cols + dim_cols
+        cols_public_dim = cols_public + dim_cols
         tb["variable_name_meta"] = tb[cols_meta_dim].agg(" - ".join, axis=1)
         tb["variable_name"] = tb[cols_dim].agg(" - ".join, axis=1)
+        tb["variable_name_public"] = tb[cols_public_dim].agg(" - ".join, axis=1)
         tb = Table(tb[cols_keep])
         tb["seriescode"] = tb["seriescode"].str.lower()
     else:
         tb["variable_name_meta"] = tb[cols_meta].agg(" - ".join, axis=1)
         tb["variable_name"] = tb[cols].agg(" - ".join, axis=1)
+        tb["variable_name_public"] = tb[cols_public].agg(" - ".join, axis=1)
         tb = Table(tb[cols_keep])
         tb["seriescode"] = tb["seriescode"].str.lower()
 
