@@ -261,7 +261,7 @@ def prepare_gdp_data(tb_maddison: Table) -> Table:
     )
 
     # Drop extra country_region column
-    tb_gdp = tb_gdp.drop(columns=["country_region"])
+    tb_gdp = tb_gdp.drop(columns=["country_region", "region_region"], errors="raise")
 
     # Merge with historical entities
     tb_gdp = pr.merge(
@@ -273,9 +273,7 @@ def prepare_gdp_data(tb_maddison: Table) -> Table:
     )
 
     # Rename growth factor columns
-    tb_gdp = tb_gdp.rename(
-        columns={"growth_factor": "growth_factor_country"},
-    )
+    tb_gdp = tb_gdp.rename(columns={"growth_factor": "growth_factor_country"}, errors="raise")
 
     # Generate growth_factor column using priority: country > historical_entity > region
     tb_gdp["growth_factor"] = tb_gdp.apply(select_growth_factor, axis=1)
@@ -316,8 +314,8 @@ def prepare_gdp_data(tb_maddison: Table) -> Table:
     ]
 
     # Check for extreme growth rates
+    extreme_growth = tb_gdp[(tb_gdp["growth_factor"] > 2.0) | (tb_gdp["growth_factor"] < 0.5)]
     if SHOW_WARNINGS:
-        extreme_growth = tb_gdp[(tb_gdp["growth_factor"] > 2.0) | (tb_gdp["growth_factor"] < 0.5)]
         if len(extreme_growth) > 0:
             log.warning(
                 f"prepare_gdp_data: Found {len(extreme_growth)} instances of extreme growth "
@@ -326,6 +324,20 @@ def prepare_gdp_data(tb_maddison: Table) -> Table:
             # Show some examples
             sample = extreme_growth.head(10)[["country", "year", "growth_factor"]]
             log.warning(f"prepare_gdp_data: Examples:\n{sample}")
+            log.warning(
+                "We will assert that these instances were already in the original data; otherwise, if they were introduced in our processing, an error will be raised"
+            )
+    for _, row in extreme_growth.iterrows():
+        # Check that those country-years of extreme growth/degrowth were already in the original data.
+        _tb = tb_maddison[(tb_maddison["country"] == row["country"])].reset_index(drop=True)
+        error = "Extreme growth factors have been introduced in the data!"
+        assert len(_tb[(_tb["year"] == row["year"])]) == 1, error
+        # Double-check that those growth factors were exactly as in the original data.
+        growth_factor_original = (
+            _tb[(_tb["year"] == row["year"] + 1)]["gdp_per_capita"].item()
+            / _tb[(_tb["year"] == row["year"])]["gdp_per_capita"].item()
+        )
+        assert growth_factor_original == row["growth_factor"], "Wrong calculation of growth rates"
 
     return tb_gdp
 
