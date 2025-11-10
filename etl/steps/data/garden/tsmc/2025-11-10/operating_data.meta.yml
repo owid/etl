@@ -16,7 +16,7 @@ tables:
   operating_data:
     variables:
       value:
-        title: Metric value << category >> << metric >>
+        title: << category >> << metric >>
         unit: ""
         description_short: Value of the metric. Units vary by metric type.
         description_key:
@@ -30,3 +30,4 @@ tables:
           - Data coverage begins in 1994 with varying levels of detail across different time periods.
         display:
           numDecimalPlaces: 2
+          name: << metric >>
