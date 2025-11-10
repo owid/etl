@@ -14,6 +14,10 @@ def run(dest_dir: str) -> None:
     # Load table
     tb = ds_meadow.read("operating_data")
 
+    # Multiply values by 100 for categories that aren't shipments or capacity
+    mask = ~tb["category"].isin(["shipments", "capacity"])
+    tb.loc[mask, "value"] = tb.loc[mask, "value"] * 100
+
     # Add country column for OWID's grapher
     tb["country"] = "Taiwan"
 
