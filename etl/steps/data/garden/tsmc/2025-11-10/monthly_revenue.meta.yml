@@ -1,0 +1,41 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Artificial Intelligence
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 30
+
+tables:
+  tsmc_monthly_revenue:
+    variables:
+      revenue:
+        title: Monthly revenue
+        unit: millions of New Taiwan Dollars
+        short_unit: NT$M
+        description_short: TSMC's consolidated monthly revenue reported in millions of New Taiwan Dollars.
+        description_key:
+          - Taiwan Semiconductor Manufacturing Company (TSMC) is the world's largest dedicated independent semiconductor foundry.
+          - Revenue figures represent consolidated monthly revenue in accordance with Taiwan's International Financial Reporting Standards (TIFRS).
+          - Data covers the period from 2006 onwards, with consolidated reporting starting in 2013.
+        display:
+          numDecimalPlaces: 0
+
+  tsmc_yearly_revenue:
+    variables:
+      revenue:
+        title: Yearly revenue
+        unit: millions of New Taiwan Dollars
+        short_unit: NT$M
+        description_short: TSMC's consolidated yearly revenue reported in millions of New Taiwan Dollars.
+        description_key:
+          - Taiwan Semiconductor Manufacturing Company (TSMC) is the world's largest dedicated independent semiconductor foundry.
+          - Revenue figures represent consolidated yearly revenue in accordance with Taiwan's International Financial Reporting Standards (TIFRS).
+          - Data covers the period from 2006 onwards, with consolidated reporting starting in 2013.
+        display:
+          numDecimalPlaces: 0

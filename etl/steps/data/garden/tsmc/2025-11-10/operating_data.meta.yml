@@ -1,0 +1,31 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Artificial Intelligence
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 30
+
+tables:
+  operating_data:
+    variables:
+      value:
+        title: Metric value << category >> << metric >>
+        unit: ""
+        description_short: Value of the metric. Units vary by metric type.
+        description_key:
+          - Taiwan Semiconductor Manufacturing Company (TSMC) is the world's largest dedicated independent semiconductor foundry.
+          - This dataset contains comprehensive quarterly operating metrics including capacity, wafer shipments, and revenue breakdowns.
+          - For Annual Capacity and Quarterly Wafer Shipments, values are in thousands of 12-inch equivalent wafers.
+          - For revenue breakdown metrics (by technology, platform, geography), values represent percentages of total revenue.
+          - Revenue breakdown by technology shows the percentage of wafer revenue from different process nodes (3nm, 5nm, 7nm, etc.).
+          - Revenue breakdown by platform shows percentage of net revenue from High Performance Computing, Smartphone, IoT, Automotive, etc.
+          - Revenue breakdown by geography shows percentage of net revenue by region (North America, China, Asia Pacific, Japan, EMEA).
+          - Data coverage begins in 1994 with varying levels of detail across different time periods.
+        display:
+          numDecimalPlaces: 2
