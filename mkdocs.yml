@@ -3,7 +3,7 @@ site_name: ETL documentation
 site_url: https://docs.owid.io/projects/etl
 site_author: Our World in Data
 site_description: >-
-      Learn about the ETL pipeline at Our World in Data.
+        Learn about the ETL pipeline at Our World in Data.
 
 # Repository
 repo_name: owid/etl
@@ -14,272 +14,273 @@ copyright: '<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>
 
 # Configuration
 theme:
-      language: en
-      name: material
-      custom_dir: docs/overrides
-      features:
-            # Code blocks can automatically render a button on the right side to allow the user to copy a code block's contents to the clipboard. ref: https://squidfunk.github.io/mkdocs-material/reference/code-blocks/#code-copy-button
-            - content.code.copy
-            # Code annotations offer a comfortable and friendly way to attach arbitrary content to specific sections of code blocks by adding numeric markers in block and inline comments in the language of the code block. ref: https://squidfunk.github.io/mkdocs-material/reference/code-blocks/#code-annotations
-            - content.code.annotate
-            - content.tooltips
-            # When expansion is enabled, the left sidebar will expand all collapsible subsections by default, so the user doesn't have to open subsections manually. ref: https://squidfunk.github.io/mkdocs-material/setup/setting-up-navigation/#navigation-expansion
-            - navigation.expand
-            # When section index pages are enabled, documents can be directly attached to sections, which is particularly useful for providing overview pages. ref: https://squidfunk.github.io/mkdocs-material/setup/setting-up-navigation/#navigation-pruning
-            - navigation.indexes
-            # When instant loading is enabled, clicks on all internal links will be intercepted and dispatched via XHR without fully reloading the page. ref: https://squidfunk.github.io/mkdocs-material/setup/setting-up-navigation/#instant-loading
-            - navigation.instant
-            # In order to provide a better user experience on slow connections when using instant navigation, a progress indicator can be enabled. It will be shown at the top of the page and will be hidden once the page has fully loaded.
-            - navigation.instant.progress
-            # When pruning is enabled, only the visible navigation items are included in the rendered HTML, reducing the size of the built site by 33% or more. ref: https://squidfunk.github.io/mkdocs-material/setup/setting-up-navigation/#navigation-pruning
-            # - navigation.prune
-            # When sections are enabled, top-level sections are rendered as groups in the sidebar for viewports above 1220px, but remain as-is on mobile. ref: https://squidfunk.github.io/mkdocs-material/setup/setting-up-navigation/#navigation-sections
-            - navigation.sections
-            # When tabs are enabled, top-level sections are rendered in a menu layer below the header for viewports above 1220px, but remain as-is on mobile. ref: https://squidfunk.github.io/mkdocs-material/setup/setting-up-navigation/#navigation-tabs
-            - navigation.tabs
-            # When sticky tabs are enabled, navigation tabs will lock below the header and always remain visible when scrolling down.
-            # - navigation.tabs.sticky
-            # A back-to-top button can be shown when the user, after scrolling down, starts to scroll up again. It's rendered centered and just below the header. ref: https://squidfunk.github.io/mkdocs-material/setup/setting-up-navigation/#back-to-top-button
-            - navigation.top
-            # When anchor tracking is enabled, the URL in the address bar is automatically updated with the active anchor as highlighted in the table of contents. ref: https://squidfunk.github.io/mkdocs-material/setup/setting-up-navigation/#anchor-tracking
-            - navigation.tracking
-            # When search sharing is activated, a  share button is rendered next to the reset button, which allows to deep link to the current search query and result. ref: https://squidfunk.github.io/mkdocs-material/setup/setting-up-site-search/#search-sharing
-            - search.share
-            # When search suggestions are enabled, the search will display the likeliest completion for the last word which can be accepted with the Right key. ref: https://squidfunk.github.io/mkdocs-material/setup/setting-up-site-search/#search-suggestions
-            - search.suggest
-            # When search highlighting is enabled and a user clicks on a search result, Material for MkDocs will highlight all occurrences after following the link. ref: https://squidfunk.github.io/mkdocs-material/setup/setting-up-site-search/#search-highlighting
-            - search.highlight
-            # When anchor following for the table of contents is enabled, the sidebar is automatically scrolled so that the active anchor is always visible. ref: https://squidfunk.github.io/mkdocs-material/setup/setting-up-navigation/#table-of-contents
-            - toc.follow
-            # When navigation integration for the table of contents is enabled, it is always rendered as part of the navigation sidebar on the left. ref: https://squidfunk.github.io/mkdocs-material/setup/setting-up-navigation/#table-of-contents
-            # - toc.integrate
-            # - navigation.expand
-            # - navigation.sections
-            # - toc.follow
-      palette:
-            # Palette toggle for light mode
-            - media: "(prefers-color-scheme: light)"
-              scheme: default
-              primary: indigo
-              accent: pink
-              toggle:
-                    icon: material/brightness-7
-                    name: Switch to dark mode
-            # Palette toggle for dark mode
-            - media: "(prefers-color-scheme: dark)"
-              scheme: slate
-              primary: black
-              accent: "amber"
-              toggle:
-                    icon: material/brightness-4
-                    name: Switch to light mode
-      font:
-            text: Helvetica Neue
-      favicon: assets/images/favicon.png
-      logo: "assets/site-logo.svg"
+        language: en
+        name: material
+        custom_dir: docs/overrides
+        features:
+                # Code blocks can automatically render a button on the right side to allow the user to copy a code block's contents to the clipboard. ref: https://squidfunk.github.io/mkdocs-material/reference/code-blocks/#code-copy-button
+                - content.code.copy
+                # Code annotations offer a comfortable and friendly way to attach arbitrary content to specific sections of code blocks by adding numeric markers in block and inline comments in the language of the code block. ref: https://squidfunk.github.io/mkdocs-material/reference/code-blocks/#code-annotations
+                - content.code.annotate
+                - content.tooltips
+                # When expansion is enabled, the left sidebar will expand all collapsible subsections by default, so the user doesn't have to open subsections manually. ref: https://squidfunk.github.io/mkdocs-material/setup/setting-up-navigation/#navigation-expansion
+                - navigation.expand
+                # When section index pages are enabled, documents can be directly attached to sections, which is particularly useful for providing overview pages. ref: https://squidfunk.github.io/mkdocs-material/setup/setting-up-navigation/#navigation-pruning
+                - navigation.indexes
+                # When instant loading is enabled, clicks on all internal links will be intercepted and dispatched via XHR without fully reloading the page. ref: https://squidfunk.github.io/mkdocs-material/setup/setting-up-navigation/#instant-loading
+                - navigation.instant
+                # In order to provide a better user experience on slow connections when using instant navigation, a progress indicator can be enabled. It will be shown at the top of the page and will be hidden once the page has fully loaded.
+                - navigation.instant.progress
+                # When pruning is enabled, only the visible navigation items are included in the rendered HTML, reducing the size of the built site by 33% or more. ref: https://squidfunk.github.io/mkdocs-material/setup/setting-up-navigation/#navigation-pruning
+                # - navigation.prune
+                # When sections are enabled, top-level sections are rendered as groups in the sidebar for viewports above 1220px, but remain as-is on mobile. ref: https://squidfunk.github.io/mkdocs-material/setup/setting-up-navigation/#navigation-sections
+                - navigation.sections
+                # When tabs are enabled, top-level sections are rendered in a menu layer below the header for viewports above 1220px, but remain as-is on mobile. ref: https://squidfunk.github.io/mkdocs-material/setup/setting-up-navigation/#navigation-tabs
+                - navigation.tabs
+                # When sticky tabs are enabled, navigation tabs will lock below the header and always remain visible when scrolling down.
+                # - navigation.tabs.sticky
+                # A back-to-top button can be shown when the user, after scrolling down, starts to scroll up again. It's rendered centered and just below the header. ref: https://squidfunk.github.io/mkdocs-material/setup/setting-up-navigation/#back-to-top-button
+                - navigation.top
+                # When anchor tracking is enabled, the URL in the address bar is automatically updated with the active anchor as highlighted in the table of contents. ref: https://squidfunk.github.io/mkdocs-material/setup/setting-up-navigation/#anchor-tracking
+                - navigation.tracking
+                # When search sharing is activated, a  share button is rendered next to the reset button, which allows to deep link to the current search query and result. ref: https://squidfunk.github.io/mkdocs-material/setup/setting-up-site-search/#search-sharing
+                - search.share
+                # When search suggestions are enabled, the search will display the likeliest completion for the last word which can be accepted with the Right key. ref: https://squidfunk.github.io/mkdocs-material/setup/setting-up-site-search/#search-suggestions
+                - search.suggest
+                # When search highlighting is enabled and a user clicks on a search result, Material for MkDocs will highlight all occurrences after following the link. ref: https://squidfunk.github.io/mkdocs-material/setup/setting-up-site-search/#search-highlighting
+                - search.highlight
+                # When anchor following for the table of contents is enabled, the sidebar is automatically scrolled so that the active anchor is always visible. ref: https://squidfunk.github.io/mkdocs-material/setup/setting-up-navigation/#table-of-contents
+                - toc.follow
+                # When navigation integration for the table of contents is enabled, it is always rendered as part of the navigation sidebar on the left. ref: https://squidfunk.github.io/mkdocs-material/setup/setting-up-navigation/#table-of-contents
+                # - toc.integrate
+                # - navigation.expand
+                # - navigation.sections
+                # - toc.follow
+        palette:
+                # Palette toggle for light mode
+                - media: "(prefers-color-scheme: light)"
+                  scheme: default
+                  primary: indigo
+                  accent: pink
+                  toggle:
+                          icon: material/brightness-7
+                          name: Switch to dark mode
+                # Palette toggle for dark mode
+                - media: "(prefers-color-scheme: dark)"
+                  scheme: slate
+                  primary: black
+                  accent: "amber"
+                  toggle:
+                          icon: material/brightness-4
+                          name: Switch to light mode
+        font:
+                text: Helvetica Neue
+        favicon: assets/images/favicon.png
+        logo: "assets/site-logo.svg"
 
 # Additional configuration
 extra:
-      homepage: https://docs.owid.io/projects/etl
-      generator: true
-      status:
-            new: Recently added
-            deprecated: Deprecated
-      social:
-            # icons available listed: https://github.com/squidfunk/mkdocs-material/tree/master/material/.icons/fontawesome
-            - icon: fontawesome/brands/github
-              link: https://github.com/owid
-            - icon: fontawesome/solid/globe
-              link: https://ourworldindata.org
-            - icon: fontawesome/brands/instagram
-              link: https://instagram.com/ourworldindata
-            - icon: fontawesome/brands/bluesky
-              link: https://bsky.app/profile/ourworldindata.org
-            - icon: fontawesome/brands/x-twitter
-              link: https://twitter.com/ourworldindata
+        homepage: https://docs.owid.io/projects/etl
+        generator: true
+        status:
+                new: Recently added
+                deprecated: Deprecated
+        social:
+                # icons available listed: https://github.com/squidfunk/mkdocs-material/tree/master/material/.icons/fontawesome
+                - icon: fontawesome/brands/github
+                  link: https://github.com/owid
+                - icon: fontawesome/solid/globe
+                  link: https://ourworldindata.org
+                - icon: fontawesome/brands/instagram
+                  link: https://instagram.com/ourworldindata
+                - icon: fontawesome/brands/bluesky
+                  link: https://bsky.app/profile/ourworldindata.org
+                - icon: fontawesome/brands/x-twitter
+                  link: https://twitter.com/ourworldindata
 
 # Extensions
 markdown_extensions:
-      # The Abbreviations extension adds the ability to add a small tooltip to an element, by wrapping it with an abbr tag. Only plain text (no markup) is supported. ref: https://squidfunk.github.io/mkdocs-material/setup/extensions/python-markdown/#abbreviations
-      - abbr
-      # The Admonition extension adds support for admonitions, more commonly known as call-outs, which can be defined in Markdown by using a simple syntax. ref: https://squidfunk.github.io/mkdocs-material/setup/extensions/python-markdown/#admonition
-      - admonition
-      # The Attribute Lists extension allows to add HTML attributes and CSS classes to almost every Markdown inline- and block-level element with a special syntax. ref: https://squidfunk.github.io/mkdocs-material/setup/extensions/python-markdown/#attribute-lists
-      - attr_list
-      # The Footnotes extension allows to define inline footnotes, which are then rendered below all Markdown content of a document. ref: https://squidfunk.github.io/mkdocs-material/setup/extensions/python-markdown/#footnotes
-      - footnotes
-      # The Markdown in HTML extension allows for writing Markdown inside of HTML, which is useful for wrapping Markdown content with custom elements. ref: https://squidfunk.github.io/mkdocs-material/setup/extensions/python-markdown/#markdown-in-html
-      - md_in_html
-      - mkdocs-click
-      - pymdownx.critic
-      - pymdownx.emoji:
-              emoji_index: !!python/name:materialx.emoji.twemoji
-              emoji_generator: !!python/name:materialx.emoji.to_svg # The Details extension supercharges the Admonition extension, making the resulting call-outs collapsible, allowing them to be opened and closed by the user. ref: https://squidfunk.github.io/mkdocs-material/setup/extensions/python-markdown-extensions/#details
+        # The Abbreviations extension adds the ability to add a small tooltip to an element, by wrapping it with an abbr tag. Only plain text (no markup) is supported. ref: https://squidfunk.github.io/mkdocs-material/setup/extensions/python-markdown/#abbreviations
+        - abbr
+        # The Admonition extension adds support for admonitions, more commonly known as call-outs, which can be defined in Markdown by using a simple syntax. ref: https://squidfunk.github.io/mkdocs-material/setup/extensions/python-markdown/#admonition
+        - admonition
+        # The Attribute Lists extension allows to add HTML attributes and CSS classes to almost every Markdown inline- and block-level element with a special syntax. ref: https://squidfunk.github.io/mkdocs-material/setup/extensions/python-markdown/#attribute-lists
+        - attr_list
+        # The Footnotes extension allows to define inline footnotes, which are then rendered below all Markdown content of a document. ref: https://squidfunk.github.io/mkdocs-material/setup/extensions/python-markdown/#footnotes
+        - footnotes
+        # The Markdown in HTML extension allows for writing Markdown inside of HTML, which is useful for wrapping Markdown content with custom elements. ref: https://squidfunk.github.io/mkdocs-material/setup/extensions/python-markdown/#markdown-in-html
+        - md_in_html
+        - mkdocs-click
+        - pymdownx.critic
+        - pymdownx.emoji:
+                  emoji_index: !!python/name:materialx.emoji.twemoji
+                  emoji_generator: !!python/name:materialx.emoji.to_svg # The Details extension supercharges the Admonition extension, making the resulting call-outs collapsible, allowing them to be opened and closed by the user. ref: https://squidfunk.github.io/mkdocs-material/setup/extensions/python-markdown-extensions/#details
 
 
-      - pymdownx.details
-      - pymdownx.keys
-      - pymdownx.snippets
-      - pymdownx.superfences:
-              custom_fences:
-                    - name: mermaid
-                      class: mermaid
-                      format: !!python/name:pymdownx.superfences.fence_code_format
-      - pymdownx.tabbed:
-              alternate_style: true
-      - toc:
-              permalink: true
-              title: On this page
-              permalink_title: Anchor link to this section for reference
+        - pymdownx.details
+        - pymdownx.keys
+        - pymdownx.snippets
+        - pymdownx.superfences:
+                  custom_fences:
+                          - name: mermaid
+                            class: mermaid
+                            format: !!python/name:pymdownx.superfences.fence_code_format
+        - pymdownx.tabbed:
+                  alternate_style: true
+        - toc:
+                  permalink: true
+                  title: On this page
+                  permalink_title: Anchor link to this section for reference
 
 # Plugins
 plugins:
-      - mkdocs-jupyter:
-              ignore_h1_titles: true
-              include_source: true
-              execute: false
-              allow_errors: false
-              show_input: true
-              include_requirejs: true
-              included: ["*.py", "*.ipynb"]
-      # The built-in search plugin integrates seamlessly with Material for MkDocs, adding multilingual client-side search with lunr and lunr-languages. ref: https://squidfunk.github.io/mkdocs-material/setup/setting-up-site-search/#built-in-search-plugin
-      - search
-      - exclude:
-              glob:
-                    - ignore/
-      - gen-files:
-              scripts:
-                    - docs/ignore/generate_dynamic_docs.py # or any other name or path
-      - blog
-      # ref: https://github.com/timvink/mkdocs-git-authors-plugin
-      - git-authors:
-              show_email_address: false
-              # authorship_threshold_percent: 1
-              show_contribution: true
-              # show_line_count: true
-              # count_empty_lines: true
-              ignore_authors:
-                    - owidbot
-              sort_authors_by: contribution
-      - git-revision-date-localized
-      - tags:
-              tags_file: tags.md
-      # When the privacy plugin is activated, plotly charts don't show. So we'll deactivate it.
-      # - privacy
-      # ref: https://squidfunk.github.io/mkdocs-material/reference/images/
-      - glightbox
+        - mkdocs-jupyter:
+                  ignore_h1_titles: true
+                  include_source: true
+                  execute: false
+                  allow_errors: false
+                  show_input: true
+                  include_requirejs: true
+                  included: ["*.py", "*.ipynb"]
+        # The built-in search plugin integrates seamlessly with Material for MkDocs, adding multilingual client-side search with lunr and lunr-languages. ref: https://squidfunk.github.io/mkdocs-material/setup/setting-up-site-search/#built-in-search-plugin
+        - search
+        - exclude:
+                  glob:
+                          - ignore/
+        - gen-files:
+                  scripts:
+                          - docs/ignore/generate_dynamic_docs.py # or any other name or path
+        - blog
+        # ref: https://github.com/timvink/mkdocs-git-authors-plugin
+        - git-authors:
+                  show_email_address: false
+                  # authorship_threshold_percent: 1
+                  show_contribution: true
+                  # show_line_count: true
+                  # count_empty_lines: true
+                  ignore_authors:
+                          - owidbot
+                  sort_authors_by: contribution
+        - git-revision-date-localized
+        - tags:
+                  tags_file: tags.md
+        # When the privacy plugin is activated, plotly charts don't show. So we'll deactivate it.
+        # - privacy
+        # ref: https://squidfunk.github.io/mkdocs-material/reference/images/
+        - glightbox
 
 # CSS config
 extra_css:
-      - css/extra.css
+        - css/extra.css
 
 # JS
 extra_javascript:
-      - https://unpkg.com/tablesort@5.3.0/dist/tablesort.min.js
-      - javascripts/tablesort.js
-      - javascripts/cell-toggles.js
+        - https://unpkg.com/tablesort@5.3.0/dist/tablesort.min.js
+        - javascripts/tablesort.js
+        - javascripts/cell-toggles.js
 
 # Custom home page
 home:
-      # Custom Homepage Elements
-      tagline: Our World in Data - Technical documentation
-      # cover_image: https://github.com/tylerdotrar/mkdocs-coverpage/blob/main/docs/attachments/wizard-posting.png?raw=true #attachments/wizard-posting.png # This path starts at your root mkdocs directory.
-      description: |-
-            This documentation explains our data workflow and tooling — both to help OWID team members work effectively and to give external readers insight into how we manage and publish our data.
-            You can also find selected public analyses related to our work.
-      # Gradient Color
-      # gradient_hsla: hsla(173, 100%, 24%, 1) # Default Green: hsla(160deg,47%,55%,1)
+        # Custom Homepage Elements
+        tagline: Our World in Data - Technical documentation
+        # cover_image: https://github.com/tylerdotrar/mkdocs-coverpage/blob/main/docs/attachments/wizard-posting.png?raw=true #attachments/wizard-posting.png # This path starts at your root mkdocs directory.
+        description: |-
+                This documentation explains our data workflow and tooling — both to help OWID team members work effectively and to give external readers insight into how we manage and publish our data.
+                You can also find selected public analyses related to our work.
+        # Gradient Color
+        # gradient_hsla: hsla(173, 100%, 24%, 1) # Default Green: hsla(160deg,47%,55%,1)
 
-      buttons:
-            - name: Get started
-              url: getting-started
-              theme: md-button md-button--primary
-            # - name: Learn more
-            #   url: architecture
-            #   theme: md-button
-            - name: Internal guides
-              url: guides
-              theme: md-button
-            - name: Technical publications
-              url: analyses/
-              theme: md-button
+        buttons:
+                - name: Get started
+                  url: getting-started
+                  theme: md-button md-button--primary
+                # - name: Learn more
+                #   url: architecture
+                #   theme: md-button
+                - name: Internal guides
+                  url: guides
+                  theme: md-button
+                - name: Technical publications
+                  url: analyses/
+                  theme: md-button
 
 # Navigation
 nav:
-      - Home: "index.md"
-      - Getting started:
-              - "getting-started/index.md"
-              - Installation: "getting-started/working-environment.md"
-              - First steps: "getting-started/building-datasets.md"
-              - Contributing: "contributing.md"
-      - Guides:
-              - "guides/index.md"
-              - Data work:
-                      - "guides/data-work/index.md"
-                      - AI workflow: "guides/data-work/ai-workflow.md"
-                      - New data: "guides/data-work/add-data.md"
-                      - Updating data: "guides/data-work/update-data.md"
-                      - Update charts: "guides/data-work/update-charts.md"
-                      - MDIMs and Explorers: "guides/data-work/mdims.md"
-                      - Export data: "guides/data-work/export-data.md"
-                      - Access archived data: "guides/data-work/access-archived-data.md"
-                      - Publish indicator and metadata with GSheet: "guides/data-work/create-gsheet.md"
-              - Admin:
-                      - Wizard: "guides/wizard.md"
-                      - CLI: "guides/etl-cli.md"
-              - Other ETL tasks:
-                      - Harmonize country names: "guides/harmonize-countries.md"
-                      - Backport from database: "guides/backport.md"
-                      - Regular updates: "guides/auto-regular-updates.md"
-                      - Automatic updates via metadata: "guides/autoupdate-cli.md"
-                      - Pull requests: "guides/pull-requests.md"
-                      - Tips when working with ETL: "guides/etl-tips.md"
-                      - Metadata in data pages: "guides/metadata-play.md"
-              - Servers & settings:
-                      - Upgrade Python version: "guides/upgrade-python-version.md"
-                      - Environments: "guides/environment.md"
-                      - Staging servers: "guides/staging-servers.md"
-                      - Public servers: "guides/sharing-external.md"
-                      - Private datasets: "guides/private-import.md"
-                      - Types in Tables: "guides/types-tables.md"
-                      - OpenAI setup: "guides/openai.md"
-                      - Edit the documentation: "dev/docs.md"
-                      - Google API: "guides/configure-google-api.md"
+        - Home: "index.md"
+        - Getting started:
+                  - "getting-started/index.md"
+                  - Installation: "getting-started/working-environment.md"
+                  - First steps: "getting-started/building-datasets.md"
+                  - Contributing: "contributing.md"
+        - Guides:
+                  - "guides/index.md"
+                  - Data work:
+                            - "guides/data-work/index.md"
+                            - AI workflow: "guides/data-work/ai-workflow.md"
+                            - New data: "guides/data-work/add-data.md"
+                            - Updating data: "guides/data-work/update-data.md"
+                            - Update charts: "guides/data-work/update-charts.md"
+                            - MDIMs and Explorers: "guides/data-work/mdims.md"
+                            - Export data: "guides/data-work/export-data.md"
+                            - Access archived data: "guides/data-work/access-archived-data.md"
+                            - Publish indicator and metadata with GSheet: "guides/data-work/create-gsheet.md"
+                  - Admin:
+                            - Wizard: "guides/wizard.md"
+                            - CLI: "guides/etl-cli.md"
+                  - Other ETL tasks:
+                            - Harmonize country names: "guides/harmonize-countries.md"
+                            - Backport from database: "guides/backport.md"
+                            - Regular updates: "guides/auto-regular-updates.md"
+                            - Automatic updates via metadata: "guides/autoupdate-cli.md"
+                            - Pull requests: "guides/pull-requests.md"
+                            - Tips when working with ETL: "guides/etl-tips.md"
+                            - Metadata in data pages: "guides/metadata-play.md"
+                  - Servers & settings:
+                            - Upgrade Python version: "guides/upgrade-python-version.md"
+                            - Environments: "guides/environment.md"
+                            - Staging servers: "guides/staging-servers.md"
+                            - Public servers: "guides/sharing-external.md"
+                            - Private datasets: "guides/private-import.md"
+                            - Types in Tables: "guides/types-tables.md"
+                            - OpenAI setup: "guides/openai.md"
+                            - Edit the documentation: "dev/docs.md"
+                            - Google API: "guides/configure-google-api.md"
 
-      - Design principles:
-              - Design principles & workflow: architecture/index.md
-              - Our journey:
-                      - "architecture/our-journey/index.md"
-              - Fundamentals:
-                      - Computational graph:
-                              - Computational graph: "architecture/design/compute-graph/index.md"
-                      - ETL model: "architecture/design/phases.md"
-                      - Data model: "architecture/design/common-format.md"
-                      - Features and constraints: "architecture/design/features-constraints.md"
-                      - The DAG: "architecture/design/dag.md"
-                      - The URI: "architecture/design/uri.md"
-              - ETL steps:
-                      - ETL steps: "architecture/workflow/index.md"
-                      - Other steps: "architecture/workflow/other-steps.md"
-      - Metadata:
-              - Metadata: "architecture/metadata/index.md"
-              - Reference: "architecture/metadata/reference/index.md"
-              - Collections reference: "architecture/metadata/reference/collections.md"
-              - Working with Metadata:
-                      - Structuring YAML file: "architecture/metadata/structuring-yaml.md"
-                      - Data Pages Workflow: "architecture/metadata/data_pages_workflow.md"
-                      - ETL MetaGPT Tool: "architecture/metadata/metadata_chatgpt_update.md"
-                      - Propagation of metadata: "architecture/metadata/propagation.md"
-                      - Processing log: "architecture/metadata/processing_log.md"
-                      - FAQs: "architecture/metadata/faqs.md"
-      - API and catalog:
-              - API: "api/index.md"
-              - Charts API: "api/chart-api.md"
-              - ETL catalog API: "api/catalog-api.md"
-              - Example API usage: "api/example-usage.md"
-              - Querying data via Datasette: "api/datasette.md"
-              - Maintenance: "api/maintenance.md"
-              - COVID-19: "api/covid.md"
-      - Technical publications:
-              - "analyses/index.md"
-              - Does the news reflect what we die from?: "analyses/media_deaths/methodology.md"
+        - Design principles:
+                  - Design principles & workflow: architecture/index.md
+                  - Our journey:
+                            - "architecture/our-journey/index.md"
+                  - Fundamentals:
+                            - Computational graph:
+                                      - Computational graph: "architecture/design/compute-graph/index.md"
+                            - ETL model: "architecture/design/phases.md"
+                            - Data model: "architecture/design/common-format.md"
+                            - Features and constraints: "architecture/design/features-constraints.md"
+                            - The DAG: "architecture/design/dag.md"
+                            - The URI: "architecture/design/uri.md"
+                  - ETL steps:
+                            - ETL steps: "architecture/workflow/index.md"
+                            - Other steps: "architecture/workflow/other-steps.md"
+        - Metadata:
+                  - Metadata: "architecture/metadata/index.md"
+                  - Reference: "architecture/metadata/reference/index.md"
+                  - Collections reference: "architecture/metadata/reference/collections.md"
+                  - Working with Metadata:
+                            - Structuring YAML file: "architecture/metadata/structuring-yaml.md"
+                            - Data Pages Workflow: "architecture/metadata/data_pages_workflow.md"
+                            - ETL MetaGPT Tool: "architecture/metadata/metadata_chatgpt_update.md"
+                            - Propagation of metadata: "architecture/metadata/propagation.md"
+                            - Processing log: "architecture/metadata/processing_log.md"
+                            - FAQs: "architecture/metadata/faqs.md"
+        - API and catalog:
+                  - API: "api/index.md"
+                  - Charts API: "api/chart-api.md"
+                  - ETL catalog API: "api/catalog-api.md"
+                  - Example API usage: "api/example-usage.md"
+                  - Querying data via Datasette: "api/datasette.md"
+                  - Maintenance: "api/maintenance.md"
+                  - COVID-19: "api/covid.md"
+        - Technical publications:
+                  - "analyses/index.md"
+                  - Does the news reflect what we die from?: "analyses/media_deaths/methodology.md"
+                  - Our COVID work: "api/covid.md"
