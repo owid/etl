@@ -15,7 +15,7 @@ The ETL is the way we ingest, process and publish data at Our World in Data (OWI
 
 ## Build a dataset
 ### Preview dataset build
-You can build any dataset in ETL using our [ETL cli](../guides/etl-cli/index.md#etl){ data-preview }: `etl run` (or `etlr`). This will execute all the steps required to build a dataset.
+You can build any dataset in ETL using our [ETL cli](../guides/etl-cli.md#etl){ data-preview }: `etl run` (or `etlr`). This will execute all the steps required to build a dataset.
 
 Before actually building the dataset, it is recommended to preview the steps that would be executed to build it by using the `--dry-run` flag.
 
@@ -231,7 +231,7 @@ VariableMeta(title='Day of the year with peak cherry blossom', description=None,
     The metadata of datasets, tables and indicators are better printed in Jupyter Notebooks.
 
 ### Using our python API
-Note that you can also read datasets using our catalog [python API](../api/){data-preview}:
+Note that you can also read datasets using our catalog [python API](../api/index.md){data-preview}:
 
 ```pycon
 >>> from owid import catalog

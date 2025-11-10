@@ -11,33 +11,31 @@ Learn more about our architecture in the following sections: -->
 
 <div class="grid cards" markdown>
 
--   **[:fontawesome-solid-paintbrush: &nbsp; The design principles of the ETL](design/compute-graph/index.md)**
+-   :fontawesome-solid-paintbrush: &nbsp; **[The design principles of the ETL](design/compute-graph/index.md){ data-preview }**
 
     ***
 
     Learn the design principles of our data architecture.
 
--   **[:fontawesome-solid-gear: &nbsp; Our workflow in ETL](workflow/index.md)**
+-   :fontawesome-solid-gear: &nbsp; **[Our workflow in ETL](workflow/index.md){ data-preview }**
 
     ***
 
     Learn the different steps in ETL.
 
--   **[:fontawesome-solid-book: &nbsp; Metadata reference](../architecture/metadata/reference/)**
+-   :fontawesome-solid-book: &nbsp; **[Metadata reference](../architecture/metadata/reference/){ data-preview }**
 
     ***
 
-    Data alone is not enough.
+    Data alone is not enough. We need [metadata](../architecture/metadata/index.md).
 
-    Learn more about our [metadata](../architecture/metadata/index.md).
-
--   **[:material-road-variant: &nbsp; Our journey](our-journey)**
+-   :material-road-variant: &nbsp; **[Our journey](our-journey/index.md){ data-preview }**
 
     ***
 
     A bit of history. Learn how we got here.
 
--  **[:material-chart-line: &nbsp; Public analyses](../analyses/)**
+-  :material-chart-line: &nbsp; **[Public analyses](../analyses/){ data-preview }**
 
     ***
 

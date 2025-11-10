@@ -9,7 +9,7 @@ All our data work is public and open-source. Our ETL work is available on GitHub
 
 [:fontawesome-brands-github: owid/etl](https://github.com/owid/etl){.md-button .md-button--primary}
 
-To build any of our datasets, you first need [to install the ETL](getting-started/working-environment/){data-preview} and then execute any step you want to build:
+To build any of our datasets, you first need [to install the ETL](getting-started/working-environment.md){data-preview} and then execute any step you want to build:
 
 ```
 uv run etl run <step>
@@ -19,7 +19,7 @@ uv run etl run <step>
 If you find any issues with our datasets or our code, please [report them on GitHub :octicons-arrow-up-right-16:](https://github.com/owid/etl/issues).
 
 ## Try our API
-You can try using our [API](api/){data-preview} to access our data and give us feedback on it.
+You can try using our [API](api/index.md){data-preview} to access our data and give us feedback on it.
 
 
 ## Suggest new datasets
