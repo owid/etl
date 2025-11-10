@@ -45,6 +45,10 @@ docs.build: .venv
 docs.serve: .venv
 	GENERATING_DOCS=1 .venv/bin/zensical serve
 
+docs.build-old: .venv
+	@echo '==> Building documentation with Zensical'
+	.venv/bin/mkdocs build
+
 docs: .venv
 	GENERATING_DOCS=1 .venv/bin/mkdocs serve
 
