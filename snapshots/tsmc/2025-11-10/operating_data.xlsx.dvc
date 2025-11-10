@@ -1,0 +1,37 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: TSMC Historical Operating Data
+    description: |-
+      Comprehensive historical operating data from Taiwan Semiconductor Manufacturing Company (TSMC), including quarterly metrics on:
+      - Annual capacity (in thousands of 12" equivalent wafers)
+      - Quarterly wafer shipments
+      - Revenue breakdown by technology node (3nm, 5nm, 7nm, 10nm, 16nm, 20nm, 28nm, 40/45nm, 65nm, 90nm, and older)
+      - Revenue breakdown by platform (High Performance Computing, Smartphone, Internet of Things, Automotive, Digital Consumer Electronics, Others)
+      - Revenue breakdown by geography (North America, China, Asia Pacific, Japan, EMEA)
+
+      Data coverage starts from 1994 (1Q94) with varying levels of detail across different time periods.
+    date_published: "2024-10-31"
+
+    # Citation
+    producer: Taiwan Semiconductor Manufacturing Company
+    citation_full: |-
+      Taiwan Semiconductor Manufacturing Company Limited (TSMC) - Historical Operating Data
+    attribution_short: TSMC
+
+    # Files
+    url_main: https://investor.tsmc.com/english/monthly-revenue/2025
+    url_download: https://investor.tsmc.com/english/encrypt/files/encrypt_file/historicalinformation/Historical_Operating_Data_110.xlsx
+    date_accessed: 2025-11-10
+
+    # License
+    license:
+      name: © TSMC
+      url: https://investor.tsmc.com/english/monthly-revenue/2025
+
+outs:
+  - md5: 47fdb51636452a4f592b617d5416d30a
+    size: 65520
+    path: operating_data.xlsx
