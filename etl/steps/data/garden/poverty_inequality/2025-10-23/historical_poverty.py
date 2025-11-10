@@ -214,8 +214,9 @@ def prepare_gdp_data(tb_maddison: Table) -> Table:
     # Restore region information
     tb_gdp["region"] = tb_gdp["country"].map(regions_map)
 
-    # Create year-over-year growth factors for countries
-    tb_gdp = create_growth_factor_column(tb=tb_gdp)
+    # Create growth_factor column, dividing GDP values by the value in the previous year.
+    tb_gdp = tb_gdp.sort_values(["country", "year"])
+    tb_gdp["growth_factor"] = tb_gdp.groupby("country")["gdp_per_capita"].transform(lambda x: x / x.shift(1))
 
     ###################################
     # REGIONS
@@ -605,19 +606,6 @@ def select_growth_factor(row):
         return row["growth_factor_historical_entity"]
     else:
         return row["growth_factor_region"]
-
-
-def create_growth_factor_column(tb: Table) -> Table:
-    """
-    Create growth_factor column, dividing GDP values by the value in the previous year.
-    """
-
-    tb = tb.sort_values(["country", "year"])
-
-    # Calculate growth factor
-    tb["growth_factor"] = tb.groupby("country")["gdp_per_capita"].transform(lambda x: x / x.shift(1))
-
-    return tb
 
 
 def create_stacked_variables(tb: Table) -> Table:
