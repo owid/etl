@@ -16,50 +16,42 @@ Making this documentation public is part of our commitment to **transparency** a
 ### Quick reference
 <div class="grid cards" markdown>
 
--   **:octicons-code-16: &nbsp; Installation**
+-   :octicons-code-16: &nbsp; **[Installation](working-environment.md){ data-preview }**
 
     ---
 
     Set up your working environment.
 
-    [:octicons-arrow-right-24: Getting started](working-environment.md)
-
--   **:fontawesome-solid-pen-nib: &nbsp; Design principles]**
+-   :fontawesome-solid-pen-nib: &nbsp; **[Design principles](../architecture/){ data-preview }**
 
     ---
 
     Learn the fundamentals.
 
-    [:fontawesome-solid-arrow-right: Learn](../architecture/)
 
--   **:material-sign-direction: &nbsp; Guides**
+-   :material-sign-direction: &nbsp; **[Guides](../guides/){ data-preview }**
 
     ---
 
-    Learn about our [data work](../guides/data-work), our [Wizard](../guides/wizard.md) tool and much more.
+    Learn about our [data work](../guides/data-work/index.md){ data-preview }, our [Wizard](../guides/wizard.md){ data-preview } tool and much more.
 
 
-    [:fontawesome-solid-arrow-right: Learn by doing](../guides/index.md)
-
--   **:fontawesome-solid-book: &nbsp; Metadata reference**
+-   :fontawesome-solid-book: &nbsp; **[Metadata reference](../architecture/metadata/reference/){ data-preview }**
 
     ---
 
     Because data alone is not enough.
 
-    [:fontawesome-solid-arrow-right: Learn more about our metadata](../architecture/metadata/reference/).
-
-
--   **:fontawesome-solid-users: &nbsp; Contribute**
+-   :fontawesome-solid-users: &nbsp; **[Contribute](../contributing.md){ data-preview }**
 
     ---
 
-    [:fontawesome-solid-arrow-right: Help us improve our work](../contributing.md)
+    Help us improve our work
 
--   **:material-api: &nbsp; API**
+-   :material-api: &nbsp; **[API](../api/index.md){data-preview}**
 
     ---
 
-    [:fontawesome-solid-arrow-right: Access our data catalog](../api/index.md).
+    Access our data catalog, get data from our charts, etc.
 
 </div>

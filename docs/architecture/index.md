@@ -1,3 +1,4 @@
+# Design principles & workflow
 Our World in Data is a publication that makes very heavy use of data to communicate about global issues.
 
 The best data on global issues comes from **the hard work of _data providers_**, which can be individual researchers, small research groups, or big institutions like the UN or World Bank. Since we reuse this work, **we are effectively a _data republisher_** that tries to process and understand data from a wide variety of sources, and present it to the public in a unified way.

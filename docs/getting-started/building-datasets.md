@@ -1,20 +1,21 @@
-!!! info "You will learn more about the structure and design of the ETL in the next [section](../../architecture/)."
+!!! note
 
-The ETL is the way we ingest, process and publish data at Our World in Data (OWID). The ETL contains a set of recipes (or steps) to build datasets, which are then made available from [OWID's catalog](../api/). A step is a python script and has a URI. URIs allow us to uniquely identify any step (or node) throughout the whole ETL. This allows us to reference datasets (and use them) when building a new one. For example, the Cherry Blossom dataset (by Yasuyuki Aono):
+    You will learn more about the structure and design of the ETL in the next [section](../architecture/index.md#design-principles-workflow){ data-preview }.
 
-*[URI]: Uniform Resource Identifier
 
-```
-data://garden/biodiversity/2024-01-25/cherry_blossom
-```
+The ETL is the way we ingest, process and publish data at Our World in Data (OWID). The ETL contains a set of recipes (or steps) to build datasets, which are then made available from [OWID's catalog](../api/index.md#data-apis){ data-preview }. A step is a python script and has a [URI](../architecture/design/uri.md#uri){ data-preview }. URIs allow us to uniquely identify any step (or node) throughout the whole ETL. This allows us to reference datasets (and use them) when building a new one.
 
-!!! info "See also"
+!!! example
 
-    [How are URIs built? :octicons-arrow-right-24:](../architecture/design/uri.md)
+    For example, the Cherry Blossom dataset (by Yasuyuki Aono):
+
+    ```
+    data://garden/biodiversity/2024-01-25/cherry_blossom
+    ```
 
 ## Build a dataset
 ### Preview dataset build
-You can build any dataset in ETL using our [ETL cli](../../guides/etl-cli): `etl run` (or `etlr`). This will execute all the steps required to build a dataset.
+You can build any dataset in ETL using our [ETL cli](../guides/etl-cli/index.md#etl){ data-preview }: `etl run` (or `etlr`). This will execute all the steps required to build a dataset.
 
 Before actually building the dataset, it is recommended to preview the steps that would be executed to build it by using the `--dry-run` flag.
 
@@ -160,7 +161,7 @@ Note that in this example, also the Cherry Blossom 2023-01-11 dataset was pushed
 
 
 ### Run ETL in a specific environment
-ETL steps are executed locally, but when pushing them to the database we can choose which database to use. This can be controlled by environment variables, which are set in an `.env`-like file. For instance, we provide [an example file](https://github.com/owid/etl/blob/master/.env.example), which should be adapted to point to the desired environment. Then, you can run any step like:
+ETL steps are executed locally, but when pushing them to the database we can choose which database to use. This can be controlled by environment variables, which are set in an `.env`-like file. For instance, we provide [an example file :octicons-arrow-up-right-16:](https://github.com/owid/etl/blob/master/.env.example), which should be adapted to point to the desired environment. Then, you can run any step like:
 
 ```
 ENV_FILE=.env.example etl run cherry_blossom --grapher
@@ -230,7 +231,7 @@ VariableMeta(title='Day of the year with peak cherry blossom', description=None,
     The metadata of datasets, tables and indicators are better printed in Jupyter Notebooks.
 
 ### Using our python API
-Note that you can also read datasets using our catalog [python API](../../api/):
+Note that you can also read datasets using our catalog [python API](../api/){data-preview}:
 
 ```pycon
 >>> from owid import catalog
