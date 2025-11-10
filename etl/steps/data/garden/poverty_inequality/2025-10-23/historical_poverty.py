@@ -98,49 +98,12 @@ MISSING_COUNTRIES_AND_REGIONS = {
     "Vanuatu": "East Asia",
 }
 
-# Historical entities mapping
-HISTORICAL_ENTITIES = {
-    "USSR": {
-        "successor_states": [
-            "Russia",
-            "Ukraine",
-            "Belarus",
-            "Uzbekistan",
-            "Kazakhstan",
-            "Georgia",
-            "Azerbaijan",
-            "Lithuania",
-            "Moldova",
-            "Latvia",
-            "Kyrgyzstan",
-            "Tajikistan",
-            "Armenia",
-            "Turkmenistan",
-            "Estonia",
-        ],
-        "end_year": 1991,
-    },
-    "Yugoslavia": {
-        "successor_states": [
-            "Serbia",
-            "Croatia",
-            "Slovenia",
-            "Bosnia and Herzegovina",
-            "North Macedonia",
-            "Montenegro",
-            "Kosovo",
-        ],
-        "end_year": 1992,
-        "region": "Eastern Europe",
-    },
-    "Czechoslovakia": {"successor_states": ["Czechia", "Slovakia"], "end_year": 1992},
-    "Former Sudan": {"successor_states": ["Sudan", "South Sudan"], "end_year": 2011, "region": "Sub Saharan Africa"},
-}
+# TODO: I've fixed "Former Sudan"->"Sudan (former)" (since the latter is the right spelling in our regions dataset). Check famines_by_regime_gdp and famines_by_regime_population, which have a hardcoded "Former Sudan" mapping to "Sudan".
 
 
 def run() -> None:
     #
-    # Load inputs
+    # Load inputs.
     #
     ds_thousand_bins = paths.load_dataset("thousand_bins_distribution")
     ds_maddison = paths.load_dataset("maddison_project_database")
@@ -149,6 +112,9 @@ def run() -> None:
     tb_thousand_bins = ds_thousand_bins.read("thousand_bins_distribution")
     tb_maddison = ds_maddison.read("maddison_project_database")
 
+    #
+    # Prepare data.
+    #
     # Prepare GDP data
     tb_gdp = prepare_gdp_data(tb_maddison)
 
@@ -158,19 +124,17 @@ def run() -> None:
     # Calculate poverty measures
     tb, tb_population = calculate_poverty_measures(tb=tb_extended, ds_population=ds_population)
 
-    # # Data quality checks
-    # run_data_quality_checks(tb)
-
     tb = tb.format(["country", "year", "poverty_line"], short_name="historical_poverty")
     tb_population = tb_population.format(["country", "year"], short_name="population")
     tb_extended = tb_extended.format(
         ["country", "year", "region", "region_old", "quantile"], short_name="historical_income_distribution"
     )
 
+    #
+    # Save outputs.
+    #
     # Create dataset
-    ds_garden = paths.create_dataset(
-        tables=[tb, tb_population], check_variables_metadata=True, default_metadata=ds_thousand_bins.metadata
-    )
+    ds_garden = paths.create_dataset(tables=[tb, tb_population], default_metadata=ds_thousand_bins.metadata)
 
     # Save dataset
     ds_garden.save()
@@ -180,6 +144,15 @@ def prepare_gdp_data(tb_maddison: Table) -> Table:
     """
     Prepare GDP per capita data for extrapolation, creating growth factors from country, historical entity, and region levels.
     """
+    # Prepare a dictionary of historical regions:
+    historical_entities = {
+        region: {
+            field: value
+            for field, value in paths.regions.get_region(region).items()
+            if field in ["end_year", "successors"]
+        }
+        for region in ["USSR", "Yugoslavia", "Czechoslovakia", "Sudan (former)"]
+    }
 
     # Select relevant columns
     tb_gdp = tb_maddison[["country", "year", "gdp_per_capita", "region"]].copy()
@@ -188,14 +161,16 @@ def prepare_gdp_data(tb_maddison: Table) -> Table:
     tb_gdp = tb_gdp[(tb_gdp["year"] >= EARLIEST_YEAR) & (tb_gdp["year"] <= LATEST_YEAR)].reset_index(drop=True)
 
     # Remove rows with missing GDP per capita
-    tb_gdp = tb_gdp.dropna(subset=["gdp_per_capita"])
+    tb_gdp = tb_gdp.dropna(subset=["gdp_per_capita"]).reset_index(drop=True)
 
-    # Assert that HISTORICAL_ENTITIES keys and successor states are in tb_gdp
+    # Assert that historical_entities keys and successor states are in tb_gdp
     all_countries = set(tb_gdp["country"].unique())
-    for entity_name, entity_data in HISTORICAL_ENTITIES.items():
+    for entity_name, entity_data in historical_entities.items():
         if entity_name not in all_countries:
             log.error(f"prepare_gdp_data: Historical entity '{entity_name}' not found in GDP data")
-        for successor in entity_data["successor_states"]:
+        # Get region for this entity.
+        region = tb_maddison[tb_maddison["country"] == entity_name]["region"].drop_duplicates().item()
+        for successor in entity_data["successors"]:
             if successor not in all_countries:
                 if SHOW_WARNINGS:
                     log.warning(
@@ -208,7 +183,7 @@ def prepare_gdp_data(tb_maddison: Table) -> Table:
                             "country": [successor],
                             "year": [LATEST_YEAR],
                             "gdp_per_capita": [pd.NA],
-                            "region": [entity_data.get("region", pd.NA)],
+                            "region": [region],
                         }
                     )
                 )
@@ -259,17 +234,17 @@ def prepare_gdp_data(tb_maddison: Table) -> Table:
 
     # Create a historical entities table
     tb_historical_entities = []
-    for entity_name, entity_data in HISTORICAL_ENTITIES.items():
+    for entity_name, entity_data in historical_entities.items():
         tb_entity = tb_gdp[(tb_gdp["country"] == entity_name)].reset_index(drop=True)
-        tb_entity["successor_states"] = [list(entity_data["successor_states"]) for _ in range(len(tb_entity))]
+        tb_entity["successors"] = [list(entity_data["successors"]) for _ in range(len(tb_entity))]
         tb_historical_entities.append(tb_entity)
 
     # Concatenate all historical entities data
     tb_historical_entities = pr.concat(tb_historical_entities, ignore_index=True)
 
     # Expand successor_states into multiple rows and rename columns
-    tb_historical_entities = tb_historical_entities.explode("successor_states").rename(
-        columns={"country": "historical_entity", "successor_states": "country"}
+    tb_historical_entities = tb_historical_entities.explode("successors").rename(
+        columns={"country": "historical_entity", "successors": "country"}
     )
 
     # Restore region information
