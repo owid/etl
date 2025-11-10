@@ -11,8 +11,8 @@ build:
     # Install dependencies
     - pip install -U uv
     - uv sync --all-extras
-    # Build docs
-    - NO_COLOR=1 GENERATING_DOCS=1 uv run zensical build --clean
+    # Build docs using Makefile target
+    - make docs.build
     # Move docs to expected location by RTD
     - mkdir -p _readthedocs
     - cp -r site/ _readthedocs/html/
