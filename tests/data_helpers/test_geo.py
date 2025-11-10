@@ -827,6 +827,7 @@ class MockRegionsDataset:
                 "is_historical": [False, False, False, False, False, False, True],
                 "members": ['["BLR", "FRA", "ITA", "RUS", "ESP", "OWID_USS"]', "[]", "[]", "[]", "[]", "[]", "[]"],
                 "successors": ["[]", "[]", "[]", "[]", "[]", "[]", '["BLR", "RUS"]'],
+                "related": ["[]", '["GUF"]', "[]", "[]", "[]", "[]", "[]"],
             }
         ).set_index("code")
         return mock_tb_regions
@@ -2487,15 +2488,15 @@ class TestRegions(unittest.TestCase):
         self.assertIn("Europe", all_regions)
         self.assertIn("High-income countries", all_regions)
 
-    def test_get_regions_only_members(self):
-        """Test getting regions with only_members=True."""
+    def test_get_regions_only_subregions(self):
+        """Test getting regions with only_subregions=True."""
         regions = geo.Regions(
             ds_regions=self.ds_regions,
             ds_income_groups=self.ds_income_groups,
             auto_load_datasets=False,
         )
 
-        regions_members = regions.get_regions(only_members=True)
+        regions_members = regions.get_regions(only_subregions=True)
 
         # Should be a dictionary of lists
         self.assertIsInstance(regions_members, dict)
