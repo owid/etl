@@ -10,6 +10,7 @@ definitions:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 30
+  title: TSMC Historical Operating Data
 
 tables:
   operating_data:
