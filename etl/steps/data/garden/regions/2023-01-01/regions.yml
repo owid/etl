@@ -934,8 +934,6 @@
   aliases:
     - "Svalbard & Jan Mayen Isl."
     - "Svalbard and Jan Mayen Islands"
-  related:
-    - "NOR"
 - code: "OWID_TRS"
   name: "Transnistria"
   region_type: "other"
