@@ -52,7 +52,7 @@ definitions:
   description_key_not_market_income: Many people, today and in the past, have no monetary income. This data accounts for this by including the estimated value of non-market income, such as food grown by subsistence farmers for their own use.
 
   description_key_scenarios: |-
-    This data combines data based on household surveys or extrapolated up until the year of the data release using GDP per capita growth estimates and forecasts, with projections from 2026-2030 based on GDP per capita growth projections from the World Bank's Macro Poverty Outlook (April 2025), together with IMF's World Economic Outlook (April 2025). For the period 2031-2050, the data is projected using the average annual historical GDP per capita growth over 2014-2023.
+    This data combines data based on household surveys or extrapolated up until the year of the data release using GDP per capita growth estimates and forecasts, with projections from 2026-2030 based on GDP per capita growth projections from the World Bank's Global Economic Prospects (June 2025), supplemented by IMF's World Economic Outlook (April 2025). For the period 2031-2050, the data is projected using the average annual historical GDP per capita growth over 2015-2024.
 
 
 # Learn more about the available fields:
