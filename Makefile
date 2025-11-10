@@ -16,7 +16,7 @@ help:
 	@echo '  make clean     	Delete all non-reference data in the data/ folder'
 	@echo '  make clobber   	Delete non-reference data and .venv'
 	@echo '  make deploy    	Re-run the full ETL on production'
-	@echo '  make docs      	Serve documentation locally'
+	@echo '  make docs.serve    Serve documentation locally'
 	@echo '  make dot       	Build a visual graph of the dependencies'
 	@echo '  make etl       	Fetch data and run all transformations for garden'
 	@echo '  make format    	Format code'
@@ -36,8 +36,17 @@ help:
 	@echo '  make watch-all 	Run all tests, watching for changes (including for modules in lib/)'
 	@echo
 
+docs.build: .venv
+	@echo '==> Generating dynamic documentation files'
+	.venv/bin/python docs/ignore/generate_dynamic_docs_standalone.py
+	@echo '==> Building documentation with Zensical'
+	GENERATING_DOCS=1 .venv/bin/zensical build --clean
+
+docs.serve: .venv
+	GENERATING_DOCS=1 .venv/bin/zensical serve
+
 docs: .venv
-	.venv/bin/mkdocs serve
+	GENERATING_DOCS=1 .venv/bin/mkdocs serve
 
 watch-all:
 	.venv/bin/watchmedo shell-command -c 'clear; make unittest; for lib in $(LIBS); do (cd $$lib && make unittest); done' --recursive --drop .

@@ -95,7 +95,7 @@ nav = [
         { "API" = "api/index.md" },
         { "Charts API" = "api/chart-api.md" },
         { "ETL catalog API" = "api/catalog-api.md" },
-        # { "Example API usage" = "api/example-usage.md" },
+        { "Example API usage" = "api/example-usage.md" },
         { "Querying data via Datasette" = "api/datasette.md" },
         { "Maintenance" = "api/maintenance.md" },
         { "COVID-19" = "api/covid.md" },
@@ -266,37 +266,37 @@ permalink_title = "Anchor link to this section for reference"
 # Plugins
 [project.plugins]
 
-[project.plugins."mkdocs-jupyter"]
-ignore_h1_titles = true
-include_source = true
-execute = false
-allow_errors = false
-show_input = true
-include_requirejs = true
-included = ["*.py", "*.ipynb"]
+# [project.plugins."mkdocs-jupyter"]
+# ignore_h1_titles = true
+# include_source = true
+# execute = false
+# allow_errors = false
+# show_input = true
+# include_requirejs = true
+# included = ["*.py", "*.ipynb"]
 
 [project.plugins.search]
 
 [project.plugins.exclude]
 glob = ["ignore/"]
 
-[project.plugins."gen-files"]
-scripts = ["docs/ignore/generate_dynamic_docs.py"]
+# [project.plugins."gen-files"]
+# scripts = ["docs/ignore/generate_dynamic_docs.py"]
 
 [project.plugins.blog]
 
-[project.plugins."git-authors"]
-show_email_address = false
-show_contribution = true
-ignore_authors = ["owidbot"]
-sort_authors_by = "contribution"
+# [project.plugins."git-authors"]
+# show_email_address = false
+# show_contribution = true
+# ignore_authors = ["owidbot"]
+# sort_authors_by = "contribution"
 
-[project.plugins."git-revision-date-localized"]
+# [project.plugins."git-revision-date-localized"]
 
 [project.plugins.tags]
 tags_file = "tags.md"
 
-[project.plugins.glightbox]
+# [project.plugins.glightbox]
 
 # Extra CSS
 extra_css = ["css/extra.css"]
