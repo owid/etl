@@ -5,11 +5,15 @@ build:
   tools:
     python: "3.10"
   commands:
+    # Init submodules
     - git submodule init
     - git submodule update
+    # Install dependencies
     - pip install -U uv
     - uv sync --all-extras
-    - uv run mkdocs build
+    # Build docs
+    - NO_COLOR=1 GENERATING_DOCS=1 uv run zensical build --clean
+    # Move docs to expected location by RTD
     - mkdir -p _readthedocs
     - cp -r site/ _readthedocs/html/
 
