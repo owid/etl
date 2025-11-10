@@ -1,0 +1,103 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: major
+    description_processing: |-
+      We obtained regional estimates of the number in poverty by summing the number of people in poverty in each region. For global estimates, we proceeded in a similar way, but summing the regional data. To calculate the share in poverty, we divided these results by the total population in each region or globally, and multiplied by 100 to get a percentage.
+    display: &common-display
+      tolerance: 0
+    presentation:
+      topic_tags:
+        - Poverty
+      title_variant: Historical estimates with projections
+      attribution_short: World Bank
+
+  ppp_year: 2021
+
+  poverty_line: |-
+    <% if povertyline == 300 %>
+    $3
+    <%- elif povertyline == 420 %>
+    $4.20
+    <%- elif povertyline == 830 %>
+    $8.30
+    <%- endif %>
+
+  poverty_line_per_day: |-
+    {definitions.poverty_line} per day
+
+  poverty_line_a_day: |-
+    {definitions.poverty_line} a day
+
+  description_key_povertyline: |-
+    <% if povertyline == 300 %>
+    The World Bank defines extreme poverty as living on less than {definitions.poverty_line_per_day}. This threshold, known as the ["International Poverty Line"](#dod:international-poverty-line), is set so that poverty can be compared across countries. This indicator plays an important and successful role in focusing the world's attention on the very poorest people. The UN uses this indicator to track progress towards [ending extreme poverty by 2030](https://ourworldindata.org/sdgs/no-poverty).
+    <%- elif povertyline == 420 %>
+    A poverty line of {definitions.poverty_line_per_day} represents definitions of national poverty lines in lower-middle-income countries.
+    <%- elif povertyline == 830 %>
+    A poverty line of {definitions.poverty_line_per_day} represents definitions of national poverty lines in upper-middle-income countries.
+    <%- endif %>
+
+  description_key_extreme_poverty_additional: |-
+    <% if povertyline == 300 %>
+    Two centuries ago, most of the world's population was extremely poor. Many believed that widespread poverty was inevitable. But this turned out to be wrong. Economic growth is possible, and poverty can decline. With this poverty line, we can track whether countries are leaving the worst poverty behind.
+    <%- endif %>
+
+  description_key_ppp: |-
+    This data is expressed in constant international dollars to adjust for inflation and differences in living costs between countries. Read more in our article, [What are international dollars?](https://ourworldindata.org/international-dollars)
+
+  description_key_welfare_type: |-
+    The data refers to income (after taxes and benefits) or to consumption, [per capita](#dod:per-capita).
+
+  description_key_not_market_income: Many people, today and in the past, have no monetary income. This data accounts for this by including the estimated value of non-market income, such as food grown by subsistence farmers for their own use.
+
+  description_key_scenarios: |-
+    This data combines data based on household surveys or extrapolated up until the year of the data release using GDP per capita growth estimates and forecasts, with projections from 2026-2030 based on GDP per capita growth projections from the World Bank's Macro Poverty Outlook (April 2025), together with IMF's World Economic Outlook (April 2025). For the period 2031-2050, the data is projected using the average annual historical GDP per capita growth over 2014-2023.
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  title: Poverty projections by the World Bank
+  update_period_days: 180
+
+
+tables:
+  poverty_projections:
+    variables:
+      headcount_ratio:
+        title: Share of population in poverty ({definitions.poverty_line_a_day})
+        unit: "%"
+        short_unit: "%"
+        description_short: "Percentage of population living in households with an income or consumption below {definitions.poverty_line_per_day}"
+        description_key:
+          - "{definitions.description_key_povertyline}"
+          - "{definitions.description_key_extreme_poverty_additional}"
+          - "{definitions.description_key_ppp}"
+          - "{definitions.description_key_not_market_income}"
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_scenarios}"
+        display:
+          name: Share of population in poverty ({definitions.poverty_line_a_day})
+          numDecimalPlaces: 1
+          <<: *common-display
+
+      headcount:
+        title: Number of people in poverty ({definitions.poverty_line_a_day})
+        unit: "people"
+        short_unit: ""
+        description_short: "Number of people living in households with an income or consumption below {definitions.poverty_line_per_day}"
+        description_key:
+          - "{definitions.description_key_povertyline}"
+          - "{definitions.description_key_extreme_poverty_additional}"
+          - "{definitions.description_key_ppp}"
+          - "{definitions.description_key_not_market_income}"
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_scenarios}"
+        display:
+          name: Number of people in poverty ({definitions.poverty_line_a_day})
+          numDecimalPlaces: 0
+          numSignificantFigures: 3
+          roundingMode: significantFigures
+          <<: *common-display
+
