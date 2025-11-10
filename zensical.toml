@@ -95,7 +95,7 @@ nav = [
         { "API" = "api/index.md" },
         { "Charts API" = "api/chart-api.md" },
         { "ETL catalog API" = "api/catalog-api.md" },
-        { "Example API usage" = "api/example-usage.md" },
+        # { "Example API usage" = "api/example-usage.md" },
         { "Querying data via Datasette" = "api/datasette.md" },
         { "Maintenance" = "api/maintenance.md" },
         { "COVID-19" = "api/covid.md" },
@@ -135,6 +135,22 @@ link = "https://bsky.app/profile/ourworldindata.org"
 [[project.extra.social]]
 icon = "fontawesome/brands/x-twitter"
 link = "https://twitter.com/ourworldindata"
+
+[[project.extra.social]]
+icon = "fontawesome/brands/facebook"
+link = "https://facebook.com/ourworldindata"
+
+[[project.extra.social]]
+icon = "fontawesome/brands/threads"
+link = "https://threads.com/ourworldindata"
+
+[[project.extra.social]]
+icon = "fontawesome/brands/bluesky"
+link = "https://bsky.app/profile/ourworldindata.org"
+
+[[project.extra.social]]
+icon = "fontawesome/brands/linkedin"
+link = "https://linkedin.com/company/ourworldindata"
 
 # Theme configuration
 [project.theme]
