@@ -331,7 +331,7 @@ if DATASET_ID is not None:
             show_table_explorers(df_explorers)
             st.markdown("#### Most frequent chart editors")
             user_counts = df_charts["User"].value_counts()
-            st.dataframe(user_counts, use_container_width=True)
+            st.dataframe(user_counts, width="stretch")
 
         with tb_explore:
             # Load dataset
