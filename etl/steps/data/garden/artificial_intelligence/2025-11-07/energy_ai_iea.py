@@ -18,8 +18,6 @@ def duplicate_2024_values_for_scenarios(tb: Table) -> Table:
     This ensures that when plotting scenario lines, they all start from the same
     2024 baseline point, avoiding breaks in the visualization.
     """
-    # Reset index to work with the data
-    tb = tb.reset_index()
 
     # Filter for 2024 historical data
     historical_2024 = tb[(tb["year"] == 2024) & (tb["scenario"] == "historical")].copy()
@@ -36,11 +34,46 @@ def duplicate_2024_values_for_scenarios(tb: Table) -> Table:
 
     duplicated_rows = pd.concat(duplicated_rows, ignore_index=True)
     duplicated_rows = Table(duplicated_rows)
-    print(duplicated_rows)
 
     # Concatenate original table with duplicated rows
     tb = pr.concat([tb, duplicated_rows], ignore_index=True)
-    tb = tb.drop(columns=["index"])
+    return tb
+
+
+def create_other_country(tb: Table) -> Table:
+    """
+    Create an "Other" country by subtracting United States and China from World.
+
+    For each combination of year, metric, data_center_category, infrastructure_type, and scenario:
+    Other = World - United States - China
+    """
+
+    # Get World data
+    world_data = tb[tb["country"] == "World"].copy()
+
+    # Get US and China data
+    us_data = tb[tb["country"] == "United States"].copy()
+    china_data = tb[tb["country"] == "China"].copy()
+
+    # Merge on all dimensions except country and value
+    merge_cols = ["year", "metric", "data_center_category", "infrastructure_type", "scenario"]
+
+    # Merge World with US and China
+    merged = world_data.merge(us_data[merge_cols + ["value"]], on=merge_cols, how="left", suffixes=("_world", "_us"))
+    merged = merged.merge(china_data[merge_cols + ["value"]], on=merge_cols, how="left")
+
+    # After the second merge, China's value column is just "value" (no suffix)
+    # Calculate Other = World - US - China
+    merged["value_other"] = merged["value_world"] - merged["value_us"].fillna(0) - merged["value"].fillna(0)
+    merged["value"] = merged["value_other"]
+
+    # Keep only necessary columns
+    other_data = merged[["year", "metric", "data_center_category", "infrastructure_type", "scenario", "value"]].copy()
+    other_data["country"] = "Other"
+
+    # Concatenate with original table
+    tb = pr.concat([tb, Table(other_data)], ignore_index=True)
+
     return tb
 
 
@@ -65,6 +98,9 @@ def run() -> None:
 
     # Duplicate 2024 historical values for each scenario to avoid line breaks in visualizations
     tb = duplicate_2024_values_for_scenarios(tb)
+
+    # Create "Other" country (World - United States - China)
+    tb = create_other_country(tb)
 
     # Format with proper index
     tb = tb.format(["country", "year", "metric", "data_center_category", "infrastructure_type", "scenario"])
