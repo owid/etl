@@ -107,6 +107,19 @@ nav = [
     ] },
 ]
 
+# Extra CSS
+extra_css = ["css/extra.css"]
+
+
+# Extra JavaScript
+extra_javascript = [
+    "https://unpkg.com/tablesort@5.3.0/dist/tablesort.min.js",
+    "javascripts/tablesort.js",
+    "javascripts/cell-toggles.js",
+    "javascripts/mermaid.mjs",
+]
+
+
 # Extra settings
 [project.extra]
 homepage = "https://docs.owid.io/projects/etl"
@@ -209,9 +222,10 @@ text = "Helvetica Neue"
 # Custom homepage configuration
 [project.home]
 tagline = "Our World in Data - Technical documentation"
+gradient_hsla = "hsla(0, 0%, 100%, 0)"
 description = """
 This documentation explains our data workflow and tooling — both to help OWID team members work effectively and to give external readers insight into how we manage and publish our data.
-You can also find selected public analyses related to our work.
+You can also find selected public analyses related to our work. LOL
 """
 
 [[project.home.buttons]]
@@ -236,26 +250,31 @@ admonition = {}
 attr_list = {}
 footnotes = {}
 md_in_html = {}
-mkdocs-click = {}
+"mkdocs-click" = {}
 
-[project.markdown_extensions."pymdownx.critic"]
+[project.markdown_extensions.pymdownx.critic]
 
-[project.markdown_extensions."pymdownx.details"]
+[project.markdown_extensions.pymdownx.details]
 
-[project.markdown_extensions."pymdownx.emoji"]
+[project.markdown_extensions.pymdownx.emoji]
 emoji_index = "material.extensions.emoji.twemoji"
 emoji_generator = "material.extensions.emoji.to_svg"
 
-[project.markdown_extensions."pymdownx.keys"]
+[project.markdown_extensions.pymdownx.keys]
 
-[project.markdown_extensions."pymdownx.snippets"]
+[project.markdown_extensions.pymdownx.snippets]
 
-[project.markdown_extensions."pymdownx.superfences"]
+[project.markdown_extensions.pymdownx.superfences]
 custom_fences = [
     { name = "mermaid", class = "mermaid", format = "pymdownx.superfences.fence_code_format" },
 ]
+# [project.markdown_extensions.pymdownx.superfences]
+# [project.markdown_extensions.pymdownx.superfences.custom_fences]
+# name = "mermaid"
+# class = "mermaid"
+# format = "pymdownx.superfences.fence_code_format"
 
-[project.markdown_extensions."pymdownx.tabbed"]
+[project.markdown_extensions.pymdownx.tabbed]
 alternate_style = true
 
 [project.markdown_extensions.toc]
@@ -266,14 +285,13 @@ permalink_title = "Anchor link to this section for reference"
 # Plugins
 [project.plugins]
 
-# [project.plugins."mkdocs-jupyter"]
-# ignore_h1_titles = true
-# include_source = true
-# execute = false
-# allow_errors = false
-# show_input = true
-# include_requirejs = true
-# included = ["*.py", "*.ipynb"]
+[project.plugins."mkdocs-jupyter"]
+ignore_h1_titles = true
+include_source = true
+execute = false
+allow_errors = false
+show_input = true
+include_requirejs = true
 
 [project.plugins.search]
 
@@ -283,27 +301,17 @@ glob = ["ignore/"]
 # [project.plugins."gen-files"]
 # scripts = ["docs/ignore/generate_dynamic_docs.py"]
 
-[project.plugins.blog]
+# [project.plugins.blog]
 
-# [project.plugins."git-authors"]
+# [project.plugins.git-authors]
 # show_email_address = false
 # show_contribution = true
 # ignore_authors = ["owidbot"]
 # sort_authors_by = "contribution"
 
-# [project.plugins."git-revision-date-localized"]
+# [project.plugins.git-revision-date-localized]
 
 [project.plugins.tags]
 tags_file = "tags.md"
 
-# [project.plugins.glightbox]
-
-# Extra CSS
-extra_css = ["css/extra.css"]
-
-# Extra JavaScript
-extra_javascript = [
-    "https://unpkg.com/tablesort@5.3.0/dist/tablesort.min.js",
-    "javascripts/tablesort.js",
-    "javascripts/cell-toggles.js",
-]
+[project.plugins.glightbox]
