@@ -20,10 +20,13 @@ def run(dest_dir: str) -> None:
     # Use period_to_timestamp to convert to start of quarter
     tb["date"] = pd.PeriodIndex(tb["Quarter"], freq="Q").to_timestamp()
 
+    # Extract year from quarter string
+    tb["year"] = tb["Quarter"].str[:4].astype(int)
+
     tb = tb.drop(columns=["Quarter", "Statistic Label", "UNIT"])
 
     tb["country"] = "Ireland"
-    tb = tb.format(["date", "electricity_consumption"])
+    tb = tb.format(["date", "year", "electricity_consumption"])
 
     # Save outputs
     ds_meadow = create_dataset(
