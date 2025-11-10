@@ -35,6 +35,12 @@ COLUMNS_AND_CATEGORIES = {
         "wealth_quintile": "Total",
         "unit_of_measure": "Deaths per 100 live births",
     },
+    "igme_stillbirth": {
+        "indicator": "Stillbirth rate",
+        "sex": "Total",
+        "wealth_quintile": "Total",
+        "unit_of_measure": "Stillbirths per 100 births",
+    },
     "igme_under_fifteen_mortality": {
         "indicator": "Under-fifteen mortality rate",
         "unit_of_measure": "Deaths per 100 live births",
@@ -51,6 +57,13 @@ COLUMNS_AND_CATEGORIES = {
         "survey_comparability": "No spells",
     },
     "undp_hdr": {"sex": "total"},
+    "ihme_gbd": {
+        "metric": "Rate",
+        "measure": "Deaths",
+        "rei": "Air pollution",
+        "age": "Age-standardized",
+        "cause": "All causes",
+    },
 }
 
 
@@ -73,6 +86,7 @@ def run() -> None:
     ds_gho = paths.load_dataset("gho")
     ds_pip = paths.load_dataset("world_bank_pip")
     ds_undp_hdr = paths.load_dataset("undp_hdr")
+    ds_ihme_gbd = paths.load_dataset("gbd_risk")
     ds_population = paths.load_dataset("population")
     ds_regions = paths.load_dataset("regions")
 
@@ -80,6 +94,7 @@ def run() -> None:
     tb_wdi = ds_wdi.read("wdi")
     tb_un_wpp = ds_un_wpp.read("life_expectancy")
     tb_igme = ds_igme.read("igme")
+    tb_igme_stillbirth = ds_igme.read("igme")
     tb_igme_youth_mortality = ds_igme.read("igme_under_fifteen_mortality")
     tb_maternal_mortality = ds_maternal_mortality.read("maternal_mortality")
     tb_wash = ds_wash.read("who")
@@ -97,6 +112,7 @@ def run() -> None:
     )
     tb_pip = ds_pip.read("world_bank_pip")
     tb_undp_hdr = ds_undp_hdr.read("undp_hdr_sex")
+    tb_ihme_gbd = ds_ihme_gbd.read("gbd_risk")
 
     #
     # Process data.
@@ -124,6 +140,13 @@ def run() -> None:
         columns={"observation_value": "child_mortality_rate"}, errors="raise"
     )
 
+    # IGME stillbirth
+    check_columns_and_categories(tb=tb_igme_stillbirth, table_name="igme_stillbirth")
+    tb_igme_stillbirth = filter_table(tb=tb_igme_stillbirth, table_name="igme_stillbirth")
+    tb_igme_stillbirth = tb_igme_stillbirth[["country", "year", "observation_value"]].rename(
+        columns={"observation_value": "stillbirth_rate"}, errors="raise"
+    )
+
     # IGME Under fifteen mortality
     check_columns_and_categories(tb=tb_igme_youth_mortality, table_name="igme_under_fifteen_mortality")
     tb_igme_youth_mortality = filter_table(tb=tb_igme_youth_mortality, table_name="igme_under_fifteen_mortality")
@@ -139,8 +162,9 @@ def run() -> None:
     # WHO WASH
     check_columns_and_categories(tb=tb_wash, table_name="wash")
     tb_wash = filter_table(tb=tb_wash, table_name="wash")
-    tb_wash = tb_wash[["country", "year", "wat_imp"]].rename(
-        columns={"wat_imp": "access_to_improved_drinking_water"}, errors="raise"
+    tb_wash = tb_wash[["country", "year", "wat_imp", "san_sm"]].rename(
+        columns={"wat_imp": "access_to_improved_drinking_water", "san_sm": "share_using_safely_managed_sanitation"},
+        errors="raise",
     )
 
     # UNWTO
@@ -227,12 +251,20 @@ def run() -> None:
     tb_undp_hdr = filter_table(tb=tb_undp_hdr, table_name="undp_hdr")
     tb_undp_hdr = tb_undp_hdr[["country", "year", "mys"]].rename(columns={"mys": "years_of_schooling"}, errors="raise")
 
+    # IHME GBD
+    check_columns_and_categories(tb=tb_ihme_gbd, table_name="ihme_gbd")
+    tb_ihme_gbd = filter_table(tb=tb_ihme_gbd, table_name="ihme_gbd")
+    tb_ihme_gbd = tb_ihme_gbd[["country", "year", "value"]].rename(
+        columns={"value": "death_rate_from_air_pollution"}, errors="raise"
+    )
+
     # Merge all the tables
     tb = pr.multi_merge(
         [
             tb_wdi,
             tb_un_wpp,
             tb_igme,
+            tb_igme_stillbirth,
             tb_igme_youth_mortality,
             tb_maternal_mortality,
             tb_wash,
@@ -246,6 +278,7 @@ def run() -> None:
             tb_gho_clean_fuel_cooking,
             tb_pip,
             tb_undp_hdr,
+            tb_ihme_gbd,
         ],
         on=["country", "year"],
         how="outer",
@@ -376,11 +409,11 @@ def check_columns_and_categories(tb: Table, table_name: str) -> None:
     for col, cat in COLUMNS_AND_CATEGORIES[table_name].items():
         if col not in tb.columns:
             raise ValueError(
-                f"Column {col} not found in {table_name} table. Columns available are: {tb.columns.tolist()}"
+                f"Column '{col}' not found in '{table_name}' table. Columns available are: {tb.columns.tolist()}"
             )
         if cat not in tb[col].values:
             raise ValueError(
-                f"Category {cat} not found in column {col} of {table_name} table. Categories available are: {tb[col].unique().tolist()}"
+                f"Category '{cat}' not found in column '{col}' of '{table_name}' table. Categories available are: {tb[col].unique().tolist()}"
             )
 
     return None
