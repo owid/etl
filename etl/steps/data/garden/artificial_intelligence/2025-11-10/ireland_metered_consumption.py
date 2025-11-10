@@ -4,13 +4,7 @@ This step processes the meadow data and creates a table with proper time series 
 with separate indicators for data centres, other customers, and total consumption.
 """
 
-import pandas as pd
-from owid.catalog import Table
-from structlog import get_logger
-
 from etl.helpers import PathFinder, create_dataset
-
-log = get_logger()
 
 # Get paths and naming conventions for current step
 paths = PathFinder(__file__)
@@ -18,7 +12,6 @@ paths = PathFinder(__file__)
 
 def run(dest_dir: str) -> None:
     """Create garden dataset from meadow dataset."""
-    log.info("ireland_metered_consumption.start")
 
     # Load inputs
     ds_meadow = paths.load_dataset("ireland_metered_consumption")
@@ -51,5 +44,3 @@ def run(dest_dir: str) -> None:
         default_metadata=ds_meadow.metadata,
     )
     ds_garden.save()
-
-    log.info("ireland_metered_consumption.end")
