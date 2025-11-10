@@ -264,6 +264,9 @@ Create PR first, then commit files:
 
 Note: The `etl pr` creates a new branch but does NOT automatically commit files - you must commit manually after creating the PR.
 
+### Commit Messages
+When creating git commits, refer to [.claude/commands/commit.md](.claude/commands/commit.md) for commit message formatting guidelines including emoji usage.
+
 ## Important Development Notes
 
 - Always use `geo.harmonize_countries()` for geographic data
