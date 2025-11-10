@@ -36,20 +36,23 @@ help:
 	@echo '  make watch-all 	Run all tests, watching for changes (including for modules in lib/)'
 	@echo
 
-docs.build: .venv
+docs-zensical.build: .venv
+	@echo '==> Cleaning previous build'
+	rm -rf site/ .cache/
+	mkdir -p .cache
 	@echo '==> Generating dynamic documentation files'
 	.venv/bin/python docs/ignore/generate_dynamic_docs_standalone.py
 	@echo '==> Building documentation with Zensical'
-	.venv/bin/zensical build --clean -f zensical.toml
+	.venv/bin/zensical build -f zensical.toml
 
-docs.serve: .venv
-	GENERATING_DOCS=1 .venv/bin/zensical serve -f zensical.toml
+docs-zensical.serve: .venv
+	.venv/bin/zensical serve -f zensical.toml
 
-docs-old.build: .venv
+docs.build: .venv
 	@echo '==> Building documentation with MkDocs'
 	.venv/bin/mkdocs build --clean
 
-docs-old.serve: .venv
+docs.serve: .venv
 	@echo '==> Serving documentation with MkDocs'
 	.venv/bin/mkdocs serve
 

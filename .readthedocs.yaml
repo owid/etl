@@ -13,7 +13,7 @@ build:
     - uv sync --all-extras
     # Build docs using Makefile target
     # - make docs.build
-    - make docs-old.build
+    - make docs.build
     # Move docs to expected location by RTD
     - mkdir -p _readthedocs
     - cp -r site/ _readthedocs/html/
