@@ -314,6 +314,12 @@ def add_china_imports_share_of_gdp(tb: Table, gdp_data: Table) -> Table:
         on=["country", "year", "counterpart_country"],
         how="left",
     )
+
+    china_mask = (tb["country"] == "China") & (tb["counterpart_country"] == "World")
+    if china_mask.any():
+        tb.loc[china_mask, "china_imports_share_of_gdp"] = -1
+    else:
+        paths.log.warning("China not found in data - cannot set china_imports_share_of_gdp to -1")
     return tb
 
 
