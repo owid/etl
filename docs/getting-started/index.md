@@ -16,46 +16,50 @@ Making this documentation public is part of our commitment to **transparency** a
 ### Quick reference
 <div class="grid cards" markdown>
 
--   __[:octicons-code-16: &nbsp; Installation](working-environment.md)__
+-   **:octicons-code-16: &nbsp; Installation**
 
     ---
 
     Set up your working environment.
 
-    Practice your [first steps](building-datasets.md).
+    [:octicons-arrow-right-24: Getting started](working-environment.md)
 
--   __[:fontawesome-solid-pen-nib: &nbsp; Design principles](../architecture/)__
+-   **:fontawesome-solid-pen-nib: &nbsp; Design principles]**
 
     ---
 
     Learn the fundamentals.
 
--   __[:material-sign-direction: &nbsp; Guides](../guides/index.md)__
+    [:fontawesome-solid-arrow-right: Learn](../architecture/)
 
-    ---
-    - [Data work](../guides/data-work): Learn how to add, update data, etc.
-    - [Wizard](../guides/wizard.md): Use our ETL admin tool!
-
-    And much more!
-
--   __[:fontawesome-solid-book: &nbsp; Metadata reference](../architecture/metadata/reference/)__
+-   **:material-sign-direction: &nbsp; Guides**
 
     ---
 
-    Data alone is not enough.
+    Learn about our [data work](../guides/data-work), our [Wizard](../guides/wizard.md) tool and much more.
 
-    Learn more about our [metadata](../architecture/metadata/index.md).
 
--   __[:fontawesome-solid-users: &nbsp; Contributing](../contributing.md)__
+    [:fontawesome-solid-arrow-right: Learn by doing](../guides/index.md)
 
-    ---
-
-    Help us improve our work.
-
--   __[:material-api: &nbsp; API](../api/index.md)__
+-   **:fontawesome-solid-book: &nbsp; Metadata reference**
 
     ---
 
-    Access our data catalog.
+    Because data alone is not enough.
+
+    [:fontawesome-solid-arrow-right: Learn more about our metadata](../architecture/metadata/reference/).
+
+
+-   **:fontawesome-solid-users: &nbsp; Contribute**
+
+    ---
+
+    [:fontawesome-solid-arrow-right: Help us improve our work](../contributing.md)
+
+-   **:material-api: &nbsp; API**
+
+    ---
+
+    [:fontawesome-solid-arrow-right: Access our data catalog](../api/index.md).
 
 </div>
