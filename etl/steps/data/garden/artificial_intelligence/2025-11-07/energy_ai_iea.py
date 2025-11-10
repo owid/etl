@@ -42,37 +42,73 @@ def duplicate_2024_values_for_scenarios(tb: Table) -> Table:
 
 def create_other_country(tb: Table) -> Table:
     """
-    Create an "Other" country by subtracting United States and China from World.
-
-    For each combination of year, metric, data_center_category, infrastructure_type, and scenario:
-    Other = World - United States - China
+    Create derived countries by subtracting specific regions:
+    - North America (IEA) excluding United States = North America (IEA) - United States
+    - Asia Pacific (IEA) excluding China = Asia Pacific (IEA) - China
+    - Rest of the world = World - United States - China - Europe (IEA) - Asia Pacific excl. China (IEA)
     """
+    merge_cols = ["year", "metric", "data_center_category", "infrastructure_type", "scenario"]
+    new_countries = []
 
-    # Get World data
-    world_data = tb[tb["country"] == "World"].copy()
-
-    # Get US and China data
+    # Get base country data
     us_data = tb[tb["country"] == "United States"].copy()
     china_data = tb[tb["country"] == "China"].copy()
+    europe_data = tb[tb["country"] == "Europe (IEA)"].copy()
 
-    # Merge on all dimensions except country and value
-    merge_cols = ["year", "metric", "data_center_category", "infrastructure_type", "scenario"]
+    # 1. North America (IEA) excluding United States = North America (IEA) - United States
+    north_america_data = tb[tb["country"] == "North America (IEA)"].copy()
+    merged_na = north_america_data.merge(
+        us_data[merge_cols + ["value"]], on=merge_cols, how="left", suffixes=("_na", "_us")
+    )
+    merged_na["value"] = merged_na["value_na"] - merged_na["value_us"].fillna(0)
 
-    # Merge World with US and China
-    merged = world_data.merge(us_data[merge_cols + ["value"]], on=merge_cols, how="left", suffixes=("_world", "_us"))
-    merged = merged.merge(china_data[merge_cols + ["value"]], on=merge_cols, how="left")
+    north_america_excl_us = merged_na[merge_cols + ["value"]].copy()
+    north_america_excl_us["country"] = "North America (IEA) excluding United States"
+    new_countries.append(north_america_excl_us)
 
-    # After the second merge, China's value column is just "value" (no suffix)
-    # Calculate Other = World - US - China
-    merged["value_other"] = merged["value_world"] - merged["value_us"].fillna(0) - merged["value"].fillna(0)
-    merged["value"] = merged["value_other"]
+    # 3. Asia Pacific (IEA) excluding China = Asia Pacific (IEA) - China
+    asia_pacific_data = tb[tb["country"] == "Asia Pacific (IEA)"].copy()
+    merged_ap = asia_pacific_data.merge(
+        china_data[merge_cols + ["value"]], on=merge_cols, how="left", suffixes=("_ap", "_china")
+    )
+    merged_ap["value"] = merged_ap["value_ap"] - merged_ap["value_china"].fillna(0)
 
-    # Keep only necessary columns
-    other_data = merged[["year", "metric", "data_center_category", "infrastructure_type", "scenario", "value"]].copy()
-    other_data["country"] = "Rest of the world"
+    asia_pacific_excl_china = merged_ap[merge_cols + ["value"]].copy()
+    asia_pacific_excl_china["country"] = "Asia Pacific excl. China (IEA)"
+    new_countries.append(asia_pacific_excl_china)
 
-    # Concatenate with original table
-    tb = pr.concat([tb, Table(other_data)], ignore_index=True)
+    # 3. Rest of the world = World - United States - China - Europe (IEA) - Asia Pacific excl. China (IEA)
+    # First add the derived Asia Pacific excl China to the table temporarily for the calculation
+    tb_with_ap_excl = pr.concat([tb, Table(asia_pacific_excl_china)], ignore_index=True)
+    ap_excl_china_data = tb_with_ap_excl[tb_with_ap_excl["country"] == "Asia Pacific excl. China (IEA)"].copy()
+
+    world_data = tb[tb["country"] == "World"].copy()
+
+    # Rename value columns before merging to avoid suffix issues
+    us_data_renamed = us_data.rename(columns={"value": "value_us"})
+    china_data_renamed = china_data.rename(columns={"value": "value_china"})
+    europe_data_renamed = europe_data.rename(columns={"value": "value_europe"})
+    ap_excl_china_data_renamed = ap_excl_china_data.rename(columns={"value": "value_ap_excl"})
+
+    merged = world_data.merge(us_data_renamed[merge_cols + ["value_us"]], on=merge_cols, how="left")
+    merged = merged.merge(china_data_renamed[merge_cols + ["value_china"]], on=merge_cols, how="left")
+    merged = merged.merge(europe_data_renamed[merge_cols + ["value_europe"]], on=merge_cols, how="left")
+    merged = merged.merge(ap_excl_china_data_renamed[merge_cols + ["value_ap_excl"]], on=merge_cols, how="left")
+
+    merged["value"] = (
+        merged["value"]
+        - merged["value_us"].fillna(0)
+        - merged["value_china"].fillna(0)
+        - merged["value_europe"].fillna(0)
+        - merged["value_ap_excl"].fillna(0)
+    )
+
+    rest_of_world = merged[merge_cols + ["value"]].copy()
+    rest_of_world["country"] = "Rest of the world"
+    new_countries.append(rest_of_world)
+
+    # Concatenate all new countries with original table
+    tb = pr.concat([tb] + [Table(nc) for nc in new_countries], ignore_index=True)
 
     return tb
 
