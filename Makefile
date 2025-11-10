@@ -40,17 +40,18 @@ docs.build: .venv
 	@echo '==> Generating dynamic documentation files'
 	.venv/bin/python docs/ignore/generate_dynamic_docs_standalone.py
 	@echo '==> Building documentation with Zensical'
-	GENERATING_DOCS=1 .venv/bin/zensical build --clean
+	.venv/bin/zensical build --clean -f zensical.toml
 
 docs.serve: .venv
-	GENERATING_DOCS=1 .venv/bin/zensical serve
+	GENERATING_DOCS=1 .venv/bin/zensical serve -f zensical.toml
 
-docs.build-old: .venv
-	@echo '==> Building documentation with Zensical'
-	.venv/bin/mkdocs build
+docs-old.build: .venv
+	@echo '==> Building documentation with MkDocs'
+	.venv/bin/mkdocs build --clean
 
-docs: .venv
-	GENERATING_DOCS=1 .venv/bin/mkdocs serve
+docs-old.serve: .venv
+	@echo '==> Serving documentation with MkDocs'
+	.venv/bin/mkdocs serve
 
 watch-all:
 	.venv/bin/watchmedo shell-command -c 'clear; make unittest; for lib in $(LIBS); do (cd $$lib && make unittest); done' --recursive --drop .
