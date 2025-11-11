@@ -12,11 +12,9 @@ tables:
   nvidia_revenue:
     variables:
       revenue_millions:
-        title: Quarterly revenue of NVIDIA by market segment
-        unit: "million USD"
+        title: NVIDIA's revenue by market segment
+        unit: "US dollars"
         short_unit: "$"
-        description_short: Quarterly revenue in millions of USD
-        description_key:
-          - NVIDIA reports revenue across five main market segments - Data Center (high-performance computing and AI), Gaming (GeForce GPUs), Professional Visualization (Quadro products), Auto (autonomous vehicle platforms), and OEM & Other.
+        description_short: NVIDIA's quarterly revenue reported in US dollars. This data is not adjusted for inflation.
         display:
           numDecimalPlaces: 0
