@@ -227,7 +227,7 @@ class UIChartProducerAnalytics:
         )
 
         # Display the chart.
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
 
 
 @st_cache_data(custom_text="Loading chart data. This can take few seconds...")

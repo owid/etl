@@ -247,7 +247,8 @@ def build_dataset_form(df: pd.DataFrame, similarity_names: Dict[str, Any]) -> "S
                     similarity_name="partial_ratio",
                     max_suggestions=10,
                     no_interactive=True,
-                    auto_threshold=80.0,
+                    auto_threshold=100.0,
+                    perfect_match_only=True,
                 )
 
                 # Run indicator upgrade
