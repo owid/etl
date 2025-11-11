@@ -136,6 +136,8 @@ def __util_get_country_codes(text_raw, tb):
     text_raw = "Afghanistan, Albania, Algeria"
     codes = __util_get_country_codes(text_raw, tb)  # tb here is the regions table
     print("- " + "\n- ".join(codes))
+
+    This is useful when parsing a raw list of countries into meaningful region member codes. To be used as a manual step.
     """
     countries_raw = text_raw.split(", ")
     mapping = tb.set_index("country").code.to_dict()
