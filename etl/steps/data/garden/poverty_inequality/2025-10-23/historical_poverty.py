@@ -128,7 +128,6 @@ def run() -> None:
 
     tb = tb.format(["country", "year", "poverty_line"], short_name="historical_poverty")
     tb_population = tb_population.format(["country", "year"], short_name="population")
-    # TODO: The following table is not stored.
     tb_extended = tb_extended.format(
         ["country", "year", "region", "region_old", "quantile"], short_name="historical_income_distribution"
     )
@@ -137,7 +136,9 @@ def run() -> None:
     # Save outputs.
     #
     # Create dataset
-    ds_garden = paths.create_dataset(tables=[tb, tb_population], default_metadata=ds_thousand_bins.metadata)
+    ds_garden = paths.create_dataset(
+        tables=[tb, tb_population, tb_extended], default_metadata=ds_thousand_bins.metadata
+    )
 
     # Save dataset
     ds_garden.save()
