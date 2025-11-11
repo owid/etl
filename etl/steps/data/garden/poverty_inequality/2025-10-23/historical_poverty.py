@@ -19,10 +19,9 @@ from typing import Tuple
 
 import owid.catalog.processing as pr
 import pandas as pd
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 from structlog import get_logger
 
-from etl.data_helpers import geo
 from etl.data_helpers.misc import interpolate_table
 from etl.helpers import PathFinder
 
@@ -98,68 +97,40 @@ MISSING_COUNTRIES_AND_REGIONS = {
     "Vanuatu": "East Asia",
 }
 
-# Historical entities mapping
-HISTORICAL_ENTITIES = {
-    "USSR": {
-        "successor_states": [
-            "Russia",
-            "Ukraine",
-            "Belarus",
-            "Uzbekistan",
-            "Kazakhstan",
-            "Georgia",
-            "Azerbaijan",
-            "Lithuania",
-            "Moldova",
-            "Latvia",
-            "Kyrgyzstan",
-            "Tajikistan",
-            "Armenia",
-            "Turkmenistan",
-            "Estonia",
-        ],
-        "end_year": 1991,
-    },
-    "Yugoslavia": {
-        "successor_states": [
-            "Serbia",
-            "Croatia",
-            "Slovenia",
-            "Bosnia and Herzegovina",
-            "North Macedonia",
-            "Montenegro",
-            "Kosovo",
-        ],
-        "end_year": 1992,
-        "region": "Eastern Europe",
-    },
-    "Czechoslovakia": {"successor_states": ["Czechia", "Slovakia"], "end_year": 1992},
-    "Former Sudan": {"successor_states": ["Sudan", "South Sudan"], "end_year": 2011, "region": "Sub Saharan Africa"},
-}
+# Countries that appear in the thousand bins dataset for which we don't have population data.
+COUNTRIES_WITHOUT_POPULATION = ["Channel Islands"]
+
+# TODO: I've fixed "Former Sudan"->"Sudan (former)" (since the latter is the right spelling in our regions dataset). Check famines_by_regime_gdp and famines_by_regime_population, which have a hardcoded "Former Sudan" mapping to "Sudan".
 
 
 def run() -> None:
     #
-    # Load inputs
+    # Load inputs.
     #
+    # Load thousand bins dataset, and read its main table.
     ds_thousand_bins = paths.load_dataset("thousand_bins_distribution")
+    tb_thousand_bins = ds_thousand_bins.read("thousand_bins_distribution")
+    # Load Maddison Project Database, and read its main table.
     ds_maddison = paths.load_dataset("maddison_project_database")
-    ds_population = paths.load_dataset("population")
+    tb_maddison = ds_maddison.read("maddison_project_database")
 
-    tb_thousand_bins = ds_thousand_bins["thousand_bins_distribution"].reset_index()
-    tb_maddison = ds_maddison["maddison_project_database"].reset_index()
-
+    #
+    # Prepare data.
+    #
     # Prepare GDP data
     tb_gdp = prepare_gdp_data(tb_maddison)
 
     # Perform backward extrapolation
-    tb_extended = extrapolate_backwards(tb_thousand_bins=tb_thousand_bins, tb_gdp=tb_gdp, ds_population=ds_population)
+    tb_extended = extrapolate_backwards(tb_thousand_bins=tb_thousand_bins, tb_gdp=tb_gdp)
 
     # Calculate poverty measures
-    tb, tb_population = calculate_poverty_measures(tb=tb_extended, ds_population=ds_population)
+    tb = calculate_poverty_measures(tb=tb_extended)
 
-    # # Data quality checks
-    # run_data_quality_checks(tb)
+    # Create stacked variables for stacked area/bar charts
+    tb = create_stacked_variables(tb=tb)
+
+    # Calculate an alternative method with our population dataset
+    tb, tb_population = calculate_alternative_method_with_population_dataset(tb_poverty=tb)
 
     tb = tb.format(["country", "year", "poverty_line"], short_name="historical_poverty")
     tb_population = tb_population.format(["country", "year"], short_name="population")
@@ -167,11 +138,12 @@ def run() -> None:
         ["country", "year", "region", "region_old", "quantile"], short_name="historical_income_distribution"
     )
 
+    #
+    # Save outputs.
+    #
     # Create dataset
     ds_garden = paths.create_dataset(
-        tables=[tb, tb_population, tb_extended],
-        check_variables_metadata=True,
-        default_metadata=ds_thousand_bins.metadata,
+        tables=[tb, tb_population, tb_extended], default_metadata=ds_thousand_bins.metadata
     )
 
     # Save dataset
@@ -182,6 +154,15 @@ def prepare_gdp_data(tb_maddison: Table) -> Table:
     """
     Prepare GDP per capita data for extrapolation, creating growth factors from country, historical entity, and region levels.
     """
+    # Prepare a dictionary of historical regions:
+    historical_entities = {
+        region: {
+            field: value
+            for field, value in paths.regions.get_region(region).items()
+            if field in ["end_year", "successors"]
+        }
+        for region in ["USSR", "Yugoslavia", "Czechoslovakia", "Sudan (former)"]
+    }
 
     # Select relevant columns
     tb_gdp = tb_maddison[["country", "year", "gdp_per_capita", "region"]].copy()
@@ -190,14 +171,16 @@ def prepare_gdp_data(tb_maddison: Table) -> Table:
     tb_gdp = tb_gdp[(tb_gdp["year"] >= EARLIEST_YEAR) & (tb_gdp["year"] <= LATEST_YEAR)].reset_index(drop=True)
 
     # Remove rows with missing GDP per capita
-    tb_gdp = tb_gdp.dropna(subset=["gdp_per_capita"])
+    tb_gdp = tb_gdp.dropna(subset=["gdp_per_capita"]).reset_index(drop=True)
 
-    # Assert that HISTORICAL_ENTITIES keys and successor states are in tb_gdp
+    # Assert that historical_entities keys and successor states are in tb_gdp
     all_countries = set(tb_gdp["country"].unique())
-    for entity_name, entity_data in HISTORICAL_ENTITIES.items():
+    for entity_name, entity_data in historical_entities.items():
         if entity_name not in all_countries:
             log.error(f"prepare_gdp_data: Historical entity '{entity_name}' not found in GDP data")
-        for successor in entity_data["successor_states"]:
+        # Get region for this entity.
+        region = tb_maddison[tb_maddison["country"] == entity_name]["region"].drop_duplicates().item()
+        for successor in entity_data["successors"]:
             if successor not in all_countries:
                 if SHOW_WARNINGS:
                     log.warning(
@@ -210,7 +193,7 @@ def prepare_gdp_data(tb_maddison: Table) -> Table:
                             "country": [successor],
                             "year": [LATEST_YEAR],
                             "gdp_per_capita": [pd.NA],
-                            "region": [entity_data.get("region", pd.NA)],
+                            "region": [region],
                         }
                     )
                 )
@@ -241,8 +224,9 @@ def prepare_gdp_data(tb_maddison: Table) -> Table:
     # Restore region information
     tb_gdp["region"] = tb_gdp["country"].map(regions_map)
 
-    # Create year-over-year growth factors for countries
-    tb_gdp = create_growth_factor_column(tb=tb_gdp)
+    # Create growth_factor column, dividing GDP values by the value in the previous year.
+    tb_gdp = tb_gdp.sort_values(["country", "year"])
+    tb_gdp["growth_factor"] = tb_gdp.groupby("country")["gdp_per_capita"].transform(lambda x: x / x.shift(1))
 
     ###################################
     # REGIONS
@@ -261,17 +245,17 @@ def prepare_gdp_data(tb_maddison: Table) -> Table:
 
     # Create a historical entities table
     tb_historical_entities = []
-    for entity_name, entity_data in HISTORICAL_ENTITIES.items():
+    for entity_name, entity_data in historical_entities.items():
         tb_entity = tb_gdp[(tb_gdp["country"] == entity_name)].reset_index(drop=True)
-        tb_entity["successor_states"] = [list(entity_data["successor_states"]) for _ in range(len(tb_entity))]
+        tb_entity["successors"] = [list(entity_data["successors"]) for _ in range(len(tb_entity))]
         tb_historical_entities.append(tb_entity)
 
     # Concatenate all historical entities data
     tb_historical_entities = pr.concat(tb_historical_entities, ignore_index=True)
 
     # Expand successor_states into multiple rows and rename columns
-    tb_historical_entities = tb_historical_entities.explode("successor_states").rename(
-        columns={"country": "historical_entity", "successor_states": "country"}
+    tb_historical_entities = tb_historical_entities.explode("successors").rename(
+        columns={"country": "historical_entity", "successors": "country"}
     )
 
     # Restore region information
@@ -288,7 +272,7 @@ def prepare_gdp_data(tb_maddison: Table) -> Table:
     )
 
     # Drop extra country_region column
-    tb_gdp = tb_gdp.drop(columns=["country_region"])
+    tb_gdp = tb_gdp.drop(columns=["country_region", "region_region"], errors="raise")
 
     # Merge with historical entities
     tb_gdp = pr.merge(
@@ -300,9 +284,7 @@ def prepare_gdp_data(tb_maddison: Table) -> Table:
     )
 
     # Rename growth factor columns
-    tb_gdp = tb_gdp.rename(
-        columns={"growth_factor": "growth_factor_country"},
-    )
+    tb_gdp = tb_gdp.rename(columns={"growth_factor": "growth_factor_country"}, errors="raise")
 
     # Generate growth_factor column using priority: country > historical_entity > region
     tb_gdp["growth_factor"] = tb_gdp.apply(select_growth_factor, axis=1)
@@ -343,8 +325,8 @@ def prepare_gdp_data(tb_maddison: Table) -> Table:
     ]
 
     # Check for extreme growth rates
+    extreme_growth = tb_gdp[(tb_gdp["growth_factor"] > 2.0) | (tb_gdp["growth_factor"] < 0.5)]
     if SHOW_WARNINGS:
-        extreme_growth = tb_gdp[(tb_gdp["growth_factor"] > 2.0) | (tb_gdp["growth_factor"] < 0.5)]
         if len(extreme_growth) > 0:
             log.warning(
                 f"prepare_gdp_data: Found {len(extreme_growth)} instances of extreme growth "
@@ -353,32 +335,49 @@ def prepare_gdp_data(tb_maddison: Table) -> Table:
             # Show some examples
             sample = extreme_growth.head(10)[["country", "year", "growth_factor"]]
             log.warning(f"prepare_gdp_data: Examples:\n{sample}")
+            log.warning(
+                "We will assert that these instances were already in the original data; otherwise, if they were introduced in our processing, an error will be raised"
+            )
+    for _, row in extreme_growth.iterrows():
+        # Check that those country-years of extreme growth/degrowth were already in the original data.
+        _tb = tb_maddison[(tb_maddison["country"] == row["country"])].reset_index(drop=True)
+        error = "Extreme growth factors have been introduced in the data!"
+        assert len(_tb[(_tb["year"] == row["year"])]) == 1, error
+        # Double-check that those growth factors were exactly as in the original data.
+        growth_factor_original = (
+            _tb[(_tb["year"] == row["year"] + 1)]["gdp_per_capita"].item()
+            / _tb[(_tb["year"] == row["year"])]["gdp_per_capita"].item()
+        )
+        assert growth_factor_original == row["growth_factor"], "Wrong calculation of growth rates"
 
     return tb_gdp
 
 
-def extrapolate_backwards(tb_thousand_bins: Table, tb_gdp: Table, ds_population: Dataset) -> Table:
+def extrapolate_backwards(tb_thousand_bins: Table, tb_gdp: Table) -> Table:
     """
     Extrapolate income distributions backwards from 1990 to 1820, using the cumulative GDP growth factors in the 1000-binned income distribution data.
     """
-
     # Create tb_thousand_bins_to_extrapolate
     tb_thousand_bins_to_extrapolate = tb_thousand_bins[tb_thousand_bins["year"] == LATEST_YEAR].reset_index(drop=True)
 
     # Assert that countries coincide in both tables
     countries_bins = set(tb_thousand_bins_to_extrapolate["country"].unique())
     countries_gdp = set(tb_gdp["country"].unique())
-    missing_countries = countries_bins - countries_gdp
     if SHOW_WARNINGS:
+        missing_countries = countries_bins - countries_gdp
         if len(missing_countries) > 0:
             sorted_missing_countries = ", ".join(sorted(missing_countries))
             log.warning(
                 f"extrapolate_backwards: The following countries are in thousand_bins but missing in GDP data: "
                 f"{sorted_missing_countries}"
             )
-
-    # Filter tb_gdp to only countries present in tb_thousand_bins_to_extrapolate
-    tb_gdp = tb_gdp[tb_gdp["country"].isin(countries_bins)].reset_index(drop=True)
+        missing_countries = countries_gdp - countries_bins
+        if len(missing_countries) > 0:
+            sorted_missing_countries = ", ".join(sorted(missing_countries))
+            log.warning(
+                f"extrapolate_backwards: The following countries are in GDP data but missing in thousand_bins: "
+                f"{sorted_missing_countries}"
+            )
 
     # For tb_thousand_bins_to_extrapolate, column year, assign a list of years from EARLIEST_YEAR to LATEST_YEAR - 1 and then explode
     tb_thousand_bins_to_extrapolate = (
@@ -387,7 +386,7 @@ def extrapolate_backwards(tb_thousand_bins: Table, tb_gdp: Table, ds_population:
         .reset_index(drop=True)
     )
 
-    # Drop pop column, we will add other data on population later
+    # Drop population column, we will add other data on population later
     tb_thousand_bins_to_extrapolate = tb_thousand_bins_to_extrapolate.drop(columns=["pop"])
 
     # Merge with tb_gdp to get growth factors
@@ -399,45 +398,46 @@ def extrapolate_backwards(tb_thousand_bins: Table, tb_gdp: Table, ds_population:
     )
 
     # Divide avg income columns by cumulative_growth_factor to extrapolate backwards
+    # NOTE: The "avg" field refers to the values of 1990, which has been repeated for all previous years. And the cumulative growth factor contains, for each year, the ratio of per capita GDP, GDPpc(1990)/GDPpc(year). Therefore, to get the average income (or consumption) of a given year, we do:
+    # Average(year) = Average(1990) / (GDPpc(1990)/GDPpc(year)) = Average(1990) / cumulative growth factor
     tb_thousand_bins_to_extrapolate["avg"] = (
         tb_thousand_bins_to_extrapolate["avg"] / tb_thousand_bins_to_extrapolate["cumulative_growth_factor"]
     )
 
-    # Add population data for this table
-    tb_thousand_bins_to_extrapolate = geo.add_population_to_table(
+    # Add a column with population data
+    tb_thousand_bins_to_extrapolate = paths.regions.add_population(
         tb=tb_thousand_bins_to_extrapolate,
-        ds_population=ds_population,
         population_col="pop",
         warn_on_missing_countries=True,
         interpolate_missing_population=True,
+        expected_countries_without_population=COUNTRIES_WITHOUT_POPULATION,
     )
 
     # Divide pop into quantiles (1000 quantiles)
     tb_thousand_bins_to_extrapolate["pop"] /= 1000
 
-    if SHOW_WARNINGS:
-        # Check empty values in pop column
-        # NOTE: I am checking this because it could be the case that some countries don't have population data for some years
-        missing_pop = tb_thousand_bins_to_extrapolate[tb_thousand_bins_to_extrapolate["pop"].isna()]
+    # Sanity check.
 
-        # Select only one quantile to review
-        missing_pop = missing_pop[missing_pop["quantile"] == 1]
-
-        # Define countries with missing population values
-        missing_countries = missing_pop["country"].unique()
-        if not missing_pop.empty:
-            log.warning(f"extrapolate_backwards: Missing population values for countries:\n{missing_countries}")
+    set_countries_missing_pop = set(
+        tb_thousand_bins_to_extrapolate[tb_thousand_bins_to_extrapolate["pop"].isna()]["country"]
+    )
+    error = (
+        f"Unexpected countries missing population data: {set_countries_missing_pop - set(COUNTRIES_WITHOUT_POPULATION)}"
+    )
+    assert set_countries_missing_pop == set(COUNTRIES_WITHOUT_POPULATION), error
 
     # Drop cumulative_growth_factor column, as it's no longer needed
     tb_thousand_bins_to_extrapolate = tb_thousand_bins_to_extrapolate.drop(columns=["cumulative_growth_factor"])
 
     # Concatenate with original tb_thousand_bins to get the 1000-binned distribution from EARLIEST_YEAR to present
-    tb_thousand_bins = pr.concat([tb_thousand_bins, tb_thousand_bins_to_extrapolate], ignore_index=True)
+    tb_thousand_bins_extended = pr.concat([tb_thousand_bins, tb_thousand_bins_to_extrapolate], ignore_index=True)
 
     # Sort values
-    tb_thousand_bins = tb_thousand_bins.sort_values(["country", "year", "quantile"]).reset_index(drop=True)
+    tb_thousand_bins_extended = tb_thousand_bins_extended.sort_values(["country", "year", "quantile"]).reset_index(
+        drop=True
+    )
 
-    return tb_thousand_bins
+    return tb_thousand_bins_extended
 
 
 def apply_backward_extrapolation(
@@ -515,7 +515,7 @@ def apply_backward_extrapolation(
     return Table(extended_rows)
 
 
-def calculate_poverty_measures(tb: Table, ds_population: Dataset) -> Tuple[Table, Table]:
+def calculate_poverty_measures(tb: Table) -> Tuple[Table, Table]:
     """
     Calculate poverty headcount and headcount ratios and for all poverty lines.
     For each year, the data is sorted by income avg, and the cumulative population is calculated.
@@ -524,7 +524,6 @@ def calculate_poverty_measures(tb: Table, ds_population: Dataset) -> Tuple[Table
 
     This function returns two tables - one with poverty measures and another with population estimates (only to deal with duplicates in the dimension poverty_line).
     """
-
     # Sort table by year and avg
     tb = tb.sort_values(["year", "avg"]).reset_index(drop=True)
 
@@ -542,8 +541,10 @@ def calculate_poverty_measures(tb: Table, ds_population: Dataset) -> Tuple[Table
 
     # Calculate results for each poverty line
     for poverty_line in POVERTY_LINES:
-        # Filter rows where avg is less than poverty line
-        tb_poverty_line = tb[tb["avg"] < poverty_line].reset_index(drop=True)
+        # Filter rows where avg is less than poverty line, and keep only relevant columns
+        tb_poverty_line = tb[tb["avg"] < poverty_line][
+            ["year", "global_population", "cum_pop", "percentage_global_pop"]
+        ].reset_index(drop=True)
 
         # Get the last row for each year (highest quantile below poverty line)
         tb_poverty_line = tb_poverty_line.groupby("year").tail(1).reset_index(drop=True)
@@ -557,56 +558,23 @@ def calculate_poverty_measures(tb: Table, ds_population: Dataset) -> Tuple[Table
     # Concatenate all poverty lines
     tb_poverty = pr.concat(tb_poverty, ignore_index=True)
 
-    # Keep relevant columns
-    tb_poverty = tb_poverty[["year", "poverty_line", "global_population", "cum_pop", "percentage_global_pop"]]
-
     # Rename columns
     tb_poverty = tb_poverty.rename(
-        columns={"cum_pop": "headcount", "percentage_global_pop": "headcount_ratio", "global_population": "population"}
+        columns={"cum_pop": "headcount", "percentage_global_pop": "headcount_ratio", "global_population": "population"},
+        errors="raise",
     )
 
     # Copy metadata from avg to headcount
     tb_poverty["headcount"] = tb_poverty["headcount"].copy_metadata(tb["avg"])
     tb_poverty["headcount_ratio"] = tb_poverty["headcount_ratio"].copy_metadata(tb["avg"])
+    # Fix units
+    tb_poverty["headcount"].metadata.unit = "people"
+    tb_poverty["headcount"].metadata.short_unit = ""
 
     # Add country column
     tb_poverty["country"] = "World"
 
-    # Create stacked variables for stacked area/bar charts
-    tb_poverty = create_stacked_variables(tb_poverty)
-
-    # Calculate an alternative method with our population dataset
-    # First, add population_omm column, the population of the world from Our World in Data
-    tb_poverty = geo.add_population_to_table(
-        tb=tb_poverty,
-        ds_population=ds_population,
-        population_col="population_omm",
-        warn_on_missing_countries=True,
-        interpolate_missing_population=True,
-    )
-
-    # Calculate headcount_ratio_omm
-    tb_poverty["headcount_ratio_omm"] = tb_poverty["headcount"] / tb_poverty["population_omm"] * 100
-
-    # Create a different table to keep population estimates
-    tb_population = tb_poverty[["country", "year", "poverty_line", "population", "population_omm"]].reset_index(
-        drop=True
-    )
-
-    # Select first poverty line in POVERTY_LINES to avoid duplicates
-    tb_population = tb_population[tb_population["poverty_line"] == str(POVERTY_LINES[0])].reset_index(drop=True)
-
-    # Drop poverty_line column
-    tb_population = tb_population.drop(columns=["poverty_line"])
-
-    # Add population differences columns
-    tb_population["population_diff"] = tb_population["population_omm"] - tb_population["population"]
-    tb_population["population_diff_pct"] = tb_population["population_diff"] / tb_population["population_omm"] * 100
-
-    # Drop population columns from tb_poverty
-    tb_poverty = tb_poverty.drop(columns=["population", "population_omm"])
-
-    return tb_poverty, tb_population
+    return tb_poverty
 
 
 def select_growth_factor(row):
@@ -622,49 +590,20 @@ def select_growth_factor(row):
         return row["growth_factor_region"]
 
 
-def create_growth_factor_column(tb: Table) -> Table:
-    """
-    Create growth_factor column, dividing GDP values by the value in the previous year.
-    """
-
-    tb = tb.sort_values(["country", "year"])
-
-    # Calculate growth factor
-    tb["growth_factor"] = tb.groupby("country")["gdp_per_capita"].transform(lambda x: x / x.shift(1))
-
-    return tb
-
-
 def create_stacked_variables(tb: Table) -> Table:
     """
     Create stacked variables from the indicators to plot them as stacked area/bar charts
     """
-
     tb = tb.copy()
 
     # Define headcount_above and headcount_ratio_above variables
     tb["headcount_above"] = tb["population"] - tb["headcount"]
-    tb["headcount_ratio_above"] = tb["headcount_above"] / tb["population"]
-
-    # Make headcount_ratio_above a percentage
-    tb["headcount_ratio_above"] = tb["headcount_ratio_above"] * 100
+    tb["headcount_ratio_above"] = 100 * (tb["headcount_above"] / tb["population"])
 
     # Define stacked variables as headcount and headcount_ratio between poverty lines
-    # Select only the necessary columns
-    tb_pivot = tb[
-        [
-            "country",
-            "year",
-            "poverty_line",
-            "headcount_ratio",
-            "headcount",
-            "population",
-        ]
-    ].copy()
-
-    # Pivot
+    # Select only the necessary columns and pivot
     tb_pivot = pr.pivot(
-        data=tb,
+        data=tb[["country", "year", "poverty_line", "headcount_ratio", "headcount", "population"]],
         index=["country", "year"],
         columns=["poverty_line"],
     )
@@ -682,10 +621,7 @@ def create_stacked_variables(tb: Table) -> Table:
             tb_pivot[varname_n] = (
                 tb_pivot[("headcount", POVERTY_LINES[i])] - tb_pivot[("headcount", POVERTY_LINES[i - 1])]
             )
-            tb_pivot[varname_pct] = tb_pivot[varname_n] / tb_pivot[("population", POVERTY_LINES[i])]
-
-            # Multiply by 100 to get percentage
-            tb_pivot[varname_pct] = tb_pivot[varname_pct] * 100
+            tb_pivot[varname_pct] = 100 * (tb_pivot[varname_n] / tb_pivot[("population", POVERTY_LINES[i])])
 
     # Now, only keep headcount_between and headcount_ratio_between, and headcount_above and headcount_ratio_above
     tb_pivot = tb_pivot.loc[
@@ -719,3 +655,39 @@ def create_stacked_variables(tb: Table) -> Table:
     tb["headcount_ratio_between"] = tb["headcount_ratio_between"].copy_metadata(tb["headcount_ratio"])
 
     return tb
+
+
+def calculate_alternative_method_with_population_dataset(tb_poverty: Table) -> Tuple[Table, Table]:
+    """
+    Calculate an alternative method with our population dataset, to compare results in Grapher. It calculates headcount_ratio_omm using population_omm from Our World in Data and also saves a population table with population differences.
+    """
+    # First, add population_omm column, the population of the world from Our World in Data
+    tb_poverty = paths.regions.add_population(
+        tb=tb_poverty,
+        population_col="population_omm",
+        warn_on_missing_countries=True,
+        interpolate_missing_population=True,
+    )
+
+    # Calculate headcount_ratio_omm
+    tb_poverty["headcount_ratio_omm"] = tb_poverty["headcount"] / tb_poverty["population_omm"] * 100
+
+    # Create a different table to keep population estimates
+    tb_population = tb_poverty[["country", "year", "poverty_line", "population", "population_omm"]].reset_index(
+        drop=True
+    )
+
+    # Select first poverty line in POVERTY_LINES to avoid duplicates
+    tb_population = tb_population[tb_population["poverty_line"] == str(POVERTY_LINES[0])].reset_index(drop=True)
+
+    # Drop poverty_line column
+    tb_population = tb_population.drop(columns=["poverty_line"])
+
+    # Add population differences columns
+    tb_population["population_diff"] = tb_population["population_omm"] - tb_population["population"]
+    tb_population["population_diff_pct"] = tb_population["population_diff"] / tb_population["population_omm"] * 100
+
+    # Drop population columns from tb_poverty
+    tb_poverty = tb_poverty.drop(columns=["population", "population_omm"])
+
+    return tb_poverty, tb_population

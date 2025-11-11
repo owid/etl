@@ -124,6 +124,7 @@ steps:
     - data://garden/wb/2025-10-13/thousand_bins_distribution
     - data://garden/ggdc/2024-04-26/maddison_project_database
     - data://garden/demography/2024-07-15/population
+    - data://garden/regions/2023-01-01/regions
   data://grapher/poverty_inequality/2025-10-23/historical_poverty:
     - data://garden/poverty_inequality/2025-10-23/historical_poverty
 
