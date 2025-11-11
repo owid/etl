@@ -56,19 +56,60 @@ tables:
             title: Regions
 
       # UN
-      un_m49_1_region:
-        title: World regions according to UN M49 (1)
+      un_region:
+        title: World regions according to UN
         description_short: |-
-          Level-1 broad regions defined by the United Nations.
+          Regions defined by the United Nations, which are used across the UN including UN WPP.
         type: ordinal
         sort:
-          - Americas (UN)
+          - Northern America (UN)
+          - Latin America and the Caribbean (UN)
           - Africa (UN)
           - Europe (UN)
           - Asia (UN)
           - Oceania (UN)
         origins:
           - *origins_un_m49
+        presentation:
+          grapher_config:
+            map:
+              colorScale:
+                customCategoryLabels:
+                  "Northern America (UN)": "Northern America"
+                  "Latin America and the Caribbean (UN)": "Latin America and the Caribbean"
+                  "Africa (UN)": "Africa"
+                  "Europe (UN)": "Europe"
+                  "Asia (UN)": "Asia"
+                  "Oceania (UN)": "Oceania"
+                customHiddenCategories:
+                  "No data": true
+
+      un_m49_1_region:
+        title: World regions according to UN M49 (1)
+        description_short: |-
+          Level-1 broad regions defined by the United Nations.
+        type: ordinal
+        sort:
+          - Americas (UN M49)
+          - Africa (UN M49)
+          - Europe (UN M49)
+          - Asia (UN M49)
+          - Oceania (UN M49)
+        origins:
+          - *origins_un_m49
+        presentation:
+          grapher_config:
+            map:
+              colorScale:
+                customCategoryLabels:
+                  "Americas (UN M49)": "Americas"
+                  "Africa (UN M49)": "Africa"
+                  "Europe (UN M49)": "Europe"
+                  "Asia (UN M49)": "Asia"
+                  "Oceania (UN M49)": "Oceania"
+                customHiddenCategories:
+                  "No data": true
+
       un_m49_2_region:
         title: World regions according to UN M49 (2)
         description_short: |-
@@ -76,50 +117,88 @@ tables:
         type: ordinal
         sort:
           # Americas
-          - Northern America (UN)
-          - Latin America and the Caribbean (UN)
+          - Northern America (UN M49)
+          - Latin America and the Caribbean (UN M49)
           # Africa
-          - Sub-Saharan Africa (UN)
-          - Northern Africa (UN)
+          - Sub-Saharan Africa (UN M49)
+          - Northern Africa (UN M49)
           # Europe
-          - Southern Europe (UN)
-          - Western Europe (UN)
-          - Northern Europe (UN)
-          - Eastern Europe (UN)
+          - Southern Europe (UN M49)
+          - Western Europe (UN M49)
+          - Northern Europe (UN M49)
+          - Eastern Europe (UN M49)
           # Asia
-          - Western Asia (UN)
-          - Central Asia (UN)
-          - Southern Asia (UN)
-          - Eastern Asia (UN)
-          - South-eastern Asia (UN)
+          - Western Asia (UN M49)
+          - Central Asia (UN M49)
+          - Southern Asia (UN M49)
+          - Eastern Asia (UN M49)
+          - South-eastern Asia (UN M49)
           # Oceania
-          - Australia and New Zealand (UN)
-          - Melanesia (UN)
-          - Micronesia (UN)
-          - Polynesia (UN)
+          - Australia and New Zealand (UN M49)
+          - Melanesia (UN M49)
+          - Micronesia (UN M49)
+          - Polynesia (UN M49)
         origins:
           - *origins_un_m49
+        presentation:
+          grapher_config:
+            map:
+              colorScale:
+                customCategoryLabels:
+                  # Americas
+                  "Northern America (UN M49)": "Norhtern America"
+                  "Latin America and the Caribbean (UN M49)": "Latin America and the Caribbean"
+                  # Africa
+                  "Sub-Saharan Africa (UN M49)": "Sub-Saharan Africa"
+                  "Northern Africa (UN M49)": "Northern Africa"
+                  # Europe
+                  "Southern Europe (UN M49)": "Southern Europe"
+                  "Western Europe (UN M49)": "Western Europe"
+                  "Northern Europe (UN M49)": "Northern Europe"
+                  "Eastern Europe (UN M49)": "Eastern Europe"
+                  # Asia
+                  "Western Asia (UN M49)": "Western Asia"
+                  "Central Asia (UN M49)": "Central Asia"
+                  "Southern Asia (UN M49)": "Southern Asia"
+                  "Eastern Asia (UN M49)": "Eastern Asia"
+                  "South-eastern Asia (UN M49)": "South-eastern Asia"
+                  # Oceania
+                  "Australia and New Zealand (UN M49)": "Australia and New Zealand"
+                  "Melanesia (UN M49)": "Melanesia"
+                  "Micronesia (UN M49)": "Micronesia"
+                  "Polynesia (UN M49)": "Polynesia"
+                customHiddenCategories:
+                  "No data": true
+
       un_m49_3_region:
         title: World regions according to UN M49 (3)
         description_short: |-
           Level-3 (most granular) regions defined by the United Nations.
         type: ordinal
         sort:
-          - "Central America (UN)"
-          - "Caribbean (UN)"
-          - "South America (UN)"
-          - "Western Africa (UN)"
-          - "Middle Africa (UN)"
-          - "Southern Africa (UN)"
-          - "Eastern Africa (UN)"
+          - "Central America (UN M49)"
+          - "Caribbean (UN M49)"
+          - "South America (UN M49)"
+          - "Western Africa (UN M49)"
+          - "Middle Africa (UN M49)"
+          - "Southern Africa (UN M49)"
+          - "Eastern Africa (UN M49)"
         origins:
           - *origins_un_m49
-      un_region:
-        title: "World regions according to the UN"
-        description_short: |-
-          Regions defined by the United Nations, which are used across the UN including UN WPP.
-        origins:
-          - *origins_un_m49
+        presentation:
+          grapher_config:
+            map:
+              colorScale:
+                customCategoryLabels:
+                  "Central America (UN M49)": "Central America"
+                  "Caribbean (UN M49)": "Caribbean"
+                  "South America (UN M49)": "South America"
+                  "Western Africa (UN M49)": "Western Africa"
+                  "Middle Africa (UN M49)": "Middle Africa"
+                  "Southern Africa (UN M49)": "Southern Africa"
+                  "Eastern Africa (UN M49)": "Eastern Africa"
+                customHiddenCategories:
+                  "No data": true
 
       # UN SDG
       unsdg_region:
@@ -138,6 +217,21 @@ tables:
           - Oceania (UN SDG)
         origins:
           - *origins_un_sdg
+        presentation:
+          grapher_config:
+            map:
+              colorScale:
+                customCategoryLabels:
+                  "Europe and Northern America (UN SDG)": "Europe and Northern America"
+                  "Latin America and the Caribbean (UN SDG)": "Latin America and the Caribbean"
+                  "Sub-Saharan Africa (UN SDG)": "Sub-Saharan Africa"
+                  "Northern Africa and Western Asia (UN SDG)": "Northern Africa and Western Asia"
+                  "Central and Southern Asia (UN SDG)": "Central and Southern Asia"
+                  "Eastern and South-Eastern Asia (UN SDG)": "Eastern and South-Eastern Asia"
+                  "Australia and New Zealand (UN SDG)": "Australia and New Zealand"
+                  "Oceania (UN SDG)": "Oceania"
+                customHiddenCategories:
+                  "No data": true
 
       # World Bank
       wb_region:
@@ -155,6 +249,20 @@ tables:
           - East Asia and Pacific (WB)
         origins:
           - *origins_wb_regions
+        presentation:
+          grapher_config:
+            map:
+              colorScale:
+                customCategoryLabels:
+                  "North America (WB)": "North America"
+                  "Latin America and Caribbean (WB)": "Latin America and Caribbean"
+                  "Sub-Saharan Africa (WB)": "Sub-Saharan Africa"
+                  "Middle East, North Africa, Afghanistan and Pakistan (WB)": "Middle East, North Africa, Afghanistan and Pakistan"
+                  "Europe and Central Asia (WB)": "Europe and Central Asia"
+                  "South Asia (WB)": "South Asia"
+                  "East Asia and Pacific (WB)": "East Asia and Pacific"
+                customHiddenCategories:
+                  "No data": true
 
       # WHO
       who_region:
@@ -171,6 +279,19 @@ tables:
           - Western Pacific (WHO)
         origins:
           - *origins_who_regions
+        presentation:
+          grapher_config:
+            map:
+              colorScale:
+                customCategoryLabels:
+                  "Americas (WHO)": "Americas"
+                  "Africa (WHO)": "Africa"
+                  "Eastern Mediterranean (WHO)": "Eastern Mediterranean"
+                  "Europe (WHO)": "Europe"
+                  "South-East Asia (WHO)": "South-East Asia"
+                  "Western Pacific (WHO)": "Western Pacific"
+                customHiddenCategories:
+                  "No data": true
 
       # Pew
       pew_region:
@@ -187,3 +308,16 @@ tables:
           - Asia-Pacific (Pew)
         origins:
           - *origins_pew_regions
+        presentation:
+          grapher_config:
+            map:
+              colorScale:
+                customCategoryLabels:
+                  "North America (Pew)": "North America"
+                  "Latin America-Caribbean (Pew)": "Latin America-Caribbean"
+                  "Sub-Saharan Africa (Pew)": "Sub-Saharan Africa"
+                  "Middle East-North Africa (Pew)": "Middle East-North Africa"
+                  "Europe (Pew)": "Europe"
+                  "Asia-Pacific (Pew)": "Asia-Pacific"
+                customHiddenCategories:
+                  "No data": true
