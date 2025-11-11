@@ -76,7 +76,7 @@ views:
           display:
             name: Unemployment rate, modeled
     config:
-      title: "Unemployment rate estimates: modeled vs. national"
+      title: "Unemployment rate estimates: national vs. modeled data"
       subtitle: "{definitions.description_short_unemployment_rate} {definitions.description_short_modeled_vs_national}"
       note: "{definitions.note_icls_13}"
       hasMapTab: false
@@ -104,7 +104,7 @@ views:
           display:
             name: Labor force participation rate, modeled
     config:
-      title: "Labor force participation rate estimates: modeled vs. national"
+      title: "Labor force participation rate estimates: national vs. modeled data"
       subtitle: "{definitions.description_short_labor_force_participation_rate} {definitions.description_short_modeled_vs_national}"
       note: "{definitions.note_icls_13}"
       hasMapTab: false
@@ -133,7 +133,7 @@ views:
           display:
             name: Employment-to-population ratio, modeled
     config:
-      title: "Employment-to-population ratio estimates: modeled vs. national"
+      title: "Employment-to-population ratio estimates: national vs. modeled data"
       subtitle: "{definitions.description_short_employment_to_population_ratio} {definitions.description_short_modeled_vs_national}"
       note: "{definitions.note_icls_13}"
       hasMapTab: false
