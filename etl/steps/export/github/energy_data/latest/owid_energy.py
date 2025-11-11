@@ -25,13 +25,13 @@ from pathlib import Path
 
 import git
 import pandas as pd
-from owid.catalog import Origin, Table
+from owid.catalog import Dataset, Origin, Table
 from structlog import get_logger
 
 from etl.config import DRY_RUN
 from etl.git_api_helpers import GithubApiRepo
 from etl.helpers import PathFinder
-from etl.paths import BASE_DIR
+from etl.paths import BASE_DIR, DATA_DIR
 
 # Initialize logger.
 log = get_logger()
@@ -87,7 +87,7 @@ def prepare_codebook(tb: Table) -> pd.DataFrame:
             and table[column].metadata.presentation.title_public is not None
         ):
             description += table[column].metadata.presentation.title_public
-        else:
+        elif table[column].metadata.title:
             description += table[column].metadata.title
         if table[column].metadata.description_short:
             description += f" - {table[column].metadata.description_short}"
@@ -217,10 +217,9 @@ def run(dest_dir: str) -> None:
     #
     # Load data.
     #
-    # Load the owid_energy dataset from external, and read its main table and codebook.
-    ds_energy = paths.load_dependency("data://external/energy_data/latest/owid_energy")
+    # Load the owid_energy dataset from external, and read its main table.
+    ds_energy = Dataset(DATA_DIR / "external/energy_data/latest/owid_energy")
     tb = ds_energy.read("owid_energy")
-    codebook_tb = ds_energy.read("owid_energy_codebook")
 
     #
     # Process data.

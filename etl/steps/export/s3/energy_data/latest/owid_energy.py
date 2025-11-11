@@ -27,13 +27,13 @@ from pathlib import Path
 
 import git
 import pandas as pd
-from owid.catalog import Table, s3_utils
+from owid.catalog import Dataset, Table, s3_utils
 from structlog import get_logger
 from tqdm.auto import tqdm
 
 from etl.config import DRY_RUN
 from etl.helpers import PathFinder
-from etl.paths import BASE_DIR
+from etl.paths import BASE_DIR, DATA_DIR
 
 # Initialize logger.
 log = get_logger()
@@ -127,7 +127,7 @@ def prepare_codebook(tb: Table) -> pd.DataFrame:
             and table[column].metadata.presentation.title_public is not None
         ):
             description += table[column].metadata.presentation.title_public
-        else:
+        elif table[column].metadata.title:
             description += table[column].metadata.title
         if table[column].metadata.description_short:
             description += f" - {table[column].metadata.description_short}"
@@ -248,7 +248,7 @@ def prepare_and_save_outputs(tb: Table, codebook: Table, temp_dir_path: Path) ->
     log.info("Creating excel file.")
     with pd.ExcelWriter(temp_dir_path / "owid-energy-data.xlsx") as writer:
         # Always write the data sheet first to ensure at least one visible sheet exists
-        tb.to_excel(writer, sheet_name="Data", index=False, float_format="%.3f")
+        pd.DataFrame(tb).to_excel(writer, sheet_name="Data", index=False, float_format="%.3f")
         pd.DataFrame(codebook).to_excel(writer, sheet_name="Metadata", index=False)
 
 
@@ -257,9 +257,8 @@ def run(dest_dir: str) -> None:
     # Load data.
     #
     # Load the owid_energy dataset from external, and read its main table.
-    ds_energy = paths.load_dependency("data://external/energy_data/latest/owid_energy")
+    ds_energy = Dataset(DATA_DIR / "external/energy_data/latest/owid_energy")
     tb = ds_energy.read("owid_energy")
-    codebook_tb = ds_energy.read("owid_energy_codebook")
 
     #
     # Process data.
