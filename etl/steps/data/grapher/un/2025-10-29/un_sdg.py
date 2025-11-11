@@ -9,7 +9,7 @@ from typing import Any, Dict, cast
 
 import pandas as pd
 import requests
-from owid.catalog import License, Origin, Table, VariableMeta, VariablePresentationMeta
+from owid.catalog import License, Origin, Table, VariableMeta
 from owid.catalog.utils import underscore
 from structlog import getLogger
 
@@ -254,7 +254,7 @@ def add_metadata_and_prepare_for_grapher(tb: Table, source_desc: dict, date_acce
         origins=[origin],
         unit=tb["long_unit"].iloc[0].lower(),
         short_unit=tb["short_unit"].iloc[0],
-        presentation=VariablePresentationMeta(title_public=tb["variable_name_public"].iloc[0]),
+        display={"name": tb["variable_name_public"].iloc[0]},
     )
 
     # Use underscore to create valid variable names
