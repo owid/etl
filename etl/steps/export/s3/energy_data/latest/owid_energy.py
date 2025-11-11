@@ -168,14 +168,15 @@ def prepare_codebook(tb: Table) -> pd.DataFrame:
     codebook = pd.DataFrame(metadata).set_index("column").sort_index()
     # For clarity, ensure column descriptions are in the same order as the columns in the data.
     first_columns = ["country", "year", "iso_code", "population", "gdp"]
-    codebook = pd.concat([codebook.loc[first_columns], codebook.drop(first_columns, errors="raise")]).reset_index()
+    codebook = pd.concat([codebook.loc[first_columns], codebook.drop(first_columns, errors="raise")]).reset_index(drop=False)
+    # Note: reset_index() here converts the 'column' index back to a column
 
     return codebook
 
 
 def prepare_data(tb: Table) -> Table:
     # Sort rows and columns conveniently.
-    tb = tb.reset_index().sort_values(["country", "year"]).reset_index(drop=True)
+    tb = tb.sort_values(["country", "year"]).reset_index(drop=True)
     first_columns = ["country", "year", "iso_code", "population", "gdp"]
     tb = tb[first_columns + [column for column in sorted(tb.columns) if column not in first_columns]]
 
