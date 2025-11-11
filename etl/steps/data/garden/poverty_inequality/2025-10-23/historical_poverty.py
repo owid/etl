@@ -100,8 +100,6 @@ MISSING_COUNTRIES_AND_REGIONS = {
 # Countries that appear in the thousand bins dataset for which we don't have population data.
 COUNTRIES_WITHOUT_POPULATION = ["Channel Islands"]
 
-# TODO: I've fixed "Former Sudan"->"Sudan (former)" (since the latter is the right spelling in our regions dataset). Check famines_by_regime_gdp and famines_by_regime_population, which have a hardcoded "Former Sudan" mapping to "Sudan".
-
 
 def run() -> None:
     #
