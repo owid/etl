@@ -60,8 +60,8 @@ Query region data programmatically:
 regions = Regions()
 regions.get_region("Europe")["members"]
 
-# Get multiple regions with their members (or successors, for historical regions)
-regions.get_regions(["Africa", "High-income countries", "USSR"], only_subregions=True)
+# Get multiple regions with their members
+regions.get_regions(["Africa", "High-income countries"], only_members=True)
 ```
 
 ### Country harmonization
