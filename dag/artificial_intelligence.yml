@@ -191,6 +191,7 @@ steps:
     - snapshot://artificial_intelligence/2025-11-11/wsts_historical_billings.xlsx
   data://garden/artificial_intelligence/2025-11-11/wsts_historical_billings:
     - data://meadow/artificial_intelligence/2025-11-11/wsts_historical_billings
+    - data://garden/bls/2025-04-12/us_consumer_prices
   data://grapher/artificial_intelligence/2025-11-11/wsts_historical_billings:
     - data://garden/artificial_intelligence/2025-11-11/wsts_historical_billings
 
