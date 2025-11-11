@@ -184,6 +184,15 @@ steps:
   data://grapher/artificial_intelligence/2023-07-07/semiconductors_cset:
     - data://garden/artificial_intelligence/2023-07-07/semiconductors_cset
 
+  #
+  # WSTS Historical Billings Report
+  #
+  data://meadow/artificial_intelligence/2025-11-11/wsts_historical_billings:
+    - snapshot://artificial_intelligence/2025-11-11/wsts_historical_billings.xlsx
+  data://garden/artificial_intelligence/2025-11-11/wsts_historical_billings:
+    - data://meadow/artificial_intelligence/2025-11-11/wsts_historical_billings
+  data://grapher/artificial_intelligence/2025-11-11/wsts_historical_billings:
+    - data://garden/artificial_intelligence/2025-11-11/wsts_historical_billings
 
   #
   # Robotaxis dataset

@@ -1,0 +1,36 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Artificial Intelligence
+    display:
+      numDecimalPlaces: 0
+
+dataset:
+  update_period_days: 90
+
+tables:
+  wsts_historical_billings_yearly:
+    variables:
+      value:
+        title: Semiconductor billings
+        unit: US$
+        short_unit: $
+        description_short: Semiconductor industry billing data reported in US dollars.
+        description_key:
+          - Semiconductor billings represent the total sales value of semiconductors shipped to customers.
+          - Data is collected from semiconductor manufacturers and aggregated by WSTS.
+          - Monthly data provides granular insights into industry performance and seasonal trends.
+          - Quarterly data offers aggregated views for longer-term analysis.
+  wsts_historical_billings_3mma:
+    variables:
+      value_3mma:
+        title: Semiconductor billings (three-month moving average)
+        unit: US$
+        short_unit: $
+        description_short: Three-month moving average of semiconductor industry billing data in US dollars.
+        description_key:
+          - The 3-month moving average smooths out short-term fluctuations in monthly billing data.
+          - This metric helps identify underlying trends in the semiconductor market.
+          - Moving averages are particularly useful for analyzing cyclical industries like semiconductors.
