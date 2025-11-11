@@ -8,7 +8,7 @@ In this section you will find guides for different use cases and tasks you might
 
 <div class="grid cards" markdown>
 
--   **[:material-arrow-up-bold-hexagon-outline: &nbsp; Data work](data-work)**
+-   **:material-arrow-up-bold-hexagon-outline: &nbsp; [Data work](data-work)**
 
     ***
 
@@ -18,7 +18,7 @@ In this section you will find guides for different use cases and tasks you might
     - [Update datasets](data-work/update-data)
     - [Update charts](data-work/update-charts)
 
--   **[:fontawesome-solid-hat-wizard: &nbsp; Wizard](wizard)**
+-   **:fontawesome-solid-hat-wizard: &nbsp; [Wizard](wizard)**
 
     ***
 
@@ -26,56 +26,56 @@ In this section you will find guides for different use cases and tasks you might
 
     It provides various tools to create ETL steps, improve existing ones, and more.
 
--   **[:octicons-terminal-16: &nbsp; CLI](etl-cli)**
+-   **:octicons-terminal-16: &nbsp; [CLI](etl-cli)**
 
     ***
 
     We also have a CLI, so that you can do some tasks from your terminal.
 
--   **[:material-music-clef-bass: &nbsp; Harmonize country names](harmonize-countries)**
+-   **:material-music-clef-bass: &nbsp; [Harmonize country names](harmonize-countries)**
 
     ***
 
     Standardize country names to use OWID's defaults.
 
--   **[:octicons-globe-16: &nbsp; Environments](environment)**
+-   **:octicons-globe-16: &nbsp; [Environments](environment)**
 
     ***
 
     All our tooling can be executed in different environments. Learn how to use them.
 
--   **[:material-server: &nbsp; Staging servers](staging-servers)**
+-   **:material-server: &nbsp; [Staging servers](staging-servers)**
 
     ***
 
     What are they? And how do we actually work with them?
 
--   **[:octicons-lock-16: &nbsp; Private datasets](private-import)**
+-   **:octicons-lock-16: &nbsp; [Private datasets](private-import)**
 
     ***
 
     Import private datasets.
 
--   **[:octicons-clock-16: &nbsp; Regular updates](auto-regular-updates)**
+-   **:octicons-clock-16: &nbsp; [Regular updates](auto-regular-updates)**
 
     ***
 
     Automate regular updates of datasets.
 
 
--   **[:fontawesome-solid-bone: &nbsp; Backport datasets](backport)**
+-   **:fontawesome-solid-bone: &nbsp; [Backport datasets](backport)**
 
     ***
 
     We use backporting to add legacy datasets to our catalog.
 
--   **[:material-note-edit: &nbsp; Edit the docs](../dev/docs)**
+-   **:material-note-edit: &nbsp; [Edit the docs](../dev/docs)**
 
     ***
 
     Improve, update our documentation.
 
--   **[:simple-openai: &nbsp; OpenAI setup ](openai)**
+-   **:simple-openai: &nbsp; [OpenAI setup ](openai)**
 
     ***
 

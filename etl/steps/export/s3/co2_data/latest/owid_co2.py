@@ -11,9 +11,9 @@ GDP are included.
 
 Outputs:
 * The data in three different formats will also be uploaded to S3, and will be made publicly available, in:
-  * https://nyc3.digitaloceanspaces.com/owid-public/data/co2/owid-co2-data.csv
-  * https://nyc3.digitaloceanspaces.com/owid-public/data/co2/owid-co2-data.xlsx
-  * https://nyc3.digitaloceanspaces.com/owid-public/data/co2/owid-co2-data.json
+  * https://owid-public.owid.io/data/co2/owid-co2-data.csv
+  * https://owid-public.owid.io/data/co2/owid-co2-data.xlsx
+  * https://owid-public.owid.io/data/co2/owid-co2-data.json
 
 """
 
@@ -22,8 +22,7 @@ import tempfile
 from pathlib import Path
 
 import pandas as pd
-from owid.catalog import Table
-from owid.datautils.s3 import S3
+from owid.catalog import Table, s3_utils
 from structlog import get_logger
 from tqdm.auto import tqdm
 
@@ -32,10 +31,6 @@ from etl.helpers import PathFinder
 # Initialize logger.
 log = get_logger()
 
-# Define S3 base URL.
-S3_URL = "https://nyc3.digitaloceanspaces.com"
-# Profile name to use for S3 client (as defined in .aws/config).
-S3_PROFILE_NAME = "default"
 # S3 bucket name and folder where dataset files will be stored.
 S3_BUCKET_NAME = "owid-public"
 S3_DATA_DIR = Path("data/co2")
@@ -83,13 +78,14 @@ def prepare_and_save_outputs(tb: Table, codebook: Table, temp_dir_path: Path) ->
 
     # Create a json file.
     log.info("Creating json file.")
-    save_data_to_json(tb, temp_dir_path / "owid-co2-data.json")
+    save_data_to_json(tb, str(temp_dir_path / "owid-co2-data.json"))
 
     # Create an excel file.
     log.info("Creating excel file.")
     with pd.ExcelWriter(temp_dir_path / "owid-co2-data.xlsx") as writer:
+        # Always write the data sheet first to ensure at least one visible sheet exists
         tb.to_excel(writer, sheet_name="Data", index=False, float_format="%.3f")
-        codebook.to_excel(writer, sheet_name="Metadata")
+        pd.DataFrame(codebook).to_excel(writer, sheet_name="Metadata", index=False)
 
 
 def run() -> None:
@@ -117,17 +113,12 @@ def run() -> None:
 
         prepare_and_save_outputs(tb, codebook=codebook, temp_dir_path=temp_dir_path)
 
-        # Initialise S3 client.
-        s3 = S3(profile_name=S3_PROFILE_NAME)
         for file_name in tqdm(["owid-co2-data.csv", "owid-co2-data.xlsx", "owid-co2-data.json"]):
             # Path to local file.
             local_file = temp_dir_path / file_name
             # Path (within bucket) to S3 file.
-            s3_file = Path("data/co2") / file_name
+            s3_file = S3_DATA_DIR / file_name
             tqdm.write(f"Uploading file {local_file} to S3 bucket {S3_BUCKET_NAME} as {s3_file}.")
-            # Upload and make public each of the files.
-            s3.upload_to_s3(
-                local_path=str(local_file),
-                s3_path=f"s3://{S3_BUCKET_NAME}/{str(s3_file)}",
-                public=True,
-            )
+
+            # Upload file to S3
+            s3_utils.upload(f"s3://{S3_BUCKET_NAME}/{str(s3_file)}", local_file, public=True)

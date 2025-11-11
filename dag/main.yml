@@ -452,8 +452,11 @@ steps:
     - snapshot-private://owid/latest/ig_countries.csv
   data-private://garden/owid/latest/ig_countries:
     - data-private://meadow/owid/latest/ig_countries
+    - data://garden/regions/2023-01-01/regions
   data-private://grapher/owid/latest/ig_countries:
     - data-private://garden/owid/latest/ig_countries
+  export://multidim/owid/latest/ig_countries:
+    - data-private://grapher/owid/latest/ig_countries
 
   # OECD Official Development Assistance (ODA)
   data://meadow/oecd/2025-02-19/official_development_assistance:

@@ -210,3 +210,13 @@ steps:
     - snapshot://wb/2025-06-11/thousand_bins_distribution.dta
   data://garden/wb/2025-06-11/thousand_bins_distribution:
     - data://meadow/wb/2025-06-11/thousand_bins_distribution
+
+  #
+  # Poverty projections in 2021 prices up to 2050
+  #
+  data://meadow/wb/2025-07-02/poverty_projections:
+    - snapshot://wb/2025-07-02/poverty_projections.dta
+  data://garden/wb/2025-07-02/poverty_projections:
+    - data://meadow/wb/2025-07-02/poverty_projections
+  data://grapher/wb/2025-07-02/poverty_projections:
+    - data://garden/wb/2025-07-02/poverty_projections
