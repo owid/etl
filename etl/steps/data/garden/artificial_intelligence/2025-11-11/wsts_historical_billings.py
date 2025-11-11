@@ -26,11 +26,7 @@ def run() -> None:
     # Harmonize country names
     tb_monthly = geo.harmonize_countries(df=tb_monthly, countries_file=paths.country_mapping_path, country_col="region")
     tb_3mma = geo.harmonize_countries(df=tb_3mma, countries_file=paths.country_mapping_path, country_col="region")
-
-    # Convert values from thousands of US$ to US$
-    tb_3mma["value_3mma"] = tb_3mma["value_3mma"] * 1000
-    tb_monthly["value"] = tb_monthly["value"] * 1000
-
+    print(tb_3mma)
     # Process monthly/quarterly data with 3 months running averages
     # Convert month name to month number
     tb_3mma["date"] = pd.to_datetime(tb_3mma["year"].astype(str) + "-" + tb_3mma["month"].astype(str), format="%Y-%B")

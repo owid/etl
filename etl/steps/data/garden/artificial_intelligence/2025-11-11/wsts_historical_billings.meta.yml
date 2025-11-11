@@ -17,7 +17,7 @@ tables:
         title: Annual semiconductor billings
         unit: US$
         short_unit: $
-        description_short: The total value of semiconductors that manufacturers ship to their customers each year. This includes sales to end users, distributors, and subsidiaries that use these components in final products.
+        description_short: The total value of semiconductors that manufacturers ship to their customers each year. This includes sales to end users, distributors, and subsidiaries that use these components in final products. The total value of semiconductors that manufacturers ship to their customers each year. This includes sales to end users, distributors, and subsidiaries that use these components in final products. The data is expressed in current US dollars and is not adjusted for inflation.
 
   wsts_historical_billings_3mma:
     variables:
@@ -25,4 +25,4 @@ tables:
         title: Semiconductor billings (three-month moving average)
         unit: US$
         short_unit: $
-        description_short: The three-month moving average of the value of semiconductors that manufacturers ship to their customers each month. This includes sales to end users, distributors, and subsidiaries that use these components in final products.
+        description_short: The three-month moving average of the value of semiconductors that manufacturers ship to their customers each month. This includes sales to end users, distributors, and subsidiaries that use these components in final products. The total value of semiconductors that manufacturers ship to their customers each year. This includes sales to end users, distributors, and subsidiaries that use these components in final products. The data is expressed in current US dollars and is not adjusted for inflation.
