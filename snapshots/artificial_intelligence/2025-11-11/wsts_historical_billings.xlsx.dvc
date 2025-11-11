@@ -6,12 +6,10 @@ meta:
     title: WSTS Historical Billings Report
     description: |-
       The World Semiconductor Trade Statistics (WSTS) Historical Billings Report provides comprehensive data on global semiconductor industry billings spanning multiple decades. The report tracks monthly and quarterly billing data across major geographic regions including Americas, Europe, Japan, and Asia Pacific, offering insights into the semiconductor market trends and regional performance.
-    date_published: "2025-09-01"
-    title_snapshot: WSTS Historical Billings Report - September 2025
 
-    description_snapshot: |-
-      Historical semiconductor industry billing data from 1986 to 2025, including monthly, quarterly, and 3-month moving average data across major geographic regions. All values are reported in thousands of US dollars.
-    # Citation
+      WSTS collects confidential sales data from participating companies. For companies that do not report, estimates are made based on their previous market shares to ensure global coverage. The result is a worldwide estimate that captures almost all non-captive semiconductor production (that is, chips sold on the open market rather than used internally).
+    date_published: "2025-09-01"
+
     producer: World Semiconductor Trade Statistics (WSTS)
     citation_full: |-
       World Semiconductor Trade Statistics (WSTS), "WSTS Historical Billings Report," September 2025.
