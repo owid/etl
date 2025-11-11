@@ -363,3 +363,13 @@ steps:
   #
   data-private://grapher/energy/2025-09-18/historical_energy_costs:
     - data-private://garden/energy/2025-09-18/historical_energy_costs
+  #
+  # Energy - OWID Energy dataset.
+  #
+  export://github/energy_data/latest/owid_energy:
+    - data://external/energy_data/latest/owid_energy
+  #
+  # Energy - OWID Energy dataset.
+  #
+  export://s3/energy_data/latest/owid_energy:
+    - data://external/energy_data/latest/owid_energy

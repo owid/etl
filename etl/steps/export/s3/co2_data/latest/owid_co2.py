@@ -21,12 +21,15 @@ import json
 import tempfile
 from pathlib import Path
 
+import git
 import pandas as pd
 from owid.catalog import Table, s3_utils
 from structlog import get_logger
 from tqdm.auto import tqdm
 
+from etl.config import DRY_RUN
 from etl.helpers import PathFinder
+from etl.paths import BASE_DIR
 
 # Initialize logger.
 log = get_logger()
@@ -100,15 +103,15 @@ def run() -> None:
     #
     # Save outputs.
     #
+    # Check if we're on master branch (if so, force dry run)
+    branch = git.Repo(BASE_DIR).active_branch.name
+    dry_run = DRY_RUN or (branch == "master")
+
+    if branch == "master":
+        log.warning("You are on master branch, using dry mode.")
+
     # Create a temporary directory for all files to be committed.
     with tempfile.TemporaryDirectory() as temp_dir:
-        ################################################################################################################
-        # TODO: Create new public files and update the way we write to them.
-        log.warning(
-            "This implementation currently does not work. We should create an R2 public bucket and update the way we write to it. For now, manually update files in Digital Ocean using the web interface."
-        )
-        ################################################################################################################
-
         temp_dir_path = Path(temp_dir)
 
         prepare_and_save_outputs(tb, codebook=codebook, temp_dir_path=temp_dir_path)
@@ -118,7 +121,10 @@ def run() -> None:
             local_file = temp_dir_path / file_name
             # Path (within bucket) to S3 file.
             s3_file = S3_DATA_DIR / file_name
-            tqdm.write(f"Uploading file {local_file} to S3 bucket {S3_BUCKET_NAME} as {s3_file}.")
 
-            # Upload file to S3
-            s3_utils.upload(f"s3://{S3_BUCKET_NAME}/{str(s3_file)}", local_file, public=True)
+            if dry_run:
+                tqdm.write(f"[DRY RUN] Would upload file {local_file} to S3 bucket {S3_BUCKET_NAME} as {s3_file}.")
+            else:
+                tqdm.write(f"Uploading file {local_file} to S3 bucket {S3_BUCKET_NAME} as {s3_file}.")
+                # Upload file to S3
+                s3_utils.upload(f"s3://{S3_BUCKET_NAME}/{str(s3_file)}", local_file, public=True)
