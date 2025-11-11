@@ -104,11 +104,11 @@ def run() -> None:
     #
     # Load inputs.
     #
+    # Load thousand bins dataset, and read its main table.
     ds_thousand_bins = paths.load_dataset("thousand_bins_distribution")
-    ds_maddison = paths.load_dataset("maddison_project_database")
-    ds_population = paths.load_dataset("population")
-
     tb_thousand_bins = ds_thousand_bins.read("thousand_bins_distribution")
+    # Load Maddison Project Database, and read its main table.
+    ds_maddison = paths.load_dataset("maddison_project_database")
     tb_maddison = ds_maddison.read("maddison_project_database")
 
     #
@@ -118,10 +118,10 @@ def run() -> None:
     tb_gdp = prepare_gdp_data(tb_maddison)
 
     # Perform backward extrapolation
-    tb_extended = extrapolate_backwards(tb_thousand_bins=tb_thousand_bins, tb_gdp=tb_gdp, ds_population=ds_population)
+    tb_extended = extrapolate_backwards(tb_thousand_bins=tb_thousand_bins, tb_gdp=tb_gdp)
 
     # Calculate poverty measures
-    tb, tb_population = calculate_poverty_measures(tb=tb_extended, ds_population=ds_population)
+    tb, tb_population = calculate_poverty_measures(tb=tb_extended)
 
     tb = tb.format(["country", "year", "poverty_line"], short_name="historical_poverty")
     tb_population = tb_population.format(["country", "year"], short_name="population")
@@ -342,7 +342,7 @@ def prepare_gdp_data(tb_maddison: Table) -> Table:
     return tb_gdp
 
 
-def extrapolate_backwards(tb_thousand_bins: Table, tb_gdp: Table, ds_population: Dataset) -> Table:
+def extrapolate_backwards(tb_thousand_bins: Table, tb_gdp: Table) -> Table:
     """
     Extrapolate income distributions backwards from 1990 to 1820, using the cumulative GDP growth factors in the 1000-binned income distribution data.
     """
@@ -504,7 +504,7 @@ def apply_backward_extrapolation(
     return Table(extended_rows)
 
 
-def calculate_poverty_measures(tb: Table, ds_population: Dataset) -> Tuple[Table, Table]:
+def calculate_poverty_measures(tb: Table) -> Tuple[Table, Table]:
     """
     Calculate poverty headcount and headcount ratios and for all poverty lines.
     For each year, the data is sorted by income avg, and the cumulative population is calculated.
