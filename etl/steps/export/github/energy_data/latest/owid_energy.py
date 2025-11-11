@@ -128,7 +128,9 @@ def prepare_codebook(tb: Table) -> pd.DataFrame:
     codebook = pd.DataFrame(metadata).set_index("column").sort_index()
     # For clarity, ensure column descriptions are in the same order as the columns in the data.
     first_columns = ["country", "year", "iso_code", "population", "gdp"]
-    codebook = pd.concat([codebook.loc[first_columns], codebook.drop(first_columns, errors="raise")]).reset_index(drop=False)
+    codebook = pd.concat([codebook.loc[first_columns], codebook.drop(first_columns, errors="raise")]).reset_index(
+        drop=False
+    )
     # Note: reset_index() here converts the 'column' index back to a column
 
     return codebook

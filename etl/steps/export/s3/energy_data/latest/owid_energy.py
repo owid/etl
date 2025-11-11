@@ -168,7 +168,9 @@ def prepare_codebook(tb: Table) -> pd.DataFrame:
     codebook = pd.DataFrame(metadata).set_index("column").sort_index()
     # For clarity, ensure column descriptions are in the same order as the columns in the data.
     first_columns = ["country", "year", "iso_code", "population", "gdp"]
-    codebook = pd.concat([codebook.loc[first_columns], codebook.drop(first_columns, errors="raise")]).reset_index(drop=False)
+    codebook = pd.concat([codebook.loc[first_columns], codebook.drop(first_columns, errors="raise")]).reset_index(
+        drop=False
+    )
     # Note: reset_index() here converts the 'column' index back to a column
 
     return codebook
@@ -204,13 +206,15 @@ def validate_data(tb: Table, codebook: pd.DataFrame) -> None:
     # Column names should not contain whitespace
     col_contains_space = tb.columns.str.contains(r"\s", regex=True)
     assert col_contains_space.sum() == 0, (
-        "Columns should not contain whitespace, but the following " f"columns do: {tb.columns[col_contains_space].tolist()}"
+        "Columns should not contain whitespace, but the following "
+        f"columns do: {tb.columns[col_contains_space].tolist()}"
     )
 
     # All columns should be lowercase
     col_is_lower = tb.columns == tb.columns.str.lower()
     assert col_is_lower.all(), (
-        "Columns should not have uppercase characters, but the following " f"columns do: {tb.columns[~col_is_lower].tolist()}"
+        "Columns should not have uppercase characters, but the following "
+        f"columns do: {tb.columns[~col_is_lower].tolist()}"
     )
 
     # No rows should be all NaN (excluding index columns)
