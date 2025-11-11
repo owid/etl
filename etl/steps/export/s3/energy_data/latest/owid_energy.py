@@ -26,13 +26,12 @@ import tempfile
 from pathlib import Path
 
 import pandas as pd
-from owid.catalog import Dataset, Table, s3_utils
+from owid.catalog import Table, s3_utils
 from structlog import get_logger
 from tqdm.auto import tqdm
 
 from etl.config import DRY_RUN
 from etl.helpers import PathFinder
-from etl.paths import DATA_DIR
 
 # Initialize logger.
 log = get_logger()
@@ -260,8 +259,8 @@ def run(dest_dir: str) -> None:
     #
     # Load data.
     #
-    # Load the owid_energy dataset from external, and read its main table.
-    ds_energy = Dataset(DATA_DIR / "external/energy_data/latest/owid_energy")
+    # Load the owid_energy dataset from garden, and read its main table.
+    ds_energy = paths.load_dataset("owid_energy")
     tb = ds_energy.read("owid_energy")
 
     #
