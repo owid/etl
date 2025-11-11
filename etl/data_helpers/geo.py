@@ -24,6 +24,7 @@ from etl.paths import DATA_DIR, LATEST_INCOME_DATASET_PATH, LATEST_POPULATION_DA
 log = get_logger()
 
 TableOrDataFrame = TypeVar("TableOrDataFrame", pd.DataFrame, Table)
+SubregionType = Literal["members", "successors", "related"]
 
 # Default income groups.
 INCOME_GROUPS = {
@@ -869,9 +870,9 @@ def add_gdp_to_table(
 
 @cache
 def create_table_of_regions_and_subregions(
-    ds_regions: Dataset, subregion_type: str = "members", unpack_subregions: bool = False
+    ds_regions: Dataset, subregion_type: SubregionType = "members", unpack_subregions: bool = False
 ) -> Table:
-    # Subregion type can be "members" or "successors" (or in principle also "related").
+    # Subregion type can be "members", "successors", or "related".
     # Get the main table from the regions dataset.
     tb_regions = ds_regions["regions"]
     tb_regions = tb_regions.loc[:, ["name", subregion_type]]
@@ -939,7 +940,7 @@ def list_members_of_region(
     custom_members: list[str] | None = None,
     include_historical_regions_in_income_groups: bool = False,
     exclude_historical_countries: bool = False,
-    subregion_type: str = "members",
+    subregion_type: SubregionType = "members",
     # TODO: Should this be True by default?
     unpack_subregions: bool = False,
 ) -> list[str]:
@@ -969,7 +970,7 @@ def list_members_of_region(
         True to include historical regions in income groups.
     exclude_historical_countries : bool
         True to include historical countries.
-    subregion_type : str
+    subregion_type : SubregionType
         Either "members" to get the members of a region (e.g. if region is a continent like "Africa"); or "successors" to get the successor countries of a historical region (e.g. "USSR"); or "related" to get related countries like overseas territories (e.g. "France").
     unpack_subregions : bool
         True to replace subregions by their countries. For example, for "World", instead of showing "Africa" as a member, it will show all African countries.
@@ -1185,7 +1186,7 @@ def add_regions_to_table(
     check_for_region_overlaps: bool = True,
     accepted_overlaps: list[dict[int, set[str]]] | None = None,
     ignore_overlaps_of_zeros: bool = False,
-    subregion_type: str = "successors",
+    subregion_type: SubregionType = "successors",
     countries_that_must_have_data: dict[str, list[str]] | None = None,
     frac_countries_that_must_have_data: dict[str, float] | None = None,
 ) -> Table:
@@ -1288,7 +1289,7 @@ def add_regions_to_table(
         * If True, overlaps of values of zero are ignored. In other words, if a region and one of its successors have
           both data on the same year, and that data is zero for both, no warning is raised.
         * If False, overlaps of values of zero are not ignored.
-    subregion_type : str, default: "successors"
+    subregion_type : SubregionType, default: "successors"
         Only relevant if check_for_region_overlaps is True.
         * If "successors", the function will look for overlaps between historical regions and their successors.
         * If "related", the function will look for overlaps between regions and their possibly related members (e.g.
@@ -1771,7 +1772,8 @@ class Regions:
                 assert len(_region) == 1, f"Multiple regions found for name {name}"
                 region_dict = _region.iloc[0].to_dict()
             # For now, use the existing function to extract members (as well as successors, for historical regions, and related countries like overseas territories), which has some additional logic.
-            for subregion_type in ["members", "successors", "related"]:
+            subregion_types: list[SubregionType] = ["members", "successors", "related"]
+            for subregion_type in subregion_types:
                 region_dict[subregion_type] = list_members_of_region(  # type: ignore
                     region=name,
                     ds_regions=self.ds_regions,
@@ -1959,7 +1961,7 @@ class Regions:
         check_for_region_overlaps: bool = True,
         accepted_overlaps: list[dict[int, set[str]]] | None = None,
         ignore_overlaps_of_zeros: bool = False,
-        subregion_type: str = "successors",
+        subregion_type: SubregionType = "successors",
         countries_that_must_have_data: dict[str, list[str]] | None = None,
     ) -> Table:
         """Add region aggregates to a table.
@@ -2346,7 +2348,7 @@ class RegionAggregator:
         tb,
         accepted_overlaps: list[dict[int, set[str]]] | None = None,
         ignore_overlaps_of_zeros: bool = False,
-        subregion_type: str = "successors",
+        subregion_type: SubregionType = "successors",
     ):
         """Check if a historical region has data on the same years as any of its successors, which could lead to double-counting data when creating region aggregates.
 
@@ -2492,7 +2494,7 @@ class RegionAggregator:
         check_for_region_overlaps: bool = True,
         accepted_overlaps: list[dict[int, set[str]]] | None = None,
         ignore_overlaps_of_zeros: bool = False,
-        subregion_type: str = "successors",
+        subregion_type: SubregionType = "successors",
         countries_that_must_have_data: dict[str, list[str]] | list[str] | None = None,
     ) -> Table:
         """Add region aggregates to a table.
@@ -2535,7 +2537,7 @@ class RegionAggregator:
             * If True, overlaps of values of zero are ignored. In other words, if a region and one of its successors have
             both data on the same year, and that data is zero for both, no warning is raised.
             * If False, overlaps of values of zero are not ignored.
-        subregion_type : str, default: "successors"
+        subregion_type : SubregionType, default: "successors"
             Only relevant if check_for_region_overlaps is True.
             * If "successors", the function will look for overlaps between historical regions and their successors.
             * If "related", the function will look for overlaps between regions and their possibly related members (e.g.
