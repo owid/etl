@@ -1,0 +1,131 @@
+title:
+  title: "Comparison of labor estimates: national vs. modeled data"
+  title_variant: ILO
+topic_tags:
+  - Work & Employment
+default_selection:
+  - United Kingdom
+  - United States
+  - South Korea
+  - Rwanda
+  - Angola
+  - Mali
+
+default_dimensions:
+  indicator: unemployment_rate
+
+dimensions:
+  - name: Metric
+    slug: indicator
+    choices:
+      - slug: unemployment_rate
+        name: Unemployment rate
+        description: Share of the labor force without work, but actively looking for a job and available to start soon.
+      - slug: labor_force_participation_rate
+        name: Labor force participation rate
+        description: Share of the working-age population who are economically active (employed or unemployed).
+      - slug: employment_to_population_ratio
+        name: Employment-to-population ratio
+        description: Share of the working-age population who are employed.
+views:
+  - dimensions:
+      indicator: unemployment_rate
+    indicators:
+      y:
+        - catalogPath: wdi#sl_uem_totl_ne_zs
+          display:
+            name: Unemployment rate, national
+            plotMarkersOnlyInLineChart: true
+        - catalogPath: wdi#sl_uem_totl_zs
+          display:
+            name: Unemployment rate, modeled
+    config:
+      title: "Unemployment rate estimates: modeled vs. national"
+      subtitle: ""
+      note: ""
+      hasMapTab: false
+      chartTypes: ["LineChart"]
+      selectedFacetStrategy: entity
+      yAxis:
+        min: 0
+      hideAnnotationFieldsInTitle:
+        time: true
+    # metadata:
+    #   description_key:
+    #     - "{definitions.description_key_extreme_poverty}"
+    #     - "{definitions.description_key_extreme_poverty_additional}"
+    #     - "{definitions.description_key_lmic_poverty_line}"
+    #     - "{definitions.description_key_umic_poverty_line}"
+    #     - "{definitions.description_key_ppp}"
+    #     - "{definitions.description_key_not_market_income}"
+    #     - "{definitions.description_key_nowcasts}"
+    #     - "{definitions.description_key_welfare_type}"
+    #   description_short: "{definitions.ppp_adjustment_subtitle}"
+
+  - dimensions:
+      indicator: labor_force_participation_rate
+    indicators:
+      y:
+        - catalogPath: wdi#sl_tlf_cact_ne_zs
+          display:
+            name: Labor force participation rate, national
+            plotMarkersOnlyInLineChart: true
+        - catalogPath: wdi#sl_tlf_cact_zs
+          display:
+            name: Labor force participation rate, modeled
+    config:
+      title: "Labor force participation rate estimates: modeled vs. national"
+      subtitle: ""
+      note: ""
+      hasMapTab: false
+      chartTypes: ["LineChart"]
+      selectedFacetStrategy: entity
+      yAxis:
+        min: 0
+      hideAnnotationFieldsInTitle:
+        time: true
+    # metadata:
+    #   description_key:
+    #     - "{definitions.description_key_extreme_poverty}"
+    #     - "{definitions.description_key_extreme_poverty_additional}"
+    #     - "{definitions.description_key_lmic_poverty_line}"
+    #     - "{definitions.description_key_umic_poverty_line}"
+    #     - "{definitions.description_key_ppp}"
+    #     - "{definitions.description_key_not_market_income}"
+    #     - "{definitions.description_key_nowcasts}"
+    #     - "{definitions.description_key_welfare_type}"
+    #   description_short: "{definitions.ppp_adjustment_subtitle}"
+
+  - dimensions:
+      indicator: employment_to_population_ratio
+    indicators:
+      y:
+        - catalogPath: wdi#sl_emp_totl_sp_ne_zs
+          display:
+            name: Employment-to-population ratio, national
+            plotMarkersOnlyInLineChart: true
+        - catalogPath: wdi#sl_emp_totl_sp_zs
+          display:
+            name: Employment-to-population ratio, modeled
+    config:
+      title: "Employment-to-population ratio estimates: modeled vs. national"
+      subtitle: ""
+      note: ""
+      hasMapTab: false
+      chartTypes: ["LineChart"]
+      selectedFacetStrategy: entity
+      yAxis:
+        min: 0
+      hideAnnotationFieldsInTitle:
+        time: true
+    # metadata:
+    #   description_key:
+    #     - "{definitions.description_key_extreme_poverty}"
+    #     - "{definitions.description_key_extreme_poverty_additional}"
+    #     - "{definitions.description_key_lmic_poverty_line}"
+    #     - "{definitions.description_key_umic_poverty_line}"
+    #     - "{definitions.description_key_ppp}"
+    #     - "{definitions.description_key_not_market_income}"
+    #     - "{definitions.description_key_nowcasts}"
+    #     - "{definitions.description_key_welfare_type}"
+    #   description_short: "{definitions.ppp_adjustment_subtitle}"

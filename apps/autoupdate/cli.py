@@ -4,6 +4,7 @@
 
 Examples:
 
+```
 # Run all autoupdate snapshots, update data, and create PRs if needed
 etl autoupdate --create-pr
 
@@ -12,6 +13,7 @@ etl autoupdate --dry-run
 
 # Only process snapshots matching a filter
 etl autoupdate --filter "population"
+```
 """
 
 import datetime as dt

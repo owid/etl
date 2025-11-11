@@ -1,3 +1,5 @@
+"""Export dataset, tables & indicator metadata in YAML format."""
+
 import copy
 from pathlib import Path
 from typing import Any, Dict, List, Literal, Optional, Tuple, Union
@@ -13,7 +15,7 @@ from etl import paths
 from etl.files import ruamel_dump, ruamel_load, yaml_dump
 
 
-@click.command(name="metadata-export", help=__doc__)
+@click.command(name="metadata-export")
 @click.argument(
     "dataset_path",
     type=click.Path(),

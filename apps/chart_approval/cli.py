@@ -101,8 +101,8 @@ def approve_identical_chart_diffs(dry_run: bool = True):
 def cli(
     dry_run: bool,
 ) -> None:
-    """Automatically approve chart diffs with identical data. This is done by
-    taking their configs and replacing variable IDs with hashes of their data.
+    """Automatically approve chart diffs with identical data. This is done by taking their configs and replacing variable IDs with hashes of their data.
+
     If the configs are then identical, the chart is approved.
 
     The comparison process:

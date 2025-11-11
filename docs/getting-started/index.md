@@ -16,46 +16,42 @@ Making this documentation public is part of our commitment to **transparency** a
 ### Quick reference
 <div class="grid cards" markdown>
 
--   __[:octicons-code-16: &nbsp; Installation](working-environment.md)__
+-   :octicons-code-16: &nbsp; **[Installation](working-environment.md){ data-preview }**
 
     ---
 
     Set up your working environment.
 
-    Practice your [first steps](building-datasets.md).
-
--   __[:fontawesome-solid-pen-nib: &nbsp; Design principles](../architecture/)__
+-   :fontawesome-solid-pen-nib: &nbsp; **[Design principles](../architecture/){ data-preview }**
 
     ---
 
     Learn the fundamentals.
 
--   __[:material-sign-direction: &nbsp; Guides](../guides/index.md)__
 
-    ---
-    - [Data work](../guides/data-work): Learn how to add, update data, etc.
-    - [Wizard](../guides/wizard.md): Use our ETL admin tool!
-
-    And much more!
-
--   __[:fontawesome-solid-book: &nbsp; Metadata reference](../architecture/metadata/reference/)__
+-   :material-sign-direction: &nbsp; **[Guides](../guides/){ data-preview }**
 
     ---
 
-    Data alone is not enough.
+    Learn about our [data work](../guides/data-work/index.md){ data-preview }, our [Wizard](../guides/wizard.md){ data-preview } tool and much more.
 
-    Learn more about our [metadata](../architecture/metadata/index.md).
 
--   __[:fontawesome-solid-users: &nbsp; Contributing](../contributing.md)__
-
-    ---
-
-    Help us improve our work.
-
--   __[:material-api: &nbsp; API](../api/index.md)__
+-   :fontawesome-solid-book: &nbsp; **[Metadata reference](../architecture/metadata/reference/){ data-preview }**
 
     ---
 
-    Access our data catalog.
+    Because data alone is not enough.
+
+-   :fontawesome-solid-users: &nbsp; **[Contribute](../contributing.md){ data-preview }**
+
+    ---
+
+    Help us improve our work
+
+-   :material-api: &nbsp; **[API](../api/index.md){data-preview}**
+
+    ---
+
+    Access our data catalog, get data from our charts, etc.
 
 </div>

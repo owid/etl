@@ -308,12 +308,35 @@ def add_china_imports_share_of_gdp(tb: Table, gdp_data: Table) -> Table:
     china_gdp = china_gdp[["country", "year", "china_imports_share_of_gdp"]].copy()
     china_gdp["counterpart_country"] = "World"
 
+    # First merge the regular china_imports_share_of_gdp data
     tb = pr.merge(
         tb,
         china_gdp,
         on=["country", "year", "counterpart_country"],
         how="left",
     )
+
+    # Create China rows for each year with china_imports_share_of_gdp = -1
+    china_years = tb[tb["counterpart_country"] == "World"]["year"].unique()
+    for year in china_years:
+        china_mask = (tb["country"] == "China") & (tb["counterpart_country"] == "World") & (tb["year"] == year)
+        if china_mask.any():
+            # Update existing rows
+            tb.loc[china_mask, "china_imports_share_of_gdp"] = -1
+        else:
+            # Add new row if it doesn't exist
+            new_row = Table(
+                pd.DataFrame(
+                    {
+                        "country": ["China"],
+                        "year": [year],
+                        "counterpart_country": ["World"],
+                        "china_imports_share_of_gdp": [-1],
+                    }
+                )
+            ).copy_metadata(tb)
+            tb = pr.concat([tb, new_row], ignore_index=True)
+
     return tb
 
 
@@ -418,7 +441,7 @@ def get_country_import_ranking(tb: Table, target_country: str) -> Table:
 
     # Add self-referential rows (e.g., China importing from China) with rank=-1
     # This row likely doesn't exist in the data but is needed for visualization
-    target_country_years = import_data[import_data["country"] == target_country]["year"].unique()
+    target_country_years = import_data["year"].unique()
 
     target_country_template = Table(
         pd.DataFrame({"country": target_country, "year": target_country_years, "import_rank": 0})

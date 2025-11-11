@@ -10,10 +10,9 @@ This script uses a three-layer approach to find issues:
 from pathlib import Path
 from typing import Any
 
-import click
 import pandas as pd
+import rich_click as click
 from rich import print as rprint
-from rich_click.rich_command import RichCommand
 
 from apps.inspector.config import MODEL_API_NAMES
 from apps.inspector.db import build_explorer_url, load_views
@@ -224,7 +223,7 @@ def run_checks(
     return all_issues, total_input_tokens, total_output_tokens, cache_creation_tokens, cache_read_tokens
 
 
-@click.command(cls=RichCommand)
+@click.command(name="inspector")
 @click.option(
     "--slug",
     "-s",
@@ -283,7 +282,7 @@ def run_checks(
     is_flag=True,
     help="Print the exact prompts sent to Claude API",
 )
-def run(
+def cli(
     slug: tuple[str, ...],
     content_type: tuple[str, ...],
     model: str | None,
@@ -297,48 +296,44 @@ def run(
 ) -> None:
     """Check explorer, multidim views, chart configs, and posts (including articles, topic pages, and data insights) for typos and semantic issues.
 
-    Examples:
-        - Check specific slug (with --slug or -s)
-        > etl inspector -s natural-disasters
+    **Examples**:
 
-        - For simplicity, the slug applies to all content types (explorers, mdims and posts); you can specify one (or more) content type (with --type or -t)
-        > etl inspector -s natural-disasters -t post
+        # Check specific slug (with --slug or -s)
+        $ etl inspector -s natural-disasters
 
-        > etl inspector -s natural-disasters -t post -t explorer
+        # For simplicity, the slug applies to all content types (explorers, mdims and posts); you can specify one (or more) content type (with --type or -t)
+        $ etl inspector -s natural-disasters -t post
 
-        - You can check multiple slugs
-        > etl inspector -s global-food -s natural-disasters
+        # etl inspector -s natural-disasters -t post -t explorer
 
-        - Use different models (with --model or -m); currently available models are haiku=fast/cheap, sonnet=balanced, opus=best quality/more expensive
-        > etl inspector -s global-food -m sonnet
+        # You can check multiple slugs
+        $ etl inspector -s global-food -s natural-disasters
 
-        > etl inspector -s natural-disasters -m opus
+        # Use different models (with --model or -m); currently available models are haiku=fast/cheap, sonnet=balanced, opus=best quality/more expensive
+        $ etl inspector -s global-food -m sonnet
+        $ etl inspector -s natural-disasters -m opus
 
-        - Save results to an output file (with --output-file or -o); it auto-resumes if interrupted, skipping already inspected content
-        > etl inspector -o issues.csv
+        # Save results to an output file (with --output-file or -o); it auto-resumes if interrupted, skipping already inspected content
+        $ etl inspector -o issues.csv
+        $ etl inspector -s global-food -o food_issues.csv
 
-        > etl inspector -s global-food -o food_issues.csv
+        # Limit number of views (useful for testing/cost control)
+        $ etl inspector -l 10
+        $ etl inspector -s natural-disasters -l 5 -m haiku
 
-        - Limit number of views (useful for testing/cost control)
-        > etl inspector -l 10
+        # Skip specific checks
+        $ etl inspector --skip-issues  # Only run typo checks with codespell (skipping AI inspection); this option has no cost
+        $ etl inspector --skip-typos  # Only run semantic checks (skipping codespell inspection); this option has costs
 
-        > etl inspector -s natural-disasters -l 5 -m haiku
+        # Estimate costs without running (dry run)
+        $ etl inspector --dry-run
+        $ etl inspector -s global-food -m opus --dry-run
 
-        - Skip specific checks
-        > etl inspector --skip-issues  # Only run typo checks with codespell (skipping AI inspection); this option has no cost
+        # Enable experimental grouping/pruning (for large result sets)
+        $ etl inspector --enable-grouping
 
-        > etl inspector --skip-typos  # Only run semantic checks (skipping codespell inspection); this option has costs
-
-        - Estimate costs without running (dry run)
-        > etl inspector --dry-run
-
-        > etl inspector -s global-food -m opus --dry-run
-
-        - Enable experimental grouping/pruning (for large result sets)
-        > etl inspector --enable-grouping
-
-        - Debug: see exact prompts sent to Claude
-        > etl inspector -s energy -l 1 --display-prompt
+        # Debug: see exact prompts sent to Claude
+        $ etl inspector -s energy -l 1 --display-prompt
 
     """
     # Get the model name to use

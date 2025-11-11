@@ -4,13 +4,16 @@ If you want to add a new service, make sure to add it to the `GROUPS` list. If i
 """
 
 import importlib
+import os
 
 import rich_click as click
 
 # Styling
 # from apps.utils.style import set_rich_click_style
 # set_rich_click_style()
-click.rich_click.USE_MARKDOWN = True
+# Disable rich formatting when generating docs to avoid ANSI escape codes in mkdocs-click
+if not os.getenv("GENERATING_DOCS"):
+    click.rich_click.USE_MARKDOWN = True
 
 
 # Lazy load
@@ -18,7 +21,7 @@ click.rich_click.USE_MARKDOWN = True
 class LazyGroup(click.RichGroup):
     """Ref: https://click.palletsprojects.com/en/8.1.x/complex/#lazily-loading-subcommands"""
 
-    def __init__(self, *args, lazy_subcommands=None, **kwargs):
+    def __init__(self, *args, lazy_subcommands=None, **kwargs):  # type: ignore[no-untyped-def]
         super().__init__(*args, **kwargs)
         # lazy_subcommands is a map of the form:
         #
@@ -181,7 +184,7 @@ GROUPS = (
         {
             "name": "Inspector",
             "commands": {
-                "inspector": "apps.inspector.inspector.run",
+                "inspector": "apps.inspector.inspector.cli",
             },
         },
         {

@@ -45,6 +45,23 @@ def run(dest_dir: str) -> None:
 
     # Subset the data
     df = subset_and_clean_data(df)
+
+    # Check for and remove duplicate rows (some countries have duplicate 'All' age group entries)
+    # First verify duplicates are truly identical across all columns
+    dupes = df[df.duplicated(subset=["country", "date", "hemisphere"], keep=False)]
+    if len(dupes) > 0:
+        log.warning(f"Found {len(dupes)} duplicate rows on [country, date, hemisphere], verifying they are identical")
+        # Check that duplicates are truly identical (not just on key columns)
+        for (country, date, hemisphere), group in dupes.groupby(["country", "date", "hemisphere"]):
+            if len(group) > 1:
+                # Check if all rows are identical
+                if not group.drop_duplicates().shape[0] == 1:
+                    raise ValueError(
+                        f"Duplicate rows for {country} on {date} have different values - investigate before dropping"
+                    )
+                log.warning(f"Removing {len(group) - 1} duplicate row(s) for {country} on {date}")
+        df = df.drop_duplicates(subset=["country", "date", "hemisphere"], keep="first")
+
     df = rename_fluid(df)
     # Remove years with fewer than 10 datapoints
     df = remove_sparse_years(df, min_datapoints_per_year=MIN_DATA_POINTS_PER_YEAR)

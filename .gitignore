@@ -64,3 +64,8 @@ dist/
 CLAUDE.local.md
 
 workbench/
+
+
+docs/architecture/metadata/reference/collections.md
+docs/architecture/metadata/reference/index.md
+docs/api/example-usage.md
