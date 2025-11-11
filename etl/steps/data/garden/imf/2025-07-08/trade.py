@@ -441,7 +441,7 @@ def get_country_import_ranking(tb: Table, target_country: str) -> Table:
 
     # Add self-referential rows (e.g., China importing from China) with rank=-1
     # This row likely doesn't exist in the data but is needed for visualization
-    target_country_years = import_data[import_data["country"] == target_country]["year"].unique()
+    target_country_years = import_data["year"].unique()
 
     target_country_template = Table(
         pd.DataFrame({"country": target_country, "year": target_country_years, "import_rank": 0})

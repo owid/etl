@@ -1,4 +1,5 @@
-We use URIs throughout all the ETL to identify files and datasets. The format of a URI varies depending on the step we are dealing with, but in general they follow the following convention:
+# URI
+We use Uniform Resource Identifiers (URIs) throughout all the ETL to identify files and datasets. The format of a URI varies depending on the step we are dealing with, but in general they follow the following convention:
 
 ```
 <prefix>://<path>

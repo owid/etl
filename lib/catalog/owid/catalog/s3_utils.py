@@ -122,19 +122,20 @@ def download_s3_folder(
             file.unlink()
 
 
-def upload(s3_url: str, filename: str, public: bool = False, quiet: bool = False) -> None:
+def upload(s3_url: str, filename: str | Path, public: bool = False, quiet: bool = False) -> None:
     """Upload the file at the given local filename to the S3 URL."""
     client = connect_r2()
     bucket, key = s3_bucket_key(s3_url)
     extra_args = {"ACL": "public-read"} if public else {}
+    filename_str = str(filename)
     try:
-        client.upload_file(filename, bucket, key, ExtraArgs=extra_args)
+        client.upload_file(filename_str, bucket, key, ExtraArgs=extra_args)
     except ClientError as e:
         log.error(e)
         raise UploadError(e)
 
     if not quiet:
-        log.info(f"UPLOADED: {filename} -> {s3_url}")
+        log.info(f"UPLOADED: {filename_str} -> {s3_url}")
 
 
 # if R2_ACCESS_KEY and R2_SECRET_KEY are null, try using credentials from rclone config
