@@ -477,8 +477,10 @@ def harmonize_countries(
 ) -> TableOrDataFrame:
     """Harmonize country names in dataframe, following the mapping given in a file.
 
-    NOTE: Instead of using this function directly, use the harmonize_names() method of the Regions class.
+    ####################################################################################################################
+    WARNING: Instead of using this function directly, use the harmonize_names() method of the Regions class.
     If you are working from within an ETL step, you can simply do: `paths.regions.harmonize_names(tb)`
+    ####################################################################################################################
 
     Countries in dataframe that are not in mapping will left unchanged (or converted to nan, if
     make_missing_countries_nan is True). If excluded_countries_file is given, countries in that list will be removed
@@ -743,9 +745,14 @@ def add_population_to_table(
 ) -> Table:
     """Add column of population to a table with metadata.
 
-    NOTE: If you are using this function in order to create per capita indicators, consider using the add_per_capita method of the Regions class.
-    You can simply do: `paths.regions.add_per_capita(tb)`
-    (This will work as long as the population dataset is among the dependencies of the step).
+    ####################################################################################################################
+    WARNING: Instead of using this function directly, use the add_population() method of the Regions class.
+    If you are working from within an ETL step, you can simply do: `paths.regions.add_population(tb)`
+    If you are using this function in order to create per capita indicators, consider using the add_per_capita method of the Regions class.
+    You can simply do: `paths.regions.add_per_capita(tb)` and population will be added automatically.
+    ####################################################################################################################
+
+    This function will work as long as the population dataset is among the dependencies of the step.
 
     Parameters
     ----------
@@ -932,6 +939,7 @@ def list_members_of_region(
     custom_members: list[str] | None = None,
     include_historical_regions_in_income_groups: bool = False,
     exclude_historical_countries: bool = False,
+    subregion_type: str = "members",
     # TODO: Should this be True by default?
     unpack_subregions: bool = False,
 ) -> list[str]:
@@ -961,6 +969,8 @@ def list_members_of_region(
         True to include historical regions in income groups.
     exclude_historical_countries : bool
         True to include historical countries.
+    subregion_type : str
+        Either "members" to get the members of a region (e.g. if region is a continent like "Africa"); or "successors" to get the successor countries of a historical region (e.g. "USSR"); or "related" to get related countries like overseas territories (e.g. "France").
     unpack_subregions : bool
         True to replace subregions by their countries. For example, for "World", instead of showing "Africa" as a member, it will show all African countries.
 
@@ -983,10 +993,10 @@ def list_members_of_region(
 
     # Get the main table from the regions dataset and create a new table that has regions and members.
     tb_countries_in_region = create_table_of_regions_and_subregions(
-        ds_regions=ds_regions, subregion_type="members", unpack_subregions=unpack_subregions
+        ds_regions=ds_regions, subregion_type=subregion_type, unpack_subregions=unpack_subregions
     )
 
-    if ds_income_groups is not None:
+    if (ds_income_groups is not None) and (subregion_type == "members"):
         if "wb_income_group" in ds_income_groups.table_names:
             # TODO: Remove this block once the old income groups dataset has been archived.
             # Get the main table from the income groups dataset.
@@ -1032,7 +1042,7 @@ def list_members_of_region(
 
     # Get list of default members for the given region, if it's known.
     if region in tb_countries_in_region.index.tolist():
-        countries_set = set(tb_countries_in_region.loc[region]["members"])
+        countries_set = set(tb_countries_in_region.loc[region][subregion_type])
     else:
         # Initialise an empty set of members.
         countries_set = set()
@@ -1043,12 +1053,12 @@ def list_members_of_region(
 
     # Add countries from the list of additional regions.
     countries_set |= set(
-        sum([tb_countries_in_region.loc[region_included]["members"] for region_included in additional_regions], [])
+        sum([tb_countries_in_region.loc[region_included][subregion_type] for region_included in additional_regions], [])
     )
 
     # Remove all countries from the list of regions excluded.
     countries_set -= set(
-        sum([tb_countries_in_region.loc[region_excluded]["members"] for region_excluded in excluded_regions], [])
+        sum([tb_countries_in_region.loc[region_excluded][subregion_type] for region_excluded in excluded_regions], [])
     )
 
     # Add the list of individual countries to be included.
@@ -1610,9 +1620,9 @@ class Regions:
 
     - Access a list of regions:
     > regions.get_regions(["Africa", "High-income countries"])
-    More conveniently
-    > regions.get_regions(["Africa", "High-income countries"], only_members=True)
-    returns a dictionary {"Africa": ["Algeria", "Angola", ...], "High-income countries": [...], ...}
+    More conveniently, if you use "only_subregions=True", you can also get a dictionary with just the list of members (for continents) and successors (for historical regions):
+    > regions.get_regions(["Africa", "High-income countries", "USSR"], only_subregions=True)
+    returns a dictionary {"Africa": ["Algeria", "Angola", ...], "High-income countries": ["American Samoa", "Andorra", ...], "USSR": ["Armenia", "Azerbaijan", ...]}
 
     - Create a countries harmonization file for the current dataset:
     > regions.harmonizer()
@@ -1620,6 +1630,9 @@ class Regions:
 
     - Applying the country name harmonization to a table:
     > regions.harmonize_names(tb)
+
+    - Adding population to a table:
+    > regions.add_population(tb)
 
     - Creating region aggregates (simple use):
     > regions.add_aggregates(tb)
@@ -1757,21 +1770,23 @@ class Regions:
                 # NOTE: If we decide to accept multiple regions with the same name, we could disambiguate by defined_by.
                 assert len(_region) == 1, f"Multiple regions found for name {name}"
                 region_dict = _region.iloc[0].to_dict()
-            # For now, use the existing function to extract members, which has some additional logic.
-            region_dict["members"] = list_members_of_region(  # type: ignore
-                region=name,
-                ds_regions=self.ds_regions,
-                # Load income groups only if necessary (and raise an error if not among dependencies).
-                ds_income_groups=self.ds_income_groups if name in INCOME_GROUPS else None,
-                include_historical_regions_in_income_groups=True,
-                unpack_subregions=True,
-            )
+            # For now, use the existing function to extract members (as well as successors, for historical regions, and related countries like overseas territories), which has some additional logic.
+            for subregion_type in ["members", "successors", "related"]:
+                region_dict[subregion_type] = list_members_of_region(  # type: ignore
+                    region=name,
+                    ds_regions=self.ds_regions,
+                    # Load income groups only if necessary (and raise an error if not among dependencies).
+                    ds_income_groups=self.ds_income_groups if name in INCOME_GROUPS else None,
+                    include_historical_regions_in_income_groups=True,
+                    subregion_type=subregion_type,
+                    unpack_subregions=True,
+                )
 
             self._region_cache[name] = region_dict
         return self._region_cache[name]
 
     def get_regions(
-        self, names: list[str] | None = None, only_members: bool = False
+        self, names: list[str] | None = None, only_subregions: bool = False
     ) -> dict[str, Any] | dict[str, list[str]]:
         """Get multiple regions.
 
@@ -1779,8 +1794,8 @@ class Regions:
         ----------
         names : list[str] or None
             List of region names to get. If None, returns all available regions.
-        only_members : dict[str, Any]
-            True to return only members of regions, e.g. {"Africa": ["Algeria", "Angola", ...], "Asia": ["Afghanistan", ...], ...}.
+        only_subregions : dict[str, Any]
+            True to return only members of regions, e.g. {"Africa": ["Algeria", "Angola", ...], "Asia": ["Afghanistan", ...], ...}, or only successors of historical regions, e.g. {"USSR": ["Armenia", "Azerbaijan", ...], ...}, or only related (e.g. overseas territories).
 
         Returns
         -------
@@ -1793,9 +1808,9 @@ class Regions:
             # If income groups cannot be loaded, remove them from the list.
             if (self._ds_income_groups is None) and not self.auto_load_datasets:
                 names = sorted(set(names) - set(INCOME_GROUPS))
-        if only_members:
-            # Create a dictionary of members of each region.
-            regions = {name: self.get_region(name)["members"] for name in names}
+        if only_subregions:
+            # Create a dictionary of members of each region (for continents) or otherwise successors (for historical regions).
+            regions = {name: (region := self.get_region(name))["members"] or region["successors"] for name in names}
         else:
             # Create a dictionary of individual region dictionaries with all information.
             regions = {name: self.get_region(name) for name in names}
@@ -1862,6 +1877,73 @@ class Regions:
             show_full_warning=show_full_warning,
         )
 
+    def add_population(
+        self,
+        tb: Table,
+        country_col: str = "country",
+        year_col: str = "year",
+        population_col: str = "population",
+        warn_on_missing_countries: bool = True,
+        show_full_warning: bool = True,
+        interpolate_missing_population: bool = False,
+        expected_countries_without_population: list[str] | None = None,
+    ) -> Table:
+        """Add population column to table.
+
+        Parameters
+        ----------
+        tb : Table
+            Input table that contains country and year columns.
+        country_col : str
+            Name of column in table with country names.
+        year_col : str
+            Name of column in table with years.
+        population_col : str
+            Name of new column to be created with population values.
+        warn_on_missing_countries : bool
+            True to warn about countries that appear in table but not in the population dataset.
+        show_full_warning : bool
+            True to display list of countries in warning messages.
+        interpolate_missing_population : bool
+            True to linearly interpolate population on years that are present in tb, but for which we do not have
+            population data; otherwise False to keep missing population data as nans.
+            For example, if interpolate_missing_population is True and tb has data for all years between 1900 and 1910,
+            but population is only given for 1900 and 1910, population will be linearly interpolated between those years.
+        expected_countries_without_population : list[str] | None
+            Countries that are expected to not have population (that should be ignored if warnings are activated).
+
+        Returns
+        -------
+        Table
+            Original table after adding a column with population values.
+
+        Examples
+        --------
+        >>> # Simple usage
+        >>> tb = paths.regions.add_population(tb)
+        >>>
+        >>> # With custom parameters
+        >>> tb = paths.regions.add_population(
+        ...     tb,
+        ...     population_col="pop",
+        ...     interpolate_missing_population=True
+        ... )
+        """
+        tb_with_population = add_population_to_table(
+            tb=tb,
+            ds_population=self.ds_population,  # type: ignore
+            country_col=country_col,
+            year_col=year_col,
+            population_col=population_col,
+            warn_on_missing_countries=warn_on_missing_countries,
+            show_full_warning=show_full_warning,
+            interpolate_missing_population=interpolate_missing_population,
+            expected_countries_without_population=expected_countries_without_population,
+        )
+        # TODO: Here we could optionally (and by default) remove the metadata from population that is often causing issues in derived indicators (I think possibly attribution, display name, and maybe other fields).
+
+        return tb_with_population
+
     def add_aggregates(
         self,
         tb: Table,
@@ -1880,15 +1962,11 @@ class Regions:
         subregion_type: str = "successors",
         countries_that_must_have_data: dict[str, list[str]] | None = None,
     ) -> Table:
-        """Convenience method to add region aggregates without explicit RegionAggregator creation.
-
-        This is equivalent to calling paths.region_aggregator(**kwargs).add_aggregates(tb).
-        For advanced use cases requiring multiple operations (e.g., both aggregates and per capita),
-        consider using paths.region_aggregator() directly for better performance.
+        """Add region aggregates to a table.
 
         Parameters
         ----------
-        tb : TableOrDataFrame
+        tb : Table
             Input table to add aggregates to.
         regions : list[str] | dict[str, Any] | None
             Regions to aggregate. If None, uses all available regions.
@@ -2417,7 +2495,7 @@ class RegionAggregator:
         subregion_type: str = "successors",
         countries_that_must_have_data: dict[str, list[str]] | list[str] | None = None,
     ) -> Table:
-        """Add region aggregates to a table (or dataframe).
+        """Add region aggregates to a table.
 
         This should be the default function to use when adding data for regions to a table (or dataframe).
         This function respects the metadata of the incoming data.
@@ -2426,7 +2504,7 @@ class RegionAggregator:
 
         Parameters
         ----------
-        tb : TableOrDataFrame
+        tb : Table
             Original data, which may or may not contain data for regions.
         num_allowed_nans_per_year : Optional[int], default: None
             * If a number is passed, this is the maximum number of nans that can be present in a particular variable and
