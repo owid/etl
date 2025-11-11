@@ -19,7 +19,7 @@ from typing import Tuple
 
 import owid.catalog.processing as pr
 import pandas as pd
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 from structlog import get_logger
 
 from etl.data_helpers.misc import interpolate_table
@@ -97,6 +97,9 @@ MISSING_COUNTRIES_AND_REGIONS = {
     "Vanuatu": "East Asia",
 }
 
+# Countries that appear in the thousand bins dataset for which we don't have population data.
+COUNTRIES_WITHOUT_POPULATION = ["Channel Islands"]
+
 # TODO: I've fixed "Former Sudan"->"Sudan (former)" (since the latter is the right spelling in our regions dataset). Check famines_by_regime_gdp and famines_by_regime_population, which have a hardcoded "Former Sudan" mapping to "Sudan".
 
 
@@ -125,6 +128,7 @@ def run() -> None:
 
     tb = tb.format(["country", "year", "poverty_line"], short_name="historical_poverty")
     tb_population = tb_population.format(["country", "year"], short_name="population")
+    # TODO: The following table is not stored.
     tb_extended = tb_extended.format(
         ["country", "year", "region", "region_old", "quantile"], short_name="historical_income_distribution"
     )
@@ -387,33 +391,29 @@ def extrapolate_backwards(tb_thousand_bins: Table, tb_gdp: Table) -> Table:
     )
 
     # Divide avg income columns by cumulative_growth_factor to extrapolate backwards
+    # NOTE: The "avg" field refers to the values of 1990, which has been repeated for all previous years. And the cumulative growth factor contains, for each year, the ratio of per capita GDP, GDPpc(1990)/GDPpc(year). Therefore, to get the average income (or consumption) of a given year, we do:
+    # Average(year) = Average(1990) / (GDPpc(1990)/GDPpc(year)) = Average(1990) / cumulative growth factor
     tb_thousand_bins_to_extrapolate["avg"] = (
         tb_thousand_bins_to_extrapolate["avg"] / tb_thousand_bins_to_extrapolate["cumulative_growth_factor"]
     )
 
-    # Add population data for this table
+    # Add a column with population data
     tb_thousand_bins_to_extrapolate = paths.regions.add_population(
         tb=tb_thousand_bins_to_extrapolate,
         population_col="pop",
         warn_on_missing_countries=True,
         interpolate_missing_population=True,
+        expected_countries_without_population=COUNTRIES_WITHOUT_POPULATION,
     )
 
     # Divide pop into quantiles (1000 quantiles)
     tb_thousand_bins_to_extrapolate["pop"] /= 1000
 
-    if SHOW_WARNINGS:
-        # Check empty values in pop column
-        # NOTE: I am checking this because it could be the case that some countries don't have population data for some years
-        missing_pop = tb_thousand_bins_to_extrapolate[tb_thousand_bins_to_extrapolate["pop"].isna()]
-
-        # Select only one quantile to review
-        missing_pop = missing_pop[missing_pop["quantile"] == 1]
-
-        # Define countries with missing population values
-        missing_countries = missing_pop["country"].unique()
-        if not missing_pop.empty:
-            log.warning(f"extrapolate_backwards: Missing population values for countries:\n{missing_countries}")
+    # Sanity check.
+    error = "Unexpected countries missing population data"
+    assert set(tb_thousand_bins_to_extrapolate[tb_thousand_bins_to_extrapolate["pop"].isna()]["country"]) == set(
+        COUNTRIES_WITHOUT_POPULATION
+    ), error
 
     # Drop cumulative_growth_factor column, as it's no longer needed
     tb_thousand_bins_to_extrapolate = tb_thousand_bins_to_extrapolate.drop(columns=["cumulative_growth_factor"])
@@ -513,7 +513,6 @@ def calculate_poverty_measures(tb: Table) -> Tuple[Table, Table]:
 
     This function returns two tables - one with poverty measures and another with population estimates (only to deal with duplicates in the dimension poverty_line).
     """
-
     # Sort table by year and avg
     tb = tb.sort_values(["year", "avg"]).reset_index(drop=True)
 
@@ -531,8 +530,10 @@ def calculate_poverty_measures(tb: Table) -> Tuple[Table, Table]:
 
     # Calculate results for each poverty line
     for poverty_line in POVERTY_LINES:
-        # Filter rows where avg is less than poverty line
-        tb_poverty_line = tb[tb["avg"] < poverty_line].reset_index(drop=True)
+        # Filter rows where avg is less than poverty line, and keep only relevant columns
+        tb_poverty_line = tb[tb["avg"] < poverty_line][
+            ["year", "global_population", "cum_pop", "percentage_global_pop"]
+        ].reset_index(drop=True)
 
         # Get the last row for each year (highest quantile below poverty line)
         tb_poverty_line = tb_poverty_line.groupby("year").tail(1).reset_index(drop=True)
@@ -546,23 +547,26 @@ def calculate_poverty_measures(tb: Table) -> Tuple[Table, Table]:
     # Concatenate all poverty lines
     tb_poverty = pr.concat(tb_poverty, ignore_index=True)
 
-    # Keep relevant columns
-    tb_poverty = tb_poverty[["year", "poverty_line", "global_population", "cum_pop", "percentage_global_pop"]]
-
     # Rename columns
     tb_poverty = tb_poverty.rename(
-        columns={"cum_pop": "headcount", "percentage_global_pop": "headcount_ratio", "global_population": "population"}
+        columns={"cum_pop": "headcount", "percentage_global_pop": "headcount_ratio", "global_population": "population"},
+        errors="raise",
     )
 
     # Copy metadata from avg to headcount
     tb_poverty["headcount"] = tb_poverty["headcount"].copy_metadata(tb["avg"])
     tb_poverty["headcount_ratio"] = tb_poverty["headcount_ratio"].copy_metadata(tb["avg"])
+    # Fix units
+    tb_poverty["headcount"].metadata.unit = "people"
+    tb_poverty["headcount"].metadata.short_unit = ""
 
     # Add country column
     tb_poverty["country"] = "World"
 
+    # TODO: I think it could possibly be better to stop the function here. Then, inside run, you add stacked variables, and then create the population table as a sanity check (if that's the intended purpose).
+
     # Create stacked variables for stacked area/bar charts
-    tb_poverty = create_stacked_variables(tb_poverty)
+    tb_poverty = create_stacked_variables(tb=tb_poverty)
 
     # Calculate an alternative method with our population dataset
     # First, add population_omm column, the population of the world from Our World in Data
@@ -614,32 +618,16 @@ def create_stacked_variables(tb: Table) -> Table:
     """
     Create stacked variables from the indicators to plot them as stacked area/bar charts
     """
-
     tb = tb.copy()
 
     # Define headcount_above and headcount_ratio_above variables
     tb["headcount_above"] = tb["population"] - tb["headcount"]
-    tb["headcount_ratio_above"] = tb["headcount_above"] / tb["population"]
-
-    # Make headcount_ratio_above a percentage
-    tb["headcount_ratio_above"] = tb["headcount_ratio_above"] * 100
+    tb["headcount_ratio_above"] = 100 * (tb["headcount_above"] / tb["population"])
 
     # Define stacked variables as headcount and headcount_ratio between poverty lines
-    # Select only the necessary columns
-    tb_pivot = tb[
-        [
-            "country",
-            "year",
-            "poverty_line",
-            "headcount_ratio",
-            "headcount",
-            "population",
-        ]
-    ].copy()
-
-    # Pivot
+    # Select only the necessary columns and pivot
     tb_pivot = pr.pivot(
-        data=tb,
+        data=tb[["country", "year", "poverty_line", "headcount_ratio", "headcount", "population"]],
         index=["country", "year"],
         columns=["poverty_line"],
     )
@@ -657,10 +645,7 @@ def create_stacked_variables(tb: Table) -> Table:
             tb_pivot[varname_n] = (
                 tb_pivot[("headcount", POVERTY_LINES[i])] - tb_pivot[("headcount", POVERTY_LINES[i - 1])]
             )
-            tb_pivot[varname_pct] = tb_pivot[varname_n] / tb_pivot[("population", POVERTY_LINES[i])]
-
-            # Multiply by 100 to get percentage
-            tb_pivot[varname_pct] = tb_pivot[varname_pct] * 100
+            tb_pivot[varname_pct] = 100 * (tb_pivot[varname_n] / tb_pivot[("population", POVERTY_LINES[i])])
 
     # Now, only keep headcount_between and headcount_ratio_between, and headcount_above and headcount_ratio_above
     tb_pivot = tb_pivot.loc[
