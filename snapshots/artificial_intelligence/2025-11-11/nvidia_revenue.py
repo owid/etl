@@ -53,11 +53,72 @@ def extract_table_from_pdf(pdf_bytes: bytes, quarter: str) -> pd.DataFrame | Non
                 log.warning("no_tables_found", quarter=quarter)
                 return None
 
-            # Use the first table found
-            table = tables[0]
+            # Select the best table
+            # Some PDFs have multiple tables - pick the one that looks like revenue data
+            table = None
+            for candidate_table in tables:
+                if len(candidate_table) > 5:  # Should have multiple segments
+                    header = candidate_table[0]
+                    # Check if header contains quarter information (Q1, Q2, Q3, Q4)
+                    header_str = str(header)
+                    if any(q in header_str for q in ["Q1", "Q2", "Q3", "Q4"]):
+                        # Check that it's a properly structured table (not all in one cell)
+                        if len(header) > 2:  # Should have multiple columns
+                            table = candidate_table
+                            break
+
+            if table is None:
+                # Fallback to first table if no good candidate found
+                log.warning("using_first_table_as_fallback", quarter=quarter)
+                table = tables[0]
+
+            # Fix concatenated values in older PDFs
+            # Some PDFs have all values in the second column as a single string
+            # Check if second column contains None values (indicating concatenation issue)
+            if len(table) > 1 and len(table[1]) > 1:
+                # Check if most cells in the first data row are None
+                first_data_row = table[1]
+                none_count = sum(1 for cell in first_data_row[1:] if cell is None)
+
+                # If more than half of the data cells are None, we have concatenation
+                if none_count > len(first_data_row) / 2:
+                    log.info("fixing_concatenated_values", quarter=quarter)
+                    fixed_table = [table[0]]  # Keep header row
+
+                    for row in table[1:]:
+                        if row[1] and isinstance(row[1], str):
+                            # Split concatenated values
+                            # Remove $ and commas, then split by whitespace
+                            values_str = row[1].replace("$", "").replace(",", "").strip()
+                            values = values_str.split()
+
+                            # Reconstruct row: [segment_name, value1, value2, ...]
+                            fixed_row = [row[0]] + values
+                            fixed_table.append(fixed_row)
+                        else:
+                            fixed_table.append(row)
+
+                    table = fixed_table
 
             # Convert to DataFrame
             df = pd.DataFrame(table[1:], columns=table[0])
+
+            # Fix Q4FY21 issue: segment names are None for some rows
+            # Use text extraction as backup to get segment names
+            if df.iloc[:, 0].isna().any():
+                log.info("fixing_missing_segment_names", quarter=quarter)
+                text = page.extract_text()
+                # Known segments in order
+                segments = ["Gaming", "Professional Visualization", "Data Center", "Auto", "OEM & Other", "TOTAL"]
+                segment_idx = 0
+                for i, row in df.iterrows():
+                    if pd.isna(row.iloc[0]) and segment_idx < len(segments):
+                        # Find which segment this should be by checking the text
+                        for seg in segments[segment_idx:]:
+                            if seg in text:
+                                df.iloc[i, 0] = seg
+                                segment_idx = segments.index(seg) + 1
+                                break
 
             return df
 
@@ -104,6 +165,7 @@ def parse_quarter_to_date(quarter_str: str) -> str | None:
 
         quarter = parts[0]  # e.g., "Q4"
         fiscal_year = parts[1]  # e.g., "FY25"
+        print(fiscal_year)
 
         # Extract quarter number
         q_num = int(quarter[1])
@@ -116,7 +178,7 @@ def parse_quarter_to_date(quarter_str: str) -> str | None:
             year = 2000 + fy
         else:
             year = 1900 + fy
-
+        print(year)
         # Map quarter to month (end of quarter)
         # Q1 ends April, Q2 ends July, Q3 ends October, Q4 ends January
         quarter_end_months = {1: (year - 1, 4), 2: (year - 1, 7), 3: (year - 1, 10), 4: (year, 1)}

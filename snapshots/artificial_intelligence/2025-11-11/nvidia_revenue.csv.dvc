@@ -30,6 +30,6 @@ meta:
       name: ©2025 NVIDIA Corporation
       url: https://www.nvidia.com/en-us/about-nvidia/terms-of-service/
 outs:
-  - md5: caac88129da19b15a541382585468333
-    size: 7208
+  - md5: 50dd7162ea474cc6f4d0a972d308542f
+    size: 9759
     path: nvidia_revenue.csv
