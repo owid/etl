@@ -477,8 +477,10 @@ def harmonize_countries(
 ) -> TableOrDataFrame:
     """Harmonize country names in dataframe, following the mapping given in a file.
 
-    NOTE: Instead of using this function directly, use the harmonize_names() method of the Regions class.
+    ####################################################################################################################
+    WARNING: Instead of using this function directly, use the harmonize_names() method of the Regions class.
     If you are working from within an ETL step, you can simply do: `paths.regions.harmonize_names(tb)`
+    ####################################################################################################################
 
     Countries in dataframe that are not in mapping will left unchanged (or converted to nan, if
     make_missing_countries_nan is True). If excluded_countries_file is given, countries in that list will be removed
@@ -743,9 +745,14 @@ def add_population_to_table(
 ) -> Table:
     """Add column of population to a table with metadata.
 
-    NOTE: If you are using this function in order to create per capita indicators, consider using the add_per_capita method of the Regions class.
-    You can simply do: `paths.regions.add_per_capita(tb)`
-    (This will work as long as the population dataset is among the dependencies of the step).
+    ####################################################################################################################
+    WARNING: Instead of using this function directly, use the add_population() method of the Regions class.
+    If you are working from within an ETL step, you can simply do: `paths.regions.add_population(tb)`
+    If you are using this function in order to create per capita indicators, consider using the add_per_capita method of the Regions class.
+    You can simply do: `paths.regions.add_per_capita(tb)` and population will be added automatically.
+    ####################################################################################################################
+
+    This function will work as long as the population dataset is among the dependencies of the step.
 
     Parameters
     ----------
@@ -1624,6 +1631,9 @@ class Regions:
     - Applying the country name harmonization to a table:
     > regions.harmonize_names(tb)
 
+    - Adding population to a table:
+    > regions.add_population(tb)
+
     - Creating region aggregates (simple use):
     > regions.add_aggregates(tb)
 
@@ -1867,6 +1877,73 @@ class Regions:
             show_full_warning=show_full_warning,
         )
 
+    def add_population(
+        self,
+        tb: Table,
+        country_col: str = "country",
+        year_col: str = "year",
+        population_col: str = "population",
+        warn_on_missing_countries: bool = True,
+        show_full_warning: bool = True,
+        interpolate_missing_population: bool = False,
+        expected_countries_without_population: list[str] | None = None,
+    ) -> Table:
+        """Add population column to table.
+
+        Parameters
+        ----------
+        tb : Table
+            Input table that contains country and year columns.
+        country_col : str
+            Name of column in table with country names.
+        year_col : str
+            Name of column in table with years.
+        population_col : str
+            Name of new column to be created with population values.
+        warn_on_missing_countries : bool
+            True to warn about countries that appear in table but not in the population dataset.
+        show_full_warning : bool
+            True to display list of countries in warning messages.
+        interpolate_missing_population : bool
+            True to linearly interpolate population on years that are present in tb, but for which we do not have
+            population data; otherwise False to keep missing population data as nans.
+            For example, if interpolate_missing_population is True and tb has data for all years between 1900 and 1910,
+            but population is only given for 1900 and 1910, population will be linearly interpolated between those years.
+        expected_countries_without_population : list[str] | None
+            Countries that are expected to not have population (that should be ignored if warnings are activated).
+
+        Returns
+        -------
+        Table
+            Original table after adding a column with population values.
+
+        Examples
+        --------
+        >>> # Simple usage
+        >>> tb = paths.regions.add_population(tb)
+        >>>
+        >>> # With custom parameters
+        >>> tb = paths.regions.add_population(
+        ...     tb,
+        ...     population_col="pop",
+        ...     interpolate_missing_population=True
+        ... )
+        """
+        tb_with_population = add_population_to_table(
+            tb=tb,
+            ds_population=self.ds_population,  # type: ignore
+            country_col=country_col,
+            year_col=year_col,
+            population_col=population_col,
+            warn_on_missing_countries=warn_on_missing_countries,
+            show_full_warning=show_full_warning,
+            interpolate_missing_population=interpolate_missing_population,
+            expected_countries_without_population=expected_countries_without_population,
+        )
+        # TODO: Here we could optionally (and by default) remove the metadata from population that is often causing issues in derived indicators (I think possibly attribution, display name, and maybe other fields).
+
+        return tb_with_population
+
     def add_aggregates(
         self,
         tb: Table,
@@ -1885,15 +1962,11 @@ class Regions:
         subregion_type: str = "successors",
         countries_that_must_have_data: dict[str, list[str]] | None = None,
     ) -> Table:
-        """Convenience method to add region aggregates without explicit RegionAggregator creation.
-
-        This is equivalent to calling paths.region_aggregator(**kwargs).add_aggregates(tb).
-        For advanced use cases requiring multiple operations (e.g., both aggregates and per capita),
-        consider using paths.region_aggregator() directly for better performance.
+        """Add region aggregates to a table.
 
         Parameters
         ----------
-        tb : TableOrDataFrame
+        tb : Table
             Input table to add aggregates to.
         regions : list[str] | dict[str, Any] | None
             Regions to aggregate. If None, uses all available regions.
@@ -2422,7 +2495,7 @@ class RegionAggregator:
         subregion_type: str = "successors",
         countries_that_must_have_data: dict[str, list[str]] | list[str] | None = None,
     ) -> Table:
-        """Add region aggregates to a table (or dataframe).
+        """Add region aggregates to a table.
 
         This should be the default function to use when adding data for regions to a table (or dataframe).
         This function respects the metadata of the incoming data.
@@ -2431,7 +2504,7 @@ class RegionAggregator:
 
         Parameters
         ----------
-        tb : TableOrDataFrame
+        tb : Table
             Original data, which may or may not contain data for regions.
         num_allowed_nans_per_year : Optional[int], default: None
             * If a number is passed, this is the maximum number of nans that can be present in a particular variable and
