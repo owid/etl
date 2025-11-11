@@ -22,6 +22,9 @@ definitions:
   description_short_employment_to_population_ratio: |-
     Share of the working-age population who are employed.
 
+  description_short_modeled_vs_national: |-
+    [National estimates](#dod:ilo-national-estimates) are based on each country's own data collection and definitions, while [modeled estimates](#dod:ilo-modelled-estimates) are produced by the ILO using statistical methods to improve comparability across countries and over time.
+
   description_key_labor_force_participation_1: |-
     The labor force participation rate shows the share of working-age people who are either employed (working for pay or profit) or unemployed (not working, but actively looking for work and available to start). This indicator shows the share of the population that is economically active.
   description_key_labor_force_participation_2: |-
@@ -74,7 +77,7 @@ views:
             name: Unemployment rate, modeled
     config:
       title: "Unemployment rate estimates: modeled vs. national"
-      subtitle: "{definitions.description_short_unemployment_rate}"
+      subtitle: "{definitions.description_short_unemployment_rate} {definitions.description_short_modeled_vs_national}"
       note: "{definitions.note_icls_13}"
       hasMapTab: false
       chartTypes: ["LineChart"]
@@ -102,7 +105,7 @@ views:
             name: Labor force participation rate, modeled
     config:
       title: "Labor force participation rate estimates: modeled vs. national"
-      subtitle: "{definitions.description_short_labor_force_participation_rate}"
+      subtitle: "{definitions.description_short_labor_force_participation_rate} {definitions.description_short_modeled_vs_national}"
       note: "{definitions.note_icls_13}"
       hasMapTab: false
       chartTypes: ["LineChart"]
@@ -131,7 +134,7 @@ views:
             name: Employment-to-population ratio, modeled
     config:
       title: "Employment-to-population ratio estimates: modeled vs. national"
-      subtitle: "{definitions.description_short_employment_to_population_ratio}"
+      subtitle: "{definitions.description_short_employment_to_population_ratio} {definitions.description_short_modeled_vs_national}"
       note: "{definitions.note_icls_13}"
       hasMapTab: false
       chartTypes: ["LineChart"]
