@@ -22,7 +22,6 @@ import pandas as pd
 from owid.catalog import Dataset, Table
 from structlog import get_logger
 
-from etl.data_helpers import geo
 from etl.data_helpers.misc import interpolate_table
 from etl.helpers import PathFinder
 
@@ -347,24 +346,27 @@ def extrapolate_backwards(tb_thousand_bins: Table, tb_gdp: Table, ds_population:
     """
     Extrapolate income distributions backwards from 1990 to 1820, using the cumulative GDP growth factors in the 1000-binned income distribution data.
     """
-
     # Create tb_thousand_bins_to_extrapolate
     tb_thousand_bins_to_extrapolate = tb_thousand_bins[tb_thousand_bins["year"] == LATEST_YEAR].reset_index(drop=True)
 
     # Assert that countries coincide in both tables
     countries_bins = set(tb_thousand_bins_to_extrapolate["country"].unique())
     countries_gdp = set(tb_gdp["country"].unique())
-    missing_countries = countries_bins - countries_gdp
     if SHOW_WARNINGS:
+        missing_countries = countries_bins - countries_gdp
         if len(missing_countries) > 0:
             sorted_missing_countries = ", ".join(sorted(missing_countries))
             log.warning(
                 f"extrapolate_backwards: The following countries are in thousand_bins but missing in GDP data: "
                 f"{sorted_missing_countries}"
             )
-
-    # Filter tb_gdp to only countries present in tb_thousand_bins_to_extrapolate
-    tb_gdp = tb_gdp[tb_gdp["country"].isin(countries_bins)].reset_index(drop=True)
+        missing_countries = countries_gdp - countries_bins
+        if len(missing_countries) > 0:
+            sorted_missing_countries = ", ".join(sorted(missing_countries))
+            log.warning(
+                f"extrapolate_backwards: The following countries are in GDP data but missing in thousand_bins: "
+                f"{sorted_missing_countries}"
+            )
 
     # For tb_thousand_bins_to_extrapolate, column year, assign a list of years from EARLIEST_YEAR to LATEST_YEAR - 1 and then explode
     tb_thousand_bins_to_extrapolate = (
@@ -373,7 +375,7 @@ def extrapolate_backwards(tb_thousand_bins: Table, tb_gdp: Table, ds_population:
         .reset_index(drop=True)
     )
 
-    # Drop pop column, we will add other data on population later
+    # Drop population column, we will add other data on population later
     tb_thousand_bins_to_extrapolate = tb_thousand_bins_to_extrapolate.drop(columns=["pop"])
 
     # Merge with tb_gdp to get growth factors
@@ -390,9 +392,8 @@ def extrapolate_backwards(tb_thousand_bins: Table, tb_gdp: Table, ds_population:
     )
 
     # Add population data for this table
-    tb_thousand_bins_to_extrapolate = geo.add_population_to_table(
+    tb_thousand_bins_to_extrapolate = paths.regions.add_population(
         tb=tb_thousand_bins_to_extrapolate,
-        ds_population=ds_population,
         population_col="pop",
         warn_on_missing_countries=True,
         interpolate_missing_population=True,
@@ -418,12 +419,14 @@ def extrapolate_backwards(tb_thousand_bins: Table, tb_gdp: Table, ds_population:
     tb_thousand_bins_to_extrapolate = tb_thousand_bins_to_extrapolate.drop(columns=["cumulative_growth_factor"])
 
     # Concatenate with original tb_thousand_bins to get the 1000-binned distribution from EARLIEST_YEAR to present
-    tb_thousand_bins = pr.concat([tb_thousand_bins, tb_thousand_bins_to_extrapolate], ignore_index=True)
+    tb_thousand_bins_extended = pr.concat([tb_thousand_bins, tb_thousand_bins_to_extrapolate], ignore_index=True)
 
     # Sort values
-    tb_thousand_bins = tb_thousand_bins.sort_values(["country", "year", "quantile"]).reset_index(drop=True)
+    tb_thousand_bins_extended = tb_thousand_bins_extended.sort_values(["country", "year", "quantile"]).reset_index(
+        drop=True
+    )
 
-    return tb_thousand_bins
+    return tb_thousand_bins_extended
 
 
 def apply_backward_extrapolation(
@@ -563,9 +566,8 @@ def calculate_poverty_measures(tb: Table, ds_population: Dataset) -> Tuple[Table
 
     # Calculate an alternative method with our population dataset
     # First, add population_omm column, the population of the world from Our World in Data
-    tb_poverty = geo.add_population_to_table(
+    tb_poverty = paths.regions.add_population(
         tb=tb_poverty,
-        ds_population=ds_population,
         population_col="population_omm",
         warn_on_missing_countries=True,
         interpolate_missing_population=True,
