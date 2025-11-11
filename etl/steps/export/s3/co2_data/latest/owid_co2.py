@@ -21,7 +21,6 @@ import json
 import tempfile
 from pathlib import Path
 
-import git
 import pandas as pd
 from owid.catalog import Table, s3_utils
 from structlog import get_logger
@@ -29,7 +28,6 @@ from tqdm.auto import tqdm
 
 from etl.config import DRY_RUN
 from etl.helpers import PathFinder
-from etl.paths import BASE_DIR
 
 # Initialize logger.
 log = get_logger()
@@ -103,13 +101,6 @@ def run() -> None:
     #
     # Save outputs.
     #
-    # Check if we're on master branch (if so, force dry run)
-    branch = git.Repo(BASE_DIR).active_branch.name
-    dry_run = DRY_RUN or (branch == "master")
-
-    if branch == "master":
-        log.warning("You are on master branch, using dry mode.")
-
     # Create a temporary directory for all files to be committed.
     with tempfile.TemporaryDirectory() as temp_dir:
         temp_dir_path = Path(temp_dir)
@@ -122,7 +113,7 @@ def run() -> None:
             # Path (within bucket) to S3 file.
             s3_file = S3_DATA_DIR / file_name
 
-            if dry_run:
+            if DRY_RUN:
                 tqdm.write(f"[DRY RUN] Would upload file {local_file} to S3 bucket {S3_BUCKET_NAME} as {s3_file}.")
             else:
                 tqdm.write(f"Uploading file {local_file} to S3 bucket {S3_BUCKET_NAME} as {s3_file}.")
