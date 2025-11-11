@@ -1,4 +1,4 @@
-## Chart data API
+# Chart API
 
 Our chart API is structured around charts on our website, i.e. at https://ourworldindata.org/grapher/* . You can find charts by searching our data catalog at [https://ourworldindata.org/data](https://ourworldindata.org/data).
 

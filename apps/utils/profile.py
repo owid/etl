@@ -1,12 +1,11 @@
-"""This script runs certain step of the ETL pipeline and profiles memory or CPU usage
-of its `run` function line by line. You can additionally specify other functions to profile.
+"""This script runs certain step of the ETL pipeline and profiles memory or CPU usage of its `run` function line by line. You can additionally specify other functions to profile.
 
-Usage:
-- Profile CPU usage of `run` function of the step:
+**Example: Profile CPU usage of `run` function of the step:**
     ```
     etl d profile --cpu garden/biodiversity/2024-01-25/cherry_blossom
     ```
-- Profile specific functions (excludes `run` for cleaner output):
+
+**Example: Profile specific functions (excludes `run` for cleaner output):**
     ```
     etl d profile --cpu garden/biodiversity/2024-01-25/cherry_blossom -f calculate_multiple_year_average
     etl d profile --cpu garden/biodiversity/2024-01-25/cherry_blossom -f etl.helpers.PathFinder.load_dataset
@@ -17,6 +16,7 @@ To profile grapher upserts, it is better to use cProfile and run something like 
 ```
 ssh owid@staging-site-my-branch "cd etl && uv run python -m cProfile -s cumtime etl/command.py grapher://grapher/biodiversity/2024-01-25/cherry_blossom --grapher --only --force --workers 1" | head -n 100
 ```
+
 """
 
 import importlib
