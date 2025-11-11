@@ -12,7 +12,7 @@ tables:
   nvidia_revenue:
     variables:
       revenue_millions:
-        title: Quarterly revenue
+        title: Quarterly revenue of NVIDIA by market segment
         unit: "million USD"
         short_unit: "$"
         description_short: Quarterly revenue in millions of USD

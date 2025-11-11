@@ -18,6 +18,7 @@ def run() -> None:
     #
     # Save outputs.
     #
+    tb = tb.rename_index_names({"segment": "country"})
     # Create a new grapher dataset with the same metadata as the garden dataset.
     ds_grapher = paths.create_dataset(tables=[tb], check_variables_metadata=True, default_metadata=ds_garden.metadata)
 
