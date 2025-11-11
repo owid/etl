@@ -169,7 +169,9 @@ def run() -> None:
 
     # Create dataset
     ds_garden = paths.create_dataset(
-        tables=[tb, tb_population], check_variables_metadata=True, default_metadata=ds_thousand_bins.metadata
+        tables=[tb, tb_population, tb_extended],
+        check_variables_metadata=True,
+        default_metadata=ds_thousand_bins.metadata,
     )
 
     # Save dataset
