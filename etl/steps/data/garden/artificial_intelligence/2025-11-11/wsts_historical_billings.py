@@ -1,7 +1,6 @@
 """Garden step for WSTS Historical Billings Report dataset."""
 
 import pandas as pd
-from owid.catalog import Table
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder
