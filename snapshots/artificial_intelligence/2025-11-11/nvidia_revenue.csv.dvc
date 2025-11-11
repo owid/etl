@@ -1,0 +1,35 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: NVIDIA Quarterly Revenue by Market Segment
+    description: |-
+      Quarterly revenue data for NVIDIA Corporation broken down by market segments including Data Center, Gaming, Professional Visualization, Auto, and OEM & Other. Data is reported in millions of USD for each fiscal quarter.
+
+      NVIDIA's fiscal year ends in January, with quarters defined as:
+      - Q1: February-April
+      - Q2: May-July
+      - Q3: August-October
+      - Q4: November-January
+    date_published: "2025-01-28"
+    title_snapshot: NVIDIA Quarterly Revenue by Market Segment - Q4 FY2025
+
+    # Citation
+    producer: NVIDIA Corporation
+    citation_full: |-
+      NVIDIA Corporation - Quarterly Revenue Trends by Market Platform (2014-2025)
+    attribution_short: NVIDIA
+
+    # Files
+    url_main: https://investor.nvidia.com/financial-info/financial-reports/default.aspx
+    date_accessed: '2025-11-11'
+
+    # License
+    license:
+      name: ©2025 NVIDIA Corporation
+      url: https://www.nvidia.com/en-us/about-nvidia/terms-of-service/
+outs:
+  - md5: caac88129da19b15a541382585468333
+    size: 7208
+    path: nvidia_revenue.csv
