@@ -11,10 +11,6 @@ dataset:
 tables:
   nvidia_revenue:
     variables:
-      quarter:
-        title: Fiscal quarter
-        unit: ""
-        description_short: NVIDIA fiscal quarter (e.g., Q4 FY25)
       revenue_millions:
         title: Quarterly revenue
         unit: "million USD"
@@ -24,17 +20,3 @@ tables:
           - NVIDIA reports revenue across five main market segments - Data Center (high-performance computing and AI), Gaming (GeForce GPUs), Professional Visualization (Quadro products), Auto (autonomous vehicle platforms), and OEM & Other.
         display:
           numDecimalPlaces: 0
-      revenue_yoy_growth:
-        title: Year-over-year revenue growth
-        unit: "%"
-        short_unit: "%"
-        description_short: Year-over-year percentage change in quarterly revenue (compared to same quarter previous year)
-        display:
-          numDecimalPlaces: 1
-      revenue_qoq_growth:
-        title: Quarter-over-quarter revenue growth
-        unit: "%"
-        short_unit: "%"
-        description_short: Sequential quarter-over-quarter percentage change in revenue
-        display:
-          numDecimalPlaces: 1

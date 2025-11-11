@@ -15,23 +15,18 @@ def run(dest_dir: str) -> None:
     ds_meadow = paths.load_dataset("nvidia_revenue")
 
     # Read table from meadow dataset.
-    tb = ds_meadow["nvidia_revenue"].reset_index()
+    tb = ds_meadow.read("nvidia_revenue")
 
     #
     # Process data.
     #
     # Add a 'country' column for NVIDIA (worldwide data)
     tb["country"] = "World"
-
-    # Calculate year-over-year growth for each segment
-    tb = tb.sort_values(["segment", "date"])
-    tb["revenue_yoy_growth"] = tb.groupby("segment")["revenue_millions"].pct_change(periods=4) * 100
-
-    # Calculate quarter-over-quarter growth
-    tb["revenue_qoq_growth"] = tb.groupby("segment")["revenue_millions"].pct_change() * 100
+    tb = tb.drop(columns=["quarter"])
+    tb["revenue_millions"] = tb["revenue_millions"] * 1_000_000  # Convert millions to actual dollars
 
     # Set appropriate format and metadata
-    tb = tb.format(["country", "date", "segment"], short_name="nvidia_revenue")
+    tb = tb.format(["country", "date", "segment"])
 
     #
     # Save outputs.

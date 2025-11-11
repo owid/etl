@@ -20,18 +20,9 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    # Ensure all columns are correctly typed
-    tb = tb.astype(
-        {
-            "date": "datetime64[ns]",
-            "quarter": "string",
-            "segment": "category",
-            "revenue_millions": "Float64",
-        }
-    )
 
     # Set index
-    tb = tb.set_index(["date", "segment"], verify_integrity=True)
+    tb = tb.format(["date", "segment"])
 
     #
     # Save outputs.
