@@ -17,13 +17,12 @@ meta:
     # Files
     url_main: https://www.lazard.com/research-insights/levelized-cost-of-energyplus/
     url_download: https://www.lazard.com/media/gjyffoqd/lazards-lcoeplus-june-2024.pdf
-    date_accessed: 2025-02-25
+    date_accessed: '2025-02-25'
 
     # License
     license:
       name: © Lazard 2024
       url: https://www.lazard.com/research-insights/levelized-cost-of-energyplus/
-
 outs:
   - md5: 43d2ef988477412e300a54b2332dbcde
     size: 1879613

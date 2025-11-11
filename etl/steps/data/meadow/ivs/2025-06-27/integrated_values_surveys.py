@@ -130,7 +130,7 @@ VARS_DICT = {
     "H006_05": "Civil war",
     "A124_02": "Different race",
     "A124_03": "Heavy drinkers",
-    "A124_06": "Inmigrant/foreign workers",
+    "A124_06": "Immigrant/foreign workers",
     "A124_07": "AIDS",
     "A124_08": "Drug addicts",
     "A124_09": "Homosexuals",
@@ -151,6 +151,8 @@ VARS_DICT = {
     "E233A": "The state makes people's incomes equal",
     "E233B": "People obey their rulers",
     "E266": "Honest elections make a difference",
+    "F028": "Attend religious services",
+    "F028B": "Pray",
 }
 
 

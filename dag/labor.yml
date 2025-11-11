@@ -1,0 +1,28 @@
+steps:
+
+  #
+  # ILOSTAT
+  #
+  data://meadow/un/2025-08-12/ilostat:
+    - snapshot://un/2025-08-12/ilostat.parquet
+    - snapshot://un/2025-08-12/ilostat_table_of_contents_country.parquet
+    - snapshot://un/2025-08-12/ilostat_dictionary_classif1.parquet
+    - snapshot://un/2025-08-12/ilostat_dictionary_classif2.parquet
+    - snapshot://un/2025-08-12/ilostat_dictionary_indicator.parquet
+    - snapshot://un/2025-08-12/ilostat_dictionary_note_classif.parquet
+    - snapshot://un/2025-08-12/ilostat_dictionary_note_indicator.parquet
+    - snapshot://un/2025-08-12/ilostat_dictionary_note_source.parquet
+    - snapshot://un/2025-08-12/ilostat_dictionary_obs_status.parquet
+    - snapshot://un/2025-08-12/ilostat_dictionary_ref_area.parquet
+    - snapshot://un/2025-08-12/ilostat_dictionary_sex.parquet
+    - snapshot://un/2025-08-12/ilostat_dictionary_source.parquet
+  data://garden/un/2025-08-12/ilostat:
+    - data://meadow/un/2025-08-12/ilostat
+  data://grapher/un/2025-08-12/ilostat:
+    - data://garden/un/2025-08-12/ilostat
+
+  #
+  # ILOSTAT national vs. modeled comparison (from WDI)
+  #
+  export://multidim/worldbank_wdi/latest/wdi:
+    - data://grapher/worldbank_wdi/2025-09-08/wdi

@@ -126,6 +126,8 @@ def run(dest_dir: str) -> None:
     paths.log.info("add share from total exports and imports")
     tb = add_share_from_total(tb)
 
+    tb = add_share_transported_by_air(tb)
+
     # Set index
     tb = tb.underscore().set_index(["year", "country"], verify_integrity=True).sort_index()
 
@@ -250,3 +252,34 @@ def add_share_from_total(tb: Table) -> Table:
     merged_df = merged_df.drop(columns=["Import_TOTAL MOT_World", "Export_TOTAL MOT_World"])
 
     return merged_df
+
+
+def add_share_transported_by_air(tb: Table) -> Table:
+    """
+    Calculate the share of plastic waste transported by air for exports and imports.
+
+    Parameters
+    ----------
+    tb : Table
+        The input table with transport mode columns
+
+    Returns
+    -------
+    tb : Table
+        Table with added air transport share columns
+    """
+    tb_with_air_share = tb.copy()
+
+    # Calculate share transported by air for exports
+    tb_with_air_share["export_share_transported_by_air"] = (
+        tb_with_air_share["Export_Air"] / tb_with_air_share["Export_TOTAL MOT"]
+    ) * 100
+    tb_with_air_share["export_share_transported_by_air"].metadata.origins = tb["Export_Air"].metadata.origins
+
+    # Calculate share transported by air for imports
+    tb_with_air_share["import_share_transported_by_air"] = (
+        tb_with_air_share["Import_Air"] / tb_with_air_share["Import_TOTAL MOT"]
+    ) * 100
+    tb_with_air_share["import_share_transported_by_air"].metadata.origins = tb["Import_Air"].metadata.origins
+
+    return tb_with_air_share

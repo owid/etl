@@ -1,9 +1,19 @@
-# CLAUDE.md
+# Agent Guide
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to automation agents working with code in this repository.
 
 # Individual Preferences
 - @~/.claude/instructions/etl.md
+
+## Critical Rules
+
+- When running `etl` command, **ALWAYS** use the `.venv/bin/etl` binary (same for `python`, `pytest`, etc.)
+⚠️ **NEVER mask problems - fix them systematically:**
+- **NEVER** return empty tables, comment out failing code, or create workarounds
+- **NEVER** catch and ignore exceptions without fixing the root cause
+- **ALWAYS** trace issues upstream through the pipeline: snapshot → meadow → garden → grapher
+- **ALWAYS** provide full error tracebacks - don't truncate diagnostic information
+- **If unsure, ASK THE USER** - don't guess or mask issues
 
 ## Architecture Overview
 
@@ -99,6 +109,15 @@ etl d prune             # Remove orphaned datasets
 pytest tests/test_etl_step_code.py::test_step_name  # Test single step
 ```
 
+## Additional Tools
+
+Get `--help` for details on any command.
+
+### etl archive
+
+Archive old datasets.
+
+
 ## Key Development Patterns
 
 ### CLI Tools
@@ -130,6 +149,22 @@ tb = tb.format(short_name="table_name")  # Sets table metadata
 tb["column"] = tb["column"].replace_metadata(unit="percent", short_unit="%")
 ```
 
+### YAML File Editing
+Always use `ruamel_load` and `ruamel_dump` from `etl.files` to preserve comments and formatting when editing YAML files:
+```python
+from etl.files import ruamel_load, ruamel_dump
+
+# Load YAML while preserving comments and formatting
+data = ruamel_load(file_path)
+
+# Modify data as needed
+data['some_key'] = new_value
+
+# Save back to file with original formatting preserved
+with open(file_path, 'w') as f:
+    f.write(ruamel_dump(data))
+```
+
 ### Creating New Steps
 1. Use Wizard UI (`make wizard`) for guided creation
 2. Or follow existing patterns in `etl/steps/data/[stage]/[namespace]/`
@@ -152,11 +187,25 @@ pytest tests/test_steps.py -m integration
 ## Configuration
 
 ### Python Environment
-- **Virtual Environment**: This project uses a Python virtual environment (`.venv/`)
-- **Activation**: Always activate the virtual environment before running commands:
-  ```bash
-  source .venv/bin/activate  # Activate virtual environment
-  ```
+
+⚠️ **CRITICAL: Virtual Environment Usage**
+
+This project uses a Python virtual environment (`.venv/`). **ALL Python commands must use the virtual environment binaries:**
+
+```bash
+# CORRECT - Use .venv binaries
+.venv/bin/python script.py
+.venv/bin/etl run step
+.venv/bin/pytest tests/
+
+# WRONG - Global commands will fail
+python script.py        # ❌ Don't use
+etl run step           # ❌ Don't use
+pytest tests/          # ❌ Don't use
+```
+
+**Throughout this document, when you see commands like `etl`, `python`, or `pytest`, always prefix them with `.venv/bin/`**
+
 - **Package Management**: Always use `uv` package manager instead of `pip`
   ```bash
   uv add package_name     # Add a new package
@@ -190,13 +239,12 @@ These are installed as editable packages (`owid-catalog`, `owid-datautils`, `owi
 - **Apps** (`apps/`): Extended functionality - Wizard, chart sync, anomaly detection, maintenance tools
 
 ## Running ETL Steps
-Use `etlr` to run ETL steps:
+Use `.venv/bin/etlr` to run ETL steps:
 
 ### Basic Usage
 - Run steps matching a pattern: `etlr biodiversity/2025-06-28/cherry_blossom`
 - Run with grapher upload: `etlr biodiversity/2025-06-28/cherry_blossom --grapher`
 - Dry run (preview): `etlr biodiversity/2025-06-28/cherry_blossom --dry-run`
-- Force re-run: `etlr biodiversity/2025-06-28/cherry_blossom --force`
 
 ### Key Options
 - `--grapher/-g`: Upload datasets to grapher database (OWID staff only)
@@ -205,7 +253,6 @@ Use `etlr` to run ETL steps:
 - `--only/-o`: Run only selected step (no dependencies)
 - `--downstream/-d`: Include downstream dependencies
 - `--exact-match/-x`: Steps must exactly match arguments
-
 
 ## Git Workflow
 Create PR first, then commit files:
@@ -217,6 +264,9 @@ Create PR first, then commit files:
 
 Note: The `etl pr` creates a new branch but does NOT automatically commit files - you must commit manually after creating the PR.
 
+### Commit Messages
+When creating git commits, refer to [.claude/commands/commit.md](.claude/commands/commit.md) for commit message formatting guidelines including emoji usage.
+
 ## Important Development Notes
 
 - Always use `geo.harmonize_countries()` for geographic data
@@ -226,9 +276,11 @@ Note: The `etl pr` creates a new branch but does NOT automatically commit files 
 - Use `make sync.catalog` to avoid rebuilding entire catalog locally
 - Check `etl d version-tracker` before major changes
 - VS Code extensions available: `make install-vscode-extensions`
-- Never run --force alone, if you want to force run a step, use --force --only together.
+- Never run --force alone, if you want to force run a step, use --force --only together
 - When running ETL steps, always use --private flag
 - When running grapher:// step in ETL, always add --grapher flag
+- **ALWAYS run `make check` before committing** - formats code, fixes linting issues, and runs type checks
+- SQL queries enclose in triple quotes for readability
 
 ### Exception Handling
 - **NEVER** catch, log, and re-raise exceptions (`except Exception: log.error(e); raise`)
@@ -298,13 +350,12 @@ print(f"Garden null values: {tb.date.isnull().sum()}")
 - **Document data issues**: Log warnings about data quality problems found during processing
 - **Fix meadow steps**: Most data cleaning should happen in meadow, not garden steps
 
-
 ## Database Access
 
 ### MySQL Connection
 Can execute SQL queries directly using the staging database:
 ```bash
-mysql -h staging-site-branch -u owid --port 3306 -D owid -e "SELECT query"
+mysql -h staging-site-[branch] -u owid --port 3306 -D owid -e "SELECT query"
 ```
 
 Example queries:
@@ -315,17 +366,3 @@ SELECT id, catalogPath, name FROM datasets WHERE shortName = 'dataset_name' AND 
 -- Check variables in dataset
 SELECT id, name FROM variables WHERE datasetId = 12345;
 ```
-
-
-## Important Development Notes
-
-- Always use `geo.harmonize_countries()` for geographic data
-- Follow the `PathFinder` pattern for step inputs/outputs
-- Using `--force` is usually unnecessary - the step will be re-run if the code changes
-- Test steps with `etl run --dry-run` before execution
-- Use `make sync.catalog` to avoid rebuilding entire catalog locally
-- Check `etl d version-tracker` before major changes
-- VS Code extensions available: `make install-vscode-extensions`
-- **ALWAYS run `make check` before committing** - formats code, fixes linting issues, and runs type checks
-- SQL queries enclose in triple quotes for readability
-- When running **etlr**, always use PREFER_DOWNLOAD=1 prefix (don't use it for **etls** command)

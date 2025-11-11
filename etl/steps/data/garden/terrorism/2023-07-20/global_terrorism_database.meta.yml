@@ -427,7 +427,7 @@ tables:
           An attack that was carried out either against an aircraft or against an airport. Attacks against airline employees while on board are also included in this value.
 
 
-          Includes attacks conducted against airport business offices and executives. Military aircrafts are not included.
+          Includes attacks conducted against airport business offices and executives. Military aircraft are not included.
         unit: 'deaths'
         display:
           name: Airports and airplanes
@@ -525,7 +525,7 @@ tables:
 
       total_nkill_military_target:
         title: Terrorism deaths Military Target
-        descrtiption: >
+        description: >
           Includes attacks against military units, patrols, barracks, convoys, jeeps, and aircraft. Also includes attacks on recruiting sites, and soldiers engaged in internal policing functions such as at checkpoints and in anti-narcotics activities. This category also includes peacekeeping units that conduct military operations (e.g., AMISOM)
         unit: "deaths"
         display:
@@ -600,11 +600,11 @@ tables:
 
       total_nkill_terrorists_non_state_militia_target:
         title: Terrorism deaths Terrorists/Non-State Militia Target
-        descrtiption: >
+        description: >
           Terrorists or members of identified terrorist groups within the GTD are included in this value. Membership is broadly defined and includes informants for terrorist groups, but excludes former or surrendered terrorists.
 
 
-          This value also includes cases involving the targeting of militias and guerillas
+          This value also includes cases involving the targeting of militias and guerrillas
         unit: "deaths"
         display:
           name: Militia
@@ -645,7 +645,7 @@ tables:
 
       total_nkill_utilities_target:
         title: Terrorism deaths Utilities Target
-        descrtiption: >
+        description: >
           This value pertains to facilities for the transmission or generation of energy. For example, power lines, oil pipelines, electrical transformers, high tension lines, gas and electric substations, are all included in this value. This value also includes lampposts or street lights.
 
 
@@ -657,7 +657,7 @@ tables:
 
       total_nkill_violent_political_party_target:
         title: Terrorism deaths Violent Political Party Target
-        descrtiption: >
+        description: >
           This value pertains to entities that are both political parties (and thus, coded as “government” in this coding scheme) and terrorists. It is operationally defined as groups that engage in electoral politics and appear as “Perpetrators” in the GTD.
         unit: "deaths"
         display:
@@ -679,7 +679,7 @@ tables:
           An attack that was carried out either against an aircraft or against an airport. Attacks against airline employees while on board are also included in this value.
 
 
-          Includes attacks conducted against airport business offices and executives. Military aircrafts are not included.
+          Includes attacks conducted against airport business offices and executives. Military aircraft are not included.
         unit: 'injuries'
         display:
           name: Airports and airplanes
@@ -770,7 +770,7 @@ tables:
           numDecimalPlaces: 0
       total_nwound_military_target:
         title: Terrorism non-fatal injuries Military Target
-        descrtiption: >
+        description: >
           Includes attacks against military units, patrols, barracks, convoys, jeeps, and aircraft. Also includes attacks on recruiting sites, and soldiers engaged in internal policing functions such as at checkpoints and in anti-narcotics activities. This category also includes peacekeeping units that conduct military operations (e.g., AMISOM)
         unit: "injuries"
         display:
@@ -841,11 +841,11 @@ tables:
 
       total_nwound_terrorists_non_state_militia_target:
         title: Terrorism non-fatal injuries Terrorists/Non-State Militia Target
-        descrtiption: >
+        description: >
           Terrorists or members of identified terrorist groups within the GTD are included in this value. Membership is broadly defined and includes informants for terrorist groups, but excludes former or surrendered terrorists.
 
 
-          This value also includes cases involving the targeting of militias and guerillas
+          This value also includes cases involving the targeting of militias and guerrillas
         unit: "injuries"
         display:
           name: Militia
@@ -884,7 +884,7 @@ tables:
 
       total_nwound_utilities_target:
         title: Terrorism non-fatal injuries Utilities Target
-        descrtiption: >
+        description: >
           This value pertains to facilities for the transmission or generation of energy. For example, power lines, oil pipelines, electrical transformers, high tension lines, gas and electric substations, are all included in this value. This value also includes lampposts or street lights.
 
 
@@ -895,7 +895,7 @@ tables:
           numDecimalPlaces: 0
       total_nwound_violent_political_party_target:
         title: Terrorism non-fatal injuries Violent Political Party Target
-        descrtiption: >
+        description: >
           This value pertains to entities that are both political parties (and thus, coded as “government” in this coding scheme) and terrorists. It is operationally defined as groups that engage in electoral politics and appear as “Perpetrators” in the GTD.
         unit: "injuries"
         display:
@@ -916,7 +916,7 @@ tables:
           An attack that was carried out either against an aircraft or against an airport. Attacks against airline employees while on board are also included in this value.
 
 
-          Includes attacks conducted against airport business offices and executives. Military aircrafts are not included.
+          Includes attacks conducted against airport business offices and executives. Military aircraft are not included.
         unit: 'attacks'
         display:
           name: Airports and airplanes
@@ -1071,7 +1071,7 @@ tables:
           numDecimalPlaces: 0
       total_incident_counts_military_target:
         title: Terrorist attacks Military Target
-        descrtiption: >
+        description: >
           Includes attacks against military units, patrols, barracks, convoys, jeeps, and aircraft. Also includes attacks on recruiting sites, and soldiers engaged in internal policing functions such as at checkpoints and in anti-narcotics activities. This category also includes peacekeeping units that conduct military operations (e.g., AMISOM)
         unit: "attacks"
         display:
@@ -1143,11 +1143,11 @@ tables:
 
       total_incident_counts_terrorists_non_state_militia_target:
         title: Terrorist attacks Terrorists/Non-State Militia Target
-        descrtiption: >
+        description: >
           Terrorists or members of identified terrorist groups within the GTD are included in this value. Membership is broadly defined and includes informants for terrorist groups, but excludes former or surrendered terrorists.
 
 
-          This value also includes cases involving the targeting of militias and guerillas
+          This value also includes cases involving the targeting of militias and guerrillas
         unit: "attacks"
         display:
           name: Militia
@@ -1187,7 +1187,7 @@ tables:
 
       total_incident_counts_utilities_target:
         title: Terrorist attacks Utilities Target
-        descrtiption: >
+        description: >
           This value pertains to facilities for the transmission or generation of energy. For example, power lines, oil pipelines, electrical transformers, high tension lines, gas and electric substations, are all included in this value. This value also includes lampposts or street lights.
 
 
@@ -1198,7 +1198,7 @@ tables:
           numDecimalPlaces: 0
       total_incident_counts_violent_political_party_target:
         title: Terrorist attacks Violent Political Party Target
-        descrtiption: >
+        description: >
           This value pertains to entities that are both political parties (and thus, coded as “government” in this coding scheme) and terrorists. It is operationally defined as groups that engage in electoral politics and appear as “Perpetrators” in the GTD.
         unit: "attacks"
         display:

@@ -9,7 +9,7 @@ definitions:
   description_processing_electricity_generation_origins: |-
     - While the Energy Institute (EI) provides a longer time series (dating back to 1965) than Ember (dating back only to 1990 for European countries and 2000 for other countries), EI does not cover all countries or all sources of electricity (for example, generation from bioenergy is missing). Therefore, when data from Ember is available for a given country and year, we use it as the primary data source. Where Ember data is unavailable, we supplement it with data from EI.
   # Processing description for indicators that only use Ember data.
-  description_procesing_only_ember_origins: ""
+  description_processing_only_ember_origins: ""
   # Processing description for direct primary energy consumption indicators.
   description_processing_direct_primary_energy_origins: |-
     - The Statistical Review of World Energy only provides data on input-equivalent primary energy consumption, not on direct primary energy consumption. We estimate the direct primary energy consumption as the sum of the primary energy consumption from coal, oil, gas, and biofuels, plus the electricity generation from low-carbon sources (nuclear, solar, wind, hydro, bioenergy, and other renewables).
@@ -41,7 +41,7 @@ tables:
         unit: terawatt-hours
         description_short: *description_short_twh
         description_processing: |-
-          {definitions.description_procesing_only_ember_origins}
+          {definitions.description_processing_only_ember_origins}
         display:
           name: Bioenergy
         presentation:
@@ -166,7 +166,7 @@ tables:
         description_short: |-
           Electricity imports minus exports, measured as a percentage of total electricity demand in the country or region.
         description_processing: |-
-          {definitions.description_procesing_only_ember_origins}
+          {definitions.description_processing_only_ember_origins}
         presentation:
           title_public: Net electricity imports as a share of demand
       nuclear_generation__twh:
@@ -211,7 +211,7 @@ tables:
         unit: terawatt-hours
         description_short: *description_short_twh
         description_processing: |-
-          {definitions.description_procesing_only_ember_origins}
+          {definitions.description_processing_only_ember_origins}
         display:
           name: Other renewables excluding bioenergy
         presentation:
@@ -251,7 +251,7 @@ tables:
         description_key:
           - *description_key_per_capita
         description_processing: |-
-          {definitions.description_procesing_only_ember_origins}
+          {definitions.description_processing_only_ember_origins}
         display:
           name: Bioenergy
           numDecimalPlaces: 0
@@ -351,7 +351,7 @@ tables:
         description_key:
           - *description_key_per_capita
         description_processing: |-
-          {definitions.description_procesing_only_ember_origins}
+          {definitions.description_processing_only_ember_origins}
         display:
           name: Other renewables excluding bioenergy
           numDecimalPlaces: 0
@@ -425,7 +425,7 @@ tables:
         description_key:
           - *description_key_per_capita
         description_processing: |-
-          {definitions.description_procesing_only_ember_origins}
+          {definitions.description_processing_only_ember_origins}
         display:
           name: Total electricity
           numDecimalPlaces: 0
@@ -536,7 +536,7 @@ tables:
         unit: terawatt-hours
         description_short: *description_short_twh
         description_processing: |-
-          {definitions.description_procesing_only_ember_origins}
+          {definitions.description_processing_only_ember_origins}
         display:
           name: Electricity demand
         presentation:
@@ -559,7 +559,7 @@ tables:
         unit: million tonnes CO₂ equivalents
         description_short: Measured in megatonnes of [CO₂ equivalents](#dod:carbondioxideequivalents).
         description_processing: |-
-          {definitions.description_procesing_only_ember_origins}
+          {definitions.description_processing_only_ember_origins}
         display:
           name: Emissions
         presentation:
@@ -581,7 +581,7 @@ tables:
         description_short: |-
           Electricity imports minus exports, measured in [terawatt-hours](#dod:watt-hours).
         description_processing: |-
-          {definitions.description_procesing_only_ember_origins}
+          {definitions.description_processing_only_ember_origins}
         display:
           name: Net imports
         presentation:

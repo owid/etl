@@ -1,5 +1,8 @@
 definitions:
   common:
+    description_processing: |-
+       **Note on current year data:** For the ongoing year (if displayed), annual averages are calculated from available monthly or semi-annual data, providing preliminary CPI values that update throughout the year. Official annual averages from BLS are only available after the year is complete.
+
     presentation:
       topic_tags:
         - Economic Growth

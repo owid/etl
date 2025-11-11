@@ -2,9 +2,7 @@
 name = "etl"
 version = "0.1.0"
 description = ""
-authors = [
-    {name = "Our World in Data", email = "tech@ourworldindata.org"},
-]
+authors = [{ name = "Our World in Data", email = "tech@ourworldindata.org" }]
 requires-python = ">=3.10, <3.14"
 dependencies = [
     "click>=8.0.1",
@@ -23,7 +21,7 @@ dependencies = [
     "pydantic>=1.9.0",
     "structlog>=21.5.0",
     "rich>=12.1.0",
-    "rich-click>=1.7.3",
+    "rich-click>=1.9.4",
     "tenacity>=8.0.1",
     "simplejson>=3.17.6",
     "xlrd>=2.0.1",
@@ -72,11 +70,15 @@ dependencies = [
     "mediacloud>=4.4.0",
     # NOTE: higher versions cause errors when running this on staging server (maybe even locally)
     # fastmcp run owid_mcp/server.py --transport=http  --host=0.0.0.0 --port=8080
-    "fastmcp<=2.10.6",
+    "fastmcp>=2.12.3",
     "pyproj>=3.7.1",
-    "pydantic-ai>=0.7.3",
+    "pydantic-ai>=1.0.10",
     "logfire[fastapi,httpx]>=4.3.3",
     "cfgrib>=0.9.15.0",
+    "metabase-api>=3.5.2",
+    "codespell>=2.4.1",
+    "zensical>=0.0.5",
+    "pandas-gbq>=0.29.2",
 ]
 
 [tool.uv.sources]
@@ -99,6 +101,7 @@ dev-dependencies = [
     "hydra-core>=1.3.2",
     "gspread>=5.12.4",
     "jsonref>=1.1.0",
+    "kaleido==1.1.0",
     "mkdocs-material>=9.5.34",
     "mkdocs-jupyter>=0.24.8",
     "mkdocs-exclude>=1.0.2",
@@ -117,6 +120,7 @@ dev-dependencies = [
     "commentjson>=0.9.0",
     "pytest-asyncio>=1.0.0",
     "sqlacodegen>=3.1.0",
+    "codespell>=2.4.1",
 ]
 
 [project.optional-dependencies]
@@ -127,7 +131,7 @@ api = [
     "joblib>=1.3.2",
 ]
 wizard = [
-    "streamlit>=1.48.0",
+    "streamlit>=1.50.0",
     "streamlit-aggrid>=0.3.4.post3",
     "streamlit-ace>=0.1.1",
     "streamlit-extras>=0.3.6",
@@ -160,16 +164,12 @@ backport = 'apps.backport.backport:backport_cli'
 [tool.ruff]
 lint.extend-select = [
     # isort
-    "I"
+    "I",
 ]
 lint.ignore = ["E501"]
 line-length = 120
 target-version = "py310"
-extend-exclude = [
-    ".ipynb_checkpoints",
-    "*cookiecutter",
-    "*.ipynb",
-]
+extend-exclude = [".ipynb_checkpoints", "*cookiecutter", "*.ipynb"]
 
 [build-system]
 requires = ["hatchling"]
@@ -194,5 +194,5 @@ exclude = [
 
 [tool.pytest.ini_options]
 markers = [
-    "integration: marks tests as integration tests (deselect with '-m \"not integration\"')"
+    "integration: marks tests as integration tests (deselect with '-m \"not integration\"')",
 ]

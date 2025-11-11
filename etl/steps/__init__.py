@@ -586,6 +586,12 @@ class DataStep(Step):
         # Save dataset, but use _instant suffix in the checksum to make sure we
         # trigger fresh run when not using INSTANT
         ds.update_metadata(meta_path)
+
+        # Also load the override metadata file if it exists (similar to create_dataset in helpers.py)
+        meta_override_path = meta_path.with_suffix(".override.yml")
+        if meta_override_path.exists():
+            ds.update_metadata(meta_override_path)
+
         ds.metadata.source_checksum = self.checksum_input() + "_instant"
         ds.save()
 
@@ -1199,7 +1205,7 @@ def _uses_old_schema(e: KeyError) -> bool:
 @contextmanager
 def isolated_env(
     working_dir: Path,
-    keep_modules: str = r"openpyxl|pyarrow|lxml|PIL|pydantic|sqlalchemy|sqlmodel|pandas|frictionless|numpy",
+    keep_modules: str = r"openpyxl|pyarrow|lxml|PIL|pydantic|sqlalchemy|sqlmodel|pandas|frictionless|numpy|pyproj|geopandas|google|plotly|shapely",
 ) -> Generator[None, None, None]:
     """Add given directory to pythonpath, run code in context, and
     then remove from pythonpath and unimport modules imported in context.

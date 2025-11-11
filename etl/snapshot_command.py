@@ -87,9 +87,11 @@ def find_snapshot_script(dataset_name: str) -> Optional[Path]:
         else:
             return None
 
+    # Remove snapshots/ prefix if present (for paths like snapshots/namespace/version/name)
+    dataset_name = dataset_name.removeprefix("snapshots/")
+
     # Remove any file extension if present (e.g., .py, .csv, .xlsx)
-    if "." in dataset_name and not dataset_name.startswith("snapshots/"):
-        # Only strip extension if it's not a full path starting with snapshots/
+    if "." in dataset_name:
         # Find the last dot and check if it's likely a file extension
         dot_index = dataset_name.rfind(".")
         if dot_index > dataset_name.rfind("/"):  # Extension is after the last slash
@@ -149,8 +151,9 @@ def run_snapshot_script(script_path: Path, upload: bool, path_to_file: Optional[
 
     try:
         spec.loader.exec_module(module)
-    except Exception as e:
-        raise click.ClickException(f"Error loading script {script_path}: {e}")
+    except Exception:
+        log.error(f"Error loading script {script_path}")
+        raise
     finally:
         # Clean up sys.path
         if script_dir in sys.path:
@@ -186,11 +189,8 @@ def _call_snapshot_function(
         if path_to_file is not None:
             args.extend(["--path-to-file", path_to_file])
 
-        try:
-            # Call the click command with parsed arguments
-            func(args, standalone_mode=False)
-        except Exception as e:
-            raise click.ClickException(f"Error calling {func_name}() click command: {e}")
+        # Call the click command with parsed arguments
+        func(args, standalone_mode=False)
     else:
         # Regular function - check its signature
         sig = inspect.signature(func)
@@ -204,12 +204,13 @@ def _call_snapshot_function(
 
         try:
             func(**kwargs)
-        except TypeError as e:
+        except TypeError:
             if path_to_file is not None and "path_to_file" not in sig.parameters:
                 raise click.ClickException(
                     f"Script {script_path} {func_name}() function doesn't accept --path-to-file argument"
                 )
-            raise click.ClickException(f"Error calling {func_name}(): {e}")
+            log.error(f"Error calling {func_name}()")
+            raise
 
 
 def run_snapshot_dvc_only(dataset_name: str, upload: bool, path_to_file: Optional[str] = None) -> None:

@@ -12,6 +12,8 @@ definitions:
   fob_basis: &fob_basis Exports are valued on an FOB basis (Free on Board). This means the values include the cost of the goods up to the exporter's border, but exclude transport and insurance costs after that point.
   cif_basis: &cif_basis Imports are valued on a CIF basis (Cost, Insurance, and Freight). This means the values include the cost of the goods, as well as the transport and insurance costs to deliver them to the importing country's border.
 
+  description_processing_partnerships: &description_processing_partnerships We calculated the share of bilateral, unilateral, and non-trading partnerships by examining all possible country pairs for each year. For each pair, we checked whether both countries reported trade with each other (bilateral), only one country reported trade (unilateral), or neither country reported trade (non-trading). We then counted the total number of partnerships in each category and calculated their shares as a percentage of all partnerships.
+
 dataset:
   update_period_days: 365
 
@@ -219,16 +221,30 @@ tables:
           numDecimalPlaces: 1
 
       import_rank:
-        title:  << counterpart_country >>´s import ranking
+        title:  << counterpart_country >>´s rank among import partners
         unit: "rank"
         short_unit: ""
-        description_short: The rank of << counterpart_country >> among a country’s import partners, based on import values that include the cost of goods, freight, and insurance.  A rank of 1 indicates that the << counterpart_country >> is the country’s largest import partner.
+        description_short: The rank of << counterpart_country >> among a country's import partners, based on import values that include the cost of goods, freight, and insurance.  A rank of 1 indicates that the << counterpart_country >> is the country's largest import partner.
         description_key:
-          - This indicator shows the rank of << counterpart_country >> among a country’s import partners.
+          - This indicator shows the rank of << counterpart_country >> among a country's import partners.
           - *cif_basis
           - Rank 1 indicates that << counterpart_country >> was the largest import partner for that country in a given year; rank 2 indicates the second largest, and higher numbers represent lower positions.
-          - This ranking highlights whether << counterpart_country >> was a dominant supplier or played a smaller role in a country’s imports.
+          - This ranking highlights whether << counterpart_country >> was a dominant supplier or played a smaller role in a country's imports.
         description_processing: "For each country and year, all import partners were ordered from largest to smallest by their CIF import values in current US dollars. The position of << counterpart_country >> in this ranking was then recorded: 1 if it was the top supplier, 2 if the second largest, and so on. Rankings were produced separately for each year."
+        display:
+          numDecimalPlaces: 0
+
+      import_rank_category:
+        title: << counterpart_country >>´s rank category among import partners
+        unit: ""
+        short_unit: ""
+        description_short: The categorical rank of << counterpart_country >> among a country's import partners, based on import values that include the cost of goods, freight, and insurance. Categories range from "1st - Top partner" for the largest import partner to "Not in top 5" for all others.
+        description_key:
+          - This indicator categorizes the rank of << counterpart_country >> among a country's import partners into distinct groups.
+          - *cif_basis
+          - Categories include "China" (for China itself, -1), "1st - Top partner" (largest supplier), "2nd", "3rd", "4th", "5th", and "Not in top 5" for all other partners.
+          - This categorical ranking is useful for visualizations and comparisons, making it easier to identify whether << counterpart_country >> was among the most important suppliers.
+        description_processing: "For each country and year, all import partners were ordered from largest to smallest by their CIF import values in current US dollars. The position of << counterpart_country >> was then categorized: '1st - Top partner' if it was the top supplier, '2nd' if the second largest, continuing through '5th', and 'Not in top 5' for all partners ranked lower than 5th. China is assigned a special category 'China' with rank -1 for self-referential rows."
         display:
           numDecimalPlaces: 0
 
@@ -239,14 +255,36 @@ tables:
           <%- endif -%>
         unit: ""
         short_unit: ""
-        description_short: The country that was the largest source of imports in a given year, based on merchandise import values that include the cost of goods plus freight and insurance.
+        description_short: For every country, the main trading partner supplying the largest share of its [merchandise imports](#dod:merchandise-imports).
         description_key:
           - This indicator shows which country was the largest source of imports for each country–year, based on import values in current US dollars.
           - *cif_basis
           - *goods_only
-          - The top supplier for each country–year was identified, and then a global count was made of how often each country appeared in this role. Here, the top ten countries with the highest counts are shown as separate categories, while the rest were grouped as ‘Other.
+          - The top supplier for each country–year was identified, and then a global count was made of how often each country appeared in this role. Here, the top ten countries with the highest counts are shown as separate categories, while the rest were grouped as "Other".
         presentation:
           title_public: Top import partner category
+          grapher_config:
+            note: Only the 10 partners most often ranked as the top import source across countries are shown; the rest are grouped as "Other".
+        display:
+          numDecimalPlaces: 0
+
+      top_export_partner_category:
+        title: |-
+          <% if counterpart_country == 'World' %>
+          Top export partner category
+          <%- endif -%>
+        unit: ""
+        short_unit: ""
+        description_short: For every country, the main trading partner receiving the largest share of its total [merchandise exports](#dod:merchandise-exports).
+        description_key:
+          - This indicator shows which country was the largest destination for exports from each country–year, based on export values in current US dollars.
+          - *fob_basis
+          - *goods_only
+          - The top destination for each country–year was identified, and then a global count was made of how often each country appeared in this role. Here, the top ten countries with the highest counts are shown as separate categories, while the rest were grouped as "Other".
+        presentation:
+          title_public: Top export partner category
+          grapher_config:
+            note: Only the 10 partners most often ranked as the top export destination across countries are shown; the rest are grouped as "Other".
         display:
           numDecimalPlaces: 0
 
@@ -282,3 +320,57 @@ tables:
         display:
           numDecimalPlaces: 0
           name: << counterpart_country >>
+
+      share_bilateral:
+        title: Share of country pairs with bilateral trade
+        unit: "%"
+        short_unit: "%"
+        description_short: Trade relationships are bilateral when countries both [import](#dod:merchandise-imports) from and [export](#dod:merchandise-exports) goods to each other.
+        description_key:
+          - This indicator shows the share of country pairs that trade goods with each other in both directions.
+          - A pair is bilateral when both countries report importing from and exporting to the other.
+          - *fob_basis
+          - *cif_basis
+          - *goods_only
+        description_processing: *description_processing_partnerships
+        presentation:
+          title_public: Share of country pairs with bilateral trade
+        display:
+            numDecimalPlaces: 1
+            name: Bilateral
+
+      share_unilateral:
+        title: Share of country pairs with unilateral trade
+        unit: "%"
+        short_unit: "%"
+        description_short: Trade relationships are unilateral when only one country in the pair [imports](#dod:merchandise-imports) from or [exports](#dod:merchandise-exports) goods to the other country.
+        description_key:
+          - This indicator shows the share of country pairs that trade goods with each other in only one direction.
+          - A pair is unilateral when only one country reports importing from or exporting to the other.
+          - *fob_basis
+          - *cif_basis
+          - *goods_only
+        description_processing: *description_processing_partnerships
+        presentation:
+          title_public: Share of country pairs with unilateral trade
+        display:
+            numDecimalPlaces: 1
+            name: Unilateral
+
+      share_non_trading:
+        title: Share of non-trading partnerships
+        unit: "%"
+        short_unit: "%"
+        description_short: Trade relationships are non-trading when neither country in the pair [imports](#dod:merchandise-imports) from or [exports](#dod:merchandise-exports) goods to the other country.
+        description_key:
+          - This indicator shows the share of country pairs that do not trade goods with each other.
+          - A pair is non-trading when neither country reports importing from or exporting to the other.
+          - *fob_basis
+          - *cif_basis
+          - *goods_only
+        description_processing: *description_processing_partnerships
+        presentation:
+          title_public: Share of non-trading partnerships
+        display:
+            numDecimalPlaces: 1
+            name: Non-trading

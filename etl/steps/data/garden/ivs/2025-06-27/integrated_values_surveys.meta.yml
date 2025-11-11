@@ -3495,32 +3495,32 @@ tables:
           <<: *common-display
 
 
-      notmentioned_neighbors_inmigrant_foreign_workers:
-        title: "Neighbors being inmigrant/foreign workers: Not mentioned"
-        description_short: '% of respondents not specifying the group when asked "On this list are various groups of people. Could you please mention any that you would not like to have as neighbors?", when the group was "Inmigrant/foreign workers".'
+      notmentioned_neighbors_immigrant_foreign_workers:
+        title: "Neighbors being immigrant/foreign workers: Not mentioned"
+        description_short: '% of respondents not specifying the group when asked "On this list are various groups of people. Could you please mention any that you would not like to have as neighbors?", when the group was "Immigrant/foreign workers".'
         display:
-          name: "Neighbors being inmigrant/foreign workers: Not mentioned"
+          name: "Neighbors being immigrant/foreign workers: Not mentioned"
           <<: *common-display
 
-      mentioned_neighbors_inmigrant_foreign_workers:
-        title: "Neighbors being inmigrant/foreign workers: Mentioned"
-        description_short: '% of respondents mentioning the group when asked "On this list are various groups of people. Could you please mention any that you would not like to have as neighbors?", when the group was "Inmigrant/foreign workers".'
+      mentioned_neighbors_immigrant_foreign_workers:
+        title: "Neighbors being immigrant/foreign workers: Mentioned"
+        description_short: '% of respondents mentioning the group when asked "On this list are various groups of people. Could you please mention any that you would not like to have as neighbors?", when the group was "Immigrant/foreign workers".'
         display:
-          name: "Neighbors being inmigrant/foreign workers: Mentioned"
+          name: "Neighbors being immigrant/foreign workers: Mentioned"
           <<: *common-display
 
-      dont_know_neighbors_inmigrant_foreign_workers:
-        title: "Neighbors being inmigrant/foreign workers: Don't know"
-        description_short: '% of respondents replying "don''t know" when asked "On this list are various groups of people. Could you please mention any that you would not like to have as neighbors?", when the group was "Inmigrant/foreign workers".'
+      dont_know_neighbors_immigrant_foreign_workers:
+        title: "Neighbors being immigrant/foreign workers: Don't know"
+        description_short: '% of respondents replying "don''t know" when asked "On this list are various groups of people. Could you please mention any that you would not like to have as neighbors?", when the group was "Immigrant/foreign workers".'
         display:
-          name: "Neighbors being inmigrant/foreign workers: Don't know"
+          name: "Neighbors being immigrant/foreign workers: Don't know"
           <<: *common-display
 
-      no_answer_neighbors_inmigrant_foreign_workers:
-        title: "Neighbors being inmigrant/foreign workers: No answer"
-        description_short: '% of answers classified as "No answer" for the question "On this list are various groups of people. Could you please mention any that you would not like to have as neighbors?", when the group was "Inmigrant/foreign workers".'
+      no_answer_neighbors_immigrant_foreign_workers:
+        title: "Neighbors being immigrant/foreign workers: No answer"
+        description_short: '% of answers classified as "No answer" for the question "On this list are various groups of people. Could you please mention any that you would not like to have as neighbors?", when the group was "Immigrant/foreign workers".'
         display:
-          name: "Neighbors being inmigrant/foreign workers: No answer"
+          name: "Neighbors being immigrant/foreign workers: No answer"
           <<: *common-display
 
 
@@ -4522,49 +4522,49 @@ tables:
 
       not_democratic:
         title: "Democracy - Democraticness in own country: Not democratic"
-        description_short: '% of respondents replying 1 to 4 in a scale from 1 to 10 when asked "And how democratically is this country being governed today?. Again using a scale from 1 to 10, where 1 means that it is “not at all democratic” and 10 means that it is “completely democratic,” what position would you choose?"'
+        description_short: '% of respondents replying 1 to 4 in a scale from 1 to 10 when asked "And how democratically is this country being governed today? Again using a scale from 1 to 10, where 1 means that it is “not at all democratic” and 10 means that it is “completely democratic,” what position would you choose?"'
         display:
           name: "Democraticness in own country: Not democratic"
           <<: *common-display
       yes_democratic:
         title: "Democracy - Democraticness in own country: Democratic"
-        description_short: '% of respondents replying 7 to 10 in a scale from 1 to 10 when asked "And how democratically is this country being governed today?. Again using a scale from 1 to 10, where 1 means that it is “not at all democratic” and 10 means that it is “completely democratic,” what position would you choose?"'
+        description_short: '% of respondents replying 7 to 10 in a scale from 1 to 10 when asked "And how democratically is this country being governed today? Again using a scale from 1 to 10, where 1 means that it is “not at all democratic” and 10 means that it is “completely democratic,” what position would you choose?"'
         display:
           name: "Democraticness in own country: Democratic"
           <<: *common-display
       not_at_all_democratic:
         title: "Democracy - Democraticness in own country: Not at all democratic"
-        description_short: '% of respondents replying 1 in a scale from 1 to 10 when asked "And how democratically is this country being governed today?. Again using a scale from 1 to 10, where 1 means that it is “not at all democratic” and 10 means that it is “completely democratic,” what position would you choose?"'
+        description_short: '% of respondents replying 1 in a scale from 1 to 10 when asked "And how democratically is this country being governed today? Again using a scale from 1 to 10, where 1 means that it is “not at all democratic” and 10 means that it is “completely democratic,” what position would you choose?"'
         display:
           name: "Democraticness in own country: Not at all democratic"
           <<: *common-display
       completely_democratic:
         title: "Democracy - Democraticness in own country: Completely democratic"
-        description_short: '% of respondents replying 10 in a scale from 1 to 10 when asked "And how democratically is this country being governed today?. Again using a scale from 1 to 10, where 1 means that it is “not at all democratic” and 10 means that it is “completely democratic,” what position would you choose?"'
+        description_short: '% of respondents replying 10 in a scale from 1 to 10 when asked "And how democratically is this country being governed today? Again using a scale from 1 to 10, where 1 means that it is “not at all democratic” and 10 means that it is “completely democratic,” what position would you choose?"'
         display:
           name: "Democraticness in own country: Completely democratic"
           <<: *common-display
       neutral_democratic:
         title: "Democracy - Democraticness in own country: Neutral"
-        description_short: '% of respondents replying 5 or 6 in a scale from 1 to 10 when asked "And how democratically is this country being governed today?. Again using a scale from 1 to 10, where 1 means that it is “not at all democratic” and 10 means that it is “completely democratic,” what position would you choose?"'
+        description_short: '% of respondents replying 5 or 6 in a scale from 1 to 10 when asked "And how democratically is this country being governed today? Again using a scale from 1 to 10, where 1 means that it is “not at all democratic” and 10 means that it is “completely democratic,” what position would you choose?"'
         display:
           name: "Democraticness in own country: Neutral"
           <<: *common-display
       dont_know_democratic:
         title: "Democracy - Democraticness in own country: Don't know"
-        description_short: '% of respondents replying "don''t know" when asked "And how democratically is this country being governed today?. Again using a scale from 1 to 10, where 1 means that it is “not at all democratic” and 10 means that it is “completely democratic,” what position would you choose?"'
+        description_short: '% of respondents replying "don''t know" when asked "And how democratically is this country being governed today? Again using a scale from 1 to 10, where 1 means that it is “not at all democratic” and 10 means that it is “completely democratic,” what position would you choose?"'
         display:
           name: "Democraticness in own country: Don't know"
           <<: *common-display
       no_answer_democratic:
         title: "Democracy - Democraticness in own country: No answer"
-        description_short: '% of answers classified as "No answer" for the question "And how democratically is this country being governed today?. Again using a scale from 1 to 10, where 1 means that it is “not at all democratic” and 10 means that it is “completely democratic,” what position would you choose?"'
+        description_short: '% of answers classified as "No answer" for the question "And how democratically is this country being governed today? Again using a scale from 1 to 10, where 1 means that it is “not at all democratic” and 10 means that it is “completely democratic,” what position would you choose?"'
         display:
           name: "Democraticness in own country: No answer"
           <<: *common-display
       avg_score_democratic:
         title: "Democracy - Democraticness in own country: Average score"
-        description_short: 'Average score in a scale from 1 to 10 when asked "And how democratically is this country being governed today?. Again using a scale from 1 to 10, where 1 means that it is “not at all democratic” and 10 means that it is “completely democratic,” what position would you choose?"'
+        description_short: 'Average score in a scale from 1 to 10 when asked "And how democratically is this country being governed today? Again using a scale from 1 to 10, where 1 means that it is “not at all democratic” and 10 means that it is “completely democratic,” what position would you choose?"'
         display:
           name: "Democraticness in own country: Average score"
           <<: *common-display
@@ -4624,6 +4624,215 @@ tables:
         description_short: 'Average score in a scale from 1 to 4 when asked "Some people think that having honest elections makes a lot of difference in their lives; other people think that it doesn’t matter much. How important would you say is having honest elections for you—very important,rather important, not very important or not at all important?" In the scale, 1 means very important and 4 means not at all important.'
         display:
           name: "Honest elections make a difference: Average score"
+          <<: *common-display
+        unit: ""
+        short_unit: ""
+
+      up_to_once_month_attend_religious_services:
+        title: "Religion - Attend religious services: Up to once a month"
+        description_short: '% of respondents replying "more than once a week", "once a week" or "once a month" when asked "Apart from weddings, funerals and christenings, about how often do you attend religious services these days?"'
+        display:
+          name: "Attend religious services: Up to once a month"
+          <<: *common-display
+      special_holydays_attend_religious_services:
+        title: "Religion - Attend religious services: Special holy days"
+        description_short: '% of respondents replying "only on special holy days/Christmas/Easter" or "other specific holy days" when asked "Apart from weddings, funerals and christenings, about how often do you attend religious services these days?"'
+        display:
+          name: "Attend religious services: Special holy days"
+          <<: *common-display
+      less_than_once_year_attend_religious_services:
+        title: "Religion - Attend religious services: Less than once a year/never"
+        description_short: '% of respondents replying "less than often (than a year)" or "never, practically never" when asked "Apart from weddings, funerals and christenings, about how often do you attend religious services these days?"'
+        display:
+          name: "Attend religious services: Less than once a year/never"
+          <<: *common-display
+      more_once_week_attend_religious_services:
+        title: "Religion - Attend religious services: More than once a week"
+        description_short: '% of respondents replying "more than once a week" when asked "Apart from weddings, funerals and christenings, about how often do you attend religious services these days?"'
+        display:
+          name: "Attend religious services: More than once a week"
+          <<: *common-display
+      once_week_attend_religious_services:
+        title: "Religion - Attend religious services: Once a week"
+        description_short: '% of respondents replying "once a week" when asked "Apart from weddings, funerals and christenings, about how often do you attend religious services these days?"'
+        display:
+          name: "Attend religious services: Once a week"
+          <<: *common-display
+      once_month_attend_religious_services:
+        title: "Religion - Attend religious services: Once a month"
+        description_short: '% of respondents replying "once a month" when asked "Apart from weddings, funerals and christenings, about how often do you attend religious services these days?"'
+        display:
+          name: "Attend religious services: Once a month"
+          <<: *common-display
+      holydays_chr_attend_religious_services:
+        title: "Religion - Attend religious services: Only on special holy days/Christmas/Easter"
+        description_short: '% of respondents replying "only on special holy days/Christmas/Easter" when asked "Apart from weddings, funerals and christenings, about how often do you attend religious services these days?"'
+        display:
+          name: "Attend religious services: Only on special holy days/Christmas/Easter"
+          <<: *common-display
+      holydays_oth_attend_religious_services:
+        title: "Religion - Attend religious services: Other specific holy days"
+        description_short: '% of respondents replying "other specific holy days" when asked "Apart from weddings, funerals and christenings, about how often do you attend religious services these days?"'
+        display:
+          name: "Attend religious services: Other specific holy days"
+          <<: *common-display
+      once_year_attend_religious_services:
+        title: "Religion - Attend religious services: Once a year"
+        description_short: '% of respondents replying "once a year" when asked "Apart from weddings, funerals and christenings, about how often do you attend religious services these days?"'
+        display:
+          name: "Attend religious services: Once a year"
+          <<: *common-display
+      less_often_attend_religious_services:
+        title: "Religion - Attend religious services: Less often than once a year"
+        description_short: '% of respondents replying "less often (than a year)" when asked "Apart from weddings, funerals and christenings, about how often do you attend religious services these days?"'
+        display:
+          name: "Attend religious services: Less often than once a year"
+          <<: *common-display
+      never_attend_religious_services:
+        title: "Religion - Attend religious services: Never"
+        description_short: '% of respondents replying "never, practically never" when asked "Apart from weddings, funerals and christenings, about how often do you attend religious services these days?"'
+        display:
+          name: "Attend religious services: Never"
+          <<: *common-display
+      dont_know_attend_religious_services:
+        title: "Religion - Attend religious services: Don't know"
+        description_short: '% of respondents replying "don''t know" when asked "Apart from weddings, funerals and christenings, about how often do you attend religious services these days?"'
+        display:
+          name: "Attend religious services: Don't know"
+          <<: *common-display
+      no_answer_attend_religious_services:
+        title: "Religion - Attend religious services: No answer"
+        description_short: '% of answers classified as "No answer" for the question "Apart from weddings, funerals and christenings, about how often do you attend religious services these days?"'
+        display:
+          name: "Attend religious services: No answer"
+          <<: *common-display
+
+      up_to_once_month_pray:
+        title: "Religion - Pray: Up to once a month"
+        description_short: '% of respondents replying "more than once a week", "once a week" or "once a month" when asked "Apart from weddings and funerals, about how often do you pray?"'
+        display:
+          name: "Pray: Up to once a month"
+          <<: *common-display
+      special_holydays_pray:
+        title: "Religion - Pray: Special holy days"
+        description_short: '% of respondents replying "only on special holy days/Christmas/Easter" or "other specific holy days" when asked "Apart from weddings and funerals, about how often do you pray?"'
+        display:
+          name: "Pray: Special holy days"
+          <<: *common-display
+      less_than_once_year_pray:
+        title: "Religion - Pray: Less than once a year/never"
+        description_short: '% of respondents replying "less than often (than a year)" or "never, practically never" when asked "Apart from weddings and funerals, about how often do you pray?"'
+        display:
+          name: "Pray: Less than once a year/never"
+          <<: *common-display
+      more_once_week_pray:
+        title: "Religion - Pray: More than once a week"
+        description_short: '% of respondents replying "more than once a week" when asked "Apart from weddings and funerals, about how often do you pray?"'
+        display:
+          name: "Pray: More than once a week"
+          <<: *common-display
+      once_week_pray:
+        title: "Religion - Pray: Once a week"
+        description_short: '% of respondents replying "once a week" when asked "Apart from weddings and funerals, about how often do you pray?"'
+        display:
+          name: "Pray: Once a week"
+          <<: *common-display
+      once_month_pray:
+        title: "Religion - Pray: Once a month"
+        description_short: '% of respondents replying "once a month" when asked "Apart from weddings and funerals, about how often do you pray?"'
+        display:
+          name: "Pray: Once a month"
+          <<: *common-display
+      holydays_chr_pray:
+        title: "Religion - Pray: Only on special holy days/Christmas/Easter"
+        description_short: '% of respondents replying "only on special holy days/Christmas/Easter" when asked "Apart from weddings and funerals, about how often do you pray?"'
+        display:
+          name: "Pray: Only on special holy days/Christmas/Easter"
+          <<: *common-display
+      holydays_oth_pray:
+        title: "Religion - Pray: Other specific holy days"
+        description_short: '% of respondents replying "other specific holy days" when asked "Apart from weddings and funerals, about how often do you pray?"'
+        display:
+          name: "Pray: Other specific holy days"
+          <<: *common-display
+      once_year_pray:
+        title: "Religion - Pray: Once a year"
+        description_short: '% of respondents replying "once a year" when asked "Apart from weddings and funerals, about how often do you pray?"'
+        display:
+          name: "Pray: Once a year"
+          <<: *common-display
+      less_often_pray:
+        title: "Religion - Pray: Less often than once a year"
+        description_short: '% of respondents replying "less often (than a year)" when asked "Apart from weddings and funerals, about how often do you pray?"'
+        display:
+          name: "Pray: Less often than once a year"
+          <<: *common-display
+      never_pray:
+        title: "Religion - Pray: Never"
+        description_short: '% of respondents replying "never, practically never" when asked "Apart from weddings and funerals, about how often do you pray?"'
+        display:
+          name: "Pray: Never"
+          <<: *common-display
+      dont_know_pray:
+        title: "Religion - Pray: Don't know"
+        description_short: '% of respondents replying "don''t know" when asked "Apart from weddings and funerals, about how often do you pray?"'
+        display:
+          name: "Pray: Don't know"
+          <<: *common-display
+      no_answer_pray:
+        title: "Religion - Pray: No answer"
+        description_short: '% of answers classified as "No answer" for the question "Apart from weddings and funerals, about how often do you pray?"'
+        display:
+          name: "Pray: No answer"
+          <<: *common-display
+
+      not_important_god:
+        title: "Religion - Importance of God: Not important"
+        description_short: '% of respondents replying 1 to 4 in a scale from 1 to 10 when asked "How important is God in your life? Please use this scale to indicate. 10 means "very important" and 1 means “not at all important."'
+        display:
+          name: "Importance of God: Not important"
+          <<: *common-display
+      important_god:
+        title: "Religion - Importance of God: Important"
+        description_short: '% of respondents replying 7 to 10 in a scale from 1 to 10 when asked "How important is God in your life? Please use this scale to indicate. 10 means "very important" and 1 means “not at all important."'
+        display:
+          name: "Importance of God: Important"
+          <<: *common-display
+      not_at_all_important_god:
+        title: "Religion - Importance of God: Not at all important"
+        description_short: '% of respondents replying 1 in a scale from 1 to 10 when asked "How important is God in your life? Please use this scale to indicate. 10 means "very important" and 1 means “not at all important."'
+        display:
+          name: "Importance of God: Not at all important"
+          <<: *common-display
+      very_important_god:
+        title: "Religion - Importance of God: Very important"
+        description_short: '% of respondents replying 10 in a scale from 1 to 10 when asked "How important is God in your life? Please use this scale to indicate. 10 means "very important" and 1 means “not at all important."'
+        display:
+          name: "Importance of God: Very important"
+          <<: *common-display
+      neutral_important_god:
+        title: "Religion - Importance of God: Neutral"
+        description_short: '% of respondents replying 5 or 6 in a scale from 1 to 10 when asked "How important is God in your life? Please use this scale to indicate. 10 means "very important" and 1 means “not at all important."'
+        display:
+          name: "Importance of God: Neutral"
+          <<: *common-display
+      dont_know_important_god:
+        title: "Religion - Importance of God: Don't know"
+        description_short: '% of respondents replying "don''t know" when asked "How important is God in your life? Please use this scale to indicate. 10 means "very important" and 1 means “not at all important."'
+        display:
+          name: "Importance of God: Don't know"
+          <<: *common-display
+      no_answer_important_god:
+        title: "Religion - Importance of God: No answer"
+        description_short: '% of answers classified as "No answer" for the question "How important is God in your life? Please use this scale to indicate. 10 means "very important" and 1 means “not at all important."'
+        display:
+          name: "Importance of God: No answer"
+          <<: *common-display
+      avg_score_important_god:
+        title: "Religion - Importance of God: Average score"
+        description_short: 'Average score in a scale from 1 to 10 when asked "How important is God in your life? Please use this scale to indicate. 10 means "very important" and 1 means “not at all important."'
+        display:
+          name: "Importance of God: Average score"
           <<: *common-display
         unit: ""
         short_unit: ""

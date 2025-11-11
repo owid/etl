@@ -6,11 +6,11 @@ meta:
     url_main: https://ec.europa.eu/eurostat/databrowser/product/page/ENV_AC_RMEFD
     url_download: |-
       https://docs.google.com/spreadsheets/d/e/2PACX-1vQZwthumPTInpogYnu4OLSR9xxSbglTx87pkN4hzCTp5JRLK5XTKSiJKstqjoj0xnqektGI_DMnOiEh/pub?output=csv
-    date_accessed: '2025-07-16'
+    date_accessed: '2025-10-23'
   name: Material footprint in EU-27 by end use (Eurostat, 2025)
   description: Raw material consumption in the EU-27, broken down by the end use of the final products.
   license: {}
 outs:
-  - md5: c7f3bf1e598d2caba677f3739f27cb18
+  - md5: dd55019c059693bba11aba705cc83734
     size: 2592
     path: material_footprint_end_use_eu.csv

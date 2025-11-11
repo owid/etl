@@ -93,7 +93,7 @@ HAPPINESS_QUESTIONS = ["happy"]
 NEIGHBORS_QUESTIONS = [
     "neighbors_different_race",
     "neighbors_heavy_drinkers",
-    "neighbors_inmigrant_foreign_workers",
+    "neighbors_immigrant_foreign_workers",
     "neighbors_aids",
     "neighbors_drug_addicts",
     "neighbors_homosexuals",
@@ -122,6 +122,10 @@ ESSENTIAL_CHARACTERISTIC_OF_DEMOCRACY_QUESTIONS = [
     "the_state_makes_peoples_incomes_equal",
     "people_obey_their_rulers",
 ]
+
+RELIGION_HOW_OFTEN_QUESTIONS = ["attend_religious_services", "pray"]
+
+IMPORTANCE_OF_GOD_QUESTIONS = ["god"]
 
 
 def run() -> None:
@@ -302,6 +306,84 @@ def drop_indicators_and_replace_nans(tb: Table) -> Table:
         answers=["strongly_agree", "agree", "neither", "disagree", "strongly_disagree"],
     )
 
+    # For democracy satisfaction questions
+    tb = replace_dont_know_by_null(
+        tb=tb,
+        questions=["satisfied_democracy"],
+        answers=[
+            "not",
+            "",
+            "neutral",
+        ],
+    )
+
+    # For political systems questions
+    tb = replace_dont_know_by_null(
+        tb=tb,
+        questions=POLITICAL_SYSTEMS_QUESTIONS,
+        answers=["very_good", "fairly_good", "fairly_bad", "very_bad"],
+    )
+
+    # For essential characteristic of democracy questions
+    tb = replace_dont_know_by_null(
+        tb=tb,
+        questions=ESSENTIAL_CHARACTERISTIC_OF_DEMOCRACY_QUESTIONS,
+        answers=[
+            "not_essential_dem_agg",
+            "essential_dem_agg",
+            "neutral_essential_dem",
+        ],
+    )
+
+    # For democracy importance question
+    tb = replace_dont_know_by_null(
+        tb=tb,
+        questions=["important_democracy"],
+        answers=["not", "", "neutral"],
+    )
+
+    # For democraticness in own country question
+    tb = replace_dont_know_by_null(
+        tb=tb,
+        questions=["democratic"],
+        answers=["not", "yes", "neutral"],
+    )
+
+    # For honest elections making a difference question
+    tb = replace_dont_know_by_null(
+        tb=tb,
+        questions=["honest_elections_make_a_difference"],
+        answers=[
+            "very_important",
+            "rather_important",
+            "not_very_important",
+            "not_at_all_important",
+        ],
+    )
+
+    # For religion how often questions
+    tb = replace_dont_know_by_null(
+        tb=tb,
+        questions=RELIGION_HOW_OFTEN_QUESTIONS,
+        answers=[
+            "up_to_once_month",
+            "special_holydays",
+            "once_year",
+            "less_than_once_year",
+        ],
+    )
+
+    # For importance of god question
+    tb = replace_dont_know_by_null(
+        tb=tb,
+        questions=["important_god"],
+        answers=[
+            "",
+            "not",
+            "neutral",
+        ],
+    )
+
     # Drop rows with all null values in columns not country and year
     tb = tb.dropna(how="all", subset=tb.columns.difference(["country", "year"]))
 
@@ -314,7 +396,7 @@ def replace_dont_know_by_null(tb: Table, questions: List[str], answers: List[str
     """
     for q in questions:
         # Add q to each member of answers
-        answers_by_question = [f"{a}_{q}" for a in answers]
+        answers_by_question = [f"{a}_{q}" if a else q for a in answers]
 
         # Check if all columns in answers_by_question are null
         tb["null_check"] = tb[answers_by_question].notnull().all(axis=1)
@@ -541,6 +623,35 @@ def sanity_checks(tb: Table) -> Table:
             "not_at_all_important",
             "dont_know",
             "no_answer",
+        ],
+        margin=MARGIN,
+    )
+
+    # For religion how often questions
+    tb = check_sum_100(
+        tb=tb,
+        questions=RELIGION_HOW_OFTEN_QUESTIONS,
+        answers=[
+            "up_to_once_month",
+            "special_holydays",
+            "once_year",
+            "less_than_once_year",
+            "dont_know",
+            "no_answer",
+        ],
+        margin=MARGIN,
+    )
+
+    # For importance of god question
+    tb = check_sum_100(
+        tb=tb,
+        questions=IMPORTANCE_OF_GOD_QUESTIONS,
+        answers=[
+            "important",
+            "not_important",
+            "neutral_important",
+            "dont_know_important",
+            "no_answer_important",
         ],
         margin=MARGIN,
     )

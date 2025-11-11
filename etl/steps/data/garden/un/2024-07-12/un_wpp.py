@@ -17,6 +17,7 @@ paths = PathFinder(__file__)
 
 YEAR_SPLIT = 2024
 COLUMNS_INDEX = ["country", "year", "sex", "age", "variant"]
+COLUMNS_INDEX_MONTH = COLUMNS_INDEX + ["month"]
 
 
 def run(dest_dir: str) -> None:
@@ -49,8 +50,9 @@ def run(dest_dir: str) -> None:
     #
 
     ## Population, Sex ratio
-    tb_population, tb_sex_ratio = process_population_sex_ratio(tb_population, tb_population_density)
+    tb_population_jan, tb_population, tb_sex_ratio = process_population_sex_ratio(tb_population, tb_population_density)
     tb_population = tb_population.format(COLUMNS_INDEX)
+    tb_population_jan = tb_population_jan.format(COLUMNS_INDEX, short_name="population_january")  # January data
 
     ## Sex ratio
     tb_sex_ratio = set_variant_to_estimates(tb_sex_ratio)
@@ -118,6 +120,7 @@ def run(dest_dir: str) -> None:
 
     # Build tables list for dataset
     tables = [
+        tb_population_jan,
         tb_population,
         tb_growth_rate,
         tb_nat_change,
@@ -149,7 +152,7 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def process_population_sex_ratio(tb: Table, tb_density: Table) -> Tuple[Table, Table]:
+def process_population_sex_ratio(tb: Table, tb_density: Table) -> Tuple[Table, Table, Table]:
     """Process the population table.
 
     Also estimate sex ratio.
@@ -222,14 +225,24 @@ def process_population_sex_ratio(tb: Table, tb_density: Table) -> Tuple[Table, T
 
     # Add population density
     tb_density = process_standard(tb_density)
-    tb = tb.merge(tb_density, on=COLUMNS_INDEX, how="left")
+    tb = tb.merge(tb_density, on=COLUMNS_INDEX_MONTH, how="left")
     del tb_density
 
     # Age as sting
     tb["age"] = tb["age"].astype("string")
     tb_sex["age"] = tb_sex["age"].astype("string")
+    # Separate january and july data
+    msk_jan = tb["month"] == "January"
+    tb_jan = tb[msk_jan]
+    tb = tb[~msk_jan]
+    tb = tb.drop(columns=["month"])
+    tb_jan = tb_jan.drop(columns=["month"])
+    # Remove january data for sex ratio
+    tb_sex_msk = tb_sex["month"] == "January"
+    tb_sex = tb_sex[~tb_sex_msk]
+    tb_sex = tb_sex.drop(columns=["month"])
 
-    return tb, tb_sex
+    return tb_jan, tb, tb_sex
 
 
 def process_dependency(tb: Table) -> Table:
@@ -583,7 +596,9 @@ def estimate_sex_ratio(tb: Table, age_groups: Optional[List[str]] = None):
 
     tb_sex = tb.loc[(tb["age"].isin(age_groups)) & (tb["sex"] != "Total")].copy()
     # Pivot
-    tb_sex = tb_sex.pivot(columns="sex", index=[col for col in COLUMNS_INDEX if col != "sex"], values="population")
+    tb_sex = tb_sex.pivot(
+        columns="sex", index=[col for col in COLUMNS_INDEX_MONTH if col != "sex"], values="population"
+    )
     # Estimate ratio
     tb_sex["sex_ratio"] = tb_sex["male"] / tb_sex["female"]
     # Reset index
@@ -591,7 +606,7 @@ def estimate_sex_ratio(tb: Table, age_groups: Optional[List[str]] = None):
     # Add missing sex column
     tb_sex["sex"] = "all"
     # Keep relevant columns
-    tb_sex = tb_sex[COLUMNS_INDEX + ["sex_ratio"]]
+    tb_sex = tb_sex[COLUMNS_INDEX_MONTH + ["sex_ratio"]]
 
     return tb_sex
 
@@ -618,7 +633,7 @@ def estimate_age_groups(tb: Table) -> Table:
     }
     tb_basic = tb_.assign(age=tb_.age.map(age_map))
     tb_basic = tb_basic.groupby(
-        ["country", "year", "sex", "age", "variant"],
+        COLUMNS_INDEX_MONTH,
         as_index=False,
         observed=True,
     )["population"].sum()
@@ -658,7 +673,7 @@ def estimate_age_groups(tb: Table) -> Table:
     # 3/ All-age group
     tb_all = (
         tb_.groupby(
-            ["country", "year", "sex", "variant"],
+            ["country", "year", "sex", "variant", "month"],
             as_index=False,
             observed=True,
         )["population"]
@@ -686,7 +701,7 @@ def _add_age_group(tb: Table, age_min: int, age_max: int, age_group: Optional[st
         tb_age = tb.loc[tb["age"].isin(ages_accepted)].drop(columns="age").copy()
 
         tb_age = tb_age.groupby(
-            ["country", "year", "sex", "variant"],
+            ["country", "year", "sex", "variant", "month"],
             as_index=False,
             observed=True,
         )["population"].sum()
@@ -707,18 +722,21 @@ def add_population_change(tb: Table) -> Table:
     # Sort by year
     tb = tb.sort_values("year")
 
-    # Estimate population change
-    pop_change = tb.groupby(["country", "sex", "age", "variant"])["population"].diff()
+    # Estimate population change # Fiona: I'm not sure this is done in the same way as WPP do for their population change variable. They have data for 1950 and it shows the difference between 1950 and 1951
+    pop_change = tb.groupby(["country", "sex", "age", "variant", "month"])["population"].diff()
     tb[column_pop_change] = pop_change
 
-    # Hotfix to estimate year 2024
+    # Hotfix to estimate year 2024 - only Medium variant available
     tb_2023 = (
         tb.loc[tb["year"] == YEAR_SPLIT - 1].copy().assign(year=YEAR_SPLIT).drop(columns=["variant", column_pop_change])
     )
-    tb = tb.merge(tb_2023, on=[col for col in COLUMNS_INDEX if col != "variant"], how="left", suffixes=("", "_2023"))
-    mask = tb["year"] == YEAR_SPLIT
-    tb.loc[mask, column_pop_change] = tb.loc[mask, "population"] - tb.loc[mask, "population_2023"]
-    tb = tb.drop(columns=["population_2023"])
+    # Something weird going on here
+    tb_merge = tb.merge(
+        tb_2023, on=[col for col in COLUMNS_INDEX_MONTH if col != "variant"], how="left", suffixes=("", "_2023")
+    )
+    mask = tb_merge["year"] == YEAR_SPLIT
+    tb_merge.loc[mask, column_pop_change] = tb_merge.loc[mask, "population"] - tb_merge.loc[mask, "population_2023"]
+    tb = tb_merge.drop(columns=["population_2023"])
 
     # Sanity check
     assert (years := set(tb.loc[tb[column_pop_change].isna()]["year"])) == {

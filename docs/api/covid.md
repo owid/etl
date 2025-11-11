@@ -16,15 +16,15 @@ We started working on COVID-19 data in early 2020, developing and implementing s
 
 !!! abstract ""
 
- :material-file-document: Hasell, J., Mathieu, E., Beltekian, D. et al. **A cross-country database of COVID-19 testing**. _Sci Data_ 7, 345 (2020). [https://doi.org/10.1038/s41597-020-00688-8](https://doi.org/10.1038/s41597-020-00688-8)
+    :material-file-document: Hasell, J., Mathieu, E., Beltekian, D. et al. **A cross-country database of COVID-19 testing**. _Sci Data_ 7, 345 (2020). [https://doi.org/10.1038/s41597-020-00688-8](https://doi.org/10.1038/s41597-020-00688-8)
 
 !!! abstract ""
 
- :material-file-document: Mathieu, E., Ritchie, H., Ortiz-Ospina, E. et al. **A global database of COVID-19 vaccinations**. _Nat Hum Behav_ 5, 947–953 (2021). [https://doi.org/10.1038/s41562-021-01122-8](https://doi.org/10.1038/s41562-021-01122-8)
+    :material-file-document: Mathieu, E., Ritchie, H., Ortiz-Ospina, E. et al. **A global database of COVID-19 vaccinations**. _Nat Hum Behav_ 5, 947–953 (2021). [https://doi.org/10.1038/s41562-021-01122-8](https://doi.org/10.1038/s41562-021-01122-8)
 
 !!! abstract ""
 
- :material-file-document: Herre, B., Rodés-Guirao, L., Mathieu, E. et al. **Best practices for government agencies to publish data: lessons from COVID-19**. _The Lancet Public Health_, Viewpoint, Volume 9, ISSUE 6, e407-e410 (2024). [https://doi.org/10.1016/S2468-2667(24)00073-2](<https://doi.org/10.1016/S2468-2667(24)00073-2>)
+    :material-file-document: Herre, B., Rodés-Guirao, L., Mathieu, E. et al. **Best practices for government agencies to publish data: lessons from COVID-19**. _The Lancet Public Health_, Viewpoint, Volume 9, ISSUE 6, e407-e410 (2024). [https://doi.org/10.1016/S2468-2667(24)00073-2](<https://doi.org/10.1016/S2468-2667(24)00073-2>)
 
 ### Transition to ETL
 
@@ -34,8 +34,11 @@ We started working on COVID-19 before our [ETL system](../../architecture). In m
 
 Our _compact COVID-19 dataset_ is a compilation of the most relevant COVID-19 indicators we have collected in the last few years. It consolidates indicators from various datasets into a single file. It comes with metadata, which explains all the indicators in detail. In the past, this dataset was generated and shared in our [GitHub](https://github.com/owid/covid-19-data/blob/master/public/data) repository.
 
-[:material-download: Download our compact dataset (CSV)](https://catalog.ourworldindata.org/garden/covid/latest/compact/compact.csv){ .md-button .md-button--primary }
+<a href="https://catalog.ourworldindata.org/garden/covid/latest/compact/compact.csv" download="owid-covid-compact.csv" class="md-button md-button--primary">:material-download: Download our compact dataset (CSV)</a>
 [:material-download: Download metadata](https://catalog.ourworldindata.org/garden/covid/latest/compact/compact.meta.json){ .md-button }
+
+!!! warning "Downloading files"
+      If clicking the button opens the CSV in your browser instead of downloading, right-click the button and select "Save Link As..." or "Download Linked File".
 
 In addition to our compact dataset, we provide individual datasets with all our COVID-19 indicators. These files are direct exports from our ETL.
 

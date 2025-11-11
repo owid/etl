@@ -7,6 +7,7 @@ The environment variables and settings here are for publishing options, they're
 only important for OWID staff.
 """
 
+import asyncio
 import os
 import pwd
 import re
@@ -115,7 +116,10 @@ ENV_GRAPHER_USER_ID = GRAPHER_USER_ID
 DB_IS_PRODUCTION = DB_NAME == "live_grapher"
 
 # Special ENV file with access to production DB (read-only), used by chart-diff
-ENV_FILE_PROD = os.environ.get("ENV_FILE_PROD")
+if "ENV_FILE_PROD" in env:
+    ENV_FILE_PROD = BASE_DIR / os.environ.get("ENV_FILE_PROD")  # type: ignore
+else:
+    ENV_FILE_PROD = None
 
 if "DATA_API_ENV" in env:
     DATA_API_ENV = env["DATA_API_ENV"]
@@ -281,10 +285,21 @@ GOOGLE_APPLICATION_CREDENTIALS = env.get("GOOGLE_APPLICATION_CREDENTIALS")
 
 def enable_sentry(enable_logs: bool = False) -> None:
     if SENTRY_DSN:
+
+        def before_send(event, hint):
+            # Ignore normal shutdown signals
+            if "exc_info" in hint:
+                exc_type, exc_value, tb = hint["exc_info"]
+                if exc_type in (KeyboardInterrupt, asyncio.CancelledError):
+                    return None
+            return event
+
+        kwargs = {"dsn": SENTRY_DSN, "before_send": before_send}
+
         if enable_logs:
-            sentry_sdk.init(dsn=SENTRY_DSN, _experiments={"enable_logs": True})
-        else:
-            sentry_sdk.init(dsn=SENTRY_DSN)
+            kwargs["_experiments"] = {"enable_logs": True}
+
+        sentry_sdk.init(**kwargs)
 
 
 # Wizard config
@@ -645,8 +660,12 @@ for env_var in env_vars:
 
 # Get Metabase credentials and parameters (for more information, visit the analytics repos).
 METABASE_API_KEY = os.environ.get("METABASE_API_KEY")
+METABASE_API_KEY_ADMIN = os.environ.get("METABASE_API_KEY_ADMIN")
 METABASE_URL = os.environ.get("METABASE_URL")
 METABASE_SEMANTIC_LAYER_DATABASE_ID = 2
+METABASE_URL_LOCAL = os.environ.get("METABASE_URL", "http://localhost:3000")
+METABASE_URL = os.environ.get("METABASE_URL", "http://metabase.owid.io")
+
 ########################################################################################################################
 # While users don't have Metadata credentials, default to Datassette.
 FORCE_DATASETTE = (not METABASE_API_KEY) or (not METABASE_URL)
@@ -666,3 +685,6 @@ DATA_PRODUCER_REPORT_STATUS_SHEET_ID = os.environ.get("DATA_PRODUCER_REPORT_STAT
 LOGFIRE_TOKEN_EXPERT = env.get("LOGFIRE_TOKEN_EXPERT")
 LOGFIRE_TOKEN_MCP = env.get("LOGFIRE_TOKEN_MCP")
 LOGFIRE_TOKEN_ETL_API = env.get("LOGFIRE_TOKEN_ETL_API")
+
+# MCP server
+OWID_MCP_SERVER_URL = env.get("OWID_MCP_SERVER_URL", "https://mcp.owid.io/mcp")

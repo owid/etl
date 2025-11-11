@@ -359,9 +359,12 @@ def run() -> None:
     tb = remap_categories(tb=tb)
 
     # Add region aggregates.
-    tb = paths.region_aggregator(
-        regions=REGIONS, index_columns=["country", "year", "producer_type", "technology"]
-    ).add_aggregates(tb, min_num_values_per_year=1)
+    tb = paths.regions.add_aggregates(
+        tb=tb,
+        regions=REGIONS,
+        index_columns=["country", "year", "producer_type", "technology"],
+        min_num_values_per_year=1,
+    )
 
     # Add groups with total capacity (e.g. "Solar (total)").
     for group_name, group_members in NEW_GROUPS.items():

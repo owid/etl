@@ -1,4 +1,12 @@
 steps:
+  # Epoch AI - Biological sequence database growth
+  data://meadow/biotech/2025-09-09/epoch_database_growth:
+  - snapshot://biotech/2025-09-09/epoch_database_growth.xlsx
+  data://garden/biotech/2025-09-09/epoch_database_growth:
+    - data://meadow/biotech/2025-09-09/epoch_database_growth
+  data://grapher/biotech/2025-09-09/epoch_database_growth:
+    - data://garden/biotech/2025-09-09/epoch_database_growth
+
   # Global mobile money dataset (GSMA)
   data://meadow/technology/2024-05-30/mobile_money:
     - snapshot://technology/2024-05-30/mobile_money.xlsx
@@ -16,3 +24,14 @@ steps:
     - data://meadow/wb/2025-05-21/findex
   data://grapher/wb/2025-05-21/findex:
     - data://garden/wb/2025-05-21/findex
+
+  #
+  # WIPO patents data
+  #
+  data://meadow/research_development/2025-10-27/patents:
+    - snapshot://research_development/2025-10-27/patents.csv
+    - snapshot://research_development/2025-10-27/historical_patents.csv
+  data://garden/research_development/2025-10-27/patents:
+    - data://meadow/research_development/2025-10-27/patents
+  data://grapher/research_development/2025-10-27/patents:
+    - data://garden/research_development/2025-10-27/patents

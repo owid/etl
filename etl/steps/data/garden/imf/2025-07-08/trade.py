@@ -68,7 +68,6 @@ def run() -> None:
     # --- Harmonize & keep only the two indicators we actually use ----------------
     tb_long = _harmonize_countries(tb_long)
     tb_long = tb_long[tb_long["indicator"].isin([EXPORT_COL, IMPORT_COL])].copy()
-    tb_long = tb_long.dropna(subset=["value"])
 
     # --- Historical overlaps: remove both on exporter side and partner side -----
     tb_long = clean_historical_overlaps(tb_long, country_col="country")
@@ -82,6 +81,13 @@ def run() -> None:
     tb_all_countries = tb_long[
         (tb_long["country"].isin(members)) & (tb_long["counterpart_country"].isin(members))
     ].copy()
+
+    # --- Trade relationships (bilateral, unilateral, non-trading) - needs to be calculated before NaNs are excluded   --------------
+    tb_partnerships = calculate_trade_relationship_shares(tb_all_countries)
+
+    # Drop nans in value column to avoid issues when doing certain calculations later
+    tb_long = tb_long.dropna(subset=["value"])
+    tb_all_countries = tb_all_countries.dropna(subset=["value"])
 
     # --- Add regional aggregates on both axes (plus Asia excl. China) -----------
     tb_long = _add_regional_aggregates(tb_long, ds_regions)
@@ -131,6 +137,15 @@ def run() -> None:
         how="left",
     )
 
+    # --- Top export partner classification (based on exports) -------------
+    tb_top_export_partners = get_top_export_partner(tb_all_countries)
+    tb = pr.merge(
+        tb,
+        tb_top_export_partners,
+        on=["country", "year", "counterpart_country"],
+        how="left",
+    )
+
     # --- Importer ranking for China & US ---------------------------------
     tb_china = get_country_import_ranking(tb_all_countries, "China")
     tb_us = get_country_import_ranking(tb_all_countries, "United States")
@@ -140,13 +155,20 @@ def run() -> None:
         tb,
         tb_china_us,
         on=["country", "year", "counterpart_country"],
-        how="left",
+        how="outer",
     )
 
+    tb = pr.concat([tb, tb_partnerships], ignore_index=True)
     # --- Format, add origins & save ----------------------------------------------------
     tb = tb.format(["country", "year", "counterpart_country"])
-    for col in tb.columns:
-        tb[col] = tb[col].copy_metadata(tb_long["value"])
+    for column in tb.columns:
+        if column in ["total_imports_share_of_gdp", "china_imports_share_of_gdp"]:
+            tb[column].metadata.origins = [
+                tb_long["value"].metadata.origins[0],
+                gdp_data["ny_gdp_mktp_cd"].metadata.origins[0],
+            ]
+        else:
+            tb[column].metadata.origins = tb_long["value"].metadata.origins
 
     ds_garden = paths.create_dataset(tables=[tb], default_metadata=ds_meadow.metadata)
     ds_garden.save()
@@ -286,12 +308,35 @@ def add_china_imports_share_of_gdp(tb: Table, gdp_data: Table) -> Table:
     china_gdp = china_gdp[["country", "year", "china_imports_share_of_gdp"]].copy()
     china_gdp["counterpart_country"] = "World"
 
+    # First merge the regular china_imports_share_of_gdp data
     tb = pr.merge(
         tb,
         china_gdp,
         on=["country", "year", "counterpart_country"],
         how="left",
     )
+
+    # Create China rows for each year with china_imports_share_of_gdp = -1
+    china_years = tb[tb["counterpart_country"] == "World"]["year"].unique()
+    for year in china_years:
+        china_mask = (tb["country"] == "China") & (tb["counterpart_country"] == "World") & (tb["year"] == year)
+        if china_mask.any():
+            # Update existing rows
+            tb.loc[china_mask, "china_imports_share_of_gdp"] = -1
+        else:
+            # Add new row if it doesn't exist
+            new_row = Table(
+                pd.DataFrame(
+                    {
+                        "country": ["China"],
+                        "year": [year],
+                        "counterpart_country": ["World"],
+                        "china_imports_share_of_gdp": [-1],
+                    }
+                )
+            ).copy_metadata(tb)
+            tb = pr.concat([tb, new_row], ignore_index=True)
+
     return tb
 
 
@@ -338,6 +383,37 @@ def get_top_partner(tb: Table) -> Table:
     return out
 
 
+def get_top_export_partner(tb: Table) -> Table:
+    """
+    Get the top export destination (by exports) for each country-year and classify based on global frequency.
+
+    This function:
+    1. Finds the largest export destination for each country-year
+    2. Counts how frequently each destination appears as #1 globally
+    3. Keeps the top 10 most frequent destinations, groups others as 'Other'
+    4. Returns with counterpart_country='World' for easy merging
+
+    Args:
+        tb: Trade data table
+
+    Returns:
+        Table with top_export_partner_category column, attached to counterpart='World' rows
+    """
+    export_data = tb[tb["indicator"] == EXPORT_COL].dropna(subset=["value"]).copy()
+    idx = export_data.groupby(["country", "year"])["value"].idxmax()
+    top_df = export_data.loc[idx, ["country", "year", "counterpart_country"]].reset_index(drop=True)
+
+    partner_counts = top_df.groupby("counterpart_country")["country"].nunique().sort_values(ascending=False)
+    top_10 = set(partner_counts.head(10).index.tolist())
+
+    top_df["top_export_partner_category"] = top_df["counterpart_country"].apply(lambda x: x if x in top_10 else "Other")
+    out = Table(top_df[["country", "year", "top_export_partner_category"]]).copy_metadata(tb)
+    out = out.drop_duplicates(subset=["country", "year"])  # safety
+
+    out["counterpart_country"] = "World"
+    return out
+
+
 def get_country_import_ranking(tb: Table, target_country: str) -> Table:
     """
     Analyze a target country's ranking as an importer for each country.
@@ -362,6 +438,37 @@ def get_country_import_ranking(tb: Table, target_country: str) -> Table:
 
     # Filter for target country only
     out = import_data[import_data["counterpart_country"] == target_country][["country", "year", "import_rank"]].copy()
+
+    # Add self-referential rows (e.g., China importing from China) with rank=-1
+    # This row likely doesn't exist in the data but is needed for visualization
+    target_country_years = import_data["year"].unique()
+
+    target_country_template = Table(
+        pd.DataFrame({"country": target_country, "year": target_country_years, "import_rank": 0})
+    )
+
+    # Combine: remove any existing self-referential rows and add our template
+    mask = out["country"] != target_country
+    out = pr.concat([out.loc[mask], target_country_template], ignore_index=True)
+
+    # Add color category based on ranking
+    def categorize_rank(rank):
+        if rank == 0:
+            return target_country
+        elif rank == 1:
+            return "1st - Top source"
+        elif rank == 2:
+            return "2nd"
+        elif rank == 3:
+            return "3rd"
+        elif rank == 4:
+            return "4th"
+        elif rank == 5:
+            return "5th"
+        else:
+            return "Not in top 5"
+
+    out["import_rank_category"] = out["import_rank"].apply(categorize_rank)
 
     out = Table(out).copy_metadata(tb)
     out["counterpart_country"] = target_country
@@ -399,10 +506,11 @@ def clean_historical_overlaps(tb: Table, country_col: str = "country") -> Table:
 
 
 def calculate_trade_relationship_shares(tb: Table) -> Table:
-    """(Currently unused but might need it later) Example of classifying bilateral/unilateral/non-trading shares."""
-    THRESHOLD = 0.01
+    THRESHOLD = 0.01  # million USD
+
     df = tb[tb.indicator.isin([EXPORT_COL, IMPORT_COL])].assign(has_trade=lambda d: d.value.fillna(0) > THRESHOLD)
 
+    #    This uses vectorized minimum/maximum on object‑dtypes:
     c1 = df[["country", "counterpart_country"]]
     df["pair"] = pd.Series(
         np.where(
@@ -414,9 +522,14 @@ def calculate_trade_relationship_shares(tb: Table) -> Table:
     )
 
     active = df[df.has_trade]
-    dir_counts = active.groupby(["year", "pair"])["country"].nunique().reset_index(name="n_dirs")
+    dir_counts = (
+        active.groupby(["year", "pair"])["country"]
+        .nunique()  # how many unique “origins” per pair-year (1 or 2)
+        .reset_index(name="n_dirs")
+    )
 
     all_pairs = df[["year", "pair"]].drop_duplicates()
+
     status = all_pairs.merge(dir_counts, on=["year", "pair"], how="left").fillna({"n_dirs": 0})
 
     status["relationship"] = pd.cut(
@@ -424,9 +537,17 @@ def calculate_trade_relationship_shares(tb: Table) -> Table:
     )
 
     counts = status.groupby(["year", "relationship"]).size().unstack(fill_value=0)
+
     total = counts.sum(axis=1)
     shares = counts.divide(total, axis=0).multiply(100)
     shares = shares.rename(
-        columns={"bilateral": "share_bilateral", "unilateral": "share_unilateral", "non_trading": "share_non_trading"}
+        columns={
+            "bilateral": "share_bilateral",
+            "unilateral": "share_unilateral",
+            "non_trading": "share_non_trading",
+        }
     ).reset_index()
-    return shares
+
+    shares["country"] = "World"
+
+    return shares[["country", "year", "share_bilateral", "share_unilateral", "share_non_trading"]]

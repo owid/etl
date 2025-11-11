@@ -7,7 +7,6 @@ import geopandas as gpd
 import numpy as np
 import pandas as pd
 import pyproj
-import rioxarray as rxr
 import xarray as xr
 from owid.catalog import Table
 from rioxarray.exceptions import NoDataInBounds, OneDimensionalRaster
@@ -41,8 +40,7 @@ def _load_data_array(snap: Snapshot) -> xr.DataArray:
                     da = xr.open_dataset(tmp_file.name, engine="cfgrib").load()
     da = da["tp"]
     # Set the coordinate reference system for the precipitation data to EPSG 4326.
-    with rxr.set_options(export_grid_mapping=False):
-        da = da.rio.write_crs("epsg:4326")
+    da = da.rio.write_crs("epsg:4326")
 
     return da
 

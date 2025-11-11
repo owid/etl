@@ -58,7 +58,8 @@ def sort_datasets_old(df: pd.DataFrame) -> pd.DataFrame:
                 num_id = df.loc[df["migration_new"], "id"].iloc[0]
                 column_sorting = f"score_{num_id}"
 
-            df = df.sort_values(column_sorting, ascending=False)
+            # Sort by similarity score (descending) and then by id (descending) to prefer most recent datasets
+            df = df.sort_values([column_sorting, "id"], ascending=[False, False])
             return df
     return df
 
@@ -246,7 +247,8 @@ def build_dataset_form(df: pd.DataFrame, similarity_names: Dict[str, Any]) -> "S
                     similarity_name="partial_ratio",
                     max_suggestions=10,
                     no_interactive=True,
-                    auto_threshold=80.0,
+                    auto_threshold=100.0,
+                    perfect_match_only=True,
                 )
 
                 # Run indicator upgrade

@@ -1,0 +1,30 @@
+# Ingest EM-DAT raw data on natural disasters.
+# Before running this script, the data needs to be downloaded:
+# * Register at https://public.emdat.be/ and verify email.
+# * Access https://public.emdat.be/data and select:
+#   * "Natural" in the list of "Classification".
+#   * All regions in "Countries".
+#   * All years.
+# * Activate "Include Historical events (pre-2000)".
+# * Then click on "Download".
+# * Run this script using the argument --path-to-file followed by the path to the downloaded file.
+meta:
+  origin:
+    producer: EM-DAT, CRED / UCLouvain
+    title: Natural disasters
+    description: |-
+      EM-DAT contains data on the occurrence and impacts of mass disasters worldwide from 1900 to the present day. EM-DAT data includes all categories classified as "natural disasters" (distinguished from technological disasters, such as oil spills and industrial accidents). This includes those from drought, earthquakes, extreme temperatures, extreme weather, floods, glacial lake outburst floods, mass movements, volcanic activity, and wildfires.
+    citation_full: EM-DAT, CRED / UCLouvain, Brussels, Belgium - www.emdat.be
+    url_main: https://emdat.be/
+    date_accessed: '2025-11-06'
+    # The date_published can be found in the excel file, sheet "EM-DAT Info", "Version".
+    # NOTE: After our initial update, we detected some data issues, contacte EM-DAT, and they fixed them.
+    # We then re-ran the ingestion with the corrected file, which has a new date_published.
+    date_published: '2025-10-31'
+    license:
+      name: UCLouvain 2023
+      url: https://doc.emdat.be/docs/legal/terms-of-use/
+outs:
+  - md5: bd92840fc5b6a374dc461d6b106da5b9
+    size: 4848683
+    path: natural_disasters.xlsx

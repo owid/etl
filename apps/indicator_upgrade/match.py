@@ -139,6 +139,8 @@ def main(
     max_suggestions: int = N_MAX_SUGGESTIONS,
     no_interactive: bool = False,
     auto_threshold: float = 100.0,
+    quiet: bool = False,
+    perfect_match_only: bool = False,
 ) -> None:
     with get_connection() as db_conn:
         # Get variables from old dataset that have been used in at least one chart.
@@ -147,13 +149,14 @@ def main(
         new_indicators = get_variables_in_dataset(db_conn=db_conn, dataset_id=new_dataset_id, only_used_in_charts=False)
 
     # Map old variable names to new variable names.
-    if no_interactive:
+    if perfect_match_only or no_interactive:
         mapping = map_old_and_new_indicators_auto(
             old_indicators=old_indicators,
             new_indicators=new_indicators,
             match_identical=match_identical,
             similarity_name=similarity_name,
             auto_threshold=auto_threshold,
+            perfect_match_only=perfect_match_only,
         )
     else:
         mapping = map_old_and_new_indicators(
@@ -165,11 +168,13 @@ def main(
         )
 
     # Display summary.
-    display_summary(old_indicators=old_indicators, new_indicators=new_indicators, mapping=mapping)
+    if not quiet:
+        display_summary(old_indicators=old_indicators, new_indicators=new_indicators, mapping=mapping)
 
     if dry_run:
         # Print the mappings and dataframe
-        print_mappings(mapping)
+        if not quiet:
+            print_mappings(mapping)
         print_mapping_dataframe(mapping, old_dataset_id, new_dataset_id)
     else:
         # Save to MySQL database
@@ -209,9 +214,7 @@ def map_old_and_new_indicators(
     # Display preliminary mapping results
     if match_identical:
         if len(mapping) > 0:
-            print(f"\n✅ Found {len(mapping)} perfect matches (identical names):")
-            for _, row in mapping.iterrows():
-                print(f"  • {row['name_old']} (ID: {row['id_old']} → {row['id_new']})")
+            print(f"\n✅ Found {len(mapping)} perfect matches (identical names)")
         else:
             print("\n❌ No perfect matches found (no variables with identical names)")
 
@@ -234,6 +237,7 @@ def map_old_and_new_indicators_auto(
     match_identical: bool = True,
     similarity_name: str = "partial_ratio",
     auto_threshold: float = 100.0,
+    perfect_match_only: bool = False,
 ) -> pd.DataFrame:
     """Map old variables to new variables automatically based on similarity threshold.
 
@@ -249,6 +253,9 @@ def map_old_and_new_indicators_auto(
         Similarity function name. Must be in `SIMILARITY_NAMES`.
     auto_threshold: float
         Minimum similarity score (0-100) to automatically create a mapping.
+    perfect_match_only: bool
+        If True, only match indicators with exact string equality (identical names).
+        Ignores auto_threshold and similarity_name.
 
     Returns
     -------
@@ -257,6 +264,22 @@ def map_old_and_new_indicators_auto(
     """
     # Get initial mapping (identical matches)
     mapping, missing_old, missing_new = preliminary_mapping(old_indicators, new_indicators, match_identical)
+
+    # If perfect_match_only is True, return only exact matches (no fuzzy matching)
+    if perfect_match_only:
+        if len(mapping) > 0:
+            log.info(f"Found {len(mapping)} perfect matches (identical names)")
+            for _, row in mapping.iterrows():
+                log.info(f"  • {row['name_old']} (ID: {row['id_old']} → {row['id_new']})")
+        else:
+            log.info("No perfect matches found (no variables with identical names)")
+
+        if len(missing_old) > 0:
+            log.warning(f"{len(missing_old)} variables have no perfect match and will be skipped")
+            for _, row in missing_old.iterrows():
+                log.warning(f"  • {row['name_old']} (ID: {row['id_old']})")
+
+        return mapping
 
     # Display preliminary mapping results
     if match_identical:
@@ -331,25 +354,24 @@ def display_summary(old_indicators: pd.DataFrame, new_indicators: pd.DataFrame, 
         Mapping table from old variable name and id to new variable name and id.
 
     """
-    print("Matched pairs:")
-    for _, row in mapping.iterrows():
-        print(f"\n  {row['name_old']} ({row['id_old']})")
-        print(f"  {row['name_new']} ({row['id_new']})")
+    print(f"\n🎉 Successfully matched {len(mapping)} variables")
 
     unmatched_old = old_indicators[~old_indicators["name"].isin(mapping["name_old"])].reset_index(drop=True)
     unmatched_new = new_indicators[~new_indicators["name"].isin(mapping["name_new"])].reset_index(drop=True)
+
     if len(unmatched_old) > 0:
-        print("\nUnmatched variables in the old dataset:")
+        print(f"\n⚠️  {len(unmatched_old)} unmatched variables in old dataset:")
         for _, row in unmatched_old.iterrows():
             print(f"  {row['name']} ({row['id']})")
     else:
-        print("\nAll variables in the old dataset have been matched.")
+        print("\n✅ All variables in the old dataset have been matched.")
+
     if len(unmatched_new) > 0:
-        print("\nUnmatched variables in the new dataset:")
+        print(f"\n⚠️  {len(unmatched_new)} unmatched variables in new dataset:")
         for _, row in unmatched_new.iterrows():
             print(f"  {row['name']} ({row['id']})")
     else:
-        print("\nAll variables in the new dataset have been matched.")
+        print("✅ All variables in the new dataset have been matched.")
 
 
 def print_mappings(mapping: pd.DataFrame) -> None:
@@ -391,13 +413,8 @@ def print_mapping_dataframe(mapping: pd.DataFrame, old_dataset_id: int, new_data
     # Create the mapping dictionary that would be saved
     mapping_dict = mapping.set_index("id_old")["id_new"].to_dict()
 
-    print("\nDataFrame that would be saved to database:")
-    print("=" * 80)
-    print(f"Dataset mapping: {old_dataset_id} -> {new_dataset_id}")
+    print(f"\nDataset mapping: {old_dataset_id} -> {new_dataset_id}")
     print(f"Number of variable mappings: {len(mapping_dict)}")
-    print("\nMapping dictionary:")
-    for old_id, new_id in mapping_dict.items():
-        print(f"  {old_id} -> {new_id}")
 
 
 def _clear_dataset_mappings(old_dataset_id: int, new_dataset_id: int) -> None:

@@ -29,7 +29,7 @@ from etl.collection import Collection, CollectionSet
 from etl.collection.core.create import Listable, create_collection
 from etl.collection.explorer import Explorer, ExplorerLegacy, create_explorer_legacy
 from etl.dag_helpers import load_dag
-from etl.data_helpers.geo import RegionAggregator, Regions
+from etl.data_helpers.geo import Regions
 from etl.grapher.helpers import grapher_checks
 from etl.snapshot import Snapshot, SnapshotMeta
 
@@ -370,32 +370,10 @@ class PathFinder:
                 ds_income_groups=ds_income_groups,
                 ds_population=ds_population,
                 countries_file=self.country_mapping_path,
+                excluded_countries_file=self.excluded_countries_path if self.excluded_countries_path.exists() else None,
                 auto_load_datasets=False,
             )
         return self._regions
-
-    def region_aggregator(
-        self,
-        regions: list[str] | dict[str, Any] | None = None,
-        index_columns: list[str] | None = None,
-        aggregations: dict[str, Any] | None = None,
-        country_col: str = "country",
-        year_col: str = "year",
-        population_col: str = "population",
-    ) -> RegionAggregator:
-        """Create a RegionAggregator that will be used on a specific table."""
-        return RegionAggregator(
-            regions=regions,
-            ds_regions=self.regions.ds_regions,
-            ds_income_groups=self.regions._ds_income_groups,
-            ds_population=self.regions._ds_population,
-            regions_all=self.regions.regions_all,
-            index_columns=index_columns,
-            aggregations=aggregations,
-            country_col=country_col,
-            year_col=year_col,
-            population_col=population_col,
-        )
 
     @property
     def snapshot_dir(self) -> Path:

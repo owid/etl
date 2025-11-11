@@ -1,0 +1,1887 @@
+# WARNING: Use this file to manually curate WDI indicators. Do NOT use the wdi.meta.yml file (which is generated automatically).
+definitions:
+
+  ####################################################################################
+  # GDP, GNI, and related indicators definitions
+  ####################################################################################
+
+  gdp: Gross domestic product (GDP) is a measure of the total value added from the production of goods and services in a country or region each year.
+  gdp_per_capita: GDP per capita is GDP divided by population.
+  gni: Gross national income (GNI) is a measure of the total income earned by residents of a country or region each year. It is calculated as GDP plus net income received from abroad, plus taxes (minus subsidies) on production.
+  gni_per_capita: GNI per capita is GNI divided by population.
+  ppp_adjustment: This data is adjusted for inflation and differences in living costs between countries.
+  ppp_prices: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2021 prices.
+  inflation_adjustment: This data is adjusted by inflation but _does not_ account for differences in living costs between countries.
+  inflation_prices: This data is expressed in constant 2015 US$.
+
+  description_short_gdp: Total economic output of a country or region per year.
+  description_short_gdp_per_capita: Average economic output per person in a country or region per year.
+  description_short_gni: Total income earned by residents of a country or region, including income earned abroad.
+  description_short_gni_per_capita: Average income per person earned by residents of a country or region, including income earned abroad.
+
+  # description_key_gdp_introduction: "[Gross domestic product](#dod:gdp) (GDP) is a comprehensive measure of countries' total income. It helps compare income levels across countries and track how they change over time. It is especially useful for understanding trends in economic growth and living standards."
+  description_key_gdp_definition: "[Gross domestic product](#dod:gdp) (GDP) is calculated as the value of all final goods and services produced each year in a country. It represents the total economic output of a country or region."
+  description_key_gdp_mention_mpd: This data comes from the World Bank and starts in 1990. For estimates going back several centuries, explore our chart of GDP from the [Maddison Project Database](https://ourworldindata.org/grapher/gdp-maddison-project-database).
+
+  description_key_gdp_per_capita_introduction: GDP per capita is a comprehensive measure of people's average income. It helps compare income levels across countries and track how they change over time. It is especially useful for understanding trends in economic growth and living standards.
+  description_key_gdp_per_capita_definition: GDP per capita is calculated as the value of all final goods and services produced each year in a country (the [gross domestic product](#dod:gdp)), divided by the population. It represents the average economic output per person.
+  description_key_gdp_per_capita_inequality: This indicator shows the large inequality between people in different countries. In the poorest countries, average incomes are below $1,000 per year; in rich countries, they are more than 50 times higher.
+  description_key_gdp_per_capita_mention_mpd: This data comes from the World Bank and starts in 1990. For estimates going back several centuries, explore our chart of GDP per capita from the [Maddison Project Database](https://ourworldindata.org/grapher/gdp-per-capita-maddison-project-database).
+
+  description_key_ppp: This data is expressed in constant international dollars to adjust for inflation and differences in living costs between countries. Read more in our article, [What are international dollars?](https://ourworldindata.org/international-dollars)
+
+  subtitle_gdp_per_capita: GDP per capita is a country's [gross domestic product](#dod:gdp) divided by its population.
+
+  description_processing_gdp_constant: |-
+    We constructed estimates of GDP and GDP per capita in constant 2021 US$ by taking the corresponding series in current US$ and applying them the growth rates of the series in constant local currency units, adjusted by the base year (2021). This is [the same methodology](https://datahelpdesk.worldbank.org/knowledgebase/articles/114943-how-do-you-derive-constant-price-series-in-usd) followed by the World Bank to obtain the series in constant 2015 US$.
+
+    We obtain this indicator to have a more meaningful comparison between exchange-rate-based and PPP-based GDP estimates in the same reference year.
+
+    We have also obtained [Our World in Data regional aggregations](https://ourworldindata.org/world-region-map-definitions) of these indicators by calculating a population-weighted average by region. You can see more information about the population data in [this dedicated article about sources](https://ourworldindata.org/population-sources).
+
+  map_brackets_gdp: &map_brackets_gdp
+    [0, 10000000000, 30000000000, 100000000000, 300000000000, 1000000000000, 3000000000000, 10000000000000, 1]
+  map_brackets_gdp_per_capita: &map_brackets_gdp_per_capita
+    [0, 1000, 2000, 5000, 10000, 20000, 50000, 1]
+
+  selected_entity_names_gdp: &selected_entity_names_gdp
+    [United States, Germany, United Kingdom, Brazil, South Korea, Japan, China, India, Ethiopia, Russia]
+  selected_entity_names_gdp_per_capita: &selected_entity_names_gdp_per_capita
+    [United States, Germany, United Kingdom, Brazil, South Korea, Japan, China, India, Ethiopia, Russia]
+
+  ####################################################################################
+  # ILOSTAT definitions
+  ####################################################################################
+
+  employment: Employment refers to people who worked for at least an hour during the reference period (typically a week), whether in paid employment or self-employment.
+  employment_for_employment_to_population_ratio: This indicator is defined as the proportion of a country’s working-age population that is employed. Employment refers to people who worked for at least an hour during the reference period (typically a week), whether in paid employment or self-employment. This indicator gives a broad sense of how many people in a country are working, regardless of the kind of job they have or how many hours they work.
+
+  icse_93: The concept of status in employment refers to a person's relationship with their job — that is, who they work for or with. It does not refer to the sector, their skill level, or the quality of their work. This is based on the [International Standard Classification of Status in Employment (ICSE-93)](#dod:icse-93), which groups jobs according to the type of relationship between the worker and their job or employer.
+
+  description_short_labor_force_participation_rate: |-
+    Share of the << sex >>working-age population << age >>who are economically active (employed or unemployed).
+  description_short_unemployment_rate: |-
+    Share of the << sex >>[labor force](#dod:labor-force) << age >>without work, but actively looking for a job and available to start soon.
+  description_short_employment_to_population_ratio: |-
+    Share of the << sex >>working-age population << age >>who are employed.
+  description_short_vulnerable_employment: |-
+    Share of employed population who are working as own-account workers (self-employed without staff), or contributing family workers (self-employed in a household business or farm).
+  description_short_labor_force_female: |-
+    Share of the working-age population (15+) who are female.
+  description_short_employment_agriculture: |-
+    Share of total employment working in the agriculture sector.
+  description_short_employment_industry: |-
+    Share of total employment working in the industry sector.
+  description_short_employment_services: |-
+    Share of total employment working in the services sector.
+  description_short_ratio_female_male_labor_force_participation_rate: |-
+    This ratio is calculated by dividing the labor force participation rate among women by the corresponding rate for men. The labor force participation rate is the share of the working-age population << age >>who are economically active (employed or unemployed).
+  description_short_children_in_employment: |-
+    Share of children aged 7-14 years involved in economic activity for at least one hour in the reference week of the survey.
+  description_short_children_in_employment_work_only: |-
+    Share of children aged 7-14 years involved in economic activity for at least one hour in the reference week of the survey and not attending school.
+  description_short_average_working_hours_of_children: |-
+    Average weekly hours worked by children aged 7-14 years involved in economic activity and attending school.
+
+  description_key_labor_force_participation_1: |-
+    The labor force participation rate shows the share of working-age people who are either employed (working for pay or profit) or unemployed (not working, but actively looking for work and available to start). This indicator shows the share of the population that is economically active.
+  description_key_labor_force_participation_2: |-
+    People who are not seeking work or are not available, such as students, retired people, or unpaid caregivers, are excluded as they are considered to be outside the labor force.
+  description_key_unemployment: |-
+    The unemployment rate measures the share of the [labor force](#dod:labor-force) that is without a job but actively looking for work and available to start soon. It is one of the most widely used indicators of labor market conditions across countries and over time.
+
+  description_key_iloest_modelled_data: |-
+    This data comes from the ILO Modelled Estimates series. The ILO combines countries' own reported estimates with statistically modeled estimates when observations are missing. This improves comparability across countries and over time and allows the ILO to calculate regional and global aggregates for every year. You can read more about how the ILO produces these estimates in the [Modelled Estimates documentation](https://ilostat.ilo.org/methods/concepts-and-definitions/ilo-modelled-estimates/).
+  description_key_national_estimates: |-
+    This data comes from national sources, typically labor force surveys, household surveys, or population censuses. Each country uses its own definitions and methods, so this data may not be directly comparable across countries and over time.
+  description_key_13th_icls: |-
+    This data follows the standards of the [13th International Classification of Labour Statisticians (ICLS)](#dod:13-icls). Under this framework, employment includes work for pay or profit, including self-employment, as well as the production of goods for own use (such as subsistence farming). Changes in the definition of employment also affect who is counted as unemployed or outside the labor force. Because definitions were updated under the [19th ICLS](#dod:19-icls), data using the newer definitions is not fully comparable with data based on the 13th ICLS. You can read more about the definitions in [this explainer by the ILO](https://www.ilo.org/publications/quick-guide-understanding-impact-new-statistical-standards-ilostat).
+
+  description_key_working_age_ilo_modeled: |-
+    When defining the labor force, the definition of “working age” varies across countries, depending on national laws and practices. In the ILO modeled estimates shown here, this is harmonized to refer to people aged 15 and older.
+  description_key_working_age_ilo_modeled_employment: |-
+    When defining the working-age population, the definition of “working age” varies across countries, depending on national laws and practices. In the ILO modeled estimates shown here, this is harmonized to refer to people aged 15 and older.
+  description_key_working_age_ilo_national: |-
+    When defining the labor force, the working-age population includes all people above the legal working age for employment in each country. The ILO’s guidelines define it as people aged 15 and older, but national definitions vary, depending on local laws. Some countries also set an upper age limit.
+
+  description_key_vulnerable_employment_1: |-
+    This indicator shows the share of employed people in vulnerable employment – those working as own-account workers or as contributing family members. These groups are more likely to lack formal arrangements and social protection, and to have variable income.
+  description_key_vulnerable_employment_2: |-
+    Own-account workers are defined as workers in self-employment jobs who do not engage any employees to work with them. Contributing family members are workers in self-employment jobs who work in an enterprise operated by a related person living in the same household. These groups are defined according to the [International Standard Classification of Status in Employment (ICSE-93)](#dod:icse-93).
+  description_key_vulnerable_employment_3: |-
+    A higher share indicates greater labor market vulnerability, which is more common in lower-income countries. Over time, the share tends to fall as countries get richer and more workers move into wage and salaried employment. It’s important to note that this is a broad measure: even within this category, people’s work circumstances can vary widely. For example, some own-account workers in rich countries are highly paid professionals or freelancers, and would not usually be considered “vulnerable”.
+  description_key_employment_agriculture: |-
+    The agriculture sector includes crop and animal production, hunting, forestry, logging, and fishing and aquaculture activities, as defined by the [International Standard Industrial Classification of All Economic Activities (ISIC)](https://ilostat.ilo.org/methods/concepts-and-definitions/classification-economic-activities/).
+  description_key_employment_industry: |-
+    The industry sector includes mining and quarrying, manufacturing, construction, and public utilities (electricity, gas, and water), as defined by the [International Standard Industrial Classification of All Economic Activities (ISIC)](https://ilostat.ilo.org/methods/concepts-and-definitions/classification-economic-activities/).
+  description_key_employment_services: |-
+    The services sector includes wholesale and retail trade; restaurants and hotels; transport, storage, and communications; financing, insurance, real estate, and business and administrative services; and public administration, community, social, and personal services, as defined by the International Standard Industrial Classification of All Economic Activities (ISIC).
+
+  note_icls_13: |-
+    Employment is defined in line with the [13th ICLS](#dod:13-icls) and includes the production of goods for own use, such as subsistence farming.
+
+  note_iloest_modelled_data: |-
+    All figures correspond to [modeled ILO estimates](#dod:ilo-modelled-estimates).
+  note_national_estimates: |-
+    Figures refer to [national estimates](#dod:ilo-national-estimates) and may not be fully comparable across countries.
+
+  note_icse_93: |-
+    Types of jobs are classified by status according to the [ICSE-93 standard](#dod:icse-93).
+
+  variant_name_iloest_modelled_data: Modeled estimates
+  variant_name_national_estimates: National estimates
+
+  ####################################################################################
+  # Education definitions
+  ####################################################################################
+
+  # Trained teachers map configuration
+  trained_teachers_grapher_config: &trained_teachers_grapher_config
+    maxTime: 2024
+    hasMapTab: true
+    map:
+      time: 2024
+      timeTolerance: 10
+      colorScale:
+        binningStrategy: manual
+        customNumericValues: [0, 10, 20,30,40,50,60,70,80,90,100]
+        baseColorScheme: Blues
+
+  # Gross enrolment ratio configuration
+  grapher_config_enrolment_pubugn: &grapher_config_enrolment_pubugn
+    maxTime: 2024
+    hasMapTab: true
+    map:
+      time: 2024
+      timeTolerance: 10
+      colorScale:
+        binningStrategy: manual
+        customNumericValues: [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 1]
+        baseColorScheme: PuBuGn
+
+  desc_key_ger: &desc_key_ger
+    - The gross enrolment ratio counts all students enrolled at a specific education level, regardless of their age. This includes students who are younger or older than the official age range because they started school early, started late, or repeated grades.
+    - It measures enrolment at a given level by dividing the total number of students—of any age—by the size of the age group officially assigned to that level. For instance, primary enrolment counts everyone enrolled, even outside ages 6–11, but compares it only to the 6–11 population.
+    - Values can exceed 100% when students repeat grades or start late. For instance, primary school enrolment might include 12- or 13-year-olds who started late or repeated grades, pushing the ratio above 100%.
+    - A value of 100% does not guarantee that all children in the official age group are enrolled in school; some may be out of school entirely, but the ratio appears high due to older students being counted in the total.
+    - Values much lower than 100% indicate that many children of the official age are not enrolled at the expected education level - they may be out of school entirely, enrolled at a different level, or have never started school.
+    - Values much higher than 100% can indicate educational challenges such as high grade repetition rates, late school entry, or inefficient progression through the system.
+    - The data comes from administrative records such as school enrolment reports, combined with population estimates typically sourced from the United Nations or national statistical offices.
+
+  desc_key_trained_teachers: &desc_key_trained_teachers
+   - Not all teachers receive the same level of preparation before entering the classroom. This indicator measures the percentage of teachers at each education level who have completed at least the minimum organized pedagogical training required for teaching at that level in their country.
+   - It captures the share of teachers who are pedagogically trained, expressed as a percentage of all teachers at that level. For example, if there are 1,000 primary teachers and 850 have completed the required training, the indicator shows 85%.
+   - The "minimum training" refers to whatever organized pedagogical preparation each country requires — pre-service teacher education programs, in-service training courses, or certification requirements that focus on teaching methods rather than subject knowledge.
+   - Values below 100% suggest some teachers are working without the pedagogical training their own country considers necessary. However, cross-country comparisons can be misleading since training requirements vary significantly between nations.
+   - This indicator does not account for differences in teachers' experience, professional status, teaching methods, materials, or classroom conditions — all of which affect the quality of teaching and learning. Some teachers without formal training may also acquire equivalent skills through professional experience.
+   - The reference years reflect the school year. In countries where the school year spans two calendar years (e.g. September 2010 to June 2011), the reference year is the year in which the school year ended (2011 in this example).
+   - The data comes from administrative records collected at schools and other organized learning centers, typically including information on teacher academic credentials and employment status.
+
+  ####################################################################################
+  # Energy definitions
+  ####################################################################################
+
+  description_short_clean_fuels: &description_short_clean_fuels |-
+    Access to [clean fuels or technologies](#dod:clean-cooking-fuels) such as natural gas, electricity, and clean cookstoves reduces exposure to indoor air pollutants, a leading cause of death in low-income households.
+  description_from_producer_clean_fuels: &description_from_producer_clean_fuels |-
+    Access to clean fuels and technologies for cooking is the proportion of total population primarily using clean cooking fuels and technologies for cooking. Under WHO guidelines, kerosene is excluded from clean cooking fuels.
+
+    Statistical concept and methodology: Data for access to clean fuels and technologies for cooking are based on the World Health Organization's (WHO) Global Household Energy Database. They are collected among different sources: only data from nationally representative household surveys (including national censuses) were used. Survey sources include Demographic and Health Surveys (DHS) and Living Standards Measurement Surveys (LSMS), Multi-Indicator Cluster Surveys (MICS), the World Health Survey (WHS), other nationally developed and implemented surveys, and various government agencies (for example, ministries of energy and utilities).
+
+    Trends in the proportion of the population using each fuel type are estimated using a single multivariate hierarchical model, with urban and rural disaggregation. Estimates for overall "polluting" fuels (unprocessed biomass, charcoal, coal, and kerosene) and "clean" fuels (gaseous fuels, electricity, as well as an aggregation of any other clean fuels like alcohol) are produced by aggregating estimates of relevant fuel types. The model was used to derive clean fuel use estimates for 191 countries (ref. Stoner, O., Shaddick, G., Economou, T., Gumy, S., Lewis, J., Lucio, I., Ruggeri, G. and Adair-Rohani, H. (2020), Global household energy model: a multivariate hierarchical approach to estimating trends in the use of polluting and clean fuels for cooking. J. R. Stat. Soc. C, 69: 815-839). Countries classified by the World Bank as high income (57 countries) in the 2022 fiscal year are assumed to have universal access to clean fuels and technologies for cooking.
+  description_short_electricity: &description_short_electricity |-
+    Access to electricity means having an electricity source that can provide very basic lighting, and charge a phone or power a radio for 4 hours per day.
+
+tables:
+  wdi:
+    variables:
+    ####################################################################################################
+    # GDP, GNI, and related indicators
+    ####################################################################################################
+      ny_gdp_pcap_pp_kd:
+        title: GDP per capita, PPP (constant 2021 international $)
+        unit: international-$ in 2021 prices
+        short_unit: $
+        display:
+          name: GDP per capita
+          numDecimalPlaces: 0
+          tolerance: 5
+        description_short: "{definitions.description_short_gdp_per_capita} {definitions.ppp_adjustment}"
+        description_key:
+          - "{definitions.description_key_gdp_per_capita_introduction}"
+          - "{definitions.description_key_gdp_per_capita_definition}"
+          - "{definitions.description_key_gdp_per_capita_inequality}"
+          - "{definitions.description_key_ppp}"
+          - "{definitions.description_key_gdp_per_capita_mention_mpd}"
+        processing_level: minor
+        presentation:
+          title_public: GDP per capita
+          title_variant: In constant international-$
+          attribution_short: World Bank
+          topic_tags:
+            - Economic Growth
+          faqs:
+            - fragment_id: poverty-international-dollars
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+          grapher_config:
+            title: GDP per capita
+            subtitle: "{definitions.subtitle_gdp_per_capita} {definitions.ppp_adjustment}"
+            note: "{definitions.ppp_prices}"
+            variantName: In constant international-$ – World Bank
+            originUrl: https://ourworldindata.org/economic-growth
+            hasMapTab: true
+            tab: map
+            yAxis:
+              min: 0
+              canChangeScaleType: true
+            hideAnnotationFieldsInTitle:
+              time: true
+              entity: true
+              changeInPrefix: true
+            hideRelativeToggle: false
+            map:
+              colorScale:
+                baseColorScheme: GnBu
+                binningStrategy: manual
+                customNumericValues: *map_brackets_gdp_per_capita
+            selectedEntityNames: *selected_entity_names_gdp_per_capita
+
+      ny_gdp_mktp_pp_kd:
+        title: GDP, PPP (constant 2021 international $)
+        unit: international-$ in 2021 prices
+        short_unit: $
+        display:
+          name: GDP
+          numDecimalPlaces: 0
+          tolerance: 5
+        description_short: "{definitions.description_short_gdp} {definitions.ppp_adjustment}"
+        description_key:
+
+          - "{definitions.description_key_gdp_definition}"
+          - "{definitions.description_key_ppp}"
+          - "{definitions.description_key_gdp_mention_mpd}"
+        processing_level: minor
+        presentation:
+          title_public: Gross domestic product (GDP)
+          title_variant: In constant international-$
+          attribution_short: World Bank
+          topic_tags:
+            - Economic Growth
+          faqs:
+            - fragment_id: poverty-international-dollars
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+          grapher_config:
+            title: Gross domestic product (GDP)
+            subtitle: "{definitions.ppp_adjustment}"
+            note: "{definitions.ppp_prices}"
+            hideRelativeToggle: false
+            hasMapTab: true
+            tab: map
+            variantName: In constant international-$ – World Bank
+            originUrl: https://ourworldindata.org/economic-growth
+            yAxis:
+              min: 0
+              canChangeScaleType: true
+            map:
+              colorScale:
+                baseColorScheme: PuBu
+                binningStrategy: manual
+                customNumericValues: *map_brackets_gdp
+            selectedEntityNames: *selected_entity_names_gdp
+
+      ny_gnp_pcap_pp_kd:
+        title: GNI per capita, PPP (constant 2021 international $)
+        unit: international-$ in 2021 prices
+        short_unit: $
+        display:
+          name: GNI per capita
+          numDecimalPlaces: 0
+          tolerance: 5
+        description_short: "{definitions.description_short_gni_per_capita} {definitions.ppp_adjustment}"
+        description_key:
+          - "{definitions.gni} {definitions.gni_per_capita}"
+          - This GNI per capita indicator provides information on economic growth and income levels from 1990.
+          - "{definitions.ppp_adjustment}"
+          - "{definitions.ppp_prices}"
+        processing_level: minor
+        presentation:
+          title_public: Gross national income (GNI) per capita
+          title_variant: In constant international-$
+          attribution_short: World Bank
+          topic_tags:
+            - Economic Growth
+          faqs:
+            - fragment_id: poverty-international-dollars
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+          grapher_config:
+            title: Gross national income (GNI) per capita
+            subtitle: Gross national income (GNI) measures the total income earned by residents of a country, including income earned abroad. {definitions.ppp_adjustment}
+            note: "{definitions.ppp_prices}"
+            variantName: World Bank
+            originUrl: https://ourworldindata.org/economic-growth
+            map:
+              colorScale:
+                binningStrategy: manual
+                baseColorScheme: BuGn
+                customNumericValues: *map_brackets_gdp_per_capita
+            selectedEntityNames: *selected_entity_names_gdp_per_capita
+            yAxis:
+              canChangeScaleType: true
+              min: 0
+            tab: map
+            hideRelativeToggle: false
+            hasMapTab: true
+
+      ny_gnp_mktp_pp_kd:
+        title: GNI, PPP (constant 2021 international $)
+        unit: international-$ in 2021 prices
+        short_unit: $
+        display:
+          name: GNI
+          numDecimalPlaces: 0
+          tolerance: 5
+        description_short: "{definitions.description_short_gni} {definitions.ppp_adjustment}"
+        description_key:
+          - "{definitions.gni}"
+          - This GNI indicator provides information on economic growth and income levels from 1990.
+          - "{definitions.ppp_adjustment}"
+          - "{definitions.ppp_prices}"
+        processing_level: minor
+        presentation:
+          title_public: Gross national income (GNI)
+          title_variant: In constant international-$
+          attribution_short: World Bank
+          topic_tags:
+            - Economic Growth
+          faqs:
+            - fragment_id: poverty-international-dollars
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+
+      ny_gdp_pcap_kd:
+        title: GDP per capita (constant 2015 US$)
+        unit: constant 2015 US$
+        short_unit: $
+        display:
+          name: GDP per capita
+          numDecimalPlaces: 0
+          tolerance: 5
+        description_short: "{definitions.description_short_gdp_per_capita} {definitions.inflation_adjustment}"
+        description_key:
+          - "{definitions.gdp} {definitions.gdp_per_capita}"
+          - This GDP per capita indicator provides information on economic growth and income levels from 1960.
+          - "{definitions.inflation_adjustment}"
+          - "{definitions.inflation_prices}"
+          - For GDP per capita estimates that account for both inflation and differences in the cost of living between countries, see [GDP per capita in constant international-$](https://ourworldindata.org/grapher/gdp-per-capita-worldbank).
+        processing_level: minor
+        presentation:
+          title_public: GDP per capita
+          title_variant: In constant US$
+          attribution_short: World Bank
+          topic_tags:
+            - Economic Growth
+          grapher_config:
+            title: GDP per capita
+            subtitle: This data is expressed in US dollars. It is adjusted for inflation but does not account for differences in living costs between countries.
+            note: This data is expressed in constant 2015 US$.
+            variantName: In constant US$ - World Bank
+            originUrl: https://ourworldindata.org/economic-growth
+            map:
+              colorScale:
+                binningStrategy: manual
+                baseColorScheme: GnBu
+                customNumericValues: *map_brackets_gdp_per_capita
+            selectedEntityNames: *selected_entity_names_gdp_per_capita
+
+          yAxis:
+            canChangeScaleType: true
+            min: 0
+          tab: map
+          hideRelativeToggle: false
+          hasMapTab: true
+          hideAnnotationFieldsInTitle:
+            entity: true
+            time: true
+            changeInPrefix: true
+
+      ny_gdp_mktp_kd:
+        title: GDP (constant 2015 US$)
+        unit: constant 2015 US$
+        short_unit: $
+        display:
+          name: GDP
+          numDecimalPlaces: 0
+          tolerance: 5
+        description_short: "{definitions.description_short_gdp} {definitions.inflation_adjustment}"
+        description_key:
+          - "{definitions.gdp}"
+          - This GDP indicator provides information on economic growth and income levels from 1960.
+          - "{definitions.inflation_adjustment}"
+          - "{definitions.inflation_prices}"
+          - For GDP estimates that account for both inflation and differences in the cost of living between countries, see [GDP in constant international-$](https://ourworldindata.org/grapher/gdp-worldbank).
+        processing_level: minor
+        presentation:
+          title_public: Gross domestic product (GDP)
+          title_variant: In constant US$
+          attribution_short: World Bank
+          topic_tags:
+            - Economic Growth
+          grapher_config:
+            title: Gross domestic product (GDP)
+            subtitle: This data is expressed in US dollars. It is adjusted for inflation but does not account for differences in living costs between countries.
+            note: This data is expressed in constant 2015 US$.
+            variantName: In constant US$ - World Bank
+            originUrl: https://ourworldindata.org/economic-growth
+            map:
+              colorScale:
+                binningStrategy: manual
+                baseColorScheme: PuBu
+                customNumericValues: *map_brackets_gdp
+            selectedEntityNames: *selected_entity_names_gdp
+            yAxis:
+              canChangeScaleType: true
+              min: 0
+            tab: map
+            hideRelativeToggle: false
+            hasMapTab: true
+
+      ny_gdp_mktp_cd_adjusted:
+        title: GDP (constant 2021 US$)
+        unit: constant 2021 US$
+        short_unit: $
+        display:
+          name: GDP
+          numDecimalPlaces: 0
+          tolerance: 5
+        description_short: "{definitions.description_short_gdp} {definitions.inflation_adjustment}"
+        description_key:
+          - "{definitions.gdp}"
+          - This GDP indicator provides information on economic growth and income levels from 1960.
+          - "{definitions.inflation_adjustment}"
+          - This data is expressed in constant 2021 US$.
+          - For GDP estimates that account for both inflation and differences in the cost of living between countries, see [GDP in constant international-$](https://ourworldindata.org/grapher/gdp-worldbank).
+        processing_level: major
+        description_processing: "{definitions.description_processing_gdp_constant}"
+        presentation:
+          title_public: Gross domestic product (GDP)
+          title_variant: In constant 2021 US$
+          attribution_short: World Bank
+          topic_tags:
+            - Economic Growth
+
+      ny_gdp_pcap_cd_adjusted:
+        title: GDP per capita (constant 2021 US$)
+        unit: constant 2021 US$
+        short_unit: $
+        display:
+          name: GDP per capita
+          numDecimalPlaces: 0
+          tolerance: 5
+        description_short: "{definitions.description_short_gdp_per_capita} {definitions.inflation_adjustment}"
+        description_key:
+          - "{definitions.gdp} {definitions.gdp_per_capita}"
+          - This GDP per capita indicator provides information on economic growth and income levels from 1960.
+          - "{definitions.inflation_adjustment}"
+          - This data is expressed in constant 2021 US$.
+          - For GDP per capita estimates that account for both inflation and differences in the cost of living between countries, see [GDP per capita in constant international-$](https://ourworldindata.org/grapher/gdp-per-capita-worldbank).
+        processing_level: major
+        description_processing: "{definitions.description_processing_gdp_constant}"
+        presentation:
+          title_public: GDP per capita
+          title_variant: In constant 2021 US$
+          attribution_short: World Bank
+          topic_tags:
+            - Economic Growth
+
+      pa_nus_pppc_rf:
+        title: Price level ratio of PPP conversion factor (GDP) to market exchange rate
+        unit: ""
+        short_unit: ""
+        display:
+          name: GDP price levels relative to the US
+          numDecimalPlaces: 2
+          tolerance: 5
+        description_short: |-
+          Ratio of Purchasing Power Parity (PPP) conversion factor to market exchange rate.
+        description_key:
+          - It shows whether a country’s currency has more or less purchasing power than its exchange rate implies, compared to the United States.
+          - A value below one means local goods and services are cheaper than in the US, while a value above one suggests local prices are higher.
+          - These comparisons are based on PPP conversion rates (also called PPP conversion factors or PPP rates). PPP rates estimate how many units of a country’s local currency are needed to buy (roughly) the same basket of goods and services in that country that one US dollar would buy in the United States. For this indicator (at the level of [GDP](#dod:gdp)), the comparison is made using a broad, economy-wide basket of goods and services.
+          - PPP rates are calculated by the [International Comparison Program (ICP)](https://www.worldbank.org/en/programs/icp), which uses the United States as a benchmark country.
+          - This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2021 prices.
+        presentation:
+          attribution_short: World Bank
+          topic_tags:
+            - Economic Growth
+
+      ####################################################################################################
+
+      it_net_user_zs:
+        title: Individuals using the Internet (% of population)
+        description_short: Share of the population who used the Internet in the last three months.
+        description_from_producer: >-
+          Internet users are individuals who have used the Internet (from any location)
+          in the last 3 months. The Internet can be used via a computer, mobile phone,
+          personal digital assistant, games machine, digital TV etc.
+
+          Limitations and exceptions: Operators have traditionally been the main source
+          of telecommunications data, so information on subscriptions has been widely
+          available for most countries. This gives a general idea of access, but a more
+          precise measure is the penetration rate - the share of households with access
+          to telecommunications. During the past few years more information on
+          information and communication technology use has become available from
+          household and business surveys. Also important are data on actual use of
+          telecommunications services. Ideally, statistics on telecommunications (and
+          other information and communications technologies) should be compiled for all
+          three measures: subscriptions, access, and use. The quality of data varies
+          among reporting countries as a result of differences in regulations covering
+          data provision and availability.
+
+          Discrepancies may also arise in cases where the end of a fiscal year differs
+          from that used by ITU, which is the end of December of every year. A number of
+          countries have fiscal years that end in March or June of every
+          year.
+
+          Statistical concept and methodology: The Internet is a world-wide public
+          computer network. It provides access to a number of communication services
+          including the World Wide Web and carries email, news, entertainment and data
+          files, irrespective of the device used (not assumed to be only via a computer -
+          it may also be by mobile phone, PDA, games machine, digital TV etc.). Access
+          can be via a fixed or mobile network. For additional/latest information on
+          sources and country notes, please also refer to:
+          https://www.itu.int/en/ITU-D/Statistics/Pages/stat/default.aspx
+
+          [Text from [World Bank World Development Indicators metadata](https://databank.worldbank.org/metadataglossary/world-development-indicators/series/IT.NET.USER.ZS)]
+        short_unit: '%'
+        unit: '% of population'
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+        description_key:
+          - An Internet user is defined by the International Telecommunication Union as anyone who has accessed the Internet from any location in the last three months.
+          - This can be from any type of device, including a computer, mobile phone, personal digital assistant, games machine, digital TV, and other technological devices.
+        processing_level: minor
+        presentation:
+          title_public: Share of the population using the Internet
+          # title_variant: WDI
+          title_variant: International Telecommunication Union
+          # attribution: # defaults to origin[*].producer so does not have to be set here
+          topic_tags:
+            - Internet
+            - Technological Change
+            - Loneliness & Social Connections
+          faqs: []
+          grapher_config:
+            title: Share of the population using the Internet
+            subtitle: 'Share of the population who [used the Internet](#dod:internetuser) in the last three months.'
+            timelineMinTime: 1990
+            sourceDesc: International Telecommunication Union (via World Bank)
+            originUrl: https://ourworldindata.org/internet
+            hideAnnotationFieldsInTitle:
+              time: true
+              entity: true
+              changeInPrefix: true
+            hasMapTab: true
+            yAxis:
+              min: 0
+              max: 100
+            map:
+              timeTolerance: 5
+              colorScale:
+                baseColorScheme: Blues
+                colorSchemeInvert: false
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 10
+                  - 20
+                  - 30
+                  - 40
+                  - 50
+                  - 60
+                  - 70
+                  - 80
+                  - 90
+                  - 100
+                customNumericLabels:
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                legendDescription: Individuals using the Internet (% of population)
+            selectedEntityNames:
+              - South Asia (WB)
+              - North America (WB)
+              - Sub-Saharan Africa (WB)
+              - East Asia and Pacific (WB)
+              - Middle East and North Africa (WB)
+              - Europe and Central Asia (WB)
+              - Latin America and Caribbean (WB)
+              - World
+
+      sh_sta_stnt_zs:
+        title: Share of children who are stunted
+        unit: '% of children under 5'
+        short_unit: '%'
+        description_short: |-
+          The share of children younger than five years old whose growth is stunted.
+        description_key:
+          - Stunting is when a child is significantly shorter than the average for their age.
+          - Stunted growth is a consequence of poor nutrition and/or repeated infection.
+          - These values are survey estimates which come with levels of uncertainty due to both sampling error and non-sampling error (e.g., measurement technical error, recording error etc.,). None of the two sources of errors have been fully taken into account for deriving estimates neither at country nor at regional or worldwide levels.
+        description_from_producer: |-
+          Prevalence of stunting is the percentage of children under age 5 whose height for age is more than two standard deviations below the median for the international reference population ages 0-59 months. For children up to two years old height is measured by recumbent length. For older children height is measured by stature while standing. The data are based on the WHO's new child growth standards released in 2006.
+
+          [Text from World Bank World Development Indicators [metadata glossary](https://databank.worldbank.org/metadataglossary/world-development-indicators/series/SH.STA.STNT.ZS)]
+        presentation:
+          title_public: Share of children who are stunted
+          # title_variant: UNICEF/WHO
+          attribution: UNICEF; World Health Organization; World Bank
+          attribution_short: UNICEF/WHO (via World Bank)
+          topic_tags:
+            - Hunger & Undernourishment
+            - Micronutrient Deficiency
+          faqs:
+            - fragment_id: stunting-definition
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+            - fragment_id: stunting-measurement
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+            - fragment_id: stunting-causes
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+          grapher_config:
+            title: 'Malnutrition: Share of children who are stunted'
+            subtitle: >-
+              The share of children younger than five years old that are defined as stunted.
+              [Stunting](#dod:stunting) is when a child is significantly shorter than the
+              average for their age. It is a consequence of poor nutrition and/or repeated
+              infection.
+            sourceDesc: UNICEF, World Health Organization and World Bank
+            hideAnnotationFieldsInTitle:
+              time: true
+              entity: true
+              changeInPrefix: true
+            hasMapTab: true
+            tab: map
+            variantName: UNICEF, World Health Organization and World Bank
+            originUrl: https://ourworldindata.org/hunger-and-undernourishment
+            yAxis:
+              min: 0
+            map:
+              timeTolerance: 5
+              colorScale:
+                baseColorScheme: YlOrRd
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 10
+                  - 20
+                  - 30
+                  - 40
+                  - 50
+                  - 60
+                  - 70
+                  - 80
+                customNumericLabels:
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                customNumericColors:
+                  - null
+                  - null
+                legendDescription: Prevalence of stunting (% of children under 5)
+            selectedEntityNames:
+              - China
+              - Colombia
+              - Kenya
+              - Peru
+              - Bangladesh
+              - United States
+            relatedQuestions:
+              - url: >-
+                  https://ourworldindata.org/grapher/share-of-children-younger-than-5-who-suffer-from-stunting#faqs
+                text: FAQs on this data
+            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
+      sh_sta_stnt_me_zs:
+        title: Share of children who are stunted (modeled estimates)
+        unit: '% of children under 5'
+        short_unit: '%'
+        description_short: |-
+          The share of children younger than five years old whose growth is stunted.
+        description_key:
+          - Stunting is when a child is significantly shorter than the average for their age.
+          - Stunted growth is a consequence of poor nutrition and/or repeated infection.
+          - These values are model estimates which account for sampling error around survey estimates and the data producer has made efforts to ensure the data is comparable over countries and time.
+        description_from_producer: |-
+          Prevalence of stunting is the percentage of children under age 5 whose height for age is more than two standard deviations below the median for the international reference population ages 0-59 months. For children up to two years old height is measured by recumbent length. For older children height is measured by stature while standing. The data are based on the WHO's new child growth standards released in 2006.
+
+          [Text from World Bank World Development Indicators [metadata glossary](https://databank.worldbank.org/metadataglossary/world-development-indicators/series/SH.STA.STNT.ME.ZS)]
+        presentation:
+          title_public: Share of children who are stunted
+          # title_variant: UNICEF/WHO
+          attribution: UNICEF; World Health Organization; World Bank
+          attribution_short: UNICEF/WHO (via World Bank)
+          topic_tags:
+            - Hunger & Undernourishment
+            - Micronutrient Deficiency
+          faqs:
+            - fragment_id: stunting-definition
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+            - fragment_id: stunting-measurement
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+            - fragment_id: stunting-causes
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+          grapher_config:
+            title: 'Malnutrition: Share of children who are stunted'
+            subtitle: >-
+              The share of children younger than five years old that are defined as stunted.
+              [Stunting](#dod:stunting) is when a child is significantly shorter than the
+              average for their age. It is a consequence of poor nutrition and/or repeated
+              infection.
+            sourceDesc: UNICEF, World Health Organization and World Bank; modeled estimates
+            hideAnnotationFieldsInTitle:
+              time: true
+              entity: true
+              changeInPrefix: true
+            hasMapTab: true
+            tab: map
+            variantName: UNICEF, World Health Organization and World Bank
+            originUrl: https://ourworldindata.org/hunger-and-undernourishment
+            yAxis:
+              min: 0
+            map:
+              timeTolerance: 5
+              colorScale:
+                baseColorScheme: YlOrRd
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 10
+                  - 20
+                  - 30
+                  - 40
+                  - 50
+                  - 60
+                  - 70
+                  - 80
+                customNumericLabels:
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                customNumericColors:
+                  - null
+                  - null
+                legendDescription: Prevalence of stunting (% of children under 5)
+            selectedEntityNames:
+              - China
+              - Colombia
+              - Kenya
+              - Peru
+              - Bangladesh
+              - United States
+            relatedQuestions:
+              - url: >-
+                  https://ourworldindata.org/grapher/share-of-children-younger-than-5-who-suffer-from-stunting#faqs
+                text: FAQs on this data
+            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
+
+      eg_cft_accs_zs:
+        title: Access to clean fuels and technologies for cooking (% of population)
+        unit: '% of population'
+        short_unit: '%'
+        description_short: *description_short_clean_fuels
+        description_from_producer: *description_from_producer_clean_fuels
+        presentation:
+          title_public: Share of the population with access to clean fuels for cooking
+          attribution: World Health Organization (via World Bank)
+          attribution_short: World Bank
+          topic_tags:
+            - Access to Energy
+            - Energy
+        processing_level: minor
+
+      eg_elc_accs_zs:
+        title: Access to electricity (% of population)
+        unit: '% of population'
+        short_unit: '%'
+        description_short: *description_short_electricity
+        description_key:
+          - "Access to electricity improves people's living conditions in many ways. [Light at night](https://ourworldindata.org/light-at-night) makes it possible to get together after sunset; mobile phones allow us to stay in touch with those far away; refrigeration reduces food waste; and household appliances free up time from chores."
+          - This data captures whether people have access to the most basic electricity supply — just enough to provide basic lighting and charge a phone or power a radio for 4 hours per day.
+          - It shows that, especially in several African countries, a large share of the population lacks the benefits of basic electricity.
+          - Universal access to electricity by 2030 is one of the United Nations [Sustainable Development Goals](https://ourworldindata.org/sdgs/affordable-clean-energy#sdg-indicator-7-1-1-access-to-electricity).
+          - "This data comes from the World Bank's World Development Indicators. Estimates are based on national household surveys, census data, and reports from energy providers or government agencies. Where data is missing, values are estimated by the source using a model based on trends across countries, regions, and time. Countries classified as “developed” by the United Nations are assumed to have universal access."
+          - "To learn more, read our article: [Definitions: access to electricity](https://ourworldindata.org/definition-electricity-access)."
+        presentation:
+          title_public: Share of the population with access to electricity
+          attribution: Data compiled from multiple sources by World Bank
+          attribution_short: World Bank
+          topic_tags:
+            - Access to Energy
+            - Energy
+        processing_level: minor
+        display:
+          numSignificantFigures: 2
+          tolerance: 5
+      sn_itk_defc_zs:
+        title: Prevalence of undernourishment (% of population)
+        unit: '% of population'
+        short_unit: '%'
+        description_short: Share of individuals that have a daily food intake that is insufficient to provide the amount of dietary energy required to maintain a normal, active, and healthy life.
+        description_key:
+          - Countries and regions with rates below 2.5% are coded as "2.5%" in the data.
+        description_from_producer: |-
+          Prevalence of undernourishments is the percentage of the population whose habitual food consumption is insufficient to provide the dietary energy levels that are required to maintain a normal active and healthy life. Data showing as 2.5 may signify a prevalence of undernourishment below 2.5%.
+
+          Limitations and exceptions: From a policy and program standpoint, this measure has its limits. First, food insecurity exists even where food availability is not a problem because of inadequate access of poor households to food. Second, food insecurity is an individual or household phenomenon, and the average food available to each person, even corrected for possible effects of low income, is not a good predictor of food insecurity among the population. And third, nutrition security is determined not only by food security but also by the quality of care of mothers and children and the quality of the household's health environment (Smith and Haddad 2000).
+
+          Statistical concept and methodology: Data on undernourishment are from the Food and Agriculture Organization (FAO) of the United Nations and measure food deprivation based on average food available for human consumption per person, the level of inequality in access to food, and the minimum calories required for an average person.
+        display:
+          numDecimalPlaces: 1
+        presentation:
+          title_public: Share of the population that is undernourished
+          attribution: Food and Agriculture Organization of the United Nations (via World Bank)
+          attribution_short: World Bank
+          topic_tags:
+            - Hunger & Undernourishment
+        processing_level: minor
+
+      ne_trd_gnfs_zs:
+        title: Trade (% of GDP)
+        unit: '% of GDP'
+        short_unit: '%'
+        description_short: |-
+          Trade in goods and services as a share of GDP, shown as a percentage.
+        description_key:
+          - This indicator measures a country’s total trade (exports and imports) relative to the size of its economy.
+          - Exports of goods and services represent the value of all goods and other market services provided to the rest of the world. Imports represent the value of all goods and other market services received from the rest of the world. In both cases, they include the value of merchandise, freight, insurance, transport, travel, royalties, license fees, and other services, such as communication, construction, financial, information, business, personal, and government services.
+
+      eg_elc_accs_zs_without:
+        title:  Access to electricity (% of population with no access)
+        unit: '% of population'
+        short_unit: '%'
+        description_short: *description_short_electricity
+        description_processing: We calculated the share of the population without access to electricity by subtracting the share of the population with access from 100%.
+        presentation:
+          title_public: Share of the population with no access to electricity
+          attribution: Data compiled from multiple sources by World Bank
+          attribution_short: World Bank
+          topic_tags:
+            - Access to Energy
+            - Energy
+        processing_level: major
+
+      eg_cft_accs_zs_without:
+        title: Access to clean fuels and technologies for cooking (% of population with no access)
+        unit: '% of population'
+        short_unit: '%'
+        description_short: *description_short_clean_fuels
+        description_from_producer: *description_from_producer_clean_fuels
+        description_processing: We calculated the share of the population without access to clean fuels and technologies for cooking by subtracting the share of the population with access from 100%.
+        presentation:
+          title_public: Share of the population with no access to clean fuels for cooking
+          attribution: World Health Organization (via World Bank)
+          attribution_short: World Bank
+          topic_tags:
+            - Access to Energy
+            - Energy
+        processing_level: major
+
+      eg_elc_accs_zs_number:
+        title: Access to electricity (number of people with access)
+        unit: 'people'
+        short_unit: ''
+        description_short: *description_short_electricity
+        description_processing: We calculated the number of people with access to electricity by multiplying the fraction of the population with access by the total population.
+        presentation:
+          title_public: Number of people with access to electricity
+          attribution: Data compiled from multiple sources by World Bank
+          attribution_short: World Bank
+          topic_tags:
+            - Access to Energy
+            - Energy
+        processing_level: major
+
+      eg_elc_accs_zs_without_number:
+        title: Access to electricity (number of people without access)
+        unit: 'people'
+        short_unit: ''
+        description_short: *description_short_electricity
+        description_processing: We calculated the number of people without access to electricity by multiplying the fraction of the population without access by the total population.
+        presentation:
+          title_public: Number of people without access to electricity
+          attribution: Data compiled from multiple sources by World Bank
+          attribution_short: World Bank
+          topic_tags:
+            - Access to Energy
+            - Energy
+        processing_level: major
+
+      eg_cft_accs_zs_number:
+        title: Access to clean fuels and technologies for cooking (number of people with access)
+        unit: 'people'
+        short_unit: ''
+        description_short: *description_short_clean_fuels
+        description_from_producer: *description_from_producer_clean_fuels
+        description_processing: We calculated the number of people with access to clean fuels and technologies for cooking by multiplying the fraction of the population with access by the total population.
+        presentation:
+          title_public: Number of people with access to clean fuels for cooking
+          attribution: World Health Organization (via World Bank)
+          attribution_short: World Bank
+          topic_tags:
+            - Access to Energy
+            - Energy
+        processing_level: major
+
+      eg_cft_accs_zs_without_number:
+        title: Access to clean fuels and technologies for cooking (number of people without access)
+        unit: 'people'
+        short_unit: ''
+        description_short: *description_short_clean_fuels
+        description_from_producer: *description_from_producer_clean_fuels
+        description_processing: We calculated the number of people without access to clean fuels and technologies for cooking by multiplying the fraction of the population without access by the total population.
+        presentation:
+          title_public: Number of people without access to clean fuels for cooking
+          attribution: World Health Organization (via World Bank)
+          attribution_short: World Bank
+          topic_tags:
+            - Access to Energy
+            - Energy
+        processing_level: major
+
+      patents_per_million_people:
+        title: Patent applications per million people
+        description_key:
+          - Patent applications per million people are calculated by Our World in Data based on patent data from the World Bank's World Development Indicators, and population estimates from the United Nations World Population Prospects.
+          - Patents are assigned based on the residence country of the first-named applicant.
+        description_from_producer: |-
+          Patent applications are worldwide patent applications filed through the Patent Cooperation Treaty procedure or with a national patent office for exclusive rights for an invention--a product or process that provides a new way of doing something or offers a new technical solution to a problem. A patent provides protection for the invention to the owner of the patent for a limited period, generally 20 years.
+
+          Resident patent applications are those for which the first-named applicant or assignee is a resident of the State or region concerned. In the case of regional offices such as the European Patent Office, a resident is an applicant from any of the member States of the regional patent convention. Patent data cover applications and grants classified by field of technology. International applications series distinguish four subcategories: a) patents taken out by residents of a country in that country; b) patents taken out in a country by non-residents of that country; c) total patents registered in the country or naming it; d) patents taken out outside a country by its residents. Data on patents granted only distinguish between patents awarded to residents and to non-residents. A patent provides protection for the invention to the owner of the patent for a limited period, generally 20 years. Patent applications are worldwide patent applications filed through the Patent Cooperation Treaty procedure or with a national patent office for exclusive rights for an invention - a product or process that provides a new way of doing something or offers a new technical solution to a problem.
+        short_unit: ""
+        unit: applications per million people
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          topic_tags:
+            - Research & Development
+
+      articles_per_million_people:
+        title: Scientific and technical journal articles per million people
+        description_short: Scientific and technical journal articles per million people. Disciplines include physics, biology, chemistry, mathematics, clinical medicine, biomedical research, engineering and technology, and earth and space sciences.
+        description_key:
+          - Scientific and technical journal articles per million people are calculated by Our World in Data based on article data from the World Bank's World Development Indicators, and population estimates from the United Nations World Population Prospects.
+          - Patents are assigned based on the residence country of the first-named applicant.
+        description_from_producer: |-
+          Scientific and technical journal articles refer to the number of scientific and engineering articles published in the following fields: physics, biology, chemistry, mathematics, clinical medicine, biomedical research, engineering and technology, and earth and space sciences.
+
+          The number of scientific and engineering articles published in the following fields: physics, biology, chemistry, mathematics, clinical medicine, biomedical research, engineering and technology, and earth and space sciences. The NSF considers article counts from a set of journals covered by Science Citation Index (SCI) and Social Sciences Citation Index (SSCI).
+        short_unit: ""
+        unit: articles per million people
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          topic_tags:
+            - Research & Development
+
+      se_pre_enrr:
+        title: Gross enrolment in pre-primary education
+        short_unit: '%'
+        unit: '%'
+        description_short:  Number of children of any age group who are enrolled in [pre-primary education](#dod:pre-primary-education), expressed as a percentage of the total population of the official pre-primary school age.
+        description_key: *desc_key_ger
+        presentation:
+          title_public: Gross enrolment in pre-primary education
+          grapher_config: *grapher_config_enrolment_pubugn
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name: Pre-primary education
+
+      se_pre_enrr_fe:
+        title: Gross enrolment in pre-primary education among girls
+        short_unit: '%'
+        unit: '%'
+        description_short: Number of girls of any age group who are enrolled in [pre-primary education](#dod:pre-primary-education), expressed as a percentage of the total population of girls of the official pre-primary school age.
+        description_key: *desc_key_ger
+        presentation:
+          title_public: Gross enrolment rate in pre-primary education among girls
+          grapher_config: *grapher_config_enrolment_pubugn
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name: Girls
+
+      se_pre_enrr_ma:
+        title:  Gross enrolment in pre-primary education among boys
+        short_unit: '%'
+        unit: '%'
+        description_short: Number of boys of any age group who are enrolled in [pre-primary education](#dod:pre-primary-education), expressed as a percentage of the total population of boys of the official pre-primary school age.
+        description_key: *desc_key_ger
+        presentation:
+          title_public: Gross enrolment rate in pre-primary education among boys
+          grapher_config: *grapher_config_enrolment_pubugn
+
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name: Boys
+
+      ####################################################################################################
+      # Trained Teachers Indicators
+      ####################################################################################################
+
+      se_pre_tcaq_zs:
+        title: Trained teachers in pre-primary education (% of total teachers)
+        unit: '% of teachers'
+        short_unit: '%'
+        description_short: Share of teachers in [pre-primary education](#dod:pre-primary-education) who have received at least the minimum organized pedagogical training required for teaching at that level, shown as a percentage of all teachers.
+        description_key: *desc_key_trained_teachers
+        presentation:
+          title_public: Share of trained teachers in pre-primary education
+          topic_tags:
+            - Global Education
+          grapher_config: *trained_teachers_grapher_config
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name: Pre-primary
+
+      se_prm_tcaq_zs:
+        title: Trained teachers in primary education (% of total teachers)
+        unit: '% of teachers'
+        short_unit: '%'
+        description_short: Share of teachers in [primary education](#dod:primary-education) who have received at least the minimum organized pedagogical training required for teaching at that level, shown as a percentage of all teachers.
+        description_key: *desc_key_trained_teachers
+        presentation:
+          title_public: Share of trained teachers in primary education
+          topic_tags:
+            - Global Education
+          grapher_config: *trained_teachers_grapher_config
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name: Primary
+
+      se_sec_tcaq_lo_zs:
+        title: Trained teachers in lower secondary education (% of total teachers)
+        unit: '% of teachers'
+        short_unit: '%'
+        description_short: Share of teachers in [lower secondary education](#dod:lower-secondary-education) who have received at least the minimum organized pedagogical training required for teaching at that level, shown as a percentage of all teachers.
+        description_key: *desc_key_trained_teachers
+        presentation:
+          title_public: Share of trained teachers in lower secondary education
+          topic_tags:
+            - Global Education
+          grapher_config: *trained_teachers_grapher_config
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name: Lower secondary
+
+      se_sec_tcaq_up_zs:
+        title: Trained teachers in upper secondary education (% of total teachers)
+        unit: '% of teachers'
+        short_unit: '%'
+        description_short: Share of teachers in [upper secondary education](#dod:upper-secondary-education) who have received at least the minimum organized pedagogical training required for teaching at that level, shown as a percentage of all teachers.
+        description_key: *desc_key_trained_teachers
+        presentation:
+          title_public: Share of trained teachers in upper secondary education
+          topic_tags:
+            - Global Education
+          grapher_config: *trained_teachers_grapher_config
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name: Upper secondary
+
+      #####################################################################################################
+      # ILOSTAT indicators
+      #####################################################################################################
+
+      sl_tlf_cact_zs:
+        title: Labor force participation rate, total (% of total population ages 15+) (modeled ILO estimate)
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          <%- set sex = "" %>
+          <%- set age = "(ages 15 and over) " %>
+          {definitions.description_short_labor_force_participation_rate}
+        description_key:
+          - "{definitions.description_key_labor_force_participation_1}"
+          - "{definitions.description_key_labor_force_participation_2}"
+          - "{definitions.description_key_working_age_ilo_modeled}"
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+          grapher_config:
+            title: Labor force participation rate
+            note: |-
+              {definitions.note_iloest_modelled_data} {definitions.note_icls_13}
+            variantName: "{definitions.variant_name_iloest_modelled_data}"
+        display:
+          name: Labor force participation rate
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      sl_tlf_cact_ma_zs:
+        title: Labor force participation rate, male (% of male population ages 15+) (modeled ILO estimate)
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          <%- set sex = "male " %>
+          <%- set age = "(ages 15 and over) " %>
+          {definitions.description_short_labor_force_participation_rate}
+        description_key:
+          - "{definitions.description_key_labor_force_participation_1}"
+          - "{definitions.description_key_labor_force_participation_2}"
+          - "{definitions.description_key_working_age_ilo_modeled}"
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+          grapher_config:
+            title: Male labor force participation rate
+            note: |-
+              {definitions.note_iloest_modelled_data} {definitions.note_icls_13}
+            variantName: "{definitions.variant_name_iloest_modelled_data}"
+        display:
+          name: Male labor force participation rate
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      sl_tlf_cact_fe_zs:
+        title: Labor force participation rate, female (% of female population ages 15+) (modeled ILO estimate)
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          <%- set sex = "female " %>
+          <%- set age = "(ages 15 and over) " %>
+          {definitions.description_short_labor_force_participation_rate}
+        description_key:
+          - "{definitions.description_key_labor_force_participation_1}"
+          - "{definitions.description_key_labor_force_participation_2}"
+          - "{definitions.description_key_working_age_ilo_modeled}"
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+          grapher_config:
+            title: Female labor force participation rate
+            note: |-
+              {definitions.note_iloest_modelled_data} {definitions.note_icls_13}
+            variantName: "{definitions.variant_name_iloest_modelled_data}"
+        display:
+          name: Female labor force participation rate
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      sl_tlf_cact_ne_zs:
+        title: Labor force participation rate, total (% of total population ages 15+) (national estimate)
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          <%- set sex = "" %>
+          <%- set age = "" %>
+          {definitions.description_short_labor_force_participation_rate} {definitions.note_national_estimates}
+        description_key:
+          - "{definitions.description_key_labor_force_participation_1}"
+          - "{definitions.description_key_labor_force_participation_2}"
+          - "{definitions.description_key_working_age_ilo_national}"
+          - "{definitions.description_key_national_estimates}"
+          - "{definitions.description_key_13th_icls}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+          grapher_config:
+            title: Labor force participation rate
+            note: |-
+              {definitions.note_icls_13}
+            variantName: "{definitions.variant_name_national_estimates}"
+        display:
+          name: Labor force participation rate
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      sl_tlf_cact_ma_ne_zs:
+        title: Labor force participation rate, male (% of male population ages 15+) (national estimate)
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          <%- set sex = "male " %>
+          <%- set age = "" %>
+          {definitions.description_short_labor_force_participation_rate} {definitions.note_national_estimates}
+        description_key:
+          - "{definitions.description_key_labor_force_participation_1}"
+          - "{definitions.description_key_labor_force_participation_2}"
+          - "{definitions.description_key_working_age_ilo_national}"
+          - "{definitions.description_key_national_estimates}"
+          - "{definitions.description_key_13th_icls}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+          grapher_config:
+            title: Male labor force participation rate
+            note: |-
+              {definitions.note_icls_13}
+            variantName: "{definitions.variant_name_national_estimates}"
+        display:
+          name: Male labor force participation rate
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      sl_tlf_cact_fe_ne_zs:
+        title: Labor force participation rate, female (% of female population ages 15+) (national estimate)
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          <%- set sex = "female " %>
+          <%- set age = "" %>
+          {definitions.description_short_labor_force_participation_rate} {definitions.note_national_estimates}
+        description_key:
+          - "{definitions.description_key_labor_force_participation_1}"
+          - "{definitions.description_key_labor_force_participation_2}"
+          - "{definitions.description_key_working_age_ilo_national}"
+          - "{definitions.description_key_national_estimates}"
+          - "{definitions.description_key_13th_icls}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+          grapher_config:
+            title: Female labor force participation rate
+            note: |-
+              {definitions.note_icls_13}
+            variantName: "{definitions.variant_name_national_estimates}"
+        display:
+          name: Female labor force participation rate
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      sl_tlf_acti_1524_fe_ne_zs:
+        title: Labor force participation rate for ages 15-24, female (%) (national estimate)
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          <%- set sex = "female " %>
+          <%- set age = "aged 15-24 " %>
+          {definitions.description_short_labor_force_participation_rate} {definitions.note_national_estimates}
+        description_key:
+          - "{definitions.description_key_labor_force_participation_1}"
+          - "{definitions.description_key_labor_force_participation_2}"
+          - "{definitions.description_key_national_estimates}"
+          - "{definitions.description_key_13th_icls}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+          grapher_config:
+            title: Youth female labor force participation rate
+            note: |-
+              {definitions.note_icls_13}
+            variantName: "{definitions.variant_name_national_estimates}"
+        display:
+          name: Female labor force participation rate, ages 15-24
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      sl_uem_totl_zs:
+        title: Unemployment, total (% of total labor force) (modeled ILO estimate)
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          <%- set sex = "" %>
+          <%- set age = "" %>
+          {definitions.description_short_unemployment_rate}
+        description_key:
+          - "{definitions.description_key_unemployment}"
+          - "{definitions.description_key_working_age_ilo_modeled}"
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+          grapher_config:
+            title: Unemployment rate
+            note: |-
+              {definitions.note_iloest_modelled_data} {definitions.note_icls_13}
+            variantName: "{definitions.variant_name_iloest_modelled_data}"
+        display:
+          name: Unemployment rate
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      sl_uem_totl_ma_zs:
+        title: Unemployment, male (% of male labor force) (modeled ILO estimate)
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          <%- set sex = "male " %>
+          <%- set age = "" %>
+          {definitions.description_short_unemployment_rate}
+        description_key:
+          - "{definitions.description_key_unemployment}"
+          - "{definitions.description_key_working_age_ilo_modeled}"
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+          grapher_config:
+            title: Male unemployment rate
+            note: |-
+              {definitions.note_iloest_modelled_data} {definitions.note_icls_13}
+            variantName: "{definitions.variant_name_iloest_modelled_data}"
+        display:
+          name: Male unemployment rate
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      sl_uem_totl_fe_zs:
+        title: Unemployment, female (% of female labor force) (modeled ILO estimate)
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          <%- set sex = "female " %>
+          <%- set age = "" %>
+          {definitions.description_short_unemployment_rate}
+        description_key:
+          - "{definitions.description_key_unemployment}"
+          - "{definitions.description_key_working_age_ilo_modeled}"
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+          grapher_config:
+            title: Female unemployment rate
+            note: |-
+              {definitions.note_iloest_modelled_data} {definitions.note_icls_13}
+            variantName: "{definitions.variant_name_iloest_modelled_data}"
+        display:
+          name: Female unemployment rate
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      sl_uem_1524_zs:
+        title: Unemployment, youth total (% of total labor force ages 15-24) (modeled ILO estimate)
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          <%- set sex = "" %>
+          <%- set age = "aged 15-24 " %>
+          {definitions.description_short_unemployment_rate}
+        description_key:
+          - "{definitions.description_key_unemployment}"
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+          grapher_config:
+            title: Youth unemployment rate
+            note: |-
+              {definitions.note_iloest_modelled_data} {definitions.note_icls_13}
+            variantName: "{definitions.variant_name_iloest_modelled_data}"
+        display:
+          name: Unemployment rate, ages 15-24
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      sl_uem_totl_ne_zs:
+        title: Unemployment, total (% of total labor force) (national estimate)
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          <%- set sex = "" %>
+          <%- set age = "" %>
+          {definitions.description_short_unemployment_rate} {definitions.note_national_estimates}
+        description_key:
+          - "{definitions.description_key_unemployment}"
+          - "{definitions.description_key_working_age_ilo_national}"
+          - "{definitions.description_key_national_estimates}"
+          - "{definitions.description_key_13th_icls}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+          grapher_config:
+            title: Unemployment rate
+            note: |-
+              {definitions.note_icls_13}
+            variantName: "{definitions.variant_name_national_estimates}"
+        display:
+          name: Unemployment rate
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      sl_emp_totl_sp_zs:
+        title: Employment to population ratio, 15+, total (%) (modeled ILO estimate)
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          <%- set sex = "" %>
+          <%- set age = "(ages 15 and older) " %>
+          {definitions.description_short_employment_to_population_ratio}
+        description_key:
+          - "{definitions.employment_for_employment_to_population_ratio}"
+          - "{definitions.description_key_working_age_ilo_modeled_employment}"
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+          grapher_config:
+            title: Employment-to-population ratio
+            note: |-
+              {definitions.note_iloest_modelled_data} {definitions.note_icls_13}
+            variantName: "{definitions.variant_name_iloest_modelled_data}"
+        display:
+          name: Employment-to-population ratio
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      sl_emp_totl_sp_ma_zs:
+        title: Employment to population ratio, 15+, male (%) (modeled ILO estimate)
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          <%- set sex = "male " %>
+          <%- set age = "(ages 15 and older) " %>
+          {definitions.description_short_employment_to_population_ratio}
+        description_key:
+          - "{definitions.employment_for_employment_to_population_ratio}"
+          - "{definitions.description_key_working_age_ilo_modeled_employment}"
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+          grapher_config:
+            title: Male employment-to-population ratio
+            note: |-
+              {definitions.note_iloest_modelled_data} {definitions.note_icls_13}
+            variantName: "{definitions.variant_name_iloest_modelled_data}"
+        display:
+          name: Male employment-to-population ratio
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      sl_emp_totl_sp_fe_zs:
+        title: Employment to population ratio, 15+, female (%) (modeled ILO estimate)
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          <%- set sex = "female " %>
+          <%- set age = "(ages 15 and older) " %>
+          {definitions.description_short_employment_to_population_ratio}
+        description_key:
+          - "{definitions.employment_for_employment_to_population_ratio}"
+          - "{definitions.description_key_working_age_ilo_modeled_employment}"
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+          grapher_config:
+            title: Female employment-to-population ratio
+            note: |-
+              {definitions.note_iloest_modelled_data} {definitions.note_icls_13}
+            variantName: "{definitions.variant_name_iloest_modelled_data}"
+        display:
+          name: Female employment-to-population ratio
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      sl_emp_totl_sp_ne_zs:
+        title: Employment to population ratio, 15+, total (%) (national estimate)
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          <%- set sex = "" %>
+          <%- set age = "" %>
+          {definitions.description_short_employment_to_population_ratio} {definitions.note_national_estimates}
+        description_key:
+          - "{definitions.employment_for_employment_to_population_ratio}"
+          - "{definitions.description_key_working_age_ilo_national}"
+          - "{definitions.description_key_national_estimates}"
+          - "{definitions.description_key_13th_icls}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+          grapher_config:
+            title: Employment-to-population ratio
+            note: |-
+              {definitions.note_icls_13}
+            variantName: "{definitions.variant_name_national_estimates}"
+        display:
+          name: Employment-to-population ratio
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      sl_emp_totl_sp_fe_ne_zs:
+        title: Employment to population ratio, 15+, female (%) (national estimate)
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          <%- set sex = "female " %>
+          <%- set age = "" %>
+          {definitions.description_short_employment_to_population_ratio} {definitions.note_national_estimates}
+        description_key:
+          - "{definitions.employment_for_employment_to_population_ratio}"
+          - "{definitions.description_key_working_age_ilo_national}"
+          - "{definitions.description_key_national_estimates}"
+          - "{definitions.description_key_13th_icls}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+          grapher_config:
+            title: Female employment-to-population ratio
+            note: |-
+              {definitions.note_icls_13}
+            variantName: "{definitions.variant_name_national_estimates}"
+        display:
+          name: Female employment-to-population ratio
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      sl_emp_vuln_zs:
+        title: Vulnerable employment, total (% of total employment) (modeled ILO estimate)
+        unit: "%"
+        short_unit: "%"
+        description_short: "{definitions.description_short_vulnerable_employment}"
+        description_key:
+          - "{definitions.description_key_vulnerable_employment_1}"
+          - "{definitions.description_key_vulnerable_employment_2}"
+          - "{definitions.description_key_vulnerable_employment_3}"
+          - "{definitions.description_key_working_age_ilo_modeled_employment}"
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+          grapher_config:
+            title: Share of workers in vulnerable employment
+            note: |-
+              {definitions.note_iloest_modelled_data} {definitions.note_icse_93} {definitions.note_icls_13}
+            variantName: "{definitions.variant_name_iloest_modelled_data}"
+        display:
+          name: Share in vulnerable employment
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      sl_tlf_totl_fe_zs:
+        title: Labor force, female (% of total labor force)
+        unit: "%"
+        short_unit: "%"
+        description_short: "{definitions.description_short_labor_force_female}"
+        description_key:
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+        display:
+          name: Share of the labor force that is female
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      sl_tlf_0714_zs:
+        title: Children in employment, total (% of children ages 7-14)
+        unit: "%"
+        short_unit: "%"
+        description_short: "{definitions.description_short_children_in_employment}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+        display:
+          name: Children in employment
+          numDecimalPlaces: 1
+          tolerance: 5
+      sl_tlf_0714_ma_zs:
+        title: Children in employment, male (% of male children ages 7-14)
+        unit: "%"
+        short_unit: "%"
+        description_short: "{definitions.description_short_children_in_employment}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+        display:
+          name: Boys in employment
+          numDecimalPlaces: 1
+          tolerance: 5
+      sl_tlf_0714_fe_zs:
+        title: Children in employment, female (% of female children ages 7-14)
+        unit: "%"
+        short_unit: "%"
+        description_short: "{definitions.description_short_children_in_employment}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+        display:
+          name: Girls in employment
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      sl_tlf_0714_wk_zs:
+        title: Children in employment, work only (% of children in employment, ages 7-14)
+        unit: "%"
+        short_unit: "%"
+        description_short: "{definitions.description_short_children_in_employment_work_only}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+        display:
+          name: Children in employment, work only
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      sl_tlf_0714_sw_tm:
+        title: Average working hours of children, study and work, ages 7-14 (hours per week)
+        unit: "hours per week"
+        short_unit: ""
+        description_short: "{definitions.description_short_average_working_hours_of_children}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+        display:
+          name: Average working hours of children, study and work
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      sl_agr_empl_zs:
+        title: Employment in agriculture (% of total employment) (modeled ILO estimate)
+        unit: "%"
+        short_unit: "%"
+        description_short: "{definitions.description_short_employment_agriculture}"
+        description_key:
+          - "{definitions.employment}"
+          - "{definitions.description_key_employment_agriculture}"
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+        display:
+          name: Employment in agriculture
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      sl_ind_empl_zs:
+        title: Employment in industry (% of total employment) (modeled ILO estimate)
+        unit: "%"
+        short_unit: "%"
+        description_short: "{definitions.description_short_employment_industry}"
+        description_key:
+          - "{definitions.employment}"
+          - "{definitions.description_key_employment_industry}"
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+        display:
+          name: Employment in industry
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      sl_srv_empl_zs:
+        title: Employment in services (% of total employment) (modeled ILO estimate)
+        unit: "%"
+        short_unit: "%"
+        description_short: "{definitions.description_short_employment_services}"
+        description_key:
+          - "{definitions.employment}"
+          - "{definitions.description_key_employment_services}"
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+        display:
+          name: Employment in services
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      sl_agr_empl_ma_zs:
+        title: Employment in agriculture, male (% of male employment) (modeled ILO estimate)
+        unit: "%"
+        short_unit: "%"
+        description_short: "{definitions.description_short_employment_agriculture}"
+        description_key:
+          - "{definitions.employment}"
+          - "{definitions.description_key_employment_agriculture}"
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+        display:
+          name: Male employment in agriculture
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      sl_ind_empl_ma_zs:
+        title: Employment in industry, male (% of male employment) (modeled ILO estimate)
+        unit: "%"
+        short_unit: "%"
+        description_short: "{definitions.description_short_employment_industry}"
+        description_key:
+          - "{definitions.employment}"
+          - "{definitions.description_key_employment_industry}"
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+        display:
+          name: Male employment in industry
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      sl_srv_empl_ma_zs:
+        title: Employment in services, male (% of male employment) (modeled ILO estimate)
+        unit: "%"
+        short_unit: "%"
+        description_short: "{definitions.description_short_employment_services}"
+        description_key:
+          - "{definitions.employment}"
+          - "{definitions.description_key_employment_services}"
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+        display:
+          name: Male employment in services
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      sl_agr_empl_fe_zs:
+        title: Employment in agriculture, female (% of female employment) (modeled ILO estimate)
+        unit: "%"
+        short_unit: "%"
+        description_short: "{definitions.description_short_employment_agriculture}"
+        description_key:
+          - "{definitions.employment}"
+          - "{definitions.description_key_employment_agriculture}"
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+        display:
+          name: Female employment in agriculture
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      sl_ind_empl_fe_zs:
+        title: Employment in industry, female (% of female employment) (modeled ILO estimate)
+        unit: "%"
+        short_unit: "%"
+        description_short: "{definitions.description_short_employment_industry}"
+        description_key:
+          - "{definitions.employment}"
+          - "{definitions.description_key_employment_industry}"
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+        display:
+          name: Female employment in industry
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      sl_srv_empl_fe_zs:
+        title: Employment in services, female (% of female employment) (modeled ILO estimate)
+        unit: "%"
+        short_unit: "%"
+        description_short: "{definitions.description_short_employment_services}"
+        description_key:
+          - "{definitions.employment}"
+          - "{definitions.description_key_employment_services}"
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+        display:
+          name: Female employment in services
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      sl_tlf_cact_fm_zs:
+        title: Ratio of female to male labor force participation rate (%) (modeled ILO estimate)
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          <%- set age = "(ages 15 and over) " %>
+          {definitions.description_short_ratio_female_male_labor_force_participation_rate}
+        description_key:
+          - "{definitions.description_key_iloest_modelled_data}"
+          - "{definitions.description_key_13th_icls}"
+        presentation:
+          attribution_short: ILO
+          topic_tags:
+            - Work & Employment
+          grapher_config:
+            title: Ratio of female to male labor force participation rates
+            note: |-
+              {definitions.note_iloest_modelled_data} {definitions.note_icls_13}
+        display:
+          name: Ratio of female to male labor force participation rate
+          numDecimalPlaces: 1
+          tolerance: 5
