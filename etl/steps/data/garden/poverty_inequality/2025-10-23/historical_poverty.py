@@ -124,7 +124,13 @@ def run() -> None:
     tb_extended = extrapolate_backwards(tb_thousand_bins=tb_thousand_bins, tb_gdp=tb_gdp)
 
     # Calculate poverty measures
-    tb, tb_population = calculate_poverty_measures(tb=tb_extended)
+    tb = calculate_poverty_measures(tb=tb_extended)
+
+    # Create stacked variables for stacked area/bar charts
+    tb = create_stacked_variables(tb=tb)
+
+    # Calculate an alternative method with our population dataset
+    tb, tb_population = calculate_alternative_method_with_population_dataset(tb_poverty=tb)
 
     tb = tb.format(["country", "year", "poverty_line"], short_name="historical_poverty")
     tb_population = tb_population.format(["country", "year"], short_name="population")
@@ -411,10 +417,14 @@ def extrapolate_backwards(tb_thousand_bins: Table, tb_gdp: Table) -> Table:
     tb_thousand_bins_to_extrapolate["pop"] /= 1000
 
     # Sanity check.
-    error = "Unexpected countries missing population data"
-    assert set(tb_thousand_bins_to_extrapolate[tb_thousand_bins_to_extrapolate["pop"].isna()]["country"]) == set(
-        COUNTRIES_WITHOUT_POPULATION
-    ), error
+
+    set_countries_missing_pop = set(
+        tb_thousand_bins_to_extrapolate[tb_thousand_bins_to_extrapolate["pop"].isna()]["country"]
+    )
+    error = (
+        f"Unexpected countries missing population data: {set_countries_missing_pop - set(COUNTRIES_WITHOUT_POPULATION)}"
+    )
+    assert set_countries_missing_pop == set(COUNTRIES_WITHOUT_POPULATION), error
 
     # Drop cumulative_growth_factor column, as it's no longer needed
     tb_thousand_bins_to_extrapolate = tb_thousand_bins_to_extrapolate.drop(columns=["cumulative_growth_factor"])
@@ -564,42 +574,7 @@ def calculate_poverty_measures(tb: Table) -> Tuple[Table, Table]:
     # Add country column
     tb_poverty["country"] = "World"
 
-    # TODO: I think it could possibly be better to stop the function here. Then, inside run, you add stacked variables, and then create the population table as a sanity check (if that's the intended purpose).
-
-    # Create stacked variables for stacked area/bar charts
-    tb_poverty = create_stacked_variables(tb=tb_poverty)
-
-    # Calculate an alternative method with our population dataset
-    # First, add population_omm column, the population of the world from Our World in Data
-    tb_poverty = paths.regions.add_population(
-        tb=tb_poverty,
-        population_col="population_omm",
-        warn_on_missing_countries=True,
-        interpolate_missing_population=True,
-    )
-
-    # Calculate headcount_ratio_omm
-    tb_poverty["headcount_ratio_omm"] = tb_poverty["headcount"] / tb_poverty["population_omm"] * 100
-
-    # Create a different table to keep population estimates
-    tb_population = tb_poverty[["country", "year", "poverty_line", "population", "population_omm"]].reset_index(
-        drop=True
-    )
-
-    # Select first poverty line in POVERTY_LINES to avoid duplicates
-    tb_population = tb_population[tb_population["poverty_line"] == str(POVERTY_LINES[0])].reset_index(drop=True)
-
-    # Drop poverty_line column
-    tb_population = tb_population.drop(columns=["poverty_line"])
-
-    # Add population differences columns
-    tb_population["population_diff"] = tb_population["population_omm"] - tb_population["population"]
-    tb_population["population_diff_pct"] = tb_population["population_diff"] / tb_population["population_omm"] * 100
-
-    # Drop population columns from tb_poverty
-    tb_poverty = tb_poverty.drop(columns=["population", "population_omm"])
-
-    return tb_poverty, tb_population
+    return tb_poverty
 
 
 def select_growth_factor(row):
@@ -680,3 +655,39 @@ def create_stacked_variables(tb: Table) -> Table:
     tb["headcount_ratio_between"] = tb["headcount_ratio_between"].copy_metadata(tb["headcount_ratio"])
 
     return tb
+
+
+def calculate_alternative_method_with_population_dataset(tb_poverty: Table) -> Tuple[Table, Table]:
+    """
+    Calculate an alternative method with our population dataset, to compare results in Grapher. It calculates headcount_ratio_omm using population_omm from Our World in Data and also saves a population table with population differences.
+    """
+    # First, add population_omm column, the population of the world from Our World in Data
+    tb_poverty = paths.regions.add_population(
+        tb=tb_poverty,
+        population_col="population_omm",
+        warn_on_missing_countries=True,
+        interpolate_missing_population=True,
+    )
+
+    # Calculate headcount_ratio_omm
+    tb_poverty["headcount_ratio_omm"] = tb_poverty["headcount"] / tb_poverty["population_omm"] * 100
+
+    # Create a different table to keep population estimates
+    tb_population = tb_poverty[["country", "year", "poverty_line", "population", "population_omm"]].reset_index(
+        drop=True
+    )
+
+    # Select first poverty line in POVERTY_LINES to avoid duplicates
+    tb_population = tb_population[tb_population["poverty_line"] == str(POVERTY_LINES[0])].reset_index(drop=True)
+
+    # Drop poverty_line column
+    tb_population = tb_population.drop(columns=["poverty_line"])
+
+    # Add population differences columns
+    tb_population["population_diff"] = tb_population["population_omm"] - tb_population["population"]
+    tb_population["population_diff_pct"] = tb_population["population_diff"] / tb_population["population_omm"] * 100
+
+    # Drop population columns from tb_poverty
+    tb_poverty = tb_poverty.drop(columns=["population", "population_omm"])
+
+    return tb_poverty, tb_population
