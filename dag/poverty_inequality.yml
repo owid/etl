@@ -162,9 +162,9 @@ steps:
     - data://meadow/wb/2025-11-10/poverty_projections
   data://grapher/wb/2025-11-10/poverty_projections:
     - data://garden/wb/2025-11-10/poverty_projections
-  
+
   #
-  # TODO: add step name (just something recognizable)
+  # Historical inequality estimates from van Zanden et al. (2014)
   #
   data://meadow/poverty_inequality/2025-11-11/historical_inequality_van_zanden_et_al:
     - snapshot://poverty_inequality/2025-11-11/historical_inequality_van_zanden_et_al.xlsx
