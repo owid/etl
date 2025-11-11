@@ -1,0 +1,29 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Historical inequality (van Zanden et al. (2014)"
+    description: |-
+      A new dataset for charting the development of global inequality between 1820 and 2000 is presented, based on a large variety of sources and methods for estimating (gross household) income inequality. On this basis we estimate the evolution of global income inequality over the past two centuries. Two sets of benchmarks about between-country inequality (the Maddison 1990 benchmark and the recent 2005 ICP round) are taken into account. We find that between 1820 and 1950, increasing per capita income is combined with increasing global inequality. After 1950, global inequality as measured by the Gini coefficient or the Theil index remains more or less constant. It also appears that the global income distribution was uni-modal in the nineteenth century, became increasingly bi-modal between 1910 and 1970 with two world wars, a depression and de-globalization, and was suddenly transformed back into a uni-modal distribution between 1980 and 2000.
+    date_published: "2014-06-15"
+
+    # Citation
+    producer: van Zanden et al. (2014)
+    citation_full: |-
+      van Zanden, J.L, Baten, J., Foldvari, P., and van Leeuwen, B. (2014). The Changing Shape of Global Inequality 1820–2000; Exploring a New Dataset. Review of Income and Wealth 60 (2): 279–97.
+    attribution_short: van Zanden et al.
+
+    # Files
+    url_main: https://onlinelibrary.wiley.com/doi/abs/10.1111/roiw.12014
+    url_download: https://clio-infra.eu/data/IncomeInequality_Broad.xlsx
+    date_accessed: '2025-11-11'
+
+    # License
+    license:
+      name: CC0
+      url: https://datasets.iisg.amsterdam/dataset.xhtml?persistentId=hdl:10622/6OHMDS
+outs:
+  - md5: 9c66f9a6d7728c6351665c6a4dc0a987
+    size: 264821
+    path: historical_inequality_van_zanden_et_al.xlsx
