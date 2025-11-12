@@ -177,6 +177,50 @@ tables:
         presentation:
           grapher_config:
             note: This indicator includes various forms of advertising such as TV, radio, print media and billboard ads, sponsorships, product placements and promotional discounts.
+        # The following description from producer had several typos and formatting issues:
+        description_from_producer: |
+          #### Rationale
+          In 2008, WHO introduced the MPOWER package to assist in the country-level implementation of six effective measures to reduce demand for tobacco products. Each measure reflects at least one provision of the WHO Framework Convention on Tobacco Control. The letter E in MPOWER denotes the "Enforce bans on tobacco advertising" measure. Tobacco advertising, promotion and sponsorship can make smoking more socially acceptable, impede efforts to educate people about the hazards of tobacco use, and strengthen the tobacco industry's influence over media, sporting and entertainment businesses. WHO Framework Convention on Tobacco Control, Article 13 (Tobacco advertising, promotion and sponsorship) calls for comprehensive bans on tobacco advertising, promotion and sponsorship in accordance with each country's constitutional principles. This indicator measures the implementation status of the E measure.
+
+          #### Definition
+          A country's legislation is assessed to determine whether all or any forms of tobacco advertising, promotion and sponsorship are banned. The groupings for this indicator are:
+
+          1 = Data not reported;
+
+          2 = Complete absence of ban, or ban that does not cover national television (TV), radio and print media;
+
+          3 = Ban on national TV, radio and print media only;
+
+          4 = Ban on national TV, radio and print media as well as on some but not all other forms of direct (a) and/or indirect (b) advertising;
+
+          5 = Ban on all forms of direct (a) and indirect (b) advertising.
+
+          (a) Direct advertising bans:
+
+          • national television and radio;
+
+          • local magazines and newspapers;
+
+          • billboards and outdoor advertising;
+
+          • point of sale.
+
+          (b) Indirect advertising bans:
+
+          • free distribution of tobacco products in the mail or through other means;
+
+          • promotional discounts;
+
+          • non-tobacco products identified with tobacco brand names (brand extension);
+
+          • brand names of non-tobacco products used for tobacco products;
+
+          • appearance of tobacco products in television and/or films;
+
+          • sponsored events.
+
+          #### Method of estimation
+          WHO assessment of a country's legislative documents.
       cig_afford_pct_gdp:
         title: Affordability of cigarettes (as a share of GDP per capita)
         unit: "%"
