@@ -150,12 +150,13 @@ def run() -> None:
     )
 
     ####################################################################################################################
-    # Fix typo found in description from producer.
+    # Fix typos found in description from producer.
     error = "Expected typo in description from producer. It may have been fixed, so, remove this patch."
-    assert "threated" in tb_garden["en_fsh_thrd_no"].metadata.description_from_producer, error
-    tb_garden["en_fsh_thrd_no"].metadata.description_from_producer = tb_garden[
-        "en_fsh_thrd_no"
-    ].metadata.description_from_producer.replace("threated", "threatened")
+    for column in ["en_fsh_thrd_no", "en_mam_thrd_no"]:
+        assert "threated" in tb_garden[column].metadata.description_from_producer, error
+        tb_garden[column].metadata.description_from_producer = tb_garden[
+            column
+        ].metadata.description_from_producer.replace("threated", "threatened")
     ####################################################################################################################
 
     #
