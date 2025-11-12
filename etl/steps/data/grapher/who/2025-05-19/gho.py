@@ -61,14 +61,17 @@ def run() -> None:
                 "patters", "patterns"
             )
 
-        if tb_name == "deaths_due_to_tuberculosis_among_hiv_negative_people__per_100_000_population":
-            # Fix typo in description from producer.
-            col = "deaths_due_to_tuberculosis_among_hiv_negative_people__per_100_000_population"
+        if tb_name in [
+            "deaths_due_to_tuberculosis_among_hiv_negative_people__per_100_000_population",
+            "number_of_deaths_due_to_tuberculosis__excluding_hiv",
+        ]:
+            # The same typo is found in all columns.
             error = "Expected typo in description from producer. It may have been fixed, so, remove this patch."
-            assert "Millenium" in tb[col].metadata.description_from_producer, error
-            tb[col].metadata.description_from_producer = tb[col].metadata.description_from_producer.replace(
-                "Millenium", "Millennium"
-            )
+            for column in tb.columns:
+                assert "Millenium" in tb[column].metadata.description_from_producer, error
+                tb[column].metadata.description_from_producer = tb[column].metadata.description_from_producer.replace(
+                    "Millenium", "Millennium"
+                )
 
         if tb.empty:
             log.warning(f"Table '{tb_name}' is empty. Skipping.")
