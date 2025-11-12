@@ -48,6 +48,17 @@ def run() -> None:
     ds_garden.save()
 ```
 
+### Ad-hoc Data Exploration
+
+For exploring snapshot data outside of ETL steps (e.g., in notebooks or debugging):
+```python
+from etl.snapshot import Snapshot
+
+# Load snapshot using short path (namespace/version/filename)
+snap = Snapshot("who/latest/fluid.csv")
+tb = snap.read_csv()
+```
+
 ### Catalog System
 
 Built on **owid.catalog** library:
@@ -261,6 +272,8 @@ Create PR first, then commit files:
 2. **Check status**: `git status` to see modified/untracked files
 3. **Add files**: `git add .` or `git add <specific-files>`
 4. **Commit**: `git commit -m "Description of changes"`
+
+⚠️ **ALWAYS use `etl pr` command to create pull requests** - never use `git checkout -b` + `gh pr create` manually.
 
 Note: The `etl pr` creates a new branch but does NOT automatically commit files - you must commit manually after creating the PR.
 
