@@ -49,6 +49,18 @@ def run() -> None:
             tb = tb.query("dhs_mics_subnational_regions__health_equity_monitor.isnull()")
             tb = tb.reset_index(["dhs_mics_subnational_regions__health_equity_monitor"], drop=True)
 
+        if (
+            tb_name
+            == "measles_containing_vaccine_second_dose__mcv2__immunization_coverage_by_the_nationally_recommended_age__pct"
+        ):
+            # Fix typo in description from producer.
+            col = "measles_containing_vaccine_second_dose__mcv2__immunization_coverage_by_the_nationally_recommended_age__pct"
+            error = "Expected typo in description from producer. It may have been fixed, so, remove this patch."
+            assert "patters" in tb[col].metadata.description_from_producer, error
+            tb[col].metadata.description_from_producer = tb[col].metadata.description_from_producer.replace(
+                "patters", "patterns"
+            )
+
         if tb.empty:
             log.warning(f"Table '{tb_name}' is empty. Skipping.")
             continue
