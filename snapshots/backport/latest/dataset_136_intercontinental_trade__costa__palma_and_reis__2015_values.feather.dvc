@@ -2,7 +2,7 @@ meta:
   source:
     name: Our World in Data catalog backport
     url: https://admin.owid.io/admin/datasets/136
-    date_accessed: 2025-11-12 17:11:57.728251
+    date_accessed: 2025-11-12 17:33:42.534056
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Intercontinental Trade - Costa, Palma and Reis (2015)

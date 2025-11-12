@@ -2,7 +2,7 @@ meta:
   source:
     name: Our World in Data catalog backport
     url: https://admin.owid.io/admin/datasets/136
-    date_accessed: 2025-11-12 17:11:55.586565
+    date_accessed: 2025-11-12 17:33:41.849703
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_136_intercontinental_trade__costa__palma_and_reis__2015
