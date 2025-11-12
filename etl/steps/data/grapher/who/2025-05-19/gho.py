@@ -49,29 +49,37 @@ def run() -> None:
             tb = tb.query("dhs_mics_subnational_regions__health_equity_monitor.isnull()")
             tb = tb.reset_index(["dhs_mics_subnational_regions__health_equity_monitor"], drop=True)
 
+        ################################################################################################################
+        # The same typos were found across many instances of description_from_producer.
+        # Assert just one occurrence of each typo, and fix them everywhere.
+        error = "Expected typo in description from producer. It may have been fixed, so, remove this patch."
+        if tb_name == "deaths_due_to_tuberculosis_among_hiv_negative_people__per_100_000_population":
+            assert (
+                "Millenium"
+                in tb[
+                    "deaths_due_to_tuberculosis_among_hiv_negative_people__per_100_000_population"
+                ].metadata.description_from_producer
+            ), error
         if (
             tb_name
             == "measles_containing_vaccine_second_dose__mcv2__immunization_coverage_by_the_nationally_recommended_age__pct"
         ):
-            # Fix typo in description from producer.
-            col = "measles_containing_vaccine_second_dose__mcv2__immunization_coverage_by_the_nationally_recommended_age__pct"
-            error = "Expected typo in description from producer. It may have been fixed, so, remove this patch."
-            assert "patters" in tb[col].metadata.description_from_producer, error
-            tb[col].metadata.description_from_producer = tb[col].metadata.description_from_producer.replace(
-                "patters", "patterns"
-            )
-
-        if tb_name in [
-            "deaths_due_to_tuberculosis_among_hiv_negative_people__per_100_000_population",
-            "number_of_deaths_due_to_tuberculosis__excluding_hiv",
-        ]:
-            # The same typo is found in all columns.
-            error = "Expected typo in description from producer. It may have been fixed, so, remove this patch."
-            for column in tb.columns:
-                assert "Millenium" in tb[column].metadata.description_from_producer, error
+            assert (
+                "patters"
+                in tb[
+                    "measles_containing_vaccine_second_dose__mcv2__immunization_coverage_by_the_nationally_recommended_age__pct"
+                ].metadata.description_from_producer
+            ), error
+        for column in tb.columns:
+            if "Millenium" in tb[column].metadata.description_from_producer:
                 tb[column].metadata.description_from_producer = tb[column].metadata.description_from_producer.replace(
                     "Millenium", "Millennium"
                 )
+            if "patters" in tb[column].metadata.description_from_producer:
+                tb[column].metadata.description_from_producer = tb[column].metadata.description_from_producer.replace(
+                    "patters", "patterns"
+                )
+        ################################################################################################################
 
         if tb.empty:
             log.warning(f"Table '{tb_name}' is empty. Skipping.")
