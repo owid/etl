@@ -1004,6 +1004,8 @@ def clean_notes(notes):
             if "ms excel" in note.lower():
                 # Skip unnecessary notes about how to download the data.
                 continue
+            # Fix detected typos.
+            note = note.replace("puposes", "purposes")
             # Ensure each note starts with a capital letter, and ends in a single period.
             # NOTE: Using capitalize() would make all characters lower case except the first.
             note = note[0].upper() + (note[1:].replace("\xa0", " ") + ".").replace("..", ".")
