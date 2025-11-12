@@ -805,7 +805,7 @@ views:
     config:
       title: Global electricity consumption
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: per_capita
       metric: secondary_energy
@@ -832,7 +832,7 @@ views:
     config:
       title: Global electricity from coal
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -846,7 +846,7 @@ views:
     config:
       title: Global electricity from coal with carbon capture and storage
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -860,7 +860,7 @@ views:
     config:
       title: Global electricity from gas
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -874,7 +874,7 @@ views:
     config:
       title: Global electricity from gas with carbon capture and storage
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -888,7 +888,7 @@ views:
     config:
       title: Global electricity from oil
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -902,7 +902,7 @@ views:
     config:
       title: Global electricity from nuclear
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -916,7 +916,7 @@ views:
     config:
       title: Global electricity from biomass
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -930,7 +930,7 @@ views:
     config:
       title: Global electricity from biomass with carbon capture and storage
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -944,7 +944,7 @@ views:
     config:
       title: Global electricity from renewables, excluding biomass
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -958,7 +958,7 @@ views:
     config:
       title: Global electricity from hydropower
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -972,7 +972,7 @@ views:
     config:
       title: Global electricity from solar
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -986,7 +986,7 @@ views:
     config:
       title: Global electricity from wind
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -1000,7 +1000,7 @@ views:
     config:
       title: Global electricity from geothermal
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -1014,7 +1014,7 @@ views:
     config:
       title: Total energy for heating
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: per_capita
       metric: secondary_energy
@@ -1041,7 +1041,7 @@ views:
     config:
       title: Global secondary energy from gas
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -1055,7 +1055,7 @@ views:
     config:
       title: Global secondary energy from oil
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -1069,7 +1069,7 @@ views:
     config:
       title: Global secondary energy from hydrogen
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -1083,7 +1083,7 @@ views:
     config:
       title: Global secondary energy from liquid biofuels
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: share_of_total
       metric: secondary_energy
@@ -2485,7 +2485,7 @@ views:
     config:
       title: Electricity consumption in Asia
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: per_capita
       metric: secondary_energy
@@ -2512,7 +2512,7 @@ views:
     config:
       title: Electricity from coal in Asia
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -2526,7 +2526,7 @@ views:
     config:
       title: Electricity from coal with carbon capture and storage in Asia
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -2540,7 +2540,7 @@ views:
     config:
       title: Electricity from gas in Asia
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -2554,7 +2554,7 @@ views:
     config:
       title: Electricity from gas with carbon capture and storage in Asia
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -2568,7 +2568,7 @@ views:
     config:
       title: Electricity from oil in Asia
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -2582,7 +2582,7 @@ views:
     config:
       title: Electricity from nuclear in Asia
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -2596,7 +2596,7 @@ views:
     config:
       title: Electricity from biomass in Asia
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -2610,7 +2610,7 @@ views:
     config:
       title: Electricity from biomass with carbon capture and storage in Asia
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -2624,7 +2624,7 @@ views:
     config:
       title: Electricity from renewables, excluding biomass in Asia
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -2638,7 +2638,7 @@ views:
     config:
       title: Electricity from hydropower in Asia
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -2652,7 +2652,7 @@ views:
     config:
       title: Electricity from solar in Asia
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -2666,7 +2666,7 @@ views:
     config:
       title: Electricity from wind in Asia
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -2680,7 +2680,7 @@ views:
     config:
       title: Electricity from geothermal in Asia
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -2694,7 +2694,7 @@ views:
     config:
       title: Total energy for heating in Asia
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: per_capita
       metric: secondary_energy
@@ -2721,7 +2721,7 @@ views:
     config:
       title: Secondary energy from gas in Asia
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -2735,7 +2735,7 @@ views:
     config:
       title: Secondary energy from oil in Asia
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -2749,7 +2749,7 @@ views:
     config:
       title: Secondary energy from hydrogen in Asia
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -2763,7 +2763,7 @@ views:
     config:
       title: Secondary energy from liquid biofuels in Asia
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: share_of_total
       metric: secondary_energy
@@ -4168,7 +4168,7 @@ views:
     config:
       title: Electricity consumption in the Middle East and Africa
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: per_capita
       metric: secondary_energy
@@ -4195,7 +4195,7 @@ views:
     config:
       title: Electricity from coal in the Middle East and Africa
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -4209,7 +4209,7 @@ views:
     config:
       title: Electricity from coal with carbon capture and storage in the Middle East and Africa
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -4223,7 +4223,7 @@ views:
     config:
       title: Electricity from gas in the Middle East and Africa
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -4237,7 +4237,7 @@ views:
     config:
       title: Electricity from gas with carbon capture and storage in the Middle East and Africa
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -4251,7 +4251,7 @@ views:
     config:
       title: Electricity from oil in the Middle East and Africa
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -4265,7 +4265,7 @@ views:
     config:
       title: Electricity from nuclear in the Middle East and Africa
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -4279,7 +4279,7 @@ views:
     config:
       title: Electricity from biomass in the Middle East and Africa
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -4293,7 +4293,7 @@ views:
     config:
       title: Electricity from biomass with carbon capture and storage in the Middle East and Africa
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -4307,7 +4307,7 @@ views:
     config:
       title: Electricity from renewables, excluding biomass in the Middle East and Africa
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -4321,7 +4321,7 @@ views:
     config:
       title: Electricity from hydropower in the Middle East and Africa
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -4335,7 +4335,7 @@ views:
     config:
       title: Electricity from solar in the Middle East and Africa
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -4349,7 +4349,7 @@ views:
     config:
       title: Electricity from wind in the Middle East and Africa
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -4363,7 +4363,7 @@ views:
     config:
       title: Electricity from geothermal in the Middle East and Africa
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -4377,7 +4377,7 @@ views:
     config:
       title: Total energy for heating in the Middle East and Africa
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: per_capita
       metric: secondary_energy
@@ -4404,7 +4404,7 @@ views:
     config:
       title: Secondary energy from gas in the Middle East and Africa
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -4418,7 +4418,7 @@ views:
     config:
       title: Secondary energy from oil in the Middle East and Africa
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -4432,7 +4432,7 @@ views:
     config:
       title: Secondary energy from hydrogen in the Middle East and Africa
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -4446,7 +4446,7 @@ views:
     config:
       title: Secondary energy from liquid biofuels in the Middle East and Africa
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: share_of_total
       metric: secondary_energy
@@ -5851,7 +5851,7 @@ views:
     config:
       title: Electricity consumption in Latin America
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: per_capita
       metric: secondary_energy
@@ -5878,7 +5878,7 @@ views:
     config:
       title: Electricity from coal in Latin America
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -5892,7 +5892,7 @@ views:
     config:
       title: Electricity from coal with carbon capture and storage in Latin America
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -5906,7 +5906,7 @@ views:
     config:
       title: Electricity from gas in Latin America
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -5920,7 +5920,7 @@ views:
     config:
       title: Electricity from gas with carbon capture and storage in Latin America
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -5934,7 +5934,7 @@ views:
     config:
       title: Electricity from oil in Latin America
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -5948,7 +5948,7 @@ views:
     config:
       title: Electricity from nuclear in Latin America
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -5962,7 +5962,7 @@ views:
     config:
       title: Electricity from biomass in Latin America
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -5976,7 +5976,7 @@ views:
     config:
       title: Electricity from biomass with carbon capture and storage in Latin America
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -5990,7 +5990,7 @@ views:
     config:
       title: Electricity from renewables, excluding biomass in Latin America
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -6004,7 +6004,7 @@ views:
     config:
       title: Electricity from hydropower in Latin America
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -6018,7 +6018,7 @@ views:
     config:
       title: Electricity from solar in Latin America
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -6032,7 +6032,7 @@ views:
     config:
       title: Electricity from wind in Latin America
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -6046,7 +6046,7 @@ views:
     config:
       title: Electricity from geothermal in Latin America
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -6060,7 +6060,7 @@ views:
     config:
       title: Total energy for heating in Latin America
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: per_capita
       metric: secondary_energy
@@ -6087,7 +6087,7 @@ views:
     config:
       title: Secondary energy from gas in Latin America
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -6101,7 +6101,7 @@ views:
     config:
       title: Secondary energy from oil in Latin America
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -6115,7 +6115,7 @@ views:
     config:
       title: Secondary energy from hydrogen in Latin America
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -6129,7 +6129,7 @@ views:
     config:
       title: Secondary energy from liquid biofuels in Latin America
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: share_of_total
       metric: secondary_energy
@@ -7534,7 +7534,7 @@ views:
     config:
       title: Electricity consumption in OECD countries
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: per_capita
       metric: secondary_energy
@@ -7561,7 +7561,7 @@ views:
     config:
       title: Electricity from coal in OECD countries
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -7575,7 +7575,7 @@ views:
     config:
       title: Electricity from coal with carbon capture and storage in OECD countries
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -7589,7 +7589,7 @@ views:
     config:
       title: Electricity from gas in OECD countries
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -7603,7 +7603,7 @@ views:
     config:
       title: Electricity from gas with carbon capture and storage in OECD countries
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -7617,7 +7617,7 @@ views:
     config:
       title: Electricity from oil in OECD countries
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -7631,7 +7631,7 @@ views:
     config:
       title: Electricity from nuclear in OECD countries
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -7645,7 +7645,7 @@ views:
     config:
       title: Electricity from biomass in OECD countries
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -7659,7 +7659,7 @@ views:
     config:
       title: Electricity from biomass with carbon capture and storage in OECD countries
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -7673,7 +7673,7 @@ views:
     config:
       title: Electricity from renewables, excluding biomass in OECD countries
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -7687,7 +7687,7 @@ views:
     config:
       title: Electricity from hydropower in OECD countries
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -7701,7 +7701,7 @@ views:
     config:
       title: Electricity from solar in OECD countries
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -7715,7 +7715,7 @@ views:
     config:
       title: Electricity from wind in OECD countries
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -7729,7 +7729,7 @@ views:
     config:
       title: Electricity from geothermal in OECD countries
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -7743,7 +7743,7 @@ views:
     config:
       title: Total energy for heating in OECD countries
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: per_capita
       metric: secondary_energy
@@ -7770,7 +7770,7 @@ views:
     config:
       title: Secondary energy from gas in OECD countries
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -7784,7 +7784,7 @@ views:
     config:
       title: Secondary energy from oil in OECD countries
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -7798,7 +7798,7 @@ views:
     config:
       title: Secondary energy from hydrogen in OECD countries
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: total
       metric: secondary_energy
@@ -7812,7 +7812,7 @@ views:
     config:
       title: Secondary energy from liquid biofuels in OECD countries
       subtitle: |-
-        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a usable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
   - dimensions:
       rate: share_of_total
       metric: secondary_energy
