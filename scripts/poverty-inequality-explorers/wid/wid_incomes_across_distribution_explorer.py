@@ -4,7 +4,20 @@
 import numpy as np
 import pandas as pd
 
-from ..common_parameters import *
+from ..common_parameters import (
+    ADDITIONAL_DESCRIPTION_WID,
+    ADDITIONAL_DESCRIPTION_WID_POST_TAX,
+    COLOR_SCALE_NUMERIC_MIN_VALUE,
+    DATA_PUBLISHED_BY_WID,
+    NEW_LINE,
+    PPP_DESCRIPTION_WID,
+    PPP_VERSION_WID,
+    SOURCE_LINK_WID,
+    SOURCE_NAME_WID,
+    TOLERANCE,
+    Y_AXIS_MIN,
+    save,
+)
 
 # ## Google sheets auxiliar data
 # These spreadsheets provide with different details depending on each type of welfare measure or tables considered.
@@ -65,7 +78,7 @@ header_dict = {
 }
 
 # Index-oriented dataframe
-df_header = pd.DataFrame.from_dict(header_dict, orient="index", columns=None)
+df_header = pd.DataFrame.from_dict(header_dict, orient="index", columns=None)  # type: ignore
 # Assigns a cell for each entity separated by comma (like in `selection`)
 df_header = df_header[0].apply(pd.Series)
 
@@ -291,7 +304,7 @@ for tab in range(len(tables)):
             df_tables.loc[j, "slug"] = f"median_{welfare['slug'][wel]}{income_aggregation['slug_suffix'][agg]}"
             df_tables.loc[j, "description"] = new_line.join(
                 [
-                    f"The level of {welfare['welfare_type'][wel]} per {income_aggregation['aggregation'][agg]} below which hald of the population falls.",
+                    f"The level of {welfare['welfare_type'][wel]} per {income_aggregation['aggregation'][agg]} below which half of the population falls.",
                     welfare["description"][wel],
                     ppp_description,
                     additional_description,
@@ -683,7 +696,7 @@ for tab in range(len(tables)):
         df_graphers.loc[j, "Income measure Dropdown"] = "After tax vs. before tax"
         df_graphers.loc[j, "Period Radio"] = f"{income_aggregation['aggregation'][agg].capitalize()}"
         df_graphers.loc[j, "subtitle"] = (
-            f"This data is adjusted for inflation and for differences in the cost of living between countries."
+            "This data is adjusted for inflation and for differences in the cost of living between countries."
         )
         df_graphers.loc[j, "note"] = (
             f"This data is expressed in [international-$](#dod:int_dollar_abbreviation) at {ppp_year} prices."
@@ -706,7 +719,7 @@ for tab in range(len(tables)):
         df_graphers.loc[j, "Income measure Dropdown"] = "After tax vs. before tax"
         df_graphers.loc[j, "Period Radio"] = f"{income_aggregation['aggregation'][agg].capitalize()}"
         df_graphers.loc[j, "subtitle"] = (
-            f"This data is adjusted for inflation and for differences in the cost of living between countries."
+            "This data is adjusted for inflation and for differences in the cost of living between countries."
         )
         df_graphers.loc[j, "note"] = (
             f"This data is expressed in [international-$](#dod:int_dollar_abbreviation) at {ppp_year} prices."
