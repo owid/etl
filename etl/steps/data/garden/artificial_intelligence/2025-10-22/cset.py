@@ -1,6 +1,7 @@
 import owid.catalog.processing as pr
 from owid.catalog import Dataset, Table
 
+from etl.catalog_helpers import last_date_accessed
 from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
@@ -67,7 +68,12 @@ def run() -> None:
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = paths.create_dataset(tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata)
+    ds_garden = paths.create_dataset(
+        tables=[tb],
+        check_variables_metadata=True,
+        default_metadata=ds_meadow.metadata,
+        yaml_params={"date_accessed": last_date_accessed(tb), "year": last_date_accessed(tb)[-4:]},
+    )
 
     ds_garden.save()
 
