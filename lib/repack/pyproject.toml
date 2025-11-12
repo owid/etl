@@ -1,6 +1,6 @@
 [project]
 name = "owid-repack"
-version = "0.1.5"
+version = "0.1.6"
 description = "Pack Pandas data frames into smaller, more memory-efficient data types."
 authors = [
     {name = "Our World in Data", email = "tech@ourworldindata.org"},

@@ -228,7 +228,7 @@ tables:
           <<: *common-display
         type: ordinal
         sort:
-          - Western Offshoots
+          - Western offshoots
           - Latin America
           - Sub Saharan Africa
           - Middle East and North Africa

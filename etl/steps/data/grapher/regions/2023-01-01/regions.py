@@ -87,11 +87,6 @@ def run() -> None:
     tb_regions.loc[:, "year"] = CURRENT_YEAR
 
     # Downstream
-    tb_regions = process_un_definitions(tb_regions)
-    # tb_regions.loc[:, "un_m49_2_region"] = tb_regions.loc[:, "un_m49_2_region"].fillna(tb_regions["un_m49_1_region"])
-    # tb_regions["un_m49_3_region"] = tb_regions["un_m49_3_region"].fillna(tb_regions["un_m49_2_region"])
-    # tb_regions.loc[:, "un_m49_3_region"] = "lal"
-    # tb_regions.loc[:, "un_m49_3_region"].fillna("la")
 
     # Update the table's metadata
     # NOTE: It would be better to do this in garden.
@@ -127,6 +122,24 @@ def process_un_definitions(tb) -> Table:
     mask = tb["un_m49_2_region"].str.contains("America", na=False)
     assert tb.loc[mask, "un_m49_2_region"].nunique() == 2, "There should be only two Americas in UN M49 level 2."
     ## Create new column
-    tb.loc[:, "un_region"] = tb.loc[:, "un_m49_1_region"].copy()
-    tb.loc[mask, "un_region"] = tb.loc[mask, "un_m49_2_region"].copy()
+    tb.loc[:, "un_region2"] = tb.loc[:, "un_m49_1_region"].copy()
+    tb.loc[mask, "un_region2"] = tb.loc[mask, "un_m49_2_region"].copy()
     return cast(Table, tb)
+
+
+def __util_get_country_codes(text_raw, tb):
+    """Use this function to convert a raw text list of country names into a list of country codes. Unknown codes are left as "UNKNOWN: {country name}".
+
+
+    Example:
+
+    text_raw = "Afghanistan, Albania, Algeria"
+    codes = __util_get_country_codes(text_raw, tb)  # tb here is the regions table
+    print("- " + "\n- ".join(codes))
+
+    This is useful when parsing a raw list of countries into meaningful region member codes. To be used as a manual step.
+    """
+    countries_raw = text_raw.split(", ")
+    mapping = tb.set_index("country").code.to_dict()
+    countries = [mapping.get(c, f"UNKNOWN: {c}") for c in countries_raw]
+    return countries

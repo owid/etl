@@ -934,8 +934,6 @@
   aliases:
     - "Svalbard & Jan Mayen Isl."
     - "Svalbard and Jan Mayen Islands"
-  related:
-    - "NOR"
 - code: "OWID_TRS"
   name: "Transnistria"
   region_type: "other"
@@ -2474,6 +2472,54 @@
     - "WSM"
 
 ##########
+# UN
+# Hybrid of M49, almost equivalent with L1 but replaces Americas with LATAM and North America
+# https://unstats.un.org/unsd/methodology/m49/
+##########
+- code: UN_AFR
+  name: "Africa (UN)"
+  region_type: "aggregate"
+  defined_by: un
+  members:
+    - UNM49_NAF
+    - UNM49_SSA
+
+- code: UN_NAM
+  name: "Northern America (UN)"
+  region_type: "aggregate"
+  defined_by: un
+  members:
+    - UNM49_NAM
+
+- code: UN_LAC
+  name: "Latin America and the Caribbean (UN)"
+  region_type: "aggregate"
+  defined_by: un
+  members:
+    - UNM49_LAC
+
+- code: UN_ASI
+  name: "Asia (UN)"
+  region_type: "aggregate"
+  defined_by: un
+  members:
+    - UNM49_ASI
+
+- code: UN_EUR
+  name: "Europe (UN)"
+  region_type: "aggregate"
+  defined_by: un
+  members:
+    - UNM49_EUR
+
+- code: UN_OCE
+  name: "Oceania (UN)"
+  region_type: "aggregate"
+  defined_by: un
+  members:
+    - UNM49_OCE
+
+##########
 # UN M49
 # https://unstats.un.org/unsd/methodology/m49/
 ##########
@@ -2481,7 +2527,7 @@
 ## In this Taiwan and Kosovo are not recognized and part of China and Serbia respectively
 ## Africa
 - code: UNM49_AFR
-  name: "Africa (UN)"
+  name: "Africa (UN M49)"
   region_type: "aggregate"
   defined_by: un_m49_1
   members:
@@ -2489,7 +2535,7 @@
     - UNM49_SSA
 ### Northern Africa
 - code: UNM49_NAF
-  name: "Northern Africa (UN)"
+  name: "Northern Africa (UN M49)"
   region_type: "aggregate"
   defined_by: un_m49_2
   members:
@@ -2502,7 +2548,7 @@
     - "ESH"
 ### Sub-Saharan Africa
 - code: UNM49_SSA
-  name: "Sub-Saharan Africa (UN)"
+  name: "Sub-Saharan Africa (UN M49)"
   region_type: "aggregate"
   defined_by: un_m49_2
   members:
@@ -2512,7 +2558,7 @@
     - UNM49_WAF
 #### members
 - code: UNM49_EAF
-  name: "Eastern Africa (UN)"
+  name: "Eastern Africa (UN M49)"
   region_type: "aggregate"
   defined_by: un_m49_3
   members:
@@ -2539,7 +2585,7 @@
     - "ZMB"
     - "ZWE"
 - code: UNM49_MAF
-  name: "Middle Africa (UN)"
+  name: "Middle Africa (UN M49)"
   region_type: "aggregate"
   defined_by: un_m49_3
   members:
@@ -2553,7 +2599,7 @@
     - "GAB"
     - "STP"
 - code: UNM49_SAF
-  name: "Southern Africa (UN)"
+  name: "Southern Africa (UN M49)"
   region_type: "aggregate"
   defined_by: un_m49_3
   members:
@@ -2563,7 +2609,7 @@
     - "ZAF"
     - "SWZ"
 - code: UNM49_WAF
-  name: "Western Africa (UN)"
+  name: "Western Africa (UN M49)"
   region_type: "aggregate"
   defined_by: un_m49_3
   members:
@@ -2587,7 +2633,7 @@
 
 ## Americas
 - code: UNM49_AMR
-  name: "Americas (UN)"
+  name: "Americas (UN M49)"
   region_type: "aggregate"
   defined_by: un_m49_1
   members:
@@ -2595,7 +2641,7 @@
     - UNM49_LAC
 ### Northern America
 - code: UNM49_NAM
-  name: "Northern America (UN)"
+  name: "Northern America (UN M49)"
   region_type: "aggregate"
   defined_by: un_m49_2
   members:
@@ -2606,7 +2652,7 @@
     - "USA"
 ### Latin America and the Caribbean
 - code: UNM49_LAC
-  name: "Latin America and the Caribbean (UN)"
+  name: "Latin America and the Caribbean (UN M49)"
   region_type: "aggregate"
   defined_by: un_m49_2
   members:
@@ -2615,7 +2661,7 @@
     - UNM49_SAM
 #### members
 - code: UNM49_CAR
-  name: "Caribbean (UN)"
+  name: "Caribbean (UN M49)"
   region_type: "aggregate"
   defined_by: un_m49_3
   members:
@@ -2648,7 +2694,7 @@
     - "VGB"
     - "VIR"
 - code: UNM49_CAM
-  name: "Central America (UN)"
+  name: "Central America (UN M49)"
   region_type: "aggregate"
   defined_by: un_m49_3
   members:
@@ -2661,7 +2707,7 @@
     - "NIC"
     - "PAN"
 - code: UNM49_SAM
-  name: "South America (UN)"
+  name: "South America (UN M49)"
   region_type: "aggregate"
   defined_by: un_m49_3
   members:
@@ -2684,7 +2730,7 @@
 
 ## Asia
 - code: UNM49_ASI
-  name: "Asia (UN)"
+  name: "Asia (UN M49)"
   region_type: "aggregate"
   defined_by: un_m49_1
   members:
@@ -2695,7 +2741,7 @@
     - UNM49_WAS
 ### members
 - code: UNM49_CAS
-  name: "Central Asia (UN)"
+  name: "Central Asia (UN M49)"
   region_type: "aggregate"
   defined_by: un_m49_2
   members:
@@ -2705,7 +2751,7 @@
     - "TKM"
     - "UZB"
 - code: UNM49_EAS
-  name: "Eastern Asia (UN)"
+  name: "Eastern Asia (UN M49)"
   region_type: "aggregate"
   defined_by: un_m49_2
   members:
@@ -2717,7 +2763,7 @@
     - "PRK"
     - "KOR"
 - code: UNM49_SEA
-  name: "South-eastern Asia (UN)"
+  name: "South-eastern Asia (UN M49)"
   region_type: "aggregate"
   defined_by: un_m49_2
   members:
@@ -2733,7 +2779,7 @@
     - "THA"
     - "VNM"
 - code: UNM49_SAS
-  name: "Southern Asia (UN)"
+  name: "Southern Asia (UN M49)"
   region_type: "aggregate"
   defined_by: un_m49_2
   members:
@@ -2747,7 +2793,7 @@
     - "PAK"
     - "LKA"
 - code: UNM49_WAS
-  name: "Western Asia (UN)"
+  name: "Western Asia (UN M49)"
   region_type: "aggregate"
   defined_by: un_m49_2
   members:
@@ -2771,7 +2817,7 @@
 
 ## Europe
 - code: UNM49_EUR
-  name: "Europe (UN)"
+  name: "Europe (UN M49)"
   region_type: "aggregate"
   defined_by: un_m49_1
   members:
@@ -2781,7 +2827,7 @@
     - UNM49_WEU
 ### members
 - code: UNM49_EEU
-  name: "Eastern Europe (UN)"
+  name: "Eastern Europe (UN M49)"
   region_type: "aggregate"
   defined_by: un_m49_2
   members:
@@ -2796,7 +2842,7 @@
     - "SVK"
     - "UKR"
 - code: UNM49_NEU
-  name: "Northern Europe (UN)"
+  name: "Northern Europe (UN M49)"
   region_type: "aggregate"
   defined_by: un_m49_2
   members:
@@ -2817,7 +2863,7 @@
     - "SWE"
     - "GBR"
 - code: UNM49_SEU
-  name: "Southern Europe (UN)"
+  name: "Southern Europe (UN M49)"
   region_type: "aggregate"
   defined_by: un_m49_2
   members:
@@ -2838,7 +2884,7 @@
     - "MKD"
     - "VAT"
 - code: UNM49_WEU
-  name: "Western Europe (UN)"
+  name: "Western Europe (UN M49)"
   region_type: "aggregate"
   defined_by: un_m49_2
   members:
@@ -2854,7 +2900,7 @@
 
 ## Oceania
 - code: UNM49_OCE
-  name: "Oceania (UN)"
+  name: "Oceania (UN M49)"
   region_type: "aggregate"
   defined_by: un_m49_1
   members:
@@ -2864,7 +2910,7 @@
     - UNM49_POL
 ### members
 - code: UNM49_ANZ
-  name: "Australia and New Zealand (UN)"
+  name: "Australia and New Zealand (UN M49)"
   region_type: "aggregate"
   defined_by: un_m49_2
   members:
@@ -2875,7 +2921,7 @@
     - "NZL"
     - "NFK"
 - code: UNM49_MEL
-  name: "Melanesia (UN)"
+  name: "Melanesia (UN M49)"
   region_type: "aggregate"
   defined_by: un_m49_2
   members:
@@ -2885,7 +2931,7 @@
     - "SLB"
     - "VUT"
 - code: UNM49_MIC
-  name: "Micronesia (UN)"
+  name: "Micronesia (UN M49)"
   region_type: "aggregate"
   defined_by: un_m49_2
   members:
@@ -2898,7 +2944,7 @@
     - "PLW"
     - "UMI"
 - code: UNM49_POL
-  name: "Polynesia (UN)"
+  name: "Polynesia (UN M49)"
   region_type: "aggregate"
   defined_by: un_m49_2
   members:
@@ -3203,3 +3249,268 @@
     - "UGA"
     - "ZMB"
     - "ZWE"
+##########
+# PEW
+##########
+- code: PEW_APA
+  name: "Asia-Pacific (Pew)"
+  region_type: "aggregate"
+  defined_by: pew
+  members:
+    - AFG
+    - ASM
+    - ARM
+    - AUS
+    - AZE
+    - BGD
+    - BTN
+    - BRN
+    - KHM
+    - CHN
+    - COK
+    - CYP
+    - FSM
+    - FJI
+    - PYF
+    - GUM
+    - HKG
+    - IND
+    - IDN
+    - IRN
+    - JPN
+    - KAZ
+    - KIR
+    - KGZ
+    - LAO
+    - MAC
+    - MYS
+    - MDV
+    - MHL
+    - MNG
+    - MMR
+    - NRU
+    - NPL
+    - NCL
+    - NZL
+    - NIU
+    - PRK
+    - MNP
+    - PAK
+    - PLW
+    - PNG
+    - PHL
+    - WSM
+    - SGP
+    - SLB
+    - KOR
+    - LKA
+    - TJK
+    - THA
+    - TLS
+    - TKL
+    - TON
+    - TUR
+    - TKM
+    - TUV
+    - UZB
+    - VUT
+    - VNM
+    - WLF
+- code: PEW_EUR
+  name: "Europe (Pew)"
+  region_type: "aggregate"
+  defined_by: pew
+  members:
+    - ALB
+    - AND
+    - AUT
+    - BLR
+    - BEL
+    - BIH
+    - BGR
+    - OWID_CIS
+    - HRV
+    - CZE
+    - DNK
+    - EST
+    - FRO
+    - FIN
+    - FRA
+    - GEO
+    - DEU
+    - GIB
+    - GRC
+    - HUN
+    - ISL
+    - IRL
+    - IMN
+    - ITA
+    - LVA
+    - LIE
+    - LTU
+    - LUX
+    - MLT
+    - MDA
+    - MCO
+    - MNE
+    - NLD
+    - MKD
+    - NOR
+    - POL
+    - PRT
+    - ROU
+    - RUS
+    - SMR
+    - SRB
+    - SVK
+    - SVN
+    - ESP
+    - SWE
+    - CHE
+    - UKR
+    - GBR
+    - VAT
+- code: PEW_LAC
+  name: "Latin America-Caribbean (Pew)"
+  region_type: "aggregate"
+  defined_by: pew
+  members:
+    - AIA
+    - ATG
+    - ARG
+    - ABW
+    - BHS
+    - BRB
+    - BLZ
+    - BOL
+    - BRA
+    - VGB
+    - BES
+    - CYM
+    - CHL
+    - COL
+    - CRI
+    - CUB
+    - CUW
+    - DMA
+    - DOM
+    - ECU
+    - SLV
+    - FLK
+    - GUF
+    - GRD
+    - GLP
+    - GTM
+    - GUY
+    - HTI
+    - HND
+    - JAM
+    - MTQ
+    - MEX
+    - MSR
+    - NIC
+    - PAN
+    - PRY
+    - PER
+    - PRI
+    - SXM
+    - KNA
+    - LCA
+    - VCT
+    - SUR
+    - TTO
+    - TCA
+    - VIR
+    - URY
+    - VEN
+- code: PEW_MENA
+  name: "Middle East-North Africa (Pew)"
+  region_type: "aggregate"
+  defined_by: pew
+  members:
+    - DZA
+    - BHR
+    - EGY
+    - IRQ
+    - ISR
+    - JOR
+    - KWT
+    - LBN
+    - LBY
+    - MAR
+    - OMN
+    - PSE
+    - QAT
+    - SAU
+    - SDN
+    - SYR
+    - TUN
+    - ARE
+    - ESH
+    - YEM
+- code: PEW_NAM
+  name: "North America (Pew)"
+  region_type: "aggregate"
+  defined_by: pew
+  members:
+    - BMU
+    - CAN
+    - GRL
+    - SPM
+    - USA
+- code: PEW_SSA
+  name: "Sub-Saharan Africa (Pew)"
+  region_type: "aggregate"
+  defined_by: pew
+  members:
+    - AGO
+    - BEN
+    - BWA
+    - BFA
+    - BDI
+    - CMR
+    - CPV
+    - CAF
+    - TCD
+    - COM
+    - COD
+    - DJI
+    - GNQ
+    - ERI
+    - SWZ
+    - ETH
+    - GAB
+    - GMB
+    - GHA
+    - GIN
+    - GNB
+    - CIV
+    - KEN
+    - LSO
+    - LBR
+    - MDG
+    - MWI
+    - MLI
+    - MRT
+    - MUS
+    - MYT
+    - MOZ
+    - NAM
+    - NER
+    - NGA
+    - COG
+    - REU
+    - RWA
+    - STP
+    - SEN
+    - SYC
+    - SLE
+    - SOM
+    - ZAF
+    - SSD
+    - SHN
+    - TZA
+    - TGO
+    - UGA
+    - ZMB
+    - ZWE
