@@ -16,9 +16,9 @@ tables:
     variables:
       revenue:
         title: Monthly revenue
-        unit: millions of New Taiwan Dollars
-        short_unit: NT$M
-        description_short: TSMC's consolidated monthly revenue reported in millions of New Taiwan Dollars.
+        unit: New Taiwan Dollars
+        short_unit: NT$
+        description_short: TSMC's consolidated monthly revenue reported in New Taiwan Dollars.
         description_key:
           - Taiwan Semiconductor Manufacturing Company (TSMC) is the world's largest dedicated independent semiconductor foundry.
           - Revenue figures represent consolidated monthly revenue in accordance with Taiwan's International Financial Reporting Standards (TIFRS).
@@ -30,9 +30,9 @@ tables:
     variables:
       revenue:
         title: Yearly revenue
-        unit: millions of New Taiwan Dollars
-        short_unit: NT$M
-        description_short: TSMC's consolidated yearly revenue reported in millions of New Taiwan Dollars.
+        unit: New Taiwan Dollars
+        short_unit: NT$
+        description_short: TSMC's consolidated yearly revenue reported in New Taiwan Dollars.
         description_key:
           - Taiwan Semiconductor Manufacturing Company (TSMC) is the world's largest dedicated independent semiconductor foundry.
           - Revenue figures represent consolidated yearly revenue in accordance with Taiwan's International Financial Reporting Standards (TIFRS).

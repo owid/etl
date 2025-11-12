@@ -74,8 +74,10 @@ def run(dest_dir: str) -> None:
     # Create a date column
     tb_long["date"] = pd.to_datetime(tb_long[["year", "month"]].assign(day=1))
 
-    # Set index
     tb_long = tb_long.drop(columns=["year", "month"])
+
+    tb_long["revenue"] = tb_long["revenue"] * 1_000_000  # Convert from millions to actual value
+    tb_wide["revenue"] = tb_wide["revenue"] * 1_000_000  # Convert from millions to actual value
 
     tb_long["revenue"].metadata.origins = [snap.metadata.origin]
     tb_wide["revenue"].metadata.origins = [snap.metadata.origin]
