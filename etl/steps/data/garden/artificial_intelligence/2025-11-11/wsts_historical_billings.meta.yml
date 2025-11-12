@@ -17,7 +17,7 @@ tables:
         title: Annual semiconductor billings
         unit: US$
         short_unit: $
-        description_short: The total value of semiconductors that manufacturers ship to their customers each year. This includes sales to end users, distributors, and subsidiaries that use these components in final products. The total value of semiconductors that manufacturers ship to their customers each year. This includes sales to end users, distributors, and subsidiaries that use these components in final products. The data is expressed in current US dollars and is not adjusted for inflation.
+        description_short: The total value of semiconductors that manufacturers ship to their customers each year. This includes sales to end users, distributors, and subsidiaries that use these components in final products. The data is expressed in current US dollars and is not adjusted for inflation.
 
       value_constant_2021_usd:
         title: Annual semiconductor billings (constant 2021 US$)
