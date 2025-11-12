@@ -158,10 +158,10 @@ steps:
   # GCP - Global Carbon Budget.
   #
   data://meadow/gcp/2025-11-13/global_carbon_budget:
-    - snapshot-private://gcp/2025-11-13/global_carbon_budget_fossil_co2_emissions.csv
-    - snapshot-private://gcp/2025-11-13/global_carbon_budget_land_use_change_emissions.xlsx
-    - snapshot-private://gcp/2025-11-13/global_carbon_budget_global_emissions.xlsx
-    - snapshot-private://gcp/2025-11-13/global_carbon_budget_national_emissions.xlsx
+    - snapshot://gcp/2025-11-13/global_carbon_budget_fossil_co2_emissions.csv
+    - snapshot://gcp/2025-11-13/global_carbon_budget_land_use_change_emissions.xlsx
+    - snapshot://gcp/2025-11-13/global_carbon_budget_global_emissions.xlsx
+    - snapshot://gcp/2025-11-13/global_carbon_budget_national_emissions.xlsx
   #
   # GCP - Global Carbon Budget.
   #
