@@ -8,11 +8,10 @@ definitions:
         - Artificial Intelligence
 
   description_key_datacenters: &description_key_datacenters
-    - Data centres were identified by examining around 2.5 million meters to find facilities with high electricity consumption that were not associated with high employment or other activities like manufacturing.
-    - Central Statistics Office of Ireland used four main approaches to identify data centres, including searching for known data centre names with consumption above 0.5 gigawatt hours, examining customers in specific business parks, and reviewing all meters with annual consumption above 1 gigawatt hour.
-    - There is no agreed definition of a data centre, so identification relies on consumption patterns and business activity analysis.
-    - A small number of data centres account for most of the metered electricity consumption by data centres.
-    - Data for all years are subject to revision as new data centres are identified or as consumption patterns change. New data centres may initially be below detection thresholds.
+    - Because there is no single definition of a data centre, the Central Statistics Office (CSO) of Ireland identified them using electricity consumption data rather than formal classifications.
+    - The CSO analysed roughly 2.5 million electricity meters to find sites that used large amounts of power but had few employees and were not involved in manufacturing.
+    - Identification was based on several checks, including known data centre operators, high-use business park customers, and meters consuming more than 1 GWh per year.
+    - The data can be updated retrospectively as new facilities are identified and as electricity use changes over time.
 
 dataset:
   update_period_days: 365
