@@ -29,6 +29,11 @@ def run(dest_dir: str) -> None:
     tb.columns.name = None
     tb.columns = [col.lower().replace(" ", "_") for col in tb.columns]
 
+    # Convert from GWh to TWh (divide by 1000)
+    consumption_cols = ["all_metered_electricity_consumption", "customers_other_than_data_centres", "data_centres"]
+    for col in consumption_cols:
+        tb[col] = tb[col] / 1000
+
     # Add country
     tb["country"] = "Ireland"
 

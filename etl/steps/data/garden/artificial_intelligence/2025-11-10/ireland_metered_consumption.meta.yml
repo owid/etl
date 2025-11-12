@@ -7,6 +7,13 @@ definitions:
       topic_tags:
         - Artificial Intelligence
 
+  description_key_datacenters: &description_key_datacenters
+    - Data centres were identified by examining around 2.5 million meters to find facilities with high electricity consumption that were not associated with high employment or other activities like manufacturing.
+    - Central Statistics Office of Ireland used four main approaches to identify data centres, including searching for known data centre names with consumption above 0.5 gigawatt hours, examining customers in specific business parks, and reviewing all meters with annual consumption above 1 gigawatt hour.
+    - There is no agreed definition of a data centre, so identification relies on consumption patterns and business activity analysis.
+    - A small number of data centres account for most of the metered electricity consumption by data centres.
+    - Data for all years are subject to revision as new data centres are identified or as consumption patterns change. New data centres may initially be below detection thresholds.
+
 dataset:
   update_period_days: 365
 
@@ -15,32 +22,34 @@ tables:
     variables:
       all_metered_electricity_consumption:
         title: Total metered electricity consumption
-        unit: Gigawatt hours
-        short_unit: GWh
-        description_short: Total electricity consumption from all metered customers in Ireland
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: Total electricity consumption from all metered customers in Ireland measured in [terawatt-hours](#dod:watt-hours).
         description_key:
-          - This includes all metered electricity consumption across Ireland, including data centres, residential, commercial, and industrial customers.
+          - This includes all metered electricity consumption across Ireland, covering data centres, residential, commercial, and industrial customers.
+          - The data is sourced from around 2.5 million meters connected to the mains electricity network.
+          - Data for all years are subject to revision as new meters are identified or classifications are corrected.
         display:
           numDecimalPlaces: 0
 
       data_centres:
         title: Data centres electricity consumption
-        unit: Gigawatt hours
-        short_unit: GWh
-        description_short: Electricity consumption by data centres in Ireland
-        description_key:
-          - Data centres were identified by examining around 2.5 million meters to identify Meter Point Reference Numbers (MPRNs) with high electricity consumption that were not associated with high employment nor with other activities such as cement manufacture.
-          - The CSO continuously monitors for both new Meter Point Reference Numbers for existing data centres as well as for new data centres.
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: Electricity consumption by data centres in Ireland measured in [terawatt-hours](#dod:watt-hours).
+        description_key: *description_key_datacenters
         display:
           numDecimalPlaces: 0
 
       customers_other_than_data_centres:
         title: Electricity consumption by non-data centre customers
-        unit: Gigawatt hours
-        short_unit: GWh
-        description_short: Electricity consumption by all customers except data centres
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: Electricity consumption by all customers except data centres measured in [terawatt-hours](#dod:watt-hours).
         description_key:
           - This includes residential, commercial, and industrial customers, but excludes data centres.
+          - The classification is based on the CSO's identification of Meter Point Reference Numbers (MPRNs) associated with data centre activity.
+          - Data for all years are subject to revision as data centre classifications are updated.
         display:
           numDecimalPlaces: 0
 
@@ -48,9 +57,9 @@ tables:
         title: Data centres as percentage of total electricity consumption
         unit: "%"
         short_unit: "%"
-        description_short: Data centre electricity consumption as a percentage of total metered consumption
+        description_short: Data centre electricity consumption as a percentage of total metered consumption.
         description_key:
-          - Calculated as (data centre consumption / total metered consumption) × 100.
-          - This indicator shows the growing share of electricity consumed by data centres in Ireland.
+          - This indicator shows the share of electricity consumed by data centres in Ireland.
+          - *description_key_datacenters
         display:
           numDecimalPlaces: 1
