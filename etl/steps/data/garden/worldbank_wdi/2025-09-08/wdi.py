@@ -25,6 +25,15 @@ paths = PathFinder(__file__)
 # Define GDP/GDP per capita indicators in current US$ and their counterpart in constant LCU
 GDP_INDICATORS = {"ny_gdp_mktp_cd": "ny_gdp_mktp_kn", "ny_gdp_pcap_cd": "ny_gdp_pcap_kn"}
 
+ILO_MODELED_AND_NATIONAL_INDICATORS = {
+    "labor_force_participation_rate": ["sl_tlf_cact_zs", "sl_tlf_cact_ne_zs"],
+    "unemployment_rate": ["sl_uem_totl_zs", "sl_uem_totl_ne_zs"],
+    "employment_to_population_ratio": ["sl_emp_totl_sp_zs", "sl_emp_totl_sp_ne_zs"],
+}
+
+# Set maximum ratio difference between ILO modeled and national values
+MAXIMUM_ALLOWED_RATIO_DIFFERENCE = 0.05  # 5%
+
 # Define base year to calculate constant 2021 US$ GDPs to compare with constant 2021 int-$ GDPs
 BASE_YEAR_FOR_CONSTANT_USD_GDP = 2021
 
@@ -119,6 +128,8 @@ def run() -> None:
     tb_garden = add_energy_access_variables(tb_garden)
 
     tb_garden = add_patents_articles_per_million_people(tb_garden)
+
+    tb_garden = add_ilo_modeling_comparison_indicators(tb_garden)
 
     # NOTE: This version of WDI doesn't have regional aggregates for internet users (it_net_user_zs).
     #  I tried to calculate them myself, but some large countries such as India have missing values and
@@ -895,4 +906,56 @@ def add_patents_articles_per_million_people(tb: Table) -> Table:
     tb["articles_per_million_people"] = tb["ip_jrn_artc_sc"] / tb["sp_pop_totl"] * 1000000
 
     tb = tb.format(["country", "year"])
+    return tb
+
+
+def add_ilo_modeling_comparison_indicators(tb: Table) -> Table:
+    """
+    Add ILO modeling comparison indicators to the table.
+    Each indicator is added as a new column with the suffix '_ilo_modeling_comparison'.
+    """
+
+    for indicator in ILO_MODELED_AND_NATIONAL_INDICATORS.keys():
+        ind_modeled = ILO_MODELED_AND_NATIONAL_INDICATORS[indicator][0]
+        ind_national = ILO_MODELED_AND_NATIONAL_INDICATORS[indicator][1]
+
+        # Calculate the ratio and add it as a new column
+        tb[f"{indicator}_ratio"] = tb[ind_modeled] / tb[ind_national]
+
+        # Create a categorical variable based on the ratio
+        # If only available in ind_national, set as 'Survey only'
+        # If only available in ind_modeled, set as 'Modeled only'
+        # If the ratio is between 1-MAXIMUM_ALLOWED_RATIO_DIFFERENCE and 1+MAXIMUM_ALLOWED_RATIO_DIFFERENCE, set as 'Both matching'
+        # If the ratio is outside this range, set as 'Both not matching'
+        # If neither is available, set as NaN
+        tb[f"{indicator}_ilo_modeling_comparison"] = pd.NA
+        tb.loc[tb[ind_national].notna() & tb[ind_modeled].isna(), f"{indicator}_ilo_modeling_comparison"] = (
+            "Survey only"
+        )
+        tb.loc[tb[ind_national].isna() & tb[ind_modeled].notna(), f"{indicator}_ilo_modeling_comparison"] = (
+            "Modeled only"
+        )
+        tb.loc[
+            tb[f"{indicator}_ratio"].between(
+                1 - MAXIMUM_ALLOWED_RATIO_DIFFERENCE, 1 + MAXIMUM_ALLOWED_RATIO_DIFFERENCE
+            ),
+            f"{indicator}_ilo_modeling_comparison",
+        ] = "Both matching"
+        tb.loc[
+            ~tb[f"{indicator}_ratio"].between(
+                1 - MAXIMUM_ALLOWED_RATIO_DIFFERENCE, 1 + MAXIMUM_ALLOWED_RATIO_DIFFERENCE
+            )
+            & tb[ind_national].notna()
+            & tb[ind_modeled].notna(),
+            f"{indicator}_ilo_modeling_comparison",
+        ] = "Both not matching"
+
+        # Copy metadata from the modeled indicator to the new comparison indicator
+        tb[f"{indicator}_ilo_modeling_comparison"] = tb[f"{indicator}_ilo_modeling_comparison"].copy_metadata(
+            tb[f"{indicator}_ratio"]
+        )
+
+        # Drop ratio column
+        tb = tb.drop(columns=[f"{indicator}_ratio"], errors="raise")
+
     return tb

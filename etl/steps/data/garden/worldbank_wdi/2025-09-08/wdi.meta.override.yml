@@ -1885,3 +1885,16 @@ tables:
           name: Ratio of female to male labor force participation rate
           numDecimalPlaces: 1
           tolerance: 5
+
+      labor_force_participation_rate_ilo_modeling_comparison:
+        title: "Labor force participation rate comparison: ILO modeled vs national estimates"
+        unit: ""
+        short_unit: ""
+      unemployment_rate_ilo_modeling_comparison:
+        title: "Unemployment rate comparison: ILO modeled vs national estimates"
+        unit: ""
+        short_unit: ""
+      employment_to_population_ratio_ilo_modeling_comparison:
+        title: "Employment-to-population ratio comparison: ILO modeled vs national estimates"
+        unit: ""
+        short_unit: ""
