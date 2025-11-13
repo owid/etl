@@ -17,6 +17,7 @@ nav = [
     { "Getting started" = [
         "getting-started/index.md",
         { "Installation" = "getting-started/working-environment.md" },
+        { "Project content" = "getting-started/project-content.md" },
         { "First steps" = "getting-started/building-datasets.md" },
         { "Contributing" = "contributing.md" },
     ] },
@@ -31,7 +32,7 @@ nav = [
             { "MDIMs and Explorers" = "guides/data-work/mdims.md" },
             { "Export data" = "guides/data-work/export-data.md" },
             { "Access archived data" = "guides/data-work/access-archived-data.md" },
-            { "Publish indicator and metadata with GSheet" = "guides/data-work/create-gsheet.md" },
+            { "Publish indicator + metadata" = "guides/data-work/create-gsheet.md" },
         ] },
         { "Admin" = [
             { "Wizard" = "guides/wizard.md" },
@@ -44,9 +45,9 @@ nav = [
             { "Automatic updates via metadata" = "guides/autoupdate-cli.md" },
             { "Pull requests" = "guides/pull-requests.md" },
             { "Tips when working with ETL" = "guides/etl-tips.md" },
-            { "Metadata in data pages" = "guides/metadata-play.md" },
+            # { "Metadata in data pages" = "guides/metadata-play.md" },
         ] },
-        { "Servers & settings" = [
+        { "Settings & servers" = [
             { "Upgrade Python version" = "guides/upgrade-python-version.md" },
             { "Environments" = "guides/environment.md" },
             { "Staging servers" = "guides/staging-servers.md" },
@@ -176,9 +177,11 @@ favicon = "assets/images/favicon.png"
 # Theme features
 features = [
     "content.code.copy",
+    "content.code.select",
     "content.code.annotate",
     "content.tooltips",
     "navigation.expand",
+    "navigation.footer",
     "navigation.indexes",
     "navigation.instant",
     "navigation.instant.progress",
@@ -243,7 +246,7 @@ name = "Technical publications"
 url = "analyses/"
 theme = "md-button"
 
-# Markdown extensions
+# MARKDOWN EXTENSIONS
 [project.markdown_extensions]
 abbr = {}
 admonition = {}
@@ -252,27 +255,21 @@ footnotes = {}
 md_in_html = {}
 "mkdocs-click" = {}
 
-[project.markdown_extensions.pymdownx.critic]
+[project.markdown_extensions.pymdownx]
+critic = {}
+details = {}
+keys = {}
+snippets = {}
+inlinehilite = {}
 
-[project.markdown_extensions.pymdownx.details]
+[project.markdown_extensions.pymdownx.highlight]
+anchor_linenums = true
+line_spans = "__span"
+pygments_lang_class = true
 
 [project.markdown_extensions.pymdownx.emoji]
 emoji_index = "material.extensions.emoji.twemoji"
 emoji_generator = "material.extensions.emoji.to_svg"
-
-[project.markdown_extensions.pymdownx.keys]
-
-[project.markdown_extensions.pymdownx.snippets]
-
-[project.markdown_extensions.pymdownx.superfences]
-custom_fences = [
-    { name = "mermaid", class = "mermaid", format = "pymdownx.superfences.fence_code_format" },
-]
-# [project.markdown_extensions.pymdownx.superfences]
-# [project.markdown_extensions.pymdownx.superfences.custom_fences]
-# name = "mermaid"
-# class = "mermaid"
-# format = "pymdownx.superfences.fence_code_format"
 
 [project.markdown_extensions.pymdownx.tabbed]
 alternate_style = true
@@ -282,7 +279,23 @@ permalink = true
 title = "On this page"
 permalink_title = "Anchor link to this section for reference"
 
-# Plugins
+[project.markdown_extensions.pymdownx.superfences]
+custom_fences = [
+    { name = "mermaid", class = "mermaid", format = "pymdownx.superfences.fence_code_format" },
+]
+
+# [project.markdown_extensions.pymdownx.superfences]
+# custom_fences = [
+#     { name = "mermaid", class = "mermaid", format = "pymdownx.superfences.fence_code_format" },
+# ]
+# [project.markdown_extensions.pymdownx.superfences]
+# [project.markdown_extensions.pymdownx.superfences.custom_fences]
+# name = "mermaid"
+# class = "mermaid"
+# format = "pymdownx.superfences.fence_code_format"
+
+
+# PLUGINS
 [project.plugins]
 
 [project.plugins."mkdocs-jupyter"]

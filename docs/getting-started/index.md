@@ -16,20 +16,20 @@ Making this documentation public is part of our commitment to **transparency** a
 ### Quick reference
 <div class="grid cards" markdown>
 
--   :octicons-code-16: &nbsp; **[Installation](working-environment.md){ data-preview }**
+-   :octicons-code-16: &nbsp; **[Installation](working-environment.md)**
 
     ---
 
     Set up your working environment.
 
--   :fontawesome-solid-pen-nib: &nbsp; **[Design principles](../architecture/){ data-preview }**
+-   :fontawesome-solid-pen-nib: &nbsp; **[Design principles](../architecture/)**
 
     ---
 
     Learn the fundamentals.
 
 
--   :material-sign-direction: &nbsp; **[Guides](../guides/){ data-preview }**
+-   :material-sign-direction: &nbsp; **[Guides](../guides/)**
 
     ---
 
@@ -42,13 +42,13 @@ Making this documentation public is part of our commitment to **transparency** a
 
     Because data alone is not enough.
 
--   :fontawesome-solid-users: &nbsp; **[Contribute](../contributing.md){ data-preview }**
+-   :fontawesome-solid-users: &nbsp; **[Contribute](../contributing.md)**
 
     ---
 
     Help us improve our work
 
--   :material-api: &nbsp; **[API](../api/index.md){data-preview}**
+-   :material-api: &nbsp; **[API](../api/index.md)**
 
     ---
 
