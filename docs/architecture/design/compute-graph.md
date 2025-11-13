@@ -1,4 +1,6 @@
-The ETL is a computational graph, that uses a [directed acyclic graph (DAG)](../dag.md) to describe the dependencies between datasets.
+# Computational graph
+
+The ETL is a computational graph, that uses a [directed acyclic graph (DAG)](dag/#dag){data-preview} to describe the dependencies between datasets.
 
 The following diagram shows the structure of the computational graph. Each step (or dataset) is represented by a node in the graph, and their dependencies are shown with edges:
 
@@ -62,7 +64,7 @@ flowchart LR
     linkStyle default stroke-width:1px;
 ```
 
-A node represents a step (or a dataset) in the ETL and is uniquely identified by its URI.
+A node represents a step (or a dataset) in the ETL and is uniquely identified by its [URI](uri/#uri){data-preview}.
 
 !!! info "Learn more about URIs"
 
