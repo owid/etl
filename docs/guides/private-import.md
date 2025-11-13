@@ -3,6 +3,8 @@ tags:
   - 👷 Staff
 ---
 
+# Private datasets
+
 While most of the data at OWID is publicly available, some datasets are added to our catalog with some restrictions. These include datasets that are not redistributable, or that are not meant to be shared with the public. This can happen due to a strict license by the data provider, or because the data is still in a draft stage and not ready for public consumption.
 
 Various privacy configurations are available:
