@@ -74,7 +74,7 @@ def save_data_to_json(tb: Table, output_path: str) -> None:
 def prepare_and_save_outputs(tb: Table, codebook: Table, temp_dir_path: Path) -> None:
     # Create a csv file.
     log.info("Creating csv file.")
-    pd.DataFrame(tb).to_csv(temp_dir_path / "owid-co2-data.csv", index=False, float_format="%.3f")
+    pd.DataFrame(tb).to_csv(temp_dir_path / "owid-co2-data.csv", index=False)
 
     # Create a json file.
     log.info("Creating json file.")
@@ -82,9 +82,10 @@ def prepare_and_save_outputs(tb: Table, codebook: Table, temp_dir_path: Path) ->
 
     # Create an excel file.
     log.info("Creating excel file.")
-    with pd.ExcelWriter(temp_dir_path / "owid-co2-data.xlsx") as writer:
-        # Always write the data sheet first to ensure at least one visible sheet exists
-        tb.to_excel(writer, sheet_name="Data", index=False, float_format="%.3f")
+    with pd.ExcelWriter(temp_dir_path / "owid-co2-data.xlsx", engine="openpyxl") as writer:
+        # Write data without automatic metadata (we'll write custom codebook instead).
+        tb.to_excel(writer, sheet_name="Data", index=False, with_metadata=False)
+        # Write the custom codebook from the dataset.
         pd.DataFrame(codebook).to_excel(writer, sheet_name="Metadata", index=False)
 
 
@@ -102,13 +103,6 @@ def run() -> None:
     #
     # Create a temporary directory for all files to be committed.
     with tempfile.TemporaryDirectory() as temp_dir:
-        ################################################################################################################
-        # TODO: Create new public files and update the way we write to them.
-        log.warning(
-            "This implementation currently does not work. We should create an R2 public bucket and update the way we write to it. For now, manually update files in Digital Ocean using the web interface."
-        )
-        ################################################################################################################
-
         temp_dir_path = Path(temp_dir)
 
         prepare_and_save_outputs(tb, codebook=codebook, temp_dir_path=temp_dir_path)

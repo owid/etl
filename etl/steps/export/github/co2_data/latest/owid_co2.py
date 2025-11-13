@@ -280,8 +280,6 @@ def run() -> None:
 
     # Uncomment to inspect changes (after the new branch has been created).
     # from etl.data_helpers.misc import compare_tables
-    # branch = "update-ghg-emissions"
     # old = pd.read_csv("https://raw.githubusercontent.com/owid/co2-data/refs/heads/master/owid-co2-data.csv")
-    # new = tb.copy()
     # new = pd.read_csv(f"https://raw.githubusercontent.com/owid/co2-data/refs/heads/{branch}/owid-co2-data.csv")
     # compare_tables(old, new, countries=["World"])
