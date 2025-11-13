@@ -254,15 +254,13 @@ def combine_tables(
     return combined
 
 
-def prepare_outputs(combined: Table, ds_regions: Dataset) -> Table:
+def prepare_outputs(combined: Table) -> Table:
     """Clean and prepare output table.
 
     Parameters
     ----------
     combined : Table
         Combined table.
-    ds_regions : Dataset
-        Regions dataset, only used to get its version.
 
     Returns
     -------
@@ -276,18 +274,6 @@ def prepare_outputs(combined: Table, ds_regions: Dataset) -> Table:
     ]
     combined = combined.dropna(subset=columns_that_must_have_data, how="all").reset_index(drop=True)
 
-    # Add metadata to the ISO column (loaded from the regions dataset).
-    combined["iso_code"].m.origins = [
-        Origin(
-            producer="International Organization for Standardization",
-            title="Regions",
-            date_published=ds_regions.version,
-        )
-    ]
-    combined["iso_code"].metadata.title = "ISO code"
-    combined["iso_code"].metadata.description_short = "ISO 3166-1 alpha-3 three-letter country codes."
-    combined["iso_code"].metadata.unit = ""
-
     # Sanity check.
     columns_with_inf = [column for column in combined.columns if len(combined[combined[column] == np.inf]) > 0]
     assert len(columns_with_inf) == 0, f"Infinity values detected in columns: {columns_with_inf}"
@@ -296,17 +282,19 @@ def prepare_outputs(combined: Table, ds_regions: Dataset) -> Table:
     first_columns = ["country", "year", "iso_code", "population", "gdp"]
     combined = combined[first_columns + [column for column in sorted(combined.columns) if column not in first_columns]]
 
-    # Improve metadata for specific columns to ensure better codebook generation.
-    improve_metadata(tb=combined)
-
-    # Improve table format.
-    combined = combined.format()
-
     return combined
 
 
-def improve_metadata(tb: Table) -> None:
-    """Improve metadata for specific columns to ensure better codebook generation."""
+def improve_metadata(tb: Table, ds_regions: Dataset) -> None:
+    """Improve metadata for specific columns to ensure better codebook generation.
+
+    Parameters
+    ----------
+    tb : Table
+        Table to improve metadata for.
+    ds_regions : Dataset
+        Regions dataset, used to get version for metadata.
+    """
     # Manually create an origin for the regions dataset.
     regions_origin = [Origin(producer="Our World in Data", title="Regions", date_published=str(tb["year"].max()))]
 
@@ -322,6 +310,18 @@ def improve_metadata(tb: Table) -> None:
     tb["year"].metadata.description = None
     tb["year"].metadata.unit = ""
     tb["year"].metadata.origins = regions_origin
+
+    # Add metadata to the ISO code column.
+    tb["iso_code"].metadata.origins = [
+        Origin(
+            producer="International Organization for Standardization",
+            title="Regions",
+            date_published=ds_regions.version,
+        )
+    ]
+    tb["iso_code"].metadata.title = "ISO code"
+    tb["iso_code"].metadata.description_short = "ISO 3166-1 alpha-3 three-letter country codes."
+    tb["iso_code"].metadata.unit = ""
 
     # Remove long description from population column (keep only short description).
     if tb["population"].metadata.description is not None:
@@ -411,7 +411,13 @@ def run() -> None:
     )
 
     # Prepare output data table.
-    tb = prepare_outputs(combined=combined, ds_regions=ds_regions)
+    tb = prepare_outputs(combined=combined)
+
+    # Improve metadata for specific columns to ensure better codebook generation.
+    improve_metadata(tb, ds_regions=ds_regions)
+
+    # Improve table format.
+    tb = tb.format()
 
     # Sanity check.
     sanity_check_outputs(tb=tb)
