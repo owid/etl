@@ -915,6 +915,8 @@ def add_ilo_modeling_comparison_indicators(tb: Table) -> Table:
     Each indicator is added as a new column with the suffix '_ilo_modeling_comparison'.
     """
 
+    tb = tb.reset_index()
+
     for indicator in ILO_MODELED_AND_NATIONAL_INDICATORS.keys():
         ind_modeled = ILO_MODELED_AND_NATIONAL_INDICATORS[indicator][0]
         ind_national = ILO_MODELED_AND_NATIONAL_INDICATORS[indicator][1]
@@ -955,7 +957,18 @@ def add_ilo_modeling_comparison_indicators(tb: Table) -> Table:
             tb[f"{indicator}_ratio"]
         )
 
+        # Calculate the maximum year with data for each indicator
+        max_year_modeled = tb.loc[tb[ind_modeled].notna(), "year"].max()
+        max_year_national = tb.loc[tb[ind_national].notna(), "year"].max()
+        max_year_for_comparison = min(max_year_modeled, max_year_national)
+
+        # Make ilo_modeling_comparison NaN for years greater than the maximum year with data for both indicators
+        tb.loc[tb["year"] > max_year_for_comparison, f"{indicator}_ilo_modeling_comparison"] = pd.NA
+
         # Drop ratio column
         tb = tb.drop(columns=[f"{indicator}_ratio"], errors="raise")
+
+    # Set index again
+    tb = tb.format()
 
     return tb
