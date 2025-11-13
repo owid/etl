@@ -103,7 +103,7 @@ Additionally, to construct indicators per capita, per GDP, and per unit energy, 
 - Regions (Our World in Data).
   - [Processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/regions/{regions_version}/regions.py)
 - Population (Our World in Data based on [a number of different sources](https://ourworldindata.org/population-sources)).
-  - [Processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/demography/{population_version}/population/__init__.py)
+  - [Processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/demography/{population_version}/population.py)
 - Income groups (World Bank).
   - [Processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/wb/{income_groups_version}/income_groups.py)
 - GDP (University of Groningen GGDC's Maddison Project Database, Bolt and van Zanden).
@@ -178,7 +178,7 @@ Additionally, to construct indicators per capita, per GDP, and per unit energy, 
 
 - **We standardize names of countries and regions.** Since the names of countries and regions are different in different data sources, we standardize all names in order to minimize data loss during data merges.
 - **We recalculate carbon emissions to CO2.** The primary data sources on CO2 emissions—the Global Carbon Project, for example—typically report emissions in tonnes of carbon. We have recalculated these figures as tonnes of CO2 using a conversion factor of 3.664.
-- **We calculate per capita figures.** All of our per capita figures are calculated from our metric `Population`, which is included in the complete dataset. These population figures are sourced from [Gapminder](http://gapminder.org) and the [UN World Population Prospects (UNWPP)](https://population.un.org/wpp/).
+- **We calculate per capita figures.** All of our per capita figures are calculated from our metric `Population`, which is included in the complete dataset.
 
 ## License
 
@@ -188,7 +188,7 @@ The data produced by third parties and made available by _Our World in Data_ is 
 
 ## Authors
 
-This data has been collected, aggregated, and documented by Hannah Ritchie, Max Roser, Edouard Mathieu, Bobbie Macdonald and Pablo Rosado.
+This data has been collected, aggregated, and documented by Pablo Rosado, Hannah Ritchie, Max Roser, Edouard Mathieu, and Bobbie Macdonald.
 
 The mission of *Our World in Data* is to make data and research on the world's largest problems understandable and accessible. [Read more about our mission](https://ourworldindata.org/about).
 
@@ -207,10 +207,10 @@ Please follow [the guidelines in our FAQ](https://ourworldindata.org/faqs#how-sh
     return readme
 
 
-def prepare_and_save_outputs(tb: Table, codebook: Table, readme: str, temp_dir_path: Path) -> None:
-    # Create codebook and save it as a csv file.
+def prepare_and_save_outputs(tb: Table, readme: str, temp_dir_path: Path) -> None:
+    # Create codebook from table metadata and save it as a csv file.
     log.info("Saving codebook csv file.")
-    pd.DataFrame(codebook).to_csv(temp_dir_path / "owid-co2-codebook.csv", index=False)
+    tb.codebook.to_csv(temp_dir_path / "owid-co2-codebook.csv", index=False)
 
     # Create a csv file.
     log.info("Saving data csv file.")
@@ -225,10 +225,15 @@ def run() -> None:
     #
     # Load data.
     #
-    # Load the owid_co2 emissions dataset from garden, and read its main table and codebook.
+    # Load the owid_co2 emissions dataset from garden, and read its main table.
     ds_gcp = paths.load_dataset("owid_co2")
     tb = ds_gcp.read("owid_co2")
-    codebook = ds_gcp.read("owid_co2_codebook")
+
+    #
+    # Process data.
+    #
+    # Create a README file.
+    readme = prepare_readme()
 
     #
     # Process data.
@@ -256,7 +261,7 @@ def run() -> None:
     with tempfile.TemporaryDirectory() as temp_dir:
         temp_dir_path = Path(temp_dir)
 
-        prepare_and_save_outputs(tb, codebook=codebook, readme=readme, temp_dir_path=temp_dir_path)
+        prepare_and_save_outputs(tb, readme=readme, temp_dir_path=temp_dir_path)
 
         repo = GithubApiRepo(repo_name="co2-data")
 
@@ -280,8 +285,6 @@ def run() -> None:
 
     # Uncomment to inspect changes (after the new branch has been created).
     # from etl.data_helpers.misc import compare_tables
-    # branch = "update-ghg-emissions"
     # old = pd.read_csv("https://raw.githubusercontent.com/owid/co2-data/refs/heads/master/owid-co2-data.csv")
-    # new = tb.copy()
     # new = pd.read_csv(f"https://raw.githubusercontent.com/owid/co2-data/refs/heads/{branch}/owid-co2-data.csv")
     # compare_tables(old, new, countries=["World"])

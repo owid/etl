@@ -24,7 +24,6 @@ meta:
     license:
       name: CC BY 4.0
       url: https://doi.org/10.5281/zenodo.5569234
-  is_public: false
 outs:
   - md5: 3008e30d913af5926a83d0d0775fb72e
     size: 3147221
