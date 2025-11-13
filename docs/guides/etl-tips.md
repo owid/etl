@@ -1,10 +1,8 @@
-!!! warning "This is a work in progress"
+# ETL tips and tricks
 
-    This page has been created to collect some practices when working with ETL that can be helpful for all the team to know.
+!!! info "Help us improve this page!"
 
-    Please contribute by adding some of your tricks and tips. [Learn how to edit the documentation](../../dev/docs/).
-
-    The content and structure of this page may change in the future.
+    Contribute by [documenting](../dev/docs/){data-preview} your tricks and tips!.
 
 
 ## Interpolate values
@@ -32,7 +30,7 @@ You can adapt the function to your needs, and perform very different kind of int
 
 === "Other interpolations"
 
-    You can use any [method from pandas](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.interpolate.html).
+    You can use any [:octicons-link-external-16: method from pandas](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.interpolate.html).
 
     ```python
     tb = interpolate_table(
@@ -55,6 +53,8 @@ You can adapt the function to your needs, and perform very different kind of int
         mode="full_range_entity",
     )
     ```
+
+---
 
 ## Expand a timeseries for all years
 Sometimes, you may need to expand a timeseries to include all years within a specific range, even if some years are missing in the original data. The `expand_time_column` function in the `data_helpers.misc` module can help you achieve this.

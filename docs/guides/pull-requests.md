@@ -7,7 +7,7 @@ We use pull requests (PRs) to propose changes to the codebase. They are the best
 
 Every PR in the ETL repository has an associated [staging server](staging-servers) created to it. To smooth this process, we have automated all of this with the command `etl pr`.
 
-!!! tip "[Learn more about how to use the `etl pr` command](../etl-cli/#etl-pr)"
+!!! tip "Learn more about how to use the [`etl pr` command](etl-cli/#etl-pr){data-preview}"
 
 ## PR work summary
 Once you've created a PR, the automation user [@owidbot](https://github.com/owidbot) will add a comment to the PR summarizing your work in the PR and providing links to relevant resources. This comment will include the following information:
@@ -33,7 +33,7 @@ You have multiple options to schedule a PR merge:
 - `/schedule 2024-11-19`: The PR will be merged at midnight (00:00 UTC) on the specified date.
 - `/schedule 2024-11-19T12:50:00.000Z`: The PR will be merged at the next sharp hour immediately following the specified timestamp (e.g., if scheduled for 12:50 UTC, it will merge at 13:00 UTC).
 
-You can find an example [here](https://github.com/owid/etl/pull/3563).
+You can find an example [:fontawesome-brands-github: here](https://github.com/owid/etl/pull/3563).
 
 <figure markdown="span">
     <img src="../../assets/pr-2.png" alt="Chart Upgrader" style="width:100%;">

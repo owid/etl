@@ -41,7 +41,7 @@ This will prevent the file to be publicly accessible without the appropriate cre
 
 Creating a private data step means that the data will not be listed in the public catalog, and therefore will not be accessible via `owid-catalog-py`.
 
-To create a private data step (meadow, garden or grapher) simply use `data-private` prefix in the step name in the DAG. For example, the step `grapher/ihme_gbd/2024-06-10/leading_causes_deaths` (this is from [health.yml](https://github.com/owid/etl/blob/master/dag/health.yml)) is private:
+To create a private data step (meadow, garden or grapher) simply use `data-private` prefix in the step name in the DAG. For example, the step `grapher/ihme_gbd/2024-06-10/leading_causes_deaths` (this is from [:fontawesome-brands-github: health.yml](https://github.com/owid/etl/blob/master/dag/health.yml)) is private:
 
 ```yaml
 # IHME GBD Leading cause of  deaths - update

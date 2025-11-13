@@ -2,7 +2,7 @@ A crucial step in the ETL process is harmonizing country names. This is because 
 
 !!! info
 
-    All our standardised country names are defined in our regions dataset (see [this YAML file](https://github.com/owid/etl/blob/master/etl/steps/data/garden/regions/2023-01-01/regions.yml)).
+    All our standardised country names are defined in our regions dataset (see [:fontawesome-brands-github: this YAML file](https://github.com/owid/etl/blob/master/etl/steps/data/garden/regions/2023-01-01/regions.yml)).
 
 Typically, harmonizing country names is done while developing the Garden step, and is consolidated into a JSON dictionary, which maps the source's country names to our standard names:
 
@@ -15,21 +15,32 @@ Typically, harmonizing country names is done while developing the Garden step, a
 }
 ```
 
-Our harmonizer is available from [Wizard](#using-wizard), the [terminal with our CLI](#using-our-cli), and the [interactive shell](#using-the-interactive-shell).
-
-## Methodology
+## Our methodology
 
 Harmonization is the editorial process by which we modify the indexing columns for a dataset to ensure that the data is consistent and unambiguous.
 
 Harmonizing a country name can sometimes be done automatically, based on mappings done in the past. However, in many cases, manual intervention is needed. For example, a `country` column containing the value `Korea` could be referring to South Korea, North Korea, or historical unified Korea, depending on the context and the intent of the data provider. In such case, human judgement is needed.
 
-We strive to harmonize country names in a way that is consistent with the [ISO 3166-1 standard](https://en.wikipedia.org/wiki/ISO_3166-1), however we use custom editorial labels for countries and regions that are often shorter than those in the standard, in order to make data visualisations richer and more understandable.
+We strive to harmonize country names in a way that is consistent with the [:octicons-link-external-16: ISO 3166-1 standard](https://en.wikipedia.org/wiki/ISO_3166-1), however we use custom editorial labels for countries and regions that are often shorter than those in the standard, in order to make data visualisations richer and more understandable.
 
 Since we also present long-run datasets over multiple centuries, a time period in which national borders have changed, split and merged, we also make a best-effort attempt to harmonize the names of historical countries and regions that no longer exist and are not present in the ISO standard.
 
-Our harmonization tool relies on [rapidfuzz](https://github.com/rapidfuzz/RapidFuzz).
+Our harmonization tool relies on [:fontawesome-brands-github: rapidfuzz](https://github.com/rapidfuzz/RapidFuzz).
 
-## Using the interactive window
+## Guidelines for harmonization
+Our harmonizer is available from [Wizard :material-arrow-down:](#using-wizard), the terminal with [our CLI :material-arrow-down:](#using-our-cli), and the [interactive shell :material-arrow-down:](#using-the-interactive-shell).
+
+
+### Using Wizard
+
+After generating a Meadow dataset, one can use the Harmonizer page in Wizard to generate a JSON mapping file for the Garden step.
+
+<figure markdown="span">
+  ![Chart Upgrader](../assets/harmonizer-wizard.png)
+  <figcaption>Harmonizer page in Wizard. You can choose default names from the dropdowns or enter custom names.</figcaption>
+</figure>
+
+### Using the interactive window
 
 If you are editing a step script in VS Code, it can be helpful to have access to the harmonizer tool from the interactive window (or interactive shell).
 
@@ -61,18 +72,10 @@ After running the harmonizer to create the mapping file, you can apply the harmo
 tb_harmonized = paths.regions.harmonize_names(tb)
 ```
 
-## Using Wizard
 
-After generating a Meadow dataset, one can use the Harmonizer page in Wizard to generate a JSON mapping file for the Garden step.
+### Using our CLI
 
-<figure markdown="span">
-  ![Chart Upgrader](../assets/harmonizer-wizard.png)
-  <figcaption>Harmonizer page in Wizard. You can choose default names from the dropdowns or enter custm names.</figcaption>
-</figure>
-
-## Using our CLI
-
-Our [ETL CLI](../etl-cli.md) contains an interactive `harmonize` command-line tool which can be used to harmonize a CSV file that contains a column with country names.
+Our [ETL client](etl-cli/){ data-preview } contains an interactive `harmonize` command-line tool which can be used to harmonize a CSV file that contains a column with country names.
 
 ```
 ~ etl harmonize --help
@@ -117,12 +120,12 @@ Beginning interactive harmonization...
 
 ? [1/18] Arab States: (Use shortcuts or arrow keys)
  » 1) Yemen Arab Republic
-   2) United States Virgin Islands
-   3) United States Minor Outlying Islands
-   4) United States
-   5) United Arab Emirates
-   6) [custom]
-   7) [skip]
+   1) United States Virgin Islands
+   2) United States Minor Outlying Islands
+   3) United States
+   4) United Arab Emirates
+   5) [custom]
+   6) [skip]
 ```
 
 The output mapping is saved in `mapping.json`. If this file existed before, it will resume the session from where it left off.
