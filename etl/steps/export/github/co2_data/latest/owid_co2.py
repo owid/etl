@@ -207,10 +207,10 @@ Please follow [the guidelines in our FAQ](https://ourworldindata.org/faqs#how-sh
     return readme
 
 
-def prepare_and_save_outputs(tb: Table, codebook: Table, readme: str, temp_dir_path: Path) -> None:
-    # Create codebook and save it as a csv file.
+def prepare_and_save_outputs(tb: Table, readme: str, temp_dir_path: Path) -> None:
+    # Create codebook from table metadata and save it as a csv file.
     log.info("Saving codebook csv file.")
-    pd.DataFrame(codebook).to_csv(temp_dir_path / "owid-co2-codebook.csv", index=False)
+    tb.codebook.to_csv(temp_dir_path / "owid-co2-codebook.csv", index=False)
 
     # Create a csv file.
     log.info("Saving data csv file.")
@@ -225,10 +225,9 @@ def run() -> None:
     #
     # Load data.
     #
-    # Load the owid_co2 emissions dataset from garden, and read its main table and codebook.
+    # Load the owid_co2 emissions dataset from garden, and read its main table.
     ds_gcp = paths.load_dataset("owid_co2")
     tb = ds_gcp.read("owid_co2")
-    codebook = ds_gcp.read("owid_co2_codebook")
 
     #
     # Process data.
@@ -256,7 +255,7 @@ def run() -> None:
     with tempfile.TemporaryDirectory() as temp_dir:
         temp_dir_path = Path(temp_dir)
 
-        prepare_and_save_outputs(tb, codebook=codebook, readme=readme, temp_dir_path=temp_dir_path)
+        prepare_and_save_outputs(tb, readme=readme, temp_dir_path=temp_dir_path)
 
         repo = GithubApiRepo(repo_name="co2-data")
 
