@@ -77,7 +77,7 @@ dependencies = [
     "cfgrib>=0.9.15.0",
     "metabase-api>=3.5.2",
     "codespell>=2.4.1",
-    "zensical>=0.0.5",
+    "zensical>=0.0.7",
     "pandas-gbq>=0.29.2",
 ]
 
