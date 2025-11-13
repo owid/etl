@@ -1,4 +1,4 @@
-# Data format
+# Data model
 
 To use data from a wide variety of sources, we need to bring it into a common format.
 
