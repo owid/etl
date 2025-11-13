@@ -236,12 +236,6 @@ def run() -> None:
     readme = prepare_readme()
 
     #
-    # Process data.
-    #
-    # Create a README file.
-    readme = prepare_readme()
-
-    #
     # Save outputs.
     #
     branch = git.Repo(BASE_DIR).active_branch.name

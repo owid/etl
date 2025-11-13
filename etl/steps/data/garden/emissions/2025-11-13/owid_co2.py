@@ -12,13 +12,7 @@ GDP are included.
 """
 
 import numpy as np
-<<<<<<< HEAD
-import pandas as pd
 from owid.catalog import Dataset, Origin, Table
-from owid.catalog.utils import remove_details_on_demand
-=======
-from owid.catalog import Dataset, Origin, Table
->>>>>>> origin/master
 from structlog import get_logger
 
 from etl.helpers import PathFinder
