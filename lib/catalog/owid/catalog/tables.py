@@ -257,10 +257,17 @@ class Table(pd.DataFrame):
         **kwargs: Any,
     ) -> None:
         # Save data and codebook to an excel file.
-        with pd.ExcelWriter(excel_writer) as writer:  # type: ignore
-            super().to_excel(writer, sheet_name=sheet_name, **kwargs)
+        if isinstance(excel_writer, pd.ExcelWriter):
+            # If excel_writer is already an ExcelWriter instance, use it, to avoid nested contexts.
+            super().to_excel(excel_writer, sheet_name=sheet_name, **kwargs)
             if with_metadata:
-                self.codebook.to_excel(writer, sheet_name=metadata_sheet_name)
+                self.codebook.to_excel(excel_writer, sheet_name=metadata_sheet_name, index=False)
+        else:
+            # If excel_writer is a file path, create a new ExcelWriter context.
+            with pd.ExcelWriter(excel_writer) as writer:  # type: ignore
+                super().to_excel(writer, sheet_name=sheet_name, **kwargs)
+                if with_metadata:
+                    self.codebook.to_excel(writer, sheet_name=metadata_sheet_name, index=False)
 
     def to_feather(
         self,
