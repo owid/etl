@@ -22,6 +22,6 @@ You can try using our [API](api/index.md){data-preview} to access our data and g
 
 ## Suggest new datasets
 - You can try to build our datasets yourself and verify that they build cleanly.
-- You can [:octicons-link-external-16: report issues](https://github.com/owid/etl/issues) you encounter, either with our code or with our datasets.
-- You can [:octicons-link-external-16: make suggestions](https://github.com/owid/etl/discussions) for important data sets that you think would add a lot of value to our work.
+- You can [:fontawesome-brands-github: report issues](https://github.com/owid/etl/issues) you encounter, either with our code or with our datasets.
+- You can [:fontawesome-brands-github: make suggestions](https://github.com/owid/etl/discussions) for important data sets that you think would add a lot of value to our work.
 - For broader questions, please refer to our [:octicons-link-external-16: FAQs](https://ourworldindata.org/faqs).

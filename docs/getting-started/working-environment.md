@@ -77,6 +77,8 @@ You will need Python 3.10+, basic build tools, and MySQL client libraries.
 
     Then, enter your Linux console and follow the instructions for Ubuntu 22.04.
 
+---
+
 ??? "Extra config for staff"
 
     OWID staff who want to upsert data from ETL to grapher database will also need access to Cloudflare R2.
@@ -135,6 +137,7 @@ Follow the instructions in the [:fontawesome-brands-github: pyenv installation g
     ```
 
     For more details visit our other project: https://github.com/pyenv/pyenv-installer
+---
 
 
 Add these lines to `~/.zshrc`, `~/.bash_profile` or `~/.bashrc`:
