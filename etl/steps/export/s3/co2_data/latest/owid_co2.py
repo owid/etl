@@ -111,5 +111,10 @@ def run() -> None:
             s3_file = S3_DATA_DIR / file_name
             tqdm.write(f"Uploading file {local_file} to S3 bucket {S3_BUCKET_NAME} as {s3_file}.")
 
-            # Upload file to S3
-            s3_utils.upload(f"s3://{S3_BUCKET_NAME}/{str(s3_file)}", local_file, public=True)
+            # Upload file to S3 and force download instead of displaying in browser
+            s3_utils.upload(
+                f"s3://{S3_BUCKET_NAME}/{str(s3_file)}",
+                local_file,
+                public=True,
+                downloadable=True,
+            )
