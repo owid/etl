@@ -827,6 +827,7 @@ class MockRegionsDataset:
                 "is_historical": [False, False, False, False, False, False, True],
                 "members": ['["BLR", "FRA", "ITA", "RUS", "ESP", "OWID_USS"]', "[]", "[]", "[]", "[]", "[]", "[]"],
                 "successors": ["[]", "[]", "[]", "[]", "[]", "[]", '["BLR", "RUS"]'],
+                "related": ["[]", '["GUF"]', "[]", "[]", "[]", "[]", "[]"],
             }
         ).set_index("code")
         return mock_tb_regions
@@ -2487,15 +2488,15 @@ class TestRegions(unittest.TestCase):
         self.assertIn("Europe", all_regions)
         self.assertIn("High-income countries", all_regions)
 
-    def test_get_regions_only_members(self):
-        """Test getting regions with only_members=True."""
+    def test_get_regions_only_subregions(self):
+        """Test getting regions with only_subregions=True."""
         regions = geo.Regions(
             ds_regions=self.ds_regions,
             ds_income_groups=self.ds_income_groups,
             auto_load_datasets=False,
         )
 
-        regions_members = regions.get_regions(only_members=True)
+        regions_members = regions.get_regions(only_subregions=True)
 
         # Should be a dictionary of lists
         self.assertIsInstance(regions_members, dict)
@@ -2548,6 +2549,66 @@ class TestRegions(unittest.TestCase):
         # country_02 should be harmonized to Country 2
         expected_countries = ["Country 2", "Country 1"]
         self.assertEqual(result["country"].tolist(), expected_countries)
+
+    def test_add_population(self):
+        """Test add_population method of Regions class."""
+        regions = geo.Regions(
+            ds_regions=self.ds_regions,
+            ds_income_groups=self.ds_income_groups,
+            ds_population=self.ds_population,
+            auto_load_datasets=False,
+        )
+
+        # Create a test table without population
+        tb = Table(
+            {
+                "country": ["France", "Italy", "Spain"],
+                "year": [2020, 2020, 2020],
+                "gdp": [2600, 2000, 1400],
+            }
+        )
+
+        # Add population using the new method
+        tb_with_pop = regions.add_population(tb)
+
+        # Check that population column was added
+        self.assertIn("population", tb_with_pop.columns)
+
+        # Check that the table has the correct number of rows
+        self.assertEqual(len(tb_with_pop), 3)
+
+        # Check that population values are present (should be from mock population dataset)
+        self.assertTrue(tb_with_pop["population"].notna().any())
+
+    def test_add_population_custom_column_names(self):
+        """Test add_population with custom column names."""
+        regions = geo.Regions(
+            ds_regions=self.ds_regions,
+            ds_income_groups=self.ds_income_groups,
+            ds_population=self.ds_population,
+            auto_load_datasets=False,
+        )
+
+        # Create a test table with custom column names
+        tb = Table(
+            {
+                "nation": ["France", "Italy"],
+                "yr": [2020, 2020],
+                "gdp": [2600, 2000],
+            }
+        )
+
+        # Add population with custom column names
+        tb_with_pop = regions.add_population(
+            tb,
+            country_col="nation",
+            year_col="yr",
+            population_col="pop",
+        )
+
+        # Check that custom population column was added
+        self.assertIn("pop", tb_with_pop.columns)
+        self.assertEqual(len(tb_with_pop), 2)
 
 
 class TestRegionAggregator(unittest.TestCase):

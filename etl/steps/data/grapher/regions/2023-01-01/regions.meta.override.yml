@@ -146,7 +146,7 @@ tables:
               colorScale:
                 customCategoryLabels:
                   # Americas
-                  "Northern America (UN M49)": "Norhtern America"
+                  "Northern America (UN M49)": "Northern America"
                   "Latin America and the Caribbean (UN M49)": "Latin America and the Caribbean"
                   # Africa
                   "Sub-Saharan Africa (UN M49)": "Sub-Saharan Africa"
