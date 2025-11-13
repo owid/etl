@@ -5,9 +5,9 @@ tags:
 
 # Update data
 
-This guide explains the general workflow to update a dataset that already exists in ETL. It assumes that you've created your [working environment](index/#create-environment).
+This guide explains the general workflow to update a dataset that already exists in ETL.
 
-!!! tip "Quick guide"
+??? tip "'Quick' summary"
 
     In a nutshell, these are the steps to follow:
 
@@ -32,13 +32,16 @@ This guide explains the general workflow to update a dataset that already exists
         - Make further changes, if suggested by the reviewer.
     - **Publish your work**: Once approved, merge the PR.
     - **After publishing**:
-          - Archive old grapher dataset(s).
+          - Archive old grapher dataset(s) in Admin.
           - Pull changes to explorers in Admin (if applicable).
           - Announce your update.
 
+!!! tip "[Try AI-powered workflow](ai-workflow/)! (experimental)"
+
+
 For simplicity, let's go through it with a real example: Assume you have to update the "Near-surface temperature anomaly" dataset, by the Met Office Hadley Centre.
 
-This guide assumes you have already a [working installation of `etl`](../../../getting-started/working-environment/), and use VSCode with the appropriate configuration and plugins.
+This guide assumes you have already a [working installation of `etl`](../../getting-started/working-environment/), and use VSCode with the appropriate configuration and plugins.
 
 ## 1. Initial setup
 
@@ -54,7 +57,7 @@ This guide assumes you have already a [working installation of `etl`](../../../g
 
         This will create a new git branch in your local repository with an empty commit, which will be pushed to remote. It will also create a draft pull request in github, and a staging server.
 
-    - Wait for a notification from [@owidbot](https://github.com/owidbot). It should take a few minutes, and will inform you that the staging server `http://staging-site-update-{short_name}` has been created.
+    - Wait for a notification from [:fontawesome-brands-github: @owidbot](https://github.com/owidbot). It should take a few minutes, and will inform you that the staging server `http://staging-site-update-{short_name}` has been created.
 
 - **Update steps using the ETL Dashboard**:
     - Start the ETL Wizard, by running:
@@ -72,7 +75,7 @@ This guide assumes you have already a [working installation of `etl`](../../../g
     - Then click on "Update X steps" (in this case, X equals 6).
         This will create all the new ETL code files needed for the update, and write those steps in the dag (in this case, in the `climate.yml` dag file).
     <figure markdown="span">
-    ![Chart Upgrader](../../../assets/etl-dashboard-update-steps.gif)
+    ![Chart Upgrader](../../assets/etl-dashboard-update-steps.gif)
     <figcaption>Animation of how to update steps in ETL Dashboard.</figcaption>
     </figure>
 
@@ -94,12 +97,12 @@ Ensure that all snapshot scripts and ETL steps run successfully. Adapt the code 
     - To open a specific snapshot, go to the bottom of the dag, where the new steps are. Select the dag entry of one of the snapshots (without including the `snapshot://` prefix), namely `met_office_hadley_centre/2024-07-02/near_surface_temperature_global.csv`, and then hit ++cmd+c++, ++cmd+p++, ++cmd+v++, ++enter++.
 
     <figure markdown="span">
-        ![Chart Upgrader](../../../assets/etl-dag-open-file.gif)
+        ![Chart Upgrader](../../assets/etl-dag-open-file.gif)
         <figcaption>Animation of the editing process of a snapshot.</figcaption>
     </figure>
 
     !!! note
-        We should always quickly have a look at the license URL, to ensure it has not changed (see [our guide on source's licenses](https://www.notion.so/owid/How-to-check-a-source-s-license-ade23e5e1e0f4610b98598f9d459f96e)).
+        We should always quickly have a look at the license URL, to ensure it has not changed (see [:fontawesome-brands-notion: our guide on source's licenses](https://www.notion.so/owid/How-to-check-a-source-s-license-ade23e5e1e0f4610b98598f9d459f96e)).
 
 - **Ensure the snapshot steps work**:
 
@@ -155,7 +158,7 @@ After updating the data, it is time to update the affected charts! This involves
     - If you have more datasets to update, simply refresh the page (++cmd+r++) and, by default, the next new dataset will be selected.
 
     <figure markdown="span">
-        ![Chart Upgrader](../../../assets/indicator-upgrader-short.gif)
+        ![Chart Upgrader](../../assets/indicator-upgrader-short.gif)
         <figcaption>Indicator upgrade flow.</figcaption>
     </figure>
 
@@ -173,7 +176,7 @@ Review all changes in existing charts, and also new charts.
     - If you are not happy with the changes, you can reject these.
 
     <figure markdown="span">
-        ![Chart Upgrader](../../../assets/chart-diff-short.gif)
+        ![Chart Upgrader](../../assets/chart-diff-short.gif)
         <figcaption>Chart diff flow. You'll be shown any chart that you've changed in your staging server (either via indicator upgrader or manually in the admin) compared to production. Here, you need to approve and/or reject the differences.</figcaption>
     </figure>
 
@@ -189,7 +192,7 @@ After your updates, the old steps are no longer relevant. Therefore, we move the
     - Then click on "Archive X steps" (in this case, X equals 6).
 
     <figure markdown="span">
-        ![Chart Upgrader](../../../assets/etl-dashboard-archive-steps.gif)
+        ![Chart Upgrader](../../assets/etl-dashboard-archive-steps.gif)
         <figcaption>Archive ETL steps.</figcaption>
     </figure>
 
@@ -235,13 +238,9 @@ Share the result of your work with the world.
 
 For convenience, we should archive grapher datasets that have been replaced by new ones.
 
-!!! note
-    This step is a bit cumbersome, feel free to skip if you don't feel confident about it. There is [an open issue](https://github.com/owid/owid-grapher/issues/3308) to make this easier.
-
 - Go to [the grapher dataset admin](https://admin.owid.io/admin/datasets).
-- Search for the dataset (type "Near-surface"). Click on it.
-- Copy the dataset id from the URL (e.g. if the URL is [https://admin.owid.io/admin/datasets/6520](https://admin.owid.io/admin/datasets/6520), the dataset id is `6520`).
-- Access the production database (e.g. using DBeaver), search for the dataset with that id, and set `isPrivate` and `isArchived` to 1.
+- Search for the dataset (type "Near-surface") and click on it.
+- In the dataset page, under "Settings" tab, click on "Archive dataset" on the bottom.
 
 ### Wrap up
 

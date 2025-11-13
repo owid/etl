@@ -20,7 +20,7 @@ status: new
     ```
 
 
-[Claude Code](https://www.claude.com/product/claude-code) is an AI-powered CLI tool that can help you with various ETL development tasks: from understanding complex code patterns to implementing new datasets, debugging data quality issues, and maintaining our codebase.
+[:octicons-link-external-16: Claude Code](https://www.claude.com/product/claude-code) is an AI-powered CLI tool that can help you with various ETL development tasks: from understanding complex code patterns to implementing new datasets, debugging data quality issues, and maintaining our codebase.
 
 At the moment it is mostly useful for updating datasets.
 
