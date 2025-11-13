@@ -88,7 +88,7 @@ def prepare_and_save_outputs(tb: Table, codebook: Table, temp_dir_path: Path) ->
         pd.DataFrame(codebook).to_excel(writer, sheet_name="Metadata", index=False)
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load data.
     #
