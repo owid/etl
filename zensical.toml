@@ -40,11 +40,11 @@ nav = [
         ] },
         { "Other ETL tasks" = [
             { "Harmonize country names" = "guides/harmonize-countries.md" },
-            { "Backport from database" = "guides/backport.md" },
-            { "Regular updates" = "guides/auto-regular-updates.md" },
-            { "Automatic updates via metadata" = "guides/autoupdate-cli.md" },
+            { "Automatic data updates" = "guides/autoupdate-cli.md" },
+            # { "Regular updates" = "guides/auto-regular-updates.md" },
             { "Pull requests" = "guides/pull-requests.md" },
-            { "Tips when working with ETL" = "guides/etl-tips.md" },
+            { "Tips and tricks in ETL" = "guides/etl-tips.md" },
+            { "Backport from database" = "guides/backport.md" },
             # { "Metadata in data pages" = "guides/metadata-play.md" },
         ] },
         { "Settings & servers" = [
@@ -61,13 +61,8 @@ nav = [
     ] },
     { "Design principles" = [
         { "Design principles & workflow" = "architecture/index.md" },
-        { "Our journey" = [
-            "architecture/our-journey/index.md",
-        ] },
-        { "Fundamentals" = [
-            { "Computational graph" = [
-                { "Computational graph" = "architecture/design/compute-graph/index.md" },
-            ] },
+        { "Principles" = [
+            { "Computational graph" = "architecture/design/compute-graph.md" },
             { "ETL model" = "architecture/design/phases.md" },
             { "Data model" = "architecture/design/common-format.md" },
             { "Features and constraints" = "architecture/design/features-constraints.md" },
@@ -77,6 +72,9 @@ nav = [
         { "ETL steps" = [
             { "ETL steps" = "architecture/workflow/index.md" },
             { "Other steps" = "architecture/workflow/other-steps.md" },
+        ] },
+        { "Our journey" = [
+            "architecture/our-journey/index.md",
         ] },
     ] },
     { "Metadata" = [
@@ -96,10 +94,10 @@ nav = [
         { "API" = "api/index.md" },
         { "Charts API" = "api/chart-api.md" },
         { "ETL catalog API" = "api/catalog-api.md" },
-        { "Example API usage" = "api/example-usage.md" },
+        # { "Example API usage" = "api/example-usage.md" },
         { "Querying data via Datasette" = "api/datasette.md" },
         { "Maintenance" = "api/maintenance.md" },
-        { "COVID-19" = "api/covid.md" },
+        { "COVID-19" = "api/covid/" },
     ] },
     { "Technical publications" = [
         "analyses/index.md",
