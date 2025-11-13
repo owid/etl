@@ -1,4 +1,5 @@
 # ETL steps
+
 We have designed an ETL (Extract, Transform, Load) system that allows us to manage the entire lifecycle of data, from ingestion to publication.
 
 There are three main types of ETL steps: snapshots (ingest data from source), data steps (process and curate data), and export steps (make data available to other parts of the system). We elaborate on these below.

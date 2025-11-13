@@ -2,6 +2,8 @@
 
     Our metadata formats are still in flux, and are likely to change over the coming weeks. -->
 
+# Metadata
+
 !!! info "Check the [metadata reference](reference) for a complete list of metadata fields."
 
 
