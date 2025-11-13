@@ -32,7 +32,10 @@ ILO_MODELED_AND_NATIONAL_INDICATORS = {
 }
 
 # Set maximum ratio difference between ILO modeled and national values
-MAXIMUM_ALLOWED_RATIO_DIFFERENCE = 0.05  # 5%
+MAXIMUM_ALLOWED_RATIO_DIFFERENCE = 0.01  # 1%
+
+# Set maximum absolute difference between ILO modeled and national values
+MAXIMUM_ALLOWED_ABSOLUTE_DIFFERENCE = 0.1  # 0.1 percentage points
 
 # Define base year to calculate constant 2021 US$ GDPs to compare with constant 2021 int-$ GDPs
 BASE_YEAR_FOR_CONSTANT_USD_GDP = 2021
@@ -924,6 +927,9 @@ def add_ilo_modeling_comparison_indicators(tb: Table) -> Table:
         # Calculate the ratio and add it as a new column
         tb[f"{indicator}_ratio"] = tb[ind_modeled] / tb[ind_national]
 
+        # Also calculate the absolute difference
+        tb[f"{indicator}_absolute_difference"] = (tb[ind_modeled] - tb[ind_national]).abs()
+
         # Create a categorical variable based on the ratio
         # If only available in ind_national, set as 'Survey only'
         # If only available in ind_modeled, set as 'Modeled only'
@@ -952,10 +958,37 @@ def add_ilo_modeling_comparison_indicators(tb: Table) -> Table:
             f"{indicator}_ilo_modeling_comparison",
         ] = "Both not matching"
 
+        # Create a categorical variable based on the absolute difference
+        # If only available in ind_national, set as 'Survey only'
+        # If only available in ind_modeled, set as 'Modeled only'
+        # If the absolute difference is less than or equal to MAXIMUM_ALLOWED_ABSOLUTE_DIFFERENCE, set as 'Both matching'
+        # If the absolute difference is greater than MAXIMUM_ALLOWED_ABSOLUTE_DIFFERENCE, set as 'Both not matching'
+        # If neither is available, set as NaN
+        tb[f"{indicator}_ilo_modeling_comparison_absolute"] = pd.NA
+        tb.loc[tb[ind_national].notna() & tb[ind_modeled].isna(), f"{indicator}_ilo_modeling_comparison_absolute"] = (
+            "Survey only"
+        )
+        tb.loc[tb[ind_national].isna() & tb[ind_modeled].notna(), f"{indicator}_ilo_modeling_comparison_absolute"] = (
+            "Modeled only"
+        )
+        tb.loc[
+            tb[f"{indicator}_absolute_difference"] <= MAXIMUM_ALLOWED_ABSOLUTE_DIFFERENCE,
+            f"{indicator}_ilo_modeling_comparison_absolute",
+        ] = "Both matching"
+        tb.loc[
+            (tb[f"{indicator}_absolute_difference"] > MAXIMUM_ALLOWED_ABSOLUTE_DIFFERENCE)
+            & tb[ind_national].notna()
+            & tb[ind_modeled].notna(),
+            f"{indicator}_ilo_modeling_comparison_absolute",
+        ] = "Both not matching"
+
         # Copy metadata from the modeled indicator to the new comparison indicator
         tb[f"{indicator}_ilo_modeling_comparison"] = tb[f"{indicator}_ilo_modeling_comparison"].copy_metadata(
             tb[f"{indicator}_ratio"]
         )
+        tb[f"{indicator}_ilo_modeling_comparison_absolute"] = tb[
+            f"{indicator}_ilo_modeling_comparison_absolute"
+        ].copy_metadata(tb[f"{indicator}_absolute_difference"])
 
         # Calculate the maximum year with data for each indicator
         max_year_modeled = tb.loc[tb[ind_modeled].notna(), "year"].max()
@@ -964,9 +997,10 @@ def add_ilo_modeling_comparison_indicators(tb: Table) -> Table:
 
         # Make ilo_modeling_comparison NaN for years greater than the maximum year with data for both indicators
         tb.loc[tb["year"] > max_year_for_comparison, f"{indicator}_ilo_modeling_comparison"] = pd.NA
+        tb.loc[tb["year"] > max_year_for_comparison, f"{indicator}_ilo_modeling_comparison_absolute"] = pd.NA
 
         # Drop ratio column
-        tb = tb.drop(columns=[f"{indicator}_ratio"], errors="raise")
+        tb = tb.drop(columns=[f"{indicator}_ratio", f"{indicator}_absolute_difference"], errors="raise")
 
     # Set index again
     tb = tb.format()

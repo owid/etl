@@ -1887,14 +1887,53 @@ tables:
           tolerance: 5
 
       labor_force_participation_rate_ilo_modeling_comparison:
-        title: "Labor force participation rate comparison: ILO modeled vs national estimates"
+        title: "Labor force participation rate comparison: ILO modeled vs. national estimates"
         unit: ""
         short_unit: ""
+        display:
+          name: "Labor force participation rate comparison: ILO modeled vs. national estimates"
+          numDecimalPlaces: 0
+          tolerance: 0
       unemployment_rate_ilo_modeling_comparison:
-        title: "Unemployment rate comparison: ILO modeled vs national estimates"
+        title: "Unemployment rate comparison: ILO modeled vs. national estimates"
         unit: ""
         short_unit: ""
+        display:
+          name: "Unemployment rate comparison: ILO modeled vs. national estimates"
+          numDecimalPlaces: 0
+          tolerance: 0
       employment_to_population_ratio_ilo_modeling_comparison:
-        title: "Employment-to-population ratio comparison: ILO modeled vs national estimates"
+        title: "Employment-to-population ratio comparison: ILO modeled vs. national estimates"
         unit: ""
         short_unit: ""
+        display:
+          name: "Employment-to-population ratio comparison: ILO modeled vs. national estimates"
+          numDecimalPlaces: 0
+          tolerance: 0
+
+      labor_force_participation_rate_ilo_modeling_comparison_absolute:
+        title: "Labor force participation rate difference: ILO modeled vs. national estimates (absolute)"
+        unit: ""
+        short_unit: ""
+        display:
+          name: "Labor force participation rate difference: ILO modeled vs. national estimates (absolute)"
+          numDecimalPlaces: 0
+          tolerance: 0
+
+      unemployment_rate_ilo_modeling_comparison_absolute:
+        title: "Unemployment rate difference: ILO modeled vs. national estimates (absolute)"
+        unit: ""
+        short_unit: ""
+        display:
+          name: "Unemployment rate difference: ILO modeled vs. national estimates (absolute)"
+          numDecimalPlaces: 0
+          tolerance: 0
+
+      employment_to_population_ratio_ilo_modeling_comparison_absolute:
+        title: "Employment-to-population ratio difference: ILO modeled vs. national estimates (absolute)"
+        unit: ""
+        short_unit: ""
+        display:
+          name: "Employment-to-population ratio difference: ILO modeled vs. national estimates (absolute)"
+          numDecimalPlaces: 0
+          tolerance: 0
