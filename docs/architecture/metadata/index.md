@@ -57,7 +57,7 @@ We automatically create data pages from an indicator using its metadata fields. 
 [Try the demo :octicons-arrow-right-24:](../../guides/metadata-play.md)
 
 ### Other uses
-Users can consume the metadata programmatically using the [`owid-catalog`](https://github.com/owid/etl/tree/master/lib/catalog).
+Users can consume the metadata programmatically using the [:fontawesome-brands-github: `owid-catalog`](https://github.com/owid/etl/tree/master/lib/catalog).
 
 ## Updating metadata using ChatGPT
 

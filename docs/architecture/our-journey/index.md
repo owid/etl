@@ -13,7 +13,7 @@ dot[...] --> catalog
 
 ## Early days
 
-In our early days, we developed the [Grapher](https://github.com/owid/owid-grapher) data visualization library to give us more control over how we visualize data. Like other tools for data journalism, such as Datawrapper, Grapher had an admin interface that let you upload a CSV to a database and make a chart with it for the site.
+In our early days, we developed [:fontawesome-brands-github: owid-rapher](https://github.com/owid/owid-grapher) data visualization library to give us more control over how we visualize data. Like other tools for data journalism, such as Datawrapper, Grapher had an admin interface that let you upload a CSV to a database and make a chart with it for the site.
 
 ```mermaid
 graph LR
@@ -23,12 +23,10 @@ upstream --> upload[manual upload] --> mysql --> site[Our World in Data site]
 
 ## Importers
 
-??? failure "Deprecated"
-
-    The `importers` repository is now deprecated, and only `etl` repository is used.
+!!! failure "The `importers` repository is now deprecated, and only `etl` repository is used."
 
 
-During the pandemic, we had to update data daily, and clicking through an admin interface became inefficient. We developed a series of scripts to directly insert data into our database (MySQL) for use on our site, the [importers](https://github.com/owid/importers) repo.
+During the pandemic, we had to update data daily, and clicking through an admin interface became inefficient. We developed a series of scripts to directly insert data into our database (MySQL) for use on our site, the [:fontawesome-brands-github: importers](https://github.com/owid/importers) repo.
 
 ```mermaid
 graph LR
@@ -39,7 +37,7 @@ upstream --> importers --> mysql
 
 Over time, we began _remixing_ data from more sources and noticed that our data scripts were insufficient to maintain a constantly growing catalog of datasets.
 
-## ETL: Current solution
+## The ETL
 We needed a better solution to build a large dataset catalog, which should be a scalable and maintainable solution:
 
 - It should be friendly to data scientists and well-established tools (such as python). Data should be consumable with `python` and in analytics environments like Jupyter.
@@ -60,3 +58,6 @@ The main users of the ETL are data managers. The ETL is designed to make their w
 
 
 <!-- Read about our [data management workflow](workflow/index.md) to learn more about how we use the ETL. -->
+
+## Next steps
+We are continuously improving the ETL to make it easier to use and more powerful. We would like to have a clear roadmap here, but it is hard to anticipate the future. Most of these discussions ocurr at [:fontawesome-brands-github: etl](https://github.com/owid/etl).
