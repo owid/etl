@@ -331,7 +331,7 @@ def improve_metadata(tb: Table) -> None:
 def sanity_check_outputs(tb: Table) -> None:
     """Perform sanity checks on the output table."""
     error = "Dataset columns should coincide with the codebook 'columns'."
-    assert set(tb.reset_index().codebook["column"]) == set(tb.reset_index().columns), error
+    assert set(tb.codebook["column"]) == set(tb.reset_index().columns), error
 
     error = "All rows in dataset should contain at least one non-NaN value."
     assert not tb.isnull().all(axis=1).any(), error

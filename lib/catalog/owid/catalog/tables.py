@@ -217,7 +217,7 @@ class Table(pd.DataFrame):
         Return a codebook for this table.
 
         The codebook contains:
-        - column: Column name
+        - column: Column name (including index columns)
         - title: Title of the indicator
         - description: Short description
         - unit: Unit of measurement (with short unit in parentheses)
@@ -230,8 +230,10 @@ class Table(pd.DataFrame):
         units = []
         sources = []
 
-        for column in self.columns:
-            md = self[column].metadata
+        # Use all_columns to include both index and regular columns.
+        for column in self.all_columns:
+            # Use get_column_or_index to access both regular and index columns.
+            md = self.get_column_or_index(column).metadata
             columns.append(column)
 
             # Determine the best title to use.
