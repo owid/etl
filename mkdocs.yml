@@ -282,8 +282,9 @@ nav:
                   - Example API usage: "api/example-usage.md"
                   - Querying data via Datasette: "api/datasette.md"
                   - Maintenance: "api/maintenance.md"
-                  - COVID-19: "api/covid.md"
         - Technical publications:
                   - "analyses/index.md"
                   - Does the news reflect what we die from?: "analyses/media_deaths/methodology.md"
                   - Our COVID work: "api/covid.md"
+                  # Keep commented out until the relevant DI is published.
+                  # - Food supply or world regions: "analyses/food_supply_of_world_regions/food_supply_of_world_regions.ipynb"
