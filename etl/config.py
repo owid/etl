@@ -302,6 +302,9 @@ def enable_sentry(enable_logs: bool = False) -> None:
         sentry_sdk.init(**kwargs)
 
 
+DOCS_BUILD = "DOCS_BUILD" not in os.environ
+
+
 # Wizard config
 WIZARD_PORT = 8053
 
