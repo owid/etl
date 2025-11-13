@@ -71,22 +71,6 @@ def save_data_to_json(tb: Table, output_path: str) -> None:
         file.write(json.dumps(output_dict, indent=4))
 
 
-def prepare_and_save_outputs(tb: Table, temp_dir_path: Path) -> None:
-    # Create a csv file.
-    log.info("Creating csv file.")
-    pd.DataFrame(tb).to_csv(temp_dir_path / "owid-co2-data.csv", index=False)
-
-    # Create a json file.
-    log.info("Creating json file.")
-    save_data_to_json(tb, str(temp_dir_path / "owid-co2-data.json"))
-
-    # Create an excel file.
-    log.info("Creating excel file.")
-    with pd.ExcelWriter(temp_dir_path / "owid-co2-data.xlsx", engine="openpyxl") as writer:
-        # Write data with automatic metadata codebook.
-        tb.to_excel(writer, sheet_name="Data", index=False, with_metadata=True, metadata_sheet_name="Metadata")
-
-
 def run() -> None:
     #
     # Load data.
@@ -102,7 +86,17 @@ def run() -> None:
     with tempfile.TemporaryDirectory() as temp_dir:
         temp_dir_path = Path(temp_dir)
 
-        prepare_and_save_outputs(tb, temp_dir_path=temp_dir_path)
+        # Create a csv file.
+        log.info("Creating csv file.")
+        pd.DataFrame(tb).to_csv(temp_dir_path / "owid-co2-data.csv", index=False)
+
+        # Create a json file.
+        log.info("Creating json file.")
+        save_data_to_json(tb, str(temp_dir_path / "owid-co2-data.json"))
+
+        # Create an excel file.
+        log.info("Creating excel file.")
+        tb.to_excel(temp_dir_path / "owid-co2-data.xlsx", index=False)
 
         for file_name in tqdm(["owid-co2-data.csv", "owid-co2-data.xlsx", "owid-co2-data.json"]):
             # Path to local file.
