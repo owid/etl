@@ -1,19 +1,22 @@
-"""Garden step that combines various datasets related to greenhouse emissions and produces the OWID CO2 dataset.
+"""Export step that uploads the OWID Energy dataset to S3.
 
-The combined datasets are:
-* Global Carbon Budget - Global Carbon Project.
-* National contributions to climate change - Jones et al.
-* Greenhouse gas emissions by sector - Climate Watch.
-* Primary energy consumption - EI & EIA.
+The combined datasets include:
+* Statistical review of world energy - Energy Institute.
+* International energy data - U.S. Energy Information Administration.
+* Energy from fossil fuels - The Shift Dataportal.
+* Yearly Electricity Data - Ember.
+* Primary energy consumption - Our World in Data.
+* Fossil fuel production - Our World in Data.
+* Energy mix - Our World in Data.
+* Electricity mix - Our World in Data.
 
-Additionally, OWID's regions dataset, population dataset and Maddison Project Database (Bolt and van Zanden, 2023) on
-GDP are included.
+Additionally, OWID's regions dataset, population dataset and Maddison Project Database on GDP are included.
 
 Outputs:
-* The data in three different formats will also be uploaded to S3, and will be made publicly available, in:
-  * https://owid-public.owid.io/data/co2/owid-co2-data.csv
-  * https://owid-public.owid.io/data/co2/owid-co2-data.xlsx
-  * https://owid-public.owid.io/data/co2/owid-co2-data.json
+* The data in three different formats will be uploaded to S3, and will be made publicly available, in:
+  * https://owid-public.owid.io/data/energy/owid-energy-data.csv
+  * https://owid-public.owid.io/data/energy/owid-energy-data.xlsx
+  * https://owid-public.owid.io/data/energy/owid-energy-data.json
 
 """
 
@@ -34,7 +37,7 @@ log = get_logger()
 
 # S3 bucket name and folder where dataset files will be stored.
 S3_BUCKET_NAME = "owid-public"
-S3_DATA_DIR = Path("data/co2")
+S3_DATA_DIR = Path("data/energy")
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -76,9 +79,9 @@ def run() -> None:
     #
     # Load data.
     #
-    # Load the owid_co2 emissions dataset from garden, and read its main table.
-    ds_gcp = paths.load_dataset("owid_co2")
-    tb = ds_gcp.read("owid_co2")
+    # Load the owid_energy dataset from garden, and read its main table.
+    ds_energy = paths.load_dataset("owid_energy")
+    tb = ds_energy.read("owid_energy")
 
     #
     # Save outputs.
@@ -89,17 +92,17 @@ def run() -> None:
 
         # Create a csv file.
         log.info("Creating csv file.")
-        pd.DataFrame(tb).to_csv(temp_dir_path / "owid-co2-data.csv", index=False)
+        pd.DataFrame(tb).to_csv(temp_dir_path / "owid-energy-data.csv", index=False)
 
         # Create a json file.
         log.info("Creating json file.")
-        save_data_to_json(tb, str(temp_dir_path / "owid-co2-data.json"))
+        save_data_to_json(tb, str(temp_dir_path / "owid-energy-data.json"))
 
         # Create an excel file.
         log.info("Creating excel file.")
-        tb.to_excel(temp_dir_path / "owid-co2-data.xlsx", index=False)
+        tb.to_excel(temp_dir_path / "owid-energy-data.xlsx", index=False)
 
-        for file_name in tqdm(["owid-co2-data.csv", "owid-co2-data.xlsx", "owid-co2-data.json"]):
+        for file_name in tqdm(["owid-energy-data.csv", "owid-energy-data.xlsx", "owid-energy-data.json"]):
             # Path to local file.
             local_file = temp_dir_path / file_name
             # Path (within bucket) to S3 file.
