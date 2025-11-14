@@ -3,6 +3,7 @@ import re
 from pathlib import Path
 from typing import Any, Dict, Optional
 
+import numpy as np
 import owid.catalog.processing as pr
 import pandas as pd
 import requests
@@ -26,9 +27,7 @@ paths = PathFinder(__file__)
 GDP_INDICATORS = {"ny_gdp_mktp_cd": "ny_gdp_mktp_kn", "ny_gdp_pcap_cd": "ny_gdp_pcap_kn"}
 
 ILO_MODELED_AND_NATIONAL_INDICATORS = {
-    "labor_force_participation_rate": ["sl_tlf_cact_zs", "sl_tlf_cact_ne_zs"],
     "unemployment_rate": ["sl_uem_totl_zs", "sl_uem_totl_ne_zs"],
-    "employment_to_population_ratio": ["sl_emp_totl_sp_zs", "sl_emp_totl_sp_ne_zs"],
 }
 
 # Set maximum ratio difference between ILO modeled and national values
@@ -925,10 +924,14 @@ def add_ilo_modeling_comparison_indicators(tb: Table) -> Table:
         ind_national = ILO_MODELED_AND_NATIONAL_INDICATORS[indicator][1]
 
         # Calculate the ratio and add it as a new column
-        tb[f"{indicator}_ratio"] = tb[ind_modeled] / tb[ind_national]
+        tb[f"{indicator}_ratio"] = (tb[ind_modeled] / tb[ind_national]).round(3)
 
         # Also calculate the absolute difference
-        tb[f"{indicator}_absolute_difference"] = (tb[ind_modeled] - tb[ind_national]).abs()
+        # Round each value to 1 decimal (using floor + 0.5 to avoid banker's rounding),
+        # then calculate the absolute difference
+        tb[f"{indicator}_absolute_difference"] = (
+            (np.floor(tb[ind_modeled] * 10 + 0.5) / 10 - np.floor(tb[ind_national] * 10 + 0.5) / 10).abs().round(1)
+        )
 
         # Create a categorical variable based on the ratio
         # If only available in ind_national, set as 'Survey only'
@@ -945,13 +948,13 @@ def add_ilo_modeling_comparison_indicators(tb: Table) -> Table:
         )
         tb.loc[
             tb[f"{indicator}_ratio"].between(
-                1 - MAXIMUM_ALLOWED_RATIO_DIFFERENCE, 1 + MAXIMUM_ALLOWED_RATIO_DIFFERENCE
+                1 - MAXIMUM_ALLOWED_RATIO_DIFFERENCE, 1 + MAXIMUM_ALLOWED_RATIO_DIFFERENCE, "neither"
             ),
             f"{indicator}_ilo_modeling_comparison",
         ] = "Both matching"
         tb.loc[
             ~tb[f"{indicator}_ratio"].between(
-                1 - MAXIMUM_ALLOWED_RATIO_DIFFERENCE, 1 + MAXIMUM_ALLOWED_RATIO_DIFFERENCE
+                1 - MAXIMUM_ALLOWED_RATIO_DIFFERENCE, 1 + MAXIMUM_ALLOWED_RATIO_DIFFERENCE, "neither"
             )
             & tb[ind_national].notna()
             & tb[ind_modeled].notna(),
@@ -972,11 +975,11 @@ def add_ilo_modeling_comparison_indicators(tb: Table) -> Table:
             "Modeled only"
         )
         tb.loc[
-            tb[f"{indicator}_absolute_difference"] <= MAXIMUM_ALLOWED_ABSOLUTE_DIFFERENCE,
+            tb[f"{indicator}_absolute_difference"] < MAXIMUM_ALLOWED_ABSOLUTE_DIFFERENCE,
             f"{indicator}_ilo_modeling_comparison_absolute",
         ] = "Both matching"
         tb.loc[
-            (tb[f"{indicator}_absolute_difference"] > MAXIMUM_ALLOWED_ABSOLUTE_DIFFERENCE)
+            (tb[f"{indicator}_absolute_difference"] >= MAXIMUM_ALLOWED_ABSOLUTE_DIFFERENCE)
             & tb[ind_national].notna()
             & tb[ind_modeled].notna(),
             f"{indicator}_ilo_modeling_comparison_absolute",
@@ -999,8 +1002,8 @@ def add_ilo_modeling_comparison_indicators(tb: Table) -> Table:
         tb.loc[tb["year"] > max_year_for_comparison, f"{indicator}_ilo_modeling_comparison"] = pd.NA
         tb.loc[tb["year"] > max_year_for_comparison, f"{indicator}_ilo_modeling_comparison_absolute"] = pd.NA
 
-        # Drop ratio column
-        tb = tb.drop(columns=[f"{indicator}_ratio", f"{indicator}_absolute_difference"], errors="raise")
+        # # Drop ratio column
+        # tb = tb.drop(columns=[f"{indicator}_ratio", f"{indicator}_absolute_difference"], errors="raise")
 
     # Set index again
     tb = tb.format()
