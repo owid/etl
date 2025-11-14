@@ -1,4 +1,5 @@
 # Wizard
+
 !!! info
 
     Wizard is a living project, and is constantly being improved and new features are being added. Consequently, this documentation might be slightly out of sync.
