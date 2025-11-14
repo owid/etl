@@ -4,7 +4,7 @@ This directory contains Jupyter notebooks that are automatically converted to HT
 
 ## How It Works
 
-1. **Conversion Script**: `scripts/convert_notebooks.py` - Automatically finds and converts all `.ipynb` files from `docs/` to `site/`
+1. **Conversion Script**: `docs/ignore/convert_notebooks.py` - Automatically finds and converts all `.ipynb` files from `docs/` to `site/`
 2. **Build Integration**: The conversion runs AFTER Zensical builds the docs in `make docs.build`
 3. **Template**: Uses nbconvert's "classic" template for clean, standard Jupyter notebook styling
 
@@ -30,13 +30,13 @@ You can also convert notebooks manually (after building docs):
 
 ```bash
 # Convert all notebooks (requires site/ directory to exist)
-.venv/bin/python scripts/convert_notebooks.py
+.venv/bin/python docs/ignore/convert_notebooks.py
 
 # Convert with verbose output
-.venv/bin/python scripts/convert_notebooks.py --verbose
+.venv/bin/python docs/ignore/convert_notebooks.py --verbose
 
 # Specify different directories
-.venv/bin/python scripts/convert_notebooks.py --docs-dir path/to/docs --output-dir path/to/output
+.venv/bin/python docs/ignore/convert_notebooks.py --docs-dir path/to/docs --output-dir path/to/output
 ```
 
 **Important**: The script requires the output directory (default: `site/`) to exist, so run it after `make docs.build`.
@@ -75,7 +75,7 @@ Simply add your `.ipynb` file anywhere in the `docs/` directory. The next time y
 
 The script uses nbconvert's "classic" template. To change the template or add custom styling:
 
-1. Modify the `template_name` parameter in `scripts/convert_notebooks.py`
+1. Modify the `template_name` parameter in `docs/ignore/convert_notebooks.py`
 2. Or add custom CSS to `docs/css/extra.css` that targets Jupyter HTML classes
 
 ## Troubleshooting
