@@ -33,10 +33,10 @@ Making this documentation public is part of our commitment to **transparency** a
 
     ---
 
-    Learn about our [data work](../guides/data-work/index.md){ data-preview }, our [Wizard](../guides/wizard.md){ data-preview } tool and much more.
+    Learn about our [data work](../guides/data-work/#data-work){ data-preview }, our [Wizard](../guides/wizard/#wizard){ data-preview } tool and much more.
 
 
--   :fontawesome-solid-book: &nbsp; **[Metadata reference](../architecture/metadata/reference/){ data-preview }**
+-   :fontawesome-solid-book: &nbsp; **[Metadata reference](../architecture/metadata/reference/#metadata-reference){ data-preview }**
 
     ---
 
