@@ -166,9 +166,7 @@ def wrap_in_full_zensical_template(
     """Wrap notebook HTML in full Zensical template with navigation and TOC."""
 
     # Replace title
-    template = re.sub(
-        r"<title>([^<]*)</title>", f"<title>{title} - {site_name}</title>", template, count=1
-    )
+    template = re.sub(r"<title>([^<]*)</title>", f"<title>{title} - {site_name}</title>", template, count=1)
 
     # Update header title to show notebook name
     # Use a function to avoid regex escape issues with notebook HTML
@@ -193,15 +191,25 @@ def wrap_in_full_zensical_template(
 .text_cell_render { line-height: 1.6; }
 .text_cell_render h1, .text_cell_render h2, .text_cell_render h3 { margin-top: 1.5em; margin-bottom: 0.5em; }
 .text_cell_render p { margin: 0.5em 0; }
-.code_cell { background-color: transparent; }
-.input_area { background-color: var(--md-code-bg-color, #f5f5f5); border-radius: 0.2rem; padding: 1rem; margin: 0.5rem 0; overflow-x: auto; word-wrap: break-word; overflow-wrap: break-word; }
+.code_cell {
+  background-color: transparent;
+}
+.input_area {
+  background-color: var(--md-code-bg-color, #f5f5f5);
+  border: 1px solid #dee2e6;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin: 0.5rem 0;
+  overflow-x: auto;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
 .input_prompt, .prompt { display: none; }
 .highlight pre { margin: 0; padding: 0; background-color: transparent !important; white-space: pre-wrap; word-wrap: break-word; overflow-wrap: break-word; }
 .output_area { padding: 0.5rem 0; }
 .output_subarea { max-width: 100%; overflow-x: auto; }
 .output_png img { max-width: 100%; height: auto; }
 .anchor-link { display: none !important; }
-.notebook-content { word-wrap: break-word; overflow-wrap: break-word; }
 .notebook-content pre, .notebook-content code { white-space: pre-wrap; word-wrap: break-word; overflow-wrap: break-word; }
 
 /* DataFrame styling - inspired by pandas default style */
@@ -292,6 +300,11 @@ def wrap_in_full_zensical_template(
   font-weight: 600;
 }
 
+/* Dark mode support for input area */
+[data-md-color-scheme="slate"] .input_area {
+  border-color: #404040;
+}
+
 /* Dark mode support for dataframes */
 [data-md-color-scheme="slate"] .dataframe {
   background-color: #1e1e1e;
@@ -330,7 +343,18 @@ def wrap_in_full_zensical_template(
 </style>
 """
 
-    new_content = f"""
+    # Check if notebook already has an h1 title
+    has_h1 = bool(re.search(r"<h1[^>]*>", notebook_html))
+
+    # Only add title if notebook doesn't have one
+    if has_h1:
+        new_content = f"""
+<div class="notebook-content">
+{notebook_html}
+</div>
+"""
+    else:
+        new_content = f"""
 <h1>{title}</h1>
 <div class="notebook-content">
 {notebook_html}
@@ -427,7 +451,7 @@ def generate_toc_html(headings: list[dict]) -> str:
             toc_html += '<li class="md-nav__item">'
             toc_html += f'<a href="#{heading["id"]}" class="md-nav__link">'
             toc_html += f'<span class="md-ellipsis">{heading["text"]}</span>'
-            toc_html += '</a>'
+            toc_html += "</a>"
 
             # Check if next heading is h3 (needs nesting)
             if i + 1 < len(headings) and headings[i + 1]["level"] == 3:
@@ -443,7 +467,7 @@ def generate_toc_html(headings: list[dict]) -> str:
             toc_html += '<li class="md-nav__item">'
             toc_html += f'<a href="#{heading["id"]}" class="md-nav__link">'
             toc_html += f'<span class="md-ellipsis">{heading["text"]}</span>'
-            toc_html += '</a>'
+            toc_html += "</a>"
             toc_html += "</li>"
 
         # For h1 (level 1) - treat like h2
@@ -451,7 +475,7 @@ def generate_toc_html(headings: list[dict]) -> str:
             toc_html += '<li class="md-nav__item">'
             toc_html += f'<a href="#{heading["id"]}" class="md-nav__link">'
             toc_html += f'<span class="md-ellipsis">{heading["text"]}</span>'
-            toc_html += '</a>'
+            toc_html += "</a>"
             toc_html += "</li>"
 
     # Close any remaining open nested navs

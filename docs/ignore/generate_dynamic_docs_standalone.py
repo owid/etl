@@ -22,6 +22,7 @@ DOCS_DIR = BASE_DIR / "docs"
 header_metadata = """---
 tags:
   - Metadata
+icon: material/api
 ---
 
 # Metadata reference
@@ -97,6 +98,7 @@ tags:
   - Collections
   - Multidim
   - Explorers
+icon: material/api
 ---
 
 # Collections reference
