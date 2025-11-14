@@ -1,7 +1,7 @@
 [project]
 # Top-level settings
 site_name = "ETL documentation"
-site_url = "https://docs.owid.io/projects/etl"
+site_url = "https://docs.owid.io/projects/etl/"
 site_description = "Learn about the ETL pipeline at Our World in Data."
 site_author = "Our World in Data"
 copyright = '<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a> • <a href="/privacy">Privacy</a> • <a href="https://ourworldindata.org/">Our World in Data</a>'
@@ -172,7 +172,6 @@ custom_dir = "docs/overrides/"
 logo = "assets/site-logo.svg"
 favicon = "assets/images/favicon.png"
 
-# Theme features
 features = [
     "content.code.copy",
     "content.code.select",
@@ -186,13 +185,16 @@ features = [
     "navigation.instant.prefetch",
     "navigation.sections",
     "navigation.tabs",
+    # "navigation.tabs.sticky",
     "navigation.top",
     "navigation.tracking",
     "search.share",
     "search.suggest",
     "search.highlight",
     "toc.follow",
-]
+    "navigation.path",
+    # "toc.integrate",
+] # Theme features
 
 [project.theme.icon]
 repo = "fontawesome/brands/github"

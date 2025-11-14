@@ -2,7 +2,7 @@
 
 !!! info "This is the methodology for the data analysis used in our article [:material-file-document: Does the news reflect what we die from?](https://ourworldindata.org/does-the-news-reflect-what-we-die-from)"
 
-    **Resources**: Browse the [code for the analysis](media_deaths_analysis.ipynb) or download a stand-alone package including methodology, code and intermediate and final data files [here](https://catalog.owid.io/analyses/media-deaths-analysis-data.zip) (direct download).
+    **Resources**: Browse the [code for the analysis](media_deaths_analysis.html) or download a stand-alone package including methodology, code and intermediate and final data files [here](https://catalog.owid.io/analyses/media-deaths-analysis-data.zip) (direct download).
 
     **Contact**: [tuna.acisu@ourworldindata.org](mailto:tuna.acisu@ourworldindata.org?subject=Media%20Mentions%20of%20Causes%20of%20Death).
 
