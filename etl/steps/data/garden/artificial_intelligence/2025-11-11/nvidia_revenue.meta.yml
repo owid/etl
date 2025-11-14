@@ -15,6 +15,12 @@ tables:
         title: NVIDIA's revenue by market segment
         unit: "US dollars"
         short_unit: "$"
-        description_short: NVIDIA's quarterly revenue reported in US dollars. This data is not adjusted for inflation.
+        description_short: NVIDIA’s self-reported quarterly revenue across its main market segments, in US dollars. This data is not adjusted for inflation.
+        description_key:
+          - This indicator shows how NVIDIA’s revenue is split across its main lines of business over time.
+          - It tracks how much the company earns each quarter from data center products, gaming, professional visualization, automotive, and other original-equipment sales.
+          - The figures come from NVIDIA’s own financial reports, are self-reported by the company, and are shown in US dollars without adjusting for inflation.
+          - Revenue is grouped by the end market each product is sold into, so changes in the areas reflect shifts in what NVIDIA sells and who its customers are.
+          - Because it focuses on revenue rather than profit, the chart shows where NVIDIA’s sales are growing or shrinking, but not how profitable each line of business is or how many units it sells.
         display:
           numDecimalPlaces: 0
