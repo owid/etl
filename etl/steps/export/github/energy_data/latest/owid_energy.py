@@ -19,6 +19,7 @@ Outputs that will be committed to a branch in the energy-data repository:
 
 """
 
+import re
 import tempfile
 from pathlib import Path
 
@@ -129,73 +130,77 @@ Additionally, to construct region aggregates and indicators per capita and per G
 
 ## Changelog
 
-- On Nov 11, 2025:
+- 2025-11-11:
   - Moved dataset to different URL.
-- On July 17, 2025:
+  - Various improvements in the codebook format.
+- 2025-07-17:
   - Updated the Energy Institute Statistical Review of World Energy.
   - Updated EIA's International energy data.
-- On May 30, 2025:
+- 2025-05-30:
   - Updated Ember's yearly electricity data, which includes data for 2024.
-- On September 5, 2024:
+- 2024-09-05:
   - Added per capita electricity demand, from Ember's yearly electricity data.
-- On August 30, 2024:
+- 2024-08-30:
   - Fixed coal electricity generation for Switzerland, which was missing in the original data, and should be zero instead.
-- On June 20, 2024:
+- 2024-06-20:
   - Updated the Energy Institute Statistical Review of World Energy.
   - Fixed issues on electricity data for aggregate regions.
-- On May 8, 2024:
+- 2024-05-08:
   - Updated Ember's yearly electricity data, which includes data for 2023.
   - Updated GDP data, now coming from Maddison Project Database 2023.
-- On January 24, 2024:
+- 2024-01-24:
   - Improved codebook, to clarify whether indicators refer to electricity generation or primary energy consumption.
   - Improved the calculation of the share of electricity in primary energy. Previously, electricity generation was calculated as a share of input-equivalent primary energy consumption. Now it is calculated as a share of direct primary energy consumption.
-- On December 12, 2023:
+- 2023-12-12:
   - Updated Ember's yearly electricity data and EIA's International energy data.
   - Enhanced codebook (improved descriptions, added units, updated sources).
   - Fixed various minor issues.
-- On July 7, 2023:
+- 2023-07-07:
   - Replaced BP's data by the new Energy Institute Statistical Review of World Energy 2023.
   - Updated Ember's yearly electricity data.
   - Updated all datasets accordingly.
-- On June 1, 2023:
+- 2023-06-01:
   - Updated Ember's yearly electricity data.
   - Renamed countries 'East Timor' and 'Faroe Islands', and added 'Middle East (Ember)'.
   - Population and per capita indicators are now calculated using an updated version of our population dataset.
-- On March 1, 2023:
+- 2023-03-01:
   - Updated Ember's yearly electricity data and fixed some minor issues.
-- On December 30, 2022:
+- 2022-12-30:
   - Fixed some minor issues with BP's dataset. Regions like "Other North America (BP)" have been removed from the data, since, in the original Statistical Review of World Energy, these regions represented different sets of countries for different indicators.
-- On December 16, 2022:
+- 2022-12-16:
   - The column `electricity_share_energy` (electricity as a share of primary energy) was added to the dataset.
   - Fixed some minor inconsistencies in electricity data between Ember and BP, by prioritizing data from Ember.
   - Updated Ember's yearly electricity data.
-- On August 9, 2022:
+- 2022-08-09:
   - All inconsistencies due to different definitions of regions among different datasets (especially Europe) have been fixed.
     - Now all regions follow [Our World in Data's definitions](https://ourworldindata.org/world-region-map-definitions).
     - We also include data for regions as defined in the original datasets; for example, `Europe (BP)` corresponds to Europe as defined by BP.
   - All data processing now occurs outside this repository; the code has been migrated to be part of the [etl repository](https://github.com/owid/etl).
   - Indicator `fossil_cons_per_capita` has been renamed `fossil_elec_per_capita` for consistency, since it corresponds to electricity generation.
   - The codebook has been updated following these changes.
-- On April 8, 2022:
+- 2022-04-08:
   - Electricity data from Ember was updated (using the Global Electricity Review 2022).
   - Data on greenhouse-gas emissions in electricity generation was added (`greenhouse_gas_emissions`).
   - Data on emissions intensity is now provided for most countries in the world.
-- On March 25, 2022:
+- 2022-03-25:
   - Data on net electricity imports and electricity demand was added.
-  - BP data was updated (using the Statistical Review of the World Energy 2021).
+  - BP data was updated (using the Statistical Review of World Energy 2021).
   - Maddison data on GDP was updated (using the Maddison Project Database 2020).
   - EIA data on primary energy consumption was included in the dataset.
   - Some issues in the dataset were corrected (for example some missing data in production by fossil fuels).
-- On February 14, 2022:
+- 2022-02-14:
   - Some issues were corrected in the electricity data, and the energy dataset was updated accordingly.
   - The json and xlsx dataset files were removed from GitHub in favor of an external storage service, to keep this repository at a reasonable size.
   - The `carbon_intensity_elec` column was added back into the energy dataset.
-- On February 3, 2022, we updated the [Ember global electricity data](https://ember-climate.org/data/global-electricity/), combined with the [European Electricity Review from Ember](https://ember-climate.org/project/european-electricity-review-2022/).
+- 2022-02-03:
+  - We updated the [Ember global electricity data](https://ember-climate.org/data/global-electricity/), combined with the [European Electricity Review from Ember](https://ember-climate.org/project/european-electricity-review-2022/).
   - The `carbon_intensity_elec` column was removed from the energy dataset (since no updated data was available).
   - Columns for electricity from other renewable sources excluding bioenergy were added (namely `other_renewables_elec_per_capita_exc_biofuel`, and `other_renewables_share_elec_exc_biofuel`).
   - Certain countries and regions have been removed from the dataset, because we identified significant inconsistencies in the original data.
-- On March 31, 2021, we updated 2020 electricity mix data.
-- On September 9, 2020, the first version of this dataset was made available.
+- 2021-03-31:
+  - We updated 2020 electricity mix data.
+- 2020-09-09:
+  - The first version of this dataset was made available.
 
 ## Data processing
 
@@ -227,9 +232,25 @@ If you are using this dataset, please cite both [Our World in Data](https://ourw
 Please follow [the guidelines in our FAQ](https://ourworldindata.org/faqs#how-should-i-cite-your-data) on how to cite our work.
 """
 
-    # log_dates = re.findall("\d{4}-\d{2}-\d{2}", readme.split("Changelog\n")[-1])
-    # error = "Update the change log to add the latest update."
-    # assert max(log_dates) >= max([stat_review_version, eia_version, shift_version, ember_version, energy_mix_version, electricity_mix_version, primary_energy_version, fossil_production, owid_energy_version, regions_version,population_version, income_groups_version, gdp_version]), error
+    log_dates = re.findall("\d{4}-\d{2}-\d{2}", readme.split("Changelog\n")[-1])
+    error = "Update the change log to add the latest update."
+    assert max(log_dates) >= max(
+        [
+            stat_review_version,
+            eia_version,
+            shift_version,
+            ember_version,
+            energy_mix_version,
+            electricity_mix_version,
+            primary_energy_version,
+            fossil_production,
+            owid_energy_version,
+            regions_version,
+            population_version,
+            income_groups_version,
+            gdp_version,
+        ]
+    ), error
 
     return readme
 

@@ -355,7 +355,7 @@ steps:
   #
   # Energy - OWID Energy dataset.
   #
-  data://garden/energy_data/2025-11-14/owid_energy:
+  data://garden/energy_data/2025-11-11/owid_energy:
     - data://garden/regions/2023-01-01/regions
     - data://garden/demography/2024-07-15/population
     - data://garden/ggdc/2024-04-26/maddison_project_database
@@ -367,9 +367,9 @@ steps:
   # Energy - OWID Energy dataset.
   #
   export://github/energy_data/latest/owid_energy:
-    - data://garden/energy_data/2025-11-14/owid_energy
+    - data://garden/energy_data/2025-11-11/owid_energy
   #
   # Energy - OWID Energy dataset.
   #
   export://s3/energy_data/latest/owid_energy:
-    - data://garden/energy_data/2025-11-14/owid_energy
+    - data://garden/energy_data/2025-11-11/owid_energy

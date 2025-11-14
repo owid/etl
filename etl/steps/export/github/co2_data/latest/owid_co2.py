@@ -167,12 +167,15 @@ Additionally, to construct indicators per capita, per GDP, and per unit energy, 
 - 2022-02-24:
   - Updated greenhouse gas emissions data from CAIT Climate Data Explorer.
   - Included two new columns in dataset: total greenhouse gases excluding land-use change and forestry, and the same as per capita values.
-- 2021-11-05: Updated CO2 emissions data with the newly released Global Carbon Budget (v2021).
+- 2021-11-05:
+  - Updated CO2 emissions data with the newly released Global Carbon Budget (v2021).
 - 2021-09-16:
   - Fixed data quality issues in CO2 emissions indicators (emissions less than 0, missing data for Eswatini, ...).
   - Replaced all input CSVs with data retrieved directly from ourworldindata.org.
-- 2021-02-08: Updated this dataset with the latest annual release from the Global Carbon Project.
-- 2020-08-07: The first version of this dataset was made available.
+- 2021-02-08:
+  - Updated this dataset with the latest annual release from the Global Carbon Project.
+- 2020-08-07:
+  - The first version of this dataset was made available.
 
 ## Data processing
 
