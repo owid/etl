@@ -1,4 +1,6 @@
 ---
+icon: lucide/brush-cleaning
+---
 tags:
     - 👷 Staff
 ---

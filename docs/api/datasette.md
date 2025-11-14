@@ -1,3 +1,6 @@
+---
+icon: lucide/database
+---
 # Querying data with DuckDB
 
 The ETL catalog is stored in two efficient formats—Feather and Parquet—making it easy to query data with tools like [:octicons-link-external-16: DuckDB](https://duckdb.org/). To access a table, use the URL pattern:

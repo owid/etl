@@ -1,3 +1,6 @@
+---
+icon: material/virus
+---
 # COVID-19
 
 This page is a compact summary of our COVID-19 work, with all the relevant links to download our COVID-19 datasets.
