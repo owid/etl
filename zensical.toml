@@ -194,31 +194,38 @@ features = [
     "toc.follow",
 ]
 
+[project.theme.icon]
+repo = "fontawesome/brands/github"
+
+
+# Palette toggle for automatic mode
+[[project.theme.palette]]
+media = "(prefers-color-scheme)"
+toggle.icon = "lucide/sun-moon"
+toggle.name = "Switch to light mode"
+
+
 # Theme palette - light mode
 [[project.theme.palette]]
 media = "(prefers-color-scheme: light)"
 scheme = "default"
 primary = "indigo"
 accent = "pink"
-
-[project.theme.palette.toggle]
-icon = "material/brightness-7"
-name = "Switch to dark mode"
+toggle.icon = "lucide/moon"
+toggle.name = "Switch to dark mode"
 
 # Theme palette - dark mode
 [[project.theme.palette]]
 media = "(prefers-color-scheme: dark)"
 scheme = "slate"
-primary = "black"
+primary = "blue"
 accent = "amber"
-
-[project.theme.palette.toggle]
-icon = "material/brightness-4"
-name = "Switch to light mode"
+toggle.icon = "lucide/sun"
+toggle.name = "Switch to light mode"
 
 # Theme fonts
 [project.theme.font]
-text = "Helvetica Neue"
+text = "Stack Sans Text"
 
 # Custom homepage configuration
 [project.home]
@@ -312,7 +319,7 @@ glob = ["ignore/"]
 # [project.plugins."gen-files"]
 # scripts = ["docs/ignore/generate_dynamic_docs.py"]
 
-# [project.plugins.blog]
+[project.plugins.blog]
 
 # [project.plugins.git-authors]
 # show_email_address = false
