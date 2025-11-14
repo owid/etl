@@ -168,7 +168,7 @@ link = "https://linkedin.com/company/ourworldindata"
 [project.theme]
 variant = "modern"                    # Use "classic" for Material for MkDocs appearance
 language = "en"
-custom_dir = "docs/overrides"
+custom_dir = "docs/overrides/"
 logo = "assets/site-logo.svg"
 favicon = "assets/images/favicon.png"
 
