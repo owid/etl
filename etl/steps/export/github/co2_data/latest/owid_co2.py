@@ -178,7 +178,9 @@ Additionally, to construct indicators per capita, per GDP, and per unit energy, 
 
 - **We standardize names of countries and regions.** Since the names of countries and regions are different in different data sources, we standardize all names in order to minimize data loss during data merges.
 - **We recalculate carbon emissions to CO2.** The primary data sources on CO2 emissions—the Global Carbon Project, for example—typically report emissions in tonnes of carbon. We have recalculated these figures as tonnes of CO2 using a conversion factor of 3.664.
-- **We calculate per capita figures.** All of our per capita figures are calculated from our metric `Population`, which is included in the complete dataset.
+- **We calculate per capita figures.** All of our per capita figures are calculated from our metric `population`, which is included in the complete dataset.
+- **We create aggregate data for regions (e.g. Africa, Europe, etc.).** Since regions are defined differently by our sources, we create our own aggregates following [*Our World in Data* region definitions](https://ourworldindata.org/world-region-map-definitions).
+  - We also include data for regions as defined in the original datasets; for example, `Europe (EI)` corresponds to Europe as defined by the Energy Institute.
 
 ## License
 

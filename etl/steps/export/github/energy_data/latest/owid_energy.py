@@ -30,6 +30,7 @@ from etl.config import DRY_RUN
 from etl.git_api_helpers import GithubApiRepo
 from etl.helpers import PathFinder
 from etl.paths import BASE_DIR
+from etl.version_tracker import VersionTracker
 
 # Initialize logger.
 log = get_logger()
@@ -39,7 +40,31 @@ paths = PathFinder(__file__)
 
 
 def prepare_readme() -> str:
-    readme = """# Data on Energy by *Our World in Data*
+    # NOTE: In a future update, we could figure out a way to generate the main content of the README from the table's metadata (possibly with the help of VersionTracker).
+    # origins = {origin.title_snapshot or origin.title: origin for origin in set(sum([tb[column].metadata.origins for column in tb.columns], []))}
+    df = VersionTracker().steps_df
+
+    # Get all dependencies of the current step.
+    dependencies = df[df["step"] == paths.step]["all_active_dependencies"].item()
+
+    # Get the versions of the main steps.
+    stat_review_version = [step for step in dependencies if "statistical_review" in step][0].split("/")[-2]
+    eia_version = [step for step in dependencies if "eia" in step][0].split("/")[-2]
+    shift_version = [step for step in dependencies if "shift" in step][0].split("/")[-2]
+    ember_version = [step for step in dependencies if "ember" in step][0].split("/")[-2]
+    energy_mix_version = [step for step in dependencies if "energy_mix" in step][0].split("/")[-2]
+    electricity_mix_version = [step for step in dependencies if "electricity_mix" in step][0].split("/")[-2]
+    primary_energy_version = [step for step in dependencies if "primary_energy" in step][0].split("/")[-2]
+    fossil_production = [step for step in dependencies if "fossil_fuel_production" in step][0].split("/")[-2]
+    owid_energy_version = [step for step in dependencies if "owid_energy" in step][0].split("/")[-2]
+
+    # Get the versions of the auxiliary steps.
+    regions_version = [step for step in dependencies if "regions" in step][0].split("/")[-2]
+    population_version = [step for step in dependencies if "population" in step][0].split("/")[-2]
+    income_groups_version = [step for step in dependencies if "income_groups" in step][0].split("/")[-2]
+    gdp_version = [step for step in dependencies if "maddison" in step][0].split("/")[-2]
+
+    readme = f"""# Data on Energy by *Our World in Data*
 
 Our complete Energy dataset is a collection of key metrics maintained by [*Our World in Data*](https://ourworldindata.org/energy). It is updated regularly and includes data on energy consumption (primary energy, per capita, and growth rates), energy mix, electricity mix and other relevant metrics.
 
@@ -48,8 +73,6 @@ Our complete Energy dataset is a collection of key metrics maintained by [*Our W
 ### 🗂️ Download our complete Energy dataset : [CSV](https://owid-public.owid.io/data/energy/owid-energy-data.csv) | [XLSX](https://owid-public.owid.io/data/energy/owid-energy-data.xlsx) | [JSON](https://owid-public.owid.io/data/energy/owid-energy-data.json)
 
 The CSV and XLSX files follow a format of 1 row per location and year. The JSON version is split by country, with an array of yearly records.
-
-The indicators represent all of our main data related to energy consumption, energy mix, electricity mix as well as other indicators of potential interest.
 
 We will continue to publish updated data on energy as it becomes available. Most metrics are published on an annual basis.
 
@@ -60,49 +83,49 @@ A [full codebook](https://github.com/owid/energy-data/blob/master/owid-energy-co
 The dataset is built upon a number of datasets and processing steps:
 - Statistical review of world energy (Energy Institute, EI):
   - [Source data](https://www.energyinst.org/statistical-review)
-  - [Ingestion code](https://github.com/owid/etl/blob/master/snapshots/energy_institute/2025-06-27/statistical_review_of_world_energy.py)
-  - [Basic processing code](https://github.com/owid/etl/blob/master/etl/steps/data/meadow/energy_institute/2025-06-27/statistical_review_of_world_energy.py)
-  - [Further processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/energy_institute/2025-06-27/statistical_review_of_world_energy.py)
+  - [Ingestion code](https://github.com/owid/etl/blob/master/snapshots/energy_institute/{stat_review_version}/statistical_review_of_world_energy.py)
+  - [Basic processing code](https://github.com/owid/etl/blob/master/etl/steps/data/meadow/energy_institute/{stat_review_version}/statistical_review_of_world_energy.py)
+  - [Further processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/energy_institute/{stat_review_version}/statistical_review_of_world_energy.py)
 - International energy data (U.S. Energy Information Administration, EIA):
   - [Source data](https://www.eia.gov/opendata/bulkfiles.php)
-  - [Ingestion code](https://github.com/owid/etl/blob/master/snapshots/eia/2025-07-08/international_energy_data.py)
-  - [Basic processing code](https://github.com/owid/etl/blob/master/etl/steps/data/meadow/eia/2025-07-08/energy_consumption.py)
-  - [Further processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/eia/2025-07-08/energy_consumption.py)
+  - [Ingestion code](https://github.com/owid/etl/blob/master/snapshots/eia/{eia_version}/international_energy_data.py)
+  - [Basic processing code](https://github.com/owid/etl/blob/master/etl/steps/data/meadow/eia/{eia_version}/energy_consumption.py)
+  - [Further processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/eia/{eia_version}/energy_consumption.py)
 - Energy from fossil fuels (The Shift Dataportal):
   - [Source data](https://www.theshiftdataportal.org/energy)
-  - [Ingestion code](https://github.com/owid/etl/blob/master/snapshots/shift/2023-12-12/energy_production_from_fossil_fuels.py)
-  - [Basic processing code](https://github.com/owid/etl/blob/master/etl/steps/data/meadow/shift/2023-12-12/energy_production_from_fossil_fuels.py)
-  - [Further processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/shift/2023-12-12/energy_production_from_fossil_fuels.py)
+  - [Ingestion code](https://github.com/owid/etl/blob/master/snapshots/shift/{shift_version}/energy_production_from_fossil_fuels.py)
+  - [Basic processing code](https://github.com/owid/etl/blob/master/etl/steps/data/meadow/shift/{shift_version}/energy_production_from_fossil_fuels.py)
+  - [Further processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/shift/{shift_version}/energy_production_from_fossil_fuels.py)
 - Yearly Electricity Data (Ember):
-  - [Source data](https://ember-climate.org/data-catalogue/yearly-electricity-data/)
-  - [Ingestion code](https://github.com/owid/etl/blob/master/snapshots/ember/2025-05-12/yearly_electricity.py)
-  - [Basic processing code](https://github.com/owid/etl/blob/master/etl/steps/data/meadow/ember/2025-05-12/yearly_electricity.py)
-  - [Further processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/ember/2025-05-12/yearly_electricity.py)
+  - [Source data](https://ember-energy.org/data/yearly-electricity-data/)
+  - [Ingestion code](https://github.com/owid/etl/blob/master/snapshots/ember/{ember_version}/yearly_electricity.py)
+  - [Basic processing code](https://github.com/owid/etl/blob/master/etl/steps/data/meadow/ember/{ember_version}/yearly_electricity.py)
+  - [Further processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/ember/{ember_version}/yearly_electricity.py)
 - Energy mix (Our World in Data based on EI's Statistical review of world energy):
-  - [Processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/energy/2025-06-27/energy_mix.py)
+  - [Processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/energy/{energy_mix_version}/energy_mix.py)
 - Fossil fuel production (Our World in Data based on EI's Statistical review of world energy & The Shift Dataportal's Energy from fossil fuels):
-  - [Processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/energy/2025-06-27/fossil_fuel_production.py)
+  - [Processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/energy/{fossil_production}/fossil_fuel_production.py)
 - Primary energy consumption (Our World in Data based on EI's Statistical review of world energy & EIA's International energy data):
-  - [Processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/energy/2025-06-27/primary_energy_consumption.py)
+  - [Processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/energy/{primary_energy_version}/primary_energy_consumption.py)
 - Electricity mix (Our World in Data based on EI's Statistical Review & Ember's Yearly Electricity Data):
-  - [Processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/energy/2025-06-27/electricity_mix.py)
+  - [Processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/energy/{electricity_mix_version}/electricity_mix.py)
 - Energy dataset (Our World in Data based on all sources above):
-  - [Processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/energy_data/latest/owid_energy.py)
+  - [Processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/energy_data/{owid_energy_version}/owid_energy.py)
   - [Exporting code](https://github.com/owid/etl/blob/master/etl/steps/export/github/energy_data/latest/owid_energy.py)
   - [Uploading code](https://github.com/owid/etl/blob/master/etl/steps/export/s3/energy_data/latest/owid_energy.py)
 
 Additionally, to construct region aggregates and indicators per capita and per GDP, we use the following datasets and processing steps:
 - Regions (Our World in Data).
-  - [Processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/regions/2023-01-01/regions.py)
+  - [Processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/regions/{regions_version}/regions.py)
 - Population (Our World in Data based on [a number of different sources](https://ourworldindata.org/population-sources)).
-  - [Processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/demography/2024-07-15/population.py)
+  - [Processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/demography/{population_version}/population.py)
 - Income groups (World Bank).
-  - [Processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/wb/2025-07-01/income_groups.py)
+  - [Processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/wb/{income_groups_version}/income_groups.py)
 - GDP (University of Groningen GGDC's Maddison Project Database, Bolt and van Zanden, 2024).
   - [Source data](https://www.rug.nl/ggdc/historicaldevelopment/maddison/releases/maddison-project-database-2023)
-  - [Ingestion code](https://github.com/owid/etl/blob/master/snapshots/ggdc/2024-04-26/maddison_project_database.py)
-  - [Basic processing code](https://github.com/owid/etl/blob/master/etl/steps/data/meadow/ggdc/2024-04-26/maddison_project_database.py)
-  - [Processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/ggdc/2024-04-26/maddison_project_database.py)
+  - [Ingestion code](https://github.com/owid/etl/blob/master/snapshots/ggdc/{gdp_version}/maddison_project_database.py)
+  - [Basic processing code](https://github.com/owid/etl/blob/master/etl/steps/data/meadow/ggdc/{gdp_version}/maddison_project_database.py)
+  - [Processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/ggdc/{gdp_version}/maddison_project_database.py)
 
 ## Changelog
 
@@ -174,9 +197,9 @@ Additionally, to construct region aggregates and indicators per capita and per G
 - On March 31, 2021, we updated 2020 electricity mix data.
 - On September 9, 2020, the first version of this dataset was made available.
 
-## Data alterations
+## Data processing
 
-- **We standardize names of countries and regions.** Since the names of countries and regions are different in different data sources, we harmonize all names to the [*Our World in Data* standard entity names](https://ourworldindata.org/world-region-map-definitions).
+- **We standardize names of countries and regions.** Since the names of countries and regions are different in different data sources, we standardize all names in order to minimize data loss during data merges.
 - **We create aggregate data for regions (e.g. Africa, Europe, etc.).** Since regions are defined differently by our sources, we create our own aggregates following [*Our World in Data* region definitions](https://ourworldindata.org/world-region-map-definitions).
   - We also include data for regions as defined in the original datasets; for example, `Europe (EI)` corresponds to Europe as defined by the Energy Institute.
 - **We recalculate primary energy in terawatt-hours.** The primary data sources on energy—the Energy Institute Statistical review of world energy, for example—typically report consumption in terms of exajoules. We have recalculated these figures as terawatt-hours using a conversion factor of 277.8.
@@ -193,16 +216,21 @@ The data produced by third parties and made available by _Our World in Data_ is 
 
 ## Authors
 
-This data has been collected, aggregated, and documented by Hannah Ritchie, Pablo Rosado, Edouard Mathieu, Max Roser.
+This data has been collected, aggregated, and documented by Pablo Rosado, Hannah Ritchie, Edouard Mathieu, and Max Roser.
 
-*Our World in Data* makes data and research on the world's largest problems understandable and accessible. [Read more about our mission](https://ourworldindata.org/about).
+The mission of *Our World in Data* is to make data and research on the world's largest problems understandable and accessible. [Read more about our mission](https://ourworldindata.org/about).
 
 ## How to cite this data?
 
-If you are using this dataset, please cite both [Our World in Data](https://ourworldindata.org/energy#citation) and the underlying data source(s).
+If you are using this dataset, please cite both [Our World in Data](https://ourworldindata.org/co2-and-greenhouse-gas-emissions#article-citation) and the underlying data source(s).
 
-Please follow [the guidelines in our FAQ](https://ourworldindata.org/faqs#citing-work-produced-by-third-parties-and-made-available-by-our-world-in-data) on how to cite our work.
+Please follow [the guidelines in our FAQ](https://ourworldindata.org/faqs#how-should-i-cite-your-data) on how to cite our work.
 """
+
+    # log_dates = re.findall("\d{4}-\d{2}-\d{2}", readme.split("Changelog\n")[-1])
+    # error = "Update the change log to add the latest update."
+    # assert max(log_dates) >= max([stat_review_version, eia_version, shift_version, ember_version, energy_mix_version, electricity_mix_version, primary_energy_version, fossil_production, owid_energy_version, regions_version,population_version, income_groups_version, gdp_version]), error
+
     return readme
 
 
