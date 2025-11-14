@@ -15,7 +15,7 @@ tables:
         title: NVIDIA's revenue by market segment
         unit: "US dollars"
         short_unit: "$"
-        description_short: NVIDIA’s self-reported quarterly revenue across its main market segments, in US dollars. This data is not adjusted for inflation.
+        description_short: NVIDIA’s self-reported quarterly revenue across its main market segments, in US dollars. NVIDIA is a key supplier of graphics processing units (GPUs), which have long powered gaming and now power much of today’s AI training. This data is not adjusted for inflation.
         description_key:
           - This indicator shows how NVIDIA’s revenue is split across its main lines of business over time.
           - It tracks how much the company earns each quarter from data center products, gaming, professional visualization, automotive, and other original-equipment sales.
