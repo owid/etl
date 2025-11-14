@@ -366,14 +366,14 @@ def extrapolate_backwards(tb_thousand_bins: Table, tb_gdp: Table) -> Table:
         if len(missing_countries) > 0:
             sorted_missing_countries = ", ".join(sorted(missing_countries))
             log.warning(
-                f"extrapolate_backwards: The following countries are in thousand_bins but missing in GDP data: "
+                f"extrapolate_backwards: The following {len(missing_countries)} countries are in thousand_bins but missing in GDP data: "
                 f"{sorted_missing_countries}"
             )
         missing_countries = countries_gdp - countries_bins
         if len(missing_countries) > 0:
             sorted_missing_countries = ", ".join(sorted(missing_countries))
             log.warning(
-                f"extrapolate_backwards: The following countries are in GDP data but missing in thousand_bins: "
+                f"extrapolate_backwards: The following {len(missing_countries)} countries are in GDP data but missing in thousand_bins: "
                 f"{sorted_missing_countries}"
             )
 
