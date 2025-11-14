@@ -113,6 +113,86 @@ def create_other_country(tb: Table) -> Table:
     return tb
 
 
+def calculate_share_of_total_demand(tb: Table, tb_electricity: Table) -> Table:
+    """
+    Calculate share of total electricity demand for regional total electricity consumption only.
+
+    Only calculates for: metric="Regional total electricity consumption (TWh)",
+    data_center_category="Total", infrastructure_type="Total", scenario="historical".
+
+    Creates a new "Rest of the World excl. China and United States" aggregate for electricity demand,
+    then calculates the percentage share for World and Rest of the World.
+    """
+    # Filter for specific metric combination only
+    tb_filtered = tb[
+        (tb["metric"] == "Regional total electricity consumption (TWh)")
+        & (tb["data_center_category"] == "Total")
+        & (tb["infrastructure_type"] == "Total")
+        & (tb["scenario"] == "historical")
+    ].copy()
+
+    # Get relevant columns from electricity mix dataset
+    tb_elec = tb_electricity.reset_index()[["country", "year", "total_demand__twh"]].copy()
+
+    # Create "Rest of the World excl. China and United States" for electricity demand
+    world_elec = tb_elec[tb_elec["country"] == "World"].copy()
+    china_elec = tb_elec[tb_elec["country"] == "China"].copy()
+    us_elec = tb_elec[tb_elec["country"] == "United States"].copy()
+
+    # Merge and subtract
+    rest_world_elec = world_elec.merge(
+        china_elec[["year", "total_demand__twh"]], on="year", how="left", suffixes=("", "_china")
+    )
+    rest_world_elec = rest_world_elec.merge(
+        us_elec[["year", "total_demand__twh"]], on="year", how="left", suffixes=("", "_us")
+    )
+    rest_world_elec["total_demand__twh"] = (
+        rest_world_elec["total_demand__twh"]
+        - rest_world_elec["total_demand__twh_china"].fillna(0)
+        - rest_world_elec["total_demand__twh_us"].fillna(0)
+    )
+    rest_world_elec["country"] = "Rest of the world excl. China and United States"
+    rest_world_elec = rest_world_elec[["country", "year", "total_demand__twh"]]
+
+    # Combine all electricity demand data
+    tb_elec_all = pr.concat([tb_elec, rest_world_elec], ignore_index=True)
+
+    # Filter for World and Rest of the world only
+    countries_to_match = ["World", "Rest of the world"]
+    tb_filtered = tb_filtered[tb_filtered["country"].isin(countries_to_match)].copy()
+
+    # Create mapping for Rest of the world
+    tb_filtered_reset = tb_filtered.reset_index()
+    tb_filtered_reset.loc[tb_filtered_reset["country"] == "Rest of the world", "country"] = (
+        "Rest of the world excl. China and United States"
+    )
+
+    # Merge AI energy with total electricity demand
+    merge_cols = ["country", "year"]
+    tb_merged = tb_filtered_reset.merge(
+        tb_elec_all[["country", "year", "total_demand__twh"]], on=merge_cols, how="left"
+    )
+
+    # Calculate share as percentage
+    tb_merged["value_share"] = (tb_merged["value"] / tb_merged["total_demand__twh"]) * 100
+
+    # Create new metric name
+    tb_merged["metric"] = "Regional total electricity consumption (share of total electricity demand)"
+
+    # Restore country name for Rest of the world
+    tb_merged.loc[tb_merged["country"] == "Rest of the world excl. China and United States", "country"] = (
+        "Rest of the world"
+    )
+
+    # Keep only the share data with original columns
+    tb_share = tb_merged[
+        ["country", "year", "metric", "data_center_category", "infrastructure_type", "scenario", "value_share"]
+    ].copy()
+    tb_share = tb_share.rename(columns={"value_share": "value"})
+
+    return Table(tb_share)
+
+
 def run() -> None:
     """Load IEA Energy and AI meadow dataset and create a garden dataset."""
     paths.log.info("energy_ai_iea.start")
@@ -126,6 +206,10 @@ def run() -> None:
     # Read the combined table from meadow
     tb = ds_meadow.read("energy_ai_iea")
 
+    # Load electricity mix dataset for total demand data
+    ds_electricity = paths.load_dataset("electricity_mix")
+    tb_electricity = ds_electricity.read("electricity_mix")
+
     # Harmonize country names
     tb = geo.harmonize_countries(
         df=tb,
@@ -138,13 +222,21 @@ def run() -> None:
     # Create "Other" country (World - United States - China)
     tb = create_other_country(tb)
 
+    # Calculate share of total electricity demand
+    tb_share = calculate_share_of_total_demand(tb, tb_electricity)
+    print(tb_share.columns)
+    # Combine original data with share data
+    tb_combined = pr.concat([tb, tb_share], ignore_index=True)
+
     # Format with proper index
-    tb = tb.format(["country", "year", "metric", "data_center_category", "infrastructure_type", "scenario"])
+    tb_combined = tb_combined.format(
+        ["country", "year", "metric", "data_center_category", "infrastructure_type", "scenario"]
+    )
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = paths.create_dataset(tables=[tb], default_metadata=ds_meadow.metadata)
+    ds_garden = paths.create_dataset(tables=[tb_combined], default_metadata=ds_meadow.metadata)
 
     # Save changes in the new garden dataset.
     ds_garden.save()
