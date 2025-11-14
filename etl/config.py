@@ -213,6 +213,9 @@ INSTANT = env.get("INSTANT", "0") in ("True", "true", "1")
 # if set, always upload grapher data & metadata JSON files even if checksums match
 FORCE_UPLOAD = env.get("FORCE_UPLOAD") in ("True", "true", "1")
 
+# if set, export steps will not upload/commit files (e.g. S3, GitHub)
+DRY_RUN = env.get("DRY_RUN", "0") in ("True", "true", "1")
+
 # Filter to speed up development - works as regex for both data processing and grapher upload
 # - In data steps: filters data rows by matching against relevant columns (e.g. causes, indicators)
 #                  this has to be implemented manually

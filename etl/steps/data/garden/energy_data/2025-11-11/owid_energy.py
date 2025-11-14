@@ -18,9 +18,13 @@ from typing import Dict
 import numpy as np
 import owid.catalog.processing as pr
 from owid.catalog import Dataset, Origin, Table
+from structlog import get_logger
 
 from etl.data_helpers.geo import add_gdp_to_table, add_population_to_table
 from etl.helpers import PathFinder
+
+# Initialize logger.
+log = get_logger()
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -231,10 +235,101 @@ def combine_tables_data_and_metadata(
     columns_with_inf = [column for column in tb_combined.columns if len(tb_combined[tb_combined[column] == np.inf]) > 0]
     assert len(columns_with_inf) == 0, f"Infinity values detected in columns: {columns_with_inf}"
 
-    # Set index and sort conveniently.
-    tb_combined = tb_combined.format()
-
     return tb_combined
+
+
+def improve_metadata(tb: Table, ds_regions: Dataset) -> None:
+    """Improve metadata for specific columns to ensure better codebook generation.
+
+    Parameters
+    ----------
+    tb : Table
+        Table to improve metadata for.
+    ds_regions : Dataset
+        Regions dataset, used to get version for metadata.
+    """
+    # Manually create an origin for the regions dataset.
+    regions_origin = [Origin(producer="Our World in Data", title="Regions", date_published=str(tb["year"].max()))]
+
+    # Manually edit some of the metadata fields for country and year columns.
+    tb["country"].metadata.title = "Country"
+    tb["country"].metadata.description_short = "Geographic location."
+    tb["country"].metadata.description = None
+    tb["country"].metadata.unit = ""
+    tb["country"].metadata.origins = regions_origin
+
+    tb["year"].metadata.title = "Year"
+    tb["year"].metadata.description_short = "Year of observation."
+    tb["year"].metadata.description = None
+    tb["year"].metadata.unit = ""
+    tb["year"].metadata.origins = regions_origin
+
+    # Add metadata to the ISO code column.
+    tb["iso_code"].metadata.origins = [
+        Origin(
+            producer="International Organization for Standardization",
+            title="Regions",
+            date_published=ds_regions.version,
+        )
+    ]
+    tb["iso_code"].metadata.title = "ISO code"
+    tb["iso_code"].metadata.description_short = "ISO 3166-1 alpha-3 three-letter country codes."
+    tb["iso_code"].metadata.unit = ""
+
+
+def sanity_check_outputs(tb: Table) -> None:
+    """Run validation checks from the original test_make_dataset.py."""
+    log.info("Running data validation checks...")
+
+    # All columns in codebook should be in the data
+    col_in_data = tb.codebook["column"].isin(tb.columns)
+    assert col_in_data.all(), (
+        "All codebook columns should be in the data, but the following "
+        f"columns are not: {tb.codebook['column'][~col_in_data].tolist()}"
+    )
+
+    # All columns in data should be in the codebook
+    col_in_codebook = tb.columns.isin(tb.codebook["column"])
+    assert col_in_codebook.all(), (
+        "All columns should be in the codebook, but the following "
+        f"columns are not: {tb.columns[~col_in_codebook].tolist()}"
+    )
+
+    # Column names should not contain whitespace
+    col_contains_space = tb.columns.str.contains(r"\s", regex=True)
+    assert col_contains_space.sum() == 0, (
+        "Columns should not contain whitespace, but the following "
+        f"columns do: {tb.columns[col_contains_space].tolist()}"
+    )
+
+    # All columns should be lowercase
+    col_is_lower = tb.columns == tb.columns.str.lower()
+    assert col_is_lower.all(), (
+        "Columns should not have uppercase characters, but the following "
+        f"columns do: {tb.columns[~col_is_lower].tolist()}"
+    )
+
+    # No rows should be all NaN (excluding index columns)
+    index_cols = ["country", "year", "iso_code"]
+    row_all_nan = tb.drop(columns=index_cols).isnull().all(axis=1)
+    assert row_all_nan.sum() == 0, (
+        "All rows should contain at least one non-NaN value, but " f"{row_all_nan.sum()} row(s) contain all NaN values."
+    )
+
+    # Check for deprecated country names
+    old_names = ["burma", "macedonia", "swaziland", "czech republic"]
+    countries_lower = set(tb["country"].str.lower())
+    for old_name in old_names:
+        assert (
+            old_name not in countries_lower
+        ), f"{old_name} is a deprecated country name that should not exist in the dataset."
+
+    # Codebook column order should match data column order
+    assert (
+        tb.codebook["column"].tolist() == tb.columns.tolist()
+    ), "Codebook column descriptions are not in the same order as data columns."
+
+    log.info("All validation checks passed.")
 
 
 def run() -> None:
@@ -268,16 +363,25 @@ def run() -> None:
             columns=["population", "primary_energy_consumption__twh"], errors="raise"
         ),
     }
-    tb_combined = combine_tables_data_and_metadata(
+    tb = combine_tables_data_and_metadata(
         tables=tables,
         ds_population=ds_population,
         ds_regions=ds_regions,
         ds_gdp=ds_gdp,
     )
 
+    # Improve table metadata.
+    improve_metadata(tb=tb, ds_regions=ds_regions)
+
+    # Sanity check outputs.
+    sanity_check_outputs(tb=tb)
+
+    # Improve table format.
+    tb = tb.format()
+
     #
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_garden = paths.create_dataset(tables=[tb_combined])
+    ds_garden = paths.create_dataset(tables=[tb])
     ds_garden.save()
