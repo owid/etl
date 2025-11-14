@@ -11,7 +11,7 @@ Dedicated staging servers are automatically created from every ETL pull request.
 
     You can visit your PR staging server at `http://staging-site-<branch>` or `https://<branch>.owid.pages.dev/`. Note that `<branch>` might differ from the exact branch name, for example `feature/123` will be `feature-123` (all symbols are changed to dashes, and the maximum length is of 50 characters).
 
-    For more details, refer to the [python code](https://github.com/owid/etl/blob/master/apps/chart_sync/cli.py#L284) generating `<branch>` from the branch name.
+    For more details, refer to the [:fontawesome-brands-github: python code](https://github.com/owid/etl/blob/master/apps/chart_sync/cli.py#L284) generating `<branch>` from the branch name.
 
 OWID site on staging servers is **public** by default. If you want to keep the work private (e.g. for embargoed data), use `-private` suffix in the branch name. This will make it available only on `http://staging-site-<branch>`.
 

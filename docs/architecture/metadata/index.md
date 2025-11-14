@@ -2,14 +2,16 @@
 
     Our metadata formats are still in flux, and are likely to change over the coming weeks. -->
 
-!!! info "Check the [metadata reference](reference) for a complete list of metadata fields."
+# Metadata
+
+!!! tip "Check the [metadata reference](reference) for a complete list of metadata fields."
 
 
 One of the main values of our work is the careful documentation that we provide along with our data and articles. In the context of
  data, we have created a metadata system in ETL that allows us to describe the data that we are working with.
 
 
-In our [data model](../design/common-format.md) there are various data objects (_snapshots_, _datasets_ that contain _tables_ with _indicators_, etc.), each of them with different types of metadata.
+In our [data model](../design/common-format/#data-model){data-preview} there are various data objects (_snapshots_, _datasets_ that contain _tables_ with _indicators_, etc.), each of them with different types of metadata.
 
 
 
@@ -18,7 +20,7 @@ The metadata is ingested into ETL in the form of [YAML files](./structuring-yaml
 
 !!! note "Questions about the metadata?"
 
-    If you have questions about the metadata, you can share these in our [discussion](https://github.com/owid/etl/discussions/categories/metadata). This greatly helps us keep track of the questions and answers, and makes it easier for others to find answers to similar questions.
+    If you have questions about the metadata, you can share these in our [:fontawesome-brands-github: discussion](https://github.com/owid/etl/discussions/categories/metadata). This greatly helps us keep track of the questions and answers, and makes it easier for others to find answers to similar questions.
 
     :material-chat-question: Additionally, we have added a [FAQs](faqs) section to this entry.
 
@@ -51,15 +53,16 @@ We have built a logic into ETL to automatically propagate metadata fields forwar
 
 
 ## Using metadata
-### Metadata and Data pages
+<!-- ### Metadata and Data pages
 We automatically create data pages from an indicator using its metadata fields. Learn how the metadata fields are mapped to a data page with our demo app.
 
-[Try the demo :octicons-arrow-right-24:](../../guides/metadata-play.md)
+[Try the demo :octicons-arrow-right-24:](../../guides/metadata-play.md) -->
 
-### Other uses
-Users can consume the metadata programmatically using the [`owid-catalog`](https://github.com/owid/etl/tree/master/lib/catalog).
+Users can consume the metadata programmatically using the [:fontawesome-brands-github: `owid-catalog`](https://github.com/owid/etl/tree/master/lib/catalog).
 
 ## Updating metadata using ChatGPT
+
+!!! warning "Experimental feature"
 
 We have developed a tool, `etl metadata-upgrade`, that uses OpenAI's GPT model to help us update metadata files. This tool supports two types of metadata files: 'snapshot' and 'grapher'. It reads the metadata file, generates an updated version, and saves it either in the specified output directory or overwrites the original file.
 

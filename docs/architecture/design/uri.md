@@ -1,11 +1,10 @@
 # URI
-We use Uniform Resource Identifiers (URIs) throughout all the ETL to identify files and datasets. The format of a URI varies depending on the step we are dealing with, but in general they follow the following convention:
+We use Uniform Resource Identifiers (URIs) throughout all the ETL to identify files and datasets. The format of a URI varies depending on the [ETL step](../workflow/#etl-steps){data-preview} we are dealing with, but in general they follow the following convention:
 
 ```
 <prefix>://<path>
 ```
 
-!!! info "[Learn more about all the ETL steps](../../workflow/)."
 
 ## Prefix
 
@@ -13,8 +12,8 @@ Most of the time, the prefix will either be `snapshot` or `data`. The former is 
 
 | Prefix     | Description                                                                                                                                                                                                                              |
 | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `snapshot` | Used for [`snapshot`](../../workflow/#snapshot) steps.                                                                                                                                                                                   |
-| `data`     | Used for [`meadow`](../../workflow/#meadow), [`garden`](../../workflow/#garden), [`grapher`](../../workflow/#grapher) and most of the ETL steps where we operate with curated [Datasets](../common-format/#datasets-owidcatalogdataset). |
+| `snapshot` | Used for [`snapshot`](../workflow/#snapshot) steps.                                                                                                                                                                                   |
+| `data`     | Used for [`meadow`](../workflow/#meadow), [`garden`](../workflow/#garden), [`grapher`](../workflow/#grapher) and most of the ETL steps where we operate with curated [Datasets](common-format/#datasets-owidcatalogdataset). |
 | `backport` | Used to import datasets from the OWID database that are not present in the ETL.                                                                                                                                                          |
 
 ## Path

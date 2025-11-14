@@ -1,3 +1,7 @@
+---
+icon: lucide/logs
+---
+
 # Processing log
 !!! warning "In progress."
 

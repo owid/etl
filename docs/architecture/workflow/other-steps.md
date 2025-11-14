@@ -1,6 +1,3 @@
----
-status: new
----
 
 So far you have learned about the standard steps. These should cover most of the cases. However, there are some other steps worth mentioning.
 
@@ -56,7 +53,7 @@ A step used to mark dependencies on HTTPS resources. The path is interpreted as 
 
 ## GitHub
 
-An empty step used only to mark a dependency on a Github repo, and trigger a rebuild of later steps whenever that repo changes. This is useful since Github is a good store for data that updates too frequently to be snapshotted, e.g. Gapminder's [open-numbers](https://github.com/open-numbers/).
+An empty step used only to mark a dependency on a Github repo, and trigger a rebuild of later steps whenever that repo changes. This is useful since Github is a good store for data that updates too frequently to be snapshotted, e.g. Gapminder's [:octicons-link-external-16: open-numbers](https://github.com/open-numbers/).
 
 The most recent commit hash of the given branch will be used to determine whether the data has been updated. This way, the ETL will be triggered to rebuild any downstream steps each time the data is changed.
 
@@ -73,13 +70,13 @@ The most recent commit hash of the given branch will be used to determine whethe
 
 ## Private steps
 
-!!! tip "[Learn more about private steps](../../guides/private-import.md)"
+!!! tip "[Follow our guide](../../guides/private-import/){data-preview} to learn more about private steps"
 
 In some cases, a source or publisher does not allow for re-publication of their data. When that happends, but we still want to use their data in ETL, we use _private steps_.
 
 Private steps work the same way as regular steps and are the only difference is that the data from these steps is not made available in our catalog and APIs.
 
-In the [DAG](../../design/dag.md), these steps appear with the prefix `data-private://`.
+In the [DAG](../design/dag/#dag){data-preview}, these steps appear with the prefix `data-private://`.
 
 !!! example
 
