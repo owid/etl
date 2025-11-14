@@ -1,11 +1,13 @@
-
+---
+icon: material/api
+---
 # ETL catalog API
 
 The ETL catalog API makes it possible to access the dataframes our data scientists use to prepare the data for our public charts.
 
 When using this API, you have access to the public catalog of data processed by our data team. The catalog indexes _tables_ of data, rather than datasets or individual indicators. To learn more, read about our [data model](../architecture/design/common-format.md).
 
-At the moment, this API only supports [Python](python.ipynb).
+At the moment, this API only supports [Python](python.html).
 
 
 !!! warning "Our ETL API is in beta"
@@ -14,4 +16,4 @@ At the moment, this API only supports [Python](python.ipynb).
 
 === "Python"
 
-    (see [example notebook](python.ipynb))
+    (see [example notebook](python.html))

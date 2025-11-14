@@ -1,7 +1,8 @@
-!!! note
+---
+icon: material/account-school
+---
 
-    You will learn more about the structure and design of the ETL in the next [section](../architecture/index.md#design-principles-workflow){ data-preview }.
-
+# First steps
 
 The ETL is the way we ingest, process and publish data at Our World in Data (OWID). The ETL contains a set of recipes (or steps) to build datasets, which are then made available from [OWID's catalog](../api/index.md#data-apis){ data-preview }. A step is a python script and has a [URI](../architecture/design/uri.md#uri){ data-preview }. URIs allow us to uniquely identify any step (or node) throughout the whole ETL. This allows us to reference datasets (and use them) when building a new one.
 
@@ -13,6 +14,10 @@ The ETL is the way we ingest, process and publish data at Our World in Data (OWI
     data://garden/biodiversity/2024-01-25/cherry_blossom
     ```
 
+!!! info
+
+    You will learn more about the structure and design of the ETL in [Design and principles](../architecture/index.md#design-principles-workflow){ data-preview } section.
+
 ## Build a dataset
 ### Preview dataset build
 You can build any dataset in ETL using our [ETL cli](../guides/etl-cli.md#etl){ data-preview }: `etl run` (or `etlr`). This will execute all the steps required to build a dataset.
@@ -21,7 +26,7 @@ Before actually building the dataset, it is recommended to preview the steps tha
 
 Let's preview the build for Cherry Blossom dataset:
 
-```
+``` {. .no-copy }
 $ etl run --dry-run data://garden/biodiversity/2024-01-25/cherry_blossom
 --- Detecting which steps need rebuilding...
 OK (0.0s)
@@ -35,7 +40,7 @@ OK (0.0s)
 
     If you are not already, make sure to use these tools within your **virtual environment**.
 
-    Details can be found in the [UV docs](https://docs.astral.sh/uv/getting-started/), but if you have never used the tool before here is a basic usage that will get you started (this assumes you have been [here](../working-environment/#install-dependencies) and installed UV):
+    Details can be found in the [:octicons-link-external-16: UV docs](https://docs.astral.sh/uv/getting-started/), but if you have never used the tool before here is a basic usage that will get you started:
 
     ```bash
     # Install the dependencies defined in pyproject.toml and uv.lock
@@ -66,12 +71,12 @@ The first step is a `snapshot://` steps, which when executed will download upstr
 
     `garden` datasets are user-ready, whereas `meadow` datasets have not been curated enough to be used in production environments. We will explore these nuances later on.
 
-    [Learn more about the ETL steps :octicons-arrow-right-24:](../../architecture/workflow)
+    [Learn more about the ETL steps :octicons-arrow-right-24:](../architecture/workflow/)
 
 <!-- `grapher` datasets are very similar to `garden` ones, but with some adjustments to make them suitable for our Database, which powers all our site.  -->
 Note that you can skip the full path of the step, in which case it will do a regex match against all available steps:
 
-```
+```{. .no-copy }
 $ etl run --dry-run cherry_blossom
 --- Detecting which steps need rebuilding...
 OK (0.0s)
@@ -88,13 +93,13 @@ Note that here there is an extra dataset listed, with prefix `data://grapher/`, 
 
     The additional step listed with prefix `data://grapher` refers to yet another dataset curation level. It is very similar to `garden` datasets, but slightly adapted for our database requirements.
 
-    [Learn more about the ETL steps :octicons-arrow-right-24:](../../architecture/workflow)
+    [Learn more about the Grapher step :octicons-arrow-right-24:](../architecture/workflow/#grapher)
 
 
 ### Build the dataset
-You can build a dataset by using the `etl run` command. This uses our [ETL CLI](../../guides/etl-cli) tool.
+You can build a dataset by using the `etl run` command.
 
-```
+```{ . .no-copy }
 $ etl run cherry_blossom
 --- Detecting which steps need rebuilding...
 OK (0.0s)
@@ -119,7 +124,7 @@ OK (3.6s)
 
 Let's confirm that the dataset was built locally:
 
-```
+```{ . .no-copy }
 $ ls -l data/garden/biodiversity/2024-01-25/cherry_blossom
 cherry_blossom.feather
 cherry_blossom.meta.json
@@ -135,7 +140,7 @@ Several files were built for the dataset: `index.json` gives metadata about the 
 ### Add the dataset to Grapher
 Datasets are created and stored in your local environment `data/`. For the previous example, we created a grapher dataset, which is saved in `data/garden/biodiversity/2024-01-25/cherry_blossom/` directory. Now, if we want to create charts with it, we need to push it to the Grapher database. This can be achieved by repeating the previous command with the `--grapher` flag:
 
-```
+```{ . .no-copy }
 $ etl run cherry_blossom --grapher
 --- Detecting which steps need rebuilding...
 OK (0.9s)
@@ -161,7 +166,7 @@ Note that in this example, also the Cherry Blossom 2023-01-11 dataset was pushed
 
 
 ### Run ETL in a specific environment
-ETL steps are executed locally, but when pushing them to the database we can choose which database to use. This can be controlled by environment variables, which are set in an `.env`-like file. For instance, we provide [an example file :octicons-arrow-up-right-16:](https://github.com/owid/etl/blob/master/.env.example), which should be adapted to point to the desired environment. Then, you can run any step like:
+ETL steps are executed locally, but when pushing them to the database we can choose which database to use. This can be controlled by environment variables, which are set in an `.env`-like file. For instance, we provide [:fontawesome-brands-github: an example file](https://github.com/owid/etl/blob/master/.env.example), which should be adapted to point to the desired environment. Then, you can run any step like:
 
 ```
 ENV_FILE=.env.example etl run cherry_blossom --grapher
@@ -173,8 +178,8 @@ ENV_FILE=.env.example etl run cherry_blossom --grapher
 Now that our `data/` folder has a table built, we can try reading it. We recommend using our library `owid-catalog`. You can load the complete dataset using the `owid.catalog.Dataset` object:
 
 ```pycon
->>> from owid.catalog import Dataset
->>> ds = Dataset('data/garden/biodiversity/2024-01-25/cherry_blossom')
+from owid.catalog import Dataset
+ds = Dataset('data/garden/biodiversity/2024-01-25/cherry_blossom')
 ```
 
 We can access the metadata of the dataset by using `Dataset.metadata`:

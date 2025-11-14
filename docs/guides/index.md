@@ -6,43 +6,27 @@ In this section you will find guides for different use cases and tasks you might
 
 ### Quick reference
 
+Below is a list of some of the most common guides to get you started. Use the left navigation to explore all the available guides.
+
 <div class="grid cards" markdown>
 
 -   **:material-arrow-up-bold-hexagon-outline: &nbsp; [Data work](data-work)**
 
     ***
 
-    Create new datasets or update old ones from our ETL catalog. Update charts.
-
-    - [Add datasets](data-work/add-data)
-    - [Update datasets](data-work/update-data)
-    - [Update charts](data-work/update-charts)
+    Create or update datasets. Keep downstream charts up-to-date. Create collections. Etc.
 
 -   **:fontawesome-solid-hat-wizard: &nbsp; [Wizard](wizard)**
 
     ***
 
-    Wizard is our ETL admin tool, which helps us with most of ETL work.
-
-    It provides various tools to create ETL steps, improve existing ones, and more.
+    Use our ETL admin tool for most of ETL work.
 
 -   **:octicons-terminal-16: &nbsp; [CLI](etl-cli)**
 
     ***
 
-    We also have a CLI, so that you can do some tasks from your terminal.
-
--   **:material-music-clef-bass: &nbsp; [Harmonize country names](harmonize-countries)**
-
-    ***
-
-    Standardize country names to use OWID's defaults.
-
--   **:octicons-globe-16: &nbsp; [Environments](environment)**
-
-    ***
-
-    All our tooling can be executed in different environments. Learn how to use them.
+    Our client gets to where Wizard can't reach.
 
 -   **:material-server: &nbsp; [Staging servers](staging-servers)**
 
@@ -50,24 +34,34 @@ In this section you will find guides for different use cases and tasks you might
 
     What are they? And how do we actually work with them?
 
--   **:octicons-lock-16: &nbsp; [Private datasets](private-import)**
+
+-   **:material-music-clef-bass: &nbsp; [Harmonize country names](harmonize-countries)**
 
     ***
 
-    Import private datasets.
+    Standardize country names to use OWID's defaults.
 
--   **:octicons-clock-16: &nbsp; [Regular updates](auto-regular-updates)**
+-   **:octicons-clock-16: &nbsp; [Automatic updates](autoupdate-cli)**
 
     ***
 
     Automate regular updates of datasets.
 
 
--   **:fontawesome-solid-bone: &nbsp; [Backport datasets](backport)**
+-   **:octicons-lock-16: &nbsp; [Private datasets](private-import)**
 
     ***
 
-    We use backporting to add legacy datasets to our catalog.
+    Import private datasets.
+
+
+-   **:octicons-globe-16: &nbsp; [Environments](environment)**
+
+    ***
+
+    All our tooling can be executed in different environments. Learn how to use them.
+
+
 
 -   **:material-note-edit: &nbsp; [Edit the docs](../dev/docs)**
 

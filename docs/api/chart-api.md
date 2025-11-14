@@ -1,3 +1,6 @@
+---
+icon: material/api
+---
 # Chart API
 
 Our chart API is structured around charts on our website, i.e. at https://ourworldindata.org/grapher/* . You can find charts by searching our data catalog at [https://ourworldindata.org/data](https://ourworldindata.org/data).
@@ -39,8 +42,8 @@ https://ourworldindata.org/grapher/life-expectancy.csv?useColumnShortNames=true
 
 Check out this list of public example notebooks that demonstrate the use of our chart API:
 
-- [Example python notebook](https://colab.research.google.com/drive/1HDcqCy6ZZ05IznXzaaP9Blvvp3qoPnP8?usp=sharing) on Google Colab using Pandas
-- [ObservableHQ notebook](https://observablehq.com/@owid/recreating-the-life-expectancy-chart) using Javascript to recreate the life expectancy chart
+- [:octicons-link-external-16: Example python notebook](https://colab.research.google.com/drive/1HDcqCy6ZZ05IznXzaaP9Blvvp3qoPnP8?usp=sharing) on Google Colab using Pandas
+- [:octicons-link-external-16: ObservableHQ notebook](https://observablehq.com/@owid/recreating-the-life-expectancy-chart) using Javascript to recreate the life expectancy chart
 
 ## CSV structure
 
@@ -52,7 +55,7 @@ Afghanistan,AFG,1950,27.7275
 Afghanistan,AFG,1951,27.9634
 ```
 
-The first two columns in the CSV file are "Entity" and "Code." "Entity" is the name of the entity, typically a country, such as "United States." "Code" is the OWID internal entity code used for countries or regions. For standard countries, this matches the [ISO alpha-3 code](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3) (e.g., "USA"); for non-standard or historical countries, we use custom codes. Country and region names are standardized across all Our World in Data datasets, allowing you to join multiple datasets using either of these columns.
+The first two columns in the CSV file are "Entity" and "Code." "Entity" is the name of the entity, typically a country, such as "United States." "Code" is the OWID internal entity code used for countries or regions. For standard countries, this matches the [:octicons-link-external-16: ISO alpha-3 code](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3) (e.g., "USA"); for non-standard or historical countries, we use custom codes. Country and region names are standardized across all Our World in Data datasets, allowing you to join multiple datasets using either of these columns.
 
 The third column is either "Year" or "Day". If the data is annual, this is "Year" and contains only the year as an integer. If the column is "Day", the column contains a date string in the form "YYYY-MM-DD".
 
