@@ -365,6 +365,13 @@ def wrap_in_full_zensical_template(
         template = template.replace('href="javascripts/', f'href="{relative_root}javascripts/')
         template = template.replace('src="javascripts/', f'src="{relative_root}javascripts/')
 
+        # Fix __config base path for JavaScript bundle
+        # Remove trailing slash from relative_root for JSON
+        base_path = relative_root.rstrip("/")
+        template = template.replace('"base":"."', f'"base":"{base_path}"')
+        # Also fix search worker path in config
+        template = template.replace('"search":"assets/javascripts/', f'"search":"{relative_root}assets/javascripts/')
+
     # Fix navigation links to be absolute from root
     # Convert relative navigation links like href="guides/" to href="../../guides/"
     if relative_root != "./":
