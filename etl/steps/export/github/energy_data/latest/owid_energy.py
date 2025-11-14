@@ -227,7 +227,7 @@ The mission of *Our World in Data* is to make data and research on the world's l
 
 ## How to cite this data?
 
-If you are using this dataset, please cite both [Our World in Data](https://ourworldindata.org/co2-and-greenhouse-gas-emissions#article-citation) and the underlying data source(s).
+If you are using this dataset, please cite both [Our World in Data](https://ourworldindata.org/energy#article-citation) and the underlying data source(s).
 
 Please follow [the guidelines in our FAQ](https://ourworldindata.org/faqs#how-should-i-cite-your-data) on how to cite our work.
 """
@@ -311,3 +311,10 @@ def run() -> None:
         log.info(
             f"Files committed successfully to branch {branch}. Create a PR here https://github.com/owid/energy-data/compare/master...{branch}."
         )
+
+    # Uncomment to inspect changes (after the new branch has been created).
+    # from etl.data_helpers.misc import compare_tables
+    # old = pd.read_csv("https://raw.githubusercontent.com/owid/energy-data/refs/heads/master/owid-energy-data.csv")
+    # new = pd.read_csv(f"https://raw.githubusercontent.com/owid/energy-data/refs/heads/{branch}/owid-energy-data.csv")
+    compare_tables(old, new, countries=["World"])
+    compare_tables(old, new)
