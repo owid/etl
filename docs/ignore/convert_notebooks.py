@@ -47,7 +47,7 @@ def convert_notebooks(docs_dir: Path, output_dir: Path, verbose: bool):
         return
 
     # Use classic template for cleaner output
-    html_exporter = HTMLExporter(template_name='classic')
+    html_exporter = HTMLExporter(template_name="classic")
 
     converted_count = 0
     skipped_count = 0
