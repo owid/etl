@@ -148,57 +148,6 @@ def clean_revenue_value(value: str | float) -> float | None:
         return None
 
 
-def parse_quarter_to_date(quarter_str: str) -> str | None:
-    """
-    Convert quarter string like 'Q4 FY25' to ISO date (end of quarter).
-    NVIDIA fiscal year ends in January, so:
-    - Q1 FYxx = April (xx-1)
-    - Q2 FYxx = July (xx-1)
-    - Q3 FYxx = October (xx-1)
-    - Q4 FYxx = January (xx)
-    """
-    try:
-        # Parse quarter string like "Q4 FY25"
-        parts = quarter_str.strip().split()
-        if len(parts) != 2:
-            return None
-
-        quarter = parts[0]  # e.g., "Q4"
-        fiscal_year = parts[1]  # e.g., "FY25"
-        print(fiscal_year)
-
-        # Extract quarter number
-        q_num = int(quarter[1])
-
-        # Extract fiscal year (last 2 digits)
-        fy = int(fiscal_year.replace("FY", ""))
-
-        # Convert to 4-digit year
-        if fy < 50:
-            year = 2000 + fy
-        else:
-            year = 1900 + fy
-        print(year)
-        # Map quarter to month (end of quarter)
-        # Q1 ends April, Q2 ends July, Q3 ends October, Q4 ends January
-        quarter_end_months = {1: (year - 1, 4), 2: (year - 1, 7), 3: (year - 1, 10), 4: (year, 1)}
-
-        end_year, end_month = quarter_end_months[q_num]
-
-        # Return last day of the month as ISO date
-        if end_month == 1:
-            return f"{end_year}-01-31"
-        elif end_month == 4:
-            return f"{end_year}-04-30"
-        elif end_month == 7:
-            return f"{end_year}-07-31"
-        elif end_month == 10:
-            return f"{end_year}-10-31"
-
-    except (ValueError, KeyError, IndexError):
-        return None
-
-
 def transform_to_long_format(df: pd.DataFrame) -> pd.DataFrame:
     """Transform wide format table to long format with date, segment, revenue columns."""
     # First column is the segment name
@@ -227,17 +176,14 @@ def transform_to_long_format(df: pd.DataFrame) -> pd.DataFrame:
             revenue = clean_revenue_value(revenue_str)
 
             if revenue is not None:
-                date = parse_quarter_to_date(quarter_col)
-                if date:
-                    records.append(
-                        {
-                            "date": date,
-                            "quarter": quarter_col,
-                            "segment": segment,
-                            "revenue_millions": revenue,
-                            "source_quarter": row.get("source_quarter", ""),
-                        }
-                    )
+                records.append(
+                    {
+                        "quarter": quarter_col,
+                        "segment": segment,
+                        "revenue_millions": revenue,
+                        "source_quarter": row.get("source_quarter", ""),
+                    }
+                )
 
     return pd.DataFrame(records)
 
@@ -274,6 +220,18 @@ def extract_nvidia_revenue() -> pd.DataFrame:
     # Transform to long format
     log.info("transforming_to_long_format")
     long_df = transform_to_long_format(combined_df)
+
+    q_info = long_df["quarter"].str.extract(r"Q(?P<q>\d)\s+FY(?P<y>\d{2})")
+
+    # Build a PeriodIndex from year + quarter
+    years = 2000 + q_info["y"].astype(int)  # "24" -> 2024, "25" -> 2025
+    quarters = q_info["q"].astype(int)
+
+    long_df["date"] = pd.PeriodIndex(
+        year=years,
+        quarter=quarters,
+        freq="Q",  # use "Q-MAR" or similar if your FY ends in March, etc.
+    ).to_timestamp()
 
     # Normalize segment names
     log.info("normalizing_segment_names")
