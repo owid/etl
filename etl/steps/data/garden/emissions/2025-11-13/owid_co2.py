@@ -323,10 +323,6 @@ def improve_metadata(tb: Table, ds_regions: Dataset) -> None:
     tb["iso_code"].metadata.description_short = "ISO 3166-1 alpha-3 three-letter country codes."
     tb["iso_code"].metadata.unit = ""
 
-    # Remove long description from population column (keep only short description).
-    if tb["population"].metadata.description is not None:
-        tb["population"].metadata.description = None
-
 
 def sanity_check_outputs(tb: Table) -> None:
     """Perform sanity checks on the output table."""
