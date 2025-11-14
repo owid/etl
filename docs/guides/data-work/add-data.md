@@ -11,7 +11,7 @@ There are different ways you can add data to the catalog, depending on your tech
 * **[Wizard](#using-wizard-recommended) **(recommended): Create ETL steps using default templates.**
 * [Manual](#manually-add-a-dataset-to-the-etl): Create complex steps manually.
 * [Fast-Track](#using-the-fast-track): For small datasets and when reproducibility is not a concern.
-* Unsure: Report on Slack: [:fontawesome-brands-slack: #data-scientists](https://app.slack.com/client/T3DR40MTQ/C025BDNS5AA/)
+* Unsure: Report on Slack: :fontawesome-brands-slack: #data-architecture
 
 
 !!! tip "[Try AI-powered workflow](ai-workflow/)! (experimental)"
