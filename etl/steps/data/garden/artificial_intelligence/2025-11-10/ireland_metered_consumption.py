@@ -15,7 +15,7 @@ def run(dest_dir: str) -> None:
 
     # Load inputs
     ds_meadow = paths.load_dataset("ireland_metered_consumption")
-    tb = ds_meadow["ireland_metered_consumption"].reset_index()
+    tb = ds_meadow.read("ireland_metered_consumption")
 
     # Store origin metadata
     origin = tb["value"].metadata.origins[0]
@@ -36,9 +36,6 @@ def run(dest_dir: str) -> None:
 
     # Add country
     tb["country"] = "Ireland"
-
-    # Calculate percentage of data centre consumption
-    tb["data_centres_pct"] = (tb["data_centres"] / tb["all_metered_electricity_consumption"]) * 100
 
     # Add metadata to all columns
     for col in tb.columns:
