@@ -199,13 +199,134 @@ def wrap_in_full_zensical_template(
 .highlight pre { margin: 0; padding: 0; background-color: transparent !important; white-space: pre-wrap; word-wrap: break-word; overflow-wrap: break-word; }
 .output_area { padding: 0.5rem 0; }
 .output_subarea { max-width: 100%; overflow-x: auto; }
-.rendered_html table { border-collapse: collapse; margin: 1em 0; font-size: 0.9em; }
-.rendered_html th, .rendered_html td { border: 1px solid #ddd; padding: 0.5em; }
-.rendered_html th { background-color: var(--md-code-bg-color, #f5f5f5); font-weight: 600; }
 .output_png img { max-width: 100%; height: auto; }
 .anchor-link { display: none !important; }
 .notebook-content { word-wrap: break-word; overflow-wrap: break-word; }
 .notebook-content pre, .notebook-content code { white-space: pre-wrap; word-wrap: break-word; overflow-wrap: break-word; }
+
+/* DataFrame styling - inspired by pandas default style */
+.dataframe {
+  border-collapse: collapse;
+  border: none;
+  font-size: 12px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  margin: 1em 0;
+  background-color: white;
+}
+
+.dataframe thead {
+  background-color: #f8f9fa;
+  border-bottom: 2px solid #dee2e6;
+}
+
+.dataframe thead th {
+  text-align: right;
+  font-weight: 600;
+  padding: 0.5em 0.75em;
+  border: none;
+  border-bottom: 2px solid #dee2e6;
+  color: #495057;
+}
+
+.dataframe tbody tr {
+  border-bottom: 1px solid #dee2e6;
+}
+
+.dataframe tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+.dataframe tbody tr:last-child {
+  border-bottom: 2px solid #dee2e6;
+}
+
+.dataframe tbody td {
+  padding: 0.5em 0.75em;
+  text-align: right;
+  border: none;
+  color: #212529;
+}
+
+.dataframe tbody th {
+  font-weight: 600;
+  text-align: right;
+  padding: 0.5em 0.75em;
+  border: none;
+  background-color: #f8f9fa;
+  color: #495057;
+}
+
+/* Index column styling */
+.dataframe tbody tr th:first-child {
+  text-align: right;
+  font-weight: 500;
+}
+
+/* Handle left-aligned text columns */
+.dataframe td[style*="text-align: left"],
+.dataframe th[style*="text-align: left"] {
+  text-align: left !important;
+}
+
+/* Scrollable table container */
+.dataframe-container {
+  overflow-x: auto;
+  margin: 1em 0;
+}
+
+/* General table styling fallback */
+.rendered_html table:not(.dataframe) {
+  border-collapse: collapse;
+  margin: 1em 0;
+  font-size: 0.9em;
+}
+
+.rendered_html table:not(.dataframe) th,
+.rendered_html table:not(.dataframe) td {
+  border: 1px solid #ddd;
+  padding: 0.5em;
+}
+
+.rendered_html table:not(.dataframe) th {
+  background-color: var(--md-code-bg-color, #f5f5f5);
+  font-weight: 600;
+}
+
+/* Dark mode support for dataframes */
+[data-md-color-scheme="slate"] .dataframe {
+  background-color: #1e1e1e;
+}
+
+[data-md-color-scheme="slate"] .dataframe thead {
+  background-color: #2d2d2d;
+  border-bottom-color: #404040;
+}
+
+[data-md-color-scheme="slate"] .dataframe thead th {
+  border-bottom-color: #404040;
+  color: #e0e0e0;
+}
+
+[data-md-color-scheme="slate"] .dataframe tbody tr {
+  border-bottom-color: #404040;
+}
+
+[data-md-color-scheme="slate"] .dataframe tbody tr:hover {
+  background-color: #2d2d2d;
+}
+
+[data-md-color-scheme="slate"] .dataframe tbody tr:last-child {
+  border-bottom-color: #404040;
+}
+
+[data-md-color-scheme="slate"] .dataframe tbody td {
+  color: #e0e0e0;
+}
+
+[data-md-color-scheme="slate"] .dataframe tbody th {
+  background-color: #2d2d2d;
+  color: #e0e0e0;
+}
 </style>
 """
 
@@ -242,17 +363,16 @@ def wrap_in_full_zensical_template(
         template = template.replace('src="assets/', f'src="{relative_root}assets/')
         template = template.replace('href="css/', f'href="{relative_root}css/')
         template = template.replace('href="javascripts/', f'href="{relative_root}javascripts/')
+        template = template.replace('src="javascripts/', f'src="{relative_root}javascripts/')
 
     # Fix navigation links to be absolute from root
     # Convert relative navigation links like href="guides/" to href="../../guides/"
     if relative_root != "./":
-        # Parse HTML to find and fix navigation links
-        soup = BeautifulSoup(template, "html.parser")
-
-        # Find all navigation links (exclude external links, anchors, and asset links)
-        for link in soup.find_all("a", href=True):
-            href = link["href"]
-            # Skip if it's an external link, anchor, or already has relative_root
+        # Use regex to fix navigation links without parsing entire HTML
+        # This preserves the original HTML structure and avoids BeautifulSoup's reformatting
+        def fix_nav_link(match):
+            href = match.group(1)
+            # Skip external links, anchors, and asset paths
             if (
                 href.startswith("http")
                 or href.startswith("#")
@@ -260,21 +380,20 @@ def wrap_in_full_zensical_template(
                 or href.startswith("assets/")
                 or href.startswith("css/")
                 or href.startswith("javascripts/")
+                or href.startswith("../")
             ):
-                continue
+                return match.group(0)
+            # Add relative_root prefix to navigation links
+            return f'href="{relative_root}{href}"'
 
-            # Convert relative navigation paths to absolute from root
-            # Examples: "guides/" -> "../../guides/", "api/" -> "../../api/"
-            if not href.startswith("../"):
-                link["href"] = relative_root + href
-
-        template = str(soup)
+        # Fix all href attributes
+        template = re.sub(r'href="([^"]+)"', fix_nav_link, template)
 
     return template
 
 
 def generate_toc_html(headings: list[dict]) -> str:
-    """Generate TOC HTML from headings list."""
+    """Generate TOC HTML from headings list with proper nesting."""
     if not headings:
         return "<p>No table of contents</p>"
 
@@ -282,13 +401,56 @@ def generate_toc_html(headings: list[dict]) -> str:
     toc_html += '<label class="md-nav__title" for="__toc">Table of contents</label>'
     toc_html += '<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>'
 
-    for heading in headings:
-        level_class = f"md-nav__item--nested" if heading["level"] == 1 else ""
-        indent = "  " * (heading["level"] - 1)
+    # Track current nesting state
+    current_level = 1
+    open_navs = []
 
-        toc_html += f'{indent}<li class="md-nav__item {level_class}">'
-        toc_html += f'<a href="#{heading["id"]}" class="md-nav__link">{heading["text"]}</a>'
-        toc_html += "</li>"
+    for i, heading in enumerate(headings):
+        level = heading["level"]
+
+        # Close nested navs if we're going back to a higher level (lower number)
+        while current_level > level:
+            toc_html += "</ul></nav>"
+            current_level -= 1
+            if open_navs:
+                open_navs.pop()
+
+        # For h2 (level 2)
+        if level == 2:
+            toc_html += '<li class="md-nav__item">'
+            toc_html += f'<a href="#{heading["id"]}" class="md-nav__link">'
+            toc_html += f'<span class="md-ellipsis">{heading["text"]}</span>'
+            toc_html += '</a>'
+
+            # Check if next heading is h3 (needs nesting)
+            if i + 1 < len(headings) and headings[i + 1]["level"] == 3:
+                toc_html += f'<nav class="md-nav" aria-label="{heading["text"]}">'
+                toc_html += '<ul class="md-nav__list">'
+                current_level = 3
+                open_navs.append(heading["text"])
+            else:
+                toc_html += "</li>"
+
+        # For h3 (level 3)
+        elif level == 3:
+            toc_html += '<li class="md-nav__item">'
+            toc_html += f'<a href="#{heading["id"]}" class="md-nav__link">'
+            toc_html += f'<span class="md-ellipsis">{heading["text"]}</span>'
+            toc_html += '</a>'
+            toc_html += "</li>"
+
+        # For h1 (level 1) - treat like h2
+        else:
+            toc_html += '<li class="md-nav__item">'
+            toc_html += f'<a href="#{heading["id"]}" class="md-nav__link">'
+            toc_html += f'<span class="md-ellipsis">{heading["text"]}</span>'
+            toc_html += '</a>'
+            toc_html += "</li>"
+
+    # Close any remaining open nested navs
+    while current_level > 2:
+        toc_html += "</ul></nav></li>"
+        current_level -= 1
 
     toc_html += "</ul></nav>"
     return toc_html
