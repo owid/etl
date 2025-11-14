@@ -12,9 +12,7 @@ GDP are included.
 """
 
 import numpy as np
-import pandas as pd
 from owid.catalog import Dataset, Origin, Table
-from owid.catalog.utils import remove_details_on_demand
 from structlog import get_logger
 
 from etl.helpers import PathFinder
@@ -256,15 +254,13 @@ def combine_tables(
     return combined
 
 
-def prepare_outputs(combined: Table, ds_regions: Dataset) -> Table:
+def prepare_outputs(combined: Table) -> Table:
     """Clean and prepare output table.
 
     Parameters
     ----------
     combined : Table
         Combined table.
-    ds_regions : Dataset
-        Regions dataset, only used to get its version.
 
     Returns
     -------
@@ -278,18 +274,6 @@ def prepare_outputs(combined: Table, ds_regions: Dataset) -> Table:
     ]
     combined = combined.dropna(subset=columns_that_must_have_data, how="all").reset_index(drop=True)
 
-    # Add metadata to the ISO column (loaded from the regions dataset).
-    combined["iso_code"].m.origins = [
-        Origin(
-            producer="International Organization for Standardization",
-            title="Regions",
-            date_published=ds_regions.version,
-        )
-    ]
-    combined["iso_code"].metadata.title = "ISO code"
-    combined["iso_code"].metadata.description_short = "ISO 3166-1 alpha-3 three-letter country codes."
-    combined["iso_code"].metadata.unit = ""
-
     # Sanity check.
     columns_with_inf = [column for column in combined.columns if len(combined[combined[column] == np.inf]) > 0]
     assert len(columns_with_inf) == 0, f"Infinity values detected in columns: {columns_with_inf}"
@@ -298,110 +282,56 @@ def prepare_outputs(combined: Table, ds_regions: Dataset) -> Table:
     first_columns = ["country", "year", "iso_code", "population", "gdp"]
     combined = combined[first_columns + [column for column in sorted(combined.columns) if column not in first_columns]]
 
-    # Improve table format.
-    combined = combined.format()
-
     return combined
 
 
-def prepare_codebook(tb: Table) -> pd.DataFrame:
-    table = tb.reset_index()
+def improve_metadata(tb: Table, ds_regions: Dataset) -> None:
+    """Improve metadata for specific columns to ensure better codebook generation.
 
+    Parameters
+    ----------
+    tb : Table
+        Table to improve metadata for.
+    ds_regions : Dataset
+        Regions dataset, used to get version for metadata.
+    """
     # Manually create an origin for the regions dataset.
-    regions_origin = [Origin(producer="Our World in Data", title="Regions", date_published=str(table["year"].max()))]
+    regions_origin = [Origin(producer="Our World in Data", title="Regions", date_published=str(tb["year"].max()))]
 
-    # Manually edit some of the metadata fields.
-    table["country"].metadata.title = "Country"
-    table["country"].metadata.description_short = "Geographic location."
-    table["country"].metadata.description = None
-    table["country"].metadata.unit = ""
-    table["country"].metadata.origins = regions_origin
-    table["year"].metadata.title = "Year"
-    table["year"].metadata.description_short = "Year of observation."
-    table["year"].metadata.description = None
-    table["year"].metadata.unit = ""
-    table["year"].metadata.origins = regions_origin
+    # Manually edit some of the metadata fields for country and year columns.
+    tb["country"].metadata.title = "Country"
+    tb["country"].metadata.description_short = "Geographic location."
+    tb["country"].metadata.description = None
+    tb["country"].metadata.unit = ""
+    tb["country"].metadata.origins = regions_origin
 
-    ####################################################################################################################
-    if table["population"].metadata.description is None:
-        print("WARNING: Column population has no longer a description field. Remove this part of the code")
-    else:
-        table["population"].metadata.description = None
+    tb["year"].metadata.title = "Year"
+    tb["year"].metadata.description_short = "Year of observation."
+    tb["year"].metadata.description = None
+    tb["year"].metadata.unit = ""
+    tb["year"].metadata.origins = regions_origin
 
-    ####################################################################################################################
-
-    # Gather column names, titles, short descriptions, unit and origins from the indicators' metadata.
-    metadata = {"column": [], "description": [], "unit": [], "source": []}
-    for column in table.columns:
-        metadata["column"].append(column)
-
-        if hasattr(table[column].metadata, "description") and table[column].metadata.description is not None:
-            print(f"WARNING: Column {column} still has a 'description' field.")
-        # Prepare indicator's description.
-        description = ""
-        if (
-            hasattr(table[column].metadata.presentation, "title_public")
-            and table[column].metadata.presentation.title_public is not None
-        ):
-            description += table[column].metadata.presentation.title_public
-        else:
-            description += table[column].metadata.title
-        if table[column].metadata.description_short:
-            description += f" - {table[column].metadata.description_short}"
-            description = remove_details_on_demand(description)
-        metadata["description"].append(description)
-
-        # Prepare indicator's unit.
-        if table[column].metadata.unit is None:
-            print(f"WARNING: Column {column} does not have a unit.")
-            unit = ""
-        else:
-            unit = table[column].metadata.unit
-        metadata["unit"].append(unit)
-
-        # Gather unique origins of current variable.
-        unique_sources = []
-        for origin in table[column].metadata.origins:
-            # Construct the source name from the origin's attribution.
-            # If not defined, build it using the default format "Producer - Data product (year)".
-            source_name = (
-                origin.attribution
-                or f"{origin.producer} - {origin.title or origin.title_snapshot} ({origin.date_published.split('-')[0]})"
-            )
-
-            # Add url at the end of the source.
-            if origin.url_main:
-                source_name += f" [{origin.url_main}]"
-
-            # Add the source to the list of unique sources.
-            if source_name not in unique_sources:
-                unique_sources.append(source_name)
-
-        # Concatenate all sources.
-        sources_combined = "; ".join(unique_sources)
-        metadata["source"].append(sources_combined)
-
-    # Create a dataframe with the gathered metadata and sort conveniently by column name.
-    codebook = pd.DataFrame(metadata).set_index("column").sort_index()
-    # For clarity, ensure column descriptions are in the same order as the columns in the data.
-    first_columns = ["country", "year", "iso_code", "population", "gdp"]
-    codebook = pd.concat([codebook.loc[first_columns], codebook.drop(first_columns, errors="raise")]).reset_index()
-    # Create a table with the appropriate metadata.
-    codebook = Table(codebook).format(
-        keys=["column"], sort_rows=False, sort_columns=False, short_name="owid_co2_codebook"
-    )
-    codebook_origin = [
-        Origin(producer="Our World in Data", title="CO2-data codebook", date_published=str(table["year"].max()))
+    # Add metadata to the ISO code column.
+    tb["iso_code"].metadata.origins = [
+        Origin(
+            producer="International Organization for Standardization",
+            title="Regions",
+            date_published=ds_regions.version,
+        )
     ]
-    for column in ["description", "unit", "source"]:
-        codebook[column].metadata.origins = codebook_origin
+    tb["iso_code"].metadata.title = "ISO code"
+    tb["iso_code"].metadata.description_short = "ISO 3166-1 alpha-3 three-letter country codes."
+    tb["iso_code"].metadata.unit = ""
 
-    return codebook
+    # Remove long description from population column (keep only short description).
+    if tb["population"].metadata.description is not None:
+        tb["population"].metadata.description = None
 
 
-def sanity_check_outputs(tb: Table, tb_codebook: Table) -> None:
+def sanity_check_outputs(tb: Table) -> None:
+    """Perform sanity checks on the output table."""
     error = "Dataset columns should coincide with the codebook 'columns'."
-    assert set(tb_codebook.reset_index()["column"]) == set(tb.reset_index().columns), error
+    assert set(tb.codebook["column"]) == set(tb.reset_index().columns), error
 
     error = "All rows in dataset should contain at least one non-NaN value."
     assert not tb.isnull().all(axis=1).any(), error
@@ -481,17 +411,20 @@ def run() -> None:
     )
 
     # Prepare output data table.
-    tb = prepare_outputs(combined=combined, ds_regions=ds_regions)
+    tb = prepare_outputs(combined=combined)
 
-    # Prepare codebook.
-    tb_codebook = prepare_codebook(tb=tb)
+    # Improve metadata for specific columns to ensure better codebook generation.
+    improve_metadata(tb, ds_regions=ds_regions)
+
+    # Improve table format.
+    tb = tb.format()
 
     # Sanity check.
-    sanity_check_outputs(tb=tb, tb_codebook=tb_codebook)
+    sanity_check_outputs(tb=tb)
 
     #
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
-    ds_grapher = paths.create_dataset(tables=[tb, tb_codebook])
+    ds_grapher = paths.create_dataset(tables=[tb])
     ds_grapher.save()

@@ -66,9 +66,10 @@ def run(path_to_folder: str, upload: bool) -> None:
         snap.metadata_path.write_text(snap.metadata.to_yaml())
 
         # Download data from source, add file to DVC and upload to S3.
-        ################################################################################################################
         # snap.create_snapshot(upload=upload)
-        # TODO: Once public, remove this, uncomment previous, and remove click.option for path to folder.
+        ################################################################################################################
+        # Once all files are public, we could remove this block, add url_download to each snapshot dvc file, uncomment previous line, and remove click.option for path to folder.
+        # However, it is convenient to have this block, as normally we update this dataset using local files (a few days before the files are publicly released).
         path_to_file = Path(path_to_folder) / data_file
         assert path_to_file.exists(), f"File {path_to_file} does not exist."
         snap.create_snapshot(filename=path_to_file, upload=upload)
