@@ -7,4 +7,3 @@ We also maintain a larger [data catalog](catalog-api/#etl-catalog-api){data-prev
 !!! note
     Unlike the Public Chart API, which exclusively provides time series data by time (typically year) and entity (typically country), our ETL catalog includes larger datasets with additional dimensions, such as age group and gender breakdowns.
 
-!!! tip "Learn more on how to use our APIs by [examples](example-usage.md)"
