@@ -46,7 +46,7 @@ docs.build: .venv
 	@echo '==> Building documentation with Zensical'
 	DOCS_BUILD=1 .venv/bin/zensical build -f zensical.toml --clean
 	@echo '==> Converting Jupyter notebooks to HTML'
-	.venv/bin/python scripts/convert_notebooks.py
+	.venv/bin/python docs/ignore/convert_notebooks.py
 
 docs.serve: .venv
 	DOCS_BUILD=1 .venv/bin/zensical serve -f zensical.toml
