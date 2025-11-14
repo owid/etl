@@ -1,15 +1,18 @@
 #!/usr/bin/env python3
 """
-Convert Jupyter notebooks to HTML with Zensical theme styling.
+Convert Jupyter notebooks to HTML wrapped in full Zensical theme.
 
 This script finds all .ipynb files in the docs directory and converts them
-to HTML using a custom template that matches the Zensical theme.
+to HTML using nbconvert, then wraps them in the complete Zensical template
+with navigation, TOC, and search functionality.
 """
 
+import re
 from pathlib import Path
 
 import click
 import nbformat
+from bs4 import BeautifulSoup
 from nbconvert import HTMLExporter
 
 
@@ -46,8 +49,17 @@ def convert_notebooks(docs_dir: Path, output_dir: Path, verbose: bool):
         click.echo("No Jupyter notebooks found in docs directory")
         return
 
-    # Use classic template for cleaner output
-    html_exporter = HTMLExporter(template_name="classic")
+    # Use basic template to get just the content without full HTML wrapper
+    html_exporter = HTMLExporter(template_name="basic")
+
+    # Load a Zensical template page
+    template_path = output_dir / "index.html"
+    if not template_path.exists():
+        click.echo(f"Error: Template page not found at {template_path}", err=True)
+        return 1
+
+    with open(template_path, "r", encoding="utf-8") as f:
+        zensical_template = f.read()
 
     converted_count = 0
     skipped_count = 0
@@ -77,9 +89,29 @@ def convert_notebooks(docs_dir: Path, output_dir: Path, verbose: bool):
             # Create parent directories if they don't exist
             html_path.parent.mkdir(parents=True, exist_ok=True)
 
+            # Get notebook title from metadata or filename
+            notebook_title = nb.metadata.get("title", relative_path.stem.replace("_", " ").title())
+
+            # Calculate depth for relative paths to assets
+            depth = len(relative_path.parts) - 1
+            relative_root = "../" * depth if depth > 0 else "./"
+
+            # Extract headings for TOC and add IDs to headings in HTML
+            body_with_ids, headings = extract_headings_from_html(body)
+
+            # Wrap the notebook HTML in full Zensical structure
+            wrapped_html = wrap_in_full_zensical_template(
+                zensical_template,
+                body_with_ids,
+                title=notebook_title,
+                site_name="ETL documentation",
+                relative_root=relative_root,
+                headings=headings,
+            )
+
             # Write HTML file
             with open(html_path, "w", encoding="utf-8") as f:
-                f.write(body)
+                f.write(wrapped_html)
 
             converted_count += 1
             if verbose:
@@ -95,6 +127,171 @@ def convert_notebooks(docs_dir: Path, output_dir: Path, verbose: bool):
     click.echo(f"\n✓ Converted {converted_count} notebook(s)")
     if skipped_count > 0:
         click.echo(f"  Skipped {skipped_count} checkpoint file(s)")
+
+
+def extract_headings_from_html(html: str) -> tuple[str, list[dict]]:
+    """Extract headings from HTML for TOC generation and add IDs to headings.
+
+    Returns:
+        tuple: (modified_html_with_ids, list_of_headings)
+    """
+    soup = BeautifulSoup(html, "html.parser")
+    headings = []
+
+    for heading in soup.find_all(["h1", "h2", "h3"]):
+        # Get heading text
+        text = heading.get_text(strip=True)
+        # Remove anchor link symbols
+        text = text.replace("¶", "").strip()
+
+        # Create ID from text (preserving case for better readability)
+        heading_id = re.sub(r"[^\w\s-]", "", text)
+        heading_id = re.sub(r"[-\s]+", "-", heading_id)
+        heading_id = heading_id.strip("-")
+
+        # Add ID to the heading element
+        heading["id"] = heading_id
+
+        # Get heading level
+        level = int(heading.name[1])
+
+        headings.append({"text": text, "id": heading_id, "level": level})
+
+    return str(soup), headings
+
+
+def wrap_in_full_zensical_template(
+    template: str, notebook_html: str, title: str, site_name: str, relative_root: str, headings: list[dict]
+) -> str:
+    """Wrap notebook HTML in full Zensical template with navigation and TOC."""
+
+    # Replace title
+    template = re.sub(
+        r"<title>([^<]*)</title>", f"<title>{title} - {site_name}</title>", template, count=1
+    )
+
+    # Update header title to show notebook name
+    # Use a function to avoid regex escape issues with notebook HTML
+    def replace_header(match):
+        return match.group(1) + title + match.group(3)
+
+    template = re.sub(
+        r'(<div class="md-header__topic" data-md-component="header-topic">.*?<span class="md-ellipsis">)(.*?)(</span>)',
+        replace_header,
+        template,
+        flags=re.DOTALL,
+    )
+
+    # Find and replace the main content
+    # Look for the article tag and replace its content
+    content_pattern = r'(<article class="md-content__inner md-typeset">)(.*?)(</article>)'
+
+    notebook_css = """
+<style>
+/* Notebook-specific styling */
+.cell { margin: 1.5rem 0; }
+.text_cell_render { line-height: 1.6; }
+.text_cell_render h1, .text_cell_render h2, .text_cell_render h3 { margin-top: 1.5em; margin-bottom: 0.5em; }
+.text_cell_render p { margin: 0.5em 0; }
+.code_cell { background-color: transparent; }
+.input_area { background-color: var(--md-code-bg-color, #f5f5f5); border-radius: 0.2rem; padding: 1rem; margin: 0.5rem 0; overflow-x: auto; word-wrap: break-word; overflow-wrap: break-word; }
+.input_prompt, .prompt { display: none; }
+.highlight pre { margin: 0; padding: 0; background-color: transparent !important; white-space: pre-wrap; word-wrap: break-word; overflow-wrap: break-word; }
+.output_area { padding: 0.5rem 0; }
+.output_subarea { max-width: 100%; overflow-x: auto; }
+.rendered_html table { border-collapse: collapse; margin: 1em 0; font-size: 0.9em; }
+.rendered_html th, .rendered_html td { border: 1px solid #ddd; padding: 0.5em; }
+.rendered_html th { background-color: var(--md-code-bg-color, #f5f5f5); font-weight: 600; }
+.output_png img { max-width: 100%; height: auto; }
+.anchor-link { display: none !important; }
+.notebook-content { word-wrap: break-word; overflow-wrap: break-word; }
+.notebook-content pre, .notebook-content code { white-space: pre-wrap; word-wrap: break-word; overflow-wrap: break-word; }
+</style>
+"""
+
+    new_content = f"""
+<h1>{title}</h1>
+<div class="notebook-content">
+{notebook_html}
+</div>
+"""
+
+    # Use a function to avoid regex escape issues with notebook HTML
+    def replace_content(match):
+        return match.group(1) + new_content + match.group(3)
+
+    template = re.sub(content_pattern, replace_content, template, flags=re.DOTALL)
+
+    # Add notebook CSS before </head>
+    template = template.replace("</head>", notebook_css + "</head>")
+
+    # Generate TOC and replace the secondary sidebar
+    if headings:
+        toc_html = generate_toc_html(headings)
+        # Find and replace the TOC sidebar
+        toc_pattern = r'(<div class="md-sidebar md-sidebar--secondary".*?>.*?<div class="md-sidebar__inner">)(.*?)(</div>\s*</div>\s*</div>)'
+
+        def replace_toc(match):
+            return match.group(1) + toc_html + match.group(3)
+
+        template = re.sub(toc_pattern, replace_toc, template, flags=re.DOTALL)
+
+    # Fix relative paths for assets
+    if relative_root != "./":
+        template = template.replace('href="assets/', f'href="{relative_root}assets/')
+        template = template.replace('src="assets/', f'src="{relative_root}assets/')
+        template = template.replace('href="css/', f'href="{relative_root}css/')
+        template = template.replace('href="javascripts/', f'href="{relative_root}javascripts/')
+
+    # Fix navigation links to be absolute from root
+    # Convert relative navigation links like href="guides/" to href="../../guides/"
+    if relative_root != "./":
+        # Parse HTML to find and fix navigation links
+        soup = BeautifulSoup(template, "html.parser")
+
+        # Find all navigation links (exclude external links, anchors, and asset links)
+        for link in soup.find_all("a", href=True):
+            href = link["href"]
+            # Skip if it's an external link, anchor, or already has relative_root
+            if (
+                href.startswith("http")
+                or href.startswith("#")
+                or href.startswith(relative_root)
+                or href.startswith("assets/")
+                or href.startswith("css/")
+                or href.startswith("javascripts/")
+            ):
+                continue
+
+            # Convert relative navigation paths to absolute from root
+            # Examples: "guides/" -> "../../guides/", "api/" -> "../../api/"
+            if not href.startswith("../"):
+                link["href"] = relative_root + href
+
+        template = str(soup)
+
+    return template
+
+
+def generate_toc_html(headings: list[dict]) -> str:
+    """Generate TOC HTML from headings list."""
+    if not headings:
+        return "<p>No table of contents</p>"
+
+    toc_html = '<nav class="md-nav md-nav--secondary" aria-label="Table of contents">'
+    toc_html += '<label class="md-nav__title" for="__toc">Table of contents</label>'
+    toc_html += '<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>'
+
+    for heading in headings:
+        level_class = f"md-nav__item--nested" if heading["level"] == 1 else ""
+        indent = "  " * (heading["level"] - 1)
+
+        toc_html += f'{indent}<li class="md-nav__item {level_class}">'
+        toc_html += f'<a href="#{heading["id"]}" class="md-nav__link">{heading["text"]}</a>'
+        toc_html += "</li>"
+
+    toc_html += "</ul></nav>"
+    return toc_html
 
 
 if __name__ == "__main__":
