@@ -1,6 +1,7 @@
 ---
 tags:
   - 👷 Staff
+icon: lucide/circle-fading-arrow-up
 ---
 
 # Update data

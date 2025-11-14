@@ -1,3 +1,8 @@
+---
+icon: lucide/layout-grid
+---
+
+# MDIMs and Explorers
 
 !!! warning "MDIMs and Explorer steps are a work in progress"
     We are currently working to align MDIMs and Explorers as much as possible. While they are presented in different ways on our site, the underlying data structure should be as similar as possible (if not identical). Learn more about the initial motivation [:fontawesome-brands-github: here](https://github.com/owid/etl/issues/3992).

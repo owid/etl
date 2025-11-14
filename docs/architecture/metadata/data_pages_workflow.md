@@ -1,6 +1,7 @@
 ---
 tags:
     - 👷 Staff
+icon: material/format-text-wrapping-overflow
 ---
 # Data Pages Workflow
 

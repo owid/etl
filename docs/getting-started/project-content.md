@@ -1,3 +1,9 @@
+---
+icon: material/folder
+---
+
+# Project content
+
 There are various folders and directories in the `etl` project. In this entry we summarize the most important ones.
 
 You don't need to understand all of them to get started, but as you work more with the ETL you will likely find yourself exploring some of these folders.

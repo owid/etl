@@ -1,3 +1,6 @@
+---
+icon: lucide/circle-question-mark
+---
 ## I see that there are multiple fields to define the name of an indicator. When should I use what?
 
 We currently have many fields related to an indicator's title, so you might be wondering when you should use one or the other. Find below a summary on their different use cases.

@@ -1,6 +1,7 @@
 ---
 tags:
   - 👷 Staff
+icon: lucide/gallery-vertical
 ---
 # Publish indicator and its metadata with Google Sheets
 

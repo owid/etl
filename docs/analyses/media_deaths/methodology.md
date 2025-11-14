@@ -1,3 +1,7 @@
+---
+icon: lucide/newspaper
+---
+
 # Does the news reflect what we die from?
 
 !!! info "This is the methodology for the data analysis used in our article [:material-file-document: Does the news reflect what we die from?](https://ourworldindata.org/does-the-news-reflect-what-we-die-from)"

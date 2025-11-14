@@ -1,3 +1,7 @@
+---
+icon: lucide/lightbulb
+---
+
 # ETL tips and tricks
 
 !!! info "Help us improve this page!"

@@ -1,3 +1,7 @@
+---
+icon: material/account-school
+---
+
 # First steps
 
 The ETL is the way we ingest, process and publish data at Our World in Data (OWID). The ETL contains a set of recipes (or steps) to build datasets, which are then made available from [OWID's catalog](../api/index.md#data-apis){ data-preview }. A step is a python script and has a [URI](../architecture/design/uri.md#uri){ data-preview }. URIs allow us to uniquely identify any step (or node) throughout the whole ETL. This allows us to reference datasets (and use them) when building a new one.

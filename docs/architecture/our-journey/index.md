@@ -1,3 +1,6 @@
+---
+icon: lucide/footprints
+---
 # Our journey
 
 We generally do not produce data but instead stand on the shoulders of big institutions like the UN and World Bank (and many others), as well as the work of individual researchers and small research groups. Our role is to promote the work of high-quality data providers and share it with the public in a context that makes it understandable.

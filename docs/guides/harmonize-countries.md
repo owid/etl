@@ -1,3 +1,6 @@
+---
+icon: lucide/whole-word
+---
 A crucial step in the ETL process is harmonizing country names. This is because different datasets or providers may use different names to refer to the same country. We want to keep country names consistent, and use names from our standardised list.
 
 !!! info

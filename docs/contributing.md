@@ -1,3 +1,7 @@
+---
+icon: material/account-group
+---
+
 # Contributing
 
 Thank you for your interest in contributing to Our World in Data!

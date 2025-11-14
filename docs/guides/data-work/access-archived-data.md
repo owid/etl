@@ -1,3 +1,8 @@
+---
+icon: lucide/package-open
+---
+
+# Access archived data
 Sometimes, you may need to access archived datasets or snapshots and compare them with current datasets. Below, we present three strategies for different use cases.
 
 

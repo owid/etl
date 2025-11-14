@@ -2,6 +2,7 @@
 tags:
   - 👷 Staff
 status: new
+icon: lucide/sparkles
 ---
 
 # AI-powered workflow

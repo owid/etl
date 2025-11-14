@@ -226,24 +226,25 @@ nav:
                   - "guides/index.md"
                   - Data work:
                             - "guides/data-work/index.md"
-                            - AI workflow: "guides/data-work/ai-workflow.md"
                             - New data: "guides/data-work/add-data.md"
                             - Updating data: "guides/data-work/update-data.md"
                             - Update charts: "guides/data-work/update-charts.md"
                             - MDIMs and Explorers: "guides/data-work/mdims.md"
                             - Export data: "guides/data-work/export-data.md"
-                            - Access archived data: "guides/data-work/access-archived-data.md"
-                            - Publish indicator + metadata: "guides/data-work/create-gsheet.md"
-                  - Admin:
+                            - Publish indicator metadata: "guides/data-work/create-gsheet.md"
                             - Wizard: "guides/wizard.md"
+                            - AI workflow: "guides/data-work/ai-workflow.md"
                             - CLI: "guides/etl-cli.md"
                   - Other tasks:
                             - Harmonize country names: "guides/harmonize-countries.md"
+                            - Access archived data: "guides/data-work/access-archived-data.md"
                             - Automatic data updates: "guides/autoupdate-cli.md"
                             - Private datasets: "guides/private-import.md"
                             - Pull requests: "guides/pull-requests.md"
                             - Tips and tricks in ETL: "guides/etl-tips.md"
-                            - Backport from database: "guides/backport.md"
+                            - Backport from db: "guides/backport.md"
+                  - Documentation:
+                            - Add a technical publication: "dev/docs.md"
                   - Settings & servers:
                             - Upgrade Python version: "guides/upgrade-python-version.md"
                             - Environments: "guides/environment.md"
@@ -251,7 +252,6 @@ nav:
                             - Public servers: "guides/sharing-external.md"
                             - Types in Tables: "guides/types-tables.md"
                             - OpenAI setup: "guides/openai.md"
-                            - Edit the documentation: "dev/docs.md"
                             - Google API: "guides/configure-google-api.md"
 
         - Design principles:

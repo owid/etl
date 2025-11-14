@@ -1,6 +1,7 @@
 ---
 tags:
   - 👷 Staff
+icon: material/code-json
 ---
 
 !!! tip "Working with YAML files in VS Code"

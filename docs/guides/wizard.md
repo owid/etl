@@ -1,3 +1,7 @@
+---
+icon: material/wizard-hat
+---
+
 # Wizard
 
 !!! info

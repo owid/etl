@@ -1,6 +1,7 @@
 ---
 tags:
   - 👷 Staff
+icon: lucide/calendar-clock
 ---
 
 # Automatic snapshot updates

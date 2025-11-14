@@ -1,4 +1,6 @@
-
+---
+icon: material/api
+---
 # ETL catalog API
 
 The ETL catalog API makes it possible to access the dataframes our data scientists use to prepare the data for our public charts.

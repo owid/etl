@@ -1,6 +1,7 @@
 ---
 tags:
     - 👷 Staff
+icon: material/plus
 ---
 # New data
 
