@@ -9,10 +9,11 @@ with navigation, TOC, and search functionality.
 
 import re
 from pathlib import Path
+from typing import cast
 
 import click
 import nbformat
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Tag
 from nbconvert import HTMLExporter
 
 
@@ -138,7 +139,10 @@ def extract_headings_from_html(html: str) -> tuple[str, list[dict]]:
     soup = BeautifulSoup(html, "html.parser")
     headings = []
 
-    for heading in soup.find_all(["h1", "h2", "h3"]):
+    for heading_elem in soup.find_all(["h1", "h2", "h3"]):
+        # Cast to Tag type for proper type checking
+        heading = cast(Tag, heading_elem)
+
         # Get heading text
         text = heading.get_text(strip=True)
         # Remove anchor link symbols
@@ -150,10 +154,12 @@ def extract_headings_from_html(html: str) -> tuple[str, list[dict]]:
         heading_id = heading_id.strip("-")
 
         # Add ID to the heading element
-        heading["id"] = heading_id
+        heading.attrs["id"] = heading_id
 
-        # Get heading level
-        level = int(heading.name[1])
+        # Get heading level (heading.name is guaranteed to be h1/h2/h3 from find_all)
+        heading_name = heading.name
+        assert heading_name is not None, "Heading name should not be None"
+        level = int(heading_name[1])
 
         headings.append({"text": text, "id": heading_id, "level": level})
 
