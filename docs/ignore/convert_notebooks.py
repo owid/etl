@@ -105,7 +105,7 @@ def convert_notebooks(docs_dir: Path, output_dir: Path, verbose: bool):
                 zensical_template,
                 body_with_ids,
                 title=notebook_title,
-                site_name="ETL documentation",
+                site_name="OWID's Technical Documentation",
                 relative_root=relative_root,
                 headings=headings,
             )

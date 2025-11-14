@@ -1,6 +1,6 @@
 [project]
 # Top-level settings
-site_name = "ETL documentation"
+site_name = "OWID's Technical Documentation"
 site_url = "https://docs.owid.io/projects/etl/"
 site_description = "Learn about the ETL pipeline at Our World in Data."
 site_author = "Our World in Data"
