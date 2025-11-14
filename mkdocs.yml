@@ -97,6 +97,12 @@ extra:
                   link: https://bsky.app/profile/ourworldindata.org
                 - icon: fontawesome/brands/x-twitter
                   link: https://twitter.com/ourworldindata
+                - icon: fontawesome/brands/facebook
+                  link: https://facebook.com/ourworldindata
+                - icon: fontawesome/brands/threads
+                  link: https://threads.com/ourworldindata
+                - icon: fontawesome/brands/linkedin
+                  link: https://linkedin.com/company/ourworldindata
 
 # Extensions
 markdown_extensions:
@@ -213,6 +219,7 @@ nav:
         - Getting started:
                   - "getting-started/index.md"
                   - Installation: "getting-started/working-environment.md"
+                  - Project content: "getting-started/project-content.md"
                   - First steps: "getting-started/building-datasets.md"
                   - Contributing: "contributing.md"
         - Guides:
@@ -226,19 +233,17 @@ nav:
                             - MDIMs and Explorers: "guides/data-work/mdims.md"
                             - Export data: "guides/data-work/export-data.md"
                             - Access archived data: "guides/data-work/access-archived-data.md"
-                            - Publish indicator and metadata with GSheet: "guides/data-work/create-gsheet.md"
+                            - Publish indicator + metadata: "guides/data-work/create-gsheet.md"
                   - Admin:
                             - Wizard: "guides/wizard.md"
                             - CLI: "guides/etl-cli.md"
                   - Other ETL tasks:
                             - Harmonize country names: "guides/harmonize-countries.md"
-                            - Backport from database: "guides/backport.md"
-                            - Regular updates: "guides/auto-regular-updates.md"
-                            - Automatic updates via metadata: "guides/autoupdate-cli.md"
+                            - Automatic data updates: "guides/autoupdate-cli.md"
                             - Pull requests: "guides/pull-requests.md"
-                            - Tips when working with ETL: "guides/etl-tips.md"
-                            - Metadata in data pages: "guides/metadata-play.md"
-                  - Servers & settings:
+                            - Tips and tricks in ETL: "guides/etl-tips.md"
+                            - Backport from database: "guides/backport.md"
+                  - Settings & servers:
                             - Upgrade Python version: "guides/upgrade-python-version.md"
                             - Environments: "guides/environment.md"
                             - Staging servers: "guides/staging-servers.md"
@@ -251,11 +256,8 @@ nav:
 
         - Design principles:
                   - Design principles & workflow: architecture/index.md
-                  - Our journey:
-                            - "architecture/our-journey/index.md"
-                  - Fundamentals:
-                            - Computational graph:
-                                      - Computational graph: "architecture/design/compute-graph/index.md"
+                  - Principles:
+                            - Computational graph: "architecture/design/compute-graph.md"
                             - ETL model: "architecture/design/phases.md"
                             - Data model: "architecture/design/common-format.md"
                             - Features and constraints: "architecture/design/features-constraints.md"
@@ -264,6 +266,8 @@ nav:
                   - ETL steps:
                             - ETL steps: "architecture/workflow/index.md"
                             - Other steps: "architecture/workflow/other-steps.md"
+                  - Our journey:
+                            - "architecture/our-journey/index.md"
         - Metadata:
                   - Metadata: "architecture/metadata/index.md"
                   - Reference: "architecture/metadata/reference/index.md"
@@ -279,9 +283,9 @@ nav:
                   - API: "api/index.md"
                   - Charts API: "api/chart-api.md"
                   - ETL catalog API: "api/catalog-api.md"
-                  - Example API usage: "api/example-usage.md"
                   - Querying data via Datasette: "api/datasette.md"
                   - Maintenance: "api/maintenance.md"
+                  - COVID-19: "api/covid/"
         - Technical publications:
                   - "analyses/index.md"
                   - Does the news reflect what we die from?: "analyses/media_deaths/methodology.md"
