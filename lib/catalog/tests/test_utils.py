@@ -2,7 +2,7 @@ import pandas as pd
 import pytest
 
 from owid.catalog import Origin, Table, VariableMeta, VariablePresentationMeta
-from owid.catalog.utils import hash_any, underscore
+from owid.catalog.utils import hash_any, remove_details_on_demand, underscore
 
 
 def test_underscore():
@@ -160,3 +160,73 @@ def test_hash_any():
         presentation=VariablePresentationMeta(title_public="Title public"),
     )
     assert hash_any(meta) == 6982634015113220894
+
+
+def test_remove_details_on_demand():
+    # Test with single DoD reference
+    assert remove_details_on_demand("This is a [description](#dod:something).") == "This is a description."
+
+    # Test with multiple DoD references in same text (the original bug case)
+    input_text = (
+        "Measured in [terawatt-hours](#dod:watt-hours). "
+        "Low-carbon sources correspond to renewables and nuclear power, "
+        "that produce significantly less [greenhouse-gas emissions](#dod:ghgemissions) than fossil fuels. "
+        "Renewables include solar, wind, hydropower, bioenergy, geothermal, wave, and tidal."
+    )
+    expected = (
+        "Measured in terawatt-hours. "
+        "Low-carbon sources correspond to renewables and nuclear power, "
+        "that produce significantly less greenhouse-gas emissions than fossil fuels. "
+        "Renewables include solar, wind, hydropower, bioenergy, geothermal, wave, and tidal."
+    )
+    assert remove_details_on_demand(input_text) == expected
+
+    # Test with no DoD references - should return unchanged
+    assert remove_details_on_demand("This is plain text.") == "This is plain text."
+
+    # Test with multiple DoDs in same sentence
+    assert (
+        remove_details_on_demand("The [value](#dod:term1) is the [measurement](#dod:term2) of [something](#dod:term3).")
+        == "The value is the measurement of something."
+    )
+
+    # Test with DoD at the beginning
+    assert (
+        remove_details_on_demand("[Temperature](#dod:temp) is measured in celsius.")
+        == "Temperature is measured in celsius."
+    )
+
+    # Test with DoD at the end
+    assert remove_details_on_demand("This measures [energy](#dod:energy)") == "This measures energy"
+
+    # Test that regular markdown links are NOT affected
+    assert (
+        remove_details_on_demand("See [this link](https://example.com) for more info.")
+        == "See [this link](https://example.com) for more info."
+    )
+
+    # Test with DoD containing special characters in the keyword
+    assert (
+        remove_details_on_demand("Measured in [CO₂ emissions](#dod:co2-emissions-detail).")
+        == "Measured in CO₂ emissions."
+    )
+
+    # Test with multiple DoDs and regular markdown links mixed
+    mixed_text = (
+        "The [energy](#dod:energy) consumption is measured in [terawatt-hours](#dod:watt-hours). "
+        "For more information, see [our methodology](https://example.com/methodology)."
+    )
+    expected_mixed = (
+        "The energy consumption is measured in terawatt-hours. "
+        "For more information, see [our methodology](https://example.com/methodology)."
+    )
+    assert remove_details_on_demand(mixed_text) == expected_mixed
+
+    # Test with brackets in the link text
+    assert remove_details_on_demand("This is [data (in brackets)](#dod:something).") == "This is data (in brackets)."
+
+    # Test with empty text
+    assert remove_details_on_demand("") == ""
+
+    # Test with DoD containing hyphens, underscores, and colons in keyword
+    assert remove_details_on_demand("The [indicator](#dod:complex-key_word:123).") == "The indicator."
