@@ -346,6 +346,24 @@ def wrap_in_full_zensical_template(
   background-color: #2d2d2d;
   color: #e0e0e0;
 }
+
+/* Copy button styling for notebook code cells */
+.input_area .md-clipboard {
+  z-index: 1;
+  width: 1.5rem;
+  height: 1.5rem;
+  color: var(--md-default-fg-color--light);
+}
+
+.input_area .md-clipboard svg {
+  width: 100%;
+  height: 100%;
+  fill: currentColor;
+}
+
+[data-md-color-scheme="slate"] .input_area .md-clipboard {
+  color: var(--md-default-fg-color--lighter);
+}
 </style>
 """
 
