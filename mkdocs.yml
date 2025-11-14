@@ -140,43 +140,43 @@ markdown_extensions:
 
 # Plugins
 plugins:
-      - mkdocs-jupyter:
-              ignore_h1_titles: true
-              include_source: true
-              execute: false
-              allow_errors: false
-              show_input: true
-              include_requirejs: true
-              included: ["*.py", "*.ipynb"]
-              remove_tag_config:
-                    remove_input_tags:
-                          - hidden
-      # The built-in search plugin integrates seamlessly with Material for MkDocs, adding multilingual client-side search with lunr and lunr-languages. ref: https://squidfunk.github.io/mkdocs-material/setup/setting-up-site-search/#built-in-search-plugin
-      - search
-      - exclude:
-              glob:
-                    - ignore/
-      - gen-files:
-              scripts:
-                    - docs/ignore/generate_dynamic_docs.py # or any other name or path
-      - blog
-      # ref: https://github.com/timvink/mkdocs-git-authors-plugin
-      - git-authors:
-              show_email_address: false
-              # authorship_threshold_percent: 1
-              show_contribution: true
-              # show_line_count: true
-              # count_empty_lines: true
-              ignore_authors:
-                    - owidbot
-              sort_authors_by: contribution
-      - git-revision-date-localized
-      - tags:
-              tags_file: tags.md
-      # When the privacy plugin is activated, plotly charts don't show. So we'll deactivate it.
-      # - privacy
-      # ref: https://squidfunk.github.io/mkdocs-material/reference/images/
-      - glightbox
+        - mkdocs-jupyter:
+                  ignore_h1_titles: true
+                  include_source: true
+                  execute: false
+                  allow_errors: false
+                  show_input: true
+                  include_requirejs: true
+                  included: ["*.py", "*.ipynb"]
+                  remove_tag_config:
+                          remove_input_tags:
+                                  - hidden
+        # The built-in search plugin integrates seamlessly with Material for MkDocs, adding multilingual client-side search with lunr and lunr-languages. ref: https://squidfunk.github.io/mkdocs-material/setup/setting-up-site-search/#built-in-search-plugin
+        - search
+        - exclude:
+                  glob:
+                          - ignore/
+        - gen-files:
+                  scripts:
+                          - docs/ignore/generate_dynamic_docs.py # or any other name or path
+        - blog
+        # ref: https://github.com/timvink/mkdocs-git-authors-plugin
+        - git-authors:
+                  show_email_address: false
+                  # authorship_threshold_percent: 1
+                  show_contribution: true
+                  # show_line_count: true
+                  # count_empty_lines: true
+                  ignore_authors:
+                          - owidbot
+                  sort_authors_by: contribution
+        - git-revision-date-localized
+        - tags:
+                  tags_file: tags.md
+        # When the privacy plugin is activated, plotly charts don't show. So we'll deactivate it.
+        # - privacy
+        # ref: https://squidfunk.github.io/mkdocs-material/reference/images/
+        - glightbox
 
 # CSS config
 extra_css:
@@ -237,9 +237,10 @@ nav:
                   - Admin:
                             - Wizard: "guides/wizard.md"
                             - CLI: "guides/etl-cli.md"
-                  - Other ETL tasks:
+                  - Other tasks:
                             - Harmonize country names: "guides/harmonize-countries.md"
                             - Automatic data updates: "guides/autoupdate-cli.md"
+                            - Private datasets: "guides/private-import.md"
                             - Pull requests: "guides/pull-requests.md"
                             - Tips and tricks in ETL: "guides/etl-tips.md"
                             - Backport from database: "guides/backport.md"
@@ -248,7 +249,6 @@ nav:
                             - Environments: "guides/environment.md"
                             - Staging servers: "guides/staging-servers.md"
                             - Public servers: "guides/sharing-external.md"
-                            - Private datasets: "guides/private-import.md"
                             - Types in Tables: "guides/types-tables.md"
                             - OpenAI setup: "guides/openai.md"
                             - Edit the documentation: "dev/docs.md"

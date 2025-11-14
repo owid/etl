@@ -38,12 +38,13 @@ nav = [
             { "Wizard" = "guides/wizard.md" },
             { "CLI" = "guides/etl-cli.md" },
         ] },
-        { "Other ETL tasks" = [
+        { "Other tasks" = [
             { "Harmonize country names" = "guides/harmonize-countries.md" },
             { "Automatic data updates" = "guides/autoupdate-cli.md" },
             # { "Regular updates" = "guides/auto-regular-updates.md" },
             { "Pull requests" = "guides/pull-requests.md" },
             { "Tips and tricks in ETL" = "guides/etl-tips.md" },
+            { "Private datasets" = "guides/private-import.md" },
             { "Backport from database" = "guides/backport.md" },
             # { "Metadata in data pages" = "guides/metadata-play.md" },
         ] },
@@ -52,7 +53,6 @@ nav = [
             { "Environments" = "guides/environment.md" },
             { "Staging servers" = "guides/staging-servers.md" },
             { "Public servers" = "guides/sharing-external.md" },
-            { "Private datasets" = "guides/private-import.md" },
             { "Types in Tables" = "guides/types-tables.md" },
             { "OpenAI setup" = "guides/openai.md" },
             { "Edit the documentation" = "dev/docs.md" },
@@ -102,6 +102,8 @@ nav = [
     { "Technical publications" = [
         "analyses/index.md",
         { "Does the news reflect what we die from?" = "analyses/media_deaths/methodology.md" },
+        { "Food supply or world regions" = "analyses/food_supply_of_world_regions/food_supply_of_world_regions.html" },
+        # { "Our COVID work" = "api/covid.md" },
         { "Our COVID work" = "api/covid.md" },
     ] },
 ]
