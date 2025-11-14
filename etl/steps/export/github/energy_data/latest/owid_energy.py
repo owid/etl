@@ -316,5 +316,4 @@ def run() -> None:
     # from etl.data_helpers.misc import compare_tables
     # old = pd.read_csv("https://raw.githubusercontent.com/owid/energy-data/refs/heads/master/owid-energy-data.csv")
     # new = pd.read_csv(f"https://raw.githubusercontent.com/owid/energy-data/refs/heads/{branch}/owid-energy-data.csv")
-    compare_tables(old, new, countries=["World"])
-    compare_tables(old, new)
+    # compare_tables(old, new, countries=["World"])
