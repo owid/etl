@@ -37,7 +37,7 @@ help:
 	@echo '  make watch-all 	Run all tests, watching for changes (including for modules in lib/)'
 	@echo
 
-docs-zensical.build: .venv
+docs.build: .venv
 	@echo '==> Cleaning previous build'
 	rm -rf site/ .cache/
 	mkdir -p .cache
@@ -46,14 +46,14 @@ docs-zensical.build: .venv
 	@echo '==> Building documentation with Zensical'
 	DOCS_BUILD=1 .venv/bin/zensical build -f zensical.toml --clean
 
-docs-zensical.serve: .venv
+docs.serve: .venv
 	DOCS_BUILD=1 .venv/bin/zensical serve -f zensical.toml
 
-docs.build: .venv
+docs-mkdocs.build: .venv
 	@echo '==> Building documentation with MkDocs'
 	.venv/bin/mkdocs build --clean
 
-docs.serve: .venv
+docs-mkdocs.serve: .venv
 	@echo '==> Serving documentation with MkDocs'
 	.venv/bin/mkdocs serve
 
